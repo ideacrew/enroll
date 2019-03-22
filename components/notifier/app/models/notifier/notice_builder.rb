@@ -11,7 +11,7 @@ module Notifier
 
     def notice_recipient
       return OpenStruct.new(hbx_id: "100009") if resource.blank?
-      (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole)) ? resource.person : resource
+      sub_resource? ? resource.person : resource
     end
 
     def construct_notice_object
@@ -37,10 +37,10 @@ module Notifier
     end
 
     def render_envelope(params)
-      template_location = if self.event_name == 'generate_initial_employer_invoice'
+      template_location = if initial_invoice?
                             'notifier/notice_kinds/initial_invoice/invoice_template.html.erb'
                           else
-                            Settings.notices.shop.partials.template
+                            envelope
                           end
        Notifier::NoticeKindsController.new.render_to_string({
         :template => template_location,
@@ -93,7 +93,7 @@ module Notifier
         encoding: 'utf8',
         header: {
           content: ApplicationController.new.render_to_string({
-            template: Settings.notices.shop.partials.header,
+            template: header,
             layout: false,
             locals: {notice: self, recipient: notice_recipient}
             }),
@@ -103,7 +103,7 @@ module Notifier
       if dc_exchange?
         options.merge!({footer: {
           content: ApplicationController.new.render_to_string({
-            template: Settings.notices.shop.partials.footer,
+            template: footer,
             layout: false,
             locals: {notice: self}
           })
@@ -149,7 +149,7 @@ module Notifier
     end
 
     def upload_to_amazonS3
-      if self.event_name == 'generate_initial_employer_invoice'
+      if initial_invoice?
         Aws::S3Storage.save(notice_path, 'invoices', file_name)
       else
         Aws::S3Storage.save(notice_path, 'notices')
@@ -159,7 +159,7 @@ module Notifier
     end
 
     def file_name
-      if self.event_name == 'generate_initial_employer_invoice'
+      if initial_invoice?
         "#{resource.organization.hbx_id}_#{TimeKeeper.datetime_of_record.strftime("%m%d%Y")}_INVOICE_R.pdf"
       end
     end
@@ -194,11 +194,31 @@ module Notifier
       UserMailer.generic_notice_alert(recipient_name,subject,recipient_to).deliver_now
     end
 
-    def send_generic_notice_alert_to_broker
-      if resource.is_a?(EmployerProfile) && resource.broker_agency_profile.present?
-        broker_name = resource.broker_agency_profile.primary_broker_role.person.full_name
-        broker_email = resource.broker_agency_profile.primary_broker_role.email_address
-        UserMailer.generic_notice_alert_to_ba(broker_name, broker_email, resource.legal_name.titleize).deliver_now
+    def send_generic_notice_alert_to_broker_and_ga
+      if resource.is_a?(EmployerProfile)
+        if resource.broker_agency_profile.present?
+          broker_name = resource.broker_agency_profile.primary_broker_role.person.full_name
+          broker_email = resource.broker_agency_profile.primary_broker_role.person.work_email_or_best
+          UserMailer.generic_notice_alert_to_ba_and_ga(broker_name, broker_email, resource.legal_name.titleize).deliver_now
+        end
+        if resource.general_agency_profile.present?
+          general_agent_name = resource.general_agency_profile.primary_staff.person.full_name
+          ga_email = resource.general_agency_profile.primary_staff.person.work_email_or_best
+          UserMailer.generic_notice_alert_to_ba_and_ga(general_agent_name, ga_email, resource.legal_name.titleize).deliver_now
+        end
+      end
+
+      if resource.is_a?(EmployeeRole)
+        if resource.employer_profile.broker_agency_profile.present?
+          broker_name = resource.employer_profile.broker_agency_profile.primary_broker_role.person.full_name
+          broker_email = resource.employer_profile.broker_agency_profile.primary_broker_role.person.work_email_or_best
+          UserMailer.generic_notice_alert_to_ba_and_ga(broker_name, broker_email, resource.person.full_name.titleize).deliver_now
+        end
+        if resource.employer_profile.general_agency_profile.present?
+          general_agent_name = resource.employer_profile.general_agency_profile.primary_staff.person.full_name
+          ga_email = resource.employer_profile.general_agency_profile.primary_staff.person.work_email_or_best
+          UserMailer.generic_notice_alert_to_ba_and_ga(general_agent_name, ga_email, resource.person.full_name.titleize).deliver_now
+        end
       end
     end
 
@@ -220,7 +240,7 @@ module Notifier
 
     def create_recipient_document(doc_uri)
       receiver = resource
-      receiver = resource.person if (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole))
+      receiver = resource.person if sub_resource?
 
       doc_params = {
         title: notice_filename,
@@ -230,7 +250,7 @@ module Notifier
         format: "application/pdf"
       }
 
-      doc_params[:date] = invoice_date if self.event_name == 'generate_initial_employer_invoice'
+      doc_params[:date] = invoice_date if initial_invoice?
       notice = receiver.documents.build(doc_params)
 
       if notice.save
@@ -241,18 +261,14 @@ module Notifier
     end
 
     def document_subject
-      if self.event_name == 'generate_initial_employer_invoice'
-        'initial_invoice'
-      else
-        'notice'
-      end
+      initial_invoice? ? 'initial_invoice' : 'notice'
     end
 
     def create_secure_inbox_message(notice)
       receiver = resource
-      receiver = resource.person if (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole))
+      receiver = resource.person if sub_resource?
 
-      if self.event_name == 'generate_initial_employer_invoice'
+      if initial_invoice?
         body = "Your Initial invoice is now available in your employer profile under Billing tab. Thank You"
       else
         body = "<br>You can download the notice by clicking this link " +
@@ -265,6 +281,26 @@ module Notifier
 
     def clear_tmp
       File.delete(notice_path)
+    end
+
+    def initial_invoice?
+      self.event_name == 'generate_initial_employer_invoice'
+    end
+
+    def sub_resource?
+      (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole))
+    end
+
+    def envelope
+      shop_market? ? Settings.notices.shop.partials.template : Settings.notices.individual.partials.template
+    end
+
+    def header
+      shop_market? ? Settings.notices.shop.partials.header : Settings.notices.individual.partials.header
+    end
+
+    def footer
+      shop_market? ? Settings.notices.shop.partials.footer : Settings.notices.individual.partials.footer
     end
   end
 end

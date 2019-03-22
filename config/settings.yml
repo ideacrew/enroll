@@ -31,6 +31,19 @@ contact_center:
   email_address: "info@dchealthlink.com"
 
 notices:
+
+  individual_market:
+    mail_address:
+      address_1: "PO Box 44018"
+      city: "Washington"
+      zip_code: "20026"
+
+  shop_market:
+    mail_address:
+      address_1: "1225 I Street, NW"
+      address_2: "Suite 400"
+      zip_code: "20005"
+
   mailing_address:
     address_1:
     address_2:
@@ -47,6 +60,15 @@ notices:
       template: "notifier/notice_kinds/template.html.erb"
       header: "notices/shared/shop_header.html.erb"
       footer: "notices/shared/shop_footer.html.erb"
+  individual:
+    attachments:
+      non_discrimination_attachment: "shop_non_discrimination_attachment.pdf"
+      envelope_without_address: "taglines.pdf"
+      employee_appeal_rights: "employee_appeal_rights.pdf"
+    partials:
+      template: "notifier/notice_kinds/template.html.erb"
+      header: "notices/shared/shop_header.html.erb"
+      footer: "notices/shared/shop_footer.html.erb" 
 
 aca:
   state_name: "District of Columbia"
@@ -59,7 +81,7 @@ aca:
 #
 
   individual_market:
-    monthly_enrollment_due_on: 16
+    monthly_enrollment_due_on: 15
     verification_outstanding_window:
       days: 0
     verification_due:
@@ -67,10 +89,11 @@ aca:
 
     open_enrollment:
       start_on: <%= Date.new(2018,11,1) %>
-      end_on: <%= Date.new(2019,01,31) %>
+      end_on: <%= Date.new(2019,02,8) %>
     upcoming_open_enrollment:
       start_on: <%= Date.new(2019,11,1) %>
       end_on: <%= Date.new(2020,01,31) %>
+
     dc_resident_application: true
     transition_family_members_link: true
 
@@ -141,19 +164,6 @@ aca:
     transmit_employers_immediately: false
     transmit_scheduled_employers: true
     employer_transmission_day_of_month: 16
-
-notices:
-  individual_market:
-    mail_address:
-      address_1: "PO Box 44018"
-      city: "Washington"
-      zip_code: "20026"
-
-  shop_market:
-    mail_address:
-      address_1: "1225 I Street, NW"
-      address_2: "Suite 400"
-      zip_code: "20005"
 
 paper_notice: 'paper-notices'
 # Note: Remote Aceess keys ad URL's Provided by DC checkbook

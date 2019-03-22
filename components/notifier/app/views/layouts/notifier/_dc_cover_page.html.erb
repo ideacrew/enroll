@@ -1,5 +1,5 @@
 <div class="page-break">
-  <%= render partial: 'notices/shared/logo_and_address_shop', :locals => {notice: notice} %>
+  <%= render partial: 'shared/logo_and_address', :locals => {notice: notice}  %>
 
   <% if recipient.shop? %>
     <%= render partial: 'layouts/notifier/dc_shop_address', :locals => {notice: notice, show_mpi_indicator: false, recipient: recipient, notice_recipient: notice_recipient} %>
