@@ -192,4 +192,16 @@ describe Invitation do
       end
     end
   end
+
+  context '.invite_employee_for_open_enrollment' do
+    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+    let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id,  hired_on: "2014-11-11") }
+    let(:invitation) { Invitation.new }
+
+    it 'should send invitation' do
+      allow(Invitation).to receive(:create).and_return invitation
+      expect(invitation).to receive(:send_employee_invitation_for_open_enrollment!)
+      Invitation.invite_employee_for_open_enrollment!(census_employee)
+    end
+  end
 end

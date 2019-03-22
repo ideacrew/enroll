@@ -601,7 +601,7 @@ class CensusEmployee < CensusMember
       census_employees = CensusEmployee.where(:"hired_on" => date).non_terminated
       census_employees.each do |ce|
         begin
-          Invitation.invite_future_employee_for_open_enrollment!(ce)
+          Invitation.invite_employee_for_open_enrollment!(ce)
         rescue Exception => e
           (Rails.logger.error { "Unable to deliver open enrollment notice to #{ce.full_name} due to --- #{e}" }) unless Rails.env.test?
         end
