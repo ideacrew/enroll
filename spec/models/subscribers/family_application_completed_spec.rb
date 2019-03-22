@@ -181,7 +181,7 @@ describe Subscribers::FamilyApplicationCompleted do
       let(:consumer_role) { Factories::EnrollmentFactory.construct_consumer_role(ua_params,user) }
 
       let(:family_db) { Family.where(e_case_id: parser.integrated_case_id).first }
-      let(:tax_household_db) { family_db.active_household.latest_active_tax_household }
+      let(:tax_household_db) { family_db.active_household.latest_active_tax_households.first }
       let(:person_db) { family_db.primary_applicant.person }
       let(:consumer_role_db) { person_db.consumer_role }
 

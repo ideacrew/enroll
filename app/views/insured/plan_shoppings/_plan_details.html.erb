@@ -92,7 +92,8 @@
               <%= render partial: "shared/csr_eligible_reminder_modal", locals: { plan: plan } %>
               <% else %>
               <%= link_to("Select Plan", "javascript:void(0)", {class: 'btn btn-default btn-right plan-select select', data: {url: thankyou_insured_plan_shopping_path(@hbx_enrollment, plan_id: plan.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)}}) %>
-            <% end %>
+              <% end %>
+          <% end %>
           <% else %>
             <%= link_to("Select Plan", "javascript:void(0)", {class: 'btn btn-default btn-right plan-select select', data: {url: thankyou_insured_plan_shopping_path(@hbx_enrollment, plan_id: plan.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)}}) %>
           <% end %>
