@@ -2851,6 +2851,162 @@ describe HbxEnrollment, dbclean: :after_all do
     end
   end
 
+  describe "#has_active_enrollment_exists_for_reinstated_date??" do
+
+    context "for Individual market" do
+      let(:ivl_family)        { FactoryGirl.create(:family, :with_primary_family_member) }
+
+      let(:ivl_enrollment)    {
+        FactoryGirl.create(:hbx_enrollment,
+                           household: ivl_family.latest_household,
+                           coverage_kind: "health",
+                           effective_on: TimeKeeper.date_of_record.last_year.beginning_of_month,
+                           enrollment_kind: "open_enrollment",
+                           kind: "individual",
+                           aasm_state: "coverage_terminated",
+                           terminated_on: TimeKeeper.date_of_record.end_of_month)
+      }
+
+      let!(:ivl_enrollment2)    {
+        FactoryGirl.create(:hbx_enrollment,
+                           household: ivl_family.latest_household,
+                           coverage_kind: "health",
+                           enrollment_kind: "open_enrollment",
+                           kind: "individual",
+                           aasm_state: "coverage_selected",
+                           effective_on: TimeKeeper.date_of_record.end_of_month + 1.day)
+      }
+
+
+      it "should return true if active enrollment exists for reinstated date " do
+        expect(ivl_enrollment.has_active_enrollment_exists_for_reinstated_date?).to be_truthy
+      end
+
+      it "should return false if no active enrollment exists for reinstated date" do
+        ivl_enrollment2.update_attributes(effective_on: TimeKeeper.date_of_record.beginning_of_year + 2.days)
+        ivl_enrollment2.reload
+        expect(ivl_enrollment.has_active_enrollment_exists_for_reinstated_date?).to be_falsey
+      end
+    end
+
+    context "for SHOP market" do
+      let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'active', start_on: TimeKeeper.date_of_record.beginning_of_year)}
+      let(:benefit_group) { employer_profile.published_plan_year.benefit_groups.first}
+
+      let!(:employer_profile2) { create(:employer_with_planyear, plan_year_state: 'active', start_on: TimeKeeper.date_of_record.beginning_of_year)}
+      let(:benefit_group2) { employer_profile.published_plan_year.benefit_groups.first}
+
+      let!(:census_employees){
+        FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
+        employee = FactoryGirl.create :census_employee, employer_profile: employer_profile
+        employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
+      }
+
+      let!(:census_employees2){
+        FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile2
+        employee = FactoryGirl.create :census_employee, employer_profile: employer_profile2
+        employee.add_benefit_group_assignment benefit_group2, benefit_group2.start_on
+      }
+
+      let!(:plan) {
+        FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: benefit_group.start_on.year, hios_id: "11111111122302-01", csr_variant_id: "01")
+      }
+
+      let(:ce) { employer_profile.census_employees.non_business_owner.first }
+      let(:ce2) { employer_profile2.census_employees.non_business_owner.first }
+
+      let!(:family) {
+        person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
+        employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
+        ce.update_attributes({employee_role: employee_role})
+        Family.find_or_build_from_employee_role(employee_role)
+      }
+
+      let(:person) { family.primary_applicant.person }
+
+      let!(:employee_role2) { FactoryGirl.create(:employee_role, person: person, census_employee: ce2, employer_profile: employer_profile2)}
+
+      let!(:enrollment) {
+        FactoryGirl.create(:hbx_enrollment,
+                           household: family.active_household,
+                           coverage_kind: "health",
+                           effective_on: TimeKeeper.date_of_record.beginning_of_year,
+                           enrollment_kind: "open_enrollment",
+                           kind: "employer_sponsored",
+                           benefit_group_id: benefit_group.id,
+                           employee_role_id: person.active_employee_roles.first.id,
+                           benefit_group_assignment_id: ce.active_benefit_group_assignment.id,
+                           plan_id: plan.id,
+                           aasm_state: "coverage_terminated",
+                           terminated_on: benefit_group.plan_year.end_on - 2.month
+        )
+      }
+
+      let!(:enrollment2) {
+        FactoryGirl.create(:hbx_enrollment,
+                           household: family.active_household,
+                           coverage_kind: "health",
+                           enrollment_kind: "open_enrollment",
+                           kind: "employer_sponsored",
+                           benefit_group_id: benefit_group.id,
+                           employee_role_id: person.active_employee_roles.first.id,
+                           benefit_group_assignment_id: ce.active_benefit_group_assignment.id,
+                           plan_id: plan.id,
+                           aasm_state: "coverage_selected",
+                           effective_on: (benefit_group.plan_year.end_on - 2.month) + 1.day
+        )
+      }
+
+      it "should return true if active enrollment exists for reinstated date " do
+        expect(enrollment.has_active_enrollment_exists_for_reinstated_date?).to be_truthy
+      end
+
+      it "should return false if no active enrollment exists for reinstated date" do
+        enrollment2.update_attributes(effective_on: benefit_group.plan_year.end_on - 1.month)
+        enrollment2.reload
+        expect(enrollment.has_active_enrollment_exists_for_reinstated_date?).to be_falsey
+      end
+
+      context "with employer_sponsored & active cobra enrollment" do
+
+        it "should return true if active enrollment exists for reinstated date " do
+          enrollment2.update_attributes(kind: "employer_sponsored_cobra")
+          enrollment2.reload
+          expect(enrollment.has_active_enrollment_exists_for_reinstated_date?).to be_truthy
+        end
+
+        it "should return false if no active enrollment exists for reinstated date" do
+          enrollment2.update_attributes(kind: "employer_sponsored_cobra", effective_on: benefit_group.plan_year.end_on - 1.month)
+          enrollment2.reload
+          expect(enrollment.has_active_enrollment_exists_for_reinstated_date?).to be_falsey
+        end
+      end
+
+      context "enrollment from two mutiple employers." do
+
+        let!(:enrollment3) {
+          FactoryGirl.create(:hbx_enrollment,
+                             household: family.active_household,
+                             coverage_kind: "health",
+                             effective_on: TimeKeeper.date_of_record.beginning_of_year,
+                             enrollment_kind: "open_enrollment",
+                             kind: "employer_sponsored",
+                             benefit_group_id: benefit_group2.id,
+                             employee_role_id: person.active_employee_roles.select{|e| e.employer_profile_id == employer_profile2.id}.first.id,
+                             benefit_group_assignment_id: ce2.active_benefit_group_assignment.id,
+                             plan_id: plan.id,
+                             aasm_state: "coverage_terminated",
+                             terminated_on: benefit_group2.plan_year.end_on - 2.month
+          )
+        }
+
+        it "should return false when reinstated date enrollment exits with different employer " do
+          expect(enrollment3.has_active_enrollment_exists_for_reinstated_date?).to be_falsey
+        end
+      end
+    end
+  end
+
   context "Cancel / Terminate Previous Enrollments for IVL" do
     attr_reader :enrollment, :household, :coverage_household
 

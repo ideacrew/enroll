@@ -1140,10 +1140,12 @@ class HbxEnrollment
     end
   end
 
-  def reinstated_enrollment_exists?
-    family.active_household.hbx_enrollments.where({:kind => self.kind, 
-      :plan_id => self.plan_id, :effective_on => self.terminated_on.next_day, 
-      :coverage_kind => self.coverage_kind}).enrolled.any?{|e| e.workflow_state_transitions.where(:to_state => 'coverage_reinstated').any?}
+  def has_active_enrollment_exists_for_reinstated_date?
+    enrollment_kind = is_shop? ? ['employer_sponsored', 'employer_sponsored_cobra'] : (Kinds - ["employer_sponsored", "employer_sponsored_cobra"])
+    family.active_household.hbx_enrollments.where({:kind.in => enrollment_kind,
+                                                   :effective_on => self.terminated_on.next_day,
+                                                   :coverage_kind => self.coverage_kind,
+                                                   :employee_role_id => self.employee_role_id}).enrolled_and_renewal.any?
   end
 
   def notify_of_coverage_start(publish_to_carrier)
@@ -1160,7 +1162,7 @@ class HbxEnrollment
   end
 
   def reinstate(edi: false)
-    return if reinstated_enrollment_exists?
+    return if has_active_enrollment_exists_for_reinstated_date?
     reinstate_enrollment = Enrollments::Replicator::Reinstatement.new(self, terminated_on.next_day).build
 
     if self.is_shop?

@@ -29,7 +29,7 @@
               <td id="employee_status" class="hidden"><%= employee_eligibility_status(enrollment) %></td>
               <td id="enrollment_can_be_reinstated" class="hidden"><%= enrollment.can_be_reinstated? %></td>
               <td id="enrollment_market" class="hidden"><%= enrollment.market_name %></td>
-              <td id="active_enroll_exists_with_reinstate_date" class="hidden"><%= enrollment.reinstated_enrollment_exists? %></td>
+              <td id="active_enroll_exists_with_reinstate_date" class="hidden"><%= enrollment.has_active_enrollment_exists_for_reinstated_date? %></td>
               <td><%= enrollment.effective_on.year %></td>
               <td><%= enrollment.effective_on %></td>
               <td><%= enrollment.terminated_on %></td>
