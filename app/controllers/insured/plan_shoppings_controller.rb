@@ -140,6 +140,10 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def print_waiver
     @hbx_enrollment = HbxEnrollment.find(params.require(:id))
+    predecessor_enrollment = @hbx_enrollment.parent_enrollment
+    unless predecessor_enrollment.nil?
+      trigger_notice_observer(predecessor_enrollment.employee_role, predecessor_enrollment, "employee_waiver_confirmation")
+    end
   end
 
   def terminate
