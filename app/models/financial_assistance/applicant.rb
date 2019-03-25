@@ -74,6 +74,7 @@ class FinancialAssistance::Applicant
   field :claimed_as_tax_dependent_by, type: BSON::ObjectId
 
   field :is_ia_eligible, type: Boolean, default: false
+  field :is_physically_disabled, type: Boolean
   field :is_medicaid_chip_eligible, type: Boolean, default: false
   field :is_non_magi_medicaid_eligible, type: Boolean, default: false
   field :is_totally_ineligible, type: Boolean, default: false
@@ -149,7 +150,7 @@ class FinancialAssistance::Applicant
   field :has_eligible_health_coverage, type: Boolean
 
   field :workflow, type: Hash, default: { }
-  
+
   embeds_many :incomes,     class_name: "::FinancialAssistance::Income"
   embeds_many :deductions,  class_name: "::FinancialAssistance::Deduction"
   embeds_many :benefits,    class_name: "::FinancialAssistance::Benefit"
