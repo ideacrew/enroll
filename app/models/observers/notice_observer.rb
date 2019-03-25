@@ -342,7 +342,6 @@ module Observers
           organizations.each do|organization|
             begin
               plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'draft').first
-              next if plan_year.benefit_groups.any?(&:is_congress)
               deliver(recipient: organization.employer_profile, event_object: plan_year, notice_event: model_event.event_key.to_s)
             rescue StandardError => e
               Rails.logger.error { "Unable to trigger #{model_event.event_key} notice to #{organization.legal_name} due to #{e.backtrace}" }
@@ -356,7 +355,6 @@ module Observers
           organizations.each do|organization|
             begin
               plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'draft').first
-              next if plan_year.benefit_groups.any?(&:is_congress)
               deliver(recipient: organization.employer_profile, event_object: plan_year, notice_event: model_event.event_key.to_s)
             rescue StandardError => e
               Rails.logger.error { "Unable to trigger #{model_event.event_key} notice to #{organization.legal_name} due to #{e.backtrace}" }
