@@ -19,11 +19,6 @@ module BenefitMarkets
       BenefitMarkets::ApplicationController.helper Rails.application.helpers
     end
 
-    initializer "benefit_markets.assets.precompile" do |app|
-      app.config.assets.paths -= [File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "app/assets/javascripts"))]
-      app.config.assets.paths -= [File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "app/assets/stylesheets"))]
-    end
-
     # config.before_initialize do
     #   Dir.glob(Rails.root + "app/models/**/*time_keeper*.rb").each do |c|
     #     require_dependency(c)
