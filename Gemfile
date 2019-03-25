@@ -88,6 +88,9 @@ group :doc do
 end
 
 group :development do
+  gem 'overcommit'
+  gem 'rubocop', "0.54.0", require: false
+  gem 'rubocop-git'
   gem 'web-console', '2.3.0'
 end
 

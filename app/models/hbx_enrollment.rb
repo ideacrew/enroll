@@ -1227,9 +1227,9 @@ class HbxEnrollment
 
     event :select_coverage, :after => :record_transition do
       transitions from: :shopping,
-                  to: :coverage_selected, after: :propagate_selection, :guard => :can_select_coverage?
+                  to: :coverage_selected, after: [:propagate_selection, :ee_select_plan_during_oe], :guard => :can_select_coverage?
       transitions from: :auto_renewing,
-                  to: :renewing_coverage_selected, after: :propagate_selection, :guard => :can_select_coverage?
+                  to: :renewing_coverage_selected, after: [:propagate_selection, :ee_select_plan_during_oe], :guard => :can_select_coverage?
       transitions from: :auto_renewing_contingent,
                   to: :renewing_contingent_selected, :guard => :can_select_coverage?
     end
@@ -1296,7 +1296,7 @@ class HbxEnrollment
       transitions from: [:coverage_termination_pending, :coverage_selected, :coverage_enrolled, :auto_renewing,
                          :renewing_coverage_selected,:auto_renewing_contingent, :renewing_contingent_selected,
                          :renewing_contingent_transmitted_to_carrier, :renewing_contingent_enrolled,
-                          :unverified, :coverage_expired],
+                          :unverified, :coverage_expired, :coverage_terminated],
                   to: :coverage_terminated, after: :propogate_terminate
     end
 
@@ -1334,7 +1334,7 @@ class HbxEnrollment
     end
 
     event :force_select_coverage, :after => :record_transition do
-      transitions from: :shopping, to: :coverage_selected, after: :propagate_selection
+      transitions from: :shopping, to: :coverage_selected, after: [:propagate_selection, :ee_select_plan_during_oe]
     end
 
   end
@@ -1477,6 +1477,18 @@ class HbxEnrollment
     submitted_at.blank? ? Time.now : submitted_at
   end
 
+  def ee_select_plan_during_oe
+    if self.census_employee.present?
+      begin
+        if self.is_open_enrollment? && self.benefit_group.plan_year.open_enrollment_contains?(TimeKeeper.datetime_of_record)
+          ShopNoticesNotifierJob.perform_later(self.census_employee.id.to_s, "ee_select_plan_during_oe", hbx_enrollment_hbx_id: self.hbx_id.to_s, :acapi_trigger =>  true)
+        end
+      rescue Exception => e
+        Rails.logger.error { "Unable to deliver employee plan selection during OE notice to #{self.census_employee.id.to_s} due to #{e.backtrace}" }
+      end
+    end
+  end
+
   def ee_plan_selection_confirmation_sep_new_hire
     if is_shop? && (enrollment_kind == "special_enrollment" || census_employee.new_hire_enrollment_period.present?)
       if census_employee.new_hire_enrollment_period.last >= TimeKeeper.date_of_record || special_enrollment_period.present?
@@ -1512,6 +1524,10 @@ class HbxEnrollment
 
   def is_enrolled_by_aasm_state?
     ENROLLED_STATUSES.include?(aasm_state)
+  end
+
+  def is_ivl_and_outstanding?
+    is_ivl_by_kind? && is_any_enrollment_member_outstanding? && ENROLLED_AND_RENEWAL_STATUSES.include?(self.aasm_state)
   end
 
   def is_effective_in_current_year?
