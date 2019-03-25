@@ -214,7 +214,7 @@ module Observers
         document = new_model_event.klass_instance
         employer_profile = document.documentable
         plan_year = employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED - ['suspended']).first
-        deliver(recipient: employer_profile, event_object: plan_year, notice_event: "employer_invoice_available") if (new_model_event.event_key == :employer_invoice_available) && plan_year && plan_year.benefit_groups.none?(&:is_congress)
+        deliver(recipient: employer_profile, event_object: plan_year, notice_event: 'initial_employer_invoice_available') if (new_model_event.event_key == :initial_employer_invoice_available) && plan_year
       end
     end
 
@@ -368,7 +368,7 @@ module Observers
           start_on = TimeKeeper.date_of_record.next_month.beginning_of_month
           EmployerProfile.initial_employers_enrolled_plan_year_state(start_on).each do |org|
             plan_year = org.employer_profile.plan_years.where(:aasm_state.in => PlanYear::INITIAL_ENROLLING_STATE).first
-            next if org.employer_profile.binder_paid? || plan_year.benefit_groups.any?(&:is_congress)
+            next if org.employer_profile.binder_paid?
             deliver(recipient: org.employer_profile, event_object: plan_year, notice_event: "initial_employer_no_binder_payment_received")
             #Notice to employee that there employer misses binder payment
             org.employer_profile.census_employees.active.each do |ce|
