@@ -19,6 +19,8 @@ module BenefitSponsors
                     metal_level_kind: :gold)
       end
 
+      let(:package_kind)            { :metal_level }
+
       let(:current_effective_date) { effective_period_start_on }
       let(:effective_period_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
       let(:effective_period_end_on)   { effective_period_start_on + 1.year - 1.day }
@@ -31,13 +33,15 @@ module BenefitSponsors
       subject { BenefitSponsors::Serializers::BenefitApplicationIssuer.to_csv(benefit_sponsorship.benefit_applications.first) }
 
       it 'returns a csv line for each carrier' do
-        serialization = [abc_organization.hbx_id,
-                         abc_organization.fein,
-                         effective_period_start_on.strftime('%Y-%m-%d'),
-                         effective_period_end_on.strftime('%Y-%m-%d'),
-                         product_package.products.first.issuer_profile.hbx_carrier_id,
-                         product_package.products.first.issuer_profile.fein].join(',')
-        expect(subject).to include(serialization)
+        all_records = product_package.products.map(&:issuer_profile).map do |issuer_profile|
+          [abc_organization.hbx_id,
+           abc_organization.fein,
+           effective_period_start_on.strftime('%Y-%m-%d'),
+           effective_period_end_on.strftime('%Y-%m-%d'),
+           issuer_profile.hbx_carrier_id,
+           issuer_profile.fein].join(',')
+        end
+        expect(subject).to eq(all_records)
       end
 
       it 'serializes the date to ISO 8601' do
