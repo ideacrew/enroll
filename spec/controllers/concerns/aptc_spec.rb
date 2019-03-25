@@ -13,6 +13,8 @@ RSpec.describe FakesController, :type => :controller do
   end
 
   let!(:person) {FactoryGirl.create(:person, :with_family, :with_consumer_role)}
+  let!(:imt){IndividualMarketTransition.new(role_type: 'consumer', reason_code: 'generating_consumer_role', effective_starting_on: person.consumer_role.created_at.to_date, submitted_at: ::TimeKeeper.datetime_of_record)}
+  let!(:update_person) {person.individual_market_transitions << imt}
   let!(:family)  { person.primary_family}
   let(:application) { FactoryGirl.create(:application, family: family) }
   let(:hbx_enrollment_one) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household) }
@@ -38,7 +40,7 @@ RSpec.describe FakesController, :type => :controller do
       end
 
       it "should get nil when person without consumer_role" do
-        allow(person).to receive(:has_active_consumer_role?).and_return false
+        allow(person).to receive(:is_consumer_role_active?).and_return false
         expect(subject.get_shopping_tax_households_from_person(person, TimeKeeper.date_of_record.year)).to eq nil
       end
     end
