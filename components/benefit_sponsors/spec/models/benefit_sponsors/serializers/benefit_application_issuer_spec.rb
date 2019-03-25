@@ -42,7 +42,7 @@ module BenefitSponsors
 
       it 'serializes the date to ISO 8601' do
         date_field = subject.first.split(',').third
-        expect(Date.strptime(date_field, '%Y-%m-%m')).to eq(effective_period_start_on)
+        expect(Date.strptime(date_field, '%Y-%m-%d')).to eq(effective_period_start_on)
       end
     end
   end
