@@ -32,17 +32,18 @@ PATH
   remote: components/benefit_markets
   specs:
     benefit_markets (0.0.1)
-      aasm (~> 4.8)
-      active_model_serializers (~> 0.10)
-      config (~> 1.7)
-      language_list (~> 1)
-      money-rails (~> 1.13)
-      mongoid (~> 7.0.2)
-      pundit (~> 2.0)
-      rails (~> 5.2.2)
-      slim (~> 3.0)
-      symmetric-encryption (~> 3.9.1)
-      virtus (~> 1.0)
+      aasm (~> 4.8.0)
+      active_model_serializers
+      config
+      i18n (= 0.7.0)
+      mini_portile2 (= 2.0.0)
+      mongoid (~> 5.4.0)
+      nokogiri (= 1.6.7.2)
+      pundit (~> 1.0.1)
+      rails (~> 4.2.7.1)
+      slim (~> 3.0.9)
+      symmetric-encryption (~> 3.6.0)
+      virtus (= 1.0.5)
 
 PATH
   remote: components/benefit_sponsors
