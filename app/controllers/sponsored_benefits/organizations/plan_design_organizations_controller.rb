@@ -6,6 +6,7 @@ module SponsoredBenefits
     include Config::BrokerAgencyHelper
 
     before_action :load_broker_agency_profile, only: [:new, :create]
+    before_action :load_profile, only: [:update]
 
     def new
       init_organization
@@ -43,17 +44,17 @@ module SponsoredBenefits
 
         if ola.blank?
           flash[:error] = "Prospect Employer must have one Primary Office Location."
-          redirect_to employers_organizations_broker_agency_profile_path(pdo.broker_agency_profile)
+          redirect_to employers_organizations_broker_agency_profile_path(@profile.id)
         elsif pdo.save
           flash[:success] = "Prospect Employer (#{pdo.legal_name}) Updated Successfully."
-          redirect_to employers_organizations_broker_agency_profile_path(pdo.broker_agency_profile)
+          redirect_to employers_organizations_broker_agency_profile_path(@profile.id)
         else
           init_organization(organization_params)
           render :edit
         end
       else
         flash[:error] = "Updating of Client employer records not allowed"
-        redirect_to employers_organizations_broker_agency_profile_path(pdo.broker_agency_profile)
+        redirect_to employers_organizations_broker_agency_profile_path(@profile.id)
       end
     end
 
@@ -120,6 +121,11 @@ module SponsoredBenefits
       ::SicCode.all.group_by(&:industry_group_label).each do |industry_group_label, sic_codes|
         @grouped_options[industry_group_label] = sic_codes.collect{|sc| ["#{sc.sic_label} - #{sc.sic_code}", sc.sic_code]}
       end
+    end
+
+    def load_profile
+      @profile = ::BrokerAgencyProfile.find(params[:profile_id]) || ::GeneralAgencyProfile.find(params[:profile_id])
+      @profile ||= BenefitSponsors::Organizations::Profile.find(params[:profile_id])
     end
   end
 end
