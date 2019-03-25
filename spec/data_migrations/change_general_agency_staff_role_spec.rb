@@ -1,5 +1,4 @@
 require "rails_helper"
-require 'byebug'
 require File.join(Rails.root, "app", "data_migrations", "change_general_agency_staff_role")
 
 describe ChangeGeneralAgencyStaffRole, dbclean: :after_each do
