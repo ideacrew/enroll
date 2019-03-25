@@ -4,8 +4,8 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 
 module BenefitSponsors
   module Exporters
-    include Config::AcaModelConcern
-    describe BenefitApplicationIssuers, :dbclean => :after_each do
+    RSpec.describe BenefitApplicationIssuers, :dbclean => :after_each do
+      include Config::AcaModelConcern
       describe '##retrive' do
         include_context 'setup benefit market with market catalogs and product packages'
         include_context 'setup initial benefit application'
