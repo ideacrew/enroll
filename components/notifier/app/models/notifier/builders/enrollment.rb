@@ -45,11 +45,6 @@ module Notifier
       merge_model.enrollment.coverage_end_on = format_date(enrollment.terminated_on)
     end
 
-    def enrollment_waiver_effective_date
-      return if enrollment.blank?
-      merge_model.enrollment.waiver_effective_date = format_date(enrollment.created_at)
-    end
-
     def enrollment_coverage_end_on_minus_60_days
       return if census_employee_record.blank?
       merge_model.enrollment.coverage_end_on_minus_60_days = format_date(census_employee_record.coverage_terminated_on - 60.days)

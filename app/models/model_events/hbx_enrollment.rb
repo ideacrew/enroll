@@ -3,7 +3,7 @@ module ModelEvents
 
     REGISTERED_EVENTS = [
       :application_coverage_selected,
-      :employee_waiver_confirmation,
+      # :employee_waiver_confirmation,
       :employee_coverage_termination
     ]
 
@@ -15,9 +15,9 @@ module ModelEvents
           is_application_coverage_selected = true
         end
 
-        if is_transition_matching?(to: :inactive, from: [:shopping, :coverage_selected, :auto_renewing, :renewing_coverage_selected], event: :waive_coverage)
-          is_employee_waiver_confirmation = true
-        end
+        # if is_transition_matching?(to: :inactive, from: [:shopping, :coverage_selected, :auto_renewing, :renewing_coverage_selected], event: :waive_coverage)
+        #   is_employee_waiver_confirmation = true
+        # end
           
         if is_transition_matching?(to: [:coverage_terminated, :coverage_termination_pending], from: [:coverage_selected, :coverage_enrolled, :auto_renewing,
                          :renewing_coverage_selected,:auto_renewing_contingent, :renewing_contingent_selected, :renewing_contingent_transmitted_to_carrier, 
