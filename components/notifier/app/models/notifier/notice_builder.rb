@@ -18,7 +18,7 @@ module Notifier
       builder_klass = ['Notifier', 'Builders', recipient.split('::').last].join('::')
       builder = builder_klass.constantize.new
       builder.resource = resource
-      builder.event_name = event_name if resource.is_a?(EmployeeRole) || resource.is_a?(EmployerProfile) || resource.is_a?(ConsumerRole)
+      builder.event_name = event_name
       builder.payload = payload
       builder.append_contact_details
       builder.dependents if resource.is_a?(ConsumerRole)

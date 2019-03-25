@@ -3,7 +3,7 @@ module Notifier
     include Notifier::Builders::PlanYear
     include Notifier::Builders::Broker
 
-    attr_accessor :payload, :broker_role, :merge_model
+    attr_accessor :payload, :broker_role, :merge_model, :event_name
 
    def initialize
       data_object = Notifier::MergeDataModels::BrokerProfile.new

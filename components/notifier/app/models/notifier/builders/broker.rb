@@ -2,7 +2,11 @@ module Notifier
   module Builders::Broker
 
     def broker_agency_account
-      employer_profile.active_broker_agency_account
+      if event_name == 'broker_fired_confirmation_to_employer' && terminated_broker_agency_account
+        terminated_broker_agency_account
+      else
+        employer_profile.active_broker_agency_account
+      end
     end
 
     def terminated_broker_agency_account
@@ -14,8 +18,6 @@ module Notifier
     def broker
       if broker_agency_account.present?
         broker_agency_account.writing_agent.parent
-      elsif terminated_broker_agency_account.present?
-        terminated_broker_agency_account.writing_agent.parent
       end
     end
 
@@ -61,8 +63,6 @@ module Notifier
     def broker_organization
       if broker_agency_account.present?
         merge_model.broker.organization = broker_agency_account.legal_name
-      elsif terminated_broker_agency_account.present?
-        merge_model.broker.organization = terminated_broker_agency_account.legal_name
       end
     end
 

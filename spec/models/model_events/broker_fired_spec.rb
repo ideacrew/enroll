@@ -90,7 +90,7 @@ RSpec.describe 'ModelEvents::BrokerFired', dbclean: :around_each  do
           "event_object_kind" => "EmployerProfile",
           "event_object_id" => employer_profile.id
       } }
-      let(:subject) { Notifier::NoticeKind.new(template: template, recipient: recipient) }
+      let(:subject) { Notifier::NoticeKind.new(template: template, recipient: recipient, event_name: 'broker_fired_confirmation_to_broker') }
       let(:merge_model) { subject.construct_notice_object }
 
       before do
@@ -157,7 +157,7 @@ RSpec.describe 'ModelEvents::BrokerFired', dbclean: :around_each  do
           "event_object_kind" => "EmployerProfile",
           "event_object_id" => employer_profile.id
       } }
-      let(:subject) { Notifier::NoticeKind.new(template: template, recipient: recipient) }
+      let(:subject) { Notifier::NoticeKind.new(template: template, recipient: recipient, event_name: 'broker_agency_fired_confirmation_to_agency') }
       let(:merge_model) { subject.construct_notice_object }
 
       before do
@@ -200,7 +200,7 @@ RSpec.describe 'ModelEvents::BrokerFired', dbclean: :around_each  do
       end
     end
 
-    context "when broker_agency_fired_confirmation is triggered" do
+    context "when broker_fired_confirmation_to_employer is triggered" do
       let(:data_elements) {
         [
           "employer_profile.notice_date",
@@ -218,7 +218,7 @@ RSpec.describe 'ModelEvents::BrokerFired', dbclean: :around_each  do
           "event_object_kind" => "EmployerProfile",
           "event_object_id" => employer_profile.id
       } }
-      let(:subject) { Notifier::NoticeKind.new(template: template, recipient: recipient) }
+      let(:subject) { Notifier::NoticeKind.new(template: template, recipient: recipient, event_name: 'broker_fired_confirmation_to_employer') }
       let(:merge_model) { subject.construct_notice_object }
 
       before do
