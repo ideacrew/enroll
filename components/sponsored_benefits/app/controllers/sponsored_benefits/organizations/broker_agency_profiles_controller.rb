@@ -13,10 +13,9 @@ module SponsoredBenefits
   private
 
     def find_profile
-      @broker_agency_profile = ::BrokerAgencyProfile.find(params[:id]) || BenefitSponsors::Organizations::Profile.find(params[:id])
-      @provider = @broker_agency_profile.primary_broker_role.person
       @profile = ::BrokerAgencyProfile.find(params[:id]) || ::GeneralAgencyProfile.find(params[:id])
       @profile ||= BenefitSponsors::Organizations::Profile.find(params[:id])
+      @provider = provider
     end
 
     def is_profile_general_agency?
@@ -33,6 +32,14 @@ module SponsoredBenefits
         ::Effective::Datatables::GeneralAgencyPlanDesignOrganizationDatatable
       else
         ::Effective::Datatables::BrokerAgencyPlanDesignOrganizationDatatable
+      end
+    end
+
+    def provider
+      if !is_profile_general_agency?
+        @profile.primary_broker_role.person
+      else
+        Person.where("general_agency_staff_roles.general_agency_profile_id" => BSON::ObjectId.from_string(@profile.id)).first
       end
     end
   end
