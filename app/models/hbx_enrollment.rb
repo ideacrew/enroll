@@ -1280,7 +1280,7 @@ class HbxEnrollment
     end
 
     event :cancel_coverage, :after => :record_transition do
-      transitions from: [:coverage_termination_pending, :auto_renewing, :renewing_coverage_selected,
+      transitions from: [:coverage_termination_pending, :coverage_terminated, :auto_renewing, :renewing_coverage_selected,
                          :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected,
                          :transmitted_to_carrier, :coverage_renewed, :unverified,
                          :coverage_enrolled, :renewing_waived, :inactive],
@@ -1550,10 +1550,22 @@ class HbxEnrollment
     )
   end
 
+  def cancel_terminated_enrollment(termination_date, edi_required)
+    if self.effective_on == termination_date && self.may_cancel_coverage?
+      self.terminated_on = nil
+      self.termination_submitted_on = nil
+      self.terminate_reason = nil
+      self.cancel_coverage!
+      self.notify_enrollment_cancel_or_termination_event(edi_required)
+      return true
+    end
+  end
+
   def reterm_enrollment_with_earlier_date(termination_date, edi_required)
 
     return false unless self.coverage_terminated? || self.coverage_termination_pending?
     return false if termination_date > self.terminated_on
+    return true if cancel_terminated_enrollment(termination_date, edi_required)
 
     if self.is_shop? && (termination_date > ::TimeKeeper.date_of_record && self.may_schedule_coverage_termination?)
       self.schedule_coverage_termination!(termination_date)

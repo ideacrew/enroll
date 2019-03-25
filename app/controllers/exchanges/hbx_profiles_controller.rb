@@ -346,13 +346,16 @@ def employer_poc
       @row = params[:family_actions_id]
       termination_date = Date.strptime(params["new_termination_date"], "%m/%d/%Y")
       if enrollment.present? && enrollment.reterm_enrollment_with_earlier_date(termination_date, params["edi_required"].present?)
-        @retrem_success = enrollment
+        message = {notice: "Enrollment Updated Successfully."}
       else
-        @retrem_failure = enrollment
+        message = {notice: "Unable to find/update Enrollment."}
       end
     rescue Exception => e
       redirect_to exchanges_hbx_profiles_root_path, flash: {error: e.to_s}
+      return
     end
+
+    redirect_to exchanges_hbx_profiles_root_path, flash: message
   end
 
   def broker_agency_index
