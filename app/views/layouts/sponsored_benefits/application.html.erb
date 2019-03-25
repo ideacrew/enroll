@@ -12,7 +12,13 @@
 </head>
 <body class="font">
     <%= render './ui-components/v1/navs/header' %>
-    <%= render 'shared/engines/broker_menu' %>
+    <% general_agency = (@profile || @broker_agency_profile).class.to_s == "GeneralAgencyProfile" %>
+    <% unless general_agency %>
+      <%= render 'shared/engines/broker_menu' %>
+    <% else %>
+      <%= render 'general_agencies/profiles/menu' %>
+    <% end %>
+    <%= yield :horizontal_menu %>
     <%= render_flash %>
     <div class="content <%= controller_name %>">
       <%= yield %>

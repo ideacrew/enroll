@@ -1,6 +1,6 @@
 <%= javascript_pack_tag 'benefit_sponsors', 'data-turbolinks-track': 'reload' if employer_has_sic_enabled? %>
 
-
+<%= hidden_field_tag "profile_id", params[:profile_id] %>
 <%= render "entity_name_and_type_fields_autofill", f: f, entity_kinds: Organization::ENTITY_KINDS %>
 <br>
 <%= render "/sponsored_benefits/organizations/office_locations/office_locations", f: f %>

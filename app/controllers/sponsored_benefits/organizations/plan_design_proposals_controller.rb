@@ -137,7 +137,6 @@ module SponsoredBenefits
     private
 
     def effective_datatable
-      @is_general_agency = params[:is_general_agency?]
       ::Effective::Datatables::PlanDesignProposalsDatatable.new(organization_id: @plan_design_organization._id)
     end
 
