@@ -237,4 +237,12 @@ module FinancialAssistanceHelper
   def show_net_amount_for(other_income)
     other_income.kind == "capital_gains" || other_income.kind == "farming_and_fishing"
   end
+
+  def decode_msg(encoded_msg)
+    if encoded_msg == '101'
+      'faa.acdes_lookup'
+    elsif encoded_msg == '010'
+      'faa.curam_lookup'
+    end
+  end
 end

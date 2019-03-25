@@ -5,13 +5,13 @@ describe CuramApplicationLookup do
 
   describe "with a slugged configuration" do
     it "returns no data found" do
-      expect(CuramApplicationLookup.instance.search_curam_financial_app(person_demographics)).to eq "NO_CURAM_DATA_FOUND"
+      expect(CuramApplicationLookup.instance.search_curam_financial_app(person_demographics)).to eq 302
     end
   end
 
   describe "with an AMQP source" do
     let(:generator) { CuramApplicationLookup::AmqpSource }
-    let(:valid_response_code) { "single_user" }
+    let(:valid_response_code) { 404 }
     let(:amqp_response) { {:return_status => valid_response_code} }
 
     it "returns a valid response code" do

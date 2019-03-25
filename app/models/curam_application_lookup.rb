@@ -14,7 +14,11 @@ class CuramApplicationLookup
   end
 
   def self.slug!
-    self.instance.provider = SlugSource
+    instance.provider = SlugSource
+  end
+
+  def self.search_curam_financial_app(person_demographics)
+    instance.search_curam_financial_app(person_demographics)
   end
 
   class AmqpSource
@@ -23,19 +27,17 @@ class CuramApplicationLookup
       retry_attempt = 0
       while (retry_attempt < 3) && request_result.nil?
         request_result = Acapi::Requestor.request("account_management.check_existing_account", person_demographics, 2)
-        retry_attempt = retry_attempt + 1
+        retry_attempt += 1
       end
       request_result.stringify_keys["return_status"]
     end
   end
 
   class SlugSource
-    def self.search_curam_financial_app(person_demographics)
-      "NO_CURAM_DATA_FOUND"
+    def self.search_curam_financial_app(*)
+      302
     end
   end
 end
 
-unless Rails.env.production?
-  CuramApplicationLookup.slug!
-end
+CuramApplicationLookup.slug! unless Rails.env.production?

@@ -220,7 +220,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
 
     context "'Yes' to is_applying_for_assistance" do
       it "should redirect to app checklist if 'yes' is answered to is_applying_for_assistance" do
-        get :get_help_paying_coverage_response, exit_after_method: false, is_applying_for_assistance: true
+        get :get_help_paying_coverage_response, exit_after_method: false, is_applying_for_assistance: "true"
         expect(response).to redirect_to(application_checklist_financial_assistance_applications_path)
         expect(family.applications.where(aasm_state: "draft").first.applicants.count).to eq 1
       end
@@ -233,7 +233,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
         person.person_relationships.create(predecessor_id: person.id, :successor_id => person1.id, :kind => "spouse", family_id: family.id)
         family_member.save
         family.save
-        get :get_help_paying_coverage_response, exit_after_method: false, is_applying_for_assistance: true
+        get :get_help_paying_coverage_response, exit_after_method: false, is_applying_for_assistance: "true"
         family.reload
         expect(family.applications.where(aasm_state: "draft").first.applicants.count).to eq 2
         expect(response).to redirect_to(application_checklist_financial_assistance_applications_path)
@@ -241,7 +241,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
     end
 
     it "should redirect to insured family memebers if 'no' is answered to is_applying_for_assistance" do
-      get :get_help_paying_coverage_response, exit_after_method: false, is_applying_for_assistance: false
+      get :get_help_paying_coverage_response, exit_after_method: false, is_applying_for_assistance: "false"
       expect(response).to redirect_to(insured_family_members_path(consumer_role_id: person.consumer_role.id))
     end
 
@@ -249,6 +249,14 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
       get :get_help_paying_coverage_response, exit_after_method: false, is_applying_for_assistance: nil
       expect(response).to redirect_to(help_paying_coverage_financial_assistance_applications_path)
       expect(flash[:error]).to match(/Please choose an option before you proceed./)
+    end
+  end
+
+  context "uqhp_flow" do
+    it "should redirect to insured family memebers" do
+      get :uqhp_flow
+      expect(family.applications.where(aasm_state: "draft").count).to eq 0
+      expect(response).to redirect_to(insured_family_members_path(consumer_role_id: person.consumer_role.id))
     end
   end
 

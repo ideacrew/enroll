@@ -1,5 +1,6 @@
 class FinancialAssistance::ApplicationsController < ApplicationController
   before_action :set_current_person
+  before_action :set_primary_family
 
   include UIHelpers::WorkflowController
   include NavigationHelper
@@ -89,28 +90,32 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     @transaction_id = params[:id]
   end
 
+  def render_message
+    @message = params["message"]
+  end
+
   def get_help_paying_coverage_response
-    family = @person.primary_family
-    family.is_applying_for_assistance = params["is_applying_for_assistance"]
-    family.save!
-    if family.is_applying_for_assistance
-      if family.applications.where(aasm_state: "draft").blank?
-        application = family.applications.build(aasm_state: "draft")
-        family.active_family_members.each do |family_member|
-          application.applicants.build(family_member_id: family_member.id)
-        end
-        application.save!
-      end
-      redirect_to application_checklist_financial_assistance_applications_path
+    if params["is_applying_for_assistance"].nil?
+      flash[:error] = "Please choose an option before you proceed."
+      redirect_to help_paying_coverage_financial_assistance_applications_path
+    elsif params["is_applying_for_assistance"] == "true"
+      person = FinancialAssistance::Factories::AssistanceFactory.new(@person)
+      @assistance_status, @message = person.search_existing_assistance
+      @family.is_applying_for_assistance = @assistance_status
+      @family.save!
+      @assistance_status ? aqhp_flow : redirect_to_msg
     else
-      if params["is_applying_for_assistance"].nil?
-        flash[:error] = "Please choose an option before you proceed."
-        redirect_to help_paying_coverage_financial_assistance_applications_path
-      else
-        family.applications.where(aasm_state: "draft").destroy_all
-        redirect_to insured_family_members_path(consumer_role_id: @person.consumer_role.id)
-      end
+      uqhp_flow
     end
+  end
+
+  def uqhp_flow
+    @family.applications.where(aasm_state: "draft").destroy_all
+    redirect_to insured_family_members_path(consumer_role_id: @person.consumer_role.id)
+  end
+
+  def redirect_to_msg
+    redirect_to render_message_financial_assistance_applications_path(message: @message)
   end
 
   def application_checklist
@@ -172,6 +177,21 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   private
+
+  def set_primary_family
+    @family = @person.primary_family
+  end
+
+  def aqhp_flow
+    if @family.applications.where(aasm_state: "draft").blank?
+      application = @family.applications.build(aasm_state: "draft")
+      @family.active_family_members.each do |family_member|
+        application.applicants.build(family_member_id: family_member.id)
+      end
+      application.save!
+    end
+    redirect_to application_checklist_financial_assistance_applications_path
+  end
 
   def dummy_data_for_demo(params)
     #Dummy_ED
