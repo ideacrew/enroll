@@ -136,7 +136,7 @@ class PlanYear
   end
 
   def census_employees_within_play_year
-    CensusEmployee.where({ :"benefit_group_assignments.benefit_group_id".in => benefit_group_ids })
+    CensusEmployee.where({ :"benefit_group_assignments.benefit_group_id".in => benefit_group_ids }).non_terminated
   end
 
   def cancel_renewal_plan_year_if_any
