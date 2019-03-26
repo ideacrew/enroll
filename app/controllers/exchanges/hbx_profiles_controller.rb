@@ -350,10 +350,10 @@ def employer_poc
       else
         message = {notice: "Unable to find/update Enrollment."}
       end
-      redirect_to exchanges_hbx_profiles_root_path, flash: message
     rescue Exception => e
-      redirect_to exchanges_hbx_profiles_root_path, flash: {error: e.to_s}
+      message = {error: e.to_s}
     end
+    redirect_to exchanges_hbx_profiles_root_path, flash: message
   end
 
   def broker_agency_index
