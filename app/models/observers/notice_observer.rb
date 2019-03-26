@@ -60,21 +60,16 @@ module Observers
         end
 
         if new_model_event.event_key == :group_termination_confirmation_notice
-          if plan_year.termination_kind.to_s == "nonpayment"
-            deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "notify_employer_of_group_non_payment_termination")
+          employer_event_name = plan_year.termination_kind.to_s == "nonpayment" ? 'notify_employer_of_group_non_payment_termination' : 'group_advance_termination_confirmation'
+          employee_event_name = plan_year.termination_kind.to_s == "nonpayment" ? 'notify_employee_of_group_non_payment_termination' : 'notify_employee_of_group_advance_termination'
 
-            plan_year.employer_profile.census_employees.active.each do |ce|
-              begin
-                deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "notify_employee_of_group_non_payment_termination")
-              end
-            end
-          else
-            deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "group_advance_termination_confirmation")
+          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: employer_event_name)
 
-            plan_year.employer_profile.census_employees.active.each do |ce|
-              begin
-                deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "notify_employee_of_group_advance_termination")
-              end
+          plan_year.employer_profile.census_employees.active.each do |ce|
+            begin
+              deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: employee_event_name)
+            rescue StandardError => e
+              Rails.logger.error { "Unable to deliver #{employee_event_name} to #{ce.full_name} due to #{e.backtrace}" }
             end
           end
         end

@@ -8,11 +8,13 @@ describe 'ModelEvents::GroupTerminationConfirmationNotice', dbclean: :around_eac
   let!(:benefit_group)  { FactoryGirl.create(:benefit_group, plan_year: model_instance) }
   let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile, employee_role_id: employee_role.id) }
   let!(:employee_role) { FactoryGirl.create(:employee_role, employer_profile: employer_profile, person: person) }
+  let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, household: family.active_household, employee_role_id: employee_role.id, aasm_state: "coverage_enrolled", benefit_group_id: benefit_group.id) }
   let!(:end_on) {TimeKeeper.date_of_record.end_of_month}
   let(:termination_kind) {"nonpayment"}
    
-  describe "ModelEvent" do
+  describe "ModelEvent", dbclean: :after_each do
     context "when group is terminated" do
+      before { employee_role.update_attributes(census_employee_id: census_employee.id) }
       it "should trigger model event" do
         model_instance.observer_peers.keys.each do |observer|
           expect(observer).to receive(:plan_year_update) do |model_event|
@@ -20,7 +22,7 @@ describe 'ModelEvents::GroupTerminationConfirmationNotice', dbclean: :around_eac
             expect(model_event).to have_attributes(:event_key => :group_termination_confirmation_notice, :klass_instance => model_instance, :options => {})
           end
         end
-        model_instance.terminate!
+        model_instance.terminate_plan_year(end_on, TimeKeeper.date_of_record, 'nonpayment', false)
       end
     end
   end
@@ -29,9 +31,12 @@ describe 'ModelEvents::GroupTerminationConfirmationNotice', dbclean: :around_eac
     context "when group terminated due to nonpayment" do
       subject { Observers::NoticeObserver.new }
 
-       let(:model_event) { ModelEvents::ModelEvent.new(:group_termination_confirmation_notice, model_instance, {}) }
+      before { employee_role.update_attributes(census_employee_id: census_employee.id) }
 
-       it "should trigger notice event" do
+      let(:model_event) { ModelEvents::ModelEvent.new(:group_termination_confirmation_notice, model_instance, {}) }
+      let(:enrollment_model_event) { ModelEvents::ModelEvent.new(:employee_coverage_termination, hbx_enrollment, {}) }
+
+      it "should trigger notice event" do
         allow(model_instance).to receive(:termination_kind).and_return(termination_kind)
 
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
@@ -43,10 +48,31 @@ describe 'ModelEvents::GroupTerminationConfirmationNotice', dbclean: :around_eac
 
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employee.notify_employee_of_group_non_payment_termination"
+          expect(payload[:employee_role_id]).to eq employee_role.id.to_s
           expect(payload[:event_object_kind]).to eq 'PlanYear'
           expect(payload[:event_object_id]).to eq model_instance.id.to_s
         end
         subject.plan_year_update(model_event)
+      end
+
+      it "should NOT trigger hbx enrollment termination event - employee_coverage_termination" do
+        model_instance.update_attributes(aasm_state: 'terminated')
+        allow(model_instance).to receive(:termination_kind).and_return(termination_kind)
+
+        expect(subject.notifier).not_to receive(:notify) do |event_name, payload|
+          expect(event_name).to eq "acapi.info.events.employer.employer_notice_for_employee_coverage_termination"
+          expect(payload[:employer_id]).to eq employer_profile.hbx_id.to_s
+          expect(payload[:event_object_kind]).to eq 'HbxEnrollment'
+          expect(payload[:event_object_id]).to eq hbx_enrollment.id.to_s
+        end
+
+        expect(subject.notifier).not_to receive(:notify) do |event_name, payload|
+          expect(event_name).to eq "acapi.info.events.employee.employee_notice_for_employee_coverage_termination"
+          expect(payload[:employee_role_id]).to eq employee_role.id.to_s
+          expect(payload[:event_object_kind]).to eq 'HbxEnrollment'
+          expect(payload[:event_object_id]).to eq hbx_enrollment.id.to_s
+        end
+        subject.hbx_enrollment_update(enrollment_model_event)
       end
     end
 

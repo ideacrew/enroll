@@ -160,7 +160,8 @@ class PlanYear
     if end_on >= TimeKeeper.date_of_record
       if may_schedule_termination?
         set_plan_year_termination_date(end_on, {termination_kind: termination_kind, terminated_on: terminated_on})
-        schedule_termination!(end_on, {termination_kind: termination_kind, terminated_on: terminated_on, transmit_xml: transmit_xml})
+        schedule_termination!
+        terminate_employee_enrollments(end_on, {transmit_xml: transmit_xml})
         notify_employer_py_terminate(transmit_xml)
       end
     elsif may_terminate?
@@ -1051,7 +1052,7 @@ class PlanYear
     # Scheduling terminations for plan years with a future end on date
     event :schedule_termination, :after => :record_transition do
       transitions from: :active,
-                    to: :termination_pending, :after => [:terminate_employee_enrollments]
+                  to: :termination_pending
     end
 
     # Coverage terminated due to non-payment
