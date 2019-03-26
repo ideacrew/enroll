@@ -11,7 +11,8 @@ module ModelEvents
       # :ineligible_renewal_application_submitted,
       :initial_employer_open_enrollment_completed,
       # # :open_enrollment_began, #not being used
-      :application_denied,
+      :initial_application_denied,
+      :renewal_application_denied,
       :renewal_employer_open_enrollment_completed
       # :group_advance_termination_confirmation,
       # :zero_employees_on_roster
@@ -74,8 +75,12 @@ module ModelEvents
         # #   is_open_enrollment_began = true
         # # end
 
-        if is_transition_matching?(to: [:application_ineligible, :renewing_application_ineligible], from: [:enrolling, :renewing_enrolling], event: :advance_date)
-          is_application_denied = true
+        if is_transition_matching?(to: :application_ineligible, from: :enrolling, event: :advance_date)
+          is_initial_application_denied = true
+        end
+
+        if is_transition_matching?(to: :renewing_application_ineligible, from: :renewing_enrolling, event: :advance_date)
+          is_renewal_application_denied = true
         end
 
         # if is_transition_matc1hing?(to: :termination_pending, from: :active, event: :schedule_termination)

@@ -2,8 +2,6 @@ require 'rails_helper'
 
 describe 'ModelEvents::InitialEmployerApplicationDenied', dbclean: :around_each do
 
-  let(:notice_event)    { "initial_employer_application_denied" }
-  let(:model_event)  { "application_denied" }
   let!(:person) { FactoryGirl.create(:person, :with_family) }
   let(:family)  { person.primary_family }
   let!(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: model_instance) }
@@ -34,7 +32,7 @@ describe 'ModelEvents::InitialEmployerApplicationDenied', dbclean: :around_each 
         model_instance.observer_peers.keys.each do |observer|
           expect(observer).to receive(:plan_year_update) do |model_event|
             expect(model_event).to be_an_instance_of(ModelEvents::ModelEvent)
-            expect(model_event).to have_attributes(:event_key => :application_denied, :klass_instance => model_instance, :options => {})
+            expect(model_event).to have_attributes(:event_key => :initial_application_denied, :klass_instance => model_instance, :options => {})
           end
         end
         model_instance.advance_date!
@@ -46,9 +44,9 @@ describe 'ModelEvents::InitialEmployerApplicationDenied', dbclean: :around_each 
     context "when initial application denied" do
       subject { Observers::NoticeObserver.new }
 
-       let(:model_event) { ModelEvents::ModelEvent.new(:application_denied, model_instance, {}) }
+      let(:model_event) { ModelEvents::ModelEvent.new(:initial_application_denied, model_instance, {}) }
 
-       it "should trigger notice event" do
+      it "should trigger notice event" do
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employer.initial_employer_application_denied"
           expect(payload[:employer_id]).to eq employer.hbx_id.to_s
@@ -128,13 +126,13 @@ describe 'ModelEvents::InitialEmployerApplicationDenied', dbclean: :around_each 
         enrollment_errors = []
         model_instance.enrollment_errors.each do |k, v|
           case k.to_s
-          when "eligible_to_enroll_count"
-            enrollment_errors << "at least one employee must be eligible to enroll"
-          when "non_business_owner_enrollment_count"
+          when 'eligible_to_enroll_count'
+            enrollment_errors << 'at least one employee must be eligible to enroll'
+          when 'non_business_owner_enrollment_count'
             enrollment_errors << "at least #{Settings.aca.shop_market.non_owner_participation_count_minimum} non-owner employee must enroll"
-          when "enrollment_ratio"
+          when 'enrollment_ratio'
             unless model_instance.effective_date.yday == 1
-              enrollment_errors << "number of eligible participants enrolling (#{model_instance.total_enrolled_count}) is less than minimum required #{model_instance.eligible_to_enroll_count * Settings.aca.shop_market.employee_participation_ratio_minimum}"
+              enrollment_errors << "number of eligible participants enrolling (#{model_instance.total_enrolled_count}) is less than minimum required #{model_instance.minimum_enrolled_count}"
             end
           end
         end

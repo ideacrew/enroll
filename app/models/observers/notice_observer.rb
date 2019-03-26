@@ -87,34 +87,24 @@ module Observers
           end
         end
 
-        if new_model_event.event_key == :application_denied
-          errors = plan_year.enrollment_errors
-          return if plan_year.benefit_groups.any?{|bg| bg.is_congress?}
+        if new_model_event.event_key == :initial_application_denied
+          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: 'initial_employer_application_denied')
+          plan_year.employer_profile.census_employees.non_terminated.each do |ce|
+            begin
+              deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: 'group_ineligibility_notice_to_employee') if ce.employee_role.present?
+            rescue StandardError => e
+              Rails.logger.error { "Unable to deliver group_ineligibility_notice_to_employee notice to #{ce.full_name} due to #{e.inspect}" } unless Rails.env.test?
+            end
+          end
+        end
 
-          if (errors.include?(:eligible_to_enroll_count) || errors.include?(:non_business_owner_enrollment_count)) || errors.include?(:enrollment_ratio)
-            if plan_year.is_renewing?
-              deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_employer_ineligibility_notice")
-
-              plan_year.employer_profile.census_employees.non_terminated.each do |ce|
-                begin
-                  if ce.employee_role.present?
-                    deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "employee_renewal_employer_ineligibility_notice")
-                  end
-                rescue Exception => e
-                  (Rails.logger.error { "Unable to deliver notice  due to #{e.inspect}" }) unless Rails.env.test?
-                end
-              end
-            else
-              deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "initial_employer_application_denied")
-              plan_year.employer_profile.census_employees.non_terminated.each do |ce|
-                begin
-                  if ce.employee_role.present?
-                    deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "group_ineligibility_notice_to_employee")
-                  end
-                rescue Exception => e
-                  (Rails.logger.error { "Unable to deliver notice  due to #{e.inspect}" }) unless Rails.env.test?
-                end
-              end
+        if new_model_event.event_key == :renewal_application_denied
+          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: 'renewal_employer_ineligibility_notice')
+          plan_year.employer_profile.census_employees.non_terminated.each do |ce|
+            begin
+              deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: 'employee_renewal_employer_ineligibility_notice') if ce.employee_role.present?
+            rescue StandardError => e
+              Rails.logger.error { "Unable to deliver employee_renewal_employer_ineligibility_notice notice to #{ce.full_name} due to #{e.inspect}" } unless Rails.env.test?
             end
           end
         end

@@ -147,13 +147,13 @@ module Notifier
       if plan_year.present?
          plan_year.enrollment_errors.each do |k, v|
           case k.to_s
-          when "eligible_to_enroll_count"
-            enrollment_errors << "at least one employee must be eligible to enroll"
-          when "non_business_owner_enrollment_count"
+          when 'eligible_to_enroll_count'
+            enrollment_errors << 'at least one employee must be eligible to enroll'
+          when 'non_business_owner_enrollment_count'
             enrollment_errors << "at least #{Settings.aca.shop_market.non_owner_participation_count_minimum} non-owner employee must enroll"
-          when "enrollment_ratio"
+          when 'enrollment_ratio'
             unless plan_year.effective_date.yday == 1
-              enrollment_errors << "number of eligible participants enrolling (#{plan_year.total_enrolled_count}) is less than minimum required #{plan_year.eligible_to_enroll_count * Settings.aca.shop_market.employee_participation_ratio_minimum}"
+              enrollment_errors << "number of eligible participants enrolling (#{plan_year.total_enrolled_count}) is less than minimum required #{plan_year.minimum_enrolled_count}"
             end
           end
         end
