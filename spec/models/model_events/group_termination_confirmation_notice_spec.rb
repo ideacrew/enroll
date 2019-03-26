@@ -53,9 +53,9 @@ describe 'ModelEvents::GroupTerminationConfirmationNotice', dbclean: :around_eac
     context "when group terminated for voluntary reason" do
       subject { Observers::NoticeObserver.new }
 
-       let(:model_event) { ModelEvents::ModelEvent.new(:group_termination_confirmation_notice, model_instance, {}) }
+      let(:model_event) { ModelEvents::ModelEvent.new(:group_termination_confirmation_notice, model_instance, {}) }
 
-       it "should trigger notice event" do
+      it "should trigger notice event" do
         allow(model_instance).to receive(:termination_kind).and_return(nil)
 
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
@@ -70,6 +70,18 @@ describe 'ModelEvents::GroupTerminationConfirmationNotice', dbclean: :around_eac
           expect(payload[:event_object_kind]).to eq 'PlanYear'
           expect(payload[:event_object_id]).to eq model_instance.id.to_s
         end
+
+        expect(subject.notifier).not_to receive(:notify) do |event_name, payload|
+          expect(event_name).to eq "acapi.info.events.employee.employer_notice_for_employee_coverage_termination"
+          expect(payload[:event_object_kind]).to eq 'HbxEnrollment'
+          expect(payload[:event_object_id]).to eq model_instance.id.to_s
+        end
+
+        expect(subject.notifier).not_to receive(:notify) do |event_name, payload|
+          expect(event_name).to eq "acapi.info.events.employee.employee_notice_for_employee_coverage_termination"
+          expect(payload[:event_object_kind]).to eq 'HbxEnrollment'
+          expect(payload[:event_object_id]).to eq model_instance.id.to_s
+        end
         subject.plan_year_update(model_event)
       end
     end
@@ -77,26 +89,26 @@ describe 'ModelEvents::GroupTerminationConfirmationNotice', dbclean: :around_eac
 
   describe "NoticeBuilder" do
 
-    context "when notice for employer is received" do
+    context 'when notice for employer is received' do
 
       let(:data_elements) {
         [
-          "employer_profile.notice_date",
-          "employer_profile.employer_name",
-          "employer_profile.plan_year.current_py_end_date",
-          "employer_profile.plan_year.group_termination_plus_31_days",
-          "employer_profile.broker.primary_fullname",
-          "employer_profile.broker.organization",
-          "employer_profile.broker.phone",
-          "employer_profile.broker_present?"
+          'employer_profile.notice_date',
+          'employer_profile.employer_name',
+          'employer_profile.plan_year.current_py_end_date',
+          'employer_profile.plan_year.group_termination_plus_31_days',
+          'employer_profile.broker.primary_fullname',
+          'employer_profile.broker.organization',
+          'employer_profile.broker.phone',
+          'employer_profile.broker_present?'
         ]
       }
       let(:merge_model) { subject.construct_notice_object }
-      let(:recipient) { "Notifier::MergeDataModels::EmployerProfile" }
+      let(:recipient) { 'Notifier::MergeDataModels::EmployerProfile' }
       let(:template)  { Notifier::Template.new(data_elements: data_elements) }
       let(:payload)   { {
-          "event_object_kind" => "PlanYear",
-          "event_object_id" => model_instance.id
+          'event_object_kind' => 'PlanYear',
+          'event_object_id' => model_instance.id
       } }
 
       subject { Notifier::NoticeKind.new(template: template, recipient: recipient) }
@@ -108,15 +120,15 @@ describe 'ModelEvents::GroupTerminationConfirmationNotice', dbclean: :around_eac
         allow(model_instance).to receive(:end_on).and_return(end_on)
       end
 
-      it "should return merge model" do
+      it 'should return merge model' do
         expect(merge_model).to be_a(recipient.constantize)
       end
 
-      it "should return the date of the notice" do
+      it 'should return the date of the notice' do
         expect(merge_model.notice_date).to eq TimeKeeper.date_of_record.strftime('%m/%d/%Y')
       end
 
-      it "should return employer name" do
+      it 'should return employer name' do
         expect(merge_model.employer_name).to eq employer_profile.legal_name
       end
 
@@ -134,26 +146,26 @@ describe 'ModelEvents::GroupTerminationConfirmationNotice', dbclean: :around_eac
       end
     end
 
-    context "when notice for employee is received" do
+    context 'when notice for employee is received' do
       let(:data_elements) {
         [
-          "employee_profile.notice_date",
-          "employee_profile.employer_name",
-          "employee_profile.plan_year.current_py_end_date",
-          "employee_profile.plan_year.current_py_plus_60_days",
-          "employee_profile.plan_year.group_termination_plus_31_days",
-          "employee_profile.broker.primary_fullname",
-          "employee_profile.broker.organization",
-          "employee_profile.broker.phone",
-          "employee_profile.broker_present?"
+          'employee_profile.notice_date',
+          'employee_profile.employer_name',
+          'employee_profile.plan_year.current_py_end_date',
+          'employee_profile.plan_year.current_py_plus_60_days',
+          'employee_profile.plan_year.group_termination_plus_31_days',
+          'employee_profile.broker.primary_fullname',
+          'employee_profile.broker.organization',
+          'employee_profile.broker.phone',
+          'employee_profile.broker_present?'
         ]
       }
       let(:merge_model) { subject.construct_notice_object }
-      let(:recipient) { "Notifier::MergeDataModels::EmployeeProfile" }
+      let(:recipient) { 'Notifier::MergeDataModels::EmployeeProfile' }
       let(:template)  { Notifier::Template.new(data_elements: data_elements) }
       let(:payload)   { {
-          "event_object_kind" => "PlanYear",
-          "event_object_id" => model_instance.id
+          'event_object_kind' => 'PlanYear',
+          'event_object_id' => model_instance.id
       } }
 
       subject { Notifier::NoticeKind.new(template: template, recipient: recipient) }
@@ -165,15 +177,15 @@ describe 'ModelEvents::GroupTerminationConfirmationNotice', dbclean: :around_eac
         allow(model_instance).to receive(:end_on).and_return(end_on)
       end
 
-      it "should return merge model" do
+      it 'should return merge model' do
         expect(merge_model).to be_a(recipient.constantize)
       end
 
-      it "should return the date of the notice" do
+      it 'should return the date of the notice' do
         expect(merge_model.notice_date).to eq TimeKeeper.date_of_record.strftime('%m/%d/%Y')
       end
 
-      it "should return employer name" do
+      it 'should return employer name' do
         expect(merge_model.employer_name).to eq employer_profile.legal_name
       end
 
@@ -189,7 +201,7 @@ describe 'ModelEvents::GroupTerminationConfirmationNotice', dbclean: :around_eac
         expect(merge_model.plan_year.group_termination_plus_31_days).to eq (model_instance.end_on + 31.days).strftime('%m/%d/%Y')
       end
 
-      it "should return false when there is no broker linked to employer" do
+      it 'should return false when there is no broker linked to employer' do
         expect(merge_model.broker_present?).to be_falsey
       end
     end
