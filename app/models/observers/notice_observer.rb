@@ -219,7 +219,6 @@ module Observers
           initial_organizations_in_enrolling_state(current_date).each do |org|
             begin
               plan_year = org.employer_profile.plan_years.where(:aasm_state => "enrolling").first
-              next if (plan_year.benefit_groups.any?{|bg| bg.is_congress?})
               org.employer_profile.census_employees.active.each do |ce|
                 begin
                   deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "initial_employee_oe_end_reminder_notice")
@@ -233,7 +232,6 @@ module Observers
           renewal_organizations_in_enrolling_state(current_date).each do |org|
             begin
               plan_year = org.employer_profile.plan_years.where(:aasm_state => "renewing_enrolling").first
-              next if (plan_year.benefit_groups.any?{|bg| bg.is_congress?})
               org.employer_profile.census_employees.active.each do |ce|
                 begin
                   deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "renewal_employee_oe_end_reminder_notice")
@@ -345,8 +343,7 @@ module Observers
       organizations_for_low_enrollment_notice(current_date).each do |organization|
         begin
           plan_year = organization.employer_profile.plan_years.where(:aasm_state.in => ["enrolling", "renewing_enrolling"]).first
-          #exclude congressional employees
-          next if ((plan_year.benefit_groups.any?{|bg| bg.is_congress?}) || (plan_year.effective_date.yday == 1))
+          next if plan_year.effective_date.yday == 1
           if plan_year.enrollment_ratio < Settings.aca.shop_market.employee_participation_ratio_minimum
             deliver(recipient: organization.employer_profile, event_object: plan_year, notice_event: "low_enrollment_notice_for_employer")
           end
