@@ -1180,9 +1180,9 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       expect(census_employee.coverage_effective_on).not_to eq nil
     end
 
-    it 'should return a nil date when a benefit group assignment has a benefit group to an expired PY' do
+    it 'should return a date equal to the newly_eligible_earlist_eligible_date when a benefit group assignment has a benefit group to an expired PY' do
       benefit_group.plan_year.update_attributes(:aasm_state => 'expired')
-      expect(census_employee.coverage_effective_on).to eq nil
+      expect(census_employee.coverage_effective_on).to eq census_employee.newly_eligible_earlist_eligible_date
     end
 
   end
