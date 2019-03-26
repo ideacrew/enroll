@@ -16,6 +16,13 @@ FactoryGirl.define do
 
     service_area { create(:benefit_markets_locations_service_area) }
 
+    trait :with_issuer_profile do
+      transient do
+        assigned_site nil
+      end
+
+      issuer_profile { create(:benefit_sponsors_organizations_issuer_profile, assigned_site: assigned_site) }
+    end
 
     trait :with_renewal_product do
       transient do
