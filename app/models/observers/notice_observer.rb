@@ -75,20 +75,16 @@ module Observers
         end
 
         if new_model_event.event_key == :group_termination_confirmation_notice
-          if plan_year.termination_kind.to_s == "nonpayment"
-            deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "notify_employer_of_group_non_payment_termination")
-            plan_year.employer_profile.census_employees.active.each do |ce|
-              begin
-                deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "notify_employee_of_group_non_payment_termination")
-              end
-            end
-          else
-            deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "group_advance_termination_confirmation")
+          employer_event_name = plan_year.termination_kind.to_s == "nonpayment" ? 'notify_employer_of_group_non_payment_termination' : 'group_advance_termination_confirmation'
+          employee_event_name = plan_year.termination_kind.to_s == "nonpayment" ? 'notify_employee_of_group_non_payment_termination' : 'notify_employee_of_group_advance_termination'
 
-            plan_year.employer_profile.census_employees.active.each do |ce|
-              begin
-                deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "notify_employee_of_group_advance_termination")
-              end
+          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: employer_event_name)
+
+          plan_year.employer_profile.census_employees.active.each do |ce|
+            begin
+              deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: employee_event_name)
+            rescue StandardError => e
+              Rails.logger.error { "Unable to deliver #{employee_event_name} to #{ce.full_name} due to #{e.backtrace}" }
             end
           end
         end
@@ -199,9 +195,13 @@ module Observers
       deliver(recipient: hbx_enrollment.census_employee.employee_role, event_object: hbx_enrollment, notice_event: "employee_waiver_confirmation") if new_model_event.event_key == :employee_waiver_confirmation
 
       if new_model_event.event_key == :employee_coverage_termination
-        if (CensusEmployee::EMPLOYMENT_ACTIVE_STATES - CensusEmployee::PENDING_STATES).include?(hbx_enrollment.census_employee.aasm_state)
-          deliver(recipient: hbx_enrollment.employer_profile, event_object: hbx_enrollment, notice_event: "employer_notice_for_employee_coverage_termination")
-          deliver(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "employee_notice_for_employee_coverage_termination")
+        if hbx_enrollment.is_shop? && (CensusEmployee::EMPLOYMENT_ACTIVE_STATES - CensusEmployee::PENDING_STATES).include?(hbx_enrollment.census_employee.aasm_state)
+          plan_year = hbx_enrollment.benefit_group.plan_year
+          # don't trigger following notices when employer terminates plan year
+          if !(plan_year.termination_pending? || plan_year.terminated?)
+            deliver(recipient: hbx_enrollment.employer_profile, event_object: hbx_enrollment, notice_event: "employer_notice_for_employee_coverage_termination")
+            deliver(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "employee_notice_for_employee_coverage_termination")
+          end
         end
       end
     end
