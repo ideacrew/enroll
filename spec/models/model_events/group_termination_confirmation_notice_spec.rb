@@ -72,14 +72,14 @@ describe 'ModelEvents::GroupTerminationConfirmationNotice', dbclean: :around_eac
         end
 
         expect(subject.notifier).not_to receive(:notify) do |event_name, payload|
-          expect(event_name).to eq "acapi.info.events.employee.nemployer_notice_for_employee_coverage_termination"
-          expect(payload[:event_object_kind]).to eq 'PlanYear'
+          expect(event_name).to eq "acapi.info.events.employee.employer_notice_for_employee_coverage_termination"
+          expect(payload[:event_object_kind]).to eq 'HbxEnrollment'
           expect(payload[:event_object_id]).to eq model_instance.id.to_s
         end
 
         expect(subject.notifier).not_to receive(:notify) do |event_name, payload|
-          expect(event_name).to eq "acapi.info.events.employee.notify_employee_of_group_advance_termination"
-          expect(payload[:event_object_kind]).to eq 'PlanYear'
+          expect(event_name).to eq "acapi.info.events.employee.employee_notice_for_employee_coverage_termination"
+          expect(payload[:event_object_kind]).to eq 'HbxEnrollment'
           expect(payload[:event_object_id]).to eq model_instance.id.to_s
         end
         subject.plan_year_update(model_event)
