@@ -21,8 +21,6 @@ module BenefitMarkets
       add_sponsor_market_policy
       add_member_market_policy
       add_product_packages
-      require 'pry'
-      binding.pry
     end
 
     def add_probation_period_kinds
