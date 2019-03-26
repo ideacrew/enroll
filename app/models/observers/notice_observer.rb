@@ -207,16 +207,21 @@ module Observers
       if BrokerAgencyProfile::REGISTERED_EVENTS.include?(new_model_event.event_key)
         broker_agency_profile = new_model_event.klass_instance
         general_agency_profile = broker_agency_profile.default_general_agency_profile
+        employer_clients = broker_agency_profile.employer_clients
 
         if new_model_event.event_key == :general_agency_hired
-          broker_agency_profile.employer_clients.each do |client|
-            deliver(recipient: general_agency_profile, event_object: client, notice_event: 'general_agency_hired_confirmation_to_agency', notice_params: { broker_agency_profile_id: broker_agency_profile.id.to_s })
+          if employer_clients
+            employer_clients.each do |client|
+              deliver(recipient: general_agency_profile, event_object: client, notice_event: 'general_agency_hired_confirmation_to_agency', notice_params: { broker_agency_profile_id: broker_agency_profile.id.to_s })
+            end
           end
           deliver(recipient: general_agency_profile, event_object: broker_agency_profile, notice_event: 'default_ga_hired_notice_to_general_agency')
 
         elsif new_model_event.event_key == :general_agency_fired
-          broker_agency_profile.employer_clients.each do |client|
-            deliver(recipient: general_agency_profile, event_object: client, notice_event: 'general_agency_fired_confirmation_to_agency', notice_params: { broker_agency_profile_id: broker_agency_profile.id.to_s })
+          if employer_clients
+            employer_clients.each do |client|
+              deliver(recipient: general_agency_profile, event_object: client, notice_event: 'general_agency_fired_confirmation_to_agency', notice_params: { broker_agency_profile_id: broker_agency_profile.id.to_s })
+            end
           end
           deliver(recipient: general_agency_profile, event_object: broker_agency_profile, notice_event: 'default_ga_fired_notice_to_general_agency')
         end
