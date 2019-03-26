@@ -65,6 +65,7 @@ notices:
       template: "notifier/notice_kinds/template.html.erb"
       header: "notices/shared/shop_header.html.erb"
       footer: "notices/shared/shop_footer.html.erb"
+      layout: "notifier/pdf_layout.html.erb"
   individual:
     attachments:
       blank_page_attachment: "blank.pdf"
@@ -75,6 +76,7 @@ notices:
       template: "notifier/notice_kinds/ivl_template.html.erb"
       header: "notices/shared/header_ivl.html.erb"
       footer: "notices/shared/footer_ivl.html.erb"
+      layout: "notifier/ivl_pdf_layout.html.erb"
 
 aca:
   state_name: "District of Columbia"

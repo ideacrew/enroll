@@ -28,7 +28,11 @@
     </tbody>
   </table>
 
-  <table class="total_table" border="0" style="margin-top: 260px;">
+  <% if recipient.shop? %>
+    <table class="total_table" border="0" style="margin-top: 260px;">
+  <% else %>
+    <table class="total_table" border="0" style="margin-top: 200px;">
+  <% end %>
     <tbody>
       <tr>
         <td><%= notice.notice_number %></td>

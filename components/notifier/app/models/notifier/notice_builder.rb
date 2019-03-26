@@ -55,7 +55,7 @@ module Notifier
     def render_notice_body(params)
       Notifier::NoticeKindsController.new.render_to_string({
         :inline => template.raw_body.gsub('${', '<%=').gsub('#{', '<%=').gsub('}','%>').gsub('[[', '<%').gsub(']]', '%>'),
-        :layout => 'notifier/pdf_layout',
+        :layout => layout,
         :locals => params
       })
     end
@@ -128,6 +128,10 @@ module Notifier
 
     def subject
       title
+    end
+
+    def layout
+      shop_market? ? Settings.notices.shop.partials.layout : Settings.notices.individual.partials.layout
     end
 
     def notice_filename
