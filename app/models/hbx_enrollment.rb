@@ -1129,6 +1129,9 @@ class HbxEnrollment
 
   def can_be_reinstated?
     return false unless self.coverage_terminated? || self.coverage_termination_pending?
+    return false if is_shop? && employee_role.is_cobra_status? && self.kind == "employer_sponsored"
+    return false if is_shop? && !employee_role.is_cobra_status? && self.kind == 'employer_sponsored_cobra'
+
     if is_shop? && employer_profile.present?
       employer_profile.plan_years.published_or_renewing_published.detect do |py|
         !py.is_conversion && (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(terminated_on.next_day)
@@ -1140,12 +1143,13 @@ class HbxEnrollment
     end
   end
 
-  def has_active_enrollment_exists_for_reinstated_date?
+  def has_active_or_term_exists_for_reinstated_date?
     enrollment_kind = is_shop? ? ['employer_sponsored', 'employer_sponsored_cobra'] : (Kinds - ["employer_sponsored", "employer_sponsored_cobra"])
     family.active_household.hbx_enrollments.where({:kind.in => enrollment_kind,
-                                                   :effective_on => self.terminated_on.next_day,
+                                                   :effective_on.gte => self.terminated_on.next_day,
                                                    :coverage_kind => self.coverage_kind,
-                                                   :employee_role_id => self.employee_role_id}).enrolled_and_renewal.any?
+                                                   :employee_role_id => self.employee_role_id,
+                                                  :aasm_state.in => (ENROLLED_AND_RENEWAL_STATUSES + CAN_REINSTATE_ENROLLMENTS)}).any?
   end
 
   def notify_of_coverage_start(publish_to_carrier)
@@ -1162,7 +1166,8 @@ class HbxEnrollment
   end
 
   def reinstate(edi: false)
-    return if has_active_enrollment_exists_for_reinstated_date?
+    return false unless can_be_reinstated?
+    return false if has_active_or_term_exists_for_reinstated_date?
     reinstate_enrollment = Enrollments::Replicator::Reinstatement.new(self, terminated_on.next_day).build
 
     if self.is_shop?
