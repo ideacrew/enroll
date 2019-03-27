@@ -376,6 +376,7 @@ function buildBenefitGroupParams() {
   }
 
   var data = {
+    'profile_id': $("#profile_id").val(),
     'benefit_group': {
       "reference_plan_id": reference_plan_id,
       "plan_option_kind": plan_option_kind,
@@ -587,6 +588,9 @@ function saveProposalAndPublish(event) {
       $.ajax({
         url: publish_url,
         type: 'POST',
+        data: {
+          profile_id: $("#profile_id").val()
+        },
         success: function(data) {
           window.location.href = data.url;
         },
