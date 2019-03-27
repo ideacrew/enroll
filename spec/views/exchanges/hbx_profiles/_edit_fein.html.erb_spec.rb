@@ -3,25 +3,25 @@ require 'rails_helper'
 RSpec.describe "hbx_admin/_edit_aptc_csr", :dbclean => :after_each do
 
   let(:site) do
-    FactoryGirl.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
+    FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
   end
   let(:organization) do
-    FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site).tap do |org|
+    FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site).tap do |org|
       benefit_sponsorship = org.employer_profile.add_benefit_sponsorship
       benefit_sponsorship.save
       org
     end
   end
   let(:person) do
-    FactoryGirl.create(:person, :with_hbx_staff_role).tap do |person|
-      FactoryGirl.create(:permission, :super_admin).tap do |permission|
+    FactoryBot.create(:person, :with_hbx_staff_role).tap do |person|
+      FactoryBot.create(:permission, :super_admin).tap do |permission|
         person.hbx_staff_role.update_attributes(permission_id: permission.id)
         person
       end
     end
   end
   let(:user) do
-    FactoryGirl.create(:user, person: person)
+    FactoryBot.create(:user, person: person)
   end
   let(:benefit_sponsorship) do
     organization.benefit_sponsorships.first

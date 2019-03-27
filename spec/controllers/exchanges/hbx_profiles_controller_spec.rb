@@ -249,7 +249,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       allow(hbx_staff_role).to receive(:view_the_configuration_tab)
       allow(user).to receive(:permission).and_return(admin_permission)
     end
-    
+
     it "should render the config index for a super admin" do
       allow(hbx_staff_role).to receive(:view_the_configuration_tab).and_return(true)
       allow(hbx_staff_role).to receive(:permission).and_return(admin_permission)
@@ -357,25 +357,25 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
     context "of an hbx super admin clicks Force Publish" do
       let(:site) do
-        FactoryGirl.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
+        FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
       end
       let(:employer_organization) do
-        FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site).tap do |org|
+        FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site).tap do |org|
           benefit_sponsorship = org.employer_profile.add_benefit_sponsorship
           benefit_sponsorship.save
           org
         end
       end
       let(:person) do
-        FactoryGirl.create(:person, :with_hbx_staff_role).tap do |person|
-          FactoryGirl.create(:permission, :super_admin).tap do |permission|
+        FactoryBot.create(:person, :with_hbx_staff_role).tap do |person|
+          FactoryBot.create(:permission, :super_admin).tap do |permission|
             person.hbx_staff_role.update_attributes(permission_id: permission.id)
             person
           end
         end
       end
       let(:user) do
-        FactoryGirl.create(:user, person: person)
+        FactoryBot.create(:user, person: person)
       end
       let(:benefit_sponsorship) do
         employer_organization.benefit_sponsorships.first
@@ -395,25 +395,25 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
     context "of an hbx super admin clicks Submit in Force Publish window" do
       let(:site) do
-        FactoryGirl.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
+        FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
       end
       let(:employer_organization) do
-        FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site).tap do |org|
+        FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site).tap do |org|
           benefit_sponsorship = org.employer_profile.add_benefit_sponsorship
           benefit_sponsorship.save
           org
         end
       end
       let(:person) do
-        FactoryGirl.create(:person, :with_hbx_staff_role).tap do |person|
-          FactoryGirl.create(:permission, :super_admin).tap do |permission|
+        FactoryBot.create(:person, :with_hbx_staff_role).tap do |person|
+          FactoryBot.create(:permission, :super_admin).tap do |permission|
             person.hbx_staff_role.update_attributes(permission_id: permission.id)
             person
           end
         end
       end
       let(:user) do
-        FactoryGirl.create(:user, person: person)
+        FactoryBot.create(:user, person: person)
       end
       let(:benefit_sponsorship) do
         employer_organization.benefit_sponsorships.first
@@ -781,10 +781,10 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       sign_in(user)
     end
 
-    context '.oe_extendable_applications' do 
+    context '.oe_extendable_applications' do
       let(:benefit_applications) { [ double(may_extend_open_enrollment?: true) ]}
 
-      before do 
+      before do
         allow(benefit_sponsorship).to receive(:oe_extendable_benefit_applications).and_return(benefit_applications)
       end
 
@@ -799,7 +799,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     context '.oe_extended_applications' do
       let(:benefit_applications) { [ double(enrollment_extended?: true) ]}
 
-      before do 
+      before do
         allow(benefit_sponsorship).to receive(:oe_extended_applications).and_return(benefit_applications)
       end
 
@@ -825,8 +825,8 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
         expect(response).to render_template("exchanges/hbx_profiles/edit_open_enrollment")
       end
     end
-    
-    context '.extend_open_enrollment' do  
+
+    context '.extend_open_enrollment' do
       let(:benefit_application) { double }
 
       before do
@@ -862,7 +862,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       sign_in(user)
     end
 
-    context '.close_extended_open_enrollment' do 
+    context '.close_extended_open_enrollment' do
       let(:benefit_application) { double }
 
       before do
@@ -880,15 +880,15 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
   end
 
   describe "benefit application creation" do
-    let!(:user)                { FactoryGirl.create(:user) }
-    let!(:person)              { FactoryGirl.create(:person, user: user) }
-    let!(:permission)          { FactoryGirl.create(:permission, :super_admin) }
-    let!(:hbx_staff_role)      { FactoryGirl.create(:hbx_staff_role, person: person, permission_id: permission.id, subrole:permission.name) }
-    let!(:rating_area)         { FactoryGirl.create_default :benefit_markets_locations_rating_area }
-    let!(:service_area)        { FactoryGirl.create_default :benefit_markets_locations_service_area }
+    let!(:user)                { FactoryBot.create(:user) }
+    let!(:person)              { FactoryBot.create(:person, user: user) }
+    let!(:permission)          { FactoryBot.create(:permission, :super_admin) }
+    let!(:hbx_staff_role)      { FactoryBot.create(:hbx_staff_role, person: person, permission_id: permission.id, subrole:permission.name) }
+    let!(:rating_area)         { FactoryBot.create_default :benefit_markets_locations_rating_area }
+    let!(:service_area)        { FactoryBot.create_default :benefit_markets_locations_service_area }
     let!(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
     let!(:benefit_market)      { site.benefit_markets.first }
-    let!(:organization)        { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+    let!(:organization)        { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let!(:employer_profile)    { organization.employer_profile }
     let!(:benefit_sponsorship) { bs = employer_profile.add_benefit_sponsorship
                                 bs.save!
@@ -959,25 +959,25 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
     context "of an hbx super admin clicks Change FEIN" do
       let(:site) do
-        FactoryGirl.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
+        FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
       end
       let(:employer_organization) do
-        FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site).tap do |org|
+        FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site).tap do |org|
           benefit_sponsorship = org.employer_profile.add_benefit_sponsorship
           benefit_sponsorship.save
           org
         end
       end
       let(:person) do
-        FactoryGirl.create(:person, :with_hbx_staff_role).tap do |person|
-          FactoryGirl.create(:permission, :super_admin).tap do |permission|
+        FactoryBot.create(:person, :with_hbx_staff_role).tap do |person|
+          FactoryBot.create(:permission, :super_admin).tap do |permission|
             person.hbx_staff_role.update_attributes(permission_id: permission.id)
             person
           end
         end
       end
       let(:user) do
-        FactoryGirl.create(:user, person: person)
+        FactoryBot.create(:user, person: person)
       end
       let(:benefit_sponsorship) do
         employer_organization.benefit_sponsorships.first
@@ -997,25 +997,25 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
     context "of an hbx super admin clicks Submit in Change FEIN window" do
       let(:site) do
-        FactoryGirl.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
+        FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
       end
       let(:employer_organization) do
-        FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site).tap do |org|
+        FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site).tap do |org|
           benefit_sponsorship = org.employer_profile.add_benefit_sponsorship
           benefit_sponsorship.save
           org
         end
       end
       let(:person) do
-        FactoryGirl.create(:person, :with_hbx_staff_role).tap do |person|
-          FactoryGirl.create(:permission, :super_admin).tap do |permission|
+        FactoryBot.create(:person, :with_hbx_staff_role).tap do |person|
+          FactoryBot.create(:permission, :super_admin).tap do |permission|
             person.hbx_staff_role.update_attributes(permission_id: permission.id)
             person
           end
         end
       end
       let(:user) do
-        FactoryGirl.create(:user, person: person)
+        FactoryBot.create(:user, person: person)
       end
       let(:benefit_sponsorship) do
         employer_organization.benefit_sponsorships.first

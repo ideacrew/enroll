@@ -1,10 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe "_new_benefit_application.html.slim", :type => :view, dbclean: :after_each  do
-  let!(:rating_area)                  { FactoryGirl.create_default :benefit_markets_locations_rating_area }
-  let!(:service_area)                 { FactoryGirl.create_default :benefit_markets_locations_service_area }
+  let!(:rating_area)                  { FactoryBot.create_default :benefit_markets_locations_rating_area }
+  let!(:service_area)                 { FactoryBot.create_default :benefit_markets_locations_service_area }
   let!(:site)                          { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-  let!(:organization)                  { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+  let!(:organization)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
   let!(:employer_profile)              { organization.employer_profile }
   let(:benefit_sponsorship)           { bs = employer_profile.add_benefit_sponsorship
                                         bs.save!

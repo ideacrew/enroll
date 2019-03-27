@@ -1000,16 +1000,16 @@ describe BenefitGroup, type: :model, dbclean: :after_each do
     end
 
     describe 'set_lowest_and_highest', dbclean: :after_each do
-      let(:benefit_group) { FactoryGirl.create(:benefit_group, plan_option_kind: 'sole_source', reference_plan: plan)}
+      let(:benefit_group) { FactoryBot.create(:benefit_group, plan_option_kind: 'sole_source', reference_plan: plan)}
       let(:organization)            { employer_profile.organization }
-      let(:carrier_profile)         { FactoryGirl.create(:carrier_profile, organization: organization) }
-      let(:carrier_profile_1)       { FactoryGirl.create(:carrier_profile) }
-      let(:reference_plan_choice)   { FactoryGirl.create(:plan, :with_premium_tables, active_year: benefit_group.start_on.year, carrier_profile: carrier_profile, metal_level: "gold") }
-      let(:bronze_plan_choice)      { FactoryGirl.create(:plan, active_year: benefit_group.start_on.year, carrier_profile: carrier_profile, metal_level: "bronze", is_vertical: false) }
-      let(:plan) { FactoryGirl.create(:plan, carrier_profile: carrier_profile)}
+      let(:carrier_profile)         { FactoryBot.create(:carrier_profile, organization: organization) }
+      let(:carrier_profile_1)       { FactoryBot.create(:carrier_profile) }
+      let(:reference_plan_choice)   { FactoryBot.create(:plan, :with_premium_tables, active_year: benefit_group.start_on.year, carrier_profile: carrier_profile, metal_level: "gold") }
+      let(:bronze_plan_choice)      { FactoryBot.create(:plan, active_year: benefit_group.start_on.year, carrier_profile: carrier_profile, metal_level: "bronze", is_vertical: false) }
+      let(:plan) { FactoryBot.create(:plan, carrier_profile: carrier_profile)}
       let(:elected_plan_set) do
         plans = [1, 2].collect do
-          FactoryGirl.create(:plan, :with_premium_tables, active_year: benefit_group.start_on.year, carrier_profile: carrier_profile)
+          FactoryBot.create(:plan, :with_premium_tables, active_year: benefit_group.start_on.year, carrier_profile: carrier_profile)
         end
         plans.concat([reference_plan_choice, bronze_plan_choice])
         plans

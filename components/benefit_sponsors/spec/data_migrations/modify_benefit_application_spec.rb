@@ -76,7 +76,7 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
     context "extend open enrollment" do
         let!(:start_on)  { TimeKeeper.date_of_record.next_month.beginning_of_month }
         let!(:effective_period)  { start_on..start_on.next_year.prev_day }
-        let!(:ineligible_benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, :with_benefit_package, benefit_sponsorship: benefit_sponsorship, aasm_state: "enrollment_ineligible", effective_period: effective_period)}
+        let!(:ineligible_benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, :with_benefit_package, benefit_sponsorship: benefit_sponsorship, aasm_state: "enrollment_ineligible", effective_period: effective_period)}
 
         before do
           allow(ENV).to receive(:[]).with("action").and_return("extend_open_enrollment")

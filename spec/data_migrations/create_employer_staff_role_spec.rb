@@ -13,15 +13,15 @@ describe CreateEmployerStaffRole, dbclean: :after_each do
   end
 
   describe 'for migrate' do
-    let!(:person)                       { FactoryGirl.create(:person) }
-    let!(:rating_area)                  { FactoryGirl.create_default :benefit_markets_locations_rating_area }
-    let!(:service_area)                 { FactoryGirl.create_default :benefit_markets_locations_service_area }
+    let!(:person)                       { FactoryBot.create(:person) }
+    let!(:rating_area)                  { FactoryBot.create_default :benefit_markets_locations_rating_area }
+    let!(:service_area)                 { FactoryBot.create_default :benefit_markets_locations_service_area }
     let!(:site)                         { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-    let!(:organization)                 { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+    let!(:organization)                 { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let!(:employer_profile)             { organization.employer_profile }
 
     context 'for successful data_migration' do
-      let!(:user)                        { FactoryGirl.create(:user, person: person) }
+      let!(:user)                        { FactoryBot.create(:user, person: person) }
 
       before :each do
         ENV['person_hbx_id'] = person.hbx_id

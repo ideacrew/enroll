@@ -31,7 +31,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
   end
 
   describe "#product_rates_available?", :dbclean => :after_each  do
-    let!(:product) { FactoryGirl.create(:benefit_markets_products_health_products_health_product) }
+    let!(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
     let(:benefit_sponsorship){ double("benefit_sponsorship") }
 
     context "when active_benefit_application is present" do
