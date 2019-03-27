@@ -28,11 +28,11 @@ module BenefitSponsors
       end
 
       it "should render show template" do
-        expect(response).to render_template("show_pending")
+        assert_template "show_pending"
       end
 
       it "should return http success" do
-        expect(response).to have_http_status(:success)
+        assert_response :success
       end
     end
 
@@ -45,7 +45,7 @@ module BenefitSponsors
         benefit_sponsorship.save!
         allow(controller).to receive(:authorize).and_return(true)
         sign_in user
-        get :show, id: benefit_sponsor.profiles.first.id, tab: 'employees'
+        get :show, params: {id: benefit_sponsor.profiles.first.id.to_s}
         allow(employer_profile).to receive(:active_benefit_sponsorship).and_return benefit_sponsorship
       end
 
@@ -68,16 +68,16 @@ module BenefitSponsors
         benefit_sponsorship.save!
         allow(controller).to receive(:authorize).and_return(true)
         sign_in user
-        get :coverage_reports, employer_profile_id: benefit_sponsor.profiles.first.id, billing_date: TimeKeeper.date_of_record.next_month.beginning_of_month.strftime("%m/%d/%Y")
+        get :coverage_reports, params: { employer_profile_id: benefit_sponsor.profiles.first.id, billing_date: TimeKeeper.date_of_record.next_month.beginning_of_month.strftime("%m/%d/%Y")}
         allow(employer_profile).to receive(:active_benefit_sponsorship).and_return benefit_sponsorship
       end
 
       it "should render coverage_reports template" do
-        expect(response).to render_template("coverage_reports")
+        assert_template "coverage_reports"
       end
 
       it "should return http success" do
-        expect(response).to have_http_status(:success)
+        assert_response :success
       end
     end
   end
