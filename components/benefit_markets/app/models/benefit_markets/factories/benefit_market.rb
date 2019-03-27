@@ -9,7 +9,7 @@ module BenefitMarkets
       end
 
       def self.call(description:, kind:, site_urn:, title:, configuration:, site_id:)
-        BenefitMarkets::BenefitMarket.new description: description, 
+        BenefitMarkets::BenefitMarket.new description: description,
           site_id: site_id,
           kind: kind,
           site_urn: site_urn,
