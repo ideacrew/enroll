@@ -43,7 +43,7 @@ module BenefitSponsors
         end
 
         def create
-          @broker_management_form = BenefitSponsors::Organizations::OrganizationForms::BrokerManagementForm.for_create(params)
+          @broker_management_form = BenefitSponsors::Organizations::OrganizationForms::BrokerManagementForm.for_create(sanitized_params)
           @broker_management_form.save
           flash[:notice] = "Your broker has been notified of your selection and should contact you shortly. You can always call or email them directly. If this is not the broker you want to use, select 'Change Broker'."
           redirect_to profiles_employers_employer_profile_path(@employer_profile, tab: 'brokers')
@@ -64,6 +64,12 @@ module BenefitSponsors
         end
 
         private
+
+        def sanitized_params
+          params.permit(:broker_agency_id,
+                        :broker_role_id,
+                        :employer_profile_id)
+        end
 
         def updateable?
           authorize @employer_profile, :updateable?
