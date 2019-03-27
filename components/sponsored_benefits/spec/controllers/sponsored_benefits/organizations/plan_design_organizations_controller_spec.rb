@@ -154,7 +154,7 @@ module SponsoredBenefits
           before :each do
             person = person(role)
             sign_in user(person)
-            patch :update, organization: updated_params, id: prospect_organization.id.to_s
+            patch :update, organization: updated_params, id: prospect_organization.id.to_s, profile_id: prospect_organization.broker_agency_profile
           end
 
           it "should update plan design organization legal_name" do
@@ -172,7 +172,7 @@ module SponsoredBenefits
           before :each do
             person = person(role)
             sign_in user(person)
-            patch :update, organization: with_out_office_params, id: prospect_organization.id.to_s
+            patch :update, organization: with_out_office_params, id: prospect_organization.id.to_s, profile_id: prospect_organization.broker_agency_profile
           end
 
           it "should not update legal_name and throw flash error" do
@@ -187,7 +187,7 @@ module SponsoredBenefits
           before :each do
             person = person(role)
             sign_in user(person)
-            patch :update, id: organization.id.to_s
+            patch :update, id: organization.id.to_s, profile_id: organization.broker_agency_profile
           end
 
           it "should throw a flash Error" do
