@@ -1,4 +1,5 @@
 site:
+  deployed_to_production: false
   key: :cca
   subdomain: "mhc"
   domain_name: "hbxshop.org"
