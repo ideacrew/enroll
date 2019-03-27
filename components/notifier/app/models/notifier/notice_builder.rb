@@ -272,6 +272,8 @@ module Notifier
       receiver = resource
       receiver = resource.person if sub_resource?
 
+      raise "Unable to save the document as identifier is nil. Event name - #{event_name}, recipient - #{receiver.full_name}" if doc_uri.nil?
+
       doc_params = {
         title: notice_filename,
         creator: "hbx_staff",
