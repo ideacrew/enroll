@@ -40,9 +40,9 @@ describe AddHbxEnrollmentMember, dbclean: :after_each do
   end
 
   describe "creating primary member record for an enrollment", dbclean: :after_each do
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
-    let(:enrollment){ FactoryGirl.create(:hbx_enrollment, household: family.active_household, kind: "employer_sponsored") }
-    let(:family_member) { FactoryGirl.create(:family_member, family: family)}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
+    let(:enrollment){ FactoryBot.create(:hbx_enrollment, household: family.active_household, kind: "employer_sponsored") }
+    let(:family_member) { FactoryBot.create(:family_member, family: family)}
     before(:each) do
       allow(ENV).to receive(:[]).with("hbx_id").and_return(enrollment.hbx_id.to_s)
       allow(ENV).to receive(:[]).with("family_member_id").and_return(family_member.id)
@@ -56,7 +56,7 @@ describe AddHbxEnrollmentMember, dbclean: :after_each do
     end
 
     it "should not create a new enrollment member record if it already exists under enrollment" do
-      enrollment.hbx_enrollment_members << FactoryGirl.build(:hbx_enrollment_member, applicant_id: family_member.id, is_subscriber: true, eligibility_date: enrollment.effective_on)
+      enrollment.hbx_enrollment_members << FactoryBot.build(:hbx_enrollment_member, applicant_id: family_member.id, is_subscriber: true, eligibility_date: enrollment.effective_on)
       enrollment.save
       hem_size = enrollment.hbx_enrollment_members.count
       subject.migrate

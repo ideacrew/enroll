@@ -7,7 +7,7 @@ module BenefitMarkets
       let(:future_product) { create :benefit_markets_products_product }
       let(:date) { TimeKeeper.date_of_record }
       let(:future_date) { (date+1.year) }
-      let!(:product) { FactoryGirl.create(:benefit_markets_products_health_products_health_product) }
+      let!(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
 
       context "#with current date" do
 

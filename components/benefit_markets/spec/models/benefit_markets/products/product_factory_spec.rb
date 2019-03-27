@@ -4,7 +4,7 @@ module BenefitMarkets
   RSpec.describe Products::ProductFactory, type: :model do
 
     describe "#has_rates?" do
-      let!(:product) { FactoryGirl.create(:benefit_markets_products_health_products_health_product) }
+      let!(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
 
       it "should return true if rates are available with atleast one carrier" do
         expect(::BenefitMarkets::Products::ProductFactory.new(TimeKeeper.date_of_record).has_rates?).to eq true

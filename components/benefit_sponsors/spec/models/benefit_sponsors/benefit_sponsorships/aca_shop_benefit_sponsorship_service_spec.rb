@@ -152,7 +152,7 @@ module BenefitSponsors
 
    describe ".update_fein" do
     let(:benefit_sponsorship) { employer_organization.employer_profile.add_benefit_sponsorship }
-    let(:exisitng_org) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)}
+    let(:exisitng_org) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)}
     let(:service_instance) { BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipService.new(benefit_sponsorship: benefit_sponsorship)}
     let(:legal_name) { exisitng_org.legal_name }
 

@@ -74,13 +74,13 @@ module BenefitSponsors
     end
 
     describe 'eligible_employee_criteria' do
-      let!(:rating_area)         { FactoryGirl.create_default :benefit_markets_locations_rating_area }
-      let!(:service_area)        { FactoryGirl.create_default :benefit_markets_locations_service_area }
+      let!(:rating_area)         { FactoryBot.create_default :benefit_markets_locations_rating_area }
+      let!(:service_area)        { FactoryBot.create_default :benefit_markets_locations_service_area }
       let!(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-      let!(:organization)        { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+      let!(:organization)        { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
       let!(:employer_profile)    { organization.employer_profile }
       let!(:benefit_sponsorship) { employer_profile.add_benefit_sponsorship }
-      let!(:ce2)                 { FactoryGirl.create(:census_employee, benefit_sponsorship_id: benefit_sponsorship.id, expected_selection: 'will_not_participate') }
+      let!(:ce2)                 { FactoryBot.create(:census_employee, benefit_sponsorship_id: benefit_sponsorship.id, expected_selection: 'will_not_participate') }
       let!(:ces)                 { create_list(:census_employee, 5, :with_enrolled_census_employee, benefit_sponsorship_id: benefit_sponsorship.id)}
 
       before :each do
