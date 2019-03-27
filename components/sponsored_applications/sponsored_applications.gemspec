@@ -20,6 +20,7 @@ Gem::Specification.new do |s|
   s.add_dependency "slim", "3.0.8"
   s.add_dependency "mongoid", '~> 5.4.0'
   s.add_dependency 'aasm', '~> 4.8.0'
+  s.add_dependency 'mongoid_userstamp', '0.4.0'
 
   s.add_development_dependency 'rspec-rails'
   s.add_development_dependency 'rspec'

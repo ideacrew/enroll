@@ -4,6 +4,7 @@ PATH
     sponsored_applications (0.0.1)
       aasm (~> 4.8.0)
       mongoid (~> 5.4.0)
+      mongoid_userstamp (= 0.4.0)
       rails (~> 4.2.3)
       slim (= 3.0.8)
 
@@ -77,6 +78,8 @@ GEM
       mongo (>= 2.5.1, < 3.0.0)
       origin (~> 2.3)
       tzinfo (>= 0.3.37)
+    mongoid_userstamp (0.4.0)
+      mongoid (>= 3.0.4)
     nokogiri (1.8.4)
       mini_portile2 (~> 2.3.0)
     origin (2.3.1)
