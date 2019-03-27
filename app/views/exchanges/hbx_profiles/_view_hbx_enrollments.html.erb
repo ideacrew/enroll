@@ -29,8 +29,8 @@
               <td id="employee_status" class="hidden"><%= employee_eligibility_status(enrollment) %></td>
               <td id="enrollment_can_be_reinstated" class="hidden"><%= enrollment.can_be_reinstated? %></td>
               <td id="enrollment_market" class="hidden"><%= enrollment.market_name %></td>
-              <td id="cobra_employee" class="hidden"><%= enrollment.employee_role.is_cobra_status? %></td>
-              <td id="cobra_enrollment" class="hidden"><%= enrollment.is_cobra_status? %></td>
+              <td id="cobra_employee" class="hidden"><%= enrollment.is_shop? && enrollment.employee_role.is_cobra_status? %></td>
+              <td id="cobra_enrollment" class="hidden"><%= enrollment.is_shop? && enrollment.is_cobra_status? %></td>
               <td id="active_enroll_exists_with_reinstate_date" class="hidden"><%= enrollment.has_active_or_term_exists_for_reinstated_date? %></td>
               <td><%= enrollment.effective_on.year %></td>
               <td><%= enrollment.effective_on %></td>
