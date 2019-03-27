@@ -14,7 +14,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   #before_action :authorize_for, except: [:edit, :update, :destroy, :request_help, :staff_index, :assister_index]
   #before_action :authorize_for_instance, only: [:edit, :update, :destroy]
   before_action :check_csr_or_hbx_staff, only: [:family_index]
-  before_action :find_benefit_sponsorship, only: [:oe_extendable_applications, :oe_extended_applications, :edit_open_enrollment, :extend_open_enrollment, :close_extended_open_enrollment, :edit_fein, :update_fein]
+  before_action :find_benefit_sponsorship, only: [:oe_extendable_applications, :oe_extended_applications, :edit_open_enrollment, :extend_open_enrollment, :close_extended_open_enrollment, :edit_fein, :update_fein, :force_publish, :edit_force_publish]
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
   layout 'single_column'
@@ -142,14 +142,29 @@ class Exchanges::HbxProfilesController < ApplicationController
      end
   end
 
+  def edit_force_publish
+    @element_to_replace_id = params[:employer_actions_id]
+    @benefit_application = @benefit_sponsorship.benefit_applications.draft_state.last
+
+    respond_to do |format|
+     format.js
+   end
+  end
+
   def force_publish
-      @benfit_sponsorships = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:"_id".in => params[:ids])
-      benefit_application = @benfit_sponsorships.first.benefit_applications.draft_state.last
-      @service = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(benefit_application)
-      @service.force_submit_application
-      respond_to do |format|
-       format.js
-     end
+    @element_to_replace_id = params[:employer_actions_id]
+    @benefit_application   = @benefit_sponsorship.benefit_applications.draft_state.last
+    
+    if @benefit_application.present?
+      @service = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(@benefit_application)
+      if @service.may_force_submit_application? || params[:publish_with_warnings] == 'true'
+        @service.force_submit_application      
+      end
+    end
+
+    respond_to do |format|
+      format.js
+    end
   end
 
   def employer_invoice
@@ -765,4 +780,5 @@ private
     @benefit_sponsorship = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.find(params[:benefit_sponsorship_id] || params[:id])
     raise "Unable to find benefit sponsorship" if @benefit_sponsorship.blank?
   end
+
 end
