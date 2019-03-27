@@ -37,7 +37,7 @@ $(function() {
       $.ajax({
         type: "POST",
         url: $("#new_forms_plan_design_proposal").attr('action'),
-        data: $("#new_forms_plan_design_proposal").serialize(),
+        data: $("#new_forms_plan_design_proposal").serialize() + "profile_id=" + $("#profile_id").val(),
         dataType: "script",
         success: function(data) {
         }

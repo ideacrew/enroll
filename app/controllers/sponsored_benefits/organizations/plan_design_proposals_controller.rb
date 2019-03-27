@@ -109,7 +109,7 @@ module SponsoredBenefits
           flash[:error] = "Quote information save failed."
         end
 
-        format.js
+        format.js { redirect_to edit_organizations_plan_design_organization_plan_design_proposal_path(@plan_design_organization, @plan_design_proposal.proposal, profile_id: params[:profile_id])}
       end
     end
 
@@ -131,13 +131,13 @@ module SponsoredBenefits
 
     def destroy
       @plan_design_proposal.destroy!
-      redirect_to organizations_plan_design_organization_plan_design_proposals_path(@plan_design_proposal.plan_design_organization._id)
+      redirect_to organizations_plan_design_organization_plan_design_proposals_path(@plan_design_proposal.plan_design_organization._id, profile_id: params[:profile_id])
     end
 
     private
 
     def effective_datatable
-      ::Effective::Datatables::PlanDesignProposalsDatatable.new(organization_id: @plan_design_organization._id)
+      ::Effective::Datatables::PlanDesignProposalsDatatable.new(organization_id: @plan_design_organization._id, profile_id: params[:profile_id])
     end
 
     def load_plan_design_organization

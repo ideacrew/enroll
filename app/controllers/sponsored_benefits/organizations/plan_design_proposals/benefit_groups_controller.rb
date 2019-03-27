@@ -6,7 +6,7 @@ module SponsoredBenefits
         plan_design_form.for_create(benefit_group_params)
 
         if plan_design_proposal.save
-          render json: { url: new_organizations_plan_design_proposal_plan_review_path(plan_design_proposal) }
+          render json: { url: new_organizations_plan_design_proposal_plan_review_path(plan_design_proposal, profile_id: params[:profile_id]) }
         else
           flash[:error] = "Something went wrong"
         end
