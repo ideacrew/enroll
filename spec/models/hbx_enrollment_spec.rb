@@ -3343,3 +3343,93 @@ describe "#reterm_enrollment_with_earlier_date" do
     end
   end
 end
+
+describe '#cancel_terminated_enrollment' do
+  let(:user) { FactoryGirl.create(:user, roles: ['hbx_staff']) }
+  let!(:person) { FactoryGirl.create(:person)}
+  let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+  let!(:household) { FactoryGirl.create(:household, family: family) }
+  let!(:enrollment) {
+    FactoryGirl.create(:hbx_enrollment,
+                       household: family.active_household,
+                       coverage_kind: 'health',
+                       kind: 'employer_sponsored',
+                       effective_on: TimeKeeper.date_of_record.last_month.beginning_of_month,
+                       terminated_on: TimeKeeper.date_of_record.end_of_month,
+                       aasm_state: 'coverage_termination_pending'
+    )}
+  let!(:glue_event_queue_name) { "#{Rails.application.config.acapi.hbx_id}.#{Rails.application.config.acapi.environment_name}.q.glue.enrollment_event_batch_handler" }
+
+  context 'shop enrollment' do
+    context 'enrollment that already terminated with past date' do
+      context 'with new termination date == enrollment effective date' do
+
+        before do
+          enrollment.update_attributes(aasm_state:'coverage_terminated', terminated_on: TimeKeeper.date_of_record - 1.day)
+          enrollment.reload
+        end
+        it 'should cancel enrollment' do
+          expect(enrollment).to receive(:notify).with('acapi.info.events.hbx_enrollment.terminated', {:reply_to=>glue_event_queue_name, 'hbx_enrollment_id' => enrollment.hbx_id, 'enrollment_action_uri' => 'urn:openhbx:terms:v1:enrollment#terminate_enrollment', 'is_trading_partner_publishable' => false})
+          enrollment.cancel_terminated_enrollment(TimeKeeper.date_of_record.last_month.beginning_of_month, false)
+          enrollment.reload
+          expect(enrollment.aasm_state).to eq 'coverage_canceled'
+          expect(enrollment.terminated_on).to eq nil
+          expect(enrollment.termination_submitted_on).to eq nil
+          expect(enrollment.terminate_reason).to eq nil
+        end
+      end
+    end
+
+    context 'enrollment that already terminated with future date' do
+      context 'with new termination date == enrollment effective date' do
+        it 'should cancel enrollment' do
+          expect(enrollment).to receive(:notify).with('acapi.info.events.hbx_enrollment.terminated', {:reply_to=>glue_event_queue_name, 'hbx_enrollment_id' => enrollment.hbx_id, 'enrollment_action_uri' => 'urn:openhbx:terms:v1:enrollment#terminate_enrollment', 'is_trading_partner_publishable' => false})
+          enrollment.cancel_terminated_enrollment(TimeKeeper.date_of_record.last_month.beginning_of_month, false)
+          enrollment.reload
+          expect(enrollment.aasm_state).to eq 'coverage_canceled'
+          expect(enrollment.terminated_on).to eq nil
+          expect(enrollment.termination_submitted_on).to eq nil
+          expect(enrollment.terminate_reason).to eq nil
+        end
+      end
+    end
+  end
+
+  context 'IVL enrollment' do
+
+    before do
+      enrollment.kind = 'individual'
+      enrollment.aasm_state= 'coverage_terminated'
+      enrollment.save
+    end
+
+    context 'enrollment that already terminated with past date' do
+      context 'with new termination date == enrollment effective date' do
+        it 'should cancel enrollment' do
+          enrollment.update_attributes(terminated_on: TimeKeeper.date_of_record - 1.day)
+          expect(enrollment).to receive(:notify).with('acapi.info.events.hbx_enrollment.terminated', {:reply_to=>glue_event_queue_name, "hbx_enrollment_id" => enrollment.hbx_id, 'enrollment_action_uri' => 'urn:openhbx:terms:v1:enrollment#terminate_enrollment', 'is_trading_partner_publishable' => false})
+          enrollment.cancel_terminated_enrollment(TimeKeeper.date_of_record.last_month.beginning_of_month, false)
+          enrollment.reload
+          expect(enrollment.aasm_state).to eq 'coverage_canceled'
+          expect(enrollment.terminated_on).to eq nil
+          expect(enrollment.termination_submitted_on).to eq nil
+          expect(enrollment.terminate_reason).to eq nil
+        end
+      end
+    end
+
+    context 'enrollment that already terminated with future date' do
+      context 'with new termination date == enrollment effective date' do
+        it 'should cancel enrollment' do
+          expect(enrollment).to receive(:notify).with('acapi.info.events.hbx_enrollment.terminated', {:reply_to=>glue_event_queue_name, "hbx_enrollment_id" => enrollment.hbx_id, "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment", "is_trading_partner_publishable" => false})
+          enrollment.cancel_terminated_enrollment(TimeKeeper.date_of_record.last_month.beginning_of_month, false)
+          enrollment.reload
+          expect(enrollment.aasm_state).to eq 'coverage_canceled'
+          expect(enrollment.terminated_on).to eq nil
+          expect(enrollment.termination_submitted_on).to eq nil
+          expect(enrollment.terminate_reason).to eq nil
+        end
+      end
+    end
+  end
+end
