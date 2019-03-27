@@ -173,11 +173,11 @@ module Observers
               employer_notice_event = 'employee_mid_year_plan_change_congressional_notice'
             else
               employer_notice_event = 'employee_mid_year_plan_change_non_congressional_notice'
-              deliver(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "employee_plan_selection_confirmation_sep_new_hire")  
             end
+            deliver(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "employee_plan_selection_confirmation_sep_new_hire")
             deliver(recipient: hbx_enrollment.employer_profile, event_object: hbx_enrollment, notice_event: employer_notice_event)
           elsif hbx_enrollment.is_open_enrollment?
-            deliver(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "notify_employee_of_plan_selection_in_open_enrollment") unless hbx_enrollment.benefit_group.is_congress
+            deliver(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "notify_employee_of_plan_selection_in_open_enrollment")
           end
         end
       end
