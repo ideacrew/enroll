@@ -1,5 +1,5 @@
 require 'rails_helper'
-RSpec.describe "/hbx_profiles/_edit_force_publish", :dbclean => :after_each do
+RSpec.describe "/hbx_profiles/_edit_force_publish", :dbclean => :around_each do
   let(:site) do
     FactoryGirl.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
   end
