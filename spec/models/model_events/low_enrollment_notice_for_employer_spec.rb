@@ -11,11 +11,7 @@ describe 'ModelEvents::LowEnrollmentNoticeForEmployer', dbclean: :around_each do
   let!(:date_mock_object) { double("Date", day: (model_instance.open_enrollment_end_on - 2.days).day)}
 
   before do
-    TimeKeeper.set_date_of_record_unprotected!(Date.new(start_on.year, start_on.prev_month.month, date_mock_object.day))
-  end
-
-   after :all do
-    TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    allow(TimeKeeper).to receive(:date_of_record).and_return model_instance.open_enrollment_end_on - 2.days
   end
 
   describe "ModelEvent" do
