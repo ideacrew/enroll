@@ -133,6 +133,7 @@ group :development, :test do
   gem 'rspec_junit_formatter',  '~> 0.2.3'
   gem 'yard',                   '~> 0.9.12',  require: false
   gem 'yard-mongoid',           '~> 0.1',     require: false
+  gem 'rails-controller-testing'
 end
 
 group :test do

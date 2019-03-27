@@ -26,6 +26,7 @@ require 'test_prof'
 require 'test_prof/recipes/rspec/factory_default'
 require 'ivl_helper'
 require 'aca_test_helper'
+require 'rails-controller-testing'
 
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate
