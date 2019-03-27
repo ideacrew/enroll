@@ -14,7 +14,7 @@ module BenefitMarkets
             'vr_due'=>'95',
             'open_enrl_start_on'=>'2017-11-01',
             'open_enrl_end_on'=>'2017-01-31',
-            'initial_application_configuration'=>{ 'pub_due_dom'=>'5',
+          'initial_application_configuration'=>{ 'pub_due_dom'=>'5',
               'erlst_strt_prior_eff_months'=>'-3',
               'appeal_per_aft_app_denial_dys'=>'30',
               'quiet_per_end'=>'28',
@@ -73,7 +73,7 @@ module BenefitMarkets
 
     describe "GET new", dbclean: :after_each do
       before do
-        get :new, :site_id => site.id
+        get :new, params: {:site_id => site.id}
       end
 
       it "should be a success" do
@@ -90,7 +90,7 @@ module BenefitMarkets
 
       context 'with valid params' do
         before do
-          post :create, :site_id => site.id, :benefit_market => valid_params
+          post :create, params: {:site_id => site.id, :benefit_market => valid_params}
         end
 
         it "should redirect" do
@@ -100,7 +100,7 @@ module BenefitMarkets
 
       context "with invalid params" do
         before do
-          post :create, :site_id => site.id, :benefit_market => invalid_params
+          post :create, params: {:site_id => site.id, :benefit_market => invalid_params}
         end
 
         it "re-renders new" do
@@ -118,7 +118,7 @@ module BenefitMarkets
       let(:benefit_market) { FactoryBot.create(:benefit_markets_benefit_market, site: site) }
 
       before do
-        put :edit, :id => benefit_market.id
+        put :edit,params: {:id => benefit_market.id}
       end
 
       it "should be a success" do
@@ -137,7 +137,7 @@ module BenefitMarkets
 
       context "with valid params" do
         before do
-          patch :update, :id => benefit_market.id, :benefit_market => valid_params
+          patch :update, params: {:id => benefit_market.id, :benefit_market => valid_params}
         end
 
         it "should redirect to site benefit markets index" do
@@ -147,7 +147,7 @@ module BenefitMarkets
 
       context "when update fails" do
         before do
-          patch :update, :id => benefit_market.id, :benefit_market => invalid_params
+          patch :update, params: {:id => benefit_market.id, :benefit_market => invalid_params}
         end
 
         it "should redirect to edit" do

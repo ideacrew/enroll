@@ -2,6 +2,8 @@ module BenefitMarkets
   class BenefitMarketsController < ApplicationController
     layout 'benefit_markets/application.html.slim'
     before_action :set_site_id
+    before_action :permit_params, only: [:create]
+    
 
     def index
       @benefit_markets = BenefitMarkets::BenefitMarket.where(site_id: @site_id)
@@ -14,7 +16,6 @@ module BenefitMarkets
     def create
       # pundit can I do this here
       @benefit_market = BenefitMarkets::Forms::BenefitMarket.for_create params[:benefit_market].merge(site_id: @site_id)
-
       if @benefit_market.save
         redirect_to site_benefit_markets_path(site_id: @site_id)
       else
@@ -28,8 +29,7 @@ module BenefitMarkets
 
     def update
       @benefit_market = BenefitMarkets::Forms::BenefitMarket.for_update params[:id]
-
-      if @benefit_market.update_attributes params[:benefit_market]
+      if @benefit_market.update_attributes market_params
         redirect_to site_benefit_markets_path(site_id: @benefit_market.site_id)
       else
         render 'edit'
@@ -49,12 +49,18 @@ module BenefitMarkets
       @site_id = params[:site_id]
     end
 
+    def permit_params 
+      self.params = params.permit!
+    end
+
     def market_params
       params.require(:benefit_market).permit(
         :site_urn,
         :kind,
         :title,
-        :description
+        :description,
+        :aca_individual_configuration,
+        :aca_shop_configuration,
       )
     end
 
