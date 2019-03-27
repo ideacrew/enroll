@@ -2848,10 +2848,34 @@ describe HbxEnrollment, dbclean: :after_all do
           expect(enrollment.can_be_reinstated?).to be_falsey
         end
       end
+
+      context "reinstating employer sponsored enrollment for cobra employee" do
+
+        before do
+          enrollment.update_attributes(aasm_state: 'coverage_terminated', terminated_on: benefit_group.plan_year.end_on - 1.month)
+          enrollment.employee_role.census_employee.update_attributes(aasm_state:'cobra_linked', cobra_begin_date: TimeKeeper.date_of_record)
+        end
+
+        it "should return false" do
+          expect(enrollment.can_be_reinstated?).to be_falsey
+        end
+      end
+
+      context "reinstating cobra enrollment for active employee" do
+
+        before do
+          enrollment.update_attributes(kind:'employer_sponsored_cobra', aasm_state: 'coverage_terminated', terminated_on: benefit_group.plan_year.end_on - 1.month)
+        end
+
+        it "should return false" do
+          expect(enrollment.can_be_reinstated?).to be_falsey
+        end
+
+      end
     end
   end
 
-  describe "#has_active_enrollment_exists_for_reinstated_date??" do
+  describe "#has_active_or_term_exists_for_reinstated_date?" do
 
     context "for Individual market" do
       let(:ivl_family)        { FactoryGirl.create(:family, :with_primary_family_member) }
@@ -2879,14 +2903,27 @@ describe HbxEnrollment, dbclean: :after_all do
 
 
       it "should return true if active enrollment exists for reinstated date " do
-        expect(ivl_enrollment.has_active_enrollment_exists_for_reinstated_date?).to be_truthy
+        expect(ivl_enrollment.has_active_or_term_exists_for_reinstated_date?).to be_truthy
+      end
+      
+      it "should return true if termianted enrollment exists for reinstated date" do
+        ivl_enrollment2.update_attributes(effective_on: TimeKeeper.date_of_record.end_of_month + 1.day, aasm_state: "coverage_terminated",)
+        ivl_enrollment2.reload
+        expect(ivl_enrollment.has_active_or_term_exists_for_reinstated_date?).to be_truthy
+      end
+
+      it "should return true if future active enrollment exists" do
+        ivl_enrollment2.update_attributes(aasm_state: "coverage_selected", effective_on: TimeKeeper.date_of_record.beginning_of_year + 5.months)
+        ivl_enrollment2.reload
+        expect(ivl_enrollment.has_active_or_term_exists_for_reinstated_date?).to be_truthy
       end
 
       it "should return false if no active enrollment exists for reinstated date" do
-        ivl_enrollment2.update_attributes(effective_on: TimeKeeper.date_of_record.beginning_of_year + 2.days)
+        ivl_enrollment2.update_attributes(effective_on: TimeKeeper.date_of_record.end_of_month + 1.day, aasm_state: "coverage_canceled",)
         ivl_enrollment2.reload
-        expect(ivl_enrollment.has_active_enrollment_exists_for_reinstated_date?).to be_falsey
+        expect(ivl_enrollment.has_active_or_term_exists_for_reinstated_date?).to be_falsey
       end
+
     end
 
     context "for SHOP market" do
@@ -2958,13 +2995,25 @@ describe HbxEnrollment, dbclean: :after_all do
       }
 
       it "should return true if active enrollment exists for reinstated date " do
-        expect(enrollment.has_active_enrollment_exists_for_reinstated_date?).to be_truthy
+        expect(enrollment.has_active_or_term_exists_for_reinstated_date?).to be_truthy
+      end
+
+      it "should return true if termianted enrollment exists for reinstated date" do
+        enrollment2.update_attributes(effective_on:benefit_group.plan_year.end_on - 2.month + 1.day, aasm_state: "coverage_terminated")
+        enrollment2.reload
+        expect(enrollment.has_active_or_term_exists_for_reinstated_date?).to be_truthy
+      end
+
+      it "should return true if future active enrollment exists" do
+        enrollment2.update_attributes(effective_on: benefit_group.plan_year.end_on - 1.month)
+        enrollment2.reload
+        expect(enrollment.has_active_or_term_exists_for_reinstated_date?).to be_truthy
       end
 
       it "should return false if no active enrollment exists for reinstated date" do
-        enrollment2.update_attributes(effective_on: benefit_group.plan_year.end_on - 1.month)
+        enrollment2.update_attributes(effective_on:benefit_group.plan_year.end_on - 2.month + 1.day, aasm_state: "coverage_canceled")
         enrollment2.reload
-        expect(enrollment.has_active_enrollment_exists_for_reinstated_date?).to be_falsey
+        expect(enrollment.has_active_or_term_exists_for_reinstated_date?).to be_falsey
       end
 
       context "with employer_sponsored & active cobra enrollment" do
@@ -2972,13 +3021,19 @@ describe HbxEnrollment, dbclean: :after_all do
         it "should return true if active enrollment exists for reinstated date " do
           enrollment2.update_attributes(kind: "employer_sponsored_cobra")
           enrollment2.reload
-          expect(enrollment.has_active_enrollment_exists_for_reinstated_date?).to be_truthy
+          expect(enrollment.has_active_or_term_exists_for_reinstated_date?).to be_truthy
+        end
+
+        it "should return true if future active enrollment exists" do
+          enrollment2.update_attributes(kind: "employer_sponsored_cobra", effective_on: benefit_group.plan_year.end_on - 1.month)
+          enrollment2.reload
+          expect(enrollment.has_active_or_term_exists_for_reinstated_date?).to be_truthy
         end
 
         it "should return false if no active enrollment exists for reinstated date" do
-          enrollment2.update_attributes(kind: "employer_sponsored_cobra", effective_on: benefit_group.plan_year.end_on - 1.month)
+          enrollment2.update_attributes(kind: "employer_sponsored_cobra", effective_on: benefit_group.plan_year.end_on - 1.month, aasm_state: "coverage_canceled")
           enrollment2.reload
-          expect(enrollment.has_active_enrollment_exists_for_reinstated_date?).to be_falsey
+          expect(enrollment.has_active_or_term_exists_for_reinstated_date?).to be_falsey
         end
       end
 
@@ -3001,7 +3056,7 @@ describe HbxEnrollment, dbclean: :after_all do
         }
 
         it "should return false when reinstated date enrollment exits with different employer " do
-          expect(enrollment3.has_active_enrollment_exists_for_reinstated_date?).to be_falsey
+          expect(enrollment3.has_active_or_term_exists_for_reinstated_date?).to be_falsey
         end
       end
     end
