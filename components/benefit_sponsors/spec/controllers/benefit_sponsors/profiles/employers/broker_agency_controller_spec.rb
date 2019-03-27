@@ -45,7 +45,7 @@ module BenefitSponsors
       context 'with out filter criteria' do
         before(:each) do
           sign_in(user_with_hbx_staff_role)
-          xhr :get, :index, employer_profile_id: employer_profile.id, format: :js
+          get :index, params: { employer_profile_id: employer_profile.id}, format: :js, xhr: true
         end
 
         it 'should be a success' do
@@ -78,7 +78,7 @@ module BenefitSponsors
       context 'with filter criteria' do
         before(:each) do
           sign_in(user_with_hbx_staff_role)
-          xhr :get, :index, employer_profile_id: employer_profile.id, q: broker_agency_profile1.legal_name[0], format: :js
+          get :index, params: {employer_profile_id: employer_profile.id, q: broker_agency_profile1.legal_name[0]}, format: :js, xhr: true
         end
 
         it 'should be a success' do
@@ -105,7 +105,7 @@ module BenefitSponsors
       context 'with filter criteria' do
         before(:each) do
           sign_in(user_with_hbx_staff_role)
-          xhr :get, :index, employer_profile_id: employer_profile.id, q: broker_agency_profile2.legal_name[0], format: :js
+          get :index, params:{ employer_profile_id: employer_profile.id, q: broker_agency_profile2.legal_name[0]}, format: :js, xhr: true
         end
 
         it 'should assign broker_agency_profiles variable' do
@@ -117,7 +117,7 @@ module BenefitSponsors
       context 'with out filter criteria with page label' do
         before :each do
           sign_in(user_with_hbx_staff_role)
-          xhr :get, :index, employer_profile_id: employer_profile.id, page: broker_agency_profile1.legal_name[0], format: :js
+          get :index, params: {employer_profile_id: employer_profile.id, page: broker_agency_profile1.legal_name[0]}, format: :js, xhr: true
         end
 
         it 'should be a success' do
@@ -157,7 +157,7 @@ module BenefitSponsors
       context 'with out filter criteria and pagination' do
         before :each do
           sign_in(user_with_hbx_staff_role)
-          xhr :get, :index, employer_profile_id: employer_profile.id, page: broker_agency_profile1.legal_name[0], organization_page: 1, format: :js
+          get :index, params: {employer_profile_id: employer_profile.id, page: broker_agency_profile1.legal_name[0], organization_page: 1}, format: :js, xhr: true
         end
 
         it 'should be a success' do
@@ -197,7 +197,7 @@ module BenefitSponsors
       context 'with filter criteria with both page label and pagination' do
         before :each do
           sign_in(user_with_hbx_staff_role)
-          xhr :get, :index, employer_profile_id: employer_profile.id, q: broker_agency_profile1.legal_name[0], organization_page: 1, format: :js
+          get :index, params:{ employer_profile_id: employer_profile.id, q: broker_agency_profile1.legal_name[0], organization_page: 1}, format: :js, xhr: true
         end
 
         it 'should be a success' do
@@ -225,7 +225,7 @@ module BenefitSponsors
           allow_any_instance_of(HbxStaffRole).to receive(:permission).and_return(double(modify_employer: true))
           sign_in(user_with_hbx_staff_role)
           @request.env['HTTP_REFERER'] = "/benefit_sponsors/profiles/employers/employer_profiles/#{employer_profile.id.to_s}?tab=brokers"
-          post :create, employer_profile_id: employer_profile.id, broker_role_id: broker_role1.id, broker_agency_id: broker_agency_profile1.id
+          post :create, params: {employer_profile_id: employer_profile.id, broker_role_id: broker_role1.id, broker_agency_id: broker_agency_profile1.id}
         end
 
         it 'should initialize broker management form' do
@@ -259,7 +259,7 @@ module BenefitSponsors
         allow_any_instance_of(HbxStaffRole).to receive(:permission).and_return(double(modify_employer: true))
         employer_profile.hire_broker_agency(broker_agency_profile1)
         sign_in(user_with_hbx_staff_role)
-        get :terminate, employer_profile_id: employer_profile.id, direct_terminate: 'true', broker_agency_id: broker_agency_profile1.id, termination_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y')
+        get :terminate, params: {employer_profile_id: employer_profile.id, direct_terminate: 'true', broker_agency_id: broker_agency_profile1.id, termination_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y')}
       end
 
       context 'for terminating an exisiting broker' do
