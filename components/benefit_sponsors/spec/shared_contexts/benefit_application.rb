@@ -19,11 +19,11 @@ RSpec.shared_context "setup initial benefit application", :shared_context => :me
   let(:dental_sponsored_benefit) { false }
   let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }
   let!(:service_areas) { 
-    benefit_sponsorship.service_areas_on(effective_period.min) 
+    benefit_sponsorship.service_areas_on(effective_period.min)
   }
+
   let(:benefit_sponsor_catalog) { benefit_sponsorship.benefit_sponsor_catalog_for(service_areas, effective_period.min) }
   let(:initial_application)     { BenefitSponsors::BenefitApplications::BenefitApplication.new(
-                                      # benefit_sponsorship: benefit_sponsorship,
                                       benefit_sponsor_catalog: benefit_sponsor_catalog,
                                       effective_period: effective_period,
                                       aasm_state: aasm_state,
@@ -34,23 +34,10 @@ RSpec.shared_context "setup initial benefit application", :shared_context => :me
                                       pte_count: 0,
                                       msp_count: 0
                                   ) }
-  
-  # let!(:initial_application)  { build(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog,
-  #                                     benefit_sponsorship: benefit_sponsorship,
-  #                                     effective_period: effective_period,
-  #                                     aasm_state: aasm_state,
-  #                                     open_enrollment_period: open_enrollment_period,
-  #                                     recorded_rating_area: benefit_sponsorship.rating_area,
-  #                                     recorded_service_areas: recorded_service_areas
-  #                                   ) }
-
-  # let(:recorded_service_areas) { benefit_sponsorship.service_areas_for(effective_period.min) }
 
   let(:product_package)           { initial_application.benefit_sponsor_catalog.product_packages.detect { |package| package.package_kind == package_kind } }
   let(:dental_product_package)    { initial_application.benefit_sponsor_catalog.product_packages.detect { |package| package.product_kind == :dental } }
   let(:current_benefit_package)   { build(:benefit_sponsors_benefit_packages_benefit_package, health_sponsored_benefit: true, dental_sponsored_benefit: dental_sponsored_benefit, product_package: product_package, dental_product_package: dental_product_package, benefit_application: initial_application) }
-
-  # before { binding.pry; benefit_sponsorship.save!; initial_application.save! }
 
   before do
     initial_application.benefit_packages = [current_benefit_package]
