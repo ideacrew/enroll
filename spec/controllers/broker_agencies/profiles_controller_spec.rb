@@ -30,7 +30,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
       allow(user).to receive(:has_broker_agency_staff_role?).and_return(true)
       FactoryBot.create(:announcement, content: "msg for Broker", audiences: ['Broker'])
       sign_in(user)
-      get :show, id: broker_agency_profile.id
+      get :show, params: {id: broker_agency_profile.id}
     end
 
     it "returns http success" do
@@ -52,7 +52,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
     before :each do
       FactoryBot.create(:broker_agency_staff_role, broker_agency_profile_id: broker_agency_profile.id, broker_agency_profile: broker_agency_profile, person: person)
       sign_in user
-      get :edit, id: broker_agency_profile.id
+      get :edit, params: {id: broker_agency_profile.id}
     end
 
     it "returns http success" do
@@ -90,25 +90,25 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
 
     it "should update person main phone" do
       broker_agency_profile.primary_broker_role.person.phones[0].update_attributes(kind: "phone main")
-      post :update, id: broker_agency_profile.id, organization: organization_params
+      post :update, params: {id: broker_agency_profile.id, organization: organization_params}
        broker_agency_profile.primary_broker_role.person.reload
        expect(broker_agency_profile.primary_broker_role.person.phones[0].extension).to eq "111"
     end
 
     it "should update person record" do
-      post :update, id: broker_agency_profile.id, organization: organization_params
+      post :update, params: {id: broker_agency_profile.id, organization: organization_params}
       broker_agency_profile.primary_broker_role.person.reload
       expect(broker_agency_profile.primary_broker_role.person.first_name).to eq "updated name"
     end
 
     it "should update record without a phone extension" do
-      post :update, id: broker_agency_profile.id, organization: organization_params
+      post :update, params: {id: broker_agency_profile.id, organization: organization_params}
       broker_agency_profile.primary_broker_role.person.reload
       expect(broker_agency_profile.primary_broker_role.person.first_name).to eq "updated name"
     end
 
     it "should update record by saving accept new clients" do
-      post :update, id: broker_agency_profile.id, organization: organization_params
+      post :update, params: {id: broker_agency_profile.id, organization: organization_params}
       broker_agency_profile.reload
       expect(broker_agency_profile.accept_new_clients).to be_truthy
       expect(broker_agency_profile.working_hours).to be_truthy
@@ -158,13 +158,13 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
 
       it "returns http status" do
         allow(form).to receive(:save).and_return(true)
-        post :create, organization: {}
+        post :create, params: {organization: {}}
         expect(response).to have_http_status(:redirect)
       end
 
       it "should render new template when invalid params" do
         allow(form).to receive(:save).and_return(false)
-        post :create, organization: {}
+        post :create, params: {organization: {}}
         expect(response).to render_template("new")
       end
     end
@@ -203,7 +203,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
       allow(person).to receive(:broker_role).and_return(nil)
       allow(person).to receive(:hbx_staff_role).and_return(nil)
       sign_in user
-      xhr :get, :employers, id: broker_agency_profile.id, format: :js
+      get :employers, params: {id: broker_agency_profile.id}, format: :js, xhr: true
       expect(response).to have_http_status(:success)
       orgs = Organization.where({"employer_profile.broker_agency_accounts"=>{:$elemMatch=>{:is_active=>true, :broker_agency_profile_id=>broker_agency_profile.id}}})
       expect(assigns(:orgs)).to eq orgs
@@ -211,7 +211,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
 
     it "should get organizations for employers where writing_agent is active" do
       sign_in user1
-      xhr :get, :employers, id: broker_agency_profile.id, format: :js
+      get :employers, params: {id: broker_agency_profile.id}, format: :js, xhr: true
       expect(response).to have_http_status(:success)
       orgs = Organization.where({"employer_profile.broker_agency_accounts"=>{:$elemMatch=>{:is_active=>true, :writing_agent_id=> broker_role.id }}})
       expect(assigns(:orgs)).to eq orgs
@@ -240,7 +240,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
       current_user = @current_user
       allow(current_user).to receive(:has_broker_role?).and_return(true)
       sign_in current_user
-      xhr :get, :family_index, id: broker_agency_profile.id
+      get :family_index, params: {id: broker_agency_profile.id}, xhr: true
       expect(response).to render_template("broker_agencies/profiles/family_index")
     end
   end
@@ -331,7 +331,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
       before :each do
         Settings.aca.general_agency_enabled = true
         sign_in user
-        xhr :get, :assign, id: broker_agency_profile.id, format: :js
+        get :assign, params: {id: broker_agency_profile.id}, format: :js, xhr: true
       end
 
       it "should return http success" do
@@ -351,7 +351,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
       before :each do
         Settings.aca.general_agency_enabled = false
         sign_in user
-        xhr :get, :assign, id: broker_agency_profile.id, format: :js
+        get :assign, params: {id: broker_agency_profile.id}, format: :js, xhr: true
       end
 
       it "should return http redirect" do
@@ -382,7 +382,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
     context "with admin user",dbclean: :after_each do
       before :each do
         sign_in hbx
-        xhr :get, :assign_history, id: broker_agency_profile.id, format: :js
+        get :assign_history, params: {id: broker_agency_profile.id}, format: :js, xhr: true
       end
 
       it "should return http success" do
@@ -397,7 +397,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
     context "with broker user",dbclean: :after_each do
       before :each do
         sign_in user
-        xhr :get, :assign_history, id: broker_agency_profile.id, format: :js
+        get :assign_history, params: {id: broker_agency_profile.id}, format: :js, xhr: true
       end
 
       it "should return http success" do
@@ -425,7 +425,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
     before :each do
       sign_in user
       favorite_general_agency.reload
-      xhr :get, :clear_assign_for_employer, id: broker_agency_profile.id, employer_id: employer_profile.id
+      get :clear_assign_for_employer, params: {id: broker_agency_profile.id, employer_id: employer_profile.id}, xhr: true
     end
 
     it "should assign general agency profiles" do
@@ -456,7 +456,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
       context "when we Assign agency" do
         before :each do
           sign_in user
-          xhr :post, :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], general_agency_id: general_agency_profile.id, type: 'Hire'
+          post :update_assign, params: {id: broker_agency_profile.id, employer_ids: [employer_profile.id], general_agency_id: general_agency_profile.id, type: 'Hire'}, xhr: true
         end
 
         it "should render" do
@@ -470,7 +470,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
       context "when we Unassign agency",dbclean: :after_each do
         before :each do
           sign_in user
-          post :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], commit: "Clear Assignment"
+          post :update_assign, params: {id: broker_agency_profile.id, employer_ids: [employer_profile.id], commit: "Clear Assignment"}
         end
 
         it "should redirect" do
@@ -494,7 +494,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
       context "when we Assign agency" do
         before :each do
           sign_in user
-          xhr :post, :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], general_agency_id: general_agency_profile.id, type: 'Hire'
+          post :update_assign, params: {id: broker_agency_profile.id, employer_ids: [employer_profile.id], general_agency_id: general_agency_profile.id, type: 'Hire'}, xhr: true
         end
 
         it "should render" do
@@ -508,7 +508,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
       context "when we Unassign agency",dbclean: :after_each do
         before :each do
           sign_in user
-          post :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], commit: "Clear Assignment"
+          post :update_assign, params: {id: broker_agency_profile.id, employer_ids: [employer_profile.id], commit: "Clear Assignment"}
         end
 
         it "should redirect" do
@@ -532,7 +532,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
       context "when we Assign agency",dbclean: :after_each do
         before :each do
           sign_in user
-          xhr :post, :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], general_agency_id: general_agency_profile.id, type: 'Hire'
+          post :update_assign, params: {id: broker_agency_profile.id, employer_ids: [employer_profile.id], general_agency_id: general_agency_profile.id, type: 'Hire'}, xhr: true
         end
 
         it "should return http redirect" do
@@ -546,7 +546,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
       context "when we Unassign agency",dbclean: :after_each do
         before :each do
           sign_in user
-          post :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], commit: "Clear Assignment"
+          post :update_assign, params: {id: broker_agency_profile.id, employer_ids: [employer_profile.id], commit: "Clear Assignment"}
         end
 
         it "should return http redirect" do
@@ -576,7 +576,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
 
     it "should set default_general_agency_profile" do
       sign_in user
-      xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, format: :js
+      post :set_default_ga, params: {id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id}, format: :js, xhr: true
       expect(assigns(:broker_agency_profile).default_general_agency_profile).to eq general_agency_profile
     end
 
@@ -584,7 +584,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
       ActiveJob::Base.queue_adapter = :test
       ActiveJob::Base.queue_adapter.enqueued_jobs = []
       sign_in user
-      xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, format: :js
+      post :set_default_ga, params: {id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id}, format: :js, xhr: true
       queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
         job_info[:job] == ShopNoticesNotifierJob
       end
@@ -600,19 +600,19 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
       expect(broker_agency_profile.default_general_agency_profile).to eq general_agency_profile
 
       sign_in user
-      xhr :post, :set_default_ga, id: broker_agency_profile.id, type: 'clear', format: :js
+      post :set_default_ga, params: {id: broker_agency_profile.id, type: 'clear'}, format: :js, xhr: true
       expect(assigns(:broker_agency_profile).default_general_agency_profile).to eq nil
     end
 
     it "should call update_ga_for_employers" do
       sign_in user
       expect(controller).to receive(:notify)
-      xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, format: :js
+      post :set_default_ga, params: {id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id}, format: :js, xhr: true
     end
 
     it "should get notice" do
       sign_in user
-      xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, format: :js
+      post :set_default_ga, params: {id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id}, format: :js, xhr: true
       expect(assigns(:notice)).to eq "Changing default general agencies may take a few minutes to update all employers."
     end
   end
@@ -639,12 +639,12 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
     end
 
     it "should search for employers in BrokerAgencies with  search string" do
-      xhr :get, :employer_datatable, id: broker_agency_profile.id, :order =>{"0"=>{"column"=>"2", "dir"=>"asc"}}, search: {value: 'abcdefgh'}
+      get :employer_datatable, params: {id: broker_agency_profile.id, :order =>{"0"=>{"column"=>"2", "dir"=>"asc"}}, search: {value: 'abcdefgh'}}, xhr: true
       expect(assigns(:employer_profiles).count).to   eq(0)
     end
 
     it "should search for employers in BrokerAgencies with empty search string" do
-      xhr :get, :employer_datatable, id: broker_agency_profile.id, :order =>{"0"=>{"column"=>"2", "dir"=>"asc"}}, search: {value: ''}
+      get :employer_datatable, params: {id: broker_agency_profile.id, :order =>{"0"=>{"column"=>"2", "dir"=>"asc"}}, search: {value: ''}}, xhr: true
       expect(assigns(:employer_profiles).count).to   eq(2)
     end
   end
@@ -660,31 +660,31 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
 
     it "should render the messages template and Broker sees all messages in Broker Mail tab" do
       sign_in user_broker
-      get :messages, id: broker_agency_profile.primary_broker_role.person, profile_id: broker_agency_profile.id.to_s, format: :js
+      get :messages, params: {id: broker_agency_profile.primary_broker_role.person, profile_id: broker_agency_profile.id.to_s}, format: :js
       expect(response).to render_template(:messages)
     end
 
     it "should render the messages template and Admin should see the messages in Broker Mail tab" do
       sign_in user_hbx
-      get :messages, id: user_hbx.person, profile_id: broker_agency_profile.id.to_s, format: :js
+      get :messages, params: {id: user_hbx.person, profile_id: broker_agency_profile.id.to_s}, format: :js
       expect(response).to render_template(:messages)
     end
 
     it "should pass broker data to @provider if you login as Broker User" do
       sign_in user_broker
-      get :messages, id: broker_agency_profile.primary_broker_role.person, profile_id: broker_agency_profile.id.to_s, format: :js
+      get :messages, params: {id: broker_agency_profile.primary_broker_role.person, profile_id: broker_agency_profile.id.to_s}, format: :js
       expect(assigns(:provider)).to eq broker_agency_profile.primary_broker_role.person
     end
 
     it "should pass admin records to @provider if you login as Admin User" do
       sign_in user_hbx
-      get :messages, id: user_hbx.person, profile_id: broker_agency_profile.id.to_s, format: :js
+      get :messages, params: {id: user_hbx.person, profile_id: broker_agency_profile.id.to_s}, format: :js
       expect(assigns(:provider)).to eq user_hbx.person
     end
 
     it "should not have broker data in @provider if you login as Admin User" do
       sign_in user_hbx
-      get :messages, id: user_hbx.person, profile_id: broker_agency_profile.id.to_s, format: :js
+      get :messages, params: {id: user_hbx.person, profile_id: broker_agency_profile.id.to_s}, format: :js
       expect(assigns(:provider)).not_to eq broker_agency_profile.primary_broker_role.person
     end
   end
