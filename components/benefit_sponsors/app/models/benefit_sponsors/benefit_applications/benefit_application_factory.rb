@@ -17,6 +17,7 @@ module BenefitSponsors
       def initialize(benefit_sponsorship, args)
         @benefit_sponsorship = benefit_sponsorship
         @benefit_application = benefit_sponsorship.benefit_applications.new
+        @benefit_application.benefit_sponsorship = benefit_sponsorship
         assign_application_attributes(args)
         @benefit_application.pull_benefit_sponsorship_attributes
       end
