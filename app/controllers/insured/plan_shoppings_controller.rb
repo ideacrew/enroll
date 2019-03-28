@@ -109,11 +109,13 @@ class Insured::PlanShoppingsController < ApplicationController
     begin
       hbx_enrollment = HbxEnrollment.find(params.require(:id))
       waiver_reason = params[:waiver_reason] || params[:terminate_reason]
+      active_household = @person.primary_family.active_household
+
       unless hbx_enrollment.shopping? || hbx_enrollment.coverage_termination_pending?
         benefit_group = hbx_enrollment.benefit_group
         benefit_group_assignment = hbx_enrollment.benefit_group_assignment
         employee_role = hbx_enrollment.employee_role || @person.employee_roles.active.last
-        coverage_household = @person.primary_family.active_household.immediate_family_coverage_household
+        coverage_household = active_household.immediate_family_coverage_household
         @waived_enrollment = coverage_household.household.new_hbx_enrollment_from(employee_role: employee_role, coverage_household: coverage_household, benefit_group: benefit_group, benefit_group_assignment: benefit_group_assignment, qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
         @waived_enrollment.coverage_kind = hbx_enrollment.coverage_kind
         @waived_enrollment.kind = 'employer_sponsored_cobra' if employee_role.present? && employee_role.is_cobra_status?
@@ -126,6 +128,10 @@ class Insured::PlanShoppingsController < ApplicationController
       else
         @waived_enrollment = hbx_enrollment
       end
+      enrollments = active_household.hbx_enrollments
+      # Just updating child would not save properly in mongo 
+      # fetch it from parent document and call update_attributes on child directly.
+      enrollments.find(params.require(:id)).update_attributes!(terminate_reason: params[:terminate_reason]) if params[:terminate_reason].present? 
       @enrollment_wavied = @waived_enrollment.waive_coverage_by_benefit_group_assignment(waiver_reason) if @waived_enrollment.may_waive_coverage? and waiver_reason.present? and @waived_enrollment.valid?
     rescue => e
       log(e.message, :severity=>'error')

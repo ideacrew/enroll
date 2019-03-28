@@ -385,7 +385,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
   end
 
   context "POST terminate" do
-    let!(:enrollment) { HbxEnrollment.new({:aasm_state => "coverage_selected", :benefit_group_id => benefit_group.id, benefit_group_assignment_id: benefit_group_assignment.id, employee_role_id: employee_role.id}) }
+    let!(:enrollment) { FactoryGirl.create(:hbx_enrollment, :aasm_state => "coverage_selected", :benefit_group_id => benefit_group.id, benefit_group_assignment_id: benefit_group_assignment.id, employee_role_id: employee_role.id, household: family.active_household)}
     let!(:terminate_reason) { "terminate_reason" }
     let!(:employer_profile) { FactoryGirl.create(:employer_profile) }
     let!(:plan_year) {FactoryGirl.create(:plan_year, employer_profile: employer_profile)}
@@ -397,7 +397,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile, benefit_group_assignments: [benefit_group_assignment]) }
 
     before do
-      allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(enrollment)
+      allow(HbxEnrollment).to receive(:find).with(enrollment.id.to_s).and_return(enrollment)
       allow(enrollment).to receive(:may_schedule_coverage_termination?).and_return(true)
       allow(enrollment).to receive(:schedule_coverage_termination!).and_return(true)
       allow(person).to receive(:primary_family).and_return(Family.new)
@@ -405,66 +405,71 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     end
 
     it "returns http success" do
-      post :terminate, id: "hbx_id"
+      post :terminate, id: enrollment.id.to_s
       expect(response).to be_redirect
     end
 
     it "goes back" do
       request.env["HTTP_REFERER"] = terminate_insured_plan_shopping_url(1)
       allow(enrollment).to receive(:may_schedule_coverage_termination?).and_return(false)
-      post :terminate, id: "hbx_id"
+      post :terminate, id: enrollment.id.to_s
       expect(response).to redirect_to(:back)
     end
 
     it "should record termination submitted date on terminate of hbx_enrollment" do
       expect(enrollment.termination_submitted_on).to eq nil
-      post :terminate, id: "hbx_id"
+      post :terminate, id: enrollment.id.to_s
       expect(enrollment.termination_submitted_on.to_time).to be_within(1.second).of TimeKeeper.datetime_of_record
       expect(response).to be_redirect
     end
 
     it "should create a new inactive enrollment" do
+      allow(HbxEnrollment).to receive(:find).with(enrollment.id.to_s).and_return(enrollment)
       allow(enrollment).to receive(:benefit_group).and_return(benefit_group)
       allow(enrollment).to receive(:benefit_group_assignment).and_return(benefit_group_assignment)
       expect(enrollment.termination_submitted_on).to eq nil
-      post :terminate, id: "hbx_id", terminate_reason: terminate_reason
-      expect(enrollment.terminate_reason).to eq terminate_reason
+      post :terminate, id: enrollment.id.to_s, terminate_reason: terminate_reason
+      expect(enrollment.reload.terminate_reason).to eq terminate_reason
     end
   end
 
   context "POST waive" do
+    let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, :aasm_state => "coverage_selected", household: household) }
+    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+    let!(:person) { family.person }
+    let!(:household) { family.active_household }
+
     before :each do
-      allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
+      allow(HbxEnrollment).to receive(:find).with(hbx_enrollment.id.to_s).and_return(hbx_enrollment)
+      allow(hbx_enrollment).to receive(:terminate_reason).and_return(nil)
       allow(hbx_enrollment).to receive(:may_waive_coverage?).and_return(true)
       allow(hbx_enrollment).to receive(:waive_coverage_by_benefit_group_assignment).and_return(true)
       allow(hbx_enrollment).to receive(:shopping?).and_return(true)
+      allow(hbx_enrollment).to receive(:household).and_return(household)
       sign_in user
     end
 
     it "should get success flash message" do
-      allow(hbx_enrollment).to receive(:terminate_reason).and_return("")
       allow(hbx_enrollment).to receive(:valid?).and_return(true)
       allow(hbx_enrollment).to receive(:save).and_return(true)
       allow(hbx_enrollment).to receive(:waive_coverage).and_return(true)
       allow(hbx_enrollment).to receive(:waiver_reason=).with("waiver").and_return(true)
-      post :waive, id: "hbx_id", waiver_reason: "waiver"
+      post :waive, id: hbx_enrollment.id.to_s, waiver_reason: "waiver"
       expect(flash[:notice]).to eq "Waive Coverage Successful"
       expect(response).to be_redirect
     end
 
-    it "should get success flash mesage when terminate_reason exists" do
+    it "should get success flash mesage when enrollment is terminated through waiver" do
       allow(hbx_enrollment).to receive(:coverage_termination_pending?).and_return(true)
-      allow(hbx_enrollment).to receive(:terminate_reason).and_return("terminate")
       allow(hbx_enrollment).to receive(:valid?).and_return(true)
-      post :waive, id: "hbx_id", waiver_reason: "waiver", terminate_reason: "terminate"
+      post :waive, id: hbx_enrollment.id.to_s, waiver_reason: "waiver"
       expect(flash[:notice]).to eq "Waive Coverage Successful"
       expect(response).to be_redirect
     end
 
     it "should get failure flash message" do
-      allow(hbx_enrollment).to receive(:terminate_reason).and_return("")
       allow(hbx_enrollment).to receive(:valid?).and_return(false)
-      post :waive, id: "hbx_id", waiver_reason: "waiver"
+      post :waive, id: hbx_enrollment.id.to_s, waiver_reason: "waiver"
       expect(flash[:alert]).to eq "Waive Coverage Failed"
       expect(response).to be_redirect
     end

@@ -508,7 +508,8 @@ class HbxEnrollment
     return false unless is_shop? # there is no concept of waiver in ivl case
     id_list = self.employer_profile.active_and_renewing_published.collect{|py| py.benefit_groups.pluck(:id)}.flatten
     shop_enrollments = household.hbx_enrollments.shop_market.by_coverage_kind(self.coverage_kind).where(:benefit_group_id.in => id_list).show_enrollments_sans_canceled.to_a
-    shop_enrollments.each do |enrollment|
+    shop_enrollments.map(&:_id).each do |enrollment_id|
+      enrollment = HbxEnrollment.find enrollment_id
       if enrollment.effective_on > TimeKeeper.date_of_record
         enrollment.cancel_coverage! if enrollment.may_cancel_coverage? # cancel coverage if enrollment is future effective
       else
