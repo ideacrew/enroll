@@ -54,8 +54,8 @@ module SponsoredBenefits
         flash[:error] = "Quote failed to publish.".html_safe
       end
       respond_to do |format|
-        format.js { render json: { url: organizations_plan_design_proposal_path(@plan_design_proposal) } }
-        format.html { redirect_to organizations_plan_design_proposal_path(@plan_design_proposal) }
+        format.js { render json: { url: organizations_plan_design_proposal_path(@plan_design_proposal, profile_id: params[:profile_id]) } }
+        format.html { redirect_to organizations_plan_design_proposal_path(@plan_design_proposal, profile_id: params[:profile_id]) }
       end
     end
 
@@ -64,7 +64,7 @@ module SponsoredBenefits
         begin
           plan_design_proposal = @plan_design_organization.build_proposal_from_existing_employer_profile
           flash[:success] = "Imported quote and employee information from your client #{@plan_design_organization.employer_profile.legal_name}."
-          redirect_to action: :edit, id: plan_design_proposal.id
+          redirect_to action: :edit, id: plan_design_proposal.id, profile_id: params[:profile_id]
         rescue Exception => e
           flash[:error] = e.to_s
           @plan_design_proposal = SponsoredBenefits::Forms::PlanDesignProposal.new(organization: @plan_design_organization)
