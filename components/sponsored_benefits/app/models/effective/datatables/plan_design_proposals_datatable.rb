@@ -38,10 +38,10 @@
           table_column :actions, :width => '50px', :proc => Proc.new { |row|
             dropdown = [
              # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
-             ['Edit Quote', sponsored_benefits.edit_organizations_plan_design_organization_plan_design_proposal_path(row.plan_design_organization, row), edit_quote_link_type(row)],
-             publish_or_view_quote_link(row: row, publish_link: sponsored_benefits.organizations_plan_design_proposal_publish_path(row.id), show_link: sponsored_benefits.organizations_plan_design_proposal_path(row)),
-             ['Copy Quote', sponsored_benefits.organizations_plan_design_proposal_proposal_copies_path(row.id), 'post'],
-             ['Remove Quote', sponsored_benefits.organizations_plan_design_organization_plan_design_proposal_path(row.plan_design_organization, row), 'delete with confirm', "Are you sure? This will permanently delete the quote information"]
+             ['Edit Quote', sponsored_benefits.edit_organizations_plan_design_organization_plan_design_proposal_path(row.plan_design_organization, row, profile_id: attributes[:profile_id]), edit_quote_link_type(row)],
+             publish_or_view_quote_link(row: row, publish_link: sponsored_benefits.organizations_plan_design_proposal_publish_path(row.id, profile_id: attributes[:profile_id]), show_link: sponsored_benefits.organizations_plan_design_proposal_path(row, profile_id: attributes[:profile_id])),
+             ['Copy Quote', sponsored_benefits.organizations_plan_design_proposal_proposal_copies_path(row.id, profile_id: attributes[:profile_id]), 'post'],
+             ['Remove Quote', sponsored_benefits.organizations_plan_design_organization_plan_design_proposal_path(row.plan_design_organization, row, profile_id: attributes[:profile_id]), 'delete with confirm', "Are you sure? This will permanently delete the quote information"]
             ]
             render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "quotes_actions_#{row.id.to_s}"}, formats: :html
           }, :filter => false, :sortable => false

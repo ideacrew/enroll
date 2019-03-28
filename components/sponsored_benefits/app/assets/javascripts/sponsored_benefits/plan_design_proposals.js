@@ -34,7 +34,7 @@ function pageInit() {
       calcPlanDesignContributions();
     } else {
       setTimeout(function() {
-        $('li.single-plan-tab').find('label').trigger('click');
+        $(".plan-design .nav-tabs li label:first").trigger('click');
       },600)
     }
   } else {
@@ -43,7 +43,7 @@ function pageInit() {
     } else {
       disableActionButtons();
       setTimeout(function() {
-        $('li.sole-source-tab').find('label').trigger('click');
+        $(".plan-design .nav-tabs li label:first").trigger('click');
       },600)
     }
     initSlider();
@@ -316,7 +316,7 @@ function calcPlanDesignContributions() {
 }
 
 function fetchBenefitKind() {
-  if(window.location.href.includes("kind=dental")) {
+  if(window.location.href.indexOf("kind=dental") > -1) {
     return "dental"
   } else {
     return "health"
@@ -376,6 +376,7 @@ function buildBenefitGroupParams() {
   }
 
   var data = {
+    'profile_id': $("#profile_id").val(),
     'benefit_group': {
       "reference_plan_id": reference_plan_id,
       "plan_option_kind": plan_option_kind,
@@ -560,9 +561,12 @@ function saveProposalAndCopy(event) {
       $.ajax({
         url: copy_url,
         type: 'POST',
+        data: {
+          profile_id: $("#profile_id").val()
+        },
         dataType: 'json',
         success: function(data) {
-          window.location.href = data.url;
+          window.location.href = data.url + "&profile_id=" + $("#profile_id").val();
         },
         error: function(data) {
           resp = $.parseJSON(data.responseText);
@@ -587,12 +591,15 @@ function saveProposalAndPublish(event) {
       $.ajax({
         url: publish_url,
         type: 'POST',
+        data: {
+          profile_id: $("#profile_id").val()
+        },
         success: function(data) {
-          window.location.href = data.url;
+          window.location.href = data.url + "&profile_id=" + $("#profile_id").val();
         },
         error: function(data) {
           var resp = $.parseJSON(data.responseText);
-          window.location.href = resp.url;
+          window.location.href = resp.url + "&profile_id=" + $("#profile_id").val();
         }
       });
     });
@@ -602,7 +609,7 @@ function saveProposalAndPublish(event) {
 function AddDentalToPlanDesignProposal(event) {
   saveProposal(event);
   var url = $("#add_dental_url").val()
-  window.location.href = url
+  window.location.href = url + "&profile_id=" + $("#profile_id").val()
 }
 
 function saveProposalAndNavigateToReview(event) {
@@ -616,7 +623,7 @@ function saveProposalAndNavigateToReview(event) {
       data: data,
       url: url
     }).done(function(data) {
-      window.location.href = data.url;
+      window.location.href = data.url + "&profile_id=" + $("#profile_id").val();
     });
   }
 }

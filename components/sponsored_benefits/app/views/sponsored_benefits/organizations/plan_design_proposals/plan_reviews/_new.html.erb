@@ -199,14 +199,14 @@
     To finalize your quote and make it available to your client, click publish Quote.  Once you publish your quote, you cannot make edits to it.  If you want to make edits to your qupte now, click Update Roster or Select Benefits.
   </div>
   <div class="col-md-3">
-    <%= link_to 'Return to Quote Management', sponsored_benefits.organizations_plan_design_organization_plan_design_proposals_path(@plan_design_organization), class:'btn btn-primary' %>
+    <%= link_to 'Return to Quote Management', sponsored_benefits.organizations_plan_design_organization_plan_design_proposals_path(@plan_design_organization, profile_id: params[:profile_id]), class:'btn btn-primary' %>
   </div>
   <div class="col-md-7 col-md-offset-5 sq-btn-grp">
     <%= link_to "Download PDF", sponsored_benefits.organizations_plan_design_proposal_plan_reviews_path(@plan_design_proposal), id: "submitPlanDesignProposal", class:'btn btn-default' %>
-    <%= link_to "Update Roster", sponsored_benefits.edit_organizations_plan_design_organization_plan_design_proposal_path(@plan_design_organization, @plan_design_proposal), class:'btn btn-primary' %>
-    <%= link_to "Select Health Benefits", sponsored_benefits.new_organizations_plan_design_proposal_plan_selection_path(@plan_design_proposal), class:'btn btn-primary' %>
-    <%= link_to "Select Dental Benefits", sponsored_benefits.new_organizations_plan_design_proposal_plan_selection_path(@plan_design_proposal, kind: "dental"), class:'btn btn-primary' if plan_design_form.is_dental_plans_avialable? %>
-    <%= link_to "Publish Quote", sponsored_benefits.organizations_plan_design_proposal_publish_path(@plan_design_proposal), method: :post, class:'btn btn-primary' %>
+    <%= link_to "Update Roster", sponsored_benefits.edit_organizations_plan_design_organization_plan_design_proposal_path(@plan_design_organization, @plan_design_proposal, profile_id: params[:profile_id]), class:'btn btn-primary' %>
+    <%= link_to "Select Health Benefits", sponsored_benefits.new_organizations_plan_design_proposal_plan_selection_path(@plan_design_proposal, profile_id: params[:profile_id]), class:'btn btn-primary' %>
+    <%= link_to "Select Dental Benefits", sponsored_benefits.new_organizations_plan_design_proposal_plan_selection_path(@plan_design_proposal, kind: "dental", profile_id: params[:profile_id]), class:'btn btn-primary' if plan_design_form.is_dental_plans_avialable? %>
+    <%= link_to "Publish Quote", sponsored_benefits.organizations_plan_design_proposal_publish_path(@plan_design_proposal, profile_id: params[:profile_id]), method: :post, class:'btn btn-primary' %>
     <div class="success-message"></div>
   </div>
 </div>

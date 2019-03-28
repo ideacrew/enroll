@@ -45,6 +45,7 @@
 //= require responsive
 //= require effective_datatables
 //= require jquery.steps
+//= require ../../../components/sponsored_benefits/app/assets/javascripts/sponsored_benefits/plan_design_proposals
 //= require_tree .
 
 var disableSelectric = false;
@@ -53,7 +54,6 @@ $(document).on('ready page:load', function () {
   Freebies.fadeElement($("body"));
   Freebies.allFreebies();
   Responsive.setSizeListeners();
-  expand_carrier();
 });
 
 function applyMultiLanguageSelect() {
@@ -81,12 +81,6 @@ function applyMultiLanguageSelectForGA() {
 function dchbx_enroll_date_of_record() {
   return new Date($('#dchbx_enroll_date_of_record').text());
 };
-
-function expand_carrier(){
-    if($(".plan-design .nav-tabs li label:first").length > 0) {
-        $(".plan-design .nav-tabs li label:first").trigger('click');
-    }
-}
 
 function getCarrierPlans(ep, ci) {
 
