@@ -13,9 +13,5 @@ module Exchanges
       person_roles << "General Agency Staff Role" if person.general_agency_staff_roles.present?
       person_roles
     end
-
-    def zero_employee_warning
-      l10n("hbx_profiles.zero_employee_warning")
-    end
   end
 end

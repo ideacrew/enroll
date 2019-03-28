@@ -333,6 +333,60 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     end
   end
 
+  describe 'force publish with eligibility warnings & publish_with_warnings param' do
+    context 'with only eligibility warnings' do
+      let!(:organization) { FactoryGirl.create(:organization) }
+      let!(:employer_profile) { FactoryGirl.create(:employer_profile, organization: organization) }
+      let!(:draft_plan_year) { FactoryGirl.create(:next_month_plan_year, :with_benefit_group, aasm_state: 'draft', employer_profile: employer_profile) }
+      let(:user) { FactoryGirl.create(:user, person: person) }
+      let(:person) do
+        FactoryGirl.create(:person, :with_hbx_staff_role).tap do |person|
+          FactoryGirl.create(:permission, :super_admin).tap do |permission|
+            person.hbx_staff_role.update_attributes(permission_id: permission.id)
+            person
+          end
+        end
+      end
+      let(:params) { { row_actions_id: "family_actions_#{organization.id.to_s}" } }
+      let(:params1) { { row_actions_id: "family_actions_#{organization.id.to_s}", publish_with_warnings: 'true' } }
+
+      before :each do
+        sign_in(user)
+      end
+
+      it 'should not update plan year aasm state' do
+        organization.office_locations.first.address.update_attributes!(state: 'CT')
+        xhr :post, :force_publish, params
+        draft_plan_year.reload
+        expect(draft_plan_year.aasm_state).to eq 'draft'
+      end
+
+      it 'should not force publish and still in draft' do
+        organization.office_locations.first.address.update_attributes!(state: 'CT')
+        xhr :post, :force_publish, params
+        draft_plan_year.reload
+        expect(draft_plan_year.aasm_state).to eq 'draft'
+      end
+
+      context 'with publish_with_warnings true & eligibility warnings' do
+        it 'should force publish and update plan year to enrolling' do
+          organization.office_locations.first.address.update_attributes!(state: 'CT')
+          xhr :post, :force_publish, params1
+          draft_plan_year.reload
+          expect(draft_plan_year.aasm_state).to eq 'publish_pending'
+        end
+      end
+
+      context 'with publish_with_warnings true & no eligibility warnings' do
+        it 'should force publish and update plan year to enrolling' do
+          xhr :post, :force_publish, params1
+          draft_plan_year.reload
+          expect(draft_plan_year.aasm_state).to eq 'enrolling'
+        end
+      end
+    end
+  end
+
   describe "CSR redirection from Show" do
     let(:user) { double("user", :has_hbx_staff_role? => false, :has_employer_staff_role? => false, :has_csr_role? => true)}
     let(:person) { double("person")}
