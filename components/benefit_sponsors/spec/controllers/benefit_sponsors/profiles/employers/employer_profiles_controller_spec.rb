@@ -45,7 +45,7 @@ module BenefitSponsors
         benefit_sponsorship.save!
         allow(controller).to receive(:authorize).and_return(true)
         sign_in user
-        get :show, params: {id: benefit_sponsor.profiles.first.id.to_s}
+        get :show, params: {id: benefit_sponsor.profiles.first.id.to_s, tab: 'employees'}
         allow(employer_profile).to receive(:active_benefit_sponsorship).and_return benefit_sponsorship
       end
 

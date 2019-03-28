@@ -22,8 +22,8 @@ module Effective
         table_column :broker_agency_profile, :label => 'Broker Agency Name', :proc => Proc.new { |row| row.employer_profile.broker_agency_profile.organization.legal_name if row.employer_profile.broker_agency_profile.present? }, :filter => false, :sortable => false
       end
 
-      def collection
-        general_agency_profile =  GeneralAgencyProfile.find(attributes[:id])
+      collection do
+        general_agency_profile = GeneralAgencyProfile.find(attributes[:id])
         @employer_list = Organization.by_general_agency_profile(general_agency_profile.id)
       end
 

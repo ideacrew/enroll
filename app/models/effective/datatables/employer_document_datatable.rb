@@ -33,7 +33,7 @@ module Effective
       end
 
 
-      def collection
+      collection do
         @employer_profile = EmployerProfile.find(attributes[:employer_profile_id])
         documents = EmployerAttestationDocument.none
         if @employer_profile.employer_attestation.present?
