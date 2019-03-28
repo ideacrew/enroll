@@ -129,7 +129,7 @@ RSpec.describe BrokerAgencies::QuotesController, type: :controller, dbclean: :af
 
     context "#delete_household" do
       it "should delete quote household" do
-        delete :delete_household, broker_role_id: person.broker_role.id, id: @quote.id , household_id: @quote.quote_households.first.id}, xhr: true
+        xhr :delete, :delete_household, params: { broker_role_id: person.broker_role.id, id: @quote.id , household_id: @quote.quote_households.first.id}
         @quote.reload
         expect(@quote.quote_households).to eq []
       end
@@ -137,9 +137,9 @@ RSpec.describe BrokerAgencies::QuotesController, type: :controller, dbclean: :af
 
     context "#delete_member" do
       it "should delete quote member" do
-        delete :delete_member, params: {id: @quote.id , broker_role_id: person.broker_role.id,
+        xhr :delete, :delete_member, params: {id: @quote.id , broker_role_id: person.broker_role.id,
                                       household_id: @quote.quote_households.first.id,
-                                      member_id:  @quote.quote_households.first.quote_members.first.id}, xhr: true
+                                      member_id:  @quote.quote_households.first.quote_members.first.id}
         @quote.reload
         expect(@quote.quote_households.first.quote_members).to eq []
       end
