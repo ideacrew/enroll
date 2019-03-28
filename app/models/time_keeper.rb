@@ -109,7 +109,11 @@ class TimeKeeper
   end
 
   def push_date_change_event
-    ModelEvents::PlanYear.date_change_event(self.date_of_record)
+    begin
+      ::PlanYear.date_change_event(date_of_record)
+    rescue StandardError => e
+      Rails.logger.error { "Error triggering plan year date change events due to #{e.inspect}" }
+    end
   end
 
   def self.with_cache
