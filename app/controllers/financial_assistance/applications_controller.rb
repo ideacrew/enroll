@@ -126,7 +126,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   def review
     save_faa_bookmark(@person, request.original_url)
     @consumer_role = @person.consumer_role
-    @application = FinancialAssistance::Application.find(params["id"])
+    @application = FinancialAssistance::Application.where(id: params["id"]).first
     @applicants = @application.active_applicants if @application.present?
     if @application.blank?
       redirect_to financial_assistance_applications_path
