@@ -561,9 +561,12 @@ function saveProposalAndCopy(event) {
       $.ajax({
         url: copy_url,
         type: 'POST',
+        data: {
+          profile_id: $("#profile_id").val()
+        },
         dataType: 'json',
         success: function(data) {
-          window.location.href = data.url;
+          window.location.href = data.url + "&profile_id=" + $("#profile_id").val();
         },
         error: function(data) {
           resp = $.parseJSON(data.responseText);
@@ -592,11 +595,11 @@ function saveProposalAndPublish(event) {
           profile_id: $("#profile_id").val()
         },
         success: function(data) {
-          window.location.href = data.url;
+          window.location.href = data.url + "&profile_id=" + $("#profile_id").val();
         },
         error: function(data) {
           var resp = $.parseJSON(data.responseText);
-          window.location.href = resp.url;
+          window.location.href = resp.url + "&profile_id=" + $("#profile_id").val();
         }
       });
     });
@@ -606,7 +609,7 @@ function saveProposalAndPublish(event) {
 function AddDentalToPlanDesignProposal(event) {
   saveProposal(event);
   var url = $("#add_dental_url").val()
-  window.location.href = url
+  window.location.href = url + "&profile_id=" + $("#profile_id").val()
 }
 
 function saveProposalAndNavigateToReview(event) {
@@ -620,7 +623,7 @@ function saveProposalAndNavigateToReview(event) {
       data: data,
       url: url
     }).done(function(data) {
-      window.location.href = data.url;
+      window.location.href = data.url + "&profile_id=" + $("#profile_id").val();
     });
   }
 }
