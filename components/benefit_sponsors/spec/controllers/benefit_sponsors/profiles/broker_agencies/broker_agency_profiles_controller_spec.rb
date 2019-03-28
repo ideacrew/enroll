@@ -82,7 +82,7 @@ module BenefitSponsors
         before :each do
           sign_in(user_with_hbx_staff_role)
           allow(controller).to receive(:set_flash_by_announcement).and_return(true)
-          get :show, id: bap_id
+          get :show, params: {id: bap_id}
         end
 
         it "should return http success" do
@@ -96,7 +96,7 @@ module BenefitSponsors
 
       context "for show with a broker_agency_profile_id and without a user" do
         before :each do
-          get :show, id: bap_id
+          get :show, params:{id: bap_id}
         end
 
         it "should not return success http status" do
@@ -113,7 +113,7 @@ module BenefitSponsors
       context "with a valid user and with broker_agency_profile_id(on successful pundit)" do
         before :each do
           sign_in(user_with_hbx_staff_role)
-          xhr :get, :family_index, id: bap_id
+          get :family_index, params:{id: bap_id}, xhr: true
         end
 
         it "should render family_index template" do
@@ -130,7 +130,7 @@ module BenefitSponsors
 
         before :each do
           sign_in(user_without_person)
-          xhr :get, :family_index, id: bap_id
+          get :family_index, params:{id: bap_id}, xhr: true
         end
 
         it "should redirect to new of registration's controller for broker_agency" do
@@ -147,7 +147,7 @@ module BenefitSponsors
       context "with a valid user" do
         before :each do
           sign_in(user_with_hbx_staff_role)
-          xhr :get, :staff_index, id: bap_id
+          get :staff_index, params:{id: bap_id}, xhr: true
         end
 
         it "should return success http status" do
@@ -164,7 +164,7 @@ module BenefitSponsors
 
         before :each do
           sign_in(user)
-          xhr :get, :staff_index, id: bap_id
+          get :staff_index, params:{id: bap_id}, xhr: true
         end
 
         it "should not return success http status" do

@@ -27,7 +27,7 @@ module BenefitSponsors
 
         before do
           sign_in user
-          xhr :get, :new
+          get :new, xhr: true
         end
 
         it "should render new template" do
@@ -56,7 +56,7 @@ module BenefitSponsors
 
         before :each do
             sign_in user
-            post :create, staff_params
+            post :create, params:{staff_params}
         end
 
         it "should initialize staff" do
@@ -88,7 +88,7 @@ module BenefitSponsors
 
         before :each do
           sign_in user
-          post :create, staff_params
+          post :create, params:{staff_params}
         end
 
         it "should redirect" do
@@ -118,7 +118,7 @@ module BenefitSponsors
 
         before :each do
           sign_in user
-          get  :approve, staff_params
+          get  :approve, params:{staff_params}
         end
 
         it "should initialize staff" do
@@ -156,7 +156,7 @@ module BenefitSponsors
           before :each do
             sign_in user
             applicant_employer_staff_role.update_attributes(aasm_state:'is_closed')
-            get  :approve, staff_params
+            get  :approve, params:{staff_params}
           end
 
         it "should redirect" do
@@ -187,7 +187,7 @@ module BenefitSponsors
 
         before :each do
           sign_in user
-          delete  :destroy, staff_params
+          delete  :destroy, params:{staff_params}
         end
 
         it "should initialize staff" do
@@ -225,7 +225,7 @@ module BenefitSponsors
         before :each do
           applicant_employer_staff_role.update_attributes(benefit_sponsor_employer_profile_id: new_benefit_sponsor.employer_profile.id)
           sign_in user
-          delete  :destroy, staff_params
+          delete  :destroy, params:{staff_params}
         end
 
         it "should redirect" do

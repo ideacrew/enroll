@@ -50,7 +50,7 @@ module Effective
         }, :filter => false, :sortable => false
       end
 
-      def collection
+      collection do
         @collection ||= Queries::PremiumBillingReportQuery.new(hbx_enrollment_ids)
       end
 

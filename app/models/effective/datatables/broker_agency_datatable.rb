@@ -27,7 +27,7 @@ module Effective
 
       end
 
-      def collection
+      collection do
         return @broker_agency_profiles_collection if defined? @broker_agency_profiles_collection
 
         # Query From New Model

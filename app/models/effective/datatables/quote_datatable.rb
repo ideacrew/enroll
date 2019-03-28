@@ -27,12 +27,12 @@ module Effective
           }, :filter => false, :sortable => false
       end
 
-      def collection
+      collection do
         state = attributes['states']
         type = attributes['employer_types']
         broker_role_id = attributes["collection_scope"] || QuoteDatatable.broker_role_id.to_s
         quotes = Quote.where('broker_role_id'.to_s => broker_role_id.strip)
-        quotes = quotes.where(employer_type: type) if ['client','prospect'].include?(type)
+        quotes = quotes.where(employer_type: type) if ['client', 'prospect'].include?(type)
         quotes = quotes.where(aasm_state: state) if ['draft', 'published', 'claimed'].include?(state)
         quotes
       end

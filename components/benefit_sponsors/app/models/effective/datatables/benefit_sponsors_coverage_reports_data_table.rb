@@ -52,7 +52,7 @@ module Effective
       end
 
 
-      def collection
+      collection do
         return @collection if defined? @collection
         @employer_profile = BenefitSponsors::Organizations::Profile.find(attributes[:id])
         return BenefitSponsors::LegacyCoverageReportAdapter.new([]) if @employer_profile.nil?

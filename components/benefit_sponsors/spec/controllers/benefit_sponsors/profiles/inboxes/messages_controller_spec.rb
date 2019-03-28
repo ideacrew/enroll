@@ -30,7 +30,7 @@ module BenefitSponsors
 
         context "show message" do
           before do
-            get :show, id: organization.employer_profile.id, message_id: inbox.messages.first.id
+            get :show, params: {id: organization.employer_profile.id, message_id: inbox.messages.first.id}
           end
 
           it "should render show template" do
@@ -44,7 +44,7 @@ module BenefitSponsors
 
         context "delete message" do
           before do
-            delete :destroy, id: organization.employer_profile.id, message_id: inbox.messages.first.id, format: :js
+            delete :destroy, params: {id: organization.employer_profile.id, message_id: inbox.messages.first.id}, format: :js
           end
 
           it "should get a notice" do
@@ -67,7 +67,7 @@ module BenefitSponsors
 
         context "show message" do
           before do
-            get :show, id: broker_person.id, message_id: @broker_inbox.messages.first.id
+            get :show, params: {id: broker_person.id, message_id: @broker_inbox.messages.first.id}
           end
 
           it "should render show template" do
@@ -81,7 +81,7 @@ module BenefitSponsors
 
         context "delete message" do
           before do
-            delete :destroy, id: broker_person.id, message_id: @broker_inbox.messages.first.id, format: :js
+            delete :destroy, params: {id: broker_person.id, message_id: @broker_inbox.messages.first.id}, format: :js
           end
 
           it "should get a notice" do
@@ -104,7 +104,7 @@ module BenefitSponsors
 
         context "show message" do
           before do
-            get :show, id: broker_person.id, message_id: @broker_inbox.messages.first.id
+            get :show, params:{id: broker_person.id, message_id: @broker_inbox.messages.first.id}
           end
 
           it "should render show template" do
@@ -118,7 +118,7 @@ module BenefitSponsors
 
         context "delete message" do
           before do
-            delete :destroy, id: broker_person.id, message_id: @broker_inbox.messages.first.id, format: :js
+            delete :destroy, params:{id: broker_person.id, message_id: @broker_inbox.messages.first.id}, format: :js
           end
 
           it "should get a notice" do
