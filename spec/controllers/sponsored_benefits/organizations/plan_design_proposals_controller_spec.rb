@@ -126,17 +126,12 @@ module SponsoredBenefits
             xhr :post, :create, { plan_design_organization_id: plan_design_organization.to_param, forms_plan_design_proposal: valid_attributes }, valid_session
           }.to change { plan_design_organization.reload.plan_design_proposals.count }.by(1)
         end
-
-        it "redirects to the created benefit_application" do
-          xhr :post, :create, { plan_design_organization_id: plan_design_organization.to_param, forms_plan_design_proposal: valid_attributes }, valid_session
-          expect(response).to have_http_status(:redirect)
-        end
       end
 
       context "with invalid params" do
         it "returns a success response (i.e. to display the 'new' template)" do
           xhr :post, :create, { plan_design_organization_id: plan_design_organization.to_param, forms_plan_design_proposal: invalid_attributes}, valid_session
-          expect(response).to have_http_status(:redirect)
+          expect(response).to be_success
         end
       end
     end
