@@ -9,10 +9,6 @@ And(/^the user enters FEIN with less than nine digits$/) do
   find('#organizations_general_organization_new_fein').set("89-423")
 end
 
-And(/^the user clicks submit button$/) do
-  page.find_button('submit').trigger('click')
-end
-
 Then(/^an warning message will be presented as FEIN must be at least nine digits$/) do
   expect(page).to have_content('FEIN must be at least 9 digits')
 end

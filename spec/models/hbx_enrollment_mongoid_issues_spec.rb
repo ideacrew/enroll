@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Family, "with 2 policies", :dbclean => :after_each do
+describe Family, "with 2 policies", :dbclean => :around_each do
   let(:family) { FactoryGirl.build(:family) }
   let(:primary) { FactoryGirl.create(:consumer_role) }
   let(:plan) { FactoryGirl.create(:plan) }
