@@ -48,7 +48,7 @@ module Effective
         }, :filter => false, :sortable => false
       end
 
-      def collection
+      collection do
         unless  (defined? @employees) && @employees.present?   #memoize the wrapper class to persist @search_string
           @employees = Queries::PlanDesignEmployeeQuery.new(attributes)
         end
