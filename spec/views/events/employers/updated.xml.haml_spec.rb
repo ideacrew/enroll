@@ -44,15 +44,15 @@ RSpec.describe "events/employers/updated.haml.erb" do
 
     context "with dental plans" do
 
-      let(:benefit_group) {bg = FactoryBot.create(:benefit_group, plan_year: plan_year);
-                          bg.elected_dental_plans = [FactoryBot.create(:plan, name: "new dental plan", coverage_kind: 'dental',
-                                                 dental_level: 'high')];
+      let(:benefit_group) {bg = FactoryBot.build(:benefit_group, plan_year: plan_year);
+                          bg.elected_dental_plans = [FactoryBot.create(:plan, name: "new dental plan", coverage_kind: 'dental', dental_level: 'high')];
                           bg}
 
       context "is_offering_dental? is true" do
         it "shows the dental plan in output" do
           benefit_group.dental_reference_plan_id = benefit_group.elected_dental_plans.first.id
-          plan_year.benefit_groups.first.save!
+          # binding.pry
+          # plan_year.benefit_groups.first.save!
           render :template => "events/employers/updated", :locals => {:employer => employer}
           expect(rendered).to include "new dental plan"
         end
@@ -62,7 +62,7 @@ RSpec.describe "events/employers/updated.haml.erb" do
       context "is_offering_dental? is false" do
         it "does not show the dental plan in output" do
           benefit_group.dental_reference_plan_id = nil
-          benefit_group.save!
+          # benefit_group.save!
           render :template => "events/employers/updated", :locals => {:employer => employer}
           expect(rendered).not_to include "new dental plan"
         end
