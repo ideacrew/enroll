@@ -196,7 +196,7 @@ RSpec.describe BenefitSponsors::SponsoredBenefits::SponsoredBenefitsController, 
 
     before :each do
       sign_in user
-      delete :destroy, params: {benefits_params}
+      delete :destroy, params: benefits_params
     end
 
     it "should redirect" do
