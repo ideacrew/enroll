@@ -20,7 +20,8 @@ describe DelinkBrokerAgency do
 
 
   before :each do
-    allow(ENV).to receive(:[]).with("person_hbx_id").and_return(person.hbx_id)
+    ENV['person_hbx_id'] = person.hbx_id
+    # allow(ENV).to receive(:[]).with("person_hbx_id").and_return(person.hbx_id)
     person.primary_family.broker_agency_accounts=[broker_agency_account]
     person.primary_family.save!
   end
