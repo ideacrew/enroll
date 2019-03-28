@@ -1,2 +1,2 @@
-# SponsoredApplications::Engine.routes.draw do
-# end
+SponsoredApplications::Engine.routes.draw do
+end

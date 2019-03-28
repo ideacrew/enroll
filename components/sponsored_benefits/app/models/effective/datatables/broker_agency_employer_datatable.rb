@@ -85,10 +85,6 @@
           row.broker_agency_profile.primary_broker_role.person.full_name
         end
 
-        scopes do
-          scope :legal_name, "Hello"
-        end
-
         def ee_count(row)
           return 'N/A' if row.is_prospect? || row.broker_relationship_inactive?
           row.employer_profile.roster_size

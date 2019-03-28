@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '2.5.1'
-gem 'rails', '~> 5.2.2'
+gem 'rails', '~> 5.2.3'
 
 #######################################################
 # FIXME
@@ -35,6 +35,7 @@ gem "benefit_markets",    path: "components/benefit_markets"
 gem "benefit_sponsors",   path: "components/benefit_sponsors"
 gem 'openhbx_cv2',        git: 'https://github.com/dchbx/openhbx_cv2.git', branch: 'master'
 gem "notifier",           path: "components/notifier"
+gem "sponsored_benefits", path: "components/sponsored_benefits"
 gem "transport_gateway",  path: "components/transport_gateway"
 gem "transport_profiles", path: "components/transport_profiles"
 #######################################################
@@ -129,8 +130,8 @@ group :development, :test do
   gem 'parallel_tests',         '~> 2.26.2'
   gem 'puma',                   '~> 3.11'
   gem 'railroady',              '~> 1.5.3'
-  gem 'rspec-rails',            '~> 3.8'
-  gem 'rspec_junit_formatter',  '~> 0.2.3'
+  gem 'rspec-rails'
+  gem 'rspec_junit_formatter'
   gem 'yard',                   '~> 0.9.12',  require: false
   gem 'yard-mongoid',           '~> 0.1',     require: false
   gem 'rails-controller-testing'
