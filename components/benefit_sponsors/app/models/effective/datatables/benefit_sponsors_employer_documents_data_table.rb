@@ -33,7 +33,7 @@ module Effective
       end
 
 
-      def collection
+      collection do
         @organization = BenefitSponsors::Organizations::Organization.employer_profiles.where(:"profiles._id" => BSON::ObjectId.from_string(attributes[:employer_profile_id])).first
         @employer_profile = @organization.employer_profile
         documents = EmployerAttestationDocument.none
