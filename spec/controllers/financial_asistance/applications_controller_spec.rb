@@ -285,16 +285,6 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
     end
   end
 
-  context "GET review_and_submit" do
-    it 'should  review and submit page' do
-      application.update_attributes(:aasm_state => "draft")
-      get :review_and_submit, id: application.id
-      expect(assigns(:consumer_role)).to eq person.consumer_role
-      expect(assigns(:application)).to eq application
-      expect(response).to render_template(:financial_assistance)
-    end
-  end
-
   context "GET wait_for_eligibility_response" do
     it "should redirect to eligibility_response_error if doesn't find the ED on wait_for_eligibility_response page" do
       get :wait_for_eligibility_response, id: application.id
