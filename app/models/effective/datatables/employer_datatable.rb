@@ -57,7 +57,8 @@ module Effective
            ['Create Plan Year', new_plan_year_exchanges_hbx_profiles_path(id: row, employer_actions_id: "family_actions_#{row.id.to_s}"), pundit_allow(HbxProfile, :can_create_plan_year?) ? 'ajax' : 'hide'],
            ['Change FEIN',  edit_fein_exchanges_hbx_profiles_path(id: row, row_actions_id: "family_actions_#{row.id.to_s}"), pundit_allow(HbxProfile, :can_change_fein?) ? 'ajax' : 'hide'],
            ['Extend Open Enrollment', oe_extendable_applications_exchanges_hbx_profiles_path(id: row.employer_profile.id, employer_actions_id: "family_actions_#{row.id}"), extend_oe_link_type(row, pundit_allow(HbxProfile, :can_extend_open_enrollment?))],
-           ['Close Open Enrollment', oe_extended_applications_exchanges_hbx_profiles_path(id: row.employer_profile.id, employer_actions_id: "family_actions_#{row.id}"), close_oe_link_type(row, pundit_allow(HbxProfile, :can_extend_open_enrollment?))]
+           ['Close Open Enrollment', oe_extended_applications_exchanges_hbx_profiles_path(id: row.employer_profile.id, employer_actions_id: "family_actions_#{row.id}"), close_oe_link_type(row, pundit_allow(HbxProfile, :can_extend_open_enrollment?))],
+           ['Force Publish', edit_force_publish_exchanges_hbx_profiles_path(row_actions_id: "family_actions_#{row.id.to_s}"), force_publish_link_type(row, pundit_allow(HbxProfile, :can_force_publish?))]
           ]
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "family_actions_#{row.id.to_s}"}, formats: :html
         }, :filter => false, :sortable => false
@@ -76,6 +77,16 @@ module Effective
       def close_oe_link_type(row, allow)
         extended_plan_years_and_allow = row.employer_profile.oe_extended_plan_years.present? && allow
         extended_plan_years_and_allow ? 'ajax' : 'hide'
+      end
+
+      def business_policy_accepted?(draft_plan_year)
+        TimeKeeper.date_of_record > draft_plan_year.due_date_for_publish && TimeKeeper.date_of_record < draft_plan_year.start_on
+      end
+
+      def force_publish_link_type(row, allow)
+        draft_plan_year = row.renewing_or_draft_py
+        draft_plan_year_and_allow = draft_plan_year.present? && business_policy_accepted?(draft_plan_year) && allow
+        draft_plan_year_and_allow ? 'ajax' : 'hide'
       end
 
       def collection
