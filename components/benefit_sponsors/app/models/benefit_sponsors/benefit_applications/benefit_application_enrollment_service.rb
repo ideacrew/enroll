@@ -124,7 +124,7 @@ module BenefitSponsors
           if benefit_application.may_begin_open_enrollment?
             benefit_application.begin_open_enrollment!
           else
-            benefit_application.errors.add(:base => "State transition failed")
+            benefit_application.errors.add(:base, "State transition failed")
             return false
           end
         end
