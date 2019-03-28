@@ -302,6 +302,7 @@ GEM
     cliver (0.3.2)
     cocaine (0.5.8)
       climate_control (>= 0.0.3, < 1.0)
+    coderay (1.1.2)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
     coffee-rails (4.1.1)
@@ -450,6 +451,7 @@ GEM
     mail (2.6.3)
       mime-types (>= 1.16, < 3)
     maskedinput-rails (1.4.1.0)
+    method_source (0.9.2)
     mime-types (2.99.3)
     mini_portile2 (2.0.0)
     minitest (5.11.3)
@@ -533,6 +535,9 @@ GEM
       cliver (~> 0.3.1)
       websocket-driver (>= 0.2.0)
     powerpack (0.1.2)
+    pry (0.12.2)
+      coderay (~> 1.1.0)
+      method_source (~> 0.9.0)
     puma (3.11.2)
     pundit (1.0.1)
       activesupport (>= 3.0.0)
@@ -853,6 +858,7 @@ DEPENDENCIES
   parallel_tests (= 2.26.2)
   poltergeist
   prawn!
+  pry
   puma
   pundit (~> 1.0.1)
   railroady (~> 1.5.2)
@@ -901,4 +907,4 @@ DEPENDENCIES
   yard-mongoid (~> 0.1.0)
 
 BUNDLED WITH
-   1.16.6
+   1.17.1
