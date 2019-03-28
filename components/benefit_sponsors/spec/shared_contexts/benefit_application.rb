@@ -31,6 +31,7 @@ RSpec.shared_context "setup initial benefit application", :shared_context => :me
                                       open_enrollment_period: open_enrollment_period,
                                       recorded_rating_area: rating_area,
                                       recorded_service_areas: service_areas,
+                                      recorded_sic_code: '021',
                                       fte_count: 5,
                                       pte_count: 0,
                                       msp_count: 0
