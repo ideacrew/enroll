@@ -36,11 +36,11 @@ FactoryBot.define do
           case product_kind
           when :health
             evaluator.health_product_package_kinds.each do |package_kind|
-              create_product_package(product_kind, package_kind, benefit_market_catalog, evaluator)
+              benefit_market_catalog.product_packages << create_product_package(product_kind, package_kind, benefit_market_catalog, evaluator)
             end
           when :dental
             evaluator.dental_product_package_kinds.each do |package_kind|
-              create_product_package(product_kind, package_kind, benefit_market_catalog, evaluator)
+              benefit_market_catalog.product_packages << create_product_package(product_kind, package_kind, benefit_market_catalog, evaluator)
             end
           end
         end
