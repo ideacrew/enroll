@@ -34,7 +34,7 @@ function pageInit() {
       calcPlanDesignContributions();
     } else {
       setTimeout(function() {
-        $('li.single-plan-tab').find('label').trigger('click');
+        $(".plan-design .nav-tabs li label:first").trigger('click');
       },600)
     }
   } else {
@@ -43,7 +43,7 @@ function pageInit() {
     } else {
       disableActionButtons();
       setTimeout(function() {
-        $('li.sole-source-tab').find('label').trigger('click');
+        $(".plan-design .nav-tabs li label:first").trigger('click');
       },600)
     }
     initSlider();
