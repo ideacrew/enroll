@@ -44,6 +44,7 @@ Rails.application.routes.draw do
       get 'render_message',on: :collection, action: 'render_message', as: 'render_message'
       get 'uqhp_flow',on: :collection, action: 'uqhp_flow', as: 'uqhp_flow'
       get :review_and_submit, on: :member
+      get :review, on: :member
       get :eligibility_results, on: :member
       get :wait_for_eligibility_response, on: :member
       get :check_eligibility_results_received, on: :member

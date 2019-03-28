@@ -123,6 +123,18 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     @application = @person.primary_family.application_in_progress
   end
 
+  def review
+    save_faa_bookmark(@person, request.original_url)
+    @consumer_role = @person.consumer_role
+    @application = FinancialAssistance::Application.find(params["id"])
+    @applicants = @application.active_applicants if @application.present?
+    if @application.blank?
+      redirect_to financial_assistance_applications_path
+    else
+      render layout: 'financial_assistance'
+    end
+  end
+
   def review_and_submit
     save_faa_bookmark(@person, request.original_url)
     @consumer_role = @person.consumer_role
