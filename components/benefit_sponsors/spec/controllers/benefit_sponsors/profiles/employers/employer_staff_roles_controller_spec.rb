@@ -56,7 +56,7 @@ module BenefitSponsors
 
         before :each do
             sign_in user
-            post :create, params:{staff_params}
+            post :create, params: staff_params
         end
 
         it "should initialize staff" do
