@@ -88,7 +88,11 @@ module BenefitSponsors
 
         before :each do
           sign_in user
+<<<<<<< HEAD
           post :create, params:{staff_params}
+=======
+          post :create, params: staff_params
+>>>>>>> 30f5e8c00a... refs#ivl_new_model_rails_5 Fix undefined id issue
         end
 
         it "should redirect" do
@@ -118,7 +122,11 @@ module BenefitSponsors
 
         before :each do
           sign_in user
+<<<<<<< HEAD
           get  :approve, params:{staff_params}
+=======
+          get  :approve, params: staff_params
+>>>>>>> 30f5e8c00a... refs#ivl_new_model_rails_5 Fix undefined id issue
         end
 
         it "should initialize staff" do
@@ -156,7 +164,11 @@ module BenefitSponsors
           before :each do
             sign_in user
             applicant_employer_staff_role.update_attributes(aasm_state:'is_closed')
+<<<<<<< HEAD
             get  :approve, params:{staff_params}
+=======
+            get  :approve, params: staff_params
+>>>>>>> 30f5e8c00a... refs#ivl_new_model_rails_5 Fix undefined id issue
           end
 
         it "should redirect" do
@@ -187,7 +199,11 @@ module BenefitSponsors
 
         before :each do
           sign_in user
+<<<<<<< HEAD
           delete  :destroy, params:{staff_params}
+=======
+          delete  :destroy, params: staff_params
+>>>>>>> 30f5e8c00a... refs#ivl_new_model_rails_5 Fix undefined id issue
         end
 
         it "should initialize staff" do
@@ -225,7 +241,11 @@ module BenefitSponsors
         before :each do
           applicant_employer_staff_role.update_attributes(benefit_sponsor_employer_profile_id: new_benefit_sponsor.employer_profile.id)
           sign_in user
+<<<<<<< HEAD
           delete  :destroy, params:{staff_params}
+=======
+          delete  :destroy, params: staff_params
+>>>>>>> 30f5e8c00a... refs#ivl_new_model_rails_5 Fix undefined id issue
         end
 
         it "should redirect" do
