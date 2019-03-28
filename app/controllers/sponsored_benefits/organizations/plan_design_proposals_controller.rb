@@ -108,8 +108,7 @@ module SponsoredBenefits
         else
           flash[:error] = "Quote information save failed."
         end
-
-        format.js { redirect_to edit_organizations_plan_design_organization_plan_design_proposal_path(@plan_design_organization, @plan_design_proposal.proposal, profile_id: params[:profile_id])}
+        format.js {render :js => "window.location.href='"+edit_organizations_plan_design_organization_plan_design_proposal_path(@plan_design_organization, @plan_design_proposal.proposal, profile_id: params[:profile_id])+"'"}
       end
     end
 
