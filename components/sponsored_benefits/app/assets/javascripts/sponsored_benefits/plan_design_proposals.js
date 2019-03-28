@@ -316,7 +316,7 @@ function calcPlanDesignContributions() {
 }
 
 function fetchBenefitKind() {
-  if(window.location.href.includes("kind=dental")) {
+  if(window.location.href.indexOf("kind=dental") > -1) {
     return "dental"
   } else {
     return "health"
