@@ -218,10 +218,8 @@ module BenefitSponsors
       end
 
       it "should be a success" do
-        binding.pry
         [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
           sign_in login_user
-          binding.pry
           get :edit, xhr: true, params: { benefit_sponsorship_id: benefit_sponsorship_id, id: ben_app1.id.to_s, benefit_application: benefit_application_params}
           expect(response).to have_http_status(:success)
         end
