@@ -26,7 +26,7 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
 
     context 'with AJAX request' do
       before :each do
-        xhr :get, :new_broker, filter: 'broker', format: :js
+        get :new_broker, params: {filter: 'broker'}, format: :js, xhr: true
       end
 
       it "should be a success" do
@@ -46,7 +46,7 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
 
   describe ".new_staff_member" do
     before :each do
-      xhr :get, :new_staff_member, filter: 'staff', format: :js
+      get :new_staff_member, params: {filter: 'staff', format: :js}, xhr: true
     end
 
     it "should be a success" do
@@ -65,7 +65,7 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
 
   describe ".new_broker_agency" do
     before :each do
-      xhr :get, :new_broker_agency, filter: 'broker', agency_type: 'new', format: :js
+      get :new_broker_agency, params: {filter: 'broker', agency_type: 'new'}, format: :js, xhr: true
     end
 
     it "should be a success" do
@@ -133,7 +133,7 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
           # allow(controller).to receive(:verify_recaptcha).and_return(true)
           allow(::Forms::BrokerAgencyProfile).to receive(:new).and_return(organization)
           allow(organization).to receive(:save).and_return(true)
-          post :create, :organization => organization_params
+          post :create, params: {organization: organization_params}
         end
 
         it "should be a redirect" do
@@ -150,7 +150,7 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
         before :each do
           allow(::Forms::BrokerAgencyProfile).to receive(:new).and_return(organization)
           allow(organization).to receive(:save).and_return(false)
-          post :create, :organization => organization_params
+          post :create, params: {organization: organization_params}
         end
 
         it "should be a redirect" do
@@ -199,7 +199,7 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
           # allow(controller).to receive(:verify_recaptcha).and_return(true)
           allow(::Forms::BrokerCandidate).to receive(:new).and_return(person)
           allow(person).to receive(:save).and_return(true)
-          post :create, :person => person_params
+          post :create, params: {person: person_params}
         end
 
         it "should be a redirect" do
@@ -215,7 +215,7 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
         before :each do
           allow(::Forms::BrokerCandidate).to receive(:new).and_return(person)
           allow(person).to receive(:save).and_return(false)
-          post :create, :person => person_params
+          post :create, params: {person: person_params}
         end
 
         it "should be a redirect" do
@@ -262,7 +262,7 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
         before :each do
           allow(::Forms::BrokerCandidate).to receive(:new).and_return(person)
           allow(person).to receive(:save).and_return(true)
-          post :create, :person => person_params
+          post :create, params: {person: person_params}
         end
 
         it "should be a redirect" do
@@ -278,7 +278,7 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
         before :each do
           allow(::Forms::BrokerCandidate).to receive(:new).and_return(person)
           allow(person).to receive(:save).and_return(false)
-          post :create, :person => person_params
+          post :create, params: {person: person_params}
         end
 
         it "should be a redirect" do
@@ -301,7 +301,7 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
     context "with full" do
       context "search by legal_name" do
         before do
-          xhr :get, :search_broker_agency, broker_agency_search: @organization.legal_name, format: :js
+          get :search_broker_agency, params: {broker_agency_search: @organization.legal_name}, format: :js, xhr: true
         end
 
         it "should be a success" do
@@ -313,7 +313,7 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
 
       context "search by fein" do
         before do
-          xhr :get, :search_broker_agency, broker_agency_search: @broker_agency_profile.fein, format: :js
+          get :search_broker_agency, params: {broker_agency_search: @broker_agency_profile.fein}, format: :js, xhr: true
         end
 
         it "should be a success" do
@@ -327,7 +327,7 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
     context "with partial" do
       context "search by legal_name" do
         before do
-          xhr :get, :search_broker_agency, broker_agency_search: @organization.legal_name.last(5), format: :js
+          get :search_broker_agency, params: {broker_agency_search: @organization.legal_name.last(5)}, format: :js, xhr: true
         end
 
         it "should be a success" do
@@ -339,7 +339,7 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
 
       context "search by fein" do
         before do
-          xhr :get, :search_broker_agency, broker_agency_search: @broker_agency_profile.fein.last(5), format: :js
+          get :search_broker_agency, params: {broker_agency_search: @broker_agency_profile.fein.last(5)}, format: :js, xhr: true
         end
 
         it "should be a success" do
