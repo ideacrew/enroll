@@ -115,7 +115,7 @@ module BenefitSponsors
         if params.empty?
           params[:agency] = self.send("#{profile_type}_params")
         end
-        get action, params: {params}
+        get action, params: params
       end
       it "should initialize agency" do
         expect(assigns(:agency).class).to eq agency_class
