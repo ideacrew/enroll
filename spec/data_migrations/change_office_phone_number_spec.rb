@@ -16,9 +16,12 @@ describe ChangeOfficePhoneNumber do
     let(:office_location) {FactoryBot.create(:office_location,:primary, organization:organization)}
     let(:phone) { FactoryBot.create(:phone, kind: "work", office_location:office_location) }
     before(:each) do
-      allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
-      allow(ENV).to receive(:[]).with("full_phone_number").and_return("20212345678")
-      allow(ENV).to receive(:[]).with("country_code").and_return("1")
+      ENV['fein'] = organization.fein
+      ENV['full_phone_number'] = "20212345678"
+      ENV['country_code'] = "1"
+      # allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
+      # allow(ENV).to receive(:[]).with("full_phone_number").and_return("20212345678")
+      # allow(ENV).to receive(:[]).with("country_code").and_return("1")
     end
     it "should have the correct country code" do
       subject.migrate
@@ -56,9 +59,13 @@ describe ChangeOfficePhoneNumber do
     let(:office_location) {FactoryBot.create(:office_location,:primary, organization:organization)}
     let(:phone) { FactoryBot.create(:phone, kind: "work", office_location:office_location) }
     before(:each) do
-      allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
-      allow(ENV).to receive(:[]).with("full_phone_number").and_return("20212345678")
-      allow(ENV).to receive(:[]).with("country_code").and_return("")
+      ENV['fein'] = organization.fein
+      ENV['full_phone_number'] = "20212345678"
+      ENV['country_code'] = ""
+      
+      # allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
+      # allow(ENV).to receive(:[]).with("full_phone_number").and_return("20212345678")
+      # allow(ENV).to receive(:[]).with("country_code").and_return("")
     end
 
     it "should have the correct extension" do

@@ -6,7 +6,9 @@ class ChangeOfficePhoneNumber < MongoidMigrationTask
       fein = (ENV['fein']).to_s
       full_phone_number = (ENV['full_phone_number']).to_s
       country_code = (ENV['country_code']).to_s
-
+      
+      # require 'pry'
+      # binding.pry
       if Organization.where(fein: fein).size != 1
         puts "no or more employer with given fein" unless Rails.env.test?
         return
