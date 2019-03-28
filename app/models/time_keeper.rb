@@ -60,6 +60,7 @@ class TimeKeeper
         number_of_days.times do
           instance.set_date_of_record(instance.date_of_record + 1.day)
           instance.push_date_of_record
+          instance.push_date_change_event
         end
       end
     end
