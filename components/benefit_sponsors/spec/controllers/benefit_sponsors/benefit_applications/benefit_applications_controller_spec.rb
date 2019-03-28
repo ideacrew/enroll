@@ -100,6 +100,7 @@ module BenefitSponsors
       }
 
       let(:ben_app)       { benefit_sponsorship.benefit_applications.build(params) }
+      let(:ben_app1) {FactoryBot.create(:benefit_sponsors_benefit_application,:with_benefit_package, benefit_sponsorship: benefit_sponsorship)}
     end
 
     before do
@@ -137,7 +138,7 @@ module BenefitSponsors
 
       def sign_in_and_do_new(user)
         sign_in user
-        get :new, :benefit_sponsorship_id => benefit_sponsorship_id
+        get :new, params: { benefit_sponsorship_id: benefit_sponsorship_id }
       end
     end
 
@@ -147,7 +148,7 @@ module BenefitSponsors
       it "should redirect" do
         [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
           sign_in_and_do_create(login_user)
-          expect(response).to have_http_status(:redirect)
+          expect(response).to have_http_status :success
         end
       end
 
@@ -190,7 +191,7 @@ module BenefitSponsors
 
       def sign_in_and_do_create(user)
         sign_in user
-        post :create, :benefit_sponsorship_id => benefit_sponsorship_id, :benefit_application => benefit_application_params
+        post :create, params: {benefit_sponsorship_id: benefit_sponsorship_id, :benefit_application => benefit_application_params}
       end
     end
 
@@ -213,13 +214,15 @@ module BenefitSponsors
       include_context 'shared_stuff'
 
       before do
-        ben_app.save
+        ben_app1.save
       end
 
       it "should be a success" do
+        binding.pry
         [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
           sign_in login_user
-          xhr :get, :edit, :benefit_sponsorship_id => benefit_sponsorship_id, id: ben_app.id.to_s, :benefit_application => benefit_application_params
+          binding.pry
+          get :edit, xhr: true, params: { benefit_sponsorship_id: benefit_sponsorship_id, id: ben_app1.id.to_s, benefit_application: benefit_application_params}
           expect(response).to have_http_status(:success)
         end
       end
@@ -227,7 +230,7 @@ module BenefitSponsors
       it "should render edit template" do
         [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
           sign_in login_user
-          xhr :get, :edit, :benefit_sponsorship_id => benefit_sponsorship_id, id: ben_app.id.to_s, :benefit_application => benefit_application_params
+          xhr :get, :edit, params: { benefit_sponsorship_id: benefit_sponsorship_id }, id: ben_app.id.to_s, :benefit_application => benefit_application_params
           expect(response).to render_template("edit")
         end
       end
@@ -235,7 +238,7 @@ module BenefitSponsors
       it "should initialize form" do
         [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
           sign_in login_user
-          xhr :get, :edit, :benefit_sponsorship_id => benefit_sponsorship_id, id: ben_app.id.to_s, :benefit_application => benefit_application_params
+          xhr :get, :edit, params: { benefit_sponsorship_id: benefit_sponsorship_id }, id: ben_app.id.to_s, :benefit_application => benefit_application_params
           expect(form_class).to respond_to(:for_edit)
         end
       end
@@ -309,7 +312,7 @@ module BenefitSponsors
 
       def sign_in_and_submit_application(user)
         sign_in user
-        post :submit_application, :benefit_application_id => benefit_application.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
+        post :submit_application, params: { benefit_sponsorship_id: benefit_sponsorship_id.to_s }, :benefit_sponsorship_id => benefit_sponsorship_id
       end
 
       context "benefit application published sucessfully" do
@@ -342,7 +345,7 @@ module BenefitSponsors
         it "should redirect with success message for employer" do
           [user].each do |login_user|
             sign_in login_user
-            xhr :post, :submit_application, :benefit_application_id => benefit_application.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
+            xhr :post, :submit_application, params: { benefit_sponsorship_id: benefit_sponsorship_id.to_s }, :benefit_sponsorship_id => benefit_sponsorship_id
             expect(flash[:notice]).to eq "Plan Year successfully published."
             expect(flash[:error]).to eq "<li>Warning: You have 0 non-owner employees on your roster. In order to be able to enroll under employer-sponsored coverage, you must have at least one non-owner enrolled. Do you want to go back to add non-owner employees to your roster?</li>"
           end
@@ -351,7 +354,7 @@ module BenefitSponsors
         it "should redirect with success message for admin" do
           [user_with_hbx_staff_role].each do |login_user|
             sign_in login_user
-            xhr :post, :submit_application, :benefit_application_id => benefit_application.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
+            xhr :post, :submit_application, params: { benefit_sponsorship_id: benefit_sponsorship_id.to_s }, :benefit_sponsorship_id => benefit_sponsorship_id
             expect(flash[:notice]).to eq "Plan Year successfully published."
             expect(flash[:error]).to eq "<li>Warning: You have 0 non-owner employees on your roster. In order to be able to enroll under employer-sponsored coverage, you must have at least one non-owner enrolled. Do you want to go back to add non-owner employees to your roster?</li>"
           end
@@ -360,7 +363,7 @@ module BenefitSponsors
         it "should redirect with success message for broker" do
           [user_with_broker_role].each do |login_user|
             sign_in login_user
-            xhr :post, :submit_application, :benefit_application_id => benefit_application.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
+            xhr :post, :submit_application, params: { benefit_sponsorship_id: benefit_sponsorship_id.to_s }, :benefit_sponsorship_id => benefit_sponsorship_id
             expect(flash[:notice]).to eq "Plan Year successfully published."
             expect(flash[:error]).to eq "<li>Warning: You have 0 non-owner employees on your roster. In order to be able to enroll under employer-sponsored coverage, you must have at least one non-owner enrolled. Do you want to go back to add non-owner employees to your roster?</li>"
           end
@@ -376,7 +379,7 @@ module BenefitSponsors
         it "should display warnings" do
           [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
             sign_in login_user
-            xhr :post, :submit_application, :benefit_application_id => benefit_application.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
+            xhr :post, :submit_application, params: { benefit_sponsorship_id: benefit_sponsorship_id.to_s }, :benefit_sponsorship_id => benefit_sponsorship_id
             have_http_status(:success)
           end
         end
@@ -388,7 +391,7 @@ module BenefitSponsors
         it "should redirect with errors" do
           [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
             sign_in login_user
-            xhr :post, :submit_application, :benefit_application_id => benefit_application.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
+            xhr :post, :submit_application, params: { benefit_sponsorship_id: benefit_sponsorship_id.to_s }, :benefit_sponsorship_id => benefit_sponsorship_id
             expect(flash[:error]).to match(/Plan Year failed to publish/)
           end
         end
@@ -404,7 +407,7 @@ module BenefitSponsors
 
       def sign_in_and_force_submit_application(user)
         sign_in user
-        post :force_submit_application, :benefit_application_id => ben_app.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
+        post :force_submit_application, :benefit_application_id => ben_app.id.to_s, params: { benefit_sponsorship_id: benefit_sponsorship_id.to_s }
       end
 
       it "should redirect" do
@@ -439,7 +442,7 @@ module BenefitSponsors
 
       def sign_in_and_revert(user)
         sign_in user
-        post :revert, :benefit_application_id => benefit_application.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
+        post :revert, :benefit_application_id => benefit_application.id.to_s, params: { benefit_sponsorship_id: benefit_sponsorship_id }
       end
 
       context "when there is no eligible application to revert" do
