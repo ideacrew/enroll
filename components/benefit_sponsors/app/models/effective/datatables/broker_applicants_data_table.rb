@@ -10,11 +10,7 @@ module Effective
 
       end
 
-      # scopes do
-      #    scope :name, "Hello"
-      # end
-
-      def collection
+      collection do
         unless  (defined? @people) && @people.present?
           @people = BenefitSponsors::Queries::BrokerApplicantsDatatableQuery.new(attributes)
         end

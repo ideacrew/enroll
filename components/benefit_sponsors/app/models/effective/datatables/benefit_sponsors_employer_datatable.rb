@@ -123,7 +123,7 @@ module Effective
         (1..fte_max_count).include?(benefit_application.fte_count) && benefit_application.sponsor_profile.is_primary_office_local?
       end
 
-      def collection
+      collection do
         return @employer_collection if defined? @employer_collection
 
         benefit_sponsorships ||= BenefitSponsors::BenefitSponsorships::BenefitSponsorship.all
