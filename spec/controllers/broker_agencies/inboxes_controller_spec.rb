@@ -22,7 +22,7 @@ RSpec.describe BrokerAgencies::InboxesController, :type => :controller, dbclean:
     end
 
     it "render new template" do
-      xhr :get, :new, :id => broker_agency_profile.id.to_s, profile_id: hbx_profile.id, to: "test", format: :js
+      get :new, params: {id: broker_agency_profile.id.to_s, profile_id: hbx_profile.id, to: "test"}, format: :js, xhr: true
       expect(response).to render_template("new")
       expect(response).to have_http_status(:success)
     end
@@ -47,21 +47,24 @@ RSpec.describe BrokerAgencies::InboxesController, :type => :controller, dbclean:
 
     it "creates new message" do
       allow(inbox_provider.inbox).to receive(:save).and_return(true)
-      post :create, valid_params, id: "558b63ef4741542b642232323"
+      valid_params[:id] = "id"
+      post :create, params: valid_params
       expect(response).to have_http_status(:redirect)
     end
 
     it "creates new message to hbx admin" do
       allow(inbox_provider.inbox).to receive(:save).and_return(true)
       valid_params.deep_merge!(message:{to: "HBX Admin"}, id: inbox_provider.id)
-      post :create, valid_params, id: "id", profile_id: hbx_profile.id
+      valid_params[:id] = "id"
+      valid_params[:profile_id] = hbx_profile.id
+      post :create, params: valid_params
       expect(response).to have_http_status(:redirect)
     end
 
     it "renders new template of broker agency" do
       allow(inbox_provider.inbox).to receive(:save).and_return(false)
       valid_params.deep_merge!(message:{to: "HBX Admin"}, id: inbox_provider.id)
-      post :create, valid_params
+      post :create, params: valid_params
       expect(response).to render_template(:new)
     end
   end
@@ -77,7 +80,7 @@ RSpec.describe BrokerAgencies::InboxesController, :type => :controller, dbclean:
       allow(BrokerAgencyProfile).to receive(:find).and_return(broker_agency_profile)
       allow(broker_agency_profile).to receive(:inbox).and_return(inbox)
       allow(inbox).to receive(:messages).and_return(messages)
-      xhr :get, :msg_to_portal, inbox_id: 1
+      get :msg_to_portal, params: {inbox_id:1}, xhr: true
       expect(response).to have_http_status(:success)
     end
   end
@@ -98,12 +101,12 @@ RSpec.describe BrokerAgencies::InboxesController, :type => :controller, dbclean:
     end
 
     it "show action" do
-      get :show, id: 1
+      get :show, params:{id: 1}
       expect(response).to have_http_status(:success)
     end
 
     it "delete action" do
-      xhr :delete, :destroy, id: 1
+      delete :destroy, params:{id:1}, xhr:true
       expect(response).to have_http_status(:success)
     end
   end
@@ -124,7 +127,7 @@ RSpec.describe BrokerAgencies::InboxesController, :type => :controller, dbclean:
     end
 
     it "show action" do
-      get :show, id: id
+      get :show, params: {id: id}
       expect(response).to have_http_status(:success)
     end
   end
