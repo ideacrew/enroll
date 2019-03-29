@@ -85,7 +85,7 @@ FactoryBot.define do
 
     trait :with_consumer_role do
       after(:create) do |p, evaluator|
-        create_list(:consumer_role, 1, person: p, dob: p.dob)
+        build_list(:consumer_role, 1, person: p, dob: p.dob).tap { |cs| binding.pry }
       end
     end
 

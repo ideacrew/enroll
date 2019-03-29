@@ -126,7 +126,8 @@ class HbxEnrollment
   # should not be transmitted to carriers nor reported in metrics.
   field :external_enrollment, type: Boolean, default: false
 
-  track_history   :on => [:kind,
+  track_history   :modifier_field_optional => true,
+                  :on => [:kind,
                           :enrollment_kind,
                           :coverage_kind,
                           :effective_on,

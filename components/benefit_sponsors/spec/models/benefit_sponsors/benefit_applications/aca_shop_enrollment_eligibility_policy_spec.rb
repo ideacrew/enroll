@@ -27,33 +27,31 @@ module BenefitSponsors
     end
 
     describe "Validates enrollment_elgibility_policy business policy" do
-
       let!(:policy_name) {:enrollment_elgibility_policy}
       let!(:policy) {subject.business_policies[policy_name]}
 
       context "When all the census employees are emrolled" do
-
-        let!(:load_enrollments) {benefit_sponsorship.census_employees.each do |ce|
-          family = FactoryBot.create(:family, :with_primary_family_member)
-          FactoryBot.create(:hbx_enrollment, household: family.active_household, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
-          ce.save
+        before do
+          benefit_sponsorship.census_employees.each do |ce|
+            family = FactoryBot.create(:family, :with_primary_family_member)
+            FactoryBot.build(:hbx_enrollment, household: family.active_household, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
+            ce.save
+          end
         end
-        }
 
         it "should satisfy rules" do
           expect(policy.is_satisfied?(benefit_application)).to eq true
         end
-
       end
 
       context "When less then minimum participation of the census employees are emrolled" do
-
-        let!(:load_enrollments) {benefit_sponsorship.census_employees.limit(3).each do |ce|
-          family = FactoryBot.create(:family, :with_primary_family_member)
-          FactoryBot.create(:hbx_enrollment, household: family.active_household, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
-          ce.save
+        before do
+          benefit_sponsorship.census_employees.limit(3).each do |ce|
+            family = FactoryBot.create(:family, :with_primary_family_member)
+            FactoryBot.create(:hbx_enrollment, household: family.active_household, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
+            ce.save
+          end
         end
-        }
 
         it "should falsify when rules not satified" do
           expect(policy.is_satisfied?(benefit_application)).to eq false
