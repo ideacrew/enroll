@@ -59,7 +59,7 @@ class BenefitGroup
 
   default_scope ->{ where(is_active: true) }
 
-  delegate :start_on, :end_on, to: :plan_year
+  delegate :start_on, :end_on, to: :plan_year, allow_nil: true
   # accepts_nested_attributes_for :plan_year
 
   delegate :employer_profile, to: :plan_year, allow_nil: true

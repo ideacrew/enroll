@@ -30,14 +30,14 @@ RSpec.describe Employers::BrokerAgencyController do
 
     it "should render js template" do
       sign_in(@user)
-      xhr :get, :index, employer_profile_id: @employer_profile.id, q: @org2.broker_agency_profile.legal_name
+      get :index, params: {employer_profile_id: @employer_profile.id, q: @org2.broker_agency_profile.legal_name}, xhr: true
       expect(response.content_type).to eq Mime::JS
     end
 
     context 'with out search string' do
       before(:each) do
         sign_in(@user)
-        xhr :get, :index, employer_profile_id: @employer_profile.id, format: :js
+        get :index, params: {employer_profile_id: @employer_profile.id}, format: :js, xhr: true
       end
 
       it "should be a success" do
@@ -57,7 +57,7 @@ RSpec.describe Employers::BrokerAgencyController do
     context 'with search string' do
       before :each do
         sign_in(@user)
-        xhr :get, :index, employer_profile_id: @employer_profile.id, q: @org2.broker_agency_profile.legal_name, format: :js
+        get :index, params: {employer_profile_id: @employer_profile.id, q: @org2.broker_agency_profile.legal_name}, format: :js, xhr: true
       end
 
       it 'should return matching agency' do
@@ -68,7 +68,7 @@ RSpec.describe Employers::BrokerAgencyController do
     context 'with search string and pagination' do
       before :each do
         sign_in(@user)
-        xhr :get, :index, employer_profile_id: @employer_profile.id, q: @org2.broker_agency_profile.legal_name, organization_page: 1, format: :js
+        get :index, params: {employer_profile_id: @employer_profile.id, q: @org2.broker_agency_profile.legal_name, organization_page: 1}, format: :js, xhr: true
       end
 
       it 'should return matching agency' do
@@ -79,7 +79,7 @@ RSpec.describe Employers::BrokerAgencyController do
     context 'with page label and pagination' do
       before :each do
         sign_in(@user)
-        xhr :get, :index, employer_profile_id: @employer_profile.id, page: @org2.broker_agency_profile.legal_name[0].upcase, organization_page: 1, format: :js
+        get :index, params: {employer_profile_id: @employer_profile.id, page: @org2.broker_agency_profile.legal_name[0].upcase, organization_page: 1}, format: :js, xhr: true
       end
 
       it 'should return matching agency' do
@@ -91,7 +91,7 @@ RSpec.describe Employers::BrokerAgencyController do
     context 'with page label and invalid pagination number' do
       before :each do
         sign_in(@user)
-        xhr :get, :index, employer_profile_id: @employer_profile.id, page: @org2.broker_agency_profile.legal_name[0].upcase, organization_page: 120, format: :js
+        get :index, params: {employer_profile_id: @employer_profile.id, page: @org2.broker_agency_profile.legal_name[0].upcase, organization_page: 120}, format: :js, xhr: true
       end
       it 'should return matching agency' do
         expect(assigns(:broker_agency_profiles).count).to eq 0
@@ -108,7 +108,7 @@ RSpec.describe Employers::BrokerAgencyController do
         allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
         allow(SponsoredBenefits::Organizations::BrokerAgencyProfile).to receive(:assign_employer).and_return(true)
         sign_in(@user)
-        post :create, employer_profile_id: @employer_profile.id, broker_role_id: @broker_role2.id, broker_agency_id: @org2.broker_agency_profile.id
+        post :create, params: {employer_profile_id: @employer_profile.id, broker_role_id: @broker_role2.id, broker_agency_id: @org2.broker_agency_profile.id}
       end
 
       it "should be a success" do
@@ -129,7 +129,7 @@ RSpec.describe Employers::BrokerAgencyController do
       before(:each) do
         allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: false))
         sign_in(@user)
-        post :create, employer_profile_id: @employer_profile.id, broker_role_id: @broker_role2.id, broker_agency_id: @org2.broker_agency_profile.id
+        post :create, params: {employer_profile_id: @employer_profile.id, broker_role_id: @broker_role2.id, broker_agency_id: @org2.broker_agency_profile.id}
       end
 
       it "should be a success" do
@@ -144,7 +144,7 @@ RSpec.describe Employers::BrokerAgencyController do
     context 'with out search string' do
       before(:each) do
         sign_in(@user)
-        xhr :get, :active_broker, employer_profile_id: @employer_profile.id, format: :js
+        get :active_broker, params: {employer_profile_id: @employer_profile.id}, format: :js, xhr: true
       end
 
       it "should be a success" do
@@ -167,7 +167,7 @@ RSpec.describe Employers::BrokerAgencyController do
       before(:each) do
         allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
         sign_in(@user)
-        get :terminate, employer_profile_id: @employer_profile.id, broker_agency_id: @org2.broker_agency_profile.id
+        get :terminate, params: {employer_profile_id: @employer_profile.id, broker_agency_id: @org2.broker_agency_profile.id}
       end
 
       it "should be a success" do
@@ -184,7 +184,7 @@ RSpec.describe Employers::BrokerAgencyController do
       end
 
       it "should terminate broker and redirect to my_account with broker tab actived" do
-        get :terminate, employer_profile_id: @employer_profile.id, broker_agency_id: @org2.broker_agency_profile.id, direct_terminate: true, termination_date: TimeKeeper.date_of_record
+        get :terminate, params: {employer_profile_id: @employer_profile.id, broker_agency_id: @org2.broker_agency_profile.id, direct_terminate: true, termination_date: TimeKeeper.date_of_record}
         expect(flash[:notice]).to eq("Broker terminated successfully.")
         expect(response).to redirect_to(employers_employer_profile_path(@employer_profile, tab: "brokers"))
       end
@@ -197,7 +197,7 @@ RSpec.describe Employers::BrokerAgencyController do
       end
 
       it "should terminate broker and redirect to my_account with broker tab actived" do
-        get :terminate, employer_profile_id: @employer_profile.id, broker_agency_id: @org2.broker_agency_profile.id, direct_terminate: true, termination_date: TimeKeeper.date_of_record
+        get :terminate, params: {employer_profile_id: @employer_profile.id, broker_agency_id: @org2.broker_agency_profile.id, direct_terminate: true, termination_date: TimeKeeper.date_of_record}
 
         expect(flash[:error]).to match(/Access not allowed/)
 
@@ -218,7 +218,7 @@ RSpec.describe Employers::BrokerAgencyController do
     end
 
     it "should be a success" do
-      post :create, employer_profile_id: @employer_profile.id, broker_role_id: @broker_role2.id, broker_agency_id: @org2.broker_agency_profile.id
+      post :create, params: {employer_profile_id: @employer_profile.id, broker_role_id: @broker_role2.id, broker_agency_id: @org2.broker_agency_profile.id}
       expect(assigns(:employer_profile).broker_role_id).to eq(@broker_role2.id.to_s)
     end
 
@@ -226,7 +226,7 @@ RSpec.describe Employers::BrokerAgencyController do
       @org2.broker_agency_profile.default_general_agency_profile = general_agency_profile
       @org2.broker_agency_profile.save
       expect(controller).to receive(:send_general_agency_assign_msg)
-      post :create, employer_profile_id: @employer_profile.id, broker_role_id: @broker_role2.id, broker_agency_id: @org2.broker_agency_profile.id
+      post :create, params: {employer_profile_id: @employer_profile.id, broker_role_id: @broker_role2.id, broker_agency_id: @org2.broker_agency_profile.id}
     end
 
     context "send_broker_assigned_msg" do

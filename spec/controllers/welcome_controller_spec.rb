@@ -40,7 +40,7 @@ RSpec.describe WelcomeController, :type => :controller do
     let(:user) { FactoryBot.build(:user) }
     it "should return to a http status success" do
       sign_in user
-      xhr :post, "show_hints", :format => "js"
+      post "show_hints", :format => "js", xhr: true
       expect( response ).to have_http_status(:success)
     end
   end

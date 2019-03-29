@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 class FakesController < ApplicationController
-  include VlpDoc
+  include ::VlpDoc
 end
 
 describe FakesController do
