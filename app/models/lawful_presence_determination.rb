@@ -27,7 +27,10 @@ class LawfulPresenceDetermination
                           :vlp_authority,
                           :citizen_status,
                           :citizenship_result,
+
+                          
                           :aasm_state],
+                          :modifier_field_optional => true,
                   :scope => :consumer_role,
                   :track_create  => false,    # track document creation, default is false
                   :track_update  => true,    # track document updates, default is true
