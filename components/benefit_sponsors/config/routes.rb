@@ -71,13 +71,13 @@ BenefitSponsors::Engine.routes.draw do
     end
   end
 
-
   resources :benefit_sponsorships do
     resources :benefit_applications, controller: "benefit_applications/benefit_applications" do
-      get 'late_rates_check', on: :collection
-      post 'revert'
-      post 'submit_application'
-      post 'force_submit_application'
+      get :late_rates_check, on: :collection
+   
+      post :revert
+      post :submit_application
+      post :force_submit_application
 
       resources :benefit_packages, controller: "benefit_packages/benefit_packages" do
         get :calculate_employer_contributions, on: :collection

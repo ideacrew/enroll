@@ -52,6 +52,7 @@ FactoryBot.define do
 
     trait :with_benefit_sponsor_catalog do
       after(:build) do |benefit_application, evaluator|
+        benefit_sponsorship ||= benefit_application.benefit_sponsorship
         if evaluator.passed_benefit_sponsor_catalog
           benefit_sponsor_catalog = evaluator.passed_benefit_sponsor_catalog
         else
@@ -65,6 +66,7 @@ FactoryBot.define do
 
     trait :with_benefit_sponsorship do
       after(:build) do |benefit_application, evaluator|
+        benefit_sponsorship ||= benefit_application.benefit_sponsorship
         benefit_sponsorship { create(:benefit_sponsors_benefit_sponsorship, :with_full_package)} unless benefit_sponsorship.present?
       end
     end

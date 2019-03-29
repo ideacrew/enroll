@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :permission do
     modify_family true
     modify_employer true
