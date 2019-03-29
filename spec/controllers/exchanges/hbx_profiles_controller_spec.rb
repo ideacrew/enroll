@@ -132,7 +132,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     end
 
   end
-
+=begin
   describe "#create" do
     let(:user) { double("User")}
     let(:person) { double("Person")}
@@ -213,6 +213,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     end
 
   end
+=end
 
   describe "#check_hbx_staff_role" do
     let(:user) { double("user")}
@@ -227,6 +228,81 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     end
   end
 
+  describe "#view_the_configuration_tab?" do
+    let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
+    let(:user_2) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
+    let(:person) { double("person")}
+    let(:hbx_staff_role) { double("hbx_staff_role")}
+    let(:hbx_profile) { double("hbx_profile")}
+    let(:admin_permission) { double("permission", name: "super_admin", view_the_configuration_tab: true)}
+    let(:admin_permission_with_time_travel) { double("permission", name: "super_admin", can_submit_time_travel_request: true, modify_admin_tabs: true)}
+    let(:staff_permission) { double("permission", name: "hbx_staff")}
+
+    before :each do
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
+      allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
+      allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
+      allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
+      allow(hbx_staff_role).to receive(:can_submit_time_travel_request).and_return(false)
+      allow(hbx_staff_role).to receive(:view_the_configuration_tab)
+      allow(user).to receive(:permission).and_return(admin_permission)
+    end
+    
+    it "should render the config index for a super admin" do
+      allow(hbx_staff_role).to receive(:view_the_configuration_tab).and_return(true)
+      allow(hbx_staff_role).to receive(:permission).and_return(admin_permission)
+      allow(hbx_staff_role).to receive(:subrole).and_return(admin_permission.name)
+      allow(admin_permission).to receive(:name).and_return(admin_permission.name)
+      allow(admin_permission).to receive(:can_submit_time_travel_request).and_return(false)
+      allow(admin_permission).to receive(:view_the_configuration_tab).and_return(true)
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      allow(user).to receive(:view_the_configuration_tab?).and_return(true)
+      allow(user).to receive(:can_submit_time_travel_request?).and_return(false)
+      allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
+      sign_in(user)
+      get :configuration
+      expect(response).to have_http_status(:success)
+      post :set_date, :forms_time_keeper => { :date_of_record =>  TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d') }
+      expect(response).to have_http_status(:redirect)
+    end
+
+    it "should not render the config index for a not super admin" do
+      allow(admin_permission).to receive(:view_the_configuration_tab).and_return(false)
+      allow(staff_permission).to receive(:view_the_configuration_tab).and_return(true)
+      allow(hbx_staff_role).to receive(:view_the_configuration_tab).and_return(false)
+      allow(hbx_staff_role).to receive(:permission).and_return(staff_permission)
+      allow(hbx_staff_role).to receive(:subrole).and_return(staff_permission.name)
+      allow(staff_permission).to receive(:name).and_return(staff_permission.name)
+      allow(user_2).to receive(:has_hbx_staff_role?).and_return(true)
+      allow(user_2).to receive(:person).and_return(person)
+
+      allow(user_2).to receive(:permission).and_return(staff_permission)
+
+      allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
+      sign_in(user_2)
+      get :configuration
+      expect(response).to have_http_status(:success)
+    end
+
+    it "should not allow super admin to time travel" do
+      allow(admin_permission).to receive(:view_the_configuration_tab).and_return(true)
+      allow(staff_permission).to receive(:view_the_configuration_tab).and_return(true)
+      allow(hbx_staff_role).to receive(:permission).and_return(staff_permission)
+      allow(hbx_staff_role).to receive(:view_the_configuration_tab).and_return(true)
+      allow(hbx_staff_role).to receive(:subrole).and_return(staff_permission.name)
+      allow(admin_permission).to receive(:can_submit_time_travel_request).and_return(false)
+      allow(user_2).to receive(:has_hbx_staff_role?).and_return(true)
+      allow(user).to receive(:view_the_configuration_tab?).and_return(true)
+      allow(user_2).to receive(:view_the_configuration_tab?).and_return(false)
+      allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
+      allow(user).to receive(:permission).and_return(admin_permission)
+      sign_in(user)
+      post :set_date, :forms_time_keeper => { :date_of_record =>  TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d') }
+      expect(response).to have_http_status(:redirect)
+    end
+  end
 
   describe "Show" do
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false, :has_csr_role? => false, :last_portal_visited => nil)}
@@ -277,32 +353,79 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     end
   end
 
-  describe "#force_publish" do
-    include_context "setup benefit market with market catalogs and product packages"
-    include_context "setup initial benefit application"
-    let(:user) { double("user", :has_hbx_staff_role? => true)}
-    let(:ben_app) { initial_application }
+   describe "GET edit_force_publish" do
 
-    before :each do
-      ben_app.update_attributes(aasm_state: "draft")
-    end
-
-    context 'does not force published if not admin' do
-      it "does not force publish benefit application for employer" do
-        xhr :get, :force_publish, {ids: [benefit_sponsorship.id]} ,  format: :js
-        expect(response).to have_http_status(302)
+    context "of an hbx super admin clicks Force Publish" do
+      let(:site) do
+        FactoryGirl.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
       end
-    end
+      let(:employer_organization) do
+        FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site).tap do |org|
+          benefit_sponsorship = org.employer_profile.add_benefit_sponsorship
+          benefit_sponsorship.save
+          org
+        end
+      end
+      let(:person) do
+        FactoryGirl.create(:person, :with_hbx_staff_role).tap do |person|
+          FactoryGirl.create(:permission, :super_admin).tap do |permission|
+            person.hbx_staff_role.update_attributes(permission_id: permission.id)
+            person
+          end
+        end
+      end
+      let(:user) do
+        FactoryGirl.create(:user, person: person)
+      end
+      let(:benefit_sponsorship) do
+        employer_organization.benefit_sponsorships.first
+      end
 
-    context 'force publish benefit application for employer' do
-      before do
+      it "renders edit_force_publish" do
         sign_in(user)
-        xhr :get, :force_publish, {ids: [benefit_sponsorship.id]} ,  format: :js
+        @params = {id: benefit_sponsorship.id.to_s, employer_actions_id: "employer_actions_#{employer_organization.employer_profile.id.to_s}", :format => 'js'}
+        xhr :get, :edit_force_publish, @params
+        expect(response).to render_template('edit_force_publish')
+        expect(response).to have_http_status(:success)
+      end
+    end
+  end
+
+  describe "POST force_publish" do
+
+    context "of an hbx super admin clicks Submit in Force Publish window" do
+      let(:site) do
+        FactoryGirl.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
+      end
+      let(:employer_organization) do
+        FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site).tap do |org|
+          benefit_sponsorship = org.employer_profile.add_benefit_sponsorship
+          benefit_sponsorship.save
+          org
+        end
+      end
+      let(:person) do
+        FactoryGirl.create(:person, :with_hbx_staff_role).tap do |person|
+          FactoryGirl.create(:permission, :super_admin).tap do |permission|
+            person.hbx_staff_role.update_attributes(permission_id: permission.id)
+            person
+          end
+        end
+      end
+      let(:user) do
+        FactoryGirl.create(:user, person: person)
+      end
+      let(:benefit_sponsorship) do
+        employer_organization.benefit_sponsorships.first
       end
 
-      it { expect(response).to have_http_status(:success) }
-      it { expect(response).to render_template('force_publish') }
-
+      it "renders force_publish" do
+        sign_in(user)
+        @params = {id: benefit_sponsorship.id.to_s, employer_actions_id: "employer_actions_#{employer_organization.employer_profile.id.to_s}", :format => 'js'}
+        xhr :post, :force_publish, @params
+        expect(response).to render_template('force_publish')
+        expect(response).to have_http_status(:success)
+      end
     end
   end
 
@@ -335,11 +458,11 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     let(:hbx_profile) { double("hbx_profile")}
 
     before :each do
-      expect(controller).to receive(:find_hbx_profile)
       allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
       allow(user).to receive(:person).and_return(person)
       allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
+      expect(controller).to receive(:find_hbx_profile)
       allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
       sign_in(user)
       get :employer_index
@@ -397,21 +520,30 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     let(:person) { double("person")}
     let(:hbx_staff_role) { double("hbx_staff_role")}
     let(:hbx_profile) { double("hbx_profile")}
+    let(:permission) { double("permission", name: "hbx_staff", view_the_configuration_tab: false )}
+
 
     before :each do
-      expect(controller).to receive(:find_hbx_profile)
+      allow(hbx_staff_role).to receive(:view_the_configuration_tab).and_return(true)
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
       allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
       allow(user).to receive(:person).and_return(person)
+      allow(user).to receive(:permission).and_return(permission)
       allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
       allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
+      allow(hbx_staff_role).to receive(:permission).and_return(permission)
+      allow(hbx_staff_role).to receive(:subrole).and_return(permission.name)
+
+      allow(hbx_staff_role).to receive(:subrole).and_return(permission.name)
+
+      allow(permission).to receive(:name).and_return(permission.name)
       sign_in(user)
       get :configuration
     end
 
     it "should render the configuration partial" do
-      expect(response).to have_http_status(:success)
-      expect(response).to render_template(:partial => 'exchanges/hbx_profiles/_configuration_index')
+      expect(response).to have_http_status(:redirect)
+      expect(response).to_not render_template(:partial => 'exchanges/hbx_profiles/_configuration_index')
     end
   end
 
@@ -430,17 +562,17 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
     it "sends timekeeper a date" do
       timekeeper_form_params = { :date_of_record =>  TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d') }
-      allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_admin_tabs: true))
+      allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_admin_tabs: true, can_submit_time_travel_request: false, name: "hbx_staff", view_the_configuration_tab: false))
+
       allow(Forms::TimeKeeper).to receive(:new).with(timekeeper_form_params).and_return(time_keeper_form)
       allow(time_keeper_form).to receive(:forms_date_of_record).and_return(TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d'))
-      expect(time_keeper_form).to receive(:set_date_of_record).with(TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d'))
       sign_in(user)
       post :set_date, :forms_time_keeper => { :date_of_record =>  TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d') }
       expect(response).to have_http_status(:redirect)
     end
 
     it "sends timekeeper a date and fails because not updateable" do
-      allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_admin_tabs: false))
+      allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_admin_tabs: false, can_submit_time_travel_request: false, name: "hbx_staff", view_the_configuration_tab: false))
       sign_in(user)
       expect(TimeKeeper).not_to receive(:set_date_of_record).with( TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d'))
       post :set_date, :forms_time_keeper => { :date_of_record =>  TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d') }
@@ -751,7 +883,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     let!(:user)                { FactoryGirl.create(:user) }
     let!(:person)              { FactoryGirl.create(:person, user: user) }
     let!(:permission)          { FactoryGirl.create(:permission, :super_admin) }
-    let!(:hbx_staff_role)      { FactoryGirl.create(:hbx_staff_role, person: person, permission_id: permission.id) }
+    let!(:hbx_staff_role)      { FactoryGirl.create(:hbx_staff_role, person: person, permission_id: permission.id, subrole:permission.name) }
     let!(:rating_area)         { FactoryGirl.create_default :benefit_markets_locations_rating_area }
     let!(:service_area)        { FactoryGirl.create_default :benefit_markets_locations_service_area }
     let!(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
@@ -782,6 +914,16 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
     before :each do
       sign_in(user)
+    end
+
+    context 'viewing configuration tab' do
+      before :each do
+        get :configuration
+      end
+
+      it 'should respond with success status' do
+        expect(response).to have_http_status(:success)
+      end
     end
 
     context '.new_benefit_application' do

@@ -15,6 +15,8 @@ FactoryGirl.define do
     trait :hbx_staff do
       can_complete_resident_application true
       can_add_sep true
+      view_the_configuration_tab false 
+      can_submit_time_travel_request false
     end
 
     trait :hbx_update_ssn do
@@ -31,6 +33,8 @@ FactoryGirl.define do
       approve_ga false
       modify_admin_tabs false
       view_admin_tabs  true
+      view_the_configuration_tab false 
+      can_submit_time_travel_request false
     end
 
     trait :hbx_csr_supervisor do
@@ -43,6 +47,8 @@ FactoryGirl.define do
       approve_ga false
       modify_admin_tabs false
       view_admin_tabs  false
+      view_the_configuration_tab false 
+      can_submit_time_travel_request false
     end
 
     trait :hbx_csr_tier2 do
@@ -55,6 +61,8 @@ FactoryGirl.define do
       approve_ga false
       modify_admin_tabs false
       view_admin_tabs false
+      view_the_configuration_tab false 
+      can_submit_time_travel_request false
     end
 
     trait :hbx_csr_tier1 do
@@ -67,6 +75,8 @@ FactoryGirl.define do
       approve_ga false
       modify_admin_tabs false
       view_admin_tabs  false
+      view_the_configuration_tab false 
+      can_submit_time_travel_request false
     end
 
     trait :developer do
@@ -93,6 +103,8 @@ FactoryGirl.define do
       modify_admin_tabs false
       view_admin_tabs  true
       can_create_benefit_application true
+      view_the_configuration_tab false 
+      can_submit_time_travel_request false
     end
 
     trait :super_admin do
@@ -103,6 +115,8 @@ FactoryGirl.define do
       can_modify_plan_year true
       can_create_benefit_application true
       can_force_publish true
+      view_the_configuration_tab true 
+      can_submit_time_travel_request false
     end
   end
 end

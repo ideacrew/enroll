@@ -27,5 +27,8 @@ HBX_PROFILES_TRANSLATIONS = {
   "en.hbx_profiles.confirm_create_ba_message" => "Are you sure you want to create a new application?",
   "en.hbx_profiles.confirm_create_ba_warning" => "Creating a new application will cancel or terminate the existing application.",
 	"en.hbx_profiles.warning" => "Warning:",
-	"en.hbx_profiles.confirm" => "Confirm"
+	"en.hbx_profiles.confirm" => "Confirm",
+	"en.hbx_profiles.publish_application" => "Publish Application",
+	"en.hbx_profiles.force_publish_success" => "Force Publish Successful",
+	"en.hbx_profiles.force_published_application_review" => "Force Published Application Under Review"
 }

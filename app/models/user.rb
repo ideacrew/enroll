@@ -114,6 +114,10 @@ class User
     idp_verified
   end
 
+  def permission
+    person.hbx_staff_role.permission
+  end
+
   def send_welcome_email
     UserMailer.welcome(self).deliver_now
     true

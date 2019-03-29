@@ -80,6 +80,7 @@ module BenefitSponsors
       if business_policy_satisfied_for?(:force_submit_benefit_application) && is_application_eligible?
         if benefit_application.may_approve_application?
           benefit_application.auto_approve_application!
+          
           if today >= benefit_application.open_enrollment_period.begin
             benefit_application.begin_open_enrollment!
             @messages['notice'] = 'Employer(s) Plan Year was successfully published.'
@@ -87,18 +88,27 @@ module BenefitSponsors
             raise 'Employer(s) Plan Year date has not matched.'
           end
         else
-          @messages['notice'] = 'Employer(s) Plan Year could not be processed'
+          @messages['notice'] = 'Employer(s) Plan Year could not be processed.'
         end
       elsif benefit_application.may_submit_for_review?
         benefit_application.submit_for_review!
         @messages['notice'] = 'Employer(s) Plan Year was successfully submitted for review.'
         @messages['warnings'] = force_publish_warnings unless force_publish_warnings.empty?
       else
-        @messages['notice'] = 'Employer(s) Plan Year could not be processed'
+        @messages['notice'] = 'Employer(s) Plan Year could not be processed.'
         @messages['warnings'] = force_publish_warnings unless force_publish_warnings.empty?
       end
     rescue => e
       @errors = [e.message]
+    end
+
+    def may_force_submit_application?
+      if business_policy_satisfied_for?(:force_submit_benefit_application) && is_application_eligible?
+        true
+      else
+        @messages['warnings'] = force_publish_warnings #business_policy.fail_results.merge(application_eligibility_warnings)
+        false
+      end
     end
 
     def begin_open_enrollment
@@ -325,7 +335,7 @@ module BenefitSponsors
     def submit_application_warnings
       [application_errors.values + application_eligibility_warnings.values].flatten.reject(&:blank?)
     end
-
+    
     def force_publish_warnings
       submit_warnings = []
       submit_warnings += business_policy.fail_results.values unless business_policy.fail_results.values.blank?
