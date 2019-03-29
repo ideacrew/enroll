@@ -53,7 +53,7 @@ RSpec.describe Employers::PremiumStatementsController do
 
     it "should return contribution" do
       sign_in(user)
-      xhr :get, :show, id: "test"
+      get :show, params: {id: "test"}, xhr: true
       expect(response).to have_http_status(:success)
     end
   end
@@ -80,13 +80,13 @@ RSpec.describe Employers::PremiumStatementsController do
 
     it "returns a text/csv content type" do
       sign_in(user)
-      xhr :get, :show, id: "test", format: :csv
+      get :show, params: {id: "test"}, format: :csv, xhr: true
       expect(response.headers['Content-Type']).to have_content 'text/csv'
     end
 
     it "returns csv content in the file" do
       sign_in(user)
-      xhr :get, :show, id: "test", format: :csv
+      get :show, params: {id: "test"}, format: :csv, xhr: true
       expect(response.header["Content-Disposition"]).to match /DCHealthLink_Premium_Billing_Report/
       expect(response.body).to have_content(/#{census_employee.full_name}/)
       expect(response.body).to have_content(/#{census_employee.dob}/)
