@@ -33,7 +33,7 @@ RSpec.describe Employers::EmployerProfilesController, dbclean: :after_each do
 
     it "should redirect" do
       sign_in(user)
-      get :show_profile, employer_profile_id: employer_profile
+      get :show_profile, params: {employer_profile_id: employer_profile}
       expect(response).to redirect_to("/benefit_sponsors/profiles/registrations/new?profile_type=benefit_sponsor")
     end
   end
@@ -45,7 +45,7 @@ RSpec.describe Employers::EmployerProfilesController, dbclean: :after_each do
 
     it "should redirect" do
       sign_in(user)
-      get :show, id: employer_profile
+      get :show, params: {id: employer_profile}
       expect(response).to redirect_to("/benefit_sponsors/profiles/registrations/new?profile_type=benefit_sponsor")
     end
   end
@@ -85,7 +85,7 @@ RSpec.describe Employers::EmployerProfilesController, dbclean: :after_each do
 
     it "should export cvs" do
       sign_in(user)
-      get :export_census_employees, employer_profile_id: employer_profile, format: :csv
+      get :export_census_employees, params: {employer_profile_id: employer_profile}, format: :csv
       expect(response).to have_http_status(:success)
     end
   end
@@ -95,7 +95,7 @@ RSpec.describe Employers::EmployerProfilesController, dbclean: :after_each do
     let(:employer_profile) { FactoryBot.create(:employer_profile) }
     it "should load upload Page" do
       sign_in(user)
-      xhr :get, :new_document, id: employer_profile
+      get :new_document, params: {id: employer_profile}, xhr: true
       expect(response).to have_http_status(:success)
     end
   end
@@ -124,7 +124,7 @@ RSpec.describe Employers::EmployerProfilesController, dbclean: :after_each do
     context "upload document", dbclean: :after_each do
       it "redirects to document list page" do
         sign_in user
-        post :upload_document, {:id => employer_profile.id, :file => file, :subject=> subject}
+        post :upload_document, params: {id: employer_profile.id, file: file, subject: subject}
         expect(response).to have_http_status(:redirect)
       end
     end
@@ -136,7 +136,7 @@ RSpec.describe Employers::EmployerProfilesController, dbclean: :after_each do
 
     it "should delete documents" do
       sign_in(user)
-      xhr :get, :delete_documents, id: employer_profile.id, ids:[1]
+      get :delete_documents, params: {id: employer_profile.id, ids:[1]}, xhr: true
       expect(response).to have_http_status(:success)
     end
   end
