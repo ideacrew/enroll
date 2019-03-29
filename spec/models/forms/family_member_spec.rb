@@ -335,7 +335,6 @@ describe "checking validations on family member object" do
       "no_ssn"=>"1",
       "gender"=>"male",
       "relationship"=>"child",
-      "is_physically_disabled" => "no",
       "citizen_status" => "",
       "tribal_id"=>"",
       "ethnicity"=>["", "", "", "", "", "", ""],
