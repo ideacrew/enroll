@@ -131,6 +131,18 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
         end
       end
 
+      context 'when coverage termination pending' do
+        before do
+          health_enrollment.schedule_coverage_termination!
+          allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([health_enrollment])
+        end
+
+        it "should return termination pending status" do
+          expect(helper.enrollment_state(census_employee)).to eq "Coverage Termination Pending (Health)"
+        end
+      end
+
+
       context 'when coverage waived' do
         before do
           health_enrollment.update_attributes(:aasm_state => :inactive)

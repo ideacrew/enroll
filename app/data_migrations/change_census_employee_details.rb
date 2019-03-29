@@ -3,6 +3,7 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 class ChangeCensusEmployeeDetails < MongoidMigrationTask
   def migrate
     action = ENV['action'].to_s
+    @census_employee = CensusEmployee.find(ENV["census_employee_id"]) if ENV["census_employee_id"].present?
 
     case action
       when "update_employment_terminated_on"
@@ -23,6 +24,7 @@ class ChangeCensusEmployeeDetails < MongoidMigrationTask
   private
 
   def census_employee_by_ssn
+    return @census_employee if @census_employee.present?
     encrypted_ssn = ENV["encrypted_ssn"]
     decrypted_ssn = SymmetricEncryption.decrypt(encrypted_ssn)
 
@@ -66,24 +68,7 @@ class ChangeCensusEmployeeDetails < MongoidMigrationTask
 
   def link_or_construct_employee_role
     census_employee = census_employee(ENV['ssn'], ENV['employer_fein'])
-        
-# After 14163 deployed we can just do census_employee.save
-    if census_employee.active_benefit_group_assignment.present?
-      if census_employee.employee_role.present?
-        census_employee.link_employee_role! if census_employee.may_link_employee_role?
-      else
-        if census_employee.has_benefit_group_assignment?
-          employee_relationship = Forms::EmployeeCandidate.new({first_name: census_employee.first_name,
-                                                        last_name: census_employee.last_name,
-                                                        ssn: census_employee.ssn,
-                                                        dob: census_employee.dob.strftime("%Y-%m-%d")})
-          person = employee_relationship.match_person if employee_relationship.present?
-          return false if person.blank? || (person.present? && person.has_active_employee_role_for_census_employee?(self))
-          Factories::EnrollmentFactory.build_employee_role(person, nil, census_employee.employer_profile, census_employee, census_employee.hired_on)
-          puts "Build Employee Role" unless Rails.env.test?
-        end
-      end
-    end
+    census_employee.save!
   end
 
   def update_employment_terminated_on(employer_fein, ssns, terminated_on)
@@ -101,6 +86,7 @@ class ChangeCensusEmployeeDetails < MongoidMigrationTask
   end
 
   def census_employee(ssn, employer_fein)
+    return @census_employee if @census_employee.present?
     employer_profile_id = Organization.where(fein: employer_fein).first.employer_profile.id
     census_employees = CensusEmployee.by_ssn(ssn).by_employer_profile_id(employer_profile_id)
 

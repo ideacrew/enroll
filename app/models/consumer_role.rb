@@ -270,7 +270,7 @@ class ConsumerRole
   #use this method to check what verification types needs to be included to the notices
   def types_include_to_notices
     verification_types.find_all do |type|
-      type.unverified_no_docs?
+      type.type_unverified?
     end
   end
 
@@ -840,14 +840,6 @@ class ConsumerRole
 
   def verification_types
     person.verification_types.active.where(applied_roles: "consumer_role") if person
-  end
-
-  #class methods
-  class << self
-    #this method will be used to check 90 days verification period for outstanding verification
-    def advance_day(check_date)
-      #handle all outstanding consumer who is unverified more than 90 days
-    end
   end
 
   private

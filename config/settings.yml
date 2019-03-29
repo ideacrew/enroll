@@ -9,10 +9,13 @@ site:
   home_forms_url: "https://dchealthlink.com/forms"
   forms_name: "DCHealthLink.com/forms"
   website_name: "www.DCHealthLink.com"
+  forms: "https://dchealthlink.com/forms#en"
+  website_url: "www.healthcare.gov"
   healthcare_name: "www.healthcare.gov"
   healthcare_url: "https://www.healthcare.gov/"
   irs_url: "https://www.irs.gov/"
   exchange_hbx_id: "DC0"
+  ivl_responsibility_url: "https://dchealthlink.com/individual-responsibility-requirement"
 
   social_media:
     facebook_url: ""
@@ -45,7 +48,7 @@ aca:
 
     open_enrollment:
       start_on: <%= Date.new(2018,11,1) %>
-      end_on: <%= Date.new(2019,01,31) %>
+      end_on: <%= Date.new(2019,02,8) %>
     dc_resident_application: true
     transition_family_members_link: true
 
@@ -131,23 +134,9 @@ notices:
 paper_notice: 'paper-notices'
 # Note: Remote Aceess keys ad URL's Provided by DC checkbook
 
-consumer_checkbook_services:
-
-    consumer_remote_access_key: 'cd535a89-49ea-4ea6-862f-e9558e8bef50'
-    consumer_reference_id: "9F03A78ADF324AFDBFBEF8E838770132"
-    base_url: "https://staging.checkbookhealth.org/hie/dc/api?environment=production"
+checkbook_services:
     current_year: 2019
     previous_year: 2018
-    dental_prod_url: "https://dc.checkbookhealth.org/sadpi/dc/2019/"
-    dental_stage_url: "https://staging.checkbookhealth.org/sadpi/DC/2019/"
-    checkbook_previous_year: "https://dc.checkbookhealth.org/hie/dc/2018/"
-
-checkbook_services:
-    remote_access_key: 'cd535a89-49ea-4ea6-862f-e9558e8bef50'
-    reference_id: "9F03A78ADF324AFDBFBEF8E838770132"
-    base_url:  "https://staging.checkbookhealth.org"
-    url: "https://staging.checkbookhealth.org"
-    congress_url: "https://dc.checkbookhealth.org/congress/dc/"
     plan_match: "DC"
 
 aptc_errors:

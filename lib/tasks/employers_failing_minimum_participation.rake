@@ -19,6 +19,13 @@ namespace :reports do
 
         employers.each do |employer|
           employer_profile = employer.employer_profile
+
+          ## temp fix - skip congress for now
+          if employer_profile.census_employees.count > 500
+             puts "Skipping #{employer_profile.hbx_id} #{employer_profile.legal_name}"
+             next
+          end
+
           plan_year = employer_profile.plan_years.detect do |py|
              (py.open_enrollment_start_on <= window_date) &&
                (py.open_enrollment_end_on >= window_date) &&

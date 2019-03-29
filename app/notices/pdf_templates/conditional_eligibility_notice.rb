@@ -17,6 +17,8 @@ module PdfTemplates
     attribute :ivl_open_enrollment_end_on, Date
     attribute :primary_address, PdfTemplates::NoticeAddress
     attribute :enrollments, Array[PdfTemplates::Enrollment]
+    attribute :health_enrollments, Array[PdfTemplates::Enrollment]
+    attribute :dental_enrollments, Array[PdfTemplates::Enrollment]
     attribute :individuals, Array[PdfTemplates::Individual], :default => []
     attribute :ssa_unverified, Array[PdfTemplates::Individual]
     attribute :dhs_unverified, Array[PdfTemplates::Individual]
@@ -38,7 +40,9 @@ module PdfTemplates
     attribute :eligibility_determinations, Array[PdfTemplates::EligibilityDetermination]
     attribute :coverage_year, String
     attribute :current_year, String
-
+    attribute :is_an_aqhp_cover_letter, Boolean
+    attribute :same_plan_health_enrollment, Boolean
+    attribute :same_plan_dental_enrollment, Boolean
 
     def other_enrollments
       enrollments.reject{|enrollment| enrollments.index(enrollment).zero? }

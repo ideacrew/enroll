@@ -26,6 +26,25 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
     end
   end
 
+  context "is_incarceration_status_satisfied?" do
+    before do
+      allow(benefit_package).to receive(:incarceration_status).and_return("unincarcerated")
+      rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, coverage_kind: 'health', family: family)
+    end
+    it "returns false if person is incarcerated" do
+      allow(consumer_role).to receive(:is_incarcerated).and_return true
+      expect(rule.is_incarceration_status_satisfied?).to eq false
+    end
+    it "returns false if answer was not populated" do
+      allow(consumer_role).to receive(:is_incarcerated).and_return nil
+      expect(rule.is_incarceration_status_satisfied?).to eq false
+    end
+    it "returns true if person is not incarcerated" do
+      allow(consumer_role).to receive(:is_incarcerated).and_return false
+      expect(rule.is_incarceration_status_satisfied?).to eq true
+    end
+  end
+
   context "#is_age_range_satisfied?" do
     let(:consumer_role) {double(dob: (TimeKeeper.date_of_record - 20.years))}
     let(:benefit_package) {double}

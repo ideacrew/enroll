@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Insured::FamiliesController do
+RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   context "set_current_user with no person" do
     let(:user) { FactoryGirl.create(:user, person: person) }
     let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
@@ -35,7 +35,7 @@ RSpec.describe Insured::FamiliesController do
   end
 end
 
-RSpec.describe Insured::FamiliesController do
+RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
   let(:hbx_enrollments) { double("HbxEnrollment") }
   let(:user) { FactoryGirl.create(:user) }
@@ -926,7 +926,7 @@ RSpec.describe Insured::FamiliesController do
     end
 
     context "should transition resident to consumer" do
-      let(:resident_person) {FactoryGirl.create(:person, :with_resident_role)}
+      let(:resident_person) {FactoryGirl.create(:person, :with_resident_role, :with_consumer_role)}
       let(:resident_family) { FactoryGirl.create(:family, :with_primary_family_member, person: resident_person) }
       let(:user){ FactoryGirl.create(:user, person: resident_person) }
       let!(:individual_market_transition) { FactoryGirl.create(:individual_market_transition, :resident, person: resident_person) }
@@ -972,7 +972,7 @@ RSpec.describe Insured::FamiliesController do
 
 end
 
-RSpec.describe Insured::FamiliesController do
+RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   describe "GET purchase" do
     let(:hbx_enrollment) { HbxEnrollment.new }
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }

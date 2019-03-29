@@ -652,11 +652,11 @@ class Person
   end
 
   def is_consumer_role_active?
-    self.active_individual_market_role == "consumer" ? true : false
+    (self.consumer_role.present? && self.active_individual_market_role == "consumer") ? true : false
   end
 
   def is_resident_role_active?
-     self.active_individual_market_role == "resident" ? true : false
+    (self.resident_role.present? && self.active_individual_market_role == "resident") ? true : false
   end
 
   class << self
@@ -667,14 +667,19 @@ class Person
     def search_hash(s_str)
       clean_str = s_str.strip
       s_rex = Regexp.new(Regexp.escape(clean_str), true)
-      {
-        "$or" => ([
-          {"first_name" => s_rex},
-          {"last_name" => s_rex},
-          {"hbx_id" => s_rex},
-          {"encrypted_ssn" => encrypt_ssn(s_rex)}
-        ] + additional_exprs(clean_str))
-      }
+      if clean_str =~ /[a-z]/i
+          { "$or" => ([
+            {"first_name" => s_rex},
+            {"last_name" => s_rex}
+          ] + additional_exprs(clean_str)) }
+      else
+        {
+          "$or" => [
+            {"hbx_id" => s_rex},
+            {"encrypted_ssn" => encrypt_ssn(clean_str)}
+          ]
+        }
+      end
     end
 
     def additional_exprs(clean_str)

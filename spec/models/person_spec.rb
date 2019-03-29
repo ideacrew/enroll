@@ -407,21 +407,38 @@ describe Person do
       end
 
       context "is_consumer_role_active?" do
-        let(:person) {FactoryGirl.build(:person)}
-        let(:consumer_role) {double(is_active?: true)}
+        let(:person) {FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role)}
 
         it "should return true" do
-          allow(person).to receive(:consumer_role).and_return(consumer_role)
-          allow(person).to receive(:is_consumer_role_active?).and_return(true)
-
           expect(person.is_consumer_role_active?).to eq true
         end
 
-        it "should return false" do
-          allow(person).to receive(:consumer_role).and_return(nil)
+        it "should return false as person doesn't have consumer_role imt" do
           allow(person).to receive(:is_consumer_role_active?).and_return(false)
-
           expect(person.is_consumer_role_active?).to eq false
+        end
+
+        it "should return false as person doesn't have consumer_role" do
+          allow(person).to receive(:consumer_role).and_return(nil)
+          expect(person.is_consumer_role_active?).to eq false
+        end
+      end
+
+      context "is_resident_role_active?" do
+        let(:person) {FactoryGirl.create(:person, :with_resident_role, :with_active_resident_role)}
+
+        it "should return true" do
+          expect(person.is_resident_role_active?).to eq true
+        end
+
+        it "should return false as person doesn't have resident_role imt" do
+          allow(person).to receive(:is_resident_role_active?).and_return(false)
+          expect(person.is_resident_role_active?).to eq false
+        end
+
+        it "should return false as person doesn't have resident_role" do
+          allow(person).to receive(:resident_role).and_return(nil)
+          expect(person.is_resident_role_active?).to eq false
         end
       end
 

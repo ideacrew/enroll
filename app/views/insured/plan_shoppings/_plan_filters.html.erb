@@ -7,9 +7,10 @@
         <%= find_my_doctor %>
         <% if @market_kind == "individual" && @coverage_kind == "health" %>
           <%=link_to l10n("estimate_your_cost") , "", data: {toggle: "modal", target: "#plan_match_redirection"} %>
-          <% elsif @market_kind == "individual" && @coverage_kind == "dental" %>
-          <%= link_to l10n("estimate_your_cost"), 'https://dc.checkbookhealth.org/sadpi/dc/2019/', target: '_blank' %>
           <% # Staging url should be changed with PROD URL before going to production REDMINE #36809 %>
+        <% end %>
+        <% if @market_kind == "individual" && @coverage_kind == "dental" && @hbx_enrollment.effective_on.year == Settings.checkbook_services.current_year %>
+          <%= link_to l10n("estimate_your_cost"), '',data: {toggle: "modal", target: "#plan_match_dental_redirection"} %>
         <% end %>
         </br>
         <% if plan_match_dc %>
@@ -22,58 +23,113 @@
    <div class="modal fade" id="plan_match_redirection" tabindex="-1" role="dialog" role="document">
     <div class="modal-dialog">
        <div class="modal-content">
-          <div class="modal-header" style="border-bottom:none">
+          <div class="modal-header" style="height:50px">
            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-           <hr>
-          </div> 
-          <div style="margin-left:20px;">
-            <p><%= l10n("modal_onscreen1") %></p>
-            <p><%= l10n("modal_onscreen2") %></p>
-            <p><%= l10n("modal_onscreen3") %></p>
-            <p><%= l10n("modal_onscreen4") %></p>
-            <p><%= l10n("modal_onscreen5") %></p>
-            <p><%= l10n("modal_onscreen6") %></p>
-            <p><%= l10n("modal_onscreen7") %></p>
-            <p><%= l10n("modal_onscreen8") %></p>
-            <p><%= l10n("modal_onscreen9") %></p>
           </div>
-          <div class="modal-footer" style="margin-right:190px">
+          <div style="margin-left:20px;">
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen") %></p>
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen1") %></p>
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen2") %></p>
+          </div>
+
+          <div class="modal-footer" style="padding:10px">
+            <center>
             <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
             <%if @hbx_enrollment.effective_on.year == 2019%>
-            <%=link_to l10n("confirm") , @dc_individual_checkbook_url, class: "btn btn-primary checkbook_url mtz" %>
+            <%=link_to l10n("confirm") , @dc_individual_checkbook_url, class: "btn btn-primary checkbook_url" %>
             <% elsif @hbx_enrollment.effective_on.year == 2018%>
-            <%=link_to l10n("confirm") , @dc_individual_checkbook_previous_year , class: "btn btn-primary  mtz", target: '_blank' %>
+            <%=link_to l10n("confirm") , @dc_individual_checkbook_previous_year , class: "btn btn-primary" %>
             <% end %>
+          </center>
           </div>
        </div>
     </div>
   </div>
 
 
+  <div class="modal fade" id="plan_match_dental_redirection" tabindex="-1" role="dialog" role="document">
+    <div class="modal-dialog">
+       <div class="modal-content">
+          <div class="modal-header" style="height:50px">
+           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          </div> 
+           <div style="margin-left:20px;">
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen") %></p>
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen1") %></p>
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen2") %></p>
+          </div>
+          <div class="modal-footer" style="padding:10px">
+            <center>
+            <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button> 
+            <%=link_to l10n("confirm") , 'https://dc.checkbookhealth.org/sadpi/dc/2019/', class: "btn btn-primary" %>
+          </div>
+        </center>
+       </div>
+    </div>
+  </div>
+
   <div class="modal fade" id="plan_match_family" tabindex="-1" role="dialog" role="document">
     <div class="modal-dialog">
        <div class="modal-content">
-          <div class="modal-header" style="border-bottom:none">
+          <div class="modal-header" style="height:50px">
            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-           <hr>
-          </div> 
-           <div style="text-align: center;">
-            <p><%= l10n("modal_onscreen1") %></p>
-            <p><%= l10n("modal_onscreen2") %></p>
-            <p><%= l10n("modal_onscreen3") %></p>
-            <p><%= l10n("modal_onscreen4") %></p>
-            <p><%= l10n("modal_onscreen5") %></p>
-            <p><%= l10n("modal_onscreen6") %></p>
-            <p><%= l10n("modal_onscreen7") %></p>
-            <p><%= l10n("modal_onscreen8") %></p>
-            <p><%= l10n("modal_onscreen9") %></p>
           </div>
-          <div class="modal-footer" style="margin-right:190px">
+           <div style="margin-left:20px;">
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen") %></p>
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen1") %></p>
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen2") %></p>
+           </div>
+          <div class="modal-footer" style="padding:10px">
+            <center>
             <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
             <%=link_to l10n("confirm") , 'https://dc.checkbookhealth.org/dc/', class: "btn btn-primary  mtz", target: '_blank'  %>
           </div>
+        </center>
        </div>
     </div>
+  </div>
+
+  <div class="modal fade" id="plan_match_shop" tabindex="-1" role="dialog" role="document"> 
+    <div class="modal-dialog">  
+       <div class="modal-content">  
+          <div class="modal-header" style="height:50px">  
+           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button> 
+          </div>  
+           <div style="margin-left:20px;">  
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen") %></p>  
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen1") %></p> 
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen2") %></p> 
+           </div> 
+          <div class="modal-footer" style="padding:10px"> 
+            <center>  
+            <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>  
+            
+            <%=link_to l10n("confirm"), @dc_checkbook_url , class: "btn btn-primary" %>  
+          </div>  
+        </center> 
+       </div> 
+    </div>  
+  </div>  
+
+   <div class="modal fade" id="plan_match_doctor_shop" tabindex="-1" role="dialog" role="document"> 
+    <div class="modal-dialog">  
+       <div class="modal-content">  
+          <div class="modal-header" style="height:50px">  
+           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button> 
+          </div>  
+           <div style="margin-left:20px;">  
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen") %></p>  
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen1") %></p> 
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen2") %></p> 
+           </div> 
+          <div class="modal-footer" style="padding:10px"> 
+            <center>  
+            <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>  
+            <%=link_to l10n("confirm") , Rails.application.config.checkbook_services_base_url + '/dcshopnationwide/' , class: "btn btn-primary",target: '_blank'%>  
+          </div>  
+        </center> 
+       </div> 
+    </div>  
   </div>
 
 

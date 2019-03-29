@@ -9,6 +9,7 @@ class CensusEmployee < CensusMember
   include Acapi::Notifiers
   include ::Eligibility::CensusEmployee
   include ::Eligibility::EmployeeBenefitPackages
+  include Insured::FamiliesHelper
 
   require 'roo'
 
@@ -124,6 +125,8 @@ class CensusEmployee < CensusMember
   scope :by_benefit_group_assignment_ids, ->(benefit_group_assignment_ids) { any_in("benefit_group_assignments._id" => benefit_group_assignment_ids) }
   scope :by_benefit_group_ids,            ->(benefit_group_ids) { any_in("benefit_group_assignments.benefit_group_id" => benefit_group_ids) }
   scope :by_ssn,                          ->(ssn) { where(encrypted_ssn: CensusMember.encrypt_ssn(ssn)).and(:encrypted_ssn.nin => ["", nil]) }
+  scope :search_with_ssn_dob,              ->(ssn, dob) { unscoped.where(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob) }
+  scope :search_dependent_with_ssn_dob,    ->(ssn, dob) { unscoped.where(:"census_dependents.encrypted_ssn" => CensusMember.encrypt_ssn(ssn), :"census_dependents.dob" => dob) }
 
   scope :matchable, ->(ssn, dob) {
     matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: {"$in": ELIGIBLE_STATES })
@@ -327,7 +330,7 @@ class CensusEmployee < CensusMember
 
   def generate_and_save_to_temp_folder
     begin
-      url = Settings.checkbook_services.url
+      url = Rails.application.config.checkbook_services_base_url
       event_kind = ApplicationEventKind.where(:event_name => 'out_of_pocker_url_notifier').first
       notice_trigger = event_kind.notice_triggers.first
       builder = notice_trigger.notice_builder.camelize.constantize.new(self, {
@@ -345,7 +348,7 @@ class CensusEmployee < CensusMember
 
   def generate_and_deliver_checkbook_url
     begin
-      url = Settings.checkbook_services.url
+      url = Rails.application.config.checkbook_services_base_url
       event_kind = ApplicationEventKind.where(:event_name => 'out_of_pocker_url_notifier').first
       notice_trigger = event_kind.notice_triggers.first
       builder = notice_trigger.notice_builder.camelize.constantize.new(self, {
@@ -646,7 +649,7 @@ class CensusEmployee < CensusMember
           begin
             #exclude new hires
             next if (ce.new_hire_enrollment_period.cover?(date) || ce.new_hire_enrollment_period.first > date)
-            ShopNoticesNotifierJob.perform_later(ce.id.to_s, "employee_open_enrollment_reminder")
+            ShopNoticesNotifierJob.perform_later(ce.id.to_s, "employee_open_enrollment_reminder", "acapi_trigger" => true)
           rescue Exception => e
             (Rails.logger.error { "Unable to deliver open enrollment reminder notice to #{ce.full_name} due to #{e}" }) unless Rails.env.test?
           end
@@ -916,6 +919,16 @@ class CensusEmployee < CensusMember
     end
   end
 
+  #sort and display latest expired enrollments in desc order
+  def past_enrollments
+    if employee_role.blank?
+      []      
+    else
+      enrollments = employee_role.person.primary_family.all_enrollments.terminated.shop_market
+      enrollments.select{|e| e.benefit_group_assignment.present? && e.benefit_group_assignment.census_employee == self && !enrollments_for_display.include?(e)}.sort_by { |enr| enrollment_coverage_end(enr)}.reverse
+    end
+  end
+
   private
 
   def record_transition
@@ -966,7 +979,7 @@ class CensusEmployee < CensusMember
 
   def active_census_employee_is_unique
     potential_dups = CensusEmployee.by_ssn(ssn).by_employer_profile_id(employer_profile_id).active
-    if potential_dups.detect { |dup| dup.id != self.id  }
+    if potential_dups.detect { |dup| dup.id != self.id }
       message = "Employee with this identifying information is already active. "\
                 "Update or terminate the active record before adding another."
       errors.add(:base, message)

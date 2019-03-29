@@ -106,6 +106,10 @@ RSpec.describe Insured::FamilyMembersController do
           get :index, :sep_id => sep.id, qle_id: sep.qualifying_life_event_kind_id
           expect(assigns(:sep).submitted_at.to_date).to eq TimeKeeper.date_of_record
         end
+
+        it "qle market kind is should be shop" do
+          expect(qle.market_kind).to eq "shop"
+        end
       end
     end
 
