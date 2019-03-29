@@ -6,6 +6,11 @@ describe "UpdateDentalRelationshipBenefits", dbclean: :after_each do
   let(:given_task_name) { "update_dental_relationship_benefits" }
   subject { UpdateDentalRelationshipBenefits.new(given_task_name, double(:current_scope => nil)) }
 
+  after :each do
+    ["fein", "plan_year_start_on", "benefit_group_id", "relationship"].each do |env_variable|
+      ENV[env_variable] = nil
+    end
+  end
 
   describe "given a task name" do
     it "has the given task name" do
@@ -16,10 +21,10 @@ describe "UpdateDentalRelationshipBenefits", dbclean: :after_each do
   describe "change person relationships kind" do
     let!(:benefit_group)  {FactoryBot.create(:benefit_group, :with_valid_dental)}
     before(:each) do
-      allow(ENV).to receive(:[]).with("fein").and_return(benefit_group.employer_profile.organization.fein)
-      allow(ENV).to receive(:[]).with("plan_year_start_on").and_return(benefit_group.plan_year.start_on)
-      allow(ENV).to receive(:[]).with("benefit_group_id").and_return(benefit_group.id)
-      allow(ENV).to receive(:[]).with("relationship").and_return('spouse')
+     ENV["fein"] = benefit_group.employer_profile.organization.fein
+     ENV["plan_year_start_on"] = benefit_group.plan_year.start_on.to_s
+     ENV["benefit_group_id"] = benefit_group.id
+     ENV["relationship"] = 'spouse'
     end
 
     it "should change person relationships kind" do
