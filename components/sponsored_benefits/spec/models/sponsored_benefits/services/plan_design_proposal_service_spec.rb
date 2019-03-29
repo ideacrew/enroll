@@ -93,6 +93,7 @@ RSpec.describe SponsoredBenefits::Services::PlanDesignProposalService, type: :mo
     context "#save_health_benefits" do
 
       before do
+        allow(organization).to receive_message_chain(:broker_agency_profile, :legal_name).and_return("Broker Profile")
         application
         subject.save_health_benefits(health_attributes)
       end
