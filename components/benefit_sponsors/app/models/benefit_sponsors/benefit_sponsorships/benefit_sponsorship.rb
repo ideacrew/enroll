@@ -90,7 +90,8 @@ module BenefitSponsors
       optional: true
 
     embeds_many :benefit_applications,
-      class_name: "::BenefitSponsors::BenefitApplications::BenefitApplication"
+      class_name: "::BenefitSponsors::BenefitApplications::BenefitApplication",
+      inverse_of: :benefit_sponsorship
 
     has_many    :census_employees,
       class_name: "::CensusEmployee"
