@@ -134,12 +134,12 @@ module BenefitSponsors
       end
 
       context "when employer offering both health and dental coverages" do
-        let(:product_kinds)  { [:health, :dental] }
+        let(:product_kinds)            { [:health, :dental] }
         let(:dental_sponsored_benefit) { true }
 
         let(:renewal_benefit_sponsor_catalog) { benefit_sponsorship.benefit_sponsor_catalog_for(benefit_sponsorship.service_areas_on(renewal_effective_date), renewal_effective_date) }
         let(:renewal_application)             { initial_application.renew(renewal_benefit_sponsor_catalog) }
-        let(:renewal_bp)        { renewal_application.benefit_packages.build }
+        let(:renewal_bp)  { renewal_application.benefit_packages.build }
 
         let(:current_app) { benefit_sponsorship.benefit_applications[0] }
         let(:current_bp)  { current_app.benefit_packages[0] }
