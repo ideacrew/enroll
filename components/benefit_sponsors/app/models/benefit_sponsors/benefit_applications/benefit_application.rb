@@ -84,7 +84,8 @@ module BenefitSponsors
     delegate :benefit_market, to: :benefit_sponsorship
 
     embeds_many :benefit_packages,
-      class_name: "::BenefitSponsors::BenefitPackages::BenefitPackage"
+      class_name: "::BenefitSponsors::BenefitPackages::BenefitPackage",
+      inverse_of: :benefit_application
 
     validates_presence_of :effective_period, :open_enrollment_period, :recorded_service_areas, :recorded_rating_area, :recorded_sic_code
 

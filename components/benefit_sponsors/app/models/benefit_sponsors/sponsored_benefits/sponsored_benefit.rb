@@ -8,7 +8,8 @@ module BenefitSponsors
 
 
       embedded_in :benefit_package, 
-                  class_name: "::BenefitSponsors::BenefitPackages::BenefitPackage", inverse_of: :sponsored_benefits
+                  class_name: "::BenefitSponsors::BenefitPackages::BenefitPackage",
+                  inverse_of: :sponsored_benefits
 
       field :product_package_kind,  type: Symbol
       field :product_option_choice, type: String # carrier id / metal level
