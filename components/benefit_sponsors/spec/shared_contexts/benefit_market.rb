@@ -15,7 +15,6 @@ RSpec.shared_context "setup benefit market with market catalogs and product pack
   let!(:renewal_rating_area) { create(:benefit_markets_locations_rating_area, active_year: renewal_effective_date.year) }
 
   let(:product_kinds)  { [:health] }
-
   let(:service_area) {
     county_zip_id = create(:benefit_markets_locations_county_zip, county_name: 'Middlesex', zip: '01754', state: 'MA').id
     create(:benefit_markets_locations_service_area, county_zip_ids: [county_zip_id], active_year: current_effective_date.year)
