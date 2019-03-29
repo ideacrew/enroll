@@ -5,7 +5,7 @@ class FakesController < ApplicationController
 end
 
 describe FakesController do
-  let(:consumer_role) { FactoryBot.create(:person, :with_consumer_role).consumer_role }
+  let(:consumer_role) { FactoryBot.build(:consumer_role) }
   let(:params) { { consumer_role: { vlp_documents_attributes: { "0" => { expiration_date: "06/23/2016" }}}, naturalized_citizen: false, eligible_immigration_status: false } }
   let(:person_params) { ActionController::Parameters.new({person: params }) }
   let(:dependent_params) { ActionController::Parameters.new({dependent: params }) }
@@ -14,14 +14,11 @@ describe FakesController do
     shared_examples_for "updating consumer documents" do |params|
       let(:person_kind) { params.split("_").first.to_sym }
       before :each do
-        subject.instance_variable_set("@params", eval(params))
-        allow(subject).to receive(:params).and_return(eval(params))
+        subject.instance_variable_set("@params", send(params))
+        allow(subject).to receive(:params).and_return(send(params))
       end
 
       it "should convert the date string to dateTime instance" do
-        expect(subject.params[person_kind]).to be_a(Hash)
-        expect(subject.params[person_kind][:consumer_role]).to be_a(Hash)
-        expect(subject.params[person_kind][:consumer_role][:vlp_documents_attributes]["0"]).to be_a(Hash)
         expect(subject.params[person_kind][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date]).to be_a(String)
         expect(subject.update_vlp_documents(consumer_role, person_kind))
         expect(subject.params[person_kind][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date]).to be_a(DateTime)
@@ -41,6 +38,7 @@ describe FakesController do
       end
       describe "#{citizen_status}" do
         before do
+          consumer_role.vlp_documents = []
           consumer_role.vlp_documents << FactoryBot.build(:vlp_document, :subject => doc_subject)
           consumer_role.citizen_status = citizen_status
         end
@@ -48,7 +46,7 @@ describe FakesController do
           expect(subject.get_vlp_doc_subject_by_consumer_role(nil)).to be_nil
         end
         it "returns #{doc_subject}" do
-          expect(subject.get_vlp_doc_subject_by_consumer_role(consumer_role)).to be doc_subject
+          expect(subject.get_vlp_doc_subject_by_consumer_role(consumer_role)).to eq doc_subject
         end
       end
     end

@@ -150,7 +150,7 @@ class ConsumerRole
 
   before_validation :ensure_validation_states, on: [:create, :update]
 
-  track_history   :on => [:five_year_bar,
+  track_history :on => [:five_year_bar,
                           :aasm_state,
                           :marital_status,
                           :ssn_validation,
