@@ -63,7 +63,7 @@ module Notifier
             consumer_role.person.age_on(TimeKeeper.date_of_record)
           else
             (
-              Date.current.year - Date.parse(payload['notice_params']['primary_member']['dob']).year
+              Date.current.year - Date.strptime(payload['notice_params']['primary_member']['dob'],"%m-%d-%Y").year
             )
           end
       end
