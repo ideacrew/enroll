@@ -34,7 +34,7 @@ FactoryBot.define do
 
     recorded_service_areas   { [create(:benefit_markets_locations_service_area)] }
     recorded_rating_area     { create(:benefit_markets_locations_rating_area) }
-    recorded_sic_code         { "011" }
+    recorded_sic_code        { "021" }
 
     transient do
       predecessor_application_state { :active }
@@ -45,16 +45,19 @@ FactoryBot.define do
       dental_package_kind { :single_product }
       dental_sponsored_benefit { false }
       predecessor_application_catalog { false }
+      passed_benefit_sponsor_catalog nil
     end
 
     trait :without_benefit_sponsor_catalog
 
     trait :with_benefit_sponsor_catalog do
       after(:build) do |benefit_application, evaluator|
-        if benefit_sponsorship = benefit_application.benefit_sponsorship
+        if evaluator.passed_benefit_sponsor_catalog
+          benefit_sponsor_catalog = evaluator.passed_benefit_sponsor_catalog
+        else
           benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.resolve_service_areas, benefit_application.effective_period.min)
-          benefit_sponsor_catalog.save
         end
+        benefit_sponsor_catalog.save
         benefit_application.benefit_sponsor_catalog = (benefit_sponsor_catalog || ::BenefitMarkets::BenefitSponsorCatalog.new)
         benefit_application.benefit_sponsor_catalog.service_areas = benefit_application.recorded_service_areas
       end
