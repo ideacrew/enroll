@@ -129,7 +129,6 @@ class ConsumerRole
   delegate :race,               :race=,              to: :person, allow_nil: true
   delegate :ethnicity,          :ethnicity=,         to: :person, allow_nil: true
   delegate :is_disabled,        :is_disabled=,       to: :person, allow_nil: true
-  delegate :is_physically_disabled,    :is_physically_disabled=,   to: :person, allow_nil: true
   delegate :tribal_id,          :tribal_id=,         to: :person, allow_nil: true
 
   embeds_many :documents, as: :documentable

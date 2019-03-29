@@ -90,7 +90,6 @@ Then(/Individual should see a form to enter personal information$/) do
   find(:xpath, '//label[@for="indian_tribe_member_no"]').click
 
   find(:xpath, '//label[@for="radio_incarcerated_no"]').click
-  find(:xpath, '//label[@for="radio_physically_disabled_no"]').click
   fill_in "person_addresses_attributes_0_address_1", :with => "4900 USAA BLVD"
   fill_in "person_addresses_attributes_0_address_2", :with => "212"
   fill_in "person_addresses_attributes_0_city", :with=> "Washington"
@@ -212,7 +211,6 @@ And(/Individual clicks on add member button/) do
   find(:xpath, '//label[@for="dependent_naturalized_citizen_false"]').click
   find(:xpath, '//label[@for="indian_tribe_member_no"]').click
   find(:xpath, '//label[@for="radio_incarcerated_no"]').click
-  find(:xpath, '//label[@for="radio_physically_disabled_no"]').click
   screenshot("add_member")
   find('.mz').click
 end
@@ -247,7 +245,6 @@ And(/Individual again clicks on add member button/) do
   find(:xpath, '//label[@for="dependent_naturalized_citizen_false"]').click
   find(:xpath, '//label[@for="indian_tribe_member_no"]').click
   find(:xpath, '//label[@for="radio_incarcerated_no"]').click
-  find(:xpath, '//label[@for="radio_physically_disabled_no"]').click
 
   #testing
   screenshot("added member")
@@ -384,7 +381,6 @@ Then(/^Individual fills in the form$/) do
   find(:xpath, '//label[@for="dependent_naturalized_citizen_false"]').click
   find(:xpath, '//label[@for="indian_tribe_member_no"]').click
   find(:xpath, '//label[@for="radio_incarcerated_no"]').click
-  find(:xpath, '//label[@for="radio_physically_disabled_no"]').click
 end
 
 Then(/^Individual ads address for dependent$/) do
