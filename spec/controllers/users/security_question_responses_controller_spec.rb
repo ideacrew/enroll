@@ -26,7 +26,7 @@ RSpec.describe Users::SecurityQuestionResponsesController do
     context "with a successful save" do
       before do
         allow(user).to receive(:save!).and_return(true)
-        xhr :post, :create, { user_id: user.id, security_question_responses: security_question_responses }
+        post :create, params: { user_id: user.id, security_question_responses: security_question_responses }, xhr: true
       end
       it { expect(assigns(:user)).to eq(user) }
       it { expect(response).to have_http_status(:success) }
@@ -37,7 +37,7 @@ RSpec.describe Users::SecurityQuestionResponsesController do
       before do
         allow(controller.request).to receive(:referrer).and_return('http://example.com')
         allow(user).to receive(:save!).and_return(false)
-        xhr :post, :create, { user_id: user.id, security_question_responses: security_question_responses }
+        post :create, params: { user_id: user.id, security_question_responses: security_question_responses }, xhr: true
       end
       it { expect(assigns(:url)).to eq('http://example.com') }
       it { expect(response).to have_http_status(:success) }
@@ -51,7 +51,7 @@ RSpec.describe Users::SecurityQuestionResponsesController do
     before do
       allow(User).to receive(:find_by).with(email: user.email).and_return(user)
       allow(User).to receive(:find_by).with(email: 'invalid@example.com').and_return(nil)
-      xhr :post, :challenge, { user: { email: email } }
+      post :challenge, params: { user: { email: email } }, xhr: true
     end
 
     context "for a valid email with no question responses" do
@@ -92,7 +92,7 @@ RSpec.describe Users::SecurityQuestionResponsesController do
       allow(user).to receive(:identity_confirmed_token=).with('SUCCESS')
       allow(user).to receive(:save!).and_return(true)
 
-      xhr :post, :authenticate, { user_id: user.id, security_question_response: successful_response }
+      post :authenticate, params: { user_id: user.id, security_question_response: successful_response }, xhr: true
     end
 
     context "a matching response" do
