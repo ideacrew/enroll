@@ -27,6 +27,7 @@ module BenefitSponsors
       end
 
       def self.for_terminate(attrs)
+        attrs.permit! if attrs.is_a?(ActionController::Parameters)
         new(attrs)
       end
 
