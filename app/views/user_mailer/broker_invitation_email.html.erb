@@ -12,7 +12,7 @@
     </div>
     <div>
       <p>
-        <strong>1.</strong> Click on this personalized link to set up your new broker account: <%= link_to "#{site_short_name}", claim_invitation_url(invitation) %><br />
+        <strong>1.</strong> Click on this personalized link to set up your new broker account: <%= link_to "#{site_short_name}", claim_invitation_url(id: invitation.id.to_s) %><br />
         <strong>Important:</strong> You must use this link to set up your account. If you don't use your personalized link when creating your account, the account won't be connected to your existing broker profile.
       </p>
     </div>
