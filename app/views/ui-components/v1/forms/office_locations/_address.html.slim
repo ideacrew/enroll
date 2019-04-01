@@ -44,27 +44,6 @@
           | Please provide a valid county.
 
 javascript:
-  function checkOLKind(element) {
-    var addressKind = element.value;
-    var row = element.closest(".row").nextSibling.nextSibling;
-    if (addressKind == "primary") {
-      row.querySelector('#inputCounty').setAttribute('required', true);
-      row.querySelector('#inputCounty').setAttribute('disabled', true);
-      row.querySelector('#inputCounty').setAttribute('data-target','zip-check.countySelect');
-      row.querySelector('#inputZip').setAttribute('required', true);
-      row.querySelector('#inputZip').setAttribute('data-action', 'change->zip-check#zipChange');
-    } else {
-      row.querySelector('#inputCounty').removeAttribute('required');
-      row.querySelector('#inputZip').removeAttribute('data-action');
-      row.querySelector('#inputZip').removeAttribute('required');
-      row.querySelector('#inputZip').removeAttribute('data-options');
-      // removes blank option from select options
-      //setTimeout(function() {
-      //  element.options[0].remove()
-     // },300)
-    }
-  }
-  
   function checkKind(element) {
     checkOLKind(element)
   }
