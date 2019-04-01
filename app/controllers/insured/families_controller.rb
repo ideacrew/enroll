@@ -29,7 +29,7 @@ class Insured::FamiliesController < FamiliesController
     log("#3860 person_id: #{@person.id}", {:severity => "error"}) if @hbx_enrollments.any?{|hbx| !hbx.is_coverage_waived? && hbx.plan.blank?}
     update_changing_hbxs(@hbx_enrollments)
 
-    @hbx_enrollments = @hbx_enrollments.reject{ |r| !valid_display_enrollments.include? r._id }
+    @hbx_enrollments = @hbx_enrollments.reject{ |r| !valid_display_enrollments.include? r._id }.limit(3)
 
     @employee_role = @person.active_employee_roles.first
     @tab = params['tab']
