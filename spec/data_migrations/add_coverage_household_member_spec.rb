@@ -18,8 +18,10 @@ describe AddCoverageHouseholdMember, dbclean: :after_each do
     let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
 
     before do
-      allow(ENV).to receive(:[]).with('hbx_id').and_return person.hbx_id
-      allow(ENV).to receive(:[]).with('family_member_id').and_return family.family_members.first.id
+      ENV['hbx_id']= person.hbx_id
+      ENV['family_member_id'] = family.family_members.first.id
+      # allow(ENV).to receive(:[]).with('hbx_id').and_return person.hbx_id
+      # allow(ENV).to receive(:[]).with('family_member_id').and_return family.family_members.first.id
     end
 
     it "should add a household" do
