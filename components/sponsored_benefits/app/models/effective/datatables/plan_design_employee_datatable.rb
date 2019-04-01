@@ -34,7 +34,6 @@ module Effective
         }, :sortable => false, :filter => false
 
         table_column :census_dependents, :label => 'No. of Dependents', :proc => Proc.new { |row|
-          binding.pry
           row.census_dependents_count
         }, :sortable => false, :filter => false
 
