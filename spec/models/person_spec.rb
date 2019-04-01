@@ -1053,7 +1053,7 @@ describe Person, :dbclean => :after_each do
     end
   end
 
-  describe ".add_employer_staff_role(first_name, last_name, dob, email, employer_profile)" do
+  describe ".add_employer_staff_role(first_name, last_name, dob, email, employer_profile)", dbclean: :around_each do
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup initial benefit application"
     let(:employer_profile) { abc_profile }
@@ -1330,7 +1330,7 @@ describe Person, :dbclean => :after_each do
   end
 
 
-  describe "staff_for_employer" do
+  describe "staff_for_employer", dbclean: :around_each do
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup initial benefit application"
     let(:employer_profile) { abc_profile }
