@@ -45,7 +45,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
       # allow(employer_profile).to receive(:plan_years).and_return("2015")
       allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
       sign_in(@user)
-      get :new, :employer_profile_id => employer_profile_id
+      get :new, params:{:employer_profile_id => employer_profile_id}
       expect(response).to have_http_status(:success)
       expect(response).to render_template("new")
       expect(assigns(:census_employee).class).to eq CensusEmployee
@@ -278,7 +278,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
       sign_in
       # allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       # allow(CensusEmployee).to receive(:find).and_return(census_employee)
-      get :show, :id => census_employee.id, :employer_profile_id => employer_profile_id
+      get :show, params:{:id => census_employee.id, :employer_profile_id => employer_profile_id}
       expect(response).to render_template("show")
     end
 
