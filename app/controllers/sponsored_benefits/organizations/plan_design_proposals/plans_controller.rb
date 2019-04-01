@@ -13,8 +13,6 @@ module SponsoredBenefits
                    offering_query.send "single_option_offered_#{kind}_plans", params[:carrier_id], params[:active_year]
                  when "sole_source"
                    offering_query.sole_source_offered_health_plans(params[:carrier_id], params[:active_year])
-                 when "custom"
-                   offering_query.custom_plan_option_offered_dental_plans(params[:active_year])
                  end
         @plans = @plans.select{|a| a.premium_tables.present?}
         @search_options = ::Plan.search_options(@plans)

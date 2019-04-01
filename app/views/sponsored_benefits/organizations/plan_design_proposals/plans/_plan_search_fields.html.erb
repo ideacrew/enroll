@@ -1,4 +1,5 @@
 <ul>
+  <%= hidden_field_tag 'elected_dental_plans', params[:plans_ids] %>
   <% search_options.each do |title, options| %>
     <% next if options.empty? %>
     <li><%= search_titles[title] %>

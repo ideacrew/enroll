@@ -217,7 +217,11 @@ function carrierSelected() {
 
   var kind = fetchBenefitKind();
   if (kind == "dental") {
-    $("#dental_elected_plan_kind").val(elected_plan_kind);
+    if(elected_plan_kind == "custom") {
+      $("#dental_elected_plan_kind").val("single_plan");
+    } else {
+      $("#dental_elected_plan_kind").val(elected_plan_kind);
+    }
     $("#dental_reference_plan_id").val("");
   }else {
     $("#elected_plan_kind").val(elected_plan_kind);
@@ -300,6 +304,11 @@ function calcPlanDesignContributions() {
 
   if (data == undefined || data == {} || !('benefit_group' in data)) {
     return;
+  }
+
+  var elected_dental_plans = $("#elected_dental_plans").val()
+  if(elected_dental_plans) {
+    data['benefit_group']['elected_dental_plans'] = elected_dental_plans
   }
 
   var url = $("#contribution_url").val();
