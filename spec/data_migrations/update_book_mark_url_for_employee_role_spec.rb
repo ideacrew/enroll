@@ -6,6 +6,12 @@ describe UpdateBookMarkUrlForEmployeerole, dbclean: :after_each do
   let(:given_task_name) { "update_book_mark_url_for_employee_role" }
   subject { UpdateBookMarkUrlForEmployeerole.new(given_task_name, double(:current_scope => nil)) }
 
+   after :each do
+    ["employee_role_id", "bookmark_url"].each do |env_variable|
+      ENV[env_variable] = nil
+    end
+  end
+
   describe "given a task name" do
     it "has the given task name" do
       expect(subject.name).to eql given_task_name
@@ -14,18 +20,17 @@ describe UpdateBookMarkUrlForEmployeerole, dbclean: :after_each do
 
   describe "update bookmark url" do
 
-    let!(:employee_role) { FactoryBot.create(:employee_role, bookmark_url: "https://enroll.dchealthlink.com")}
+    let(:person) { FactoryBot.create(:person, :with_ssn, :with_employee_role)}
+    let(:employee_role) {person.employee_roles.first}
 
     before(:each) do
-      allow(ENV).to receive(:[]).with("employee_role_id").and_return(employee_role.id.to_s)
-      allow(ENV).to receive(:[]).with("bookmark_url").and_return("https://enroll.dchealthlink.com/families/home")    
+      ENV["employee_role_id"] = employee_role.id.to_s
+      ENV["bookmark_url"] = "https://enroll.dchealthlink.com/families/home"
     end
 
     it "should update bookmark url associated with employee role" do
-      expect(employee_role.bookmark_url).to eq "https://enroll.dchealthlink.com"
       subject.migrate
-      employee_role.reload
-      expect(employee_role.bookmark_url).to eq "https://enroll.dchealthlink.com/families/home"
+      expect(employee_role.reload.bookmark_url).to eq "https://enroll.dchealthlink.com/families/home"
     end
   end
 end

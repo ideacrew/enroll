@@ -116,7 +116,7 @@ module BenefitSponsors
 
       def sign_in_and_do_new
         sign_in user
-        get :new, :benefit_application_id => benefit_application_id, :benefit_sponsorship_id => benefit_sponsorship_id
+        get :new, params: { benefit_application_id: benefit_application_id, benefit_sponsorship_id: benefit_sponsorship_id }
       end
 
       it "should route to benefits tab if rates are not present" do
@@ -184,7 +184,7 @@ module BenefitSponsors
 
       def sign_in_and_do_create
         sign_in user
-        post :create, :benefit_sponsorship_id => benefit_sponsorship_id, :benefit_application_id => benefit_application_id, :benefit_package => benefit_package_params
+        post :create, params: { benefit_sponsorship_id: benefit_sponsorship_id, benefit_application_id: benefit_application_id, benefit_package: benefit_package_params }
       end
 
     end
@@ -198,7 +198,7 @@ module BenefitSponsors
 
       def sign_in_and_do_edit
         sign_in user
-        get :edit, :benefit_sponsorship_id => benefit_sponsorship_id, :benefit_application_id => benefit_application_id, :id => benefit_package.id.to_s
+        get :edit, params: { benefit_sponsorship_id: benefit_sponsorship_id, benefit_application_id: benefit_application_id, id: benefit_package.id.to_s }
       end
 
       it "should be a success" do
@@ -221,7 +221,7 @@ module BenefitSponsors
 
       def sign_in_and_get_ref_prod
         sign_in user
-        get :reference_product_summary, :reference_plan_id => product.id, :benefit_application_id => benefit_application_id, :benefit_sponsorship_id => benefit_sponsorship_id
+        get :reference_product_summary, params: { :reference_plan_id => product.id, :benefit_application_id => benefit_application_id, :benefit_sponsorship_id => benefit_sponsorship_id }
       end
 
       before do
@@ -254,7 +254,7 @@ module BenefitSponsors
 
       def sign_in_and_do_update
         sign_in user
-        post :update, :benefit_sponsorship_id => benefit_sponsorship_id, :benefit_application_id => benefit_application_id, :id => benefit_package.id.to_s, :benefit_package => benefit_package_params
+        post :update, params: { :benefit_sponsorship_id => benefit_sponsorship_id, :benefit_application_id => benefit_application_id, :id => benefit_package.id.to_s, :benefit_package => benefit_package_params }
       end
 
       before do
@@ -286,7 +286,7 @@ module BenefitSponsors
 
         it "should redirect to edit dental benefit page" do
           sign_in user
-          post :update, :benefit_sponsorship_id => benefit_sponsorship_id, :benefit_application_id => benefit_application_id, :id => benefit_package.id.to_s, :benefit_package => benefit_package_params, add_dental_benefits: "true"
+          post :update, params: { :benefit_sponsorship_id => benefit_sponsorship_id, :benefit_application_id => benefit_application_id, :id => benefit_package.id.to_s, :benefit_package => benefit_package_params, add_dental_benefits: "true" }
           expect(response.location.include?("sponsored_benefits/new?kind=dental")).to be_truthy
         end
       end

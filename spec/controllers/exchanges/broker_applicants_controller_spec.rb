@@ -7,7 +7,7 @@ RSpec.describe Exchanges::BrokerApplicantsController do
 
     before :each do
       sign_in(user)
-      xhr :get, :index, format: :js
+      get :index, format: :js, xhr:true
     end
 
     it "should render index" do
@@ -32,7 +32,7 @@ RSpec.describe Exchanges::BrokerApplicantsController do
 
     before :each do
       sign_in(user)
-      xhr :get, :edit, id: broker_role.person.id, format: :js
+      get :edit, params:{id: broker_role.person.id}, format: :js, xhr:true
     end
 
     it "should render edit" do
@@ -57,7 +57,7 @@ RSpec.describe Exchanges::BrokerApplicantsController do
 
     context 'when application denied' do
       before :each do
-        put :update, id: broker_role.person.id, deny: true, format: :js
+        put :update, params:{id: broker_role.person.id, deny: true}, format: :js
         broker_role.reload
       end
 
@@ -73,7 +73,7 @@ RSpec.describe Exchanges::BrokerApplicantsController do
 
       before :each do
         FactoryBot.create(:hbx_profile)
-        put :update, id: broker_role.person.id, approve: true, person: { broker_role_attributes: { training: true , carrier_appointments: {}} } , format: :js
+        put :update, params:{id: broker_role.person.id, approve: true, person: { broker_role_attributes: { training: true , carrier_appointments: {}} } }, format: :js
         broker_role.reload
       end
 
@@ -93,7 +93,7 @@ RSpec.describe Exchanges::BrokerApplicantsController do
       context 'when application is approved' do
         before :each do
           broker_role.update_attributes({ broker_agency_profile_id: @broker_agency_profile.id })
-          put :update, id: broker_role.person.id, approve: true, person: { broker_role_attributes: { training: true , carrier_appointments: {}} } , format: :js
+          put :update, params: {id: broker_role.person.id, approve: true, person: { broker_role_attributes: { training: true , carrier_appointments: {}} }} , format: :js
           broker_role.reload
         end
 
@@ -113,7 +113,7 @@ RSpec.describe Exchanges::BrokerApplicantsController do
         before :each do
           broker_role.update_attributes({ broker_agency_profile_id: @broker_agency_profile.id })
           broker_role.approve!
-          put :update, id: broker_role.person.id, update: true, person: { broker_role_attributes: { training: true , carrier_appointments: {"Aetna Health Inc"=>"true", "United Health Care Insurance"=>"true"}} } , format: :js
+          put :update, params:{id: broker_role.person.id, update: true, person: { broker_role_attributes: { training: true , carrier_appointments: {"Aetna Health Inc"=>"true", "United Health Care Insurance"=>"true"}} }} , format: :js
           broker_role.reload
         end
 
@@ -140,7 +140,7 @@ RSpec.describe Exchanges::BrokerApplicantsController do
           before :each do
             Settings.aca.broker_carrier_appointments_enabled = true
             broker_role.update_attributes({ broker_agency_profile_id: @broker_agency_profile.id })
-            put :update, id: broker_role.person.id, pending: true, person:  { broker_role_attributes: { training: true , carrier_appointments: {}} } , format: :js
+            put :update, params:{id: broker_role.person.id, pending: true, person:  { broker_role_attributes: { training: true , carrier_appointments: {}} }} , format: :js
             broker_role.reload
           end
 
@@ -177,7 +177,7 @@ RSpec.describe Exchanges::BrokerApplicantsController do
           before :each do
             Settings.aca.broker_carrier_appointments_enabled = false
             broker_role.update_attributes({ broker_agency_profile_id: @broker_agency_profile.id })
-            put :update, id: broker_role.person.id, pending: true, person:  { broker_role_attributes: { training: true , carrier_appointments: {"Altus"=>"true",
+            put :update, params:{id: broker_role.person.id, pending: true, person:  { broker_role_attributes: { training: true , carrier_appointments: {"Altus"=>"true",
                                       "Blue Cross Blue Shield MA"=>"true",
                                       "Boston Medical Center Health Plan"=>"true",
                                       "Delta"=>nil,
@@ -188,7 +188,7 @@ RSpec.describe Exchanges::BrokerApplicantsController do
                                       "Minuteman Health"=>nil,
                                       "Neighborhood Health Plan"=>nil,
                                       "Tufts Health Plan Direct"=>nil,
-                                      "Tufts Health Plan Premier"=>nil}  } } , format: :js
+                                      "Tufts Health Plan Premier"=>nil}  } }} , format: :js
             broker_role.reload
           end
 
@@ -224,7 +224,7 @@ RSpec.describe Exchanges::BrokerApplicantsController do
         before :each do
           broker_role.update_attributes({ broker_agency_profile_id: @broker_agency_profile.id })
           broker_role.approve!
-          put :update, id: broker_role.person.id, decertify: true, format: :js
+          put :update, params:{id: broker_role.person.id, decertify: true}, format: :js
           broker_role.reload
         end
 
@@ -241,7 +241,7 @@ RSpec.describe Exchanges::BrokerApplicantsController do
           broker_role.update_attributes({ broker_agency_profile_id: @broker_agency_profile.id })
           broker_role.approve!
           broker_role.decertify!
-          put :update, id: broker_role.person.id, recertify: true, format: :js
+          put :update, params:{id: broker_role.person.id, recertify: true}, format: :js
           broker_role.reload
         end
 

@@ -6,6 +6,12 @@ describe UpdateBrokerAgencyProfileLegalName, dbclean: :after_each do
   let(:given_task_name) { "update_broker_agency_profile_legal_name" }
   subject { UpdateBrokerAgencyProfileLegalName.new(given_task_name, double(:current_scope => nil)) }
 
+  after :each do
+    ["fein", "new_legal_name"].each do |env_variable|
+      ENV[env_variable] = nil
+    end
+  end
+
   describe "given a task name" do
     it "has the given task name" do
       expect(subject.name).to eql given_task_name
@@ -19,8 +25,8 @@ describe UpdateBrokerAgencyProfileLegalName, dbclean: :after_each do
     let(:organization) { broker_agency_profile.organization }
 
     before(:each) do
-      allow(ENV).to receive(:[]).with("fein").and_return organization.fein
-      allow(ENV).to receive(:[]).with("new_legal_name").and_return "agency2"
+      ENV["fein"] =  organization.fein
+      ENV["new_legal_name"] = "agency2"
     end
 
     context "change the legal name of broker agency profile", dbclean: :after_each do
