@@ -2,14 +2,12 @@ function checkOLKind(element) {
   var addressKind = $(element).val();
   var row = $(element).closest(".row").next(".row").next(".row");
   if (addressKind == "primary") {
-    console.log("ADDING");
     row.find('#inputCounty').attr('required', true);
     row.find('#inputCounty').attr('disabled', true);
     row.find('#inputCounty').attr('data-target','zip-check.countySelect');
     row.find('#inputZip').attr('required', true);
     row.find('#inputZip').attr('data-action', 'change->zip-check#zipChange');
   } else {
-    console.log("REMOVING");
     row.find('#inputCounty').removeAttr('required');
     row.find('#inputCounty').removeProp('required');
     row.find('#inputZip').removeAttr('data-action');
