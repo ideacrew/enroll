@@ -59,10 +59,6 @@ module Forms
         if @is_incarcerated.nil?
           self.errors.add(:base, "Incarceration status is required")
         end
-
-        if @is_physically_disabled.nil?
-          self.errors.add(:base, "Physically disabled status is required")
-        end
       end
     end
 
@@ -183,7 +179,6 @@ module Forms
         :ethnicity => ethnicity,
         :language_code => language_code,
         :is_incarcerated => is_incarcerated,
-        :is_physically_disabled => is_physically_disabled,
         :citizen_status => @citizen_status,
         :tribal_id => tribal_id,
         :no_dc_address => no_dc_address,
@@ -231,7 +226,6 @@ module Forms
         :ethnicity => found_family_member.ethnicity,
         :language_code => found_family_member.language_code,
         :is_incarcerated => found_family_member.is_incarcerated,
-        :is_physically_disabled => found_family_member.is_physically_disabled,
         :citizen_status => found_family_member.citizen_status,
         :naturalized_citizen => found_family_member.naturalized_citizen,
         :eligible_immigration_status => found_family_member.eligible_immigration_status,

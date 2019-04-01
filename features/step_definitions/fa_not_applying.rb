@@ -25,7 +25,6 @@ And(/the primary member has filled mandatory information required$/) do
   find(:xpath, '//label[@for="person_naturalized_citizen_false"]').click
   find(:xpath, '//label[@for="indian_tribe_member_no"]').click
   find(:xpath, '//label[@for="radio_incarcerated_no"]').click
-  find(:xpath, '//label[@for="radio_physically_disabled_no"]').click
   fill_in "person_addresses_attributes_0_address_1", with: personal_information[:address_1]
   fill_in "person_addresses_attributes_0_address_2", with: personal_information[:address_2]
   fill_in "person_addresses_attributes_0_city", with: personal_information[:city]

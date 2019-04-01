@@ -291,7 +291,6 @@ RSpec.describe Insured::FamilyMembersController do
              "indian_tribe_member"=>"false",
              "tribal_id"=>"",
              "is_incarcerated"=>"false",
-             "is_physically_disabled"=>"false",
              "ethnicity"=>["", "", "", "", "", "", ""],
              "is_consumer_role"=>"true",
              "same_with_primary"=>"true",

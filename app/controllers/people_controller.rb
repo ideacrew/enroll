@@ -374,7 +374,6 @@ private
       :gender,
       :us_citizen,
       :is_incarcerated,
-      :is_physically_disabled,
       :language_code,
       :is_disabled,
       :race,
