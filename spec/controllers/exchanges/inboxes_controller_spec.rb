@@ -25,12 +25,12 @@ RSpec.describe Exchanges::InboxesController do
       end
 
       it "should render show" do
-        get :show, id: "test"
+        get :show, params:{id: "test"}
         expect(response).to have_http_status(:success)
       end
 
       it "delete action" do
-        xhr :delete, :destroy, id: 1
+        delete :destroy, params:{id: 1}, xhr:true
         expect(response).to have_http_status(:success)
       end
     end
@@ -41,7 +41,7 @@ RSpec.describe Exchanges::InboxesController do
       end
 
       it "should render show" do
-        get :show, id: "test"
+        get :show, params:{id: "test"}
         expect(response).to have_http_status(:success)
         expect(message.message_read).to eq(false)
       end
