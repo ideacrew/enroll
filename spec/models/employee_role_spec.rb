@@ -48,7 +48,7 @@ end
 
 describe ".coverage_effective_on" do
 
-  context 'when both active and renewal benefit groups present', dbclean: :after_each do
+  context 'when both active and renewal benefit groups present', dbclean: :around_each do
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup renewal application"
 
@@ -87,7 +87,7 @@ describe ".coverage_effective_on" do
   end
 end
 
-describe EmployeeRole, dbclean: :after_each do
+describe EmployeeRole, dbclean: :around_each do
   let(:ssn) {"987654321"}
   let(:dob) {36.years.ago.to_date}
   let(:gender) {"female"}
@@ -269,7 +269,7 @@ describe EmployeeRole, dbclean: :after_each do
 =end
 end
 
-describe EmployeeRole, dbclean: :after_each do
+describe EmployeeRole, dbclean: :around_each do
   let(:person_created_at) {10.minutes.ago}
   let(:person_updated_at) {8.minutes.ago}
   let(:employee_role_created_at) {9.minutes.ago}
@@ -492,7 +492,7 @@ describe EmployeeRole, dbclean: :after_each do
 end
 
 
-describe EmployeeRole, dbclean: :after_each do
+describe EmployeeRole, dbclean: :around_each do
 
   # let(:employer_profile)          { FactoryBot.create(:employer_profile) }
   let(:calendar_year) {TimeKeeper.date_of_record.year}
@@ -695,7 +695,7 @@ describe EmployeeRole, dbclean: :after_each do
   end
 end
 
-describe "#benefit_package", dbclean: :after_each do
+describe "#benefit_package", dbclean: :around_each do
   include_context "setup benefit market with market catalogs and product packages"
   include_context "setup renewal application"
 
@@ -727,7 +727,7 @@ describe "#benefit_package", dbclean: :after_each do
     end
   end
 
-  context "plan shop through qle and having active & expired plan years", dbclean: :after_each do
+  context "plan shop through qle and having active & expired plan years", dbclean: :around_each do
 
     before do
       benefit_sponsorship
@@ -752,7 +752,7 @@ end
 
 describe EmployeeRole do
 
-  context 'is_dental_offered?', dbclean: :after_each do
+  context 'is_dental_offered?', dbclean: :around_each do
 
     include_context "setup benefit market with market catalogs and product packages"
 
