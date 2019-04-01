@@ -2,7 +2,7 @@ require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
-RSpec.describe EnrollmentShopping::EnrollmentBuilder, dbclean: :after_each do
+RSpec.describe EnrollmentShopping::EnrollmentBuilder, dbclean: :around_each do
 
   include_context "setup benefit market with market catalogs and product packages"
   include_context "setup initial benefit application"
