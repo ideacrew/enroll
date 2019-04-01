@@ -3,7 +3,7 @@ require 'aasm/rspec'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
-RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
+RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
 
   describe HbxEnrollment, dbclean: :around_each do
     include_context "setup benefit market with market catalogs and product packages"
@@ -105,7 +105,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
     end
   end
 
-  describe HbxEnrollment, dbclean: :after_each do
+  describe HbxEnrollment, dbclean: :around_each do
 
     include_context "BradyWorkAfterAll"
 
@@ -467,7 +467,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
       end
     end
 
-    context "#propogate_waiver", dbclean: :after_each do
+    context "#propogate_waiver", dbclean: :around_each do
       let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
       let(:census_employee) {FactoryBot.create(:census_employee)}
       let(:benefit_group_assignment) {FactoryBot.create(:benefit_group_assignment, benefit_group: package, census_employee: census_employee)}
@@ -794,7 +794,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
       end
     end
 
-    context "cancel_coverage!", dbclean: :after_each do
+    context "cancel_coverage!" do
       let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
       let(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, household: family.active_household, aasm_state: "inactive")}
 
@@ -809,7 +809,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
       end
     end
 
-    context "cancel_for_non_payment!", dbclean: :after_each do
+    context "cancel_for_non_payment!" do
       let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
       let(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, household: family.active_household, aasm_state: "inactive")}
 
@@ -824,8 +824,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
       end
     end
 
-
-    context "terminate_for_non_payment!", dbclean: :after_each do
+    context "terminate_for_non_payment!" do
       let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
       let(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, household: family.active_household, aasm_state: "coverage_selected")}
 
@@ -841,7 +840,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
     end
   end
 
-  describe HbxEnrollment, dbclean: :after_each do
+  describe HbxEnrollment, dbclean: :around_each do
 
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup initial benefit application"
@@ -1024,7 +1023,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
     end
   end
 
-  describe HbxEnrollment, "given a set of broker accounts", dbclean: :after_each do
+  describe HbxEnrollment, "given a set of broker accounts", dbclean: :around_each do
     let(:submitted_at) {Time.mktime(2008, 12, 13, 12, 34, 00)}
     subject {HbxEnrollment.new(:submitted_at => submitted_at)}
     let(:broker_agency_account_1) {double(:start_on => start_on_1, :end_on => end_on_1)}
@@ -1075,7 +1074,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
     end
   end
 
-  describe HbxEnrollment, "given an enrollment kind of 'special_enrollment'", dbclean: :after_each do
+  describe HbxEnrollment, "given an enrollment kind of 'special_enrollment'", dbclean: :around_each do
     subject {HbxEnrollment.new({:enrollment_kind => "special_enrollment"})}
 
     it "should NOT be a shop new hire" do
@@ -1102,7 +1101,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
     end
   end
 
-  describe HbxEnrollment, "given an enrollment kind of 'open_enrollment'", dbclean: :after_each do
+  describe HbxEnrollment, "given an enrollment kind of 'open_enrollment'", dbclean: :around_each do
     subject {HbxEnrollment.new({:enrollment_kind => "open_enrollment"})}
 
     it "should not have an eligibility event date" do
@@ -1235,7 +1234,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
     end
   end
 
-  describe HbxEnrollment, 'dental shop calculation related', type: :model, dbclean: :after_each do
+  describe HbxEnrollment, 'dental shop calculation related', type: :model, dbclean: :around_each do
     context ".find_enrollments_by_benefit_group_assignment" do
 
       let(:enrollment) { FactoryBot.create(:hbx_enrollment,
@@ -1407,7 +1406,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
     end
   end
 
-  describe HbxEnrollment, 'Updating Existing Coverage', type: :model, dbclean: :after_each do
+  describe HbxEnrollment, 'Updating Existing Coverage', type: :model, dbclean: :around_each do
 
     include_context "setup benefit market with market catalogs and product packages"
 
@@ -1444,7 +1443,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
       employee_role.update(census_employee_id: census_employee.id)
     end
 
-    context 'When family has active coverage and makes changes for their coverage', dbclean: :after_each do
+    context 'When family has active coverage and makes changes for their coverage' do
 
       include_context "setup initial benefit application"
 
@@ -1486,7 +1485,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
       end
     end
 
-    context 'When family passively renewed', dbclean: :after_each do
+    context 'When family passively renewed' do
       include_context "setup renewal application"
 
       let(:predecessor_application_catalog) { true }
@@ -1505,7 +1504,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
       let(:special_enrollment_period_id) { nil }
       let(:passive_renewal) { shop_family.reload.enrollments.where(:aasm_state => 'auto_renewing').first }
 
-      context 'When Actively Renewed', dbclean: :after_each do
+      context 'When Actively Renewed', dbclean: :around_each do
 
         let(:new_enrollment_product_id) { passive_renewal.product_id }
 
@@ -1565,7 +1564,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
         end
       end
 
-      context '.update_renewal_coverage', dbclean: :after_each do
+      context '.update_renewal_coverage', dbclean: :around_each do
 
         before do
           allow(benefit_package).to receive(:is_renewal_benefit_available?).and_return(true)
@@ -1683,7 +1682,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
     end
   end
 
-  describe HbxEnrollment, 'Voiding enrollments', type: :model, dbclean: :after_each do
+  describe HbxEnrollment, 'Voiding enrollments', type: :model, dbclean: :around_each do
     let!(:hbx_profile) {FactoryBot.create(:hbx_profile)}
     let(:family) {FactoryBot.build(:individual_market_family)}
     let(:hbx_enrollment) {FactoryBot.build(:hbx_enrollment, :individual_unassisted, household: family.active_household, effective_on: TimeKeeper.date_of_record)}
@@ -1733,7 +1732,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
       end
   end
 
-  describe HbxEnrollment, 'Renewal Purchase', type: :model, dbclean: :after_each do
+  describe HbxEnrollment, 'Renewal Purchase', type: :model, dbclean: :around_each do
     let(:family) {FactoryBot.build(:individual_market_family)}
     let(:hbx_enrollment) {FactoryBot.build(:hbx_enrollment, :individual_unassisted, household: family.active_household, kind: 'individual')}
 
@@ -1769,7 +1768,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
     end
   end
 
-  describe HbxEnrollment, 'state machine', dbclean: :after_each do
+  describe HbxEnrollment, 'state machine', dbclean: :around_each do
     let(:family) {FactoryBot.build(:individual_market_family)}
     subject {FactoryBot.build(:hbx_enrollment, :individual_unassisted, household: family.active_household)}
 
@@ -1803,7 +1802,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
     end
   end
 
-  describe HbxEnrollment, 'validate_for_cobra_eligiblity', dbclean: :after_each do
+  describe HbxEnrollment, 'validate_for_cobra_eligiblity', dbclean: :around_each do
 
     context 'When employee is designated as cobra' do
 
@@ -1845,7 +1844,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
     end
   end
 
-  describe HbxEnrollment, '.build_plan_premium', type: :model, dbclean: :after_each do
+  describe HbxEnrollment, '.build_plan_premium', type: :model, dbclean: :around_each do
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup initial benefit application"
 
@@ -1932,7 +1931,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
     end
   end
 
-  describe HbxEnrollment, dbclean: :after_each do
+  describe HbxEnrollment, dbclean: :around_each do
     include_context "BradyWorkAfterAll"
 
     before :all do
@@ -1981,7 +1980,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
   end
 end
 
-describe HbxEnrollment, type: :model, :dbclean => :after_each do
+describe HbxEnrollment, type: :model, :dbclean => :around_each do
   let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }
 
   include_context "setup benefit market with market catalogs and product packages" do

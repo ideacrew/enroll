@@ -35,6 +35,7 @@ class ResidentRole
   validates_presence_of :dob, :gender
 
   accepts_nested_attributes_for :person, :paper_applications
+  
 
   embeds_many :local_residency_responses, class_name:"EventResponse"
 

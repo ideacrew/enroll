@@ -168,6 +168,8 @@ class ConsumerRole
                           :residency_rejected],
                   :scope => :person,
                   :modifier_field => :modifier,
+                  :modifier_field_optional => :true,
+                  
                   :version_field => :tracking_version,
                   :track_create  => true,    # track document creation, default is false
                   :track_update  => true,    # track document updates, default is true
