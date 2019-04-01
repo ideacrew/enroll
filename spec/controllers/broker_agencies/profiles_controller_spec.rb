@@ -65,10 +65,13 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
   end
 
   describe "patch update", dbclean: :after_each do
-    let(:user) { double(has_broker_role?: true)}
-    #let(:org) { double }
+  # let(:user) { double(has_broker_role?: true)}
+    let!(:user) { FactoryBot.create(:user, person: person, roles: ['broker']) }
+
+    let!(:person) { FactoryBot.create(:person) }
+    let(:primary_broker_role) { FactoryBot.create(:broker_role, person: person)}
     let(:org) { FactoryBot.create(:organization)}
-    let(:broker_agency_profile){ FactoryBot.create(:broker_agency_profile, organization: org) }
+    let(:broker_agency_profile){ FactoryBot.create(:broker_agency_profile, organization: org, primary_broker_role: primary_broker_role) }
     let(:organization_params) do
       {
         id: org.id, first_name: "updated name", last_name: "updates", accept_new_clients: true, working_hours: true,
@@ -533,10 +536,6 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
         before :each do
           sign_in user
           post :update_assign, params: {id: broker_agency_profile.id, employer_ids: [employer_profile.id], general_agency_id: general_agency_profile.id, type: 'Hire'}, xhr: true
-        end
-
-        it "should return http redirect" do
-          expect(response).to have_http_status(:redirect)
         end
 
         it "should redirect to broker_agency_profile" do
