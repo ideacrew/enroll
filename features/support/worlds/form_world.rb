@@ -11,6 +11,24 @@ module FormWorld
     find('#fteCount').set(5)
     find('#open_enrollment_end_on').set('')
   end
+
+  def generate_sic_codes
+    Mongoid::Migration.say_with_time("Load SIC Codes") do
+    $__ALL_SIC_CODE_YAMLS ||= begin
+      cz_pattern = Rails.root.join("db", "seedfiles", "fixtures", "sic_codes", "sic_code_*.yaml")
+      sic_codes = Array.new
+      loaded_class_1 = ::SicCode
+      Dir.glob(cz_pattern).each do |f_name|
+        yaml_str = File.read(f_name)
+        data = YAML.load(yaml_str)
+        sic_codes << data.as_json
+      end
+      sic_codes
+    end
+    ::SicCode.collection.insert_many($__ALL_SIC_CODE_YAMLS)
+    end
+  end
+
 end
 
 World(FormWorld)
