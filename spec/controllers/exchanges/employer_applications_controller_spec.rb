@@ -62,6 +62,21 @@ RSpec.describe Exchanges::EmployerApplicationsController, dbclean: :after_each d
       expect(response).to have_http_status(:redirect)
       expect(flash[:error]).to match(/Access not allowed/)
     end
+
+    unless allow_mid_month_voluntary_terms? || allow_mid_month_non_payment_terms?
+      context 'non-mid month terminations' do
+
+        before :each do
+          allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', can_modify_plan_year: true))
+          sign_in(user)
+          put :terminate, employer_application_id: initial_application.id, employer_id: benefit_sponsorship.id, end_on: TimeKeeper.date_of_record.next_month.end_of_month.prev_day, term_reason: "nonpayment", term_kind: "nonpayment"
+        end
+
+        it 'should display appropriate error message' do
+          expect(flash[:error]).to eq "#{benefit_sponsorship.organization.legal_name}'s Application could not be terminated: Exchange doesn't allow mid month non payment terminations"
+        end
+      end
+    end
   end
 
   describe "PUT cancel" do

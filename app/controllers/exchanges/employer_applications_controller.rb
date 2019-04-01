@@ -23,7 +23,7 @@ class Exchanges::EmployerApplicationsController < ApplicationController
     if result
       flash[:notice] = "#{@benefit_sponsorship.organization.legal_name}'s Application terminated successfully."
     else
-      flash[:error] = "#{@benefit_sponsorship.organization.legal_name}'s Application could not be terminated due to #{errors.inject(''){|memo, error| '#{memo}<li>#{error}</li>'}.html_safe}"
+      flash[:error] = "#{@benefit_sponsorship.organization.legal_name}'s Application could not be terminated: #{errors.values.to_sentence}"
     end
     render :js => "window.location = #{exchanges_hbx_profiles_root_path.to_json}"
   end

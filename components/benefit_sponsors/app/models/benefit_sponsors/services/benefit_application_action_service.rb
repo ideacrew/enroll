@@ -49,7 +49,7 @@ module BenefitSponsors
 
       def map_errors_for(errors, onto:)
         errors.each do |k, v|
-          onto.add(k, v)
+          onto[k] = v
         end
       end
     end
