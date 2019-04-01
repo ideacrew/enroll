@@ -2,6 +2,7 @@ class BenefitGroup
 
   include Mongoid::Document
   include Mongoid::Timestamps
+  include Config::AcaModelConcern
 
   field :reference_plan_id, type: BSON::ObjectId
   field :plan_option_kind, type: String

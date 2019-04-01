@@ -204,6 +204,7 @@ class Plan
   scope :health_metal_levels_all,               ->{ any_in(metal_level: REFERENCE_PLAN_METAL_LEVELS << "catastrophic") }
   scope :health_metal_levels_sans_catastrophic, ->{ any_in(metal_level: REFERENCE_PLAN_METAL_LEVELS) }
   scope :health_metal_nin_catastropic,          ->{ not_in(metal_level: "catastrophic") }
+  scope :with_enabled_metal_levels,             -> { any_in(metal_level: REFERENCE_PLAN_METAL_LEVELS )}
 
 
   scope :by_plan_ids, ->(plan_ids) { where(:id => {"$in" => plan_ids}) }
@@ -239,6 +240,10 @@ class Plan
 
   def plan_deductible
     deductible_integer
+  end
+
+  def dental?
+    coverage_kind && coverage_kind.downcase == "dental"
   end
 
   class << self

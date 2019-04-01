@@ -18,6 +18,7 @@ module Config::AcaModelConcern
     delegate :employee_participation_ratio_minimum, to: :class
     delegate :non_owner_participation_count_minimum, to: :class
     delegate :aca_shop_market_small_market_employee_count_maximum, to: :class
+    delegate :offerings_constrained_to_service_areas?, to: :class
   end
 
   class_methods do
@@ -83,6 +84,10 @@ module Config::AcaModelConcern
 
     def non_owner_participation_count_minimum
       @@non_owner_participation_count_minimum ||= Settings.aca.shop_market.non_owner_participation_count_minimum.to_f
+    end
+
+    def offerings_constrained_to_service_areas?
+      @@offerings_constrained_to_service_areas ||= Settings.aca.offerings_constrained_to_service_areas
     end
   end
 end
