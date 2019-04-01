@@ -135,6 +135,7 @@ group :development, :test do
   gem 'yard',                   '~> 0.9.12',  require: false
   gem 'yard-mongoid',           '~> 0.1',     require: false
   gem 'rails-controller-testing'
+  gem 'climate_control', '~> 0.2.0'
 end
 
 group :test do

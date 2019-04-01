@@ -118,11 +118,13 @@ describe AddingEmployeeRole, dbclean: :after_each do
 
       context 'when census employee id is invalid then' do
         before(:each) do
-          allow(ENV).to receive(:[]).with('action').and_return('Link')
-          allow(ENV).to receive(:[]).with('census_employee_ids').and_return '123abc987pqr'
+          # allow(ENV).to receive(:[]).with('action').and_return('Link')
+          # allow(ENV).to receive(:[]).with('census_employee_ids').and_return 
         end
         it 'should raise an error' do
-          expect(subject.migrate).to eq('No Census Employee found with 123abc987pqr')
+          ClimateControl.modify action: 'Link', census_employee_ids: '123abc987pqr' do
+            expect(subject.migrate).to eq('No Census Employee found with 123abc987pqr')
+          end
         end
       end
     end
@@ -130,17 +132,18 @@ describe AddingEmployeeRole, dbclean: :after_each do
     context 'when benefit application state is not published then' do
       let!(:benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, aasm_state: :draft) }
       before(:each) do
-        allow(ENV).to receive(:[]).with('action').and_return('Link')
-        allow(ENV).to receive(:[]).with('census_employee_ids').and_return "#{census_employee.id}"
         census_employee.benefit_group_assignments << benefit_group_assignment
         census_employee.save!
         benefit_group_assignment.save!
       end
+
       it 'employee state should not be changed to employee_role_linked' do
-        expect(census_employee.aasm_state).to eq 'eligible'
-        subject.migrate
-        census_employee.reload
-        expect(census_employee.aasm_state).to eq 'eligible'
+        ClimateControl.modify action: 'Link', census_employee_ids: census_employee.id.to_s do
+          expect(census_employee.aasm_state).to eq 'eligible'
+          subject.migrate
+          census_employee.reload
+          expect(census_employee.aasm_state).to eq 'eligible'
+        end
       end
     end
 
