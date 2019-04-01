@@ -8,7 +8,7 @@ describe RemoveDependent, dbclean: :after_each do
   subject { RemoveDependent.new(given_task_name, double(:current_scope => nil)) }
 
   before do
-    allow(ENV).to receive(:[]).with("family_member_id").and_return(family.family_members.where(is_primary_applicant: false).first.id)
+    ENV["family_member_id"] = family.family_members.where(is_primary_applicant: false).first.id.to_s
   end
 
   describe "given a task name" do

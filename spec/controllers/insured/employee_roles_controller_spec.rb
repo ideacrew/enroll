@@ -244,7 +244,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
         allow(employment_relationship).to receive_message_chain(:census_employee,:employer_profile,:parent,:legal_name).and_return("legal_name")
         request.env["HTTP_REFERER"] = "/"
         sign_in(user)
-        post :create, :employment_relationship => employment_relationship_properties
+        post :create, params:{:employment_relationship => employment_relationship_properties}
       end
 
       it "should redirect" do
@@ -374,7 +374,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
     end
 
     it 'should redirect to a placeholder url' do
-      get :show, id: 888
+      get :show, params:{id: 888}
       expect(response).to redirect_to(search_insured_employee_index_path)
     end
 
@@ -384,7 +384,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
         expect(msg[:user]).to eq(user.oim_id)
         expect(msg[:url]).to match /insured\/employee\/888/
       end
-      get :show, id: 888
+      get :show, params:{id: 888}
     end
   end
 
