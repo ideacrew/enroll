@@ -16,8 +16,8 @@ RSpec.describe "events/employers/updated.haml.erb" do
     end
 
     let(:plan_year) { PlanYear.new(:aasm_state => "published", :created_at => DateTime.now,
-                                  :fte_count => 5,
                                   :start_on => DateTime.now,
+                                  :fte_count => 5,
                                   :open_enrollment_start_on => DateTime.now,
                                   :open_enrollment_end_on => DateTime.now)
                     }
