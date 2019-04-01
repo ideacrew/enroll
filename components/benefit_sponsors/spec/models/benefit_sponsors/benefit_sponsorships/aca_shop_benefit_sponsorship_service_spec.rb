@@ -34,7 +34,8 @@ module BenefitSponsors
       default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site, aasm_state: sponsorship_state)
     }
 
-    let!(:april_renewal_sponsors)         { create_list(:benefit_sponsors_benefit_sponsorship, 2, :with_organization_cca_profile,
+    let(:april_renewal_sponsors)         { create_list(:benefit_sponsors_benefit_sponsorship, 2, :with_organization_cca_profile,
+      :with_previous_year_rating_area, :with_previous_year_service_areas,
       :with_renewal_benefit_application, initial_application_state: renewal_current_application_state,
       renewal_application_state: renewal_application_state,
       default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site,

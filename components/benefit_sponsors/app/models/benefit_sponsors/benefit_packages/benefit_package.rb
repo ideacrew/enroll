@@ -268,11 +268,11 @@ module BenefitSponsors
       end
 
       def enrolled_families
-        Family.enrolled_through_benefit_package(self)
+        ::Family.enrolled_through_benefit_package(self)
       end
 
       def enrolled_and_terminated_families
-        Family.enrolled_and_terminated_through_benefit_package(self)
+        ::Family.enrolled_and_terminated_through_benefit_package(self)
       end
 
       def effectuate_member_benefits
@@ -302,7 +302,6 @@ module BenefitSponsors
       def terminate_member_benefits
         enrolled_and_terminated_families.each do |family|
           enrollments = family.enrollments.by_benefit_package(self).enrolled_waived_terminated_and_expired
-
           sponsored_benefits.each do |sponsored_benefit|
             hbx_enrollment = enrollments.by_coverage_kind(sponsored_benefit.product_kind).first
             if hbx_enrollment

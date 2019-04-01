@@ -78,7 +78,7 @@ Given (/^.*a CCA sole source employer health benefit package, in open enrollment
   sb = @benefit_package.sponsored_benefits.first
   sbenefit, _price, _cont = cost_estimator.calculate(sb, sb.reference_product, sb.product_package, build_new_pricing_determination: true)
   @benefit_package.save!
-  @benefit_sponsorship.update_attributes!({aasm_state: :initial_enrollment_open})
+  @benefit_sponsorship.update_attributes!({aasm_state: :applicant})
   @benefit_application.update_attributes!({aasm_state: :enrollment_open})
 end
 

@@ -16,9 +16,11 @@ module BenefitSponsors
               deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "group_advance_termination_confirmation")
               census_employees = benefit_application.benefit_sponsorship.census_employees.non_terminated
               census_employees.each do |ce|
-               begin
-                 deliver(recipient: ce.employee_role, event_object: benefit_application, notice_event: "notify_employee_of_group_advance_termination")
-               end
+                begin
+                  deliver(recipient: ce.employee_role, event_object: benefit_application, notice_event: "notify_employee_of_group_advance_termination")
+                rescue Exception => e
+                  Rails.logger.error { "Unable to trigger notify_employee_of_group_advance_termination notice to #{ce.full_name} due to #{e.backtrace}" }
+                end
              end
             end
           end
