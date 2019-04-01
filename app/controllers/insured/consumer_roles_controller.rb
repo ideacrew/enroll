@@ -2,10 +2,11 @@ class Insured::ConsumerRolesController < ApplicationController
   include ApplicationHelper
   include VlpDoc
   include ErrorBubble
+  include NavigationHelper
 
   before_action :check_consumer_role, only: [:search, :match]
   before_action :find_consumer_role, only: [:edit, :update]
-  #before_action :authorize_for, except: [:edit, :update]
+  before_filter :load_support_texts, only: [:edit, :search, :match, :update]
 
   # generate initial individual_market_transition as a placeholder for initial enrollment in IVL
   after_action :create_initial_market_transition, only: [:create]
@@ -199,6 +200,10 @@ class Insured::ConsumerRolesController < ApplicationController
     set_consumer_bookmark_url
     @consumer_role.build_nested_models_for_person
     @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@consumer_role)
+    respond_to do |format|
+      format.js
+      format.html
+    end
   end
 
   def update
@@ -312,7 +317,8 @@ class Insured::ConsumerRolesController < ApplicationController
       :indian_tribe_member,
       :tribal_id,
       :no_dc_address,
-      :no_dc_address_reason,
+      :is_homeless,
+      :is_temporarily_out_of_state,
       :is_applying_coverage
     ]
   end
@@ -353,6 +359,10 @@ class Insured::ConsumerRolesController < ApplicationController
     else
       return message
     end
+  end
+
+  def load_support_texts
+    @support_texts = YAML.load_file("app/views/shared/support_text_household.yml")
   end
 
   def build_person_params

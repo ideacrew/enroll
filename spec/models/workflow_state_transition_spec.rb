@@ -5,7 +5,7 @@ RSpec.describe WorkflowStateTransition, type: :model do
   it { should validate_presence_of :transition_at }
 
   let(:from_state) { "applicant" }
-  let(:to_state) { "approved" }
+  let(:to_state) { "determined" }
   let(:transition_at) { Time.now }
 
   describe ".new" do

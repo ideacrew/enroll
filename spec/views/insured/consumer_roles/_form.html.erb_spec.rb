@@ -12,6 +12,7 @@ RSpec.describe "insured/consumer_roles/_form.html.erb" do
       person.consumer_role.build_nested_models_for_person
       mock_form = ActionView::Helpers::FormBuilder.new(:person, person, helper, {})
       stub_template "shared/_consumer_fields.html.erb" => ''
+      stub_template "shared/_modal_support_text_household.html.erb" => '<b> Is this person applying for coverage ? </b> <br> <br> If you need coverage, select ‘yes’. If you’re applying for coverage for someone else, but don’t need coverage for yourself, select ‘no’. If you don’t need or qualify for coverage, but someone in your family or that you include on your tax return does, you can apply on their behalf.'
       sign_in current_user
       allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
       assign(:consumer_role, person.consumer_role)
@@ -55,6 +56,7 @@ RSpec.describe "insured/consumer_roles/_form.html.erb" do
       @person.consumer_role.build_nested_models_for_person
       mock_form = ActionView::Helpers::FormBuilder.new(:person, @person, helper, {})
       stub_template "shared/_consumer_fields.html.erb" => ''
+      stub_template "shared/_modal_support_text_household.html.erb" => '<b> Is this person applying for coverage ? </b> <br> <br> If you need coverage, select ‘yes’. If you’re applying for coverage for someone else, but don’t need coverage for yourself, select ‘no’. If you don’t need or qualify for coverage, but someone in your family or that you include on your tax return does, you can apply on their behalf.'
       allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
       assign(:consumer_role, @person.consumer_role)
       assign(:person, @person)
@@ -89,6 +91,7 @@ RSpec.describe "insured/consumer_roles/_form.html.erb" do
       @person.consumer_role.build_nested_models_for_person
       mock_form = ActionView::Helpers::FormBuilder.new(:person, @person, helper, {})
       stub_template "shared/_consumer_fields.html.erb" => ''
+      stub_template "shared/_modal_support_text_household.html.erb" => '<b> Is this person applying for coverage ? </b> <br> <br> If you need coverage, select ‘yes’. If you’re applying for coverage for someone else, but don’t need coverage for yourself, select ‘no’. If you don’t need or qualify for coverage, but someone in your family or that you include on your tax return does, you can apply on their behalf.'
       #returning false for everyone except hbx_staff
       allow(view).to receive(:policy_helper).and_return(double("ConsumerRole", can_view_application_types?: false), double("FamilyPolicy", updateable?: true))
 

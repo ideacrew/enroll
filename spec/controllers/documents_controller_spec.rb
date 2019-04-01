@@ -1,11 +1,11 @@
 require 'rails_helper'
 
 RSpec.describe DocumentsController, :type => :controller do
-  let(:user) { FactoryGirl.create(:user) }
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+  let!(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+  let!(:user) { FactoryGirl.create(:user, person: person) }
   let(:consumer_role) {FactoryGirl.build(:consumer_role)}
   let(:document) {FactoryGirl.build(:vlp_document)}
-  let(:family)  {FactoryGirl.create(:family, :with_primary_family_member)}
+  let!(:family)  {FactoryGirl.create(:family, :with_primary_family_member, person: person)}
   let(:hbx_enrollment) { FactoryGirl.build(:hbx_enrollment) }
   let(:ssn_type) { FactoryGirl.build(:verification_type, type_name: 'Social Security Number') }
   let(:dc_type) { FactoryGirl.build(:verification_type, type_name: 'DC Residency') }
@@ -167,5 +167,39 @@ RSpec.describe DocumentsController, :type => :controller do
         expect(response).to redirect_to :back
       end
     end
+
+    #TODO: Needs refactor after assisted_verification structure is refactored
+    # context "assisted verification reason inputs" do
+    #
+    #   before :each do
+    #     allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
+    #     assisted_verification.assisted_verification_documents << [FactoryGirl.build(:assisted_verification_document)]
+    #   end
+    #
+    #   let!(:application) { FactoryGirl.create(:application, family: family) }
+    #   let!(:applicant) { FactoryGirl.create(:applicant, application: application, family_member_id: family.primary_applicant.id) }
+    #   let!(:assisted_verification) { FactoryGirl.create(:assisted_verification, applicant: applicant, verification_type: "MEC") }
+    #
+    #
+    #   it "should not update verification attributes without verification reason" do
+    #     post :update_verification_type, { person_id: person.id,
+    #                                       verification_type: "MEC",
+    #                                       verification_reason: "",
+    #                                       family_member_id: family.primary_applicant.id }
+    #     applicant.reload
+    #     expect(applicant.assisted_income_reason).to eq nil
+    #   end
+    #
+    #   (VlpDocument::VERIFICATION_REASONS + AssistedVerificationDocument::VERIFICATION_REASONS).uniq.each do |reason|
+    #     it "should update verification attributes for #{reason} type" do
+    #       post :update_verification_type, { person_id: person.id,
+    #                                         verification_type: "MEC",
+    #                                         verification_reason: reason,
+    #                                         family_member_id: family.primary_applicant.id }
+    #       applicant.reload
+    #       expect(applicant.assisted_mec_reason).to eq (reason)
+    #     end
+    #   end
+    # end
   end
 end

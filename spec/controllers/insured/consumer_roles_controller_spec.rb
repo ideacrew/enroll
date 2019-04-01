@@ -547,6 +547,5 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
         expect(response).to redirect_to(edit_insured_consumer_role_path(user.person.consumer_role.id))
       end
     end
-
   end
 end
