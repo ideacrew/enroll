@@ -23,13 +23,13 @@ RSpec.describe PeopleController, dbclean: :after_each do
   describe "POST create" do
     context "with valid attributes" do 
       it 'should add a new person' do 
-        expect { post :create, person: FactoryBot.attributes_for(:person) }.to change(Person,:count).by(0)
+        expect { post :create, params: {person: FactoryBot.attributes_for(:person)} }.to change(Person,:count).by(0)
       end
     end
 
     context "with invalid attributes"  do
       it 'should not add a new person' do  
-        expect { post :create, person: FactoryBot.attributes_for(:person,:with_bad_mailing_address) }.to_not change(Person,:count)
+        expect { post :create, params: {person: FactoryBot.attributes_for(:person,:with_bad_mailing_address)} }.to_not change(Person,:count)
       end
     end
   end
@@ -56,7 +56,7 @@ RSpec.describe PeopleController, dbclean: :after_each do
       allow(person).to receive(:has_active_consumer_role?).and_return(false)
       person_attributes[:addresses_attributes] = addresses_attributes
       sign_in user
-      post :update, id: person.id, person: person_attributes
+      post :update, params: {id: person.id, person: person_attributes}
     end
 
 
@@ -74,7 +74,7 @@ RSpec.describe PeopleController, dbclean: :after_each do
     context "when individual" do
 
       before do
-        allow(request).to receive(:referer).and_return("insured/families/personal")
+        request.headers.merge!(referer: "insured/families/personal")
         allow(person).to receive(:has_active_consumer_role?).and_return(true)
       end
       it "update person" do
@@ -82,8 +82,8 @@ RSpec.describe PeopleController, dbclean: :after_each do
         allow(vlp_document).to receive(:save).and_return(true)
         consumer_role_attributes[:vlp_documents_attributes] = vlp_documents_attributes
         person_attributes[:consumer_role_attributes] = consumer_role_attributes
-
-        post :update, id: person.id, person: person_attributes
+        # binding.pry
+        post :update,  params: {id: person.id, person: person_attributes}
         expect(response).to redirect_to(personal_insured_families_path)
         expect(assigns(:person)).not_to be_nil
         expect(flash[:notice]).to eq 'Person was successfully updated.'
@@ -93,7 +93,7 @@ RSpec.describe PeopleController, dbclean: :after_each do
         allow(person).to receive(:update_attributes).and_return(true)
         person_attributes.merge!({"is_applying_coverage" => "false"})
 
-        post :update, id: person.id, person: person_attributes
+        post :update, params: {id: person.id, person: person_attributes}
         expect(assigns(:person).consumer_role.is_applying_coverage).to eq false
       end
     end
@@ -104,7 +104,7 @@ RSpec.describe PeopleController, dbclean: :after_each do
         allow(controller).to receive(:get_census_employee).and_return(census_employee)
         allow(person).to receive(:update_attributes).and_return(true)
 
-        post :update, id: person.id, person: person_attributes
+        post :update, params: {id: person.id, person: person_attributes}
         expect(response).to redirect_to(family_account_path)
         expect(flash[:notice]).to eq 'Person was successfully updated.'
       end
