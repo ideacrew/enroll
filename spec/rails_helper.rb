@@ -51,7 +51,7 @@ RSpec.configure do |config|
   DatabaseCleaner.strategy = :truncation, {:except => %w[translations]}
 
   config.after(:example, :dbclean => :after_each) do
-    DatabaseCleaner.clean
+    # DatabaseCleaner.clean
 #    TimeKeeper.set_date_of_record_unprotected!(Date.current)
   end
 

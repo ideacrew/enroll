@@ -2,6 +2,7 @@ require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
+
 RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   context "set_current_user with no person" do
     let(:user) { FactoryBot.create(:user, person: person) }
@@ -399,19 +400,19 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
     it "assigns variable to change QLE to IVL flow" do
       allow(person).to receive(:has_multiple_roles?).and_return(true)
-      get :manage_family, market: "shop_market_events"
+      get :manage_family, params: {market: "shop_market_events"}
       expect(assigns(:manually_picked_role)).to eq "shop_market_events"
     end
 
     it "assigns variable to change QLE to Employee flow" do
       allow(person).to receive(:has_multiple_roles?).and_return(true)
-      get :manage_family, market: "individual_market_events"
+      get :manage_family, params: {market: "individual_market_events"}
       expect(assigns(:manually_picked_role)).to eq "individual_market_events"
     end
 
     it "doesn't assign the variable to show different flow for QLE" do
       allow(person).to receive(:has_multiple_roles?).and_return(false)
-      get :manage_family, market: "shop_market_events"
+      get :manage_family, params: {market: "shop_market_events"}
       expect(assigns(:manually_picked_role)).to eq nil
     end
   end
@@ -469,7 +470,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       allow(user).to receive(:has_hbx_staff_role?).and_return(false)
       allow(person).to receive(:active_employee_roles).and_return(employee_role)
       allow(family).to receive_message_chain("special_enrollment_periods.where").and_return([special_enrollment_period])
-      get :find_sep, hbx_enrollment_id: "2312121212", change_plan: "change_plan"
+      get :find_sep, params: {hbx_enrollment_id: "2312121212", change_plan: "change_plan"}
     end
 
     it "should be a redirect to edit insured person" do
@@ -511,7 +512,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
     context 'when its initial enrollment' do
       before :each do
-        post :record_sep, qle_id: @qle.id, qle_date: Date.today
+        post :record_sep, params: {qle_id: @qle.id, qle_date: Date.today}
       end
 
       it "should redirect" do
@@ -525,7 +526,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
       before :each do
         allow(@family).to receive(:enrolled_hbx_enrollments).and_return([double])
-        post :record_sep, qle_id: @qle.id, qle_date: Date.today
+        post :record_sep, params: {qle_id: @qle.id, qle_date: Date.today}
       end
 
       it "should redirect with change_plan parameter" do
@@ -546,7 +547,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
     context "#check_marriage_reason" do
       it "renders the check_marriage reason template" do
-        xhr :get, 'check_marriage_reason', :date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => @qle.id, :format => 'js'
+        get 'check_marriage_reason', params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => @qle.id, :format => 'js'}, xhr: true
         expect(response).to have_http_status(:success)
         expect(response).to render_template(:check_marriage_reason)
         expect(assigns(:qle_date_calc)).to eq assigns(:qle_date) - Settings.aca.qle.with_in_sixty_days.days
@@ -555,20 +556,20 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
     context "#check_move_reason" do
       it "renders the 'check_move_reason' template" do
-        xhr :get, 'check_move_reason', :date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => @qle.id, :format => 'js'
+     get 'check_move_reason', params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => @qle.id, :format => 'js'}, xhr: true
         expect(response).to have_http_status(:success)
         expect(response).to render_template(:check_move_reason)
         expect(assigns(:qle_date_calc)).to eq assigns(:qle_date) - Settings.aca.qle.with_in_sixty_days.days
       end
 
       it "returns qualified_date as true" do
-        xhr :get, 'check_move_reason', :date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => @qle.id, :format => 'js'
+     get 'check_move_reason', params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => @qle.id, :format => 'js'}, xhr: true
         expect(response).to have_http_status(:success)
         expect(assigns['qualified_date']).to eq(true)
       end
 
       it "returns qualified_date as false" do
-        xhr :get, 'check_move_reason', :date_val => (TimeKeeper.date_of_record + 31.days).strftime("%m/%d/%Y"), :qle_id => @qle.id, :format => 'js'
+     get 'check_move_reason',  params: {:date_val => (TimeKeeper.date_of_record + 31.days).strftime("%m/%d/%Y"), :qle_id => @qle.id, :format => 'js'}, xhr: true
         expect(response).to have_http_status(:success)
         expect(assigns['qualified_date']).to eq(false)
       end
@@ -576,19 +577,19 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
     context "#check_insurance_reason" do
       it "renders the 'check_insurance_reason' template" do
-        xhr :get, 'check_insurance_reason', :date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => @qle.id, :format => 'js'
+     get 'check_insurance_reason',  params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => @qle.id, :format => 'js'}, xhr: true
         expect(response).to have_http_status(:success)
         expect(response).to render_template(:check_insurance_reason)
       end
 
       it "returns qualified_date as true" do
-        xhr :get, 'check_insurance_reason', :date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => @qle.id, :format => 'js'
+     get 'check_insurance_reason',params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => @qle.id, :format => 'js'}, xhr: true
         expect(response).to have_http_status(:success)
         expect(assigns['qualified_date']).to eq(true)
       end
 
       it "returns qualified_date as false" do
-        xhr :get, 'check_insurance_reason', :date_val => (TimeKeeper.date_of_record + 31.days).strftime("%m/%d/%Y"), :qle_id => @qle.id, :format => 'js'
+     get 'check_insurance_reason', params: {:date_val => (TimeKeeper.date_of_record + 31.days).strftime("%m/%d/%Y"), :qle_id => @qle.id, :format => 'js'}, xhr: true
         expect(response).to have_http_status(:success)
         expect(assigns['qualified_date']).to eq(false)
       end
@@ -603,13 +604,13 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     end
 
     it "renders the 'check_qle_date' template" do
-      xhr :get, 'check_qle_date', :date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :format => 'js'
+   get 'check_qle_date', params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :format => 'js'}, xhr: true
       expect(response).to have_http_status(:success)
     end
 
     describe "with valid params" do
       it "returns qualified_date as true" do
-        xhr :get, 'check_qle_date', :date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :format => 'js'
+     get 'check_qle_date',params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :format => 'js'}, xhr: true
         expect(response).to have_http_status(:success)
         expect(assigns['qualified_date']).to eq(true)
       end
@@ -618,12 +619,12 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     describe "with invalid params" do
 
       it "returns qualified_date as false for invalid future date" do
-        xhr :get, 'check_qle_date', {:date_val => (TimeKeeper.date_of_record + 31.days).strftime("%m/%d/%Y"), :format => 'js'}
+     get 'check_qle_date',params: {:date_val => (TimeKeeper.date_of_record + 31.days).strftime("%m/%d/%Y"), :format => 'js'}, xhr: true
         expect(assigns['qualified_date']).to eq(false)
       end
 
       it "returns qualified_date as false for invalid past date" do
-        xhr :get, 'check_qle_date', {:date_val => (TimeKeeper.date_of_record - 61.days).strftime("%m/%d/%Y"), :format => 'js'}
+     get 'check_qle_date', params: {:date_val => (TimeKeeper.date_of_record - 61.days).strftime("%m/%d/%Y"), :format => 'js'}, xhr: true
         expect(assigns['qualified_date']).to eq(false)
       end
     end
@@ -640,7 +641,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
       it "future_qualified_date return true/false when qle market kind is shop" do
         date = TimeKeeper.date_of_record.strftime("%m/%d/%Y")
-        xhr :get, :check_qle_date, date_val: date, qle_id: qle.id, format: :js
+     get :check_qle_date,params: {date_val: date, qle_id: qle.id, format: :js}
         expect(response).to have_http_status(:success)
         expect(assigns(:future_qualified_date)).to eq(false)
       end
@@ -649,7 +650,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         qle = FactoryBot.build(:qualifying_life_event_kind, market_kind: "individual")
         allow(QualifyingLifeEventKind).to receive(:find).and_return(qle)
         date = TimeKeeper.date_of_record.strftime("%m/%d/%Y")
-        xhr :get, :check_qle_date, date_val: date, qle_id: qle.id, format: :js
+        get :check_qle_date, params: {date_val: date, qle_id: qle.id, format: :js}
         expect(response).to have_http_status(:success)
         expect(assigns(:qualified_date)).to eq true
         expect(assigns(:future_qualified_date)).to eq(nil)
@@ -678,7 +679,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       context "normal qle event" do
         it "should return true" do
           date = TimeKeeper.date_of_record.strftime("%m/%d/%Y")
-          xhr :get, :check_qle_date, date_val: date, format: :js
+       get :check_qle_date,params: {date_val: date, format: :js}
           expect(response).to have_http_status(:success)
           expect(assigns(:qualified_date)).to eq true
         end
@@ -686,7 +687,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         it "should return false" do
           sign_in user
           date = (TimeKeeper.date_of_record + 40.days).strftime("%m/%d/%Y")
-          xhr :get, :check_qle_date, date_val: date, format: :js
+       get :check_qle_date, params: {date_val: date, format: :js}
           expect(response).to have_http_status(:success)
           expect(assigns(:qualified_date)).to eq false
         end
@@ -701,21 +702,21 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
         it "should return true" do
           date = (TimeKeeper.date_of_record + 8.days).strftime("%m/%d/%Y")
-          xhr :get, :check_qle_date, date_val: date, qle_id: qle.id, format: :js
+       get :check_qle_date, params: {date_val: date, qle_id: qle.id, format: :js}
           expect(response).to have_http_status(:success)
           expect(assigns(:qualified_date)).to eq true
         end
 
         it "should return false" do
           date = (TimeKeeper.date_of_record - 8.days).strftime("%m/%d/%Y")
-          xhr :get, :check_qle_date, date_val: date, qle_id: qle.id, format: :js
+       get :check_qle_date, params: {date_val: date, qle_id: qle.id, format: :js}
           expect(response).to have_http_status(:success)
           expect(assigns(:qualified_date)).to eq false
         end
 
         it "should return false and also notify sep request denied" do
           date = TimeKeeper.date_of_record.prev_month.strftime("%m/%d/%Y")
-          xhr :get, :check_qle_date, qle_id: qle.id, date_val: date, qle_title: qle.title, qle_reporting_deadline: date, qle_event_on: date, format: :js
+       get :check_qle_date, params: {qle_id: qle.id, date_val: date, qle_title: qle.title, qle_reporting_deadline: date, qle_event_on: date, format: :js}
           expect(assigns(:qualified_date)).to eq false
 
           expect(subject.notifier).to receive(:notify) do |event_name, payload|
@@ -735,7 +736,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
           allow(QualifyingLifeEventKind).to receive(:find).and_return(qle)
           allow(qle).to receive(:is_dependent_loss_of_coverage?).and_return(true)
           allow(qle).to receive(:employee_gaining_medicare).and_return(effective_on_options)
-          xhr :get, :check_qle_date, date_val: date, qle_id: qle.id, format: :js
+       get :check_qle_date, params: {date_val: date, qle_id: qle.id, format: :js}
           expect(response).to have_http_status(:success)
           expect(assigns(:effective_on_options)).to eq effective_on_options
         end
@@ -750,7 +751,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
           FactoryBot.build(:broker_agency_account, family: family, employer_profile: nil)
         ]
         allow(Family).to receive(:find).and_return family
-        delete :delete_consumer_broker , :id => family.id
+        delete :delete_consumer_broker , params: {:id => family.id}
       end
 
       it "should delete consumer broker" do
@@ -769,7 +770,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     end
 
     it "displays the upload_notice_form view" do
-      xhr :get, :upload_notice_form
+   get :upload_notice_form
       expect(response).to have_http_status(:success)
       expect(response).to render_template(:upload_notice_form)
     end
@@ -806,7 +807,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     end
 
     it "when successful displays 'File Saved'" do
-      post :upload_notice, {:file => file, :subject=> subject}
+      post :upload_notice, params: {:file => file, :subject=> subject}
       expect(flash[:notice]).to eq("File Saved")
       expect(response).to have_http_status(:found)
       expect(response).to redirect_to request.env["HTTP_REFERER"]
@@ -903,7 +904,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       allow(person).to receive(:primary_family).and_return(family)
       allow(hbx_enrollment).to receive(:reset_dates_on_previously_covered_members).and_return(true)
       sign_in(user)
-      get :purchase, id: family.id, hbx_enrollment_id: hbx_enrollment.id, terminate: 'terminate'
+      get :purchase, params:{id: family.id, hbx_enrollment_id: hbx_enrollment.id, terminate: 'terminate'}
     end
 
     it "should get hbx_enrollment" do
