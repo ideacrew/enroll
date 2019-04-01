@@ -49,7 +49,7 @@ gem 'mongo_session_store',      '~> 3.1'
 gem 'mongoid-autoinc',          '~> 6.0'
 gem 'mongoid-history',          '~> 0.8'
 # gem 'mongoid-versioning',       '~> 1.2.0'
-gem 'mongoid_userstamp',        '~> 0.4'
+gem 'mongoid_userstamp',        '~> 0.4', :path => "./project_gems/mongoid_userstamp-0.4.0"
 gem 'mongoid_rails_migrations', '~> 1.2'
 
 ## General gems
