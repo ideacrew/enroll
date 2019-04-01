@@ -37,7 +37,7 @@ RSpec.describe Exchanges::AnnouncementsController do
         before :each do
           allow(user).to receive(:has_hbx_staff_role?).and_return true
           sign_in user
-          get :index, filter: 'all'
+          get :index, params: {filter: 'all'}
         end
 
         it "get all announcements" do
@@ -52,7 +52,7 @@ RSpec.describe Exchanges::AnnouncementsController do
 
     it "should redirect when login without hbx_staff" do
       sign_in user_no_person
-      post :create, announcement_params
+      post :create, params: announcement_params
       expect(response).to have_http_status(:redirect)
       expect(flash[:error]).to eq "You must be an HBX staff member"
     end
@@ -62,7 +62,7 @@ RSpec.describe Exchanges::AnnouncementsController do
         allow(user).to receive(:has_hbx_staff_role?).and_return true
         allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_admin_tabs: true))
         sign_in user
-        post :create, announcement_params
+        post :create, params: announcement_params
       end
 
       it "should redirect" do
@@ -79,7 +79,7 @@ RSpec.describe Exchanges::AnnouncementsController do
         allow(user).to receive(:has_hbx_staff_role?).and_return true
         allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_admin_tabs: false))
         sign_in user
-        post :create, announcement_params
+        post :create, params: announcement_params
       end
 
       it "should redirect" do
@@ -97,7 +97,7 @@ RSpec.describe Exchanges::AnnouncementsController do
         allow(user).to receive(:has_hbx_staff_role?).and_return true
         allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_admin_tabs: true))
         sign_in user
-        post :create, invalid_announcement_params
+        post :create, params: invalid_announcement_params
       end
 
       it "should render template" do
@@ -113,7 +113,7 @@ RSpec.describe Exchanges::AnnouncementsController do
   describe "DELETE destroy" do
     it "should redirect when login without hbx_staff" do
       sign_in user
-      delete :destroy, id: announcement.id
+      delete :destroy, params: {id: announcement.id}
       expect(response).to have_http_status(:redirect)
       expect(flash[:error]).to eq "You must be an HBX staff member"
     end
@@ -123,7 +123,7 @@ RSpec.describe Exchanges::AnnouncementsController do
         allow(user).to receive(:has_hbx_staff_role?).and_return true
         allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_admin_tabs: true))
         sign_in user
-        delete :destroy, id: announcement.id
+        delete :destroy,params: {id: announcement.id}
       end
 
       it "should redirect" do
@@ -140,7 +140,7 @@ RSpec.describe Exchanges::AnnouncementsController do
         allow(user).to receive(:has_hbx_staff_role?).and_return true
         allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_admin_tabs: false))
         sign_in user
-        post :destroy, id: announcement.id
+        post :destroy,params: {id: announcement.id}
       end
 
       it "should redirect" do
@@ -156,7 +156,7 @@ RSpec.describe Exchanges::AnnouncementsController do
   describe "GET dismiss" do
     it "should update session" do
       sign_in user
-      get :dismiss, content: "hello announcement"
+      get :dismiss, params: {content: "hello announcement"}
       expect(session[:dismiss_announcements]).to eq ["hello announcement"].to_json
     end
   end
