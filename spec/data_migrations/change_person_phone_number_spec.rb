@@ -15,10 +15,15 @@ describe ChangePersonPhoneNumber do
     let(:person) { FactoryBot.create(:person) }
     let(:phone) {FactoryGril.create(:phone,:for_testing, person:person)}
     before(:each) do
-      allow(ENV).to receive(:[]).with("hbx_id").and_return(person.hbx_id)
-      allow(ENV).to receive(:[]).with("phone_kind").and_return("home")
-      allow(ENV).to receive(:[]).with("full_phone_number").and_return("20212345678")
-      allow(ENV).to receive(:[]).with("country_code").and_return("1")
+      ENV['hbx_id'] = person.hbx_id
+      ENV['phone_kind'] = "home"
+      ENV['full_phone_number'] = "20212345678"
+      ENV['country_code'] = '1'
+
+      # allow(ENV).to receive(:[]).with("hbx_id").and_return(person.hbx_id)
+      # allow(ENV).to receive(:[]).with("phone_kind").and_return("home")
+      # allow(ENV).to receive(:[]).with("full_phone_number").and_return("20212345678")
+      # allow(ENV).to receive(:[]).with("country_code").and_return("1")
     end
     it "should have the correct country code" do
       subject.migrate
@@ -55,10 +60,15 @@ describe ChangePersonPhoneNumber do
     let(:person) { FactoryBot.create(:person) }
     let(:phone) {FactoryGril.create(:phone,:for_testing, person:person)}
     before(:each) do
-      allow(ENV).to receive(:[]).with("hbx_id").and_return(person.hbx_id)
-      allow(ENV).to receive(:[]).with("phone_kind").and_return("home")
-      allow(ENV).to receive(:[]).with("full_phone_number").and_return("20212345678")
-      allow(ENV).to receive(:[]).with("country_code").and_return("")
+      ENV['hbx_id'] = person.hbx_id
+      ENV['phone_kind'] = "home"
+      ENV['full_phone_number'] = "20212345678"
+      ENV['country_code'] = ''
+
+      # allow(ENV).to receive(:[]).with("hbx_id").and_return(person.hbx_id)
+      # allow(ENV).to receive(:[]).with("phone_kind").and_return("home")
+      # allow(ENV).to receive(:[]).with("full_phone_number").and_return("20212345678")
+      # allow(ENV).to receive(:[]).with("country_code").and_return("")
     end
 
     it "should have the correct extension" do
