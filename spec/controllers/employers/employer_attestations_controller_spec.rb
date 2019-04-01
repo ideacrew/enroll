@@ -10,7 +10,7 @@ RSpec.describe Employers::EmployerAttestationsController do
     it "should render the edit template" do
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
       sign_in(user)
-      xhr :get, :edit, {id: employer_profile.id}
+      get :edit, params: {id: employer_profile.id}, xhr: true
       expect(response).to have_http_status(:success)
     end
   end
@@ -20,7 +20,7 @@ RSpec.describe Employers::EmployerAttestationsController do
 
     it "should render the edit template" do
       sign_in(user)
-      xhr :get, :new
+      get :new, xhr: true
       expect(response).to have_http_status(:success)
     end
   end
@@ -36,7 +36,7 @@ RSpec.describe Employers::EmployerAttestationsController do
       allow(Aws::S3Storage).to receive(:save).and_return(doc_uri)
 
       sign_in(user)
-      post :create, {id: employer_profile.id}
+      post :create, params: {id: employer_profile.id}
     end
 
     context 'when file upload failed' do
@@ -70,7 +70,7 @@ RSpec.describe Employers::EmployerAttestationsController do
       allow(attestation_doc).to receive(:submit_review).and_return(true)
 
       sign_in(user)
-      put :update, {id: attestation_doc.employer_profile.id, employer_attestation_id: attestation_doc.id, status: 'accepted'}
+      put :update, params: {id: attestation_doc.employer_profile.id, employer_attestation_id: attestation_doc.id, status: 'accepted'}
 
       expect(flash[:notice]).to eq "Employer attestation updated successfully"
       expect(response).to have_http_status(:redirect)
