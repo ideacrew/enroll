@@ -733,13 +733,30 @@ Then(/^.+ should see the new dependent form$/) do
   expect(page).to have_content('Confirm Member')
 end
 
-When(/^.+ enters? the dependent info of Sorens daughter$/) do
+When(/^.+ enters? the dependent info of .+ daughter$/) do
   fill_in 'dependent[first_name]', with: 'Cynthia'
   fill_in 'dependent[last_name]', with: 'White'
-  fill_in 'jq_datepicker_ignore_dependent[dob]', with: '01/15/2011'
+  date = TimeKeeper.date_of_record - 28.years
+  dob = date.to_s
+  fill_in 'jq_datepicker_ignore_dependent[dob]', with: dob
   find(:xpath, "//p[@class='label'][contains(., 'This Person Is')]").click
   find(:xpath, "//li[@data-index='3'][contains(., 'Child')]").click
   find(:xpath, "//label[@for='radio_female']").click
+end
+
+When(/^.+ enters? the dependent info of Patrick wife$/) do
+  fill_in 'dependent[first_name]', with: 'Cynthia'
+  fill_in 'dependent[last_name]', with: 'Patrick'
+  fill_in 'dependent[ssn]', with: '123445678'
+  fill_in 'jq_datepicker_ignore_dependent[dob]', with: '01/15/1996'
+  find(:xpath, "//p[@class='label'][contains(., 'This Person Is')]").click
+  find(:xpath, "//li[@data-index='1'][contains(., 'Spouse')]").click
+  find(:xpath, "//label[@for='radio_female']").click
+  fill_in 'dependent[addresses][0][address_1]', with: '123 STREET'
+  fill_in 'dependent[addresses][0][city]', with: 'WASHINGTON'
+  find(:xpath, "//p[@class='label'][contains(., 'SELECT STATE')]").click
+  find(:xpath, "//li[@data-index='24'][contains(., 'MA')]").click
+  fill_in 'dependent[addresses][0][zip]', with: '01001'
 end
 
 When(/^.+ clicks? confirm member$/) do
@@ -1087,4 +1104,24 @@ end
 And(/^Hbx Admin click on Employers/) do
   find_link("Employers").visible?
   click_link("Employers")
+end
+
+And(/^.+ sees the (.*) page and clicks Continue$/) do |which_page|
+  expect(page).to have_content(which_page)
+  find("#btn-continue").click
+end
+
+And(/^.+ clicks Confirm$/) do
+  click_link 'Confirm'
+end
+
+And(/^.+ selects the first plan available$/) do
+  links = page.all('a')
+  first_plan_html_class = "btn btn-default btn-right plan-select select interaction-click-control-select-plan"
+  first_plan_select_link = links.detect { |link| link.text == "Select Plan" }
+  first_plan_select_link.trigger('click')
+end
+
+When(/^.+ clicks Shop for new plan button$/) do
+  click_button 'Shop for new plan'
 end
