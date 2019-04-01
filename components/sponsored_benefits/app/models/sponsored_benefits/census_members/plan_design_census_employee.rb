@@ -129,6 +129,10 @@ module SponsoredBenefits
         plan_design_organization.employer_profile
       end
 
+      def census_dependents_count
+        census_dependents.all.count
+      end
+
       def plan_design_organization
         plan_design_proposal.plan_design_organization
       end
