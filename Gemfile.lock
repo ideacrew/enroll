@@ -29,6 +29,12 @@ GIT
       ttfunk (~> 1.0.3)
 
 PATH
+  remote: project_gems/mongoid_userstamp-0.4.0
+  specs:
+    mongoid_userstamp (0.4.0)
+      mongoid (>= 3.0.4)
+
+PATH
   remote: components/benefit_markets
   specs:
     benefit_markets (0.0.1)
@@ -1193,8 +1199,6 @@ GEM
       mongoid (>= 4.0.0)
       rails (>= 4.2.0)
       railties (>= 4.2.0)
-    mongoid_userstamp (0.4.0)
-      mongoid (>= 3.0.4)
     mono_logger (1.1.0)
     msgpack (1.2.9)
     multi_json (1.13.1)
@@ -1519,7 +1523,7 @@ DEPENDENCIES
   mongoid-history (~> 0.8)
   mongoid-rspec (~> 4)
   mongoid_rails_migrations (~> 1.2)
-  mongoid_userstamp (~> 0.4)
+  mongoid_userstamp (~> 0.4)!
   newrelic_rpm (~> 5.0)
   nokogiri (~> 1.10)
   nokogiri-happymapper (~> 0.8.0)
