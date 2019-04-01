@@ -23,7 +23,7 @@ describe UpdateBenefitGroupAssignmentStartDate, dbclean: :after_each do
     let(:census_employee) { FactoryBot.create(:census_employee, employer_profile_id: plan_year.employer_profile.id)}
 
     before(:each) do
-      allow(ENV).to receive(:[]).with("fein").and_return(plan_year.employer_profile.parent.fein)
+      ENV["fein"] = plan_year.employer_profile.parent.fein
       allow(benefit_group_assignment).to receive(:plan_year).and_return(plan_year)
       benefit_group_assignments = [benefit_group_assignment]
       allow(CensusEmployee).to receive(:find).and_return(census_employee)
