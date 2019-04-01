@@ -2,6 +2,7 @@ class BenefitGroup
 
   include Mongoid::Document
   include Mongoid::Timestamps
+  include Config::AcaModelConcern
 
     embedded_in :plan_year
 
