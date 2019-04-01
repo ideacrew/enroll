@@ -31,15 +31,15 @@ RSpec.describe Exchanges::SecurityQuestionsController, dbclean: :after_each do
 
   describe 'POST create' do
     context 'When create a question with invalid params' do
-      before { post :create, security_question: { title: nil } }
-      it { expect(assigns(:question).title).to be_nil }
+      before { post :create, params:{security_question: { title: nil } } }
+      it { expect(assigns(:question).title).to be_empty }
       it { expect(assigns(:question).errors.full_messages).to eq(['Title can\'t be blank']) }
       it { expect(response).to have_http_status(:success) }
       it { expect(response).to render_template('exchanges/security_questions/new') }
     end
 
     context 'When question is created successfully' do
-      before { post :create, security_question: { title: 'First Question' } }
+      before { post :create, params: {security_question: { title: 'First Question' } } }
       it { expect(assigns(:question)).to be_a(SecurityQuestion) }
       it { expect(SecurityQuestion.all).not_to eq([]) }
       it { expect(assigns(:question).title).to eq('First Question') }
@@ -48,7 +48,7 @@ RSpec.describe Exchanges::SecurityQuestionsController, dbclean: :after_each do
   end
 
   describe 'GET edit' do
-    before { get :edit, id: question.id }
+    before { get :edit, params: {id: question.id } }
     it { expect(assigns(:question)).to eq(question) }
     it { expect(response).to have_http_status(:success) }
     it { expect(response).to render_template('exchanges/security_questions/edit') }
@@ -57,12 +57,16 @@ RSpec.describe Exchanges::SecurityQuestionsController, dbclean: :after_each do
   describe 'PUT update' do
     let(:true_if_allowed) { true }
     let(:title) { 'Updated title' }
+    let(:params) {{ title: title } }
+    let(:nil_params) {{ title: "" } }
+    let(:strong_params){ActionController::Parameters.new(params).permit(:title)}
+    let(:strong_nil_params){ActionController::Parameters.new(nil_params).permit(:title)}
+
     before do
       allow(question).to receive(:safe_to_edit_or_delete?).and_return(true_if_allowed)
-      allow(question).to receive(:update_attributes).with({ title: nil }).and_return(false)
-      allow(question).to receive(:update_attributes).with({ title: 'Updated title' }).and_return(true)
+      allow(question).to receive(:update_attributes).with( strong_params ).and_return(true)
       allow(question).to receive(:title).and_return(title)
-      put :update, id: question.id, security_question: { title: title }
+      put :update, params: {id: question.id, security_question: strong_params }
     end
 
     context 'When update question with valid title' do
@@ -80,10 +84,11 @@ RSpec.describe Exchanges::SecurityQuestionsController, dbclean: :after_each do
     end
 
     context 'When update question with blank title' do
-      let(:title) { nil }
       let(:errors) { double(:errors, full_messages: ["Title can't be blank"]) }
       before do
         allow(question).to receive(:errors).and_return(errors)
+        allow(question).to receive(:update_attributes).with(strong_nil_params).and_return(false)
+        put :update,params: {id: question.id, security_question: strong_nil_params}
       end
       it { expect(assigns(:question)).to eq(question) }
       it { expect(assigns(:question).errors.full_messages).to eq(['Title can\'t be blank']) }
@@ -99,7 +104,7 @@ RSpec.describe Exchanges::SecurityQuestionsController, dbclean: :after_each do
       allow(question).to receive(:safe_to_edit_or_delete?).and_return(true_if_allowed)
       expect(question).to receive(:destroy).exactly(this_many).times
 
-      delete :destroy, id: question.id
+      delete :destroy, params: { id: question.id }
     end
 
     it { expect(response).to redirect_to('/exchanges/security_questions') }
