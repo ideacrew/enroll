@@ -1164,6 +1164,28 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
   #
   # end
 
+  context '.coverage_effective_on' do
+
+    let(:census_employee) { CensusEmployee.new(**valid_params) }
+    let(:benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
+
+    before do
+      census_employee.benefit_group_assignments = [benefit_group_assignment]
+      census_employee.save!
+    end
+
+    it 'should return a non nil date when a benefit group assignment has a benefit group to a non expired PY' do
+      benefit_group.plan_year.update_attributes(:aasm_state => 'published')
+      expect(census_employee.coverage_effective_on).not_to eq nil
+    end
+
+    it 'should return a date equal to the newly_eligible_earlist_eligible_date when a benefit group assignment has a benefit group to an expired PY' do
+      benefit_group.plan_year.update_attributes(:aasm_state => 'expired')
+      expect(census_employee.coverage_effective_on).to eq census_employee.newly_eligible_earlist_eligible_date
+    end
+
+  end
+
   context '.new_hire_enrollment_period' do
 
     let(:census_employee) { CensusEmployee.new(**valid_params) }
