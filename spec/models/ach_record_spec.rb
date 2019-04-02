@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe AchRecord, :type => :model do
+RSpec.describe AchRecord, :type => :model, dbclean: :after_each do
   let(:bank_name) { "M&T Bank"}
   let(:routing_number) { "123456789" }
   let(:params) { { routing_number: routing_number, bank_name: bank_name} }

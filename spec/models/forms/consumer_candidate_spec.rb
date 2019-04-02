@@ -1,5 +1,5 @@
 require 'rails_helper'
-describe Forms::ConsumerCandidate, "asked to match a person" do
+describe Forms::ConsumerCandidate, "asked to match a person", dbclean: :after_each do
 
   let(:user){ create(:user) }
   let(:person) { create(:person, :with_ssn, user: user) }
@@ -17,7 +17,7 @@ describe Forms::ConsumerCandidate, "asked to match a person" do
   let(:subject) { Forms::ConsumerCandidate.new(params) }
 
   context "uniq ssn" do
-    
+
     context 'when ssn blank' do
       let(:params) { {:ssn => nil} }
 
@@ -33,7 +33,7 @@ describe Forms::ConsumerCandidate, "asked to match a person" do
       end
     end
 
-    context 'when ssn matches with unclaimed user account' do 
+    context 'when ssn matches with unclaimed user account' do
       let(:person) { create(:person, :with_ssn) }
 
       it "should not add errors" do
@@ -63,10 +63,10 @@ describe Forms::ConsumerCandidate, "asked to match a person" do
     end
 
     context "does not add errors when ssn & dob matches with existing person record" do
-  
+
       let(:params) { {:ssn => person.ssn, :dob => person.dob.strftime("%Y-%m-%d")} }
-    
-      it 'should not add errors' do 
+
+      it 'should not add errors' do
         subject.uniq_ssn_dob
         expect(subject.errors[:base]).to eq []
       end

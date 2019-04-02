@@ -117,7 +117,8 @@ class VlpDocument < Document
 
   field :comment, type: String
 
-  track_history :on => [:title,
+  track_history :modifier_field_optional => true,
+                :on => [:title,
                         :subject,
                         :alien_number,
                         :i94_number,

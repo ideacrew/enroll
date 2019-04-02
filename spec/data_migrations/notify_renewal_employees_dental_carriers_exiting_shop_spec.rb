@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "notify_renewal_employees_dental_carriers_exiting_shop")
 
-describe NotifyRenewalEmployeesDentalCarriersExitingShop do
+describe NotifyRenewalEmployeesDentalCarriersExitingShop, dbclean: :after_each do
 
   let(:given_task_name) { "notify_renewal_employees_dental_carriers_exiting_shop" }
   subject { NotifyRenewalEmployeesDentalCarriersExitingShop.new(given_task_name, double(:current_scope => nil)) }

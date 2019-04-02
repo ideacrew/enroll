@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "activate_or_deactivate_employer_link_for_broker")
 
-describe ActivateOrDeactivateEmployerLinkForBroker do
+describe ActivateOrDeactivateEmployerLinkForBroker, dbclean: :after_each do
 
   let(:given_task_name) { "activate_or_deactivate_employer_link_for_broker" }
   subject { ActivateOrDeactivateEmployerLinkForBroker.new(given_task_name, double(:current_scope => nil)) }
