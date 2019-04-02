@@ -472,13 +472,16 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       let(:census_employee) {FactoryBot.create(:census_employee)}
       let(:benefit_group_assignment) {FactoryBot.create(:benefit_group_assignment, benefit_group: package, census_employee: census_employee)}
       let(:application) {double(:start_on => TimeKeeper.date_of_record.beginning_of_month, :end_on => (TimeKeeper.date_of_record.beginning_of_month + 1.year) - 1.day, :aasm_state => :active)}
-      let(:package) {double("BenefitPackage", :is_a? => BenefitSponsors::BenefitPackages::BenefitPackage, :_id => "id", :plan_year => application, :benefit_application => application)}
+      let(:package) {double("BenefitPackage", :is_a? => BenefitSponsors::BenefitPackages::BenefitPackage, :_id => "id", :plan_year => application, :benefit_application => application, start_on: Date.new(2019,4,1),end_on: Date.new(2020,3,31))}
       let(:ivl_enrollment) {FactoryBot.create(:hbx_enrollment, :individual_unassisted, household: family.active_household)}
       let(:existing_shop_enrollment) {FactoryBot.create(:hbx_enrollment, :shop, household: family.active_household)}
       let(:enrollment_for_waiver) {FactoryBot.create(:hbx_enrollment, household: family.active_household, predecessor_enrollment_id: existing_shop_enrollment.id, benefit_group_assignment_id: benefit_group_assignment.id)}
+      
       before do
         allow(census_employee).to receive(:benefit_group_assignments).and_return [benefit_group_assignment]
+        # allow(package).to receive(:start_on).and_return :start_on_1
       end
+
       it "should return false if it is an ivl enrollment" do
         expect(ivl_enrollment.propogate_waiver).to eq false
       end
