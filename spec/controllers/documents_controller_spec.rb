@@ -3,8 +3,7 @@ require 'rails_helper'
 RSpec.describe DocumentsController, :type => :controller do
   let(:user) { FactoryBot.create(:user) }
   let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_family) }
-  let(:consumer_role) {FactoryBot.build(:consumer_role)}
-  let(:document) {FactoryBot.build(:vlp_document)}
+  let(:document) {FactoryBot.build( :vlp_document )}
   let(:family)  {FactoryBot.create(:family, :with_primary_family_member)}
   let(:hbx_enrollment) { FactoryBot.build(:hbx_enrollment) }
 
@@ -17,8 +16,10 @@ RSpec.describe DocumentsController, :type => :controller do
       family_member = FactoryBot.build(:family_member, person: person, family: family)
       person.families.first.family_members << family_member
       allow(FamilyMember).to receive(:find).with(family_member.id).and_return(family_member)
-      person.consumer_role.vlp_documents = [document]
-      delete :destroy, person_id: person.id, id: document.id, family_member_id: family_member.id
+      allow(family_member).to receive(:family).and_return family
+      allow(family).to receive(:update_family_document_status!).and_return true
+      person.consumer_role.vlp_documents << document
+      delete :destroy, params: {person_id: person.id, id: document.id, family_member_id: family_member.id}
     end
     it "redirects_to verification page" do
       expect(response).to redirect_to verification_insured_families_path
@@ -37,19 +38,19 @@ RSpec.describe DocumentsController, :type => :controller do
       end
 
       it "should redirect to verification" do
-        put :update, person_id: person.id, id: document.id
+        put :update, params: { person_id: person.id, id: document.id }
         expect(response).to redirect_to verification_insured_families_path
       end
 
       it "updates document status" do
-        put :update, person_id: person.id, id: document.id, :person=>{ :vlp_document=>{:comment=>"hghghg"}}, :comment => true, :status => "ready"
+        put :update, params: { person_id: person.id, id: document.id, :person=>{ :vlp_document=>{:comment=>"hghghg"}}, :comment => true, :status => "ready" }
         allow(family).to receive(:update_family_document_status!).and_return(true)
         document.reload
         expect(document.status).to eq("ready")
       end
 
       it "updates family vlp_documents_status" do
-        put :update, person_id: person.id, id: document.id
+        put :update, params: { person_id: person.id, id: document.id }
         allow(family).to receive(:update_family_document_status!).and_return(true)
       end
     end
@@ -60,12 +61,12 @@ RSpec.describe DocumentsController, :type => :controller do
       end
 
       it "should redirect to verification" do
-        put :update, person_id: person.id, id: document.id
+        put :update, params: { person_id: person.id, id: document.id }
         expect(response).to redirect_to verification_insured_families_path
       end
 
       it "updates document status" do
-        put :update, person_id: person.id, id: document.id, :status => "accept"
+        put :update, params: {person_id: person.id, id: document.id, :status => "accept" }
         allow(family).to receive(:update_family_document_status!).and_return(true)
         document.reload
         expect(document.status).to eq("accept")
@@ -74,21 +75,23 @@ RSpec.describe DocumentsController, :type => :controller do
   end
 
   describe 'POST Fed_Hub_Request' do
+    let(:consumer_role) { person.consumer_role }
     before :each do
       request.env["HTTP_REFERER"] = "http://test.com"
+      allow(consumer_role).to receive(:invoke_residency_verification!).and_return(true)
     end
     context 'Call Hub for SSA verification' do
       it 'should redirect if verification type is SSN or Citozenship' do
-        post :fed_hub_request, verification_type: 'Social Security Number',person_id: person.id, id: document.id
-        expect(response).to redirect_to :back
+        post :fed_hub_request, params: { verification_type: 'Social Security Number',person_id: person.id, id: document.id }
+        expect(response).to redirect_to "http://test.com"
         expect(flash[:success]).to eq('Request was sent to FedHub.')
       end
     end
     context 'Call Hub for Residency verification' do
       it 'should redirect if verification type is Residency' do
         person.consumer_role.update_attributes(aasm_state: 'verification_outstanding')
-        post :fed_hub_request, verification_type: 'DC Residency',person_id: person.id, id: document.id
-        expect(response).to redirect_to :back
+        post :fed_hub_request, params: { verification_type: 'DC Residency',person_id: person.id, id: document.id }
+        expect(response).to redirect_to "http://test.com"
         expect(flash[:success]).to eq('Request was sent to Local Residency.')
       end
     end
@@ -97,11 +100,11 @@ RSpec.describe DocumentsController, :type => :controller do
   describe "PUT extend due date" do
     before :each do
       request.env["HTTP_REFERER"] = "http://test.com"
-      put :extend_due_date, family_member_id: family.primary_applicant.id, verification_type: "Citizenship"
+      put :extend_due_date, params: { family_member_id: family.primary_applicant.id, verification_type: "Citizenship" }
     end
 
     it "should redirect to back" do
-      expect(response).to redirect_to :back
+      expect(response).to redirect_to "http://test.com"
     end
   end
   describe "PUT update_verification_type" do
@@ -111,10 +114,10 @@ RSpec.describe DocumentsController, :type => :controller do
 
     shared_examples_for "update verification type" do |type, reason, admin_action, updated_attr, result|
       it "updates #{updated_attr} for #{type} to #{result} with #{admin_action} admin action" do
-        post :update_verification_type, { person_id: person.id,
-                                          verification_type: type,
-                                          verification_reason: reason,
-                                          admin_action: admin_action}
+        post :update_verification_type, params: { person_id: person.id,
+                                                  verification_type: type,
+                                                  verification_reason: reason,
+                                                  admin_action: admin_action}
         person.reload
         if updated_attr == "lawful_presence_update_reason"
           expect(person.consumer_role.lawful_presence_update_reason["v_type"]).to eq(type)
@@ -149,7 +152,7 @@ RSpec.describe DocumentsController, :type => :controller do
     it 'updates verification type if verification reason is expired' do
       initial_value = person.consumer_role.lawful_presence_update_reason
       params = { person_id: person.id, verification_type: 'Citizenship', verification_reason: 'Expired', admin_action: 'return_for_deficiency'}
-      put :update_verification_type, params
+      put :update_verification_type, params: params
       person.reload
       updated_value = person.consumer_role.lawful_presence_update_reason
 
@@ -159,17 +162,14 @@ RSpec.describe DocumentsController, :type => :controller do
 
     context "redirection" do
       it "should redirect to back" do
-        post :update_verification_type, person_id: person.id
-        expect(response).to redirect_to :back
+        post :update_verification_type, params: { person_id: person.id }
+        expect(response).to redirect_to "http://test.com"
       end
     end
 
     context "verification reason inputs" do
       it "should not update verification attributes without verification reason" do
-        post :update_verification_type, { person_id: person.id,
-                                          verification_type: "Citizenship",
-                                          verification_reason: "",
-                                          admin_action: "verify"}
+        post :update_verification_type, params: { person_id: person.id, verification_type: "Citizenship", verification_reason: "", admin_action: "verify"}
         person.reload
         expect(person.consumer_role.lawful_presence_update_reason).to eq nil
       end

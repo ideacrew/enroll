@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe ShopEmployerNotices::RenewalEmployerReminderToPublishPlanyear do
+RSpec.describe ShopEmployerNotices::RenewalEmployerReminderToPublishPlanyear, dbclean: :after_each do
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
   let!(:employer_profile){ create :employer_profile}
   let!(:person){ create :person}

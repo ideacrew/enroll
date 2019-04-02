@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Users::SecurityQuestionResponsesController do
+RSpec.describe Users::SecurityQuestionResponsesController, dbclean: :after_each do
   let(:user) { double(:user, email: 'test@example.com', id: '1', person: person, security_question_responses: []) }
   let(:person) { double("Person", has_active_consumer_role?: true)}
   let(:security_question_one) { create(:security_question, title: "What was your dog's name?")}

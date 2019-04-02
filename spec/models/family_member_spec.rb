@@ -30,7 +30,7 @@ describe FamilyMember, "given a person" do
 end
 
 
-describe FamilyMember, "given a person" do
+describe FamilyMember, "given a person", dbclean: :after_each do
   let(:person) { create :person ,:with_family }
 
   it "should error when trying to save duplicate family member" do
