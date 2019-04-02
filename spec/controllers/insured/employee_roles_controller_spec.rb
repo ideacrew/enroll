@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
+RSpec.describe Insured::EmployeeRolesController, :dbclean => :around_each do
   describe "PUT update" do
     let(:employee_role_id) { "123455555" }
     let(:person_parameters) { { :first_name => "SOMDFINKETHING", :employee_role_id => employee_role_id} }
@@ -20,7 +20,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       allow(Person).to receive(:find).with(person_id).and_return(person)
       allow(person).to receive(:employee_roles).and_return([employee_role])
       allow(Forms::EmployeeRole).to receive(:new).with(person, employee_role).and_return(role_form)
-      allow(role_form).to receive(:update_attributes).with(person_parameters).and_return(save_result)
+      allow(role_form).to receive(:update_attributes).and_return(save_result)
       allow(user).to receive(:person).and_return(person)
       allow(person).to receive(:employee_roles).and_return([employee_role])
       allow(employee_role).to receive(:save!).and_return(true)
@@ -207,7 +207,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
 
     context "can construct_employee_role" do
       before :each do
-        allow(Forms::EmploymentRelationship).to receive(:new).with(employment_relationship_properties).and_return(employment_relationship)
+        allow(Forms::EmploymentRelationship).to receive(:new).and_return(employment_relationship)
         allow(Factories::EnrollmentFactory).to receive(:construct_employee_role).with(user, census_employee, employment_relationship).and_return([employee_role, family])
         allow(benefit_group).to receive(:effective_on_for).with(hired_on).and_return(effective_date)
         allow(census_employee).to receive(:is_linked?).and_return(true)
@@ -239,12 +239,12 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
 
     context "can not construct_employee_role" do
       before :each do
-        allow(Forms::EmploymentRelationship).to receive(:new).with(employment_relationship_properties).and_return(employment_relationship)
+        allow(Forms::EmploymentRelationship).to receive(:new).and_return(employment_relationship)
         allow(Factories::EnrollmentFactory).to receive(:construct_employee_role).with(user, census_employee, employment_relationship).and_return([nil, nil])
         allow(employment_relationship).to receive_message_chain(:census_employee,:employer_profile,:parent,:legal_name).and_return("legal_name")
         request.env["HTTP_REFERER"] = "/"
         sign_in(user)
-        post :create, params:{:employment_relationship => employment_relationship_properties}
+        post :create, params:{employment_relationship: employment_relationship_properties}
       end
 
       it "should redirect" do
@@ -270,7 +270,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       sign_in(user)
       allow(mock_employee_candidate).to receive(:match_census_employees).and_return(found_census_employees)
       allow(census_employee).to receive(:is_active?).and_return(true)
-      allow(Forms::EmployeeCandidate).to receive(:new).with(person_parameters.merge({user_id: user_id})).and_return(mock_employee_candidate)
+      allow(Forms::EmployeeCandidate).to receive(:new).and_return(mock_employee_candidate)
       allow(Factories::EmploymentRelationshipFactory).to receive(:build).with(mock_employee_candidate, [census_employee]).and_return(employment_relationships)
       post :match, params: {person: person_parameters}
     end
