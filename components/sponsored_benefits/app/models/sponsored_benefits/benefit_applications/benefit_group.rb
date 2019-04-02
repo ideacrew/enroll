@@ -152,9 +152,10 @@ module SponsoredBenefits
       def set_bounding_cost_dental_plans
         return if reference_plan_id.nil?
 
-        if plan_option_kind == "single_plan"
+        option_kind = self.persisted? ? dental_plan_option_kind : plan_option_kind
+        if option_kind == "single_plan"
           plans = elected_dental_plans
-        elsif plan_option_kind == "single_carrier"
+        elsif option_kind == "single_carrier"
           plans = Plan.shop_dental_by_active_year(reference_plan.active_year).by_carrier_profile(reference_plan.carrier_profile)
         end
 
