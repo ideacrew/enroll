@@ -32,6 +32,7 @@ class Insured::FamiliesController < FamiliesController
     @hbx_enrollments = @hbx_enrollments.reject{ |r| !valid_display_enrollments.include? r._id }
 
     @employee_role = @person.active_employee_roles.last
+    @hbx_enrollments = @hbx_enrollments[0..3] if @hbx_enrollments.size > 4
     @tab = params['tab']
     @family_members = @family.active_family_members
 

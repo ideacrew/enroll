@@ -418,7 +418,7 @@ GEM
       sprockets (>= 2.0)
     origin (2.3.1)
     orm_adapter (0.5.0)
-    overcommit (0.44.0)
+    overcommit (0.46.0)
       childprocess (~> 0.6, >= 0.6.3)
       iniparse (~> 1.4)
     parallel (1.12.1)
