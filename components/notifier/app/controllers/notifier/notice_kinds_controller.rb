@@ -80,21 +80,25 @@ module Notifier
     end
 
     def upload_notices
-      notices = Roo::Spreadsheet.open(params[:file].tempfile.path)
       @errors = []
+      if file_content_type == 'text/csv'
+        notices = Roo::Spreadsheet.open(params[:file].tempfile.path)
 
-      notices.each do |notice_row|
-        next if notice_row[0] == 'Notice Number'
+        notices.each do |notice_row|
+          next if notice_row[0] == 'Notice Number'
 
-        if Notifier::NoticeKind.where(notice_number: notice_row[0]).blank?
-          notice = Notifier::NoticeKind.new(notice_number: notice_row[0], title: notice_row[1], description: notice_row[2], recipient: notice_row[3], event_name: notice_row[4])
-          notice.template = Template.new(raw_body: notice_row[5])
-          unless notice.save
-            @errors << "Notice #{notice_row[0]} got errors: #{notice.errors.to_s}"
+          if Notifier::NoticeKind.where(notice_number: notice_row[0]).blank?
+            notice = Notifier::NoticeKind.new(notice_number: notice_row[0], title: notice_row[1], description: notice_row[2], recipient: notice_row[3], event_name: notice_row[4])
+            notice.template = Template.new(raw_body: notice_row[5])
+            unless notice.save
+              @errors << "Notice #{notice_row[0]} got errors: #{notice.errors.to_s}"
+            end
+          else
+            @errors << "Notice #{notice_row[0]} already exists."
           end
-        else
-          @errors << "Notice #{notice_row[0]} already exists."
         end
+      else
+        @errors << 'Please upload csv format files only.'
       end
 
       if @errors.empty?
@@ -137,6 +141,10 @@ module Notifier
     end
 
     private
+
+    def file_content_type
+      params[:file].content_type
+    end
 
     def check_hbx_staff_role
       if current_user.blank? || !current_user.has_hbx_staff_role?

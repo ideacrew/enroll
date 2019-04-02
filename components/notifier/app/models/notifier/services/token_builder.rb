@@ -32,7 +32,7 @@ module Notifier
       end
       placeholders
     end
-  
+
     def editor_tokens
       editor_attributes.inject([]) do |data, (virtus_model_name, virtus_attributes)|
         virtus_attributes.each do |attribute|
