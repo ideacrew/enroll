@@ -15,7 +15,7 @@ describe CreateRenewalPlanYearAndEnrollment, dbclean: :after_each do
     end
   end
 
-  describe "create_renewal_plan_year_and_passive_renewals", dbclean: :after_each do
+  describe "create_renewal_plan_year_and_passive_renewals", dbclean: :around_each do
 
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup initial benefit application"
@@ -53,16 +53,16 @@ describe CreateRenewalPlanYearAndEnrollment, dbclean: :after_each do
       before(:each) do
         allow(::BenefitMarkets::Products::ProductRateCache).to receive(:age_bounding).and_return(20)
         allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(15)
-        allow(ENV).to receive(:[]).with("fein").and_return(abc_organization.fein)
-        allow(ENV).to receive(:[]).with("action").and_return("renewal_plan_year")
       end
 
       it "should create renewing draft plan year" do
+        ClimateControl.modify fein: abc_organization.fein, action: "renewal_plan_year" do
         expect(abc_organization.employer_profile.benefit_applications.map(&:aasm_state)).to eq [:active]
         subject.migrate
         abc_organization.reload
         expect(abc_organization.employer_profile.benefit_applications.map(&:aasm_state)).to eq [:active,:draft]
         expect(family.active_household.hbx_enrollments.map(&:aasm_state)).to eq ['coverage_selected']
+        end
       end
     end
 
@@ -71,15 +71,15 @@ describe CreateRenewalPlanYearAndEnrollment, dbclean: :after_each do
       before(:each) do
         allow(::BenefitMarkets::Products::ProductRateCache).to receive(:age_bounding).and_return(20)
         allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(15)
-        allow(ENV).to receive(:[]).with("start_on").and_return(initial_application.effective_period.min)
-        allow(ENV).to receive(:[]).with("action").and_return("trigger_renewal_py_for_employers")
       end
 
       it "should create renewing plan year" do
+        ClimateControl.modify start_on: initial_application.effective_period.min.to_s, action: "trigger_renewal_py_for_employers" do
         expect(abc_organization.employer_profile.benefit_applications.map(&:aasm_state)).to eq [:active]
         subject.migrate
         abc_organization.reload
         expect(abc_organization.employer_profile.benefit_applications.map(&:aasm_state)).to eq [:active, :draft]
+        end
       end
     end
 
@@ -89,8 +89,6 @@ describe CreateRenewalPlanYearAndEnrollment, dbclean: :after_each do
       before(:each) do
         allow(::BenefitMarkets::Products::ProductRateCache).to receive(:age_bounding).and_return(20)
         allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(15)
-        allow(ENV).to receive(:[]).with("fein").and_return(abc_organization.fein)
-        allow(ENV).to receive(:[]).with("action").and_return("renewal_plan_year_passive_renewal")
         ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
         ::BenefitMarkets::Products::ProductFactorCache.initialize_factor_cache!
         new_product = BenefitMarkets::Products::Product.all.where(:'application_period.min'=>reference_product.application_period.min + 1.year, :product_package_kinds.in => [:single_issuer]).first
@@ -105,6 +103,7 @@ describe CreateRenewalPlanYearAndEnrollment, dbclean: :after_each do
       end
 
       it "should create renewing plan year and passive enrollments" do
+        ClimateControl.modify fein: abc_organization.fein, action: "renewal_plan_year_passive_renewal" do
         expect(abc_organization.employer_profile.benefit_applications.map(&:aasm_state)).to eq [:active]
         expect(family.active_household.hbx_enrollments.map(&:aasm_state)).to eq ['coverage_selected']
         subject.migrate
@@ -112,8 +111,8 @@ describe CreateRenewalPlanYearAndEnrollment, dbclean: :after_each do
         family.reload
         expect(abc_organization.employer_profile.benefit_applications.map(&:aasm_state)).to eq [:active, :enrollment_open]
         expect(family.active_household.hbx_enrollments.map(&:aasm_state)).to eq ['coverage_selected','auto_renewing']
+        end
       end
     end
   end
 end
-
