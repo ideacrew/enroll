@@ -274,9 +274,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
     it "should be successful" do
       application.update_attributes(:aasm_state => "submitted")
       get :review, id: application.id
-      expect(assigns(:consumer_role)).to eq person.consumer_role
       expect(assigns(:application)).to eq application
-      expect(response).to render_template(:financial_assistance)
     end
 
     it "should redirect to applications page" do
