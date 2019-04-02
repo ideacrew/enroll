@@ -9,6 +9,13 @@ describe UpdateEeDependentSSN, dbclean: :after_each do
   let(:census_dependent) { CensusDependent.new(first_name:'David', last_name:'Henry', ssn: "", employee_relationship: "spouse", dob: TimeKeeper.date_of_record - 30.years, gender: "male") }
   let(:census_env_params) {{ce_id: census_employee.id, dep_id: census_dependent.id, dep_ssn: census_dependent.ssn}}
 
+
+  def run_env_specific
+    ClimateControl.modify census_env_params do
+      subject.migrate
+    end
+  end
+
   describe "given a task name" do
     it "has the given task name" do
       expect(subject.name).to eql given_task_name
@@ -37,23 +44,22 @@ describe UpdateEeDependentSSN, dbclean: :after_each do
 
   describe "when Cron job recives" do 
     context "env_params" do
+
+      before :each do
+        census_employee.census_dependents = [census_dependent]
+      end
+
       it "allow dependent ssn's to be updated to nil" do
-        ClimateControl.modify census_env_params do 
-          census_employee.census_dependents = [census_dependent]
-          subject.migrate
-          census_employee.reload
-          expect(census_employee.census_dependents.first.ssn).to match(nil)
-        end
+        census_employee.reload
+        run_env_specific
+        expect(census_employee.census_dependents.first.ssn).to match(nil)
       end
 
       it "allow dependent ssn's to be updated" do
-        ClimateControl.modify census_env_params do 
-          census_employee.census_dependents = [census_dependent]
-          census_employee.census_dependents.first.update_attributes!(ssn: "123456789")
-          subject.migrate
-          census_employee.reload
-          expect(census_employee.census_dependents.first.ssn).to match("123456789")
-        end
+        census_employee.census_dependents.first.update_attributes!(ssn: "123456789")
+        run_env_specific
+        census_employee.reload
+        expect(census_employee.census_dependents.first.ssn).to match("123456789")
       end
     end
   end
