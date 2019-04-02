@@ -213,7 +213,7 @@ class DocumentsController < ApplicationController
 
   def update_document
     @document = EmployerProfile.find(params[:document_id]).employer_attestation
-    @reason = params[:reason_for_rejection] == "nil"? params[:other_reason] : params[:reason_for_rejection]
+    @reason = params[:reason_for_rejection] == "nil" ? params[:other_reason] : params[:reason_for_rejection]
     @document.employer_attestation_documents.find(params[:attestation_doc_id]).update_attributes(aasm_state: params[:status],reason_for_rejection: @reason)
     @document.update_attributes(aasm_state: params[:status])
 
