@@ -36,45 +36,39 @@ describe ChangeEnrollmentDetails do
     let(:new_plan) { FactoryBot.create(:plan) }
     let(:new_benefit_group) { FactoryBot.create(:benefit_group) }
 
-    before(:each) do
-      allow(ENV).to receive(:[]).with("hbx_id").and_return("#{hbx_enrollment.hbx_id},#{hbx_enrollment2.hbx_id}")
-      allow(ENV).to receive(:[]).with("new_effective_on").and_return(hbx_enrollment.effective_on + 1.month)
-      allow(ENV).to receive(:[]).with("action").and_return "change_effective_date"
-    end
-
     it "should change effective on date" do
-      effective_on = hbx_enrollment.effective_on
-      subject.migrate
-      hbx_enrollment.reload
-      hbx_enrollment2.reload
-      expect(hbx_enrollment.effective_on).to eq effective_on + 1.month
-      expect(hbx_enrollment2.effective_on).to eq effective_on + 1.month
+      ClimateControl.modify hbx_id: "#{hbx_enrollment.hbx_id},#{hbx_enrollment2.hbx_id}", new_effective_on: "#{hbx_enrollment.effective_on + 1.month}", action: "change_effective_date" do 
+          effective_on = hbx_enrollment.effective_on
+          subject.migrate
+          hbx_enrollment.reload
+          hbx_enrollment2.reload
+          expect(hbx_enrollment.effective_on).to eq (effective_on + 1.month)
+          expect(hbx_enrollment2.effective_on).to eq (effective_on + 1.month)
+        end
     end
 
     it "should move enrollment to enrolled status from canceled status" do
-      allow(ENV).to receive(:[]).with("action").and_return "revert_cancel"
-      hbx_enrollment.cancel_coverage!
-      subject.migrate
-      hbx_enrollment.reload
-      hbx_enrollment2.reload
-      expect(hbx_enrollment.aasm_state).to eq "coverage_enrolled"
-      expect(hbx_enrollment2.aasm_state).to eq "coverage_enrolled"
+      ClimateControl.modify hbx_id: "#{hbx_enrollment.hbx_id},#{hbx_enrollment2.hbx_id}", new_effective_on: "#{hbx_enrollment.effective_on + 1.month}", action: "revert_cancel" do 
+        hbx_enrollment.cancel_coverage!
+        subject.migrate
+        hbx_enrollment.reload
+        hbx_enrollment2.reload
+        expect(hbx_enrollment.aasm_state).to eq "coverage_enrolled"
+        expect(hbx_enrollment2.aasm_state).to eq "coverage_enrolled"
+      end
     end
 
     context "revert enrollment termination" do
-
-      before do
-        allow(ENV).to receive(:[]).with("hbx_id").and_return("#{term_enrollment.hbx_id},#{term_enrollment2.hbx_id}")
-        allow(ENV).to receive(:[]).with("action").and_return "revert_termination"
-        subject.migrate
-        term_enrollment.reload
-        term_enrollment2.reload
-      end
-
+      
       shared_examples_for "revert termination" do |val, result|
         it "should equals #{result}" do
-          expect(actual_result(term_enrollment, val)).to eq result
-          expect(actual_result(term_enrollment2, val)).to eq result
+          ClimateControl.modify hbx_id:"#{term_enrollment.hbx_id},#{term_enrollment2.hbx_id}", action: "revert_termination" do 
+            subject.migrate
+            term_enrollment.reload
+            term_enrollment2.reload
+            expect(actual_result(term_enrollment, val)).to eq result
+            expect(actual_result(term_enrollment2, val)).to eq result
+          end
         end
       end
 
@@ -85,10 +79,10 @@ describe ChangeEnrollmentDetails do
 
     context "revert enrollment termination for individual enrollment" do
       before do
-        allow(ENV).to receive(:[]).with("hbx_id").and_return("#{term_enrollment3.hbx_id}")
-        allow(ENV).to receive(:[]).with("action").and_return "revert_termination"
-        subject.migrate
-        term_enrollment3.reload
+        ClimateControl.modify hbx_id:"#{term_enrollment3.hbx_id}", action: "revert_termination" do 
+          subject.migrate
+          term_enrollment3.reload
+        end
       end
 
       shared_examples_for "revert termination" do |val, result|
@@ -103,17 +97,14 @@ describe ChangeEnrollmentDetails do
     end
 
     context "terminate enrollment with given termination date" do
-      before do
-        allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)
-        allow(ENV).to receive(:[]).with("action").and_return "terminate"
-        allow(ENV).to receive(:[]).with("terminated_on").and_return "01/01/2016"
-        subject.migrate
-        hbx_enrollment.reload
-      end
-
+      
       shared_examples_for "termination" do |val, result|
         it "should equals #{result}" do
-          expect(actual_result(hbx_enrollment, val)).to eq result
+          ClimateControl.modify hbx_id:"#{hbx_enrollment.hbx_id}", action: "terminate",terminated_on: "01/01/2016" do 
+            subject.migrate
+            hbx_enrollment.reload
+           expect(actual_result(hbx_enrollment, val)).to eq result
+          end
         end
       end
 
@@ -127,36 +118,31 @@ describe ChangeEnrollmentDetails do
 
       let(:benefit_package) { ::BenefitSponsors::BenefitPackages::BenefitPackage.new }
 
-      before do
-        allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)
-        allow(ENV).to receive(:[]).with("action").and_return "change_enrollment_status"
-        allow(ENV).to receive(:[]).with("new_aasm_state").and_return "move_to_enrolled"
-        hbx_enrollment.update_attribute("aasm_state","enrolled_contingent")
-        hbx_enrollment.reload
-      end
-
+      
       it "should change the aasm state " do
-        allow(::BenefitSponsors::BenefitPackages::BenefitPackage).to receive(:find).and_return(benefit_package)
-        allow(benefit_package).to receive(:successor).and_return(nil)
-        expect(hbx_enrollment.may_move_to_enrolled?).to eq true
-        subject.migrate
-        hbx_enrollment.reload
-        expect(hbx_enrollment.aasm_state).to eq "coverage_selected"
+        ClimateControl.modify hbx_id:"#{hbx_enrollment.hbx_id}", action: "change_enrollment_status",new_aasm_state: "move_to_enrolled" do 
+          hbx_enrollment.update_attribute("aasm_state","enrolled_contingent")
+          hbx_enrollment.reload
+          allow(::BenefitSponsors::BenefitPackages::BenefitPackage).to receive(:find).and_return(benefit_package)
+          allow(benefit_package).to receive(:successor).and_return(nil)
+          expect(hbx_enrollment.may_move_to_enrolled?).to eq true
+          subject.migrate
+          hbx_enrollment.reload
+          expect(hbx_enrollment.aasm_state).to eq "coverage_selected"
+        end
       end
 
     end
 
     context "it should cancel the enrollment when it is eligible for cancelling" do
-      before do
-        allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)
-        allow(ENV).to receive(:[]).with("action").and_return "cancel"
-      end
 
       it "should cancel the enrollment when it is eligible for cancelling" do
-        expect(hbx_enrollment.may_cancel_coverage?).to eq true
-        subject.migrate
-        hbx_enrollment.reload
-        expect(hbx_enrollment.aasm_state).to eq "coverage_canceled"
+        ClimateControl.modify hbx_id:"#{hbx_enrollment.hbx_id}", action: "cancel" do 
+          expect(hbx_enrollment.may_cancel_coverage?).to eq true
+          subject.migrate
+          hbx_enrollment.reload
+          expect(hbx_enrollment.aasm_state).to eq "coverage_canceled"
+        end
       end
       it "should not cancel the enrollment when it is not eligible for cancelling" do
         hbx_enrollment.update_attributes(aasm_state:"coverage_terminated")
@@ -169,57 +155,46 @@ describe ChangeEnrollmentDetails do
     end
 
     context "generate_hbx_signature" do
-      before do
-        allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)
-        allow(ENV).to receive(:[]).with("action").and_return "generate_hbx_signature"
-        hbx_enrollment.update_attribute(:enrollment_signature, "")
-      end
-
+      
       it "should have a enrollment_signature" do
-        subject.migrate
-        hbx_enrollment.reload
-        expect(hbx_enrollment.enrollment_signature.present?).to be_truthy
+        ClimateControl.modify hbx_id:"#{hbx_enrollment.hbx_id}", action: "generate_hbx_signature" do 
+          hbx_enrollment.update_attribute(:enrollment_signature, "")
+          subject.migrate
+          hbx_enrollment.reload
+          expect(hbx_enrollment.enrollment_signature.present?).to be_truthy
+        end
       end
     end
 
     context "expire the enrollment" do
-      before do
-        allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)
-        allow(ENV).to receive(:[]).with("action").and_return "expire_enrollment"
-        subject.migrate
-        hbx_enrollment.reload
-      end
-
+      
       it "should expire the enrollment" do
-        expect(hbx_enrollment.aasm_state).to eq "coverage_expired"
+        ClimateControl.modify hbx_id:"#{hbx_enrollment.hbx_id}", action: "expire_enrollment" do 
+          subject.migrate
+          hbx_enrollment.reload
+          expect(hbx_enrollment.aasm_state).to eq "coverage_expired"
+        end
       end
     end
 
     context "change the plan of enrollment" do
-      before do
-        allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)
-        allow(ENV).to receive(:[]).with("new_product_id").and_return(new_plan.id)
-        allow(ENV).to receive(:[]).with("action").and_return "change_plan"
-        subject.migrate
-        hbx_enrollment.reload
-      end
-
+      
       it "should change the plan of enrollment" do
-        expect(hbx_enrollment.product_id).to eq new_plan.id
+        ClimateControl.modify hbx_id:"#{hbx_enrollment.hbx_id}", action: "change_plan",new_product_id: new_plan.id do 
+          subject.migrate
+          hbx_enrollment.reload
+          expect(hbx_enrollment.product_id).to eq new_plan.id
+        end
       end
     end
 
     context "change the benefit group of enrollment" do
-      before do
-        allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)
-        allow(ENV).to receive(:[]).with("new_sponsored_benefit_package_id").and_return(new_benefit_group.id)
-        allow(ENV).to receive(:[]).with("action").and_return "change_benefit_group"
-        subject.migrate
-        hbx_enrollment.reload
-      end
-
       it "should change the benefit group of enrollment" do
-        expect(hbx_enrollment.sponsored_benefit_package_id).to eq new_benefit_group.id
+        ClimateControl.modify hbx_id:"#{hbx_enrollment.hbx_id}", new_sponsored_benefit_package_id: new_benefit_group.id, action: "change_benefit_group" do 
+          subject.migrate
+          hbx_enrollment.reload 
+          expect(hbx_enrollment.sponsored_benefit_package_id).to eq new_benefit_group.id
+        end
       end
     end
   end
