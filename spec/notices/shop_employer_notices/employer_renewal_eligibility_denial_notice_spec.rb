@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe ShopEmployerNotices::EmployerRenewalEligibilityDenialNotice do
+RSpec.describe ShopEmployerNotices::EmployerRenewalEligibilityDenialNotice, dbclean: :after_each do
   let(:address)  { Address.new(kind: "primary", address_1: "3234 R st", city: "Alexandria", state: "VA", zip: "20402") }
   let(:office_location) do
     OfficeLocation.new(
