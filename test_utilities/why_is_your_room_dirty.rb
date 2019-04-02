@@ -37,20 +37,17 @@ at_exit do
   DirtyDbRoom.format_unmatched_examples!
 end
 
-module FactoryGirl::Syntax::Methods
-  def create_with_log(name, *traits_and_overrides, &block)
+module DirtyRoomLoggingMethods
+  def create(name, *traits_and_overrides, &block)
     DirtyDbRoom.room_made_dirty!(name)
-    create_without_log(name, *traits_and_overrides, &block)
+    super(name, *traits_and_overrides, &block)
   end
 
-  alias_method_chain :create, :log
-
-  def build_with_log(name, *traits_and_overrides, &block)
+  def build(name, *traits_and_overrides, &block)
     DirtyDbRoom.room_made_dirty!(name)
-    build_without_log(name, *traits_and_overrides, &block)
+    super(name, *traits_and_overrides, &block)
   end
-
-  alias_method_chain :build, :log
 end
+FactoryBot::Syntax::Methods.send(:prepend, DirtyRoomLoggingMethods)
 
 DirtyDbRoom.initialize_stern_mom!

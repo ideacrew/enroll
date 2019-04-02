@@ -12,15 +12,14 @@ describe RemoveCeFromRoster, dbclean: :after_each do
   describe "remove census_employee" do
     let(:employer_profile)     { FactoryBot.create(:employer_profile) }
     let(:census_employee)     { FactoryBot.create(:census_employee, employer_profile_id: employer_profile.id) }
-    before(:each) do
-      allow(ENV).to receive(:[]).with("ce_id").and_return(census_employee.id)
-    end
     it "should remove the census employee from the employer" do
-      ce_id = census_employee.id
-      expect(employer_profile.census_employees.where(id: ce_id).size).to eq 1
-      subject.migrate
-      employer_profile.reload
-      expect(employer_profile.census_employees.where(id: ce_id).size).to eq 0
+      ClimateControl.modify ce_id: census_employee.id.to_s do 
+        ce_id = census_employee.id
+        expect(employer_profile.census_employees.where(id: ce_id).size).to eq 1
+        subject.migrate
+        employer_profile.reload
+        expect(employer_profile.census_employees.where(id: ce_id).size).to eq 0
+      end
     end
   end
 end
