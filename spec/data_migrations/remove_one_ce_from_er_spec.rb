@@ -5,11 +5,6 @@ describe RemoveOneCeFromEr, dbclean: :after_each do
 
   let(:given_task_name) { "remove_one_ce_from_er" }
   subject { RemoveOneCeFromEr.new(given_task_name, double(:current_scope => nil)) }
-  after :each do
-    ["census_employee_id"].each do |env_variable|
-      ENV[env_variable] = nil
-    end
-  end
 
   describe "given a task name" do
     it "has the given task name" do
@@ -25,24 +20,24 @@ describe RemoveOneCeFromEr, dbclean: :after_each do
       let(:census_employee){ FactoryBot.create(:census_employee, dob: TimeKeeper.date_of_record - 30.years)}
       let(:employee_role) {FactoryBot.create(:employee_role)}
       before :each do
-        ENV["census_employee_id"] = census_employee.id
-        allow(employee_role).to receive(:census_employee_id).and_return census_employee.id
         person.employee_roles[0].update_attributes(census_employee_id: census_employee.id)
         census_employee.update_attributes(employee_role_id: person.employee_roles[0].id)
       end
       
       it "should remove one census_employee" do
-        ce_id = census_employee.id
-        subject.migrate
-        expect(CensusEmployee.where(id: ce_id).first).to eq nil
+        ClimateControl.modify census_employee_id: census_employee.id.to_s do
+          subject.migrate
+          expect(CensusEmployee.where(id: census_employee.id.to_s).first).to eq nil
+        end
       end
 
       it "should remove employee role" do
-        ce_id = census_employee.id
-        ee_id = census_employee.employee_role_id
-        expect(person.primary_family.latest_household.hbx_enrollments).to eq []
-        subject.migrate
-        expect(EmployeeRole.find(ee_id)).to eq nil
+        ClimateControl.modify census_employee_id: census_employee.id.to_s do 
+          ee_id = census_employee.employee_role_id
+          expect(person.primary_family.latest_household.hbx_enrollments).to eq []
+          subject.migrate
+          expect(EmployeeRole.find(ee_id)).to eq nil
+        end 
       end    
   end
 end

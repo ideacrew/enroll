@@ -137,7 +137,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     let(:family_member) { family.primary_family_member }
     it "return http success" do
       sign_in user
-      get :new, person_id: person.id, employee_role_id: employee_role.id
+      get :new, params: { person_id: person.id, employee_role_id: employee_role.id }
       expect(response).to have_http_status(:success)
     end
 
@@ -154,19 +154,19 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
     it "return blank change_plan" do
       sign_in user
-      get :new, person_id: person.id, employee_role_id: employee_role.id
+      get :new, params: { person_id: person.id, employee_role_id: employee_role.id }
       expect(assigns(:change_plan)).to eq ""
     end
 
     it "return change_plan" do
       sign_in user
-      get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: "change"
+      get :new, params: { person_id: person.id, employee_role_id: employee_role.id, change_plan: "change" }
       expect(assigns(:change_plan)).to eq "change"
     end
 
     it "should get person" do
       sign_in user
-      get :new, person_id: person.id, employee_role_id: employee_role.id
+      get :new, params: { person_id: person.id, employee_role_id: employee_role.id }
       expect(assigns(:person)).to eq person
     end
 
@@ -178,7 +178,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       # allow_any_instance_of(GroupSelectionPrevaricationAdapter).to receive(:selected_enrollment).with(family, employee_role).and_return(hbx_enrollment)
 
       sign_in user
-      get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_by_qle', market_kind: 'shop', hbx_enrollment_id: hbx_enrollment.id
+      get :new, params: { person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_by_qle', market_kind: 'shop', hbx_enrollment_id: hbx_enrollment.id }
       expect(assigns(:hbx_enrollment)).to eq hbx_enrollment
     end
 
@@ -196,7 +196,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       family.reload
       person.save
       sign_in user
-      get :new, person_id: person.id, employee_role_id: employee_role.id, market_kind: 'shop'
+      get :new, params: { person_id: person.id, employee_role_id: employee_role.id, market_kind: 'shop' }
       expect(assigns(:coverage_family_members_for_cobra)).to eq [family.primary_family_member]
     end
 
@@ -207,13 +207,13 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       # allow_any_instance_of(GroupSelectionPrevaricationAdapter).to receive(:selected_enrollment).with(family, employee_role).and_return(hbx_enrollment)
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return true
       sign_in user
-      get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_by_qle', market_kind: 'shop', consumer_role_id: consumer_role.id, hbx_enrollment_id: hbx_enrollment.id
+      get :new, params: { person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_by_qle', market_kind: 'shop', consumer_role_id: consumer_role.id, hbx_enrollment_id: hbx_enrollment.id }
       expect(assigns(:hbx_enrollment)).to eq hbx_enrollment
     end
 
     it "should not get hbx_enrollment when has active hbx_enrollments and not in qle flow" do
       sign_in user
-      get :new, person_id: person.id, employee_role_id: employee_role.id
+      get :new, params: { person_id: person.id, employee_role_id: employee_role.id }
       expect(assigns(:hbx_enrollment)).not_to eq hbx_enrollment
     end
 
@@ -226,7 +226,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return true
 
       sign_in user
-      get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_by_qle', market_kind: 'shop', consumer_role_id: consumer_role.id
+      get :new, params: { person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_by_qle', market_kind: 'shop', consumer_role_id: consumer_role.id }
       expect(assigns(:disable_market_kind)).to eq "individual"
     end
 
@@ -237,7 +237,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return true
         allow(hbx_enrollment).to receive(:kind).and_return "individual"
         sign_in user
-        get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_plan', hbx_enrollment_id: "123"
+        get :new, params: { person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_plan', hbx_enrollment_id: "123" }
       end
 
       it "should set market kind when user select to make changes in open enrollment" do
@@ -266,13 +266,13 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
       it "should set session" do
         sign_in user
-        get :new, person_id: person.id, consumer_role_id: consumer_role.id, change_plan: "change", hbx_enrollment_id: "123"
+        get :new, params: { person_id: person.id, consumer_role_id: consumer_role.id, change_plan: "change", hbx_enrollment_id: "123" }
         expect(session[:pre_hbx_enrollment_id]).to eq "123"
       end
 
       it "should get new_effective_on" do
         sign_in user
-        get :new, person_id: person.id, consumer_role_id: consumer_role.id, change_plan: "change", hbx_enrollment_id: "123"
+        get :new, params: { person_id: person.id, consumer_role_id: consumer_role.id, change_plan: "change", hbx_enrollment_id: "123" }
         expect(assigns(:new_effective_on)).to eq TimeKeeper.date_of_record
       end
     end
@@ -281,7 +281,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
   context "GET terminate_selection" do
     it "return http success and render" do
       sign_in
-      get :terminate_selection, person_id: person.id
+      get :terminate_selection, params: { person_id: person.id }
       expect(response).to have_http_status(:success)
       expect(response).to render_template(:terminate_selection)
     end
@@ -291,7 +291,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     it "return http success and render" do
       sign_in
       allow(HbxEnrollment).to receive(:find).and_return(hbx_enrollment)
-      get :terminate_confirm, person_id: person.id, hbx_enrollment_id: hbx_enrollment.id
+      get :terminate_confirm, params: { person_id: person.id, hbx_enrollment_id: hbx_enrollment.id }
       expect(response).to have_http_status(:success)
       expect(response).to render_template(:terminate_confirm)
     end
@@ -310,14 +310,14 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       allow(hbx_enrollment).to receive(:terminate_benefit)
       expect(HbxEnrollment.aasm.state_machine.events[:terminate_coverage].transitions[0].opts.values.include?(:propogate_terminate)).to eq true
       expect(hbx_enrollment.termination_submitted_on).to eq nil
-      post :terminate, term_date: TimeKeeper.date_of_record, hbx_enrollment_id: hbx_enrollment.id
+      post :terminate, params: { term_date: TimeKeeper.date_of_record, hbx_enrollment_id: hbx_enrollment.id }
       expect(hbx_enrollment.termination_submitted_on).to eq TimeKeeper.datetime_of_record
       expect(response).to redirect_to(family_account_path)
     end
 
     it "should redirect back if hbx enrollment can't be terminated" do
       hbx_enrollment.assign_attributes(aasm_state: "shopping")
-      post :terminate, term_date: TimeKeeper.date_of_record, hbx_enrollment_id: hbx_enrollment.id
+      post :terminate, params: { term_date: TimeKeeper.date_of_record, hbx_enrollment_id: hbx_enrollment.id }
       expect(hbx_enrollment.may_terminate_coverage?).to be_falsey
       expect(response).to redirect_to(terminate_confirm_insured_group_selections_path(person_id: person.id, hbx_enrollment_id: hbx_enrollment.id))
     end
@@ -325,7 +325,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
     it "should redirect back if termination date is in the past" do
       allow(hbx_enrollment).to receive(:terminate_benefit)
-      post :terminate, term_date: TimeKeeper.date_of_record - 10.days, hbx_enrollment_id: hbx_enrollment.id
+      post :terminate, params: { term_date: TimeKeeper.date_of_record - 10.days, hbx_enrollment_id: hbx_enrollment.id }
       expect(hbx_enrollment.may_terminate_coverage?).to be_truthy
       expect(response).to redirect_to(terminate_confirm_insured_group_selections_path(person_id: person.id, hbx_enrollment_id: hbx_enrollment.id))
     end
@@ -344,7 +344,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     it "should redirect" do
       sign_in user
       allow(hbx_enrollment).to receive(:save).and_return(true)
-      post :create, person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids
+      post :create, params: { person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids }
       family.reload
       family.active_household.reload
       expect(response).to have_http_status(:redirect)
@@ -355,7 +355,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       user = FactoryBot.create(:user, id: 98, person: FactoryBot.create(:person))
       sign_in user
       allow(hbx_enrollment).to receive(:save).and_return(true)
-      post :create, person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids, change_plan: 'change'
+      post :create, params: { person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids, change_plan: 'change' }
       family.reload
       family.active_household.reload
       expect(response).to have_http_status(:redirect)
@@ -370,7 +370,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         sign_in user
         allow(old_hbx).to receive(:is_shop?).and_return true
         family.active_household.reload
-        post :create, person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids, commit: 'Keep existing plan', change_plan: 'change', hbx_enrollment_id: old_hbx.id
+        post :create, params: { person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids, commit: 'Keep existing plan', change_plan: 'change', hbx_enrollment_id: old_hbx.id }
         family.reload
         family.active_household.reload
       end
@@ -398,7 +398,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         allow(HbxEnrollment).to receive(:find).and_return old_hbx
         allow(old_hbx).to receive(:is_shop?).and_return true
         allow(old_hbx).to receive(:family).and_return family
-        post :create, person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids, commit: 'Keep existing plan', change_plan: 'change', hbx_enrollment_id: old_hbx.id
+        post :create, params: { person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids, commit: 'Keep existing plan', change_plan: 'change', hbx_enrollment_id: old_hbx.id }
       end
 
       it "should redirect" do
@@ -418,7 +418,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       allow(person).to receive(:employee_roles).and_return([employee_role])
       allow(hbx_enrollment).to receive(:save).and_return(false)
 
-      post :create, person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids
+      post :create, params: { person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids }
       expect(response).to have_http_status(:redirect)
       expect(flash[:error]).not_to eq 'You must select the primary applicant to enroll in the healthcare plan'
       expect(response).not_to redirect_to(new_insured_group_selection_path(person_id: person.id, employee_role_id: employee_role.id, change_plan: '', market_kind: 'shop', enrollment_kind: ''))
@@ -433,14 +433,14 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       allow(hbx_enrollments).to receive(:show_enrollments_sans_canceled).and_return []
       person.employee_roles.first.census_employee.update_attributes(aasm_state: "cobra_eligible", coverage_terminated_on: TimeKeeper.date_of_record, cobra_begin_date: TimeKeeper.date_of_record - 1.day)
       person.reload
-      post :create, person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids
+      post :create, params: { person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids }
       expect(response).to have_http_status(:redirect)
       expect(flash[:error]).to match /You may not enroll for cobra after/
       expect(response).to redirect_to(new_insured_group_selection_path(person_id: person.id, employee_role_id: person.employee_roles.first.id, change_plan: '', market_kind: 'shop', enrollment_kind: ''))
     end
 
     it "should render group selection page if without family_member_ids" do
-      post :create, person_id: person.id, employee_role_id: employee_role.id
+      post :create, params: { person_id: person.id, employee_role_id: employee_role.id }
       expect(response).to have_http_status(:redirect)
       expect(flash[:error]).to eq 'You must select at least one Eligible applicant to enroll in the healthcare plan'
       expect(response).to redirect_to(new_insured_group_selection_path(person_id: person.id, employee_role_id: employee_role.id, change_plan: '', market_kind: 'shop', enrollment_kind: ''))

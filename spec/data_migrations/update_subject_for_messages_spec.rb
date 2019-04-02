@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "update_subject_for_messages")
 
-describe UpdateSubjectForMessages, dbclean: :after_each do
+describe UpdateSubjectForMessages, dbclean: :after_each, dbclean: :after_each do
   let(:given_task_name) { "update_subject_for_messages" }
   subject { UpdateSubjectForMessages.new(given_task_name, double(:current_scope => nil)) }
 
