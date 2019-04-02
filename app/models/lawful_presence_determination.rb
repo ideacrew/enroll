@@ -23,18 +23,16 @@ class LawfulPresenceDetermination
   field :aasm_state, type: String
   embeds_many :workflow_state_transitions, as: :transitional
 
-  track_history   :on => [:vlp_verified_at,
-                          :vlp_authority,
-                          :citizen_status,
-                          :citizenship_result,
-
-                          
-                          :aasm_state],
-                          :modifier_field_optional => true,
-                  :scope => :consumer_role,
-                  :track_create  => false,    # track document creation, default is false
-                  :track_update  => true,    # track document updates, default is true
-                  :track_destroy => false     # track document destruction, default is false
+  track_history :modifier_field_optional => true,
+                :on => [:vlp_verified_at,
+                        :vlp_authority,
+                        :citizen_status,
+                        :citizenship_result,
+                        :aasm_state],
+                :scope => :consumer_role,
+                :track_create  => false,    # track document creation, default is false
+                :track_update  => true,    # track document updates, default is true
+                :track_destroy => false     # track document destruction, default is false
 
   aasm do
     state :verification_pending, initial: true
