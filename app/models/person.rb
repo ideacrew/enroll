@@ -524,6 +524,15 @@ class Person
     no_dc_address and no_dc_address_reason.present?
   end
 
+  def age_on(date)
+    age = date.year - dob.year
+    if date.month < dob.month || (date.month == dob.month && date.day < dob.day)
+      age - 1
+    else
+      age
+    end
+  end
+
   def is_dc_resident?
     return false if no_dc_address == true && no_dc_address_reason.blank?
     return true if no_dc_address == true && no_dc_address_reason.present?
