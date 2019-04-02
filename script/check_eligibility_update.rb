@@ -24,7 +24,7 @@ def check_eligibility_update
           puts "Person with ssn: #{ssn} has no family."
           next
         end
-        deter = person.primary_family.active_household.latest_active_tax_household_with_year(2018).try(:latest_eligibility_determination)
+        deter = person.primary_family.active_household.latest_active_tax_households_with_year(2018).try(:latest_eligibility_determination)
         if deter && deter.e_pdc_id =~ /MANUALLY_10_06_2017LOADING/
           output_csv << [person.ssn, person.hbx_id, deter.tax_household.submitted_at, deter.max_aptc, deter.csr_percent_as_integer, deter.e_pdc_id]
           ran << person.hbx_id

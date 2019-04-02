@@ -9,7 +9,7 @@ RSpec.describe Products::QhpController, :type => :controller do
   let(:benefit_group){double("BenefitGroup")}
   let(:reference_plan){double("Plan")}
   let(:tax_household) {double}
-  let(:household) {double(latest_active_tax_household_with_year: tax_household)}
+  let(:household) {double(latest_active_tax_households_with_year: tax_household)}
   let(:family) {FactoryGirl.create(:family, :with_primary_family_member, person: person)}
 
   context "GET comparison" do
