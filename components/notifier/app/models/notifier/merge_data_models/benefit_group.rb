@@ -15,7 +15,7 @@ module Notifier
         start_on: "12/1/2018",
         title: "Adams Benefit Group",
         plan_option_kind: 'single_plan',
-        plan_offerings_text: 'Gold Metal Level'
+        plan_offerings_text: 'Gold Metal Level',
         reference_plan_name: 'Blue Cross Blue Shieldd HMO',
         reference_plan_carrier_name: 'BCBS'
         })
