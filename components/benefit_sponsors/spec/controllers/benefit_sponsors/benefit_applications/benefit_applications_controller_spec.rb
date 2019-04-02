@@ -5,12 +5,13 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 
 module BenefitSponsors
   RSpec.describe BenefitApplications::BenefitApplicationsController, type: :controller, dbclean: :after_each do
-#    include_context "setup benefit market with market catalogs and product packages"
+   # include_context "setup benefit market with market catalogs and product packages"
 
     routes { BenefitSponsors::Engine.routes }
     let(:site) { BenefitSponsors::SiteSpecHelpers.create_cca_site_with_hbx_profile_and_empty_benefit_market }
     let(:benefit_market) { site.benefit_markets.first }
     let(:effective_period) { (effective_period_start_on..effective_period_end_on) }
+    # let(:premium_tabels) { FactoryBot.create(:benefit_markets_products_premium_table, rating_area: ben_app1.recorded_rating_area_id)}
     let!(:current_benefit_market_catalog) do
       BenefitSponsors::ProductSpecHelpers.construct_cca_benefit_market_catalog_with_renewal_catalog(site, benefit_market, effective_period)
       benefit_market.benefit_market_catalogs.where(
@@ -100,7 +101,6 @@ module BenefitSponsors
       }
 
       let(:ben_app)       { benefit_sponsorship.benefit_applications.build(params) }
-      let(:ben_app1) {FactoryBot.create(:benefit_sponsors_benefit_application,:with_benefit_package, benefit_sponsorship: benefit_sponsorship)}
     end
 
     before do
@@ -112,7 +112,7 @@ module BenefitSponsors
       user_with_broker_role.person.broker_role.update_attributes!(aasm_state: 'active')
     end
 
-    describe "GET new", dbclean: :after_each do
+    describe "GET new", :dbclean => :around_each do
       include_context 'shared_stuff'
 
       it "should initialize the form" do
@@ -142,7 +142,7 @@ module BenefitSponsors
       end
     end
 
-    describe "POST create", dbclean: :after_each do
+    describe "POST create", :dbclean => :around_each do
       include_context 'shared_stuff'
 
       it "should redirect" do
@@ -195,7 +195,7 @@ module BenefitSponsors
       end
     end
 
-    describe "GET late_rates_check", dbclean: :after_each do
+    describe "GET late_rates_check", :dbclean => :around_each do
 
       before { sign_in user }
 
@@ -210,17 +210,17 @@ module BenefitSponsors
       end
     end
 
-    describe "GET edit", dbclean: :after_each do
+    describe "GET edit", :dbclean => :around_each do
       include_context 'shared_stuff'
 
       before do
-        ben_app1.save
+        ben_app.save
       end
 
       it "should be a success" do
         [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
           sign_in login_user
-          get :edit, xhr: true, params: { benefit_sponsorship_id: benefit_sponsorship_id, id: ben_app1.id.to_s, benefit_application: benefit_application_params }
+          get :edit, xhr: true, params: { benefit_sponsorship_id: benefit_sponsorship_id, id: ben_app.id.to_s, benefit_application: benefit_application_params }
           expect(response).to have_http_status(:success)
         end
       end
@@ -242,7 +242,7 @@ module BenefitSponsors
       end
     end
 
-    describe "POST update" do
+    describe "POST update", :dbclean => :around_each do
       include_context 'shared_stuff'
 
       before do
@@ -300,7 +300,7 @@ module BenefitSponsors
       end
     end
 
-    describe "POST publish" do
+    describe "POST publish", :dbclean => :around_each do
 
       include_context 'shared_stuff'
       include_context "setup initial benefit application"
@@ -396,7 +396,7 @@ module BenefitSponsors
       end
     end
 
-    describe "POST force publish", dbclean: :after_each do
+    describe "POST force publish", :dbclean => :around_each do
       include_context 'shared_stuff'
       include_context "setup initial benefit application"
 
@@ -432,7 +432,7 @@ module BenefitSponsors
       end
     end
 
-    describe "POST revert", dbclean: :after_each do
+    describe "POST revert", :dbclean => :around_each do
       include_context 'shared_stuff'
       include_context "setup initial benefit application"
 

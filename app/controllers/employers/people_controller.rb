@@ -11,7 +11,7 @@ class Employers::PeopleController < ApplicationController
   end
 
   def match
-    @employee_candidate = Forms::EmployeeCandidate.new(params.require(:person).merge({user_id: current_user.id}))
+    @employee_candidate = Forms::EmployeeCandidate.new(person_params.merge({user_id: current_user.id}))
     if @employee_candidate.valid?
       found_person = @employee_candidate.match_person
       unless params["create_person"].present? # when search button is clicked
@@ -80,6 +80,9 @@ class Employers::PeopleController < ApplicationController
 
   private
 
+  def person_params 
+    params.require(:person).permit(:first_name, :user_id) 
+  end
   def build_nested_models
     ["home","mobile","work","fax"].each do |kind|
       @person.phones.build(kind: kind) if @person.phones.select{|phone| phone.kind == kind}.blank?
