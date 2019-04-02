@@ -176,10 +176,19 @@ module SponsoredBenefits
 
       def elected_dental_plans=(new_plans)
         return unless new_plans.present?
-        if new_plans.is_a?(String)
-          self.elected_dental_plan_ids = new_plans.split(" ")
+        if parsed_dental_elected_plan_ids(new_plans).is_a?(Array) && new_plans.is_a?(String)
+          self.elected_dental_plan_ids = parsed_dental_elected_plan_ids(new_plans)
         else
           self.elected_dental_plan_ids = new_plans.reduce([]) { |list, plan| list << plan._id }
+        end
+      end
+
+      def parsed_dental_elected_plan_ids(new_plans)
+        return @result if defined? @result
+        @result = begin
+          JSON.parse(new_plans)
+        rescue Exception => e
+          new_plans.split(" ")
         end
       end
     end
