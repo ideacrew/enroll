@@ -57,7 +57,8 @@
                         <%= hidden_field_tag 'docs_owner', person.id  %>
                         <%= hidden_field_tag 'verification_type', verif_type.id  %>
                       <% end %>
-                    </div>
+                    <% end %>
+                  </div>
 
                     <% if current_user.has_hbx_staff_role? %>
                       <div class="v-type-actions col-md-2">
