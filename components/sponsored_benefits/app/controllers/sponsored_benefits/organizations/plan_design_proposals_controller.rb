@@ -1,3 +1,5 @@
+require_dependency "sponsored_benefits/application_controller"
+
 module SponsoredBenefits
   class Organizations::PlanDesignProposalsController < ApplicationController
     include SponsoredBenefits::ApplicationHelper
@@ -10,7 +12,7 @@ module SponsoredBenefits
     before_action :load_plan_design_proposal, only: [:edit, :update, :destroy, :publish, :show]
     before_action :published_plans_are_view_only, only: [:edit]
     before_action :claimed_quotes_are_view_only, only: [:edit]
-    before_action :load_broker_agency_profile, only: [:new, :edit]
+    before_action :load_profile, only: [:new, :edit, :index]
 
     def index
       @datatable = effective_datatable
@@ -200,9 +202,10 @@ module SponsoredBenefits
       end
     end
 
-    def load_broker_agency_profile
-      @broker_agency_profile = @plan_design_organization.broker_agency_profile
-      @provider = @broker_agency_profile.primary_broker_role.person
+    def load_profile
+      @profile = ::BrokerAgencyProfile.find(params[:profile_id]) || ::GeneralAgencyProfile.find(params[:profile_id])
+      @profile ||= BenefitSponsors::Organizations::Profile.find(params[:profile_id])
+      @provider = provider
     end
   end
 end

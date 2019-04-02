@@ -18,10 +18,6 @@ module SponsoredBenefits
       @provider = provider
     end
 
-    def is_profile_general_agency?
-      @profile.class.to_s == "GeneralAgencyProfile"
-    end
-
     def general_agency_profiles
       return @general_agency_profiles if defined? @general_agency_profiles
       @general_agency_profiles = ::GeneralAgencyProfile.all
@@ -32,14 +28,6 @@ module SponsoredBenefits
         ::Effective::Datatables::GeneralAgencyPlanDesignOrganizationDatatable
       else
         ::Effective::Datatables::BrokerAgencyPlanDesignOrganizationDatatable
-      end
-    end
-
-    def provider
-      if !is_profile_general_agency?
-        @profile.primary_broker_role.person
-      else
-        Person.where("general_agency_staff_roles.general_agency_profile_id" => BSON::ObjectId.from_string(@profile.id)).first
       end
     end
   end
