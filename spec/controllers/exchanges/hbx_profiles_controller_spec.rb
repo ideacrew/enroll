@@ -299,7 +299,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
       allow(user).to receive(:permission).and_return(admin_permission)
       sign_in(user)
-      post :set_date, params: {forms_time_keeper => { :date_of_record =>  TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d') }}
+      post :set_date, params: {forms_time_keeper: { date_of_record:  TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d') }}
       expect(response).to have_http_status(:redirect)
     end
   end
@@ -391,7 +391,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     end
   end
 
-  describe "POST force_publish" do
+  describe "POST force_publish", :dbclean => :around_each do
 
     context "of an hbx super admin clicks Submit in Force Publish window" do
       let(:site) do
@@ -879,7 +879,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     end
   end
 
-  describe "benefit application creation" do
+  describe "benefit application creation", :dbclean => :around_each do
     let!(:user)                { FactoryBot.create(:user) }
     let!(:person)              { FactoryBot.create(:person, user: user) }
     let!(:permission)          { FactoryBot.create(:permission, :super_admin) }
@@ -955,7 +955,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     end
   end
 
-  describe "GET edit_fein" do
+  describe "GET edit_fein", :dbclean => :around_each do
 
     context "of an hbx super admin clicks Change FEIN" do
       let(:site) do
@@ -993,7 +993,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     end
   end
 
-  describe "POST update_fein" do
+  describe "POST update_fein", :dbclean => :around_each do
 
     context "of an hbx super admin clicks Submit in Change FEIN window" do
       let(:site) do
