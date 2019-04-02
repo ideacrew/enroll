@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe ScheduledEvent, type: :model do
+RSpec.describe ScheduledEvent, type: :model, dbclean: :after_each do
   subject { ScheduledEvent.new }
 
   it "has a valid factory" do

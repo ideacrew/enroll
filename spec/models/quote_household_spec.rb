@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe QuoteHousehold, type: :model do
+RSpec.describe QuoteHousehold, type: :model, dbclean: :after_each do
 
   let(:quote){ create :quote ,:with_two_households_and_members }
   let(:quote_benefit_group_1){create :quote_benefit_group, title: "Group1" , quote: quote}

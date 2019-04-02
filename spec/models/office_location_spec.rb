@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe OfficeLocation, :type => :model do
+RSpec.describe OfficeLocation, :type => :model, dbclean: :after_each do
 
   it { should validate_presence_of :address }
 

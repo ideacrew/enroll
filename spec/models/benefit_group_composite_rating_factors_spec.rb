@@ -49,7 +49,7 @@ describe BenefitGroup, "being asked for a group size rating factor" do
   end
 end
 
-describe BenefitGroup, "for a plan year which should estimate the group size" do
+describe BenefitGroup, "for a plan year which should estimate the group size", dbclean: :after_each do
   let(:employer_profile) { build(:employer_profile) }
   let(:plan_year) { PlanYear.new(:start_on => Date.new(2015, 2, 1), employer_profile: employer_profile) }
 
@@ -94,7 +94,7 @@ describe BenefitGroup, "for a plan year which should NOT estimate the group size
   end
 end
 
-describe BenefitGroup, "being asked for a composite rating participation rate factor" do
+describe BenefitGroup, "being asked for a composite rating participation rate factor", dbclean: :after_each do
   let(:carrier_profile_id) { double }
   let(:plan) { instance_double(Plan, :carrier_profile_id => carrier_profile_id) }
   let(:plan_option_kind) { "sole_source" }

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe UsersController do
+describe UsersController, dbclean: :after_each do
   let(:admin) { instance_double(User) }
   let(:user_policy) { instance_double(UserPolicy) }
   let(:user) { instance_double(User, :email => user_email) }

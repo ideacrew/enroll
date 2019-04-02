@@ -57,7 +57,7 @@ describe MoveEnrollmentBetweenTwoAccount, dbclean: :after_each do
       expect(family2.active_household.hbx_enrollments.size).to eq @size2+1
     end
   end
-  describe "it should move a shop enrollment" do
+  describe "it should move a shop enrollment", dbclean: :after_each do
     include_context 'setup benefit market with market catalogs and product packages'
     include_context 'setup initial benefit application'
 
