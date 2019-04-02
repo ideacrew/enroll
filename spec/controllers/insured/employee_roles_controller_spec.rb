@@ -34,14 +34,14 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
     describe "given valid person parameters" do
       let(:save_result) { true }
       it "should redirect to dependent_details" do
-        put :update, :person => person_parameters, :id => person_id
+        put :update, params: {person: person_parameters, id: person_id}
         expect(response).to have_http_status(:redirect)
         expect(response).to redirect_to(insured_family_members_path(:employee_role_id => employee_role_id))
       end
 
       context "to verify new addreses not created on updating the existing address" do
         before :each do
-          put :update, :person => person_parameters, :id => person_id
+          put :update, params: {person: person_parameters, id: person_id}
         end
 
         it "should not empty the person's addresses on update" do
@@ -57,7 +57,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
     describe "given invalid person parameters" do
       let(:save_result) { false }
       it "should render edit" do
-        put :update, :person => person_parameters, :id => person_id
+        put :update, params: {person: person_parameters, id: person_id}
         expect(response).to have_http_status(:success)
         expect(response).to render_template("edit")
         expect(assigns(:person)).to eq role_form
@@ -65,7 +65,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
 
      it "should call bubble_address_errors_by_person" do
        expect(controller).to receive(:bubble_address_errors_by_person)
-       put :update, :person => person_parameters, :id => person_id
+       put :update, params: {person: person_parameters, id: person_id}
        expect(response).to have_http_status(:success)
        expect(response).to render_template(:edit)
      end
@@ -100,7 +100,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
         allow(family).to receive(:latest_household).and_return(household)
         allow(household).to receive(:hbx_enrollments).and_return(hbx_enrollments)
         sign_in user
-        xhr :get, :new_message_to_broker
+        get :new_message_to_broker, xhr: true
         expect(response).to have_http_status(:success)
         expect(response).to render_template("new_message_to_broker")
       end
@@ -108,7 +108,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
         allow(person).to receive(:user).and_return(user)
         allow(broker_role).to receive(:person).and_return(person)
         sign_in user
-        post :send_message_to_broker, hbx_enrollment_id: hbx_enrollment.id
+        post :send_message_to_broker, params: {hbx_enrollment_id: hbx_enrollment.id}
         expect(response).to have_http_status(:redirect)
         expect(response).to redirect_to(insured_plan_shopping_path(:id => hbx_enrollment.id))
       end
@@ -157,7 +157,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
 
     context 'edit person parameters' do
       before :each do
-        get :edit, id: employee_role.id
+        get :edit, params: {id: employee_role.id}
       end
 
       it "return success http status" do
@@ -184,7 +184,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
 
     it "should trigger notice" do
       expect_any_instance_of(BenefitSponsors::Services::NoticeService).to receive(:deliver).with(notice_trigger_params).and_return(true)
-      get :edit, id: employee_role.id
+      get :edit, params: {id: employee_role.id}
     end
   end
 
@@ -216,7 +216,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
         allow(user).to receive(:switch_to_idp!)
         allow(user).to receive(:has_hbx_staff_role?).and_return(false)
         allow(employment_relationship).to receive_message_chain(:census_employee,:employer_profile,:parent,:legal_name).and_return("legal_name")
-        post :create, :employment_relationship => employment_relationship_properties
+        post :create, params: {employment_relationship: employment_relationship_properties}
       end
 
       it "should render the edit template" do
@@ -272,7 +272,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       allow(census_employee).to receive(:is_active?).and_return(true)
       allow(Forms::EmployeeCandidate).to receive(:new).with(person_parameters.merge({user_id: user_id})).and_return(mock_employee_candidate)
       allow(Factories::EmploymentRelationshipFactory).to receive(:build).with(mock_employee_candidate, [census_employee]).and_return(employment_relationships)
-      post :match, :person => person_parameters
+      post :match, params: {person: person_parameters}
     end
 
     context "given invalid parameters" do
