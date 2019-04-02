@@ -13,6 +13,8 @@
 <%= hidden_field_tag :copy_proposal_url, sponsored_benefits.organizations_plan_design_proposal_proposal_copies_path(plan_design_proposal.id) %>
 <%= hidden_field_tag :benefits_kind, kind %>
 <%= hidden_field_tag :add_dental_url, sponsored_benefits.new_organizations_plan_design_proposal_plan_selection_path(plan_design_proposal.id, kind: 'dental') %>
+<%= hidden_field_tag :elected_dental_plans, plan_design_proposal.active_benefit_group.elected_dental_plan_ids if plan_design_proposal.active_benefit_group %>
+
 <div class="row">
   <div class="col-md-12">
       <div class="hidden">

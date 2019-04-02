@@ -306,11 +306,6 @@ function calcPlanDesignContributions() {
     return;
   }
 
-  var elected_dental_plans = $("#elected_dental_plans").val()
-  if(elected_dental_plans) {
-    data['benefit_group']['elected_dental_plans'] = elected_dental_plans
-  }
-
   var url = $("#contribution_url").val();
 
   $.ajax({
@@ -391,6 +386,11 @@ function buildBenefitGroupParams() {
       "plan_option_kind": plan_option_kind,
       "kind": kind
     }
+  }
+
+  var elected_dental_plans = $("#elected_dental_plans").val()
+  if(elected_dental_plans) {
+    data['benefit_group']['elected_dental_plans'] = elected_dental_plans
   }
 
   if(plan_option_kind == 'sole_source') {

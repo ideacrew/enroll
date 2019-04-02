@@ -42,6 +42,16 @@ module SponsoredBenefits
         current_user
       end
 
+      def is_profile_general_agency?
+        @profile.class.to_s == "GeneralAgencyProfile"
+      end
 
+      def provider
+        if !is_profile_general_agency?
+          @profile.primary_broker_role.person
+        else
+          Person.where("general_agency_staff_roles.general_agency_profile_id" => BSON::ObjectId.from_string(@profile.id)).first
+        end
+      end
   end
 end
