@@ -13,14 +13,13 @@ describe RemoveHbxId do
 
   describe "changing person ssn" do
     let(:person) { FactoryBot.create(:person)}
-    before(:each) do
-      allow(ENV).to receive(:[]).with("person_hbx_id").and_return(person.hbx_id)
-    end
 
     it "should set person hbx id to nil" do
-      subject.migrate
-      person.reload
-      expect(person.hbx_id).to eq nil
+      ClimateControl.modify person_hbx_id: person.hbx_id do 
+        subject.migrate
+        person.reload
+        expect(person.hbx_id).to eq nil
+      end
     end
   end
 end
