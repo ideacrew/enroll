@@ -75,13 +75,15 @@ RSpec.describe DocumentsController, :type => :controller do
   end
 
   describe 'POST Fed_Hub_Request' do
+    let(:consumer_role) { person.consumer_role }
     before :each do
       request.env["HTTP_REFERER"] = "http://test.com"
+      allow(consumer_role).to receive(:invoke_residency_verification!).and_return(true)
     end
     context 'Call Hub for SSA verification' do
       it 'should redirect if verification type is SSN or Citozenship' do
         post :fed_hub_request, params: { verification_type: 'Social Security Number',person_id: person.id, id: document.id }
-        expect(response).to redirect_to :back
+        expect(response).to redirect_to "http://test.com"
         expect(flash[:success]).to eq('Request was sent to FedHub.')
       end
     end
@@ -89,7 +91,7 @@ RSpec.describe DocumentsController, :type => :controller do
       it 'should redirect if verification type is Residency' do
         person.consumer_role.update_attributes(aasm_state: 'verification_outstanding')
         post :fed_hub_request, params: { verification_type: 'DC Residency',person_id: person.id, id: document.id }
-        expect(response).to redirect_to :back
+        expect(response).to redirect_to "http://test.com"
         expect(flash[:success]).to eq('Request was sent to Local Residency.')
       end
     end
@@ -102,7 +104,7 @@ RSpec.describe DocumentsController, :type => :controller do
     end
 
     it "should redirect to back" do
-      expect(response).to redirect_to :back
+      expect(response).to redirect_to "http://test.com"
     end
   end
   describe "PUT update_verification_type" do
@@ -161,7 +163,7 @@ RSpec.describe DocumentsController, :type => :controller do
     context "redirection" do
       it "should redirect to back" do
         post :update_verification_type, params: { person_id: person.id }
-        expect(response).to redirect_to :back
+        expect(response).to redirect_to "http://test.com"
       end
     end
 
