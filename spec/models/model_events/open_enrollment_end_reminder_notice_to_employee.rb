@@ -1,17 +1,18 @@
 require 'rails_helper'
 
-RSpec.describe 'ModelEvents::InitialEmployeeOeEndReminderNotice', :dbclean => :after_each  do
-  let(:notice_event) { "initial_employee_oe_end_reminder_notice" }
+RSpec.describe 'ModelEvents::OpenEnrollmentEndReminderNoticeToEmployee', :dbclean => :after_each  do
+  let(:notice_event) { "open_enrollment_end_reminder_notice_to_employee" }
   let(:start_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }
   let(:organization) { FactoryGirl.create(:organization) }
   let!(:employer_profile) { FactoryGirl.create(:employer_profile, organization: organization) }
   let(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, aasm_state: 'enrolling') }
   let(:person){ FactoryGirl.create(:person, :with_family)}
-  let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile, employee_role_id: employee_role.id) }
+  let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile, employee_role_id: employee_role.id, hired_on: start_on.prev_year) }
   let!(:employee_role) { FactoryGirl.create(:employee_role, employer_profile: employer_profile, person: person) }
   let(:date_mock_object) { Date.new(start_on.year, start_on.prev_month.month, (Settings.aca.shop_market.open_enrollment.monthly_end_on - 2))}
 
   before do
+    census_employee.update_attributes!(created_at: start_on.prev_year)
     TimeKeeper.set_date_of_record_unprotected!(date_mock_object)
   end
 
@@ -21,8 +22,8 @@ RSpec.describe 'ModelEvents::InitialEmployeeOeEndReminderNotice', :dbclean => :a
 
   describe "ModelEvent" do
     it "should trigger model event" do
-      expect_any_instance_of(Observers::NoticeObserver).to receive(:deliver).with(recipient: employer_profile, event_object: plan_year, notice_event: 'low_enrollment_notice_for_employer').and_return(true)
-      expect_any_instance_of(Observers::NoticeObserver).to receive(:deliver).with(recipient: employee_role, event_object: plan_year, notice_event: notice_event).and_return(true)
+      expect_any_instance_of(Observers::NoticeObserver).to receive(:deliver).with(recipient: employee_role, event_object: plan_year, notice_event: notice_event)
+      expect_any_instance_of(Observers::NoticeObserver).to receive(:deliver).with(recipient: employer_profile, event_object: plan_year, notice_event: 'low_enrollment_notice_for_employer')
       PlanYear.date_change_event(date_mock_object)
     end
   end
@@ -30,17 +31,16 @@ RSpec.describe 'ModelEvents::InitialEmployeeOeEndReminderNotice', :dbclean => :a
   describe "NoticeTrigger" do
     context "2 days before open enrollment end date" do
       subject { Observers::NoticeObserver.new }
-      let(:model_event) { ModelEvents::ModelEvent.new(:initial_employee_oe_end_reminder_notice, plan_year, {}) }
+      let(:model_event) { ModelEvents::ModelEvent.new(:open_enrollment_end_reminder_notice_to_employee, plan_year, {}) }
 
       it "should trigger notice event" do
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
-          expect(event_name).to eq "acapi.info.events.employer.low_enrollment_notice_for_employer"
+          expect(event_name).to eq "acapi.info.events.employee.open_enrollment_end_reminder_notice_to_employee"
           expect(payload[:event_object_kind]).to eq 'PlanYear'
           expect(payload[:event_object_id]).to eq plan_year.id.to_s
         end
-
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
-          expect(event_name).to eq "acapi.info.events.employee.initial_employee_oe_end_reminder_notice"
+          expect(event_name).to eq "acapi.info.events.employer.low_enrollment_notice_for_employer"
           expect(payload[:event_object_kind]).to eq 'PlanYear'
           expect(payload[:event_object_id]).to eq plan_year.id.to_s
         end
@@ -100,12 +100,21 @@ RSpec.describe 'ModelEvents::InitialEmployeeOeEndReminderNotice', :dbclean => :a
       expect(merge_model.last_name).to eq person.last_name
     end
 
-    it "" do
+    it "should return open enrollment end on" do
       expect(merge_model.plan_year.current_py_oe_end_date).to eq plan_year.open_enrollment_end_on.strftime('%m/%d/%Y')
     end
 
     it "should return false when there is no broker linked to employer" do
       expect(merge_model.broker_present?).to be_falsey
+    end
+
+    context 'for renewing plan year' do
+      let(:renewing_plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, aasm_state: 'renewing_enrolling') }
+      let(:payload) { { "event_object_kind" => "PlanYear", "event_object_id" => plan_year.id } }
+
+      it 'should return renewing plan year open enrollment end on' do
+        expect(merge_model.plan_year.current_py_oe_end_date).to eq renewing_plan_year.open_enrollment_end_on.strftime('%m/%d/%Y')
+      end
     end
   end
 end

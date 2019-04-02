@@ -25,7 +25,7 @@ describe 'ModelEvents::LowEnrollmentNoticeForEmployer', dbclean: :around_each do
 
    describe "NoticeTrigger" do
     subject { Observers::NoticeObserver.new }
-    let(:model_event) { ModelEvents::ModelEvent.new(:low_enrollment_notice_for_employer, model_instance, {}) }
+    let(:model_event) { ModelEvents::ModelEvent.new(:open_enrollment_end_reminder_notice_to_employee, model_instance, {}) }
 
     context '2 days prior to publishing dead line' do
       it 'should trigger notice event' do

@@ -210,36 +210,7 @@ module Observers
       current_date = TimeKeeper.date_of_record
       if PlanYear::DATA_CHANGE_EVENTS.include?(model_event.event_key)
 
-        if model_event.event_key == :low_enrollment_notice_for_employer
-          trigger_low_enrollment_notice(current_date)
-        end
-
-        if model_event.event_key == :initial_employee_oe_end_reminder_notice
-          trigger_low_enrollment_notice(current_date)
-          initial_organizations_in_enrolling_state(current_date).each do |org|
-            begin
-              plan_year = org.employer_profile.plan_years.where(:aasm_state => "enrolling").first
-              org.employer_profile.census_employees.active.each do |ce|
-                begin
-                  deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "initial_employee_oe_end_reminder_notice")
-                end
-              end
-            end
-          end
-        end
-
-        if model_event.event_key == :renewal_employee_oe_end_reminder_notice
-          renewal_organizations_in_enrolling_state(current_date).each do |org|
-            begin
-              plan_year = org.employer_profile.plan_years.where(:aasm_state => "renewing_enrolling").first
-              org.employer_profile.census_employees.active.each do |ce|
-                begin
-                  deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "renewal_employee_oe_end_reminder_notice")
-                end
-              end
-            end
-          end
-        end
+        trigger_low_enrollment_and_oe_end_reminder_notice(current_date) if model_event.event_key == :open_enrollment_end_reminder_notice_to_employee
 
         if [ :renewal_employer_publish_plan_year_reminder_after_soft_dead_line,
              :renewal_plan_year_first_reminder_before_soft_dead_line,
@@ -339,15 +310,20 @@ module Observers
       deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "zero_employees_on_roster_notice") if plan_year.employer_profile.census_employees.active.count < 1
     end
 
-    def trigger_low_enrollment_notice(current_date)
-      organizations_for_low_enrollment_notice(current_date).each do |organization|
-        begin
-          plan_year = organization.employer_profile.plan_years.where(:aasm_state.in => ["enrolling", "renewing_enrolling"]).first
-          next if plan_year.effective_date.yday == 1
-          if plan_year.enrollment_ratio < Settings.aca.shop_market.employee_participation_ratio_minimum
-            deliver(recipient: organization.employer_profile, event_object: plan_year, notice_event: "low_enrollment_notice_for_employer")
+    def trigger_low_enrollment_and_oe_end_reminder_notice(current_date)
+      organizations_for_low_enrollment_notice(current_date).each do |org|
+        plan_year = org.employer_profile.plan_years.where(:aasm_state.in => ["enrolling", "renewing_enrolling"]).first
+        census_employees = org.employer_profile.census_employees.non_terminated
+        census_employees.each do |ce|
+          begin
+            next if ce.new_hire_enrollment_period.cover?(current_date) || ce.new_hire_enrollment_period.first > current_date
+            deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "open_enrollment_end_reminder_notice_to_employee")
+          rescue StandardError => e
+            Rails.logger.error { "Unable to trigger open_enrollment_end_reminder_notice_to_employee to #{ce.full_name} due to #{e.backtrace}" }
           end
         end
+        next if plan_year.effective_date.yday == 1
+        deliver(recipient: org.employer_profile, event_object: plan_year, notice_event: "low_enrollment_notice_for_employer") if plan_year.enrollment_ratio < Settings.aca.shop_market.employee_participation_ratio_minimum
       end
     end
 

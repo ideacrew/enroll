@@ -18,14 +18,12 @@ module ModelEvents
     ]
 
     DATA_CHANGE_EVENTS = [
-      :initial_employee_oe_end_reminder_notice,
-      :renewal_employee_oe_end_reminder_notice,
+      :open_enrollment_end_reminder_notice_to_employee,
         # :renewal_employer_open_enrollment_completed,
         # :renewal_employer_publish_plan_year_reminder_after_soft_dead_line,
         # :renewal_plan_year_first_reminder_before_soft_dead_line,
         # :initial_employer_no_binder_payment_received,
         # :renewal_plan_year_publish_dead_line,
-        :low_enrollment_notice_for_employer
         # :initial_employer_first_reminder_to_publish_plan_year,
         # :initial_employer_second_reminder_to_publish_plan_year,
         # :initial_employer_final_reminder_to_publish_plan_year
@@ -147,10 +145,6 @@ module ModelEvents
         #   is_renewal_plan_year_publish_dead_line = true
         # end
 
-        if new_date.day == Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on - 2
-          is_low_enrollment_notice_for_employer = true
-        end
-
         # # reminder notices for initial application with unpublished plan year
         # if (new_date+2.days).day == Settings.aca.shop_market.initial_application.advertised_deadline_of_month # 2 days prior to advertised deadline of month i.e., 8th of the month
         #   is_initial_employer_first_reminder_to_publish_plan_year = true
@@ -159,6 +153,11 @@ module ModelEvents
         # elsif new_date.day == Settings.aca.shop_market.initial_application.publish_due_day_of_month - 2 # 2 days prior to publish deadline of month i.e., 13th of the month
         #   is_initial_employer_final_reminder_to_publish_plan_year = true
         # end
+
+        # triggering the event every day open enrollment end reminder notice to employees
+        # This is because there is a possibility for the employers to change the open enrollment end date
+        # This also triggers low enrollment notice to employer
+        is_open_enrollment_end_reminder_notice_to_employee = true
 
         DATA_CHANGE_EVENTS.each do |event|
           if event_fired = instance_eval("is_" + event.to_s)
