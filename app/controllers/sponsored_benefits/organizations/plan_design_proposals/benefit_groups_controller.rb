@@ -15,7 +15,7 @@ module SponsoredBenefits
       def destroy
         plan_design_form.for_destroy
         flash[:success] = "Succesfully removed dental benefits from Quote"
-        redirect_to new_organizations_plan_design_proposal_plan_selection_path(proposal_id: params[:proposal_id])
+        redirect_to new_organizations_plan_design_proposal_plan_selection_path(proposal_id: params[:proposal_id], profile_id: params[:profile_id])
       end
 
       private
