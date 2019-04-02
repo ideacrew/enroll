@@ -3,7 +3,7 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 class RemoveOneCeFromEr < MongoidMigrationTask
   def migrate
     begin
-      census_employee=CensusEmployee.where(id:ENV['census_employee_id']).first
+      census_employee = CensusEmployee.where(id: ENV['census_employee_id']).first
         if census_employee.nil?
           puts 'Census Employee not found' unless Rails.env.test?
           return
