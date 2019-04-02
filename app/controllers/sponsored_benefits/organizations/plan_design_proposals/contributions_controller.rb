@@ -31,6 +31,7 @@ module SponsoredBenefits
         end
 
         def benefit_group
+          return @benefit_group if defined? @benefit_group
           @benefit_group ||= sponsorship.benefit_applications.first.benefit_groups.build(benefit_group_params)
         end
 
