@@ -1,5 +1,6 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "update_family_members_index")
+
 describe UpdateFamilyMembersIndex do
 
   let(:given_task_name) { "update_family_members_index" }
