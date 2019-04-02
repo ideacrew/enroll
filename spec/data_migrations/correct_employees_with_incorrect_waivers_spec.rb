@@ -62,11 +62,12 @@ describe CorrectEmployeesWithIncorrectWaivers, dbclean: :after_each do
     context "when family has incorrect passive waiver", dbclean: :after_each do
 
       before do
-        allow(ENV).to receive(:[]).with("year").and_return(renewing_employer.active_plan_year.start_on.year)
+        # allow(ENV).to receive(:[]).with("year").and_return(renewing_employer.active_plan_year.start_on.year)
         generate_renewal
       end
 
       it 'should cancel passive waiver and active waiver' do
+        ClimateControl.modify year: renewing_employer.active_plan_year.start_on.year.to_s do
         active_waiver = family.active_household.hbx_enrollments.detect{|e| e.inactive? }
         passive_waiver = family.active_household.hbx_enrollments.detect{|e| e.renewing_waived?}
         expect(active_waiver).to be_truthy
@@ -74,12 +75,15 @@ describe CorrectEmployeesWithIncorrectWaivers, dbclean: :after_each do
         subject.migrate
         expect(active_waiver.reload.coverage_canceled?).to be_truthy
         expect(passive_waiver.reload.coverage_canceled?).to be_truthy
+        end
       end
 
       it 'should generate passive renewal off of active coverage' do
+        ClimateControl.modify year: renewing_employer.active_plan_year.start_on.year.to_s do
         expect(family.active_household.hbx_enrollments.detect{|e| e.auto_renewing?}).to be_nil
         subject.migrate
         expect(family.reload.active_household.hbx_enrollments.detect{|e| e.auto_renewing?}).not_to be_nil
+        end
       end
     end
 
