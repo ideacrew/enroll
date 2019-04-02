@@ -60,7 +60,10 @@ RSpec.describe 'ModelEvents::GeneralAgencyHiredNotice', dbclean: :around_each  d
         end
       end
 
-      context "broker selects a default GA and broker has clients(employers)" do
+      context "broker has a default GA and selects another GA" do
+
+        let(:general_agency_profile2) { FactoryGirl.create(:general_agency_profile) }
+        let(:broker_agency_profile){ FactoryGirl.create(:broker_agency_profile, default_general_agency_profile_id: general_agency_profile2.id) }
 
         def update_broker_agency_profile
           broker_agency_profile.default_general_agency_profile = general_agency_profile
@@ -71,7 +74,13 @@ RSpec.describe 'ModelEvents::GeneralAgencyHiredNotice', dbclean: :around_each  d
           broker_agency_profile.observer_peers.keys.each do |observer|
             expect(observer).to receive(:broker_agency_profile_update) do |model_event|
               expect(model_event).to be_an_instance_of(ModelEvents::ModelEvent)
-              expect(model_event).to have_attributes(:event_key => :general_agency_hired, :klass_instance => broker_agency_profile, :options => {})
+              expect(model_event).to have_attributes(:event_key => :default_general_agency_hired, :klass_instance => broker_agency_profile, :options => { :old_general_agency_profile_id => general_agency_profile2.id.to_s })
+            end
+          end
+          broker_agency_profile.observer_peers.keys.each do |observer|
+            expect(observer).to receive(:broker_agency_profile_update) do |model_event|
+              expect(model_event).to be_an_instance_of(ModelEvents::ModelEvent)
+              expect(model_event).to have_attributes(:event_key => :default_general_agency_fired, :klass_instance => broker_agency_profile, :options => { :old_general_agency_profile_id => general_agency_profile2.id.to_s })
             end
           end
           update_broker_agency_profile
@@ -117,14 +126,9 @@ RSpec.describe 'ModelEvents::GeneralAgencyHiredNotice', dbclean: :around_each  d
         end
 
         let(:subject)     { Observers::NoticeObserver.new }
-        let(:model_event) { ModelEvents::ModelEvent.new(:general_agency_hired, broker_model_instance, {}) }
+        let(:model_event) { ModelEvents::ModelEvent.new(:default_general_agency_hired, broker_model_instance, {}) }
 
         it "should trigger notice event" do
-          expect(subject.notifier).to receive(:notify) do |event_name, payload|
-            expect(event_name).to eq "acapi.info.events.general_agency.general_agency_hired_confirmation_to_agency"
-            expect(payload[:event_object_kind]).to eq 'EmployerProfile'
-            expect(payload[:event_object_id]).to eq employer_profile.id.to_s
-          end
           expect(subject.notifier).to receive(:notify) do |event_name, payload|
             expect(event_name).to eq "acapi.info.events.general_agency.default_ga_hired_notice_to_general_agency"
             expect(payload[:event_object_kind]).to eq 'BrokerAgencyProfile'
