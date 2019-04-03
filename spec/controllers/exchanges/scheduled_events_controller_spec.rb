@@ -114,7 +114,6 @@ RSpec.describe Exchanges::ScheduledEventsController do
       post :delete_current_event, params:{id: scheduled_event.id, time: time}, xhr:true
     end
     it "should create an exception" do
-      binding.pry
       expect(ScheduledEvent.all.first.event_exceptions.length).to eq 1
       expect(ScheduledEvent.all.first.event_exceptions.first.time.day).to eq 22
       expect(ScheduledEvent.all.first.event_exceptions.first.time.month).to eq 8
