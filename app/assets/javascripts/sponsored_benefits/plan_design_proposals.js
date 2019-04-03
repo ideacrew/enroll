@@ -586,6 +586,8 @@ function saveProposalAndCopy(event) {
 }
 
 function saveProposalAndPublish(event) {
+  event.preventDefault();
+  event.stopImmediatePropagation()
   data = buildBenefitGroupParams();
   if (proposalIsInvalid(data)) {
 
