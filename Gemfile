@@ -56,6 +56,8 @@ gem 'mongoid_rails_migrations', '~> 1.2'
 gem 'aasm',                     '~> 4.8'
 gem 'addressable',              '~> 2.3'
 gem 'animate-rails',            '~> 1.0.10'
+gem 'recurring_select'
+
 gem 'aws-sdk',                  '~> 3.0'
 gem 'bcrypt',                   '~> 3.1'
 gem 'bootsnap',                 '>= 1.1', require: false
