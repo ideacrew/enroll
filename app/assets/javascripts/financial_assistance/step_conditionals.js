@@ -507,7 +507,7 @@ $(document).ready(function(){
 
   $("#mailed_yes, #mailed_no").on('change', function() {
     if( $('#mailed_yes, #mailed_no').is(':checked')){
-      $('.interaction-click-control-continue').prop('disabled', false)
+      $('.interaction-click-control-continue').prop('disabled', false);
      }
   });
 
