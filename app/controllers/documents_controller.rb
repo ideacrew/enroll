@@ -39,7 +39,7 @@ class DocumentsController < ApplicationController
        raise "Sorry! You are not authorized to download this document."
       end
     rescue => e
-      redirect_to(:back, :flash => {error: e.message})
+      redirect_back(fallback_location: root_path, :flash => {error: e.message})
     end
   end
 
@@ -59,7 +59,7 @@ class DocumentsController < ApplicationController
     end
 
     respond_to do |format|
-      format.html { redirect_to :back, :flash => flash_message }
+      format.html { redirect_back(fallback_location: root_path, :flash => flash_message) }
     end
   end
 
@@ -73,14 +73,14 @@ class DocumentsController < ApplicationController
        respond_to do |format|
          format.html {
            flash[:success] = "Enrollment group was completely verified."
-           redirect_to :back
+           redirect_back(fallback_location: root_path)
          }
        end
      else
        respond_to do |format|
          format.html {
            flash[:danger] = "Family does not have any active Enrollment to verify."
-           redirect_to :back
+           redirect_back(fallback_location: root_path)
          }
        end
      end
@@ -96,7 +96,7 @@ class DocumentsController < ApplicationController
       format.html {
         hub =  params[:verification_type] == 'DC Residency' ? 'Local Residency' : 'FedHub'
         flash[:success] = "Request was sent to #{hub}."
-        redirect_to :back
+        redirect_back(fallback_location: root_path)
       }
       format.js
     end
@@ -137,7 +137,7 @@ class DocumentsController < ApplicationController
     else
       flash[:danger] = "Family Member does not have any unverified Enrollment to extend verification due date."
     end
-    redirect_to :back
+    redirect_back(fallback_location: root_path)
   end
 
   def destroy
@@ -213,7 +213,7 @@ class DocumentsController < ApplicationController
 
   def update_document
     @document = EmployerProfile.find(params[:document_id]).employer_attestation
-    @reason = params[:reason_for_rejection] == "nil"? params[:other_reason] : params[:reason_for_rejection]
+    @reason = params[:reason_for_rejection] == "nil" ? params[:other_reason] : params[:reason_for_rejection]
     @document.employer_attestation_documents.find(params[:attestation_doc_id]).update_attributes(aasm_state: params[:status],reason_for_rejection: @reason)
     @document.update_attributes(aasm_state: params[:status])
 

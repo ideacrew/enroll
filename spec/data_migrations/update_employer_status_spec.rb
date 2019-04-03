@@ -18,36 +18,38 @@ describe UpdateEmployerStatus, dbclean: :after_each do
     let(:employer_profile){ FactoryBot.build(:employer_profile, aasm_state:'registered', plan_years: [plan_year]) }
     let(:organization)  {FactoryBot.create(:organization,employer_profile:employer_profile)}
 
-    before(:each) do
-      allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
-      allow(ENV).to receive(:[]).with("plan_year_start_on").and_return(plan_year.start_on)
-    end
-
     it "should update aasm_state of employer profile" do
-      subject.migrate
-      employer_profile.reload
-      expect(employer_profile.aasm_state).to eq "enrolled"
+      ClimateControl.modify fein:organization.fein, plan_year_start_on:"#{plan_year.start_on}" do
+        subject.migrate
+        employer_profile.reload
+        expect(employer_profile.aasm_state).to eq "enrolled"
+      end
     end
 
     it "should update aasm_state of plan year" do
-      subject.migrate
-      plan_year.reload
-      expect(plan_year.aasm_state).to eq "enrolled"
+      ClimateControl.modify fein:organization.fein, plan_year_start_on:"#{plan_year.start_on}" do
+        subject.migrate
+        plan_year.reload
+        expect(plan_year.aasm_state).to eq "enrolled"
+      end
     end
 
     it "should not update aasm_state of employer profile for invalid state" do
-      employer_profile.aasm_state='ineligile'
-      employer_profile.save
-      subject.migrate
-      employer_profile.reload
-      expect(employer_profile.aasm_state).to eq "ineligile"
+      ClimateControl.modify fein:organization.fein, plan_year_start_on:"#{plan_year.start_on}" do
+        employer_profile.aasm_state='ineligile'
+        employer_profile.save
+        subject.migrate
+        employer_profile.reload
+        expect(employer_profile.aasm_state).to eq "ineligile"
+      end
     end
 
     it "should not should update aasm_state of plan year when ENV['plan_year_start_on'] is empty" do
-      allow(ENV).to receive(:[]).with("plan_year_start_on").and_return('')
+      ClimateControl.modify fein:organization.fein, plan_year_start_on:"" do
       subject.migrate
       plan_year.reload
       expect(plan_year.aasm_state).to eq "application_ineligible"
+      end
     end
   end
 end

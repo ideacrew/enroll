@@ -23,34 +23,30 @@ describe RemoveMemberFromHbxEnrollment, dbclean: :after_each do
     context "it should not remove the hbx_enrollment" do
       let!(:hbx_enrollment_member1) { FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: hbx_enrollment, applicant_id: family_member1.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }
       let!(:hbx_enrollment_member2) { FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: hbx_enrollment, applicant_id: family_member2.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }
-      before(:each) do
-        allow(ENV).to receive(:[]).with("enrollment_hbx_id").and_return(hbx_enrollment.hbx_id)
-        allow(ENV).to receive(:[]).with("hbx_enrollment_member_id").and_return(hbx_enrollment_member1.id)
-      end
+  
       it "should not remove the hbx_enrollment" do
-        size=household.hbx_enrollments.size
-        expect(household.hbx_enrollments.size).to eq size
-        subject.migrate
-        household.reload
-        expect(household.hbx_enrollments.size).to eq size
+        ClimateControl.modify enrollment_hbx_id: hbx_enrollment.hbx_id, hbx_enrollment_member_id: hbx_enrollment_member1.id do 
+          size=hbx_enrollment.hbx_enrollment_members.size
+          expect(hbx_enrollment.hbx_enrollment_members.size).to eq size
+          subject.migrate
+          household.reload
+          expect(household.hbx_enrollments.first.hbx_enrollment_members.size).to eq size-1
+        end
       end
     end
     context "it should remove the related hbx_enrollment member" do
       let!(:hbx_enrollment_member1) { FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: hbx_enrollment, applicant_id: family_member1.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }
       let!(:hbx_enrollment_member2) { FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: hbx_enrollment, applicant_id: family_member2.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }
-      before(:each) do
-        allow(ENV).to receive(:[]).with("enrollment_hbx_id").and_return(hbx_enrollment.hbx_id)
-        allow(ENV).to receive(:[]).with("hbx_enrollment_member_id").and_return(hbx_enrollment_member1.id)
-      end
+      
       it "should remove the related hbx_enrollment_member from the hbx_enrollment" do
-        size=hbx_enrollment.hbx_enrollment_members.size
-        expect(hbx_enrollment.hbx_enrollment_members.size).to eq size
-        subject.migrate
-        household.reload
-        expect(household.hbx_enrollments.first.hbx_enrollment_members.size).to eq size-1
+        ClimateControl.modify enrollment_hbx_id: hbx_enrollment.hbx_id, hbx_enrollment_member_id: hbx_enrollment_member1.id do 
+          size=hbx_enrollment.hbx_enrollment_members.size
+          expect(hbx_enrollment.hbx_enrollment_members.size).to eq size
+          subject.migrate
+          household.reload
+          expect(household.hbx_enrollments.first.hbx_enrollment_members.size).to eq size-1
+        end
       end
     end
-
-
   end
 end

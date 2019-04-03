@@ -22,25 +22,23 @@ describe ChangePlanYearEffectiveDate, dbclean: :after_each do
     let(:enrollment) { FactoryBot.create(:hbx_enrollment, household: family.active_household)}
     let(:benefit_group_assignment) {FactoryBot.build(:benefit_group_assignment, benefit_group: benefit_group)}
     let(:census_employee) { FactoryBot.create(:census_employee, employer_profile_id: plan_year.employer_profile.id, :aasm_state => "eligible", benefit_group_assignments: [benefit_group_assignment]) }
-
-    before(:each) do
-      allow(ENV).to receive(:[]).with("fein").and_return(plan_year.employer_profile.parent.fein)
-      allow(ENV).to receive(:[]).with("aasm_state").and_return(plan_year.aasm_state)
-      allow(ENV).to receive(:[]).with("py_new_start_on").and_return(plan_year.start_on - 1.month)
-      allow(ENV).to receive(:[]).with("referenece_plan_hios_id").and_return(plan.hios_id)
-      allow(ENV).to receive(:[]).with("ref_plan_active_year").and_return(plan.active_year)
-      allow(ENV).to receive(:[]).with("action_on_enrollments").and_return("")
-      allow(ENV).to receive(:[]).with("plan_year_state").and_return("")
-      allow(benefit_group).to receive(:elected_plans_by_option_kind).and_return [plan]
-      plan_year.employer_profile.update_attributes(profile_source: "conversion")
-    end
-
+    
     it "should change the plan year effective on date" do
-      start_on = plan_year.start_on
-      expect(start_on).to eq (TimeKeeper.date_of_record + 2.months).beginning_of_month
-      subject.migrate
-      plan_year.reload
-      expect(plan_year.start_on).to eq start_on - 1.month
+      ClimateControl.modify fein: plan_year.employer_profile.parent.fein,
+        aasm_state: plan_year.aasm_state,
+        py_new_start_on: "#{plan_year.start_on - 1.month}",
+        referenece_plan_hios_id: plan.hios_id,
+        ref_plan_active_year: "#{plan.active_year}",
+        action_on_enrollments: "",
+        plan_year_state: "" do
+        allow(benefit_group).to receive(:elected_plans_by_option_kind).and_return [plan]
+        plan_year.employer_profile.update_attributes(profile_source: "conversion")
+        start_on = plan_year.start_on
+        expect(start_on).to eq (TimeKeeper.date_of_record + 2.months).beginning_of_month
+        subject.migrate
+        plan_year.reload
+        expect(plan_year.start_on).to eq (start_on - 1.month)
+      end
     end
 
     it "should change the reference plan" do
@@ -56,17 +54,31 @@ describe ChangePlanYearEffectiveDate, dbclean: :after_each do
     end
 
     it "should publish the plan year" do
-      allow(ENV).to receive(:[]).with("REDIS_URL").and_return("redis://what") # No
-      allow(ENV).to receive(:[]).with("REDIS_NAMESPACE_QUIET").and_return("what") # Idea
-      allow(ENV).to receive(:[]).with("REDIS_NAMESPACE_DEPRECATIONS").and_return("what") # WTF
-      allow(ENV).to receive(:[]).with("plan_year_state").and_return("force_publish")
-      allow_any_instance_of(CensusEmployee).to receive(:has_benefit_group_assignment?).and_return(true)
-      employer = plan_year.employer_profile
-      employer.census_employees << census_employee
-      employer.save!
-      subject.migrate
-      plan_year.reload
-      expect(plan_year.aasm_state).not_to eq "draft"
+      # allow(ENV).to receive(:[]).with("REDIS_URL").and_return("redis://what") # No
+      # allow(ENV).to receive(:[]).with("REDIS_NAMESPACE_QUIET").and_return("what") # Idea
+      # allow(ENV).to receive(:[]).with("REDIS_NAMESPACE_DEPRECATIONS").and_return("what") # WTF
+      # allow(ENV).to receive(:[]).with("plan_year_state").and_return("force_publish")
+      ClimateControl.modify fein: plan_year.employer_profile.parent.fein,
+              aasm_state: plan_year.aasm_state,
+              py_new_start_on: "#{plan_year.start_on - 1.month}",
+              referenece_plan_hios_id: plan.hios_id,
+              ref_plan_active_year: "#{plan.active_year}",
+              action_on_enrollments: "",
+              REDIS_URL: "redis://what",
+              REDIS_NAMESPACE_QUIET: "what",
+              REDIS_NAMESPACE_DEPRECATIONS: "what",
+              REDIS_NAMESPACE_DEPRECATIONS: "what", 
+              plan_year_state: "force_publish" do
+          allow_any_instance_of(CensusEmployee).to receive(:has_benefit_group_assignment?).and_return(true)
+          allow(benefit_group).to receive(:elected_plans_by_option_kind).and_return [plan]
+          plan_year.employer_profile.update_attributes(profile_source: "conversion")
+          employer = plan_year.employer_profile
+          employer.census_employees << census_employee
+          employer.save!
+          subject.migrate
+          plan_year.reload
+          expect(plan_year.aasm_state).not_to eq "draft"
+        end
     end
 
     it "should revert the renewal py if received args as revert renewal" do

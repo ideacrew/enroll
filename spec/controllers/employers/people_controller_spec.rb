@@ -26,7 +26,7 @@ RSpec.describe Employers::PeopleController do
     before(:each) do
       allow(user).to receive(:person).and_return(person)
       sign_in(user)
-      post :create, person: person_parameters
+      post :create, params: {person: person_parameters}
     end
 
     context "it should create person when create person button is clicked" do
@@ -46,7 +46,7 @@ RSpec.describe Employers::PeopleController do
     let(:addresses) {double(:select => double("select")) }
     let(:emails) {double(:select => double("select")) }
     let(:person) { double(:phones => phones, :addresses => addresses, :emails => emails)}
-    let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
+    let(:person_parameters) { ActionController::Parameters.new(:first_name => "SOMDFINKETHING").permit(:first_name,:user_id) }
     let(:more_params){{:create_person => "create", person: person_parameters}}
     let(:found_person) { [] }
     let(:mock_employee_candidate) { instance_double("Forms::EmployeeCandidate", :valid? => validation_result) }
@@ -59,7 +59,7 @@ RSpec.describe Employers::PeopleController do
       sign_in(user)
       allow(Forms::EmployeeCandidate).to receive(:new).with(person_parameters.merge({user_id: user_id})).and_return(mock_employee_candidate)
       allow(mock_employee_candidate).to receive(:match_person).and_return(found_person)
-      post :match, more_params
+      post :match, params: more_params
     end
 
     context "it should create person when create person button is clicked" do
@@ -75,7 +75,7 @@ RSpec.describe Employers::PeopleController do
   describe "POST match" do
     let(:user) { double(id: user_id) }
     let(:user_id) { "SOMDFINKETHING_ID" }
-    let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
+    let!(:person_parameters) { ActionController::Parameters.new(:first_name => "SOMDFINKETHING").permit(:first_name,:user_id) } 
     let(:found_person) { [] }
     let(:mock_employee_candidate) { instance_double("Forms::EmployeeCandidate", :valid? => validation_result) }
 
@@ -83,7 +83,7 @@ RSpec.describe Employers::PeopleController do
       sign_in(user)
       allow(Forms::EmployeeCandidate).to receive(:new).with(person_parameters.merge({user_id: user_id})).and_return(mock_employee_candidate)
       allow(mock_employee_candidate).to receive(:match_person).and_return(found_person)
-      post :match, :person => person_parameters
+      post :match, params: {:person => person_parameters}
     end
 
     context "given invalid parameters" do
@@ -145,7 +145,7 @@ RSpec.describe Employers::PeopleController do
       allow(person).to receive(:employer_contact).and_return("test")
       allow(person).to receive(:updated_by=).and_return("test")
       allow(person).to receive(:update_attributes).and_return(save_result)
-      put :update, valid_params
+      put :update, params: valid_params
     end
 
     context "given valid person parameters" do
