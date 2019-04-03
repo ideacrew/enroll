@@ -25,9 +25,7 @@ describe DeleteSingleInvoiceWithFein, dbclean: :after_each do
         format: 'file_content_type' })}
 
     before do
-      # allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
       employer_profile.documents << employer_invoice_1
-      # allow(ENV).to receive(:[]).with("date").and_return(employer_profile.documents.first.date.to_s)
     end
 
     it 'Should delete the invoice' do
