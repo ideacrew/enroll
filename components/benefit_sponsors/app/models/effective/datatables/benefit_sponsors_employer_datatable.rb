@@ -14,14 +14,13 @@ module Effective
           bulk_action 'Mark Binder Paid', binder_paid_exchanges_hbx_profiles_path, data: {  confirm: 'Mark Binder Paid?', no_turbolink: true }
         end
 
-        table_column :legal_name, :proc => Proc.new { |row|
+        col :legal_name do |row|
           @employer_profile = row.organization.employer_profile
           (link_to row.organization.legal_name.titleize, benefit_sponsors.profiles_employers_employer_profile_path(@employer_profile.id, :tab=>'home'))
-
-          }, :sortable => false, :filter => false
-        table_column :fein, :label => 'FEIN', :proc => Proc.new { |row| row.organization.fein }, :sortable => false, :filter => false
-        table_column :hbx_id, :label => 'HBX ID', :proc => Proc.new { |row| row.organization.hbx_id }, :sortable => false, :filter => false
-        table_column :broker, :proc => Proc.new { |row|
+        end
+        col :fein, :label => 'FEIN', :proc => Proc.new { |row| row.organization.fein }, :sortable => false, :filter => false
+        col :hbx_id, :label => 'HBX ID', :proc => Proc.new { |row| row.organization.hbx_id }, :sortable => false, :filter => false
+        col :broker, :proc => Proc.new { |row|
             @employer_profile.try(:active_broker_agency_legal_name).try(:titleize) #if row.employer_profile.broker_agency_profile.present?
           }, :filter => false
 
@@ -33,26 +32,26 @@ module Effective
         # table_column :conversion, :proc => Proc.new { |row|
         #   boolean_to_glyph(row.is_conversion?)}, :filter => {include_blank: false, :as => :select, :collection => ['All','Yes', 'No'], :selected => 'All'}
 
-        table_column :source_kind, :proc => Proc.new { |row|
+        col :source_kind, :proc => Proc.new { |row|
           row.source_kind.to_s.humanize},
           :filter => {include_blank: false, :as => :select, :collection => SOURCE_KINDS, :selected => "all"}
 
-        table_column :plan_year_state, :proc => Proc.new { |row|
+        col :plan_year_state, :proc => Proc.new { |row|
           if row.latest_benefit_application.present?
             benefit_application_summarized_state(row.latest_benefit_application)
           end }, :filter => false
-        table_column :effective_date, :proc => Proc.new { |row|
+        col :effective_date, :proc => Proc.new { |row|
           if row.latest_benefit_application.present?
             row.latest_benefit_application.effective_period.min.strftime("%m/%d/%Y")
           end }, :filter => false, :sortable => true
 
-        table_column :invoiced?, :proc => Proc.new { |row|
+        col :invoiced?, :proc => Proc.new { |row|
           boolean_to_glyph(@employer_profile.current_month_invoice.present?)}, :filter => false
 
         # table_column :xml_submitted, :label => 'XML Submitted', :proc => Proc.new {|row| format_time_display(@employer_profile.xml_transmitted_timestamp)}, :filter => false, :sortable => false
 
         if employer_attestation_is_enabled?
-          table_column :attestation_status, :label => 'Attestation Status', :proc => Proc.new {|row|
+          col :attestation_status, :label => 'Attestation Status', :proc => Proc.new {|row|
             #TODO fix this after employer attestation is fixed, this is only temporary fix
             #used below condition, as employer_attestation is embedded from both employer profile and benefit sponsorship
             if row.employer_attestation.present?
@@ -63,7 +62,7 @@ module Effective
           }, :filter => false, :sortable => false
         end
 
-        table_column :actions, :width => '50px', :proc => Proc.new { |row|
+        col :actions, :width => '50px', :proc => Proc.new { |row|
           dropdown = [
            # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
            ['Transmit XML', "#", "disabled"],
@@ -155,8 +154,7 @@ module Effective
             benefit_sponsorships = benefit_sponsorships.attestations_by_kind(attributes[:attestations])
           end
         end
-
-          @employer_collection = benefit_sponsorships
+        benefit_sponsorships
       end
 
       def global_search?
