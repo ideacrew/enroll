@@ -14,7 +14,7 @@ require 'rails_helper'
     end
 
     it "should redirect to new_user_password_path" do
-      post :create, { user: { email: email} }
+      post :create, params: { user: { email: email} }
       expect(response).to have_http_status(302)
     end
   end
