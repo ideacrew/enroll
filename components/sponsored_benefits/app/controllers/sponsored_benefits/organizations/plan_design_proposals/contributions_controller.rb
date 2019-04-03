@@ -7,7 +7,7 @@ module SponsoredBenefits
         if benefit_group.sole_source?
           benefit_group.build_estimated_composite_rates
         end
-        benefit_group.send "set_bounding_cost_#{kind}_plans"
+        benefit_group.set_bounding_cost_plans
         @employer_contribution_amount = benefit_group.monthly_employer_contribution_amount(@plan)
         @min_employee_cost = benefit_group.monthly_min_employee_cost
         @max_employee_cost = benefit_group.monthly_max_employee_cost
@@ -31,20 +31,15 @@ module SponsoredBenefits
         end
 
         def benefit_group
-          if kind == "health"
-            @benefit_group ||= sponsorship.benefit_applications.first.benefit_groups.build(benefit_group_params)
-          else
-            dental_relation = benefit_group_params[:relationship_benefits_attributes]
-            benefit_group_dental_params = benefit_group_params.merge(dental_relationship_benefits_attributes: dental_relation)
-
-            @benefit_group ||= sponsorship.benefit_applications.first.benefit_groups.build(benefit_group_dental_params)
-          end
+          return @benefit_group if defined? @benefit_group
+          @benefit_group ||= sponsorship.benefit_applications.first.benefit_groups.build(benefit_group_params)
         end
 
         def benefit_group_params
           params.require(:benefit_group).permit(
                       :reference_plan_id,
                       :plan_option_kind,
+                      :elected_dental_plans,
                       relationship_benefits_attributes: [:relationship, :premium_pct, :offered],
                       composite_tier_contributions_attributes: [:composite_rating_tier, :employer_contribution_percent, :offered]
           )

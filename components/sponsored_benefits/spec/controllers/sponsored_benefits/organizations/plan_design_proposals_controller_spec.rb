@@ -70,7 +70,7 @@ module SponsoredBenefits
 
     describe "GET #index" do
       it "returns a success response" do
-        xhr :get, :index, { plan_design_organization_id: plan_design_organization.id }, valid_session
+        xhr :get, :index, { plan_design_organization_id: plan_design_organization.id, profile_id:  plan_design_organization.owner_profile_id}, valid_session
         expect(response).to be_success
       end
     end
@@ -84,14 +84,14 @@ module SponsoredBenefits
 
     describe "GET #new" do
       it "returns a success response" do
-        get :new, { plan_design_organization_id: plan_design_organization.id }, valid_session
+        get :new, { plan_design_organization_id: plan_design_organization.id, profile_id:  plan_design_organization.owner_profile_id }, valid_session
         expect(response).to be_success
       end
     end
 
     describe "GET #edit" do
       it "returns a success response" do
-        get :edit, { id: plan_design_proposal.to_param, plan_design_organization_id: plan_design_organization.id }, valid_session
+        get :edit, { id: plan_design_proposal.to_param, plan_design_organization_id: plan_design_organization.id, profile_id:  plan_design_organization.owner_profile_id }, valid_session
         expect(response).to be_success
       end
     end

@@ -18,7 +18,7 @@ module SponsoredBenefits
       it "should return success" do
         sign_in user_with_broker_role
         benefit_application.benefit_sponsorship.update_attributes(initial_enrollment_period: enrollment_period)
-        get :new, plan_design_proposal_id: plan_design_proposal.id
+        get :new, plan_design_proposal_id: plan_design_proposal.id, profile_id: broker_agency_profile.id
         expect(response).to have_http_status(:success)
       end
     end
