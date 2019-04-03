@@ -49,9 +49,9 @@ describe "CcaEmployerProfilesMigration" do
 
     #TODO modify it after employer profile script is updated according to benefit sponsorship
     it "should match total migrated organizations" do
-      silence_stream(STDOUT) do
+      # silence_stream(STDOUT) do
         Mongoid::Migrator.run(:up, @migrations_paths, @test_version.to_i)
-      end
+      # end
 
       expect(@migrated_organizations.count).to eq 1
     end
