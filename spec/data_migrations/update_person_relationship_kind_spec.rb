@@ -19,14 +19,16 @@ describe UpdatePersonRelationshipKind, dbclean: :after_each do
     before(:each) do
       person.person_relationships << PersonRelationship.new(relative: person, kind: "child")
       person.save
-      allow(ENV).to receive(:[]).with("hbx_id").and_return(person.hbx_id)
+      # allow(ENV).to receive(:[]).with("hbx_id").and_return(person.hbx_id)
     end
 
     it "should change person relationships kind" do
-      expect(person.person_relationships.first.kind).to  eq("child")
-      subject.migrate
-      person.reload
-      expect(person.person_relationships.first.kind).to  eq("self")
+      ClimateControl.modify hbx_id: person.hbx_id do 
+        expect(person.person_relationships.first.kind).to  eq("child")
+        subject.migrate
+        person.reload
+        expect(person.person_relationships.first.kind).to  eq("self")
+      end
     end
   end
 end
