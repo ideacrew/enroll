@@ -14,16 +14,15 @@ describe RemovePersonSsn do
 
   describe "changing person ssn" do
     let(:person) { FactoryBot.create(:person, ssn:"123123123")}
-    before(:each) do
-      allow(ENV).to receive(:[]).with("person_hbx_id").and_return(person.hbx_id)
-    end
 
     it "should change person ssn to nil" do
+      ClimateControl.modify person_hbx_id: person.hbx_id do
       ssn=person.ssn
       expect(person.ssn).to eq ssn
       subject.migrate
       person.reload
       expect(person.ssn).to eq nil
+      end
     end
   end
 end
