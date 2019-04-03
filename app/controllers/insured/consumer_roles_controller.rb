@@ -35,8 +35,8 @@ class Insured::ConsumerRolesController < ApplicationController
       session.delete(:individual_assistance_path)
     end
 
-    if params.permit(:build_consumer_role)[:build_consumer_role].present? && session[:person_id]
-      person = Person.find(session[:person_id])
+    if params[:build_consumer_role].present? && params[:person_id].present?
+      person = Person.find(params[:person_id])
 
       @person_params = person.attributes.extract!("first_name", "middle_name", "last_name", "gender")
       @person_params[:ssn] = Person.decrypt_ssn(person.encrypted_ssn)

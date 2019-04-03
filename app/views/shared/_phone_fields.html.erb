@@ -1,6 +1,8 @@
 <div id="phone_info" class="row no-buffer no-border-top">
   <div class="phone col-md-12 col-sm-12 col-xs-12 no-pd">
     <%= f.fields_for :phones, errors: {}, fieldset: true do |phone|  %>
+      <% next if phone.object.kind ==  'phone main' %>
+      <% next if phone.object.kind ==  'work' %>
       <% if((phone.index == 0) || (phone.index == 2)) && ::Phone::KINDS.include?(phone.object.kind) %>
         <div class="row row-form-wrapper no-buffer">
       <% end %>
@@ -15,7 +17,7 @@
         <%= phone.text_field :full_phone_number, placeholder: "#{kind} PHONE", class: "#{required} number textfield floatlabel phone_number form-control" %>
       </div>
     </div>
-    <% if((phone.index == 1) || (phone.index == 3)) %>
+      <% if((phone.index == 1) || (phone.index == 3)) %>
         </div>
       <% end %>
     <% end%>
