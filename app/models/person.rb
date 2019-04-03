@@ -14,6 +14,7 @@ class Person
   include UnsetableSparseFields
   include FullStrippedNames
   include ::BenefitSponsors::Concerns::Observable
+  include SponsoredBenefits::Concerns::Dob
 
   # verification history tracking
   include Mongoid::History::Trackable
