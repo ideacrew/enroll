@@ -21,7 +21,8 @@ describe ActivateOrDeactivateEmployerLinkForBroker, dbclean: :around_each do
                                             fein: organization.fein,
                                             legal_name: organization.legal_name,
                                             has_active_broker_relationship: false,
-                                            sic_code: employer_profile.sic_code
+                                            sic_code: employer_profile.sic_code,
+                                            broker_agency_profile:broker_agency_profile1
                                           )
                                         }
 
