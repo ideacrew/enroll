@@ -22,10 +22,9 @@ describe RemoveFamilyMemberFromCoverageHousehold, dbclean: :after_each do
     action: "RemoveCoverageHouseholdMember"
   }}
 
-
  def with_modified_env(options, &block)
-  ClimateControl.modify(options, &block)
-end 
+   ClimateControl.modify(options, &block)
+ end
 
   let(:given_task_name) {"remove_family_member_from_coverage_household"}
 
@@ -48,7 +47,6 @@ end
     end
   end
 
-
   describe "removing duplicate family member" do
 
     it "should remove a family member based on first and last names" do
@@ -59,8 +57,6 @@ end
       end
     end
   end
-
-
   
   describe "removing all duplicate family member" do
     let(:family_member_2) {FactoryBot.create(:family_member, family: family)}

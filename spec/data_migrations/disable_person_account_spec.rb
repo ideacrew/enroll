@@ -13,15 +13,15 @@ describe DisablePersonAccount do
   end
 
   describe "disable person account", dbclean: :after_each do
-    let(:person) { FactoryBot.create(:person, is_active: true, is_disabled: nil) }
-    before(:each) do
-      allow(ENV).to receive(:[]).with("hbx_id").and_return(person.hbx_id)
-    end
+    let(:person) { FactoryBot.create(:person, :with_ssn, is_active: true, is_disabled: nil) }
+    let(:employee_role) { FactoryBot.create(:employee_role, person: person)}
     it "should disable the person" do
-      subject.migrate
-      person.reload
-      expect(person.is_active).to eq false
-      expect(person.is_disabled).to eq true
+      ClimateControl.modify hbx_id: person.hbx_id do 
+        subject.migrate
+        person.reload
+        expect(person.is_active).to eq false
+        expect(person.is_disabled).to eq true
+      end
     end
   end
 end

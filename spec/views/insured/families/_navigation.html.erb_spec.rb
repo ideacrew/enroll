@@ -7,8 +7,8 @@ RSpec.describe "insured/families/_navigation.html.erb" do
   let(:person){
     instance_double(
       "Person",
-      first_name: "my first name",
-      last_name: "my last name"
+      first_name: "My first name",
+      last_name: "My last name"
       )
   }
   let(:employee_role){ instance_double("EmployeeRole") }
@@ -62,9 +62,10 @@ RSpec.describe "insured/families/_navigation.html.erb" do
       end
 
       it "should display the info under my account in the side bar" do
-        expect(rendered).to have_selector('h4', 'My Account')
-        expect(rendered).to have_selector('span', "#{person.first_name} #{person.last_name}")
-        expect(rendered).to have_selector('span', "Your household of #{family_members.count}")
+        expect(rendered).to have_text('My Account')
+        expect(rendered).to have_text("#{person.first_name}")
+        expect(rendered).to have_text("#{person.last_name}")
+        expect(rendered).to have_text("Your Household of #{family_members.count}")
       end
 
       it "should display the list of active household" do
@@ -96,9 +97,10 @@ RSpec.describe "insured/families/_navigation.html.erb" do
       end
 
       it "should display the info under my account in the side bar" do
-        expect(rendered).to have_selector('h4', 'My Account')
-        expect(rendered).to have_selector('span', "#{person.first_name} #{person.last_name}")
-        expect(rendered).to have_selector('span', "Your household of #{family_members.count}")
+        expect(rendered).to have_text( 'My Account')
+        expect(rendered).to have_text("#{person.first_name}" )
+        expect(rendered).to have_text("#{person.last_name}")
+        expect(rendered).to have_text("Your Household of #{family_members.count}")
       end
 
       it "should display the list of active household" do
@@ -132,9 +134,10 @@ RSpec.describe "insured/families/_navigation.html.erb" do
       end
 
       it "should display the info under my account in the side bar" do
-        expect(rendered).to have_selector('h4', 'My Account')
-        expect(rendered).to have_selector('span', "#{person.first_name} #{person.last_name}")
-        expect(rendered).to have_selector('span', "Your household of #{family_members.count}")
+        expect(rendered).to have_text( 'My Account')
+        expect(rendered).to have_text("#{person.first_name}" )
+        expect(rendered).to have_text("#{person.last_name}")
+        expect(rendered).to have_text("Your Household of #{family_members.count}")
       end
 
       it "should display the list of active household" do
@@ -168,9 +171,9 @@ RSpec.describe "insured/families/_navigation.html.erb" do
     end
 
     it "should display the info under my account in the side bar" do
-      expect(rendered).to have_selector('h4', 'My Account')
-      expect(rendered).to have_selector('span', "#{person.first_name} #{person.last_name}")
-      expect(rendered).to have_selector('span', "Your household of #{family_members.count}")
+      expect(rendered).to have_text('My Account')
+      expect(rendered).to have_text("#{person.first_name}")
+      expect(rendered).to have_text("Your Household of #{family_members.count}")
     end
 
     it "should display the list of active household" do
