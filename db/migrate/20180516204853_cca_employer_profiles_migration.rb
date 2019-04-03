@@ -13,9 +13,10 @@ class CcaEmployerProfilesMigration < Mongoid::Migration
 
       CSV.open(file_name, 'w') do |csv|
         csv << field_names
-
+        
         #build and create GeneralOrganization and its profiles
         status = create_profile(site_key, csv, logger)
+        # binding.pry
 
         if status
           puts "" unless Rails.env.test?
@@ -171,7 +172,6 @@ class CcaEmployerProfilesMigration < Mongoid::Migration
 
   def self.initialize_new_profile(old_org, old_profile_params)
     new_profile = BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new(old_profile_params)
-
     if @old_profile.contact_method == "Only Electronic communications"
       new_profile.contact_method = :electronic_only
     elsif @old_profile.contact_method == "Paper and Electronic communications"
@@ -190,10 +190,9 @@ class CcaEmployerProfilesMigration < Mongoid::Migration
 
   def self.build_employer_attestation(obj)
 
-    old_attestation_params = @old_profile.employer_attestation.attributes.except("_id", "employer_profile", "employer_attestation_documents", "workflow_state_transitions")
+    old_attestation_params = @old_profile.employer_attestation.attributes.except("_id", "updated_by_id", "employer_profile", "employer_attestation_documents", "workflow_state_transitions")
 
     new_employer_attestation  = obj.build_employer_attestation(old_attestation_params)
-
     old_workflow_state_trans = @old_profile.employer_attestation.workflow_state_transitions
     build_workflow_state_transition(old_workflow_state_trans ,new_employer_attestation)
 

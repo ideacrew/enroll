@@ -14,15 +14,14 @@ describe RemoveOrganization, dbclean: :after_each do
 
   describe "deleting organization" do
     let(:organization) { FactoryBot.create(:organization)}
-    before(:each) do
-      allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
-    end
 
     it "should remove organization" do
+      ClimateControl.modify fein: organization.fein do
       fein=organization.fein
       expect(organization.fein).to eq fein
       subject.migrate
       expect(Organization.where(fein: fein).size).to eq 0
+      end
     end
   end
 end
