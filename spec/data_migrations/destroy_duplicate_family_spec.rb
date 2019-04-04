@@ -17,10 +17,6 @@ describe DestroyDuplicateFamily, dbclean: :after_each do
     let(:active_household) {family.active_household}
     let(:enrollment) { FactoryBot.create(:hbx_enrollment, effective_on:TimeKeeper.date_of_record,aasm_state:'coverage_selected')}
 
-    before(:each) do
-      # allow(ENV).to receive(:[]).with("family_id").and_return(family.id)
-    end
-
     it 'should destroy family when account has no active enrollments' do
       ClimateControl.modify family_id: family.id do
         expect(Family.all.count).to eq 1
