@@ -35,6 +35,16 @@ $(document).ready(function() {
       }
     }, interval_time);
   }
+
+  $("#household_info_add_member").click(function() {
+    var path = location.pathname.split('/')[1];
+    if (path === 'financial_assistance') {
+      setTimeout(function() {
+        $('span#is_applying_coverage_value_dep').hide();
+      },200);
+    }
+  });
+
 });
 // Provides functionality to display modal then navigate to household income on confirming
 var toLocation = '';
