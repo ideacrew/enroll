@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :general_agency_staff_role do
-    person { FactoryBot.create(:person) }
+    person { FactoryBot.create(:person, :with_ssn) }
     npn do
       Forgery('basic').text(:allow_lower   => false,
                             :allow_upper   => false,

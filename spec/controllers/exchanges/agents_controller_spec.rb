@@ -40,19 +40,19 @@ RSpec.describe Exchanges::AgentsController do
 
     before(:each) do
       allow(current_user).to receive(:roles).and_return ['consumer']
-      controller.class.skip_before_action :check_agent_role
+      controller.class.skip_before_action :check_agent_role, raise: false
     end
     context "actions when not passed Ridp" do
       it 'should redirect to family account path' do
         sign_in current_user
-        get :resume_enrollment, person_id: person_user.id
+        get :resume_enrollment, params: {person_id: person_user.id}
         expect(response).to redirect_to family_account_path
       end
 
       it 'should redirect to consumer role bookmark url' do
         consumer_role.update_attributes(bookmark_url: '/')
         sign_in current_user
-        get :resume_enrollment, person_id: person_user.id
+        get :resume_enrollment, params: {person_id: person_user.id}
         expect(response).to redirect_to person_user.consumer_role.bookmark_url
       end
     end
@@ -65,12 +65,12 @@ RSpec.describe Exchanges::AgentsController do
       end
 
       it "should not redirect to family account path if not paper application" do
-        get :resume_enrollment, person_id: person_user.id, original_application_type: "not_paper"
+        get :resume_enrollment,params: {person_id: person_user.id, original_application_type: "not_paper"}
         expect(response).not_to redirect_to family_account_path
       end
 
       it "should redirect to family account path if admin submitted paper application" do
-        get :resume_enrollment, person_id: person_user.id, original_application_type: "paper"
+        get :resume_enrollment, params: {person_id: person_user.id, original_application_type: "paper"}
         expect(response).to redirect_to family_account_path
       end
     end
