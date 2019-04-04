@@ -31,7 +31,7 @@ module Effective
         }, :filter => false, :sortable => false
       end
 
-      collection do
+      def collection
         return @notices_collection if defined? @notices_collection
         @notices_collection = Notifier::NoticeKind.all
       end
