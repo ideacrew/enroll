@@ -12,9 +12,9 @@ describe UpdateHbxId do
   end
 
   describe "changing hbx id within person records", db_clean: :before_each do
-    
-    let!(:person1) { FactoryBot.create(:person)}
-    let!(:person2) { FactoryBot.create(:person)}
+
+    let!(:person1) { FactoryBot.create(:person, :with_ssn)}
+    let!(:person2) { FactoryBot.create(:person, :with_ssn)}
     let(:correct_hbxid) {person1.hbx_id}
     let(:incorrect_hbxid) {person2.hbx_id}
 
