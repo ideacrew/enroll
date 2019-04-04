@@ -1,9 +1,9 @@
 <div class="dropdown pull-right" id="<%= row_actions_id %>">
-  <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="dropdown_for_<%= row_actions_id %>">
+  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" >
     Actions
     <span class="caret"></span>
   </button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown_for_<%= row_actions_id %>">
+  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
     <% dropdowns.each do |line| %>
       <!-- line[0] is Link Name (Eg: Add SEP)
            line[1] is Link Path
@@ -14,8 +14,8 @@
           <% if line[0] == 'Edit APTC / CSR' %>
             <%= link_to line[0], line[1], class: "btn btn-info btn-xs edit_aptc_csr_#{row_actions_id}", disabled: true, remote: true %>
           <% else %>
-            <%= link_to line[0], line[1], class: "btn btn-xs", disabled: true%>
-          <%end%>
+            <%= link_to line[0], line[1], class: "btn btn-info btn-xs", disabled: true %>
+          <% end %>
         <%when "static"%>
           <%= link_to line[0], line[1], class: "btn btn-xs" %>
         <% when "post" %>
@@ -39,3 +39,6 @@
     <% end %>
   </ul>
 </div>
+<script>
+    $("li>a:contains('Collapse Form')").addClass('disabled');
+</script>

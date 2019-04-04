@@ -37,7 +37,7 @@ module SponsoredBenefits
       if @form.fire!
         flash[:notice] = "Succesfully Fired General Agency"
       else
-        flash[:notice] = "Clear Assignment failed: #{@form.errors.full_messages.join(",")}"
+        flash[:error] = "Clear Assignment failed: #{@form.errors.full_messages.join(",")}"
       end
       redirect_to sponsored_benefits.employers_organizations_broker_agency_profile_path(id: @form.broker_agency_profile_id)
     end
