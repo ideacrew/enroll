@@ -1,13 +1,21 @@
 class FinancialAssistance::ApplicationsController < ApplicationController
   before_action :set_current_person
   before_action :set_primary_family
+  before_action :eligibility_check,  only: [:create]
+  before_action :eligibility_check,  only: [:get_help_paying_coverage_response], if: :check_cond?
 
   include UIHelpers::WorkflowController
   include NavigationHelper
   include Acapi::Notifiers
+  include L10nHelper
+  include FinancialAssistanceHelper
   require 'securerandom'
 
   before_filter :load_support_texts, only: [:edit, :help_paying_coverage]
+
+  def check_cond?
+    params["is_applying_for_assistance"] == true
+  end
 
   def index
     @family = @person.primary_family
@@ -20,11 +28,16 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def create
-    @application = @person.primary_family.applications.new
-    @application.populate_applicants_for(@person.primary_family)
-    @application.save!
+    if @assistance_status
+      @application = @person.primary_family.applications.new
+      @application.populate_applicants_for(@person.primary_family)
+      @application.save!
 
-    redirect_to edit_financial_assistance_application_path(@application)
+      redirect_to edit_financial_assistance_application_path(@application)
+    else
+      flash[:error] = l10n(decode_msg(@message)).to_s
+      redirect_to financial_assistance_applications_path
+    end
   end
 
   def edit
@@ -99,8 +112,6 @@ class FinancialAssistance::ApplicationsController < ApplicationController
       flash[:error] = "Please choose an option before you proceed."
       redirect_to help_paying_coverage_financial_assistance_applications_path
     elsif params["is_applying_for_assistance"] == "true"
-      person = FinancialAssistance::Factories::AssistanceFactory.new(@person)
-      @assistance_status, @message = person.search_existing_assistance
       @family.is_applying_for_assistance = @assistance_status
       @family.save!
       @assistance_status ? aqhp_flow : redirect_to_msg
@@ -177,6 +188,11 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   private
+
+  def eligibility_check
+    person = FinancialAssistance::Factories::AssistanceFactory.new(@person)
+    @assistance_status, @message = person.search_existing_assistance
+  end
 
   def set_primary_family
     @family = @person.primary_family
