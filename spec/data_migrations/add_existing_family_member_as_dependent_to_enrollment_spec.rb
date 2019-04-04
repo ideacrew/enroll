@@ -10,41 +10,39 @@ describe AddExistingFamilyMemberAsDependentToEnrollment, dbclean: :after_each do
 
   let(:family_member){FactoryBot.create(:family_member, family: family,is_primary_applicant: false, is_active: true, person: person)}
   context "won't add enrollment memeber if not found hbx_enrollment" do
-    before do
-      allow(ENV).to receive(:[]).with("hbx_enrollment_id").and_return('')
-      allow(ENV).to receive(:[]).with("family_member_id").and_return(family_member.id)
-      allow(ENV).to receive(:[]).with("coverage_begin").and_return("2016-01-01")
-      family.add_family_member(person)
-    end
     it "won't add enrollment memeber if not found hbx_enrollment" do
-      family_member_id=family_member.id
-      expect(hbx_enrollment.hbx_enrollment_members.where(applicant_id:family_member_id).size).to eq 0
-      subject.migrate
-      hbx_enrollment.reload
-      expect(hbx_enrollment.hbx_enrollment_members.where(applicant_id:family_member_id).size).to eq 0
+      ClimateControl.modify hbx_enrollment_id:'',family_member_id: family_member.id,coverage_begin:"2016-01-01" do 
+        family.add_family_member(person)
+        family_member_id=family_member.id
+        expect(hbx_enrollment.hbx_enrollment_members.where(applicant_id:family_member_id).size).to eq 0
+        subject.migrate
+        hbx_enrollment.reload
+        expect(hbx_enrollment.hbx_enrollment_members.where(applicant_id:family_member_id).size).to eq 0
+      end
     end
   end
 
   context "will add enrollment memeber if find hbx_enrollment_" do
-    before(:each) do
-      allow(ENV).to receive(:[]).with("hbx_enrollment_id").and_return(hbx_enrollment.id)
-      allow(ENV).to receive(:[]).with("family_member_id").and_return(family_member.id)
-      allow(ENV).to receive(:[]).with("coverage_begin").and_return("2016-01-01")
-      family.add_family_member(person)
-    end
     it "will add enrollment memeber if found hbx_enrollment" do
-      family_member_id=family_member.id
-      expect(hbx_enrollment.hbx_enrollment_members.where(applicant_id:family_member_id).size).to eq 0
-      subject.migrate
-      hbx_enrollment.reload
-      expect(hbx_enrollment.hbx_enrollment_members.where(applicant_id:family_member_id).size).to eq 1
+      ClimateControl.modify hbx_enrollment_id:hbx_enrollment.id,family_member_id: family_member.id,coverage_begin:"2016-01-01" do 
+        family.add_family_member(person)
+        family_member_id=family_member.id
+        expect(hbx_enrollment.hbx_enrollment_members.where(applicant_id:family_member_id).size).to eq 0
+        subject.migrate
+        hbx_enrollment.reload
+        expect(hbx_enrollment.hbx_enrollment_members.where(applicant_id:family_member_id).size).to eq 1
+      end
     end
     it "will add enrollment memeber with coverage start on date" do
-      family_member_id=family_member.id
-      expect(hbx_enrollment.hbx_enrollment_members.where(applicant_id:family_member_id).size).to eq 0
-      subject.migrate
-      hbx_enrollment.reload
-      expect(hbx_enrollment.hbx_enrollment_members.where(applicant_id:family_member_id).first.coverage_start_on).to eq Date.new(2016,1,1)
+      ClimateControl.modify hbx_enrollment_id:hbx_enrollment.id,family_member_id: family_member.id,coverage_begin:"2016-01-01" do 
+        family.add_family_member(person)
+        family_member_id=family_member.id
+        expect(hbx_enrollment.hbx_enrollment_members.where(applicant_id:family_member_id).size).to eq 0
+        subject.migrate
+        hbx_enrollment.reload
+        expect(hbx_enrollment.hbx_enrollment_members.where(applicant_id:family_member_id).first.coverage_start_on).to eq Date.new(2016,1,1)
+      end
     end
   end
 end
+
