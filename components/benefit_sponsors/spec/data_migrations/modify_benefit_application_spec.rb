@@ -16,10 +16,7 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
 
     let(:current_effective_date)  { TimeKeeper.date_of_record.beginning_of_month }
     let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-    let!(:benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
-                                            benefit_market: benefit_market,
-                                            title: "SHOP Benefits for #{current_effective_date.year}",
-                                            application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year))
+    let!(:benefit_market_catalog) { FactoryBot.create(:benefit_markets_benefit_market_catalog, :with_product_packages, benefit_market: benefit_market, title: "SHOP Benefits for #{current_effective_date.year}", application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year))
                                           }
     let(:benefit_market)      { site.benefit_markets.first }
     let!(:product_package) { benefit_market_catalog.product_packages.first }
@@ -39,23 +36,23 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
         service_area_list: [service_area],
         organization: organization,
         profile_id: organization.profiles.first.id,
-        benefit_market: site.benefit_markets[0],
+        benefit_market: benefit_market,
         employer_attestation: employer_attestation)
     end
 
     let(:start_on)  { current_effective_date }
     let(:effective_period)  { start_on..start_on.next_year.prev_day }
-    let!(:package)  {FactoryBot.create(:benefit_markets_products_product_package, 
-    packagable: benefit_market_catalog
-  )}
+    let!(:package)  { FactoryBot.build(:benefit_markets_products_product_package,
+      packagable: benefit_market_catalog
+    )}
     let!(:benefit_application) {
       application = FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, effective_period: effective_period, aasm_state: :active)
 
       application.benefit_sponsor_catalog.save!
       application
-  }
+    }
     let!(:benefit_package) { FactoryBot.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application, product_package: product_package, is_active: true) }
-    let(:benefit_group_assignment) {FactoryBot.build(:benefit_group_assignment, benefit_group: benefit_package)}
+    let(:benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, benefit_group: benefit_package) }
 
     let(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: benefit_sponsorship.profile, census_employee_id: census_employee.id) }
     let(:census_employee) { FactoryBot.create(:census_employee,
@@ -69,19 +66,21 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
                             sponsored_benefit_package_id: benefit_package.id, benefit_group_assignment_id: benefit_group_assignment.id,
                             aasm_state: 'coverage_selected') }
 
-    before(:each) do
-      allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
+    around do |example|
+      ClimateControl.modify fein: organization.fein do
+        example.run
+      end
     end
 
     context "extend open enrollment" do
-        let!(:start_on)  { TimeKeeper.date_of_record.next_month.beginning_of_month }
-        let!(:effective_period)  { start_on..start_on.next_year.prev_day }
+        let!(:start_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }
+        let!(:effective_period) { start_on..start_on.next_year.prev_day }
         let!(:ineligible_benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, :with_benefit_package, benefit_sponsorship: benefit_sponsorship, aasm_state: "enrollment_ineligible", effective_period: effective_period)}
 
-        before do
-          allow(ENV).to receive(:[]).with("action").and_return("extend_open_enrollment")
-          allow(ENV).to receive(:[]).with("effective_date").and_return(start_on.strftime("%m/%d/%Y"))
-          allow(ENV).to receive(:[]).with("oe_end_date").and_return(start_on.prev_day.strftime("%m/%d/%Y"))
+        around do |example|
+          ClimateControl.modify action: 'extend_open_enrollment', effective_date: start_on.strftime("%m/%d/%Y"), oe_end_date: start_on.prev_day.strftime("%m/%d/%Y") do
+            example.run
+          end
         end
 
         it "should extend open enrollment from enrollment ineligible" do
@@ -114,9 +113,10 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
       context "update aasm state to enrollment open for non renewing ER" do
         let(:effective_date) { start_on }
 
-        before do
-          allow(ENV).to receive(:[]).with("action").and_return("begin_open_enrollment")
-          allow(ENV).to receive(:[]).with("effective_date").and_return(effective_date.strftime("%m/%d/%Y"))
+        around do |example|
+          ClimateControl.modify effective_date: effective_date.strftime("%m/%d/%Y"), action: 'begin_open_enrollment' do
+            example.run
+          end
         end
 
         it "should update the benefit application" do
@@ -141,9 +141,13 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
         let(:effective_date) { start_on }
 
         before do
-          allow(ENV).to receive(:[]).with("action").and_return("begin_open_enrollment")
-          allow(ENV).to receive(:[]).with("effective_date").and_return(effective_date.strftime("%m/%d/%Y"))
           expect_any_instance_of(BenefitSponsors::BenefitApplications::BenefitApplication).to receive(:is_renewing?).at_least(:once).and_return(true)
+        end
+
+        around do |example|
+          ClimateControl.modify effective_date: effective_date.strftime("%m/%d/%Y"), action: 'begin_open_enrollment' do
+            example.run
+          end
         end
 
         it "should update the benefit application" do
@@ -165,13 +169,20 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
       let(:end_on)           { start_on.next_month.end_of_month }
 
       before do
-        allow(ENV).to receive(:[]).with('off_cycle_renewal').and_return('true')
-        allow(ENV).to receive(:[]).with("termination_notice").and_return("true")
-        allow(ENV).to receive(:[]).with("action").and_return("terminate")
-        allow(ENV).to receive(:[]).with("termination_date").and_return(termination_date.strftime("%m/%d/%Y"))
-        allow(ENV).to receive(:[]).with("end_on").and_return(end_on.strftime("%m/%d/%Y"))
         subject.migrate
         benefit_application.reload
+      end
+
+      around do |example|
+        ClimateControl.modify(
+          off_cycle_renewal: 'true',
+          termination_notice: 'true',
+          action: 'terminate',
+          termination_date: termination_date.strftime("%m/%d/%Y"),
+          end_on: end_on.strftime("%m/%d/%Y")
+        ) do
+          example.run
+        end
       end
 
       it "should terminate the benefit application" do
@@ -205,20 +216,32 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
       let!(:past_effective_period) {past_start_on..past_start_on.next_year.prev_day }
       let!(:mid_plan_year_effective_date) {start_on.next_month}
       let!(:range_effective_period) { mid_plan_year_effective_date..mid_plan_year_effective_date.next_year.prev_day }
-      let!(:draft_benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, :with_benefit_package, benefit_sponsorship: benefit_sponsorship, aasm_state: :imported, effective_period: past_effective_period)}
-      let!(:import_draft_benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, :with_benefit_package, benefit_sponsorship: benefit_sponsorship, aasm_state: :imported, effective_period: range_effective_period)}
+      let!(:draft_benefit_application) do
+        benefit_market_catalog
+        FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, :with_benefit_package, benefit_sponsorship: benefit_sponsorship, aasm_state: :imported, effective_period: past_effective_period).tap do |application|
+          application.benefit_sponsor_catalog.save!
+        end
+      end
+      let!(:import_draft_benefit_application) do
+        benefit_market_catalog
+        FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, :with_benefit_package, benefit_sponsorship: benefit_sponsorship, aasm_state: :imported, effective_period: range_effective_period).tap do |application|
+          application.benefit_sponsor_catalog.save!
+        end
+      end
 
-      before :each do
-        allow(ENV).to receive(:[]).with('action').and_return 'cancel'
-        allow(ENV).to receive(:[]).with('plan_year_start_on').and_return import_draft_benefit_application.effective_period.min.strftime("%m/%d/%Y")
-        subject.migrate
+      around do |example|
+        ClimateControl.modify plan_year_start_on: import_draft_benefit_application.effective_period.min.strftime("%m/%d/%Y"), action: 'cancel' do
+          example.run
+        end
       end
 
       it "does not cancel non-imported draft benefit applications" do
+        subject.migrate
         expect(draft_benefit_application.reload.aasm_state).to eq :imported
       end
 
       it "cancels import draft benefit applications" do
+        subject.migrate
         expect(import_draft_benefit_application.reload.aasm_state).to eq :canceled
       end
     end
@@ -228,11 +251,15 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
       let(:new_start_date) { start_on.next_month }
       let(:new_end_date) { new_start_date + 1.year }
 
-      before do
-        allow(ENV).to receive(:[]).with("action").and_return("update_effective_period_and_approve")
-        allow(ENV).to receive(:[]).with("effective_date").and_return(effective_date.strftime("%m/%d/%Y"))
-        allow(ENV).to receive(:[]).with("new_start_date").and_return(new_start_date.strftime("%m/%d/%Y"))
-        allow(ENV).to receive(:[]).with("new_end_date").and_return(new_end_date.strftime("%m/%d/%Y"))
+      around do |example|
+        ClimateControl.modify(
+          action: 'update_effective_period_and_approve',
+          effective_date: effective_date.strftime("%m/%d/%Y"),
+          new_start_date: new_start_date.strftime("%m/%d/%Y"),
+          new_end_date: new_end_date.strftime("%m/%d/%Y")
+        ) do
+          example.run
+        end
       end
 
       it "should update the initial benefit application and transition the benefit sponsorship" do
@@ -255,10 +282,15 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
 
     context "Should force publish the benefit application", dbclean: :after_each do
       let(:effective_date) { start_on }
-      
+
       before do
-        allow(ENV).to receive(:[]).with("action").and_return("force_submit_application")
-        allow(ENV).to receive(:[]).with("effective_date").and_return(effective_date.strftime("%m/%d/%Y"))
+        allow(benefit_sponsorship.profile).to receive(:employer_attestation).and_return(double(:blank? => true))
+      end
+
+      around do |example|
+        ClimateControl.modify effective_date: effective_date.strftime("%m/%d/%Y"), action: 'force_submit_application' do
+          example.run
+        end
       end
 
       it "should update the benefit application and transition the benefit sponsorship" do
@@ -338,11 +370,15 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
       let!(:old_benefit_package) { FactoryBot.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: old_benefit_application, product_package: product_package_1) }
       let!(:renewing_benefit_package) { FactoryBot.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: renewing_benefit_application, product_package: product_package_2) }
 
-      before do
-        allow(ENV).to receive(:[]).with("action").and_return("update_effective_period_and_approve")
-        allow(ENV).to receive(:[]).with("effective_date").and_return(effective_date.strftime("%m/%d/%Y"))
-        allow(ENV).to receive(:[]).with("new_start_date").and_return(new_start_date.strftime("%m/%d/%Y"))
-        allow(ENV).to receive(:[]).with("new_end_date").and_return(new_end_date.strftime("%m/%d/%Y"))
+      around do |example|
+        ClimateControl.modify(
+          action: 'update_effective_period_and_approve',
+          effective_date: effective_date.strftime("%m/%d/%Y"),
+          new_start_date: new_start_date.strftime("%m/%d/%Y"),
+          new_end_date: new_end_date.strftime("%m/%d/%Y")
+        ) do
+          example.run
+        end
       end
 
       it "should update the renewing benefit application and transition the benefit sponsorship" do
@@ -368,12 +404,16 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
       let(:termination_date) { start_on.next_month.next_day }
       let(:end_on)           { start_on.next_month.end_of_month }
 
-      before do
-        allow(ENV).to receive(:[]).with('off_cycle_renewal').and_return('true')
-        allow(ENV).to receive(:[]).with("termination_notice").and_return("true")
-        allow(ENV).to receive(:[]).with("action").and_return("terminate")
-        allow(ENV).to receive(:[]).with("termination_date").and_return(termination_date.strftime("%m/%d/%Y"))
-        allow(ENV).to receive(:[]).with("end_on").and_return(end_on.strftime("%m/%d/%Y"))
+      around do |example|
+        ClimateControl.modify(
+          off_cycle_renewal: 'true',
+          termination_notice: 'true',
+          action: 'terminate',
+          termination_date: termination_date.strftime("%m/%d/%Y"),
+          end_on: end_on.strftime("%m/%d/%Y")
+        ) do
+          example.run
+        end
       end
 
       let(:model_instance) { benefit_application }

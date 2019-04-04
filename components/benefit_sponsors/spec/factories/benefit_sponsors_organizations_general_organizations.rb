@@ -25,7 +25,7 @@ FactoryBot.define do
 
     trait :with_aca_shop_cca_employer_profile do
       after :build do |organization, evaluator|
-        build(:benefit_sponsors_organizations_aca_shop_cca_employer_profile, organization: organization, employer_attestation: nil)
+        build(:benefit_sponsors_organizations_aca_shop_cca_employer_profile, organization: organization)
       end
     end
 
