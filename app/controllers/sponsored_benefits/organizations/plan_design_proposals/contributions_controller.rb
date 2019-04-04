@@ -33,6 +33,12 @@ module SponsoredBenefits
         def benefit_group
           return @benefit_group if defined? @benefit_group
           @benefit_group ||= sponsorship.benefit_applications.first.benefit_groups.build(benefit_group_params)
+
+          # This always take one benefit group at a time to calculate costs. we never save this to database.
+          if @benefit_group.reference_plan.dental?
+            @benefit_group.dental_relationship_benefits = @benefit_group.relationship_benefits
+          end
+          @benefit_group
         end
 
         def benefit_group_params
