@@ -20,86 +20,86 @@ describe UpdatingBrokerAgencyAccountOrProfile, dbclean: :after_each do
   
   context "create_org_and_broker_agency_profile" do
     before(:each) do
-      allow(ENV).to receive(:[]).with("person_hbx_id").and_return(person.hbx_id)
-      allow(ENV).to receive(:[]).with("legal_name").and_return(organization.legal_name)
-      allow(ENV).to receive(:[]).with("fein").and_return(fein)
-      allow(ENV).to receive(:[]).with("defualt_general_agency_id").and_return(broker_agency_profile.default_general_agency_profile_id)
-      allow(ENV).to receive(:[]).with("npn").and_return(person.broker_role.npn)
-      allow(ENV).to receive(:[]).with("address_1").and_return(office_locations.address_1)
-      allow(ENV).to receive(:[]).with("address_2").and_return(office_locations.address_2)
-      allow(ENV).to receive(:[]).with("city").and_return(office_locations.city)
-      allow(ENV).to receive(:[]).with("state").and_return(office_locations.state)
-      allow(ENV).to receive(:[]).with("zip").and_return(office_locations.zip)
-      allow(ENV).to receive(:[]).with("area_code").and_return(office_locations_contact.area_code)
-      allow(ENV).to receive(:[]).with("number").and_return(office_locations_contact.number)
-      allow(ENV).to receive(:[]).with("market_kind").and_return(broker_agency_profile.market_kind)
-      # allow(ENV).to receive(:[]).with("broker_agency_profile_id").and_return(broker_agency_profile.id.to_s)
-      allow(ENV).to receive(:[]).with("action").and_return("create_org_and_broker_agency_profile")
+      # allow(ENV).to receive(:[]).with("person_hbx_id").and_return(person.hbx_id)
+      # allow(ENV).to receive(:[]).with("legal_name").and_return(organization.legal_name)
+      # allow(ENV).to receive(:[]).with("fein").and_return(fein)
+      # allow(ENV).to receive(:[]).with("defualt_general_agency_id").and_return(broker_agency_profile.default_general_agency_profile_id)
+      # allow(ENV).to receive(:[]).with("npn").and_return(person.broker_role.npn)
+      # allow(ENV).to receive(:[]).with("address_1").and_return(office_locations.address_1)
+      # allow(ENV).to receive(:[]).with("address_2").and_return(office_locations.address_2)
+      # allow(ENV).to receive(:[]).with("city").and_return(office_locations.city)
+      # allow(ENV).to receive(:[]).with("state").and_return(office_locations.state)
+      # allow(ENV).to receive(:[]).with("zip").and_return(office_locations.zip)
+      # allow(ENV).to receive(:[]).with("area_code").and_return(office_locations_contact.area_code)
+      # allow(ENV).to receive(:[]).with("number").and_return(office_locations_contact.number)
+      # allow(ENV).to receive(:[]).with("market_kind").and_return(broker_agency_profile.market_kind)
+      # # allow(ENV).to receive(:[]).with("broker_agency_profile_id").and_return(broker_agency_profile.id.to_s)
+      # allow(ENV).to receive(:[]).with("action").and_return("create_org_and_broker_agency_profile")
       employer_profile.broker_agency_accounts << broker_agency_account
     end
 
     it "Should update the person broker_role id with with new broker_agency" do
-      subject.migrate
-      person.reload
-      expect(person.broker_role.broker_agency_profile.organization.fein).to eq fein
-    end
+      ClimateControl.modify person_hbx_id:person.hbx_id,
+      legal_name: organization.legal_name,
+      fein:fein,
+      defualt_general_agency_id: broker_agency_profile.default_general_agency_profile_id,
+      npn:person.broker_role.npn,
+      address_1:office_locations.address_1,
+      address_2:office_locations.address_2,
+      city:office_locations.city,
+      state:office_locations.state,
+      zip:office_locations.zip,
+      area_code:office_locations_contact.area_code,
+      number:office_locations_contact.number,
+      market_kind:broker_agency_profile.market_kind,
+      action:'create_org_and_broker_agency_profile' do 
+        subject.migrate
+        person.reload
+        expect(person.broker_role.broker_agency_profile.organization.fein).to eq fein
+      end
   end
 
   context "update_broker_role" do
-    before(:each) do
-      allow(ENV).to receive(:[]).with("person_hbx_id").and_return(person.hbx_id)
-      allow(ENV).to receive(:[]).with("legal_name").and_return(organization.legal_name)
-      allow(ENV).to receive(:[]).with("fein").and_return(fein)
-      allow(ENV).to receive(:[]).with("defualt_general_agency_id").and_return(broker_agency_profile.default_general_agency_profile_id)
-      allow(ENV).to receive(:[]).with("npn").and_return(person.broker_role.npn)
-      allow(ENV).to receive(:[]).with("address_1").and_return(office_locations.address_1)
-      allow(ENV).to receive(:[]).with("address_2").and_return(office_locations.address_2)
-      allow(ENV).to receive(:[]).with("city").and_return(office_locations.city)
-      allow(ENV).to receive(:[]).with("state").and_return(office_locations.state)
-      allow(ENV).to receive(:[]).with("zip").and_return(office_locations.zip)
-      allow(ENV).to receive(:[]).with("area_code").and_return(office_locations_contact.area_code)
-      allow(ENV).to receive(:[]).with("number").and_return(office_locations_contact.number)
-      allow(ENV).to receive(:[]).with("market_kind").and_return('both')
-      allow(ENV).to receive(:[]).with("broker_agency_profile_id").and_return(broker_agency_profile.id.to_s)
-      allow(ENV).to receive(:[]).with("action").and_return("update_broker_role")
-      employer_profile.broker_agency_accounts << broker_agency_account
+      before(:each) do
+        # allow(ENV).to receive(:[]).with("person_hbx_id").and_return(person.hbx_id)
+        # allow(ENV).to receive(:[]).with("legal_name").and_return(organization.legal_name)
+        # allow(ENV).to receive(:[]).with("fein").and_return(fein)
+        # allow(ENV).to receive(:[]).with("defualt_general_agency_id").and_return(broker_agency_profile.default_general_agency_profile_id)
+        # allow(ENV).to receive(:[]).with("npn").and_return(person.broker_role.npn)
+        # allow(ENV).to receive(:[]).with("address_1").and_return(office_locations.address_1)
+        # allow(ENV).to receive(:[]).with("address_2").and_return(office_locations.address_2)
+        # allow(ENV).to receive(:[]).with("city").and_return(office_locations.city)
+        # allow(ENV).to receive(:[]).with("state").and_return(office_locations.state)
+        # allow(ENV).to receive(:[]).with("zip").and_return(office_locations.zip)
+        # allow(ENV).to receive(:[]).with("area_code").and_return(office_locations_contact.area_code)
+        # allow(ENV).to receive(:[]).with("number").and_return(office_locations_contact.number)
+        # allow(ENV).to receive(:[]).with("market_kind").and_return('both')
+        # allow(ENV).to receive(:[]).with("broker_agency_profile_id").and_return(broker_agency_profile.id.to_s)
+        # allow(ENV).to receive(:[]).with("action").and_return("update_broker_role")
+        employer_profile.broker_agency_accounts << broker_agency_account
+      end
+      
+      it "Should update the person broker_role id with with new broker_agency" do
+        ClimateControl.modify person_hbx_id:person.hbx_id,
+        legal_name: organization.legal_name,
+        fein:fein,
+        defualt_general_agency_id: broker_agency_profile.default_general_agency_profile_id,
+        npn:person.broker_role.npn,
+        address_1:office_locations.address_1,
+        address_2:office_locations.address_2,
+        city:office_locations.city,
+        state:office_locations.state,
+        zip:office_locations.zip,
+        area_code:office_locations_contact.area_code,
+        number:office_locations_contact.number,
+        market_kind:'both',
+        action:'update_broker_role' do 
+          puts "id = #{broker_agency_profile.id}"
+            subject.migrate
+            person.reload
+            expect(person.broker_role.market_kind).to eq 'both'
+        end
+      end
     end
-
-    it "Should update the person broker_role id with with new broker_agency" do
-      subject.migrate
-      person.reload
-      expect(person.broker_role.market_kind).to eq 'both'
-    end
-  end
-
-  context "update_family_broker_agency_account_with_writing_agent" do
-    before(:each) do
-      allow(ENV).to receive(:[]).with("person_hbx_id").and_return(person.hbx_id)
-      allow(ENV).to receive(:[]).with("legal_name").and_return(organization.legal_name)
-      allow(ENV).to receive(:[]).with("fein").and_return(fein)
-      allow(ENV).to receive(:[]).with("defualt_general_agency_id").and_return(broker_agency_profile.default_general_agency_profile_id)
-      allow(ENV).to receive(:[]).with("npn").and_return(person.broker_role.npn)
-      allow(ENV).to receive(:[]).with("address_1").and_return(office_locations.address_1)
-      allow(ENV).to receive(:[]).with("address_2").and_return(office_locations.address_2)
-      allow(ENV).to receive(:[]).with("city").and_return(office_locations.city)
-      allow(ENV).to receive(:[]).with("state").and_return(office_locations.state)
-      allow(ENV).to receive(:[]).with("zip").and_return(office_locations.zip)
-      allow(ENV).to receive(:[]).with("area_code").and_return(office_locations_contact.area_code)
-      allow(ENV).to receive(:[]).with("number").and_return(office_locations_contact.number)
-      allow(ENV).to receive(:[]).with("market_kind").and_return('both')
-      allow(ENV).to receive(:[]).with("broker_agency_profile_id").and_return(broker_agency_profile.id.to_s)
-      allow(ENV).to receive(:[]).with("hbx_id").and_return(new_person.hbx_id)
-      allow(ENV).to receive(:[]).with("org_fein").and_return(broker_agency_profile.fein)
-      allow(ENV).to receive(:[]).with("action").and_return("update_family_broker_agency_account_with_writing_agent")
-    end
-
-    # Can't be fixed as the broker agency accounts association with family updated with new model.
-    # it "Should update the writing agent of broker agency account" do
-    #   new_person.primary_family.broker_agency_accounts.first.update_attributes(writing_agent_id: '')
-    #   expect(new_person.primary_family.broker_agency_accounts.first.writing_agent).to eq nil
-    #   subject.migrate
-    #   new_person.primary_family.reload
-    #   expect(new_person.primary_family.broker_agency_accounts.first.writing_agent).to eq broker_agency_profile.primary_broker_role
-    # end
   end
 end
