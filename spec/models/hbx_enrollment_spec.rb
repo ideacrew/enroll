@@ -715,12 +715,14 @@ describe HbxEnrollment, dbclean: :after_all do
     it "should cancel the shop enrollment when effective_on is in future" do
       expect(enrollment_two.effective_on).to be > TimeKeeper.date_of_record
       enrollment_two.propogate_waiver
+      enrollment_two.reload
       expect(enrollment_two.aasm_state).to eq "coverage_canceled"
     end
 
     it "should terminate the shop enrollment when effective_on is in past" do
       expect(enrollment_four.effective_on).to be <= TimeKeeper.date_of_record
       enrollment_four.propogate_waiver
+      enrollment_four.reload
       expect(enrollment_four.aasm_state).to eq "coverage_termination_pending"
     end
   end
