@@ -149,7 +149,7 @@ describe Forms::BrokerAgencyProfile, ".save", :dbclean => :after_each do
       }}
 
     before(:each) do
-      FactoryBot.create(:person, first_name: "joseph", last_name: "smith", dob: "10/10/1974")
+      FactoryBot.create(:person, :with_ssn, first_name: "joseph", last_name: "smith", dob: "10/10/1974")
       subject.save
     end
 
