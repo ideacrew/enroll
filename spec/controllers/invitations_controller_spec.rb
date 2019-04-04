@@ -16,7 +16,7 @@ RSpec.describe InvitationsController do
       let(:unclaimed) { false }
 
       it "should redirect back to the welcome page with an error" do
-        get :claim, :id => invitation_id
+        get :claim, params: {id: invitation_id}
         expect(response).to redirect_to(root_url)
         expect(flash[:error]).to eq "Invalid invitation."
       end
@@ -29,7 +29,7 @@ RSpec.describe InvitationsController do
         expect(invitation).to receive(:claim_invitation!).with(user, controller) do |u, c|
           c.redirect_to root_url
         end
-        get :claim, :id => invitation_id
+        get :claim, params: {id: invitation_id}
         expect(response).to redirect_to(root_url)
       end
     end
