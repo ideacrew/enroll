@@ -23,33 +23,32 @@ describe RemoveBenefitPackage, dbclean: :after_each do
     let(:plan_year)         { FactoryBot.create(:plan_year, employer_profile: employer_profile) }
     let(:employer_profile)  { FactoryBot.create(:employer_profile) }
 
-    before(:each) do
-      allow(ENV).to receive(:[]).with("fein").and_return(employer_profile.parent.fein)
-      allow(ENV).to receive(:[]).with("aasm_state").and_return(plan_year.aasm_state)
-      allow(ENV).to receive(:[]).with("id").and_return(benefit_group.id)
-      allow(ENV).to receive(:[]).with("existing_bg_id").and_return(benefit_group_two.id)
-      allow(ENV).to receive(:[]).with("new_name_for_bg").and_return("new_title")
-    end
-
+    
     it "should remove the benefit package" do
-      expect(plan_year.benefit_groups.size).to eq 2
-      subject.migrate
-      plan_year.reload
-      expect(plan_year.benefit_groups.size).to eq 1
+      ClimateControl.modify fein:employer_profile.parent.fein, aasm_state: plan_year.aasm_state, id: benefit_group.id, existing_bg_id: benefit_group_two.id, new_name_for_bg: "new_title" do 
+        expect(plan_year.benefit_groups.size).to eq 2
+        subject.migrate
+        plan_year.reload
+        expect(plan_year.benefit_groups.size).to eq 1
+      end
     end
 
     it "should remove the benefit group assignments and enrollments" do
-      expect(benefit_group.benefit_group_assignments.first.hbx_enrollments.size).to eq 1
-      expect(benefit_group.benefit_group_assignments.size).to eq 1
-      subject.migrate
-      plan_year.reload
-      expect(benefit_group.benefit_group_assignments.size).to eq 0
+      ClimateControl.modify fein:employer_profile.parent.fein, aasm_state: plan_year.aasm_state, id: benefit_group.id, existing_bg_id: benefit_group_two.id, new_name_for_bg: "new_title" do 
+        expect(benefit_group.benefit_group_assignments.first.hbx_enrollments.size).to eq 1
+        expect(benefit_group.benefit_group_assignments.size).to eq 1
+        subject.migrate
+        plan_year.reload
+        expect(benefit_group.benefit_group_assignments.size).to eq 0
+      end
     end
 
     it "should change the benefit group title" do
-      subject.migrate
-      plan_year.reload
-      expect(plan_year.benefit_groups.first.title).to eq "New title"
+      ClimateControl.modify fein:employer_profile.parent.fein, aasm_state: plan_year.aasm_state, id: benefit_group.id, existing_bg_id: benefit_group_two.id, new_name_for_bg: "new_title" do 
+        subject.migrate
+        plan_year.reload
+        expect(plan_year.benefit_groups.first.title).to eq "New title"
+      end
     end
   end
 end

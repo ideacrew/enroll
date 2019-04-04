@@ -22,7 +22,7 @@ RSpec.describe "events/v2/employer/updated.haml.erb" , dbclean: :after_each do
     let!(:health_sponsored_benefit) {benefit_package.health_sponsored_benefit}
     let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
     let!(:update_products)  { product_package.products.update_all(issuer_profile:issuer_profile) }
-    let(:sponsor_contribution) {FactoryBot.create(:benefit_sponsors_sponsored_benefits_sponsor_contribution,product_package: product_package,sponsored_benefit:health_sponsored_benefit)}
+    let(:sponsor_contribution) {FactoryBot.build(:benefit_sponsors_sponsored_benefits_sponsor_contribution,product_package: product_package,sponsored_benefit:health_sponsored_benefit)}
 
     let!(:update_benefit) {
       benefit_application.aasm_state = :active
@@ -139,7 +139,7 @@ RSpec.describe "events/v2/employer/updated.haml.erb" , dbclean: :after_each do
         let!(:benefit_package) { FactoryBot.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application, product_package: product_package,dental_sponsored_benefit:true,  dental_product_package:dental_product_package) }
         let!(:dental_sponsored_benefit) {benefit_package.dental_sponsored_benefit}
         let!(:update_dental_product) {dental_sponsored_benefit.reference_product.update_attributes(issuer_profile_id:issuer_profile.id)}
-        let(:dental_sponsor_contribution) {FactoryBot.create(:benefit_sponsors_sponsored_benefits_sponsor_contribution,product_package: dental_product_package,sponsored_benefit:dental_sponsored_benefit)}
+        let(:dental_sponsor_contribution) {FactoryBot.build(:benefit_sponsors_sponsored_benefits_sponsor_contribution,product_package: dental_product_package,sponsored_benefit:dental_sponsored_benefit)}
 
         before do
           allow(sponsor_contribution).to receive(:contribution_model).and_return(product_package.contribution_model)
