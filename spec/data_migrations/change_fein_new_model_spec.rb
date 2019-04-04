@@ -30,10 +30,6 @@ describe ChangeFeinNewModel, dbclean: :after_each do
     end
 
     context "when there is existing fein" do
-      # before(:each) do
-      #   allow(ENV).to receive(:[]).with("old_fein").and_return(old_fein)
-      #   allow(ENV).to receive(:[]).with("new_fein").and_return(old_fein)
-      # end
 
       it "should raise error" do
         ClimateControl.modify old_fein:old_fein,new_fein:old_fein do
