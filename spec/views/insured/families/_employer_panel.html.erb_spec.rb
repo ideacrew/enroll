@@ -1,7 +1,7 @@
 require 'rails_helper'
 
-RSpec.describe "insured/families/_employer_panel.html.erb" do
-  let(:person) {FactoryBot.build(:person)}
+RSpec.describe "insured/families/_employer_panel.html.erb", db_clean: :after_each do
+  let(:person) {FactoryBot.create(:person)}
   let(:employee_role) {FactoryBot.build(:employee_role)}
   let(:employer_profile) {FactoryBot.build(:employer_profile)}
 
@@ -14,7 +14,6 @@ RSpec.describe "insured/families/_employer_panel.html.erb" do
   end
 
   context 'Person has a single employer/employee_role' do  
-    let(:person) { FactoryBot.create :person, :with_employee_role }
 
     before :each do
       render "insured/families/employer_panel", employee_role: person.employee_roles.first
@@ -34,13 +33,12 @@ RSpec.describe "insured/families/_employer_panel.html.erb" do
 
     it "should have employer name" do
       expect(rendered).to have_selector('input')
-      expect(rendered).to have_content("Congratulations on your new job at 
-                                        #{person.employee_roles.first.employer_profile.legal_name}.")
+      expect(rendered).to have_content("Congratulations on your new job at #{person.employee_roles.first.employer_profile.legal_name}.")
     end
   end
 
   context 'Person has two employers/employee_roles' do  
-    let(:person) { FactoryBot.create :person, :with_employee_role, :with_employee_role }
+    let(:person) { FactoryBot.create :person, :with_employee_role }
 
     before :each do
       render "insured/families/employer_panel", employee_role: person.employee_roles.first
@@ -64,10 +62,8 @@ RSpec.describe "insured/families/_employer_panel.html.erb" do
 
     it "should have notices for both employers" do
       expect(rendered).to have_selector('input')
-      expect(rendered).to have_content("Congratulations on your new job at 
-                                        #{person.employee_roles[0].employer_profile.legal_name}.")
-      expect(rendered).to have_content("Congratulations on your new job at 
-                                        #{person.employee_roles[1].employer_profile.legal_name}.")
+      expect(rendered).to have_content("Congratulations on your new job at #{person.employee_roles[0].employer_profile.legal_name}.")
+      expect(rendered).to have_content("Congratulations on your new job at #{person.employee_roles[1].employer_profile.legal_name}.")
     end
   end
 end
