@@ -13,31 +13,30 @@ describe ActivateBenefitGroupAssignment do
     end
   end
 
-  def with_modified_env(options, &block)
-    ClimateControl.modify(options, &block)
-  end
-
   describe 'activate benefit group assignment' do
     let!(:census_employee) { FactoryBot.create(:census_employee,ssn:'123456789')}
     let!(:benefit_group_assignment1)  { FactoryBot.create(:benefit_group_assignment, is_active: false, census_employee: census_employee)}
     let!(:benefit_group_assignment2)  { FactoryBot.create(:benefit_group_assignment, is_active: false, census_employee: census_employee)}
+    let!(:bga_params) {{ce_ssn: census_employee.ssn, bga_id: benefit_group_assignment1.id}}
+
+    around do |example|
+      ClimateControl.modify bga_params do
+        example.run
+      end
+    end
 
     context 'activate_benefit_group_assignment', dbclean: :after_each do
       it 'should activate_related_benefit_group_assignment' do
-        ClimateControl.modify ce_ssn: census_employee.ssn, bga_id: benefit_group_assignment1.id do
-          expect(benefit_group_assignment1.is_active).to eq false
-          subject.migrate
-          census_employee.reload
-          expect(census_employee.benefit_group_assignments.where(id:benefit_group_assignment1.id).first.is_active).to eq true
-        end
+        expect(benefit_group_assignment1.is_active).to eq false
+        subject.migrate
+        census_employee.reload
+        expect(census_employee.benefit_group_assignments.where(id:benefit_group_assignment1.id).first.is_active).to eq true
       end
       it 'should_not activate_unrelated_benefit_group_assignment' do
-        with_modified_env ce_ssn: census_employee.ssn, bga_id: benefit_group_assignment1.id do
-          expect(benefit_group_assignment2.is_active).to eq false
-          subject.migrate
-          census_employee.reload
-          expect(census_employee.benefit_group_assignments.where(id:benefit_group_assignment2.id).first.is_active).to eq false
-        end
+        expect(benefit_group_assignment2.is_active).to eq false
+        subject.migrate
+        census_employee.reload
+        expect(census_employee.benefit_group_assignments.where(id:benefit_group_assignment2.id).first.is_active).to eq false
       end
     end
   end
