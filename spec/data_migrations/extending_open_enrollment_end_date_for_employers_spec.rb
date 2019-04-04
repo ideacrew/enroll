@@ -19,25 +19,29 @@ describe ExtendingOpenEnrollmentEndDateForEmployers, dbclean: :after_each do
 
       before(:each) do
         organization.employer_profile.renewing_plan_year.update_attribute(:open_enrollment_end_on, Date.new(2016,11,13))
-        allow(ENV).to receive(:[]).with("py_start_on").and_return(organization.employer_profile.renewing_plan_year.start_on)
-        allow(ENV).to receive(:[]).with("new_oe_end_date").and_return(organization.employer_profile.renewing_plan_year.open_enrollment_end_on + 2.days)
       end
 
       it "should change the open_enrollment_end_on date of conversion ER" do
-        organization.employer_profile.update_attribute(:profile_source, "conversion")
-        end_date = organization.employer_profile.renewing_plan_year.open_enrollment_end_on
-        subject.migrate
-        organization.employer_profile.reload
-        expect(organization.employer_profile.renewing_plan_year.open_enrollment_end_on).to eq  (end_date + 2.days)
+        ClimateControl.modify py_start_on:"#{organization.employer_profile.renewing_plan_year.start_on}",
+          new_oe_end_date:"#{(organization.employer_profile.renewing_plan_year.open_enrollment_end_on + 2.days)}" do 
+          organization.employer_profile.update_attribute(:profile_source, "conversion")
+          end_date = organization.employer_profile.renewing_plan_year.open_enrollment_end_on
+          subject.migrate
+          organization.employer_profile.reload
+          expect(organization.employer_profile.renewing_plan_year.open_enrollment_end_on).to eq  (end_date + 2.days)
+        end
       end
 
       it "should change the open_enrollment_end_on date if it renewing non-conversion ER" do
-        organization.employer_profile.update_attribute(:profile_source, "self_serve")
-        end_date = organization.employer_profile.renewing_plan_year.open_enrollment_end_on
-        subject.migrate
-        organization.employer_profile.reload
-        expect(organization.employer_profile.renewing_plan_year.open_enrollment_end_on).to eq  (end_date + 2.days)
-      end
+        ClimateControl.modify py_start_on:"#{organization.employer_profile.renewing_plan_year.start_on}",
+        new_oe_end_date:"#{(organization.employer_profile.renewing_plan_year.open_enrollment_end_on + 2.days)}" do 
+          organization.employer_profile.update_attribute(:profile_source, "self_serve")
+          end_date = organization.employer_profile.renewing_plan_year.open_enrollment_end_on
+          subject.migrate
+          organization.employer_profile.reload
+          expect(organization.employer_profile.renewing_plan_year.open_enrollment_end_on).to eq  (end_date + 2.days)
+        end
+        end
     end
 
     context "for initial employer" do
@@ -45,16 +49,14 @@ describe ExtendingOpenEnrollmentEndDateForEmployers, dbclean: :after_each do
       let(:employer_profile) { plan_year.employer_profile }
       let!(:plan_year) { FactoryBot.create(:plan_year, aasm_state: "active") }
 
-      before(:each) do
-        allow(ENV).to receive(:[]).with("py_start_on").and_return(organization.employer_profile.plan_years.first.start_on)
-        allow(ENV).to receive(:[]).with("new_oe_end_date").and_return(organization.employer_profile.plan_years.first.open_enrollment_end_on + 2.days)
-      end
-
       it "should not change the open_enrollment_end_on date for inital employer" do
-        end_date = organization.employer_profile.plan_years.first.open_enrollment_end_on
-        subject.migrate
-        organization.employer_profile.reload
-        expect(organization.employer_profile.plan_years.first.open_enrollment_end_on).to eq (end_date)
+        ClimateControl.modify py_start_on:"#{(organization.employer_profile.plan_years.first.start_on)}",
+        new_oe_end_date:"#{(organization.employer_profile.plan_years.first.open_enrollment_end_on + 2.days)}" do
+          end_date = organization.employer_profile.plan_years.first.open_enrollment_end_on
+          subject.migrate
+          organization.employer_profile.reload
+          expect(organization.employer_profile.plan_years.first.open_enrollment_end_on).to eq (end_date)
+        end
       end
     end
   end
