@@ -11,29 +11,33 @@ describe ChangeLastPortalVisited, dbclean: :after_each do
   describe "change the last portal visited for a user" do
     let(:user) { FactoryBot.create(:user) }
     before(:each) do
-      allow(ENV).to receive(:[]).with("user_oimid").and_return(user.oim_id)
-      allow(ENV).to receive(:[]).with("new_url").and_return("/insured/families/search")
+      # allow(ENV).to receive(:[]).with("user_oimid").and_return(user.oim_id)
+      # allow(ENV).to receive(:[]).with("new_url").and_return("/insured/families/search")
     end
     it "should change the last visited url of the user" do
-      last_portal_visited=user.last_portal_visited
-      expect(user.last_portal_visited).to eq last_portal_visited
-      subject.migrate
-      user.reload
-      expect(user.last_portal_visited).to eq "/insured/families/search"
+      ClimateControl.modify user_oimid:user.oim_id,new_url:"/insured/families/search" do 
+        last_portal_visited=user.last_portal_visited
+        expect(user.last_portal_visited).to eq last_portal_visited
+        subject.migrate
+        user.reload
+        expect(user.last_portal_visited).to eq "/insured/families/search"
+      end
     end
   end
   describe "not change the last visited url if the user not found" do
     let(:user) { FactoryBot.create(:user) }
     before(:each) do
-      allow(ENV).to receive(:[]).with("user_oimid").and_return("")
-      allow(ENV).to receive(:[]).with("new_url").and_return("newemail@gmail.com")
+      # allow(ENV).to receive(:[]).with("user_oimid").and_return("")
+      # allow(ENV).to receive(:[]).with("new_url").and_return("newemail@gmail.com")
     end
     it "should change the email of the user" do
-      last_portal_visited=user.last_portal_visited
-      expect(user.last_portal_visited).to eq last_portal_visited
-      subject.migrate
-      user.reload
-      expect(user.last_portal_visited).to eq last_portal_visited
+      ClimateControl.modify user_oimid:'', new_url: "newemail@gmail.com" do 
+        last_portal_visited=user.last_portal_visited
+        expect(user.last_portal_visited).to eq last_portal_visited
+        subject.migrate
+        user.reload
+        expect(user.last_portal_visited).to eq last_portal_visited
+      end
     end
   end
 end
