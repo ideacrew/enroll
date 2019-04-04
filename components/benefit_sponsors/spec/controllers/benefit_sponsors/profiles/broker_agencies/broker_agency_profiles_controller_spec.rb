@@ -189,13 +189,16 @@ module BenefitSponsors
 
       context "should return sucess and family" do
         before :each do
-          ce.employee_role = ee_person.employee_roles.first
+          ce.employee_role_id = ee_person.employee_roles.first.id
           ce.save
-          ee_person.employee_roles.first.census_employee = ce
+          ee_person.employee_roles.first.census_employee_id = ce.id
           ee_person.save
+          DataTablesInQuery = Struct.new(:draw, :skip, :take, :search_string)
+          dt_query = DataTablesInQuery.new("1", 0, 10, "")
           sign_in(user_with_hbx_staff_role)
+          allow(controller).to receive(:extract_datatable_parameters).and_return(dt_query)
           xhr :get, :family_datatable, id: bap_id
-          @query = BenefitSponsors::Queries::BrokerFamiliesQuery.new(nil, organization.profiles.first.id)
+          @query = ::BenefitSponsors::Queries::BrokerFamiliesQuery.new(nil, organization.profiles.first.id)
         end
 
         it "should return a family" do
@@ -220,14 +223,17 @@ module BenefitSponsors
 
       context "should not return family" do
         before :each do
-          ce.employee_role = ee_person.employee_roles.first
+          ce.employee_role_id = ee_person.employee_roles.first.id
           ce.save
-          ee_person.employee_roles.first.census_employee = ce
+          ee_person.employee_roles.first.census_employee_id = ce.id
           ee_person.save
-          benefit_sponsorship.broker_agency_accounts.first.delete
+          benefit_sponsorship.broker_agency_accounts.first.update_attributes(is_active: false)
+          DataTablesInQuery = Struct.new(:draw, :skip, :take, :search_string)
+          dt_query = DataTablesInQuery.new("1", 0, 10, "")
           sign_in(user_with_hbx_staff_role)
+          allow(controller).to receive(:extract_datatable_parameters).and_return(dt_query)
           xhr :get, :family_datatable, id: bap_id
-          @query = BenefitSponsors::Queries::BrokerFamiliesQuery.new(nil, organization.profiles.first.id)
+          @query = ::BenefitSponsors::Queries::BrokerFamiliesQuery.new(nil, organization.profiles.first.id)
         end
 
         it "should not return family" do
