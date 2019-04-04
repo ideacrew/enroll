@@ -16,14 +16,15 @@ describe RemoveUserRecord, dbclean: :after_each do
     let(:person) { FactoryBot.create(:person)}
     let(:user) { FactoryBot.create(:user, person: person) }
     before(:each) do
-      allow(ENV).to receive(:[]).with("hbx_id").and_return person.hbx_id
       allow(person).to receive(:user).and_return(user)
     end
 
     it "should remove user record" do
-      subject.migrate
-      person.reload
-      expect(Person.where(hbx_id: person.hbx_id).first.user).to eq nil
+      ClimateControl.modify hbx_id: person.hbx_id do 
+        subject.migrate
+        person.reload
+        expect(Person.where(hbx_id: person.hbx_id).first.user).to eq nil
+      end
     end
   end
 end
