@@ -18,39 +18,52 @@ describe "Importing data", dbclean: :after_each do
     let!(:plan_year5)         { FactoryBot.create(:plan_year, benefit_groups: [benefit_group_2], aasm_state: "publish_pending", start_on: start_on, employer_profile: employer_profile_2) }
     subject { CancelPlanYearsGroup.new(given_task_name, double(:current_scope => nil)) }
 
-    before :each do
-      allow(ENV).to receive(:[]).with('file_name').and_return "spec/test_data/cancel_plan_years/CancelPlanYears.csv"
-    end
+    # before :each do
+    #   allow(ENV).to receive(:[]).with('file_name').and_return "spec/test_data/cancel_plan_years/CancelPlanYears.csv"
+    # end
 
     it "should cancel the plan year for matching the fein start_on and aasm_state" do
-      expect(plan_year1.aasm_state).to eq("application_ineligible")
-      subject.migrate
-      plan_year1.reload
-      expect(plan_year1.aasm_state).to eq("canceled")
+      ClimateControl.modify file_name:"spec/test_data/cancel_plan_years/CancelPlanYears.csv" do
+          expect(plan_year1.aasm_state).to eq("application_ineligible")
+          subject.migrate
+          plan_year1.reload
+          expect(plan_year1.aasm_state).to eq("canceled")
+      end
     end
+
     it "should not cancel/effect the second plan year of the same employer" do
-      expect(plan_year2.aasm_state).to eq("active")
-      subject.migrate
-      plan_year2.reload
-      expect(plan_year2.aasm_state).to eq("active")
+      ClimateControl.modify file_name:"spec/test_data/cancel_plan_years/CancelPlanYears.csv" do
+        expect(plan_year2.aasm_state).to eq("active")
+        subject.migrate
+        plan_year2.reload
+        expect(plan_year2.aasm_state).to eq("active")
+      end
     end
+
     it "should not cancel the plan year for plan year state not matching" do
-      expect(plan_year3.aasm_state).to eq("draft")
-      subject.migrate
-      plan_year3.reload
-      expect(plan_year3.aasm_state).to eq("draft")
+      ClimateControl.modify file_name:"spec/test_data/cancel_plan_years/CancelPlanYears.csv" do
+        expect(plan_year3.aasm_state).to eq("draft")
+        subject.migrate
+        plan_year3.reload
+        expect(plan_year3.aasm_state).to eq("draft")
+      end
     end
+
     it "should not cancel the plan year for start on date not matching" do
-      expect(plan_year4.aasm_state).to eq("draft")
-      subject.migrate
-      plan_year4.reload
-      expect(plan_year4.aasm_state).to eq("draft")
+      ClimateControl.modify file_name:"spec/test_data/cancel_plan_years/CancelPlanYears.csv" do
+        expect(plan_year4.aasm_state).to eq("draft")
+        subject.migrate
+        plan_year4.reload
+        expect(plan_year4.aasm_state).to eq("draft")
+      end
     end
 
     it "should not cancel the plan year for all the valid details" do
-      expect(plan_year5.aasm_state).to eq("publish_pending")
-      subject.migrate
-      plan_year5.reload
-      expect(plan_year5.aasm_state).to eq("canceled")
+      ClimateControl.modify file_name:"spec/test_data/cancel_plan_years/CancelPlanYears.csv" do
+        expect(plan_year5.aasm_state).to eq("publish_pending")
+        subject.migrate
+        plan_year5.reload
+        expect(plan_year5.aasm_state).to eq("canceled")
+      end
     end
 end
