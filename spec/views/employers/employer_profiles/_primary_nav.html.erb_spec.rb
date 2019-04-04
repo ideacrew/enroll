@@ -114,14 +114,14 @@ end
 
 RSpec.describe "employers/employer_profiles/_primary_nav AS GeneralAgency" do
   let(:employer_profile) { FactoryBot.create(:employer_profile) }
-  let(:person) { FactoryBot.create(:person, :first_name=>'fred', :last_name=>'flintstone'  )}
+  let(:person) { FactoryBot.create(:person,:with_ssn, :first_name=>'fred', :last_name=>'flintstone'  )}
   let(:current_user) { FactoryBot.create(:user, :roles => ['general_agency_staff'], :person => person) }
   before :each do
     general_agency = FactoryBot.create :general_agency, legal_name: 'Zooxy', general_agency_traits: :with_staff
     staff = general_agency.general_agency_profile.general_agency_staff_roles.last
     staff.person.emails.last.update(kind: 'work')
     user = FactoryBot.create(:user, :roles => ['general_agency_staff'], :person => staff.person)
-
+    
     @employer_profile = employer_profile
     sign_in user
     allow(view).to receive(:policy_helper).and_return(double("EmployerProfilePolicy", updateable?: true, list_enrollments?: true))
