@@ -8,6 +8,8 @@ FactoryBot.define do
     dob "1972-04-04".to_date
     is_incarcerated false
     is_active true
+    sequence(:ssn) {|n| "11111111#{n}" }
+
     gender "male"
     # us_citizen "true"
     # indian_tribe_member "false"
