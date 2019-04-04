@@ -29,12 +29,6 @@ GIT
       ttfunk (~> 1.0.3)
 
 PATH
-  remote: project_gems/mongoid_userstamp-0.4.0
-  specs:
-    mongoid_userstamp (0.4.0)
-      mongoid (>= 3.0.4)
-
-PATH
   remote: components/benefit_markets
   specs:
     benefit_markets (0.0.1)
@@ -122,6 +116,12 @@ PATH
       rubyzip (>= 1.2.1)
       symmetric-encryption (~> 3.9.1)
       transport_gateway
+
+PATH
+  remote: project_gems/mongoid_userstamp-0.4.0
+  specs:
+    mongoid_userstamp (0.4.0)
+      mongoid (>= 3.0.4)
 
 GEM
   remote: https://rubygems.org/
@@ -1111,6 +1111,7 @@ GEM
       multi_xml (>= 0.5.2)
     i18n (1.6.0)
       concurrent-ruby (~> 1.0)
+    ice_cube (0.16.3)
     ice_nine (0.11.2)
     iniparse (1.4.4)
     inline_svg (1.3.1)
@@ -1291,6 +1292,12 @@ GEM
     rdoc (6.1.1)
     recaptcha (4.13.2)
       json
+    recurring_select (2.1.0)
+      coffee-rails (>= 3.1)
+      ice_cube (>= 0.11)
+      jquery-rails (>= 3.0)
+      rails (>= 3.2)
+      sass-rails (>= 4.0)
     redcarpet (3.4.0)
     redis (4.1.0)
     redis-namespace (1.6.0)
@@ -1495,6 +1502,7 @@ DEPENDENCIES
   carrierwave-mongoid (~> 1.2)
   certified (~> 1)
   ckeditor (~> 4.2.4)
+  climate_control (~> 0.2.0)
   coffee-rails (~> 4.2.2)
   combine_pdf (~> 1.0)
   config (~> 1.0)
@@ -1546,6 +1554,7 @@ DEPENDENCIES
   rails (~> 5.2.3)
   rails-controller-testing
   recaptcha (~> 4.13)
+  recurring_select
   redcarpet (~> 3.4)
   redis (~> 4.0)
   resque (~> 2.0)
