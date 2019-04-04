@@ -33,6 +33,8 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
         change_enrollment_status
       when "move_enrollment_to_shopping"
         move_enr_to_shopping
+      when "change_consumer_role_id"
+        change_consumer_role_id
     end
   end
 
@@ -43,6 +45,19 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
         raise "Found no (OR) more than 1 enrollments with the #{hbx_id}" unless Rails.env.test?
       end
       enrollments << HbxEnrollment.by_hbx_id(hbx_id.to_s).first
+    end
+  end
+  
+  def change_consumer_role_id
+    consumer_role_id = ENV['consumer_role_id'].to_s
+    puts "no consumer role id is provided" unless consumer_role_id.present?
+    @enrollments.each do |enrollment|
+      if enrollment.kind == 'individual'
+        enrollment.update_attributes(consumer_role_id: consumer_role_id)
+        puts "Changed consumer role id to for enrollment #{enrollment.hbx_id} to #{consumer_role_id}" unless Rails.env.test?
+      else
+        puts "The enrollment with hbx-id #{enrollment.hbx_id} is not ivl" unless Rails.env.test?
+      end
     end
   end
 

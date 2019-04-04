@@ -26,7 +26,7 @@ describe ChangeEnrollmentDetails do
   describe "changing enrollment attributes" do
 
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
-    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household)}
+    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household,consumer_role_id:'321321321')}
     let(:hbx_enrollment2) { FactoryGirl.create(:hbx_enrollment, household: family.active_household)}
     let(:term_enrollment) { FactoryGirl.create(:hbx_enrollment, :terminated, household: family.active_household)}
     let(:term_enrollment2) { FactoryGirl.create(:hbx_enrollment, :terminated, household: family.active_household)}
@@ -142,6 +142,24 @@ describe ChangeEnrollmentDetails do
         subject.migrate
         hbx_enrollment.reload
         expect(hbx_enrollment.aasm_state).to eq "coverage_selected"
+      end
+
+    end
+
+    context "change consumer_role_id of enrollment " do
+      before do
+        allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)
+        allow(ENV).to receive(:[]).with("consumer_role_id").and_return("123123123")
+        allow(ENV).to receive(:[]).with("action").and_return "change_consumer_role_id"    
+        hbx_enrollment.update_attributes(kind:"individual")
+        hbx_enrollment.reload
+      end
+
+      it "should change the consumer role id  " do
+        expect(hbx_enrollment.consumer_role_id).to eq "321321321"
+        subject.migrate
+        hbx_enrollment.reload
+        expect(hbx_enrollment.consumer_role_id).to eq "123123123"
       end
 
     end
