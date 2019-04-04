@@ -1300,7 +1300,7 @@ describe "#all_persons_vlp_documents_status" do
     let(:person2) {FactoryBot.create(:person, :with_consumer_role)}
     let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person1)}
     let(:family_member2) { FactoryBot.create(:family_member, person: person2, family: family)}
-    let(:doc1) { FactoryBot.build(:vlp_document, verification_type: "Social Security Number") }
+    let(:doc1) { FactoryBot.buil(:vlp_document, verification_type: "Social Security Number") }
     let(:doc2) { FactoryBot.build(:vlp_document) }
     let(:doc3) { FactoryBot.build(:vlp_document, verification_type: "DC Residency") }
 
