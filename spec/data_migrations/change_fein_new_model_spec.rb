@@ -19,28 +19,27 @@ describe ChangeFeinNewModel, dbclean: :after_each do
     let(:exempt_organization) { FactoryBot.create(:benefit_sponsors_organizations_exempt_organization, profiles: [issuer_profile], fein: old_fein)}
 
     context "when there is no existing fein" do
-      before(:each) do
-        allow(ENV).to receive(:[]).with("old_fein").and_return(old_fein)
-        allow(ENV).to receive(:[]).with("new_fein").and_return(new_fein)
-      end
-
       it "should update from old fein to new fein" do
-        exempt_organization
-        subject.migrate
-        exempt_organization.reload
-        expect(exempt_organization.fein).to eq new_fein
+        ClimateControl.modify old_fein:old_fein,new_fein:new_fein do
+          exempt_organization
+          subject.migrate
+          exempt_organization.reload
+          expect(exempt_organization.fein).to eq new_fein
+        end
       end
     end
 
     context "when there is existing fein" do
-      before(:each) do
-        allow(ENV).to receive(:[]).with("old_fein").and_return(old_fein)
-        allow(ENV).to receive(:[]).with("new_fein").and_return(old_fein)
-      end
+      # before(:each) do
+      #   allow(ENV).to receive(:[]).with("old_fein").and_return(old_fein)
+      #   allow(ENV).to receive(:[]).with("new_fein").and_return(old_fein)
+      # end
 
       it "should raise error" do
-        exempt_organization
-        expect { subject.migrate }.to raise_error("organization with fein #{old_fein} already present")
+        ClimateControl.modify old_fein:old_fein,new_fein:old_fein do
+          exempt_organization
+          expect { subject.migrate }.to raise_error("organization with fein #{old_fein} already present")
+        end
       end
     end
   end
