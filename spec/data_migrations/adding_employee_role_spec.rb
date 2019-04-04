@@ -45,12 +45,10 @@ describe AddingEmployeeRole, dbclean: :after_each do
       end
 
       context 'when census employee id is invalid then' do
-        before(:each) do
-          allow(ENV).to receive(:[]).with('action').and_return('Add')
-          allow(ENV).to receive(:[]).with('census_employee_id').and_return '123abc987pqr'
-        end
         it 'should raise an error' do
-          expect(subject.migrate).to eq('No Census Employee found by 123abc987pqr')
+          ClimateControl.modify action: 'Add',census_employee_id: '123abc987pqr' do 
+           expect(subject.migrate).to eq('No Census Employee found by 123abc987pqr') 
+          end
         end
       end
 
@@ -65,32 +63,27 @@ describe AddingEmployeeRole, dbclean: :after_each do
       end
 
       context 'when census person_id is invalid then' do
-        before(:each) do
-          allow(ENV).to receive(:[]).with('action').and_return('Add')
-          allow(ENV).to receive(:[]).with('census_employee_id').and_return census_employee.id
-          allow(ENV).to receive(:[]).with('person_id').and_return '123abc987pqr'
-        end
         it 'should raise an error' do
+          ClimateControl.modify action: 'Add',census_employee_id: census_employee.id,person_id: '123abc987pqr' do 
           expect(subject.migrate).to eq('Person not found by 123abc987pqr')
+          end
         end
       end
     end
 
     context 'employee without an employee role' do
-      before(:each) do
-        census_employee.update_attribute(:employer_profile_id, employer_profile.id)
-        allow(ENV).to receive(:[]).with('action').and_return('Add')
-        allow(ENV).to receive(:[]).with('census_employee_id').and_return(census_employee.id)
-        allow(ENV).to receive(:[]).with('person_id').and_return(person.id)
-        census_employee.benefit_group_assignments << benefit_group_assignment
-        census_employee.save!
-        benefit_group_assignment.save!
-      end
       it 'should link employee role' do
-        expect(census_employee.employee_role).to eq nil
-        subject.migrate
-        census_employee.reload
-        expect(census_employee.employee_role).not_to eq nil
+        ClimateControl.modify action: 'Add',census_employee_id: census_employee.id,person_id: person.id do 
+          census_employee.update_attribute(:employer_profile_id, employer_profile.id)
+          census_employee.benefit_group_assignments << benefit_group_assignment
+          census_employee.save!
+          benefit_group_assignment.save!
+
+          expect(census_employee.employee_role).to eq nil
+          subject.migrate
+          census_employee.reload
+          expect(census_employee.employee_role).not_to eq nil
+        end
       end
     end
   end
@@ -99,11 +92,11 @@ describe AddingEmployeeRole, dbclean: :after_each do
 
     context 'When ENV params are invalid' do
       context 'when action is invalid then' do
-        before(:each) do
-          allow(ENV).to receive(:[]).with('action').and_return('Hello')
-        end
+
         it 'should raise an error' do
-          expect(subject.migrate).to eq('Invalid action Hello!')
+          ClimateControl.modify action: 'Hello'do 
+            expect(subject.migrate).to eq('Invalid action Hello!')
+          end
         end
       end
 
@@ -117,10 +110,6 @@ describe AddingEmployeeRole, dbclean: :after_each do
       end
 
       context 'when census employee id is invalid then' do
-        before(:each) do
-          # allow(ENV).to receive(:[]).with('action').and_return('Link')
-          # allow(ENV).to receive(:[]).with('census_employee_ids').and_return 
-        end
         it 'should raise an error' do
           ClimateControl.modify action: 'Link', census_employee_ids: '123abc987pqr' do
             expect(subject.migrate).to eq('No Census Employee found with 123abc987pqr')
@@ -148,30 +137,29 @@ describe AddingEmployeeRole, dbclean: :after_each do
     end
 
     context 'when census employee ids are valid' do
-      before(:each) do
-        allow(ENV).to receive(:[]).with('action').and_return('Link')
-        allow(ENV).to receive(:[]).with('census_employee_ids').and_return "#{census_employee.id}, #{census_employee2.id}, #{census_employee3.id}"
-        census_employee.benefit_group_assignments << benefit_group_assignment
-        census_employee.save!
-        benefit_group_assignment.save!
-        census_employee2.benefit_group_assignments << benefit_group_assignment2
-        census_employee2.save!
-        benefit_group_assignment2.save!
-        census_employee3.benefit_group_assignments << benefit_group_assignment3
-        census_employee3.save!
-        benefit_group_assignment3.save!
-      end
       it 'employees should have eligible state then employee role linked states' do
-        expect(census_employee.aasm_state).to eq 'eligible'
-        expect(census_employee2.aasm_state).to eq 'eligible'
-        expect(census_employee3.aasm_state).to eq 'eligible'
-        subject.migrate
-        census_employee.reload
-        census_employee2.reload
-        census_employee3.reload
-        expect(census_employee.aasm_state).to eq 'employee_role_linked'
-        expect(census_employee2.aasm_state).to eq 'employee_role_linked'
-        expect(census_employee3.aasm_state).to eq 'employee_role_linked'
+        ClimateControl.modify action: 'Link', census_employee_ids: "#{census_employee.id}, #{census_employee2.id}, #{census_employee3.id}" do
+          census_employee.benefit_group_assignments << benefit_group_assignment
+          census_employee.save!
+          benefit_group_assignment.save!
+          census_employee2.benefit_group_assignments << benefit_group_assignment2
+          census_employee2.save!
+          benefit_group_assignment2.save!
+          census_employee3.benefit_group_assignments << benefit_group_assignment3
+          census_employee3.save!
+          benefit_group_assignment3.save!
+          
+          expect(census_employee.aasm_state).to eq 'eligible'
+          expect(census_employee2.aasm_state).to eq 'eligible'
+          expect(census_employee3.aasm_state).to eq 'eligible'
+          subject.migrate
+          census_employee.reload
+          census_employee2.reload
+          census_employee3.reload
+          expect(census_employee.aasm_state).to eq 'employee_role_linked'
+          expect(census_employee2.aasm_state).to eq 'employee_role_linked'
+          expect(census_employee3.aasm_state).to eq 'employee_role_linked'
+        end
       end
     end
   end
