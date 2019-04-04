@@ -148,7 +148,7 @@ module BenefitSponsors
       it "should redirect" do
         [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
           sign_in_and_do_create(login_user)
-          expect(response).to have_http_status :success
+            expect(response).to have_http_status(:redirect)
         end
       end
 
@@ -220,7 +220,7 @@ module BenefitSponsors
       it "should be a success" do
         [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
           sign_in login_user
-          get :edit, xhr: true, params: { benefit_sponsorship_id: benefit_sponsorship_id, id: ben_app.id.to_s, benefit_application: benefit_application_params }
+          get :edit, xhr: true, params: {benefit_sponsorship_id: benefit_sponsorship_id, id: ben_app.id.to_s, benefit_application: benefit_application_params}
           expect(response).to have_http_status(:success)
         end
       end
@@ -236,7 +236,7 @@ module BenefitSponsors
       it "should initialize form" do
         [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
           sign_in login_user
-          get :edit, xhr: true, params: { benefit_sponsorship_id: benefit_sponsorship_id, id: ben_app.id.to_s, benefit_application: benefit_application_params }
+          get :edit, xhr: true, params: {benefit_sponsorship_id: benefit_sponsorship_id, id: ben_app.id.to_s, benefit_application: benefit_application_params}
           expect(form_class).to respond_to(:for_edit)
         end
       end
