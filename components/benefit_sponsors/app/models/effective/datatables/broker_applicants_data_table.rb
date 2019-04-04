@@ -10,7 +10,7 @@ module Effective
 
       end
 
-      collection do
+      def collection
         unless  (defined? @people) && @people.present?
           @people = BenefitSponsors::Queries::BrokerApplicantsDatatableQuery.new(attributes)
         end

@@ -34,7 +34,7 @@ module Effective
           pp.employee_roles.present?  ? "Yes" : "No" }, :filter => false, :sortable => false
       end
 
-      collection do
+      def collection
         @collection ||= Queries::GeneralAgencyFamiliesQuery.new(attributes[:id])
       end
 

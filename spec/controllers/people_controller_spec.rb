@@ -82,7 +82,6 @@ RSpec.describe PeopleController, dbclean: :after_each do
         allow(vlp_document).to receive(:save).and_return(true)
         consumer_role_attributes[:vlp_documents_attributes] = vlp_documents_attributes
         person_attributes[:consumer_role_attributes] = consumer_role_attributes
-        # binding.pry
         post :update,  params: {id: person.id, person: person_attributes}
         expect(response).to redirect_to(personal_insured_families_path)
         expect(assigns(:person)).not_to be_nil

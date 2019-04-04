@@ -11,7 +11,6 @@ class Exchanges::SecurityQuestionsController < ApplicationController
 
   def create
     @question = SecurityQuestion.new(security_question_params)
-    # binding.pry
     if @question.save
       redirect_to exchanges_security_questions_path, notice: 'Question was successfully created'
     else

@@ -9,10 +9,8 @@ gem 'rails', '~> 5.2.3'
 #######################################################
 
 # Update to use features from new version
-# gem 'effective_datatables', path: './project_gems/effective_datatables-2.6.14'
-gem 'haml-rails'
-gem 'effective_datatables', '~> 4.3'
-# gem 'jquery-datatables-rails', '3.4.0'
+gem 'effective_datatables', path: './project_gems/effective_datatables-2.6.14'
+# gem 'jquery-datatables-rails', '3.4.0'config/initializers/effective_datatables.rb
 
 # Verify this gem git reference is necessary.  Otherwise point it to release level
 gem 'prawn', :git => 'https://github.com/prawnpdf/prawn.git', :ref => '8028ca0cd2'
@@ -127,11 +125,6 @@ group :development, :test do
   # gem 'bundler-audit',          '~> 0.6'
   gem 'capistrano',             '~> 3.1'
   gem 'capistrano-rails',       '1.4'
-  gem 'pry'
-  gem 'pry-byebug'
-  gem 'pry-rails'
-  gem 'pry-remote'
-  gem 'pry-stack_explorer'
   gem 'email_spec',             '~> 2'
   gem 'factory_bot_rails',      '~> 4.11'
   gem 'forgery',                '~> 0.7.0'
