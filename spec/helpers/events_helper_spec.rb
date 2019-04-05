@@ -371,5 +371,16 @@ describe EventsHelper, "employer_plan_years", dbclean: :after_each do
         expect(subject.employer_plan_years(abc_profile, nil)).to eq [predecessor_application]
       end
     end
+
+    context "employer with terminated pending plan year " do
+      before do
+        predecessor_application.update_attributes({:aasm_state => "termination_pending"})
+        renewal_application.update_attributes({:aasm_state => "canceled"})
+      end
+
+      it "should return the terminated pending plan year" do
+        expect(subject.employer_plan_years(abc_profile, nil)).to eq [predecessor_application]
+      end
+    end
   end
 end

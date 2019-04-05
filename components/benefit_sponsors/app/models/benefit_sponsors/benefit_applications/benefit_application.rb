@@ -943,7 +943,7 @@ module BenefitSponsors
               return false if self.imported?
               return false if self.effective_period.blank?
               return true if self.enrollment_eligible? || self.binder_paid? || self.active?
-              self.terminated? || self.expired?
+              terminated? || termination_pending? || expired?
             end
 
             def enrollment_quiet_period
