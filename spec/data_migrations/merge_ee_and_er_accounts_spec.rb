@@ -19,11 +19,6 @@ describe MergeEeAndErAccounts, dbclean: :after_each do
     let(:employer_staff_role) {FactoryBot.create(:employer_staff_role,employer_profile_id:employer_profile.id)}
     let(:employer_profile){FactoryBot.create(:employer_profile)}
 
-    before(:each) do
-      # allow(ENV).to receive(:[]).with("employee_hbx_id").and_return(person.hbx_id)
-      # allow(ENV).to receive(:[]).with("employer_hbx_id").and_return(employer_staff_role.person.hbx_id)
-    end
-
     context 'giving a new state' do
       it 'should assign user to the employee' do
         ClimateControl.modify employee_hbx_id: person.hbx_id, employer_hbx_id: employer_staff_role.person.hbx_id do
