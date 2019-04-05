@@ -12,7 +12,7 @@ describe ChangeErToApplicantState do
     end
   end
 
-  describe "change employer profile to applicant state", dbclean: :after_each do
+  describe "change employer profile to applicant state", dbclean: :around_each do
     let(:benefit_group) { FactoryBot.create(:benefit_group)}
     let(:plan_year) { FactoryBot.create(:plan_year, benefit_groups: [benefit_group], aasm_state: "canceled")}
     let(:employer_profile)     { FactoryBot.build(:employer_profile, plan_years: [plan_year]) }
@@ -24,11 +24,11 @@ describe ChangeErToApplicantState do
     let!(:enrollment) { FactoryBot.create(:hbx_enrollment, household: family.active_household, aasm_state: "coverage_enrolled", benefit_group_id: plan_year.benefit_groups.first.id)}
 
     before(:each) do
-      allow(ENV).to receive(:[]).with('plan_year_state').and_return(plan_year.aasm_state)
-      allow(ENV).to receive(:[]).with('feins').and_return(plan_year.employer_profile.parent.fein)
-      subject.migrate
-      plan_year.reload
-      enrollment.reload
+      ClimateControl.modify plan_year_state: plan_year.aasm_state, feins: plan_year.employer_profile.parent.fein do
+        subject.migrate
+        plan_year.reload
+        enrollment.reload
+      end
     end
 
     it "should cancel the plan year" do
