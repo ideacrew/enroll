@@ -76,8 +76,8 @@ RSpec.describe "insured/consumer_roles/edit.html.erb" do
       expect(rendered).to have_selector('#vlp_documents_container')
       expect(rendered).to have_selector('#immigration_doc_type')
       expect(rendered).to have_selector('#naturalization_doc_type')
-      expect(rendered).to have_selector('input#vlp_doc_target_id')
-      expect(rendered).to have_selector('input#vlp_doc_target_type')
+      expect(rendered).to have_selector('input#vlp_doc_target_id', visible: false)
+      expect(rendered).to have_selector('input#vlp_doc_target_type', visible: false)
       expect(rendered).to have_selector('.vlp_doc_area')
     end
   end
