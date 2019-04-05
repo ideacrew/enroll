@@ -19,15 +19,20 @@ module Services
         else
           @census_employee = @hbx_enrollment.employee_role.census_employee
           @is_congress = is_congress
-          is_congress ? @url = CONGRESS_URL+"#{@hbx_enrollment.coverage_year}/" : @url = BASE_URL+SHOP_PATH
+          is_congress ? @url = CONGRESS_URL : @url = BASE_URL+SHOP_PATH
         end
       end
 
       def generate_url
-        return @url if is_congress
+        #return @url if is_congress
         return "http://checkbook_url" if Rails.env.test?
         begin
-          construct_body = @hbx_enrollment.kind.downcase == "individual" ? construct_body_ivl : construct_body_shop
+          construct_body = {}
+          if is_congress
+            construct_body = construct_body_congress
+          else
+            construct_body = @hbx_enrollment.kind.downcase == "individual" ? construct_body_ivl : construct_body_shop 
+          end
 
           @result = HTTParty.post(@url,
                 :body => construct_body.to_json,
@@ -42,9 +47,11 @@ module Services
             return uri
           else
             raise "Unable to generate url"
+            return false
           end
         rescue Exception => e
           Rails.logger.error { "Unable to generate url for hbx_enrollment_id #{@hbx_enrollment.id} due to #{e.backtrace}" }
+          return false
         end
       end
 
@@ -53,24 +60,25 @@ module Services
       end
 
       def csr_value
-        active_house_hold = @hbx_enrollment.household.latest_active_tax_household_with_year(enrollment_year)
-        if active_house_hold.nil?
-          return "-01"
-        else 
-          case active_house_hold.latest_eligibility_determination.csr_percent_as_integer.to_s
-          when "100"
-            "-01"
-          when "94"
-            "-06"
-          when "87"
-            "-05"
-          when "73"
-            "-04"
-          when "0"
-             "-02"
-          when "limited"
-            "-03"
+        active_tax_house_hold = @hbx_enrollment.household.latest_active_tax_household_with_year(enrollment_year)
+
+        if active_tax_house_hold
+          case active_tax_house_hold.valid_csr_kind(hbx_enrollment)
+          when 'csr_100'
+            '-01'
+          when 'csr_94'
+            '-06'
+          when 'csr_87'
+            '-05'
+          when 'csr_73'
+            '-04'
+          when 'csr_0'
+            '-02'
+          when 'limited'
+            '-03'
           end
+        else
+          return '-01'
         end
       end
 
@@ -78,13 +86,10 @@ module Services
         active_house_hold = @hbx_enrollment.household.latest_active_tax_household_with_year(enrollment_year)
         if active_house_hold.nil?
           return "NULL"
-        else 
+        else
           active_house_hold.latest_eligibility_determination.max_aptc.to_i
         end
       end
-
-
-      private
 
       def construct_body_shop
         {
@@ -100,7 +105,8 @@ module Services
           "contribution": employer_contributions,
           "reference_plan": reference_plan.hios_id,
           "filterOption": filter_option,
-          "filterValue": filter_value
+          "filterValue": filter_value,
+          "enrollmentId": @hbx_enrollment.id.to_s,
         }
       end
 
@@ -112,6 +118,16 @@ module Services
           "family": consumer_build_family,
           "aptc": elected_aptc.to_s,
           "csr": csr_value,
+          "enrollmentId": @hbx_enrollment.id.to_s, #Host Name will be static as Checkbook suports static URL's and hostname should be changed before going to production.
+         }
+      end
+
+      def construct_body_congress
+        {
+          "remote_access_key": Rails.application.config.checkbook_services_remote_access_key,
+          "reference_id": Rails.application.config.checkbook_services_reference_id,
+          "employee_coverage_date": @hbx_enrollment.effective_on.strftime("%Y-%m-%d"),
+          "family": build_congress_employee_age,
           "enrollmentId": @hbx_enrollment.id.to_s, #Host Name will be static as Checkbook suports static URL's and hostname should be changed before going to production.
          }
       end
@@ -169,6 +185,14 @@ module Services
           family << {"age": age, "pregnant": false, "AIAN": tribal_id}
         end
         family
+      end
+
+      def build_congress_employee_age
+        family = []
+        @hbx_enrollment.hbx_enrollment_members.each do |dependent|
+          family << {"dob": dependent.family_member.person.dob.strftime("%Y-%m-%d")}
+          end
+          family
       end
 
       def build_family
