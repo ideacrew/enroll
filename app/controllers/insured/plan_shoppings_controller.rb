@@ -27,7 +27,7 @@ class Insured::PlanShoppingsController < ApplicationController
       if plan_selection.hbx_enrollment.errors.present?
         flash[:error] = plan_selection.hbx_enrollment.errors.full_messages
       end
-      redirect_to :back
+        redirect_back(fallback_location: :back)
       return
     end
 
@@ -140,9 +140,9 @@ class Insured::PlanShoppingsController < ApplicationController
       hbx_enrollment.terminate_reason = params[:terminate_reason] if params[:terminate_reason].present?
       hbx_enrollment.schedule_coverage_termination!(@person.primary_family.terminate_date_for_shop_by_enrollment(hbx_enrollment))
       hbx_enrollment.update_renewal_coverage
-      redirect_to family_account_path
+      redirect_back(fallback_location: family_account_path) 
     else
-      redirect_to :back
+      redirect_back(fallback_location: root_path) 
     end
   end
 

@@ -275,7 +275,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       request.env["HTTP_REFERER"] = terminate_insured_plan_shopping_url(1)
       allow(hbx_enrollment).to receive(:may_schedule_coverage_termination?).and_return(false)
       post :terminate, params: {id: "hbx_id"}
-      expect(response).to redirect_to(:back)
+      expect(response).to be_redirect
     end
 
     it "should record termination submitted date on terminate of hbx_enrollment" do
