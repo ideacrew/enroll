@@ -1,9 +1,8 @@
 require "rails_helper"
 
 shared_examples "a valid invitation" do |sk, role|
-    user = FactoryBot.build(:user)
   it "should be valid with a source_kind of #{sk} and a role of #{role}" do
-    record = Invitation.new({role: role, source_kind: sk, user: user}.merge(valid_params))
+    record = Invitation.new({role: role, source_kind: sk}.merge(valid_params))
     expect(record.valid?).to eq true
   end
 end

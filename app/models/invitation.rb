@@ -22,7 +22,7 @@ class Invitation
   field :aasm_state, type: String
   field :invitation_email, type: String
 
-  belongs_to :user
+  belongs_to :user, optional: true
 
   validates_presence_of :invitation_email, :allow_blank => false
   validates_presence_of :source_id, :allow_blank => false
