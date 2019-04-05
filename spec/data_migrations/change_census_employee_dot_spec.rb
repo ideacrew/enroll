@@ -1,6 +1,6 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "change_census_employee_dot")
-describe ChangeCensusEmployeeDot, dbclean: :after_each do
+describe ChangeCensusEmployeeDot, dbclean: :around_each do
   describe "given a task name" do
     let(:given_task_name) { "change_census_employee_dot" }
     subject {ChangeCensusEmployeeDot.new(given_task_name, double(:current_scope => nil)) }
@@ -24,17 +24,16 @@ describe ChangeCensusEmployeeDot, dbclean: :after_each do
       let(:date) { TimeKeeper.date_of_record.next_month.beginning_of_month + 2.days }
       let(:date1){TimeKeeper.date_of_record - 5.days}
       before :each do
-        allow(ENV).to receive(:[]).with('census_employee_id').and_return census_employee.id
-        allow(ENV).to receive(:[]).with('new_dot').and_return "01/01/2016"
-        census_employee.aasm_state="employee_termination_pending"
-        census_employee.save!
-        subject.migrate
-        census_employee.reload
+        ClimateControl.modify census_employee_id: census_employee.id, new_dot: "01/01/2016" do
+          census_employee.aasm_state="employee_termination_pending"
+          census_employee.save!
+          subject.migrate
+          census_employee.reload
+        end
       end
       it "should change dot of ce not in employment termination state" do
         expect(census_employee.employment_terminated_on).to eq Date.new(2016,01,01)
         expect(census_employee.aasm_state).to eq "employment_terminated"
-
       end
     end
 
@@ -50,12 +49,12 @@ describe ChangeCensusEmployeeDot, dbclean: :after_each do
                                     }
       let(:date) {TimeKeeper::date_of_record - 1.days }
       before :each do
-        allow(ENV).to receive(:[]).with('census_employee_id').and_return census_employee.id
-        allow(ENV).to receive(:[]).with('new_dot').and_return "01/01/2016"
-        census_employee.aasm_state="employment_terminated"
-        census_employee.save
-        subject.migrate
-        census_employee.reload
+        ClimateControl.modify census_employee_id: census_employee.id, new_dot: "01/01/2016" do
+          census_employee.aasm_state="employment_terminated"
+          census_employee.save
+          subject.migrate
+          census_employee.reload
+        end
       end
       it "should change dot of ce not in employment termination state" do
         ce=CensusEmployee.find(census_employee.id)
