@@ -3,7 +3,7 @@ require "rails_helper"
 describe Forms::BrokerCandidate do
 
   let(:broker_role) { FactoryBot.build(:broker_role, npn: '234567890') }
-  let(:person_obj) { FactoryBot.create(:person, first_name: "steve", last_name: "smith", dob: "10/10/1974") }
+  let(:person_obj) { FactoryBot.create(:person, :with_ssn, first_name: "steve", last_name: "smith", dob: "10/10/1974") }
 
   let(:attributes) { {
     broker_applicant_type: "broker", 
@@ -151,7 +151,7 @@ describe Forms::BrokerCandidate do
         }}
       
       before(:each) do
-        2.times { FactoryBot.create(:person, first_name: "john", last_name: "smith", dob: "10/10/1974") }
+        2.times { FactoryBot.create(:person, :with_ssn, first_name: "john", last_name: "smith", dob: "10/10/1974") }
         subject.save
       end
 
@@ -186,7 +186,7 @@ describe Forms::BrokerCandidate do
           }}
 
         before (:each) do 
-          FactoryBot.create(:person, first_name: 'kevin', last_name: subject.last_name, dob: subject.dob)
+          FactoryBot.create(:person, :with_ssn, first_name: 'kevin', last_name: subject.last_name, dob: subject.dob)
         end
 
         it 'should update existing person with broker role' do
@@ -232,7 +232,7 @@ describe Forms::BrokerCandidate do
           }}
 
         before (:each) do 
-          FactoryBot.create(:person, first_name: 'joe', last_name: subject.last_name, dob: subject.dob)
+          FactoryBot.create(:person, :with_ssn, first_name: 'joe', last_name: subject.last_name, dob: subject.dob)
         end
 
         it 'should update existing person with broker staff role' do
@@ -259,7 +259,7 @@ describe Forms::BrokerCandidate do
 
         before (:each) do 
           Person.delete_all
-          FactoryBot.create(:person, first_name: subject.first_name, last_name: subject.last_name, dob: subject.dob)
+          FactoryBot.create(:person, :with_ssn, first_name: subject.first_name, last_name: subject.last_name, dob: subject.dob)
         end
 
         it 'should update existing person with addresses' do
