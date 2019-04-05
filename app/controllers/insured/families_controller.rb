@@ -197,14 +197,13 @@ class Insured::FamiliesController < FamiliesController
 
   # admin manually uploads a notice for person
   def upload_notice
-
     if (!params.permit![:file]) || (!params.permit![:subject])
       flash[:error] = "File or Subject not provided"
-      redirect_to(:back)
+      redirect_back(fallback_location: :back)
       return
     elsif file_content_type != 'application/pdf'
       flash[:error] = "Please upload a PDF file. Other file formats are not supported."
-      redirect_to(:back)
+      redirect_back(fallback_location: :back)
       return
     end
 
@@ -225,7 +224,7 @@ class Insured::FamiliesController < FamiliesController
       flash[:error] = "Could not save file."
     end
 
-    redirect_to(:back)
+      redirect_back(fallback_location: :back)
     return
   end
 

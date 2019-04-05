@@ -531,7 +531,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
       it "should redirect with change_plan parameter" do
         expect(response).to have_http_status(:redirect)
-        expect(response).to redirect_to(new_insured_group_selection_path({person_id: person.id, consumer_role_id: person.consumer_role.try(:id), change_plan: 'change_plan', enrollment_kind: 'sep', qle_id: @qle.id}))
+        expect(response).to redirect_back(fallback_location: new_insured_group_selection_path({person_id: person.id, consumer_role_id: person.consumer_role.try(:id), change_plan: 'change_plan', enrollment_kind: 'sep', qle_id: @qle.id}))
       end
     end
   end
@@ -810,14 +810,14 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       post :upload_notice, params: {:file => file, :subject=> subject}
       expect(flash[:notice]).to eq("File Saved")
       expect(response).to have_http_status(:found)
-      expect(response).to redirect_to request.env["HTTP_REFERER"]
+      expect(response).to be_redirect
     end
 
     it "when failure displays 'File not uploaded'" do
       post :upload_notice
       expect(flash[:error]).to eq("File or Subject not provided")
       expect(response).to have_http_status(:found)
-      expect(response).to redirect_to request.env["HTTP_REFERER"]
+      expect(response).to be_redirect
     end
 
     context "notice_upload_secure_message" do
