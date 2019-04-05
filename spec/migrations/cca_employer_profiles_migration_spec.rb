@@ -34,9 +34,6 @@ describe "CcaEmployerProfilesMigration" do
 
       FactoryBot.create(:employee_role, employer_profile: employer_profile)
       site = BenefitSponsors::Site.all.first
-      benefit_market = FactoryBot.create(:benefit_markets_benefit_market)
-      site.benefit_markets << benefit_market
-      site.save!
       BenefitSponsors::Organizations::Organization.employer_profiles.delete_all
       @migrated_organizations = BenefitSponsors::Organizations::Organization.employer_profiles
       @old_organizations = Organization.all_employer_profiles
