@@ -557,13 +557,13 @@ RSpec.describe Organization, dbclean: :after_each do
       it "legal_name changed_attributes " do
         organization.legal_name = "test1"
         organization.save!
-        expect(organization.instance_variable_get(:@changed_fields)).to eq ["legal_name", "version", "updated_at"]
+        expect(organization.instance_variable_get(:@changed_fields)).to eq ["legal_name", "updated_at"]
       end
 
       it "fein changed_attributes" do
         organization.fein ="000000001"
         organization.save
-        expect(organization.instance_variable_get(:@changed_fields)).to eq ["fein", "version", "updated_at"]
+        expect(organization.instance_variable_get(:@changed_fields)).to eq ["fein", "updated_at"]
       end
     end
   end
