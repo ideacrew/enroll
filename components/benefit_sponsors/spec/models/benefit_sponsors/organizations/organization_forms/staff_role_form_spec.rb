@@ -72,13 +72,13 @@ module BenefitSponsors
 
     describe '#for_create' do
 
-      let!(:person) { FactoryBot.create(:person) }
+      let!(:person) { FactoryBot.create(:person, :with_ssn) }
       let!(:params) {
         {
             profile_id: employer_profile.id.to_s,
             first_name: person.first_name,
             last_name: person.last_name,
-            dob: person.dob.to_s
+            dob: Date.new(1972,04,04).to_s
         }
       }
 
