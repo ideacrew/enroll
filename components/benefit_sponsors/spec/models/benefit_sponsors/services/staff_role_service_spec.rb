@@ -48,7 +48,7 @@ module BenefitSponsors
             profile_id: employer_profile.id,
             first_name:new_person.first_name,
             last_name:new_person.last_name,
-            dob:new_person.dob.to_s)
+            dob:Date.new(1972,04,04).to_s)
         }
 
         it 'should add staff role for profile' do
