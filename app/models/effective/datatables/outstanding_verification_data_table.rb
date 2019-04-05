@@ -19,7 +19,7 @@ module Effective
 
       end
 
-      collection do
+      def collection
         unless (defined? @families) && @families.present? #memoize the wrapper class to persist @search_string
           @families = Queries::OutstandingVerificationDatatableQuery.new(attributes)
         end

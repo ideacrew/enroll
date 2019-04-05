@@ -40,11 +40,7 @@ module Effective
         }, :filter => false, :sortable => false
       end
 
-      # scopes do
-      #    scope :legal_name, "Hello"
-      # end
-
-      collection do
+      def collection
         unless  (defined? @families) && @families.present?   #memoize the wrapper class to persist @search_string
           @families = Queries::FamilyDatatableQuery.new(attributes)
         end

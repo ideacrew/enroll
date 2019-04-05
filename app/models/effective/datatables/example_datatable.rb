@@ -8,7 +8,7 @@ module Effective
         array_column :email
       end
 
-      collection do
+      def collection
         [
           [1, 'June', 'Huang', 'june@einstein.com'],
           [2, 'Leo', 'Stubbs', 'leo@einstein.com'],

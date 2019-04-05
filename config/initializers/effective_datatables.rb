@@ -23,19 +23,19 @@ EffectiveDatatables.setup do |config|
 
   # Date & DateTime Format
   # By default, format Date and DateTime values with the following
-  # config.date_format = '%Y-%m-%d'
-  # config.datetime_format = '%Y-%m-%d %H:%M'
+  config.date_format = '%Y-%m-%d'
+  config.datetime_format = '%Y-%m-%d %H:%M'
 
   # Boolean format
   # If :yes_no, display as yes_no instead of true/false
-  # config.boolean_format = :yes_no
+  config.boolean_format = :yes_no
 
-  # # Format integer columns with the following proc or function
-  # config.integer_format = :number_with_delimiter
+  # Format integer columns with the following proc or function
+  config.integer_format = :number_with_delimiter
 
-  # # Default number of entries shown per page
-  # # Valid options are: 10, 25, 50, 100, 250, 1000, :all
-  # config.default_entries = 10
+  # Default number of entries shown per page
+  # Valid options are: 10, 25, 50, 100, 250, 1000, :all
+  config.default_entries = 10
 
   # When using the actions_column DSL method, apply the following behavior
   # Valid values for each action are:
@@ -55,14 +55,14 @@ EffectiveDatatables.setup do |config|
   #
   # You can override these defaults on a per-table basis
   # by calling `actions_column(show: false, edit: true, destroy: :authorize)`
-  # config.actions_column = {
-  #   show: :authorize,
-  #   edit: :authorize,
-  #   destroy: :authorize,
-  #   unarchive: :authorize
-  # }
+  config.actions_column = {
+    show: :authorize,
+    edit: :authorize,
+    destroy: :authorize,
+    unarchive: :authorize
+  }
 
   # Which packages to load when using the charts DSL
-  # config.google_chart_packages = ['corechart', 'gauge', 'geochart']
+  config.google_chart_packages = ['corechart', 'gauge', 'geochart']
 
 end
