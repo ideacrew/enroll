@@ -1,6 +1,4 @@
 require 'rails_helper'
-include L10nHelper
-include ActionView::Helpers::TranslationHelper
 
 RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
   let(:person) { FactoryGirl.create(:person)}
@@ -213,6 +211,9 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
     end
 
     context "when there is response from eligibility service" do
+      include L10nHelper
+      include ActionView::Helpers::TranslationHelper
+
       before do
         allow(controller).to receive(:call_service)
         controller.instance_variable_set(:@assistance_status, false)
