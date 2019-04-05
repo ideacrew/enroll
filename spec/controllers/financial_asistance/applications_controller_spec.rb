@@ -1,4 +1,6 @@
 require 'rails_helper'
+include L10nHelper
+include ActionView::Helpers::TranslationHelper
 
 RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
   let(:person) { FactoryGirl.create(:person)}
@@ -218,7 +220,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
         get :copy, id: application.id
       end
 
-      let(:message) {"It looks like you're already covered by Medicaid. Please call DC Health Link at (855) 532-5465 to make updates to your case. If you keep going, we'll check to see if you qualify to enroll in a private health insurance plan on DC Health Link, but won't be able to tell you if you qualify for Medicaid or cost savings."}
+      let(:message) {l10n("faa.acdes_lookup")}
 
       it 'should not copy applicant and redirect to financial_assistance_applications_path' do
         expect(response).to redirect_to(financial_assistance_applications_path)
