@@ -20,6 +20,7 @@ class LawfulPresenceDetermination
   field :vlp_document_id, type: String
   field :citizen_status, type: String
   field :citizenship_result, type: String
+  field :qualified_non_citizenship_result, type:  String
   field :aasm_state, type: String
   embeds_many :workflow_state_transitions, as: :transitional
 
@@ -73,10 +74,18 @@ class LawfulPresenceDetermination
 
   def start_vlp_process(requested_start_date)
     notify(VLP_VERIFICATION_REQUEST_EVENT_NAME, {:person => self.ivl_role.person, :coverage_start_date => requested_start_date})
+    mock_dummy_data
   end
 
   def assign_citizen_status(new_status)
     update_attributes(citizen_status: new_status)
+  end
+
+  def mock_dummy_data
+    xml = [File.read(Rails.root.join("spec", "test_data", "lawful_presence_payloads", "response2.xml")), File.read(Rails.root.join("spec", "test_data", "lawful_presence_payloads", "response3.xml")) ].sample
+    payload = {:individual_id =>  self.ivl_role.person.hbx_id, :body => xml}
+    lawful_subscriber = ::Subscribers::LawfulPresence.new
+    lawful_subscriber.call(nil, nil, nil, nil, payload )
   end
 
   private
@@ -84,6 +93,8 @@ class LawfulPresenceDetermination
     approval_information = args.first
     self.update_attributes!(vlp_verified_at: approval_information.determined_at,
                             vlp_authority: approval_information.vlp_authority)
+
+    self.qualified_non_citizenship_result = approval_information.qualified_non_citizenship_result if approval_information.qualified_non_citizenship_result
     if approval_information.citizenship_result
       self.citizenship_result = approval_information.citizenship_result
     else
@@ -103,8 +114,10 @@ class LawfulPresenceDetermination
 
   def record_denial_information(*args)
     denial_information = args.first
+    qnc_result = denial_information.qualified_non_citizenship_result.present? ? denial_information.qualified_non_citizenship_result : nil
     self.update_attributes!(vlp_verified_at: denial_information.determined_at,
                             vlp_authority: denial_information.vlp_authority,
+                            qualified_non_citizenship_result: qnc_result,
                             citizenship_result: ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS)
   end
 
