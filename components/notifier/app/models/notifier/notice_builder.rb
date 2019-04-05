@@ -6,6 +6,7 @@ module Notifier
 
     def to_html(options = {})
       data_object = (resource.present? ? construct_notice_object : recipient.constantize.stubbed_object)
+      validate_data_object(data_object)
       render_envelope({recipient: data_object}) + render_notice_body({recipient_klass_name => data_object})
     end
 
@@ -34,6 +35,69 @@ module Notifier
         builder.instance_eval(element_retriver)
       end
       builder.merge_model
+    end
+
+    def element_retrivers
+      element_retrivers_array = []
+      setting_tokens = []
+      template.data_elements.each do |element|
+        elements = element.split('.')
+        if elements.include?(recipient_klass_name.to_s)
+          element_retrivers_array << elements.reject{|ele| ele == recipient_klass_name.to_s}.join('.')
+        else
+          setting_tokens << elements.join('.')
+        end
+      end
+      [element_retrivers_array, setting_tokens]
+    end
+
+    def none_or_only_broker_condition_present?(conditions)
+      conditions.blank? || (conditions.size == 1 && conditions.include?("broker_present?"))
+    end
+
+    def validate_tokens(merge_model, tokens)
+      tokens.each do |token|
+        value = merge_model.instance_eval token
+        log_and_raise_exception(token) if value.nil?
+      end
+      return true
+    end
+
+    def log_and_raise_exception(token)
+      @logger ||= Logger.new("#{Rails.root}/log/shop_notices_token_validation_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
+      @logger.info "Missing token - #{token} for event #{event_name} recipient - #{resource.class} id - #{resource.id}"
+      raise "Missing token - #{token} for event #{event_name} recipient - #{resource.class} id - #{resource.id}"
+    end
+
+    def validate_broker_tokens(merge_model, tokens)
+      return true unless merge_model.broker_present?
+      validate_tokens(merge_model, tokens)
+    end
+
+    def validate_settings(tokens)
+      (setting_tokens + tokens).each do |token|
+        value = instance_eval token
+        log_and_raise_exception(token) if value.nil?
+      end
+      return true
+    end
+
+    def validate_data_object(merge_model)
+      return true unless resource.present?
+      data_tokens, setting_tokens = element_retrivers
+      conditions = data_tokens & merge_model.conditions
+      collections = data_tokens & merge_model.collections
+
+      return true if collections.present? || !none_or_only_broker_condition_present?(conditions)
+      broker_tokens, other_tokens = data_tokens.partition { |token| token.split(Regexp.union(['.', '_'])).include?("broker") }
+      # Validates all tokens except broker tokens here
+      other_tokens_validator = validate_tokens(merge_model, other_tokens)
+      # Validates broker tokens here
+      broker_validator = validate_broker_tokens(merge_model, broker_tokens)
+      # Validates settings here
+      settings_validator = validate_settings(setting_tokens)
+
+      other_tokens_validator && broker_validator && settings_validator
     end
 
     def render_envelope(params)

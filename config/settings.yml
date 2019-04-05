@@ -1,5 +1,6 @@
 site:
   short_name: "DC Health Link"
+  domain_name: "dchealthlink.com"
   byline: "DC's Online Health Insurance Marketplace"
   long_name: ""
   copyright_period_start: "2013"
