@@ -205,7 +205,7 @@ describe "for families with financial assistance application" do
 end
 
 describe FamilyMember, "aptc_benchmark_amount" do
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+  let(:person) { FactoryGirl.create(:person, :with_consumer_role, dob: TimeKeeper.date_of_record - 46.years)}
   let(:family) {FactoryGirl.create(:family, :with_primary_family_member, person: person, e_case_id: "family_test#1000")}
   let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
   let(:plan) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', csr_variant_id: '01', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01") }

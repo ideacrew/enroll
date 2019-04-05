@@ -1,8 +1,7 @@
 class FinancialAssistance::ApplicationsController < ApplicationController
   before_action :set_current_person
   before_action :set_primary_family
-  before_action :eligibility_check,  only: [:create]
-  before_action :eligibility_check,  only: [:get_help_paying_coverage_response], if: :check_cond?
+  before_action :check_eligibility, only: [:create, :get_help_paying_coverage_response, :copy]
 
   include UIHelpers::WorkflowController
   include NavigationHelper
@@ -12,10 +11,6 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   require 'securerandom'
 
   before_filter :load_support_texts, only: [:edit, :help_paying_coverage]
-
-  def check_cond?
-    params["is_applying_for_assistance"] == true
-  end
 
   def index
     @family = @person.primary_family
@@ -28,16 +23,11 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def create
-    if @assistance_status
-      @application = @person.primary_family.applications.new
-      @application.populate_applicants_for(@person.primary_family)
-      @application.save!
+    @application = @family.applications.new
+    @application.populate_applicants_for(@family)
+    @application.save!
 
-      redirect_to edit_financial_assistance_application_path(@application)
-    else
-      flash[:error] = l10n(decode_msg(@message)).to_s
-      redirect_to financial_assistance_applications_path
-    end
+    redirect_to edit_financial_assistance_application_path(@application)
   end
 
   def edit
@@ -189,9 +179,11 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   private
 
-  def eligibility_check
+  def check_eligibility
     person = FinancialAssistance::Factories::AssistanceFactory.new(@person)
     @assistance_status, @message = person.search_existing_assistance
+    return if params['action'] == "get_help_paying_coverage_response"
+    [(flash[:error] = l10n(decode_msg(@message))), (redirect_to financial_assistance_applications_path)] unless @assistance_status
   end
 
   def set_primary_family
