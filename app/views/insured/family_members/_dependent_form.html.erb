@@ -84,6 +84,9 @@
 
         <div class="row row-form-wrapper no-buffer">
           <% if @person.has_active_consumer_role? %>
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg top-buffer" >
+              <label id="is_applying_coverage_value_dep">Does <%= @dependent.try(:family_member).try(:person).present? ? @dependent.try(:family_member).try(:person).try(:first_name) : "this person" %> need coverage?</label>
+            </div>
             <% first_checked, second_checked = is_applying_coverage_value_dependent(dependent) %>
             <%= render 'shared/is_applying_for_coverage', f: f, first_checked: first_checked, second_checked: second_checked %>
           <% end %>
@@ -138,14 +141,12 @@
         </div>
 
         <div class="row row-form-wrapper no-buffer">
-          <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 form-group-lg no-pd">
-            <%= f.select :relationship, relationship_options(f.object, request.referer), {include_blank: "#{l10n("this_person_is_name", name: @person.first_name)} *"} %>
-          </div>
-
-
           <% if has_active_consumer_dependent?(@person,@dependent) %>
-            <div class="col-lg-5 col-md-2 col-sm-2 col-xs-5 form-group form-group-lg no-pd top-buffer" >
-              <span id="is_applying_coverage_value_dep">Is <%= @dependent.try(:family_member).try(:person).present? ? @dependent.try(:family_member).try(:person).try(:first_name) : "this person" %> applying for coverage?</span>
+            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 form-group form-group-lg mt18">
+              <label class="static_label label-floatlabel mt-label">NAME</label>
+              <label id="is_applying_coverage_value_dep_1" class= "ml-label">
+                <%= @dependent.try(:family_member).try(:person).present? ? @dependent.try(:family_member).try(:person).try(:first_name) : "this person" %>
+              </label>
             </div>
           <% end %>
           <div class="col-md-5 mt18">
