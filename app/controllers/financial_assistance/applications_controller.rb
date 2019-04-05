@@ -180,10 +180,14 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   private
 
   def check_eligibility
-    person = FinancialAssistance::Factories::AssistanceFactory.new(@person)
-    @assistance_status, @message = person.search_existing_assistance
+    call_service
     return if params['action'] == "get_help_paying_coverage_response"
     [(flash[:error] = l10n(decode_msg(@message))), (redirect_to financial_assistance_applications_path)] unless @assistance_status
+  end
+
+  def call_service
+    person = FinancialAssistance::Factories::AssistanceFactory.new(@person)
+    @assistance_status, @message = person.search_existing_assistance
   end
 
   def set_primary_family

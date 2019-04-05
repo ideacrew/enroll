@@ -196,16 +196,37 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
   end
 
   context "GET copy" do
-    before do
-      family.applications.each { |app| app.update_attributes(aasm_state: "determined")}
+    context "when there is not response from eligibility service" do
+      before do
+        family.applications.each {|app| app.update_attributes(aasm_state: "determined")}
+      end
+
+      it 'should copy applicant and redirect to financial assistance application edit path' do
+        get :copy, id: application.id
+        family.reload
+        existing_app_ids = [application.id, application2.id]
+        copy_app = application.family.applications.reject {|app| existing_app_ids.include? app.id}.first
+        expect(response).to redirect_to(edit_financial_assistance_application_path(copy_app.id))
+      end
     end
 
-    it 'should copy applicant and redirect to financial assistance application edit path' do
-      get :copy, id: application.id
-      family.reload
-      existing_app_ids = [application.id, application2.id]
-      copy_app = application.family.applications.reject{ |app| existing_app_ids.include? app.id }.first
-      expect(response).to redirect_to(edit_financial_assistance_application_path(copy_app.id))
+    context "when there is response from eligibility service" do
+      before do
+        allow(controller).to receive(:call_service)
+        controller.instance_variable_set(:@assistance_status, false)
+        controller.instance_variable_set(:@message, "101")
+        get :copy, id: application.id
+      end
+
+      let(:message) {"It looks like you're already covered by Medicaid. Please call DC Health Link at (855) 532-5465 to make updates to your case. If you keep going, we'll check to see if you qualify to enroll in a private health insurance plan on DC Health Link, but won't be able to tell you if you qualify for Medicaid or cost savings."}
+
+      it 'should not copy applicant and redirect to financial_assistance_applications_path' do
+        expect(response).to redirect_to(financial_assistance_applications_path)
+      end
+
+      it 'should not copy applicant and throw message' do
+        expect(flash[:error].to_s).to match(message)
+      end
     end
   end
 
