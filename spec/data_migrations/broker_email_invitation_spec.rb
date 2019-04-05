@@ -10,41 +10,43 @@ describe BrokerEmailInvitation, dbclean: :after_each do
     end
   end
 
-  describe "Send invitation to the broker" do
+  describe "Send invitation to the broker", dbclean: :after_each do
     let(:registered_broker_role) {FactoryBot.create(:broker_role, npn: "2323334", aasm_state:"active")}
-    before do
-      allow(ENV).to receive(:[]).with("npn").and_return(registered_broker_role.npn)
-    end
+
     it "count of the invitation email for the broker role should increase" do
-     expect(Invitation.where(:source_id => registered_broker_role.id).count ).to eq 0
-     subject.migrate
-     expect(Invitation.where(:source_id => registered_broker_role.id).count ).to eq 1
+      ClimateControl.modify npn: registered_broker_role.npn do 
+        expect(Invitation.where(:source_id => registered_broker_role.id).count ).to eq 0
+        subject.migrate
+        expect(Invitation.where(:source_id => registered_broker_role.id).count ).to eq 1
+      end
     end
   end
 
   describe "Already invited broker should not be sent an invitation" do    
     let(:registered_broker_role) {FactoryBot.create(:broker_role, npn: "2323334", aasm_state:"active")}
     let(:invitation) { FactoryBot.create(:invitation, :broker_role, :source_id => registered_broker_role.id, :invitation_email => registered_broker_role.email_address)}
-    before do
-      allow(ENV).to receive(:[]).with("npn").and_return(registered_broker_role.npn)
-    end
+
     it "count of the invitation email for the broker role should not increase" do
-     invitation.reload
-     expect(Invitation.where(:source_id => registered_broker_role.id).count ).to eq 1
-     subject.migrate
-     expect(Invitation.where(:source_id => registered_broker_role.id).count ).to eq 1
+      ClimateControl.modify npn: registered_broker_role.npn do 
+
+      invitation.reload
+      expect(Invitation.where(:source_id => registered_broker_role.id).count ).to eq 1
+      subject.migrate
+      expect(Invitation.where(:source_id => registered_broker_role.id).count ).to eq 1
+      end
     end
   end
 
   describe "Do not send an invitation to the broker who is not in active state" do
     let(:registered_broker_role) {FactoryBot.create(:broker_role, npn: "2323334", aasm_state:"broker_agency_pending")}
-    before do
-      allow(ENV).to receive(:[]).with("npn").and_return(registered_broker_role.npn)
-    end
+
     it "count of the invitation email for the broker role should not increase" do
-     expect(Invitation.where(:source_id => registered_broker_role.id).count ).to eq 0
-     subject.migrate
-     expect(Invitation.where(:source_id => registered_broker_role.id).count ).to eq 0
+      ClimateControl.modify npn: registered_broker_role.npn do 
+
+        expect(Invitation.where(:source_id => registered_broker_role.id).count ).to eq 0
+        subject.migrate
+        expect(Invitation.where(:source_id => registered_broker_role.id).count ).to eq 0
+      end
     end
   end
 end
