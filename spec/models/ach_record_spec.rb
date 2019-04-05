@@ -46,7 +46,7 @@ RSpec.describe AchRecord, :type => :model, dbclean: :after_each do
       end
 
       it "is valid without the confirmation included" do
-        expect(AchRecord.new(params)).to_not be_valid
+        expect(AchRecord.new(params)).to be_valid
       end
     end
   end
