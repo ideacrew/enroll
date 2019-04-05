@@ -590,6 +590,7 @@ describe Person, :dbclean => :after_each do
 
     context "a person" do
       it "should know its age today" do
+
         expect(greg.age_on(Date.today)).to eq gregs_age
       end
 
