@@ -14,6 +14,7 @@ class Person
   include UnsetableSparseFields
   include FullStrippedNames
   include ::BenefitSponsors::Concerns::Observable
+  include SponsoredBenefits::Concerns::Dob
 
   # verification history tracking
   include Mongoid::History::Trackable
@@ -522,6 +523,15 @@ class Person
 
   def residency_eligible?
     no_dc_address and no_dc_address_reason.present?
+  end
+
+  def age_on(date)
+    age = date.year - dob.year
+    if date.month < dob.month || (date.month == dob.month && date.day < dob.day)
+      age - 1
+    else
+      age
+    end
   end
 
   def is_dc_resident?

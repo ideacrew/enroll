@@ -67,7 +67,7 @@ describe "CcaBrokerAgencyAccountsMigration" do
       site = BenefitSponsors::Site.all.first
       benefit_market = FactoryBot.create(:benefit_markets_benefit_market)
       site.benefit_markets << benefit_market
-      site.save!
+      # site.save!
 
       BenefitSponsors::Organizations::Organization.employer_profiles.delete_all
       @orgs_with_emp_profile = BenefitSponsors::Organizations::Organization.employer_profiles
@@ -84,10 +84,10 @@ describe "CcaBrokerAgencyAccountsMigration" do
 
 
     it "should start and complete profiles migrations" do
-      silence_stream(STDOUT) do
+      # silence_stream(STDOUT) do
         Mongoid::Migrator.run(:up, @migrations_paths, @emp_migration_version.to_i)
         Mongoid::Migrator.run(:up, @migrations_paths, @bk_migration_version.to_i)
-      end
+      # end
 
       @orgs_with_emp_profile.each do |migrated_organization|
 
@@ -111,9 +111,9 @@ describe "CcaBrokerAgencyAccountsMigration" do
     describe "after profiles migration" do
 
       it "should start and complete accounts migrations" do
-        silence_stream(STDOUT) do
+        # silence_stream(STDOUT) do
           Mongoid::Migrator.run(:up, @migrations_paths, @baa_migration_version.to_i)
-        end
+        # end
       end
 
       it "should have benefit sponsorships" do

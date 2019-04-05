@@ -468,9 +468,6 @@ describe Person, :dbclean => :after_each do
       @p5 = Person.create(first_name: "Justin", last_name: "Kenny", dob: "1983-06-20", is_active: false)
     end
 
-#    after(:all) do
-#      DatabaseCleaner.clean
-#    end
 
     it 'matches by last_name, first name and dob if no previous ssn and no current ssn' do
       expect(Person.match_by_id_info(last_name: @p4.last_name, dob: @p4.dob, first_name: @p4.first_name)).to eq [@p4]
@@ -593,6 +590,7 @@ describe Person, :dbclean => :after_each do
 
     context "a person" do
       it "should know its age today" do
+
         expect(greg.age_on(Date.today)).to eq gregs_age
       end
 
@@ -1204,8 +1202,8 @@ describe Person, :dbclean => :after_each do
     context "person has active employee roles" do
       before(:each) do
         person.employee_roles.create!(FactoryBot.create(:employee_role, person: person,
-                                                                       census_employee_id: census_employee.id).attributes)
-        person.employee_roles.pluck(:census_employee).each { |census_employee| census_employee.update_attribute(:aasm_state, 'eligible') }
+              census_employee_id: census_employee.id).attributes)
+        person.active_employee_roles.each { |employee_role| employee_role.census_employee.update_attribute(:aasm_state, 'eligible') }
       end
 
       it "should return true if person has active employee role for given census_employee" do

@@ -150,30 +150,29 @@ class ConsumerRole
 
   before_validation :ensure_validation_states, on: [:create, :update]
 
-  track_history :on => [:five_year_bar,
-                          :aasm_state,
-                          :marital_status,
-                          :ssn_validation,
-                          :native_validation,
-                          :is_state_resident,
-                          :local_residency_validation,
-                          :ssn_update_reason,
-                          :lawful_presence_update_reason,
-                          :native_update_reason,
-                          :residency_update_reason,
-                          :is_applying_coverage,
-                          :ssn_rejected,
-                          :native_rejected,
-                          :lawful_presence_rejected,
-                          :residency_rejected],
-                  :scope => :person,
-                  :modifier_field => :modifier,
-                  :modifier_field_optional => :true,
-                  
-                  :version_field => :tracking_version,
-                  :track_create  => true,    # track document creation, default is false
-                  :track_update  => true,    # track document updates, default is true
-                  :track_destroy => true
+  track_history :modifier_field_optional => true,
+                :on => [:five_year_bar,
+                        :aasm_state,
+                        :marital_status,
+                        :ssn_validation,
+                        :native_validation,
+                        :is_state_resident,
+                        :local_residency_validation,
+                        :ssn_update_reason,
+                        :lawful_presence_update_reason,
+                        :native_update_reason,
+                        :residency_update_reason,
+                        :is_applying_coverage,
+                        :ssn_rejected,
+                        :native_rejected,
+                        :lawful_presence_rejected,
+                        :residency_rejected],
+                :scope => :person,
+                :modifier_field => :modifier,
+                :version_field => :tracking_version,
+                :track_create  => true,    # track document creation, default is false
+                :track_update  => true,    # track document updates, default is true
+                :track_destroy => true
 
   # used to track history verification actions can be used on any top node model to build history of changes.
   # in this case consumer role taken as top node model instead of family member bz all verification functionality tied to consumer role model

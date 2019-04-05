@@ -27,7 +27,7 @@ module Effective
           }, :filter => false, :sortable => false
       end
 
-      collection do
+      def collection
         state = attributes['states']
         type = attributes['employer_types']
         broker_role_id = attributes["collection_scope"] || QuoteDatatable.broker_role_id.to_s

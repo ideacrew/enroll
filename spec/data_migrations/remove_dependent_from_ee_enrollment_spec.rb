@@ -8,46 +8,49 @@ describe RemoveDependentFromEeEnrollment, dbclean: :after_each do
   let!(:hbx_enrollment){FactoryBot.create(:hbx_enrollment, hbx_enrollment_members:[hbx_enrollment_member], household:family.active_household)}
 
   context "won't delete enrollment memeber if not found hbx_enrollment" do
-    before do
-      allow(ENV).to receive(:[]).with("enrollment_id").and_return('')
-      allow(ENV).to receive(:[]).with("enrollment_member_id").and_return(hbx_enrollment.hbx_enrollment_members.first.id)
-    end
     it "won't delete enrollment memeber if not found hbx_enrollment" do
-      enrollment_member_id=hbx_enrollment.hbx_enrollment_members.first.id
-      expect(hbx_enrollment.hbx_enrollment_members.where(id: enrollment_member_id).size).to eq 1
-      subject.migrate
-      hbx_enrollment.reload
-      expect(hbx_enrollment.hbx_enrollment_members.where(id: enrollment_member_id).size).to eq 1
+      ClimateControl.modify enrollment_id:'',enrollment_member_id: hbx_enrollment.hbx_enrollment_members.first.id do 
+        enrollment_member_id=hbx_enrollment.hbx_enrollment_members.first.id
+        expect(hbx_enrollment.hbx_enrollment_members.where(id: enrollment_member_id).size).to eq 1
+        subject.migrate
+        hbx_enrollment.reload
+        expect(hbx_enrollment.hbx_enrollment_members.where(id: enrollment_member_id).size).to eq 1
+      end
     end
   end
 
   context "won't delete enrollment memeber if not found hbx_enrollment_member" do
-    before do
-      allow(ENV).to receive(:[]).with("enrollment_id").and_return(hbx_enrollment.id)
-      allow(ENV).to receive(:[]).with("enrollment_member_id").and_return("")
+    # before do
+    #   allow(ENV).to receive(:[]).with("enrollment_id").and_return(hbx_enrollment.id)
+    #   allow(ENV).to receive(:[]).with("enrollment_member_id").and_return("")
 
-    end
+    # end
     it "won't delete enrollment memeber if not found hbx_enrollment" do
-      enrollment_member_id=hbx_enrollment.hbx_enrollment_members.first.id
-      expect(hbx_enrollment.hbx_enrollment_members.where(id: enrollment_member_id).size).to eq 1
-      subject.migrate
-      hbx_enrollment.reload
-      expect(hbx_enrollment.hbx_enrollment_members.where(id: enrollment_member_id).size).to eq 1
+      ClimateControl.modify enrollment_id:hbx_enrollment.id, enrollment_member_id: "" do 
+          enrollment_member_id=hbx_enrollment.hbx_enrollment_members.first.id
+          expect(hbx_enrollment.hbx_enrollment_members.where(id: enrollment_member_id).size).to eq 1
+          subject.migrate
+          hbx_enrollment.reload
+          expect(hbx_enrollment.hbx_enrollment_members.where(id: enrollment_member_id).size).to eq 1
+      end
     end
   end
 
   context "will delete enrollment memeber if find hbx_enrollment_member within hbx_enrollment" do
-    before do
-      allow(ENV).to receive(:[]).with("enrollment_id").and_return(hbx_enrollment.id)
-      allow(ENV).to receive(:[]).with("enrollment_member_id").and_return(hbx_enrollment.hbx_enrollment_members.first.id)
+    # before do
+    #   allow(ENV).to receive(:[]).with("enrollment_id").and_return(hbx_enrollment.id)
+    #   allow(ENV).to receive(:[]).with("enrollment_member_id").and_return(hbx_enrollment.hbx_enrollment_members.first.id)
 
-    end
+    # end
     it "won't delete enrollment memeber if not found hbx_enrollment" do
-      enrollment_member_id=hbx_enrollment.hbx_enrollment_members.first.id
-      expect(hbx_enrollment.hbx_enrollment_members.where(id: enrollment_member_id).size).to eq 1
-      subject.migrate
-      hbx_enrollment.reload
-      expect(hbx_enrollment.hbx_enrollment_members.where(id: enrollment_member_id).size).to eq 0
+      ClimateControl.modify enrollment_id:hbx_enrollment.id, enrollment_member_id: hbx_enrollment.hbx_enrollment_members.first.id do 
+
+        enrollment_member_id=hbx_enrollment.hbx_enrollment_members.first.id
+        expect(hbx_enrollment.hbx_enrollment_members.where(id: enrollment_member_id).size).to eq 1
+        subject.migrate
+        hbx_enrollment.reload
+        expect(hbx_enrollment.hbx_enrollment_members.where(id: enrollment_member_id).size).to eq 0
+      end
     end
   end
 end

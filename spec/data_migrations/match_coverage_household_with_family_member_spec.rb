@@ -20,27 +20,29 @@ describe MatchCoverageHouseholdWithFamilyMember, dbclean: :after_each do
 
     context 'When family member has empty coverage household members' do
       before do
-        allow(ENV).to receive(:[]).with('hbx_id').and_return person.hbx_id
         coverage_household.coverage_household_members.last.destroy
       end
       it "should add a coverage household members for familiy members" do
-        expect(coverage_household.coverage_household_members.size).to eq(2)
-        subject.migrate
-        coverage_household.reload
-        expect(coverage_household.coverage_household_members.size).to eq(3)
+        ClimateControl.modify hbx_id: person.hbx_id do
+          expect(coverage_household.coverage_household_members.size).to eq(2)
+          subject.migrate
+          coverage_household.reload
+          expect(coverage_household.coverage_household_members.size).to eq(3)
+        end
       end
     end
 
     context 'When family member has unnecessary  coverage household family members' do
       before do
-        allow(ENV).to receive(:[]).with('hbx_id').and_return person.hbx_id
         coverage_household.coverage_household_members.create(family_member_id: 'hffh5as76d57a')
       end
       it "should remove the coverage household members that is not related to family members" do
-        expect(coverage_household.coverage_household_members.size).to eq(4)
-        subject.migrate
-        coverage_household.reload
-        expect(coverage_household.coverage_household_members.size).to eq(3)
+        ClimateControl.modify hbx_id: person.hbx_id do
+          expect(coverage_household.coverage_household_members.size).to eq(4)
+          subject.migrate
+          coverage_household.reload
+          expect(coverage_household.coverage_household_members.size).to eq(3)
+        end
       end
     end
   end

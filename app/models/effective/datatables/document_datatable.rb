@@ -39,7 +39,7 @@ module Effective
         row.current_month_invoice.present? ? 'disabled' : 'post_ajax'
       end
 
-      collection do
+      def collection
         organizations = Organization.all_employer_profiles.employer_profiles_with_attestation_document
         if attributes[:aasm_state].present?
           organizations.where(:"employer_profile.employer_attestation.employer_attestation_documents.aasm_state" => attributes[:aasm_state])

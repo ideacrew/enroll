@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe AchRecord, :type => :model do
+RSpec.describe AchRecord, :type => :model, dbclean: :after_each do
   let(:bank_name) { "M&T Bank"}
   let(:routing_number) { "123456789" }
   let(:params) { { routing_number: routing_number, bank_name: bank_name} }
@@ -46,7 +46,7 @@ RSpec.describe AchRecord, :type => :model do
       end
 
       it "is valid without the confirmation included" do
-        expect(AchRecord.new(params)).to_not be_valid
+        expect(AchRecord.new(params)).to be_valid
       end
     end
   end

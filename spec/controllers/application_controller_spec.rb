@@ -71,7 +71,7 @@ RSpec.describe ApplicationController do
 
     it "should get signed in flash notice" do
       allow(controller).to receive(:authentication_not_required?).and_return true
-      get :index, user_token: user.authentication_token
+      get :index, params: {user_token: user.authentication_token}
       expect(flash[:notice]).to eq "Signed in Successfully."
     end
   end

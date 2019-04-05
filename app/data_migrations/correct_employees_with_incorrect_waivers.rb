@@ -85,7 +85,7 @@ class CorrectEmployeesWithIncorrectWaivers < MongoidMigrationTask
 
   def plan_year_query(i)
     {
-      :start_on => Date.new(ENV['year'],i,1),
+      :start_on => Date.new(ENV['year'].to_i,i,1),
       :aasm_state.in => ['active', 'expired']
     }
   end

@@ -21,14 +21,14 @@ module BradysAfterAll
     end
 
     def female_brady(name, age)
-      FactoryBot.create(:female, first_name: name, last_name: "Brady", dob: dob(age), addresses: [build_brady_address], phones: [build_brady_phone])
+      female = FactoryBot.create(:female, first_name: name, last_name: "Brady", dob: dob(age), addresses: [build_brady_address], phones: [build_brady_phone])
+      female.reload
     end
 
     def male_brady(name, age)
-      FactoryBot.create(:male, first_name: name, last_name: "Brady", dob: dob(age), addresses: [build_brady_address], phones: [build_brady_phone])
+      male = FactoryBot.create(:male, first_name: name, last_name: "Brady", dob: dob(age), addresses: [build_brady_address], phones: [build_brady_phone])
+      male.reload
     end
-
-    attr_reader :mike, :carol
 
     def mikes_age; 40; end
     def carols_age; 35; end

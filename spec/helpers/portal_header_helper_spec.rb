@@ -20,12 +20,13 @@ RSpec.describe PortalHeaderHelper, :type => :helper, dbclean: :after_each do
       let!(:employee_role) { FactoryBot.build(:employee_role, person: current_user.person, employer_profile: employer_profile)}
 
       it "should have I'm an Employer link when user has active employer_staff_role" do
-        expect(portal_display_name(controller)).to eq "<a class=\"portal\" href=\"/benefit_sponsors/profiles/employers/employer_profiles/" + emp_id.to_s + "?tab=home\"><img src=\"/images/icons/icon-business-owner.png\" alt=\"Icon business owner\" /> &nbsp; I'm an Employer</a>"
+        expect(portal_display_name(controller)).to eq "<a class=\"portal\" href=\"/benefit_sponsors/profiles/employers/employer_profiles/" + emp_id.to_s + "?tab=home\"><img src=\"/images/icons/icon-business-owner.png\" /> &nbsp; I'm an Employer</a>"
+
       end
 
       it "should have I'm an Employee link when user has active employee_staff_role" do
         allow(current_user.person).to receive(:active_employee_roles).and_return [employee_role]
-        expect(portal_display_name('')).to eq "<a class=\"portal\" href=\"/families/home\"><img src=\"/images/icons/cca-icon-individual.png\" alt=\"Cca icon individual\" /> &nbsp; I'm an Employee</a>"
+        expect(portal_display_name('')).to eq "<a class=\"portal\" href=\"/families/home\"><img src=\"/images/icons/cca-icon-individual.png\" /> &nbsp; I'm an Employee</a>"
       end
 
       it "should have Welcome prompt when user has no active role" do
@@ -42,13 +43,13 @@ RSpec.describe PortalHeaderHelper, :type => :helper, dbclean: :after_each do
       end
 
       it "should have Individual and Family link when user completes RIDP and Consent form" do
-        expect(portal_display_name(controller)).to eq "<a class=\"portal\" href=\"/families/home\"><img src=\"/images/icons/icon-family.png\" alt=\"Icon family\" /> &nbsp; Individual and Family</a>"
+        expect(portal_display_name(controller)).to eq "<a class=\"portal\" href=\"/families/home\"><img src=\"/images/icons/icon-family.png\" /> &nbsp; Individual and Family</a>"
       end
 
       it "should not have Individual and Family link for users with no identity_verified_date" do
         current_user.identity_verified_date = nil
         current_user.save
-        expect(portal_display_name(controller)).to eq "<a class='portal'><img src=\"/images/icons/icon-family.png\" alt=\"Icon family\" /> &nbsp; Individual and Family</a>"
+        expect(portal_display_name(controller)).to eq "<a class='portal'><img src=\"/images/icons/icon-family.png\" /> &nbsp; Individual and Family</a>"
       end
     end
 

@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module BenefitMarkets
-  RSpec.describe Forms::ProductForm do
+  RSpec.describe Forms::ProductForm, dbclean: :after_each do
     describe '::for_new' do
       let(:product) { create :benefit_markets_products_product }
       let(:future_product) { create :benefit_markets_products_product }

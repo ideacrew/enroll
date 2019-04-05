@@ -20,15 +20,12 @@ describe ChangeNewHireRule do
       let(:plan_year)         { FactoryBot.build(:plan_year, benefit_groups: [benefit_group]) }
       let!(:employer_profile)  { FactoryBot.create(:employer_profile, organization: organization, plan_years: [plan_year]) }
 
-      before(:each) do
-        allow(ENV).to receive(:[]).with("fein").and_return organization.fein
-        allow(ENV).to receive(:[]).with("plan_year_state").and_return plan_year.aasm_state
-      end
-
       it "will change the effective on kind for the benefit group from date_of_hire to first_of_month" do
-        subject.migrate
-        benefit_group.reload
-        expect(benefit_group.effective_on_kind).to eq "first_of_month"
+        ClimateControl.modify fein: organization.fein, plan_year_state: plan_year.aasm_state do
+          subject.migrate
+          benefit_group.reload
+          expect(benefit_group.effective_on_kind).to eq "first_of_month"
+        end
       end
     end
   end

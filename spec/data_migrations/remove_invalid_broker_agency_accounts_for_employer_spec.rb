@@ -21,23 +21,20 @@ describe RemoveInvalidBrokerAgencyAccountsForEmployer, dbclean: :after_each do
     let(:employer_profile){ FactoryBot.build(:employer_profile,broker_agency_accounts:[invalid_broker_agency_account,valid_broker_agency_account]) }
     let(:organization1) {FactoryBot.create(:organization,employer_profile:employer_profile)}
 
-    before(:each) do
-      allow(ENV).to receive(:[]).with("fein").and_return(organization1.fein)
-    end
-
     context "employer profile with invalid broker agency account" do
 
       it "should delete broker agency accounts with no writing agent" do
-        invalid_broker_agency_account.update_attribute(:writing_agent_id,nil)
-        employer_profile.reload
-        invalid_agency_account = employer_profile.broker_agency_accounts.where(id:invalid_broker_agency_account.id).first
-        expect(employer_profile.broker_agency_accounts.unscoped.count).to eq 2
-        expect(invalid_agency_account.writing_agent.present?).to eq false
-
-        subject.migrate
-        employer_profile.reload
-        expect(employer_profile.broker_agency_accounts.unscoped.count).to eq 1
-        expect(employer_profile.broker_agency_accounts.first).to eq valid_broker_agency_account
+        ClimateControl.modify fein: organization1.fein do 
+          invalid_broker_agency_account.update_attribute(:writing_agent_id,nil)
+          employer_profile.reload
+          invalid_agency_account = employer_profile.broker_agency_accounts.where(id:invalid_broker_agency_account.id).first
+          expect(employer_profile.broker_agency_accounts.unscoped.count).to eq 2
+          expect(invalid_agency_account.writing_agent.present?).to eq false
+          subject.migrate
+          employer_profile.reload
+          expect(employer_profile.broker_agency_accounts.unscoped.count).to eq 1
+          expect(employer_profile.broker_agency_accounts.first).to eq valid_broker_agency_account
+        end
       end
     end
 
@@ -45,12 +42,9 @@ describe RemoveInvalidBrokerAgencyAccountsForEmployer, dbclean: :after_each do
 
       it "should not delete valid broker agency accounts" do
         expect(employer_profile.broker_agency_accounts.unscoped.count).to eq 2
-
         subject.migrate
         expect(employer_profile.broker_agency_accounts.unscoped.count).to eq 2
       end
-
     end
-
   end
 end

@@ -18,18 +18,19 @@ describe AddHbxEnrollmentMember, dbclean: :after_each do
       hbx
     end
     let(:family_member) { FactoryBot.create(:family_member, family: family)}
-    before(:each) do
-      allow(ENV).to receive(:[]).with("hbx_id").and_return(enrollment.hbx_id.to_s)
-      allow(ENV).to receive(:[]).with("family_member_id").and_return(family_member.id)
-    end
-    it "should create a new enrollment member record" do
+
+  it "should create a new enrollment member record" do
+    ClimateControl.modify hbx_id:enrollment.hbx_id.to_s,family_member_id:family_member.id do 
       hem_size = enrollment.hbx_enrollment_members.count
       subject.migrate
       enrollment.reload
       expect(enrollment.hbx_enrollment_members.count).to eq (hem_size+1)
     end
+  end
 
-    it "should not create a new enrollment member record if it already exists under enrollment" do
+  it "should not create a new enrollment member record if it already exists under enrollment" do
+    ClimateControl.modify hbx_id:enrollment.hbx_id.to_s,family_member_id:family_member.id do 
+
       enrollment.hbx_enrollment_members << FactoryBot.build(:hbx_enrollment_member, applicant_id: family_member.id, is_subscriber: false, eligibility_date: TimeKeeper.date_of_record - 30.days)
       enrollment.save
       hem_size = enrollment.hbx_enrollment_members.count
@@ -38,30 +39,37 @@ describe AddHbxEnrollmentMember, dbclean: :after_each do
       expect(enrollment.hbx_enrollment_members.count).to eq hem_size
     end
   end
+  end
 
   describe "creating primary member record for an enrollment", dbclean: :after_each do
     let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
     let(:enrollment){ FactoryBot.create(:hbx_enrollment, household: family.active_household, kind: "employer_sponsored") }
     let(:family_member) { FactoryBot.create(:family_member, family: family)}
     before(:each) do
-      allow(ENV).to receive(:[]).with("hbx_id").and_return(enrollment.hbx_id.to_s)
-      allow(ENV).to receive(:[]).with("family_member_id").and_return(family_member.id)
-      allow(ENV).to receive(:[]).with("coverage_start_on").and_return(enrollment.effective_on)
+      
+      # allow(ENV).to receive(:[]).with("hbx_id").and_return(enrollment.hbx_id.to_s)
+      # allow(ENV).to receive(:[]).with("family_member_id").and_return(family_member.id)
+      # allow(ENV).to receive(:[]).with("coverage_start_on").and_return(enrollment.effective_on)
     end
     it "should create a new enrollment member record" do
-      hem_size = enrollment.hbx_enrollment_members.count
-      subject.migrate
-      enrollment.reload
-      expect(enrollment.hbx_enrollment_members.count).to eq (hem_size+1)
+      ClimateControl.modify hbx_id:enrollment.hbx_id.to_s,family_member_id:family_member.id, coverage_start_on: "#{enrollment.effective_on}" do 
+        hem_size = enrollment.hbx_enrollment_members.count
+        subject.migrate
+        enrollment.reload
+        expect(enrollment.hbx_enrollment_members.count).to eq (hem_size+1)
+      end
     end
 
     it "should not create a new enrollment member record if it already exists under enrollment" do
-      enrollment.hbx_enrollment_members << FactoryBot.build(:hbx_enrollment_member, applicant_id: family_member.id, is_subscriber: true, eligibility_date: enrollment.effective_on)
-      enrollment.save
-      hem_size = enrollment.hbx_enrollment_members.count
-      subject.migrate
-      enrollment.reload
-      expect(enrollment.hbx_enrollment_members.count).to eq hem_size
+      ClimateControl.modify hbx_id:enrollment.hbx_id.to_s,family_member_id:family_member.id, coverage_start_on: "#{enrollment.effective_on}" do 
+
+        enrollment.hbx_enrollment_members << FactoryBot.build(:hbx_enrollment_member, applicant_id: family_member.id, is_subscriber: true, eligibility_date: enrollment.effective_on)
+        enrollment.save
+        hem_size = enrollment.hbx_enrollment_members.count
+        subject.migrate
+        enrollment.reload
+        expect(enrollment.hbx_enrollment_members.count).to eq hem_size
+      end
     end
   end
 end

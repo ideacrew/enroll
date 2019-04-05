@@ -8,6 +8,7 @@ FactoryBot.define do
     dob "1972-04-04".to_date
     is_incarcerated false
     is_active true
+
     gender "male"
     # us_citizen "true"
     # indian_tribe_member "false"
@@ -129,7 +130,6 @@ FactoryBot.define do
     end
 
     factory :person_with_employee_role do
-
       after(:create) do |person, evaluator|
         create_list(:employee_role, 1, person: person, census_employee_id: evaluator.census_employee_id, employer_profile_id: evaluator.employer_profile_id, hired_on: evaluator.hired_on, ssn: evaluator.ssn, dob: evaluator.dob)
       end

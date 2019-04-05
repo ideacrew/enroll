@@ -33,7 +33,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
   let(:rate_schedule_date) {TimeKeeper.date_of_record}
   let(:cost_calculator) { HbxEnrollmentSponsoredCostCalculator.new(hbx_enrollment) }
 
-  context "POST checkout" do
+  context "POST checkout", :dbclean => :around_each do
     before do
       allow(BenefitMarkets::Products::Product).to receive(:find).with("plan_id").and_return(product)
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
@@ -54,25 +54,25 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     end
 
     it "should get person" do
-      post :checkout, id: "hbx_id", plan_id: "plan_id"
+      post :checkout, params: {id: "hbx_id", plan_id: "plan_id"}
       expect(assigns(:person)).to eq person
     end
 
     it "returns http success" do
-      post :checkout, id: "hbx_id", plan_id: "plan_id"
+      post :checkout, params: {id: "hbx_id", plan_id: "plan_id"}
       expect(response).to have_http_status(:redirect)
     end
 
     it "should delete pre_hbx_enrollment_id session" do
       session[:pre_hbx_enrollment_id] = "123"
-      post :checkout, id: "hbx_id", plan_id: "plan_id"
+      post :checkout, params: {id: "hbx_id", plan_id: "plan_id"}
       expect(response).to have_http_status(:redirect)
       expect(session[:pre_hbx_enrollment_id]).to eq nil
     end
 
     context "employee hire_on date greater than enrollment date" do
       it "fails" do
-        post :checkout, id: "hbx_id", plan_id: "plan_id"
+        post :checkout, params: {id: "hbx_id", plan_id: "plan_id"}
         expect(flash[:error]).to include("You are attempting to purchase coverage prior to your date of hire on record. Please contact your Employer for assistance")
       end
     end
@@ -88,18 +88,18 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       end
 
       it "should redirect" do
-        post :checkout, id: "hbx_id", plan_id: "plan_id"
+        post :checkout, params: {id: "hbx_id", plan_id: "plan_id"}
         expect(response).to have_http_status(:redirect)
       end
 
       it "should get flash" do
-        post :checkout, id: "hbx_id", plan_id: "plan_id"
+        post :checkout, params: {id: "hbx_id", plan_id: "plan_id"}
         expect(flash[:error]).to include("You can not keep an existing plan which belongs to previous plan year")
       end
     end
   end
 
-  context "GET receipt" do
+  context "GET receipt", :dbclean => :around_each do
     let(:member_group) { double("MEMBERGROUP")}
 
     before do
@@ -121,7 +121,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
     it "returns http success" do
       sign_in(user)
-      get :receipt, id: "id"
+      get :receipt, params: {id: "id"}
       expect(response).to have_http_status(:success)
     end
 
@@ -131,12 +131,12 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       allow(hbx_enrollment).to receive(:coverage_kind).and_return('health')
       allow(hbx_enrollment).to receive(:employer_profile).and_return(abc_profile)
       sign_in(user)
-      get :receipt, id: "id"
+      get :receipt, params: {id: "id"}
       expect(assigns(:employer_profile)).to eq abc_profile
     end
   end
 
-  context "GET thankyou" do
+  context "GET thankyou", :dbclean => :around_each do
     let(:member_group) { double("MEMBERGROUP")}
 
     before do
@@ -165,19 +165,19 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
     it "returns http success" do
       sign_in(user)
-      get :thankyou, id: "id", plan_id: "plan_id"
+      get :thankyou, params: {id: "id", plan_id: "plan_id"}
       expect(response).to have_http_status(:success)
     end
 
     it "should be enrollable" do
       sign_in(user)
-      get :thankyou, id: "id", plan_id: "plan_id"
+      get :thankyou, params: {id: "id", plan_id: "plan_id"}
       expect(assigns(:enrollable)).to be_truthy
     end
 
     it "should be waivable" do
       sign_in(user)
-      get :thankyou, id: "id", plan_id: "plan_id"
+      get :thankyou, params: {id: "id", plan_id: "plan_id"}
       expect(assigns(:waivable)).to be_truthy
     end
 
@@ -186,7 +186,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       allow(hbx_enrollment).to receive(:coverage_kind).and_return('health')
       allow(hbx_enrollment).to receive(:employer_profile).and_return(abc_profile)
       sign_in(user)
-      get :thankyou, id: "id", plan_id: "plan_id"
+      get :thankyou, params: {id: "id", plan_id: "plan_id"}
       expect(assigns(:employer_profile)).to eq abc_profile
     end
 
@@ -198,7 +198,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       current_broker_user.person.broker_role = BrokerRole.new({:broker_agency_profile_id => 99})
       allow(session).to receive(:[]).and_return(person.id.to_s)
       sign_in(current_broker_user)
-      get :thankyou, id: "id", plan_id: "plan_id"
+      get :thankyou, params: {id: "id", plan_id: "plan_id"}
       expect(response).to have_http_status(:success)
     end
 
@@ -209,19 +209,19 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
       it "should not be enrollable" do
         sign_in(user)
-        get :thankyou, id: "id", plan_id: "plan_id"
+        get :thankyou, params: {id: "id", plan_id: "plan_id"}
         expect(assigns(:enrollable)).to be_falsey
       end
 
       it "should not be waivable" do
         sign_in(user)
-        get :thankyou, id: "id", plan_id: "plan_id"
+        get :thankyou, params: {id: "id", plan_id: "plan_id"}
         expect(assigns(:waivable)).to be_falsey
       end
 
       it "should update session" do
         sign_in(user)
-        get :thankyou, id: "id", plan_id: "plan_id", elected_aptc: "50"
+        get :thankyou, params: {id: "id", plan_id: "plan_id", elected_aptc: "50"}
         expect(session[:elected_aptc]).to eq 50
       end
     end
@@ -243,17 +243,17 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     # end
   end
 
-  context "GET print_waiver" do
+  context "GET print_waiver", :dbclean => :around_each do
     it "should return hbx_enrollment to print waiver" do
       allow(user).to receive(:person).and_return(person)
       allow(HbxEnrollment).to receive(:find).with("id").and_return(hbx_enrollment)
       sign_in(user)
-      get :print_waiver, id: "id"
+      get :print_waiver, params: {id: "id"}
       expect(response).to have_http_status(:success)
     end
   end
 
-  context "POST terminate" do
+  context "POST terminate", :dbclean => :around_each do
     before do
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
       allow(hbx_enrollment).to receive(:may_schedule_coverage_termination?).and_return(true)
@@ -267,26 +267,26 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     end
 
     it "returns http success" do
-      post :terminate, id: "hbx_id"
+      post :terminate, params: {id: "hbx_id"}
       expect(response).to be_redirect
     end
 
     it "goes back" do
       request.env["HTTP_REFERER"] = terminate_insured_plan_shopping_url(1)
       allow(hbx_enrollment).to receive(:may_schedule_coverage_termination?).and_return(false)
-      post :terminate, id: "hbx_id"
-      expect(response).to redirect_to(:back)
+      post :terminate, params: {id: "hbx_id"}
+      expect(response).to be_redirect
     end
 
     it "should record termination submitted date on terminate of hbx_enrollment" do
       expect(hbx_enrollment.termination_submitted_on).to eq nil
-      post :terminate, id: "hbx_id"
+      post :terminate, params: {id: "hbx_id"}
       expect(hbx_enrollment.termination_submitted_on).to be_within(1.second).of TimeKeeper.datetime_of_record
       expect(response).to be_redirect
     end
   end
 
-  context "GET waive" do
+  context "GET waive", :dbclean => :around_each do
     before :each do
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
       sign_in user
@@ -294,20 +294,20 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
     it "should get success flash message" do
       allow(hbx_enrollment).to receive(:waive_coverage_by_benefit_group_assignment).with("Because").and_return(true)
-      get :waive, id: "hbx_id", waiver_reason: "Because"
+      get :waive, params: {id: "hbx_id", waiver_reason: "Because"}
       expect(flash[:notice]).to eq "Waive Coverage Successful"
       expect(response).to be_redirect
     end
 
     it "should get failure flash message" do
       allow(hbx_enrollment).to receive(:waive_coverage_by_benefit_group_assignment).with("Because").and_raise(StandardError.new("WAIVE FAILED"))
-      get :waive, id: "hbx_id", waiver_reason: "Because"
+      get :waive, params: {id: "hbx_id", waiver_reason: "Because"}
       expect(flash[:alert]).to eq "Waive Coverage Failed"
       expect(response).to be_redirect
     end
   end
 
-  context "GET show" do
+  context "GET show", :dbclean => :around_each do
     let(:product_1)   { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
     let(:product_2)   { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
     let(:product_3)   { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
@@ -358,7 +358,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     context "normal" do
       before :each do
         allow(hbx_enrollment).to receive(:can_waive_enrollment?).and_return(true)
-        get :show, id: "hbx_id"
+        get :show, params: {id: "hbx_id"}
       end
 
       it "should be success" do
@@ -381,7 +381,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
         allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
         allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return(false)
         allow(hbx_enrollment).to receive(:coverage_kind).and_return('health')
-        get :show, id: "hbx_id"
+        get :show, params: {id: "hbx_id"}
       end
 
       it "should not be waivable" do
@@ -412,7 +412,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
             allow(person).to receive(:active_employee_roles).and_return []
             allow(person).to receive(:employee_roles).and_return []
             allow(hbx_enrollment).to receive(:kind).and_return 'individual'
-            get :show, id: "hbx_id"
+            get :show, params: {id: "hbx_id"}
           end
 
           it "should get max_aptc" do
@@ -430,7 +430,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
             allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
             allow(person).to receive(:active_employee_roles).and_return []
             allow(person).to receive(:employee_roles).and_return []
-            get :show, id: "hbx_id"
+            get :show, params: {id: "hbx_id"}
           end
 
           it "should get max_aptc" do
@@ -450,7 +450,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
             allow(person).to receive(:employee_roles).and_return []
             session[:max_aptc] = 100
             session[:elected_aptc] = 80
-            get :show, id: "hbx_id"
+            get :show, params: {id: "hbx_id"}
           end
 
           it "should get max_aptc" do
@@ -472,7 +472,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
             allow(hbx_enrollment).to receive(:coverage_kind).and_return 'health'
             allow(hbx_enrollment).to receive(:kind).and_return 'shop'
             allow_any_instance_of(Services::CheckbookServices::PlanComparision).to receive(:generate_url).and_return("http://temp.url")
-            get :show, id: "hbx_id"
+            get :show, params: {id: "hbx_id"}
           end
 
           it "should get max_aptc" do

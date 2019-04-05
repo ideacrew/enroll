@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "_consumer_brokers_widget.html.erb" do
+RSpec.describe '_consumer_brokers_widget.html.erb' do
 
   context 'insured home broker widget as consumer with primary family and broker agency accounts' do
     let!(:consumer_role) { FactoryBot.create(:consumer_role) }
@@ -21,16 +21,16 @@ RSpec.describe "_consumer_brokers_widget.html.erb" do
     before :each do
       assign(:person, person)
       assign :family_members, [family_member]
-      allow(person).to receive_message_chain("primary_family.current_broker_agency").and_return(broker_agency_account)
-      allow(person).to receive_message_chain("primary_family.current_broker_agency.broker_agency_profile").and_return(broker_agency_profile)
+      allow(person).to receive_message_chain('primary_family.current_broker_agency').and_return(broker_agency_account)
+      allow(person).to receive_message_chain('primary_family.current_broker_agency.broker_agency_profile').and_return(broker_agency_profile)
       render 'insured/families/consumer_brokers_widget'
     end
 
-    it "should display broker widget for consumer" do
-      expect(rendered).to have_selector('h3', "Your Broker")
+    it 'should display broker widget for consumer' do
+      expect(rendered).to have_text('h3', "Your Broker")
     end
 
-    it "should display brokers email" do
+    it 'should display brokers email' do
       expect(rendered).to match("mailto")
     end
 
@@ -55,22 +55,20 @@ RSpec.describe "_consumer_brokers_widget.html.erb" do
     before :each do
       assign(:person, person)
       assign :family_members, [family_member]
-      allow(person).to receive_message_chain("primary_family.current_broker_agency.present?").and_return(false)
+      allow(person).to receive_message_chain('primary_family.current_broker_agency.present?').and_return(false)
       render 'insured/families/consumer_brokers_widget'
     end
 
-    it "should display broker widget for consumer" do
-      expect(rendered).to have_selector('h3', "Select a Broker or Assister")
+    it 'should display broker widget for consumer' do
+      expect(rendered).to have_text('h3', 'Select a Broker or Assister')
     end
 
-    it "should display get help signing up button" do
-      expect(rendered).to have_selector('a', "Get Help Signing Up")
+    it 'should display get help signing up button' do
+      expect(rendered).to have_text('a', 'Get Help Signing Up')
     end
 
-    it "should display get help signing up button" do
-      expect(rendered).to have_selector('a', "Find Assistance Another Way")
+    it 'should display get help signing up button' do
+      expect(rendered).to have_text('a', 'Find Assistance Another Way')
     end
-
   end
-
 end

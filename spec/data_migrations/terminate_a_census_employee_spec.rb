@@ -3,6 +3,11 @@ require File.join(Rails.root, "app", "data_migrations", "terminate_a_census_empl
 describe TerminateACensusEmployee, dbclean: :after_each do
   let(:given_task_name) { "terminate a census_employee" }
   subject { TerminateACensusEmployee.new(given_task_name, double(:current_scope => nil)) }
+  after :each do
+    ["id", "termination_date"].each do |env_variable|
+      ENV[env_variable] = nil
+    end
+  end
 
   describe "changes the census employees aasm_state to terminated" do
     let(:benefit_group)            { FactoryBot.build(:benefit_group) }
@@ -12,8 +17,8 @@ describe TerminateACensusEmployee, dbclean: :after_each do
     let(:census_employee) { FactoryBot.create(:census_employee, :old_case, employer_profile: employer_profile, benefit_group_assignments: [benefit_group_assignment] ) }
     
     before(:each) do
-      allow(ENV).to receive(:[]).with("id").and_return(census_employee.id)
-      allow(ENV).to receive(:[]).with("termination_date").and_return (TimeKeeper.date_of_record - 30.days)
+      ENV["id"] = census_employee.id
+      ENV["termination_date"] = (TimeKeeper.date_of_record - 30.days).to_s
       census_employee.update_attributes({:aasm_state => 'employee_role_linked'})
     end
     

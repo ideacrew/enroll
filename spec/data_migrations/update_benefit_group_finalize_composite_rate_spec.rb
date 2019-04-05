@@ -23,24 +23,28 @@ describe UpdateBenefitGroupFinalizeCompositeRate, dbclean: :after_each do
     let!(:composite_tier_contribution) {plan_year.benefit_groups.first.composite_tier_contributions.first}
 
     before(:each) do
-      allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
-      allow(ENV).to receive(:[]).with("plan_year_start_on").and_return(plan_year.start_on)
+      # allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
+      # allow(ENV).to receive(:[]).with("plan_year_start_on").and_return(plan_year.start_on)
     end
 
     it "should calculate final tier premium amount" do
-      expect(composite_tier_contribution.final_tier_premium).to eq nil
-      subject.migrate
-      composite_tier_contribution.reload
-      plan_year.reload
-      expect(composite_tier_contribution.final_tier_premium).to eq 0.0
+      ClimateControl.modify fein:organization.fein,plan_year_start_on:"#{plan_year.start_on}" do 
+        expect(composite_tier_contribution.final_tier_premium).to eq nil
+        subject.migrate
+        composite_tier_contribution.reload
+        plan_year.reload
+        expect(composite_tier_contribution.final_tier_premium).to eq 0.0
+      end
     end
 
     it "employer with multiple plan year with same py start date,should pick active plan year to calculate final tier premium amount" do
-      subject.migrate
-      composite_tier_contribution.reload
-      plan_year.reload
-      expect(composite_tier_contribution.final_tier_premium).to eq 0.0
-      expect(composite_tier_contribution.benefit_group.plan_year).to eq plan_year
+      ClimateControl.modify fein:organization.fein,plan_year_start_on:"#{plan_year.start_on}" do 
+        subject.migrate
+        composite_tier_contribution.reload
+        plan_year.reload
+        expect(composite_tier_contribution.final_tier_premium).to eq 0.0
+        expect(composite_tier_contribution.benefit_group.plan_year).to eq plan_year
+      end
     end
   end
 end

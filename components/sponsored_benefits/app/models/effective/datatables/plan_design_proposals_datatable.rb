@@ -87,7 +87,7 @@
         	attr_accessor :organization_id
         end
 
-        collection do
+        def collection
           unless (defined? @quotes) && @quotes.present?
             @quotes = Queries::PlanDesignProposalsQuery.new(attributes)
           end

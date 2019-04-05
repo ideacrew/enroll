@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe BrokerAgencies::QuotesController, type: :controller, dbclean: :after_each do
+RSpec.describe BrokerAgencies::QuotesController, type: :controller, dbclean: :around_each do
   let(:person){create(:person , :with_broker_role)}
   let(:user){create(:user, person: person)}
   let(:quote){create :quote , :with_household_and_members}
@@ -13,7 +13,7 @@ RSpec.describe BrokerAgencies::QuotesController, type: :controller, dbclean: :af
     sign_in user
   end
 
-  describe "Create"  do
+  describe "Create", :dbclean => :around_each do
     before do
       allow(user).to receive_message_chain(:person,:broker_role,:id){person.broker_role.id}
       allow(user).to receive(:has_broker_role?){true}
@@ -56,7 +56,7 @@ RSpec.describe BrokerAgencies::QuotesController, type: :controller, dbclean: :af
     end
   end
 
-  describe "Update" do
+  describe "Update", :dbclean => :around_each do
     before do
       @quote = FactoryBot.create(:quote,:with_household_and_members)
     end
@@ -110,7 +110,7 @@ RSpec.describe BrokerAgencies::QuotesController, type: :controller, dbclean: :af
     end
   end
 
-  describe "Delete" do
+  describe "Delete", :dbclean => :around_each do
     before do
       @quote = FactoryBot.create(:quote,:with_household_and_members)
     end
@@ -137,7 +137,7 @@ RSpec.describe BrokerAgencies::QuotesController, type: :controller, dbclean: :af
 
     context "#delete_member" do
       it "should delete quote member" do
-        xhr :delete, :delete_member, params: {id: @quote.id , broker_role_id: person.broker_role.id,
+        delete :delete_member, xhr: true, params: {id: @quote.id , broker_role_id: person.broker_role.id,
                                       household_id: @quote.quote_households.first.id,
                                       member_id:  @quote.quote_households.first.quote_members.first.id}
         @quote.reload
@@ -146,7 +146,7 @@ RSpec.describe BrokerAgencies::QuotesController, type: :controller, dbclean: :af
     end
   end
 
-  describe "GET new" do
+  describe "GET new", :dbclean => :around_each do
 
     it "should render the new template" do
       get :new, params: {broker_role_id: person.broker_role.id}
@@ -154,7 +154,7 @@ RSpec.describe BrokerAgencies::QuotesController, type: :controller, dbclean: :af
     end
   end
 
-  describe "GET my_quotes" do
+  describe "GET my_quotes", :dbclean => :around_each do
 
     it "returns http success" do
       get :my_quotes, params: {broker_role_id: person.broker_role.id}
@@ -162,7 +162,7 @@ RSpec.describe BrokerAgencies::QuotesController, type: :controller, dbclean: :af
     end
   end
 
-  describe "GET edit" do
+  describe "GET edit", :dbclean => :around_each do
 
     before do
       quote.update_attributes(broker_role_id: person.broker_role.id)
@@ -174,7 +174,7 @@ RSpec.describe BrokerAgencies::QuotesController, type: :controller, dbclean: :af
     end
   end
 
-  describe "POST publish_quote" do
+  describe "POST publish_quote", :dbclean => :around_each do
     it "should publish_quote" do
       quote.quote_benefit_groups.first.relationship_benefit_for("employee").update_attributes!(:premium_pct => "60")
       allow(quote).to receive(:may_publish?).and_return(true)
@@ -197,7 +197,7 @@ RSpec.describe BrokerAgencies::QuotesController, type: :controller, dbclean: :af
 
   end
 
-  describe "Creating New Quote " do
+  describe "Creating New Quote", :dbclean => :around_each do
     before do
       @quote = FactoryBot.create(:quote,:with_household_and_members)
       quote_household_attributes.merge!("id" => @quote.quote_households.first.id, "quote_members_attributes" => { "0" => {"first_name" =>"Kevin",

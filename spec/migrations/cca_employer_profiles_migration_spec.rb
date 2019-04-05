@@ -34,9 +34,6 @@ describe "CcaEmployerProfilesMigration" do
 
       FactoryBot.create(:employee_role, employer_profile: employer_profile)
       site = BenefitSponsors::Site.all.first
-      benefit_market = FactoryBot.create(:benefit_markets_benefit_market)
-      site.benefit_markets << benefit_market
-      site.save!
       BenefitSponsors::Organizations::Organization.employer_profiles.delete_all
       @migrated_organizations = BenefitSponsors::Organizations::Organization.employer_profiles
       @old_organizations = Organization.all_employer_profiles
@@ -49,9 +46,9 @@ describe "CcaEmployerProfilesMigration" do
 
     #TODO modify it after employer profile script is updated according to benefit sponsorship
     it "should match total migrated organizations" do
-      silence_stream(STDOUT) do
+      # silence_stream(STDOUT) do
         Mongoid::Migrator.run(:up, @migrations_paths, @test_version.to_i)
-      end
+      # end
 
       expect(@migrated_organizations.count).to eq 1
     end

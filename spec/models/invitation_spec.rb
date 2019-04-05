@@ -120,7 +120,7 @@ describe Invitation do
     let(:user) { FactoryBot.create :user }
     let(:redirection_obj) { instance_double(InvitationsController) }
     let(:general_agency_staff_role) { FactoryBot.create :general_agency_staff_role }
-    let(:invitation) { FactoryBot.create :invitation, :general_agency_staff_role, source_id: general_agency_staff_role.id }
+    let(:invitation) { FactoryBot.create :invitation, :general_agency_staff_role, user: user, source_id: general_agency_staff_role.id }
 
     subject { invitation.claim_general_agency_staff_role user, redirection_obj }
 

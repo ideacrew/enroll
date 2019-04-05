@@ -18,12 +18,12 @@ module Effective
           @employer_profile = row.organization.employer_profile
           (link_to row.organization.legal_name.titleize, benefit_sponsors.profiles_employers_employer_profile_path(@employer_profile.id, :tab=>'home'))
 
-          }, :sortable => false, :filter => false
+        }, :sortable => false, :filter => false
         table_column :fein, :label => 'FEIN', :proc => Proc.new { |row| row.organization.fein }, :sortable => false, :filter => false
         table_column :hbx_id, :label => 'HBX ID', :proc => Proc.new { |row| row.organization.hbx_id }, :sortable => false, :filter => false
         table_column :broker, :proc => Proc.new { |row|
-            @employer_profile.try(:active_broker_agency_legal_name).try(:titleize) #if row.employer_profile.broker_agency_profile.present?
-          }, :filter => false
+          @employer_profile.try(:active_broker_agency_legal_name).try(:titleize) #if row.employer_profile.broker_agency_profile.present?
+        }, :filter => false
 
         # TODO: Make this based on settings. MA does not use, but others might.
         # table_column :general_agency, :proc => Proc.new { |row|
@@ -35,7 +35,7 @@ module Effective
 
         table_column :source_kind, :proc => Proc.new { |row|
           row.source_kind.to_s.humanize},
-          :filter => {include_blank: false, :as => :select, :collection => SOURCE_KINDS, :selected => "all"}
+                     :filter => {include_blank: false, :as => :select, :collection => SOURCE_KINDS, :selected => "all"}
 
         table_column :plan_year_state, :proc => Proc.new { |row|
           if row.latest_benefit_application.present?
@@ -65,20 +65,20 @@ module Effective
 
         table_column :actions, :width => '50px', :proc => Proc.new { |row|
           dropdown = [
-           # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
-           ['Transmit XML', "#", "disabled"],
-           ['Generate Invoice', generate_invoice_exchanges_hbx_profiles_path(ids: [row.id]), generate_invoice_link_type(@employer_profile)],
-           ['Create Plan Year', main_app.new_benefit_application_exchanges_hbx_profiles_path(benefit_sponsorship_id: row.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), pundit_allow(HbxProfile, :can_create_benefit_application?) ? 'ajax' : 'hide'],
-           ['Change FEIN', edit_fein_exchanges_hbx_profiles_path(id: row.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), pundit_allow(HbxProfile, :can_change_fein?) ? "ajax" : "hide"],
-           ['Force Publish', edit_force_publish_exchanges_hbx_profiles_path(id: @employer_profile.latest_benefit_sponsorship.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), force_publish_link_type(row, pundit_allow(HbxProfile, :can_force_publish?))]
+              # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
+              ['Transmit XML', "#", "disabled"],
+              ['Generate Invoice', generate_invoice_exchanges_hbx_profiles_path(ids: [row.id]), generate_invoice_link_type(@employer_profile)],
+              ['Create Plan Year', main_app.new_benefit_application_exchanges_hbx_profiles_path(benefit_sponsorship_id: row.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), pundit_allow(HbxProfile, :can_create_benefit_application?) ? 'ajax' : 'hide'],
+              ['Change FEIN', edit_fein_exchanges_hbx_profiles_path(id: row.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), pundit_allow(HbxProfile, :can_change_fein?) ? "ajax" : "hide"],
+              ['Force Publish', edit_force_publish_exchanges_hbx_profiles_path(id: @employer_profile.latest_benefit_sponsorship.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), force_publish_link_type(row, pundit_allow(HbxProfile, :can_force_publish?))]
           ]
 
           if individual_market_is_enabled?
             people_id = Person.where({"employer_staff_roles.employer_profile_id" => @employer_profile._id}).map(&:id)
             dropdown.insert(2,['View Username and Email', main_app.get_user_info_exchanges_hbx_profiles_path(
-              people_id: people_id,
-              employers_action_id: "employer_actions_#{@employer_profile.id}"
-              ), !people_id.empty? && pundit_allow(Family, :can_view_username_and_email?) ? 'ajax' : 'disabled'])
+                people_id: people_id,
+                employers_action_id: "employer_actions_#{@employer_profile.id}"
+            ), !people_id.empty? && pundit_allow(Family, :can_view_username_and_email?) ? 'ajax' : 'disabled'])
           end
 
           if employer_attestation_is_enabled?
@@ -90,8 +90,8 @@ module Effective
 
           if row.oe_extended_applications.present? && pundit_allow(HbxProfile, :can_extend_open_enrollment?)
             dropdown.insert(4, ['Close Open Enrollment', main_app.oe_extended_applications_exchanges_hbx_profiles_path(
-              id: @employer_profile.latest_benefit_sponsorship.id,
-              employer_actions_id: "employer_actions_#{@employer_profile.id}"
+                id: @employer_profile.latest_benefit_sponsorship.id,
+                employer_actions_id: "employer_actions_#{@employer_profile.id}"
             ), 'ajax'])
           end
 
@@ -123,7 +123,7 @@ module Effective
         (1..fte_max_count).include?(benefit_application.fte_count) && benefit_application.sponsor_profile.is_primary_office_local?
       end
 
-      collection do
+      def collection
         return @employer_collection if defined? @employer_collection
 
         benefit_sponsorships ||= BenefitSponsors::BenefitSponsorships::BenefitSponsorship.all
@@ -146,9 +146,9 @@ module Effective
 
 
           if attributes[:upcoming_dates].present?
-              if date = Date.strptime(attributes[:upcoming_dates], "%m/%d/%Y")
-                benefit_sponsorships = benefit_sponsorships.effective_date_begin_on(date)
-              end
+            if date = Date.strptime(attributes[:upcoming_dates], "%m/%d/%Y")
+              benefit_sponsorships = benefit_sponsorships.effective_date_begin_on(date)
+            end
           end
 
           if attributes[:attestations].present? && attributes[:attestations] != "employer_attestations"
@@ -156,7 +156,7 @@ module Effective
           end
         end
 
-          @employer_collection = benefit_sponsorships
+        @employer_collection = benefit_sponsorships
       end
 
       def global_search?
@@ -201,53 +201,53 @@ module Effective
         @next_90_day = @next_60_day.next_month
 
         filters = {
-        enrolling_renewing:
-          [
-            {scope:'all', label: 'All'},
-            {scope: 'benefit_application_renewal_pending', label: 'Application Pending'},
-            {scope: 'benefit_application_enrolling_renewing_oe', label: 'Open Enrollment'}
-          ],
-        enrolling_initial:
-          [
-            {scope:'all', label: 'All'},
-            {scope: 'benefit_application_pending', label: 'Application Pending'},
-            {scope: 'benefit_application_enrolling_initial_oe', label: 'Open Enrollment'},
-            {scope: 'benefit_application_initial_binder_paid', label: 'Binder Paid'},
-            {scope: 'benefit_application_initial_binder_pending', label: 'Binder Pending'}
-          ],
-        enrolled:
-          [
-            {scope:'benefit_application_enrolled', label: 'All' },
-            {scope:'benefit_application_suspended', label: 'Suspended' }
-          ],
-        upcoming_dates:
-          [
-            {scope: @next_30_day, label: @next_30_day },
-            {scope: @next_60_day, label: @next_60_day }
-          ],
-        enrolling:
-          [
-            {scope: 'benefit_application_enrolling', label: 'All'},
-            {scope: 'benefit_application_enrolling_initial', label: 'Initial', subfilter: :enrolling_initial},
-            {scope: 'benefit_application_enrolling_renewing', label: 'Renewing / Converting', subfilter: :enrolling_renewing},
-            {scope: 'benefit_application_enrolling', label: 'Upcoming Dates', subfilter: :upcoming_dates}
-          ],
-         attestations:
-          [
-            {scope: 'employer_attestations', label: 'All'},
-            {scope: 'submitted', label: 'Submitted'},
-            {scope: 'pending', label: 'Pending'},
-            {scope: 'approved', label: 'Approved'},
-            {scope: 'denied', label: 'Denied'}
-          ],
-        employers:
-         [
-           {scope:'all', label: 'All'},
-           {scope:'benefit_sponsorship_applicant', label: 'Applicants'},
-           {scope:'benefit_application_enrolling', label: 'Enrolling', subfilter: :enrolling},
-           {scope:'benefit_application_enrolled', label: 'Enrolled', subfilter: :enrolled}
-         ],
-        top_scope: :employers
+            enrolling_renewing:
+                [
+                    {scope:'all', label: 'All'},
+                    {scope: 'benefit_application_renewal_pending', label: 'Application Pending'},
+                    {scope: 'benefit_application_enrolling_renewing_oe', label: 'Open Enrollment'}
+                ],
+            enrolling_initial:
+                [
+                    {scope:'all', label: 'All'},
+                    {scope: 'benefit_application_pending', label: 'Application Pending'},
+                    {scope: 'benefit_application_enrolling_initial_oe', label: 'Open Enrollment'},
+                    {scope: 'benefit_application_initial_binder_paid', label: 'Binder Paid'},
+                    {scope: 'benefit_application_initial_binder_pending', label: 'Binder Pending'}
+                ],
+            enrolled:
+                [
+                    {scope:'benefit_application_enrolled', label: 'All' },
+                    {scope:'benefit_application_suspended', label: 'Suspended' }
+                ],
+            upcoming_dates:
+                [
+                    {scope: @next_30_day, label: @next_30_day },
+                    {scope: @next_60_day, label: @next_60_day }
+                ],
+            enrolling:
+                [
+                    {scope: 'benefit_application_enrolling', label: 'All'},
+                    {scope: 'benefit_application_enrolling_initial', label: 'Initial', subfilter: :enrolling_initial},
+                    {scope: 'benefit_application_enrolling_renewing', label: 'Renewing / Converting', subfilter: :enrolling_renewing},
+                    {scope: 'benefit_application_enrolling', label: 'Upcoming Dates', subfilter: :upcoming_dates}
+                ],
+            attestations:
+                [
+                    {scope: 'employer_attestations', label: 'All'},
+                    {scope: 'submitted', label: 'Submitted'},
+                    {scope: 'pending', label: 'Pending'},
+                    {scope: 'approved', label: 'Approved'},
+                    {scope: 'denied', label: 'Denied'}
+                ],
+            employers:
+                [
+                    {scope:'all', label: 'All'},
+                    {scope:'benefit_sponsorship_applicant', label: 'Applicants'},
+                    {scope:'benefit_application_enrolling', label: 'Enrolling', subfilter: :enrolling},
+                    {scope:'benefit_application_enrolled', label: 'Enrolled', subfilter: :enrolled}
+                ],
+            top_scope: :employers
         }
         if employer_attestation_is_enabled?
           filters[:employers] << {scope:'employer_attestations', label: 'Employer Attestations', subfilter: :attestations}

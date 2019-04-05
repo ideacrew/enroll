@@ -70,7 +70,7 @@ module Effective
         row.current_month_invoice.present? ? 'disabled' : 'post_ajax'
       end
 
-      collection do
+       def collection
         return @employer_collection if defined? @employer_collection
         employers = Organization.all_employer_profiles
         if attributes[:employers].present? && !['all'].include?(attributes[:employers])
@@ -91,7 +91,6 @@ module Effective
 
 
         @employer_collection = employers
-
       end
 
       def global_search?

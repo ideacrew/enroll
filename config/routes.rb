@@ -3,6 +3,7 @@ Rails.application.routes.draw do
 #  mount Resque::Server, at: '/jobs'
   mount BenefitSponsors::Engine,      at: "/benefit_sponsors"
   mount BenefitMarkets::Engine,       at: "/benefit_markets"
+  mount SponsoredBenefits::Engine,    at: "/sponsored_benefits"
   mount TransportGateway::Engine,     at: "/transport_gateway"
   mount TransportProfiles::Engine,    at: "/transport_profiles"
   mount Notifier::Engine,             at: "/notifier"
