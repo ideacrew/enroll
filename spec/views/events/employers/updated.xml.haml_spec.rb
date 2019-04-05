@@ -51,7 +51,6 @@ RSpec.describe "events/employers/updated.haml.erb" do
       context "is_offering_dental? is true" do
         it "shows the dental plan in output" do
           benefit_group.dental_reference_plan_id = benefit_group.elected_dental_plans.first.id
-          # binding.pry
           # plan_year.benefit_groups.first.save!
           render :template => "events/employers/updated", :locals => {:employer => employer}
           expect(rendered).to include "new dental plan"

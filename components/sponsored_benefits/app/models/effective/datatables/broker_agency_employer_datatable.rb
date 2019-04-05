@@ -105,7 +105,7 @@
         	attr_accessor :profile_id
         end
 
-        collection do
+        def collection
           unless (defined? @employers) && @employers.present?
             @employers = Queries::PlanDesignOrganizationQuery.new(attributes)
           end

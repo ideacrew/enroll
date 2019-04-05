@@ -69,13 +69,17 @@ module Effective
         has_manys = {}
         has_and_belongs_to_manys = {}
 
-        (collection.klass.reflect_on_all_associations() rescue []).each do |reflect|
-          if reflect.macro == :has_many
-            klass = reflect.klass || (reflect.build_association({}).class)
-            has_manys[reflect.name.to_s] = { klass: klass }
-          elsif reflect.macro == :has_and_belongs_to_many
-            klass = reflect.klass || (reflect.build_association({}).class)
-            has_and_belongs_to_manys[reflect.name.to_s] = { klass: klass }
+        if defined?(::ActiveRecord::Base)
+          unless collection.kind_of?(::ActiveRecord::Base)
+            (collection.klass.reflect_on_all_associations() rescue []).each do |reflect|
+              if reflect.macro == :has_many
+                klass = reflect.klass || (reflect.build_association({}).class)
+                has_manys[reflect.name.to_s] = {klass: klass}
+              elsif reflect.macro == :has_and_belongs_to_many
+                klass = reflect.klass || (reflect.build_association({}).class)
+                has_and_belongs_to_manys[reflect.name.to_s] = {klass: klass}
+              end
+            end
           end
         end
 

@@ -24,7 +24,7 @@ module Effective
                              }, :filter => false, :sortable => false
       end
 
-      collection do
+      def collection
         unless (defined? @user_collection) && @user_collection.present? #memoize the wrapper class to persist @search_string
           @user_collection = Queries::UserDatatableQuery.new(attributes)
         end
