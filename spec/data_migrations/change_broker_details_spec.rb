@@ -7,7 +7,7 @@ describe ChangeBrokerDetails, dbclean: :after_each do
   let(:person) {FactoryBot.create(:person, user: user)}
   let(:user) {FactoryBot.create(:user)}
   let(:broker_role) {FactoryBot.create(:broker_role, broker_agency_profile: broker_agency_profile, market_kind: 'shop')}
-  let(:broker_agency_profile) {FactoryBot.create(:broker_agency_profile, market_kind: 'shop')}
+  let!(:broker_agency_profile) {FactoryBot.create(:broker_agency_profile, market_kind: 'shop')}
 
   subject {ChangeBrokerDetails.new(given_task_name, double(:current_scope => nil))}
 
@@ -18,15 +18,16 @@ describe ChangeBrokerDetails, dbclean: :after_each do
   end
 
   describe "update broker role details" do
-    before(:each) do
-      allow(ENV).to receive(:[]).with("hbx_id").and_return person.hbx_id
-      allow(ENV).to receive(:[]).with("new_market_kind").and_return('shop')
-      allow(Person).to receive(:where).and_return([person])
-      allow(person).to receive(:broker_role).and_return(broker_role)
+    around do |example|
+      ClimateControl.modify hbx_id: person.hbx_id, new_market_kind: 'shop' do
+        example.run
+      end
     end
 
     context "broker_role", dbclean: :after_each do
       it "should update broker role" do
+        allow(Person).to receive(:where).and_return([person])
+        allow(person).to receive(:broker_role).and_return(broker_role)
         subject.migrate
         person.broker_role.reload
         expect(person.broker_role.market_kind).to eq "shop"
@@ -36,16 +37,16 @@ describe ChangeBrokerDetails, dbclean: :after_each do
   end
 
   describe "Validate Market Kind" do
-
-    before(:each) do
-      allow(ENV).to receive(:[]).with("hbx_id").and_return person.hbx_id
-      allow(ENV).to receive(:[]).with("new_market_kind").and_return('invalid market kind')
-      allow(Person).to receive(:where).and_return([person])
-      allow(person).to receive(:broker_role).and_return(broker_role)
+    around do |example|
+      ClimateControl.modify hbx_id: person.hbx_id, new_market_kind: 'invalid market kind' do
+        example.run
+      end
     end
 
     context "broker_role", dbclean: :after_each do
       it "should not update broker role market kind" do
+        allow(Person).to receive(:where).and_return([person])
+        allow(person).to receive(:broker_role).and_return(broker_role)
         subject.migrate
         person.broker_role.reload
         expect(person.broker_role.market_kind).to eq "shop"

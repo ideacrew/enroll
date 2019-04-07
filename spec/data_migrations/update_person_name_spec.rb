@@ -10,18 +10,20 @@ describe UpdatePersonName, dbclean: :after_each do
     end
   end
   describe "changing person's name" do
-    let(:person) { FactoryBot.create(:person, first_name: 'James', last_name: 'federer')}
-    before(:each) do
-      allow(ENV).to receive(:[]).with("hbx_id").and_return(person.hbx_id)
-      allow(ENV).to receive(:[]).with("first_name").and_return("Chirec")
-      allow(ENV).to receive(:[]).with("last_name").and_return("Yuin")
-    end
+    let!(:person) { FactoryBot.create(:person, first_name: 'James', last_name: 'federer')}
 
     it "should change name of the person" do
-      subject.migrate
       person.reload
-       expect(person.first_name).to eq 'Chirec'
-       expect(person.last_name).to eq 'Yuin'
+      ClimateControl.modify(
+        hbx_id: person.hbx_id,
+        first_name: 'Chirec',
+        last_name: 'Yuin'
+      ) do
+        subject.migrate
+        person.reload
+        expect(person.first_name).to eq 'Chirec'
+        expect(person.last_name).to eq 'Yuin'
+      end
     end
   end
 end
