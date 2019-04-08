@@ -73,11 +73,14 @@ class CcaEmployerProfilesMigration < Mongoid::Migration
             raise Exception unless @benefit_sponsorship.valid?
             BenefitSponsors::BenefitSponsorships::BenefitSponsorship.skip_callback(:save, :after, :notify_on_save)
             @benefit_sponsorship.save!
+            BenefitSponsors::BenefitSponsorships::BenefitSponsorship.set_callback(:save, :after, :notify_on_save)
 
             raise Exception unless new_organization.valid?
             BenefitSponsors::Organizations::Organization.skip_callback(:create, :after, :notify_on_create)
             BenefitSponsors::Organizations::Profile.skip_callback(:save, :after, :publish_profile_event)
             new_organization.save!
+            BenefitSponsors::Organizations::Organization.set_callback(:create, :after, :notify_on_create)
+            BenefitSponsors::Organizations::Profile.set_callback(:save, :after, :publish_profile_event)
 
             #employer staff roles migration
             person_records_with_old_staff_roles = find_staff_roles
@@ -112,6 +115,10 @@ class CcaEmployerProfilesMigration < Mongoid::Migration
                   census_employee_found.benefit_group_assignments << old_census.benefit_group_assignments
                   census_employee_found.save(:validate => false)
                   old_census.update(benefit_group_assignments: [])
+                  CensusEmployee.set_callback(:save, :after, :assign_benefit_packages)
+                  CensusEmployee.set_callback(:save, :after, :assign_default_benefit_package)
+                  CensusEmployee.set_callback(:save, :after, :construct_employee_role)
+                  CensusEmployee.set_callback(:update, :after, :update_hbx_enrollment_effective_on_by_hired_on)
                 end
               else
                 old_census.employee_role.update_attributes(benefit_sponsors_employer_profile_id: profile.id) if old_census.employee_role && old_census.employee_role.benefit_sponsors_employer_profile_id.blank?
@@ -122,6 +129,10 @@ class CcaEmployerProfilesMigration < Mongoid::Migration
                 CensusEmployee.skip_callback(:save, :after, :construct_employee_role)
                 CensusEmployee.skip_callback(:update, :after, :update_hbx_enrollment_effective_on_by_hired_on)
                 old_census.save(:validate => false)
+                CensusEmployee.set_callback(:save, :after, :assign_default_benefit_package)
+                CensusEmployee.set_callback(:save, :after, :assign_benefit_packages)
+                CensusEmployee.set_callback(:save, :after, :construct_employee_role)
+                CensusEmployee.set_callback(:update, :after, :update_hbx_enrollment_effective_on_by_hired_on)
               end
             end
 
@@ -134,6 +145,7 @@ class CcaEmployerProfilesMigration < Mongoid::Migration
                 staff_role = old_staff.employer_staff_roles.where(employer_profile_id: @old_profile.id).first
                 EmployerStaffRole.skip_callback(:update, :after, :notify_observers)
                 staff_role.update_attributes(benefit_sponsor_employer_profile_id: profile.id)
+                EmployerStaffRole.set_callback(:update, :after, :notify_observers)
               end
             end
 
@@ -219,6 +231,7 @@ class CcaEmployerProfilesMigration < Mongoid::Migration
       doc.identifier = document.identifier if document.identifier.present?
       BenefitSponsors::Documents::Document.skip_callback(:save, :after, :notify_on_save)
       doc.save!
+      BenefitSponsors::Documents::Document.set_callback(:save, :after, :notify_on_save)
     end
 
     old_org.documents.each do |document|
@@ -226,6 +239,7 @@ class CcaEmployerProfilesMigration < Mongoid::Migration
       doc.identifier = document.identifier if document.identifier.present?
       BenefitSponsors::Documents::Document.skip_callback(:save, :after, :notify_on_save)
       doc.save!
+      BenefitSponsors::Documents::Document.set_callback(:save, :after, :notify_on_save)
     end
   end
 
