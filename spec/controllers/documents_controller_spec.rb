@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe DocumentsController, :type => :controller do
   let(:user) { FactoryBot.create(:user) }
-  let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_family) }
+  let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_family, :with_ssn) }
   let(:document) {FactoryBot.build( :vlp_document )}
   let(:family)  {FactoryBot.create(:family, :with_primary_family_member)}
   let(:hbx_enrollment) { FactoryBot.build(:hbx_enrollment) }
