@@ -17,22 +17,24 @@ describe TriggerShopNotices, dbclean: :after_each do
     let(:employer_profile2){ FactoryBot.create(:employer_profile) }
 
     before :each do
-      allow(ENV).to receive(:[]).with("recipient_ids").and_return("#{employer_profile1.fein}, #{employer_profile2.fein}")
-      allow(ENV).to receive(:[]).with("event").and_return("initial_employer_ineligibility_notice")
-      allow(ENV).to receive(:[]).with("action").and_return "employer_notice"
-
-      ActiveJob::Base.queue_adapter = :test
-      ActiveJob::Base.queue_adapter.enqueued_jobs = []
-      subject.migrate
+      # allow(ENV).to receive(:[]).with("recipient_ids").and_return("#{employer_profile1.fein}, #{employer_profile2.fein}")
+      # allow(ENV).to receive(:[]).with("event").and_return("initial_employer_ineligibility_notice")
+      # allow(ENV).to receive(:[]).with("action").and_return "employer_notice"
     end
     
     it "should trigger employer_notice job in queue" do
-      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
-        job_info[:job] == ShopNoticesNotifierJob
+      ClimateControl.modify recipient_ids:"#{employer_profile1.fein}, #{employer_profile2.fein}",event:'initial_employer_ineligibility_notice', action:'employer_notice' do 
+  
+        ActiveJob::Base.queue_adapter = :test
+        ActiveJob::Base.queue_adapter.enqueued_jobs = []
+        subject.migrate
+        queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+          job_info[:job] == ShopNoticesNotifierJob
+        end
+        expect(queued_job[:args]).not_to be_empty
+        expect(queued_job[:args].include?(employer_profile1.id.to_s)).to be_truthy
+        expect(queued_job[:args].include?("initial_employer_ineligibility_notice")).to be_truthy
       end
-      expect(queued_job[:args]).not_to be_empty
-      expect(queued_job[:args].include?(employer_profile1.id.to_s)).to be_truthy
-      expect(queued_job[:args].include?("initial_employer_ineligibility_notice")).to be_truthy
     end
   end
 end
