@@ -8,9 +8,9 @@ FactoryBot.define do
     dob  {Date.new(1965,1,1)}
     hired_on {20.months.ago}
 
-    after :build do |ce, evaluator|
-      if ce.employer_profile.blank?
-        ce.employer_profile = create(:employer_profile)
+    after :build do |ee, evaluator|
+      if ee.employer_profile.blank?
+        ee.employer_profile = create(:employer_profile)
       end
     end
   end
