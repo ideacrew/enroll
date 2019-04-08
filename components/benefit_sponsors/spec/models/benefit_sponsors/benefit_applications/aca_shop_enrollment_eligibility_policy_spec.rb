@@ -34,7 +34,7 @@ module BenefitSponsors
         before do
           benefit_sponsorship.census_employees.each do |ce|
             family = FactoryBot.create(:family, :with_primary_family_member)
-            FactoryBot.build(:hbx_enrollment, household: family.active_household, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
+            FactoryBot.create(:hbx_enrollment, household: family.active_household, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
             ce.save
           end
         end
