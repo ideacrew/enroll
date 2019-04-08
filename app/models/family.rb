@@ -1099,7 +1099,7 @@ class Family
   end
 
   def is_document_not_verified(type, person)
-    ["valid", "attested", "verified", "External Source"].include?(verification_type_status(type, person))?  false : true
+    ["valid", "attested", "verified", "External Source"].include?(verification_type_status(type, person)) ? false : true
   end
 
   def has_valid_e_case_id?
