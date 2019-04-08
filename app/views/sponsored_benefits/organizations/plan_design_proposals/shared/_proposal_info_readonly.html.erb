@@ -22,20 +22,23 @@
 
       <br />
 
-      <div class="col-md-4 col-md-4 col-xs-12 form-group form-group-lg no-pd">
-        <h4>SIC Code</h4>
-        <%= @plan_design_organization.sic_code %>
-      </div>
+      <% unless aca_state_abbreviation == 'DC' %>
 
-      <div class="col-md-4 col-md-4 col-xs-12 form-group form-group-lg no-pd">
-        <h4>Zip Code</h4>
-        <%= @plan_design_organization.office_locations.first.address.zip %>
-      </div>
+        <div class="col-md-4 col-md-4 col-xs-12 form-group form-group-lg no-pd">
+          <h4>SIC Code</h4>
+          <%= @plan_design_organization.sic_code %>
+        </div>
 
-      <div class="col-md-4 col-md-4 col-xs-12 form-group form-group-lg no-pd">
-        <h4>County</h4>
-        <%= @plan_design_organization.office_locations.first.address.county %>
-      </div>
+        <div class="col-md-4 col-md-4 col-xs-12 form-group form-group-lg no-pd">
+          <h4>Zip Code</h4>
+          <%= @plan_design_organization.office_locations.first.address.zip %>
+        </div>
+
+        <div class="col-md-4 col-md-4 col-xs-12 form-group form-group-lg no-pd">
+          <h4>County</h4>
+          <%= @plan_design_organization.office_locations.first.address.county %>
+        </div>
+      <% end %>
     </div>    
   </div>
 </div>
