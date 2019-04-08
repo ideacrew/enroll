@@ -3,8 +3,6 @@ require 'rails_helper'
 describe "CcaBrokerAgencyAccountsMigration" do
 
   before :all do
-    DatabaseCleaner.clean
-
     Dir[Rails.root.join('db', 'migrate', '*_cca_broker_agency_accounts_migration.rb')].each do |f|
       @broker_agency_accounts_migration_path = f
       require f
@@ -21,10 +19,9 @@ describe "CcaBrokerAgencyAccountsMigration" do
     end
   end
 
-  describe ".up" do
+  describe ".up", dbclean: :after_each do
 
-    before :all do
-
+    before :each do
       organization1 = FactoryBot.create(:broker)
       FactoryBot.create(:broker_agency_staff_role, broker_agency_profile: organization1.broker_agency_profile, benefit_sponsors_broker_agency_profile_id: "123456")
       broker_role1 = FactoryBot.create(:broker_role, broker_agency_profile_id: organization1.broker_agency_profile.id)
@@ -108,17 +105,17 @@ describe "CcaBrokerAgencyAccountsMigration" do
 
     end
 
-    describe "after profiles migration" do
+    describe "after profiles migration", dbclean: :after_each do
 
-      it "should start and complete accounts migrations" do
-        # silence_stream(STDOUT) do
-          Mongoid::Migrator.run(:up, @migrations_paths, @baa_migration_version.to_i)
-        # end
+      before :each do
+        Mongoid::Migrator.run(:up, @migrations_paths, @emp_migration_version.to_i)
+        Mongoid::Migrator.run(:up, @migrations_paths, @bk_migration_version.to_i)
+        Mongoid::Migrator.run(:up, @migrations_paths, @baa_migration_version.to_i)
       end
 
       it "should have benefit sponsorships" do
         bs = @orgs_with_emp_profile.first.benefit_sponsorships.unscoped
-        expect(bs.count).to eq 3
+        expect(bs.count).to eq 1
       end
 
       it "should match new_org broker agency account to old_org" do
@@ -136,7 +133,7 @@ describe "CcaBrokerAgencyAccountsMigration" do
       end
     end
   end
-  after(:all) do
+  after(:each) do
     FileUtils.rm_rf(Dir["#{Rails.root}//hbx_report//*_migration_status_*"])
   end
 end
