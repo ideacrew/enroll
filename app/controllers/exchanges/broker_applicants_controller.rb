@@ -42,7 +42,8 @@ class Exchanges::BrokerApplicantsController < ApplicationController
       flash[:notice] = "Broker applicant denied."
     elsif params['update']
       all_carrier_appointment = BrokerRole::BROKER_CARRIER_APPOINTMENTS.stringify_keys
-      all_carrier_appointment.merge!(params[:person][:broker_role_attributes][:carrier_appointments]) if params[:person][:broker_role_attributes][:carrier_appointments]
+      permitted_params = params[:person][:broker_role_attributes][:carrier_appointments].permit!
+      all_carrier_appointment.merge!(permitted_params) if permitted_params
       params[:person][:broker_role_attributes][:carrier_appointments]= all_carrier_appointment
       broker_role.update(params.require(:person).require(:broker_role_attributes).permit!.except(:id))
     elsif params['decertify']
@@ -83,7 +84,8 @@ class Exchanges::BrokerApplicantsController < ApplicationController
     all_carrier_appointment = BrokerRole::BROKER_CARRIER_APPOINTMENTS.stringify_keys
     broker_carrier_appointments_enabled = Settings.aca.broker_carrier_appointments_enabled
     unless broker_carrier_appointments_enabled
-      all_carrier_appointment.merge!(params[:person][:broker_role_attributes][:carrier_appointments]) if params[:person][:broker_role_attributes][:carrier_appointments]
+      permitted_params =  params[:person][:broker_role_attributes][:carrier_appointments].permit!
+      all_carrier_appointment.merge!(permitted_params) if permitted_params
       params[:person][:broker_role_attributes][:carrier_appointments]= all_carrier_appointment
     else
       params[:person][:broker_role_attributes][:carrier_appointments]= all_carrier_appointment.each{ |key,str| all_carrier_appointment[key] = "true" }
