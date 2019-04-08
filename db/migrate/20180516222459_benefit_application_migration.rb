@@ -56,6 +56,7 @@ class BenefitApplicationMigration < Mongoid::Migration
         construct_workflow_state_for_benefit_sponsorship(benefit_sponsorship, old_org)
         BenefitSponsors::BenefitSponsorships::BenefitSponsorship.skip_callback(:save, :after, :notify_on_save)
         benefit_sponsorship.save
+        BenefitSponsors::BenefitSponsorships::BenefitSponsorship.set_callback(:save, :after, :notify_on_save)
 
         old_org.employer_profile.plan_years.asc(:start_on).each do |plan_year|
 
@@ -84,6 +85,7 @@ class BenefitApplicationMigration < Mongoid::Migration
               BenefitSponsors::BenefitApplications::BenefitApplication.skip_callback(:save, :after, :notify_on_save)
               benefit_application.save!
               assign_employee_benefits(benefit_sponsorship)
+              BenefitSponsors::BenefitApplications::BenefitApplication.set_callback(:save, :after, :notify_on_save)
               print '.' unless Rails.env.test?
               csv << [old_org.legal_name, old_org.fein, plan_year.id, plan_year.start_on, 'Success']
               success += 1
@@ -350,6 +352,10 @@ class BenefitApplicationMigration < Mongoid::Migration
         CensusEmployee.skip_callback(:save, :after, :construct_employee_role)
         CensusEmployee.skip_callback(:update, :after, :update_hbx_enrollment_effective_on_by_hired_on)
         census_employee.save(:validate => false)
+        CensusEmployee.set_callback(:save, :after, :assign_default_benefit_package)
+        CensusEmployee.set_callback(:save, :after, :assign_benefit_packages)
+        CensusEmployee.set_callback(:save, :after, :construct_employee_role)
+        CensusEmployee.set_callback(:update, :after, :update_hbx_enrollment_effective_on_by_hired_on)
       end
     end
   end

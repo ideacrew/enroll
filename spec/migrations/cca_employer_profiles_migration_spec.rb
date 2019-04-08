@@ -3,17 +3,15 @@ require 'rails_helper'
 describe "CcaEmployerProfilesMigration" do
 
   before :all do
-    DatabaseCleaner.clean
-
     Dir[Rails.root.join('db', 'migrate', '*_cca_employer_profiles_migration.rb')].each do |f|
       @path = f
       require f
     end
   end
 
-  describe ".up" do
+  describe ".up", dbclean: :after_each do
 
-    before :all do
+    before :each do
       organization = FactoryBot.create(:organization, legal_name: "bk_one", dba: "bk_corp", home_page: "http://www.example.com")
       FactoryBot.create(:broker_agency_profile, organization: organization)
 
@@ -35,21 +33,18 @@ describe "CcaEmployerProfilesMigration" do
       FactoryBot.create(:employee_role, employer_profile: employer_profile)
       site = BenefitSponsors::Site.all.first
       BenefitSponsors::Organizations::Organization.employer_profiles.delete_all
-      @migrated_organizations = BenefitSponsors::Organizations::Organization.employer_profiles
       @old_organizations = Organization.all_employer_profiles
 
       CensusEmployee.create(first_name:"Eddie", last_name:"Vedder", gender:"male", dob: "1964-10-23".to_date, employer_profile_id: @old_organizations.first.employer_profile.id, hired_on: "2015-04-01".to_date, ssn: "112212221")
 
       @migrations_paths = Rails.root.join("db/migrate")
       @test_version = @path.split("/").last.split("_").first
+      Mongoid::Migrator.run(:up, @migrations_paths, @test_version.to_i)
+      @migrated_organizations = BenefitSponsors::Organizations::Organization.employer_profiles
     end
 
     #TODO modify it after employer profile script is updated according to benefit sponsorship
     it "should match total migrated organizations" do
-      # silence_stream(STDOUT) do
-        Mongoid::Migrator.run(:up, @migrations_paths, @test_version.to_i)
-      # end
-
       expect(@migrated_organizations.count).to eq 1
     end
 
@@ -140,7 +135,7 @@ describe "CcaEmployerProfilesMigration" do
       expect(nce.benefit_sponsorship_id).to eq(@migrated_organizations.first.benefit_sponsorships.first.id)
     end
   end
-  after(:all) do
-    FileUtils.rm_rf(Dir["#{Rails.root}//hbx_report//employer_profiles_migration_*"])
+  after(:each) do
+    FileUtils.rm_rf(Dir["#{Rails.root}/hbx_report/employer_profiles_migration_*"])
   end
 end

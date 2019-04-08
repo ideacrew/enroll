@@ -229,17 +229,13 @@ class CcaEmployerProfilesMigration < Mongoid::Migration
     @old_profile.documents.each do |document|
       doc = new_profile.documents.new(document.attributes.except("_id", "_type", "identifier","size"))
       doc.identifier = document.identifier if document.identifier.present?
-      BenefitSponsors::Documents::Document.skip_callback(:save, :after, :notify_on_save)
       doc.save!
-      BenefitSponsors::Documents::Document.set_callback(:save, :after, :notify_on_save)
     end
 
     old_org.documents.each do |document|
       doc = new_profile.documents.new(document.attributes.except("_id", "_type", "identifier","size"))
       doc.identifier = document.identifier if document.identifier.present?
-      BenefitSponsors::Documents::Document.skip_callback(:save, :after, :notify_on_save)
       doc.save!
-      BenefitSponsors::Documents::Document.set_callback(:save, :after, :notify_on_save)
     end
   end
 
