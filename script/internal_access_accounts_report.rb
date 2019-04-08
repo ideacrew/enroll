@@ -12,7 +12,7 @@ def fields_for_record
   %w(user_id last_name first_name hbx_staff_sub_role created_at last_log_in deactived_on status)
 end
 
-def hbx_staff_people(active=true)
+def hbx_staff_people(active = true)
   users = Person.all_hbx_staff_roles.inject([]) do |arr, person|
     if !active
       arr << person if person.user && (person.user.oim_id.match(/.*disable/i).present? || person.user.oim_id.match(/.*do[-_]not[-_]/i).present? || person.user.oim_id.match(/.*access[-_]denied/i).present?)
@@ -23,12 +23,12 @@ def hbx_staff_people(active=true)
   end
 end
 
-def hbx_staff_people_active
-  hbx_staff_people
+def hbx_staff_people_active(active = true)
+  hbx_staff_people(active)
 end
 
 def hbx_staff_people_inactive
-  hbx_staff_people(active=false)
+  hbx_staff_people(false)
 end
 
 def hbx_role(person)
@@ -45,11 +45,10 @@ def build_record(person)
 end
 
 def last_login(person)
-  #SessionIdHistory.for_user(user_id: person.user_id).order('created_at DESC').first.created_at
   user = person.user.blank? ? "no_user" : person.user.last_sign_in_at
 end
 
-CSV.open("internal_access_accounts_report_#{timestamp}.csv","w") do |csv|
+CSV.open("internal_access_accounts_report_#{timestamp}.csv", "w") do |csv|
   empty_sub = fields_for_record.drop(1).map{''}
   csv << ["Report generated #{timestamp}"] + empty_sub
   csv << ["There are #{all_hbx_staff_role.count} people who have a hbx_staff_role"] + empty_sub
