@@ -1055,8 +1055,8 @@ describe Person, :dbclean => :after_each do
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup initial benefit application"
     let(:employer_profile) { abc_profile }
-    let(:person_params) {{first_name: Forgery('name').first_name, last_name: Forgery('name').first_name, dob: '1990/05/01'}}
-    let(:person1) {FactoryBot.create(:person, person_params)}
+    let(:person_params) { {first_name: Forgery('name').first_name, last_name: Forgery('name').first_name, dob: '1990/05/01'} }
+    let(:person1) { FactoryBot.create(:person, person_params) }
 
     context 'duplicate person PII' do
       before do
@@ -1085,7 +1085,10 @@ describe Person, :dbclean => :after_each do
     end
 
     context 'matching one person PII' do
-      before {@status, @result = Person.add_employer_staff_role(person1.first_name, person1.last_name, person1.dob,'#default@email.com', employer_profile )}
+      before do
+        person1.reload
+        @status, @result = Person.add_employer_staff_role(person1.first_name, person1.last_name, person1.dob,'#default@email.com', employer_profile )
+      end
 
       it 'returns true' do
         expect(@status).to eq true
@@ -1245,6 +1248,7 @@ describe Person, :dbclean => :after_each do
     let(:empty_hash) { {} }
 
     before do
+      person.reload
       allow(person).to receive(:primary_family).and_return(primary_family)
       allow(primary_family).to receive(:enrollments).and_return([enrollment])
     end
@@ -1267,6 +1271,7 @@ describe Person, :dbclean => :after_each do
       let(:new_dob_to_make_person_sixty_one)    { Date.new(1955,1,1) }
 
       before do
+        person_older_than_sixty_one.reload
         allow(person_older_than_sixty_one).to receive(:primary_family).and_return(primary_family)
         allow(primary_family).to receive(:enrollments).and_return([enrollment])
       end
