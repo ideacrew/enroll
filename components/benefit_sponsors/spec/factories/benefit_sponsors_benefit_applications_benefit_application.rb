@@ -1,6 +1,6 @@
 FactoryBot.define do
 
-  sequence(:random_count) do |n|
+  sequence(:random_count, (1..25).cycle) do |n|
     @random_counts ||= (1..25).to_a.shuffle
     @random_counts[n]
   end
