@@ -20,7 +20,7 @@ module Notify
   def payload(obj, field:)
     return nil unless obj.send(field)
 
-    if obj.send(field).respond_to?(:target)
+    if obj.relations[field].present?
       # relation
       if obj.send(field).is_a?(Array)
         # embeds_many
