@@ -73,9 +73,13 @@ describe UpdatePlanYearsWithDentalOfferings do
 
       before do
         allow(Person).to receive(:where).and_return([person])
-        allow(ENV).to receive(:[]).with('calender_month').and_return effective_on.month
-        allow(ENV).to receive(:[]).with('calender_year').and_return effective_on.year
         allow(person).to receive(:primary_family).and_return(family)
+      end
+
+      around do |example|
+        ClimateControl.modify calender_month: effective_on.month.to_s, calender_year: effective_on.year.to_s do
+          example.run
+        end
       end
 
       it "should add dental offerings to plan year" do

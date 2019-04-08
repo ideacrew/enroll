@@ -10,7 +10,7 @@ RSpec.describe "insured/families/_effective_on_kind_fields.html.erb" do
   it "should show hidden field" do
     allow(qlk).to receive(:effective_on_kinds).and_return(['date_of_event'])
     render "insured/families/effective_on_kind_fields"
-    expect(rendered).to have_selector('input#effective_on_kind')
+    expect(rendered).to have_selector('input#effective_on_kind', visible: false)
   end
 
   it "should have select for effective_on_kind" do

@@ -92,12 +92,12 @@ RSpec.describe "insured/_plan_filters.html.erb" do
 
     it "should have Premium amount search" do
       expect(rendered).to match /Premium Amount/
-      expect(rendered).to have_selector("input[value='1000']", count: 2)
+      expect(rendered).to have_selector("input[value='1000']", count: 2, visible: false)
     end
 
     it "should have Deductible Amount search" do
       expect(rendered).to match /Deductible Amount/
-      expect(rendered).to have_selector("input[value='998']", count: 2)
+      expect(rendered).to have_selector("input[value='998']", count: 2, visible: false)
     end
   end
 
@@ -169,8 +169,8 @@ RSpec.describe "insured/_plan_filters.html.erb" do
 
     it "should have aptc area" do
       expect(rendered).to have_selector('div.aptc')
-      expect(rendered).to have_selector('input#max_aptc')
-      expect(rendered).to have_selector('input#set_elected_aptc_url')
+      expect(rendered).to have_selector('input#max_aptc', visible: false)
+      expect(rendered).to have_selector('input#set_elected_aptc_url', visible: false)
       expect(rendered).to have_selector("input[name='elected_pct']")
     end
 
