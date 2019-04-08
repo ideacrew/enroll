@@ -279,6 +279,8 @@ function setMyPlans(element) {
 }
 
 function setSliderDisplayVal(slideEvt) {
+  slideEvt.preventDefault();
+  slideEvt.stopImmediatePropagation();
   $(this).closest('.form-group').find('.hidden-param').val(slideEvt.value).attr('value', slideEvt.value);
   $(this).closest('.form-group').find('.slide-label').text(slideEvt.value + "%");
   calcPlanDesignContributions();
@@ -556,6 +558,8 @@ function saveProposal(event) {
 }
 
 function saveProposalAndCopy(event) {
+  event.preventDefault();
+  event.stopImmediatePropagation();
   var data = buildBenefitGroupParams();
   if (proposalIsInvalid(data)) {
 
@@ -587,7 +591,7 @@ function saveProposalAndCopy(event) {
 
 function saveProposalAndPublish(event) {
   event.preventDefault();
-  event.stopImmediatePropagation()
+  event.stopImmediatePropagation();
   data = buildBenefitGroupParams();
   if (proposalIsInvalid(data)) {
 
