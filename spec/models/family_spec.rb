@@ -1268,27 +1268,25 @@ describe "#all_persons_vlp_documents_status" do
     end
 
     it "returns all_persons_vlp_documents_status is fully uploaded when all documents are uploaded" do
-      family_person.consumer_role.vlp_documents << FactoryBot.build(:vlp_document, verification_type: "Social Security Number")
-      family_person.consumer_role.vlp_documents << FactoryBot.build(:vlp_document, verification_type: "DC Residency")
+      family_person.consumer_role.vlp_documents << FactoryBot.build(:vlp_document, verification_type: "Citizenship")
       family_person.consumer_role.update_attributes(ssn_validation: "valid")
-      family_person.save!
       expect(family.all_persons_vlp_documents_status).to eq("Fully Uploaded")
     end
 
     it "returns all_persons_vlp_documents_status is Fully Uploaded when documents status is verified" do
-      family_person.consumer_role.vlp_documents << FactoryBot.build(:vlp_document, verification_type: "DC Residency" )
+      family_person.consumer_role.vlp_documents << FactoryBot.build(:vlp_document, verification_type: "Citizenship")
       family_person.consumer_role.update_attributes(ssn_validation: "valid")
-      family_person.save!
       expect(family.all_persons_vlp_documents_status).to eq("Fully Uploaded")
     end
 
     it "returns all_persons_vlp_documents_status is partially uploaded when document is rejected" do
+      family_person.consumer_role.vlp_documents << FactoryBot.build(:vlp_document, verification_type: "Citizenship")
       family_person.consumer_role.update_attributes(:ssn_rejected => true)
-      family_person.save!
       expect(family.all_persons_vlp_documents_status).to eq("Partially Uploaded")
     end
 
     it "returns all_persons_vlp_documents_status is Partially Uploaded when documents status is verified and other is not uploaded" do
+      family_person.consumer_role.vlp_documents << FactoryBot.build(:vlp_document, verification_type: "Citizenship")
       family_person.consumer_role.update_attributes(ssn_validation: "valid")
       allow(family_person).to receive(:verification_types).and_return ["social Security", "Citizenship"]
       expect(family.all_persons_vlp_documents_status).to eq("Partially Uploaded")
@@ -1312,6 +1310,7 @@ describe "#all_persons_vlp_documents_status" do
     end
 
     it "returns all_persons_vlp_documents_status is partially uploaded when single document is uploaded on both" do
+      person1.consumer_role.vlp_documents << FactoryBot.build(:vlp_document, verification_type: "Citizenship")
       allow(person1.consumer_role).to receive(:vlp_documents).and_return doc1
       allow(person2.consumer_role).to receive(:vlp_documents).and_return doc1
       expect(family.all_persons_vlp_documents_status).to eq("Partially Uploaded")
