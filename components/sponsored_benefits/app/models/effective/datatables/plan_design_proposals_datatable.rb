@@ -9,7 +9,7 @@
                 ## will become link to view-only page
                 row.title
               else
-                link_to row.title, sponsored_benefits.edit_organizations_plan_design_organization_plan_design_proposal_path(row.plan_design_organization, row)
+                link_to row.title, sponsored_benefits.edit_organizations_plan_design_organization_plan_design_proposal_path(row.plan_design_organization, row, profile_id: attributes[:profile_id])
               end
               }, :sortable => false, :filter => false
           table_column :effective_date, :label => 'Effective Date', :proc => Proc.new { |row| proposal_sponsorship(row).initial_enrollment_period.begin.strftime("%Y - %m - %d") }, :sortable => true, :filter => false
