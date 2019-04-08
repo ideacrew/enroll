@@ -63,6 +63,21 @@ module SponsoredBenefits
           })
       end
 
+      def employee_cost_for_plan(ce, plan = reference_plan)
+        pcd = if @is_congress
+          decorated_plan(plan, ce)
+        elsif plan_option_kind == 'sole_source' && !plan.dental?
+          CompositeRatedPlanCostDecorator.new(plan, self, effective_composite_tier(ce), ce.is_cobra_status?)
+        else
+          if plan.dental? && dental_reference_plan.present?
+            PlanCostDecorator.new(plan, ce, self, dental_reference_plan)
+          else
+            PlanCostDecorator.new(plan, ce, self, reference_plan)
+          end
+        end
+        pcd.total_employee_cost
+      end
+
       def lowest_cost_plan
         @lowest_cost_plan ||= ::Plan.find(lowest_cost_plan_id)
       end
