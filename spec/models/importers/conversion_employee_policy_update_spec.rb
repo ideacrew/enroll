@@ -48,7 +48,7 @@ describe Importers::ConversionEmployeePolicyUpdate, dbclean: :after_each do
         :fein=> employer_profile.fein,
         :benefit_begin_date=> benefit_group.start_on,
         :hios_id=>hbx_enrollment.plan.hios_id,
-        :subscriber_ssn=>person.ssn,
+        :subscriber_ssn=>person.reload.ssn,
         :subscriber_dob=>person.dob.strftime("%m/%d/%Y"),
         :subscriber_gender=>person.gender,
         :subscriber_name_first=>person.first_name,
@@ -64,7 +64,7 @@ describe Importers::ConversionEmployeePolicyUpdate, dbclean: :after_each do
 
     let(:dependent1_attrs) do
       {
-        :dep_1_ssn=>spouse.ssn,
+        :dep_1_ssn=>spouse.reload.ssn,
         :dep_1_dob=>spouse.dob.strftime("%m/%d/%Y"),
         :dep_1_gender=>spouse.gender,
         :dep_1_name_first=>spouse.first_name,
@@ -75,7 +75,7 @@ describe Importers::ConversionEmployeePolicyUpdate, dbclean: :after_each do
 
     let(:dependent2_attrs) do
       {
-        :dep_2_ssn=>child.ssn,
+        :dep_2_ssn=>child.reload.ssn,
         :dep_2_dob=>child.dob.strftime("%m/%d/%Y"),
         :dep_2_gender=>child.gender,
         :dep_2_name_first=>child.first_name,
@@ -86,7 +86,7 @@ describe Importers::ConversionEmployeePolicyUpdate, dbclean: :after_each do
 
     let(:dependent3_attrs) do
       {
-        :dep_3_ssn=>child1.ssn,
+        :dep_3_ssn=>child1.reload.ssn,
         :dep_3_dob=>child1.dob.strftime("%m/%d/%Y"),
         :dep_3_gender=>child1.gender,
         :dep_3_name_first=>child1.first_name,
