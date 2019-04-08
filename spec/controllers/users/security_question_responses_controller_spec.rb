@@ -34,12 +34,16 @@ RSpec.describe Users::SecurityQuestionResponsesController, dbclean: :after_each 
     end
 
     context "with an error on save" do
-      before do
-        allow(controller.request).to receive(:referrer).and_return('http://example.com')
+      before(:each) do
         allow(user).to receive(:save!).and_return(false)
-        post :create, params: { user_id: user.id, security_question_responses: security_question_responses }, xhr: true
+        post :create, params: { user_id: user.id, security_question_responses: security_question_responses,headers: { 'HTTP_REFERER' => 'http://example.com' } }, xhr: true
+        allow(controller.request).to receive(:referrer).and_return('http://example.com')
       end
-      it { expect(assigns(:url)).to eq('http://example.com') }
+      it 'ss' do
+        request.headers.merge!('HTTP_REFERER' => 'http://example.com')
+        # binding.pry
+        expect(request.referer).to eq('http://example.com') 
+      end
       it { expect(response).to have_http_status(:success) }
       it { expect(response).to render_template('users/security_question_responses/error_response') }
     end

@@ -40,7 +40,7 @@ RSpec.describe "employers/employer_profiles/my_account/_families.html.erb" do
     expect(rendered).to match(/#{person_1.last_name}/)
     expect(rendered).to have_link("#{person_1.first_name} #{person_1.last_name}", href: "/employers/employer_profiles/test/consumer_override?person_id=#{person_1.id}")
     expect(rendered).to match(/#{format_date person_1.dob}/)
-    expect(rendered).to match(/#{number_to_obscured_ssn person_1.ssn}/)
+    expect(rendered).to have_text(number_to_obscured_ssn(person_1.ssn))
     expect(rendered).not_to have_link("Consumer", href:"/employers/employer_profiles/test/consumer_override?person_id=test")
   end
 
