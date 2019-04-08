@@ -1639,7 +1639,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
                                          coverage_kind: "health",
                                          kind: "employer_sponsored",
                                          benefit_sponsorship_id: benefit_sponsorship.id,
-                                         sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
+                                         sponsored_benefit_package_id: census_employee.active_benefit_package.id,
                                          employee_role_id: census_employee.employee_role.id,
                                          benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
                                          aasm_state: "coverage_selected"
@@ -1654,7 +1654,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
                                                    coverage_kind: "health",
                                                    kind: "employer_sponsored",
                                                    benefit_sponsorship_id: benefit_sponsorship.id,
-                                                   sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
+                                                   sponsored_benefit_package_id: census_employee.active_benefit_package.id,
                                                    employee_role_id: census_employee.employee_role.id,
                                                    benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
                                                    aasm_state: state
@@ -1666,7 +1666,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
                                                    coverage_kind: "dental",
                                                    kind: "employer_sponsored",
                                                    benefit_sponsorship_id: benefit_sponsorship.id,
-                                                   sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
+                                                   sponsored_benefit_package_id: census_employee.active_benefit_package.id,
                                                    employee_role_id: census_employee.employee_role.id,
                                                    benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
                                                    aasm_state: state
@@ -1953,14 +1953,14 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
       it "query string for census employee firstname or last name" do
         employee_search = "test1"
-        expected_result = {"$or" => [{"$or" => [{"first_name" => /test1/i}, {"last_name" => /test1/i}]}, {"encrypted_ssn" => "+MZq0qWj9VdyUd9MifJWpQ=="}]}
+        expected_result = {"$or" => [{"$or" => [{"first_name" => /test1/i}, {"last_name" => /test1/i}]}, {"encrypted_ssn" => "+MZq0qWj9VdyUd9MifJWpQ==\n"}]}
         result = CensusEmployee.search_hash(employee_search)
         expect(result).to eq expected_result
       end
 
       it "census employee query string for full name" do
         employee_search = "test1 test2"
-        expected_result = {"$or" => [{"$and" => [{"first_name" => /test1|test2/i}, {"last_name" => /test1|test2/i}]}, {"encrypted_ssn" => "0m50gjJW7mR4HLnepJyFmg=="}]}
+        expected_result = {"$or" => [{"$and" => [{"first_name" => /test1|test2/i}, {"last_name" => /test1|test2/i}]}, {"encrypted_ssn" => "0m50gjJW7mR4HLnepJyFmg==\n"}]}
         result = CensusEmployee.search_hash(employee_search)
         expect(result).to eq expected_result
       end
