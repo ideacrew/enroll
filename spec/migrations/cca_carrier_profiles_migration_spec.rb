@@ -3,17 +3,15 @@ require 'rails_helper'
 describe "CcaCarrierProfilesMigration" do
 
   before :all do
-    DatabaseCleaner.clean
-
     Dir[Rails.root.join('db', 'migrate', '*_cca_carrier_profiles_migration.rb')].each do |f|
       @path = f
       require f
     end
   end
 
-  describe ".up" do
+  describe ".up", dbclean: :after_each do
 
-    before :all do
+    before :each do
       FactoryBot.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, site_key: :cca)
       organization = FactoryBot.create(:organization, legal_name: "bk_one", dba: "bk_corp", home_page: "http://www.example.com")
       FactoryBot.create(:broker_agency_profile, organization: organization)
@@ -32,11 +30,11 @@ describe "CcaCarrierProfilesMigration" do
 
       @migrations_paths = Rails.root.join("db/migrate")
       @test_version = @path.split("/").last.split("_").first
+      Mongoid::Migrator.run(:up, @migrations_paths, @test_version.to_i)
     end
 
     it "should match total migrated organizations with carrier profiles" do
       # silence_stream(STDOUT) do
-        Mongoid::Migrator.run(:up, @migrations_paths, @test_version.to_i)
       # end
 
       expect(@migrated_organizations.count).to eq 9
@@ -64,8 +62,8 @@ describe "CcaCarrierProfilesMigration" do
       expect(@old_organizations.map(&:office_locations).flatten.map(&:phone).map(&:full_phone_number).include?(@migrated_organizations.first.issuer_profile.office_locations.first.phone.full_phone_number)).to eq true
     end
   end
-  after(:all) do
-    FileUtils.rm_rf(Dir["#{Rails.root}//hbx_report//carrier_profile_migration_*"])
+  after(:each) do
+    FileUtils.rm_rf(Dir["#{Rails.root}/hbx_report/carrier_profile_migration_*"])
   end
 end
 
