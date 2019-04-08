@@ -29,15 +29,16 @@
     <h3>Add the total number of employees in your workforce</h3>
     <div class="row row-form-wrapper no-buffer" style="display: block;">
       <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-        <%= f.text_field :fte_count, class: "floatlabel form-control", required: true, placeholder: 'FULL TIME EMPLOYEES' %>
+        <%= f.text_field :fte_count, class: "floatlabel form-control", required: true, placeholder: 'FULL TIME EMPLOYEES *' %>
       </div>
       <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-        <%= f.text_field :pte_count, class: "floatlabel form-control", required: true, placeholder: 'PART TIME EMPLOYEES' %>
+        <%= f.text_field :pte_count, class: "floatlabel form-control", required: true, placeholder: 'PART TIME EMPLOYEES *' %>
       </div>
       <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-        <%= f.text_field :msp_count, class: "floatlabel form-control", required: true, placeholder: 'MEDICARE SECOND PAYERS' %>
+        <%= f.text_field :msp_count, class: "floatlabel form-control", required: true, placeholder: 'MEDICARE SECOND PAYERS *' %>
       </div>
     </div>
+    <p class='memo'>* = required field</p>
     <br>
   </div>
 </div>

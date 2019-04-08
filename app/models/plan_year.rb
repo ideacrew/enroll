@@ -44,13 +44,13 @@ class PlanYear
   field :is_conversion, type: Boolean, default: false
 
   # Number of full-time employees
-  field :fte_count, type: Integer, default: 0
+  field :fte_count, type: Integer
 
   # Number of part-time employess
-  field :pte_count, type: Integer, default: 0
+  field :pte_count, type: Integer
 
   # Number of Medicare Second Payers
-  field :msp_count, type: Integer, default: 0
+  field :msp_count, type: Integer
 
   # Calculated Fields for DataTable
   field :enrolled_summary, type: Integer, default: 0
@@ -591,8 +591,8 @@ class PlanYear
     end
 
     # Maximum company size at time of initial registration on the HBX
-    if !(is_renewing?) && (fte_count > Settings.aca.shop_market.small_market_employee_count_maximum)
-      warnings.merge!({ fte_count: "Has #{Settings.aca.shop_market.small_market_employee_count_maximum} or fewer full time equivalent employees" })
+    if !is_renewing? && (fte_count < 1 || fte_count > Settings.aca.shop_market.small_market_employee_count_maximum)
+      warnings.merge!({ fte_count: "Number of full time equivalents (FTEs) exceeds maximum allowed (#{Settings.aca.shop_market.small_market_employee_count_maximum})" })
     end
 
     # Exclude Jan 1 effective date from certain checks
