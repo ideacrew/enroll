@@ -17,7 +17,7 @@ module SponsoredBenefits
         @plans = @plans.select{|a| a.premium_tables.present?}
         @search_options = ::Plan.search_options(@plans)
         @search_option_titles = {
-                'plan_type': 'HMO / PPO',
+                'plan_type': (Settings.aca.state_abbreviation == 'DC') ? 'Plan Type' : 'HMO / PPO',
                 'plan_hsa': 'HSA - Compatible',
                 'metal_level': 'Metal Level',
                 'plan_deductible': 'Individual deductible (in network)'
@@ -30,7 +30,7 @@ module SponsoredBenefits
         @plans = @plans.select{|a| a.premium_tables.present?}
         @search_options = ::Plan.search_options(@plans)
         @search_option_titles = {
-            'plan_type': 'HMO / PPO',
+            'plan_type': (Settings.aca.state_abbreviation == 'DC') ? 'Plan Type' : 'HMO / PPO',
             'plan_hsa': 'HSA - Compatible',
             'metal_level': 'Metal Level',
             'plan_deductible': 'Individual deductible (in network)'
