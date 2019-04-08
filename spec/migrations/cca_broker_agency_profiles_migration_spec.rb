@@ -3,17 +3,15 @@ require 'rails_helper'
 describe "CcaBrokerAgencyProfilesMigration" do
 
   before :all do
-    DatabaseCleaner.clean
-
     Dir[Rails.root.join('db', 'migrate', '*_cca_broker_agency_profiles_migration.rb')].each do |f|
       @path = f
       require f
     end
   end
 
-  describe ".up" do
+  describe ".up", dbclean: :after_each do
 
-    before :all do
+    before :each do
       FactoryBot.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, site_key: :cca)
 
       organization = FactoryBot.create(:broker)
@@ -37,28 +35,27 @@ describe "CcaBrokerAgencyProfilesMigration" do
       FactoryBot.create(:employee_role, employer_profile: employer_profile)
       BenefitSponsors::Organizations::Organization.employer_profiles.delete_all
 
-      @migrated_organizations = BenefitSponsors::Organizations::Organization.broker_agency_profiles
       @old_organizations = Organization.has_broker_agency_profile
 
       @migrations_paths = Rails.root.join("db/migrate")
       @test_version = @path.split("/").last.split("_").first
-    end
-
-    it "should match total migrated organizations with employer profiles" do
-      # silence_stream(STDOUT) do
-        Mongoid::Migrator.run(:up, @migrations_paths, @test_version.to_i)
-      # end
-
-      expect(@migrated_organizations.count).to eq @old_organizations.count
-    end
-
-    it "should not migrate organizations with employer profiles" do
-      expect(BenefitSponsors::Organizations::Organization.employer_profiles.count).to eq 0
+#      silence_stream(STDOUT) do
+      Mongoid::Migrator.run(:up, @migrations_paths, @test_version.to_i)
+#      end
+      @migrated_organizations = BenefitSponsors::Organizations::Organization.broker_agency_profiles
     end
 
     it "should match messages" do
       migrated_profile = @migrated_organizations.first.broker_agency_profile
       expect(migrated_profile.inbox.messages.count).to eq @old_organizations.first.broker_agency_profile.inbox.messages.count
+    end
+
+    it "should match total migrated organizations with employer profiles" do
+      expect(@migrated_organizations.count).to eq @old_organizations.count
+    end
+
+    it "should not migrate organizations with employer profiles" do
+      expect(BenefitSponsors::Organizations::Organization.employer_profiles.count).to eq 0
     end
 
     it "should match documents" do
@@ -116,7 +113,7 @@ describe "CcaBrokerAgencyProfilesMigration" do
     end
   end
 
-  after(:all) do
-    FileUtils.rm_rf(Dir["#{Rails.root}//hbx_report//cca_broker_profile_migration_*"])
+  after(:each) do
+    FileUtils.rm_rf(Dir["#{Rails.root}/hbx_report/cca_broker_profile_migration_*"])
   end
 end
