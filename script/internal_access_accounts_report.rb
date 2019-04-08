@@ -57,7 +57,7 @@ CSV.open("internal_access_accounts_report_#{timestamp}.csv","w") do |csv|
   csv << ["Deactivated Admins ********************"] + empty_sub
   csv << fields_for_record
   hbx_staff_people_inactive.each do |person|
-    csv << build_record(person,active=false)
+    csv << build_record(person)
   end
   csv << [''] + empty_sub
   csv << ["Active Admins ********************"] + empty_sub
