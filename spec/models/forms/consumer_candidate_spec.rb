@@ -2,11 +2,11 @@ require 'rails_helper'
 describe Forms::ConsumerCandidate, "asked to match a person", dbclean: :after_each do
 
   let(:user){ create(:user) }
-  let(:person) { create(:person, :with_ssn, user: user) }
+  let!(:person) { create(:person, :with_ssn, user: user) }
 
-  let(:params) { {
+  let!(:params) { {
     :dob => "2012-10-12",
-    :ssn => person.ssn,
+    :ssn => person.reload.ssn,
     :first_name => "yo",
     :last_name => "guy",
     :gender => "m",
@@ -54,7 +54,7 @@ describe Forms::ConsumerCandidate, "asked to match a person", dbclean: :after_ea
     end
 
     context 'when ssn & dob combination did not match with existing person' do
-      let(:params) { {:ssn => person.ssn, :dob => "2012-10-12"} }
+      let(:params) { {:ssn => person.reload.ssn, :dob => "2012-10-12"} }
 
       it "should add errors" do
         subject.uniq_ssn_dob
