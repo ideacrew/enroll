@@ -849,11 +849,9 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         end
 
         context "person has chosen not to receive electronic communication" do
-          before do
-            consumer_role2.contact_method = "Only Paper communication"
-          end
-
           it "should not sent the email" do
+            consumer_role2.update_attributes!(contact_method:"Only Paper communication")
+            consumer_role2.person.employee_roles.first.update_attributes!(contact_method:"Only Paper communication")
             expect(@controller.send(:notice_upload_email)).to be nil
           end
         end

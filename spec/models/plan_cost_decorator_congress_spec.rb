@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe PlanCostDecoratorCongress, dbclean: :after_each do
   let!(:plan_year)          { double("PlanYear", start_on: Date.today.beginning_of_year) }
-  let!(:benefit_group)      { double("BenefitGroupCongress", plan_year: plan_year, over_one_dependents_max_amt: Money.new("97190"), employee_max_amt: Money.new("43769"), first_dependent_max_amt: Money.new("97190"), contribution_pct_as_int: 75) }
+  let!(:benefit_group)      { double("BenefitGroupCongress", plan_year: plan_year, over_one_dependents_max_amt: Money.new('97190'), employee_max_amt: Money.new("43769"), first_dependent_max_amt: Money.new("97190"), contribution_pct_as_int: 75) }
   let(:hbx_enrollment)      { HbxEnrollment.new }
   let!(:hem_employee)       { double("HbxEnrollmentMember_Employee", class: HbxEnrollmentMember, _id: "a", age_on_effective_date: 19, age_on_eligibility_date: 19, is_subscriber?: true , primary_relationship: "self") }
   let!(:hem_spouse)         { double("HbxEnrollmentMember_Spouse",   class: HbxEnrollmentMember, _id: "b", age_on_effective_date: 20, age_on_eligibility_date: 20, is_subscriber?: false, primary_relationship: "spouse") }
@@ -57,7 +57,7 @@ RSpec.describe PlanCostDecoratorCongress, dbclean: :after_each do
         let(:premium_constant) { 800.0 }
 
         it "should have an employer contribution for employee" do
-          expect(plan_cost_decorator.employer_contribution_for(hem_employee)).to eq benefit_group.employee_max_amt
+          expect(plan_cost_decorator.employer_contribution_for(hem_employee)).to eq benefit_group.employee_max_amt.to_f
         end
       end
     end
@@ -86,7 +86,7 @@ RSpec.describe PlanCostDecoratorCongress, dbclean: :after_each do
         end
 
         it "should have a total employer contribution" do
-          expect(plan_cost_decorator.total_employer_contribution).to eq benefit_group.first_dependent_max_amt
+          expect(plan_cost_decorator.total_employer_contribution).to eq benefit_group.first_dependent_max_amt.to_f
         end
       end
 
