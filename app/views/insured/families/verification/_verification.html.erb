@@ -66,11 +66,6 @@
                       </div>
                     <% end %>
                   </div>
-                  <% if current_user.has_hbx_staff_role? %>
-                    <div class="v-type-actions col-md-2">
-                      <%= select_tag :verification_actions, admin_actions(verif_type, f_member.person), {id: "v-action-#{person.id}-#{v_type.split.join('-')}", prompt: 'Action'} %>
-                    </div>
-                  <% end %>
               </div>
               <% if current_user.has_hbx_staff_role? %>
                     <%= render :partial => "insured/families/verification/admin_verification_actions", locals: { person: person, type: verif_type, v_type: v_type, f_member: f_member} %>
