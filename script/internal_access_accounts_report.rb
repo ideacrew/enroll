@@ -1,5 +1,7 @@
 require 'csv'
 
+require 'csv'
+
 def timestamp
   Time.now.strftime('%m_%d_%Y_at_%H_%M')
 end
@@ -23,8 +25,8 @@ def hbx_staff_people(active = true)
   end
 end
 
-def hbx_staff_people_active(active = true)
-  hbx_staff_people(active)
+def hbx_staff_people_active
+  hbx_staff_people
 end
 
 def hbx_staff_people_inactive
@@ -35,17 +37,19 @@ def hbx_role(person)
   person.hbx_staff_role
 end
 
+def last_login(person)
+  #SessionIdHistory.for_user(user_id: person.user_id).order('created_at DESC').first.created_at
+  user = person.user.blank? ? "no_user" : person.user.last_sign_in_at
+end
+
 def role_status(person)
   hbx_role(person).is_active? ? "active" : "inactive"
 end
 
-def build_record(person)
+def build_record(person, active = true)
   user_id = person.user.blank? ? "no_user" : person.user.id
-  [user_id, person.last_name, person.first_name, hbx_role(person).subrole, hbx_role(person).created_at, last_login(person), "", role_status(person)]
-end
-
-def last_login(person)
-  user = person.user.blank? ? "no_user" : person.user.last_sign_in_at
+  updated_at = person.user.blank? ? "no_user" : person.user.updated_at
+  [user_id, person.last_name, person.first_name, hbx_role(person).subrole, hbx_role(person).created_at, last_login(person), active ? "N/A" : updated_at, active ? role_status(person) : "inactive"]
 end
 
 CSV.open("internal_access_accounts_report_#{timestamp}.csv", "w") do |csv|
@@ -53,15 +57,15 @@ CSV.open("internal_access_accounts_report_#{timestamp}.csv", "w") do |csv|
   csv << ["Report generated #{timestamp}"] + empty_sub
   csv << ["There are #{all_hbx_staff_role.count} people who have a hbx_staff_role"] + empty_sub
   csv << ["Genereating report ********************"] + empty_sub
-  csv << ["Deactivated Admins ********************"] + empty_sub
+  csv << ["Active Admins ********************"] + empty_sub
   csv << fields_for_record
-  hbx_staff_people_inactive.each do |person|
+  hbx_staff_people_active.each do |person|
     csv << build_record(person)
   end
   csv << [''] + empty_sub
-  csv << ["Active Admins ********************"] + empty_sub
-  hbx_staff_people_active.each do |person|
-    csv << build_record(person)
+  csv << ["Deactivated Admins ********************"] + empty_sub
+  hbx_staff_people_inactive.each do |person|
+    csv << build_record(person, false)
   end
   csv << ["End of Report ********************"] + empty_sub
 end
