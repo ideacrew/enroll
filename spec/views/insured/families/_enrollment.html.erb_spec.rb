@@ -340,7 +340,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     let(:employer_profile) { FactoryGirl.build_stubbed(:employer_profile) }
     let(:enrollment) { double("enrollment", aasm_state: "inactive", coverage_kind: "health", is_shop?: true,
                         employer_profile: employer_profile, effective_on: TimeKeeper.date_of_record - 1.month,
-                        submitted_at: TimeKeeper.date_of_record - 1.month, waiver_reason: nil, id: nil) }
+                        submitted_at: TimeKeeper.date_of_record - 1.month, waiver_reason: 'waiver_reason', terminate_reason: nil, id: nil) }
 
     context "it should render waived_coverage_widget " do
 
