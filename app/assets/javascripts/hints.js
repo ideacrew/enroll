@@ -1,7 +1,7 @@
 var Hints = ( function( window, undefined ) {
 
   function myPortalsLinkReminder() {
-    $('.my-portal-links .dropdown-toggle').css({'color': '#007bc4;'});
+    $('.my-portal-links .dropdown-toggle').css({'color': '#ED812A;'});
     $('.dropdown[data-toggle="popover"]').popover('show');
     $('.popover-title').append('<button id="popovercloseid" type="button" class="close" style="position: absolute; top: 10px; right: 15px;" title="Don\'t Show Again" data-toggle="tooltip">&times;</button>');
     Freebies.tooltip();
