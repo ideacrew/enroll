@@ -234,9 +234,8 @@ module Observers
         if model_event.event_key == :low_enrollment_notice_for_employer
           organizations_for_low_enrollment_notice(current_date).each do |organization|
            begin
-             plan_year = organization.employer_profile.plan_years.where(:aasm_state.in => ["enrolling", "renewing_enrolling"]).first
-             #exclude congressional employees
-              next if ((plan_year.benefit_groups.any?{|bg| bg.is_congress?}) || (plan_year.effective_date.yday == 1))
+              plan_year = organization.employer_profile.plan_years.where(:aasm_state.in => ["enrolling", "renewing_enrolling"]).first
+              next if plan_year.effective_date.yday == 1
               if plan_year.enrollment_ratio < Settings.aca.shop_market.employee_participation_ratio_minimum
                 deliver(recipient: organization.employer_profile, event_object: plan_year, notice_event: "low_enrollment_notice_for_employer")
               end
@@ -322,9 +321,7 @@ module Observers
     end
 
     def trigger_zero_employees_on_roster_notice(plan_year)
-      if !plan_year.benefit_groups.any?{|bg| bg.is_congress?} && plan_year.employer_profile.census_employees.active.count < 1
-        deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "zero_employees_on_roster_notice")
-      end
+      deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "zero_employees_on_roster_notice") if plan_year.employer_profile.census_employees.active.count < 1
     end
 
     def organizations_for_low_enrollment_notice(current_date)
