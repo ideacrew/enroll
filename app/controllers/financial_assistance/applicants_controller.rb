@@ -15,6 +15,7 @@ class FinancialAssistance::ApplicantsController < ApplicationController
 
   def other_questions
     save_faa_bookmark(@person, request.original_url)
+    set_admin_bookmark_url
     @applicant = @application.active_applicants.find(params[:id])
     render layout: 'financial_assistance'
   end
@@ -35,6 +36,7 @@ class FinancialAssistance::ApplicantsController < ApplicationController
 
   def step
     save_faa_bookmark(@person, request.original_url.gsub(/\/step.*/, "/step/#{@current_step.to_i}"))
+    set_admin_bookmark_url
     flash[:error] = nil
     model_name = @model.class.to_s.split('::').last.downcase
     model_params = params[model_name]

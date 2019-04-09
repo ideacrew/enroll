@@ -1,10 +1,13 @@
 class FinancialAssistance::ApplicationsController < ApplicationController
   before_action :set_current_person
   before_action :set_primary_family
+  before_action :check_eligibility, only: [:create, :get_help_paying_coverage_response, :copy]
 
   include UIHelpers::WorkflowController
   include NavigationHelper
   include Acapi::Notifiers
+  include L10nHelper
+  include FinancialAssistanceHelper
   require 'securerandom'
 
   before_filter :load_support_texts, only: [:edit, :help_paying_coverage]
@@ -20,8 +23,8 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def create
-    @application = @person.primary_family.applications.new
-    @application.populate_applicants_for(@person.primary_family)
+    @application = @family.applications.new
+    @application.populate_applicants_for(@family)
     @application.save!
 
     redirect_to edit_financial_assistance_application_path(@application)
@@ -29,6 +32,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   def edit
     save_faa_bookmark(@person, request.original_url)
+    set_admin_bookmark_url
     @family = @person.primary_family
     @application = @person.primary_family.applications.find params[:id]
     matrix = @family.build_relationship_matrix
@@ -38,6 +42,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   def step
     save_faa_bookmark(@person, request.original_url.gsub(/\/step.*/, "/step/#{@current_step.to_i}"))
+    set_admin_bookmark_url
     flash[:error] = nil
     model_name = @model.class.to_s.split('::').last.downcase
     model_params = params[model_name]
@@ -87,6 +92,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   def help_paying_coverage
     save_faa_bookmark(@person, request.original_url)
+    set_admin_bookmark_url
     @transaction_id = params[:id]
   end
 
@@ -99,8 +105,6 @@ class FinancialAssistance::ApplicationsController < ApplicationController
       flash[:error] = "Please choose an option before you proceed."
       redirect_to help_paying_coverage_financial_assistance_applications_path
     elsif params["is_applying_for_assistance"] == "true"
-      person = FinancialAssistance::Factories::AssistanceFactory.new(@person)
-      @assistance_status, @message = person.search_existing_assistance
       @family.is_applying_for_assistance = @assistance_status
       @family.save!
       @assistance_status ? aqhp_flow : redirect_to_msg
@@ -120,11 +124,13 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   def application_checklist
     save_faa_bookmark(@person, request.original_url)
+    set_admin_bookmark_url
     @application = @person.primary_family.application_in_progress
   end
 
   def review_and_submit
     save_faa_bookmark(@person, request.original_url)
+    set_admin_bookmark_url
     @consumer_role = @person.consumer_role
     @application = @person.primary_family.application_in_progress
     @applicants = @application.active_applicants if @application.present?
@@ -137,12 +143,14 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   def wait_for_eligibility_response
     save_faa_bookmark(@person, financial_assistance_applications_path)
+    set_admin_bookmark_url
     @family = @person.primary_family
     @application = @person.primary_family.applications.find(params[:id])
   end
 
   def eligibility_results
     save_faa_bookmark(@person, request.original_url)
+    set_admin_bookmark_url
     @family = @person.primary_family
     @application = @person.primary_family.applications.find(params[:id])
 
@@ -151,6 +159,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   def application_publish_error
     save_faa_bookmark(@person, request.original_url)
+    set_admin_bookmark_url
     @family = @person.primary_family
     @application = @person.primary_family.applications.find(params[:id])
 
@@ -159,6 +168,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   def eligibility_response_error
     save_faa_bookmark(@person, request.original_url)
+    set_admin_bookmark_url
     @family = @person.primary_family
     @application = @person.primary_family.applications.find(params[:id])
     @application.update_attributes(determination_http_status_code: 999) if @application.determination_http_status_code.nil?
@@ -177,6 +187,17 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   private
+
+  def check_eligibility
+    call_service
+    return if params['action'] == "get_help_paying_coverage_response"
+    [(flash[:error] = l10n(decode_msg(@message))), (redirect_to financial_assistance_applications_path)] unless @assistance_status
+  end
+
+  def call_service
+    person = FinancialAssistance::Factories::AssistanceFactory.new(@person)
+    @assistance_status, @message = person.search_existing_assistance
+  end
 
   def set_primary_family
     @family = @person.primary_family
