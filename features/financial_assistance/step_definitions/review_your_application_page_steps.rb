@@ -135,3 +135,19 @@ Then(/^all data should be presented as previously entered$/) do
     expect(find("#need_help_paying_bills_no")).to be_checked
   end
 end
+
+Then(/^the "Review Application" link will be disabled$/) do
+  find_link('Review Application')['disabled'].should == 'disabled'
+end
+
+Then(/^the “Review Application” link will be actionable$/) do
+  find_link('Review Application').visible?
+end
+
+When(/^clicks the “Review Application” link$/) do
+  click_link('Review Application')
+end
+
+Then(/^the user will navigate to the Review Application page$/) do
+  expect(page).to have_content('Review Your Application')
+end
