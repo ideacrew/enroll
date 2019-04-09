@@ -339,6 +339,28 @@ def employer_poc
     end
   end
 
+  def view_enrollment_to_update_end_date
+    @person = Person.find(params[:person_id])
+    @row = params[:family_actions_id]
+    @enrollments = @person.primary_family.terminated_enrollments
+  end
+
+  def update_enrollment_termianted_on_date
+    begin
+      enrollment = HbxEnrollment.find(params[:enrollment_id].strip)
+      @row = params[:family_actions_id]
+      termination_date = Date.strptime(params["new_termination_date"], "%m/%d/%Y")
+      if enrollment.present? && enrollment.reterm_enrollment_with_earlier_date(termination_date, params["edi_required"].present?)
+        message = {notice: "Enrollment Updated Successfully."}
+      else
+        message = {notice: "Unable to find/update Enrollment."}
+      end
+    rescue Exception => e
+      message = {error: e.to_s}
+    end
+    redirect_to exchanges_hbx_profiles_root_path, flash: message
+  end
+
   def broker_agency_index
 
     @datatable = Effective::Datatables::BrokerAgencyDatatable.new

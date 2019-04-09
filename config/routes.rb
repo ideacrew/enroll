@@ -102,6 +102,8 @@ Rails.application.routes.draw do
         get :show_sep_history
         get :view_terminated_hbx_enrollments
         get :get_user_info
+        get :view_enrollment_to_update_end_date
+        post :update_enrollment_termianted_on_date
         get :identity_verification
         post :identity_verification_datatable
         get :user_account_index
