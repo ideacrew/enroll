@@ -11,7 +11,7 @@ RSpec.describe IvlNotices::IvlToCoverallTransitionNoticeBuilder, dbclean: :after
       :notice_builder => 'IvlNotices::IvlToCoverallTransitionNoticeBuilder',
       :event_name => 'ivl_to_coverall_transition_notice',
       :mpi_indicator => 'IVL_CDC',
-      :title => "Your Insurance through DC Health Link Has Changed to Cover All DC"})
+      :title => "Your Insurance through Be Well NM Has Changed to Cover All DC"})
   }
   let(:valid_params) {{
       :subject => application_event.title,

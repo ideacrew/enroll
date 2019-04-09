@@ -1,14 +1,14 @@
 site:
-  short_name: "DC Health Link"
-  byline: "DC's Online Health Insurance Marketplace"
+  short_name: "Be Well New Mexico"
+  byline: "New Mexico's Health Insurance Exchange"
   long_name: ""
-  copyright_period_start: "2013"
-  header_message: "Welcome to the District's Health Insurance Marketplace"
+  copyright_period_start: "2019"
+  header_message: "Welcome to New Mexico's Health Insurance Exchange"
   logo_file_name: "logo.png"
-  home_url: "https://www.dchealthlink.com/"
+  home_url: "https://https://www.bewellnm.com//"
   home_forms_url: "https://dchealthlink.com/forms"
   forms_name: "DCHealthLink.com/forms"
-  website_name: "www.DCHealthLink.com"
+  website_name: "https://www.bewellnm.com/"
   forms: "https://dchealthlink.com/forms#en"
   website_url: "www.healthcare.gov"
   healthcare_name: "www.healthcare.gov"
@@ -21,8 +21,8 @@ site:
     facebook_url: ""
 
 contact_center:
-  name: "DC Health Link's Customer Care Center"
-  alt_name: "DC Health Link Customer Service"
+  name: "NM HIX Customer Care Center"
+  alt_name: "NM HIX Customer Service"
   phone_number: "1-855-532-5465"
   tty_number: "1-855-532-5465"
   tty: "771"
@@ -30,9 +30,9 @@ contact_center:
   email_address: "info@dchealthlink.com"
 
 aca:
-  state_name: "District of Columbia"
-  state_abbreviation: "DC"
-  hbx_abbreviation: "DC Health Benefit Exchange"
+  state_name: "New Mexico"
+  state_abbreviation: "NM"
+  hbx_abbreviation: "NM Health Insurance Exchange"
   market_kinds: ["individual", "shop"]
 #
   qle:

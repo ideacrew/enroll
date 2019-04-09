@@ -52,7 +52,7 @@ class EmployerInvoice
       message_params = {
         sender_id: "admins",
         parent_message_id: @organization.employer_profile.id,
-        from: "DC Health Link",
+        from: "Be Well NM",
         to: "Employer Mailbox",
         subject: subject,
         body: body

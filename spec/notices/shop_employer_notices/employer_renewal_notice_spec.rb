@@ -14,7 +14,7 @@ RSpec.describe ShopEmployerNotices::EmployerRenewalNotice, :dbclean => :after_ea
                             :notice_builder => 'ShopEmployerNotices::EmployerRenewalNotice',
                             :event_name => 'conversion_group_renewal',
                             :mpi_indicator => 'MPI_SHOP6',
-                            :title => "Welcome to DC Health Link, Group Renewal Available"})
+                            :title => "Welcome to Be Well NM, Group Renewal Available"})
                           }
     let(:conversion_valid_parmas) {{
         :subject => conversion_application_event.title,

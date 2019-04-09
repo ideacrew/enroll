@@ -176,7 +176,7 @@ class Employers::CensusEmployeesController < ApplicationController
       if @census_employee.update_for_cobra(@cobra_date, current_user)
         flash[:notice] = "Successfully update Census Employee."
       else
-        flash[:error] = "COBRA cannot be initiated for this employee because termination date is over 6 months in the past. Please contact DC Health Link at 855-532-5465 for further assistance."
+        flash[:error] = "COBRA cannot be initiated for this employee because termination date is over 6 months in the past. Please contact Be Well NM at 855-532-5465 for further assistance."
       end
     else
       flash[:error] = "Please enter cobra date."

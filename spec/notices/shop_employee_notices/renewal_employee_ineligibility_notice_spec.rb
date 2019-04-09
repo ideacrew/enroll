@@ -22,7 +22,7 @@ require 'rails_helper'
                             :notice_builder => 'ShopEmployeeNotices::RenewalEmployeeIneligibilityNotice',
                             :event_name => 'renewal_employer_ineligibility_notice_to_employee',
                             :mpi_indicator => 'SHOP_D039',
-                            :title => "Termination of Employer’s Health Coverage Offered Through DC Health Link"})
+                            :title => "Termination of Employer’s Health Coverage Offered Through Be Well NM"})
                           }
   let(:valid_params) {{
       :subject => application_event.title,

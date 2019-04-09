@@ -125,9 +125,9 @@ class HbxProfile
   ## HBX general settings
   StateName = "District of Columbia"
   StateAbbreviation = "DC"
-  CallCenterName = "DC Health Link's Customer Care Center"
+  CallCenterName = "Be Well NM's Customer Care Center"
   CallCenterPhoneNumber = "1-855-532-5465"
-  ShortName = "DC Health Link"
+  ShortName = "Be Well NM"
 
   IndividualEnrollmentDueDayOfMonth = Settings.aca.individual_market.monthly_enrollment_due_on
 

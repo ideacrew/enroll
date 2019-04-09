@@ -9,4 +9,4 @@ Feature: Outstanding Verifications screen
     When Admin clicks Outstanding Verifications
     Then the Admin is navigated to the Outstanding Verifications screen
     Then the Admin has the ability to use the following filters for documents provided: Fully Uploaded, Partially Uploaded, None Uploaded, All
-    Then the Admin is directed to that user's My DC Health Link page
+    Then the Admin is directed to that user's My Be Well NM page

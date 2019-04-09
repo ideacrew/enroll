@@ -82,7 +82,7 @@ namespace :update_seed do
       { criteria: { title: "Change in APTC/CSR", market_kind: "individual" }, 
          attribs: { reason: "eligibility_change_income", 
                     title: "Change in income that may impact my tax credits/cost-sharing reductions ", 
-                    tool_tip: "Increases or decreases to income that may impact eligibility for or the dollar amount of household tax credits or cost-sharing reductions. (Only applies to those currently enrolled in a plan through DC Health Link)." 
+                    tool_tip: "Increases or decreases to income that may impact eligibility for or the dollar amount of household tax credits or cost-sharing reductions. (Only applies to those currently enrolled in a plan through Be Well NM)." 
                   } 
         },
 
@@ -100,10 +100,10 @@ namespace :update_seed do
                   } 
         },
 
-      { criteria: { title: "Problem with my enrollment caused by DC Health Link", market_kind: "individual" }, 
+      { criteria: { title: "Problem with my enrollment caused by Be Well NM", market_kind: "individual" }, 
          attribs: { reason: "enrollment_error_or_misconduct_hbx", 
-                    title: "Enrollment error caused by DC Health Link", 
-                    tool_tip: "You are not enrolled or are enrolled in the wrong plan because of an error made by DC Health Link or the Department of Health and Human Services" 
+                    title: "Enrollment error caused by Be Well NM", 
+                    tool_tip: "You are not enrolled or are enrolled in the wrong plan because of an error made by Be Well NM or the Department of Health and Human Services" 
                   } 
         },
 
@@ -117,7 +117,7 @@ namespace :update_seed do
       { criteria: { title: "Problem with my enrollment caused by someone providing me with enrollment assistance", market_kind: "individual" }, 
          attribs: { reason: "enrollment_error_or_misconduct_non_hbx", 
                     title: "Enrollment error caused by someone providing me with enrollment assistance", 
-                    tool_tip: "You are not enrolled or are enrolled in the wrong plan because of an error made by a broker, in-person assister, or another expert trained by DC Health Link" 
+                    tool_tip: "You are not enrolled or are enrolled in the wrong plan because of an error made by a broker, in-person assister, or another expert trained by Be Well NM" 
                   } 
         },
 
@@ -138,7 +138,7 @@ namespace :update_seed do
       { criteria: { title: "My employer applied for small business coverage during open enrollment but was denied after open enrollment ended", market_kind: "individual" }, 
          attribs: { reason: "eligibility_change_employer_ineligible", 
                     title: "Found ineligible for employer-sponsored insurance after open enrollment ended", 
-                    tool_tip: "Did not enroll in individual or family coverage because employer was applying to provide coverage through DC Health Link during open enrollment"
+                    tool_tip: "Did not enroll in individual or family coverage because employer was applying to provide coverage through Be Well NM during open enrollment"
                   } 
         },
 
@@ -159,7 +159,7 @@ namespace :update_seed do
       { criteria: { title: "I was unable to enroll because of a system outage", market_kind: "individual" }, 
          attribs: { reason: "exceptional_circumstances_system_outage", 
                     title: "System outage prevented enrollment", 
-                    tool_tip: "A DC Health Link outage or outage in federal or local data sources close to an open enrollment or special enrollment deadline prevented enrollment" 
+                    tool_tip: "A Be Well NM outage or outage in federal or local data sources close to an open enrollment or special enrollment deadline prevented enrollment" 
                   } 
         },
 

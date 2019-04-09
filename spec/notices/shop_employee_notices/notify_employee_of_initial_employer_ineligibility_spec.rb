@@ -20,7 +20,7 @@ RSpec.describe ShopEmployeeNotices::NotifyEmployeeOfInitialEmployerIneligibility
                             :notice_builder => 'ShopEmployeeNotices::NotifyEmployeeOfInitialEmployerIneligibility',
                             :event_name => 'notify_employee_of_initial_employer_ineligibility',
                             :mpi_indicator => 'SHOP_D040',
-                            :title => "Termination of Employer’s Health Coverage Offered through DC Health Link"})
+                            :title => "Termination of Employer’s Health Coverage Offered through Be Well NM"})
                           }
 
     let(:valid_parmas) {{

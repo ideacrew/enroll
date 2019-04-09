@@ -40,7 +40,7 @@ RSpec.describe ShopEmployeeNotices::TerminationOfEmployersHealthCoverage, :dbcle
                             :notice_builder => 'ShopEmployeeNotices::TerminationOfEmployersHealthCoverage',
                             :event_name => 'notice_to_ee_that_er_plan_year_will_not_be_written',
                             :mpi_indicator => 'SHOP_D064',
-                            :title => "Termination of Employer’s Health Coverage Offered through DC Health Link"})
+                            :title => "Termination of Employer’s Health Coverage Offered through Be Well NM"})
                           }
   let(:valid_params) {{
       :subject => application_event.title,

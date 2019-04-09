@@ -1,10 +1,10 @@
 
 site:
-  short_name: "DC Health Link"
+  short_name: "Be Well NM"
   long_name: ""
 
   call_center: 
-    name: "DC Health Link's Customer Care Center"
+    name: "Be Well NM's Customer Care Center"
     phone_number: "1-855-532-5465"
 
 aca:
