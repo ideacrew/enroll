@@ -135,9 +135,28 @@ RSpec.describe "events/v2/employer/updated.haml.erb" , dbclean: :after_each do
 
     context "with dental plans" do
       context "is_offering_dental? is true" do
-
+        let!(:benefit_package) do
+          FactoryBot.create(
+            :benefit_sponsors_benefit_packages_benefit_package,
+            benefit_application: benefit_application,
+            product_package: product_package,
+            dental_sponsored_benefit:true, 
+            dental_product_package:dental_product_package
+          )
+        end
+        let!(:dental_sponsored_benefit) { benefit_package.dental_sponsored_benefit }
+        let!(:update_dental_product) { dental_sponsored_benefit.reference_product.update_attributes!(issuer_profile_id:issuer_profile.id) }  
+        let(:dental_sponsor_contribution) do
+          FactoryBot.build(
+            :benefit_sponsors_sponsored_benefits_sponsor_contribution,
+            product_package: dental_product_package,
+            sponsored_benefit:dental_sponsored_benefit
+          )
+        end
+        
         before do
           allow(sponsor_contribution).to receive(:contribution_model).and_return(product_package.contribution_model)
+          BenefitSponsors::SponsoredBenefits::ContributionLevel.any_instance.stub_chain(:contribution_unit, :name).and_return('employee')
         end
 
         it "shows the dental plan in output" do
