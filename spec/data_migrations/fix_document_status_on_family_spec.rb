@@ -9,7 +9,7 @@ describe FixDocumentStatus, dbclean: :after_each do
   let(:vlp_document) {FactoryBot.build(:vlp_document, :identifier => 'identifier', :verification_type  => 'Citizenship')}
 
   around do |example|
-    ClimateControl.modify hbx_ids:[family_person.hbx_id].join(',') do
+    ClimateControl.modify hbx_ids: family_person.hbx_id do
       example.run
       DatabaseCleaner.clean
     end
