@@ -2023,13 +2023,14 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     end
 
     context "when ER has active and renewal benefit applications" do
+
       include_context "setup renewal application"
 
       let(:benefit_group_assignment_two) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: renewal_application.benefit_packages.first, census_employee: census_employee)}
 
       it "should return active benefit_package if given effective_on date is in active benefit application" do
         coverage_date = initial_application.end_on - 1.month
-        expect(census_employee.benefit_package_for_date(coverage_date)).to eq initial_application.benefit_packages.first
+        expect(census_employee.benefit_package_for_date(coverage_date)).to eq renewal_application.benefit_packages.first
       end
 
       it "should return renewal benefit_package if given effective_on date is in renewal benefit application" do
