@@ -136,14 +136,8 @@ RSpec.describe "events/v2/employer/updated.haml.erb" , dbclean: :after_each do
     context "with dental plans" do
       context "is_offering_dental? is true" do
 
-        let!(:benefit_package) { FactoryBot.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application, product_package: product_package,dental_sponsored_benefit:true,  dental_product_package:dental_product_package) }
-        let!(:dental_sponsored_benefit) {benefit_package.dental_sponsored_benefit}
-        let!(:update_dental_product) {dental_sponsored_benefit.reference_product.update_attributes(issuer_profile_id:issuer_profile.id)}
-        let(:dental_sponsor_contribution) {FactoryBot.build(:benefit_sponsors_sponsored_benefits_sponsor_contribution,product_package: dental_product_package,sponsored_benefit:dental_sponsored_benefit)}
-
         before do
           allow(sponsor_contribution).to receive(:contribution_model).and_return(product_package.contribution_model)
-          allow(dental_sponsor_contribution).to receive(:contribution_model).and_return(dental_product_package.contribution_model)
         end
 
         it "shows the dental plan in output" do
@@ -152,7 +146,6 @@ RSpec.describe "events/v2/employer/updated.haml.erb" , dbclean: :after_each do
           expect(@doc2.xpath("//x:benefit_groups/x:benefit_group/x:elected_plans/x:elected_plan/x:is_dental_only", "x"=>"http://openhbx.org/api/terms/1.0").detect {|node| node.text == "true" }.present?).to eq true
         end
       end
-
 
       context "is_offering_dental? is false" do
         before do
