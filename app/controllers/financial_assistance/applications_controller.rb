@@ -141,6 +141,13 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     end
   end
 
+  def review
+    save_faa_bookmark(@person, request.original_url)
+    @application = FinancialAssistance::Application.where(id: params["id"]).first
+    @applicants = @application.active_applicants if @application.present?
+    redirect_to financial_assistance_applications_path if @application.blank?
+  end
+
   def wait_for_eligibility_response
     save_faa_bookmark(@person, financial_assistance_applications_path)
     set_admin_bookmark_url
