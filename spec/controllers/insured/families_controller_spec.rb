@@ -779,7 +779,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   describe "GET upload_notice", dbclean: :after_each do
 
     let(:consumer_role2) { FactoryBot.create(:consumer_role) }
-    let(:person2) { FactoryBot.create(:person) }
+    let(:person2) { FactoryBot.create(:person, :with_employee_role) }
     let(:user2) { FactoryBot.create(:user, person: person2, roles: ["hbx_staff"]) }
     let(:file) { double }
     let(:temp_file) { double }

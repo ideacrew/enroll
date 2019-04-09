@@ -11,7 +11,7 @@ describe Importers::ConversionEmployeeAction, :dbclean => :after_each do
     end
 
     it "adds an 'employer not found' error to the instance" do
-      expect(subject.errors.get(:fein)).to include("does not exist")
+      expect(subject.errors[:fein]).to include("does not exist")
     end
   end
 

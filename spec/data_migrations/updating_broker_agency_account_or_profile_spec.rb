@@ -2,7 +2,7 @@ require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "updating_broker_agency_account_or_profile")
 
 describe UpdatingBrokerAgencyAccountOrProfile, dbclean: :after_each do
-  
+
   let!(:given_task_name) { "delinking_broker" }
   let!(:person) { FactoryBot.create(:person,:with_broker_role)}
   let!(:organization1) {FactoryBot.create(:organization)}
@@ -17,7 +17,7 @@ describe UpdatingBrokerAgencyAccountOrProfile, dbclean: :after_each do
   let!(:family) {FactoryBot.create(:family,:with_primary_family_member, person:new_person, broker_agency_accounts:[broker_agency_account])}
 
   subject { UpdatingBrokerAgencyAccountOrProfile.new(given_task_name, double(:current_scope => nil)) }
-  
+
   context "create_org_and_broker_agency_profile" do
     before(:each) do
       # allow(ENV).to receive(:[]).with("person_hbx_id").and_return(person.hbx_id)
@@ -52,7 +52,7 @@ describe UpdatingBrokerAgencyAccountOrProfile, dbclean: :after_each do
       area_code:office_locations_contact.area_code,
       number:office_locations_contact.number,
       market_kind:broker_agency_profile.market_kind,
-      action:'create_org_and_broker_agency_profile' do 
+      action:'create_org_and_broker_agency_profile' do
         subject.migrate
         person.reload
         expect(person.broker_role.broker_agency_profile.organization.fein).to eq fein
@@ -78,7 +78,7 @@ describe UpdatingBrokerAgencyAccountOrProfile, dbclean: :after_each do
         # allow(ENV).to receive(:[]).with("action").and_return("update_broker_role")
         employer_profile.broker_agency_accounts << broker_agency_account
       end
-      
+
       it "Should update the person broker_role id with with new broker_agency" do
         ClimateControl.modify person_hbx_id:person.hbx_id,
         legal_name: organization.legal_name,
@@ -93,7 +93,8 @@ describe UpdatingBrokerAgencyAccountOrProfile, dbclean: :after_each do
         area_code:office_locations_contact.area_code,
         number:office_locations_contact.number,
         market_kind:'both',
-        action:'update_broker_role' do 
+        broker_agency_profile_id: broker_agency_profile.id,
+        action:'update_broker_role' do
           puts "id = #{broker_agency_profile.id}"
             subject.migrate
             person.reload
