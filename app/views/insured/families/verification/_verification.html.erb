@@ -57,7 +57,8 @@
                         <%= hidden_field_tag 'docs_owner', person.id  %>
                         <%= hidden_field_tag 'verification_type', verif_type.id  %>
                       <% end %>
-                    </div>
+                    <% end %>
+                  </div>
 
                     <% if current_user.has_hbx_staff_role? %>
                       <div class="v-type-actions col-md-2">
@@ -94,7 +95,8 @@
                               <%= link_to document_path(vlp_doc, :person_id => person.id, :verification_type => verif_type.id, :doc_title => vlp_doc.title.titleize), method: :delete do %>
                                 <i class="fa fa-trash-o fa-lg pull-right" title="Delete"></i>
                               <% end %>
-                            </div>
+                            </span>
+                          </div>
 
                             <div class="v-doc col-md-1">
                               <span class="<%=pundit_class(Family, :updateable?)%>" >
