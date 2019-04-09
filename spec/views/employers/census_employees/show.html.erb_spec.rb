@@ -162,16 +162,11 @@ RSpec.describe "employers/census_employees/show.html.erb", dbclean: :after_each 
   end
 
   context "when both ee and er have no benefit group assignment" do
-    let(:census_employee) { FactoryBot.create(:census_employee)}
-    let(:hbx_enrollment) { double("HbxEnrollment")}
-    before do
-      assign(:benefit_sponsorship, census_employee.benefit_sponsorship)
-    end
-
+    
     it "should only have BENIFIT PACKAGE" do
       render template: "employers/census_employees/show.html.erb"
-      expect(rendered).to have_selector('div', text: 'SELECT BENEFIT PACKAGE')
-      expect(rendered).to_not have_selector('div', text: current_benefit_package.title)
+      expect(rendered).to have_selector('option', text: 'SELECT BENEFIT PACKAGE')
+      expect(rendered).to have_selector('div', text: current_benefit_package.title)
     end
   end
 
