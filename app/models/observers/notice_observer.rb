@@ -217,13 +217,13 @@ module Observers
         broker = broker_agency_profile.primary_broker_role
         if new_model_event.event_key == :broker_hired
           deliver(recipient: broker ,event_object: employer_profile, notice_event: "broker_hired_notice_to_broker")
-          deliver(recipient: broker_agency_profile,event_object: employer_profile, notice_event: "broker_agency_hired_confirmation_to_agency")
+          # deliver(recipient: broker_agency_profile,event_object: employer_profile, notice_event: "broker_agency_hired_confirmation_to_agency")
           deliver(recipient: employer_profile ,event_object: employer_profile, notice_event: "broker_hired_confirmation_to_employer")
         end
 
         if new_model_event.event_key == :broker_fired
           deliver(recipient: broker ,event_object: employer_profile, notice_event: "broker_fired_confirmation_to_broker")
-          deliver(recipient: broker_agency_profile, event_object: employer_profile, notice_event: "broker_agency_fired_confirmation_to_agency")
+          # deliver(recipient: broker_agency_profile, event_object: employer_profile, notice_event: "broker_agency_fired_confirmation_to_agency")
           deliver(recipient: employer_profile, event_object: broker_agency_account ,notice_event: "broker_fired_confirmation_to_employer")
         end
       end
