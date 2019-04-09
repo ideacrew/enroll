@@ -156,6 +156,12 @@ Style/SymbolArray:
 Style/WordArray:
   Enabled: false
 
+Bundler/OrderedGems:
+  Enabled: false
+
+Gemspec/OrderedDependencies:
+  Enabled: false
+
 require:
   - ./cops/lint/empty_rescue_clause.rb
 
