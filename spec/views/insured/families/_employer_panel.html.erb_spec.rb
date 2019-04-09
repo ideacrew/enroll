@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe "insured/families/_employer_panel.html.erb", db_clean: :after_each do
-  let(:person) {FactoryBot.create(:person)}
+  let(:person) {FactoryBot.create(:person, :with_employee_role)}
   let(:employee_role) {FactoryBot.build(:employee_role)}
   let(:employer_profile) {FactoryBot.build(:employer_profile)}
 
@@ -39,8 +39,11 @@ RSpec.describe "insured/families/_employer_panel.html.erb", db_clean: :after_eac
 
   context 'Person has two employers/employee_roles' do  
     let(:person) { FactoryBot.create :person, :with_employee_role }
+    let(:employee_role1) {FactoryBot.build(:employee_role, person: person)}
+    let(:employee_role2) {FactoryBot.build(:employee_role, person: person)}
 
     before :each do
+      allow(person).to receive(:employee_roles).and_return([employee_role1, employee_role2])
       render "insured/families/employer_panel", employee_role: person.employee_roles.first
     end
 
