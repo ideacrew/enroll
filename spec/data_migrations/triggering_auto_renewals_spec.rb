@@ -59,8 +59,7 @@ describe TriggeringAutoRenewals, dbclean: :after_each do
     }
 
     around do |example|
-      ClimateControl.modify py_start_on: organization.employer_profile.plan_years.where(:aasm_state => "renewing_enrolling").first.start_on do
-        allow(Time).to receive(:now).and_return(Time.parse("2016-10-20 00:00:00"))
+      ClimateControl.modify py_start_on: "#{(organization.employer_profile.plan_years.where(:aasm_state => "renewing_enrolling").first.start_on)}" do
         example.run
       end
     end
