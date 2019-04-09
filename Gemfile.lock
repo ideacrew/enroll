@@ -18,6 +18,13 @@ GIT
       nokogiri-happymapper (~> 0.5)
 
 GIT
+  remote: https://github.com/harshared/simple_calendar
+  revision: 109781178efa26c89ba51efa496bca29bc70a565
+  specs:
+    simple_calendar (2.2.5)
+      rails (>= 3.0)
+
+GIT
   remote: https://github.com/prawnpdf/prawn.git
   revision: 8028ca0cd2aae8c72df9fc4bf16388948423bcb2
   ref: 8028ca0cd2
@@ -1576,6 +1583,7 @@ DEPENDENCIES
   sassc (~> 1.12)
   sdoc (~> 1.0)
   shoulda-matchers (~> 3)
+  simple_calendar!
   simplecov (~> 0.14)
   slim (~> 3.0)
   slim-rails (~> 3.2)
