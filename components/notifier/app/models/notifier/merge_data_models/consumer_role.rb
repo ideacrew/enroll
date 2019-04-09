@@ -129,7 +129,7 @@ module Notifier
       end
 
       def aptc_amount_available?
-        aptc.present? && aptc.to_i > 0
+        aptc.present? && aptc.to_i >= 0
       end
 
       def aptc_is_zero?
