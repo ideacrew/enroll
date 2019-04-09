@@ -23,6 +23,8 @@ class FinancialAssistance::Application
 
   SUBMITTED_STATUS  = %w(submitted verifying_income)
 
+  REVIEWABLE_STATUSES = %w(submitted determination_response_error determined).freeze
+
   FAA_SCHEMA_FILE_PATH     = File.join(Rails.root, 'lib', 'schemas', 'financial_assistance.xsd')
 
   # TODO: Need enterprise ID assignment call for Assisted Application
@@ -446,6 +448,10 @@ class FinancialAssistance::Application
 
   def is_determined?
     self.aasm_state == "determined" ? true : false
+  end
+
+  def is_reviewable?
+    REVIEWABLE_STATUSES.include?(aasm_state)
   end
 
   def incomplete_applicants?
