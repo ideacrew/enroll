@@ -405,37 +405,31 @@ describe HbxEnrollment, dbclean: :after_all do
       end
     end
 
-    context "waive_coverage_by_benefit_group_assignment" do
+    context "waive_enrollment" do
       before :all do
-        @enrollment4 = household.create_hbx_enrollment_from(
+        @enrollment5 = household.new_hbx_enrollment_from(
           employee_role: mikes_employee_role,
           coverage_household: coverage_household,
           benefit_group: mikes_benefit_group,
           benefit_group_assignment: @mikes_benefit_group_assignments
-        )
-        @enrollment4.save
-        @enrollment5 = household.create_hbx_enrollment_from(
-          employee_role: mikes_employee_role,
-          coverage_household: coverage_household,
-          benefit_group: mikes_benefit_group,
-          benefit_group_assignment: @mikes_benefit_group_assignments
-
         )
         @enrollment5.save
-        @enrollment4.waive_coverage_by_benefit_group_assignment("start a new job")
         @enrollment5.reload
+        @enrollment4 = @enrollment5.construct_waiver_enrollment(nil, 'waiver_reason')
+        @enrollment4.save
+        @enrollment4.waive_enrollment
       end
 
       it "enrollment4 should be inactive" do
-        expect(@enrollment4.aasm_state).to eq "inactive"
+        expect(@enrollment4.aasm_state).to eq 'inactive'
       end
 
       it "enrollment4 should get waiver_reason" do
-        expect(@enrollment4.waiver_reason).to eq "start a new job"
+        expect(@enrollment4.waiver_reason).to eq 'waiver_reason'
       end
 
       it "enrollment5 should not be waived" do
-        expect(@enrollment5.aasm_state).to eq "shopping"
+        expect(@enrollment5.aasm_state).to eq 'shopping'
       end
 
       it "enrollment5 should not have waiver_reason" do
@@ -710,20 +704,6 @@ describe HbxEnrollment, dbclean: :after_all do
       enrollment_two.update_attribute(:coverage_kind, "dental")
       enrollment_two.propogate_waiver
       expect(enrollment_two.benefit_group_assignment.aasm_state).not_to eq "coverage_waived"
-    end
-
-    it "should cancel the shop enrollment when effective_on is in future" do
-      expect(enrollment_two.effective_on).to be > TimeKeeper.date_of_record
-      enrollment_two.propogate_waiver
-      enrollment_two.reload
-      expect(enrollment_two.aasm_state).to eq "coverage_canceled"
-    end
-
-    it "should terminate the shop enrollment when effective_on is in past" do
-      expect(enrollment_four.effective_on).to be <= TimeKeeper.date_of_record
-      enrollment_four.propogate_waiver
-      enrollment_four.reload
-      expect(enrollment_four.aasm_state).to eq "coverage_termination_pending"
     end
   end
 end
