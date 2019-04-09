@@ -69,6 +69,10 @@ module BenefitSponsors
         self.is_conversion? && published_benefit_application.present? && published_benefit_application.is_conversion?
       end
 
+      def is_renewing_employer?
+        self.plan_years.renewing.first.present?
+      end
+
       def renewing_benefit_application
         benefit_applications.detect { |benefit_application| benefit_application.is_renewing? }
       end
