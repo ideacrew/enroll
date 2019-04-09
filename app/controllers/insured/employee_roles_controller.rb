@@ -74,10 +74,9 @@ class Insured::EmployeeRolesController < ApplicationController
         end
       end
     else
-      respond_to do |format|
         log("Refs #19220 We have an SSN collision for the employee belonging to employer #{@employment_relationship.census_employee.employer_profile.parent.legal_name}", :severity=>'error')
-        format.html { redirect_to :back, alert: "You can not enroll as another employee. Please reach out to customer service for assistance"}
-      end
+        flash[:alert] = "You can not enroll as another employee. Please reach out to customer service for assistance"
+        redirect_back(fallback_location: root_path)
     end
   end
 
