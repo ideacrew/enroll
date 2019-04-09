@@ -28,7 +28,7 @@ RSpec.describe PortalHeaderHelper, :type => :helper do
 
       it "should have Welcome prompt when user has no active role" do
         allow(current_user).to receive(:has_employer_staff_role?).and_return(false)
-        expect(portal_display_name(controller)).to eq "<a class='portal'>Welcome to the District's Health Insurance Marketplace</a>"
+        expect(portal_display_name(controller)).to eq "<a class='portal'>Welcome to New Mexico's health Insurance Exchange</a>"
       end
 
      

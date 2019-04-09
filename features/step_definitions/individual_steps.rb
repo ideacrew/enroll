@@ -272,7 +272,7 @@ And(/I click on log out link$/) do
 end
 
 And(/^.+ click on sign in existing account$/) do
-  expect(page).to have_content "Welcome to the District's Health Insurance Marketplace"
+  expect(page).to have_content "Welcome to New Mexico's health Insurance Exchange"
   find('.interaction-click-control-sign-in-existing-account').click
 end
 

@@ -89,6 +89,7 @@ group :development do
 end
 
 group :development, :test do
+gem 'pry'
   gem 'capistrano', '3.3.5'
   gem 'capistrano-rails', '1.1.6'
   gem 'email_spec', '2.0.0'

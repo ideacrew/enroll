@@ -24,7 +24,7 @@ When(/^the user clicks on the MEDICAID & TAX CREDITS button$/) do
 end
 
 Then(/^EA sets a flag in IAM to direct the consumer to the curam\/ drupal login$/) do
-  expect(page).to have_content('info@dchealthlink.com')
+  expect(page).to have_content('info@bewellnm.com')
 end
 
 When(/^selects a Person account and navigates to Verification page$/) do
