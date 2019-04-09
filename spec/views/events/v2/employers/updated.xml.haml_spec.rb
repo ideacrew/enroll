@@ -17,6 +17,7 @@ RSpec.describe "events/v2/employer/updated.haml.erb" , dbclean: :after_each do
     }
     let(:benefit_application) { employer_profile.latest_benefit_application }
     let(:product_package) { benefit_market_catalog.product_packages.where(package_kind: :single_issuer).first }
+    let(:dental_contribution_moode) { }
     let!(:dental_product_package) {benefit_market_catalog.product_packages.where(product_kind: :dental).first}
     let!(:benefit_package) { FactoryBot.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application, product_package: product_package) }
     let!(:health_sponsored_benefit) {benefit_package.health_sponsored_benefit}
@@ -140,8 +141,8 @@ RSpec.describe "events/v2/employer/updated.haml.erb" , dbclean: :after_each do
             :benefit_sponsors_benefit_packages_benefit_package,
             benefit_application: benefit_application,
             product_package: product_package,
-            dental_sponsored_benefit:true, 
-            dental_product_package:dental_product_package
+            dental_sponsored_benefit: true, 
+            dental_product_package: dental_product_package
           )
         end
         let!(:dental_sponsored_benefit) { benefit_package.dental_sponsored_benefit }
@@ -150,13 +151,14 @@ RSpec.describe "events/v2/employer/updated.haml.erb" , dbclean: :after_each do
           FactoryBot.build(
             :benefit_sponsors_sponsored_benefits_sponsor_contribution,
             product_package: dental_product_package,
-            sponsored_benefit:dental_sponsored_benefit
+            sponsored_benefit: dental_sponsored_benefit
           )
         end
         
         before do
           allow(sponsor_contribution).to receive(:contribution_model).and_return(product_package.contribution_model)
-          BenefitSponsors::SponsoredBenefits::ContributionLevel.any_instance.stub_chain(:contribution_unit, :name).and_return('employee')
+          allow(dental_sponsored_benefit).to receive(:sponsor_contribution).and_return(dental_sponsor_contribution)
+          allow(dental_sponsor_contribution).to receive(:contribution_model).and_return(dental_product_package.contribution_model)
         end
 
         it "shows the dental plan in output" do
