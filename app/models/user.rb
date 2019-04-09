@@ -13,7 +13,9 @@ class User
   validates_presence_of :oim_id
   validates_uniqueness_of :oim_id, :case_sensitive => false
   validate :oim_id_rules
-  validates_uniqueness_of :email,:case_sensitive => false
+  validates :email,
+   uniqueness: { :case_sensitive => false },
+   format: { with: Devise::email_regexp, allow_blank: true, message: "(optional) is invalid" }
 
   scope :datatable_search, ->(query) {
     search_regex = ::Regexp.compile(/.*#{query}.*/i)
