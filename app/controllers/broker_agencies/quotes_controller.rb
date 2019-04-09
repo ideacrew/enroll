@@ -290,7 +290,7 @@ class BrokerAgencies::QuotesController < ApplicationController
     if @qh
       if @qh.quote_members.find(params[:member_id]).delete
         respond_to do |format|
-          format.js { render :nothing => true}
+          format.js { render body: nil}
         end
       end
     end
@@ -301,9 +301,10 @@ class BrokerAgencies::QuotesController < ApplicationController
     @qh = @quote.quote_households.find(params[:household_id])
     if @qh.destroy
       respond_to do |format|
-        format.js { render :nothing => true }
+        format.js { render body: nil}
       end
     end
+    # return true
   end
 
   def delete_benefit_group
