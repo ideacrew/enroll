@@ -1,10 +1,13 @@
 class FinancialAssistance::ApplicationsController < ApplicationController
   before_action :set_current_person
   before_action :set_primary_family
+  before_action :check_eligibility, only: [:create, :get_help_paying_coverage_response, :copy]
 
   include UIHelpers::WorkflowController
   include NavigationHelper
   include Acapi::Notifiers
+  include L10nHelper
+  include FinancialAssistanceHelper
   require 'securerandom'
 
   before_filter :load_support_texts, only: [:edit, :help_paying_coverage]
@@ -20,8 +23,8 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def create
-    @application = @person.primary_family.applications.new
-    @application.populate_applicants_for(@person.primary_family)
+    @application = @family.applications.new
+    @application.populate_applicants_for(@family)
     @application.save!
 
     redirect_to edit_financial_assistance_application_path(@application)
@@ -99,8 +102,6 @@ class FinancialAssistance::ApplicationsController < ApplicationController
       flash[:error] = "Please choose an option before you proceed."
       redirect_to help_paying_coverage_financial_assistance_applications_path
     elsif params["is_applying_for_assistance"] == "true"
-      person = FinancialAssistance::Factories::AssistanceFactory.new(@person)
-      @assistance_status, @message = person.search_existing_assistance
       @family.is_applying_for_assistance = @assistance_status
       @family.save!
       @assistance_status ? aqhp_flow : redirect_to_msg
@@ -177,6 +178,17 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   private
+
+  def check_eligibility
+    call_service
+    return if params['action'] == "get_help_paying_coverage_response"
+    [(flash[:error] = l10n(decode_msg(@message))), (redirect_to financial_assistance_applications_path)] unless @assistance_status
+  end
+
+  def call_service
+    person = FinancialAssistance::Factories::AssistanceFactory.new(@person)
+    @assistance_status, @message = person.search_existing_assistance
+  end
 
   def set_primary_family
     @family = @person.primary_family
