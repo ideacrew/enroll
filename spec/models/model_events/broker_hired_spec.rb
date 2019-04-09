@@ -38,11 +38,6 @@ RSpec.describe 'ModelEvents::BrokerHired', dbclean: :around_each  do
           expect(payload[:event_object_id]).to eq employer_profile.id.to_s
         end
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
-          expect(event_name).to eq "acapi.info.events.broker_agency.broker_agency_hired_confirmation_to_agency"
-          expect(payload[:event_object_kind]).to eq 'EmployerProfile'
-          expect(payload[:event_object_id]).to eq employer_profile.id.to_s
-        end
-        expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employer.broker_hired_confirmation_to_employer"
           expect(payload[:event_object_kind]).to eq 'EmployerProfile'
           expect(payload[:event_object_id]).to eq employer_profile.id.to_s
@@ -120,76 +115,6 @@ RSpec.describe 'ModelEvents::BrokerHired', dbclean: :around_each  do
 
       it "should return employer poc last name" do
         expect(merge_model.employer_poc_lastname).to eq employer_profile.staff_roles.first.last_name
-      end
-
-      it "should return broker agency name " do
-        expect(merge_model.broker_agency_name).to eq broker_agency_profile.legal_name
-      end
-    end
-
-
-    context "when broker_agency_hired_confirmation is triggered" do
-      let(:data_elements) {
-        [
-          "broker_agency_profile.notice_date",
-          "broker_agency_profile.employer_name",
-          "broker_agency_profile.first_name",
-          "broker_agency_profile.last_name",
-          "broker_agency_profile.assignment_date",
-          "broker_agency_profile.broker_agency_name",
-          "broker_agency_profile.employer_poc_firstname",
-          "broker_agency_profile.employer_poc_lastname",
-          "broker_agency_profile.employer_poc_phone",
-          "broker_agency_profile.employer_poc_email"
-        ]
-      }
-
-      let(:recipient) { "Notifier::MergeDataModels::BrokerAgencyProfile" }
-      let(:template)  { Notifier::Template.new(data_elements: data_elements) }
-      let(:payload)   { {
-          "event_object_kind" => "EmployerProfile",
-          "event_object_id" => employer_profile.id
-      } }
-      let(:subject) { Notifier::NoticeKind.new(template: template, recipient: recipient) }
-      let(:merge_model) { subject.construct_notice_object }
-
-      before do
-        allow(subject).to receive(:resource).and_return(broker_agency_profile)
-        allow(subject).to receive(:payload).and_return(payload)
-      end
-
-      it "should return merge model" do
-        expect(merge_model).to be_a(recipient.constantize)
-      end
-
-      it "should return notice date" do
-        expect(merge_model.notice_date).to eq TimeKeeper.date_of_record.strftime('%m/%d/%Y')
-      end
-
-      it "should return employer name" do
-        expect(merge_model.employer_name).to eq employer_profile.legal_name
-      end
-
-      it "should return broker first and last name" do
-        expect(merge_model.first_name).to eq broker_agency_profile.primary_broker_role.person.first_name
-        expect(merge_model.last_name).to eq broker_agency_profile.primary_broker_role.person.last_name
-      end
-
-      it "should return broker assignment date" do
-        expect(merge_model.assignment_date).to eq model_instance.start_on.strftime('%m/%d/%Y')
-      end
-
-      it "should return employer poc name" do
-        expect(merge_model.employer_poc_firstname).to eq employer_profile.staff_roles.first.first_name
-        expect(merge_model.employer_poc_lastname).to eq employer_profile.staff_roles.first.last_name
-      end
-
-      it "should return employer poc phone" do
-        expect(merge_model.employer_poc_phone).to eq employer_profile.staff_roles.first.work_phone_or_best
-      end
-
-      it "should return employer poc email" do
-        expect(merge_model.employer_poc_email).to eq employer_profile.staff_roles.first.work_email_or_best
       end
 
       it "should return broker agency name " do
