@@ -79,8 +79,8 @@ RSpec.configure do |config|
   # config.filter_gems_from_backtrace("gem name")
 #  config.include ModelMatcherHelpers, :type => :model
   config.include Mongoid::Matchers, type: :model
-  config.include Devise::TestHelpers, :type => :controller
-  config.include Devise::TestHelpers, :type => :view
+  config.include Devise::Test::ControllerHelpers, :type => :controller
+  config.include Devise::Test::ControllerHelpers, :type => :view
   config.include FactoryBot::Syntax::Methods
   config.include Capybara::DSL
 
