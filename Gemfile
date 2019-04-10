@@ -112,6 +112,7 @@ end
 group :development, :test do
   gem 'capistrano', '3.3.5'
   gem 'capistrano-rails', '1.1.6'
+  gem 'climate_control', '0.2.0'
   gem 'email_spec', '2.0.0'
   gem 'factory_girl_rails', '4.6.0'
   gem 'forgery'
