@@ -1,8 +1,10 @@
 <div class="page-break">
   <%= render partial: 'shared/logo_and_address', :locals => {notice: notice}  %>
 
-  <% if recipient.shop? || recipient.individual? %>
+  <% if recipient.shop? %>
     <%= render partial: 'layouts/notifier/dc_shop_address', :locals => {notice: notice, show_mpi_indicator: false, recipient: recipient, notice_recipient: notice_recipient} %>
+  <% elsif recipient.individual? %>
+    <%= render partial: 'layouts/notifier/dc_ivl_address', :locals => {notice: notice, show_mpi_indicator: false, recipient: recipient, notice_recipient: notice_recipient} %>
   <% else %>
     <%= render partial: 'notices/shared/address', :locals => {notice: notice, show_mpi_indicator: false} %>
   <% end %>
@@ -28,11 +30,7 @@
     </tbody>
   </table>
 
-  <% if recipient.shop? %>
-    <table class="total_table" border="0" style="margin-top: 260px;">
-  <% else %>
-    <table class="total_table" border="0" style="margin-top: 200px;">
-  <% end %>
+  <table class="total_table" border="0" style="margin-top: 260px;">
     <tbody>
       <tr>
         <td><%= notice.notice_number %></td>
