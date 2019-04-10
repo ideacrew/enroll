@@ -2,7 +2,7 @@
 <% if dc_exchange? %>
 <%= render partial: 'layouts/notifier/dc_cover_page', :locals => {notice: notice, recipient: recipient, notice_recipient: notice_recipient } %>
 <%= render partial: 'shared/logo_and_address', :locals => {notice: notice} %>
-<%= render partial: "layouts/notifier/dc_shop_address", :locals => {notice: notice, recipient: recipient, notice_recipient: notice_recipient } %>
+<%= render partial: "layouts/notifier/dc_ivl_address", :locals => {notice: notice, recipient: recipient, notice_recipient: notice_recipient } %>
 <% else %>
 <%= render 'cover', recipient: recipient, notice_number: notice_number %>
 <%= render 'logo' %>
