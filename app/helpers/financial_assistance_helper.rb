@@ -202,6 +202,7 @@ module FinancialAssistanceHelper
   end
 
   def income_and_deductions_for_any(application)
+    return false if application.blank?
     application.applicants.each do |applicant|
       return true if income_and_deductions_for(applicant).present?
     end

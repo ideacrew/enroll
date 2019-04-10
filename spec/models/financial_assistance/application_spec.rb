@@ -578,6 +578,35 @@ RSpec.describe FinancialAssistance::Application, type: :model do
     end
   end
 
+  context 'is_reviewable?' do
+    let(:faa) { double(:application) }
+    context 'when submitted' do
+      it 'should return true' do
+        allow(application).to receive(:aasm_state).and_return('submitted')
+        expect(application.is_reviewable?).to eq true
+      end
+    end
+
+    context 'when determination_response_error' do
+      it 'should return true' do
+        allow(application).to receive(:aasm_state).and_return('determination_response_error')
+        expect(application.is_reviewable?).to eq true
+      end
+    end
+
+    context 'when determined' do
+      it 'should return true' do
+        allow(application).to receive(:aasm_state).and_return('determined')
+        expect(application.is_reviewable?).to eq true
+      end
+    end
+
+    it 'should return false if the application is in draft state' do
+      allow(application).to receive(:aasm_state).and_return('draft')
+      expect(application.is_reviewable?).to eq false
+    end
+  end
+
   describe 'check the validity of an application' do
 
     let!(:valid_app) { FactoryGirl.create(:application, aasm_state: 'draft', family: family, applicants: [applicant_primary]) }
