@@ -5,9 +5,9 @@
   br
   h1.no-buffer
     strong
-      = 'Be Well New Mexico'
+      = l10n('.welcome_to_site_name', short_name: Settings.site.short_name)
   h3.darkblue.no-buffer#nm_title
-    = "New Mexico's Health Insurance Exchange"
+    = l10n('.site_byline')
   br
   - if user_signed_in?
     strong
