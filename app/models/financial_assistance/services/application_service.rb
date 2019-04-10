@@ -28,14 +28,14 @@ module FinancialAssistance
       end
 
       def sync!
-        new!(drafted_app).sync_family_members_with_applicants
+        new(drafted_app).sync_family_members_with_applicants
       end
 
       def copy!
-        new!(submitted_app).copy_application
+        new(submitted_app).copy_application
       end
 
-      def new!(application)
+      def new(application)
         factory_klass.new(application)
       end
 
