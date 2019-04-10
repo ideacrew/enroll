@@ -553,7 +553,7 @@ module BenefitSponsors
 
         it "should find sponsorships with application in approved state and matching open enrollment begin date" do
           expect(subject.may_begin_open_enrollment?(april_open_enrollment_begin_on).size).to eq (march_sponsors.size + april_sponsors.size)
-          expect(subject.may_begin_open_enrollment?(april_open_enrollment_begin_on).to_a).to eq (march_sponsors + april_sponsors)
+          expect(subject.may_begin_open_enrollment?(april_open_enrollment_begin_on).to_a.sort).to eq ((march_sponsors + april_sponsors).sort)
         end
       end
 
@@ -564,7 +564,7 @@ module BenefitSponsors
 
           it "matching open enrollment end on date should be returned" do
             expect(subject.may_end_open_enrollment?(april_open_enrollment_end_on.next_day).size).to eq (march_sponsors.size + april_sponsors.size + april_renewal_sponsors.size)
-            expect(subject.may_end_open_enrollment?(april_open_enrollment_end_on.next_day).to_a).to eq (march_sponsors + april_sponsors + april_renewal_sponsors)
+            expect(subject.may_end_open_enrollment?(april_open_enrollment_end_on.next_day).to_a.sort).to eq ((march_sponsors + april_sponsors + april_renewal_sponsors).sort)
           end
         end
 
@@ -574,7 +574,7 @@ module BenefitSponsors
 
           it "matching open enrollment end on date should be returned" do
             expect(subject.may_end_open_enrollment?(april_open_enrollment_end_on.next_day).size).to eq (march_sponsors.size + april_sponsors.size + april_renewal_sponsors.size)
-            expect(subject.may_end_open_enrollment?(april_open_enrollment_end_on.next_day).to_a).to eq (march_sponsors + april_sponsors + april_renewal_sponsors)
+            expect(subject.may_end_open_enrollment?(april_open_enrollment_end_on.next_day).to_a.sort).to eq ((march_sponsors + april_sponsors + april_renewal_sponsors).sort)
           end
         end
       end
@@ -585,10 +585,10 @@ module BenefitSponsors
 
         it "should find sponsorships with application in enrollment_eligible state and matching effective period begin date" do
           expect(subject.may_begin_benefit_coverage?(march_effective_date).size).to eq (march_sponsors.size)
-          expect(subject.may_begin_benefit_coverage?(march_effective_date).to_a).to eq (march_sponsors)
+          expect(subject.may_begin_benefit_coverage?(march_effective_date).to_a.sort).to eq (march_sponsors.sort)
 
           expect(subject.may_begin_benefit_coverage?(april_effective_date).size).to eq (march_sponsors.size + april_sponsors.size + april_renewal_sponsors.size)
-          expect(subject.may_begin_benefit_coverage?(april_effective_date).to_a).to eq (march_sponsors + april_sponsors + april_renewal_sponsors)
+          expect(subject.may_begin_benefit_coverage?(april_effective_date).to_a.sort).to eq ((march_sponsors + april_sponsors + april_renewal_sponsors).sort)
         end
       end
 
@@ -599,10 +599,10 @@ module BenefitSponsors
 
         it "should find sponsorships with application in active state and matching effective period end date" do
           expect(subject.may_end_benefit_coverage?(march_effective_date.next_year).size).to eq (march_sponsors.size)
-          expect(subject.may_end_benefit_coverage?(march_effective_date.next_year).to_a).to eq (march_sponsors)
+          expect(subject.may_end_benefit_coverage?(march_effective_date.next_year).to_a.sort).to eq (march_sponsors.sort)
 
           expect(subject.may_end_benefit_coverage?(april_effective_date.next_year).size).to eq (march_sponsors.size + april_sponsors.size + april_renewal_sponsors.size)
-          expect(subject.may_end_benefit_coverage?(april_effective_date.next_year).to_a).to eq (march_sponsors + april_sponsors + april_renewal_sponsors)
+          expect(subject.may_end_benefit_coverage?(april_effective_date.next_year).to_a.sort).to eq ((march_sponsors + april_sponsors + april_renewal_sponsors).sort)
         end
       end
 
@@ -611,7 +611,7 @@ module BenefitSponsors
 
         it "should find sponsorships with application in active state and matching effective period begin date" do
           expect(subject.may_renew_application?(april_effective_date.prev_day).size).to eq (april_renewal_sponsors.size)
-          expect(subject.may_renew_application?(april_effective_date.prev_day).to_a).to eq (april_renewal_sponsors)
+          expect(subject.may_renew_application?(april_effective_date.prev_day).to_a.sort).to eq (april_renewal_sponsors.sort)
         end
       end
 
@@ -692,10 +692,10 @@ module BenefitSponsors
 
         it "should find initial sponsorships with applications in enrollment_closed state and matching effective date" do
           expect(subject.may_transition_as_initial_ineligible?(march_effective_date).size).to eq (march_sponsors.size)
-          expect(subject.may_transition_as_initial_ineligible?(march_effective_date).to_a).to eq (march_sponsors)
+          expect(subject.may_transition_as_initial_ineligible?(march_effective_date).to_a.sort).to eq (march_sponsors.sort)
 
           expect(subject.may_transition_as_initial_ineligible?(april_effective_date).size).to eq (april_ineligible_sponsors.size)
-          expect(subject.may_transition_as_initial_ineligible?(april_effective_date).to_a).to eq (april_ineligible_sponsors)
+          expect(subject.may_transition_as_initial_ineligible?(april_effective_date).to_a.sort).to eq (april_ineligible_sponsors.sort)
         end
       end
 
@@ -713,10 +713,10 @@ module BenefitSponsors
 
         it "should find sponsorships with application in enrollment_eligible state and matching effective period begin date" do
           expect(subject.may_cancel_ineligible_application?(march_effective_date).size).to eq (march_sponsors.size)
-          expect(subject.may_cancel_ineligible_application?(march_effective_date).to_a).to eq (march_sponsors)
+          expect(subject.may_cancel_ineligible_application?(march_effective_date).to_a.sort).to eq (march_sponsors.sort)
 
           expect(subject.may_cancel_ineligible_application?(april_effective_date).size).to eq (april_ineligible_sponsors.size + april_renewal_sponsors.size)
-          expect(subject.may_cancel_ineligible_application?(april_effective_date).to_a).to eq (april_ineligible_sponsors + april_renewal_sponsors)
+          expect(subject.may_cancel_ineligible_application?(april_effective_date).to_a.sort).to eq ((april_ineligible_sponsors + april_renewal_sponsors).sort)
         end
       end
     end
