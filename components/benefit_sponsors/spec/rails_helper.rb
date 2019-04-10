@@ -22,7 +22,7 @@ FactoryBot.definition_file_paths = [
   File.expand_path(File.join(File.dirname(__FILE__),'../../benefit_markets/spec/factories')),
   File.expand_path(File.join(File.dirname(__FILE__),'dummy/spec/factories'))
 ]
-# FactoryBot.find_definitions
+FactoryBot.find_definitions
 
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|
