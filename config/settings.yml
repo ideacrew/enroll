@@ -27,6 +27,7 @@ contact_center:
   name: "DC Health Link's Customer Care Center"
   alt_name: "DC Health Link Customer Service"
   phone_number: "1-855-532-5465"
+  short_number: "(855) 532-5465"
   tty_number: "1-855-532-5465"
   tty: "771"
   alt_phone_number: "1-855-532-LINK"
