@@ -6,7 +6,7 @@ module BenefitSponsors
 
     subject { BenefitSponsors::Organizations::OrganizationForms::OrganizationForm }
 
-    describe "model attributes" do
+    describe "model attributes", dbclean: :after_each do
 
       let!(:params) {
         {
@@ -38,12 +38,32 @@ module BenefitSponsors
         expect(new_form).to_not be_valid
       end
 
-      it "new form with invalid fein" do
-        params[:fein]='1112222'
+      it "new form with invalid legal_name" do
+        params[:legal_name]= nil
         new_form = subject.new params
         new_form.validate
         expect(new_form).to_not be_valid
-        expect(new_form.errors.messages.has_key?(:fein)).to eq true
+        expect(new_form.errors.messages.has_key?(:legal_name)).to eq true
+      end
+
+      context "for fein" do
+        it "new form should not be valid when fein is nil for benefit_sponsor" do
+          params[:fein]=nil
+          new_form = subject.new params
+          new_form.profile_type = "benefit_sponsor"
+          new_form.validate
+          expect(new_form).to_not be_valid
+          expect(new_form.errors.messages.has_key?(:fein)).to eq true
+        end
+
+        it "new form should be valid when fein is nil for broker_agency" do
+          params[:fein]=nil
+          new_form = subject.new params
+          new_form.profile_type = "broker_agency"
+          new_form.validate
+          expect(new_form).to be_valid
+          expect(new_form.errors.messages.has_key?(:fein)).to eq false
+        end
       end
     end
   end

@@ -19,10 +19,10 @@ module BenefitSponsors
 
       validates :fein,
         length: { is: 9, message: "%{value} is not a valid FEIN" },
-        numericality: true
+        numericality: true, if: :is_employer_profile?
 
-      validates_presence_of :entity_kind
-      validates_presence_of :fein, :legal_name
+      validates_presence_of :entity_kind, :legal_name
+      validates_presence_of :fein, if: :is_employer_profile?
 
       def persisted?
         false
@@ -37,6 +37,14 @@ module BenefitSponsors
       def fein=(new_fein)
         fein = new_fein.to_s.gsub(/\D/, '') rescue nil
         super fein
+      end
+
+      def is_broker_profile?
+        profile_type == "broker_agency"
+      end
+
+      def is_employer_profile?
+        profile_type == "benefit_sponsor"
       end
 
       def profile_attributes=(profile_params)
