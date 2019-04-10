@@ -10,27 +10,29 @@
     <%= link_to 'Continue', next_url, class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue', disabled: (local_assigns[:disabled].nil? ? false : disabled) unless (action_name == "eligibility_results") && (params.keys.exclude?"cur") %>
 <% end %>
 
-<ul class='list-unstyled list-right-section'>
-  <li>
-    <%= link_to previous_url do %>
-      <%= image_tag 'icons/list.png' %>
-      PREVIOUS
-    <% end %>
-  </li>
-  <li>
-    <a href="#">
-      <%= image_tag 'icons/list.png' %>
-      SAVE &amp; EXIT
-    </a>
-    <br>
-    <br>
-  </li>
-  <li>
-    <p class="aside-text">
-      If you select Save &amp; Exit, you can save your work and continue where you left off the next time you login.
-    </p>
-  </li>
-  <br class="clear">
-</ul>
+<% unless action_name == "review" %>
+  <ul class='list-unstyled list-right-section'>
+    <li>
+      <%= link_to previous_url do %>
+        <%= image_tag 'icons/list.png' %>
+        PREVIOUS
+      <% end %>
+    </li>
+    <li>
+      <a href="#">
+        <%= image_tag 'icons/list.png' %>
+        SAVE &amp; EXIT
+      </a>
+      <br>
+      <br>
+    </li>
+    <li>
+      <p class="aside-text">
+        If you select Save &amp; Exit, you can save your work and continue where you left off the next time you login.
+      </p>
+    </li>
+    <br class="clear">
+  </ul>
+<% end %>
 
 <%= render partial: 'shared/help_me_sign_up' %>
