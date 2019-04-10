@@ -495,6 +495,7 @@ describe HbxEnrollment, dbclean: :after_all do
       }
       let(:hbx_enrollment_members) { enrollment.hbx_enrollment_members}
       let(:active_year) {TimeKeeper.date_of_record.year}
+      let(:thhs) {family.households.first.tax_households}
 
       before :each do
         allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
@@ -504,7 +505,7 @@ describe HbxEnrollment, dbclean: :after_all do
 
       it "should return plans with csr kind when individual market is selected" do
         decorated_plans = enrollment.decorated_elected_plans('health', enrollment.kind)
-        expect(decorated_plans). to eq (benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, 'health', tax_household))
+        expect(decorated_plans). to eq(benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, 'health', thhs))
       end
     end
 
@@ -538,6 +539,7 @@ describe HbxEnrollment, dbclean: :after_all do
       let(:consumer_role) { FactoryGirl.create(:consumer_role) }
       let(:person) { household.family.primary_applicant.person}
       let(:family) { household.family }
+      let(:application) { double(family: family)}
       let(:enrollment) {
         enrollment = household.new_hbx_enrollment_from(
           consumer_role: consumer_role,
@@ -566,6 +568,8 @@ describe HbxEnrollment, dbclean: :after_all do
           allow(household).to receive(:family).and_return family
           allow(family).to receive(:is_under_special_enrollment_period?).and_return false
           allow(family).to receive(:is_under_ivl_open_enrollment?).and_return true
+          allow(family).to receive(:active_approved_application).and_return application
+          allow(application).to receive(:latest_active_tax_households_with_year).and_return []
           allow(enrollment).to receive(:enrollment_kind).and_return "open_enrollment"
         end
 
@@ -604,6 +608,8 @@ describe HbxEnrollment, dbclean: :after_all do
         end
 
         it "should return decoratored plans when not in the open enrollment" do
+          allow(family).to receive(:active_approved_application).and_return application
+          allow(application).to receive(:latest_active_tax_households_with_year).and_return []
           enrollment.update_attributes(effective_on: sep.effective_on - 1.month)
           allow(renewal_bcp).to receive(:open_enrollment_contains?).and_return false
           allow(benefit_sponsorship).to receive(:benefit_coverage_period_by_effective_date).with(enrollment.effective_on).and_return(bcp)

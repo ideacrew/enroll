@@ -55,6 +55,6 @@ module HbxAdminHelper
   end
 
   def active_eligibility?(family)
-    family.active_household.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year) ? 'Yes' : 'No'
+    family.active_household.latest_active_tax_households_with_year(TimeKeeper.date_of_record.year) ? 'Yes' : 'No'
   end
 end

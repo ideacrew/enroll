@@ -307,6 +307,10 @@ class EmployerProfile
     self.profile_source.to_s == "conversion"
   end
 
+  def is_conversion?
+    self.profile_source.to_s == "conversion"
+  end
+
   def is_converting?
     self.is_conversion? && published_plan_year.present? && published_plan_year.is_conversion
   end

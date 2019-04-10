@@ -6,11 +6,13 @@ class Insured::VerificationDocumentsController < ApplicationController
 
   def upload
     @doc_errors = []
+    application_in_context = @family.latest_applicable_submitted_application
+    applicant = application_in_context.applicants.where(family_member_id: params[:family_member]).first if application_in_context
     if params[:file]
       params[:file].each do |file|
         doc_uri = Aws::S3Storage.save(file_path(file), 'id-verification')
         if doc_uri.present?
-          if update_vlp_documents(file_name(file), doc_uri)
+          if update_vlp_documents(file_name(file), doc_uri, applicant)
             add_type_history_element(file)
             flash[:notice] = "File Saved"
           else
@@ -42,6 +44,7 @@ class Insured::VerificationDocumentsController < ApplicationController
   end
 
   private
+
   def updateable?
     authorize Family, :updateable?
   end
@@ -73,12 +76,20 @@ class Insured::VerificationDocumentsController < ApplicationController
     @docs_owner = Person.find(params[:docs_owner]) if params[:docs_owner]
   end
 
-  def update_vlp_documents(title, file_uri)
-    document = @verification_type.vlp_documents.build
-    success = document.update_attributes({:identifier=>file_uri, :subject => title, :title=>title, :status=>"downloaded"})
-    @verification_type.update_attributes(:rejected => false, :validation_status => "review", :update_reason => "document uploaded")
-    @doc_errors = document.errors.full_messages unless success
-    @docs_owner.save!
+  def update_vlp_documents(title, file_uri, applicant=nil)
+    v_type = params[:verification_type]
+
+    if FinancialAssistance::AssistedVerification::VERIFICATION_TYPES.include?(v_type)
+      @document = applicant.assisted_verifications.where(verification_type: params[:verification_type] ).first.assisted_verification_documents.build
+      success = @document.update_attributes({:identifier=>file_uri, :title=>title, :status=>"downloaded"})
+    else
+      document = @verification_type.vlp_documents.build
+      success = document.update_attributes({:identifier=>file_uri, :subject => title, :title=>title, :status=>"downloaded"})
+      @verification_type.update_attributes(:rejected => false, :validation_status => "review", :update_reason => "document uploaded")
+    end
+
+    @doc_errors = @document.errors.full_messages unless success
+    @docs_owner.save
   end
 
   def update_paper_application(title, file_uri)

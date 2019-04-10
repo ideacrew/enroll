@@ -1,9 +1,9 @@
-.container.home.module.welcome
+.container.home.module.welcome#welcome
   br
   br
   br
   br
-  h1.no-buffer
+  h1.no-buffer#nm_title
     strong
       = l10n('.welcome_to_site_name', short_name: Settings.site.short_name)
   h3.darkblue.no-buffer#nm_title
@@ -15,13 +15,13 @@
     br
     br
   
-  = link_to l10n(".consumer_family_portal"), privacy_insured_consumer_role_index_path(uqhp: true), class: "btn btn-default"
-  = link_to l10n(".assisted_consumer_family_portal"), privacy_insured_consumer_role_index_path(aqhp: true), class: "btn btn-default"
-  = link_to l10n(".returning_user"), family_account_path, class: "btn btn-default"
-  = link_to l10n(".broker_agency_portal"), broker_agencies_root_path, class: "btn btn-default"
-  = link_to l10n(".hbx_portal"), exchanges_hbx_profiles_root_path, class: "btn btn-default"
+  = link_to l10n(".consumer_family_portal"), privacy_insured_consumer_role_index_path(uqhp: true), class: "home-button btn btn-default "
+  = link_to l10n(".assisted_consumer_family_portal"), privacy_insured_consumer_role_index_path(aqhp: true), class: "home-button btn btn-default "
+  = link_to l10n(".returning_user"), family_account_path, class: " home-button btn btn-default "
+  = link_to l10n(".broker_agency_portal"), broker_agencies_root_path, class: " home-button btn btn-default "
+  = link_to l10n(".hbx_portal"), exchanges_hbx_profiles_root_path, class: " home-button btn btn-default "
 
   - if !user_signed_in?
-    = link_to l10n(".broker_registration"), broker_registration_path, class: "btn btn-default"
+    = link_to l10n(".broker_registration"), broker_registration_path, class: " home-button btn btn-default "
   .div#welcome-nav-options
     = image_tag ("nm_hero.png"), :class => "pfl_cover" 

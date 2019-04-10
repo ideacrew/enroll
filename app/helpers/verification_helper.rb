@@ -74,6 +74,12 @@ module VerificationHelper
     person.consumer_role.aasm_state != "fully_verified"
   end
 
+  def applicant_unverified?
+    applicant = @f_member.applicant_for_verification
+    return false unless applicant
+    applicant.aasm_state != "fully_verified" if applicant.present?
+  end
+
   def enrollment_group_unverified?(person)
     person.primary_family.contingent_enrolled_active_family_members.flat_map(&:person).flat_map(&:consumer_role).flat_map(&:verification_types).select{|type| type.is_type_outstanding?}.any?
   end
