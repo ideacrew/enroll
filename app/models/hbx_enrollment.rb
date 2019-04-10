@@ -402,7 +402,7 @@ class HbxEnrollment
 
   def parent_enrollment
     return nil if predecessor_enrollment_id.blank?
-    HbxEnrollment.find(predecessor_enrollment_id).first
+    HbxEnrollment.find(predecessor_enrollment_id)
   end
 
   def census_employee
@@ -517,13 +517,13 @@ class HbxEnrollment
     end
   end
 
-  def construct_waiver_enrollment(terminate_reason = nil, waiver_reason = nil)
+  def construct_waiver_enrollment(waiver_reason = nil)
     employee_role =  self.employee_role
     coverage_household = employee_role.person.primary_family.active_household.immediate_family_coverage_household
     waived_enrollment = coverage_household.household.new_hbx_enrollment_from(employee_role: employee_role, coverage_household: coverage_household, benefit_group: benefit_group, benefit_group_assignment: benefit_group_assignment, qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
     waived_enrollment.coverage_kind = coverage_kind
     waived_enrollment.kind = 'employer_sponsored_cobra' if employee_role.present? && employee_role.is_cobra_status?
-    waived_enrollment.terminate_reason = terminate_reason if terminate_reason
+    waived_enrollment.terminate_reason = terminate_reason if self.terminate_reason
     waived_enrollment.waiver_reason = waiver_reason if waiver_reason
     waived_enrollment.predecessor_enrollment_id = self._id
     waived_enrollment.generate_hbx_signature
@@ -562,16 +562,17 @@ class HbxEnrollment
   def terminate_enrollment(coverage_end_date = TimeKeeper.date_of_record.end_of_month, terminate_reason)
     if coverage_end_date >= TimeKeeper.date_of_record
       if may_schedule_coverage_termination?
+        update_attributes(terminate_reason: terminate_reason)
         schedule_coverage_termination!(coverage_end_date) 
       end  
     else
-      terminate_coverage!(coverage_end_date) if may_terminate_coverage? #terminate coverage if enrollment is past effective
+      update_attributes(terminate_reason: terminate_reason) && terminate_coverage!(coverage_end_date) if may_terminate_coverage? #terminate coverage if enrollment is past effective
     end
 
     if is_shop?
       if coverage_termination_pending? || coverage_terminated?
         unless waiver_enrollment_present?
-          waiver = construct_waiver_enrollment(terminate_reason)
+          waiver = construct_waiver_enrollment
           waiver.waive_coverage!
         end
       end

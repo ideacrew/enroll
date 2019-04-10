@@ -107,21 +107,26 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def waive
     hbx_enrollment = HbxEnrollment.find(params.require(:id))
-    if params[:waiver_reason] && !hbx_enrollment.shopping?
-      @waiver_enrollment = hbx_enrollment.construct_waiver_enrollment(nil, params[:waiver_reason]) if !hbx_enrollment.waiver_enrollment_present? # do not construct waiver enrollment if already been created
-    else
-      @waiver_enrollment = hbx_enrollment
-    end
+    begin
+      if params[:waiver_reason] && !hbx_enrollment.shopping?
+        @waiver_enrollment = hbx_enrollment.construct_waiver_enrollment(params[:waiver_reason]) if !hbx_enrollment.waiver_enrollment_present? # do not construct waiver enrollment if already been created
+      else
+        @waiver_enrollment = hbx_enrollment
+      end
 
-    if @waiver_enrollment.may_waive_coverage?
-      @waiver_enrollment.waiver_reason = params[:waiver_reason]
-      @waiver_enrollment.waive_enrollment
-    end
+      if @waiver_enrollment.may_waive_coverage?
+        @waiver_enrollment.waiver_reason = params[:waiver_reason]
+        @waiver_enrollment.waive_enrollment
+      end
 
-    if @waiver_enrollment.inactive?
-      redirect_to print_waiver_insured_plan_shopping_path(@waiver_enrollment), notice: "Waive Coverage Successful"
-    else
-      redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: @waiver_enrollment.id), alert: "Waive Coverage Failed"
+      if @waiver_enrollment.inactive?
+        redirect_to print_waiver_insured_plan_shopping_path(@waiver_enrollment), notice: "Waive Coverage Successful"
+      else
+        redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), alert: "Waive Coverage Failed"
+      end
+    rescue => e
+      log(e.message, :severity=>'error')
+      redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), alert: "Waive Coverage Failed"
     end
   end
 

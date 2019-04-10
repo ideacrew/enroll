@@ -415,7 +415,7 @@ describe HbxEnrollment, dbclean: :after_all do
         )
         @enrollment5.save
         @enrollment5.reload
-        @enrollment4 = @enrollment5.construct_waiver_enrollment(nil, 'waiver_reason')
+        @enrollment4 = @enrollment5.construct_waiver_enrollment('waiver_reason')
         @enrollment4.save
         @enrollment4.waive_enrollment
       end
