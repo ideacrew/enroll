@@ -1,7 +1,7 @@
 module BenefitSponsors
   module Organizations
     class BrokerAgencyProfile < BenefitSponsors::Organizations::Profile
-      include SetCurrentUser
+      include ::SetCurrentUser
       include AASM
       include ::Config::AcaModelConcern
 
