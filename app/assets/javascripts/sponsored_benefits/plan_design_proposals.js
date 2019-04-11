@@ -622,12 +622,16 @@ function saveProposalAndPublish(event) {
 }
 
 function AddDentalToPlanDesignProposal(event) {
+  event.preventDefault();
+  event.stopImmediatePropagation();
   saveProposal(event);
   var url = $("#add_dental_url").val()
   window.location.href = url + "&profile_id=" + $("#profile_id").val()
 }
 
 function saveProposalAndNavigateToReview(event) {
+  event.preventDefault();
+  event.stopImmediatePropagation();
   var data = buildBenefitGroupParams();
   if (proposalIsInvalid(data)) {
 
