@@ -16,37 +16,3 @@ test:
     iv: 1234567890ABCDEF
     cipher_name: aes-128-cbc
     version: 1
-release:
-  ciphers:
-  - keystore: :file
-    cipher_name: aes-256-cbc
-    version: 1
-    key_filename: "~/.symmetric-encryption/symmetric-encryption_release_v1.encrypted_key"
-    iv: !binary |-
-      jdTJL16lGnROMVXzBxsV+Q==
-    key_encrypting_key:
-      encrypted_key: !binary |-
-        pSvLdUvhdKZQrOwEwFlZN9FPkIL+99W4ih8kgFIykUju7t50UCFFkhIWIBRkx1SH
-      iv: !binary |-
-        /w2oHjBlS0uqxOUQRfjjfQ==
-      key_encrypting_key:
-        key_filename: "~/.symmetric-encryption/symmetric-encryption_release_v1.kekek"
-        iv: !binary |-
-          p3x8/pmCERrN0BPE0JZ8Rg==
-production:
-  ciphers:
-  - keystore: :file
-    cipher_name: aes-256-cbc
-    version: 1
-    key_filename: "~/.symmetric-encryption/symmetric-encryption_production_v1.encrypted_key"
-    iv: !binary |-
-      vD30I/nNxdhBRHxS0enzyg==
-    key_encrypting_key:
-      encrypted_key: !binary |-
-        QEuMF1WQW5A9x5TSjiN17t7fotzWxifS6Xfj9ZluPcgovuA/+UWTeQruZzF8FuaZ
-      iv: !binary |-
-        40u6ALwef03KdVaePl6SVQ==
-      key_encrypting_key:
-        key_filename: "~/.symmetric-encryption/symmetric-encryption_production_v1.kekek"
-        iv: !binary |-
-          ZLpprAFOv7g9SS5rR1sfHQ==
