@@ -6,16 +6,11 @@ require 'spec_helper'
 abort("The Rails environment is running in production mode!") if Rails.env.production?
 require 'rspec/rails'
 # Add additional requires below this line. Rails is not loaded until this point!
-require 'mongoid-rspec'
 require 'shoulda/matchers'
 require 'database_cleaner'
 require 'capybara/rails'
 require 'capybara/rspec'
-require "forgery"
 require 'factory_bot_rails'
-require 'test_prof'
-require 'test_prof/recipes/rspec/factory_default'
-require 'pundit/rspec'
 
 
 FactoryBot.definition_file_paths = [
@@ -24,11 +19,11 @@ FactoryBot.definition_file_paths = [
 ]
 FactoryBot.find_definitions
 
-Shoulda::Matchers.configure do |config|
-  config.integrate do |with|
-    with.test_framework :rspec
-  end
-end
+# Shoulda::Matchers.configure do |config|
+#   config.integrate do |with|
+#     with.test_framework :rspec
+#   end
+# end
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
 # run as spec files by default. This means that files in spec/support that end
@@ -94,4 +89,3 @@ RSpec.configure do |config|
     DatabaseCleaner.clean
   end
 end
-nd
