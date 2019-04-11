@@ -29,6 +29,12 @@ GIT
       ttfunk (~> 1.0.3)
 
 PATH
+  remote: components
+  specs:
+    ui_helpers (0.0.1)
+      rails (~> 4.2.3)
+
+PATH
   remote: project_gems/effective_datatables-2.6.14
   specs:
     effective_datatables (2.6.14)
@@ -702,6 +708,7 @@ DEPENDENCIES
   therubyracer
   turbolinks (= 2.5.3)
   uglifier (>= 1.3.0)
+  ui_helpers!
   unicorn (~> 4.8.3)
   virtus
   warden

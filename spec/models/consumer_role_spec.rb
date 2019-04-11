@@ -218,22 +218,25 @@ describe "#build_nested_models_for_person" do
   end
 end
 
-describe "#latest_active_tax_household_with_year" do
+describe "#latest_active_tax_households_with_year" do
   include_context "BradyBunchAfterAll"
   let(:family) { FactoryGirl.build(:family)}
   let(:consumer_role) { ConsumerRole.new }
+  let(:year) { TimeKeeper.date_of_record.year }
   before :all do
     create_tax_household_for_mikes_family
     @consumer_role = mike.consumer_role
-    @taxhouhold = mikes_family.latest_household.tax_households.last
+    @taxhouhold = mikes_family.latest_household.tax_households
   end
 
-  it "should rerturn active taxhousehold of this year" do
-    expect(@consumer_role.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year, mikes_family)).to eq @taxhouhold
+  it "should rerturn active taxhouseholds of this year" do
+    expect(@consumer_role.latest_active_tax_households_with_year(year, mikes_family)).to be_a Mongoid::Criteria
+    expect(@consumer_role.latest_active_tax_households_with_year(year, mikes_family).klass ==  TaxHousehold).to be true
+    expect(@consumer_role.latest_active_tax_households_with_year(year, mikes_family).map(&:effective_starting_on).map(&:year).uniq).to eq [year]
   end
 
   it "should rerturn nil when can not found taxhousehold" do
-    expect(consumer_role.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year, family)).to eq nil
+    expect(consumer_role.latest_active_tax_households_with_year(year, family)).to eq nil
   end
   context "vlp exist but document is NOT uploaded" do
       let(:person) {FactoryGirl.create(:person, :with_consumer_role)}

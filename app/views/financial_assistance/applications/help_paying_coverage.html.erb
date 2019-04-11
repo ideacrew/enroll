@@ -1,0 +1,54 @@
+<% content_for :horizontal_status do %>
+<% if show_component(request.path) %>
+<%= render :partial =>  'insured/families/horizontal_status.html.erb', locals: {step: 1} %>
+<% end %>
+<% end %>
+<%= form_tag(get_help_paying_coverage_response_financial_assistance_applications_path, method: :get) do %>
+<div class="container">
+  <div id="new_person_wrapper">
+    <div class="row">
+      <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+        <%= render :partial => 'shared/left_nav.html.erb' %>
+      </div>
+      <input type='hidden' name='exit_after_method' value='false' id='exit_after_method'>
+      <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 bottom-pd">
+        <div class="bottom-pd">
+          <h2 class="darkblue">Help Paying for Coverage</h2>
+          <p><b>You can get help paying for coverage if you qualify.</b> This includes Medicaid, tax credits that help you pay for your health plan, and cost-sharing reductions that lower your share of the costs for many health services. Select your choice, then select CONTINUE.</p>
+
+          <p class="memo">* = required field</p>
+
+          <div id="help_paying_coverage" class="focus_effect module">
+
+            <div class="row row-form-wrapper no-buffer">
+              <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 fa-text-color" style="margin-top: 10px">
+                <span class="fa-text-color" >Do you want to apply for <span href="#" data-toggle="tooltip" title="Medicaid is a joint federal-state health program that provides health care coverage to low-income and disabled adults, children and families. To be eligible for DC Medicaid, you must be a District resident and must meet non-financial and financial eligibility requirements. Medicaid covers many services, including doctor visits, hospital care, prescription drugs, mental health services, transportation and many other services at little or no cost to the individual. Currently, 1 out of every 3 District residents receives quality health care coverage through the Medicaid program. Learn more about DC Medicaid." class= "dottedline test" >Medicaid</span>, <span href="#" data-toggle="tooltip" title="An informal way of referring to the Advance Premium Tax Credit for individuals or families or the Small Business Tax Credit." class= "dottedline test">tax credits</span>, savings and <span href="#" data-toggle="tooltip" title="A discount that lowers your costs for deductibles, coinsurance, copayments, and also lowers what you have to pay to reach your out-of-pocket limit. To get these savings, you must apply for financial assistance. DC Health Link will help you determine if you qualify as part of the application process. Then you can enroll. Most customers must enroll in a Silver Health Plan to receive cost-sharing reductions. Native Americans receive additional cost-sharing reductions regardless of a plan's metal level." class= "dottedline test">cost-sharing reductions</span> ? *</span>
+              </div>
+
+              <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" style="margin-top: 14px">
+                <input class=" " id="radio1"  type="radio" value="true" name="is_applying_for_assistance" <%='checked'if @person.primary_family.is_applying_for_assistance%>>
+                <label class="radio-label" for="radio1"><span>Yes</span></label>
+              </div>
+              <div class="col-lg-2 col-md-2 col-sm-1 col-xs-1" style="margin-top: 14px">
+                <input class=" " id="radio2"  type="radio" value="false" name="is_applying_for_assistance" <%='checked'if @person.primary_family.is_applying_for_assistance == false%>>
+                <label class="radio-label" for="radio2"><span>No</span></label>
+              </div>
+              <div class="col-md-2 not-sure-margin left-seprator">
+                <a href="#is_applying_for_assistance" data-toggle="modal" data-target="#is_applying_for_assistance">Not Sure?</a>
+                <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_applying_for_assistance"} %>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+      <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+        <%= render  partial: 'shared/individual_progress', locals: {step: 'help_paying_coverage'} %>
+      </div>
+    </div>
+  </div>
+</div>
+<%end%>
+
