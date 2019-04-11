@@ -14,15 +14,46 @@ color: $dark-blue;
 .home-button{
   margin-left:10px;
 }
+@media (min-width: 1200px) {
+  #carousel-container, #welcome{
+    width: 1470px;
+      display: block;
+  margin-left: auto;
+  margin-right: auto;
+  }
+}
+#welcome .btn{
+  font-size:18px;
+}
+
+.carousel-control.left-nm {
+  background-image: -webkit-linear-gradient(left, rgba(0, 0, 0,0) 0%, rgba(0, 0, 0, .0001) 100%);
+  background-image:      -o-linear-gradient(left, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, .0001) 100%);
+  background-image: -webkit-gradient(linear, left top, right top, from(rgba(0, 0, 0, .1)), to(rgba(0, 0, 0, .0001)));
+  background-image:         linear-gradient(to right, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, .0001) 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#80000000', endColorstr='#00000000', GradientType=1);
+  background-repeat: repeat-x;
+}
+.carousel-control.right-nm {
+  right: 0;
+  left: auto;
+  background-image: -webkit-linear-gradient(left, rgba(0, 0, 0, .0001) 0%, rgba(0, 0, 0, 0) 100%);
+  background-image:      -o-linear-gradient(left, rgba(0, 0, 0, .0001) 0%, rgba(0, 0, 0, 0) 100%);
+  background-image: -webkit-gradient(linear, left top, right top, from(rgba(0, 0, 0, .0001)), to(rgba(0, 0, 0, .5)));
+  background-image:         linear-gradient(to right, rgba(0, 0, 0, .0001) 0%, rgba(0, 0, 0, 0) 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00000000', endColorstr='#80000000', GradientType=1);
+  background-repeat: repeat-x;
+}
+
 .navbar {
   margin-bottom: 0;
-  height:150px;
+  height:135px;
   background-color: $primary-button-text;
   border-bottom: solid 10px $primary-blue;
   .navbar-header {
     .navbar-brand {
       border-right: solid 2px #d7d7d7;
-      min-height: 140px;
+      min-height: 124px;
       img {
         max-height: 100px;
       }
