@@ -1,4 +1,4 @@
-# Rails.application.routes.draw do
+Rails.application.routes.draw do
 
-#   mount TransportProfiles::Engine => "/transport_profiles"
-# end
+  mount TransportProfiles::Engine => "/transport_profiles"
+end

@@ -16,7 +16,7 @@ require 'factory_bot_rails'
 require 'test_prof'
 require 'test_prof/recipes/rspec/factory_default'
 require 'pundit/rspec'
-
+require 'climate_control'
 
 FactoryBot.definition_file_paths = [
   File.expand_path(File.join(File.dirname(__FILE__),'../../benefit_markets/spec/factories')),
@@ -79,8 +79,8 @@ RSpec.configure do |config|
   # config.filter_gems_from_backtrace("gem name")
 #  config.include ModelMatcherHelpers, :type => :model
   config.include Mongoid::Matchers, type: :model
-  config.include Devise::TestHelpers, :type => :controller
-  config.include Devise::TestHelpers, :type => :view
+  config.include Devise::Test::ControllerHelpers, :type => :controller
+  config.include Devise::Test::ControllerHelpers, :type => :view
   config.include FactoryBot::Syntax::Methods
   config.include Capybara::DSL
 

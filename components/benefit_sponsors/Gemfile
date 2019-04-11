@@ -15,7 +15,7 @@ gemspec
 
 gem "notifier", path: "../notifier"
 gem "benefit_markets", path: "../benefit_markets"
-#gem "sponsored_benefits", path: "../sponsored_benefits"
+gem "sponsored_benefits", path: "../sponsored_benefits"
 gem "effective_datatables", path: ".../../../../project_gems/effective_datatables-2.6.14"
 
 group :development, :test do

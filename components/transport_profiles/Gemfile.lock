@@ -25,7 +25,7 @@ PATH
     transport_gateway (0.0.1)
       aws-sdk (>= 2.2.4)
       net-sftp (~> 2.1, >= 2.1.2)
-      rails (>= 5.2.2)
+      rails (>= 5.2.3)
 
 GEM
   remote: https://rubygems.org/
