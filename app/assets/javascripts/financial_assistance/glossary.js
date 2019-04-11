@@ -1055,7 +1055,7 @@ $(document).ready(function() {
       $('.run-glossary:contains(' + term.term + ')').each(function(i, matchingEl) {
         var regex = new RegExp(term.term)
         var text = $($.parseHTML(term.description)).text();
-        $(matchingEl).html($(matchingEl).html().replace(regex, '<span class="glossary" data-toggle="tooltip" title="' + text + '">' + term.term + '</span>'));
+        $(matchingEl).html($(matchingEl).html().replace(regex, `<span id='myTooltip' class="glossary" data-toggle="tooltip" data-trigger="click" title="<span class='glyphicon glyphicon-remove pull-right' onclick='myToolTip(this)'></span><br /> ${text}" data-html="true">${term.term}</span>`));
       });
     })
     //$.ajax({
@@ -1066,3 +1066,7 @@ $(document).ready(function() {
     //});
   }
 });
+
+function myToolTip(element) {
+  $(element).parent().parent().tooltip('hide');
+}
