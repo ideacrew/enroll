@@ -2,11 +2,13 @@ require 'rails_helper'
 
 module SponsoredBenefits
   RSpec.describe Organizations::PlanDesignOrganization, type: :model, dbclean: :around_each do
+    let(:owner_profile_id)  {BSON::ObjectId.from_time(DateTime.now)}
 
     describe "#expire proposals for non Prospect Employer" do
+
       let(:organization) { create(:sponsored_benefits_plan_design_organization,
                               sponsor_profile_id: "1234",
-                              owner_profile_id: "5678",
+                              owner_profile_id: owner_profile_id,
                               legal_name: "ABC Company",
                               sic_code: "0345" ) }
 
@@ -64,7 +66,7 @@ module SponsoredBenefits
       let(:employer_profile) { double(active_plan_year: plan_year, census_employees: census_employees, sic_code: "0345")}
 
       let!(:plan_design_organization) { create(:sponsored_benefits_plan_design_organization,
-        owner_profile_id: "5678",
+        owner_profile_id: owner_profile_id,
         legal_name: "ABC Company",
         sic_code: "0345" )
       }
@@ -137,7 +139,7 @@ module SponsoredBenefits
       describe ".general_agency_profile" do
         let!(:plan_design_organization) { create(:sponsored_benefits_plan_design_organization,
                                             sponsor_profile_id: nil,
-                                            owner_profile_id: "89769",
+                                            owner_profile_id: owner_profile_id,
                                             legal_name: "ABC Company",
                                             sic_code: "0345" ) }
         let!(:broker_agency) { double("sponsored_benefits_broker_agency_profile", id: "89769")}

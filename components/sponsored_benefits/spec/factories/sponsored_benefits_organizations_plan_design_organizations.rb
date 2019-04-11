@@ -8,11 +8,11 @@ FactoryBot.define do
     end
 
     sequence :sponsor_profile_id do |n|
-      "12345#{n}"
+      BSON::ObjectId.from_time(DateTime.now)
     end
 
     sequence :owner_profile_id do |n|
-      "52345#{n}"
+      BSON::ObjectId.from_time(DateTime.now)
     end
 
     fein do
