@@ -17,3 +17,6 @@ gem "effective_datatables", path: ".../../../../project_gems/effective_datatable
 # To use a debugger
 # gem 'byebug', group: [:development, :test]
 
+group :development, :test do
+  gem 'rails-controller-testing'
+end
