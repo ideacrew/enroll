@@ -85,8 +85,8 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def copy
-    old_application = @person.primary_family.applications.find params[:id]
-    @application = old_application.copy_application
+    service = application_service.new(@family, {application_id: params[:id]})
+    @application = service.process_application if service.code == :copy!
     redirect_to edit_financial_assistance_application_path(@application)
   end
 
@@ -265,5 +265,9 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   def find
     @application = @person.primary_family.applications.find(params[:id]) if params.key?(:id)
+  end
+
+  def application_service
+    FinancialAssistance::Services::ApplicationService
   end
 end
