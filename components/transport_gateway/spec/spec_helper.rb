@@ -15,9 +15,9 @@
 
 require File.expand_path("../dummy/config/environment", __FILE__)
 require 'shoulda/matchers'
-require 'database_cleaner'
-require 'factory_bot_rails'
-# require 'pry'
+require 'webmock/rspec'
+
+WebMock.disable_net_connect!(allow_localhost: true)
 
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 RSpec.configure do |config|
