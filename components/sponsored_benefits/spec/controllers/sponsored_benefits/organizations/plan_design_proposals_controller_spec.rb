@@ -90,28 +90,28 @@ module SponsoredBenefits
 
     describe "GET #index" do
       it "returns a success response" do
-        xhr :get, :index, { plan_design_organization_id: plan_design_organization.id }, valid_session
+        get :index, params: { plan_design_organization_id: plan_design_organization.id }, xhr: true
         expect(response).to be_success
       end
     end
 
     describe "GET #show" do
       it "returns a success response" do
-        get :show, { id: plan_design_proposal.to_param }, valid_session
+        get :show, params: { id: plan_design_proposal.to_param }
         expect(response).to be_success
       end
     end
 
     describe "GET #new" do
       it "returns a success response" do
-        get :new, { plan_design_organization_id: plan_design_organization.id }, valid_session
+        get :new, params: { plan_design_organization_id: plan_design_organization.id }
         expect(response).to be_success
       end
     end
 
     describe "GET #edit" do
       it "returns a success response" do
-        get :edit, { id: plan_design_proposal.to_param, plan_design_organization_id: plan_design_organization.id }, valid_session
+        get :edit, params: { id: plan_design_proposal.to_param, plan_design_organization_id: plan_design_organization.id }
         expect(response).to be_success
       end
     end
@@ -120,19 +120,19 @@ module SponsoredBenefits
       context "with valid params" do
         it "creates a new Organizations::PlanDesignProposal" do
           expect {
-            xhr :post, :create, { plan_design_organization_id: plan_design_organization.to_param, forms_plan_design_proposal: valid_attributes }, valid_session
+            post :create, params: { plan_design_organization_id: plan_design_organization.to_param, forms_plan_design_proposal: valid_attributes }, xhr: true
           }.to change { plan_design_organization.reload.plan_design_proposals.count }.by(1)
         end
 
         it "redirects to the created benefit_application" do
-          xhr :post, :create, { plan_design_organization_id: plan_design_organization.to_param, forms_plan_design_proposal: valid_attributes }, valid_session
+          post :create, params: { plan_design_organization_id: plan_design_organization.to_param, forms_plan_design_proposal: valid_attributes }, xhr: true
           expect(response).to render_template('create')
         end
       end
 
       context "with invalid params" do
         it "returns a success response (i.e. to display the 'new' template)" do
-          xhr :post, :create, { plan_design_organization_id: plan_design_organization.to_param, forms_plan_design_proposal: invalid_attributes}, valid_session
+          post :create, params: { plan_design_organization_id: plan_design_organization.to_param, forms_plan_design_proposal: invalid_attributes}, xhr: true
           expect(response).to be_success
         end
       end
