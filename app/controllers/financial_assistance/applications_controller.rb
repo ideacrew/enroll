@@ -202,8 +202,13 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def call_service
-    person = FinancialAssistance::Factories::AssistanceFactory.new(@person)
-    @assistance_status, @message = person.search_existing_assistance
+    if Settings.financial_assistance.ext_service.aceds_curam
+      person = FinancialAssistance::Factories::AssistanceFactory.new(@person)
+      @assistance_status, @message = person.search_existing_assistance
+    else
+      @assistance_status = true
+      @message = nil
+    end
   end
 
   def set_primary_family
