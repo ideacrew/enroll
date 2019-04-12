@@ -6,6 +6,10 @@ class EmployerProfilePolicy < ApplicationPolicy
     hbx_staff.permission.list_enrollments
   end
 
+  def modify_admin_tabs?
+    return true if user.person.hbx_staff_role
+  end
+
   def updateable?                
     return true unless role = user.person && user.person.hbx_staff_role
     role.permission.modify_employer
