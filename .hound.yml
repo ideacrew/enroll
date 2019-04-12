@@ -1,2 +1,4 @@
 rubocop:
-  config_file: .rubocop.yml
+  config_file: .rubocop.houndci.yml
+scss:
+  config_file: .scss-lint.yml
