@@ -14,8 +14,7 @@ data-toggle="modal" data-target="#terminate_employee_enrollments_modal">Terminat
           <strong>Please select reason for termination: <br></strong>
           <%= select_tag('termination_reason',options_for_select([["Non Payment", "non_payment"]]), class: "form-control")%>
           <strong>Please select date of termination: <br></strong>
-          <%= date_field_tag 'termination_date', Time.now.strftime('%Y-%m-%d'), class: "form-control" %>
-          <%#=text_field_tag "termination_date", nil, id: "termination-date-picker_#{employer_profile.id}", class: "form-control date-field date-picker", "data-date-min" =>  employer_profile.active_plan_year.start_on + 1.day, "data-date-max" => employer_profile.active_plan_year.end_on %>
+          <%= text_field_tag "termination_date", nil, required: true, id: "termination-date-picker_#{employer_profile.id}", class: "form-control date-field date-picker", "data-date-min" =>  employer_profile.active_plan_year.start_on + 1.day, "data-date-max" => employer_profile.active_plan_year.end_on %>
           <strong>Transmit to Carrier?</strong>
           <%= check_box_tag 'transmit_xml', true %> <br>
 
