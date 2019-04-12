@@ -66,9 +66,7 @@ module SponsoredBenefits
         plan_design_organization.save
       end
 
-      pending "should successfully add plan year to employer profile with published quote" do
-        # this spec should pass once we code fix plan_design_organization belongs_to relation mentioned model
-        # in rails 5 every belongs_to should be directly associate while saving
+       it "should successfully add plan year to employer profile with published quote" do
         plan_design_proposal.publish!
         builder = SponsoredBenefits::BenefitApplications::EmployerProfileBuilder.new(plan_design_proposal, benefit_sponsor_organization)
         expect(benefit_sponsor_organization.active_benefit_sponsorship.benefit_applications.present?).to eq false
