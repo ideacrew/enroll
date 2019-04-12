@@ -1,5 +1,5 @@
 require "rails_helper"
-require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market"    
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application"
 require "#{BenefitSponsors::Engine.root}/spec/support/benefit_sponsors_site_spec_helpers"
 require "#{BenefitSponsors::Engine.root}/spec/support/benefit_sponsors_product_spec_helpers"
@@ -55,7 +55,7 @@ RSpec.describe "employers/census_employees/show.html.erb", dbclean: :after_each 
     assign(:datatable, Effective::Datatables::EmployeeDatatable.new({id: abc_profile.id}))
     assign(:census_employee, census_employee)
     assign(:benefit_group_assignment, benefit_group_assignment)
-    assign(:benefit_sponsorship, benefit_sponsorship) 
+    assign(:benefit_sponsorship, benefit_sponsorship)
     assign(:hbx_enrollment, hbx_enrollment)
     assign(:hbx_enrollments, [hbx_enrollment])
     assign(:benefit_group, current_benefit_package)
@@ -77,7 +77,7 @@ RSpec.describe "employers/census_employees/show.html.erb", dbclean: :after_each 
     allow(EmployerGroupSizeRatingFactorSet).to receive(:where).and_return([double(lookup: 1.0)])
     allow(hbx_enrollment).to receive(:benefit_group).and_return(current_benefit_package)
     allow(group_enrollment).to receive(:member_enrollments).and_return([member_enrollment])
-    allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_package) 
+    allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_package)
   end
 
   it "should show the address of census employee" do
@@ -158,20 +158,15 @@ RSpec.describe "employers/census_employees/show.html.erb", dbclean: :after_each 
       render template: "employers/census_employees/show.html.erb"
       expect(rendered).to have_selector('div', text: 'SELECT BENEFIT PACKAGE')
       expect(rendered).to have_selector('div', text: current_benefit_package.title)
-    end 
+    end
   end
 
   context "when both ee and er have no benefit group assignment" do
-    let(:census_employee) { FactoryBot.create(:census_employee)}
-    let(:hbx_enrollment) { double("HbxEnrollment")}
-    before do
-      assign(:benefit_sponsorship, census_employee.benefit_sponsorship) 
-    end
     
     it "should only have BENIFIT PACKAGE" do
       render template: "employers/census_employees/show.html.erb"
-      expect(rendered).to have_selector('div', text: 'SELECT BENEFIT PACKAGE')
-      expect(rendered).to_not have_selector('div', text: current_benefit_package.title)
+      expect(rendered).to have_selector('option', text: 'SELECT BENEFIT PACKAGE')
+      expect(rendered).to have_selector('div', text: current_benefit_package.title)
     end
   end
 

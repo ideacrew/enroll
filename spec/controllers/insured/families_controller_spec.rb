@@ -531,7 +531,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
       it "should redirect with change_plan parameter" do
         expect(response).to have_http_status(:redirect)
-        expect(response).to redirect_back(fallback_location: new_insured_group_selection_path({person_id: person.id, consumer_role_id: person.consumer_role.try(:id), change_plan: 'change_plan', enrollment_kind: 'sep', qle_id: @qle.id}))
+        expect(controller).to redirect_to(new_insured_group_selection_path({person_id: person.id, consumer_role_id: person.consumer_role.try(:id), change_plan: 'change_plan', enrollment_kind: 'sep', qle_id: @qle.id}))
       end
     end
   end
@@ -779,7 +779,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   describe "GET upload_notice", dbclean: :after_each do
 
     let(:consumer_role2) { FactoryBot.create(:consumer_role) }
-    let(:person2) { FactoryBot.create(:person) }
+    let(:person2) { FactoryBot.create(:person, :with_employee_role) }
     let(:user2) { FactoryBot.create(:user, person: person2, roles: ["hbx_staff"]) }
     let(:file) { double }
     let(:temp_file) { double }
@@ -849,11 +849,9 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         end
 
         context "person has chosen not to receive electronic communication" do
-          before do
-            consumer_role2.contact_method = "Only Paper communication"
-          end
-
           it "should not sent the email" do
+            consumer_role2.update_attributes!(contact_method:"Only Paper communication")
+            consumer_role2.person.employee_roles.first.update_attributes!(contact_method:"Only Paper communication")
             expect(@controller.send(:notice_upload_email)).to be nil
           end
         end

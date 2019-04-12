@@ -111,7 +111,7 @@ RSpec.describe Plan, dbclean: :after_each do
       context "check associations with plan model with renewal plan mapping" do
         it "embeds_many assiciation check" do
           association = Plan.reflect_on_association(:renewal_plan_mappings)
-          expect(association.macro).to eq (:embeds_many)
+          expect(association.class).to eq (Mongoid::Association::Embedded::EmbedsMany)
           expect(association.name).to eq (:renewal_plan_mappings)
         end
       end

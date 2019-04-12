@@ -58,13 +58,13 @@ describe TriggeringAutoRenewals, dbclean: :after_each do
       org
     }
 
-    before(:each) do
-      allow(Time).to receive(:now).and_return(Time.parse("2016-10-20 00:00:00"))
-      allow(ENV).to receive(:[]).with("py_start_on").and_return(organization.employer_profile.plan_years.where(:aasm_state => "renewing_enrolling").first.start_on)
+    around do |example|
+      ClimateControl.modify py_start_on: "#{(organization.employer_profile.plan_years.where(:aasm_state => "renewing_enrolling").first.start_on)}" do
+        example.run
+      end
     end
 
     context "triggering a new enrollment" do
-
       it "should trigger a auto-renewing enrollment by deleting the waived one", dbclean: :after_each do
         census_employee = organization.employer_profile.census_employees.first
         employee_role = census_employee.employee_role

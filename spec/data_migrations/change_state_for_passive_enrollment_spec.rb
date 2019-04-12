@@ -28,10 +28,10 @@ describe ChangeStateForPassiveEnrollment, dbclean: :after_each do
     let!(:renewal_benefit_group_assignment) { FactoryBot.create(:benefit_group_assignment, benefit_group_id: renewing_benefit_group.id, is_active: false, census_employee: census_employee, start_on: renewing_benefit_group.start_on) }
 
     let(:census_employee)             { FactoryBot.create :census_employee, employer_profile: employer_profile }
-    let(:person)                      { FactoryBot.create(:person, :with_family) }
+    let!(:person)                      { FactoryBot.create(:person, :with_family, :with_ssn) }
 
     let!(:employee_role)              { FactoryBot.create(:employee_role, person: person, census_employee: census_employee, employer_profile: employer_profile) }
-    let(:family)                      { person.primary_family }  
+    let(:family)                            { person.primary_family }
     let!(:enrollment_one)              { FactoryBot.create(:hbx_enrollment,
                                              household: family.active_household,
                                              coverage_kind: "dental",
@@ -54,6 +54,8 @@ describe ChangeStateForPassiveEnrollment, dbclean: :after_each do
                                              aasm_state: 'coverage_canceled') }
 
     it "should change the passive enrollment aasm state" do
+      person.employee_roles =[employee_role]
+      person.save
       expect(enrollment_two.aasm_state).to eq "coverage_canceled"
       subject.migrate
       enrollment_two.reload

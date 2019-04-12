@@ -186,10 +186,10 @@ RSpec.describe Exchanges::BrokerApplicantsController do
               "Minuteman Health"=>nil,
               "Neighborhood Health Plan"=>nil,
               "Tufts Health Plan Direct"=>nil,
-              "Tufts Health Plan Premier"=>nil} } } ).permit!
+              "Tufts Health Plan Premier"=>nil} } }).permit!
             Settings.aca.broker_carrier_appointments_enabled = false
             broker_role.update_attributes({ broker_agency_profile_id: @broker_agency_profile.id })
-            put :update, params:{id: broker_role.person.id, pending: true, person: person_hash} , format: :js
+            put :update, params:{id: broker_role.person.id, pending: true, person: person_hash}, format: :js
             broker_role.reload
           end
 
@@ -197,15 +197,15 @@ RSpec.describe Exchanges::BrokerApplicantsController do
             expect(broker_role.carrier_appointments).to eq("Altus"=>"true",
                                                             "Blue Cross Blue Shield MA"=>"true",
                                                             "Boston Medical Center Health Plan"=>"true",
-                                                            "Delta"=>nil,
-                                                            "FCHP"=>nil,
+                                                            "Delta"=>"",
+                                                            "FCHP"=>"",
                                                             "Guardian"=>"true",
-                                                            "Health New England"=>nil,
-                                                            "Harvard Pilgrim Health Care"=>nil,
-                                                            "Minuteman Health"=>nil,
-                                                            "Neighborhood Health Plan"=>nil,
-                                                            "Tufts Health Plan Direct"=>nil,
-                                                            "Tufts Health Plan Premier"=>nil)
+                                                            "Health New England"=>"",
+                                                            "Harvard Pilgrim Health Care"=>"",
+                                                            "Minuteman Health"=>"",
+                                                            "Neighborhood Health Plan"=>"",
+                                                            "Tufts Health Plan Direct"=>"",
+                                                            "Tufts Health Plan Premier"=>"")
           end
 
           it "should change applicant status to broker_agency_pending" do

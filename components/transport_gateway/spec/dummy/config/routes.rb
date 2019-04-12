@@ -1,4 +1,4 @@
-# Rails.application.routes.draw do
+Rails.application.routes.draw do
 
-#   mount TransportGateway::Engine => "/transport_gateway"
-# end
+  mount TransportGateway::Engine => "/transport_gateway"
+end

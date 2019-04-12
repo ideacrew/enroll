@@ -1,3 +1,5 @@
+require 'mail'
+
 module Validations
   module Email
     class EmailValidator < ActiveModel::EachValidator

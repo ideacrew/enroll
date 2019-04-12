@@ -6,12 +6,16 @@ require 'spec_helper'
 abort("The Rails environment is running in production mode!") if Rails.env.production?
 require 'rspec/rails'
 # Add additional requires below this line. Rails is not loaded until this point!
+require 'mongoid-rspec'
 require 'shoulda/matchers'
 require 'database_cleaner'
 require 'capybara/rails'
 require 'capybara/rspec'
-require 'forgery'
+require "forgery"
 require 'factory_bot_rails'
+require 'test_prof'
+require 'test_prof/recipes/rspec/factory_default'
+require 'pundit/rspec'
 
 FactoryBot.definition_file_paths = [
 # File.expand_path(File.join(File.dirname(__FILE__),'factories')),
@@ -73,7 +77,9 @@ RSpec.configure do |config|
   config.filter_rails_from_backtrace!
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
+  config.include Mongoid::Matchers, type: :model
   config.include FactoryBot::Syntax::Methods
+  config.include Capybara::DSL
 
   config.after(:example, :dbclean => :after_each) do
     DatabaseCleaner.clean
