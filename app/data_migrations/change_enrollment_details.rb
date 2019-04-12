@@ -1,3 +1,4 @@
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class ChangeEnrollmentDetails < MongoidMigrationTask
@@ -135,7 +136,7 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
   def cancel_enr
     @enrollments.each do |enrollment|
       if enrollment.may_cancel_coverage?
-        enrollment.cancel_coverage!
+        enrollment.update_attributes(aasm_state:"coverage_canceled")
         puts "enrollment with hbx_id: #{enrollment.hbx_id} cancelled" unless Rails.env.test?
       else
         puts " Issue with enrollment with hbx_id: #{enrollment.hbx_id}" unless Rails.env.test?
@@ -161,7 +162,7 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
   def expire_enrollment
     @enrollments.each do |enrollment|
       if enrollment.may_expire_coverage?
-        enrollment.expire_coverage!
+        enrollment.update_attributes(aasm_state:"coverage_expired")
         puts "expire enrollment with hbx_id: #{enrollment.hbx_id}" unless Rails.env.test?
       else
         puts "HbxEnrollment with hbx_id: #{enrollment.hbx_id} can not be expired" unless Rails.env.test?
