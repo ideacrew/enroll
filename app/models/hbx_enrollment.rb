@@ -537,6 +537,7 @@ class HbxEnrollment
     id_list = self.employer_profile.active_and_renewing_published.collect{|py| py.benefit_groups.pluck(:id)}.flatten
     shop_enrollments = household.hbx_enrollments.shop_market.by_coverage_kind(self.coverage_kind).where(:benefit_group_id.in => id_list).show_enrollments_sans_canceled
     shop_enrollments.each do |enrollment|
+      next if enrollment.inactive?
       coverage_end_date = family.terminate_date_for_shop_by_enrollment(enrollment)
       if enrollment.effective_on >= coverage_end_date
         enrollment.cancel_coverage! if enrollment.may_cancel_coverage? # cancel coverage if enrollment is future effective
