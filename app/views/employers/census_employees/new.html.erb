@@ -1,7 +1,0 @@
-<% content_for :navigation do %>
-  <%= render :partial => 'ui-components/v1/navs/employers_navigation', :locals => {:active_tab=>params[:tab], organization: @employer_profile.organization, profile: @employer_profile} %>
-<% end %>
-
-<%= form_for @census_employee, url: {action: "create", employer_id: @employer_profile.id} do |f| %>
-  <%= render 'form', f: f %>
-<% end %>

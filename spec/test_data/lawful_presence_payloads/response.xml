@@ -1,9 +1,0 @@
-<ridp:lawful_presence xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-                      xmlns:ridp='http://openhbx.org/api/terms/1.0'
-                      xsi:schemaLocation='http://openhbx.org/api/terms/1.0 file:/Users/tevans/proj/cv_example_builder/verification_services.xsd'>
-  <ridp:case_number>12121</ridp:case_number>
-  <ridp:lawful_presence_indeterminate>
-    <ridp:response_code>urn:openhbx:terms:v1:lawful_presence:determination#invalid_information</ridp:response_code>
-    <ridp:response_text>Complete information.</ridp:response_text>
-  </ridp:lawful_presence_indeterminate>
-</ridp:lawful_presence>

@@ -1,6 +1,0 @@
-<% if @kind == "carrier" %>
-    $("fieldset#<%= @target %>").find(".carrier-select .carrier-<%= @key %> select").html("<%= escape_javascript(render "plan_options") %>").selectric('refresh');
-<% elsif @kind == "metal-level" %>
-  $("fieldset#<%= @target %>").find(".metal-level-select .metal-level-<%= @key %> select").html("<%= escape_javascript(render "plan_options") %>").selectric('refresh');
-<% end %>
-
