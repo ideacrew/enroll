@@ -44,6 +44,9 @@ class Permission
     def hbx_staff
       Permission.where(name: 'hbx_staff').first
     end
+    def super_admin
+      Permission.where(name: 'super_admin').first
+    end
     def hbx_read_only
       Permission.where(name: 'hbx_read_only').first
     end

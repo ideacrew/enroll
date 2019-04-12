@@ -11,16 +11,17 @@ class DefinePermissions < MigrationTask
   	  modify_admin_tabs: true, view_admin_tabs: true, can_view_username_and_email:true, can_lock_unlock:true, can_reset_password:true)
     Permission.create(name: 'hbx_read_only', modify_family: true, list_enrollments: true, view_admin_tabs: true)
   	Permission.create(name: 'hbx_csr_supervisor', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true)
-  	Permission.create(name: 'hbx_tier3', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
-  	  send_broker_agency_message: true, approve_broker: true, approve_ga: true,
-  	  modify_admin_tabs: true, view_admin_tabs: true, can_view_username_and_email:true, can_lock_unlock:true, can_reset_password:true, can_create_plan_year:true, can_extend_open_enrollment:true)
-  	Permission.create(name: 'hbx_csr_tier2', modify_family: true, modify_employer: true)
     Permission.create(name: 'hbx_csr_tier1', modify_family: true)
     Permission.create(name: 'developer', list_enrollments: true, view_admin_tabs: true)
+    Permission.create(name: 'hbx_tier3', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
+      send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_update_ssn: false, can_complete_resident_application: false,
+      can_add_sep: false, can_lock_unlock: true, can_view_username_and_email: false, can_reset_password: false, modify_admin_tabs: true,
+      view_admin_tabs: true, can_create_plan_year:true, can_extend_open_enrollment:true, can_force_publish: true)
+    Permission.create(name: 'hbx_csr_tier2', modify_family: true, modify_employer: true)
     Permission.create(name: 'super_admin', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
-                      send_broker_agency_message: true, approve_broker: true, approve_ga: true,
-                      modify_admin_tabs: true, view_admin_tabs: true, can_view_username_and_email:true, can_lock_unlock:true, can_reset_password:true, can_add_sep:true, can_change_fein: true,
-                      can_extend_open_enrollment:true, can_create_plan_year:true)
+      send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_update_ssn: false, can_complete_resident_application: false,
+      can_add_sep: false, can_lock_unlock: true, can_view_username_and_email: false, can_reset_password: false, modify_admin_tabs: true,
+      view_admin_tabs: true, can_change_fein: true, can_extend_open_enrollment:true, can_create_plan_year:true, can_force_publish: true)
   	permission = Permission.hbx_staff
     Person.where(hbx_staff_role: {:$exists => true}).all.each{|p|p.hbx_staff_role.update_attributes(permission_id: permission.id, subrole:'hbx_staff')}
   end
@@ -60,10 +61,14 @@ class DefinePermissions < MigrationTask
 
   def hbx_admin_can_update_ssn
     Permission.hbx_staff.update_attributes!(can_update_ssn: true)
+    Permission.super_admin.update_attributes!(can_update_ssn: true)
+    Permission.hbx_tier3.update_attributes!(can_update_ssn: true)
   end
 
   def hbx_admin_csr_view_personal_info_page
     Permission.hbx_staff.update_attributes!(view_personal_info_page: true)
+    Permission.super_admin.update_attributes!(view_personal_info_page: true)
+    Permission.hbx_tier3.update_attributes!(view_personal_info_page: true)
     Permission.hbx_csr_supervisor.update_attributes!(view_personal_info_page: true)
     Permission.hbx_csr_tier2.update_attributes!(view_personal_info_page: true)
     Permission.hbx_csr_tier1.update_attributes!(view_personal_info_page: true)
@@ -71,18 +76,26 @@ class DefinePermissions < MigrationTask
 
   def hbx_admin_can_complete_resident_application
     Permission.hbx_staff.update_attributes!(can_complete_resident_application: true)
+    Permission.super_admin.update_attributes!(can_complete_resident_application: true)
+    Permission.hbx_tier3.update_attributes!(can_complete_resident_application: true)
   end
 
   def hbx_admin_can_add_sep
     Permission.hbx_staff.update_attributes!(can_add_sep: true)
+    Permission.super_admin.update_attributes!(can_add_sep: true)
+    Permission.hbx_tier3.update_attributes!(can_add_sep: true)
   end
 
   def hbx_admin_can_add_pdc
     Permission.hbx_staff.update_attributes!(can_add_pdc: true)
+    Permission.super_admin.update_attributes!(can_add_pdc: true)
+    Permission.hbx_tier3.update_attributes!(can_add_pdc: true)
   end
 
   def hbx_admin_can_view_username_and_email
     Permission.hbx_staff.update_attributes!(can_view_username_and_email: true)
+    Permission.super_admin.update_attributes!(can_view_username_and_email: true)
+    Permission.hbx_tier3.update_attributes!(can_view_username_and_email: true)
     Permission.hbx_read_only.update_attributes!(can_view_username_and_email: true)
     Permission.hbx_csr_supervisor.update_attributes!(can_view_username_and_email: true)
     Permission.hbx_csr_tier1.update_attributes!(can_view_username_and_email: true)
@@ -91,10 +104,14 @@ class DefinePermissions < MigrationTask
 
   def hbx_admin_can_view_application_types
     Permission.hbx_staff.update_attributes!(can_view_application_types: true)
+    Permission.super_admin.update_attributes!(can_view_application_types: true)
+    Permission.hbx_tier3.update_attributes!(can_view_application_types: true)
   end
 
   def hbx_admin_can_access_new_consumer_application_sub_tab
     Permission.hbx_staff.update_attributes!(can_access_new_consumer_application_sub_tab: true)
+    Permission.super_admin.update_attributes!(can_access_new_consumer_application_sub_tab: true)
+    Permission.hbx_tier3.update_attributes!(can_access_new_consumer_application_sub_tab: true)
     Permission.hbx_csr_supervisor.update_attributes!(can_access_new_consumer_application_sub_tab: true)
     Permission.hbx_csr_tier1.update_attributes!(can_access_new_consumer_application_sub_tab: true)
     Permission.hbx_csr_tier2.update_attributes!(can_access_new_consumer_application_sub_tab: true)
@@ -102,6 +119,8 @@ class DefinePermissions < MigrationTask
 
   def hbx_admin_can_access_identity_verification_sub_tab
     Permission.hbx_staff.update_attributes!(can_access_identity_verification_sub_tab: true)
+    Permission.super_admin.update_attributes!(can_access_identity_verification_sub_tab: true)
+    Permission.hbx_tier3.update_attributes!(can_access_identity_verification_sub_tab: true)
     Permission.hbx_csr_supervisor.update_attributes!(can_access_identity_verification_sub_tab: true)
     Permission.hbx_csr_tier1.update_attributes!(can_access_identity_verification_sub_tab: true)
     Permission.hbx_csr_tier2.update_attributes!(can_access_identity_verification_sub_tab: true)
@@ -109,14 +128,20 @@ class DefinePermissions < MigrationTask
 
   def hbx_admin_can_access_outstanding_verification_sub_tab
     Permission.hbx_staff.update_attributes!(can_access_outstanding_verification_sub_tab: true)
+    Permission.super_admin.update_attributes!(can_access_outstanding_verification_sub_tab: true)
+    Permission.hbx_tier3.update_attributes!(can_access_outstanding_verification_sub_tab: true)
   end
 
   def hbx_admin_can_access_accept_reject_identity_documents
     Permission.hbx_staff.update_attributes!(can_access_accept_reject_identity_documents: true)
+    Permission.super_admin.update_attributes!(can_access_accept_reject_identity_documents: true)
+    Permission.hbx_tier3.update_attributes!(can_access_accept_reject_identity_documents: true)
   end
 
   def hbx_admin_can_access_accept_reject_paper_application_documents
     Permission.hbx_staff.update_attributes!(can_access_accept_reject_paper_application_documents: true)
+    Permission.super_admin.update_attributes!(can_access_accept_reject_paper_application_documents: true)
+    Permission.hbx_tier3.update_attributes!(can_access_accept_reject_paper_application_documents: true)
     Permission.hbx_csr_supervisor.update_attributes!(can_access_accept_reject_paper_application_documents: true)
     Permission.hbx_csr_tier1.update_attributes!(can_access_accept_reject_paper_application_documents: true)
     Permission.hbx_csr_tier2.update_attributes!(can_access_accept_reject_paper_application_documents: true)
@@ -124,10 +149,14 @@ class DefinePermissions < MigrationTask
 
   def hbx_admin_can_delete_identity_application_documents
     Permission.hbx_staff.update_attributes!(can_delete_identity_application_documents: true)
+    Permission.super_admin.update_attributes!(can_delete_identity_application_documents: true)
+    Permission.hbx_tier3.update_attributes!(can_delete_identity_application_documents: true)
   end
 
   def hbx_admin_can_access_pay_now
     Permission.hbx_staff.update_attributes!(can_access_pay_now: true)
+    Permission.super_admin.update_attributes!(can_access_pay_now: true)
+    Permission.hbx_tier3.update_attributes!(can_access_pay_now: true)
     Permission.hbx_csr_supervisor.update_attributes!(can_access_pay_now: true)
     Permission.hbx_csr_tier1.update_attributes!(can_access_pay_now: true)
     Permission.hbx_csr_tier2.update_attributes!(can_access_pay_now: true)
@@ -135,10 +164,13 @@ class DefinePermissions < MigrationTask
 
   def hbx_admin_can_transition_family_members
    Permission.hbx_staff.update_attributes!(can_transition_family_members: true)
+   Permission.super_admin.update_attributes!(can_transition_family_members: true)
+   Permission.hbx_tier3.update_attributes!(can_transition_family_members: true)
   end
 
   def hbx_admin_can_access_user_account_tab
     Permission.hbx_staff.update_attributes!(can_access_user_account_tab: true)
+    Permission.super_admin.update_attributes!(can_access_user_account_tab: true)
     Permission.hbx_tier3.update_attributes!(can_access_user_account_tab: true)
   end
 
@@ -158,11 +190,22 @@ class DefinePermissions < MigrationTask
 
   def grant_super_admin_access
     raise "User Email Argument expected!!"if ENV['user_email'].blank?
+
     user_emails = ENV['user_email'].split(',')
     hbx_profile = HbxProfile.all.first
     users = User.where(:email.in => user_emails)
     users.each do |user|
-      HbxStaffRole.create!(person: user.person, permission_id: Permission.super_admin.id, subrole: 'super_admin', hbx_profile_id: hbx_profile.id)
+      HbxStaffRole.create!( person: user.person, permission_id: Permission.super_admin.id, subrole: 'super_admin', hbx_profile_id: hbx_profile.id)
+    end
+  end
+
+  def grant_hbx_tier3_access
+    raise "User Email Argument expected!!"if ENV['user_email'].blank?
+    user_emails = ENV['user_email'].split(',')
+    hbx_profile = HbxProfile.all.first
+    users = User.where(:email.in => user_emails)
+    users.each do |user|
+      HbxStaffRole.create!( person: user.person, permission_id: Permission.hbx_tier3.id, subrole: 'hbx_tier3', hbx_profile_id: hbx_profile.id)
     end
   end
 end
