@@ -527,6 +527,7 @@ class HbxEnrollment
     waived_enrollment.waiver_reason = waiver_reason if waiver_reason
     waived_enrollment.predecessor_enrollment_id = self._id
     waived_enrollment.generate_hbx_signature
+    waived_enrollment.submitted_at = TimeKeeper.datetime_of_record
     if waived_enrollment.save!
       waived_enrollment.household.reload
     end
@@ -536,8 +537,8 @@ class HbxEnrollment
   def term_existing_shop_enrollments
     id_list = self.employer_profile.active_and_renewing_published.collect{|py| py.benefit_groups.pluck(:id)}.flatten
     shop_enrollments = household.hbx_enrollments.shop_market.by_coverage_kind(self.coverage_kind).where(:benefit_group_id.in => id_list).show_enrollments_sans_canceled
-    shop_enrollments.each do |enrollment|
-      next if enrollment.inactive?
+    enrollments = shop_enrollments.where(:aasm_state.nin => WAIVED_STATUSES)
+    enrollments.each do |enrollment|
       coverage_end_date = family.terminate_date_for_shop_by_enrollment(enrollment)
       if enrollment.effective_on >= coverage_end_date
         enrollment.cancel_coverage! if enrollment.may_cancel_coverage? # cancel coverage if enrollment is future effective
@@ -1249,7 +1250,7 @@ class HbxEnrollment
     state :shopping, initial: true
     state :coverage_selected, :after_enter => [:update_renewal_coverage, :handle_coverage_selection]
     state :transmitted_to_carrier
-    state :coverage_enrolled
+    state :coverage_enrolled, :after_enter => :update_renewal_coverage
 
     state :coverage_termination_pending
     state :coverage_canceled      # coverage never took effect
