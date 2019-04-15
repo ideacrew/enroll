@@ -30,7 +30,6 @@ Gem::Specification.new do |s|
   s.add_dependency "non-stupid-digest-assets"
   s.add_dependency "roo", "~> 2.1.0"
   s.add_dependency 'aasm', '~> 4.8'
-  s.add_dependency 'acapi'
   s.add_dependency 'config'
   s.add_dependency 'money-rails', '~> 1.13'
 
