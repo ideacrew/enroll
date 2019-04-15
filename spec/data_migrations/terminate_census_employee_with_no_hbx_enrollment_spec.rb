@@ -20,7 +20,7 @@ describe TerminateCensusEmployeeWithNoHbxEnrollment, dbclean: :after_each do
     let(:employment_terminated_on) { TimeKeeper.date_of_record - 1.day }
 
     it 'census employee should termianated' do
-      ClimateControl.modify hbx_id: person.hbx_id, employment_terminated_on: employment_terminated_on.to_s do
+      ClimateControl.modify "hbx_id" => person.hbx_id, "employment_terminated_on" => employment_terminated_on.strftime("%Y-%m-%d") do
         census_employee.terminate_employment(employment_terminated_on)
         subject.migrate
         expect(census_employee.aasm_state).to eq 'employment_terminated'
