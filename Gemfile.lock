@@ -100,10 +100,13 @@ PATH
       aasm (~> 4.8.0)
       config
       devise (~> 4.5)
+      ffi (~> 1.9)
+      kaminari (~> 0.17.0)
       mongoid (~> 7.0.2)
       pundit (~> 2.0)
       rails (~> 5.2.3)
       roo (~> 2.1.0)
+      sass (~> 3.7.3)
       slim (~> 3.0.8)
       symmetric-encryption (~> 3.9.1)
 

@@ -25,6 +25,9 @@ Gem::Specification.new do |s|
   s.add_dependency 'symmetric-encryption', '~> 3.9.1'
   s.add_dependency 'roo', '~> 2.1.0'
   s.add_dependency 'pundit',                    '~> 2.0'
+  s.add_dependency 'ffi', '~> 1.9'
+  s.add_dependency 'kaminari', '~> 0.17.0'
+  s.add_dependency 'sass', '~> 3.7.3'
 
   s.test_files = Dir["spec/**/*"]
 
@@ -33,11 +36,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'database_cleaner'
   s.add_development_dependency 'capybara',                  '~> 3.12'
   s.add_development_dependency 'factory_bot_rails',         '~> 4'
-  s.add_development_dependency 'pry'
-  s.add_development_dependency 'pry-rails'
-  s.add_development_dependency 'pry-stack_explorer'
-  s.add_development_dependency 'pry-byebug'
-  s.add_development_dependency 'pry-remote'
   s.add_development_dependency 'forgery',                   '~> 0.7.0'
   s.add_development_dependency 'test-prof',                 '~> 0.5.0'
   s.add_development_dependency "mongoid-rspec",             '~> 4'
