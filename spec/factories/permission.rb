@@ -20,6 +20,15 @@ FactoryGirl.define do
       name 'hbx_staff'
     end
 
+    trait :super_admin do
+      can_complete_resident_application true
+      can_add_sep true
+      can_access_new_consumer_application_sub_tab true
+      can_access_identity_verification_sub_tab true
+      can_access_outstanding_verification_sub_tab true
+      name 'super_admin'
+    end
+
     trait :hbx_update_ssn do
       can_update_ssn true
     end
@@ -59,6 +68,7 @@ FactoryGirl.define do
       can_reset_password true
       can_extend_open_enrollment true
       can_force_publish true
+      name 'hbx_tier3'
     end
 
     trait :hbx_csr_tier2 do
