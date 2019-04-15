@@ -46,12 +46,11 @@ module EventsHelper
 
   def xml_qualifying_reason_uri(hbx_enrollment)
     reason = hbx_enrollment.terminate_reason
-    event_uri = case
-                when reason == "I do not have other coverage"
+    event_uri = if reason == "I do not have other coverage"
                   "voluntary_withdrawal"
-                when reason == "non_payment"
+                elsif reason == "non_payment"
                   "non_payment"
-                when HbxEnrollment::WAIVER_REASONS.include?(reason)
+                elsif HbxEnrollment::WAIVER_REASONS.include?(reason)
                   "alternate_benefit_available"
                 else
                   "termination_of_benefits"
