@@ -52,7 +52,7 @@ describe AddHbxEnrollmentMember, dbclean: :after_each do
       # allow(ENV).to receive(:[]).with("coverage_start_on").and_return(enrollment.effective_on)
     end
     it "should create a new enrollment member record" do
-      ClimateControl.modify hbx_id:enrollment.hbx_id.to_s,family_member_id:family_member.id, coverage_start_on: "#{enrollment.effective_on}" do 
+      ClimateControl.modify hbx_id:enrollment.hbx_id.to_s,family_member_id:family_member.id, coverage_start_on: "#{enrollment.effective_on.strftime("%Y-%m-%d")}" do 
         hem_size = enrollment.hbx_enrollment_members.count
         subject.migrate
         enrollment.reload
