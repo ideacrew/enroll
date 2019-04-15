@@ -24,6 +24,9 @@ module Notifier
       attribute :previous_coverage_year, Integer
       attribute :aptc, String
       attribute :dependents, Array[MergeDataModels::Dependent]
+      attribute :magi_medicaid_members, Array[MergeDataModels::Dependent]
+      attribute :aqhp_or_non_magi_medicaid_members, Array[MergeDataModels::Dependent]
+      attribute :uqhp_or_non_magi_medicaid_members, Array[MergeDataModels::Dependent]
       attribute :addresses, Array[MergeDataModels::Address]
       attribute :aqhp_eligible, Boolean
       attribute :totally_ineligible, Boolean
@@ -33,6 +36,13 @@ module Notifier
       attribute :non_magi_medicaid, Boolean
       attribute :csr, Boolean
       attribute :csr_percent, Integer
+      attribute :aqhp_event, Boolean
+      attribute :uqhp_event, Boolean
+      attribute :magi_medicaid_members_present, Boolean
+      attribute :aqhp_or_non_magi_medicaid_members_present, Boolean
+      attribute :uqhp_or_non_magi_medicaid_members_present, Boolean
+      attribute :totally_ineligible_members_present, Boolean
+      attribute :irs_consent_not_needed, Boolean
 
       def self.stubbed_object
         notice = Notifier::MergeDataModels::ConsumerRole.new(
@@ -51,13 +61,18 @@ module Notifier
             federal_tax_filing_status: 'Married Filing Jointly',
             expected_income_for_coverage_year: "$25,000",
             tax_household_size: 2,
-            aptc: '363.23',
-            aqhp_eligible: true,
-            uqhp_eligible: false,
+            aptc: "$363.23",
+            aqhp_event: true,
+            uqhp_event: false,
+            magi_medicaid_members_present: false,
+            aqhp_or_non_magi_medicaid_members_present: true,
+            uqhp_or_non_magi_medicaid_members_present: false,
+            totally_ineligible_members_present: false,
             totally_ineligible: false,
+            irs_consent_not_needed: false,
             non_magi_medicaid: false,
             magi_medicaid: false,
-            irs_consent: true,
+            irs_consent: false,
             csr: true,
             csr_percent: 73,
             ivl_oe_start_date: Date.parse('November 01, 2019')
@@ -70,21 +85,22 @@ module Notifier
         notice.mailing_address = Notifier::MergeDataModels::Address.stubbed_object
         notice.addresses = [notice.mailing_address]
         notice.dependents = [Notifier::MergeDataModels::Dependent.stubbed_object]
+        #notice.family_members = [Notifier::MergeDataModels::Dependent.stubbed_object]
         notice
       end
 
       def collections
-        %w[addresses dependents]
+        %w[addresses dependents magi_medicaid_members aqhp_or_non_magi_medicaid_members uqhp_or_non_magi_medicaid_members]
       end
 
       def conditions
         %w[
             aqhp_eligible? uqhp_eligible? incarcerated? irs_consent?
-            magi_medicaid? aqhp_or_non_magi_medicaid? uqhp_or_non_magi_medicaid?
+            magi_medicaid? magi_medicaid_members_present? aqhp_or_non_magi_medicaid_members_present? uqhp_or_non_magi_medicaid_members_present?
             irs_consent_not_needed? aptc_amount_available? csr?
-            aqhp_eligible_and_irs_consent_not_needed? csr_is_73? csr_is_87?
+            aqhp_event_and_irs_consent_not_needed? csr_is_73? csr_is_87?
             csr_is_94? csr_is_100? csr_is_zero? csr_is_nil? non_magi_medicaid?
-            aptc_is_zero? totally_ineligible?
+            aptc_is_zero? totally_ineligible? aqhp_event? uqhp_event? totally_ineligible_members_present?
         ]
       end
 
@@ -140,8 +156,32 @@ module Notifier
         csr
       end
 
-      def aqhp_eligible_and_irs_consent_not_needed?
-        aqhp_eligible? && !irs_consent?
+      def aqhp_event?
+        aqhp_event
+      end
+
+      def uqhp_event?
+        uqhp_event
+      end
+
+      def magi_medicaid_members_present?
+        magi_medicaid_members_present
+      end
+
+      def aqhp_or_non_magi_medicaid_members_present?
+        aqhp_or_non_magi_medicaid_members_present
+      end
+
+      def uqhp_or_non_magi_medicaid_members_present?
+        uqhp_or_non_magi_medicaid_members_present
+      end
+
+      def totally_ineligible_members_present?
+        totally_ineligible_members_present
+      end
+
+      def aqhp_event_and_irs_consent_not_needed?
+        aqhp_event? && !irs_consent?
       end
 
       def csr_is_73?

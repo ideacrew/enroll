@@ -44,7 +44,7 @@ module Notifier
           if uqhp_notice?
             nil
           else
-            (payload['notice_params']['primary_member']['aptc'])
+            ActionController::Base.helpers.number_to_currency(payload['notice_params']['primary_member']['aptc'])
           end
       end
 
@@ -108,6 +108,69 @@ module Notifier
               totally_ineligible: dependent.is_totally_ineligible
             }
           )
+        end
+        magi_medicaid_members
+        aqhp_or_non_magi_medicaid_members
+        uqhp_or_non_magi_medicaid_members
+      end
+
+      def magi_medicaid_members
+        primary_member = []
+        merge_model.magi_medicaid_members = []
+        primary_member << payload['notice_params']['primary_member']
+        dependent_members = payload['notice_params']['dependents']
+        family_members = primary_member + dependent_members
+        family_members.each do |member|
+          next if member["magi_medicaid"] != "Yes"
+          fam_member = Notifier::Services::DependentService.new(uqhp_notice?, member)
+          merge_model.magi_medicaid_members << MergeDataModels::Dependent.new(
+             {
+                first_name: fam_member.first_name,
+                last_name: fam_member.last_name,
+                age: fam_member.age
+              }
+            )
+          end
+      end
+
+      def aqhp_or_non_magi_medicaid_members
+       primary_member = []
+       merge_model.aqhp_or_non_magi_medicaid_members = []
+       primary_member << payload['notice_params']['primary_member']
+       dependent_members = payload['notice_params']['dependents']
+       family_members = primary_member + dependent_members
+       family_members.each do |member|
+        if (member["aqhp_eligible"] == "Yes" || member["non_magi_medicaid"] == "Yes")
+          fam_member = Notifier::Services::DependentService.new(uqhp_notice?, member)
+          merge_model.aqhp_or_non_magi_medicaid_members << MergeDataModels::Dependent.new(
+              {
+                first_name: fam_member.first_name,
+                last_name: fam_member.last_name,
+                age: fam_member.age
+              }
+            )
+          end
+        end
+      end
+
+      def uqhp_or_non_magi_medicaid_members
+        primary_member = []
+        merge_model.uqhp_or_non_magi_medicaid_members = []
+        primary_member << payload['notice_params']['primary_member']
+        dependent_members = payload['notice_params']['dependents']
+        family_members = primary_member + dependent_members
+
+        family_members.each do |member|
+          if (member["uqhp_eligible"] == "Yes" || member["non_magi_medicaid"] == "Yes")
+            fam_member = Notifier::Services::DependentService.new(uqhp_notice?, member)
+            merge_model.uqhp_or_non_magi_medicaid_members << MergeDataModels::Dependent.new(
+                {
+                  first_name: fam_member.first_name,
+                  last_name: fam_member.last_name,
+                  age: fam_member.age
+                }
+              )
+          end
         end
       end
 
@@ -228,8 +291,32 @@ module Notifier
         merge_model.csr = payload['notice_params']['primary_member']['csr'].casecmp('YES').zero?
       end
 
+      def aqhp_event
+        merge_model.aqhp_event =  (event_name == 'projected_eligibility_notice_2')
+      end
+
+      def uqhp_event
+        merge_model.uqhp_event =  (event_name == 'projected_eligibility_notice_1')
+      end
+
+      def magi_medicaid_members_present
+        merge_model.magi_medicaid_members_present = merge_model.magi_medicaid_members.present?
+      end
+
+      def aqhp_or_non_magi_medicaid_members_present
+        merge_model.aqhp_or_non_magi_medicaid_members_present = merge_model.aqhp_or_non_magi_medicaid_members.present?
+      end
+
+      def uqhp_or_non_magi_medicaid_members_present
+        merge_model.uqhp_or_non_magi_medicaid_members_present = merge_model.uqhp_or_non_magi_medicaid_members.present?
+      end
+
       def csr_percent
         merge_model.csr_percent = payload['notice_params']['primary_member']['csr_percent'].blank? ? nil : Integer(payload['notice_params']['primary_member']['csr_percent'])
+      end
+
+      def totally_ineligible_members_present
+        merge_model.totally_ineligible_members_present = totally_ineligible? || merge_model.dependents.any?{|e| e.totally_ineligible? }
       end
 
       def format_date(date)
@@ -294,9 +381,9 @@ module Notifier
         csr
       end
 
-      def aqhp_eligible_and_irs_consent_not_needed?
+      def aqhp_event_and_irs_consent_not_needed?
         return false if uqhp_notice?
-        aqhp_eligible? && !irs_consent?
+        aqhp_event? && !irs_consent?
       end
 
       def csr_is_73?
@@ -322,6 +409,30 @@ module Notifier
       def csr_is_zero?
         false unless csr?
         csr_percent.zero?
+      end
+
+      def aqhp_event?
+        aqhp_event
+      end
+
+      def uqhp_event?
+        uqhp_event
+      end
+
+      def magi_medicaid_members_present?
+        magi_medicaid_members_present
+      end
+
+      def aqhp_or_non_magi_medicaid_members_present?
+        aqhp_or_non_magi_medicaid_members_present
+      end
+
+      def uqhp_or_non_magi_medicaid_members_present?
+        uqhp_or_non_magi_medicaid_members_present
+      end
+
+      def totally_ineligible_members_present?
+        totally_ineligible_members_present
       end
 
       def csr_is_nil?
