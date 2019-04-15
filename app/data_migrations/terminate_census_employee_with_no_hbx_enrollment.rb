@@ -4,6 +4,7 @@ class TerminateCensusEmployeeWithNoHbxEnrollment < MongoidMigrationTask
   def migrate
     raise "hbx id is not present" if ENV['hbx_id'].blank?
     raise "employment_terminated_on is not present" if ENV['employment_terminated_on'].blank?
+    # TODO: What is the format supposed to be? How do we handle parse errors?
     employment_terminated_on = ENV['employment_terminated_on'].to_date
     person = Person.by_hbx_id(ENV['hbx_id']).first
     if person.present?
