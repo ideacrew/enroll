@@ -16,9 +16,10 @@ module Notifier
         @is_totally_ineligible = totally_ineligible?
         @is_uqhp_eligible = uqhp_eligible?
         @is_aqhp_eligible = aqhp_eligible?
+        @is_magi_medicaid_eligibile = medicaid_eligible?
       end
 
-      attr_accessor :is_uqhp_notice, :payload_member, :age, :is_aqhp_eligible
+      attr_accessor :is_uqhp_notice, :payload_member, :age, :is_aqhp_eligible, :is_magi_medicaid_eligibile
       attr_accessor :person, :is_toatally_ineligible, :is_uqhp_eligible
       attr_accessor :first_name, :last_name
 
@@ -54,6 +55,10 @@ module Notifier
 
       def uqhp_eligible?
         is_uqhp_notice.presence || payload_member['uqhp_eligible'].casecmp('YES').zero?
+      end
+
+      def medicaid_eligible?
+        is_uqhp_notice.presence || payload_member['magi_medicaid'].casecmp('YES').zero?
       end
     end
   end
