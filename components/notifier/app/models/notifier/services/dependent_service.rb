@@ -3,11 +3,12 @@ module Notifier
   module Services
     class DependentService
 
-      attr_accessor :is_uqhp_notice, :payload_member, :age, :is_aqhp_eligible
+      attr_accessor :is_uqhp_notice, :payload_member, :age, :is_aqhp_eligible, :is_magi_medicaid_eligibile
       attr_accessor :person, :is_totally_ineligible, :is_uqhp_eligible
       attr_accessor :first_name, :last_name
 
       def initialize(is_uqhp_notice, member)
+
         @is_uqhp_notice = is_uqhp_notice
         @payload_member = member
         @person = person_details
@@ -17,6 +18,7 @@ module Notifier
         @is_totally_ineligible = totally_ineligible?
         @is_uqhp_eligible = uqhp_eligible?
         @is_aqhp_eligible = aqhp_eligible?
+        @is_magi_medicaid_eligibile = medicaid_eligible?
       end
 
       private
@@ -51,6 +53,10 @@ module Notifier
 
       def uqhp_eligible?
         is_uqhp_notice.presence || payload_member['uqhp_eligible'].casecmp('YES').zero?
+      end
+
+      def medicaid_eligible?
+        is_uqhp_notice.presence || payload_member['magi_medicaid'].casecmp('YES').zero?
       end
     end
   end
