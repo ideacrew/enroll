@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 RSpec.describe BenefitSponsors::ApplicationHelper, type: :helper, dbclean: :after_each do
   include BenefitSponsors::ApplicationHelper
