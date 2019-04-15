@@ -58,7 +58,7 @@ module Notifier
     end
 
     def conditions
-      %w{broker_present? census_employee_health_and_dental_enrollment? census_employee_health_enrollment? census_employee_dental_enrollment?}
+      ["broker_present?", "census_employee_health_and_dental_enrollment?", "census_employee_health_enrollment?", "census_employee_dental_enrollment?", "future_sep?"]
     end
 
     def census_employee_health_enrollment?
@@ -67,6 +67,10 @@ module Notifier
 
     def census_employee_dental_enrollment?
       self.census_employee.latest_terminated_dental_enrollment_plan_name.present?
+    end
+
+    def future_sep?
+      Date.strptime(special_enrollment_period.event_on, '%m/%d/%Y').future?
     end
 
     def census_employee_health_and_dental_enrollment?
