@@ -205,16 +205,16 @@ end
 describe EventsHelper, "transforming a qualifying_reason for external xml" do
 
   RESULT_PAIR = {
-      "I do not have other coverage" => "voluntary_withdrawal",
-      "non_payment" => "non_payment",
-      "I have coverage through Medicaid" => "alternate_benefit_available",
-      "I have coverage through Tricare" => "alternate_benefit_available",
-      "I have coverage through Medicare" => "alternate_benefit_available",
-      "I have coverage through an individual market health plan" => "alternate_benefit_available",
-      "I have coverage through any other employer health plan" => "alternate_benefit_available",
-      "I have coverage through parent’s employer health plan" => "alternate_benefit_available",
-      "I have coverage through spouse’s employer health plan" => "alternate_benefit_available",
-      "" => "termination_of_benefits"
+    "I do not have other coverage" => "voluntary_withdrawal",
+    "non_payment" => "non_payment",
+    "I have coverage through Medicaid" => "alternate_benefit_available",
+    "I have coverage through Tricare" => "alternate_benefit_available",
+    "I have coverage through Medicare" => "alternate_benefit_available",
+    "I have coverage through an individual market health plan" => "alternate_benefit_available",
+    "I have coverage through any other employer health plan" => "alternate_benefit_available",
+    "I have coverage through parent’s employer health plan" => "alternate_benefit_available",
+    "I have coverage through spouse’s employer health plan" => "alternate_benefit_available",
+    "" => "termination_of_benefits"
   }
 
   subject { EventsHelperSlug.new }
