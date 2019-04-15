@@ -72,9 +72,7 @@ module SponsoredBenefits
         plan_design_organization.save
       end
 
-      pending "should instantiate a plan year object and must have correct values assigned" do
-        # this spec should pass once we code fix plan_design_organization belongs_to relation mentioned model
-        # in rails 5 every belongs_to should be directly associate while saving
+      it "should instantiate a plan year object and must have correct values assigned" do
         ben_app = benefit_application.to_benefit_sponsors_benefit_application(benefit_sponsor_organization)
         expect(ben_app.class).to eq BenefitSponsors::BenefitApplications::BenefitApplication
         expect(ben_app.benefit_packages.present?).to eq true
