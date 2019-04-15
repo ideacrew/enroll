@@ -152,7 +152,7 @@ class Insured::ConsumerRolesController < ApplicationController
         @person = @consumer_role.person
       else
       # not logging error because error was logged in construct_consumer_role
-        render file: 'public/500.html', status: 500
+        redirect_to 'public/500.html', status: 500
         return
       end
     rescue Exception => e
