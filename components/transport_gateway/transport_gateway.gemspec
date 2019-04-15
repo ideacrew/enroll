@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'rails', '>= 5.2.3'
   s.add_dependency 'net-sftp', '~> 2.1', '>= 2.1.2'
   s.add_dependency 'net-ssh', '4.2.0'
-  s.add_dependency 'aws-sdk', '>= 2.2.4'
+  s.add_dependency 'aws-sdk', '~> 2.2.4'
 
   s.add_development_dependency 'rspec-rails'
   s.add_development_dependency 'shoulda-matchers'
