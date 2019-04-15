@@ -57,7 +57,7 @@ gem 'addressable',              '~> 2.3'
 gem 'animate-rails',            '~> 1.0.10'
 gem 'recurring_select'
 
-gem 'aws-sdk',                  '~> 3.0'
+gem 'aws-sdk',                  '~> 2.2.4'
 gem 'bcrypt',                   '~> 3.1'
 gem 'bootsnap',                 '>= 1.1', require: false
 gem 'bootstrap',                '~> 4.1'
