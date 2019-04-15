@@ -223,7 +223,7 @@ describe DefinePermissions, dbclean: :after_each do
         expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_transition_family_members).to be false
         expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_transition_family_members).to be false
         expect(@hbx_csr_tier2_person.hbx_staff_role.permission.can_transition_family_members).to be false
-        expect(@super_admin_person.hbx_staff_role.permission.can_transition_family_members).to be false
+        expect(@super_admin_person.hbx_staff_role.permission.can_transition_family_members).to be true
       end
     end
 
@@ -767,14 +767,14 @@ describe DefinePermissions, dbclean: :after_each do
       subject.hbx_admin_can_access_accept_reject_identity_documents
       expect(Person.all.count).to eq(8)
       expect(@hbx_staff_person.hbx_staff_role.permission.can_access_accept_reject_identity_documents).to be true
-      expect(@hbx_super_admin_person.hbx_staff_role.permission.can_access_accept_reject_identity_documents).to be true
+      expect(@super_admin_person.hbx_staff_role.permission.can_access_accept_reject_identity_documents).to be true
       expect(@hbx_tier3_person.hbx_staff_role.permission.can_access_accept_reject_identity_documents).to be true
     end
     it "updates hbx_admin_can_access_accept_reject_paper_application_documents to true" do
       subject.hbx_admin_can_access_accept_reject_paper_application_documents
       expect(Person.all.count).to eq(8)
       expect(@hbx_staff_person.hbx_staff_role.permission.can_access_accept_reject_paper_application_documents).to be true
-      expect(@hbx_super_admin_person.hbx_staff_role.permission.can_access_accept_reject_paper_application_documents).to be true
+      expect(@super_admin_person.hbx_staff_role.permission.can_access_accept_reject_paper_application_documents).to be true
       expect(@hbx_tier3_person.hbx_staff_role.permission.can_access_accept_reject_paper_application_documents).to be true
       expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_access_accept_reject_paper_application_documents).to be true
       expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_access_accept_reject_paper_application_documents).to be true
@@ -784,7 +784,7 @@ describe DefinePermissions, dbclean: :after_each do
       subject.hbx_admin_can_delete_identity_application_documents
       expect(Person.all.count).to eq(8)
       expect(@hbx_staff_person.hbx_staff_role.permission.can_delete_identity_application_documents).to be true
-      expect(@hbx_super_admin_person.hbx_staff_role.permission.can_delete_identity_application_documents).to be true
+      expect(@super_admin_person.hbx_staff_role.permission.can_delete_identity_application_documents).to be true
       expect(@hbx_tier3_person.hbx_staff_role.permission.can_delete_identity_application_documents).to be true
     end
   end
