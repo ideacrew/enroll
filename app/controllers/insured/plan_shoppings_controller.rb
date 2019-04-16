@@ -118,6 +118,10 @@ class Insured::PlanShoppingsController < ApplicationController
 
       if @waiver_enrollment.inactive?
         redirect_to print_waiver_insured_plan_shopping_path(@waiver_enrollment), notice: "Waive Coverage Successful"
+        predecessor_enrollment = @waiver_enrollment.parent_enrollment
+        unless predecessor_enrollment.nil?
+          trigger_notice_observer(predecessor_enrollment.employee_role, predecessor_enrollment, "employee_waiver_confirmation")
+        end
       else
         redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), alert: "Waive Coverage Failed"
       end
@@ -129,10 +133,6 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def print_waiver
     @hbx_enrollment = HbxEnrollment.find(params.require(:id))
-    predecessor_enrollment = @hbx_enrollment.parent_enrollment
-    unless predecessor_enrollment.nil?
-      trigger_notice_observer(predecessor_enrollment.employee_role, predecessor_enrollment, "employee_waiver_confirmation")
-    end
   end
 
   def terminate

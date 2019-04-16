@@ -439,11 +439,15 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
   end
 
   context "POST waive" do
+    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+    let!(:parent_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, aasm_state: 'coverage_terminated') }
+
     before :each do
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
       allow(hbx_enrollment).to receive(:may_waive_coverage?).and_return(true)
       allow(hbx_enrollment).to receive(:waive_enrollment).and_return(true)
       allow(hbx_enrollment).to receive(:shopping?).and_return(true)
+      allow(hbx_enrollment).to receive(:parent_enrollment).and_return(parent_enrollment)
       sign_in user
     end
 
