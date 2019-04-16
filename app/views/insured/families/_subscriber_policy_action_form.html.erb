@@ -1,0 +1,67 @@
+<div class="panel panel-default">
+  <div class="panel-heading">Subscriber Policy Actions</div>
+    <div class="panel-body">
+      <%= form_tag(subscriber_policy_action_insured_family_path(@family.id)) do %>
+      <%# Hidden fields for createSep method, visible when 'Add Sep' is selected %>
+      <div id="subscriber_policy_action_form_sep_fields" class='hidden'>
+        <%= hidden_field_tag 'family', @family.id %>
+        <%= hidden_field_tag 'person', @family.id %>
+        <%= hidden_field_tag 'firstName', @person.first_name %>
+        <%= hidden_field_tag 'lastName', @person.last_name %>
+        <%= select_tag("qle_id", options_for_select(@all_qle_events.map { |qle| [qle.reason.titleize, qle.id.to_s] }.uniq )) %>
+        <%= select_tag("effective_on_kind", options_for_select(QualifyingLifeEventKind::EffectiveOnKinds.map { |kind| [kind.titleize, kind] } )) %>
+        <% sep_date_fields = ["event_date", "start_on", "end_on", "next_poss_effective_date"] %>
+        <% sep_date_fields.each do |field_name| %>
+            <strong><%= field_name.titleize %></strong>
+          <%= text_field_tag field_name, nil, required: true, id: "add-sep-date-picker_#{field_name}",
+               class: "form-control date-field date-picker sep-date-field", "data-date-min" =>  '', "data-date-max" => '' %>
+        <% end %>
+        <strong>Admin Comment for SEP</strong>
+        <%= text_field_tag "admin_comment", nil, class: 'form-control' %>
+      </div>
+      <%# End createSep fields %>
+        <% subscriber_policy_actions = [
+            ["Add SEP", "add_sep"],
+            ["Cancel Enrollment", "cancel"],
+            ["Create Eligibility", "create_eligibility"],
+            ["Reinstate", "reinstate"],
+            ["Shorten Coverage Span", "shorten_coverage_span"],
+            ["Terminate", "terminate"]
+          ]
+        %>
+        <% subscriber_policy_actions.each do |action| %>
+          <% action_radio_title = action[0] %>
+          <% action_radio_value = action[1] %>
+          <%= radio_button_tag 'subscriber_policy_action', action_radio_value, false %>
+          <strong> <%= action_radio_title %> </strong> <br>
+        <% end %>
+
+        <%= submit_tag "Confirm", class: "btn btn-large btn-primary", onclick: "return confirm('Are you sure you wish to perform this action?')" %>
+
+      <% end %>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    function toggleDisplayRequireAddSepFields(event) {
+      var sep_date_fields_div = document.getElementById("subscriber_policy_action_form_sep_fields");
+      var sep_date_fields = document.querySelectorAll(".sep-date-field")
+      if (event.target.id == 'subscriber_policy_action_add_sep') {
+        sep_date_fields_div.classList.remove("hidden");
+        for (var i = 0; i < sep_date_fields.length; i++) {
+          sep_date_fields[i].required = true;
+        }
+      } else {
+        sep_date_fields_div.classList.add("hidden");
+        for (var i = 0; i < sep_date_fields.length; i++) {
+          sep_date_fields[i].required = false;
+        }
+      }
+    };
+    var subscriberPolicyActionRadioButtons = document.querySelectorAll('input[name="subscriber_policy_action"]');
+    for (var i = 0; i < subscriberPolicyActionRadioButtons.length; i++) {
+      subscriberPolicyActionRadioButtons[i].addEventListener('click', toggleDisplayRequireAddSepFields);
+    }
+  });
+</script>

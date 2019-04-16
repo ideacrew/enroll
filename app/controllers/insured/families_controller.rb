@@ -2,6 +2,7 @@ class Insured::FamiliesController < FamiliesController
   include VlpDoc
   include Acapi::Notifiers
   include ApplicationHelper
+  include SepAll
 
   before_action :updateable?, only: [:delete_consumer_broker, :record_sep, :purchase, :upload_notice]
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
@@ -17,6 +18,7 @@ class Insured::FamiliesController < FamiliesController
     set_bookmark_url
     set_admin_bookmark_url
     @active_sep = @family.latest_active_sep
+    @all_qle_events = QualifyingLifeEventKind.all.to_a
 
     log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
 
@@ -112,6 +114,38 @@ class Insured::FamiliesController < FamiliesController
     respond_to do |format|
       format.html
     end
+  end
+
+  # For the radio selections on the subscriber policy page
+  # Only HBX admin should be able to access these actions
+  def subscriber_policy_action
+    authorize @family, :show?
+    selected_action = params["subscriber_policy_action"]
+    family_id = params["family"]
+    if selected_action == "add_sep"
+      createSep #  See sep_all.rb
+      flash[:notice] = @message_for_partial # From createSep action
+    elsif selected_action == 'cancel'
+      # Unsure if proper logic
+      cancel_eligible_enrollments =  Family.find(family_id).all_enrollments.cancel_eligible
+      cancel_eligible_enrollments.each { |enrollment| enrollment.cancel_coverage! }
+      flash[:notice] = "Successfully canceled all family enrollments."
+    elsif selected_action == "create_eligibility"
+      # Logic needed
+    elsif selected_action == "reinstate"
+      # Logic needed
+      flash[:notice] = "Successfully reinstated all family enrollments."
+    elsif selected_action ==  "shorten_coverage_span"
+      # Logic needed
+    elsif selected_action == "terminate"
+      # Unsure if proper logic
+      terminate_eligible_enrollments = Family.find(family_id).all_enrollments.can_terminate
+      terminate_eligible_enrollments.each { |enrollment| enrollment.terminate_coverage! }
+      flash[:notice] = "Successfully terminated all family enrollments."
+    else
+      flash[:error] = "Please select a valid subscriber policy action type."
+    end
+    redirect_to home_insured_families_path
   end
 
   def inbox
@@ -451,11 +485,8 @@ class Insured::FamiliesController < FamiliesController
     end_date = TimeKeeper.date_of_record + @qle.pre_event_sep_in_days.try(:days)
     @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
     @qle_date_calc = @qle_date - Settings.aca.qle.with_in_sixty_days.days
-
     if @person.resident_role?
       @resident_role_id = @person.resident_role.id
     end
-
   end
-
 end

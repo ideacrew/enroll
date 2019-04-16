@@ -182,6 +182,7 @@ Rails.application.routes.draw do
       member do
         delete 'delete_consumer_broker'
         get 'generate_out_of_pocket_url'
+        post 'subscriber_policy_action'
       end
 
       collection do
