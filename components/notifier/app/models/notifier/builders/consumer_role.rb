@@ -111,7 +111,7 @@ module Notifier
         end
         magi_medicaid_members
         aqhp_or_non_magi_medicaid_members
-        uqhp_or_non_magi_medicaid_members
+        #uqhp_or_non_magi_medicaid_members
       end
 
       def magi_medicaid_members
@@ -134,36 +134,15 @@ module Notifier
       end
 
       def aqhp_or_non_magi_medicaid_members
-       primary_member = []
-       merge_model.aqhp_or_non_magi_medicaid_members = []
-       primary_member << payload['notice_params']['primary_member']
-       dependent_members = payload['notice_params']['dependents']
-       family_members = primary_member + dependent_members
-       family_members.each do |member|
-        if (member["aqhp_eligible"] == "Yes" || member["non_magi_medicaid"] == "Yes")
-          fam_member = Notifier::Services::DependentService.new(uqhp_notice?, member)
-          merge_model.aqhp_or_non_magi_medicaid_members << MergeDataModels::Dependent.new(
-              {
-                first_name: fam_member.first_name,
-                last_name: fam_member.last_name,
-                age: fam_member.age
-              }
-            )
-          end
-        end
-      end
-
-      def uqhp_or_non_magi_medicaid_members
         primary_member = []
-        merge_model.uqhp_or_non_magi_medicaid_members = []
+        merge_model.aqhp_or_non_magi_medicaid_members = []
         primary_member << payload['notice_params']['primary_member']
         dependent_members = payload['notice_params']['dependents']
         family_members = primary_member + dependent_members
-
         family_members.each do |member|
-          if (member["uqhp_eligible"] == "Yes" || member["non_magi_medicaid"] == "Yes")
+          if (member["aqhp_eligible"] == "Yes" || member["non_magi_medicaid"] == "Yes")
             fam_member = Notifier::Services::DependentService.new(uqhp_notice?, member)
-            merge_model.uqhp_or_non_magi_medicaid_members << MergeDataModels::Dependent.new(
+            merge_model.aqhp_or_non_magi_medicaid_members << MergeDataModels::Dependent.new(
                 {
                   first_name: fam_member.first_name,
                   last_name: fam_member.last_name,
@@ -427,9 +406,9 @@ module Notifier
         aqhp_or_non_magi_medicaid_members_present
       end
 
-      def uqhp_or_non_magi_medicaid_members_present?
-        uqhp_or_non_magi_medicaid_members_present
-      end
+      #def uqhp_or_non_magi_medicaid_members_present?
+        #uqhp_or_non_magi_medicaid_members_present
+      #end
 
       def totally_ineligible_members_present?
         totally_ineligible_members_present
