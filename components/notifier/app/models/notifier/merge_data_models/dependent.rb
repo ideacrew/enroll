@@ -20,7 +20,6 @@ module Notifier
     attribute :non_magi_medicaid, Boolean
     attribute :magi_medicaid, Boolean
     attribute :aqhp_or_non_magi_medicaid_members_present, Boolean
-    attribute :uqhp_or_non_magi_medicaid_members_present, Boolean
     attribute :totally_ineligible_members_present, Boolean
 
     def self.stubbed_object
@@ -44,7 +43,6 @@ module Notifier
         non_magi_medicaid: false,
         magi_medicaid: false,
         aqhp_or_non_magi_medicaid_members_present: true,
-        uqhp_or_non_magi_medicaid_members_present: false,
         totally_ineligible_members_present: false
       })
     end
