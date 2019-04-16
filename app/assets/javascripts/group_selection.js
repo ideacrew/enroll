@@ -114,7 +114,7 @@ function toggleErrosOnEmployerSelection() {
 
       setDentalBenefits(checked_er.attr('dental_benefits'));
       errorsForChangeInCoverageKind(employer_id);
-      setPrimaryForShop();
+      // setPrimaryForShop();
     }
 
   } else {
