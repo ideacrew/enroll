@@ -227,6 +227,10 @@ module Notifier
       merge_model.special_enrollment_period.event_on = event_on
     end
 
+    def future_sep?
+      Date.strptime(special_enrollment_period_event_on, '%m/%d/%Y').future?
+    end
+
     def special_enrollment_period_title
       merge_model.special_enrollment_period.title = (payload['notice_params'] && payload['notice_params']['qle_title']) ? payload['notice_params']['qle_title'] : special_enrollment_period.title
     end

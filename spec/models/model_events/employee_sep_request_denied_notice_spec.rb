@@ -118,6 +118,29 @@ RSpec.describe 'ModelEvents::EmployeeSepRequestDeniedNotice', :dbclean => :after
       it "should return qle_reported_on" do
         expect(merge_model.special_enrollment_period.qle_reported_on).to eq TimeKeeper.date_of_record.strftime('%m/%d/%Y')
       end
+
+      it 'should return true if event date is in future' do
+        expect(merge_model.future_sep?).to be_truthy
+      end
+
+      context 'with valid/past event on date' do
+
+        let(:payload) do
+          {
+            "event_object_kind" => "PlanYear",
+            "event_object_id" => plan_year.id,
+            "notice_params" =>  {
+              "qle_title" => qle.title,
+              "qle_reporting_deadline" => @reporting_deadline,
+              "qle_event_on" => TimeKeeper.date_of_record.prev_day.strftime("%m/%d/%Y")
+            }
+          }
+        end
+
+        it 'should return false' do
+          expect(merge_model.future_sep?).to be_falsey
+        end
+      end
     end
   end
 end
