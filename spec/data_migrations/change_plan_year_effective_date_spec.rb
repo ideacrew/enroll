@@ -83,7 +83,6 @@ describe ChangePlanYearEffectiveDate, dbclean: :after_each do
               action_on_enrollments: "",
               REDIS_URL: "redis://what",
               REDIS_NAMESPACE_QUIET: "what",
-              REDIS_NAMESPACE_DEPRECATIONS: "what",
               REDIS_NAMESPACE_DEPRECATIONS: "what", 
               plan_year_state: "force_publish" do
           allow_any_instance_of(CensusEmployee).to receive(:has_benefit_group_assignment?).and_return(true)
@@ -108,7 +107,6 @@ describe ChangePlanYearEffectiveDate, dbclean: :after_each do
           action_on_enrollments: "",
           REDIS_URL: "redis://what",
           REDIS_NAMESPACE_QUIET: "what",
-          REDIS_NAMESPACE_DEPRECATIONS: "what",
           REDIS_NAMESPACE_DEPRECATIONS: "what", 
           plan_year_state: "revert_renewal" do
             plan_year.employer_profile.update_attributes!(profile_source: "conversion")
@@ -133,7 +131,6 @@ describe ChangePlanYearEffectiveDate, dbclean: :after_each do
         action_on_enrollments: "",
         REDIS_URL: "redis://what",
         REDIS_NAMESPACE_QUIET: "what",
-        REDIS_NAMESPACE_DEPRECATIONS: "what",
         REDIS_NAMESPACE_DEPRECATIONS: "what", 
         plan_year_state: "revert_application" do
         subject.migrate
@@ -155,7 +152,6 @@ describe ChangePlanYearEffectiveDate, dbclean: :after_each do
       action_on_enrollments: "",
       REDIS_URL: "redis://what",
       REDIS_NAMESPACE_QUIET: "what",
-      REDIS_NAMESPACE_DEPRECATIONS: "what",
       REDIS_NAMESPACE_DEPRECATIONS: "what", 
       plan_year_state: "revert_application" do
         subject.migrate
@@ -175,7 +171,6 @@ describe ChangePlanYearEffectiveDate, dbclean: :after_each do
         action_on_enrollments: "",
         REDIS_URL: "redis://what",
         REDIS_NAMESPACE_QUIET: "what",
-        REDIS_NAMESPACE_DEPRECATIONS: "what",
         REDIS_NAMESPACE_DEPRECATIONS: "what", 
         plan_year_state: "revert_application" do
         subject.migrate
@@ -194,7 +189,6 @@ describe ChangePlanYearEffectiveDate, dbclean: :after_each do
         action_on_enrollments: "py_start_on",
         REDIS_URL: "redis://what",
         REDIS_NAMESPACE_QUIET: "what",
-        REDIS_NAMESPACE_DEPRECATIONS: "what",
         REDIS_NAMESPACE_DEPRECATIONS: "what", 
         plan_year_state: "revert_application" do
         subject.migrate
@@ -214,7 +208,6 @@ describe ChangePlanYearEffectiveDate, dbclean: :after_each do
         action_on_enrollments: "py_start_on",
         REDIS_URL: "redis://what",
         REDIS_NAMESPACE_QUIET: "what",
-        REDIS_NAMESPACE_DEPRECATIONS: "what",
         REDIS_NAMESPACE_DEPRECATIONS: "what", 
         plan_year_state: "revert_application" do
       end
@@ -231,7 +224,6 @@ describe ChangePlanYearEffectiveDate, dbclean: :after_each do
         action_on_enrollments: "py_start_on",
         REDIS_URL: "redis://what",
         REDIS_NAMESPACE_QUIET: "what",
-        REDIS_NAMESPACE_DEPRECATIONS: "what",
         REDIS_NAMESPACE_DEPRECATIONS: "what", 
         plan_year_state: "revert_application" do
       expect(subject.migrate).to eq nil
