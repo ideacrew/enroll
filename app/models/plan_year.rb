@@ -1188,6 +1188,30 @@ class PlanYear
     end
   end
 
+  def send_employee_renewal_invites
+    benefit_groups.each do |bg|
+      bg.census_employees.non_terminated.each do |ce|
+        Invitation.invite_renewal_employee!(ce)
+      end
+    end
+  end
+
+  def send_employee_initial_enrollment_invites
+    benefit_groups.each do |bg|
+      bg.census_employees.non_terminated.each do |ce|
+        Invitation.invite_initial_employee!(ce)
+      end
+    end
+  end
+
+  def send_active_employee_invites
+    benefit_groups.each do |bg|
+      bg.census_employees.non_terminated.each do |ce|
+        Invitation.invite_employee!(ce)
+      end
+    end
+  end
+  
   def notify_cancel_event(transmit_xml = false)
     return unless transmit_xml
     transition = self.latest_workflow_state_transition
@@ -1273,7 +1297,7 @@ class PlanYear
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     if self.employer_profile.census_employees.active.count < 1
       begin
-        self.employer_profile.trigger_notices("zero_employees_on_roster")
+        self.employer_profile.trigger_notices("zero_employees_on_roster", "acapi_trigger" =>  true)
       rescue Exception => e
         Rails.logger.error { "Unable to deliver employer zero employees on roster notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
       end
@@ -1284,21 +1308,12 @@ class PlanYear
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     self.employer_profile.census_employees.non_terminated.each do |ce|
       begin
-        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notify_employee_of_initial_employer_ineligibility")
+        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notify_employee_of_initial_employer_ineligibility", "acapi_trigger" =>  true)
       rescue Exception => e
         Rails.logger.error { "Unable to deliver employee initial eligibiliy notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
       end
     end
   end
-
-  # def initial_employer_ineligibility_notice
-  #   return true if benefit_groups.any?{|bg| bg.is_congress?}
-  #   begin
-  #     self.employer_profile.trigger_notices("initial_employer_ineligibility_notice", "acapi_trigger" => true)
-  #   rescue Exception => e
-  #     Rails.logger.error { "Unable to deliver employer initial ineligibiliy notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
-  #   end
-  # end
 
   def renewal_group_notice
     event_name = aasm.current_event.to_s.gsub(/!/, '')
@@ -1336,7 +1351,7 @@ class PlanYear
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     if (application_eligibility_warnings.include?(:primary_office_location) || application_eligibility_warnings.include?(:fte_count))
       begin
-        self.employer_profile.trigger_notices("initial_employer_denial")
+        self.employer_profile.trigger_notices("initial_employer_denial", "acapi_trigger" =>  true)
       rescue Exception => e
         Rails.logger.error { "Unable to deliver employer initial denial notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
       end
@@ -1353,10 +1368,16 @@ class PlanYear
   #   end
   # end
 
-  # def renewal_employer_open_enrollment_completed
-  #   return true if benefit_groups.any?{|bg| bg.is_congress?}
-  #   self.employer_profile.trigger_notices("renewal_employer_open_enrollment_completed")
-  # end
+  def renewal_employer_ineligibility_notice_to_employee
+    return true if benefit_groups.any?{|bg| bg.is_congress?}
+      self.employer_profile.census_employees.non_terminated.each do |ce|
+       begin
+         ShopNoticesNotifierJob.perform_later(ce.id.to_s, "renewal_employer_ineligibility_notice_to_employee", "acapi_trigger" =>  true)
+       rescue Exception => e
+         Rails.logger.error { "Unable to deliver employer renewal ineligiblity denial notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
+      end
+    end
+  end
 
   def employer_renewal_eligibility_denial_notice
     if application_eligibility_warnings.include?(:primary_office_location)
@@ -1374,30 +1395,6 @@ class PlanYear
       to_state: aasm.to_state,
       event: aasm.current_event
     )
-  end
-
-  def send_employee_renewal_invites
-    benefit_groups.each do |bg|
-      bg.census_employees.non_terminated.each do |ce|
-        Invitation.invite_renewal_employee!(ce)
-      end
-    end
-  end
-
-  def send_employee_initial_enrollment_invites
-    benefit_groups.each do |bg|
-      bg.census_employees.non_terminated.each do |ce|
-        Invitation.invite_initial_employee!(ce)
-      end
-    end
-  end
-
-  def send_active_employee_invites
-    benefit_groups.each do |bg|
-      bg.census_employees.non_terminated.each do |ce|
-        Invitation.invite_employee!(ce)
-      end
-    end
   end
 
   def send_employee_invites
