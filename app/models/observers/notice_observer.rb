@@ -193,7 +193,6 @@ module Observers
             end
           end
         end
-      end
     end
 
     def document_update(new_model_event)
