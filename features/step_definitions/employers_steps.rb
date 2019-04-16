@@ -445,8 +445,8 @@ Given /^an employer exists$/ do
   owner :with_family, :employer, organization: employer
 end
 
-Given /^the employer has draft plan year$/ do
-  create(:custom_plan_year, employer_profile: employer.employer_profile, start_on: TimeKeeper.date_of_record.beginning_of_month, aasm_state: 'draft', with_dental: false)
+Given /^the employer has (.*?) plan year$/ do |aasm_state|
+  @custom_plan_year = create(:custom_plan_year, employer_profile: employer.employer_profile, start_on: TimeKeeper.date_of_record.beginning_of_month, aasm_state: aasm_state, with_dental: false)
 end
 
 Given /^the employer has broker agency profile$/ do
