@@ -19,8 +19,9 @@ class Exchanges::EmployerApplicationsController < ApplicationController
       if @application.present?
         end_on = Date.strptime(params[:end_on], "%m/%d/%Y")
         termination_kind = params['term_reason']
+        enrollment_term_reason = termination_kind == "nonpayment" ? "non_payment" : "voluntary_withdrawl"
         trasmit_to_carrier = (params['trasmit_to_carrier'] == "true" || params['trasmit_to_carrier'] == true) ? true : false
-        @application.terminate_plan_year(end_on, TimeKeeper.date_of_record, termination_kind, trasmit_to_carrier)
+        @application.terminate_plan_year(end_on, TimeKeeper.date_of_record, termination_kind, trasmit_to_carrier, enrollment_term_reason)
         flash[:notice] = "Employer Application terminated successfully."
       else
         flash[:error] = "Employer Application can't be terminated."
