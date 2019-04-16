@@ -12,7 +12,7 @@ module SponsoredBenefits
   	  embeds_one :phone, class_name:"SponsoredBenefits::Locations::Phone", cascade_callbacks: true, validate: true
   	  accepts_nested_attributes_for :phone, reject_if: :all_blank, allow_destroy: true
 
-      validates_presence_of :address, class_name:"SponsoredBenefits::Locations::Address"
+      validates_presence_of :address, class_name:"SponsoredBenefits::Locations::Address", if: :sic_code_exists_for_employer?
 
   	  # validate :address_includes_county_for_employers_primary_location
 
@@ -35,6 +35,9 @@ module SponsoredBenefits
         address.present? ? address.zip : ""
       end
 
+      def sic_code_exists_for_employer?
+        Settings.aca.employer_has_sic_field
+      end
 
 
   	  # def parent
