@@ -295,6 +295,7 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
 
       it "should update the benefit application and transition the benefit sponsorship" do
         benefit_application.update_attributes!(aasm_state: "draft")
+        benefit_application.update_attributes!(fte_count: 3)
         expect(benefit_application.effective_period.min.to_date).to eq effective_date
         subject.migrate
         benefit_application.reload
