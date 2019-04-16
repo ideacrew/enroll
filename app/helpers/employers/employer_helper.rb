@@ -108,7 +108,6 @@ module Employers::EmployerHelper
   end
 
     def render_plan_offerings(benefit_group, coverage_type)
-    binding.pry
     reference_plan = benefit_group.reference_plan
     if coverage_type == "dental" && benefit_group.plan_option_kind == "single_plan"
       plan_count = benefit_group.elected_dental_plan_ids.count
