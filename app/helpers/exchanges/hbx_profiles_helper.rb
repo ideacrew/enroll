@@ -1,5 +1,6 @@
 module Exchanges
   module HbxProfilesHelper
+    include L10nHelper
     def get_person_roles(person, person_roles = [])
       person_roles << "Employee Role" if person.active_employee_roles.present?
       person_roles << "Consumer Role" if person.is_consumer_role_active?
