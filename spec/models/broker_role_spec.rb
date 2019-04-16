@@ -107,21 +107,18 @@ describe BrokerRole, dbclean: :after_each do
 
     context "with duplicate npn number" do
       let(:params) {valid_params}
-      let(:broker_person) { FactoryBot.create(:person)}
-      let(:broker_role_with_same_npn) {FactoryBot.build(:broker_role, npn: npn0, person: broker_person, provider_kind: provider_kind)}
-
-      def save_existing_npn(broker_role_with_same_npn)
-        begin
-          broker_role_with_same_npn.save!
-        rescue Mongo::Error::OperationFailure => e
-          e.class
-        end
-      end
+      let!(:broker_person) { FactoryBot.create(:person)}
+      let!(:broker_role_with_same_npn) {FactoryBot.build(:broker_role, npn: npn0, person: broker_person, provider_kind: provider_kind)}
 
       it "should raise" do
         expect(BrokerRole.create(**params)).to be_truthy
         expect(BrokerRole.by_npn(npn0)).not_to be_nil
-        expect(save_existing_npn(broker_role_with_same_npn)).to eq(Mongo::Error::OperationFailure)
+        monogid_exception_class = begin
+                                    broker_role_with_same_npn.save!
+                                  rescue Mongo::Error::OperationFailure => e
+                                     e.class
+        end
+        expect(monogid_exception_class).to eq(Mongo::Error::OperationFailure)
       end
     end
 
