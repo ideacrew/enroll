@@ -1196,6 +1196,11 @@ describe Person do
       person.general_agency_staff_roles << FactoryGirl.build(:general_agency_staff_role)
       expect(person.agent?).to be_truthy
     end
+
+    it 'should return true with broker_agency_staff_roles' do
+      person.general_agency_staff_roles << FactoryGirl.build(:broker_agency_staff_role)
+      expect(person.agent?).to be_truthy
+    end
   end
 
   describe "dob_change_implication_on_active_enrollments" do

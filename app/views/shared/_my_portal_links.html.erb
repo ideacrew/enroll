@@ -3,9 +3,8 @@
 <% employer = employer_staff.first %>
 <% broker_agency_staff_roles = (current_user.person && current_user.person.active_broker_staff_roles) || [] %>
 <% broker =  current_user.try(:has_broker_agency_staff_role?) %>
-<% roles = [insured, broker] %>
-<% portal_count = roles.select{|role|role}.count + employer_staff.count%>
-
+<% roles = [insured] %>
+<% portal_count = roles.select{|role|role}.count + employer_staff.count + broker_agency_staff_roles.count%>
 
   <% if portal_count == 1 %>
     <span>

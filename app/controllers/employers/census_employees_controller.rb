@@ -6,7 +6,7 @@ class Employers::CensusEmployeesController < ApplicationController
   def new
     @census_employee = build_census_employee(@employer_profile.try(:id))
     @no_ssn = @employer_profile.no_ssn || false
-
+    @broker_agency_profile_id = @employer_profile.active_broker_agency_account.broker_agency_profile_id if @employer_profile.active_broker_agency_account.present?
     if @no_ssn
       flash[:notice] = "SSN requirement is currently disabled. This means you are not required to input an SSN when adding new employees to your roster at this time."
     end
@@ -20,6 +20,7 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def create
+    @broker_agency_profile_id = @employer_profile.active_broker_agency_account.broker_agency_profile_id if @employer_profile.active_broker_agency_account.present?
     @census_employee = CensusEmployee.new(census_employee_params)
     @census_employee.assign_benefit_packages(benefit_group_id: benefit_group_id, renewal_benefit_group_id: renewal_benefit_group_id)
     @census_employee.employer_profile = @employer_profile

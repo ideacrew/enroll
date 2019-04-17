@@ -68,6 +68,7 @@ class Exchanges::AgentsController < ApplicationController
 
   def check_for_paper_app
     session[:person_id] = params[:person_id]
+    session[:broker_agency_profile_id] = params[:broker_agency_profile_id]
     session[:original_application_type] = params['original_application_type']
     @person = Person.find(params[:person_id])
     if session[:original_application_type] == "paper"
