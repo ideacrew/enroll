@@ -47,6 +47,21 @@ font-size:30px;
   background-repeat: repeat-x;
 }
 
+  .navbar-native {
+  margin-bottom: 0;
+  height:90px;
+  background-color: $primary-button-text;
+  border-bottom: solid 10px $primary-blue;
+  .navbar-header {
+    .navbar-brand {
+      border-right: solid 2px #d7d7d7;
+      min-height: 80px;
+      img {
+        max-height: 55px;
+      }
+    }
+  }
+  }
 .navbar {
   margin-bottom: 0;
   height:90px;
@@ -61,6 +76,8 @@ font-size:30px;
       }
     }
   }
+  
+  
   .navbar-collapse {
     .header-text {
       color: $primary-gray;

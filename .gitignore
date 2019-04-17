@@ -26,11 +26,11 @@ components/**/log/*
 
 # Ignore local data content
 db/data
-db/seedfiles/**/*.xml
-db/seedfiles/**/*.xls
-db/seedfiles/**/*.xlsx
-db/seedfiles/**/*.bson
-db/seedfiles/**/*.json
+# db/seedfiles/**/*.xml
+# db/seedfiles/**/*.xls
+# db/seedfiles/**/*.xlsx
+# db/seedfiles/**/*.bson
+# db/seedfiles/**/*.json
 # db/seedfiles/*.csv
 db/seedfiles/*.yml
 db/seedfiles/plan_xmls/**/*.pdf
