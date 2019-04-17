@@ -1,15 +1,15 @@
 FactoryBot.define do
   factory :plan_design_census_employee, class: 'SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee' do
 
-    first_name "Eddie"
+    first_name { "Eddie" }
     sequence(:last_name) {|n| "Vedder#{n}" }
-    dob "1964-10-23".to_date
-    gender "male"
-    expected_selection "enroll"
-    employee_relationship "self"
-    hired_on "2015-04-01".to_date
+    dob { "1964-10-23".to_date }
+    gender { "male" }
+    expected_selection { "enroll" }
+    employee_relationship { "self" }
+    hired_on { "2015-04-01".to_date }
     sequence(:ssn) { |n| 222222220 + n }
-    is_business_owner  false
+    is_business_owner  { false }
 
     address { build(:sponsored_benefits_locations_address) }
     email { build(:sponsored_benefits_email) }
@@ -20,7 +20,7 @@ FactoryBot.define do
     # plan_design_organization            { FactoryBot.build(:plan_design_organization) }
 
     transient do
-      create_with_spouse false
+      create_with_spouse { false }
     end
 
     after(:create) do |census_employee, evaluator|
@@ -31,7 +31,7 @@ FactoryBot.define do
     end
 
     trait :owner do
-      is_business_owner  true
+      is_business_owner  { true }
     end
 
     trait :with_spouse do
@@ -39,7 +39,7 @@ FactoryBot.define do
     end
 
     trait :blank_email do
-      email nil
+      email { nil }
     end
   end
 end

@@ -3,11 +3,11 @@ FactoryBot.define do
     sequence(:email) {|n| "example#{n}@example.com"}
     sequence(:oim_id) {|n| "example#{n}"}
     gen_pass = User.generate_valid_password
-    password gen_pass
-    password_confirmation gen_pass
+    password { gen_pass }
+    password_confirmation { gen_pass }
     sequence(:authentication_token) {|n| "j#{n}-#{n}DwiJY4XwSnmywdMW"}
-    approved true
-    roles ['web_service']
+    approved { true }
+    roles { ['web_service'] }
 
     transient do
       with_security_questions { true }
@@ -21,20 +21,20 @@ FactoryBot.define do
   end
 
   trait :without_email do
-    email ' '
+    email { ' ' }
   end
 
   trait :without_password do
-    password ' '
+    password { ' ' }
   end
 
   trait :without_password_confirmation do
-    password_confirmation ' '
+    password_confirmation { ' ' }
   end
 
 
   trait :hbx_staff do
-    roles ["hbx_staff"]
+    roles { ["hbx_staff"] }
 
     after :create do |user, evaluator|
       if user.person.present?
@@ -45,31 +45,31 @@ FactoryBot.define do
   end
 
   trait :with_hbx_staff_role do
-    roles ["hbx_staff"]
+    roles { ["hbx_staff"] }
   end
 
   trait :consumer do
-    roles ["consumer"]
+    roles { ["consumer"] }
   end
 
   trait :resident do
-    roles ["resident"]
+    roles { ["resident"] }
   end
 
   trait "assister" do
-    roles ["assister"]
+    roles { ["assister"] }
   end
 
   trait "csr" do
-    roles ["csr"]
+    roles { ["csr"] }
   end
 
   trait "employee" do
-    roles ["employee"]
+    roles { ["employee"] }
   end
 
   trait :broker_with_person do
-    roles ["broker"]
+    roles { ["broker"] }
 
     transient do
       organization {}
@@ -101,19 +101,19 @@ FactoryBot.define do
   end
 
   trait :employer_staff do
-    roles ["employer_staff"]
+    roles { ["employer_staff"] }
   end
 
   trait "broker" do
-    roles ["broker"]
+    roles { ["broker"] }
   end
 
   trait "broker_agency_staff" do
-    roles ["broker_agency_staff"]
+    roles { ["broker_agency_staff"] }
   end
 
   trait :general_agency_staff do
-    roles ['general_agency_staff']
+    roles { ['general_agency_staff'] }
   end
 
   trait :with_consumer_role do

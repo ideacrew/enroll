@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :benefit_sponsorship do
-    service_markets %W(individual shop)
+    service_markets { %W(individual shop) }
     benefit_coverage_periods { [FactoryBot.build(:benefit_coverage_period)] }
 
     trait :single_open_enrollment_coverage_period do

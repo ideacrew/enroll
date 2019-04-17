@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :office_location do
 
-    is_primary  false
+    is_primary  { false }
     address { FactoryBot.build(:address, kind: "branch") }
     phone   { FactoryBot.build(:phone, kind: "work") }
 
@@ -10,7 +10,7 @@ FactoryBot.define do
     end
 
     trait :primary do
-      is_primary true
+      is_primary { true }
       address { FactoryBot.build(:address, kind: "primary") }
     end
 

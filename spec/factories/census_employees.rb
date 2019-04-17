@@ -1,14 +1,14 @@
 FactoryBot.define do
   factory :census_employee do
-    first_name "Eddie"
+    first_name { "Eddie" }
     sequence(:last_name) {|n| "Vedder#{n}" }
-    dob "1964-10-23".to_date
-    gender "male"
-    expected_selection "enroll"
-    employee_relationship "self"
-    hired_on "2015-04-01".to_date
+    dob { "1964-10-23".to_date }
+    gender { "male" }
+    expected_selection { "enroll" }
+    employee_relationship { "self" }
+    hired_on { "2015-04-01".to_date }
     sequence(:ssn) { |n| 222222220 + n }
-    is_business_owner  false
+    is_business_owner  { false }
     association :address, strategy: :build
     association :email, strategy: :build
     association :employer_profile, strategy: :create
@@ -22,7 +22,7 @@ FactoryBot.define do
     transient do
       benefit_group { build(:benefit_group) }
       renewal_benefit_group { build(:benefit_group) }
-      create_with_spouse false
+      create_with_spouse { false }
     end
 
     after(:create) do |census_employee, evaluator|
@@ -33,12 +33,12 @@ FactoryBot.define do
     end
 
     trait :old_case do
-      benefit_sponsorship_id nil
-      benefit_sponsors_employer_profile_id nil
+      benefit_sponsorship_id { nil }
+      benefit_sponsors_employer_profile_id { nil }
     end
 
     trait :owner do
-      is_business_owner  true
+      is_business_owner  { true }
     end
 
     trait :with_spouse do
@@ -46,7 +46,7 @@ FactoryBot.define do
     end
 
     trait :blank_email do
-      email nil
+      email { nil }
     end
     trait :termination_details do
       # aasm_state "employment_terminated"
@@ -55,12 +55,12 @@ FactoryBot.define do
     end
 
     trait :with_enrolled_census_employee do
-      aasm_state :eligible
+      aasm_state { :eligible }
     end
 
     trait :general_agency do
       transient do
-        general_agency_traits []
+        general_agency_traits { [] }
         general_agency_attributes { {} }
       end
 

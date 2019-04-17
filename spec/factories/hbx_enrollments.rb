@@ -1,25 +1,25 @@
 FactoryBot.define do
   factory :hbx_enrollment do
     household
-    kind "employer_sponsored"
-    elected_premium_credit 0
-    applied_premium_credit 0
+    kind { "employer_sponsored" }
+    elected_premium_credit { 0 }
+    applied_premium_credit { 0 }
     effective_on {1.month.ago.to_date}
-    terminated_on nil
-    waiver_reason "this is the reason"
+    terminated_on { nil }
+    waiver_reason { "this is the reason" }
     # broker_agency_id nil
     # writing_agent_id nil
     submitted_at {2.months.ago}
-    aasm_state "coverage_selected"
+    aasm_state { "coverage_selected" }
     aasm_state_date {effective_on}
-    updated_by "factory"
-    is_active true
-    enrollment_kind "open_enrollment"
+    updated_by { "factory" }
+    is_active { true }
+    enrollment_kind { "open_enrollment" }
     # comments
 
     transient do
-      enrollment_members []
-      active_year TimeKeeper.date_of_record.year
+      enrollment_members { [] }
+      active_year { TimeKeeper.date_of_record.year }
     end
 
     plan { create(:plan, :with_rating_factors, :with_premium_tables, active_year: active_year) }
@@ -30,31 +30,31 @@ FactoryBot.define do
 
     trait :with_dental_coverage_kind do
       association :plan, factory: [:plan, :with_dental_coverage]
-      coverage_kind "dental"
+      coverage_kind { "dental" }
     end
 
     trait :individual_unassisted do
-      kind "individual"
-      elected_premium_credit 0
-      applied_premium_credit 0
-      aasm_state "coverage_selected"
+      kind { "individual" }
+      elected_premium_credit { 0 }
+      applied_premium_credit { 0 }
+      aasm_state { "coverage_selected" }
     end
 
     trait :individual_assisted do
-      kind "individual"
-      elected_premium_credit 150
-      applied_premium_credit 110
-      aasm_state "coverage_selected"
+      kind { "individual" }
+      elected_premium_credit { 150 }
+      applied_premium_credit { 110 }
+      aasm_state { "coverage_selected" }
     end
 
     trait :shop do
-      kind "employer_sponsored"
-      aasm_state "coverage_selected"
+      kind { "employer_sponsored" }
+      aasm_state { "coverage_selected" }
     end
 
     trait :cobra_shop do
-      kind "employer_sponsored_cobra"
-      aasm_state "coverage_selected"
+      kind { "employer_sponsored_cobra" }
+      aasm_state { "coverage_selected" }
     end
 
     trait :health_plan do
@@ -82,21 +82,21 @@ FactoryBot.define do
     end
 
     trait :coverage_selected do
-      aasm_state "coverage_selected"
+      aasm_state { "coverage_selected" }
     end
 
     trait :open_enrollment do
-      enrollment_kind  "open_enrollment"
+      enrollment_kind  { "open_enrollment" }
     end
 
     trait :special_enrollment do
-      enrollment_kind special_enrollment
+      enrollment_kind { special_enrollment }
     end
 
     trait :terminated do
-      aasm_state "coverage_terminated"
-      terminated_on Time.now.last_month.end_of_month
-      termination_submitted_on TimeKeeper.date_of_record
+      aasm_state { "coverage_terminated" }
+      terminated_on { Time.now.last_month.end_of_month }
+      termination_submitted_on { TimeKeeper.date_of_record }
     end
 
     trait :older_effective_date do

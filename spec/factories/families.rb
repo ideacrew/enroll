@@ -2,12 +2,12 @@ FactoryBot.define do
   factory :family do
     association :person
     sequence(:e_case_id) {|n| "abc#{n}12xyz#{n}"}
-    renewal_consent_through_year  2017
-    submitted_at Time.now
-    updated_at "user"
+    renewal_consent_through_year  { 2017 }
+    submitted_at { Time.now }
+    updated_at { "user" }
 
     transient do
-      people []
+      people { [] }
     end
 
     trait :with_primary_family_member do

@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :benefit_coverage_period do
-    service_market           "individual"
+    service_market           { "individual" }
     start_on                 { Date.new(TimeKeeper.date_of_record.year, 1, 1) }
     end_on                   { Date.new(TimeKeeper.date_of_record.year, 12, 31) }
     open_enrollment_start_on { Date.new(TimeKeeper.date_of_record.year - 1, 11, 1) }

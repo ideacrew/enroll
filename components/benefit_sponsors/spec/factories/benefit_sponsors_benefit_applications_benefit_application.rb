@@ -45,7 +45,7 @@ FactoryBot.define do
       dental_package_kind { :single_product }
       dental_sponsored_benefit { false }
       predecessor_application_catalog { false }
-      passed_benefit_sponsor_catalog nil
+      passed_benefit_sponsor_catalog { nil }
     end
 
     trait :without_benefit_sponsor_catalog

@@ -1,11 +1,11 @@
 FactoryBot.define do
   factory :employer_profile_no_attestation, class: EmployerProfile do
     organization            { FactoryBot.build(:organization) }
-    entity_kind             "c_corporation"
-    sic_code "1111"
+    entity_kind             { "c_corporation" }
+    sic_code { "1111" }
 
     transient do
-      employee_roles []
+      employee_roles { [] }
     end
 
     before :create do |employer_profile, evaluator|
@@ -17,12 +17,12 @@ FactoryBot.define do
 
   factory :employer_profile do
     organization            { FactoryBot.build(:organization) }
-    entity_kind             "c_corporation"
-    sic_code "1111"
+    entity_kind             { "c_corporation" }
+    sic_code { "1111" }
 
     transient do
-      employee_roles []
-      attested true
+      employee_roles { [] }
+      attested { true }
     end
 
     trait :with_full_inbox do
@@ -55,18 +55,18 @@ FactoryBot.define do
   factory :registered_employer, class: EmployerProfile do
 
     organization { FactoryBot.build(:organization) }
-    entity_kind "c_corporation"
-    sic_code '1111'
+    entity_kind { "c_corporation" }
+    sic_code { '1111' }
     transient do
-      start_on TimeKeeper.date_of_record.beginning_of_month
-      plan_year_state 'draft'
-      renewal_plan_year_state 'renewing_draft'
+      start_on { TimeKeeper.date_of_record.beginning_of_month }
+      plan_year_state { 'draft' }
+      renewal_plan_year_state { 'renewing_draft' }
       reference_plan_id { FactoryBot.create(:plan).id }
       renewal_reference_plan_id { FactoryBot.create(:plan).id }
-      dental_reference_plan_id nil
-      dental_renewal_reference_plan_id nil
-      with_dental false
-      is_conversion false
+      dental_reference_plan_id { nil }
+      dental_renewal_reference_plan_id { nil }
+      with_dental { false }
+      is_conversion { false }
     end
 
     factory :employer_with_planyear do

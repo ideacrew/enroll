@@ -1,15 +1,15 @@
 FactoryBot.define do
   factory :person do
     # name_pfx 'Mr'
-    first_name 'John'
+    first_name { 'John' }
     # middle_name 'X'
     sequence(:last_name) {|n| "Smith#{n}" }
     # name_sfx 'Jr'
-    dob "1972-04-04".to_date
-    is_incarcerated false
-    is_active true
+    dob { "1972-04-04".to_date }
+    is_incarcerated { false }
+    is_active { true }
 
-    gender "male"
+    gender { "male" }
     # us_citizen "true"
     # indian_tribe_member "false"
     # naturalized_citizen "false"
@@ -43,21 +43,21 @@ FactoryBot.define do
     end
 
     trait :without_first_name do
-      first_name ' '
+      first_name { ' ' }
     end
 
     trait :without_last_name do
-      last_name ' '
+      last_name { ' ' }
     end
 
     factory :invalid_person, traits: [:without_first_name, :without_last_name]
 
     trait :male do
-      gender "male"
+      gender { "male" }
     end
 
     trait :female do
-      gender "female"
+      gender { "female" }
     end
 
     trait :with_employer_staff_role do
@@ -124,9 +124,9 @@ FactoryBot.define do
     factory :female, traits: [:female]
 
     transient do
-      census_employee_id nil
-      employer_profile_id nil
-      hired_on nil
+      census_employee_id { nil }
+      employer_profile_id { nil }
+      hired_on { nil }
     end
 
     factory :person_with_employee_role do

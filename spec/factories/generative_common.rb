@@ -17,7 +17,7 @@ FactoryBot.define do
     kind { 
       Address::KINDS[Random.rand(3)]
     }
-    address_1 Forgery('address').street_address
+    address_1 { Forgery('address').street_address }
     address_2 { 
       if Forgery('basic').boolean
         Forgery('address').street_address
@@ -25,8 +25,8 @@ FactoryBot.define do
         nil
       end
     }
-    state Forgery('address').state_abbrev
-    zip Forgery('address').zip
-    city Forgery('address').city
+    state { Forgery('address').state_abbrev }
+    zip { Forgery('address').zip }
+    city { Forgery('address').city }
   end
 end

@@ -73,17 +73,17 @@ FactoryBot.define do
 
   factory(:generative_person_employee_role, {class: EmployeeRole}) do
     transient do
-      person_obj nil
+      person_obj { nil }
     end
     person { person_obj }
   end
 
   factory(:generative_person_broker_role, {class: BrokerRole}) do
     transient do
-      person_obj nil
+      person_obj { nil }
     end
     person { person_obj }
-    npn "123432423"
+    npn { "123432423" }
     broker_agency_profile {
       FactoryBot.build_stubbed :generative_broker_agency_profile
     }
