@@ -1,8 +1,8 @@
 FactoryBot.define do
   factory :hbx_profile do
     organization            { FactoryBot.build(:organization) }
-    us_state_abbreviation   Settings.aca.state_abbreviation
-    cms_id   "DC0"
+    us_state_abbreviation   { Settings.aca.state_abbreviation }
+    cms_id   { "DC0" }
     benefit_sponsorship { FactoryBot.build(:benefit_sponsorship) }
 
     trait :open_enrollment_coverage_period do

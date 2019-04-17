@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :employer_attestation do
     employer_profile
-    aasm_state "unsubmitted"
+    aasm_state { "unsubmitted" }
 
     trait :with_attestation_document do
       after :create do |employer_attestation, evaluator|

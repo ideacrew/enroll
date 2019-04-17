@@ -2,19 +2,19 @@ FactoryBot.define do
   factory :plan do
     sequence(:hbx_id)    { |n| n + 12345 }
     sequence(:name)      { |n| "BlueChoice Silver#{n} 2,000" }
-    abbrev              "BC Silver $2k"
+    abbrev              { "BC Silver $2k" }
     sequence(:hios_id, (10..99).cycle)  { |n| "41842DC04000#{n}-01" }
     active_year         { TimeKeeper.date_of_record.year }
-    coverage_kind       "health"
-    metal_level         "silver"
-    plan_type           "pos"
-    market              "shop"
-    ehb                 0.9943
+    coverage_kind       { "health" }
+    metal_level         { "silver" }
+    plan_type           { "pos" }
+    market              { "shop" }
+    ehb                 { 0.9943 }
     carrier_profile     { FactoryBot.create(:carrier_profile)  } #{ BSON::ObjectId.from_time(DateTime.now) }
-    minimum_age         19
-    maximum_age         66
-    deductible          "$500"
-    family_deductible   "$500 per person | $1000 per group"
+    minimum_age         { 19 }
+    maximum_age         { 66 }
+    deductible          { "$500" }
+    family_deductible   { "$500 per person | $1000 per group" }
 
     # association :premium_tables, strategy: :build
     #
@@ -53,14 +53,14 @@ FactoryBot.define do
     end
 
     trait :with_dental_coverage do
-      coverage_kind "dental"
-       metal_level "dental"
-      dental_level "high"
+      coverage_kind { "dental" }
+       metal_level { "dental" }
+      dental_level { "high" }
     end
 
     trait :with_premium_tables do
       transient do
-        premium_tables_count 6
+        premium_tables_count { 6 }
       end
 
       after(:create) do |plan, evaluator|
@@ -79,58 +79,58 @@ FactoryBot.define do
     end
 
     trait :csr_00 do
-      coverage_kind   "health"
-      metal_level     "silver"
-      market          "individual"
-      csr_variant_id  "00"
+      coverage_kind   { "health" }
+      metal_level     { "silver" }
+      market          { "individual" }
+      csr_variant_id  { "00" }
     end
 
     trait :csr_87 do
-      coverage_kind   "health"
-      metal_level     "silver"
-      market          "individual"
-      csr_variant_id  "87"
+      coverage_kind   { "health" }
+      metal_level     { "silver" }
+      market          { "individual" }
+      csr_variant_id  { "87" }
     end
 
     trait :catastrophic do
-      coverage_kind   "health"
-      metal_level     "catastrophic"
-      market          "individual"
+      coverage_kind   { "health" }
+      metal_level     { "catastrophic" }
+      market          { "individual" }
     end
 
     trait :individual_health do
-      coverage_kind   "health"
-      market          "individual"
+      coverage_kind   { "health" }
+      market          { "individual" }
     end
 
     trait :individual_dental do
-      coverage_kind   "dental"
-      market          "individual"
-      metal_level     "low"
+      coverage_kind   { "dental" }
+      market          { "individual" }
+      metal_level     { "low" }
     end
 
     trait :shop_health do
-      coverage_kind   "health"
-      market          "shop"
+      coverage_kind   { "health" }
+      market          { "shop" }
     end
 
     trait :shop_dental do
-      coverage_kind   "dental"
-      market          "shop"
-      metal_level     "high"
+      coverage_kind   { "dental" }
+      market          { "shop" }
+      metal_level     { "high" }
     end
 
     trait :this_year do
-      active_year Time.now.year
+      active_year { Time.now.year }
     end
 
     trait :next_year do
-      active_year Time.now.year
+      active_year { Time.now.year }
     end
 
     trait :premiums_for_2015 do
       transient do
-        premium_tables_count 6
+        premium_tables_count { 6 }
       end
 
       after :create do |plan, evaluator|
@@ -141,7 +141,7 @@ FactoryBot.define do
 
     trait :with_next_year_premium_tables do
       transient do
-        next_year_premium_tables_count 6
+        next_year_premium_tables_count { 6 }
       end
       active_year {TimeKeeper.date_of_record.next_year.year}
       after(:create) do |plan, evaluator|
@@ -168,8 +168,8 @@ FactoryBot.define do
 
   factory :premium_table do
     sequence(:age, (19..66).cycle)
-    start_on  TimeKeeper.date_of_record.beginning_of_year
-    end_on  TimeKeeper.date_of_record.beginning_of_year.next_year - 1.day
+    start_on  { TimeKeeper.date_of_record.beginning_of_year }
+    end_on  { TimeKeeper.date_of_record.beginning_of_year.next_year - 1.day }
     cost {(age * 1001.00) / 100.00}
 
     after :create do |pt|
@@ -205,32 +205,32 @@ end
 
 FactoryBot.define do
   factory(:plan_template, {class: Plan}) do
-    name "Some plan name"
+    name { "Some plan name" }
     carrier_profile_id { BSON::ObjectId.new }
     sequence(:hios_id, (100000..999999).cycle)  { |n| "#{n}-01" }
-    active_year Date.today.year
+    active_year { Date.today.year }
     metal_level { ["bronze","silver","gold","platinum"].shuffle.sample }
 
     trait :shop_health do
-      market "shop"
-      coverage_kind "health"
+      market { "shop" }
+      coverage_kind { "health" }
     end
     trait :ivl_health do
-      market "individual"
-      coverage_kind "health"
+      market { "individual" }
+      coverage_kind { "health" }
     end
     trait :shop_dental do
-      market "shop"
-      coverage_kind "dental"
-      metal_level "dental"
-      dental_level "high"
+      market { "shop" }
+      coverage_kind { "dental" }
+      metal_level { "dental" }
+      dental_level { "high" }
     end
 
     trait :ivl_dental do
-      market "individual"
-      coverage_kind "dental"
-      metal_level "dental"
-      dental_level "high"
+      market { "individual" }
+      coverage_kind { "dental" }
+      metal_level { "dental" }
+      dental_level { "high" }
     end
     trait :unoffered do
       sequence(:hios_id, (100000..999999).cycle)  { |n| "#{n}-00" }

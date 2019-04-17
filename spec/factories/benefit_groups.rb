@@ -14,16 +14,16 @@ FactoryBot.define do
       FactoryBot.build(:relationship_benefit, benefit_group: self, relationship: :disabled_child_26_and_over, premium_pct: 40, employer_max_amt:  200.00),
       FactoryBot.build(:relationship_benefit, benefit_group: self, relationship: :child_26_and_over,          premium_pct:  0, employer_max_amt:    0.00, offered: false),
       ] }
-    effective_on_kind "date_of_hire"
-    terminate_on_kind "end_of_month"
-    plan_option_kind "single_plan"
-    description "my first benefit group"
-    effective_on_offset 0
-    default false
+    effective_on_kind { "date_of_hire" }
+    terminate_on_kind { "end_of_month" }
+    plan_option_kind { "single_plan" }
+    description { "my first benefit group" }
+    effective_on_offset { 0 }
+    default { false }
     reference_plan_id {FactoryBot.create(:plan, :with_rating_factors, :with_premium_tables)._id}
     elected_plan_ids { [ self.reference_plan_id ]}
     elected_dental_plan_ids { [self.reference_plan_id] }
-    employer_max_amt_in_cents 1000_00
+    employer_max_amt_in_cents { 1000_00 }
 
     trait :premiums_for_2015 do
       reference_plan_id {FactoryBot.create(:plan, :with_rating_factors, :premiums_for_2015 )._id}
@@ -40,10 +40,10 @@ FactoryBot.define do
       FactoryBot.build_stubbed(:dental_relationship_benefit, benefit_group: self, relationship: :child_26_and_over,          premium_pct:  0, employer_max_amt:    0.00, offered: false),
       ] }
 
-      dental_plan_option_kind "single_plan"
+      dental_plan_option_kind { "single_plan" }
       dental_reference_plan_id {FactoryBot.create(:plan, :with_rating_factors, :with_premium_tables)._id}
       elected_dental_plan_ids { [ self.dental_reference_plan_id ]}
-      employer_max_amt_in_cents 1000_00
+      employer_max_amt_in_cents { 1000_00 }
   end
 
   trait :with_dental_benefits do
@@ -56,10 +56,10 @@ FactoryBot.define do
         FactoryBot.build(:dental_relationship_benefit, benefit_group: self, relationship: :child_26_and_over,          premium_pct:  0, employer_max_amt:    0.00, offered: false),
     ] }
 
-    dental_plan_option_kind "single_plan"
+    dental_plan_option_kind { "single_plan" }
     dental_reference_plan_id {FactoryBot.create(:plan, :with_premium_tables)._id}
     elected_dental_plan_ids { [ self.dental_reference_plan_id ]}
-    employer_max_amt_in_cents 1000_00
+    employer_max_amt_in_cents { 1000_00 }
   end
 
   trait :invalid_employee_relationship_benefit do
@@ -77,13 +77,13 @@ end
 FactoryBot.define do
   factory :benefit_group_congress, class: BenefitGroup do
     plan_year
-    is_congress true
-    effective_on_kind "first_of_month"
-    terminate_on_kind "end_of_month"
-    plan_option_kind "metal_level"
-    description "Congress Standard"
-    effective_on_offset 30
-    default true
+    is_congress { true }
+    effective_on_kind { "first_of_month" }
+    terminate_on_kind { "end_of_month" }
+    plan_option_kind { "metal_level" }
+    description { "Congress Standard" }
+    effective_on_offset { 30 }
+    default { true }
 
     reference_plan_id {FactoryBot.create(:plan, :with_rating_factors, :with_premium_tables)._id}
     elected_plan_ids { [ self.reference_plan_id ]}

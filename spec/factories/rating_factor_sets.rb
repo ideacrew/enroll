@@ -4,28 +4,28 @@ FactoryBot.define do
     association :carrier_profile
 
     active_year { TimeKeeper.date_of_record.year }
-    max_integer_factor_key nil
-    default_factor_value 1.0
-    rating_factor_entries [ FactoryBot.build(:rating_factor_entry) ]
+    max_integer_factor_key { nil }
+    default_factor_value { 1.0 }
+    rating_factor_entries { [ FactoryBot.build(:rating_factor_entry) ] }
   end
 
   factory :employer_group_size_rating_factor_set, class: EmployerGroupSizeRatingFactorSet, parent: :rating_factor_set do
     association :carrier_profile
 
     active_year { TimeKeeper.date_of_record.year }
-    max_integer_factor_key 10
-    default_factor_value 1.0
-    rating_factor_entries [ FactoryBot.build(:rating_factor_entry) ]
+    max_integer_factor_key { 10 }
+    default_factor_value { 1.0 }
+    rating_factor_entries { [ FactoryBot.build(:rating_factor_entry) ] }
   end
 
   factory :composite_rating_tier_factor_set, class: CompositeRatingTierFactorSet, parent: :rating_factor_set do
     association :carrier_profile
     active_year { TimeKeeper.date_of_record.year }
-    rating_factor_entries [ FactoryBot.build(:rating_factor_entry, factor_key: 'employee_only'),
+    rating_factor_entries { [ FactoryBot.build(:rating_factor_entry, factor_key: 'employee_only'),
                             FactoryBot.build(:rating_factor_entry, factor_key: 'family'),
                             FactoryBot.build(:rating_factor_entry, factor_key: 'employee_and_spouse'),
                             FactoryBot.build(:rating_factor_entry, factor_key: 'employee_and_one_or_more_dependents')
-                          ]
+                          ] }
   end
 
 end

@@ -18,7 +18,7 @@ FactoryBot.define do
 
     trait :with_issuer_profile do
       transient do
-        assigned_site nil
+        assigned_site { nil }
       end
 
       issuer_profile { create(:benefit_sponsors_organizations_issuer_profile, assigned_site: assigned_site) }

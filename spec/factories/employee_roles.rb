@@ -4,7 +4,7 @@ FactoryBot.define do
     association :person
 #    association :employer_profile
     sequence(:ssn, 111111111)
-    gender "male"
+    gender { "male" }
     dob  {Date.new(1965,1,1)}
     hired_on {20.months.ago}
 

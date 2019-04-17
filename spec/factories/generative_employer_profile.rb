@@ -37,8 +37,8 @@ FactoryBot.define do
   end
 
   factory(:generative_reference_plan, {class: Plan}) do
-    active_year 2015
-    hios_id "JDFLKJELKFJKLDJFIODFIE-01"
+    active_year { 2015 }
+    hios_id { "JDFLKJELKFJKLDJFIODFIE-01" }
     coverage_kind {
       pick_list = Plan::COVERAGE_KINDS
       max = pick_list.length
@@ -56,7 +56,7 @@ FactoryBot.define do
 
   factory(:generative_relationship_benefit, {class: RelationshipBenefit}) do
     transient do
-      rel_kind ""
+      rel_kind { "" }
     end
     relationship { rel_kind }
     premium_pct { Random.rand * 100.00 }
@@ -73,10 +73,10 @@ FactoryBot.define do
   end
 
   factory(:generative_plan_year, {class: PlanYear}) do
-    open_enrollment_start_on Date.today
-    open_enrollment_end_on Date.today
-    start_on Date.today
-    end_on Date.today
+    open_enrollment_start_on { Date.today }
+    open_enrollment_end_on { Date.today }
+    start_on { Date.today }
+    end_on { Date.today }
     benefit_groups {
       example_count = Random.rand(4)
       (0..example_count).to_a.map do |e|
@@ -97,10 +97,10 @@ FactoryBot.define do
   # end
 
   factory(:generative_broker_agency_profile, {class: BrokerAgencyProfile }) {
-    ach_routing_number "123456789"
-    ach_account_number "9999999999999999"
+    ach_routing_number { "123456789" }
+    ach_account_number { "9999999999999999" }
     organization { FactoryBot.build_stubbed :generative_organization }
-    corporate_npn "11234234"
+    corporate_npn { "11234234" }
   }
 
   factory(:generative_broker_role, {class: BrokerRole}) do

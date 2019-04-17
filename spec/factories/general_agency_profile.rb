@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :general_agency_profile do
-    entity_kind "s_corporation"
-    market_kind "shop"
+    entity_kind { "s_corporation" }
+    market_kind { "shop" }
     organization
     sequence(:corporate_npn) {|n| "2002345#{n}" }
 
@@ -11,10 +11,10 @@ FactoryBot.define do
       end
     end
     trait :shop_agency do
-      market_kind "shop"
+      market_kind { "shop" }
     end
      trait :ivl_agency do
-      market_kind "individual"
+      market_kind { "individual" }
     end
   end
 end

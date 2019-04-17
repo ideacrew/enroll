@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :benefit_sponsors_documents_employer_attestation, class: 'BenefitSponsors::Documents::EmployerAttestation' do
-    aasm_state "unsubmitted"
+    aasm_state { "unsubmitted" }
 
     trait :with_attestation_document do
       after :create do |employer_attestation, evaluator|

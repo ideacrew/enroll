@@ -1,8 +1,8 @@
 FactoryBot.define do
   factory :organization do
-    legal_name  "Turner Agency, Inc"
-    dba         "Turner Brokers"
-    home_page   "http://www.example.com"
+    legal_name  { "Turner Agency, Inc" }
+    dba         { "Turner Brokers" }
+    home_page   { "http://www.example.com" }
     office_locations  { [FactoryBot.build(:office_location, :primary),
                          FactoryBot.build(:office_location)] }
 
@@ -123,7 +123,7 @@ FactoryBot.define do
                             :allow_numeric => true,
                             :allow_special => false, :exactly => 9)
     end
-    home_page   "http://www.example.com"
+    home_page   { "http://www.example.com" }
     office_locations  { [FactoryBot.build(:office_location, :primary),
                          FactoryBot.build(:office_location)] }
 
@@ -203,7 +203,7 @@ FactoryBot.define do
     sequence(:legal_name) {|n| "Broker Agency#{n}" }
     sequence(:dba) {|n| "Broker Agency#{n}" }
     sequence(:fein, 200000000)
-    home_page   "http://www.example.com"
+    home_page   { "http://www.example.com" }
     office_locations  { [FactoryBot.build(:office_location, :primary),
                          FactoryBot.build(:office_location)] }
 
@@ -225,7 +225,7 @@ FactoryBot.define do
     end
 
     transient do
-      general_agency_traits []
+      general_agency_traits { [] }
       general_agency_attributes { {} }
     end
 
@@ -247,7 +247,7 @@ FactoryBot.define do
                             :allow_numeric => true,
                             :allow_special => false, :exactly => 9)
     end
-    home_page   "http://www.example.com"
+    home_page   { "http://www.example.com" }
     office_locations  { [FactoryBot.build(:office_location, :primary),
                          FactoryBot.build(:office_location)] }
 
