@@ -8,6 +8,7 @@ module Notifier
       include ActionView::Helpers::NumberHelper
       include Notifier::ApplicationHelper
       include Notifier::ConsumerRoleHelper
+      include Notifier::VerificationHelper
       include Config::ContactCenterHelper
       include Config::SiteHelper
 
@@ -83,8 +84,6 @@ module Notifier
           dependent = Notifier::Services::DependentService.new(uqhp_notice?, member)
           merge_model.dependents << dependent_hash(dependent, member)
         end
-        magi_medicaid_members
-        aqhp_or_non_magi_medicaid_members
       end
 
       def magi_medicaid_members
@@ -227,10 +226,12 @@ module Notifier
       end
 
       def magi_medicaid_members_present
+        magi_medicaid_members
         merge_model.magi_medicaid_members_present = merge_model.magi_medicaid_members.present?
       end
 
       def aqhp_or_non_magi_medicaid_members_present
+        aqhp_or_non_magi_medicaid_members
         merge_model.aqhp_or_non_magi_medicaid_members_present = merge_model.aqhp_or_non_magi_medicaid_members.present?
       end
 
