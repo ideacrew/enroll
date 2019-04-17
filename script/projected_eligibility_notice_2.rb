@@ -51,10 +51,11 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
         @notifier.deliver(
           recipient: consumer_role,
           event_object: consumer_role,
-          notice_event: 'projected_eligibility_notice_2',
+          notice_event: 'projected_eligibility_notice',
           notice_params: {
             dependents: dependents.map(&:to_hash),
-            primary_member: primary_member.to_hash
+            primary_member: primary_member.to_hash,
+            aqhp_event: 'aqhp_projected_eligibility_notice_2'
           }
         )
         puts "***************** Notice delivered to #{primary_person.hbx_id} *****************" unless Rails.env.test?

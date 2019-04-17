@@ -220,11 +220,11 @@ module Notifier
       end
 
       def aqhp_event
-        merge_model.aqhp_event =  (event_name == 'projected_eligibility_notice_2')
+        merge_model.aqhp_event =  payload['notice_params']['aqhp_event'] == 'aqhp_projected_eligibility_notice_2'
       end
 
       def uqhp_event
-        merge_model.uqhp_event =  (event_name == 'projected_eligibility_notice_1')
+        merge_model.uqhp_event =  payload['notice_params']['uqhp_event'] == 'uqhp_projected_eligibility_notice_1'
       end
 
       def magi_medicaid_members_present
@@ -369,7 +369,7 @@ module Notifier
       end
 
       def uqhp_notice?
-        event_name == 'projected_eligibility_notice_1'
+        payload['notice_params']['uqhp_event'] == 'uqhp_projected_eligibility_notice_1'
       end
     end
   end
