@@ -12,11 +12,11 @@ When(/^MEDICAID & TAX CREDITS button is visible to the user$/) do
 end
 
 Then(/^there will be text to the left of the MEDICAID & TAX CREDITS button$/) do
-  expect(page).to have_content('If you applied for Medicaid and tax credit savings, view additional documents')
+  expect(page).to have_content('If you qualify for Medicaid, view your Medicaid documents.')
 end
 
 Then(/^there will be messages text to the left of the MEDICAID & TAX CREDITS button$/) do
-  expect(page).to have_content('If you applied for Medicaid and tax credit savings, view additional messages')
+  expect(page).to have_content('If you qualify for Medicaid, view your Medicaid messages.')
 end
 
 When(/^the user clicks on the MEDICAID & TAX CREDITS button$/) do
