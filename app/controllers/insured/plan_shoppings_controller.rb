@@ -107,24 +107,33 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def waive
     hbx_enrollment = HbxEnrollment.find(params.require(:id))
+    waiver_success = false
+
     begin
-      if params[:waiver_reason] && !hbx_enrollment.shopping?
-        @waiver_enrollment = hbx_enrollment.construct_waiver_enrollment(params[:waiver_reason]) if !hbx_enrollment.waiver_enrollment_present? # do not construct waiver enrollment if already been created
-      else
+      if hbx_enrollment.shopping?
         @waiver_enrollment = hbx_enrollment
-      end
-
-      if @waiver_enrollment.may_waive_coverage?
-        @waiver_enrollment.waiver_reason = params[:waiver_reason]
-        @waiver_enrollment.waive_enrollment
-      end
-
-      if @waiver_enrollment.inactive?
-        redirect_to print_waiver_insured_plan_shopping_path(@waiver_enrollment), notice: "Waive Coverage Successful"
-        predecessor_enrollment = @waiver_enrollment.parent_enrollment
-        unless predecessor_enrollment.nil?
-          trigger_notice_observer(predecessor_enrollment.employee_role, predecessor_enrollment, "employee_waiver_confirmation")
+      else
+        unless hbx_enrollment.waiver_enrollment_present?
+          family = hbx_enrollment.family 
+          coverage_end_date = family.terminate_date_for_shop_by_enrollment(hbx_enrollment)
+          @waiver_enrollment = hbx_enrollment.construct_waiver_enrollment(params[:waiver_reason], coverage_end_date: coverage_end_date)
         end
+      end
+
+      if @waiver_enrollment.present?
+        if @waiver_enrollment.may_waive_coverage?
+          @waiver_enrollment.waiver_reason = params[:waiver_reason]
+          @waiver_enrollment.waive_enrollment
+        end
+
+        if @waiver_enrollment.inactive?
+          waiver_success = true
+        end
+      end
+
+      if waiver_success 
+        redirect_to print_waiver_insured_plan_shopping_path(@waiver_enrollment), notice: "Waive Coverage Successful"
+        trigger_notice_observer(@waiver_enrollment.employee_role, @waiver_enrollment, "employee_waiver_confirmation")
       else
         redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), alert: "Waive Coverage Failed"
       end
