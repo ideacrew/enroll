@@ -114,9 +114,7 @@ class Insured::PlanShoppingsController < ApplicationController
         @waiver_enrollment = hbx_enrollment
       else
         unless hbx_enrollment.waiver_enrollment_present?
-          family = hbx_enrollment.family 
-          coverage_end_date = family.terminate_date_for_shop_by_enrollment(hbx_enrollment)
-          @waiver_enrollment = hbx_enrollment.construct_waiver_enrollment(params[:waiver_reason], coverage_end_date: coverage_end_date)
+          @waiver_enrollment = hbx_enrollment.construct_waiver_enrollment(params[:waiver_reason])
         end
       end
 

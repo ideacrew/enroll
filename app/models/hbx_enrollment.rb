@@ -517,16 +517,11 @@ class HbxEnrollment
     end
   end
 
-  def construct_waiver_enrollment(waiver_reason = nil, coverage_end_date: nil)
-    plan_year = benefit_group.plan_year
-    if coverage_end_date
-      opt_effective_on = coverage_end_date.next_day 
-      opt_effective_on  = nil unless (plan_year.start_on..plan_year.end_on).cover?(coverage_end_date.next_day)
-    end
-
+  def construct_waiver_enrollment(waiver_reason = nil)
     qle = (family.is_under_special_enrollment_period? && family.latest_shop_sep.present?)
+
     coverage_household = employee_role.person.primary_family.active_household.immediate_family_coverage_household
-    waived_enrollment = coverage_household.household.new_hbx_enrollment_from(employee_role: employee_role, coverage_household: coverage_household, benefit_group: benefit_group, benefit_group_assignment: benefit_group_assignment, qle: qle, opt_effective_on: opt_effective_on)
+    waived_enrollment = coverage_household.household.new_hbx_enrollment_from(employee_role: employee_role, coverage_household: coverage_household, benefit_group: benefit_group, benefit_group_assignment: benefit_group_assignment, qle: qle)
     waived_enrollment.coverage_kind = coverage_kind
     waived_enrollment.enrollment_kind = (qle ? 'special_enrollment' : 'open_enrollment')
     waived_enrollment.kind = 'employer_sponsored_cobra' if employee_role.present? && employee_role.is_cobra_status?
@@ -601,7 +596,7 @@ class HbxEnrollment
     if is_shop?
       if coverage_termination_pending? || coverage_terminated?
         unless waiver_enrollment_present?
-          waiver = construct_waiver_enrollment(coverage_end_date: coverage_end_date)
+          waiver = construct_waiver_enrollment
           waiver.waive_coverage!
         end
       end
