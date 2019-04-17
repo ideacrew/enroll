@@ -229,7 +229,7 @@ describe Queries::NamedPolicyQueries, "Policy Queries", dbclean: :after_each do
           let!(:cobra_employee_waivers) {
             cobra_employees.inject([]) do |enrollments, ce|
               enrollment= create_enrollment(family: ce.employee_role.person.primary_family, kind:"employer_sponsored_cobra", benefit_group_assignment: ce.renewal_benefit_group_assignment, employee_role: ce.employee_role, submitted_at: effective_on - 10.days, status: 'shopping')
-              enrollment.waive_coverage!
+              enrollment.waive_enrollment
               enrollments << enrollment
             end
           }
