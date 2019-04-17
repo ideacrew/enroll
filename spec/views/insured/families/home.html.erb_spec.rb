@@ -51,4 +51,13 @@ RSpec.describe "insured/families/home.html.erb" do
     expect(rendered).to_not have_selector('div#qle-details-for-existing-sep')
   end
 
+  context "Subscriber Policy Action Panel" do
+    it "should display for HBX admin" do
+
+    end
+
+    it "should not display for non HBX admin" do
+
+    end
+  end
 end

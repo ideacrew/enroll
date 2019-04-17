@@ -887,6 +887,36 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     end
   end
 
+  describe "POST subscriber_policy_action" do
+    before do
+      sign_in(user)
+    end
+
+    it "should add sep" do
+
+    end
+
+    it "should cancel enrollments" do
+
+    end
+
+    it "should create eligibility" do
+
+    end
+
+    it "should reinstate enrollments" do
+  
+    end
+
+    it "should terminate enrollments" do
+
+    end
+
+    it "should throw error if valid subscriber_policy_action not submitted" do
+
+    end
+  end
+
   describe "POST transition_family_members_update" do
 
     before :each do
