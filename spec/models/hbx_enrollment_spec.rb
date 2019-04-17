@@ -3100,7 +3100,10 @@ describe HbxEnrollment, dbclean: :after_all do
     end
 
     it "should notify event with is_trading_partner_publishable = false" do
-      expect(hbx_enrollment).to receive(:notify).with("acapi.info.events.hbx_enrollment.terminated", {:reply_to=>glue_event_queue_name, "hbx_enrollment_id" => hbx_enrollment.hbx_id, "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment", "is_trading_partner_publishable" => false})
+      expect(hbx_enrollment).to receive(:notify).with("acapi.info.events.hbx_enrollment.terminated", {:reply_to => glue_event_queue_name,
+                                                                                                      "hbx_enrollment_id" => hbx_enrollment.hbx_id,
+                                                                                                      "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment",
+                                                                                                      "is_trading_partner_publishable" => false})
       hbx_enrollment.notify_enrollment_cancel_or_termination_event(false)
     end
   end
