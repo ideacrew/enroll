@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "employers/plan_years/_plan_options.html.erb" do
+RSpec.describe "employers/plan_years/_plan_options.html.erb", dbclean: :after_each do
   let(:organization) {FactoryBot.create(:organization)}
   let(:carrier_profile) {FactoryBot.create(:carrier_profile, organization: organization)}
   let(:plan) {FactoryBot.create(:plan, carrier_profile: carrier_profile)}

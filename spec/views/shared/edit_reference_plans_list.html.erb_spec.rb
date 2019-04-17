@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe "shared/_edit_reference_plans_list.html.erb" do
+describe "shared/_edit_reference_plans_list.html.erb", dbclean: :after_each do
   let(:mock_benefit_group) { double(:plan_option_kind => nil, :persisted? => false, :carrier_for_elected_plan => nil, :metal_level_for_elected_plan => nil, :reference_plan_id => nil )}
   let(:mock_plan_year) { double(:metal_level_plans_for => []) }
   let(:carrier_profile1) {double(:id => "carrier_1", :legal_name => "org_name_1")}

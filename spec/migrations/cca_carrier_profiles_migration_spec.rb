@@ -34,9 +34,6 @@ describe "CcaCarrierProfilesMigration" do
     end
 
     it "should match total migrated organizations with carrier profiles" do
-      # silence_stream(STDOUT) do
-      # end
-
       expect(@migrated_organizations.count).to eq 9
     end
 
