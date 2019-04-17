@@ -8,11 +8,11 @@
                   - gutter: 12
                     type: raw_html
                     classNames: 'small-padding-top-bottom'
-                    text: "To make it easier to determine my eligibility for help paying for coverage in future years, I agree to allow DC Health Link to use my income data, including information from tax returns, for the next five years.DC Health Link will send me a notice, let me make any changes, and I can opt out at any time. *<br>"
+                    text: "To make it easier to determine my eligibility for help paying for coverage in future years, I agree to allow DC Health Link to use my income data, including information from tax returns, for the next five years. DC Health Link will send me a notice, let me make any changes, and I can opt out at any time. *<br>"
             - cells:
                   - gutter: 2
                     type: label_radio
-                    label: I Agree
+                    label: I agree
                     id: 'agree'
                     value: true
                     classNames: 'span-text'
@@ -39,7 +39,7 @@
                   - gutter: 12
                     type: raw_html
                     classNames: 'small-padding-top-bottom'
-                    text: "How long would you like your eligibility for help paying for cost saving to be renewed? *"
+                    text: "How long would you like your eligibility for help paying for coverage to be renewed? *"
                   - gutter: 12
                     type: label_radio
                     label: 5 years
@@ -96,7 +96,7 @@
                   - gutter: 8
                     type: raw_html
                     classNames: 'small-padding-top-bottom'
-                    text: "Would you like to register to vote in DC or update your current registration? * (a form will be mailed to you)"
+                    text: "Would you like to register to vote in DC or update your current registration? * (A form will be mailed to you)"
                   - gutter: 2
                     type: label_radio
                     id: 'mailed_yes'
@@ -120,21 +120,21 @@
                   - gutter: 12
                     type: raw_html
                     classNames: 'small-padding-top-bottom'
-                    text: "<b>PLEASE NOTE:</b> If you select 'No' you will be considered to have decided not to have requested a voter registration form at this time.<br>
+                    text: "<b>PLEASE NOTE:</b> If you select 'No' you will be considered to have decided not to have requested a voter registration form at this time.<br><br>
                     You may file a complaint if you believe that someone has interfered with: <br><br>
                     * Your right to register or not register to vote <br>
                     * Your right to privacy in deciding whether or not to register to vote <br>
                     * Your right to choose your own political party or other political choice <br><br>
 
                     <b>To file a complaint, contact:</b><br>
-                    D.C. Board of Elections<br>
-                    441 4th Street, N.W.<br>
-                    Suite 250-North<br>
-                    Washington, DC 20001<br>
+                    DC Board of Elections<br>
+                    1015 Half Street, SE<br>
+                    Suite 750<br>
+                    Washington, DC 20003<br>
                     Phone: (202) 727-2525 <br>"
 - step:
     heading: Submit Your Application
-    heading_text: "This is the last step. Carefully read the information below. Select 'I Agree' after each statement to acknowledge your agreement.Then, enter your name to electronically sign the application.When you're finished, select SUBMIT MY APPLICATION."
+    heading_text: "This is the last step. Carefully read the information below. Select 'I agree' after each statement to acknowledge your agreement. Then, enter your name to electronically sign the application. When you're finished, select SUBMIT APPLICATION."
     sections:
       - section:
           lines:
@@ -142,12 +142,12 @@
                   - gutter: 12
                     type: raw_html
                     classNames: 'small-padding-top-bottom'
-                    text: <b> I understand that eligibility for Medicaid or private health insurance with or without financial assistance will be reviewed every year. </b> <br><br> This process is called renewal. DC Health Link will review eligibility by checking its records and other electronic data sources including with my consent information about my federal tax returns from the IRS. DC Health Link will send me a notice that includes the information it has found by checking its records and other electronic data sources and I will be able to correct information that is wrong.I may also be asked to provide additional information if found eligible Medicaid or private health insurance coverage with or without financial assistance will be extended for another year for myself and/or members of my application group child support veterans payments or supplemental security income(SSI).
+                    text: <b>I understand that eligibility for Medicaid or private health insurance, with or without financial assistance, will be reviewed every year.</b> <br><br> This process is called renewal. DC Health Link will review eligibility by checking its records and other electronic data sources including, with my consent, information about my federal tax returns from the IRS. DC Health Link will send me a notice that includes the information it has found by checking its records and other electronic data sources, and I will be able to correct information that is wrong. If found eligible for Medicaid or private health insurance coverage, with or without financial assistance, I may also be asked to provide additional information to extend coverage for another year for myself and/or other members of my application group.
             - cells:
                   - gutter: 12
                     type: checkbox
                     classNames: 'span-text'
-                    label: I Agree *
+                    label: I agree *
                     value: true
                     required: true
                     model: application
@@ -160,19 +160,17 @@
                   type: raw_html
                   classNames: span-text
                   text: <b> I understand that I must report any changes that might affect my eligibility or the eligibility of a household member for health insurance. </b> <br> <br>
-                        "I can report changes by going online and logging into 'My Account', by calling DC Health Link's Customer Care Center toll-free at 1-855-532-5465,
-                        or by submitting information via mail or in-person at one of the Department of Human Services' Service Centers. <br> <br>
+                        I can report changes by going online and logging into "My Account", by calling DC Health Link's Contact Center toll free at (855) 532-5465 TTY':' 711,
+                        or by submitting information via mail or in-person at one of the Department of Human Services service centers. <br> <br>
 
-                        I'm the person whose name appears in the signaature line below. I understand that I'm submitting an application for health insurance and that
+                        I'm the person whose name appears in the signature line below. I understand that I'm submitting an application for health insurance and that
                         information that I provided will be used to decide eligibility for each member of my application group. <br> <br>
 
-                        I ve reviewd the information in this application, and I attest under penalty of perjury, that it is accurate and complete to the best of my knowledge,
-                        I understand if Im not truthful, there may be a penalty, including retroactive termination of my coverage and a obligation to repy all medical claims
-                        previously covered by the health insurance"
+                        I have reviewed the information in this application and I attest, under penalty of perjury, that it is accurate and complete to the best of my knowledge. I understand that if I’m not truthful, there may be a penalty, including retroactive termination of my coverage and an obligation to repay all medical claims previous covered by the health insurance"
             - cells:
                 - gutter: 12
                   type: checkbox
-                  label: I Agree *
+                  label: I agree *
                   value: true
                   #required: true
                   name: medicaid_terms
@@ -185,11 +183,11 @@
                 - gutter: 12
                   type: raw_html
                   classNames: 'span-text'
-                  text: "If anyone in my application group is found eligible for Medicaid, I am authorizing the Medicaid agency to pursue and get any money from other health insurance, legal settlements, or other third parties that may be legally responsible for paying for any healthcare received by me or members of my applicant group. I am also giving to the Medicaid agency rights to pursue and get medical support from a spouse or parent."
+                  text: "If anyone in my application group is found eligible for Medicaid, I am authorizing the Medicaid agency to pursue and get any money from other health insurance, legal settlements, or other third parties that may be legally responsible for paying for any health care received by me or members of my applicant group. I am also giving to the Medicaid agency rights to pursue and get medical support from a spouse or parent."
             - cells:
                 - gutter: 12
                   type: checkbox
-                  label: I Agree *
+                  label: I agree *
                   value: true
                   required: true
                   classNames: 'span-text'
@@ -228,11 +226,11 @@
                 - gutter: 12
                   type: raw_html
                   classNames: 'span-text'
-                  text: "If yes, I know that, if anyone in my application group is found eligible for Medicaid, I will be asked to cooperate with the Child Support Agency to collect medical support from the parent who lives outside the home. If I think that cooperating to collect medical support will harm me or my children, I can tell my case worker and I may not have to cooperate."
+                  text: "If yes, I know that, if anyone in my application group is found eligible for Medicaid, I will be asked to cooperate with the Child Support Agency to collect medical support from the parent who lives outside the home. If I think that cooperating to collect medical support will harm me or my children, I can tell my caseworker and I may not have to cooperate."
             - cells:
                 - gutter: 12
                   type: checkbox
-                  label: I Agree *
+                  label: I agree *
                   value: true
                   classNames: 'span-text'
                   model: application
@@ -244,11 +242,11 @@
                 - gutter: 12
                   type: raw_html
                   classNames: 'small-padding-top-bottom'
-                  text: "I have reviewed the information in this application and I attest under penalty of perjury that it is accurate and complete to the best of my knowledge. I understand if I am not truthful, there may be a penalty."
+                  text: "I have reviewed the information in this application and I attest, under penalty of perjury, that it is accurate and complete to the best of my knowledge. I understand that if I am not truthful, there may be a penalty."
             - cells:
                 - gutter: 12
                   type: checkbox
-                  label: I Agree *
+                  label: I agree *
                   value: true
                   required: true
                   classNames: 'span-text'

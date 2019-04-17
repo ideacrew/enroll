@@ -14,7 +14,7 @@
       </div>
     </div>
       <!-- <h2 class="darkblue">Other Questions for <%= @applicant.family_member.person.first_name.titleize %> </h2> -->
-      <p>Tell us about this person's other questions. When you're finished select CONTINUE.</p>
+      <p>Answer these questions for this person. When you're finished, select CONTINUE.</p>
       <p class="memo">* = required field</p>
 
         <% if @applicant.present? && @applicant.person.no_ssn == "1" %>
@@ -34,10 +34,10 @@
 
           <div class="row row-form-wrapper no-buffer row-height">
             <div class='col-md-6'>
-              <span class="fa-text-color">Reason, why you dont have an SSN?</span>
+              <span class="fa-text-color">Why doesn't this person have an SSN?</span>
             </div>
             <div class='col-md-2'>
-              <%= f.text_field :non_ssn_apply_reason, class: "floatlabel", id: "no_ssn_reason", placeholder: "reason" %>
+              <%= f.text_field :non_ssn_apply_reason, class: "floatlabel", id: "no_ssn_reason", placeholder: "Reason" %>
             </div>
           </div>
         <% end %>
@@ -62,7 +62,7 @@
 
       <div class="row row-form-wrapper no-buffer row-height">
         <div class='col-lg-6 col-md-6 top-buffer'>
-          <span class="fa-text-color">Pregnancy due date</span>
+          <span class="fa-text-color">Pregnancy due date?</span>
         </div>
         <div class='col-lg-6 col-md-6'>
           <%= f.text_field :pregnancy_due_on, class: "jq-datepicker floatlabel", id: "applicant_pregnancy_due_on", placeholder: "Due Date" %>
