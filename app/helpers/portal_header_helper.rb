@@ -5,7 +5,7 @@ module PortalHeaderHelper
       "<a class='portal'>#{l10n("welcome.index.byline")}</a>".html_safe
     elsif current_user.try(:has_hbx_staff_role?)
       link_to "#{image_tag 'icons/icon-exchange-admin.png'} &nbsp; I'm an Admin".html_safe, main_app.exchanges_hbx_profiles_root_path, class: "portal"
-    elsif (current_user.person.try(:broker_role?)
+    elsif current_user.person.try(:broker_role?)
       link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe, main_app.broker_agencies_profile_path(id: @broker_agency_profile_id || session[:broker_agency_profile_id] || params[:id] ), class: "portal"
     elsif current_user.try(:person).try(:csr_role) || current_user.try(:person).try(:assister_role)
       link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Trained Expert".html_safe, main_app.home_exchanges_agents_path, class: "portal"
