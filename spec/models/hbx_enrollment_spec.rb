@@ -407,6 +407,7 @@ describe HbxEnrollment, dbclean: :after_all do
 
     context "waive_enrollment" do
       before :all do
+        mikes_benefit_group.plan_year.update_attributes!(aasm_state: 'active')
         @enrollment5 = household.new_hbx_enrollment_from(
           employee_role: mikes_employee_role,
           coverage_household: coverage_household,
