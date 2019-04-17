@@ -18,7 +18,7 @@ module SponsoredBenefits
       field :published_on, type: Date
       field :aasm_state, type: String
 
-      embeds_one :profile, class_name: "SponsoredBenefits::Organizations::AcaShop#{Settings.aca.state_abbreviation.capitalize}EmployerProfile"
+      embeds_one :profile, class_name: "SponsoredBenefits::Organizations::AcaShop#{Settings.aca.state_key.capitalize}EmployerProfile"
       delegate :effective_date, to: :profile
       validates_uniqueness_of :claim_code, :case_sensitive => false, :allow_nil => true
 
