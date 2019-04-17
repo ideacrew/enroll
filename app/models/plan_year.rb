@@ -17,7 +17,7 @@ class PlanYear
   INITIAL_ENROLLING_STATE = %w(publish_pending eligibility_review published published_invalid enrolling enrolled)
   INITIAL_ELIGIBLE_STATE  = %w(published enrolling enrolled)
   #This is being used only for datatable action
-  ACTIVE_STATES_PER_DT    = %w(publish_pending enrolling enrollment_closed enrolled application_ineligible active)
+  ACTIVE_STATES_PER_DT    = %w(publish_pending enrolling enrollment_closed enrolled application_ineligible active termination_pending)
 
   VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT_TAG = "benefit_coverage_period_terminated_voluntary"
   VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT = "acapi.info.events.employer.benefit_coverage_period_terminated_voluntary"
