@@ -379,21 +379,27 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
   end
 
   context "POST terminate" do
-    let!(:enrollment) { HbxEnrollment.new({:aasm_state => "coverage_selected", :benefit_group_id => benefit_group.id, benefit_group_assignment_id: benefit_group_assignment.id, employee_role_id: employee_role.id}) }
+    let!(:enrollment) {
+      FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, enrollment_members: family.family_members, household: family.active_household, :aasm_state => "coverage_selected", :benefit_group_id => benefit_group.id, benefit_group_assignment_id: benefit_group_assignment.id, employee_role_id: employee_role.id)
+    }
+    let(:sep) { FactoryGirl.create :special_enrollment_period, family: family, qle_on: TimeKeeper.date_of_record.last_month.end_of_month }
     let!(:terminate_reason) { "terminate_reason" }
     let!(:employer_profile) { FactoryGirl.create(:employer_profile) }
-    let!(:plan_year) {FactoryGirl.create(:plan_year, employer_profile: employer_profile)}
+    let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, aasm_state: 'enrolling')}
     let!(:benefit_group) {FactoryGirl.create(:benefit_group, plan_year: plan_year)}
     let!(:benefit_group_assignment) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)}
     let!(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
     let!(:person) { family.person }
-    let!(:employee_role) { FactoryGirl.create(:employee_role, census_employee_id: census_employee.id, person: person)}
+    let!(:employee_role) { FactoryGirl.create(:employee_role, census_employee_id: census_employee.id, person: person, employer_profile_id: employer_profile.id)}
     let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile, benefit_group_assignments: [benefit_group_assignment]) }
+    let!(:coverage_end_on) { TimeKeeper.date_of_record.last_month.end_of_month }
 
     before do
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(enrollment)
       allow(enrollment).to receive(:may_schedule_coverage_termination?).and_return(true)
       allow(enrollment).to receive(:schedule_coverage_termination!).and_return(true)
+      allow(family).to receive(:earliest_effective_shop_sep).and_return sep
+      allow(enrollment).to receive(:terminate_reason).and_return("terminate_reason")
       allow(person).to receive(:primary_family).and_return(Family.new)
       sign_in user
     end
@@ -406,22 +412,22 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     it "goes back" do
       request.env["HTTP_REFERER"] = terminate_insured_plan_shopping_url(1)
       allow(enrollment).to receive(:may_schedule_coverage_termination?).and_return(false)
+      allow(enrollment).to receive(:may_terminate_coverage?).and_return(false)
       post :terminate, id: "hbx_id"
       expect(response).to redirect_to(:back)
     end
 
-    it "should record termination submitted date on terminate of hbx_enrollment" do
-      expect(enrollment.termination_submitted_on).to eq nil
-      post :terminate, id: "hbx_id"
-      expect(enrollment.termination_submitted_on.to_time).to be_within(1.second).of TimeKeeper.datetime_of_record
+    it "should record terminated_on date when termination of hbx_enrollment" do
+      expect(enrollment.terminated_on).to eq nil
+      post :terminate, id: "hbx_id", terminate_reason: terminate_reason
+      enrollment.reload
+      expect(enrollment.terminated_on).to eq coverage_end_on
       expect(response).to be_redirect
     end
 
     it "should create a new inactive enrollment" do
-      allow(enrollment).to receive(:benefit_group).and_return(benefit_group)
-      allow(enrollment).to receive(:benefit_group_assignment).and_return(benefit_group_assignment)
-      expect(enrollment.termination_submitted_on).to eq nil
       post :terminate, id: "hbx_id", terminate_reason: terminate_reason
+      enrollment.reload
       expect(enrollment.terminate_reason).to eq terminate_reason
     end
   end
@@ -430,7 +436,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     before :each do
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
       allow(hbx_enrollment).to receive(:may_waive_coverage?).and_return(true)
-      allow(hbx_enrollment).to receive(:waive_coverage_by_benefit_group_assignment).and_return(true)
+      allow(hbx_enrollment).to receive(:waive_enrollment).and_return(true)
       allow(hbx_enrollment).to receive(:shopping?).and_return(true)
       sign_in user
     end
@@ -441,6 +447,17 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       allow(hbx_enrollment).to receive(:save).and_return(true)
       allow(hbx_enrollment).to receive(:waive_coverage).and_return(true)
       allow(hbx_enrollment).to receive(:waiver_reason=).with("waiver").and_return(true)
+      allow(hbx_enrollment).to receive(:inactive?).and_return(true)
+      post :waive, id: "hbx_id", waiver_reason: "waiver"
+      expect(flash[:notice]).to eq "Waive Coverage Successful"
+      expect(response).to be_redirect
+    end
+
+    it "should get success flash mesage when enrollment is terminated" do
+      allow(hbx_enrollment).to receive(:coverage_termination_pending?).and_return(true)
+      allow(hbx_enrollment).to receive(:waiver_reason=).with("waiver").and_return(true)
+      allow(hbx_enrollment).to receive(:valid?).and_return(true)
+      allow(hbx_enrollment).to receive(:inactive?).and_return(true)
       post :waive, id: "hbx_id", waiver_reason: "waiver"
       expect(flash[:notice]).to eq "Waive Coverage Successful"
       expect(response).to be_redirect
@@ -449,53 +466,57 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     it "should get success flash mesage when terminate_reason exists" do
       allow(hbx_enrollment).to receive(:coverage_termination_pending?).and_return(true)
       allow(hbx_enrollment).to receive(:terminate_reason).and_return("terminate")
+      allow(hbx_enrollment).to receive(:waiver_reason=).with("waiver").and_return(true)
       allow(hbx_enrollment).to receive(:valid?).and_return(true)
+      allow(hbx_enrollment).to receive(:inactive?).and_return(true)
       post :waive, id: "hbx_id", waiver_reason: "waiver", terminate_reason: "terminate"
       expect(flash[:notice]).to eq "Waive Coverage Successful"
       expect(response).to be_redirect
     end
 
     it "should get failure flash message" do
-      allow(hbx_enrollment).to receive(:terminate_reason).and_return("")
+      allow(hbx_enrollment).to receive(:waiver_reason=).with("waiver").and_return(false)
       allow(hbx_enrollment).to receive(:valid?).and_return(false)
+      allow(hbx_enrollment).to receive(:inactive?).and_return(false)
       post :waive, id: "hbx_id", waiver_reason: "waiver"
       expect(flash[:alert]).to eq "Waive Coverage Failed"
       expect(response).to be_redirect
     end
 
     context "waived_enrollment coverage kind" do
-      let(:person) { FactoryGirl.create(:person) }
-      let(:household) {double(:immediate_family_coverage_household=> coverage_household)}
-      let(:coverage_household) {double}
-      let(:family) {Family.new}
-      let(:hbx_enrollment) {HbxEnrollment.create}
-      let(:wavied_enrollment) {HbxEnrollment.create}
+      let!(:hbx_enrollment) {
+        FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, enrollment_members: family.family_members, household: family.active_household, :aasm_state => "coverage_selected", :benefit_group_id => benefit_group.id, benefit_group_assignment_id: benefit_group_assignment.id, employee_role_id: employee_role.id)
+      }
+      let(:sep) { FactoryGirl.create :special_enrollment_period, family: family, qle_on: TimeKeeper.date_of_record.last_month.end_of_month }
+      let!(:waiver_reason) { "waiver_reason" }
+      let!(:employer_profile) { FactoryGirl.create(:employer_profile) }
+      let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, aasm_state: 'enrolling')}
+      let!(:benefit_group) {FactoryGirl.create(:benefit_group, plan_year: plan_year)}
+      let!(:benefit_group_assignment) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)}
+      let!(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+      let!(:person) { family.person }
+      let!(:employee_role) { FactoryGirl.create(:employee_role, census_employee_id: census_employee.id, person: person, employer_profile_id: employer_profile.id)}
+      let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile, benefit_group_assignments: [benefit_group_assignment]) }
       
       before :each do
         allow(HbxEnrollment).to receive(:find).with(hbx_enrollment.id).and_return(hbx_enrollment)
-        allow(person).to receive(:primary_family).and_return(family)
-        allow(person).to receive(:has_active_employee_role?).and_return(true)
-        allow(family).to receive(:active_household).and_return(household)
-        allow(coverage_household).to receive(:household).and_return(household)
         allow(hbx_enrollment).to receive(:shopping?).and_return(false)
         sign_in user
       end
 
-      it "wavied enrollment coverage kind should be dental as waiving hbx_enrollment kind is dental" do
+      it "waived enrollment coverage kind should be dental as waiving hbx_enrollment kind is dental" do
         hbx_enrollment.coverage_kind='dental'
         hbx_enrollment.save
-        allow(household).to receive(:new_hbx_enrollment_from).and_return(wavied_enrollment)
-        expect(wavied_enrollment.coverage_kind).to eq 'health' #by deafult it will be health
-        post :waive, id: hbx_enrollment.id, waiver_reason: "waiver"
-        expect(wavied_enrollment.coverage_kind).to eq 'dental'
+        post :waive, id: hbx_enrollment.id, waiver_reason: waiver_reason
+        waived_enrollment = employee_role.person.primary_family.enrollments.where(predecessor_enrollment_id: hbx_enrollment.id).first
+        expect(waived_enrollment.coverage_kind).to eq 'dental'
       end
 
-      it "wavied enrollment coverage kind should be health as waiving hbx_enrollment kind is health" do
+      it "waived enrollment coverage kind should be health as waiving hbx_enrollment kind is health" do
         expect(hbx_enrollment.coverage_kind).to eq 'health'
-        allow(household).to receive(:new_hbx_enrollment_from).and_return(wavied_enrollment)
-        expect(wavied_enrollment.coverage_kind).to eq 'health'
-        post :waive, id: hbx_enrollment.id, waiver_reason: "waiver"
-        expect(wavied_enrollment.coverage_kind).to eq 'health'
+        post :waive, id: hbx_enrollment.id, waiver_reason: waiver_reason
+        waived_enrollment = employee_role.person.primary_family.enrollments.where(predecessor_enrollment_id: hbx_enrollment.id).first
+        expect(waived_enrollment.coverage_kind).to eq 'health'
       end
     end
   end
