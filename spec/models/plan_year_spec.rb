@@ -2522,7 +2522,7 @@ describe PlanYear, '.terminate_employee_benefit_packages', type: :model, dbclean
   let(:benefit_group_assignment1) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group, end_on: plan_year.end_on)}
   let!(:census_employee) { FactoryGirl.create(:census_employee, benefit_group_assignments: [benefit_group_assignment1],employee_role_id: employee_role1.id,employer_profile_id: employer_profile.id) }
   let(:new_end_on) { TimeKeeper.date_of_record.prev_day }
-  let!(:enrollment) { FactoryGirl.create(:hbx_enrollment, effective_on: start_on, household: family.active_household, benefit_group_id: benefit_group.id, aasm_state:'coverage_selected', employee_role: census_employee.employee_role)}
+  let!(:enrollment) { FactoryGirl.create(:hbx_enrollment, effective_on: start_on, household: family.active_household, benefit_group_id: benefit_group.id, aasm_state: 'coverage_selected', employee_role: census_employee.employee_role)}
 
   before do
     plan_year.terminate_plan_year(new_end_on, TimeKeeper.date_of_record, 'nonpayment', false, 'nonpayment')
@@ -2704,11 +2704,10 @@ describe PlanYear, '.terminate_employee_enrollments', type: :model, dbclean: :af
         hbx_enrollment.reload
         if py_end_on < TimeKeeper.date_of_record
           expect(hbx_enrollment.aasm_state).to eq 'coverage_terminated'
-          expect(hbx_enrollment.terminate_reason).to eq 'nonpayment'
         else
           expect(hbx_enrollment.aasm_state).to eq 'coverage_termination_pending'
-          expect(hbx_enrollment.terminate_reason).to eq 'nonpayment'
         end
+        expect(hbx_enrollment.terminate_reason).to eq 'nonpayment'
       end
     end
 
@@ -2738,7 +2737,7 @@ describe PlanYear, '.terminate_employee_enrollments', type: :model, dbclean: :af
       let(:plan_year_end_on) { terminated_on.prev_day }
 
       it "should update terminated_on on hbx_enrollment" do
-        plan_year.terminate_employee_enrollments(plan_year_end_on, options = {enrollment_term_reason: 'nonpayment'})
+        plan_year.terminate_employee_enrollments(plan_year_end_on, {enrollment_term_reason: 'nonpayment'})
         expect(hbx_enrollment.reload.terminated_on).to eq plan_year_end_on
         expect(hbx_enrollment.reload.terminate_reason).to eq 'nonpayment'
       end
@@ -2749,7 +2748,7 @@ describe PlanYear, '.terminate_employee_enrollments', type: :model, dbclean: :af
       let(:plan_year_end_on) { terminated_on.next_day }
 
       it "should NOT update terminated_on on hbx_enrollment" do
-        plan_year.terminate_employee_enrollments(plan_year_end_on, options = {enrollment_term_reason: 'nonpayment'})
+        plan_year.terminate_employee_enrollments(plan_year_end_on, {enrollment_term_reason: 'nonpayment'})
         expect(hbx_enrollment.reload.terminated_on).to eq terminated_on
         expect(hbx_enrollment.reload.terminate_reason).to eq nil
       end
@@ -2773,7 +2772,7 @@ describe PlanYear, '.terminate_employee_enrollments', type: :model, dbclean: :af
       let(:plan_year_end_on) { terminated_on.next_day }
 
       it "should NOT update terminated_on on hbx_enrollment" do
-        plan_year.terminate_employee_enrollments(plan_year_end_on, options = {enrollment_term_reason: 'nonpayment'})
+        plan_year.terminate_employee_enrollments(plan_year_end_on, {enrollment_term_reason: 'nonpayment'})
         expect(hbx_enrollment.reload.terminated_on).to eq terminated_on
         expect(hbx_enrollment.reload.terminate_reason).to eq nil
       end
