@@ -6,8 +6,12 @@ module Notifier
     EVENT_PREFIX = "acapi.info.events."
 
     EVENT_MAP = {
-      employer: {
-        binder_paid: :benefit_coverage_initial_binder_paid,        
+      employer:
+      {
+        binder_paid: :benefit_coverage_initial_binder_paid
+      },
+      consumer_role: {
+        projected_eligibility_notice: :projected_eligibility_notice
       }
     }
 
