@@ -96,7 +96,7 @@ class Insured::ConsumerRolesController < ApplicationController
                   session[:person_id] = @person.id
                 else
                 # not logging error because error was logged in construct_consumer_role
-                  render file: 'public/500.html', status: 500
+                  redirect_to file: 'public/500.html'
                   return
                 end
               rescue Exception => e
@@ -148,7 +148,7 @@ class Insured::ConsumerRolesController < ApplicationController
         @person = @consumer_role.person
       else
       # not logging error because error was logged in construct_consumer_role
-        render file: 'public/500.html', status: 500
+        redirect_to 'public/500.html'
         return
       end
     rescue Exception => e

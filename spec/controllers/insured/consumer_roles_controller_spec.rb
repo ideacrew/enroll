@@ -191,7 +191,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       #need to follow up
       sign_in user
       post :create, person: person_params
-      expect(response).to have_http_status(500)
+      expect(response).to have_http_status(:redirect)
     end
   end
 
