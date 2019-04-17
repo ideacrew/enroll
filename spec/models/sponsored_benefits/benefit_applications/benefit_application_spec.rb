@@ -59,36 +59,6 @@ module SponsoredBenefits
       end
     end
 
-    context "#to_benefit_sponsors_benefit_application" do
-      let(:benefit_sponsor_organization) { organization }
-
-      before(:each) do
-        benefit_application
-        # plan.hios_id = product.hios_id
-        # plan.save
-        # sponsor_benefit_sponsorship.rating_area = rating_area
-        # sponsor_benefit_sponsorship.service_areas = [service_area]
-        # sponsor_benefit_sponsorship.save
-        # plan_design_organization.plan_design_proposals << [plan_design_proposal]
-        # plan_design_proposal.profile = profile
-        # profile.benefit_sponsorships = [benefit_sponsorship]
-        # benefit_sponsorship.benefit_applications = [benefit_application]
-        # benefit_application.benefit_groups << benefit_group
-        # plan_design_organization.save
-      end
-
-      it "should instantiate a plan year object and must have correct values assigned" do
-        # toDO - Fix these specs while fixing claim quote functionality
-        # ben_app = benefit_application.to_benefit_sponsors_benefit_application(benefit_sponsor_organization)
-        # expect(ben_app.class).to eq BenefitSponsors::BenefitApplications::BenefitApplication
-        # expect(ben_app.benefit_packages.present?).to eq true
-        # expect(ben_app.start_on).to eq benefit_application.effective_period.begin
-        # expect(ben_app.end_on).to eq benefit_application.effective_period.end
-        # expect(ben_app.open_enrollment_start_on).to eq benefit_application.open_enrollment_period.begin
-        # expect(ben_app.open_enrollment_end_on).to eq benefit_application.open_enrollment_period.end
-      end
-    end
-
     context "a BenefitApplication class" do
       let(:subject)             { BenefitApplications::BenefitApplication }
       let(:begin_day)  { Settings.aca.shop_market.open_enrollment.monthly_end_on -
