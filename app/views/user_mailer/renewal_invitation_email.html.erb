@@ -39,7 +39,7 @@ Dear <%= census_employee.full_name.humanize.titleize %>,
   <br/>
   <ul style="list-style-type:circle">
     <li>By calling 855-532-5465;</li>
-    <li>Online at <%= link_to site_short_name, site_home_url %>; or</li>
+    <li>Online at <a href="<%= site_main_web_address_url %>"><%= site_short_name %></a>; or</li>
     <li>By email at <%= mail_to contact_center_email_address %>.</li>
   </ul>
 </div>
