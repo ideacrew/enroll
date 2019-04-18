@@ -3,6 +3,7 @@ class Insured::ConsumerRolesController < ApplicationController
   include VlpDoc
   include ErrorBubble
 
+  before_action :permit_params, only: [:privacy, :match]
   before_action :check_consumer_role, only: [:search, :match]
   before_action :find_consumer_role, only: [:edit, :update]
   before_action :individual_market_is_enabled?
@@ -14,7 +15,7 @@ class Insured::ConsumerRolesController < ApplicationController
   def privacy
     set_current_person(required: false)
     @val = params[:aqhp] || params[:uqhp]
-    @key = params.key(@val)
+    @key = params.to_h.key(@val)
     @search_path = {@key => @val}
     if @person.try(:resident_role?)
       bookmark_url = @person.resident_role.bookmark_url.to_s.present? ? @person.resident_role.bookmark_url.to_s : nil
@@ -241,6 +242,10 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   private
+
+  def permit_params
+    params.permit!
+  end
 
   def user_not_authorized(exception)
     policy_name = exception.policy.class.to_s.underscore
