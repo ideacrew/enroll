@@ -53,8 +53,8 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
           event_object: consumer_role,
           notice_event: 'projected_eligibility_notice',
           notice_params: {
-            dependents: dependents.map(&:to_hash),
             primary_member: primary_member.to_hash,
+            dependents: dependents.map(&:to_hash),
             aqhp_event: 'aqhp_projected_eligibility_notice_2'
           }
         )

@@ -48,9 +48,9 @@ module Notifier
         notice = Notifier::MergeDataModels::ConsumerRole.new(
           {
             notice_date: TimeKeeper.date_of_record.strftime('%B %d, %Y'),
-            first_name: 'Samules',
-            last_name: 'Parker',
-            primary_fullname: 'Samules Parker',
+            first_name: 'Primary',
+            last_name: 'Test',
+            primary_fullname: 'Primary Test',
             age: 28,
             dc_resident: 'Yes',
             citizenship: 'US Citizen',
@@ -62,17 +62,17 @@ module Notifier
             expected_income_for_coverage_year: "$25,000",
             tax_household_size: 2,
             aptc: "$363.23",
+            aqhp_eligible: 'Yes',
             aqhp_event: true,
             uqhp_event: false,
-            magi_medicaid_members_present: false,
+            magi_medicaid_members_present: true,
             aqhp_or_non_magi_medicaid_members_present: true,
             uqhp_or_non_magi_medicaid_members_present: false,
             totally_ineligible_members_present: false,
-            totally_ineligible: false,
-            irs_consent_not_needed: false,
-            non_magi_medicaid: false,
-            magi_medicaid: false,
+            non_magi_medicaid: 'No',
+            magi_medicaid: 'No',
             irs_consent: false,
+            totally_ineligible: 'No',
             csr: true,
             csr_percent: 73,
             ivl_oe_start_date: Date.parse('November 01, 2019')
@@ -85,7 +85,8 @@ module Notifier
         notice.mailing_address = Notifier::MergeDataModels::Address.stubbed_object
         notice.addresses = [notice.mailing_address]
         notice.dependents = [Notifier::MergeDataModels::Dependent.stubbed_object]
-        #notice.family_members = [Notifier::MergeDataModels::Dependent.stubbed_object]
+        notice.aqhp_or_non_magi_medicaid_members = [notice]
+        notice.magi_medicaid_members = [Notifier::MergeDataModels::Dependent.stubbed_object]
         notice
       end
 
