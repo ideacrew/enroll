@@ -1,5 +1,9 @@
 <div class='hide' id='dchbx_enroll_date_of_record'><%= TimeKeeper.date_of_record.iso8601 %></div>
+  <% if current_user && current_user.try(:person).try(:is_native?)%>
+  <nav class="navbar-native navbar-default navbar-static-top">
+  <%else%>
   <nav class="navbar navbar-default navbar-static-top">
+  <%end%>
     <div class="container">
       <!-- Brand and toggle get grouped for better mobile display -->
       <div class="navbar-header">
@@ -17,7 +21,12 @@
       <!-- Collect the nav links, forms, and other content for toggling -->
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
         <ul class="nav navbar-nav">
-          <li><h4 class="no-buffer"><%= get_header_text(controller_name) %></h4></a></li>
+  <% if current_user && current_user.try(:person).try(:is_native?)%>
+         <li><h4 class="no-buffer"><a class='portal'>Native Portal</a></h4></a></li>
+      <%else%>
+        <li><h4 class="no-buffer"><%= get_header_text(controller_name) %></h4></a></li>
+      <%end%>
+
         </ul>
 
         <ul class="nav navbar-nav navbar-right">

@@ -47,11 +47,11 @@ font-size:30px;
   background-repeat: repeat-x;
 }
 
-  .navbar-native {
+.navbar-native {
   margin-bottom: 0;
   height:90px;
   background-color: $primary-button-text;
-  border-bottom: solid 10px $primary-blue;
+  border-bottom: solid 10px #063C49;
   .navbar-header {
     .navbar-brand {
       border-right: solid 2px #d7d7d7;
@@ -61,7 +61,59 @@ font-size:30px;
       }
     }
   }
+  
+  .navbar-collapse {
+    .header-text {
+      color: $primary-blue;
+      font-size: 14px;
+      text-transform: uppercase;
+      margin-top:20px;
+      font-weight: $primary-bold;
+    }
+    .navbar-nav:first-of-type {
+      a.portal {
+        text-align: center;
+        vertical-align: middle;
+        line-height: 100px;
+        font-size:20px;
+        padding: 23px 15px;
+        font-weight: 600;
+        &:hover {
+          background-color: $background-hover;
+          text-decoration: none;
+        }
+      }
+    }
+    .navbar-right {
+      li:last-of-type {
+        text-align: right;
+      }
+      a.call-customer-service {
+        span:first-of-type {}
+        span:last-of-type {
+          .fa {
+            color: $primary-blue;
+          }
+          strong {
+            line-height: 0;
+            font-size: 16px;
+            color: $primary-black;
+          }
+        }
+      }
+      .my-portal-links {
+        min-height: 70px;
+        padding: 15px 15px;
+        display: block;
+        border-left: solid 1px #d7d7d7;
+        .users-name {
+          color: $primary-black;
+        }
+      }
+    }
   }
+}
+
 .navbar {
   margin-bottom: 0;
   height:90px;
