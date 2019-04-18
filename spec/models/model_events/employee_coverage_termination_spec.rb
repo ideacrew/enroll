@@ -10,7 +10,7 @@ RSpec.describe 'ModelEvents::EmployeeCoverageTermination', dbclean: :around_each
   let!(:employer_profile) { FactoryGirl.create(:employer_profile, organization: organization) }
   let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile, first_name: person.first_name, last_name: person.last_name) }
   let!(:employee_role) { FactoryGirl.create(:employee_role, employer_profile: employer_profile, census_employee_id: census_employee.id, person: person) }
-  let!(:model_instance) { FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, household: family.active_household, employee_role_id: employee_role.id, aasm_state: "coverage_enrolled", benefit_group_id: benefit_group.id) }
+  let!(:model_instance) { FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, household: family.active_household, employee_role_id: employee_role.id, aasm_state: "coverage_enrolled", benefit_group_id: benefit_group.id, terminate_reason: "i am terminating enrollment") }
 
   describe "when an employee successfully terminates employer sponsored coverage" do
 
