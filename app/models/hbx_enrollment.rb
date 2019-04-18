@@ -565,21 +565,28 @@ class HbxEnrollment
   end
 
   def set_predecessor_if_exists
+    predecessor_benefit_groups = [benefit_group.id]
+
+    if effective_on == benefit_group.start_on && benefit_group.plan_year.is_renewing?
+      if employer_profile
+        predecessor_plan_year = employer_profile.published_plan_years_by_date(effective_on.prev_day).first
+        predecessor_benefit_groups = predecessor_plan_year.benefit_groups.pluck(:id) if predecessor_plan_year
+      end
+    end
+
     predecessor_enrollment = household.hbx_enrollments.where({
-      :benefit_group_id => benefit_group_id,
+      :benefit_group_id.in => predecessor_benefit_groups,
       :aasm_state.in => ENROLLED_STATUSES,
       :coverage_kind => coverage_kind}).first
+
     update(predecessor_enrollment_id: predecessor_enrollment.id) if predecessor_enrollment.present?
   end
 
   def waive_enrollment
-    if may_waive_coverage?
+    if is_shop? && may_waive_coverage?
       waive_coverage!
       set_predecessor_if_exists if predecessor_enrollment_id.blank?
-
-      if is_shop?
-        term_existing_shop_enrollments
-      end
+      term_existing_shop_enrollments
     end
   end
 
