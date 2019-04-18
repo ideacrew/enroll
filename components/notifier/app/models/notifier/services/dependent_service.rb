@@ -8,7 +8,6 @@ module Notifier
       attr_accessor :first_name, :last_name
 
       def initialize(is_uqhp_notice, member)
-
         @is_uqhp_notice = is_uqhp_notice
         @payload_member = member
         @person = person_details
