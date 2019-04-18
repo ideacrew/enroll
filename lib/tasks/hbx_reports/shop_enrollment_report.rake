@@ -14,6 +14,8 @@ require File.join(Rails.root, "app", "reports", "hbx_reports", "shop_enrollment_
 # 3) Run the below rake task
 # RAILS_ENV=production bundle exec rake hbx_reports:shop_enrollment_report
 
+#For any errors please do check this file "log/shop_enrollment_report_error.log"
+
 namespace :hbx_reports do
   desc "SHOP Enrollment Recon Report"
   ShopEnrollmentReport.define_task :shop_enrollment_report => :environment

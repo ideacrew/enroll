@@ -30,24 +30,20 @@ class ShopEnrollmentReport < MongoidMigrationTask
   end
 
   def writing_on_csv(enrollment_ids_final, glue_list)
-    fields = ['Employer ID', 'Employer FEIN', 'Employer Name', 'Employer Plan Year Start Date', 'Plan Year State', 'Employer State',
-              'Enrollment Group ID', 'Enrollment Purchase Date/Time', 'Coverage Start Date', 'Enrollment State', 'Subscriber HBX ID',
-              'Subscriber First Name','Subscriber Last Name', 'Plan HIOS Id', 'Covered lives on the enrollment', 'Enrollment Reason',
-              'In Glue']
+    shop_headers = ['Employer ID', 'Employer FEIN', 'Employer Name', 'Employer Plan Year Start Date', 'Plan Year State', 'Employer State',
+                    'Enrollment Group ID', 'Enrollment Purchase Date/Time', 'Coverage Start Date', 'Enrollment State', 'Subscriber HBX ID',
+                    'Subscriber First Name','Subscriber Last Name', 'Plan HIOS Id', 'Covered lives on the enrollment', 'Enrollment Reason',
+                    'In Glue']
 
     file_name = "#{Rails.root}/shop_enrollment_report.csv"
     CSV.open(file_name, "w", force_quotes: true) do |csv|
-      csv << fields
+      csv << shop_headers
       enrollment_ids_final.each do |id|
         begin
           hbx_enrollment = HbxEnrollment.by_hbx_id(id).first
+          next unless hbx_enrollment.is_shop?
           employer_profile = hbx_enrollment.employer_profile
-          case hbx_enrollment.enrollment_kind
-          when "special_enrollment"
-            enrollment_reason = hbx_enrollment.special_enrollment_period.qualifying_life_event_kind.reason
-          when "open_enrollment"
-            enrollment_reason = hbx_enrollment.eligibility_event_kind
-          end
+          enrollment_reason = enrollment_kind(hbx_enrollment)
           plan_year = hbx_enrollment.benefit_group.plan_year
           plan_year_start = plan_year.start_on.to_s
           subscriber = hbx_enrollment.subscriber
@@ -62,9 +58,19 @@ class ShopEnrollmentReport < MongoidMigrationTask
                   subscriber_hbx_id,first_name,last_name,hbx_enrollment.plan.hios_id,hbx_enrollment.hbx_enrollment_members.size,
                   enrollment_reason,in_glue]
         rescue StandardError => e
-          puts "Could not add the hbx_enrollment's information on to the CSV for eg_id:#{id}, because #{e.inspect}" unless Rails.env.test?
+          @logger = Logger.new("#{Rails.root}/log/shop_enrollment_report_error.log")
+          (@logger.error { "Could not add the hbx_enrollment's information on to the CSV for eg_id:#{id}, subscriber_hbx_id:#{subscriber_hbx_id}, #{e.inspect}" }) unless Rails.env.test?
         end
       end
+    end
+  end
+
+  def enrollment_kind(hbx_enrollment)
+    case hbx_enrollment.enrollment_kind
+    when "special_enrollment"
+      hbx_enrollment.special_enrollment_period.qualifying_life_event_kind.reason
+    when "open_enrollment"
+      hbx_enrollment.eligibility_event_kind
     end
   end
 end
