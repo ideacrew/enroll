@@ -1,6 +1,6 @@
 module BenefitSponsors
   module Documents
-    class EmployerAttestationDocument < Document
+    class EmployerAttestationDocument < BenefitSponsors::Documents::Document
       include Mongoid::Document
       include SetCurrentUser
       include Mongoid::Timestamps
