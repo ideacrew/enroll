@@ -887,7 +887,6 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   end
 
   describe "POST subscriber_policy_action" do
-    let(:subscriber_policy_action_family_access_policy) { instance_double(FamilyPolicy, :show? => true) }
     let(:user) { FactoryGirl.create(:user, :with_family, :with_hbx_staff_role) }
     let(:consumer_person) { FactoryGirl.create(:person, :with_consumer_role) }
     let(:family_primary_member) { FactoryGirl.create(:family, :with_primary_family_member_and_dependent) }
@@ -899,6 +898,8 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         reason: "eligibility_documents_provided "
       )
     end
+
+    # HBX Enrollments belong to a household, and a household ota  factory?
 
     before :each do
       sign_in(user)
@@ -987,6 +988,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         subscriber_policy_action: "terminate",
         transmit_xml: true
       )
+      binding.pry
       expect(flash[:notice]).to eq("Successfully terminated all family enrollments.")
       expect(response).to redirect_to(home_insured_families_path)
     end

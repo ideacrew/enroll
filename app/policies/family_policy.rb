@@ -42,6 +42,10 @@ class FamilyPolicy < ApplicationPolicy
     permission.modify_family
   end
 
+  def can_subscriber_policy_action?
+    return true if user.person.hbx_staff_role
+  end
+
   def updateable?
     return true unless role = user.person && user.person.hbx_staff_role
     role.permission.modify_family

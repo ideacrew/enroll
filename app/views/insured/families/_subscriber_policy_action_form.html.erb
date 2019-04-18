@@ -2,6 +2,18 @@
   <div class="panel-heading">Subscriber Policy Actions</div>
     <div class="panel-body">
       <%= form_tag(subscriber_policy_action_insured_family_path(@family.id)) do %>
+        <%# To save the selected hbx enrollments to apply actions to %>
+        <div id="selected_hbx_enrollments_fields" class='hidden' >
+          <%= text_field_tag 'selected_hbx_enrollments', '', required: true, class: 'form-control' %>
+        </div>
+      <%# Hidden fields for terminate, visible when 'Terminate' is selected%>
+      <div id="subscriber_policy_action_form_termination_fields" class='hidden' >
+        <strong>Termination Date</strong>
+        <%= text_field_tag "termination_date", nil, required: true,
+              id: "add-termination-date-date-picker",
+              class: "form-control date-field date-picker", "data-date-min" =>  '', "data-date-max" => '' %>
+      </div>
+      <%# End Termination Fields %>
       <%# Hidden fields for createSep method, visible when 'Add Sep' is selected %>
       <div id="subscriber_policy_action_form_sep_fields" class='hidden'>
         <%= hidden_field_tag 'family', @family.id %>
@@ -44,15 +56,30 @@
 
 <script>
   document.addEventListener("DOMContentLoaded", function() {
-    function toggleDisplayRequireAddSepFields(event) {
+    function toggleDisplayActionFields(event) {
+      // Sep Date Fields
       var sep_date_fields_div = document.getElementById("subscriber_policy_action_form_sep_fields");
       var sep_date_fields = document.querySelectorAll(".sep-date-field")
+      // Termination Date
+      var termination_date_field = document.getElementById("subscriber_policy_action_form_termination_fields");
       if (event.target.id == 'subscriber_policy_action_add_sep') {
+        termination_date_field.classList.add("hidden")
+        termination_date_field.required = false;
         sep_date_fields_div.classList.remove("hidden");
         for (var i = 0; i < sep_date_fields.length; i++) {
           sep_date_fields[i].required = true;
         }
+      } else if (event.target.id == "subscriber_policy_action_terminate") {
+        console.log("Terminate selected")
+        termination_date_field.classList.remove("hidden")
+        termination_date_field.required = true;
+        sep_date_fields_div.classList.add("hidden");
+        for (var i = 0; i < sep_date_fields.length; i++) {
+          sep_date_fields[i].required = false;
+        }
       } else {
+        termination_date_field.classList.add("hidden")
+        termination_date_field.required = false;
         sep_date_fields_div.classList.add("hidden");
         for (var i = 0; i < sep_date_fields.length; i++) {
           sep_date_fields[i].required = false;
@@ -61,7 +88,43 @@
     };
     var subscriberPolicyActionRadioButtons = document.querySelectorAll('input[name="subscriber_policy_action"]');
     for (var i = 0; i < subscriberPolicyActionRadioButtons.length; i++) {
-      subscriberPolicyActionRadioButtons[i].addEventListener('click', toggleDisplayRequireAddSepFields);
+      subscriberPolicyActionRadioButtons[i].addEventListener('click', toggleDisplayActionFields);
+    }
+    
+    var hbxEnrollmentCheckboxes = document.getElementsByClassName('hbx_enrollment_checkbox');
+    function appendSelectedHbxEnrollmentIds(event) {
+      var selected_hbx_enrollments_field = document.getElementById("selected_hbx_enrollments");
+      // Need to account for if the ID is already there, etc.
+      // Need to either use this method or a dfiferent one to check the other ones selected.
+      var selected_hbx_checkbox = event.target;
+      var checkbox_hbx_enrollment_value = ''
+      var selected_hbx_enrollments_array = selected_hbx_enrollments.value.split(" ");
+      var new_selected_hbx_enrollments_array = '';
+      var new_selected_hbx_enrollments_array_string = '';
+      if (selected_hbx_checkbox.checked) {
+        checkbox_hbx_enrollment_value = event.target.value;
+        // Not already in the array
+        if (selected_hbx_enrollments_array.includes(checkbox_hbx_enrollment_value) == false) {
+          selected_hbx_enrollments_array.push(checkbox_hbx_enrollment_value)
+          new_selected_hbx_enrollments_array = selected_hbx_enrollments_array
+          new_selected_hbx_enrollments_array_string = new_selected_hbx_enrollments_array.join(" ");
+        }
+      // If the user de selects a checkbox
+      } else {
+        new_selected_hbx_enrollments_array = selected_hbx_enrollments_array.filter(
+          function(id) {
+            return id == checkbox_hbx_enrollment_value
+          }
+        );
+        console.log("New array is " + new_selected_hbx_enrollments_array)
+        // Assure they are evenly spaced
+        new_selected_hbx_enrollments_array_string = new_selected_hbx_enrollments_array.join(" ");
+      }
+      selected_hbx_enrollments_field.value = new_selected_hbx_enrollments_array_string;
+    }
+    for (var i = 0; i < hbxEnrollmentCheckboxes.length; i++) {
+      hbxEnrollmentCheckboxes[i].addEventListener('change', appendSelectedHbxEnrollmentIds);
     }
   });
 </script>
+

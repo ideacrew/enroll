@@ -4,7 +4,6 @@
 <div class="col-xs-12">
   <div id="plan-summary"></div>
 </div>
-
 <div id='account-detail'>
   <% @person.active_employee_roles.each do |employee_role|%>
     <%= render 'employer_panel', employee_role: employee_role if newhire_enrollment_eligible?(employee_role) %>
@@ -14,38 +13,23 @@
     <h1><%= l10n("my_site_short_name", site_short_name: Settings.site.short_name) %></h1>
   </div>
 
-  <% role = current_user.person.hbx_staff_role %>
-  <% if role.present? && role.permission.modify_admin_tabs %>
-    <%= render partial: 'employers_selection' if @person.has_multiple_active_employers? %>
-    <%= render partial: 'qle_detail' %>
-    <%= render partial: 'qle_detail_for_existing_sep' if @active_sep.present?%>
-    <%= render partial: "enrollment_with_subscriber_policy_action_form", :collection => @hbx_enrollments, :as => :hbx_enrollment, locals: { read_only: false } %>
-    <div class="row">
-      <div class="col-md-12">
-        <%= render partial: 'shop_for_plans_widget' %>
-      </div>
+  <div class="row">
+    <div class="col-md-8">
+      <%= render partial: 'employers_selection' if @person.has_multiple_active_employers? %>
+      <%= render partial: 'qle_detail' %>
+      <%= render partial: 'qle_detail_for_existing_sep' if @active_sep.present?%>
+      <%= render partial: "enrollment", :collection => @hbx_enrollments, :as => :hbx_enrollment, locals: { read_only: false } %>
+      <%= render partial: 'shop_for_plans_widget' %>
+      <%= render partial: 'apply_for_medicaid_widget' %>
     </div>
-    <div class='row'>
-      <div class="col-md-12">
-        <%= render partial: 'apply_for_medicaid_widget' %>
-      </div>
-    </div>
-
-  <% else %>
-
-    <div class="row">
-      <div class="col-md-8">
-        <%= render partial: 'employers_selection' if @person.has_multiple_active_employers? %>
-        <%= render partial: 'qle_detail' %>
-        <%= render partial: 'qle_detail_for_existing_sep' if @active_sep.present?%>
-        <%= render partial: "enrollment", :collection => @hbx_enrollments, :as => :hbx_enrollment, locals: { read_only: false } %>
-        <%= render partial: 'shop_for_plans_widget' %>
-        <%= render partial: 'apply_for_medicaid_widget' %>
-      </div>
-      <div class="col-md-4 right-column">
+    <div class="col-md-4 right-column">
+      <% policy = FamilyPolicy.new(current_user, @family) %>
+      <% if policy.can_subscriber_policy_action? %>
+        <%= render 'insured/families/subscriber_policy_action_form' %>
+      <% else %>
         <%= render 'right_column' %>
-      </div>
+      <% end %>
     </div>
-  <%end %>
+  </div>
 </div>
 <%= render 'insured/plan_shoppings/help_with_plan' %>
