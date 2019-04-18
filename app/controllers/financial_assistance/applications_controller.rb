@@ -16,9 +16,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     @family = @person.primary_family
     @family_members = @person.primary_family.active_family_members
     @applications = @family.applications
-    if @person.active_employee_roles.present?
-      @employee_role = @person.active_employee_roles.first
-    end
+    @employee_role = @person.active_employee_roles.first if @person.active_employee_roles.present?
   end
 
   def new
