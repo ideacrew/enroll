@@ -3,8 +3,11 @@ require 'rails_helper'
 RSpec.describe "insured/families/home.html.erb" do
   let(:person) {FactoryGirl.create(:person, :with_employee_role, :with_family)} #let(:person) { FactoryGirl.create(:person, :with_family ) }
   let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+  let(:user_with_hbx_staff_role) { FactoryGirl.create(:user, :with_family, :with_hbx_staff_role) }
+  let(:user_with_employer_role) {FactoryGirl.create(:user, :with_family, :employer_staff) }
+  let(:hbx_staff_permission) { FactoryGirl.create(:permission, :hbx_staff) }
 
-  let(:qle_first_of_month) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_first_of_month, ) }
+  let!(:qle_first_of_month) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_first_of_month) }
   let(:sep){
     sep = family.special_enrollment_periods.new
     sep.effective_on_kind = 'first_of_month'
@@ -15,6 +18,11 @@ RSpec.describe "insured/families/home.html.erb" do
     sep
   }
 
+  # For displaying HBX Enrollment to test subscribe rpolicy actions
+  let(:employer_profile) { FactoryGirl.build(:employer_profile) }
+  let(:plan) { FactoryGirl.build(:plan) }
+  let(:hbx) { HbxEnrollment.new(created_at: TimeKeeper.date_of_record, effective_on: TimeKeeper.date_of_record) }
+
   before :each do
     stub_template "insured/families/_right_column.html.erb" => ''
     stub_template "insured/families/_qle_detail.html.erb" => ''
@@ -23,6 +31,7 @@ RSpec.describe "insured/families/home.html.erb" do
     stub_template "insured/families/_shop_for_plans_widget.html.erb" => ''
     stub_template "insured/families/_apply_for_medicaid_widget.html.erb" => ''
     stub_template "insured/plan_shoppings/_help_with_plan.html.erb" => ''
+    allow(view).to receive(:current_user).and_return(user_with_employer_role)
     assign(:person, person)
 
     assign(:family, family)
@@ -52,12 +61,25 @@ RSpec.describe "insured/families/home.html.erb" do
   end
 
   context "Subscriber Policy Action Panel" do
-    it "should display for HBX admin" do
+    before :each do
+      assign(:hbx_enrollments, [hbx])
+      assign(:all_qle_events, [qle_first_of_month])
+      allow(hbx).to receive(:plan).and_return(plan)
+    end
 
+    it "should display for HBX admin with proper action buttons" do
+      allow(view).to receive(:current_user).and_return(user_with_hbx_staff_role)
+      user_with_hbx_staff_role.stub_chain('person.hbx_staff_role.permission').and_return(hbx_staff_permission)
+      render file: "insured/families/home.html.erb"
+      expect(rendered).to include("Subscriber Policy Actions")
+      actions = ["Add SEP", "Cancel Enrollment", "Create Eligibility", "Reinstate", "Shorten Coverage Span", "Terminate"]
+      actions.each { |action| expect(rendered).to include(action) }
     end
 
     it "should not display for non HBX admin" do
-
+      expect(view.current_user).to eq(user_with_employer_role)
+      render file: "insured/families/home.html.erb"
+      expect(rendered).not_to include("Subscriber Policy Actions")
     end
   end
 end

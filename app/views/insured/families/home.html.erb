@@ -14,7 +14,8 @@
     <h1><%= l10n("my_site_short_name", site_short_name: Settings.site.short_name) %></h1>
   </div>
 
-  <% if current_user.has_hbx_staff_role? %>
+  <% role = current_user.person.hbx_staff_role %>
+  <% if role.present? && role.permission.modify_admin_tabs %>
     <%= render partial: 'employers_selection' if @person.has_multiple_active_employers? %>
     <%= render partial: 'qle_detail' %>
     <%= render partial: 'qle_detail_for_existing_sep' if @active_sep.present?%>

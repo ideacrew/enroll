@@ -127,20 +127,20 @@ class Insured::FamiliesController < FamiliesController
       flash[:notice] = @message_for_partial # From createSep action
     elsif selected_action == 'cancel'
       # Unsure if proper logic
-      cancel_eligible_enrollments =  Family.find(family_id).all_enrollments.cancel_eligible
-      cancel_eligible_enrollments.each { |enrollment| enrollment.cancel_coverage! }
+      cancel_eligible_enrollments = Family.find(family_id).all_enrollments.cancel_eligible
+      cancel_eligible_enrollments.each(&:cancel_coverage!)
       flash[:notice] = "Successfully canceled all family enrollments."
     elsif selected_action == "create_eligibility"
       # Logic needed
     elsif selected_action == "reinstate"
       # Logic needed
       flash[:notice] = "Successfully reinstated all family enrollments."
-    elsif selected_action ==  "shorten_coverage_span"
+    elsif selected_action == "shorten_coverage_span"
       # Logic needed
     elsif selected_action == "terminate"
       # Unsure if proper logic
       terminate_eligible_enrollments = Family.find(family_id).all_enrollments.can_terminate
-      terminate_eligible_enrollments.each { |enrollment| enrollment.terminate_coverage! }
+      terminate_eligible_enrollments.each(&:terminate_coverage!)
       flash[:notice] = "Successfully terminated all family enrollments."
     else
       flash[:error] = "Please select a valid subscriber policy action type."
