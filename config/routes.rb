@@ -104,6 +104,8 @@ Rails.application.routes.draw do
         get :get_user_info
         get :view_enrollment_to_update_end_date
         post :update_enrollment_termianted_on_date
+        get :edit_force_publish
+        post :force_publish
         get :identity_verification
         post :identity_verification_datatable
         get :user_account_index

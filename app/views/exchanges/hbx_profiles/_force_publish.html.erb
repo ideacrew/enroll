@@ -1,0 +1,26 @@
+<div class='alert alert-error'><a class='close' data-dismiss='alert'>x</a>
+  <% if @plan_year.application_errors.present? %>
+    <% @plan_year.application_errors.values.flatten.each do |app_errors| %>
+      <li><%= app_errors %></li>
+    <% end %>
+  <% elsif @plan_year.assigned_census_employees_without_owner.blank? %>
+    <li><%= l10n("hbx_profiles.zero_employee_warning") %></li>
+  <% end %>
+</div>
+<div class="container bottom-pd">
+  <% if @plan_year.publish_pending? || @plan_year.renewing_publish_pending? %>
+    <h4 class="title"> <%= l10n("hbx_profiles.force_published_application_review") %> </h4>
+  <% elsif @plan_year.application_errors.present? %>
+    <h4 class="title"> <%= l10n("hbx_profiles.force_publish_fail") %> </h4>
+  <% else %>
+    <h4 class="title"> <%= l10n("hbx_profiles.force_publish_success") %> </h4>
+  <% end %>
+  <table class="table">
+    <thead> </thead>
+    <tbody>
+      <tr>
+        <td> <span class="btn btn-default" onclick="$('tr.child-row:visible').remove();"> <%= l10n("close")%> </span> </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

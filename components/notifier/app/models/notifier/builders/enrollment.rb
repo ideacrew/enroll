@@ -3,21 +3,19 @@ module Notifier
 
     def enrollment
       return @enrollment if defined? @enrollment
-      if payload['event_object_kind'].constantize == HbxEnrollment
-        @enrollment = HbxEnrollment.find(payload['event_object_id'])
-      elsif event_matched?
+      if event_matched?
         @enrollment = health_enrollment
+      elsif payload['event_object_kind'].constantize == HbxEnrollment
+        @enrollment = HbxEnrollment.find(payload['event_object_id'])
       end
     end
 
     def dental_enrollment
-      if event_matched?
-        enrollments.by_coverage_kind("dental").first
-      end
+      enrollments.by_coverage_kind('dental').first if event_matched?
     end
 
     def event_matched?
-      ["employee_notice_for_employee_terminated_from_roster", "initial_employee_plan_selection_confirmation"].include?(event_name)
+      ['employee_notice_for_employee_terminated_from_roster', 'initial_employee_plan_selection_confirmation', 'renewal_employer_open_enrollment_completed'].include?(event_name)
     end
 
     def enrollments
@@ -25,11 +23,11 @@ module Notifier
     end
 
     def health_enrollment
-      enrollments.by_coverage_kind("health").first
+      enrollments.by_coverage_kind('health').first
     end
 
     def latest_terminated_health_enrollment
-      enrollment = employee_role.person.primary_family.active_household.hbx_enrollments.shop_market.by_coverage_kind("health").where(:aasm_state.in => ["coverage_termination_pending", "coverage_terminated"]).detect do |hbx|
+      enrollment = employee_role.person.primary_family.active_household.hbx_enrollments.shop_market.by_coverage_kind("health").where(:aasm_state.in => ['coverage_termination_pending', 'coverage_terminated']).detect do |hbx|
         census_employee_record.employment_terminated_on < hbx.terminated_on
       end
       enrollment
