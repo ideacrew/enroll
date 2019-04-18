@@ -36,8 +36,8 @@ module SponsoredBenefits
       # The name of the country where this address is located
       field :country_name, type: String, default: ""
 
-      validates :zip, presence: true, unless: :plan_design_model?
-      validates :kind, presence: true, unless: :plan_design_model?
+      validates :zip, presence: true, if: :sic_code_exists_for_employer?
+      validates :kind, presence: true, if: :sic_code_exists_for_employer?
 
       validates :kind,
         inclusion: { in: KINDS + OFFICE_KINDS, message: "%{value} is not a valid address kind" },
@@ -74,6 +74,10 @@ module SponsoredBenefits
       [:city, :zip, :address_1, :address_2].all? do |attr|
         self.send(attr).blank?
       end
+    end
+
+    def sic_code_exists_for_employer?
+      Settings.aca.employer_has_sic_field
     end
 
     # Get the full address formatted as a string with each line enclosed within html <div> tags

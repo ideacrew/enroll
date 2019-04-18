@@ -27,7 +27,7 @@
           <th>Provider Network</th>
           <% qhps.each do |qhp|%>
             <th colspan="2">
-              <%= render partial: "shared/network_data", locals: {plan: qhp.plan} %>
+              <%= qhp.plan.nationwide ? "Nationwide" : "DC-Metro" %>
             </th>
           <% end %>
         </tr>
