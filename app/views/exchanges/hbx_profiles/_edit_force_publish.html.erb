@@ -1,0 +1,41 @@
+<div class="container" id="extendable_applications_table">
+  <div class = "table-responsive table-override">
+    <div class="pull-right">
+      <a href="javascript:void(0);" onclick="$('tr.child-row:visible').remove();">
+        <span aria-hidden="true"> <i class="fa fa-times fa-lg"></i> </span>
+      </a>
+    </div>
+    <h4 class="text-center heading-text"> <%= l10n("hbx_profiles.publish_application") %> </h4>
+    <%= form_tag force_publish_exchanges_hbx_profiles_path(row_actions_id: "family_actions_#{@organization.id.to_s}"), :method => :post, :remote => true do %>
+      <table class = "table" style="table-layout: fixed;">
+        <thead>
+          <tr>
+            <th><%= l10n("hbx_profiles.application_type")%></th>
+            <th><%= l10n("hbx_profiles.effective_date")%></th>
+            <th><%= l10n("hbx_profiles.oe_end_date")%></th>
+            <th><%= l10n("hbx_profiles.application_status")%></th>
+            <th><%= l10n("hbx_profiles.submitted_at")%></th>
+            <th><%= l10n("hbx_profiles.last_updated_at")%></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><%= @organization.employer_profile.is_renewing_employer? ? "Renewing" : "Initial" %></td>
+            <td><%= @plan_year.start_on.strftime('%m/%d/%Y') %></td>
+            <td><%= @plan_year.open_enrollment_end_on.strftime('%m/%d/%Y') %></td>
+            <td><%= @plan_year.aasm_state.titleize %></td>
+            <td><%= TimeKeeper.local_time(@plan_year.created_at).strftime('%m/%d/%Y %I:%M%p') %></td>
+            <td><%= TimeKeeper.local_time(@plan_year.updated_at).strftime('%m/%d/%Y %I:%M%p') %></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="row no-buffer child-row">
+        <div class="col-md-12 no-pd col-sm-12 col-xs-12 top-buffer text-center">
+          <span class="btn btn-default" onclick="$('tr.child-row:visible').remove();"> <%= l10n(".cancel") %> </span>
+          <%= submit_tag l10n('.submit'), :class => "btn btn-primary", :remote => true, :size => '100px' %>
+        </div>
+      </div>
+      <%= render "employers/plan_years/publish_modal", plan_year: @plan_year, admin_override: true, publish_url: force_publish_exchanges_hbx_profiles_path(row_actions_id: "family_actions_#{@organization.id.to_s}", publish_with_warnings: true) %>
+    <% end %>
+  </div>
+</div>
