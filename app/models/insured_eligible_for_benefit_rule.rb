@@ -95,7 +95,10 @@ class InsuredEligibleForBenefitRule
 
       #TODO person can have more than one families
       person.families.last.family_members.active.each do |family_member|
-        if age_on_next_effective_date(family_member.dob) >= 19 && family_member.is_dc_resident?
+        next if (family_member.person_id == person.id)
+        fm_person = family_member.person_version_for(person.updated_at)
+        next unless fm_person
+        if age_on_next_effective_date(fm_person.dob) >= 19 && fm_person.is_dc_resident?
           return true
         end
       end
