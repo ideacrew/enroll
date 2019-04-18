@@ -13,7 +13,7 @@ class FinancialAssistance::BenefitsController < ApplicationController
     save_faa_bookmark(@person, request.original_url)
     set_admin_bookmark_url
     render layout: 'financial_assistance'
-    @insurance_kinds = FinancialAssistance::Benefit::INSURANCE_KINDS
+    # @insurance_kinds = FinancialAssistance::Benefit::INSURANCE_TYPE
   end
 
   def new

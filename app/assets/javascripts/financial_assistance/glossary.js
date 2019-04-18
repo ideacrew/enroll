@@ -122,7 +122,7 @@ $(document).ready(function() {
         "description": "An operating division of the <a href='\/glossary#us_department_of_health_and_human_services' target='_blank'>U.S. Department of Health and Human Services<\/a> that administers <a href='\/glossary#medicare' target='_blank'>Medicare<\/a>, <a href='\/glossary#medicaid' target='_blank'>Medicaid<\/a>, the <a href='\/glossary#children&#39;s_health_insurance_program' target='_blank'>Children's Health Insurance Program<\/a>, and parts of the <a href='\/glossary#affordable_care_act' target='_blank'>Affordable Care Act<\/a>."
       },
       {
-        "term": "Children's Health Insurance Program",
+        "term": "Children\u2019s Health Insurance Program",
         "description": "An insurance program that provides no cost or low cost health coverage to children in families that earn too much money to qualify for Medicaid but not enough to buy private health insurance. In the District of Columbia, you can apply for CHIP coverage any time of the year through the <a href='\/glossary#medicaid' target='_blank'>Medicaid<\/a> program."
       },
       {

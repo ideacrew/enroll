@@ -11,7 +11,7 @@ class FinancialAssistance::Deduction
       alimony_paid
       deductable_part_of_self_employment_taxes
       domestic_production_activities
-      penalty_on_early_withdrawel_of_savings
+      penalty_on_early_withdrawl_of_savings
       educator_expenses
       rent_or_royalties
       self_employment_sep_simple_and_qualified_plans
@@ -21,8 +21,26 @@ class FinancialAssistance::Deduction
       health_savings_account
       ira_deduction
       reservists_performing_artists_and_fee_basis_government_official_expenses
-      tution_and_fees
+      tuition_and_fees
     )
+    
+  DEDUCTION_TYPE = {
+    alimony_paid: "Alimony paid",
+    deductable_part_of_self_employment_taxes: "Deductible part of self-employment taxes",
+    domestic_production_activities: "Domestic production activities and deduction",
+    penalty_on_early_withdrawl_of_savings: "Penalty on early withdrawl of savings",
+    educator_expenses: "Educator expenses",
+    self_employment_sep_simple_and_qualified_plans: "Self-employmed SEP, SIMPLE, and qualified plans",
+    self_employed_health_insurance: "Self-employed health insurance",
+    student_loan_interest: "Student loan interest",
+    moving_expenses: "Moving expenses",
+    health_savings_account: "Health savings account",
+    ira_deduction: "IRA deduction",
+    reservists_performing_artists_and_fee_basis_government_official_expenses: "Certain business expenses of reservists, performing artists, and fee-basis government officials",
+    tution_and_fees: "Tuition and fees"
+  }
+    
+  
 
   field :title, type: String
   field :kind, as: :deduction_type, type: String, default: 'alimony_paid'
