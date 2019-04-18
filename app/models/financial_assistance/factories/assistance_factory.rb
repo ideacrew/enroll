@@ -2,6 +2,7 @@ module FinancialAssistance
   module Factories
     # To call service, encode message, object to attr
     class AssistanceFactory
+      include EventsHelper
       attr_accessor :person
 
       def initialize(person)
@@ -20,7 +21,7 @@ module FinancialAssistance
           first_name: person.first_name,
           last_name: person.last_name,
           ssn: person.ssn,
-          dob: person.dob
+          dob: simple_date_for(person.dob)
         }
       end
 
