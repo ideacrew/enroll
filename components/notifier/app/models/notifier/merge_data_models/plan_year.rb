@@ -5,6 +5,7 @@ module Notifier
     attribute :current_py_oe_start_date, String
     attribute :current_py_oe_end_date, String
     attribute :current_py_start_date, String
+    attribute :current_py_start_date_plus_one_year, String
     attribute :current_py_end_date, String
     attribute :current_py_plus_60_days, String
     attribute :py_end_on_plus_60_days, String
@@ -53,6 +54,7 @@ module Notifier
         current_py_oe_start_date: (current_py_start.prev_month).strftime('%m/%d/%Y'),
         current_py_oe_end_date: (current_py_start.prev_month + 19.days).strftime('%m/%d/%Y'),
         current_py_start_date: current_py_start.strftime('%m/%d/%Y'),
+        current_py_start_date_plus_one_year: current_py_start.next_year.strftime('%m/%d/%Y'),
         next_available_start_date: current_py_start.next_month.strftime('%m/%d/%Y'),
         current_py_end_date: renewal_py_start.prev_day.strftime('%m/%d/%Y'),
         next_application_deadline: current_py_start.strftime('%m/%d/%Y'),

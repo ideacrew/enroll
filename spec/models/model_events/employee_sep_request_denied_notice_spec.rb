@@ -57,6 +57,7 @@ RSpec.describe 'ModelEvents::EmployeeSepRequestDeniedNotice', :dbclean => :after
         "employee_profile.first_name",
         "employee_profile.last_name",
         "employee_profile.broker_present?",
+        'employee_profile.plan_year.current_py_start_date_plus_one_year',
         "employee_profile.special_enrollment_period.title",
         "employee_profile.special_enrollment_period.reporting_deadline",
         "employee_profile.special_enrollment_period.event_on",
@@ -100,6 +101,10 @@ RSpec.describe 'ModelEvents::EmployeeSepRequestDeniedNotice', :dbclean => :after
 
     it "should return false when there is no broker linked to employer" do
       expect(merge_model.broker_present?).to be_falsey
+    end
+
+    it "should return next effective plan year start date" do
+      expect(merge_model.plan_year.current_py_start_date_plus_one_year).to eq plan_year.start_on.next_year.strftime('%m/%d/%Y')
     end
 
     context "with QLE data_elements" do
