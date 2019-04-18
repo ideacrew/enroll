@@ -345,16 +345,17 @@ module BenefitSponsors
         Family.all_enrollments_by_benefit_package(self).each do |family|
           enrollments = family.active_household.hbx_enrollments.by_benefit_package(self)
           canceled_coverages = enrollments.canceled.select{|enrollment| enrollment.workflow_state_transitions.any?{|wst| canceled_after?(wst, application_transition.transition_at) } }
+          if canceled_coverages.present?
+            sponsored_benefits.each do |sponsored_benefit|
+              hbx_enrollment = canceled_coverages.detect{|coverage| coverage.coverage_kind == sponsored_benefit.product_kind.to_s}
+              enrollment_transition = hbx_enrollment.workflow_state_transitions[0] if hbx_enrollment.present?
 
-          sponsored_benefits.each do |sponsored_benefit|
-            hbx_enrollment = canceled_coverages.detect{|coverage| coverage.coverage_kind == sponsored_benefit.product_kind.to_s}
-            enrollment_transition = hbx_enrollment.workflow_state_transitions[0]
+              if enrollment_transition.present? && enrollment_transition.to_state == hbx_enrollment.aasm_state
+                hbx_enrollment.update(aasm_state: enrollment_transition.from_state)
+                hbx_enrollment.workflow_state_transitions.create(from_state: enrollment_transition.to_state, to_state: enrollment_transition.from_state)
 
-            if enrollment_transition.present? && enrollment_transition.to_state == hbx_enrollment.aasm_state
-              hbx_enrollment.update(aasm_state: enrollment_transition.from_state)
-              hbx_enrollment.workflow_state_transitions.create(from_state: enrollment_transition.to_state, to_state: enrollment_transition.from_state)
-
-              hbx_enrollment.benefit_group_assignment.update_status_from_enrollment(hbx_enrollment)
+                hbx_enrollment.benefit_group_assignment.update_status_from_enrollment(hbx_enrollment)
+              end
             end
           end
         end

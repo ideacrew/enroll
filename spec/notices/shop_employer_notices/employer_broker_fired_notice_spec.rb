@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe ShopEmployerNotices::EmployerBrokerFiredNotice, dbclean: :before_each do
+RSpec.describe ShopEmployerNotices::EmployerBrokerFiredNotice, dbclean: :after_each do
   before(:all) do
 
     @site =  FactoryGirl.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)

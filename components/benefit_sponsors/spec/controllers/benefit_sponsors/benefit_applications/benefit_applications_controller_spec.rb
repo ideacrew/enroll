@@ -194,6 +194,21 @@ module BenefitSponsors
       end
     end
 
+    describe "GET late_rates_check", dbclean: :after_each do
+
+      before { sign_in user }
+
+      it "should return false when it is not in late rate scenario" do
+        xhr :get, :late_rates_check, :start_on_date => effective_period_start_on.strftime('%m/%d/%Y'), benefit_sponsorship_id: "123"
+        expect(response.body).to eq "false"
+      end
+
+      it "should return true during late rates scenario" do
+        xhr :get, :late_rates_check, :start_on_date => effective_period_start_on.prev_year.strftime('%m/%d/%Y'), benefit_sponsorship_id: "123"
+        expect(response.body).to eq "true"
+      end
+    end
+
     describe "GET edit", dbclean: :after_each do
       include_context 'shared_stuff'
 

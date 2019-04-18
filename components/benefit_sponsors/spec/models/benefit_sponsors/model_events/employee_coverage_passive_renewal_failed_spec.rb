@@ -1,16 +1,19 @@
 require 'rails_helper'
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeCoveragePassiveRenewalFailed', :dbclean => :after_each do
+  include_context "setup benefit market with market catalogs and product packages"
+  include_context "setup renewal application"
 
   let(:model_event)  { "employee_coverage_passive_renewal_failed" }
   let(:notice_event) { "employee_coverage_passive_renewal_failed" }
-  let!(:start_on) { TimeKeeper.date_of_record.next_month.beginning_of_month}
-  let!(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-  let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile_renewal_application, site: site) }
-  let(:employer_profile) { organization.employer_profile }
-  let(:benefit_sponsorship) { employer_profile.active_benefit_sponsorship }
-  let!(:active_benefit_application) { benefit_sponsorship.current_benefit_application }
-  let!(:renewing_benefit_application) { benefit_sponsorship.renewal_benefit_application }
+
+  let(:renewal_state)           { :enrollment_open }
+  let(:renewal_effective_date)  { TimeKeeper.date_of_record.next_month.beginning_of_month }
+  let(:current_effective_date)  { renewal_effective_date.prev_year }
+  let(:employer_profile) { abc_profile }  
+
   let!(:person){ FactoryGirl.create(:person, :with_family)}
   let!(:family) {person.primary_family}
   let!(:employee_role) { FactoryGirl.create(:benefit_sponsors_employee_role, person: person, employer_profile: employer_profile, census_employee_id: census_employee.id)}
@@ -25,10 +28,10 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeCoveragePassiveRenewalFail
       census_employee.class.observer_peers.keys.each do |observer|
         expect(observer).to receive(:notifications_send) do |instance, model_event|
           expect(model_event).to be_an_instance_of(::BenefitSponsors::ModelEvents::ModelEvent)
-          expect(model_event).to have_attributes(:event_key => :employee_coverage_passive_renewal_failed, :klass_instance => census_employee, :options => {event_object: renewing_benefit_application})
+          expect(model_event).to have_attributes(:event_key => :employee_coverage_passive_renewal_failed, :klass_instance => census_employee, :options => {event_object: renewal_application})
         end
       end
-      census_employee.trigger_model_event(:employee_coverage_passive_renewal_failed, {event_object: renewing_benefit_application})
+      census_employee.trigger_model_event(:employee_coverage_passive_renewal_failed, {event_object: renewal_application})
     end
   end
 
@@ -36,14 +39,14 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeCoveragePassiveRenewalFail
     context "when renewal employee auto renewal" do
       subject { BenefitSponsors::Observers::CensusEmployeeObserver.new }
 
-      let(:model_event) { ::BenefitSponsors::ModelEvents::ModelEvent.new(:employee_coverage_passive_renewal_failed, census_employee, {event_object:renewing_benefit_application}) }
+      let(:model_event) { ::BenefitSponsors::ModelEvents::ModelEvent.new(:employee_coverage_passive_renewal_failed, census_employee, {event_object:renewal_application}) }
 
       it "should trigger notice event" do
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employee.employee_coverage_passive_renewal_failed"
           expect(payload[:employee_role_id]).to eq census_employee.employee_role.id.to_s
           expect(payload[:event_object_kind]).to eq 'BenefitSponsors::BenefitApplications::BenefitApplication'
-          expect(payload[:event_object_id]).to eq renewing_benefit_application.id.to_s
+          expect(payload[:event_object_id]).to eq renewal_application.id.to_s
         end
         subject.notifications_send(census_employee, model_event)
       end
@@ -73,7 +76,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeCoveragePassiveRenewalFail
 
     let!(:payload)   { {
       "event_object_kind" => "BenefitSponsors::BenefitApplications::BenefitApplication",
-      "event_object_id" => renewing_benefit_application.id
+      "event_object_id" => renewal_application.id
     } }
 
     context "when notice event received" do
@@ -82,8 +85,8 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeCoveragePassiveRenewalFail
       before do
         allow(subject).to receive(:resource).and_return(census_employee.employee_role)
         allow(subject).to receive(:payload).and_return(payload)
-        renewing_benefit_application.update_attributes(:predecessor_id => active_benefit_application.id )
-        census_employee.trigger_model_event(:employee_coverage_passive_renewal_failed, {event_object: renewing_benefit_application})
+        renewal_application.update_attributes(:predecessor_id => predecessor_application.id )
+        census_employee.trigger_model_event(:employee_coverage_passive_renewal_failed, {event_object: renewal_application})
       end
 
       it "should retrun merge model" do
@@ -99,15 +102,15 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeCoveragePassiveRenewalFail
       end
 
       it "should return renewal plan year start date" do
-        expect(merge_model.benefit_application.renewal_py_start_date).to eq renewing_benefit_application.start_on.strftime('%m/%d/%Y')
+        expect(merge_model.benefit_application.renewal_py_start_date).to eq renewal_application.start_on.strftime('%m/%d/%Y')
       end
 
       it "should return renewal plan year open enrollment start date" do
-        expect(merge_model.benefit_application.renewal_py_oe_start_date).to eq renewing_benefit_application.open_enrollment_start_on.strftime('%m/%d/%Y')
+        expect(merge_model.benefit_application.renewal_py_oe_start_date).to eq renewal_application.open_enrollment_start_on.strftime('%m/%d/%Y')
       end
 
       it "should return renewal plan year open enrollment end date" do
-        expect(merge_model.benefit_application.renewal_py_oe_end_date).to eq renewing_benefit_application.open_enrollment_end_on.strftime('%m/%d/%Y')
+        expect(merge_model.benefit_application.renewal_py_oe_end_date).to eq renewal_application.open_enrollment_end_on.strftime('%m/%d/%Y')
       end
 
       it "should return false when there is no broker linked to employer" do

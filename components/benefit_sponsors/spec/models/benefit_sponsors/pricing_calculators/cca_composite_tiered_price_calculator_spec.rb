@@ -94,7 +94,7 @@ module BenefitSponsors
             member_id: employee_member_id
           )
         end
-		    let(:employee_age) { 27 }
+        let(:employee_age) { 27 }
 
         let(:spouse_member_id) { "some_spouse_id" }
         let(:spouse_dob) { Date.new(1995, 9, 27) }
@@ -115,18 +115,18 @@ module BenefitSponsors
           )
         end
 
-				let(:child_member_id) { "some_child1_member_id" }
-				let(:child_dob) { Date.new(2015, 1, 1) }
-				let(:child) do
-					instance_double(
-						"::BenefitMarkets::SponsoredBenefits::RosterMember",
-						member_id: child_member_id,
-						relationship: "child",
-						is_disabled?: false,
-						dob: child_dob,
+        let(:child_member_id) { "some_child1_member_id" }
+        let(:child_dob) { Date.new(2015, 1, 1) }
+        let(:child) do
+          instance_double(
+            "::BenefitMarkets::SponsoredBenefits::RosterMember",
+            member_id: child_member_id,
+            relationship: "child",
+            is_disabled?: false,
+            dob: child_dob,
             is_primary_member?: false
-					)
-				end
+          )
+        end
         let(:child_enrollment) do
           ::BenefitSponsors::Enrollments::MemberEnrollment.new(
             member_id: child_member_id
@@ -187,9 +187,9 @@ module BenefitSponsors
         end
 
         before(:each) do
-					allow(pricing_model).to receive(:map_relationship_for).with("self", employee_age, false).and_return("employee")
-					allow(pricing_model).to receive(:map_relationship_for).with("spouse", spouse_age, false).and_return("spouse")
-					allow(pricing_model).to receive(:map_relationship_for).with("child", child_age, false).and_return("dependent")
+          allow(pricing_model).to receive(:map_relationship_for).with("self", employee_age, false).and_return("employee")
+          allow(pricing_model).to receive(:map_relationship_for).with("spouse", spouse_age, false).and_return("spouse")
+          allow(pricing_model).to receive(:map_relationship_for).with("child", child_age, false).and_return("dependent")
           allow(employee_only_pricing_unit).to receive(:match?).with({"dependent"=>1, "employee"=>1, "spouse"=>1}).and_return(false)
           allow(employee_and_spouse_pricing_unit).to receive(:match?).with({"dependent"=>1, "employee"=>1, "spouse"=>1}).and_return(false)
           allow(employee_and_dependents_pricing_unit).to receive(:match?).with({"dependent"=>1, "employee"=>1, "spouse"=>1}).and_return(false)

@@ -221,6 +221,7 @@ class BenefitGroup
 
   def set_lowest_and_highest(plans)
     if plans.size > 0
+      plans = plans.select{|a| a.premium_tables.present?}
       plans_by_cost = plans.sort_by { |plan| plan.premium_tables.first.cost }
 
       self.lowest_cost_plan_id  = plans_by_cost.first.id

@@ -35,6 +35,10 @@ module BenefitSponsors
 
     describe "when employee selects coverage in Open Enrollment" do
       context "ModelEvent" do
+        before do
+          allow(model_instance).to receive(:can_select_coverage?).and_return(true)
+        end
+
         it "should trigger model event" do
           model_instance.class.observer_peers.keys.each do |observer|
             expect(observer).to receive(:notifications_send) do |model_instance, model_event|

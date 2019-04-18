@@ -44,12 +44,16 @@ FactoryGirl.define do
       package_kind :single_issuer
       dental_package_kind :single_product
       dental_sponsored_benefit false
+      predecessor_application_catalog false
     end
+
+    trait :without_benefit_sponsor_catalog
 
     trait :with_benefit_sponsor_catalog do
       after(:build) do |benefit_application, evaluator|
         if benefit_sponsorship = benefit_application.benefit_sponsorship
           benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.resolve_service_areas, benefit_application.effective_period.min)
+          benefit_sponsor_catalog.save
         end
         benefit_application.benefit_sponsor_catalog = (benefit_sponsor_catalog || ::BenefitMarkets::BenefitSponsorCatalog.new)
         benefit_application.benefit_sponsor_catalog.service_areas = benefit_application.recorded_service_areas
@@ -83,14 +87,16 @@ FactoryGirl.define do
 
     trait :with_predecessor_application do
       after(:build) do |benefit_application, evaluator|
+
         predecessor_application = FactoryGirl.create(:benefit_sponsors_benefit_application,
+          (evaluator.predecessor_application_catalog ? :with_benefit_sponsor_catalog : :without_benefit_sponsor_catalog),
           :with_benefit_package,
           benefit_sponsorship: benefit_application.benefit_sponsorship,
           effective_period: (benefit_application.effective_period.begin - 1.year)..(benefit_application.effective_period.end - 1.year),
           open_enrollment_period: (benefit_application.open_enrollment_period.begin - 1.year)..(benefit_application.open_enrollment_period.end - 1.year),
-           dental_sponsored_benefit: evaluator.dental_sponsored_benefit,
-          aasm_state: evaluator.predecessor_application_state # ,
-#          recorded_service_areas: benefit_application.benefit_sponsorship.service_areas_on(benefit_application.effective_period.begin - 1.year)
+          dental_sponsored_benefit: evaluator.dental_sponsored_benefit,
+          aasm_state: evaluator.predecessor_application_state,
+          recorded_service_areas: benefit_application.benefit_sponsorship.service_areas_on(benefit_application.effective_period.begin - 1.year)
         )
 
         benefit_application.predecessor = predecessor_application
