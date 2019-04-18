@@ -149,10 +149,11 @@ class Insured::PlanShoppingsController < ApplicationController
     coverage_end_date = @person.primary_family.terminate_date_for_shop_by_enrollment(hbx_enrollment)
     hbx_enrollment.terminate_enrollment(coverage_end_date, params[:terminate_reason])
 
-    if hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_termination_pending?
+    if hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_termination_pending? || hbx_enrollment.coverage_canceled?
       hbx_enrollment.update_renewal_coverage
-      @person.primary_family.active_household.reload
-      waiver_enrollment = @person.primary_family.enrollments.where(predecessor_enrollment_id: hbx_enrollment.id).first
+      household = @person.primary_family.active_household
+      household.reload
+      waiver_enrollment = household.hbx_enrollments.where(predecessor_enrollment_id: hbx_enrollment.id).first
       redirect_to print_waiver_insured_plan_shopping_path(waiver_enrollment), notice: "Waive Coverage Successful"
     else
       redirect_to :back

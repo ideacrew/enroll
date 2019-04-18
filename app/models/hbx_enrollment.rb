@@ -538,29 +538,28 @@ class HbxEnrollment
 
   def term_existing_shop_enrollments
     plan_year = benefit_group.plan_year
+    terminating_benefit_group_ids = plan_year.benefit_groups.pluck(:id)
 
-    shop_enrollments = household.hbx_enrollments.where({
-      :benefit_group_id.in => plan_year.benefit_groups.pluck(:id), 
-      :coverage_kind => coverage_kind,
-    }).enrolled_and_renewing
-
-    # cancel or term only passive renewals(exclude active renewals and passive waivers)
-    if !plan_year.is_renewing? && employer_profile.renewing_plan_year.present?
-      id_list = self.employer_profile.published_plan_year.benefit_groups.pluck(:id)
-      shop_enrollments += household.hbx_enrollments.where(:benefit_group_id.in => id_list, :coverage_kind => coverage_kind).renewing.to_a
-    end
-
-    shop_enrollments.each do |enrollment|
-      coverage_end_date = family.terminate_date_for_shop_by_enrollment(enrollment)
-      if enrollment.effective_on >= coverage_end_date
-        enrollment.cancel_coverage! if enrollment.may_cancel_coverage? # cancel coverage if enrollment is future effective
-      else
-        if coverage_end_date >= TimeKeeper.date_of_record
-          enrollment.schedule_coverage_termination!(coverage_end_date) if enrollment.may_schedule_coverage_termination?
-        else
-          enrollment.terminate_coverage!(coverage_end_date) if enrollment.may_terminate_coverage?
+    # cancel or term previous year enrollments if waiver is created under renewal application
+    # cancel or term renewal application enrollments if waiver created under the active application
+    if plan_year.is_renewing?
+      if effective_on == benefit_group.start_on
+        if employer_profile
+          predecessor_plan_year = employer_profile.published_plan_years_by_date(effective_on.prev_day).first
+          terminating_benefit_group_ids += predecessor_plan_year.benefit_groups.pluck(:id) if predecessor_plan_year.present?
         end
       end
+    else
+      terminating_benefit_group_ids += self.employer_profile.renewing_plan_year.benefit_groups.pluck(:id) if employer_profile.renewing_plan_year.present?
+    end
+
+    household.hbx_enrollments.where({
+      :benefit_group_id.in => terminating_benefit_group_ids, 
+      :coverage_kind => coverage_kind,
+      }).enrolled_and_renewing.each do |enrollment|
+
+      coverage_end_date = family.terminate_date_for_shop_by_enrollment(enrollment)
+      term_or_cancel_enrollment(enrollment, coverage_end_date)
     end
   end
 
@@ -591,22 +590,28 @@ class HbxEnrollment
   end
 
   def terminate_enrollment(coverage_end_date = TimeKeeper.date_of_record.end_of_month, terminate_reason)
-    if coverage_end_date >= TimeKeeper.date_of_record
-      if may_schedule_coverage_termination?
-        update_attributes(terminate_reason: terminate_reason)
-        schedule_coverage_termination!(coverage_end_date) 
-      end  
-    else
-      update_attributes(terminate_reason: terminate_reason) && terminate_coverage!(coverage_end_date) if may_terminate_coverage? #terminate coverage if enrollment is past effective
-    end
+    term_or_cancel_enrollment(self, coverage_end_date, terminate_reason)
 
     if is_shop?
-      if coverage_termination_pending? || coverage_terminated?
+      if coverage_termination_pending? || coverage_terminated? || coverage_canceled?
         unless waiver_enrollment_present?
           waiver = construct_waiver_enrollment
-          waiver.waive_coverage!
+          waiver.waive_coverage! if may_waive_coverage?
         end
       end
+    end
+  end
+
+  def term_or_cancel_enrollment(enrollment, coverage_end_date, term_reason = nil)
+    if enrollment.effective_on >= coverage_end_date
+      enrollment.cancel_coverage! if enrollment.may_cancel_coverage? # cancel coverage if enrollment is future effective
+    else
+      if coverage_end_date >= TimeKeeper.date_of_record
+        enrollment.schedule_coverage_termination!(coverage_end_date) if enrollment.may_schedule_coverage_termination?
+      else
+        enrollment.terminate_coverage!(coverage_end_date) if enrollment.may_terminate_coverage?
+      end
+      enrollment.update(terminate_reason: terminate_reason) if (coverage_termination_pending? || coverage_terminated?) && term_reason.present?
     end
   end
 

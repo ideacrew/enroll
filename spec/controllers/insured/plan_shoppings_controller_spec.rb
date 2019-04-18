@@ -377,9 +377,22 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
   end
 
   context "POST terminate" do
-    let!(:enrollment) {
-      FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, enrollment_members: family.family_members, household: family.active_household, :aasm_state => "coverage_selected", :benefit_group_id => benefit_group.id, benefit_group_assignment_id: benefit_group_assignment.id, employee_role_id: employee_role.id)
-    }
+    let!(:enrollment) { FactoryGirl.create(:hbx_enrollment,
+      :with_enrollment_members,
+      :enrollment_members => family.family_members,
+      :household => family.active_household,
+      :aasm_state => "coverage_selected",
+      :benefit_group_id => benefit_group.id,
+      :benefit_group_assignment_id => benefit_group_assignment.id,
+      :employee_role_id => employee_role.id)}
+
+    let!(:waiver_enrollment) { FactoryGirl.create(:hbx_enrollment,
+      :aasm_state => 'inactive',
+      :household => family.active_household,
+      :benefit_group_id => benefit_group.id,
+      :benefit_group_assignment_id => benefit_group_assignment.id,
+      :employee_role_id => employee_role.id)}
+
     let(:sep) { FactoryGirl.create :special_enrollment_period, family: family, qle_on: TimeKeeper.date_of_record.last_month.end_of_month }
     let!(:terminate_reason) { "terminate_reason" }
     let!(:employer_profile) { FactoryGirl.create(:employer_profile) }
@@ -399,6 +412,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       allow(family).to receive(:earliest_effective_shop_sep).and_return sep
       allow(enrollment).to receive(:terminate_reason).and_return("terminate_reason")
       allow(person).to receive(:primary_family).and_return(Family.new)
+      allow(waiver_enrollment).to receive(:parent_enrollment).and_return(enrollment)
       sign_in user
     end
 
