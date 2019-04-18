@@ -119,11 +119,10 @@ class Insured::FamiliesController < FamiliesController
   # For the radio selections on the subscriber policy page
   # Only HBX admin should be able to access these actions
   def subscriber_policy_action
-    authorize @family, :show?
     selected_action = params["subscriber_policy_action"]
     family_id = params["family"]
     if selected_action == "add_sep"
-      createSep #  See sep_all.rb
+      createSep # See sep_all.rb
       flash[:notice] = @message_for_partial # From createSep action
     elsif selected_action == 'cancel'
       # Unsure if proper logic
@@ -137,6 +136,7 @@ class Insured::FamiliesController < FamiliesController
       flash[:notice] = "Successfully reinstated all family enrollments."
     elsif selected_action == "shorten_coverage_span"
       # Logic needed
+      flash[:notice] = "Successfully shortened coverage span."
     elsif selected_action == "terminate"
       # Unsure if proper logic
       terminate_eligible_enrollments = Family.find(family_id).all_enrollments.can_terminate

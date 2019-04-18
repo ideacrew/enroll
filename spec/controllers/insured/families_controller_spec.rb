@@ -7,7 +7,6 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
     let!(:individual_market_transition) { FactoryGirl.create(:individual_market_transition, person: person) }
 
-
     before :each do
       sign_in user
     end
@@ -888,32 +887,120 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   end
 
   describe "POST subscriber_policy_action" do
-    before do
+    let(:subscriber_policy_action_family_access_policy) { instance_double(FamilyPolicy, :show? => true) }
+    let(:user) { FactoryGirl.create(:user, :with_family, :with_hbx_staff_role) }
+    let(:consumer_person) { FactoryGirl.create(:person, :with_consumer_role) }
+    let(:family_primary_member) { FactoryGirl.create(:family, :with_primary_family_member_and_dependent) }
+    let(:effective_on_kind) { QualifyingLifeEventKind::EffectiveOnKinds.sample }
+    let(:qle) do
+      FactoryGirl.create(
+        :qualifying_life_event_kind,
+        title: "Provided documents proving eligibility",
+        reason: "eligibility_documents_provided "
+      )
+    end
+
+    before :each do
       sign_in(user)
+      allow(self).to receive(:family).and_return(family_primary_member)
     end
 
     it "should add sep" do
-
+      # Current user also used as a param here in createSep method
+      # createSep method expects a "person" parameter equal to an instance of Family class's mongo id
+      post(
+        :subscriber_policy_action,
+        id: family_primary_member.id,
+        subscriber_policy_action: "add_sep",
+        family: family_primary_member.id,
+        person: family_primary_member.id,
+        firstName: consumer_person.first_name,
+        lastName: consumer_person.last_name,
+        qle_id: qle.id,
+        effective_on_kind: effective_on_kind,
+        effecive_on_date: Date.today + 1.month,
+        event_date: Date.today,
+        start_on: Date.today + 1.month,
+        end_on: Date.today + 2.months,
+        admin_comment: "This is a comment.",
+        transmit_xml: true
+      )
+      # This should be sufficient, the createSep method creates a flash
+      # message for special_enrollment_period.save
+      params = self.controller.params
+      person_name = params[:firstName] + " " + params[:lastName]
+      expect(flash[:notice]).to eq("SEP Added for #{person_name}")
+      expect(response).to redirect_to(home_insured_families_path)
+      family_primary_member.reload
+      expect(family_primary_member.special_enrollment_periods.length).to eq(1)
     end
 
     it "should cancel enrollments" do
-
+      post(
+        :subscriber_policy_action,
+        id: family.id,
+        family: family.id,
+        subscriber_policy_action: "cancel",
+        transmit_xml: true
+      )
+      expect(flash[:notice]).to eq("Successfully canceled all family enrollments.")
+      expect(response).to redirect_to(home_insured_families_path)
     end
 
     it "should create eligibility" do
-
+      post(
+        :subscriber_policy_action,
+        id: family.id,
+        subscriber_policy_action: "create_eligibility",
+        transmit_xml: true
+      )
     end
 
     it "should reinstate enrollments" do
-  
+        post(
+        :subscriber_policy_action,
+        id: family.id,
+        subscriber_policy_action: "reinstate",
+        transmit_xml: true
+      )
+      expect(flash[:notice]).to eq("Successfully reinstated all family enrollments.")
+      expect(response).to redirect_to(home_insured_families_path)
+    end
+
+    it "should shorten coverage span" do
+      post(
+        :subscriber_policy_action,
+        id: family.id,
+        family: family.id,
+        subscriber_policy_action: "shorten_coverage_span",
+        transmit_xml: true
+      )
+      expect(flash[:notice]).to eq("Successfully shortened coverage span.")
+      expect(response).to redirect_to(home_insured_families_path)
     end
 
     it "should terminate enrollments" do
-
+      post(
+        :subscriber_policy_action,
+        id: family.id,
+        family: family.id,
+        subscriber_policy_action: "terminate",
+        transmit_xml: true
+      )
+      expect(flash[:notice]).to eq("Successfully terminated all family enrollments.")
+      expect(response).to redirect_to(home_insured_families_path)
     end
-
+    
+    # Technically not possible from the UI, as they are radio buttons
     it "should throw error if valid subscriber_policy_action not submitted" do
-
+      post(
+        :subscriber_policy_action,
+        id: family_primary_member.id,
+        subscriber_policy_action: nil,
+        transmit_xml: true
+      )
+      expect(flash[:error]).to eq("Please select a valid subscriber policy action type.")
+      expect(response).to redirect_to(home_insured_families_path)
     end
   end
 
