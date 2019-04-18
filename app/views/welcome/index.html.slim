@@ -1,13 +1,8 @@
 .container.home.module.welcome#welcome
   br
-  br
-  br
-  br
   h1.no-buffer#nm_title
     strong
       = l10n('.welcome_to_site_name', short_name: Settings.site.short_name)
-  h3.darkblue.no-buffer#nm_title
-    = l10n('.site_byline')
   br
   - if user_signed_in?
     strong
@@ -21,8 +16,10 @@
   = link_to l10n(".broker_agency_portal"), broker_agencies_root_path, class: " home-button btn btn-default "
   = link_to l10n(".hbx_portal"), exchanges_hbx_profiles_root_path, class: " home-button btn btn-default "
 
+
   - if !user_signed_in?
     = link_to l10n(".broker_registration"), broker_registration_path, class: " home-button btn btn-default "
+    = link_to l10n(".analytics"), exchanges_hbx_profiles_root_path, class: " home-button btn btn-default "
 #carousel-container
   #myCarousel.carousel.slide data-ride="carousel" 
     .carousel-inner

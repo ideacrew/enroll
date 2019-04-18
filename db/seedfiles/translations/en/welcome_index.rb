@@ -14,6 +14,6 @@ WELCOME_INDEX_TRANSLATIONS = {
   "en.welcome.index.returning_user" => "Returning User",
   "en.welcome.index.signed_in_as" => "Signed in as %{current_user}",
   "en.welcome.index.welcome_email" => "Welcome %{current_user}",
-  "en.welcome.index.welcome_to_site_name" => "Be Well New Mexico",
+  "en.welcome.index.welcome_to_site_name" => "beWellnm",
   "en.welcome.index.site_byline" => "New Mexico's Online Health Insurance Exchange"
 }

@@ -1,5 +1,5 @@
 site:
-  short_name: "Be Well New Mexico"
+  short_name: "beWellnm"
   byline: "New Mexico's Health Insurance Exchange"
   long_name: ""
   copyright_period_start: "2019"
@@ -30,8 +30,8 @@ contact_center:
   email_address: "info@bewellnm.com"
 
 aca:
-  state_name: "New Mexico"
-  state_abbreviation: "NM"
+  state_name: "District of Columbia"
+  state_abbreviation: "DC"
   hbx_abbreviation: "NM Health Insurance Exchange"
   market_kinds: ["individual", "shop"]
 #
@@ -138,6 +138,10 @@ checkbook_services:
     current_year: 2019
     previous_year: 2018
     plan_match: "DC"
+
+financial_assistance:
+  ext_service:
+    aceds_curam: false
 
 aptc_errors:
   effective_date_overflow: "Updates not allowed at this time. Effective Date happens to be after the Policy's life (next year) when following the 15th day rule."

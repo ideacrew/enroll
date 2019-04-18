@@ -58,7 +58,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
           @application.submit! if @application.complete?
           payload = generate_payload(@application)
           if @application.publish(payload)
-            #dummy_data_for_demo(params) if @application.complete? && @application.is_submitted? #For_Populating_dummy_ED_for_DEMO #temporary
+            dummy_data_for_demo(params) if @application.complete? && @application.is_submitted? #For_Populating_dummy_ED_for_DEMO #temporary
             redirect_to wait_for_eligibility_response_financial_assistance_application_path(@application)
           else
             @application.unsubmit!
@@ -188,7 +188,6 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     application = @person.primary_family.applications.find(params[:id])
     render :text => "#{application.success_status_codes?(application.determination_http_status_code)}"
   end
-  
   def checklist_pdf
     send_file(Rails.root.join("public", "ivl_checklist.pdf").to_s, :disposition => "inline", :type => "application/pdf")
   end
@@ -202,8 +201,13 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def call_service
-    person = FinancialAssistance::Factories::AssistanceFactory.new(@person)
-    @assistance_status, @message = person.search_existing_assistance
+    if Settings.financial_assistance.ext_service.aceds_curam
+      person = FinancialAssistance::Factories::AssistanceFactory.new(@person)
+      @assistance_status, @message = person.search_existing_assistance
+    else
+      @assistance_status = true
+      @message = nil
+    end
   end
 
   def set_primary_family
@@ -225,7 +229,6 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     #Dummy_ED
     coverage_year = @person.primary_family.application_applicable_year
     @model.update_attributes!(aasm_state: "determined", assistance_year: coverage_year, determination_http_status_code: 200)
-
     @model.tax_households.each do |txh|
       txh.update_attributes!(allocated_aptc: 200.00, is_eligibility_determined: true, effective_starting_on: Date.new(coverage_year, 01, 01))
       txh.eligibility_determinations.build(max_aptc: 200.00,

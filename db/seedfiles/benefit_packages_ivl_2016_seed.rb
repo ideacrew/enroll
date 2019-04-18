@@ -1,7 +1,6 @@
 puts "::: Creating IVL 2016 benefit packages :::"
 
 # BenefitPackages - HBX 2016
-
 hbx = HbxProfile.current_hbx
 
 # Second lowest cost silver plan

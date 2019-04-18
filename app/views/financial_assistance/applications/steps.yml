@@ -8,11 +8,11 @@
                   - gutter: 12
                     type: raw_html
                     classNames: 'small-padding-top-bottom'
-                    text: "To make it easier to determine my eligibility for help paying for coverage in future years, I agree to allow DC Health Link to use my income data, including information from tax returns, for the next five years.DC Health Link will send me a notice, let me make any changes, and I can opt out at any time.<br>"
+                    text: "To make it easier to determine my eligibility for help paying for coverage in future years, I agree to allow DC Health Link to use my income data, including information from tax returns, for the next five years.DC Health Link will send me a notice, let me make any changes, and I can opt out at any time. *<br>"
             - cells:
                   - gutter: 2
                     type: label_radio
-                    label: I Agree *
+                    label: I Agree
                     id: 'agree'
                     value: true
                     classNames: 'span-text'
@@ -24,7 +24,7 @@
                     type: label_radio
                     id: 'disagree'
                     classNames: 'span-text'
-                    label: I disagree *
+                    label: I disagree
                     value: false
                     model: application
                     name: is_renewal_authorized
@@ -96,7 +96,7 @@
                   - gutter: 8
                     type: raw_html
                     classNames: 'small-padding-top-bottom'
-                    text: "Would you like to register to vote in DC or update your current registration? (a form will be mailed to you)"
+                    text: "Would you like to register to vote in DC or update your current registration? * (a form will be mailed to you)"
                   - gutter: 2
                     type: label_radio
                     id: 'mailed_yes'
@@ -110,7 +110,7 @@
                     type: label_radio
                     label: "No"
                     id: 'mailed_no'
-                    classNames: 'span-text' 
+                    classNames: 'span-text'
                     value: false
                     classNames: 'span-text'
                     model: application
