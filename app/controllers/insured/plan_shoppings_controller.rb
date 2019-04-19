@@ -129,7 +129,7 @@ class Insured::PlanShoppingsController < ApplicationController
         end
       end
 
-      if waiver_success 
+      if waiver_success
         redirect_to print_waiver_insured_plan_shopping_path(@waiver_enrollment), notice: "Waive Coverage Successful"
         trigger_notice_observer(@waiver_enrollment.employee_role, @waiver_enrollment, "employee_waiver_confirmation")
       else

@@ -52,8 +52,7 @@ RSpec.describe 'ModelEvents::EmployeeWaiverConfirmation', dbclean: :around_each 
           "employee_profile.enrollment.coverage_kind",
           "employee_profile.enrollment.enrolled_count",
           "employee_profile.enrollment.plan_name",
-          "employee_profile.enrollment.coverage_end_on"
-
+          "employee_profile.enrollment.waiver_effective_on"
         ]
       }
 
@@ -101,6 +100,10 @@ RSpec.describe 'ModelEvents::EmployeeWaiverConfirmation', dbclean: :around_each 
 
       it "should return enrollment coverage_kind" do
         expect(merge_model.enrollment.plan_name).to eq model_instance.plan.name
+      end
+
+      it "should return enrollment coverage_kind" do
+        expect(merge_model.enrollment.waiver_effective_on).to eq model_instance.effective_on.strftime('%m/%d/%Y')
       end
     end
   end
