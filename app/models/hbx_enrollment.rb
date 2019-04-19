@@ -596,7 +596,7 @@ class HbxEnrollment
       if coverage_termination_pending? || coverage_terminated? || coverage_canceled?
         unless waiver_enrollment_present?
           waiver = construct_waiver_enrollment
-          waiver.waive_coverage! if may_waive_coverage?
+          waiver.waive_coverage! if waiver.may_waive_coverage?
         end
       end
     end
