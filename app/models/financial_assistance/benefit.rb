@@ -37,7 +37,7 @@ class FinancialAssistance::Benefit
     is_eligible
     is_enrolled
   )
-  
+
   INSURANCE_TYPE = {
     acf_refugee_medical_assistance: "ACF Refugee Medical Assistance",
     americorps_health_benefits: "AmeriCorps health benefits",
