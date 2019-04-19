@@ -19,7 +19,7 @@ class DefinePermissions < MigrationTask
     Permission.create(name: 'developer', list_enrollments: true, view_admin_tabs: true)
     Permission.create(name: 'super_admin', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
                       send_broker_agency_message: true, approve_broker: true, approve_ga: true,
-                      modify_admin_tabs: true, view_admin_tabs: true, can_view_username_and_email:true, can_lock_unlock:true, can_reset_password:true, can_add_sep:true)
+                      modify_admin_tabs: true, view_admin_tabs: true, can_view_username_and_email:true, can_lock_unlock:true, can_reset_password:true, can_add_sep:true, can_change_fein: true)
   	permission = Permission.hbx_staff
     Person.where(hbx_staff_role: {:$exists => true}).all.each{|p|p.hbx_staff_role.update_attributes(permission_id: permission.id, subrole:'hbx_staff')}
   end
@@ -118,7 +118,7 @@ class DefinePermissions < MigrationTask
     Permission.hbx_staff.update_attributes!(can_access_accept_reject_paper_application_documents: true)
     Permission.hbx_csr_supervisor.update_attributes!(can_access_accept_reject_paper_application_documents: true)
     Permission.hbx_csr_tier1.update_attributes!(can_access_accept_reject_paper_application_documents: true)
-    Permission.hbx_csr_tier2.update_attributes!(can_access_accept_reject_paper_application_documents: true)  
+    Permission.hbx_csr_tier2.update_attributes!(can_access_accept_reject_paper_application_documents: true)
   end
 
   def hbx_admin_can_delete_identity_application_documents
