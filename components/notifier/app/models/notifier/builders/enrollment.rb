@@ -19,7 +19,7 @@ module Notifier
     end
 
     def enrollments
-      employee_role.person.primary_family.active_household.hbx_enrollments.shop_market.enrolled
+      employee_role.person.primary_family.active_household.hbx_enrollments.shop_market.enrolled_and_renewing
     end
 
     def health_enrollment
