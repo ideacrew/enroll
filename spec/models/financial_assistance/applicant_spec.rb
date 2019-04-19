@@ -5,7 +5,7 @@ RSpec.describe FinancialAssistance::Applicant, type: :model do
     allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
   end
 
-  let!(:person1) { FactoryGirl.create(:person, :with_consumer_role) }
+  let!(:person1) { FactoryGirl.create(:person, :with_consumer_role, dob: TimeKeeper.date_of_record - 46.years) }
   let!(:person2) { FactoryGirl.create(:person, :with_consumer_role, dob: '1972-04-04'.to_date) }
   let!(:family)  { family = FactoryGirl.create(:family, :with_primary_family_member, person: person1)
     FactoryGirl.create(:family_member, family: family, person: person2)
