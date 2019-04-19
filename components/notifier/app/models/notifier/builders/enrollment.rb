@@ -11,7 +11,7 @@ module Notifier
     end
 
     def dental_enrollment
-      enrollments.by_coverage_kind('dental').first if event_matched?
+      enrollments.by_coverage_kind('dental').sort_by(&:created_at).last if event_matched?
     end
 
     def event_matched?
@@ -23,7 +23,7 @@ module Notifier
     end
 
     def health_enrollment
-      enrollments.by_coverage_kind('health').first
+      enrollments.by_coverage_kind('health').sort_by(&:created_at).last
     end
 
     def latest_terminated_health_enrollment
