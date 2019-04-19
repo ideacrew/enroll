@@ -91,7 +91,11 @@ RSpec.shared_context "set up broker agency profile for BQT, by using configurati
   let(:dental_reference_product) { dental_product }
 
   def health_plan
-    FactoryGirl.create(:plan, :with_premium_tables, coverage_kind: "health")
+    if Settings.aca.state_abbreviation == "DC"
+      FactoryGirl.create(:plan, :with_premium_tables, coverage_kind: "health")
+    else
+      FactoryGirl.create(:plan, :with_premium_tables, :with_rating_factors, coverage_kind: "health")
+    end
   end
 
   def health_product
@@ -106,7 +110,11 @@ RSpec.shared_context "set up broker agency profile for BQT, by using configurati
   end
 
   def dental_plan
-    FactoryGirl.create(:plan, :with_premium_tables, coverage_kind: "dental")
+    if Settings.aca.state_abbreviation == "DC"
+      FactoryGirl.create(:plan, :with_premium_tables, coverage_kind: "dental")
+    else
+      FactoryGirl.create(:plan, :with_premium_tables, :with_rating_factors, coverage_kind: "dental")
+    end
   end
 
   def dental_product
