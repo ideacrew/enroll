@@ -15,7 +15,7 @@ module Notifier
     end
 
     def event_matched?
-      ['employee_notice_for_employee_terminated_from_roster', 'initial_employee_plan_selection_confirmation', 'renewal_employer_open_enrollment_completed'].include?(event_name)
+      ['employee_notice_for_employee_terminated_from_roster', 'initial_employee_plan_selection_confirmation', 'renewal_employee_enrollment_confirmation'].include?(event_name)
     end
 
     def enrollments
