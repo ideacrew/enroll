@@ -62,7 +62,6 @@
   - elsif next_link.present?  && current_user.has_hbx_staff_role? && @person.primary_family.application_type == "In Person"
     = link_to "Continue", next_link, :method => :get, class: 'button btn btn-lg btn-primary  btn-block interaction-click-control-continue', id: 'btn-continue', :disabled => !identity_verified
   - else next_link.present?
-    = link_to "Continue", next_link, :method => :get, class: 'button btn btn-lg btn-primary  btn-block interaction-click-control-continue', id: 'btn-continue', :disabled => !identity_verified
 - elsif defined? url
   = link_to 'Continue', url, class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue'
 - elsif step == 4

@@ -753,7 +753,7 @@ class ConsumerRole
 
   def is_native?
     # US_CITIZEN_STATUS == citizen_status
-    native_validation == 'valid'
+    native_validation == 'valid' 
   end
 
   def is_non_native?
