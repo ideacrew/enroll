@@ -135,4 +135,9 @@ class HbxProfilePolicy < ApplicationPolicy
     return true unless role = user.person.hbx_staff_role
     role.permission.can_force_publish
   end
+
+  def can_change_fein?
+    return false unless role = user.person.hbx_staff_role
+    role.permission.can_change_fein
+  end
 end
