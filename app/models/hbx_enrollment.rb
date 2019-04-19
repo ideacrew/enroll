@@ -545,7 +545,7 @@ class HbxEnrollment
     if plan_year.is_renewing?
       if effective_on == benefit_group.start_on
         if employer_profile
-          predecessor_plan_year = employer_profile.published_plan_years_by_date(effective_on.prev_day).first
+          predecessor_plan_year = employer_profile.plan_years.published_plan_years_by_date(effective_on.prev_day).first
           terminating_benefit_group_ids += predecessor_plan_year.benefit_groups.pluck(:id) if predecessor_plan_year.present?
         end
       end
@@ -568,7 +568,7 @@ class HbxEnrollment
 
     if effective_on == benefit_group.start_on && benefit_group.plan_year.is_renewing?
       if employer_profile
-        predecessor_plan_year = employer_profile.published_plan_years_by_date(effective_on.prev_day).first
+        predecessor_plan_year = employer_profile.plan_years.published_plan_years_by_date(effective_on.prev_day).first
         predecessor_benefit_groups = predecessor_plan_year.benefit_groups.pluck(:id) if predecessor_plan_year
       end
     end
@@ -611,8 +611,8 @@ class HbxEnrollment
       else
         enrollment.terminate_coverage!(coverage_end_date) if enrollment.may_terminate_coverage?
       end
-      enrollment.update(terminate_reason: terminate_reason) if (coverage_termination_pending? || coverage_terminated?) && term_reason.present?
     end
+    enrollment.update(terminate_reason: term_reason) if term_reason.present?
   end
 
   def waiver_enrollment_present?
