@@ -12,7 +12,7 @@ FactoryGirl.define do
       FactoryGirl.build(:relationship_benefit, benefit_group: self, relationship: :domestic_partner,           premium_pct: 40, employer_max_amt:  200.00),
       FactoryGirl.build(:relationship_benefit, benefit_group: self, relationship: :child_under_26,             premium_pct: 40, employer_max_amt:  200.00),
     ] }
-    reference_plan {FactoryGirl.create(:plan, :with_premium_tables)}
+    reference_plan {FactoryGirl.create(:plan, :with_premium_tables, :with_rating_factors)}
     elected_plans { [ self.reference_plan ]}
   end
 end
