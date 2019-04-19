@@ -63,13 +63,13 @@
           <div style="<%= style %>" class="row no-buffer address-row show no-dc-address-reasons">
             <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
               <div class="address_checkbox">
-                <%= f.check_box :is_homeless %>
+                <%= f.check_box :is_homeless, id:'is-homeless', onclick:'verifyValid(this)' %>
                 <label for="checkbox"><span>A homeless DC resident.</span></label>
               </div>
             </div>
             <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
               <div class="address_checkbox">
-                <%= f.check_box :is_temporarily_out_of_state %>
+                <%= f.check_box :is_temporarily_out_of_state, id:'out-of-state', onclick:'verifyValid(this)' %>
                 <label for="checkbox">
                   <span>Currently living outside of DC temporarily and plan to return.</span>
                 </label>
@@ -96,4 +96,13 @@ $(document).ready(function () {
     if (!$("#no_dc_address").is(':checked') && $(this).val() != 'DC') {alert('You have selected a Non DC state, please check No DC Address')}
   });
 });
+
+function verifyValid(element) {
+  if (element.checked && element.id === 'is-homeless') {
+    $('#out-of-state').prop('checked',false);
+  }
+  if (element.checked && element.id === 'out-of-state') {
+    $('#is-homeless').prop('checked',false);
+  }
+}
 </script>
