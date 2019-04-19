@@ -12,9 +12,14 @@
         <ul class="application-warnings"></ul>
       </div>
       <div class="modal-footer">
-        <%= link_to 'Force Publish', employers_employer_profile_plan_year_force_publish_path(@employer_profile,plan_year), method: :post, :class => 'btn btn-danger' %>
-        <% error_page = plan_year.application_eligibility_warnings[:primary_office_location].present? ? edit_employers_employer_profile_path(@employer_profile.organization, plan_year_id: plan_year.id) : edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year, publish: true) %>
-        <%= link_to 'Cancel', error_page, method: :get, :class => 'btn btn-default' %>
+        <% if defined?(admin_override) %>
+          <%= link_to 'Force Publish Anyways', force_publish_exchanges_hbx_profiles_path(row_actions_id: "family_actions_#{@organization.id.to_s}", publish_with_warnings: true),method: :post, :class => 'btn btn-danger', remote: true %>
+          <button class="btn btn-default" data-dismiss="modal" type="button"><%= l10n(".cancel") %></button>
+        <% else %>
+          <%= link_to 'Force Publish', employers_employer_profile_plan_year_force_publish_path(@employer_profile,plan_year), method: :post, :class => 'btn btn-danger' %>
+          <% error_page = plan_year.application_eligibility_warnings[:primary_office_location].present? ? edit_employers_employer_profile_path(@employer_profile.organization, plan_year_id: plan_year.id) : edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year, publish: true) %>
+          <%= link_to 'Cancel', error_page, method: :get, :class => 'btn btn-default' %>
+        <% end %>
       </div>
     </div>
   </div>
