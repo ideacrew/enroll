@@ -1,4 +1,4 @@
-@individual_enabled
+@wip
 Feature: EE with consumer role plan purchase
 
   Scenario: when user purchase plan for self & having ineligible family member
@@ -53,4 +53,3 @@ Feature: EE with consumer role plan purchase
     And employee should also see the reason for ineligibility
     And employee clicked on shop for new plan
     Then employee should see primary and valid dependent
-

@@ -4,7 +4,6 @@ Feature: As a Super Admin I will be the only user
   Background: Setup site, employer, and benefit application
     Given a CCA site exists with a benefit market
     And there is an employer ABC Widgets
-    And this employer has not setup a benefit application
     Given that a user with a HBX staff role with Super Admin subrole exists and is logged in
     And the user is on the Employer Index of the Admin Dashboard
     And the user clicks Action for that Employer

@@ -1,6 +1,4 @@
-Feature: Update DOB and SSN
-    In order to update DOB and SSN
-    User should have the role of an admin
+Feature: Only Super Admin HBX Staff HBX Tier3 will be able to see & access the Edit DOB SSN Feature.
 
   Background: Setup site, employer, benefit application and active employee
     Given a CCA site exists with a benefit market
@@ -32,22 +30,21 @@ Feature: Update DOB and SSN
     And Employee Patrick Doe should see their plan start date on the page
     And Hbx Admin logs out
 
- Scenario: Admin enters invalid DOB or SSN
-    Given that a user with a HBX staff role with HBX staff subrole exists and is logged in
+  Scenario Outline: HBX Staff with <subrole> subroles should <action> Change FEIN button
+    Given that a user with a HBX staff role with <subrole> subrole exists and is logged in
     And the user is on the Family Index of the Admin Dashboard
     When the user clicks Action for that Employer
-    Then the user will see the Edit DOB SSN button
-    When user clicks on edit DOB/SSN link
-    When user enters an invalid SSN and clicks on update
-    Then Hbx Admin should see the edit form being rendered again with a validation error message
-    And Hbx Admin logs out
+    Then the user will <action> the Edit DOB SSN button
 
- Scenario: Admin enters valid DOB or SSN
-    Given that a user with a HBX staff role with HBX staff subrole exists and is logged in
-    And the user is on the Family Index of the Admin Dashboard
-    When the user clicks Action for that Employer
-    Then the user will see the Edit DOB SSN button
-    When user clicks on edit DOB/SSN link
-    When Hbx Admin enters a valid DOB and SSN and clicks on update
-    Then Hbx Admin should see the update partial rendered with update sucessful message
-    And Hbx Admin logs out
+    Examples:
+      | subrole       | action  |
+      | Super Admin   | see     |	
+      | HBX Tier3     | see     |
+      | HBX Staff     | see     |
+      | HBX Read Only | not see |
+      | Developer     | not see |
+
+
+
+
+

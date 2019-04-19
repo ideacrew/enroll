@@ -11,18 +11,18 @@ Given (/a matched Employee exists with multiple employee roles/) do
   employee_role1 = FactoryBot.create :employee_role, person: @person, employer_profile: org1.employer_profile
   employee_role2 = FactoryBot.create :employee_role, person: @person, employer_profile: org2.employer_profile
   ce1 =  FactoryBot.build(:census_employee,
-          first_name: @person.first_name, 
-          last_name: @person.last_name, 
-          dob: @person.dob, 
-          ssn: @person.ssn, 
+          first_name: @person.first_name,
+          last_name: @person.last_name,
+          dob: @person.dob,
+          ssn: @person.ssn,
           employee_role_id: employee_role1.id,
           employer_profile: org1.employer_profile
         )
   ce2 =  FactoryBot.build(:census_employee,
-          first_name: @person.first_name, 
-          last_name: @person.last_name, 
-          dob: @person.dob, 
-          ssn: @person.ssn, 
+          first_name: @person.first_name,
+          last_name: @person.last_name,
+          dob: @person.dob,
+          ssn: @person.ssn,
           employee_role_id: employee_role2.id,
           employer_profile: org2.employer_profile
         )
@@ -47,10 +47,10 @@ Given (/a matched Employee exists with consumer role/) do
   @person = FactoryBot.create(:person, :with_family, :with_consumer_role, first_name: "Employee", last_name: "E", user: user)
   employee_role = FactoryBot.create :employee_role, person: @person, employer_profile: org.employer_profile
   ce =  FactoryBot.build(:census_employee,
-          first_name: @person.first_name, 
-          last_name: @person.last_name, 
-          dob: @person.dob, 
-          ssn: @person.ssn, 
+          first_name: @person.first_name,
+          last_name: @person.last_name,
+          dob: @person.dob,
+          ssn: @person.ssn,
           employee_role_id: employee_role.id,
           employer_profile: org.employer_profile
         )
@@ -85,7 +85,7 @@ end
 
 And(/(.*) also has a health enrollment with primary person covered/) do |role|
   sep = FactoryBot.create :special_enrollment_period, family: @family
-  enrollment = FactoryBot.create(:hbx_enrollment, 
+  enrollment = FactoryBot.create(:hbx_enrollment,
                                   household: @family.active_household,
                                   kind: (@employee_role.present? ? "employer_sponsored" : (role == "Resident" ? "coverall" : "individual")),
                                   effective_on: TimeKeeper.date_of_record,
@@ -108,7 +108,7 @@ And(/employee also has a (.*) enrollment with primary covered under (.*) employe
                   else
                     @person.active_employee_roles[1].employer_profile.plan_years[0].benefit_groups[0]
                   end
-  enrollment = FactoryBot.create(:hbx_enrollment, 
+  enrollment = FactoryBot.create(:hbx_enrollment,
                                   household: @person.primary_family.active_household,
                                   kind: "employer_sponsored",
                                   effective_on: TimeKeeper.date_of_record,
@@ -131,16 +131,17 @@ Given (/a matched Employee exists with active and renwal plan years/) do
   org = FactoryBot.create :organization, :with_active_and_renewal_plan_years
   @active_benefit_group = org.employer_profile.active_plan_year.benefit_groups[0]
   active_bga = FactoryBot.build :benefit_group_assignment, benefit_group: @active_benefit_group
+  benefit_package = FactoryBot.build :benefit_package
 
   @renewal_benefit_group = org.employer_profile.show_plan_year.benefit_groups[0]
-  renewal_bga = FactoryBot.build :benefit_group_assignment, benefit_group: @renewal_benefit_group
+  renewal_bga = FactoryBot.build :benefit_group_assignment, benefit_group: @renewal_benefit_group, benefit_package_id: benefit_package.id
 
   @employee_role = person.employee_roles[0]
   ce =  FactoryBot.build(:census_employee,
-          first_name: person.first_name, 
-          last_name: person.last_name, 
-          dob: person.dob, 
-          ssn: person.ssn, 
+          first_name: person.first_name,
+          last_name: person.last_name,
+          dob: person.dob,
+          ssn: person.ssn,
           employee_role_id: @employee_role.id,
           employer_profile: org.employer_profile
         )
@@ -175,8 +176,12 @@ And(/Employer not offers dental benefits for spouse in renewal plan year/) do
   @renewal_benefit_group.save
 end
 
-And(/(.*) should also see the reason for ineligibility/) do |role|
-  if role == "employee"
+And(/(.*) should also see the reason for ineligibility/) do |named_person|
+  person_hash = people[named_person]
+
+  person = Person.where(:first_name => /#{person_hash[:first_name]}/i,
+                        :last_name => /#{person_hash[:last_name]}/i).first
+  if person.active_employee_roles.present?
     expect(page).to have_content "This dependent is ineligible for employer-sponsored"
   else
     expect(page).to have_content "eligibility failed on family_relationships"
@@ -213,12 +218,12 @@ Then(/(.*) should see primary person/) do |role|
 end
 
 Then(/(.*) should see the enrollment with make changes button/) do |role|
-  expect(page).to have_content "#{TimeKeeper.date_of_record.year} HEALTH COVERAGE"
+  expect(page).to have_content "#{(current_effective_date || TimeKeeper.date_of_record).year} HEALTH COVERAGE"
   expect(page).to have_link "Make Changes"
 end
 
 Then(/(.*) should see the dental enrollment with make changes button/) do |role|
-  expect(page).to have_content "#{TimeKeeper.date_of_record.year} DENTAL COVERAGE"
+  expect(page).to have_content "#{(current_effective_date || TimeKeeper.date_of_record).year} DENTAL COVERAGE"
   expect(page).to have_link "Make Changes"
 end
 
@@ -227,13 +232,15 @@ When(/(.*) clicked on make changes button/) do |role|
 end
 
 When(/(.*) clicked continue on household info page/) do |role|
-  find_all("#btn_household_continue")[1].click
+  find_all("#btn_household_continue")[0].click
 end
 
 Then(/(.*) should see all the family members names/) do |role|
   people = Person.all
   people.each do |person|
-    expect(page).to have_content "#{person.full_name}"
+    expect(page).to have_content "#{person.last_name}"
+    expect(page).to have_content "#{person.first_name}"
+
   end
 end
 
@@ -294,7 +301,7 @@ When(/employee switched to (.*) employer/) do |employer|
 end
 
 When(/employee clicked on shop for plans/) do
-  find(".interaction-click-control-shop-for-plans").trigger('click')
+  find(".interaction-click-control-shop-for-plans").click
   wait_for_ajax
 end
 

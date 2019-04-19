@@ -25,6 +25,17 @@ Then(/^.+ should see an initial fieldset to enter my name, ssn and dob$/) do
   @browser.button(value: /Search Person/).fire_event("onclick")
 end
 
+Then(/^(.*?) should be able to set up benefit aplication$/) do |legal_name|
+  wait_for_ajax
+  click_button "OK"
+end
+
+Then(/^(.*?) Employer visit the benefits page$/) do |legal_name|
+  organization = ::BenefitSponsors::Organizations::Organization.where(legal_name: legal_name).first
+  employer_profile = organization.employer_profile
+  visit benefit_sponsors.profiles_employers_employer_profile_path(employer_profile.id, :tab => 'benefits')
+end
+
 Then(/^.+ uploads an attestation document/) do
   if (Settings.aca.enforce_employer_attestation.to_s == "true")
     find('.interaction-click-control-documents').click
@@ -236,7 +247,7 @@ end
 
 When(/^.+ clicks on terminate button for rehired census employee$/) do
   @browser.a(text: /Terminate/).wait_until_present
-  @browser.execute_script("$('.interaction-click-control-terminate').last().trigger('click')")
+  @browser.execute_script("$('.interaction-click-control-terminate').last().click")
   terminated_date = (TimeKeeper.date_of_record + 60.days).strftime("%m/%d/%Y")
   @browser.execute_script("$('.date-picker').val(\'#{terminated_date}\')")
   #click submit
@@ -300,14 +311,15 @@ end
 
 When(/^I go to the Profile tab$/) do
   find('.interaction-click-control-update-business-info').click
-  find('.interaction-click-control-cancel').click
+  find('.interaction-click-control-cancel').clickfeatures/employers/step_definitions/cobra_steps.rb
 
   expect(page).to have_content('Business Info')
 end
 
 
-When(/^.+ go[es]+ to the benefits tab I should see plan year information$/) do
-  click_link 'Benefits'
+When(/^(.*?) go[es]+ to the benefits tab I should see plan year information$/) do |legal_name|
+  profile = @organization[legal_name].employer_profile
+  visit  benefit_sponsors.profiles_employers_employer_profile_path(profile.id, :tab=>'benefits')
 end
 
 When(/^I go to MY Health Connector tab$/) do
@@ -387,12 +399,11 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits with
   wait_for_ajax(10,2)
   find('.reference-plans label').click
   wait_for_ajax(10,2)
-  find('.interaction-click-control-create-plan-year').trigger('click')
+  find('.interaction-click-control-create-plan-year').click
 end
 
 And(/^.+ should see a success message after clicking on create plan year button$/) do
-  expect(page).to have_content('Plan Year successfully created')
-  screenshot("employer_plan_year_success_message")
+  expect(page).to have_content('Benefit Package successfully created.')
 end
 
 When(/^.+ enters filter in plan selection page$/) do
@@ -401,11 +412,11 @@ When(/^.+ enters filter in plan selection page$/) do
 end
 
 When(/^.+ enters? hsa_compatible filter in plan selection page$/) do
-  find(:xpath, "//div[contains(@class, 'selectric-plan-carrier-selection-filter')]//p[@class='label']").trigger 'click'
-  find(:xpath, "//div[contains(@class, 'selectric-plan-carrier-selection-filter')]//li[contains(@class, 'interaction-choice-control-carrier-1')]").trigger 'click'
+  find(:xpath, "//div[contains(@class, 'selectric-plan-carrier-selection-filter')]//p[@class='label']").click
+  find(:xpath, "//div[contains(@class, 'selectric-plan-carrier-selection-filter')]//li[contains(@class, 'interaction-choice-control-carrier-1')]").click
 
-  find(:xpath, "//div[contains(@class, 'selectric-plan-hsa-eligibility-selection-filter')]//p[@class='label']").trigger 'click'
-  find(:xpath, "//div[contains(@class, 'selectric-plan-hsa-eligibility-selection-filter')]//li[contains(@class, 'interaction-choice-control-carrier-0')]").trigger 'click'
+  find(:xpath, "//div[contains(@class, 'selectric-plan-hsa-eligibility-selection-filter')]//p[@class='label']").click
+  find(:xpath, "//div[contains(@class, 'selectric-plan-hsa-eligibility-selection-filter')]//li[contains(@class, 'interaction-choice-control-carrier-0')]").click
 
   click_link 'Apply'
 end
@@ -504,6 +515,7 @@ module EmployeeWorld
     # :employer_profile, *traits, attributes.merge(:employer_profiles_traits => :with_staff)
   end
 end
+
 World(EmployeeWorld)
 
 Given /^an employer exists$/ do
@@ -523,8 +535,9 @@ When /^they visit the Employer Home page$/ do
   visit employers_employer_profile_path(employer.employer_profile) + "?tab=home"
 end
 
-When /^they visit the Employee Roster$/ do
-  visit employers_employer_profile_path(employer.employer_profile) + "?tab=employees"
+And(/^(.*?) employer visit the Employee Roster$/) do |legal_name|
+  employer_profile = employer_profile(legal_name)
+  visit benefit_sponsors.profiles_employers_employer_profile_path(employer_profile.id, :tab => 'employees')
 end
 
 And(/^(.*?) employer visit the Employee Roster$/) do |legal_name|
@@ -564,7 +577,7 @@ And /^clicks on terminate employee$/ do
   terminate_date = (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y")
   page.execute_script("$('.date-picker').val(\'#{terminate_date}\')")
   expect(page).to have_content 'Employee Roster'
-  first("a.delete_confirm").trigger('click')
+  first("a.delete_confirm").click
   wait_for_ajax(3,2)
 end
 
@@ -584,13 +597,13 @@ end
 
 And /^employer clicks on terminated employee$/ do
   expect(page).to have_content "Eddie Vedder"
-  click_link 'Eddie Vedder1'
+  click_link 'Eddie Vedder'
 end
 
 And /^employer clicks on linked employee with address$/ do
-  employees.first.update_attributes(aasm_state: "employee_role_linked")
+  @census_employees.first.update_attributes(aasm_state: "employee_role_linked")
   expect(page).to have_content "Eddie Vedder"
-  click_link employees.first.full_name
+  click_link @census_employees.first.full_name
 end
 
 Then /^ER should land on (.*) EE tab$/ do |val|
@@ -604,7 +617,7 @@ And /^ER enters (.*) EE name on search bar$/ do |val|
 end
 
 And /^ER clicks on search button$/ do
-  find(".interaction-click-control-search").trigger('click')
+  find(".interaction-click-control-search").click
 end
 
 Then /^ER should see the (.*) searched EE on the roster page$/ do |val|
@@ -627,15 +640,14 @@ Then /^ER should see all the terminated employees$/ do
   expect(page).not_to have_content employees.first.last_name
 end
 
-
 Then /^employer should not see the address on the roster$/ do
   expect(page).not_to have_content /Address/
 end
 
 And /^employer clicks on linked employee without address$/ do
-  employees.first.address.delete
+  @census_employees.first.address.delete
   expect(page).to have_content "Eddie Vedder"
-  click_link employees.first.full_name
+  click_link @census_employees.first.full_name
 end
 
 Then /^employer should see the address on the roster$/ do
@@ -657,19 +669,20 @@ And /^employer clicks on update employee$/ do
 end
 
 And /^employer clicks on non-linked employee with address$/ do
-  employees.first.update_attributes(aasm_state: "eligible")
-  click_link employees.first.full_name
+  @census_employees.first.update_attributes(aasm_state: "eligible")
+  click_link @census_employees.first.full_name
 end
 
 And /^employer clicks on non-linked employee without address$/ do
-  employees.first.address.delete
-  employees.first.update_attributes(aasm_state: "eligible")
-  click_link employees.first.full_name
+  @census_employees.first.address.delete
+  @census_employees.first.update_attributes(aasm_state: "eligible")
+  click_link @census_employees.first.full_name
 end
 
 Then /^employer should see employee roaster$/ do
   expect(page).to have_content "Employee Roster"
 end
+
 And /^employer should also see termination date$/ do
   expect(page).to have_content "Terminated On"
 end
@@ -699,27 +712,44 @@ Then /^employer should see the (.*) button$/ do |status|
   find_link(status.capitalize).visible?
 end
 
-And /^employer clicks on (.*) button$/ do |status|
+When /^employer clicks on (.*) button$/ do |status|
   click_link(status.capitalize)
 end
 
-Then /^employer should see the field to enter (.*) date$/ do |status|
-  status = status == 'termination' ? 'ENTER DATE OF TERMINATION' : 'ENTER DATE OF REHIRE'
-  expect(page).to have_content status
+When /^employer clicks on the (.*) link$/ do |status|
+  click_link(status.titleize)
 end
 
+# Then /^employer should see the field to enter (.*) date$/ do |status|
+#   status = status == 'termination' ? 'ENTER DATE OF TERMINATION' : 'ENTER DATE OF REHIRE'
+#   expect(page).to have_content status
+# end
+
 And /^employer clicks on (.*) button with date as (.*)$/ do |status, date|
-  date = date == 'today' ? TimeKeeper.date_of_record : TimeKeeper.date_of_record - 3.months
-  find('.date-picker.date-field').set date
-  find('.btn-primary.btn-sm').click
+  date = date == 'pastdate' ? TimeKeeper.date_of_record - 1.day  : TimeKeeper.date_of_record - 3.months
+  find('input.text-center.date-picker').set date
+  find('#home').click
+  find("a", :text => "Terminate Employee").click
 end
 
 Then /^employer should see the (.*) success flash notice$/ do |status|
-  result = status == 'terminated' ? "Successfully terminated Census Employee." : "Successfully rehired Census Employee."
+  # Phantom JS starts checking before Rails Action complete
+  sleep(3)
+  result = case status
+           when "terminated"
+             "Successfully terminated Census Employee."
+           when "Initiate cobra"
+             "Successfully update Census Employee."
+           else
+             "Successfully rehired Census Employee."
+           end
+
   expect(page).to have_content result
 end
 
 Then /^employer should see the error flash notice$/ do
+  # Phantom JS starts checking before Rails Action complete
+  sleep(3)
   expect(page).to have_content /Census Employee could not be terminated: Termination date must be within the past 60 days./
 end
 
@@ -782,7 +812,7 @@ Then(/^.+ fill the document form$/) do
   script = "$('[name=\"file\"]').css({opacity: 100, display: 'block'});"
   page.evaluate_script(script)
 
-  find(:xpath,"//*[@id='modal-wrapper']/div/form/label").trigger('click')
+  find(:xpath,"//*[@id='modal-wrapper']/div/form/label").click
   within '.upload_document' do
     attach_file('file', "#{Rails.root}/test/JavaScript.pdf")
   end
@@ -804,7 +834,7 @@ Then(/^Employer should see Action Needed under document/) do
 end
 
 And(/^the employer clicks document name/) do
-  find(:xpath,"//*[@id='effective_datatable_wrapper']//a[contains(.,'JavaScript.pdf')]").trigger('click')
+  find(:xpath,"//*[@id='effective_datatable_wrapper']//a[contains(.,'JavaScript.pdf')]").click
 end
 
 Then(/^the employer should see Download,Print Option/) do
@@ -812,4 +842,73 @@ Then(/^the employer should see Download,Print Option/) do
 
   expect(page).to have_content('Download')
   expect(page).to have_content('Print')
+end
+
+And(/^employer should see (.*?) to remove text$/) do |text|
+  expect(page).to have_content(text)
+end
+
+And(/^employer clicks on Actions drop down for one of (.*?) employee$/) do |status|
+  census_id = @census_employees.first.id.to_s
+  find(:xpath, "//*[@id='dropdown_for_census_employeeid_#{census_id}']").click
+end
+
+When(/^employer clicks on button terminated for datatable$/)do
+  find(:xpath, "//*[@id='Tab:terminated']").click
+end
+
+And /^employer clicks on submit button by entering todays date$/ do
+  date = TimeKeeper.date_of_record
+  find('input.text-center.date-picker').set date
+  terminated_id = @census_employees.first.id.to_s
+  find(:xpath, "//*[@id='rehire_#{terminated_id}']/strong").click
+end
+
+When(/^employer selects one of their employees on Employee Roster$/) do
+  census_employee = @census_employees.first
+  expect(page).to have_content "Eddie Vedder"
+  click_link census_employee.full_name
+end
+
+Then(/^employer should see (terminated )?census employee's details$/) do |terminated|
+  sleep(3)
+  if terminated
+    expect(page).to have_content "Terminated"
+  else
+    expect(page).to have_content "Eligible"
+  end
+end
+
+Then(/^employer clicks logout$/) do
+  find('.interaction-click-control-logout').click
+end
+
+Then /^employer should see Enter effective date for (.*?) Action/ do |action_name|
+  case action_name
+  when "Initiate cobra"
+    page_text = "Enter effective date for COBRA coverage to begin"
+    id = 'cobra-enter-date'
+  end
+
+  find_by_id(id).visible?
+  expect(page).to have_content(page_text)
+end
+
+And(/^employer should see default cobra start date$/) do
+  terminated_on = @census_employees.first.employment_terminated_on.next_month.beginning_of_month.to_s
+  expect(find('input.text-center.date-picker').value).to eq terminated_on
+end
+
+And(/^employer sets cobra start date to two months after termination date$/) do
+  date = @census_employees.first.employment_terminated_on + 2.months
+  page.execute_script("$('.datepicker').val(#{date.to_s})")
+end
+
+When(/^EnterPrise Limited employer clicks on Initiate COBRA button$/) do
+  id = @census_employees.first.id.to_s
+  find(:xpath, "//*[@id='cobra-#{id}']").click
+end
+
+And(/^employer should see census employee status as (.*?)$/) do |status|
+  expect(page).to have_content status
 end
