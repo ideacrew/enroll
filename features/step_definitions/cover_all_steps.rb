@@ -7,7 +7,7 @@ Then(/^Hbx Admin should not see an New DC Resident Application link$/) do
 end
 
 When(/^Hbx Admin clicks on New DC Resident Application link$/) do
-  find(:xpath, "//*[@id='inbox']/div/div[3]/div/span/div[1]/ul/li[3]/a").trigger('click')
+  find(:xpath, "//*[@id='inbox']/div/div[3]/div/span/div[1]/ul/li[3]/a").click
 end
 
 Then(/^Hbx Admin should see New DC Resident Personal Information page$/) do
@@ -19,7 +19,7 @@ When(/HBX Admin goes to register an user as individual$/) do
   fill_in 'person[first_name]', :with => "Carlos"
   fill_in 'person[last_name]', :with => "Devina"
   fill_in 'jq_datepicker_ignore_person[dob]', :with => (@u.adult_dob :adult_dob)
-  find(:xpath, '//label[@for="radio_male"]').trigger('click')
+  find(:xpath, '//label[@for="radio_male"]').click
   find('.btn', text: 'CONTINUE').click
 end
 

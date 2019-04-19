@@ -43,7 +43,7 @@ end
 
 When(/^the broker clicks on the Select File to Upload button$/) do
   Capybara.ignore_hidden_elements = false
-  find(:xpath,"//*[@id='modal-wrapper']/div/form/label").trigger('click')
+  find(:xpath,"//*[@id='modal-wrapper']/div/form/label").click
   within '.upload_csv' do
     attach_file('employee_roster_file', "#{Rails.root}/spec/test_data/employee_roster_import/Employee_Roster_sample.xlsx")
   end
@@ -82,7 +82,7 @@ When(/^broker enters valid information$/) do
 end
 
 When(/^the broker clicks on the Save Changes button$/) do
-  find('.interaction-click-control-save-changes').trigger 'click'
+  find('.interaction-click-control-save-changes').click
 end
 
 Then(/^the broker should see a successful message$/) do
@@ -91,15 +91,15 @@ end
 
 Then(/^the broker clicks on Home button$/) do
   sleep 2
-  find('.interaction-click-control-home').trigger 'click'
+  find('.interaction-click-control-home').click
 end
 
 Then(/^the broker clicks Actions dropdown$/) do
-  find('.dropdown-toggle', :text => "Actions").trigger 'click'
+  find('.dropdown-toggle', :text => "Actions").click
 end
 
 When(/^the broker clicks delete$/) do
-  find('a', text: "Delete"). trigger 'click'
+  find('a', text: "Delete"). click
 end
 
 Then(/^the broker sees the confirmation$/) do
@@ -119,11 +119,11 @@ end
 
 Then(/^adds a new benefit group$/) do
   fill_in "quote[quote_benefit_groups_attributes][0][title]", with: 'My Benefit Group'
-  find('.interaction-click-control-save-changes').trigger 'click'
+  find('.interaction-click-control-save-changes').click
 end
 
 Then(/^the broker saves the quote$/) do
-  find('.interaction-click-control-save-changes').trigger 'click'
+  find('.interaction-click-control-save-changes').click
 end
 
 When(/^the broker clicks on quote$/) do
@@ -164,36 +164,36 @@ Then(/^the broker enters Employer Contribution percentages for dental plan$/) do
 end
 
 Then(/^the broker filters health plans$/) do
-  find(:xpath, "//*[@id='quote-plan-list']/label[1]").trigger("click")
-  find(:xpath, "//*[@id='quote-plan-list']/label[2]").trigger("click")
+  find(:xpath, "//*[@id='quote-plan-list']/label[1]").click
+  find(:xpath, "//*[@id='quote-plan-list']/label[2]").click
 end
 
 Then(/^the broker filters dental plans$/) do
-  find(:xpath, "//*[@id='quote-dental-plan-list']/label[1]").trigger("click")
-  find(:xpath, "//*[@id='quote-dental-plan-list']/label[2]").trigger("click")
+  find(:xpath, "//*[@id='quote-dental-plan-list']/label[1]").click
+  find(:xpath, "//*[@id='quote-dental-plan-list']/label[2]").click
 end
 
 Then(/^the broker clicks Compare Costs for health plans$/) do
-  find('#CostComparison').trigger 'click'
+  find('#CostComparison').click
 end
 
 Then(/^the broker clicks Compare Costs for dental plans$/) do
-  find('#DentalCostComparison').trigger 'click'
+  find('#DentalCostComparison').click
 end
 
 When(/^the broker selects the Reference Health Plan$/) do
   wait_for_ajax(3)
-  find('div#single_plan_1').trigger("click")
+  find('div#single_plan_1').click
 end
 
 When(/^the broker selects the Reference Dental Plan$/) do
   wait_for_ajax(3)
-  find('div#single_dental_plan_1').trigger("click")
+  find('div#single_dental_plan_1').click
   wait_for_ajax
 end
 
 Then(/^the broker clicks Publish Quote button$/) do
-  find('#publish_quote').trigger 'click'
+  find('#publish_quote').click
 end
 
 Then(/^the broker sees that the Quote is published$/) do
@@ -201,5 +201,5 @@ Then(/^the broker sees that the Quote is published$/) do
 end
 
 When(/^the broker clicks Dental Features$/) do
-  find('.interaction-click-control-dental-features-and-cost-criteria').trigger 'click'
+  find('.interaction-click-control-dental-features-and-cost-criteria').click
 end

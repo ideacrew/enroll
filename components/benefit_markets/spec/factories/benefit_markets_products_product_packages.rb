@@ -20,6 +20,7 @@ FactoryBot.define do
       number_of_products { 2 }
       county_zip_id { nil }
       service_area { nil }
+      issuer_profile { nil }
     end
 
     after(:build) do |product_package, evaluator|
@@ -36,6 +37,7 @@ FactoryBot.define do
             application_period: product_package.application_period,
             product_package_kinds: [ product_package.package_kind ],
             service_area: service_area,
+            issuer_profile_id: evaluator.issuer_profile.try(:id),
             metal_level_kind: :gold)
         end
       when :dental
@@ -46,6 +48,7 @@ FactoryBot.define do
             application_period: product_package.application_period,
             product_package_kinds: [ product_package.package_kind ],
             service_area: service_area,
+            issuer_profile_id: evaluator.issuer_profile.try(:id),
             metal_level_kind: :dental)
         end
       end

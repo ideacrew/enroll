@@ -29,6 +29,8 @@ module PermissionsWorld
   end
 
   def hbx_admin_can_update_ssn
+    Permission.super_admin.update_attributes!(can_update_ssn: true)
+    Permission.hbx_tier3.update_attributes!(can_update_ssn: true)
     Permission.hbx_staff.update_attributes!(can_update_ssn: true)
   end
 
