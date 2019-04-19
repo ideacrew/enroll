@@ -22,7 +22,7 @@ class FinancialAssistance::Deduction
       reservists_performing_artists_and_fee_basis_government_official_expenses
       tuition_and_fees
     )
-    
+
   DEDUCTION_TYPE = {
     alimony_paid: "Alimony paid",
     deductable_part_of_self_employment_taxes: "Deductible part of self-employment taxes",
@@ -36,10 +36,8 @@ class FinancialAssistance::Deduction
     health_savings_account: "Health savings account",
     ira_deduction: "IRA deduction",
     reservists_performing_artists_and_fee_basis_government_official_expenses: "Certain business expenses of reservists, performing artists, and fee-basis government officials",
-    tution_and_fees: "Tuition and fees"
+    tuition_and_fees: "Tuition and fees"
   }
-    
-  
 
   field :title, type: String
   field :kind, as: :deduction_type, type: String, default: 'alimony_paid'
