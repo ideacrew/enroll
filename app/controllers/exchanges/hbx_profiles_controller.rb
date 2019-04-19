@@ -521,17 +521,19 @@ def employer_poc
   end
 
   def edit_force_publish
+    authorize HbxProfile, :can_force_publish?
     @element_to_replace_id = params[:row_actions_id]
-    @organization = Organization.find(@element_to_replace_id.split("_").last)
-    @plan_year = @organization.employer_profile.draft_plan_year.last
+    @organization = Organization.find(@element_to_replace_id.split('_').last)
+    @plan_year = @organization.renewing_or_draft_py
   end
 
   def force_publish
+    authorize HbxProfile, :can_force_publish?
     @element_to_replace_id = params[:row_actions_id]
-    @organization = Organization.find(@element_to_replace_id.split("_").last)
-    @plan_year = @organization.employer_profile.draft_plan_year.last
-    if @plan_year.may_force_publish? && params[:publish_with_warnings] == 'true'
-      @plan_year.force_publish!
+    @organization = Organization.find(@element_to_replace_id.split('_').last)
+    @plan_year = @organization.renewing_or_draft_py
+    if params[:publish_with_warnings] == 'true' || @plan_year.application_eligibility_warnings.blank?
+      @plan_year.force_publish! if @plan_year.may_force_publish?
     end
 
     respond_to do |format|
@@ -549,7 +551,7 @@ def employer_poc
   end
 
   def update_dob_ssn
-    authorize  Family, :can_update_ssn?
+    authorize Family, :can_update_ssn?
     @element_to_replace_id = params[:person][:family_actions_id]
     @person = Person.find(params[:person][:pid]) if !params[:person].blank? && !params[:person][:pid].blank?
     @ssn_match = Person.find_by_ssn(params[:person][:ssn]) unless params[:person][:ssn].blank?

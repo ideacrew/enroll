@@ -99,7 +99,7 @@ module Effective
       end
 
       def force_publish_link_type(row, allow)
-        draft_plan_year = row.employer_profile.draft_plan_year.last
+        draft_plan_year = row.renewing_or_draft_py
         draft_plan_year_and_allow = draft_plan_year.present? && business_policy_accepted?(draft_plan_year) && allow
         draft_plan_year_and_allow ? 'ajax' : 'hide'
       end

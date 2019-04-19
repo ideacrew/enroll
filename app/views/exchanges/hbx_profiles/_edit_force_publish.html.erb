@@ -6,7 +6,7 @@
       </a>
     </div>
     <h4 class="text-center heading-text"> <%= l10n("hbx_profiles.publish_application") %> </h4>
-    <%= form_tag force_publish_exchanges_hbx_profiles_path(row_actions_id: "family_actions_#{@organization.id.to_s}", publish_with_warnings: false), :method => :post, :remote => true do %>
+    <%= form_tag force_publish_exchanges_hbx_profiles_path(row_actions_id: "family_actions_#{@organization.id.to_s}"), :method => :post, :remote => true do %>
       <table class = "table" style="table-layout: fixed;">
         <thead>
           <tr>
@@ -20,11 +20,10 @@
         </thead>
         <tbody>
           <tr>
-            <% @employer_profile = @organization.employer_profile %>
-            <td><%= "Initial" %></td>
+            <td><%= @organization.employer_profile.is_renewing_employer? ? "Renewing" : "Initial" %></td>
             <td><%= @plan_year.start_on.strftime('%m/%d/%Y') %></td>
             <td><%= @plan_year.open_enrollment_end_on.strftime('%m/%d/%Y') %></td>
-            <td><%= @plan_year.aasm_state %></td>
+            <td><%= @plan_year.aasm_state.titleize %></td>
             <td><%= TimeKeeper.local_time(@plan_year.created_at).strftime('%m/%d/%Y %I:%M%p') %></td>
             <td><%= TimeKeeper.local_time(@plan_year.updated_at).strftime('%m/%d/%Y %I:%M%p') %></td>
           </tr>

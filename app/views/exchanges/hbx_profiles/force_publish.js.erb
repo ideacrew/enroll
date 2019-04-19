@@ -1,7 +1,6 @@
-
-<% if @plan_year.application_eligibility_warnings.present? && params[:publish_with_warnings] == 'false' %>
+<% if @plan_year.application_eligibility_warnings.present? && params.has_key?(:commit)%>
   $(".application-warnings").empty();
-  <% @plan_year.application_eligibility_warnings.each_value do |warning| %>
+  <% @plan_year.application_eligibility_warnings.values.flatten.each do |warning| %>
     $(".application-warnings").append("<li><%= warning %></li>");
   <% end %>
   $("#publishPlanYear").modal('show');

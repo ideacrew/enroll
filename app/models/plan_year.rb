@@ -82,6 +82,7 @@ class PlanYear
 
   scope :published_or_renewing_published, -> { any_of([published.selector, renewing_published_state.selector]) }
   scope :published_or_renewing_published_or_terminated, -> { any_in(aasm_state: PUBLISHED + RENEWING_PUBLISHED_STATE + TERMINATED_STATE) }
+  scope :renewing_draft_or_draft, -> { any_in(aasm_state: %w[draft renewing_draft]) }
 
   scope :by_date_range,     ->(begin_on, end_on) { where(:"start_on".gte => begin_on, :"start_on".lte => end_on) }
   scope :published_plan_years_within_date_range, ->(begin_on, end_on) {
