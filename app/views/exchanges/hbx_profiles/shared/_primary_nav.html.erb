@@ -1,6 +1,6 @@
 <% content_for :horizontal_menu do %>
   <div class="mainmenu">
-    <div class="container">
+    <div class="container" id="admin">
       <ul role="tablist" class="list-unstyled list-inline" id="myTab">
         <li role="presentation"<%= menu_tab_class(active_tab, "hbx-profile-tab") %>>
           <%= link_to(exchanges_hbx_profiles_path, "aria-expanded" => "true", "aria-controls" => "hbx_profile", "role" => "tab" ) do  %>
@@ -139,6 +139,11 @@
             <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Inbox"></span>
           <% end %>
         </li>
+        <li role="presentation"<%= menu_tab_class(active_tab, "staff-tab") %> class="tab-second <%=pundit_class HbxProfile, :view_admin_tabs?%>">
+            <span class="hidden-xs"><a href= "https://public.tableau.com/profile/arnd.plagge#!/vizhome/nm_mock_up_complete_20190419/NMIVLOverview">Analytics</a></span>
+            <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Staff"></span>
+        </li>
+        
         <!-- <li role="presentation"<%= menu_tab_class(active_tab, "binder-tab") %> class="tab-second">
          <%= link_to(binder_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "binder", "role" => "tab" ) do  %>
             <span class="hidden-xs">Binder Transition</span>
