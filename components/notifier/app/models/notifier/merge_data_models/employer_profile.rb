@@ -6,6 +6,7 @@ module Notifier
     DATE_ELEMENTS = %w(current_py_start_on current_py_end_on renewal_py_start_on renewal_py_end_on)
 
     attribute :notice_date, String
+    attribute :notice_date_plus_31_days, String
     attribute :first_name, String
     attribute :last_name, String
     # attribute :primary_identifier, String
@@ -33,6 +34,7 @@ module Notifier
     def self.stubbed_object
       notice = Notifier::MergeDataModels::EmployerProfile.new({
         notice_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
+        notice_date_plus_31_days: (TimeKeeper.date_of_record + 31.days).strftime('%m/%d/%Y'),
         first_name: 'John',
         last_name: 'Whitmore',
         email: 'johnwhitmore@gmail.com',

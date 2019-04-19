@@ -120,6 +120,7 @@ describe 'ModelEvents::GroupTerminationConfirmationNotice', dbclean: :around_eac
       let(:data_elements) {
         [
           'employer_profile.notice_date',
+          'employer_profile.notice_date_plus_31_days',
           'employer_profile.employer_name',
           'employer_profile.plan_year.current_py_end_date',
           'employer_profile.plan_year.group_termination_plus_31_days',
@@ -152,6 +153,10 @@ describe 'ModelEvents::GroupTerminationConfirmationNotice', dbclean: :around_eac
 
       it 'should return the date of the notice' do
         expect(merge_model.notice_date).to eq TimeKeeper.date_of_record.strftime('%m/%d/%Y')
+      end
+
+      it 'should return the date of the notice plus 31 days' do
+        expect(merge_model.notice_date_plus_31_days).to eq((TimeKeeper.date_of_record + 31.days).strftime('%m/%d/%Y'))
       end
 
       it 'should return employer name' do
