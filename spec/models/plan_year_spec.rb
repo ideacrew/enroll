@@ -2991,19 +2991,19 @@ describe "#trigger_notice_for_voluntary_termination" do
   context "when employer is terminated due to voluntary termination " do
     it "with future date - should trigger notice" do
       expect(employer_profile).to receive(:trigger_notices).with("group_advance_termination_confirmation", "acapi_trigger" =>  true)
-      plan_year.terminate_plan_year(TimeKeeper.date_of_record.next_month, TimeKeeper.date_of_record, "voluntary", false)
+      plan_year.terminate_plan_year(TimeKeeper.date_of_record.next_month, TimeKeeper.date_of_record, "voluntary", false, "voluntary")
     end
 
     it "with past date - should trigger notices" do
       expect(employer_profile).to receive(:trigger_notices).with("group_advance_termination_confirmation", "acapi_trigger" =>  true)
-      plan_year.terminate_plan_year(TimeKeeper.date_of_record.prev_month, TimeKeeper.date_of_record, "voluntary", false)
+      plan_year.terminate_plan_year(TimeKeeper.date_of_record.prev_month, TimeKeeper.date_of_record, "voluntary", false, "voluntary")
     end
   end
 
   context 'when employer is terminated due to non-payment' do
     it "should not trigger notice" do
       expect(employer_profile).not_to receive(:trigger_notices).with("group_advance_termination_confirmation", "acapi_trigger" =>  true)
-      plan_year.terminate_plan_year(TimeKeeper.date_of_record.prev_month, TimeKeeper.date_of_record, "nonpayment", false)
+      plan_year.terminate_plan_year(TimeKeeper.date_of_record.prev_month, TimeKeeper.date_of_record, "nonpayment", false, "nonpayment")
     end
   end
 end
