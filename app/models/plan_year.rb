@@ -187,7 +187,7 @@ class PlanYear
     renewing_plan_year
   end
 
-  def terminate_plan_year(end_on, terminated_on, termination_kind, transmit_xml)
+  def terminate_plan_year(end_on, terminated_on, termination_kind, transmit_xml, enrollment_term_reason)
     renewing_plan_year = parent.plan_years.where(:aasm_state.in => RENEWING + ['renewing_application_ineligible']).first
 
     if renewing_plan_year
@@ -196,7 +196,7 @@ class PlanYear
 
     if end_on >= TimeKeeper.date_of_record
       if self.may_schedule_termination?
-        self.schedule_termination!(end_on, options = {termination_kind: termination_kind, terminated_on: terminated_on, transmit_xml: transmit_xml})
+        schedule_termination!(end_on, {termination_kind: termination_kind, terminated_on: terminated_on, transmit_xml: transmit_xml, enrollment_term_reason: enrollment_term_reason})
         notify_employer_py_terminate(transmit_xml)
         trigger_notice_for_voluntary_termination
       end
@@ -205,7 +205,7 @@ class PlanYear
        self.terminate!(end_on)
        set_plan_year_termination_date(end_on, options = {termination_kind: termination_kind, terminated_on: terminated_on})
        notify_employer_py_terminate(transmit_xml)
-       self.terminate_employee_enrollments(end_on, options = {transmit_xml: transmit_xml})
+       terminate_employee_enrollments(end_on, {transmit_xml: transmit_xml, enrollment_term_reason: enrollment_term_reason})
        employer_profile.revert_application! if employer_profile.may_revert_application?
        trigger_notice_for_voluntary_termination
      end
@@ -269,14 +269,14 @@ class PlanYear
           if hbx_enrollment.may_terminate_coverage?
             if hbx_enrollment.terminated_on.nil? || (hbx_enrollment.terminated_on.present? && (hbx_enrollment.terminated_on > py_end_on))
               hbx_enrollment.terminate_coverage!(py_end_on)
-              hbx_enrollment.update_attributes!(termination_submitted_on: TimeKeeper.date_of_record)
+              hbx_enrollment.update_attributes!(termination_submitted_on: TimeKeeper.date_of_record, terminate_reason: options[:enrollment_term_reason])
               hbx_enrollment.notify_enrollment_cancel_or_termination_event(options[:transmit_xml])
             end
           end
         else
           if hbx_enrollment.may_schedule_coverage_termination?
             hbx_enrollment.schedule_coverage_termination!(py_end_on)
-            hbx_enrollment.update_attributes!(termination_submitted_on: TimeKeeper.date_of_record)
+            hbx_enrollment.update_attributes!(termination_submitted_on: TimeKeeper.date_of_record, terminate_reason: options[:enrollment_term_reason])
             hbx_enrollment.notify_enrollment_cancel_or_termination_event(options[:transmit_xml])
           end
         end
