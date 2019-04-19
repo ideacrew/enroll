@@ -46,13 +46,14 @@ RSpec.describe "app/views/events/enrollment_event.xml.haml" do
 
     before do
       hbx_enrollment.aasm_state = 'coverage_terminated'
+      hbx_enrollment.terminate_reason = 'non_payment'
       hbx_enrollment.save
       render :template => "events/enrollment_event", :locals => {hbx_enrollment: hbx_enrollment}
       @doc = Nokogiri::XML(rendered)
     end
 
     it "should include qualifying_reason" do
-      expect(@doc.xpath("//x:qualifying_reason", "x" => "http://openhbx.org/api/terms/1.0").text).to eq "urn:openhbx:terms:v1:benefit_maintenance#termination_of_benefits"
+      expect(@doc.xpath("//x:qualifying_reason", "x" => "http://openhbx.org/api/terms/1.0").text).to eq "urn:openhbx:terms:v1:benefit_maintenance#non_payment"
     end
   end
 end
