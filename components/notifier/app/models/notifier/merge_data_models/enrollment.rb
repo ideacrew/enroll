@@ -13,6 +13,7 @@ module Notifier
     attribute :employee_first_name, String
     attribute :employee_last_name, String
     attribute :coverage_end_on, String
+    attribute :waiver_effective_on, String
     attribute :enrolled_count, String
     attribute :enrollment_kind, String
     # attribute :metal_level, String

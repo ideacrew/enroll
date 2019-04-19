@@ -3,11 +3,28 @@ module Notifier
 
     def enrollment
       return @enrollment if defined? @enrollment
-      if event_matched?
+      if payload['event_object_kind'].constantize == HbxEnrollment
+        enrollment = HbxEnrollment.find(payload['event_object_id'])
+        @enrollment = waived_enrollment(enrollment)
+      elsif event_matched?
         @enrollment = health_enrollment
       elsif payload['event_object_kind'].constantize == HbxEnrollment
         @enrollment = HbxEnrollment.find(payload['event_object_id'])
       end
+    end
+
+    def waived_enrollment(enrollment)
+      if event_name == 'employee_waiver_confirmation' && enrollment.is_coverage_waived?
+        enrollment.parent_enrollment.present? ? enrollment.parent_enrollment : enrollment
+      else
+        enrollment
+      end
+    end
+
+    def enrollment_waiver_effective_on
+      return if enrollment.blank?
+      effective_date = enrollment.terminated_on.nil? ? enrollment.effective_on : enrollment.terminated_on + 1.day
+      merge_model.enrollment.waiver_effective_on = format_date(effective_date)
     end
 
     def dental_enrollment

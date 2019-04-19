@@ -175,11 +175,11 @@ module Notifier
     end
 
     def latest_terminated_health_enrollment
-      census_employee_record.active_benefit_group_assignment.hbx_enrollments.select{ |en| en.coverage_kind == "health" }.first
+      census_employee_record.active_benefit_group_assignment.hbx_enrollments.select{ |en| en.coverage_kind == "health" && !HbxEnrollment::WAIVED_STATUSES.include?(en.aasm_state)}.first
     end
 
     def latest_terminated_dental_enrollment
-      census_employee_record.active_benefit_group_assignment.hbx_enrollments.select{ |en| en.coverage_kind == "dental" }.first
+      census_employee_record.active_benefit_group_assignment.hbx_enrollments.select{ |en| en.coverage_kind == "dental" && !HbxEnrollment::WAIVED_STATUSES.include?(en.aasm_state)}.first
     end
 
     def census_employee_latest_terminated_health_enrollment_plan_name
@@ -188,9 +188,33 @@ module Notifier
       end
     end
 
+    def census_employee_latest_terminated_health_enrollment_enrolled_count
+      if latest_terminated_health_enrollment.present?
+        merge_model.census_employee.latest_terminated_health_enrollment_enrolled_count = latest_terminated_health_enrollment.humanized_dependent_summary
+      end
+    end
+
+    def census_employee_latest_terminated_health_enrollment_coverage_end_on
+      if latest_terminated_health_enrollment.present?
+        merge_model.census_employee.latest_terminated_health_enrollment_coverage_end_on = format_date(latest_terminated_health_enrollment.terminated_on)
+      end
+    end
+
     def census_employee_latest_terminated_dental_enrollment_plan_name
       if latest_terminated_dental_enrollment.present?
         merge_model.census_employee.latest_terminated_dental_enrollment_plan_name = latest_terminated_dental_enrollment.plan.name
+      end
+    end
+
+    def census_employee_latest_terminated_dental_enrollment_enrolled_count
+      if latest_terminated_dental_enrollment.present?
+        merge_model.census_employee.latest_terminated_dental_enrollment_enrolled_count = latest_terminated_dental_enrollment.humanized_dependent_summary
+      end
+    end
+
+    def census_employee_latest_terminated_dental_enrollment_coverage_end_on
+      if latest_terminated_dental_enrollment.present?
+        merge_model.census_employee.latest_terminated_dental_enrollment_coverage_end_on = format_date(latest_terminated_dental_enrollment.terminated_on)
       end
     end
 
