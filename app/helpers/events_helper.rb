@@ -44,20 +44,6 @@ module EventsHelper
     "urn:dc0:terms:v1:qualifying_life_event##{event_uri}"
   end
 
-  def xml_qualifying_reason_uri(hbx_enrollment)
-    reason = hbx_enrollment.terminate_reason
-    event_uri = if reason == "I do not have other coverage"
-                  "voluntary_withdrawal"
-                elsif reason == "non_payment"
-                  "non_payment"
-                elsif HbxEnrollment::WAIVER_REASONS.include?(reason)
-                  "alternate_benefit_available"
-                else
-                  "termination_of_benefits"
-                end
-    "urn:openhbx:terms:v1:benefit_maintenance##{event_uri}"
-  end
-
   def office_location_address_kind(kind)
     if kind == "primary"
       "work"

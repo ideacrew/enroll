@@ -203,35 +203,6 @@ describe EventsHelper, "transforming a qualifying event kind for external xml" d
 
 end
 
-describe EventsHelper, "transforming a qualifying_reason for external xml" do
-
-  RESULT_PAIR = {
-    "I do not have other coverage" => "voluntary_withdrawal",
-    "non_payment" => "non_payment",
-    "I have coverage through Medicaid" => "alternate_benefit_available",
-    "I have coverage through Tricare" => "alternate_benefit_available",
-    "I have coverage through Medicare" => "alternate_benefit_available",
-    "I have coverage through an individual market health plan" => "alternate_benefit_available",
-    "I have coverage through any other employer health plan" => "alternate_benefit_available",
-    "I have coverage through parent’s employer health plan" => "alternate_benefit_available",
-    "I have coverage through spouse’s employer health plan" => "alternate_benefit_available",
-    "" => "termination_of_benefits"
-  }
-
-  subject { EventsHelperSlug.new }
-
-  let(:family) { FactoryGirl.build(:family, :with_primary_family_member_and_dependent)}
-  let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, kind: "employer_sponsored", aasm_state: "coverage_terminated") }
-
-  RESULT_PAIR.each_pair do |k,v|
-    it "maps \"#{k}\" to \"#{v}\"" do
-      hbx_enrollment.update_attributes(terminate_reason: k)
-      expect(subject.xml_qualifying_reason_uri(hbx_enrollment)).to eq "urn:openhbx:terms:v1:benefit_maintenance##{v}"
-    end
-  end
-
-end
-
 describe EventsHelper, "selecting plan years to be exported" do
   subject { EventsHelperSlug.new }
 
