@@ -72,6 +72,6 @@ When(/^the user clicks View My Applications$/) do
   find('span', text:'View My Applications').click
 end
 
-Then(/^the user will be on the My Financial Assistance Applications page$/) do
-  expect(page).to have_content("My Financial Assistance Applications")
+Then(/^the user will be on the Cost Savings Applications page$/) do
+  expect(page).to have_content("Cost Savings Applications")
 end
