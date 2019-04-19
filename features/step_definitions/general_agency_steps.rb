@@ -35,8 +35,8 @@ And(/^.+ enters general agency information$/) do
   find(:xpath, "//p[@class='label'][contains(., 'Select Practice Area')]").click
   find(:xpath, "//li[contains(., 'Both – Individual & Family AND Small Business Marketplaces')]").click
 
-  find(:xpath, "//label[input[@name='organization[accept_new_clients]']]").trigger('click')
-  find(:xpath, "//label[input[@name='organization[working_hours]']]").trigger('click')
+  find(:xpath, "//label[input[@name='organization[accept_new_clients]']]").click
+  find(:xpath, "//label[input[@name='organization[working_hours]']]").click
 end
 
 And(/^.+ clicks? on Create General Agency$/) do
@@ -138,8 +138,8 @@ And(/^.+ enters broker agency information for ga flow$/) do
   find(:xpath, "//p[@class='label'][contains(., 'Select Practice Area')]").click
   find(:xpath, "//li[contains(., 'Both – Individual & Family AND Small Business Marketplaces')]").click
 
-  find(:xpath, "//label[input[@name='organization[accept_new_clients]']]").trigger('click')
-  find(:xpath, "//label[input[@name='organization[working_hours]']]").trigger('click')
+  find(:xpath, "//label[input[@name='organization[accept_new_clients]']]").click
+  find(:xpath, "//label[input[@name='organization[working_hours]']]").click
 end
 
 When(/^.+ registers with valid information for ga flow$/) do

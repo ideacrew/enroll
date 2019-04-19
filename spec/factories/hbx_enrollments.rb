@@ -81,6 +81,10 @@ FactoryBot.define do
       product {  FactoryBot.create(:benefit_markets_products_product) }
     end
 
+    trait :with_health_product do
+      product { FactoryGirl.create(:benefit_markets_products_health_products_health_product)}
+    end
+
     trait :coverage_selected do
       aasm_state { "coverage_selected" }
     end

@@ -1,16 +1,16 @@
-
-Then(/^Hbx Admin checks FCHP$/) do
-  find(:xpath, "//label[input[@name='person[broker_role_attributes][carrier_appointments][FCHP]']]").trigger('click')
+And(/^Hbx Admin should see broker application with carrier appointments$/) do
+  if Settings.aca.broker_carrier_appointments_enabled
+    find_all("[id^=person_broker_role_attributes_carrier_appointments_]").each do |checkbox|
+      checkbox.should be_checked
+    end
+    expect(page).to have_content("Carrier appointments for broker are not necessary for participation in #{Settings.site.long_name}")
+  end
 end
 
-Then(/^Hbx Admin checks Guardian$/) do
-  find(:xpath, "//label[input[@name='person[broker_role_attributes][carrier_appointments][Guardian]']]").trigger('click')
+And(/^Admin clicks on the pending button$/) do
+  find('.interaction-click-control-broker-pending').click
 end
 
-When(/^Hbx Admin clicks pending button$/) do
-  click_button "Pending"
-end
-
-Then(/^Hbx Admin sees a successful message$/) do
+Then(/^Hbx Admin views a successful message$/) do
   expect(page).to have_content('Broker applicant is now pending.')
 end

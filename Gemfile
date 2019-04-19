@@ -144,6 +144,7 @@ group :test do
   gem 'action_mailer_cache_delivery', '~> 0.3'
   gem 'capybara',                     '~> 3.12'
   gem 'capybara-screenshot',          '~> 1.0.18'
+  gem 'chromedriver-helper'
   gem 'cucumber',                     '~> 3'
   gem 'cucumber-rails',               '~> 1.6',   :require => false
   gem 'fakeredis',                    '~> 0.7.0', :require => 'fakeredis/rspec'
@@ -151,6 +152,7 @@ group :test do
   gem 'poltergeist',                  '~> 1.18.0'
   gem 'rspec-instafail',              '~> 1'
   gem 'ruby-progressbar',             '~> 1'
+  gem 'selenium-webdriver', '3.141.0'
   gem 'shoulda-matchers',             '~> 3'
   gem 'simplecov',                    '~> 0.14',  :require => false
   gem 'test-prof',                    '~> 0.5.0'

@@ -8,8 +8,8 @@ module BenefitSponsorWorld
     end
   end
 
-  def benefit_sponsor_catalog
-    @benefit_sponsor_catalog ||= benefit_sponsorship.benefit_sponsor_catalog_for(service_areas, effective_period.min).tap(&:save!)
+  def benefit_sponsor_catalog(employer = nil)
+    @benefit_sponsor_catalog ||= benefit_sponsorship(employer).benefit_sponsor_catalog_for(service_areas, effective_period.min).tap(&:save!)
   end
 
   def issuer_profile
