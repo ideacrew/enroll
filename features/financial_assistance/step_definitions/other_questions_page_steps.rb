@@ -23,7 +23,7 @@ And(/^the user answers no to the have you applied for an SSN question$/) do
 end
 
 Then(/^the reason why question is displayed$/) do
-  expect(page).to have_content('Reason, why you dont have an SSN?')
+  expect(page).to have_content('Why doesn\'t this person have an SSN?')
 end
 
 Given(/^the user answers yes to being pregnant$/) do
