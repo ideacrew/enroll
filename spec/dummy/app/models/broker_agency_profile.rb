@@ -55,6 +55,7 @@ class BrokerAgencyProfile
 
   class << self
     def find(id)
+      return nil if id.blank?
       organizations = Organization.where("broker_agency_profile._id" => BSON::ObjectId.from_string(id)).to_a
       organizations.size > 0 ? organizations.first.broker_agency_profile : nil
     end

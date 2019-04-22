@@ -245,6 +245,22 @@ class Plan
     coverage_kind && coverage_kind.downcase == "dental"
   end
 
+  def self.for_service_areas_and_carriers(service_area_carrier_pairs, active_year, metal_level = nil, coverage_kind = 'health')
+    plan_criteria_set = service_area_carrier_pairs.map do |sap|
+      criteria = {
+        :carrier_profile_id => sap.first,
+        :service_area_id => sap.last,
+        :active_year => active_year,
+        :coverage_kind => coverage_kind
+      }
+      if metal_level.present?
+        criteria.merge(metal_level: metal_level)
+      end
+      criteria
+    end
+    self.where("$or" => plan_criteria_set)
+  end
+
   class << self
 
     def search_options(plans)

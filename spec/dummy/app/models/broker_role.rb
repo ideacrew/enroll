@@ -27,6 +27,7 @@ class BrokerRole
   # Broker National Producer Number (unique identifier)
   field :npn, type: String
   field :broker_agency_profile_id, type: BSON::ObjectId
+  field :benefit_sponsors_broker_agency_profile_id, type: BSON::ObjectId
   field :provider_kind, type: String
   field :reason, type: String
 
@@ -37,6 +38,39 @@ class BrokerRole
   field :license, type: Boolean
   field :training, type: Boolean
   field :carrier_appointments, type: Hash , default: BROKER_CARRIER_APPOINTMENTS
+
+  def broker_agency_profile=(new_broker_agency)
+    if new_broker_agency.is_a? BenefitSponsors::Organizations::BrokerAgencyProfile
+      if new_broker_agency.nil?
+        self.benefit_sponsors_broker_agency_profile_id = nil
+      else
+        raise ArgumentError.new("expected BenefitSponsors::Organizations::BrokerAgencyProfile class") unless new_broker_agency.is_a? BenefitSponsors::Organizations::BrokerAgencyProfile
+        self.benefit_sponsors_broker_agency_profile_id = new_broker_agency._id
+        @broker_agency_profile = new_broker_agency
+      end
+    else
+      if new_broker_agency.nil?
+        self.broker_agency_profile_id = nil
+      else
+        raise ArgumentError.new("expected BrokerAgencyProfile class") unless new_broker_agency.is_a? BrokerAgencyProfile
+        self.broker_agency_profile_id = new_broker_agency._id
+        @broker_agency_profile = new_broker_agency
+      end
+    end
+  end
+
+  def broker_agency_profile
+    return @broker_agency_profile if defined? @broker_agency_profile
+    if self.benefit_sponsors_broker_agency_profile_id.nil?
+      @broker_agency_profile = BrokerAgencyProfile.find(broker_agency_profile_id) if has_broker_agency_profile?
+    else
+      @broker_agency_profile = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => benefit_sponsors_broker_agency_profile_id).first.broker_agency_profile if has_broker_agency_profile?
+    end
+  end
+
+  def has_broker_agency_profile?
+    self.benefit_sponsors_broker_agency_profile_id.present? || self.broker_agency_profile_id.present?
+  end
 
   class << self
     def find(id)

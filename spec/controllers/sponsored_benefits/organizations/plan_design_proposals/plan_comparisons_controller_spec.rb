@@ -14,9 +14,15 @@ module SponsoredBenefits
     routes { SponsoredBenefits::Engine.routes }
 
     describe "GET new" do
-      let!(:person) { FactoryGirl.create(:person, :with_broker_role).tap do |person|
-                                         person.broker_role.update_attributes(broker_agency_profile_id: broker_agency_profile.id.to_s)
-      end }
+      let!(:person) {
+        FactoryGirl.create(:person, :with_broker_role).tap do |person|
+          if Settings.aca.state_abbreviation == 'DC'
+            person.broker_role.update_attributes(broker_agency_profile_id: broker_agency_profile.id.to_s)
+          else
+            person.broker_role.update_attributes(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id.to_s)
+          end
+        end
+      }
 
       let!(:user_with_broker_role) { FactoryGirl.create(:user, person: person) }
       let(:plans) { FactoryGirl.create_list(:plan, 2, :with_premium_tables, market: 'shop') }
