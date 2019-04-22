@@ -84,7 +84,7 @@
                     type: label_radio
                     label: "None. I understand that this means I won't get cost savings in future years unless I change my mind and tell DC Health Link"
                     value: 0
-                    classNames: 'span-text'
+                    classNames: 'span-text radio-inline-override'
                     model: application
                     name: years_to_renew
                     attribute: years_to_renew
