@@ -94,10 +94,10 @@ Rails.application.routes.draw do
         get :show_sep_history
         get :view_terminated_hbx_enrollments
         get :get_user_info
-        get :edit_fein
-        post :update_fein
         get :edit_force_publish
         post :force_publish
+        get :edit_fein
+        post :update_fein
         get :identity_verification
         post :identity_verification_datatable
         get :user_account_index

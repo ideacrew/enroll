@@ -59,6 +59,7 @@ FactoryGirl.define do
       can_reset_password true
       can_extend_open_enrollment true
       can_force_publish true
+      name 'hbx_tier3'
     end
 
     trait :hbx_csr_tier2 do
@@ -111,9 +112,9 @@ FactoryGirl.define do
       can_access_identity_verification_sub_tab true
       can_access_outstanding_verification_sub_tab true
       can_view_username_and_email true
-      can_change_fein true
       can_extend_open_enrollment true
       can_force_publish true
+      can_change_fein true
       name 'super_admin'
     end
   end
