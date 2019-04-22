@@ -19,7 +19,7 @@ gem 'prawn', :git => 'https://github.com/prawnpdf/prawn.git', :ref => '8028ca0cd
 # gem 'recurring_select', :git => 'https://github.com/brianweiner/recurring_select'
 
 ## Fix this dependency -- bring into project
-gem 'simple_calendar', :git => 'https://github.com/harshared/simple_calendar'
+gem 'simple_calendar', :git => 'https://github.com/harshared/simple_calendar.git'
 
 ## Verify Rails 5 eliminates need for this gem with MongoDB
 gem 'database_cleaner',       '~> 1.7'
