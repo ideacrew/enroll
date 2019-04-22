@@ -54,6 +54,10 @@ module Notifier
       merge_model.notice_date = format_date(TimeKeeper.date_of_record)
     end
 
+    def notice_date_plus_31_days
+      merge_model.notice_date_plus_31_days = format_date(TimeKeeper.date_of_record + 31.days)
+    end
+
     def employer_name
       merge_model.employer_name = employer_profile.legal_name
     end
