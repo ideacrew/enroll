@@ -47,10 +47,11 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
           @notifier.deliver(
             recipient: consumer_role,
             event_object: consumer_role,
-            notice_event: 'projected_eligibility_notice_1',
+            notice_event: 'projected_eligibility_notice',
             notice_params: {
+              primary_member: subscriber.to_hash,
               dependents: dependents.map(&:to_hash),
-              primary_member: subscriber.to_hash
+              uqhp_event: 'uqhp_projected_eligibility_notice_1'
             }
           )
           csv << [

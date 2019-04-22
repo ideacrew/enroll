@@ -1,6 +1,10 @@
 require "rails_helper"
 
 describe "ProjectedEligibilityNotice_1" do
+  before do
+    DatabaseCleaner.clean
+  end
+
   let!(:person) {FactoryGirl.create(:person, :with_consumer_role, first_name: "Test", last_name: "Data", hbx_id: "91091f87b17d4f91af5fd1646d8acf66") }
   let!(:user) {FactoryGirl.create(:user, person: person) }
   let!(:family100) {FactoryGirl.create(:family, :with_primary_family_member, person: person, id: "5c6594605f326d004f000060")}
@@ -9,8 +13,8 @@ describe "ProjectedEligibilityNotice_1" do
     end
 
   it "should create projected_eligibility_notice_uqhp report" do
-    invoke_pre_script
-    data = file_reader
+    invoke_pre_script1
+    data = file_reader1
     expect(data[0].present?).to eq true
     expect(data[1].present?).to eq true
     expect(data[1][0]).to eq(family100.id.to_s)
@@ -25,12 +29,12 @@ end
 
 private
 
-def file_reader
+def file_reader1
   files = Dir.glob(File.join(Rails.root, 'spec/test_data/notices/projected_eligibility_notice_uqhp_report_*.csv'))
   data = CSV.read files.first
 end
 
-def invoke_pre_script
-  eligibility_script = File.join(Rails.root, "script/projected_eligibility_notice_1.rb")
-  load eligibility_script
+def invoke_pre_script1
+  eligibility_script1 = File.join(Rails.root, "script/projected_eligibility_notice_1.rb")
+  load eligibility_script1
 end

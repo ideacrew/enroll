@@ -40,6 +40,9 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
       primary_member = members.detect{ |m| m["dependent"].casecmp('NO').zero?}
       dependents = members.select{|m| m["dependent"].casecmp('YES').zero?}
       next if primary_member.nil?
+      next if members.select{ |m| m["resident"] && m["resident"].casecmp('NO').zero? }.present?
+      next if members.select{ |m| m["incarcerated"] && m["incarcerated"].casecmp('YES').zero? }.present?
+      next if members.any?{ |m| m["citizen_status"].blank? || (m["citizen_status"] == "non_native_not_lawfully_present_in_us") || (m["citizen_status"] == "not_lawfully_present_in_us")}
       person = Person.where(:hbx_id => primary_member["subscriber_id"]).first
       primary_person = person.primary_family ? person : person.families.first.primary_applicant.person
       consumer_role = primary_person.consumer_role
@@ -48,10 +51,11 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
         @notifier.deliver(
           recipient: consumer_role,
           event_object: consumer_role,
-          notice_event: 'projected_eligibility_notice_2',
+          notice_event: 'projected_eligibility_notice',
           notice_params: {
+            primary_member: primary_member.to_hash,
             dependents: dependents.map(&:to_hash),
-            primary_member: primary_member.to_hash
+            aqhp_event: 'aqhp_projected_eligibility_notice_2'
           }
         )
         puts "***************** Notice delivered to #{primary_person.hbx_id} *****************" unless Rails.env.test?

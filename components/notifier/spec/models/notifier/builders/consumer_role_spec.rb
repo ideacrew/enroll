@@ -39,7 +39,7 @@ RSpec.describe 'Notifier::Builders::ConsumerRole', :dbclean => :after_each do
       end
 
       it "should have aptc from payload" do
-        expect(subject.aptc).to eq(payload["notice_params"]["primary_member"]["aptc"])
+        expect(subject.aptc).to eq(ActionController::Base.helpers.number_to_currency(payload["notice_params"]["primary_member"]["aptc"]))
       end
 
       it "should have incarcerated from payload" do
