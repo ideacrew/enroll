@@ -350,15 +350,18 @@ describe DefinePermissions, dbclean: :after_each do
 
         it 'returns false before the rake task is ran' do
           expect(hbx_tier3.hbx_staff_role.permission.can_force_publish).to be false
+          expect(hbx_tier3.hbx_staff_role.permission.can_change_fein).to be false
         end
 
         context 'after the rake task is run' do
           before do
             subject.hbx_admin_can_force_publish
+            subject.hbx_admin_can_change_fein
           end
 
           it 'returns true' do
             expect(hbx_tier3.hbx_staff_role.permission.can_force_publish).to be true
+            expect(hbx_tier3.hbx_staff_role.permission.can_change_fein).to be true
           end
         end
       end
