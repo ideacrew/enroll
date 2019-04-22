@@ -193,7 +193,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
     it "should throw a 500 error" do
       sign_in user
       post :create, person: person_params
-      expect(response).to have_http_status(500)
+      expect(response).to have_http_status(:redirect)
     end
   end
 
