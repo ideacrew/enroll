@@ -713,10 +713,10 @@ $(document).ready(function() {
         "term": "Payment Bundling",
         "description": "A payment structure where different health care providers who are treating you for the same or related conditions are paid an overall sum for taking care of your condition rather than being paid for each individual treatment, test, or procedure. Providers are rewarded for coordinating care, preventing complications and errors, and reducing unnecessary or duplicative tests and treatments."
       },
-      {
-        "term": "Penalty",
-        "description": "Formally known as the <a href='\/glossary#individual_shared_responsibility_payment' target='_blank'>Individual Shared Responsibility Payment<\/a>."
-      },
+      // {
+      //   "term": "Penalty",
+      //   "description": "Formally known as the <a href='\/glossary#individual_shared_responsibility_payment' target='_blank'>Individual Shared Responsibility Payment<\/a>."
+      // },
       {
         "term": "Physician Services",
         "description": "Health care services a licensed medical physician (M.D. \u2013 Medical Doctor or D.O. \u2013 Doctor of Osteopathic Medicine) provides or coordinates."
@@ -898,6 +898,10 @@ $(document).ready(function() {
         "description": "Silver Health Plans pay 70 percent of <a href='\/glossary#in-network' target='_blank'>in-network<\/a> expenses for an average population of consumers. The <a href='\/glossary#premium' target='_blank'>premiums<\/a> are typically lower, but the <a href='\/glossary#out-of-pocket_limit' target='_blank'>out-of-pocket limit<\/a> of what you'll pay before the plan starts paying is higher. If you qualify for <a href='\/glossary#cost-sharing_reduction' target='_blank'>cost-sharing reductions<\/a> and choose a silver plan, you'll have very low out-of-pocket expenses. <a href='\/glossary#metal_level' target='_blank'>Metal levels<\/a> only focus on what the plan is expected to pay, and do NOT reflect the quality of health care or <a href='\/glossary#service_provider' target='_blank'>service providers<\/a> available through the <a href='\/glossary#health_insurance' target='_blank'>health insurance<\/a> plan. Once you meet your in-network out-of-pocket limit for the <a href='\/glossary#plan_year' target='_blank'>plan year<\/a>, plans pay 100 percent of the <a href='\/glossary#allowed_amount' target='_blank'>allowed amount<\/a> for <a href='\/glossary#covered_services' target='_blank'>covered services<\/a>. "
       },
       {
+        "term": "Silver Plan",
+        "description": "Silver Health Plans pay 70 percent of <a href='\/glossary#in-network' target='_blank'>in-network<\/a> expenses for an average population of consumers. The <a href='\/glossary#premium' target='_blank'>premiums<\/a> are typically lower, but the <a href='\/glossary#out-of-pocket_limit' target='_blank'>out-of-pocket limit<\/a> of what you'll pay before the plan starts paying is higher. If you qualify for <a href='\/glossary#cost-sharing_reduction' target='_blank'>cost-sharing reductions<\/a> and choose a silver plan, you'll have very low out-of-pocket expenses. <a href='\/glossary#metal_level' target='_blank'>Metal levels<\/a> only focus on what the plan is expected to pay, and do NOT reflect the quality of health care or <a href='\/glossary#service_provider' target='_blank'>service providers<\/a> available through the <a href='\/glossary#health_insurance' target='_blank'>health insurance<\/a> plan. Once you meet your in-network out-of-pocket limit for the <a href='\/glossary#plan_year' target='_blank'>plan year<\/a>, plans pay 100 percent of the <a href='\/glossary#allowed_amount' target='_blank'>allowed amount<\/a> for <a href='\/glossary#covered_services' target='_blank'>covered services<\/a>. "
+      },
+      {
         "term": "SLCSP",
         "description": "The acronym for <a href='\/glossary#second_lowest_cost_silver_plan' target='_blank'>Second Lowest Cost Silver Plan<\/a>."
       },
@@ -1054,10 +1058,19 @@ $(document).ready(function() {
     $(terms).each(function(i, term) {
       $('.run-glossary:contains(' + term.term + ')').each(function(i, matchingEl) {
         var regex = new RegExp(term.term)
-        var text = $($.parseHTML(term.description)).text();
-        $(matchingEl).html($(matchingEl).html().replace(regex, '<span class="glossary" data-toggle="tooltip" title="' + text + '">' + term.term + '</span>'));
+        var text = term.description;
+        $(matchingEl).html($(matchingEl).html().replace(regex, '<span class="glossary" data-toggle="tooltip" data-placement="auto top" data-trigger="click focus" data-boundary="window" data-fallbackPlacement="flip" data-html="true" title="' + text + '">' + term.term + '</span>'));
       });
     })
+
+    // Because of the change to tooltip on click instead of hover, you need to
+    // manually close each tooltip. This will close others if you click to open one.
+    $('.glossary').on('click',function(e){
+        var el = $(this).siblings('.tooltip');
+    	  $('.tooltip').not(el).hide();
+    });
+
+
     //$.ajax({
     //  cache: true,
     //  type: 'json',
