@@ -30,9 +30,15 @@
           The enclosed letter has important information about your health or dental insurance, which may include steps you need to take to get or keep your insurance.
         </td>
       </tr>
+      <% if recipient.shop? %>
       <tr>
         <br></br>
       </tr>
+      <% else %>
+      <tr>
+        <br />
+      </tr>
+      <% end %>
     </tbody>
   </table>
 
