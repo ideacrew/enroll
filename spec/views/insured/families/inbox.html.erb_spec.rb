@@ -110,7 +110,7 @@ describe "insured/families/inbox.html.erb", dbclean: :after_each do
       end
 
       it "should verify if the Curam navigation link exists on the page" do
-        expect(rendered).to have_link('Medicaid & Tax Credits')
+        expect(rendered).to have_link('Go to Medicaid')
       end
     end
   end
