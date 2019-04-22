@@ -18,7 +18,7 @@ GIT
       nokogiri-happymapper (~> 0.5)
 
 GIT
-  remote: https://github.com/harshared/simple_calendar
+  remote: https://github.com/harshared/simple_calendar.git
   revision: 109781178efa26c89ba51efa496bca29bc70a565
   specs:
     simple_calendar (2.2.5)
