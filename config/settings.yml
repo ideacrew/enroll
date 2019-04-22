@@ -1,9 +1,9 @@
 site:
-  short_name: "beWellnm"
-  byline: "New Mexico's Health Insurance Exchange"
+  short_name: "OPM"
+  byline: "OPM.GOV"
   long_name: ""
   copyright_period_start: "2019"
-  header_message: "Welcome to New Mexico's Health Insurance Exchange"
+  header_message: "OPM.GOV"
   logo_file_name: "logo.png"
   mailer_logo_file_name: "dchealthlink.jpg"
   home_url: "https://www.bewellnm.com/"

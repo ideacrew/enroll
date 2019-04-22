@@ -19,19 +19,3 @@
 
   - if !user_signed_in?
     = link_to l10n(".broker_registration"), broker_registration_path, class: " home-button btn btn-default "
-#carousel-container
-  #myCarousel.carousel.slide data-ride="carousel" 
-    .carousel-inner
-      .item.active
-        =image_tag ("nm_hero.png"), :class => "pfl_cover", :id => 'pfl_cover'
-      .item
-        =image_tag ("family_nm.png"), :class => "pfl_cover" , :id => 'pfl_cover'
-      .item
-        =image_tag ("office_nm.png"), :class => "pfl_cover" , :id => 'pfl_cover'
-    /! Left and right controls
-    a.left-nm.carousel-control data-slide="prev" href="#myCarousel" 
-      span.glyphicon.glyphicon-chevron-left
-      span.sr-only Previous
-    a.right-nm.carousel-control data-slide="next" href="#myCarousel" 
-      span.glyphicon.glyphicon-chevron-right
-      span.sr-only Next

@@ -2,7 +2,7 @@ module PortalHeaderHelper
   include L10nHelper
   def portal_display_name(controller)
     if current_user.nil?
-      "<a class='portal'>NEW MEXICO'S HEALTH INSURANCE EXCHANGE</a>".html_safe
+      "<a class='portal'>OPM.GOV</a>".html_safe
     elsif current_user.try(:has_hbx_staff_role?)
       link_to "#{image_tag 'icons/icon-exchange-admin.png'} &nbsp; I'm an Admin".html_safe, main_app.exchanges_hbx_profiles_root_path, class: "portal"
     elsif current_user.person.try(:broker_role)
