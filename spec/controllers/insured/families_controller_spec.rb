@@ -898,12 +898,20 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         reason: "eligibility_documents_provided "
       )
     end
-
-    # HBX Enrollments belong to a household, and a household ota  factory?
+    let(:hbx_plan) { FactoryGirl.create(:plan) }
+    let(:selected_hbx_enrollment_string) { "#{hbx_enrollment.id}" }
+    let(:hbx_enrollment) do
+      FactoryGirl.create(
+        :hbx_enrollment,
+        household: family_primary_member.active_household,
+        kind: 'individual',
+        effective_on: (TimeKeeper.date_of_record.beginning_of_month).to_date,
+        plan_id: hbx_plan.id
+      )
+    end
 
     before :each do
       sign_in(user)
-      allow(self).to receive(:family).and_return(family_primary_member)
     end
 
     it "should add sep" do
@@ -913,6 +921,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         :subscriber_policy_action,
         id: family_primary_member.id,
         subscriber_policy_action: "add_sep",
+        selected_hbx_enrollments: selected_hbx_enrollment_string,
         family: family_primary_member.id,
         person: family_primary_member.id,
         firstName: consumer_person.first_name,
@@ -939,18 +948,22 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     it "should cancel enrollments" do
       post(
         :subscriber_policy_action,
-        id: family.id,
-        family: family.id,
+        selected_hbx_enrollments: selected_hbx_enrollment_string,
+        id: family_primary_member.id,
+        family: family_primary_member.id,
         subscriber_policy_action: "cancel",
         transmit_xml: true
       )
       expect(flash[:notice]).to eq("Successfully canceled all family enrollments.")
       expect(response).to redirect_to(home_insured_families_path)
+      hbx_enrollment.reload
+      expect(hbx_enrollment.aasm_state).to eq('coverage_canceled')
     end
 
     it "should create eligibility" do
       post(
         :subscriber_policy_action,
+        selected_hbx_enrollments: selected_hbx_enrollment_string,
         id: family.id,
         subscriber_policy_action: "create_eligibility",
         transmit_xml: true
@@ -960,6 +973,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     it "should reinstate enrollments" do
         post(
         :subscriber_policy_action,
+        selected_hbx_enrollments: selected_hbx_enrollment_string,
         id: family.id,
         subscriber_policy_action: "reinstate",
         transmit_xml: true
@@ -972,6 +986,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       post(
         :subscriber_policy_action,
         id: family.id,
+        selected_hbx_enrollments: selected_hbx_enrollments_string,
         family: family.id,
         subscriber_policy_action: "shorten_coverage_span",
         transmit_xml: true
@@ -984,11 +999,11 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       post(
         :subscriber_policy_action,
         id: family.id,
+        selected_hbx_enrollments: selected_hbx_enrollments_string,
         family: family.id,
         subscriber_policy_action: "terminate",
         transmit_xml: true
       )
-      binding.pry
       expect(flash[:notice]).to eq("Successfully terminated all family enrollments.")
       expect(response).to redirect_to(home_insured_families_path)
     end

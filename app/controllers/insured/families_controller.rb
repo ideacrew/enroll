@@ -3,6 +3,7 @@ class Insured::FamiliesController < FamiliesController
   include Acapi::Notifiers
   include ApplicationHelper
   include SepAll
+  include SubscriberPolicyAction
 
   before_action :updateable?, only: [:delete_consumer_broker, :record_sep, :purchase, :upload_notice]
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
@@ -119,41 +120,8 @@ class Insured::FamiliesController < FamiliesController
   # For the radio selections on the subscriber policy page
   # Only HBX admin should be able to access these actions
   def subscriber_policy_action
-    # The "selected hbx enrollments" will be a string of mongo id's for hbx enrollments separated
-    selected_hbx_enrollments = params["selected_hbx_enrollments"].gsub(/\s+/m, ' ').strip.split(" ")
-    selected_action = params["subscriber_policy_action"]
-    duped_params = params.dup
-    family = Person.find(params[:person])
-    if selected_action == "add_sep"
-      createSep # See sep_all.rb
-      flash[:notice] = @message_for_partial # From createSep action
-    elsif selected_action == 'cancel'
-      # The cancel and termination will be tricky, the cancel and terminate
-      # methods in the Bulk Actions for Admin class seems to allow dynamic params
-      params_with_cancel_hbx = selected_hbx_enrollments.each_with_index do |val, index|
-        params["cancel_hbx_#{index}".to_sym] = val
-      end
-      ::Forms::BulkActionsForAdmin.new(params_with_cancel_hbx).cancel_enrollments
-      flash[:notice] = "Successfully canceled all family enrollments."
-    elsif selected_action == "create_eligibility"
-      # Logic needed
-      family.primary_family.active_household.create_new_tax_household(params[:person])
-      flash[:notice] = "Successfully created eligibility."
-    elsif selected_action == "reinstate"
-      # Logic needed
-      flash[:notice] = "Successfully reinstated all family enrollments."
-    elsif selected_action == "shorten_coverage_span"
-      # Logic needed
-      flash[:notice] = "Successfully shortened coverage span."
-    elsif selected_action == "terminate"
-      params_with_terminate_hbx = selected_hbx_enrollments.each_with_index do |val, index|
-        params["terminate_hbx_#{index}".to_sym] = val
-      end
-      ::Forms::BulkActionsForAdmin.new(params_with_cancel_hbx).terminate_enrollments
-      flash[:notice] = "Successfully terminated all family enrollments."
-    else
-      flash[:error] = "Please select a valid subscriber policy action type."
-    end
+    # Flash notice/errors handled in module
+    execute_subscriber_policy_action
     redirect_to home_insured_families_path
   end
 
