@@ -5,7 +5,7 @@ RSpec.describe ShopEmployerNotices::EmployerAccountCreationNotice, :dbclean => :
   let!(:employer_profile){ create :employer_profile, aasm_state: "active"}
   let(:person){ create :person}
   let(:application_event){ double("ApplicationEventKind",{
-                            :name =>'Welcome to Be Well NM',
+                            :name =>'Welcome to OPM',
                             :notice_template => 'notices/shop_employer_notices/employer_account_creation_notice',
                             :notice_builder => 'ShopEmployerNotices::EmployerAccountCreationNotice',
                             :event_name => 'employer_account_creation_notice',

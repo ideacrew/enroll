@@ -280,7 +280,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       render "employers/employer_profiles/employee_csv_upload_errors"
     end
     rescue Exception => e
-      if e.message == "Unrecognized Employee Census spreadsheet format. Contact Be Well NM for current template."
+      if e.message == "Unrecognized Employee Census spreadsheet format. Contact OPM for current template."
         render "employers/employer_profiles/_download_new_template"
       else
         @census_employee_import.errors.add(:base, e.message)

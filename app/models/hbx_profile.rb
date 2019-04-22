@@ -125,9 +125,9 @@ class HbxProfile
   ## HBX general settings
   StateName = "District of Columbia"
   StateAbbreviation = "DC"
-  CallCenterName = "Be Well NM's Customer Care Center"
+  CallCenterName = "OPM's Customer Care Center"
   CallCenterPhoneNumber = "1-855-532-5465"
-  ShortName = "Be Well NM"
+  ShortName = "OPM"
 
   IndividualEnrollmentDueDayOfMonth = Settings.aca.individual_market.monthly_enrollment_due_on
 

@@ -102,14 +102,14 @@ class UserMailer < ApplicationMailer
     files_to_attach.each do |file_name, file_path|
       attachments["#{file_name}"] = File.read(file_path)
     end
-    message = mail({to: email, subject: "You have a new message from Be Well NM", from: 'no-reply@individual.dchealthlink.com'}) do |format|
+    message = mail({to: email, subject: "You have a new message from OPM", from: 'no-reply@individual.dchealthlink.com'}) do |format|
       format.html {render "generic_notice_alert", locals: {first_name: first_name, notice_subject: notice_subject}}
     end
   end
 
   def generic_notice_alert_to_ba_and_ga(first_name, email, employer_name)
     if email.present?
-      message = mail({to: email, subject: "You have a new message from Be Well NM", from: 'no-reply@individual.dchealthlink.com'}) do |format|
+      message = mail({to: email, subject: "You have a new message from OPM", from: 'no-reply@individual.dchealthlink.com'}) do |format|
         format.html {render "generic_notice_alert_to_broker_and_ga", locals: {first_name: first_name, employer_name: employer_name}}
       end
     end

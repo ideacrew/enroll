@@ -19,7 +19,7 @@ RSpec.describe ShopEmployeeNotices::NotifyRenewalEmployeesDentalCarriersExitingS
                             :notice_builder => 'ShopEmployeeNotices::NotifyRenewalEmployeesDentalCarriersExitingShop',
                             :event_name => 'notify_renewal_employees_dental_carriers_exiting_shop',
                             :mpi_indicator => 'SHOP_D092',
-                            :title => "Dental Carrier Exit from Be Well NM’s Small Business Marketplace"})
+                            :title => "Dental Carrier Exit from OPM’s Small Business Marketplace"})
                           }
 
   let(:valid_params) {{

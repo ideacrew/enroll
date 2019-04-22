@@ -1,10 +1,10 @@
 
 site:
-  short_name: "Be Well NM"
+  short_name: "OPM"
   long_name: ""
 
   call_center: 
-    name: "Be Well NM's Customer Care Center"
+    name: "OPM's Customer Care Center"
     phone_number: "1-855-532-5465"
 
 aca:

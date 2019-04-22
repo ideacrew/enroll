@@ -7,7 +7,7 @@
 <table class="total_table" border="0">
   <tbody>
   <tr>
-    <td><h3>YOUR INSURANCE THROUGH Be Well NM HAS CHANGED TO COVER ALL DC</h3></td>
+    <td><h3>YOUR INSURANCE THROUGH OPM HAS CHANGED TO COVER ALL DC</h3></td>
   </tr>
   </tbody>
 </table>
@@ -21,10 +21,10 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-    content: "We're sending you this letter because enrollment for the people listed below, who enrolled in private insurance through Be Well NM, will now be moved to a program called Cover All DC. This letter tells you who this impacts, why the change occurred, and what's different. "} %>
+    content: "We're sending you this letter because enrollment for the people listed below, who enrolled in private insurance through OPM, will now be moved to a program called Cover All DC. This letter tells you who this impacts, why the change occurred, and what's different. "} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-    contents: ["The people listed below still have the same insurance plan they enrolled in through Be Well NM. The enrollment has moved from Be Well NM to a program called Cover All DC."],
+    contents: ["The people listed below still have the same insurance plan they enrolled in through OPM. The enrollment has moved from OPM to a program called Cover All DC."],
     heading: "Who's Impacted", sub_heading: '',top_margin: '10px', bottom_margin: '5px'} %>
 
 <% notice.individuals.each do |member| %>
@@ -32,22 +32,22 @@
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-    content: "If someone else in your household has private insurance through Be Well NM, and their name is not listed above, they're still enrolled through Be Well NM - not Cover All DC."} %>
+    content: "If someone else in your household has private insurance through OPM, and their name is not listed above, they're still enrolled through OPM - not Cover All DC."} %>
 
 <% if notice.assisted_enrollments.present? %>
   <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-      contents: ["Be Well NM is required by federal law to be sure that people who enroll in health insurance through our system are eligible. We're also required to be sure that people who receive help paying for insurance are eligible for the help they're receiving."],
+      contents: ["OPM is required by federal law to be sure that people who enroll in health insurance through our system are eligible. We're also required to be sure that people who receive help paying for insurance are eligible for the help they're receiving."],
       heading: "Why this Change Occurred", sub_heading: '', top_margin: '5px', bottom_margin: '5px'} %>
 <% else %>
   <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-      contents: ["Be Well NM is required by federal law to be sure that people who enroll in health insurance through our system are eligible."],
+      contents: ["OPM is required by federal law to be sure that people who enroll in health insurance through our system are eligible."],
       heading: "Why this Change Occurred", sub_heading: '', top_margin: '5px', bottom_margin: '5px'} %>
 <% end %>
 
 
 <% notice.individuals.each do |member| %>
   <%= render partial: 'notices/shared/unordered_list', :locals => {listings: [
-      ["#{member.first_name} #{member.last_name}, Age #{member.age} is not eligible for private insurance through Be Well NM because of one of these reasons:",
+      ["#{member.first_name} #{member.last_name}, Age #{member.age} is not eligible for private insurance through OPM because of one of these reasons:",
          ["This person does not have an eligible immigration status.",
           "This person's immigration documents have expired.",
           "You did not submit the documents we requested to verify this person's eligibility by the deadline.  "]]]} %>
@@ -63,7 +63,7 @@
 
 <% if notice.assisted_enrollments.present? && notice.csr_enrollments.present?  %>
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-      content: "The Cover All DC plan is the same plan the people listed enrolled in through Be Well NM. It offers the same covered services."} %>
+      content: "The Cover All DC plan is the same plan the people listed enrolled in through OPM. It offers the same covered services."} %>
   <%= render partial: 'notices/shared/unordered_list', locals: {
       previous: "Some things are different:",
       listings: ["<strong>Your premium may be higher.</strong> The people listed are no longer eligible for cost savings like the advance premium tax credit, and must pay full price for coverage.", "<strong>Your annual deductible, copayments and coinsurance will be higher.</strong> Cost-sharing reductions are not available to people enrolled in coverage through Cover All DC. The people listed must now pay full price for out-of-pocket costs when they get covered services.", "<strong>You'll no longer get a Form 1095-A at tax time for those listed.</strong> Form 1095-A is the IRS form we send to show that you had health insurance."]} %>
@@ -73,10 +73,10 @@
       listings: ["<strong>Your premium may be higher.</strong> The people listed are no longer eligible for cost savings like the advance premium tax credit, and must pay full price for coverage.", "<strong>You'll no longer get a Form 1095-A at tax time for those listed.</strong> Form 1095-A is the IRS form we send to show that you had health insurance."]} %>
 <% else %>
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-      content: "The Cover All DC plan is the same plan the people listed enrolled in through Be Well NM. It offers the same covered services."} %>
+      content: "The Cover All DC plan is the same plan the people listed enrolled in through OPM. It offers the same covered services."} %>
   <%= render partial: 'notices/shared/unordered_list', locals: {
       previous: "Some things are different:",
-      listings: ["<strong>Your premium may be higher.</strong> While the people listed will still have the same plan, we have to re-start the plan. If any of the people listed now enrolled through Cover All DC had a birthday since their Be Well NM plan started, the premium may increase to reflect the age change.", "<strong>You'll no longer get a Form 1095-A at tax time for those listed.</strong> Form 1095-A is the IRS form we send to show that you had health insurance."]} %>
+      listings: ["<strong>Your premium may be higher.</strong> While the people listed will still have the same plan, we have to re-start the plan. If any of the people listed now enrolled through Cover All DC had a birthday since their OPM plan started, the premium may increase to reflect the age change.", "<strong>You'll no longer get a Form 1095-A at tax time for those listed.</strong> Form 1095-A is the IRS form we send to show that you had health insurance."]} %>
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
@@ -85,7 +85,7 @@
 
 
 <%= render partial: 'notices/shared/custom_listing', :locals => {
-    listing: "The people listed may be eligible to enroll in a plan through Be Well NM again if they submit the documents needed to verify eligibility. The list of documents we would need is included in this letter."} %>
+    listing: "The people listed may be eligible to enroll in a plan through OPM again if they submit the documents needed to verify eligibility. The list of documents we would need is included in this letter."} %>
 
 <%= render partial: 'notices/shared/custom_listing', :locals => {
     listing: "If the people listed like the plan they have, they don't need to do anything right now. Just keep paying the monthly premiums on time.  "} %>
@@ -94,7 +94,7 @@
     listing: "The people listed are eligible to change plans, but there's limited time. Login to your account at <a href='https://https://www.bewellnm.com/'>dchealthlink.com</a> to sign up for a new plan before #{(TimeKeeper.date_of_record + 60.days).strftime("%B %d, %Y")}."} %>
 
 <%= render partial: 'notices/shared/custom_listing', :locals => {
-    listing: "Get expert help choosing a new plan (at no cost to you) from a Be Well NM registered Broker. Go to <a href='https://https://www.bewellnm.com//find-expert'>dchealthlink.com/find-expert</a> to search for a Broker near you. You can also call Be Well NM if you have questions or need help."} %>
+    listing: "Get expert help choosing a new plan (at no cost to you) from a OPM registered Broker. Go to <a href='https://https://www.bewellnm.com//find-expert'>dchealthlink.com/find-expert</a> to search for a Broker near you. You can also call OPM if you have questions or need help."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
     contents: ["If you do not agree with the results, or think we made a mistake, you have the right to request an appeal. You can learn more about your rights, and how to request an appeal in the insert included with this letter."],

@@ -15,12 +15,12 @@ Dear <%= census_employee.full_name.humanize.titleize %>,
   <br/>
   Depending on the plans offered to you by your employer, you may or may not be able to automatically renew your coverage.
   If you are eligible to auto renew into coverage, the enrollment in your account will appear as “Auto Renewing”.
-  To review your coverage options through Be Well NM, you must access your online account to complete your plan selection
+  To review your coverage options through OPM, you must access your online account to complete your plan selection
   for enrollment by <%= census_employee.renewal_benefit_group_assignment.plan_year.open_enrollment_end_on.to_formatted_s %>
   for coverage effective <%= census_employee.renewal_benefit_group_assignment.plan_year.start_on.to_date.to_formatted_s %> .
   If you no longer wish to receive coverage through <%= census_employee.employer_profile.legal_name %>
   you will need to access your <%= Settings.site.short_name %> account and waive coverage for the upcoming plan year.
-  Please go to <a href="<%= Settings.site.home_url %>">Be Well NM</a> to create an account or login to your existing account to view your plan options and complete the enrollment process.
+  Please go to <a href="<%= Settings.site.home_url %>">OPM</a> to create an account or login to your existing account to view your plan options and complete the enrollment process.
   <br/>
   <br/>
   <b>
@@ -35,11 +35,11 @@ Dear <%= census_employee.full_name.humanize.titleize %>,
   <h2 style="color: #ED812A;">
     For Questions or Assistance:
   </h2>
-  You can contact Be Well NM with any questions:
+  You can contact OPM with any questions:
   <br/>
   <ul style="list-style-type:circle">
     <li>By calling 855-532-5465;</li>
-    <li>Online at <a href="<%= Settings.site.home_url %>">Be Well NM</a>; or</li>
+    <li>Online at <a href="<%= Settings.site.home_url %>">OPM</a>; or</li>
     <li>By email at employer.hbx@dc.gov.</li>
   </ul>
 </div>

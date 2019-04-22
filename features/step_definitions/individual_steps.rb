@@ -292,7 +292,7 @@ And(/I click on back to my account button$/) do
 end
 
 Then(/I should land on home page$/) do
-  expect(page).to have_content 'My Be Well NM'
+  expect(page).to have_content 'My OPM'
 end
 
 And(/I click on log out link$/) do

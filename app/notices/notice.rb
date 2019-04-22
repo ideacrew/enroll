@@ -168,7 +168,7 @@ class Notice
     body = "<br>You can download the notice by clicking this link " +
             "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(recipient.class.to_s,
               recipient.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title + "</a>"
-    message = recipient.inbox.messages.build({ subject: subject, body: body, from: 'Be Well NM' })
+    message = recipient.inbox.messages.build({ subject: subject, body: body, from: 'OPM' })
     message.save!
   end
 

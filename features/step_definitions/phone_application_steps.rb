@@ -14,7 +14,7 @@ And(/^the Admin is on the Personal Info page for the family$/) do
   find(:xpath, '//label[@for="is_applying_coverage_true"]').click
   find('.btn', text: 'CONTINUE').click
 
-  expect(page).to have_content('Thank you. Next, we need to verify if you or you and your family are eligible to enroll in coverage through Be Well NM. Please select CONTINUE.')
+  expect(page).to have_content('Thank you. Next, we need to verify if you or you and your family are eligible to enroll in coverage through OPM. Please select CONTINUE.')
   find('.btn', text: 'CONTINUE').click
 end
 

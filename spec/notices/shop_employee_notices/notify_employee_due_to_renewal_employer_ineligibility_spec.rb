@@ -22,7 +22,7 @@ RSpec.describe ShopEmployeeNotices::NotifyEmployeeDueToRenewalEmployerIneligibil
                             :notice_builder => 'ShopEmployeeNotices::NotifyEmployeeDueToRenewalEmployerIneligibility',
                             :event_name => 'notify_employee_of_renewing_employer_ineligibility',
                             :mpi_indicator => 'MPI_SHOP10066',
-                            :title => "Termination of Employer’s Health Coverage Offered through Be Well NM"})
+                            :title => "Termination of Employer’s Health Coverage Offered through OPM"})
                           }
 
     let(:valid_parmas) {{

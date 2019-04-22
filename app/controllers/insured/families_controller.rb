@@ -433,7 +433,7 @@ class Insured::FamiliesController < FamiliesController
   def notice_upload_email
     if (@person.consumer_role.present? && @person.consumer_role.can_receive_electronic_communication?) ||
       (@person.employee_roles.present? && (@person.employee_roles.map(&:contact_method) & ["Only Electronic communications", "Paper and Electronic communications"]).any?)
-      UserMailer.generic_notice_alert(@person.first_name, "You have a new message from Be Well NM", @person.work_email_or_best).deliver_now
+      UserMailer.generic_notice_alert(@person.first_name, "You have a new message from OPM", @person.work_email_or_best).deliver_now
     end
   end
 
@@ -441,7 +441,7 @@ class Insured::FamiliesController < FamiliesController
     body = "<br>You can download the notice by clicking this link " +
             "<a href=" + "#{authorized_document_download_path('Person', @person.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + subject + "</a>"
 
-    @person.inbox.messages << Message.new(subject: subject, body: body, from: 'Be Well NM')
+    @person.inbox.messages << Message.new(subject: subject, body: body, from: 'OPM')
     @person.save!
   end
 

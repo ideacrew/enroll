@@ -54,7 +54,7 @@
                  "Let us know by October 15, #{notice.coverage_year.to_i - 1 } if you need to update your household information for #{notice.coverage_year}",
                  "Review your projected eligibility results for #{notice.coverage_year}"]} %>
     <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-       contents: ["The federal government requires us to verify your household income every year to see if you’re still eligible for help paying for coverage. We do this by checking tax data from the Internal Revenue Service (IRS), but need your consent. If you do not give us permission to check IRS data, you can’t get help paying for coverage.", "If you want to continue to receive a tax credit to help pay your monthly premiums, or cost-sharing reductions that lower other health care costs in #{notice.coverage_year}, call Be Well NM as soon as possible at #{notice.hbe.phone}. Tell customer service that you want to update your IRS consent."],
+       contents: ["The federal government requires us to verify your household income every year to see if you’re still eligible for help paying for coverage. We do this by checking tax data from the Internal Revenue Service (IRS), but need your consent. If you do not give us permission to check IRS data, you can’t get help paying for coverage.", "If you want to continue to receive a tax credit to help pay your monthly premiums, or cost-sharing reductions that lower other health care costs in #{notice.coverage_year}, call OPM as soon as possible at #{notice.hbe.phone}. Tell customer service that you want to update your IRS consent."],
          heading: 'It’s Urgent that You Call Us if You Still Need Help Paying for Coverage', sub_heading: '', bottom_margin: '5px'} %>
   <% end %>
 <% end %>
@@ -65,7 +65,7 @@
 
 <% if notice.notification_type == "projected_eligibility_notice_1"%>
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-   content: "Each year, the federal government requires us to confirm that you still qualify to get coverage through Be Well NM. Please review your household information. If it’s correct, you don’t need to do anything right now. If this information needs to be updated for #{notice.coverage_year}, or if you need to add or remove someone, please let us know by October 15, #{notice.coverage_year.to_i - 1 }. To make updates, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> or call us at #{notice.hbe.phone}."} %>
+   content: "Each year, the federal government requires us to confirm that you still qualify to get coverage through OPM. Please review your household information. If it’s correct, you don’t need to do anything right now. If this information needs to be updated for #{notice.coverage_year}, or if you need to add or remove someone, please let us know by October 15, #{notice.coverage_year.to_i - 1 }. To make updates, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> or call us at #{notice.hbe.phone}."} %>
 
   <% notice.uqhp_individuals.each do |member| %>
     <%= render partial: 'notices/shared/table_for_ivlr_notices', locals: {
@@ -79,7 +79,7 @@
 
 <% if notice.notification_type == "projected_eligibility_notice_2"%>
   <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-   contents: ["Each year, the federal government requires us to confirm that you still qualify to get coverage through Be Well NM. We also need to verify any cost savings you may qualify for in #{notice.coverage_year}.","Please review your household information. If it’s correct, you don’t need to do anything right now. If this information needs to be updated for #{notice.coverage_year}, or if you need to add or remove someone, please let us know by October 15, #{notice.coverage_year.to_i - 1 }. To make updates, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> or call us at #{notice.hbe.phone}."], heading: '', sub_heading: '', bottom_margin: '5px'} %>
+   contents: ["Each year, the federal government requires us to confirm that you still qualify to get coverage through OPM. We also need to verify any cost savings you may qualify for in #{notice.coverage_year}.","Please review your household information. If it’s correct, you don’t need to do anything right now. If this information needs to be updated for #{notice.coverage_year}, or if you need to add or remove someone, please let us know by October 15, #{notice.coverage_year.to_i - 1 }. To make updates, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> or call us at #{notice.hbe.phone}."], heading: '', sub_heading: '', bottom_margin: '5px'} %>
   <% notice.individuals.each do |member| %>
     <%= render partial: 'notices/shared/table_for_ivlr_notices', locals: {
                                rows: [['Household Member:', "#{member.first_name.titleize} #{member.last_name.titleize}  Age: #{member.age}"],

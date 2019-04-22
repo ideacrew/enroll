@@ -60,7 +60,7 @@ module InvoiceHelper
     @pdf.move_cursor_to @pdf.bounds.height
     @pdf.move_cursor_to last_measured_y
 
-    @pdf.text_box "Be Well NM", :at => [address_x_pos,  @pdf.cursor]
+    @pdf.text_box "OPM", :at => [address_x_pos,  @pdf.cursor]
     @pdf.move_down lineheight_y
     @pdf.text_box "PO Box 97022", :at => [address_x_pos,  @pdf.cursor]
     @pdf.move_down lineheight_y
@@ -147,7 +147,7 @@ module InvoiceHelper
       @pdf.go_to_page(i+1)
       @pdf.font_size 9
       @pdf.bounding_box([0, @pdf.bounds.bottom + 25], :width => @pdf.bounds.width) {
-        @pdf.text_box "Questions? Call Be Well NM Customer Service at 855-532-5465, go online to http://https://www.bewellnm.com//, or contact your broker.", :at => [address_x, @pdf.bounds.height], :align => :center
+        @pdf.text_box "Questions? Call OPM Customer Service at 855-532-5465, go online to http://https://www.bewellnm.com//, or contact your broker.", :at => [address_x, @pdf.bounds.height], :align => :center
       }
     end
 
@@ -269,9 +269,9 @@ module InvoiceHelper
       @pdf.text_box "#{address.city}, #{address.state} #{address.zip}", :at => [address_x, 596]
     end
     @pdf.move_down 24
-    @pdf.text_box "Please review the billing summary. This is a consolidated bill for all your benefits through Be Well NM. Please pay the Total Amount Due.", :at => [address_x, @pdf.cursor]
+    @pdf.text_box "Please review the billing summary. This is a consolidated bill for all your benefits through OPM. Please pay the Total Amount Due.", :at => [address_x, @pdf.cursor]
     @pdf.move_down 36
-    @pdf.text_box "Since your annual employee open enrollment period is still ongoing, this invoice reflects your employees’ enrollment activity on Be Well NM as of the day before the statement date. You can view your employee enrollments in your account at any time using the Enrollment Report available in your employer account on Be Well NM. Any adjustments resulting from your employees’ enrollment changes will appear on your next monthly invoice from Be Well NM. Please pay this invoice in full.", :at => [address_x, @pdf.cursor]
+    @pdf.text_box "Since your annual employee open enrollment period is still ongoing, this invoice reflects your employees’ enrollment activity on OPM as of the day before the statement date. You can view your employee enrollments in your account at any time using the Enrollment Report available in your employer account on OPM. Any adjustments resulting from your employees’ enrollment changes will appear on your next monthly invoice from OPM. Please pay this invoice in full.", :at => [address_x, @pdf.cursor]
 
     @pdf.text_box "Payment Options", :at => [address_x, @pdf.cursor], :style => :bold
     @pdf.move_down 24
@@ -281,13 +281,13 @@ module InvoiceHelper
     @pdf.move_down 24
     @pdf.text_box "\u2022 Return the attached payment coupon with a personal, business, or cashier’s check for prompt, accurate and timely posting of your payment. Address payments to:", :at => [address_x, @pdf.cursor]
     @pdf.move_down 24
-    @pdf.text_box "Be Well NM", :at => [240, @pdf.cursor]
+    @pdf.text_box "OPM", :at => [240, @pdf.cursor]
     @pdf.move_down lineheight_y
     @pdf.text_box "PO Box 97022", :at => [240, @pdf.cursor]
     @pdf.move_down lineheight_y
     @pdf.text_box "Washington, DC 20090", :at => [240, @pdf.cursor]
     @pdf.move_down 24
-    @pdf.text_box "\u2022 Call Be Well NM Customer Service at 855-532-5465", :at => [address_x, @pdf.cursor]
+    @pdf.text_box "\u2022 Call OPM Customer Service at 855-532-5465", :at => [address_x, @pdf.cursor]
     @pdf.move_down 36
 
     @pdf.text_box "PLEASE DETACH HERE AND RETURN THE BOTTOM PORTION WITH YOUR PAYMENT", :at => [address_x, @pdf.cursor], :align => :center, :style => :bold
@@ -301,7 +301,7 @@ module InvoiceHelper
     @pdf.text_box "Amount Enclosed:", :at => [address_x, 88], :align => :center, :style => :bold
     @pdf.image cheque_amount_path, :width => 160, :at => [cheque_amount_path_x, 98]
 
-    @pdf.text_box "Be Well NM", :at => [320,  48]
+    @pdf.text_box "OPM", :at => [320,  48]
     @pdf.text_box "PO Box 97022", :at => [320,  36]
     @pdf.text_box "Washington, DC 20090", :at => [320,  24]
 
@@ -361,11 +361,11 @@ module InvoiceHelper
     end
 
     @pdf.move_down 36
-    @pdf.text_box "Please review the billing summary. This is a consolidated bill for all your benefits through Be Well NM. Please pay the Total Amount Due.", :at => [address_x, @pdf.cursor]
+    @pdf.text_box "Please review the billing summary. This is a consolidated bill for all your benefits through OPM. Please pay the Total Amount Due.", :at => [address_x, @pdf.cursor]
     @pdf.move_down 36
-    @pdf.text_box "Since your annual employee open enrollment period is still ongoing, this invoice reflects your employees’ enrollment activity on Be Well NM as of the day before the statement date You can view your employee enrollments in your account at any time using the Enrollment Report available in your employer account on Be Well NM. Any adjustments resulting from your employees’ enrollment changes will appear on your next monthly invoice from Be Well NM. Please pay this invoice in full.", :at => [address_x, @pdf.cursor]
+    @pdf.text_box "Since your annual employee open enrollment period is still ongoing, this invoice reflects your employees’ enrollment activity on OPM as of the day before the statement date You can view your employee enrollments in your account at any time using the Enrollment Report available in your employer account on OPM. Any adjustments resulting from your employees’ enrollment changes will appear on your next monthly invoice from OPM. Please pay this invoice in full.", :at => [address_x, @pdf.cursor]
     @pdf.move_down 72
-    @pdf.text_box "You will now receive a monthly invoice from Be Well NM. Payments should be directed to Be Well NM for your health insurance coverage. You may receive one or two invoices from your health insurance company related to your current coverage purchased outside of Be Well NM. If you receive additional bills directly from your current health insurance company, please pay or contact them directly. If you continue to purchase dental or vision coverage directly from a health insurance company, you will continue to pay that company directly.", :at => [address_x, @pdf.cursor]
+    @pdf.text_box "You will now receive a monthly invoice from OPM. Payments should be directed to OPM for your health insurance coverage. You may receive one or two invoices from your health insurance company related to your current coverage purchased outside of OPM. If you receive additional bills directly from your current health insurance company, please pay or contact them directly. If you continue to purchase dental or vision coverage directly from a health insurance company, you will continue to pay that company directly.", :at => [address_x, @pdf.cursor]
     @pdf.move_down 72
     @pdf.text_box "Payment Options", :at => [address_x, @pdf.cursor], :style => :bold
     @pdf.move_down 24
@@ -375,13 +375,13 @@ module InvoiceHelper
     @pdf.move_down 24
     @pdf.text_box "\u2022 Return the attached payment coupon with a personal, business, or cashier’s check for prompt, accurate and timely posting of your payment. Address payments to:", :at => [address_x, @pdf.cursor]
     @pdf.move_down 24
-    @pdf.text_box "Be Well NM", :at => [240, @pdf.cursor]
+    @pdf.text_box "OPM", :at => [240, @pdf.cursor]
     @pdf.move_down lineheight_y
     @pdf.text_box "PO Box 97022", :at => [240, @pdf.cursor]
     @pdf.move_down lineheight_y
     @pdf.text_box "Washington, DC 20090", :at => [240, @pdf.cursor]
     @pdf.move_down 24
-    @pdf.text_box "\u2022 Call Be Well NM Customer Service at 855-532-5465", :at => [address_x, @pdf.cursor]
+    @pdf.text_box "\u2022 Call OPM Customer Service at 855-532-5465", :at => [address_x, @pdf.cursor]
     @pdf.move_down 24
 
     @pdf.text_box "PLEASE DETACH HERE AND RETURN THE BOTTOM PORTION WITH YOUR PAYMENT", :at => [address_x, @pdf.cursor], :align => :center, :style => :bold
@@ -395,7 +395,7 @@ module InvoiceHelper
     @pdf.text_box "Amount Enclosed:", :at => [address_x, 88], :align => :center, :style => :bold
     @pdf.image cheque_amount_path, :width => 160, :at => [cheque_amount_path_x, 98]
 
-    @pdf.text_box "Be Well NM", :at => [320,  48]
+    @pdf.text_box "OPM", :at => [320,  48]
     @pdf.text_box "PO Box 97022", :at => [320,  36]
     @pdf.text_box "Washington, DC 20090", :at => [320,  24]
 
@@ -450,7 +450,7 @@ module InvoiceHelper
     end
 
     @pdf.move_down 72
-    @pdf.text_box "Please review the billing summary. This is a consolidated bill for all your benefits through Be Well NM. Please pay the Total Amount Due.", :at => [address_x, @pdf.cursor]
+    @pdf.text_box "Please review the billing summary. This is a consolidated bill for all your benefits through OPM. Please pay the Total Amount Due.", :at => [address_x, @pdf.cursor]
     @pdf.move_down 48
     @pdf.text_box "Payment Options", :at => [address_x, @pdf.cursor], :style => :bold
     @pdf.move_down 24
@@ -460,13 +460,13 @@ module InvoiceHelper
     @pdf.move_down 24
     @pdf.text_box "\u2022 Return the attached payment coupon with a personal, business, or cashier’s check for prompt, accurate and timely posting of your payment. Address payments to:", :at => [address_x, @pdf.cursor]
     @pdf.move_down 36
-    @pdf.text_box "Be Well NM", :at => [240, @pdf.cursor]
+    @pdf.text_box "OPM", :at => [240, @pdf.cursor]
     @pdf.move_down lineheight_y
     @pdf.text_box "PO Box 97022", :at => [240, @pdf.cursor]
     @pdf.move_down lineheight_y
     @pdf.text_box "Washington, DC 20090", :at => [240, @pdf.cursor]
     @pdf.move_down 24
-    @pdf.text_box "\u2022 Call Be Well NM Customer Service at 855-532-5465", :at => [address_x, @pdf.cursor]
+    @pdf.text_box "\u2022 Call OPM Customer Service at 855-532-5465", :at => [address_x, @pdf.cursor]
     @pdf.move_down 24
 
     @pdf.text_box "PLEASE DETACH HERE AND RETURN THE BOTTOM PORTION WITH YOUR PAYMENT", :at => [address_x, @pdf.cursor], :align => :center, :style => :bold
@@ -481,7 +481,7 @@ module InvoiceHelper
     @pdf.text_box "Amount Enclosed:", :at => [address_x, 112], :align => :center, :style => :bold
     @pdf.image cheque_amount_path, :width => 160, :at => [cheque_amount_path_x, 122]
 
-    @pdf.text_box "Be Well NM", :at => [320,  72]
+    @pdf.text_box "OPM", :at => [320,  72]
     @pdf.text_box "PO Box 97022", :at => [320,  60]
     @pdf.text_box "Washington, DC 20090", :at => [320,  48]
 

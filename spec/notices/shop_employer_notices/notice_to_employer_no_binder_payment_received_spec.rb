@@ -12,7 +12,7 @@ RSpec.describe ShopEmployerNotices::NoticeToEmployerNoBinderPaymentReceived do
                             :notice_builder => 'ShopEmployerNotices::NoticeToEmployerNoBinderPaymentReceived',
                             :mpi_indicator => 'SHOP_D063',
                             :event_name => 'initial_employer_no_binder_payment_received',
-                            :title => "NO PAYMENT FOR GROUP HEALTH COVERAGE ON Be Well NM"})
+                            :title => "NO PAYMENT FOR GROUP HEALTH COVERAGE ON OPM"})
                           }
   let(:valid_parmas) {{
       :subject => application_event.title,

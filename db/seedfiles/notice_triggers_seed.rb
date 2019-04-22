@@ -66,7 +66,7 @@ shop_notice_triggers = [
   {
     hbx_id: 'SHOP_D002',
     title: 'Employer Approval Notice',
-    description: 'Application to Offer Group Health Coverage in Be Well NM',
+    description: 'Application to Offer Group Health Coverage in OPM',
     resource_name: 'employer',
     event_name: 'initial_employer_approval',
     notice_triggers: [
@@ -87,7 +87,7 @@ shop_notice_triggers = [
   {
     hbx_id: 'DIG003',
     title: 'Employer Denial Notice',
-    description: 'Application to Offer Group Health Coverage in Be Well NM',
+    description: 'Application to Offer Group Health Coverage in OPM',
     resource_name: 'employer',
     event_name: 'initial_employer_denial',
     notice_triggers: [
@@ -108,7 +108,7 @@ shop_notice_triggers = [
   {
     hbx_id: 'DRG006',
     title: 'Plan Offerings Finalized',
-    description: 'Application to Offer Group Health Coverage in Be Well NM when an Employer publishes PlanYear',
+    description: 'Application to Offer Group Health Coverage in OPM when an Employer publishes PlanYear',
     resource_name: 'employer',
     event_name: 'planyear_renewal_3a',
     notice_triggers: [
@@ -129,7 +129,7 @@ shop_notice_triggers = [
   {
     hbx_id: 'DRG007',
     title: 'Plan Offerings Finalized',
-    description: 'Application to Offer Group Health Coverage in Be Well NM when an Employer PlanYear is force published',
+    description: 'Application to Offer Group Health Coverage in OPM when an Employer PlanYear is force published',
     resource_name: 'employer',
     event_name: 'planyear_renewal_3b',
     notice_triggers: [
@@ -194,7 +194,7 @@ shop_notice_triggers = [
 
   {
     hbx_id: 'SHOP6',
-    title: 'Welcome to Be Well NM, Group Renewal Available',
+    title: 'Welcome to OPM, Group Renewal Available',
     description: 'Renewing Your Health Insurance Coverage for Your Small Business on November 1, 2016',
     resource_name: 'employer',
     event_name: 'conversion_group_renewal',
@@ -383,7 +383,7 @@ shop_notice_triggers = [
   },
   {
     hbx_id: 'SHOP_D039',
-    title: 'Termination of Employer’s Health Coverage Offered Through Be Well NM',
+    title: 'Termination of Employer’s Health Coverage Offered Through OPM',
     description: 'This notices goes to all the renewal EEs that ER is terminated from SHOP.',
     resource_name: 'employee_role',
     event_name: 'renewal_employer_ineligibility_notice_to_employee',
@@ -425,7 +425,7 @@ shop_notice_triggers = [
   },
   {
     hbx_id: 'DAG058',
-    title: 'Ineligible for SHOP Coverage Offered through Be Well NM',
+    title: 'Ineligible for SHOP Coverage Offered through OPM',
     description: 'Employee must be notified when they are terminated from an ER roster that they are no longer eligible to enroll in coverage with that ER, effective DOT',
     resource_name: 'employee_role',
     event_name: 'employee_termination_notice',
@@ -750,7 +750,7 @@ shop_notice_triggers = [
       event_name: 'employer_broker_fired',
       notice_triggers: [
           {
-              name: 'YOU REMOVED YOUR BROKER ON Be Well NM',
+              name: 'YOU REMOVED YOUR BROKER ON OPM',
               notice_template: 'notices/shop_employer_notices/employer_broker_fired_notice',
               notice_builder: 'ShopEmployerNotices::EmployerBrokerFiredNotice',
               mpi_indicator: 'SHOP_D052',
@@ -807,7 +807,7 @@ shop_notice_triggers = [
   },
   {
     hbx_id: 'DIE040',
-    title: 'Termination of Employer’s Health Coverage Offered through Be Well NM',
+    title: 'Termination of Employer’s Health Coverage Offered through OPM',
     description: 'Notification to employees regarding their Employer’s ineligibility.',
     resource_name: 'employee_role',
     event_name: 'notify_employee_of_initial_employer_ineligibility',
@@ -912,7 +912,7 @@ shop_notice_triggers = [
   },
   {
     hbx_id: 'SHOP_D001',
-    title: 'Welcome to Be Well NM',
+    title: 'Welcome to OPM',
     description: 'ER creates an account in DC Health',
     resource_name: 'employer',
     event_name: 'employer_account_creation_notice',
@@ -933,7 +933,7 @@ shop_notice_triggers = [
   },
   {
     hbx_id: 'SHOP10066',
-    title: 'Termination of Employer’s Health Coverage Offered through Be Well NM',
+    title: 'Termination of Employer’s Health Coverage Offered through OPM',
     description: 'Notify Employees of their Employer Termination from SHOP due to ineligibility',
     resource_name: 'employee_role',
     event_name: 'notify_employee_of_renewing_employer_ineligibility',
@@ -1061,7 +1061,7 @@ shop_notice_triggers = [
    },
    {
     hbx_id: 'SHOP_D091',
-    title: 'Dental Carrier Exit from Be Well NM’s Small Business Marketplace',
+    title: 'Dental Carrier Exit from OPM’s Small Business Marketplace',
     description: 'Notify Employers of their Dental Carriers are Exiting',
     resource_name: 'employer',
     event_name: 'employer_renewal_dental_carriers_exiting_notice',
@@ -1082,7 +1082,7 @@ shop_notice_triggers = [
   },
   {
     hbx_id: 'SHOP_D092',
-    title: 'Dental Carrier Exit from Be Well NM’s Small Business Marketplace',
+    title: 'Dental Carrier Exit from OPM’s Small Business Marketplace',
     description: 'Notify Renewal Employees of dental plan carriers are exiting SHOP market',
     resource_name: 'employee_role',
     event_name: 'notify_renewal_employees_dental_carriers_exiting_shop',
@@ -1103,7 +1103,7 @@ shop_notice_triggers = [
   },
   {         
     hbx_id: 'SHOP_D064',
-    title: 'Termination of Employer’s Health Coverage Offered through Be Well NM',
+    title: 'Termination of Employer’s Health Coverage Offered through OPM',
     description: 'When an initial group misses the binder payment deadline this notice is sent to employees to let them know the group will not be offering coverage',
     resource_name: 'employee_role',
     event_name: 'notice_to_ee_that_er_plan_year_will_not_be_written',
@@ -1124,7 +1124,7 @@ shop_notice_triggers = [
   },
   {
     hbx_id: 'SHOP_D093',
-    title: 'Dental Carrier Exit from Be Well NM’s Small Business Marketplace',
+    title: 'Dental Carrier Exit from OPM’s Small Business Marketplace',
     description: 'Notify Renewal Employees of dental plan carriers are exiting SHOP market - Excludes 1/1/2018 renewal EEs',
     resource_name: 'employee_role',
     event_name: 'dental_carriers_exiting_shop_notice_to_ee',
@@ -1187,7 +1187,7 @@ shop_notice_triggers = [
   },
   {
     hbx_id: 'DIG063',
-    title: "NO PAYMENT FOR GROUP HEALTH COVERAGE ON Be Well NM",
+    title: "NO PAYMENT FOR GROUP HEALTH COVERAGE ON OPM",
     description: 'When an initial employer misses the binder payment deadline, this is sent the day after the binder payment deadline.',
     resource_name: 'employer',
     event_name: 'initial_employer_no_binder_payment_received',
@@ -1338,7 +1338,7 @@ ivl_notice_triggers = [
 
   {
     hbx_id: 'IVL_PRE_1',
-    title: 'Update your information at Be Well NM by October 15',
+    title: 'Update your information at OPM by October 15',
     description: 'Notice to be sent out to individuals with UQHP(Unassisted)',
     resource_name: 'consumer_role',
     event_name: 'projected_eligibility_notice_1',
@@ -1360,7 +1360,7 @@ ivl_notice_triggers = [
 
   {
     hbx_id: 'IVL_PRE_2',
-    title: 'Update your information at Be Well NM by October 15',
+    title: 'Update your information at OPM by October 15',
     description: 'Notice to be sent out to individuals with AQHP(Assisted)',
     resource_name: 'consumer_role',
     event_name: 'projected_eligibility_notice_2',
@@ -1620,7 +1620,7 @@ ivl_notice_triggers = [
   {
     hbx_id: 'IVL_ELA',
     title: 'ACTION REQUIRED - HEALTH COVERAGE ELIGIBILITY',
-    description: 'Notice will be sent to all the individuals eligible for coverage through Be Well NM',
+    description: 'Notice will be sent to all the individuals eligible for coverage through OPM',
     resource_name: 'consumer_role',
     event_name: 'eligibility_notice',
     notice_triggers: [
@@ -1640,7 +1640,7 @@ ivl_notice_triggers = [
   },
   {
     hbx_id: 'IVL_NEL',
-    title: 'IMPORTANT NOTICE - INELIGIBLE FOR COVERAGE THROUGH Be Well NM',
+    title: 'IMPORTANT NOTICE - INELIGIBLE FOR COVERAGE THROUGH OPM',
     description: 'Notice will be sent to the household if everyone in the household is ineligible',
     resource_name: 'consumer_role',
     event_name: 'ineligibility_notice',
@@ -1748,7 +1748,7 @@ ivl_notice_triggers = [
 
   {
     hbx_id: 'IVL_CDC',
-    title: 'Your Insurance through Be Well NM Has Changed to Cover All DC',
+    title: 'Your Insurance through OPM Has Changed to Cover All DC',
     description: 'This is an Transition Notice and is sent for people who are moved to Coverall DC',
     resource_name: 'consumer_role',
     event_name: 'ivl_to_coverall_transition_notice',
@@ -1770,8 +1770,8 @@ ivl_notice_triggers = [
 
   {
     hbx_id: 'IVL_DCH',
-    title: 'Your Insurance through Cover All DC Has Changed to Be Well NM',
-    description: 'This is an Transition Notice and is sent for people who are moved to Be Well NM',
+    title: 'Your Insurance through Cover All DC Has Changed to OPM',
+    description: 'This is an Transition Notice and is sent for people who are moved to OPM',
     resource_name: 'consumer_role',
     event_name: 'coverall_to_ivl_transition_notice',
     notice_triggers: [
