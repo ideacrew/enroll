@@ -2,7 +2,11 @@
   <%= render partial: 'insured/families/waived_coverage_widget', locals: { read_only: read_only || disable_make_changes_button?(hbx_enrollment), hbx_enrollment: hbx_enrollment } %>
 <% else %>
 <% plan = hbx_enrollment.plan %>
-<div class="module hbx-enrollment-panel panel panel-default">
+
+<% status_enrolled = HbxEnrollment::ENROLLED_STATUSES.include?(hbx_enrollment.aasm_state) %>
+<% hidden_enrollment_css_class = status_enrolled == false ? "hidden" : nil %>
+<% non_enrolled_status_enrollment_css_class = status_enrolled == false ? "non_enrolled_enrollment" : nil %>
+<div class="module hbx-enrollment-panel panel panel-default <%= non_enrolled_status_enrollment_css_class %> <%= hidden_enrollment_css_class %>">
   <div class="panel-heading vertically-aligned-row">
     <h3 class="no-buffer">
       <%= hbx_enrollment.coverage_year %> <%= plan.coverage_kind %> Coverage
@@ -200,3 +204,30 @@
 </div>
 </div>
 <% end %>
+
+
+<script>
+  var nonEnrolledStatusEnrollmentPanels = document.getElementsByClassName("non_enrolled_enrollment");
+  var enrollmentToggleCheckbox = document.getElementById("display_all_enrollments");
+  function toggleDisplayEnrollments(event) {
+    if (event.target.checked) {
+      for (var i = 0; i < nonEnrolledStatusEnrollmentPanels.length; i++) {
+        nonEnrolledStatusEnrollmentPanels[i].classList.remove("hidden");
+      }
+    } else {
+        for (var i = 0; i < nonEnrolledStatusEnrollmentPanels.length; i++) {
+        nonEnrolledStatusEnrollmentPanels[i].classList.add("hidden");
+      }
+    }
+  };
+  // For when family home page loaded through clicking off of the families index page
+  if (enrollmentToggleCheckbox != null || enrollmentToggleCheckbox != undefined) {
+    enrollmentToggleCheckbox.addEventListener('click', toggleDisplayEnrollments);
+  };
+  // For when families home page is refreshed when user on it
+  document.addEventListener("DOMContentLoaded", function() {
+    var enrollmentToggleCheckbox = document.getElementById("display_all_enrollments");
+    enrollmentToggleCheckbox.addEventListener('click', toggleDisplayEnrollments);
+  })
+
+</script>

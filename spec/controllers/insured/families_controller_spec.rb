@@ -21,6 +21,21 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       get :home, {:family => family.id}
       expect(response).to be_redirect
     end
+
+    context "HBX admin variables to show all enrollments" do
+      let(:user_with_hbx_staff_role) { FactoryGirl.create(:user, :with_family, :with_hbx_staff_role) }
+      it "should assign all_hbx_enrollments_for_admin variable if hbx admin user" do
+        sign_in(user_with_hbx_staff_role)
+        get :home, {:family => family.id.to_s}
+        expect(assigns.keys).to include("all_hbx_enrollments_for_admin")
+      end
+
+      it "should not assign all_hbx_enrollments_for_admin for non hbx admin user" do
+        sign_in(user)
+        get :home, {:family => family.id.to_s}
+        expect(assigns.keys).to_not include("all_hbx_enrollments_for_admin")
+      end
+    end
   end
 
   context "set_current_user  as agent" do
