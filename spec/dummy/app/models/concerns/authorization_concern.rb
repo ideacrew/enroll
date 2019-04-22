@@ -11,6 +11,7 @@ module AuthorizationConcern
     field :authentication_token
 
     ## Recoverable
+    embeds_many :security_question_responses
     field :reset_password_token,   type: String
     field :reset_password_sent_at, type: Time
     field :identity_confirmed_token, type: String

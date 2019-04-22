@@ -8,4 +8,5 @@ class PremiumTable
   field :start_on, type: Date
   field :end_on, type: Date
   field :cost, type: Float
+  field :rating_area, type: String
 end
