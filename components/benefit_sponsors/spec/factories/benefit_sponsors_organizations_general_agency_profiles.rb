@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :benefit_sponsors_organizations_general_agency_profile, class: '::BenefitSponsors::Organizations::GeneralAgencyProfile' do
     entity_kind "s_corporation"
     market_kind "shop"
@@ -17,9 +17,9 @@ FactoryGirl.define do
     after(:build) do |profile, evaluator|
       if profile.organization.blank?
         if evaluator.assigned_site
-          profile.organization = FactoryGirl.build(:benefit_sponsors_organizations_general_organization, legal_name: evaluator.legal_name, site: evaluator.assigned_site )
+          profile.organization = FactoryBot.build(:benefit_sponsors_organizations_general_organization, legal_name: evaluator.legal_name, site: evaluator.assigned_site )
         else
-          profile.organization = FactoryGirl.build(:benefit_sponsors_organizations_general_organization, :with_site)
+          profile.organization = FactoryBot.build(:benefit_sponsors_organizations_general_organization, :with_site)
         end
       end
     end
@@ -45,7 +45,7 @@ FactoryGirl.define do
 
     trait :with_staff do
       after :create do |benefit_sponsors_organizations_general_agency_profile, evaluator|
-        FactoryGirl.create(:general_agency_staff_role,
+        FactoryBot.create(:general_agency_staff_role,
           benefit_sponsors_general_agency_profile_id: benefit_sponsors_organizations_general_agency_profile.id)
       end
     end

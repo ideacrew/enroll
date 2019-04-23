@@ -18,12 +18,12 @@ module BenefitSponsors
     # let!(:broker_role) { FactoryBot.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person) }
 
     let!(:broker_role) { FactoryBot.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
-    # let(:person) { FactoryGirl.create(:person, emails:[FactoryGirl.build(:email, kind:'work')],employer_staff_roles:[active_employer_staff_role],broker_role:broker_role) }
-    # let(:user) { FactoryGirl.create(:user, :person => person)}
+    # let(:person) { FactoryBot.create(:person, emails:[FactoryBot.build(:email, kind:'work')],employer_staff_roles:[active_employer_staff_role],broker_role:broker_role) }
+    # let(:user) { FactoryBot.create(:user, :person => person)}
     let!(:general_agency) {FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, site: site)}
     let!(:general_agency_profile) {general_agency.profiles.first }
     let(:general_role) {FactoryBot.create(:general_agency_staff_role, aasm_state: "active", benefit_sponsors_general_agency_profile_id: general_agency_profile.id)}
-    let(:person) { FactoryBot.create(:person, emails:[FactoryGirl.build(:email, kind:'work')],employer_staff_roles:[active_employer_staff_role],broker_role:broker_role, general_role: general_role) }
+    let(:person) { FactoryBot.create(:person, emails:[FactoryBot.build(:email, kind:'work')],employer_staff_roles:[active_employer_staff_role],broker_role:broker_role, general_role: general_role) }
     let(:user) { FactoryBot.create(:user, :person => person)}
 
     def agency(type)
@@ -114,8 +114,8 @@ module BenefitSponsors
     
     describe "has_general_agency_staff_role_for_profile?" do
       context "check for general agency staff role" do
-        let(:general_agency_person) { FactoryGirl.create(:person, emails:[FactoryGirl.build(:email, kind:'work')],employer_staff_roles:[active_employer_staff_role]) }
-        let(:general_agency_user) { FactoryGirl.create(:user, :person => general_agency_person)}
+        let(:general_agency_person) { FactoryBot.create(:person, emails:[FactoryBot.build(:email, kind:'work')],employer_staff_roles:[active_employer_staff_role]) }
+        let(:general_agency_user) { FactoryBot.create(:user, :person => general_agency_person)}
         it "has general_agency_staff_role" do
           expect(subject.new.has_general_agency_staff_role_for_profile?(general_agency_user,general_agency_profile)).to eq false
         end
