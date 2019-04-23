@@ -3,13 +3,15 @@ module Employers::EmployerHelper
     @family.try(:census_employee).try(:address).try(:kind) || 'home'
   end
 
-  def employee_state_format(employee_state=nil, termination_date=nil)
+  def employee_state_format(census_employee=nil, employee_state=nil, termination_date=nil)
     if employee_state == "employee_termination_pending" && termination_date.present?
       return "Termination Pending " + termination_date.to_s
     elsif employee_state == 'employee_role_linked'
       return 'Account Linked'
     elsif employee_state == 'eligible'
       return 'No Account Linked'
+    elsif employee_state == "cobra_linked" && census_employee.has_cobra_hbx_enrollment?
+      return "Cobra Enrolled"
     else
       return employee_state.humanize
     end
@@ -118,10 +120,10 @@ module Employers::EmployerHelper
     profile_and_service_area_pairs = CarrierProfile.carrier_profile_service_area_pairs_for(employer_profile, start_on)
     query = profile_and_service_area_pairs.select { |pair| pair.first == carrier_profile.id }
 
-    if coverage_type == ".dental" && benefit_group.dental_plan_option_kind == "single_plan"
+    if coverage_type == "dental" && benefit_group.dental_plan_option_kind == "single_plan"
       plan_count = benefit_group.elected_dental_plan_ids.count
       "#{plan_count} Plans"
-    elsif coverage_type == ".dental" && benefit_group.dental_plan_option_kind == "single_carrier"
+    elsif coverage_type == "dental" && benefit_group.dental_plan_option_kind == "single_carrier"
       plan_count = Plan.shop_dental_by_active_year(reference_plan.active_year).by_carrier_profile(reference_plan.carrier_profile).count
       "All #{reference_plan.carrier_profile.legal_name} Plans (#{plan_count})"
     else
@@ -268,9 +270,9 @@ module Employers::EmployerHelper
 
   def selected_benefit_plan(plan)
     case plan
-      when 'single_carrier', 'single_issuer' then fetch_plan_title_for_single_carrier
-      when 'metal_level' then fetch_plan_title_for_metal_level
-      when 'single_plan', 'sole_source', 'single_product' then 'A Single Plan'
+      when :single_issuer then 'One Carrier'
+      when :metal_level then 'One Level'
+      when :single_product then 'A Single Plan'
     end
   end
 

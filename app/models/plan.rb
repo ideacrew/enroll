@@ -490,6 +490,21 @@ class Plan
 
   class << self
 
+    def has_rates_for_all_carriers?(start_on_date=nil)
+      date = start_on_date || PlanYear.calculate_start_on_dates[0]
+      return false if date.blank?
+
+      Rails.cache.fetch("#{date.to_s}", expires_in: 2.days) do
+        Plan.collection.aggregate([
+          {"$match" => {"active_year" => date.year}},
+          {"$match" => {"coverage_kind" => "health"}},
+          {"$unwind" => '$premium_tables'},
+          {"$match" => {"premium_tables.start_on" => { "$lte" => date}}},
+          {"$match" => {"premium_tables.end_on" => { "$gte" => date}}},
+        ],:allow_disk_use => true).to_a.present?
+      end
+    end
+
     def monthly_premium(plan_year, hios_id, insured_age, coverage_begin_date)
       result = []
       if plan_year.to_s == coverage_begin_date.to_date.year.to_s

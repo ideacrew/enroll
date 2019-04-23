@@ -4,11 +4,16 @@ class CensusEmployee < CensusMember
   include Searchable
   include Autocomplete
   include Config::AcaModelConcern
+  include BenefitSponsors::Concerns::Observable
+  include ::BenefitSponsors::ModelEvents::CensusEmployee
   
   require 'roo'
   
   EMPLOYMENT_ACTIVE_STATES = %w(eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked cobra_eligible cobra_linked cobra_termination_pending)
   EMPLOYMENT_TERMINATED_STATES = %w(employment_terminated cobra_terminated rehired)
+  ELIGIBLE_STATES = %w(eligible newly_designated_eligible cobra_eligible employee_termination_pending cobra_termination_pending)
+  PENDING_STATES = %w(employee_termination_pending cobra_termination_pending)
+  EMPLOYMENT_ACTIVE_ONLY = %w(eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked)
 
   field :is_business_owner, type: Boolean, default: false
   field :hired_on, type: Date
@@ -35,6 +40,12 @@ class CensusEmployee < CensusMember
 
   belongs_to :benefit_sponsorship, class_name: "BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
 
+  embeds_many :workflow_state_transitions, as: :transitional
+
+  after_save :notify_on_save
+
+  add_observer ::BenefitSponsors::Observers::CensusEmployeeObserver.new, [:notifications_send]
+
   accepts_nested_attributes_for :census_dependents, :benefit_group_assignments
 
   scope :by_benefit_package_and_assignment_on,->(benefit_package, effective_on, is_active) {
@@ -44,9 +55,20 @@ class CensusEmployee < CensusMember
       }})
   }
 
+  scope :benefit_application_assigned,     ->(benefit_application) { where(:"benefit_group_assignments.benefit_package_id".in => benefit_application.benefit_packages.pluck(:_id)) }
+  scope :benefit_application_unassigned,   ->(benefit_application) { where(:"benefit_group_assignments.benefit_package_id".nin => benefit_application.benefit_packages.pluck(:_id)) }
+
+
   scope :non_terminated,     ->{ where(:aasm_state.nin => EMPLOYMENT_TERMINATED_STATES) }
   scope :active,             ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_STATES) }
+  scope :pending,           ->{ any_in(aasm_state: PENDING_STATES) }
   scope :non_business_owner, ->{ where(is_business_owner: false) }
+  scope :benefit_application_assigned,     ->(benefit_application) { where(:"benefit_group_assignments.benefit_package_id".in => benefit_application.benefit_packages.pluck(:_id)) }
+  scope :benefit_application_unassigned,   ->(benefit_application) { where(:"benefit_group_assignments.benefit_package_id".nin => benefit_application.benefit_packages.pluck(:_id)) }
+
+  scope :eligible_without_term_pending, ->{ any_in(aasm_state: (ELIGIBLE_STATES - PENDING_STATES)) }
+  scope :active_alone,      ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_ONLY) }
+
 
   def initialize(*args)
     super(*args)
@@ -119,6 +141,304 @@ class CensusEmployee < CensusMember
       transitions from: :cobra_terminated, to: :cobra_linked, :guard => :has_employee_role_linked?
       transitions from: :cobra_terminated, to: :cobra_eligible
     end
+  end
 
+  def is_active?
+    EMPLOYMENT_ACTIVE_STATES.include?(aasm_state)
+  end
+
+  def employer_profile=(new_employer_profile)
+    raise ArgumentError.new("expected EmployerProfile") unless new_employer_profile.class.to_s.match(/EmployerProfile/)
+      self.benefit_sponsors_employer_profile_id = new_employer_profile._id
+    @employer_profile = new_employer_profile
+  end
+
+  def employer_profile
+    return @employer_profile if defined? @employer_profile
+    return @employer_profile = BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.find(self.employer_profile_id) if (self.employer_profile_id.present? && self.benefit_sponsors_employer_profile_id.blank?)
+    return nil if self.benefit_sponsorship.blank? # Need this for is_case_old?
+    @employer_profile = self.benefit_sponsorship.organization.employer_profile
+  end
+
+  def is_case_old?(employer_profile=nil)
+    employer_profile = employer_profile || self.employer_profile
+    employer_profile.present? && employer_profile.is_a?(BenefitSponsors::Organizations::AcaShopCcaEmployerProfile)
+  end
+
+  def employee_role
+    return nil if self.employee_role_id.nil?
+    return @employee_role if @employee_role
+    @employee_role = EmployeeRole.find(self.employee_role_id)
+  end
+
+  def benefit_sponsorship=(benefit_sponsorship)
+    return "expected Benefit Sponsorship" unless defined?(BenefitSponsors::BenefitSponsorships::BenefitSponsorship)
+    self.benefit_sponsorship_id = benefit_sponsorship.id
+    self.benefit_sponsors_employer_profile_id = benefit_sponsorship.profile.id
+    @benefit_sponsorship = benefit_sponsorship
+  end
+
+  def qle_30_day_eligible?
+    is_inactive? && (TimeKeeper.date_of_record - employment_terminated_on).to_i < 30
+  end
+
+  def active_benefit_group_assignment
+    benefit_group_assignments.detect { |assignment| assignment.is_active? }
+  end
+
+  def renewal_benefit_group_assignment
+    return benefit_group_assignments.order_by(:'updated_at'.desc).detect{ |assignment| assignment.plan_year && assignment.plan_year.is_renewing? } if is_case_old?
+    benefit_group_assignments.order_by(:'updated_at'.desc).detect{ |assignment| assignment.benefit_application && assignment.benefit_application.is_renewing? }
+  end
+
+  def inactive_benefit_group_assignments
+    benefit_group_assignments.reject(&:is_active?)
+  end
+
+  def waived?
+    bga = renewal_benefit_group_assignment || active_benefit_group_assignment
+    return bga.present? ? bga.aasm_state == 'coverage_waived' : false
+  end
+
+  def active_benefit_group_assignment=(benefit_package_id)
+    benefit_application = BenefitSponsors::BenefitApplications::BenefitApplication.where(
+      :"benefit_packages._id" => benefit_package_id
+    ).first || employer_profile.active_benefit_sponsorship.current_benefit_application
+
+    if benefit_application.present?
+      benefit_packages = benefit_package_id.present? ? [benefit_application.benefit_packages.find(benefit_package_id)] : benefit_application.benefit_packages
+    end
+
+    if benefit_packages.present? && (active_benefit_group_assignment.blank? || !benefit_packages.map(&:id).include?(active_benefit_group_assignment.benefit_package.id))
+      find_or_create_benefit_group_assignment(benefit_packages)
+    end
+  end
+
+  def renewal_benefit_group_assignment=(renewal_package_id)
+    benefit_application = BenefitSponsors::BenefitApplications::BenefitApplication.where(
+      :"benefit_packages._id" => renewal_package_id
+    ).first || employer_profile.active_benefit_sponsorship.renewal_benefit_application
+
+    if benefit_application.present?
+      benefit_packages = renewal_package_id.present? ? [benefit_application.benefit_packages.find(renewal_package_id)] : benefit_application.benefit_packages
+    end
+
+    if benefit_packages.present? && (renewal_benefit_group_assignment.blank? || !benefit_packages.map(&:id).include?(renewal_benefit_group_assignment.benefit_package.id))
+      add_renew_benefit_group_assignment(benefit_packages)
+    end
+  end
+
+  def find_or_create_benefit_group_assignment(benefit_packages)
+    if benefit_packages.present?
+      bg_assignments = benefit_group_assignments.where(:benefit_package_id.in => benefit_packages.map(&:_id)).order_by(:'created_at'.desc)
+
+      if bg_assignments.present?
+        valid_bg_assignment = bg_assignments.where(:aasm_state.ne => 'initialized').first || bg_assignments.first
+        valid_bg_assignment.make_active
+      else
+        add_benefit_group_assignment(benefit_packages.first, benefit_packages.first.benefit_application.start_on)
+      end
+    end
+  end
+
+  def add_benefit_group_assignment(new_benefit_group, start_on = nil)
+    raise ArgumentError, "expected BenefitGroup" unless new_benefit_group.is_a?(BenefitSponsors::BenefitPackages::BenefitPackage)
+    reset_active_benefit_group_assignments(new_benefit_group)
+    benefit_group_assignments << BenefitGroupAssignment.new(benefit_group: new_benefit_group, start_on: (start_on || new_benefit_group.start_on))
+  end
+
+  def reset_active_benefit_group_assignments(new_benefit_group)
+    benefit_group_assignments.select { |assignment| assignment.is_active? }.each do |benefit_group_assignment|
+      benefit_group_assignment.end_on = [new_benefit_group.start_on - 1.day, benefit_group_assignment.start_on].max
+      benefit_group_assignment.update_attributes(is_active: false)
+    end
+  end
+
+  def published_benefit_group_assignment
+    benefit_group_assignments.detect do |benefit_group_assignment|
+      benefit_group_assignment.benefit_group.is_active && benefit_group_assignment.benefit_group.plan_year.employees_are_matchable?
+    end
+  end
+
+  def active_and_renewing_benefit_group_assignments
+    result = []
+    result << active_benefit_group_assignment if !active_benefit_group_assignment.nil?
+    result << renewal_benefit_group_assignment if !renewal_benefit_group_assignment.nil?
+    result
+  end
+
+  def coverage_effective_on(package = nil)
+  package = possible_benefit_package if (package.blank? || package.is_conversion?) # cautious
+  if package.present?
+    
+    effective_on_date = package.effective_on_for(hired_on)
+    if newly_designated_eligible? || newly_designated_linked?
+      effective_on_date = [effective_on_date, newly_eligible_earlist_eligible_date].max
+    end
+
+    effective_on_date
+  end
+end
+
+  def new_hire_enrollment_period
+    start_on = [hired_on, TimeKeeper.date_according_to_exchange_at(created_at)].max
+    end_on = earliest_eligible_date.present? ? [start_on + 30.days, earliest_eligible_date].max : (start_on + 30.days)
+    (start_on.beginning_of_day)..(end_on.end_of_day)
+  end
+
+  def earliest_eligible_date
+    benefit_group_assignment = renewal_benefit_group_assignment || active_benefit_group_assignment
+    
+    if benefit_group_assignment
+      benefit_group_assignment.benefit_group.eligible_on(hired_on)
+    end
+  end
+
+  def terminate_employment(employment_terminated_on)
+    begin
+      terminate_employment!(employment_terminated_on)
+    rescue => e
+      Rails.logger.error { e }
+      false
+    else
+      self
+    end
+  end
+
+  def terminate_employee_enrollments
+    term_eligible_active_enrollments = active_benefit_group_enrollments.show_enrollments_sans_canceled.non_terminated if active_benefit_group_enrollments.present?
+    term_eligible_renewal_enrollments = renewal_benefit_group_enrollments.show_enrollments_sans_canceled.non_terminated if renewal_benefit_group_enrollments.present?
+    enrollments = (Array.wrap(term_eligible_active_enrollments) + Array.wrap(term_eligible_renewal_enrollments)).compact
+
+    enrollments.each do |enrollment|
+      if enrollment.effective_on > self.coverage_terminated_on
+        enrollment.cancel_coverage!(self.coverage_terminated_on) if enrollment.may_cancel_coverage?
+      else
+        if self.coverage_terminated_on < TimeKeeper.date_of_record
+          enrollment.terminate_coverage!(self.coverage_terminated_on) if enrollment.may_terminate_coverage?
+        else
+          enrollment.schedule_coverage_termination!(self.coverage_terminated_on) if enrollment.may_schedule_coverage_termination?
+        end
+      end
+    end
+  end
+
+
+  def terminate_employment!(employment_terminated_on)
+    if may_schedule_employee_termination?
+      self.employment_terminated_on = employment_terminated_on
+      self.coverage_terminated_on = earliest_coverage_termination_on(employment_terminated_on)
+    end
+
+    if employment_terminated_on < TimeKeeper.date_of_record
+      if may_terminate_employee_role?
+        terminate_employee_role!
+        # perform_employer_plan_year_count
+      else
+        message = "Error terminating employment: unable to terminate employee role for: #{self.full_name}"
+        Rails.logger.error { message }
+        raise CensusEmployeeError, message
+      end
+    else # Schedule Future Terminations as employment_terminated_on is in the future
+      schedule_employee_termination! if may_schedule_employee_termination?
+    end
+    terminate_employee_enrollments
+    self
+  end
+
+  def earliest_coverage_termination_on(employment_termination_date, submitted_date = TimeKeeper.date_of_record)
+    employment_based_date = employment_termination_date.end_of_month
+    submitted_based_date  = TimeKeeper.date_of_record.
+                              advance(Settings.
+                                          aca.
+                                          shop_market.
+                                          retroactive_coverage_termination_maximum
+                                          .to_hash
+                                        ).end_of_month
+
+    [employment_based_date, submitted_based_date].max
+  end
+
+  def record_transition
+    self.workflow_state_transitions << WorkflowStateTransition.new(
+      from_state: aasm.from_state,
+      to_state: aasm.to_state,
+      event: aasm.current_event
+    )
+  end
+
+  def active_benefit_group
+    if active_benefit_group_assignment.present?
+      active_benefit_group_assignment.benefit_package
+    end
+  end
+
+  def published_benefit_group
+    published_benefit_group_assignment.benefit_group if published_benefit_group_assignment
+  end
+
+  def renewal_published_benefit_group
+    if renewal_benefit_group_assignment && renewal_benefit_group_assignment.benefit_group.plan_year.employees_are_matchable?
+      renewal_benefit_group_assignment.benefit_group
+    end
+  end
+
+  def active_benefit_group_enrollments
+    return nil if employee_role.blank?
+    family = Family.where({
+      "households.hbx_enrollments" => {:"$elemMatch" => {
+        :"sponsored_benefit_package_id".in => [active_benefit_group.try(:id)].compact,
+        :"employee_role_id" => self.employee_role_id}
+      }
+    }).first
+
+    return [] if family.blank?
+
+    family.active_household.hbx_enrollments.where(
+      :"sponsored_benefit_package_id".in => [active_benefit_group.try(:id)].compact,
+      :"employee_role_id" => self.employee_role_id,
+      :"aasm_state".ne => "shopping"
+    )
+  end
+
+  def renewal_benefit_group_enrollments
+    return nil if employee_role.blank?
+    family = Family.where({
+      "households.hbx_enrollments" => {:"$elemMatch" => {
+        :"sponsored_benefit_package_id".in => [renewal_published_benefit_group.try(:id)].compact,
+        :"employee_role_id" => self.employee_role_id }
+      }
+    }).first
+
+    return [] if family.blank?
+
+    family.active_household.hbx_enrollments.where(
+      :"sponsored_benefit_package_id".in => [renewal_published_benefit_group.try(:id)].compact,
+      :"employee_role_id" => self.employee_role_id,
+      :"aasm_state".ne => "shopping"
+    )
+  end
+
+  def benefit_package_assignment_on(effective_date)
+    benefit_group_assignments.effective_on(effective_date).active.first
+  end
+
+  def assign_to_benefit_package(benefit_package, assignment_on)
+    return if benefit_package.blank?
+
+    benefit_group_assignments.create(
+        start_on: assignment_on,
+        end_on:   benefit_package.effective_period.max,
+        benefit_package: benefit_package,
+        is_active: false
+    )
+  end
+
+  def active_benefit_group_assignment
+    benefit_group_assignments.detect { |assignment| assignment.is_active? }
+  end
+
+  def renewal_benefit_group_assignment
+    benefit_group_assignments.order_by(:'updated_at'.desc).detect{ |assignment| assignment.benefit_application && assignment.benefit_application.is_renewing? }
   end
 end

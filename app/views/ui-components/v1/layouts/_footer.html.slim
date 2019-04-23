@@ -9,11 +9,17 @@ footer.footer-wrapper#footer-uic
           li 
             a.call-customer-service href="tel:#{contact_center_phone_number}"
               span
-                i.fa.fa-phone.fa-lg 
+                i.fas.fa-phone.fa-lg
                 | &nbsp; 
                 = contact_center_phone_number
+          li
+            = mail_to contact_center_email_address, target: '_blank' do
+              span
+                i.fas.fa-envelope.fa-lg
+                | &nbsp;
+                = Settings.contact_center.email_address
           li 
             = link_to site_faqs_url, target: '_blank' do
-              i.fa.fa-question.fa-lg
+              i.fas.fa-question.fa-lg
               | &nbsp; 
               | FAQs

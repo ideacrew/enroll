@@ -1,4 +1,6 @@
 require 'rails_helper'
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 describe Family, "given a primary applicant and a dependent" do
   let(:person) { Person.new }
@@ -240,20 +242,23 @@ describe Family, type: :model, dbclean: :after_each do
     end
 
     context "when a broker account is created for the Family" do
-      let(:broker_agency_profile) { FactoryGirl.build(:broker_agency_profile) }
+      let(:broker_agency_profile) { FactoryGirl.build(:benefit_sponsors_organizations_broker_agency_profile)}
       let(:writing_agent)         { FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile.id) }
-      let(:broker_agency_profile2) { FactoryGirl.build(:broker_agency_profile) }
+      let(:broker_agency_profile2) { FactoryGirl.create(:benefit_sponsors_organizations_broker_agency_profile)}
       let(:writing_agent2)         { FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile2.id) }
+
       it "adds a broker agency account" do
         carols_family.hire_broker_agency(writing_agent.id)
         expect(carols_family.broker_agency_accounts.length).to eq(1)
       end
+
       it "adding twice only gives two broker agency accounts" do
         carols_family.hire_broker_agency(writing_agent.id)
         carols_family.hire_broker_agency(writing_agent.id)
         expect(carols_family.broker_agency_accounts.unscoped.length).to eq(2)
         expect(Family.by_writing_agent_id(writing_agent.id).count).to eq(1)
       end
+
       it "new broker adds a broker_agency_account" do
         carols_family.hire_broker_agency(writing_agent.id)
         carols_family.hire_broker_agency(writing_agent2.id)
@@ -262,12 +267,14 @@ describe Family, type: :model, dbclean: :after_each do
         expect(carols_family.broker_agency_accounts[1].is_active).to be_truthy
         expect(carols_family.broker_agency_accounts[1].writing_agent_id).to eq(writing_agent2.id)
       end
+
       it "carol changes brokers" do
         carols_family.hire_broker_agency(writing_agent.id)
         carols_family.hire_broker_agency(writing_agent2.id)
         expect(Family.by_writing_agent_id(writing_agent.id).count).to eq(0)
         expect(Family.by_writing_agent_id(writing_agent2.id).count).to eq(1)
       end
+
       it "writing_agent is popular" do
         carols_family.hire_broker_agency(writing_agent.id)
         carols_family.hire_broker_agency(writing_agent2.id)
@@ -276,6 +283,7 @@ describe Family, type: :model, dbclean: :after_each do
         expect(Family.by_writing_agent_id(writing_agent.id).count).to eq(2)
         expect(Family.by_writing_agent_id(writing_agent2.id).count).to eq(0)
       end
+
       it "broker agency profile is popular" do
         carols_family.hire_broker_agency(writing_agent.id)
         carols_family.hire_broker_agency(writing_agent2.id)
@@ -284,9 +292,7 @@ describe Family, type: :model, dbclean: :after_each do
         expect(Family.by_broker_agency_profile_id(broker_agency_profile.id).count).to eq(2)
         expect(Family.by_broker_agency_profile_id(broker_agency_profile2.id).count).to eq(0)
       end
-
     end
-
   end
 
   ## TODO: Add method
@@ -808,34 +814,13 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
   end
 
   context "one shop open enrollment period" do
-    let!(:benefit_group) do
-      bg = FactoryGirl.create(:benefit_group)
-      py = bg.plan_year
-      py.open_enrollment_start_on = TimeKeeper.date_of_record - 5.days
-      py.open_enrollment_end_on = TimeKeeper.date_of_record + 5.days
-      py.aasm_state = "published"
-      py.save
-      bg
-    end
-    let(:plan_year) { benefit_group.plan_year }
-    let(:employer_profile) { plan_year.employer_profile }
-    let!(:employee_role) { FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile) }
-    let!(:census_employee) do
-      ce = FactoryGirl.create(:census_employee,
-        first_name: person.first_name,
-        last_name: person.last_name,
-        dob: person.dob,
-        gender: person.gender,
-        hired_on: TimeKeeper.date_of_record - 5.years,
-        ssn: person.ssn,
-        address: person.addresses.first,
-        email: person.emails.first,
-        employer_profile: employer_profile
-      )
-      employee_role.census_employee = ce
-      employee_role.save
-      ce
-    end
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup initial benefit application"
+
+    let(:person) {FactoryGirl.create(:person)}
+    let!(:benefit_group) { current_benefit_package }
+    let!(:census_employee) { FactoryGirl.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile, benefit_group: current_benefit_package ) }
+    let!(:employee_role) { FactoryGirl.create(:employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id) }
     let!(:benefit_group_assignment) { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee)}
 
     it "should be in open enrollment" do
@@ -869,64 +854,18 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
   end
 
   context "multiple shop open enrollment periods" do
-    let!(:benefit_group) do
-      bg = FactoryGirl.create(:benefit_group)
-      py = bg.plan_year
-      py.open_enrollment_start_on = TimeKeeper.date_of_record - 5.days
-      py.open_enrollment_end_on = TimeKeeper.date_of_record + 5.days
-      py.aasm_state = "published"
-      py.save
-      bg
-    end
-    let(:plan_year) { benefit_group.plan_year }
-    let(:employer_profile) { plan_year.employer_profile }
-    let!(:employee_role) { FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile) }
-    let!(:census_employee) do
-      ce = FactoryGirl.create(:census_employee,
-        first_name: person.first_name,
-        last_name: person.last_name,
-        dob: person.dob,
-        gender: person.gender,
-        hired_on: TimeKeeper.date_of_record - 5.years,
-        ssn: person.ssn,
-        address: person.addresses.first,
-        email: person.emails.first,
-        employer_profile: employer_profile
-      )
-      employee_role.census_employee = ce
-      employee_role.save
-      ce
-    end
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup initial benefit application"
+
+    let(:person) {FactoryGirl.create(:person)}
+    let!(:benefit_group) { current_benefit_package }
+    let!(:census_employee) { FactoryGirl.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile, benefit_group: benefit_group ) }
+    let!(:employee_role) { FactoryGirl.create(:employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id) }
     let!(:benefit_group_assignment) { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee)}
 
-    let!(:benefit_group2) do
-      bg = FactoryGirl.create(:benefit_group)
-      py = bg.plan_year
-      py.open_enrollment_start_on = TimeKeeper.date_of_record - 5.days
-      py.open_enrollment_end_on = TimeKeeper.date_of_record + 5.days
-      py.aasm_state = "published"
-      py.save
-      bg
-    end
-    let(:plan_year2) { benefit_group2.plan_year }
-    let(:employer_profile2) { plan_year2.employer_profile }
-    let!(:employee_role2) { FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile2) }
-    let!(:census_employee2) do
-      ce = FactoryGirl.create(:census_employee,
-        first_name: person.first_name,
-        last_name: person.last_name,
-        dob: person.dob,
-        gender: person.gender,
-        hired_on: TimeKeeper.date_of_record - 5.years,
-        ssn: person.ssn,
-        address: person.addresses.first,
-        email: person.emails.first,
-        employer_profile: employer_profile2
-      )
-      employee_role2.census_employee = ce
-      employee_role2.save
-      ce
-    end
+    let!(:benefit_group2) { current_benefit_package }
+    let!(:census_employee2) { FactoryGirl.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile, benefit_group: benefit_group2 ) }
+    let!(:employee_role2) { FactoryGirl.create(:employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee2.id) }
     let!(:benefit_group_assignment2) { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group2, census_employee: census_employee2)}
 
     it "should be in open enrollment" do
@@ -983,37 +922,15 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
   end
 
   context "one shop and one ivl open enrollment period" do
-    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :single_open_enrollment_coverage_period) }
 
-    let!(:benefit_group) do
-      bg = FactoryGirl.create(:benefit_group)
-      py = bg.plan_year
-      py.open_enrollment_start_on = TimeKeeper.date_of_record - 5.days
-      py.open_enrollment_end_on = TimeKeeper.date_of_record + 5.days
-      py.aasm_state = "published"
-      py.save
-      bg
-    end
-    let(:plan_year) { benefit_group.plan_year }
-    let(:employer_profile) { plan_year.employer_profile }
-    let!(:employee_role) { FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile) }
-    let!(:census_employee) do
-      ce = FactoryGirl.create(:census_employee,
-        first_name: person.first_name,
-        last_name: person.last_name,
-        dob: person.dob,
-        gender: person.gender,
-        hired_on: TimeKeeper.date_of_record - 5.years,
-        ssn: person.ssn,
-        address: person.addresses.first,
-        email: person.emails.first,
-        employer_profile: employer_profile
-      )
-      employee_role.census_employee = ce
-      employee_role.save
-      ce
-    end
-    let!(:benefit_group_assignment) { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup initial benefit application"
+    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :single_open_enrollment_coverage_period) }
+    let(:person) {FactoryGirl.create(:person)}
+    let!(:benefit_group) { current_benefit_package }
+    let!(:census_employee) { FactoryGirl.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile, benefit_group: benefit_group ) }
+    let!(:employee_role) { FactoryGirl.create(:employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id) }
+    let!(:benefit_group_assignment) { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee)}
 
     it "should be in open enrollment" do
       expect(family.is_under_open_enrollment?).to be_truthy
@@ -1041,66 +958,19 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
   end
 
   context "multiple shop and one ivl open enrollment periods" do
-    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :single_open_enrollment_coverage_period) }
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup initial benefit application"
 
-    let!(:benefit_group) do
-      bg = FactoryGirl.create(:benefit_group)
-      py = bg.plan_year
-      py.open_enrollment_start_on = TimeKeeper.date_of_record - 5.days
-      py.open_enrollment_end_on = TimeKeeper.date_of_record + 5.days
-      py.aasm_state = "published"
-      py.save
-      bg
-    end
-    let(:plan_year) { benefit_group.plan_year }
-    let(:employer_profile) { plan_year.employer_profile }
-    let!(:employee_role) { FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile) }
-    let!(:census_employee) do
-      ce = FactoryGirl.create(:census_employee,
-        first_name: person.first_name,
-        last_name: person.last_name,
-        dob: person.dob,
-        gender: person.gender,
-        hired_on: TimeKeeper.date_of_record - 5.years,
-        ssn: person.ssn,
-        address: person.addresses.first,
-        email: person.emails.first,
-        employer_profile: employer_profile
-      )
-      employee_role.census_employee = ce
-      employee_role.save
-      ce
-    end
+    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :single_open_enrollment_coverage_period) }
+    let(:person) {FactoryGirl.create(:person)}
+    let!(:benefit_group) { current_benefit_package }
+    let!(:census_employee) { FactoryGirl.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile, benefit_group: benefit_group ) }
+    let!(:employee_role) { FactoryGirl.create(:employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id) }
     let!(:benefit_group_assignment) { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee)}
 
-    let!(:benefit_group2) do
-      bg = FactoryGirl.create(:benefit_group)
-      py = bg.plan_year
-      py.open_enrollment_start_on = TimeKeeper.date_of_record - 5.days
-      py.open_enrollment_end_on = TimeKeeper.date_of_record + 5.days
-      py.aasm_state = "published"
-      py.save
-      bg
-    end
-    let(:plan_year2) { benefit_group2.plan_year }
-    let(:employer_profile2) { plan_year2.employer_profile }
-    let!(:employee_role2) { FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile2) }
-    let!(:census_employee2) do
-      ce = FactoryGirl.create(:census_employee,
-        first_name: person.first_name,
-        last_name: person.last_name,
-        dob: person.dob,
-        gender: person.gender,
-        hired_on: TimeKeeper.date_of_record - 5.years,
-        ssn: person.ssn,
-        address: person.addresses.first,
-        email: person.emails.first,
-        employer_profile: employer_profile2
-      )
-      employee_role2.census_employee = ce
-      employee_role2.save
-      ce
-    end
+    let!(:benefit_group2) { current_benefit_package }
+    let!(:census_employee2) { FactoryGirl.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile, benefit_group: benefit_group2 ) }
+    let!(:employee_role2) { FactoryGirl.create(:employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee2.id) }
     let!(:benefit_group_assignment2) { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group2, census_employee: census_employee2)}
 
     it "should be in open enrollment" do

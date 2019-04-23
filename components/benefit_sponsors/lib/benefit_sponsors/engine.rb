@@ -5,6 +5,7 @@ require 'virtus'
 require 'devise'
 require 'pundit'
 require 'language_list'
+require 'interactor'
 
 module BenefitSponsors
   class Engine < ::Rails::Engine

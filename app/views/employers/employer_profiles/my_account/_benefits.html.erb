@@ -1,5 +1,11 @@
+<% flag = rates_available?(@employer_profile) %>
 <div class="benefits-tab">
   <div class="row">
+    <% if flag == 'blocking' %>
+    <div class="alert alert-info" role="alert">
+      <strong><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <%= Settings.site.late_rates_message %></strong>
+    </div>
+    <% end %>
     <div class="col-xs-8">
       <h1>Benefits - Coverage You Offer</h1>
     </div>
@@ -62,7 +68,7 @@
         <%= pundit_span EmployerProfile, :updateable? %>
             <% if plan_year.draft? || plan_year.renewing_draft? %>
                 <% if plan_year.overlapping_published_plan_years.empty? %>
-                    <%= link_to "Publish Plan Year &nbsp;<i class='fa fa-users' aria-hidden='true'></i>".html_safe, employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-default pull-right" %>
+                    <%= link_to "Publish Plan Year &nbsp;<i class='fa fa-users' aria-hidden='true'></i>".html_safe, employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-default pull-right #{rates_available?(@employer_profile, plan_year.start_on)}" %>
 
                 <% end %>
                 <%= link_to "Edit Plan Year &nbsp;<i class='fas fa-pencil-alt' aria-hidden='true'></i>".html_safe, edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-default pull-right mrz"%>
@@ -76,6 +82,50 @@
         </span>
       </div>
     </div>
+
+    <% if draft_plan_year?(plan_year) %>
+      <div class="panel benefitgroup col-xs-12" style="min-height:226px">
+        <div class="col-xs-1">
+          <i class="make-default draft fa fa-star fa-3x" data-toggle="tooltip" style="margin-top:30px"></i>
+        </div>
+        <div class="col-xs-11">
+          <section class="col-xs-10">
+            <header class="row">
+              <h3 class="title">
+                <%= plan_year.start_on.to_date.year%>
+                Plan Year (<%= plan_year.aasm_state.to_s.humanize.titleize %>)
+              </h3>
+            </header>
+          </section>
+          <div class="col-xs-2">
+
+          </div>
+          <table>
+            <tr>
+              <td>
+                <header>Coverage Year</header>
+              </td>
+              <td>
+                <p>
+                  <%= plan_year.start_on.to_date.to_formatted_s :long_ordinal %> - <%= plan_year.end_on.to_date.to_formatted_s :long_ordinal %>
+                </p>
+              </td>
+              <% if plan_year.terminated_on %>
+                <td>
+                    <header>Terminated On</header>
+                </td>
+                <td>
+                   <p>
+                      <%= plan_year.terminated_on.to_date.to_formatted_s :long_ordinal %>
+                   </p>
+                </td>
+              <%end%>
+            </tr>
+          </table>
+        </div>
+      </div>
+    <% end %>
+    
     <% plan_year.benefit_groups.each_with_index do |bg, bi| %>
     <% bg.build_estimated_composite_rates %>
     <div class="benefit-group">
@@ -461,7 +511,7 @@
         groups of employees.
       </p>
       <%=pundit_span EmployerProfile, :updateable?%>
-        <%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile, tab: 'benefits'), class: "btn btn-primary btn-lg", data: {loading_text: "Loading..."} %>
+        <%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile, tab: 'benefits'), class: "btn btn-primary btn-lg #{flag}", data: {loading_text: "Loading..."} %>
       </span>
     <% end %>
   </div>

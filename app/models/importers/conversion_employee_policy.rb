@@ -43,6 +43,17 @@ module Importers
       end
     end
 
+    def find_plan
+      return @plan unless @plan.nil?
+      return nil if hios_id.blank?
+      clean_hios = hios_id.strip
+      corrected_hios_id = (clean_hios.end_with?("-01") ? clean_hios : clean_hios + "-01")
+      @plan = Plan.where({
+        active_year: plan_year.to_i,
+        hios_id: corrected_hios_id
+      }).first
+    end
+
     def find_employee
       return @found_employee unless @found_employee.nil?
       return nil if subscriber_ssn.blank?
@@ -60,15 +71,12 @@ module Importers
       @found_employee = non_terminated_employees.sort_by(&:hired_on).last
     end
 
-    def find_plan 
-      return @plan unless @plan.nil?
-      return nil if hios_id.blank?
-      clean_hios = hios_id.strip
-      corrected_hios_id = (clean_hios.end_with?("-01") ? clean_hios : clean_hios + "-01")
-      @plan = Plan.where({
-        active_year: plan_year.to_i,
-        hios_id: corrected_hios_id
-      }).first
+    def current_benefit_application(employer)
+      if (employer.organization.active_benefit_sponsorship.source_kind.to_s == "conversion")
+        employer.benefit_applications.where(:aasm_state => :imported).first
+      else
+        employer.benefit_applications.where(:aasm_state => :active).first
+      end
     end
 
     def find_employer
@@ -114,18 +122,7 @@ module Importers
       end
 
       existing_person = existing_people.first
-
-      if existing_person.has_active_employer_staff_role?
-        #only in new model employer staff role already exist
-        # Future needs to handle one person with 2  different staff roles
-        staff_role_id = existing_person.user.id if existing_person.user
-        existing_person.unset(:user_id)
-        merge_staff.set(:user_id => staff_role_id) if staff_role_id
-        existing_person.destroy!
-        merge_staff.save!
-        return true
-      end
-
+      
       merge_poc_and_employee_person(merge_staff, existing_person, employer)
       true
     end
@@ -152,6 +149,14 @@ module Importers
       end
     end
 
+    # for normal :conversion, :mid_plan_year_conversion we use :imported plan year
+    # but while creating :dental sponsored_benefit we will add it on :active benefit_application
+    def fetch_application_based_sponsored_kind
+      employer = find_employer
+      benefit_application = sponsored_benefit_kind == :dental ? employer.active_benefit_application : current_benefit_application(employer)
+      benefit_application
+    end
+
     def save
       return false unless valid?
       employer = find_employer      
@@ -163,7 +168,8 @@ module Importers
       end
 
       plan = find_plan
-      rating_area_id = employer.active_benefit_application.recorded_rating_area_id
+      benefit_application = fetch_application_based_sponsored_kind
+      rating_area_id = benefit_application.recorded_rating_area_id
       bga = find_benefit_group_assignment
 
       # add when benefit_group_assignments not added to employees
@@ -209,12 +215,17 @@ module Importers
           return false
         end
 
-        cancel_other_enrollments_for_bga(bga)
+        cancel_other_enrollments_for_bga(bga, sponsored_benefit_kind)
         house_hold = family.active_household
         coverage_household = house_hold.immediate_family_coverage_household
 
         benefit_package   = bga.benefit_package
-        sponsored_benefit = benefit_package.sponsored_benefit_for('health')
+
+
+        sponsored_benefit = benefit_package.sponsored_benefits.unscoped.detect{|sponsored_benefit|
+          sponsored_benefit.product_kind == sponsored_benefit_kind
+        }
+
         # for regular conversions we are setting flag to true and mid_year_conversions to false
         set_external_enrollments = @mid_year_conversion ? false : true
 
@@ -228,6 +239,7 @@ module Importers
           external_enrollment: set_external_enrollments
           })
 
+        en.external_enrollment = set_external_enrollments
         en.hbx_enrollment_members.each do |mem|
           mem.eligibility_date = start_date
           mem.coverage_start_on = start_date
@@ -242,7 +254,7 @@ module Importers
 
         en_attributes = {
           aasm_state: en.effective_on > TimeKeeper.date_of_record ? "coverage_selected" : "coverage_enrolled",
-          coverage_kind: 'health'
+          coverage_kind: sponsored_benefit_kind
         }
 
         unless employer.is_a?(EmployerProfile)
@@ -262,8 +274,10 @@ module Importers
       end
     end
 
-    def cancel_other_enrollments_for_bga(bga)
-      enrollments = HbxEnrollment.find_enrollments_by_benefit_group_assignment(bga)
+    def cancel_other_enrollments_for_bga(bga, sponsored_benefit_kind)
+      all_enrollments = HbxEnrollment.find_enrollments_by_benefit_group_assignment(bga)
+      enrollments = all_enrollments.select { |enrollment| enrollment.coverage_kind == sponsored_benefit_kind }
+
       enrollments.each do |en|
         en.hbx_enrollment_members.each do |hen|
            hen.coverage_end_on = hen.coverage_start_on

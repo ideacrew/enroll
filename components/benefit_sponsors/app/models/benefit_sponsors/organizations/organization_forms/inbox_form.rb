@@ -6,14 +6,12 @@ module BenefitSponsors
 
       attribute :access_key, String
       attribute :messages, Array[OrganizationForms::MessageForm]
+      attribute :unread_messages_count, Integer
 
       def persisted?
         false
       end
 
-      def unread_messages
-        [] # TODO
-      end
     end
   end
 end

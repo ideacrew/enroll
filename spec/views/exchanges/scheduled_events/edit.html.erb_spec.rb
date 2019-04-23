@@ -4,8 +4,8 @@ describe "exchanges/scheduled_events/show.html.erb" do
   let(:user) { FactoryGirl.create(:user, :person => person) }
   let(:scheduled_event) { FactoryGirl.create(:scheduled_event) }
   before :each do
-  	assign(:scheduled_event, scheduled_event)
-  	allow(view).to receive(:policy_helper).and_return(double("Policy", view_admin_tabs?: true))
+    assign(:scheduled_event, scheduled_event)
+    allow(view).to receive(:policy_helper).and_return(double("Policy", view_admin_tabs?: true))
     sign_in user
   end
 
@@ -13,7 +13,7 @@ describe "exchanges/scheduled_events/show.html.erb" do
     def view.scheduled_event
       @scheduled_event ||= ScheduledEvent.find(params[:id])
     end
-  	render template: "exchanges/scheduled_events/_edit.html.erb"
+    render template: "exchanges/scheduled_events/_edit.html.erb"
     expect(rendered).to have_text(/Holiday/)
     expect(rendered).to have_text(/Offset rule/)
   end

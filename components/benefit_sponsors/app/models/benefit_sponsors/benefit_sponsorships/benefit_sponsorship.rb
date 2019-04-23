@@ -81,6 +81,7 @@ module BenefitSponsors
     delegate :sic_code,     :sic_code=,     to: :profile, allow_nil: true
     delegate :primary_office_location,      to: :profile, allow_nil: true
     delegate :enforce_employer_attestation, to: :benefit_market
+    delegate :legal_name,   :fein,          to: :organization
 
     belongs_to  :organization,
       inverse_of: :benefit_sponsorships,
@@ -138,7 +139,7 @@ module BenefitSponsors
 
     scope :may_end_open_enrollment?, -> (compare_date = TimeKeeper.date_of_record) {
       where(:benefit_applications => {
-        :$elemMatch => {:"open_enrollment_period.max".lt => compare_date, :aasm_state => :enrollment_open }}
+        :$elemMatch => {:"open_enrollment_period.max".lt => compare_date, :"aasm_state".in => [:enrollment_open, :enrollment_extended] }}
       )
     }
 
@@ -364,9 +365,18 @@ module BenefitSponsors
       ["ineligible", "terminated"].exclude?(aasm_state)
     end
 
+    def benefit_market_catalog_for(effective_date)
+      benefit_market.benefit_market_catalog_effective_on(effective_date)
+    end
+
     def benefit_sponsor_catalog_for(recorded_service_areas, effective_date)
-      benefit_market_catalog = benefit_market.benefit_market_catalog_effective_on(effective_date)
+      benefit_market_catalog = benefit_market_catalog_for(effective_date)
       benefit_market_catalog.benefit_sponsor_catalog_for(service_areas: recorded_service_areas, effective_date: effective_date)
+    end
+
+    def open_enrollment_period_for(effective_date)
+      benefit_market_catalog = benefit_market_catalog_for(effective_date)
+      benefit_market_catalog.open_enrollment_period_on(effective_date)
     end
 
     def published_benefit_application
@@ -375,11 +385,35 @@ module BenefitSponsors
 
     def submitted_benefit_application
       # renewing_published_plan_year || active_plan_year ||
-      published_benefit_application
+      published_benefit_application || imported_benefit_application
+    end
+
+    def imported_benefit_application
+      benefit_applications.order_by(:"updated_at".desc).imported.first if is_conversion?
     end
 
     def benefit_applications_by(ids)
       benefit_applications.find(ids)
+    end
+
+    # Open enrollment can be extended only for recent applications (i.e, upto 6 months old)
+    # Benefit Application's with overlapping coverage can't be extended
+    def oe_extendable_benefit_applications
+      benefit_applications.where(:"effective_period.min".gte => TimeKeeper.date_of_record.beginning_of_month).select do |benefit_application|
+        benefit_application.may_extend_open_enrollment? && !overlapping_coverage_exists?(benefit_application)
+      end
+    end
+
+    def overlapping_coverage_exists?(benefit_application)
+      benefit_applications.approved_and_terminated
+       .by_overlapping_effective_period(benefit_application.effective_period)
+       .reject{|result| result == benefit_application}.present?
+    end
+
+    def oe_extended_applications
+      benefit_applications.select do |application| 
+        application.enrollment_extended? && TimeKeeper.date_of_record > open_enrollment_period_for(application.effective_date).max
+      end
     end
 
     def benefit_application_successors_for(benefit_application)
@@ -414,7 +448,7 @@ module BenefitSponsors
     end
 
     def most_recent_benefit_application
-      published_benefit_application || benefit_applications.order_by(:"updated_at".desc).non_imported.first
+      published_benefit_application || benefit_applications.order(updated_at: :desc).non_terminated_non_imported.first || benefit_applications.order_by(:"updated_at".desc).non_imported.first
     end
 
     def renewing_submitted_benefit_application # TODO -recheck
@@ -447,10 +481,10 @@ module BenefitSponsors
     end
 
     def carriers_dropped_for(product_kind)
-      active_benefit_application.issuers_offered_for(product_kind) - renewal_benefit_application.issuers_offered_for(product_kind)
+      renewal_benefit_application.predecessor.issuers_offered_for(product_kind) - renewal_benefit_application.issuers_offered_for(product_kind)
     end
+    
     ####
-
 
     # Workflow for self service
     aasm do
@@ -514,7 +548,7 @@ module BenefitSponsors
         transitions from: [:applicant, :initial_application_approved,
                           :initial_application_under_review, :initial_application_denied,
                           :initial_enrollment_closed, :initial_enrollment_eligible, :binder_reversed,
-                          :initial_enrollment_ineligible], to: :applicant
+                          :initial_enrollment_ineligible, :terminated], to: :applicant
       end
 
       event :terminate do
@@ -587,14 +621,39 @@ module BenefitSponsors
         deny_initial_enrollment_eligibility! if may_deny_initial_enrollment_eligibility?
       when :active
         begin_coverage! if may_begin_coverage?
-      when :expired
-        cancel! if may_cancel?
+      when :terminated
+        terminate! if may_terminate?
       when :canceled
-        cancel! if (may_cancel? && aasm.current_event == :activate_enrollment!)
+        cancel! if may_cancel?
       when :draft
         revert_to_applicant! if may_revert_to_applicant?
+      when :enrollment_extended
+        extend_open_enrollment(aasm)
       end
+    end
 
+    def extend_open_enrollment(aasm)
+      if aasm.from_state == :enrollment_ineligible || aasm.from_state == :enrollment_closed
+        if initial_enrollment_ineligible? || initial_enrollment_closed?
+          update_state_without_event(:initial_enrollment_open)
+        end
+      else
+        if transition = workflow_state_transitions[0]
+          if transition.from_state == 'initial_enrollment_ineligible' && transition.to_state == 'applicant'
+            update_state_without_event(:initial_enrollment_open)
+          end
+
+          if transition.from_state == 'active' && transition.to_state == 'applicant'
+            update_state_without_event(:active)
+          end
+        end
+      end
+    end
+
+    def update_state_without_event(new_state)
+      old_state = self.aasm_state
+      self.update(aasm_state: new_state)
+      self.workflow_state_transitions.create(from_state: old_state, to_state: new_state)
     end
 
     def is_conversion?

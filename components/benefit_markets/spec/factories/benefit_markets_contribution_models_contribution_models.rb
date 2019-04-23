@@ -15,20 +15,18 @@ FactoryGirl.define do
           ),
         BenefitMarkets::ContributionModels::MemberRelationship.new(
           relationship_name: "spouse",
-          relationship_kinds: ["spouse", "life_partner"]
+          relationship_kinds: ["spouse"]
           ),
         BenefitMarkets::ContributionModels::MemberRelationship.new(
-          relationship_name: "dependent",
-          age_threshold: 26,
-          age_comparison: :<,
-          relationship_kinds: ["child", "adopted_child","foster_child","stepchild", "ward"]
+          relationship_name: "domestic_partner",
+          relationship_kinds: ["life_partner", "domestic_partner"]
           ),
         BenefitMarkets::ContributionModels::MemberRelationship.new(
           relationship_name: "dependent",
           age_threshold: 26,
           age_comparison: :>=,
           disability_qualifier: true,
-          relationship_kinds: ["child", "adopted_child","foster_child","stepchild", "ward"]
+          relationship_kinds: ["child", "adopted_child", "foster_child", "stepchild", "ward"]
           )
       ]
 
@@ -59,9 +57,22 @@ FactoryGirl.define do
           ])
 
       contribution_model.contribution_units << build(:benefit_markets_contribution_models_fixed_percent_contribution_unit, 
-        name: "dependent",
-        display_name: "Dependent",
+        name: "domestic_partner",
+        display_name: "Domestic Partner",
         order: 2,
+        default_contribution_factor: 0.25,
+        member_relationship_maps: [
+          BenefitMarkets::ContributionModels::MemberRelationshipMap.new({
+            relationship_name: "domestic_partner",
+            operator: :>=,
+            count: 1
+            })
+          ])
+
+      contribution_model.contribution_units << build(:benefit_markets_contribution_models_fixed_percent_contribution_unit, 
+        name: "dependent",
+        display_name: "Child Under 26",
+        order: 3,
         default_contribution_factor: 0.25,
         member_relationship_maps: [
           BenefitMarkets::ContributionModels::MemberRelationshipMap.new({
@@ -70,6 +81,10 @@ FactoryGirl.define do
             count: 1
             })
           ])
+    end
+
+    trait :for_health_single_product do
+      # toDo
     end
   end
 end

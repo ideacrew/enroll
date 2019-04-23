@@ -1,7 +1,7 @@
 .hide#dchbx_enroll_date_of_record = TimeKeeper.date_of_record.iso8601
 
 #header-uic
-  nav.navbar.navbar-default.navbar-static-top
+  nav class=("navbar navbar-default navbar-static-top #{"pre_prod_nav_color" if ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true'}")
     .container
       //Brand and toggle get grouped for better mobile display
       .navbar-header
@@ -19,7 +19,7 @@
               span.header-text = l10n(".call_customer_service")
               br
               span
-                i.fa.fa-phone.mr-1
+                i.fas.fa-phone.mr-1
               strong = Settings.contact_center.phone_number
           - if signed_in?
             li

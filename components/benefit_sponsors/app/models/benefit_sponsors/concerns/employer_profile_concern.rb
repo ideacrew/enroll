@@ -182,20 +182,22 @@ module BenefitSponsors
 
       def billing_benefit_application(billing_date=nil)
         billing_report_date = billing_date.is_a?(Date) ? billing_date : TimeKeeper.date_of_record.next_month
-        valid_applications = benefit_applications.non_draft.non_imported
-        application = valid_applications.effective_period_cover(billing_report_date).first
-        if billing_date.blank? && application.blank?
+        valid_applications = benefit_applications.non_draft.non_canceled
 
-          application = valid_applications.future_effective_date(billing_report_date).open_enrollment_period_cover.first
-          return application, application.start_on if application.present?
-
-          application = valid_applications.effective_period_cover.first
-          return application, TimeKeeper.date_of_record if application.present?
-
-          application = valid_applications.future_effective_date(billing_report_date).first
-          return application, application.start_on if application.present?
+        if billing_date.present?
+          application = valid_applications.effective_period_cover(billing_date).first
+          return application, billing_date
         end
-        return application, billing_report_date
+
+        application = valid_applications.future_effective_date(billing_report_date).first
+        return application, application.start_on.to_date if application.present?
+
+        application = valid_applications.effective_period_cover(billing_report_date).first
+        return application, billing_report_date if application.present?
+
+        application = valid_applications.effective_period_cover.first
+        return application, TimeKeeper.date_of_record if application.present?
+        return nil, nil
       end
 
       # Deprecate below methods in future
@@ -263,7 +265,7 @@ module BenefitSponsors
       end
 
       def current_month_invoice
-        documents.select{ |document| document.subject == 'invoice' && document.date.strftime("%Y%m") == TimeKeeper.date_of_record.strftime("%Y%m")}
+        documents.select{ |document| ["invoice", "initial_invoice"].include?(document.subject) && document.date.strftime("%Y%m") == TimeKeeper.date_of_record.strftime("%Y%m")}
       end
 
       def find_plan_year_by_effective_date(target_date)
@@ -271,7 +273,7 @@ module BenefitSponsors
           (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(target_date)
         end
 
-        (benefit_application.present? && benefit_application.external_benefit_application?) ? renewing_published_benefit_application : benefit_application
+        (benefit_application.present? && benefit_application.imported?) ? renewing_published_benefit_application : benefit_application
       end
 
       def enrollments_for_billing(billing_date = nil)

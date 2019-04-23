@@ -217,13 +217,17 @@ class Family
                                                     :"households.hbx_enrollments.aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::WAIVED_STATUSES),
                                                     :"households.hbx_enrollments.sponsored_benefit_package_id" => benefit_package._id
                                                   ) }
+  scope :all_enrollments_by_benefit_package,    ->(benefit_package) { unscoped.where(
+                                                    :"households.hbx_enrollments" => {
+                                                      :$elemMatch => { :sponsored_benefit_package_id => benefit_package._id, :aasm_state.ne => :shopping }
+                                                  }) }
 
-  scope :all_enrollments_by_benefit_sponsorship_id,   ->(benefit_sponsorship_id){where(:"households.hbx_enrollments.benefit_sponsorship_id" => benefit_sponsorship_id) }
+  scope :all_enrollments_by_benefit_sponsorship_id,  ->(benefit_sponsorship_id){where(:"households.hbx_enrollments.benefit_sponsorship_id" => benefit_sponsorship_id) }
   scope :enrolled_under_benefit_application,    ->(benefit_application) { unscoped.where(
                                                     :"households.hbx_enrollments" => {
                                                       :$elemMatch => {
                                                         :sponsored_benefit_package_id => {"$in" => benefit_application.benefit_packages.pluck(:_id) },
-                                                        :aasm_state => {"$nin" => %w(coverage_canceled shopping) },
+                                                        :aasm_state => {"$nin" => %w(coverage_canceled shopping coverage_terminated) },
                                                         :coverage_kind => "health"
                                                       }
                                                   })}
@@ -265,11 +269,11 @@ class Family
     enrolled_plans = active_household.hbx_enrollments.enrolled_and_renewing.by_coverage_kind(enrollment.coverage_kind)
 
     if enrollment.is_shop?
-      bg_ids = enrollment.benefit_group.plan_year.benefit_groups.map(&:id)
-      enrolled_plans = enrolled_plans.where(:benefit_group_id.in => bg_ids)
+      bg_ids = enrollment.sponsored_benefit_package.benefit_application.benefit_packages.map(&:id)
+      enrolled_plans = enrolled_plans.where(:sponsored_benefit_package_id.in => bg_ids)
     end
 
-    enrolled_plans.collect(&:plan_id)
+    enrolled_plans.collect(&:product_id)
   end
 
   def enrollments

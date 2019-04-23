@@ -1,10 +1,33 @@
 module ApplicationHelper
 
+  def can_employee_shop?(date)
+    return false if date.blank?
+    date = Date.strptime(date.to_s,"%m/%d/%Y")
+    Plan.has_rates_for_all_carriers?(date) == false
+  end
+
+  def rates_available?(employer, date=nil)
+    employer.applicant? && !Plan.has_rates_for_all_carriers?(date) ? "blocking" : ""
+  end
+
+  def product_rates_available?(benefit_sponsorship, date=nil)
+    date = Date.strptime(date.to_s, '%m/%d/%Y') if date.present?
+    return false if benefit_sponsorship.present? && benefit_sponsorship.active_benefit_application.present?
+    date = date || BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new.calculate_start_on_dates[0]
+    benefit_sponsorship.applicant? && BenefitMarkets::Forms::ProductForm.for_new(date).fetch_results.is_late_rate
+  end
+
   def deductible_display(hbx_enrollment, plan)
     if hbx_enrollment.hbx_enrollment_members.size > 1
       plan.family_deductible.split("|").last.squish
     else
       plan.deductible
+    end
+  end
+
+  def draft_plan_year?(plan_year)
+    if plan_year.aasm_state == "draft" && plan_year.try(:benefit_groups).empty?
+      plan_year
     end
   end
 
@@ -407,6 +430,22 @@ module ApplicationHelper
     carrier_name = carrier_logo(plan)
     image_tag("logo/carrier/#{carrier_name.parameterize.underscore}.jpg", width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
   end
+      
+  def digest_logos
+    carrier_logo_hash = Hash.new(carriers:{})
+    carriers = ::BenefitSponsors::Organizations::Organization.issuer_profiles
+    carriers.each do |car|
+      if Rails.env == "production"
+        image = "logo/carrier/#{car.legal_name.parameterize.underscore}.jpg"
+        digest_image = "/assets/#{Rails.application.assets.find_asset(image).digest_path}"
+        carrier_logo_hash[car.legal_name] = digest_image
+      else
+        image = "/assets/logo/carrier/#{car.legal_name.parameterize.underscore}.jpg"
+        carrier_logo_hash[car.legal_name] = image
+      end
+    end
+    carrier_logo_hash
+  end
 
   def display_carrier_pdf_logo(plan, options = {:width => 50})
     carrier_name = carrier_logo(plan)
@@ -587,7 +626,7 @@ module ApplicationHelper
       return plan.metal_level.to_s.titleize if plan.coverage_kind.to_s == "health"
       (plan.active_year == 2015 ? plan.metal_level : plan.dental_level).try(:to_s).try(:titleize) || ""
     else
-      return plan.metal_level_kind.to_s.titleize if plan.kind == :health
+      return plan.metal_level_kind.to_s.titleize if plan.kind.to_s == "health"
       # TODO Update this for dental plans
       (plan.active_year == 2015 ? plan.metal_level_kind : plan.dental_level).try(:to_s).try(:titleize) || ""
     end
@@ -728,4 +767,5 @@ module ApplicationHelper
       member_group_hash
     end.to_json
   end
+
 end

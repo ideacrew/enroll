@@ -10,19 +10,20 @@ module BenefitSponsors
       end
 
       def call(klass_name, date)
+        end_date = (benefit_application.effective_period.min > date.end_of_month) ? benefit_application.effective_period.min : date.end_of_month
         klass_name.collection.aggregate([
           {"$match" => { "households.hbx_enrollments" => {
             "$elemMatch" => {
             "sponsored_benefit_id" => @sponsored_benefit.id,
             "aasm_state" => { "$in" => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES)},
-            "effective_on" =>  {"$lte" => date.end_of_month, "$gte" => benefit_application.effective_period.min}
+            "effective_on" =>  {"$lte" => end_date, "$gte" => benefit_application.effective_period.min}
           }}}},
           {"$unwind" => "$households"},
           {"$unwind" => "$households.hbx_enrollments"},
           {"$match" => {
             "households.hbx_enrollments.sponsored_benefit_id" => @sponsored_benefit.id,
             "households.hbx_enrollments.aasm_state" => { "$in" => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES)},
-            "households.hbx_enrollments.effective_on" =>  {"$lte" => date.end_of_month, "$gte" => benefit_application.effective_period.min},
+            "households.hbx_enrollments.effective_on" =>  {"$lte" => end_date, "$gte" => benefit_application.effective_period.min},
             "$or" => [
              {"households.hbx_enrollments.terminated_on" => {"$eq" => nil} },
              {"households.hbx_enrollments.terminated_on" => {"$gte" => date.end_of_month}}

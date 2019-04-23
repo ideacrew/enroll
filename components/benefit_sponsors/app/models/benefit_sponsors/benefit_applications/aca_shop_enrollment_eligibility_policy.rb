@@ -38,23 +38,34 @@ module BenefitSponsors
             success:  ->(benefit_application){"validated successfully"},
             fail:     ->(benefit_application){"At least one member must be eligible to enroll" }
 
-    business_policy :passes_open_enrollment_period_policy,
-            rules: [:minimum_participation_rule, :non_business_owner_enrollment_count, :minimum_eligible_member_count]
+    business_policy :enrollment_elgibility_policy,
+                    rules: [:minimum_participation_rule, :non_business_owner_enrollment_count, :minimum_eligible_member_count]
 
+    # For 1/1 effective date minimum participation rule does not apply
+    # 1+ non-owner rule does apply
+    business_policy :non_minimum_participation_enrollment_eligiblity_policy,
+                    rules: [:non_business_owner_enrollment_count, :minimum_eligible_member_count]
 
-    # business_policy :loosely_passes_open_enrollment_period_policy,
-    #         rules: [:period_begin_before_end_rule]
 
     def business_policies_for(model_instance, event_name)
       if model_instance.is_a?(BenefitSponsors::BenefitApplications::BenefitApplication)
         case event_name
-        when :end_open_enrollment
-          business_policies[:passes_open_enrollment_period_policy]
-        else
-          business_policies[:passes_open_enrollment_period_policy]
+          when :end_open_enrollment
+            enrollment_eligiblity_policy_for(model_instance)
+          else
+            enrollment_eligiblity_policy_for(model_instance)
         end
       end
     end
 
+    private
+
+    def enrollment_eligiblity_policy_for(model_instance)
+      if model_instance.start_on.yday == 1
+        business_policies[:non_minimum_participation_enrollment_eligiblity_policy]
+      else
+        business_policies[:enrollment_elgibility_policy]
+      end
+    end
   end
 end

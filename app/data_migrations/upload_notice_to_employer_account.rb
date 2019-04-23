@@ -11,13 +11,19 @@ class UploadNoticeToEmployerAccount < MongoidMigrationTask
     notice_subject = ENV['notice_name']
     notice_title = ENV['notice_name'].titleize.gsub(/\s*/, '')
 
-    employer_profile = EmployerProfile.find_by_fein(ENV['fein'])
+    employer_profile = find_employer_profile(ENV['fein'].to_s)
 
     if employer_profile.present?
       upload_and_send_secure_message(employer_profile, notice_path, notice_title, notice_subject)
     else
       puts "No employer account found with the given FEIN - #{ENV['fein']}" unless Rails.env.test?
     end
+  end
+
+  def find_employer_profile(fein)
+    organization = BenefitSponsors::Organizations::Organization.employer_profiles.where(fein: fein)
+    puts "organization did not find" if organization.count != 1
+    organization.first.employer_profile
   end
 
   def upload_and_send_secure_message(employer_profile, notice_path, notice_title, notice_subject)

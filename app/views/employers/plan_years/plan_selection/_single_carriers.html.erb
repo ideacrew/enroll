@@ -26,7 +26,7 @@
           <span class="plan-label">Level: </span><span><%= plan.metal_level.titleize %></span><br>
           <span class="plan-label">Network: </span>
           <span>
-            <%= render partial: "shared/network_data", locals: {plan: plan} %>
+            <%= render partial: "shared/network_data", locals: {plan: plan, plans: @plans} %>
           </span>
           <br/>
           <%= link_to 'View Summary', reference_plan_summary_employers_employer_profile_plan_years_path(ref_plan_id: plan.id, hios_id: plan.hios_id, coverage_kind: plan.coverage_kind), remote: 'true', class: "view-summary fourteen" %>

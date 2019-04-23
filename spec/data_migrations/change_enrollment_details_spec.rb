@@ -124,6 +124,9 @@ describe ChangeEnrollmentDetails do
 
 
     context "change enrollment aasm state" do
+
+      let(:benefit_package) { ::BenefitSponsors::BenefitPackages::BenefitPackage.new }
+
       before do
         allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)
         allow(ENV).to receive(:[]).with("action").and_return "change_enrollment_status"
@@ -133,6 +136,8 @@ describe ChangeEnrollmentDetails do
       end
 
       it "should change the aasm state " do
+        allow(::BenefitSponsors::BenefitPackages::BenefitPackage).to receive(:find).and_return(benefit_package)
+        allow(benefit_package).to receive(:successor).and_return(nil)
         expect(hbx_enrollment.may_move_to_enrolled?).to eq true
         subject.migrate
         hbx_enrollment.reload
@@ -193,28 +198,28 @@ describe ChangeEnrollmentDetails do
     context "change the plan of enrollment" do
       before do
         allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)
-        allow(ENV).to receive(:[]).with("new_plan_id").and_return(new_plan.id)
+        allow(ENV).to receive(:[]).with("new_product_id").and_return(new_plan.id)
         allow(ENV).to receive(:[]).with("action").and_return "change_plan"
         subject.migrate
         hbx_enrollment.reload
       end
 
       it "should change the plan of enrollment" do
-        expect(hbx_enrollment.plan_id).to eq new_plan.id
+        expect(hbx_enrollment.product_id).to eq new_plan.id
       end
     end
 
     context "change the benefit group of enrollment" do
       before do
         allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)
-        allow(ENV).to receive(:[]).with("new_benefit_group_id").and_return(new_benefit_group.id)
+        allow(ENV).to receive(:[]).with("new_sponsored_benefit_package_id").and_return(new_benefit_group.id)
         allow(ENV).to receive(:[]).with("action").and_return "change_benefit_group"
         subject.migrate
         hbx_enrollment.reload
       end
 
       it "should change the benefit group of enrollment" do
-        expect(hbx_enrollment.benefit_group_id).to eq new_benefit_group.id
+        expect(hbx_enrollment.sponsored_benefit_package_id).to eq new_benefit_group.id
       end
     end
   end

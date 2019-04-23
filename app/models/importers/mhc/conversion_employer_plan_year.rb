@@ -10,7 +10,9 @@ module Importers::Mhc
       "boston medical center health plan" => "BMCHP",
       "blue cross blue shield ma" => "BCBS",
       "tufts health plan premier" => "THPP",
-      "tufts health direct" => "THPD"
+      "tufts health direct" => "THPD",
+      "ALTUS" => "ALT",
+      "DELTA DENTAL" => "DDA"
     }
 
     validate :validate_plan_selection, :validate_reference_plan
@@ -25,7 +27,10 @@ module Importers::Mhc
       :employee_and_one_or_more_dependents_rt_premium,
       :family_rt_offered,
       :family_rt_contribution,
-      :family_rt_premium
+      :family_rt_premium,
+      :employer_domestic_partner_rt_contribution,
+      :employer_child_under_26_rt_contribution,
+      :sponsored_benefit_kind
 
     def initialize(opts = {})
       super(opts)
@@ -33,6 +38,10 @@ module Importers::Mhc
 
     def plan_selection=(val)
       @plan_selection = val.to_s.parameterize('_')
+    end
+
+    def carrier=(val)
+      @carrier = self.class::CARRIER_MAPPING[val]
     end
 
     def validate_reference_plan

@@ -36,5 +36,5 @@ context "shows families", dbclean: :after_each do
       render partial: 'broker_agencies/profiles/families_table_for_broker', :collection => [families] , as: :families
       expect(rendered).not_to have_selector("a", text: /phone/)
     end
-  end	
+  end  
 end

@@ -7,7 +7,7 @@ module BenefitSponsors
         :employer_invoice_available
       ]
 
-      def notify_on_save
+      def notify_on_create
         if subject == 'initial_invoice' && identifier.present?
           is_initial_employer_invoice_available = true
         end

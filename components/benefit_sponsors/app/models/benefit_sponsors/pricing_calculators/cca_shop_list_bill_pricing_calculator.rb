@@ -20,6 +20,7 @@ module BenefitSponsors
           @product = product
           @group_size_factor = gs_factor
           @sic_code_factor = sc_factor
+          @discount_kid_count = 0
         end
 
         def add(member)
@@ -29,7 +30,10 @@ module BenefitSponsors
           pu = @pricing_unit_map[rel.to_s]
           @relationship_totals[rel.to_s] = @relationship_totals[rel.to_s] + 1
           rel_count = @relationship_totals[rel.to_s]
-          member_price = if (pu.eligible_for_threshold_discount && (rel_count > pu.discounted_above_threshold))
+          if (rel.to_s == "dependent") && (coverage_age < 21)
+            @discount_kid_count = @discount_kid_count + 1
+          end
+          member_price = if (rel.to_s == "dependent") && (coverage_age < 21) && (@discount_kid_count > 3)
                            0.00
                          else
                            # Do calc

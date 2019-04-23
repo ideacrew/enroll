@@ -12,6 +12,8 @@ RSpec.describe "insured/plan_shoppings/_coverage_information.html.erb" do
   let(:hbx_enrollment){ HbxEnrollment.new(benefit_group: benefit_group, employee_role: employee_role, effective_on: 1.month.ago.to_date, updated_at: DateTime.now  ) }
   let(:person) { FactoryGirl.create(:person)}
   let(:terminate_date) { TimeKeeper.date_of_record.end_of_month }
+  let(:group_enrollment) { double("BenefitSponsors::Enrollments::GroupEnrollment", product_cost_total: 200.00, sponsor_contribution_total: 100 , employee_cost_total: 100 )}
+  let(:member_group) { double("BenefitSponsors::Enrollments::GroupEnrollment", group_enrollment: group_enrollment)}
 
   context "terminate" do
     before :each do
@@ -21,7 +23,8 @@ RSpec.describe "insured/plan_shoppings/_coverage_information.html.erb" do
       @benefit_group = @enrollment.benefit_group
       @reference_plan = @benefit_group.reference_plan
       @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
-
+      
+      assign :member_group, member_group
       assign :terminate, 'terminate'
       assign :enrollment, hbx_enrollment
       assign :terminate_date, terminate_date

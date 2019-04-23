@@ -1,0 +1,276 @@
+- single_product_carriers = @sponsored_benefit_form.catalog.single_product_options
+- is_new_benefit = @sponsored_benefit_form.is_new_benefit
+= f.hidden_field :is_new_benefit, value: f.object.is_new_benefit
+
+#metal-level-select.card
+	.card-body
+		ul.nav.nav-tabs role="tablist"
+			li.active.col-md-4.col-sm-4 role="presentation"
+				a href="#plan" aria-controls="dentalPlan" role="tab" data-toggle="tab" One Plan
+				= f.radio_button :product_package_kind, "single_product", checked: true, class: 'product_package_kind mr-1 hidden'
+		.tab-content
+			.tab-pane.active#plan role="tabpanel"
+				h4 = fetch_dental_product_option_choice_description_for_single_plan
+				br
+				- single_product_carriers.each do |issuer_name, issuer_id|
+					.col-xs-3.plans
+						.col-xs-12
+							label.container
+								= f.radio_button :product_option_choice, issuer_id, :data => {issuername: issuer_name}, onclick:"getPlanInfo(this); loadSingleProductSponsorContribution(this);"
+								span.checkmark
+								= issuer_name
+								
+#referencePlans.hidden
+	h2.heading-text.pt-1.float-left Select Your Reference Plan
+	
+	h4 Now select a reference plan. The reference plan is used to cap employer costs. You’ll choose a reference plan. Then, your contribution towards employee premiums will be applied to the reference plan you choose regardless of which plans your employees select. After you select your reference plan, scroll down to review your costs.
+	
+	= render "products", f: f
+
+= render "employee_costs_modal"
+
+#yourSponsorContributions
+	#sponsorContributions.mt-1
+		.col-xs-12
+			.col-xs-6.offered-heading
+				.text-uppercase.text-center 
+					| Offered
+					i.fas.fa-question-circle
+			.col-xs-6.offered-heading
+				.text-uppercase.text-center 
+					| Employer Contribution
+					i.fas.fa-question-circle
+			.col-xs-12#benefitFields
+				= f.fields_for :sponsor_contribution, (@sponsored_benefit_form.sponsor_contribution || @sponsored_benefit_form.catalog.sponsor_contributions.first), errors: {}, fieldset: false do |sc|
+					= sc.fields_for :contribution_levels, sc.object.contribution_levels, errors: {}, fieldset: false do |cl|
+						.row
+							.col-xs-6.pr-3
+								.row.sc-container
+									.col-xs-12.ml-2.mt-2
+										label.container.ml-1
+											= cl.object.display_name.try(:humanize)
+											= cl.hidden_field :display_name, value: cl.object.display_name
+											= cl.hidden_field :contribution_unit_id, value: cl.object.contribution_unit_id
+											= cl.check_box :is_offered, {class: "contribution_handler", disabled: (cl.object.is_employee_cl), :onchange => "newContributionAmounts(this)"}, "true", "false"
+											span.checkmark
+												
+							.col-xs-6
+								.col-xs-3
+									= cl.number_field :contribution_factor, class: "cl-input-#{cl.object.contribution_unit_id}", value: (cl.object.contribution_factor * 100).to_i, "data" => {"unit-id" => cl.object.contribution_unit_id.to_s}, :onchange => "setSliderInput(this); newContributionAmounts(this);"
+								.col-xs-9
+									input.slider class="slider-#{cl.object.contribution_unit_id.to_s}" data-unit-id=cl.object.contribution_unit_id min=0 max=100 step=5 type="range" value=(cl.object.contribution_factor * 100) onchange="setNumberInput(this); newContributionAmounts(this);"
+										span.slide-label.pull-right
+								
+
+	#yourReferencePlanDetails
+    - if !is_new_benefit && !is_new_benefit.nil?
+      #referencePlanEditDisplay
+        span.hidden.edit_flow
+          = f.radio_button :reference_plan_id, f.object.reference_plan_id, :data => {plan_title: f.object.reference_product.title, metal_level: f.object.reference_product.metal_level_kind, carrier_name: f.object.reference_product.issuer_name, plan_type: f.object.reference_product.plan_kind}
+        = render "reference_plan", f: f
+
+- if !is_new_benefit && !is_new_benefit.nil?
+  javascript:
+    window.onload = function() {
+      document.getElementById('metal-level-select').classList.add('hidden');
+      loadEmployeeCosts();
+    }
+
+    function loadEmployeeCosts() {
+      var table = document.getElementById('eeTableBody');
+
+      table.querySelectorAll('tr').forEach(function(element) {
+        element.remove()
+        });
+
+      var tr = document.createElement('tr')
+      var estimate = #{@sponsored_benefit_form.employees_cost.to_json.html_safe};
+      var productOptionKind = 'single_product';
+      var productsTotal;
+      var planOptions = #{@sponsored_benefit_form.catalog.plan_options.to_json.html_safe};
+      var element = document.querySelector("input[name='sponsored_benefits[reference_plan_id]']:checked");
+      var selectedName = element.dataset.carrierName;
+      var planTitle = element.dataset.planTitle;
+      filteredProducts = planOptions[productOptionKind][selectedName];
+      
+      document.getElementById('planOfferingsTitle').innerHTML = '';
+      document.getElementById('planOfferingsTitle').append(`Plan Offerings - ${planTitle} (${filteredProducts.length})`)
+
+      tr.innerHTML =
+        `
+        <td class="text-center">${estimate[0].name}</td>
+        <td class="text-center">${estimate[0].dependent_count}</td>
+        <td class="text-center">$ ${estimate[0].lowest_cost_estimate}</td>
+        <td class="text-center">$ ${estimate[0].reference_estimate}</td>
+        <td class="text-center">$ ${estimate[0].highest_cost_estimate}</td>
+        `
+      table.appendChild(tr)
+    }
+
+javascript:
+  var productOptionKind = 'single_product';
+  var sponsorContribution = String;
+  var referencePlanID = String;
+  var erCL = #{aca_shop_market_employer_contribution_percent_minimum};
+  var familyCL = #{aca_shop_market_employer_family_contribution_percent_minimum};
+	var productsTotal;
+	var eeContribution;
+  var spouse;
+  var domesticPartner;
+  var childUnder26;
+  var contributionInputs;
+  var planOptions = #{@sponsored_benefit_form.catalog.plan_options.to_json.html_safe};
+ 
+  var tempContributionValues = {
+    eeContribution:eeContribution || 0,
+    spouse:spouse || 0,
+    domesticPartner:domesticPartner || 0,
+    childUnder26:childUnder26 || 0
+  }
+
+  function getPlanInfo(element) {
+    var selectedName = element.dataset.issuername;
+    filteredProducts = planOptions[productOptionKind][selectedName];
+    productsTotal = filteredProducts.length;
+  }
+
+  function displayReferencePlanDetails(element, options) {
+    if(!(element || options)) {
+      return
+    }
+
+    options = options || {};
+    planTitle = options.planTitle || element.dataset.planTitle;
+    metalLevel = options.metalLevel || element.dataset.metalLevel;
+    carrierName = options.carrierName || element.dataset.carrierName;
+    planType = options.planType || element.dataset.planType;
+    referencePlanID = options.referencePlanID || element.value;
+    sponsoredBenefitId = options.sponsoredBenefitId;
+    // showFormButtons();
+
+    if (productsTotal === undefined){
+      if (element) {
+        var selectedName = element.dataset.carrierName;
+        filteredProducts = planOptions[productOptionKind][selectedName];
+        productsTotal = filteredProducts.length;
+      }
+    }
+
+    document.getElementById('yourReferencePlanDetails').innerHTML = '#{escape_javascript(render :partial => "./ui-components/v1/cards/reference_plan_details_shell")}'
+
+    if (element.parentElement.classList.contains('edit_flow')) {
+      document.getElementById('changeReferencePlan').classList.remove('hidden');
+    }
+
+    document.getElementById('referencePlanTitle').append(planTitle);
+    document.getElementById('rpType').append(planType);
+    document.getElementById('rpCarrier').append(carrierName);
+    document.getElementById('rpMetalLevel').append(metalLevel);
+    document.getElementById('rpNetwork').append('N/A');
+
+    document.getElementById('planOfferingsTitle').innerHTML = '';
+    document.getElementById('planOfferingsTitle').append(`Plan Offerings - ${planTitle} (${productsTotal})`)
+
+    if (document.getElementById('referencePlanEditDisplay')) {
+      document.getElementById('referencePlanEditDisplay').classList.add('hidden');
+    }
+
+    calculateEmployerContributions(productOptionKind, referencePlanID, sponsoredBenefitId, "sponsored_benefits")
+    calculateEmployeeCosts(productOptionKind, referencePlanID, sponsoredBenefitId, "sponsored_benefits")
+  }
+
+  function newContributionAmounts(element) {
+    contributionInputs = document.querySelectorAll("[data-contribution-input='true']")
+    contributionHandlers = document.querySelectorAll(".contribution_handler")
+
+    contributionInputs.forEach(function(element) {
+      switch (element.dataset.displayname) {
+        case 'Employee':
+          eeContribution = element.value;
+          if (eeContribution > 0) {
+            tempContributionValues.eeContribution = parseInt (eeContribution);
+          }
+        break;
+        case 'Spouse':
+          spouse = element.value;
+          if (spouse > 0) {
+            tempContributionValues.spouse = parseInt (spouse);
+          }
+        break;
+        case 'Domestic Partner':
+          domesticPartner = element.value;
+          if (domesticPartner > 0) {
+            tempContributionValues.domesticPartner = parseInt (domesticPartner);
+          }
+        break;
+        case 'Child Under 26':
+          childUnder26 = element.value;
+          if (childUnder26 > 0) {
+            tempContributionValues.childUnder26 = parseInt (childUnder26);
+          }
+        break;
+      }
+
+      tempLevels = JSON.stringify(tempContributionValues);
+      localStorage.setItem("contributionLevels",tempLevels);
+    })
+
+    contributionHandlers.forEach(function(element) {
+      switch (element.dataset.displayname) {
+        case 'Employee':
+          if(!(element.checked)) {
+            eeContribution = 100
+          }
+        break;
+        case 'Spouse':
+          if(!(element.checked)) {
+            spouse = 100
+          }
+        break;
+        case 'Domestic Partner':
+          if(!(element.checked)) {
+            domesticPartner = 100
+          }
+        break;
+        case 'Child Under 26':
+          if(!(element.checked)) {
+            childUnder26 = 100
+          }
+        break;
+      }
+    })
+
+    if (document.getElementById('sponsored_benefits_is_new_benefit').value == "true") {
+      if (eeContribution < erCL) {
+        disableNewPlanYearButton()
+      } else if (spouse < familyCL || domesticPartner < familyCL || childUnder26 < familyCL) {
+        disableNewPlanYearButton()
+      } else if (!(document.querySelectorAll(".reference-plans input[type='radio']:checked").length)) {
+        disableNewPlanYearButton()
+      } else {
+        enableNewPlanYearButton()
+      }
+    }
+
+    displayReferencePlanDetails(document.querySelector("input[name='sponsored_benefits[reference_plan_id]']:checked"));
+  }
+
+  function disableNewPlanYearButton() {
+		var savePlanYearButton = document.getElementById('submitDentalBenefits');
+    savePlanYearButton.classList.add('disabled');
+		preventSubmissionOnEnter()
+  }
+
+  function enableNewPlanYearButton() {
+		var savePlanYearButton = document.getElementById('submitDentalBenefits');
+    savePlanYearButton.classList.remove('disabled');
+  }
+
+  function preventSubmissionOnEnter() {
+		document.getElementById('new_benefit_package').onkeypress = function(e) {
+			var key = e.charCode || e.keyCode || 0;
+			if (key == 13) {
+			    e.preventDefault();
+			  }
+		}
+	}

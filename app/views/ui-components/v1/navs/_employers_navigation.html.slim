@@ -17,8 +17,8 @@ nav
       = link_to 'Billing', benefit_sponsors.profiles_employers_employer_profile_path(profile.id,:tab=>'billing'), "aria-expanded" => "true"
     li
       = link_to(benefit_sponsors.profiles_employers_employer_profile_path(profile.id, :tab=>'inbox'), class: 'hidden-xs', "aria-expanded" => "true" ) do
-        | Messages 
-        span.badge.message-unread #{profile.inbox.unread_messages.try(:count) || 0}
+        | Messages
+        span.badge.message-unread #{profile_unread_messages_count(profile)}
 
   .my-account-widget.panel.panel-default
     .panel-heading

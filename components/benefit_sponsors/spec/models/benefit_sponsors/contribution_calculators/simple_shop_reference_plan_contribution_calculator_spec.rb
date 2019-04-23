@@ -1,7 +1,7 @@
 require "rails_helper"
 
 module BenefitSponsors
-  RSpec.describe ContributionCalculators::SimpleShopReferencePlanContributionCalculator do
+  RSpec.describe ContributionCalculators::SimpleShopReferencePlanContributionCalculator, :dbclean => :after_each do
     let(:contribution_calculator) do
       ::BenefitSponsors::ContributionCalculators::SimpleShopReferencePlanContributionCalculator.new
     end
@@ -78,7 +78,7 @@ module BenefitSponsors
             product_price: primary_price 
           )
         end
-		    let(:employee_age) { 27 }
+        let(:employee_age) { 27 }
 
         let(:spouse_member_id) { "some_spouse_id" }
         let(:spouse_dob) { Date.new(1995, 9, 27) }
@@ -100,18 +100,18 @@ module BenefitSponsors
           )
         end
 
-				let(:child_member_id) { "some_child1_member_id" }
-				let(:child_dob) { Date.new(2015, 1, 1) }
-				let(:child) do
-					instance_double(
-						"::BenefitMarkets::SponsoredBenefits::RosterMember",
-						member_id: child_member_id,
-						relationship: "child",
-						is_disabled?: false,
-						dob: child_dob,
+        let(:child_member_id) { "some_child1_member_id" }
+        let(:child_dob) { Date.new(2015, 1, 1) }
+        let(:child) do
+          instance_double(
+            "::BenefitMarkets::SponsoredBenefits::RosterMember",
+            member_id: child_member_id,
+            relationship: "child",
+            is_disabled?: false,
+            dob: child_dob,
             is_primary_member?: false
-					)
-				end
+          )
+        end
         let(:child_enrollment) do
           ::BenefitSponsors::Enrollments::MemberEnrollment.new(
             member_id: child_member_id,
@@ -186,9 +186,9 @@ module BenefitSponsors
         let(:reference_product) { double(id: "reference product id") }
 
         before(:each) do
-					allow(contribution_model).to receive(:map_relationship_for).with("self", employee_age, false).and_return("employee")
-					allow(contribution_model).to receive(:map_relationship_for).with("spouse", spouse_age, false).and_return("spouse")
-					allow(contribution_model).to receive(:map_relationship_for).with("child", child_age, false).and_return("dependent")
+          allow(contribution_model).to receive(:map_relationship_for).with("self", employee_age, false).and_return("employee")
+          allow(contribution_model).to receive(:map_relationship_for).with("spouse", spouse_age, false).and_return("spouse")
+          allow(contribution_model).to receive(:map_relationship_for).with("child", child_age, false).and_return("dependent")
           allow(employee_contribution_unit).to receive(:match?).with({"employee"=>1}).and_return(true)
           allow(employee_contribution_unit).to receive(:match?).with({"spouse"=>1}).and_return(false)
           allow(employee_contribution_unit).to receive(:match?).with({"dependent"=>1}).and_return(false)

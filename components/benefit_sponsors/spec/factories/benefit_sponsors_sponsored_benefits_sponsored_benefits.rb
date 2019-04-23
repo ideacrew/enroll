@@ -3,5 +3,6 @@ FactoryGirl.define do
     
     benefit_package { create(:benefit_sponsors_benefit_packages_benefit_package) }
     product_package_kind  :single_issuer
+    reference_product { FactoryGirl.build(:benefit_markets_products_health_products_health_product) }
   end
 end

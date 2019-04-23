@@ -25,6 +25,11 @@ module Queries
         carrier_profile = CarrierProfile.find(carrier_id)
         Plan.by_active_year(start_on).shop_market.check_plan_offerings_for_sole_source.health_coverage.by_carrier_profile(carrier_profile).and(hios_id: /-01/)
       end
+
+      def single_option_offered_dental_plans(carrier_id, start_on)
+        carrier_profile = CarrierProfile.find(carrier_id)
+        Plan.by_active_year(start_on).shop_market.dental_coverage.by_carrier_profile(carrier_profile).and(hios_id: /-01/)
+      end
     end
   end
 end

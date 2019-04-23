@@ -221,6 +221,7 @@ class BenefitGroup
 
   def set_lowest_and_highest(plans)
     if plans.size > 0
+      plans = plans.select{|a| a.premium_tables.present?}
       plans_by_cost = plans.sort_by { |plan| plan.premium_tables.first.cost }
 
       self.lowest_cost_plan_id  = plans_by_cost.first.id
@@ -317,7 +318,11 @@ class BenefitGroup
   end
 
   def dental_relationship_benefit_for(relationship)
-    dental_relationship_benefits.where(relationship: relationship).first
+    if dental_reference_plan.blank? && reference_plan.coverage_kind == 'dental'
+      relationship_benefits.where(relationship: relationship).first
+    else
+      dental_relationship_benefits.where(relationship: relationship).first
+    end
   end
 
   def build_relationship_benefits
@@ -373,6 +378,8 @@ class BenefitGroup
 
   def monthly_employer_contribution_amount(plan = reference_plan)
     return 0 if targeted_census_employees.count > 199
+    is_dental = self.persisted? && plan.present? && plan.coverage_kind == "dental"
+    rp = is_dental ? dental_reference_plan : reference_plan
 
     if self.sole_source? && self.composite_tier_contributions.empty?
       build_composite_tier_contributions
@@ -380,10 +387,10 @@ class BenefitGroup
     end
     targeted_census_employees.active.collect do |ce|
 
-      if plan_option_kind == 'sole_source'
+      if plan_option_kind == 'sole_source' && plan.coverage_kind == "health"
         pcd = CompositeRatedPlanCostDecorator.new(plan, self, effective_composite_tier(ce), ce.is_cobra_status?)
       else
-        pcd = PlanCostDecorator.new(plan, ce, self, reference_plan)
+        pcd = PlanCostDecorator.new(plan, ce, self, rp)
       end
 
       pcd.total_employer_contribution
@@ -422,7 +429,11 @@ class BenefitGroup
     elsif plan_option_kind == 'sole_source' && !plan.dental?
       CompositeRatedPlanCostDecorator.new(plan, self, effective_composite_tier(ce), ce.is_cobra_status?)
     else
-      PlanCostDecorator.new(plan, ce, self, reference_plan)
+      if plan.dental? && dental_reference_plan.present?
+        PlanCostDecorator.new(plan, ce, self, dental_reference_plan)
+      else
+        PlanCostDecorator.new(plan, ce, self, reference_plan)
+      end
     end
     pcd.total_employee_cost
   end

@@ -13,6 +13,7 @@ module BenefitSponsors
 
       def initialize(new_date)
         @new_date = new_date
+        initialize_logger
         shop_daily_events
         auto_submit_renewal_applications
         process_applications_missing_binder_payment
@@ -32,53 +33,37 @@ module BenefitSponsors
 
       def open_enrollment_begin
         benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_begin_open_enrollment?(new_date)
-
-        benefit_sponsorships.each do |benefit_sponsorship|
-          execute_sponsor_event(benefit_sponsorship, :begin_open_enrollment)
-        end
+        execute_sponsor_event(benefit_sponsorships, :begin_open_enrollment)
       end
 
       def open_enrollment_end
         benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_end_open_enrollment?(new_date)
-
-        benefit_sponsorships.each do |benefit_sponsorship|
-          execute_sponsor_event(benefit_sponsorship, :end_open_enrollment)
-        end
+        execute_sponsor_event(benefit_sponsorships, :end_open_enrollment)
       end
 
       def benefit_begin
         benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_begin_benefit_coverage?(new_date)
-
-        benefit_sponsorships.each do |benefit_sponsorship|
-          execute_sponsor_event(benefit_sponsorship, :begin_sponsor_benefit)   
-        end
+        execute_sponsor_event(benefit_sponsorships, :begin_sponsor_benefit)
       end
 
       def benefit_end
         benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_end_benefit_coverage?(new_date)
-
-        benefit_sponsorships.each do |benefit_sponsorship|
-          execute_sponsor_event(benefit_sponsorship, :end_sponsor_benefit)
-        end
+        execute_sponsor_event(benefit_sponsorships, :end_sponsor_benefit)
       end
 
       def benefit_termination
         benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_terminate_benefit_coverage?(new_date)
-
-        benefit_sponsorships.each do |benefit_sponsorship|
-          execute_sponsor_event(benefit_sponsorship, :terminate_sponsor_benefit)
-        end
+        execute_sponsor_event(benefit_sponsorships, :terminate_sponsor_benefit)
       end
 
       def benefit_renewal
         months_prior_to_effective = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months.abs
-        renewal_application_begin = (new_date + months_prior_to_effective.months)
+        renewal_offset_days = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.day_of_month.days
+        renewal_application_begin = (new_date + months_prior_to_effective.months - renewal_offset_days)
 
         if renewal_application_begin.mday == 1
           benefit_sponsorships = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.may_renew_application?(renewal_application_begin.prev_day)
-          benefit_sponsorships.each do |benefit_sponsorship|
-            execute_sponsor_event(benefit_sponsorship, :renew_sponsor_benefit)
-          end
+          execute_sponsor_event(benefit_sponsorships, :renew_sponsor_benefit)
         end
       end
 
@@ -89,20 +74,14 @@ module BenefitSponsors
 
         if new_date == binder_next_day
           benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_transition_as_initial_ineligible?(application_effective_date)
-
-          benefit_sponsorships.each do |benefit_sponsorship|
-            execute_sponsor_event(benefit_sponsorship, :mark_initial_ineligible)
-          end
+          execute_sponsor_event(benefit_sponsorships, :mark_initial_ineligible)
         end
       end
 
       def auto_cancel_ineligible_applications
         if new_date.mday == 1
           benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_cancel_ineligible_application?(new_date)
-
-          benefit_sponsorships.each do |benefit_sponsorship|
-            execute_sponsor_event(benefit_sponsorship, :auto_cancel_ineligible)
-          end
+          execute_sponsor_event(benefit_sponsorships, :auto_cancel_ineligible)
         end
       end
 
@@ -110,10 +89,7 @@ module BenefitSponsors
         if new_date.day == Settings.aca.shop_market.renewal_application.force_publish_day_of_month
           effective_on = new_date.next_month.beginning_of_month
           benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_auto_submit_application?(effective_on)
-
-          benefit_sponsorships.each do |benefit_sponsorship|
-            execute_sponsor_event(benefit_sponsorship, :auto_submit_application)
-          end
+          execute_sponsor_event(benefit_sponsorships, :auto_submit_application)
         end
       end
 
@@ -129,15 +105,13 @@ module BenefitSponsors
         start_on = new_date.next_month.beginning_of_month
         benefit_sponsors = BenefitSponsors::BenefitSponsorships::BenefitSponsorship
         benefit_sponsors = benefit_sponsors.find_by_feins(feins) if feins.any?
-        
-        benefit_sponsors.may_transmit_renewal_enrollment?(start_on).each do |benefit_sponsorship|
-          execute_sponsor_event(benefit_sponsorship, :transmit_renewal_eligible_event) if benefit_sponsorship.is_renewal_transmission_eligible?
-          execute_sponsor_event(benefit_sponsorship, :transmit_renewal_carrier_drop_event) if benefit_sponsorship.is_renewal_carrier_drop?
-        end
 
-        benefit_sponsors.may_transmit_initial_enrollment?(start_on).each do |benefit_sponsorship|
-          execute_sponsor_event(benefit_sponsorship, :transmit_initial_eligible_event)
-        end
+        renewal_benefit_sponsorships = benefit_sponsors.may_transmit_renewal_enrollment?(start_on)
+        execute_sponsor_event(renewal_benefit_sponsorships, :transmit_renewal_eligible_event)
+        execute_sponsor_event(renewal_benefit_sponsorships, :transmit_renewal_carrier_drop_event)
+
+        initial_benefit_sponsorships = benefit_sponsors.may_transmit_initial_enrollment?(start_on)
+        execute_sponsor_event(initial_benefit_sponsorships, :transmit_initial_eligible_event)
       end
 
       def close_enrollment_quiet_period
@@ -149,15 +123,21 @@ module BenefitSponsors
 
       private
 
-      def execute_sponsor_event(benefit_sponsorship, event)
-        BenefitSponsors::BenefitSponsorships::BenefitSponsorshipDirector.new(new_date).process(benefit_sponsorship, event)
+      def execute_sponsor_event(benefit_sponsorships, event)
+        BenefitSponsors::BenefitSponsorships::BenefitSponsorshipDirector.new(new_date).process(benefit_sponsorships, event)
       end
 
       def process_events_for(&block)
         begin
           block.call
         rescue Exception => e
+          @logger.error e.message
+          @logger.error e.backtrace.join("\n")
         end
+      end
+
+      def initialize_logger
+        @logger = Logger.new("#{Rails.root}/log/aca_shop_scheduled_events.log") unless defined? @logger
       end
     end
   end

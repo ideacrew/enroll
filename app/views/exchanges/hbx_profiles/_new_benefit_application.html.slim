@@ -1,0 +1,148 @@
+= form_tag create_benefit_application_exchanges_hbx_profiles_path(benefit_sponsorship_id: @ba_form.benefit_sponsorship_id),class:'admin-plan-year-form', :method => :post, :remote => true do
+  = hidden_field_tag :employer_actions_id, params["employer_actions_id"]
+  br
+  .row
+    .pull-right[style="margin-right:20px"]
+      i.fas.fa-times.fa-2x.admin-fa-times#closeBAForm[onclick="closeRow(this)"]
+  .row
+    .col-md-4
+      label[for="effectiveStartDate" style="font-weight:bold"]
+        = l10n("hbx_profiles.effective_start_date")
+      br
+      .input-group
+        = select_tag :start_on, options_for_select(@ba_form.start_on_options.keys), {:prompt => "SELECT START ON", class:'form-control floatlabel benefit-application-start-date', onchange:"selectedDate(this); validateInputs()", id:'baStartDate'}
+    .col-md-4
+      label[for="effectiveEndDate" style="font-weight:bold"]
+        = l10n("hbx_profiles.effective_end_date")
+      br
+      .input-group
+        = text_field_tag :end_on, nil, class:'form-control', readonly: true
+        span.input-group-addon
+          i.fas.fa-calendar-alt
+    .col-md-4
+      label[for="fullTimeEmployees" style="font-weight:bold"]
+        = l10n("hbx_profiles.full_time_employees")
+      br
+      = text_field_tag :fte_count, nil, class:'form-control', id:'fteCount', onchange: "enableDisableSubmit()", onblur: "checkifValid(this)"
+      .required-item.hidden
+        = l10n("hbx_profiles.provide_fte_count")
+  br
+  .row
+    .col-md-4
+      label[for="openEnrollmentStartDate" style="font-weight:bold"]
+        = l10n('hbx_profiles.oe_start_date')
+      br
+      .input-group
+        = text_field_tag :open_enrollment_start_on, nil, class:'form-control blocking', onchange: "enableDisableSubmit()", onblur: "checkifValid(this)", :"data-date-min" => @ba_form.start_on ? (Date.strptime(@ba_form.start_on, "%m/%d/%Y") - 2.months) : ""
+        .required-item.hidden
+          = l10n("hbx_profiles.provide_oe_start_date")
+    .col-md-4
+      label[for="openEnrollmentEndDate" style="font-weight:bold"]
+        = l10n('hbx_profiles.open_enrollment_end_date')
+      br
+      .input-group
+        = text_field_tag :open_enrollment_end_on, nil, class: "form-control interaction-field-control-plan_year-open_enrollment_end_on blocking", onchange: "enableDisableSubmit()", onblur: "checkifValid(this)"
+        .required-item.hidden
+          = l10n("hbx_profiles.provide_oe_end_date")
+  br
+  .row
+    .col-md-12
+      button#adminCreatePyButton.pull-right.btn.btn-primary.disabled[type="submit"]
+        | Submit
+
+javascript:
+  $( function() {
+    $("#open_enrollment_start_on").datepicker();
+    $("#open_enrollment_end_on").datepicker();
+    $("#binder_due_date").datepicker();
+  } );
+
+  function selectedDate(element) {
+    if (element && element.value) {
+      assignBenefitApplicationDates(element.value)
+      document.getElementById('open_enrollment_start_on').classList.remove('blocking');
+      document.getElementById('open_enrollment_end_on').classList.remove('blocking');
+    } else {
+      resetInputOptions()
+    }
+    enableDisableSubmit()
+  }
+
+  function checkifValid(element) {
+    input = element.closest('input');
+    label = element.closest('.col-md-4').getElementsByTagName('label')[0];
+    feedback = element.nextSibling;
+    if (!element.value) {
+      label.setAttribute("class", "required-feedback");
+      input.setAttribute("class", "required-input");
+      feedback.classList.remove('hidden');
+    } else {
+      feedback.classList.add('hidden');
+      label.classList.remove('required-feedback');
+      input.classList.remove('required-input');
+    }
+  }
+
+  function validateInputs() {
+    inputs = document.getElementsByClassName('admin-plan-year-form')[0].querySelectorAll('input');
+    for (input of inputs) {
+      if (input.id === 'open_enrollment_start_on' || input.id === 'open_enrollment_end_on') {
+        checkifValid(input);
+      }
+    }
+  }
+
+  function closeRow(element) {
+    element.closest('tr').remove();
+  }
+
+  var employeeCounts = {
+    fte: Number
+  }
+
+  function enableDisableSubmit() {
+    var start_on = document.getElementById('baStartDate');
+    var end_on = document.getElementById('end_on');
+    var oe_start_on = document.getElementById('open_enrollment_start_on');
+    var oe_end_on = document.getElementById('open_enrollment_end_on');
+    var fte_count = document.getElementById('fteCount');
+
+    if (fte_count) {
+      employeeCounts.fte = fte_count.value
+    }
+
+    if ((employeeCounts.fte >= 1) && start_on.value && end_on.value && oe_start_on.value && oe_end_on.value) {
+      document.getElementById('adminCreatePyButton').classList.remove('disabled')
+    } else {
+      document.getElementById('adminCreatePyButton').classList.add('disabled')
+    }
+  }
+
+  function resetInputOptions() {
+    document.querySelector('input#end_on').value = '';
+    document.querySelector("input#open_enrollment_start_on").value = '';
+    document.querySelector("input#open_enrollment_end_on").value = '';
+  }
+
+  function assignBenefitApplicationDates(targetDate) {
+    var date = JSON.parse('#{@ba_form.start_on_options.to_json.html_safe}');
+    document.querySelector('input#end_on').value = getFormattedDate(date[targetDate]["benefit_application_end_on"]);
+    document.querySelector("input#open_enrollment_start_on").value = getFormattedDate(date[targetDate]["open_enrollment_start_on"]);
+    document.querySelector("input#open_enrollment_end_on").value = getFormattedDate(date[targetDate]["open_enrollment_end_on"]);
+  }
+
+css:
+  .required-feedback {
+    color: #dc3545;
+  }
+  .required-item {
+    color: #dc3545;
+    margin-top:5px;
+  }
+  .required-input {
+    border-color: #dc3545;
+    border-radius: .25rem;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+  }

@@ -5,7 +5,7 @@ module BenefitSponsors
       include Pundit
 
       def new
-        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.for_new(params.require(:benefit_sponsorship_id))
+        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.for_new(params.permit(:benefit_sponsorship_id))
         authorize @benefit_application_form, :updateable?
       end
 
@@ -26,7 +26,7 @@ module BenefitSponsors
       end
 
       def update
-        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.for_update(params.require(:id))
+        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.for_update(params.permit(:id, :benefit_sponsorship_id))
         authorize @benefit_application_form, :updateable?
         if @benefit_application_form.update_attributes(application_params)
           flash[:notice] = "Benefit Application updated successfully."
@@ -44,10 +44,10 @@ module BenefitSponsors
       end
 
       def submit_application
-        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.fetch(params.require(:benefit_application_id))
+        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.fetch(params.permit(:benefit_application_id, :benefit_sponsorship_id))
         authorize @benefit_application_form, :updateable?
         if @benefit_application_form.submit_application
-          flash[:notice] = "Benefit Application successfully published."
+          flash[:notice] = "Plan Year successfully published."
           flash[:error] = error_messages(@benefit_application_form)
           render :js => "window.location = #{profiles_employers_employer_profile_path(@benefit_application_form.show_page_model.benefit_sponsorship.profile, tab: 'benefits').to_json}"
         elsif @benefit_application_form.is_ineligible_to_submit?
@@ -55,13 +55,13 @@ module BenefitSponsors
             format.js
           end
         else
-          flash[:error] = "Benefit Application failed to submit. #{@benefit_application_form.errors.messages.values.flatten.inject(""){|memo, error| "#{memo}<li>#{error}</li>"}.html_safe}"
+          flash[:error] = "Plan Year failed to publish. #{@benefit_application_form.errors.messages.values.flatten.inject(""){|memo, error| "#{memo}<li>#{error}</li>"}.html_safe}"
           render :js => "window.location = #{profiles_employers_employer_profile_path(@benefit_application_form.show_page_model.benefit_sponsorship.profile, tab: 'benefits').to_json}"
         end
       end
 
       def force_submit_application
-        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.fetch(params.require(:benefit_application_id))
+        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.fetch(params.permit(:benefit_application_id, :benefit_sponsorship_id))
         authorize @benefit_application_form, :updateable?
         if @benefit_application_form.force_submit_application_with_eligibility_errors
           flash[:error] = "As submitted, this application is ineligible for coverage under the #{Settings.site.short_name} exchange. If information that you provided leading to this determination is inaccurate, you have 30 days from this notice to request a review by DCHL officials."
@@ -70,7 +70,7 @@ module BenefitSponsors
       end
 
       def revert
-        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.fetch(params.require(:benefit_application_id))
+        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.fetch(params.permit(:benefit_application_id, :benefit_sponsorship_id))
         authorize @benefit_application_form, :revert_application?
         if @benefit_application_form.revert
           flash[:notice] = "Plan Year successfully reverted to draft state."
@@ -78,6 +78,13 @@ module BenefitSponsors
           flash[:error] = "Plan Year could not be reverted to draft state. #{error_messages(@benefit_application_form)}".html_safe
         end
         render :js => "window.location = #{profiles_employers_employer_profile_path(@benefit_application_form.show_page_model.benefit_sponsorship.profile, tab: 'benefits').to_json}"
+      end
+
+      def late_rates_check
+        date = params[:start_on_date].present? ? Date.strptime(params[:start_on_date], "%m/%d/%Y") : nil
+        product_form = BenefitMarkets::Forms::ProductForm.for_new(date)
+        product_form = product_form.fetch_results
+        render json: product_form.is_late_rate
       end
 
       private

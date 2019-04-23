@@ -33,9 +33,9 @@ module BenefitSponsors
         def map_ce_relationship(rel)
           {
             "spouse" => "spouse",
-            "domestic_partner" => "domestic partner",
+            "domestic_partner" => "domestic_partner",
             "child_under_26" => "child",
-            "disabled_child_26_and_over" => "disabled child"
+            "disabled_child_26_and_over" => "child"
           }[rel]
         end
 
@@ -208,7 +208,7 @@ module BenefitSponsors
       end
 
       def eligible_employee_criteria
-        ::CensusEmployee.where(
+        ::CensusEmployee.active_alone.where(
           :benefit_sponsorship_id => benefit_sponsorship.id,
           :hired_on => {"$lte" => coverage_start},
           "$or" => [

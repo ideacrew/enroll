@@ -1,7 +1,10 @@
+require File.join(File.dirname(__FILE__), "..", "support/benefit_sponsors_site_spec_helpers")
+
 RSpec.shared_context "setup benefit market with market catalogs and product packages", :shared_context => :metadata do
 
-  let(:site)                    { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+  let(:site)                    { ::BenefitSponsors::SiteSpecHelpers.create_cca_site_with_hbx_profile_and_benefit_market }
   let(:benefit_market)          { site.benefit_markets.first }
+  let(:rating_area)             { create_default(:benefit_markets_locations_rating_area) }
   # let(:benefit_market)          { create(:benefit_markets_benefit_market, site_urn: 'mhc', kind: :aca_shop, title: "MA Health Connector SHOP Market") }
 
   let(:current_effective_date)  { (TimeKeeper.date_of_record + 2.months).beginning_of_month.prev_year }
@@ -11,14 +14,45 @@ RSpec.shared_context "setup benefit market with market catalogs and product pack
   let!(:current_rating_area) { create(:benefit_markets_locations_rating_area, active_year: current_effective_date.year) }
   let!(:renewal_rating_area) { create(:benefit_markets_locations_rating_area, active_year: renewal_effective_date.year) }
 
-  let!(:current_benefit_market_catalog) { build(:benefit_markets_benefit_market_catalog, :with_product_packages,
+  let(:product_kinds)  { [:health] }
+
+  let(:service_area) {
+    county_zip_id = create(:benefit_markets_locations_county_zip, county_name: 'Middlesex', zip: '01754', state: 'MA').id
+    create(:benefit_markets_locations_service_area, county_zip_ids: [county_zip_id], active_year: current_effective_date.year)
+  }
+
+  let(:renewal_service_area) {
+    create(:benefit_markets_locations_service_area, county_zip_ids: service_area.county_zip_ids, active_year: service_area.active_year + 1)
+  }
+     
+  let!(:health_products) { create_list(:benefit_markets_products_health_products_health_product,
+          5,
+          :with_renewal_product,
+          application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
+          product_package_kinds: [:single_issuer, :metal_level, :single_product],
+          service_area: service_area,
+          renewal_service_area: renewal_service_area,
+          metal_level_kind: :gold) }
+
+  let!(:dental_products) { create_list(:benefit_markets_products_dental_products_dental_product,
+          5,
+          :with_renewal_product,
+          application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
+          product_package_kinds: [:single_product],
+          service_area: service_area,
+          renewal_service_area: renewal_service_area, 
+          metal_level_kind: :dental) }
+
+  let!(:current_benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
     benefit_market: benefit_market,
+    product_kinds: product_kinds,
     title: "SHOP Benefits for #{current_effective_date.year}",
     application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year))
   }
 
-  let!(:renewal_benefit_market_catalog) { build(:benefit_markets_benefit_market_catalog, :with_product_packages,
+  let!(:renewal_benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
     benefit_market: benefit_market,
+    product_kinds: product_kinds,
     title: "SHOP Benefits for #{renewal_effective_date.year}",
     application_period: (renewal_effective_date.beginning_of_year..renewal_effective_date.end_of_year))
   }
@@ -38,10 +72,5 @@ RSpec.shared_context "setup benefit market with market catalogs and product pack
         end
       end
     end
-  end
-
-  it "should create valid benefit market catalogs" do
-    expect(current_benefit_market_catalog).to be_valid
-    expect(renewal_benefit_market_catalog).to be_valid
   end
 end

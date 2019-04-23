@@ -19,7 +19,7 @@ attributes: !ruby/hash:BSON::Document
   benefit_market_id: !ruby/object:BSON::ObjectId
     raw_data: !binary |-
       WxWP5p+ICzHOaecf
-  updated_at: 2018-07-05 15:58:18.600000000 Z
+  updated_at: 2018-08-25 18:00:57.379000000 Z
   created_at: 2018-07-05 15:58:18.600000000 Z
   product_packages:
   - !ruby/hash:BSON::Document

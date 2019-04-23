@@ -39,12 +39,13 @@ module BenefitSponsors
 
         attr_reader :excluded_dependent_ids
 
-        def initialize(c_model, level_map, elig_dates, c_start, c_product, c_previous_product, primary_id)
+        def initialize(c_model, p_model, level_map, elig_dates, c_start, c_product, c_previous_product, primary_id)
           @offered_calculator = ::BenefitSponsors::CoverageAgeCalculator.new
           @eligibility_dates = elig_dates
           @coverage_start = c_start
           @level_map = level_map
           @contribution_model = c_model
+          @pricing_model = p_model
           @relationship_totals = Hash.new(0)
           @product = c_product
           @previous_product = c_previous_product
@@ -59,7 +60,8 @@ module BenefitSponsors
           coverage_age = @offered_calculator.calc_coverage_age_for(member, @product, @coverage_start, @eligibility_dates, @previous_product)
           relationship = member.is_primary_member? ? "self" : member.relationship
           rel_name = @contribution_model.map_relationship_for(relationship, coverage_age, member.is_disabled?)
-          if rel_name
+          pricing_rel_name = @pricing_model.map_relationship_for(relationship, coverage_age, member.is_disabled?)
+          if rel_name && pricing_rel_name
             @relationship_totals[rel_name.to_s] = @relationship_totals[rel_name] + 1
             @member_rels[member.member_id] = rel_name
             @member_dobs[member.member_id] = member.dob
@@ -116,7 +118,8 @@ module BenefitSponsors
         roster_coverage.member_enrollments.each do |m_en|
           coverage_eligibility_dates[m_en.member_id] = m_en.coverage_eligibility_on
         end
-        state = OptimizerState.new(contribution_model, level_map, coverage_eligibility_dates, roster_coverage.coverage_start_on, roster_coverage.product, roster_coverage.previous_product, covered_roster_entry.primary_member.member_id)
+
+        state = OptimizerState.new(contribution_model, sponsor_contribution.sponsored_benefit.pricing_model, level_map, coverage_eligibility_dates, roster_coverage.coverage_start_on, roster_coverage.product, roster_coverage.previous_product, covered_roster_entry.primary_member.member_id)
         covered_roster_entry.members.each do |member|
           state.add(member)
         end

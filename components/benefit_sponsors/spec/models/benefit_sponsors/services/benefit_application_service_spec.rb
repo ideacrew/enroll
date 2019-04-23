@@ -1,7 +1,19 @@
 require 'rails_helper'
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require File.join(File.dirname(__FILE__), "..", "..", "..", "support/benefit_sponsors_product_spec_helpers")
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 module BenefitSponsors
   RSpec.describe ::BenefitSponsors::Services::BenefitApplicationService, type: :model, :dbclean => :after_each do
+    subject { ::BenefitSponsors::Services::BenefitApplicationService.new }
+
+    def init_form_for_create
+      ::BenefitSponsors::Forms::BenefitApplicationForm.for_create(create_ba_params)
+    end
+
+    def set_bs_for_service(ba_form)
+      subject.find_benefit_sponsorship(ba_form)
+    end
 
     describe "constructor" do
       let(:benefit_sponser_ship) { double("BenefitSponsorship", {
@@ -18,7 +30,9 @@ module BenefitSponsors
     end
 
     describe ".store service" do
+      include_context "setup benefit market with market catalogs and product packages"
 
+      let(:current_effective_date) { effective_period_start_on }
       let(:effective_period_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
       let(:effective_period_end_on)   { effective_period_start_on + 1.year - 1.day }
       let(:effective_period)          { effective_period_start_on..effective_period_end_on }
@@ -34,14 +48,10 @@ module BenefitSponsors
         }
       end
 
-      let!(:rating_area)   { FactoryGirl.create_default :benefit_markets_locations_rating_area }
-      let!(:service_area)  { FactoryGirl.create_default :benefit_markets_locations_service_area }
-
       let(:benefit_application_form) { FactoryGirl.build(:benefit_sponsors_forms_benefit_application) }
       let!(:invalid_application_form) { BenefitSponsors::Forms::BenefitApplicationForm.new}
       let!(:invalid_benefit_application) { BenefitSponsors::BenefitApplications::BenefitApplication.new }
 
-      let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :with_benefit_market_catalog_and_product_packages, :cca) }
       let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
       let(:benefit_sponsorship) do
         FactoryGirl.create(
@@ -55,11 +65,9 @@ module BenefitSponsors
           benefit_market: site.benefit_markets[0],
           employer_attestation: employer_attestation)
       end
+
       let(:benefit_application)       { benefit_sponsorship.benefit_applications.new(params) }
-
-      let!(:benefit_market) { site.benefit_markets.first }
       let!(:employer_attestation)     { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
-
       let!(:benefit_application_factory) { BenefitSponsors::BenefitApplications::BenefitApplicationFactory }
 
       before do
@@ -68,9 +76,20 @@ module BenefitSponsors
 
       context "has received valid attributes" do
         it "should save updated benefit application" do
-          allow(benefit_market).to receive(:benefit_sponsor_catalog_for).with([],benefit_application.effective_period.begin).and_return(nil)
           service_obj = Services::BenefitApplicationService.new(benefit_application_factory)
           expect(service_obj.store(benefit_application_form, benefit_application)).to eq [true, benefit_application]
+        end
+      end
+
+      context ".save" do
+        it "benefit application form has benefit sponsorship with terminated state should revert to applicant state on save" do
+          service_obj = Services::BenefitApplicationService.new(benefit_application_factory)
+          benefit_sponsorship.update_attributes(aasm_state: :terminated)
+          benefit_application_form['benefit_sponsorship_id'] = benefit_sponsorship.id
+          service_obj.save(benefit_application_form)
+          benefit_sponsorship.reload
+          expect(benefit_sponsorship.aasm_state).to eq :applicant
+
         end
       end
 
@@ -133,6 +152,110 @@ module BenefitSponsors
       end
     end
 
+    describe '.can_create_draft_ba?' do
+      let!(:rating_area)                  { FactoryGirl.create_default :benefit_markets_locations_rating_area }
+      let!(:service_area)                 { FactoryGirl.create_default :benefit_markets_locations_service_area }
+      let(:site)                          { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+      let(:organization)                  { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+      let(:employer_profile)              { organization.employer_profile }
+      let(:benefit_sponsorship)           { bs = employer_profile.add_benefit_sponsorship
+                                            bs.save!
+                                            bs }
+      let(:create_ba_params)              { { "start_on"=>"02/01/2019", "end_on"=>"01/31/2020", "fte_count"=>"11",
+                                              "open_enrollment_start_on"=>"01/15/2019", "open_enrollment_end_on"=>"01/20/2019",
+                                              "benefit_sponsorship_id"=> benefit_sponsorship.id.to_s} }
+
+      [:active, :pending, :enrollment_open, :enrollment_eligible, :enrollment_closed, :enrollment_ineligible, :termination_pending].each do |active_state|
+        context 'for imported' do
+          let!(:ba) { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, aasm_state: :draft) }
+
+          context 'without dt active state' do
+            it 'should return true as no bas has dt active state' do
+              set_bs_for_service(init_form_for_create)
+              expect(subject.can_create_draft_ba?).to be_truthy
+            end
+          end
+
+          context 'with dt active state' do
+            let!(:ba2) { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, aasm_state: active_state) }
+
+            it 'should return false as dt active state exists for one of the bas' do
+              set_bs_for_service(init_form_for_create)
+              expect(subject.can_create_draft_ba?).to be_falsey
+            end
+          end
+        end
+      end
+
+      context 'for termination_pending' do
+        let!(:ba) { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, aasm_state: :termination_pending) }
+        let!(:ba2) { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, aasm_state: :active) }
+
+        context 'with dt active state' do
+          it 'should return false as dt active state exists for one of the bas' do
+            set_bs_for_service(init_form_for_create)
+            expect(subject.can_create_draft_ba?).to be_falsey
+          end
+        end
+      end
+    end
+
+    describe '.create_or_cancel_draft_ba' do
+      let!(:rating_area)                  { FactoryGirl.create_default :benefit_markets_locations_rating_area }
+      let!(:service_area)                 { FactoryGirl.create_default :benefit_markets_locations_service_area }
+      let(:site)                          { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+      let(:benefit_market)                { site.benefit_markets.first }
+      let(:organization)                  { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+      let(:employer_profile)              { organization.employer_profile }
+      let(:benefit_sponsorship)           { bs = employer_profile.add_benefit_sponsorship
+                                            bs.save!
+                                            bs }
+      let(:effective_period)              { Date.new(2019, 02, 01)..Date.new(2020,01,31) }
+      let(:create_ba_params)              { { "start_on"=>effective_period.min.to_s, "end_on"=>effective_period.max.to_s, "fte_count"=>"11",
+                                              "open_enrollment_start_on"=>"01/15/2019", "open_enrollment_end_on"=>"01/20/2019",
+                                              "benefit_sponsorship_id"=> benefit_sponsorship.id.to_s} }
+      let!(:current_benefit_market_catalog) do
+        BenefitSponsors::ProductSpecHelpers.construct_cca_benefit_market_catalog_with_renewal_catalog(site, benefit_market, effective_period)
+        benefit_market.benefit_market_catalogs.where(
+          "application_period.min" => effective_period.min.to_s
+        ).first
+      end
+
+      context 'for admin_datatable_action' do
+        let!(:ba)   { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, aasm_state: :imported) }
+        let!(:ba2)  { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, aasm_state: :active) }
+
+        before :each do
+          create_ba_params.merge!({ pte_count: '0', msp_count: '0', admin_datatable_action: true })
+          @form = init_form_for_create
+          set_bs_for_service(@form)
+          @result = subject.create_or_cancel_draft_ba(@form, "")
+        end
+
+        it 'should return a combination of false and nil' do
+          expect(@result).to eq [false, nil]
+        end
+
+        it 'should add errors to form' do
+          expect(@form.errors.full_messages).to eq ['Existing plan year with overlapping coverage exists']
+        end
+      end
+
+      context 'not for admin_datatable_action' do
+        before :each do
+          @form = init_form_for_create
+          set_bs_for_service(@form)
+          @model_attrs = subject.form_params_to_attributes(@form)
+        end
+
+        it 'should return true and instance as ba succesfully created' do
+          result = subject.create_or_cancel_draft_ba(@form, @model_attrs)
+          benefit_sponsorship.reload
+          expect(result).to eq [true, benefit_sponsorship.benefit_applications.first]
+        end
+      end
+    end
+
     # describe ".publish" do
     #   let(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, :with_full_package)}
     #   let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship) }
@@ -148,6 +271,5 @@ module BenefitSponsors
     #     end
     #   end
     # end
-
   end
 end

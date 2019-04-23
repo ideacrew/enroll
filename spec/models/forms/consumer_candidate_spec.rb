@@ -108,8 +108,11 @@ describe "match a person in db" do
       expect(subject.match_person).to eq db_person
     end
 
-    context "with a person who has no ssn but an employer staff role" do
-      let(:employer_staff_role) { EmployerStaffRole.create(person: db_person, employer_profile_id: "1") }
+    context "with a person who has no ssn but an employer staff role", dbclean: :after_each do
+      let!(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+      let!(:benefit_sponsor)     { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+      let!(:employer_profile)    { benefit_sponsor.employer_profile }
+      let!(:employer_staff_role) { EmployerStaffRole.create(person: db_person, benefit_sponsor_employer_profile_id: employer_profile.id) }
 
       it 'matches person by last name, first name and dob' do
         db_person.employer_staff_roles << employer_staff_role

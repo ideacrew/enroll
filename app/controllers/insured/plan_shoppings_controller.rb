@@ -7,7 +7,7 @@ class Insured::PlanShoppingsController < ApplicationController
   include Acapi::Notifiers
   extend Acapi::Notifiers
   include Aptc
-  include ApplicationHelper
+
   before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show, :plans, :checkout, :terminate]
   before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show, :plans, :checkout, :receipt]
 
@@ -155,7 +155,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
     sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(@hbx_enrollment)
-    products = @hbx_enrollment.sponsored_benefit.products(@hbx_enrollment.effective_on)
+    products = @hbx_enrollment.sponsored_benefit.products(@hbx_enrollment.sponsored_benefit.rate_schedule_date)
     @issuer_profiles = []
     @issuer_profile_ids = products.map(&:issuer_profile_id).uniq
     ip_lookup_table = {}
@@ -166,11 +166,19 @@ class Insured::PlanShoppingsController < ApplicationController
       end
     end
     ::Caches::CustomCache.allocate(::BenefitSponsors::Organizations::Organization, :plan_shopping, ip_lookup_table)
-    @member_groups = sponsored_cost_calculator.groups_for_products(products)
-    @enrolled_hbx_enrollment_plan_ids = []
+    @enrolled_hbx_enrollment_plan_ids = @hbx_enrollment.family.currently_enrolled_plans(@hbx_enrollment)
+    @member_groups = sort_member_groups(sponsored_cost_calculator.groups_for_products(products))
     @products = @member_groups.map(&:group_enrollment).map(&:product)
-    @metal_levels = @products.map(&:metal_level).uniq
-    @plan_types = @products.map(&:health_plan_kind).uniq
+    if @hbx_enrollment.coverage_kind == 'health'
+      @metal_levels = @products.map(&:metal_level).uniq
+      @plan_types = @products.map(&:product_type).uniq
+    elsif @hbx_enrollment.coverage_kind == 'dental'
+      @metal_levels = @products.map(&:metal_level).uniq
+      @plan_types = @products.map(&:product_type).uniq
+    else
+      @plan_types = []
+      @metal_levels = []
+    end
     # @networks = []
     @carrier_names = @issuer_profiles.map{|ip| ip.legal_name}
     @use_family_deductable = (@hbx_enrollment.hbx_enrollment_members.count > 1)
@@ -204,6 +212,11 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   private
+
+  # no dental as of now
+  def sort_member_groups(products)
+    products.select { |prod| prod.group_enrollment.product.id.to_s == @enrolled_hbx_enrollment_plan_ids.first.to_s } + products.select { |prod| prod.group_enrollment.product.id.to_s != @enrolled_hbx_enrollment_plan_ids.first.to_s }.sort_by { |mg| (mg.group_enrollment.product_cost_total - mg.group_enrollment.sponsor_contribution_total) }
+  end
 
   def sort_by_standard_plans(plans)
     standard_plans, other_plans = plans.partition{|p| p.is_standard_plan? == true}

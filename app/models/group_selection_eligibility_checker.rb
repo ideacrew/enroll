@@ -9,11 +9,12 @@ class GroupSelectionEligibilityChecker
     @sponsored_benefit = benefit_package.sponsored_benefits.detect do |sb|
       sb.product_kind.to_s == coverage_kind.to_s
     end
-    @contribution_model = @sponsored_benefit.contribution_model
+    @contribution_model = @sponsored_benefit.contribution_model if @sponsored_benefit.present?
     @age_calculator = ::BenefitSponsors::CoverageAgeCalculator.new
   end
 
   def can_cover?(family_member, coverage_date)
+    return false if @sponsored_benefit.blank?
     rel, disability, dob = map_family_member_data(family_member)
     return true if (rel.to_s == "self")
     return false if dob > coverage_date
@@ -27,7 +28,7 @@ class GroupSelectionEligibilityChecker
     return false if matching_contribution_units.empty?
     cu_ids = matching_contribution_units.map(&:id)
     matching_contribution_levels = @sponsored_benefit.sponsor_contribution.contribution_levels.select do |cl|
-      cu_ids.include?(cl.contribution_unit_id) 
+      cu_ids.include?(cl.contribution_unit_id)
     end
     return false if matching_contribution_levels.empty?
     matching_contribution_levels.any?(&:is_offered?)

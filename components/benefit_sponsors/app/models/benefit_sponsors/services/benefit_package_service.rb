@@ -18,7 +18,7 @@ module BenefitSponsors
       def load_form_metadata(form)
         application  = find_benefit_application(form)
         @employer_profile = benefit_application.benefit_sponsorship.profile
-        form.catalog = BenefitSponsors::BenefitApplications::BenefitSponsorCatalogDecorator.new(application.benefit_sponsor_catalog)
+        form.catalog = BenefitSponsors::BenefitApplications::BenefitSponsorHealthCatalogDecorator.new(application.benefit_sponsor_catalog)
         if form.sponsored_benefits.present?
           load_employer_estimates(form)
           load_employees_cost_estimates(form)
@@ -64,6 +64,7 @@ module BenefitSponsors
           form.parent = BenefitSponsors::Forms::BenefitApplicationForm.for_edit(id: application.id.to_s, benefit_sponsorship_id: application.benefit_sponsorship.id.to_s)
         end
         form.is_new_package = false
+        form.has_dental_sponsored_benefits = benefit_package.dental_sponsored_benefit.present?
         attributes_to_form_params(benefit_package, form)
       end
 
@@ -108,7 +109,7 @@ module BenefitSponsors
       # No dental in MA. So, calculating premiums only for health sponsored benefits.
       def calculate_premiums(form)
         sb_form = form.sponsored_benefits.first
-        
+
         estimator = ::BenefitSponsors::Services::SponsoredBenefitCostEstimationService.new
         benefit_application = find_benefit_application(form)
         model_attributes = form_params_to_attributes(form)
@@ -121,7 +122,7 @@ module BenefitSponsors
 
       def calculate_employee_cost_details(form)
         sb_form = form.sponsored_benefits.first
-        
+
         estimator = ::BenefitSponsors::Services::SponsoredBenefitCostEstimationService.new
         benefit_application = find_benefit_application(form)
         model_attributes = form_params_to_attributes(form)
@@ -240,6 +241,13 @@ module BenefitSponsors
         model_attribute_name
       end
 
+      def is_dental_products_available?(form)
+        form.catalog.product_packages.where(
+          :product_kind => :dental,
+          :"products" => {:"$exists" => true}
+        ).present?
+      end
+
       private
 
       def attributes_to_form_params(benefit_package, form)
@@ -255,7 +263,7 @@ module BenefitSponsors
       end
 
       def sponsored_benefits_attributes_to_form_params(benefit_package)
-        benefit_package.sponsored_benefits.inject([]) do |sponsored_benefits, sponsored_benefit|
+        benefit_package.sponsored_benefits.where(_type: "BenefitSponsors::SponsoredBenefits::HealthSponsoredBenefit").inject([]) do |sponsored_benefits, sponsored_benefit|
           sponsored_benefits << Forms::SponsoredBenefitForm.new({
             id: sponsored_benefit.id,
             product_option_choice: sponsored_benefit.product_option_choice,
@@ -272,7 +280,7 @@ module BenefitSponsors
           title: reference_product.title,
           issuer_name: reference_product.issuer_profile.legal_name,
           plan_kind: reference_product.health_plan_kind,
-          metal_level_kind: reference_product.metal_level_kind,
+          metal_level_kind: reference_product.metal_level,
           network_information: reference_product.network_information,
         })
       end

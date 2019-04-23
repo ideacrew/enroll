@@ -125,75 +125,102 @@ module BradysAfterAll
   shared_context "BradyWorkAfterAll" do
     include_context "BradyBunchAfterAll"
 
-    attr_reader :mikes_benefit_group, :mikes_plan_year, :mikes_census_employee, :mikes_census_family, :mikes_hired_on, :mikes_employee_role
+    attr_reader :mikes_benefit_group, :mikes_plan_year, :mikes_census_employee, :mikes_census_family, :mikes_hired_on, :mikes_employee_role, :mikes_benefit_sponsorship
     attr_reader :carols_benefit_group, :carols_plan_year, :carols_census_employee, :carols_census_family, :carols_hired_on
 
     def create_brady_census_families
+      @site = create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
+
       create_brady_coverage_households
       create_brady_employers
-      @mikes_benefit_group = FactoryGirl.build(:benefit_group, plan_year: nil)
-      @mikes_plan_year = FactoryGirl.create(:plan_year, employer_profile: mikes_employer, benefit_groups: [mikes_benefit_group])
+
+      current_effective_date   = TimeKeeper.date_of_record.beginning_of_month
+      benefit_market = @site.benefit_markets.first
+      current_benefit_market_catalog =  create(:benefit_markets_benefit_market_catalog, :with_product_packages,
+                                                benefit_market: benefit_market,
+                                                title: "SHOP Benefits for #{current_effective_date.year}",
+                                                application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year)
+                                              )
+                                          
+      package_kind             = :single_issuer
+      effective_period         = current_effective_date..current_effective_date.next_year.prev_day
+      open_enrollment_period   = effective_period.min.prev_month..(effective_period.min - 10.days)
+
+      @mikes_benefit_sponsorship = @mikes_employer.add_benefit_sponsorship
+      recorded_service_areas  = mikes_benefit_sponsorship.service_areas_on(effective_period.min)
+  
+      @mikes_plan_year        = create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog,
+                                        :with_benefit_package,
+                                        benefit_sponsorship: mikes_benefit_sponsorship,
+                                        effective_period: effective_period,
+                                        aasm_state: :active,
+                                        open_enrollment_period: open_enrollment_period,
+                                        recorded_rating_area: mikes_benefit_sponsorship.rating_area,
+                                        recorded_service_areas: recorded_service_areas
+                                      )
+
+      @mikes_benefit_group   = @mikes_plan_year.benefit_packages[0] 
+
+      # @mikes_benefit_group = FactoryGirl.build(:benefit_group, plan_year: nil)
+      # @mikes_plan_year = FactoryGirl.create(:plan_year, employer_profile: mikes_employer, benefit_groups: [mikes_benefit_group])
       @mikes_hired_on = 1.year.ago.beginning_of_year.to_date
-      @mikes_benefit_group_assignments = FactoryGirl.build(:benefit_group_assignment,
-                                                           benefit_group_id: @mikes_benefit_group.id,
-                                                           start_on: @mikes_plan_year.start_on,
-                                                           aasm_state: "initialized"
-                                                           )
-      @mikes_census_employee = FactoryGirl.create(:census_employee,
-                                                   first_name: mike.first_name,  last_name: mike.last_name,
-                                                   dob: mike.dob, address: mike.addresses.first, hired_on: mikes_hired_on,
-                                                   employer_profile_id: @mikes_employer.id,
-                                                   benefit_group_assignments: [@mikes_benefit_group_assignments]
-                                                  )
-      @carols_hired_on = 1.year.ago.beginning_of_year.to_date
-      @carols_benefit_group = FactoryGirl.build(:benefit_group, plan_year: nil)
-      @carols_plan_year = FactoryGirl.create(:plan_year, employer_profile: carols_employer, benefit_groups: [carols_benefit_group])
-      @carols_benefit_group_assignments = FactoryGirl.build(:benefit_group_assignment,
-                                                           benefit_group_id: @carols_benefit_group.id,
-                                                           start_on: @carols_plan_year.start_on,
-                                                           aasm_state: "initialized"
-                                                           )
-      @carols_census_employee = FactoryGirl.create(:census_employee,
-                                                    first_name: carol.first_name,  last_name: carol.last_name,
-                                                    dob: carol.dob, address: carol.addresses.first, hired_on: carols_hired_on,
-                                                    employer_profile_id: @carols_employer.id,
-                                                    benefit_group_assignments: [@carols_benefit_group_assignments]
-                                                   )
+      # @mikes_benefit_group_assignments = FactoryGirl.build(:benefit_group_assignment,
+      #                                                      benefit_group_id: @mikes_benefit_group.id,
+      #                                                      start_on: @mikes_plan_year.start_on,
+      #                                                      aasm_state: "initialized"
+      #                                                      )
+      
+      @mikes_census_employee = FactoryGirl.create(:census_employee, :with_active_assignment,
+                                                  first_name: mike.first_name,  last_name: mike.last_name,
+                                                  dob: mike.dob, address: mike.addresses.first, hired_on: mikes_hired_on,
+                                                  benefit_sponsorship: @mikes_benefit_sponsorship, employer_profile: @mikes_employer, 
+                                                  benefit_group: @mikes_benefit_group
+                                                )
+
+      # @carols_hired_on = 1.year.ago.beginning_of_year.to_date
+      # @carols_benefit_group = FactoryGirl.build(:benefit_group, plan_year: nil)
+      # @carols_plan_year = FactoryGirl.create(:plan_year, employer_profile: carols_employer, benefit_groups: [carols_benefit_group])
+      # @carols_benefit_group_assignments = FactoryGirl.build(:benefit_group_assignment,
+      #                                                      benefit_group_id: @carols_benefit_group.id,
+      #                                                      start_on: @carols_plan_year.start_on,
+      #                                                      aasm_state: "initialized"
+      #                                                      )
+      # @carols_census_employee = FactoryGirl.create(:census_employee,
+      #                                               first_name: carol.first_name,  last_name: carol.last_name,
+      #                                               dob: carol.dob, address: carol.addresses.first, hired_on: carols_hired_on,
+      #                                               employer_profile_id: @carols_employer.id,
+      #                                               benefit_group_assignments: [@carols_benefit_group_assignments]
+      #                                              )
       create_brady_employee_roles
     end
 
     def create_brady_employee_roles
       mike.ssn = "4423445555"
-      @mikes_employee_role = EmployeeRole.create!({
+
+      @mikes_employee_role = FactoryGirl.create(:employee_role,
         :person => mike,
-        :employer_profile_id => mikes_employer.id,
-        :benefit_group_id => mikes_benefit_group.id,
-        :census_employee_id => @mikes_census_employee.id,
-        :hired_on => mikes_hired_on
-      })
+        benefit_sponsors_employer_profile_id: mikes_employer.id,
+        employer_profile_id: nil,
+        hired_on: @mikes_census_employee.hired_on, 
+        census_employee_id: @mikes_census_employee.id)
     end
 
     attr_reader :mikes_employer, :carols_employer
     def create_brady_employers
       create_brady_work_organizations
-      @mikes_employer = FactoryGirl.build(:employer_profile, organization: mikes_organization)
-      @carols_employer = FactoryGirl.build(:employer_profile)
+      @mikes_employer = @mikes_organization.employer_profile
+      # @carols_employer = FactoryGirl.build(:employer_profile)
     end
 
     attr_reader :mikes_organization, :carols_organization
     def create_brady_work_organizations
       create_brady_office_locations
-      @mikes_organization = FactoryGirl.create(:organization,
-                                                 legal_name: "Mike's Architects Limited",
-                                                 dba: "MAL",
-                                                 office_locations: [mikes_office_location]
-                                                )
-      @carols_organization = FactoryGirl.create(:organization,
-                                                  legal_name: "Care Real S Tates",
-                                                  dba: "CRST",
-                                                  office_locations: [carols_office_location],
-                                                  employer_profile: carols_employer
-                                                 )
+      @mikes_organization = FactoryGirl.create(:benefit_sponsors_organizations_general_organization, 
+                                               :with_aca_shop_cca_employer_profile, site: @site,
+                                               legal_name: "Mike's Architects Limited",
+                                               dba: "MAL"
+                                               # office_locations: [mikes_office_location]
+                                               )
     end
 
     attr_reader :mikes_office_location, :carols_office_location

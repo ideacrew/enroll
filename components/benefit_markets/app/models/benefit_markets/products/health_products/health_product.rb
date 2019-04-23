@@ -59,11 +59,11 @@ module BenefitMarkets
       scope :hmo_plans,           ->{ where(health_plan_kind: :hmo) }
       scope :epo_plans,           ->{ where(health_plan_kind: :epo) }
 
-      scope :bronze_plans,        ->{ where(metal_level: :bronze) }
-      scope :silver_plans,        ->{ where(metal_level: :silver) }
-      scope :gold_plans,          ->{ where(metal_level: :gold) }
-      scope :platinum_plans,      ->{ where(metal_level: :platinum) }
-      scope :catastrophic_plans,  ->{ where(metal_level: :catastrophic) }
+      scope :bronze_plans,        ->{ where(metal_level_kind: :bronze) }
+      scope :silver_plans,        ->{ where(metal_level_kind: :silver) }
+      scope :gold_plans,          ->{ where(metal_level_kind: :gold) }
+      scope :platinum_plans,      ->{ where(metal_level_kind: :platinum) }
+      scope :catastrophic_plans,  ->{ where(metal_level_kind: :catastrophic) }
 
 
       validates :health_plan_kind,
@@ -80,6 +80,10 @@ module BenefitMarkets
 
       def metal_level
         metal_level_kind.to_s
+      end
+
+      def product_type
+        health_plan_kind.to_s
       end
 
       private

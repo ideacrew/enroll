@@ -1,20 +1,23 @@
 require 'rails_helper'
 
-RSpec.describe "layouts/_header.html.erb" do
+RSpec.describe "layouts/_header.html.erb", :dbclean => :after_each do
 
-  let(:person_user){Person.new(first_name: 'fred', last_name: 'flintstone')}
+  let(:person_user) { FactoryGirl.create(:person) }
   let(:current_user){FactoryGirl.create(:user, :person=>person_user)}
+  let(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+  let(:benefit_sponsor)     { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+  let(:employer_profile)    { benefit_sponsor.employer_profile }
+  let(:active_employer_staff_role) {FactoryGirl.create(:benefit_sponsor_employer_staff_role, person: person_user, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
   let(:broker_agency_profile){FactoryGirl.create(:broker_agency_profile)}
   let(:broker_role){FactoryGirl.build(:broker_role, broker_agency_profile_id: broker_agency_profile.id)}
-  let(:employer_profile){ FactoryGirl.build(:employer_profile) }
-  let(:employer_staff_role){ FactoryGirl.build(:employer_staff_role, :person=>person_user, :employer_profile_id=>employer_profile.id)}
   let(:signed_in?){ true }
+
   #let!(:byline) { create(:translation, key: "en.layouts.header.byline", value: Settings.site.header_message) }
   before do
     Translation.create(key: "en.welcome.index.byline", value: "\"#{Settings.site.header_message}\"")
   end
   before(:each) do
-  	sign_in current_user
+    sign_in current_user
   end
   it 'identifies HBX Staff' do
     current_user.roles=['hbx_staff']
@@ -30,7 +33,7 @@ RSpec.describe "layouts/_header.html.erb" do
     expect(rendered).to match(/I'm a Broker/)
   end
   it 'identifies Employers' do
-    allow(person_user).to receive(:employer_staff_roles).and_return([employer_staff_role])
+    allow(person_user).to receive(:employer_staff_roles).and_return([active_employer_staff_role])
     current_user.roles=['employer_staff']
     current_user.save
     render :template => 'layouts/_header.html.erb'

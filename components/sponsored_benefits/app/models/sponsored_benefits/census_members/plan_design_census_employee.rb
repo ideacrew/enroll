@@ -207,7 +207,7 @@ module SponsoredBenefits
                 census_member.gender
               ]
 
-              if census_member.is_a?(SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee)
+              if census_member.is_a?(::SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee)
                 values += [
                   census_member.hired_on.present? ? census_member.hired_on.strftime("%m/%d/%Y") : "",
                   census_member.employment_terminated_on.present? ? census_member.employment_terminated_on.strftime("%m/%d/%Y") : "",

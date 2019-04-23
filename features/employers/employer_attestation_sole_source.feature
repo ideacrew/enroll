@@ -8,7 +8,7 @@ Feature: Employer Profile
     Then Jack Doe create a new account for employer
     Then I should see a successful sign up message
     And I select the all security question and give the answer
-    When I have submit the security questions
+    When I have submitted the security questions
     Then I should click on employer portal
     Then Jack Doe creates a new employer profile with default_office_location
     When I go to the Profile tab

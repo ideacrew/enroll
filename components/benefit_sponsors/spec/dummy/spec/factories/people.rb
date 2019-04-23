@@ -16,12 +16,24 @@ FactoryGirl.define do
       end
     end
 
+    trait :with_family do
+      after :create do |person|
+        family = FactoryGirl.create :family, :with_primary_family_member, person: person
+      end
+    end
+
     trait :with_work_phone do
       phones { [FactoryGirl.build(:phone, kind: "work") ] }
     end
 
     trait :with_work_email do
       emails { [FactoryGirl.build(:email, kind: "work") ] }
+    end
+
+    trait :with_employee_role do
+      after(:create) do |p, _evaluator|
+        create_list(:benefit_sponsors_employee_role, 1, person: p)
+      end
     end
   end
 end

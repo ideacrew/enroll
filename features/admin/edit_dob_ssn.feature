@@ -6,7 +6,7 @@ Feature: Update DOB and SSN
         Given Hbx Admin exists
             When Hbx Admin logs on to the Hbx Portal
             And I select the all security question and give the answer
-            When I have submit the security questions
+            When I have submitted the security questions
             And Hbx Admin clicks on the Families tab
             Then Hbx Admin should see the list of primary applicants and an Action button
             When Hbx Admin clicks on the Action button
@@ -21,7 +21,7 @@ Feature: Update DOB and SSN
         Given Hbx Admin exists
             When Hbx Admin logs on to the Hbx Portal
             And I select the all security question and give the answer
-            When I have submit the security questions
+            When I have submitted the security questions
             And Hbx Admin clicks on the Families tab
             Then Hbx Admin should see the list of primary applicants and an Action button
             When Hbx Admin clicks on the Action button

@@ -1,11 +1,34 @@
 <html>
-<body>
-Dear <%= person_name %>,
-<br />
-<div>Congratulations! Your application to become a certified broker on the <%= site_short_name %> for Business platform has been approved!</div><br />
-<div>
-	<p>To access your broker portal and start assisting your small business clients, please go to the <%= link_to "#{site_short_name}", claim_invitation_url(invitation) %> for Business to create your broker account and manage your clients.<br />For any questions or assistance with accessing your broker portal, please contact the Health Connector for Business at <%= contact_center_phone_number %> (TTY: <%=contact_center_tty_number %>) or <a href="https://www.mahealthconnector.org/"><%= site_website_name %></a>
-	</p>
-</div>
-</body>
+  <body>
+    <div>
+      Dear <%= person_name %>,
+    </div>
+    <br />
+    <div>
+      Congratulations-- we've reviewed your application and you are now approved as a certified broker through the Health Connector for Business.
+    </div>
+    <div>
+      <p><strong>Next Steps:</strong></p>
+    </div>
+    <div>
+      <p>
+        <strong>1.</strong> Click on this personalized link to set up your new broker account: <%= link_to "#{site_short_name}", claim_invitation_url(invitation) %><br />
+        <strong>Important:</strong> You must use this link to set up your account. If you don't use your personalized link when creating your account, the account won't be connected to your existing broker profile.
+      </p>
+    </div>
+    <div>
+      <p>
+        <strong>2.</strong> After you've set up your new username and password, log in to your new Health Connector for Business broker account through <a href="<%= site_user_sign_in_url %>">our website</a>.
+      </p>
+    </div>
+
+    <div>
+      <p>If you have questions or need help, please call us at <%= contact_center_phone_number %> (TTY: <%=contact_center_tty_number %>).</p>
+    </div>
+
+    <div>
+      <p> Thank you, </p>
+      <p> <%= site_title %> </p>
+    </div>
+  </body>
 </html>

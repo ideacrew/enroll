@@ -1,17 +1,17 @@
 require "rails_helper"
 
 module BenefitSponsors
-	RSpec.describe SponsoredBenefits::RelationshipRosterEligibilityOptimizer do
-		subject { ::BenefitSponsors::SponsoredBenefits::RelationshipRosterEligibilityOptimizer.new }
+  RSpec.describe BenefitSponsors::SponsoredBenefits::RelationshipRosterEligibilityOptimizer, :dbclean => :after_each do
+    subject { ::BenefitSponsors::SponsoredBenefits::RelationshipRosterEligibilityOptimizer.new }
 
-		let(:employee_dob) { Date.new(1990, 6, 1) }
-	  let(:employee_member_id) { "some_employee_id" }
-		let(:roster_entry) do
-			::BenefitSponsors::Members::MemberGroup.new(
+    let(:employee_dob) { Date.new(1990, 6, 1) }
+    let(:employee_member_id) { "some_employee_id" }
+    let(:roster_entry) do
+      ::BenefitSponsors::Members::MemberGroup.new(
         roster_members,
         group_enrollment: group_enrollment,
-			)
-		end
+      )
+    end
 
     let(:employee) do
       instance_double(
@@ -56,6 +56,8 @@ module BenefitSponsors
     let(:product) { double(id: "some_product_id") }
 
     let(:coverage_start_date) { Date.new(2018, 1, 1) }
+    let(:sponsored_benefit) { double("::BenefitMarkets::SponsoredBenefits::SponsoredBenefit", pricing_model: pricing_model)}
+    let(:pricing_model) { double("BenefitMarkets::PricingModels::PricingModel")}
 
     describe "given:
       - a sponsor which offers choice rating and contributions
@@ -144,6 +146,10 @@ module BenefitSponsors
         let(:member_enrollments) { [employee_enrollment, spouse_member_enrollment, nibling_member_enrollment] }
 
         before(:each) do
+          allow(sponsor_contribution).to receive(:sponsored_benefit).and_return(sponsored_benefit)
+          allow(pricing_model).to receive(:map_relationship_for).with("self", employee_age, false).and_return("employee")
+          allow(pricing_model).to receive(:map_relationship_for).with("spouse", spouse_age, false).and_return("spouse")
+          allow(pricing_model).to receive(:map_relationship_for).with("nephew", nibling_age, false).and_return(nil)
           allow(contribution_model).to receive(:map_relationship_for).with("self", employee_age, false).and_return("employee")
           allow(contribution_model).to receive(:map_relationship_for).with("spouse", spouse_age, false).and_return("spouse")
           allow(contribution_model).to receive(:map_relationship_for).with("nephew", nibling_age, false).and_return(nil)
@@ -257,6 +263,9 @@ module BenefitSponsors
         let(:member_enrollments) { [employee_enrollment, spouse_member_enrollment] }
 
         before(:each) do
+          allow(sponsor_contribution).to receive(:sponsored_benefit).and_return(sponsored_benefit)
+          allow(pricing_model).to receive(:map_relationship_for).with("self", employee_age, false).and_return("employee")
+          allow(pricing_model).to receive(:map_relationship_for).with("spouse", spouse_age, false).and_return("spouse")
           allow(contribution_model).to receive(:map_relationship_for).with("self", employee_age, false).and_return("employee")
           allow(contribution_model).to receive(:map_relationship_for).with("spouse", spouse_age, false).and_return("spouse")
           allow(spouse_contribution_unit).to receive(:match?).with({"spouse" => 1}).and_return(true)

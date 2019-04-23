@@ -1,16 +1,14 @@
 <html>
-  <%= render :partial => "notices/shared/logo" %>
-  <span class="fssize1 health-connector-address" align="right" style="padding-right: 15px">"SHOP_M009"%></span><br><br><br><br><br>
-   <span class="wid50" align="left"><%= TimeKeeper.date_of_record.strftime('%m/%d/%Y') %></span>
+  <span class="wid50" align="left"><%= TimeKeeper.date_of_record.strftime('%m/%d/%Y') %></span><br><br>
     <body>
-      <b> ASSISTANCE ENROLLING IN EMPLOYER-SPONSORED HEALTH INSURANCE</b>
+      <b> ASSISTANCE ENROLLING IN EMPLOYER-SPONSORED INSURANCE</b>
       <br/>
       <br/>
       <div>
         Dear <%= first_name %>,
       </div>
         <br/>
-          You recently applied for employer-sponsored health insurance through the <%= site_short_name %>.  You are not eligible to enroll in coverage through the <%= site_short_name %> because we were unable to match you with an employer.
+          You recently applied for employer-sponsored insurance through the <%= site_short_name %>.  You are not eligible to enroll in coverage through the <%= site_short_name %> because we were unable to match you with an employer.
         <br><br/>
       <div>
         If you believe this determination was made in error, please check the information entered on your application is correct and confirm with your employer that your demographic information is listed correctly on their roster. If you continue to experience difficulty matching to your employer and plan shopping on the <%= site_short_name %>, please reach out to us at the options below.
@@ -25,7 +23,7 @@
           <tbody>
             <tr>
               <td>
-                <ul style="list-style: circle;>
+                <ul style="list-style: circle;">
                 <li style="margin-top: 0px;">
                   By calling <%=contact_center_phone_number%>. TTY: <%=contact_center_tty_number%>
                 </li>

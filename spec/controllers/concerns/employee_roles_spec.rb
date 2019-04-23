@@ -4,7 +4,7 @@ class FakesController < ApplicationController
   include EmployeeRoles
 end
 
-describe FakesController do
+describe FakesController, dbclean: :after_each do
   let(:person) { FactoryGirl.create(:person)}
   let(:employee_role1) { FactoryGirl.create(:employee_role)}
   let(:employee_role2) { FactoryGirl.create(:employee_role)}

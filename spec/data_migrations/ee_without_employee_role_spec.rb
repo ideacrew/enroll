@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "ee_without_employee_role")
 
-describe EeWithoutEmployeeRole do
+describe EeWithoutEmployeeRole, dbclean: :after_each do
 
   let(:given_task_name) { "ee_without_employee_role" }
   subject { EeWithoutEmployeeRole.new(given_task_name, double(:current_scope => nil)) }

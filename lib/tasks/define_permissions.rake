@@ -38,6 +38,43 @@ namespace :permissions do
   desc 'hbx admin can view username and email'
   DefinePermissions.define_task :hbx_admin_can_view_username_and_email => :environment
 end
+
+#RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_change_fein
+namespace :permissions do
+  desc 'hbx system admin can change fein'
+  DefinePermissions.define_task :hbx_admin_can_change_fein => :environment
+end
+
+# RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_force_publish
+namespace :permissions do
+  desc 'hbx admin can force publish'
+  DefinePermissions.define_task :hbx_admin_can_force_publish => :environment
+end
+
+# RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_extend_open_enrollment
+namespace :permissions do
+  desc 'hbx admin can extend open enrollment'
+  DefinePermissions.define_task :hbx_admin_can_extend_open_enrollment => :environment
+end
+
+# RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_create_benefit_application
+namespace :permissions do
+  desc 'hbx admin can extend open enrollment'
+  DefinePermissions.define_task :hbx_admin_can_create_benefit_application => :environment
+end
+
+# RAILS_ENV=production bundle exec rake permissions:grant_super_admin_access user_email="<email address1>,<email address2>"
+namespace :permissions do
+  desc 'grant super admin access for given users'
+  DefinePermissions.define_task :grant_super_admin_access => :environment
+end
+
+# RAILS_ENV=production bundle exec rake permissions:grant_hbx_tier3_access user_email="<email address1>,<email address2>"
+namespace :permissions do
+  desc 'grant hbx tier3 access for given users'
+  DefinePermissions.define_task :grant_hbx_tier3_access => :environment
+end
+
 #rake permissions:initial_hbx
 #rake permissions:migrate_hbx
 #rake permissions:hbx_admin_can_update_ssn

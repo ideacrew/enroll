@@ -12,6 +12,7 @@ module BenefitSponsors
           send(delivery_method, recipient, event_object, notice_event, notice_params)
         rescue Exception => e
           Rails.logger.error { "Could not deliver #{notice_event} notice due to #{e}" }
+          raise e if Rails.env.test? # RSpec Expectation Not Met Error is getting rescued here
         end
       end
 
