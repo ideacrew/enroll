@@ -210,6 +210,7 @@ class Plan
 
   scope :by_nationwide, ->(types) { where(:nationwide => {"$in" => types})}
   scope :by_dc_network, ->(types) { where(:dc_in_network => {"$in" => types})}
+  scope :check_plan_offerings_for_single_carrier,  ->{ where(is_vertical: "true") }
 
 
   def carrier_profile=(new_carrier_profile)
