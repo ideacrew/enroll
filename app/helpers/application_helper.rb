@@ -711,5 +711,12 @@ module ApplicationHelper
     return true unless hbx_staff_role.present?
     hbx_staff_role.permission.can_access_pay_now
   end
-end
 
+  def show_resident_checkboxes
+    employee_role = current_user.person.has_active_employee_role?
+    consumer_role = current_user.person.is_consumer_role_active?
+    resident_role = current_user.person.is_resident_role_active?
+    return true unless employee_role
+    return true if consumer_role || resident_role
+  end
+end
