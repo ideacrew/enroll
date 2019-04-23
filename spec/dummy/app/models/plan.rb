@@ -58,6 +58,10 @@ class Plan
   # for dental plans only, metal level -> high/low values
   field :dental_level, type: String
 
+  field :is_horizontal, type: Boolean, default: -> { true }
+  field :is_vertical, type: Boolean, default: -> { true }
+  field :is_sole_source, type: Boolean, default: -> { true }
+
   default_scope -> {order("name ASC")}
 
   # Metal level
