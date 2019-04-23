@@ -26,7 +26,7 @@ Feature: As an admin user I should have the ability to extend the OE
   Scenario: Draft application published between submission deadline & application effective date
     Given that a user with a HBX staff role with Super Admin subrole exists and is logged in
     And the user is on the Employer Index of the Admin Dashboard
-    And system date is between submission deadline & application effective date
+    And the system date is less than the earliest_start_prior_to_effective_on
     When ABC widgets FTE count is less than or equal to shop:small_market_employee_count_maximum
     And ABC widgets primary address state is MA
     And the user clicks Action for that Employer
