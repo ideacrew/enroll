@@ -144,14 +144,16 @@ def primary_answered_data?(person, person_version, family)
     return false if cr.blank?
     lpd = cr.lawful_presence_determination
     return false if lpd.blank?
-    !(lpd.citizen_status.blank? || (primary_person.is_incarcerated == nil))
+    true
+#    !(lpd.citizen_status.blank? || (primary_person.is_incarcerated == nil))
   else
     primary_person = family.primary_applicant.person
     cr = primary_person.consumer_role
     return false if cr.blank?
     lpd = cr.lawful_presence_determination
     return false if lpd.blank?
-    !(lpd.citizen_status.blank? || (primary_person.is_incarcerated == nil))
+    true
+#    !(lpd.citizen_status.blank? || (primary_person.is_incarcerated == nil))
   end
 end
 
@@ -209,7 +211,7 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
             cr.person = pers
           end
           begin
-            if version_in_window?(pers) # && primary_has_address?(pers_record, pers, fam) && primary_answered_data?(pers_record, pers, fam) # && not_authorized_by_curam?(pers)
+            if version_in_window?(pers) && primary_answered_data?(pers_record, pers, fam) # && primary_has_address?(pers_record, pers, fam) && primary_answered_data?(pers_record, pers, fam) # && not_authorized_by_curam?(pers)
               eligible = calc_eligibility_for(cr, fam, health_benefit_packages, pers.updated_at)
               lpd = cr.lawful_presence_determination
               if lpd
