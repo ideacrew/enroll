@@ -146,40 +146,38 @@ module BenefitSponsors
         end
 
         def init_profile_organization(existing_org, attributes)
-          if is_broker_profile?
-            init_broker_organization(existing_org, attributes)
-          elsif is_employer_profile?
-            init_benefit_organization(existing_org, attributes)
-          end
-        end
-
-        def init_broker_organization(organization, attributes)
-          if organization.present? && !organization.broker_agency_profile.present?
-            organization.profiles << build_profile(profile_attributes(attributes))
-            organization
-          else
-            build_organization(attributes)
-          end
-        end
-
-        def init_benefit_organization(existing_org, attributes)
-          if existing_org
-            self.claimed = is_employer_profile_claimed?(existing_org)
-            unless claimed
-              if existing_org.employer_profile.blank?
-                existing_org.profiles << build_profile(profile_attributes(attributes))
-                self.profile.add_benefit_sponsorship
-              end
-            end
-            existing_org
-          else
-            build_organization(attributes)
-          end
-
-          # handler.organization = existing_org
-          # handler.factory = self
-          # handler.fetch_organization(attributes) || build_organization(attributes)
-
+        #   if is_broker_profile?
+        #     init_broker_organization(existing_org, attributes)
+        #   elsif is_employer_profile?
+        #     init_benefit_organization(existing_org, attributes)
+        #   end
+        # end
+        #
+        # def init_broker_organization(organization, attributes)
+        #   if organization.present? && !organization.broker_agency_profile.present?
+        #     organization.profiles << build_profile(profile_attributes(attributes))
+        #     organization
+        #   else
+        #     build_organization(attributes)
+        #   end
+        # end
+        #
+        # def init_benefit_organization(existing_org, attributes)
+        #   if existing_org
+        #     self.claimed = is_employer_profile_claimed?(existing_org)
+        #     unless claimed
+        #       if existing_org.employer_profile.blank?
+        #         existing_org.profiles << build_profile(profile_attributes(attributes))
+        #         self.profile.add_benefit_sponsorship
+        #       end
+        #     end
+        #     existing_org
+        #   else
+        #     build_organization(attributes)
+        #   end
+          handler.organization = existing_org
+          handler.factory = self
+          handler.fetch_organization(attributes) || build_organization(attributes)
         end
 
         def build_organization(attrs = {})
@@ -194,6 +192,7 @@ module BenefitSponsors
         end
 
         def build_profile(attrs = {})
+
           # profile = if is_broker_profile?
           #             build_broker_profile(attrs)
           #           elsif is_employer_profile?
@@ -212,7 +211,6 @@ module BenefitSponsors
           new_office_location.build_phone
           new_office_location
         end
-
 
         # def build_broker_profile(attrs = {})
         #   Organizations::BrokerAgencyProfile.new(attrs)
@@ -309,21 +307,20 @@ module BenefitSponsors
         end
 
         def redirection_url(is_pending=nil, is_saved=nil)
-          if is_broker_profile?
-            :broker_new_registration_url
-          elsif is_employer_profile?
-            return "sponsor_show_pending_registration_url" if is_pending
-            # return "sponsor_home_registration_url@#{profile_id}" if is_saved
-            resource_id = profile_id
-            resource_id = organization.employer_profile.id if resource_id.blank? && organization.present?
-            return "sponsor_home_registration_url@#{resource_id}" if is_saved
-
-            :sponsor_new_registration_url
-          end
+          # if is_broker_profile?
+          #   :broker_new_registration_url
+          # elsif is_employer_profile?
+          #   return "sponsor_show_pending_registration_url" if is_pending
+          #   # return "sponsor_home_registration_url@#{profile_id}" if is_saved
+          #   resource_id = profile_id
+          #   resource_id = organization.employer_profile.id if resource_id.blank? && organization.present?
+          #   return "sponsor_home_registration_url@#{resource_id}" if is_saved
           #
-          # handler.is_saved = is_saved
-          # handler.factory = self
-          # handler.redirection_url
+          #   :sponsor_new_registration_url
+          # end
+          handler.is_saved = is_saved
+          handler.factory = self
+          handler.redirection_url
         end
 
         def redirection_url_on_update
