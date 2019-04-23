@@ -32,17 +32,18 @@ Feature: As an admin user I should have the ability to extend the OE
     And the user clicks Action for that Employer
     Then the user will see the Force Publish button
     And the user clicks on Force Publish button
-    And the user clicks submit button
+    And the user clicks submit to confirm force publish
     Then the force publish successful message should be displayed
 
   Scenario Outline: Draft application published between submission deadline & application effective date
     Given that a user with a HBX staff role with Super Admin subrole exists and is logged in
     And the user is on the Employer Index of the Admin Dashboard
-    And system date is between submission deadline & application effective date
+    And the system date is less than the earliest_start_prior_to_effective_on
     And ABC widgets FTE count is <compare_fte> to shop:small_market_employee_count_maximum
     And ABC widgets primary address state <state_check> MA
     And the user clicks Action for that Employer
     And the user clicks on Force Publish button
+    And the user clicks submit to confirm force publish
     Then a <compare_fte> warning message will appear
     # And ask to confirm intention to publish.
 
@@ -56,12 +57,12 @@ Feature: As an admin user I should have the ability to extend the OE
   Scenario: Application force published with eligibility warnings should go to publish pending state
     Given that a user with a HBX staff role with Super Admin subrole exists and is logged in
     And the user is on the Employer Index of the Admin Dashboard
-    And system date is between submission deadline & application effective date
+    And the system date is less than the earliest_start_prior_to_effective_on
     And ABC widgets FTE count is more than to shop:small_market_employee_count_maximum
     And ABC widgets primary address state is not MA
     And the user clicks Action for that Employer
     And the user clicks on Force Publish button
-    And the user clicks submit button
-    Then a warning message will appear
+    And the user clicks submit to confirm force publish
+    Then a less than or equal warning message will appear
     And the user clicks publish anyways
     Then the user will see published sucessfully for review message

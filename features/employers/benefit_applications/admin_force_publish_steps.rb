@@ -40,6 +40,10 @@ When(/^the user clicks on Force Publish button$/) do
   find('.btn.btn-xs', text: 'Force Publish').click
 end
 
+And(/^the user clicks submit to confirm force publish$/) do
+  page.find_button('Submit').click
+end
+
 Then(/^the force published action should display 'Employer\(s\) Plan Year was successfully published'$/) do
   sleep 2
   expect(page).to have_content('Employer(s) Plan Year was successfully published')

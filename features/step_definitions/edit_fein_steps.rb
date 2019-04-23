@@ -15,7 +15,9 @@ end
 
 And(/^the user clicks submit button$/) do
   # TODO: Research if accept_confirm block no longer needed
-  page.find_button('Submit').click
+  accept_confirm do
+    page.find_button('Submit').click
+  end
 end
 
 Then(/^an warning message will be presented as FEIN must be at least nine digits$/) do
