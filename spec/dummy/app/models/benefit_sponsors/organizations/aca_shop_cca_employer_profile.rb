@@ -40,6 +40,11 @@ module BenefitSponsors
 
       #   self
       # end
+
+      def build_nested_models
+        return if inbox.present?
+        build_inbox
+      end
     end
   end
 end

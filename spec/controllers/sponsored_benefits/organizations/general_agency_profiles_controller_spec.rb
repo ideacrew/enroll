@@ -1,7 +1,7 @@
 require 'rails_helper'
 require "#{SponsoredBenefits::Engine.root}/spec/shared_contexts/sponsored_benefits"
 module SponsoredBenefits
-  RSpec.describe Organizations::GeneralAgencyProfilesController do
+  RSpec.describe Organizations::GeneralAgencyProfilesController, dbclean: :after_each do
     include_context "set up broker agency profile for BQT, by using configuration settings"
     routes { SponsoredBenefits::Engine.routes }
 

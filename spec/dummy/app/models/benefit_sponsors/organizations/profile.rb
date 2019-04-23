@@ -11,6 +11,10 @@ module BenefitSponsors
 
       embeds_many :office_locations,
         class_name:"BenefitSponsors::Locations::OfficeLocation", cascade_callbacks: true
+      embeds_one  :inbox, as: :recipient, cascade_callbacks: true,
+                  class_name:"BenefitSponsors::Inboxes::Inbox"
+
+      after_initialize :build_nested_models
 
       delegate :hbx_id,                   to: :organization, allow_nil: false
       delegate :legal_name, :legal_name=, to: :organization, allow_nil: false

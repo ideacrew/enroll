@@ -32,7 +32,7 @@ module BenefitSponsors
       field :home_page, type: String
 
       # embeds_many :documents, as: :documentable
-      # accepts_nested_attributes_for :inbox
+      accepts_nested_attributes_for :inbox
 
       # has_many :broker_agency_contacts, class_name: "Person", inverse_of: :broker_agency_contact
       # accepts_nested_attributes_for :broker_agency_contacts, reject_if: :all_blank, allow_destroy: true
@@ -49,7 +49,7 @@ module BenefitSponsors
         inclusion: { in: Organizations::BrokerAgencyProfile::MARKET_KINDS, message: "%{value} is not a valid practice area" },
         allow_blank: false
 
-      # after_initialize :build_nested_models
+      after_initialize :build_nested_models
 
       scope :active,      ->{ any_in(aasm_state: ["is_applicant", "is_approved"]) }
       scope :inactive,    ->{ any_in(aasm_state: ["is_rejected", "is_suspended", "is_closed"]) }
@@ -68,6 +68,12 @@ module BenefitSponsors
       def primary_broker_role
         return @primary_broker_role if defined? @primary_broker_role
         @primary_broker_role = BrokerRole.find(self.primary_broker_role_id) unless primary_broker_role_id.blank?
+      end
+
+      private
+
+      def build_nested_models
+        build_inbox if inbox.nil?
       end
     end
   end
