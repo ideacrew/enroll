@@ -193,8 +193,7 @@
             </span>
           <% end %>
           <%= link_to l10n("view_details"), summary_products_plans_path({standard_component_id: plan.hios_id, hbx_enrollment_id: hbx_enrollment.id, active_year: plan.active_year, source: 'account'}), {class: 'btn btn-primary  btn-block', remote: true} %> <br>
-          <% policy = FamilyPolicy.new(current_user, @family) %>
-          <% if policy.can_subscriber_policy_action? %>
+          <% if pundit_allow(Family, :can_subscriber_policy_action?) %>
             <%# For the Subscriber Action Buttons Form %>
             <strong>Apply Subscriber Action to Enrollment?</strong> <br>
             <input type="checkbox" name="<%= "check_for_#{hbx_enrollment.id}" %>" value="<%= hbx_enrollment.id %>" class="hbx_enrollment_checkbox">

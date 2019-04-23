@@ -6,6 +6,8 @@ RSpec.describe "insured/families/home.html.erb" do
   let(:user_with_hbx_staff_role) { FactoryGirl.create(:user, :with_family, :with_hbx_staff_role) }
   let(:user_with_employer_role) {FactoryGirl.create(:user, :with_family, :employer_staff) }
   let(:hbx_staff_permission) { FactoryGirl.create(:permission, :hbx_staff) }
+  let(:non_hbx_family_policy) { FamilyPolicy.new(user_with_employer_role, family) }
+  let(:hbx_family_policy) { FamilyPolicy.new(user_with_hbx_staff_role, family) }
 
   let!(:qle_first_of_month) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_first_of_month) }
   let(:sep){
@@ -26,25 +28,28 @@ RSpec.describe "insured/families/home.html.erb" do
   before :each do
     stub_template "insured/families/_right_column.html.erb" => ''
     stub_template "insured/families/_qle_detail.html.erb" => ''
-    stub_template "insured/families/_enrollment.html.erb" => ''
     stub_template "insured/families/_navigation.html.erb" => ''
     stub_template "insured/families/_shop_for_plans_widget.html.erb" => ''
     stub_template "insured/families/_apply_for_medicaid_widget.html.erb" => ''
     stub_template "insured/plan_shoppings/_help_with_plan.html.erb" => ''
     allow(view).to receive(:current_user).and_return(user_with_employer_role)
+    allow(view).to receive(:policy_helper).and_return(non_hbx_family_policy)
     assign(:person, person)
-
     assign(:family, family)
-    render file: "insured/families/home.html.erb"
+    assign(:hbx_enrollments, [hbx])
+    assign(:all_qle_events, [qle_first_of_month])
+    allow(hbx).to receive(:plan).and_return(plan)
   end
 
   it "should display the title" do
     allow(family).to receive(:active_seps).and_return(false)
+    render file: "insured/families/home.html.erb"
     expect(rendered).to have_selector('h1', text: "My #{Settings.site.short_name}")
   end
 
   it "should have plan-summary area" do
     allow(family).to receive(:active_seps).and_return(false)
+    render file: "insured/families/home.html.erb"
     expect(rendered).to have_selector('div#plan-summary')
   end
 
@@ -61,14 +66,9 @@ RSpec.describe "insured/families/home.html.erb" do
   end
 
   context "Subscriber Policy Action Panel" do
-    before :each do
-      assign(:hbx_enrollments, [hbx])
-      assign(:all_qle_events, [qle_first_of_month])
-      allow(hbx).to receive(:plan).and_return(plan)
-    end
-
     it "should display for HBX admin with proper action buttons" do
       allow(view).to receive(:current_user).and_return(user_with_hbx_staff_role)
+      allow(view).to receive(:policy_helper).and_return(hbx_family_policy)
       user_with_hbx_staff_role.stub_chain('person.hbx_staff_role.permission').and_return(hbx_staff_permission)
       render file: "insured/families/home.html.erb"
       expect(rendered).to include("Subscriber Policy Actions")
@@ -78,6 +78,7 @@ RSpec.describe "insured/families/home.html.erb" do
 
     it "should not display for non HBX admin" do
       expect(view.current_user).to eq(user_with_employer_role)
+      allow(view).to receive(:policy_helper).and_return(non_hbx_family_policy)
       render file: "insured/families/home.html.erb"
       expect(rendered).not_to include("Subscriber Policy Actions")
     end
