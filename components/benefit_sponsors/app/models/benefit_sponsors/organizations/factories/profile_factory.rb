@@ -145,41 +145,38 @@ module BenefitSponsors
         end
 
         def init_profile_organization(existing_org, attributes)
-<<<<<<< HEAD
-          if is_broker_profile?
-            init_broker_organization(existing_org, attributes)
-          elsif is_employer_profile?
-            init_benefit_organization(existing_org, attributes)
-          end
-        end
-
-        def init_broker_organization(organization, attributes)
-          if organization.present? && !organization.broker_agency_profile.present?
-            organization.profiles << build_profile(profile_attributes(attributes))
-            organization
-          else
-            build_organization(attributes)
-          end
-        end
-
-        def init_benefit_organization(existing_org, attributes)
-          if existing_org
-            self.claimed = is_employer_profile_claimed?(existing_org)
-            unless claimed
-              if existing_org.employer_profile.blank?
-                existing_org.profiles << build_profile(profile_attributes(attributes))
-                self.profile.add_benefit_sponsorship
-              end
-            end
-            existing_org
-          else
-            build_organization(attributes)
-          end
-=======
+        #   if is_broker_profile?
+        #     init_broker_organization(existing_org, attributes)
+        #   elsif is_employer_profile?
+        #     init_benefit_organization(existing_org, attributes)
+        #   end
+        # end
+        #
+        # def init_broker_organization(organization, attributes)
+        #   if organization.present? && !organization.broker_agency_profile.present?
+        #     organization.profiles << build_profile(profile_attributes(attributes))
+        #     organization
+        #   else
+        #     build_organization(attributes)
+        #   end
+        # end
+        #
+        # def init_benefit_organization(existing_org, attributes)
+        #   if existing_org
+        #     self.claimed = is_employer_profile_claimed?(existing_org)
+        #     unless claimed
+        #       if existing_org.employer_profile.blank?
+        #         existing_org.profiles << build_profile(profile_attributes(attributes))
+        #         self.profile.add_benefit_sponsorship
+        #       end
+        #     end
+        #     existing_org
+        #   else
+        #     build_organization(attributes)
+        #   end
           handler.organization = existing_org
           handler.factory = self
           handler.fetch_organization(attributes) || build_organization(attributes)
->>>>>>> ce0eea425a... refactoring profile factory to remove dependency on checking profile type
         end
 
         def build_organization(attrs = {})
@@ -194,15 +191,14 @@ module BenefitSponsors
         end
 
         def build_profile(attrs = {})
-<<<<<<< HEAD
-          profile = if is_broker_profile?
-                      build_broker_profile(attrs)
-                    elsif is_employer_profile?
-                      build_sponsor_profile(attrs)
-                    end
-=======
+
+          # profile = if is_broker_profile?
+          #             build_broker_profile(attrs)
+          #           elsif is_employer_profile?
+          #             build_sponsor_profile(attrs)
+          #           end
+
           profile = handler.build_profile(attrs)
->>>>>>> ce0eea425a... refactoring profile factory to remove dependency on checking profile type
           profile.office_locations << build_office_locations if profile.office_locations.empty?
           self.profile_id = profile.id
           self.profile = profile
@@ -215,25 +211,22 @@ module BenefitSponsors
           new_office_location
         end
 
-<<<<<<< HEAD
-        def build_broker_profile(attrs = {})
-          Organizations::BrokerAgencyProfile.new(attrs)
-        end
+        # def build_broker_profile(attrs = {})
+        #   Organizations::BrokerAgencyProfile.new(attrs)
+        # end
+        #
+        # def build_sponsor_profile(attrs = {})
+        #   build_sponsor_profile_class.new(attrs)
+        # end
+        #
+        # def build_sponsor_profile_class
+        #   if site_key == :dc
+        #     Organizations::AcaShopDcEmployerProfile
+        #   elsif site_key == :cca
+        #     Organizations::AcaShopCcaEmployerProfile
+        #   end
+        # end
 
-        def build_sponsor_profile(attrs = {})
-          build_sponsor_profile_class.new(attrs)
-        end
-
-        def build_sponsor_profile_class
-          if site_key == :dc
-            Organizations::AcaShopDcEmployerProfile
-          elsif site_key == :cca
-            Organizations::AcaShopCcaEmployerProfile
-          end
-        end
-
-=======
->>>>>>> ce0eea425a... refactoring profile factory to remove dependency on checking profile type
         def build_organization_class
           # Use GeneralOrganization for now
           GeneralOrganization || ExemptOrganization
@@ -313,23 +306,20 @@ module BenefitSponsors
         end
 
         def redirection_url(is_pending=nil, is_saved=nil)
-<<<<<<< HEAD
-          if is_broker_profile?
-            :broker_new_registration_url
-          elsif is_employer_profile?
-            return "sponsor_show_pending_registration_url" if is_pending
-            # return "sponsor_home_registration_url@#{profile_id}" if is_saved
-            resource_id = profile_id
-            resource_id = organization.employer_profile.id if resource_id.blank? && organization.present?
-            return "sponsor_home_registration_url@#{resource_id}" if is_saved
-
-            :sponsor_new_registration_url
-          end
-=======
+          # if is_broker_profile?
+          #   :broker_new_registration_url
+          # elsif is_employer_profile?
+          #   return "sponsor_show_pending_registration_url" if is_pending
+          #   # return "sponsor_home_registration_url@#{profile_id}" if is_saved
+          #   resource_id = profile_id
+          #   resource_id = organization.employer_profile.id if resource_id.blank? && organization.present?
+          #   return "sponsor_home_registration_url@#{resource_id}" if is_saved
+          #
+          #   :sponsor_new_registration_url
+          # end
           handler.is_saved = is_saved
           handler.factory = self
           handler.redirection_url
->>>>>>> ce0eea425a... refactoring profile factory to remove dependency on checking profile type
         end
 
         def redirection_url_on_update
@@ -439,7 +429,7 @@ module BenefitSponsors
             end
             person.save!
           end
-          
+
           def fetch_organization(attributes)
             if organization.present? && !organization.general_agency_profile.present?
               organization.profiles << build_profile(attributes)
