@@ -166,6 +166,7 @@ class HbxEnrollment
   scope :enrolled_and_renewal, ->{where(:aasm_state.in => ENROLLED_AND_RENEWAL_STATUSES )}
   scope :enrolled_and_renewing, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES)) }
   scope :enrolled_and_renewing_and_shopping, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES + ['shopping'])) }
+  scope :enrolled_and_renewing_and_expired, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES + ['coverage_expired'])) }
   scope :effective_asc,      -> { order(effective_on: :asc) }
   scope :effective_desc,      ->{ order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) }
   scope :waived,              ->{ where(:aasm_state.in => WAIVED_STATUSES )}
@@ -550,13 +551,14 @@ class HbxEnrollment
         end
       end
     else
-      terminating_benefit_group_ids += self.employer_profile.renewing_plan_year.benefit_groups.pluck(:id) if employer_profile.renewing_plan_year.present?
+      future_plan_year = employer_profile.find_plan_year_by_effective_date(plan_year.end_on.next_day)
+      terminating_benefit_group_ids += future_plan_year.benefit_groups.pluck(:id) if future_plan_year.present?
     end
 
     household.hbx_enrollments.where({
       :benefit_group_id.in => terminating_benefit_group_ids, 
       :coverage_kind => coverage_kind,
-      }).enrolled_and_renewing.each do |enrollment|
+      }).enrolled_and_renewing_and_expired.each do |enrollment|
 
       coverage_end_date = family.terminate_date_for_shop_by_enrollment(enrollment)
       term_or_cancel_enrollment(enrollment, coverage_end_date)
