@@ -9,17 +9,17 @@ Given(/^the user with a (.*?) role(?: with (.*?) subrole)? updates permisssions 
 end
 
 Then(/^the user will see the Config tab$/) do
-  find('.dropdown-toggle', :text => "Admin").trigger 'click'
+  find('.dropdown-toggle', :text => "Admin").click
   expect(page).to have_content('Config')
 end
 
 Then(/^the user will not see the Config tab$/) do
-  find('.dropdown-toggle', :text => "Admin").trigger 'click'
+  find('.dropdown-toggle', :text => "Admin").click
   expect(page).to_not have_content('Config')
 end
 
 Given(/^the user goes to the Config Page$/) do
-  find('.dropdown-toggle', :text => "Admin").trigger 'click'
+  find('.dropdown-toggle', :text => "Admin").click
   click_link 'Config'
   expect(page).to have_content('Configuration')
 end
@@ -29,6 +29,6 @@ Then(/^the user will not see the Time Tavel option$/) do
 end
 
 Then(/^the user will see the Time Tavel option$/) do
-  expect(page).to have_button('Set Current Date', disabled: "")
+  expect(page).to have_button('Set Current Date', disabled: false)
 end
 
