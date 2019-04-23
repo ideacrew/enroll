@@ -6,7 +6,7 @@
       <th style='width: 18%; height: 40px; padding: 10px'> <%= l10n("legal_name") %></th>
       <th style='width: 18%'> <%= l10n("npn") %></th>
       <th style='width: 18%'> <%= l10n("primary_broker_name") %></th>
-      <th style='width: 20%; text-align: center'> <%=l10n("select_this_broker")%></th>
+      <th style='width: 18%; text-align: center'> <%=l10n("select_this_broker")%></th>
       </thead>
       <% @broker_agency_profiles.each do |agency| %>
         <tbody class="select-broker">
@@ -14,7 +14,7 @@
           <td><%= agency.legal_name %></td>
           <td><%= agency.primary_broker_role.npn %></td>
           <td><%= agency.primary_broker_role.person.full_name %></td>
-          <td colspan="1"><a href="javascript:void(0)" class='btn btn-primary select-broker-agency pull-right'  data-broker_agency_profile_id="<%= agency._id %>"><%=l10n("select_this_broker")%></a></td>
+          <td colspan="1"><a href="javascript:void(0)" class='btn btn-danger select-broker-agency pull-right'  data-broker_agency_profile_id="<%= agency._id %>"><%=l10n("select_this_broker")%></a></td>
           </td>
         </tr>
         </tbody>
