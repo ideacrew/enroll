@@ -184,11 +184,14 @@ class Organization
   end
 
   def invoices
-    documents.select{ |document| document.subject == 'invoice' }
+    invoices = []
+    invoices = documents.select{ |document| document.subject == 'invoice' }
+    invoices += employer_profile.documents.select{ |document| document.subject == 'initial_invoice' }
+    invoices
   end
 
   def current_month_invoice
-    documents.select{ |document| document.subject == 'invoice' && document.date.strftime("%Y%m") == TimeKeeper.date_of_record.strftime("%Y%m")}
+    invoices.select{ |document| document.date.strftime("%Y%m") == TimeKeeper.date_of_record.strftime("%Y%m")}
   end
 
   # Strip non-numeric characters
@@ -370,6 +373,10 @@ class Organization
 
   end
 
+  def renewing_or_draft_py
+    employer_profile.plan_years.renewing_draft_or_draft.last
+  end
+
   class << self
     def employer_profile_renewing_starting_on(date_filter)
       employer_profile_renewing_coverage.employer_profile_plan_year_start_on(date_filter)
@@ -434,6 +441,5 @@ class Organization
       agency_ids = agencies.map{|org| org.broker_agency_profile.id}
       brokers.select{ |broker| agency_ids.include?(broker.broker_role.broker_agency_profile_id) }
     end
-    
   end
 end

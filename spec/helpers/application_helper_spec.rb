@@ -426,38 +426,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
     it "should not return next year" do
       expect(helper.previous_year).not_to eq (TimeKeeper.date_of_record.year + 1)
     end
-end
-
-  describe ".notify_employer_when_employee_terminate_coverage" do
-    let(:benefit_group) { FactoryGirl.create(:benefit_group)}
-    let(:person) {FactoryGirl.create(:person)}
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member,person:person)}
-    let(:active_plan_year){ FactoryGirl.build(:plan_year,start_on:TimeKeeper.date_of_record.next_month.beginning_of_month - 1.year, end_on:TimeKeeper.date_of_record.end_of_month,aasm_state: "active",benefit_groups:[benefit_group]) }
-    let(:employer_profile){ FactoryGirl.build(:employer_profile, plan_years: [active_plan_year]) }
-    let(:organization)  {FactoryGirl.create(:organization,employer_profile:employer_profile)}
-    let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)}
-    let(:employee_role) { FactoryGirl.create(:employee_role)}
-    let(:census_employee) { FactoryGirl.create(:census_employee,employer_profile: employer_profile,:benefit_group_assignments => [benefit_group_assignment],employee_role_id:employee_role.id) }
-    let(:enrollment) { FactoryGirl.create(:hbx_enrollment, benefit_group_id: benefit_group.id, household:family.active_household,benefit_group_assignment_id: benefit_group_assignment.id, employee_role_id:employee_role.id)}
-
-    it "should trigger notify_employer_when_employee_terminate_coverage job in queue" do
-      allow(enrollment).to receive(:is_shop?).and_return(true)
-      allow(enrollment).to receive(:enrollment_kind).and_return('health')
-      allow(enrollment).to receive(:employer_profile).and_return(employer_profile)
-      allow(enrollment).to receive(:census_employee).and_return(census_employee)
-      ActiveJob::Base.queue_adapter = :test
-      ActiveJob::Base.queue_adapter.enqueued_jobs = []
-      helper.notify_employer_when_employee_terminate_coverage(enrollment)
-      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
-        job_info[:job] == ShopNoticesNotifierJob
-      end
-      expect(queued_job[:args]).not_to be_empty
-      expect(queued_job[:args].include?('notify_employer_when_employee_terminate_coverage')).to be_truthy
-      expect(queued_job[:args].include?("#{enrollment.employer_profile.id.to_s}")).to be_truthy
-      expect(queued_job[:args].third["hbx_enrollment"]).to eq enrollment.hbx_id.to_s
-    end
   end
-
 
   describe "convert_to_bool" do
     let(:val1) {true }

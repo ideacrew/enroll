@@ -6,7 +6,7 @@
   <div>Dear <%= census_employee.full_name.humanize.titleize %>,</div>
   <br/>
   <div>
-    Good News! <%= census_employee.employer_profile.legal_name %> has chosen to offer of health insurance coverage to its employees through <%= Settings.site.short_name %> and will contribute to your monthly premium to make the cost of coverage more affordable. Your new hire open enrollment period begins on <b><%= census_employee.new_hire_enrollment_period.first.to_date.to_formatted_s %></b>.
+    Good News! <%= census_employee.employer_profile.legal_name %> has chosen to offer health insurance coverage to its employees through <%= Settings.site.short_name %> and will contribute to your monthly premium to make the cost of coverage more affordable. Your new hire open enrollment period begins on <b><%= census_employee.new_hire_enrollment_period.first.to_date.to_formatted_s %></b>.
   </div>
   <br/>
   <div>

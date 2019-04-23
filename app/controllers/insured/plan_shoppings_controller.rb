@@ -7,8 +7,9 @@ class Insured::PlanShoppingsController < ApplicationController
   include Acapi::Notifiers
   extend Acapi::Notifiers
   include Aptc
-  before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show, :plans, :checkout, :terminate,:plan_selection_callback]
-  before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show, :plans, :checkout, :receipt,:set_elected_aptc,:plan_selection_callback]
+
+  before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show, :plans, :checkout, :terminate, :plan_selection_callback]
+  before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show, :plans, :checkout, :receipt, :set_elected_aptc, :plan_selection_callback]
 
   def checkout
     plan_selection = PlanSelection.for_enrollment_id_and_plan_id(params.require(:id), params.require(:plan_id))
@@ -57,9 +58,6 @@ class Insured::PlanShoppingsController < ApplicationController
 
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
-    @enrollment.ee_plan_selection_confirmation_sep_new_hire
-
-    @enrollment.mid_year_plan_change_notice
 
     send_receipt_emails if @person.emails.first
   end
@@ -105,35 +103,40 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def waive
-    person = @person
     hbx_enrollment = HbxEnrollment.find(params.require(:id))
-    waiver_reason = params[:waiver_reason]
+    waiver_success = false
 
-    # Create a new hbx_enrollment for the waived enrollment.
-    unless hbx_enrollment.shopping?
-      employee_role = @person.employee_roles.active.last if employee_role.blank? and @person.has_active_employee_role?
-      coverage_household = @person.primary_family.active_household.immediate_family_coverage_household
-      waived_enrollment =  coverage_household.household.new_hbx_enrollment_from(employee_role: employee_role, coverage_household: coverage_household, benefit_group: nil, benefit_group_assignment: nil, qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
-      waived_enrollment.coverage_kind= hbx_enrollment.coverage_kind
-      waived_enrollment.kind = 'employer_sponsored_cobra' if employee_role.present? && employee_role.is_cobra_status?
-      waived_enrollment.generate_hbx_signature
-
-      if waived_enrollment.save!
-        hbx_enrollment = waived_enrollment
-        hbx_enrollment.household.reload # Make sure we reload the household to reflect the newly created HbxEnrollment
+    begin
+      if hbx_enrollment.shopping?
+        @waiver_enrollment = hbx_enrollment
+      else
+        unless hbx_enrollment.waiver_enrollment_present?
+          family = hbx_enrollment.family 
+          coverage_end_date = family.terminate_date_for_shop_by_enrollment(hbx_enrollment)
+          @waiver_enrollment = hbx_enrollment.construct_waiver_enrollment(params[:waiver_reason], coverage_end_date: coverage_end_date)
+        end
       end
-    end
 
-    if hbx_enrollment.may_waive_coverage? and waiver_reason.present? and hbx_enrollment.valid?
-      hbx_enrollment.waive_coverage_by_benefit_group_assignment(waiver_reason)
-      redirect_to print_waiver_insured_plan_shopping_path(hbx_enrollment), notice: "Waive Coverage Successful"
+      if @waiver_enrollment.present?
+        if @waiver_enrollment.may_waive_coverage?
+          @waiver_enrollment.waiver_reason = params[:waiver_reason]
+          @waiver_enrollment.waive_enrollment
+        end
 
-    else
+        if @waiver_enrollment.inactive?
+          waiver_success = true
+        end
+      end
+
+      if waiver_success 
+        redirect_to print_waiver_insured_plan_shopping_path(@waiver_enrollment), notice: "Waive Coverage Successful"
+      else
+        redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), alert: "Waive Coverage Failed"
+      end
+    rescue => e
+      log(e.message, :severity=>'error')
       redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), alert: "Waive Coverage Failed"
     end
-  rescue => e
-    log(e.message, :severity=>'error')
-    redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), alert: "Waive Coverage Failed"
   end
 
   def print_waiver
@@ -142,15 +145,14 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def terminate
     hbx_enrollment = HbxEnrollment.find(params.require(:id))
+    coverage_end_date = @person.primary_family.terminate_date_for_shop_by_enrollment(hbx_enrollment)
+    hbx_enrollment.terminate_enrollment(coverage_end_date, params[:terminate_reason])
 
-    if hbx_enrollment.may_schedule_coverage_termination?
-      hbx_enrollment.termination_submitted_on = TimeKeeper.datetime_of_record
-      hbx_enrollment.terminate_reason = params[:terminate_reason] if params[:terminate_reason].present?
-      hbx_enrollment.schedule_coverage_termination!(@person.primary_family.terminate_date_for_shop_by_enrollment(hbx_enrollment))
+    if hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_termination_pending?
       hbx_enrollment.update_renewal_coverage
-      notify_employer_when_employee_terminate_coverage(hbx_enrollment)
-      hbx_enrollment.notify_employee_confirming_coverage_termination
-      redirect_to family_account_path
+      @person.primary_family.active_household.reload
+      waiver_enrollment = @person.primary_family.enrollments.where(predecessor_enrollment_id: hbx_enrollment.id).first
+      redirect_to print_waiver_insured_plan_shopping_path(waiver_enrollment), notice: "Waive Coverage Successful"
     else
       redirect_to :back
     end

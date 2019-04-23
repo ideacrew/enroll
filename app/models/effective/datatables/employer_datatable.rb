@@ -53,7 +53,8 @@ module Effective
            ['Generate Invoice', generate_invoice_exchanges_hbx_profiles_path(ids: [row]), generate_invoice_link_type(row)],
            [text_to_display(row.employer_profile), disable_ssn_requirement_exchanges_hbx_profiles_path(ids: [row], no_ssn_field: row.employer_profile.no_ssn), 'post_ajax'],
            ['View Username and Email', get_user_info_exchanges_hbx_profiles_path(people_id: Person.where({"employer_staff_roles.employer_profile_id" => row.employer_profile._id}).map(&:id), employers_action_id: "family_actions_#{row.id.to_s}"), pundit_allow(Family, :can_view_username_and_email?) ? 'ajax' : 'disabled'],
-           ['Plan Years', exchanges_employer_applications_path(employer_id: row.employer_profile._id, employers_action_id: "family_actions_#{row.id}"), 'ajax']
+           ['Plan Years', exchanges_employer_applications_path(employer_id: row.employer_profile._id, employers_action_id: "family_actions_#{row.id}"), 'ajax'],
+           ['Force Publish', edit_force_publish_exchanges_hbx_profiles_path(row_actions_id: "family_actions_#{row.id.to_s}"), force_publish_link_type(row, pundit_allow(HbxProfile, :can_force_publish?))]
           ]
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "family_actions_#{row.id.to_s}"}, formats: :html
         }, :filter => false, :sortable => false
@@ -61,7 +62,17 @@ module Effective
       end
 
       def generate_invoice_link_type(row)
-        row.current_month_invoice.present? ? 'disabled' : 'post_ajax'
+        (row.current_month_invoice.present? || !row.employer_profile.is_new_employer?) ? 'disabled' : 'post_ajax'
+      end
+
+      def business_policy_accepted?(draft_plan_year)
+        TimeKeeper.date_of_record > draft_plan_year.due_date_for_publish && TimeKeeper.date_of_record < draft_plan_year.start_on
+      end
+
+      def force_publish_link_type(row, allow)
+        draft_plan_year = row.renewing_or_draft_py
+        draft_plan_year_and_allow = draft_plan_year.present? && business_policy_accepted?(draft_plan_year) && allow
+        draft_plan_year_and_allow ? 'ajax' : 'hide'
       end
 
       def collection

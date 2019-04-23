@@ -215,10 +215,10 @@ RSpec.describe Organization, dbclean: :after_each do
       end
 
       context 'by_broker_agency_profile' do  
-        let(:organization6)  {FactoryGirl.create(:organization, fein: "024897585")}
-        let(:broker_agency_profile)  {organization6.create_broker_agency_profile(market_kind: "both", primary_broker_role_id: "8754985")}
-        let(:organization7)  {FactoryGirl.create(:organization, fein: "724897585")}
-        let(:broker_agency_profile7)  {organization7.create_broker_agency_profile(market_kind: "both", primary_broker_role_id: "7754985")}
+        let(:broker_role6)   { FactoryGirl.create(:broker_role, aasm_state:'active') }
+        let(:broker_agency_profile)  { FactoryGirl.create(:broker_agency_profile, market_kind: "both", primary_broker_role_id: broker_role6.id)}
+        let(:broker_role7)   { FactoryGirl.create(:broker_role, aasm_state:'active') }
+        let(:broker_agency_profile7)  { FactoryGirl.create(:broker_agency_profile, market_kind: "both", primary_broker_role_id: broker_role7.id)}
         let(:organization3)  {FactoryGirl.create(:organization, fein: "034267123")}
 
         it 'should match employers with active broker agency_profile' do
@@ -517,4 +517,20 @@ RSpec.describe Organization, dbclean: :after_each do
     end
   end
 
+  describe 'renewing_or_draft_py' do
+    context 'get renewing draft or draft plan year' do
+      let!(:organization)     { FactoryGirl.create(:organization) }
+      let!(:employer_profile) { FactoryGirl.build(:employer_profile, organization: organization) }
+      let!(:draft_plan_year)  { FactoryGirl.create(:next_month_plan_year, :with_benefit_group, aasm_state: 'draft', employer_profile: employer_profile) }
+      let!(:non_draft_plan_year) { FactoryGirl.create(:next_month_plan_year, :with_benefit_group, aasm_state: 'enrolling', employer_profile: employer_profile) }
+
+      it 'should return draft plan year' do
+        expect(organization.renewing_or_draft_py).to eq(draft_plan_year)
+      end
+
+      it 'should not return enrolling plan year' do
+        expect(organization.renewing_or_draft_py).not_to eq(non_draft_plan_year)
+      end
+    end
+  end
 end

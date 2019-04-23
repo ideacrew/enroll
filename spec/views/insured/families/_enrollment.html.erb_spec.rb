@@ -79,6 +79,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     let(:benefit_group) { FactoryGirl.create(:benefit_group) }
 
     before :each do
+      allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
       allow(hbx_enrollment).to receive(:is_special_enrollment?).and_return(false)
       allow(hbx_enrollment).to receive(:coverage_terminated?).and_return(false)
       allow(hbx_enrollment).to receive(:coverage_expired?).and_return(false)
@@ -91,7 +92,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx_enrollment).to receive(:consumer_role_id).and_return(false)
       allow(census_employee.employee_role).to receive(:is_under_open_enrollment?).and_return(true)
       allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
-      allow(hbx_enrollment).to receive(:coverage_termination_pending?).and_return(true)
+      allow(hbx_enrollment).to receive(:coverage_termination_pending?).and_return(false)
       allow(hbx_enrollment).to receive(:future_enrollment_termination_date).and_return(TimeKeeper.date_of_record)
       allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
@@ -196,6 +197,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
 
     before :each do
+      allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
       allow(hbx_enrollment).to receive(:coverage_canceled?).and_return(false)
       allow(hbx_enrollment).to receive(:coverage_expired?).and_return(false)
       allow(hbx_enrollment).to receive(:is_coverage_waived?).and_return(false)
@@ -242,6 +244,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     let(:benefit_group) { FactoryGirl.create(:benefit_group) }
 
     before :each do
+      allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
       allow(hbx_enrollment).to receive(:coverage_canceled?).and_return(false)
       allow(hbx_enrollment).to receive(:coverage_expired?).and_return(false)
       allow(hbx_enrollment).to receive(:is_coverage_waived?).and_return(false)
@@ -338,14 +341,16 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
   context "when the enrollment is_coverage_waived" do
     let(:employer_profile) { FactoryGirl.build_stubbed(:employer_profile) }
+    let(:benefit_group) { FactoryGirl.build_stubbed(:benefit_group)}
     let(:enrollment) { double("enrollment", aasm_state: "inactive", coverage_kind: "health", is_shop?: true,
                         employer_profile: employer_profile, effective_on: TimeKeeper.date_of_record - 1.month,
-                        submitted_at: TimeKeeper.date_of_record - 1.month, waiver_reason: nil, id: nil) }
+                        submitted_at: TimeKeeper.date_of_record - 1.month, waiver_reason: 'waiver_reason', terminate_reason: nil, id: nil) }
 
     context "it should render waived_coverage_widget " do
 
       before :each do
         allow(enrollment).to receive(:is_coverage_waived?).and_return true
+        allow(enrollment).to receive(:benefit_group).and_return(benefit_group)
         allow(view).to receive(:disable_make_changes_button?).with(enrollment).and_return true
         render partial: "insured/families/enrollment", collection: [enrollment], as: :hbx_enrollment, locals: { read_only: false }
       end
@@ -363,6 +368,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
       before :each do
         allow(enrollment).to receive(:is_coverage_waived?).and_return true
+        allow(enrollment).to receive(:benefit_group).and_return(benefit_group)
         allow(view).to receive(:disable_make_changes_button?).with(enrollment).and_return false
         render partial: "insured/families/enrollment", collection: [enrollment], as: :hbx_enrollment, locals: { read_only: false }
       end
