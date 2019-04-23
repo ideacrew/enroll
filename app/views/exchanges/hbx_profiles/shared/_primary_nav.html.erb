@@ -98,25 +98,6 @@
             <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Broker Agencies"></span>
          <% end %>
         </li>
-
-        <li role="presentation"<%= menu_tab_class(active_tab, "issuers-tab") %> class="<%=pundit_class HbxProfile, :view_admin_tabs?%>">
-         <%= link_to(issuer_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "issuers", "role" => "tab" ) do  %>
-            <span class="hidden-xs">Issuers</span>
-            <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Issuers"></span>
-         <% end %>
-        </li>
-        <li role="presentation"<%= menu_tab_class(active_tab, "products-tab") %> class="<%=pundit_class HbxProfile, :view_admin_tabs?%>">
-         <%= link_to(product_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "products", "role" => "tab" ) do  %>
-            <span class="hidden-xs">Products</span>
-            <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Products"></span>
-         <% end %>
-        </li>
-        <li role="presentation"<%= menu_tab_class(active_tab, "users-orphans-tab") %> class="<%=pundit_class HbxProfile, :view_admin_tabs?%>">
-         <%= link_to(users_orphans_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "users_orphans", "role" => "tab" ) do  %>
-            <span class="hidden-xs">Orphan Accounts</span>
-            <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Orphan Accounts"></span>
-         <% end %>
-        </li>
         <li role="presentation"<%= menu_tab_class(active_tab, "configuration-tab") %> class="tab-second <%=pundit_class HbxProfile, :view_admin_tabs?%>">
          <%= link_to(configuration_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "configuration", "role" => "tab" ) do  %>
             <span class="hidden-xs">Config</span>

@@ -29,7 +29,7 @@
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
         <ul class="nav navbar-nav">
   <% if current_user && current_user.try(:person).try(:is_native?)%>
-         <li><h4 class="no-buffer"><a class='portal'>Native Portal</a></h4></a></li>
+         <li><h4 class="no-buffer"><a class='portal'>Sovereign Nations Portal</a></h4></a></li>
       <%else%>
         <li><h4 class="no-buffer"><%= get_header_text(controller_name) %></h4></a></li>
       <%end%>
