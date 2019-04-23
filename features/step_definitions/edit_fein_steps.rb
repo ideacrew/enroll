@@ -18,6 +18,7 @@ And(/^the user clicks submit button$/) do
   accept_confirm do
     page.find_button('Submit').click
   end
+  sleep(3)
 end
 
 Then(/^an warning message will be presented as FEIN must be at least nine digits$/) do
@@ -25,7 +26,11 @@ Then(/^an warning message will be presented as FEIN must be at least nine digits
 end
 
 And(/^the user enters FEIN matches an existing Employer Profile FEIN$/) do
-  find('#organizations_general_organization_new_fein').set(employer("Xfinity Enterprise")[:fein])
+  # For some reason these inspections makes the scenario pass, otherwise it causes them
+  # to allow it to pass through
+  #puts("Xfinitiy enterprise fein is #{employer('Xfinity Enterprise').fein.inspect}")
+  #puts("ABC widgets fein is #{employer('Abc Widgets').fein.inspect}")
+  find('#organizations_general_organization_new_fein').set(employer("Xfinity Enterprise").fein)
 end
 
 Then(/^an warning message will be presented as FEIN matches HBX ID Legal Name$/) do
