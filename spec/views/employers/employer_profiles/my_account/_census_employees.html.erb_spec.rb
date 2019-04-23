@@ -8,7 +8,7 @@ RSpec.describe "employers/employer_profiles/my_account/_census_employees.html.er
   let(:user_with_employer_role) {FactoryGirl.create(:user, :with_family, :employer_staff) }
   let(:hbx_staff_permission) { FactoryGirl.create(:permission, :hbx_staff) }
   let(:non_hbx_employer_profile_policy) { EmployerProfilePolicy.new(user_with_employer_role, employer_profile) }
-  let(:hbx_employer_profile_policy) { EmployerProfilePolicy.new(user_with_hbx_staff_role, user_with_hbx_staff_role) }
+  let(:hbx_employer_profile_policy) { EmployerProfilePolicy.new(user_with_hbx_staff_role, employer_profile) }
 
   before :each do
     allow(employer_profile).to receive(:census_employees).and_return [census_employee]
