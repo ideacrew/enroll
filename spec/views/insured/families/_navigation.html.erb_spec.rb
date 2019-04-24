@@ -43,7 +43,7 @@ RSpec.describe "insured/families/_navigation.html.erb" do
         expect(rendered).to have_selector('a[href="/families/home?tab=home"]', text: "My #{Settings.site.short_name}")
         expect(rendered).to have_selector('a[href="/insured/families/brokers?tab=broker"]', text: 'My Broker')
         expect(rendered).to have_selector('a[href="/insured/families/verification?tab=verification"]', text: 'Documents')
-        expect(rendered).to have_selector('a[href="/financial_assistance/applications"]', text: 'Help Paying for Coverage')
+        expect(rendered).to have_selector('a[href="/financial_assistance/applications"]', text: 'Cost Savings')
         expect(rendered).to have_selector('a[href="/insured/families/inbox?tab=messages"]', text: 'Messages')
       end
 
@@ -116,7 +116,7 @@ RSpec.describe "insured/families/_navigation.html.erb" do
         expect(rendered).to have_selector('a[href="/families/home?tab=home"]', text: "My #{Settings.site.short_name}")
         expect(rendered).to have_selector('a[href="/insured/families/brokers?tab=broker"]', text: 'My Broker')
         expect(rendered).to have_selector('a[href="/insured/families/verification?tab=verification"]', text: 'Documents')
-        expect(rendered).to have_selector('a[href="/financial_assistance/applications"]', text: 'Help Paying for Coverage')
+        expect(rendered).to have_selector('a[href="/financial_assistance/applications"]', text: 'Cost Savings')
         expect(rendered).to have_selector('a[href="/insured/families/inbox?tab=messages"]', text: 'Messages')
       end
 
@@ -152,7 +152,7 @@ RSpec.describe "insured/families/_navigation.html.erb" do
       expect(rendered).to have_selector('a[href="/families/home?tab=home"]', text: "My #{Settings.site.short_name}")
       expect(rendered).to have_selector('a[href="/insured/families/brokers?tab=broker"]', text: 'My Broker')
       expect(rendered).to have_selector('a[href="/insured/families/verification?tab=verification"]', text: 'Documents')
-      expect(rendered).to have_selector('a[href="/financial_assistance/applications"]', text: 'Help Paying for Coverage')
+      expect(rendered).to have_selector('a[href="/financial_assistance/applications"]', text: 'Cost Savings')
       expect(rendered).to have_selector('a[href="/insured/families/inbox?tab=messages"]', text: 'Messages')
     end
 

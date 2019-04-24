@@ -54,7 +54,7 @@
 
       <br />
 
-      <% FinancialAssistance::Deduction::DEDUCTION_TYPE.each do |deduction_kind, label| %>
+      <% FinancialAssistance::Deduction::KINDS.each do |deduction_kind| %>
         <div id="<%= deduction_kind %>"class="deduction-kind">
           <div class="row row-form-wrapper lightgray radio-align fa-text-color no-buffer row-height">
             <div class="col-md-1 checkbox-mr">
@@ -62,7 +62,7 @@
             </div>
 
             <div class="col-md-9 no-pd <%= deduction_kind %>">
-              <%= label %>
+              <%= FinancialAssistance::Deduction::DEDUCTION_TYPE[deduction_kind.to_sym] %>
             </div>
           </div>
 
@@ -76,7 +76,7 @@
             <%= render partial: 'financial_assistance/deductions/deduction_form', locals: { deduction: FinancialAssistance::Deduction.new, kind: deduction_kind} %>
           </div>
           <div class="col-md-12 add-more-link-<%=deduction_kind%>" id="add-more-link">
-             <%= link_to "<span class='fa-icon fa-stack plus-mr' aria-hidden='true'><i class= 'fa fa-circle-thin fa-stack-2x'></i> <i class='fa fa-plus fa-stack-1x'></i></span> <b>Add More</b> #{label}".html_safe, "javascript:void(0);", :id => "add_new_deduction_kind", :class => "#{'hidden' unless @applicant.deductions.of_kind(deduction_kind).present? }" %>
+             <%= link_to "<span class='fa-icon fa-stack plus-mr' aria-hidden='true'><i class= 'fa fa-circle-thin fa-stack-2x'></i> <i class='fa fa-plus fa-stack-1x'></i></span> <b>Add More</b> #{FinancialAssistance::Deduction::DEDUCTION_TYPE[deduction_kind.to_sym]}".html_safe, "javascript:void(0);", :id => "add_new_deduction_kind", :class => "#{'hidden' unless @applicant.deductions.of_kind(deduction_kind).present? }" %>
           </div>
         </div>
       <% end %>

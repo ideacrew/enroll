@@ -78,7 +78,7 @@
                   <td><%= applicant.age_of_the_applicant %></td>
                   <td><%= applicant.person.gender.humanize %></td>
                   <td><%= applicant.family_member.relationship.humanize %></td>
-                  <td><%= applicant.person.citizen_status.humanize if applicant.person.citizen_status.present? %></td>
+                  <td><%= applicant.person.format_citizen if applicant.person.citizen_status.present? %></td>
                   <td><%= human_boolean applicant.person.is_incarcerated %></td>
                   <td><%= human_boolean applicant.person.is_applying_coverage %></td>
                 </tr>
@@ -102,7 +102,7 @@
             </div>
 
             <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
-              <div class="col-md-11">Income</div>
+              <div class="col-md-11">INCOME</div>
             </div>
 
             <div class="row row-form-wrapper ptb no-buffer row-height form-content">
@@ -124,7 +124,7 @@
             </div>
 
             <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
-              <div class="col-md-11">Income Adjustments</div>
+              <div class="col-md-11">INCOME ADJUSTMENTS</div>
             </div>
 
             <div class="row row-form-wrapper ptb no-buffer row-height form-content">
@@ -134,7 +134,7 @@
             </div>
 
             <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
-              <div class="col-md-11">Health Coverage</div>
+              <div class="col-md-11">HEALTH COVERAGE</div>
             </div>
 
             <div class="row row-form-wrapper ptb no-buffer row-height form-content">
