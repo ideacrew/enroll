@@ -1123,8 +1123,8 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
         it "should render template " do
           xhr :post, :update_enrollment_termianted_on_date, enrollment_id: enrollment.id.to_s, family_actions_id: family.id, new_termination_date: TimeKeeper.date_of_record.to_s, format: :js
-          expect(response).to have_http_status(:success)
-          expect(response).to render_template("update_enrollment_termianted_on_date")
+          expect(response).to have_http_status(:redirect)
+          expect(response).to redirect_to(exchanges_hbx_profiles_root_path)
         end
 
         context "enrollment that already terminated with past date" do
@@ -1165,8 +1165,8 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
         it "should render template " do
           xhr :post, :update_enrollment_termianted_on_date, enrollment_id: enrollment.id.to_s, family_actions_id: family.id, new_termination_date: TimeKeeper.date_of_record.to_s, format: :js
-          expect(response).to have_http_status(:success)
-          expect(response).to render_template("update_enrollment_termianted_on_date")
+          expect(response).to have_http_status(:redirect)
+          expect(response).to redirect_to(exchanges_hbx_profiles_root_path)
         end
 
         context "enrollment that already terminated with past date" do

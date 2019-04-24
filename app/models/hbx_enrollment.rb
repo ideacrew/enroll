@@ -1766,10 +1766,24 @@ class HbxEnrollment
     active_consumer_role_people.present? ? active_consumer_role_people.map(&:consumer_role).any?(&:verification_outstanding?) : false
   end
 
+  def cancel_terminated_enrollment(termination_date, edi_required)
+    if effective_on == termination_date
+      prevs_state = self.aasm_state
+      self.update_attributes(aasm_state: "coverage_canceled", terminated_on: nil, termination_submitted_on: nil, terminate_reason: nil)
+      workflow_state_transitions << WorkflowStateTransition.new(
+          from_state: prevs_state,
+          to_state: "coverage_canceled"
+      )
+      self.notify_enrollment_cancel_or_termination_event(edi_required)
+      return true
+    end
+  end
+
   def reterm_enrollment_with_earlier_date(termination_date, edi_required)
 
     return false unless self.coverage_terminated? || self.coverage_termination_pending?
     return false if termination_date > self.terminated_on
+    return true if cancel_terminated_enrollment(termination_date, edi_required)
 
     if self.is_shop? && (termination_date > ::TimeKeeper.date_of_record && self.may_schedule_coverage_termination?)
       self.schedule_coverage_termination!(termination_date)
