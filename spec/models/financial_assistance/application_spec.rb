@@ -497,14 +497,6 @@ RSpec.describe FinancialAssistance::Application, type: :model do
     end
   end
 
-  describe '.copy_application' do
-    it 'returns count of application after copy application' do
-      expect(family.applications.count).to eq 5
-      application.copy_application
-      expect(family.applications.count).to eq 6
-    end
-  end
-
   describe 'applications with eligibility determinations, tax households and applicants' do
     it 'should return all the applications for the family' do
       expect(family.applications.count).to eq 5

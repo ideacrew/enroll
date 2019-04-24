@@ -527,47 +527,6 @@ class FinancialAssistance::Application
     active_applicants.map(&:is_ia_eligible).include?(true) && !active_applicants.map(&:is_medicaid_chip_eligible).include?(true)
   end
 
-  def copy_application
-    if self.family.application_in_progress.blank?
-      self.applicants.each do |applicant|
-        applicant.person.person_relationships.each do |pr|
-          puts pr.inspect
-        end
-      end
-      new_application = self.dup
-      new_application.applicants.each do |applicant|
-        applicant.person.person_relationships.each do |pr|
-          puts pr.inspect
-        end
-      end
-      new_application.aasm_state = "draft"
-      new_application.submitted_at = nil
-      new_application.created_at = nil
-      new_application.hbx_id = HbxIdGenerator.generate_application_id
-      new_application.determination_http_status_code = nil
-      new_application.determination_error_message = nil
-      new_application.save!
-      new_application.sync_family_members_with_applicants
-      new_application
-    end
-  end
-
-  def sync_family_members_with_applicants
-    active_member_ids = family.active_family_members.map(&:id)
-    applicants.each do |app| app.update_attributes(:is_active => false) if !active_member_ids.include?(app.family_member_id) end
-    active_applicant_family_member_ids = active_applicants.map(&:family_member_id)
-    family.active_family_members.each do |fm|
-      if !active_applicant_family_member_ids.include?(fm.id)
-        applicant_in_context = applicants.where(family_member_id: fm.id)
-        if applicant_in_context.present?
-          applicant_in_context.first.update_attributes(is_active: true)
-        else
-          applicants.create(family_member_id: fm.id)
-        end
-      end
-    end
-  end
-
 private
 
   def clean_params(model_params)

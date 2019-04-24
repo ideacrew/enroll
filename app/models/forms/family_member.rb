@@ -310,14 +310,8 @@ module Forms
     end
 
     def copy_finanacial_assistances_application
-      if family.applications.present?
-        application_in_draft = family.application_in_progress
-        if application_in_draft.present?
-          application_in_draft.sync_family_members_with_applicants
-        else family.latest_submitted_application.present?
-          family.latest_submitted_application.copy_application
-        end
-      end
+      service = application_service.new(family)
+      service.process_application unless service.code == :no_app
     end
 
     def age_on(date)
@@ -327,6 +321,12 @@ module Forms
       else
         age
       end
-    end  
+    end
+
+    private
+
+    def application_service
+      FinancialAssistance::Services::ApplicationService
+    end
   end
 end
