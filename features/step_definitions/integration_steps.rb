@@ -1167,11 +1167,6 @@ And(/^Hbx Admin click on Employers/) do
   click_link("Employers")
 end
 
-And(/^.+ sees the (.*) page and clicks Continue$/) do |which_page|
-  expect(page).to have_content(which_page)
-  find("#btn-continue").click
-end
-
 And(/^.+ clicks Confirm$/) do
   click_link 'Confirm'
 end
