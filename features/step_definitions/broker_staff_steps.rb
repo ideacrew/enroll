@@ -25,6 +25,8 @@ When(/^Broker staff should see a list of Broker Agencies searched and selects hi
 end
 
 Then(/^Broker staff submits his application and see successful message$/) do
+  expect(page).to have_content('Select Your Broker')
+  expect(page).to have_content('Select This Broker')
   expect(page).to have_button('Submit', disabled: false)
   find('#broker-staff-btn').click
   expect(page).to have_content('Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed.')
