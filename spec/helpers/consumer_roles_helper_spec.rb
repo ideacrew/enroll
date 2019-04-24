@@ -192,4 +192,4 @@ RSpec.describe ConsumerRolesHelper, :type => :helper do
   end
 
 end
-end 
+end
