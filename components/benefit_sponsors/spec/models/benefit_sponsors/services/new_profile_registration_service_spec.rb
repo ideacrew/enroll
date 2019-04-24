@@ -121,15 +121,5 @@ module BenefitSponsors
         end
       end
     end
-
-    describe "has_general_agency_staff_role_for_profile?" do
-      context "check for general agency staff role" do
-        let(:general_agency_person) { FactoryBot.create(:person, emails:[FactoryBot.build(:email, kind:'work')],employer_staff_roles:[active_employer_staff_role]) }
-        let(:general_agency_user) { FactoryBot.create(:user, :person => general_agency_person)}
-        it "has general_agency_staff_role" do
-          expect(subject.new.has_general_agency_staff_role_for_profile?(general_agency_user,general_agency_profile)).to eq false
-        end
-      end
-    end
   end
 end
