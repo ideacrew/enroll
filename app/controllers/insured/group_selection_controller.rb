@@ -1,6 +1,7 @@
 class Insured::GroupSelectionController < ApplicationController
   include Insured::GroupSelectionHelper
 
+  before_action :permit_params, only: [:create]
   before_action :initialize_common_vars, only: [:new, :create, :terminate_selection]
   # before_action :set_vars_for_market, only: [:new]
   # before_action :is_under_open_enrollment, only: [:new]
@@ -50,17 +51,6 @@ class Insured::GroupSelectionController < ApplicationController
     @waivable = @adapter.can_waive?(@hbx_enrollment, params)
   end
 
-  def select_enrollment_members(hbx_enrollment, family_member_ids)
-    hbx_enrollment.hbx_enrollment_members = hbx_enrollment.hbx_enrollment_members.select do |member|
-      family_member_ids.include? member.applicant_id
-    end
-  end
-
-  def validate_enrolling_members(hbx_enrollment)
-    invalid_member_exist = hbx_enrollment.hbx_enrollment_members.map(&:valid_enrolling_member?).include?(false)
-    raise "Please select valid enrolling members" if invalid_member_exist
-  end
-
   def create
     keep_existing_plan = @adapter.keep_existing_plan?(params)
     @market_kind = @adapter.create_action_market_kind(params)
@@ -75,7 +65,7 @@ class Insured::GroupSelectionController < ApplicationController
 
     unless @adapter.is_waiving?(params)
       raise "You must select at least one Eligible applicant to enroll in the healthcare plan" if params[:family_member_ids].blank?
-      family_member_ids = params.require(:family_member_ids).each do |index, family_member_id|
+      family_member_ids = params.require(:family_member_ids).to_h.collect do |_index, family_member_id|
         BSON::ObjectId.from_string(family_member_id)
       end
     end
@@ -168,6 +158,21 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   private
+
+  def permit_params
+    params.permit!
+  end
+
+  def select_enrollment_members(hbx_enrollment, family_member_ids)
+    hbx_enrollment.hbx_enrollment_members = hbx_enrollment.hbx_enrollment_members.select do |member|
+      family_member_ids.include? member.applicant_id
+    end
+  end
+
+  def validate_enrolling_members(hbx_enrollment)
+    invalid_member_exist = hbx_enrollment.hbx_enrollment_members.map(&:valid_enrolling_member?).include?(false)
+    raise "Please select valid enrolling members" if invalid_member_exist
+  end
 
   def build_hbx_enrollment(family_member_ids)
     case @market_kind
