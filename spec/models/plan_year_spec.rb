@@ -2540,6 +2540,16 @@ describe PlanYear, '.update_employee_benefit_packages', type: :model, dbclean: :
 
       expect(census_employee.active_benefit_group_assignment.start_on).to eq modified_start_on
     end
+    it "should update benefit group assignment dates" do
+      plan_year = employer_profile.active_plan_year
+      plan_year.start_on = modified_start_on
+      plan_year.end_on = modified_end_on
+      plan_year.save
+      census_employee.reload
+      expect(plan_year.census_employees_within_play_year.size).to eq 1
+      census_employee.update_attributes(aasm_state:'employment_terminated')
+      expect(plan_year.census_employees_within_play_year.size).to eq 0
+    end
   end
 end
 
@@ -2570,7 +2580,7 @@ describe PlanYear, '.terminate_employee_benefit_packages', type: :model, dbclean
   let!(:census_employee) { FactoryGirl.create(:census_employee, benefit_group_assignments: [benefit_group_assignment1],employee_role_id: employee_role1.id,employer_profile_id: employer_profile.id) }
   let(:new_end_on) { TimeKeeper.date_of_record.prev_day }
   let!(:enrollment) { FactoryGirl.create(:hbx_enrollment, effective_on: start_on, household: family.active_household, benefit_group_id: benefit_group.id, aasm_state: 'coverage_selected', employee_role: census_employee.employee_role)}
-
+  let!(:census_employee1){FactoryGirl.create(:census_employee, :termination_details, benefit_group_assignments: [benefit_group_assignment1],employee_role_id: employee_role1.id,employer_profile_id: employer_profile.id)}
   before do
     plan_year.terminate_plan_year(new_end_on, TimeKeeper.date_of_record, 'nonpayment', false, 'nonpayment')
     plan_year.reload
@@ -2578,6 +2588,11 @@ describe PlanYear, '.terminate_employee_benefit_packages', type: :model, dbclean
   end
 
   context 'when plan year is terminated' do
+    it "should include only the non-terminated census employee" do
+      census_employee1.update_attributes(aasm_state:'employment_terminated')
+      expect(employer_profile.census_employees.size).to eq 2
+      expect(plan_year.census_employees_within_play_year.size).to eq 1
+    end
     it "should terminate employee benefit group assignments" do
       expect(benefit_group_assignment1.end_on).to eq plan_year.end_on
     end
@@ -2601,6 +2616,7 @@ describe PlanYear, 'Cancel plan year', type: :model, dbclean: :after_each do
   let(:active_benefit_group_assignment) {FactoryGirl.build(:benefit_group_assignment, start_on: active_plan_year.start_on, benefit_group_id: benefit_group.id)}
   let(:renewal_benefit_group_assignment) {FactoryGirl.build(:benefit_group_assignment, start_on: renewal_plan_year.start_on, benefit_group_id: benefit_group1.id)}
   let(:census_employee)   { FactoryGirl.create(:census_employee, employer_profile: employer_profile, benefit_group_assignments:[active_benefit_group_assignment, renewal_benefit_group_assignment]) }
+  let(:census_employee1)   { FactoryGirl.create(:census_employee, :termination_details, employer_profile: employer_profile, benefit_group_assignments:[active_benefit_group_assignment, renewal_benefit_group_assignment]) }
   let(:employee_role)   { FactoryGirl.build(:employee_role, employer_profile: employer_profile )}
   let(:enrollment) { FactoryGirl.build(:hbx_enrollment, household: family.active_household, employee_role: census_employee.employee_role)}
   let(:enrollment2) { FactoryGirl.build(:hbx_enrollment, household: family.active_household, employee_role: census_employee.employee_role,aasm_state:'auto_renewing')}
@@ -2615,6 +2631,11 @@ describe PlanYear, 'Cancel plan year', type: :model, dbclean: :after_each do
     end
 
     context '.cancel_employee_benefit_packages' do
+      it "should include only the non-terminated census employee" do
+      census_employee1.update_attributes(aasm_state:'employment_terminated')
+      expect(employer_profile.census_employees.size).to eq 2
+      expect(active_plan_year.census_employees_within_play_year.size).to eq 1
+    end
 
       it "should cancel employee benefit group assignments" do
         expect(active_benefit_group_assignment.aasm_state).to eq "initialized"
