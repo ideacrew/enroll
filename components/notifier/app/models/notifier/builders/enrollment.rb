@@ -4,24 +4,39 @@ module Notifier
     def enrollment
       return @enrollment if defined? @enrollment
       if payload['event_object_kind'].constantize == HbxEnrollment
-        enrollment = HbxEnrollment.find(payload['event_object_id'])
-        @enrollment = waived_enrollment(enrollment)
+        @enrollment = HbxEnrollment.find(payload['event_object_id'])
       elsif event_matched?
         @enrollment = health_enrollment
       end
     end
 
-    def waived_enrollment(enrollment)
-      if event_name == 'employee_waiver_confirmation' && enrollment.is_coverage_waived?
-        enrollment.parent_enrollment.present? ? enrollment.parent_enrollment : enrollment
-      else
-        enrollment
-      end
+    def parent_enrollment
+      return if enrollment.blank?
+      enrollment.parent_enrollment
+    end
+
+    def enrollment_waiver_plan_name
+      return if parent_enrollment.blank?
+      merge_model.enrollment.waiver_plan_name = parent_enrollment.plan.name
+    end
+
+    def enrollment_waiver_enrolled_count
+      return if parent_enrollment.blank?
+      merge_model.enrollment.waiver_enrolled_count = parent_enrollment.humanized_dependent_summary
+    end
+
+    def enrollment_waiver_coverage_end_on
+      return if parent_enrollment.blank?
+      merge_model.enrollment.waiver_coverage_end_on = parent_enrollment.terminated_on
     end
 
     def enrollment_waiver_effective_on
-      return if enrollment.blank?
-      effective_date = enrollment.terminated_on.nil? ? enrollment.effective_on : enrollment.terminated_on + 1.day
+      effective_date = if parent_enrollment.present?
+                        parent_enrollment.terminated_on.nil? ? parent_enrollment.effective_on : parent_enrollment.terminated_on + 1.day
+                      else
+                        enrollment.effective_on
+                      end
+
       merge_model.enrollment.waiver_effective_on = format_date(effective_date)
     end
 
