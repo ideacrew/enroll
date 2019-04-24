@@ -50,7 +50,7 @@ end
 And(/^.+ enters broker agency information for SHOP markets$/) do
   fill_in 'agency[organization][legal_name]', with: "Logistics Inc"
   fill_in 'agency[organization][dba]', with: "Logistics Inc"
-  fill_in 'agency[organization][fein]', with: "890890891"
+  # fill_in 'agency[organization][fein]', with: "890890891"
   # Auto-Generates FEIN
   # fill_in 'organization[fein]', with: "890890891"
 
