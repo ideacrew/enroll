@@ -345,15 +345,18 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     let(:enrollment) { double("enrollment", aasm_state: "inactive", coverage_kind: "health", is_shop?: true,
                         employer_profile: employer_profile, effective_on: TimeKeeper.date_of_record - 1.month,
                         submitted_at: TimeKeeper.date_of_record - 1.month, waiver_reason: 'waiver_reason', terminate_reason: nil, id: nil) }
+    let!(:parent_enrollment) { FactoryGirl.build_stubbed(:hbx_enrollment) }
+
+    before :each do
+      allow(enrollment).to receive(:is_coverage_waived?).and_return true
+      allow(enrollment).to receive(:benefit_group).and_return(benefit_group)
+      allow(enrollment).to receive(:parent_enrollment).and_return(parent_enrollment)
+      allow(parent_enrollment).to receive(:benefit_group).and_return(benefit_group)
+      allow(view).to receive(:disable_make_changes_button?).with(enrollment).and_return true
+      render partial: "insured/families/enrollment", collection: [enrollment], as: :hbx_enrollment, locals: { read_only: false }
+    end
 
     context "it should render waived_coverage_widget " do
-
-      before :each do
-        allow(enrollment).to receive(:is_coverage_waived?).and_return true
-        allow(enrollment).to receive(:benefit_group).and_return(benefit_group)
-        allow(view).to receive(:disable_make_changes_button?).with(enrollment).and_return true
-        render partial: "insured/families/enrollment", collection: [enrollment], as: :hbx_enrollment, locals: { read_only: false }
-      end
 
       it "should render waiver template with read_only param as true" do
         expect(response).to render_template(partial: "insured/families/waived_coverage_widget", locals: {read_only: true, hbx_enrollment: enrollment})
@@ -365,13 +368,6 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
 
     context "it should render waived_coverage_widget with read_only param value as helper method result" do
-
-      before :each do
-        allow(enrollment).to receive(:is_coverage_waived?).and_return true
-        allow(enrollment).to receive(:benefit_group).and_return(benefit_group)
-        allow(view).to receive(:disable_make_changes_button?).with(enrollment).and_return false
-        render partial: "insured/families/enrollment", collection: [enrollment], as: :hbx_enrollment, locals: { read_only: false }
-      end
 
       it "should render waiver template with read_only param" do
         expect(response).to render_template(partial: "insured/families/waived_coverage_widget", locals: {read_only: view.disable_make_changes_button?(enrollment), hbx_enrollment: enrollment})
