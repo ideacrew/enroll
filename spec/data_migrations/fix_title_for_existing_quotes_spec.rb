@@ -13,19 +13,19 @@ describe FixTitleForExistingQuotes, dbclean: :after_each do
   end
 
   describe "fix title for existing quotes", dbclean: :after_each do
-    let(:broker_agency) { FactoryGirl.create(:broker_agency_profile)}
-    let(:plan_design_organization) { FactoryGirl.create(:sponsored_benefits_plan_design_organization, :with_profile, owner_profile_id: broker_agency.id) }
+    let(:broker_agency) { FactoryBot.create(:broker_agency_profile)}
+    let(:plan_design_organization) { FactoryBot.create(:sponsored_benefits_plan_design_organization, :with_profile, owner_profile_id: broker_agency.id) }
     let(:proposal) { plan_design_organization.plan_design_proposals.first }
     let(:profile) do
       profile = proposal.profile
-      profile.benefit_sponsorships = [FactoryGirl.build(:plan_design_benefit_sponsorship)]
+      profile.benefit_sponsorships = [FactoryBot.build(:plan_design_benefit_sponsorship)]
       profile.save
       profile
     end
 
     let(:benefit_sponsorship) { profile.benefit_sponsorships.first }
-    let(:benefit_application) { FactoryGirl.create(:plan_design_benefit_application, :with_benefit_group, benefit_sponsorship: benefit_sponsorship)}
-    let(:plan) { FactoryGirl.create(:plan, :with_premium_tables)}
+    let(:benefit_application) { FactoryBot.create(:plan_design_benefit_application, :with_benefit_group, benefit_sponsorship: benefit_sponsorship)}
+    let(:plan) { FactoryBot.create(:plan, :with_premium_tables)}
     let!(:benefit_group) do
       bg = benefit_application.benefit_groups.first
       bg.relationship_benefits.build(relationship: "employee", premium_pct: 100)

@@ -182,10 +182,10 @@ module BenefitSponsors
       include_context "setup initial benefit application"
       include_context "setup employees with benefits"
 
-      let!(:broker_agency_accounts) { FactoryGirl.create(:benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: organization.profiles.first, benefit_sponsorship: benefit_sponsorship) }
-      let!(:user) { FactoryGirl.create(:user, roles: [], person: FactoryGirl.create(:person)) }
+      let!(:broker_agency_accounts) { FactoryBot.create(:benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: organization.profiles.first, benefit_sponsorship: benefit_sponsorship) }
+      let!(:user) { FactoryBot.create(:user, roles: [], person: FactoryBot.create(:person)) }
       let!(:ce) { benefit_sponsorship.census_employees.first }
-      let!(:ee_person) { FactoryGirl.create(:person, :with_employee_role, :with_family, first_name: ce.first_name, last_name: ce.last_name, dob: ce.dob, ssn: ce.ssn, gender: ce.gender) }
+      let!(:ee_person) { FactoryBot.create(:person, :with_employee_role, :with_family, first_name: ce.first_name, last_name: ce.last_name, dob: ce.dob, ssn: ce.ssn, gender: ce.gender) }
 
       context "should return sucess and family" do
         before :each do
@@ -197,7 +197,7 @@ module BenefitSponsors
           dt_query = DataTablesInQuery.new("1", 0, 10, "")
           sign_in(user_with_hbx_staff_role)
           allow(controller).to receive(:extract_datatable_parameters).and_return(dt_query)
-          xhr :get, :family_datatable, id: bap_id
+          get :family_datatable, params: { id: bap_id }, xhr: true
           @query = ::BenefitSponsors::Queries::BrokerFamiliesQuery.new(nil, organization.profiles.first.id)
         end
 
@@ -213,7 +213,7 @@ module BenefitSponsors
       context "should not return sucess" do
         before :each do
           sign_in(user)
-          xhr :get, :family_datatable, id: bap_id
+          get :family_datatable, params: { id: bap_id }, xhr: true
         end
 
         it "should not return sucess http status" do
@@ -232,7 +232,7 @@ module BenefitSponsors
           dt_query = DataTablesInQuery.new("1", 0, 10, "")
           sign_in(user_with_hbx_staff_role)
           allow(controller).to receive(:extract_datatable_parameters).and_return(dt_query)
-          xhr :get, :family_datatable, id: bap_id
+          get :family_datatable, params: { id: bap_id }, xhr: true
           @query = ::BenefitSponsors::Queries::BrokerFamiliesQuery.new(nil, organization.profiles.first.id)
         end
 

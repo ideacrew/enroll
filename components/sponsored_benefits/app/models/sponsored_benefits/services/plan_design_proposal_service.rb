@@ -41,7 +41,6 @@ module SponsoredBenefits
       end
 
       def save_health_benefits(attrs={})
-<<<<<<< HEAD
         benefit_group = benefit_group(
           attrs.merge!(
             {
@@ -49,9 +48,6 @@ module SponsoredBenefits
             }
           )
         )
-=======
-        benefit_group = benefit_group(attrs)
->>>>>>> running specs and failing at creation of user and person
         update_benefits(attrs) if benefit_group.persisted?
         benefit_group.elected_plans = benefit_group.elected_plans_by_option_kind
 

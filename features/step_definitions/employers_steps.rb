@@ -540,11 +540,6 @@ And(/^(.*?) employer visit the Employee Roster$/) do |legal_name|
   visit benefit_sponsors.profiles_employers_employer_profile_path(employer_profile.id, :tab => 'employees')
 end
 
-And(/^(.*?) employer visit the Employee Roster$/) do |legal_name|
-  employer_profile = employer_profile(legal_name)
-  visit benefit_sponsors.profiles_employers_employer_profile_path(employer_profile.id, :tab => 'employees')
-end
-
 When /^click on one of their employees$/ do
   click_link employees.first.full_name
 end

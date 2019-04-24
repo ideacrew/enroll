@@ -68,21 +68,11 @@ And(/^(.*?) employer terminates employees$/) do |legal_name|
   end
 end
 
-And(/^staff role person logged in$/) do
-  login_as @staff_role, scope: :user
-end
 
 And(/^(.*?) is logged in and on the home page$/) do |legal_name|
   organization = @organization[legal_name]
   employer_profile = organization.employer_profile
   visit benefit_sponsors.profiles_employers_employer_profile_path(employer_profile.id, :tab => 'home')
-end
-
-And(/^(.*?) employer has a staff role$/) do |legal_name|
-  employer_profile = employer_profile(legal_name)
-  employer_staff_role = FactoryGirl.build(:benefit_sponsor_employer_staff_role, aasm_state: 'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)
-  person = FactoryGirl.create(:person, employer_staff_roles: [employer_staff_role])
-  @staff_role ||= FactoryGirl.create(:user, :person => person)
 end
 
 And(/^staff role person logged in$/) do

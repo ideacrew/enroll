@@ -8,8 +8,8 @@ module BenefitSponsors
     include_context "setup initial benefit application"
     let(:service_class) { BenefitSponsors::Services::RosterUploadService }
     let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_month }
-    let!(:user) { FactoryGirl.create(:user) }
-    let!(:person) { FactoryGirl.create(:person) }
+    let!(:user) { FactoryBot.create(:user) }
+    let!(:person) { FactoryBot.create(:person) }
     let(:ce) { create(:census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile) }
     let(:address_params) {ce.address.attributes}
     let(:ini_address_form) {Organizations::OrganizationForms::AddressForm.new(address_params)}

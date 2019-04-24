@@ -1182,7 +1182,3 @@ And(/^.+ selects the first plan available$/) do
   first_plan_select_link = links.detect { |link| link.text == "Select Plan" }
   first_plan_select_link.trigger('click')
 end
-
-When(/^.+ clicks Shop for new plan button$/) do
-  click_button 'Shop for new plan'
-end
