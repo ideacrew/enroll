@@ -19,7 +19,6 @@ Feature: Update DOB and SSN
     And I select the all security question and give the answer
     And I have submitted the security questions
     And Employee goes to register as an employee
-    And Employee should see the employee search page
     And Employee enters the identifying info of Patrick Doe
     And Employee should see the matched employee record form
     And Employee accepts the matched employer
