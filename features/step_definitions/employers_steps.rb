@@ -653,12 +653,14 @@ And /^employer populates the address field$/ do
   fill_in 'census_employee[address_attributes][address_1]', :with => "1026 Potomac"
   fill_in 'census_employee[address_attributes][address_2]', :with => "Apt ABC"
   fill_in 'census_employee[address_attributes][city]', :with => "Alpharetta"
-  select('GA', from: 'census_employee_address_attributes_state')
+  find(:xpath, "//p[@class='label'][contains(., 'SELECT STATE')]").click
+  find(:xpath, "//li[contains(., 'GA')]").click
+
   fill_in 'census_employee[address_attributes][zip]', :with => "30228"
 end
 
 And /^employer clicks on update employee$/ do
-  click_button 'Update Employee'
+  find('.interaction-click-control-update-employee').click
 end
 
 And /^employer clicks on non-linked employee with address$/ do
