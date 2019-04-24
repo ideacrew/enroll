@@ -1166,14 +1166,3 @@ And(/^Hbx Admin click on Employers/) do
   find_link("Employers").visible?
   click_link("Employers")
 end
-
-And(/^.+ clicks Confirm$/) do
-  click_link 'Confirm'
-end
-
-And(/^.+ selects the first plan available$/) do
-  links = page.all('a')
-  first_plan_html_class = "btn btn-default btn-right plan-select select interaction-click-control-select-plan"
-  first_plan_select_link = links.detect { |link| link.text == "Select Plan" }
-  first_plan_select_link.trigger('click')
-end
