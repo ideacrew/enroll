@@ -36,7 +36,7 @@ Given(/^all applicants are in Info Completed state with all types of income$/) d
     find(:xpath, '//*[@id="btn-continue"]').click
   
     find("#has_deductions_true").click
-    find(:css, "#deduction_kind[value='rent_or_royalties']").set(true)
+    find(:css, "#deduction_kind[value='moving_expenses']").set(true)
     fill_in 'financial_assistance_deduction[amount]', with: '50'
     fill_in 'financial_assistance_deduction[start_on]', with:'1/1/2018'
     find(:xpath, '//*[@id="new_financial_assistance_deduction"]/div/div[1]/div[2]/div/div[2]/b').click
@@ -123,7 +123,7 @@ Then(/^all data should be presented as previously entered$/) do
     expect(find("#has_other_income_true")).to be_checked
   elsif /deductions$/.match(current_path)
     expect(find("#has_deductions_true")).to be_checked
-    expect(find(:css, "#deduction_kind[value='rent_or_royalties']")).to be_checked
+    expect(find(:css, "#deduction_kind[value='moving_expenses']")).to be_checked
   elsif /benefits$/.match(current_path)
     expect(find("#has_enrolled_health_coverage_false")).to be_checked
     expect(find("#has_eligible_health_coverage_false")).to be_checked
