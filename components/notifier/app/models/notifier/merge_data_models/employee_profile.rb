@@ -68,7 +68,11 @@ module Notifier
     end
 
     def conditions
-      ["broker_present?", "census_employee_health_and_dental_enrollment?", "census_employee_health_enrollment?", "census_employee_dental_enrollment?", "future_sep?", "has_multiple_enrolled_enrollments?", "has_health_enrolled_enrollment?", "has_dental_enrolled_enrollment?"]
+      %w{broker_present? has_multiple_enrolled_enrollments? has_health_enrolled_enrollment? has_dental_enrolled_enrollment? census_employee_health_and_dental_enrollment? census_employee_health_enrollment? census_employee_dental_enrollment? has_parent_enrollment?, future_sep?}
+    end
+
+    def has_parent_enrollment?
+      enrollment.waiver_plan_name.present?
     end
 
     def census_employee_health_enrollment?
