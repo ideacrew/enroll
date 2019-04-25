@@ -18,7 +18,7 @@ module BenefitMarkets
     #   DC Individual Market Initial & Renewal, Congress:
     #     :application_period => Date.new(2018,1,1)..Date.new(2018,12,31)
     #   MA GIC
-    #     :application_period => Date.new(2018,7,1)..Date.new(2018,6,30)
+    #     :application_period => Date.new(2018,7,1)..Date.new(2019,6,30)
     #   DC/MA SHOP Market:
     #     :application_period => Date.new(2018,1,1)..Date.new(2018,12,31)
     field :application_period,          type: Range

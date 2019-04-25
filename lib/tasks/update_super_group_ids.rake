@@ -20,15 +20,16 @@ namespace :supergroup do
           2.upto(sheet_data.last_row) do |row_number|
             begin
               row_data = sheet_data.row(row_number)
-              row_data[@headers["group_number"]] = row_data[@headers["group_number"]].to_i.to_s if sheet_name == "Altus"
+              group_number = row_data[@headers["group_number"]].to_i == row_data[@headers["group_number"]] ? row_data[@headers["group_number"]].to_i.to_s : row_data[@headers["group_number"]]
+
               # old model
               fetch_old_model_record = Plan.where(hios_id: row_data[@headers["hios_issuer_id"]], active_year: row_data[@headers["plan year"]]).first
-              fetch_old_model_record.update_attributes(carrier_special_plan_identifier: row_data[@headers["group_number"]]) if fetch_old_model_record.present?
+              fetch_old_model_record.update_attributes(carrier_special_plan_identifier: group_number) if fetch_old_model_record.present?
               # end old model
 
               # new model
               fetch_new_model_record = ::BenefitMarkets::Products::Product.where(hios_id: row_data[@headers["hios_issuer_id"]]).select{|a| a.active_year == row_data[@headers["plan year"]].to_i}.first
-              fetch_new_model_record.update_attributes(issuer_assigned_id: row_data[@headers["group_number"]])  if fetch_new_model_record.present?
+              fetch_new_model_record.update_attributes(issuer_assigned_id: group_number)  if fetch_new_model_record.present?
               # end new model
             rescue Exception => e
               puts "#{e.message}"

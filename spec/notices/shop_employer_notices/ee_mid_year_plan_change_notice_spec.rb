@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe ShopEmployerNotices::EeMidYearPlanChangeNotice do
+RSpec.describe ShopEmployerNotices::EeMidYearPlanChangeNotice, dbclean: :after_each do
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 2.month - 1.year}
   let!(:employer_profile){ create :employer_profile, aasm_state: "active"}
   let!(:person){ create :person}

@@ -12,7 +12,7 @@ describe ChangeCeDateOfTermination do
     end
   end
 
-  describe "census employee not in terminated state" do
+  describe "census employee not in terminated state", dbclean: :after_each do
     subject { ChangeCeDateOfTermination.new("change_ce_date_of_termination", double(:current_scope => nil)) }
 
     let(:employer_profile) { census_employee.employer_profile }
@@ -33,7 +33,7 @@ describe ChangeCeDateOfTermination do
     end
   end
 
-  describe "census employee's in terminated state" do
+  describe "census employee's in terminated state", dbclean: :after_each do
     subject { ChangeCeDateOfTermination.new("termiante_census_employee", double(:current_scope => nil)) }
 
     let(:employer_profile) { census_employee.employer_profile }

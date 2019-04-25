@@ -4,6 +4,17 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 
 RSpec.describe ApplicationHelper, :type => :helper do
 
+  describe "#can_employee_shop??" do
+    it "should return false if date is empty" do
+      expect(helper.can_employee_shop?(nil)).to eq false
+    end
+
+    it "should return true if date is present and rates are present" do
+      allow(Plan).to receive(:has_rates_for_all_carriers?).and_return(false)
+      expect(helper.can_employee_shop?("10/01/2018")).to eq true
+    end
+  end
+
   describe "#rates_available?" do
     let(:employer_profile){ double("EmployerProfile") }
 
@@ -16,6 +27,32 @@ RSpec.describe ApplicationHelper, :type => :helper do
     it "should return empty string when false" do
       allow(employer_profile).to receive(:applicant?).and_return(false)
       expect(helper.rates_available?(employer_profile)).to eq ""
+    end
+  end
+
+  describe "#product_rates_available?", :dbclean => :after_each  do
+    let!(:product) { FactoryGirl.create(:benefit_markets_products_health_products_health_product) }
+    let(:benefit_sponsorship){ double("benefit_sponsorship") }
+
+    context "when active_benefit_application is present" do
+      it "should return false" do
+        allow(benefit_sponsorship).to receive(:active_benefit_application).and_return(true)
+        expect(helper.product_rates_available?(benefit_sponsorship)).to eq false
+      end
+    end
+
+    context "when active_benefit_application is not present" do
+      before(:each) do
+        allow(benefit_sponsorship).to receive(:active_benefit_application).and_return(false)
+        allow(benefit_sponsorship).to receive(:applicant?).and_return(true)
+      end
+      it "should return false if not in late rates" do
+        expect(helper.product_rates_available?(benefit_sponsorship)).to eq false
+      end
+
+      it "should return true if during late rates" do
+        expect(helper.product_rates_available?(benefit_sponsorship, TimeKeeper.date_of_record + 1.year)).to eq true
+      end
     end
   end
 

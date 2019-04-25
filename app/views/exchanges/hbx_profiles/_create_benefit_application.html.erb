@@ -1,0 +1,22 @@
+<% if @save_errors.present? %>
+  <div class='alert alert-error'><a class='close' data-dismiss='alert'>x</a>
+    <% @save_errors.each do |err| %>
+      <%= err %>
+    <% end %>
+  </div>
+  <% message_for_display = l10n("hbx_profiles.ba_fail_message") %>
+<% else %>
+  <% message_for_display =  l10n("hbx_profiles.ba_success_message") %>
+<% end %>
+
+<div class="container bottom-pd text-center">
+  <h4 class="title"><%= message_for_display %></h4>
+  <table class="table">
+    <thead> </thead>
+    <tbody>
+      <tr>
+        <td> <span class="btn btn-default" onclick="$('tr.child-row:visible').remove();"> <%= l10n(".cancel") %> </span> </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

@@ -1,38 +1,75 @@
 class HbxProfilePolicy < ApplicationPolicy
 
   def view_admin_tabs?
-    return true unless role = user.person.hbx_staff_role
+    role = user_hbx_staff_role
+    return false unless role
     role.permission.view_admin_tabs
   end
 
   def modify_admin_tabs?
-    return true unless role = user.person.hbx_staff_role
+    role = user_hbx_staff_role
+    return false unless role
     role.permission.modify_admin_tabs
   end
 
+  def view_the_configuration_tab?
+    role = user_hbx_staff_role
+    return false unless role
+    role.permission.view_the_configuration_tab
+  end
+
+  def can_submit_time_travel_request?
+    role = user_hbx_staff_role
+    return false unless role
+    return false unless role.permission.name == "super_admin"
+    role.permission.can_submit_time_travel_request
+  end
+
   def send_broker_agency_message?
-    return true unless role = user.person.hbx_staff_role
+    role = user_hbx_staff_role
+    return false unless role
     role.permission.send_broker_agency_message
   end
 
   def approve_broker?
-    return true unless role = user.person.hbx_staff_role
+    role = user_hbx_staff_role
+    return false unless role
     role.permission.approve_broker
   end
 
   def approve_ga?
-    return true unless role = user.person.hbx_staff_role
+    role = user_hbx_staff_role
+    return false unless role
     role.permission.approve_ga
   end
 
   def can_extend_open_enrollment?
-    return true unless role = user.person.hbx_staff_role
+    role = user_hbx_staff_role
+    return false unless role
     role.permission.can_extend_open_enrollment
   end
 
+  def can_create_benefit_application?
+    role = user_hbx_staff_role
+    return false unless role
+    role.permission.can_create_benefit_application?
+  end
+
+  def can_change_fein?
+    role = user_hbx_staff_role
+    return false unless role
+    role.permission.can_change_fein
+  end
+
+  def can_force_publish?
+    role = user_hbx_staff_role
+    return false unless role
+    role.permission.can_force_publish
+  end
+
   def show?
-    @user.has_role?(:hbx_staff) or
-      @user.has_role?(:csr) or
+    @user.has_role?(:hbx_staff) ||
+      @user.has_role?(:csr) ||
       @user.has_role?(:assister)
   end
 
@@ -97,7 +134,16 @@ class HbxProfilePolicy < ApplicationPolicy
   end
 
   def can_add_sep?
-    return false unless role = user.person && user.person.hbx_staff_role
+    role = user_hbx_staff_role
+    return false unless role
     role.permission.can_add_sep
+  end
+
+  private
+
+  def user_hbx_staff_role
+    person = user.person
+    return nil unless person
+    person.hbx_staff_role
   end
 end

@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe 'BenefitSponsors::ModelEvents::EmployerInitialEligibilityDenialNotice', dbclean: :after_each  do
   let(:notice_event) { "employer_initial_eligibility_denial_notice" }
 
-  let(:start_on) { (TimeKeeper.date_of_record - 2.months).beginning_of_month }
+  let(:start_on) { (TimeKeeper.date_of_record).beginning_of_month }
   let(:open_enrollment_start_on) {(TimeKeeper.date_of_record - 1.month).beginning_of_month}
   let(:current_effective_date)  { TimeKeeper.date_of_record }
   let(:prior_month_open_enrollment_start)  { TimeKeeper.date_of_record.beginning_of_month + Settings.aca.shop_market.open_enrollment.monthly_end_on - Settings.aca.shop_market.open_enrollment.minimum_length.days - 1.day}

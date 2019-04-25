@@ -97,7 +97,7 @@ class PersonRelationship
   field :relative_id, type: BSON::ObjectId
   field :kind, type: String
 
-	validates_presence_of :relative_id, message: "Choose a relative"
+  validates_presence_of :relative_id, message: "Choose a relative"
   validates :kind,
             presence: true,
             allow_blank: false,

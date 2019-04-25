@@ -3,29 +3,29 @@ module PermissionsWorld
     Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
       send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_update_ssn: false, can_complete_resident_application: false,
       can_add_sep: false, can_lock_unlock: true, can_view_username_and_email: false, can_reset_password: false, modify_admin_tabs: true,
-      view_admin_tabs: true)
+      view_admin_tabs: true,   view_the_configuration_tab: true, can_submit_time_travel_request: false)
     Permission.create(name: 'hbx_read_only', modify_family: true, modify_employer: false, revert_application: false, list_enrollments: true,
       send_broker_agency_message: false, approve_broker: false, approve_ga: false,
-      modify_admin_tabs: false, view_admin_tabs: true)
+      modify_admin_tabs: false, view_admin_tabs: true,  view_the_configuration_tab: true, can_submit_time_travel_request: false)
     Permission.create(name: 'hbx_csr_supervisor', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
       send_broker_agency_message: false, approve_broker: false, approve_ga: false,
-      modify_admin_tabs: false, view_admin_tabs: false)
+      modify_admin_tabs: false, view_admin_tabs: false,  view_the_configuration_tab: true, can_submit_time_travel_request: false)
     Permission.create(name: 'hbx_csr_tier2', modify_family: true, modify_employer: true, revert_application: false, list_enrollments: false,
       send_broker_agency_message: false, approve_broker: false, approve_ga: false,
-      modify_admin_tabs: false, view_admin_tabs: false)
+      modify_admin_tabs: false, view_admin_tabs: false,  view_the_configuration_tab: true, can_submit_time_travel_request: false)
     Permission.create(name: 'hbx_csr_tier1', modify_family: true, modify_employer: false, revert_application: false, list_enrollments: false,
       send_broker_agency_message: false, approve_broker: false, approve_ga: false,
-      modify_admin_tabs: false, view_admin_tabs: false)
+      modify_admin_tabs: false, view_admin_tabs: false,  view_the_configuration_tab: true, can_submit_time_travel_request: false)
     Permission.create(name: 'developer', modify_family: false, modify_employer: false, revert_application: false, list_enrollments: true,
       send_broker_agency_message: false, approve_broker: false, approve_ga: false,
-      modify_admin_tabs: false, view_admin_tabs: true)
+      modify_admin_tabs: false, view_admin_tabs: true,  view_the_configuration_tab: true, can_submit_time_travel_request: false)
     Permission.create(name: 'hbx_tier3', modify_family: true, modify_employer: false, revert_application: false, list_enrollments: true,
       send_broker_agency_message: false, approve_broker: false, approve_ga: false,
-      modify_admin_tabs: false, view_admin_tabs: true)
+      modify_admin_tabs: false, view_admin_tabs: true,  view_the_configuration_tab: true, can_submit_time_travel_request: false)
     Permission.create(name: 'super_admin', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
       send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_update_ssn: false, can_complete_resident_application: false,
       can_add_sep: false, can_lock_unlock: true, can_view_username_and_email: false, can_reset_password: false, modify_admin_tabs: true,
-      view_admin_tabs: true, can_extend_open_enrollment: true)
+      view_admin_tabs: true, can_extend_open_enrollment: true, can_change_fein: true,  view_the_configuration_tab: true, can_submit_time_travel_request: false)
   end
 
   def hbx_admin_can_update_ssn
@@ -55,8 +55,23 @@ module PermissionsWorld
     Permission.hbx_staff.update_attributes(can_reset_password: true)
   end
 
+  def hbx_admin_can_change_fein
+    Permission.super_admin.update_attributes(can_change_fein: true)
+    Permission.hbx_tier3.update_attributes(can_change_fein: true)
+  end
+
+  def hbx_admin_can_force_publish
+    Permission.super_admin.update_attributes(can_force_publish: true)
+    Permission.hbx_tier3.update_attributes(can_force_publish: true)
+  end
+
   def hbx_admin_can_extend_open_enrollment
     Permission.hbx_tier3.update_attributes(can_extend_open_enrollment: true)
+  end
+
+  def hbx_admin_can_create_benefit_application
+    Permission.super_admin.update_attributes(can_create_benefit_application: true)
+    Permission.hbx_tier3.update_attributes(can_create_benefit_application: true)
   end
 
   def make_all_permissions
@@ -67,7 +82,10 @@ module PermissionsWorld
     hbx_admin_can_lock_unlock
     hbx_admin_can_view_username_and_email
     hbx_admin_can_reset_password
+    hbx_admin_can_change_fein
+    hbx_admin_can_force_publish
     hbx_admin_can_extend_open_enrollment
+    hbx_admin_can_create_benefit_application
   end
 end
 

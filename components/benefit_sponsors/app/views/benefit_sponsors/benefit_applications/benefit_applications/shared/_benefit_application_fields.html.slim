@@ -1,3 +1,7 @@
+.alert.alert-info.hide role="alert"
+  strong
+    i.fa.fa-exclamation-triangle aria-hidden="true"
+    = Settings.site.late_rates_message
 h1.heading-text Add Benefit Package
 .row.pl-1
   h3 When would you like your coverage to start? (In the next 2 months)
@@ -121,3 +125,26 @@ javascript:
 		initDatepicker(id,new Date(dateOptions.oeStartOn),new Date(dateOptions.oeEndOn))
 	}
 
+  $('#baStartDate').change(function() {
+    var date = $(this).val();
+    plansForDate(date);
+  })
+
+  function plansForDate(date) {
+    $.ajax({
+      type: "GET",
+      data:{
+        start_on_date: date
+      },
+      success: function(res) {
+        if (res != true) { // late rate scenario
+          $('.alert-info').addClass('hide');
+          $("#benefitContinueBtn").val("Continue");
+        }else if (res == true) {
+          $('.alert-info').removeClass('hide');
+          $("#benefitContinueBtn").val("Save");
+        }
+      },
+      url: "/benefit_sponsors/benefit_sponsorships/#{@benefit_application_form.benefit_sponsorship_id}/benefit_applications/late_rates_check"
+    });
+  }

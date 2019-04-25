@@ -3,7 +3,7 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 require File.join(Rails.root, "app", "data_migrations", "fix_special_enrollment_period.rb")
 
-describe FixSpecialEnrollmentPeriod do
+describe FixSpecialEnrollmentPeriod, dbclean: :after_each do
   let(:given_task_name) { "fix_special_enrollment_period" }
   subject { FixSpecialEnrollmentPeriod.new(given_task_name, double(:current_scope => nil)) }
 

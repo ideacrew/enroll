@@ -40,8 +40,7 @@ module BenefitSponsors
                                                   canceled:   :cancel
                                                 }
 
-
-
+    field :expiration_date,           type: Date
 
     # The date range when this application is active
     field :effective_period,        type: Range
@@ -94,10 +93,11 @@ module BenefitSponsors
     before_validation :pull_benefit_sponsorship_attributes
     after_create      :renew_benefit_package_assignments
     after_save        :notify_on_save
-    after_create      :notify_on_create
+    after_create      :notify_on_create, :set_expiration_date
 
     # Use chained scopes, for example: approved.effective_date_begin_on(start, end)
     scope :draft,               ->{ any_in(aasm_state: APPLICATION_DRAFT_STATES) }
+    scope :draft_and_exception, ->{ any_in(aasm_state: [:draft] + APPLICATION_EXCEPTION_STATES) }
     scope :draft_state,         ->{ where(aasm_state: :draft) }
     scope :approved,            ->{ any_in(aasm_state: APPLICATION_APPROVED_STATES) }
 
@@ -111,13 +111,17 @@ module BenefitSponsors
     scope :coverage_effective,              ->{ any_in(aasm_state: COVERAGE_EFFECTIVE_STATES) }
     scope :terminated,                      ->{ any_in(aasm_state: TERMINATED_STATES) }
     scope :imported,                        ->{ any_in(aasm_state: IMPORTED_STATES) }
-    scope :non_canceled,                    ->{ not_in(aasm_state: TERMINATED_STATES) }
+    scope :non_terminated,                  ->{ not_in(aasm_state: TERMINATED_STATES) }
+    scope :non_canceled,                    ->{ where(:aasm_state.nin => CANCELED_STATES) }
     scope :non_draft,                       ->{ not_in(aasm_state: APPLICATION_DRAFT_STATES) }
     scope :non_imported,                    ->{ not_in(aasm_state: IMPORTED_STATES) }
 
     scope :expired,                         ->{ any_in(aasm_state: EXPIRED_STATES) }
     scope :non_terminated_non_imported,     ->{ not_in(aasm_state: TERMINATED_IMPORTED_STATES) }
     scope :approved_and_terminated,         ->{ any_in(aasm_state: APPPROVED_AND_TERMINATED_STATES) }
+
+    # Used for specific DataTable Action only
+    scope :active_states_per_dt_action,     ->{ any_in(aasm_state: [:active, :pending, :enrollment_open, :enrollment_eligible, :enrollment_closed, :enrollment_ineligible, :termination_pending]) }
 
     # scope :is_renewing,                     ->{ where(:predecessor => {:$exists => true},
     #                                                   :aasm_state.in => APPLICATION_DRAFT_STATES + ENROLLING_STATES).order_by(:'created_at'.desc)
@@ -218,7 +222,6 @@ module BenefitSponsors
         ]
       )
     }
-
 
     # Migration map for plan_year to benefit_application
     def matching_state_for(plan_year)
@@ -480,6 +483,10 @@ module BenefitSponsors
     def hbx_enrollments
       @hbx_enrollments = [] if benefit_packages.size == 0
       @hbx_enrollments ||= HbxEnrollment.all_enrollments_under_benefit_application(self)
+    end
+
+    def enrollments_till_given_effective_on(date)
+      hbx_enrollments.select { |en| en.effective_on <= date } if hbx_enrollments.present?
     end
 
     def cancel_enrollments
@@ -1013,6 +1020,10 @@ module BenefitSponsors
     end
 
     private
+
+    def set_expiration_date
+      update_attribute(:expiration_date, effective_period.min) unless expiration_date
+    end
 
     def refresh_recorded_rating_area
       self.recorded_rating_area = benefit_sponsorship.rating_area_on(self.start_on)

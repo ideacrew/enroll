@@ -7,7 +7,7 @@ RSpec.describe 'upload the invoice to s3', :type => :task, dbclean: :after_each 
   let!(:benefit_markets_location_rating_area) { FactoryGirl.create_default(:benefit_markets_locations_rating_area) }
   let!(:benefit_markets_location_service_area) { FactoryGirl.create_default(:benefit_markets_locations_service_area) }
   let!(:security_question)  { FactoryGirl.create_default :security_question }
-  let(:current_effective_date)  { TimeKeeper.date_of_record }
+  let(:current_effective_date)  { TimeKeeper.date_of_record.next_month.beginning_of_month }
   let(:start_on)                { current_effective_date.prev_month.beginning_of_month }
   let(:effective_period)        { start_on..start_on.next_year.prev_day }
   let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "insured/families/_employers_selection.html.erb" do
+RSpec.describe "insured/families/_employers_selection.html.erb", dbclean: :after_each do
   let(:person) {FactoryGirl.build(:person)}
   let(:employee_role1) {FactoryGirl.build(:employee_role, person: person, employer_profile: ef1)}
   let(:employee_role2) {FactoryGirl.build(:employee_role, person: person, employer_profile: ef2)}

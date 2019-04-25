@@ -26,13 +26,16 @@ Gem::Specification.new do |s|
   s.add_dependency 'symmetric-encryption', '~> 3.6.0'
   s.add_dependency 'pundit', '~> 1.0.1'
   s.add_dependency 'active_model_serializers'
-  s.add_dependency 'virtus'
+  s.add_dependency 'virtus', '1.0.5'
+  s.add_dependency 'i18n', '0.7.0'
+  s.add_dependency 'nokogiri', '1.6.7.2'
+  s.add_dependency 'mini_portile2', '2.0.0'
 
   s.add_development_dependency "rspec-rails"
   s.add_development_dependency 'shoulda-matchers'
   s.add_development_dependency 'database_cleaner'
-  s.add_development_dependency 'capybara'
-  s.add_development_dependency 'factory_girl_rails'
+  s.add_development_dependency 'capybara', '2.6.2'
+  s.add_development_dependency 'factory_girl_rails', '4.6.0'
   s.add_development_dependency 'forgery'
   s.add_development_dependency 'mongoid_rails_migrations'
 end

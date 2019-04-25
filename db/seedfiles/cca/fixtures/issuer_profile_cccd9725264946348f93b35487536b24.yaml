@@ -5,7 +5,7 @@ attributes: !ruby/hash:BSON::Document
     raw_data: !binary |-
       W1d/98CdB9xzNUX4
   _type: BenefitSponsors::Organizations::ExemptOrganization
-  fein: '050153223'
+  fein: '050513223'
   site_id: !ruby/object:BSON::ObjectId
     raw_data: !binary |-
       WxWP5J+ICzHOaeVu

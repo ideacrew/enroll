@@ -16,7 +16,7 @@ describe "Importing data", dbclean: :after_each do
     let!(:plan_year3)         { FactoryGirl.create(:plan_year, benefit_groups: [benefit_group_2], aasm_state: "draft", start_on: start_on, employer_profile: employer_profile_2) }
     let!(:plan_year4)         { FactoryGirl.create(:plan_year, benefit_groups: [benefit_group_2], aasm_state: "draft", start_on: start_on_1, employer_profile: employer_profile_2) }
     let!(:plan_year5)         { FactoryGirl.create(:plan_year, benefit_groups: [benefit_group_2], aasm_state: "publish_pending", start_on: start_on, employer_profile: employer_profile_2) }
-  	subject { CancelPlanYearsGroup.new(given_task_name, double(:current_scope => nil)) }
+    subject { CancelPlanYearsGroup.new(given_task_name, double(:current_scope => nil)) }
     
     before :each do   
       allow(ENV).to receive(:[]).with('file_name').and_return "spec/test_data/cancel_plan_years/CancelPlanYears.csv"
