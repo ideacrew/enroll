@@ -111,7 +111,7 @@ $(document).on('click', '#modal-wrapper .modal-close', function(){
 });
 
 
-$(document).ready(function () {
+$(document).on('ready turbolinks:load', function () {
 
   // ACTUALLY BELONGS IN APPLICATION.JS
   $('.module a.view-more').on('click', function() {
