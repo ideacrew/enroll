@@ -31,7 +31,7 @@ table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child:before{
   font-family: 'Courier New', Courier, monospace;
   line-height: 14px;
   content: '+';
-  background-color: #337ab7;
+  background-color: #2E2E2E;
 }
 table.dataTable.dtr-inline.collapsed > tbody > tr.parent > td:first-child:before,
 table.dataTable.dtr-inline.collapsed > tbody > tr.parent > th:first-child:before {
@@ -79,7 +79,7 @@ table.dataTable.dtr-column > tbody > tr > th.control:before {
   font-family: 'Courier New', Courier, monospace;
   line-height: 14px;
   content: '+';
-  background-color: #337ab7;
+  background-color: #2E2E2E;
 }
 table.dataTable.dtr-column > tbody > tr.parent td.control:before,
 table.dataTable.dtr-column > tbody > tr.parent th.control:before {

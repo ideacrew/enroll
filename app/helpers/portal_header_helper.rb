@@ -26,7 +26,7 @@ module PortalHeaderHelper
     elsif current_user.try(:consumer_role).try(:is_native?)
       "<a class='portal'>native person</a>".html_safe
     else
-      "<a class='portal'>Welcome to the Office of Personnel Management</a>".html_safe
+      "<a class='portal'> Office of Personnel Management</a>".html_safe
     end
   end
 
