@@ -169,9 +169,11 @@ RSpec.describe BrokerAgencies::ProfilesController do
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
     let(:hbx_staff_role) { double("hbx_staff_role")}
     let(:hbx_profile) { double("hbx_profile")}
-    let(:person){double(:broker_agency_staff_roles => [double(:broker_agency_profile_id => 5)]) }
+    let(:person){FactoryGirl.create(:person) }
+    let(:broker_agency_staff_role) {FactoryGirl.create(:broker_agency_staff_role, aasm_state: 'active', broker_agency_profile_id: '5')}
 
     it "should redirect to myaccount" do
+      person.broker_agency_staff_roles << broker_agency_staff_role
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
       allow(user).to receive(:person).and_return(person)
       allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
@@ -181,34 +183,6 @@ RSpec.describe BrokerAgencies::ProfilesController do
       sign_in(user)
       get :new
       expect(response).to have_http_status(:redirect)
-    end
-  end
-
-  describe "get employers" do
-    let(:user) { FactoryGirl.create(:user, :roles => ['broker_agency_staff'], :person => person)}
-    let(:user1) {FactoryGirl.create(:user,:roles=> [], person: broker_role.person)}
-    let(:person) {broker_agency_staff_role.person}
-    let(:person1) {broker_role.person}
-    let(:organization) {FactoryGirl.create(:organization)}
-    let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, organization: organization) }
-    let(:broker_agency_staff_role) {FactoryGirl.build(:broker_agency_staff_role, broker_agency_profile: broker_agency_profile)}
-    let(:broker_role) { FactoryGirl.create(:broker_role,  broker_agency_profile: broker_agency_profile, aasm_state: 'active')}
-    it "should get organizations for employers where broker_agency_account is active" do
-      allow(person).to receive(:broker_role).and_return(nil)
-      allow(person).to receive(:hbx_staff_role).and_return(nil)
-      sign_in user
-      xhr :get, :employers, id: broker_agency_profile.id, format: :js
-      expect(response).to have_http_status(:success)
-      orgs = Organization.where({"employer_profile.broker_agency_accounts"=>{:$elemMatch=>{:is_active=>true, :broker_agency_profile_id=>broker_agency_profile.id}}})
-      expect(assigns(:orgs)).to eq orgs
-    end
-
-    it "should get organizations for employers where writing_agent is active" do
-      sign_in user1
-      xhr :get, :employers, id: broker_agency_profile.id, format: :js
-      expect(response).to have_http_status(:success)
-      orgs = Organization.where({"employer_profile.broker_agency_accounts"=>{:$elemMatch=>{:is_active=>true, :writing_agent_id=> broker_role.id }}})
-      expect(assigns(:orgs)).to eq orgs
     end
   end
 
@@ -236,6 +210,30 @@ RSpec.describe BrokerAgencies::ProfilesController do
       sign_in current_user
       xhr :get, :family_index, id: broker_agency_profile.id
       expect(response).to render_template("broker_agencies/profiles/family_index")
+    end
+
+    it 'renders the families_index template if current user has hbx_staff_role?' do
+      current_user = @current_user
+      allow(current_user).to receive(:has_hbx_staff_role?).and_return(true)
+      sign_in current_user
+      xhr :get, :family_index, id: broker_agency_profile.id
+      expect(response).to render_template('broker_agencies/profiles/family_index')
+    end
+
+    it 'renders the families_index template if current user has broker_agency_staff_role' do
+      current_user = @current_user
+      allow(current_user).to receive(:has_broker_agency_staff_role?).and_return(true)
+      sign_in current_user
+      xhr :get, :family_index, id: broker_agency_profile.id
+      expect(response).to render_template('broker_agencies/profiles/family_index')
+    end
+
+    it 'should not render the families_index template if current user does not have has broker_agency_staff_role' do
+      current_user = @current_user
+      allow(current_user).to receive(:has_broker_agency_staff_role?).and_return(false)
+      sign_in current_user
+      xhr :get, :family_index, id: broker_agency_profile.id
+      expect(response).not_to render_template('broker_agencies/profiles/family_index')
     end
   end
 
@@ -284,29 +282,6 @@ RSpec.describe BrokerAgencies::ProfilesController do
           expect(["shop", "both"].include? staff_person.broker_role.market_kind).to be_truthy
         end
       end
-    end
-  end
-
-  describe "GET assign" do
-    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
-    let(:broker_role) { FactoryGirl.create(:broker_role, aasm_state: 'active', broker_agency_profile: broker_agency_profile) }
-    let(:person) { broker_role.person }
-    let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
-    before :each do
-      sign_in user
-      xhr :get, :assign, id: broker_agency_profile.id, format: :js
-    end
-
-    it "should return http success" do
-      expect(response).to have_http_status(:success)
-    end
-
-    it "should get general_agency_profiles" do
-      expect(assigns(:general_agency_profiles)).to eq GeneralAgencyProfile.all_by_broker_role(broker_role)
-    end
-
-    it "should get employers" do
-      expect(assigns(:employers)).to eq Organization.by_broker_agency_profile(broker_agency_profile.id).map(&:employer_profile).first(20)
     end
   end
 
@@ -365,46 +340,6 @@ RSpec.describe BrokerAgencies::ProfilesController do
 
     it "should get employer_profile" do
       expect(assigns(:employer_profile)).to eq employer_profile
-    end
-  end
-
-  describe "POST update_assign" do
-    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
-    let(:broker_role) { FactoryGirl.create(:broker_role, :aasm_state => 'active', broker_agency_profile: broker_agency_profile) }
-    let(:person) { broker_role.person }
-    let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
-    let(:employer_profile) { FactoryGirl.create(:employer_profile, general_agency_profile: general_agency_profile) }
-    context "when we Assign agency" do
-      before :each do
-        sign_in user
-        xhr :post, :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], general_agency_id: general_agency_profile.id, type: 'Hire'
-      end
-
-      it "should render" do
-        expect(response).to render_template(:update_assign)
-      end
-
-      it "should get notice" do
-        expect(flash[:notice]).to eq 'Assign successful.'
-      end
-    end
-    context "when we Unassign agency" do
-      before :each do
-        sign_in user
-        post :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], commit: "Clear Assignment"
-      end
-
-      it "should redirect" do
-        expect(response).to have_http_status(:redirect)
-      end
-
-      it "should get notice" do
-        expect(flash[:notice]).to eq 'Unassign successful.'
-      end
-      it "should update aasm_state" do
-        employer_profile.reload
-        expect(employer_profile.general_agency_accounts.first.aasm_state).to eq "inactive"
-      end
     end
   end
 

@@ -9,7 +9,7 @@
           <% end %>
         </li>
         <li role="presentation" id="employers-tab" <%= menu_tab_class(active_tab, "employers-tab") %>>
-          <%= link_to(employers_broker_agencies_profiles_path(id: @broker_agency_profile.id), "aria-expanded" => "true", :remote => true, "aria-controls" => "employers", "role" => "tab" ) do  %>
+          <%= link_to(sponsored_benefits.employers_organizations_broker_agency_profile_path(id: @broker_agency_profile.id), "aria-expanded" => "true", :remote => true, "aria-controls" => "employers", "role" => "tab" ) do  %>
             <span class="hidden-xs"><%= l10n("employers")%></span>
             <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Employers"></span>
           <% end %>
@@ -42,12 +42,6 @@
             <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="General Agencies"></span>
           <% end %>
         </li>
-        <li role="presentation" id="assign-tab" <%= menu_tab_class(active_tab, "assign-tab") %>>
-          <%= link_to(assign_broker_agencies_profile_path(id: @id), "aria-expanded" => "true", :remote => true, "aria-controls" => "assign", "role" => "tab" ) do  %>
-            <span class="hidden-xs">Assign</span>
-            <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Assign"></span>
-          <% end %>
-        </li>
         <li role="presentation" id="quote-roster-tab" <%= menu_tab_class(active_tab, "quote-roster-tab") %>>
          <%= link_to my_quotes_broker_agencies_broker_role_quotes_path(@broker_agency_profile.primary_broker_role), "aria-expanded" => "true",  "role" => "tab", 'data-no-turbolink' => true  do  %>
             <span class="hidden-xs">Quoting Tool</span>
@@ -68,7 +62,7 @@
             <%= l10n("broker_mail")%>
           <% end %>
         </li>
-        <% if current_user.has_hbx_staff_role? || current_user.has_broker_role?%>
+        <% if current_user.has_hbx_staff_role? || current_user.has_broker_role? || current_user.has_broker_agency_staff_role?%>
         <% else %>
           <li role="presentation" class="multi-line">
             <%= link_to url_for(SamlInformation.curam_broker_dashboard) do %>
