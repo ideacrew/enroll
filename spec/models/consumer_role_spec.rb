@@ -1104,4 +1104,3 @@ describe 'coverage_purchased!' do
     person.consumer_role.coverage_purchased!
   end
 end
-
