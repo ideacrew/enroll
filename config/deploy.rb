@@ -1,5 +1,5 @@
 # config valid only for current version of Capistrano
-lock '3.3.5'
+lock '~> 3.3.5'
 
 set :application, 'enroll'
 set :repo_url, 'https://github.com/dchbx/enroll.git'
