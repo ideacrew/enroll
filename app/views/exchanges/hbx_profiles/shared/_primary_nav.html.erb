@@ -26,7 +26,7 @@
               active_tab: active_tab,
               remote: true,
               pundit_object: HbxProfile,
-              pundit_method: :access_outstanding_verification_sub_tab?
+              pundit_method: :can_access_outstanding_verification_sub_tab?
             } %>
             <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
               tab_name: 'new-consumer-application',

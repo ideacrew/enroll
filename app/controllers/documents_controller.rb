@@ -1,7 +1,7 @@
 class DocumentsController < ApplicationController
   before_action :updateable?, except: [:show_docs, :download]
   before_action :set_document, only: [:destroy, :update]
-  before_action :set_person, only: [:enrollment_docs_state, :fed_hub_request, :enrollment_verification, :update_verification_type, :extend_due_date]
+  before_action :set_person, only: [:enrollment_docs_state, :fed_hub_request, :enrollment_verification, :update_verification_type, :extend_due_date, :update_ridp_verification_type]
   before_action :add_type_history_element, only: [:update_verification_type, :fed_hub_request, :destroy]
   respond_to :html, :js
 
@@ -76,7 +76,7 @@ class DocumentsController < ApplicationController
     end
 
     respond_to do |format|
-      format.html { redirect_to :back, :flash => flash_message }
+      format.html { redirect_back fallback_location: '/', :flash => flash_message }
     end
   end
 
