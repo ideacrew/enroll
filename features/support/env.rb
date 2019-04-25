@@ -3,8 +3,9 @@
 # newer version of cucumber-rails. Consider adding your own code to a new file
 # instead of editing this one. Cucumber will automatically load all features/**/*.rb
 # files.
-require_relative '../../spec/ivl_helper'
 
+ENV["RAILS_ENV"] ||= 'test'
+$LOADING_CUCUMBER_ENV = true
 require 'selenium-webdriver'
 require 'cucumber/rails'
 require 'email_spec/cucumber'
@@ -16,6 +17,7 @@ require 'cucumber/rspec/doubles'
 Dir[File.expand_path(Rails.root.to_s + "/lib/test/**/*.rb")].each { |f| load f }
 require File.expand_path(File.dirname(__FILE__) + '/../../config/environment')
 require "rspec/rails"
+require_relative '../../spec/ivl_helper'
 
 # Capybara defaults to CSS3 selectors rather than XPath.
 # If you'd prefer to use XPath, just uncomment this line and adjust any
