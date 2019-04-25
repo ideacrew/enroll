@@ -52,9 +52,22 @@ RSpec.describe 'Notifier::Builders::ConsumerRole', :dbclean => :after_each do
         expect(subject.dependents.first['filer_type']).to eq('Filers')
         expect(subject.dependents.count).to eq(2)
       end
+
       it "should have dependent citizen_status attributes" do
         expect(subject.citizen_status("US")).to eq('US Citizen')
         expect(subject.dependents.count).to eq(2)
+      end
+
+      it "should have magi_medicaid_members_present" do
+        expect(subject.magi_medicaid_members_present).to eq(false)
+      end
+
+      it "should have aqhp_or_non_magi_medicaid_members_present" do
+        expect(subject.aqhp_or_non_magi_medicaid_members_present).to eq(true)
+      end
+
+      it "should have uqhp_or_non_magi_medicaid_members_present" do
+        expect(subject.uqhp_or_non_magi_medicaid_members_present).to eq(false)
       end
     end
 
@@ -124,6 +137,40 @@ RSpec.describe 'Notifier::Builders::ConsumerRole', :dbclean => :after_each do
         it "should have address " do
           expect(address.address_1.present?)
         end
+      end
+    end
+  end
+
+  describe "A uqhp_eligible in aqhp event" do
+    let(:payload2) {
+      file = Rails.root.join("spec", "test_data", "notices", "proj_elig_report_aqhp_2019_test_data.csv")
+      csv = CSV.open(file, "r", :headers => true)
+      data = csv.to_a
+
+      {
+        "consumer_role_id" => "5c61bf485f326d4e4f0000c",
+        "event_object_kind" =>  "ConsumerRole",
+        "event_object_id" => "5bcdec94eab5e76691000cec",
+        "notice_params" => {
+          "primary_member" => data.select{ |m| m["dependent"].casecmp('NO').zero? && m["uqhp_eligible"].casecmp('YES').zero?}.first.to_hash
+        }
+      }
+    }
+
+    let!(:person2) { FactoryGirl.create(:person, :with_consumer_role, hbx_id: "a16f4029916445fcab3dbc44bb7aadd1", first_name: "Test2", last_name: "Data2") }
+    let!(:family2) { FactoryGirl.create(:family, :with_primary_family_member, person: person2) }
+
+    let(:subject2) {
+      consumer = Notifier::Builders::ConsumerRole.new
+      consumer.payload = payload2
+      consumer.consumer_role = person2.consumer_role
+      consumer
+    }
+
+    context "uqhp_eligible in aqhp_event" do
+      it "should be uqhp_eligible in aqhp event" do
+        allow(subject2).to receive(:uqhp_notice?).and_return(false)
+        expect(subject2.uqhp_eligible).to eq(true)
       end
     end
   end
