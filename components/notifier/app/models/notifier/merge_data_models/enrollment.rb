@@ -14,14 +14,11 @@ module Notifier
     attribute :employee_last_name, String
     attribute :coverage_end_on, String
     attribute :enrolled_count, String
-<<<<<<< HEAD
     attribute :enrollment_kind, String
-=======
     attribute :waiver_effective_on, String
     attribute :waiver_plan_name, String
     attribute :waiver_enrolled_count, String
     attribute :waiver_coverage_end_on, String
->>>>>>> origin/notice_engine_39976
     # attribute :metal_level, String
     attribute :coverage_kind, String
     # attribute :plan_carrier, String
