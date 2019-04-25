@@ -52,9 +52,22 @@ RSpec.describe 'Notifier::Builders::ConsumerRole', :dbclean => :after_each do
         expect(subject.dependents.first['filer_type']).to eq('Filers')
         expect(subject.dependents.count).to eq(2)
       end
+
       it "should have dependent citizen_status attributes" do
         expect(subject.citizen_status("US")).to eq('US Citizen')
         expect(subject.dependents.count).to eq(2)
+      end
+
+      it "should have magi_medicaid_members_present" do
+        expect(subject.magi_medicaid_members_present).to eq(false)
+      end
+
+      it "should have aqhp_or_non_magi_medicaid_members_present" do
+        expect(subject.aqhp_or_non_magi_medicaid_members_present).to eq(true)
+      end
+
+      it "should have uqhp_or_non_magi_medicaid_members_present" do
+        expect(subject.uqhp_or_non_magi_medicaid_members_present).to eq(false)
       end
     end
 
