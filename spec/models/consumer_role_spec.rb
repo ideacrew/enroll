@@ -1118,7 +1118,7 @@ describe 'coverage_purchased!' do
     person.consumer_role.lawful_presence_determination.update_attributes(citizen_status: nil)
     expect_any_instance_of(LawfulPresenceDetermination).to receive(:notify).with("local.enroll.lawful_presence.vlp_verification_request", {:person => person, :coverage_start_date => start_date})
     person.consumer_role.coverage_purchased!
-  en
+  end
 end
 
 describe "Verification Tracker" do
