@@ -36,12 +36,15 @@ Feature: Super Admin & tier3 able to see & access "Extend Open Enrollment" Featu
     | super_admin | renewing_enrolling              | see       |
     | super_admin | renewing_application_ineligible | see       |
     | super_admin | renewing_enrollment_extended    | see       |
+    | super_admin | renewing_canceled               | see       |
     | super_admin | renewing_enrolled               | not see   |
     | hbx_tier3   | renewing_draft                  | not see   |
     | hbx_tier3   | renewing_enrolling              | see       |
     | hbx_tier3   | renewing_enrollment_extended    | see       |
     | hbx_tier3   | renewing_enrolling              | see       |
     | hbx_tier3   | renewing_enrolled               | not see   |
+    | hbx_tier3   | renewing_canceled               | see       |
+
 
 
   Scenario: HBX Staff with super_admin subroles access Extend Open Enrollment button and able to entend 

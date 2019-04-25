@@ -1133,8 +1133,8 @@ class PlanYear
     end
 
     event :extend_open_enrollment, :after => :record_transition do
-      transitions from: [:canceled, :application_ineligible, :enrollment_extended, :enrolling ], to: :enrollment_extended,                                     :guard => [:is_application_eligible?]
-      transitions from: [:canceled, :renewing_application_ineligible, :renewing_enrollment_extended, :renewing_enrolling ], to: :renewing_enrollment_extended, :guard => [:is_application_eligible?]
+      transitions from: [:canceled, :application_ineligible, :enrollment_extended, :enrolling], to: :enrollment_extended,                                     :guard => [:is_application_eligible?]
+      transitions from: [:renewing_canceled, :renewing_application_ineligible, :renewing_enrollment_extended, :renewing_enrolling], to: :renewing_enrollment_extended, :guard => [:is_application_eligible?]
     end
   end
 
