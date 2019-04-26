@@ -1,7 +1,3 @@
-Given(/^Hbx Admin clicks on Employers link$/) do
-  click_link 'Employers'
-end
-
 When(/^Hbx Admin should see an Create Plan Year button$/) do
   expect(page).to have_content("Create Plan Year")
 end

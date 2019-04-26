@@ -3,7 +3,7 @@ require File.join(Rails.root, "app", "data_migrations", "define_permissions")
 
 describe DefinePermissions, dbclean: :after_each do
   subject { DefinePermissions.new(given_task_name, double(:current_scope => nil))}
-  let(:roles) {%w{hbx_staff super_admin hbx_read_only hbx_csr_supervisor hbx_tier3 hbx_csr_tier2 hbx_csr_tier1 developer} }
+  let(:roles) {%w{hbx_staff hbx_read_only hbx_csr_supervisor hbx_tier3 hbx_csr_tier2 hbx_csr_tier1 developer super_admin} }
   describe 'create permissions' do
     let(:given_task_name) {':initial_hbx'}
     before do
@@ -733,6 +733,7 @@ describe DefinePermissions, dbclean: :after_each do
       hbx_csr_tier1_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_tier2_person, subrole: "hbx_csr_tier1", permission_id: permission_hbx_csr_tier2.id)
       hbx_csr_tier2_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_tier1_person, subrole: "hbx_csr_tier2", permission_id: permission_hbx_csr_tier1.id)
     end
+
     it "updates hbx_admin_can_access_new_consumer_application_sub_tab to true" do
       subject.hbx_admin_can_access_new_consumer_application_sub_tab
       expect(Person.all.count).to eq(7)
@@ -743,6 +744,7 @@ describe DefinePermissions, dbclean: :after_each do
       expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_access_new_consumer_application_sub_tab).to be true
       expect(@hbx_csr_tier2_person.hbx_staff_role.permission.can_access_new_consumer_application_sub_tab).to be true
     end
+
     it "updates hbx_admin_can_access_identity_verification_sub_tab to true" do
       subject.hbx_admin_can_access_identity_verification_sub_tab
       expect(Person.all.count).to eq(7)
@@ -753,6 +755,7 @@ describe DefinePermissions, dbclean: :after_each do
       expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_access_identity_verification_sub_tab).to be true
       expect(@hbx_csr_tier2_person.hbx_staff_role.permission.can_access_identity_verification_sub_tab).to be true
     end
+
     it "updates hbx_admin_can_access_outstanding_verification_sub_tab to true" do
       subject.hbx_admin_can_access_outstanding_verification_sub_tab
       expect(Person.all.count).to eq(7)
@@ -760,6 +763,7 @@ describe DefinePermissions, dbclean: :after_each do
       expect(@hbx_super_admin_person.hbx_staff_role.permission.can_access_outstanding_verification_sub_tab).to be true
       expect(@hbx_tier3_person.hbx_staff_role.permission.can_access_outstanding_verification_sub_tab).to be true
     end
+
     it "updates hbx_admin_can_complete_resident_application to true" do
       subject.hbx_admin_can_complete_resident_application
       expect(Person.all.count).to eq(7)
@@ -767,6 +771,7 @@ describe DefinePermissions, dbclean: :after_each do
       expect(@hbx_super_admin_person.hbx_staff_role.permission.can_complete_resident_application).to be true
       expect(@hbx_tier3_person.hbx_staff_role.permission.can_complete_resident_application).to be true
     end
+
     it "updates hbx_admin_can_access_accept_reject_identity_documents to true" do
       subject.hbx_admin_can_access_accept_reject_identity_documents
       expect(Person.all.count).to eq(7)
@@ -774,6 +779,7 @@ describe DefinePermissions, dbclean: :after_each do
       expect(@hbx_super_admin_person.hbx_staff_role.permission.can_access_accept_reject_identity_documents).to be true
       expect(@hbx_tier3_person.hbx_staff_role.permission.can_access_accept_reject_identity_documents).to be true
     end
+
     it "updates hbx_admin_can_access_accept_reject_paper_application_documents to true" do
       subject.hbx_admin_can_access_accept_reject_paper_application_documents
       expect(Person.all.count).to eq(7)
@@ -784,6 +790,7 @@ describe DefinePermissions, dbclean: :after_each do
       expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_access_accept_reject_paper_application_documents).to be true
       expect(@hbx_csr_tier2_person.hbx_staff_role.permission.can_access_accept_reject_paper_application_documents).to be true
     end
+
     it "updates hbx_admin_can_delete_identity_application_documents to true" do
       subject.hbx_admin_can_delete_identity_application_documents
       expect(Person.all.count).to eq(7)
