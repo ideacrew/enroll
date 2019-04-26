@@ -28,7 +28,7 @@ module Forms
     end
 
     def update_attributes(hsh)
-      for_wrapper, for_person = clean_attributes(hsh)
+      for_wrapper, for_person = clean_attributes(hsh.to_h)
       for_wrapper.each_pair do |k,v|
         self.send("#{k}=", v)
       end

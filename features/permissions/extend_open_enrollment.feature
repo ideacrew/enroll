@@ -3,9 +3,9 @@ Feature: As a Super Admin I will be the only user
 
   Background: Setup site, employer, and benefit application
     Given a CCA site exists with a benefit market
+    Given benefit market catalog exists for enrollment_open initial employer with health benefits
     And there is an employer ABC Widgets
-    And this employer has a enrollment_open benefit application
-    And this benefit application has a benefit package containing health benefits
+    And employer ABC Widgets has enrollment_open benefit application
 
   Scenario Outline: HBX Staff with <subrole> subroles should <action> Extend Open Enrollment button
     Given that a user with a HBX staff role with <subrole> subrole exists and is logged in

@@ -1,4 +1,6 @@
 require 'rails_helper'
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 module BenefitSponsors
   RSpec.describe Profiles::BrokerAgencies::BrokerAgencyProfilesController, type: :controller, dbclean: :after_each do
@@ -171,6 +173,71 @@ module BenefitSponsors
 
         it "should redirect to new of registration's controller for broker_agency" do
           expect(response).to redirect_to(new_profiles_registration_path(profile_type: "broker_agency"))
+        end
+      end
+    end
+
+    describe "family_datatable" do
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup initial benefit application"
+      include_context "setup employees with benefits"
+
+      let!(:broker_agency_accounts) { FactoryBot.create(:benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: organization.profiles.first, benefit_sponsorship: benefit_sponsorship) }
+      let!(:user) { FactoryBot.create(:user, roles: [], person: FactoryBot.create(:person)) }
+      let!(:ce) { benefit_sponsorship.census_employees.first }
+      let!(:ee_person) { FactoryBot.create(:person, :with_employee_role, :with_family, first_name: ce.first_name, last_name: ce.last_name, dob: ce.dob, ssn: ce.ssn, gender: ce.gender) }
+
+      context "should return sucess and family" do
+        before :each do
+          ce.employee_role_id = ee_person.employee_roles.first.id
+          ce.save
+          ee_person.employee_roles.first.census_employee_id = ce.id
+          ee_person.save
+          DataTablesInQuery = Struct.new(:draw, :skip, :take, :search_string)
+          dt_query = DataTablesInQuery.new("1", 0, 10, "")
+          sign_in(user_with_hbx_staff_role)
+          allow(controller).to receive(:extract_datatable_parameters).and_return(dt_query)
+          get :family_datatable, params: { id: bap_id }, xhr: true
+          @query = ::BenefitSponsors::Queries::BrokerFamiliesQuery.new(nil, organization.profiles.first.id)
+        end
+
+        it "should return a family" do
+          expect(@query.total_count).not_to eq 0
+        end
+
+        it "should return success http status" do
+          expect(response).to have_http_status(:success)
+        end
+      end
+
+      context "should not return sucess" do
+        before :each do
+          sign_in(user)
+          get :family_datatable, params: { id: bap_id }, xhr: true
+        end
+
+        it "should not return sucess http status" do
+          expect(response).not_to have_http_status(:success)
+        end
+      end
+
+      context "should not return family" do
+        before :each do
+          ce.employee_role_id = ee_person.employee_roles.first.id
+          ce.save
+          ee_person.employee_roles.first.census_employee_id = ce.id
+          ee_person.save
+          benefit_sponsorship.broker_agency_accounts.first.update_attributes(is_active: false)
+          DataTablesInQuery = Struct.new(:draw, :skip, :take, :search_string)
+          dt_query = DataTablesInQuery.new("1", 0, 10, "")
+          sign_in(user_with_hbx_staff_role)
+          allow(controller).to receive(:extract_datatable_parameters).and_return(dt_query)
+          get :family_datatable, params: { id: bap_id }, xhr: true
+          @query = ::BenefitSponsors::Queries::BrokerFamiliesQuery.new(nil, organization.profiles.first.id)
+        end
+
+        it "should not return family" do
+          expect(@query.total_count).to eq 0
         end
       end
     end

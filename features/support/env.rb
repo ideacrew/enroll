@@ -3,19 +3,21 @@
 # newer version of cucumber-rails. Consider adding your own code to a new file
 # instead of editing this one. Cucumber will automatically load all features/**/*.rb
 # files.
-require_relative '../../spec/ivl_helper'
 
+ENV["RAILS_ENV"] ||= 'test'
+$LOADING_CUCUMBER_ENV = true
+require 'selenium-webdriver'
 require 'cucumber/rails'
 require 'email_spec/cucumber'
 require 'rspec/expectations'
 require 'capybara/cucumber'
-require 'capybara/poltergeist'
 require 'capybara-screenshot/cucumber'
 require 'cucumber/rspec/doubles'
 
 Dir[File.expand_path(Rails.root.to_s + "/lib/test/**/*.rb")].each { |f| load f }
 require File.expand_path(File.dirname(__FILE__) + '/../../config/environment')
 require "rspec/rails"
+require_relative '../../spec/ivl_helper'
 
 # Capybara defaults to CSS3 selectors rather than XPath.
 # If you'd prefer to use XPath, just uncomment this line and adjust any
@@ -67,21 +69,19 @@ end
 # The :transaction strategy is faster, but might give you threading problems.
 # See https://github.com/cucumber/cucumber-rails/blob/master/features/choose_javascript_database_strategy.feature
 Cucumber::Rails::Database.javascript_strategy = :truncation
-Capybara.default_driver = :poltergeist
-Capybara.javascript_driver = :poltergeist
-phantomjs_options = ['--ignore-ssl-errors=yes', '--ssl-protocol=any', '--load-images=no']
-phantomjs_options.push('--proxy=localhost:9050', '--proxy-type=socks5') if Rails.env.production? || Rails.env.development?
 
-Capybara.register_driver :poltergeist do |app|
-  options = {
-      :port => (51674 + ENV['TEST_ENV_NUMBER'].to_i),
-      :js_errors => true,
-      :timeout => 120,
-      :debug => false,
-      :phantomjs_options => phantomjs_options,
-      :inspector => true,
-      :window_size => [1280,720],
-      :phantomjs_logger => File.open("log/phantomjs_test.log", "a"),
-  }
-  Capybara::Poltergeist::Driver.new(app, options)
+Capybara::Screenshot.webkit_options = { width: 2280, height: 1800 }
+Capybara::Screenshot.prune_strategy = :keep_last_run
+
+Capybara.register_driver :selenium_chrome do |app|
+  options = Selenium::WebDriver::Chrome::Options.new
+  options.add_argument("--window-size=1024,768")
+  options.add_argument("headless")
+
+  Capybara::Selenium::Driver.new(app,
+    browser: :chrome,
+    options: options
+  )
 end
+
+Capybara.default_driver = :selenium_chrome

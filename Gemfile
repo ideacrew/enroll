@@ -19,7 +19,7 @@ gem 'prawn', :git => 'https://github.com/prawnpdf/prawn.git', :ref => '8028ca0cd
 # gem 'recurring_select', :git => 'https://github.com/brianweiner/recurring_select'
 
 ## Fix this dependency -- bring into project
-gem 'simple_calendar', :git => 'https://github.com/harshared/simple_calendar'
+gem 'simple_calendar', :git => 'https://github.com/harshared/simple_calendar.git'
 
 ## Verify Rails 5 eliminates need for this gem with MongoDB
 gem 'database_cleaner',       '~> 1.7'
@@ -86,6 +86,7 @@ gem 'pundit',                   '~> 2.0'
 gem "recaptcha",                '~> 4.13', require: 'recaptcha/rails'
 gem 'redcarpet',                '~> 3.4'
 gem 'redis',                    '~> 4.0'
+gem 'redis-rails',              '~> 5.0.2'
 gem 'resque',                   '~> 2.0'
 gem 'roo',                      '~> 2.1'
 gem 'ruby-saml',                '~> 1.3'
@@ -151,11 +152,13 @@ group :test do
   gem 'poltergeist',                  '~> 1.18.0'
   gem 'rspec-instafail',              '~> 1'
   gem 'ruby-progressbar',             '~> 1'
+  gem 'selenium-webdriver', '3.141.0'
   gem 'shoulda-matchers',             '~> 3'
   gem 'simplecov',                    '~> 0.14',  :require => false
   gem 'test-prof',                    '~> 0.5.0'
   gem 'warden',                       '~> 1.2.7'
   gem 'watir',                        '~> 6.10.3'
+  gem 'webdriver'
   gem 'webmock',                      '~> 3.0.1'
 end
 

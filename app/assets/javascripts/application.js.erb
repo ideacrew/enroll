@@ -12,6 +12,8 @@
 //
 //= require jquery
 //= require jquery_ujs
+//= require jquery-ui
+//= require jquery-ui/widgets/datepicker
 //= require bootstrap.min
 //= require jquery.selectric.min
 //= require turbolinks
@@ -34,6 +36,7 @@
 //= require plan_year_selection
 //= require aptc
 //= require announcement
+//= require bootstrap-slider
 //= require bootstrap-hooks
 //= require general_agency
 //= require dataTables/jquery.dataTables
@@ -108,7 +111,7 @@ $(document).on('click', '#modal-wrapper .modal-close', function(){
 });
 
 
-$(document).ready(function () {
+$(document).on('ready turbolinks:load', function () {
 
   // ACTUALLY BELONGS IN APPLICATION.JS
   $('.module a.view-more').on('click', function() {

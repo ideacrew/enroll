@@ -14,6 +14,8 @@ FactoryBot.define do
       dental_product_package_kinds { [:single_product] }
       number_of_products { 5 }
       product_kinds { [:health, :dental] }
+      service_area nil
+      issuer_profile nil
     end
 
     association :benefit_market, factory: :benefit_markets_benefit_market
@@ -29,9 +31,12 @@ FactoryBot.define do
             title: "#{package_kind.to_s.humanize} #{product_kind}",
             description: "#{package_kind.to_s.humanize} #{product_kind}",
             application_period: benefit_market_catalog.application_period,
-            number_of_products: evaluator.number_of_products
+            number_of_products: evaluator.number_of_products,
+            service_area: evaluator.service_area,
+            issuer_profile: evaluator.issuer_profile
           )
         end
+
         evaluator.product_kinds.each do |product_kind|
           case product_kind
           when :health
