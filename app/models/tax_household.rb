@@ -138,8 +138,8 @@ class TaxHousehold
 
   # to check if all the enrolling family members are not aptc
   def is_all_non_aptc?(hbx_enrollment)
-    enrolling_family_members = find_enrolling_fms(hbx_enrollment)
-    find_non_aptc_fms(enrolling_family_members).count == enrolling_family_members.count
+    fm_ids = hbx_enrollment.hbx_enrollment_members.pluck(:applicant_id)
+    tax_household_members.where(:applicant_id.in => fm_ids).none?(&:is_ia_eligible?)
   end
 
   def is_member_aptc_eligible?(family_member)

@@ -468,21 +468,31 @@ RSpec.describe TaxHousehold, type: :model do
 
   context 'is_all_non_aptc?' do
     let!(:family) { create(:family, :with_primary_family_member_and_dependent) }
+    let(:fm1_id) { family.family_members[0].id }
+    let(:fm2_id) { family.family_members[1].id }
     let(:household) { create(:household, family: family) }
     let!(:tax_household) { create(:tax_household, household: household) }
-    let(:hbx_enrollment) { create(:hbx_enrollment, :with_enrollment_members,household: household) }
+    let(:hbx_enrollment) do
+      create(:hbx_enrollment, household: household).tap do |enr|
+        enr.hbx_enrollment_members << build(:hbx_enrollment_member, applicant_id: fm1_id)
+        enr.hbx_enrollment_members << build(:hbx_enrollment_member, applicant_id: fm2_id)
+      end
+    end
+    let!(:tax_household_member1) { tax_household.tax_household_members.create!(is_ia_eligible: true, applicant_id: fm1_id) }
+    let!(:tax_household_member2) { tax_household.tax_household_members.create!(is_uqhp_eligible: true, applicant_id: fm2_id) }
 
     context 'when all family_members are medicaid' do
-      before do
-        allow(tax_household).to receive(:is_all_non_aptc?).and_return false
+      it 'should return false' do
+        result = tax_household.is_all_non_aptc?(hbx_enrollment)
+        expect(result).to eq(false)
       end
-        it 'should return false' do
-          result = tax_household.is_all_non_aptc?(hbx_enrollment)
-          expect(result).to eq(false)
-        end
-      end
+    end
 
     context 'when all family_members are not medicaid' do
+      before :each do
+        hbx_enrollment.hbx_enrollment_members.first.delete
+      end
+
       it 'should return true' do
         result = tax_household.is_all_non_aptc?(hbx_enrollment)
         expect(result).to eq(true)
