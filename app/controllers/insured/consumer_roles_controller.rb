@@ -13,8 +13,9 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def privacy
     set_current_person(required: false)
-    @val = params[:aqhp] || params[:uqhp]
-    @key = params.key(@val)
+    params_hash = params.permit!.to_h
+    @val = params_hash[:aqhp] || params_hash[:uqhp]
+    @key = params_hash.key(@val)
     @search_path = {@key => @val}
     if @person.try(:resident_role?)
       bookmark_url = @person.resident_role.bookmark_url.to_s.present? ? @person.resident_role.bookmark_url.to_s : nil
@@ -54,7 +55,7 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def match
     @no_save_button = true
-    @person_params = params.require(:person).merge({user_id: current_user.id})
+    @person_params = params.require(:person).merge({user_id: current_user.id}).permit!.to_h
     @consumer_candidate = Forms::ConsumerCandidate.new(@person_params)
     @person = @consumer_candidate
     @use_person = true #only used to manupulate form data
@@ -259,7 +260,7 @@ class Insured::ConsumerRolesController < ApplicationController
       @person.consumer_role.move_identity_documents_to_verified(@person.primary_family.application_type)
       redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
     else
-      redirect_to :back
+      redirect_back fallback_location: '/'
     end
   end
 

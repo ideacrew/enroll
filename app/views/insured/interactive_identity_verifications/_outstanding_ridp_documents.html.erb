@@ -69,7 +69,7 @@
                                     <% if pundit_allow(HbxProfile, :can_delete_identity_application_documents?) %>
                                       <span class="<%=pundit_class(Family, :updateable?)%>" >
                                           <%= link_to insured_ridp_document_path(ridp_doc, :person_id => @person.id), method: :delete, remote: true do %>
-                                            <i class="fa fa-trash-o fa-lg pull-right" title="Delete"></i>
+                                            <i class="far fa-trash-alt fa-lg role-trashcan" title="Delete"></i>
                                         <% end %>
                                       </span>
                                     <% end %>  

@@ -26,7 +26,7 @@ class Insured::RidpDocumentsController < ApplicationController
     else
       flash[:error] = "File not uploaded. Please select the file to upload."
     end
-    redirect_to(:back)
+    redirect_back fallback_location: '/'
   end
 
   def download
@@ -37,7 +37,7 @@ class Insured::RidpDocumentsController < ApplicationController
       send_data Aws::S3Storage.find(uri), download_options(document)
     else
       flash[:error] = "File does not exist or you are not authorized to access it."
-      redirect_to(:back)
+      redirect_back fallback_location: '/'
     end
     ridp_docs_clean(@person)
   end
