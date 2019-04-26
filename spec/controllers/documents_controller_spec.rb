@@ -25,7 +25,6 @@ RSpec.describe DocumentsController, :type => :controller do
     end
 
     it "should delete document record" do
-      binding.pry
       person.reload
       expect(person.consumer_role.vlp_documents).to be_empty
     end
