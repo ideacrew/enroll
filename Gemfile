@@ -145,7 +145,6 @@ group :test do
   gem 'action_mailer_cache_delivery', '~> 0.3'
   gem 'capybara',                     '~> 3.12'
   gem 'capybara-screenshot',          '~> 1.0.18'
-  gem 'chromedriver-helper'
   gem 'cucumber',                     '~> 3'
   gem 'cucumber-rails',               '~> 1.6',   :require => false
   gem 'fakeredis',                    '~> 0.7.0', :require => 'fakeredis/rspec'
@@ -159,6 +158,7 @@ group :test do
   gem 'test-prof',                    '~> 0.5.0'
   gem 'warden',                       '~> 1.2.7'
   gem 'watir',                        '~> 6.10.3'
+  gem 'webdriver'
   gem 'webmock',                      '~> 3.0.1'
 end
 
