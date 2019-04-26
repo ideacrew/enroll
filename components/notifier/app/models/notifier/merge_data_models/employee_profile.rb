@@ -68,7 +68,7 @@ module Notifier
     end
 
     def conditions
-      %w{broker_present? has_multiple_enrolled_enrollments? has_health_enrolled_enrollment? has_dental_enrolled_enrollment? census_employee_health_and_dental_enrollment? census_employee_health_enrollment? census_employee_dental_enrollment? has_parent_enrollment?, future_sep?}
+      %w{broker_present? has_multiple_enrolled_enrollments? has_health_enrolled_enrollment? has_dental_enrolled_enrollment? census_employee_health_and_dental_enrollment? census_employee_health_enrollment? census_employee_dental_enrollment? has_parent_enrollment? future_sep?}
     end
 
     def has_parent_enrollment?
