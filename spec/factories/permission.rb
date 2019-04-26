@@ -17,8 +17,6 @@ FactoryBot.define do
       can_add_sep { true }
       view_the_configuration_tab { false } 
       can_submit_time_travel_request { false }
-      can_complete_resident_application true
-      can_add_sep true
       name 'hbx_staff'
     end
 
@@ -80,15 +78,6 @@ FactoryBot.define do
       view_admin_tabs  { false }
       view_the_configuration_tab { false } 
       can_submit_time_travel_request { false }
-      modify_family true
-      modify_employer false
-      revert_application false
-      list_enrollments true
-      send_broker_agency_message false
-      approve_broker false
-      approve_ga false
-      modify_admin_tabs false
-      view_admin_tabs  true
       name 'hbx_read_only'
     end
 
