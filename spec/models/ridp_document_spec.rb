@@ -1,8 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe RidpDocument, :type => :model do
-  let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
-  let(:person2) {FactoryGirl.create(:person, :with_consumer_role)}
+  let(:person) {FactoryBot.create(:person, :with_consumer_role)}
+  let(:person2) {FactoryBot.create(:person, :with_consumer_role)}
 
 
   describe "creates person with ridp_docs" do

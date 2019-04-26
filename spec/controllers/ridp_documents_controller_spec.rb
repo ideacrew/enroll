@@ -1,8 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe Insured::RidpDocumentsController, :type => :controller do
-  let(:user) { FactoryGirl.create(:user) }
-  let(:person) { FactoryGirl.build(:person, :with_consumer_role) }
+  let(:user) { FactoryBot.create(:user) }
+  let(:person) { FactoryBot.build(:person, :with_consumer_role) }
   let(:consumer_role) { {consumer_role: ''} }
   let(:consumer_wrapper) { double }
 
@@ -13,7 +13,7 @@ RSpec.describe Insured::RidpDocumentsController, :type => :controller do
       allow_any_instance_of(Insured::RidpDocumentsController).to receive(:person_consumer_role)
 
       sign_in user
-      post :upload, consumer_role: consumer_role
+      post :upload, params: {consumer_role: consumer_role}
       expect(flash[:error]).to be_present
     end
 
@@ -21,7 +21,7 @@ RSpec.describe Insured::RidpDocumentsController, :type => :controller do
       request.env["HTTP_REFERER"] = "/home"
       allow(user).to receive(:person).and_return person
       sign_in user
-      post :upload, {consumer_role: ""}
+      post :upload, params: {consumer_role: ""}
       expect(flash[:notice]).not_to be_present
       expect(response).to have_http_status(:redirect)
       expect(flash[:error]).to eq "File not uploaded. Please select the file to upload."
@@ -52,7 +52,7 @@ RSpec.describe Insured::RidpDocumentsController, :type => :controller do
         allow_any_instance_of(Insured::RidpDocumentsController).to receive(:update_ridp_documents).with("sample-filename", doc_id).and_return(true)
         allow(Aws::S3Storage).to receive(:save).with(file_path, bucket_name).and_return(doc_id)
         sign_in user
-        post :upload, params
+        post :upload, params: params
         expect(flash[:notice]).to be_present
       end
     end
@@ -64,7 +64,7 @@ RSpec.describe Insured::RidpDocumentsController, :type => :controller do
         allow_any_instance_of(Insured::RidpDocumentsController).to receive(:get_document).and_return(nil)
         allow_any_instance_of(Insured::RidpDocumentsController).to receive(:ridp_docs_clean).and_return(true)
         sign_in user
-        get :download, key:"sample-key"
+        get :download, params: { key:"sample-key" }
         expect(flash[:error]).to eq("File does not exist or you are not authorized to access it.")
       end
     end
@@ -74,11 +74,8 @@ RSpec.describe Insured::RidpDocumentsController, :type => :controller do
         allow_any_instance_of(Insured::RidpDocumentsController).to receive(:ridp_docs_clean).and_return(true)
         allow_any_instance_of(Insured::RidpDocumentsController).to receive(:get_person)
         allow_any_instance_of(Insured::RidpDocumentsController).to receive(:get_document).with('sample-key').and_return(RidpDocument.new)
-        allow_any_instance_of(Insured::RidpDocumentsController).to receive(:send_data).with(nil, {:content_type=>"application/octet-stream", :filename=>"untitled"}) {
-          @controller.render nothing: true # to prevent a 'missing template' error
-        }
         sign_in user
-        get :download, key:"sample-key"
+        get :download, params: { key:"sample-key" }
         expect(flash[:error]).to be_nil
         expect(response.status).to eq(200)
       end

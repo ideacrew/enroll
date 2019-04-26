@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe DocumentsController, :type => :controller do
   let(:user) { FactoryBot.create(:user) }
   let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_family, :with_ssn) }
-  let(:document) {FactoryBot.build( :vlp_document )}
+  let(:document) { person.consumer_role.vlp_documents.first }
   let(:family)  {FactoryBot.create(:family, :with_primary_family_member)}
   let(:hbx_enrollment) { FactoryBot.build(:hbx_enrollment) }
 
@@ -18,7 +18,6 @@ RSpec.describe DocumentsController, :type => :controller do
       allow(FamilyMember).to receive(:find).with(family_member.id).and_return(family_member)
       allow(family_member).to receive(:family).and_return family
       allow(family).to receive(:update_family_document_status!).and_return true
-      person.consumer_role.vlp_documents << document
       delete :destroy, params: {person_id: person.id, id: document.id, family_member_id: family_member.id}
     end
     it "redirects_to verification page" do
@@ -26,6 +25,7 @@ RSpec.describe DocumentsController, :type => :controller do
     end
 
     it "should delete document record" do
+      binding.pry
       person.reload
       expect(person.consumer_role.vlp_documents).to be_empty
     end
@@ -186,7 +186,7 @@ RSpec.describe DocumentsController, :type => :controller do
 
     shared_examples_for "update ridp verification type" do |type, reason, admin_action, updated_attr, result|
       it "updates #{updated_attr} for #{type} to #{result} with #{admin_action} admin action" do
-        post :update_ridp_verification_type, { person_id: person.id,
+        post :update_ridp_verification_type, params: { person_id: person.id,
                                                ridp_verification_type: type,
                                                verification_reason: reason,
                                                admin_action: admin_action}
@@ -207,8 +207,8 @@ RSpec.describe DocumentsController, :type => :controller do
 
     context "redirection" do
       it "should redirect to back" do
-        post :update_ridp_verification_type, person_id: person.id
-        expect(response).to redirect_to :back
+        post :update_ridp_verification_type, params: { person_id: person.id }
+        expect(response).to have_http_status(:redirect)
       end
     end
   end
