@@ -5,8 +5,7 @@ module SponsoredBenefits
     pending "add some examples to (or delete) #{__FILE__}"
 
     context "add benefit group" do
-      it "should create benefit group" do 
-        # binding.pry
+      it "should create benefit group" do
       end
     end
   end

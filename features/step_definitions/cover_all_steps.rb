@@ -6,8 +6,8 @@ Then(/^Hbx Admin should not see an New DC Resident Application link$/) do
   expect(page).not_to have_content('New DC Resident Application')
 end
 
-Then(/^Hbx Admin should not see an DC Resident Application link$/) do
-  find(:xpath, "/html/body/div[2]/div/ul/li[2]/ul/li[5]/a/span[1]", text: 'DC Resident Application')[:class].include?("blocking") == false
+When(/^Hbx Admin clicks on New DC Resident Application link$/) do
+  find(:xpath, "//*[@id='inbox']/div/div[3]/div/span/div[1]/ul/li[3]/a").click
 end
 
 Then(/^Hbx Admin should not see an New Consumer Phone Application link and New Consumer Paper Application link$/) do
@@ -28,7 +28,7 @@ When(/HBX Admin goes to register an user as individual$/) do
   fill_in 'person[first_name]', :with => "Carlos"
   fill_in 'person[last_name]', :with => "Devina"
   fill_in 'jq_datepicker_ignore_person[dob]', :with => (@u.adult_dob :adult_dob)
-  find(:xpath, '//label[@for="radio_male"]').trigger('click')
+  find(:xpath, '//label[@for="radio_male"]').click
   find('.btn', text: 'CONTINUE').click
 end
 

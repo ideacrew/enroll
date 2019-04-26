@@ -18,7 +18,7 @@ GIT
       nokogiri-happymapper (~> 0.5)
 
 GIT
-  remote: https://github.com/harshared/simple_calendar
+  remote: https://github.com/harshared/simple_calendar.git
   revision: 109781178efa26c89ba51efa496bca29bc70a565
   specs:
     simple_calendar (2.2.5)
@@ -612,8 +612,24 @@ GEM
       sass-rails (>= 4.0)
     redcarpet (3.4.0)
     redis (4.1.0)
+    redis-actionpack (5.0.2)
+      actionpack (>= 4.0, < 6)
+      redis-rack (>= 1, < 3)
+      redis-store (>= 1.1.0, < 2)
+    redis-activesupport (5.0.7)
+      activesupport (>= 3, < 6)
+      redis-store (>= 1.3, < 2)
     redis-namespace (1.6.0)
       redis (>= 3.0.4)
+    redis-rack (2.0.5)
+      rack (>= 1.5, < 3)
+      redis-store (>= 1.2, < 2)
+    redis-rails (5.0.2)
+      redis-actionpack (>= 5.0, < 6)
+      redis-activesupport (>= 5.0, < 6)
+      redis-store (>= 1.2, < 2)
+    redis-store (1.6.0)
+      redis (>= 2.2, < 5)
     regexp_parser (1.3.0)
     responders (2.4.1)
       actionpack (>= 4.2.0, < 6.0)
@@ -778,6 +794,7 @@ GEM
       activemodel (>= 5.0)
       bindex (>= 0.4.0)
       railties (>= 5.0)
+    webdriver (0.1.0)
     webmock (3.0.1)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
@@ -875,6 +892,7 @@ DEPENDENCIES
   recurring_select
   redcarpet (~> 3.4)
   redis (~> 4.0)
+  redis-rails (~> 5.0.2)
   resque (~> 2.0)
   roo (~> 2.1)
   rspec-instafail (~> 1)
@@ -887,6 +905,7 @@ DEPENDENCIES
   sass-rails (~> 5)
   sassc (~> 1.12)
   sdoc (~> 1.0)
+  selenium-webdriver (= 3.141.0)
   shoulda-matchers (~> 3)
   simple_calendar!
   simplecov (~> 0.14)
@@ -906,6 +925,7 @@ DEPENDENCIES
   warden (~> 1.2.7)
   watir (~> 6.10.3)
   web-console (>= 3)
+  webdriver
   webmock (~> 3.0.1)
   webpacker (~> 3.4)
   wicked_pdf (~> 1.1.0)

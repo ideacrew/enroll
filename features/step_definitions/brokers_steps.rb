@@ -5,19 +5,21 @@ end
 
 When(/^Primary Broker should see the New Broker Agency form$/) do
   wait_for_ajax
-  expect(page).to have_css("#broker_agency_form")
+  expect(page).to have_css("#broker_registration_form")
+  # Agency fields are part of the broker registration form
+  expect(page).to have_content("Broker Agency Information")
+
 end
 
 When(/^.+ enters personal information$/) do
   visit "/broker_registration"
-
-  fill_in 'organization[first_name]', with: 'Ricky'
-  fill_in 'organization[last_name]', with: 'Martin'
-  fill_in 'jq_datepicker_ignore_organization[dob]', with: '10/10/1984'
-  find('.interaction-field-control-person-email').click
-  fill_in 'organization[email]', with: 'ricky.martin@example.com'
-  fill_in 'organization[npn]', with: '109109109'
+  fill_in 'agency[staff_roles_attributes][0][first_name]', with: 'Ricky'
+  fill_in 'agency[staff_roles_attributes][0][last_name]', with: 'Martin'
+  fill_in 'inputDOB', with: '10/10/1984'
+  fill_in 'inputEmail', with: 'ricky.martin@example.com'
+  fill_in 'agency[staff_roles_attributes][0][npn]', with: '109109109'
 end
+
 
 And(/^.+ enters broker agency information for individual markets$/) do
   fill_in 'organization[legal_name]', with: "Logistics Inc"
@@ -36,13 +38,19 @@ And(/^.+ enters broker agency information for individual markets$/) do
   find(:xpath, '//label[input[@value="bn"]]').click
   find(:xpath, '//label[input[@value="fr"]]').click
 
-  find(:xpath, "//label[input[@name='organization[accept_new_clients]']]").trigger('click')
-  find(:xpath, "//label[input[@name='organization[working_hours]']]").trigger('click')
+  find(:xpath, "//label[input[@name='organization[accept_new_clients]']]").click
+  find(:xpath, "//label[input[@name='organization[working_hours]']]").click
+end
+
+And(/^Current broker agency is fake fein$/) do
+  broker_agency.is_fake_fein = true
+  broker_agency.save
 end
 
 And(/^.+ enters broker agency information for SHOP markets$/) do
-  fill_in 'organization[legal_name]', with: "Logistics Inc"
-  fill_in 'organization[dba]', with: "Logistics Inc"
+  fill_in 'agency[organization][legal_name]', with: "Logistics Inc"
+  fill_in 'agency[organization][dba]', with: "Logistics Inc"
+  # fill_in 'agency[organization][fein]', with: "890890891"
   # Auto-Generates FEIN
   # fill_in 'organization[fein]', with: "890890891"
 
@@ -52,25 +60,47 @@ And(/^.+ enters broker agency information for SHOP markets$/) do
 
   # find(:xpath, "//p[@class='label'][contains(., 'Select Practice Area')]").click
   # find(:xpath, "//li[contains(., 'Small Business Marketplace ONLY')]").click
+  # Languages
+  find("option[value='tr']").click
+  find("#agency_organization_profile_attributes_accept_new_clients").click
 
-  find('button.multiselect').click
-  find(:xpath, '//label[input[@value="bn"]]').click
-  find(:xpath, '//label[input[@value="fr"]]').click
+  fill_in 'agency_organization_profile_attributes_ach_routing_number', with: '123456789'
+  fill_in 'agency_organization_profile_attributes_ach_routing_number_confirmation', with: '123456789'
+  fill_in 'agency_organization_profile_attributes_ach_account_number', with: '9999999999999999'
+  # Using this as a seperate step was deleting the rest of the form
+  role = "Primary Broker"
+  location = 'default_office_location'
+  location = eval(location) if location.class == String
+  RatingArea.where(zip_code: "01001").first || FactoryBot.create(:rating_area, zip_code: "01001", county_name: "Hampden", rating_area: Settings.aca.rating_areas.first)
+  fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][address_1]', :with => location[:address1]
+  fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][address_2]', :with => location[:address2]
+  fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][city]', :with => location[:city]
 
-  find(:xpath, "//label[input[@name='organization[accept_new_clients]']]").trigger('click')
-  find(:xpath, "//label[input[@name='organization[working_hours]']]").trigger('click')
+  # find(:xpath, "//div[contains(@class, 'selectric')][p[contains(text(), 'SELECT STATE')]]").click
+  select "MA", from: "inputState"
+  # agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][state]
+  # find(:xpath, "//div[contains(@class, 'selectric-scroll')]/ul/li[contains(text(), '#{location[:state]}')]").click
 
-  fill_in 'organization[ach_record][routing_number]', with: '123456789'
-  fill_in 'organization[ach_record][routing_number_confirmation]', with: '123456789'
-  fill_in 'organization[ach_record][account_number]', with: '9999999999999999'
-  find("#organization_ach_record_routing_number_confirmation").send_keys([:control, "a"])
+  fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][zip]', :with => location[:zip]
+  if role.include? 'Employer'
+    wait_for_ajax
+    select "#{location[:county]}", :from => "agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][county]"
+  end
+  fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][area_code]', :with => location[:phone_area_code]
+  fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][number]', :with => location[:phone_number]
+  fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][extension]', :with => location[:phone_extension]
+  wait_for_ajax
+  # Clicking the 'Create Broker Agency' button 
+  find("#broker-btn").click
 end
+
 
 And(/^.+ clicks? on Create Broker Agency$/) do
   wait_for_ajax
   page.find('h1', text: 'Broker Registration').click
   wait_for_ajax
-  click_button "Create Broker Agency", wait: 6
+  # Clicking the 'Create Broker Agency' button 
+  find("#broker-btn").click
 end
 
 Then(/^.+ should see broker registration successful message$/) do
@@ -81,8 +111,9 @@ end
 And(/^.+ should see the list of broker applicants$/) do
 end
 
-Then(/^.+ clicks? on the current broker applicant show button$/) do
-  find('.interaction-click-control-broker-show').trigger('click')
+
+Then(/^.+ click the current broker applicant show button$/) do
+  find('.interaction-click-control-broker-show').click
 end
 
 And(/^.+ should see the broker application with carrier appointments$/) do
@@ -94,8 +125,8 @@ And(/^.+ should see the broker application with carrier appointments$/) do
   end
 end
 
-And(/^.+ clicks? on approve broker button$/) do
-  find('.interaction-click-control-broker-approve').trigger('click')
+And(/^.+ click approve broker button$/) do
+  find('.interaction-click-control-broker-approve').click
 end
 
 Then(/^.+ should see the broker successfully approved message$/) do
@@ -103,9 +134,11 @@ Then(/^.+ should see the broker successfully approved message$/) do
 end
 
 And(/^.+ should receive an invitation email$/) do
-  open_email("ricky.martin@example.com", :with_subject => "Congratulations! Your Broker Application for the #{Settings.site.short_name} for Business has been Approved!")
+  open_email(
+    "ricky.martin@example.com",
+    :with_subject => "Important information for accessing your new broker account through the #{Settings.site.short_name}"
+  )
   expect(current_email.to).to eq(["ricky.martin@example.com"])
-  #current_email.should have_subject("Invitation from your Employer to Sign up for Health Insurance at #{Settings.site.short_name} ")
 end
 
 When(/^.+ visits? invitation url in email$/) do
@@ -236,7 +269,7 @@ Then(/^.* creates and publishes a plan year$/) do
   fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][2][premium_pct]", with: 50
   fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][3][premium_pct]", with: 50
 
-  find('.interaction-click-control-create-plan-year').trigger('click')
+  find('.interaction-click-control-create-plan-year').click
   find('.alert-notice')
 
   if (Settings.aca.enforce_employer_attestation.to_s == "true")
@@ -271,7 +304,7 @@ Then(/^.+ sees employer census family created$/) do
   expect(page).to have_content('successfully created')
 end
 
-Then(/^(?:(?!Employee).)+ should see the matched employee record form$/) do
+Then(/^(?:Employee){0}.+ should see the matched employee record form$/) do
   screenshot("broker_employer_search_results")
   expect(page).to have_content('Legal LLC')
 end

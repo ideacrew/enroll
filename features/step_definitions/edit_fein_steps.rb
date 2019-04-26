@@ -6,7 +6,19 @@ When(/^the user clicks Change FEIN link in the Actions dropdown for ABC Widgets 
 end
 
 And(/^the user enters FEIN with less than nine digits$/) do
-  find('#organizations_general_organization_new_fein').set("89-423")
+  accept_alert do
+    find('#organizations_general_organization_new_fein').set("89-42312")
+    # Submit already within the alert block
+    page.find_button('Submit').click
+  end
+end
+
+And(/^the user clicks submit button$/) do
+  # TODO: Research if accept_confirm block no longer needed
+  accept_confirm do
+    page.find_button('Submit').click
+  end
+  sleep(3)
 end
 
 Then(/^an warning message will be presented as FEIN must be at least nine digits$/) do
@@ -14,9 +26,12 @@ Then(/^an warning message will be presented as FEIN must be at least nine digits
 end
 
 And(/^the user enters FEIN matches an existing Employer Profile FEIN$/) do
-  find('#organizations_general_organization_new_fein').set(employer("Xfinity Enterprise")[:fein])
+  # For some reason these inspections makes the scenario pass, otherwise it causes them
+  # to allow it to pass through
+  #puts("Xfinitiy enterprise fein is #{employer('Xfinity Enterprise').fein.inspect}")
+  #puts("ABC widgets fein is #{employer('Abc Widgets').fein.inspect}")
+  find('#organizations_general_organization_new_fein').set(employer("Xfinity Enterprise").fein)
 end
-
 
 Then(/^an warning message will be presented as FEIN matches HBX ID Legal Name$/) do
   expect(page).to have_content("FEIN matches HBX ID #{employer("Xfinity Enterprise")[:hbx_id]}, #{employer("Xfinity Enterprise")[:legal_name]}")

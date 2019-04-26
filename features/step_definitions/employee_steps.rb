@@ -20,6 +20,34 @@ Given (/a matched Employee exists with only employee role/) do
   @employee_role.update_attributes(census_employee_id: ce.id, employer_profile_id: org.employer_profile.id)
 end
 
+Given (/(.*) has a matched employee role/) do |name|
+  steps %{
+    When Patrick Doe creates an HBX account
+    And I select the all security question and give the answer
+    When I have submitted the security questions
+    When Employee goes to register as an employee
+    Then Employee should see the employee search page
+    When Employee enters the identifying info of Patrick Doe
+    Then Employee should see the matched employee record form
+    When Employee accepts the matched employer
+    When Employee completes the matched employee form for Patrick Doe
+  }
+end
+
+def employee_by_legal_name(legal_name, person)
+  org = org_by_legal_name(legal_name)
+  employee_role = FactoryBot.create(:employee_role, person: person, benefit_sponsors_employer_profile_id: org.employer_profile.id)
+  ce = FactoryBot.create(:census_employee,
+    first_name: person.first_name,
+    last_name: person.last_name,
+    ssn: person.ssn,
+    dob: person.dob,
+    employer_profile: org.employer_profile,
+    benefit_sponsorship: benefit_sponsorship(org),
+    employee_role_id: employee_role.id
+  )
+end
+
 Given (/a person exists with dual roles/) do
   FactoryBot.create(:user)
   FactoryBot.create(:person, :with_employee_role, :with_consumer_role, :with_family, first_name: "Dual Role Person", last_name: "E", user: user)
@@ -50,3 +78,19 @@ end
 Then (/Employee redirects to ivl flow/) do
   expect(page).to have_content("Personal Information")
 end
+
+And(/employee (.*) with a dependent has (.*) relationship with age (.*) than 26/) do |named_person, kind, var|
+  dob = (var == "greater" ? TimeKeeper.date_of_record - 35.years : TimeKeeper.date_of_record - 5.years)
+  person_hash = people[named_person]
+  person = Person.where(:first_name => /#{person_hash[:first_name]}/i,
+                        :last_name => /#{person_hash[:last_name]}/i).first
+  @family = person.primary_family
+  dependent = FactoryBot.create :person, dob: dob
+  fm = FactoryBot.create :family_member, family: @family, person: dependent
+  person.person_relationships << PersonRelationship.new(kind: kind, relative_id: dependent.id)
+  ch = @family.active_household.immediate_family_coverage_household
+  ch.coverage_household_members << CoverageHouseholdMember.new(family_member_id: fm.id)
+  ch.save
+  person.save
+end
+

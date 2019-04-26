@@ -3,7 +3,7 @@ Then (/^Hbx Admin sees Families link$/) do
   expect(page).to have_text("Families")
 end
 
-When(/^Hbx Admin clicks on Families link$/) do
+When(/^Hbx Admin click Families link$/) do
   click_link "Families"
   wait_for_ajax
   find(:xpath, "//*[@id='myTab']/li[2]/ul/li[1]/a/span[1]", :wait => 10).click

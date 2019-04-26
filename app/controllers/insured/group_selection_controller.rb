@@ -60,14 +60,18 @@ class Insured::GroupSelectionController < ApplicationController
         raise "You're not yet eligible under your employer-sponsored benefits. Please return on #{new_hire_enrollment_period.begin.strftime("%m/%d/%Y")} to enroll for coverage."
       end
     end
-    
+
     unless @adapter.is_waiving?(params)
       raise "You must select at least one Eligible applicant to enroll in the healthcare plan" if params[:family_member_ids].blank?
-      family_member_ids = params.require(:family_member_ids).each do |index, family_member_id|
+      family_member_params = params.require(:family_member_ids)
+      family_member_params.permit! if family_member_params.kind_of?(ActionController::Parameters)
+      family_member_ids = family_member_params.to_h.collect do |index, family_member_id|
         BSON::ObjectId.from_string(family_member_id)
       end
     end
+
     hbx_enrollment = build_hbx_enrollment(family_member_ids)
+
     if @adapter.is_waiving?(params)
       if hbx_enrollment.save
         @adapter.assign_enrollment_to_benefit_package_assignment(@employee_role, hbx_enrollment)

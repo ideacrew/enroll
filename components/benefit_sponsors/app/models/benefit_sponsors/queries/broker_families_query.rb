@@ -46,7 +46,7 @@ module BenefitSponsors
 
       def employee_person_ids
         benefit_sponsorships = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(
-          :"broker_agency_accounts.benefit_sponsors_broker_agency_profile_id" => @broker_agency_profile_id
+          :broker_agency_accounts => {"$elemMatch" => {:benefit_sponsors_broker_agency_profile_id => @broker_agency_profile_id, is_active: true}}
         )
 
         @census_employee_ids = benefit_sponsorships.flat_map(&:census_employees).map(&:id)

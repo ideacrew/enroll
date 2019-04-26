@@ -79,10 +79,13 @@ class Exchanges::HbxProfilesController < ApplicationController
     @organization = @benefit_sponsorship.organization
     @element_to_replace_id = params[:employer_actions_id]
     service_obj = ::BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipService.new(benefit_sponsorship: @benefit_sponsorship)
-    @result,  @errors_on_save = service_obj.update_fein(params['organizations_general_organization']['new_fein'])
-    respond_to do |format|
-      format.js { render "edit_fein" } if @errors_on_save
-      format.js { render "update_fein" }
+    update_fein_result_array = service_obj.update_fein(params['organizations_general_organization']['new_fein'])
+    @result = update_fein_result_array[0]
+    @errors_on_save = update_fein_result_array[1]
+    if @errors_on_save
+      respond_to { |format| format.js { render 'edit_fein' } }
+    else
+      respond_to { |format| format.js { render 'update_fein' } }
     end
   end
 
