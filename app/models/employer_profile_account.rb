@@ -35,7 +35,7 @@ class EmployerProfileAccount
   end
 
   def adjustments_since_last_invoice
-    current_statement_date.present? ? (self.current_statement_activity.where(:posting_date.gt => current_statement_date, :type => "Adjustments")).to_a : []
+    current_statement_date.present? ? current_statement_activity.where(:posting_date.gt => current_statement_date, :type => "Adjustments", :is_passive_renewal => false).to_a : []
   end
 
   def last_premium_payment

@@ -46,6 +46,7 @@ module Subscribers
              csa.type = line[:type]
              csa.coverage_month = line[:coverage_month]
              csa.payment_method = line[:payment_method]
+             csa.is_passive_renewal = line[:is_passive_renewal]
              employer_profile_account.current_statement_activity << csa
              csa.save
            end
