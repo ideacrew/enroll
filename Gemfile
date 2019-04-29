@@ -60,7 +60,6 @@ gem 'recurring_select'
 gem 'aws-sdk',                  '~> 2.2.4'
 gem 'bcrypt',                   '~> 3.1'
 gem 'bootsnap',                 '>= 1.1', require: false
-gem 'bootstrap',                '~> 4.1'
 gem 'ckeditor',                 '~> 4.2.4'
 gem 'coffee-rails',             '~> 4.2.2'
 gem 'combine_pdf',              '~> 1.0'
@@ -198,6 +197,7 @@ end
 #######################################################
 # gem 'bootstrap-multiselect-rails', '~> 0.9.9'
 # gem 'bootstrap-slider-rails', '6.0.17'
+# gem 'bootstrap',                '~> 4.1'
 # gem 'chosen-rails'
 # gem 'jquery-turbolinks'
 # gem 'jquery-ui-rails'
