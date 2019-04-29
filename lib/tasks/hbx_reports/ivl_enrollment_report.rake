@@ -8,7 +8,7 @@ require File.join(Rails.root, "app", "reports", "hbx_reports", "ivl_enrollment_r
 # 3) Run the below rake task
 # RAILS_ENV=production bundle exec rake hbx_reports:ivl_enrollment_report purchase_date_start='06/01/2018' purchase_date_end='06/10/2018'
 
-# Another way is by running daily and it will give enrollment details of past 10 weeks. Steps to follow
+# Another way is by running daily and it will give enrollment details of past 30 days. Steps to follow
 # 1) You need to pull a list of enrollments from glue with this script on a text file(bundle exec rails r script/queries/print_all_policy_ids.rb > all_glue_policies.txt -e production)
 # 2) Place that file into the Enroll Root directory.
 # 3) Run the below rake task

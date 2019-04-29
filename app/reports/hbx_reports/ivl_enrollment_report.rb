@@ -6,7 +6,7 @@ class IvlEnrollmentReport < MongoidMigrationTask
   def migrate
     if ENV['purchase_date_start'].blank? && ENV['purchase_date_end'].blank?
       # Purchase dates are from 10 weeks to todays date
-      purchase_date_start = (Time.now - 10.weeks).beginning_of_day
+      purchase_date_start = (Time.now - 30.days).beginning_of_day
       purchase_date_end = Time.now.end_of_day
     else
       purchase_date_start = Time.strptime(ENV['purchase_date_start'],'%m/%d/%Y').beginning_of_day
@@ -31,9 +31,8 @@ class IvlEnrollmentReport < MongoidMigrationTask
   end
 
   def writing_on_csv(enrollment_ids_final, glue_list)
-    ivl_headers = ['Enrollment GroupID', 'Purchase Date', 'Coverage Start', 'Enrollment State', 'Subscriber HBXID',
-                   'Subscriber First Name', 'Subscriber Last Name', 'HIOS ID', 'Family Size', 'Enrollment Reason',
-                   'In Glue']
+    ivl_headers = ['Enrollment GroupID', 'Purchase Date', 'Coverage Start', 'Coverage Kind', 'Enrollment State', 'Subscriber HBXID',
+                   'Subscriber First Name', 'Subscriber Last Name', 'HIOS ID', 'Family Size', 'Enrollment Reason', 'In Glue']
 
     file_name = "#{Rails.root}/ivl_enrollment_report.csv"
     CSV.open(file_name, "w", force_quotes: true) do |csv|
@@ -50,7 +49,7 @@ class IvlEnrollmentReport < MongoidMigrationTask
             last_name = subscriber.person.last_name
           end
           in_glue = glue_list.include?(id) if glue_list.present?
-          csv << [id,hbx_enrollment.created_at,hbx_enrollment.effective_on,hbx_enrollment.aasm_state,
+          csv << [id,hbx_enrollment.created_at,hbx_enrollment.effective_on,hbx_enrollment.coverage_kind,hbx_enrollment.aasm_state,
                   subscriber_hbx_id,first_name,last_name,hbx_enrollment.plan.hios_id,hbx_enrollment.hbx_enrollment_members.size,
                   enrollment_reason,in_glue]
         rescue StandardError => e

@@ -41,9 +41,8 @@ describe IvlEnrollmentReport, dbclean: :after_each do
   end
 
   it "returns correct fields" do
-    ivl_headers = ['Enrollment GroupID', 'Purchase Date', 'Coverage Start', 'Enrollment State', 'Subscriber HBXID',
-                   'Subscriber First Name', 'Subscriber Last Name', 'HIOS ID', 'Family Size', 'Enrollment Reason',
-                   'In Glue']
+    ivl_headers = ['Enrollment GroupID', 'Purchase Date', 'Coverage Start', 'Coverage Kind', 'Enrollment State', 'Subscriber HBXID',
+                   'Subscriber First Name', 'Subscriber Last Name', 'HIOS ID', 'Family Size', 'Enrollment Reason', 'In Glue']
     expect(@file[0]).to eq ivl_headers
     expect(@file[1].present?).to eq true
   end
