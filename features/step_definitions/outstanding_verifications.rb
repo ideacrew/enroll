@@ -8,7 +8,7 @@ end
 
 When(/^Admin clicks Outstanding Verifications$/) do
   page.find('.families.dropdown-toggle.interaction-click-control-families').click
-  page.find('.interaction-click-control-outstanding-verifications').click
+  page.find('.interaction-click-control-outstanding-verifications').trigger('click')
 end
 
 When(/^Admin clicks Families tab$/) do

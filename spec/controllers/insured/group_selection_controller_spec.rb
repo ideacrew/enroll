@@ -128,8 +128,17 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     hbx_enrollment.hbx_enrollment_members.build(applicant_id: family.family_members.first.id, is_subscriber: true, coverage_start_on: "2018-10-23 19:32:05 UTC", eligibility_date: "2018-10-23 19:32:05 UTC")
     hbx_enrollment.save
     hbx_enrollment.reload
-
     FactoryBot.create(:special_enrollment_period, family: family)
+    allow(Person).to receive(:find).and_return(person)
+    allow(person).to receive(:primary_family).and_return(family)
+    allow(family).to receive(:active_household).and_return(household)
+    allow(person).to receive(:consumer_role).and_return(nil)
+    allow(person).to receive(:consumer_role?).and_return(false)
+    allow(user).to receive(:last_portal_visited).and_return('/')
+    allow(user).to receive(:has_hbx_staff_role?).and_return false
+    allow(person).to receive(:active_employee_roles).and_return [employee_role]
+    allow(person).to receive(:has_active_employee_role?).and_return true
+    allow(employee_role).to receive(:benefit_group).and_return benefit_group
   end
 
   context "GET new" do

@@ -77,6 +77,7 @@ class Insured::PlanShoppingsController < ApplicationController
   def thankyou
     set_elected_aptc_by_params(params[:elected_aptc]) if params[:elected_aptc].present?
     set_consumer_bookmark_url(family_account_path)
+    set_admin_bookmark_url
     @plan = BenefitMarkets::Products::Product.find(params[:plan_id])
     @enrollment = HbxEnrollment.find(params.require(:id))
     @enrollment.set_special_enrollment_period
@@ -148,6 +149,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def show
     set_consumer_bookmark_url(family_account_path) if params[:market_kind] == 'individual'
+    set_admin_bookmark_url if params[:market_kind] == 'individual'
     set_employee_bookmark_url(family_account_path) if params[:market_kind] == 'shop'
     set_resident_bookmark_url(family_account_path) if params[:market_kind] == 'coverall'
     hbx_enrollment_id = params.require(:id)
@@ -194,6 +196,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def plans
     set_consumer_bookmark_url(family_account_path)
+    set_admin_bookmark_url
     set_plans_by(hbx_enrollment_id: params.require(:id))
     if @person.primary_family.active_household.latest_active_tax_household.present?
       if is_eligibility_determined_and_not_csr_100?(@person)

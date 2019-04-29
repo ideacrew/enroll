@@ -53,7 +53,7 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:update_vlp_documents).with(cleaned_params, "sample-filename", doc_id).and_return(true)
         allow(Aws::S3Storage).to receive(:save).with(file_path, bucket_name).and_return(doc_id)
         sign_in user
-        post :upload, params
+        post :upload, params: params
         expect(flash[:notice]).to be_present
       end
     end
@@ -84,7 +84,7 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
 
         controller.instance_variable_set(:"@family", family)
         sign_in user
-        post :upload, params
+        post :upload, params: params
 
       end
 
@@ -101,7 +101,7 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:get_document).and_return(nil)
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:vlp_docs_clean).and_return(true)
         sign_in user
-        get :download, key:"sample-key"
+        get :download, params: { key:"sample-key" }
         expect(flash[:error]).to eq("File does not exist or you are not authorized to access it.")
       end
     end
@@ -111,11 +111,8 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:vlp_docs_clean).and_return(true)
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:get_family)
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:get_document).with('sample-key').and_return(VlpDocument.new)
-        allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:send_data).with('', {:content_type=>"application/octet-stream", :filename=>"untitled"}) {
-                                                                             @controller.render nothing: true # to prevent a 'missing template' error
-                                                                           }
         sign_in user
-        get :download, key:"sample-key"
+        get :download, params: { key:"sample-key" }
         expect(flash[:error]).to be_nil
         expect(response.status).to eq(200)
       end
