@@ -133,7 +133,7 @@ invoices:
 aca:
   state_name: "Massachusetts"
   state_abbreviation: "MA"
-  market_kinds: ["shop"]
+  market_kinds: ["shop", "individual"]
   hbx_abbreviation: "DC Health Benefit Exchange"
   nationwide_markets: false
   general_agency_enabled: false
