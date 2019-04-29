@@ -3,6 +3,10 @@ require File.join(File.dirname(__FILE__), "..", "..", "..", "support/benefit_spo
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
+class ApplicationHelperModStubber
+  extend ::BenefitSponsors::Employers::EmployerHelper
+end
+
 module BenefitSponsors
   RSpec.describe BenefitApplications::BenefitApplication, type: :model, :dbclean => :after_each do
     let(:site) { ::BenefitSponsors::SiteSpecHelpers.create_cca_site_with_hbx_profile_and_benefit_market }
@@ -43,14 +47,14 @@ module BenefitSponsors
     end
 
     describe "A new model instance" do
-     it { is_expected.to be_mongoid_document }
-     it { is_expected.to have_fields(:effective_period, :open_enrollment_period, :terminated_on)}
-     it { is_expected.to have_field(:expiration_date).of_type(Date)}
-     it { is_expected.to have_field(:aasm_state).of_type(Symbol).with_default_value_of(:draft)}
-     it { is_expected.to have_field(:fte_count).of_type(Integer).with_default_value_of(0)}
-     it { is_expected.to have_field(:pte_count).of_type(Integer).with_default_value_of(0)}
-     it { is_expected.to have_field(:msp_count).of_type(Integer).with_default_value_of(0)}
-     it { is_expected.to embed_many(:benefit_packages)}
+      it { is_expected.to be_mongoid_document }
+      it { is_expected.to have_fields(:effective_period, :open_enrollment_period, :terminated_on)}
+      it { is_expected.to have_field(:expiration_date).of_type(Date)}
+      it { is_expected.to have_field(:aasm_state).of_type(Symbol).with_default_value_of(:draft)}
+      it { is_expected.to have_field(:fte_count).of_type(Integer).with_default_value_of(0)}
+      it { is_expected.to have_field(:pte_count).of_type(Integer).with_default_value_of(0)}
+      it { is_expected.to have_field(:msp_count).of_type(Integer).with_default_value_of(0)}
+      it { is_expected.to embed_many(:benefit_packages)}
 
       context "with no arguments" do
         subject { described_class.new }
@@ -101,13 +105,15 @@ module BenefitSponsors
         end
       end
 
-      context "with no recorded_sic_code" do
-        subject { described_class.new(params.except(:recorded_sic_code)) }
+      if ApplicationHelperModStubber.display_sic_field_for_employer?
+        context 'with no recorded_sic_code' do
+          subject { described_class.new(params.except(:recorded_sic_code)) }
 
-        it "should not be valid" do
-          subject.validate
-          expect(subject).to_not be_valid
-          expect(subject.errors[:recorded_sic_code].first).to match(/can't be blank/)
+          it 'should not be valid' do
+            subject.validate
+            expect(subject).to_not be_valid
+            expect(subject.errors[:recorded_sic_code].first).to match(/can't be blank/)
+          end
         end
       end
 
