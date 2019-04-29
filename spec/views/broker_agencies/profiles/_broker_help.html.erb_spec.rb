@@ -17,7 +17,7 @@ RSpec.describe "broker_agencies/profiles/_broker_help_table.html.erb" do
   end
 
   it "should be able to Select Broker" do
-    expect(rendered).to have_selector('button', text: 'Select this Broker')
+    expect(rendered).to have_selector('button', text: 'Select This Broker')
   end
   it "should show Broker Agency name" do
     expect(rendered).to have_selector('.tt-u', text: broker_agency_profile.legal_name)

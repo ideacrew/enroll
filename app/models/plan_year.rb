@@ -73,6 +73,7 @@ class PlanYear
   scope :renewing,          ->{ any_in(aasm_state: RENEWING) }
 
   scope :published_or_renewing_published, -> { any_of([published.selector, renewing_published_state.selector]) }
+  scope :renewing_draft_or_draft, -> { any_in(aasm_state: %w[draft renewing_draft]) }
 
   scope :by_date_range,     ->(begin_on, end_on) { where(:"start_on".gte => begin_on, :"start_on".lte => end_on) }
   scope :published_plan_years_within_date_range, ->(begin_on, end_on) {
@@ -116,6 +117,13 @@ class PlanYear
           assignment.update(end_on: self.end_on) if assignment.end_on.present?
         end
       end
+    end
+  end
+
+  def activate_employee_benefit_packages
+    census_employees_within_play_year.each do |census_employee|
+      assignment = census_employee.benefit_group_assignments_for(self).first
+      assignment.make_active if assignment.present?
     end
   end
 
@@ -189,7 +197,7 @@ class PlanYear
   def enrollments_for_plan_year
     id_list = self.benefit_groups.map(&:id)
     families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list)
-    enrollment_selector = [HbxEnrollment::enrolled.selector, HbxEnrollment::renewing.selector, HbxEnrollment::waived.selector]
+    enrollment_selector = [HbxEnrollment::enrolled.selector, HbxEnrollment::renewing.selector, HbxEnrollment::waived.selector, HbxEnrollment::terminated.selector]
     enrollments = families.inject([]) do |enrollments, family|
       enrollments += family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).any_of(enrollment_selector).to_a
     end
@@ -212,11 +220,15 @@ class PlanYear
         hbx_enrollment.cancel_coverage! if hbx_enrollment.may_cancel_coverage?
         hbx_enrollment.notify_enrollment_cancel_or_termination_event(options[:transmit_xml])
       else
-        if py_end_on < TimeKeeper.date_of_record
+        if hbx_enrollment.coverage_termination_pending? && hbx_enrollment.terminated_on.present? && (hbx_enrollment.terminated_on < py_end_on)
+          #do nothing
+        elsif py_end_on < TimeKeeper.date_of_record
           if hbx_enrollment.may_terminate_coverage?
-            hbx_enrollment.terminate_coverage!(py_end_on)
-            hbx_enrollment.update_attributes!(termination_submitted_on: TimeKeeper.date_of_record)
-            hbx_enrollment.notify_enrollment_cancel_or_termination_event(options[:transmit_xml])
+            if hbx_enrollment.terminated_on.nil? || (hbx_enrollment.terminated_on.present? && (hbx_enrollment.terminated_on > py_end_on))
+              hbx_enrollment.terminate_coverage!(py_end_on)
+              hbx_enrollment.update_attributes!(termination_submitted_on: TimeKeeper.date_of_record)
+              hbx_enrollment.notify_enrollment_cancel_or_termination_event(options[:transmit_xml])
+            end
           end
         else
           if hbx_enrollment.may_schedule_coverage_termination?
@@ -968,8 +980,8 @@ class PlanYear
 
       transitions from: :renewing_enrolled,   to: :active,              :guard  => :is_event_date_valid?
       transitions from: :renewing_published,  to: :renewing_enrolling,  :guard  => :is_event_date_valid?
-      transitions from: :renewing_enrolling,  to: :renewing_enrolled,   :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
-      transitions from: :renewing_enrolling,  to: :renewing_application_ineligible, :guard => :is_open_enrollment_closed?, :after => [:renewal_employer_ineligibility_notice, :zero_employees_on_roster]
+      transitions from: :renewing_enrolling,  to: :renewing_enrolled,   :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?], :after => :renewal_employee_enrollment_confirmation
+      transitions from: :renewing_enrolling,  to: :renewing_application_ineligible, :guard => :is_open_enrollment_closed?, :after => [:renewal_employer_ineligibility_notice, :zero_employees_on_roster, :renewal_employer_ineligibility_notice_to_employee]
 
       transitions from: :enrolling, to: :enrolling  # prevents error when plan year is already enrolling
     end
@@ -1173,6 +1185,30 @@ class PlanYear
     end
   end
 
+  def send_employee_renewal_invites
+    benefit_groups.each do |bg|
+      bg.census_employees.non_terminated.each do |ce|
+        Invitation.invite_renewal_employee!(ce)
+      end
+    end
+  end
+
+  def send_employee_initial_enrollment_invites
+    benefit_groups.each do |bg|
+      bg.census_employees.non_terminated.each do |ce|
+        Invitation.invite_initial_employee!(ce)
+      end
+    end
+  end
+
+  def send_active_employee_invites
+    benefit_groups.each do |bg|
+      bg.census_employees.non_terminated.each do |ce|
+        Invitation.invite_employee!(ce)
+      end
+    end
+  end
+  
   def notify_cancel_event(transmit_xml = false)
     return unless transmit_xml
     transition = self.latest_workflow_state_transition
@@ -1276,7 +1312,7 @@ class PlanYear
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     if self.employer_profile.census_employees.active.count < 1
       begin
-        self.employer_profile.trigger_notices("zero_employees_on_roster")
+        self.employer_profile.trigger_notices("zero_employees_on_roster", "acapi_trigger" =>  true)
       rescue Exception => e
         Rails.logger.error { "Unable to deliver employer zero employees on roster notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
       end
@@ -1287,7 +1323,7 @@ class PlanYear
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     self.employer_profile.census_employees.non_terminated.each do |ce|
       begin
-        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notify_employee_of_initial_employer_ineligibility")
+        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notify_employee_of_initial_employer_ineligibility", "acapi_trigger" =>  true)
       rescue Exception => e
         Rails.logger.error { "Unable to deliver employee initial eligibiliy notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
       end
@@ -1297,7 +1333,7 @@ class PlanYear
   def initial_employer_approval_notice
     return true if (benefit_groups.any?{|bg| bg.is_congress?} || (fte_count < 1))
     begin
-      self.employer_profile.trigger_notices("initial_employer_approval")
+      self.employer_profile.trigger_notices("initial_employer_approval", "acapi_trigger" =>  true)
     rescue Exception => e
       Rails.logger.error { "Unable to deliver employer initial eligibiliy approval notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
     end
@@ -1348,7 +1384,7 @@ class PlanYear
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     if (application_eligibility_warnings.include?(:primary_office_location) || application_eligibility_warnings.include?(:fte_count))
       begin
-        self.employer_profile.trigger_notices("initial_employer_denial")
+        self.employer_profile.trigger_notices("initial_employer_denial", "acapi_trigger" =>  true)
       rescue Exception => e
         Rails.logger.error { "Unable to deliver employer initial denial notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
       end
@@ -1370,12 +1406,36 @@ class PlanYear
     self.employer_profile.trigger_notices("renewal_employer_open_enrollment_completed")
   end
 
+  def renewal_employee_enrollment_confirmation
+    self.employer_profile.census_employees.non_terminated.each do |ce|
+      begin
+        enrollments = ce.renewal_benefit_group_assignment.hbx_enrollments
+        if enrollments.present? && enrollments.select { |enr| enr.effective_on == start_on}.present?
+          ShopNoticesNotifierJob.perform_later(ce.id.to_s, "renewal_employee_enrollment_confirmation", "acapi_trigger" => true)
+        end
+      rescue Exception => e
+        Rails.logger.error { "Unable to deliver renewal_employee_enrollment_confirmation to census_employee - #{ce.id} notice due to '#{e}' " }
+      end
+    end
+  end
+
   def renewal_employer_ineligibility_notice
     return true if benefit_groups.any? { |bg| bg.is_congress? }
     begin
       self.employer_profile.trigger_notices("renewal_employer_ineligibility_notice", "acapi_trigger" =>  true)
     rescue Exception => e
       Rails.logger.error { "Unable to deliver employer renewal ineligiblity denial notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
+    end
+  end
+
+  def renewal_employer_ineligibility_notice_to_employee
+    return true if benefit_groups.any?{|bg| bg.is_congress?}
+      self.employer_profile.census_employees.non_terminated.each do |ce|
+       begin
+         ShopNoticesNotifierJob.perform_later(ce.id.to_s, "renewal_employer_ineligibility_notice_to_employee", "acapi_trigger" =>  true)
+       rescue Exception => e
+         Rails.logger.error { "Unable to deliver employer renewal ineligiblity denial notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
+      end
     end
   end
 
@@ -1395,30 +1455,6 @@ class PlanYear
       to_state: aasm.to_state,
       event: aasm.current_event
     )
-  end
-
-  def send_employee_renewal_invites
-    benefit_groups.each do |bg|
-      bg.census_employees.non_terminated.each do |ce|
-        Invitation.invite_renewal_employee!(ce)
-      end
-    end
-  end
-
-  def send_employee_initial_enrollment_invites
-    benefit_groups.each do |bg|
-      bg.census_employees.non_terminated.each do |ce|
-        Invitation.invite_initial_employee!(ce)
-      end
-    end
-  end
-
-  def send_active_employee_invites
-    benefit_groups.each do |bg|
-      bg.census_employees.non_terminated.each do |ce|
-        Invitation.invite_employee!(ce)
-      end
-    end
   end
 
   def send_employee_invites

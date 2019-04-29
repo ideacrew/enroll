@@ -57,7 +57,7 @@ module Queries
       end
       #add other scopes here
       return family if @search_string.blank? || @search_string.length < 2
-      person_id = Person.search(@search_string).pluck(:_id)
+      person_id = Person.search(@search_string, nil, nil, true).pluck(:_id)
       #Caution Mongo optimization on chained "$in" statements with same field
       #is to do a union, not an interactionl
       family_scope = family.and('family_members.person_id' => {"$in" => person_id})

@@ -109,6 +109,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def show
     @tab = params['tab']
+    @broker_agency_profile_id = @employer_profile.active_broker_agency_account.broker_agency_profile_id if @employer_profile.active_broker_agency_account.present?
     if params[:q] || params[:page] || params[:commit] || params[:status]
       paginate_employees
     else
@@ -140,6 +141,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def show_profile
     @tab ||= params[:tab]
+    @broker_agency_profile_id = @employer_profile.active_broker_agency_account.broker_agency_profile_id if @employer_profile.active_broker_agency_account.present?
     if @tab == 'benefits'
       @current_plan_year = @employer_profile.active_plan_year
       @plan_years = @employer_profile.plan_years.order(id: :desc)
@@ -248,7 +250,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def consumer_override
     session[:person_id] = params['person_id']
-    redirect_to family_account_path
+    redirect_to family_account_path(employer_profile_id: params['employer_profile_id'])
   end
 
   def export_census_employees

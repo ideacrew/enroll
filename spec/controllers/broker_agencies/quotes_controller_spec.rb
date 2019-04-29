@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe BrokerAgencies::QuotesController, type: :controller, dbclean: :after_each do
   let(:person){create(:person , :with_broker_role)}
+  let(:broker_agency_profile) {FactoryGirl.create(:broker_agency_profile, primary_broker_role_id: person.broker_role.id)}
   let(:user){create(:user, person: person)}
   let(:quote){create :quote , :with_household_and_members}
   let(:quote_benefit_group){build_stubbed :quote_benefit_group}
@@ -157,6 +158,7 @@ RSpec.describe BrokerAgencies::QuotesController, type: :controller, dbclean: :af
   describe "GET my_quotes" do
 
     it "returns http success" do
+      person.broker_role.update_attributes(broker_agency_profile_id: broker_agency_profile.id)
       get :my_quotes, broker_role_id: person.broker_role.id
       expect(response).to have_http_status(:success)
     end
