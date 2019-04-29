@@ -30,10 +30,9 @@ class ShopEnrollmentReport < MongoidMigrationTask
   end
 
   def writing_on_csv(enrollment_ids_final, glue_list)
-    shop_headers = ['Employer ID', 'Employer FEIN', 'Employer Name', 'Employer Plan Year Start Date', 'Plan Year State', 'Employer State',
-                    'Enrollment Group ID', 'Enrollment Purchase Date/Time', 'Coverage Start Date', 'Enrollment State', 'Subscriber HBX ID',
-                    'Subscriber First Name','Subscriber Last Name', 'Plan HIOS Id', 'Covered lives on the enrollment', 'Enrollment Reason',
-                    'In Glue']
+    shop_headers = ['Employer ID', 'Employer FEIN', 'Employer Name', 'Plan Year Start', 'Plan Year State', 'Employer State',
+                    'Enrollment GroupID', 'Purchase Date', 'Coverage Start', 'Enrollment State', 'Subscriber HBXID',
+                    'Subscriber First Name','Subscriber Last Name', 'HIOS ID', 'Family Size', 'Enrollment Reason', 'In Glue']
 
     file_name = "#{Rails.root}/shop_enrollment_report.csv"
     CSV.open(file_name, "w", force_quotes: true) do |csv|
