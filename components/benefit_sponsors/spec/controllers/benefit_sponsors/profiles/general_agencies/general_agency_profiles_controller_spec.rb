@@ -2,9 +2,9 @@ require 'rails_helper'
 module BenefitSponsors
   RSpec.describe Profiles::GeneralAgencies::GeneralAgencyProfilesController, type: :controller, dbclean: :after_each do
     routes { BenefitSponsors::Engine.routes }
-    let!(:user_with_hbx_staff_role) { FactoryGirl.create(:user, :with_hbx_staff_role) }
-    let!(:person) { FactoryGirl.create(:person, user: user_with_hbx_staff_role )}
-    let(:general_agency) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, :with_site) }
+    let!(:user_with_hbx_staff_role) { FactoryBot.create(:user, :with_hbx_staff_role) }
+    let!(:person) { FactoryBot.create(:person, user: user_with_hbx_staff_role )}
+    let(:general_agency) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, :with_site) }
     let(:profile) { general_agency.profiles.first }
 
     context "#show" do

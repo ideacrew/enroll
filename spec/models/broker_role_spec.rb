@@ -11,7 +11,7 @@ describe BrokerRole, dbclean: :after_each do
   let(:provider_kind)  {"broker"}
 
   # before :all do
-  #   @broker_agency_profile = FactoryGirl.create(:broker_agency_profile)
+  #   @broker_agency_profile = FactoryBot.create(:broker_agency_profile)
   # end
 
 
@@ -292,7 +292,7 @@ describe BrokerRole, dbclean: :after_each do
 
     # TODO
     it '#address= and #address sets & gets work address on parent person instance' do
-      # address = FactoryGirl.build(:address)
+      # address = FactoryBot.build(:address)
       # address.kind = "work"
 
       # expect(person0.build_broker_role(address: address).address._id).to eq address._id

@@ -82,7 +82,7 @@ FactoryBot.define do
     end
 
     trait :with_health_product do
-      product { FactoryGirl.create(:benefit_markets_products_health_products_health_product)}
+      product { FactoryBot.create(:benefit_markets_products_health_products_health_product)}
     end
 
     trait :coverage_selected do
