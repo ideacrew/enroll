@@ -27,10 +27,10 @@ RSpec.describe "events/individuals/created.haml.erb", dbclean: :after_each do
 
   describe "given a person has broker role", dbclean: :after_each do
 
-    let(:broker_agency_organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization,:with_site,:with_broker_agency_profile)}
+    let(:broker_agency_organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization,:with_site,:with_broker_agency_profile)}
     let!(:broker_agency_profile) { broker_agency_organization.broker_agency_profile }
-    let!(:person_broker) {FactoryGirl.create(:person,:with_work_email, :with_work_phone)}
-    let!(:broker) {FactoryGirl.create(:broker_role,aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person_broker)}
+    let!(:person_broker) {FactoryBot.create(:person,:with_work_email, :with_work_phone)}
+    let!(:broker) {FactoryBot.create(:broker_role,aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person_broker)}
 
     before :each do
       render :template => "events/individuals/created", :locals => { :individual => person_broker}
