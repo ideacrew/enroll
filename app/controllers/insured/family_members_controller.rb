@@ -7,6 +7,7 @@ class Insured::FamilyMembersController < ApplicationController
 
   def index
     set_bookmark_url
+    set_admin_bookmark_url
     @type = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? "employee" : "consumer"
 
     if (params[:resident_role_id].present? && params[:resident_role_id])
@@ -150,6 +151,7 @@ class Insured::FamilyMembersController < ApplicationController
 
   def resident_index
     set_bookmark_url
+    set_admin_bookmark_url
     @resident_role = @person.resident_role
     @change_plan = params[:change_plan].present? ? 'change_by_qle' : ''
     @change_plan_date = params[:qle_date].present? ? params[:qle_date] : ''

@@ -32,6 +32,7 @@ Feature: Update DOB and SSN
     And Employee Patrick Doe should see their plan start date on the page
     And Hbx Admin logs out
 
+
  Scenario: Admin enters invalid DOB or SSN
     Given that a user with a HBX staff role with HBX staff subrole exists and is logged in
     And the user is on the Family Index of the Admin Dashboard
@@ -51,3 +52,4 @@ Feature: Update DOB and SSN
     When Hbx Admin enters a valid DOB and SSN and clicks on update
     Then Hbx Admin should see the update partial rendered with update sucessful message
     And Hbx Admin logs out
+

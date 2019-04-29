@@ -28,7 +28,7 @@ site:
   tab_icon: 'favicon.ico'
   mailer_logo_file_name: "health_connector.png"
   employer_application_deadline_link: "https://www.mahealthconnector.org/business/employers/employer-resources-and-information/employer-coverage-deadlines"
-  s3_prefix: "mhc"
+  s3_prefix: "dc"
   broker_quoting_enabled: false
   broker_claim_quoting_enabled: true
   guidance_for_business_owners_url: "https://www.mahealthconnector.org/help-center-answers/guidance-for-business-owners"
@@ -133,7 +133,7 @@ invoices:
 aca:
   state_name: "Massachusetts"
   state_abbreviation: "MA"
-  market_kinds: ["shop"]
+  market_kinds: ["shop", "individual"]
   hbx_abbreviation: "DC Health Benefit Exchange"
   nationwide_markets: false
   general_agency_enabled: false
@@ -146,7 +146,7 @@ aca:
   address_query_county: true
   broker_routing_information: true
   recaptcha_enabled: false
-  security_questions: true
+  security_questions: false
   user_accounts_enabled: true
   plan_options_available: ["sole_source", "single_carrier", "metal_level"]
   dental_plan_options_available: ["single_plan"]
@@ -163,7 +163,7 @@ aca:
 
   qle:
     with_in_sixty_days: 60
-#
+  #
   individual_market:
     monthly_enrollment_due_on: 15
     verification_outstanding_window:
@@ -172,11 +172,11 @@ aca:
       days: 95
 
     open_enrollment:
-      start_on: <%= Date.new(2017,11,1) %>
-      end_on: <%= Date.new(2018,02,05) %>
-    upcoming_open_enrollment:
       start_on: <%= Date.new(2018,11,1) %>
-      end_on: <%= Date.new(2019,01,31) %>
+      end_on: <%= Date.new(2019,02,05) %>
+    upcoming_open_enrollment:
+      start_on: <%= Date.new(2019,11,1) %>
+      end_on: <%= Date.new(2020,01,31) %>
 
   shop_market:
     valid_employer_attestation_documents_url: 'https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist'
