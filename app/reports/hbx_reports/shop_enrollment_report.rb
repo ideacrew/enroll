@@ -5,7 +5,7 @@ class ShopEnrollmentReport < MongoidMigrationTask
   def migrate
     if ENV['purchase_date_start'].blank? && ENV['purchase_date_end'].blank?
       # Purchase dates are from 10 weeks to todays date
-      purchase_date_start = (Time.now - 10.weeks).beginning_of_day
+      purchase_date_start = (Time.now - 30.days).beginning_of_day
       purchase_date_end = Time.now.end_of_day
     else
       purchase_date_start = Time.strptime(ENV['purchase_date_start'],'%m/%d/%Y').beginning_of_day
@@ -31,7 +31,7 @@ class ShopEnrollmentReport < MongoidMigrationTask
 
   def writing_on_csv(enrollment_ids_final, glue_list)
     shop_headers = ['Employer ID', 'Employer FEIN', 'Employer Name', 'Plan Year Start', 'Plan Year State', 'Employer State',
-                    'Enrollment GroupID', 'Purchase Date', 'Coverage Start', 'Enrollment State', 'Subscriber HBXID',
+                    'Enrollment GroupID', 'Purchase Date', 'Coverage Start', 'Coverage Kind', 'Enrollment State', 'Subscriber HBXID',
                     'Subscriber First Name','Subscriber Last Name', 'HIOS ID', 'Family Size', 'Enrollment Reason', 'In Glue']
 
     file_name = "#{Rails.root}/shop_enrollment_report.csv"
@@ -53,8 +53,8 @@ class ShopEnrollmentReport < MongoidMigrationTask
           end
           in_glue = glue_list.include?(id) if glue_list.present?
           csv << [employer_profile.hbx_id,employer_profile.fein,employer_profile.legal_name,plan_year_start,plan_year.aasm_state,
-                  employer_profile.aasm_state,id,hbx_enrollment.created_at,hbx_enrollment.effective_on,hbx_enrollment.aasm_state,
-                  subscriber_hbx_id,first_name,last_name,hbx_enrollment.plan.hios_id,hbx_enrollment.hbx_enrollment_members.size,
+                  employer_profile.aasm_state,id,hbx_enrollment.created_at,hbx_enrollment.effective_on,hbx_enrollment.coverage_kind,
+                  hbx_enrollment.aasm_state,subscriber_hbx_id,first_name,last_name,hbx_enrollment.plan.hios_id,hbx_enrollment.hbx_enrollment_members.size,
                   enrollment_reason,in_glue]
         rescue StandardError => e
           @logger = Logger.new("#{Rails.root}/log/shop_enrollment_report_error.log")

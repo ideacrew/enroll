@@ -38,7 +38,7 @@ describe ShopEnrollmentReport, dbclean: :after_each do
 
   it "returns correct fields" do
     shop_headers = ['Employer ID', 'Employer FEIN', 'Employer Name', 'Plan Year Start', 'Plan Year State', 'Employer State',
-                    'Enrollment GroupID', 'Purchase Date', 'Coverage Start', 'Enrollment State', 'Subscriber HBXID',
+                    'Enrollment GroupID', 'Purchase Date', 'Coverage Start', 'Coverage Kind', 'Enrollment State', 'Subscriber HBXID',
                     'Subscriber First Name','Subscriber Last Name', 'HIOS ID', 'Family Size', 'Enrollment Reason', 'In Glue']
                     
     expect(@file[0]).to eq shop_headers
