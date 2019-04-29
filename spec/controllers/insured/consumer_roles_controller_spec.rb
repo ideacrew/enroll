@@ -37,7 +37,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       allow(person).to receive(:consumer_role?).and_return(true)
       allow(person).to receive(:consumer_role).and_return(consumer_role)
       allow(consumer_role).to receive(:bookmark_url).and_return("test")
-      get :privacy, {:aqhp => 'true'}
+      get :privacy, params: {:aqhp => 'true'}
       expect(response).to have_http_status(:redirect)
       expect(response).to redirect_to(person.consumer_role.bookmark_url+"?aqhp=true")
     end
@@ -70,14 +70,14 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
     end
 
     it "should set the session flag for aqhp the param exists" do
-      get :search, aqhp: true
+      get :search, params: { aqhp: true }
       expect(session[:individual_assistance_path]).to be_truthy
     end
 
     it "should unset the session flag for aqhp if the param does not exist upon return" do
-      get :search, aqhp: true
+      get :search, params: { aqhp: true }
       expect(session[:individual_assistance_path]).to be_truthy
-      get :search, uqhp: true
+      get :search, params: { uqhp: true }
       expect(session[:individual_assistance_path]).to be_falsey
     end
 
@@ -108,7 +108,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
 
       it "renders the 'search' template" do
         allow(mock_consumer_candidate).to receive(:errors).and_return({})
-        post :match, :person => person_parameters
+        post :match, params: { :person => person_parameters }
         expect(response).to have_http_status(:success)
         expect(response).to render_template("search")
         expect(assigns[:consumer_candidate]).to eq mock_consumer_candidate
@@ -123,7 +123,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
         let(:person){ double("Person") }
         let(:person_parameters){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"000000111"}}
         before :each do
-          post :match, :person => person_parameters
+          post :match, params: { :person => person_parameters }
         end
 
         it "renders the 'no_match' template", dbclean: :after_each do
@@ -137,7 +137,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
           let(:found_person) { [person] }
 
           it "renders the 'match' template" do
-            post :match, :person => person_parameters
+            post :match, params: { :person => person_parameters }
             expect(response).to have_http_status(:success)
             expect(response).to render_template("match")
             expect(assigns[:consumer_candidate]).to eq mock_consumer_candidate
@@ -152,7 +152,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
           allow(mock_employee_candidate).to receive(:match_census_employees).and_return([])
           #allow(mock_resident_candidate).to receive(:dob).and_return()
           allow(Factories::EmploymentRelationshipFactory).to receive(:build).and_return(true)
-          post :match, :person => person_parameters
+          post :match, params: { :person => person_parameters }
         end
 
         it "render employee role match template" do
@@ -170,7 +170,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
         allow(mock_consumer_candidate).to receive(:errors).and_return({:ssn_taken => "test test test"})
       end
       it "should navigate to another page which has information for user to signin/recover account" do
-        post :match, :person => person_parameters
+        post :match, params: { :person => person_parameters }
         expect(response).to redirect_to(ssn_taken_insured_consumer_role_index_path)
         expect(flash[:alert]).to eq "The SSN entered is associated with an existing user. Please <a href=\"https://iam_login_url\">Sign In</a> with your user name and password or <a href=\"https://account_recovery\">Click here</a> if you've forgotten your password."
       end
@@ -187,7 +187,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
     end
     it "should create new person/consumer role object" do
       sign_in user
-      post :create, person: person_params
+      post :create, params: { person: person_params }
       expect(response).to have_http_status(:redirect)
     end
 
@@ -202,7 +202,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
     end
     it "should throw a 500 error" do
       sign_in user
-      post :create, person: person_params
+      post :create, params: { person: person_params }
       expect(response).to have_http_status(500)
     end
   end
@@ -219,7 +219,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
     end
     it "should render new template" do
       sign_in user
-      get :edit, id: "test"
+      get :edit, params: { id: "test" }
       expect(response).to have_http_status(:success)
       expect(response).to render_template(:edit)
     end
@@ -245,7 +245,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       
       before :each do
         allow(controller).to receive(:update_vlp_documents).and_return(true)
-        put :update, person: person_params, id: "test"
+        put :update, params: { person: person_params, id: "test" }
       end
 
       it "should not empty the person's addresses on update" do
@@ -266,7 +266,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       allow(consumer_role).to receive(:update_by_person).and_return(true)
       allow(controller).to receive(:update_vlp_documents).and_return(true)
       allow(controller).to receive(:is_new_paper_application?).and_return false
-      put :update, person: person_params, id: "test"
+      put :update, params: { person: person_params, id: "test" }
       expect(response).to have_http_status(:redirect)
       expect(response).to redirect_to(ridp_agreement_insured_consumer_role_index_path)
     end
@@ -274,7 +274,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
     it "should redirect to family members path when current user is admin & doing new paper app" do
       allow(controller).to receive(:update_vlp_documents).and_return(true)
       allow(controller).to receive(:is_new_paper_application?).and_return true
-      put :update, person: person_params, id: "test"
+      put :update, params: { person: person_params, id: "test" }
       expect(response).to have_http_status(:redirect)
       expect(response).to redirect_to(insured_family_members_path(consumer_role_id: consumer_role.id))
     end
@@ -282,7 +282,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
     it "should not update the person" do
       allow(controller).to receive(:update_vlp_documents).and_return(false)
       allow(consumer_role).to receive(:update_by_person).and_return(true)
-      put :update, person: person_params, id: "test"
+      put :update, params: { person: person_params, id: "test" }
       expect(response).to have_http_status(:success)
       expect(response).to render_template(:edit)
     end
@@ -290,13 +290,13 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
     it "should not update the person" do
       allow(controller).to receive(:update_vlp_documents).and_return(false)
       allow(consumer_role).to receive(:update_by_person).and_return(false)
-      put :update, person: person_params, id: "test"
+      put :update, params: { person: person_params, id: "test" }
       expect(response).to have_http_status(:success)
       expect(response).to render_template(:edit)
     end
 
     it "should raise error" do
-      put :update, person: person_params, id: "test"
+      put :update, params: { person: person_params, id: "test" }
       expect(response).to have_http_status(:success)
       expect(response).to render_template(:edit)
       expect(person.errors.full_messages).to include "Document type cannot be blank"
@@ -306,7 +306,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       allow(controller).to receive(:update_vlp_documents).and_return(true)
       allow(consumer_role).to receive(:update_by_person).and_return(false)
       expect(controller).to receive(:bubble_address_errors_by_person)
-      put :update, person: person_params, id: "test"
+      put :update, params: { person: person_params, id: "test" }
       expect(response).to have_http_status(:success)
       expect(response).to render_template(:edit)
     end
@@ -314,7 +314,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
 
   context "GET immigration_document_options", dbclean: :after_each do
     let(:person) {FactoryBot.create(:person, :with_consumer_role)}
-    let(:params) {{target_type: 'Person', target_id: "person_id", vlp_doc_target: "vlp doc", vlp_doc_subject: "I-327 (Reentry Permit)"}}
+    let(:par) {{target_type: 'Person', target_id: "person_id", vlp_doc_target: "vlp doc", vlp_doc_subject: "I-327 (Reentry Permit)"}}
     let(:family_member) {FactoryBot.create(:person, :with_consumer_role)}
     before :each do
       sign_in user
@@ -323,7 +323,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
     context "target type is Person", dbclean: :after_each do
       before :each do
         allow(Person).to receive(:find).and_return person
-        xhr :get, 'immigration_document_options', params, format: :js
+        xhr :get, 'immigration_document_options', params: { target_type: 'Person', target_id: "person_id", vlp_doc_target: "vlp doc", vlp_doc_subject: "I-327 (Reentry Permit)" }, format: :js
       end
       it "should get person" do
         expect(response).to have_http_status(:success)
@@ -351,7 +351,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
 
     it "render javascript template" do
       allow(Person).to receive(:find).and_return person
-      xhr :get, 'immigration_document_options', params, format: :js
+      xhr :get, 'immigration_document_options', params: { target_type: 'Person', target_id: "person_id", vlp_doc_target: "vlp doc", vlp_doc_subject: "I-327 (Reentry Permit)"}, format: :js
       expect(response).to have_http_status(:success)
       expect(response).to render_template(:immigration_document_options)
     end
@@ -418,7 +418,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
 
     context "with pre-existing consumer_role", dbclean: :after_each do
       it "should not have a resident role created for it" do
-        post :match, :person => resident_parameters
+        post :match, params: { :person => resident_parameters }
         expect(user.person.resident_role).to be_nil
         #expect(response).to redirect_to(family_account_path)
         expect(response).to render_template("match")
@@ -428,7 +428,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
     context "with pre-existing resident_role", dbclean: :after_each do
       it "should navigate to family account page" do
         allow(person).to receive(:resident_role).and_return(resident_role)
-        post :match, :person => resident_parameters
+        post :match, params: { :person => resident_parameters }
         expect(user.person.resident_role).not_to be_nil
         expect(response).to redirect_to(family_account_path)
       end
@@ -438,7 +438,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       it "should navigate to family account page" do
         allow(person).to receive(:consumer_role).and_return(consumer_role)
         allow(person).to receive(:resident_role).and_return(resident_role)
-        post :match, :person => resident_parameters
+        post :match, params: { :person => resident_parameters }
         expect(user.person.consumer_role).not_to be_nil
         expect(user.person.resident_role).not_to be_nil
         expect(response).to redirect_to(family_account_path)
@@ -465,7 +465,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
 
       it "should redirect to the edit page of the consumer role of the current user" do
         sign_in user
-        get :edit, id: "test"
+        get :edit, params: { id: "test" }
         expect(response).to have_http_status(:redirect)
         expect(response).to redirect_to(edit_insured_consumer_role_path(user.person.consumer_role.id))
       end
