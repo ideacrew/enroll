@@ -31,9 +31,9 @@ class IvlEnrollmentReport < MongoidMigrationTask
   end
 
   def writing_on_csv(enrollment_ids_final, glue_list)
-    ivl_headers = ['Enrollment Group ID', 'Enrollment Purchase Date/Time', 'Coverage Start Date', 'Enrollment State',
-                   'Subscriber HBX ID', 'Subscriber First Name','Subscriber Last Name', 'Plan HIOS Id',
-                   'Covered lives on the enrollment', 'Enrollment Reason', 'In Glue']
+    ivl_headers = ['Enrollment GroupID', 'Purchase Date', 'Coverage Start', 'Enrollment State', 'Subscriber HBXID',
+                   'Subscriber First Name', 'Subscriber Last Name', 'HIOS ID', 'Family Size', 'Enrollment Reason',
+                   'In Glue']
 
     file_name = "#{Rails.root}/ivl_enrollment_report.csv"
     CSV.open(file_name, "w", force_quotes: true) do |csv|
