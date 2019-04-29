@@ -6,6 +6,8 @@ class Employers::PlanYearsController < ApplicationController
 
   def new
     @plan_year = build_plan_year
+    @employer_profile = EmployerProfile.find(params[:employer_profile_id])
+    @broker_agency_profile_id =  @employer_profile.active_broker_agency_account.broker_agency_profile_id if @employer_profile.active_broker_agency_account.present?
     @carriers_cache = CarrierProfile.all.inject({}){|carrier_hash, carrier_profile| carrier_hash[carrier_profile.id] = carrier_profile.legal_name; carrier_hash;}
   end
 
@@ -137,7 +139,7 @@ class Employers::PlanYearsController < ApplicationController
     if @employer_profile.default_benefit_group.blank?
       @plan_year.benefit_groups[0].default= true
     end
-
+    @broker_agency_profile_id = @employer_profile.active_broker_agency_account.broker_agency_profile_id if @employer_profile.active_broker_agency_account.present?
     if @plan_year.save
       flash[:notice] = "Plan Year successfully created."
       redirect_to employers_employer_profile_path(@employer_profile.id, :tab=>'benefits')
