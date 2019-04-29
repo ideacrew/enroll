@@ -274,10 +274,12 @@ describe Forms::GeneralAgencyProfile, ".match_or_create_person", :dbclean => :af
 end
 
 describe Forms::GeneralAgencyProfile, ".find", dbclean: :after_each do
-  let(:general_agency_profile) { FactoryBot.create(:general_agency_profile, :with_staff) }
+  let(:general_agency_profile) { FactoryBot.create(:general_agency_profile) }
+  let(:general_agency_staff_role) { FactoryBot.create(:general_agency_staff_role) }
   let(:organization) { general_agency_profile.organization }
 
   before :each do
+    general_agency_staff_role.update_attributes(general_agency_profile_id: general_agency_profile.id)
     @form = Forms::GeneralAgencyProfile.find(general_agency_profile.id)
   end
 

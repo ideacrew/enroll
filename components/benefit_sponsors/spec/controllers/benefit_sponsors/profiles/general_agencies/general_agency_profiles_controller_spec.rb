@@ -8,12 +8,13 @@ module BenefitSponsors
     let(:profile) { general_agency.profiles.first }
 
     context "#show" do
-      context "when user signed in" do 
+      context "when user signed in" do
         before do
           sign_in user_with_hbx_staff_role
           allow(controller).to receive(:set_flash_by_announcement).and_return(true)
-          get :show, id: profile.id
+          get :show, params: {id: profile.id}
         end
+
         it "should set general_agency_profile instance variable" do
           expect(assigns(:general_agency_profile)).to eq profile
         end
@@ -33,7 +34,7 @@ module BenefitSponsors
 
       context "when user not signed in" do
         before do
-          get :show, id: profile.id
+          get :show, params: {id: profile.id}
         end
 
         it "should redirect to the user's signup" do
@@ -45,7 +46,7 @@ module BenefitSponsors
     context "#employers" do
       before do
         sign_in user_with_hbx_staff_role
-        xhr :get, :employers, id: profile.id
+        get :employers, params:{id: profile.id}, xhr: true
       end
       it "should set datatable instance variable" do
         expect(assigns(:datatable).class).to eq Effective::Datatables::BenefitSponsorsGeneralAgencyDataTable
@@ -81,7 +82,7 @@ module BenefitSponsors
     context "#families" do
       before do
         sign_in user_with_hbx_staff_role
-        xhr :get, :families, id: profile.id
+        get :families, params:{id: profile.id}, xhr: true
       end
       it "should set datatable instance variable" do
         expect(assigns(:datatable).class).to eq Effective::Datatables::BenefitSponsorsGeneralAgencyFamilyDataTable

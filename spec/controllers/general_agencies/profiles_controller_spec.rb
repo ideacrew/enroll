@@ -58,17 +58,17 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
 
     it "should update person main phone" do
       general_agency_profile.primary_staff.person.phones[0].update_attributes(kind: "phone main")
-      post :update, id: general_agency_profile.id, organization: {id: org.id, first_name: "updated name", last_name: "updates", office_locations_attributes: {"0"=>
+      post :update, params:{id: general_agency_profile.id, organization: {id: org.id, first_name: "updated name", last_name: "updates", office_locations_attributes: {"0"=>
                                                                                                                                                                {"address_attributes"=>{"kind"=>"primary", "address_1"=>"234 nfgjkhghf", "address_2"=>"", "city"=>"jfhgdfhgjgdf", "state"=>"DC", "zip"=>"35645"},
-                                                                                                                                                                "phone_attributes"=>{"kind"=>"phone main", "area_code"=>"564", "number"=>"111-1111", "extension"=>"111"}}}}
+                                                                                                                                                                "phone_attributes"=>{"kind"=>"phone main", "area_code"=>"564", "number"=>"111-1111", "extension"=>"111"}}}}}
       general_agency_profile.primary_staff.person.reload
       expect(general_agency_profile.primary_staff.person.phones[0].extension).to eq "111"
     end
 
     it "should update person record" do
-      post :update, id: general_agency_profile.id, organization: {id: org.id, first_name: "updated name", last_name: "updates", office_locations_attributes: {"0"=>
+      post :update, params:{id: general_agency_profile.id, organization: {id: org.id, first_name: "updated name", last_name: "updates", office_locations_attributes: {"0"=>
                                                                                                                                                                {"address_attributes"=>{"kind"=>"primary", "address_1"=>"234 nfgjkhghf", "address_2"=>"", "city"=>"jfhgdfhgjgdf", "state"=>"DC", "zip"=>"35645"},
-                                                                                                                                                                "phone_attributes"=>{"kind"=>"phone main", "area_code"=>"564", "number"=>"111-1111", "extension"=>"111"}}}}
+                                                                                                                                                                "phone_attributes"=>{"kind"=>"phone main", "area_code"=>"564", "number"=>"111-1111", "extension"=>"111"}}}}}
       general_agency_profile.primary_staff.person.reload
       expect(general_agency_profile.primary_staff.person.first_name).to eq "updated name"
     end
@@ -102,14 +102,14 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
 
   describe "GET search_general_agency" do
     it "should returns http success" do
-      xhr :get, :search_general_agency, general_agency_search: 'general_agency', format: :js
+      get :search_general_agency, params:{general_agency_search: 'general_agency'}, xhr: true, format: :js
       expect(response).to have_http_status(:success)
     end
 
     it "should get general_agency_profile" do
       Organization.delete_all
       ga = FactoryBot.create(:general_agency_profile)
-      xhr :get, :search_general_agency, general_agency_search: ga.legal_name, format: :js
+      get :search_general_agency, params:{general_agency_search: ga.legal_name}, xhr: true, format: :js
       expect(assigns[:general_agency_profiles]).to eq [ga]
     end
   end
@@ -119,7 +119,7 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
       FactoryBot.create(:announcement, content: "msg for GA", audiences: ['GA'])
       allow(user).to receive(:has_general_agency_staff_role?).and_return true
       sign_in(user)
-      get :show, id: general_agency_profile.id
+      get :show, params:{id: general_agency_profile.id}
     end
 
     it "returns http success" do
@@ -146,7 +146,7 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
   describe "GET employers" do
     before(:each) do
       sign_in(user)
-      xhr :get, :employers, id: general_agency_profile.id
+      get :employers, params:{id: general_agency_profile.id}, xhr: true
     end
 
     it "returns http success" do
@@ -175,7 +175,7 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
       let(:family2) { FactoryBot.create(:family, :with_primary_family_member , :person => person2  ) }
       before(:each) do
         allow(general_agency_profile).to receive(:families).and_return [family,family2]
-        xhr :get, :families, id: general_agency_profile.id
+        get :families, params:{id: general_agency_profile.id}, xhr: true
       end
 
       it "returns http success" do
@@ -224,7 +224,7 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
   describe "GET staffs" do
     before(:each) do
       sign_in(user)
-      xhr :get, :staffs, id: general_agency_profile.id
+      get :staffs, params:{id: general_agency_profile.id}, xhr: true
     end
 
     it "returns http success" do
@@ -243,7 +243,7 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
   describe "GET edit_staff" do
     before(:each) do
       sign_in(user)
-      xhr :get, :edit_staff, id: general_agency_staff.id
+      get :edit_staff, params:{id: general_agency_staff.id}, xhr: true
     end
 
     it "returns http success" do
@@ -260,7 +260,7 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
       FactoryBot.create(:hbx_profile) if HbxProfile.count == 0
       sign_in(user)
       general_agency_staff.unset(:benefit_sponsors_general_agency_profile_id) # ToDo - Move/remove these old specs
-      post :update_staff, id: general_agency_staff.id, approve: 'true'
+      post :update_staff, params:{id: general_agency_staff.id, approve: 'true'}
     end
 
     it "should redirect" do
@@ -280,7 +280,7 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
   describe "GET messages" do
     before(:each) do
       sign_in(user)
-      xhr :get, :messages
+      get :messages, xhr: true
     end
 
     it "returns http success" do
@@ -299,7 +299,7 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
   describe "GET agency_messages" do
     before(:each) do
       sign_in(user)
-      xhr :get, :agency_messages, id: general_agency_profile.id
+      get :agency_messages, params:{id: general_agency_profile.id}, xhr: true
     end
 
     it "returns http success" do
@@ -314,7 +314,7 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
   describe "GET inbox" do
     before(:each) do
       sign_in(user)
-      xhr :get, :inbox, id: general_agency_profile.id
+      get :inbox, params:{id: general_agency_profile.id}, xhr: true
     end
 
     it "returns http success" do
@@ -343,7 +343,7 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
 
     it "should redirect" do
       allow(form).to receive(:save).and_return true
-      post :create, organization: {first_name: 'test'}
+      post :create, params:{organization: {first_name: 'test'}}
       expect(response).to have_http_status(:redirect)
       expect(flash[:notice]).to eq "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
     end
@@ -351,14 +351,14 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
     it "should render new_agency template" do
       allow(form).to receive(:save).and_return false
       allow(form).to receive(:only_staff_role?).and_return false
-      post :create, organization: {first_name: 'test'}
+      post :create, params:{organization: {first_name: 'test'}}
       expect(response).to render_template("new_agency")
     end
 
     it "should render new_agency_staff template" do
       allow(form).to receive(:save).and_return false
       allow(form).to receive(:only_staff_role?).and_return true
-      post :create, organization: {first_name: 'test'}
+      post :create, params:{organization: {first_name: 'test'}}
       expect(response).to render_template("new_agency_staff")
     end
   end
