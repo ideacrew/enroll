@@ -1210,6 +1210,11 @@ describe Person do
       person.general_agency_staff_roles << FactoryGirl.build(:general_agency_staff_role)
       expect(person.agent?).to be_truthy
     end
+
+    it 'should return true with broker_agency_staff_roles' do
+      person.general_agency_staff_roles << FactoryGirl.build(:broker_agency_staff_role)
+      expect(person.agent?).to be_truthy
+    end
   end
 
   describe "dob_change_implication_on_active_enrollments" do
@@ -1312,8 +1317,25 @@ describe Person do
     end
   end
 
+  context 'has_active_broker_staff_role?' do
+    let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
+    let(:person) {FactoryGirl.create(:person)}
+    let(:broker_agency_staff_role) {FactoryGirl.build(:broker_agency_staff_role, aasm_state: 'active')}
 
-  describe "staff_for_employer" do
+    it 'should return true if active broker staff roles are present' do
+      person.broker_agency_staff_roles << broker_agency_staff_role
+      expect(person.has_active_broker_staff_role?). to eq true
+    end
+
+    it 'should return false if no active broker staff roles are present' do
+      broker_agency_staff_role.update_attributes!(aasm_state: 'broker_agency_pending')
+      person.broker_agency_staff_roles << broker_agency_staff_role
+      expect(person.has_active_broker_staff_role?). to eq false
+    end
+  end
+
+
+  describe "staff_for_employer", dbclean: :after_each do
     let(:employer_profile) { FactoryGirl.build(:employer_profile) }
 
     context "employer has no staff roles assigned" do
@@ -1379,6 +1401,265 @@ describe Person do
       end
     end
   end
+
+  describe ".add_broker_agency_staff_role", dbclean: :after_each  do
+
+    let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
+    let(:person_params) {{first_name: Forgery('name').first_name, last_name: Forgery('name').first_name, dob: '1990/05/01'}}
+    let(:person1) {FactoryGirl.create(:person, person_params)}
+
+    context 'duplicate person PII' do
+      before do
+        FactoryGirl.create(:person, person_params)
+        @status, @result = Person.add_broker_agency_staff_role(person1.first_name, person1.last_name, person1.dob,'#default@email.com', broker_agency_profile )
+      end
+      it 'returns false' do
+        expect(@status).to eq false
+      end
+
+      it 'returns msg' do
+        expect(@result).to be_instance_of String
+      end
+    end
+
+    context 'zero matching person PII' do
+      before {@status, @result = Person.add_broker_agency_staff_role('sam', person1.last_name, person1.dob,'#default@email.com', broker_agency_profile )}
+
+      it 'returns false' do
+        expect(@status).to eq false
+      end
+
+      it 'returns msg' do
+        expect(@result).to be_instance_of String
+      end
+    end
+
+    context 'matching one person PII' do
+      before {@status, @result = Person.add_broker_agency_staff_role(person1.first_name, person1.last_name, person1.dob,'#default@email.com', broker_agency_profile )}
+
+      it 'returns true' do
+        expect(@status).to eq true
+      end
+
+      it 'returns the person' do
+        expect(@result).to eq person1
+      end
+    end
+
+    context 'person already has broker role with this broker agency' do
+      before {
+        Person.add_broker_agency_staff_role(person1.first_name, person1.last_name, person1.dob,'#default@email.com', broker_agency_profile )
+        @status, @result = Person.add_broker_agency_staff_role(person1.first_name, person1.last_name, person1.dob,'#default@email.com', broker_agency_profile )
+      }
+
+      it 'returns false' do
+        expect(@status).to eq false
+      end
+
+      it 'returns the person' do
+        expect(@result).to be_instance_of String
+      end
+    end
+  end
+
+  describe ".deactivate_broker_agency_staff_role" do
+    let(:person) {FactoryGirl.create(:person)}
+    let(:broker_agency_profile) {FactoryGirl.create(:broker_agency_profile)}
+    let(:broker_agency_profile_second) {FactoryGirl.create(:broker_agency_profile)}
+    before{
+      FactoryGirl.create(:broker_agency_staff_role, broker_agency_profile_id:broker_agency_profile.id, person: person, aasm_state: 'active')
+    }
+
+    context 'finds the person and deactivates the role' do
+      before{
+        @status, @result = Person.deactivate_broker_agency_staff_role(person.id, broker_agency_profile.id)
+      }
+      it 'returns true' do
+        expect(@status).to be true
+      end
+
+      it 'returns msg' do
+        expect(@result).to be_instance_of String
+      end
+
+      it 'should terminate broker agency staff role' do
+        expect(person.reload.broker_agency_staff_roles.first.aasm_state).to eq "broker_agency_terminated"
+      end
+    end
+
+    context 'person does not have broker agency staff role' do
+      before{
+        @status, @result = Person.deactivate_broker_agency_staff_role(person.id, broker_agency_profile_second.id)
+      }
+      it 'returns false' do
+        expect(@status).to eq false
+      end
+
+      it 'returns msg' do
+        expect(@result).to be_instance_of String
+      end
+
+      it 'should not terminate other broker agency staff role' do
+        expect(person.reload.broker_agency_staff_roles.first.aasm_state).to eq "active"
+      end
+    end
+  end
+
+  describe "staff_for_broker", dbclean: :after_each do
+    let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
+
+    context "broker has no broker agency staff roles assigned" do
+      it "should return an empty array" do
+        expect(Person.staff_for_broker(broker_agency_profile)).to eq []
+      end
+    end
+
+    context "broker agency has an active broker staff role" do
+      let(:broker_person) { FactoryGirl.create(:person) }
+      let(:staff_role)  {FactoryGirl.create(:broker_agency_staff_role, aasm_state: 'active', broker_agency_profile_id: broker_agency_profile.id)}
+
+      before do
+        broker_person.broker_agency_staff_roles << staff_role
+      end
+
+      it "should return the person object in an array" do
+        expect(Person.staff_for_broker(broker_agency_profile)).to include(broker_person)
+      end
+    end
+
+
+    context "multiple brokers have same person as staff" do
+      let(:broker_agency_profile2) { FactoryGirl.create(:broker_agency_profile) }
+      let(:broker_person) { FactoryGirl.create(:person) }
+      let(:staff_role1)  {FactoryGirl.create(:broker_agency_staff_role, aasm_state: 'active', broker_agency_profile_id: broker_agency_profile.id)}
+      let(:staff_role2)  {FactoryGirl.create(:broker_agency_staff_role, aasm_state: 'broker_agency_terminated', broker_agency_profile_id: broker_agency_profile2.id)}
+
+
+      before do
+        broker_person.broker_agency_staff_roles << staff_role1
+        broker_person.broker_agency_staff_roles << staff_role2
+      end
+
+      it "should return the person object in an array for broker 1" do
+        expect(Person.staff_for_broker(broker_agency_profile)).to include(broker_person)
+      end
+
+      it "should not return the person object in an array for broker 2" do
+        expect(Person.staff_for_broker(broker_agency_profile2)).not_to include(broker_person)
+      end
+    end
+  end
+
+  describe "staff_for_broker_including_pending", dbclean: :after_each do
+    let(:broker_agency_profile) {FactoryGirl.create(:broker_agency_profile)}
+    let(:broker_staff_people) { FactoryGirl.create_list(:person, 5)}
+    let(:terminated_staff_member) { FactoryGirl.create(:person)}
+    let(:pending_staff_member) { FactoryGirl.create(:person)}
+
+    before{
+      broker_staff_people.each do |person|
+        FactoryGirl.create(:broker_agency_staff_role, broker_agency_profile_id:broker_agency_profile.id, person: person, broker_agency_profile: broker_agency_profile, aasm_state: 'active')
+      end
+      FactoryGirl.create(:broker_agency_staff_role, broker_agency_profile_id:broker_agency_profile.id, person: terminated_staff_member, broker_agency_profile: broker_agency_profile, aasm_state: 'broker_agency_terminated')
+      FactoryGirl.create(:broker_agency_staff_role, broker_agency_profile_id:broker_agency_profile.id, person: pending_staff_member, broker_agency_profile: broker_agency_profile, aasm_state: 'broker_agency_pending')
+    }
+
+
+    context "finds all active & pending broker staff" do
+      before {
+        @broker_staff = Person.staff_for_broker_including_pending(broker_agency_profile)
+      }
+
+      it "should return all active staff for broker" do
+        expect(@broker_staff.size).to eq(6)
+      end
+
+      it "should only return active & pending staff for broker" do
+        @broker_staff.each do |staff|
+          expect(staff.broker_agency_staff_roles.first.is_open?).to be true
+        end
+      end
+
+    end
+  end
+
+  describe 'has_active_staff?' do
+    let(:broker_agency_profile) {FactoryGirl.create(:broker_agency_profile)}
+    let(:active_staff_member) { FactoryGirl.create(:person)}
+    let(:broker_agency_id) {broker_agency_profile.id}
+
+    before do
+      FactoryGirl.create(:broker_agency_staff_role, broker_agency_profile_id:broker_agency_profile.id, person: active_staff_member, broker_agency_profile: broker_agency_profile, aasm_state: 'active')
+    end
+
+    it 'should return true if active broker staff is already assigned to broker agency' do
+      expect(active_staff_member.has_active_staff?(broker_agency_id)). to eq true
+    end
+
+    it 'should return false if terminated broker staff is already assigned to broker agency' do
+      active_staff_member.broker_agency_staff_roles[0].update_attributes(aasm_state: 'broker_agency_terminated')
+      expect(active_staff_member.has_active_staff?(broker_agency_id)). to eq false
+    end
+  end
+
+  describe 'has_pending_staff?' do
+    let(:broker_agency_profile) {FactoryGirl.create(:broker_agency_profile)}
+    let(:pending_staff_member) { FactoryGirl.create(:person)}
+    let(:broker_agency_id) {broker_agency_profile.id}
+
+    before do
+      FactoryGirl.create(:broker_agency_staff_role, broker_agency_profile_id:broker_agency_profile.id, person: pending_staff_member, broker_agency_profile: broker_agency_profile, aasm_state: 'broker_agency_pending')
+    end
+
+    it 'should return true if pending broker staff is already assigned to broker agency' do
+      expect(pending_staff_member.has_pending_staff?(broker_agency_id)). to eq true
+    end
+
+    it 'should return false if terminated broker staff is already assigned to broker agency' do
+      pending_staff_member.broker_agency_staff_roles[0].update_attributes(aasm_state: 'broker_agency_terminated')
+      expect(pending_staff_member.has_pending_staff?(broker_agency_id)). to eq false
+    end
+  end
+
+  describe 'terminated_matching_broker' do
+    let(:broker_agency_profile) {FactoryGirl.create(:broker_agency_profile)}
+    let(:terminated_staff_member) { FactoryGirl.create(:person)}
+    let(:broker_agency_id) {broker_agency_profile.id}
+
+    before do
+     @broker_staff_role = FactoryGirl.create(:broker_agency_staff_role, broker_agency_profile_id:broker_agency_profile.id, person: terminated_staff_member, broker_agency_profile: broker_agency_profile, aasm_state: 'broker_agency_terminated')
+    end
+
+    it 'should return terminated_staff_member if terminated broker staff is already assigned to broker agency' do
+      expect(terminated_staff_member.terminated_matching_broker(broker_agency_id)). to eq @broker_staff_role
+    end
+
+    it 'should not return terminated_staff_member if terminated broker staff is already assigned to broker agency' do
+      terminated_staff_member.broker_agency_staff_roles[0].update_attributes(aasm_state: 'active')
+      expect(terminated_staff_member.terminated_matching_broker(broker_agency_id)). to eq nil
+    end
+  end
+
+  describe 'has_pending_broker_staff_role?' do
+    let(:broker_agency_profile) {FactoryGirl.create(:broker_agency_profile)}
+    let(:pending_staff_member) { FactoryGirl.create(:person)}
+    let(:broker_agency_id) {broker_agency_profile.id}
+
+    before do
+      FactoryGirl.create(:broker_agency_staff_role, broker_agency_profile_id:broker_agency_profile.id, person: pending_staff_member, broker_agency_profile: broker_agency_profile, aasm_state: 'broker_agency_pending')
+    end
+
+    it 'should return true if there are broker staffs in pending state' do
+      expect(pending_staff_member.has_pending_broker_staff_role?(broker_agency_id)). to eq true
+    end
+
+    it 'should return false if there are no broker staffs in pending state' do
+      pending_staff_member.broker_agency_staff_roles[0].update_attributes(aasm_state: 'broker_agency_terminated')
+      expect(pending_staff_member.has_pending_broker_staff_role?(broker_agency_id)). to eq false
+    end
+  end
+
+
 end
 
 describe Person, "given a relationship to update", dbclean: :after_each do

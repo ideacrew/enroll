@@ -246,6 +246,61 @@ describe Forms::BrokerCandidate do
         end
       end
 
+      context 'when active staff role is already associated with broker agency profile ' do
+        let(:other_attributes) { {
+            first_name: 'joe1',
+            broker_applicant_type: 'staff'
+        }}
+
+        before (:each) do
+          person = FactoryGirl.create(:person, first_name: 'joe1', last_name: subject.last_name, dob: subject.dob)
+          FactoryGirl.create(:broker_agency_staff_role, aasm_state: 'active', broker_agency_profile_id: @broker_agency_profile.id, person: person)
+        end
+
+        it 'should raise an error' do
+          subject.save
+          expect(subject.errors.to_hash[:base]).to include('You are already associated with this Broker Agency')
+        end
+      end
+
+      context 'when pending staff role is already associated with broker agency profile ' do
+        let(:other_attributes) { {
+            first_name: 'joe2',
+            broker_applicant_type: 'staff'
+        }}
+
+        before (:each) do
+          person = FactoryGirl.create(:person, first_name: 'joe2', last_name: subject.last_name, dob: subject.dob)
+          FactoryGirl.create(:broker_agency_staff_role, aasm_state: 'broker_agency_pending', broker_agency_profile_id: @broker_agency_profile.id, person: person)
+        end
+
+        it 'should raise an error' do
+          subject.save
+          expect(subject.errors.to_hash[:base]).to include('your application status was in pending with this Broker Agency')
+        end
+      end
+
+      context 'when terminated staff role associated with broker agency profile ' do
+        let(:other_attributes) { {
+            first_name: 'joe3',
+            broker_applicant_type: 'staff'
+        }}
+
+        before (:each) do
+          person = FactoryGirl.create(:person, first_name: 'joe3', last_name: subject.last_name, dob: subject.dob)
+          FactoryGirl.create(:broker_agency_staff_role, aasm_state: 'broker_agency_terminated', broker_agency_profile_id: @broker_agency_profile.id, person: person)
+        end
+
+        it 'should update staff role to pending state' do
+          person = Person.where(first_name: 'joe3', last_name: subject.last_name, dob: subject.dob).first
+          expect(person.broker_agency_staff_roles[0].aasm_state). to eq('broker_agency_terminated')
+          subject.save
+          person.reload
+          expect(person.broker_agency_staff_roles.count). to eq(1)
+          expect(person.broker_agency_staff_roles[0].aasm_state). to eq('broker_agency_pending')
+        end
+      end
+
       context 'address' do
         let(:other_attributes) { {
           :addresses_attributes => {"0" => {
