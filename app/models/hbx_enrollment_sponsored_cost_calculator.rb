@@ -15,11 +15,11 @@ class HbxEnrollmentSponsoredCostCalculator
 
   protected
 
-	def calculate_groups_for_products(products)
-		products.map do |product|
-			member_group_with_product = @member_group.clone_for_coverage(product)
-			member_group_with_pricing = @pricing_calculator.calculate_price_for(@pricing_model, member_group_with_product, @sponsor_contribution)
-			@contribution_calculator.calculate_contribution_for(@contribution_model, member_group_with_pricing, @sponsor_contribution)
-		end
-	end
+  def calculate_groups_for_products(products)
+    products.map do |product|
+      member_group_with_product = @member_group.clone_for_coverage(product)
+      member_group_with_pricing = @pricing_calculator.calculate_price_for(@pricing_model, member_group_with_product, @sponsor_contribution)
+      @contribution_calculator.calculate_contribution_for(@contribution_model, member_group_with_pricing, @sponsor_contribution)
+    end
+  end
 end

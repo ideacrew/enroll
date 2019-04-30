@@ -1,40 +1,41 @@
 require 'rails_helper'
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 describe Factories::EnrollmentFactory, "starting with unlinked employee_family and employee_role", :dbclean => :after_each do
   def p(model)
     model.class.find(model.id)
   end
 
+  let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }
+
+  include_context "setup benefit market with market catalogs and product packages"
+  include_context "setup initial benefit application"
+
   let(:hired_on) { TimeKeeper.date_of_record - 30.days }
   let(:terminated_on) { TimeKeeper.date_of_record - 1.days }
   let(:dob) { employee_role.dob }
   let(:ssn) { employee_role.ssn }
-  let(:site)                  { build(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-  let(:benefit_sponsor)        { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile_initial_application, site: site) }
-  let(:benefit_sponsorship)    { benefit_sponsor.active_benefit_sponsorship }
-  let(:employer_profile)      {  benefit_sponsorship.profile }
-  let!(:benefit_package) { benefit_sponsorship.benefit_applications.first.benefit_packages.first}
-  let(:benefit_group_assignment) {FactoryGirl.build(:benefit_group_assignment, benefit_package: benefit_package)}
 
-  let!(:census_employee) {
-    FactoryGirl.create(:census_employee,
+  let!(:census_employee) do
+    create(:census_employee,
       hired_on: hired_on,
       employment_terminated_on: terminated_on,
-      dob: dob,
-      ssn: ssn,
-      benefit_sponsors_employer_profile_id: employer_profile,
-      benefit_group_assignments:[benefit_group_assignment]
+      dob: dob, ssn: ssn,
+      benefit_sponsorship: benefit_sponsorship,
+      employer_profile: benefit_sponsorship.profile,
+      benefit_group: current_benefit_package
     )
-  }
+  end
 
   let(:employee_role) {
-    FactoryGirl.build(:employee_role, employer_profile: employer_profile)
+    FactoryGirl.build(:employee_role, employer_profile: abc_profile)
   }
 
   describe "After performing the link", :dbclean => :after_each do
 
     before(:each) do
-      Factories::EnrollmentFactory.link_census_employee(census_employee, employee_role, employer_profile)
+      Factories::EnrollmentFactory.link_census_employee(census_employee, employee_role, abc_profile)
     end
 
     it "should set employee role id on the census employee" do
@@ -42,7 +43,7 @@ describe Factories::EnrollmentFactory, "starting with unlinked employee_family a
     end
 
     it "should set employer profile id on the employee_role" do
-      expect(employee_role.benefit_sponsors_employer_profile_id).to eq employer_profile.id
+      expect(employee_role.benefit_sponsors_employer_profile_id).to eq abc_profile.id
     end
 
     it "should set census employee id on the employee_role" do

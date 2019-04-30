@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "_create_benefit_application.html.erb", :type => :view, dbclean: :after_each  do
+RSpec.describe "_create_benefit_application.html.erb", :type => :view, dbclean: :around_each do
 
   context 'when save_errors exists' do
     before do

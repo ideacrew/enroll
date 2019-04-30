@@ -16,12 +16,15 @@ PATH
       aasm (~> 4.8.0)
       active_model_serializers
       config
+      i18n (= 0.7.0)
+      mini_portile2 (= 2.0.0)
       mongoid (~> 5.4.0)
+      nokogiri (= 1.6.7.2)
       pundit (~> 1.0.1)
       rails (~> 4.2.7.1)
       slim (~> 3.0.9)
       symmetric-encryption (~> 3.6.0)
-      virtus
+      virtus (= 1.0.5)
 
 PATH
   remote: ../notifier
@@ -64,9 +67,12 @@ PATH
       active_model_serializers
       config
       devise (~> 3.5.4)
+      interactor (= 3.1.0)
+      interactor-rails (= 2.0.2)
       language_list (~> 1.1.0)
       money-rails (~> 1.3.0)
       mongoid (~> 5.4.0)
+      mongoid-autoinc
       pundit (~> 1.0.1)
       rails (~> 4.2.7.1)
       roo (~> 2.1.0)
@@ -99,7 +105,7 @@ GEM
       erubis (~> 2.7.0)
       rails-dom-testing (~> 1.0, >= 1.0.5)
       rails-html-sanitizer (~> 1.0, >= 1.0.2)
-    active_model_serializers (0.10.7)
+    active_model_serializers (0.10.8)
       actionpack (>= 4.1, < 6)
       activemodel (>= 4.1, < 6)
       case_transform (>= 0.2)
@@ -128,19 +134,16 @@ GEM
       descendants_tracker (~> 0.0.4)
       ice_nine (~> 0.11.0)
       thread_safe (~> 0.3, >= 0.3.1)
-    bcrypt (3.1.11)
-    binding_of_caller (0.8.0)
-      debug_inspector (>= 0.0.1)
+    bcrypt (3.1.12)
     bson (4.3.0)
     builder (3.2.3)
-    byebug (10.0.2)
-    capybara (2.18.0)
+    capybara (2.6.2)
       addressable
-      mini_mime (>= 0.1.3)
+      mime-types (>= 1.16)
       nokogiri (>= 1.3.3)
       rack (>= 1.0.0)
       rack-test (>= 0.5.4)
-      xpath (>= 2.0, < 4.0)
+      xpath (~> 2.0)
     case_transform (0.2)
       activesupport
     ckeditor (4.2.4)
@@ -149,7 +152,6 @@ GEM
     climate_control (0.2.0)
     cocaine (0.6.0)
       terrapin (= 0.6.0)
-    coderay (1.1.2)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
     coffee-rails (4.2.2)
@@ -171,7 +173,6 @@ GEM
       awesome_print (>= 0.2.1)
       unidecoder (>= 1.1.1)
     database_cleaner (1.6.2)
-    debug_inspector (0.0.3)
     deep_merge (1.2.1)
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
@@ -215,10 +216,10 @@ GEM
     equalizer (0.0.11)
     erubis (2.7.0)
     execjs (2.7.0)
-    factory_girl (4.9.0)
+    factory_girl (4.5.0)
       activesupport (>= 3.0.0)
-    factory_girl_rails (4.9.0)
-      factory_girl (~> 4.9.0)
+    factory_girl_rails (4.6.0)
+      factory_girl (~> 4.5.0)
       railties (>= 3.0.0)
     ffi (1.9.23)
     forgery (0.7.0)
@@ -243,6 +244,10 @@ GEM
     i18n (0.7.0)
     ice_nine (0.11.2)
     inflecto (0.0.2)
+    interactor (3.1.0)
+    interactor-rails (2.0.2)
+      interactor (~> 3.0)
+      rails (>= 3, < 5.1)
     json (1.8.6)
     jsonapi-renderer (0.2.0)
     kaminari (1.1.1)
@@ -263,12 +268,11 @@ GEM
       nokogiri (>= 1.5.9)
     mail (2.7.0)
       mini_mime (>= 0.1.1)
-    method_source (0.9.0)
     mime-types (3.1)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2016.0521)
     mini_mime (1.0.0)
-    mini_portile2 (2.3.0)
+    mini_portile2 (2.0.0)
     minitest (5.11.3)
     monetize (1.1.0)
       money (~> 6.5.0)
@@ -286,6 +290,8 @@ GEM
       mongo (>= 2.5.1, < 3.0.0)
       origin (~> 2.3)
       tzinfo (>= 0.3.37)
+    mongoid-autoinc (5.0.2)
+      mongoid (~> 5.0)
     mongoid-compatibility (0.5.1)
       activesupport
       mongoid (>= 2.0)
@@ -301,26 +307,12 @@ GEM
       rails (>= 4.2.0)
       railties (>= 4.2.0)
     netrc (0.11.0)
-    nokogiri (1.8.2)
-      mini_portile2 (~> 2.3.0)
+    nokogiri (1.6.7.2)
+      mini_portile2 (~> 2.0.0.rc2)
     non-stupid-digest-assets (1.0.9)
       sprockets (>= 2.0)
     origin (2.3.1)
     orm_adapter (0.5.0)
-    pry (0.11.3)
-      coderay (~> 1.1.0)
-      method_source (~> 0.9.0)
-    pry-byebug (3.6.0)
-      byebug (~> 10.0)
-      pry (~> 0.10)
-    pry-rails (0.3.6)
-      pry (>= 0.10.4)
-    pry-remote (0.1.8)
-      pry (~> 0.9)
-      slop (~> 3.0)
-    pry-stack_explorer (0.4.9.2)
-      binding_of_caller (>= 0.7)
-      pry (>= 0.9.11)
     public_suffix (3.0.2)
     pundit (1.0.1)
       activesupport (>= 3.0.0)
@@ -388,7 +380,6 @@ GEM
       rspec-mocks (~> 3.7.0)
       rspec-support (~> 3.7.0)
     rspec-support (3.7.1)
-    ruby-prof (0.17.0)
     ruby-rc4 (0.1.5)
     ruby_parser (3.11.0)
       sexp_processor (~> 4.9)
@@ -413,7 +404,6 @@ GEM
     slim (3.0.9)
       temple (>= 0.7.6, < 0.9)
       tilt (>= 1.3.3, < 2.1)
-    slop (3.6.0)
     sprockets (3.7.1)
       concurrent-ruby (~> 1.0)
       rack (> 1, < 3)
@@ -445,8 +435,8 @@ GEM
       rack (>= 1.0)
     wicked_pdf (1.0.6)
     wkhtmltopdf-binary-edge (0.12.3.0)
-    xpath (3.0.0)
-      nokogiri (~> 1.8)
+    xpath (2.1.0)
+      nokogiri (~> 1.3)
 
 PLATFORMS
   ruby
@@ -454,22 +444,16 @@ PLATFORMS
 DEPENDENCIES
   benefit_markets!
   benefit_sponsors!
-  capybara
+  capybara (= 2.6.2)
   database_cleaner
   effective_datatables!
-  factory_girl_rails (= 4.9.0)
+  factory_girl_rails (= 4.6.0)
   forgery
   mongoid-rspec
   mongoid_rails_migrations
   notifier!
-  pry
-  pry-byebug
-  pry-rails
-  pry-remote
-  pry-stack_explorer
   rails-perftest
   rspec-rails
-  ruby-prof
   shoulda-matchers
   sponsored_benefits!
   test-prof (= 0.5.0)
