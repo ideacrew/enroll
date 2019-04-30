@@ -46,9 +46,6 @@ Rails/Validation:
   Enabled: false
 
 # TODO: RWC
-Rails:
-  Enabled: false
-
 Layout/CommentIndentation:
   Enabled: false
 

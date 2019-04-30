@@ -158,7 +158,7 @@ group :test do
   gem 'test-prof',                    '~> 0.5.0'
   gem 'warden',                       '~> 1.2.7'
   gem 'watir',                        '~> 6.10.3'
-  gem 'webdriver'
+  gem 'webdrivers',                   '3.8.0'
   gem 'webmock',                      '~> 3.0.1'
 end
 
