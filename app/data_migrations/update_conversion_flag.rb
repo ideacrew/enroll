@@ -5,19 +5,19 @@ class UpdateConversionFlag < MongoidMigrationTask
     begin
       feins = ENV['fein'].split(',').map(&:lstrip)
       feins.each do |fein|
-        organization = Organization.where(fein: fein)
-        if organization.size != 1
-          puts "Issues with organization of fein #{fein}" unless Rails.env.test?
-          next
-        end
-        emp = organization.first.employer_profile
-        
-        if ENV['profile_source'] == "self_serve"
-          attestation_doc(emp)
+        benefit_sponsorship = ::BenefitSponsors::Organizations::Organization.where(:fein => fein).first.active_benefit_sponsorship
+        if benefit_sponsorship
+          emp = benefit_sponsorship.profile
+          if ENV['source_kind'] == "self_serve"
+            attestation_doc(emp)
+          else
+            benefit_sponsorship.update_attributes!(source_kind: ENV['source_kind'].to_sym)
+            puts "Conversion flag updated #{ENV['source_kind']} for #{fein}" unless Rails.env.test?
+            attestation_doc(emp)
+          end
         else
-          emp.update_attributes!(profile_source: ENV['profile_source'])
-          puts "Conversion flag updated #{ENV['profile_source']} for #{fein}" unless Rails.env.test?
-          attestation_doc(emp)
+          puts "Issues with benefit_sponsorship of fein #{fein}" unless Rails.env.test?
+          next
         end
       end
     rescue Exception => e
