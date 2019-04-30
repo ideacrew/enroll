@@ -25,7 +25,7 @@ module UIHelpers
         @id = attributes['id']
         @prompt = attributes['prompt']
         @support_text_key = attributes['support_text_key']
-        @class_names = attributes['classNames']
+        @class_names = attributes['classNames'] ? attributes['classNames'] : ''
       end
 
       def name_attribute(field=nil)
