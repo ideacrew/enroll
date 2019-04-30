@@ -14,6 +14,8 @@
   %had_prior_insurance= applicant.had_prior_insurance?
 %has_state_health_benefit= applicant.has_state_health_benefit?
 %is_medicare_eligible= applicant.is_medicare_eligible
+- unless applicant.is_physically_disabled.nil?
+  %is_physically_disabled= applicant.is_physically_disabled
 - unless applicant.is_student.nil?
   %is_student= applicant.is_student
 - unless applicant.student_kind.blank?

@@ -24,6 +24,7 @@
 			<xs:element name="had_prior_insurance" type="xs:boolean" minOccurs="0"/>
 			<xs:element name="has_state_health_benefit" type="xs:boolean" minOccurs="0"/>
 			<xs:element name="is_medicare_eligible" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="is_physically_disabled" type="xs:boolean" minOccurs="0"/>
 			<xs:element name="is_student" type="xs:boolean" minOccurs="0"/>
 			<xs:element name="student_type" type="FinancialAssistanceApplicationStudentNameType" minOccurs="0"/>
 			<xs:element name="school_type" type="FinancialAssistanceApplicationSchoolNameType" minOccurs="0"/>
