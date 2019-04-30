@@ -1,4 +1,3 @@
-
 module Effective
   module Datatables
     class FamilyDataTable < Effective::MongoidDatatable
@@ -39,7 +38,48 @@ module Effective
       end
 
       scopes do
-         scope :legal_name, "Hello"
+        scope :market_type, 'Market Type',
+        filter: {
+          as: 'select',
+          label: false,
+          collection: [
+            ['All Market Types', 'all_with_hbx_enrollments'],
+            ['SHOP', 'by_enrollment_shop_market'],
+            ['IVL', 'by_enrollment_individual_market'],
+            ['COBRA', 'by_enrollment_cobra']
+          ],
+          input_html: { class: 'form-control' }
+        }
+        scope :coverage_type, 'Coverage Type',
+        filter: {
+          as: 'select',
+          label: false,
+          collection: [
+            ['All Coverage Types', 'by_enrollment_health_dental'],
+            ['Medical', 'by_enrollment_health'],
+            ['Dental', 'by_enrollment_dental']
+          ],
+          input_html: { class: 'form-control' }
+        }
+        scope :plan_year, 'Plan Years',
+        filter: {
+          as: 'select',
+          label: false,
+          collection: ((TimeKeeper.date_of_record - 3.years).year..(TimeKeeper.date_of_record.year)).to_a.map { |year| [year.to_s, year.to_s] }.insert(0, ['All Plan Years', nil]),
+          input_html: { class: 'form-control' },
+        }
+        scope :is_active, 'Active State',
+        filter: {
+          as: 'select',
+          label: false,
+          collection: [
+            ['All Active/Inactive', 'by_enrollment_active_inactive'],
+            ['Active', 'by_enrollment_active'],
+            ['Inactive', 'by_enrollment_inactive'],
+            ['Terminated', 'by_enrollment_terminated']
+          ],
+          input_html: { class: 'form-control' }
+        }
       end
 
       def collection
@@ -77,32 +117,6 @@ module Effective
 
       def new_eligibility_family_member_link_type(row, allow)
         allow && row.primary_applicant.person.has_active_consumer_role? ? 'ajax' : 'disabled'
-      end
-
-
-      def nested_filter_definition
-        {
-        employer_options: [
-          {scope: 'all', label: 'All'},
-          {scope: 'enrolled', label: 'Enrolled'},
-          {scope: 'by_enrollment_renewing', label: 'Renewing'},
-          {scope: 'waived', label: 'Waived'},
-          {scope: 'sep_eligible', label: 'SEP Eligible'}
-        ],
-        individual_options: [
-          {scope: 'all', label: 'All'},
-          {scope: 'all_assistance_receiving', label: 'Assisted'},
-          {scope: 'all_unassisted', label: 'Unassisted'},
-          {scope: 'sep_eligible', label: 'SEP Eligible'}
-        ],
-        families: [
-          {scope: 'all', label: 'All'},
-          {scope: 'by_enrollment_individual_market', label: 'Individual Enrolled', subfilter: :individual_options},
-          {scope: 'by_enrollment_shop_market', label: 'Employer Sponsored Coverage Enrolled', subfilter: :employer_options},
-          {scope: 'non_enrolled', label: 'Non Enrolled'},
-        ],
-        top_scope: :families
-        }
       end
     end
   end

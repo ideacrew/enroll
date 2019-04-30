@@ -199,13 +199,22 @@ class Family
   scope :all_enrolled_and_enrolling_enrollments,->{  where(:"households.hbx_enrollments.aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES))}
   scope :all_enrollments_by_writing_agent_id,   ->(broker_id){ where(:"households.hbx_enrollments.writing_agent_id" => broker_id) }
   scope :all_enrollments_by_benefit_group_id,   ->(benefit_group_id){where(:"households.hbx_enrollments.benefit_group_id" => benefit_group_id) }
+  scope :by_enrollment_active,                  ->{ where(:"households.hbx_enrollments.is_active" == true) }
+  scope :by_enrollment_active_inactive,         ->{ where(:"households.hbx_enrollments.is_active".in => [true, false]) }
+  scope :by_enrollment_inactive,                ->{ where(:"households.hbx_enrollments.is_active" == false) }
+  scope :by_enrollment_cobra,                   ->{ where(:"households.hbx_enrollments.aasm_state".in => ['coverage_terminated', 'coverage_termination_pending', 'auto_renewing']) }
   scope :by_enrollment_individual_market,       ->{ where(:"households.hbx_enrollments.kind".in => ["individual", "unassisted_qhp", "insurance_assisted_qhp", "streamlined_medicaid", "emergency_medicaid", "hcr_chip"]) }
   scope :by_enrollment_shop_market,             ->{ where(:"households.hbx_enrollments.kind".in => ["employer_sponsored", "employer_sponsored_cobra"]) }
   scope :by_enrollment_renewing,                ->{ where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::RENEWAL_STATUSES) }
   scope :by_enrollment_created_datetime_range,  ->(start_at, end_at){ where(:"households.hbx_enrollments.created_at" => { "$gte" => start_at, "$lte" => end_at} )}
   scope :by_enrollment_updated_datetime_range,  ->(start_at, end_at){ where(:"households.hbx_enrollments.updated_at" => { "$gte" => start_at, "$lte" => end_at} )}
   scope :by_enrollment_effective_date_range,    ->(start_on, end_on){ where(:"households.hbx_enrollments.effective_on" => { "$gte" => start_on, "$lte" => end_on} )}
-  scope :non_enrolled,                          ->{ where(:"households.hbx_enrollments.aasm_state".nin => HbxEnrollment::ENROLLED_STATUSES) }
+  scope :by_enrollment_canceled,                ->{ where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::CANCELED_STATUSES) }
+  scope :by_enrollment_terminated,              ->{ where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::TERMINATED_STATUSES) }
+  scope :by_enrollment_health,                  ->{ where(:"households.hbx_enrollments.coverage_kind" == 'health') }       
+  scope :by_enrollment_dental,                  ->{ where(:"households.hbx_enrollments.coverage_kind" == 'dental') }   
+  scope :by_enrollment_health_dental,           ->{ where(:"households.hbx_enrollments.coverage_kind".in == HbxEnrollment::COVERAGE_KINDS) }  
+  scope :non_enrolled,                          ->{ where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::ENROLLED_STATUSES) }
   scope :sep_eligible,                          ->{ where(:"active_seps.count".gt => 0) }
   scope :coverage_waived,                       ->{ where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::WAIVED_STATUSES) }
   scope :having_unverified_enrollment,          ->{ by_enrollment_individual_market.all_enrollments.where(:"households.hbx_enrollments.is_any_enrollment_member_outstanding" => true)}

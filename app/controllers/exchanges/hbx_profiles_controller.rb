@@ -226,7 +226,6 @@ def employer_poc
   def family_index_dt
     @selector = params[:scopes][:selector] if params[:scopes].present?
     @datatable = Effective::Datatables::FamilyDataTable.new(params[:scopes])
-    #render '/exchanges/hbx_profiles/family_index_datatable'
   end
   
   def identity_verification

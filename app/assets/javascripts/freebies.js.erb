@@ -65,7 +65,8 @@ var Freebies = ( function( window, undefined ) {
 
 	function selectric() {
 		if (!disableSelectric) {
-			$("select[multiple!='multiple']").not('[name*="dataTable_length"]').selectric();
+			// Need to get this working to not show anything with "scopes" in beginning of name
+			$("select[multiple!='multiple']").not('[name*="dataTable_length"]').not("[name^='scopes']").selectric();
 		}
 	}
 
