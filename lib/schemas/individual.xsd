@@ -1306,6 +1306,7 @@
 					<xs:documentation>Person is resident of HBX state</xs:documentation>
 				</xs:annotation>
 			</xs:element>
+			<xs:element name="qualified_non_citizen_code" type="xs:string" minOccurs="0"/>
 			<xs:group ref="OptionalResourceTimestampGroup"/>
 		</xs:sequence>
 	</xs:complexType>
