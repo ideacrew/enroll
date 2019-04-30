@@ -13,7 +13,10 @@ class GeneralAgencyStaffRole
 
   associated_with_one :general_agency_profile, :benefit_sponsors_general_agency_profile_id, "::BenefitSponsors::Organizations::GeneralAgencyProfile"
 
-  validates_presence_of :benefit_sponsors_general_agency_profile_id, :npn
+  validates_presence_of :npn
+  validates_presence_of :benefit_sponsors_general_agency_profile_id, :if => Proc.new { |m| m.general_agency_profile_id.blank? }
+  validates_presence_of :general_agency_profile_id, :if => Proc.new { |m| m.benefit_sponsors_general_agency_profile_id.blank? }
+
   accepts_nested_attributes_for :person, :workflow_state_transitions
   validates :npn,
     numericality: {only_integer: true},
