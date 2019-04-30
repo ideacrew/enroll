@@ -11,5 +11,6 @@ class CurrentStatementActivity
   field :amount, type: Money
   field :coverage_month, type: Date
   field :payment_method, type: String
+  field :is_passive_renewal, type: Boolean, default: false
 
 end
