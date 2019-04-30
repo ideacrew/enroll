@@ -10,7 +10,7 @@
                     classNames: 'small-padding-top-bottom'
                     text: "To make it easier to determine my eligibility for help paying for coverage in future years, I agree to allow DC Health Link to use my income data, including information from tax returns, for the next five years.DC Health Link will send me a notice, let me make any changes, and I can opt out at any time. *<br>"
             - cells:
-                  - gutter: 2
+                  - gutter: 3
                     type: label_radio
                     label: I Agree
                     id: 'agree'
@@ -20,11 +20,11 @@
                     name: is_renewal_authorized
                     attribute: is_renewal_authorized
                     id: 'eligibility_easier_yes'
-                  - gutter: 2
+                  - gutter: 3
                     type: label_radio
                     id: 'disagree'
                     classNames: 'span-text'
-                    label: I disagree
+                    label: I Disagree
                     value: false
                     model: application
                     name: is_renewal_authorized
