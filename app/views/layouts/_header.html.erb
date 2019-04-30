@@ -30,13 +30,51 @@
         <ul class="nav navbar-nav">
   <% if current_user && current_user.try(:person).try(:is_native?)%>
          <li><h4 class="no-buffer"><a class='portal'>Sovereign Nations Portal</a></h4></a></li>
+
+        </ul>
+
+        <ul class="nav navbar-nav  navbar-right">
+
+          <li><a class="call-customer-service" id ='native-text' href="tel:<%= Settings.contact_center.phone_number %>">
+            <span class="header-text"id ='native-text'>
+              <%= l10n(".call_customer_service") %>
+            </span>
+            <br/>
+            <span>
+              <i class="fa fa-phone fa-lg"id ='native-text'></i>
+              <strong>
+                <%= Settings.contact_center.phone_number %>
+              </strong>
+            </span>
+          </a>
+          </li>
+                    <% if signed_in? %>
+            <li>
+              <span class="my-portal-links">
+                <%= render partial: "shared/my_portal_links"%>
+                <span>
+                  <a href="https://dchealthlink.com/help" target="_blank" class="header-text" id='native-text'>Help</a>
+                </span>
+                <span> | </span>
+                <span>
+                  <%= link_to "Logout", main_app.destroy_user_session_path, method: "delete", class: "header-text", id:'native-text' %>
+                </span>
+                <br/>
+                <strong class="users-name"><%= user_first_name_last_name_and_suffix %></strong>
+                <% unless current_user.try(:person).try(:hbx_id).nil? %>
+                  &nbsp;
+                  <span><%= l10n(".my_id") %>: <%= truncate(current_user.try(:person).try(:hbx_id).upcase, length: 8, omission: '') %></span>
+                <% end %>
+              </span>
+            </li>
+          <% end %>
       <%else%>
-        <li><h4 class="no-buffer"><%= get_header_text(controller_name) %></h4></a></li>
-      <%end%>
+        <li><h4 class="no-buffer"id ='native-text'><%= get_header_text(controller_name) %></h4></a></li>
 
         </ul>
 
         <ul class="nav navbar-nav navbar-right">
+
           <li><a class="call-customer-service" href="tel:<%= Settings.contact_center.phone_number %>">
             <span class="header-text">
               <%= l10n(".call_customer_service") %>
@@ -70,6 +108,8 @@
               </span>
             </li>
           <% end %>
+      <%end%>
+
         </ul>
       </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->

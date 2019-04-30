@@ -8,7 +8,7 @@
                   - gutter: 12
                     type: raw_html
                     classNames: 'small-padding-top-bottom'
-                    text: "To make it easier to determine my eligibility for help paying for coverage in future years, I agree to allow DC Health Link to use my income data, including information from tax returns, for the next five years.DC Health Link will send me a notice, let me make any changes, and I can opt out at any time. *<br>"
+                    text: "To make it easier to determine my eligibility for help paying for coverage in future years, I agree to allow  NM HIX to use my income data, including information from tax returns, for the next five years. NM HIX will send me a notice, let me make any changes, and I can opt out at any time. *<br>"
             - cells:
                   - gutter: 2
                     type: label_radio
@@ -34,7 +34,7 @@
                   - gutter: 12
                     type: raw_html
                     classNames: 'small-padding-top-bottom'
-                    text: "When it’s time to renew or change coverage, I authorize DC Health Link to automatically check my federal income tax returns for the sole purpose of redetermining my eligibility."
+                    text: "When it’s time to renew or change coverage, I authorize  NM HIX to automatically check my federal income tax returns for the sole purpose of redetermining my eligibility."
             - cells:
                   - gutter: 12
                     type: raw_html
@@ -82,7 +82,7 @@
                     attribute: years_to_renew
                   - gutter: 12
                     type: label_radio
-                    label: "None. I understand that this means I won't get cost savings in future years unless I change my mind and tell DC Health Link"
+                    label: "None. I understand that this means I won't get cost savings in future years unless I change my mind and tell  NM HIX"
                     value: 0
                     classNames: 'span-text'
                     model: application
@@ -96,7 +96,7 @@
                   - gutter: 8
                     type: raw_html
                     classNames: 'small-padding-top-bottom'
-                    text: "Would you like to register to vote in DC or update your current registration? * (a form will be mailed to you)"
+                    text: "Would you like to register to vote in  NM or update your current registration? * (a form will be mailed to you)"
                   - gutter: 2
                     type: label_radio
                     id: 'mailed_yes'
@@ -130,7 +130,7 @@
                     D.C. Board of Elections<br>
                     441 4th Street, N.W.<br>
                     Suite 250-North<br>
-                    Washington, DC 20001<br>
+                    Washington,  NM 20001<br>
                     Phone: (202) 727-2525 <br>"
 - step:
     heading: Submit Your Application
@@ -142,7 +142,7 @@
                   - gutter: 12
                     type: raw_html
                     classNames: 'small-padding-top-bottom'
-                    text: <b> I understand that eligibility for Medicaid or private health insurance with or without financial assistance will be reviewed every year. </b> <br><br> This process is called renewal. DC Health Link will review eligibility by checking its records and other electronic data sources including with my consent information about my federal tax returns from the IRS. DC Health Link will send me a notice that includes the information it has found by checking its records and other electronic data sources and I will be able to correct information that is wrong.I may also be asked to provide additional information if found eligible Medicaid or private health insurance coverage with or without financial assistance will be extended for another year for myself and/or members of my application group child support veterans payments or supplemental security income(SSI).
+                    text: <b> I understand that eligibility for Medicaid or private health insurance with or without financial assistance will be reviewed every year. </b> <br><br> This process is called renewal.  NM HIX will review eligibility by checking its records and other electronic data sources including with my consent information about my federal tax returns from the IRS.  NM HIX will send me a notice that includes the information it has found by checking its records and other electronic data sources and I will be able to correct information that is wrong.I may also be asked to provide additional information if found eligible Medicaid or private health insurance coverage with or without financial assistance will be extended for another year for myself and/or members of my application group child support veterans payments or supplemental security income(SSI).
             - cells:
                   - gutter: 12
                     type: checkbox
@@ -160,7 +160,7 @@
                   type: raw_html
                   classNames: span-text
                   text: <b> I understand that I must report any changes that might affect my eligibility or the eligibility of a household member for health insurance. </b> <br> <br>
-                        "I can report changes by going online and logging into 'My Account', by calling DC Health Link's Customer Care Center toll-free at 1-855-532-5465,
+                        "I can report changes by going online and logging into 'My Account', by calling  NM HIX's Customer Care Center toll-free at 1-855-532-5465,
                         or by submitting information via mail or in-person at one of the Department of Human Services' Service Centers. <br> <br>
 
                         I'm the person whose name appears in the signaature line below. I understand that I'm submitting an application for health insurance and that
