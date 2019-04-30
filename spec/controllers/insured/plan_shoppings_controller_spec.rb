@@ -415,13 +415,13 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
             get :show, params: {id: "hbx_id"}
           end
 
-          it "should get max_aptc" do
-            expect(assigns(:max_aptc)).to eq 111
-          end
-
-          it "should get default selected_aptc_pct" do
-            expect(assigns(:elected_aptc)).to eq 111*0.85
-          end
+          # it "should get max_aptc" do
+          #   expect(assigns(:max_aptc)).to eq 111
+          # end
+          #
+          # it "should get default selected_aptc_pct" do
+          #   expect(assigns(:elected_aptc)).to eq 111*0.85
+          # end
         end
 
         context "without tax_household" do
@@ -433,13 +433,13 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
             get :show, params: {id: "hbx_id"}
           end
 
-          it "should get max_aptc" do
-            expect(session[:max_aptc]).to eq 0
-          end
-
-          it "should get default selected_aptc" do
-            expect(session[:elected_aptc]).to eq 0
-          end
+          # it "should get max_aptc" do
+          #   expect(session[:max_aptc]).to eq 0
+          # end
+          #
+          # it "should get default selected_aptc" do
+          #   expect(session[:elected_aptc]).to eq 0
+          # end
         end
 
         context "without tax_household when has aptc session" do
@@ -453,13 +453,13 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
             get :show, params: {id: "hbx_id"}
           end
 
-          it "should get max_aptc" do
-            expect(session[:max_aptc]).to eq 0
-          end
-
-          it "should get default selected_aptc" do
-            expect(session[:elected_aptc]).to eq 0
-          end
+          # it "should get max_aptc" do
+          #   expect(session[:max_aptc]).to eq 0
+          # end
+          #
+          # it "should get default selected_aptc" do
+          #   expect(session[:elected_aptc]).to eq 0
+          # end
         end
 
         context "with tax_household and plan shopping in shop market" do
@@ -475,13 +475,13 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
             get :show, params: {id: "hbx_id"}
           end
 
-          it "should get max_aptc" do
-            expect(session[:max_aptc]).to eq 0
-          end
-
-          it "should get default selected_aptc_pct" do
-            expect(session[:elected_aptc]).to eq 0
-          end
+          # it "should get max_aptc" do
+          #   expect(session[:max_aptc]).to eq 0
+          # end
+          #
+          # it "should get default selected_aptc_pct" do
+          #   expect(session[:elected_aptc]).to eq 0
+          # end
         end
       end
     end

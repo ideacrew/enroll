@@ -11,7 +11,7 @@ describe Subscribers::FamilyApplicationCompleted do
     end.id.split('#').last
   end.select do |th|
     th.id == th.primary_applicant_id && th.primary_applicant_id == parser.primary_family_member_id.split('#').last
-  end.first.eligibility_determinations.max_by(&:determination_date).maximum_aptc }
+  end.first.eligibility_determinations.max_by(&:determination_date).maximum_aptc.to_f.round(1) }
 
   it "should subscribe to the correct event" do
     expect(Subscribers::FamilyApplicationCompleted.subscription_details).to eq ["acapi.info.events.family.application_completed"]
@@ -72,9 +72,9 @@ describe Subscribers::FamilyApplicationCompleted do
             expect(tax_household_db).to be_truthy
             expect(tax_household_db).to eq person.primary_family.active_household.latest_active_tax_household
             expect(tax_household_db.primary_applicant.family_member.person).to eq person
-            expect(tax_household_db.allocated_aptc).to eq 0
+            expect(tax_household_db.allocated_aptc.to_f).to eq 0
             expect(tax_household_db.is_eligibility_determined).to be_truthy
-            expect(tax_household_db.current_max_aptc).to eq max_aptc
+            expect(tax_household_db.current_max_aptc.to_f).to eq max_aptc
           end
         end
 
@@ -107,9 +107,9 @@ describe Subscribers::FamilyApplicationCompleted do
           if tax_household_db
             expect(tax_household_db).to be_truthy
             expect(tax_household_db.primary_applicant.family_member.person).to eq person
-            expect(tax_household_db.allocated_aptc).to eq 0
+            expect(tax_household_db.allocated_aptc.to_f).to eq 0
             expect(tax_household_db.is_eligibility_determined).to be_truthy
-            expect(tax_household_db.current_max_aptc).to eq max_aptc
+            expect(tax_household_db.current_max_aptc.to_f).to eq max_aptc
             expect(tax_household_db.effective_ending_on).to be_truthy
           end
         end
@@ -119,9 +119,9 @@ describe Subscribers::FamilyApplicationCompleted do
             updated_tax_household = tax_household_db.household.latest_active_tax_household
             expect(updated_tax_household).to be_truthy
             expect(updated_tax_household.primary_applicant.family_member.person).to eq person
-            expect(updated_tax_household.allocated_aptc).to eq 0
+            expect(updated_tax_household.allocated_aptc.to_f).to eq 0
             expect(updated_tax_household.is_eligibility_determined).to be_truthy
-            expect(updated_tax_household.current_max_aptc).to eq max_aptc
+            expect(updated_tax_household.current_max_aptc.to_f).to eq max_aptc
             expect(updated_tax_household.effective_ending_on).not_to be_truthy
           end
         end
