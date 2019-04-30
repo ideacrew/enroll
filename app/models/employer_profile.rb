@@ -947,7 +947,7 @@ class EmployerProfile
 
       org_collection.where(:"employer_profile.plan_years" => {
                            :$elemMatch => {:start_on => start_on, :aasm_state.in => ['enrolled', 'active']}},
-                           :"employer_profile.aasm_state".in => ['binder_paid', 'active'],
+                           :"employer_profile.aasm_state".in => ['binder_paid', 'enrolled'],
                            :"employer_profile.workflow_state_transitions" =>
                               {:$elemMatch => {"to_state" => 'binder_paid', "transition_at" => {
                                   "$gte" => TimeKeeper.start_of_exchange_day_from_utc(transition_at),
