@@ -142,7 +142,7 @@ describe "#find_vlp_document_by_key" do
 end
 
 describe "#move_identity_documents_to_outstanding" do
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+  let(:person) { FactoryBot.create(:person, :with_consumer_role)}
 
   context "move to outstanding if initial state is unverified" do
 
@@ -272,21 +272,21 @@ context "Verification process and notices" do
     end
     context "ridp exist but document is NOT uploaded" do
       it "returns false for ridp doc without uploaded copy" do
-        person.consumer_role.ridp_documents << FactoryGirl.build(:ridp_document, :identifier => nil )
+        person.consumer_role.ridp_documents << FactoryBot.build(:ridp_document, :identifier => nil )
         expect(person.consumer_role.has_ridp_docs_for_type?("Identity")).to be_falsey
       end
       it "returns false for Identity type" do
-        person.consumer_role.ridp_documents << FactoryGirl.build(:ridp_document, :identifier => nil, :ridp_verification_type  => "Identity")
+        person.consumer_role.ridp_documents << FactoryBot.build(:ridp_document, :identifier => nil, :ridp_verification_type  => "Identity")
         expect(person.consumer_role.has_ridp_docs_for_type?("Identity")).to be_falsey
       end
     end
     context "ridp with uploaded copy" do
       it "returns true if person has uploaded documents for this type" do
-        person.consumer_role.ridp_documents << FactoryGirl.build(:ridp_document, :identifier => "identifier", :ridp_verification_type  => "Identity")
+        person.consumer_role.ridp_documents << FactoryBot.build(:ridp_document, :identifier => "identifier", :ridp_verification_type  => "Identity")
         expect(person.consumer_role.has_ridp_docs_for_type?("Identity")).to be_truthy
       end
       it "returns false if person has NO documents for this type" do
-        person.consumer_role.ridp_documents << FactoryGirl.build(:ridp_document, :identifier => "identifier", :ridp_verification_type  => "Identity")
+        person.consumer_role.ridp_documents << FactoryBot.build(:ridp_document, :identifier => "identifier", :ridp_verification_type  => "Identity")
         expect(person.consumer_role.has_ridp_docs_for_type?("Identity")).to be_truthy
       end
     end
