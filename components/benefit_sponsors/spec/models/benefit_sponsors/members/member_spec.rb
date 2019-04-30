@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module BenefitSponsors
-  RSpec.describe Members::Member, type: :model do
+  RSpec.describe Members::Member, type: :model, :dbclean => :after_each do
 
     let(:employee_member) { described_class.new }
 

@@ -37,8 +37,8 @@ module Notifier
         enr = fetch_enrollment(enrollment["_id"])
         enrollment_model = Notifier::MergeDataModels::Enrollment.new
         enrollment_model.plan_name = enr.product.title
-        enrollment_model.employee_responsible_amount = enr.total_employer_contribution
-        enrollment_model.employer_responsible_amount = enr.total_employee_cost
+        enrollment_model.employer_responsible_amount = enr.total_employer_contribution
+        enrollment_model.employee_responsible_amount = enr.total_employee_cost
         enrollment_model.premium_amount = enr.total_premium
 
         employee = enr.subscriber.person

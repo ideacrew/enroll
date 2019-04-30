@@ -26,7 +26,7 @@ module BenefitSponsors
             case @tab
             when 'benefits'
               @benefit_sponsorship = @employer_profile.organization.active_benefit_sponsorship
-              @benefit_applications = @employer_profile.benefit_applications.desc(:"start_on").asc(:predecessor_id)
+              @benefit_applications = @employer_profile.benefit_applications.non_imported.desc(:"start_on").asc(:predecessor_id)
             when 'documents'
               @datatable = ::Effective::Datatables::BenefitSponsorsEmployerDocumentsDataTable.new({employer_profile_id: @employer_profile.id})
               load_documents
@@ -135,7 +135,7 @@ module BenefitSponsors
 
           data_table_params.merge!({
             renewal: true
-          }) if @employer_profile.renewing_published_benefit_application.present?
+          }) if @employer_profile.renewal_benefit_application.present?
 
           data_table_params
         end

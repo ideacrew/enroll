@@ -6,8 +6,6 @@ module Importers
     include ActiveModel::Model
 
     HIRE_COVERAGE_POLICIES = {
-#     "date of hire" => NewHireCoveragePolicy.new("date_of_hire", 0),
-#     "date of hire equal to effective date" => NewHireCoveragePolicy.new("date_of_hire", 0),
       "first of the month following 30 days" => NewHireCoveragePolicy.new("first_of_month", 30),
       "first of the month following 60 days" => NewHireCoveragePolicy.new("first_of_month", 60),
       "first of the month following date of hire" => NewHireCoveragePolicy.new("first_of_month", 0),

@@ -3,6 +3,8 @@ FactoryGirl.define do
 
     employer_attestation  { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
     sic_code              "001"
+    referred_by           "Other"
+    referred_reason       "Other Reason"
 
     transient do
       site nil
@@ -25,7 +27,7 @@ FactoryGirl.define do
         if evaluator.site
           site = evaluator.site
         else
-          site = create(:benefit_sponsors_site, :as_hbx_profile, :with_benefit_market, :cca)
+          site = BenefitSponsors::Site.by_site_key(:cca).first || create(:benefit_sponsors_site, :as_hbx_profile, :with_benefit_market, :cca)
         end
         profile.organization = build(:benefit_sponsors_organizations_general_organization, site: site)
       end

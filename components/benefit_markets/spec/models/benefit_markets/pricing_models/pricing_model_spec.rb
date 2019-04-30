@@ -45,5 +45,22 @@ module BenefitMarkets
         expect(subject.pricing_calculator.kind_of?(::BenefitMarkets::PricingModelsMocks::MockPriceCalculator)).to be_truthy
       end
     end
+
+    describe ".map_relationship_for" do
+      let(:pricing_model) { FactoryGirl.build :benefit_markets_pricing_models_pricing_model }
+
+      it "should return nil" do
+        expect(pricing_model.map_relationship_for("child_over_26", 27, false)).to be_nil
+      end
+
+      it "should return matched member relationship" do
+        expect(pricing_model.map_relationship_for("child", 16, false)).to eq :dependent
+      end
+
+    end
+
+
+
+
   end
 end

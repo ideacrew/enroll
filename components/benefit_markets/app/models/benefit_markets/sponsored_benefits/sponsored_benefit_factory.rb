@@ -26,9 +26,6 @@ module BenefitMarkets
 
       private
 
-
-
-
       def sponsored_benefit_class_name_for(product_kind)
         "#{product_kind}_sponsored_benefit"
       end

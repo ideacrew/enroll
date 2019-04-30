@@ -3,6 +3,8 @@ require 'rake'
 require 'stringio'
 
 describe 'terminating employer active plan year & enrollments', :dbclean => :around_each do
+  skip do "Rake task depricated, & rake task & spec moved to new model"
+
   describe 'migrations:terminate_employer_account' do
 
     let(:benefit_group) { FactoryGirl.create(:benefit_group)}
@@ -51,5 +53,6 @@ describe 'terminating employer active plan year & enrollments', :dbclean => :aro
       expect(active_plan_year.aasm_state).to eq "published"
     end
 
+  end
   end
 end

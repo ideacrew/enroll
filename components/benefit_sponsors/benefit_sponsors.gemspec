@@ -31,6 +31,9 @@ Gem::Specification.new do |s|
   s.add_dependency 'active_model_serializers'
   s.add_dependency 'devise', '~> 3.5.4'
   s.add_dependency 'language_list', '~> 1.1.0'
+  s.add_dependency 'mongoid-autoinc'
+  s.add_dependency 'interactor', '3.1.0'
+  s.add_dependency 'interactor-rails', '2.0.2'
 
   s.test_files = Dir["spec/**/*"]
 
@@ -38,16 +41,10 @@ Gem::Specification.new do |s|
   s.add_development_dependency "mongoid-rspec"
   s.add_development_dependency 'shoulda-matchers'
   s.add_development_dependency 'database_cleaner'
-  s.add_development_dependency 'capybara'
-  s.add_development_dependency 'factory_girl_rails', '4.9.0'
+  s.add_development_dependency 'capybara', '2.6.2'
+  s.add_development_dependency 'factory_girl_rails', '4.6.0'
   s.add_development_dependency 'test-prof', '0.5.0'
-  s.add_development_dependency 'pry'
-  s.add_development_dependency 'pry-rails'
-  s.add_development_dependency 'pry-stack_explorer'
-  s.add_development_dependency 'pry-byebug'
-  s.add_development_dependency 'pry-remote'
   s.add_development_dependency 'forgery'
   s.add_development_dependency 'mongoid_rails_migrations'
   s.add_development_dependency 'rails-perftest'
-  s.add_development_dependency 'ruby-prof'
 end

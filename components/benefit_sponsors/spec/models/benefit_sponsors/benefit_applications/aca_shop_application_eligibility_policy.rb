@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module BenefitSponsors
-  RSpec.describe BenefitApplications::AcaShopApplicationEligibilityPolicy, type: :model do
+  RSpec.describe BenefitApplications::AcaShopApplicationEligibilityPolicy, type: :model, :dbclean => :after_each do
 
     let!(:subject) { BenefitApplications::AcaShopApplicationEligibilityPolicy.new }
 

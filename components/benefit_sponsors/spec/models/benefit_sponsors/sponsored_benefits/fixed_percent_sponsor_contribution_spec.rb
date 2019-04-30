@@ -1,7 +1,7 @@
 require "rails_helper"
 
 module BenefitSponsors
-  RSpec.describe BenefitSponsors::SponsoredBenefits::FixedPercentSponsorContribution do
+  RSpec.describe BenefitSponsors::SponsoredBenefits::FixedPercentSponsorContribution, :dbclean => :after_each do
     describe "given a contribution level with no contribution factor" do
       let(:contribution_level) {
         {

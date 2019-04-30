@@ -17,7 +17,7 @@ namespace :employers do
 
     def published_on(application)
       return nil if application.blank? || application.workflow_state_transitions.blank?
-      application.workflow_state_transitions.where(:event => "approve_application").first.try(:transition_at)
+      application.workflow_state_transitions.where(:"event".in => ["approve_application", "approve_application!", "publish", "force_publish", "publish!", "force_publish!"]).first.try(:transition_at)
     end
 
     def import_to_csv(csv, profile, package=nil)
@@ -40,7 +40,7 @@ namespace :employers do
         else
           employee_cl = health_contribution_levels.where(display_name: /Employee Only/i).first
           spouse_cl = domestic_partner_cl = child_under_26_cl = health_contribution_levels.where(display_name: /Family/i).first
-        end        
+        end
 
         benefit_sponsorship = application.benefit_sponsorship
         broker_account = benefit_sponsorship.broker_agency_accounts.first
@@ -51,7 +51,7 @@ namespace :employers do
       broker_account ||= benefit_sponsorship.broker_agency_accounts.first
       broker_role ||= broker_account.broker_agency_profile.primary_broker_role if broker_account.present?
 
-      staff_role = profile.staff_roles.first
+      staff_role = profile.staff_roles.detect {|person| person.user.present? }
 
       csv << [
         profile.legal_name,
@@ -61,6 +61,8 @@ namespace :employers do
         profile.entity_kind,
         profile.sic_code,
         profile.profile_source,
+        profile.referred_by,
+        profile.referred_reason,
         benefit_sponsorship.aasm_state,
         "", # GA related TODO for DC
         "", # GA related TODO for DC
@@ -92,7 +94,7 @@ namespace :employers do
         0, # child_over_26_cl.contribution_pct
         package.try(:title),
         package.try(:plan_option_kind),
-        reference_product.try(:issuer_profile_id),
+        reference_product.try(:issuer_profile).try(:abbrev),
         reference_product.try(:metal_level),
         single_product?(package),
         reference_product.try(:title),
@@ -110,14 +112,14 @@ namespace :employers do
         broker_role.try(:broker_agency_profile).try(:npn),
         broker_account.try(:broker_agency_profile).try(:legal_name),
         broker_role.try(:person).try(:full_name),
-        broker_role.try(:npn), 
+        broker_role.try(:npn),
         broker_account.try(:start_on)
       ]
     end
 
     CSV.open(file_name, "w") do |csv|
 
-      headers = %w(employer.legal_name employer.dba employer.fein employer.hbx_id employer.entity_kind employer.sic_code employer_profile.profile_source employer.status ga_fein ga_agency_name ga_start_on
+      headers = %w(employer.legal_name employer.dba employer.fein employer.hbx_id employer.entity_kind employer.sic_code employer_profile.profile_source employer.referred_by employer.referred_reason employer.status ga_fein ga_agency_name ga_start_on
                                 office_location.is_primary office_location.address.address_1 office_location.address.address_2
                                 office_location.address.city office_location.address.state office_location.address.zip mailing_location.address_1 mailing_location.address_2 mailing_location.city mailing_location.state mailing_location.zip
                                 office_location.phone.full_phone_number staff.name staff.phone staff.email
@@ -132,7 +134,7 @@ namespace :employers do
 
       puts "No general agency profile for CCA Employers" unless general_agency_enabled?
 
-      organizations.no_timeout.each do |organization| 
+      organizations.no_timeout.each do |organization|
         begin
           profile = organization.employer_profile
 

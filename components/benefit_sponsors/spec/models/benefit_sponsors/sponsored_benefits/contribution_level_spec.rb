@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module BenefitSponsors
-  RSpec.describe ::BenefitSponsors::SponsoredBenefits::ContributionLevel do
+  RSpec.describe ::BenefitSponsors::SponsoredBenefits::ContributionLevel, :dbclean => :after_each do
     describe "given nothing" do
       it "requires a display name" do
         subject.valid?

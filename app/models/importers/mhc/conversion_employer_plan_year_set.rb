@@ -1,7 +1,7 @@
 module Importers::Mhc
   class ConversionEmployerPlanYearSet
     def headers
-     [
+      common_headers = [
         "Action",
         "FEIN",
         "Doing Business As",
@@ -40,25 +40,49 @@ module Importers::Mhc
         "Carrier Selected",
         "Plan Selection Category",
         "Plan Name",
-        "Plan HIOS Id",
-        "Employee Only Rating Tier Contribution",
-        "Employee Rating Tier Premium",
-        "Employee And Spouse Rating Tier Offered",
-        "Employee And Spouse Rating Tier Contribution",
-        "Employee And Spouse Rating Tier Premium",
-        "Employee And Dependents Rating Tier Offered",
-        "Employee And Dependents Rating Tier Contribution",
-        "Employee And Dependents Rating Tier Premium",
-        "Family Rating Tier",
-        "Family Rating Tier Contribution",
-        "Family Rating Tier Premium",
-        "Import Status",
-        "Import Details"
+        "Plan HIOS Id"
+     ]
+
+       # different headers for health and dental
+      @sponsored_benefit_kind ||= :health
+      sponsored_headers = (@sponsored_benefit_kind == :dental) ? dental_benefit_headers : health_benefit_headers
+
+      combined_headers =(common_headers.push sponsored_headers).flatten!
+
+      combined_headers
+    end
+
+    def health_benefit_headers
+      [
+          "Employee Only Rating Tier Contribution",
+          "Employee Rating Tier Premium",
+          "Employee And Spouse Rating Tier Offered",
+          "Employee And Spouse Rating Tier Contribution",
+          "Employee And Spouse Rating Tier Premium",
+          "Employee And Dependents Rating Tier Offered",
+          "Employee And Dependents Rating Tier Contribution",
+          "Employee And Dependents Rating Tier Premium",
+          "Family Rating Tier",
+          "Family Rating Tier Contribution",
+          "Family Rating Tier Premium",
+          "Import Status",
+          "Import Details"
+      ]
+    end
+
+    def dental_benefit_headers
+      [
+          "Employer Contribution - Employee",
+          "Employer Contribution - Spouse",
+          "Employer Contribution - Domestic Partner",
+          "Employer Contribution - Child Under 26",
+          "Import Status",
+          "Import Details"
       ]
     end
 
     def row_mapping
-      [
+      common_mapping= [
       :action,
       :fein,
       :ignore,
@@ -97,19 +121,39 @@ module Importers::Mhc
       :carrier,
       :plan_selection,
       :ignore,
-      :single_plan_hios_id,
-      :employee_only_rt_contribution,
-      :employee_only_rt_premium,
-      :employee_and_spouse_rt_offered,
-      :employee_and_spouse_rt_contribution,
-      :employee_and_spouse_rt_premium,
-      :employee_and_one_or_more_dependents_rt_offered,
-      :employee_and_one_or_more_dependents_rt_contribution,
-      :employee_and_one_or_more_dependents_rt_premium,
-      :family_rt_offered,
-      :family_rt_contribution,
-      :family_rt_premium
-    ]
+      :single_plan_hios_id
+      ]
+
+      @sponsored_benefit_kind ||= :health
+      sponsored_mapping = (@sponsored_benefit_kind ==  :dental) ? dental_benefit_mapping : health_benefit_mapping
+      combined_mapping = (common_mapping.push sponsored_mapping).flatten!
+      combined_mapping
+    end
+
+
+    def dental_benefit_mapping
+      [
+         :employee_only_rt_contribution,
+         :employee_and_spouse_rt_contribution,
+         :employer_domestic_partner_rt_contribution,
+         :employer_child_under_26_rt_contribution
+      ]
+    end
+
+    def health_benefit_mapping
+      [
+          :employee_only_rt_contribution,
+          :employee_only_rt_premium,
+          :employee_and_spouse_rt_offered,
+          :employee_and_spouse_rt_contribution,
+          :employee_and_spouse_rt_premium,
+          :employee_and_one_or_more_dependents_rt_offered,
+          :employee_and_one_or_more_dependents_rt_contribution,
+          :employee_and_one_or_more_dependents_rt_premium,
+          :family_rt_offered,
+          :family_rt_contribution,
+          :family_rt_premium
+      ]
     end
 
     include ::Importers::RowSet

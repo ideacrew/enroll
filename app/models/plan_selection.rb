@@ -42,7 +42,7 @@ class PlanSelection
 #    if enrollment_members_verification_status(market_kind)
 #      hbx_enrollment.move_to_contingent!
 #    else
-    hbx_enrollment.select_coverage!(qle: qle)
+    hbx_enrollment.select_coverage!(qle: qle) if hbx_enrollment.may_select_coverage?
 #    end
     hbx_enrollment.update_existing_shop_coverage
   end

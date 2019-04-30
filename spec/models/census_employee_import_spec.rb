@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe CensusEmployeeImport, :type => :model do
+RSpec.describe CensusEmployeeImport, dbclean: :after_each, :type => :model do
 
   let(:tempfile) { double("", path: 'spec/test_data/census_employee_import/DCHL Employee Census.xlsx') }
   let(:file) {

@@ -128,7 +128,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
     let(:family) { double("Family") }
     let(:email){ double("Email", address: "test@example.com", kind: "home") }
     let(:id){ EmployeeRole.new.id }
-    let!(:notice_trigger_params) { {recipient: employee_role, event_object: census_employee, notice_event: "employee_matches_employer_rooster"} }
+    let!(:notice_trigger_params) { {recipient: employee_role, event_object: census_employee, notice_event: "employee_matches_employer_rooster", :notice_params=>{}} }
 
     before :each do
       allow(EmployeeRole).to receive(:find).and_return(employee_role)
@@ -183,7 +183,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
     end
 
     it "should trigger notice" do
-      expect_any_instance_of(Observers::NoticeObserver).to receive(:deliver).with(notice_trigger_params).and_return(true)
+      expect_any_instance_of(BenefitSponsors::Services::NoticeService).to receive(:deliver).with(notice_trigger_params).and_return(true)
       get :edit, id: employee_role.id
     end
   end
@@ -214,6 +214,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
         allow(employee_role).to receive(:census_employee).and_return(census_employee)
         sign_in(user)
         allow(user).to receive(:switch_to_idp!)
+        allow(user).to receive(:has_hbx_staff_role?).and_return(false)
         allow(employment_relationship).to receive_message_chain(:census_employee,:employer_profile,:parent,:legal_name).and_return("legal_name")
         post :create, :employment_relationship => employment_relationship_properties
       end
@@ -320,8 +321,6 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
     let(:person) { FactoryGirl.build(:person) }
 
     before(:each) do
-      allow(user).to receive(:has_employee_role?).and_return(false)
-      allow(user).to receive(:has_consumer_role?).and_return(false)
       allow(user).to receive(:person).and_return(person)
       sign_in(user)
       get :search
@@ -344,25 +343,20 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
     let(:employee_role) {FactoryGirl.create(:employee_role)}
 
     it "renders the 'welcome' template when user has no employee role" do
-      allow(user).to receive(:has_employee_role?).and_return(false)
-      allow(user).to receive(:has_consumer_role?).and_return(false)
       allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:has_active_employee_role?).and_return(false)
       allow(user).to receive(:last_portal_visited=).and_return(true)
       allow(user).to receive(:save!).and_return(true)
       sign_in(user)
-      allow(user).to receive(:person).and_return(person)
       get :privacy
       expect(response).to have_http_status(:success)
       expect(response).to render_template("privacy")
     end
 
     it "renders the 'my account' template when user has employee role" do
-      allow(user).to receive(:has_employee_role?).and_return(true)
       allow(user).to receive(:person).and_return(person)
-      allow(user).to receive(:last_portal_visited=).and_return(family_account_path)
-
-      allow(user).to receive(:save!).and_return(true)
-      allow(person).to receive(:employee_roles).and_return([employee_role])
+      allow(person).to receive(:has_active_employee_role?).and_return(true)
+      allow(person).to receive(:active_employee_roles).and_return([employee_role])
       allow(employee_role).to receive(:bookmark_url).and_return(family_account_path)
       sign_in(user)
       get :privacy

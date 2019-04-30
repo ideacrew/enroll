@@ -21,9 +21,9 @@
           <%= hidden_field_tag(:hbx_enrollment_id, @hbx_enrollment.id) if @hbx_enrollment.present? %>
 
           <% if @adapter.can_shop_shop?(@person) || @adapter.can_shop_individual?(@person) || @adapter.can_shop_resident?(@person) %>
-            <div id="coverage-household">
+            <div id="coverage-household" class='row no-buffer'>
               <div class="module group-selection-table">
-                <div class="table-responsive table-border">
+                <div class="table-responsive table-border" style="background-color: #fff">
                   <% @show_residency_alert = false %>
                   <%= render 'coverage_household' %>
                 </div>
@@ -83,7 +83,7 @@
                 </div>
 
                 <% if dental_market_enabled? %>
-                  <div id="dental-radio-button" class="n-radio-row <%= 'dn' if @adapter.can_shop_shop?(@person) && !@adapter.is_dental_offered?(@employee_role) %>">
+                  <div id="dental-radio-button" class="n-radio-row <%= 'dn' if @adapter.can_shop_shop?(@person) && !@adapter.is_eligible_for_dental?(@employee_role, @change_plan, @hbx_enrollment) %>">
                     <label class="n-radio" for="coverage_kind_dental">
                       <%= radio_button_tag 'coverage_kind', 'dental', is_coverage_kind_checked?("dental"), disabled: is_coverage_kind_disabled?("dental"), id: 'coverage_kind_dental', class: 'n-radio' %>
                       <span class="n-radio">

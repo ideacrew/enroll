@@ -19,7 +19,7 @@ class Insured::FamiliesController < FamiliesController
 
     log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
 
-    @hbx_enrollments = @family.enrollments.order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) || []
+    @hbx_enrollments = @family.enrollments.non_external.order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) || []
     @enrollment_filter = @family.enrollments_for_display
 
     valid_display_enrollments = Array.new

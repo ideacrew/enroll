@@ -41,6 +41,27 @@ module Notifier
       enrollment
     end
 
+    def self.stubbed_object_dental
+      end_on = TimeKeeper.date_of_record.end_of_month
+      enrollment = Notifier::MergeDataModels::Enrollment.new({
+        coverage_start_on: TimeKeeper.date_of_record.next.beginning_of_month.strftime('%m/%d/%Y'),
+        coverage_end_on: end_on,
+        plan_name: 'Delta Dental',
+        employer_responsible_amount: '$250.0',
+        employee_responsible_amount: '$90.0',
+        premium_amount: '340.0',
+        enrolled_count: '2',
+        employee_first_name: 'David',
+        employee_last_name: 'Finch',
+        coverage_end_on_minus_60_days: ((end_on - 60.days).strftime('%m/%d/%Y')),
+        coverage_end_on_plus_60_days: ((end_on + 60.days).strftime('%m/%d/%Y'))
+      })
+
+      enrollment.subscriber = Notifier::MergeDataModels::Person.stubbed_object
+      enrollment.dependents = [Notifier::MergeDataModels::Person.stubbed_object]
+      enrollment
+    end
+
     def employer_cost
       number_to_currency(employer_responsible_amount.to_f)
     end

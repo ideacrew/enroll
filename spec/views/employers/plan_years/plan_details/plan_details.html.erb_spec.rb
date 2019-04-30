@@ -9,50 +9,77 @@ RSpec.describe "employers/plan_years/plan_selection/_plan_details.html.erb" do
       )
   }
 
-  let(:carrier_profile){
-    instance_double(
-      "CarrierProfile",
-      legal_name: "cp 1"
-      )
-  }
-
-  let(:health_plan){
-    instance_double(
+  def new_plan
+    double(
       "Plan",
-      name: "my health plan",
-      plan_type: "ppo",
-      carrier_profile: carrier_profile,
-      metal_level: "bronze",
+      title: "My Silly Plan",
+      name: "plan name",
+      carrier_profile: double(legal_name: "legal")
+    )
+  end
+
+  def plan_cost_decorator
+    double(
+      "PlanCostDecorator",
+      title: new_plan.title,
+      premium_for: double("premium_for"),
+      employer_contribution_for: double("employer_contribution_for"),
+      employee_cost_for: double("employee_cost_for"),
+      total_premium: double("total_premium"),
+      total_employer_contribution: double("total_employer_contribution"),
+      total_employee_cost: double("total_employee_cost"),
+      issuer_profile: double(legal_name: "carefirst"),
+      metal_level: "Silver",
       coverage_kind: "health",
-      network_information: "This is a plan",
-      active_year: 2016,
-      nationwide: true
-      )
-  }
+      kind: "health",
+      name: new_plan.name,
+      metal_level_kind: 'metal level kind',
+      plan_type: "plan type",
+      network_information: "network_information",
+      carrier_profile: double(legal_name: "legal")
+    )
+  end
 
-  let(:dental_plan){
-    instance_double(
+  def dental_plan
+    double(
       "Plan",
-      name: "my dental plan",
-      plan_type: "ppo",
-      carrier_profile: carrier_profile,
-      metal_level: "high",
+      title: "My Silly Plan",
+      name: "plan name",
+      carrier_profile: double(legal_name: "legal")
+    )
+  end
+
+  def plan_cost_decorator_dental
+    double(
+      "PlanCostDecorator",
+      title: dental_plan.title,
+      premium_for: double("premium_for"),
+      employer_contribution_for: double("employer_contribution_for"),
+      employee_cost_for: double("employee_cost_for"),
+      total_premium: double("total_premium"),
+      total_employer_contribution: double("total_employer_contribution"),
+      total_employee_cost: double("total_employee_cost"),
+      issuer_profile: double(legal_name: "carefirst"),
+      metal_level: "Gold",
       coverage_kind: "dental",
-      network_information: "This is a plan",
-      active_year: 2016,
-      dental_level: "high",
-      nationwide: true
-      )
-  }
+      kind: "health",
+      name: new_plan.name,
+      metal_level_kind: "Gold",
+      plan_type: "plan type",
+      network_information: "network_information",
+      carrier_profile: double(legal_name: "legal")
+    )
+  end
 
   before :each do
     assign :employer_profile, employer_profile
+
   end
 
   context "for health" do
 
     before :each do
-      assign :plan, health_plan
+      @plan = plan_cost_decorator
       render partial: "employers/plan_years/plan_selection/plan_details"
     end
 
@@ -61,8 +88,8 @@ RSpec.describe "employers/plan_years/plan_selection/_plan_details.html.erb" do
     end
 
     it "should have health plan summary info" do
-      expect(rendered).to match /#{health_plan.plan_type}/i
-      expect(rendered).to match /#{health_plan.metal_level}/i
+      expect(rendered).to match /#{ @plan.plan_type}/i
+      expect(rendered).to match /#{ @plan.metal_level_kind}/i
     end
 
     it "should have note during plan selection" do
@@ -75,14 +102,13 @@ RSpec.describe "employers/plan_years/plan_selection/_plan_details.html.erb" do
   context "for dental" do
 
     before :each do
-      assign :plan, dental_plan
+      @plan = plan_cost_decorator_dental
       render partial: "employers/plan_years/plan_selection/plan_details"
     end
 
     it "should have health plan summary info" do
-      expect(rendered).to match /#{dental_plan.plan_type}/i
-      expect(rendered).to match /#{dental_plan.metal_level}/i
+      expect(rendered).to match /#{@plan.plan_type}/i
+      expect(rendered).to match /#{@plan.metal_level_kind}/i
     end
   end
-
 end

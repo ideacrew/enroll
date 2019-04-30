@@ -166,15 +166,18 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
         expect(User.create(**params).person.errors[:ssn]).to eq ["SSN must be 9 digits"]
       end
     end
+
     context "roles" do
       let(:params){valid_params.deep_merge({roles: ["employee", "broker", "hbx_staff"]})}
+      let(:person) { FactoryGirl.create(:person) }
+      let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+      let(:benefit_sponsor)     { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+      let(:employer_profile)    { benefit_sponsor.employer_profile }
+      let!(:active_employer_staff_role) {FactoryGirl.create(:benefit_sponsor_employer_staff_role, person: person, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
+
       it "should return proper roles" do
         user = User.new(**params)
-        person = FactoryGirl.create(:person)
         allow(user).to receive(:person).and_return(person)
-        employer_staff_role =FactoryGirl.create(:employer_staff_role, person: person)
-        #allow(person).to receive(:employee_roles).and_return([role])
-        FactoryGirl.create(:employer_staff_role, person: person)
         #Deprecated. DO NOT USE.  Migrate to person.active_employee_roles.present?
         #expect(user.has_employee_role?).to be_truthy
         expect(user.has_employer_staff_role?).to be_truthy
@@ -427,6 +430,30 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
       it "should return false when general agency staff" do
         user.roles = ['general_agency_staff']
         expect(user.can_change_broker?).to eq false
+      end
+    end
+  end
+
+  describe "permission", dbclean: :after_each do
+    let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
+    let(:person) { double("person")}
+    let(:hbx_staff_role) { double("hbx_staff_role")}
+    let(:hbx_profile) { double("hbx_profile")}
+    let(:permission) { double("permission", name: "super_admin")}
+
+    before :each do
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
+      allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
+      allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
+      allow(hbx_staff_role).to receive(:permission).and_return(permission)
+    end
+    
+    context "should set the return the permission for the user " do
+      it 'returns the permission for the user' do
+        allow(user).to receive(:permission).and_return(person.hbx_staff_role.permission)
+        expect(user.permission).to eq permission
       end
     end
   end

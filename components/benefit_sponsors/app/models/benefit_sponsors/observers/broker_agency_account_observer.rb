@@ -6,7 +6,7 @@ module BenefitSponsors
       attr_accessor :notifier
 
       def broker_hired?(account, options={})
-        if !account.persisted? && account.valid?
+        if !account.persisted? && account.valid? && account.benefit_sponsorship?
           profile = account.benefit_sponsorship.profile
           notify(
             "acapi.info.events.employer.broker_added",
@@ -19,7 +19,7 @@ module BenefitSponsors
       end
 
       def broker_fired?(account, options={})
-        if account.persisted? && account.changed? && account.changed_attributes.include?("is_active")
+        if account.persisted? && account.changed? && account.changed_attributes.include?("is_active") && account.benefit_sponsorship.present?
           profile = account.benefit_sponsorship.profile
           notify(
             "acapi.info.events.employer.broker_terminated",
@@ -34,22 +34,24 @@ module BenefitSponsors
       def notifications_send(model_instance, new_model_event)
         if new_model_event.present? &&  new_model_event.is_a?(BenefitSponsors::ModelEvents::ModelEvent)
           broker_agency_account = new_model_event.klass_instance
+          if  broker_agency_account.benefit_sponsorship.present?
 
-          broker_agency_profile = broker_agency_account.broker_agency_profile
-          broker = broker_agency_profile.primary_broker_role
-          employer_profile = broker_agency_account.benefit_sponsorship.profile
+            broker_agency_profile = broker_agency_account.broker_agency_profile
+            broker = broker_agency_profile.primary_broker_role
+            employer_profile = broker_agency_account.benefit_sponsorship.profile
 
-          if BenefitSponsors::ModelEvents::BrokerAgencyAccount::REGISTERED_EVENTS.include?(new_model_event.event_key)
-            if new_model_event.event_key == :broker_hired
-              deliver(recipient: broker, event_object: employer_profile, notice_event: "broker_hired_notice_to_broker")
-              deliver(recipient: broker_agency_profile, event_object: employer_profile, notice_event: "broker_agency_hired_confirmation")
-              deliver(recipient: employer_profile, event_object: employer_profile, notice_event: "broker_hired_confirmation_to_employer")
-            end
+            if BenefitSponsors::ModelEvents::BrokerAgencyAccount::REGISTERED_EVENTS.include?(new_model_event.event_key)
+              if new_model_event.event_key == :broker_hired
+                deliver(recipient: broker, event_object: employer_profile, notice_event: "broker_hired_notice_to_broker")
+                deliver(recipient: broker_agency_profile, event_object: employer_profile, notice_event: "broker_agency_hired_confirmation")
+                deliver(recipient: employer_profile, event_object: employer_profile, notice_event: "broker_hired_confirmation_to_employer")
+              end
 
-            if new_model_event.event_key == :broker_fired
-              deliver(recipient: broker, event_object: employer_profile, notice_event: "broker_fired_confirmation_to_broker")
-              deliver(recipient: broker_agency_profile, event_object: employer_profile, notice_event: "broker_agency_fired_confirmation")
-              deliver(recipient: employer_profile, event_object: broker_agency_account, notice_event: "broker_fired_confirmation_to_employer")
+              if new_model_event.event_key == :broker_fired
+                deliver(recipient: broker, event_object: employer_profile, notice_event: "broker_fired_confirmation_to_broker")
+                deliver(recipient: broker_agency_profile, event_object: employer_profile, notice_event: "broker_agency_fired_confirmation")
+                deliver(recipient: employer_profile, event_object: broker_agency_account, notice_event: "broker_fired_confirmation_to_employer")
+              end
             end
           end
         end

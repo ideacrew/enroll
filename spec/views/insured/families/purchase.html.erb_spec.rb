@@ -7,6 +7,8 @@ RSpec.describe "insured/families/purchase.html.erb" do
   let(:benefit_group){ FactoryGirl.build(:benefit_group) }
   let(:hbx_enrollment){ HbxEnrollment.new(benefit_group: benefit_group, employee_role: employee_role, effective_on: 1.month.ago.to_date, updated_at: DateTime.now  ) }
   let(:person) { FactoryGirl.create(:person)}
+  let(:group_enrollment) { double("BenefitSponsors::Enrollments::GroupEnrollment", product_cost_total: 200.00, sponsor_contribution_total: 100 , employee_cost_total: 100 )}
+  let(:member_group) { double("BenefitSponsors::Enrollments::GroupEnrollment", group_enrollment: group_enrollment)}
   context "purchase" do
     before :each do
       @person = employee_role.person
@@ -14,6 +16,7 @@ RSpec.describe "insured/families/purchase.html.erb" do
       @enrollment = hbx_enrollment
       @benefit_group = benefit_group
       @reference_plan = @benefit_group.reference_plan
+      @member_group = member_group
       @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
       allow(person).to receive(:consumer_role).and_return(false)
       @person = person
@@ -39,6 +42,7 @@ RSpec.describe "insured/families/purchase.html.erb" do
       @plan = plan
       @enrollment = hbx_enrollment
       @benefit_group = benefit_group
+      @member_group = member_group
       @reference_plan = @benefit_group.reference_plan
       @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
       assign :terminate, 'terminate'

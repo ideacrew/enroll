@@ -7,7 +7,7 @@ module BenefitMarkets
       let(:aca_initial_individual_configuration) { AcaIndividualInitialApplicationConfiguration.new }
 
       let(:pub_due_dom)       { 5 }
-      let(:erlst_strt_prior_eff_months)    	  { -3 }
+      let(:erlst_strt_prior_eff_months)        { -3 }
       let(:appeal_per_aft_app_denial_dys)              { 30 }
       let(:quiet_per_end)  { 28 }
       let(:inelig_per_aft_app_denial_dys)    { 90 }

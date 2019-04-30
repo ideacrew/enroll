@@ -3,10 +3,10 @@ class DeleteSingleInvoiceWithFein < MongoidMigrationTask
   def migrate
     fein = ENV['fein']
     date = Date.strptime(ENV['date'], "%m/%d/%Y")
-    organization = Organization.where(fein: fein)
+    organization = ::BenefitSponsors::Organizations::Organization.where(fein: fein)
     return puts "Fein has more than one organization or no organization to it" if organization.size != 1 && !Rails.env.test?
-    invoice = organization.first.documents.detect{|invoice| invoice.date == date && invoice.subject == 'invoice' }
+    invoice = organization.first.employer_profile.invoices.detect{|invoice| invoice.date == date && invoice.subject == 'initial_invoice' }
     invoice.destroy if invoice
-    puts "invoice for #{date} has been deleted successfully" if invoice.destroy && !Rails.env.test?
+    puts "invoice for #{date} has been deleted successfully" if !Rails.env.test?
   end
 end

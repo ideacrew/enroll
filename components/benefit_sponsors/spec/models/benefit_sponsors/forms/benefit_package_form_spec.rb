@@ -22,10 +22,6 @@ module BenefitSponsors
     let!(:product)                  { product_package.products.first }
     let!(:issuer_profile)           { FactoryGirl.create :benefit_sponsors_organizations_issuer_profile, assigned_site: site }
 
-    after :all do
-      DatabaseCleaner.clean
-    end
-
     shared_context "valid params", :shared_context => :metadata do
       let(:benefit_package_params) {
         {
@@ -59,7 +55,8 @@ module BenefitSponsors
         {
           "0" => {:is_offered => "true", :display_name => "Employee", :contribution_factor => "0.95"},
           "1" => {:is_offered => "true", :display_name => "Spouse", :contribution_factor => "0.85"},
-          "2" => {:is_offered => "true", :display_name => "Dependent", :contribution_factor => "0.75"}
+          "2" => {:is_offered => "true", :display_name => "Domestic Partner", :contribution_factor => "0.75"},
+          "3" => {:is_offered => "true", :display_name => "Child Under 26", :contribution_factor => "0.75"}
         }
       }
     end
@@ -97,7 +94,8 @@ module BenefitSponsors
         {
           "0" => {:is_offered => "true", :display_name => "Employee", :contribution_factor => nil},
           "1" => {:is_offered => "true", :display_name => "Spouse", :contribution_factor => "0.85"},
-          "2" => {:is_offered => "true", :display_name => "Dependent", :contribution_factor => "0.75"}
+          "2" => {:is_offered => "true", :display_name => "Domestic Partner", :contribution_factor => "0.75"},
+          "3" => {:is_offered => "true", :display_name => "Child Under 26", :contribution_factor => "0.75"}
         }
       }
     end

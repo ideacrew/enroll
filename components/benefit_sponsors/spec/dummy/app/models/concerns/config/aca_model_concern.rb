@@ -20,6 +20,7 @@ module Config::AcaModelConcern
     delegate :non_owner_participation_count_minimum, to: :class
     delegate :aca_shop_market_small_market_employee_count_maximum, to: :class
     delegate :aca_shop_market_transmit_scheduled_employers, to: :class
+    delegate :aca_shop_market_employer_transmission_day_of_month, to: :class
   end
 
   class_methods do
@@ -57,6 +58,10 @@ module Config::AcaModelConcern
 
     def use_simple_employer_calculation_model?
       @@use_simple_employer_calculation_model ||= (Settings.aca.use_simple_employer_calculation_model.to_s.downcase == "true")
+    end
+
+    def aca_shop_market_employer_transmission_day_of_month
+      @@aca_shop_market_employer_transmission_day_of_month ||= Settings.aca.shop_market.employer_transmission_day_of_month
     end
 
     def market_rating_areas

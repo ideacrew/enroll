@@ -1,5 +1,5 @@
 <div id="employer-selection" class='row no-buffer'>
-  <p class="twenty"><%= l10n("employer").pluralize(@employee_role.person.active_employee_roles.size)%></p>
+  <h3><%= l10n("employer").pluralize(@employee_role.person.active_employee_roles.size)%></h3>
 
     <div class="n-radio-group">
       <% @person.active_employee_roles.each_with_index do |employee_role, index| %>
@@ -14,5 +14,4 @@
         </div>
       <% end %>
     </div>
-  <hr />
 </div>

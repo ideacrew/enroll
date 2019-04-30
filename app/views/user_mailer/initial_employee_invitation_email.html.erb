@@ -1,8 +1,6 @@
 <html>
 <body>
-  <% fname = census_employee.full_name %>
-  <% fname.slice! census_employee.last_name %>
-  Dear <%= fname.humanize.titleize %>,
+  Dear <%= census_employee.full_name.humanize.titleize %>,
 <br/>
 <br/>
 <div>
@@ -23,7 +21,7 @@ If you have other insurance coverage and do not wish to enroll into the plan(s) 
     What is Open Enrollment?
   </b>
   <br/>
-    Open enrollment is your annual opportunity to enroll in health plans offered by your employer.  Outside of this open enrollment period, you will only be allowed to make changes to your enrollment if you experience certain qualifying life events (QLE) such as marriage, birth, adoption, or other qualifying events.
+    Open enrollment is your annual opportunity to enroll in plans offered by your employer.  Outside of this open enrollment period, you will only be allowed to make changes to your enrollment if you experience certain qualifying life events (QLE) such as marriage, birth, adoption, or other qualifying events.
   <br/>
   <br/>
   <b>
@@ -35,6 +33,7 @@ If you have other insurance coverage and do not wish to enroll into the plan(s) 
       <li>Go to <%= site_main_web_link %></li>
       <li>Log-in or create an account as an employee
       <li>If necessary, update your household information add any dependents, Make your plan selection(s) or waive coverage</li>
+    </ul>
   <br/>
   <h2 style="color: #007bc4;">
     For Questions or Assistance:

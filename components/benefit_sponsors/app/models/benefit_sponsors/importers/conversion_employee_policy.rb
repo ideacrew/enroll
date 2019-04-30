@@ -7,12 +7,20 @@ module BenefitSponsors
         census_employee = find_employee
         return nil unless census_employee
 
+        benefit_application = fetch_application_based_sponsored_kind
         found_employer = find_employer
-        benefit_application = find_employer.active_benefit_application
 
         if benefit_application
           candidate_bgas = census_employee.benefit_group_assignments.where(:"benefit_package_id".in  => benefit_application.benefit_packages.map(&:id))
           @found_benefit_group_assignment = candidate_bgas.sort_by(&:start_on).last
+        end
+      end
+
+      def current_benefit_application(employer)
+        if (employer.organization.active_benefit_sponsorship.source_kind.to_s == "conversion")
+          employer.benefit_applications.where(:aasm_state => :imported).first
+        else
+          employer.benefit_applications.where(:aasm_state => :active).first
         end
       end
 
@@ -39,16 +47,40 @@ module BenefitSponsors
         return @plan unless @plan.nil?
         return nil if hios_id.blank?
         clean_hios = hios_id.strip
-        corrected_hios_id = (clean_hios.end_with?("-01") ? clean_hios : clean_hios + "-01")
+
+        if sponsored_benefit_kind == :dental
+          corrected_hios_id = clean_hios.split("-")[0]
+        else
+          corrected_hios_id = (clean_hios.end_with?("-01") ? clean_hios : clean_hios + "-01")
+        end
+
         sponsor_benefit = find_sponsor_benefit
-        sponsor_benefit.product_package.products.where(hios_id: corrected_hios_id ).first
+
+        if sponsor_benefit.source_kind == :conversion
+          actual_start_on = (sponsor_benefit.benefit_package.end_on + 1.day).prev_year
+          # hios = (sponsored_benefit_kind == :dental ? hios_id : corrected_hios_id)
+          ::BenefitMarkets::Products::Product.where(hios_id: corrected_hios_id).detect do |product|
+            product.application_period.cover?(actual_start_on)
+          end
+        else
+          sponsor_benefit.product_package.products.where(hios_id: corrected_hios_id).first
+        end
       end
 
       def find_sponsor_benefit
-        employer = find_employer
-        benefit_application = employer.active_benefit_application
+        benefit_application = fetch_application_based_sponsored_kind
         benefit_package = benefit_application.benefit_packages.first
-        sponsor_benefit = benefit_package.sponsored_benefits.first
+        benefit_package.sponsored_benefits.unscoped.detect{|sponsored_benefit|
+          sponsored_benefit.product_kind == sponsored_benefit_kind
+        }
+      end
+
+      # for normal :conversion, :mid_plan_year_conversion we use :imported plan year
+      # but while creating :dental sponsored_benefit we will add it on :active benefit_application
+      def fetch_application_based_sponsored_kind
+        employer = find_employer
+        benefit_application = sponsored_benefit_kind == :dental ? employer.active_benefit_application : current_benefit_application(employer)
+        benefit_application
       end
 
       def find_employer

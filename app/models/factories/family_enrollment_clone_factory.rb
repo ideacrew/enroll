@@ -46,6 +46,8 @@ module Factories
       clone_enrollment.sponsored_benefit_id = enrollment.sponsored_benefit_id
       clone_enrollment.rating_area_id = enrollment.rating_area_id
       clone_enrollment.issuer_profile_id = enrollment.issuer_profile_id
+      assignment = census_employee.benefit_group_assignment_by_package(enrollment.sponsored_benefit_package_id)
+      clone_enrollment.benefit_group_assignment_id = assignment.id
 
       if enrollment.sponsored_benefit_package.benefit_application.is_renewing?
         clone_enrollment.aasm_state = 'auto_renewing'

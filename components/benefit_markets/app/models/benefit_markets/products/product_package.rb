@@ -133,9 +133,7 @@ module BenefitMarkets
     # Intersection of BenefitMarket::Products that match both service area and effective date
     def benefit_market_products_available_for(service_areas, effective_date)
       service_area_ids = service_areas.map(&:id)
-      benefit_market_products_available_on(effective_date).select do |product|
-        service_area_ids.include?(product.service_area_id)
-      end # & benefit_market_products_available_where(service_areas)
+      all_benefit_market_products.by_service_areas(service_area_ids).effective_with_premiums_on(effective_date)
     end
 
     # BenefitMarket::Products available for purchase on effective date
@@ -151,6 +149,8 @@ module BenefitMarkets
     def products_for_plan_option_choice(product_option_choice)
       if package_kind == :metal_level
         products.by_metal_level_kind(product_option_choice)
+      elsif package_kind == :multi_product
+        products
       else
         issuer_profile = BenefitSponsors::Organizations::IssuerProfile.find(product_option_choice)
         return [] unless issuer_profile

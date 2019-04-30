@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe PeopleController do
+RSpec.describe PeopleController, dbclean: :after_each do
   let(:census_employee_id) { "abcdefg" }
   let(:user) { FactoryGirl.build(:user) }
   let(:email) {FactoryGirl.build(:email)}

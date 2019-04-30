@@ -78,6 +78,10 @@ FactoryGirl.define do
       active_csr_00_plan
     end
 
+    trait :with_product do
+      product {  FactoryGirl.create(:benefit_markets_products_product) }
+    end
+
     trait :coverage_selected do
       aasm_state "coverage_selected"
     end
