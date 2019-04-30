@@ -1303,8 +1303,8 @@ describe EmployerProfile, "group transmissions", dbclean: :after_each do
       before do
         if transition_at.present?
           employer_profile.workflow_state_transitions << WorkflowStateTransition.new( from_state:"applicant", to_state: emp_state, transition_at: Date.new(start_date.year,start_date.prev_month.month, transition_at).to_time.utc)
-          if transition_at == 31
-            employer_profile.update_attributes(aasm_state: "active")
+          if transition_at == TimeKeeper.date_of_record.end_of_month.mday
+            employer_profile.update_attributes(aasm_state: "enrolled")
             plan_year.update_attributes(aasm_state: 'active')
           end
         end
@@ -1337,7 +1337,7 @@ describe EmployerProfile, "group transmissions", dbclean: :after_each do
       before do
         if transition_at.present?
           renewing_employer.renewing_plan_year.workflow_state_transitions << WorkflowStateTransition.new( to_state: py_state, transition_at: Date.new(start_date.year,start_date.prev_month.month, transition_at).to_time.utc)
-          if transition_at == 31
+          if transition_at == TimeKeeper.date_of_record.end_of_month.mday
             renewing_employer.active_plan_year.update_attributes(aasm_state: 'expired')
             renewing_employer.renewing_plan_year.update_attributes(aasm_state: 'active')
           end
@@ -1348,7 +1348,7 @@ describe EmployerProfile, "group transmissions", dbclean: :after_each do
         allow_any_instance_of(EmployerProfile).to receive(:is_renewal_carrier_drop?).and_return(false)
         allow_any_instance_of(EmployerProfile).to receive(:renewal_effectuated_carrier_drop?).and_return(false)
         expect_any_instance_of(EmployerProfile).to receive(:notify).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: renewing_employer.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
-        if transition_at == 31
+        if transition_at == TimeKeeper.date_of_record.end_of_month.mday
           expect(renewing_employer.is_renewal_transmission_eligible?).to eq false
           expect(renewing_employer.is_transmission_eligible_for_renewal_effectuated?(start_date)).to eq true
         else
