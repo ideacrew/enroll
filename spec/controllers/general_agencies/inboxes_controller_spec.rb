@@ -11,11 +11,11 @@ RSpec.describe GeneralAgencies::InboxesController, dbclean: :after_each do
     Settings.aca.general_agency_enabled = true
     Enroll::Application.reload_routes!
   end
-  
+
   describe "Get new" do
     before do
       sign_in user
-      xhr :get, :new, :id => general_agency_profile.id, profile_id: hbx_profile.id, to: "test", format: :js
+      get :new, params:{:id => general_agency_profile.id, profile_id: hbx_profile.id}, xhr: true, format: :js
     end
 
     it "render new template" do
@@ -33,7 +33,7 @@ RSpec.describe GeneralAgencies::InboxesController, dbclean: :after_each do
       allow(GeneralAgencyProfile).to receive(:find).and_return(general_agency_profile)
       allow(general_agency_profile).to receive(:inbox).and_return(inbox)
       allow(inbox).to receive(:messages).and_return(messages)
-      xhr :get, :msg_to_portal, inbox_id: general_agency_profile.id
+      get :msg_to_portal, params:{:inbox_id => general_agency_profile.id}, xhr: true
       expect(response).to have_http_status(:success)
     end
   end
@@ -53,12 +53,12 @@ RSpec.describe GeneralAgencies::InboxesController, dbclean: :after_each do
     end
 
     it "show action" do
-      xhr :get, :show, id: 1
+      get :show, params:{:id => 1}, xhr: true
       expect(response).to have_http_status(:success)
     end
 
     it "delete action" do
-      xhr :delete, :destroy, id: 1
+      delete :destroy, params:{:id => 1}, xhr: true
       expect(response).to have_http_status(:success)
     end
   end

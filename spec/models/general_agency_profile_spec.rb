@@ -156,12 +156,14 @@ RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
     end
 
     it "linked_employees" do
+      general_agency_staff_role.update_attributes(general_agency_profile_id: general_agency_profile.id)
       allow(EmployerProfile).to receive(:find_by_general_agency_profile).and_return [employer_profile]
       allow(Person).to receive(:where).and_return [person]
       expect(general_agency_profile.linked_employees).to eq [person]
     end
 
     it "families" do
+      general_agency_staff_role.update_attributes(general_agency_profile_id: general_agency_profile.id)
       allow(EmployerProfile).to receive(:find_by_general_agency_profile).and_return [employer_profile]
       allow(Person).to receive(:where).and_return [person]
       expect(general_agency_profile.families).to eq [person.primary_family]
