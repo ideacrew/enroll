@@ -414,9 +414,11 @@ describe HbxEnrollment, dbclean: :after_all do
           benefit_group: mikes_benefit_group,
           benefit_group_assignment: @mikes_benefit_group_assignments
         )
+        @enrollment5.enrollment_kind = 'special_enrollment'
         @enrollment5.save
         @enrollment5.reload
         @enrollment4 = @enrollment5.construct_waiver_enrollment('waiver_reason')
+        @enrollment4.enrollment_kind = 'special_enrollment'
         @enrollment4.save
         @enrollment4.waive_enrollment
       end

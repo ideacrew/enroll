@@ -555,11 +555,27 @@ class HbxEnrollment
       terminating_benefit_group_ids += future_plan_year.benefit_groups.pluck(:id) if future_plan_year.present?
     end
 
-    household.hbx_enrollments.where({
+    terminating_enrollments = household.hbx_enrollments.where({
       :benefit_group_id.in => terminating_benefit_group_ids, 
       :coverage_kind => coverage_kind,
-      }).enrolled_and_renewing_and_expired.each do |enrollment|
+      }).enrolled_and_renewing_and_expired
 
+    renewing_enrollments = household.hbx_enrollments.where({
+      :benefit_group_id.in => terminating_benefit_group_ids, 
+      :coverage_kind => coverage_kind,
+      }).renewing
+
+    # waive only renewal enrollments if waives coverage after clicking "make changes" on renewing coverage
+    enrollments = if RENEWAL_STATUSES.include?(parent_enrollment.aasm_state)
+                    parent_enrollment.to_a
+                  elsif is_open_enrollment?
+                    update(predecessor_enrollment_id: renewing_enrollments.first.id)
+                    renewing_enrollments
+                  else
+                    terminating_enrollments
+                  end
+
+    enrollments.each do |enrollment|
       coverage_end_date = family.terminate_date_for_shop_by_enrollment(enrollment)
       term_or_cancel_enrollment(enrollment, coverage_end_date)
     end
