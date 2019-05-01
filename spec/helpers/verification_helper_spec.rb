@@ -53,18 +53,18 @@ RSpec.describe VerificationHelper, :type => :helper do
     context "consumer role" do
       it_behaves_like "verification type status", "outstanding", "Social Security Number", false, "outstanding", false, false
       it_behaves_like "verification type status", "valid", "Social Security Number", false, "verified", false, false
-      it_behaves_like "verification type status", "outstanding", "Social Security Number", true, "review", false, false
+      it_behaves_like "verification type status", "outstanding", "Social Security Number", true, "in review", false, false
       it_behaves_like "verification type status", "outstanding", "American Indian Status", false, "outstanding", false, false
       it_behaves_like "verification type status", "valid", "American Indian Status", false, "verified", false, false
-      it_behaves_like "verification type status", "outstanding", "American Indian Status", true, "review", false, false
+      it_behaves_like "verification type status", "outstanding", "American Indian Status", true, "in review", false, false
       it_behaves_like "verification type status", "outstanding", "Citizenship", false, "outstanding", false, false
       it_behaves_like "verification type status", "valid", "Citizenship", false, "verified", false, false
-      it_behaves_like "verification type status", "outstanding", "Citizenship", true, "review", false, false
+      it_behaves_like "verification type status", "outstanding", "Citizenship", true, "in review", false, false
       it_behaves_like "verification type status", "outstanding", "Immigration status", false, "outstanding", false, false
       it_behaves_like "verification type status", "valid", "Immigration status", false, "verified", false, false
-      it_behaves_like "verification type status", "outstanding", "Immigration status", true, "review", false, false
+      it_behaves_like "verification type status", "outstanding", "Immigration status", true, "in review", false, false
       it_behaves_like "verification type status", "valid", "Immigration status", true, "verified", false, false
-      it_behaves_like "verification type status", "outstanding", "DC Residency", true, "review", false, false
+      it_behaves_like "verification type status", "outstanding", "DC Residency", true, "in review", false, false
       it_behaves_like "verification type status", "valid", "DC Residency", true, "attested", false, false, Date.new(2005,11,10)
       it_behaves_like "verification type status", "valid", "DC Residency", true, "verified", false, false
       it_behaves_like "verification type status", "valid", "Citizenship", true, "verified", false, false, Date.new(2005,11,10)
@@ -82,7 +82,7 @@ RSpec.describe VerificationHelper, :type => :helper do
     let(:types) { ['Identity', 'Application'] }
     shared_examples_for 'ridp type status' do |current_state, ridp_type, uploaded_doc, status|
       before do
-        uploaded_doc ? person.consumer_role.ridp_documents << FactoryGirl.build(:ridp_document, :ridp_verification_type => ridp_type) : person.consumer_role.ridp_documents = []
+        uploaded_doc ? person.consumer_role.ridp_documents << FactoryBot.build(:ridp_document, :ridp_verification_type => ridp_type) : person.consumer_role.ridp_documents = []
         if current_state == "valid"
           person.consumer_role.identity_validation = "valid"
           person.consumer_role.application_validation = "valid"
@@ -189,12 +189,12 @@ RSpec.describe VerificationHelper, :type => :helper do
 
     context 'ridp type status in review' do
       it 'returns warning  for IDENTITY with docs' do
-        person.consumer_role.ridp_documents << FactoryGirl.build(:ridp_document, :ridp_verification_type => 'Identity')
+        person.consumer_role.ridp_documents << FactoryBot.build(:ridp_document, :ridp_verification_type => 'Identity')
         expect(helper.ridp_type_class('Identity', person)).to eq('warning')
       end
 
       it 'returns warning  for APPLICATION with docs' do
-        person.consumer_role.ridp_documents << FactoryGirl.build(:ridp_document, :ridp_verification_type => 'Application')
+        person.consumer_role.ridp_documents << FactoryBot.build(:ridp_document, :ridp_verification_type => 'Application')
         expect(helper.ridp_type_class('Application', person)).to eq('warning')
       end
     end
@@ -360,85 +360,15 @@ RSpec.describe VerificationHelper, :type => :helper do
   end
 
   describe "#show_v_type" do
-    context "SSN" do
+    context "curam" do
       it "returns in review if documents for ssn uploaded" do
-        person.consumer_role.vlp_documents << FactoryBot.build(:vlp_document, :verification_type => "Social Security Number")
-        expect(helper.show_v_type('Social Security Number', person).gsub('&nbsp;', '')).to eq("Review")
-      end
-      it "returns verified if ssn_validation is valid" do
-        person.consumer_role.ssn_validation = "valid"
-        expect(helper.show_v_type('Social Security Number', person).gsub('&nbsp;', '')).to eq("Verified")
-      end
-      it "returns outstanding for unverified without documents and more than 24hs request" do
-        expect(helper.show_v_type('Social Security Number', person).gsub('&nbsp;', '')).to eq("Outstanding")
-      end
-      it "returns processing if consumer has pending state" do
-        allow_any_instance_of(ConsumerRole).to receive(:ssa_pending?).and_return true
-        expect(helper.show_v_type('Social Security Number', person).gsub('&nbsp;', '')).to eq("Processing")
+        expect(helper.show_v_type('curam', person).gsub('&nbsp;', '')).to eq("External Source")
       end
     end
-    context "Citizenship" do
-      it "returns in review if documents for citizenship uploaded" do
-        person.consumer_role.vlp_documents << FactoryBot.build(:vlp_document, :verification_type => "citizenship")
-        expect(helper.show_v_type('Citizenship', person).gsub('&nbsp;', '')).to eq("Review")
-      end
-      it "returns verified if lawful_presence_determination successful" do
-        person.consumer_role.lawful_presence_determination.aasm_state = "verification_successful"
-        expect(helper.show_v_type('Citizenship', person).gsub('&nbsp;', '')).to eq("Verified")
-      end
-      it "returns outstanding for unverified citizenship and more than 24hs request" do
-        person.consumer_role.lawful_presence_determination.aasm_state = "verification_outstanding"
-        person.consumer_role.vlp_documents = []
-        expect(helper.show_v_type('Citizenship', person).gsub('&nbsp;', '')).to eq("Outstanding")
-      end
-      it "returns processing if consumer has pending state and no response from hub less than 24hours" do
-        allow_any_instance_of(ConsumerRole).to receive(:citizenship_immigration_processing?).and_return true
-        person.consumer_role.vlp_documents = []
-        expect(helper.show_v_type('Citizenship', person).gsub('&nbsp;', '')).to eq("Processing")
-      end
-    end
-    context "Immigration status" do
-      it "returns in review if documents for citizenship uploaded" do
-        person.consumer_role.vlp_documents << FactoryBot.build(:vlp_document, :verification_type => "Immigration status")
-        expect(helper.show_v_type('Immigration status', person).gsub('&nbsp;', '')).to eq("Review")
-      end
-      it "returns verified if lawful_presence_determination successful" do
-        person.consumer_role.lawful_presence_determination.aasm_state = "verification_successful"
-        expect(helper.show_v_type('Immigration status', person).gsub('&nbsp;', '')).to eq("Verified")
-      end
-      it "returns outstanding for unverified citizenship and more than 24hs request" do
-        person.consumer_role.lawful_presence_determination.aasm_state = "verification_outstanding"
-        person.consumer_role.vlp_documents = []
-        expect(helper.show_v_type('Immigration status', person).gsub('&nbsp;', '')).to eq("Outstanding")
-      end
-      it "returns processing if consumer has pending state and no response from hub less than 24hours" do
-        allow_any_instance_of(ConsumerRole).to receive(:citizenship_immigration_processing?).and_return true
-        person.consumer_role.vlp_documents = []
-        expect(helper.show_v_type('Immigration status', person).gsub('&nbsp;', '')).to eq("Processing")
-      end
-    end
-    context 'DC Residency' do
-      it 'returns in review if documents for Residency  uploaded' do
-        person.consumer_role.local_residency_validation = 'pending'
-        person.consumer_role.is_state_resident = false
-        person.consumer_role.vlp_documents << FactoryBot.build(:vlp_document, :verification_type => "DC Residency")
-        expect(helper.show_v_type('DC Residency', person).gsub('&nbsp;', '')).to eq("Review")
-      end
-      it 'returns verified if residency is valid' do
-        allow_any_instance_of(ConsumerRole).to receive(:residency_verified?).and_return true
-        person.consumer_role.local_residency_validation = 'valid'
-        expect(helper.show_v_type('DC Residency', person).gsub('&nbsp;', '')).to eq("Verified")
-      end
-      it 'returns outstanding for residency outstanding' do
-        person.consumer_role.is_state_resident = false
-        person.consumer_role.vlp_documents = []
-        expect(helper.show_v_type('DC Residency', person).gsub('&nbsp;', '')).to eq('Outstanding')
-      end
-      it 'returns processing if consumer has pending state and no response from hub less than 24hours' do
-        person.consumer_role.is_state_resident = false
-        person.consumer_role.local_residency_validation = "pending"
-        person.consumer_role.vlp_documents = []
-        expect(helper.show_v_type('DC Residency', person).gsub('&nbsp;', '')).to eq("Processing")
+
+    context "not curam" do
+      it "returns in review if documents for ssn uploaded" do
+        expect(helper.show_v_type('valid', person).gsub('&nbsp;', '')).to eq("Verified")
       end
     end
   end
@@ -446,7 +376,7 @@ RSpec.describe VerificationHelper, :type => :helper do
   describe '#show_ridp_type' do
     context 'IDENTITY' do
       it 'returns in review if documents for identity uploaded' do
-        person.consumer_role.ridp_documents << FactoryGirl.build(:ridp_document, :ridp_verification_type => 'Identity')
+        person.consumer_role.ridp_documents << FactoryBot.build(:ridp_document, :ridp_verification_type => 'Identity')
         expect(helper.show_ridp_type('Identity', person)).to eq("&nbsp;&nbsp;&nbsp;In Review&nbsp;&nbsp;&nbsp;")
       end
 
@@ -464,7 +394,7 @@ RSpec.describe VerificationHelper, :type => :helper do
 
     context 'APPLICATION' do
       it 'returns in review if documents for applicationuploaded' do
-        person.consumer_role.ridp_documents << FactoryGirl.build(:ridp_document, :ridp_verification_type => 'Application')
+        person.consumer_role.ridp_documents << FactoryBot.build(:ridp_document, :ridp_verification_type => 'Application')
         expect(helper.show_ridp_type('Application', person)).to eq("&nbsp;&nbsp;&nbsp;In Review&nbsp;&nbsp;&nbsp;")
       end
 
@@ -514,7 +444,7 @@ RSpec.describe VerificationHelper, :type => :helper do
       context "#{v_type}" do
         before do
           person.consumer_role.ridp_documents=[]
-          docs.to_i.times { person.consumer_role.ridp_documents << FactoryGirl.build(:ridp_document, :ridp_verification_type => v_type)}
+          docs.to_i.times { person.consumer_role.ridp_documents << FactoryBot.build(:ridp_document, :ridp_verification_type => v_type)}
         end
         it "returns array with #{result} documents" do
           expect(helper.ridp_documents_list(person, v_type).size).to eq result.to_i
@@ -525,7 +455,7 @@ RSpec.describe VerificationHelper, :type => :helper do
       context "#{v_type}" do
         before do
           person.consumer_role.ridp_documents=[]
-          ['Identity', 'Application'].each {|type| person.consumer_role.ridp_documents << FactoryGirl.build(:ridp_document, :ridp_verification_type => type)}
+          ['Identity', 'Application'].each {|type| person.consumer_role.ridp_documents << FactoryBot.build(:ridp_document, :ridp_verification_type => type)}
         end
         it "returns array with #{result} documents" do
           expect(helper.ridp_documents_list(person, v_type).size).to eq result.to_i
