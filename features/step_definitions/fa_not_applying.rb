@@ -55,7 +55,7 @@ When(/^the user clicks on submit button$/) do
 end
 
 When(/^the Experian returns a VERIFIED response$/) do
-  click_link "Please click here once you have contacted the exchange and have been told to proceed."
+  click_link "Continue Application"
 end
 
 Then(/^the user will navigate to the Help Paying for Coverage page$/) do
