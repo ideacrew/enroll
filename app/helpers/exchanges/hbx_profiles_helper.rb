@@ -13,5 +13,18 @@ module Exchanges
       person_roles << "General Agency Staff Role" if person.general_agency_staff_roles.present?
       person_roles
     end
+
+    def update_fein_errors(error_messages, new_fein)
+      error_messages.to_a.inject([]) do |f_errors, error|
+        if error[1].first.include?("is not a valid")
+          f_errors << "FEIN must be at least 9 digits"
+        elsif error[1].first.include?("is already taken")
+          org = Organization.where(fein: (new_fein.gsub(/\D/, ''))).first
+          f_errors << "FEIN matches HBX ID #{org.hbx_id}, #{org.legal_name}"
+        else
+          f_errors << error[1].first
+        end
+      end
+    end
   end
 end

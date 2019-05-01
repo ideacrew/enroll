@@ -45,6 +45,15 @@ describe AccessPolicies::GeneralAgencyProfile, :dbclean => :after_each do
       end
     end
 
+    context "for a broker_agency_staff_role" do
+      let(:staff_role) { FactoryGirl.create(:broker_agency_staff_role) }
+      let(:user) { FactoryGirl.create(:user, person: staff_role.person ) }
+
+      it "should authorize" do
+        expect(subject.authorize_index(ga_controller)).to be_truthy
+      end
+    end
+
     context "for normal user" do
       let(:user) { FactoryGirl.create(:user) }
 
@@ -85,6 +94,15 @@ describe AccessPolicies::GeneralAgencyProfile, :dbclean => :after_each do
       end
     end
 
+    context "for a broker_agency_staff_role" do
+      let(:staff_role) { FactoryGirl.create(:broker_agency_staff_role) }
+      let(:user) { FactoryGirl.create(:user, person: staff_role.person ) }
+
+      it "should authorize" do
+        expect(subject.authorize_assign(broker_controller, broker_agency_profile)).to be_truthy
+      end
+    end
+
     context "for a normal user" do
       let(:user) { FactoryGirl.create(:user) }
 
@@ -108,6 +126,15 @@ describe AccessPolicies::GeneralAgencyProfile, :dbclean => :after_each do
     context "for a broker_role" do
       let(:person) { FactoryGirl.create(:person) }
       let(:user) { FactoryGirl.create(:user, :broker, person: person) }
+
+      it "should authorize" do
+        expect(subject.authorize_set_default_ga(broker_controller, broker_agency_profile)).to be_truthy
+      end
+    end
+
+    context "for a broker_agency_staff_role" do
+      let(:staff_role) { FactoryGirl.create(:broker_agency_staff_role) }
+      let(:user) { FactoryGirl.create(:user, person: staff_role.person ) }
 
       it "should authorize" do
         expect(subject.authorize_set_default_ga(broker_controller, broker_agency_profile)).to be_truthy

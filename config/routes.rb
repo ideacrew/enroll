@@ -93,6 +93,8 @@ Rails.application.routes.draw do
         get :get_user_info
         get :edit_force_publish
         post :force_publish
+        get :edit_fein
+        post :update_fein
         get :identity_verification
         post :identity_verification_datatable
         get :user_account_index
@@ -382,6 +384,12 @@ Rails.application.routes.draw do
       end
       member do
         get :favorite
+      end
+    end
+
+    resources :broker_agency_staff_roles, :only => [:new, :create, :destroy] do
+      member do
+        get :approve
       end
     end
 
