@@ -5,11 +5,7 @@ module CensusEmployeeWorld
   end
 
   def fetch_benefit_group(legal_name)
-    org_by_legal_name(legal_name).benefit_sponsorships.first.benefit_applications.first.benefit_packages.first
-  end
-
-  def org_by_legal_name(legal_name)
-    @organization[legal_name]
+    employer(legal_name).benefit_sponsorships.first.benefit_applications.first.benefit_packages.first
   end
 
   def build_enrollment(attributes, *traits)
@@ -29,12 +25,8 @@ module CensusEmployeeWorld
   def person_record_from_census_employee(person, legal_name = nil, organizations = nil)
     organizations.reject! { |organization| @organization.values.include?(organization) == false }
     census_employee = CensusEmployee.where(first_name: person[:first_name], last_name: person[:last_name]).first
-    if legal_name.nil?
-      employer = @organization.values.first
-    else
-      employer = @organization[legal_name]
-    end
-    employer_prof = employer.profiles.first
+    
+    employer_prof = employer_profile(legal_name)
     emp_staff_role = FactoryBot.create(
       :benefit_sponsor_employer_staff_role,
       aasm_state: 'is_active',
@@ -93,11 +85,7 @@ module CensusEmployeeWorld
   end
 
   def create_census_employee_from_person(person, legal_name = nil)
-    if legal_name.nil?
-      organization = @organization.values.first
-    else
-      organization = @organization[legal_name]
-    end
+    organization = employer(legal_name)
     sponsorship = benefit_sponsorship(organization)
     benefit_group = fetch_benefit_group(organization.legal_name)
     FactoryBot.create(
@@ -127,7 +115,7 @@ And(/^census employee (.*?) new_hire_enrollment_period is greater than date of r
 end
 
 And(/^there (are|is) (\d+) (employee|employees) for (.*?)$/) do |_, roster_count, _, legal_name|
-  sponsorship = org_by_legal_name(legal_name).benefit_sponsorships.first
+  sponsorship = employer(legal_name).benefit_sponsorships.first
   census_employees roster_count.to_i, benefit_sponsorship: sponsorship, employer_profile: sponsorship.profile
 end
 
@@ -168,7 +156,7 @@ end
 
 And(/employee (.*) already matched with employer (.*?)(?: and (.*?))? and logged into employee portal/) do |named_person, legal_name, legal_name2|
   person = people[named_person]
-  sponsorship = org_by_legal_name(legal_name).benefit_sponsorships.first
+  sponsorship = employer(legal_name).benefit_sponsorships.first
   profile = sponsorship.profile
   ce = sponsorship.census_employees.where(:first_name => /#{person[:first_name]}/i,
                                           :last_name => /#{person[:last_name]}/i).first
@@ -232,7 +220,7 @@ And(/^Employees for (.*?) have both Benefit Group Assignments Employee role$/) d
 
   step "Assign benefit group assignments to #{legal_name} employee"
 
-  employer_profile = org_by_legal_name(legal_name).employer_profile
+  employer_profile = employer(legal_name).employer_profile
 
   @census_employees.each do |employee|
     person = FactoryBot.create(:person, :with_family, first_name: employee.first_name, last_name: employee.last_name, dob: employee.dob, ssn: employee.ssn)
