@@ -580,6 +580,7 @@ When(/^.+ go(?:es)? to register as an employee$/) do
   find("option[id='sec-answer-0-1']").click
   find("option[id='sec-answer-0-2']").click
   click_button('Save Responses')
+  sleep 1
   find('.interaction-click-control-continue').click
 end
 
@@ -816,9 +817,9 @@ When(/^.+ clicks? health radio on the group selection page$/) do
   find(:xpath, '//label[@for="coverage_kind_dental"]').click
 end
 
-When(/^(?:Employee){0}.+ clicks? continue on the group selection page$/) do
-  find('#btn-continue').click
-end
+# When(/^(?:Employee){0}.+ clicks? continue on the group selection page$/) do
+#   find('#btn-continue').click
+# end
 
 Then(/^.+ should see the plan shopping welcome page$/) do
   expect(page).to have_content('Choose Plan')
