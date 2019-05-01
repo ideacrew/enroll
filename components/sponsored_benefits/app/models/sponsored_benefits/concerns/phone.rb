@@ -16,6 +16,8 @@ module SponsoredBenefits
       field :primary, type: Boolean
       field :full_phone_number, type: String, default: ""
 
+      embedded_in :office_location, class_name: "SponsoredBenefits::Organizations::OfficeLocation"
+
       before_validation :save_phone_components
 
       before_save :set_full_phone_number

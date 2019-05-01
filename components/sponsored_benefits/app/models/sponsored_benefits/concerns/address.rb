@@ -36,6 +36,8 @@ module SponsoredBenefits
       # The name of the country where this address is located
       field :country_name, type: String, default: ""
 
+      embedded_in :office_location, class_name: "SponsoredBenefits::Organizations::OfficeLocation"
+
       validates :zip, presence: true, if: :sic_code_exists_for_employer?
       validates :kind, presence: true, if: :sic_code_exists_for_employer?
 
@@ -71,7 +73,7 @@ module SponsoredBenefits
     #
     # @return [ true, false ] true if blank, false if present
     def blank?
-      [:city, :zip, :address_1, :address_2].all? do |attr|
+      [:city, :zip, :state, :address_1, :address_2].all? do |attr|
         self.send(attr).blank?
       end
     end
