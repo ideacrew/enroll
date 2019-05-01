@@ -4,6 +4,20 @@ require 'csv'
 class OutstandingMonthlyEnrollments < MongoidMigrationTask
   include Config::AcaHelper
 
+  def get_enrollment_ids(benefit_applications)
+    benefit_applications.inject([]) do |ids, ba|
+      families = Family.unscoped.where(:"households.hbx_enrollments" => { :$elemMatch => {  :sponsored_benefit_package_id => { "$in" => ba.benefit_packages.pluck(:_id) },
+                                                                                            :aasm_state => { "$nin" => %w[coverage_canceled shopping coverage_terminated] }}})
+      id_list = ba.benefit_packages.collect(&:_id).uniq
+      enrs = families.inject([]) do |enrollments, family|
+        enrollments << family.active_household.hbx_enrollments.where(:sponsored_benefit_package_id.in => id_list).enrolled_and_renewing.to_a
+        enrollments.flatten.compact.uniq
+      end
+      ids += enrs.map(&:id)
+      ids.flatten.compact.uniq
+    end
+  end
+
   def migrate
     effective_on = Date.strptime(ENV['start_date'],'%m/%d/%Y') 
     file_name = "#{Rails.root}/hbx_report/#{effective_on.strftime('%Y%m%d')}_employer_enrollments_#{Time.now.strftime('%Y%m%d%H%M')}.csv"
@@ -49,7 +63,8 @@ class OutstandingMonthlyEnrollments < MongoidMigrationTask
       csv << field_names
       benefit_sponsorships = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where({"benefit_applications" => {"$elemMatch" => {"effective_period.min" => effective_on}}})
       benefit_applications = benefit_sponsorships.to_a.flat_map(&:benefit_applications).to_a.select{|ba| ba.effective_period.min == effective_on}
-      enrollment_ids = benefit_applications.flat_map(&:hbx_enrollments).map(&:hbx_id).compact.uniq
+      enrollment_ids = get_enrollment_ids(benefit_applications)
+      # enrollment_ids = benefit_applications.flat_map(&:hbx_enrollments).map(&:hbx_id).compact.uniq
       enrollment_ids.each do |id|
         begin
           hbx_enrollment = HbxEnrollment.by_hbx_id(id).first
