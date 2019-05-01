@@ -30,16 +30,9 @@
                   </button>
                 </div>
               </div>
-              <div class="col-md-3 col-sm-3 col-xs-0 floatlabel"></div>
             </div>
           </div>
         </div>
-
-        <% if kind == 'home' %>
-          <div style="<%= style %>"class="col-lg-3 col-md-3 col-sm-3 col-xs-5 form-group form-group-lg no-pd top-buffer" >
-            <% target = f.object.class.to_s.downcase %>
-          </div>
-        <% end %>
       </div>
       <div style="<%= style %>" class="row row-form-wrapper no-buffer address-row <%= div_class %>">
         <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
