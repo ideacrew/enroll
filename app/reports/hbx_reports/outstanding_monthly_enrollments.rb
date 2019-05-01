@@ -29,8 +29,8 @@ class OutstandingMonthlyEnrollments < MongoidMigrationTask
         end_on = benefit_application.renewal_quiet_period_end(effective_on)
       else
         end_on = benefit_application.initial_quiet_period_end(effective_on)
-      end 
-        return start_on..end_on
+      end
+      (start_on..end_on)
     end
 
     glue_list = File.read("all_glue_policies.txt").split("\n").map(&:strip) if File.exists?("all_glue_policies.txt")
