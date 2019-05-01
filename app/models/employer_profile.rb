@@ -111,8 +111,12 @@ class EmployerProfile
     organization
   end
 
+
   def census_employees
-    CensusEmployee.find_by_employer_profile(self)
+    employer_profile = self
+      Person.where("employee_roles.employer_profile_id" => employer_profile.id).reduce([]) do |list, person|
+      list << person.employee_roles.detect { |ee| ee.employer_profile_id == employer_profile.id }
+    end
   end
 
   def covered_employee_roles

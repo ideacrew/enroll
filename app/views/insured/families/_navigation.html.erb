@@ -33,11 +33,7 @@
         <% end %>
       </li>
     <% end %>
-    <li <%= menu_tab_class(@tab, 'messages') %>>
-      <%= link_to(inbox_insured_families_path(tab: 'messages')) do  %>
-        <%= l10n("messages") %> <span class="badge message-unread"><%= @person.inbox.unread_messages.size %></span>
-      <% end %>
-    </li>
+
   </ul>
   <div class="module my-account-widget panel panel-default">
     <div class="panel-heading">

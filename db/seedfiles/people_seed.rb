@@ -25,7 +25,7 @@ p0 = Person.create!(first_name: "Bill", last_name: "Murray", addresses: [hm_addr
 p1 = Person.create!(first_name: "Dan", last_name: "Aykroyd")
 p2 = Person.create!(first_name: "Chevy", last_name: "Chase")
 p3 = Person.create!(first_name: "Jane", last_name: "Curtin", addresses: [hm_addr, ml_addr], phones: [mb_phone])
-p4 = Person.create!(first_name: "Martina", last_name: "Williams", ssn: "151482930", dob: "01/25/1990", gender: "female", phones: [wk_phone1], emails: [wk_dan_email])
+p4 = Person.create!(first_name: "Martina", last_name: "Williams", ssn: "100000000", dob: "01/25/1990", gender: "female", phones: [wk_phone1], emails: [wk_dan_email])
 
 
 def generate_approved_broker (broker, wk_addr, wk_phone, wk_email, email)
@@ -62,13 +62,13 @@ puts "::: Creating ConsumerRole Roles:::"
 c0 = ConsumerRole.new(person: p0, is_incarcerated: false, is_applicant: true, is_state_resident: true, citizen_status: "us_citizen")
 c0.gender = "male"
 c0.dob = "09/21/1950"
-c0.ssn = "444556666"
+c0.ssn = "100000001"
 c0.save!
 
 c1 = ConsumerRole.new(person: p1, is_incarcerated: false, is_applicant: true, is_state_resident: true, citizen_status: "us_citizen")
 c1.gender = "male"
 c1.dob = "07/01/1952"
-c1.ssn = "444556665"
+c1.ssn = "100000002"
 c1.save!
 
 # first_name: "Bill", last_name: "Murray", gender: "male", dob: "09/21/1950", employee_relationship: "self", hired_on: "01/16/2015", ssn: "444556666"
