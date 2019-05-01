@@ -5,7 +5,7 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 
 RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
 
-  describe HbxEnrollment do
+  describe HbxEnrollment, dbclean: :around_each do
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup initial benefit application"
 
@@ -988,7 +988,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
   end
 
   context "Benefits are terminated" do
-    let(:effective_on_date) {TimeKeeper.date_of_record.beginning_of_month - 1.month}
+    let(:effective_on_date) {TimeKeeper.date_of_record.beginning_of_month}
     let!(:hbx_profile) {FactoryGirl.create(:hbx_profile)}
 
     context "Individual benefit" do
@@ -1489,6 +1489,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
     context 'When family passively renewed', dbclean: :after_each do
       include_context "setup renewal application"
 
+      let(:predecessor_application_catalog) { true }
       let(:current_effective_date) { (TimeKeeper.date_of_record + 2.months).beginning_of_month - 1.year }
       let(:renewal_state) { :enrollment_open }
       let(:open_enrollment_period)  { TimeKeeper.date_of_record..(effective_period.min - 10.days) }

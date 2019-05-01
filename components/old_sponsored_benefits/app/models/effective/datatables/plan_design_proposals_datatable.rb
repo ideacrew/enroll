@@ -84,7 +84,7 @@
         end
 
         class << self
-        	attr_accessor :organization_id
+          attr_accessor :organization_id
         end
 
         def collection

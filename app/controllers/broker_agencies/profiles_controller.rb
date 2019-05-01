@@ -56,7 +56,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def update
-    authorize HbxProfile, :modify_admin_tabs?
     sanitize_broker_profile_params
     params.permit!
 
@@ -67,6 +66,9 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @organization_dup = @organization.office_locations.as_json
 
     #clear office_locations, don't worry, we will recreate
+
+    authorize @organization.broker_agency_profile, :update?
+
     @organization.assign_attributes(:office_locations => [])
     @organization.save(validate: false)
     person = @broker_agency_profile.primary_broker_role.person
@@ -226,7 +228,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def set_default_ga
-    authorize HbxProfile, :modify_admin_tabs?
+    authorize @broker_agency_profile, :set_default_ga?
     @general_agency_profile = GeneralAgencyProfile.find(params[:general_agency_profile_id]) rescue nil
     if @broker_agency_profile.present?
       old_default_ga_id = @broker_agency_profile.default_general_agency_profile.id.to_s rescue nil
@@ -322,7 +324,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   def update_assign
     params[:general_agency_id] = params[:employers_general_agency_id] if params[:employers_general_agency_id]
-    authorize HbxProfile, :modify_admin_tabs?
+    authorize @broker_agency_profile, :set_default_ga?
     if params[:general_agency_id].present? || params[:employer_ids].present? && params[:bulk_actions_resources].present?
       general_agency_profile = GeneralAgencyProfile.find(params[:general_agency_id])
       case params[:type]
@@ -385,9 +387,8 @@ class BrokerAgencies::ProfilesController < ApplicationController
   def clear_assign_for_employer
     @broker_role = current_user.person.broker_role || nil
     @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role, approved_only: true)
-    
-    authorize HbxProfile, :modify_admin_tabs?
     @employer_profile = EmployerProfile.find(params[:employer_id]) rescue nil
+    authorize @employer_profile, :fire_general_agency?
     if @employer_profile.present?
       send_general_agency_assign_msg(@employer_profile.general_agency_profile, @employer_profile, 'Terminate')
       @employer_profile.fire_general_agency!

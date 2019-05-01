@@ -174,6 +174,12 @@ Then (/(.*) should see renewal policy in active status/) do |named_person|
   enrollment.find('.panel-heading', text: 'Coverage Selected')
 end
 
+Then(/(.*) should see active enrollment with their spouse/) do |named_person|
+  sleep 1 #wait for e-mail nonsense
+  enrollment = page.all('.hbx-enrollment-panel').detect{|e| e.find('.panel-heading .text-right').text == 'Coverage Selected' }
+
+  expect(enrollment.find('.family-members')).to have_content 'Cynthia'
+end
 
 Then(/(.*) should see active enrollment with his daughter/) do |named_person|
   sleep 1 #wait for e-mail nonsense

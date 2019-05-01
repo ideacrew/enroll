@@ -6,8 +6,8 @@ describe "exchanges/scheduled_events/new.html.erb" do
   let(:scheduled_event) { ScheduledEvent.new }
 
   before :each do
-  	assign(:scheduled_event, scheduled_event)
-  	allow(view).to receive(:policy_helper).and_return(double("Policy", view_admin_tabs?: true))
+    assign(:scheduled_event, scheduled_event)
+    allow(view).to receive(:policy_helper).and_return(double("Policy", view_admin_tabs?: true))
     sign_in user
   end
 
@@ -15,8 +15,8 @@ describe "exchanges/scheduled_events/new.html.erb" do
     def view.scheduled_event
       @scheduled_event ||= ScheduledEvent.find(params[:id])
     end
-  	render template: "exchanges/scheduled_events/_new"
-  	expect(rendered).to have_text(/Create Scheduled Events/)
+    render template: "exchanges/scheduled_events/_new"
+    expect(rendered).to have_text(/Create Scheduled Events/)
     expect(rendered).to have_text(/Start time/)
     expect(rendered).to have_text(/Recurring rules/)
     expect(rendered).to have_text(/Offset rule/)

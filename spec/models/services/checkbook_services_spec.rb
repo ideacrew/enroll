@@ -4,7 +4,7 @@ class ApplicationHelperModStubber
   extend ApplicationHelper
 end
 
-describe ::Services::CheckbookServices::PlanComparision do
+describe ::Services::CheckbookServices::PlanComparision, dbclean: :after_each do
 
   let(:census_employee) { FactoryGirl.build(:census_employee, first_name: person.first_name, last_name: person.last_name, dob: person.dob, ssn: person.ssn, employee_role_id: employee_role.id)}
   let(:household) { FactoryGirl.create(:household, family: person.primary_family)}

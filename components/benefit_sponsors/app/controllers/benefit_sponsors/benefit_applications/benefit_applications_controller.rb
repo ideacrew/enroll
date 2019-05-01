@@ -5,7 +5,7 @@ module BenefitSponsors
       include Pundit
 
       def new
-        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.for_new(params.require(:benefit_sponsorship_id))
+        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.for_new(params.permit(:benefit_sponsorship_id))
         authorize @benefit_application_form, :updateable?
       end
 
@@ -78,6 +78,13 @@ module BenefitSponsors
           flash[:error] = "Plan Year could not be reverted to draft state. #{error_messages(@benefit_application_form)}".html_safe
         end
         render :js => "window.location = #{profiles_employers_employer_profile_path(@benefit_application_form.show_page_model.benefit_sponsorship.profile, tab: 'benefits').to_json}"
+      end
+
+      def late_rates_check
+        date = params[:start_on_date].present? ? Date.strptime(params[:start_on_date], "%m/%d/%Y") : nil
+        product_form = BenefitMarkets::Forms::ProductForm.for_new(date)
+        product_form = product_form.fetch_results
+        render json: product_form.is_late_rate
       end
 
       private

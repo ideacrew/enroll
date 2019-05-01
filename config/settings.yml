@@ -47,9 +47,10 @@ site:
   healthcare_url: "https://www.healthcare.gov/"
   irs_url: "https://www.irs.gov/"
   exchange_hbx_id: "MA0"
+  tufts_premier_url: "https://tuftshealthplan.com/contact-us/members"
   mail_address: "noreply@healthconnector.org"
   privacy_policy: "https://www.mahealthconnector.org/site-policies/privacy-policy"
-  late_rates_message: "Premiums for some coverage effective dates are not yet available. Premiums are typically ready for employers at least 30 days before your coverage starts, and often sooner than that. Please check back again soon to see if premium rates are available, or call customer service if you need more additional assistance."
+  late_rates_message: "Due to a delay, premiums for some coverage effective dates are not available yet. Please check again soon to see if this information has been updated. You can also contact Customer Service or your broker if you need help."
 
   exchange_name: "Massachusetts Health Connector"
   social_media:
@@ -219,7 +220,7 @@ aca:
     renewal_application:
       earliest_start_prior_to_effective_on:
         months: -2
-        day_of_month: 0
+        day_of_month: 22
       monthly_open_enrollment_end_on: 20
       publish_due_day_of_month: 15
       application_submission_soft_deadline: 10
@@ -229,7 +230,7 @@ aca:
           days: 5
       quiet_period:
         month_offset: -1
-        mday: 26
+        mday: 25
 
     benefit_period:
       length_minimum:
@@ -258,7 +259,7 @@ aca:
       minimum_commission_statement_year: 2017
 
     transmit_scheduled_employers: true
-    employer_transmission_day_of_month: 27
+    employer_transmission_day_of_month: 26
   transmit_employers_immediately: false
   employer_has_sic_field: true
   validate_county: true

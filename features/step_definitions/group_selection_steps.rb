@@ -131,16 +131,17 @@ Given (/a matched Employee exists with active and renwal plan years/) do
   org = FactoryGirl.create :organization, :with_active_and_renewal_plan_years
   @active_benefit_group = org.employer_profile.active_plan_year.benefit_groups[0]
   active_bga = FactoryGirl.build :benefit_group_assignment, benefit_group: @active_benefit_group
+  benefit_package = FactoryGirl.build :benefit_package
 
   @renewal_benefit_group = org.employer_profile.show_plan_year.benefit_groups[0]
-  renewal_bga = FactoryGirl.build :benefit_group_assignment, benefit_group: @renewal_benefit_group
+  renewal_bga = FactoryGirl.build :benefit_group_assignment, benefit_group: @renewal_benefit_group, benefit_package_id: benefit_package.id
 
   @employee_role = person.employee_roles[0]
   ce =  FactoryGirl.build(:census_employee,
-          first_name: person.first_name, 
-          last_name: person.last_name, 
-          dob: person.dob, 
-          ssn: person.ssn, 
+          first_name: person.first_name,
+          last_name: person.last_name,
+          dob: person.dob,
+          ssn: person.ssn,
           employee_role_id: @employee_role.id,
           employer_profile: org.employer_profile
         )
@@ -209,7 +210,7 @@ end
 
 Then(/(.*) should see primary person/) do |role|
   primary = Person.all.select { |person| person.primary_family.present? }.first
-  expect(page).to have_content "COVERAGE FOR: #{primary.full_name}"
+  expect(page).to have_content "Covered: #{primary.first_name}"
 end
 
 Then(/(.*) should see the enrollment with make changes button/) do |role|

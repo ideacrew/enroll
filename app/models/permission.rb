@@ -3,6 +3,8 @@ class Permission
   include SetCurrentUser
   include Mongoid::Timestamps
 
+  PERMISSION_KINDS = %w(hbx_staff hbx_read_only hbx_csr_supervisor hbx_csr_tier1 hbx_csr_tier2 hbx_tier3 developer super_admin)
+
   field :name, type: String
 
   field :modify_family, type: Boolean, default: false
@@ -21,6 +23,11 @@ class Permission
   field :can_view_username_and_email, type: Boolean, default: false
   field :can_reset_password, type: Boolean, default: false
   field :can_extend_open_enrollment, type: Boolean, default: false
+  field :can_create_benefit_application, type: Boolean, default: false
+  field :can_change_fein, type: Boolean, default: false
+  field :can_force_publish, type: Boolean, default: false
+  field :view_the_configuration_tab, type: Boolean, default: false
+  field :can_submit_time_travel_request, type: Boolean, default: false
 
   class << self
     def hbx_staff
