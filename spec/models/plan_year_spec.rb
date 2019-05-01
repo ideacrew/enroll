@@ -2652,7 +2652,7 @@ end
 
 describe PlanYear, '.terminate_employee_enrollments', type: :model, dbclean: :after_each do
   let(:person) { FactoryGirl.create(:person, :with_family)}
-  let(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
+  let(:start_on) { TimeKeeper.date_of_record.beginning_of_month.prev_month }
   let(:employer_profile) { FactoryGirl.create(:employer_profile) }
   let(:employee_role) {FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile)}
   let!(:plan_year) {FactoryGirl.create(:plan_year, employer_profile: employer_profile, aasm_state: 'active', start_on: start_on)}
@@ -2688,7 +2688,7 @@ describe PlanYear, '.terminate_employee_enrollments', type: :model, dbclean: :af
     end
 
     it "should move the enrollment to canceled state if enrollment effective_on > py_end_on" do
-      hbx_enrollment.update_attributes!(effective_on: start_on.next_month)
+      hbx_enrollment.update_attributes!(effective_on: start_on + 2.months)
       plan_year.terminate_plan_year(py_termination_dates[1], TimeKeeper.date_of_record, 'voluntary', false)
       hbx_enrollment.reload
       expect(hbx_enrollment.aasm_state).to eq 'coverage_canceled'

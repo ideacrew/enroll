@@ -12,7 +12,7 @@ describe 'ModelEvents::RenewalEmployerIneligibiltyNotice', dbclean: :around_each
   let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
   let!(:benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: active_benefit_group, census_employee: census_employee) }
   let!(:employee_role) { FactoryGirl.create(:employee_role, employer_profile: employer,census_employee_id: census_employee.id, person: person) }
-  let!(:model_instance) { FactoryGirl.create(:plan_year, employer_profile: employer, start_on: start_on + 1.year, :aasm_state => 'renewing_enrolling', open_enrollment_end_on:  TimeKeeper.date_of_record.prev_day) }
+  let!(:model_instance) { FactoryGirl.create(:plan_year, employer_profile: employer, start_on: start_on + 1.year, :aasm_state => 'renewing_enrolling', open_enrollment_start_on: TimeKeeper.date_of_record.prev_day - 11.days, open_enrollment_end_on: TimeKeeper.date_of_record.prev_day) }
   let!(:renewal_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: model_instance, title: "Benefits #{model_instance.start_on.year}") }
   let!(:date_mock_object) { (start_on - 2.months).end_of_month.prev_day }
   let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, :with_enrollment_members,

@@ -33,7 +33,7 @@ RSpec.describe UserMailer do
     let(:email) { UserMailer.send_employee_open_enrollment_invitation(census_employee.email_address, census_employee, invitation) }
 
     context 'should send invite_initial_employee_for_open_enrollment when census_employee DOH is in the past' do
-      let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id, hired_on: TimeKeeper.date_of_record.prev_day) }
+      let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id, hired_on: TimeKeeper.date_of_record) }
 
       it 'should match from address' do
         expect(email.from).to match(['no-reply@shop.dchealthlink.com'])

@@ -43,7 +43,7 @@ describe 'ModelEvents::LowEnrollmentNoticeForEmployer', dbclean: :around_each do
       let(:start_on) { (TimeKeeper.date_of_record.beginning_of_month + 2.months).prev_year }
       let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer, start_on: start_on, :aasm_state => 'active' ) }
       let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
-      let!(:model_instance) { FactoryGirl.create(:plan_year, employer_profile: employer, start_on: start_on + 1.year, :aasm_state => 'renewing_enrolling', open_enrollment_start_on: TimeKeeper.date_of_record.prev_day) }
+      let!(:model_instance) { FactoryGirl.create(:plan_year, employer_profile: employer, start_on: start_on + 1.year, :aasm_state => 'renewing_enrolling', open_enrollment_start_on: TimeKeeper.date_of_record) }
       let!(:renewal_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: model_instance, title: "Benefits #{model_instance.start_on.year}") }
 
       it 'should trigger model event' do
@@ -139,7 +139,7 @@ describe 'ModelEvents::LowEnrollmentNoticeForEmployer', dbclean: :around_each do
     let(:start_on) { (TimeKeeper.date_of_record.beginning_of_month + 2.months).prev_year }
     let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer, start_on: start_on, :aasm_state => 'active' ) }
     let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
-    let!(:model_instance) { FactoryGirl.create(:plan_year, employer_profile: employer, start_on: start_on + 1.year, :aasm_state => 'renewing_enrolling', open_enrollment_start_on: TimeKeeper.date_of_record.prev_day) }
+    let!(:model_instance) { FactoryGirl.create(:plan_year, employer_profile: employer, start_on: start_on + 1.year, :aasm_state => 'renewing_enrolling', open_enrollment_start_on: TimeKeeper.date_of_record) }
     let!(:renewal_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: model_instance, title: "Benefits #{model_instance.start_on.year}") }
     let(:merge_model) { subject.construct_notice_object }
     let(:recipient) { "Notifier::MergeDataModels::EmployerProfile" }
