@@ -166,7 +166,6 @@ FactoryBot.define do
       approve_ga false
       modify_admin_tabs false
       view_admin_tabs  false
-      name 'developer'
     end
   end
 end

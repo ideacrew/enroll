@@ -2,7 +2,6 @@
 require File.join(Rails.root, "lib/mongoid_migration_task")
 class AddNewEligibilityDetermination < MongoidMigrationTask
   def migrate
-    puts ENV.to_a
     people = get_people
     people.each do |person|
       if person.primary_family.nil? || person.primary_family.active_household.nil? || person.primary_family.active_household.latest_active_tax_household.nil?

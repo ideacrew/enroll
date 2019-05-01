@@ -353,7 +353,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     end
   end
 
-   describe "GET edit_force_publish" do
+  describe "GET edit_force_publish" do
 
     context "of an hbx super admin clicks Force Publish" do
       let(:site) do

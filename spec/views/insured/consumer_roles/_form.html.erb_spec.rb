@@ -99,10 +99,10 @@ RSpec.describe "insured/consumer_roles/_form.html.erb" do
   end
 
   context "user doesn't has an associated e_case_id" do
-    let(:person) { FactoryGirl.create(:person) }
-    let!(:person2) { FactoryGirl.create(:person, :with_consumer_role) }
-    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person2) }
-    let(:current_user) {FactoryGirl.create(:user, :hbx_staff, person: person)}
+    let(:person) { FactoryBot.create(:person) }
+    let!(:person2) { FactoryBot.create(:person, :with_consumer_role) }
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person2) }
+    let(:current_user) {FactoryBot.create(:user, :hbx_staff, person: person)}
     before :each do
       @person = person2
       sign_in current_user

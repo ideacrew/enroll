@@ -1,9 +1,9 @@
 
 When(/^the user has a family with e_case_id and visit personal information edit page$/) do
-  person = FactoryGirl.create(:person, first_name: "sarah")
-  person2 = FactoryGirl.create(:person, :with_consumer_role, first_name: "mahesh")
-  family = FactoryGirl.create(:family, :with_primary_family_member, person: person2, e_case_id: "e_case_id")
-  current_user = FactoryGirl.create(:user, :hbx_staff, person: person)
+  person = FactoryBot.create(:person, first_name: "sarah")
+  person2 = FactoryBot.create(:person, :with_consumer_role, first_name: "mahesh")
+  family = FactoryBot.create(:family, :with_primary_family_member, person: person2, e_case_id: "e_case_id")
+  current_user = FactoryBot.create(:user, :hbx_staff, person: person)
   expect(person2.primary_family.e_case_id).to eq("e_case_id")
   visit edit_insured_consumer_role_path(person2.consumer_role.id)
 end

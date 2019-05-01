@@ -161,10 +161,10 @@ RSpec.describe ConsumerRolesHelper, :type => :helper do
   end
 
   context "ridp_redirection_link" do
-    let(:person) {FactoryGirl.build(:person, :with_consumer_role)}
-    let(:family) { FactoryGirl.build(:family)}
-    let(:user) { FactoryGirl.create(:user) }
-    let(:current_user) { FactoryGirl.create(:user, :person => person) }
+    let(:person) {FactoryBot.build(:person, :with_consumer_role)}
+    let(:family) { FactoryBot.build(:family)}
+    let(:user) { FactoryBot.create(:user) }
+    let(:current_user) { FactoryBot.create(:user, :person => person) }
 
     before :each do
       allow(helper).to receive(:current_user).and_return(current_user)
