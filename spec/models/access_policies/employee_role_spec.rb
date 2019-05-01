@@ -93,7 +93,7 @@ describe AccessPolicies::EmployeeRole, :dbclean => :after_each do
       end
     end
   end
-  
+
   context "with general agency staff role user" do
     include ActiveSupport::Concern
     subject { AccessPolicies::EmployeeRole.new(general_user) }
@@ -103,10 +103,11 @@ describe AccessPolicies::EmployeeRole, :dbclean => :after_each do
     let(:general_agency_profile) { FactoryBot.create(:general_agency_profile) }
 
     before do
+      general_agency_staff_role.unset(:benefit_sponsors_general_agency_profile_id) # ToDo - Move/remove these old specs
       general_agency_staff_role.save
       general_agency_account = GeneralAgencyAccount.create(employer_profile: person.employee_roles.first.employer_profile, start_on: TimeKeeper.date_of_record, general_agency_profile_id: general_agency_profile.id)
     end
-    
+
     context "who doesn't match employer_profile_id" do
       it "should redirect you to your bookmark employee role page or families home" do
         EmployerProfile.find_by_general_agency_profile(general_agency_profile).each { |employer_profile| employer_profile.destroy }
@@ -114,7 +115,7 @@ describe AccessPolicies::EmployeeRole, :dbclean => :after_each do
         subject.authorize_employee_role(person.employee_roles.first, controller)
       end
     end
-    
+
     context "who matches employer_profile_id by genearl agent role" do
       it "should be ok with the action" do
         expect(subject.authorize_employee_role(person.employee_roles.first, controller)).to be_truthy
