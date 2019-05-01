@@ -24,8 +24,8 @@ RSpec.describe "insured/plan_shoppings/_individual_agreement.html.erb" do
   end
 
   it "should have two hidden fields for first and last name" do
-    expect(rendered).to have_selector("input[value='jack']")
-    expect(rendered).to have_selector("input[value='white']")
+    expect(rendered).to have_selector("input[value='jack']", :visible => false)
+    expect(rendered).to have_selector("input[value='white']", :visible => false)
   end
 end
 end
