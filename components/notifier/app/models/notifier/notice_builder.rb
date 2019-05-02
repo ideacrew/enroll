@@ -180,7 +180,6 @@ module Notifier
       doc_uri = upload_to_amazonS3
       notice  = create_recipient_document(doc_uri)
       create_secure_inbox_message(notice)
-      clear tmp
     end
 
     def upload_to_amazonS3
