@@ -404,6 +404,8 @@ GEM
       redis (>= 3.2, < 5.0)
     ffi (1.9.25)
     forgery (0.7.0)
+    geckodriver-helper (0.23.0)
+      archive-zip (~> 0.7)
     gherkin (5.1.0)
     globalid (0.4.2)
       activesupport (>= 4.2.0)

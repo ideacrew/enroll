@@ -73,15 +73,20 @@ Cucumber::Rails::Database.javascript_strategy = :truncation
 Capybara::Screenshot.webkit_options = { width: 2280, height: 1800 }
 Capybara::Screenshot.prune_strategy = :keep_last_run
 
-Capybara.register_driver :selenium_chrome do |app|
-  options = Selenium::WebDriver::Chrome::Options.new
+Capybara::Screenshot.register_driver(:firefox_headless) do |driver, path|
+  driver.browser.save_screenshot(path)
+end
+
+Capybara.register_driver :firefox_headless do |app|
+  options = Selenium::WebDriver::Firefox::Options.new
   options.add_argument("--window-size=1024,768")
-  options.add_argument("headless")
+  options.add_argument("--headless")
 
   Capybara::Selenium::Driver.new(app,
-    browser: :chrome,
+    browser: :firefox,
     options: options
   )
 end
 
-Capybara.default_driver = :selenium_chrome
+Capybara.javascript_driver = :firefox_headless
+Capybara.default_driver = :firefox_headless
