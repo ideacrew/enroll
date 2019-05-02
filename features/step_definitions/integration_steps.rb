@@ -574,13 +574,14 @@ end
 When (/^(.*) logs? out$/) do |someone|
   click_link "Logout"
   visit "/"
+  sleep 5 #FIX ME: remove sleep and replace with find & wait
 end
 
 When(/^.+ go(?:es)? to register as an employee$/) do
-  find("option[id='sec-answer-0-0']").click
-  find("option[id='sec-answer-0-1']").click
-  find("option[id='sec-answer-0-2']").click
-  click_button('Save Responses')
+  # find("option[id='sec-answer-0-0']").click
+  # find("option[id='sec-answer-0-1']").click
+  # find("option[id='sec-answer-0-2']").click
+  # click_button('Save Responses')
   sleep 1
   find('.interaction-click-control-continue').click
 end
@@ -790,6 +791,7 @@ When(/^.+ enters? the dependent info of Patrick wife$/) do
   fill_in 'dependent[ssn]', with: '123445678'
   fill_in 'jq_datepicker_ignore_dependent[dob]', with: '01/15/1996'
   find('#dependents_info_wrapper').click
+  sleep 1
   find(:xpath, "//span[@class='label'][contains(., 'This Person Is')]").click
   find(:xpath, "//li[@data-index='1'][contains(., 'Spouse')]").click
   find(:xpath, "//label[@for='radio_female']").click
@@ -852,6 +854,7 @@ When(/^.+ clicks Shop for new plan button$/) do
 end
 
 Then(/^.+ should see the list of plans$/) do
+  find('#planContainer', wait: 10)
   expect(page).to have_link('Select')
   screenshot("plan_shopping")
 end
@@ -886,6 +889,7 @@ Then(/^.+ should see the receipt page$/) do
 end
 
 Then(/^.+ should see the "my account" page$/) do
+  find('.my-account-page', wait: 10)
   expect(page).to have_content("My #{Settings.site.short_name}")
   screenshot("my_account")
 end

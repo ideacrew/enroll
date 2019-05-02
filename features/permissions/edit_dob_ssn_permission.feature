@@ -28,13 +28,13 @@ Feature: Only Super Admin HBX Staff HBX Tier3 will be able to see & access the E
     And Employee clicks Confirm
     And Employee sees the Enrollment Submitted page and clicks Continue
     And Employee Patrick Doe should see their plan start date on the page
-    And Hbx Admin logs out
-
+   
   Scenario Outline: HBX Staff with <subrole> subroles should <action> Change FEIN button
     Given that a user with a HBX staff role with <subrole> subrole exists and is logged in
     And the user is on the Family Index of the Admin Dashboard
     When the user clicks Action for that Employer
     Then the user will <action> the Edit DOB SSN button
+    And Hbx Admin logs out
 
     Examples:
       | subrole       | action  |

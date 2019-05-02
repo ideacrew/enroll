@@ -32,7 +32,7 @@ module EmployerWorld
   end
 
   def employer_profile(legal_name = nil)
-    @employer_profile ||= employer(legal_name).employer_profile
+    employer(legal_name).employer_profile
   end
 
   def registering_employer
@@ -81,7 +81,6 @@ And(/^(.*?) employer terminates employees$/) do |legal_name|
     employee.terminate_employment(termination_date)
   end
 end
-
 
 And(/^(.*?) is logged in and on the home page$/) do |legal_name|
   organization = @organization[legal_name]

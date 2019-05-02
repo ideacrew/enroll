@@ -5,17 +5,16 @@ Given(/^(.*) eligibility rule has been set to (.*)?/) do |legal_name, rule|
     'first of month following 30 days' => 30,
     'first of month following 60 days' => 60
   }
-  organization = @organization[legal_name]
-  employer_profile = organization.employer_profile
-  employer_profile.benefit_applications.each do |ba|
-    ba.benefit_groups.each do |bg|
-      bg.update_attributes({
-        'probation_period_kind' => 'first_of_month'
-        })
+
+  employer_profile = employer_profile(legal_name)
+  sponsorship = employer_profile.active_benefit_sponsorship
+  sponsorship.benefit_applications.each do |benefit_application|
+    benefit_application.benefit_packages.each do |benefit_package|
+      benefit_package.probation_period_kind = :first_of_month
     end
   end
+  sponsorship.save!
 end
-
 
 Given(/I reset employee to future enrollment window/) do
   CensusEmployee.where(:first_name => /Patrick/i, :last_name => /Doe/i).first.update_attributes({
@@ -79,7 +78,7 @@ Then(/Employee tries to complete purchase of another plan/) do
 end
 
 When(/(.*) clicks \"Shop for Plans\" on my account page/) do |named_person|
-  find('.interaction-click-control-shop-for-plans').click
+  find('.interaction-click-control-shop-for-plans', wait: 10).click
 end
 
 When(/^Employee clicks continue button on group selection page for dependents$/) do
@@ -91,13 +90,7 @@ When(/^Employee clicks continue button on group selection page for dependents$/)
 end
 
 When(/(.*) clicks continue on the group selection page/) do |named_person|
-  reset_product_cache
-  wait_for_ajax(2,2)
-  if find_all('.interaction-click-control-continue', wait: 10).any?
-    find('.interaction-click-control-continue').click
-  else
-    find('.interaction-click-control-shop-for-new-plan', :wait => 10).click
-  end
+  find_all('.interaction-click-control-continue,.interaction-click-control-shop-for-new-plan', wait: 10).first.click
 end
 
 Then(/^I can click Shop for Plans button$/) do
@@ -112,9 +105,7 @@ And(/Employer for (.*) has (.*) rule/) do |named_person, rule|
 end
 
 Then(/(.*) should see (.*) page with employer name and plan details/) do |named_person, page|
-  organization = @organization["Acme Inc."]
-  employer_profile = organization.employer_profile
-  find('p', text: employer_profile.legal_name)
+  find('p', text: employer("Acme Inc.").legal_name, wait: 10)
   find('.coverage_effective_date', text: expected_effective_on.strftime("%m/%d/%Y"))
 end
 
@@ -123,7 +114,7 @@ When(/(.*) clicks back to my account button/) do |named_person|
 end
 
 When(/(.*) clicks on Continue button on receipt page/) do |named_person|
-  find('.interaction-click-control-continue').click
+  find('.interaction-click-control-continue', wait: 10).click
 end
 
 Then(/(.*) should see enrollment on my account page/) do |named_person|
@@ -282,7 +273,7 @@ end
 
 Then(/Employee should see \"not yet eligible\" error message/) do
   screenshot("new_hire_not_yet_eligible_exception")
-  wait_for_ajax(2,2)
+  find('.alert.alert-error', wait: 10)
   expect(page).to have_content("You're not yet eligible under your employer-sponsored benefits. Please return on #{TimeKeeper.date_of_record + 15.days} to enroll for coverage.")
   visit '/families/home'
 end
@@ -295,13 +286,13 @@ end
 
 When(/Employee enters Qualifying Life Event/) do
   wait_for_ajax
-  first("#carousel-qles a").click
+  find_all("#carousel-qles a", wait: 10).first.click
   expect(page).to have_content "Married"
   screenshot("future_qle_date")
   wait_for_ajax
   fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
-  find('.interaction-click-control-continue').click
-  click_button "Continue"
+  find('#qle_submit', wait: 10).click
+  find('input.interaction-click-control-continue', wait: 10, visible: false).click
   screenshot("completing SEP")
 end
 
