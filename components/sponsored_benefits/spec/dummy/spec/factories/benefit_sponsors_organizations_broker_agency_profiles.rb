@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :benefit_sponsors_organizations_broker_agency_profile, class: 'BenefitSponsors::Organizations::BrokerAgencyProfile' do
 
     market_kind :shop
@@ -19,9 +19,9 @@ FactoryGirl.define do
     after(:build) do |profile, evaluator|
       if profile.organization.blank?
         if evaluator.assigned_site
-          profile.organization = FactoryGirl.build(:benefit_sponsors_organizations_general_organization, legal_name: evaluator.legal_name, site: evaluator.assigned_site )
+          profile.organization = FactoryBot.build(:benefit_sponsors_organizations_general_organization, legal_name: evaluator.legal_name, site: evaluator.assigned_site )
         else
-          profile.organization = FactoryGirl.build(:benefit_sponsors_organizations_general_organization, :with_site)
+          profile.organization = FactoryBot.build(:benefit_sponsors_organizations_general_organization, :with_site)
         end
       end
     end

@@ -31,82 +31,82 @@ module SponsoredBenefits
     }
 
     describe "GET index" do
-      let(:person) { FactoryGirl.create(:person, :with_broker_role).tap do |person|
+      let(:person) { FactoryBot.create(:person, :with_broker_role).tap do |person|
         person.broker_role.update_attributes(broker_agency_profile_id: broker_agency_profile.id.to_s)
       end }
 
-      let!(:user_with_broker_role) { FactoryGirl.create(:user, person: person) }
+      let!(:user_with_broker_role) { FactoryBot.create(:user, person: person) }
 
       it "returns a success response" do
         sign_in user_with_broker_role
-        get :index, { plan_design_proposal_id: plan_design_proposal.id }
-        expect(response).to be_success
+        get :index, params: { plan_design_proposal_id: plan_design_proposal.id }
+        expect(response).to be_successful
       end
     end
 
     describe "GET show" do
-      let(:person) { FactoryGirl.create(:person, :with_broker_role).tap do |person|
+      let(:person) { FactoryBot.create(:person, :with_broker_role).tap do |person|
         person.broker_role.update_attributes(broker_agency_profile_id: broker_agency_profile.id.to_s)
       end }
 
-      let!(:user_with_broker_role) { FactoryGirl.create(:user, person: person) }
+      let!(:user_with_broker_role) { FactoryBot.create(:user, person: person) }
 
       it "returns a success response" do
         sign_in user_with_broker_role
-        get :show, plan_design_proposal_id: plan_design_proposal.id, :id => plan_design_census_employee.to_param
-        expect(response).to be_success
+        get :show, params: {plan_design_proposal_id: plan_design_proposal.id, :id => plan_design_census_employee.to_param}
+        expect(response).to be_successful
       end
     end
 
     describe "GET new" do
-      let(:person) { FactoryGirl.create(:person, :with_broker_role).tap do |person|
+      let(:person) { FactoryBot.create(:person, :with_broker_role).tap do |person|
         person.broker_role.update_attributes(broker_agency_profile_id: broker_agency_profile.id.to_s)
       end }
 
-      let!(:user_with_broker_role) { FactoryGirl.create(:user, person: person) }
+      let!(:user_with_broker_role) { FactoryBot.create(:user, person: person) }
 
       it "returns a success response" do
         sign_in user_with_broker_role
-        xhr :get, :new, plan_design_proposal_id: plan_design_proposal.id, format: :js
+        get :new, xhr: true, params: {plan_design_proposal_id: plan_design_proposal.id}
         expect(assigns(:census_employee)).to be_a(SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee)
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response).to render_template('new')
       end
 
       context "upload" do
         it "returns a success response" do
           sign_in user_with_broker_role
-          xhr :get, :new, plan_design_proposal_id: plan_design_proposal.id, modal: "upload", format: :js
+          get :new, xhr: true, params: { plan_design_proposal_id: plan_design_proposal.id, modal: "upload"}
           expect(assigns(:census_employee)).to be_a(SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee)
-          expect(response).to be_success
+          expect(response).to be_successful
           expect(response).to render_template('upload_employees')
         end
       end
     end
 
     describe "GET #edit" do
-      let(:person) { FactoryGirl.create(:person, :with_broker_role).tap do |person|
+      let(:person) { FactoryBot.create(:person, :with_broker_role).tap do |person|
         person.broker_role.update_attributes(broker_agency_profile_id: broker_agency_profile.id.to_s)
       end }
 
-      let!(:user_with_broker_role) { FactoryGirl.create(:user, person: person) }
+      let!(:user_with_broker_role) { FactoryBot.create(:user, person: person) }
 
       it "returns a success response" do
         sign_in user_with_broker_role
-        xhr :get, :edit, plan_design_proposal_id: plan_design_proposal.id, :id => plan_design_census_employee.to_param, format: :js
+        get :edit, xhr: true, params: {plan_design_proposal_id: plan_design_proposal.id, :id => plan_design_census_employee.to_param}
         expect(assigns(:census_employee)).to eq plan_design_census_employee
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response).to render_template('edit')
       end
     end
 
     describe "POST #create" do
 
-      let(:person) { FactoryGirl.create(:person, :with_broker_role).tap do |person|
+      let(:person) { FactoryBot.create(:person, :with_broker_role).tap do |person|
         person.broker_role.update_attributes(broker_agency_profile_id: broker_agency_profile.id.to_s)
       end }
 
-      let!(:user_with_broker_role) { FactoryGirl.create(:user, person: person) }
+      let!(:user_with_broker_role) { FactoryBot.create(:user, person: person) }
 
       context "with valid params" do
         let(:plan_proposal) { plan_design_proposal }
@@ -118,13 +118,13 @@ module SponsoredBenefits
 
         it "creates a new CensusMembers::PlanDesignCensusEmployee" do
           sign_in user_with_broker_role
-          post :create, plan_design_proposal_id: plan_design_proposal.id, census_members_plan_design_census_employee: valid_attributes
+          post :create, params: {plan_design_proposal_id: plan_design_proposal.id, census_members_plan_design_census_employee: valid_attributes}
           expect(response).to redirect_to "http://test.host"
         end
 
         it "creates a new CensusMembers::PlanDesignCensusEmployee with dependents" do
           sign_in user_with_broker_role
-          post :create, {plan_design_proposal_id: plan_design_proposal.id, census_members_plan_design_census_employee: valid_attributes}
+          post :create, params: {plan_design_proposal_id: plan_design_proposal.id, census_members_plan_design_census_employee: valid_attributes}
           census_employee = CensusMembers::PlanDesignCensusEmployee.last
           expect(census_employee.census_dependents.size).to eq 2
           spouse = census_employee.census_dependents.detect {|cd| cd.employee_relationship == 'spouse'}
@@ -141,7 +141,7 @@ module SponsoredBenefits
           edit_url = edit_organizations_plan_design_organization_plan_design_proposal_path(plan_design_org, plan_proposal)
           request.env["HTTP_REFERER"] = edit_url
           sign_in user_with_broker_role
-          post :create, {plan_design_proposal_id: plan_design_proposal.id, census_members_plan_design_census_employee: valid_attributes}
+          post :create, params: {plan_design_proposal_id: plan_design_proposal.id, census_members_plan_design_census_employee: valid_attributes}
           expect(flash[:success]).to eq "Employee record created successfully."
           expect(response).to redirect_to edit_url
         end
@@ -156,7 +156,7 @@ module SponsoredBenefits
           it "returns a success response (i.e. to display the 'new' template)" do
             sign_in user_with_broker_role
             valid_attributes["dob"] = nil
-            post :create, {plan_design_proposal_id: plan_design_proposal.id, census_members_plan_design_census_employee: valid_attributes}
+            post :create, params: {plan_design_proposal_id: plan_design_proposal.id, census_members_plan_design_census_employee: valid_attributes}
             expect(flash[:error]).to eq "Unable to create employee record. [\"Dob can't be blank\", \"Dob can't be blank\"]"
 
             expect(response).to redirect_to "http://test.host"
@@ -165,34 +165,34 @@ module SponsoredBenefits
     end
 
     describe "DELETE #destroy" do
-      let(:person) { FactoryGirl.create(:person, :with_broker_role).tap do |person|
+      let(:person) { FactoryBot.create(:person, :with_broker_role).tap do |person|
         person.broker_role.update_attributes(broker_agency_profile_id: broker_agency_profile.id.to_s)
       end }
 
-      let!(:user_with_broker_role) { FactoryGirl.create(:user, person: person) }
+      let!(:user_with_broker_role) { FactoryBot.create(:user, person: person) }
 
       it "destroys the requested census_members_plan_design_census_employee" do
         sign_in user_with_broker_role
         plan_design_census_employee = CensusMembers::PlanDesignCensusEmployee.create! valid_attributes
         expect {
-          delete :destroy, plan_design_proposal_id: plan_design_proposal.id.to_s, id: plan_design_census_employee.id.to_s, format: :js
+          delete :destroy, params: {plan_design_proposal_id: plan_design_proposal.id.to_s, id: plan_design_census_employee.id.to_s, format: :js}
         }.to change(CensusMembers::PlanDesignCensusEmployee, :count).by(-1)
       end
 
       it "redirects to the census_members_plan_design_census_employees list" do
         sign_in user_with_broker_role
         plan_design_census_employee = CensusMembers::PlanDesignCensusEmployee.create! valid_attributes
-        delete :destroy, plan_design_proposal_id: plan_design_proposal.id.to_s, id: plan_design_census_employee.id.to_s, format: :js
+        delete :destroy, params: { plan_design_proposal_id: plan_design_proposal.id.to_s, id: plan_design_census_employee.id.to_s, format: :js}
         expect(response.code).to eq "200"
       end
     end
 
     describe "PUT #update" do
-      let(:person) {FactoryGirl.create(:person, :with_broker_role).tap do |person|
+      let(:person) {FactoryBot.create(:person, :with_broker_role).tap do |person|
         person.broker_role.update_attributes(broker_agency_profile_id: broker_agency_profile.id.to_s)
       end}
 
-      let!(:user_with_broker_role) {FactoryGirl.create(:user, person: person)}
+      let!(:user_with_broker_role) {FactoryBot.create(:user, person: person)}
       let(:new_attributes) {{
               "first_name"  => "John",
               "middle_name" => "",
@@ -221,10 +221,10 @@ module SponsoredBenefits
         context "when dependent added" do
           it "should add dependents" do
             expect(census_employee.census_dependents).to be_empty
-            xhr :put, :update, plan_design_proposal_id: praposal.id.to_s, :id => census_employee.id.to_s, :census_members_plan_design_census_employee => new_attributes.merge(census_dependents_attributes: census_dependents_attributes), format: :js
+            put :update, xhr: true, params: {plan_design_proposal_id: praposal.id.to_s, :id => census_employee.id.to_s, :census_members_plan_design_census_employee => new_attributes.merge(census_dependents_attributes: census_dependents_attributes)}
             census_employee.reload
             expect(census_employee.census_dependents.size).to eq 2
-            expect(response).to be_success
+            expect(response).to be_successful
             expect(response).to render_template('update')
           end
         end
@@ -240,7 +240,7 @@ module SponsoredBenefits
 
           it "should drop dependents" do
             expect(census_employee.census_dependents.size).to eq 2
-            xhr :put, :update, plan_design_proposal_id: plan_design_proposal.id, :id => census_employee.to_param, :census_members_plan_design_census_employee => new_attributes.merge(census_dependents_attributes: delete_dependents_attributes), format: :js
+            put :update, xhr: true, params: {plan_design_proposal_id: plan_design_proposal.id, :id => census_employee.to_param, :census_members_plan_design_census_employee => new_attributes.merge(census_dependents_attributes: delete_dependents_attributes)}
             census_employee.reload
             expect(census_employee.census_dependents.size).to eq 1
             expect(census_employee.census_dependents.detect {|cd| cd.employee_relationship == 'child_under_26'}).to be_nil
@@ -268,7 +268,7 @@ module SponsoredBenefits
           }}
 
           it "should update employee and dependents information" do
-            xhr :put, :update, plan_design_proposal_id: praposal.id, :id => census_employee.to_param, :census_members_plan_design_census_employee => updated_attributes, format: :js
+            put :update, xhr: true, params: {plan_design_proposal_id: praposal.id, :id => census_employee.to_param, :census_members_plan_design_census_employee => updated_attributes}
             census_employee.reload
             expect((census_employee.email.attributes.to_a & updated_attributes["email_attributes"].to_a).to_h).to eq updated_attributes["email_attributes"]
             expect((census_employee.address.attributes.to_a & updated_attributes["address_attributes"].to_a).to_h).to eq updated_attributes["address_attributes"]

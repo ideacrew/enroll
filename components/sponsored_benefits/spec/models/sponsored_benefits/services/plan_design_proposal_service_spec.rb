@@ -5,12 +5,12 @@ RSpec.describe SponsoredBenefits::Services::PlanDesignProposalService, type: :mo
     proposal: proposal
   )}
 
-  let(:organization) { FactoryGirl.create(:sponsored_benefits_plan_design_organization, :with_profile)}
+  let(:organization) { FactoryBot.create(:sponsored_benefits_plan_design_organization, :with_profile)}
   let(:proposal) { organization.plan_design_proposals.first }
   let(:benefit_kind) { "health" }
   let(:profile) { proposal.profile }
   let(:sponsorship) { profile.benefit_sponsorships.first }
-  let(:application) { FactoryGirl.create(:plan_design_benefit_application, benefit_sponsorship: sponsorship)}
+  let(:application) { FactoryBot.create(:plan_design_benefit_application, benefit_sponsorship: sponsorship)}
 
   before do
     DatabaseCleaner.clean
@@ -60,7 +60,7 @@ RSpec.describe SponsoredBenefits::Services::PlanDesignProposalService, type: :mo
   describe "#ensure_dental_benefits" do
 
     let(:benefit_kind) { "dental" }
-    let(:application) { FactoryGirl.create(:plan_design_benefit_application, :with_benefit_group, benefit_sponsorship: sponsorship) }
+    let(:application) { FactoryBot.create(:plan_design_benefit_application, :with_benefit_group, benefit_sponsorship: sponsorship) }
 
     before do
       application

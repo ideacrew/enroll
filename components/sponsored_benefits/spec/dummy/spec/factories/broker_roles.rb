@@ -1,6 +1,6 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :broker_role do
-    person { FactoryGirl.create(:person, :with_work_phone, :with_work_email) }
+    person { FactoryBot.create(:person, :with_work_phone, :with_work_email) }
     npn do
       Forgery('basic').text(:allow_lower   => false,
                             :allow_upper   => false,

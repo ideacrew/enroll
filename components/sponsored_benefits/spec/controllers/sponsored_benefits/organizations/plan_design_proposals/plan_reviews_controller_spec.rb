@@ -6,8 +6,8 @@ module SponsoredBenefits
     routes { SponsoredBenefits::Engine.routes }
     include_context "set up broker agency profile for BQT, by using configuration settings"
 
-    let!(:person) { FactoryGirl.create(:person, :with_broker_role) }
-    let!(:user_with_broker_role) { FactoryGirl.create(:user, person: person ) }
+    let!(:person) { FactoryBot.create(:person, :with_broker_role) }
+    let!(:user_with_broker_role) { FactoryBot.create(:user, person: person ) }
 
     before do
       plan_design_census_employee
@@ -17,45 +17,45 @@ module SponsoredBenefits
     end
  
     describe "GET #new" do
+      before do
+        get :new, params: {plan_design_proposal_id: plan_design_proposal.id}
+      end
+
       it "should return a success response" do
-        get :new, plan_design_proposal_id: plan_design_proposal.id
         expect(response).to have_http_status(:success)
       end
 
       it "should set the plan_design_organization instance variable" do
-        get :new, plan_design_proposal_id: plan_design_proposal.id
         expect(assigns(:plan_design_organization)).to eq plan_design_proposal.plan_design_organization
       end
 
       it "should set benefit_group instance variable" do
-        get :new, plan_design_proposal_id: plan_design_proposal.id
         expect(assigns(:benefit_group)).to eq benefit_group
       end
 
       it "should set census_employees instance variable" do
-        get :new, plan_design_proposal_id: plan_design_proposal.id
         expect(assigns(:census_employees)).to eq(plan_design_proposal.profile.benefit_sponsorships.first.census_employees)
       end
     end
 
     describe "GET #show" do
+      before do
+        get :show, params: {plan_design_proposal_id: plan_design_proposal.id}
+      end
+
       it "should return a success response" do
-        get :show, plan_design_proposal_id: plan_design_proposal.id
         expect(response).to have_http_status(:success)
       end
 
       it "should set the plan_design_organization instance variable" do
-        get :show, plan_design_proposal_id: plan_design_proposal.id
         expect(assigns(:plan_design_organization)).to eq plan_design_proposal.plan_design_organization
       end
 
       it "should set the benefit_group instance variable" do
-        get :show, plan_design_proposal_id: plan_design_proposal.id
         expect(assigns(:benefit_group)).to eq benefit_group
       end
 
       it "should set the census_employees instance variable" do
-        get :show, plan_design_proposal_id: plan_design_proposal.id
         expect(assigns(:census_employees)).to eq(plan_design_proposal.profile.benefit_sponsorships.first.census_employees)
       end
     end

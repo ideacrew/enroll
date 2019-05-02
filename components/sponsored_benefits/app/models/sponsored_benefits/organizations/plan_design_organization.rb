@@ -7,7 +7,7 @@ module SponsoredBenefits
       include Concerns::OrganizationConcern
       include Concerns::AcaRatingAreaConfigConcern
 
-      belongs_to :broker_agency_profile, class_name: "SponsoredBenefits::Organizations::BrokerAgencyProfile", inverse_of: 'plan_design_organization'
+      belongs_to :broker_agency_profile, class_name: "SponsoredBenefits::Organizations::BrokerAgencyProfile", inverse_of: 'plan_design_organization', optional: true
 
       # Registered legal name
       field :legal_name, type: String

@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :benefit_sponsors_locations_phone, class: 'BenefitSponsors::Locations::Phone' do
     kind 'work'
     # sequence(:area_code, WrappingSequence.new(100, 999)) { |n| "#{n}"}

@@ -5,8 +5,8 @@ module SponsoredBenefits
   RSpec.describe Organizations::BrokerAgencyProfilesController, type: :controller, dbclean: :around_each  do
     routes { SponsoredBenefits::Engine.routes }
     include_context "set up broker agency profile for BQT, by using configuration settings"
-    let!(:user_with_hbx_staff_role) { FactoryGirl.create(:user, :with_hbx_staff_role) }
-    let!(:person) { FactoryGirl.create(:person, user: user_with_hbx_staff_role )}
+    let!(:user_with_hbx_staff_role) { FactoryBot.create(:user, :with_hbx_staff_role) }
+    let!(:person) { FactoryBot.create(:person, user: user_with_hbx_staff_role )}
     # let(:broker_double) { double(id: '12345') }
     # let(:current_person) { double(:current_person) }
     # let(:broker_role) { double(:broker_role, broker_agency_profile_id: '5ac4cb58be0a6c3ef400009b') }
@@ -26,7 +26,7 @@ module SponsoredBenefits
     context "#employers" do
       before do
         sign_in user_with_hbx_staff_role
-        xhr :get, :employers, id: owner_profile.id
+        get :employers, xhr: true, params: {id: owner_profile.id}
       end
 
       it "should set datatable instance variable" do

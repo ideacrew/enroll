@@ -7,20 +7,20 @@ module SponsoredBenefits
 
     include_context "set up broker agency profile for BQT, by using configuration settings"
 
-    let(:plans) { FactoryGirl.create_list(:plan, 5, :with_premium_tables, market: 'shop')}
+    let(:plans) { FactoryBot.create_list(:plan, 5, :with_premium_tables, market: 'shop')}
 
-    let(:person) { FactoryGirl.create(:person, :with_broker_role).tap do |person|
+    let(:person) { FactoryBot.create(:person, :with_broker_role).tap do |person|
       person.broker_role.update_attributes(broker_agency_profile_id: broker_agency_profile.id.to_s)
     end }
 
-    let!(:user_with_broker_role) { FactoryGirl.create(:user, person: person) }
+    let!(:user_with_broker_role) { FactoryBot.create(:user, person: person) }
 
     describe "GET #index" do
       let(:carrier_profile_id) {plans.first.carrier_profile.id.to_s}
 
       before :each do
         sign_in user_with_broker_role
-        get :index, plan_design_organization_id: plan_design_organization.id, selected_carrier_level: "single_carrier", kind: "health", carrier_id: carrier_profile_id, active_year: TimeKeeper.date_of_record.year, format: :js
+        get :index, params: {plan_design_organization_id: plan_design_organization.id, selected_carrier_level: "single_carrier", kind: "health", carrier_id: carrier_profile_id, active_year: TimeKeeper.date_of_record.year, format: :js}
       end
 
       it "returns a success response" do

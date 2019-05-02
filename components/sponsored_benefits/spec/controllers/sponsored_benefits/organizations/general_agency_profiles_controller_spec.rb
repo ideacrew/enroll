@@ -5,8 +5,8 @@ module SponsoredBenefits
     include_context "set up broker agency profile for BQT, by using configuration settings"
     routes { SponsoredBenefits::Engine.routes }
 
-    let(:user) { FactoryGirl.create(:user)}
-    let(:person) { FactoryGirl.create(:person, user: user)}
+    let(:user) { FactoryBot.create(:user)}
+    let(:person) { FactoryBot.create(:person, user: user)}
 
     before do
       sign_in person.user
@@ -14,7 +14,7 @@ module SponsoredBenefits
     
     describe "GET index" do
       before do
-        xhr :get, :index, id: plan_design_organization.id, broker_agency_profile_id: plan_design_organization.owner_profile_id, action_id: "plan_design_#{plan_design_organization.id}"
+        get :index, xhr: true, params: { id: plan_design_organization.id, broker_agency_profile_id: plan_design_organization.owner_profile_id, action_id: "plan_design_#{plan_design_organization.id}"}
       end
 
       it "should initialize form object" do
@@ -28,7 +28,7 @@ module SponsoredBenefits
 
     describe "POST assign" do
       before do
-        post :assign, ids: [plan_design_organization.id], broker_agency_profile_id: plan_design_organization.owner_profile_id, general_agency_profile_id: general_agency_profile.id
+        post :assign, params: {ids: [plan_design_organization.id], broker_agency_profile_id: plan_design_organization.owner_profile_id, general_agency_profile_id: general_agency_profile.id}
       end
 
       it "should initialize form object" do
@@ -42,7 +42,7 @@ module SponsoredBenefits
 
     describe "POST fire" do
       before do
-        post :fire, id: plan_design_organization.id, broker_agency_profile_id: plan_design_organization.owner_profile_id
+        post :fire, params: {id: plan_design_organization.id, broker_agency_profile_id: plan_design_organization.owner_profile_id}
       end
 
       it "should initialize form object" do

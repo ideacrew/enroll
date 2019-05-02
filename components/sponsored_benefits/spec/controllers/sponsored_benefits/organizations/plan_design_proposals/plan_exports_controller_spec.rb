@@ -6,11 +6,11 @@ module SponsoredBenefits
     routes { SponsoredBenefits::Engine.routes }
     include_context "set up broker agency profile for BQT, by using configuration settings"
 
-    let!(:person) { FactoryGirl.create(:person, :with_broker_role).tap do |person|
+    let!(:person) { FactoryBot.create(:person, :with_broker_role).tap do |person|
                     person.broker_role.update_attributes(broker_agency_profile_id: plan_design_organization.owner_profile_id)
     end
     }
-    let!(:user_with_broker_role) { FactoryGirl.create(:user, person: person ) }
+    let!(:user_with_broker_role) { FactoryBot.create(:user, person: person ) }
     let(:enrollment_period) {TimeKeeper.date_of_record.beginning_of_month..(TimeKeeper.date_of_record.beginning_of_month + 15.days)}
 
     describe "POST create" do
@@ -18,7 +18,7 @@ module SponsoredBenefits
         plan_design_census_employee
         benefit_application.benefit_sponsorship.update_attributes(initial_enrollment_period: enrollment_period)
         sign_in user_with_broker_role
-        post :create, plan_design_proposal_id: plan_design_proposal.id, benefit_group: {kind: :health}
+        post :create, params: {plan_design_proposal_id: plan_design_proposal.id, benefit_group: {kind: :health}}
       end
 
       it "should be success" do
