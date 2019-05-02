@@ -94,28 +94,28 @@ module SponsoredBenefits
     describe "GET #index" do
       it "returns a success response" do
         get :index, params: { plan_design_organization_id: plan_design_organization.id, profile_id:  plan_design_organization.owner_profile_id}
-        expect(response).to be_success
+        expect(response).to be_successful
       end
     end
 
     describe "GET #show" do
       it "returns a success response" do
         get :show, params: { id: plan_design_proposal.to_param }
-        expect(response).to be_success
+        expect(response).to be_successful
       end
     end
 
     describe "GET #new" do
       it "returns a success response" do
         get :new, params: { plan_design_organization_id: plan_design_organization.id, profile_id:  plan_design_organization.owner_profile_id }
-        expect(response).to be_success
+        expect(response).to be_successful
       end
     end
 
     describe "GET #edit" do
       it "returns a success response" do
         get :edit, params: { id: plan_design_proposal.to_param, plan_design_organization_id: plan_design_organization.id, profile_id:  plan_design_organization.owner_profile_id }
-        expect(response).to be_success
+        expect(response).to be_successful
       end
     end
 
@@ -131,7 +131,7 @@ module SponsoredBenefits
       context "with invalid params" do
         it "returns a success response (i.e. to display the 'new' template)" do
           post :create, xhr: true, params: { plan_design_organization_id: plan_design_organization.to_param, forms_plan_design_proposal: invalid_attributes}
-          expect(response).to be_success
+          expect(response).to be_successful
         end
       end
     end
@@ -160,7 +160,7 @@ module SponsoredBenefits
     #     it "returns a success response (i.e. to display the 'edit' template)" do
     #       plan_design_proposal = Organizations::PlanDesignProposal.create! valid_attributes
     #       put :update, {:id => plan_design_proposal.to_param, :organizations_plan_design_proposal => invalid_attributes}, valid_session
-    #       expect(response).to be_success
+    #       expect(response).to be_successful
     #     end
     #   end
     # end
