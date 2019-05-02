@@ -82,7 +82,7 @@ module SponsoredBenefits
         end
 
         it "should returns a success response" do
-          expect(response).to be_success
+          expect(response).to be_successful
         end
       end
     end
@@ -138,7 +138,7 @@ module SponsoredBenefits
         context "for user #{role}" do
 
           it "returns a success response" do
-            expect(response).to be_success
+            expect(response).to be_successful
           end
         end
       end

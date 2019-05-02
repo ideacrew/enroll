@@ -22,7 +22,7 @@ module SponsoredBenefits
       end
 
       it "should be success" do
-        expect(response).to be_success
+        expect(response).to be_successful
       end
     end
 
