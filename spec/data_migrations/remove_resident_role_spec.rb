@@ -9,7 +9,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
     describe "given a task name" do
       it "has the given task name" do
-        puts "test ------------#{subject}"
         expect(subject.name).to eql given_task_name
       end
     end
