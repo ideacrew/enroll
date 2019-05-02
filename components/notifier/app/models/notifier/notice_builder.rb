@@ -137,7 +137,11 @@ module Notifier
     end
 
     def notice_filename
-      "#{subject.titleize.gsub(/\s+/, '_')}"
+      if shop_market?
+        "#{subject.titleize.gsub(/\s+/, '_')}"
+      else
+        "#{subject.titleize.gsub(/\s+/, '_')}_#{notice_recipient.hbx_id}"
+      end
     end
 
     def non_discrimination_attachment
@@ -177,7 +181,8 @@ module Notifier
     def upload_and_send_secure_message
       doc_uri = upload_to_amazonS3
       notice  = create_recipient_document(doc_uri)
-      create_secure_inbox_message(notice) unless self.event_name == 'generate_initial_employer_invoice'
+      create_secure_inbox_message(notice)
+      clear tmp
     end
 
     def upload_to_amazonS3
