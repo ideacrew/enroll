@@ -610,7 +610,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       context "with tax_household" do
         before :each do
           allow(family).to receive(:latest_household).and_return(household)
-          allow(household).to receive(:latest_active_tax_household_with_year).and_return tax_household
+          allow(household).to receive(:latest_active_tax_households_with_year).and_return tax_household
           allow(tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return(111)
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
           allow(person).to receive(:active_employee_roles).and_return []

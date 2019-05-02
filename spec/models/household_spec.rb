@@ -87,7 +87,7 @@ RSpec.describe Household, :type => :model do
       end
     end
 
-    context 'latest_active_tax_household_with_year' do
+    context 'latest_active_tax_households_with_year' do
       let(:family)          { FactoryGirl.create(:family, :with_primary_family_member) }
       let!(:household)      { FactoryGirl.create(:household, family: family) }
       let(:tax_household)   { FactoryGirl.create(:tax_household, household: household, effective_ending_on: nil, is_eligibility_determined: true) }
