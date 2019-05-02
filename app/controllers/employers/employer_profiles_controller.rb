@@ -297,15 +297,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   def redirect_to_first_allowed
     redirect_to employers_employer_profile_path(:id => current_user.person.employer_staff_roles.first.employer_profile_id)
   end
-
-  def employer_account_creation_notice
-    begin
-      ShopNoticesNotifierJob.perform_later(@organization.employer_profile.id.to_s, "employer_account_creation_notice")
-    rescue Exception => e
-      Rails.logger.error { "Unable to deliver Employer Notice to #{@organization.employer_profile.legal_name} due to #{e}" }
-    end
-  end
-
+  
   def terminate_employee_roster_enrollments
     employer_profile = EmployerProfile.find(params["employer_profile_id"])
     if employer_profile.active_plan_year.present?
