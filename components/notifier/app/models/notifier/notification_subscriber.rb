@@ -16,7 +16,7 @@ module Notifier
         begin
           notice_kind.execute_notice(event_name, payload)
         rescue Exception => e
-          logger.info ("Exception: #{e}----#{event_name}----#{payload}")
+          logger.info("Exception: #{e}----#{event_name}----#{payload}")
           # ADD LOGGING AND HANDLING
           puts "#{e.inspect} #{e.backtrace}"
           error_payload = JSON.dump({
