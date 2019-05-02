@@ -9,10 +9,14 @@ module Notifier
     def call(event_name, e_start, e_end, msg_id, payload)
       log("NOTICE EVENT: #{event_name} #{payload}", {:severity => 'info'})
 
+      logger = Logger.new("#{Rails.root}/log/notification_subscriber_log_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
+      logger.info("NOTICE EVENT: #{event_name}---#{payload}")
+
       NoticeKind.where(event_name: event_name.split(".")[4]).each do |notice_kind|
         begin
           notice_kind.execute_notice(event_name, payload)
         rescue Exception => e
+          logger.info ("Exception: #{e}----#{event_name}----#{payload}")
           # ADD LOGGING AND HANDLING
           puts "#{e.inspect} #{e.backtrace}"
           error_payload = JSON.dump({
