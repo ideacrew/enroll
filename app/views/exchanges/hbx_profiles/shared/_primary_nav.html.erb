@@ -10,15 +10,17 @@
         <li class="brokers-dropdown dropdown">
           <a href="#" class="families dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Families<span class="caret"></span></a>
           <ul class="dropdown-menu">
-            <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
-              tab_name: 'families',
-              link_path: family_index_dt_exchanges_hbx_profiles_path,
-              display_name: 'Families',
-              active_tab: active_tab,
-              remote: true,
-              pundit_object: nil,
-              pundit_method: nil
-            } %>
+             <li>
+               <%= link_to(
+                    family_index_dt_exchanges_hbx_profiles_path,
+                    :remote => false,
+                    "aria-expanded" => "true",
+                    "aria-controls" => "Families",
+                    "role" => "tab" ) do  %>
+                 <span class="hidden-xs">Families</span>
+                 <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title='Families'></span>
+              <% end %>
+            </li>
             <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
               tab_name: 'outstanding-verifications',
               link_path: outstanding_verification_dt_exchanges_hbx_profiles_path,
