@@ -57,7 +57,7 @@ When(/^Hbx Admin submit the question form$/) do
 end
 
 Then(/^there (is|are) (\d+) preloaded security questions$/) do |text, num|
-  (0...num.to_i).each do |int|
+  (0..num.to_i).each do |int|
     FactoryBot.create(:security_question, title: "Security Question #{int.to_i + 1}")
   end
 end
@@ -102,10 +102,7 @@ end
 
 # Old one, doesn't seem to be working for choosing the questions
 Then(/^I select the all security question and give the answer$/) do
-  (0..2).each do |num|
-    page.all('.security-question-select', visible: false)[num].set("Security Question #{num + 1}")
-    page.all('.interaction-field-control-security-question-response-question-answer', visible: false)[num].set("Answer #{num+1}")
-  end
+  step 'user fills out the security questions modal'
 end
 
 When(/^user fills out the security questions modal$/) do
@@ -126,6 +123,7 @@ end
 
 When(/I have submitted the security questions$/) do
   screenshot("group_selection")
+  sleep 1
   find('.interaction-click-control-save-responses').click
 end
 

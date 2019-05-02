@@ -14,8 +14,8 @@ end
 
 Given /(\w+) has already provided security question responses/ do |name|
   security_questions = []
-  3.times do
-    security_questions << FactoryBot.create(:security_question)
+  3.times do |index|
+    security_questions << FactoryBot.create(:security_question, title: "Security Question #{index.to_i + 1}")
   end
   User.all.each do |u|
     next if u.security_question_responses.count == 3
