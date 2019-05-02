@@ -13,7 +13,7 @@ class OutstandingMonthlyEnrollments < MongoidMigrationTask
         enrollments << family.active_household.hbx_enrollments.where(:sponsored_benefit_package_id.in => id_list).enrolled_and_renewing.to_a
         enrollments.flatten.compact.uniq
       end
-      ids += enrs.map(&:id)
+      ids += enrs.map(&:hbx_id)
       ids.flatten.compact.uniq
     end
   end
