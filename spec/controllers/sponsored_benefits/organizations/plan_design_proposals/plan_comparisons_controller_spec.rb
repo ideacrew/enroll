@@ -15,7 +15,7 @@ module SponsoredBenefits
 
     describe "GET new" do
       let!(:person) {
-        FactoryGirl.create(:person, :with_broker_role).tap do |person|
+        FactoryBot.create(:person, :with_broker_role).tap do |person|
           if Settings.aca.state_abbreviation == 'DC'
             person.broker_role.update_attributes(broker_agency_profile_id: broker_agency_profile.id.to_s)
           else
@@ -24,12 +24,12 @@ module SponsoredBenefits
         end
       }
 
-      let!(:user_with_broker_role) { FactoryGirl.create(:user, person: person) }
-      let(:plans) { FactoryGirl.create_list(:plan, 2, :with_premium_tables, market: 'shop') }
+      let!(:user_with_broker_role) { FactoryBot.create(:user, person: person) }
+      let(:plans) { FactoryBot.create_list(:plan, 2, :with_premium_tables, market: 'shop') }
 
       before :each do
         sign_in user_with_broker_role
-        get :new, plan_design_proposal_id: plan_design_proposal.id, sort_by: "", plans: [plans.first.id.to_s, plans.last.id.to_s], format: "js"
+        get :new, params: {plan_design_proposal_id: plan_design_proposal.id, sort_by: "", plans: [plans.first.id.to_s, plans.last.id.to_s], format: "js"}
       end
 
       it "should return success" do

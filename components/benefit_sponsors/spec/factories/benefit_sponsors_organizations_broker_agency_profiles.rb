@@ -5,6 +5,7 @@ FactoryBot.define do
     corporate_npn { "0989898981" }
     ach_routing_number { '123456789' }
     ach_account_number { '9999999999999999' }
+    association :primary_broker_role, factory: :broker_role
     transient do
       legal_name { nil }
       office_locations_count { 1 }

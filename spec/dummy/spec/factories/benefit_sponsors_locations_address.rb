@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :benefit_sponsors_locations_address, class: 'BenefitSponsors::Locations::Address' do
 
     kind 'home'

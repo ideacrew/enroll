@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :sponsored_benefits_email, class: 'SponsoredBenefits::Email' do
     kind 'home'
     sequence(:address) { |n| "example#{n}@example.com" }

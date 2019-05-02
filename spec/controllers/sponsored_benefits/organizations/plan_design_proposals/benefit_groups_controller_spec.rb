@@ -6,8 +6,8 @@ module SponsoredBenefits
     routes { SponsoredBenefits::Engine.routes }
     include_context "set up broker agency profile for BQT, by using configuration settings"
 
-    let!(:person) { FactoryGirl.create(:person, :with_broker_role) }
-    let!(:user_with_broker_role) { FactoryGirl.create(:user, person: person ) }
+    let!(:person) { FactoryBot.create(:person, :with_broker_role) }
+    let!(:user_with_broker_role) { FactoryBot.create(:user, person: person ) }
 
     let(:attrs) {
       {
@@ -33,7 +33,7 @@ module SponsoredBenefits
         benefit_application.benefit_groups.delete_all
         sign_in user_with_broker_role
         person.broker_role.update_attributes(broker_agency_profile_id: plan_design_organization.owner_profile_id)
-        post :create, plan_design_proposal_id: plan_design_proposal.id, benefit_group: attrs
+        post :create, params: {plan_design_proposal_id: plan_design_proposal.id, benefit_group: attrs}
       end
 
       it "should be success" do
@@ -50,7 +50,7 @@ module SponsoredBenefits
       before do
         sign_in user_with_broker_role
         person.broker_role.update_attributes(broker_agency_profile_id: plan_design_organization.owner_profile_id)
-        delete :destroy, plan_design_proposal_id: plan_design_proposal.id, id: benefit_group.id, benefit_group: {kind: 'dental'}
+        delete :destroy, params: {plan_design_proposal_id: plan_design_proposal.id, id: benefit_group.id, benefit_group: {kind: 'dental'}}
       end
 
       it "redirects to new_organizations_plan_design_proposal_plan_selection_path" do
