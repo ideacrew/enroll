@@ -1,6 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe Insured::FamilyMembersController do
+  before :all do
+    DatabaseCleaner.clean
+  end
+
   let(:user) { instance_double("User", :primary_family => test_family, :person => person) }
   let(:qle) { FactoryGirl.create(:qualifying_life_event_kind) }
   let(:test_family) { FactoryGirl.build(:family, :with_primary_family_member) }

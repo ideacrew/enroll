@@ -489,7 +489,5 @@ class Household
     end
 
     end_multiple_thh
-
-    self.save!
   end
 end
