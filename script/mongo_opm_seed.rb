@@ -23,7 +23,7 @@ class OpmSeed
     @ee_count_mapping = {}
     @eps = Organization.all.map(&:employer_profile).compact.map(&:id)
     @org_cache =  ActiveSupport::Cache::MemoryStore.new
-    @client = Mongo::Client.new([ '127.0.0.1:27017' ], :database => 'nm_enroll_development')
+    @client = Mongo::Client.new([ '127.0.0.1:27017' ], :database => 'opm_development')
   end
 
   def time_rand from = 0.0, to = Time.now
@@ -96,16 +96,17 @@ class OpmSeed
     puts "********************************* OPM Agency seed started at #{Time.now} ********************************* "
 
     CSV.foreach("#{Rails.root}/db/seedfiles/opm_agencies.csv", :headers => true) do |row|
-      @agency_codes[row[4]] = row[5].split('').drop(5).join('')
-      # @ee_count_mapping[row[3]] = row[5].split('').drop(5).join('')
-
+      parent_agency = row[3].split('').drop(3).join('')
+      @agency_codes[row[4]] = [row[5].split('').drop(5).join(''), parent_agency]
       date = DateTime.now
      org =  {
         "created_at"=>nil,
         "dba"=> "#{row[5].split('').drop(5).join('')}",
+        "parent_agency" =>parent_agency,
         "employer_profile"=>
          {"_id" => BSON::ObjectId.new,
           "aasm_state"=>"applicant",
+          "logo" => parent_agency.downcase.parameterize.underscore.split('').push(".","p","n","g").join(''),
           "broker_agency_accounts"=>
            [{
             "_id" => BSON::ObjectId.new,
@@ -233,11 +234,11 @@ class OpmSeed
       "employer_profile_id"=>ep.id,
       "employment_terminated_on"=>nil,
       "encrypted_ssn"=> get_ssn,
-      "first_name"=>"George",
+      "first_name"=>name_0.split[0],
       "gender"=>"male",
       "hired_on"=>Time.new("2017,04,03"),
       "is_business_owner"=>true,
-      "last_name"=>"Jetson",
+      "last_name"=>name_0.split[1],
       "middle_name"=>nil,
       "name_sfx"=>nil,
       "no_ssn_allowed"=>false,
@@ -300,11 +301,11 @@ class OpmSeed
         "employer_profile_id"=>ep.id,
         "employment_terminated_on"=>nil,
         "encrypted_ssn"=> get_ssn,
-        "first_name"=>"George",
+        "first_name"=>name_1.split[0],
         "gender"=>"male",
         "hired_on"=>Time.new("2017,04,03"),
         "is_business_owner"=>true,
-        "last_name"=>"Jetson",
+        "last_name"=>name_1.split[1],
         "middle_name"=>nil,
         "name_sfx"=>nil,
         "no_ssn_allowed"=>false,
@@ -832,9 +833,9 @@ end
         "employee_relationship"=>"child_under_26",
         "employer_assigned_family_id"=>nil,
         "encrypted_ssn"=>get_ssn,
-        "first_name"=>"Judy",
+        "first_name"=>name_2.split[0],
         "gender"=>"female",
-        "last_name"=>"Jetson",
+        "last_name"=>name_2.split[1],
         "middle_name"=>nil,
         "name_sfx"=>nil,
         "updated_at"=>nil}],
@@ -854,11 +855,11 @@ end
       "employer_profile_id"=>ep.id,
       "employment_terminated_on"=>nil,
       "encrypted_ssn"=> get_ssn,
-      "first_name"=>"George",
+      "first_name"=>name_0.split[0],
       "gender"=>"male",
       "hired_on"=>Time.new("2017,04,03"),
       "is_business_owner"=>true,
-      "last_name"=>"Jetson",
+      "last_name"=>name_0.split[1],
       "middle_name"=>nil,
       "name_sfx"=>nil,
       "no_ssn_allowed"=>false,
@@ -921,11 +922,11 @@ end
         "employer_profile_id"=>ep.id,
         "employment_terminated_on"=>nil,
         "encrypted_ssn"=> get_ssn,
-        "first_name"=>"George",
+        "first_name"=>name_1.split[0],
         "gender"=>"male",
         "hired_on"=>Time.new("2017,04,03"),
         "is_business_owner"=>true,
-        "last_name"=>"Jetson",
+        "last_name"=>name_1.split[1],
         "middle_name"=>nil,
         "name_sfx"=>nil,
         "no_ssn_allowed"=>false,
@@ -1482,9 +1483,9 @@ family_1 = {
         "employee_relationship"=>"child_under_26",
         "employer_assigned_family_id"=>nil,
         "encrypted_ssn"=>get_ssn,
-        "first_name"=>"Judy",
+        "first_name"=>name_2.split[0],
         "gender"=>"female",
-        "last_name"=>"Jetson",
+        "last_name"=>name_2.split[1],
         "middle_name"=>nil,
         "name_sfx"=>nil,
         "updated_at"=>nil}],
@@ -1504,11 +1505,11 @@ family_1 = {
       "employer_profile_id"=>ep.id,
       "employment_terminated_on"=>nil,
       "encrypted_ssn"=> get_ssn,
-      "first_name"=>"George",
+      "first_name"=>name_0.split[0],
       "gender"=>"male",
       "hired_on"=>Time.new("2017,04,03"),
       "is_business_owner"=>true,
-      "last_name"=>"Jetson",
+      "last_name"=>name_0.split[1],
       "middle_name"=>nil,
       "name_sfx"=>nil,
       "no_ssn_allowed"=>false,
@@ -1571,11 +1572,11 @@ family_1 = {
         "employer_profile_id"=>ep.id,
         "employment_terminated_on"=>nil,
         "encrypted_ssn"=> get_ssn,
-        "first_name"=>"George",
+        "first_name"=>name_1.split[0],
         "gender"=>"male",
         "hired_on"=>Time.new("2017,04,03"),
         "is_business_owner"=>true,
-        "last_name"=>"Jetson",
+        "last_name"=>name_1.split[1],
         "middle_name"=>nil,
         "name_sfx"=>nil,
         "no_ssn_allowed"=>false,
@@ -2204,11 +2205,11 @@ family_1 = {
       "employer_profile_id"=>ep.id,
       "employment_terminated_on"=>nil,
       "encrypted_ssn"=> get_ssn,
-      "first_name"=>"George",
       "gender"=>"male",
+      "first_name"=> name_0.split[0],
       "hired_on"=>Time.new("2017,04,03"),
       "is_business_owner"=>true,
-      "last_name"=>"Jetson",
+      "last_name"=>name_0.split[1],
       "middle_name"=>nil,
       "name_sfx"=>nil,
       "no_ssn_allowed"=>false,
@@ -2271,11 +2272,11 @@ family_1 = {
         "employer_profile_id"=>ep.id,
         "employment_terminated_on"=>nil,
         "encrypted_ssn"=> get_ssn,
-        "first_name"=>"George",
+        "first_name"=>name_1.split[0],
         "gender"=>"male",
         "hired_on"=>Time.new("2017,04,03"),
         "is_business_owner"=>true,
-        "last_name"=>"Jetson",
+        "last_name"=>name_1.split[1],
         "middle_name"=>nil,
         "name_sfx"=>nil,
         "no_ssn_allowed"=>false,
@@ -2821,7 +2822,8 @@ family_1 = {
       @sampler = 0
       
     CSV.foreach("db/seedfiles/opm_people.csv", :headers => true).with_index(1)  do |row,ln|
-      org = Organization.where(dba: @agency_codes[row[0]]).first
+      binding.pry
+      org = Organization.where(dba: @agency_codes[row[0]][0]).first
       ep =  org.employer_profile
       age = @age_codes[row[2]]
       name_0 = Faker::Name.name
@@ -2829,7 +2831,6 @@ family_1 = {
       name_2 = Faker::Name.name
       name_3 = Faker::Name.name
       name_4 = Faker::Name.name
-
       family_id_0 = BSON::ObjectId.new
       family_id_1 = BSON::ObjectId.new
       family_id_2 = BSON::ObjectId.new
@@ -2838,21 +2839,21 @@ family_1 = {
       if @counter == 0
         if @sampler == 0 
           spouse_and_kid(ep,age,name_0,name_1,name_2,name_3,family_id_0,family_id_1, "active")
-          spouse_and_kid(ep,age,name_0,name_1,name_2,name_3,family_id_2,family_id_3, "retired")
+          spouse_and_kid(ep,age,name_3,name_2,name_1,name_0,family_id_2,family_id_3, "retired")
          @sampler = 1
         else 
           big_fam(ep,age,name_0,name_1,name_2,name_3,name_4,family_id_0,family_id_1,"active")
-          big_fam(ep,age,name_0,name_1,name_2,name_3,name_4,family_id_2,family_id_3, "retired")
+          big_fam(ep,age,name_4,name_3,name_2,name_1,name_0,family_id_2,family_id_3, "retired")
          @sampler = 0 
         end
          @counter  = 1
       elsif @counter == 1 
           spouse_only(ep,age,name_0,name_1,name_2,family_id_2,family_id_3,"active") 
-          spouse_only(ep,age,name_0,name_1,name_2,family_id_0,family_id_1,"retired") 
+          spouse_only(ep,age,name_2,name_1,name_0,family_id_0,family_id_1,"retired") 
         @counter = 2
       elsif @counter == 2
           solo(ep,age,name_0,name_1,family_id_0,family_id_1,"active") 
-          solo(ep,age,name_0,name_1,family_id_2,family_id_3,"retired") 
+          solo(ep,age,name_1,name_0,family_id_2,family_id_3,"retired") 
         @counter = 0
         end
       end
@@ -2865,20 +2866,20 @@ family_1 = {
     seed = OpmSeed.new
     
     seed.build_orgs 
-    seed.get_ee_count 
+    # seed.get_ee_count 
     seed.build_people
 
   #  ar  = Family.all.map(&:family_members).compact.map(&:count)
-  #     one = 0
-  #   two = 0
-  #   three = 0
-  #   four  = 0
-  #   ar.each{|num|one+=1 if num == 1}
-  #   ar.each{|num|two+=1 if num == 2}
+    #   one = 0
+    # two = 0
+    # three = 0
+    # four  = 0
+    # ar.each{|num|one+=1 if num == 1}
+    # ar.each{|num|two+=1 if num == 2}
 
-  #   ar.each{|num|three+=1 if num == 3}
+    # ar.each{|num|three+=1 if num == 3}
 
-  #   ar.each{|num|four+=1 if num == 4}
+    # ar.each{|num|four+=1 if num == 4}
 # puts "one =  #{ar.count/one}"
 # puts "two =  #{ar.count/two}"
 # puts "three =  #{ar.count/three}"

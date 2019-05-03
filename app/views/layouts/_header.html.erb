@@ -13,9 +13,9 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-  <% if current_user && current_user.try(:person).try(:is_native?)%>
+  <% if @employer_profile && @employer_profile.logo%>
     <a class="">
-      <%= image_tag 'native.png', :id =>"native-logo"  %>
+      <%= image_tag @employer_profile.logo, :id =>"native-logo"  %>
     </a>
   <%else%>
     <a class="navbar-brand" id="logo">

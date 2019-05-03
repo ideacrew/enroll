@@ -111,15 +111,23 @@ class Exchanges::HbxProfilesController < ApplicationController
      end
   end
 
+  def find_orgs 
+    # @orgs =  Organization.where(parent_agency:params[:org][:parent_agency])
+    @orgs =Organization.where(parent_agency: params[:org][:parent_agency])
+    respond_to do |format|
+      format.js
+    end
+
+  end
+
   def employer_invoice
     # Dynamic Filter values for upcoming 30, 60, 90 days renewals
     @next_30_day = TimeKeeper.date_of_record.next_month.beginning_of_month
     @next_60_day = @next_30_day.next_month
     @next_90_day = @next_60_day.next_month
-
-
+    @org = Organization.first
+    @parent_agencies =  Organization.all.map(&:parent_agency).compact.uniq
     @datatable = Effective::Datatables::EmployerDatatable.new
-
     respond_to do |format|
       format.js
     end

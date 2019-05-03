@@ -1,12 +1,12 @@
 puts "*"*80
 puts "::: Generating Broker Agencies:::"
 require 'broker_parser'
-
 p0 = Person.where(last_name: "Murray").first
 p1 = Person.where(last_name: "Chase").first
 p3 = Person.where(last_name: "Curtin").first
 bk1 = BrokerRole.find_by_npn("2068981")
 bk0 = BrokerRole.find_by_npn("1682443")
+
 
 supported_state_abbreviation = Settings.aca.state_abbreviation
 supported_market_type = Settings.aca.market_kinds.count == 2 ? 'both' : Settings.aca.market_kinds.first

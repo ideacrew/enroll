@@ -20,7 +20,6 @@ wk_dan_email = Email.new(kind: "work", address: "thomas.dan@dc.gov")
 
 npn0 = "1682443"
 npn1 = "2068981"
-
 p0 = Person.create!(first_name: "Bill", last_name: "Murray", addresses: [hm_addr], phones: [hm_phone], emails: [hm_email])
 p1 = Person.create!(first_name: "Dan", last_name: "Aykroyd")
 p2 = Person.create!(first_name: "Chevy", last_name: "Chase")

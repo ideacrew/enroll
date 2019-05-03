@@ -14,7 +14,7 @@ module Effective
 
         table_column :legal_name, :proc => Proc.new { |row|
           @employer_profile = row.employer_profile
-          (link_to row.legal_name.titleize, employers_employer_profile_path(@employer_profile, :tab=>'home')) + raw("<br>") + truncate(row.id.to_s, length: 8, omission: '' )
+          (link_to row.legal_name.titleize, employers_employer_profile_path(@employer_profile, :tab=>'home')) + raw("<br>")
 
           }, :sortable => false, :filter => false
         #table_column :hbx_id, :label => 'HBX ID', :proc => Proc.new { |row| truncate(row.id.to_s, length: 8, omission: '' ) }, :sortable => false, :filter => false
@@ -85,6 +85,8 @@ module Effective
           employers = employers.send(attributes[:enrolling_renewing]) if attributes[:enrolling_renewing].present?
 
           employers = employers.send(attributes[:enrolled]) if attributes[:enrolled].present?
+          employers = employers.send(attributes[:enrolled]) if attributes[:enrolled].present?
+
 
           if attributes[:upcoming_dates].present?
               if date = Date.strptime(attributes[:upcoming_dates], "%m/%d/%Y")
@@ -98,6 +100,7 @@ module Effective
         @employer_collection = employers
 
       end
+
 
       def text_to_display(employer)
         employer.no_ssn ? "Enable SSN/TIN" : "Disable SSN/TIN"
@@ -121,6 +124,8 @@ module Effective
             collection.datatable_search_employer_profile_source("conversion")
           elsif search_term == "No"
             collection.datatable_search_employer_profile_source("self_serve")
+          elsif params[:parent_agency].present? 
+            Organization.where(parent_agency:params[:parent_agency])
           else
             super
           end

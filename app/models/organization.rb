@@ -26,6 +26,8 @@ class Organization
 
   # Registered legal name
   field :legal_name, type: String
+  field :parent_agency, type: String
+
 
   # Doing Business As (alternate name)
   field :dba, type: String
@@ -172,6 +174,10 @@ class Organization
   }
   scope :datatable_search, ->(query) { self.where({"$or" => ([{"legal_name" => Regexp.compile(Regexp.escape(query), true)}, {"fein" => Regexp.compile(Regexp.escape(query), true)}, {"hbx_id" => Regexp.compile(Regexp.escape(query), true)}])}) }
   
+
+  def self.agencies
+    # Organization.all
+  end
   def self.generate_fein
     loop do
       random_fein = (["00"] + 7.times.map{rand(10)} ).join

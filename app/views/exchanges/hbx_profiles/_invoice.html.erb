@@ -3,10 +3,18 @@
   <a href="#" data-dismiss="alert" class="close interaction-click-control-×">×</a>
   </div>
 <% end %>
-
 <h1>Employers</h1>
-
-<%= render_datatable(@datatable) %>
+  
+  <%=
+  select_tag( "parent_agency", options_for_select(@parent_agencies,'name'),  class: "progress_and_message", prompt:"FILTER BY DEPARTMENT",
+  data: {
+    remote: true,
+    url: url_for( action: :employer_invoice)
+  }
+)
+  
+  %>
+  <%= render_datatable(@datatable) %>
 <script type="text/javascript" charset="utf-8">
   initializeDataTables();
 </script>

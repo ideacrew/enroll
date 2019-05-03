@@ -36,6 +36,8 @@ class EmployerProfile
 
   field :entity_kind, type: String
   field :sic_code, type: String
+  field :logo, type: String
+
 
   field :no_ssn, type: Boolean, default: false
   field :enable_ssn_date, type: DateTime
@@ -113,10 +115,7 @@ class EmployerProfile
 
 
   def census_employees
-    employer_profile = self
-      Person.where("employee_roles.employer_profile_id" => employer_profile.id).reduce([]) do |list, person|
-      list << person.employee_roles.detect { |ee| ee.employer_profile_id == employer_profile.id }
-    end
+    CensusMember.where(employer_profile_id: self.id)
   end
 
   def covered_employee_roles

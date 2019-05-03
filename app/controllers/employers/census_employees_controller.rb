@@ -279,7 +279,7 @@ class Employers::CensusEmployeesController < ApplicationController
 
   def find_census_employee
     id = params[:id] || params[:census_employee_id]
-    @census_employee = CensusEmployee.find(id)
+    @census_employee = CensusMember.find(id) || CensusEmployee.find(id)
   end
 
   def build_census_employee(employer_profile_id = nil)
