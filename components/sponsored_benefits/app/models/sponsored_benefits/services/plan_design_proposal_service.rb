@@ -41,7 +41,13 @@ module SponsoredBenefits
       end
 
       def save_health_benefits(attrs={})
-        benefit_group = benefit_group(attrs)
+        benefit_group = benefit_group(
+          attrs.merge!(
+            {
+              title: "Benefit Group Created for: #{plan_design_organization.legal_name} by #{plan_design_organization.broker_agency_profile.legal_name}"
+            }
+          )
+        )
         update_benefits(attrs) if benefit_group.persisted?
         benefit_group.elected_plans = benefit_group.elected_plans_by_option_kind
 

@@ -1,15 +1,17 @@
-<% if @service.errors.present? %>
-  <p><%= @service.errors.join(', ') %></p>
-<% else %>
-  <% if @service.messages['warnings'].present? %>
-    <p>
-      <% @service.messages['warnings'].each do |msg| %>
-      <li>* <%= msg.html_safe %></li>
-    </p>
+<div class="container bottom-pd text-center">
+  <h4 class="title"> 
+    <% if @service.benefit_application.pending? %>
+      <%= l10n("hbx_profiles.force_published_application_review") %>
+    <% else %>
+      <%= l10n("hbx_profiles.force_publish_success") %>
     <% end %>
-  <% elsif @service.messages['notice'].present? %>
-    <p><%= @service.messages['notice'] %></p>
-  <% end %>
-<% end %>
-
-
+  </h4>
+  <table class="table">
+    <thead> <%= @service.messages['notice'] %></thead>
+    <tbody>
+      <tr>
+        <td> <span class="btn btn-default" onclick="$('tr.child-row:visible').remove();"> Close </span> </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

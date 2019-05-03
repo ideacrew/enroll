@@ -433,4 +433,28 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
       end
     end
   end
+
+  describe "permission", dbclean: :after_each do
+    let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
+    let(:person) { double("person")}
+    let(:hbx_staff_role) { double("hbx_staff_role")}
+    let(:hbx_profile) { double("hbx_profile")}
+    let(:permission) { double("permission", name: "super_admin")}
+
+    before :each do
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
+      allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
+      allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
+      allow(hbx_staff_role).to receive(:permission).and_return(permission)
+    end
+    
+    context "should set the return the permission for the user " do
+      it 'returns the permission for the user' do
+        allow(user).to receive(:permission).and_return(person.hbx_staff_role.permission)
+        expect(user.permission).to eq permission
+      end
+    end
+  end
 end

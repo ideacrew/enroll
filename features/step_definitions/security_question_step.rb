@@ -6,8 +6,12 @@ Given 'There are preloaded security question on the system' do
   step "there are 3 preloaded security questions"
 end
 
-Then(/^Hbx Admin should see Security Question link$/) do
-  find_link('Security Question').visible?
+Given(/^the user click on config drop down in the Admin Tab$/) do
+  find(:xpath, '//*[@id="myTab"]/li[13]/ul/li[4]/a/span[1]').click
+end
+
+Then(/^user should able to see Secuity Questions$/) do
+  expect(page).to have_content("Security Questions")
 end
 
 Then(/^there is (\d+) questions available in the list$/) do |num|
@@ -26,6 +30,14 @@ When(/^Hbx Admin clicks on (.*?) Question link$/) do |link|
                   'Delete'
                 end
   click_link(link_title)
+end
+
+Given(/^user will clicks on New Question link$/) do
+  find_link('New Question').trigger('click')
+end
+
+Then(/^user fill out New Question form detail$/) do
+  fill_in 'security_question_title', :with => 'First security question'
 end
 
 Then(/^Hbx Admin should see (.*?) Question form$/) do |text|
@@ -50,13 +62,32 @@ Then(/^there (is|are) (\d+) preloaded security questions$/) do |text, num|
   end
 end
 
+Then(/^user should see already in use text$/) do
+  expect(page).to have_content("That Question is already in use")
+end
+
+
 Then(/^the question title updated successfully$/) do
-  page.all('table.table-wrapper tbody tr').last.should(have_content(question_attrs[:title]))
+  pending # This needs to be fixed in 40436
+  # page.all('table.table-wrapper tbody tr').last.should(have_content(question_attrs[:title]))
 end
 
 Then 'I confirm the delete question popup' do
   page.evaluate_script('window.confirm = function() { return true; }')
 end
+
+Given(/^user click on Security Question link$/) do
+  find_link('Security Question').trigger('click')
+end
+
+When(/^Hbx Admin click on Edit Question link$/) do
+  click_link("Edit", :match => :first)
+end
+
+When(/^Hbx Admin click on Delete Question link$/) do
+  find(:xpath, "(//a[text()='Delete'])[2]").trigger('click')
+end
+
 
 Then(/^I can(not)? see the security modal dialog$/) do |negate|
   if negate
@@ -73,7 +104,7 @@ Then(/^I select the all security question and give the answer$/) do
   end
 end
 
-When(/I have submit the security questions$/) do
+When(/I have submitted the security questions$/) do
   screenshot("group_selection")
   find('.interaction-click-control-save-responses').click
 end

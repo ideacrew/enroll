@@ -22,5 +22,8 @@ HBX_PROFILES_TRANSLATIONS = {
 	'en.hbx_profiles.provide_oe_end_date' => 'Please provide Open Enrollment End On date.',
 	"en.hbx_profiles.change_fein" => "Change FEIN",
 	"en.hbx_profiles.new_fein" => "New FEIN",
-	"en.hbx_profiles.update_fein_success" => "FEIN Update Successful"
+	"en.hbx_profiles.update_fein_success" => "FEIN Update Successful",
+		"en.hbx_profiles.publish_application" => "Publish Application",
+	"en.hbx_profiles.force_publish_success" => "Force Publish Successful",
+	"en.hbx_profiles.force_published_application_review" => "Force Published Application Under Review"
 }

@@ -1,24 +1,24 @@
 include Config::SiteHelper
 
-When(/^the system date is (greater|less) than the earliest_start_prior_to_effective_on$/) do |compare|
+When(/^the system date is (greater|less) than the application_effective_date$/) do |compare|
   if compare == 'greater'
-    allow(TimeKeeper).to receive(:date_of_record).and_return((initial_application.effective_period.min + 15.days))
+    allow(TimeKeeper).to receive(:date_of_record).and_return((initial_application.effective_period.min + 5.days))
     TimeKeeper.date_of_record > initial_application.effective_period.min == true
+  else
+    allow(TimeKeeper).to receive(:date_of_record).and_return((initial_application.effective_period.min - 5.days))
+    TimeKeeper.date_of_record < initial_application.effective_period.min == true
   end
 end
 
 And(/^the system date is (greater|less) than the publish_due_day_of_month$/) do |compare|
   if compare == 'less'
-    TimeKeeper.date_of_record.day < initial_application.publish_due_day_of_month == true
+    unless  TimeKeeper.date_of_record < initial_application.last_day_to_publish == true
+      allow(TimeKeeper).to receive(:date_of_record).and_return((initial_application.last_day_to_publish - 1.day))
+    end
   elsif compare == 'greater'
-    allow(TimeKeeper).to receive(:date_of_record).and_return((initial_application.open_enrollment_period.max - 1.day))
-    TimeKeeper.date_of_record.day > initial_application.publish_due_day_of_month == true
-  end
-end
-
-When(/^the system date is (greater|less) than the monthly open enrollment end_on$/) do |compare|
-  if compare == 'less'
-    TimeKeeper.date_of_record < initial_application.open_enrollment_period.max == true
+    unless TimeKeeper.date_of_record > initial_application.last_day_to_publish == true
+      allow(TimeKeeper).to receive(:date_of_record).and_return((initial_application.last_day_to_publish + 1.day))
+    end
   end
 end
 
@@ -30,7 +30,11 @@ When(/^the system date is (.*?) open_enrollment_period start date$/) do |compare
 end
 
 When(/^the user clicks on Force Publish button$/) do
-  find('.btn.btn-xs', text: 'Force Publish').trigger('click')
+  find('.btn.btn-xs', text: 'Force Publish').click
+end
+
+And(/^the user clicks submit button$/) do
+  find_button('Submit').trigger('click')
 end
 
 When (/^(.*?) FTE count is (less than or equal|more than) to shop:small_market_employee_count_maximum$/) do |employer, compare|
@@ -54,9 +58,21 @@ And (/^(.*?) primary address state (is|is not) MA$/) do |employer, compare|
 end
 
 Then(/^a warning message will appear$/) do
-  expect(page.driver.browser.modal_message).to have_content('Can not publish due to fte count out range or primary office location out of MA, Publish anyway?')
+  expect(find("#submitBenefitApplication .modal-body")).to have_content("If you submit this application as is, the small business application may be ineligible for coverage through the Health Connector because it does not meet the eligibility reason(s) identified below:")
 end
 
-And(/^ask to confirm intention to publish.$/) do
+And(/^ask to confirm intention to publish$/) do
   page.driver.browser.accept_confirm
+end
+
+And(/^the user clicks publish anyways$/) do
+  find('a', :text => "Publish Anyways").click
+end
+
+Then(/^the force publish successful message should be displayed$/) do 
+  expect(page).to have_content('Force Publish Successful')
+end
+
+Then(/^the user will see published sucessfully for review message$/) do
+  expect(page).to have_content('Employer(s) Plan Year was successfully submitted for review')
 end

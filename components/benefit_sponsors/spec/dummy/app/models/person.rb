@@ -173,6 +173,10 @@ class Person
     active_broker_staff_roles.size > 0
   end
 
+  def active_employer_staff_roles
+    employer_staff_roles.present? ? employer_staff_roles.active : []
+  end
+
   def self.decrypt_ssn(val)
     SymmetricEncryption.decrypt(val)
   end

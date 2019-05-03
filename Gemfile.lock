@@ -133,9 +133,10 @@ PATH
   remote: components/transport_gateway
   specs:
     transport_gateway (0.0.1)
-      aws-sdk (>= 2.2.4)
+      aws-sdk (~> 2.2.4)
       net-sftp (~> 2.1, >= 2.1.2)
-      rails (>= 4.2.0)
+      net-ssh (= 4.2.0)
+      rails (>= 4.2.0, < 5.0)
 
 PATH
   remote: components/transport_profiles
@@ -143,8 +144,9 @@ PATH
     transport_profiles (0.0.1)
       acapi
       mongoid (= 5.4.0)
-      rails (>= 4.2.0)
-      rubyzip (>= 1.2.1)
+      nokogiri (= 1.6.7.2)
+      rails (>= 4.2.0, < 5.0)
+      rubyzip (= 1.2.1)
       symmetric-encryption (~> 3.6.0)
       transport_gateway
 
@@ -803,6 +805,7 @@ DEPENDENCIES
   certified
   chosen-rails
   ckeditor
+  climate_control (= 0.2.0)
   coffee-rails (~> 4.1.0)
   combine_pdf
   config (~> 1.0.0)
