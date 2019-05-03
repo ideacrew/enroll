@@ -14,8 +14,8 @@ end
 
 Given /(\w+) has already provided security question responses/ do |name|
   security_questions = []
-  3.times do |index|
-    security_questions << FactoryBot.create(:security_question, title: "Security Question #{index.to_i + 1}")
+  3.times do
+    security_questions << FactoryBot.create(:security_question)
   end
   User.all.each do |u|
     next if u.security_question_responses.count == 3
@@ -261,8 +261,8 @@ Given /Admin selects Hannahs company/ do
 end
 
 Then("user will click on action tab") do
-  sleep(3)
-  find_all('.dropdown.pull-right', text: 'Actions')[0].click
+  sleep 5
+  find('.dropdown.pull-right', text: 'Actions', wait: 10, match: :first).click
 end
 
 Given /(\w+) has HBXAdmin privileges/ do |name|
