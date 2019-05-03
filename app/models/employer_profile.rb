@@ -143,6 +143,7 @@ class EmployerProfile
 
   # for broker agency
   def hire_broker_agency(new_broker_agency, start_on = today)
+    SponsoredBenefits::Organizations::BrokerAgencyProfile.assign_employer(broker_agency: new_broker_agency, employer: self) if organization
     start_on = start_on.to_date.beginning_of_day
     if active_broker_agency_account.present?
       terminate_on = (start_on - 1.day).end_of_day
@@ -155,6 +156,7 @@ class EmployerProfile
 
   def fire_broker_agency(terminate_on = today)
     return unless active_broker_agency_account
+    SponsoredBenefits::Organizations::BrokerAgencyProfile.unassign_broker(broker_agency: active_broker_agency_account.broker_agency_profile, employer: self) if organization
     active_broker_agency_account.end_on = terminate_on
     active_broker_agency_account.is_active = false
     active_broker_agency_account.save!

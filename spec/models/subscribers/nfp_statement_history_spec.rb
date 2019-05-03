@@ -24,7 +24,15 @@ describe Subscribers::NfpStatementHistory do
           :payments=>"-1051.92",
           :total_due=>"350.64",
           :statement_date=>"01/03/2019",
-          :adjustment_items=>[],
+          :adjustment_items=>[
+            {
+              :amount=>"100",
+              :name=>"Some name",
+              :description=>"BlueDental Preferred High",
+              :posting_date=>"01/03/2019",
+              :is_passive_renewal=>"true"
+            }
+          ],
           :payment_history=>[
             {
               :amount=>"1051.92",
@@ -60,6 +68,10 @@ describe Subscribers::NfpStatementHistory do
 
       it "should update current statement date" do
         expect(employer.employer_profile_account.current_statement_date.strftime('%m/%d/%Y')).to eq "01/03/2019"
+      end
+
+      it 'should update current_statement_activity' do
+        expect(employer.employer_profile_account.current_statement_activity.first.description).to eq 'BlueDental Preferred High'
       end
     end
   end

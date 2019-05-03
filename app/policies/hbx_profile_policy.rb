@@ -136,11 +136,6 @@ class HbxProfilePolicy < ApplicationPolicy
     role.permission.can_add_pdc
   end
 
-  def can_force_publish?
-    return true unless role = user.person.hbx_staff_role
-    role.permission.can_force_publish
-  end
-
   def can_change_fein?
     return false unless role = user.person.hbx_staff_role
     role.permission.can_change_fein
@@ -149,5 +144,10 @@ class HbxProfilePolicy < ApplicationPolicy
   def can_create_plan_year?
     return true unless role = user.person.hbx_staff_role
     role.permission.can_create_plan_year?
+  end
+
+  def can_force_publish?
+    return true unless role = user.person.hbx_staff_role
+    role.permission.can_force_publish
   end
 end

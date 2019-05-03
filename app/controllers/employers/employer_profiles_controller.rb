@@ -539,4 +539,8 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   def check_origin?
     request.referrer.present? and URI.parse(request.referrer).host == "app.dchealthlink.com"
   end
+
+  def get_sic_codes
+    @grouped_options = Caches::SicCodesCache.load
+  end
 end

@@ -1,5 +1,7 @@
 source 'https://rubygems.org'
 
+gem "sponsored_benefits", path: "components/sponsored_benefits"
+
 gem 'aasm', '~> 4.8.0'
 gem 'acapi', git: 'https://github.com/dchbx/acapi.git', branch: '1.3.2'
 gem 'addressable', '2.3.8'
@@ -37,6 +39,7 @@ gem 'mongoid-autoinc'
 gem 'mongoid-enum'
 gem 'mongoid-history'
 gem 'mongoid-versioning'
+gem 'mongoid_rails_migrations', git: 'https://github.com/adacosta/mongoid_rails_migrations.git', branch: 'master'
 gem 'mongoid_userstamp'
 gem 'nokogiri', '1.6.7.2'
 gem 'nokogiri-happymapper', :require => 'happymapper'

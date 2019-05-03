@@ -14,7 +14,7 @@ describe DefinePermissions, dbclean: :after_each do
     end
     it "creates permissions" do
       expect(Permission.count).to eq(8)
-      expect(Person.first.hbx_staff_role.subrole).to eq 'hbx_staff'
+    	expect(Person.first.hbx_staff_role.subrole).to eq 'hbx_staff'
       expect(Permission.all.map(&:name)).to match_array roles
     end
 
@@ -171,16 +171,16 @@ describe DefinePermissions, dbclean: :after_each do
         Person.all.delete
         @hbx_staff_person = FactoryGirl.create(:person)
         @hbx_tier3_person = FactoryGirl.create(:person)
-        @super_admin_person = FactoryGirl.create(:person)
+        @hbx_super_admin_person = FactoryGirl.create(:person)
         hbx_staff_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_staff_person, subrole: "hbx_staff", permission_id: Permission.hbx_staff.id)
         hbx_tier3_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_tier3_person, subrole: "hbx_tier3", permission_id: Permission.hbx_tier3.id)
-        super_admin_role = FactoryGirl.create(:hbx_staff_role, person: @super_admin_person, subrole: "super_admin", permission_id: Permission.super_admin.id)
+        super_admin_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_super_admin_person, subrole: "super_admin", permission_id: Permission.super_admin.id)
       end
 
       it "check can_extend_open_enrollment permission " do
         expect(Person.all.count).to eq(3)
         expect(@hbx_tier3_person.hbx_staff_role.permission.can_extend_open_enrollment).to be true
-        expect(@super_admin_person.hbx_staff_role.permission.can_extend_open_enrollment).to be true
+        expect(@hbx_super_admin_person.hbx_staff_role.permission.can_extend_open_enrollment).to be true
         expect(@hbx_staff_person.hbx_staff_role.permission.can_extend_open_enrollment).to be false
       end
     end

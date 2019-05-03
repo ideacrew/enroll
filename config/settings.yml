@@ -20,6 +20,20 @@ site:
   social_media:
     facebook_url: ""
 
+plan_option_titles:
+  sole_source: 'Single Plan'
+  metal_level: 'By Metal Level'
+  single_carrier: 'By Carrier'
+  single_plan: 'Single Plan'
+
+plan_option_descriptions:
+  sole_source: "Choose one plan and your contribution amount. All employees can enroll in that plan."
+  metal_level: "Choose a benefit level and your contribution amount. Your employees will be able to choose a plan offered by any insurance carrier at that benefit level."
+  single_carrier: "Choose an insurance carrier and your contribution amount. Your employees will be able to choose a plan from that carrier at any benefit level."
+  single_plan: "Choose one plan and your contribution amount. All employees can enroll in that plan."
+  dental:
+    single_plan: "For Dental coverage, you will choose one dental plan from one carrier as the option that all of your employees can enroll in."
+
 contact_center:
   name: "DC Health Link's Customer Care Center"
   alt_name: "DC Health Link Customer Service"
@@ -35,7 +49,17 @@ aca:
   state_name: "District of Columbia"
   state_abbreviation: "DC"
   hbx_abbreviation: "DC Health Benefit Exchange"
+  nationwide_markets: true
   market_kinds: ["individual", "shop"]
+  employer_has_sic_field: false
+  employer_has_county_validation: false
+  plan_options_available: ["single_plan", "single_carrier", "metal_level"]
+  dental_plan_options_available: ["single_carrier", "custom"]
+  offerings_constrained_to_service_areas: false
+  rating_areas:
+    - nil
+  carrier_hios_logo_variant:
+    '': ""
 #
   qle:
     with_in_sixty_days: 60
@@ -57,6 +81,7 @@ aca:
   shop_market:
     small_market_employee_count_maximum: 50
     employer_contribution_percent_minimum: 50
+    employer_family_contribution_percent_minimum: 0
     employee_participation_ratio_minimum: <%= 2 / 3.0 %>
     non_owner_participation_count_minimum: 1
     binder_payment_due_on: 12
@@ -106,6 +131,7 @@ aca:
 
       minimum_length:
         days: 5
+        adv_days: 10
       maximum_length:
         months: 2
 
@@ -122,6 +148,7 @@ aca:
     transmit_employers_immediately: false
     transmit_scheduled_employers: true
     employer_transmission_day_of_month: 16
+  general_agency_enabled: true
 
 notices:
   individual_market:

@@ -1,10 +1,33 @@
 module ApplicationHelper
 
+  def can_employee_shop?(date)
+    return false if date.blank?
+    date = Date.strptime(date.to_s,"%m/%d/%Y")
+    Plan.has_rates_for_all_carriers?(date) == false
+  end
+
   def deductible_display(hbx_enrollment, plan)
     if hbx_enrollment.hbx_enrollment_members.size > 1
       plan.family_deductible.split("|").last.squish
     else
       plan.deductible
+    end
+  end
+
+  def display_carrier_pdf_logo(plan, options = {:width => 50})
+    carrier_name = carrier_logo(plan)
+    image_tag(wicked_pdf_asset_base64("logo/carrier/#{carrier_name.parameterize.underscore}.jpg"), width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
+  end
+
+  def carrier_logo(plan)
+    if plan.extract_value.class.to_s == "Plan"
+      return "" if !plan.carrier_profile.legal_name.extract_value.present?
+      issuer_hios_id = plan.hios_id[0..4].extract_value
+      Settings.aca.carrier_hios_logo_variant[issuer_hios_id] || plan.carrier_profile.legal_name.extract_value
+    else
+      return "" if !plan.issuer_profile.legal_name.extract_value.present?
+      issuer_hios_id = plan.hios_id[0..4].extract_value
+      Settings.aca.carrier_hios_logo_variant[issuer_hios_id] || plan.issuer_profile.legal_name.extract_value
     end
   end
 
@@ -618,6 +641,7 @@ module ApplicationHelper
   end
 
   def eligibility_criteria(employer)
+    return unless employer.respond_to?(:show_plan_year)
     if employer.show_plan_year.present?
       participation_rule_text = participation_rule(employer)
       non_owner_participation_rule_text = non_owner_participation_rule(employer)
