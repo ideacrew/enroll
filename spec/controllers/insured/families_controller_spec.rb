@@ -445,6 +445,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   end
 
   describe "GET inbox" do
+    let(:person) {FactoryGirl.create(:person, :with_broker_role, :with_consumer_role)}
     before :each do
       allow(family).to receive(:active_family_members).and_return(family_members)
       get :inbox

@@ -8,7 +8,7 @@ Background: new applicant navigation to the FAA Household Info page
   And the user answers all VERIFY IDENTITY  questions
   When the user clicks submit
   And Experian returns a VERIFIED response
-  Then The user will navigate to the Help Paying for Coverage page
+  Then the user will navigate to the Help Paying for Coverage page
 	And saves a YES answer to the question: Do you want to apply for Medicaid…
 
 Scenario: new applicant navigation to the FAA Household Info page

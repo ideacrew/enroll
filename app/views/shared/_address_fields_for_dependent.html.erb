@@ -58,7 +58,7 @@
           </div>
         </div>
 
-        <% if kind == 'home' %>
+        <% if kind == 'home' && show_no_dc_address %>
           <% style="display:none;" if f.object.no_dc_address.blank? || f.object.no_dc_address == false || f.object.no_dc_address == 'false' %>
           <div style="<%= style %>" class="row no-buffer address-row show no-dc-address-reasons">
             <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">

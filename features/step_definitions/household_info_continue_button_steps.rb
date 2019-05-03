@@ -78,6 +78,7 @@ When(/^all applicants are in Info Completed state$/) do
     find("#is_self_attested_blind_no").click
     find("#has_daily_living_no").click
     find("#need_help_paying_bills_no").click
+    find("#radio_physically_disabled_no").click
     find('[name=commit]').click       
   end
 end

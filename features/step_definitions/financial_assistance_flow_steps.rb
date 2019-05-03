@@ -56,7 +56,7 @@ When(/^the user clicks submit$/) do
 end
 
 When(/^Experian returns a VERIFIED response$/) do
-  click_link "Please click here once you have contacted the exchange and have been told to proceed."
+  click_link "Continue Application"
 end
 
 Then(/^The user will navigate to the Help Paying for Coverage page$/) do
@@ -68,7 +68,7 @@ Given(/^the user is on the Help Paying For Coverage page$/) do
 end
 
 When(/^the user clicks CONTINUE$/) do
-  find('.interaction-click-control-continue').click
+  find('.interaction-click-control-continue').trigger('click')
 end
 
 When(/^the answer to Do you want to apply for Medicaid… is NIL$/) do

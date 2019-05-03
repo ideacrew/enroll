@@ -13,6 +13,7 @@ class FinancialAssistance::Deduction
       domestic_production_activities
       penalty_on_early_withdrawl_of_savings
       educator_expenses
+      rent_or_royalties
       self_employment_sep_simple_and_qualified_plans
       self_employed_health_insurance
       student_loan_interest

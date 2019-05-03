@@ -652,6 +652,14 @@ class Person
     employer_staff_roles.present? ? employer_staff_roles.active : []
   end
 
+  def active_broker_staff_roles
+    self.broker_agency_staff_roles.where(:aasm_state => :active)
+  end
+
+  def has_active_broker_staff_role?
+    active_broker_staff_roles.size > 0
+  end
+
   def has_multiple_roles?
     consumer_role.present? && active_employee_roles.present?
   end
@@ -701,6 +709,29 @@ class Person
 
   def is_resident_role_active?
     (self.resident_role.present? && self.active_individual_market_role == "resident") ? true : false
+  end
+
+
+  def has_pending_broker_staff_role?(broker_agency_profile_id)
+    self.broker_agency_staff_roles.where({
+                                             aasm_state: :broker_agency_pending,
+                                             broker_agency_profile_id: broker_agency_profile_id
+
+                                         }).size > 0
+  end
+
+  def has_active_staff?(broker_agency_id)
+    active_matching_broker = broker_agency_staff_roles.detect{|role| role if role.broker_agency_profile_id == BSON::ObjectId.from_string(broker_agency_id) && role.is_active?}
+    active_matching_broker.present? ? true : false
+  end
+
+  def has_pending_staff?(broker_agency_id)
+    pending_matching_broker = broker_agency_staff_roles.detect{|role| role if role.broker_agency_profile_id == BSON::ObjectId.from_string(broker_agency_id) && role.agency_pending?}
+    pending_matching_broker.present? ? true : false
+  end
+
+  def terminated_matching_broker(broker_agency_id)
+    broker_agency_staff_roles.detect{|role| role if role.broker_agency_profile_id == BSON::ObjectId.from_string(broker_agency_id) && role.agency_terminated?}
   end
 
   class << self
@@ -861,6 +892,25 @@ class Person
         })
     end
 
+    def staff_for_broker(broker_profile)
+      Person.where(:broker_agency_staff_roles => {
+          '$elemMatch' => {
+              aasm_state: :active,
+              broker_agency_profile_id: broker_profile.id
+
+          }
+      })
+    end
+
+    def staff_for_broker_including_pending(broker_profile)
+      Person.where(:broker_agency_staff_roles => {
+          '$elemMatch' => {
+              broker_agency_profile_id: broker_profile.id,
+              :aasm_state.in => [:broker_agency_pending, :active]
+          }
+      })
+    end
+
     # Adds employer staff role to person
     # Returns status and message if failed
     # Returns status and person if successful
@@ -892,6 +942,38 @@ class Person
       else
         return false, 'No matching employer staff role'
       end
+    end
+
+    def deactivate_broker_agency_staff_role(person_id, broker_agency_profile_id)
+      begin
+        person = Person.find(person_id)
+      rescue
+        return false, 'Person not found'
+      end
+
+      broker_agency_staff_role = person.broker_agency_staff_roles.detect{ |role|
+        (role.broker_agency_profile_id.to_s || role.broker_agency_profile_id.to_s) == broker_agency_profile_id.to_s && role.is_open?
+      }
+
+      if broker_agency_staff_role
+        broker_agency_staff_role.broker_agency_terminate!
+        return true, 'Broker Agency Staff Role is inactive'
+      else
+        return false, 'No matching Broker Agency Staff role'
+      end
+    end
+
+    def add_broker_agency_staff_role(first_name, last_name, dob, email, broker_agency_profile)
+      person = Person.where(first_name: /^#{first_name}$/i, last_name: /^#{last_name}$/i, dob: dob)
+
+      return false, 'Person does not exist on the Exchange' if person.count == 0
+      return false, 'Person count too high, please contact HBX Admin' if person.count > 1
+      return false, 'Person already has a staff role for this broker agency' if Person.staff_for_broker_including_pending(broker_agency_profile).include?(person.first)
+
+      broker_agency_staff_role = BrokerAgencyStaffRole.new(person: person.first, broker_agency_profile_id: broker_agency_profile.id, aasm_state: "active")
+      broker_agency_staff_role.save
+
+      return true, person.first
     end
 
   end
@@ -973,7 +1055,7 @@ class Person
   end
 
   def agent?
-    agent = self.csr_role || self.assister_role || self.broker_role || self.hbx_staff_role || self.general_agency_staff_roles.present?
+    agent = self.csr_role || self.assister_role || self.broker_role || self.hbx_staff_role || self.general_agency_staff_roles.present? || self.broker_agency_staff_roles.present?
     !!agent
   end
 
