@@ -63,6 +63,21 @@ RSpec.describe UserMailer do
         expect(email.body.raw_source).to have_content(/has invited you to sign up for employer-sponsored health insurance through/)
       end
     end
+  end
+
+  describe 'broker_staff_invitation_email' do
+    let(:hbx_id) { rand(10000 )}
+    let(:person_id) { double("465") }
+    let(:invitation) {double("123")}
+    let(:email){UserMailer.broker_staff_invitation_email('john@dc.gov', 'john', invitation, person_id)}
+
+    it 'should not allow a reply' do
+      expect(email.from).to match(['no-reply@shop.dchealthlink.com'])
+    end
+
+    it "should have subject of #{Settings.site.short_name}" do
+      expect(email.subject).to match(/Invitation to create your Broker Staff account on DC Health Link/)
+    end
 
   end
 end

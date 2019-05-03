@@ -76,4 +76,31 @@ RSpec.describe Exchanges::AgentsController do
       end
     end
   end
+
+  describe 'user_permission_satisfied?', dbclean: :after_each do
+
+    context 'user has specific roles' do
+      before do
+        allow(current_user).to receive(:has_broker_agency_staff_role?).and_return true
+        allow(current_user).to receive(:has_broker_role?).and_return true
+      end
+
+      it 'should return true if user has broker role or broker agency staff role' do
+        sign_in(current_user)
+        expect(subject.instance_eval{ user_permission_satisfied? }).to eq true
+      end
+    end
+
+    context 'user does not have any roles' do
+      before do
+        allow(current_user).to receive(:has_broker_agency_staff_role?).and_return false
+        allow(current_user).to receive(:has_broker_role?).and_return false
+      end
+
+      it 'should return false if user does not have any roles' do
+        sign_in(current_user)
+        expect(subject.instance_eval{ user_permission_satisfied? }).to eq false
+      end
+    end
+  end
 end

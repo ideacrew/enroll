@@ -1,19 +1,19 @@
 <% insured = (current_user.try(:has_consumer_role?) && current_user.identity_verified_date.nil? == false) || current_user.try(:has_employee_role?) %>
 <% employer_staff =  (current_user.person && current_user.person.active_employer_staff_roles) || []%>
 <% employer = employer_staff.first %>
+<% broker_agency_staff_roles = (current_user.person && current_user.person.active_broker_staff_roles) || [] %>
 <% broker =  current_user.try(:has_broker_agency_staff_role?) %>
-<% roles = [insured, broker] %>
-<% portal_count = roles.select{|role|role}.count + employer_staff.count%>
-
+<% roles = [insured] %>
+<% portal_count = roles.select{|role|role}.count + employer_staff.count + broker_agency_staff_roles.count%>
 
   <% if portal_count == 1 %>
     <span>
       <%= link_to l10n(".my_insured_portal"), main_app.family_account_path(tab: 'home'), class: 'header-text' if insured %>
       <%= link_to "My Employer Portal", main_app.new_employers_employer_profile_path, class: 'header-text' if employer_staff.present? %>
-      <%= link_to "My Broker Agency Portal", main_app.broker_agencies_root_path, class: 'header-text' if broker %>
+      <%= link_to "My Broker Agency Portal", main_app.broker_agencies_root_path, class: 'header-text' if broker_agency_staff_roles.any? %>
       <span> | </span>
     </span>
-    <%elsif portal_count > 1 %>
+  <%elsif portal_count > 1 %>
     <span>
       <a href="#" class="dropdown-toggle header-text" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">My Portals <span class="caret"></span></a>
       <ul class="dropdown-menu">
@@ -34,8 +34,15 @@
             <% employer = EmployerProfile.find(id) %>
             <li><%= link_to employer.legal_name, main_app.employers_employer_profile_path(employer, tab: 'home'), class: 'header-text' %></li>
         <% end %>
+<<<<<<< HEAD
         <% if broker %>
           <li><%= link_to "My Broker Agency Portal", main_app.broker_agencies_root_path, class: 'header-text' %></li>
+=======
+        <% broker_agency_staff_roles.each do |broker_staff_role| %>
+          <%profile = broker_staff_role.broker_agency_profile%>
+          <% broker_link =  broker_agencies_profile_path(profile) %>
+          <li style="text-align:left"><%= link_to profile.legal_name, broker_link, class: 'header-text' %></li>
+>>>>>>> origin/Enhancement-16177
         <% end %>
       </ul>
       <span> | </span>
