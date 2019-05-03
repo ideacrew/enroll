@@ -7,7 +7,7 @@ RSpec.describe "broker_agencies/broker_roles/_existing_broker_agency_form.html.e
 
   it "should have search area" do
     render template: "broker_agencies/broker_roles/_existing_broker_agency_form.html.erb"
-    expect(rendered).to have_selector("input[placeholder='Name/FEIN']")
+    expect(rendered).to have_selector("input[placeholder='Agency/Broker Name, NPN']")
   end
 
   it "should have asterik for mandatory feilds" do

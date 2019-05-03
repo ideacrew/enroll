@@ -52,6 +52,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   let(:sep) { double("SpecialEnrollmentPeriod") }
 
   before :each do
+    allow(hbx_enrollments).to receive(:size).and_return(1)
     allow(hbx_enrollments).to receive(:order).and_return(hbx_enrollments)
     allow(hbx_enrollments).to receive(:waived).and_return([])
     allow(hbx_enrollments).to receive(:any?).and_return(false)
@@ -444,6 +445,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   end
 
   describe "GET inbox" do
+    let(:person) {FactoryGirl.create(:person, :with_broker_role, :with_consumer_role)}
     before :each do
       allow(family).to receive(:active_family_members).and_return(family_members)
       get :inbox

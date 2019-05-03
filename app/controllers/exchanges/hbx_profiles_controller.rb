@@ -452,7 +452,7 @@ def employer_poc
     end
   end
 
-   def view_terminated_hbx_enrollments
+  def view_terminated_hbx_enrollments
     @person = Person.find(params[:person_id])
     @element_to_replace_id = params[:family_actions_id]
     @enrollments = @person.primary_family.terminated_enrollments
@@ -480,6 +480,27 @@ def employer_poc
     redirect_to exchanges_hbx_profiles_root_path, flash: message
   end
 
+  def edit_force_publish
+    authorize HbxProfile, :can_force_publish?
+    @element_to_replace_id = params[:row_actions_id]
+    @organization = Organization.find(@element_to_replace_id.split('_').last)
+    @plan_year = @organization.renewing_or_draft_py
+  end
+
+  def force_publish
+    authorize HbxProfile, :can_force_publish?
+    @element_to_replace_id = params[:row_actions_id]
+    @organization = Organization.find(@element_to_replace_id.split('_').last)
+    @plan_year = @organization.renewing_or_draft_py
+    if params[:publish_with_warnings] == 'true' || @plan_year.application_eligibility_warnings.blank?
+      @plan_year.force_publish! if @plan_year.may_force_publish?
+    end
+
+    respond_to do |format|
+      format.js
+    end
+  end
+
   def verify_dob_change
     @person = Person.find(params[:person_id])
     @element_to_replace_id = params[:family_actions_id]
@@ -490,7 +511,7 @@ def employer_poc
   end
 
   def update_dob_ssn
-    authorize  Family, :can_update_ssn?
+    authorize Family, :can_update_ssn?
     @element_to_replace_id = params[:person][:family_actions_id]
     @person = Person.find(params[:person][:pid]) if !params[:person].blank? && !params[:person][:pid].blank?
     @ssn_match = Person.find_by_ssn(params[:person][:ssn]) unless params[:person][:ssn].blank?
@@ -666,6 +687,36 @@ def employer_poc
     end
     redirect_to exchanges_hbx_profiles_root_path
 
+  end
+
+  def edit_fein
+    authorize HbxProfile, :can_change_fein?
+    @organization = Organization.find(params[:id])
+    @element_to_replace_id = params[:row_actions_id]
+
+    respond_to do |format|
+      format.js { render "edit_fein" }
+    end
+  end
+
+  def update_fein
+    authorize HbxProfile, :can_change_fein?
+    @organization = Organization.find(params["id"])
+    @element_to_replace_id = params[:row_actions_id]
+
+    if @organization
+      begin
+        @organization.assign_attributes(fein: (params[:organization][:new_fein]))
+        @organization.save!
+      rescue => e
+        @errors_on_save = @organization.errors.messages
+      end
+    end
+
+    respond_to do |format|
+      format.js { render "edit_fein" } if @errors_on_save
+      format.js { render "update_fein" }
+    end
   end
 
 private

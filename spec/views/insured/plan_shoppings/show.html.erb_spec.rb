@@ -47,6 +47,8 @@ RSpec.describe "insured/show" do
     broker_person.broker_role = broker_role
     broker_person.save
     sign_in current_broker_user
+    controller.params[:id] = "100"
+    allow(controller).to receive(:controller_path).and_return("broker_agencies")
     render :template => 'layouts/_header.html.erb'
     expect(rendered).to match(/I'm a Broker/)
     expect(rendered).to_not match(/Welcome|Family/)

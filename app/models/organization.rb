@@ -370,6 +370,10 @@ class Organization
 
   end
 
+  def renewing_or_draft_py
+    employer_profile.plan_years.renewing_draft_or_draft.last
+  end
+
   class << self
     def employer_profile_renewing_starting_on(date_filter)
       employer_profile_renewing_coverage.employer_profile_plan_year_start_on(date_filter)
@@ -395,6 +399,10 @@ class Organization
         query_params << {"broker_agency_profile.working_hours" => eval(search_params[:working_hours])}
       end
 
+      if search_params[:is_staff_registration].present?
+        query_params << {}
+      end
+
       query_params
     end
 
@@ -414,7 +422,6 @@ class Organization
             "$in" => BrokerRole.agencies_with_matching_broker(search_params[:q])
           }
         })
-
         brokers = BrokerRole.brokers_matching_search_criteria(search_params[:q])
         if brokers.any?
           search_params.delete(:q)
@@ -424,8 +431,13 @@ class Organization
             agencies_matching_advanced_criteria = orgs2.where({ "$and" => build_query_params(search_params) })
             return filter_brokers_by_agencies(agencies_matching_advanced_criteria, brokers)
           end
+        elsif search_params['is_staff_registration'] == 'true'
+          return self.search_agencies_by_criteria(search_params)
         end
+      elsif !search_params[:q].present? && search_params['is_staff_registration'] == 'true'
+        return []
       end
+
 
       self.search_agencies_by_criteria(search_params)
     end
@@ -434,6 +446,5 @@ class Organization
       agency_ids = agencies.map{|org| org.broker_agency_profile.id}
       brokers.select{ |broker| agency_ids.include?(broker.broker_role.broker_agency_profile_id) }
     end
-    
   end
 end
