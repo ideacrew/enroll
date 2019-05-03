@@ -9,7 +9,7 @@ describe "CcaCarrierProfilesMigration" do
     end
   end
 
-  describe ".up", dbclean: :after_each do
+  xdescribe ".up", dbclean: :after_each do
 
     before :each do
       FactoryBot.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, site_key: :cca)
