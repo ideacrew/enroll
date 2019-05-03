@@ -52,4 +52,4 @@ Feature: The different eligibility response pages received after submitting an a
     And the user qualifies for "no assistance"
     And the user is on the Eligibility Results page
     When the user clicks View My Applications
-    Then the user will be on the My Financial Assistance Applications page
+    Then the user will be on the Cost Savings Applications page

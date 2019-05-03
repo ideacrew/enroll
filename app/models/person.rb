@@ -1132,6 +1132,10 @@ class Person
     person_relationships.where(family_id: family_id, predecessor_id: self.id, successor_id: successor.id).first.present?
   end
 
+  def format_citizen
+    ::ConsumerRole::CITIZEN_KINDS[citizen_status.to_sym]
+  end
+
   private
   def is_ssn_composition_correct?
     # Invalid compositions:

@@ -91,7 +91,7 @@
                       <td><%= applicant.age_of_the_applicant %></td>
                       <td><%= applicant.person.gender.humanize %></td>
                       <td><%= applicant.family_member.relationship.humanize %></td>
-                      <td><%= applicant.person.citizen_status.humanize if applicant.person.citizen_status.present? %></td>
+                      <td><%= applicant.person.format_citizen if applicant.person.citizen_status.present? %></td>
                       <td><%= human_boolean applicant.person.is_incarcerated %></td>
                       <td><%= human_boolean applicant.person.is_applying_coverage %></td>
                     </tr>
@@ -109,7 +109,7 @@
                   </div>
                 </div>
                 <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                  <div class="col-md-6">Will this Person file taxes for <%= @application.family.application_applicable_year %>? *</div>
+                  <div class="col-md-6">Will this person file taxes for <%= @application.family.application_applicable_year %>? *</div>
                   <div class="col-md-6"><%= human_boolean(applicant.is_required_to_file_taxes) %></div>
                 </div>
                 <div class="row row-form-wrapper ptb no-buffer row-height form-content">
@@ -120,7 +120,7 @@
                 </div>
 
                 <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
-                  <div class="col-md-11">Income</div>
+                  <div class="col-md-11">INCOME</div>
                   <div class="col-md-1">
                     <%= link_to financial_assistance_application_applicant_incomes_path(@application, applicant) do %>
                     <i class="fa fa-pencil fa-lg"></i>
@@ -129,14 +129,14 @@
                 </div>
 
                 <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                  <div class="col-md-6">Does this person have income from an employer (wages, tips, bonuses, etc)
+                  <div class="col-md-6">Does this person have income from an employer (wages, tips, bonuses, etc.)
                     in <%= @application.family.application_applicable_year %>?
                   </div>
                   <div class="col-md-6"><%= human_boolean applicant.has_job_income %></div>
                 </div>
 
                 <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                  <div class="col-md-6">Is this person self employed?</div>
+                  <div class="col-md-6">Is this person self-employed?</div>
                   <div class="col-md-6"><%= human_boolean applicant.has_self_employment_income %></div>
                 </div>
 
@@ -147,7 +147,7 @@
                 </div>
 
                 <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
-                  <div class="col-md-11">Income Adjustments</div>
+                  <div class="col-md-11">INCOME ADJUSTMENTS</div>
                   <div class="col-md-1">
                     <%= link_to financial_assistance_application_applicant_deductions_path(@application, applicant) do %>
                     <i class="fa fa-pencil fa-lg"></i>
@@ -162,7 +162,7 @@
                 </div>
 
                 <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
-                  <div class="col-md-11">Health Coverage</div>
+                  <div class="col-md-11">HEALTH COVERAGE</div>
                   <div class="col-md-1">
                     <%= link_to financial_assistance_application_applicant_benefits_path(@application, applicant) do %>
                     <i class="fa fa-pencil fa-lg"></i>
@@ -192,11 +192,11 @@
                 </div>
               </div>
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                <div class="col-md-6">Is the Person pregnant?</div>
+                <div class="col-md-6">Is this person pregnant?</div>
                 <div class="col-md-6"><%= human_boolean applicant.is_pregnant %></div>
               </div>
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                <div class="col-md-6">Is the Person blind?</div>
+                <div class="col-md-6">Is this person blind?</div>
                 <div class="col-md-6"><%= human_boolean applicant.is_self_attested_blind %></div>
               </div>
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">

@@ -47,7 +47,7 @@
 
     <div class="row row-form-wrapper no-buffer">
       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg">
-        <label class="fa-text-color">Is the employee currently in a waiting period and eligible to enroll in the next 3 months ? *</label>
+        <label class="fa-text-color">Is the employee currently in a waiting period and eligible to enroll in the next 3 months? *</label>
       </div>
       <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
         <div class="radio skinned-form-controls skinned-form-controls-mac">
@@ -73,7 +73,7 @@
 
     <div class="row row-form-wrapper no-buffer">
       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg">
-        <label class="fa-text-color">Does this employer offer a health plan that meets the minimum value standard ? *</label>
+        <label class="fa-text-color">Does this employer offer a health plan that meets the minimum value standard? *</label>
       </div>
       <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
         <div class="radio skinned-form-controls skinned-form-controls-mac">
@@ -99,7 +99,7 @@
 
     <div class="row row-form-wrapper no-buffer row-height">
       <div class="col-md-6 fa-select select-box">
-        <%= f.label :esi_covered, 'Who Can be Covered? *', class: "label-color" %>
+        <%= f.label :esi_covered, 'Who can be covered? *', class: "label-color" %>
         <%= f.select :esi_covered, options_for_select({"Self" => "self", "Self And Spouse" => "self_and_spouse", "Family" => "family" }, selected: benefit.esi_covered), {prompt: 'Choose' }, {:required => true} %>
       </div>
       <div class="col-md-6">
@@ -114,7 +114,7 @@
 
     <div class="row row-form-wrapper radio-align no-buffer">
       <div class='col-md-9 labelforcoverage'>
-        <span class="fa-text-color">How much would the employee only pay for the lowest cost minimum value standard plan ? *</span>
+        <span class="fa-text-color">How much would the employee only pay for the lowest cost minimum value standard plan? *</span>
       </div>
       <div class='col-md-2 not-sure-margin'>
         <a href="#employee_cost" data-toggle="modal" data-target="#employee_cost_<%= benefit.id %>" id="employee_cost" class="interaction-click-control-not-sure? benefit-support-modal">Not Sure?</a>

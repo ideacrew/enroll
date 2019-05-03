@@ -15,7 +15,7 @@ Given(/^the user answers yes to having other income$/) do
 end
 
 Then(/^the other income choices should show$/) do
-  expect(page).to have_content "Common types of income you must report."
+  expect(page).to have_content "Common types of income you must report"
 end
 
 Given(/^the user checks a other income checkbox$/) do
