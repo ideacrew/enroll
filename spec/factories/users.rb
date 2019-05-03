@@ -15,7 +15,11 @@ FactoryBot.define do
 
     after(:create) do |user, evaluator|
       if evaluator.with_security_questions
-        3.times { create(:security_question_response, user: user) }
+
+        3.times {|i| 
+          security_question = create(:security_question, title: "Security Question #{i + 1}")
+          create(:security_question_response, user: user, security_question: security_question)
+        }
       end
     end
   end

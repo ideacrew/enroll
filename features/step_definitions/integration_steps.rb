@@ -31,6 +31,7 @@ def people
       dob: "01/01/1980",
       dob_date: "01/01/1980".to_date,
       ssn: "786120965",
+      home_phone: "2025551234",
       email: 'patrick.doe@dc.gov',
       password: 'aA1!aA1!aA1!',
       fein: registering_employer.fein # 570834919
@@ -573,13 +574,15 @@ end
 When (/^(.*) logs? out$/) do |someone|
   click_link "Logout"
   visit "/"
+  sleep 5 #FIX ME: remove sleep and replace with find & wait
 end
 
 When(/^.+ go(?:es)? to register as an employee$/) do
-  find("option[id='sec-answer-0-0']").click
-  find("option[id='sec-answer-0-1']").click
-  find("option[id='sec-answer-0-2']").click
-  click_button('Save Responses')
+  # find("option[id='sec-answer-0-0']").click
+  # find("option[id='sec-answer-0-1']").click
+  # find("option[id='sec-answer-0-2']").click
+  # click_button('Save Responses')
+  sleep 1
   find('.interaction-click-control-continue').click
 end
 
@@ -628,11 +631,12 @@ end
 
 When(/^.+ enters? the identifying info of (.*)$/) do |named_person|
   person = people[named_person]
-
+  person_ssn = "#{person[:ssn][0..2]}-#{person[:ssn][3..4]}-#{person[:ssn][5..8]}"
+  
   fill_in 'person[first_name]', :with => person[:first_name]
   fill_in 'person[last_name]', :with => person[:last_name]
-  fill_in 'person[dob]', :with => person[:dob]
-  fill_in 'person[ssn]', :with => person[:ssn]
+  fill_in 'jq_datepicker_ignore_person[dob]', :with => person[:dob]
+  fill_in 'person[ssn]', :with => person_ssn
   find(:xpath, '//label[@for="radio_male"]').click
 
   screenshot("information_entered")
@@ -651,7 +655,7 @@ Then(/^.+ should not see the matched employee record form$/) do
 end
 
 Then(/^Employee should see the matched employee record form$/) do
-  expect(page).to have_content(@organization[@organization.keys.first].legal_name)
+  expect(page).to have_content(employer.legal_name)
   screenshot("employer_search_results")
 end
 
@@ -711,12 +715,11 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   # find("#person_addresses_attributes_0_city").click
   # find("#person_addresses_attributes_0_zip").click
   find_by_id("person_phones_attributes_0_full_phone_number", wait: 10)
-  fill_in "person[phones_attributes][0][full_phone_number]", :with => person[:home_phone]
-
-  screenshot("personal_info_complete")
   wait_for_ajax
-  fill_in "person[phones_attributes][0][full_phone_number]", :with => person[:home_phone] #because why not...
-  expect(page).to have_field("HOME PHONE", with: "(#{person[:home_phone][0..2]}) #{person[:home_phone][3..5]}-#{person[:home_phone][6..9]}") if person[:home_phone].present?
+  phone_number = "(#{person[:home_phone][0..2]}) #{person[:home_phone][3..5]}-#{person[:home_phone][6..9]}"
+  fill_in "person[phones_attributes][0][full_phone_number]", :with => phone_number
+  screenshot("personal_info_complete")
+  expect(page).to have_field("HOME PHONE", with: phone_number) if person[:home_phone].present?
   #find("#btn-continue").click
   click_button 'CONTINUE'
 end
@@ -777,7 +780,7 @@ When(/^.+ enters? the dependent info of .+ daughter$/) do
   date = TimeKeeper.date_of_record - 28.years
   dob = date.to_s
   fill_in 'jq_datepicker_ignore_dependent[dob]', with: dob
-  find(:xpath, "//p[@class='label'][contains(., 'This Person Is')]").click
+  find(:xpath, "//span[@class='label'][contains(., 'This Person Is')]").click
   find(:xpath, "//li[@data-index='3'][contains(., 'Child')]").click
   find(:xpath, "//label[@for='radio_female']").click
 end
@@ -788,12 +791,13 @@ When(/^.+ enters? the dependent info of Patrick wife$/) do
   fill_in 'dependent[ssn]', with: '123445678'
   fill_in 'jq_datepicker_ignore_dependent[dob]', with: '01/15/1996'
   find('#dependents_info_wrapper').click
-  find(:xpath, "//p[@class='label'][contains(., 'This Person Is')]").click
+  sleep 1
+  find(:xpath, "//span[@class='label'][contains(., 'This Person Is')]").click
   find(:xpath, "//li[@data-index='1'][contains(., 'Spouse')]").click
   find(:xpath, "//label[@for='radio_female']").click
   fill_in 'dependent[addresses][0][address_1]', with: '123 STREET'
   fill_in 'dependent[addresses][0][city]', with: 'WASHINGTON'
-  find(:xpath, "//p[@class='label'][contains(., 'SELECT STATE')]").click
+  find(:xpath, "//span[@class='label'][contains(., 'SELECT STATE')]").click
   find(:xpath, "//li[@data-index='24'][contains(., 'MA')]").click
   fill_in 'dependent[addresses][0][zip]', with: '01001'
 end
@@ -816,9 +820,9 @@ When(/^.+ clicks? health radio on the group selection page$/) do
   find(:xpath, '//label[@for="coverage_kind_dental"]').click
 end
 
-When(/^(?:Employee){0}.+ clicks? continue on the group selection page$/) do
-  find('#btn-continue').click
-end
+# When(/^(?:Employee){0}.+ clicks? continue on the group selection page$/) do
+#   find('#btn-continue').click
+# end
 
 Then(/^.+ should see the plan shopping welcome page$/) do
   expect(page).to have_content('Choose Plan')
@@ -850,6 +854,7 @@ When(/^.+ clicks Shop for new plan button$/) do
 end
 
 Then(/^.+ should see the list of plans$/) do
+  find('#planContainer', wait: 10)
   expect(page).to have_link('Select')
   screenshot("plan_shopping")
 end
@@ -884,6 +889,7 @@ Then(/^.+ should see the receipt page$/) do
 end
 
 Then(/^.+ should see the "my account" page$/) do
+  find('.my-account-page', wait: 10)
   expect(page).to have_content("My #{Settings.site.short_name}")
   screenshot("my_account")
 end

@@ -6,7 +6,7 @@ $(".date-picker").on("change", function () {
     $("#msg").text(val + " changed");
 });
 
-$(document).ready(function() {
+$(document).on("ready turbolinks:load", function() {
     $("input.capital").keyup(function() {
         var val = $(this).val();
         val = val.replace(/_/g, '');
@@ -22,7 +22,7 @@ window.setCaptchaSiteKey = function(key) {
     captchaSiteKey = key
 }
 
-$(document).ready(function(){
+$(document).on("ready turbolinks:load", function() {
   if (typeof grecaptcha !== 'undefined') {
     $('#invisible-recaptcha-form').on('submit', function(event) {
         if(grecaptcha.getResponse(captchaWidget) ==''){

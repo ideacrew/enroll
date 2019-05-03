@@ -304,10 +304,10 @@ Then(/^.+ sees employer census family created$/) do
   expect(page).to have_content('successfully created')
 end
 
-Then(/^(?:Employee){0}.+ should see the matched employee record form$/) do
-  screenshot("broker_employer_search_results")
-  expect(page).to have_content('Legal LLC')
-end
+# Then(/^(?:Employee){0}+ should see the matched employee record form$/) do
+#   screenshot("broker_employer_search_results")
+#   expect(page).to have_content('Legal LLC')
+# end
 
 Then(/^Broker Assisted is a family$/) do
   find(:xpath, "//li[contains(., 'Families')]/a").click
