@@ -181,10 +181,10 @@ class Exchanges::HbxProfilesController < ApplicationController
 
   def employer_datatable
     # copy the link and open in new tab
-    url = current_user.try(:last_portal_visited) || root_path if current_user.present?
+    last_visited_url = current_user.try(:last_portal_visited) || root_path if current_user.present?
     @datatable = Effective::Datatables::BenefitSponsorsEmployerDatatable.new
       respond_to do |format|
-       format.html { redirect_to(url) }
+       format.html { redirect_to(last_visited_url) }
        format.js
       end
   end
