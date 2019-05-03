@@ -31,7 +31,7 @@ module BenefitSponsors
     initializer "webpacker.proxy" do |app|
       insert_middleware =
         begin
-          MyEngine.webpacker.config.dev_server.present?
+          BenefitSponsors.webpacker.config.dev_server.present?
         rescue StandardError => e
           e.message
         end
@@ -40,7 +40,7 @@ module BenefitSponsors
       app.middleware.insert_before(
         0, Webpacker::DevServerProxy, # "Webpacker::DevServerProxy" if Rails version < 5
         ssl_verify_none: true,
-        webpacker: MyEngine.webpacker
+        webpacker: BenefitSponsors.webpacker
       )
     end
   end
