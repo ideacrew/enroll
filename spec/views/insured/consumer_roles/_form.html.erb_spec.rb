@@ -1,29 +1,6 @@
 require "rails_helper"
-
+include ActionView::Context
 RSpec.describe "insured/consumer_roles/_form.html.erb" do
-  let(:person) { Person.new }
-  let(:current_user) {FactoryBot.create(:user)}
-
-  #before do
-    #Translation.create(key: "en.required_field", value: "\"required field\"")
-  #end
-
-  before :each do
-    helper = Object.new.extend ActionView::Helpers::FormHelper
-    helper.extend ActionView::Context
-    helper.extend ActionDispatch::Routing::PolymorphicRoutes
-    helper.extend ActionView::Helpers::FormOptionsHelper
-    person.build_consumer_role if person.consumer_role.blank?
-    person.consumer_role.build_nested_models_for_person
-    mock_form = ActionView::Helpers::FormBuilder.new(:person, person, helper, {})
-    stub_template "shared/_consumer_fields.html.erb" => ''
-    sign_in current_user
-    allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
-    assign(:consumer_role, person.consumer_role)
-    assign(:person, person)
-    render partial: "insured/consumer_roles/form", locals: {f: mock_form}
-  end
-
   context "render insured consumer role form" do
     let(:person) { Person.new }
     let(:current_user) {FactoryBot.create(:user)}
@@ -63,7 +40,6 @@ RSpec.describe "insured/consumer_roles/_form.html.erb" do
     end
   end
 
-
   context "user has an associated e_case_id" do
     let(:person) { FactoryBot.create(:person) }
     let!(:person2) { FactoryBot.create(:person, :with_consumer_role) }
@@ -99,10 +75,10 @@ RSpec.describe "insured/consumer_roles/_form.html.erb" do
   end
 
   context "user doesn't has an associated e_case_id" do
-    let(:person) { FactoryGirl.create(:person) }
-    let!(:person2) { FactoryGirl.create(:person, :with_consumer_role) }
-    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person2) }
-    let(:current_user) {FactoryGirl.create(:user, :hbx_staff, person: person)}
+    let(:person) { FactoryBot.create(:person) }
+    let!(:person2) { FactoryBot.create(:person, :with_consumer_role) }
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person2) }
+    let(:current_user) {FactoryBot.create(:user, :hbx_staff, person: person)}
     before :each do
       @person = person2
       sign_in current_user

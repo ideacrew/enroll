@@ -28,7 +28,7 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb",dbclean: :afte
       end
 
       it 'should have title' do
-        expect(rendered).to have_selector('strong', "Browse Health and Dental plans from carriers in the DC Health Exchange")
+        expect(rendered).to have_selector('strong', text: "Shop for health and dental plans")
       end
       
       it "should have image" do
@@ -55,8 +55,8 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb",dbclean: :afte
       render "insured/families/shop_for_plans_widget"
     end
 
-    it "should not have link without change_plan" do
-      expect(rendered).not_to have_selector("a[href='/insured/consumer_role/build']")
+    it "should have link without change_plan" do
+      expect(rendered).to have_selector("a[href='/insured/consumer_role/build']")
     end
   end
 

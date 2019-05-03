@@ -1,9 +1,9 @@
 require "rails_helper"
 
 describe "insured/interactive_identity_verifications/service_unavailable" do
-  let(:person) { FactoryGirl.create(:person) }
-  let(:consumer_role) { FactoryGirl.create(:consumer_role) }
-  let(:current_user) {FactoryGirl.create(:user)}
+  let(:person) { FactoryBot.create(:person) }
+  let(:consumer_role) { FactoryBot.create(:consumer_role) }
+  let(:current_user) {FactoryBot.create(:user)}
   before :each do
     assign(:person, person)
     assign(:consumer_role, consumer_role)

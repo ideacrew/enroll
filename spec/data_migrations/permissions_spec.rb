@@ -775,19 +775,18 @@ describe DefinePermissions, dbclean: :after_each do
     before do
       User.all.delete
       Person.all.delete
-      @hbx_staff_person = FactoryGirl.create(:person)
-      @hbx_csr_supervisor_person = FactoryGirl.create(:person)
-      @hbx_csr_tier1_person = FactoryGirl.create(:person)
-      @hbx_csr_tier2_person = FactoryGirl.create(:person)
-      permission_hbx_staff = FactoryGirl.create(:permission, :hbx_staff)
-      permission_hbx_csr_supervisor = FactoryGirl.create(:permission, :hbx_csr_supervisor)
-      permission_hbx_csr_tier2 = FactoryGirl.create(:permission, :hbx_csr_tier2)
-      permission_hbx_csr_tier1 = FactoryGirl.create(:permission, :hbx_csr_tier1)
-      hbx_staff_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_staff_person, subrole: "hbx_staff", permission_id: permission_hbx_staff.id)
-      hbx_csr_supervisor_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_supervisor_person, subrole: "hbx_csr_supervisor", permission_id: permission_hbx_csr_supervisor.id)
-      hbx_csr_tier1_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_tier2_person, subrole: "hbx_csr_tier1", permission_id: permission_hbx_csr_tier2.id)
-      hbx_csr_tier2_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_tier1_person, subrole: "hbx_csr_tier2", permission_id: permission_hbx_csr_tier1.id)
-
+      @hbx_staff_person = FactoryBot.create(:person)
+      @hbx_csr_supervisor_person = FactoryBot.create(:person)
+      @hbx_csr_tier1_person = FactoryBot.create(:person)
+      @hbx_csr_tier2_person = FactoryBot.create(:person)
+      permission_hbx_staff = FactoryBot.create(:permission, :hbx_staff)
+      permission_hbx_csr_supervisor = FactoryBot.create(:permission, :hbx_csr_supervisor)
+      permission_hbx_csr_tier2 = FactoryBot.create(:permission, :hbx_csr_tier2)
+      permission_hbx_csr_tier1 = FactoryBot.create(:permission, :hbx_csr_tier1)
+      hbx_staff_role = FactoryBot.create(:hbx_staff_role, person: @hbx_staff_person, subrole: "hbx_staff", permission_id: permission_hbx_staff.id)
+      hbx_csr_supervisor_role = FactoryBot.create(:hbx_staff_role, person: @hbx_csr_supervisor_person, subrole: "hbx_csr_supervisor", permission_id: permission_hbx_csr_supervisor.id)
+      hbx_csr_tier1_role = FactoryBot.create(:hbx_staff_role, person: @hbx_csr_tier2_person, subrole: "hbx_csr_tier1", permission_id: permission_hbx_csr_tier2.id)
+      hbx_csr_tier2_role = FactoryBot.create(:hbx_staff_role, person: @hbx_csr_tier1_person, subrole: "hbx_csr_tier2", permission_id: permission_hbx_csr_tier1.id)
       subject.hbx_admin_csr_view_personal_info_page
     end
     it "updates hbx_admin_csr_view_personal_info_page to true" do
@@ -817,45 +816,31 @@ describe DefinePermissions, dbclean: :after_each do
     before do
       User.all.delete
       Person.all.delete
-      @hbx_staff_person = FactoryGirl.create(:person)
-      @hbx_read_only_person = FactoryGirl.create(:person)
-      @hbx_csr_supervisor_person = FactoryGirl.create(:person)
-      @hbx_csr_tier1_person = FactoryGirl.create(:person)
-      @hbx_csr_tier2_person = FactoryGirl.create(:person)
-      permission_hbx_staff = FactoryGirl.create(:permission, :hbx_staff)
-      permission_hbx_read_only = FactoryGirl.create(:permission, :hbx_read_only)
-      permission_hbx_csr_supervisor = FactoryGirl.create(:permission, :hbx_csr_supervisor)
-      permission_hbx_csr_tier2 = FactoryGirl.create(:permission, :hbx_csr_tier2)
-      permission_hbx_csr_tier1 = FactoryGirl.create(:permission, :hbx_csr_tier1)
-      hbx_staff_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_staff_person, subrole: "hbx_staff", permission_id: permission_hbx_staff.id)
-      hbx_read_only = FactoryGirl.create(:hbx_staff_role, person: @hbx_read_only_person, subrole: "hbx_read_only", permission_id: permission_hbx_staff.id)
-      hbx_csr_supervisor_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_supervisor_person, subrole: "hbx_csr_supervisor", permission_id: permission_hbx_csr_supervisor.id)
-      hbx_csr_tier1_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_tier2_person, subrole: "hbx_csr_tier1", permission_id: permission_hbx_csr_tier2.id)
-      hbx_csr_tier2_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_tier1_person, subrole: "hbx_csr_tier2", permission_id: permission_hbx_csr_tier1.id)
+      @hbx_staff_person = FactoryBot.create(:person)
+      @hbx_read_only_person = FactoryBot.create(:person)
+      @hbx_csr_supervisor_person = FactoryBot.create(:person)
+      @hbx_csr_tier1_person = FactoryBot.create(:person)
+      @hbx_csr_tier2_person = FactoryBot.create(:person)
+      permission_hbx_staff = FactoryBot.create(:permission, :hbx_staff)
+      permission_hbx_read_only = FactoryBot.create(:permission, :hbx_read_only)
+      permission_hbx_csr_supervisor = FactoryBot.create(:permission, :hbx_csr_supervisor)
+      permission_hbx_csr_tier2 = FactoryBot.create(:permission, :hbx_csr_tier2)
+      permission_hbx_csr_tier1 = FactoryBot.create(:permission, :hbx_csr_tier1)
+      hbx_staff_role = FactoryBot.create(:hbx_staff_role, person: @hbx_staff_person, subrole: "hbx_staff", permission_id: permission_hbx_staff.id)
+      hbx_read_only = FactoryBot.create(:hbx_staff_role, person: @hbx_read_only_person, subrole: "hbx_read_only", permission_id: permission_hbx_staff.id)
+      hbx_csr_supervisor_role = FactoryBot.create(:hbx_staff_role, person: @hbx_csr_supervisor_person, subrole: "hbx_csr_supervisor", permission_id: permission_hbx_csr_supervisor.id)
+      hbx_csr_tier1_role = FactoryBot.create(:hbx_staff_role, person: @hbx_csr_tier2_person, subrole: "hbx_csr_tier1", permission_id: permission_hbx_csr_tier2.id)
+      hbx_csr_tier2_role = FactoryBot.create(:hbx_staff_role, person: @hbx_csr_tier1_person, subrole: "hbx_csr_tier2", permission_id: permission_hbx_csr_tier1.id)
     end
-    it "updates hbx_admin_access_new_consumer_application_sub_tab to true" do
-      subject.hbx_admin_access_new_consumer_application_sub_tab
+    it "updates hbx_admin_can_access_new_consumer_application_sub_tab to true" do
+      subject.hbx_admin_can_access_new_consumer_application_sub_tab
       expect(Person.all.count).to eq(5)
-      expect(@hbx_staff_person.hbx_staff_role.permission.access_new_consumer_application_sub_tab).to be true
-      expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.access_new_consumer_application_sub_tab).to be true
-      expect(@hbx_csr_tier2_person.hbx_staff_role.permission.access_new_consumer_application_sub_tab).to be true
-      expect(@hbx_csr_tier1_person.hbx_staff_role.permission.access_new_consumer_application_sub_tab).to be true
-    end
-    it "updates hbx_admin_access_outstanding_verification_sub_tab to true" do
-      subject.hbx_admin_access_outstanding_verification_sub_tab
-      expect(Person.all.count).to eq(5)
-      expect(@hbx_staff_person.hbx_staff_role.permission.access_outstanding_verification_sub_tab).to be true
-      expect(@hbx_read_only_person.hbx_staff_role.permission.access_outstanding_verification_sub_tab).to be true
-    end
-    it "updates hbx_admin_access_identity_verification_sub_tab to true" do
-      subject.hbx_admin_access_identity_verification_sub_tab
-      expect(Person.all.count).to eq(5)
-      expect(@hbx_staff_person.hbx_staff_role.permission.access_identity_verification_sub_tab).to be true
       expect(@hbx_staff_person.hbx_staff_role.permission.can_access_new_consumer_application_sub_tab).to be true
       expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_access_new_consumer_application_sub_tab).to be true
-      expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_access_new_consumer_application_sub_tab).to be true
       expect(@hbx_csr_tier2_person.hbx_staff_role.permission.can_access_new_consumer_application_sub_tab).to be true
+      expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_access_new_consumer_application_sub_tab).to be true
     end
+
     it "updates hbx_admin_can_access_identity_verification_sub_tab to true" do
       subject.hbx_admin_can_access_identity_verification_sub_tab
       expect(Person.all.count).to eq(5)

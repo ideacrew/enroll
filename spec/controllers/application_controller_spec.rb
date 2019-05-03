@@ -164,9 +164,9 @@ RSpec.describe ApplicationController do
   end
 
   describe 'hbx_staff_and_consumer_role' do
-    let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
-    let(:user) { FactoryGirl.create(:user, :person => person) }
-    let(:role) {FactoryGirl.create(:consumer_role)}
+    let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+    let(:user) { FactoryBot.create(:user, :person => person) }
+    let(:role) {FactoryBot.create(:consumer_role)}
 
     context 'current user is hbx admin and role is consumer' do
       before do
@@ -208,12 +208,12 @@ RSpec.describe ApplicationController do
   end
 
   describe 'hbx_staff_and_consumer_role and person with no user' do
-    let(:current_person) { FactoryGirl.create(:person, :with_consumer_role) }
-    let(:current_user) { FactoryGirl.create(:user, :person => current_person) }
-    let(:role) {FactoryGirl.create(:consumer_role)}
-    let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+    let(:current_person) { FactoryBot.create(:person, :with_consumer_role) }
+    let(:current_user) { FactoryBot.create(:user, :person => current_person) }
+    let(:role) {FactoryBot.create(:consumer_role)}
+    let(:person) { FactoryBot.create(:person, :with_consumer_role)}
 
-    let(:user2) { FactoryGirl.create(:user) }
+    let(:user2) { FactoryBot.create(:user) }
 
     context 'current user is hbx admin and role is consumer with no user record' do
       before do

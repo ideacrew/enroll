@@ -52,7 +52,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     before do
       TimeKeeper.set_date_of_record_unprotected!(effective_on)
     end
-
+=begin
     describe '.existing_enrollment_for_covered_individuals' do
 
       context 'when active coverage present' do
@@ -118,5 +118,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
       end
     end
+=end
   end
 end

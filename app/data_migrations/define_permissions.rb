@@ -99,8 +99,6 @@ class DefinePermissions < MigrationTask
 
   def hbx_admin_can_complete_resident_application
     Permission.hbx_staff.update_attributes!(can_complete_resident_application: true)
-    Permission.super_admin.update_attributes!(can_complete_resident_application: true)
-    Permission.hbx_tier3.update_attributes!(can_complete_resident_application: true)
   end
 
   def hbx_admin_can_add_sep
@@ -174,11 +172,11 @@ class DefinePermissions < MigrationTask
     Permission.hbx_staff.update_attributes!(can_view_application_types: true)
   end
 
-  def hbx_admin_access_new_consumer_application_sub_tab
-    Permission.hbx_staff.update_attributes!(access_new_consumer_application_sub_tab: true)
-    Permission.hbx_csr_supervisor.update_attributes!(access_new_consumer_application_sub_tab: true)
-    Permission.hbx_csr_tier1.update_attributes!(access_new_consumer_application_sub_tab: true)
-    Permission.hbx_csr_tier2.update_attributes!(access_new_consumer_application_sub_tab: true)
+  def hbx_admin_can_access_new_consumer_application_sub_tab
+    Permission.hbx_staff.update_attributes!(can_access_new_consumer_application_sub_tab: true)
+    Permission.hbx_csr_supervisor.update_attributes!(can_access_new_consumer_application_sub_tab: true)
+    Permission.hbx_csr_tier1.update_attributes!(can_access_new_consumer_application_sub_tab: true)
+    Permission.hbx_csr_tier2.update_attributes!(can_access_new_consumer_application_sub_tab: true)
   end
 
   def hbx_admin_can_access_identity_verification_sub_tab
@@ -190,14 +188,10 @@ class DefinePermissions < MigrationTask
 
   def hbx_admin_can_access_outstanding_verification_sub_tab
     Permission.hbx_staff.update_attributes!(can_access_outstanding_verification_sub_tab: true)
-    Permission.super_admin.update_attributes!(can_access_outstanding_verification_sub_tab: true)
-    Permission.hbx_tier3.update_attributes!(can_access_outstanding_verification_sub_tab: true)
   end
 
   def hbx_admin_can_access_accept_reject_identity_documents
     Permission.hbx_staff.update_attributes!(can_access_accept_reject_identity_documents: true)
-    Permission.super_admin.update_attributes!(can_access_accept_reject_identity_documents: true)
-    Permission.hbx_tier3.update_attributes!(can_access_accept_reject_identity_documents: true)
   end
 
   def hbx_admin_can_access_accept_reject_paper_application_documents

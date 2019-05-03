@@ -192,6 +192,8 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     end
 
     it "should get coverage_family_members_for_cobra when has active hbx_enrollments and in open enrollment" do
+      family.active_household.hbx_enrollments << [hbx_enrollment]
+      family.save
       allow(hbx_enrollments).to receive(:shop_market).and_return(hbx_enrollments)
       allow(hbx_enrollments).to receive(:enrolled_and_renewing).and_return(hbx_enrollments)
       allow(hbx_enrollments).to receive(:effective_desc).and_return([hbx_enrollment])
@@ -351,6 +353,8 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     end
 
     it "should redirect" do
+      family.active_household.hbx_enrollments << [hbx_enrollment]
+      family.save
       sign_in user
       allow(hbx_enrollment).to receive(:save).and_return(true)
       post :create, params: { person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids }
@@ -361,6 +365,8 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     end
 
     it "with change_plan" do
+      family.active_household.hbx_enrollments << [hbx_enrollment]
+      family.save
       user = FactoryBot.create(:user, id: 98, person: FactoryBot.create(:person))
       sign_in user
       allow(hbx_enrollment).to receive(:save).and_return(true)
@@ -375,6 +381,8 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       let(:old_hbx) {hbx_enrollment}
 
       before :each do
+        family.active_household.hbx_enrollments << [hbx_enrollment]
+        family.save
         user = FactoryBot.create(:user, person: FactoryBot.create(:person))
         sign_in user
         allow(old_hbx).to receive(:is_shop?).and_return true

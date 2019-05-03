@@ -1052,8 +1052,8 @@ describe Person, :dbclean => :after_each do
   end
 
   describe 'ridp_verification_types' do
-    let(:user) {FactoryGirl.create(:user)}
-    let(:person) {FactoryGirl.create(:person, :with_consumer_role, user: user) }
+    let(:user) {FactoryBot.create(:user)}
+    let(:person) {FactoryBot.create(:person, :with_consumer_role, user: user) }
 
     shared_examples_for 'collecting ridp verification types for person' do |ridp_types, types_count, is_applicant|
       before do

@@ -70,14 +70,14 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
     end
 
     it "should set the session flag for aqhp the param exists" do
-      get :search, params: {aqhp: true}
+      get :search, params: { aqhp: true }
       expect(session[:individual_assistance_path]).to be_truthy
     end
 
     it "should unset the session flag for aqhp if the param does not exist upon return" do
-      get :search, params: {aqhp: true}
+      get :search, params: { aqhp: true }
       expect(session[:individual_assistance_path]).to be_truthy
-      get :search, params: {uqhp: true}
+      get :search, params: { uqhp: true }
       expect(session[:individual_assistance_path]).to be_falsey
     end
 
@@ -123,7 +123,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
         let(:person){ double("Person") }
         let(:person_parameters){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"000000111"}}
         before :each do
-          post :match, params: {person: person_parameters}
+          post :match, params: { :person => person_parameters }
         end
 
         it "renders the 'no_match' template", dbclean: :after_each do
@@ -137,7 +137,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
           let(:found_person) { [person] }
 
           it "renders the 'match' template" do
-            post :match, params: { person: person_parameters }
+            post :match, params: { :person => person_parameters }
             expect(response).to have_http_status(:success)
             expect(response).to render_template("match")
             expect(assigns[:consumer_candidate]).to eq mock_consumer_candidate
@@ -152,7 +152,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
           allow(mock_employee_candidate).to receive(:match_census_employees).and_return([])
           #allow(mock_resident_candidate).to receive(:dob).and_return()
           allow(Factories::EmploymentRelationshipFactory).to receive(:build).and_return(true)
-          post :match, params: {person: person_parameters}
+          post :match, params: { :person => person_parameters }
         end
 
         it "render employee role match template" do
@@ -170,7 +170,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
         allow(mock_consumer_candidate).to receive(:errors).and_return({:ssn_taken => "test test test"})
       end
       it "should navigate to another page which has information for user to signin/recover account" do
-        post :match, params: { person: person_parameters }
+        post :match, params: { :person => person_parameters }
         expect(response).to redirect_to(ssn_taken_insured_consumer_role_index_path)
         expect(flash[:alert]).to eq "The SSN entered is associated with an existing user. Please <a href=\"https://iam_login_url\">Sign In</a> with your user name and password or <a href=\"https://account_recovery\">Click here</a> if you've forgotten your password."
       end
@@ -219,7 +219,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
     end
     it "should render new template" do
       sign_in user
-      get :edit, params: {id: "test"}
+      get :edit, params: { id: "test" }
       expect(response).to have_http_status(:success)
       expect(response).to render_template(:edit)
     end

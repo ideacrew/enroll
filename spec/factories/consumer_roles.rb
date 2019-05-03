@@ -14,13 +14,13 @@ FactoryBot.define do
     is_applying_coverage { true }
   end
 
-  # factory(:consumer_role_person, {class: ::Person}) do
-  #   first_name { Forgery(:name).first_name }
-  #   last_name { Forgery(:name).first_name }
-  #   gender { Forgery(:personal).gender }
-  #   sequence(:ssn, 222222222)
-  #   dob Date.new(1980, 1, 1)
-  # end
+  factory(:consumer_role_person, {class: ::Person}) do
+    first_name { Forgery(:name).first_name }
+    last_name { Forgery(:name).first_name }
+    gender { Forgery(:personal).gender }
+    sequence(:ssn, 222222222)
+    dob Date.new(1980, 1, 1)
+  end
 
 
   factory(:consumer_role_object, {class: ::ConsumerRole}) do
