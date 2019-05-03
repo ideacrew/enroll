@@ -41,7 +41,7 @@ class Exchanges::BrokerApplicantsController < ApplicationController
       broker_role.deny!
       flash[:notice] = "Broker applicant denied."
     elsif params['update']
-      all_carrier_appointment = BrokerRole::BROKER_CARRIER_APPOINTMENTS.stringify_keys
+      all_carrier_appointment = "BrokerRole::#{Settings.site.key.upcase}_BROKER_CARRIER_APPOINTMENTS".constantize.stringify_keys
       permitted_params = params[:person][:broker_role_attributes][:carrier_appointments].permit!
       all_carrier_appointment.merge!(permitted_params) if permitted_params
       params[:person][:broker_role_attributes][:carrier_appointments]= all_carrier_appointment
@@ -81,7 +81,7 @@ class Exchanges::BrokerApplicantsController < ApplicationController
   private
 
   def broker_carrier_appointments
-    all_carrier_appointment = BrokerRole::BROKER_CARRIER_APPOINTMENTS.stringify_keys
+    all_carrier_appointment = "BrokerRole::#{Settings.site.key.upcase}_BROKER_CARRIER_APPOINTMENTS".constantize.stringify_keys
     broker_carrier_appointments_enabled = Settings.aca.broker_carrier_appointments_enabled
     unless broker_carrier_appointments_enabled
       permitted_params =  params[:person][:broker_role_attributes][:carrier_appointments].permit!

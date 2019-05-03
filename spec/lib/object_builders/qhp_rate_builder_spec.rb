@@ -43,37 +43,40 @@ describe "QhpRateBuilder", dbclean: :after_each do
                                       :rate_area_id => rating_area.rating_area
                                      }]}}
 
-  context "old model" do
-    it "should return qhp builder object" do
-      rates_runner(rates_hash, 2017)
-      plan.reload
-      expect(plan.premium_tables.size).to eq 1
-      expect(plan.premium_tables.first.age).to eq rates_hash[:items].first[:age_number]
-      expect(plan.premium_tables.first.cost).to eq rates_hash[:items].first[:primary_enrollee]
-      expect(plan.premium_tables.first.start_on.to_date).to eq rates_hash[:items].first[:effective_date].to_date
-      expect(plan.premium_tables.first.end_on.to_date).to eq rates_hash[:items].first[:expiration_date].to_date
-    end
-  end
+  if Settings.site.key == :cca
 
-  context "new model" do
-
-    before :each do
-      rates_runner
-      hp1.reload
-      hp3.reload
+    context "old model" do
+      it "should return qhp builder object" do
+        rates_runner(rates_hash, 2017)
+        plan.reload
+        expect(plan.premium_tables.size).to eq 1
+        expect(plan.premium_tables.first.age).to eq rates_hash[:items].first[:age_number]
+        expect(plan.premium_tables.first.cost).to eq rates_hash[:items].first[:primary_enrollee]
+        expect(plan.premium_tables.first.start_on.to_date).to eq rates_hash[:items].first[:effective_date].to_date
+        expect(plan.premium_tables.first.end_on.to_date).to eq rates_hash[:items].first[:expiration_date].to_date
+      end
     end
 
-    it "should not load rates for 2017 products hp2 & hp4" do
-      expect(hp2.premium_tables.size).to eq 2
-      expect(hp4.premium_tables.size).to eq 2
-    end
+    context "new model" do
 
-    it "should return 1 tuple with rating area and age from the file" do
-      expect(hp1.premium_tables[2].premium_tuples.count).to eq 1
-    end
+      before :each do
+        rates_runner
+        hp1.reload
+        hp3.reload
+      end
 
-    it "should return 2 tuples with same rating area and different age" do
-      expect(hp3.premium_tables[2].premium_tuples.count).to eq 2
+      it "should not load rates for 2017 products hp2 & hp4" do
+        expect(hp2.premium_tables.size).to eq 2
+        expect(hp4.premium_tables.size).to eq 2
+      end
+
+      it "should return 1 tuple with rating area and age from the file" do
+        expect(hp1.premium_tables[2].premium_tuples.count).to eq 1
+      end
+
+      it "should return 2 tuples with same rating area and different age" do
+        expect(hp3.premium_tables[2].premium_tuples.count).to eq 2
+      end
     end
   end
 end

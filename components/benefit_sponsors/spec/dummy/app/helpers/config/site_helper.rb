@@ -8,6 +8,10 @@ module Config::SiteHelper
     Settings.site.byline
   end
 
+  def site_key
+    Settings.site.key
+  end
+
   def site_domain_name
     Settings.site.domain_name
   end

@@ -57,8 +57,8 @@
           <ul class="application-warnings"></ul>
         </div>
         <div class="modal-footer">
-          <%= link_to 'Force Publish', benefit_sponsorship_benefit_application_force_submit_application_path(benefit_application.benefit_sponsorship, benefit_application), method: :post, :class => 'btn btn-danger' %>
-          <% error_page = warnings[:primary_office_location].present? ? edit_profiles_registration_path(benefit_application.benefit_sponsorship.profile) : edit_benefit_sponsorship_benefit_application_path(benefit_application.benefit_sponsorship, benefit_application) %>
+          <%= link_to 'Force Publish', benefit_sponsors.benefit_sponsorship_benefit_application_force_submit_application_path(benefit_application.benefit_sponsorship, benefit_application), method: :post, :class => 'btn btn-danger' %>
+          <% error_page = warnings[:primary_office_location].present? ? benefit_sponsors.edit_profiles_registration_path(benefit_application.benefit_sponsorship.profile) : benefit_sponsors.edit_benefit_sponsorship_benefit_application_path(benefit_application.benefit_sponsorship, benefit_application) %>
           <%= link_to 'Cancel', error_page, method: :get, :class => 'btn btn-default' %>
         </div>
       <%end%>

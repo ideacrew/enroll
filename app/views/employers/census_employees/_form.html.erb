@@ -32,9 +32,7 @@
       </div>
       <div class="key-btn text-right <%= pundit_class EmployerProfile, :updateable? %>">
         <% button_label = @census_employee.persisted? ? 'Update Employee' : 'Create Employee' %>
-        <button class="btn btn-primary btn-lg" type="submit">
-          <%= "#{button_label}".html_safe %>
-        </button>
+        <%= f.button "#{button_label}".html_safe, class: "btn btn-primary btn-lg" %>
       </div>
     </div>
   </div>

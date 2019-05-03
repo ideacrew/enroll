@@ -7,7 +7,8 @@ RSpec.describe PortalHeaderHelper, :type => :helper, dbclean: :after_each do
     let(:signed_in?){ true }
 
     context "has_employer_staff_role?" do
-      let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+      let(:site_key)         { Settings.site.key }
+      let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, site_key) }
       let!(:benefit_sponsor)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
       let!(:employer_profile)    { benefit_sponsor.employer_profile }
       let!(:employer_staff_role){ FactoryBot.create(:employer_staff_role, aasm_state:'is_closed', :benefit_sponsor_employer_profile_id=>employer_profile.id)}
@@ -26,7 +27,7 @@ RSpec.describe PortalHeaderHelper, :type => :helper, dbclean: :after_each do
 
       it "should have I'm an Employee link when user has active employee_staff_role" do
         allow(current_user.person).to receive(:active_employee_roles).and_return [employee_role]
-        expect(portal_display_name('')).to eq "<a class=\"portal\" href=\"/families/home\"><img src=\"/images/icons/cca-icon-individual.png\" /> &nbsp; I'm an Employee</a>"
+        expect(portal_display_name('')).to eq "<a class=\"portal\" href=\"/families/home\"><img src=\"/images/icons/#{site_key}-icon-individual.png\" /> &nbsp; I'm an Employee</a>"
       end
 
       it "should have Welcome prompt when user has no active role" do

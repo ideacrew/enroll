@@ -3,6 +3,8 @@ module BenefitSponsors
     module Employers
       class EmployerProfilesController < ::BenefitSponsors::ApplicationController
 
+        include Config::AcaHelper
+
         before_action :find_employer, only: [:show, :inbox, :bulk_employee_upload, :export_census_employees, :coverage_reports, :download_invoice]
         before_action :load_group_enrollments, only: [:coverage_reports], if: :is_format_csv?
         before_action :check_and_download_invoice, only: [:download_invoice]
@@ -29,7 +31,7 @@ module BenefitSponsors
               @benefit_applications = @employer_profile.benefit_applications.non_imported.desc(:"start_on").asc(:predecessor_id)
             when 'documents'
               @datatable = ::Effective::Datatables::BenefitSponsorsEmployerDocumentsDataTable.new({employer_profile_id: @employer_profile.id})
-              load_documents
+              load_documents if employer_attestation_is_enabled?
             when 'employees'
               @datatable = ::Effective::Datatables::EmployeeDatatable.new(employee_datatable_params)
             when 'brokers'

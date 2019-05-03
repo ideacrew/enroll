@@ -5,6 +5,6 @@ FactoryBot.define do
     issuer_provided_code { "MAS001" }
     issuer_profile_id { BenefitSponsors::Organizations::IssuerProfile.new.id }
     # Both of these would never happen at the same time
-    covered_states { ["MA"] }
+    covered_states { [Settings.aca.state_abbreviation] }
   end
 end

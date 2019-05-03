@@ -131,11 +131,11 @@ invoices:
   addendum: 'ma_non_discrimination_and_language_tags.pdf'
 
 aca:
-  state_name: "Massachusetts"
+  state_name: "District of Columbia"
   state_abbreviation: "DC"
   market_kinds: ["shop", "individual"]
   hbx_abbreviation: "DC Health Benefit Exchange"
-  nationwide_markets: false
+  nationwide_markets: true
   general_agency_enabled: false
   broker_carrier_appointments_enabled: true
   dental_market_enabled: true
