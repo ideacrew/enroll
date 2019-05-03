@@ -452,8 +452,7 @@ def employer_poc
     end
   end
 
-<<<<<<< HEAD
-   def view_terminated_hbx_enrollments
+  def view_terminated_hbx_enrollments
     @person = Person.find(params[:person_id])
     @element_to_replace_id = params[:family_actions_id]
     @enrollments = @person.primary_family.terminated_enrollments
@@ -479,7 +478,8 @@ def employer_poc
     end
 
     redirect_to exchanges_hbx_profiles_root_path, flash: message
-=======
+  end
+
   def edit_force_publish
     authorize HbxProfile, :can_force_publish?
     @element_to_replace_id = params[:row_actions_id]
@@ -499,7 +499,6 @@ def employer_poc
     respond_to do |format|
       format.js
     end
->>>>>>> origin/master
   end
 
   def verify_dob_change
