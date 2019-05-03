@@ -48,8 +48,8 @@ module BenefitSponsors
 
 
     # Organization responsible for administering this site
-    # has_one   :owner_organization, inverse_of: :site_owner,
-    #           class_name: "BenefitSponsors::Organizations::ExemptOrganization"
+    has_one   :owner_organization, inverse_of: :site_owner,
+              class_name: "BenefitSponsors::Organizations::ExemptOrganization"
 
     # Set of organizations who offer, broker and sponsor benefits on this site
     # has_many  :site_organizations, inverse_of: :site,
@@ -69,7 +69,6 @@ module BenefitSponsors
 
 
     scope :by_site_key,   ->(site_key) { where(site_key: site_key) }
-
 
 
   end
