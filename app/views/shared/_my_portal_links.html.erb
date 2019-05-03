@@ -34,15 +34,10 @@
             <% employer = EmployerProfile.find(id) %>
             <li><%= link_to employer.legal_name, main_app.employers_employer_profile_path(employer, tab: 'home'), class: 'header-text' %></li>
         <% end %>
-<<<<<<< HEAD
-        <% if broker %>
-          <li><%= link_to "My Broker Agency Portal", main_app.broker_agencies_root_path, class: 'header-text' %></li>
-=======
         <% broker_agency_staff_roles.each do |broker_staff_role| %>
           <%profile = broker_staff_role.broker_agency_profile%>
           <% broker_link =  broker_agencies_profile_path(profile) %>
           <li style="text-align:left"><%= link_to profile.legal_name, broker_link, class: 'header-text' %></li>
->>>>>>> origin/Enhancement-16177
         <% end %>
       </ul>
       <span> | </span>
