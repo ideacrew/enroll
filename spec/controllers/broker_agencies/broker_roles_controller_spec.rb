@@ -294,13 +294,16 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
   context "search_broker_agency" do
     before :all do
       @organization = FactoryGirl.create(:broker_agency)
+      @person = FactoryGirl.create(:person, :with_broker_role)
       @broker_agency_profile = @organization.broker_agency_profile
+      @person.broker_role.update_attributes(broker_agency_profile_id: @broker_agency_profile.id, aasm_state: 'active')
+      @broker_agency_profile.update_attributes(aasm_state: 'is_approved')
     end
 
     context "with full" do
       context "search by legal_name" do
         before do
-          xhr :get, :search_broker_agency, broker_agency_search: @organization.legal_name, format: :js
+          xhr :get, :search_broker_agency, q: @organization.legal_name, is_staff_registration: true, format: :js
         end
 
         it "should be a success" do
@@ -310,15 +313,27 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
         end
       end
 
-      context "search by fein" do
+      context "search by broker name" do
         before do
-          xhr :get, :search_broker_agency, broker_agency_search: @broker_agency_profile.fein, format: :js
+          xhr :get, :search_broker_agency, q: @person.first_name, is_staff_registration: true, format: :js
         end
 
         it "should be a success" do
           expect(response).to have_http_status(:success)
           expect(response).to render_template("search_broker_agency")
           expect(assigns(:broker_agency_profiles)).to eq [@broker_agency_profile]
+        end
+      end
+
+      context "search by random name" do
+        before do
+          xhr :get, :search_broker_agency, q: 'random', is_staff_registration: true, format: :js
+        end
+
+        it "should be a success" do
+          expect(response).to have_http_status(:success)
+          expect(response).to render_template("search_broker_agency")
+          expect(assigns(:broker_agency_profiles).count).to eq 0
         end
       end
     end
@@ -336,9 +351,9 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
         end
       end
 
-      context "search by fein" do
+      context "search by broker name" do
         before do
-          xhr :get, :search_broker_agency, broker_agency_search: @broker_agency_profile.fein.last(5), format: :js
+          xhr :get, :search_broker_agency, broker_agency_search: @person.first_name.last(3), format: :js
         end
 
         it "should be a success" do

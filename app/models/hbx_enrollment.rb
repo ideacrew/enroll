@@ -52,6 +52,7 @@ class HbxEnrollment
   ]
   CAN_TERMINATE_ENROLLMENTS = %w(coverage_termination_pending coverage_selected auto_renewing renewing_coverage_selected unverified coverage_enrolled)
 
+  ENROLLMENTS_TO_UPDATE_END_DATE = %w(coverage_termination_pending coverage_terminated)
   CAN_REINSTATE_ENROLLMENTS = %w(coverage_termination_pending coverage_terminated)
 
   ENROLLMENT_TRAIN_STOPS_STEPS = {"coverage_selected" => 1, "transmitted_to_carrier" => 2, "coverage_enrolled" => 3,
@@ -165,6 +166,7 @@ class HbxEnrollment
   scope :without_aptc,        ->{lte("applied_aptc_amount.cents": 0) }
   scope :enrolled,            ->{ where(:aasm_state.in => ENROLLED_STATUSES ) }
   scope :can_terminate,       ->{ where(:aasm_state.in =>  CAN_TERMINATE_ENROLLMENTS) }
+  scope :can_update_enrollments_end_date,       ->{ where(:aasm_state.in =>  ENROLLMENTS_TO_UPDATE_END_DATE) }
   scope :can_reinstate,       ->{ where(:aasm_state.in =>  CAN_REINSTATE_ENROLLMENTS) }
   scope :renewing,            ->{ where(:aasm_state.in => RENEWAL_STATUSES )}
   scope :enrolled_and_renewal, ->{where(:aasm_state.in => ENROLLED_AND_RENEWAL_STATUSES )}
@@ -1129,6 +1131,9 @@ class HbxEnrollment
 
   def can_be_reinstated?
     return false unless self.coverage_terminated? || self.coverage_termination_pending?
+    return false if is_shop? && employee_role.is_cobra_status? && self.kind == "employer_sponsored"
+    return false if is_shop? && !employee_role.is_cobra_status? && self.kind == 'employer_sponsored_cobra'
+
     if is_shop? && employer_profile.present?
       employer_profile.plan_years.published_or_renewing_published.detect do |py|
         !py.is_conversion && (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(terminated_on.next_day)
@@ -1140,10 +1145,13 @@ class HbxEnrollment
     end
   end
 
-  def reinstated_enrollment_exists?
-    family.active_household.hbx_enrollments.where({:kind => self.kind, 
-      :plan_id => self.plan_id, :effective_on => self.terminated_on.next_day, 
-      :coverage_kind => self.coverage_kind}).enrolled.any?{|e| e.workflow_state_transitions.where(:to_state => 'coverage_reinstated').any?}
+  def has_active_or_term_exists_for_reinstated_date?
+    enrollment_kind = is_shop? ? ['employer_sponsored', 'employer_sponsored_cobra'] : (Kinds - ["employer_sponsored", "employer_sponsored_cobra"])
+    family.active_household.hbx_enrollments.where({:kind.in => enrollment_kind,
+                                                   :effective_on.gte => self.terminated_on.next_day,
+                                                   :coverage_kind => self.coverage_kind,
+                                                   :employee_role_id => self.employee_role_id,
+                                                  :aasm_state.in => (ENROLLED_AND_RENEWAL_STATUSES + CAN_REINSTATE_ENROLLMENTS)}).any?
   end
 
   def notify_of_coverage_start(publish_to_carrier)
@@ -1160,7 +1168,8 @@ class HbxEnrollment
   end
 
   def reinstate(edi: false)
-    return if reinstated_enrollment_exists?
+    return false unless can_be_reinstated?
+    return false if has_active_or_term_exists_for_reinstated_date?
     reinstate_enrollment = Enrollments::Replicator::Reinstatement.new(self, terminated_on.next_day).build
 
     if self.is_shop?
@@ -1548,6 +1557,10 @@ class HbxEnrollment
     submitted_at.blank? ? Time.now : submitted_at
   end
 
+  def is_reinstated_enrollment?
+    self.workflow_state_transitions.any?{|w| w.from_state == "coverage_reinstated"}
+  end
+
   def ee_select_plan_during_oe
     if self.census_employee.present?
       begin
@@ -1558,10 +1571,6 @@ class HbxEnrollment
         Rails.logger.error { "Unable to deliver employee plan selection during OE notice to #{self.census_employee.id.to_s} due to #{e.backtrace}" }
       end
     end
-  end
-
-  def is_reinstated_enrollment?
-    self.workflow_state_transitions.any?{|w| w.from_state == "coverage_reinstated"}
   end
 
   def ee_plan_selection_confirmation_sep_new_hire
@@ -1632,6 +1641,39 @@ class HbxEnrollment
             "is_trading_partner_publishable" => transmit_flag
         }
     )
+  end
+
+  def cancel_terminated_enrollment(termination_date, edi_required)
+    if effective_on == termination_date
+      prevs_state = self.aasm_state
+      self.update_attributes(aasm_state: "coverage_canceled", terminated_on: nil, termination_submitted_on: nil, terminate_reason: nil)
+      workflow_state_transitions << WorkflowStateTransition.new(
+          from_state: prevs_state,
+          to_state: "coverage_canceled"
+      )
+      self.notify_enrollment_cancel_or_termination_event(edi_required)
+      return true
+    end
+  end
+
+  def reterm_enrollment_with_earlier_date(termination_date, edi_required)
+
+    return false unless self.coverage_terminated? || self.coverage_termination_pending?
+    return false if termination_date > self.terminated_on
+    return true if cancel_terminated_enrollment(termination_date, edi_required)
+
+    if self.is_shop? && (termination_date > ::TimeKeeper.date_of_record && self.may_schedule_coverage_termination?)
+      self.schedule_coverage_termination!(termination_date)
+      self.notify_enrollment_cancel_or_termination_event(edi_required)
+      return true
+    elsif self.may_terminate_coverage?
+      self.terminated_on = termination_date
+      self.terminate_coverage!(termination_date)
+      self.notify_enrollment_cancel_or_termination_event(edi_required)
+      return true
+    else
+      false
+    end
   end
 
   private

@@ -53,7 +53,7 @@ module Forms
             :accept_new_clients => accept_new_clients
             })
       else
-        person.broker_agency_staff_roles << ::BrokerAgencyStaffRole.new(:broker_agency_profile => broker_agency_profile)
+        add_broker_staff(person,broker_agency_profile)
       end
 
       true
@@ -62,6 +62,22 @@ module Forms
     def match_or_create_person
       super
       person.addresses << @addresses.select(&:valid?)
+    end
+
+    def add_broker_staff(person, agency_profile)
+      terminated_broker = person.terminated_matching_broker(self.broker_agency_id)
+      if person.has_active_staff?(self.broker_agency_id)
+        errors.add(:base, 'You are already associated with this Broker Agency')
+        return false
+      elsif person.has_pending_staff?(self.broker_agency_id)
+        errors.add(:base, 'your application status was in pending with this Broker Agency')
+        return false
+      elsif terminated_broker.present?
+        terminated_broker.broker_agency_pending!
+        return true
+      else
+        person.broker_agency_staff_roles << ::BrokerAgencyStaffRole.new(:broker_agency_profile => agency_profile)
+      end
     end
 
     def validate_broker_agency
