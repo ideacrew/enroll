@@ -5,6 +5,22 @@ module SponsoredBenefits
   RSpec.describe Organizations::PlanDesignOrganization, type: :model, dbclean: :around_each do
     include_context "set up broker agency profile for BQT, by using configuration settings"
 
+     describe ".plan_design_organization" do
+        let(:plan_design_organization) { SponsoredBenefits::Organizations::PlanDesignOrganization.new(legal_name: "Tesla") }
+        let(:status) { Settings.aca.employer_has_sic_field ? false : true }
+        let(:dc_office_location) { SponsoredBenefits::Organizations::OfficeLocation.new(is_primary: false, address: address)}
+        let(:address) { SponsoredBenefits::Locations::Address.new(state: "dc")}
+
+        it "should check plan design organization validation based on sic factor" do
+          expect(plan_design_organization.valid?).to eq status
+        end
+
+        it "organization office location not necessarily primary for DC" do
+          plan_design_organization.office_locations << dc_office_location
+          expect(plan_design_organization.valid?).to eq status
+        end
+     end
+
     describe "#expire proposals for non Prospect Employer" do
       let(:organization) { create(:sponsored_benefits_plan_design_organization,
                               sponsor_profile_id: "1234",

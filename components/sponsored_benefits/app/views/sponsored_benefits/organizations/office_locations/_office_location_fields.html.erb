@@ -50,7 +50,7 @@
               </div>
               <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
                 <%if individual_market_is_enabled? %>
-                  <%= address.select :state, options_for_select(State::NAME_IDS.map(&:last), selected: "DC"),{},class:'form-control', required: true %>
+                  <%= address.select :state, options_for_select(State::NAME_IDS.map(&:last), selected: "DC"),{},class:'form-control' %>
                 <%else%>
                   <%= address.select(:state, options_for_select(State::NAME_IDS.map(&:last), selected: address.object.state), {include_blank: "SELECT STATE"},class:'form-control', required: true) %>
                 <%end%>

@@ -35,10 +35,6 @@ module SponsoredBenefits
         address.present? ? address.zip : ""
       end
 
-      def sic_code_exists_for_employer?
-        Settings.aca.employer_has_sic_field
-      end
-
 
   	  # def parent
   	  #   self.organization
