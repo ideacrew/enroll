@@ -50,7 +50,7 @@ Then(/^the user is on the Eligibility Response Error page$/) do
 end
 
 Given(/^the user is on the Waiting for Results page$/) do
-  expect(page).to have_content "Waiting for your Eligibility results..."
+  expect(page).to have_content "Waiting for your eligibility results..."
 end
 
 Then(/^the user's "([^"]*)" results show$/) do |type|
