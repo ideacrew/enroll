@@ -1,3 +1,6 @@
+# Report for brokers without broker staff role.
+# rake command: RAILS_ENV=production bundle exec rake reports:broker_without_staff_role
+
 require 'csv'
 
 namespace :reports do
