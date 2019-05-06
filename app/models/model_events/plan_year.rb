@@ -6,6 +6,8 @@ module ModelEvents
       :initial_application_submitted,
       :renewal_application_submitted,
       :renewal_application_autosubmitted,
+      :ineligible_initial_application_submitted,
+      :ineligible_renewal_application_submitted,
       # :renewal_enrollment_confirmation,
       # :ineligible_initial_application_submitted,
       # :ineligible_renewal_application_submitted,
@@ -51,21 +53,9 @@ module ModelEvents
           is_renewal_employer_open_enrollment_completed = true
         end
 
-        # if is_transition_matching?(to: :publish_pending, from: :draft, event: [:publish, :force_publish])
-        #   is_ineligible_initial_application_submitted = true
-        # end
-
-        # if is_transition_matching?(to: :renewing_publish_pending, from: :renewing_draft, event: [:publish, :force_publish])
-        #   is_ineligible_renewal_application_submitted = true
-        # end
-
         if is_transition_matching?(to: [:published, :enrolling], from: :draft, event: :publish)
           is_initial_application_submitted = true
         end
-
-        # if is_transition_matching?(to: :renewing_enrolled, from: :renewing_enrolling, event: :advance_date)
-        #   is_renewal_enrollment_confirmation = true
-        # end
 
         if is_transition_matching?(to: [:renewing_published, :renewing_enrolling], from: :renewing_draft, event: :publish)
           is_renewal_application_submitted = true
@@ -74,6 +64,18 @@ module ModelEvents
         if is_transition_matching?(to: [:renewing_published, :renewing_enrolling], from: :renewing_draft, event: :force_publish)
           is_renewal_application_autosubmitted = true
         end
+
+        if is_transition_matching?(to: :publish_pending, from: :draft, event: :force_publish)
+          is_ineligible_initial_application_submitted = true
+        end
+
+        if is_transition_matching?(to: :renewing_publish_pending, from: :renewing_draft, event: :force_publish)
+          is_ineligible_renewal_application_submitted = true
+        end
+
+        # if is_transition_matching?(to: :renewing_enrolled, from: :renewing_enrolling, event: :advance_date)
+        #   is_renewal_enrollment_confirmation = true
+        # end
 
         # # Not being used any wherer as of now
         # # if enrolling? || renewing_enrolling?

@@ -181,8 +181,9 @@ module Notifier
 
     def plan_year_warnings
       plan_year_warnings = []
-      if current_plan_year.present?
-        current_plan_year.application_eligibility_warnings.each do |k, _|
+      plan_year = current_plan_year || renewal_plan_year
+        if plan_year.present?
+        plan_year.application_eligibility_warnings.each do |k, _|
           case k.to_s
           when "fte_count"
             plan_year_warnings << "Full Time Equivalent must be 1-50"

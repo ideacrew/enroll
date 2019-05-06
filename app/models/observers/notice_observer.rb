@@ -16,7 +16,34 @@ module Observers
 
         if new_model_event.event_key == :initial_application_submitted
           deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "initial_application_submitted")
-          trigger_zero_employees_on_roster_notice(plan_year)
+          # trigger_zero_employees_on_roster_notice(plan_year)
+        end
+
+        if new_model_event.event_key == :renewal_application_submitted
+          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_application_submitted")
+          # trigger_zero_employees_on_roster_notice(plan_year)
+        end
+
+        if new_model_event.event_key == :renewal_application_autosubmitted
+          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_application_autosubmitted")
+          # trigger_zero_employees_on_roster_notice(plan_year)
+        end
+
+        if new_model_event.event_key == :ineligible_initial_application_submitted
+          if (plan_year.application_eligibility_warnings.include?(:primary_office_location) || plan_year.application_eligibility_warnings.include?(:fte_count))
+            deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "employer_initial_eligibility_denial_notice")
+          end
+        end
+
+        if new_model_event.event_key == :ineligible_renewal_application_submitted
+          if plan_year.application_eligibility_warnings.include?(:primary_office_location)
+            deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "employer_renewal_eligibility_denial_notice")
+            # plan_year.employer_profile.census_employees.non_terminated.each do |ce|
+            #   if ce.employee_role.present?
+            #     deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "termination_of_employers_health_coverage")
+            #   end
+            # end
+          end
         end
 
         if new_model_event.event_key == :zero_employees_on_roster
@@ -32,11 +59,6 @@ module Observers
               deliver(recipient: ce.employee_role, event_object: enrollment, notice_event: "renewal_employee_enrollment_confirmation")
             end
           end
-        end
-
-        if new_model_event.event_key == :renewal_application_submitted
-          trigger_zero_employees_on_roster_notice(plan_year)
-          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "planyear_renewal_3a")
         end
 
         if new_model_event.event_key == :initial_employer_open_enrollment_completed
@@ -57,29 +79,11 @@ module Observers
           employee_event_name = plan_year.termination_kind.to_s == "nonpayment" ? 'notify_employee_of_group_non_payment_termination' : 'notify_employee_of_group_advance_termination'
 
           deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: employer_event_name)
-
           plan_year.employer_profile.census_employees.active.each do |ce|
             begin
               deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: employee_event_name)
             rescue StandardError => e
               Rails.logger.error { "Unable to deliver #{employee_event_name} to #{ce.full_name} due to #{e.backtrace}" }
-            end
-          end
-        end
-
-        if new_model_event.event_key == :ineligible_initial_application_submitted
-          if (plan_year.application_eligibility_warnings.include?(:primary_office_location) || plan_year.application_eligibility_warnings.include?(:fte_count))
-            deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "employer_initial_eligibility_denial_notice")
-          end
-        end
-
-        if new_model_event.event_key == :ineligible_renewal_application_submitted
-          if plan_year.application_eligibility_warnings.include?(:primary_office_location)
-            deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "employer_renewal_eligibility_denial_notice")
-            plan_year.employer_profile.census_employees.non_terminated.each do |ce|
-              if ce.employee_role.present?
-                deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "termination_of_employers_health_coverage")
-              end
             end
           end
         end
