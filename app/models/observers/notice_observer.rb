@@ -217,6 +217,43 @@ module Observers
       end
     end
 
+    def broker_agency_profile_update(new_model_event)
+      raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
+
+      if BrokerAgencyProfile::REGISTERED_EVENTS.include?(new_model_event.event_key)
+        broker_agency_profile = new_model_event.klass_instance
+
+        if new_model_event.event_key == :default_general_agency_hired
+          general_agency_profile = broker_agency_profile.default_general_agency_profile
+          deliver(recipient: general_agency_profile, event_object: broker_agency_profile, notice_event: 'default_ga_hired_notice_to_general_agency')
+        end
+
+        if new_model_event.event_key == :default_general_agency_fired
+          general_agency_profile_id = new_model_event.options[:old_general_agency_profile_id]
+          general_agency_profile = GeneralAgencyProfile.find general_agency_profile_id
+          deliver(recipient: general_agency_profile, event_object: broker_agency_profile, notice_event: 'default_ga_fired_notice_to_general_agency')
+        end
+      end
+    end
+
+    def general_agency_account_update(new_model_event)
+      raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
+
+      if GeneralAgencyAccount::REGISTERED_EVENTS.include?(new_model_event.event_key)
+        general_agency_account = new_model_event.klass_instance
+        employer_profile = general_agency_account.employer_profile
+        general_agency_profile = general_agency_account.general_agency_profile
+
+        if new_model_event.event_key == :general_agency_hired
+          deliver(recipient: general_agency_profile, event_object: employer_profile, notice_event: "general_agency_hired_confirmation_to_agency", notice_params: { general_agency_account_id: general_agency_account.id.to_s })
+        end
+
+        if new_model_event.event_key == :general_agency_fired
+          deliver(recipient: general_agency_profile, event_object: employer_profile, notice_event: "general_agency_fired_confirmation_to_agency", notice_params: { general_agency_account_id: general_agency_account.id.to_s })
+        end
+      end
+    end
+
     def vlp_document_update; end
     def ridp_document_update; end
     def paper_application_update; end
@@ -310,6 +347,8 @@ module Observers
     def special_enrollment_period_date_change; end
     def broker_agency_account_date_change; end
     def employee_role_date_change; end
+    def general_agency_account_date_change; end
+    def broker_agency_profile_date_change; end
 
     def census_employee_update(new_model_event)
       raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)

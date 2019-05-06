@@ -236,9 +236,12 @@ class EmployerProfile
 
   def fire_general_agency!(terminate_on = TimeKeeper.datetime_of_record)
     return if active_general_agency_account.blank?
-    general_agency_accounts.active.update_all(aasm_state: "inactive", end_on: terminate_on)
+    general_agency_accounts.active.each do |ga_account|
+      ga_account.aasm_state = 'inactive'
+      ga_account.end_on = terminate_on
+      ga_account.save!
+    end
     notify_general_agent_terminated
-    self.trigger_notices("general_agency_terminated")
   end
   alias_method :general_agency_profile=, :hire_general_agency
 
