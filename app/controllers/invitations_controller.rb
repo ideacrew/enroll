@@ -41,7 +41,13 @@ class InvitationsController < ApplicationController
   end
 
   def require_login_and_allow_new_account
-    if current_user.nil?
+    person = Person.find(params[:person_id]) if params[:person_id]
+    if person && person.user
+      invitation = Invitation.find(params[:id])
+      staff_role = BrokerAgencyStaffRole.find(invitation.source_id)
+      session[:portal] = broker_agencies_profile_path(staff_role.broker_agency_profile)
+      redirect_to new_user_session_url(:invitation_id => params[:id])
+    elsif current_user.nil?
       session[:portal] = url_for(params)
       redirect_to new_user_registration_url(:invitation_id => params[:id])
     end
