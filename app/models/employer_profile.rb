@@ -5,7 +5,12 @@ class EmployerProfile
   include AASM
   include Acapi::Notifiers
   extend Acapi::Notifiers
+  include ModelEvents::EmployerProfile
+  include Concerns::Observable
   include StateTransitionPublisher
+  include Concerns::Observable
+  include ModelEvents::EmployerProfile
+
 
   embedded_in :organization
   attr_accessor :broker_role_id
@@ -86,6 +91,8 @@ class EmployerProfile
 
   after_initialize :build_nested_models
   after_save :save_associated_nested_models
+  after_create :notify_on_create
+  after_save :notify_on_save
 
   scope :active,      ->{ any_in(aasm_state: ACTIVE_STATES) }
   scope :inactive,    ->{ any_in(aasm_state: INACTIVE_STATES) }
@@ -534,16 +541,6 @@ class EmployerProfile
       CensusEmployee.matchable(person.ssn, person.dob)
     end
 
-    def organizations_for_low_enrollment_notice(new_date)
-      Organization.where(:"employer_profile.plan_years" =>
-        { :$elemMatch => {
-          :"aasm_state".in => ["enrolling", "renewing_enrolling"],
-          :"open_enrollment_end_on" => new_date+2.days
-          }
-      })
-
-    end
-
     def organizations_for_open_enrollment_begin(new_date)
       Organization.where(:"employer_profile.plan_years" =>
           { :$elemMatch => {
@@ -720,19 +717,6 @@ class EmployerProfile
             rescue Exception => e
               Rails.logger.error { "Error force publishing renewing plan year for #{organization.legal_name} due to #{e}" }
             end
-          end
-        end
-
-        organizations_for_low_enrollment_notice(new_date).each do |organization|
-          begin
-            plan_year = organization.employer_profile.plan_years.where(:aasm_state.in => ["enrolling", "renewing_enrolling"]).first
-            #exclude congressional employees
-            next if ((plan_year.benefit_groups.any?{|bg| bg.is_congress?}) || (plan_year.effective_date.yday == 1))
-            if plan_year.enrollment_ratio < Settings.aca.shop_market.employee_participation_ratio_minimum
-              organization.employer_profile.trigger_notices("low_enrollment_notice_for_employer", "acapi_trigger" => true)
-            end
-          rescue Exception => e
-            Rails.logger.error { "Unable to deliver Low Enrollment Notice to #{organization.legal_name} due to #{e}" }
           end
         end
 
@@ -976,24 +960,19 @@ class EmployerProfile
   def self.update_status_to_binder_paid(organization_ids)
     organization_ids.each do |id|
       if org = Organization.find(id)
-        org.employer_profile.update_attribute(:aasm_state, "binder_paid")
-        self.initial_employee_plan_selection_confirmation(org)
+        org.employer_profile.binder_credited!
       end
     end
   end
 
-  def self.initial_employee_plan_selection_confirmation(org)
-    begin
-      if org.employer_profile.is_new_employer?
-        census_employees = org.employer_profile.census_employees.non_terminated
-        census_employees.each do |ce|
-          if ce.active_benefit_group_assignment.hbx_enrollment.present? && ce.active_benefit_group_assignment.hbx_enrollment.effective_on == org.employer_profile.plan_years.where(:aasm_state.in => ["enrolled", "enrolling"]).first.start_on
-            ShopNoticesNotifierJob.perform_later(ce.id.to_s, "initial_employee_plan_selection_confirmation", "acapi_trigger" => true )
-          end
-        end
+  def self.notice_for_missing_binder_payment(org)
+    org.employer_profile.trigger_notices("initial_employer_no_binder_payment_received", "acapi_trigger" => true)
+    org.employer_profile.census_employees.active.each do |ce|
+      begin
+        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notice_to_ee_that_er_plan_year_will_not_be_written", "acapi_trigger" =>  true )
+      rescue Exception => e
+        (Rails.logger.error {"Unable to deliver notice_to_ee_that_er_plan_year_will_not_be_written to #{ce.full_name} due to #{e}"}) unless Rails.env.test?
       end
-    rescue Exception => e
-      Rails.logger.error {"Unable to deliver initial_employee_plan_selection_confirmation to employees of #{org.legal_name} due to #{e.backtrace}"}
     end
   end
 

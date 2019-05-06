@@ -38,7 +38,6 @@ module Notifier
         dependent_termination_date: TimeKeeper.date_of_record.end_of_month.strftime('%m/%d/%Y'),
         email: 'johnwhitmore@yahoo.com',
         dependents_name: "Arya, Sansa",
-        enrollment_plan_name: 'Blue Cross Blue Shield Plan',
         ivl_oe_start_date: Settings.aca.individual_market.upcoming_open_enrollment.start_on,
         ivl_oe_end_date: Settings.aca.individual_market.upcoming_open_enrollment.end_on,
         # coverage_begin_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
@@ -64,7 +63,7 @@ module Notifier
     end
 
     def conditions
-      %w{broker_present? census_employee_health_and_dental_enrollment? census_employee_health_enrollment? census_employee_dental_enrollment?}
+      ["broker_present?", "census_employee_health_and_dental_enrollment?", "census_employee_health_enrollment?", "census_employee_dental_enrollment?", "future_sep?"]
     end
 
     def census_employee_health_enrollment?
@@ -73,6 +72,10 @@ module Notifier
 
     def census_employee_dental_enrollment?
       self.census_employee.latest_terminated_dental_enrollment_plan_name.present?
+    end
+
+    def future_sep?
+      Date.strptime(special_enrollment_period.event_on, '%m/%d/%Y').future?
     end
 
     def census_employee_health_and_dental_enrollment?

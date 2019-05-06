@@ -5,8 +5,10 @@ class SpecialEnrollmentPeriod
   include TimeHelper
   include Acapi::Notifiers
   extend Acapi::Notifiers
-  include ModelEvents::SpecialEnrollmentPeriod
   include Concerns::Observable
+  include ModelEvents::SpecialEnrollmentPeriod
+
+  after_save :notify_on_save
 
   embedded_in :family
   embeds_many :comments, as: :commentable, cascade_callbacks: true

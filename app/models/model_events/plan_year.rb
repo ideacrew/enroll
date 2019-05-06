@@ -22,7 +22,8 @@ module ModelEvents
     ]
 
     DATA_CHANGE_EVENTS = [
-        # :renewal_employer_open_enrollment_completed
+      :open_enrollment_end_reminder_notice_to_employee,
+        # :renewal_employer_open_enrollment_completed,
         # :renewal_employer_publish_plan_year_reminder_after_soft_dead_line,
         # :renewal_plan_year_first_reminder_before_soft_dead_line,
         :initial_employer_no_binder_payment_received,
@@ -128,6 +129,22 @@ module ModelEvents
           is_renewal_employer_second_reminder_to_publish_plan_year = true
         end
 
+        #it goes to all initial employees 2 days before their open enrollment end i.e., 8th of the month
+        # low enrollment notice for initial employers will be triggerd through this event
+        if new_date.day == Settings.aca.shop_market.open_enrollment.monthly_end_on - 2
+          is_initial_employee_oe_end_reminder_notice = true
+        end
+
+        #it goes to all renewal employees 2 days before their open enrollment end i.e., 8th of the month
+        if new_date.day == Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on - 2
+          is_renewal_employee_oe_end_reminder_notice = true
+        end
+
+        # # renewal employer publish plan_year reminder a day after advertised soft deadline i.e 11th of the month
+        # if new_date.day == Settings.aca.shop_market.renewal_application.application_submission_soft_deadline - 1
+        #   is_renewal_employer_publish_plan_year_reminder_after_soft_dead_line = true
+        # end
+
         # renewal_application with un-published plan year, send notice 2 days before soft dead line i.e 3th of the month
         if new_date.day == Settings.aca.shop_market.renewal_application.application_submission_soft_deadline - 2
           is_renewal_employer_first_reminder_to_publish_plan_year = true
@@ -166,6 +183,11 @@ module ModelEvents
         elsif new_date.day == Settings.aca.shop_market.initial_application.publish_due_day_of_month - 2 # 2 days prior to publish deadline of month i.e., 3rd of the month
           is_initial_employer_final_reminder_to_publish_plan_year = true
         end
+
+        # triggering the event every day open enrollment end reminder notice to employees
+        # This is because there is a possibility for the employers to change the open enrollment end date
+        # This also triggers low enrollment notice to employer
+        is_open_enrollment_end_reminder_notice_to_employee = true
 
         DATA_CHANGE_EVENTS.each do |event|
           if event_fired = instance_eval("is_" + event.to_s)

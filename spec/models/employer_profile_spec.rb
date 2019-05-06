@@ -834,25 +834,6 @@ describe EmployerProfile, "roster size" do
   end
 end
 
-describe EmployerProfile, "ER made binder payment, Admin user selected 'Mark Binder Paid' for group", dbclean: :after_each do
-  let!(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
-  let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'enrolled', start_on: start_on)}
-  let!(:benefit_group) { employer_profile.published_plan_year.benefit_groups.first}
-  let!(:organization) { employer_profile.organization }
-  let!(:census_employee){
-    employee = FactoryGirl.create :census_employee, employer_profile: employer_profile
-    employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
-    employee
-  }
-  let!(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
-  let!(:hbx_enrollment) { FactoryGirl.build(:hbx_enrollment, household: family.active_household, benefit_group_assignment_id: benefit_group.benefit_group_assignments.first.id, benefit_group_id: benefit_group.id, effective_on: start_on)}
-
-  it "should trigger notice" do
-    expect(EmployerProfile).to receive(:initial_employee_plan_selection_confirmation)
-    EmployerProfile.update_status_to_binder_paid([organization.id])
-  end
-end
-
 describe EmployerProfile, "when a binder premium is credited" do
   let(:hbx_id) { "some hbx id string value" }
   let(:employer) { EmployerProfile.new(:aasm_state => :eligible, :organization => Organization.new(:hbx_id => hbx_id)) }
@@ -969,18 +950,6 @@ describe EmployerProfile, "Renewal Queries" do
     it 'should return organizations for renewal' do
       months_prior = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months * -1
       expect(EmployerProfile.organizations_eligible_for_renewal(Date.new(calender_year+1, 2, 1)).to_a).to eq [organization2]
-    end
-  end
-
-  context '.organizations_for_low_enrollment_notice', dbclean: :after_each do
-    let(:date) { TimeKeeper.date_of_record }
-    let!(:low_organization)  {FactoryGirl.create(:organization, fein: "097936010")}
-    let!(:low_employer_profile) { FactoryGirl.create(:employer_profile, organization: low_organization) }
-    let!(:low_plan_year1) { FactoryGirl.create(:plan_year, aasm_state: "enrolling", employer_profile: low_employer_profile, :open_enrollment_end_on => date+2.days, start_on: (date+2.days).next_month.beginning_of_month)}
-    let!(:low_plan_year2) { FactoryGirl.create(:plan_year, aasm_state: "renewing_enrolling", employer_profile: low_employer_profile, :open_enrollment_end_on => date+2.days, start_on: (date+2.days).next_month.beginning_of_month)}
-
-    it 'should return organizations elgible low enrollment notice' do
-      expect(EmployerProfile.organizations_for_low_enrollment_notice(date).to_a).to eq [low_organization]
     end
   end
 end

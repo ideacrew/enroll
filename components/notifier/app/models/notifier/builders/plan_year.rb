@@ -8,6 +8,12 @@ module Notifier
       end
     end
 
+    def plan_year_current_py_start_date_plus_one_year
+      if current_plan_year.present?
+        merge_model.plan_year.current_py_start_date_plus_one_year = format_date(current_plan_year.start_on.next_year)
+      end
+    end
+
     def plan_year_current_py_end_date
       if current_plan_year.present?
         merge_model.plan_year.current_py_end_date = format_date(current_plan_year.end_on)
@@ -72,8 +78,15 @@ module Notifier
     end
 
     def plan_year_current_py_oe_end_date
+      plan_year = 
+        if ['zero_employees_on_roster_notice', 'low_enrollment_notice_for_employer', 'open_enrollment_end_reminder_notice_to_employee'].include? event_name
+          load_plan_year
+        else
+          current_plan_year
+        end
+
       if current_plan_year.present?
-        merge_model.plan_year.current_py_oe_end_date = format_date(current_plan_year.open_enrollment_end_on)
+        merge_model.plan_year.current_py_oe_end_date = format_date(plan_year.open_enrollment_end_on)
       end
     end
 

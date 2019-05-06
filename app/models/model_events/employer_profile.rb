@@ -2,7 +2,8 @@ module ModelEvents
   module EmployerProfile
 
     REGISTERED_EVENTS = [
-      # :initial_employee_plan_selection_confirmation
+      :welcome_notice_to_employer,
+      :initial_employee_plan_selection_confirmation
     ]
 
     #TODO: The trigger for this notice is in the controller and it has to be eventually moved to observer pattern.
@@ -10,7 +11,6 @@ module ModelEvents
     OTHER_EVENTS = [
       # :generate_initial_employer_invoice,
       # :broker_hired_confirmation_to_employer,
-      # :welcome_notice_to_employer
     ]
 
     def trigger_model_event(event_name, event_options = {})
@@ -19,11 +19,34 @@ module ModelEvents
       end
     end
 
+    def notify_on_create
+
+      if self.present?
+        is_welcome_notice_to_employer = true
+      end
+
+      if false
+        is_initial_employee_plan_selection_confirmation = true
+      end
+
+      REGISTERED_EVENTS.each do |event|
+        if event_fired = instance_eval("is_" + event.to_s)
+          # event_name = ("on_" + event.to_s).to_sym
+          event_options = {} # instance_eval(event.to_s + "_options") || {}
+          notify_observers(ModelEvent.new(event, self, event_options))
+        end
+      end
+    end
+
     def notify_on_save
       if aasm_state_changed?
-        # if is_transition_matching?(to: :binder_paid, from: :eligible, event: :binder_credited)
-        #   is_initial_employee_plan_selection_confirmation = true
-        # end
+        if is_transition_matching?(to: :binder_paid, from: :eligible, event: :binder_credited)
+          is_initial_employee_plan_selection_confirmation = true
+        end
+
+        if false
+          is_welcome_notice_to_employer = true
+        end
 
         REGISTERED_EVENTS.each do |event|
           if event_fired = instance_eval("is_" + event.to_s)

@@ -638,6 +638,11 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     end
 
     context "qle event when person has dual roles" do
+      let(:organization) { FactoryGirl.create(:organization, :with_active_plan_year) }
+      let(:employer_profile) { organization.employer_profile }
+      let(:notice_event1) {"sep_denial_notice_for_ee_active_on_single_roster"}
+      let(:notice_event2) {"sep_denial_notice_for_ee_active_on_multiple_rosters"}
+
       before :each do
         allow(person).to receive(:user).and_return(user)
         allow(person).to receive(:has_active_employee_role?).and_return(true)
@@ -647,6 +652,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         @qle = FactoryGirl.create(:qualifying_life_event_kind)
         @family = FactoryGirl.build(:family, :with_primary_family_member)
         allow(person).to receive(:primary_family).and_return(@family)
+        allow(employee_roles.first).to receive(:employer_profile).and_return(employer_profile)
       end
 
       it "future_qualified_date return true/false when qle market kind is shop" do
@@ -656,6 +662,23 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         expect(assigns(:future_qualified_date)).to eq(false)
       end
 
+      it "trigger notice_event1 for unqualified date when qle market kind is shop and employee active on single roster" do
+        qle = FactoryGirl.create(:qualifying_life_event_kind, market_kind: 'shop')
+        date = TimeKeeper.date_of_record.next_month.strftime("%m/%d/%Y")
+        today = TimeKeeper.date_of_record.strftime("%m/%d/%Y")
+        expect(controller).to receive(:trigger_notice_observer).with(person.active_employee_roles.first, employer_profile.plan_years.first, notice_event1, {:qle_title=> @qle.title, :qle_reporting_deadline=> today, :qle_event_on=> date})
+        xhr :get, :check_qle_date, date_val: date, qle_id: qle.id, format: :js
+      end
+
+      it 'should trigger notice_event2 when employee active on multiple rosters' do
+        allow(person).to receive(:has_multiple_active_employers?).and_return(true)
+        qle = FactoryGirl.create(:qualifying_life_event_kind, market_kind: 'shop')
+        date = TimeKeeper.date_of_record.next_month.strftime("%m/%d/%Y")
+        today = TimeKeeper.date_of_record.strftime("%m/%d/%Y")
+        expect(controller).to receive(:trigger_notice_observer).with(person.active_employee_roles.first, employer_profile.plan_years.first, notice_event2, {:qle_title=> @qle.title, :qle_reporting_deadline=> today, :qle_event_on=> date})
+        xhr :get, :check_qle_date, date_val: date, qle_id: qle.id, format: :js
+      end
+
       it "future_qualified_date should return nil when qle market kind is indiviual" do
         qle = FactoryGirl.build(:qualifying_life_event_kind, market_kind: "individual")
         allow(QualifyingLifeEventKind).to receive(:find).and_return(qle)
@@ -663,6 +686,14 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         xhr :get, :check_qle_date, date_val: date, qle_id: qle.id, format: :js
         expect(response).to have_http_status(:success)
         expect(assigns(:future_qualified_date)).to eq(nil)
+      end
+
+      it "should not trigger sep request denial notice unqualified date  when qle market kind is individual" do
+        qle = FactoryGirl.build(:qualifying_life_event_kind, market_kind: "individual")
+        allow(QualifyingLifeEventKind).to receive(:find).and_return(qle)
+        date = TimeKeeper.date_of_record.next_month.strftime("%m/%d/%Y")
+        expect(controller).not_to receive(:trigger_notice_observer)
+        xhr :get, :check_qle_date, date_val: date, qle_id: qle.id, format: :js
       end
     end
 
@@ -693,6 +724,15 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       end
 
       context "special qle events which can not have future date" do
+        let(:organization) { FactoryGirl.create(:organization, :with_active_plan_year) }
+        let(:employer_profile) { organization.employer_profile }
+        let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
+        let(:employee_role) { FactoryGirl.create(:employee_role, employer_profile: employer_profile, census_employee_id: census_employee.id) }
+
+        before do
+          allow(person).to receive(:active_employee_roles).and_return([employee_role])
+        end
+
         it "should return true" do
           sign_in user
           date = (TimeKeeper.date_of_record + 8.days).strftime("%m/%d/%Y")

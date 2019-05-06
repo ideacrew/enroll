@@ -38,7 +38,13 @@ module Notifier
     end
 
     def append_contact_details
-      mailing_address = employee_role.person.mailing_address
+      mailing_address =
+        if employee_role.person.mailing_address
+          employee_role.person.mailing_address
+        elsif employee_role.census_employee
+          employee_role.census_employee.address
+        end
+
       if mailing_address.present?
         merge_model.mailing_address = MergeDataModels::Address.new({
           street_1: mailing_address.address_1,
@@ -199,16 +205,20 @@ module Notifier
     end
 
     def special_enrollment_period_event_on
-      event_on = special_enrollment_period.nil? ? payload['notice_params']['qle_event_on'] : special_enrollment_period.event_on
+      event_on = (payload['notice_params'] && payload['notice_params']['qle_event_on']) ? payload['notice_params']['qle_event_on'] : format_date(special_enrollment_period.qle_on)
       merge_model.special_enrollment_period.event_on = event_on
     end
 
+    def future_sep?
+      Date.strptime(special_enrollment_period_event_on, '%m/%d/%Y').future?
+    end
+
     def special_enrollment_period_title
-      merge_model.special_enrollment_period.title = special_enrollment_period.nil? ? payload['notice_params']['qle_title'] : special_enrollment_period.title
+      merge_model.special_enrollment_period.title = (payload['notice_params'] && payload['notice_params']['qle_title']) ? payload['notice_params']['qle_title'] : special_enrollment_period.title
     end
 
     def special_enrollment_period_qle_reported_on
-      merge_model.special_enrollment_period.qle_reported_on = (special_enrollment_period.present? && special_enrollment_period.qle_on.present?) ? format_date(special_enrollment_period.qle_on) : format_date(TimeKeeper.date_of_record)
+      merge_model.special_enrollment_period.qle_reported_on = format_date(TimeKeeper.date_of_record)
     end
 
     def special_enrollment_period_start_on
@@ -218,7 +228,9 @@ module Notifier
     end
 
     def special_enrollment_period_end_on
-      merge_model.special_enrollment_period.end_on = format_date(special_enrollment_period.end_on)
+      if special_enrollment_period.present? && special_enrollment_period.start_on.present?
+        merge_model.special_enrollment_period.end_on = format_date(special_enrollment_period.end_on)
+      end
     end
 
     def special_enrollment_period_submitted_at
@@ -226,7 +238,7 @@ module Notifier
     end
 
     def special_enrollment_period_reporting_deadline
-      deadline = payload['notice_params']['qle_reporting_deadline']
+      deadline = payload['notice_params'] && payload['notice_params']['qle_reporting_deadline']
       merge_model.special_enrollment_period.reporting_deadline = deadline
     end
 

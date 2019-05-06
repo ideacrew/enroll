@@ -140,6 +140,10 @@ module Observers
             end
           end
         end
+
+        if new_model_event.event_key == :welcome_notice_to_employer
+          deliver(recipient: employer_profile, event_object: employer_profile, notice_event: "welcome_notice_to_employer")
+        end
       end
 
       if EmployerProfile::OTHER_EVENTS.include?(new_model_event.event_key)
@@ -151,10 +155,7 @@ module Observers
 
         if new_model_event.event_key == :broker_hired_confirmation_to_employer
           deliver(recipient: employer_profile, event_object: employer_profile, notice_event: "broker_hired_confirmation_to_employer")
-        elsif new_model_event.event_key == :welcome_notice_to_employer
-          deliver(recipient: employer_profile, event_object: employer_profile, notice_event: "welcome_notice_to_employer")
         end
-
       end
     end
 
@@ -231,17 +232,7 @@ module Observers
       current_date = TimeKeeper.date_of_record
       if PlanYear::DATA_CHANGE_EVENTS.include?(model_event.event_key)
 
-        if model_event.event_key == :low_enrollment_notice_for_employer
-          organizations_for_low_enrollment_notice(current_date).each do |organization|
-           begin
-              plan_year = organization.employer_profile.plan_years.where(:aasm_state.in => ["enrolling", "renewing_enrolling"]).first
-              next if plan_year.effective_date.yday == 1
-              if plan_year.enrollment_ratio < Settings.aca.shop_market.employee_participation_ratio_minimum
-                deliver(recipient: organization.employer_profile, event_object: plan_year, notice_event: "low_enrollment_notice_for_employer")
-              end
-            end
-          end
-        end
+        trigger_low_enrollment_and_oe_end_reminder_notice(current_date) if model_event.event_key == :open_enrollment_end_reminder_notice_to_employee
 
         if [ :renewal_employer_first_reminder_to_publish_plan_year,
              :renewal_employer_second_reminder_to_publish_plan_year,
@@ -302,12 +293,18 @@ module Observers
     end
 
     def special_enrollment_period_update(new_model_event)
-      special_enrollment_period = new_model_event.klass_instance
+      raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
+      if SpecialEnrollmentPeriod::REGISTERED_EVENTS.include?(new_model_event.event_key)
+        special_enrollment_period = new_model_event.klass_instance
 
-      if special_enrollment_period.is_shop?
-        primary_applicant = special_enrollment_period.family.primary_applicant
-        if employee_role = primary_applicant.person.active_employee_roles[0]
-          deliver(recipient: employee_role, event_object: special_enrollment_period, notice_event: "employee_sep_request_accepted")
+        if new_model_event.event_key == :employee_sep_request_accepted
+          if special_enrollment_period.is_shop?
+            person = special_enrollment_period.family.primary_applicant.person
+            if employee_role = person.active_employee_roles[0]
+              event_name = person.has_multiple_active_employers? ? 'sep_accepted_notice_for_ee_active_on_multiple_rosters' : 'sep_accepted_notice_for_ee_active_on_single_roster'
+              deliver(recipient: employee_role, event_object: special_enrollment_period, notice_event: event_name)
+            end
+          end
         end
       end
     end
@@ -318,6 +315,7 @@ module Observers
     def document_date_change; end
     def special_enrollment_period_date_change; end
     def broker_agency_account_date_change; end
+    def employee_role_date_change; end
 
     def census_employee_update(new_model_event)
       raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
@@ -334,6 +332,17 @@ module Observers
       end
     end
 
+    def employee_role_update(new_model_event)
+      raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
+      employee_role = new_model_event.klass_instance
+
+      if EmployeeRole::REGISTERED_EVENTS.include?(new_model_event.event_key)
+       if new_model_event.event_key == :employee_matches_employer_roster
+        deliver(recipient: employee_role, event_object: employee_role.census_employee, notice_event: "employee_matches_employer_roster")
+       end
+      end
+    end
+
     def deliver(recipient:, event_object:, notice_event:, notice_params: {})
       notifier.deliver(recipient: recipient, event_object: event_object, notice_event: notice_event, notice_params: notice_params)
     end
@@ -342,10 +351,45 @@ module Observers
       deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "zero_employees_on_roster_notice") if plan_year.employer_profile.census_employees.active.count < 1
     end
 
+    def trigger_low_enrollment_and_oe_end_reminder_notice(current_date)
+      organizations_for_low_enrollment_notice(current_date).each do |org|
+        plan_year = org.employer_profile.plan_years.where(:aasm_state.in => ["enrolling", "renewing_enrolling"]).first
+        census_employees = org.employer_profile.census_employees.non_terminated
+        census_employees.each do |ce|
+          begin
+            next if ce.new_hire_enrollment_period.cover?(current_date) || ce.new_hire_enrollment_period.first > current_date
+            deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "open_enrollment_end_reminder_notice_to_employee")
+          rescue StandardError => e
+            Rails.logger.error { "Unable to trigger open_enrollment_end_reminder_notice_to_employee to #{ce.full_name} due to #{e.backtrace}" }
+          end
+        end
+        next if plan_year.effective_date.yday == 1
+        deliver(recipient: org.employer_profile, event_object: plan_year, notice_event: "low_enrollment_notice_for_employer") if plan_year.enrollment_ratio < Settings.aca.shop_market.employee_participation_ratio_minimum
+      end
+    end
+
     def organizations_for_low_enrollment_notice(current_date)
       Organization.where(:"employer_profile.plan_years" =>
         { :$elemMatch => {
           :"aasm_state".in => ["enrolling", "renewing_enrolling"],
+          :"open_enrollment_end_on" => current_date+2.days
+          }
+      })
+    end
+
+    def initial_organizations_in_enrolling_state(current_date)
+      Organization.where(:"employer_profile.plan_years" =>
+        { :$elemMatch => {
+          :"aasm_state" => "enrolling",
+          :"open_enrollment_end_on" => current_date+2.days
+          }
+      })
+    end
+
+    def renewal_organizations_in_enrolling_state(current_date)
+      Organization.where(:"employer_profile.plan_years" =>
+        { :$elemMatch => {
+          :"aasm_state" => "renewing_enrolling",
           :"open_enrollment_end_on" => current_date+2.days
           }
       })
