@@ -985,6 +985,7 @@ class PlanYear
       transitions from: :renewing_published,  to: :renewing_enrolling,  :guard  => :is_event_date_valid?
       transitions from: :renewing_enrolling,  to: :renewing_enrolled,   :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
       transitions from: :renewing_enrolling,  to: :renewing_application_ineligible, :guard => :is_open_enrollment_closed?, :after => [:zero_employees_on_roster]
+
       transitions from: :enrolling, to: :enrolling  # prevents error when plan year is already enrolling
     end
 
@@ -1340,22 +1341,6 @@ class PlanYear
   #   rescue Exception => e
   #     Rails.logger.error { "Unable to deliver employer open enrollment completed notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
   #   end
-  # end
-
-  def initial_employer_denial_notice
-    return true if benefit_groups.any?{|bg| bg.is_congress?}
-    if (application_eligibility_warnings.include?(:primary_office_location) || application_eligibility_warnings.include?(:fte_count))
-      begin
-        self.employer_profile.trigger_notices("initial_employer_denial", "acapi_trigger" =>  true)
-      rescue Exception => e
-        Rails.logger.error { "Unable to deliver employer initial denial notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
-      end
-    end
-  end
-
-  # def renewal_employer_open_enrollment_completed
-  #   return true if benefit_groups.any?{|bg| bg.is_congress?}
-  #   self.employer_profile.trigger_notices("renewal_employer_open_enrollment_completed")
   # end
 
   def renewal_employer_ineligibility_notice_to_employee
