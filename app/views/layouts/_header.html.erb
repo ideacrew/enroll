@@ -13,9 +13,10 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-  <% if @employer_profile && @employer_profile.logo%>
+        <%logos = ['department_of_agriculture.png','department_of_health_and_human_services.png','department_of_the_army.png','department_of_veterans_affairs.png']%>
+  <% if @employer_profile && @employer_profile.logo.in?(logos)%>
     <a class="">
-      <%= image_tag @employer_profile.logo, :id =>"native-logo"  %>
+      <%= image_tag @employer_profile.logo || 'logo.png', :id =>"native-logo"  %>
     </a>
   <%else%>
     <a class="navbar-brand" id="logo">

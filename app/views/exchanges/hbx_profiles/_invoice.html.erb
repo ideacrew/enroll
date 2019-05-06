@@ -6,10 +6,10 @@
 <h1>Employers</h1>
   
   <%=
-  select_tag( "parent_agency", options_for_select(@parent_agencies,'name'),  class: "progress_and_message", prompt:"FILTER BY DEPARTMENT",
+  select_tag( "parent_agency", options_for_select(@parent_agencies,'name'),  class: "form-control", prompt:"FILTER BY DEPARTMENT", id: "department-filter",
   data: {
     remote: true,
-    url: url_for( action: :employer_invoice)
+    url: url_for(action: :employer_invoice)
   }
 )
   

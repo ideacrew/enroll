@@ -5,6 +5,16 @@ class CensusMember
   validates_with Validations::DateRangeValidator
 
   GENDER_KINDS = %W(male female)
+  EMPLOYMENT_ACTIVE_STATES = %w(eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked cobra_eligible cobra_linked cobra_termination_pending)
+  EMPLOYMENT_TERMINATED_STATES = %w(employment_terminated rehired cobra_terminated)
+  NEWLY_DESIGNATED_STATES = %w(newly_designated_eligible newly_designated_linked)
+  LINKED_STATES = %w(employee_role_linked newly_designated_linked cobra_linked)
+  ELIGIBLE_STATES = %w(eligible newly_designated_eligible cobra_eligible employee_termination_pending cobra_termination_pending)
+  COBRA_STATES = %w(cobra_eligible cobra_linked cobra_terminated cobra_termination_pending)
+  PENDING_STATES = %w(employee_termination_pending cobra_termination_pending)
+
+  EMPLOYEE_TERMINATED_EVENT_NAME = "acapi.info.events.census_employee.terminated"
+  EMPLOYEE_COBRA_TERMINATED_EVENT_NAME = "acapi.info.events.census_employee.cobra_terminated"
 
   field :first_name, type: String
   field :middle_name, type: String
@@ -39,6 +49,9 @@ class CensusMember
 
 
   validate :date_of_birth_is_past
+
+  scope :active,            ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_STATES) }
+
 
   after_validation :move_encrypted_ssn_errors
 

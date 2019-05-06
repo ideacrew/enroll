@@ -9,7 +9,7 @@ module Employers::EmployerHelper
     elsif employee_state == 'employee_role_linked'
       return 'Account Linked'
     elsif employee_state == 'eligible'
-      return 'No Account Linked'
+      return 'Account Linked'
     else
       return employee_state.humanize
     end

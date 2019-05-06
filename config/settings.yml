@@ -24,8 +24,8 @@ site:
     facebook_url: ""
 
 contact_center:
-  name: "NM HIX Customer Care Center"
-  alt_name: "NM HIX Customer Service"
+  name: "OPM Customer Care Center"
+  alt_name: "OPM Customer Service"
   phone_number: "1-855-532-5465"
   short_number: "(855) 532-5465"
   tty_number: "1-855-532-5465"
@@ -83,7 +83,7 @@ notices:
 aca:
   state_name: "District of Columbia"
   state_abbreviation: "DC"
-  hbx_abbreviation: "NM Health Insurance Exchange"
+  hbx_abbreviation: "OPM Health Insurance Exchange"
   market_kinds: ["individual", "shop"]
 #
   qle:

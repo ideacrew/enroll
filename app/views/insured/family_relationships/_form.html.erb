@@ -3,7 +3,7 @@
   below. Then select CONTINUE.</p>
 <%= form_tag "/insured/family_relationships", remote: form_remote do %>
     <%= hidden_field_tag :family_id, family.id %>
-    <%= hidden_field_tag :consumer_role_id, params[:consumer_role_id].present? ? params[:consumer_role_id] : family.primary_applicant.person.consumer_role.id %>
+    <%= hidden_field_tag :consumer_role_id, params[:consumer_role_id].present? ? params[:consumer_role_id] : family.primary_applicant.person.consumer_role.id rescue nil %>
     <%= hidden_field_tag :resident_role_id, params[:resident_role_id] %>
     <%= hidden_field_tag :employee_role_id, params[:employee_role_id] %>
     <%= hidden_field_tag :redirect_url, redirect_url %>

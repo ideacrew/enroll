@@ -1,4 +1,4 @@
-require 'mongo'
+  require 'mongo'
 require 'csv'
 require 'pp'
 
@@ -23,7 +23,7 @@ class OpmSeed
     @ee_count_mapping = {}
     @eps = Organization.all.map(&:employer_profile).compact.map(&:id)
     @org_cache =  ActiveSupport::Cache::MemoryStore.new
-    @client = Mongo::Client.new([ '127.0.0.1:27017' ], :database => 'opm_development')
+    @client = Mongo::Client.new([ '172.30.1.55:27017' ], :database => 'enroll-opm')
   end
 
   def time_rand from = 0.0, to = Time.now
@@ -84,6 +84,10 @@ class OpmSeed
     @ssn = @ssn.next 
     ssn =  "#{@ssn.to_s[0,3]}00#{@ssn.to_s[5,7]}"
     Person.encrypt_ssn(ssn)
+  end
+
+  def get_gender
+    ["male","female"].sample
   end
 
   def get_fein
@@ -185,16 +189,11 @@ class OpmSeed
         "updated_by_id"=>nil,
         "version"=>1}
 
-       @client[:organizations].insert_one org
+      #  @client[:organizations].insert_one org
 
     end
   end
 
-  def get_ee_count 
-    CSV.foreach("db/seedfiles/AgencyCount.csv", :headers => true) do |row|
-        @ee_count[row[0]] = row[1]
-    end
-  end
 
   def spouse_only(ep,age,name_0,name_1,name_2,family_id_0,family_id_1,status)
     family_member_id_0 = BSON::ObjectId.new
@@ -212,9 +211,9 @@ class OpmSeed
         "employee_relationship"=>"spouse",
         "employer_assigned_family_id"=>nil,
         "encrypted_ssn"=>get_ssn,
-        "first_name"=>"Jane",
-        "gender"=>"female",
-        "last_name"=>"Jetson",
+        "first_name"=>name_1.split[0],
+        "gender"=>get_gender,
+        "last_name"=>name_1.split[1],
         "middle_name"=>nil,
         "name_sfx"=>nil,
         "updated_at"=>nil}],
@@ -248,43 +247,6 @@ class OpmSeed
         "_type" => 'census_employee',
         "aasm_state"=>"eligible",
         "autocomplete"=> nil,
-        # "census_dependents"=>
-        # [{ "_id" => BSON::ObjectId.new,
-        #   "created_at"=>nil,
-        #   "dob"=> fifty,
-        #   "employee_relationship"=>"spouse",
-        #   "employer_assigned_family_id"=>nil,
-        #   "encrypted_ssn"=>get_ssn,
-        #   "first_name"=>"Jane",
-        #   "gender"=>"female",
-        #   "last_name"=>"Jetson",
-        #   "middle_name"=>nil,
-        #   "name_sfx"=>nil,
-        #   "updated_at"=>nil},
-        #   { "_id" => BSON::ObjectId.new,
-        #   "created_at"=>nil,
-        #   "dob"=> young,
-        #   "employee_relationship"=>"child_under_26",
-        #   "employer_assigned_family_id"=>nil,
-        #   "encrypted_ssn"=>get_ssn,
-        #   "first_name"=>"Judy",
-        #   "gender"=>"female",
-        #   "last_name"=>"Jetson",
-        #   "middle_name"=>nil,
-        #   "name_sfx"=>nil,
-        #   "updated_at"=>nil},
-        #   { "_id" => BSON::ObjectId.new,
-        #   "created_at"=>nil,
-        #   "dob"=>young,
-        #   "employee_relationship"=>"child_under_26",
-        #   "employer_assigned_family_id"=>nil,
-        #   "encrypted_ssn"=>get_ssn,
-        #   "first_name"=>"Elroy",
-        #   "gender"=>"male",
-        #   "last_name"=>"Jetson",
-        #   "middle_name"=>nil,
-        #   "name_sfx"=>nil,
-        #   "updated_at"=> nil}],
         "cobra_begin_date"=>nil,
         "coverage_terminated_on"=>young,
         "created_at"=>nil,
@@ -331,21 +293,15 @@ class OpmSeed
     "created_at"=>nil,
     "kind"=>"spouse",
     "updated_at"=>nil,
-    "predecessor_id" => p0_id,
-     "successor_id"=> p2_id, 
+    "predecessor_id" => p2_id,
+     "successor_id"=> p0_id, 
      "family_id" => family_id_0},
-    #  {"_id"=>BSON::ObjectId.new,
-    #  "created_at"=>nil,
-    #  "kind"=>"spouse",
-    #  "updated_at"=>nil,
-    #  "predecessor_id" => p0_id,
-    #   "successor_id"=> p2_id, 
-    #   "family_id" => family_id_0}
+
   ],
   "ethnicity"=>nil,
   "first_name"=>name_0.split[0],
   "full_name"=>name_0,
-  "gender"=>"female",
+  "gender"=>get_gender,
   "general_agency_contact_id"=>nil,
   "hbx_id"=>nil,
   "is_active"=>true,
@@ -401,15 +357,8 @@ class OpmSeed
     "ethnicity"=>nil,
     "first_name"=>name_1.split[0],
     "full_name"=>name_1,
-    # "person_relationships"=>
-    # [{"_id"=>BSON::ObjectId.new,
-    #   "created_at"=>nil,
-    #   "kind"=>"spouse",
-    #   "updated_at"=>nil,
-    #   "predecessor_id" => p0_id,
-    #    "successor_id"=> p1_id, 
-    #    "family_id" => family_id_0}],
-    "gender"=>"female",
+
+    "gender"=>get_gender,
     "general_agency_contact_id"=>nil,
     "hbx_id"=>nil,
     "is_active"=>true,
@@ -465,16 +414,16 @@ class OpmSeed
     "ethnicity"=>nil,
     "first_name"=>name_2.split[0],
     "full_name"=>name_2,
-    "gender"=>"female",
+    "gender"=>get_gender,
     "general_agency_contact_id"=>nil,
     "hbx_id"=>nil,
     "person_relationships"=>
     [{"_id"=>BSON::ObjectId.new,
       "created_at"=>nil,
-      "kind"=>"child",
+      "kind"=>"spouse",
       "updated_at"=>nil,
-      "predecessor_id" =>p0_id,
-      "successor_id"=> p2_id, 
+      "predecessor_id" =>p2_id,
+      "successor_id"=> p0_id, 
       "family_id" => family_id_0}],
     "is_active"=>true,
     "is_disabled"=>nil,
@@ -501,55 +450,6 @@ class OpmSeed
     "version"=>1}
 
 
-
-  # p3 = {
-  #   "_id" => p3_id,
-  #   "alternate_name"=>nil,
-  #   "broker_agency_contact_id"=>nil,
-  #   "created_at"=>nil,
-  #   "date_of_death"=>nil,
-  #   "dob"=> @ce_0['census_dependents'][1]['dob'],
-  #   "dob_check"=>nil,
-  #   "employer_contact_id"=>nil,
-  #   "encrypted_ssn"=> @ce_0['census_dependents'][1]['encrypted_ssn'],
-  #   "ethnicity"=>nil,
-  #   "first_name"=>name.split[0],
-  #   "full_name"=>name,
-  #   "person_relationships"=>
-  #   [{"_id"=>BSON::ObjectId.new,
-  #     "created_at"=>nil,
-  #     "kind"=>"child",
-  #     "relative_id"=>p0_id,
-  #     "updated_at"=>nil,
-  #     "predecessor_id" =>p0['_id'],
-  #     "successor_id"=> p3_id, 
-  #     "family_id" => family_id_0}],
-  #   "gender"=>"female",
-  #   "general_agency_contact_id"=>nil,
-  #   "hbx_id"=>nil,
-  #   "is_active"=>true,
-  #   "is_disabled"=>nil,
-  #   "is_homeless"=>false,
-  #   "is_incarcerated"=>nil,
-  #   "is_physically_disabled"=>nil,
-  #   "is_temporarily_out_of_state"=>false,
-  #   "is_tobacco_user"=>"unknown",
-  #   "language_code"=>nil,
-  #   "last_name"=>name.split[1],
-  #   "middle_name"=>nil,
-  #   "modifier_id"=>nil,
-  #   "name_pfx"=>nil,
-  #   "name_sfx"=>nil,
-  #   "no_dc_address"=>false,
-  #   "no_ssn"=>nil,
-  #   "race"=>nil,
-  #   "tracking_version"=>1,
-  #   "tribal_id"=>nil,
-  #   "updated_at"=>nil,
-  #   "updated_by"=>nil,
-  #   "updated_by_id"=>nil,
-  #   "user_id"=> nil,
-  #   "version"=>1}
 
 
   @client[:people].insert_one p0
@@ -616,11 +516,7 @@ fam = {
       "family_member_id"=> family_member_id_1,
       "is_subscriber"=>false,
       "updated_at"=>nil },
-      # {    "_id" => BSON::ObjectId.new,
-      # "created_at"=>nil,
-      # "family_member_id"=> family_member_id_3,
-      # "is_subscriber"=>false,
-      # "updated_at"=>nil }
+
     ],
    "created_at"=>nil,
    "is_determination_split_household"=>false,
@@ -676,7 +572,7 @@ family_1 = {
 "e_case_id"=>nil,
 "e_status_code"=>nil,
 "family_members"=>
-[{ "_id" => family_member_id_0,
+[{ "_id" => family_member_id_2,
   "broker_role_id"=>nil,
   "created_at"=>nil,
   "former_family_id"=>nil,
@@ -686,40 +582,8 @@ family_1 = {
   "is_primary_applicant"=>true,
   "person_id"=> p1['_id'],
   "updated_at"=>nil,
-  "updated_by_id"=>nil},
-  { "_id" => family_member_id_1,
-  "broker_role_id"=>nil,
-  "created_at"=>nil,
-  "former_family_id"=>nil,
-  "is_active"=>true,
-  "is_consent_applicant"=>false,
-  "is_coverage_applicant"=>true,
-  "is_primary_applicant"=>false,
-  "person_id"=> p1['_id'],
-  "updated_at"=>nil,
-  "updated_by_id"=>nil},
-  # { "_id" => family_member_id_2,
-  # "broker_role_id"=>nil,
-  # "created_at"=>nil,
-  # "former_family_id"=>nil,
-  # "is_active"=>true,
-  # "is_consent_applicant"=>false,
-  # "is_coverage_applicant"=>true,
-  # "is_primary_applicant"=>false,
-  # "person_id"=> p2['_id'],
-  # "updated_at"=>nil,
-  # "updated_by_id"=>nil},
-  # { "_id" => family_member_id_3,
-  # "broker_role_id"=>nil,
-  # "created_at"=>nil,
-  # "former_family_id"=>nil,
-  # "is_active"=>true,
-  # "is_consent_applicant"=>false,
-  # "is_coverage_applicant"=>true,
-  # "is_primary_applicant"=>false,
-  # "person_id"=> p3['_id'],
-  # "updated_at"=>nil,
-  # "updated_by_id"=>nil}
+  "updated_by_id"=>nil}
+
 ],
 "haven_app_id"=>nil,
 "hbx_assigned_id"=>10002,
@@ -732,24 +596,15 @@ family_1 = {
      "coverage_household_members"=>
       [{    "_id" => BSON::ObjectId.new,
         "created_at"=>nil,
-        "family_member_id"=> family_member_id_3,
+        "family_member_id"=> family_member_id_2,
         "is_subscriber"=>true,
-        "updated_at"=>nil }
-        # {    "_id" => BSON::ObjectId.new,
-        # "created_at"=>nil,
-        # "family_member_id"=> family_member_id_1,
-        # "is_subscriber"=>false,
-        # "updated_at"=>nil },
-        # {    "_id" => BSON::ObjectId.new,
-        # "created_at"=>nil,
-        # "family_member_id"=> family_member_id_2,
-        # "is_subscriber"=>false,
-        # "updated_at"=>nil },
-        # {    "_id" => BSON::ObjectId.new,
-        # "created_at"=>nil,
-        # "family_member_id"=> family_member_id_3,
-        # "is_subscriber"=>false,
-        # "updated_at"=>nil }
+        "updated_at"=>nil },
+        {    "_id" => BSON::ObjectId.new,
+          "created_at"=>nil,
+          "family_member_id"=> family_member_id_3,
+          "is_subscriber"=>true,
+          "updated_at"=>nil }
+
       ],
      "created_at"=>nil,
      "is_determination_split_household"=>false,
@@ -809,7 +664,6 @@ end
     family_member_id_0 = BSON::ObjectId.new
     family_member_id_1 = BSON::ObjectId.new
     family_member_id_2 = BSON::ObjectId.new
-    # counter = ln
     @ce_0 = {"_id" => BSON::ObjectId.new,
       "_type" => 'census_employee',
       "aasm_state"=>"eligible",
@@ -821,9 +675,9 @@ end
         "employee_relationship"=>"spouse",
         "employer_assigned_family_id"=>nil,
         "encrypted_ssn"=>get_ssn,
-        "first_name"=>"Jane",
-        "gender"=>"female",
-        "last_name"=>"Jetson",
+        "first_name"=>name_1.split[0],
+        "gender"=>get_gender,
+        "last_name"=>name_1.split[1],
         "middle_name"=>nil,
         "name_sfx"=>nil,
         "updated_at"=>nil},
@@ -834,7 +688,7 @@ end
         "employer_assigned_family_id"=>nil,
         "encrypted_ssn"=>get_ssn,
         "first_name"=>name_2.split[0],
-        "gender"=>"female",
+        "gender"=>get_gender,
         "last_name"=>name_2.split[1],
         "middle_name"=>nil,
         "name_sfx"=>nil,
@@ -869,43 +723,6 @@ end
         "_type" => 'census_employee',
         "aasm_state"=>"eligible",
         "autocomplete"=> nil,
-        # "census_dependents"=>
-        # [{ "_id" => BSON::ObjectId.new,
-        #   "created_at"=>nil,
-        #   "dob"=> fifty,
-        #   "employee_relationship"=>"spouse",
-        #   "employer_assigned_family_id"=>nil,
-        #   "encrypted_ssn"=>get_ssn,
-        #   "first_name"=>"Jane",
-        #   "gender"=>"female",
-        #   "last_name"=>"Jetson",
-        #   "middle_name"=>nil,
-        #   "name_sfx"=>nil,
-        #   "updated_at"=>nil},
-        #   { "_id" => BSON::ObjectId.new,
-        #   "created_at"=>nil,
-        #   "dob"=> young,
-        #   "employee_relationship"=>"child_under_26",
-        #   "employer_assigned_family_id"=>nil,
-        #   "encrypted_ssn"=>get_ssn,
-        #   "first_name"=>"Judy",
-        #   "gender"=>"female",
-        #   "last_name"=>"Jetson",
-        #   "middle_name"=>nil,
-        #   "name_sfx"=>nil,
-        #   "updated_at"=>nil},
-        #   { "_id" => BSON::ObjectId.new,
-        #   "created_at"=>nil,
-        #   "dob"=>young,
-        #   "employee_relationship"=>"child_under_26",
-        #   "employer_assigned_family_id"=>nil,
-        #   "encrypted_ssn"=>get_ssn,
-        #   "first_name"=>"Elroy",
-        #   "gender"=>"male",
-        #   "last_name"=>"Jetson",
-        #   "middle_name"=>nil,
-        #   "name_sfx"=>nil,
-        #   "updated_at"=> nil}],
         "cobra_begin_date"=>nil,
         "coverage_terminated_on"=>young,
         "created_at"=>nil,
@@ -952,20 +769,20 @@ end
     "created_at"=>nil,
     "kind"=>"spouse",
     "updated_at"=>nil,
-    "predecessor_id" => p0_id,
-     "successor_id"=> p2_id, 
+    "predecessor_id" => p2_id,
+     "successor_id"=> p0_id, 
      "family_id" => family_id_0},
      {"_id"=>BSON::ObjectId.new,
      "created_at"=>nil,
-     "kind"=>"spouse",
+     "kind"=>"child",
      "updated_at"=>nil,
-     "predecessor_id" => p0_id,
-      "successor_id"=> p3_id, 
+     "predecessor_id" => p3_id,
+      "successor_id"=> p0_id, 
       "family_id" => family_id_0}],
   "ethnicity"=>nil,
   "first_name"=>name_0.split[0],
   "full_name"=>name_0,
-  "gender"=>"female",
+  "gender"=>get_gender,
   "general_agency_contact_id"=>nil,
   "hbx_id"=>nil,
   "is_active"=>true,
@@ -1021,15 +838,7 @@ end
     "ethnicity"=>nil,
     "first_name"=>name_1.split[0],
     "full_name"=>name_1,
-    "person_relationships"=>
-    [{"_id"=>BSON::ObjectId.new,
-      "created_at"=>nil,
-      "kind"=>"spouse",
-      "updated_at"=>nil,
-      "predecessor_id" => p0_id,
-       "successor_id"=> p2_id, 
-       "family_id" => family_id_0}],
-    "gender"=>"female",
+    "gender"=>get_gender,
     "general_agency_contact_id"=>nil,
     "hbx_id"=>nil,
     "is_active"=>true,
@@ -1085,16 +894,16 @@ end
     "ethnicity"=>nil,
     "first_name"=>name_2.split[0],
     "full_name"=>name_2,
-    "gender"=>"female",
+    "gender"=>get_gender,
     "general_agency_contact_id"=>nil,
     "hbx_id"=>nil,
     "person_relationships"=>
     [{"_id"=>BSON::ObjectId.new,
       "created_at"=>nil,
-      "kind"=>"child",
+      "kind"=>"spouse",
       "updated_at"=>nil,
-      "predecessor_id" =>p0_id,
-      "successor_id"=> p2_id, 
+      "predecessor_id" =>p2_id,
+      "successor_id"=> p0_id, 
       "family_id" => family_id_0}],
     "is_active"=>true,
     "is_disabled"=>nil,
@@ -1120,8 +929,6 @@ end
     "user_id"=> nil,
     "version"=>1}
 
-
-
   p3 = {
     "_id" => p3_id,
     "alternate_name"=>nil,
@@ -1139,12 +946,11 @@ end
     [{"_id"=>BSON::ObjectId.new,
       "created_at"=>nil,
       "kind"=>"child",
-      "relative_id"=>p0_id,
       "updated_at"=>nil,
-      "predecessor_id" =>p0['_id'],
-      "successor_id"=> p3_id, 
+      "predecessor_id" =>p3_id,
+      "successor_id"=> p0_id, 
       "family_id" => family_id_0}],
-    "gender"=>"female",
+    "gender"=>get_gender,
     "general_agency_contact_id"=>nil,
     "hbx_id"=>nil,
     "is_active"=>true,
@@ -1227,17 +1033,6 @@ end
 "person_id"=> p3['_id'],
 "updated_at"=>nil,
 "updated_by_id"=>nil},
-# { "_id" => family_member_id_3,
-# "broker_role_id"=>nil,
-# "created_at"=>nil,
-# "former_family_id"=>nil,
-# "is_active"=>true,
-# "is_consent_applicant"=>false,
-# "is_coverage_applicant"=>true,
-# "is_primary_applicant"=>false,
-# "person_id"=> p3['_id'],
-# "updated_at"=>nil,
-# "updated_by_id"=>nil}
 ],
 "haven_app_id"=>nil,
 "hbx_assigned_id"=>10002,
@@ -1263,11 +1058,7 @@ end
       "family_member_id"=> family_member_id_2,
       "is_subscriber"=>false,
       "updated_at"=>nil }
-      # {    "_id" => BSON::ObjectId.new,
-      # "created_at"=>nil,
-      # "family_member_id"=> family_member_id_3,
-      # "is_subscriber"=>false,
-      # "updated_at"=>nil }
+
     ],
    "created_at"=>nil,
    "is_determination_split_household"=>false,
@@ -1323,7 +1114,7 @@ family_1 = {
 "e_case_id"=>nil,
 "e_status_code"=>nil,
 "family_members"=>
-[{ "_id" => family_member_id_0,
+[{ "_id" => family_member_id_1,
   "broker_role_id"=>nil,
   "created_at"=>nil,
   "former_family_id"=>nil,
@@ -1333,40 +1124,8 @@ family_1 = {
   "is_primary_applicant"=>true,
   "person_id"=> p1['_id'],
   "updated_at"=>nil,
-  "updated_by_id"=>nil},
-  { "_id" => family_member_id_1,
-  "broker_role_id"=>nil,
-  "created_at"=>nil,
-  "former_family_id"=>nil,
-  "is_active"=>true,
-  "is_consent_applicant"=>false,
-  "is_coverage_applicant"=>true,
-  "is_primary_applicant"=>false,
-  "person_id"=> p1['_id'],
-  "updated_at"=>nil,
-  "updated_by_id"=>nil},
-  { "_id" => family_member_id_2,
-  "broker_role_id"=>nil,
-  "created_at"=>nil,
-  "former_family_id"=>nil,
-  "is_active"=>true,
-  "is_consent_applicant"=>false,
-  "is_coverage_applicant"=>true,
-  "is_primary_applicant"=>false,
-  "person_id"=> p2['_id'],
-  "updated_at"=>nil,
-  "updated_by_id"=>nil},
-  # { "_id" => family_member_id_2,
-  # "broker_role_id"=>nil,
-  # "created_at"=>nil,
-  # "former_family_id"=>nil,
-  # "is_active"=>true,
-  # "is_consent_applicant"=>false,
-  # "is_coverage_applicant"=>true,
-  # "is_primary_applicant"=>false,
-  # "person_id"=> p3['_id'],
-  # "updated_at"=>nil,
-  # "updated_by_id"=>nil}
+  "updated_by_id"=>nil}
+
 ],
 "haven_app_id"=>nil,
 "hbx_assigned_id"=>10002,
@@ -1382,21 +1141,7 @@ family_1 = {
         "family_member_id"=> family_member_id_3,
         "is_subscriber"=>true,
         "updated_at"=>nil }
-        # {    "_id" => BSON::ObjectId.new,
-        # "created_at"=>nil,
-        # "family_member_id"=> family_member_id_1,
-        # "is_subscriber"=>false,
-        # "updated_at"=>nil },
-        # {    "_id" => BSON::ObjectId.new,
-        # "created_at"=>nil,
-        # "family_member_id"=> family_member_id_2,
-        # "is_subscriber"=>false,
-        # "updated_at"=>nil },
-        # {    "_id" => BSON::ObjectId.new,
-        # "created_at"=>nil,
-        # "family_member_id"=> family_member_id_3,
-        # "is_subscriber"=>false,
-        # "updated_at"=>nil }
+
       ],
      "created_at"=>nil,
      "is_determination_split_household"=>false,
@@ -1471,9 +1216,9 @@ family_1 = {
         "employee_relationship"=>"spouse",
         "employer_assigned_family_id"=>nil,
         "encrypted_ssn"=>get_ssn,
-        "first_name"=>"Jane",
-        "gender"=>"female",
-        "last_name"=>"Jetson",
+        "first_name"=>name_1.split[0],
+        "gender"=>get_gender,
+        "last_name"=>name_1.split[1],
         "middle_name"=>nil,
         "name_sfx"=>nil,
         "updated_at"=>nil},
@@ -1484,11 +1229,35 @@ family_1 = {
         "employer_assigned_family_id"=>nil,
         "encrypted_ssn"=>get_ssn,
         "first_name"=>name_2.split[0],
-        "gender"=>"female",
+        "gender"=>get_gender,
         "last_name"=>name_2.split[1],
         "middle_name"=>nil,
         "name_sfx"=>nil,
-        "updated_at"=>nil}],
+        "updated_at"=>nil},
+        { "_id" => BSON::ObjectId.new,
+          "created_at"=>nil,
+          "dob"=> young,
+          "employee_relationship"=>"child_under_26",
+          "employer_assigned_family_id"=>nil,
+          "encrypted_ssn"=>get_ssn,
+          "first_name"=>name_3.split[0],
+          "gender"=>get_gender,
+          "last_name"=>name_3.split[1],
+          "middle_name"=>nil,
+          "name_sfx"=>nil,
+          "updated_at"=>nil},
+          { "_id" => BSON::ObjectId.new,
+            "created_at"=>nil,
+            "dob"=> young,
+            "employee_relationship"=>"child_under_26",
+            "employer_assigned_family_id"=>nil,
+            "encrypted_ssn"=>get_ssn,
+            "first_name"=>name_4.split[0],
+            "gender"=>get_gender,
+            "last_name"=>name_4.split[1],
+            "middle_name"=>nil,
+            "name_sfx"=>nil,
+            "updated_at"=>nil}],
       "cobra_begin_date"=>nil,
       "coverage_terminated_on"=>nil,
       "created_at"=>nil,
@@ -1526,9 +1295,9 @@ family_1 = {
           "employee_relationship"=>"spouse",
           "employer_assigned_family_id"=>nil,
           "encrypted_ssn"=>get_ssn,
-          "first_name"=>"Jane",
-          "gender"=>"female",
-          "last_name"=>"Jetson",
+          "first_name"=>name_1.split[0],
+          "gender"=>get_gender,
+          "last_name"=>name_1.split[1],
           "middle_name"=>nil,
           "name_sfx"=>nil,
           "updated_at"=>nil},
@@ -1538,9 +1307,9 @@ family_1 = {
           "employee_relationship"=>"child_under_26",
           "employer_assigned_family_id"=>nil,
           "encrypted_ssn"=>get_ssn,
-          "first_name"=>"Judy",
-          "gender"=>"female",
-          "last_name"=>"Jetson",
+          "first_name"=>name_2.split[0],
+          "gender"=>get_gender,
+          "last_name"=>name_2.split[1],
           "middle_name"=>nil,
           "name_sfx"=>nil,
           "updated_at"=>nil},
@@ -1550,9 +1319,9 @@ family_1 = {
           "employee_relationship"=>"child_under_26",
           "employer_assigned_family_id"=>nil,
           "encrypted_ssn"=>get_ssn,
-          "first_name"=>"Elroy",
+          "first_name"=>name_3.split[0],
           "gender"=>"male",
-          "last_name"=>"Jetson",
+          "last_name"=>name_3.split[1],
           "middle_name"=>nil,
           "name_sfx"=>nil,
           "updated_at"=> nil}],
@@ -1604,27 +1373,27 @@ family_1 = {
     "created_at"=>nil,
     "kind"=>"spouse",
     "updated_at"=>nil,
-    "predecessor_id" => p0_id,
-     "successor_id"=> p1_id, 
+    "predecessor_id" => p2_id,
+     "successor_id"=> p0_id, 
      "family_id" => family_id_0},
      {"_id"=>BSON::ObjectId.new,
      "created_at"=>nil,
-     "kind"=>"spouse",
+     "kind"=>"child",
      "updated_at"=>nil,
-     "predecessor_id" => p0_id,
-      "successor_id"=> p2_id, 
+     "predecessor_id" => p3_id,
+      "successor_id"=> p0_id, 
       "family_id" => family_id_0},
       {"_id"=>BSON::ObjectId.new,
         "created_at"=>nil,
-        "kind"=>"spouse",
+        "kind"=>"child",
         "updated_at"=>nil,
         "predecessor_id" => p0_id,
-         "successor_id"=> p3_id, 
+         "successor_id"=> p4_id, 
          "family_id" => family_id_0}],
   "ethnicity"=>nil,
   "first_name"=>name_0.split[0],
   "full_name"=>name_0,
-  "gender"=>"female",
+  "gender"=>get_gender,
   "general_agency_contact_id"=>nil,
   "hbx_id"=>nil,
   "is_active"=>true,
@@ -1680,7 +1449,7 @@ family_1 = {
     "ethnicity"=>nil,
     "first_name"=>name_1.split[0],
     "full_name"=>name_1,
-    "gender"=>"female",
+    "gender"=>get_gender,
     "general_agency_contact_id"=>nil,
     "hbx_id"=>nil,
     "is_active"=>true,
@@ -1736,16 +1505,16 @@ family_1 = {
     "ethnicity"=>nil,
     "first_name"=>name_2.split[0],
     "full_name"=>name_2,
-    "gender"=>"female",
+    "gender"=>get_gender,
     "general_agency_contact_id"=>nil,
     "hbx_id"=>nil,
     "person_relationships"=>
     [{"_id"=>BSON::ObjectId.new,
       "created_at"=>nil,
-      "kind"=>"child",
+      "kind"=>"spouse",
       "updated_at"=>nil,
-      "predecessor_id" =>p0_id,
-      "successor_id"=> p2_id, 
+      "predecessor_id" =>p2_id,
+      "successor_id"=> p0_id, 
       "family_id" => family_id_0}],
     "is_active"=>true,
     "is_disabled"=>nil,
@@ -1792,10 +1561,10 @@ family_1 = {
       "kind"=>"child",
       "relative_id"=>p0_id,
       "updated_at"=>nil,
-      "predecessor_id" =>p0['_id'],
-      "successor_id"=> p3_id, 
+      "predecessor_id" => p3_id,
+      "successor_id"=> p0_id, 
       "family_id" => family_id_0}],
-    "gender"=>"female",
+    "gender"=>get_gender,
     "general_agency_contact_id"=>nil,
     "hbx_id"=>nil,
     "is_active"=>true,
@@ -1835,7 +1604,16 @@ family_1 = {
     "ethnicity"=>nil,
     "first_name"=>name_4.split[0],
     "full_name"=>name_4,
-    "gender"=>"female",
+    "gender"=>get_gender,
+    "person_relationships"=>
+    [{"_id"=>BSON::ObjectId.new,
+      "created_at"=>nil,
+      "kind"=>"child",
+      "relative_id"=>p0_id,
+      "updated_at"=>nil,
+      "predecessor_id" =>p4_id,
+      "successor_id"=> p0_id, 
+      "family_id" => family_id_0}],
     "general_agency_contact_id"=>nil,
     "hbx_id"=>nil,
     "is_active"=>true,
@@ -2026,39 +1804,6 @@ family_1 = {
   "is_primary_applicant"=>true,
   "person_id"=> p1['_id'],
   "updated_at"=>nil,
-  "updated_by_id"=>nil},
-  { "_id" => family_member_id_1,
-  "broker_role_id"=>nil,
-  "created_at"=>nil,
-  "former_family_id"=>nil,
-  "is_active"=>true,
-  "is_consent_applicant"=>false,
-  "is_coverage_applicant"=>true,
-  "is_primary_applicant"=>false,
-  "person_id"=> p1['_id'],
-  "updated_at"=>nil,
-  "updated_by_id"=>nil},
-  { "_id" => family_member_id_2,
-  "broker_role_id"=>nil,
-  "created_at"=>nil,
-  "former_family_id"=>nil,
-  "is_active"=>true,
-  "is_consent_applicant"=>false,
-  "is_coverage_applicant"=>true,
-  "is_primary_applicant"=>false,
-  "person_id"=> p2['_id'],
-  "updated_at"=>nil,
-  "updated_by_id"=>nil},
-  { "_id" => family_member_id_3,
-  "broker_role_id"=>nil,
-  "created_at"=>nil,
-  "former_family_id"=>nil,
-  "is_active"=>true,
-  "is_consent_applicant"=>false,
-  "is_coverage_applicant"=>true,
-  "is_primary_applicant"=>false,
-  "person_id"=> p3['_id'],
-  "updated_at"=>nil,
   "updated_by_id"=>nil}
 ],
 "haven_app_id"=>nil,
@@ -2152,43 +1897,6 @@ family_1 = {
       "_type" => 'census_employee',
       "aasm_state"=>"eligible",
       "autocomplete"=> nil,
-      # "census_dependents"=>
-      # [{ "_id" => BSON::ObjectId.new,
-      #   "created_at"=>nil,
-      #   "dob"=> fifty,
-      #   "employee_relationship"=>"spouse",
-      #   "employer_assigned_family_id"=>nil,
-      #   "encrypted_ssn"=>get_ssn,
-      #   "first_name"=>"Jane",
-      #   "gender"=>"female",
-      #   "last_name"=>"Jetson",
-      #   "middle_name"=>nil,
-      #   "name_sfx"=>nil,
-      #   "updated_at"=>nil},
-      #   { "_id" => BSON::ObjectId.new,
-      #   "created_at"=>nil,
-      #   "dob"=> young,
-      #   "employee_relationship"=>"child_under_26",
-      #   "employer_assigned_family_id"=>nil,
-      #   "encrypted_ssn"=>get_ssn,
-      #   "first_name"=>"Judy",
-      #   "gender"=>"female",
-      #   "last_name"=>"Jetson",
-      #   "middle_name"=>nil,
-      #   "name_sfx"=>nil,
-      #   "updated_at"=>nil},
-      #   { "_id" => BSON::ObjectId.new,
-      #   "created_at"=>nil,
-      #   "dob"=>young,
-      #   "employee_relationship"=>"child_under_26",
-      #   "employer_assigned_family_id"=>nil,
-      #   "encrypted_ssn"=>get_ssn,
-      #   "first_name"=>"Elroy",
-      #   "gender"=>"male",
-      #   "last_name"=>"Jetson",
-      #   "middle_name"=>nil,
-      #   "name_sfx"=>nil,
-      #   "updated_at"=> nil}],
       "cobra_begin_date"=>nil,
       "coverage_terminated_on"=>nil,
       "created_at"=>nil,
@@ -2219,43 +1927,6 @@ family_1 = {
         "_type" => 'census_employee',
         "aasm_state"=>"eligible",
         "autocomplete"=> nil,
-        # "census_dependents"=>
-        # [{ "_id" => BSON::ObjectId.new,
-        #   "created_at"=>nil,
-        #   "dob"=> fifty,
-        #   "employee_relationship"=>"spouse",
-        #   "employer_assigned_family_id"=>nil,
-        #   "encrypted_ssn"=>get_ssn,
-        #   "first_name"=>"Jane",
-        #   "gender"=>"female",
-        #   "last_name"=>"Jetson",
-        #   "middle_name"=>nil,
-        #   "name_sfx"=>nil,
-        #   "updated_at"=>nil},
-        #   { "_id" => BSON::ObjectId.new,
-        #   "created_at"=>nil,
-        #   "dob"=> young,
-        #   "employee_relationship"=>"child_under_26",
-        #   "employer_assigned_family_id"=>nil,
-        #   "encrypted_ssn"=>get_ssn,
-        #   "first_name"=>"Judy",
-        #   "gender"=>"female",
-        #   "last_name"=>"Jetson",
-        #   "middle_name"=>nil,
-        #   "name_sfx"=>nil,
-        #   "updated_at"=>nil},
-        #   { "_id" => BSON::ObjectId.new,
-        #   "created_at"=>nil,
-        #   "dob"=>young,
-        #   "employee_relationship"=>"child_under_26",
-        #   "employer_assigned_family_id"=>nil,
-        #   "encrypted_ssn"=>get_ssn,
-        #   "first_name"=>"Elroy",
-        #   "gender"=>"male",
-        #   "last_name"=>"Jetson",
-        #   "middle_name"=>nil,
-        #   "name_sfx"=>nil,
-        #   "updated_at"=> nil}],
         "cobra_begin_date"=>nil,
         "coverage_terminated_on"=>young,
         "created_at"=>nil,
@@ -2284,8 +1955,6 @@ family_1 = {
 
   p0_id =  BSON::ObjectId.new
   p1_id = BSON::ObjectId.new
-  # p2_id = BSON::ObjectId.new
-  # p3_id = BSON::ObjectId.new
 
   p0 = {
     "_id" => p0_id,
@@ -2297,32 +1966,10 @@ family_1 = {
   "dob_check"=>nil,
   "employer_contact_id"=>nil,
   "encrypted_ssn"=> @ce_0['encrypted_ssn'],
-  # "person_relationships"=>
-  # [{"_id"=>BSON::ObjectId.new,
-  #   "created_at"=>nil,
-  #   "kind"=>"spouse",
-  #   "updated_at"=>nil,
-  #   "predecessor_id" => p0_id,
-  #    "successor_id"=> p1_id, 
-  #    "family_id" => family_id_0},
-  #    {"_id"=>BSON::ObjectId.new,
-  #    "created_at"=>nil,
-  #    "kind"=>"spouse",
-  #    "updated_at"=>nil,
-  #    "predecessor_id" => p0_id,
-  #     "successor_id"=> p2_id, 
-  #     "family_id" => family_id_0},
-  #     {"_id"=>BSON::ObjectId.new,
-  #     "created_at"=>nil,
-  #     "kind"=>"spouse",
-  #     "updated_at"=>nil,
-  #     "predecessor_id" => p0_id,
-  #      "successor_id"=> p3_id, 
-  #      "family_id" => family_id_0}],
   "ethnicity"=>nil,
   "first_name"=>name_0.split[0],
   "full_name"=>name_0,
-  "gender"=>"female",
+  "gender"=>get_gender,
   "general_agency_contact_id"=>nil,
   "hbx_id"=>nil,
   "is_active"=>true,
@@ -2378,15 +2025,7 @@ family_1 = {
     "ethnicity"=>nil,
     "first_name"=>name_1.split[0],
     "full_name"=>name_1,
-    # "person_relationships"=>
-    # [{"_id"=>BSON::ObjectId.new,
-    #   "created_at"=>nil,
-    #   "kind"=>"spouse",
-    #   "updated_at"=>nil,
-    #   "predecessor_id" => p0_id,
-    #    "successor_id"=> p1_id, 
-    #    "family_id" => family_id}],
-    "gender"=>"female",
+    "gender"=>get_gender,
     "general_agency_contact_id"=>nil,
     "hbx_id"=>nil,
     "is_active"=>true,
@@ -2429,110 +2068,11 @@ family_1 = {
       "updated_by_id"=>nil}],}
 
 
-  # p2 = {
-  #   "_id" => p2_id,
-  #   "alternate_name"=>nil,
-  #   "broker_agency_contact_id"=>nil,
-  #   "created_at"=>nil,
-  #   "date_of_death"=>nil,
-  #   "dob"=> @ce['census_dependents'][1]['dob'],
-  #   "dob_check"=>nil,
-  #   "employer_contact_id"=>nil,
-  #   "encrypted_ssn"=> @ce['census_dependents'][1]['encrypted_ssn'],
-  #   "ethnicity"=>nil,
-  #   "first_name"=>name.split[0],
-  #   "full_name"=>name,
-  #   "gender"=>"female",
-  #   "general_agency_contact_id"=>nil,
-  #   "hbx_id"=>nil,
-  #   "person_relationships"=>
-  #   [{"_id"=>BSON::ObjectId.new,
-  #     "created_at"=>nil,
-  #     "kind"=>"child",
-  #     "updated_at"=>nil,
-  #     "predecessor_id" =>p0_id,
-  #     "successor_id"=> p2_id, 
-  #     "family_id" => family_id}],
-  #   "is_active"=>true,
-  #   "is_disabled"=>nil,
-  #   "is_homeless"=>false,
-  #   "is_incarcerated"=>nil,
-  #   "is_physically_disabled"=>nil,
-  #   "is_temporarily_out_of_state"=>false,
-  #   "is_tobacco_user"=>"unknown",
-  #   "language_code"=>nil,
-  #   "last_name"=>name.split[1],
-  #   "middle_name"=>nil,
-  #   "modifier_id"=>nil,
-  #   "name_pfx"=>nil,
-  #   "name_sfx"=>nil,
-  #   "no_dc_address"=>false,
-  #   "no_ssn"=>nil,
-  #   "race"=>nil,
-  #   "tracking_version"=>1,
-  #   "tribal_id"=>nil,
-  #   "updated_at"=>nil,
-  #   "updated_by"=>nil,
-  #   "updated_by_id"=>nil,
-  #   "user_id"=> nil,
-  #   "version"=>1}
-
-
-
-  # p3 = {
-  #   "_id" => p3_id,
-  #   "alternate_name"=>nil,
-  #   "broker_agency_contact_id"=>nil,
-  #   "created_at"=>nil,
-  #   "date_of_death"=>nil,
-  #   "dob"=> @ce['census_dependents'][2]['dob'],
-  #   "dob_check"=>nil,
-  #   "employer_contact_id"=>nil,
-  #   "encrypted_ssn"=> @ce['census_dependents'][2]['encrypted_ssn'],
-  #   "ethnicity"=>nil,
-  #   "first_name"=>name.split[0],
-  #   "full_name"=>name,
-  #   "person_relationships"=>
-  #   [{"_id"=>BSON::ObjectId.new,
-  #     "created_at"=>nil,
-  #     "kind"=>"child",
-  #     "relative_id"=>p0_id,
-  #     "updated_at"=>nil,
-  #     "predecessor_id" =>p0['_id'],
-  #     "successor_id"=> p3_id, 
-  #     "family_id" => family_id}],
-  #   "gender"=>"female",
-  #   "general_agency_contact_id"=>nil,
-  #   "hbx_id"=>nil,
-  #   "is_active"=>true,
-  #   "is_disabled"=>nil,
-  #   "is_homeless"=>false,
-  #   "is_incarcerated"=>nil,
-  #   "is_physically_disabled"=>nil,
-  #   "is_temporarily_out_of_state"=>false,
-  #   "is_tobacco_user"=>"unknown",
-  #   "language_code"=>nil,
-  #   "last_name"=>name.split[1],
-  #   "middle_name"=>nil,
-  #   "modifier_id"=>nil,
-  #   "name_pfx"=>nil,
-  #   "name_sfx"=>nil,
-  #   "no_dc_address"=>false,
-  #   "no_ssn"=>nil,
-  #   "race"=>nil,
-  #   "tracking_version"=>1,
-  #   "tribal_id"=>nil,
-  #   "updated_at"=>nil,
-  #   "updated_by"=>nil,
-  #   "updated_by_id"=>nil,
-  #   "user_id"=> nil,
-  #   "version"=>1}
 
 
   @client[:people].insert_one p0
   @client[:people].insert_one p1
-  # @client[:people].insert_one p2
-  # @client[:people].insert_one p3
+
 
   @client[:census_members].insert_one @ce_0
   @client[:census_members].insert_one @ce_1
@@ -2541,7 +2081,6 @@ family_1 = {
   family_member_id_0 = BSON::ObjectId.new
   family_member_id_1 = BSON::ObjectId.new
   family_member_id_2 = BSON::ObjectId.new
-  # family_member_id_3 = BSON::ObjectId.new
 
 
   family_0 = {
@@ -2562,39 +2101,6 @@ family_1 = {
 "person_id"=> p0['_id'],
 "updated_at"=>nil,
 "updated_by_id"=>nil}
-# { "_id" => family_member_id_1,
-# "broker_role_id"=>nil,
-# "created_at"=>nil,
-# "former_family_id"=>nil,
-# "is_active"=>true,
-# "is_consent_applicant"=>false,
-# "is_coverage_applicant"=>true,
-# "is_primary_applicant"=>false,
-# "person_id"=> p1['_id'],
-# "updated_at"=>nil,
-# "updated_by_id"=>nil},
-# { "_id" => family_member_id_2,
-# "broker_role_id"=>nil,
-# "created_at"=>nil,
-# "former_family_id"=>nil,
-# "is_active"=>true,
-# "is_consent_applicant"=>false,
-# "is_coverage_applicant"=>true,
-# "is_primary_applicant"=>false,
-# "person_id"=> p2['_id'],
-# "updated_at"=>nil,
-# "updated_by_id"=>nil},
-# { "_id" => family_member_id_3,
-# "broker_role_id"=>nil,
-# "created_at"=>nil,
-# "former_family_id"=>nil,
-# "is_active"=>true,
-# "is_consent_applicant"=>false,
-# "is_coverage_applicant"=>true,
-# "is_primary_applicant"=>false,
-# "person_id"=> p3['_id'],
-# "updated_at"=>nil,
-# "updated_by_id"=>nil}
 ],
 "haven_app_id"=>nil,
 "hbx_assigned_id"=>10002,
@@ -2610,21 +2116,6 @@ family_1 = {
       "family_member_id"=> family_member_id_0,
       "is_subscriber"=>true,
       "updated_at"=>nil }
-      # {    "_id" => BSON::ObjectId.new,
-      # "created_at"=>nil,
-      # "family_member_id"=> family_member_id_1,
-      # "is_subscriber"=>false,
-      # "updated_at"=>nil },
-      # {    "_id" => BSON::ObjectId.new,
-      # "created_at"=>nil,
-      # "family_member_id"=> family_member_id_2,
-      # "is_subscriber"=>false,
-      # "updated_at"=>nil },
-      # {    "_id" => BSON::ObjectId.new,
-      # "created_at"=>nil,
-      # "family_member_id"=> family_member_id_3,
-      # "is_subscriber"=>false,
-      # "updated_at"=>nil }
     ],
    "created_at"=>nil,
    "is_determination_split_household"=>false,
@@ -2680,7 +2171,7 @@ family_1 = {
 "e_case_id"=>nil,
 "e_status_code"=>nil,
 "family_members"=>
-[{ "_id" => family_member_id_0,
+[{ "_id" => family_member_id_1,
   "broker_role_id"=>nil,
   "created_at"=>nil,
   "former_family_id"=>nil,
@@ -2688,42 +2179,10 @@ family_1 = {
   "is_consent_applicant"=>false,
   "is_coverage_applicant"=>true,
   "is_primary_applicant"=>true,
-  "person_id"=> p0['_id'],
+  "person_id"=> p1['_id'],
   "updated_at"=>nil,
   "updated_by_id"=>nil}
-  # { "_id" => family_member_id_1,
-  # "broker_role_id"=>nil,
-  # "created_at"=>nil,
-  # "former_family_id"=>nil,
-  # "is_active"=>true,
-  # "is_consent_applicant"=>false,
-  # "is_coverage_applicant"=>true,
-  # "is_primary_applicant"=>false,
-  # "person_id"=> p1['_id'],
-  # "updated_at"=>nil,
-  # "updated_by_id"=>nil},
-  # { "_id" => family_member_id_2,
-  # "broker_role_id"=>nil,
-  # "created_at"=>nil,
-  # "former_family_id"=>nil,
-  # "is_active"=>true,
-  # "is_consent_applicant"=>false,
-  # "is_coverage_applicant"=>true,
-  # "is_primary_applicant"=>false,
-  # "person_id"=> p2['_id'],
-  # "updated_at"=>nil,
-  # "updated_by_id"=>nil},
-  # { "_id" => family_member_id_3,
-  # "broker_role_id"=>nil,
-  # "created_at"=>nil,
-  # "former_family_id"=>nil,
-  # "is_active"=>true,
-  # "is_consent_applicant"=>false,
-  # "is_coverage_applicant"=>true,
-  # "is_primary_applicant"=>false,
-  # "person_id"=> p3['_id'],
-  # "updated_at"=>nil,
-  # "updated_by_id"=>nil}
+
 ],
 "haven_app_id"=>nil,
 "hbx_assigned_id"=>10002,
@@ -2739,21 +2198,7 @@ family_1 = {
         "family_member_id"=> family_member_id_0,
         "is_subscriber"=>true,
         "updated_at"=>nil }
-        # {    "_id" => BSON::ObjectId.new,
-        # "created_at"=>nil,
-        # "family_member_id"=> family_member_id_1,
-        # "is_subscriber"=>false,
-        # "updated_at"=>nil },
-        # {    "_id" => BSON::ObjectId.new,
-        # "created_at"=>nil,
-        # "family_member_id"=> family_member_id_2,
-        # "is_subscriber"=>false,
-        # "updated_at"=>nil },
-        # {    "_id" => BSON::ObjectId.new,
-        # "created_at"=>nil,
-        # "family_member_id"=> family_member_id_3,
-        # "is_subscriber"=>false,
-        # "updated_at"=>nil }
+
       ],
      "created_at"=>nil,
      "is_determination_split_household"=>false,
@@ -2830,6 +2275,11 @@ family_1 = {
       name_2 = Faker::Name.name
       name_3 = Faker::Name.name
       name_4 = Faker::Name.name
+      name_5 = Faker::Name.name
+      name_6 = Faker::Name.name
+      name_7 = Faker::Name.name
+      name_8 = Faker::Name.name
+      name_9 = Faker::Name.name
       family_id_0 = BSON::ObjectId.new
       family_id_1 = BSON::ObjectId.new
       family_id_2 = BSON::ObjectId.new
@@ -2838,21 +2288,21 @@ family_1 = {
       if @counter == 0
         if @sampler == 0 
           spouse_and_kid(ep,age,name_0,name_1,name_2,name_3,family_id_0,family_id_1, "active")
-          spouse_and_kid(ep,age,name_3,name_2,name_1,name_0,family_id_2,family_id_3, "retired")
+          spouse_and_kid(ep,age,name_4,name_5,name_6,name_7,family_id_2,family_id_3, "retired")
          @sampler = 1
         else 
-          big_fam(ep,age,name_0,name_1,name_2,name_3,name_4,family_id_0,family_id_1,"active")
-          big_fam(ep,age,name_4,name_3,name_2,name_1,name_0,family_id_2,family_id_3, "retired")
+          big_fam(ep,age,name_8,name_9,name_0,name_1,name_2,family_id_0,family_id_1,"active")
+          big_fam(ep,age,name_3,name_4,name_5,name_6,name_7,family_id_2,family_id_3, "retired")
          @sampler = 0 
         end
          @counter  = 1
       elsif @counter == 1 
-          spouse_only(ep,age,name_0,name_1,name_2,family_id_2,family_id_3,"active") 
-          spouse_only(ep,age,name_2,name_1,name_0,family_id_0,family_id_1,"retired") 
+          spouse_only(ep,age,name_8,name_9,name_0,family_id_2,family_id_3,"active") 
+          spouse_only(ep,age,name_1,name_2,name_3,family_id_0,family_id_1,"retired") 
         @counter = 2
       elsif @counter == 2
-          solo(ep,age,name_0,name_1,family_id_0,family_id_1,"active") 
-          solo(ep,age,name_1,name_0,family_id_2,family_id_3,"retired") 
+          solo(ep,age,name_4,name_5,family_id_0,family_id_1,"active") 
+          solo(ep,age,name_6,name_7,family_id_2,family_id_3,"retired") 
         @counter = 0
         end
       end
@@ -2865,25 +2315,4 @@ family_1 = {
     seed = OpmSeed.new
     
     seed.build_orgs 
-    # seed.get_ee_count 
     seed.build_people
-
-  #  ar  = Family.all.map(&:family_members).compact.map(&:count)
-    #   one = 0
-    # two = 0
-    # three = 0
-    # four  = 0
-    # ar.each{|num|one+=1 if num == 1}
-    # ar.each{|num|two+=1 if num == 2}
-
-    # ar.each{|num|three+=1 if num == 3}
-
-    # ar.each{|num|four+=1 if num == 4}
-# puts "one =  #{ar.count/one}"
-# puts "two =  #{ar.count/two}"
-# puts "three =  #{ar.count/three}"
-
-# two
-# three
-# puts "ar count  = #{ar.count}"
-# four

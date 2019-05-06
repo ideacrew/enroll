@@ -62,9 +62,8 @@ gem 'sprockets', '~> 2.12.3'
 gem 'symmetric-encryption', '~> 3.6.0'
 gem 'therubyracer', platforms: :ruby
 gem 'turbolinks','2.5.3'
-gem 'uglifier', '>= 1.3.0', :require => 'uglifier'
-gem 'faker', :git => 'https://github.com/stympy/faker.git', :branch => 'master'
-
+gem 'uglifier', '>= 1.3.0'
+gem 'faker', '~> 1.8', '>= 1.8.7'
 gem 'virtus'
 gem 'wicked_pdf', '1.0.6'
 gem 'wkhtmltopdf-binary-edge', '~> 0.12.3.0'
