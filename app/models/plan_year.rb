@@ -1021,7 +1021,7 @@ class PlanYear
       transitions from: :renewing_draft, to: :renewing_draft,     :guard => :is_application_invalid?
       transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :zero_employees_on_roster]
       transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_eligible?, :after => [:zero_employees_on_roster]
-      transitions from: :renewing_draft, to: :renewing_publish_pending, :after => :notify_employee_of_renewing_employer_ineligibility
+      transitions from: :renewing_draft, to: :renewing_publish_pending
     end
 
     # Employer requests review of invalid application determination
@@ -1331,19 +1331,6 @@ class PlanYear
     end
   end
 
-  #notice will be sent to employees when a renewing employer has his primary office address outside of DC.
-  def notify_employee_of_renewing_employer_ineligibility
-    return true if benefit_groups.any?{|bg| bg.is_congress?}
-    if application_eligibility_warnings.include?(:primary_office_location)
-      self.employer_profile.census_employees.non_terminated.each do |ce|
-        begin
-          ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notify_employee_of_renewing_employer_ineligibility")
-        rescue Exception => e
-          Rails.logger.error { "Unable to deliver employee employer renewal denial notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
-        end
-      end
-    end
-  end
 
   # def initial_employer_open_enrollment_completed
   #   #also check if minimum participation and non owner conditions are met by ER.
@@ -1355,6 +1342,16 @@ class PlanYear
   #   end
   # end
 
+  def initial_employer_denial_notice
+    return true if benefit_groups.any?{|bg| bg.is_congress?}
+    if (application_eligibility_warnings.include?(:primary_office_location) || application_eligibility_warnings.include?(:fte_count))
+      begin
+        self.employer_profile.trigger_notices("initial_employer_denial", "acapi_trigger" =>  true)
+      rescue Exception => e
+        Rails.logger.error { "Unable to deliver employer initial denial notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
+      end
+    end
+  end
 
   # def renewal_employer_open_enrollment_completed
   #   return true if benefit_groups.any?{|bg| bg.is_congress?}

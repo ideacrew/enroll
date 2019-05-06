@@ -33,11 +33,11 @@ module Observers
         if new_model_event.event_key == :ineligible_renewal_application_submitted
           if plan_year.application_eligibility_warnings.include?(:primary_office_location)
             deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "employer_renewal_eligibility_denial_notice")
-            # plan_year.employer_profile.census_employees.non_terminated.each do |ce|
-            #   if ce.employee_role.present?
-            #     deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "termination_of_employers_health_coverage")
-            #   end
-            # end
+            plan_year.employer_profile.census_employees.non_terminated.each do |ce|
+              if ce.employee_role.present?
+                deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "termination_of_employers_health_coverage")
+              end
+            end
           end
         end
 
@@ -172,14 +172,13 @@ module Observers
       end
 
       deliver(recipient: hbx_enrollment.census_employee.employee_role, event_object: hbx_enrollment, notice_event: "employee_waiver_confirmation") if new_model_event.event_key == :employee_waiver_confirmation
-
       if new_model_event.event_key == :employee_coverage_termination
         if hbx_enrollment.is_shop? && (CensusEmployee::EMPLOYMENT_ACTIVE_STATES - CensusEmployee::PENDING_STATES).include?(hbx_enrollment.census_employee.aasm_state)
           plan_year = hbx_enrollment.benefit_group.plan_year
           # don't trigger following notices when employer terminates plan year
           if !(plan_year.termination_pending? || plan_year.terminated?)
             deliver(recipient: hbx_enrollment.employer_profile, event_object: hbx_enrollment, notice_event: "employer_notice_for_employee_coverage_termination")
-            deliver(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "employee_notice_for_employee_coverage_termination")
+            deliver(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "employee_notice_for_employee_coverage_termination") if hbx_enrollment.terminate_reason.present? #do not trigger when EE waives coverage
           end
         end
       end

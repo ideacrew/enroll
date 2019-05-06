@@ -11,12 +11,22 @@ RSpec.describe 'ModelEvents::EmployeeWaiverConfirmation', dbclean: :around_each 
   let!(:employer_profile) { FactoryGirl.create(:employer_profile, organization: organization) }
   let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile, first_name: person.first_name, last_name: person.last_name) }
   let!(:employee_role) { FactoryGirl.create(:employee_role, employer_profile: employer_profile, census_employee_id: census_employee.id, person: person) }
-  let!(:model_instance) { FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, 
+  let!(:parent_enrollment){ FactoryGirl.create(:hbx_enrollment,
+    aasm_state: 'coverage_termination_pending',
+    household: family.active_household,
+    employee_role_id: employee_role.id,
+    terminated_on: TimeKeeper.date_of_record.end_of_month
+    )}
+  let!(:model_instance) { FactoryGirl.create(:hbx_enrollment,
+    :with_enrollment_members, 
     household: family.active_household,
     employee_role_id: employee_role.id,
     benefit_group_id: benefit_group.id,
     aasm_state: "shopping",
-    benefit_group_assignment_id: benefit_group_assignment.id) }
+    plan_id: "",
+    benefit_group_assignment_id: benefit_group_assignment.id,
+    predecessor_enrollment_id: parent_enrollment.id
+    )}
 
   describe "when an employee successfully terminates employer sponsored coverage" do
 
@@ -49,11 +59,10 @@ RSpec.describe 'ModelEvents::EmployeeWaiverConfirmation', dbclean: :around_each 
           "employee_profile.employer_name",
           "employee_profile.enrollment.employee_first_name",
           "employee_profile.enrollment.employee_last_name",
-          "employee_profile.enrollment.coverage_kind",
-          "employee_profile.enrollment.enrolled_count",
-          "employee_profile.enrollment.plan_name",
-          "employee_profile.enrollment.coverage_end_on"
-
+          "employee_profile.enrollment.waiver_effective_on",
+          "employee_profile.enrollment.waiver_plan_name",
+          "employee_profile.enrollment.waiver_enrolled_count",
+          "employee_profile.enrollment.waiver_coverage_end_on"
         ]
       }
 
@@ -91,16 +100,34 @@ RSpec.describe 'ModelEvents::EmployeeWaiverConfirmation', dbclean: :around_each 
         expect(merge_model.enrollment.employee_last_name).to eq model_instance.census_employee.last_name
       end
 
-      it "should return enrollment coverage_kind" do
-        expect(merge_model.enrollment.coverage_kind).to eq model_instance.coverage_kind
+      it "should return enrollment effective_on" do
+        expect(merge_model.enrollment.waiver_effective_on).to eq parent_enrollment.terminated_on.next_day.strftime('%m/%d/%Y')
       end
 
-      it "should return enrollment covered dependents" do
-        expect(merge_model.enrollment.enrolled_count).to eq model_instance.humanized_dependent_summary.to_s
+      context "when waiver has a parent enrollment" do
+
+        it "should return enrollment plan_name" do
+          expect(merge_model.enrollment.waiver_plan_name).to eq parent_enrollment.plan.name
+        end
+
+        it "should return enrollment covered dependents" do
+          expect(merge_model.enrollment.waiver_enrolled_count).to eq parent_enrollment.humanized_dependent_summary.to_s
+        end
+
+        it "should return enrollment coverage_end_on" do
+          expect(merge_model.enrollment.waiver_coverage_end_on).to eq parent_enrollment.terminated_on.strftime('%m/%d/%Y')
+        end
       end
 
-      it "should return enrollment coverage_kind" do
-        expect(merge_model.enrollment.plan_name).to eq model_instance.plan.name
+      context "when waiver does not have a parent enrollment" do
+
+        before do
+          allow(model_instance).to receive(:predecessor_enrollment_id).and_return(nil)
+        end
+
+        it "should not return parent_enrollment" do
+          expect(model_instance.parent_enrollment).to eq nil
+        end
       end
     end
   end

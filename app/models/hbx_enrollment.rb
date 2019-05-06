@@ -580,6 +580,7 @@ class HbxEnrollment
 
     enrollments.each do |enrollment|
       coverage_end_date = family.terminate_date_for_shop_by_enrollment(enrollment)
+      enrollment.update(waiver_reason: waiver_reason) if waiver_reason.present?
       term_or_cancel_enrollment(enrollment, coverage_end_date)
     end
   end
@@ -610,8 +611,9 @@ class HbxEnrollment
     end
   end
 
-  def terminate_enrollment(coverage_end_date = TimeKeeper.date_of_record.end_of_month, terminate_reason)
-    term_or_cancel_enrollment(self, coverage_end_date, terminate_reason)
+  def terminate_enrollment(coverage_end_date = TimeKeeper.date_of_record.end_of_month, term_reason)
+    update(terminate_reason: term_reason) if term_reason.present?
+    term_or_cancel_enrollment(self, coverage_end_date)
 
     if is_shop?
       if coverage_termination_pending? || coverage_terminated? || coverage_canceled?
@@ -623,7 +625,7 @@ class HbxEnrollment
     end
   end
 
-  def term_or_cancel_enrollment(enrollment, coverage_end_date, term_reason = nil)
+  def term_or_cancel_enrollment(enrollment, coverage_end_date)
     if enrollment.effective_on >= coverage_end_date
       enrollment.cancel_coverage! if enrollment.may_cancel_coverage? # cancel coverage if enrollment is future effective
     else
@@ -633,7 +635,6 @@ class HbxEnrollment
         enrollment.terminate_coverage!(coverage_end_date) if enrollment.may_terminate_coverage?
       end
     end
-    enrollment.update(terminate_reason: term_reason) if term_reason.present?
   end
 
   def waiver_enrollment_present?

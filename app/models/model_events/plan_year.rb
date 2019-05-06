@@ -10,7 +10,6 @@ module ModelEvents
       :ineligible_renewal_application_submitted,
       # :renewal_enrollment_confirmation,
       # :ineligible_initial_application_submitted,
-      # :ineligible_renewal_application_submitted,
       :initial_employer_open_enrollment_completed,
       # # :open_enrollment_began, #not being used
       :initial_application_denied,

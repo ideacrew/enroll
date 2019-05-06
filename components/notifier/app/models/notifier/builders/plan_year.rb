@@ -77,6 +77,12 @@ module Notifier
       end
     end
 
+    def plan_year_py_end_on_plus_60_days
+      if current_or_renewal_py.present?
+        merge_model.plan_year.py_end_on_plus_60_days = format_date(current_or_renewal_py.end_on + 60.days)
+      end
+    end
+
     def plan_year_current_py_oe_end_date
       plan_year = 
         if ['zero_employees_on_roster_notice', 'low_enrollment_notice_for_employer', 'open_enrollment_end_reminder_notice_to_employee'].include? event_name
@@ -195,7 +201,7 @@ module Notifier
     def plan_year_warnings
       plan_year_warnings = []
       plan_year = current_plan_year || renewal_plan_year
-        if plan_year.present?
+      if plan_year.present?
         plan_year.application_eligibility_warnings.each do |k, _|
           case k.to_s
           when "fte_count"
@@ -246,6 +252,10 @@ module Notifier
           @renewal_plan_year = employer_profile.plan_years.detect{|py| py.is_published? && py.start_on == plan_year.start_on.prev_year}
         end
       end
+    end
+
+    def current_or_renewal_py
+      plan_year = current_plan_year || renewal_plan_year
     end
 
     def format_date(date)

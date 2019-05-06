@@ -15,6 +15,7 @@ module Notifier
       data_object.mailing_address = Notifier::MergeDataModels::Address.new
       data_object.broker = Notifier::MergeDataModels::Broker.new
       data_object.enrollment = Notifier::MergeDataModels::Enrollment.new
+      data_object.dental_enrollment = Notifier::MergeDataModels::Enrollment.new
       data_object.plan_year = Notifier::MergeDataModels::PlanYear.new
       data_object.census_employee = Notifier::MergeDataModels::CensusEmployee.new
       data_object.special_enrollment_period = Notifier::MergeDataModels::SpecialEnrollmentPeriod.new
@@ -72,50 +73,6 @@ module Notifier
       merge_model.employer_name = employee_role.employer_profile.legal_name
     end
 
-    def enrollment
-      return @enrollment if defined? @enrollment
-      if payload['event_object_kind'].constantize == HbxEnrollment
-        @enrollment = employee_role.person.primary_family.active_household.hbx_enrollments.find(payload['event_object_id'])
-      elsif event_name == "employee_notice_for_employee_terminated_from_roster"
-        @enrollment = latest_terminated_health_enrollment if latest_terminated_health_enrollment.present?
-      end
-    end
-
-    def enrollment_enrollment_kind
-      return if enrollment.blank?
-      merge_model.enrollment.enrollment_kind = enrollment.enrollment_kind
-    end
-
-    def enrollment_coverage_end_on
-      return if enrollment.blank?
-      if event_name == "employee_notice_for_employee_terminated_from_roster"
-        merge_model.enrollment.coverage_end_on = format_date(census_employee_record.employment_terminated_on.end_of_month)
-      else
-        merge_model.enrollment.coverage_end_on = format_date(enrollment.terminated_on)
-      end
-    end
-
-    def enrollment_coverage_start_on
-      return if enrollment.blank?
-      merge_model.enrollment.coverage_start_on = format_date(enrollment.effective_on)
-    end
-
-    def enrollment_plan_name
-      if enrollment.present?
-        merge_model.enrollment.plan_name = enrollment.plan.name
-      end
-    end
-
-    def enrollment_employee_responsible_amount
-      return if enrollment.blank?
-      merge_model.enrollment.employee_responsible_amount = number_to_currency(enrollment.total_employee_cost, precision: 2)
-    end
-
-    def enrollment_employer_responsible_amount
-      return if enrollment.blank?
-      merge_model.enrollment.employer_responsible_amount = number_to_currency(enrollment.total_employer_contribution, precision: 2)
-    end
-
     def census_employee_record
       employee_role.census_employee
     end
@@ -130,6 +87,10 @@ module Notifier
 
     def coverage_terminated_on
       merge_model.coverage_terminated_on = format_date(census_employee_record.coverage_terminated_on)
+    end
+
+    def coverage_terminated_on_plus_30_days
+      merge_model.coverage_terminated_on_plus_30_days = format_date(census_employee_record.coverage_terminated_on + 30.days)
     end
 
     def earliest_coverage_begin_date
@@ -152,16 +113,37 @@ module Notifier
       merge_model.census_employee.latest_terminated_dental_enrollment_plan_name.present?
     end
 
+    def has_parent_enrollment?
+      waiver_enr = census_employee_record.active_benefit_group_assignment.hbx_enrollments.select {|en| HbxEnrollment::WAIVED_STATUSES.include?(en.aasm_state)}.first
+      waiver_enr.parent_enrollment.present?
+    end
+
+    def has_multiple_enrolled_enrollments?
+      enrolled_enrollments.size > 1
+    end
+
+    def has_health_enrolled_enrollment?
+      enrolled_enrollments.by_coverage_kind("health").first.present?
+    end
+
+    def has_dental_enrolled_enrollment?
+      enrolled_enrollments.by_coverage_kind("dental").first.present?
+    end
+
+    def enrolled_enrollments
+      employee_role.person.primary_family.active_household.hbx_enrollments.shop_market.enrolled
+    end
+
     def census_employee_health_and_dental_enrollment?
       census_employee_health_enrollment? && census_employee_dental_enrollment?
     end
 
     def latest_terminated_health_enrollment
-      census_employee_record.active_benefit_group_assignment.hbx_enrollments.select{ |en| en.coverage_kind == "health" }.first
+      census_employee_record.active_benefit_group_assignment.hbx_enrollments.select{ |en| en.coverage_kind == "health" && !HbxEnrollment::WAIVED_STATUSES.include?(en.aasm_state)}.first
     end
 
     def latest_terminated_dental_enrollment
-      census_employee_record.active_benefit_group_assignment.hbx_enrollments.select{ |en| en.coverage_kind == "dental" }.first
+      census_employee_record.active_benefit_group_assignment.hbx_enrollments.select{ |en| en.coverage_kind == "dental" && !HbxEnrollment::WAIVED_STATUSES.include?(en.aasm_state)}.first
     end
 
     def census_employee_latest_terminated_health_enrollment_plan_name
@@ -191,7 +173,7 @@ module Notifier
     def dependent_termination_date
       merge_model.dependent_termination_date = format_date(TimeKeeper.date_of_record.end_of_month)
     end
-    
+
     # Using same merge model for special enrollment period and qualifying life event kind.
     def special_enrollment_period
       return @special_enrollment_period if defined? @special_enrollment_period
