@@ -24,11 +24,6 @@ module Observers
           # trigger_zero_employees_on_roster_notice(plan_year)
         end
 
-        if new_model_event.event_key == :renewal_application_autosubmitted
-          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_application_autosubmitted")
-          # trigger_zero_employees_on_roster_notice(plan_year)
-        end
-
         if new_model_event.event_key == :ineligible_initial_application_submitted
           if (plan_year.application_eligibility_warnings.include?(:primary_office_location) || plan_year.application_eligibility_warnings.include?(:fte_count))
             deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "employer_initial_eligibility_denial_notice")
@@ -70,7 +65,7 @@ module Observers
         end
 
         if new_model_event.event_key == :renewal_application_autosubmitted
-          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "planyear_renewal_3b")
+          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_application_autosubmitted")
           trigger_zero_employees_on_roster_notice(plan_year)
         end
 

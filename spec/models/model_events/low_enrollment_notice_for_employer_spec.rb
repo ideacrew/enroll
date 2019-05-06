@@ -18,7 +18,7 @@ describe 'ModelEvents::LowEnrollmentNoticeForEmployer', dbclean: :around_each do
     context "when initial employer 2 days prior to dead line" do
       it "should trigger model event" do
         expect_any_instance_of(Observers::NoticeObserver).to receive(:deliver).with(recipient: employer, event_object: model_instance, notice_event: notice_event).and_return(true)
-        PlanYear.date_change_event(date_mock_object)
+        PlanYear.date_change_event(TimeKeeper.date_of_record)
       end
     end
   end
