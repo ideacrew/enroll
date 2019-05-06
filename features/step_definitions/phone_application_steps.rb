@@ -83,17 +83,17 @@ When(/^the Admin clicks CONTINUE after uploading and verifying an application$/)
   find(:xpath,"//*[@id='Identity']/div/div[4]/div").click
   find('.interaction-choice-control-verification-reason-1').click
   find('.selectric-interaction-choice-control-verification-reason').click
-  select('Document in EnrollApp', :from => 'verification_reason')
+  find("li", :text => "Document in EnrollApp").click
   find('.v-type-confirm-button').click
 
   find(:xpath,"//*[@id='Application']/div/div[4]/div").click
   find('.interaction-choice-control-verification-reason-1').click
   find('.selectric-interaction-choice-control-verification-reason').click
-  select('Document in EnrollApp', :from => 'verification_reason')
+  find("li", :text => "Document in EnrollApp").click
   find('.v-type-confirm-button').click
 
   expect(page).to have_content('Application successfully verified.')
-  find('.btn', text: 'CONTINUE').click
+  find('.button', text: 'Continue').click
 end
 
 Then(/^the Admin can navigate to the next page and finish the application$/) do

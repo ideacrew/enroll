@@ -9,11 +9,11 @@ When(/^the Admin clicks CONTINUE after uploading and verifying an Identity$/) do
     attach_file("file[]", "#{Rails.root}/lib/pdf_templates/blank.pdf", visible:false)
   end
   wait_for_ajax(10,2)
-  find(:xpath, "/html/body/div[2]/div[3]/div/div/div[1]/div[2]/div/div/div/div[2]/div[1]/div/div[4]/div/div[2]").click
+  find(:xpath,"//*[@id='Identity']/div/div[4]/div").click
   find('.interaction-choice-control-verification-reason-1').click
-  find('.interaction-choice-control-verification-reason', :text => /\ASelect Reason\z/).click
-  select('Document in EnrollApp', :from => 'verification_reason')
+  find('.selectric-interaction-choice-control-verification-reason').click
+  find("li", :text => "Document in EnrollApp").click
   find('.v-type-confirm-button').click
   expect(page).to have_content('Identity successfully verified.')
-  find('.btn', text: 'CONTINUE').click
+  find('.button', text: 'Continue').click
 end
