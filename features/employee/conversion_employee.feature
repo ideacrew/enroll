@@ -17,8 +17,6 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
     And Employee has not signed up as an HBX user
     And Patrick Doe visits the employee portal
     When Patrick Doe creates an HBX account
-    And I select the all security question and give the answer
-    When I have submitted the security questions
     When Employee goes to register as an employee
     Then Employee should see the employee search page
     When Employee enters the identifying info of Patrick Doe
