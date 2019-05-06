@@ -801,22 +801,6 @@ class HbxEnrollment
     end
   end
 
-  def mid_year_plan_change_notice
-    if self.census_employee.present?
-      begin
-        if (self.enrollment_kind != "open_enrollment" || self.census_employee.new_hire_enrollment_period.present?)
-          if self.benefit_group.is_congress
-            ShopNoticesNotifierJob.perform_later(self.employer_profile.id.to_s, "ee_mid_year_plan_change_congressional_notice", hbx_enrollment: self.hbx_id.to_s)
-          else
-            ShopNoticesNotifierJob.perform_later(self.employer_profile.id.to_s, "ee_mid_year_plan_change_non_congressional_notice", hbx_enrollment: self.hbx_id.to_s)
-          end
-        end
-      rescue Exception => e
-        Rails.logger.error {"Unable to send employee mid year plan change notice to census_employee - #{census_employee.id} due to #{e.backtrace}"}
-      end
-    end
-  end
-
   def <=>(other)
     other_members = other.hbx_enrollment_members # - other.terminated_members
     [plan.hios_id, effective_on, hbx_enrollment_members.sort_by{|x| x.hbx_id}] <=> [other.plan.hios_id, other.effective_on, other_members.sort_by{|x| x.hbx_id}]

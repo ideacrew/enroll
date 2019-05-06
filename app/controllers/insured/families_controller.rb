@@ -146,7 +146,7 @@ class Insured::FamiliesController < FamiliesController
       @qle_reason_val = params[:qle_reason_val] if params[:qle_reason_val].present?
       @qle_end_on = @qle_date + @qle.post_event_sep_in_days.try(:days)
     end
-
+    
     @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
     if @person.has_active_employee_role? && !(@qle.present? && @qle.individual?)
       @future_qualified_date = (@qle_date > TimeKeeper.date_of_record) ? true : false
@@ -154,12 +154,6 @@ class Insured::FamiliesController < FamiliesController
 
     if @person.resident_role?
       @resident_role_id = @person.resident_role.id
-    end
-
-    if ((@qle.present? && @qle.shop?) && !@qualified_date && !@person.has_multiple_active_employers? )
-      sep_request_denial_notice
-    elsif is_ee_sep_request_accepted?
-      ee_sep_request_accepted_notice
     end
   end
 
@@ -244,29 +238,6 @@ class Insured::FamiliesController < FamiliesController
     @family = Family.find(params[:id])
     if @family.current_broker_agency.destroy
       redirect_to :action => "home" , flash: {notice: "Successfully deleted."}
-    end
-  end
-
-  def sep_request_denial_notice
-    begin
-      ShopNoticesNotifierJob.perform_later(@person.active_employee_roles.first.census_employee.id.to_s, "sep_request_denial_notice",qle_reported_date: "#{@qle_date}", qle_title: @qle.title)
-    rescue Exception => e
-      log("#{e.message}; person_id: #{@person.id}")
-    end
-  end
-
-  def is_ee_sep_request_accepted?
-    !@person.has_multiple_active_employers? && @qle.present? && @qle.shop?
-  end
-
-  def ee_sep_request_accepted_notice
-    employee_role = @person.active_employee_roles.first
-    if employee_role.present? && employee_role.census_employee.present?
-      begin
-        ShopNoticesNotifierJob.perform_later(employee_role.census_employee.id.to_s, "ee_sep_request_accepted_notice", {title: @qle.title, end_on: "#{@qle_end_on}", qle_on: "#{@qle_date}"} )
-      rescue Exception => e
-        Rails.logger.error{"Unable to deliver employee SEP accepted notice to person_id: #{@person.id} due to #{e.message}"}
-      end
     end
   end
 

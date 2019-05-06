@@ -160,11 +160,12 @@ module Observers
 
       hbx_enrollment = new_model_event.klass_instance
       return unless HbxEnrollment::REGISTERED_EVENTS.include?(new_model_event.event_key) && hbx_enrollment.is_shop?
-
       if hbx_enrollment.census_employee.is_active?
         if new_model_event.event_key == :application_coverage_selected
           if hbx_enrollment.is_special_enrollment? || hbx_enrollment.new_hire_enrollment_for_shop? #hbx_enrollment.census_employee.new_hire_enrollment_period.cover?(TimeKeeper.date_of_record))
             deliver(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "employee_plan_selection_confirmation_sep_new_hire")
+            notice_event = hbx_enrollment.benefit_group.is_congress ? "employee_mid_year_plan_change_congressional_notice" : "employee_mid_year_plan_change_non_congressional_notice"
+            deliver(recipient: hbx_enrollment.employer_profile, event_object: hbx_enrollment, notice_event: notice_event)
           elsif hbx_enrollment.is_open_enrollment?
             deliver(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "notify_employee_of_plan_selection_in_open_enrollment")
           end

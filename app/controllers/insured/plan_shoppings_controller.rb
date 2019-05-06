@@ -59,8 +59,6 @@ class Insured::PlanShoppingsController < ApplicationController
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
 
-    @enrollment.mid_year_plan_change_notice
-
     send_receipt_emails if @person.emails.first
   end
 
