@@ -2,6 +2,9 @@ class Document
   include Mongoid::Document
   include Mongoid::Timestamps
   include Mongoid::Attributes::Dynamic
+  include Acapi::Notifiers
+  include ModelEvents::Document
+  include Concerns::Observable
 
 
   ACCESS_RIGHTS = %w(public pii_restricted)

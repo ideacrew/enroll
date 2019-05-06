@@ -545,6 +545,21 @@ module ApplicationHelper
     end
   end
 
+  def trigger_notice_observer(recipient, event_object, notice_event, params={})
+    observer = Observers::NoticeObserver.new
+    observer.deliver(recipient: recipient, event_object: event_object, notice_event: notice_event, notice_params: params)
+  end
+
+  def notify_employer_when_employee_terminate_coverage(hbx_enrollment)
+    begin
+      if hbx_enrollment.is_shop? && hbx_enrollment.census_employee.present? && hbx_enrollment.employer_profile.present?
+        ShopNoticesNotifierJob.perform_later(hbx_enrollment.employer_profile.id.to_s, "notify_employer_when_employee_terminate_coverage", hbx_enrollment: hbx_enrollment.hbx_id.to_s)
+      end
+    rescue Exception => e
+      (Rails.logger.error { "Unable to deliver employee_terminate_coverage_notice of employee #{hbx_enrollment.census_employee.id.to_s} to #{hbx_enrollment.employer_profile.id.to_s}due to #{e}" }) unless Rails.env.test?
+    end
+  end
+
   def disable_purchase?(disabled, hbx_enrollment, options = {})
     disabled || !hbx_enrollment.can_select_coverage?(qle: options[:qle])
   end

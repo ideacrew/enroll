@@ -7,7 +7,7 @@ module ModelEvents
 
     def notify_on_save
       # if subject == 'initial_invoice' && identifier.present?
-      #   is_initial_employer_invoice_available = true
+        # is_initial_employer_invoice_available = true
       # end
 
       REGISTERED_EVENTS.each do |event|
