@@ -4,7 +4,7 @@ module Notifier
     include Notifier::Builders::Broker
     include Notifier::ApplicationHelper
 
-    attr_accessor :general_agency, :merge_model, :payload
+    attr_accessor :general_agency, :merge_model, :payload, :event_name
 
     def initialize
       data_object = Notifier::MergeDataModels::GeneralAgency.new

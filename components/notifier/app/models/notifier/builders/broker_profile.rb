@@ -3,7 +3,7 @@ module Notifier
     include Notifier::Builders::PlanYear
     include Notifier::Builders::Broker
 
-    attr_accessor :payload, :broker_role, :merge_model
+    attr_accessor :payload, :broker_role, :merge_model, :event_name
 
    def initialize
       data_object = Notifier::MergeDataModels::BrokerProfile.new
@@ -74,12 +74,17 @@ module Notifier
 
     def termination_date
       if terminated_broker_agency_account.present?
-        merge_model.termination_date = terminated_broker_agency_account.end_on
+        merge_model.termination_date = format_date terminated_broker_agency_account.end_on
       end
     end
 
     def broker_agency_name
       merge_model.broker_agency_name = broker_role.broker_agency_profile.legal_name
+    end
+
+    def format_date(date)
+      return if date.blank?
+      date.strftime("%m/%d/%Y")
     end
   end
 end
