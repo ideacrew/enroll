@@ -14,8 +14,6 @@ Feature: Only HBX Staff will be able to see & access the Reset Password Feature.
     And Employee has not signed up as an HBX user
     And Patrick Doe visits the employee portal
     And Patrick Doe creates an HBX account
-    And I select the all security question and give the answer
-    And I have submitted the security questions
     And Employee goes to register as an employee
     And Employee should see the employee search page
     And Employee enters the identifying info of Patrick Doe
