@@ -15,41 +15,30 @@ When /^they click the 'New General Agency' button$/ do
 end
 
 Then /^they should see the new general agency form$/ do
-  expect(page).to have_content('General Agency / TPA Registration')
+  expect(page).to have_content('General Agency Registration')
   screenshot("general_agency_registration")
 end
 
 When /^they complete the new general agency form and hit the 'Submit' button$/ do
-  FactoryBot.create(:rating_area, zip_code: "01002", county: "Franklin", rating_area: Settings.aca.rating_areas.first)
-  fill_in 'organization[first_name]', with: Forgery(:name).first_name
-  fill_in 'organization[last_name]', with: Forgery(:name).last_name
-  fill_in 'jq_datepicker_ignore_organization[dob]', with: (Time.now - rand(20..50).years).strftime('%m/%d/%Y')
-  find('.interaction-field-control-organization-email').click
-  fill_in 'organization[email]', with: Forgery(:email).address
-  fill_in 'organization[npn]', with: '2222222222'
-  fill_in 'organization[legal_name]', with: (company_name = Forgery(:name).company_name)
-  fill_in 'organization[dba]', with: company_name
-  fill_in 'organization[fein]', with: '333333333'
-  find(:xpath, "//p[contains(., 'Select Practice Area')]").click
-  find('.selectric-items').find('.interaction-choice-control-organization-market-kind-1').click
-  find('.multiselect').click
-  find(:xpath, "//li[contains(., 'English')]").click
-  find('.multiselect').click
-  find('input.interaction-field-control-organization-legal-name').click
-  fill_in 'organization[office_locations_attributes][0][address_attributes][address_1]', with: Forgery(:address).street_address
-  fill_in 'organization[office_locations_attributes][0][address_attributes][city]', with: 'Washington'
-
-  find(:xpath, "//p[contains(., 'SELECT STATE')]").click
-  find(:xpath, "//li[contains(., 'DC')]").click
-
-  fill_in 'organization[office_locations_attributes][0][address_attributes][zip]', with: '01002'
+  FactoryBot.create(:rating_area, zip_code: "01002", county_name: "Franklin", rating_area: Settings.aca.rating_areas.first)
+  fill_in 'inputFirstname', with: Forgery(:name).first_name
+  fill_in 'inputLastname', with: Forgery(:name).last_name
+  fill_in 'inputDOB', with: (Time.now - rand(20..50).years).strftime('%m/%d/%Y')
+  fill_in 'inputEmail', with: Forgery(:email).address
+  fill_in 'inputNPN', with: '2222222222'
+  fill_in 'validationCustomLegalName', with: (company_name = Forgery(:name).company_name)
+  fill_in 'validationCustomdba', with: company_name
+  fill_in 'inputFein', with: '333333333'
+  find(:xpath, "//*[@id='agency_organization_profile_attributes_market_kind']").click
+  select "Small Business Marketplace ONLY", from: "agency_organization_profile_attributes_market_kind"
+  fill_in 'inputAddress1', with: Forgery(:address).street_address
+  fill_in 'agency_organization_profile_attributes_office_locations_attributes_0_address_attributes_city', with: 'Washington'
+  select "MA", from: "inputState" #needs to change it to DC
+  fill_in 'inputZip', with: '01002'
   wait_for_ajax
-  select "#{location[:county]}", :from => "organization[office_locations_attributes][0][address_attributes][county]"
-
-  fill_in 'organization[office_locations_attributes][0][phone_attributes][area_code]', with: Forgery(:address).phone.match(/\((\d\d\d)\)/)[1]
-  fill_in 'organization[office_locations_attributes][0][phone_attributes][number]', with: Forgery(:address).phone.match(/\)(.*)$/)[1]
-
-  find('.interaction-click-control-create-general-agency').click
+  fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][area_code]', with: '234'
+  fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][number]', with: '9845945'
+  find('#general-btn').click
 end
 
 Then /^they should see a confirmation message$/ do
@@ -57,13 +46,7 @@ Then /^they should see a confirmation message$/ do
 end
 
 Then /^a pending approval status$/ do
-  expect(GeneralAgencyProfile.last.aasm_state).to eq('is_applicant')
-end
-
-And /^a general agency, pending approval, exists$/ do
-  general_agency
-  staff = general_agency.general_agency_profile.general_agency_staff_roles.last
-  staff.person.emails.last.update(kind: 'work')
+  expect(::BenefitSponsors::Organizations::GeneralAgencyProfile.all.last.aasm_state).to eq('is_applicant')
 end
 
 When /^the HBX admin visits the general agency list$/ do
@@ -72,17 +55,21 @@ When /^the HBX admin visits the general agency list$/ do
   click_link 'General Agencies'
 end
 
+Then(/^Hbx Admin is on Broker Index and clicks General Agencies$/) do
+  find('.interaction-click-control-general-agencies').click
+end
+
 Then /^they should see the pending general agency$/ do
-  expect(page).to have_content(general_agency.legal_name)
+  expect(page).to have_content(@general_agency_organization.legal_name)
   screenshot("general_agency_list")
 end
 
 When /^they click the link of general agency$/ do
-  click_link general_agency.legal_name
+  click_link @general_agency_organization.legal_name
 end
 
 Then /^they should see the home of general agency$/ do
-  expect(page).to have_content("General Agency : #{general_agency.legal_name}")
+  expect(page).to have_content("General Agency : #{@general_agency_organization.legal_name}")
   screenshot("general_agency_homepage")
 end
 
@@ -90,18 +77,7 @@ When /^they visit the list of staff$/ do
   find('.interaction-click-control-staff').click
 end
 
-Then /^they should see the name of staff$/ do
-  full_name = general_agency.general_agency_profile.general_agency_staff_roles.last.person.full_name
-  expect(page).to have_content("General Agency Staff")
-  expect(page).to have_content(general_agency.legal_name)
-  expect(page).to have_content(full_name)
-  screenshot("general_agency_staff_list")
-
-  click_link full_name
-end
-
 When /^they approve the general agency$/ do
-  click_link general_agency.general_agency_profile.general_agency_staff_roles.last.person.full_name
   screenshot("general_agency_staff_edit_page")
   click_button 'Approve'
 end
@@ -111,37 +87,13 @@ Then /^they should see updated status$/ do
   screenshot("general_agency_staff_approved")
 end
 
-Then /^the general agency should receive an email$/ do
-  staff = general_agency.general_agency_profile.general_agency_staff_roles.last
-  open_email(staff.email_address)
-end
-
-Given /^a general agency, approved, awaiting account creation, exists$/ do
-  general_agency
-  staff = general_agency.general_agency_profile.general_agency_staff_roles.last
-  staff.person.emails.last.update(kind: 'work')
-  staff.approve!
-end
-
-When /^the HBX admin visits the link received in the approval email$/ do
-  staff = general_agency.general_agency_profile.general_agency_staff_roles.last
-  email_address = staff.email_address
-
-  open_email(email_address)
-  expect(current_email.to).to eq([email_address])
-
-  invitation_link = links_in_email(current_email).first
-  invitation_link.sub!(/http\:\/\/127\.0\.0\.1\:3000/, '')
-  visit(invitation_link)
-end
-
 Then /^they should see an account creation form$/ do
   expect(page).to have_css('.interaction-click-control-create-account')
   screenshot("general_agency_staff_register_by_invitation")
 end
 
 When /^they complete the account creation form and hit the 'Submit' button$/ do
-  email_address = general_agency.general_agency_profile.general_agency_staff_roles.last.email_address
+  email_address = @general_agency_organization.general_agency_profile.general_agency_staff_roles.last.email_address
   fill_in "user[oim_id]", with: email_address
   fill_in "user[password]", with: "aA1!aA1!aA1!"
   fill_in "user[password_confirmation]", with: "aA1!aA1!aA1!"
@@ -154,7 +106,7 @@ Then /^they should see a welcome message$/ do
 end
 
 Then /^they see the General Agency homepage$/ do
-  expect(page).to have_content(general_agency.legal_name)
+  expect(page).to have_content(@general_agency_organization.legal_name)
 end
 
 Given /^a general agency, approved, confirmed, exists$/ do
