@@ -774,38 +774,6 @@ class EmployerProfile
           end
         end
 
-        #Initial employer reminder notices to publish plan year.
-        start_on = (new_date+2.months).beginning_of_month
-        start_on_1 = (new_date+1.month).beginning_of_month
-        if new_date+2.days == start_on.last_month
-          initial_employers_reminder_to_publish(start_on).each do |organization|
-            begin
-              organization.employer_profile.trigger_notices("initial_employer_first_reminder_to_publish_plan_year", "acapi_trigger" => true)
-            rescue Exception => e
-              Rails.logger.error { "Unable to send first reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}" }
-            end
-          end
-        elsif new_date+1.day == start_on.last_month
-          initial_employers_reminder_to_publish(start_on).each do |organization|
-            begin
-              organization.employer_profile.trigger_notices("initial_employer_second_reminder_to_publish_plan_year", "acapi_trigger" => true)
-            rescue Exception => e
-              Rails.logger.error { "Unable to send second reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}" }
-            end
-          end
-        else
-          plan_year_due_date = Date.new(start_on_1.prev_month.year, start_on_1.prev_month.month, Settings.aca.shop_market.initial_application.publish_due_day_of_month)
-          if (new_date + 2.days) == plan_year_due_date
-            initial_employers_reminder_to_publish(start_on_1).each do |organization|
-              begin
-                organization.employer_profile.trigger_notices("initial_employer_final_reminder_to_publish_plan_year", "acapi_trigger" => true)
-              rescue Exception => e
-                Rails.logger.error { "Unable to send final reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}" }
-              end
-            end
-          end
-        end
-
         if new_date.prev_day.day == Settings.aca.shop_market.initial_application.quiet_period_end_on
           effective_on = new_date.prev_day.next_month.beginning_of_month.strftime("%Y-%m-%d")
           notify("acapi.info.events.employer.initial_employer_quiet_period_ended", {:effective_on => effective_on})
