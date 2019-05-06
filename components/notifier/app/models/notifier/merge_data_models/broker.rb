@@ -18,7 +18,7 @@ module Notifier
       Notifier::MergeDataModels::Broker.new({
         primary_fullname: 'Count Olaf',
         primary_first_name: 'Count',
-        primary_last_name: 'Count',
+        primary_last_name: 'Olaf',
         organization: 'Best Brokers LLC',
         phone: '703-303-1007',
         assignment_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),

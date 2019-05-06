@@ -20,6 +20,18 @@ module Notifier
       end
     end
 
+    def plan_year_renewal_year
+      if renewal_plan_year.present?
+        merge_model.plan_year.renewal_year = renewal_plan_year.start_on.year.to_s
+      end
+    end
+
+    def plan_year_current_year
+      if current_plan_year.present?
+        merge_model.plan_year.current_year = current_plan_year.start_on.year.to_s
+      end
+    end
+
     def plan_year_next_available_start_date
       merge_model.plan_year.next_available_start_date = PlanYear.calculate_start_on_options.first.last.to_date
     end

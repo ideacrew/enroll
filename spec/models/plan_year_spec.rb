@@ -2494,21 +2494,6 @@ describe PlanYear, '.update_employee_benefit_packages', type: :model, dbclean: :
   end
 end
 
-describe "#trigger renewal_employee_enrollment_confirmation", type: :model, dbclean: :after_all do
-  let!(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
-  let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'renewing_enrolled', start_on: start_on)}
-  let!(:benefit_group) { employer_profile.plan_years.first.benefit_groups.first}
-  let!(:census_employee){ FactoryGirl.create :census_employee, employer_profile: employer_profile }
-  let!(:plan_year1) { employer_profile.plan_years.first }
-  let!(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
-  let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, benefit_group_assignment_id: benefit_group.benefit_group_assignments.first.id, benefit_group_id: benefit_group.id, effective_on: start_on, aasm_state: "renewing_coverage_enrolled")}
-
-   it "should trigger renewal_employee_enrollment_confirmation" do
-    expect(ShopNoticesNotifierJob).to receive(:perform_later).with(census_employee.id.to_s, "renewal_employee_enrollment_confirmation", {"acapi_trigger" => true})
-    plan_year1.send(:renewal_employee_enrollment_confirmation)
-  end
-end
-
 describe PlanYear, '.terminate_employee_benefit_packages', type: :model, dbclean: :after_each do
   let(:person) {FactoryGirl.create(:person)}
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
@@ -2667,7 +2652,7 @@ end
 
 describe PlanYear, '.terminate_employee_enrollments', type: :model, dbclean: :after_each do
   let(:person) { FactoryGirl.create(:person, :with_family)}
-  let(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
+  let(:start_on) { TimeKeeper.date_of_record.beginning_of_month.prev_month }
   let(:employer_profile) { FactoryGirl.create(:employer_profile) }
   let(:employee_role) {FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile)}
   let!(:plan_year) {FactoryGirl.create(:plan_year, employer_profile: employer_profile, aasm_state: 'active', start_on: start_on)}
@@ -2703,7 +2688,7 @@ describe PlanYear, '.terminate_employee_enrollments', type: :model, dbclean: :af
     end
 
     it "should move the enrollment to canceled state if enrollment effective_on > py_end_on" do
-      hbx_enrollment.update_attributes!(effective_on: start_on.next_month)
+      hbx_enrollment.update_attributes!(effective_on: start_on + 2.months)
       plan_year.terminate_plan_year(py_termination_dates[1], TimeKeeper.date_of_record, 'voluntary', false)
       hbx_enrollment.reload
       expect(hbx_enrollment.aasm_state).to eq 'coverage_canceled'
