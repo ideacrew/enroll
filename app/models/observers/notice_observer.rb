@@ -14,20 +14,6 @@ module Observers
       if PlanYear::REGISTERED_EVENTS.include?(new_model_event.event_key)
         plan_year = new_model_event.klass_instance
 
-        if new_model_event.event_key == :renewal_application_denied
-          errors = plan_year.enrollment_errors
-
-          if (errors.include?(:eligible_to_enroll_count) || errors.include?(:non_business_owner_enrollment_count))
-            deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_employer_ineligibility_notice")
-
-            plan_year.employer_profile.census_employees.non_terminated.each do |ce|
-              if ce.employee_role.present?
-                deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "employee_renewal_employer_ineligibility_notice")
-              end
-            end
-          end
-        end
-
         if new_model_event.event_key == :initial_application_submitted
           deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "initial_application_submitted")
           trigger_zero_employees_on_roster_notice(plan_year)
@@ -39,6 +25,13 @@ module Observers
 
         if new_model_event.event_key == :renewal_employer_open_enrollment_completed
           deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_employer_open_enrollment_completed")
+          plan_year.employer_profile.census_employees.non_terminated.each do |ce|
+            enrollments = ce.renewal_benefit_group_assignment.hbx_enrollments
+            enrollment = enrollments.select{ |enr| (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES).include?(enr.aasm_state) }.sort_by(&:updated_at).last
+            if enrollment.present?
+              deliver(recipient: ce.employee_role, event_object: enrollment, notice_event: "renewal_employee_enrollment_confirmation")
+            end
+          end
         end
 
         if new_model_event.event_key == :renewal_application_submitted
@@ -92,7 +85,6 @@ module Observers
         end
 
         if new_model_event.event_key == :renewal_enrollment_confirmation
-          deliver(recipient: plan_year.employer_profile,  event_object: plan_year, notice_event: "renewal_employer_open_enrollment_completed" )
           plan_year.employer_profile.census_employees.non_terminated.each do |ce|
             enrollments = ce.renewal_benefit_group_assignment.hbx_enrollments
             enrollment = enrollments.select{ |enr| (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES).include?(enr.aasm_state) }.sort_by(&:updated_at).last
@@ -102,19 +94,26 @@ module Observers
           end
         end
 
-        if new_model_event.event_key == :application_denied
-          errors = plan_year.enrollment_errors
-          
-          if(errors.include?(:enrollment_ratio) || errors.include?(:non_business_owner_enrollment_count))
-            plan_year.employer_profile.census_employees.non_terminated.each do |ce|
-              if ce.employee_role.present?
-                deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "group_ineligibility_notice_to_employee")
-              end
+        if new_model_event.event_key == :initial_application_denied
+          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: 'initial_employer_application_denied')
+          plan_year.employer_profile.census_employees.non_terminated.each do |ce|
+            begin
+              deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: 'group_ineligibility_notice_to_employee') if ce.employee_role.present?
+            rescue StandardError => e
+              Rails.logger.error { "Unable to deliver group_ineligibility_notice_to_employee notice to #{ce.full_name} due to #{e.inspect}" } unless Rails.env.test?
             end
           end
+        end
 
-          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "initial_employer_application_denied")
-
+        if new_model_event.event_key == :renewal_application_denied
+          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: 'renewal_employer_ineligibility_notice')
+          plan_year.employer_profile.census_employees.non_terminated.each do |ce|
+            begin
+              deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: 'employee_renewal_employer_ineligibility_notice') if ce.employee_role.present?
+            rescue StandardError => e
+              Rails.logger.error { "Unable to deliver employee_renewal_employer_ineligibility_notice notice to #{ce.full_name} due to #{e.inspect}" } unless Rails.env.test?
+            end
+          end
         end
 
         if PlanYear::DATA_CHANGE_EVENTS.include?(new_model_event.event_key)

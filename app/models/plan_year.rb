@@ -942,7 +942,7 @@ class PlanYear
     state :published_invalid, :after_enter => :decline_application    # Non-compliant plan application was forced-published
 
     state :enrolling, :after_enter => [:send_employee_invites, :link_census_employees]  # Published plan has entered open enrollment
-    state :enrolled,  :after_enter => [:ratify_enrollment, :initial_employer_open_enrollment_completed] # Published plan open enrollment has ended and is eligible for coverage,
+    state :enrolled,  :after_enter => [:ratify_enrollment] # Published plan open enrollment has ended and is eligible for coverage,
                                                                       #   but effective date is in future
     state :application_ineligible, :after_enter => :deny_enrollment   # Application is non-compliant for enrollment
     state :expired              # Non-published plans are expired following their end on date
@@ -954,7 +954,7 @@ class PlanYear
     state :renewing_published
     state :renewing_publish_pending
     state :renewing_enrolling, :after_enter => [:trigger_passive_renewals, :send_employee_invites]
-    state :renewing_enrolled, :after_enter => :renewal_employer_open_enrollment_completed
+    state :renewing_enrolled #:after_enter => :renewal_employer_open_enrollment_completed
     state :renewing_application_ineligible, :after_enter => :deny_enrollment  # Renewal application is non-compliant for enrollment
     state :renewing_canceled
 
@@ -975,7 +975,7 @@ class PlanYear
       transitions from: :enrolled,  to: :active,                  :guard  => :is_event_date_valid?
       transitions from: :published, to: :enrolling,               :guard  => :is_event_date_valid?
       transitions from: :enrolling, to: :enrolled,                :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
-      transitions from: :enrolling, to: :application_ineligible,  :guard => :is_open_enrollment_closed?, :after => [:initial_employer_ineligibility_notice, :notify_employee_of_initial_employer_ineligibility]
+      transitions from: :enrolling, to: :application_ineligible,  :guard => :is_open_enrollment_closed?, :after => [:notify_employee_of_initial_employer_ineligibility]
       # transitions from: :enrolling, to: :canceled,  :guard  => :is_open_enrollment_closed?, :after => :deny_enrollment  # Talk to Dan
 
       transitions from: :active, to: :terminated, :guard => :is_event_date_valid?
@@ -983,9 +983,8 @@ class PlanYear
 
       transitions from: :renewing_enrolled,   to: :active,              :guard  => :is_event_date_valid?
       transitions from: :renewing_published,  to: :renewing_enrolling,  :guard  => :is_event_date_valid?
-      transitions from: :renewing_enrolling,  to: :renewing_enrolled,   :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?], :after => :renewal_employee_enrollment_confirmation
-      transitions from: :renewing_enrolling,  to: :renewing_application_ineligible, :guard => :is_open_enrollment_closed?, :after => [:renewal_employer_ineligibility_notice, :zero_employees_on_roster, :renewal_employer_ineligibility_notice_to_employee]
-
+      transitions from: :renewing_enrolling,  to: :renewing_enrolled,   :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
+      transitions from: :renewing_enrolling,  to: :renewing_application_ineligible, :guard => :is_open_enrollment_closed?, :after => [:zero_employees_on_roster]
       transitions from: :enrolling, to: :enrolling  # prevents error when plan year is already enrolling
     end
 
@@ -1102,12 +1101,12 @@ class PlanYear
       transitions from: [:expired, :active], to: :conversion_expired, :guard => :can_be_migrated?
     end
 
-    event :close_open_enrollment, :after => :record_transition do 
+    event :close_open_enrollment, :after => :record_transition do
       transitions from: :enrolling, to: :enrolled,                :guards => [:is_enrollment_valid?]
-      transitions from: :enrolling, to: :application_ineligible,  :after => [:initial_employer_ineligibility_notice, :notify_employee_of_initial_employer_ineligibility]
+      transitions from: :enrolling, to: :application_ineligible,  :after => [:notify_employee_of_initial_employer_ineligibility]
 
       transitions from: :renewing_enrolling,  to: :renewing_enrolled,   :guards => [:is_enrollment_valid?]
-      transitions from: :renewing_enrolling,  to: :renewing_application_ineligible, :after => [:renewal_employer_ineligibility_notice, :zero_employees_on_roster]
+      transitions from: :renewing_enrolling,  to: :renewing_application_ineligible, :after => [:zero_employees_on_roster]
     end
   end
 
@@ -1314,24 +1313,6 @@ class PlanYear
     end
   end
 
-  def initial_employer_approval_notice
-    return true if (benefit_groups.any?{|bg| bg.is_congress?} || (fte_count < 1))
-    begin
-      self.employer_profile.trigger_notices("initial_employer_approval", "acapi_trigger" =>  true)
-    rescue Exception => e
-      Rails.logger.error { "Unable to deliver employer initial eligibiliy approval notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
-    end
-  end
-
-  def initial_employer_ineligibility_notice
-    return true if benefit_groups.any?{|bg| bg.is_congress?}
-    begin
-      self.employer_profile.trigger_notices("initial_employer_ineligibility_notice", "acapi_trigger" => true)
-    rescue Exception => e
-      Rails.logger.error { "Unable to deliver employer initial ineligibiliy notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
-    end
-  end
-
   def renewal_group_notice
     event_name = aasm.current_event.to_s.gsub(/!/, '')
     return true if (benefit_groups.any?{|bg| bg.is_congress?} || ["publish","withdraw_pending","revert_renewal"].include?(event_name))
@@ -1375,42 +1356,21 @@ class PlanYear
     end
   end
 
-  def initial_employer_open_enrollment_completed
-    #also check if minimum participation and non owner conditions are met by ER.
-    return true if benefit_groups.any?{|bg| bg.is_congress?}
-    begin
-      self.employer_profile.trigger_notices("initial_employer_open_enrollment_completed")
-    rescue Exception => e
-      Rails.logger.error { "Unable to deliver employer open enrollment completed notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
-    end
-  end
+  # def initial_employer_open_enrollment_completed
+  #   #also check if minimum participation and non owner conditions are met by ER.
+  #   return true if benefit_groups.any?{|bg| bg.is_congress?}
+  #   begin
+  #     self.employer_profile.trigger_notices("initial_employer_open_enrollment_completed")
+  #   rescue Exception => e
+  #     Rails.logger.error { "Unable to deliver employer open enrollment completed notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
+  #   end
+  # end
 
-  def renewal_employer_open_enrollment_completed
-    return true if benefit_groups.any?{|bg| bg.is_congress?}
-    self.employer_profile.trigger_notices("renewal_employer_open_enrollment_completed")
-  end
 
-  def renewal_employee_enrollment_confirmation
-    self.employer_profile.census_employees.non_terminated.each do |ce|
-      begin
-        enrollments = ce.renewal_benefit_group_assignment.hbx_enrollments
-        if enrollments.present? && enrollments.select { |enr| enr.effective_on == start_on}.present?
-          ShopNoticesNotifierJob.perform_later(ce.id.to_s, "renewal_employee_enrollment_confirmation", "acapi_trigger" => true)
-        end
-      rescue Exception => e
-        Rails.logger.error { "Unable to deliver renewal_employee_enrollment_confirmation to census_employee - #{ce.id} notice due to '#{e}' " }
-      end
-    end
-  end
-
-  def renewal_employer_ineligibility_notice
-    return true if benefit_groups.any? { |bg| bg.is_congress? }
-    begin
-      self.employer_profile.trigger_notices("renewal_employer_ineligibility_notice", "acapi_trigger" =>  true)
-    rescue Exception => e
-      Rails.logger.error { "Unable to deliver employer renewal ineligiblity denial notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
-    end
-  end
+  # def renewal_employer_open_enrollment_completed
+  #   return true if benefit_groups.any?{|bg| bg.is_congress?}
+  #   self.employer_profile.trigger_notices("renewal_employer_open_enrollment_completed")
+  # end
 
   def renewal_employer_ineligibility_notice_to_employee
     return true if benefit_groups.any?{|bg| bg.is_congress?}

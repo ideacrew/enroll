@@ -151,12 +151,16 @@ module Notifier
       enrollment_errors = []
       plan_year = (renewal_plan_year || current_plan_year)
       if plan_year.present?
-        plan_year.enrollment_errors.each do |k, _|
+         plan_year.enrollment_errors.each do |k, v|
           case k.to_s
-          when "enrollment_ratio"
-            enrollment_errors << "At least 75% of your eligible employees enrolled in your group health coverage or waive due to having other coverage"
-          when "non_business_owner_enrollment_count"
-            enrollment_errors << "One non-owner employee enrolled in health coverage"
+          when 'eligible_to_enroll_count'
+            enrollment_errors << 'at least one employee must be eligible to enroll'
+          when 'non_business_owner_enrollment_count'
+            enrollment_errors << "at least #{Settings.aca.shop_market.non_owner_participation_count_minimum} non-owner employee must enroll"
+          when 'enrollment_ratio'
+            unless plan_year.effective_date.yday == 1
+              enrollment_errors << "number of eligible participants enrolling (#{plan_year.total_enrolled_count}) is less than minimum required #{plan_year.minimum_enrolled_count}"
+            end
           end
         end
         merge_model.plan_year.enrollment_errors = enrollment_errors.join(' AND/OR ')
