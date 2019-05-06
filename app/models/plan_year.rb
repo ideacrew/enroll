@@ -158,20 +158,19 @@ class PlanYear
     if renewing_plan_year
       renewing_plan_year.cancel_renewal!(transmit_xml) if renewing_plan_year.may_cancel_renewal?
     end
-
     if end_on >= TimeKeeper.date_of_record
-      if self.may_schedule_termination?
-        self.schedule_termination!(end_on, options = {termination_kind: termination_kind, terminated_on: terminated_on, transmit_xml: transmit_xml})
+      if may_schedule_termination?
+        set_plan_year_termination_date(end_on, {termination_kind: termination_kind, terminated_on: terminated_on})
+        schedule_termination!
+        terminate_employee_enrollments(end_on, {transmit_xml: transmit_xml})
         notify_employer_py_terminate(transmit_xml)
       end
-    else
-     if self.may_terminate?
-       self.terminate!(end_on)
-       set_plan_year_termination_date(end_on, options = {termination_kind: termination_kind, terminated_on: terminated_on})
-       notify_employer_py_terminate(transmit_xml)
-       self.terminate_employee_enrollments(end_on, options = {transmit_xml: transmit_xml})
-       employer_profile.revert_application! if employer_profile.may_revert_application?
-     end
+    elsif may_terminate?
+      set_plan_year_termination_date(end_on, {termination_kind: termination_kind, terminated_on: terminated_on})
+      terminate!(end_on)
+      notify_employer_py_terminate(transmit_xml)
+      terminate_employee_enrollments(end_on, {transmit_xml: transmit_xml})
+      employer_profile.revert_application! if employer_profile.may_revert_application?
     end
   end
 
@@ -1052,9 +1051,9 @@ class PlanYear
     end
 
     # Scheduling terminations for plan years with a future end on date
-    event :schedule_termination, :after => [:record_transition, :set_plan_year_termination_date] do
+    event :schedule_termination, :after => :record_transition do
       transitions from: :active,
-                    to: :termination_pending, :after => [:terminate_employee_enrollments]
+                  to: :termination_pending
     end
 
     # Coverage terminated due to non-payment
@@ -1122,7 +1121,6 @@ class PlanYear
     self.end_on = end_on
     self.terminated_on = options[:terminated_on]
     self.termination_kind= options[:termination_kind]
-    self.save!
   end
 
   def trigger_passive_renewals

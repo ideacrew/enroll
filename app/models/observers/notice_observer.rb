@@ -59,11 +59,18 @@ module Observers
           trigger_zero_employees_on_roster_notice(plan_year)
         end
 
-        if new_model_event.event_key == :group_advance_termination_confirmation
-          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "group_advance_termination_confirmation")
+        if new_model_event.event_key == :group_termination_confirmation_notice
+          employer_event_name = plan_year.termination_kind.to_s == "nonpayment" ? 'notify_employer_of_group_non_payment_termination' : 'group_advance_termination_confirmation'
+          employee_event_name = plan_year.termination_kind.to_s == "nonpayment" ? 'notify_employee_of_group_non_payment_termination' : 'notify_employee_of_group_advance_termination'
+
+          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: employer_event_name)
 
           plan_year.employer_profile.census_employees.active.each do |ce|
-            deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "notify_employee_of_group_advance_termination")
+            begin
+              deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: employee_event_name)
+            rescue StandardError => e
+              Rails.logger.error { "Unable to deliver #{employee_event_name} to #{ce.full_name} due to #{e.backtrace}" }
+            end
           end
         end
 
@@ -151,37 +158,26 @@ module Observers
     def hbx_enrollment_update(new_model_event)
       raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
 
-      if HbxEnrollment::REGISTERED_EVENTS.include?(new_model_event.event_key)
-        hbx_enrollment = new_model_event.klass_instance
+      hbx_enrollment = new_model_event.klass_instance
+      return unless HbxEnrollment::REGISTERED_EVENTS.include?(new_model_event.event_key) && hbx_enrollment.is_shop?
 
-        if hbx_enrollment.is_shop? && hbx_enrollment.census_employee.is_active?
-
-          #TODO: Need to fix these methods on benefit application while dealing with notices.
-          is_valid_employer_py_oe = true#(hbx_enrollment.sponsored_benefit_package.plan_year.open_enrollment_contains?(hbx_enrollment.submitted_at) || hbx_enrollment.benefit_group.plan_year.open_enrollment_contains?(hbx_enrollment.created_at))
-
-          if new_model_event.event_key == :notify_employee_of_plan_selection_in_open_enrollment
-            if is_valid_employer_py_oe
-              deliver(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "notify_employee_of_plan_selection_in_open_enrollment") #renewal EE notice
-            end
-          end
-
-          if new_model_event.event_key == :application_coverage_selected
-            if is_valid_employer_py_oe
-              deliver(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "notify_employee_of_plan_selection_in_open_enrollment") #initial EE notice
-            end
-
-            if !is_valid_employer_py_oe && (hbx_enrollment.enrollment_kind == "special_enrollment" || hbx_enrollment.census_employee.new_hire_enrollment_period.cover?(TimeKeeper.date_of_record))
-              deliver(recipient: hbx_enrollment.census_employee.employee_role, event_object: hbx_enrollment, notice_event: "employee_plan_selection_confirmation_sep_new_hire")
-            end
+      if hbx_enrollment.census_employee.is_active?
+        if new_model_event.event_key == :application_coverage_selected
+          if hbx_enrollment.is_special_enrollment? || hbx_enrollment.new_hire_enrollment_for_shop? #hbx_enrollment.census_employee.new_hire_enrollment_period.cover?(TimeKeeper.date_of_record))
+            deliver(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "employee_plan_selection_confirmation_sep_new_hire")
+          elsif hbx_enrollment.is_open_enrollment?
+            deliver(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "notify_employee_of_plan_selection_in_open_enrollment")
           end
         end
+      end
 
-        if new_model_event.event_key == :employee_waiver_confirmation
-          deliver(recipient: hbx_enrollment.census_employee.employee_role, event_object: hbx_enrollment, notice_event: "employee_waiver_confirmation")
-        end
+      deliver(recipient: hbx_enrollment.census_employee.employee_role, event_object: hbx_enrollment, notice_event: "employee_waiver_confirmation") if new_model_event.event_key == :employee_waiver_confirmation
 
-        if new_model_event.event_key == :employee_coverage_termination
-          if hbx_enrollment.is_shop? && (CensusEmployee::EMPLOYMENT_ACTIVE_STATES - CensusEmployee::PENDING_STATES).include?(hbx_enrollment.census_employee.aasm_state) && hbx_enrollment.sponsored_benefit_package.is_active
+      if new_model_event.event_key == :employee_coverage_termination
+        if hbx_enrollment.is_shop? && (CensusEmployee::EMPLOYMENT_ACTIVE_STATES - CensusEmployee::PENDING_STATES).include?(hbx_enrollment.census_employee.aasm_state)
+          plan_year = hbx_enrollment.benefit_group.plan_year
+          # don't trigger following notices when employer terminates plan year
+          if !(plan_year.termination_pending? || plan_year.terminated?)
             deliver(recipient: hbx_enrollment.employer_profile, event_object: hbx_enrollment, notice_event: "employer_notice_for_employee_coverage_termination")
             deliver(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "employee_notice_for_employee_coverage_termination")
           end

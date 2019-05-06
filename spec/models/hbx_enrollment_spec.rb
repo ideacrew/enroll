@@ -1517,6 +1517,8 @@ context "Benefits are terminated" do
 
   context "SHOP benefit" do
     let(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member) }
+    let(:census_employee)   { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith') }
+    let(:employee_role)     { FactoryGirl.create(:employee_role, census_employee_id: census_employee.id) }
     let(:shop_enrollment)   { FactoryGirl.create(:hbx_enrollment,
                                                  household: shop_family.latest_household,
                                                  coverage_kind: "health",
@@ -1524,7 +1526,8 @@ context "Benefits are terminated" do
                                                  enrollment_kind: "open_enrollment",
                                                  kind: "employer_sponsored",
                                                  submitted_at: effective_on_date - 10.days,
-                                                 benefit_group_id: benefit_group.id
+                                                 benefit_group_id: benefit_group.id,
+                                                 employee_role_id: employee_role.id
                                                  )
                               }
 
@@ -2622,60 +2625,6 @@ describe HbxEnrollment, dbclean: :after_all do
     it "should cancel the previous enrollment if the effective_on date of the previous and the current are the same." do
       @enrollment2.cancel_previous(TimeKeeper.date_of_record.year)
       expect(@enrollment1.aasm_state).to eq "coverage_canceled"
-    end
-  end
-
-  describe "#trigger ee_plan_selection_confirmation_sep_new_hire" do
-    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: @household, kind: "employer_sponsored", employee_role_id: employee_role.id) }
-    let(:census_employee) { FactoryGirl.create(:census_employee)  }
-    let(:employee_role){FactoryGirl.build(:employee_role, :census_employee => census_employee)}
-
-    before :each do
-      @household = mikes_family.households.first
-    end
-
-    it "should trigger ee_plan_selection_confirmation_sep_new_hire job in queue" do
-      allow(hbx_enrollment).to receive(:census_employee).and_return(census_employee)
-      allow(hbx_enrollment).to receive(:employee_role).and_return(employee_role)
-      allow(employee_role).to receive(:is_under_open_enrollment?).and_return(false)
-      ActiveJob::Base.queue_adapter = :test
-      ActiveJob::Base.queue_adapter.enqueued_jobs = []
-
-      hbx_enrollment.ee_plan_selection_confirmation_sep_new_hire
-      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
-        job_info[:job] == ShopNoticesNotifierJob
-      end
-
-      expect(queued_job[:args]).not_to be_empty
-      expect(queued_job[:args].include?('ee_plan_selection_confirmation_sep_new_hire')).to be_truthy
-      expect(queued_job[:args].include?("#{hbx_enrollment.census_employee.id.to_s}")).to be_truthy
-      expect(queued_job[:args].third["hbx_enrollment"]).to eq hbx_enrollment.hbx_id.to_s
-    end
-  end
-
-  describe "#trigger notify_employee_confirming_coverage_termination" do
-    let(:family) { FactoryGirl.build(:family, :with_primary_family_member_and_dependent)}
-    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, kind: "employer_sponsored", employee_role_id: employee_role.id) }
-    let(:census_employee) { FactoryGirl.create(:census_employee)  }
-    let(:employee_role){FactoryGirl.build(:employee_role, :census_employee => census_employee)}
-
-    before :each do
-      allow(hbx_enrollment).to receive(:census_employee).and_return(census_employee)
-      allow(hbx_enrollment).to receive(:employee_role).and_return(employee_role)
-      allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
-    end
-
-    it "should trigger notify_employee_confirming_coverage_termination job in queue" do
-      ActiveJob::Base.queue_adapter = :test
-      ActiveJob::Base.queue_adapter.enqueued_jobs = []
-      hbx_enrollment.notify_employee_confirming_coverage_termination
-      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
-        job_info[:job] == ShopNoticesNotifierJob
-      end
-      expect(queued_job[:args]).not_to be_empty
-      expect(queued_job[:args].include?('notify_employee_confirming_coverage_termination')).to be_truthy
-      expect(queued_job[:args].include?("#{hbx_enrollment.census_employee.id.to_s}")).to be_truthy
-      expect(queued_job[:args].third["hbx_enrollment_hbx_id"]).to eq hbx_enrollment.hbx_id.to_s
     end
   end
 
