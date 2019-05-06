@@ -4,9 +4,9 @@ Then (/^Hbx Admin sees Families link$/) do
 end
 
 When(/^Hbx Admin click Families link$/) do
-  click_link "Families"
+  find('.interaction-click-control-families').click
   wait_for_ajax
-  find(:xpath, "//*[@id='myTab']/li[2]/ul/li[1]/a/span[1]", :wait => 10).click
+  find(:xpath, "//*[@id='myTab']/li[2]/ul/li[2]/a", :wait => 10).click
   wait_for_ajax
 end
 

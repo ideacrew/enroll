@@ -1,7 +1,7 @@
 And(/^admin has navigated into the NEW CONSUMER APPLICATION$/) do
 	visit exchanges_hbx_profiles_root_path
-	click_link "Families"
-	page.find('.interaction-click-control-new-consumer-application').trigger('click')
+  find('.interaction-click-control-families').click
+	page.find('.interaction-click-control-new-consumer-application').click
 	visit begin_consumer_enrollment_exchanges_agents_path
 end
 
@@ -15,15 +15,15 @@ And(/^the Admin is on the Personal Info page for the family$/) do
   find('.btn', text: 'CONTINUE').click
 
   expect(page).to have_content('Thank you. Next, we need to verify if you or you and your family are eligible to enroll in coverage through DC Health Link. Please select CONTINUE.')
-  find('.btn', text: 'CONTINUE').click
+  find('.interaction-click-control-continue').click
 end
 
 And(/^the Admin clicks the Application Type drop down$/) do
-	find(:xpath, "//p[@class='label'][contains(., 'choose')]").click 
+	find(:xpath, "//*[@id='new_person_wrapper']/div/div[1]/div[1]/div[2]/div/div[2]").click
 end
 
 And(/^the Admin selects the Phone application option$/) do
-  find(:xpath, "//select[@name='person[family][application_type]']/option[@value='Phone']")
+  find(".interaction-choice-control-application-type-id-1")
 end
 
 Given(/^all other mandatory fields on the page have been populated$/) do
@@ -34,13 +34,17 @@ Given(/^all other mandatory fields on the page have been populated$/) do
   fill_in "person_addresses_attributes_0_address_1", with: "123 Main St"
   fill_in "person_addresses_attributes_0_address_2", with: "apt 1005"
   fill_in "person_addresses_attributes_0_city", with: "Washington"
-  find(:xpath, "//p[@class='label'][contains(., 'SELECT STATE')]").click
+  find(:xpath, "//span[@class='label'][contains(., 'SELECT STATE')]").click
   find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[3]/div/ul/li[10]').click
   fill_in "person[addresses_attributes][0][zip]", with: "35465"
 end
 
 When(/^Admin clicks CONTINUE button$/) do
   find('.btn', text: 'CONTINUE').click
+end
+
+When(/^Admin clicks Continue button$/) do
+  find('.button', text: 'Continue').click
 end
 
 Then(/^the Admin should navigate to the Experian Auth and Consent Page$/) do
@@ -69,17 +73,22 @@ When(/^the Admin clicks CONTINUE after uploading and verifying an application$/)
   within '#select_upload_identity' do
     attach_file("file[]", "#{Rails.root}/lib/pdf_templates/blank.pdf", visible:false)
   end
-  wait_for_ajax(10,2)
 
-  find(:xpath, "/html/body/div[2]/div[3]/div/div/div[1]/div[2]/div/div/div/div[2]/div[1]/div/div[4]/div/div[2]").click
+  find('#upload_application').click
+  within '#upload_application' do
+    attach_file("file[]", "#{Rails.root}/lib/pdf_templates/blank.pdf", visible:false)
+  end
+
+  wait_for_ajax(10,2)
+  find(:xpath,"//*[@id='Identity']/div/div[4]/div").click
   find('.interaction-choice-control-verification-reason-1').click
-  find('.interaction-choice-control-verification-reason', :text => /\ASelect Reason\z/).click
+  find('.selectric-interaction-choice-control-verification-reason').click
   select('Document in EnrollApp', :from => 'verification_reason')
   find('.v-type-confirm-button').click
 
-  find(:xpath, "/html/body/div[2]/div[3]/div/div/div[1]/div[2]/div/div/div/div[2]/div[5]/div/div[4]/div/div[2]").click
+  find(:xpath,"//*[@id='Application']/div/div[4]/div").click
   find('.interaction-choice-control-verification-reason-1').click
-  find('.interaction-choice-control-verification-reason', :text => /\ASelect Reason\z/).click
+  find('.selectric-interaction-choice-control-verification-reason').click
   select('Document in EnrollApp', :from => 'verification_reason')
   find('.v-type-confirm-button').click
 
