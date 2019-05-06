@@ -3,7 +3,7 @@ module BenefitSponsors
 
     def show?
       return false unless user.present?
-      user.has_hbx_staff_role? || is_broker_for_employer?(record) || is_general_agency_staff_for_employer?(record) || is_staff_role_for_employer?(record)
+      user.has_hbx_staff_role? || is_broker_for_employer?(record) || is_general_agency_staff_for_employer?(record) || is_broker_staff_role_for_employer?(record) || is_staff_role_for_employer?(record)
     end
 
     def show_pending?
@@ -13,7 +13,7 @@ module BenefitSponsors
 
     def coverage_reports?
       return false unless user.present?
-      return true if (user.has_hbx_staff_role? && can_list_enrollments?) || is_broker_for_employer?(record) || is_general_agency_staff_for_employer?(record)
+      return true if (user.has_hbx_staff_role? && can_list_enrollments?) || is_broker_for_employer?(record) || is_general_agency_staff_for_employer?(record) || is_broker_staff_role_for_employer?(record)
       is_staff_role_for_employer?(record)
     end
 
@@ -28,6 +28,12 @@ module BenefitSponsors
     def is_staff_role_for_employer?(profile)
       staff_roles = user.person.employer_staff_roles
       staff_roles.any? {|role| role.benefit_sponsor_employer_profile_id == record.id }
+    end
+
+    def is_broker_staff_role_for_employer?(profile)
+      staff_roles = user.person.broker_agency_staff_roles
+      broker_profiles = staff_roles.map(&:benefit_sponsors_broker_agency_profile_id)
+      profile.broker_agency_accounts.any? {|acc|  broker_profiles.include?(acc.benefit_sponsors_broker_agency_profile_id)}
     end
 
     def is_broker_for_employer?(profile)

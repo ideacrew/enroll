@@ -87,6 +87,14 @@ class UserMailer < ApplicationMailer
     end
   end
 
+  def broker_staff_invitation_email(email, person_name, invitation, person_id)
+    if email.present?
+      mail({to: email, subject: "Invitation to create your Broker Staff account on #{Settings.site.short_name} "}) do |format|
+        format.html { render "broker_staff_invitation_email", :locals => { :person_name => person_name, :invitation => invitation, :person_id => person_id }}
+      end
+    end
+  end
+
   def message_to_broker(person, broker, params)
     if broker.email_address.present?
       mail({to: broker.email_address, subject: params[:subject], from: person.user.email}) do |format|

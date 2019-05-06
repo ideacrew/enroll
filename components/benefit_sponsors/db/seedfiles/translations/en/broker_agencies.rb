@@ -1,5 +1,6 @@
 BROKER_AGENCIES_TRANSLATIONS = {
 	"en.broker_agencies.broker_roles.select_your_broker_agency" => "Select Your Broker Agency",
+	"en.broker_agencies.broker_roles.select_your_broker" => "Select Your Broker",
 	"en.search" => "Search",
 	"en.submit_application" => "Submit Application",
   "en.broker_agencies.broker_roles.new_broker_agency_form.broker_agency_information" => "Broker Agency Information",
@@ -14,6 +15,7 @@ BROKER_AGENCIES_TRANSLATIONS = {
 	"en.fein" => "FEIN",
 	"en.primary_broker_name" => "Primary Broker Name",
 	"en.broker_agencies.broker_roles.select_this_broker_agency" => "select this broker agency",
+	"en.broker_agencies.broker_roles.select_this_broker" => "select this broker",
 	"en.broker_registration"=> "Broker Registration",
 	"en.broker_agencies.profiles.broker_agency_message" => "Broker Agency Message",
 	"en.broker_agencies.profiles.send_secure_message" => "Send Secure Message to %{site_short_name}",
