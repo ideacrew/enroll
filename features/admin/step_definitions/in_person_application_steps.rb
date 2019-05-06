@@ -1,5 +1,5 @@
 When(/^the Admin selects the In Person application option$/) do
-	find(:xpath, "//select[@name='person[family][application_type]']/option[@value='In Person']")
+  find("li", :text => "In Person").click
 end
 
 When(/^the Admin clicks CONTINUE after uploading and verifying an Identity$/) do
