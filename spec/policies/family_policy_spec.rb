@@ -150,12 +150,12 @@ describe FamilyPolicy, "given a user who has the modify family permission" do
 end
 
 describe FamilyPolicy, 'given a family with an active broker with only broker role' do
-  let(:person) {FactoryGirl.create(:person, :with_family)}
-  let(:user) {FactoryGirl.create(:user, person: person)}
-  let(:family) {person.primary_family}
-  let(:broker_role) {FactoryGirl.create(:broker_role, aasm_state: 'active', broker_agency_profile_id: broker_agency_profile.id, person: person)}
-  let(:broker_agency_profile) {FactoryGirl.create(:broker_agency_profile)}
-  let(:broker_agency_account) {FactoryGirl.create(:broker_agency_account, broker_agency_profile_id:broker_agency_profile.id, writing_agent_id: broker_role.id, is_active: true)}
+  let(:person) { FactoryGirl.create(:person, :with_family) }
+  let(:user) { FactoryGirl.create(:user, person: person) }
+  let(:family) { person.primary_family }
+  let(:broker_role) { FactoryGirl.create(:broker_role, aasm_state: 'active', broker_agency_profile_id: broker_agency_profile.id, person: person) }
+  let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
+  let(:broker_agency_account) { FactoryGirl.create(:broker_agency_account, broker_agency_profile_id:broker_agency_profile.id, writing_agent_id: broker_role.id, is_active: true) }
 
 
   subject { FamilyPolicy.new(user, family) }
@@ -173,12 +173,12 @@ end
 
 describe 'can_broker_modify_family' do
 
-  let(:person) {FactoryGirl.create(:person, :with_family)}
-  let(:user) {FactoryGirl.create(:user, person: person)}
-  let(:family) {person.primary_family}
-  let(:broker_role) {FactoryGirl.create(:broker_role, aasm_state: 'active', broker_agency_profile_id: broker_agency_profile.id, person: person)}
-  let(:broker_agency_profile) {FactoryGirl.create(:broker_agency_profile)}
-  let(:broker_agency_account) {FactoryGirl.create(:broker_agency_account, broker_agency_profile_id:broker_agency_profile.id, writing_agent_id: broker_role.id, is_active: true)}
+  let(:person) { FactoryGirl.create(:person, :with_family) }
+  let(:user) { FactoryGirl.create(:user, person: person) }
+  let(:family) { person.primary_family }
+  let(:broker_role) { FactoryGirl.create(:broker_role, aasm_state: 'active', broker_agency_profile_id: broker_agency_profile.id, person: person) }
+  let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
+  let(:broker_agency_account) { FactoryGirl.create(:broker_agency_account, broker_agency_profile_id:broker_agency_profile.id, writing_agent_id: broker_role.id, is_active: true) }
 
   subject { FamilyPolicy.new(user, family) }
 
@@ -192,8 +192,8 @@ describe 'can_broker_modify_family' do
 
   context 'person with only broker staff role' do
 
-    let!(:broker_agency_staff_role1) {FactoryGirl.create(:broker_agency_staff_role, aasm_state: 'active', broker_agency_profile_id: broker_agency_profile.id, person: person)}
-    let!(:broker_agency_staff_role2) {FactoryGirl.create(:broker_agency_staff_role, aasm_state: 'pending', person: person)}
+    let!(:broker_agency_staff_role1) { FactoryGirl.create(:broker_agency_staff_role, aasm_state: 'active', broker_agency_profile_id: broker_agency_profile.id, person: person) }
+    let!(:broker_agency_staff_role2) { FactoryGirl.create(:broker_agency_staff_role, aasm_state: 'pending', person: person) }
 
     it 'can modify family' do
       allow(family).to receive(:active_broker_agency_account).and_return broker_agency_account
