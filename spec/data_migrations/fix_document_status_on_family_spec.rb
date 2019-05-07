@@ -22,7 +22,7 @@ describe FixDocumentStatus, dbclean: :after_each do
     family_person.save!
     family.update_family_document_status!
     expect(family.all_persons_vlp_documents_status).to eq('Fully Uploaded')
-    family_person.consumer_role.vlp_documents.first.destroy
+    family_person.consumer_role.vlp_documents = []
     subject.migrate
     family.reload
     expect(family.vlp_documents_status).to eq('None')

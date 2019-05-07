@@ -14,68 +14,53 @@ describe UpdateCuramUserRecords, dbclean: :after_each do
     end
   end
 
-  before do
-    allow(ENV).to receive(:[]).with('action').and_return ""
-    allow(ENV).to receive(:[]).with('user_email').and_return curam_user.email
-    allow(ENV).to receive(:[]).with('user_name').and_return curam_user.username
-    allow(ENV).to receive(:[]).with('find_user_by').and_return "email"
-    allow(ENV).to receive(:[]).with('new_user_email').and_return nil
-    allow(ENV).to receive(:[]).with('new_user_name').and_return nil
-  end
-
   describe "update username & email of the curam user", dbclean: :after_each do
-
     it "should update the username of the user by finding user by username" do
-      allow(ENV).to receive(:[]).with('action').and_return "update_UserName"
-      allow(ENV).to receive(:[]).with('new_user_name').and_return "UpdatE@This"
-      subject.migrate
-      curam_user.reload
-      expect(curam_user.username).to eq "UpdatE@This"
+      ClimateControl.modify :action => "update_UserName", :new_user_name => "UpdatE@This", :user_email => curam_user.email, :user_name => curam_user.username, :find_user_by => "email" do
+        subject.migrate
+        curam_user.reload
+        expect(curam_user.username).to eq "UpdatE@This"
+      end
     end
 
     it "should update the email of the user by finding user by username" do
-      allow(ENV).to receive(:[]).with('find_user_by').and_return "user_name"
-      allow(ENV).to receive(:[]).with('new_user_email').and_return "updatingemail@gmail.com"
-      allow(ENV).to receive(:[]).with('action').and_return "update_Email"
-      subject.migrate
-      curam_user.reload
-      expect(curam_user.email).to eq "updatingemail@gmail.com"
+      ClimateControl.modify :action => "update_Email", :new_user_email => "updatingemail@gmail.com", :find_user_by => "user_name", :user_email => curam_user.email, :user_name => curam_user.username do
+        subject.migrate
+        curam_user.reload
+        expect(curam_user.email).to eq "updatingemail@gmail.com"
+      end
     end
 
     it "should update the username of the user by finding user by email" do
-      allow(ENV).to receive(:[]).with('find_user_by').and_return "email"
-      allow(ENV).to receive(:[]).with('new_user_name').and_return "user@321"
-      allow(ENV).to receive(:[]).with('action').and_return "update_username"
-      subject.migrate
-      curam_user.reload
-      expect(curam_user.username).to eq "user@321"
+      ClimateControl.modify :action => "update_username", :new_user_name => "user@321", :find_user_by => "email", :user_email => curam_user.email, :user_name => curam_user.username do
+        subject.migrate
+        curam_user.reload
+        expect(curam_user.username).to eq "user@321"
+      end
     end
 
     it "should update the email of the user by finding user by email" do
-      allow(ENV).to receive(:[]).with('find_user_by').and_return "email"
-      allow(ENV).to receive(:[]).with('new_user_email').and_return "updatingemail@gmail.com"
-      allow(ENV).to receive(:[]).with('action').and_return "update_Email"
-      subject.migrate
-      curam_user.reload
-      expect(curam_user.email).to eq "updatingemail@gmail.com"
+      ClimateControl.modify :action => "update_Email", :new_user_email => "updatingemail@gmail.com", :find_user_by => "email", :user_email => curam_user.email, :user_name => curam_user.username do
+        subject.migrate
+        curam_user.reload
+        expect(curam_user.email).to eq "updatingemail@gmail.com"
+      end
     end
 
     it "should update the dob of the user by finding user by email" do
-      allow(ENV).to receive(:[]).with('find_user_by').and_return "email"
-      allow(ENV).to receive(:[]).with('action').and_return "update_dob"
-      allow(ENV).to receive(:[]).with('new_dob').and_return "04/04/1990"
-      subject.migrate
-      curam_user.reload
-      expect(curam_user.dob).to eq Date.parse("04/04/1990")
+      ClimateControl.modify :action => "update_dob", :new_dob => "04/04/1990", :find_user_by => "email", :user_email => curam_user.email, :user_name => curam_user.username do
+        subject.migrate
+        curam_user.reload
+        expect(curam_user.dob).to eq Date.parse("04/04/1990")
+      end
     end
 
     it "should update the ssn of the user by finding user by email" do
-      allow(ENV).to receive(:[]).with('find_user_by').and_return "email"
-      allow(ENV).to receive(:[]).with('action').and_return "update_ssn"
-      allow(ENV).to receive(:[]).with('new_ssn').and_return "456738293"
-      subject.migrate
-      curam_user.reload
-      expect(curam_user.ssn).to eq "456738293"
+      ClimateControl.modify :action => "update_ssn", :new_dob => "456738293", :find_user_by => "email", :user_email => curam_user.email, :user_name => curam_user.username, :new_ssn => "456738293" do
+        subject.migrate
+        curam_user.reload
+        expect(curam_user.ssn).to eq "456738293"
+      end
     end
   end
 end

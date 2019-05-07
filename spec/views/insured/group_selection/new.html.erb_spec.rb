@@ -173,6 +173,12 @@ RSpec.describe "insured/group_selection/new.html.erb" do
         assign(:person, jail_person)
         assign(:coverage_household, coverage_household_jail)
         assign(:benefit, benefit_package)
+        assign(:adapter, adapter)
+        allow(adapter).to receive(:can_shop_shop?).with(jail_person).and_return(false)
+        allow(adapter).to receive(:can_shop_both_markets?).with(jail_person).and_return(false)
+        allow(adapter).to receive(:can_shop_resident?).with(jail_person).and_return(false)
+        allow(adapter).to receive(:can_shop_individual?).with(jail_person).and_return(true)
+        allow(adapter).to receive(:class_for_ineligible_row).and_return("ineligible_ivl_row")
         allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx)
         allow_any_instance_of(InsuredEligibleForBenefitRule).to receive(:is_family_relationships_satisfied?).and_return(true)
         allow(benefit_package).to receive(:start_on).and_return(TimeKeeper.date_of_record.beginning_of_year)
@@ -201,7 +207,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
         end
 
         it "should have one ineligible row" do
-          expect(rendered).to have_selector("tr[class^='ineligible_ivl_row']", count: 1)
+          expect(rendered).to have_selector("tr[class^='ineligible_ivl_row']")
         end
 
         it "should have coverage_kinds area" do
@@ -593,6 +599,11 @@ RSpec.describe "insured/group_selection/new.html.erb" do
         assign :market_kind, 'individual'
         assign :change_plan, true
         assign :hbx_enrollment, hbx_enrollment
+        assign(:adapter, adapter)
+        allow(adapter).to receive(:can_shop_shop?).with(person).and_return(false)
+        allow(adapter).to receive(:can_shop_both_markets?).with(person).and_return(false)
+        allow(adapter).to receive(:can_shop_resident?).with(person).and_return(false)
+        allow(adapter).to receive(:can_shop_individual?).with(person).and_return(true)
         allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.beginning_of_month)
         allow(hbx_enrollment).to receive(:coverage_selected?).and_return(true)
         allow(view).to receive(:can_employee_shop?).and_return(false)
@@ -710,6 +721,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
         assign :hbx_enrollment, hbx_enrollment
         assign(:adapter, adapter)
         allow(adapter).to receive(:can_shop_individual?).with(person).and_return(true)
+        allow(adapter).to receive(:is_eligible_for_dental?).and_return(false)
         allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.beginning_of_month)
         allow(hbx_enrollment).to receive(:coverage_selected?).and_return(true)
         allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
@@ -773,86 +785,18 @@ RSpec.describe "insured/group_selection/new.html.erb" do
         end
 
         it "dental option should have a class of dn" do
+          allow(adapter).to receive(:is_eligible_for_dental?).and_return(false)
           assign(:market_kind, 'shop')
           render file: "insured/group_selection/new.html.erb"
           expect(rendered).to have_selector('.n-radio-row.dn')
         end
 
         it "dental option should not be visible" do
+          allow(adapter).to receive(:is_eligible_for_dental?).and_return(true)
           render file: "insured/group_selection/new.html.erb"
           expect(rendered).to_not have_selector('.n-radio-row.dn')
         end
       end
-    end
-
-    it 'renders the form for a new enrollment creation' do
-      expect(rendered).to have_selector('form#group-selection-form')
-    end
-
-    it "should show the title of family members" do
-      expect(rendered).to match /Choose Coverage for your Household/
-    end
-
-    it "should display eligible coverage household members" do 
-      doc = Nokogiri::HTML(rendered)
-      member_elements = doc.css("div#coverage-household table tr")
-
-      coverage_household.coverage_household_members.each_with_index do |coverage_household_member, index|
-        family_member  = coverage_household_member.family_member
-        member_element = member_elements[index]
-
-        expect(member_element).to have_selector('label', text: "#{family_member.full_name} (Age : #{family_member.age} years)")
-
-        if family_member.is_primary?
-          expect(member_element).to have_selector('.is_primary')
-        else
-          expect(member_element).not_to have_selector('.is_primary')
-        end
-
-        family_member.health_ineligible? ? expect_error_message(member_element, "td.health_errors_1") : expect_no_error_message(member_element, "td.health_errors_1")
-        family_member.dental_ineligible? ? expect_error_message(member_element, "td.dental_errors_1") : expect_no_error_message(member_element, "td.dental_errors_1")
-      end
-    end
-
-    it "should display effective on date" do
-      render file: "insured/group_selection/new.html.erb"
-      expect(rendered).to have_content("EFFECTIVE DATE: #{effective_on.strftime('%m/%d/%Y')}")
-    end
-
-    it "should display Employer details" do 
-      expect(response).to have_css('div#employer-selection h3', text: 'Employer')
-      expect(response).to have_css('div#employer-selection label', text: employer_profile.legal_name)
-      expect(response).to have_css("div#employer-selection input[checked='checked']")
-    end
-
-    it "should display both health and dental coverage options" do 
-      doc = Nokogiri::HTML(rendered)
-      expect(doc.css('div#coverage_kinds .n-radio-row').size).to eq 2
-    end
-
-    it "should display health coverage option with checked radio option" do
-      doc = Nokogiri::HTML(rendered)
-      expect(doc.css('div#coverage_kinds .n-radio-row')[0].css('label')).to have_content('Health')
-      expect(doc.css('div#coverage_kinds .n-radio-row')[0].css('label')).to have_selector("input[type='radio'][checked='checked']")
-    end
-
-    it "should display dental coverage option with non checked radio option" do
-      doc = Nokogiri::HTML(rendered)
-      expect(doc.css('div#coverage_kinds .n-radio-row')[1].css('label')).to have_content('Dental')
-      expect(doc.css('div#coverage_kinds .n-radio-row')[1].css('label')).to have_selector("input[type='radio']")
-      expect(doc.css('div#coverage_kinds .n-radio-row')[1].css('label')).not_to have_selector("input[type='radio'][checked='checked']")
-    end
-
-    it "shouldn't see marketplace options" do
-      expect(rendered).not_to have_selector('h3', text: 'Marketplace')
-    end
-
-    it "should not see employer-sponsored coverage radio option" do
-      expect(rendered).not_to have_selector('#market_kind_shop')
-    end
-
-    it "should not see individual coverage radio option" do
-      expect(rendered).not_to have_selector('#market_kind_individual')
     end
   end
 end

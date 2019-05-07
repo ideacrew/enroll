@@ -502,7 +502,6 @@ When(/^(.*) logs on to the (.*)?/) do |named_person, portal|
   #TODO this fixes the random login fails b/c of empty params on email
   fill_in "user[login]", :with => person[:email] unless find(:xpath, '//*[@id="user_login"]').value == person[:email]
   find('.interaction-click-control-sign-in').click
-  sleep 10
   visit portal_uri
   # Adding sleep seems to help prevent the AuthenticityToken error
   # which apeared to be throwing in at least the
@@ -547,7 +546,7 @@ end
 
 Then(/^(?:.+) should see a successful sign up message$/) do
   FactoryBot.create(:sic_code, sic_code: "0111")
-  expect(page).to have_content("Welcome to #{Settings.site.short_name}. Your account has been created.")
+  expect(page).to have_content("Welcome!")
   screenshot("employer_sign_up_welcome")
 end
 

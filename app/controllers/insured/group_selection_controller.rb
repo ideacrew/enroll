@@ -7,6 +7,7 @@ class Insured::GroupSelectionController < ApplicationController
 
   def new
     set_bookmark_url
+    set_admin_bookmark_url
     @adapter.disable_market_kinds(params) do |disabled_market_kind|
       @disable_market_kind = disabled_market_kind
     end

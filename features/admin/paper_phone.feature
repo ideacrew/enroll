@@ -1,25 +1,15 @@
-Feature: Paper Enrollment options exist
-  In order to support paper enrollments
-  Link is provided that will track paper enrollment
+Feature: Phone and Paper Enrollment options exist
+  In order to support paper and phone enrollments
+  Links are provided that will track phone and paper enrollments
 
-   Background: Setup site, employer, and benefit application
-    Given a CCA site exists with a benefit market
-    Given Qualifying life events are present
-    And benefit market catalog exists for enrollment_open renewal employer with health benefits
-    And there is an employer ABC Widgets
+  Background:
+    Given a Hbx admin with read and write permissions exists
+    When Hbx Admin logs on to the Hbx Portal
+    When Hbx Admin click Families link
 
-  Scenario Outline: Super Admin HBX Tier3 HBX Staff Can able to do Paper Application
-    Given that a user with a HBX staff role with <subrole> subrole exists and is logged in
-    And the user is on the Family Index of the Admin Dashboard
-    Then I see the Paper link
-    And user will click on New Employee Paper Application link
-    Then HBX admin start new employee enrollment
-    #Note: Phone festure does not exists in MA
-    #Then I see the Phone link
+  Scenario: Phone and Phone Enrollment
+    Then I see the DC Resident Application link
+    Then I see the New Consumer Application link
 
-    Examples:
-      | subrole       | action  |
-      | Super Admin   | see     | 
-      | HBX Tier3     | see     |
-      | HBX Staff     | see     |
-      | HBX Read Only | not see |
+  Scenario: Disabling Paper link
+    Then the Paper action should not be actionable

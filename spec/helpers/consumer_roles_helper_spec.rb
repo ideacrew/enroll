@@ -159,5 +159,37 @@ RSpec.describe ConsumerRolesHelper, :type => :helper do
       end
     end
   end
+
+  context "ridp_redirection_link" do
+    let(:person) {FactoryBot.build(:person, :with_consumer_role)}
+    let(:family) { FactoryBot.build(:family)}
+    let(:user) { FactoryBot.create(:user) }
+    let(:current_user) { FactoryBot.create(:user, :person => person) }
+
+    before :each do
+      allow(helper).to receive(:current_user).and_return(current_user)
+      allow(current_user).to receive(:has_hbx_staff_role?).and_return(false)
+      allow(person).to receive(:primary_family).and_return family
+    end
+
+    it "should return admin bookmark url" do
+      allow(person.consumer_role).to receive(:identity_verified?).and_return true
+      person.primary_family.update_attributes(application_type: 'Paper')
+      consumer = person.consumer_role
+      consumer.admin_bookmark_url = "/insured/ridp_agreement"
+      person.save
+      expect(helper.ridp_redirection_link(person)).to eq "/insured/ridp_agreement"
+    end
+
+    it "should return nil if identity is not verified and current user has not staff role" do
+      allow(person.consumer_role).to receive(:identity_verified?).and_return false
+      person.primary_family.update_attributes(application_type: 'In Person')
+      consumer = person.consumer_role
+      consumer.admin_bookmark_url = "/insured/ridp_agreement"
+      person.save
+      expect(helper.ridp_redirection_link(person)).to eq nil
+    end
+  end
+
 end
 end

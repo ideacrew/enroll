@@ -16,19 +16,16 @@ describe CloneConsumerRole do
     let!(:person1) { FactoryBot.create(:person, :with_consumer_role) }
     let!(:person2) { FactoryBot.create(:person) }
 
-    before(:each) do
-      allow(ENV).to receive(:[]).with("old_hbx_id").and_return(person1.hbx_id)
-      allow(ENV).to receive(:[]).with("new_hbx_id").and_return(person2.hbx_id)
-    end
-
     it "should clone consumer role from person1 to person2" do
-      expect(person1.consumer_role).not_to eq nil
-      expect(person2.consumer_role).to eq nil
-      subject.migrate
-      person1.reload
-      person2.reload
-      expect(person1.consumer_role).not_to eq nil
-      expect(person2.consumer_role).not_to eq nil
+      ClimateControl.modify :old_hbx_id => person1.hbx_id, :new_hbx_id => person2.hbx_id do
+        expect(person1.consumer_role).not_to eq nil
+        expect(person2.consumer_role).to eq nil
+        subject.migrate
+        person1.reload
+        person2.reload
+        expect(person1.consumer_role).not_to eq nil
+        expect(person2.consumer_role).not_to eq nil
+      end
     end
   end
 
@@ -36,14 +33,11 @@ describe CloneConsumerRole do
     let(:person1) { FactoryBot.create(:person) }
     let(:person2){ FactoryBot.create(:person) }
 
-    before(:each) do
-      allow(ENV).to receive(:[]).with("old_hbx_id").and_return(person1.hbx_id)
-      allow(ENV).to receive(:[]).with("new_hbx_id").and_return(person2.hbx_id)
-    end
-
     it "should not move user from person1 to person2" do
-      subject.migrate
-      expect(person2.consumer_role).to eq nil
+      ClimateControl.modify :old_hbx_id => person1.hbx_id, :new_hbx_id => person2.hbx_id do
+        subject.migrate
+        expect(person2.consumer_role).to eq nil
+      end
     end
   end
 

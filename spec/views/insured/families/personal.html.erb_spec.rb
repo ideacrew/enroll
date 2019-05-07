@@ -10,6 +10,10 @@ RSpec.describe "insured/families/personal.html.erb" do
     assign(:employee_role, employee_role)
     sign_in(current_user)
     allow(person).to receive(:employee_roles).and_return([employee_role])
+    allow(person).to receive_message_chain("primary_family.current_broker_agency.present?").and_return(false)
+    allow(view).to receive(:enrollment_group_unverified?).and_return true
+    allow(view).to receive(:verification_needed?).and_return true
+    allow(view).to receive(:documents_uploaded).and_return true
     allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
   render file: "insured/families/personal.html.erb"
   end
@@ -49,6 +53,9 @@ RSpec.describe "insured/families/personal.html.erb" do
 
     context "for consumer role" do
       let(:person) {FactoryBot.create(:person, :with_consumer_role)}
+      let(:employee_role) {FactoryBot.create(:employee_role, census_employee_id: census_employee.id)}
+      let(:census_employee) {FactoryBot.create(:census_employee)}
+      let(:current_user) { FactoryBot.create(:user, person: person) }
 
       it "should renders home address fields and consumer fields" do
         expect(response).to render_template("shared/_consumer_fields")

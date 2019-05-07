@@ -14,8 +14,6 @@ Feature: Only Super Admin HBX Staff HBX Tier3 will be able to see & access the E
     And Employee has not signed up as an HBX user
     And Patrick Doe visits the employee portal
     And Patrick Doe creates an HBX account
-    And I select the all security question and give the answer
-    And I have submitted the security questions
     And Employee goes to register as an employee
     And Employee should see the employee search page
     And Employee enters the identifying info of Patrick Doe
@@ -29,20 +27,20 @@ Feature: Only Super Admin HBX Staff HBX Tier3 will be able to see & access the E
     And Employee sees the Enrollment Submitted page and clicks Continue
     And Employee Patrick Doe should see their plan start date on the page
    
-  Scenario Outline: HBX Staff with <subrole> subroles should <action> Change FEIN button
-    Given that a user with a HBX staff role with <subrole> subrole exists and is logged in
-    And the user is on the Family Index of the Admin Dashboard
-    When the user clicks Action for that Employer
-    Then the user will <action> the Edit DOB SSN button
-    And Hbx Admin logs out
-
-    Examples:
-      | subrole       | action  |
-      | Super Admin   | see     |	
-      | HBX Tier3     | see     |
-      | HBX Staff     | see     |
-      | HBX Read Only | not see |
-      | Developer     | not see |
+#  Scenario Outline: HBX Staff with <subrole> subroles should <action> Change FEIN button
+#    Given that a user with a HBX staff role with <subrole> subrole exists and is logged in
+#    And the user is on the Family Index of the Admin Dashboard
+#    When the user clicks Action for that Employer
+#    Then the user will <action> the Edit DOB SSN button
+#    And Hbx Admin logs out
+#
+#    Examples:
+#      | subrole       | action  |
+#      | Super Admin   | see     |
+#      | HBX Tier3     | see     |
+#      | HBX Staff     | see     |
+#      | HBX Read Only | not see |
+#      | Developer     | not see |
 
 
 
