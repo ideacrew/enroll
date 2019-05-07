@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe 'BenefitSponsors::ModelEvents::LowEnrollmentNoticeForEmployer', dbclean: :around_each do
 
-  let(:model_event) { "low_enrollment_notice_for_employer" }
+  let(:model_event) { "open_enrollment_end_reminder_and_low_enrollment" }
   let(:start_on) { TimeKeeper.date_of_record.next_month.beginning_of_month}
   let!(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
   let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
@@ -23,12 +23,12 @@ RSpec.describe 'BenefitSponsors::ModelEvents::LowEnrollmentNoticeForEmployer', d
   describe "ModelEvent" do
     it "should trigger model event" do
       model_instance.class.observer_peers.keys.select { |ob| ob.is_a? BenefitSponsors::Observers::NoticeObserver }.each do |observer|
-          expect(observer).to receive(:notifications_send) do |instance, model_event|
-            expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
-          end
-          expect(observer).to receive(:notifications_send) do |instance, model_event|
+        expect(observer).to receive(:process_application_events) do |_instance, model_event|
           expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
-          expect(model_event).to have_attributes(:event_key => :low_enrollment_notice_for_employer, :klass_instance => model_instance, :options => {})
+        end
+        expect(observer).to receive(:process_application_events) do |_instance, model_event|
+          expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
+          expect(model_event).to have_attributes(:event_key => :open_enrollment_end_reminder_and_low_enrollment, :klass_instance => model_instance, :options => {})
         end
       end
       BenefitSponsors::BenefitApplications::BenefitApplication.date_change_event(date_mock_object)
@@ -37,9 +37,9 @@ RSpec.describe 'BenefitSponsors::ModelEvents::LowEnrollmentNoticeForEmployer', d
 
   describe "NoticeTrigger" do
     context "2 days prior to publishing dead line" do
-      subject { BenefitSponsors::Observers::BenefitApplicationObserver.new }
+      subject { BenefitSponsors::Observers::NoticeObserver.new }
 
-      let(:model_event) { BenefitSponsors::ModelEvents::ModelEvent.new(:low_enrollment_notice_for_employer, model_instance, {}) }
+      let(:model_event) { BenefitSponsors::ModelEvents::ModelEvent.new(:open_enrollment_end_reminder_and_low_enrollment, model_instance, {}) }
       if TimeKeeper.date_of_record.next_month.beginning_of_month.yday != 1
         it "should trigger notice event" do
           expect(subject.notifier).to receive(:notify) do |event_name, payload|
@@ -48,7 +48,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::LowEnrollmentNoticeForEmployer', d
             expect(payload[:event_object_kind]).to eq 'BenefitSponsors::BenefitApplications::BenefitApplication'
             expect(payload[:event_object_id]).to eq model_instance.id.to_s
           end
-          subject.notifications_send(model_instance, model_event)
+          subject.process_application_events(model_instance, model_event)
         end
       end
     end

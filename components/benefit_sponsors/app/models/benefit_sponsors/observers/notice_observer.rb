@@ -101,7 +101,7 @@ module BenefitSponsors
       def process_benefit_sponsorship_events(_model_instance, model_event)
         raise ArgumentError, "expected BenefitSponsors::ModelEvents::ModelEvent" unless model_event.present? && model_event.is_a?(BenefitSponsors::ModelEvents::ModelEvent)
 
-        method_name = "trigger_#{model_event.event_key}"
+        method_name = "trigger_#{model_event.event_key}_notice"
         raise StandardError, "unable to find method name: #{method_name}" unless respond_to?(method_name)
 
         __send__(method_name, model_event)
@@ -166,7 +166,7 @@ module BenefitSponsors
       def trigger_employer_open_enrollment_completed_notice(model_event)
         benefit_application = model_event.klass_instance
         policy = enrollment_policy.business_policies_for(benefit_application, :end_open_enrollment)
-        return if policy.is_satisfied?(benefit_application)
+        return unless policy.is_satisfied?(benefit_application)
 
         notice_event = benefit_application.is_renewing? ? "renewal_employer_open_enrollment_completed" : "initial_employer_open_enrollment_completed"
         deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: notice_event)

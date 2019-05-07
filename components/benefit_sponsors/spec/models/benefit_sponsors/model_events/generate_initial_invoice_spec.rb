@@ -18,8 +18,8 @@ RSpec.describe 'BenefitSponsors::ModelEvents::GenerateInitialEmployerInvoice', d
 
   describe "ModelEvent" do
     it "should trigger model event" do
-      model_instance.class.observer_peers.keys.each do |observer|
-        expect(observer).to receive(:notifications_send) do |instance, model_event|
+      model_instance.class.observer_peers.keys.select{ |ob| ob.is_a? BenefitSponsors::Observers::NoticeObserver }.each do |observer|
+        expect(observer).to receive(:process_employer_profile_events) do |_instance, model_event|
           expect(model_event).to be_an_instance_of(::BenefitSponsors::ModelEvents::ModelEvent)
           expect(model_event).to have_attributes(:event_key => :generate_initial_employer_invoice, :klass_instance => model_instance, :options => {})
         end
@@ -30,7 +30,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::GenerateInitialEmployerInvoice', d
 
   describe "NoticeTrigger" do
     context "when initial invoice is generated" do
-      subject { BenefitSponsors::Observers::EmployerProfileObserver.new }
+      subject { BenefitSponsors::Observers::NoticeObserver.new }
       let(:model_event) { ::BenefitSponsors::ModelEvents::ModelEvent.new(:generate_initial_employer_invoice, model_instance, {}) }
 
       it "should trigger notice event" do
@@ -40,7 +40,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::GenerateInitialEmployerInvoice', d
           expect(payload[:event_object_kind]).to eq 'BenefitSponsors::BenefitApplications::BenefitApplication'
           expect(payload[:event_object_id]).to eq benefit_application.id.to_s
         end
-        subject.notifications_send(model_instance, model_event)
+        subject.process_employer_profile_events(model_instance, model_event)
       end
     end
   end

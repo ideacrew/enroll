@@ -43,8 +43,8 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployeePlanSelectionConfir
   describe "Plan selection confirmation when ER made binder payment" do
     context "ModelEvent" do
       it "should set to true after transition" do
-        benefit_sponsorship.class.observer_peers.keys.each do |observer|
-          expect(observer).to receive(:notifications_send) do |model_instance, model_event|
+        benefit_sponsorship.class.observer_peers.keys.select{ |ob| ob.is_a? BenefitSponsors::Observers::NoticeObserver }.each do |observer|
+          expect(observer).to receive(:process_benefit_sponsorship_events) do |_model_instance, model_event|
             expect(model_event).to be_an_instance_of(::BenefitSponsors::ModelEvents::ModelEvent)
             expect(model_event).to have_attributes(:event_key => :initial_employee_plan_selection_confirmation, :klass_instance => benefit_sponsorship, :options => {})
           end
@@ -54,7 +54,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployeePlanSelectionConfir
     end
 
     context "NoticeTrigger" do
-      subject { BenefitSponsors::Observers::BenefitSponsorshipObserver.new }
+      subject { BenefitSponsors::Observers::NoticeObserver.new }
       let(:model_event) { ::BenefitSponsors::ModelEvents::ModelEvent.new(:initial_employee_plan_selection_confirmation, benefit_sponsorship, {}) }
 
       it "should trigger notice event" do
@@ -63,7 +63,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployeePlanSelectionConfir
           expect(payload[:event_object_kind]).to eq 'CensusEmployee'
           expect(payload[:event_object_id]).to eq census_employee.id.to_s
         end
-        subject.notifications_send(hbx_enrollment, model_event)
+        subject.process_benefit_sponsorship_events(hbx_enrollment, model_event)
       end
     end
   end

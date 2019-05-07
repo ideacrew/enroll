@@ -29,7 +29,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::ApplicationCoverageSelected', :dbc
   describe "when employee plan coverage selected" do
     context "ModelEvent" do
       it "should trigger model event" do
-        model_instance.class.observer_peers.keys.each do |observer|
+        model_instance.class.observer_peers.keys.select{ |ob| ob.is_a? BenefitSponsors::Observers::NoticeObserver }.each do |observer|
           expect(observer).to receive(:process_enrollment_events) do |_instance, model_event|
             expect(model_event).to be_an_instance_of(::BenefitSponsors::ModelEvents::ModelEvent)
             expect(model_event).to have_attributes(:event_key => :application_coverage_selected, :klass_instance => model_instance, :options => {})

@@ -1,5 +1,6 @@
-# rubocop:disable Lint/UselessAssignment
+# frozen_string_literal: true
 
+# rubocop:disable Lint/UselessAssignment
 module BenefitSponsors
   module ModelEvents
     module BenefitApplication

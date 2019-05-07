@@ -3,25 +3,25 @@ require 'rails_helper'
 RSpec.describe 'BenefitSponsors::ModelEvents::WelcomeNoticeToEmployer', dbclean: :around_each  do
   let(:notice_event)  { "welcome_notice_to_employer" }
   let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-  let!(:model_instance)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
-  let!(:employer_profile)    { model_instance.employer_profile }
+  let!(:model_instance)     { FactoryBot.build(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+  let(:employer_profile)    { model_instance.employer_profile }
   let(:person){ create :person}
 
   describe "when ER successfully creates account" do
     context "ModelEvent" do
       it "should trigger model event" do
         model_instance.class.observer_peers.keys.select { |ob| ob.is_a? BenefitSponsors::Observers::NoticeObserver }.each do |observer|
-          expect(observer).to receive(:notifications_send) do |model_instance, model_event|
+          expect(observer).to receive(:process_organization_events) do |model_instance, model_event|
             expect(model_event).to be_an_instance_of(::BenefitSponsors::ModelEvents::ModelEvent)
             expect(model_event).to have_attributes(:event_key => :welcome_notice_to_employer, :klass_instance => model_instance, :options => {})
           end
         end
-        model_instance.notify_on_create
+        model_instance.save!
       end
     end
 
     context "NoticeTrigger" do
-      subject { BenefitSponsors::Observers::OrganizationObserver.new }
+      subject { BenefitSponsors::Observers::NoticeObserver.new }
       let(:model_event) { ::BenefitSponsors::ModelEvents::ModelEvent.new(:welcome_notice_to_employer, model_instance, {}) }
 
       it "should trigger notice event" do
@@ -30,7 +30,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::WelcomeNoticeToEmployer', dbclean:
           expect(payload[:event_object_kind]).to eq 'BenefitSponsors::Organizations::AcaShopCcaEmployerProfile'
           expect(payload[:event_object_id]).to eq employer_profile.id.to_s
         end
-        subject.notifications_send(model_instance, model_event)
+        subject.process_organization_events(model_instance, model_event)
       end
     end
   end

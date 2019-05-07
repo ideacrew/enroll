@@ -4,7 +4,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerFirstRemainderToPub
 
   let(:model_event) { "initial_employer_first_reminder_to_publish_plan_year" }
   let(:notice_event) { "initial_employer_first_reminder_to_publish_plan_year" }
-  let(:start_on) { TimeKeeper.date_of_record.next_month.beginning_of_month}
+  let(:start_on) { (TimeKeeper.date_of_record + 2.months).beginning_of_month }
   let!(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
   let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
   let!(:employer_profile)    { organization.employer_profile }
@@ -20,12 +20,12 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerFirstRemainderToPub
 
   describe "ModelEvent" do
     it "should trigger model event" do
-      model_instance.class.observer_peers.keys.each do |observer|
-        expect(observer).to receive(:notifications_send) do |instance, model_event|
+      model_instance.class.observer_peers.keys.select{ |ob| ob.is_a? BenefitSponsors::Observers::NoticeObserver }.each do |observer|
+        expect(observer).to receive(:process_application_events) do |_instance, model_event|
           expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
         end
 
-        expect(observer).to receive(:notifications_send) do |instance, model_event|
+        expect(observer).to receive(:process_application_events) do |_instance, model_event|
           expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
           expect(model_event).to have_attributes(:event_key => :initial_employer_first_reminder_to_publish_plan_year, :klass_instance => model_instance, :options => {})
         end
@@ -36,7 +36,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerFirstRemainderToPub
 
   describe "NoticeTrigger" do
     context "2 days prior to soft dead line" do
-      subject { BenefitSponsors::Observers::BenefitApplicationObserver.new }
+      subject { BenefitSponsors::Observers::NoticeObserver.new }
       let(:model_event) { BenefitSponsors::ModelEvents::ModelEvent.new(:initial_employer_first_reminder_to_publish_plan_year, model_instance, {}) }
 
       it "should trigger notice event" do
@@ -46,7 +46,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerFirstRemainderToPub
           expect(payload[:event_object_kind]).to eq 'BenefitSponsors::BenefitApplications::BenefitApplication'
           expect(payload[:event_object_id]).to eq model_instance.id.to_s
         end
-        subject.notifications_send(model_instance, model_event)
+        subject.process_application_events(model_instance, model_event)
       end
     end
   end

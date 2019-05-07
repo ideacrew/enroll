@@ -39,7 +39,6 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerApplicationDenied',
   describe "NoticeTrigger" do
     context "open enrollment end" do
       subject { BenefitSponsors::Observers::NoticeObserver.new }
-
       let(:model_event) { BenefitSponsors::ModelEvents::ModelEvent.new(:employer_open_enrollment_completed, model_instance, {}) }
 
       it "should trigger notice event" do
