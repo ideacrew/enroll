@@ -1,6 +1,7 @@
   require 'mongo'
 require 'csv'
 require 'pp'
+require 'securerandom'
 
 class OpmSeed
 
@@ -20,10 +21,16 @@ class OpmSeed
       "K" => sixty_five,
       'Z' => old }  
     @agency_codes = {}
+    @ssn= "0000001"
     @ee_count_mapping = {}
     @eps = Organization.all.map(&:employer_profile).compact.map(&:id)
     @org_cache =  ActiveSupport::Cache::MemoryStore.new
-    @client = Mongo::Client.new([ '172.30.1.55:27017' ], :database => 'enroll-opm')
+    @people = []
+    @families = []
+    @ces = []
+  
+    # @client = Mongo::Client.new([ '127.0.0.1:27017' ], :database => 'opm_development')
+    @client = Mongo::Client.new([ '172.30.1.55:27017' ], :database => 'enroll_opm', auth_source: 'admin', user:'admin', password:'enrUAT7102*@!')
   end
 
   def time_rand from = 0.0, to = Time.now
@@ -80,10 +87,10 @@ class OpmSeed
 
   
   def get_ssn
-    @ssn ||= (99999999..999999999).begin  
+    @ssn ||= (999999..9999999).begin  
     @ssn = @ssn.next 
-    ssn =  "#{@ssn.to_s[0,3]}00#{@ssn.to_s[5,7]}"
-    Person.encrypt_ssn(ssn)
+    ssn =  "00#{@ssn}"
+    Person.encrypt_ssn(ssn) 
   end
 
   def get_gender
@@ -95,6 +102,13 @@ class OpmSeed
     @ssn = @ssn.next 
     ssn =  "#{@ssn.to_s}"
   end
+
+  def get_hbx_id
+    @ssn ||= (999999..9999999).begin  
+    @ssn = @ssn.next 
+    ssn =  "#{@ssn.to_s}"
+  end
+
 
   def build_orgs
     puts "********************************* OPM Agency seed started at #{Time.now} ********************************* "
@@ -150,7 +164,7 @@ class OpmSeed
           "updated_by_id"=>nil,
           "xml_transmitted_timestamp"=>nil},
         "fein"=>get_fein,
-        "hbx_id"=>"72e528076a17402b9af921b2f0b82e8a",
+        "hbx_id"=>get_hbx_id,
         "home_page"=>nil,
         "is_active"=>nil,
         "is_fake_fein"=>nil,
@@ -303,7 +317,7 @@ class OpmSeed
   "full_name"=>name_0,
   "gender"=>get_gender,
   "general_agency_contact_id"=>nil,
-  "hbx_id"=>nil,
+  "hbx_id"=>get_hbx_id,
   "is_active"=>true,
   "is_disabled"=>nil,
   "is_homeless"=>false,
@@ -325,7 +339,7 @@ class OpmSeed
   "updated_at"=>nil,
   "updated_by"=>nil,
   "updated_by_id"=>nil,
-  "user_id"=> nil,
+  "user_id"=> get_hbx_id,
   "employee_roles"=>
   [{"_id"=>BSON::ObjectId('5cc6f28cec83a57a36000869'),
     "benefit_group_id"=>nil,
@@ -360,7 +374,7 @@ class OpmSeed
 
     "gender"=>get_gender,
     "general_agency_contact_id"=>nil,
-    "hbx_id"=>nil,
+    "hbx_id"=>get_hbx_id,
     "is_active"=>true,
     "is_disabled"=>nil,
     "is_homeless"=>false,
@@ -382,7 +396,7 @@ class OpmSeed
     "updated_at"=>nil,
     "updated_by"=>nil,
     "updated_by_id"=>nil,
-    "user_id"=> nil,
+    "user_id"=> get_hbx_id,
     "version"=>1,
     "employee_roles"=>
     [{"_id"=>BSON::ObjectId('5cc6f28cec83a57a36000869'),
@@ -416,7 +430,7 @@ class OpmSeed
     "full_name"=>name_2,
     "gender"=>get_gender,
     "general_agency_contact_id"=>nil,
-    "hbx_id"=>nil,
+    "hbx_id"=>get_hbx_id,
     "person_relationships"=>
     [{"_id"=>BSON::ObjectId.new,
       "created_at"=>nil,
@@ -446,19 +460,17 @@ class OpmSeed
     "updated_at"=>nil,
     "updated_by"=>nil,
     "updated_by_id"=>nil,
-    "user_id"=> nil,
+    "user_id"=> get_hbx_id,
     "version"=>1}
 
 
 
 
-  @client[:people].insert_one p0
-  @client[:people].insert_one p1
-  @client[:people].insert_one p2
+
   # @client[:people].insert_one p3
 
-  @client[:census_members].insert_one @ce_0
-  @client[:census_members].insert_one @ce_1
+  # @client[:census_members].insert_one @ce_0
+  # @client[:census_members].insert_one @ce_1
 
 
   family_member_id_0 = BSON::ObjectId.new
@@ -654,9 +666,12 @@ family_1 = {
 "vlp_documents_status"=>nil}
 
 
-@client[:families].insert_one fam
-@client[:families].insert_one family_1
+# @client[:families].insert_one fam
+# @client[:families].insert_one family_1
 
+@people.push(p0, p1, p2)
+@ces.push(@ce_0, @ce_10)
+@families.push(fam, family_1)
 
 end
 
@@ -784,7 +799,7 @@ end
   "full_name"=>name_0,
   "gender"=>get_gender,
   "general_agency_contact_id"=>nil,
-  "hbx_id"=>nil,
+  "hbx_id"=>get_hbx_id,
   "is_active"=>true,
   "is_disabled"=>nil,
   "is_homeless"=>false,
@@ -806,7 +821,7 @@ end
   "updated_at"=>nil,
   "updated_by"=>nil,
   "updated_by_id"=>nil,
-  "user_id"=> nil,
+  "user_id"=> get_hbx_id,
   "employee_roles"=>
   [{"_id"=>BSON::ObjectId('5cc6f28cec83a57a36000869'),
     "benefit_group_id"=>nil,
@@ -840,7 +855,7 @@ end
     "full_name"=>name_1,
     "gender"=>get_gender,
     "general_agency_contact_id"=>nil,
-    "hbx_id"=>nil,
+    "hbx_id"=>get_hbx_id,
     "is_active"=>true,
     "is_disabled"=>nil,
     "is_homeless"=>false,
@@ -862,7 +877,7 @@ end
     "updated_at"=>nil,
     "updated_by"=>nil,
     "updated_by_id"=>nil,
-    "user_id"=> nil,
+    "user_id"=> get_hbx_id,
     "version"=>1,
     "employee_roles"=>
     [{"_id"=>BSON::ObjectId('5cc6f28cec83a57a36000869'),
@@ -896,7 +911,7 @@ end
     "full_name"=>name_2,
     "gender"=>get_gender,
     "general_agency_contact_id"=>nil,
-    "hbx_id"=>nil,
+    "hbx_id"=>get_hbx_id,
     "person_relationships"=>
     [{"_id"=>BSON::ObjectId.new,
       "created_at"=>nil,
@@ -926,7 +941,7 @@ end
     "updated_at"=>nil,
     "updated_by"=>nil,
     "updated_by_id"=>nil,
-    "user_id"=> nil,
+    "user_id"=> get_hbx_id,
     "version"=>1}
 
   p3 = {
@@ -952,7 +967,7 @@ end
       "family_id" => family_id_0}],
     "gender"=>get_gender,
     "general_agency_contact_id"=>nil,
-    "hbx_id"=>nil,
+    "hbx_id"=>get_hbx_id,
     "is_active"=>true,
     "is_disabled"=>nil,
     "is_homeless"=>false,
@@ -974,7 +989,7 @@ end
     "updated_at"=>nil,
     "updated_by"=>nil,
     "updated_by_id"=>nil,
-    "user_id"=> nil,
+    "user_id"=> get_hbx_id,
     "version"=>1}
 
 
@@ -1387,15 +1402,15 @@ family_1 = {
         "created_at"=>nil,
         "kind"=>"child",
         "updated_at"=>nil,
-        "predecessor_id" => p0_id,
-         "successor_id"=> p4_id, 
+        "predecessor_id" => p4_id,
+         "successor_id"=> p0_id, 
          "family_id" => family_id_0}],
   "ethnicity"=>nil,
   "first_name"=>name_0.split[0],
   "full_name"=>name_0,
   "gender"=>get_gender,
   "general_agency_contact_id"=>nil,
-  "hbx_id"=>nil,
+  "hbx_id"=>get_hbx_id,
   "is_active"=>true,
   "is_disabled"=>nil,
   "is_homeless"=>false,
@@ -1417,7 +1432,7 @@ family_1 = {
   "updated_at"=>nil,
   "updated_by"=>nil,
   "updated_by_id"=>nil,
-  "user_id"=> nil,
+  "user_id"=> get_hbx_id,
   "employee_roles"=>
   [{"_id"=>BSON::ObjectId('5cc6f28cec83a57a36000869'),
     "benefit_group_id"=>nil,
@@ -1451,7 +1466,7 @@ family_1 = {
     "full_name"=>name_1,
     "gender"=>get_gender,
     "general_agency_contact_id"=>nil,
-    "hbx_id"=>nil,
+    "hbx_id"=>get_hbx_id,
     "is_active"=>true,
     "is_disabled"=>nil,
     "is_homeless"=>false,
@@ -1473,7 +1488,7 @@ family_1 = {
     "updated_at"=>nil,
     "updated_by"=>nil,
     "updated_by_id"=>nil,
-    "user_id"=> nil,
+    "user_id"=> get_hbx_id,
     "version"=>1,
     "employee_roles"=>
     [{"_id"=>BSON::ObjectId('5cc6f28cec83a57a36000869'),
@@ -1507,7 +1522,7 @@ family_1 = {
     "full_name"=>name_2,
     "gender"=>get_gender,
     "general_agency_contact_id"=>nil,
-    "hbx_id"=>nil,
+    "hbx_id"=>get_hbx_id,
     "person_relationships"=>
     [{"_id"=>BSON::ObjectId.new,
       "created_at"=>nil,
@@ -1537,7 +1552,7 @@ family_1 = {
     "updated_at"=>nil,
     "updated_by"=>nil,
     "updated_by_id"=>nil,
-    "user_id"=> nil,
+    "user_id"=> get_hbx_id,
     "version"=>1}
 
 
@@ -1566,7 +1581,7 @@ family_1 = {
       "family_id" => family_id_0}],
     "gender"=>get_gender,
     "general_agency_contact_id"=>nil,
-    "hbx_id"=>nil,
+    "hbx_id"=>get_hbx_id,
     "is_active"=>true,
     "is_disabled"=>nil,
     "is_homeless"=>false,
@@ -1588,7 +1603,7 @@ family_1 = {
     "updated_at"=>nil,
     "updated_by"=>nil,
     "updated_by_id"=>nil,
-    "user_id"=> nil,
+    "user_id"=> get_hbx_id,
     "version"=>1}
 
   p4 = {
@@ -1600,7 +1615,7 @@ family_1 = {
     "dob"=> @ce_1['census_dependents'][0]['dob'],
     "dob_check"=>nil,
     "employer_contact_id"=>nil,
-    "encrypted_ssn"=> @ce_1['census_dependents'][0]['encrypted_ssn'],
+    "encrypted_ssn"=> @ce_1['census_dependents'][2]['encrypted_ssn'],
     "ethnicity"=>nil,
     "first_name"=>name_4.split[0],
     "full_name"=>name_4,
@@ -1615,7 +1630,7 @@ family_1 = {
       "successor_id"=> p0_id, 
       "family_id" => family_id_0}],
     "general_agency_contact_id"=>nil,
-    "hbx_id"=>nil,
+    "hbx_id"=>get_hbx_id,
     "is_active"=>true,
     "is_disabled"=>nil,
     "is_homeless"=>false,
@@ -1637,7 +1652,7 @@ family_1 = {
     "updated_at"=>nil,
     "updated_by"=>nil,
     "updated_by_id"=>nil,
-    "user_id"=> nil,
+    "user_id"=> get_hbx_id,
     "version"=>1}
 
 
@@ -1971,7 +1986,7 @@ family_1 = {
   "full_name"=>name_0,
   "gender"=>get_gender,
   "general_agency_contact_id"=>nil,
-  "hbx_id"=>nil,
+  "hbx_id"=>get_hbx_id,
   "is_active"=>true,
   "is_disabled"=>nil,
   "is_homeless"=>false,
@@ -1993,7 +2008,7 @@ family_1 = {
   "updated_at"=>nil,
   "updated_by"=>nil,
   "updated_by_id"=>nil,
-  "user_id"=> nil,
+  "user_id"=> get_hbx_id,
   "employee_roles"=>
   [{"_id"=>BSON::ObjectId('5cc6f28cec83a57a36000869'),
     "benefit_group_id"=>nil,
@@ -2027,7 +2042,7 @@ family_1 = {
     "full_name"=>name_1,
     "gender"=>get_gender,
     "general_agency_contact_id"=>nil,
-    "hbx_id"=>nil,
+    "hbx_id"=>get_hbx_id,
     "is_active"=>true,
     "is_disabled"=>nil,
     "is_homeless"=>false,
@@ -2049,7 +2064,7 @@ family_1 = {
     "updated_at"=>nil,
     "updated_by"=>nil,
     "updated_by_id"=>nil,
-    "user_id"=> nil,
+    "user_id"=> get_hbx_id,
     "version"=>1,
     "employee_roles"=>
     [{"_id"=>BSON::ObjectId('5cc6f28cec83a57a36000869'),
@@ -2253,8 +2268,16 @@ family_1 = {
 
   end
 
-  def all_cats 
-
+  def db_dump
+    @people = @people.map { |person| { insert_one: person } }
+    @client[:people].insert_many @people
+    @families = @families.map { |family| { insert_one: family } }
+    @client[:families].insert_many @families
+    @ces = @ces.map { |ce| { insert_one: ce } }
+    @client[:census_members].insert_many @ces
+    @people = []
+    @families = []
+    @ces = []
   end
 
 
@@ -2295,14 +2318,23 @@ family_1 = {
           big_fam(ep,age,name_3,name_4,name_5,name_6,name_7,family_id_2,family_id_3, "retired")
          @sampler = 0 
         end
+        if @people.count >= 99 
+          db_dump
+        end
          @counter  = 1
       elsif @counter == 1 
           spouse_only(ep,age,name_8,name_9,name_0,family_id_2,family_id_3,"active") 
           spouse_only(ep,age,name_1,name_2,name_3,family_id_0,family_id_1,"retired") 
+          if @people.count >= 99 
+            db_dump
+          end
         @counter = 2
       elsif @counter == 2
           solo(ep,age,name_4,name_5,family_id_0,family_id_1,"active") 
           solo(ep,age,name_6,name_7,family_id_2,family_id_3,"retired") 
+          if @people.count >= 99 
+            db_dump
+          end
         @counter = 0
         end
       end
@@ -2316,3 +2348,8 @@ family_1 = {
     
     seed.build_orgs 
     seed.build_people
+
+
+# Organization.all.each do |org|
+#     org.update_attributes(hbx_id: HbxIdGenerator.generate_organization_id)
+# end

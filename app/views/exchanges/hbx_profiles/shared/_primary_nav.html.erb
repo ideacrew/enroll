@@ -46,15 +46,6 @@
               pundit_object: HbxProfile,
               pundit_method: :can_access_identity_verification_sub_tab?
             } %>
-              <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
-                tab_name: 'dc-resident-application',
-                link_path: main_app.begin_resident_enrollment_exchanges_residents_path(original_application_type: 'paper'),
-                display_name: 'DC Resident Application',
-                active_tab: active_tab,
-                remote: false,
-                pundit_object: ResidentRole,
-                pundit_method: :begin_resident_enrollment?
-              } %>
           </ul>
         </li>
 
