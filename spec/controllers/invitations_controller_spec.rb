@@ -34,5 +34,25 @@ RSpec.describe InvitationsController do
       end
     end
 
+    describe 'with a valid invitation for already existing user' do
+      let(:user) { FactoryGirl.create(:user) }
+      let(:person) { FactoryGirl.create(:person, user: user) }
+      let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
+      let!(:broker_agency_staff_role) { FactoryGirl.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: 'active', person: person)}
+      let(:invitation) { Invitation.new }
+      let(:params) { {id: invitation.id, person_id: person.id }}
+
+      before(:each) do
+        sign_in(user)
+        allow(Invitation).to receive(:find).with(invitation.id).and_return(invitation)
+      end
+
+      it 'should redirect to sign in page if already person with user record is present' do
+        invitation.source_id = broker_agency_staff_role.id
+        get :claim, params
+        expect(response).to redirect_to(new_user_session_url(:invitation_id => params[:id]))
+      end
+    end
+
   end
 end

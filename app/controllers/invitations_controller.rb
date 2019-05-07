@@ -45,7 +45,7 @@ class InvitationsController < ApplicationController
     if person && person.user
       invitation = Invitation.find(params[:id])
       staff_role = BrokerAgencyStaffRole.find(invitation.source_id)
-      session[:portal] = broker_agencies_profile_path(staff_role.broker_agency_profile)
+      session[:portal] = benefit_sponsors.profiles_broker_agencies_broker_agency_profile_path(staff_role.benefit_sponsors_broker_agency_profile_id)
       redirect_to new_user_session_url(:invitation_id => params[:id])
     elsif current_user.nil?
       session[:portal] = url_for(params)

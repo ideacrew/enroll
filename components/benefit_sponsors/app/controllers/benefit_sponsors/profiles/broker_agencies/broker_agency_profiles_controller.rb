@@ -80,7 +80,7 @@ module BenefitSponsors
         def commission_statements
           permitted = params.permit(:id)
           @id = permitted[:id]
-          if current_user.has_broker_role?
+          if current_user.has_broker_agency_staff_role?
             id = BSON::ObjectId(params[:id]) || current_user.person.broker_role.benefit_sponsors_broker_agency_profile_id
             find_broker_agency_profile(id)
           elsif current_user.has_hbx_staff_role?
