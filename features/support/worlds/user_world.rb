@@ -54,7 +54,7 @@ Given(/^that a user with a (.*?) role(?: with (.*?) subrole)? exists and is logg
     when "HBX staff"
       user = admin(subrole)
   end
-  login_as(user, :scope => :user)
+  login_as user
 end
 
 And(/^the user is on the Employer Index of the Admin Dashboard$/) do

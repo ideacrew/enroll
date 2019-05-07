@@ -89,5 +89,5 @@ And(/^(.*?) is logged in and on the home page$/) do |legal_name|
 end
 
 And(/^staff role person logged in$/) do
-  login_as @staff_role, scope: :user
+  login_as @staff_role
 end

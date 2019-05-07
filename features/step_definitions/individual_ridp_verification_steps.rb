@@ -80,7 +80,7 @@ And(/^an uploaded identity verification in REVIEW status is present$/) do
 end
 
 And(/^an uploaded application in VERIFIED status is present$/) do
-	login_as hbx_admin, scope: :user
+	login_as hbx_admin
 	visit exchanges_hbx_profiles_root_path
 	find(:xpath, "//li[contains(., '#{"Families"}')]", :wait => 10).click
   find(:xpath,'//*[@id="myTab"]/li[2]/ul/li[1]/a/span[1]', :wait => 10).trigger('click')
@@ -97,7 +97,7 @@ And(/^an uploaded application in VERIFIED status is present$/) do
 end
 
 And(/^an uploaded Identity verification in VERIFIED status is present$/) do
-  login_as hbx_admin, scope: :user
+  login_as hbx_admin
   visit exchanges_hbx_profiles_root_path
   find(:xpath, "//li[contains(., '#{"Families"}')]", :wait => 10).click
   find(:xpath,'//*[@id="myTab"]/li[2]/ul/li[1]/a/span[1]', :wait => 10).trigger('click')
@@ -122,7 +122,7 @@ Then(/^visibly ENABLED$/) do
 end
 
 When(/^the Admin clicks “Continue” on the doc upload page$/) do
-  login_as hbx_admin, scope: :user
+  login_as hbx_admin
   visit exchanges_hbx_profiles_root_path
   find(:xpath, "//li[contains(., '#{"Families"}')]", :wait => 10).click
   find(:xpath,'//*[@id="myTab"]/li[2]/ul/li[1]/a/span[1]', :wait => 10).trigger('click')
@@ -165,7 +165,7 @@ When(/^an Experian Error screen appears for the consumer$/) do
 end
 
 When(/^an uploaded Identity verification in VERIFIED status is present on failed experian screen$/) do
-  login_as hbx_admin, scope: :user
+  login_as hbx_admin
   visit exchanges_hbx_profiles_root_path
   find(:xpath, "//li[contains(., '#{"Families"}')]", :wait => 10).click
   find(:xpath,'//*[@id="myTab"]/li[2]/ul/li[1]/a/span[1]', :wait => 10).trigger('click')
@@ -182,7 +182,7 @@ When(/^an uploaded Identity verification in VERIFIED status is present on failed
 end
 
 When(/^an uploaded application in VERIFIED status is present on failed experian screen$/) do
-  login_as hbx_admin, scope: :user
+  login_as hbx_admin
   visit exchanges_hbx_profiles_root_path
   find(:xpath, "//li[contains(., '#{"Families"}')]", :wait => 10).click
   find(:xpath,'//*[@id="myTab"]/li[2]/ul/li[1]/a/span[1]', :wait => 10).trigger('click')

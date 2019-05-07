@@ -675,7 +675,7 @@ Then(/^Employee should not see the individual market place workflow$/) do
 end
 
 Given(/^Employer exists and logs in and adds and employee$/) do
-  login_as @staff_role, scope: :user
+  login_as @staff_role
 end
 
 # TODO: needs to be merged
@@ -988,7 +988,7 @@ When(/^(?:General){0}.+ clicks? on the ((?:General|Staff){0}.+) option$/) do |ta
 end
 
 And(/^clicks on the person in families tab$/) do
-  login_as hbx_admin, scope: :user
+  login_as hbx_admin
   visit exchanges_hbx_profiles_root_path
   page.find('.families.dropdown-toggle.interaction-click-control-families').click
   find(:xpath, "//a[@href='/exchanges/hbx_profiles/family_index_dt']").click

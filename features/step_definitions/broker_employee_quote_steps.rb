@@ -26,7 +26,7 @@ Given (/^that a broker exists$/) do
 end
 
 And(/^the broker is signed in$/) do
-  login_as broker, scope: :user
+  login_as broker
 end
 
 When(/^he visits the Roster Quoting tool$/) do
