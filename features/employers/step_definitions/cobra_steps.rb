@@ -141,7 +141,7 @@ Then(/^fill the form with hired date as future date$/) do
   # Census Employee
   fill_in 'census_employee[first_name]', with: person[:first_name], :wait => 10
   fill_in 'census_employee[last_name]', with: person[:last_name]
-  find(:xpath, "//p[contains(., 'NONE')]").click
+  find(:xpath, "//span[contains(., 'NONE')]").click
   find(:xpath, "//li[contains(., 'Jr.')]").click
 
   fill_in 'jq_datepicker_ignore_census_employee[dob]', :with => person[:dob]
@@ -156,12 +156,12 @@ Then(/^fill the form with hired date as future date$/) do
   fill_in 'census_employee[address_attributes][address_2]', :with => "Apt ABC"
   fill_in 'census_employee[address_attributes][city]', :with => "Alpharetta"
 
-  find(:xpath, "//p[@class='label'][contains(., 'SELECT STATE')]").click
+  find(:xpath, "//span[@class='label'][contains(., 'SELECT STATE')]").click
   find(:xpath, "//li[contains(., 'GA')]").click
 
   fill_in 'census_employee[address_attributes][zip]', :with => "30228"
 
-  find(:xpath, "//p[contains(., 'SELECT KIND')]").click
+  find(:xpath, "//span[contains(., 'SELECT KIND')]").click
   find(:xpath, "//li[@data-index='1'][contains(., 'home')]").click
 
   fill_in 'census_employee[email_attributes][address]', :with => person[:email]

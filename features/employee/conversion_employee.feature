@@ -55,7 +55,7 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for enrollment_open renewal employer with health benefits
     And there is an employer ABC Widgets
-    And ACME Widgets, Inc. employer has a staff role
+    And ABC Widgets employer has a staff role
     And employer ABC Widgets has imported and renewing enrollment_open benefit applications
 
     Given there exists Patrick Doe employee for employer ABC Widgets
@@ -92,7 +92,7 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for enrollment_open renewal employer with health benefits
     And there is an employer ABC Widgets
-    And ACME Widgets, Inc. employer has a staff role
+    And ABC Widgets employer has a staff role
     And employer ABC Widgets has imported and renewing enrollment_open benefit applications
 
     Given there exists Patrick Doe employee for employer ABC Widgets

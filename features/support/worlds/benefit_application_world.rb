@@ -143,7 +143,7 @@ And(/^this employer offering (.*?) contribution to (.*?)$/) do |percent, display
 end
 
 And(/^this employer (.*?) not offering (.*?) benefits to (.*?)$/) do |legal_name, sponsored_benefit, display_name|
-  legal_name = @organization[legal_name]
+  legal_name = employer(legal_name)
   benefit_sponsorship = benefit_sponsorship(legal_name)
   benefit_sponsorship.benefit_applications.each do |application|
     application.benefit_packages.each do |benefit_package|
@@ -169,7 +169,7 @@ end
 #     employer Acme Inc. has expired  and renewing enrollment_eligible benefit applications
 #     employer Acme Inc. has expired  and renewing active benefit applications
 And(/^employer (.*) has (.*) and renewing (.*) benefit applications$/) do |legal_name, earlier_application_status, new_application_status|
-  @employer_profile = @organization[legal_name].employer_profile
+  @employer_profile = employer_profile(legal_name)
   create_applications(predecessor_status: earlier_application_status.to_sym, new_application_status: new_application_status.to_sym)
 end
 
@@ -180,14 +180,14 @@ end
 #     employer Acme Inc. has expired benefit application 
 #     employer Acme Inc. has draft benefit application
 And(/^employer (.*) has (.*) benefit application$/) do |legal_name, new_application_status|
-  @employer_profile = @organization[legal_name].employer_profile
+  @employer_profile = employer_profile(legal_name)
   create_application(new_application_status: new_application_status.to_sym)
 end
 
 And(/^employer (.*?) has a (.*?) benefit application with offering health and dental$/) do |legal_name, state|
   health_products
   aasm_state(state.to_sym)
-  organization = @organization[legal_name]
+  organization = employer(legal_name)
   # Mirrors the original step minus the census employee declaration
   current_application = benefit_application_by_employer(organization)
   current_package = new_benefit_package_by_application(current_application)

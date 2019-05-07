@@ -20,6 +20,7 @@ end
 
 Then(/^the Terminate Enrollment option should be enabled$/) do
   find_link('Terminate Enrollment')['data-remote'].should == 'true'
+  sleep 5
 end
 
 Then(/^the Cancel Enrollment option should be disabled$/) do

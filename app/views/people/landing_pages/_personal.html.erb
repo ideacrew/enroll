@@ -109,8 +109,9 @@
       <div class="no-buffer no-border-top">
         <div class="form-group form-group-lg">
           <% if aca_security_questions %>
-            <p class="sixteen"><a class="change-password-link" href="#">Change my password</a></p>
-            <p class="sixteen"><a class="update-security-responses-link" href="#">Update my security challenge responses</a></p>
+            <p class="sixteen"><a class="change-password-link" id='change_password_link' href="#passwordChangeModal" data-toggle="modal" data-target="#passwordChangeModal">Change my password</a></p>
+            <p class="sixteen"><a class="update-security-responses-link" id='update_security_responses_link' href="#securityQuestionModal" data-toggle="modal" data-target="#securityQuestionModal">Update my security challenge responses</a>
+            </p>
           <% end %>
         </div>
       </div>
@@ -120,21 +121,7 @@
     <button type="submit" class="btn btn-primary btn-br hidden"><i class="fa fa-user-plus"></i> Save</button>
     <span class='btn btn-lg btn-primary btn-br' onclick='PersonValidations.manageRequiredValidations($(this));'><i class="fa fa-user-plus"></i> Save</span>
   </div>
-  <div class="modal fade" id="securityChallengeModal" tabindex="-1" role="dialog" aria-labelledby="securityChallengeModal">
-  </div>
-
 <% end %>
 <br>
 <%= render 'devise/passwords/edit' %>
 <%= render 'users/security_question_responses/edit_modal', action: 'replace', method: 'POST', edit_mode: true %>
-<script>
-  $(document).ready(function(){
-    $('.change-password-link').on('click', function(){
-      $('#passwordChangeModal').modal('show');
-    });
-
-    $('.update-security-responses-link').on('click', function(){
-      $('#securityQuestionModal').modal('show');
-    });
-  });
-</script>

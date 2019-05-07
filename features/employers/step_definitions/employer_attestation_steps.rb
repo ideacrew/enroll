@@ -46,8 +46,7 @@ When(/^Admin click all employers link/) do
 end
 
 When (/^Admin clicks employer attestation filter$/) do
-  wait_for_ajax
-  find_by_id('Tab:employer_attestations').click
+  find_by_id('Tab:employer_attestations', wait: 10).click
 end
 
 And(/^Admin clicks (.*) filter in employer attestation$/) do|state|
@@ -89,8 +88,7 @@ When (/^Admin clicks submit in employer attestation form$/) do
 end
 
 Then (/^Admin should see attestation updated message$/) do
-  wait_for_ajax
-  expect(page).to have_content "Employer attestation updated successfully"
+  expect(find('.alert-notice')).to have_content("Employer attestation updated successfully")
 end
 
 When (/^Admin clicks employer in employers_attestation filter$/) do
@@ -112,7 +110,7 @@ And(/^Employer should see attestation upload button disabled$/) do
 end
 
 When(/^Admin choose (.*)$/) do |state|
-  find_field(state).click
+  find('div.radio', text: state).click
 end
 
 When(/^Admin enters the information needed$/) do
@@ -134,7 +132,7 @@ end
 
 def enter_plan_year_info
   wait_for_ajax(2,2)
-  find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]", :wait => 3).click
+  find('span', text: 'SELECT START ON').click
   find(:xpath, "//li[@data-index='1'][contains(., '#{(effective_period.min).year}')]", :wait => 3).click
   find('.interaction-field-control-fteemployee').click
   fill_in 'benefit_application[fte_count]', with: '3'

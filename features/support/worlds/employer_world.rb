@@ -1,24 +1,38 @@
 module EmployerWorld
-  def employer(legal_name, *traits)
+  # This method is designed to be used in two kinds of scenarios,
+  # 1. where there are multiple employers for a scenario and it's called with
+  # legal_name to find the right one
+  # 2. where there is only one employer for a scenario and no legal_name is needed
+  #
+  # If no legal_name is specified but an employer has already been created this method
+  # defaults to the first employer created
+  def employer(legal_name=nil, *traits)
     attributes = traits.extract_options!
     traits.push(:with_aca_shop_cca_employer_profile) unless traits.include? :with_aca_shop_cca_employer_profile_no_attestation
     @organization ||= {}
 
-    if @organization[legal_name].blank?
-      organization = FactoryBot.create(
+    # puts "running for legal_name: #{legal_name}"
+    # puts "@organization.keys.inspect: #{@organization.keys.inspect}"
+
+    if legal_name.blank?
+      if @organization.empty?
+        @organization[:default] ||= FactoryBot.create(:benefit_sponsors_organizations_general_organization,
+          *traits,
+          attributes.merge(site: site)
+        )
+      else
+        @organization.values.first
+      end
+    else
+      @organization[legal_name] ||= FactoryBot.create(
         :benefit_sponsors_organizations_general_organization, *traits,
         attributes.merge(site: site)
-        )
-
-      @employer_profile = organization.employer_profile
-      @organization[legal_name] = organization
+      )
     end
-
-    @organization[legal_name]
   end
 
   def employer_profile(legal_name = nil)
-    @employer_profile ||= employer(legal_name).employer_profile
+    employer(legal_name).employer_profile
   end
 
   def registering_employer
@@ -67,7 +81,6 @@ And(/^(.*?) employer terminates employees$/) do |legal_name|
     employee.terminate_employment(termination_date)
   end
 end
-
 
 And(/^(.*?) is logged in and on the home page$/) do |legal_name|
   organization = @organization[legal_name]

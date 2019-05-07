@@ -60,7 +60,6 @@ gem 'recurring_select'
 gem 'aws-sdk',                  '~> 2.2.4'
 gem 'bcrypt',                   '~> 3.1'
 gem 'bootsnap',                 '>= 1.1', require: false
-gem 'bootstrap',                '~> 4.1'
 gem 'ckeditor',                 '~> 4.2.4'
 gem 'coffee-rails',             '~> 4.2.2'
 gem 'combine_pdf',              '~> 1.0'
@@ -152,13 +151,12 @@ group :test do
   gem 'poltergeist',                  '~> 1.18.0'
   gem 'rspec-instafail',              '~> 1'
   gem 'ruby-progressbar',             '~> 1'
-  gem 'selenium-webdriver', '3.141.0'
   gem 'shoulda-matchers',             '~> 3'
   gem 'simplecov',                    '~> 0.14',  :require => false
   gem 'test-prof',                    '~> 0.5.0'
   gem 'warden',                       '~> 1.2.7'
   gem 'watir',                        '~> 6.10.3'
-  gem 'webdriver'
+  gem 'webdrivers',                   '3.8.0'
   gem 'webmock',                      '~> 3.0.1'
 end
 
@@ -199,6 +197,7 @@ end
 #######################################################
 # gem 'bootstrap-multiselect-rails', '~> 0.9.9'
 # gem 'bootstrap-slider-rails', '6.0.17'
+# gem 'bootstrap',                '~> 4.1'
 # gem 'chosen-rails'
 # gem 'jquery-turbolinks'
 # gem 'jquery-ui-rails'
@@ -209,4 +208,5 @@ end
 # gem 'sass-rails', '~> 5.0'
 # gem 'sprockets', '~> 2.12.3'
 # gem 'therubyracer', '~> 0.12.3', platforms: :ruby
+# gem 'selenium-webdriver', '3.141.0'
 #######################################################

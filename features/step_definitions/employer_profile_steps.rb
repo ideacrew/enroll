@@ -261,8 +261,8 @@ Given /Admin selects Hannahs company/ do
 end
 
 Then("user will click on action tab") do
-  sleep(3)
-  find_all('.dropdown.pull-right', text: 'Actions')[0].click
+  sleep 5
+  find('.dropdown.pull-right', text: 'Actions', wait: 10, match: :first).click
 end
 
 Given /(\w+) has HBXAdmin privileges/ do |name|

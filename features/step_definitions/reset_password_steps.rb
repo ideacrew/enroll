@@ -20,7 +20,7 @@ When(/^Hbx Admin click on (.*?) link in action drop down$/) do |link|
 end
 
 And(/^Hbx admin confirms password send/) do
-  find('.lock-confirm-btn').click
+  click_button("Send Reset Password Instructions")
   wait_for_ajax
 end
 
