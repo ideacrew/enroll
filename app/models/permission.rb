@@ -28,6 +28,15 @@ class Permission
   field :can_force_publish, type: Boolean, default: false
   field :view_the_configuration_tab, type: Boolean, default: false
   field :can_submit_time_travel_request, type: Boolean, default: false
+  field :can_view_application_types, type: Boolean, default: false
+  field :view_personal_info_page, type: Boolean, default: false
+  field :can_access_new_consumer_application_sub_tab, type: Boolean, default: false
+  field :can_access_outstanding_verification_sub_tab, type: Boolean, default: false
+  field :can_access_resident_application_sub_tab, type: Boolean, default: false
+  field :can_access_identity_verification_sub_tab, type: Boolean, default: false
+  field :can_access_accept_reject_identity_documents, type: Boolean, default: false
+  field :can_access_accept_reject_paper_application_documents, type: Boolean, default: false
+  field :can_delete_identity_application_documents, type: Boolean, default: false
 
   class << self
     def hbx_staff

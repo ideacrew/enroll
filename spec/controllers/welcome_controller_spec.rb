@@ -46,3 +46,15 @@ RSpec.describe WelcomeController, :type => :controller do
   end
 
 end
+
+describe WelcomeController, "visiting #index:
+  - as a non-logged in user
+  - using a non-english preferred language (ko)
+", :type => :controller do
+
+  it "returns http success" do
+    @request.headers["HTTP_ACCEPT_LANGUAGE"] = "ko"
+    get :index
+    expect(response).to have_http_status(:success)
+  end
+end

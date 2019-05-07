@@ -19,7 +19,7 @@ gem 'prawn', :git => 'https://github.com/prawnpdf/prawn.git', :ref => '8028ca0cd
 # gem 'recurring_select', :git => 'https://github.com/brianweiner/recurring_select'
 
 ## Fix this dependency -- bring into project
-gem 'simple_calendar', :git => 'https://github.com/harshared/simple_calendar'
+gem 'simple_calendar', :git => 'https://github.com/harshared/simple_calendar.git'
 
 ## Verify Rails 5 eliminates need for this gem with MongoDB
 gem 'database_cleaner',       '~> 1.7'
@@ -60,7 +60,6 @@ gem 'recurring_select'
 gem 'aws-sdk',                  '~> 2.2.4'
 gem 'bcrypt',                   '~> 3.1'
 gem 'bootsnap',                 '>= 1.1', require: false
-gem 'bootstrap',                '~> 4.1'
 gem 'ckeditor',                 '~> 4.2.4'
 gem 'coffee-rails',             '~> 4.2.2'
 gem 'combine_pdf',              '~> 1.0'
@@ -86,6 +85,7 @@ gem 'pundit',                   '~> 2.0'
 gem "recaptcha",                '~> 4.13', require: 'recaptcha/rails'
 gem 'redcarpet',                '~> 3.4'
 gem 'redis',                    '~> 4.0'
+gem 'redis-rails',              '~> 5.0.2'
 gem 'resque',                   '~> 2.0'
 gem 'roo',                      '~> 2.1'
 gem 'ruby-saml',                '~> 1.3'
@@ -156,6 +156,7 @@ group :test do
   gem 'test-prof',                    '~> 0.5.0'
   gem 'warden',                       '~> 1.2.7'
   gem 'watir',                        '~> 6.10.3'
+  gem 'webdrivers',                   '3.8.0'
   gem 'webmock',                      '~> 3.0.1'
 end
 
@@ -196,6 +197,7 @@ end
 #######################################################
 # gem 'bootstrap-multiselect-rails', '~> 0.9.9'
 # gem 'bootstrap-slider-rails', '6.0.17'
+# gem 'bootstrap',                '~> 4.1'
 # gem 'chosen-rails'
 # gem 'jquery-turbolinks'
 # gem 'jquery-ui-rails'
@@ -206,4 +208,5 @@ end
 # gem 'sass-rails', '~> 5.0'
 # gem 'sprockets', '~> 2.12.3'
 # gem 'therubyracer', '~> 0.12.3', platforms: :ruby
+# gem 'selenium-webdriver', '3.141.0'
 #######################################################

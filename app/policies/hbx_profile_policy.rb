@@ -139,6 +139,32 @@ class HbxProfilePolicy < ApplicationPolicy
     role.permission.can_add_sep
   end
 
+  def access_identity_verification_sub_tab?
+    return @user.person.hbx_staff_role.permission.can_access_identity_verification_sub_tab if (@user.person && @user.person.hbx_staff_role)
+    return false
+  end
+
+  def access_outstanding_verification_sub_tab?
+    return @user.person.hbx_staff_role.permission.can_access_outstanding_verification_sub_tab if (@user.person && @user.person.hbx_staff_role)
+    return false
+  end
+
+  def can_access_accept_reject_identity_documents?
+    return @user.person.hbx_staff_role.permission.can_access_accept_reject_identity_documents if (@user.person && @user.person.hbx_staff_role)
+    return false
+  end
+
+  def can_access_accept_reject_paper_application_documents?
+    return @user.person.hbx_staff_role.permission.can_access_accept_reject_paper_application_documents if (@user.person && @user.person.hbx_staff_role)
+    return false
+  end
+
+  def can_delete_identity_application_documents?
+    return @user.person.hbx_staff_role.permission.can_delete_identity_application_documents if (@user.person && @user.person.hbx_staff_role)
+    return false
+  end
+
+
   private
 
   def user_hbx_staff_role
@@ -146,4 +172,5 @@ class HbxProfilePolicy < ApplicationPolicy
     return nil unless person
     person.hbx_staff_role
   end
+
 end

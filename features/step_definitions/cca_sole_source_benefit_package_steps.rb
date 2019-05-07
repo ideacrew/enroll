@@ -6,13 +6,20 @@ def products_for(product_package, calender_year)
   BenefitMarkets::Products::HealthProducts::HealthProduct.by_product_package(product_package).collect { |prod| prod.create_copy_for_embedding }
 end
 
+def effective_date(start_or_end)
+  effective_year = Time.now.year
+  return Date.new(effective_year, 1, 1) if start_or_end == "start"
+  return Date.new(effective_year, 12, 31) if start_or_end == "end"
+end
+
 Given (/^.*a configured CCA benefit market, pricing models, and catalog$/) do
   @site = ::BenefitSponsors::SiteSpecHelpers.create_cca_site_with_hbx_profile_and_empty_benefit_market(:aca_shop)
   benefit_market = @site.benefit_markets.first
-  effective_year = Time.now.year
-  effective_on_start = Date.new(effective_year, 1,1)
-  effective_on_end = Date.new(effective_year, 12,31)
-  ::BenefitSponsors::ProductSpecHelpers.construct_cca_benefit_market_catalog_with_renewal_catalog(@site, benefit_market, (effective_on_start..effective_on_end))
+  ::BenefitSponsors::ProductSpecHelpers.construct_cca_benefit_market_catalog_with_renewal_catalog(
+    @site,
+    benefit_market,
+    (effective_date("start")..effective_date("end"))
+  )
 end
 
 Given (/^.*a CCA sole source employer health benefit package, in open enrollment$/) do
@@ -45,10 +52,10 @@ Given (/^.*a CCA sole source employer health benefit package, in open enrollment
   @employer_profile = @employer_organization.profiles.first
   @benefit_sponsorship = @employer_profile.add_benefit_sponsorship
   @benefit_sponsorship.save!
-  service_areas = @benefit_sponsorship.service_areas_on(Date.new(2018,8,1))
+  service_areas = @benefit_sponsorship.service_areas_on(effective_date("start"))
   benefit_application = ::BenefitSponsors::BenefitApplications::BenefitApplicationFactory.call(
     @benefit_sponsorship,
-    effective_period: (Date.new(2018,8,1)..Date.new(2019,7,30)),
+    effective_period: (effective_date("start")..effective_date("end")),
     open_enrollment_period: (Date.new(2018,7,1)..Date.new(2018,7,20)),
     fte_count: 5,
     pte_count: 0,

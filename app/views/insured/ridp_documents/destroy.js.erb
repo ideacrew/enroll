@@ -1,0 +1,10 @@
+$('#doc_table_row_<%=@document.id%>').fadeOut();
+
+setTimeout(function() {
+  if($('#doc_table_row_<%=@document.id%>').parent('.ridp-doc-list').find('.row:visible').length == 0)
+      $('#doc_table_row_<%=@document.id%>').parent('.ridp-doc-list').parent('.row').fadeOut();
+
+  $("div#<%= @document.ridp_verification_type %>  span#status").replaceWith('<span class="label lb-md label-<%=ridp_type_class(@document.ridp_verification_type, @person)%>" id="status">\n' +
+      " <%= show_ridp_type(@document.ridp_verification_type, @person) %>\n" +
+      "</span>&nbsp;");
+}, 500);

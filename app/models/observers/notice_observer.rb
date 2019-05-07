@@ -202,6 +202,7 @@ module Observers
     end
 
     def vlp_document_update; end
+    def ridp_document_update; end
     def paper_application_update; end
     def employer_attestation_document_update; end
 

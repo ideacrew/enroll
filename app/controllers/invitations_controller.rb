@@ -42,7 +42,7 @@ class InvitationsController < ApplicationController
 
   def require_login_and_allow_new_account
     if current_user.nil?
-      session[:portal] = url_for(params)
+      session[:portal] = url_for(params.permit!)
       redirect_to new_user_registration_url(:invitation_id => params[:id])
     end
   end

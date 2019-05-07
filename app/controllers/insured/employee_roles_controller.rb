@@ -22,7 +22,7 @@ class Insured::EmployeeRolesController < ApplicationController
 
   def match
     @no_save_button = true
-    @person_params = params.require(:person).merge({user_id: current_user.id})
+    @person_params = params.require(:person).merge({user_id: current_user.id}).permit!
     @employee_candidate = Forms::EmployeeCandidate.new(@person_params)
     @person = @employee_candidate
     if @employee_candidate.valid?
@@ -50,7 +50,7 @@ class Insured::EmployeeRolesController < ApplicationController
   end
 
   def create
-    @employment_relationship = Forms::EmploymentRelationship.new(params.require(:employment_relationship))
+    @employment_relationship = Forms::EmploymentRelationship.new(employment_relationship_params)
     @employee_role, @family = Factories::EnrollmentFactory.construct_employee_role(actual_user, @employment_relationship.census_employee, @employment_relationship)
 
     census_employees = if actual_user && actual_user.person.present?
@@ -221,5 +221,10 @@ class Insured::EmployeeRolesController < ApplicationController
       current_user.last_portal_visited = search_insured_employee_index_path
       current_user.save!
     end
+  end
+
+  def employment_relationship_params
+    params.require(:employment_relationship).permit(:first_name, :last_name, :middle_name,
+      :name_pfx, :name_sfx, :gender, :hired_on, :eligible_for_coverage_on, :census_employee_id, :employer_name)
   end
 end

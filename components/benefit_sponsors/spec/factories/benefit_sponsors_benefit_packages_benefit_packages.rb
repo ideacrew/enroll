@@ -16,7 +16,6 @@ FactoryBot.define do
     end
 
     after(:build) do |benefit_package, evaluator|
-      
       if evaluator.health_sponsored_benefit
         build(:benefit_sponsors_sponsored_benefits_health_sponsored_benefit, benefit_package: benefit_package, product_package: evaluator.product_package)
       end

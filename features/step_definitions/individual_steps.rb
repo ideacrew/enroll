@@ -71,7 +71,7 @@ end
 
 When(/^\w+ clicks? on continue button$/) do
   wait_for_ajax
-  find('.btn', text: 'CONTINUE').click
+  find('.interaction-click-control-continue', text: 'Continue').click
 end
 
 Then(/^.+ should see heading labeled personal information/) do
@@ -90,11 +90,10 @@ Then(/Individual should see a form to enter personal information$/) do
   find(:xpath, '//label[@for="indian_tribe_member_no"]').click
 
   find(:xpath, '//label[@for="radio_incarcerated_no"]').click
-
   fill_in "person_addresses_attributes_0_address_1", :with => "4900 USAA BLVD"
   fill_in "person_addresses_attributes_0_address_2", :with => "212"
   fill_in "person_addresses_attributes_0_city", :with=> "Washington"
-  find(:xpath, "//p[@class='label'][contains(., 'SELECT STATE')]").click
+  find('.interaction-choice-control-state-id', text: 'SELECT STATE *').click
   find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[3]/div/ul/li[10]').click
   fill_in "person[addresses_attributes][0][zip]", :with => "20002"
   fill_in "person[phones_attributes][0][full_phone_number]", :with => "9999999999"
@@ -137,7 +136,7 @@ And(/Individual clicks on confirm member/) do
 end
 
 When(/Individual clicks on Save and Exit/) do
-  find('li a', text: 'SAVE & EXIT').trigger('click')
+  find('li a', text: 'SAVE & EXIT').click
 end
 
 Then (/Individual resumes enrollment/) do
@@ -152,7 +151,7 @@ end
 
 When /^Individual clicks on Individual and Family link should be on privacy agreeement page/ do
   wait_for_ajax
-  find('.interaction-click-control-individual-and-family').trigger('click')
+  find('.interaction-click-control-individual-and-family').click
   expect(page).to have_content('Authorization and Consent')
 end
 
@@ -164,7 +163,7 @@ end
 
 When /^Individual clicks on Individual and Family link should be on verification page/ do
   wait_for_ajax
-  find('.interaction-click-control-individual-and-family').trigger('click')
+  find('.interaction-click-control-individual-and-family').click
   expect(page).to have_content('Verify Identity')
 end
 
@@ -175,7 +174,7 @@ Then(/^\w+ should see identity verification page and clicks on submit/) do
   screenshot("identify_verification")
   click_button "Submit"
   screenshot("override")
-  click_link "Please click here once you have contacted the exchange and have been told to proceed."
+  click_link "Continue Application"
 end
 
 Then(/\w+ should see the dependents form/) do
@@ -230,7 +229,7 @@ And(/I click on continue button on household info form/) do
 end
 
 Then(/Individual creates a new HBX account$/) do
-  click_button 'Create account', :wait => 10
+  find('.interaction-click-control-create-account').click
   fill_in "user[oim_id]", :with => "testflow@test.com"
   fill_in "user[password]", :with => "aA1!aA1!aA1!"
   fill_in "user[password_confirmation]", :with => "aA1!aA1!aA1!"
@@ -287,7 +286,7 @@ And(/^I click on continue button on group selection page$/) do
   click_button "CONTINUE"
   screenshot("test2")
   wait_for_ajax
-  find(:xpath, '//*[@id="btn-continue"]').trigger('click')
+  find(:xpath, '//*[@id="btn-continue"]').click
   #click_button "Continue" #Post
   screenshot("test3")
   #Goes off the see the wizard at /I select three plans to compare/ for now
@@ -328,7 +327,7 @@ Then(/^Individual fills in the form$/) do
   fill_in 'dependent[last_name]', :with => (@u.last_name :last_name)
   fill_in 'jq_datepicker_ignore_dependent[dob]', :with => (@u.adult_dob :dob)
   fill_in 'dependent[ssn]', :with => (@u.ssn :ssn)
-  find('.house .selectric p.label').trigger 'click'
+  find('.house .selectric p.label').click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Sibling')]").click
   find(:xpath, '//label[@for="radio_male"]').click
   find(:xpath, '//label[@for="dependent_us_citizen_true"]').click
@@ -341,7 +340,7 @@ Then(/^Individual ads address for dependent$/) do
   find(:xpath, '//label[@for="dependent_same_with_primary"]').click
   fill_in 'dependent[addresses][0][address_1]', :with => '36 Campus Lane'
   fill_in 'dependent[addresses][0][city]', :with => 'Washington'
-  find('#address_info .selectric p.label').trigger 'click'
+  find('#address_info .selectric p.label').click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'DC')]").click
   fill_in 'dependent[addresses][0][zip]', :with => "20002"
   all(:css, ".mz").last.click
@@ -437,7 +436,7 @@ end
 
 When(/I click on the header link to return to CSR page/) do
   expect(page).to have_content "I'm a Trained Expert", :wait => 10
-  find(:xpath, "//a[text()[contains(.,' a Trained Expert')]]").trigger('click')
+  find(:xpath, "//a[text()[contains(.,' a Trained Expert')]]").click
 end
 
 Then(/CSR clicks on New Consumer Paper Application/) do

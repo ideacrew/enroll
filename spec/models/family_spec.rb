@@ -1366,6 +1366,20 @@ describe "#document_due_date", dbclean: :after_each do
       end
     end
   end
+
+  describe "save application type in family model" do
+    context "person saves application type as Phone" do
+      let(:new_person) { FactoryBot.create(:person, :with_family) }
+      let(:person) { FactoryBot.create(:person) }
+      let(:current_user) {FactoryBot.create(:user, :hbx_staff, person: person)}
+      before do
+        new_person.primary_family.update_attributes(application_type: "Phone")
+      end
+      it "should save and disaply the person's application type as Phone" do
+        expect(new_person.primary_family.application_type).to eq "Phone"
+      end
+    end
+  end
 end
 
 describe Family, '#is_document_not_verified' do

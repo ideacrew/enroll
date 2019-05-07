@@ -6,7 +6,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   include ::Config::AcaHelper
 
   before_action :modify_admin_tabs?, only: [:binder_paid, :transmit_group_xml]
-  before_action :check_hbx_staff_role, except: [:request_help, :configuration, :show, :assister_index, :family_index, :update_cancel_enrollment, :update_terminate_enrollment]
+  before_action :check_hbx_staff_role, except: [:request_help, :configuration, :show, :assister_index, :family_index, :update_cancel_enrollment, :update_terminate_enrollment, :identity_verification]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
   before_action :view_the_configuration_tab?, only: [:configuration, :set_date]
   before_action :can_submit_time_travel_request?, only: [:set_date]
@@ -79,10 +79,13 @@ class Exchanges::HbxProfilesController < ApplicationController
     @organization = @benefit_sponsorship.organization
     @element_to_replace_id = params[:employer_actions_id]
     service_obj = ::BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipService.new(benefit_sponsorship: @benefit_sponsorship)
-    @result,  @errors_on_save = service_obj.update_fein(params['organizations_general_organization']['new_fein'])
-    respond_to do |format|
-      format.js { render "edit_fein" } if @errors_on_save
-      format.js { render "update_fein" }
+    update_fein_result_array = service_obj.update_fein(params['organizations_general_organization']['new_fein'])
+    @result = update_fein_result_array[0]
+    @errors_on_save = update_fein_result_array[1]
+    if @errors_on_save
+      respond_to { |format| format.js { render 'edit_fein' } }
+    else
+      respond_to { |format| format.js { render 'update_fein' } }
     end
   end
 
@@ -295,6 +298,10 @@ def employer_poc
     @selector = params[:scopes][:selector] if params[:scopes].present?
     @datatable = Effective::Datatables::FamilyDataTable.new(params[:scopes])
     #render '/exchanges/hbx_profiles/family_index_datatable'
+  end
+  
+  def identity_verification
+    @datatable = Effective::Datatables::IdentityVerificationDataTable.new(params[:scopes])
   end
 
   def user_account_index

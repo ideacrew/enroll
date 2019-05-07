@@ -83,7 +83,7 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
     it "should displays cobra function" do
       assign(:census_employees, [census_employee2])
       render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
-      expect(rendered).to match(/Initiate Cobra/)
+      expect(rendered).to match(/Initiate cobra/)
     end
 
     # it "should displays cobra confirm area" do

@@ -11,7 +11,7 @@ describe Subscribers::FamilyApplicationCompleted do
     end.id.split('#').last
   end.select do |th|
     th.id == th.primary_applicant_id && th.primary_applicant_id == parser.primary_family_member_id.split('#').last
-  end.first.eligibility_determinations.max_by(&:determination_date).maximum_aptc }
+  end.first.eligibility_determinations.max_by(&:determination_date).maximum_aptc.to_f }
 
   it "should subscribe to the correct event" do
     expect(Subscribers::FamilyApplicationCompleted.subscription_details).to eq ["acapi.info.events.family.application_completed"]
@@ -226,7 +226,7 @@ describe Subscribers::FamilyApplicationCompleted do
           expect(tax_household_db.primary_applicant.family_member.person).to eq person
           expect(tax_household_db.allocated_aptc).to eq 0
           expect(tax_household_db.is_eligibility_determined).to be_truthy
-          expect(tax_household_db.current_max_aptc).to eq max_aptc
+          expect(tax_household_db.current_max_aptc.to_f).to eq max_aptc
         end
 
         it "updates all consumer role verifications" do
@@ -299,7 +299,7 @@ describe Subscribers::FamilyApplicationCompleted do
         expect(tax_household_db.primary_applicant.family_member.person).to eq person
         expect(tax_household_db.allocated_aptc).to eq 0
         expect(tax_household_db.is_eligibility_determined).to be_truthy
-        expect(tax_household_db.current_max_aptc).to eq max_aptc
+        expect(tax_household_db.current_max_aptc.to_f).to eq max_aptc
       end
 
       it "updates all consumer role verifications" do
@@ -364,7 +364,7 @@ describe Subscribers::FamilyApplicationCompleted do
         expect(tax_household_db.primary_applicant.family_member.person).to eq person
         expect(tax_household_db.allocated_aptc).to eq 0
         expect(tax_household_db.is_eligibility_determined).to be_truthy
-        expect(tax_household_db.current_max_aptc).to eq max_aptc
+        expect(tax_household_db.current_max_aptc.to_f).to eq max_aptc
       end
 
       it "updates all consumer role verifications" do
@@ -395,7 +395,7 @@ describe Subscribers::FamilyApplicationCompleted do
         expect(tax_household_db.primary_applicant.family_member.person).to eq person
         expect(tax_household_db.allocated_aptc).to eq 0
         expect(tax_household_db.is_eligibility_determined).to be_truthy
-        expect(tax_household_db.current_max_aptc).to eq max_aptc
+        expect(tax_household_db.current_max_aptc.to_f).to eq max_aptc
         expect(tax_household_db.effective_ending_on).to be_truthy
       end
 
@@ -405,7 +405,7 @@ describe Subscribers::FamilyApplicationCompleted do
         expect(updated_tax_household.primary_applicant.family_member.person).to eq person
         expect(updated_tax_household.allocated_aptc).to eq 0
         expect(updated_tax_household.is_eligibility_determined).to be_truthy
-        expect(updated_tax_household.current_max_aptc).to eq max_aptc
+        expect(updated_tax_household.current_max_aptc.to_f).to eq max_aptc
         expect(updated_tax_household.effective_ending_on).not_to be_truthy
       end
     end
@@ -471,7 +471,7 @@ describe Subscribers::FamilyApplicationCompleted do
         expect(tax_household_db.primary_applicant.family_member.person).to eq person
         expect(tax_household_db.allocated_aptc).to eq 0
         expect(tax_household_db.is_eligibility_determined).to be_truthy
-        expect(tax_household_db.current_max_aptc).to eq max_aptc
+        expect(tax_household_db.current_max_aptc.to_f).to eq max_aptc
       end
 
       it "has 4 tax household members with primary person as primary tax household member" do
@@ -563,7 +563,7 @@ describe Subscribers::FamilyApplicationCompleted do
           expect(existing_dep_consumer_role_db.residency_determined_at).to eq primary.created_at
           expect(existing_dep_consumer_role_db.citizen_status).to eq primary.verifications.citizen_status.split('#').last
           expect(existing_dep_consumer_role_db.is_state_resident).to eq primary.verifications.is_lawfully_present
-          expect(existing_dep_consumer_role_db.is_incarcerated).to eq primary.person_demographics.is_incarcerated
+          expect(existing_dep_consumer_role_db.is_incarcerated).to eq nil
         end
 
         it "updates the address for the primary applicant's person" do

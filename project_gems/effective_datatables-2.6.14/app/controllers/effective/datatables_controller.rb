@@ -4,13 +4,14 @@ module Effective
 
     # This will respond to both a GET and a POST
     def show
-      if params[:custom_attributes].presence
-        params[:custom_attributes].permit!
-      end
+      params[:custom_attributes].permit! if params[:custom_attributes].presence
+      params[:attributes].permit! if params[:attributes].presence
+      params[:scopes].permit! if params[:scopes].presence
 
       attributes = (params[:attributes].presence || {}).merge(referer: request.referer).merge(custom_attributes: params.try(:custom_attributes, []))
       scopes = (params[:scopes].presence || params[:custom_attributes].presence || {})
-      @datatable = find_datatable(params[:id]).try(:new, attributes.merge(scopes))
+
+      @datatable = find_datatable(params[:id]).try(:new, attributes.merge(scopes).to_hash)
       @datatable.view = view_context if !@datatable.nil?
 
       EffectiveDatatables.authorized?(self, :index, @datatable.try(:collection_class) || @datatable.try(:class))

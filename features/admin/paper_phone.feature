@@ -1,4 +1,3 @@
-@individual_enabled
 Feature: Phone and Paper Enrollment options exist
   In order to support paper and phone enrollments
   Links are provided that will track phone and paper enrollments
@@ -6,9 +5,11 @@ Feature: Phone and Paper Enrollment options exist
   Background:
     Given a Hbx admin with read and write permissions exists
     When Hbx Admin logs on to the Hbx Portal
-    When Hbx Admin clicks on Families link
-    And the Hbx Admin clicks on the Action button
+    When Hbx Admin click Families link
 
   Scenario: Phone and Phone Enrollment
-    Then I see the Paper link
-    Then I see the Phone link
+    Then I see the DC Resident Application link
+    Then I see the New Consumer Application link
+
+  Scenario: Disabling Paper link
+    Then the Paper action should not be actionable
