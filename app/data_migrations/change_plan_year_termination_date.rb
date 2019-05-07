@@ -18,7 +18,7 @@ class ChangePlanYearTerminationDate < MongoidMigrationTask
         else
           plan_year.update_attributes!(end_on: terminated_on)
           plan_year.save
-          puts "Update the termination date to #{new_terminated_on} ." unless Rails.env.test?
+          puts "Update the termination date to #{terminated_on} ." unless Rails.env.test?
         end
       rescue Exception => e
         puts "Error: #{e.message}" unless Rails.env.test?
