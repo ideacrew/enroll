@@ -3,7 +3,7 @@
     <%= f.fields_for :phones, errors: {}, fieldset: true do |phone|  %>
         <% next if phone.object.kind ==  'phone main' %>
         <% next if phone.object.kind ==  'work' && controller_path.include?("consumer_roles") %>
-      <% if((phone.index == 0) || (phone.index == 2)) && ::Phone::KINDS.include?(phone.object.kind) %>%>
+      <% if((phone.index == 0) || (phone.index == 2)) && ::Phone::KINDS.include?(phone.object.kind) %>
         <div class="row row-form-wrapper no-buffer">
       <% end %>
     <div class="col-md-6 col-sm-6 no-pd">
