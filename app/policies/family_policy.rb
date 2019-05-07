@@ -6,20 +6,16 @@ class FamilyPolicy < ApplicationPolicy
       return true if (@record.primary_applicant.person_id == user_person.id)
       return true if can_modify_family?(user_person)
       broker_staff_roles = user_person.active_broker_staff_roles
+      broker_role = user_person.broker_role
       employee_roles = primary_applicant.person.active_employee_roles
-      if broker_staff_roles.any?
-        ivl_broker_account = @record.active_broker_agency_account
-        if ivl_broker_account
-          staff_account = broker_staff_roles.detect{|staff_role| staff_role.broker_agency_profile_id == ivl_broker_account.broker_agency_profile_id}
-          if staff_account
-            return true if (ivl_broker_account.broker_agency_profile_id == staff_account.broker_agency_profile_id)
-          end
-        end
+      if broker_role.present? || broker_staff_roles.any?
+        return true if can_broker_modify_family?(broker_role, broker_staff_roles)
+
         if employee_roles.any?
           broker_agency_profile_account_ids = employee_roles.map do |er|
             er.employer_profile.active_broker_agency_account
           end.compact.map(&:broker_agency_profile_id)
-          broker_staff_roles = user_person.active_broker_staff_roles
+          return true if broker_role.present? && broker_agency_profile_account_ids.include?(broker_role.broker_agency_profile_id)
           broker_staff_roles.each do |broker_staff|
             return true if broker_agency_profile_account_ids.include?(broker_staff.broker_agency_profile_id)
           end
@@ -46,6 +42,20 @@ class FamilyPolicy < ApplicationPolicy
     permission = hbx_staff_role.permission
     return false unless permission
     permission.modify_family
+  end
+
+  def can_broker_modify_family?(broker, broker_staff)
+    ivl_broker_account = @record.active_broker_agency_account
+    if ivl_broker_account.present?
+      if broker.present?
+        return true if (ivl_broker_account.broker_agency_profile_id == broker.broker_agency_profile_id)
+      elsif broker_staff.present?
+        staff_account = broker_staff.detect{|staff_role| staff_role.broker_agency_profile_id == ivl_broker_account.broker_agency_profile_id}
+        if staff_account
+          return true if (ivl_broker_account.broker_agency_profile_id == staff_account.broker_agency_profile_id)
+        end
+      end
+    end
   end
 
   def updateable?
