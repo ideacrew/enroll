@@ -1,4 +1,4 @@
-@individual_enabled
+@wip
 Feature: Insured Plan Shopping on Individual market
 
   Scenario: New insured user purchases on individual market
