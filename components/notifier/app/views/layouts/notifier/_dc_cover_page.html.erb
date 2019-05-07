@@ -3,6 +3,8 @@
 
   <% if recipient.shop? %>
     <%= render partial: 'layouts/notifier/dc_shop_address', :locals => {notice: notice, show_mpi_indicator: false, recipient: recipient, notice_recipient: notice_recipient} %>
+  <% elsif recipient.individual? %>
+    <%= render partial: 'layouts/notifier/dc_ivl_address', :locals => {notice: notice, show_mpi_indicator: false, recipient: recipient, notice_recipient: notice_recipient} %>
   <% else %>
     <%= render partial: 'notices/shared/address', :locals => {notice: notice, show_mpi_indicator: false} %>
   <% end %>

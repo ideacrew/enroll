@@ -21,8 +21,11 @@ module Notifier
       builder.event_name = event_name
       builder.payload = payload
       builder.append_contact_details
+      builder.dependents if resource.is_a?(ConsumerRole)
       template.data_elements.each do |element|
         elements = element.split('.')
+        next if resource.is_a?(ConsumerRole) && elements.first == 'dependent'
+
         date_element = elements.detect{|ele| Notifier::MergeDataModels::EmployerProfile::DATE_ELEMENTS.any?{|date| ele.match(/#{date}/i).present?}}
 
         if date_element.present?
@@ -52,7 +55,7 @@ module Notifier
     def render_notice_body(params)
       Notifier::NoticeKindsController.new.render_to_string({
         :inline => template.raw_body.gsub('${', '<%=').gsub('#{', '<%=').gsub('}','%>').gsub('[[', '<%').gsub(']]', '%>'),
-        :layout => 'notifier/pdf_layout',
+        :layout => layout,
         :locals => params
       })
     end
@@ -73,9 +76,16 @@ module Notifier
         file << self.to_pdf
       end
 
-      attach_envelope
-      non_discrimination_attachment
-      # clear_tmp
+      if shop_market?
+        attach_envelope
+        non_discrimination_attachment
+        # clear_tmp
+      else
+        ivl_blank_page
+        ivl_non_discrimination
+        ivl_attach_envelope
+        voter_application
+      end
     end
 
     def pdf_options
@@ -120,12 +130,36 @@ module Notifier
       title
     end
 
+    def layout
+      shop_market? ? Settings.notices.shop.partials.layout : Settings.notices.individual.partials.layout
+    end
+
     def notice_filename
-      "#{subject.titleize.gsub(/\s+/, '_')}"
+      if shop_market?
+        "#{subject.titleize.gsub(/\s+/, '_')}"
+      else
+        "#{subject.titleize.gsub(/\s+/, '_')}_#{notice_recipient.hbx_id}"
+      end
     end
 
     def non_discrimination_attachment
       join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', shop_non_discrimination_attachment)]
+    end
+
+    def ivl_non_discrimination
+      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', ivl_non_discrimination_attachment)] if ['projected_eligibility_notice'].include?(event_name)
+    end
+
+    def ivl_attach_envelope
+      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', ivl_envelope_without_address)] if ['projected_eligibility_notice'].include?(event_name)
+    end
+
+    def voter_application
+      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', ivl_voter_application)] if ['projected_eligibility_notice'].include?(event_name)
+    end
+
+    def ivl_blank_page
+      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', ivl_blank_page_attachment)] if ['projected_eligibility_notice'].include?(event_name)
     end
 
     def attach_envelope
@@ -174,7 +208,7 @@ module Notifier
         return resource.staff_roles.first.full_name.titleize
       end
 
-      if resource.is_a?(EmployeeRole)
+      if resource.is_a?(EmployeeRole) || resource.is_a?(ConsumerRole)
         return resource.person.full_name.titleize
       end
     end
@@ -184,7 +218,7 @@ module Notifier
         return resource.staff_roles.first.work_email_or_best
       end
 
-      if resource.is_a?(EmployeeRole)
+      if resource.is_a?(EmployeeRole) || resource.is_a?(ConsumerRole)
         return resource.person.work_email_or_best
       end
     end
@@ -223,8 +257,8 @@ module Notifier
     end
 
     def store_paper_notice
-      bucket_name= Settings.paper_notice
-      notice_filename_for_paper_notice = "#{recipient.hbx_id}_#{subject.titleize.gsub(/\s+/, '_')}"
+      bucket_name = Settings.paper_notice
+      notice_filename_for_paper_notice = "#{@resource.person.hbx_id}_#{subject.titleize.gsub(/\s+/, '_')}"
       notice_path_for_paper_notice = Rails.root.join("tmp", "#{notice_filename_for_paper_notice}.pdf")
       begin
         FileUtils.cp(notice_path, notice_path_for_paper_notice)
@@ -290,7 +324,7 @@ module Notifier
     end
 
     def sub_resource?
-      (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole))
+      (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole) || resource.is_a?(ConsumerRole))
     end
 
     def envelope
