@@ -2,7 +2,7 @@
 When(/^the user clicks Change FEIN link in the Actions dropdown for ABC Widgets Employer$/) do
   sleep(3)
   find_all('.dropdown.pull-right', text: 'Actions')[0].click
-  click_link('Change FEIN')
+  find('li', text: 'Change FEIN').click x: 2, y: 2
 end
 
 And(/^the user enters FEIN with less than nine digits$/) do
