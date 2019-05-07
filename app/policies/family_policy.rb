@@ -46,12 +46,12 @@ class FamilyPolicy < ApplicationPolicy
 
   def can_broker_modify_family?(broker, broker_staff)
     ivl_broker_account = @record.active_broker_agency_account
-    return unless ivl_broker_account.present?
+    return false unless ivl_broker_account.present?
     if broker.present?
       return true if ivl_broker_account.broker_agency_profile_id == broker.broker_agency_profile_id
     elsif broker_staff.present?
       staff_account = broker_staff.detect{|staff_role| staff_role.broker_agency_profile_id == ivl_broker_account.broker_agency_profile_id}
-      return unless staff_account
+      return false unless staff_account
       return true if ivl_broker_account.broker_agency_profile_id == staff_account.broker_agency_profile_id
     end
   end
