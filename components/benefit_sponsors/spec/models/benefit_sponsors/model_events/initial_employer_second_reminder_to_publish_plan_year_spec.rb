@@ -20,7 +20,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerSecondRemainderToPu
 
   describe "ModelEvent" do
     it "should trigger model event" do
-      model_instance.class.observer_peers.keys.each do |observer|
+      model_instance.class.observer_peers.keys.select { |ob| ob.is_a? BenefitSponsors::Observers::NoticeObserver }.each do |observer|
         expect(observer).to receive(:notifications_send) do |instance, model_event|
           expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
           expect(model_event).to have_attributes(:event_key => :initial_employer_second_reminder_to_publish_plan_year, :klass_instance => model_instance, :options => {})

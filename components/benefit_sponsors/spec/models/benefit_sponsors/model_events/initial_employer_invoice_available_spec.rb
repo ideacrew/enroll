@@ -27,7 +27,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerInvoiceAvailable', 
   describe "ModelEvent" do
     context "when initial invoice is generated" do
       it "should trigger model event" do
-        model_instance.class.observer_peers.keys.each do |observer|
+        model_instance.class.observer_peers.keys.select { |ob| ob.is_a? BenefitSponsors::Observers::NoticeObserver }.each do |observer|
           expect(observer).to receive(:notifications_send) do |instance, model_event|
             expect(model_event).to be_an_instance_of(::BenefitSponsors::ModelEvents::ModelEvent)
             expect(model_event).to have_attributes(:event_key => :initial_employer_invoice_available, :klass_instance => model_instance, :options => {})

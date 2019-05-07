@@ -35,7 +35,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployeeAutoRenewalNotifica
 
   describe "ModelEvent" do
     it "should trigger model event" do
-      census_employee.class.observer_peers.keys.each do |observer|
+      census_employee.class.observer_peers.keys.select { |ob| ob.is_a? BenefitSponsors::Observers::NoticeObserver }.each do |observer|
         expect(observer).to receive(:process_census_employee_events) do |_instance, model_event|
           expect(model_event).to be_an_instance_of(::BenefitSponsors::ModelEvents::ModelEvent)
           expect(model_event).to have_attributes(:event_key => :employee_coverage_passively_renewed, :klass_instance => census_employee, :options => {event_object: renewal_application})

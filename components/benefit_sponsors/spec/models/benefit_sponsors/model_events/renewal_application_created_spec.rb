@@ -16,7 +16,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalApplicationCreated', dbclea
   describe "when renewal application created" do
     context "ModelEvent" do
       it "should trigger model event" do
-        model_instance.class.observer_peers.keys.each do |observer|
+        model_instance.class.observer_peers.keys.select { |ob| ob.is_a? BenefitSponsors::Observers::NoticeObserver }.each do |observer|
           expect(observer).to receive(:process_application_events) do |_model_instance, model_event|
             expect(model_event).to be_an_instance_of(::BenefitSponsors::ModelEvents::ModelEvent)
             expect(model_event).to have_attributes(:event_key => :renewal_application_created, :klass_instance => model_instance, :options => {})
