@@ -101,7 +101,8 @@ module BenefitSponsors
 
 
       accepts_nested_attributes_for :profiles
-      add_observer BenefitSponsors::Observers::OrganizationObserver.new, [:update, :notifications_send]
+      add_observer BenefitSponsors::Observers::OrganizationObserver.new, [:update]
+      add_observer BenefitSponsors::Observers::NoticeObserver.new, [:process_organization_events]
 
       validates_presence_of :legal_name, :site_id, :profiles
       # validates_presence_of :benefit_sponsorships, if: :is_benefit_sponsor?

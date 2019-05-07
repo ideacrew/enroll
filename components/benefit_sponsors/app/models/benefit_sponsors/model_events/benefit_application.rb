@@ -1,3 +1,5 @@
+# rubocop:disable Lint/UselessAssignment
+
 module BenefitSponsors
   module ModelEvents
     module BenefitApplication
@@ -11,25 +13,17 @@ module BenefitSponsors
         :application_denied,
         :renewal_application_created,
         :renewal_application_autosubmitted,
-
-        # :renewal_enrollment_confirmation,
-        # :renewal_application_submitted,
-        # :ineligible_renewal_application_submitted,
-        # :open_enrollment_began, #not being used
-        # :renewal_application_denied,
-        # :zero_employees_on_roster,
       ]
 
       DATA_CHANGE_EVENTS = [
-          :renewal_employer_publish_plan_year_reminder_after_soft_dead_line,
-          :renewal_employer_open_enrollment_completed,
-          :renewal_plan_year_first_reminder_before_soft_dead_line,
           :initial_employer_no_binder_payment_received,
-          :renewal_plan_year_publish_dead_line,
-          :low_enrollment_notice_for_employer,
           :initial_employer_first_reminder_to_publish_plan_year,
           :initial_employer_second_reminder_to_publish_plan_year,
-          :initial_employer_final_reminder_to_publish_plan_year
+          :initial_employer_final_reminder_to_publish_plan_year,
+          :renewal_employer_first_reminder_to_publish_plan_year,
+          :renewal_employer_second_reminder_to_publish_plan_year,
+          :renewal_employer_third_reminder_to_publish_plan_year,
+          :open_enrollment_end_reminder_and_low_enrollment
       ]
 
       OTHER_EVENTS = [
@@ -65,34 +59,6 @@ module BenefitSponsors
             is_renewal_application_autosubmitted = true
           end
 
-          # if is_transition_matching?(to: :enrollment_closed, from: :enrollment_open, event: :end_open_enrollment)
-          #   is_renewal_enrollment_confirmation = true
-          # end
-
-          # if is_transition_matching?(to: :renewing_draft, from: :draft, event: :renew_plan_year)
-          #   is_renewal_application_created = true
-          # end
-
-          # if is_transition_matching?(to: [:renewing_published, :renewing_enrolling], from: :renewing_draft, event: :publish)
-          #   is_renewal_application_submitted = true
-          # end
-
-          # if is_transition_matching?(to: :renewing_publish_pending, from: :renewing_draft, event: [:publish, :force_publish])
-          #   is_ineligible_renewal_application_submitted = true
-          # end
-
-          # if is_transition_matching?(to: :terminated, from: [:active, :suspended], event: :terminate)
-          #   is_group_advance_termination_confirmation = true
-          # end
-
-          # if is_transition_matching?(to: :published, from: :draft, event: :force_publish)
-          #   is_zero_employees_on_roster = true
-          # end
-
-          # if is_transition_matching?(to: :renewing_application_ineligible, from: :renewing_enrolling, event: :advance_date)
-          #   is_renewal_application_denied = true
-          # end
-
           # TODO -- encapsulated notify_observers to recover from errors raised by any of the observers
           REGISTERED_EVENTS.each do |event|
             begin
@@ -104,7 +70,6 @@ module BenefitSponsors
               Rails.logger.info { "Benefit Application REGISTERED_EVENTS: #{event} unable to notify observers" }
             end
           end
-
         end
       end
 
@@ -174,10 +139,6 @@ module BenefitSponsors
             is_renewal_plan_year_publish_dead_line = true
           end
 
-          if new_date.day == Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on - 2
-            is_low_enrollment_notice_for_employer = true
-          end
-
           if new_date.day == Settings.aca.shop_market.initial_application.advertised_deadline_of_month - 2 # 2 days prior to advertised deadline of month i.e., 8th of the month
             is_initial_employer_first_reminder_to_publish_plan_year = true
           elsif new_date.day == Settings.aca.shop_market.initial_application.advertised_deadline_of_month - 1 # 1 day prior to advertised deadline of month i.e., 9th of the month
@@ -185,6 +146,11 @@ module BenefitSponsors
           elsif new_date.day == Settings.aca.shop_market.initial_application.publish_due_day_of_month - 2 # 2 days prior to publish deadline of month i.e., 13th of the month
             is_initial_employer_final_reminder_to_publish_plan_year = true
           end
+
+          # triggering the event every day open enrollment end reminder notice to employees
+          # This is because there is a possibility for the employers to change the open enrollment end date
+          # This also triggers low enrollment notice to employer
+          is_open_enrollment_end_reminder_and_low_enrollment = true
 
           DATA_CHANGE_EVENTS.each do |event|
             begin
@@ -198,7 +164,6 @@ module BenefitSponsors
           end
         end
       end
-
     end
   end
 end

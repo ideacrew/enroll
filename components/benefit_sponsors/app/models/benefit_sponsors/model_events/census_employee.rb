@@ -3,7 +3,7 @@ module BenefitSponsors
     module CensusEmployee
 
       REGISTERED_EVENTS = [
-        :employee_notice_for_employee_terminated_from_roster
+        :employee_terminated_from_roster
       ]
 
       OTHER_EVENTS = [
@@ -14,7 +14,7 @@ module BenefitSponsors
 
       def notify_on_save
         if is_transition_matching?(to: [:employment_terminated, :employee_termination_pending], from: [:eligible, :employee_role_linked, :newly_designated_eligible, :newly_designated_linked], event: [:terminate_employee_role, :schedule_employee_termination])
-          is_employee_notice_for_employee_terminated_from_roster = true
+          is_employee_terminated_from_roster = true
         end
 
         REGISTERED_EVENTS.each do |event|
@@ -37,7 +37,7 @@ module BenefitSponsors
 
       def trigger_model_event(event_name, event_options = {})
         if OTHER_EVENTS.include?(event_name)
-          ::CensusEmployee.add_observer(BenefitSponsors::Observers::CensusEmployeeObserver.new, [:notifications_send])
+          ::CensusEmployee.add_observer(BenefitSponsors::Observers::NoticeObserver.new, [:process_census_employee_events])
           notify_observers(ModelEvent.new(event_name, self, event_options))
         end
       end

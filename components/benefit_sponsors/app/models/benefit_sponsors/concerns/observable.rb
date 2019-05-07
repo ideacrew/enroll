@@ -10,8 +10,9 @@ module BenefitSponsors
               model_instance = self
               if args.is_a?(BenefitSponsors::ModelEvents::ModelEvent)
                 model_instance = args.klass_instance
-                next unless (event == :notifications_send)
               end
+              next if k.is_a?(BenefitSponsors::Observers::NoticeObserver) & args.blank?
+
               k.send event, model_instance, args
             end
           end

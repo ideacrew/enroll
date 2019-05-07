@@ -25,15 +25,6 @@ module BenefitSponsors
         end
       end
 
-      def notifications_send(model_instance, new_model_event)
-        if new_model_event.present? &&  new_model_event.is_a?(BenefitSponsors::ModelEvents::ModelEvent)
-          organization = new_model_event.klass_instance
-          if new_model_event.event_key == :welcome_notice_to_employer
-            deliver(recipient: organization.employer_profile, event_object: organization.employer_profile, notice_event: "welcome_notice_to_employer")
-          end
-        end
-      end
-
       private
 
       def initialize

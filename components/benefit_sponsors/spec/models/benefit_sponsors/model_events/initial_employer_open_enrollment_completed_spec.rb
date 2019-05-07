@@ -26,7 +26,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerApplicationDenied',
   describe "ModelEvent" do
     it "should trigger model event" do
       model_instance.class.observer_peers.keys.each do |observer|
-          expect(observer).to receive(:notifications_send) do |model_instance, model_event|
+        expect(observer).to receive(:process_application_events) do |_model_instance, model_event|
           expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
           expect(model_event).to have_attributes(:event_key => :employer_open_enrollment_completed, :klass_instance => model_instance, :options => {})
         end
@@ -38,7 +38,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerApplicationDenied',
 
   describe "NoticeTrigger" do
     context "open enrollment end" do
-      subject { BenefitSponsors::Observers::BenefitApplicationObserver.new }
+      subject { BenefitSponsors::Observers::NoticeObserver.new }
 
       let(:model_event) { BenefitSponsors::ModelEvents::ModelEvent.new(:employer_open_enrollment_completed, model_instance, {}) }
 
@@ -50,7 +50,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerApplicationDenied',
           expect(payload[:event_object_id]).to eq model_instance.id.to_s
         end
         allow_any_instance_of(BenefitMarkets::BusinessRulesEngine::BusinessPolicy).to receive(:is_satisfied?).with(model_instance).and_return true
-        subject.notifications_send(model_instance, model_event)
+        subject.process_application_events(model_instance, model_event)
       end
     end
   end
