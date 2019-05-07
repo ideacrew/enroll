@@ -15,7 +15,7 @@ module ModelEvents
       :initial_application_denied,
       :renewal_application_denied,
       :group_termination_confirmation_notice,
-      :renewal_employer_open_enrollment_completed
+      :renewal_employer_open_enrollment_completed,
       # :group_advance_termination_confirmation,
       :zero_employees_on_roster
     ]

@@ -877,6 +877,16 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
+  context '.send_invite!' do
+    let(:params)                  { valid_params }
+    let(:initial_census_employee) { CensusEmployee.new(**params) }
+
+    it 'should send invitation to employee' do
+      expect(initial_census_employee).to receive(:send_invite!)
+      initial_census_employee.save
+    end
+  end
+
   context "newhire_enrollment_eligible" do
     let(:census_employee) { FactoryGirl.build(:census_employee) }
     let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment) }
