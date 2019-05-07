@@ -72,6 +72,12 @@
   initializeDataTables();
 
   $(document).ajaxComplete(function() {
+    if ($('.alert-notice')[0]) {
+      $('.alert-notice').hide() 
+    }
+    if ($('.alert-error')[0]) {
+      $('.alert-error').hide() 
+    }
     if ($.isEmptyObject(CKEDITOR.instances)) {
       CKEDITOR.replace('notice_kind_template_raw_body', {});
     }
