@@ -96,7 +96,7 @@ describe 'ModelEvents::ZeroEmployeesOnRosterNotice', dbclean: :around_each  do
 
           if event == :renewal_application_autosubmitted
             expect(subject.notifier).to receive(:notify) do |event_name, payload|
-              expect(event_name).to eq "acapi.info.events.employer.planyear_renewal_3b"
+              expect(event_name).to eq "acapi.info.events.employer.renewal_application_autosubmitted"
               expect(payload[:employer_id]).to eq employer.hbx_id.to_s
               expect(payload[:event_object_kind]).to eq 'PlanYear'
               expect(payload[:event_object_id]).to eq model_instance.id.to_s
@@ -112,20 +112,20 @@ describe 'ModelEvents::ZeroEmployeesOnRosterNotice', dbclean: :around_each  do
             end
           end
 
+          if event == :renewal_application_submitted
+            expect(subject.notifier).to receive(:notify) do |event_name, payload|
+              expect(event_name).to eq "acapi.info.events.employer.renewal_application_submitted"
+              expect(payload[:employer_id]).to eq employer.hbx_id.to_s
+              expect(payload[:event_object_kind]).to eq 'PlanYear'
+              expect(payload[:event_object_id]).to eq model_instance.id.to_s
+            end
+          end
+
           expect(subject.notifier).to receive(:notify) do |event_name, payload|
             expect(event_name).to eq "acapi.info.events.employer.zero_employees_on_roster_notice"
             expect(payload[:employer_id]).to eq employer.hbx_id.to_s
             expect(payload[:event_object_kind]).to eq 'PlanYear'
             expect(payload[:event_object_id]).to eq model_instance.id.to_s
-          end
-
-          if event == :renewal_application_submitted
-            expect(subject.notifier).to receive(:notify) do |event_name, payload|
-              expect(event_name).to eq "acapi.info.events.employer.planyear_renewal_3a"
-              expect(payload[:employer_id]).to eq employer.hbx_id.to_s
-              expect(payload[:event_object_kind]).to eq 'PlanYear'
-              expect(payload[:event_object_id]).to eq model_instance.id.to_s
-            end
           end
 
           subject.plan_year_update(model_event)

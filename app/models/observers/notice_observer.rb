@@ -16,12 +16,12 @@ module Observers
 
         if new_model_event.event_key == :initial_application_submitted
           deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "initial_application_submitted")
-          # trigger_zero_employees_on_roster_notice(plan_year)
+          trigger_zero_employees_on_roster_notice(plan_year)
         end
 
         if new_model_event.event_key == :renewal_application_submitted
           deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_application_submitted")
-          # trigger_zero_employees_on_roster_notice(plan_year)
+          trigger_zero_employees_on_roster_notice(plan_year)
         end
 
         if new_model_event.event_key == :ineligible_initial_application_submitted
@@ -190,7 +190,7 @@ module Observers
 
       if Document::REGISTERED_EVENTS.include?(new_model_event.event_key)
         document = new_model_event.klass_instance
-        employer_profile = document.documentable.employer_profile
+        employer_profile = document.documentable
         plan_year = employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED - ['suspended']).first
         deliver(recipient: employer_profile, event_object: plan_year, notice_event: 'initial_employer_invoice_available') if (new_model_event.event_key == :initial_employer_invoice_available) && plan_year
       end
