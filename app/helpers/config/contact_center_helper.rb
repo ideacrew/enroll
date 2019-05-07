@@ -3,6 +3,10 @@ module Config::ContactCenterHelper
     Settings.contact_center.mailing_address.address_1
   end
 
+  def contact_center_po_box
+    Settings.contact_center.po_box
+  end
+
   def contact_center_alt_name
     Settings.contact_center.alt_name
   end
@@ -20,7 +24,7 @@ module Config::ContactCenterHelper
   end
 
   def contact_center_city
-    Settings.contact_center.mailing_address.city
+    Settings.contact_center.city
   end
 
   def contact_center_email_address
@@ -40,7 +44,7 @@ module Config::ContactCenterHelper
   end
 
   def contact_center_postal_code
-    Settings.contact_center.mailing_address.zip_code
+    Settings.contact_center.zip_code
   end
 
   def contact_center_name
@@ -52,7 +56,7 @@ module Config::ContactCenterHelper
   end
 
   def contact_center_state
-    Settings.contact_center.mailing_address.state
+    Settings.contact_center.state
   end
 
   def contact_center_tty_number

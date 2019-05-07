@@ -6,8 +6,9 @@ class Document
   include ModelEvents::Document
   include Concerns::Observable
 
-
   ACCESS_RIGHTS = %w(public pii_restricted)
+
+  after_create :notify_on_create
 
   # Enable polymorphic associations
   embedded_in :documentable, polymorphic: true
