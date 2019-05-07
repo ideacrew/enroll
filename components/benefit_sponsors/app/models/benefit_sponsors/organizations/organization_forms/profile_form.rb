@@ -3,6 +3,7 @@ module BenefitSponsors
     class OrganizationForms::ProfileForm
       include Virtus.model
       include ActiveModel::Validations
+      include Config::AcaHelper
 
       attribute :id, String
       attribute :market_kind, Symbol
@@ -31,7 +32,7 @@ module BenefitSponsors
       attribute :office_locations, Array[OrganizationForms::OfficeLocationForm]
 
       validates_presence_of :market_kind, if: :is_broker_profile?
-      validates_presence_of :ach_routing_number, if: :is_broker_profile?
+      validates_presence_of :ach_routing_number, if: :routing_information_enabled?
       validates_presence_of :referred_by, if: :is_cca_profile?
 
       validate :validate_profile_office_locations
@@ -47,6 +48,10 @@ module BenefitSponsors
       end
 
       def is_broker_profile?
+        profile_type == "broker_agency"
+      end
+
+      def routing_information_enabled?
         aca_broker_routing_information && profile_type == "broker_agency"
       end
 
