@@ -47,7 +47,7 @@ module BenefitSponsors
       end
 
       def is_broker_profile?
-        profile_type == "broker_agency"
+        aca_broker_routing_information && profile_type == "broker_agency"
       end
 
       def is_employer_profile?

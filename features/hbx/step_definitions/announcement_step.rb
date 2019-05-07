@@ -16,8 +16,9 @@ When(/Hbx admin enter announcement info for (.*?)$/) do |role|
   fill_in 'jq_datepicker_ignore_announcement[end_date]', with: (TimeKeeper.date_of_record + 5.days).to_s
   find('#announcement_content').click
   find('#announcement_audiences_ivl').click if role == "ivl"
-  find('#announcement_audiences_employer').click if role == "employee"
+  find('#announcement_audiences_employee').click if role == "employee"
   expect(page).to have_content "Announcements"
+  sleep 1
   find('.interaction-click-control-create-announcement').click
 end
 
@@ -27,8 +28,9 @@ When(/^Hbx admin enter announcement info with future date for (.*?)$/) do |role|
   fill_in 'jq_datepicker_ignore_announcement[end_date]', with: (TimeKeeper.date_of_record + 15.days).to_s
   find('#announcement_content').click
   find('#announcement_audiences_ivl').click if role == "ivl"
-  find('#announcement_audiences_employer').click if role == "employee"
+  find('#announcement_audiences_employee').click if role == "employee"
   expect(page).to have_content "Announcements"
+  sleep 1
   find('.interaction-click-control-create-announcement').click
 end
 
@@ -49,7 +51,8 @@ When(/^Hbx admin enter announcement info with invalid params for (.*?)$/) do |ro
   fill_in 'jq_datepicker_ignore_announcement[end_date]', with: (TimeKeeper.date_of_record).to_s
   find('#announcement_content').click
   find('#announcement_audiences_ivl').click if role == "ivl"
-  find('#announcement_audiences_employer').click if role == "employee"
+  find('#announcement_audiences_employee').click if role == "employee"
+  sleep 1
   find('.interaction-click-control-create-announcement').click
 end
 

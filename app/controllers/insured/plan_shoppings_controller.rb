@@ -181,7 +181,7 @@ class Insured::PlanShoppingsController < ApplicationController
       @plan_types = []
       @metal_levels = []
     end
-    # @networks = []
+    @networks = @products.map(&:network_information).uniq if offers_nationwide_plans?
     @carrier_names = @issuer_profiles.map{|ip| ip.legal_name}
     @use_family_deductable = (@hbx_enrollment.hbx_enrollment_members.count > 1)
     @waivable = @hbx_enrollment.can_waive_enrollment?

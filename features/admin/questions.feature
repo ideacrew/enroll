@@ -1,3 +1,4 @@
+@ma_only
 Feature: Add, Edit and Delete security questions
 
   Background: Setup Site
