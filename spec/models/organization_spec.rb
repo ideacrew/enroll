@@ -124,7 +124,7 @@ RSpec.describe Organization, dbclean: :after_each do
     let(:organization2) {FactoryBot.create(:organization, legal_name: "Turner Inc")}
     let!(:carrier_profile_2) {FactoryBot.create(:carrier_profile, with_service_areas: 0, organization: organization2, issuer_hios_ids: ['22222'])}
     let(:single_choice_organization) {FactoryBot.create(:organization, legal_name: "Restricted Options")}
-    let!(:sole_source_participater) { create(:carrier_profile, with_service_areas: 0, organization: single_choice_organization, offers_sole_source: true) }
+    let!(:sole_source_participater) { create(:carrier_profile, with_service_areas: 0, organization: single_choice_organization, offers_sole_source: true, issuer_hios_ids: ['11111']) }
 
     let!(:carrier_one_service_area) { create(:carrier_service_area, service_area_zipcode: '10001', issuer_hios_id: carrier_profile_1.issuer_hios_ids.first) }
     let(:address) { double(zip: '10001', county: 'County', state: Settings.aca.state_abbreviation) }
