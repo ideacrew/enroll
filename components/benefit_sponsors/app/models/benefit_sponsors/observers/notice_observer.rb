@@ -321,7 +321,7 @@ module BenefitSponsors
             next if ce.new_hire_enrollment_period.cover?(date) || ce.new_hire_enrollment_period.first > date
 
             deliver(recipient: ce.employee_role, event_object: benefit_application, notice_event: "employee_open_enrollment_reminder") if ce.employee_role
-          rescue => e
+          rescue StandardError => e
             (Rails.logger.error { "Unable to deliver open enrollment reminder notice to #{ce.full_name} due to #{e}" }) unless Rails.env.test?
           end
           next if benefit_application.effective_period.min.yday == 1

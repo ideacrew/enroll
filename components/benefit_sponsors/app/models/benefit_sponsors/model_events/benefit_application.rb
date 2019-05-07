@@ -167,3 +167,5 @@ module BenefitSponsors
     end
   end
 end
+
+# rubocop:enable Lint/UselessAssignment
