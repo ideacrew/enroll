@@ -968,17 +968,6 @@ class EmployerProfile
     end
   end
 
-  def self.notice_for_missing_binder_payment(org)
-    org.employer_profile.trigger_notices("initial_employer_no_binder_payment_received", "acapi_trigger" => true)
-    org.employer_profile.census_employees.active.each do |ce|
-      begin
-        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notice_to_ee_that_er_plan_year_will_not_be_written", "acapi_trigger" =>  true )
-      rescue Exception => e
-        (Rails.logger.error {"Unable to deliver notice_to_ee_that_er_plan_year_will_not_be_written to #{ce.full_name} due to #{e}"}) unless Rails.env.test?
-      end
-    end
-  end
-
   def is_new_employer?
     !renewing_plan_year.present? #&& TimeKeeper.date_of_record > 10
   end

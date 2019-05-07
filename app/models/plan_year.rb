@@ -975,7 +975,7 @@ class PlanYear
       transitions from: :enrolled,  to: :active,                  :guard  => :is_event_date_valid?
       transitions from: :published, to: :enrolling,               :guard  => :is_event_date_valid?
       transitions from: :enrolling, to: :enrolled,                :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
-      transitions from: :enrolling, to: :application_ineligible,  :guard => :is_open_enrollment_closed?, :after => [:notify_employee_of_initial_employer_ineligibility]
+      transitions from: :enrolling, to: :application_ineligible,  :guard => :is_open_enrollment_closed?
       # transitions from: :enrolling, to: :canceled,  :guard  => :is_open_enrollment_closed?, :after => :deny_enrollment  # Talk to Dan
 
       transitions from: :active, to: :terminated, :guard => :is_event_date_valid?
@@ -1104,7 +1104,7 @@ class PlanYear
 
     event :close_open_enrollment, :after => :record_transition do
       transitions from: :enrolling, to: :enrolled,                :guards => [:is_enrollment_valid?]
-      transitions from: :enrolling, to: :application_ineligible,  :after => [:notify_employee_of_initial_employer_ineligibility]
+      transitions from: :enrolling, to: :application_ineligible
 
       transitions from: :renewing_enrolling,  to: :renewing_enrolled,   :guards => [:is_enrollment_valid?]
       transitions from: :renewing_enrolling,  to: :renewing_application_ineligible
@@ -1291,27 +1291,6 @@ class PlanYear
   def is_plan_year_end?
     TimeKeeper.date_of_record.end_of_day == end_on
   end
-
-  def notify_employee_of_initial_employer_ineligibility
-    return true if benefit_groups.any?{|bg| bg.is_congress?}
-    self.employer_profile.census_employees.non_terminated.each do |ce|
-      begin
-        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notify_employee_of_initial_employer_ineligibility", "acapi_trigger" =>  true)
-      rescue Exception => e
-        Rails.logger.error { "Unable to deliver employee initial eligibiliy notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
-      end
-    end
-  end
-
-  # def initial_employer_open_enrollment_completed
-  #   #also check if minimum participation and non owner conditions are met by ER.
-  #   return true if benefit_groups.any?{|bg| bg.is_congress?}
-  #   begin
-  #     self.employer_profile.trigger_notices("initial_employer_open_enrollment_completed")
-  #   rescue Exception => e
-  #     Rails.logger.error { "Unable to deliver employer open enrollment completed notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
-  #   end
-  # end
 
   def record_transition
     self.workflow_state_transitions << WorkflowStateTransition.new(
