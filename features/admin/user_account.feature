@@ -37,8 +37,8 @@ Feature: User Account page
     When Hbx AdminEnrollments logs on to the Hbx Portal
     And Hbx Admin click on User Accounts
     Then Hbx Admin should see search box
-    When a user enters the first user oim_id in the search box
-    Then a user should see a result with the first user oim_id but not others
-    When a user enters first user email
-    Then a user should see a result with first user emails but not others
+    When a user enters an user name search box
+    Then a user should see a result with the user name
+    When a user enter person hbx id
+    Then a user should see a result with hbx id
 
