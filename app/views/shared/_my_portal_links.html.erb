@@ -2,8 +2,8 @@
 <% employer_staff =  (current_user.person && current_user.person.active_employer_staff_roles) || []%>
 <% employer = employer_staff.first %>
 <% broker_staff_roles =  (current_user.person && current_user.person.active_broker_staff_roles) || []%>
-<% roles = [insured, broker_staff_roles] %>
-<% portal_count = roles.select{|role|role}.count + employer_staff.count%>
+<% roles = [insured] %>
+<% portal_count = roles.select{|role|role}.count + employer_staff.count + broker_staff_roles.count%>
 
   <% if portal_count == 1 %>
     <span>
