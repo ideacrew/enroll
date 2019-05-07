@@ -147,22 +147,30 @@ Then(/^I should only see user with broker role$/)do
   expect(page).to have_content("Unlocked")
 end
 
-When(/^a user enters an user name search box$/)do
-  page.find("input[type='search']").set(@user_1.oim_id)
+When(/^a user enters the first user oim_id in the search box$/) do
+  user = User.first
+  page.find("input[type='search']").set(user.oim_id)
 end
 
-Then(/^a user should see a result with the user name$/) do
-  expect(page).to have_content(@user_1.oim_id)
-  expect(page).to have_no_content(@user_2.oim_id)
+Then(/^a user should see a result with the first user oim_id but not others$/) do
+  user = User.first
+  expect(page).to have_content(user.oim_id)
+  User.all[1..-1].to_a.each do |user|
+    expect(page).to have_no_content(user.oim_id)
+  end
 end
 
-When(/^a user enter person hbx id$/)do
-  page.find("input[type='search']").set(@user_1.email)
+When(/^a user enters first user email$/)do
+  user = User.first.email
+  page.find("input[type='search']").set(user.email)
 end
 
-Then(/^a user should see a result with hbx id$/) do
-  expect(page).to have_content(@user_1.email)
-  expect(page).to have_no_content(@user_2.email)
+Then(/^a user should see a result with first user emails but not others$/) do
+  user = User.first
+  expect(page).to have_content(user.email)
+  User.all[1..-1].to_a.each do |user|
+    expect(page).to have_no_content(user.email)
+  end
 end
 
 Then(/^Hbx Admin click on User Accounts$/) do

@@ -1,9 +1,16 @@
 {
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.8.1",
     "@rails/webpacker": "3.4",
     "axios": "^0.18.0",
+    "bootstrap": "^4.3.1",
+    "jquery": "^3.4.0",
+    "jquery-ui": "^1.12.1",
     "npm": "^6.0.0",
-    "stimulus": "^1.0.1"
+    "popper.js": "^1.15.0",
+    "rails-ujs": "^5.2.3",
+    "stimulus": "^1.0.1",
+    "turbolinks": "^5.2.0"
   },
   "devDependencies": {
     "babel-jest": "^22.4.3",
