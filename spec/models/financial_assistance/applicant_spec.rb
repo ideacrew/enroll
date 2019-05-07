@@ -716,4 +716,42 @@ RSpec.describe FinancialAssistance::Applicant, type: :model do
       end
     end
   end
+
+  describe 'other_questions_complete?' do
+    context 'applicant age is not in between 18 and 26' do
+      it 'should return false if other questions are not answered' do
+        expect(applicant1.other_questions_complete?).to be false
+      end
+
+      it 'should return true if other questions answered' do
+        applicant1.update_attributes(has_daily_living_help: false, need_help_paying_bills: false)
+        expect(applicant1.other_questions_complete?).to be true
+      end
+
+      it 'should return false if SSN is not entered and SSN question is not answered' do
+        applicant1.person.update_attributes(ssn: nil)
+        applicant1.update_attributes(has_daily_living_help: false, need_help_paying_bills: false)
+        expect(applicant1.other_questions_complete?).to be false
+      end
+    end
+
+    context 'applicant age is in between 18 and 26' do
+      it 'should return false if other questions are not answered' do
+        expect(applicant2.other_questions_complete?).to be false
+      end
+
+      it 'should return true if other questions answered' do
+        person2.update_attributes(dob: TimeKeeper.date_of_record - 20.years)
+        person2.update_attributes(ssn: nil)
+        applicant2.update_attributes(has_daily_living_help: false, need_help_paying_bills: false, is_ssn_applied: false, is_former_foster_care: false)
+        expect(applicant2.other_questions_complete?).to be true
+      end
+
+      it 'should return false if SSN is not entered and SSN question is not answered' do
+        person2.update_attributes(dob: TimeKeeper.date_of_record - 20.years)
+        applicant2.update_attributes(has_daily_living_help: false, need_help_paying_bills: false)
+        expect(applicant2.other_questions_complete?).to be false
+      end
+    end
+  end
 end
