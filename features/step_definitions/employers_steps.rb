@@ -555,7 +555,7 @@ Given /^the employer has employees$/ do
 end
 
 Given /^the employer is logged in$/ do
-  login_as owner, scope: :user
+  login_as owner
 end
 
 Then /^employer should see Bulk Actions$/ do

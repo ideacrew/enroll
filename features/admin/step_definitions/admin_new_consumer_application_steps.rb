@@ -57,7 +57,7 @@ Then(/^Individual should land on Documents upload page$/) do
 end
 
 When(/^clicks on Individual in Families tab$/) do
-  login_as hbx_admin, scope: :user
+  login_as hbx_admin
   visit exchanges_hbx_profiles_root_path
   find(:xpath, "//li[contains(., '#{"Families"}')]", :wait => 10).click
   find(:xpath,'//*[@id="myTab"]/li[2]/ul/li[1]/a/span[1]', :wait => 10).trigger('click')

@@ -1,5 +1,5 @@
 Given(/^Employer exists and logs in$/) do
-  login_as @staff_role, scope: :user
+  login_as @staff_role
 end
 
 Then(/^Employee should click on Manage Family button$/) do

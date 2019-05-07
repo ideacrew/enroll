@@ -1,7 +1,7 @@
 <%
 rerun = File.file?('rerun.txt') ? IO.read('rerun.txt') : ""
 rerun_opts = rerun.to_s.strip.empty? ? "--format #{ENV['CUCUMBER_FORMAT'] || 'progress'} features" : "--format #{ENV['CUCUMBER_FORMAT'] || 'pretty'} #{rerun}"
-std_opts = "--format #{ENV['CUCUMBER_FORMAT'] || 'pretty'} --strict --tags  'not @wip' --tags 'not @ridp_disabled'  --tags 'not @individual_enabled' --tags 'not @general_agency_enabled' --tags 'not @quoting_enabled' --tags  'not @more_than_sole_source'"
+std_opts = "--format #{ENV['CUCUMBER_FORMAT'] || 'pretty'} --strict --tags  'not @wip' --tags 'not @general_agency_enabled' --tags 'not @quoting_enabled' --tags  'not @more_than_sole_source'"
 
 %>
 default: <%= std_opts %> -r features
