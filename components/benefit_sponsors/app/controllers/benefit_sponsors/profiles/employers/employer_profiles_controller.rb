@@ -22,6 +22,7 @@ module BenefitSponsors
         def show # TODO - Each when clause should be a seperate action.
           authorize @employer_profile
           @tab = params['tab']
+          @broker_agency_profile = @employer_profile.active_broker_agency_account.broker_agency_profile if @employer_profile.active_broker_agency_account.present?
           if (params[:q] || params[:page] || params[:commit] || params[:status]).present?
             # paginate_employees
           else

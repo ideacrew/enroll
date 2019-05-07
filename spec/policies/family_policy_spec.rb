@@ -27,14 +27,21 @@ describe FamilyPolicy, "given a user who is the primary member" do
 end
 
 describe FamilyPolicy, "given a family with an active broker agency account", :dbclean => :after_each do
-  let(:person) { FactoryBot.create(:person, :with_family)}
+  let(:broker_person_id) { double }
+  let(:broker_agency_profile_id) { double }
+  let(:person) { FactoryGirl.create(:person, :with_family)}
   let(:family) { (person.primary_family) }
   let(:site)  { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-  let(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, market_kind: 'shop', legal_name: 'Legal Name1', assigned_site: site) }
-  let(:broker_role) { FactoryBot.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id ) }
-  let(:broker_agency_account) {FactoryBot.create(:broker_agency_account, broker_agency_profile_id: broker_agency_profile_id_account, writing_agent_id: broker_role.id, is_active: true)}
+  let(:broker_agency_profile) { FactoryGirl.create(:benefit_sponsors_organizations_broker_agency_profile, market_kind: 'shop', legal_name: 'Legal Name1', assigned_site: site) }
+  let(:broker_person) { instance_double(Person, :id => broker_person_id, :active_broker_staff_roles => [broker_agency_staff_role], :active_general_agency_staff_roles => [], :hbx_staff_role => nil) }
+  let(:broker_agency_staff_role) { instance_double(BrokerAgencyStaffRole, :benefit_sponsors_broker_agency_profile_id => broker_agency_profile_id) }
+  let(:broker_agency_account) {FactoryGirl.create(:broker_agency_account, broker_agency_profile_id: broker_agency_profile_id_account, writing_agent_id: broker_role.id, is_active: true)}
 
   subject { FamilyPolicy.new(user, family) }
+
+  before(:each) do
+    allow(broker_person).to receive(:broker_role).and_return nil
+  end
 
   describe "when the user is an active member of the same broker agency as the account" do
     let(:broker_agency_profile_id_account) { broker_agency_profile.id }
@@ -46,9 +53,11 @@ describe FamilyPolicy, "given a family with an active broker agency account", :d
   end
 
   describe "when the user is an active member of a different broker agency from the account" do
+    let(:broker_person_id) { double }
+    let(:broker_agency_profile_id) { double }
     let(:broker_agency_profile_id_account) { double }
-    let(:broker_person) { broker_role.person }
-    let(:user) { FactoryBot.create(:user, :person => broker_person)}
+    let(:broker_person) { instance_double(Person, :id => broker_person_id, :active_broker_staff_roles => [broker_agency_staff_role], :active_general_agency_staff_roles => [], :hbx_staff_role => nil) }
+    let(:user) { FactoryGirl.create(:user, :person => broker_person)}
 
     it "can't show" do
       expect(subject.show?).to be_falsey
@@ -57,17 +66,24 @@ describe FamilyPolicy, "given a family with an active broker agency account", :d
 end
 
 describe FamilyPolicy, "given a family where the primary has an active employer broker account", dbclean: :after_each do
+  let(:broker_person_id) { double }
+  let(:broker_agency_profile_id) { double }
   let(:site)  { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
   let(:organization)        { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
   let(:employer_profile)    { organization.employer_profile }
   let(:employee_role) {FactoryBot.create(:employee_role, employer_profile: employer_profile)}
   let(:person) { FactoryBot.create(:person, :with_family)}
   let(:family) { (person.primary_family) }
-  let(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, market_kind: 'shop', legal_name: 'Legal Name1', assigned_site: site) }
-  let(:broker_role) { FactoryBot.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id ) }
-  let(:broker_agency_account) {FactoryBot.create(:broker_agency_account, broker_agency_profile_id: broker_agency_profile_id_account, writing_agent_id: broker_role.id, is_active: true)}
+  let(:broker_agency_profile) { FactoryGirl.create(:benefit_sponsors_organizations_broker_agency_profile, market_kind: 'shop', legal_name: 'Legal Name1', assigned_site: site) }
+  let(:broker_person) { instance_double(Person, :id => broker_person_id, :active_broker_staff_roles => [broker_agency_staff_role], :active_general_agency_staff_roles => [], :hbx_staff_role => nil) }
+  let(:broker_agency_staff_role) { instance_double(BrokerAgencyStaffRole, :benefit_sponsors_broker_agency_profile_id => broker_agency_profile_id) }
+  let(:broker_agency_account) {FactoryGirl.create(:broker_agency_account, broker_agency_profile_id: broker_agency_profile_id_account, writing_agent_id: broker_role.id, is_active: true)}
 
   subject { FamilyPolicy.new(user, family) }
+
+  before(:each) do
+    allow(broker_person).to receive(:broker_role).and_return nil
+  end
 
   describe "when the user is an active member of the same broker agency as the account" do
     let(:broker_agency_profile_id_account) { broker_agency_profile.id }
@@ -96,9 +112,10 @@ describe FamilyPolicy, "given a family where the primary has an active employer 
   let(:family) { instance_double(Family, :primary_applicant => primary_member, :active_broker_agency_account => nil) }
   let(:employer_profile) { instance_double(EmployerProfile, :active_broker_agency_account => nil, :active_general_agency_account => general_agency_account) }
   let(:employee_role) { instance_double(EmployeeRole, :employer_profile => employer_profile) }
-  let(:person) { instance_double(Person, :id => primary_person_id, :active_employee_roles => [employee_role]) }
+  let(:person) { instance_double(Person, :id => primary_person_id, :active_employee_roles => [employee_role], :active_broker_staff_roles => [broker_agency_staff_role]) }
+  let(:broker_agency_staff_role) { instance_double(BrokerAgencyStaffRole, :benefit_sponsors_broker_agency_profile_id => '1234') }
   let(:user) { instance_double(User, :person => ga_person) }
-  let(:ga_person) { instance_double(Person, :id => ga_person_id, :broker_role => nil, :active_general_agency_staff_roles => [general_agency_staff_role], :hbx_staff_role => nil) }
+  let(:ga_person) { instance_double(Person, :id => ga_person_id, :broker_role => nil, :active_general_agency_staff_roles => [general_agency_staff_role], :active_broker_staff_roles => [broker_agency_staff_role], :hbx_staff_role => nil) }
   let(:general_agency_staff_role) { instance_double(GeneralAgencyStaffRole, :general_agency_profile_id => general_agency_profile_id) }
   let(:general_agency_account) { instance_double(GeneralAgencyAccount, :general_agency_profile_id => general_agency_account_profile_id ) }
   let(:primary_member) { instance_double(FamilyMember, :person_id => primary_person_id, :person => person) }
@@ -139,3 +156,63 @@ describe FamilyPolicy, "given a user who has the modify family permission" do
   end
 end
 
+describe FamilyPolicy, 'given a family with an active broker with only broker role' do
+  let(:primary_person_id) { double }
+  let(:broker_person_id) { double }
+  let(:broker_agency_profile_id) { double }
+  let(:family) { instance_double(Family, :primary_applicant => primary_member, :active_broker_agency_account => broker_agency_account) }
+  let(:person) { instance_double(Person, :id => primary_person_id, :active_employee_roles => []) }
+  let(:user) { instance_double(User, :person => broker_person) }
+  let(:broker_role) { instance_double(BrokerRole, :benefit_sponsors_broker_agency_profile_id => broker_agency_profile_id) }
+  let(:broker_person) { instance_double(Person, :id => broker_person_id, :broker_role => broker_role, :active_general_agency_staff_roles => [], :hbx_staff_role => nil) }
+  let(:broker_agency_account) { instance_double(BenefitSponsors::Accounts::BrokerAgencyAccount, :benefit_sponsors_broker_agency_profile_id => broker_agency_profile_id_account) }
+  let(:primary_member) { instance_double(FamilyMember, :person_id => primary_person_id, :person => person) }
+
+
+  subject { FamilyPolicy.new(user, family) }
+
+  before(:each) do
+    allow(family).to receive(:active_broker_agency_account).and_return broker_agency_account
+    allow(broker_person).to receive(:active_broker_staff_roles).and_return []
+  end
+
+  context 'when the user is an active member of the same broker agency as the account' do
+    let(:broker_agency_profile_id_account) { broker_agency_profile_id }
+
+    it 'can show' do
+      allow(broker_person).to receive(:active_broker_staff_roles).and_return []
+      expect(subject.show?).to be_truthy
+    end
+  end
+end
+
+describe 'can_broker_modify_family' do
+
+  let(:person) { FactoryGirl.create(:person, :with_family) }
+  let(:user) { FactoryGirl.create(:user, person: person) }
+  let(:family) { person.primary_family }
+  let(:broker_role) { FactoryGirl.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person) }
+  let(:broker_agency_profile) { FactoryGirl.create(:benefit_sponsors_organizations_broker_agency_profile) }
+  let(:broker_agency_account) { FactoryGirl.create(:benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: broker_agency_profile, writing_agent_id: broker_role.id, is_active: true) }
+
+  subject { FamilyPolicy.new(user, family) }
+
+  context 'person with only broker role' do
+
+    it 'can modify family' do
+      allow(family).to receive(:active_broker_agency_account).and_return broker_agency_account
+      expect(subject.can_broker_modify_family?(broker_role, nil)).to be_truthy
+    end
+  end
+
+  context 'person with only broker staff role' do
+
+    let!(:broker_agency_staff_role1) { FactoryGirl.create(:broker_agency_staff_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person) }
+    let!(:broker_agency_staff_role2) { FactoryGirl.create(:broker_agency_staff_role, aasm_state: 'pending', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person) }
+
+    it 'can modify family' do
+      allow(family).to receive(:active_broker_agency_account).and_return broker_agency_account
+      expect(subject.can_broker_modify_family?(nil, person.active_broker_staff_roles)).to be_truthy
+    end
+  end
+end
