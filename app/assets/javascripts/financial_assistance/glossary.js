@@ -1073,7 +1073,7 @@ $(document).ready(function() {
     // Because of the change to tooltip on click instead of hover, you need to
     // manually close each tooltip. This will close others if you click to open one.
     $('.glossary').on('click',function(e){
-        var el = $(this).siblings('.tooltip');
+        var el = $(this).next('.tooltip');
     	  $('.tooltip').not(el).hide();
     });
 
