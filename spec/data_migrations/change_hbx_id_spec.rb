@@ -10,18 +10,29 @@ describe ChangeHbxId do
       expect(subject.name).to eql given_task_name
     end
   end
-
-  describe "changing person hbx id" do
+  describe "changing person hbx id to a target hbx_id" do
     let(:person) { FactoryGirl.create(:person)}
     before(:each) do
       allow(ENV).to receive(:[]).with("person_hbx_id").and_return(person.hbx_id)
       allow(ENV).to receive(:[]).with("new_hbx_id").and_return("34588973")
     end
-
     it "should change person hbx id " do
       subject.migrate
       person.reload
       expect(person.hbx_id).to eq "34588973"
+    end
+  end
+  describe "changing person hbx id to a target hbx_id" do
+    let(:person) { FactoryGirl.create(:person)}
+    before(:each) do
+      allow(ENV).to receive(:[]).with("person_hbx_id").and_return(person.hbx_id)
+      allow(ENV).to receive(:[]).with("new_hbx_id").and_return("")
+    end
+    it "should change person hbx id " do
+      hbx_id = person.hbx_id
+      subject.migrate
+      person.reload
+      expect(person.hbx_id).not_to eq hbx_id
     end
   end
 end
