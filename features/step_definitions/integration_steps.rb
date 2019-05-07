@@ -502,7 +502,11 @@ When(/^(.*) logs on to the (.*)?/) do |named_person, portal|
   #TODO this fixes the random login fails b/c of empty params on email
   fill_in "user[login]", :with => person[:email] unless find(:xpath, '//*[@id="user_login"]').value == person[:email]
   find('.interaction-click-control-sign-in').click
+  sleep 10
   visit portal_uri
+  # Adding sleep seems to help prevent the AuthenticityToken error
+  # which apeared to be throwing in at least the
+  # add_sep_read_and_write_feature cucumber.
 end
 
 Then(/^.+ creates (.+) as a roster employee$/) do |named_person|
@@ -1159,8 +1163,8 @@ Given(/^a Hbx admin with read and write permissions and employers$/) do
   person = people['Hbx AdminEnrollments']
   hbx_profile = FactoryBot.create :hbx_profile
   user = FactoryBot.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
-  @user_1 = FactoryBot.create :user, :with_family, :employer_staff, oim_id: "Employer1"
-  @user_2 = FactoryBot.create :user, :with_family, :employer_staff, oim_id: "Employer2"
+  user_1 = FactoryBot.create :user, :with_family, :employer_staff, oim_id: "Employer1"
+  user_2 = FactoryBot.create :user, :with_family, :employer_staff, oim_id: "Employer2"
   FactoryBot.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
   org1 = FactoryBot.create(:organization, legal_name: 'Acme Agency', hbx_id: "123456")
   employer_profile = FactoryBot.create :employer_profile, organization: org1
