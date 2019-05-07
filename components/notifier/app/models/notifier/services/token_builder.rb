@@ -5,10 +5,11 @@ module Notifier
       placeholders = []
 
       model_builder.collections.each do |collection|
+        sub_collection = collection.split('.').last
         placeholders << {
           title: "Loop: #{collection.humanize}",
           target: [parent_data_model, collection].join('.'),
-          iterator: collection.singularize,
+          iterator: sub_collection.singularize,
           type: 'loop'
         }
 
@@ -29,7 +30,6 @@ module Notifier
           type: 'condition'
         }
       end
-
       placeholders
     end
 

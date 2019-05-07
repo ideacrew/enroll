@@ -1,5 +1,7 @@
 class Employers::EmployerProfilesController < Employers::EmployersController
 
+  include ApplicationHelper
+
   before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
                                        :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees, :link_from_quote, :generate_checkbook_urls]
   before_action :check_show_permissions, only: [:show, :show_profile, :destroy, :inbox, :bulk_employee_upload, :bulk_employee_upload_form]
@@ -258,7 +260,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
 
   def generate_checkbook_urls
-    @employer_profile.generate_checkbook_notices
+    trigger_notice_observer(@employer_profile, @employer_profile, 'out_of_pocker_url_notifier')
     flash[:notice] = "Custom Plan Match instructions are being generated.  Check your secure Messages inbox shortly."
     redirect_to action: :show, :tab => :employees
   end

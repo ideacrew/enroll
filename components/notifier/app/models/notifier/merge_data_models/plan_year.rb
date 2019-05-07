@@ -42,6 +42,7 @@ module Notifier
 
     attribute :warnings, String
     attribute :enrollment_errors, Hash[Symbol => String]
+    attribute :benefit_groups, Array[MergeDataModels::BenefitGroup]
 
     def self.stubbed_object
       reference_date = TimeKeeper.date_of_record.next_month.beginning_of_month
@@ -49,7 +50,7 @@ module Notifier
       renewal_py_start = reference_date
       prev_month = current_py_start.prev_month
 
-      Notifier::MergeDataModels::PlanYear.new({
+      plan_year =  Notifier::MergeDataModels::PlanYear.new({
         current_py_oe_start_date: (current_py_start.prev_month).strftime('%m/%d/%Y'),
         current_py_oe_end_date: (current_py_start.prev_month + 19.days).strftime('%m/%d/%Y'),
         current_py_start_date: current_py_start.strftime('%m/%d/%Y'),
@@ -87,6 +88,8 @@ module Notifier
         eligible_to_enroll_count: '6',
         monthly_employer_contribution_amount: "$216.34"
       })
+      plan_year.benefit_groups = Notifier::MergeDataModels::BenefitGroup.stubbed_object
+      plan_year
     end
   end
 end
