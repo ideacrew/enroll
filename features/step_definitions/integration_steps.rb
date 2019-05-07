@@ -849,11 +849,11 @@ When(/^.+ clicks? my insured portal link$/) do
 end
 
 When(/^.+ clicks? shop for plans button$/) do
-  click_button "Shop for Plans"
+  find('.interaction-click-control-shop-for-plans', wait: 5).click
 end
 
 When(/^.+ clicks Shop for new plan button$/) do
-  click_button 'Shop for new plan'
+  find('.interaction-click-control-shop-for-new-plan', wait: 5).click
 end
 
 Then(/^.+ should see the list of plans$/) do
