@@ -129,8 +129,7 @@ module Notifier
         else
           current_plan_year
         end
-
-      if current_plan_year.present?
+      if plan_year.present?
         merge_model.plan_year.current_py_oe_end_date = format_date(plan_year.open_enrollment_end_on)
       end
     end

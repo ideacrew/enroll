@@ -984,7 +984,7 @@ class PlanYear
       transitions from: :renewing_enrolled,   to: :active,              :guard  => :is_event_date_valid?
       transitions from: :renewing_published,  to: :renewing_enrolling,  :guard  => :is_event_date_valid?
       transitions from: :renewing_enrolling,  to: :renewing_enrolled,   :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
-      transitions from: :renewing_enrolling,  to: :renewing_application_ineligible, :guard => :is_open_enrollment_closed?, :after => [:zero_employees_on_roster]
+      transitions from: :renewing_enrolling,  to: :renewing_application_ineligible, :guard => :is_open_enrollment_closed?
 
       transitions from: :enrolling, to: :enrolling  # prevents error when plan year is already enrolling
     end
@@ -994,13 +994,13 @@ class PlanYear
     # Submit plan year application
     event :publish, :after => :record_transition do
       transitions from: :draft, to: :draft,     :guard => :is_application_unpublishable?
-      transitions from: :draft, to: :enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :zero_employees_on_roster]
-      transitions from: :draft, to: :published, :guard => :is_application_eligible?, :after => [:zero_employees_on_roster]
+      transitions from: :draft, to: :enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => :accept_application
+      transitions from: :draft, to: :published, :guard => :is_application_eligible?
       transitions from: :draft, to: :publish_pending
 
       transitions from: :renewing_draft, to: :renewing_draft,     :guard => :is_application_unpublishable?
-      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :zero_employees_on_roster]
-      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_eligible? , :after => [:zero_employees_on_roster]
+      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => :accept_application
+      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_eligible? 
       transitions from: :renewing_draft, to: :renewing_publish_pending
     end
 
@@ -1015,13 +1015,13 @@ class PlanYear
       transitions from: :publish_pending, to: :published_invalid
 
       transitions from: :draft, to: :draft,     :guard => :is_application_invalid?
-      transitions from: :draft, to: :enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :zero_employees_on_roster]
-      transitions from: :draft, to: :published, :guard => :is_application_eligible?, :after => :zero_employees_on_roster
+      transitions from: :draft, to: :enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => :accept_application
+      transitions from: :draft, to: :published, :guard => :is_application_eligible?
       transitions from: :draft, to: :publish_pending
 
       transitions from: :renewing_draft, to: :renewing_draft,     :guard => :is_application_invalid?
-      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :zero_employees_on_roster]
-      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_eligible?, :after => [:zero_employees_on_roster]
+      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => :accept_application
+      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_eligible?
       transitions from: :renewing_draft, to: :renewing_publish_pending
     end
 
@@ -1107,7 +1107,7 @@ class PlanYear
       transitions from: :enrolling, to: :application_ineligible,  :after => [:notify_employee_of_initial_employer_ineligibility]
 
       transitions from: :renewing_enrolling,  to: :renewing_enrolled,   :guards => [:is_enrollment_valid?]
-      transitions from: :renewing_enrolling,  to: :renewing_application_ineligible, :after => [:zero_employees_on_roster]
+      transitions from: :renewing_enrolling,  to: :renewing_application_ineligible
     end
   end
 
@@ -1292,17 +1292,6 @@ class PlanYear
     TimeKeeper.date_of_record.end_of_day == end_on
   end
 
-  def zero_employees_on_roster
-    return true if benefit_groups.any?{|bg| bg.is_congress?}
-    if self.employer_profile.census_employees.active.count < 1
-      begin
-        self.employer_profile.trigger_notices("zero_employees_on_roster", "acapi_trigger" =>  true)
-      rescue Exception => e
-        Rails.logger.error { "Unable to deliver employer zero employees on roster notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
-      end
-    end
-  end
-
   def notify_employee_of_initial_employer_ineligibility
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     self.employer_profile.census_employees.non_terminated.each do |ce|
@@ -1342,17 +1331,6 @@ class PlanYear
   #     Rails.logger.error { "Unable to deliver employer open enrollment completed notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
   #   end
   # end
-
-  def renewal_employer_ineligibility_notice_to_employee
-    return true if benefit_groups.any?{|bg| bg.is_congress?}
-      self.employer_profile.census_employees.non_terminated.each do |ce|
-       begin
-         ShopNoticesNotifierJob.perform_later(ce.id.to_s, "renewal_employer_ineligibility_notice_to_employee", "acapi_trigger" =>  true)
-       rescue Exception => e
-         Rails.logger.error { "Unable to deliver employer renewal ineligiblity denial notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
-      end
-    end
-  end
 
   def record_transition
     self.workflow_state_transitions << WorkflowStateTransition.new(
