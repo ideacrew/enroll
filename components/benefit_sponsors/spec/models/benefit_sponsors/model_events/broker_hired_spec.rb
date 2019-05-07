@@ -16,7 +16,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerAgencyHiredConfirmation', db
   let!(:broker_agency_organization1) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, legal_name: 'First Legal Name', site: site) }
   let!(:broker_agency_profile) { broker_agency_organization1.broker_agency_profile}
   let!(:model_instance) { create :benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: broker_agency_profile, benefit_sponsorship: benefit_sponsorship }
-  let!(:broker_role1) { FactoryBot.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person1) }
+  let!(:broker_role1) { broker_agency_profile.primary_broker_role }
   
   before do
     broker_agency_profile.update_attributes(primary_broker_role_id: broker_role1.id)
