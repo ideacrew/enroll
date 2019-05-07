@@ -1,22 +1,27 @@
 module UserWorld
-
   def employee(employer=nil)
     if @employee
       @employee
     else
-      employer_staff_role = FactoryBot.build(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer.profiles.first.id)
+      employer_staff_role = FactoryBot.create(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer.profiles.first.id)
       person = FactoryBot.create(:person, employer_staff_roles:[employer_staff_role])
       @employee = FactoryBot.create(:user, :person => person)
     end
   end
 
-  def broker(broker_agency=nil)
-    if @broker
-      @broker
+  def employer_staff
+    if @employer_staff
+      @employer_staff
     else
-      person = FactoryBot.create(:person)
-      broker_role = FactoryBot.build(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person)
-      @broker = FactoryBot.create(:user, :person => person)
+      @employer_staff = FactoryBot.create(:user, :employer_staff)
+    end
+  end
+
+  def employee_role
+    if @employee_role
+      @employee_role
+    else
+      @employee_role = FactoryBot.create(:user, :employee)
     end
   end
 
@@ -37,24 +42,53 @@ module UserWorld
       end
       hbx_staff_role = HbxStaffRole.create!( person: person, permission_id: permission_id, subrole: subrole, hbx_profile_id: hbx_profile_id)
       @admin = FactoryBot.create(:user, :person => person)
-
     end
   end
-
 end
 
 World(UserWorld)
 
-Given(/^that a user with a (.*?) role(?: with (.*?) subrole)? exists and is logged in$/) do |type, subrole|
+Given(/^that a user with a (.*?) role(?: with (.*?) subrole)? exists and (.*?) logged in$/) do |type, subrole, logged_in|
   case type
     when "Employer"
       user = employee(employer)
     when "Broker"
-      user = broker(broker_agency_profile)
+      # in features/step_definitions/broker_employee_quote_steps.rb BrokerWorld module
+      user = broker
     when "HBX staff"
       user = admin(subrole)
+    when 'Employer Role'
+      user = employer_staff
+    when 'Employee Role'
+      user = employee_role
   end
-  login_as user
+  case logged_in
+    when 'is'
+      login_as(user, :scope => :user)
+    when 'is not'
+      nil
+  end
+end
+
+And(/^user with (.*?) role is (.*?)$/) do |type, locked_status|
+  case type
+    when "Employer"
+      user = employee(employer)
+    when "Broker"
+      user = broker
+    when "HBX staff"
+      user = admin(subrole)
+    when 'Employer Role'
+      user = employer_staff
+    when 'Employee Role'
+      user = employee_role
+  end
+  case locked_status
+  when 'locked'
+    user.update_attributes(locked_at: Date.today)
+  when 'unblocked'
+    user.update_attributes(locked_at: nil)
+  end
 end
 
 And(/^the user is on the Employer Index of the Admin Dashboard$/) do

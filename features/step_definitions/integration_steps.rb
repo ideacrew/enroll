@@ -508,6 +508,14 @@ When(/^(.*) logs on to the (.*)?/) do |named_person, portal|
   # add_sep_read_and_write_feature cucumber.
 end
 
+When(/^user visits the (.*)?/) do |portal|
+  visit "/"
+  portal_class = "interaction-click-control-#{portal.downcase.gsub(/ /, '-')}"
+  portal_uri = find("a.#{portal_class}")["href"]
+  sleep 10
+  visit portal_uri
+end
+
 Then(/^.+ creates (.+) as a roster employee$/) do |named_person|
   person = people[named_person]
   screenshot("create_census_employee")
@@ -1157,18 +1165,22 @@ Then(/Devops can verify session logs/) do
   expect(user.person.consumer_role).not_to be nil
 end
 
-Given(/^a Hbx admin with read and write permissions and employers$/) do
-  p_staff=FactoryBot.create :permission, :hbx_update_ssn
-  person = people['Hbx AdminEnrollments']
-  hbx_profile = FactoryBot.create :hbx_profile
-  user = FactoryBot.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
-  @user_1 = FactoryBot.create :user, :with_family, :employer_staff, oim_id: "Employer1"
-  @user_2 = FactoryBot.create :user, :with_family, :employer_staff, oim_id: "Employer2"
-  FactoryBot.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
-  org1 = FactoryBot.create(:organization, legal_name: 'Acme Agency', hbx_id: "123456")
-  employer_profile = FactoryBot.create :employer_profile, organization: org1
-  org2 = FactoryBot.create(:organization, legal_name: 'Chase & Assoc', hbx_id: "67890")
-  employer_profile = FactoryBot.create :employer_profile, organization: org2
+Given(/^(.*) admin user with read and write permissions present/) do |hbx_admin_person|
+  p_staff = FactoryBot.create(:permission, :hbx_update_ssn)
+  hbx_profile = FactoryBot.create(:hbx_profile)
+  person = people[hbx_admin_person]
+  user = FactoryBot.create(:user,
+    :with_family,
+    :hbx_staff,
+    email: person[:email],
+    password: person[:password],
+    password_confirmation: person[:password]
+  )
+  FactoryBot.create(:hbx_staff_role,
+    person: user.person,
+    hbx_profile: hbx_profile,
+    permission_id: p_staff.id
+  )
 end
 
 And(/^Hbx Admin click on Employers/) do
