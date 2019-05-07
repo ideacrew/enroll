@@ -64,7 +64,7 @@ Layout/ExtraSpacing:
 Layout/EmptyLinesAroundClassBody:
   Enabled: false
 
-Layout/IndentArray:
+Layout/IndentFirstArrayElement:
   Enabled: false
 
 # Re-enable once other problems are solved

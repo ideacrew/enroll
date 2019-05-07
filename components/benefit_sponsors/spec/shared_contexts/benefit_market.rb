@@ -16,7 +16,7 @@ RSpec.shared_context "setup benefit market with market catalogs and product pack
 
   let(:product_kinds)  { [:health] }
   let(:service_area) {
-    county_zip_id = create(:benefit_markets_locations_county_zip, county_name: 'Middlesex', zip: '01754', state: 'MA').id
+    county_zip_id = create(:benefit_markets_locations_county_zip, county_name: 'Middlesex', zip: '20024', state: Settings.aca.state_abbreviation).id
     create(:benefit_markets_locations_service_area, county_zip_ids: [county_zip_id], active_year: current_effective_date.year)
   }
 

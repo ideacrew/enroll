@@ -2,6 +2,10 @@ require 'rails_helper'
 
 RSpec.describe "employers/plan_years/plan_selection/_plan_details.html.erb" do
 
+  class AcaHelperModStubber
+    extend Config::AcaHelper
+  end
+
   let(:employer_profile){
     instance_double(
       "EmployerProfile",
@@ -80,6 +84,7 @@ RSpec.describe "employers/plan_years/plan_selection/_plan_details.html.erb" do
 
     before :each do
       @plan = plan_cost_decorator
+      allow(@plan).to receive(:nationwide).and_return(true) if AcaHelperModStubber.offers_nationwide_plans?
       render partial: "employers/plan_years/plan_selection/plan_details"
     end
 
@@ -103,6 +108,7 @@ RSpec.describe "employers/plan_years/plan_selection/_plan_details.html.erb" do
 
     before :each do
       @plan = plan_cost_decorator_dental
+      allow(@plan).to receive(:nationwide).and_return(true) if AcaHelperModStubber.offers_nationwide_plans?
       render partial: "employers/plan_years/plan_selection/plan_details"
     end
 

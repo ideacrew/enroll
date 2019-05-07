@@ -7,13 +7,17 @@ Then(/Employee (.*) should click the Personal Tab/) do |named_person|
 end
 
 Then(/Employee (.*) should click Change my Password/) do |named_person|
-  wait_for_ajax
-  page.execute_script("document.querySelector('#change_password_link').click()")
+  if aca_security_questions
+    wait_for_ajax
+    page.execute_script("document.querySelector('#change_password_link').click()")
+  end
 end
 
 Then(/Employee (.*) should click Update my security challenge responses/) do |named_person|
-  wait_for_ajax
-  page.execute_script("document.querySelector('#update_security_responses_link').click()")
+  if aca_security_questions
+    wait_for_ajax
+    page.execute_script("document.querySelector('#update_security_responses_link').click()")
+  end
 end
 
 Then(/they attempt to submit a new password/) do

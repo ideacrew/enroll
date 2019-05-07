@@ -135,20 +135,28 @@ describe "shared/_comparison.html.erb", dbclean: :after_each do
     end
 
     it "should have rx formulary url coverage_kind = health" do
+      plan.update_attributes!(nationwide: true)
       render "shared/comparison", :qhps => mock_qhps
       expect(rendered).to match(/#{plan.rx_formulary_url}/)
       expect(rendered).to match("PROVIDER DIRECTORY")
     end
 
     if aca_state_abbreviation == "DC" # There is no plan comparision for MA dental
-      it "should not have rx_formulary_url coverage_kind = dental" do
-        render "shared/comparison", :qhps => mock_qhps
-        expect(rendered).to_not match(/#{plan.rx_formulary_url}/)
+      context 'for dental coverage' do
+        let!(:dental_product) { FactoryBot.create(:benefit_markets_products_dental_products_dental_product) }
+        let!(:dental_plan) { FactoryBot.create(:plan, market: 'shop', metal_level: 'dental', hios_id: "91111111122302", coverage_kind: 'dental', dental_level: 'high') }
+        let!(:mock_qhp){instance_double("Products::QhpCostShareVariance", :product => dental_product, :plan => dental_plan, :plan_marketing_name => dental_product.title)}
+        let(:mock_qhps) {[mock_qhp]}
+        it "should not have rx_formulary_url coverage_kind = dental" do
+          render "shared/comparison", :qhps => mock_qhps
+          expect(rendered).to_not have_selector('a', text: 'DRUG LIST')
+        end
       end
     end
 
     if offers_nationwide_plans?
       it "should have provider directory url if nationwide = true" do
+        plan.update_attributes!(nationwide: true)
         render "shared/comparison", :qhps => mock_qhps
         expect(rendered).to match(/#{plan.provider_directory_url}/)
       end

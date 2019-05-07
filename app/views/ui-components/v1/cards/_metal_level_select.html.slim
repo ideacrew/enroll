@@ -27,15 +27,15 @@
           li.col-md-4.col-sm-4 role="presentation" onclick="radioSelected(this)"
             a href="#carrier" aria-controls="carrier" role="tab" data-toggle="tab" data-name="single_issuer"
               i.far.fa-circle.mr-2
-              | One Carrier
+              = fetch_plan_title_for_single_carrier
           li.col-md-4.col-sm-4 role="presentation" onclick="radioSelected(this)"
             a href="#level" aria-controls="level" role="tab" data-toggle="tab" data-name="metal_level"
               i.far.fa-circle.mr-2
-              | One Level
+              = fetch_plan_title_for_metal_level
           li.col-md-4.col-sm-4 role="presentation" onclick="radioSelected(this)"
             a href="#plan" aria-controls="plan" role="tab" data-toggle="tab" data-name="single_product"
               i.far.fa-circle.mr-2
-              | One Plan
+              = fetch_plan_title_for_single_plan
         .tab-content
           .tab-pane.fade#carrier role="tabpanel"
             h4

@@ -17,6 +17,7 @@ namespace :import do
     files = Rails.env.test? ? [args[:file]] : Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{Settings.aca.state_abbreviation.downcase}/master_xml", "**", "*.xlsx"))
 
     if Settings.aca.state_abbreviation.downcase == "dc" # DC
+      # TODO Fix Rake task for DC context and Spec.
       files.each do |file|
         year = file.split("/")[-2].to_i
         puts "*"*80 unless Rails.env.test?

@@ -73,12 +73,6 @@ fixture_dumps
 # Ignore .orig files
 *.orig
 
-/public/packs
-/public/packs-test
-/node_modules
-yarn-debug.log*
-.yarn-integrity
-
 # Make sure no PII is accidently commited
 # add w/ git add --force if actually docs
 *.csv
@@ -89,3 +83,10 @@ yarn-debug.log*
 *.xlsx
 *.doc
 *.docx
+
+/public/packs
+/public/packs-test
+/node_modules
+/yarn-error.log
+yarn-debug.log*
+.yarn-integrity

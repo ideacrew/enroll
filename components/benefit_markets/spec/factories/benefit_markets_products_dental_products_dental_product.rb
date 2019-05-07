@@ -10,6 +10,7 @@ FactoryBot.define do
     premium_ages         { 20..65 }
     # health_plan_kind     :pos
     ehb                  { 0.9943 }
+    network_information  { 'DC Metro' }
     metal_level_kind     { :dental }
 
     product_package_kinds { [:single_product] }

@@ -40,24 +40,26 @@ describe UpdateCarrierAppointments do
                 "Tufts Health Plan Premier" => nil}
     end
 
-    it "should return new carrier appointments for pending brokers " do
-      allow(BrokerRole).to receive(:all).and_return([@broker_role])
-      subject.migrate
-      expect(@broker_role.carrier_appointments).to eq  @value
-    end
+    if Settings.site.key.to_s == "cca"
+      it "should return new carrier appointments for pending brokers " do
+        allow(BrokerRole).to receive(:all).and_return([@broker_role])
+        subject.migrate
+        expect(@broker_role.carrier_appointments).to eq @value
+      end
 
-    it "should return value for the combination of old & new carrier appointments " do
-      @broker_role.carrier_appointments.store("Aetna Life Insurance Company", nil)
-      allow(BrokerRole).to receive(:all).and_return([@broker_role])
-      subject.migrate
-      expect(@broker_role.carrier_appointments).to eq  @value
-    end
+      it "should return value for the combination of old & new carrier appointments " do
+        @broker_role.carrier_appointments.store("Aetna Life Insurance Company", nil)
+        allow(BrokerRole).to receive(:all).and_return([@broker_role])
+        subject.migrate
+        expect(@broker_role.carrier_appointments).to eq @value
+      end
 
-    it "should return value for value " do
-     @broker_role = FactoryBot.create(:broker_role, carrier_appointments: @value)
-      allow(BrokerRole).to receive(:all).and_return([@broker_role])
-      subject.migrate
-      expect(@broker_role.carrier_appointments).to eq  @value
+      it "should return value for value " do
+        @broker_role = FactoryBot.create(:broker_role, carrier_appointments: @value)
+        allow(BrokerRole).to receive(:all).and_return([@broker_role])
+        subject.migrate
+        expect(@broker_role.carrier_appointments).to eq @value
+      end
     end
 
   end

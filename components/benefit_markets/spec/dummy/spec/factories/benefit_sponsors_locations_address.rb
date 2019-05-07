@@ -5,8 +5,8 @@ FactoryBot.define do
     sequence(:address_1, 1111) { |n| "#{n} Awesome Street" }
     sequence(:address_2, 111) { |n| "##{n}" }
     city { 'Boston' }
-    state { 'MA' }
-    zip { '02130' }
+    state { Settings.aca.state_abbreviation }
+    zip { '20024' }
     county { 'Suffolk' } # Suffolk County zips: 02101 -> 02137
 
     # This address is in rating area RMA03 and has good issuer service area coverage
@@ -14,8 +14,8 @@ FactoryBot.define do
       kind      { 'work' }
       address_1 { '27 Reo Road' }
       city      { 'Maynard' }
-      state     { 'MA' }
-      zip       { '01754' }
+      state     { Settings.aca.state_abbreviation }
+      zip       { '20024' }
       county    { 'Middlesex' }
     end
 

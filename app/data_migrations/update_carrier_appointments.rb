@@ -18,10 +18,10 @@ class UpdateCarrierAppointments < MongoidMigrationTask
                 "Tufts Health Plan Premier" => "Tufts Health Plan Premier"
                }
     BrokerRole.all.each do |br|
-        all_carrier_appointment = BrokerRole::BROKER_CARRIER_APPOINTMENTS.stringify_keys
-        data = br.carrier_appointments.map {|k, v| mappings[k] ? [mappings[k], v] : nil}.compact.to_h
-        br.carrier_appointments = all_carrier_appointment.merge! data
-        br.save
+      all_carrier_appointment = "BrokerRole::#{Settings.site.key.upcase}_BROKER_CARRIER_APPOINTMENTS".constantize.stringify_keys
+      data = br.carrier_appointments.map {|k, v| mappings[k] ? [mappings[k], v] : nil}.compact.to_h
+      br.carrier_appointments = all_carrier_appointment.merge! data
+      br.save
     end
   end
 end

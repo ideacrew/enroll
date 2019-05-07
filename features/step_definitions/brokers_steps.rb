@@ -1,3 +1,11 @@
+# frozen_string_literal: true
+
+module BrokerStepsHelper
+  include Config::AcaHelper
+end
+
+World(BrokerStepsHelper)
+
 When(/^.+ visits the HBX Broker Registration form$/) do
   visit '/'
   find(".interaction-click-control-broker-registration", wait: 10).click
@@ -64,9 +72,11 @@ And(/^.+ enters broker agency information for SHOP markets$/) do
   find("option[value='tr']").click
   find("#agency_organization_profile_attributes_accept_new_clients").click
 
-  fill_in 'agency_organization_profile_attributes_ach_routing_number', with: '123456789'
-  fill_in 'agency_organization_profile_attributes_ach_routing_number_confirmation', with: '123456789'
-  fill_in 'agency_organization_profile_attributes_ach_account_number', with: '9999999999999999'
+  if aca_broker_routing_information
+    fill_in 'agency_organization_profile_attributes_ach_routing_number', with: '123456789'
+    fill_in 'agency_organization_profile_attributes_ach_routing_number_confirmation', with: '123456789'
+    fill_in 'agency_organization_profile_attributes_ach_account_number', with: '9999999999999999'
+  end
   # Using this as a seperate step was deleting the rest of the form
   role = "Primary Broker"
   location = 'default_office_location'

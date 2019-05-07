@@ -7,6 +7,7 @@ class Insured::PlanShoppingsController < ApplicationController
   include Acapi::Notifiers
   extend Acapi::Notifiers
   include Aptc
+  include Config::AcaHelper
 
   before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show, :plans, :checkout, :terminate]
   before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show, :plans, :checkout, :receipt]
@@ -181,7 +182,7 @@ class Insured::PlanShoppingsController < ApplicationController
       @plan_types = []
       @metal_levels = []
     end
-    # @networks = []
+    @networks = @products.map(&:network_information).uniq if offers_nationwide_plans?
     @carrier_names = @issuer_profiles.map{|ip| ip.legal_name}
     @use_family_deductable = (@hbx_enrollment.hbx_enrollment_members.count > 1)
     @waivable = @hbx_enrollment.can_waive_enrollment?
