@@ -1064,7 +1064,7 @@ $(document).ready(function() {
 
     $(terms).each(function(i, term) {
       $('.run-glossary:contains(' + term.term + ')').each(function(i, matchingEl) {
-        var regex = new RegExp(term.term, 'i')
+        var regex = new RegExp(term.term, 'i');
         var text = term.description;
         $(matchingEl).html($(matchingEl).html().replace(regex, '<span class="glossary" data-toggle="tooltip" data-placement="auto top" data-trigger="click focus" data-boundary="window" data-fallbackPlacement="flip" data-html="true" title="' + text + '">' + term.term + '</span>'));
       });
