@@ -173,7 +173,7 @@ aca:
 
     open_enrollment:
       start_on: <%= Date.new(2018,11,1) %>
-      end_on: <%= Date.new(2019,02,05) %>
+      end_on: <%= Date.new(2019,02,8) %>
     upcoming_open_enrollment:
       start_on: <%= Date.new(2019,11,1) %>
       end_on: <%= Date.new(2020,01,31) %>
