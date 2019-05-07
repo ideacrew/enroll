@@ -65,8 +65,7 @@ end
 
 And(/^Employee sees Enrollment Submitted and clicks Continue$/) do
   expect(page).to have_content("Enrollment Submitted")
-  click_link 'CONTINUE'
-  wait_for_ajax
+  find('a.interaction-click-control-continue', text: 'CONTINUE', wait: 5).click
 end
 
 And(/^Employee sees Enrollment Submitted and clicks Go to My Account$/) do
@@ -300,7 +299,5 @@ end
 
 Then(/Employee should see family members page and clicks continue/) do
   expect(page).to have_content "Household Info: Family Members"
-  within '#dependent_buttons' do
-    click_link "Continue"
-  end
+  find('#dependent_buttons .interaction-click-control-continue', :wait => 5).click
 end

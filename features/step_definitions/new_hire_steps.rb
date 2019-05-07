@@ -118,6 +118,7 @@ When(/(.*) clicks on Continue button on receipt page/) do |named_person|
 end
 
 Then(/(.*) should see enrollment on my account page/) do |named_person|
+  find('.hbx-enrollment-panel .heading-text', wait: 5)
   expect(page).to have_content(named_person)
   exchange_date = TimeKeeper.date_according_to_exchange_at(Time.current)
   expect(page).to have_content("Plan Selected: #{exchange_date.strftime("%m/%d/%Y")}")

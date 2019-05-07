@@ -703,11 +703,11 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   page.evaluate_script("window.location.reload()")
   wait_for_ajax(3,2)
   person = people[named_person]
-  screenshot("before modal")
-  # find('.interaction-click-control-click-here').click
-  screenshot("during modal")
-  # find('.interaction-click-control-close').click
-  screenshot("after modal")
+  # screenshot("before modal")
+  # # find('.interaction-click-control-click-here').click
+  # screenshot("during modal")
+  # # find('.interaction-click-control-close').click
+  # screenshot("after modal")
   expect(page).to have_css('input.interaction-field-control-person-phones-attributes-0-full-phone-number')
   wait_for_ajax(3,2)
 
@@ -723,14 +723,13 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   fill_in "person[phones_attributes][0][full_phone_number]", :with => phone_number
   screenshot("personal_info_complete")
   expect(page).to have_field("HOME PHONE", with: phone_number) if person[:home_phone].present?
-  #find("#btn-continue").click
-  click_button 'CONTINUE'
+  find('.interaction-click-control-continue', text: 'CONTINUE', wait: 5)
 end
 
 And(/^.+ sees the (.*) page and clicks Continue$/) do |which_page|
+  find('.interaction-click-control-add-member', wait: 10)
   expect(page).to have_content(which_page)
-  find("#btn-continue").click
-  wait_for_ajax
+  find('.family_members .interaction-click-control-continue', text: 'CONTINUE', wait: 5)
 end
 
 And(/^.+ clicks Confirm$/) do
@@ -816,6 +815,7 @@ When(/^.+ clicks? continue on the dependents page$/) do
 end
 
 Then(/^.+ should see the group selection page$/) do
+  find('#group-selection-form', :wait => 10)
   expect(page).to have_css('form')
 end
 
@@ -873,7 +873,7 @@ And (/(.*) should see the plans from the (.*) plan year$/) do |named_person, pla
 end
 
 When(/^.+ selects? a plan on the plan shopping page$/) do
-  first(:link, 'Select Plan').click
+  find_all('.interaction-click-control-select-plan', wait: 5)[0].click
 end
 
 Then(/^.+ should see the coverage summary page$/) do
@@ -882,7 +882,7 @@ Then(/^.+ should see the coverage summary page$/) do
 end
 
 When(/^.+ clicks? on Confirm button on the coverage summary page$/) do
-  find('.interaction-click-control-confirm').click
+  find('.interaction-click-control-confirm', wait: 5).click
 end
 
 Then(/^.+ should see the receipt page$/) do
