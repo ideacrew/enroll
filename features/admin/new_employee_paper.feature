@@ -15,9 +15,9 @@ Feature: Paper Enrollment options exist
     And user will click on New Employee Paper Application link
     Then HBX admin start new employee enrollment
 
-    Examples:
-      | subrole       | action  |
-      | Super Admin   | see     | 
-      | HBX Tier3     | see     |
-      | HBX Staff     | see     |
-      | HBX Read Only | not see |
+#    Examples:
+#      | subrole       | action  |
+#      | Super Admin   | see     |
+#      | HBX Tier3     | see     |
+#      | HBX Staff     | see     |
+#      | HBX Read Only | not see |

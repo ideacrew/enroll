@@ -12,11 +12,11 @@ Feature: Hbx Admin as Phone Application for ivl- User Disagrees to Experian Iden
     When Admin clicks CONTINUE button
     Then the Admin should navigate to the Experian Auth and Consent Page
 
-  Scenario: Hbx Admin will be navigated to the DOCUMENT UPLOAD page
-    Given the Admin should navigate to the Experian Auth and Consent Page
-    When the Admin chooses 'I Disagree'
-    And Admin clicks Continue button
-    Then the Admin will be navigated to the DOCUMENT UPLOAD page
+#  Scenario: Hbx Admin will be navigated to the DOCUMENT UPLOAD page
+#    Given the Admin should navigate to the Experian Auth and Consent Page
+#    When the Admin chooses 'I Disagree'
+#    And Admin clicks Continue button
+#    Then the Admin will be navigated to the DOCUMENT UPLOAD page
 
     # TODO: should rectify this issue
 #  Scenario: Hbx Admin clicks continue without uploading and verifying an application
@@ -27,19 +27,19 @@ Feature: Hbx Admin as Phone Application for ivl- User Disagrees to Experian Iden
 #    When the Admin clicks CONTINUE without uploading and verifying an application
 #    Then the Admin can navigate to the next page and finish the application
 
-  Scenario: Hbx Admin clicks continue after uploading and verifying an application
-    Given the Admin should navigate to the Experian Auth and Consent Page
-    When the Admin chooses 'I Disagree'
-    And Admin clicks Continue button
-    Then the Admin will be navigated to the DOCUMENT UPLOAD page
-    When the Admin clicks CONTINUE after uploading and verifying an application
-    Then the Admin can navigate to the next page and finish the application
-
-  Scenario: Hbx Admin clicks continue after uploading and verifying an application
-    Given the Admin should navigate to the Experian Auth and Consent Page
-    When the Admin chooses 'I Disagree'
-    And Admin clicks Continue button
-    Then the Admin will be navigated to the DOCUMENT UPLOAD page
-    When the Admin clicks CONTINUE after uploading and verifying an Identity
-    Then the Admin can navigate to the next page and finish the application
+#  Scenario: Hbx Admin clicks continue after uploading and verifying an application
+#    Given the Admin should navigate to the Experian Auth and Consent Page
+#    When the Admin chooses 'I Disagree'
+#    And Admin clicks Continue button
+#    Then the Admin will be navigated to the DOCUMENT UPLOAD page
+#    When the Admin clicks CONTINUE after uploading and verifying an application
+#    Then the Admin can navigate to the next page and finish the application
+#
+#  Scenario: Hbx Admin clicks continue after uploading and verifying an application
+#    Given the Admin should navigate to the Experian Auth and Consent Page
+#    When the Admin chooses 'I Disagree'
+#    And Admin clicks Continue button
+#    Then the Admin will be navigated to the DOCUMENT UPLOAD page
+#    When the Admin clicks CONTINUE after uploading and verifying an Identity
+#    Then the Admin can navigate to the next page and finish the application
     

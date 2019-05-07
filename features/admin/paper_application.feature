@@ -11,10 +11,10 @@ Background: Hbx Admin navigates into the new consumer application with paper app
   When Admin clicks CONTINUE button
   Then the Admin will be navigated to the DOCUMENT UPLOAD page
 
-Scenario: Hbx Admin clicks continue after uploading and verifying an Application
-  Given the Admin will be navigated to the DOCUMENT UPLOAD page
-  When the Admin clicks CONTINUE after uploading and verifying an application
-  Then the Admin can navigate to the next page and finish the application
+#Scenario: Hbx Admin clicks continue after uploading and verifying an Application
+#  Given the Admin will be navigated to the DOCUMENT UPLOAD page
+#  When the Admin clicks CONTINUE after uploading and verifying an application
+#  Then the Admin can navigate to the next page and finish the application
 
 Scenario: Hbx Admin clicks continue after uploading and verifying an Identity
   Given the Admin will be navigated to the DOCUMENT UPLOAD page
