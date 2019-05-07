@@ -16,8 +16,6 @@ Feature: Update DOB and SSN
     And Employee has not signed up as an HBX user
     And Patrick Doe visits the employee portal
     And Patrick Doe creates an HBX account
-    And I select the all security question and give the answer
-    And I have submitted the security questions
     And Employee goes to register as an employee
     And Employee should see the employee search page
     And Employee enters the identifying info of Patrick Doe
@@ -32,24 +30,24 @@ Feature: Update DOB and SSN
     And Employee Patrick Doe should see their plan start date on the page
     And Hbx Admin logs out
 
-
- Scenario: Admin enters invalid DOB or SSN
-    Given that a user with a HBX staff role with HBX staff subrole exists and is logged in
-    And the user is on the Family Index of the Admin Dashboard
-    When the user clicks Action for that Employer
-    Then the user will see the Edit DOB SSN button
-    When user clicks on edit DOB/SSN link
-    When user enters an invalid SSN and clicks on update
-    Then Hbx Admin should see the edit form being rendered again with a validation error message
-    And Hbx Admin logs out
-
- Scenario: Admin enters valid DOB or SSN
-    Given that a user with a HBX staff role with HBX staff subrole exists and is logged in
-    And the user is on the Family Index of the Admin Dashboard
-    When the user clicks Action for that Employer
-    Then the user will see the Edit DOB SSN button
-    When user clicks on edit DOB/SSN link
-    When Hbx Admin enters a valid DOB and SSN and clicks on update
-    Then Hbx Admin should see the update partial rendered with update sucessful message
-    And Hbx Admin logs out
+#Employer scenarios
+# Scenario: Admin enters invalid DOB or SSN
+#    Given that a user with a HBX staff role with HBX staff subrole exists and is logged in
+#    And the user is on the Family Index of the Admin Dashboard
+#    When the user clicks Action for that Employer
+#    Then the user will see the Edit DOB SSN button
+#    When user clicks on edit DOB/SSN link
+#    When user enters an invalid SSN and clicks on update
+#    Then Hbx Admin should see the edit form being rendered again with a validation error message
+#    And Hbx Admin logs out
+#
+# Scenario: Admin enters valid DOB or SSN
+#    Given that a user with a HBX staff role with HBX staff subrole exists and is logged in
+#    And the user is on the Family Index of the Admin Dashboard
+#    When the user clicks Action for that Employer
+#    Then the user will see the Edit DOB SSN button
+#    When user clicks on edit DOB/SSN link
+#    When Hbx Admin enters a valid DOB and SSN and clicks on update
+#    Then Hbx Admin should see the update partial rendered with update sucessful message
+#    And Hbx Admin logs out
 

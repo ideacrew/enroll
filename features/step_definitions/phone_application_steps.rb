@@ -11,7 +11,6 @@ And(/^the Admin is on the Personal Info page for the family$/) do
   fill_in "jq_datepicker_ignore_person_dob", with: "11/11/1991"
   fill_in "person_ssn", with: '212-31-3131'
   find(:xpath, '//label[@for="radio_male"]').click
-  find(:xpath, '//label[@for="is_applying_coverage_true"]').click
   find('.btn', text: 'CONTINUE').click
 
   expect(page).to have_content('Thank you. Next, we need to verify if you or you and your family are eligible to enroll in coverage through DC Health Link. Please select CONTINUE.')

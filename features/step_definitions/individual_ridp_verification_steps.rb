@@ -39,11 +39,11 @@ And(/^Identity verification is OUTSTANDING$/) do
 end
 
 Then(/^the CONTINUE button is functionally DISABLED$/) do
-	find('.interaction-click-control-continue')['disabled'].should == "disabled"
+	find('.interaction-click-control-continue')['disabled'].should == "true"
 end
 
 Then(/^visibly DISABLED$/) do
-	find('.interaction-click-control-continue')['disabled'].should == "disabled"
+	find('.interaction-click-control-continue')['disabled'].should == "true"
 end
 
 And(/^an uploaded application in REVIEW status is present$/) do
