@@ -950,7 +950,7 @@ class PlanYear
     state :active               # Published plan year is in-force
     state :termination_pending
 
-    state :renewing_draft, :after_enter => :renewal_group_notice # renewal_group_notice - Sends a notice three months prior to plan year renewing
+    state :renewing_draft
     state :renewing_published
     state :renewing_publish_pending
     state :renewing_enrolling, :after_enter => [:trigger_passive_renewals, :send_employee_invites]
@@ -1302,25 +1302,6 @@ class PlanYear
       end
     end
   end
-
-  def renewal_group_notice
-    event_name = aasm.current_event.to_s.gsub(/!/, '')
-    return true if (benefit_groups.any?{|bg| bg.is_congress?} || ["publish","withdraw_pending","revert_renewal"].include?(event_name))
-    if self.employer_profile.is_converting?
-      begin
-        self.employer_profile.trigger_notices("conversion_group_renewal")
-      rescue Exception => e
-        Rails.logger.error { "Unable to deliver employer conversion group renewal notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
-      end
-    else
-      begin
-        self.employer_profile.trigger_notices("group_renewal_5", "acapi_trigger" => true)
-      rescue Exception => e
-        Rails.logger.error { "Unable to deliver employer group_renewal_5 notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
-      end
-    end
-  end
-
 
   # def initial_employer_open_enrollment_completed
   #   #also check if minimum participation and non owner conditions are met by ER.
