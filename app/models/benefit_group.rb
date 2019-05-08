@@ -263,7 +263,7 @@ class BenefitGroup
   end
 
   def census_employees
-    CensusEmployee.find_all_by_benefit_group(self)
+    CensusMember.find_all_by_benefit_group(self)
   end
 
   def assignable_to?(census_employee)

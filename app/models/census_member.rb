@@ -51,6 +51,8 @@ class CensusMember
   validate :date_of_birth_is_past
 
   scope :active,            ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_STATES) }
+  scope :non_business_owner,              ->{ where(is_business_owner: false) }
+  scope :eligible_without_term_pending, ->{ any_in(aasm_state: (ELIGIBLE_STATES - PENDING_STATES)) }
 
 
   after_validation :move_encrypted_ssn_errors
@@ -63,6 +65,10 @@ class CensusMember
       end
     end
     true
+  end
+
+  def self.find_all_by_benefit_group(benefit_group)
+    unscoped.where("benefit_group_assignments.benefit_group_id" => benefit_group._id)
   end
 
   def ssn_changed?
