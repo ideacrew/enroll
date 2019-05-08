@@ -67,6 +67,22 @@ class CensusMember
     true
   end
 
+  def self.search_hash(s_rex)
+    clean_str = s_rex.strip.split.map{|i| Regexp.escape(i)}.join("|")
+    action = s_rex.strip.split.size > 1 ? "$and" : "$or"
+    search_rex = Regexp.compile(clean_str, true)
+    {
+        "$or" => [
+            {action => [
+                {"first_name" => search_rex},
+                {"last_name" => search_rex}
+            ]},
+            {"encrypted_ssn" => encrypt_ssn(clean_str)}
+        ]
+    }
+  end
+end
+
   def self.find_all_by_benefit_group(benefit_group)
     unscoped.where("benefit_group_assignments.benefit_group_id" => benefit_group._id)
   end

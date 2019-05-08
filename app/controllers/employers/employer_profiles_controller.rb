@@ -339,7 +339,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
                          @employer_profile.census_employees.sort rescue nil
                        end
     if params["employee_search"].present?
-      query_string = CensusEmployee.search_hash(params["employee_search"])
+      query_string = CensusMember.search_hash(params["employee_search"])
       census_employees = census_employees.any_of(query_string)
     end
     @page_alphabets = page_alphabets(census_employees, "last_name")
