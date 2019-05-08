@@ -80,7 +80,6 @@ class CensusMember
             {"encrypted_ssn" => encrypt_ssn(clean_str)}
         ]
     }
-  end
 end
 
   def self.find_all_by_benefit_group(benefit_group)
