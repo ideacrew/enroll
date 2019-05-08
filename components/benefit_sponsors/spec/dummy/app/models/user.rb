@@ -135,6 +135,11 @@ class User
     has_role?(:broker_agency_staff)
   end
 
+  def is_benefit_sponsor_active_broker?(profile_id)
+    profile_organization = BenefitSponsors::Organizations::Organization.employer_profiles.where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)).first
+    person == profile_organization.employer_profile.active_broker if profile_organization&.employer_profile && profile_organization.employer_profile.active_broker
+  end
+
   def has_broker_role?
     has_role?(:broker)
   end

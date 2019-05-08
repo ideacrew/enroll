@@ -1,4 +1,4 @@
-@individual_enabled
+@wip
 Feature: Consumer verification process
 
   Scenario: Outstanding verification

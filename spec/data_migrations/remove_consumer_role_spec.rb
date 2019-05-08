@@ -21,33 +21,45 @@ describe RemoveConsumerRole do
         kind: 'individual', consumer_role_id: person1.consumer_role.id, resident_role_id: person1.resident_role.id)
     end
 
-    before(:each) do
-      allow(ENV).to receive(:[]).with("p_to_fix_id").and_return('58e3dc7dqwewqewqe')
-
-      subject.migrate
-      person1.reload
-    end
-
     it "deletes the consumer role for person1" do
-      expect(person1.consumer_role).to be_nil
+      ClimateControl.modify :p_to_fix_id => '58e3dc7dqwewqewqe' do
+        subject.migrate
+        person1.reload
+        expect(person1.consumer_role).to be_nil
+      end
     end
 
     it "does not delete the resident role for person1" do
-      expect(person1.resident_role).not_to be_nil
+      ClimateControl.modify :p_to_fix_id => '58e3dc7dqwewqewqe' do
+        subject.migrate
+        person1.reload
+        expect(person1.resident_role).not_to be_nil
+      end
     end
 
     it "sets the kind attribute on person1's enrollment to coverall" do
-      expect(person1.primary_family.active_household.hbx_enrollments.first.kind).to eq("coverall")
+      ClimateControl.modify :p_to_fix_id => '58e3dc7dqwewqewqe' do
+        subject.migrate
+        person1.reload
+        expect(person1.primary_family.active_household.hbx_enrollments.first.kind).to eq("coverall")
+      end
     end
 
     it "sets the consumer_role_id on person1's enrollment to nil" do
-      expect(person1.primary_family.active_household.hbx_enrollments.first.consumer_role_id).to be(nil)
+      ClimateControl.modify :p_to_fix_id => '58e3dc7dqwewqewqe' do
+        subject.migrate
+        person1.reload
+        expect(person1.primary_family.active_household.hbx_enrollments.first.consumer_role_id).to be(nil)
+      end
     end
 
     it "leaves the resident_role_id on person1's enrollment to be the resident role of person1" do
-      expect(person1.primary_family.active_household.hbx_enrollments.first.resident_role_id).to eq(person1.resident_role.id)
+      ClimateControl.modify :p_to_fix_id => '58e3dc7dqwewqewqe' do
+        subject.migrate
+        person1.reload
+        expect(person1.primary_family.active_household.hbx_enrollments.first.resident_role_id).to eq(person1.resident_role.id)
+      end
     end
-
   end
 end
 end

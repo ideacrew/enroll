@@ -18,7 +18,7 @@ RSpec.describe HbxAdminHelper, :type => :helper do
     end
 
     it "returns the applied_aptc percent for an enrollment" do
-      expect(helper.find_applied_aptc_percent(hbx.applied_aptc_amount, 214.00)).to eq 47
+      expect(helper.find_applied_aptc_percent(hbx.applied_aptc_amount, 214.00).to_i).to eq 47
     end
 
     context "returns the correct class for td styling for current and past " do

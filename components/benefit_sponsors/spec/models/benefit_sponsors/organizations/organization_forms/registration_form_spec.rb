@@ -3,7 +3,7 @@ require 'rails_helper'
 module BenefitSponsors
 
   RSpec.describe Organizations::OrganizationForms::RegistrationForm, type: :model, dbclean: :after_each do
-    let(:site)  { create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :cca) }
+    let(:site)  { create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, Settings.site.key) }
     let!(:benefit_market)  { benefit_market = site.benefit_markets.first
                               benefit_market.save }
     let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }

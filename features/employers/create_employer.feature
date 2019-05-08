@@ -1,4 +1,4 @@
-@individual_enabled
+@wip
 Feature: Create Employer
   In order for Employers to create and manage an account on the HBX for their organization
   In order for Employees to purchase insurance

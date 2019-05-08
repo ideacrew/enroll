@@ -22,7 +22,7 @@ module BenefitSponsors
         title: "ACA SHOP",
         description: "CCA ACA Shop Market",
         kind: :aca_shop,
-        site_urn: "cca",
+        site_urn: Settings.site.key.to_s,
         site_id: site_id,
         configuration: {
           _id: config_id,
@@ -88,11 +88,11 @@ module BenefitSponsors
       office_location_id = BSON::ObjectId.from_string('5bd8931fec969ce8e31386de')
       site_props = {
         _id: site_id,
-        site_key: :cca,
-        byline: "The Right Place for the Right Plan",
-        short_name: "Health Connector",
-        domain_name: "hbxshop.org",
-        long_name: "Massachusetts Health Connector",
+        site_key: Settings.site.key,
+        byline: Settings.site.byline,
+        short_name: Settings.site.short_name,
+        domain_name: Settings.site.domain_name,
+        long_name: Settings.site.long_name,
         copyright_period_start: '2018'
       }
       org_props = {
@@ -101,14 +101,14 @@ module BenefitSponsors
         dba: "CCA",
         fein: '123123456',
         hbx_id: '210005',
-        legal_name: "Health Connector",
+        legal_name: Settings.site.short_name,
         site_id: site_id,
         profiles: [{
           _id: profile_id,
           contact_method: :paper_and_electronic,
           _type: "BenefitSponsors::Organizations::HbxProfile",
           cms_id: "MA0",
-          us_state_abbreviation: "MA",
+          us_state_abbreviation: Settings.aca.state_abbreviation,
           is_benefit_sponsorship_eligible: true,
           office_locations: [{
             _id: office_location_id,
@@ -118,8 +118,8 @@ module BenefitSponsors
               address_1: "1225 I St, NW",
               kind: "work",
               city: "Washington",
-              state: "MA",
-              zip: '20002',
+              state: Settings.aca.state_abbreviation,
+              zip: '20024'
             },
             phone: {
               _id: phone_id,

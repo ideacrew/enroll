@@ -128,9 +128,9 @@ module BenefitSponsors
 
       county_zip_props = {
         "_id": county_zip_id,
-        state: "MA",
+        state: Settings.aca.state_abbreviation,
         county_name: "Suffolk",
-        zip: "02121"
+        zip: "20024"
       }
       BenefitMarkets::Locations::CountyZip.collection.insert_one(county_zip_props)
 
@@ -151,7 +151,7 @@ module BenefitSponsors
         issuer_provided_code: "MAS002",
         issuer_provided_title: "Dental Only Issuer State Service Area",
         issuer_profile_id: issuer_profile_id,
-        covered_states: ["MA"]
+        covered_states: [Settings.aca.state_abbreviation]
       }
       BenefitMarkets::Locations::ServiceArea.collection.insert_one(state_service_area_props)
       renewal_id_1 = renewal_product_props.blank? ? nil : renewal_product_props[0]["_id"]
@@ -199,9 +199,9 @@ module BenefitSponsors
 
       county_zip_props = {
         "_id": county_zip_id,
-        state: "MA",
+        state: Settings.aca.state_abbreviation,
         county_name: "Suffolk",
-        zip: "02121"
+        zip: "20024"
       }
       BenefitMarkets::Locations::CountyZip.collection.insert_one(county_zip_props)
 
@@ -222,7 +222,7 @@ module BenefitSponsors
         issuer_provided_code: "MAS002",
         issuer_provided_title: "Health and Dental Issuer State Service Area",
         issuer_profile_id: issuer_profile_id,
-        covered_states: ["MA"]
+        covered_states: [Settings.aca.state_abbreviation]
       }
       BenefitMarkets::Locations::ServiceArea.collection.insert_one(state_service_area_props)
       renewal_id_1 = renewal_product_props.blank? ? nil : renewal_product_props[0]["_id"]
@@ -310,9 +310,9 @@ module BenefitSponsors
 
       county_zip_props = {
         "_id": county_zip_id,
-        state: "MA",
+        state: Settings.aca.state_abbreviation,
         county_name: "Suffolk",
-        zip: "02121"
+        zip: "20024"
       }
       BenefitMarkets::Locations::CountyZip.collection.insert_one(county_zip_props)
 
@@ -333,7 +333,7 @@ module BenefitSponsors
         issuer_provided_code: "MAS002",
         issuer_provided_title: "Health Only Issuer State Service Area",
         issuer_profile_id: issuer_profile_id,
-        covered_states: ["MA"]
+        covered_states: [Settings.aca.state_abbreviation]
       }
       BenefitMarkets::Locations::ServiceArea.collection.insert_one(state_service_area_props)
       renewal_id_1 = renewal_product_props.blank? ? nil : renewal_product_props[0]["_id"]
@@ -427,7 +427,7 @@ module BenefitSponsors
         "_id": rating_area_id,
         active_year: effective_period.min.year,
         exchange_provided_code: "R-MA001",
-        covered_states: ["MA"]
+        covered_states: [Settings.aca.state_abbreviation]
       }
       BenefitMarkets::Locations::RatingArea.collection.insert_one(rating_area_props)
       rating_area_id
@@ -453,7 +453,7 @@ module BenefitSponsors
             "12345"
           ],
           hbx_carrier_id: "50202",
-          issuer_state: "MA",
+          issuer_state: Settings.aca.state_abbreviation,
           abbrev: "C1HO",
           offers_sole_source: true,
           shop_dental: false,
@@ -473,7 +473,7 @@ module BenefitSponsors
             "22345"
           ],
           hbx_carrier_id: "60202",
-          issuer_state: "MA",
+          issuer_state: Settings.aca.state_abbreviation,
           abbrev: "C2HD",
           offers_sole_source: true,
           shop_dental: true,
@@ -493,7 +493,7 @@ module BenefitSponsors
             "32345"
           ],
           hbx_carrier_id: "70202",
-          issuer_state: "MA",
+          issuer_state: Settings.aca.state_abbreviation,
           abbrev: "C3DO",
           offers_sole_source: true,
           shop_dental: true,

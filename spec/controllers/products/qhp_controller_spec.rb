@@ -89,37 +89,37 @@ RSpec.describe Products::QhpController, :type => :controller, dbclean: :around_e
       expect(assigns(:coverage_kind)).to eq "dental"
     end
 
-    if individual_market_is_enabled?
-      it "should return dental plan if hbx_enrollment does not have plan object" do
-        allow(qhp_cost_share_variance).to receive(:hios_plan_and_variant_id=)
-        sign_in(user)
-        get :summary, params: {standard_component_id: "11111100001111-01", hbx_enrollment_id: ivl_health_enrollment.id, active_year: ivl_health_enrollment.effective_on.year, market_kind: "individual", coverage_kind: "dental"}
-        expect(response).to have_http_status(:success)
-        expect(assigns(:market_kind)).to eq "individual"
-        expect(assigns(:coverage_kind)).to eq "dental"
-      end
-
-      it "should return summary of a plan for ivl and coverage_kind: health" do
-        sign_in(user)
-        get :summary, params: {standard_component_id: "11111100001111-01", hbx_enrollment_id: ivl_health_enrollment.id, active_year: ivl_health_enrollment.effective_on.year, market_kind: "individual", coverage_kind: "health"}
-        expect(response).to have_http_status(:success)
-        expect(assigns(:market_kind)).to eq "individual"
-        expect(assigns(:coverage_kind)).to eq "health"
-        expect(assigns(:benefit_group)).to be_truthy
-        expect(assigns(:reference_plan)).to be_falsey
-      end
-
-      it "should return summary of a plan for ivl and coverage_kind: dental" do
-        allow(qhp_cost_share_variance).to receive(:hios_plan_and_variant_id=)
-        sign_in(user)
-        get :summary, params: {standard_component_id: "11111100001111-01", hbx_enrollment_id: ivl_health_enrollment.id, active_year: ivl_health_enrollment.effective_on.year, market_kind: "individual", coverage_kind: "dental"}
-        expect(response).to have_http_status(:success)
-        expect(assigns(:market_kind)).to eq "individual"
-        expect(assigns(:coverage_kind)).to eq "dental"
-        expect(assigns(:benefit_group)).to be_truthy
-        expect(assigns(:reference_plan)).to be_falsey
-      end
-    end
+    # if individual_market_is_enabled?
+    #   it "should return dental plan if hbx_enrollment does not have plan object" do
+    #     allow(qhp_cost_share_variance).to receive(:hios_plan_and_variant_id=)
+    #     sign_in(user)
+    #     get :summary, params: {standard_component_id: "11111100001111-01", hbx_enrollment_id: ivl_health_enrollment.id, active_year: ivl_health_enrollment.effective_on.year, market_kind: "individual", coverage_kind: "dental"}
+    #     expect(response).to have_http_status(:success)
+    #     expect(assigns(:market_kind)).to eq "individual"
+    #     expect(assigns(:coverage_kind)).to eq "dental"
+    #   end
+    #
+    #   it "should return summary of a plan for ivl and coverage_kind: health" do
+    #     sign_in(user)
+    #     get :summary, params: {standard_component_id: "11111100001111-01", hbx_enrollment_id: ivl_health_enrollment.id, active_year: ivl_health_enrollment.effective_on.year, market_kind: "individual", coverage_kind: "health"}
+    #     expect(response).to have_http_status(:success)
+    #     expect(assigns(:market_kind)).to eq "individual"
+    #     expect(assigns(:coverage_kind)).to eq "health"
+    #     expect(assigns(:benefit_group)).to be_truthy
+    #     expect(assigns(:reference_plan)).to be_falsey
+    #   end
+    #
+    #   it "should return summary of a plan for ivl and coverage_kind: dental" do
+    #     allow(qhp_cost_share_variance).to receive(:hios_plan_and_variant_id=)
+    #     sign_in(user)
+    #     get :summary, params: {standard_component_id: "11111100001111-01", hbx_enrollment_id: ivl_health_enrollment.id, active_year: ivl_health_enrollment.effective_on.year, market_kind: "individual", coverage_kind: "dental"}
+    #     expect(response).to have_http_status(:success)
+    #     expect(assigns(:market_kind)).to eq "individual"
+    #     expect(assigns(:coverage_kind)).to eq "dental"
+    #     expect(assigns(:benefit_group)).to be_truthy
+    #     expect(assigns(:reference_plan)).to be_falsey
+    #   end
+    # end
   end
 
   context "GET summary with bad HbxEnrollment", :dbclean => :around_each do
@@ -165,32 +165,32 @@ RSpec.describe Products::QhpController, :type => :controller, dbclean: :around_e
       allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.year)
     end
 
-    if individual_market_is_enabled?
-      it "should return comparison of a plan" do
-        sign_in(user)
-        get :comparison, params: {standard_component_ids: ["11111100001111-01", "11111100001111-02"], hbx_enrollment_id: hbx_enrollment.id, market_kind: 'individual'}
-        expect(response).to have_http_status(:success)
-        expect(assigns(:qhps).count).to eq 2
-      end
-
-      context "should return uniq plans" do
-        before :each do
-          allow(Products::QhpCostShareVariance).to receive(:find).and_return([qhp1, qhp2, qhp3, qhp4])
-          sign_in(user)
-        end
-
-        it "should return uniq plans when same plan" do
-          get :comparison, params: {standard_component_ids: ["11111100001111-01", "11111100001111-01"], hbx_enrollment_id: hbx_enrollment.id, market_kind: 'individual'}
-          expect(response).to be_success
-          expect(assigns(:qhps).count).to eq 2
-        end
-
-        it "should return uniq plans when 2" do
-          get :comparison, params: {standard_component_ids: ["11111100001111-01", "11111100001111-02"], hbx_enrollment_id: hbx_enrollment.id, market_kind: 'individual'}
-          expect(response).to be_success
-          expect(assigns(:qhps).count).to eq 2
-        end
-      end
-    end
+    # if individual_market_is_enabled?
+    #   it "should return comparison of a plan" do
+    #     sign_in(user)
+    #     get :comparison, params: {standard_component_ids: ["11111100001111-01", "11111100001111-02"], hbx_enrollment_id: hbx_enrollment.id, market_kind: 'individual'}
+    #     expect(response).to have_http_status(:success)
+    #     expect(assigns(:qhps).count).to eq 2
+    #   end
+    #
+    #   context "should return uniq plans" do
+    #     before :each do
+    #       allow(Products::QhpCostShareVariance).to receive(:find).and_return([qhp1, qhp2, qhp3, qhp4])
+    #       sign_in(user)
+    #     end
+    #
+    #     it "should return uniq plans when same plan" do
+    #       get :comparison, params: {standard_component_ids: ["11111100001111-01", "11111100001111-01"], hbx_enrollment_id: hbx_enrollment.id, market_kind: 'individual'}
+    #       expect(response).to be_success
+    #       expect(assigns(:qhps).count).to eq 2
+    #     end
+    #
+    #     it "should return uniq plans when 2" do
+    #       get :comparison, params: {standard_component_ids: ["11111100001111-01", "11111100001111-02"], hbx_enrollment_id: hbx_enrollment.id, market_kind: 'individual'}
+    #       expect(response).to be_success
+    #       expect(assigns(:qhps).count).to eq 2
+    #     end
+    #   end
+    # end
   end
 end

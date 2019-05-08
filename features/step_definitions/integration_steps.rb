@@ -502,11 +502,18 @@ When(/^(.*) logs on to the (.*)?/) do |named_person, portal|
   #TODO this fixes the random login fails b/c of empty params on email
   fill_in "user[login]", :with => person[:email] unless find(:xpath, '//*[@id="user_login"]').value == person[:email]
   find('.interaction-click-control-sign-in').click
-  sleep 10
   visit portal_uri
   # Adding sleep seems to help prevent the AuthenticityToken error
   # which apeared to be throwing in at least the
   # add_sep_read_and_write_feature cucumber.
+end
+
+When(/^user visits the (.*)?/) do |portal|
+  visit "/"
+  portal_class = "interaction-click-control-#{portal.downcase.gsub(/ /, '-')}"
+  portal_uri = find("a.#{portal_class}")["href"]
+  sleep 10
+  visit portal_uri
 end
 
 Then(/^.+ creates (.+) as a roster employee$/) do |named_person|
@@ -547,7 +554,7 @@ end
 
 Then(/^(?:.+) should see a successful sign up message$/) do
   FactoryBot.create(:sic_code, sic_code: "0111")
-  expect(page).to have_content("Welcome to #{Settings.site.short_name}. Your account has been created.")
+  expect(page).to have_content("Welcome!")
   screenshot("employer_sign_up_welcome")
 end
 
@@ -676,7 +683,7 @@ Then(/^Employee should not see the individual market place workflow$/) do
 end
 
 Given(/^Employer exists and logs in and adds and employee$/) do
-  login_as @staff_role, scope: :user
+  login_as @staff_role
 end
 
 # TODO: needs to be merged
@@ -692,7 +699,7 @@ end
 
 Then(/^Employee (.+) should see coverage effective date/) do |named_person|
   census_employee = CensusEmployee.where(:first_name => /#{people[named_person][:first_name]}/i, :last_name => /#{people[named_person][:last_name]}/i).first
-  find('p', text: census_employee.benefit_sponsorship.legal_name)
+  find('p', text: census_employee.benefit_sponsorship.legal_name, wait: 10)
   find('.coverage_effective_date', text: census_employee.earliest_eligible_date.strftime("%m/%d/%Y"))
 end
 
@@ -704,11 +711,11 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   page.evaluate_script("window.location.reload()")
   wait_for_ajax(3,2)
   person = people[named_person]
-  screenshot("before modal")
-  # find('.interaction-click-control-click-here').click
-  screenshot("during modal")
-  # find('.interaction-click-control-close').click
-  screenshot("after modal")
+  # screenshot("before modal")
+  # # find('.interaction-click-control-click-here').click
+  # screenshot("during modal")
+  # # find('.interaction-click-control-close').click
+  # screenshot("after modal")
   expect(page).to have_css('input.interaction-field-control-person-phones-attributes-0-full-phone-number')
   wait_for_ajax(3,2)
 
@@ -724,14 +731,13 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   fill_in "person[phones_attributes][0][full_phone_number]", :with => phone_number
   screenshot("personal_info_complete")
   expect(page).to have_field("HOME PHONE", with: phone_number) if person[:home_phone].present?
-  #find("#btn-continue").click
-  click_button 'CONTINUE'
+  find('.interaction-click-control-continue', text: 'CONTINUE', wait: 5)
 end
 
 And(/^.+ sees the (.*) page and clicks Continue$/) do |which_page|
+  find('.interaction-click-control-add-member', wait: 10)
   expect(page).to have_content(which_page)
-  find("#btn-continue").click
-  wait_for_ajax
+  find('.family_members .interaction-click-control-continue', text: 'CONTINUE', wait: 5)
 end
 
 And(/^.+ clicks Confirm$/) do
@@ -817,6 +823,7 @@ When(/^.+ clicks? continue on the dependents page$/) do
 end
 
 Then(/^.+ should see the group selection page$/) do
+  find('#group-selection-form', :wait => 10)
   expect(page).to have_css('form')
 end
 
@@ -850,11 +857,11 @@ When(/^.+ clicks? my insured portal link$/) do
 end
 
 When(/^.+ clicks? shop for plans button$/) do
-  click_button "Shop for Plans"
+  find('.interaction-click-control-shop-for-plans', wait: 5).click
 end
 
 When(/^.+ clicks Shop for new plan button$/) do
-  click_button 'Shop for new plan'
+  find('.interaction-click-control-shop-for-new-plan', wait: 5).click
 end
 
 Then(/^.+ should see the list of plans$/) do
@@ -874,7 +881,7 @@ And (/(.*) should see the plans from the (.*) plan year$/) do |named_person, pla
 end
 
 When(/^.+ selects? a plan on the plan shopping page$/) do
-  first(:link, 'Select Plan').click
+  find_all('.interaction-click-control-select-plan', wait: 5)[0].click
 end
 
 Then(/^.+ should see the coverage summary page$/) do
@@ -883,7 +890,7 @@ Then(/^.+ should see the coverage summary page$/) do
 end
 
 When(/^.+ clicks? on Confirm button on the coverage summary page$/) do
-  find('.interaction-click-control-confirm').click
+  find('.interaction-click-control-confirm', wait: 5).click
 end
 
 Then(/^.+ should see the receipt page$/) do
@@ -989,7 +996,7 @@ When(/^(?:General){0}.+ clicks? on the ((?:General|Staff){0}.+) option$/) do |ta
 end
 
 And(/^clicks on the person in families tab$/) do
-  login_as hbx_admin, scope: :user
+  login_as hbx_admin
   visit exchanges_hbx_profiles_root_path
   page.find('.families.dropdown-toggle.interaction-click-control-families').click
   find(:xpath, "//a[@href='/exchanges/hbx_profiles/family_index_dt']").click
@@ -1158,18 +1165,22 @@ Then(/Devops can verify session logs/) do
   expect(user.person.consumer_role).not_to be nil
 end
 
-Given(/^a Hbx admin with read and write permissions and employers$/) do
-  p_staff=FactoryBot.create :permission, :hbx_update_ssn
-  person = people['Hbx AdminEnrollments']
-  hbx_profile = FactoryBot.create :hbx_profile
-  user = FactoryBot.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
-  @user_1 = FactoryBot.create :user, :with_family, :employer_staff, oim_id: "Employer1"
-  @user_2 = FactoryBot.create :user, :with_family, :employer_staff, oim_id: "Employer2"
-  FactoryBot.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
-  org1 = FactoryBot.create(:organization, legal_name: 'Acme Agency', hbx_id: "123456")
-  employer_profile = FactoryBot.create :employer_profile, organization: org1
-  org2 = FactoryBot.create(:organization, legal_name: 'Chase & Assoc', hbx_id: "67890")
-  employer_profile = FactoryBot.create :employer_profile, organization: org2
+Given(/^(.*) admin user with read and write permissions present/) do |hbx_admin_person|
+  p_staff = FactoryBot.create(:permission, :hbx_update_ssn)
+  hbx_profile = FactoryBot.create(:hbx_profile)
+  person = people[hbx_admin_person]
+  user = FactoryBot.create(:user,
+    :with_family,
+    :hbx_staff,
+    email: person[:email],
+    password: person[:password],
+    password_confirmation: person[:password]
+  )
+  FactoryBot.create(:hbx_staff_role,
+    person: user.person,
+    hbx_profile: hbx_profile,
+    permission_id: p_staff.id
+  )
 end
 
 And(/^Hbx Admin click on Employers/) do

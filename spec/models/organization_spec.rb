@@ -130,6 +130,13 @@ RSpec.describe Organization, dbclean: :after_each do
     let(:address) { double(zip: '10001', county: 'County', state: Settings.aca.state_abbreviation) }
     let(:office_location) { double(address: address)}
     let(:carrier_plan) { instance_double(Plan, active_year: '2017', is_sole_source: true, is_vertical: false, is_horizontal: false) }
+    let!(:all_carriers) do
+      carrier_names = {}
+      carrier_names[carrier_profile_1.id.to_s] = carrier_profile_1.legal_name
+      carrier_names[carrier_profile_2.id.to_s] = carrier_profile_2.legal_name
+      carrier_names[sole_source_participater.id.to_s] = sole_source_participater.legal_name
+      carrier_names.sort
+    end
 
     before :each do
       Rails.cache.clear
@@ -151,20 +158,36 @@ RSpec.describe Organization, dbclean: :after_each do
 
         it "valid_carrier_names_for_options" do
           carriers = [[carrier_profile_1.legal_name, carrier_profile_1.id.to_s], [carrier_profile_2.legal_name, carrier_profile_2.id.to_s],[sole_source_participater.legal_name, sole_source_participater.id.to_s]]
-          expect(Organization.valid_carrier_names_for_options).to match_array carriers
+          all_carriers = [[carrier_profile_1.legal_name, carrier_profile_1.id.to_s], [carrier_profile_2.legal_name, carrier_profile_2.id.to_s],[sole_source_participater.legal_name, sole_source_participater.id.to_s]]
+          if constrain_service_areas?
+            expect(Organization.valid_carrier_names_for_options).to match_array carriers
+          else
+            expect(Organization.valid_carrier_names_for_options.sort).to match_array all_carriers
+          end
         end
 
         it "valid_carrier_names_for_options passes arguments and filters to sole source only" do
           carriers = [[sole_source_participater.legal_name, sole_source_participater.id.to_s]]
-          expect(Organization.valid_carrier_names_for_options(sole_source_only: true)).to match_array carriers
+          all_carriers = {}
+          all_carriers[carrier_profile_1.legal_name] = carrier_profile_1.id.to_s
+          all_carriers[carrier_profile_2.legal_name] = carrier_profile_2.id.to_s
+          all_carriers[sole_source_participater.legal_name] = sole_source_participater.id.to_s
+          if constrain_service_areas?
+            expect(Organization.valid_carrier_names_for_options(sole_source_only: true)).to match_array carriers
+          else
+            expect(Organization.valid_carrier_names_for_options(sole_source_only: true).sort).to match_array all_carriers
+          end
         end
 
         it "can filter out by service area" do
           carrier_names = {}
           carrier_names[carrier_profile_1.id.to_s] = carrier_profile_1.legal_name
           carrier_names[sole_source_participater.id.to_s] = sole_source_participater.legal_name
-
-          expect(Organization.valid_carrier_names(primary_office_location: office_location)).to match_array carrier_names
+          if constrain_service_areas?
+            expect(Organization.valid_carrier_names(primary_office_location: office_location)).to match_array carrier_names
+          else
+            expect(Organization.valid_carrier_names(primary_office_location: office_location).sort).to match_array all_carriers
+          end
         end
       end
 
@@ -184,16 +207,27 @@ RSpec.describe Organization, dbclean: :after_each do
         it "returns carriers if they are available in the service area and offer plans for that coverage level" do
           carrier_names = {}
           multiple_carriers = {}
+          all_carriers = {}
           carrier_names[carrier_profile_1.id.to_s] = carrier_profile_1.legal_name
           multiple_carriers[carrier_profile_1.id.to_s] = carrier_profile_1.legal_name
           multiple_carriers[sole_source_participater.id.to_s] = sole_source_participater.legal_name
-          expect(Organization.valid_carrier_names(primary_office_location: office_location, active_year: 2017, selected_carrier_level: 'sole_source')).to match_array carrier_names
-          expect(Organization.valid_carrier_names(primary_office_location: office_location, active_year: 2018, selected_carrier_level: 'sole_source')).to match_array multiple_carriers
+          all_carriers[carrier_profile_1.id.to_s] = carrier_profile_1.legal_name
+          all_carriers[carrier_profile_2.id.to_s] = carrier_profile_2.legal_name
+          all_carriers[sole_source_participater.id.to_s] = sole_source_participater.legal_name
+          if constrain_service_areas?
+            expect(Organization.valid_carrier_names(primary_office_location: office_location, active_year: 2017, selected_carrier_level: 'sole_source')).to match_array carrier_names
+            expect(Organization.valid_carrier_names(primary_office_location: office_location, active_year: 2018, selected_carrier_level: 'sole_source')).to match_array multiple_carriers
+          else
+            expect(Organization.valid_carrier_names(primary_office_location: office_location, active_year: 2017, selected_carrier_level: 'sole_source')).to match_array all_carriers
+            expect(Organization.valid_carrier_names(primary_office_location: office_location, active_year: 2018, selected_carrier_level: 'sole_source')).to match_array all_carriers
+          end
         end
 
         it "returns no carriers if there are no matches" do
-          expect(Organization.valid_carrier_names(primary_office_location: office_location, active_year: 2017, selected_carrier_level: 'metal_level')).to match_array []
-          expect(Organization.valid_carrier_names(primary_office_location: office_location, active_year: 2017, selected_carrier_level: 'single_plan')).to match_array []
+          if constrain_service_areas?
+            expect(Organization.valid_carrier_names(primary_office_location: office_location, active_year: 2017, selected_carrier_level: 'metal_level')).to match_array []
+            expect(Organization.valid_carrier_names(primary_office_location: office_location, active_year: 2017, selected_carrier_level: 'single_plan')).to match_array []
+          end
         end
       end
     end

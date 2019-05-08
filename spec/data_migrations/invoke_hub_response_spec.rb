@@ -14,29 +14,22 @@ describe InvokeHubResponse, dbclean: :after_each do
   end
 
   describe "invoke hub response", dbclean: :after_each do
-
     let!(:person) { FactoryBot.create(:person, :with_consumer_role) }
     let!(:invalid_person) {FactoryBot.create(:person) }
-
-    before do
-      allow(ENV).to receive(:[]).with('hbx_id').and_return person.hbx_id
-    end
-
     it "should invoke hub response succesfully " do
-      subject.migrate
-      person.consumer_role.reload
-      expect(person.consumer_role.aasm_state).not_to eq "unverified"
+      ClimateControl.modify :hbx_id => person.hbx_id do
+        subject.migrate
+        person.consumer_role.reload
+        expect(person.consumer_role.aasm_state).not_to eq "unverified"
+      end
     end
 
   end
 
   describe "should not invoke hub response", dbclean: :after_each do
-
     let!(:invalid_person) {FactoryBot.create(:person) }
-
     before do
       $stdout = StringIO.new
-      allow(ENV).to receive(:[]).with('hbx_id').and_return invalid_person.hbx_id
     end
 
     after(:all) do
@@ -44,8 +37,10 @@ describe InvokeHubResponse, dbclean: :after_each do
     end
 
     it "should not invoke hub with invalid person" do
-      subject.migrate
-      expect($stdout.string).to match("Consumer role not found with hbx id #{invalid_person.hbx_id}")
+      ClimateControl.modify :hbx_id => invalid_person.hbx_id do
+        subject.migrate
+        expect($stdout.string).to match("Consumer role not found with hbx id #{invalid_person.hbx_id}")
+      end
     end
 
   end

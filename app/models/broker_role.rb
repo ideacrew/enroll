@@ -14,18 +14,31 @@ class BrokerRole
     "Both – Individual & Family AND Small Business Marketplaces" => "both"
   }
 
-  BROKER_CARRIER_APPOINTMENTS = {"Altus" => nil,
+  DC_BROKER_CARRIER_APPOINTMENTS = {
+    "Aetna Health Inc" => nil,
+    "Aetna Life Insurance Company" => nil,
+    "Carefirst Bluechoice Inc" => nil,
+    "Group Hospitalization and Medical Services Inc" => nil,
+    "Kaiser Foundation" => nil,
+    "Optimum Choice" => nil,
+    "United Health Care Insurance" => nil,
+    "United Health Care Mid Atlantic" => nil
+  }.freeze
+
+  CCA_BROKER_CARRIER_APPOINTMENTS = {
+    "Altus" => nil,
     "Blue Cross Blue Shield MA" => nil,
-     "Boston Medical Center Health Plan" => nil,
-     "Delta" => nil,
-     "FCHP" => nil,
-     "Guardian" => nil,
-     "Health New England" => nil,
-     "Harvard Pilgrim Health Care" => nil,
-     "Minuteman Health" => nil,
-     "Neighborhood Health Plan" => nil,
-     "Tufts Health Plan Direct" => nil,
-     "Tufts Health Plan Premier" => nil}
+    "Boston Medical Center Health Plan" => nil,
+    "Delta" => nil,
+    "FCHP" => nil,
+    "Guardian" => nil,
+    "Health New England" => nil,
+    "Harvard Pilgrim Health Care" => nil,
+    "Minuteman Health" => nil,
+    "Neighborhood Health Plan" => nil,
+    "Tufts Health Plan Direct" => nil,
+    "Tufts Health Plan Premier" => nil
+  }.freeze
 
   embedded_in :person
 
@@ -44,7 +57,7 @@ class BrokerRole
   field :accept_new_clients, type: Boolean
   field :license, type: Boolean
   field :training, type: Boolean
-  field :carrier_appointments, type: Hash , default: BROKER_CARRIER_APPOINTMENTS
+  field :carrier_appointments, type: Hash, default: "BrokerRole::#{Settings.site.key.upcase}_BROKER_CARRIER_APPOINTMENTS".constantize
 
   embeds_many :workflow_state_transitions, as: :transitional
   embeds_many :favorite_general_agencies, cascade_callbacks: true

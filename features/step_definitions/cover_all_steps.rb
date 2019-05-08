@@ -1,5 +1,5 @@
-Then(/^Hbx Admin should see an New DC Resident Application link$/) do
-  find_link('New DC Resident Application').visible?
+Then(/^Hbx Admin should see an DC Resident Application link$/) do
+  find_link('DC Resident Application').visible?
 end
 
 Then(/^Hbx Admin should not see an New DC Resident Application link$/) do
@@ -10,8 +10,17 @@ When(/^Hbx Admin clicks on New DC Resident Application link$/) do
   find(:xpath, "//*[@id='inbox']/div/div[3]/div/span/div[1]/ul/li[3]/a").click
 end
 
-Then(/^Hbx Admin should see New DC Resident Personal Information page$/) do
-  expect(page).not_to have_content('Personal Information')
+Then(/^Hbx Admin should not see an New Consumer Phone Application link and New Consumer Paper Application link$/) do
+  expect(page).not_to have_content('New Consumer Phone Application')
+  expect(page).not_to have_content('New Consumer Paper Application')
+end
+
+When(/^Hbx Admin clicks on DC Resident Application link$/) do
+  find(:xpath, '//*[@id="myTab"]/li[2]/ul/li[5]/a').trigger('click')
+end
+
+Then(/^Hbx Admin should see DC Resident Personal Information page$/) do
+  expect(page).to have_content('Personal Information')
 end
 
 When(/HBX Admin goes to register an user as individual$/) do
@@ -101,5 +110,3 @@ Then(/HBX Admin should see the home page with text coverage selected/) do
   expect(page).to have_content('Coverage Selected')
   screenshot("home_page")
 end
-
-

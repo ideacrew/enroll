@@ -24,7 +24,7 @@ end
 # For new updates
 When(/(.*) clicks continue on group selection page for dependents/) do |named_person|
   if find_all('.interaction-click-control-continue').any?
-    find('.interaction-click-control-continue').click
+    find('.interaction-click-control-continue', wait: 10).click
   else
     find('.interaction-click-control-shop-for-new-plan', :wait => 10).click
   end
@@ -87,6 +87,8 @@ When(/^.+ clicks continue on waiver summary page/) do
 end
 
 Then("Employee should able to see Waiver tile") do
+  find('.interaction-click-control-shop-for-plans', wait: 5)
+
   expect(page).to have_content 'Waived'
   expect(page).to have_content 'Waived Date'
   expect(page).to have_content 'Reason Waived'

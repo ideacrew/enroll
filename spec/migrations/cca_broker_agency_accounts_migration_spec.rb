@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe "CcaBrokerAgencyAccountsMigration" do
+xdescribe "CcaBrokerAgencyAccountsMigration" do
 
   before :all do
     Dir[Rails.root.join('db', 'migrate', '*_cca_broker_agency_accounts_migration.rb')].each do |f|
@@ -19,7 +19,7 @@ describe "CcaBrokerAgencyAccountsMigration" do
     end
   end
 
-  describe ".up", dbclean: :after_each do
+  xdescribe ".up", dbclean: :after_each do
 
     before :each do
       organization1 = FactoryBot.create(:broker)
@@ -105,7 +105,7 @@ describe "CcaBrokerAgencyAccountsMigration" do
 
     end
 
-    describe "after profiles migration", dbclean: :after_each do
+    xdescribe "after profiles migration", dbclean: :after_each do
 
       before :each do
         Mongoid::Migrator.run(:up, @migrations_paths, @emp_migration_version.to_i)

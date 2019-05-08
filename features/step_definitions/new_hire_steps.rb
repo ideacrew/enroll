@@ -118,6 +118,7 @@ When(/(.*) clicks on Continue button on receipt page/) do |named_person|
 end
 
 Then(/(.*) should see enrollment on my account page/) do |named_person|
+  find('.hbx-enrollment-panel .heading-text', wait: 5)
   expect(page).to have_content(named_person)
   exchange_date = TimeKeeper.date_according_to_exchange_at(Time.current)
   expect(page).to have_content("Plan Selected: #{exchange_date.strftime("%m/%d/%Y")}")
@@ -168,6 +169,7 @@ Then(/(.*) click on make changes button on passive renewal/) do |named_person|
 end
 
 Then(/Employee (.*) should see confirm your plan selection page/) do |named_person|
+  find('.interaction-click-control-confirm', wait: 5)
   expect(page).to have_content "Confirm Your Plan Selection"
 end
 

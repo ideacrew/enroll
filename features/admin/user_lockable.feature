@@ -1,4 +1,4 @@
-@individual_enabled
+@wip
 Feature: Lock and Unlock user account
   In order to lock/unlock user
   User should have the role of an admin

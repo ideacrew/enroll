@@ -65,8 +65,7 @@ end
 
 And(/^Employee sees Enrollment Submitted and clicks Continue$/) do
   expect(page).to have_content("Enrollment Submitted")
-  click_link 'CONTINUE'
-  wait_for_ajax
+  find('a.interaction-click-control-continue', text: 'CONTINUE', wait: 5).click
 end
 
 And(/^Employee sees Enrollment Submitted and clicks Go to My Account$/) do
@@ -239,6 +238,7 @@ Then(/(.*) should get qle effective date as coverage effective date/) do |named_
 end
 
 When(/(.+) should see coverage summary page with renewing benefit application start date as effective date/) do |named_person|
+  find('.interaction-click-control-confirm', wait: 10)
   step "#{named_person} should get plan year start date as coverage effective date"
   find('.interaction-click-control-confirm').click
 end
@@ -300,7 +300,5 @@ end
 
 Then(/Employee should see family members page and clicks continue/) do
   expect(page).to have_content "Household Info: Family Members"
-  within '#dependent_buttons' do
-    click_link "Continue"
-  end
+  find('#dependent_buttons .interaction-click-control-continue', :wait => 5).click
 end

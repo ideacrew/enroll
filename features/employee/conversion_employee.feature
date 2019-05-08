@@ -17,8 +17,6 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
     And Employee has not signed up as an HBX user
     And Patrick Doe visits the employee portal
     When Patrick Doe creates an HBX account
-    And I select the all security question and give the answer
-    When I have submitted the security questions
     When Employee goes to register as an employee
     Then Employee should see the employee search page
     When Employee enters the identifying info of Patrick Doe
@@ -187,56 +185,56 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
       # Then Soren White should see the receipt page with renewing plan year start date as effective date
       # Then Employee should see "my account" page with enrollment
 
-  Scenario: Existing Employee can buy coverage from multiple employers during open enrollment of renewing plan year
-
-    Given a CCA site exists with a benefit market
-    Given benefit market catalog exists for enrollment_open renewal employer with health benefits
-    And there is an employer ABC Widgets
-    And employer ABC Widgets has imported and renewing enrollment_open benefit applications
-    Given there is a census employee record for Patrick Doe for employer ABC Widgets
-
-    And there is an employer ACME Inc
-    And employer ACME Inc has imported and renewing enrollment_open benefit applications
-    Given there is a census employee record for Patrick Doe for employer ACME Inc
-
-    And census employee records for Patrick Doe have current hired on date for each employers
-    And Patrick Doe matches all employee roles to employers and is logged in
-    
-    Then Patrick Doe should see the employee privacy text
-    When Patrick Doe enters the identifying info of Patrick Doe
-    And Patrick Doe sees the option to enroll for all employers
-    When Patrick Doe accepts the matched employer
-    When Employee completes the matched employee form for Patrick Doe
-    And Employee sees the Household Info: Family Members page and clicks Continue    
-    And employee visits the Employee Portal page
-
-    And Patrick Doe has New Hire Badges for all employers
-    When Patrick Doe click the first button of new hire badge
-
-    Then Employee should see the group selection page
-    When Employee clicks continue on the group selection page
-    Then Employee should see the plan shopping welcome page
-    Then Employee should see the list of plans
-    Then employee should see text for employer ABC Widgets
-    When Employee selects a plan on the plan shopping page
-    Then Employee should see the coverage summary page
-    Then employee should see text for employer ABC Widgets
-    When Employee clicks on Confirm button on the coverage summary page
-    Then employee should see text for employer ABC Widgets
-    Then Employee should see the receipt page
-    Then Employee should see the "my account" page
-
-    When Patrick Doe click the button of new hire badge for 2st ER
-
-    Then Employee should see the group selection page
-    When Employee clicks continue on the group selection page
-    Then Employee should see the plan shopping welcome page
-    Then Employee should see the list of plans
-    Then employee should see text for employer ACME Inc
-    When Employee selects a plan on the plan shopping page
-    Then Employee should see the coverage summary page
-    Then employee should see text for employer ACME Inc
-    When Employee clicks on Confirm button on the coverage summary page
-    Then employee should see text for employer ACME Inc
-    Then Employee should see the receipt page
-    Then Employee should see the "my account" page
+#  Scenario: Existing Employee can buy coverage from multiple employers during open enrollment of renewing plan year
+#
+#    Given a CCA site exists with a benefit market
+#    Given benefit market catalog exists for enrollment_open renewal employer with health benefits
+#    And there is an employer ABC Widgets
+#    And employer ABC Widgets has imported and renewing enrollment_open benefit applications
+#    Given there is a census employee record for Patrick Doe for employer ABC Widgets
+#
+#    And there is an employer ACME Inc
+#    And employer ACME Inc has imported and renewing enrollment_open benefit applications
+#    Given there is a census employee record for Patrick Doe for employer ACME Inc
+#
+#    And census employee records for Patrick Doe have current hired on date for each employers
+#    And Patrick Doe matches all employee roles to employers and is logged in
+#
+#    Then Patrick Doe should see the employee privacy text
+#    When Patrick Doe enters the identifying info of Patrick Doe
+#    And Patrick Doe sees the option to enroll for all employers
+#    When Patrick Doe accepts the matched employer
+#    When Employee completes the matched employee form for Patrick Doe
+#    And Employee sees the Household Info: Family Members page and clicks Continue
+#    And employee visits the Employee Portal page
+#
+#    And Patrick Doe has New Hire Badges for all employers
+#    When Patrick Doe click the first button of new hire badge
+#
+#    Then Employee should see the group selection page
+#    When Employee clicks continue on the group selection page
+#    Then Employee should see the plan shopping welcome page
+#    Then Employee should see the list of plans
+#    Then employee should see text for employer ABC Widgets
+#    When Employee selects a plan on the plan shopping page
+#    Then Employee should see the coverage summary page
+#    Then employee should see text for employer ABC Widgets
+#    When Employee clicks on Confirm button on the coverage summary page
+#    Then employee should see text for employer ABC Widgets
+#    Then Employee should see the receipt page
+#    Then Employee should see the "my account" page
+#
+#    When Patrick Doe click the button of new hire badge for 2st ER
+#
+#    Then Employee should see the group selection page
+#    When Employee clicks continue on the group selection page
+#    Then Employee should see the plan shopping welcome page
+#    Then Employee should see the list of plans
+#    Then employee should see text for employer ACME Inc
+#    When Employee selects a plan on the plan shopping page
+#    Then Employee should see the coverage summary page
+#    Then employee should see text for employer ACME Inc
+#    When Employee clicks on Confirm button on the coverage summary page
+#    Then employee should see text for employer ACME Inc
+#    Then Employee should see the receipt page
+#    Then Employee should see the "my account" page

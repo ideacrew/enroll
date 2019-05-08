@@ -137,6 +137,14 @@ RSpec.describe Exchanges::BrokerApplicantsController do
 
       context 'when broker carrier appointments enabled and application is pending' do
         context 'when application is pending' do
+          let(:carrier_appointments_hash) do
+            ca = {}
+            "BrokerRole::#{Settings.site.key.upcase}_BROKER_CARRIER_APPOINTMENTS".constantize.stringify_keys.each do |k, _v|
+              ca[k] = "true"
+            end
+            ca
+          end
+
           before :each do
             Settings.aca.broker_carrier_appointments_enabled = true
             broker_role.update_attributes({ broker_agency_profile_id: @broker_agency_profile.id })
@@ -145,18 +153,7 @@ RSpec.describe Exchanges::BrokerApplicantsController do
           end
 
           it "all broker carrier appointments should be true" do
-            expect(broker_role.carrier_appointments).to eq("Altus"=>"true",
-                                                            "Blue Cross Blue Shield MA"=>"true",
-                                                            "Boston Medical Center Health Plan"=>"true",
-                                                            "Delta"=>"true",
-                                                            "FCHP"=>"true",
-                                                            "Guardian"=>"true",
-                                                            "Health New England"=>"true",
-                                                            "Harvard Pilgrim Health Care"=>"true",
-                                                            "Minuteman Health"=>"true",
-                                                            "Neighborhood Health Plan"=>"true",
-                                                            "Tufts Health Plan Direct"=>"true",
-                                                            "Tufts Health Plan Premier"=>"true")
+            expect(broker_role.carrier_appointments).to eq(carrier_appointments_hash)
           end
 
           it "should change applicant status to broker_agency_pending" do
@@ -174,19 +171,33 @@ RSpec.describe Exchanges::BrokerApplicantsController do
 
       context 'when broker carrier appointments disabled and application is pending' do
         context 'when application is pending' do
+
+          let(:dc_hash) do
+            {
+              "Aetna Health Inc" => "true",
+              "Aetna Life Insurance Company" => "true",
+              "Carefirst Bluechoice Inc" => "true"
+            }
+          end
+          let(:ma_hash) do
+            {
+              "Boston Medical Center Health Plan" => "true",
+              "Delta" => "true",
+              "FCHP" => "true"
+            }
+          end
+          let(:carrier_appointments_hash) do
+            ca = "BrokerRole::#{Settings.site.key.upcase}_BROKER_CARRIER_APPOINTMENTS".constantize.stringify_keys
+            merged_hash =
+              if Settings.site.key == :dc
+                ca.merge!(dc_hash)
+              elsif Settings.site.key == :cca
+                ca.merge!(dc_hash)
+              end
+            merged_hash
+          end
           before :each do
-            person_hash  =  ActionController::Parameters.new({ broker_role_attributes: { training: true , carrier_appointments: {"Altus"=>"true",
-              "Blue Cross Blue Shield MA"=>"true",
-              "Boston Medical Center Health Plan"=>"true",
-              "Delta"=>nil,
-              "FCHP"=>nil,
-              "Guardian"=>"true",
-              "Health New England"=>nil,
-              "Harvard Pilgrim Health Care"=>nil,
-              "Minuteman Health"=>nil,
-              "Neighborhood Health Plan"=>nil,
-              "Tufts Health Plan Direct"=>nil,
-              "Tufts Health Plan Premier"=>nil} } }).permit!
+            person_hash = ActionController::Parameters.new({ broker_role_attributes: { training: true, carrier_appointments: carrier_appointments_hash } }).permit!
             Settings.aca.broker_carrier_appointments_enabled = false
             broker_role.update_attributes({ broker_agency_profile_id: @broker_agency_profile.id })
             put :update, params:{id: broker_role.person.id, pending: true, person: person_hash}, format: :js
@@ -194,18 +205,7 @@ RSpec.describe Exchanges::BrokerApplicantsController do
           end
 
           it "broker carrier appointments should be user selected" do
-            expect(broker_role.carrier_appointments).to eq("Altus"=>"true",
-                                                            "Blue Cross Blue Shield MA"=>"true",
-                                                            "Boston Medical Center Health Plan"=>"true",
-                                                            "Delta"=>"",
-                                                            "FCHP"=>"",
-                                                            "Guardian"=>"true",
-                                                            "Health New England"=>"",
-                                                            "Harvard Pilgrim Health Care"=>"",
-                                                            "Minuteman Health"=>"",
-                                                            "Neighborhood Health Plan"=>"",
-                                                            "Tufts Health Plan Direct"=>"",
-                                                            "Tufts Health Plan Premier"=>"")
+            expect(broker_role.carrier_appointments.find {|_k, v| v == "true" }).to eq(carrier_appointments_hash.find {|_k, v| v == "true" })
           end
 
           it "should change applicant status to broker_agency_pending" do
