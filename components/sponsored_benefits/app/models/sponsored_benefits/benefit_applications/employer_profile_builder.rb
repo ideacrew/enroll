@@ -69,12 +69,12 @@ module SponsoredBenefits
       def add_benefit_sponsors_benefit_application
         if aca_state_abbreviation == "DC"
           quote_benefit_application = @benefit_application.to_plan_year(@organization)
-          if @organization.active_plan_year.present? || @organization.is_converting?
+          if @organization.employer_profile.active_plan_year.present? || @organization.employer_profile.is_converting?
             quote_benefit_application.renew_plan_year if quote_benefit_application.may_renew_plan_year?
           end
 
           if quote_benefit_application.valid? && @organization.valid?
-            @organization.plan_years.each do |plan_year|
+            @organization.employer_profile.plan_years.each do |plan_year|
               next unless plan_year.start_on == quote_benefit_application.start_on
               if plan_year.is_renewing?
                 plan_year.cancel_renewal! if plan_year.may_cancel_renewal?
@@ -83,9 +83,9 @@ module SponsoredBenefits
               end
             end
           end
-          @organization.plan_years << quote_benefit_application
+          @organization.employer_profile.plan_years << quote_benefit_application
           @organization.save!
-          @organization.census_employees.each do |census_employee|
+          @organization.employer_profile.census_employees.each do |census_employee|
             census_employee.save
           end
         else

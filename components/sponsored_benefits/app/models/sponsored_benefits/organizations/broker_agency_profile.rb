@@ -15,16 +15,8 @@ module SponsoredBenefits
           SponsoredBenefits::Organizations::PlanDesignOrganization.find_by_owner(id).first
         end
 
-        def cca_profile_office_locations(profile)
-          profile.office_locations if Settings.aca.state_abbreviation == "MA" # Bring in aca helper
-        end
-
-        def dc_profile_office_locations(profile)
-          profile.organization.office_locations if Settings.aca.state_abbreviation == "DC" # Bring in aca helper
-        end
-
         def office_locations(profile)
-          cca_profile_office_locations(profile) || dc_profile_office_locations(profile)
+          profile.office_locations
         end
 
         def find_or_initialize_broker_profile(profile)
