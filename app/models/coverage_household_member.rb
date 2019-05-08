@@ -24,7 +24,7 @@ class CoverageHouseholdMember
 
   def family_member
     return @family_member if defined? @family_member
-    @family_member = family.family_members.find(family_member_id) if family_member_id.present?
+    @family_member = FamilyMember.find(family_member_id) if family_member_id.present?
   end
 
   def applicant=(new_applicant)

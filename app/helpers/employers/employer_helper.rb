@@ -18,14 +18,14 @@ module Employers::EmployerHelper
   def enrollment_state(census_employee=nil)
     humanize_enrollment_states(census_employee.active_benefit_group_assignment).gsub("Coverage Selected", "Enrolled").gsub("Coverage Waived", "Waived").gsub("Coverage Terminated", "Terminated").gsub("Coverage Termination Pending", "Coverage Termination Pending").html_safe
   end
-
+  
   def renewal_enrollment_state(census_employee=nil)
     humanize_enrollment_states(census_employee.renewal_benefit_group_assignment).gsub("Coverage Renewing", "Auto-Renewing").gsub("Coverage Selected", "Enrolling").gsub("Coverage Waived", "Waiving").gsub("Coverage Terminated", "Terminating").html_safe
   end
-
+  
   def humanize_enrollment_states(benefit_group_assignment)
     enrollment_states = []
-
+    
     if benefit_group_assignment
       enrollments = benefit_group_assignment.hbx_enrollments
 

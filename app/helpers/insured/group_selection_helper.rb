@@ -183,26 +183,27 @@ module Insured
     end
 
     def is_eligible_for_dental?(employee_role, change_plan, enrollment)
-      renewing_bg = employee_role.census_employee.renewal_published_benefit_group
-      active_bg = employee_role.census_employee.active_benefit_group
+      false
+      # renewing_bg = employee_role.census_employee.renewal_published_benefit_group
+      # active_bg = employee_role.census_employee.active_benefit_group
 
-      if change_plan != "change_by_qle"
-        if change_plan == "change_plan" && enrollment.present? && enrollment.is_shop?
-          enrollment.benefit_group.is_offering_dental?
-        elsif employee_role.can_enroll_as_new_hire?
-          active_bg.present? && active_bg.is_offering_dental?
-        else
-          ( renewing_bg || active_bg ).present? && (renewing_bg || active_bg ).is_offering_dental?
-        end
-      else
-        effective_on = employee_role.person.primary_family.current_sep.effective_on
+      # if change_plan != "change_by_qle"
+      #   if change_plan == "change_plan" && enrollment.present? && enrollment.is_shop?
+      #     enrollment.benefit_group.is_offering_dental?
+      #   elsif employee_role.can_enroll_as_new_hire?
+      #     active_bg.present? && active_bg.is_offering_dental?
+      #   else
+      #     ( renewing_bg || active_bg ).present? && (renewing_bg || active_bg ).is_offering_dental?
+      #   end
+      # else
+      #   effective_on = employee_role.person.primary_family.current_sep.effective_on
 
-        if renewing_bg.present? && is_covered_plan_year?(renewing_bg.plan_year, effective_on)
-          renewing_bg.is_offering_dental?
-        elsif active_bg.present?
-          active_bg.is_offering_dental?
-        end
-      end
+      #   if renewing_bg.present? && is_covered_plan_year?(renewing_bg.plan_year, effective_on)
+      #     renewing_bg.is_offering_dental?
+      #   elsif active_bg.present?
+      #     active_bg.is_offering_dental?
+      #   end
+      # end
     end
 
     def is_covered_plan_year?(plan_year, effective_on)

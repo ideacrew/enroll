@@ -119,7 +119,7 @@ class EmployeeRole
 
   def new_census_employee
     return @census_employee if defined? @census_employee
-    @census_employee = CensusEmployee.find(self.census_employee_id) unless census_employee_id.blank?
+    @census_employee = CensusMember.find(self.census_employee_id) unless census_employee_id.blank?
   end
 
   alias_method :census_employee=, :new_census_employee=
