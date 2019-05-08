@@ -117,7 +117,7 @@ module BenefitSponsors
         when "BrokerAgencyProfile"
           inbox_profiles_broker_agencies_broker_agency_profile_path(id: provider.id.to_s, folder: folder)
         when "GeneralAgencyProfile"
-          #TODO FIX IT for GA
+          inbox_profiles_general_agencies_general_agency_profile_path(id: provider.id.to_s, folder: folder)
       end
     end
 

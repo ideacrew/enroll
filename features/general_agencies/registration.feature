@@ -1,7 +1,8 @@
-@general_agency_enabled
+# @general_agency_enabled
 Feature: Create a General Agency Profile
 
   Scenario: A General Agency Submits Application
+    Given a CCA site exists with a benefit market
     Given a general agency agent visits the DCHBX
     When they click the 'New General Agency' button
     Then they should see the new general agency form
@@ -10,9 +11,11 @@ Feature: Create a General Agency Profile
     And a pending approval status
 
   Scenario: A General Agency is Approved
-    Given an HBX admin exists
+    Given a CCA site exists with a benefit market
+    When that a user with a HBX staff role with HBX Staff subrole exists and is logged in
     And a general agency, pending approval, exists
-    When the HBX admin visits the general agency list
+    And Hbx Admin is on Broker Index of the Admin Dashboard
+    And Hbx Admin is on Broker Index and clicks General Agencies
     Then they should see the pending general agency
     When they click the link of general agency
     Then they should see the home of general agency
@@ -23,6 +26,7 @@ Feature: Create a General Agency Profile
     And the general agency should receive an email
 
   Scenario: A General Agency Creates an Account
+    Given a CCA site exists with a benefit market
     Given a general agency, approved, awaiting account creation, exists
     When the HBX admin visits the link received in the approval email
     Then they should see an account creation form

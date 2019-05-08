@@ -17,7 +17,13 @@ FactoryBot.define do
     end
 
     trait :with_ssn do
-      sequence(:ssn) { |n| 222222220 + n }
+        sequence(:ssn) { |n| 222222220 + n }
+    end
+
+    trait :with_general_agency_staff_role do
+      after(:create) do |p, evaluator|
+        create_list(:general_agency_staff_role, 1, person: p)
+      end
     end
 
     trait :with_family do
