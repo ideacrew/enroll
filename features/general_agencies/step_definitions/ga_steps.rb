@@ -101,7 +101,7 @@ When /^they complete the account creation form and hit the 'Submit' button$/ do
 end
 
 Then /^they should see a welcome message$/ do
-  expect(page).to have_content("Welcome to #{Settings.site.short_name}. Your account has been created.")
+  expect(page).to have_content("Welcome! You have signed up successfully")
   screenshot("general_agency_homepage_for_staff")
 end
 
