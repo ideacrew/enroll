@@ -7,6 +7,10 @@ module SiteWorld
     BenefitMarkets::Products::ProductFactorCache.initialize_factor_cache!
     BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
   end
+
+  def semantic_link_class(title)
+    ".interaction-click-control-#{title.downcase.split.join('-')}"
+  end
 end
 
 World(SiteWorld)

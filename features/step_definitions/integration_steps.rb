@@ -990,7 +990,7 @@ When(/^(?:General){0}.+ clicks? on the ((?:General|Staff){0}.+) dropdown$/) do |
 end
 
 When(/^(?:General){0}.+ clicks? on the ((?:General|Staff){0}.+) option$/) do |tab_name|
-  find(".interaction-click-control-#{tab_name.downcase.gsub(' ','-')}").click
+  find(".interaction-click-control-#{tab_name.downcase.gsub(' ','-')}", wait: 5).click
   wait_for_ajax
   find('#myTabContent').click
 end
