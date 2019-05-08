@@ -752,6 +752,7 @@ And(/^.+ selects the first plan available$/) do
 end
 
 Then(/^.+ should see the dependents page$/) do
+  find('.interaction-click-control-add-member', wait: 10)
   expect(page).to have_content('Add Member')
   screenshot("dependents_page")
 end
