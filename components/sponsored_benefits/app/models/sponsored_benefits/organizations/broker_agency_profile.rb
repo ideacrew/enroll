@@ -16,7 +16,8 @@ module SponsoredBenefits
         end
 
         def office_locations(profile)
-          profile.office_locations
+          return profile.office_locations if profile.respond_to?('office_locations')
+          profile.organization.office_locations 
         end
 
         def find_or_initialize_broker_profile(profile)
