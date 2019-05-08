@@ -336,9 +336,10 @@ class Employers::EmployerProfilesController < Employers::EmployersController
                        when 'cobra'
                          @employer_profile.census_employees.by_cobra.sorted
                        else
-                         @employer_profile.census_employees.sort rescue nil
+                         @employer_profile.census_employees rescue nil
                        end
     if params["employee_search"].present?
+
       query_string = CensusMember.search_hash(params["employee_search"])
       census_employees = census_employees.any_of(query_string)
     end
@@ -346,7 +347,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
     if params[:page].present?
       page_no = cur_page_no(@page_alphabets.first)
-      @census_employees = census_employees.where("last_name" => /^#{page_no}/i).page(params[:pagina])
+      @census_employees = census_employees.where("last_name" => /^#{page_no}/i).page(params[:page])
       #@avaliable_employee_names ||= @census_employees.limit(20).map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
     else
 
