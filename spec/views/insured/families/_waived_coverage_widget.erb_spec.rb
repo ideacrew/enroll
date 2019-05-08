@@ -7,10 +7,12 @@ RSpec.describe "_waived_coverage_widget.html.erb" do
   let(:family) { FactoryGirl.build_stubbed(:family, person: person) }
   let(:person) { FactoryGirl.build_stubbed(:person) }
   let(:employer_profile) { FactoryGirl.build_stubbed(:employer_profile) }
+  let(:benefit_group) { FactoryGirl.build_stubbed(:benefit_group)}
 
   before :each do
     assign(:person, person)
     allow(hbx_enrollment).to receive(:employer_profile).and_return(employer_profile)
+    allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
   end
   # Added in the case of @person not persent
   context 'a person object not passed to widget' do

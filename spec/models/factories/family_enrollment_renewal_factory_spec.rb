@@ -73,27 +73,6 @@ RSpec.describe Factories::FamilyEnrollmentRenewalFactory, :type => :model, dbcle
               generate_renewal
               expect(current_family.active_household.hbx_enrollments.renewing.by_coverage_kind(coverage_kind).present?).to be_truthy
             end
-
-            context 'non-congressional employees should receive notifications' do
-              it 'should trigger notifications' do
-                if coverage_kind == 'health'
-                  expect(ShopNoticesNotifierJob).to receive(:perform_later).with(employee_A.census_employee.id.to_s, "employee_open_enrollment_auto_renewal", "acapi_trigger" => true)
-                  generate_renewal
-                end
-              end
-            end
-
-            context 'congressional employees should not receive notifications' do
-
-              before do
-                renewing_employer.renewing_plan_year.benefit_groups.first.update_attributes(is_congress: true)
-                generate_renewal
-              end
-
-              it 'should not trigger notifications' do
-                expect(ShopNoticesNotifierJob).not_to receive(:perform_later).with(employee_A.census_employee.id.to_s, "employee_open_enrollment_auto_renewal", "acapi_trigger" => true)
-              end
-            end
           end
 
           context 'when employer changed plan offerings and renewal plans not offered' do
