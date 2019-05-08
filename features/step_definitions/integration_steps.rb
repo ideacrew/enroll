@@ -699,7 +699,7 @@ end
 
 Then(/^Employee (.+) should see coverage effective date/) do |named_person|
   census_employee = CensusEmployee.where(:first_name => /#{people[named_person][:first_name]}/i, :last_name => /#{people[named_person][:last_name]}/i).first
-  find('p', text: census_employee.benefit_sponsorship.legal_name)
+  find('p', text: census_employee.benefit_sponsorship.legal_name, wait: 10)
   find('.coverage_effective_date', text: census_employee.earliest_eligible_date.strftime("%m/%d/%Y"))
 end
 

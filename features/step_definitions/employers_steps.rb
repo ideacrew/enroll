@@ -704,6 +704,7 @@ And /^employer click on pencil symbol next to employee status bar$/ do
 end
 
 Then /^employer should see the (.*) button$/ do |status|
+  find(".interaction-click-control-#{status.split(/\s/).join('-').downcase}", wait: 5)
   find_link(status.capitalize).visible?
 end
 
@@ -712,7 +713,7 @@ When /^employer clicks on (.*) button$/ do |status|
 end
 
 When /^employer clicks on the (.*) link$/ do |status|
-  click_link(status.titleize)
+  find(".interaction-click-control-#{status.split(/\s/).join('-').downcase}", wait: 5).click
 end
 
 # Then /^employer should see the field to enter (.*) date$/ do |status|

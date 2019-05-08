@@ -238,6 +238,7 @@ Then(/(.*) should get qle effective date as coverage effective date/) do |named_
 end
 
 When(/(.+) should see coverage summary page with renewing benefit application start date as effective date/) do |named_person|
+  find('.interaction-click-control-confirm', wait: 10)
   step "#{named_person} should get plan year start date as coverage effective date"
   find('.interaction-click-control-confirm').click
 end
