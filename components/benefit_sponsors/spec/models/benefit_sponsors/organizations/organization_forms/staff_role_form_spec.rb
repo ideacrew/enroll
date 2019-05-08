@@ -7,12 +7,12 @@ module BenefitSponsors
     let!(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
     let!(:benefit_sponsor) { create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let!(:employer_profile) { benefit_sponsor.employer_profile }
-    let!(:broker_organization)                  { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+    let!(:broker_organization)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
     let(:broker_agency_profile) { broker_organization.broker_agency_profile }
-    let!(:broker_agency_staff_role) {FactoryGirl.build(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id)}
-    let!(:active_employer_staff_role) {FactoryGirl.build(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
-    let!(:person) { FactoryGirl.create(:person, employer_staff_roles:[active_employer_staff_role]) }
-    let(:user) { FactoryGirl.create(:user, :person => person)}
+    let!(:broker_agency_staff_role) {FactoryBot.build(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id)}
+    let!(:active_employer_staff_role) {FactoryBot.build(:benefit_sponsor_employer_staff_role, aasm_state: 'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
+    let!(:person) { FactoryBot.create(:person, employer_staff_roles: [active_employer_staff_role]) }
+    let(:user) { FactoryBot.create(:user, :person => person)}
 
     subject { BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm }
 
@@ -260,7 +260,7 @@ module BenefitSponsors
 
     describe '#for_broker_agency_search' do
 
-      let!(:person) { FactoryGirl.create(:person) }
+      let!(:person) { FactoryBot.create(:person) }
       let!(:params) {
         {
             filter_criteria: {"q" => broker_agency_profile.legal_name},

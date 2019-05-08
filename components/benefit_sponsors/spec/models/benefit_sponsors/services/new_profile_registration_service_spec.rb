@@ -7,7 +7,7 @@ module BenefitSponsors
     subject { BenefitSponsors::Services::NewProfileRegistrationService }
     let!(:security_question)  { FactoryBot.create_default :security_question }
     let!(:site) { ::BenefitSponsors::SiteSpecHelpers.create_cca_site_with_hbx_profile_and_benefit_market }
-    let!(:general_org) {FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)}
+    let!(:general_org) {FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)}
     let!(:employer_profile) {general_org.employer_profile}
     let!(:user) { FactoryBot.create(:user)}
     let!(:person) { FactoryBot.create(:person, emails:[ FactoryBot.build(:email, kind:'work') ], user_id: user.id) }
@@ -143,9 +143,9 @@ module BenefitSponsors
     describe ".is_broker_agency_registered?" do
 
       let(:profile_form) {BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.new(profile_id: broker_agency_profile.id )}
-      let(:user1) { FactoryGirl.create(:user)}
-      let(:person1) { FactoryGirl.create(:person, emails:[FactoryGirl.build(:email, kind:'work')], user: user1) }
-      let!(:broker_agency_staff_role) { FactoryGirl.build(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: "coverage_terminated",  person: person1 )}
+      let(:user1) { FactoryBot.create(:user)}
+      let(:person1) { FactoryBot.create(:person, emails: [FactoryBot.build(:email, kind: 'work')], user: user1) }
+      let!(:broker_agency_staff_role) { FactoryBot.build(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: "coverage_terminated",  person: person1)}
 
 
       it 'should return false if broker staff role or broker role exists for the user' do

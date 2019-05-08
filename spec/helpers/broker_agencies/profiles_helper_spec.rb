@@ -2,9 +2,9 @@ require 'rails_helper'
 
 RSpec.describe BrokerAgencies::ProfilesHelper, dbclean: :after_each, :type => :helper do
 
-  let(:user) { FactoryGirl.create(:user) }
-  let(:person) { FactoryGirl.create(:person, user: user) }
-  let(:person2) { FactoryGirl.create(:person) }
+  let(:user) { FactoryBot.create(:user) }
+  let(:person) { FactoryBot.create(:person, user: user) }
+  let(:person2) { FactoryBot.create(:person) }
 
   describe 'disable_edit_broker_agency?' do
 

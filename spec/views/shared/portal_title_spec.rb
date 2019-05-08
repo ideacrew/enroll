@@ -7,10 +7,10 @@ RSpec.describe "layouts/_header.html.erb", :dbclean => :after_each do
   let(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
   let(:benefit_sponsor)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
   let(:employer_profile)    { benefit_sponsor.employer_profile }
-  let(:active_employer_staff_role) {FactoryGirl.create(:benefit_sponsor_employer_staff_role, person: person_user, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
-  let(:this_broker_agency_profile){FactoryGirl.create(:broker_agency_profile)}
+  let(:active_employer_staff_role) {FactoryBot.create(:benefit_sponsor_employer_staff_role, person: person_user, aasm_state: 'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
+  let(:this_broker_agency_profile){FactoryBot.create(:broker_agency_profile)}
   let(:signed_in?){ true }
-  let(:broker_agency_staff_role) {FactoryGirl.create(:broker_agency_staff_role, broker_agency_profile_id:this_broker_agency_profile.id, person: person_user, broker_agency_profile: this_broker_agency_profile, aasm_state: 'active')}
+  let(:broker_agency_staff_role) {FactoryBot.create(:broker_agency_staff_role, broker_agency_profile_id: this_broker_agency_profile.id, person: person_user, broker_agency_profile: this_broker_agency_profile, aasm_state: 'active')}
   #let!(:byline) { create(:translation, key: "en.layouts.header.byline", value: Settings.site.header_message) }
   before do
     Translation.create(key: "en.welcome.index.byline", value: "\"#{Settings.site.header_message}\"")

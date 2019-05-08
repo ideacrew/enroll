@@ -1,11 +1,11 @@
 require "rails_helper"
 
 RSpec.describe "employers/employer_profiles/_primary_nav AS BROKER AGENCY STAFF" do
-  let(:employer_profile) { FactoryGirl.create(:employer_profile) }
-  let(:person) { FactoryGirl.create(:person, :first_name=>'fred', :last_name=>'flintstone'  )}
-  let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
-  let(:broker_agency_staff_role) { FactoryGirl.create(:broker_agency_staff_role, aasm_state: "active", benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id)}
-  let(:current_user) { FactoryGirl.create(:user, :roles => ['broker_agency_staff'], :person => person) }
+  let(:employer_profile) { FactoryBot.create(:employer_profile) }
+  let(:person) { FactoryBot.create(:person, :first_name => 'fred', :last_name => 'flintstone')}
+  let(:broker_agency_profile) { FactoryBot.create(:broker_agency_profile) }
+  let(:broker_agency_staff_role) { FactoryBot.create(:broker_agency_staff_role, aasm_state: "active", benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id)}
+  let(:current_user) { FactoryBot.create(:user, :roles => ['broker_agency_staff'], :person => person) }
   before :each do
     @employer_profile = employer_profile
     sign_in current_user
