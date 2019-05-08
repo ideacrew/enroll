@@ -26,7 +26,7 @@ describe FamilyPolicy, "given a user who is the primary member" do
   end
 end
 
-describe FamilyPolicy, "given a family with an active broker agency account" do
+describe FamilyPolicy, "given a family with an active broker with only broker staff role" do
   let(:primary_person_id) { double }
   let(:broker_person_id) { double }
   let(:broker_agency_profile_id) { double }
@@ -39,6 +39,10 @@ describe FamilyPolicy, "given a family with an active broker agency account" do
   let(:primary_member) { instance_double(FamilyMember, :person_id => primary_person_id, :person => person) }
 
   subject { FamilyPolicy.new(user, family) }
+
+  before(:each) do
+    allow(broker_person).to receive(:broker_role).and_return nil
+  end
 
   describe "when the user is an active member of the same broker agency as the account" do
     let(:broker_agency_profile_id_account) { broker_agency_profile_id }
@@ -72,6 +76,9 @@ describe FamilyPolicy, "given a family where the primary has an active employer 
   let(:primary_member) { instance_double(FamilyMember, :person_id => primary_person_id, :person => person) }
 
   subject { FamilyPolicy.new(user, family) }
+  before(:each) do
+    allow(broker_person).to receive(:broker_role).and_return nil
+  end
 
   describe "when the user is an active member of the same broker agency as the account" do
     let(:broker_agency_profile_id_account) { broker_agency_profile_id }
@@ -140,4 +147,57 @@ describe FamilyPolicy, "given a user who has the modify family permission" do
     expect(subject.show?).to be_truthy
   end
 
+end
+
+describe FamilyPolicy, 'given a family with an active broker with only broker role' do
+  let(:person) { FactoryGirl.create(:person, :with_family) }
+  let(:user) { FactoryGirl.create(:user, person: person) }
+  let(:family) { person.primary_family }
+  let(:broker_role) { FactoryGirl.create(:broker_role, aasm_state: 'active', broker_agency_profile_id: broker_agency_profile.id, person: person) }
+  let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
+  let(:broker_agency_account) { FactoryGirl.create(:broker_agency_account, broker_agency_profile_id:broker_agency_profile.id, writing_agent_id: broker_role.id, is_active: true) }
+
+
+  subject { FamilyPolicy.new(user, family) }
+
+
+  context 'when the user is an active member of the same broker agency as the account' do
+    let(:broker_agency_profile_id_account) { broker_agency_profile.id }
+
+    it 'can show' do
+      allow(person).to receive(:active_broker_staff_roles).and_return []
+      expect(subject.show?).to be_truthy
+    end
+  end
+end
+
+describe 'can_broker_modify_family' do
+
+  let(:person) { FactoryGirl.create(:person, :with_family) }
+  let(:user) { FactoryGirl.create(:user, person: person) }
+  let(:family) { person.primary_family }
+  let(:broker_role) { FactoryGirl.create(:broker_role, aasm_state: 'active', broker_agency_profile_id: broker_agency_profile.id, person: person) }
+  let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
+  let(:broker_agency_account) { FactoryGirl.create(:broker_agency_account, broker_agency_profile_id:broker_agency_profile.id, writing_agent_id: broker_role.id, is_active: true) }
+
+  subject { FamilyPolicy.new(user, family) }
+
+  context 'person with only broker role' do
+
+    it 'can modify family' do
+      allow(family).to receive(:active_broker_agency_account).and_return broker_agency_account
+      expect(subject.can_broker_modify_family?(broker_role, nil)).to be_truthy
+    end
+  end
+
+  context 'person with only broker staff role' do
+
+    let!(:broker_agency_staff_role1) { FactoryGirl.create(:broker_agency_staff_role, aasm_state: 'active', broker_agency_profile_id: broker_agency_profile.id, person: person) }
+    let!(:broker_agency_staff_role2) { FactoryGirl.create(:broker_agency_staff_role, aasm_state: 'pending', person: person) }
+
+    it 'can modify family' do
+      allow(family).to receive(:active_broker_agency_account).and_return broker_agency_account
+      expect(subject.can_broker_modify_family?(nil, person.active_broker_staff_roles)).to be_truthy
+    end
+  end
 end
