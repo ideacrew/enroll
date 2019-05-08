@@ -36,11 +36,12 @@ When(/^the system date is (.*?) open_enrollment_period start date$/) do |compare
 end
 
 When(/^the user clicks on Force Publish button$/) do
-  # TODO: Research if accept_confirm block no longer needed
-  find('.btn.btn-xs', text: 'Force Publish').click
+  page.execute_script("[...document.querySelectorAll('.col-actions .dropdown-menu li a')].filter(e => e.innerText == 'Force Publish')[0].click();")
 end
 
 And(/^the user clicks submit to confirm force publish$/) do
+  wait_for_ajax
+  find('.heading-text', text: 'Publish Application', wait: 10)
   page.find_button('Submit').click
 end
 
@@ -81,11 +82,20 @@ And(/^ask to confirm intention to publish$/) do
   page.driver.browser.accept_confirm
 end
 
-And(/^the user clicks publish anyways$/) do
-  find('a', :text => "Publish Anyways").click
+And(/^the user clicks force publish$/) do
+  find('a', :text => "Force Publish", wait: 5).click
 end
 
-Then(/^the force publish successful message should be displayed$/) do 
+Then(/^the user will see application ineligible message$/) do 
+  expect(page).to have_content('As submitted, this application is ineligible for coverage')
+end
+
+And(/^the user clicks publish anyways$/) do
+  find('a', :text => "Publish Anyways", wait: 5).click
+end
+
+Then(/^the force publish successful message should be displayed$/) do
+  find('h4', text: 'Force Publish Successful', wait: 5)
   expect(page).to have_content('Force Publish Successful')
 end
 
