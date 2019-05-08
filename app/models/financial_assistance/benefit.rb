@@ -139,6 +139,16 @@ class FinancialAssistance::Benefit
     clean_params(params)
   end
 
+  class << self
+    def find(id)
+      bson_id = BSON::ObjectId.from_string(id.to_s)
+      applications = ::FinancialAssistance::Application.where("applicants.benefits._id" => bson_id)
+      return unless applications.size == 1
+      applicants = applications.first.applicants.where("benefits._id" => bson_id)
+      applicants.size == 1 ? applicants.first.benefits.find(bson_id) : nil
+    end
+  end
+
 private
   def clean_params(params)
     model_params = params[:benefit]

@@ -72,6 +72,16 @@ class FinancialAssistance::Deduction
 
   scope :of_kind, ->(deduction_kind) { where(kind: deduction_kind) }
 
+  class << self
+    def find(id)
+      bson_id = BSON::ObjectId.from_string(id.to_s)
+      applications = ::FinancialAssistance::Application.where("applicants.deductions._id" => bson_id)
+      return unless applications.size == 1
+      applicants = applications.first.applicants.where("deductions._id" => bson_id)
+      applicants.size == 1 ? applicants.first.deductions.find(bson_id) : nil
+    end
+  end
+
 private
 
   def set_submission_timestamp

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe FinancialAssistance::Income, type: :model do
+RSpec.describe FinancialAssistance::Income, type: :model, dbclean: :after_each do
   let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
   let(:household) { family.households.first }
   let(:application) { FactoryGirl.create(:application, family: family) }
@@ -28,6 +28,24 @@ RSpec.describe FinancialAssistance::Income, type: :model do
 
     it "should save submission" do
       expect(FinancialAssistance::Income.create(valid_params).valid?(:submission)).to be_truthy
+    end
+  end
+
+  describe 'find' do
+    let!(:income) { FactoryGirl.create(:financial_assistance_income, applicant: applicant) }
+
+    context 'when proper applicant id is sent' do
+      it 'should return the applicant instance' do
+        instance = ::FinancialAssistance::Income.find income.id
+        expect(instance).to eq income
+      end
+    end
+
+    context 'when wrong id is sent' do
+      it 'should return nil' do
+        instance = ::FinancialAssistance::Income.find application.id
+        expect(instance).to be_nil
+      end
     end
   end
 

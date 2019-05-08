@@ -12,6 +12,11 @@ module FinancialAssistanceHelper
     return sum
   end
 
+  def applicant_name(applicant_id)
+    applicant = FinancialAssistance::Applicant.find applicant_id
+    applicant.person.full_name if applicant
+  end
+
   def total_aptc_across_tax_households(application_id)
     application = FinancialAssistance::Application.find(application_id)
     total_aptc = 0.0
@@ -203,10 +208,7 @@ module FinancialAssistanceHelper
 
   def income_and_deductions_for_any(application)
     return false if application.blank?
-    application.applicants.each do |applicant|
-      return true if income_and_deductions_for(applicant).present?
-    end
-    return false
+    application.applicants.any? {|applicant| income_and_deductions_for(applicant).present?}
   end
 
   def start_to_end_dates(embedded_document)

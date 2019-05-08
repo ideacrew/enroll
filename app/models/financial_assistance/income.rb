@@ -156,6 +156,15 @@ class FinancialAssistance::Income
   def hours_worked_per_week
   end
 
+  class << self
+    def find(id)
+      bson_id = BSON::ObjectId.from_string(id.to_s)
+      applications = ::FinancialAssistance::Application.where("applicants.incomes._id" => bson_id)
+      return unless applications.size == 1
+      applicants = applications.first.applicants.where("incomes._id" => bson_id)
+      applicants.size == 1 ? applicants.first.incomes.find(bson_id) : nil
+    end
+  end
 
 private
 
