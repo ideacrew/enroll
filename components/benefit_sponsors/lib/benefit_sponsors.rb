@@ -3,6 +3,7 @@ require "benefit_sponsors/engine"
 require "mongoid"
 require "aasm"
 require 'config'
+require 'interactor'
 
 module BenefitSponsors
 

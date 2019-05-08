@@ -2,7 +2,13 @@ source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '2.5.1'
-gem 'rails', '~> 5.2.3'
+
+
+if ENV['DEPENDENCIES_NEXT']
+  gem "rails", "6.0.0.rc1"
+else
+  gem "rails", "~> 5.2.3"
+end
 
 #######################################################
 # FIXME
@@ -70,7 +76,7 @@ gem 'haml',                     '~> 5.0'
 gem 'httparty',                 '~> 0.16'
 gem 'i18n',                     '~> 1.5'
 gem 'interactor',               '~> 3.0'
-gem 'interactor-rails',         '~> 2.2'
+#gem 'interactor-rails',         '~> 2.2'
 gem 'jbuilder',                 '~> 2.7'
 gem 'jquery-rails',             '~> 4.3'
 gem 'kaminari',                 '~> 0.17'
