@@ -4,7 +4,7 @@ Feature: HBX Admin should be able to send the broker application to pending stat
     Given a CCA site exists with a benefit market
     When there is a Broker XYZ
     And the broker is assigned to a broker agency
-    Then user visits the Broker Registration form
+    Then user goes to the Broker Registration form
 
   Scenario: Broker can enter ACH information
     Given user enters the personal and Broker Agency information

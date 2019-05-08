@@ -156,7 +156,7 @@ When(/^the user clicks the 'Confirm' button on the Employer Registration Form$/)
   find('.alert', text: "Welcome to Health Connector. Your account has been created.")
 end
 
-Given(/^user visits the Broker Registration form$/) do
+Given(/^user goes to the Broker Registration form$/) do
   visit '/'
   find(".interaction-click-control-broker-registration", wait: 10).click
   wait_for_ajax
