@@ -87,6 +87,8 @@ When(/^.+ clicks continue on waiver summary page/) do
 end
 
 Then("Employee should able to see Waiver tile") do
+  find('.interaction-click-control-shop-for-plans', wait: 5)
+
   expect(page).to have_content 'Waived'
   expect(page).to have_content 'Waived Date'
   expect(page).to have_content 'Reason Waived'

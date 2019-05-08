@@ -169,6 +169,7 @@ Then(/(.*) click on make changes button on passive renewal/) do |named_person|
 end
 
 Then(/Employee (.*) should see confirm your plan selection page/) do |named_person|
+  find('.interaction-click-control-confirm', wait: 5)
   expect(page).to have_content "Confirm Your Plan Selection"
 end
 

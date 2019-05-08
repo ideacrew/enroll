@@ -64,5 +64,5 @@ Feature: As an admin user I should have the ability to extend the OE
     And the user clicks on Force Publish button
     And the user clicks submit to confirm force publish
     Then a less than or equal warning message will appear
-    And the user clicks publish anyways
-    Then the user will see published sucessfully for review message
+    And the user clicks force publish
+    Then the user will see application ineligible message

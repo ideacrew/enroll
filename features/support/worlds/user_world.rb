@@ -25,6 +25,26 @@ module UserWorld
     end
   end
 
+  # def users_by_role(role_name = nil, *traits)
+  #  attributes = traits.extract_options!
+  #  @users_by_role ||= {}
+
+  #  if role_name.blank?
+  #    if @users_by_role.empty?
+  #      raise "No users by role present."
+  #    else
+  #      @users_by_role.values.first
+  #    end
+  #  else
+  #    #define_permissions unless Permission.where(name: role_name).present?
+  #    #role = Permission.where(name: role_name).first
+  #    @users_by_role_name[role_name] ||= FactoryBot.create(:user, roles: [role_name])
+  #  end
+  # end
+  
+  # perhaps should be an array for suroles
+  # example
+  # if @admin_roles[subrole]
   def admin(subrole)
     if @admin
       @admin
@@ -61,6 +81,8 @@ Given(/^that a user with a (.*?) role(?: with (.*?) subrole)? exists and (.*?) l
       user = employer_staff
     when 'Employee Role'
       user = employee_role
+    else
+      user = users_by_role(type)
   end
   case logged_in
     when 'is'
