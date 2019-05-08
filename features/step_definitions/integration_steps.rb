@@ -492,7 +492,7 @@ When(/^(.*) logs on to the (.*)?/) do |named_person, portal|
   person = people[named_person]
 
   visit "/"
-  portal_class = semantic_link_class(portal)
+  portal_class = "interaction-click-control-#{portal.downcase.gsub(/ /, '-')}"
   portal_uri = find("a.#{portal_class}")["href"]
 
   visit "/users/sign_in"
@@ -510,7 +510,7 @@ end
 
 When(/^user visits the (.*)?/) do |portal|
   visit "/"
-  portal_class = semantic_link_class(portal)
+  portal_class = "interaction-click-control-#{portal.downcase.gsub(/ /, '-')}"
   portal_uri = find("a.#{portal_class}")["href"]
   sleep 10
   visit portal_uri
@@ -990,7 +990,7 @@ When(/^(?:General){0}.+ clicks? on the ((?:General|Staff){0}.+) dropdown$/) do |
 end
 
 When(/^(?:General){0}.+ clicks? on the ((?:General|Staff){0}.+) option$/) do |tab_name|
-  find(semantic_link_class(tab_name), wait: 5).click
+  find(".interaction-click-control-#{tab_name.downcase.gsub(' ','-')}", wait: 5).click
   wait_for_ajax
   find('#myTabContent').click
 end
