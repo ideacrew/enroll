@@ -199,7 +199,7 @@ RSpec.describe "::FinancialAssistance::Factories::ConditionalFieldsLookupFactory
       end
     end
 
-    [:foster_care_us_state, :age_left_foster_care].each do |attribute|
+    [:foster_care_us_state, :age_left_foster_care, :had_medicaid_during_foster_care].each do |attribute|
       describe attribute.to_s do
         context 'where the current applicant was in foster care' do
           before do

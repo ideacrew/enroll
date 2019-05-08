@@ -81,6 +81,10 @@ module FinancialAssistance
         @instance.is_former_foster_care
       end
 
+      def had_medicaid_during_foster_care
+        @instance.is_former_foster_care
+      end
+
       def is_student
         @instance.student_age_satisfied?
       end
