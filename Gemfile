@@ -99,7 +99,7 @@ gem 'uglifier',                 '>= 4'
 gem 'virtus',                   '~> 1.0'
 gem 'wicked_pdf',               '~> 1.1.0'
 gem 'wkhtmltopdf-binary-edge',  '~> 0.12.3.0'
-gem 'webpacker',                '~> 3.4'
+gem 'webpacker',                '~> 4.0.2'
 
 
 group :doc do
@@ -111,6 +111,7 @@ group :development do
   gem 'overcommit',             '~> 0.47'
   gem 'rubocop',                require: false
   gem 'rubocop-rspec'
+  gem 'rubocop-git'
 
 
   # Access an interactive console on exception pages or by calling 'console' anywhere in the code.

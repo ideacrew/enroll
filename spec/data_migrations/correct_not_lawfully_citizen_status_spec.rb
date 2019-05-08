@@ -25,7 +25,6 @@ describe CorrectNotLawfullyCitizenStatus, dbclean: :after_each do
       allow(subject).to receive(:get_families).and_return([family])
       allow(subject).to receive(:get_enrollments).and_return([enrollment])
       allow(subject).to receive(:get_members).and_return([person])
-      allow(person).to receive(:versions).and_return([person2, person3])
       subject.migrate
     end
     it "assigns #{result} as citizen status if old status: #{old_state} and current status: #{new_state}" do

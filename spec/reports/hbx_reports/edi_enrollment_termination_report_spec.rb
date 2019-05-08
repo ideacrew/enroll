@@ -47,9 +47,6 @@ describe TerminatedHbxEnrollments, dbclean: :after_each do
                                              termination_submitted_on: Date.yesterday.midday,
                                              workflow_state_transitions: [workflow_state_transition2])}
 
-
-  let(:publisher) { double }
-
   before :all do
     DatabaseCleaner.clean
   end
@@ -71,19 +68,13 @@ describe TerminatedHbxEnrollments, dbclean: :after_each do
   end
 
   shared_examples_for "returns csv file list with terminated hbx_enrollments" do |field_name, result|
-    let(:time_now) { Time.now }
-    let!(:date) { Date.new(2018,1,1) }
-    let!(:fixed_time) { Time.parse("Jan 1 2018 10:00:00") }
-
     before :each do
-      ENV['start_date'] = nil
-      allow(TimeKeeper).to receive(:date_of_record).and_return(date)
-      allow(TimeKeeper).to receive(:datetime_of_record).and_return(fixed_time)
-     @file = File.expand_path("#{Rails.root}/public/CCA_test_EDIENROLLMENTTERMINATION_2018_01_01_10_00_00.csv")
-     allow(Time).to receive(:now).and_return(time_now)
-     allow(Publishers::Legacy::EdiEnrollmentTerminationReportPublisher).to receive(:new).and_return(publisher)
-     allow(publisher).to receive(:publish).with(URI.join("file://", @file))
-     subject.migrate
+      subject.migrate
+      @file = if individual_market_is_enabled?
+                Dir.glob(File.join(Rails.root, "/public/edi_enrollment_termination_report_*")).first
+              else
+                Dir.glob(File.join(Rails.root, "CCA_#{ENV["RAILS_ENV"]}_EDIENROLLMENTTERMINATION_*.csv"))
+              end
     end
 
     it "check the records included in file" do

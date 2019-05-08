@@ -15,6 +15,7 @@ class Insured::FamiliesController < FamiliesController
     build_employee_role_by_census_employee_id
     set_flash_by_announcement
     set_bookmark_url
+    set_admin_bookmark_url
     @active_sep = @family.latest_active_sep
 
     log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
@@ -41,6 +42,7 @@ class Insured::FamiliesController < FamiliesController
 
   def manage_family
     set_bookmark_url
+    set_admin_bookmark_url
     @family_members = @family.active_family_members
     @resident = @person.has_active_resident_role?
     # @employee_role = @person.employee_roles.first
@@ -317,10 +319,17 @@ class Insured::FamiliesController < FamiliesController
     elsif @person.has_active_consumer_role?
       if !(@person.addresses.present? || @person.no_dc_address.present? || @person.no_dc_address_reason.present?)
         redirect_to edit_insured_consumer_role_path(@person.consumer_role)
-      elsif @person.user && !@person.user.identity_verified?
+      elsif ridp_redirection
         redirect_to ridp_agreement_insured_consumer_role_index_path
       end
     end
+  end
+
+  def ridp_redirection
+    return false if current_user.has_hbx_staff_role?
+    consumer = @person.consumer_role
+    not_verified = ((@person.user.present? ? @person.user.identity_verified? : false) || consumer.identity_verified?) ? false : true
+    @person.user && not_verified
   end
 
   def update_changing_hbxs(hbxs)

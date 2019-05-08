@@ -1,4 +1,7 @@
 module FormWorld
+  include Employers::EmployerHelper
+  include Config::AcaHelper
+
   def fill_in_admin_create_plan_year_form
     first_element = find("#baStartDate > option:nth-child(2)").text
     select(first_element, :from => "baStartDate")
@@ -33,14 +36,14 @@ module FormWorld
     fill_in 'agency_organization_dba', with: registering_employer.dba
     fill_in 'agency_organization_fein', with: registering_employer.fein
     select 'Tax Exempt Organization', from: 'agency_organization_entity_kind'
-    select "0111", from: "agency_organization_profile_attributes_sic_code"
+    select "0111", from: "agency_organization_profile_attributes_sic_code" if display_sic_field_for_employer?
     fill_in 'inputAddress1', with: registering_employer.employer_profile.office_locations.first.address.address_1
     fill_in 'agency_organization_profile_attributes_office_locations_attributes_0_address_attributes_city', with: registering_employer.employer_profile.office_locations.first.address.city
     select registering_employer.employer_profile.office_locations.first.address.state, from: 'inputState'
     fill_in 'inputZip', with: registering_employer.employer_profile.office_locations.first.address.zip
     fill_in 'inputAreacode', with: registering_employer.employer_profile.office_locations.first.phone.area_code
     phone_number2.set registering_employer.employer_profile.office_locations.first.phone.number
-    select 'Radio', from: 'referred-by-select'
+    select 'Radio', from: 'referred-by-select' if display_referred_by_field_for_employer?
   end
 
   def fill_in_registration_form_employer_personal_information_registration_form
@@ -165,9 +168,11 @@ And(/^user enters the personal and Broker Agency information$/) do
 end
 
 And(/^user enters the ach routing information$/) do
-  fill_in 'agency[organization][profile_attributes][ach_account_number]', with: '99999999999999'
-  fill_in 'agency[organization][profile_attributes][ach_routing_number]', with: '123456789'
-  fill_in 'agency[organization][profile_attributes][ach_routing_number_confirmation]', with: '123456789'
+  if aca_broker_routing_information
+    fill_in 'agency[organization][profile_attributes][ach_account_number]', with: '99999999999999'
+    fill_in 'agency[organization][profile_attributes][ach_routing_number]', with: '123456789'
+    fill_in 'agency[organization][profile_attributes][ach_routing_number_confirmation]', with: '123456789'
+  end
 end
 
 And(/^user enters the office locations and phones$/) do

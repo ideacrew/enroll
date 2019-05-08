@@ -3,14 +3,13 @@
 module BrokerWorld
   def broker(*traits)
     attributes = traits.extract_options!
-    @broker ||= FactoryBot.create :user, *traits, attributes
+    @broker ||= FactoryBot.create(:user, :broker_with_person, *traits, attributes)
   end
 
   def broker_agency(*traits)
     attributes = traits.extract_options!
     @broker_agency ||= FactoryBot.create :broker, *traits, attributes
   end
-
 end
 
 World(BrokerWorld)
@@ -26,7 +25,7 @@ Given (/^that a broker exists$/) do
 end
 
 And(/^the broker is signed in$/) do
-  login_as broker, scope: :user
+  login_as broker
 end
 
 When(/^he visits the Roster Quoting tool$/) do

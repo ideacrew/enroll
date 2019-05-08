@@ -50,7 +50,7 @@ Then /^a pending approval status$/ do
 end
 
 When /^the HBX admin visits the general agency list$/ do
-  login_as hbx_admin, scope: :user
+  login_as hbx_admin
   visit exchanges_hbx_profiles_root_path
   click_link 'General Agencies'
 end

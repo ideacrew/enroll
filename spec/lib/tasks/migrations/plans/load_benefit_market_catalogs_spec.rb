@@ -37,8 +37,8 @@ describe "load_benefit_market_catalogs", dbclean: :after_each do
 
   end
 
-  let!(:site) {FactoryBot.create(:benefit_sponsors_site, :with_owner_exempt_organization, site_key: :mhc)}
-  let!(:bm) {FactoryBot.create(:benefit_markets_benefit_market, site: site, site_urn: :cca)}
+  let!(:site) {FactoryBot.create(:benefit_sponsors_site, :with_owner_exempt_organization, site_key: Settings.site.key)}
+  let!(:bm) {FactoryBot.create(:benefit_markets_benefit_market, site: site, site_urn: Settings.site.key)}
   let!(:pp_issuer) {FactoryBot.build(:benefit_markets_products_product_package, package_kind: :single_issuer)}
   let!(:pp_product) {FactoryBot.build(:benefit_markets_products_product_package, package_kind: :single_product)}
   let!(:pp_metal) {FactoryBot.build(:benefit_markets_products_product_package, package_kind: :metal_level)}

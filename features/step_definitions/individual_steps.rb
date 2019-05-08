@@ -71,7 +71,7 @@ end
 
 When(/^\w+ clicks? on continue button$/) do
   wait_for_ajax
-  find('.btn', text: 'CONTINUE').click
+  find('.interaction-click-control-continue', text: 'Continue').click
 end
 
 Then(/^.+ should see heading labeled personal information/) do
@@ -90,11 +90,10 @@ Then(/Individual should see a form to enter personal information$/) do
   find(:xpath, '//label[@for="indian_tribe_member_no"]').click
 
   find(:xpath, '//label[@for="radio_incarcerated_no"]').click
-
   fill_in "person_addresses_attributes_0_address_1", :with => "4900 USAA BLVD"
   fill_in "person_addresses_attributes_0_address_2", :with => "212"
   fill_in "person_addresses_attributes_0_city", :with=> "Washington"
-  find(:xpath, "//p[@class='label'][contains(., 'SELECT STATE')]").click
+  find('.interaction-choice-control-state-id', text: 'SELECT STATE *').click
   find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[3]/div/ul/li[10]').click
   fill_in "person[addresses_attributes][0][zip]", :with => "20002"
   fill_in "person[phones_attributes][0][full_phone_number]", :with => "9999999999"
@@ -175,7 +174,7 @@ Then(/^\w+ should see identity verification page and clicks on submit/) do
   screenshot("identify_verification")
   click_button "Submit"
   screenshot("override")
-  click_link "Please click here once you have contacted the exchange and have been told to proceed."
+  click_link "Continue Application"
 end
 
 Then(/\w+ should see the dependents form/) do
@@ -230,7 +229,7 @@ And(/I click on continue button on household info form/) do
 end
 
 Then(/Individual creates a new HBX account$/) do
-  click_button 'Create account', :wait => 10
+  find('.interaction-click-control-create-account').click
   fill_in "user[oim_id]", :with => "testflow@test.com"
   fill_in "user[password]", :with => "aA1!aA1!aA1!"
   fill_in "user[password_confirmation]", :with => "aA1!aA1!aA1!"

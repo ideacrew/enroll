@@ -1,4 +1,4 @@
-@individual_enabled
+@wip
 Feature: Consumer shops for plan with existing seps
 
   Scenario: Consumer work flow if he selects existing sep

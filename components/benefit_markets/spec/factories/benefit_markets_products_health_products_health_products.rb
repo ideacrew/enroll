@@ -9,6 +9,7 @@ FactoryBot.define do
     description          { "Highest rated and highest value" }
     health_plan_kind     { :pos }
     ehb                  { 0.9943 }
+    network_information  { 'DC Metro' }
     metal_level_kind     { BenefitMarkets::Products::HealthProducts::HealthProduct::METAL_LEVEL_KINDS.sample }
 
     product_package_kinds { [:single_product, :single_issuer, :metal_level] }

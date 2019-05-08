@@ -85,6 +85,9 @@ describe HbxProfilePolicy do
       expect(policy.approve_ga?).to be true
       expect(policy.view_the_configuration_tab?).to be false
       expect(policy.can_submit_time_travel_request?).to be false
+      expect(policy.can_access_accept_reject_identity_documents?).to be false
+      expect(policy.can_access_accept_reject_paper_application_documents?).to be false
+      expect(policy.can_delete_identity_application_documents?).to be false
     end
 
     it 'hbx_read_only' do
@@ -96,6 +99,9 @@ describe HbxProfilePolicy do
       expect(policy.approve_ga?).to be false
       expect(policy.view_the_configuration_tab?).to be false
       expect(policy.can_submit_time_travel_request?).to be false
+      expect(policy.can_access_accept_reject_identity_documents?).to be false
+      expect(policy.can_access_accept_reject_paper_application_documents?).to be false
+      expect(policy.can_delete_identity_application_documents?).to be false
     end
 
     it 'hbx_csr_supervisor' do
@@ -107,6 +113,9 @@ describe HbxProfilePolicy do
       expect(policy.approve_ga?).to be false
       expect(policy.view_the_configuration_tab?).to be false
       expect(policy.can_submit_time_travel_request?).to be false
+      expect(policy.can_access_accept_reject_identity_documents?).to be false
+      expect(policy.can_access_accept_reject_paper_application_documents?).to be false
+      expect(policy.can_delete_identity_application_documents?).to be false
     end
 
     it 'hbx_csr_tier2' do
@@ -118,6 +127,9 @@ describe HbxProfilePolicy do
       expect(policy.approve_ga?).to be false
       expect(policy.view_the_configuration_tab?).to be false
       expect(policy.can_submit_time_travel_request?).to be false
+      expect(policy.can_access_accept_reject_identity_documents?).to be false
+      expect(policy.can_access_accept_reject_paper_application_documents?).to be false
+      expect(policy.can_delete_identity_application_documents?).to be false
     end
 
     it 'csr_tier1' do
@@ -160,6 +172,9 @@ describe HbxProfilePolicy do
 
     it "is prohibited from approving GAs" do
       expect(policy.approve_ga?).to be false
+      expect(policy.can_access_accept_reject_identity_documents?).to be false
+      expect(policy.can_access_accept_reject_paper_application_documents?).to be false
+      expect(policy.can_delete_identity_application_documents?).to be false
     end
 
     it "is prohibited from extending open enrollment" do

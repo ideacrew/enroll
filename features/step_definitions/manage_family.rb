@@ -1,5 +1,5 @@
 Given(/^Employer exists and logs in$/) do
-  login_as @staff_role, scope: :user
+  login_as @staff_role
 end
 
 Then(/^Employee should click on Manage Family button$/) do
@@ -11,8 +11,10 @@ Then(/^Employee should click on the Personal Tab link$/) do
 end
 
 Then(/^Employee should click on Change my Password link$/) do
-  wait_for_ajax
-  page.execute_script("document.querySelector('#change_password_link').click()")
+  if aca_security_questions
+    wait_for_ajax
+    page.execute_script("document.querySelector('#change_password_link').click()")
+  end
 end
 
 Then(/they can submit a new password/) do

@@ -24,12 +24,12 @@ Feature: Employee termination and Re-hire functionality
     And employer clicks on submit button by entering todays date
     Then employer should see the rehired success flash notice
 
-  Scenario: Employer terminated EE with DOT in past greater than 60 days
-    Given staff role person logged in
-    And ABC Widgets employer visit the Employee Roster
-    And employer clicks on Actions drop down for one of active employee
-    And employer should see the terminate button
-    When employer clicks on terminate button
-    Then employer should see Enter termination date to remove text
-    And employer clicks on Terminate Employee button with date as past greater than 60 days
-    Then employer should see the error flash notice
+#  Scenario: Employer terminated EE with DOT in past greater than 60 days
+#    Given staff role person logged in
+#    And ABC Widgets employer visit the Employee Roster
+#    And employer clicks on Actions drop down for one of active employee
+#    And employer should see the terminate button
+#    When employer clicks on terminate button
+#    Then employer should see Enter termination date to remove text
+#    And employer clicks on Terminate Employee button with date as past greater than 60 days
+#    Then employer should see the error flash notice

@@ -1,5 +1,10 @@
 module BenefitSponsors
   module ApplicationHelper
+    include ::Webpacker::Helper
+
+    def current_webpacker_instance
+      BenefitSponsors.webpacker
+    end
 
     def bootstrap_class_for flash_type
       case flash_type

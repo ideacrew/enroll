@@ -1,5 +1,5 @@
 site:
-  key: :cca
+  key: :dc
   subdomain: "mhc"
   domain_name: "hbxshop.org"
   site_title: "Massachusetts Health Connector for Business"
@@ -18,7 +18,7 @@ site:
   main_web_address: "www.MAhealthconnector.org"
   health_care_website: "www.healthcare.gov"
   health_care_website_url: "https://www.healthcare.gov"
-  short_name: "Health Connector"
+  short_name: "DC Health Link"
   byline: "The Right Place for the Right Plan"
   long_name: "Massachusetts Health Connector"
   copyright_period_start: "2017"
@@ -28,7 +28,7 @@ site:
   tab_icon: 'favicon.ico'
   mailer_logo_file_name: "health_connector.png"
   employer_application_deadline_link: "https://www.mahealthconnector.org/business/employers/employer-resources-and-information/employer-coverage-deadlines"
-  s3_prefix: "mhc"
+  s3_prefix: "dc"
   broker_quoting_enabled: false
   broker_claim_quoting_enabled: true
   guidance_for_business_owners_url: "https://www.mahealthconnector.org/help-center-answers/guidance-for-business-owners"
@@ -97,16 +97,16 @@ contact_center:
 
 plan_option_titles:
   sole_source: 'One Plan'
-  metal_level: 'One Level'
-  single_carrier: 'One Carrier'
-  single_plan: 'One Plan'
+  metal_level: 'By Metal Level'
+  single_carrier: 'By Carrier'
+  single_plan: 'Single Plan'
   plan_year_tooltip: "Employer premium contribution for Employee Only Health Plans must be at least"
 
 plan_option_descriptions:
   sole_source: "Choose one plan and your contribution amount. All employees can enroll in that plan."
-  metal_level: "Choose a benefit level and your contribution amount. Your employees will be able to choose a plan offered by any insurance carrier at that benefit level."
-  single_carrier: "Choose an insurance carrier and your contribution amount. Your employees will be able to choose a plan from that carrier at any benefit level."
-  single_plan: "Choose one plan and your contribution amount. All employees can enroll in that plan."
+  metal_level: "Select your preferred metal level. Your plan participants will be able to choose any plan by any carrier within the metal level you select. Your costs will be fixed to a specific plan you’ll choose in a minute. Bronze means the plan is expected to pay 60% of expenses for an average population of consumers, Silver 70%, Gold 80% and Platinum 90%."
+  single_carrier: "Select your preferred insurance company carrier. Your plan participants will be able to choose any plan offered by the carrier you select. Your costs will be fixed to a specific plan you’ll choose in a minute."
+  single_plan: "Select your preferred insurance company carrier. You will then select one plan and it'll be the only plan your participants can choose. It'll never cost you more to let your plan participants choose by carrier or by metal level. Are you sure you only want to offer a single plan?"
   dental:
     single_plan: "For Dental coverage, you will choose one dental plan from one carrier as the option that all of your employees can enroll in."
 
@@ -131,11 +131,11 @@ invoices:
   addendum: 'ma_non_discrimination_and_language_tags.pdf'
 
 aca:
-  state_name: "Massachusetts"
-  state_abbreviation: "MA"
-  market_kinds: ["shop"]
+  state_name: "District of Columbia"
+  state_abbreviation: "DC"
+  market_kinds: ["shop", "individual"]
   hbx_abbreviation: "DC Health Benefit Exchange"
-  nationwide_markets: false
+  nationwide_markets: true
   general_agency_enabled: true
   broker_carrier_appointments_enabled: true
   dental_market_enabled: true
@@ -143,10 +143,10 @@ aca:
   dental_plan_years_available: [""]
   minimum_primary_contribution_percentage: 50
   minimum_family_contribution_percentage: 30
-  address_query_county: true
-  broker_routing_information: true
+  address_query_county: false
+  broker_routing_information: false
   recaptcha_enabled: false
-  security_questions: true
+  security_questions: false
   user_accounts_enabled: true
   plan_options_available: ["sole_source", "single_carrier", "metal_level"]
   dental_plan_options_available: ["single_plan"]
@@ -163,7 +163,7 @@ aca:
 
   qle:
     with_in_sixty_days: 60
-#
+  #
   individual_market:
     monthly_enrollment_due_on: 15
     verification_outstanding_window:
@@ -172,16 +172,13 @@ aca:
       days: 95
 
     open_enrollment:
-      # start_on: <%= Date.new(2017,11,1) %>
-      # end_on: <%= Date.new(2018,02,05) %>
       start_on: <%= Date.new(2018,11,1) %>
-      end_on: <%= Date.new(2019,01,31) %>
-    dc_resident_application: true
-    transition_family_members_link: true
-
+      end_on: <%= Date.new(2019,02,8) %>
+      # dc_resident_application: true
+      # transition_family_members_link: true
     upcoming_open_enrollment:
-      start_on: <%= Date.new(2018,11,1) %>
-      end_on: <%= Date.new(2019,01,31) %>
+      start_on: <%= Date.new(2019,11,1) %>
+      end_on: <%= Date.new(2020,01,31) %>
 
   shop_market:
     valid_employer_attestation_documents_url: 'https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist'
@@ -266,14 +263,15 @@ aca:
     employer_transmission_day_of_month: 26
   transmit_employers_immediately: false
   employer_has_sic_field: false
+  employer_registration_has_referred_by_field: false
   validate_county: false
 
   use_simple_employer_calculation_model: false
   carrier_special_plan_identifier_namespace: "urn:MA:terms:v1:plan:super_group_id#"
-  offerings_constrained_to_service_areas: true
-  employer_attestation: true
-  enforce_employer_attestation: true
-  plan_match_tool: false
+  offerings_constrained_to_service_areas: false
+  employer_attestation: false
+  enforce_employer_attestation: false
+  plan_match_tool: true
   rating_areas:
     - R-MA001
     - R-MA002

@@ -9,7 +9,7 @@ describe "CcaEmployerProfilesMigration" do
     end
   end
 
-  describe ".up", dbclean: :after_each do
+  xdescribe ".up", dbclean: :after_each do
 
     before :each do
       organization = FactoryBot.create(:organization, legal_name: "bk_one", dba: "bk_corp", home_page: "http://www.example.com")

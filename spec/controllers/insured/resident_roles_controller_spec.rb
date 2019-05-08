@@ -48,7 +48,7 @@ RSpec.describe Exchanges::ResidentsController, :type => :controller do
     end
     it "should render edit template" do
       sign_in user
-      get :edit, id: "test"
+      get :edit, params: { id: "test" }
       expect(response).to have_http_status(:success)
       expect(response).to render_template(:edit)
     end
@@ -68,7 +68,7 @@ RSpec.describe Exchanges::ResidentsController, :type => :controller do
 
     it "should update existing person" do
       allow(resident_role).to receive(:update_by_person).and_return(true)
-      put :update, person: person_params, id: "test"
+      put :update, params: { person: person_params, id: "test" }
       expect(response).to have_http_status(:redirect)
       expect(response).to redirect_to(ridp_bypass_exchanges_residents_path)
     end

@@ -56,14 +56,16 @@ fieldset.mt-2
       br
       br
       = render partial: './ui-components/v1/forms/office_locations/office_location_fields', locals: {f: f_profile}
-      h4.mt-1 Referred By *
-      = f_profile.select :referred_by, options_for_select(f_profile.object.referred_by_options, selected: f_profile.object.try(:referred_by)), { prompt: "How did you find out about the Massachusetts Health Connector?"}, {:required => true, :class => "form-control", id: "referred-by-select"}
-      .invalid-feedback
-        |
-          Please select referred by.
-      br
-      = f_profile.text_area :referred_reason, :placeholder => "Other (please describe) *", class: "form-control hidden", id: "other-reason-textarea"
-      br
+
+      - if display_referred_by_field_for_employer?
+        h4.mt-1 Referred By *
+        = f_profile.select :referred_by, options_for_select(f_profile.object.referred_by_options, selected: f_profile.object.try(:referred_by)), { prompt: "How did you find out about the Massachusetts Health Connector?"}, {:required => true, :class => "form-control", id: "referred-by-select"}
+        .invalid-feedback
+          |
+            Please select referred by.
+        br
+        = f_profile.text_area :referred_reason, :placeholder => "Other (please describe) *", class: "form-control hidden", id: "other-reason-textarea"
+        br
       h4.mt-1 Please indicate preferred method to receive notices (OPTIONAL)
       = f_profile.select :contact_method, options_for_select(f_profile.object.contact_method_options, selected: f_profile.object.contact_method[1]), {}, class:'form-control'
       = f.submit "Confirm", class: "btn btn-primary pull-right mt-2"

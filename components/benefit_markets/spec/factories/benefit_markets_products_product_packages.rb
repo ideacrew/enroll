@@ -25,7 +25,7 @@ FactoryBot.define do
 
     after(:build) do |product_package, evaluator|
 
-      county_zip_id = evaluator.county_zip_id || create(:benefit_markets_locations_county_zip, county_name: 'Middlesex', zip: '01754', state: 'MA').id
+      county_zip_id = evaluator.county_zip_id || create(:benefit_markets_locations_county_zip, county_name: 'Middlesex', zip: '20024', state: Settings.aca.state_abbreviation).id
       service_area  = evaluator.service_area || create(:benefit_markets_locations_service_area, county_zip_ids: [county_zip_id], active_year: product_package.application_period.min.year)
 
       case product_package.product_kind

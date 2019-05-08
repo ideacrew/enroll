@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe "CcaBrokerAgencyProfilesMigration" do
+xdescribe "CcaBrokerAgencyProfilesMigration" do
 
   before :all do
     Dir[Rails.root.join('db', 'migrate', '*_cca_broker_agency_profiles_migration.rb')].each do |f|
@@ -9,7 +9,7 @@ describe "CcaBrokerAgencyProfilesMigration" do
     end
   end
 
-  describe ".up", dbclean: :after_each do
+  xdescribe ".up", dbclean: :after_each do
 
     before :each do
       FactoryBot.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, site_key: :cca)

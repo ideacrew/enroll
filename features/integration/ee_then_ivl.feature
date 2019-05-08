@@ -1,4 +1,4 @@
-@individual_enabled
+@wip
 Feature: Insured Enrolls as Employee then as Consumer and then does IVL purchase
   Scenario: New insured user purchases on individual market
      Given Individual has not signed up as an HBX user

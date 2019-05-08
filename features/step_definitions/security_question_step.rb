@@ -1,9 +1,17 @@
-def question_attrs
-  { title: 'Updated security question', visible: false }
+# frozen_string_literal: true
+
+module SecurityQuestionsHelper
+  include Config::AcaHelper
+
+  def question_attrs
+    { title: 'Updated security question', visible: false }
+  end
 end
 
+World(SecurityQuestionsHelper)
+
 Given 'There are preloaded security question on the system' do
-  step "there are 3 preloaded security questions"
+  step "there are 3 preloaded security questions" if aca_security_questions
 end
 
 Given(/^the user click on config drop down in the Admin Tab$/) do
@@ -15,8 +23,10 @@ Then(/^user should able to see Secuity Questions$/) do
 end
 
 Then(/^there is (\d+) questions available in the list$/) do |num|
-  sleep 3
-  expect(page.all('table.table-wrapper tbody tr').count).to eq(num.to_i)
+  if aca_security_questions
+    sleep 3
+    expect(page.all('table.table-wrapper tbody tr').count).to eq(num.to_i)
+  end
 end
 
 When(/^Hbx Admin clicks on (.*?) Question link$/) do |link|
@@ -77,7 +87,7 @@ Then 'I confirm the delete question popup' do
 end
 
 Given(/^user click on Security Question link$/) do
-  find_link('Security Question').click
+  find_link('Security Question').click if aca_security_questions
 end
 
 When(/^Hbx Admin click on Edit Question link$/) do
@@ -102,15 +112,17 @@ end
 
 # Old one, doesn't seem to be working for choosing the questions
 Then(/^I select the all security question and give the answer$/) do
-  step 'user fills out the security questions modal'
+  step 'user fills out the security questions modal' if aca_security_questions
 end
 
 When(/^user fills out the security questions modal$/) do
-  security_questions = SecurityQuestion.all.to_a.map(&:id)
-  (0..2).each do |num|
-    question_select_id = "sec-#{num}"
-    page.execute_script("document.getElementById('#{question_select_id}').value = '#{security_questions[num].to_s}';")
-    page.all('.interaction-field-control-security-question-response-question-answer', visible: false)[num].set("Answer #{num+1}")
+  if aca_security_questions
+    security_questions = SecurityQuestion.all.to_a.map(&:id)
+    (0..2).each do |num|
+      question_select_id = "sec-#{num}"
+      page.execute_script("document.getElementById('#{question_select_id}').value = '#{security_questions[num]}';")
+      page.all('.interaction-field-control-security-question-response-question-answer', visible: false)[num].set("Answer #{num + 1}")
+    end
   end
 end
 
@@ -122,9 +134,11 @@ When(/^.+ submits termination reason$/) do
 end
 
 When(/I have submitted the security questions$/) do
-  screenshot("group_selection")
-  sleep 1
-  find('.interaction-click-control-save-responses').click
+  if aca_security_questions
+    screenshot("group_selection")
+    sleep 1
+    find('.interaction-click-control-save-responses').click
+  end
 end
 
 Then 'I have landed on employer profile page' do

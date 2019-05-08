@@ -15,28 +15,26 @@ Feature: Employee with current date of hire
     And Acme Inc. employer has a staff role
     And there is a census employee record for Patrick Doe for employer Acme Inc.
 
-  Scenario: New hire has enrollment period based on hired date
-    Given staff role person logged in
-    And Employee has current hired on date
-    And Acme Inc. employer visit the Employee Roster
-    Then Employer logs out
-    Given Employee has not signed up as an HBX user
-    And Patrick Doe visits the employee portal
-    When Patrick Doe creates an HBX account
-    And I select the all security question and give the answer
-    When I have submitted the security questions
-    When Employee goes to register as an employee
-    Then Employee should see the employee search page
-    When Employee enters the identifying info of Patrick Doe
-    Then Employee should see the matched employee record form
-    When Employee accepts the matched employer
-    When Employee completes the matched employee form for Patrick Doe
-    And Employee sees the Household Info: Family Members page and clicks Continue
-    And Employee sees the Choose Coverage for your Household page and clicks Continue
-    And Employee selects the first plan available
-    And Employee clicks Confirm
-    And Employee sees the Enrollment Submitted page and clicks Continue
-    Then Employee should see the "my account" page
+#  Scenario: New hire has enrollment period based on hired date
+#    Given staff role person logged in
+#    And Employee has current hired on date
+#    And Acme Inc. employer visit the Employee Roster
+#    Then Employer logs out
+#    Given Employee has not signed up as an HBX user
+#    And Patrick Doe visits the employee portal
+#    When Patrick Doe creates an HBX account
+#    When Employee goes to register as an employee
+#    Then Employee should see the employee search page
+#    When Employee enters the identifying info of Patrick Doe
+#    Then Employee should see the matched employee record form
+#    When Employee accepts the matched employer
+#    When Employee completes the matched employee form for Patrick Doe
+#    And Employee sees the Household Info: Family Members page and clicks Continue
+#    And Employee sees the Choose Coverage for your Household page and clicks Continue
+#    And Employee selects the first plan available
+#    And Employee clicks Confirm
+#    And Employee sees the Enrollment Submitted page and clicks Continue
+#    Then Employee should see the "my account" page
 
     Given Acme Inc. eligibility rule has been set to first of month following or coinciding with date of hire
     Then Employee tries to complete purchase of another plan

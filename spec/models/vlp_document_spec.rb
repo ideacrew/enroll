@@ -13,7 +13,7 @@ RSpec.describe VlpDocument, :type => :model do
 
     it "returns number of uploaded documents" do
       person2.consumer_role.vlp_documents.first.identifier = "url"
-      expect(person2.consumer_role.vlp_documents.uploaded.count).to eq(1)
+      expect(person2.consumer_role.vlp_documents.select{|d| d.identifier.present?}.count).to eq(1)
     end
   end
 end
