@@ -43,7 +43,7 @@ class InvitationsController < ApplicationController
 
   def require_login_and_allow_new_account
     person = Person.find(params[:person_id]) if params[:person_id]
-    if person && person.user
+    if person&.user
       invitation = Invitation.find(params[:id])
       staff_role = BrokerAgencyStaffRole.find(invitation.source_id)
       session[:portal] = benefit_sponsors.profiles_broker_agencies_broker_agency_profile_path(staff_role.benefit_sponsors_broker_agency_profile_id)

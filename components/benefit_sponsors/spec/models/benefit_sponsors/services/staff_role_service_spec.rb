@@ -77,19 +77,19 @@ module BenefitSponsors
       end
 
       context "adding broker staff role for new person" do
-          let!(:new_person) { FactoryGirl.create(:person) }
-          let(:staff_role_form) { BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(
-              profile_id: broker_agency_profile.id,
-              profile_type: "broker_agency_staff",
-              first_name: new_person.first_name,
-              last_name: new_person.last_name,
-              dob: new_person.dob.to_s,
-              email: "steve@gmail.com")
-          }
+        let!(:new_person) { FactoryBot.create(:person) }
+        let(:staff_role_form) do
+          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(profile_id: broker_agency_profile.id,
+                                                                               profile_type: "broker_agency_staff",
+                                                                               first_name: new_person.first_name,
+                                                                               last_name: new_person.last_name,
+                                                                               dob: new_person.dob.to_s,
+                                                                               email: "steve@gmail.com")
+        end
 
-          it 'should add broker staff role for broker agency profile' do
-            expect(subject.add_profile_representative!(staff_role_form)).to eq [true, new_person]
-          end
+        it 'should add broker staff role for broker agency profile' do
+          expect(subject.add_profile_representative!(staff_role_form)).to eq [true, new_person]
+        end
       end
 
       context "adding person to broker agency in which he is already a staff" do

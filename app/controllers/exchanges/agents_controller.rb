@@ -88,7 +88,7 @@ class Exchanges::AgentsController < ApplicationController
 
   def user_permission_satisfied?
     @roles = []
-    ['agent', 'hbx_staff', 'broker', 'broker_agency_staff', 'general_agency_staff'].each do|role|
+    ['agent', 'hbx_staff', 'broker', 'broker_agency_staff', 'general_agency_staff'].each do |role|
       @roles << current_user.public_send("has_#{role}_role?")
     end
     @roles.include?(true) ? true : false
