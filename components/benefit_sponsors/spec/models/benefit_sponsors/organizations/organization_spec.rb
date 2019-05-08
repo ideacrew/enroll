@@ -111,14 +111,14 @@ module BenefitSponsors
     context "search for broker agencies" do
       let!(:site)                          { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
       let(:organization_with_hbx_profile)  { site.owner_organization }
-      let!(:organization)                  { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+      let!(:organization)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
       let!(:broker_agency_profile1) { organization.broker_agency_profile }
 
-      let!(:second_organization)                  { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+      let!(:second_organization)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
       let!(:second_broker_agency_profile) { second_organization.broker_agency_profile }
       let!(:subject) { BenefitSponsors::Organizations::Organization }
-      let!(:new_person_for_staff) { FactoryGirl.create(:person) }
-      let!(:broker_role) { FactoryGirl.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile1.id, person: new_person_for_staff) }
+      let!(:new_person_for_staff) { FactoryBot.create(:person) }
+      let!(:broker_role) { FactoryBot.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile1.id, person: new_person_for_staff) }
 
 
       let(:bap_id) { organization.broker_agency_profile.id }

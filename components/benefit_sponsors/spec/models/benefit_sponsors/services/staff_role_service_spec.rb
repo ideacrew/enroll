@@ -8,18 +8,18 @@ module BenefitSponsors
     let(:employer_organization)   { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let(:employer_profile)        { employer_organization.employer_profile }
 
-    let!(:broker_organization)                  { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+    let!(:broker_organization)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
 
     let(:broker_agency_profile) { broker_organization.broker_agency_profile }
 
 
     # let!(:employer_profile) {benefit_sponsor.employer_profile}
-    let!(:active_employer_staff_role) {FactoryGirl.build(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
-    let!(:person) { FactoryGirl.create(:person, employer_staff_roles:[active_employer_staff_role]) }
-    let!(:broker_agency_staff_role) {FactoryGirl.build(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id)}
-    let!(:active_employer_staff_role) {FactoryGirl.build(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
-    let!(:broker_person) { FactoryGirl.create(:person) }
-    let(:user) { FactoryGirl.create(:user, :person => person)}
+    let!(:active_employer_staff_role) {FactoryBot.build(:benefit_sponsor_employer_staff_role, aasm_state: 'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
+    let!(:person) { FactoryBot.create(:person, employer_staff_roles: [active_employer_staff_role]) }
+    let!(:broker_agency_staff_role) {FactoryBot.build(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id)}
+    let!(:active_employer_staff_role) {FactoryBot.build(:benefit_sponsor_employer_staff_role, aasm_state: 'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
+    let!(:broker_person) { FactoryBot.create(:person) }
+    let(:user) { FactoryBot.create(:user, :person => person)}
 
     describe ".find_profile" do
 
@@ -189,7 +189,7 @@ module BenefitSponsors
     describe ".match_or_create_person", dbclean: :after_each do
       context 'when more than 1 person matched' do
         before :each do
-          2.times { FactoryGirl.create(:person, first_name: "steve", last_name: "smith", dob: "10/10/1974") }
+          2.times { FactoryBot.create(:person, first_name: "steve", last_name: "smith", dob: "10/10/1974") }
         end
 
         let(:staff_role_form) { BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(
@@ -262,15 +262,15 @@ module BenefitSponsors
 
     describe ".add_broker_agency_staff_role", dbclean: :after_each  do
 
-      let!(:broker_organization)                  { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+      let!(:broker_organization)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
 
       let(:broker_agency_profile) { broker_organization.broker_agency_profile }
       let(:person_params) {{first_name: Forgery('name').first_name, last_name: Forgery('name').first_name, dob: '1990/05/01'}}
-      let(:person1) {FactoryGirl.create(:person, person_params)}
+      let(:person1) {FactoryBot.create(:person, person_params)}
 
       context 'duplicate person PII' do
         before do
-          FactoryGirl.create(:person, person_params)
+          FactoryBot.create(:person, person_params)
           @status, @result = subject.add_broker_agency_staff_role(person1.first_name, person1.last_name, person1.dob,'#default@email.com', broker_agency_profile )
         end
         it 'returns false' do
@@ -323,15 +323,15 @@ module BenefitSponsors
     end
 
     describe ".deactivate_broker_agency_staff_role" do
-      let(:person) {FactoryGirl.create(:person)}
-      let!(:broker_organization)                  { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+      let(:person) {FactoryBot.create(:person)}
+      let!(:broker_organization)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
 
       let(:broker_agency_profile) { broker_organization.broker_agency_profile }
-      let!(:broker_organization_second)                  { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+      let!(:broker_organization_second)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
 
       let(:broker_agency_profile_second) { broker_organization_second.broker_agency_profile }
       before{
-        FactoryGirl.create(:broker_agency_staff_role, broker_agency_profile_id:broker_agency_profile.id, person: person, broker_agency_profile: broker_agency_profile, aasm_state: 'active')
+        FactoryBot.create(:broker_agency_staff_role, broker_agency_profile_id: broker_agency_profile.id, person: person, broker_agency_profile: broker_agency_profile, aasm_state: 'active')
       }
 
       context 'finds the person and deactivates the role' do

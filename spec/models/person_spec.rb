@@ -1357,17 +1357,17 @@ describe Person, :dbclean => :after_each do
   end
 
   describe 'get staff for broker' do
-    let(:broker_agency_profile) {FactoryGirl.create(:broker_agency_profile)}
-    let(:broker_staff_people) { FactoryGirl.create_list(:person, 5)}
-    let(:terminated_staff_member) { FactoryGirl.create(:person)}
-    let(:pending_staff_member) { FactoryGirl.create(:person)}
+    let(:broker_agency_profile) {FactoryBot.create(:broker_agency_profile)}
+    let(:broker_staff_people) { FactoryBot.create_list(:person, 5)}
+    let(:terminated_staff_member) { FactoryBot.create(:person)}
+    let(:pending_staff_member) { FactoryBot.create(:person)}
 
     before{
       broker_staff_people.each do |person|
-        FactoryGirl.create(:broker_agency_staff_role, broker_agency_profile_id:broker_agency_profile.id, person: person, broker_agency_profile: broker_agency_profile, aasm_state: 'active')
+        FactoryBot.create(:broker_agency_staff_role, broker_agency_profile_id: broker_agency_profile.id, person: person, broker_agency_profile: broker_agency_profile, aasm_state: 'active')
       end
-      FactoryGirl.create(:broker_agency_staff_role, broker_agency_profile_id:broker_agency_profile.id, person: terminated_staff_member, broker_agency_profile: broker_agency_profile, aasm_state: 'broker_agency_terminated')
-      FactoryGirl.create(:broker_agency_staff_role, broker_agency_profile_id:broker_agency_profile.id, person: pending_staff_member, broker_agency_profile: broker_agency_profile, aasm_state: 'broker_agency_pending')
+      FactoryBot.create(:broker_agency_staff_role, broker_agency_profile_id: broker_agency_profile.id, person: terminated_staff_member, broker_agency_profile: broker_agency_profile, aasm_state: 'broker_agency_terminated')
+      FactoryBot.create(:broker_agency_staff_role, broker_agency_profile_id: broker_agency_profile.id, person: pending_staff_member, broker_agency_profile: broker_agency_profile, aasm_state: 'broker_agency_pending')
     }
 
     context 'finds all active staff for broker with same broker agency profile id' do
