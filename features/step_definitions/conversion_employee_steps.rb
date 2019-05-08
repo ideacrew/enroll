@@ -234,7 +234,7 @@ end
 Then(/(.*) should get qle effective date as coverage effective date/) do |named_person|
   person = people[named_person]
   effective_on = Person.where(:first_name=> person[:first_name]).first.primary_family.current_sep.effective_on
-  find('.coverage_effective_date', text: effective_on.strftime("%m/%d/%Y"))
+  find('.coverage_effective_date', text: effective_on.strftime("%m/%d/%Y"), wait: 10)
 end
 
 When(/(.+) should see coverage summary page with renewing benefit application start date as effective date/) do |named_person|
