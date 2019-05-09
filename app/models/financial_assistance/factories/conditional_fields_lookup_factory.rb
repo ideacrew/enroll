@@ -47,20 +47,13 @@ module FinancialAssistance
         @instance.is_ssn_applied && @instance.non_ssn_apply_reason.present?
       end
 
+      # method to check for both pregnancy_due_on and children_expected_count fields
       def pregnancy_due_on
         @instance.is_pregnant
       end
 
-      def children_expected_count
-        @instance.is_pregnant
-      end
-
+      # method to check for both is_post_partum_period and pregnancy_end_on fields
       def is_post_partum_period
-        # Intentionally verifying if the value is 'false', as value NIL means something else in this context
-        @instance.is_pregnant == false
-      end
-
-      def pregnancy_end_on
         # Intentionally verifying if the value is 'false', as value NIL means something else in this context
         @instance.is_pregnant == false
       end
@@ -73,15 +66,8 @@ module FinancialAssistance
         @instance.foster_age_satisfied?
       end
 
+      # method to check for foster_care_us_state, age_left_foster_care and had_medicaid_during_foster_care
       def foster_care_us_state
-        @instance.is_former_foster_care
-      end
-
-      def age_left_foster_care
-        @instance.is_former_foster_care
-      end
-
-      def had_medicaid_during_foster_care
         @instance.is_former_foster_care
       end
 
@@ -89,29 +75,14 @@ module FinancialAssistance
         @instance.student_age_satisfied?
       end
 
+      # method to check for student_kind, student_status_end_on and student_school_kind
       def student_kind
-        @instance.is_student
-      end
-
-      def student_status_end_on
-        @instance.is_student
-      end
-
-      def student_school_kind
         @instance.is_student
       end
 
       def display_applicant_field?
         send(@attribute)
       end
-
-      def display_application_field?() end
-
-      def display_income_field?() end
-
-      def display_benefit_field?() end
-
-      def display_deduction_field?() end
     end
   end
 end

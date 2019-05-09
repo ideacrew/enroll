@@ -103,52 +103,48 @@ RSpec.describe "::FinancialAssistance::Factories::ConditionalFieldsLookupFactory
       end
     end
 
-    [:pregnancy_due_on, :children_expected_count].each do |attribute|
-      describe attribute.to_s do
-        context 'where the current applicant is not pregnant' do
-          before do
-            @instance = subject.new('applicant', applicant1.id, attribute)
-          end
-
-          it 'should not return true' do
-            expect(@instance.conditionally_displayable?).to be_falsey
-          end
+    describe 'for pregnant' do
+      context 'where the current applicant is not pregnant' do
+        before do
+          @instance = subject.new('applicant', applicant1.id,:pregnancy_due_on)
         end
 
-        context 'where the current applicant is pregnant' do
-          before do
-            applicant1.update_attributes!(is_pregnant: true)
-            @instance = subject.new('applicant', applicant1.id, attribute)
-          end
+        it 'should not return true' do
+          expect(@instance.conditionally_displayable?).to be_falsey
+        end
+      end
 
-          it 'should return true' do
-            expect(@instance.conditionally_displayable?).to be_truthy
-          end
+      context 'where the current applicant is pregnant' do
+        before do
+          applicant1.update_attributes!(is_pregnant: true)
+          @instance = subject.new('applicant', applicant1.id,:pregnancy_due_on)
+        end
+
+        it 'should return true' do
+          expect(@instance.conditionally_displayable?).to be_truthy
         end
       end
     end
 
-    [:is_post_partum_period, :pregnancy_end_on].each do |attribute|
-      describe attribute.to_s do
-        context 'where the current applicant is pregnant' do
-          before do
-            @instance = subject.new('applicant', applicant1.id, attribute)
-          end
-
-          it 'should not return true' do
-            expect(@instance.conditionally_displayable?).to be_falsey
-          end
+    describe 'for not pregnant' do
+      context 'where the current applicant is pregnant' do
+        before do
+          @instance = subject.new('applicant', applicant1.id,:is_post_partum_period)
         end
 
-        context 'where the current applicant is not pregnant' do
-          before do
-            applicant1.update_attributes!(is_pregnant: false)
-            @instance = subject.new('applicant', applicant1.id, attribute)
-          end
+        it 'should not return true' do
+          expect(@instance.conditionally_displayable?).to be_falsey
+        end
+      end
 
-          it 'should return true' do
-            expect(@instance.conditionally_displayable?).to be_truthy
-          end
+      context 'where the current applicant is not pregnant' do
+        before do
+          applicant1.update_attributes!(is_pregnant: false)
+          @instance = subject.new('applicant', applicant1.id,:is_post_partum_period)
+        end
+
+        it 'should return true' do
+          expect(@instance.conditionally_displayable?).to be_truthy
         end
       end
     end
@@ -199,27 +195,25 @@ RSpec.describe "::FinancialAssistance::Factories::ConditionalFieldsLookupFactory
       end
     end
 
-    [:foster_care_us_state, :age_left_foster_care, :had_medicaid_during_foster_care].each do |attribute|
-      describe attribute.to_s do
-        context 'where the current applicant was in foster care' do
-          before do
-            @instance = subject.new('applicant', applicant1.id, attribute)
-          end
-
-          it 'should not return true' do
-            expect(@instance.conditionally_displayable?).to be_falsey
-          end
+    describe 'where the applicant was in foster care' do
+      context 'where the current applicant was in foster care' do
+        before do
+          @instance = subject.new('applicant', applicant1.id, :foster_care_us_state)
         end
 
-        context 'where the current applicant has not enrolled in Medicaid' do
-          before do
-            applicant1.update_attributes!(is_former_foster_care: true)
-            @instance = subject.new('applicant', applicant1.id, attribute)
-          end
+        it 'should not return true' do
+          expect(@instance.conditionally_displayable?).to be_falsey
+        end
+      end
 
-          it 'should return true' do
-            expect(@instance.conditionally_displayable?).to be_truthy
-          end
+      context 'where the current applicant has not enrolled in Medicaid' do
+        before do
+          applicant1.update_attributes!(is_former_foster_care: true)
+          @instance = subject.new('applicant', applicant1.id, :foster_care_us_state)
+        end
+
+        it 'should return true' do
+          expect(@instance.conditionally_displayable?).to be_truthy
         end
       end
     end
@@ -247,27 +241,25 @@ RSpec.describe "::FinancialAssistance::Factories::ConditionalFieldsLookupFactory
       end
     end
 
-    [:student_kind, :student_status_end_on, :student_school_kind].each do |attribute|
-      describe attribute.to_s do
-        context 'where the current applicant was in foster care' do
-          before do
-            @instance = subject.new('applicant', applicant1.id, attribute)
-          end
-
-          it 'should not return true' do
-            expect(@instance.conditionally_displayable?).to be_falsey
-          end
+    describe 'where applicant is a student' do
+      context 'where the current applicant was in foster care' do
+        before do
+          @instance = subject.new('applicant', applicant1.id, :student_kind)
         end
 
-        context 'where the current applicant has not enrolled in Medicaid' do
-          before do
-            applicant1.update_attributes!(is_student: true)
-            @instance = subject.new('applicant', applicant1.id, attribute)
-          end
+        it 'should not return true' do
+          expect(@instance.conditionally_displayable?).to be_falsey
+        end
+      end
 
-          it 'should return true' do
-            expect(@instance.conditionally_displayable?).to be_truthy
-          end
+      context 'where the current applicant has not enrolled in Medicaid' do
+        before do
+          applicant1.update_attributes!(is_student: true)
+          @instance = subject.new('applicant', applicant1.id, :student_kind)
+        end
+
+        it 'should return true' do
+          expect(@instance.conditionally_displayable?).to be_truthy
         end
       end
     end
