@@ -36,6 +36,7 @@ class EmployerProfile
   delegate :updated_by, :updated_by=, to: :organization, allow_nil: false
 
   embeds_one  :inbox, as: :recipient, cascade_callbacks: true
+  embeds_one  :employer_attestation
   accepts_nested_attributes_for :inbox
 
   after_initialize :build_nested_models

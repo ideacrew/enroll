@@ -3,4 +3,6 @@ class EmployerAttestation
   include Mongoid::Timestamps
 
   field :aasm_state, type: String, default: "unsubmitted"
+
+  embedded_in :employer_profile
 end
