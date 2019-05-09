@@ -81,11 +81,18 @@ module Notifier
         non_discrimination_attachment
         # clear_tmp
       else
+        raise ArgumentError, "Notice body is empty or not pdf" unless File.exist?(notice_path) && correct_content_type
+
         ivl_blank_page
         ivl_non_discrimination
         ivl_attach_envelope
         voter_application
       end
+    end
+
+    def correct_content_type
+      acceptable_types = ".pdf"
+      acceptable_types.include? notice_path.extname
     end
 
     def pdf_options
