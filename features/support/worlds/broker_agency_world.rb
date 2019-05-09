@@ -56,6 +56,6 @@ Then(/^Hbx Admin is on Broker Index and clicks Broker Applicants$/) do
 end
 
 Then(/^Hbx Admin the clicks on current broker applicant show button$/) do
-  find('.interaction-click-control-broker-show').click
+  find_all('.interaction-click-control-broker-show').first.click
 end
 
