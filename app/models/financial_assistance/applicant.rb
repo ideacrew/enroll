@@ -418,7 +418,7 @@ class FinancialAssistance::Applicant
   end
 
   def student_age_satisfied?
-    [18, 19].include? age_of_the_applicant
+    [18, 19].include? age_of_applicant
   end
 
   def foster_age_satisfied?

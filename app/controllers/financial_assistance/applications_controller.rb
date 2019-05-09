@@ -2,6 +2,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   before_action :set_current_person
   before_action :set_primary_family
   before_action :check_eligibility, only: [:create, :get_help_paying_coverage_response, :copy]
+  before_action :init_cfl_service, only: :review_and_submit
 
   include UIHelpers::WorkflowController
   include NavigationHelper
@@ -195,6 +196,10 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   private
+
+  def init_cfl_service
+    @cfl_service = ::FinancialAssistance::Services::ConditionalFieldsLookupService.new
+  end
 
   def check_eligibility
     call_service

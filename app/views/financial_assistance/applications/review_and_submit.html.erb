@@ -1,5 +1,3 @@
-<% @cfl_service = FinancialAssistance::Services::ConditionalFieldsLookupService.new %>
-
 <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row">
   <div class="col-md-9">
     <div id="dependents_info_wrapper">
@@ -231,28 +229,26 @@
               <div class="col-md-6"><%= human_boolean applicant.is_pregnant %></div>
             </div>
 
+            <!-- Case where the applicant is Pregnant(fields: :pregnancy_due_on and :children_expected_count) -->
             <% if @cfl_service.displayable_field?('applicant', applicant.id, :pregnancy_due_on) %>
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                 <div class="col-md-6">Pregnancy due date?</div>
                 <div class="col-md-6"><%= applicant.pregnancy_due_on.to_s %></div>
               </div>
-            <% end %>
 
-            <% if @cfl_service.displayable_field?('applicant', applicant.id, :children_expected_count) %>
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                 <div class="col-md-6">How many children is this person expecting?</div>
                 <div class="col-md-6"><%= applicant.children_expected_count %></div>
               </div>
             <% end %>
 
+            <!-- Case where the applicant is Not Pregnant(fields: :is_post_partum_period and :pregnancy_end_on) -->
             <% if @cfl_service.displayable_field?('applicant', applicant.id, :is_post_partum_period) %>
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                 <div class="col-md-6">Was this person pregnant in the last 60 days?</div>
                 <div class="col-md-6"><%= human_boolean applicant.is_post_partum_period %></div>
               </div>
-            <% end %>
 
-            <% if @cfl_service.displayable_field?('applicant', applicant.id, :pregnancy_end_on) %>
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                 <div class="col-md-6">Pregnancy end on date</div>
                 <div class="col-md-6"><%= applicant.pregnancy_end_on.to_s %></div>
@@ -273,21 +269,18 @@
               </div>
             <% end %>
 
+            <!-- Case where the applicant was in Foster Care(fields: :foster_care_us_state, :age_left_foster_care, :had_medicaid_during_foster_care) -->
             <% if @cfl_service.displayable_field?('applicant', applicant.id, :foster_care_us_state) %>
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                 <div class="col-md-6">Where was this person in foster care?</div>
                 <div class="col-md-6"><%= applicant.foster_care_us_state %></div>
               </div>
-            <% end %>
 
-            <% if @cfl_service.displayable_field?('applicant', applicant.id, :age_left_foster_care) %>
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                 <div class="col-md-6">How old was this person when they left foster care?</div>
                 <div class="col-md-6"><%= applicant.age_left_foster_care %></div>
               </div>
-            <% end %>
 
-            <% if @cfl_service.displayable_field?('applicant', applicant.id, :had_medicaid_during_foster_care) %>
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                 <div class="col-md-6">Was this person enrolled in Medicaid when they left foster care?</div>
                 <div class="col-md-6"><%= human_boolean applicant.had_medicaid_during_foster_care %></div>
@@ -301,21 +294,18 @@
               </div>
             <% end %>
 
+            <!-- Case where the applicant is a student(fields: :student_kind, :student_status_end_on, :student_school_kind) -->
             <% if @cfl_service.displayable_field?('applicant', applicant.id, :student_kind) %>
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                 <div class="col-md-6">What is the type of student?</div>
                 <div class="col-md-6"><%= applicant.student_kind %></div>
               </div>
-            <% end %>
 
-            <% if @cfl_service.displayable_field?('applicant', applicant.id, :student_status_end_on) %>
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                 <div class="col-md-6">Student status end on date?</div>
                 <div class="col-md-6"><%= applicant.student_status_end_on %></div>
               </div>
-            <% end %>
 
-            <% if @cfl_service.displayable_field?('applicant', applicant.id, :student_school_kind) %>
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                 <div class="col-md-6">What type of school do you go to?</div>
                 <div class="col-md-6"><%= human_boolean applicant.student_school_kind %></div>
@@ -344,12 +334,6 @@
               <div class="col-md-6">Does this person have Disability?</div>
               <div class="col-md-6"><%= human_boolean applicant.is_physically_disabled %></div>
             </div>
-
-<!--             <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-              <div class="col-md-6">Has this person ever been in foster care?</div>
-              <div class="col-md-6"><%= human_boolean applicant.is_former_foster_care %></div>
-            </div> -->
-
           </div>
         </div>
         <br>
