@@ -417,10 +417,10 @@ class FinancialAssistance::Applicant
   end
 
   def other_questions_complete?
-    if (age_of_the_applicant > 18 && age_of_the_applicant < 26)
-      !has_daily_living_help.nil? && !need_help_paying_bills.nil? && !is_former_foster_care.nil?
+    if age_of_the_applicant > 18 && age_of_the_applicant < 26
+      (other_questions_answers << is_former_foster_care).include?(nil) ? false : true
     else
-      !has_daily_living_help.nil? && !need_help_paying_bills.nil?
+      other_questions_answers.include?(nil) ? false : true
     end
   end
 
@@ -603,6 +603,13 @@ class FinancialAssistance::Applicant
   end
 
   private
+
+  def other_questions_answers
+    [:has_daily_living_help, :need_help_paying_bills, :is_ssn_applied].inject([]) do |array, question|
+      array << send(question) if question != :is_ssn_applied || (question == :is_ssn_applied && consumer_role.no_ssn == '1')
+      array
+    end
+  end
 
   def validate_applicant_information
     validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temp_out_of_state, :family_member_id, :is_pregnant, :is_self_attested_blind, :has_daily_living_help, :need_help_paying_bills #, :tax_household_id
