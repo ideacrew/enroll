@@ -15,13 +15,9 @@
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
 require File.expand_path("../dummy/config/environment", __FILE__)
-require 'shoulda/matchers'
-require 'database_cleaner'
-require 'capybara/rails'
-require 'capybara/rspec'
-require 'factory_girl_rails'
-FactoryGirl.definition_file_paths = [File.expand_path('../factories', __FILE__)]
-FactoryGirl.find_definitions
+FactoryGirl.definition_file_paths = [
+  File.expand_path(File.join(File.dirname(__FILE__),'dummy/spec/factories'))
+]
 
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate

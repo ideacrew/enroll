@@ -36,14 +36,20 @@ module BenefitApplicationWorld
     @service_areas ||= benefit_sponsorship.service_areas_on(effective_period.min)
   end
 
+  def sic_code
+    @sic_code ||= benefit_sponsorship.sic_code
+  end
+
   def initial_application
     @initial_application ||= BenefitSponsors::BenefitApplications::BenefitApplication.new(
+        benefit_sponsorship: benefit_sponsorship,
         benefit_sponsor_catalog: benefit_sponsor_catalog,
         effective_period: effective_period,
         aasm_state: aasm_state,
         open_enrollment_period: open_enrollment_period,
         recorded_rating_area: rating_area,
         recorded_service_areas: service_areas,
+        recorded_sic_code: sic_code,
         fte_count: 5,
         pte_count: 0,
         msp_count: 0
@@ -90,6 +96,22 @@ module BenefitApplicationWorld
     benefit_sponsorship.save!
     benefit_sponsor_catalog.save!
   end
+
+  def new_benefit_package
+    FactoryGirl.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: initial_application, product_package: find_product_package(:health, :single_issuer), dental_product_package: find_product_package(:dental, :single_issuer))
+  end
+
+  def ce
+    create_list(:census_employee, 1 , :with_active_assignment, first_name: "Patrick", last_name: "Doe", dob: "1980-01-01".to_date, ssn: "786120965", benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: initial_application.benefit_packages.first)
+  end
+
+  def find_product_package(product_kind,package_kind)
+    current_benefit_market_catalog.product_packages.detect do |product_package|
+      product_package.product_kind == product_kind &&
+      product_package.package_kind == package_kind
+    end
+  end
+
 end
 
 World(BenefitApplicationWorld)
@@ -133,6 +155,16 @@ And(/^this employer has a (.*?) benefit application$/) do |status|
   end
 end
 
+And(/^this employer has enrollment_open benefit application with offering health and dental$/) do
+  aasm_state(:enrollment_open)
+  initial_application.benefit_packages = [new_benefit_package]
+  benefit_sponsorship.benefit_applications << initial_application
+  ce
+  benefit_sponsorship.organization.update_attributes!(fein: "764141112")
+  benefit_sponsorship.save!
+  benefit_sponsor_catalog.save!
+end
+
 And(/^this benefit application has a benefit package containing (.*?)(?: and (.*?))? benefits$/) do |health, dental|
   if health == "health"
     health_state(true)
@@ -141,4 +173,23 @@ And(/^this benefit application has a benefit package containing (.*?)(?: and (.*
     dental_state(true)
   end
   update_benefit_sponsorship
+end
+
+And(/^employer (.*?) has a (.*?) benefit application with offering health and dental$/) do |legal_name, state|
+  health_products
+  aasm_state(state.to_sym)
+  organization = @organization[legal_name]
+  # Mirrors the original step minus the census employee declaration
+  current_application = benefit_application_by_employer(organization)
+  current_package = new_benefit_package_by_application(current_application)
+  current_sponsorship = benefit_sponsorship(organization)
+
+  current_application.benefit_packages << current_package
+  current_application.save!
+  current_sponsorship.benefit_applications << current_application
+  current_sponsorship.save!
+  current_catalog = benefit_sponsor_catalog(organization)
+  current_catalog.save!
+  expect(current_application.benefit_packages.present?).to eq(true)
+  expect(current_sponsorship.benefit_applications.present?).to eq(true)
 end

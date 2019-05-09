@@ -29,7 +29,7 @@ describe FixPlanYear, dbclean: :after_each do
       before :each do
         allow(ENV).to receive(:[]).with("fein").and_return organization.fein
         allow(ENV).to receive(:[]).with("start_on").and_return plan_year.start_on
-        allow(ENV).to receive(:[]).with("end_on").and_return (plan_year.start_on-1.day) + 1.year
+        allow(ENV).to receive(:[]).with("end_on").and_return (plan_year.start_on+ 1.year) -1.day
         allow(ENV).to receive(:[]).with("aasm_state").and_return 'active'
         allow(ENV).to receive(:[]).with("terminated_on").and_return ''
         allow(ENV).to receive(:[]).with("update_enrollments").and_return "true"

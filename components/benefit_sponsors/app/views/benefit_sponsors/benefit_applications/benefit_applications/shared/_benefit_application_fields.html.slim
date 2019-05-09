@@ -20,11 +20,13 @@ h1.heading-text Add Benefit Package
   h3.mr-1 Select your open enrollment dates
   h4.i.fas.fa-question-circle data-toggle='tooltip' title=plan_shop_tool_tip_helper
   .col-md-12.col-sm-12.col-xs-12.p0
+    - oe_start_on = f.object.open_enrollment_start_on.present? ? Date.strptime(f.object.open_enrollment_start_on, "%m/%d/%Y") : nil
+    - oe_end_on = f.object.open_enrollment_end_on.present? ? Date.strptime(f.object.open_enrollment_end_on, "%m/%d/%Y") : nil
     .row.row-form-wrapper#uic-wrapper
       .col-md-6.col-sm-12
-        = f.text_field :open_enrollment_start_on, class: "form-control", required: true, placeholder: 'OPEN ENROLLMENT START DATE', onmouseover:"showDatepicker('benefit_application_open_enrollment_start_on')", :"data-date-min" => f.object.start_on ? (Date.strptime(f.object.start_on, "%m/%d/%Y") - 2.months) : ""
+        = f.text_field :open_enrollment_start_on, class: "form-control", required: true, placeholder: 'OPEN ENROLLMENT START DATE', onmouseover:"showDatepicker('benefit_application_open_enrollment_start_on')", onchange:"isValidDate(this)", :"data-date-min" => f.object.start_on ? (Date.strptime(f.object.start_on, "%m/%d/%Y") - 2.months) : "", "data-oe-start-date" => oe_start_on
       .col-md-6.col-sm-12
-        = f.text_field :open_enrollment_end_on, class: "form-control interaction-field-control-plan_year-open_enrollment_end_on", required: true, placeholder: 'OPEN ENROLLMENT END DATE', onmouseover:"showDatepicker('benefit_application_open_enrollment_end_on')"
+        = f.text_field :open_enrollment_end_on, class: "form-control interaction-field-control-plan_year-open_enrollment_end_on", required: true, placeholder: 'OPEN ENROLLMENT END DATE', onmouseover:"showDatepicker('benefit_application_open_enrollment_end_on')", onchange:"isValidDate(this)", "data-oe-end-date" => oe_end_on
 .row.pl-1
   h3 Add the total number of employees in your workforce
 .row
@@ -147,4 +149,19 @@ javascript:
       },
       url: "/benefit_sponsors/benefit_sponsorships/#{@benefit_application_form.benefit_sponsorship_id}/benefit_applications/late_rates_check"
     });
+  }
+
+  function isValidDate(element)
+  {
+    var oe_start_date = $("#benefit_application_open_enrollment_start_on").attr("data-oe-start-date")
+    var oe_end_date = $("#benefit_application_open_enrollment_end_on").attr("data-oe-end-date")
+    var date_regex = /^(0[1-9]|1[0-2])\/(0[1-9]|1\d|2\d|3[01])\/(19|20)\d{2}$/;
+    if (!(date_regex.test(element.value)) && element.id == "benefit_application_open_enrollment_start_on") {
+      alert('Invalid Date Format');
+      element.value = oe_start_date;
+    }
+    else if (!(date_regex.test(element.value)) && element.id == "benefit_application_open_enrollment_end_on") {
+      alert('Invalid Date Format');
+      element.value = oe_end_date;
+    }
   }

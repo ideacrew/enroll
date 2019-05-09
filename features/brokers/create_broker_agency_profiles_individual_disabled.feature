@@ -34,7 +34,7 @@ Feature: Create Primary Broker and Broker Agency
     Given Hbx Admin exists
     When Hbx Admin logs on to the Hbx Portal
     And I select the all security question and give the answer
-    When I have submit the security questions
+    When I have submitted the security questions
     And Hbx Admin clicks on the Brokers dropdown
     And Hbx Admin clicks on the Broker Applications option
     Then Hbx Admin should see the list of broker applicants
