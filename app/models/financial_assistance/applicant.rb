@@ -424,13 +424,6 @@ class FinancialAssistance::Applicant
     end
   end
 
-  def other_questions_answers
-    [:has_daily_living_help, :need_help_paying_bills, :is_ssn_applied].inject([]) do |array, question|
-      array << send(question) if question != :is_ssn_applied || (question == :is_ssn_applied && consumer_role.no_ssn == '1')
-      array
-    end
-  end
-
   def tax_info_complete?
     !is_required_to_file_taxes.nil? &&
       !is_claimed_as_tax_dependent.nil?
@@ -610,6 +603,13 @@ class FinancialAssistance::Applicant
   end
 
   private
+
+  def other_questions_answers
+    [:has_daily_living_help, :need_help_paying_bills, :is_ssn_applied].inject([]) do |array, question|
+      array << send(question) if question != :is_ssn_applied || (question == :is_ssn_applied && consumer_role.no_ssn == '1')
+      array
+    end
+  end
 
   def validate_applicant_information
     validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temp_out_of_state, :family_member_id, :is_pregnant, :is_self_attested_blind, :has_daily_living_help, :need_help_paying_bills #, :tax_household_id
