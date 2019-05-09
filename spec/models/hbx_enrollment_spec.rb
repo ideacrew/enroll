@@ -1842,6 +1842,36 @@ describe HbxEnrollment, 'dental shop calculation related', type: :model, dbclean
   end
 end
 
+# Should this be individual or employer sponsored?
+context "A terminated enrollment" do
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+  let(:enrollment) do
+    FactoryGirl.create(
+      :hbx_enrollment,
+      household: family.active_household,
+      kind: "employer_sponsored",
+      submitted_at: TimeKeeper.datetime_of_record - 3.day,
+      created_at: TimeKeeper.datetime_of_record - 3.day
+    )
+  end
+
+  before do
+    enrollment.aasm_state = "coverage_terminated"
+    enrollment.terminated_on = enrollment.effective_on
+    enrollment.external_enrollment = true
+    enrollment.hbx_enrollment_members.each do |em|
+      em.coverage_end_on = em.coverage_start_on
+    end
+    enrollment.save!
+  end
+
+  it "should cancel a terminated enrollment" do
+    enrollment.cancel_terminated_coverage!
+    enrollment.reload
+    expect(enrollment.aasm_state).to eq("coverage_canceled")
+  end
+end
+
 context "A cancelled external enrollment", :dbclean => :after_each do
   let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
   let(:enrollment) do

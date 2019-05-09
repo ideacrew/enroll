@@ -628,6 +628,7 @@ class HbxEnrollment
   def term_or_cancel_enrollment(enrollment, coverage_end_date)
     if enrollment.effective_on >= coverage_end_date
       enrollment.cancel_coverage! if enrollment.may_cancel_coverage? # cancel coverage if enrollment is future effective
+      enrollment.cancel_terminated_coverage! if may_cancel_terminated_coverage?
     else
       if coverage_end_date >= TimeKeeper.date_of_record
         enrollment.schedule_coverage_termination!(coverage_end_date) if enrollment.may_schedule_coverage_termination?
@@ -651,8 +652,11 @@ class HbxEnrollment
       if same_signatures(previous_enrollment) && !previous_enrollment.is_shop?
         if self.effective_on > previous_enrollment.effective_on && previous_enrollment.may_terminate_coverage?
           previous_enrollment.terminate_coverage!(effective_on - 1.day)
+        elsif self.effective_on > previous_enrollment.effective_on && previous_enrollment.may_cancel_terminated_coverage?
+          previous_enrollment.cancel_terminated_coverage!(effective_on - 1.day)
         else
           previous_enrollment.cancel_coverage! if previous_enrollment.may_cancel_coverage?
+          previous_enrollment.cancel_terminated_coverage! if previous_enrollment.may_cancel_terminated_coverage?
         end
       end
     end
@@ -676,6 +680,8 @@ class HbxEnrollment
         enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
       elsif enrollment.currently_active? && enrollment.may_terminate_coverage?
         terminate_proc.call(enrollment)
+      elsif enrollment.may_cancel_terminated_coverage?
+        enrollment.cancel_terminated_coverage!
       elsif enrollment.future_active?
         if enrollment.effective_on >= self.effective_on
           enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
@@ -1379,6 +1385,10 @@ class HbxEnrollment
       transitions from: [:renewing_waived, :inactive], to: :inactive
     end
 
+    event :cancel_terminated_coverage, :after => :record_transition do
+      transitions from: :coverage_terminated, to: :coverage_canceled
+    end
+
     event :cancel_coverage, :after => :record_transition do
       transitions from: [:coverage_termination_pending, :auto_renewing, :renewing_coverage_selected,
                          :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected,
@@ -1613,7 +1623,7 @@ class HbxEnrollment
   def notify_enrollment_cancel_or_termination_event(transmit_flag)
 
     return unless transmit_flag
-    return unless self.coverage_terminated? || self.coverage_canceled? || self.coverage_termination_pending?
+    return unless self.coverage_terminated? || self.coverage_canceled? || self.coverage_termination_pending? || self.
 
     config = Rails.application.config.acapi
     notify(

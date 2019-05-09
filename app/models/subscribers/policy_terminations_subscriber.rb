@@ -33,6 +33,8 @@ module Subscribers
                 en.cancel_for_non_payment!
               elsif en.may_cancel_coverage?
                 en.cancel_coverage!
+              elsif en.may_cancel_terminated_coverage?
+                en.cancel_terminated_coverage!
               end
             else
               Rails.logger.error("PolicyTerminationsSubscriber") { "Found and attempting to process #{en.hbx_id} as termination" }
