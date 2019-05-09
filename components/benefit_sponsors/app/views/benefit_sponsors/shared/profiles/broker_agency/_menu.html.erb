@@ -79,7 +79,7 @@
           </li>
         <% end %>
 
-        <% if current_user.has_hbx_staff_role? %>
+        <% if current_user.has_hbx_staff_role? || current_user.has_broker_role? || current_user.has_broker_agency_staff_role? %>
         <% else %>
           <% if individual_market_is_enabled? %>
             <li role="presentation" class="multi-line">
