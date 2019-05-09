@@ -418,22 +418,17 @@ class FinancialAssistance::Applicant
 
   def other_questions_complete?
     if age_of_the_applicant > 18 && age_of_the_applicant < 26
-      !other_questions_answered?.include?(false) && !is_former_foster_care.nil?
+      (other_questions_answers << is_former_foster_care).include?(nil) ? false : true
     else
-      !other_questions_answered?.include?(false)
+      other_questions_answers.include?(nil) ? false : true
     end
   end
 
-  def other_questions_answered?
-    arrayed = []
-    %w[has_daily_living_help need_help_paying_bills is_ssn_applied].each do |question|
-      arrayed << if question == 'is_ssn_applied' && consumer_role.no_ssn?
-                   !send(question).nil?
-                 elsif question != 'is_ssn_applied'
-                   !send(question).nil?
-                 end
+  def other_questions_answers
+    [:has_daily_living_help, :need_help_paying_bills, :is_ssn_applied].inject([]) do |array, question|
+      array << send(question) if question != :is_ssn_applied || (question == :is_ssn_applied && consumer_role.no_ssn == '1')
+      array
     end
-    arrayed
   end
 
   def tax_info_complete?

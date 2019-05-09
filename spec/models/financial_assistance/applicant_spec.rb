@@ -729,7 +729,7 @@ RSpec.describe FinancialAssistance::Applicant, type: :model do
       end
 
       it 'should return false if SSN is not entered and SSN question is not answered' do
-        applicant1.person.update_attributes(ssn: nil)
+        applicant1.person.update_attributes(ssn: nil, no_ssn: "1")
         applicant1.update_attributes(has_daily_living_help: false, need_help_paying_bills: false)
         expect(applicant1.other_questions_complete?).to be false
       end
