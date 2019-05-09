@@ -7,7 +7,7 @@ module BenefitSponsors
           @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_new
           respond_to do |format|
             format.html { render 'new', layout: false} if params[:profile_type]
-            format.js  { render 'new_staff_form'}
+            format.js  { render 'new'}
           end
         end
 
