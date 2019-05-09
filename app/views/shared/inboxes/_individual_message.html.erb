@@ -4,7 +4,7 @@
     <%= message.try(:to)   if @folder == 'Sent'%>
   </td>
   <td>
-    <%=message.created_at.strftime("%m/%d/%Y") %>
+    <%=message.created_at.try(:strftime,("%m/%d/%Y")) || Time.now %>
     <td>
       <%= message.try(:subject) %>
     </td>
