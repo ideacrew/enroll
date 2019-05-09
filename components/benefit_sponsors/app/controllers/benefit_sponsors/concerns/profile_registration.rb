@@ -8,6 +8,10 @@ module BenefitSponsors
         new_profiles_registration_path(profile_type: "broker_agency")
       end
 
+      def general_agency_new_registration_url
+        new_profiles_registration_path(profile_type: "general_agency")
+      end
+
       def sponsor_new_registration_url
         new_profiles_registration_path(profile_type: "benefit_sponsor")
       end
@@ -28,11 +32,17 @@ module BenefitSponsors
         profiles_broker_agencies_broker_agency_profile_path(profile_id || @agency.organization.profile.id)
       end
 
+      def general_show_registration_url(profile_id=nil)
+        profiles_general_agencies_general_agency_profile_path(profile_id || @agency.organization.profile.id)
+      end
+
       def agency_home_url(profile_id)
         if is_employer_profile?
           sponsor_home_registration_url(profile_id)
         elsif is_broker_profile?
           broker_show_registration_url(profile_id)
+        elsif is_general_profile?
+          general_show_registration_url(profile_id)
         end
       end
 

@@ -19,12 +19,12 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerFinalRemainderToPub
 
   describe "ModelEvent" do
     it "should trigger model event" do
-      model_instance.class.observer_peers.keys.each do |observer|
-        expect(observer).to receive(:notifications_send) do |instance, model_event|
+      model_instance.class.observer_peers.keys.select{ |ob| ob.is_a? BenefitSponsors::Observers::NoticeObserver }.each do |observer|
+        expect(observer).to receive(:process_application_events) do |_instance, model_event|
           expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
         end
 
-        expect(observer).to receive(:notifications_send) do |instance, model_event|
+        expect(observer).to receive(:process_application_events) do |_instance, model_event|
           expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
           expect(model_event).to have_attributes(:event_key => :initial_employer_final_reminder_to_publish_plan_year, :klass_instance => model_instance, :options => {})
         end
@@ -35,7 +35,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerFinalRemainderToPub
 
   describe "NoticeTrigger" do
     context "2 days prior to publishing dead line" do
-      subject { BenefitSponsors::Observers::BenefitApplicationObserver.new }
+      subject { BenefitSponsors::Observers::NoticeObserver.new }
 
       let(:model_event) { BenefitSponsors::ModelEvents::ModelEvent.new(:initial_employer_final_reminder_to_publish_plan_year, model_instance, {}) }
 
@@ -46,7 +46,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerFinalRemainderToPub
           expect(payload[:event_object_kind]).to eq 'BenefitSponsors::BenefitApplications::BenefitApplication'
           expect(payload[:event_object_id]).to eq model_instance.id.to_s
         end
-        subject.notifications_send(model_instance, model_event)
+        subject.process_application_events(model_instance, model_event)
       end
     end
   end

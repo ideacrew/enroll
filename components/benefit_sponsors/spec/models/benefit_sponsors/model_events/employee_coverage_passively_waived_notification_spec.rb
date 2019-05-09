@@ -38,8 +38,8 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeCoveragePassivelyWaivedNot
 
   describe "ModelEvent" do
     it "should trigger model event" do
-      census_employee.class.observer_peers.keys.each do |observer|
-        expect(observer).to receive(:notifications_send) do |instance, model_event|
+      census_employee.class.observer_peers.keys.select{ |ob| ob.is_a? BenefitSponsors::Observers::NoticeObserver }.each do |observer|
+        expect(observer).to receive(:process_census_employee_events) do |_instance, model_event|
           expect(model_event).to be_an_instance_of(::BenefitSponsors::ModelEvents::ModelEvent)
           expect(model_event).to have_attributes(:event_key => :employee_coverage_passively_waived, :klass_instance => census_employee, :options => {event_object: renewal_application})
         end
@@ -50,7 +50,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeCoveragePassivelyWaivedNot
 
   describe "NoticeTrigger" do
     context "when renewal employee auto renewal" do
-      subject { BenefitSponsors::Observers::CensusEmployeeObserver.new }
+      subject { BenefitSponsors::Observers::NoticeObserver.new }
 
       let(:model_event) { ::BenefitSponsors::ModelEvents::ModelEvent.new(:employee_coverage_passively_waived, census_employee, {event_object:renewal_application}) }
 
@@ -61,7 +61,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeCoveragePassivelyWaivedNot
           expect(payload[:event_object_kind]).to eq 'BenefitSponsors::BenefitApplications::BenefitApplication'
           expect(payload[:event_object_id]).to eq renewal_application.id.to_s
         end
-        subject.notifications_send(census_employee, model_event)
+        subject.process_census_employee_events(census_employee, model_event)
       end
     end
   end

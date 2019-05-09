@@ -7,7 +7,6 @@ module BenefitSponsors
       ]
 
       def notify_on_create
-
         if self.employer_profile
           is_welcome_notice_to_employer = true
         end

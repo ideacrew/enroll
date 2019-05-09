@@ -8,7 +8,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployerPublishPlanYearRemi
   include_context "setup renewal application"
   include_context "setup employees with benefits"
 
-  let(:model_event) { "renewal_employer_publish_plan_year_reminder_after_soft_dead_line" }
+  let(:model_event) { "renewal_employer_second_reminder_to_publish_plan_year" }
   let(:roster_size) { 2 }
 
   let(:renewal_effective_date)  { TimeKeeper.date_of_record.next_month.beginning_of_month }
@@ -23,10 +23,10 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployerPublishPlanYearRemi
 
   describe "ModelEvent" do
     it "should trigger model event" do
-      model_instance.class.observer_peers.keys.each do |observer|
-        expect(observer).to receive(:notifications_send) do |instance, model_event|
+      model_instance.class.observer_peers.keys.select{ |ob| ob.is_a? BenefitSponsors::Observers::NoticeObserver }.each do |observer|
+        expect(observer).to receive(:process_application_events) do |_instance, model_event|
           expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
-          expect(model_event).to have_attributes(:event_key => :renewal_employer_publish_plan_year_reminder_after_soft_dead_line, :klass_instance => model_instance, :options => {})
+          expect(model_event).to have_attributes(:event_key => :renewal_employer_second_reminder_to_publish_plan_year, :klass_instance => model_instance, :options => {})
         end
       end
       BenefitSponsors::BenefitApplications::BenefitApplication.date_change_event(date_mock_object)
@@ -35,17 +35,17 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployerPublishPlanYearRemi
 
   describe "NoticeTrigger" do
     context "1 days after soft dead line" do
-      subject { BenefitSponsors::Observers::BenefitApplicationObserver.new  }
-      let(:model_event) { BenefitSponsors::ModelEvents::ModelEvent.new(:renewal_employer_publish_plan_year_reminder_after_soft_dead_line, model_instance, {}) }
+      subject { BenefitSponsors::Observers::NoticeObserver.new  }
+      let(:model_event) { BenefitSponsors::ModelEvents::ModelEvent.new(:renewal_employer_second_reminder_to_publish_plan_year, model_instance, {}) }
 
       it "should trigger notice event" do
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
-          expect(event_name).to eq "acapi.info.events.employer.renewal_employer_publish_plan_year_reminder_after_soft_dead_line"
+          expect(event_name).to eq "acapi.info.events.employer.renewal_employer_second_reminder_to_publish_plan_year"
           expect(payload[:employer_id]).to eq employer_profile.hbx_id.to_s
           expect(payload[:event_object_kind]).to eq 'BenefitSponsors::BenefitApplications::BenefitApplication'
           expect(payload[:event_object_id]).to eq model_instance.id.to_s
         end
-        subject.notifications_send(model_instance, model_event)
+        subject.process_application_events(model_instance, model_event)
       end
     end
   end

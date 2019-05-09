@@ -23,7 +23,7 @@ module BenefitSponsors
         })
       end
 
-      def self.organizations_for_low_enrollment_notice(current_date)
+      def self.organizations_ending_oe_in_two_days(current_date)
         BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where({
           :"benefit_applications" => { 
             :$elemMatch => {

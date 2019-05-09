@@ -17,7 +17,7 @@ module BenefitSponsors
 
       after_create :notify_on_create
 
-      add_observer ::BenefitSponsors::Observers::DocumentObserver.new, [:notifications_send]
+      add_observer ::BenefitSponsors::Observers::NoticeObserver.new, [:process_document_events]
 
       belongs_to :documentable, polymorphic: true, optional: true
 

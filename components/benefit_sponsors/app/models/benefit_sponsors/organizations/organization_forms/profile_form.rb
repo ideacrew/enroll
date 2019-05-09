@@ -32,6 +32,8 @@ module BenefitSponsors
       attribute :office_locations, Array[OrganizationForms::OfficeLocationForm]
 
       validates_presence_of :market_kind, if: :is_broker_profile?
+      validates_presence_of :market_kind, if: :is_general_agency_profile?
+      # validates_presence_of :ach_routing_number, if: :is_broker_profile?
       validates_presence_of :ach_routing_number, if: :routing_information_enabled?
       validates_presence_of :referred_by, if: :is_cca_profile?
 
@@ -49,6 +51,10 @@ module BenefitSponsors
 
       def is_broker_profile?
         profile_type == "broker_agency"
+      end
+
+      def is_general_agency_profile?
+        profile_type == "general_agency"
       end
 
       def routing_information_enabled?

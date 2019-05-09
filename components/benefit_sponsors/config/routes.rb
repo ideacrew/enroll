@@ -13,6 +13,34 @@ BenefitSponsors::Engine.routes.draw do
           get :staff_index
           get :agency_messages
           get :commission_statements
+          get :general_agency_index
+        end
+        member do
+          post :clear_assign_for_employer
+          get :assign
+          post :update_assign
+          post :family_datatable
+          get :inbox
+          get :download_commission_statement
+          get :show_commission_statement
+          post :set_default_ga
+        end
+      end
+      resources :broker_applicants
+    end
+
+    namespace :general_agencies do
+      resources :general_agency_profiles, only: [:new, :create, :show, :index, :edit, :update] do
+        collection do
+          get :families
+          get :messages
+          get :staff_index
+          get :agency_messages
+          get :commission_statements
+          get :employers
+          get :staffs
+          get :edit_staff
+          post :update_staff
         end
         member do
           post :clear_assign_for_employer
@@ -24,9 +52,8 @@ BenefitSponsors::Engine.routes.draw do
           get :show_commission_statement
         end
       end
-      resources :broker_applicants
-    end
 
+    end
     namespace :employers do
       resources :employer_profiles, only: [:show] do
         get :export_census_employees

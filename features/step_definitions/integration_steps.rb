@@ -752,6 +752,7 @@ And(/^.+ selects the first plan available$/) do
 end
 
 Then(/^.+ should see the dependents page$/) do
+  find('.interaction-click-control-add-member', wait: 10)
   expect(page).to have_content('Add Member')
   screenshot("dependents_page")
 end
@@ -990,7 +991,7 @@ When(/^(?:General){0}.+ clicks? on the ((?:General|Staff){0}.+) dropdown$/) do |
 end
 
 When(/^(?:General){0}.+ clicks? on the ((?:General|Staff){0}.+) option$/) do |tab_name|
-  find(".interaction-click-control-#{tab_name.downcase.gsub(' ','-')}").click
+  find(".interaction-click-control-#{tab_name.downcase.gsub(' ','-')}", wait: 5).click
   wait_for_ajax
   find('#myTabContent').click
 end

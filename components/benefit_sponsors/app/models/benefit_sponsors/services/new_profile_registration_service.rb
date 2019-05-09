@@ -22,7 +22,7 @@ module BenefitSponsors
       end
 
       def find
-        organization = factory_class.build(profile_id: profile_id)
+        organization = factory_class.build(profile_id: profile_id, profile_type: profile_type)
         staff_roles = factory_class.find_representatives(profile_id, profile_type)
         attributes_to_form_params(organization, staff_roles)
       end
@@ -129,6 +129,8 @@ module BenefitSponsors
       def profile_attributes(form)
         if is_broker_profile?
           form.attributes.slice(:id, :market_kind, :home_page, :accept_new_clients, :languages_spoken, :working_hours, :ach_routing_number, :ach_account_number)
+        elsif is_general_agency_profile?
+        form.attributes.slice(:id, :market_kind, :home_page, :accept_new_clients, :languages_spoken)
         elsif is_sponsor_profile?
           if is_cca_sponsor_profile?
             form.attributes.slice(:contact_method, :id, :sic_code, :referred_by, :referred_reason)
@@ -148,6 +150,10 @@ module BenefitSponsors
 
       def is_broker_profile?
         profile_type == "broker_agency"
+      end
+
+      def is_general_agency_profile?
+        profile_type == "general_agency"
       end
 
       def is_sponsor_profile?
@@ -195,6 +201,8 @@ module BenefitSponsors
       def pluck_profile(organization)
         if is_broker_profile?
           organization.profiles.where(_type: /BrokerAgencyProfile/).first
+        elsif is_general_agency_profile?
+        organization.profiles.where(_type: /GeneralAgencyProfile/).first
         elsif is_sponsor_profile?
           organization.profiles.where(_type: /EmployerProfile/).first
         end
@@ -241,6 +249,11 @@ module BenefitSponsors
         profile.primary_broker_role_id == broker_role.id
       end
 
+      def has_general_agency_staff_role_for_profile?(user, profile) # When profile is general agency
+        ga_staff_roles = user.person.general_agency_staff_roles
+        ga_staff_roles.any? {|role| role.benefit_sponsors_general_agency_profile_id == profile.id }
+      end
+
       def has_employer_staff_role_for_profile?(user, profile) # When profile is benefit sponsor
         staff_roles = user.person.employer_staff_roles
         staff_roles.any? {|role| role.benefit_sponsor_employer_profile_id == profile.id }
@@ -248,7 +261,7 @@ module BenefitSponsors
 
       def is_staff_for_agency?(user, form)
         profile = load_profile
-        has_employer_staff_role_for_profile?(user, profile) || has_broker_role_for_profile?(user, profile)
+        has_employer_staff_role_for_profile?(user, profile) || has_broker_role_for_profile?(user, profile) || has_general_agency_staff_role_for_profile?(user, profile)
       end
 
       def load_profile
