@@ -173,9 +173,20 @@ RSpec.describe "::FinancialAssistance::Factories::ConditionalFieldsLookupFactory
         end
       end
 
-      context 'where the current applicant is not pregnant' do
+      context 'where the current applicant is not pregnant, is in post_partum_period and did not pregnancy_end_on' do
         before do
           applicant1.update_attributes!(is_pregnant: false, is_post_partum_period: true)
+          @instance = subject.new('applicant', applicant1.id, :pregnancy_end_on)
+        end
+
+        it 'should return false' do
+          expect(@instance.conditionally_displayable?).to eq false
+        end
+      end
+
+      context 'where the current applicant is not pregnant, is in post_partum_period and entered pregnancy_end_on' do
+        before do
+          applicant1.update_attributes!(is_pregnant: false, is_post_partum_period: true, pregnancy_end_on: (TimeKeeper.date_of_record - 20.days))
           @instance = subject.new('applicant', applicant1.id, :pregnancy_end_on)
         end
 
