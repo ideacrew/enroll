@@ -180,9 +180,8 @@ Then(/^.+ should see bank information$/) do
 end
 
 Then(/^.+ should see successful message with broker agency home page$/) do
-  expect(page).to have_content("Welcome to #{Settings.site.short_name}. Your account has been created.")
-
-  expect(page).to have_content('Broker Agency : Logistics Inc')
+ #expect(page).to have_content("Welcome to #{Settings.site.short_name}. Your account has been created.")
+  expect(page).to have_content('Broker Agency : First Legal Name')
 end
 
 Then(/^.+ should see no active broker$/) do
