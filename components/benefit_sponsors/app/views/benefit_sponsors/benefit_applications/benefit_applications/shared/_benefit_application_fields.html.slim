@@ -126,6 +126,16 @@ javascript:
 	function showDatepicker(id) {
 		initDatepicker(id,new Date(dateOptions.oeStartOn),new Date(dateOptions.oeEndOn))
 	}
+  // Temporary fix to Select your open enrollment dates row width and alignment
+  (function() {
+    var element = document.querySelectorAll('.col-md-12')[1].querySelector('#uic-wrapper');
+    element.style.marginLeft = "10px"
+    element.style.width = "98%"
+    var element2 = document.querySelectorAll('.col-md-12')[2].querySelector('#uic-wrapper');
+    element2.querySelectorAll('input').forEach(function(input) {
+      input.style.height = "23px"
+    })
+  })();
 
   $('#baStartDate').change(function() {
     var date = $(this).val();
