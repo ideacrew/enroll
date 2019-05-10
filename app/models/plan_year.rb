@@ -109,6 +109,15 @@ class PlanYear
     )
   }
 
+  scope :published_or_renewing_published_plan_years_by_date, ->(date) {
+    where(
+      "$and" => [
+        {:aasm_state.in => (PUBLISHED + RENEWING_PUBLISHED_STATE) },
+        {:"start_on".lte => date, :"end_on".gte => date}
+      ]
+    )
+  }
+
   after_update :update_employee_benefit_packages
 
   after_save :notify_on_save
