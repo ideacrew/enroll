@@ -1055,19 +1055,30 @@ $(document).ready(function() {
       }
     ]
 
+    // this allows the :contains selector to be case insensitive
+    $.expr[":"].contains = $.expr.createPseudo(function (arg) {
+      return function (elem) {
+        return $(elem).text().toLowerCase().indexOf(arg.toLowerCase()) >= 0;
+      };
+    });
     $(terms).each(function(i, term) {
       $('.run-glossary:contains(' + term.term + ')').each(function(i, matchingEl) {
-        var regex = new RegExp(term.term)
+        var regex = new RegExp(term.term, 'i');
         var text = term.description;
         $(matchingEl).html($(matchingEl).html().replace(regex, '<span class="glossary" data-toggle="tooltip" data-placement="auto top" data-trigger="click focus" data-boundary="window" data-fallbackPlacement="flip" data-html="true" title="' + text + '">' + term.term + '</span>'));
       });
-    })
+    });
 
     // Because of the change to tooltip on click instead of hover, you need to
-    // manually close each tooltip. This will close others if you click to open one.
-    $('.glossary').on('click',function(e){
-        var el = $(this).siblings('.tooltip');
-    	  $('.tooltip').not(el).hide();
+    // manually close each tooltip. This will close others if you click to open one
+    // or click outside of a tooltip.
+    $(document).click(function(e){
+      if (e.target.className == 'glossary') {
+        $('.glossary').not($(e.target)).tooltip('hide');
+      }
+      else if (!$(e.target).parents('.tooltip').length) {
+        $('.glossary').tooltip('hide');
+      }
     });
 
 
