@@ -3,6 +3,9 @@ class BrokerAgencyProfile
   include SetCurrentUser
   include Mongoid::Timestamps
   include AASM
+  include Acapi::Notifiers
+  include Concerns::Observable
+  include ModelEvents::BrokerAgencyProfile
 
   embedded_in :organization
 
@@ -60,6 +63,7 @@ class BrokerAgencyProfile
     inclusion: { in: Organization::ENTITY_KINDS[0..3], message: "%{value} is not a valid business entity kind" },
     allow_blank: false
 
+  before_save :notify_before_save
   after_initialize :build_nested_models
 
   scope :active,      ->{ any_in(aasm_state: ["is_applicant", "is_approved"]) }
