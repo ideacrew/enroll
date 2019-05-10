@@ -301,7 +301,7 @@ RSpec.describe "::FinancialAssistance::Factories::ConditionalFieldsLookupFactory
     end
 
     describe 'where applicant is a student' do
-      context 'where the current applicant was in foster care' do
+      context 'where the current applicant not in the range of a student' do
         before do
           @instance = subject.new('applicant', applicant1.id, :student_kind)
         end
@@ -311,8 +311,20 @@ RSpec.describe "::FinancialAssistance::Factories::ConditionalFieldsLookupFactory
         end
       end
 
-      context 'where the current applicant has not enrolled in Medicaid' do
+      context 'where the current applicant is a student but not in the date range anymore' do
         before do
+          applicant1.update_attributes!(is_student: true)
+          @instance = subject.new('applicant', applicant1.id, :student_kind)
+        end
+
+        it 'should return false' do
+          expect(@instance.conditionally_displayable?).to eq false
+        end
+      end
+
+      context 'for an applicant who is a student and also in the student date range' do
+        before do
+          primary_person.update_attributes(dob: (TimeKeeper.date_of_record - 18.years))
           applicant1.update_attributes!(is_student: true)
           @instance = subject.new('applicant', applicant1.id, :student_kind)
         end
