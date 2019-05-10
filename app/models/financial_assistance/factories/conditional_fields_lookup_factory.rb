@@ -60,7 +60,7 @@ module FinancialAssistance
 
       def pregnancy_end_on
         # Intentionally verifying if the value is 'false', as value NIL means something else in this context
-        @instance.is_pregnant == false && @instance.is_post_partum_period #&& @instance.pregnancy_end_on.present?
+        @instance.is_pregnant == false && @instance.is_post_partum_period && @instance.pregnancy_end_on.present?
       end
 
       def is_enrolled_on_medicaid
