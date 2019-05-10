@@ -55,6 +55,39 @@ describe Subscribers::PolicyTerminationsSubscriber do
     end
   end
 
+  describe 'given a terminated event to be canceled' do
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+    let(:enrollment) do
+      FactoryGirl.create(:hbx_enrollment,
+                       household: family.active_household,
+                       kind: "employer_sponsored",
+                       submitted_at: TimeKeeper.datetime_of_record - 3.day,
+                       created_at: TimeKeeper.datetime_of_record - 3.day
+                       )
+    end
+    let(:termination_date) { Date.today - 1.week }
+    let(:termination_payload) do
+      {
+        :resource_instance_uri => "urn:some_thing:policy#policy_id",
+        :event_effective_date => termination_date.strftime("%Y%m%d"),
+        :hbx_enrollment_ids => JSON.dump([enrollment_id]),
+        :qualifying_reason => "non_payment"
+      }
+    end
+
+    before :each do
+      enrollment.aasm_state = 'coverage_terminated'
+      enrollment.save!
+      allow(enrollment).to receive(:may_cancel_terminated_coverage?).and_return(true)
+    end
+
+    it "cancels the enrollment" do
+      enrollment.cancel_terminated_coverage!
+      enrollment.reload
+      subject.call(cancelation_event_name, nil, nil, nil, termination_payload)
+    end
+  end
+
   describe "given a cancel event" do
     let(:termination_payload) do
       {

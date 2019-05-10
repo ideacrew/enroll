@@ -628,6 +628,7 @@ class HbxEnrollment
   def term_or_cancel_enrollment(enrollment, coverage_end_date)
     if enrollment.effective_on >= coverage_end_date
       enrollment.cancel_coverage! if enrollment.may_cancel_coverage? # cancel coverage if enrollment is future effective
+      # Should new event be added here?
       enrollment.cancel_terminated_coverage! if may_cancel_terminated_coverage?
     else
       if coverage_end_date >= TimeKeeper.date_of_record
@@ -652,6 +653,7 @@ class HbxEnrollment
       if same_signatures(previous_enrollment) && !previous_enrollment.is_shop?
         if self.effective_on > previous_enrollment.effective_on && previous_enrollment.may_terminate_coverage?
           previous_enrollment.terminate_coverage!(effective_on - 1.day)
+        # Should new event be added here like this?
         elsif self.effective_on > previous_enrollment.effective_on && previous_enrollment.may_cancel_terminated_coverage?
           previous_enrollment.cancel_terminated_coverage!(effective_on - 1.day)
         else
@@ -1623,7 +1625,7 @@ class HbxEnrollment
   def notify_enrollment_cancel_or_termination_event(transmit_flag)
 
     return unless transmit_flag
-    return unless self.coverage_terminated? || self.coverage_canceled? || self.coverage_termination_pending? || self.
+    return unless self.coverage_terminated? || self.coverage_canceled? || self.coverage_termination_pending?
 
     config = Rails.application.config.acapi
     notify(

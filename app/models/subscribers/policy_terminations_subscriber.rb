@@ -34,6 +34,8 @@ module Subscribers
               elsif en.may_cancel_coverage?
                 en.cancel_coverage!
               elsif en.may_cancel_terminated_coverage?
+                # See redmine issue 20344. Tracing the failure of the publish_non_payment_spreadsheet.rb script to cancel
+                # terminated enrollments on Graylog led to this file
                 en.cancel_terminated_coverage!
               end
             else
