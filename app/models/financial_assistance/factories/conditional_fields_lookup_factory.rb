@@ -82,7 +82,7 @@ module FinancialAssistance
 
       # method to check for student_kind, student_status_end_on and student_school_kind
       def student_kind
-        @instance.is_student
+        is_student && @instance.is_student
       end
 
       def display_applicant_field?
