@@ -20,14 +20,14 @@ module BenefitSponsors
       ].freeze
 
       DATE_CHANGE_EVENTS = [
-          :initial_employer_no_binder_payment_received,
-          :initial_employer_first_reminder_to_publish_plan_year,
-          :initial_employer_second_reminder_to_publish_plan_year,
-          :initial_employer_final_reminder_to_publish_plan_year,
-          :renewal_employer_first_reminder_to_publish_plan_year,
-          :renewal_employer_second_reminder_to_publish_plan_year,
-          :renewal_employer_third_reminder_to_publish_plan_year,
-          :open_enrollment_end_reminder_and_low_enrollment
+        :renewal_employer_first_reminder_to_publish_plan_year,
+        :renewal_employer_second_reminder_to_publish_plan_year,
+        :renewal_employer_third_reminder_to_publish_plan_year,
+        :initial_employer_no_binder_payment_received,
+        :initial_employer_first_reminder_to_publish_plan_year,
+        :initial_employer_second_reminder_to_publish_plan_year,
+        :initial_employer_final_reminder_to_publish_plan_year,
+        :open_enrollment_end_reminder_and_low_enrollment
       ].freeze
 
       OTHER_EVENTS = [
