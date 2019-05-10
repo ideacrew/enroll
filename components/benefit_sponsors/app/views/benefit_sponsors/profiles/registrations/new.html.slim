@@ -1,13 +1,13 @@
 - if @profile_type == "broker_agency"
-  #tabs
+  #broker_agency_form
     ul
       li
-        a href="#tabs-1"  = l10n("broker")
+        a href="#broker_registration"  = l10n("broker")
       li
-        a href="#tabs-2"  = l10n("broker_agency_staff")
-    #tabs-1
+        a href="#broker_agency_staff"  = l10n("broker_agency_staff")
+    #broker_registration
       = render :partial => "benefit_sponsors/profiles/registrations/broker_registration_form"
-    #tabs-2
+    #broker_agency_staff
 
 - elsif @profile_type == "general_agency"
   .general-agency-registration-container.mt-4.pt-4.pl-3.pr-3.pb-3
@@ -52,9 +52,9 @@
 javascript:
   validateForm();
 
-  $("#tabs").tabs({
+  $("#broker_agency_form").tabs({
     activate: function (event, ui) {
-      if (ui.newPanel.selector == "#tabs-2") {
+      if (ui.newPanel.selector == "#broker_agency_staff") {
         var url = "/benefit_sponsors/profiles/broker_agencies/broker_agency_staff_roles/new"
         if(!$("#loaded").length) {
           $.ajax({
@@ -62,7 +62,7 @@ javascript:
             type: "GET",
             data: {profile_type: "broker_agency_staff"},
             success: function (data) {
-              $("#tabs-2").html(data)
+              $("#broker_agency_staff").html(data)
                 initDatepicker('inputStaffDOB', new Date("#{Date.today.beginning_of_month-90.years}"), new Date("#{Date.today.end_of_month-18.years}"));
             }
           })

@@ -16,7 +16,7 @@ module BenefitSponsors
           begin
             @status , @result = @staff.save
             unless @staff.is_broker_registration_page
-              flash[:notice] = "Role added sucessfully" if @status
+              flash[:notice] = "Role added successfully" if @status
               flash[:error] = "Role was not added because " + @result unless @status
             end
           rescue Exception => e
@@ -34,7 +34,7 @@ module BenefitSponsors
           begin
             @status, @result = @staff.approve
             if @status
-              flash[:notice] = "Role approved sucessfully"
+              flash[:notice] = "Role approved successfully"
             else
               flash[:error] = "Role was not approved because " + @result
             end
@@ -50,7 +50,7 @@ module BenefitSponsors
           begin
             @status, @result = @staff.destroy
             if @status
-              flash[:notice] = "Role removed succesfully"
+              flash[:notice] = "Role removed successfully"
             else
               flash[:error] = "Role was not removed because " + @result
             end
