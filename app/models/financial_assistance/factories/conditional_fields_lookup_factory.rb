@@ -73,7 +73,7 @@ module FinancialAssistance
 
       # method to check for foster_care_us_state, age_left_foster_care and had_medicaid_during_foster_care
       def foster_care_us_state
-        @instance.is_former_foster_care
+        is_former_foster_care && @instance.is_former_foster_care
       end
 
       def is_student
