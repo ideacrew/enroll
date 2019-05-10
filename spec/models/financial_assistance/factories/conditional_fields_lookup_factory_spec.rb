@@ -142,7 +142,7 @@ RSpec.describe "::FinancialAssistance::Factories::ConditionalFieldsLookupFactory
     describe 'for not pregnant' do
       context 'where the current applicant is pregnant' do
         before do
-          @instance = subject.new('applicant', applicant1.id,:is_post_partum_period)
+          @instance = subject.new('applicant', applicant1.id, :is_post_partum_period)
         end
 
         it 'should not return true' do
@@ -153,7 +153,30 @@ RSpec.describe "::FinancialAssistance::Factories::ConditionalFieldsLookupFactory
       context 'where the current applicant is not pregnant' do
         before do
           applicant1.update_attributes!(is_pregnant: false)
-          @instance = subject.new('applicant', applicant1.id,:is_post_partum_period)
+          @instance = subject.new('applicant', applicant1.id, :is_post_partum_period)
+        end
+
+        it 'should return true' do
+          expect(@instance.conditionally_displayable?).to be_truthy
+        end
+      end
+    end
+
+    describe 'for not pregnant, pregnancy_end_on' do
+      context 'where the current applicant is pregnant' do
+        before do
+          @instance = subject.new('applicant', applicant1.id, :pregnancy_end_on)
+        end
+
+        it 'should not return true' do
+          expect(@instance.conditionally_displayable?).to be_falsey
+        end
+      end
+
+      context 'where the current applicant is not pregnant' do
+        before do
+          applicant1.update_attributes!(is_pregnant: false, is_post_partum_period: true)
+          @instance = subject.new('applicant', applicant1.id, :pregnancy_end_on)
         end
 
         it 'should return true' do

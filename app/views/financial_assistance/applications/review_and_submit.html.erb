@@ -220,7 +220,7 @@
             <% if @cfl_service.displayable_field?('applicant', applicant.id, :non_ssn_apply_reason) %>
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                 <div class="col-md-6">Why doesn't this person have an SSN?</div>
-                <div class="col-md-6"><%= human_boolean applicant.non_ssn_apply_reason %></div>
+                <div class="col-md-6"><%= applicant.non_ssn_apply_reason.to_s %></div>
               </div>
             <% end %>
 
@@ -242,13 +242,14 @@
               </div>
             <% end %>
 
-            <!-- Case where the applicant is Not Pregnant(fields: :is_post_partum_period and :pregnancy_end_on) -->
             <% if @cfl_service.displayable_field?('applicant', applicant.id, :is_post_partum_period) %>
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                 <div class="col-md-6">Was this person pregnant in the last 60 days?</div>
                 <div class="col-md-6"><%= human_boolean applicant.is_post_partum_period %></div>
               </div>
+            <% end %>
 
+            <% if @cfl_service.displayable_field?('applicant', applicant.id, :pregnancy_end_on) %>
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                 <div class="col-md-6">Pregnancy end on date</div>
                 <div class="col-md-6"><%= applicant.pregnancy_end_on.to_s %></div>

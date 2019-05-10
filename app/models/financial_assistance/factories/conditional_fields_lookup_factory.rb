@@ -53,10 +53,14 @@ module FinancialAssistance
         @instance.is_pregnant
       end
 
-      # method to check for both is_post_partum_period and pregnancy_end_on fields
       def is_post_partum_period
         # Intentionally verifying if the value is 'false', as value NIL means something else in this context
         @instance.is_pregnant == false
+      end
+
+      def pregnancy_end_on
+        # Intentionally verifying if the value is 'false', as value NIL means something else in this context
+        @instance.is_pregnant == false && @instance.is_post_partum_period #&& @instance.pregnancy_end_on.present?
       end
 
       def is_enrolled_on_medicaid
