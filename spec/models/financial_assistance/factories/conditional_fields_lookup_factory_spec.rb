@@ -259,6 +259,18 @@ RSpec.describe "::FinancialAssistance::Factories::ConditionalFieldsLookupFactory
           @instance = subject.new('applicant', applicant1.id, :foster_care_us_state)
         end
 
+        it 'should return false' do
+          expect(@instance.conditionally_displayable?).to eq false
+        end
+      end
+
+      context 'where the current applicant has not enrolled in Medicaid and also satisfies foster care age' do
+        before do
+          primary_person.update_attributes(dob: (TimeKeeper.date_of_record - 21.years))
+          applicant1.update_attributes!(is_former_foster_care: true)
+          @instance = subject.new('applicant', applicant1.id, :foster_care_us_state)
+        end
+
         it 'should return true' do
           expect(@instance.conditionally_displayable?).to be_truthy
         end
