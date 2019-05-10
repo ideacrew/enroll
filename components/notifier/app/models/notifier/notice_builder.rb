@@ -1,6 +1,7 @@
 module Notifier
   module NoticeBuilder
     include Config::SiteConcern
+    include Config::SiteHelper
     include Notifier::ApplicationHelper
     include ApplicationHelper
     include Notifier::ApplicationHelper
@@ -171,23 +172,23 @@ module Notifier
     end
 
     def recipient_name
-      if resource.is_a?(BenefitSponsors::Organizations::AcaShopCcaEmployerProfile)
-        return resource.staff_roles.first.full_name.titleize
-      end
+      return resource.staff_roles.first.full_name.titleize if is_employer?
 
-      if resource.is_a?(EmployeeRole)
-        return resource.person.full_name.titleize
-      end
+      return resource.person.full_name.titleize if is_employee?
     end
 
     def recipient_to
-      if resource.is_a?(BenefitSponsors::Organizations::AcaShopCcaEmployerProfile)
-        return resource.staff_roles.first.work_email_or_best
-      end
+      return resource.staff_roles.first.work_email_or_best if is_employer?
 
-      if resource.is_a?(EmployeeRole)
-        return resource.person.work_email_or_best
-      end
+      return resource.person.work_email_or_best if is_employee?
+    end
+
+    def is_employer?
+      resource.is_a?("BenefitSponsors::Organizations::AcaShop#{site_key.capitalize}EmployerProfile".constantize)
+    end
+
+    def is_employee?
+      resource.is_a?(EmployeeRole)
     end
 
     # @param recipient is a Person object
@@ -196,11 +197,11 @@ module Notifier
     end
 
     def send_generic_notice_alert_to_broker
-      if resource.is_a?(BenefitSponsors::Organizations::AcaShopCcaEmployerProfile) && resource.broker_agency_profile.present?
-        broker_name = resource.broker_agency_profile.primary_broker_role.person.full_name
-        broker_email = resource.broker_agency_profile.primary_broker_role.email_address
-        UserMailer.generic_notice_alert_to_ba(broker_name, broker_email, resource.legal_name.titleize).deliver_now
-      end
+      return unless is_employer? && resource.broker_agency_profile.present?
+
+      broker_name = resource.broker_agency_profile.primary_broker_role.person.full_name
+      broker_email = resource.broker_agency_profile.primary_broker_role.email_address
+      UserMailer.generic_notice_alert_to_ba(broker_name, broker_email, resource.legal_name.titleize).deliver_now
     end
 
     def store_paper_notice

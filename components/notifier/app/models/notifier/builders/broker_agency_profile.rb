@@ -1,6 +1,7 @@
 module Notifier
   class Builders::BrokerAgencyProfile
 
+    include Config::SiteHelper
     # include Notifier::Builders::PlanYear
     include Notifier::Builders::Broker
 
@@ -50,9 +51,9 @@ module Notifier
     end
 
     def employer
-      if payload['event_object_kind'].constantize == BenefitSponsors::Organizations::AcaShopCcaEmployerProfile
-        employer = BenefitSponsors::Organizations::Profile.find payload['event_object_id']
-      end
+      return unless payload['event_object_kind'].constantize == "BenefitSponsors::Organizations::AcaShop#{site_key.capitalize}EmployerProfile".constantize
+
+      BenefitSponsors::Organizations::Profile.find payload['event_object_id']
     end
 
     def employer_name
