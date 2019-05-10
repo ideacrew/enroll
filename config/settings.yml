@@ -204,8 +204,8 @@ aca:
       days: -60
 
     initial_application:
-      publish_due_day_of_month: 15
-      advertised_deadline_of_month: 10
+      publish_due_day_of_month: 5
+      advertised_deadline_of_month: 1
       earliest_start_prior_to_effective_on:
         months: -2
         day_of_month: 0
@@ -222,10 +222,10 @@ aca:
       earliest_start_prior_to_effective_on:
         months: -2
         day_of_month: 21
-      monthly_open_enrollment_end_on: 20
-      publish_due_day_of_month: 15
-      application_submission_soft_deadline: 10
-      force_publish_day_of_month: 16
+      monthly_open_enrollment_end_on: 13
+      publish_due_day_of_month: 10
+      application_submission_soft_deadline: 5
+      force_publish_day_of_month: 11
       open_enrollment:
         minimum_length:
           days: 5
