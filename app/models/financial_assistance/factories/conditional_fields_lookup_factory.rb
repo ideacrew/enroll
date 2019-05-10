@@ -39,13 +39,17 @@ module FinancialAssistance
         @instance.is_claimed_as_tax_dependent
       end
 
+      def has_no_ssn?
+        @instance.person.no_ssn == '1'
+      end
+
       def is_ssn_applied
-        !@instance.is_ssn_applied.nil?
+        has_no_ssn? && !@instance.is_ssn_applied.nil?
       end
 
       def non_ssn_apply_reason
         # Intentionally verifying if the value is 'false', as value NIL means something else in this context
-        @instance.is_ssn_applied == false && @instance.non_ssn_apply_reason.present?
+        has_no_ssn? && @instance.is_ssn_applied == false && @instance.non_ssn_apply_reason.present?
       end
 
       # method to check for both pregnancy_due_on and children_expected_count fields
