@@ -45,6 +45,15 @@ module BenefitSponsors
         __send__(method_name, model_event, census_employee)
       end
 
+      def process_employee_role_events(_model_instance, model_event)
+        raise ArgumentError, "expected BenefitSponsors::ModelEvents::ModelEvent" unless model_event.present? && model_event.is_a?(BenefitSponsors::ModelEvents::ModelEvent)
+
+        method_name = "trigger_#{model_event.event_key}_notice"
+        raise StandardError, "unable to find method name: #{method_name}" unless respond_to?(method_name)
+
+        __send__(method_name, model_event)
+      end
+
       def process_broker_agency_events(_model_instance, model_event)
         raise ArgumentError, "expected BenefitSponsors::ModelEvents::ModelEvent" unless model_event.present? && model_event.is_a?(BenefitSponsors::ModelEvents::ModelEvent)
 
@@ -122,7 +131,7 @@ module BenefitSponsors
 
         return unless !is_valid_employer_py_oe && (hbx_enrollment.enrollment_kind == "special_enrollment" || hbx_enrollment.census_employee.new_hire_enrollment_period.cover?(TimeKeeper.date_of_record))
 
-        deliver(recipient: hbx_enrollment.employer_profile, event_object: hbx_enrollment, notice_event: "employee_mid_year_plan_change_notice_to_employer")
+        deliver(recipient: hbx_enrollment.employer_profile, event_object: hbx_enrollment, notice_event: "employee_mid_year_plan_change_non_congressional_notice")
         deliver(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "employee_plan_selection_confirmation_sep_new_hire")
       end
 
@@ -153,11 +162,16 @@ module BenefitSponsors
         deliver(recipient: census_employee.employee_role, event_object: model_event.options[:event_object], notice_event: "employee_coverage_passive_renewal_failed")
       end
 
+      def trigger_employee_matches_employer_roster_notice(model_event)
+        employee_role = model_event.klass_instance
+        deliver(recipient: employee_role, event_object: employee_role.census_employee, notice_event: "employee_matches_employer_roster")
+      end
+
       def trigger_application_submitted_notice(model_event)
         benefit_application = model_event.klass_instance
         trigger_zero_employees_on_roster_notice(benefit_application)
         if benefit_application.is_renewing?
-          deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "renewal_application_published")
+          deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "renewal_application_submitted")
         else
           deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "initial_application_submitted")
         end
@@ -225,7 +239,7 @@ module BenefitSponsors
 
       def trigger_renewal_application_autosubmitted_notice(model_event)
         benefit_application = model_event.klass_instance
-        deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "plan_year_auto_published") if benefit_application.is_renewing?
+        deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "renewal_application_autosubmitted") if benefit_application.is_renewing?
         trigger_zero_employees_on_roster_notice(benefit_application)
       end
 
