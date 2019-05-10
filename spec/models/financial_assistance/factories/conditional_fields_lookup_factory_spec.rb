@@ -71,12 +71,26 @@ RSpec.describe "::FinancialAssistance::Factories::ConditionalFieldsLookupFactory
       [true, false].each do |boolean|
         context 'where the current applicant has applied for SSN' do
           before do
+            primary_person.update_attributes!(no_ssn: '1')
             applicant1.update_attributes!(is_ssn_applied: boolean)
             @instance = subject.new('applicant', applicant1.id, :is_ssn_applied)
           end
 
           it 'should return true' do
             expect(@instance.conditionally_displayable?).to be_truthy
+          end
+        end
+      end
+
+      [true, false].each do |boolean|
+        context 'where the current applicant has applied for SSN but has an SSN' do
+          before do
+            applicant1.update_attributes!(is_ssn_applied: boolean)
+            @instance = subject.new('applicant', applicant1.id, :is_ssn_applied)
+          end
+
+          it 'should return false' do
+            expect(@instance.conditionally_displayable?).to eq false
           end
         end
       end
@@ -93,14 +107,26 @@ RSpec.describe "::FinancialAssistance::Factories::ConditionalFieldsLookupFactory
         end
       end
 
-      context 'where the current applicant answered false to is_ssn_applied' do
+      context 'where the current applicant answered false to is_ssn_applied and applicant has no ssn' do
         before do
+          primary_person.update_attributes!(no_ssn: '1')
           applicant1.update_attributes!(is_ssn_applied: false, non_ssn_apply_reason: 'not eligible')
           @instance = subject.new('applicant', applicant1.id, :non_ssn_apply_reason)
         end
 
         it 'should return true' do
           expect(@instance.conditionally_displayable?).to be_truthy
+        end
+      end
+
+      context 'where the current applicant answered false to is_ssn_applied and applicant has a valid ssn' do
+        before do
+          applicant1.update_attributes!(is_ssn_applied: false, non_ssn_apply_reason: 'not eligible')
+          @instance = subject.new('applicant', applicant1.id, :non_ssn_apply_reason)
+        end
+
+        it 'should return false' do
+          expect(@instance.conditionally_displayable?).to eq false
         end
       end
 
