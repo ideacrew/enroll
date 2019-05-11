@@ -8,7 +8,7 @@ module BenefitSponsors
       attribute :id, String
       attribute :kind, String
       attribute :product_option_choice, String
-      attribute :product_package_kind, String, default: 'single_product'
+      attribute :product_package_kind, String, default: Settings.aca.default_dental_option_kind
       
       # for employee cost details
       attribute :employees_cost, Array[EmployeeCostForm]

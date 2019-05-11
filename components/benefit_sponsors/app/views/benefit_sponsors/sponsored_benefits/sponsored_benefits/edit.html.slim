@@ -1,7 +1,7 @@
 = content_for :navigation do
   = render :partial => "ui-components/v1/navs/employers_navigation", :locals => {:active_tab=>params[:tab], organization: @sponsored_benefit_form.service.organization, profile: @sponsored_benefit_form.service.profile}
 
-.container
+.col-md-12.col-xs-12
   h1.heading-text Dental - Edit Benefit Package
   h4 Let's start by creating a benefit package. As you complete the fields below, you can scroll up or down to change your choices at any time to see how it impacts your costs.
   .row#change_reference_product
