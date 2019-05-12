@@ -217,7 +217,7 @@ Given(/^Hbx Admin exists$/) do
   p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true,
                             list_enrollments: true, send_broker_agency_message: true, approve_broker: true, approve_ga: true,
                             modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_lock_unlock: true,
-                            can_reset_password: true, view_the_configuration_tab: true)
+                            can_reset_password: true, view_the_configuration_tab: true, can_access_new_consumer_application_sub_tab: true)
   person = people['Hbx Admin']
   hbx_profile = FactoryBot.create :hbx_profile
   user = FactoryBot.create :user, :with_family, :hbx_staff, with_security_questions: false, email: person[:email], password: person[:password], password_confirmation: person[:password]
@@ -435,7 +435,7 @@ When(/(^.+) enters? office location for (.+)$/) do |role, location|
   select "MA", from: "inputState"
   # agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][state]
   # find(:xpath, "//div[contains(@class, 'selectric-scroll')]/ul/li[contains(text(), '#{location[:state]}')]").click
-
+  select "Primary", from: "kindSelect"
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][zip]', :with => location[:zip]
   if role.include? 'Employer'
     wait_for_ajax
@@ -446,6 +446,7 @@ When(/(^.+) enters? office location for (.+)$/) do |role, location|
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][extension]', :with => location[:phone_extension]
   wait_for_ajax
   page.find('h4', text: "#{Settings.site.byline}").click
+  find('#broker-btn').click
 end
 
 When(/^.+ updates office location from (.+) to (.+)$/) do |old_add, new_add|

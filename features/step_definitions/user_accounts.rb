@@ -113,9 +113,9 @@ When(/^a user enters (.*) user email$/) do |user_role|
 end
 
 Then(/^a user should see a result with (.*) user email and not (.*) user email$/) do |result_user_role, non_result_user_role|
-  case user_role
+  case result_user_role
   when 'Employee Role'
-    user = employee_role
+    result_user = employee_role
   end
   case non_result_user_role
   when 'Broker'
