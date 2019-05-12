@@ -74,27 +74,32 @@ module BenefitSponsors
 
       context "if the TimeKeeper's day is after monthly_end_on" do
         before :each do
-          allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(2019, 01, 29))
+          allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(2019, 1, 29))
         end
 
         it 'should return hash with 2 date keys' do
           ba_schedular = subject.start_on_options_with_schedule(true)
-          [Date.new(2019, 02, 01), Date.new(2019, 03, 01)].each do |date|
+          [Date.new(2019, 2, 1), Date.new(2019, 3, 1)].each do |date|
             expect(ba_schedular.keys.include?(date)).to be_truthy
           end
         end
 
-        it 'should return hash with only 1 date key' do
+        it 'should return hash with dates based on exchange' do
           ba_schedular = subject.start_on_options_with_schedule(false)
-          expect(ba_schedular.keys).to eq [Date.new(2019, 03, 01)]
+          if Settings.site.key == :cca
+            expect(ba_schedular.keys).to eq [Date.new(2019, 3, 1)]
+          else
+            expect(ba_schedular.keys).to eq [Date.new(2019, 3, 1), Date.new(2019, 4, 1)]
+          end
         end
       end
     end
 
     describe 'calculate_start_on_dates' do
-      let(:previous_date) { Date.new(2019, 01, 02) }
-      let(:later_date) { Date.new(2019, 01, 28) }
-      let(:both_dates) { [Date.new(2019, 02, 01), Date.new(2019, 03, 01)] }
+      let(:previous_date) { Date.new(2019, 1, 2) }
+      let(:later_date) { Date.new(2019, 1, 28) }
+      let(:both_dates) { [Date.new(2019, 2, 1), Date.new(2019, 3, 1)] }
+      let(:dc_dates) { [Date.new(2019, 2, 1), Date.new(2019, 3, 1), Date.new(2019, 4, 1)] }
 
       context 'after open_enrollment_minimum_begin_day_of_month' do
         before :each do
@@ -102,14 +107,22 @@ module BenefitSponsors
         end
 
         context 'not an admin data table action' do
-          it 'should return 1 date' do
-            expect(subject.calculate_start_on_dates).to eq [Date.new(2019, 03, 01)]
+          it 'should return dates based on exchange' do
+            if Settings.site.key == :cca
+              expect(subject.calculate_start_on_dates).to eq [Date.new(2019, 3, 1)]
+            else
+              expect(subject.calculate_start_on_dates).to eq [Date.new(2019, 3, 1), Date.new(2019, 4, 1)]
+            end
           end
         end
 
         context 'not an admin data table action' do
-          it 'should return 2 dates' do
-            expect(subject.calculate_start_on_dates(true)).to eq both_dates
+          it 'should return dates based on exchange' do
+            if Settings.site.key == :cca
+              expect(subject.calculate_start_on_dates(true)).to eq both_dates
+            else
+              expect(subject.calculate_start_on_dates(true)).to eq dc_dates
+            end
           end
         end
       end
@@ -120,24 +133,32 @@ module BenefitSponsors
         end
 
         context 'not an admin data table action' do
-          it 'should return 1 date' do
-            expect(subject.calculate_start_on_dates).to eq both_dates
+          it 'should return dates based on exchange' do
+            if Settings.site.key == :cca
+              expect(subject.calculate_start_on_dates).to eq both_dates
+            else
+              expect(subject.calculate_start_on_dates).to eq dc_dates
+            end
           end
         end
 
         context 'not an admin data table action' do
-          it 'should return 2 dates' do
-            expect(subject.calculate_start_on_dates(true)).to eq both_dates
+          it 'should return correct dates based on exchange' do
+            if Settings.site.key == :cca
+              expect(subject.calculate_start_on_dates(true)).to eq both_dates
+            else
+              expect(subject.calculate_start_on_dates(true)).to eq dc_dates
+            end
           end
         end
       end
     end
 
     describe 'open_enrollment_period_by_effective_date' do
-      let(:start_on) { Date.new(2019, 02, 01) }
-      let(:previous_date) { Date.new(2019, 01, 02) }
-      let(:later_date) { Date.new(2019, 01, 28) }
-      let(:default_monthly_end_on_date) { Date.new(2019, 01, Settings.aca.shop_market.open_enrollment.monthly_end_on) }
+      let(:start_on) { Date.new(2019, 2, 1) }
+      let(:previous_date) { Date.new(2019, 1, 2) }
+      let(:later_date) { Date.new(2019, 1, 28) }
+      let(:default_monthly_end_on_date) { Date.new(2019, 1, Settings.aca.shop_market.open_enrollment.monthly_end_on) }
       let(:oe_min_days) { Settings.aca.shop_market.open_enrollment.minimum_length.days }
       let(:oe_start_date) { (start_on - Settings.aca.shop_market.open_enrollment.maximum_length.months.months) }
 

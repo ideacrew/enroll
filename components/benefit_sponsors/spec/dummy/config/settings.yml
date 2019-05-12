@@ -18,7 +18,7 @@ site:
   main_web_address: "www.MAhealthconnector.org"
   health_care_website: "www.healthcare.gov"
   health_care_website_url: "https://www.healthcare.gov"
-  short_name: "Health Connector"
+  short_name: "DC Health Link"
   byline: "The Right Place for the Right Plan"
   long_name: "Massachusetts Health Connector"
   copyright_period_start: "2017"
@@ -28,7 +28,7 @@ site:
   tab_icon: 'favicon.ico'
   mailer_logo_file_name: "health_connector.png"
   employer_application_deadline_link: "https://www.mahealthconnector.org/business/employers/employer-resources-and-information/employer-coverage-deadlines"
-  s3_prefix: "mhc"
+  s3_prefix: "dc"
   broker_quoting_enabled: false
   broker_claim_quoting_enabled: true
   guidance_for_business_owners_url: "https://www.mahealthconnector.org/help-center-answers/guidance-for-business-owners"
@@ -131,13 +131,13 @@ invoices:
   addendum: 'ma_non_discrimination_and_language_tags.pdf'
 
 aca:
-  state_name: "Massachusetts"
-  state_abbreviation: "MA"
+  state_name: "District of Columbia"
+  state_abbreviation: "DC"
   state_key : "dc"
-  market_kinds: ["shop"]
+  market_kinds: ["shop", "individual"]
   hbx_abbreviation: "DC Health Benefit Exchange"
   nationwide_markets: true
-  general_agency_enabled: false
+  general_agency_enabled: true
   broker_carrier_appointments_enabled: true
   dental_market_enabled: true
   calendar_enabled: true
@@ -164,7 +164,7 @@ aca:
 
   qle:
     with_in_sixty_days: 60
-#
+  #
   individual_market:
     monthly_enrollment_due_on: 15
     verification_outstanding_window:
@@ -173,20 +173,22 @@ aca:
       days: 95
 
     open_enrollment:
-      start_on: <%= Date.new(2017,11,1) %>
-      end_on: <%= Date.new(2018,02,05) %>
-    upcoming_open_enrollment:
       start_on: <%= Date.new(2018,11,1) %>
-      end_on: <%= Date.new(2019,01,31) %>
+      end_on: <%= Date.new(2019,02,8) %>
+      # dc_resident_application: true
+      # transition_family_members_link: true
+    upcoming_open_enrollment:
+      start_on: <%= Date.new(2019,11,1) %>
+      end_on: <%= Date.new(2020,01,31) %>
 
   shop_market:
     valid_employer_attestation_documents_url: 'https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist'
     small_market_employee_count_maximum: 50
     employer_contribution_percent_minimum: 50
     employer_family_contribution_percent_minimum: 33
-    employee_participation_ratio_minimum: <%= 3 / 4.0 %>
+    employee_participation_ratio_minimum: <%= 2 / 3.0 %>
     non_owner_participation_count_minimum: 1
-    binder_payment_due_on: 23
+    binder_payment_due_on: 12
     small_market_active_employee_limit: 200
     new_employee_paper_application: true
     census_employees_template_file: 'Health Connector - Employee Census Template'
@@ -203,10 +205,10 @@ aca:
       days: -60
 
     initial_application:
-      publish_due_day_of_month: 15
-      advertised_deadline_of_month: 10
+      publish_due_day_of_month: 5
+      advertised_deadline_of_month: 1
       earliest_start_prior_to_effective_on:
-        months: -2
+        months: -3
         day_of_month: 0
       appeal_period_after_application_denial:
         days: 30
@@ -215,22 +217,22 @@ aca:
         days: 90
       quiet_period:
         month_offset: 0
-        mday: 8
+        mday: 28
 
     renewal_application:
       earliest_start_prior_to_effective_on:
-        months: -2
-        day_of_month: 21
-      monthly_open_enrollment_end_on: 20
-      publish_due_day_of_month: 15
-      application_submission_soft_deadline: 10
-      force_publish_day_of_month: 16
+        months: -3
+        day_of_month: 0
+      monthly_open_enrollment_end_on: 13
+      publish_due_day_of_month: 10
+      application_submission_soft_deadline: 5
+      force_publish_day_of_month: 11
       open_enrollment:
         minimum_length:
-          days: 5
+          days: 3
       quiet_period:
         month_offset: -1
-        mday: 25
+        mday: 15
 
     benefit_period:
       length_minimum:
@@ -240,7 +242,7 @@ aca:
 
     open_enrollment:
       monthly_start_on: 1
-      monthly_end_on: 20
+      monthly_end_on: 10
 
       minimum_length:
         days: 5

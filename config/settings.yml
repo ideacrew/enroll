@@ -185,9 +185,9 @@ aca:
     small_market_employee_count_maximum: 50
     employer_contribution_percent_minimum: 50
     employer_family_contribution_percent_minimum: 33
-    employee_participation_ratio_minimum: <%= 3 / 4.0 %>
+    employee_participation_ratio_minimum: <%= 2 / 3.0 %>
     non_owner_participation_count_minimum: 1
-    binder_payment_due_on: 23
+    binder_payment_due_on: 12
     small_market_active_employee_limit: 200
     new_employee_paper_application: true
     census_employees_template_file: 'Health Connector - Employee Census Template'
@@ -204,10 +204,10 @@ aca:
       days: -60
 
     initial_application:
-      publish_due_day_of_month: 15
-      advertised_deadline_of_month: 10
+      publish_due_day_of_month: 5
+      advertised_deadline_of_month: 1
       earliest_start_prior_to_effective_on:
-        months: -2
+        months: -3
         day_of_month: 0
       appeal_period_after_application_denial:
         days: 30
@@ -216,22 +216,22 @@ aca:
         days: 90
       quiet_period:
         month_offset: 0
-        mday: 8
+        mday: 28
 
     renewal_application:
       earliest_start_prior_to_effective_on:
-        months: -2
-        day_of_month: 21
-      monthly_open_enrollment_end_on: 20
-      publish_due_day_of_month: 15
-      application_submission_soft_deadline: 10
-      force_publish_day_of_month: 16
+        months: -3
+        day_of_month: 0
+      monthly_open_enrollment_end_on: 13
+      publish_due_day_of_month: 10
+      application_submission_soft_deadline: 5
+      force_publish_day_of_month: 11
       open_enrollment:
         minimum_length:
-          days: 5
+          days: 3
       quiet_period:
         month_offset: -1
-        mday: 25
+        mday: 15
 
     benefit_period:
       length_minimum:
@@ -241,7 +241,7 @@ aca:
 
     open_enrollment:
       monthly_start_on: 1
-      monthly_end_on: 20
+      monthly_end_on: 10
 
       minimum_length:
         days: 5
