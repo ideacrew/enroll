@@ -435,7 +435,7 @@ When(/(^.+) enters? office location for (.+)$/) do |role, location|
   select "MA", from: "inputState"
   # agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][state]
   # find(:xpath, "//div[contains(@class, 'selectric-scroll')]/ul/li[contains(text(), '#{location[:state]}')]").click
-
+  select "Primary", from: "kindSelect"
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][zip]', :with => location[:zip]
   if role.include? 'Employer'
     wait_for_ajax
@@ -446,6 +446,7 @@ When(/(^.+) enters? office location for (.+)$/) do |role, location|
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][extension]', :with => location[:phone_extension]
   wait_for_ajax
   page.find('h4', text: "#{Settings.site.byline}").click
+  find('#broker-btn').click
 end
 
 When(/^.+ updates office location from (.+) to (.+)$/) do |old_add, new_add|
