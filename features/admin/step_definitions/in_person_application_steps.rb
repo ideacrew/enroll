@@ -9,7 +9,9 @@ When(/^the Admin clicks CONTINUE after uploading and verifying an Identity$/) do
     attach_file('file[]', "#{Rails.root}/lib/pdf_templates/blank.pdf", visible: false)
   end
   wait_for_ajax(10, 2)
-  find(:xpath, "//*[@id='Identity']/div/div[4]/div").click
+  within('#Identity') do
+    find('.label', :text => "Action").click
+  end
   find('.interaction-choice-control-verification-reason-1').click
   wait_for_ajax(10, 2)
   find('.selectric-interaction-choice-control-verification-reason').click
