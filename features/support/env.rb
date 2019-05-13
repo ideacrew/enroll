@@ -6,7 +6,7 @@
 
 ENV["RAILS_ENV"] ||= 'test'
 $LOADING_CUCUMBER_ENV = true
-require 'selenium-webdriver'
+require 'webdrivers'
 require 'cucumber/rails'
 require 'email_spec/cucumber'
 require 'rspec/expectations'
@@ -72,10 +72,13 @@ Cucumber::Rails::Database.javascript_strategy = :truncation
 
 Capybara::Screenshot.webkit_options = { width: 2280, height: 1800 }
 Capybara::Screenshot.prune_strategy = :keep_last_run
+Webdrivers::Chromedriver.required_version = '2.46'
+Webdrivers.cache_time = 86_400
 
 Capybara.register_driver :selenium_chrome do |app|
   options = Selenium::WebDriver::Chrome::Options.new
   options.add_argument("--window-size=1024,768")
+  options.add_argument("headless")
 
   Capybara::Selenium::Driver.new(app,
     browser: :chrome,
