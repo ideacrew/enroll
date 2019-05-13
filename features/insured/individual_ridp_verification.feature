@@ -71,7 +71,7 @@ Feature: Consumer RIDP verification process
     And the consumer is on the DOCUMENT UPLOAD page
     Then Individual logs out
     When an HBX admin exists
-    When the Admin clicks “Continue” on the doc upload page
+    When admin selects the consumer
     Then the Admin is unable to complete the application for the consumer until ID is verified
 
   Scenario: Identity is verified by admin

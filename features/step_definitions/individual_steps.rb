@@ -59,6 +59,8 @@ And(/user should see your information page$/) do
 end
 
 When(/user goes to register as an individual$/) do
+  # add wait_for_ajax when failed due to ajax delay
+  # wait_for_ajax(30,2)
   fill_in 'person[first_name]', :with => (@u.first_name :first_name)
   fill_in 'person[last_name]', :with => (@u.last_name :last_name)
   fill_in 'jq_datepicker_ignore_person[dob]', :with => (@u.adult_dob :adult_dob)
@@ -75,6 +77,8 @@ When(/^\w+ clicks? on continue button$/) do
 end
 
 Then(/^.+ should see heading labeled personal information/) do
+  # add wait_for_ajax when failed due to ajax delay
+  # wait_for_ajax
   expect(page).to have_content("Personal Information")
 end
 
@@ -229,7 +233,11 @@ And(/I click on continue button on household info form/) do
 end
 
 Then(/Individual creates a new HBX account$/) do
+  # add wait_for_ajax when failed due to ajax delay
+  # wait_for_ajax(30,2)
   find('.interaction-click-control-create-account').click
+  # add wait_for_ajax when failed due to ajax delay
+  # wait_for_ajax(30,2)
   fill_in "user[oim_id]", :with => "testflow@test.com"
   fill_in "user[password]", :with => "aA1!aA1!aA1!"
   fill_in "user[password_confirmation]", :with => "aA1!aA1!aA1!"
@@ -262,6 +270,8 @@ And(/^.+ click on sign in existing account$/) do
 end
 
 And(/I signed in$/) do
+  # add wait_for_ajax when failed due to ajax delay
+  # wait_for_ajax(30,2)
   fill_in "user[login]", :with => "testflow@test.com"
   fill_in "user[password]", :with => "aA1!aA1!aA1!"
   click_button 'Sign in'

@@ -11,17 +11,23 @@ When(/^the consumer clicks CONTINUE$/) do
 end
 
 Then(/^the consumer will be directed to the DOCUMENT UPLOAD page$/) do
+  # add wait_for_ajax when failed due to ajax delay
+  # wait_for_ajax(30,2)
 	expect(page).to have_content('Identity')
 	expect(page).to have_content('Application')
 end
 
 Given(/^that the consumer has “Disagreed” to AUTH & CONSENT$/) do
 	visit 'insured/consumer_role/ridp_agreement'
+  # add wait_for_ajax when failed due to ajax delay
+  # wait_for_ajax(30,2)
 	find(:xpath, '//label[@for="agreement_disagree"]').click
 	click_link "Continue"
 end
 
 And(/^the consumer is on the DOCUMENT UPLOAD page$/) do
+  # add wait_for_ajax when failed due to ajax delay
+  # wait_for_ajax(30,2)
 	expect(page).to have_content('Identity')
 	expect(page).to have_content('Application')
 end
@@ -51,7 +57,9 @@ And(/^an uploaded application in REVIEW status is present$/) do
   file_path = File.dirname(__FILE__)
   allow_any_instance_of(Insured::RidpDocumentsController).to receive(:file_path).and_return(file_path)
   allow(Aws::S3Storage).to receive(:save).with(file_path, 'id-verification').and_return(doc_id)
-  find('#upload_application').click
+  # add wait_for_ajax when failed due to ajax delay
+  # wait_for_ajax(10, 2)
+  find('#upload_application')
 	within '#upload_application' do
 		attach_file("file[]", "#{Rails.root}/lib/pdf_templates/blank.pdf", visible:false)
   end
@@ -68,7 +76,7 @@ And(/^an uploaded identity verification in REVIEW status is present$/) do
   allow_any_instance_of(Insured::RidpDocumentsController).to receive(:file_path).and_return(file_path)
   allow(Aws::S3Storage).to receive(:save).with(file_path, 'id-verification').and_return(doc_id)
 	find('#upload_identity').click
-	find('#select_upload_identity').click
+	find('#select_upload_identity')
 	within '#select_upload_identity' do
 		attach_file("file[]", "#{Rails.root}/lib/pdf_templates/blank.pdf", visible:false)
   end
@@ -80,17 +88,19 @@ And(/^an uploaded identity verification in REVIEW status is present$/) do
 end
 
 And(/^an uploaded application in VERIFIED status is present$/) do
-	login_as hbx_admin
-	visit exchanges_hbx_profiles_root_path
-	find(:xpath, "//li[contains(., '#{"Families"}')]", :wait => 10).click
+  login_as hbx_admin
+  visit exchanges_hbx_profiles_root_path
+  find(:xpath, "//li[contains(., 'Families')]", :wait => 10).click
   find('.interaction-click-control-identity-verification').click
-  wait_for_ajax(10,2)
+  wait_for_ajax(10, 2)
   find('a', :text => /First*/i).click
-	expect(page).to have_content('Application')
-  find(:xpath, "/html/body/div[2]/div[2]/div/div/div[1]/div[2]/div/div/div/div[2]/div[5]/div/div[4]/div").click
+  expect(page).to have_content('Application')
+  wait_for_ajax(10, 2)
+  find(:xpath, "//*[@id='Application']/div/div[4]/div").click
   find('.interaction-choice-control-verification-reason-1').click
-  find('.interaction-choice-control-verification-reason', :text => /\ASelect Reason\z/).click
-  select('Document in EnrollApp', :from => 'verification_reason')
+  wait_for_ajax(10, 2)
+  find('.selectric-interaction-choice-control-verification-reason').click
+  find('li', :text => 'Document in EnrollApp').click
   find('.v-type-confirm-button').click
   expect(page).to have_content('Application successfully verified.')
 end
@@ -99,15 +109,17 @@ And(/^an uploaded Identity verification in VERIFIED status is present$/) do
   login_as hbx_admin
   visit exchanges_hbx_profiles_root_path
   find(:xpath, "//li[contains(., '#{"Families"}')]", :wait => 10).click
-  find(:xpath,'//*[@id="myTab"]/li[2]/ul/li[1]/a/span[1]', :wait => 10).trigger('click')
+  find(:xpath,'//*[@id="myTab"]/li[2]/ul/li[8]/a').click
   wait_for_ajax(10,2)
   family_member = find('a', :text => /First/)
-  family_member.trigger("click")
+  family_member.click
+  wait_for_ajax(10, 2)
   expect(page).to have_content('Identity')
-  find(:xpath, "/html/body/div[2]/div[2]/div/div/div[1]/div[2]/div/div/div/div[2]/div[1]/div/div[4]/div").click
+  find(:xpath, "//*[@id='Identity']/div/div[4]/div").click
   find('.interaction-choice-control-verification-reason-1').click
-  find('.interaction-choice-control-verification-reason', :text => /\ASelect Reason\z/).click
-  select('Document in EnrollApp', :from => 'verification_reason')
+  wait_for_ajax(10, 2)
+  find('.selectric-interaction-choice-control-verification-reason').click
+  find('li', :text => 'Document in EnrollApp').click
   find('.v-type-confirm-button').click
   expect(page).to have_content('Identity successfully verified.')
 end
@@ -130,8 +142,19 @@ When(/^the Admin clicks “Continue” on the doc upload page$/) do
   family_member.trigger("click")
 end
 
+When(/^admin selects the consumer$/) do
+  login_as hbx_admin
+  visit exchanges_hbx_profiles_root_path
+  find(:xpath, "//li[contains(.,'Families')]", :wait => 10).click
+  find(:xpath,'//*[@id="myTab"]/li[2]/ul/li[2]/a').click
+  wait_for_ajax(10,2)
+  find('a', :text => /First/).click
+end
+
 Then(/^the Admin is unable to complete the application for the consumer until ID is verified$/) do
-  find('.interaction-click-control-continue')['disabled'].should == "disabled"
+  # add wait_for_ajax when failed due to ajax delay
+  # wait_for_ajax(30,2)
+  find('.interaction-click-control-continue')['disabled'].should == 'true'
 end
 
 
@@ -142,12 +165,16 @@ When(/^the consumer selects “I Agree”$/) do
 end
 
 Then(/^the consumer will be directed to answer the Experian Identity Proofing questions$/) do
+  # add wait_for_ajax when failed due to ajax delay
+  # wait_for_ajax(30,2)
   expect(page).to have_content('Verify Identity')
   find(:xpath, '//label[@for="interactive_verification_questions_attributes_0_response_id_a"]').click
   find(:xpath, '//label[@for="interactive_verification_questions_attributes_1_response_id_c"]').click
 end
 
 And(/^that the consumer has answered the Experian Identity Proofing questions$/) do
+  # add wait_for_ajax when failed due to ajax delay
+  # wait_for_ajax(30,2)
   find(:xpath, '//label[@for="interactive_verification_questions_attributes_0_response_id_a"]').click
   find(:xpath, '//label[@for="interactive_verification_questions_attributes_1_response_id_c"]').click
   screenshot("identify_verification")
@@ -167,16 +194,19 @@ When(/^an uploaded Identity verification in VERIFIED status is present on failed
   login_as hbx_admin
   visit exchanges_hbx_profiles_root_path
   find(:xpath, "//li[contains(., '#{"Families"}')]", :wait => 10).click
-  find(:xpath,'//*[@id="myTab"]/li[2]/ul/li[1]/a/span[1]', :wait => 10).trigger('click')
+  find(:xpath,'//*[@id="myTab"]/li[2]/ul/li[8]/a').click
   wait_for_ajax(10,2)
   family_member = find('a', :text => /First/)
-  family_member.trigger("click")
+  family_member.click
+  wait_for_ajax(10,2)
   expect(page).to have_content('Identity')
-  find(:xpath, "/html/body/div[2]/div[2]/div/div/div[1]/div[3]/div[1]/div/div/div/div[2]/div[1]/div/div[4]/div").click
+  find(:xpath, "//*[@id='Identity']/div/div[4]/div").click
   find('.interaction-choice-control-verification-reason-1').click
-  find('.interaction-choice-control-verification-reason', :text => /\ASelect Reason\z/).click
-  select('Document in EnrollApp', :from => 'verification_reason')
+  wait_for_ajax(10,2)
+  find('.selectric-interaction-choice-control-verification-reason').click
+  find('li', :text => 'Document in EnrollApp').click
   find('.v-type-confirm-button').click
+  wait_for_ajax(10,2)
   expect(page).to have_content('Identity successfully verified.')
 end
 
@@ -184,16 +214,19 @@ When(/^an uploaded application in VERIFIED status is present on failed experian 
   login_as hbx_admin
   visit exchanges_hbx_profiles_root_path
   find(:xpath, "//li[contains(., '#{"Families"}')]", :wait => 10).click
-  find(:xpath,'//*[@id="myTab"]/li[2]/ul/li[1]/a/span[1]', :wait => 10).trigger('click')
+  find(:xpath,'//*[@id="myTab"]/li[2]/ul/li[8]/a').click
   wait_for_ajax(10,2)
   family_member = find('a', :text => /First/)
-  family_member.trigger("click")
+  family_member.click
+  wait_for_ajax(10,2)
   expect(page).to have_content('Application')
-  find(:xpath, "/html/body/div[2]/div[2]/div/div/div[1]/div[3]/div[1]/div/div/div/div[2]/div[5]/div/div[4]/div").click
+  find(:xpath, "//*[@id='Application']/div/div[4]/div").click
   find('.interaction-choice-control-verification-reason-1').click
-  find('.interaction-choice-control-verification-reason', :text => /\ASelect Reason\z/).click
-  select('Document in EnrollApp', :from => 'verification_reason')
+  wait_for_ajax(10,2)
+  find('.selectric-interaction-choice-control-verification-reason').click
+  find('li', :text => 'Document in EnrollApp').click
   find('.v-type-confirm-button').click
+  wait_for_ajax(10,2)
   expect(page).to have_content('Application successfully verified.')
 end
 
@@ -213,6 +246,8 @@ end
 When(/^HBX admin click on none of the situations listed above apply checkbox$/) do
   expect(page).to have_content 'None of the situations listed above apply'
   find('#no_qle_checkbox').click
+  # add wait_for_ajax when failed due to ajax delay
+  # wait_for_ajax(30,2)
   expect(page).to have_content 'To enroll before open enrollment'
 end
 
@@ -222,6 +257,8 @@ And(/^HBX admin click on back to my account button$/) do
 end
 
 Then(/^HBX admin should land on home page$/) do
+  # add wait_for_ajax when failed due to ajax delay
+  # wait_for_ajax(30,2)
   expect(page).to have_content 'My DC Health Link'
 end
 

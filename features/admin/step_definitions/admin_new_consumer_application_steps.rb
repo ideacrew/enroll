@@ -7,18 +7,22 @@ When(/^hbx admin uploads application document and verifies application$/) do
   file_path = File.dirname(__FILE__)
   allow_any_instance_of(Insured::RidpDocumentsController).to receive(:file_path).and_return(file_path)
   allow(Aws::S3Storage).to receive(:save).with(file_path, 'id-verification').and_return(doc_id)
-  find('#upload_application').click
+  find('#upload_application')
   within '#upload_application' do
     attach_file("file[]", "#{Rails.root}/lib/pdf_templates/blank.pdf", visible:false)
   end
   wait_for_ajax(2)
   expect(page).to have_content('File Saved')
   expect(page).to have_content('In Review')
-  find(:xpath, "/html/body/div[2]/div[3]/div/div/div[1]/div[2]/div/div/div/div[2]/div[5]/div/div[4]/div/div[2]").click
+  wait_for_ajax(2,2)
+  within('#Application') do
+    find('.label', :text => "Action").click
+  end
   find('.interaction-choice-control-verification-reason-1').click
-  find('.interaction-choice-control-verification-reason', :text => /\ASelect Reason\z/).click
-  select('Document in EnrollApp', :from => 'verification_reason')
+  find('.selectric-interaction-choice-control-verification-reason').click
+  find('li', :text => 'Document in EnrollApp').click
   find('.v-type-confirm-button').click
+  wait_for_ajax(10,2)
 
   expect(page).to have_content('Application successfully verified.')
 end
@@ -32,6 +36,8 @@ Then(/^Admin continues to families home page$/) do
 end
 
 When(/^user registers as an individual$/) do
+  # add wait_for_ajax when failed due to ajax delay
+  # wait_for_ajax(2,2)
   fill_in "person_first_name", with: "John"
   fill_in "person_last_name", with: "Smith"
   fill_in "jq_datepicker_ignore_person_dob", with: "11/11/1991"
@@ -51,6 +57,8 @@ When(/^the Individual clicks CONTINUE$/) do
 end
 
 Then(/^Individual should land on Documents upload page$/) do
+  # add wait_for_ajax when failed due to ajax delay
+  # wait_for_ajax(30,2)
   expect(page).to have_content('Verified')
   expect(page).to have_content('Identity')
   expect(page).to have_content('Application')
@@ -60,10 +68,11 @@ When(/^clicks on Individual in Families tab$/) do
   login_as hbx_admin
   visit exchanges_hbx_profiles_root_path
   find(:xpath, "//li[contains(., '#{"Families"}')]", :wait => 10).click
-  find(:xpath,'//*[@id="myTab"]/li[2]/ul/li[1]/a/span[1]', :wait => 10).trigger('click')
+  find(:xpath,'//*[@id="myTab"]/li[2]/ul/li[2]/a', :wait => 10).click
   wait_for_ajax(10,2)
   family_member = find('a', :text => /\AJohn Smith\z/)
-  family_member.trigger("click")
+  family_member.click
+  wait_for_ajax(10,2)
   expect(page).to have_content('Identity')
 end
 

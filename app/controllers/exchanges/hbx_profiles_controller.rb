@@ -304,14 +304,6 @@ def employer_poc
     @datatable = Effective::Datatables::IdentityVerificationDataTable.new(params[:scopes])
   end
 
-  def identity_verification
-    @datatable = Effective::Datatables::IdentityVerificationDataTable.new(params[:scopes])
-  end
-
-  def user_account_index
-    @datatable = Effective::Datatables::UserAccountDatatable.new
-  end
-
   def user_account_index
     @datatable = Effective::Datatables::UserAccountDatatable.new
   end
