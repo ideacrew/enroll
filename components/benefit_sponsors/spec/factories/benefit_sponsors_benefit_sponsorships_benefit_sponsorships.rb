@@ -51,7 +51,7 @@ FactoryGirl.define do
         if evaluator.site
           site = evaluator.site
         else
-          site  = create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
+          site  = BenefitSponsors::Site.by_site_key(:cca).first || create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
         end
         organization  = create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)
         benefit_sponsorship.benefit_market = site.benefit_markets.first

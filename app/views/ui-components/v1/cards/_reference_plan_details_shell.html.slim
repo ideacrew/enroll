@@ -7,9 +7,13 @@
 
 
 .panel.panel-default
-  .panel-body
-    h5.heading-text
-      strong#referencePlanTitle
+  .panel-body    
+    .col-xs-8
+        h5.heading-text
+          strong#referencePlanTitle
+    .col-xs-4
+      .row#changeReferencePlan.hidden 
+        a onclick="showPlanSelection()" Change reference Plan?      
     table.table
       tbody
         tr

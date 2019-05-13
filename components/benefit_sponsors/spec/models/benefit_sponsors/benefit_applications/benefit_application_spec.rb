@@ -1,8 +1,11 @@
 require 'rails_helper'
+require File.join(File.dirname(__FILE__), "..", "..", "..", "support/benefit_sponsors_site_spec_helpers")
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 module BenefitSponsors
   RSpec.describe BenefitApplications::BenefitApplication, type: :model, :dbclean => :after_each do
-    let(:site)                    { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    let(:site) { ::BenefitSponsors::SiteSpecHelpers.create_cca_site_with_hbx_profile_and_benefit_market }
     let(:benefit_market)          { site.benefit_markets.first }
     let(:employer_organization)   { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let(:benefit_sponsorship)    { BenefitSponsors::BenefitSponsorships::BenefitSponsorship.new(profile: employer_organization.employer_profile) }
@@ -28,9 +31,21 @@ module BenefitSponsors
       }
     end
 
+    let(:valid_params) do
+      {
+          effective_period:         effective_period,
+          open_enrollment_period:   open_enrollment_period,
+          benefit_sponsor_catalog:  benefit_sponsor_catalog,
+          recorded_rating_area_id: rating_area.id,
+          recorded_service_area_ids:[service_area.id],
+          recorded_sic_code: sic_code
+      }
+    end
+
     describe "A new model instance" do
      it { is_expected.to be_mongoid_document }
      it { is_expected.to have_fields(:effective_period, :open_enrollment_period, :terminated_on)}
+     it { is_expected.to have_field(:expiration_date).of_type(Date)}
      it { is_expected.to have_field(:aasm_state).of_type(Symbol).with_default_value_of(:draft)}
      it { is_expected.to have_field(:fte_count).of_type(Integer).with_default_value_of(0)}
      it { is_expected.to have_field(:pte_count).of_type(Integer).with_default_value_of(0)}
@@ -97,7 +112,7 @@ module BenefitSponsors
       end
 
       context "with all required arguments" do
-        subject {described_class.new(params) }
+        subject {described_class.new(valid_params) }
 
         before do
           subject.benefit_sponsorship = benefit_sponsorship
@@ -128,7 +143,7 @@ module BenefitSponsors
     describe "Extending an open_enrollment_period", :dbclean => :after_each do
       let(:employer_organization)   { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
       let(:benefit_sponsorship)     { BenefitSponsors::BenefitSponsorships::BenefitSponsorship.new(profile: employer_organization.employer_profile) }
-      let(:benefit_application)     { described_class.new(params) }
+      let(:benefit_application)     { described_class.new(valid_params) }
 
       before do
         benefit_application.benefit_sponsorship = benefit_sponsorship
@@ -294,7 +309,7 @@ module BenefitSponsors
     describe "Transitioning a BenefitApplication through Plan Design states" do
       let(:employer_organization)   { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
       let(:benefit_sponsorship)     { BenefitSponsors::BenefitSponsorships::BenefitSponsorship.new(profile: employer_organization.employer_profile) }
-      let(:benefit_application)     { described_class.new(params) }
+      let(:benefit_application)     { described_class.new(valid_params) }
 
 
       before do
@@ -460,6 +475,8 @@ module BenefitSponsors
         let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile_id: nil, benefit_sponsors_employer_profile_id: employer_profile.id, benefit_sponsorship: benefit_sponsorship, :benefit_group_assignments => [benefit_group_assignment]) }
 
         let!(:renewal_application) {initial_application.renew(renewal_benefit_sponsor_catalog)}
+        let(:renewal_bga) {FactoryGirl.create(:benefit_sponsors_benefit_group_assignment, benefit_group: renewal_application.benefit_packages.first, census_employee: census_employee, is_active: false)}
+
 
         it "should generate renewal application" do
           expect(renewal_application.predecessor).to eq initial_application
@@ -471,7 +488,7 @@ module BenefitSponsors
 
           before do
             renewal_application.save
-            census_employee.reload
+            renewal_bga
           end
 
           it "should create renewal benefit group assignment" do
@@ -488,12 +505,15 @@ module BenefitSponsors
         context "when renewal application moved to enrollment_open state" do
 
           before do
+            renewal_bga
             renewal_application.aasm_state = :enrollment_open
+            renewal_application.recorded_rating_area=  rating_area
+            renewal_application.recorded_service_areas = [service_area]
+            renewal_application.recorded_sic_code = sic_code
             renewal_application.save!
           end
 
           it "should not update benefit group assignments" do
-            census_employee.reload
             expect(renewal_application.aasm_state).to eq :enrollment_open
 
             expect(census_employee.renewal_benefit_group_assignment.is_active).to eq false
@@ -507,23 +527,66 @@ module BenefitSponsors
         context "when renewal application moved to active state" do
 
           before do
+            renewal_bga
             renewal_application.aasm_state = :enrollment_eligible
+            renewal_application.recorded_rating_area=  rating_area
+            renewal_application.recorded_service_areas = [service_area]
+            renewal_application.recorded_sic_code = sic_code
+            initial_application.update_attributes(predecessor_id: renewal_application.id)
+            renewal_application.renew_benefit_package_assignments
             renewal_application.save!
             renewal_application.activate_enrollment!
-            census_employee.reload
           end
 
           it "should activate renewal benefit group assignment & set is_active to true" do
             expect(renewal_application.aasm_state).to eq :active
-
-            expect(census_employee.active_benefit_group_assignment.benefit_application).to eq renewal_application
+            renewal_bga = census_employee.benefit_group_assignments.effective_on(renewal_application.effective_period.min).first
+            expect(renewal_bga.benefit_application).to eq renewal_application
             expect(census_employee.active_benefit_group_assignment.is_active).to eq true
-            expect(census_employee.renewal_benefit_group_assignment).to eq nil
           end
 
-          it "should deactivate active benefit group assignment" do
+          xit "should deactivate active benefit group assignment" do
             expect(census_employee.benefit_group_assignments.where(benefit_package_id:benefit_package.id).first.is_active).to eq false
           end
+        end
+      end
+    end
+
+    describe "enrollments_till_given_effective_on" do
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup initial benefit application"
+      context "No hbx_enrollments for the benefit application" do
+        it "No hbx_enrollment under the benefit application" do
+          expect(benefit_sponsorship.benefit_applications.first.hbx_enrollments.count).to eq 0
+        end
+      end
+
+      context "HbxEnrollment avalaibale for benefit application return the enrollment with the given date" do
+        before do
+          enrollment = HbxEnrollment.new(effective_on: Date.today.next_month.beginning_of_month)
+          enrollment1 = HbxEnrollment.new(effective_on: Date.today.next_month.beginning_of_month + 2.months)
+          benefit_sponsorship.benefit_applications.first.hbx_enrollments << enrollment
+          benefit_sponsorship.benefit_applications.first.hbx_enrollments << enrollment1
+          benefit_sponsorship.benefit_applications.first.save
+        end
+        it "Benefit application should have enrollment under the application" do
+          expect(benefit_sponsorship.benefit_applications.first.hbx_enrollments.count).not_to eq 0
+        end
+
+        it "Benefit application should have enrollment under the application" do
+          expect(benefit_sponsorship.benefit_applications.first.hbx_enrollments.count).to eq 2
+        end
+
+        it "Should return the enrollments only with the effective date as next month start date" do
+          expect(benefit_sponsorship.benefit_applications.first.enrollments_till_given_effective_on(Date.today.next_month.beginning_of_month).count).not_to eq 0
+        end
+
+        it "should not return enrollment outside given date" do
+          expect(benefit_sponsorship.benefit_applications.first.enrollments_till_given_effective_on(Date.today.next_month.beginning_of_month).count).to eq 1
+        end
+
+        it "should return enrollments within the given date" do
+          expect(benefit_sponsorship.benefit_applications.first.enrollments_till_given_effective_on(Date.today.next_month.beginning_of_month + 2.months).count).to eq 2
         end
       end
     end
@@ -722,6 +785,25 @@ module BenefitSponsors
       end
     end
 
+    describe "after_create actions" do
+      let(:employer_organization)   { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+      let(:benefit_sponsorship)     { BenefitSponsors::BenefitSponsorships::BenefitSponsorship.new(profile: employer_organization.employer_profile) }
+      let(:benefit_application)     { described_class.new(valid_params) }
 
+      before do
+        benefit_application.benefit_sponsorship = benefit_sponsorship
+        benefit_application.save!
+      end
+
+      context "for expiration_date" do
+        it "should default to min date of effective_period" do
+          expect(benefit_application.expiration_date).to eq (benefit_application.effective_period.min)
+        end
+
+        it "should not default to max date of effective_period" do
+          expect(benefit_application.expiration_date).not_to eq (benefit_application.effective_period.max)
+        end
+      end
+    end
   end
 end

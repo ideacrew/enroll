@@ -13,7 +13,7 @@ module BenefitSponsors
       field :probation_period_kind, type: Symbol
       field :is_default, type: Boolean, default: false
       field :is_active, type: Boolean, default: true
-      field :predecessor_id, type: BSON::ObjectId
+      field :predecessor_id, type: BSON::ObjectId  # Deprecated
 
       # Deprecated: replaced by FEHB profile and FEHB market
       # field :is_congress, type: Boolean, default: false
@@ -89,17 +89,6 @@ module BenefitSponsors
         end
       end
 
-      def package_for_date(coverage_start_date)
-        if (coverage_start_date <= end_on) && (coverage_start_date >= start_on)
-          return self
-        elsif (coverage_start_date < start_on)
-          return nil unless predecessor.present?
-          predecessor.package_for_date(coverage_start_date)
-        else
-          return nil unless successor.present?
-          successor.package_for_date(coverage_start_date)
-        end
-      end
 
       # TODO: there can be only one sponsored benefit of each kind
       def add_sponsored_benefit(new_sponsored_benefit)
@@ -206,7 +195,7 @@ module BenefitSponsors
 
         new_benefit_package.predecessor = self
 
-        sponsored_benefits.each do |sponsored_benefit|
+        sponsored_benefits.unscoped.each do |sponsored_benefit|
           new_benefit_package.add_sponsored_benefit(sponsored_benefit.renew(new_benefit_package))
         end
         new_benefit_package
@@ -251,17 +240,24 @@ module BenefitSponsors
             hbx_enrollment = enrollments.by_coverage_kind(sponsored_benefit.product_kind).first
 
             if hbx_enrollment && is_renewal_benefit_available?(hbx_enrollment)
-              renewed_enrollment = hbx_enrollment.renew_benefit(self)
-              if renewed_enrollment.is_coverage_waived?
-                census_employee.trigger_model_event(:employee_coverage_passively_waived, {event_object: self.benefit_application}) if sponsored_benefit.health?
-              else
-                census_employee.trigger_model_event(:employee_coverage_passively_renewed, {event_object: self.benefit_application}) if sponsored_benefit.health?
-              end
-            else
-              census_employee.trigger_model_event(:employee_coverage_passive_renewal_failed, {event_object: self.benefit_application}) if sponsored_benefit.health?
+              renewed_enrollment = hbx_enrollment.renew_benefit(self)       
             end
+
+            trigger_renewal_model_event(sponsored_benefit, census_employee, renewed_enrollment)
           end
         end
+      end
+
+      def trigger_renewal_model_event(sponsored_benefit, census_employee, renewed_enrollment = nil)
+        return unless sponsored_benefit.health?
+
+        renewal_model_event = if renewed_enrollment.present?
+          renewed_enrollment.is_coverage_waived? ? :employee_coverage_passively_waived : :employee_coverage_passively_renewed
+        else
+          :employee_coverage_passive_renewal_failed
+        end
+
+        census_employee.trigger_model_event(renewal_model_event, {event_object: self.benefit_application})
       end
 
       def is_renewal_benefit_available?(enrollment)
@@ -349,16 +345,17 @@ module BenefitSponsors
         Family.all_enrollments_by_benefit_package(self).each do |family|
           enrollments = family.active_household.hbx_enrollments.by_benefit_package(self)
           canceled_coverages = enrollments.canceled.select{|enrollment| enrollment.workflow_state_transitions.any?{|wst| canceled_after?(wst, application_transition.transition_at) } }
+          if canceled_coverages.present?
+            sponsored_benefits.each do |sponsored_benefit|
+              hbx_enrollment = canceled_coverages.detect{|coverage| coverage.coverage_kind == sponsored_benefit.product_kind.to_s}
+              enrollment_transition = hbx_enrollment.workflow_state_transitions[0] if hbx_enrollment.present?
 
-          sponsored_benefits.each do |sponsored_benefit|
-            hbx_enrollment = canceled_coverages.detect{|coverage| coverage.coverage_kind == sponsored_benefit.product_kind.to_s}
-            enrollment_transition = hbx_enrollment.workflow_state_transitions[0]
+              if enrollment_transition.present? && enrollment_transition.to_state == hbx_enrollment.aasm_state
+                hbx_enrollment.update(aasm_state: enrollment_transition.from_state)
+                hbx_enrollment.workflow_state_transitions.create(from_state: enrollment_transition.to_state, to_state: enrollment_transition.from_state)
 
-            if enrollment_transition.present? && enrollment_transition.to_state == hbx_enrollment.aasm_state
-              hbx_enrollment.update(aasm_state: enrollment_transition.from_state)
-              hbx_enrollment.workflow_state_transitions.create(from_state: enrollment_transition.to_state, to_state: enrollment_transition.from_state)
-
-              hbx_enrollment.benefit_group_assignment.update_status_from_enrollment(hbx_enrollment)
+                hbx_enrollment.benefit_group_assignment.update_status_from_enrollment(hbx_enrollment)
+              end
             end
           end
         end
@@ -405,6 +402,10 @@ module BenefitSponsors
 
       def sponsored_benefit_for(coverage_kind)
         sponsored_benefits.detect{|sponsored_benefit| sponsored_benefit.product_kind == coverage_kind.to_sym }
+      end
+
+      def is_offering_dental?
+        sponsored_benefit_for(:dental).present?
       end
 
       def census_employees_assigned_on(effective_date, is_active = true)

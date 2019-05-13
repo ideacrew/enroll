@@ -2,7 +2,7 @@
  <div class="modal-dialog" role="document">
    <div class="modal-content">
      <div class="modal-header">
-       <h4 class="modal-title" id="securityQuestionModalLabel">Please helps us secure your account</h4>
+       <h4 class="modal-title" id="securityQuestionModalLabel">Please help us secure your account</h4>
      </div>
      <%= form_for [:user, current_user.security_question_responses.build], url: main_app.user_security_question_responses_path(user_id: current_user.id.to_s), method: method, name: "user_security_question_responses[]", remote: true do |f| %>
        <div class="modal-body">

@@ -16,21 +16,25 @@ RSpec.describe Factories::EmployerEnrollFactory, type: :model, dbclean: :after_e
       plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :enrolled, :start_on => Date.new(calendar_year, 5, 1), :end_on => Date.new(calendar_year+1, 4, 30),
       :open_enrollment_start_on => Date.new(calendar_year, 4, 1), :open_enrollment_end_on => Date.new(calendar_year, 4, 10), fte_count: 5
       benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: plan_year
-      owner = FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
-      2.times{|i| FactoryGirl.create :census_employee, employer_profile: employer_profile, dob: TimeKeeper.date_of_record - 30.years + i.days }
+      owner = FactoryGirl.create :census_employee, :old_case, :owner, employer_profile: employer_profile
+      2.times{|i| FactoryGirl.create :census_employee, :old_case, employer_profile: employer_profile, dob: TimeKeeper.date_of_record - 30.years + i.days }
       employer_profile.census_employees.each do |ce|
         person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
         employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
         ce.update_attributes({employee_role: employee_role})
         family = Family.find_or_build_from_employee_role(employee_role)
-        enrollment = HbxEnrollment.create_from(
-          employee_role: employee_role,
-          coverage_household: family.households.first.coverage_households.first,
-          benefit_group_assignment: ce.active_benefit_group_assignment,
-          benefit_group: benefit_group,
-          )
-        next if ce.is_business_owner?
-        enrollment.update_attributes(:aasm_state => 'coverage_selected')
+
+        create(:hbx_enrollment,
+          household: family.active_household,
+          coverage_kind: "health",
+          effective_on: benefit_group.start_on,
+          enrollment_kind: 'open_enrollment',
+          kind: 'employer_sponsored',
+          benefit_group_id: benefit_group.id,
+          employee_role_id: employee_role.id,
+          benefit_group_assignment_id: ce.active_benefit_group_assignment.id,
+          aasm_state: (ce.is_business_owner? ? 'shopping' : 'coverage_selected')
+        )
       end
 
       org
@@ -92,30 +96,41 @@ RSpec.describe Factories::EmployerEnrollFactory, type: :model, dbclean: :after_e
       :open_enrollment_start_on => Date.new(calendar_year, 4, 1), :open_enrollment_end_on => Date.new(calendar_year, 4, 10), fte_count: 5
       benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: active_plan_year
       renewing_benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: renewing_plan_year
-      owner = FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
-      2.times{|i| FactoryGirl.create :census_employee, employer_profile: employer_profile, dob: TimeKeeper.date_of_record - 30.years + i.days }
+      owner = FactoryGirl.create :census_employee, :old_case, :owner, employer_profile: employer_profile
+      2.times{|i| FactoryGirl.create :census_employee, :old_case, employer_profile: employer_profile, dob: TimeKeeper.date_of_record - 30.years + i.days }
       employer_profile.census_employees.each do |ce|
         person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
         employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
         ce.update_attributes({employee_role: employee_role})
         family = Family.find_or_build_from_employee_role(employee_role)
 
+        enrollment = create(:hbx_enrollment,
+          household: family.active_household,
+          coverage_kind: "health",
+          effective_on: benefit_group.start_on,
+          enrollment_kind: 'open_enrollment',
+          kind: 'employer_sponsored',
+          benefit_group_id: benefit_group.id,
+          employee_role_id: employee_role.id,
+          benefit_group_assignment_id: ce.active_benefit_group_assignment.id,
+          aasm_state: 'coverage_selected'
+        )
+        ce.active_benefit_group_assignment.update_attributes(aasm_state: 'coverage_selected', hbx_enrollment_id: enrollment.id)
 
-        enrollment = HbxEnrollment.create_from(
-          employee_role: employee_role,
-          coverage_household: family.households.first.coverage_households.first,
-          benefit_group_assignment: ce.active_benefit_group_assignment,
-          benefit_group: benefit_group,
-          )
-        enrollment.update_attributes(:aasm_state => 'coverage_selected')
 
-        enrollment = HbxEnrollment.create_from(
-          employee_role: employee_role,
-          coverage_household: family.households.first.coverage_households.first,
-          benefit_group_assignment: ce.renewal_benefit_group_assignment,
-          benefit_group: renewing_benefit_group,
-          )
-        enrollment.update_attributes(:aasm_state => 'auto_renewing')
+        enrollment = create(:hbx_enrollment, 
+          household: family.active_household,
+          coverage_kind: "health",
+          effective_on: renewing_benefit_group.start_on,
+          enrollment_kind: 'open_enrollment',
+          kind: 'employer_sponsored',
+          benefit_group_id: renewing_benefit_group.id,
+          employee_role_id: employee_role.id,
+          benefit_group_assignment_id: ce.renewal_benefit_group_assignment.id,
+          aasm_state: 'auto_renewing'
+        )
+
+        ce.renewal_benefit_group_assignment.update_attributes(aasm_state: 'auto_renewing', hbx_enrollment_id: enrollment.id)
       end
 
       org
@@ -143,7 +158,7 @@ RSpec.describe Factories::EmployerEnrollFactory, type: :model, dbclean: :after_e
 
         employer_profile.census_employees.each do |ce|
           expect(ce.active_benefit_group_assignment.benefit_group).to eq renewing_plan_year.benefit_groups.first
-          expect(ce.active_benefit_group_assignment.aasm_state).to eq 'coverage_selected'
+          expect(ce.active_benefit_group_assignment.aasm_state).to eq 'auto_renewing'
         end
         expect(employer_profile.aasm_state).to eq 'enrolled'
       end
@@ -174,7 +189,7 @@ RSpec.describe Factories::EmployerEnrollFactory, type: :model, dbclean: :after_e
 
         employer_profile.census_employees.each do |ce|
           expect(ce.active_benefit_group_assignment.benefit_group).not_to eq renewing_plan_year.benefit_groups.first
-          expect(ce.active_benefit_group_assignment.aasm_state).to eq 'initialized'
+          expect(ce.active_benefit_group_assignment.aasm_state).to eq 'coverage_selected'
         end
         expect(employer_profile.aasm_state).to eq 'applicant'
       end
@@ -193,29 +208,38 @@ RSpec.describe Factories::EmployerEnrollFactory, type: :model, dbclean: :after_e
         :open_enrollment_start_on => Date.new(calendar_year, 4, 1), :open_enrollment_end_on => Date.new(calendar_year, 4, 10), fte_count: 5
         benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: active_plan_year
         renewing_benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: renewing_plan_year
-        owner = FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
-        2.times{|i| FactoryGirl.create :census_employee, employer_profile: employer_profile, dob: TimeKeeper.date_of_record - 30.years + i.days }
+        owner = FactoryGirl.create :census_employee, :old_case, :owner, employer_profile: employer_profile
+        2.times{|i| FactoryGirl.create :census_employee, :old_case, employer_profile: employer_profile, dob: TimeKeeper.date_of_record - 30.years + i.days }
         employer_profile.census_employees.each do |ce|
           person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
           employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
           ce.update_attributes({:employee_role =>  employee_role })
           family = Family.find_or_build_from_employee_role(employee_role)
-
-          enrollment = HbxEnrollment.create_from(
-            employee_role: employee_role,
-            coverage_household: family.households.first.coverage_households.first,
-            benefit_group_assignment: ce.active_benefit_group_assignment,
-            benefit_group: benefit_group,
+          
+          enrollment = create(:hbx_enrollment,
+            household: family.active_household,
+            coverage_kind: "health",
+            effective_on: benefit_group.start_on,
+            enrollment_kind: 'open_enrollment',
+            kind: 'employer_sponsored',
+            benefit_group_id: benefit_group.id,
+            employee_role_id: employee_role.id,
+            benefit_group_assignment_id: ce.active_benefit_group_assignment.id,
+            aasm_state: 'coverage_selected'
             )
-          enrollment.update_attributes(:aasm_state => 'coverage_selected')
+          ce.active_benefit_group_assignment.update_attributes(aasm_state: 'coverage_selected', hbx_enrollment_id: enrollment.id)
 
-          enrollment = HbxEnrollment.create_from(
-            employee_role: employee_role,
-            coverage_household: family.households.first.coverage_households.first,
-            benefit_group_assignment: ce.renewal_benefit_group_assignment,
-            benefit_group: renewing_benefit_group,
+          create(:hbx_enrollment, 
+            household: family.active_household,
+            coverage_kind: "health",
+            effective_on: renewing_benefit_group.start_on,
+            enrollment_kind: 'open_enrollment',
+            kind: 'employer_sponsored',
+            benefit_group_id: renewing_benefit_group.id,
+            employee_role_id: employee_role.id,
+            benefit_group_assignment_id: ce.renewal_benefit_group_assignment.id,
+            aasm_state: 'auto_renewing'
             )
-          enrollment.update_attributes(:aasm_state => 'auto_renewing')
         end
 
         org
@@ -232,11 +256,6 @@ RSpec.describe Factories::EmployerEnrollFactory, type: :model, dbclean: :after_e
 
         expect(active_plan_year.aasm_state).to eq 'active'
 
-        employer_profile.census_employees.each do |ce|
-          next if ce.is_business_owner?
-          ce.active_benefit_group_assignment.update_attributes(:aasm_state => 'coverage_selected')
-        end
-
         employer_enroll_factory = Factories::EmployerEnrollFactory.new
         employer_enroll_factory.date = date_of_record_to_use
         employer_enroll_factory.employer_profile = employer_profile
@@ -245,7 +264,6 @@ RSpec.describe Factories::EmployerEnrollFactory, type: :model, dbclean: :after_e
         expect(active_plan_year.aasm_state).to eq 'expired'
 
         employer_profile.census_employees.each do |ce|
-          next if ce.is_business_owner?
           expect(ce.active_benefit_group_assignment).to be_nil
           expired_assignment = ce.benefit_group_assignments.detect{|bg_assignment| bg_assignment.benefit_group == active_plan_year.benefit_groups.first }
           expect(expired_assignment.aasm_state).to eq 'coverage_expired'

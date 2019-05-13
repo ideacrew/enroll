@@ -62,8 +62,11 @@ module SponsoredBenefits
         new_bg = new_application.benefit_groups.build({
           title: bg.title,
           reference_plan_id: bg.reference_plan_id,
+          dental_reference_plan_id: bg.dental_reference_plan_id,
           plan_option_kind: bg.plan_option_kind,
-          elected_plans: bg.elected_plans
+          dental_plan_option_kind: bg.dental_plan_option_kind,
+          elected_plans: bg.elected_plans,
+          elected_dental_plan_ids: bg.elected_dental_plan_ids
         })
 
         bg.composite_tier_contributions.each do |contribution|
@@ -71,6 +74,10 @@ module SponsoredBenefits
         end
         bg.relationship_benefits.each do |rb|
           new_bg.relationship_benefits << rb.clone
+        end
+
+        bg.dental_relationship_benefits.each do |rb|
+          new_bg.dental_relationship_benefits << rb.clone
         end
 
         new_bg.estimate_composite_rates

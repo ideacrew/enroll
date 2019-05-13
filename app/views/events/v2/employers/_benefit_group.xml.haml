@@ -11,7 +11,7 @@
   %elected_plans
     = render :partial => "events/v2/employers/elected_plan", :collection => elected_plans
   -#%federal_contributions= " " field not available in benefit group modal
-  - if sponsored_benefit.single_plan_type?
+  - if sponsored_benefit.single_plan_type? && sponsored_benefit._type != "BenefitSponsors::SponsoredBenefits::DentalSponsoredBenefit"
     %composite_rating_tiers
       - pricing_deter = sponsored_benefit.latest_pricing_determination
       - pricing_deter.pricing_determination_tiers.each do |deter_tier|

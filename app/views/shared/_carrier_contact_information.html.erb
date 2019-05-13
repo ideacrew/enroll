@@ -4,7 +4,7 @@
       <div class="modal-header">
         <button class="close" data-dismiss="modal" type="button">&times;</button>
         <h4 class="modal-title"><%= plan.issuer_profile.legal_name %>
-          Customer Service Line</h4>
+          <%=l10n("plans.csl")%></h4>
       </div>
       <div class="modal-body">
         <i class="fa fa-phone fa-3x"></i>
@@ -13,166 +13,209 @@
             <% case plan.issuer_profile.legal_name %>
             <% when "BMC HealthNet Plan" %>
               <div>
-                <strong> Call: </strong>
-                <strong><a href="tel:+18558338120"> 1-855-833-8120 </a></strong> <br>
-                <strong> TTY: </strong> 711 TTY <br>
-                <strong>Hours: </strong>
-                 Monday through Friday from 8:00 a.m. to 6:00 p.m. Eastern Time
-                 <br>
-                <strong> Email: </strong> memberquestions@bmchp.org <br/>
+                <strong><a href= <%= l10n('plans.bhp_href_phone')%> > <%=l10n("plans.bhp_phone")%></a></strong> <br>
+                <strong><%=l10n("plans.tty")%></strong> <%=l10n("plans.tty_number")%><br><br>
+                <strong><%=l10n("plans.email") %> </strong><%=l10n("plans.bhp_email")%> <br/>
+                <strong><%=l10n("plans.hours") %> </strong><%=l10n("plans.bhp_hours")%><br>
               </div>
+
+            <% when "UnitedHealthcare" %>
+              <div>
+               <%=l10n("plans.uh_phone")%><br/>
+                <strong><%=l10n('plans.tty')%></strong> <%=l10n("plans.tty_num")%><br/><br/>
+                <strong><%=l10n("plans.hours")%></strong> <%=l10n("plans.uh_hours")%>
+              </div>
+
             <% when "Fallon Health" %>
               <div>
-                <strong> Call: </strong>
-                <strong><a href="tel:+18008685200"> 1-800-868-5200 </a></strong> <br>
-                <strong> TTY: </strong> Please call TRS Relay 711  <br>
-                <strong> Hours: </strong> Monday, Tuesday, Thursday, and Friday from 8:00 a.m. to 6:00 p.m. Eastern Time, and Wednesday from 10:00 a.m. to 6:00 p.m. Eastern Time <br>
-                <strong> Email: </strong> FCHPcustomerservice@fallonhealth.org <br/>
+                <strong><%=l10n("plans.call")%></strong>
+                <strong><a href= <%=l10n('plans.fh_href_phone')%> ><%=l10n("plans.fh_phone")%></a></strong> <br>
+                <strong><%=l10n("plans.tty")%></strong> <%=l10n("plans.fh_tty_number")%><br>
+                <strong><%=l10n("plans.email")%></strong> <%=l10n("plans.fh_email")%><br>
+                <strong><%=l10n("plans.hours")%></strong> <%=l10n("plans.fh_hours")%>
               </div>
+
             <% when "Health New England" %>
               <div>
-                <strong> Call: </strong>
-                <strong> Local: </strong> <a href="tel:+14137874004"> 1-413-787-4004 </a> <br>
-                <strong> Toll-free: </strong> <a href="tel:+18003102835"> 1-800-310-2835 </a> <br>
-                <strong> TTY/TDD: </strong> <a href="tel:+18004392370"> 1-800-439-2370 </a> <br>
-                <strong> Hours: </strong> Monday through Friday, 8:00 a.m. to 6:00 p.m. Eastern Time <br>
-                <strong> Email: </strong> memberservices@hne.com <br/>
+                <strong><%=l10n("plans.call")%></strong>
+                <strong><%=l10n("plans.local")%></strong> <a href=<%=l10n('plans.hne_href_local')%> ><%=l10n("plans.hne_local_phone")%></a> <br>
+                <strong><%=l10n("plans.toll_free")%></strong><a href=<%=l10n('plans.hne_href_toll')%> ><%=l10n("plans.hne_toll_free")%></a> <br>
+                <strong><%=l10n("plans.ttd/tty")%></strong><a href=<%=l10n('plans.hne_href_tty')%> ><%=l10n("plans.hne_tty")%></a> <br>
+                <strong><%=l10n("plans.email")%></strong><%=l10n("plans.hne_email")%><br>
+                <strong><%=l10n("plans.hours")%></strong><%=l10n("plans.hne_hours")%><br/>
               </div>
+
             <% when "Blue Cross Blue Shield MA" %>
               <div>
-                <strong> Call: </strong>
-                <strong> For Small Group/FOM: </strong> <a href="tel:+18007823675"> 1-800-782-3675 </a> <br>
-                <strong> TTY: </strong> 711 TTY <br>
-                <strong> Hours: </strong> Monday through Friday, 8:00 a.m. to 6:00 p.m. Eastern Time <br>
-                <strong> Email: </strong> send secure email after login to member account <br/>
+                <strong><%=l10n("plans.call")%></strong>
+                <strong><%=l10n("plans.bcbs_ivl")%><strong><a href=<%=l10n('plans.bcbs_href_ivl_phone')%> ><%=l10n("plans.bcbs_ivl_phone")%></a><br>
+                <strong><%=l10n("plans.bcbs_small")%></strong><a href=<%=l10n('plans.bcbs_small_href_phone')%> ><%=l10n("plans.bcbs_small_phone")%></a> <br>
+                <strong><%=l10n("plans.tty")%></strong><%=l10n("plans.tty_num")%><br>
+                <strong><%=l10n("plans.email")%></strong><%=l10n("plans.bcbs_email")%><br/>
+                <strong><%=l10n("plans.hours")%></strong><%=l10n("plans.bcbs_hours")%><br>
               </div>
+
             <% when "Harvard Pilgrim Health Care" %>
               <div>
-                <strong> Call: </strong>
-                <a href="tel:+18779074742"> 1-877-907-4742 </a> <br>
-                <strong> TTY: </strong> 711 TTY <br>
-                <strong> Hours: </strong> Monday, Tuesday, & Thursday from 8:00 a.m. to 6:00 p.m.; Wednesday from 10:00 a.m. to 6:00 p.m.; and Friday from 8:00 a.m. to 5:30 p.m <br>
-                <strong> Email: </strong> send secure email after login to member account <br/>
+                <strong><%=l10n("plans.call")%></strong>
+                <a href=<%=l10n('plans.hphc_href_phone')%> ><%=l10n("plans.hphc_phone")%></a><br>
+                <strong><%=l10n("plans.tty")%></strong><%=l10n("plans.tty_num")%><br>
+                <strong><%=l10n("plans.email")%></strong><%=l10n("plans.hphc_email")%><br>
+                <strong><%=l10n("plans.hours")%></strong><%=l10n("plans.hphc_hours")%><br/>
               </div>
-            <% when "Neighborhood Health Plan" %>
+
+            <% when "AllWays Health Partners" %>
               <div>
-                <strong> Call: </strong>
-                <a href="tel:+18664145533"> 1-866-414-5533 </a> <br>
-                <strong> TTY: </strong> 1-800-655-1761 (or 711) <br>
-                <strong> Hours: </strong> Monday, Tuesday, Wednesday, Friday from 8:00 a.m. to 6:00 p.m.; Thursday from 8:00 a.m. to 8:00 p.m.  <br>
-                <strong> Email: </strong> memberservices@nhp.org <br/>
+                <strong><%=l10n("plans.call")%></strong>
+                <a href=<%=l10n('plans.ahp_href_phone')%> ><%=l10n("plans.ahp_phone")%></a> <br>
+                <strong><%=l10n("plans.tty")%></strong><%=l10n("plans.tty_num")%><br>
+                <strong><%=l10n("plans.email")%></strong><%=l10n("plans.ahp_email")%><br>
+                <strong><%=l10n("plans.hours")%></strong><%=l10n("plans.ahp_hours")%><br/>
               </div>
-            <% when "Tufts Health Direct" %>
+
+            <% when "United Healthcare" %>
               <div>
-                <strong> Call: </strong>
-                <a href="tel:+18882571985"> 1-888-257-1985 </a> <br>
-                <strong> Hours: </strong> Monday through Friday, from 8 a.m. to 5 p.m. <br>
-                <strong> Email: </strong><br/>
+               <%=l10n("plans.uh_phone")%><br/>
+                <strong><%=l10n('plans.tty')%></strong> <%=l10n("plans.tty_num")%><br/><br/>
+                <strong><%=l10n("plans.hours")%></strong> <%=l10n("plans.uh_hours")%>
               </div>
-            <% when "Tufts Health Plan Premier" %>
+
+              <% when "Tufts Health Direct" %>
               <div>
-                <strong> Call: </strong>
-                <a href="tel:+18004620224"> 1-800-462-0224 </a> <br>
-                <strong> Hours: </strong> Monday - Thursday 8:00 am - 7:00pm; Friday 8:00 am - 5:00pm <br>
-                <strong> Email: </strong><br/>
+                <strong><%=l10n("plans.call")%></strong>
+                <a href=<%=l10n('plans.thd_href_phone')%> ><%=l10n("plans.thd_phone")%>(<%=l10n("plans.tty")%><%=l10n("plans.tty_num")%>)</a><br>
+                <strong><%=l10n("plans.email")%></strong><%=l10n("plans.thd_email")%><br>
+                <strong><%=l10n("plans.hours")%></strong><%=l10n("plans.thd_hours")%><br/>
               </div>
+
+            <% when "Tufts Health Premier" %>
+              <div>
+                <strong><%=l10n("plans.thpp_ph")%></strong>
+                <a href=<%=l10n("plans.thd_href_phone")%> > <%=l10n("plans.thpp_phone")%></a> <br>
+                <strong><%=l10n('plans.tty')%></strong> <%=l10n("plans.tty_num")%><br>
+                <strong><%=l10n("plans.hours")%> </strong> <%=l10n("plans.thpp_hours")%><br>
+                <strong><%=l10n("plans.email")%> </strong> <%= site_tufts_premier_link %> <%=l10n("plans.thpp_under")%><br/>
+                <strong><%=l10n("plans.thpp_bh")%> </strong>
+                <a href=<%=l10n("plans.thpp_bh_tel")%> > <%=l10n("plans.thpp_bh_phone")%></a> <br>
+                <%=l10n("plans.thpp_time")%> <br>
+                <strong><%=l10n("plans.thpp_nurseline")%> </strong><%=l10n("plans.thpp_nurseline_number")%><br>
+              </div>
+
             <% when "CareFirst" %>
               <div>
-                Call:
+                <%=l10n("plans.call")%>
                 <strong>
-                  <a href="tel:+18554443119">1-855-444-3119</a>
+                  <a href=<%=l10n('plans.cf_href_phone')%> ><%=l10n("plans.cf_phone")%></a>
                 </strong>
               </div>
             <% when "Aetna" %>
               <div>
-                <strong>For Customers Enrolled in Individual and Family Plans</strong><br/>
-                Call:
+                <strong><%=l10n("plans.aetna_ivl_and_family")%></strong><br/>
+                <%=l10n("plans.call")%>
                 <strong>
-                  <a href="tel:+18555866959">1-855-586-6959</a>
+                  <a href=<%=l10n('plans.aetna_href_phone')%>><%=l10n("plans.aetna_phone")%></a>
                 </strong><br/>
-                from 8am-6pm EST, Monday - Friday
+                <%=l10n("plans.aetna_hours")%>
                 <br/>
                 <br/>
-                <strong>For Brokers and Employers</strong><br/>
-                Call:
+                <strong><%=l10n("plans.aetna_brokers_and_emprs")%></strong><br/>
+                <%=l10n("plans.call")%>
                 <strong>
-                  <a href="tel:+18884222128">1-888-422-2128</a>
+                  <a href=<%=l10n("plans.aetna_href_broker_and_emprs_phone")%> ><%=l10n("plans.aetna_broker_and_emprs_phone")%></a>
                 </strong><br/>
-                from 8am-5pm EST, Monday - Friday
+                <%=l10n("plans.aetna_broker_and_emprs_hours")%>
                 <br/>
                 <br/>
-                <strong>For Small Business Employees</strong><br/>
-                Call:
+                <strong><%=l10n("plans.sbe")%></strong><br/>
+                <%=l10n("plans.call")%>
                 <strong>
-                  <a href="tel:+1-855-885-3289">Call 1-855-885-3289</a>
+                  <a href=<%=l10n('plans.aetna_href_sbe_call')%> ><%=l10n("plans.aetna_sbe_call")%></a>
                 </strong><br/>
-                from 8am-6pm EST, Monday - Friday
+                <%=l10n("plans.aetna_hours")%>
                 <br/>
               </div>
             <% when "Kaiser" %>
               <div>
-                Call:
+                <%=l10n("plans.call")%>
               <strong>
-                <a href="tel:+18007777902">1-800-777-7902</a>
+                <a href=<%=l10n('plans.kaiser_href_phone')%> ><%=l10n("plans.kaiser_phone")%></a>
               </strong>
               </div>
             <% when "UnitedHealthcare" %>
               <div>
-                Call:
-                <strong>
-                  <a href="tel:+18778562430">1-877-856-2430</a>
-                </strong><br/>
+               <%=l10n("plans.uh_phone")%><br/>
+                <strong><%=l10n('plans.tty')%></strong> <%=l10n("plans.tty_num")%><br/><br/>
+                <strong><%=l10n("plans.hours")%></strong> <%=l10n("plans.uh_hours")%>
               </div>
             <% end %>
           </div>
         <% else %>
           <div class="carrier-numbers">
             <% case plan.issuer_profile.legal_name %>
+            <% when "Altus Dental" %>
+              <div>
+                <strong><%=l10n("plans.call")%></strong>
+                <a href=<%=l10n('plans.ad_href_phone')%> ><%=l10n("plans.ad_phone")%></a> <br>
+                <strong><%=l10n("plans.tty")%></strong><%=l10n("plans.ad_tty")%><br>
+                <strong><%=l10n("plans.email")%></strong><%=l10n("plans.ad_email")%><br>
+                <strong><%=l10n("plans.hours")%></strong><%=l10n("plans.ad_hours")%><br/>
+                <strong><%=l10n("plans.infoline")%></strong>
+                <a href=<%=l10n('plans.ad_href_phone')%> ><%=l10n("plans.ad_phone")%></a><br>
+                <%=l10n("plans.ad_infoline")%>
+              </div>
+            <% when "Delta Dental" %>
+              <div>
+                <strong><%=l10n("plans.call")%></strong>
+                <a href=<%=l10n('plans.dd_href_phone')%> ><%=l10n("plans.dd_phone")%></a><br>
+                <strong><%=l10n("plans.tty")%></strong><%=l10n("plans.tty_num")%><br>
+                <strong><%=l10n("plans.email")%></strong><%=l10n("plans.dd_email")%><br>
+                <strong><%=l10n("plans.hours")%></strong><%=l10n("plans.dd_hours")%><br/>
+              </div>
             <% when "CareFirst" %>
                 <div>
-                  Call:
+                  <%=l10n("plans.call")%>
                   <strong>
-                  <a href="tel:+18554443119">1-855-444-3119</a>
+                  <a href=<%=l10n('plans.cf_href_phone')%> ><%=l10n("plans.cf_phone")%></a>
                   </strong><br/>
                 </div>
             <% when  "Delta Dental"%>
               <div>
-                Call:
+                <%=l10n("plans.call")%>
                 <strong>
-                  <a href="tel:+18004710236">1-800-471-0236</a>
+                  <a href=<%l10n('plans.dd_href_number1')%> ><%=l10n("plans.dd_number1")%></a>
                 </strong>
                 or
                 <strong>
-                  <a href="tel:+18004710275">1-800-471-0275</a>
+                  <a href=<%=l10n('plans.dd_href_number2')%> ><%=l10n("plans.dd_number2")%></a>
                 </strong>
                 <br/>
               </div>
             <% when "MetLife"%>
               <div>
-                Call:
+                <%=l10n("plans.call")%>
                 <strong>
-                  <a href="tel:+18556382221">1-855-638-2221</a>
+                  <a href=<%=l10n('plans.metlife_href_phone')%> ><%=l10n("plans.metlife_phone")%></a>
                 </strong><br/>
               </div>
             <% when "Dentegra" %>
               <div>
-                Call:
+                <%=l10n("plans.call")%>
                 <strong>
-                  <a href="tel:+18004710284">1-800-471-0284</a>
+                  <a href=<%=l10n('plans.dentegra_href_phone')%> ><%=l10n("plans_dentegra_phone")%></a>
                 </strong><br/>
               </div>
             <% when "Dominion" %>
               <div>
-                Call:
+                <%=l10n("plans.call")%>
                 <strong>
-                  <a href="tel:+18552243016">1-855-224-3016</a>
+                  <a href=<%=l10n('plans.dominion_href_phone')%> ><%=l10n("plans.dominion_phone")%></a>
                 </strong><br/>
               </div>
             <% when "BestLife" %>
               <div><br/>
-                Call:
+                <%=l10n("plans.call")%>
                 <strong>
-                  <a href="tel:+18004330088">1-800-433-0088</a>
+                  <a href=<%=l10n('plans.bestlife_href_phone')%> ><%=l10n("plans.bestlife_phone")%></a>
                 </strong><br/>
               </div>
             <% end %>

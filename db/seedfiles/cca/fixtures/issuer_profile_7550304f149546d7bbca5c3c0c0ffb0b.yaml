@@ -1,0 +1,70 @@
+--- !ruby/object:BenefitSponsors::Organizations::ExemptOrganization
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      W1eARMCdB98/qiTq
+  _type: BenefitSponsors::Organizations::ExemptOrganization
+  fein: 046143185
+  site_id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP5J+ICzHOaeVu
+  legal_name: Delta Dental
+  hbx_id: 7550304f149546d7bbca5c3c0c0ffb0b
+  updated_at: 2018-07-24 19:38:44.720000000 Z
+  created_at: 2018-07-24 19:38:44.720000000 Z
+  profiles:
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        W1eARMCdB98/qiTp
+    contact_method: :paper_and_electronic
+    _type: BenefitSponsors::Organizations::IssuerProfile
+    issuer_hios_ids:
+    - '80538,11821'
+    issuer_state: MA
+    market_coverage: shop (small group)
+    hbx_carrier_id: 20004
+    abbrev: DDA
+    ivl_health: false
+    ivl_dental: false
+    shop_health: false
+    shop_dental: true
+    is_benefit_sponsorship_eligible: false
+    offers_sole_source: false
+    dental_only_plan: false
+    updated_at: 2018-07-24 19:38:44.720000000 Z
+    created_at: 2018-07-24 19:38:44.720000000 Z
+    office_locations:
+    - !ruby/hash:BSON::Document
+      _id: !ruby/object:BSON::ObjectId
+        raw_data: !binary |-
+          W1eARMCdB98/qiTm
+      is_primary: true
+      address: !ruby/hash:BSON::Document
+        _id: !ruby/object:BSON::ObjectId
+          raw_data: !binary |-
+            W1eARMCdB98/qiTn
+        address_1: address_placeholder
+        address_2: address_2
+        address_3: ''
+        county: ''
+        country_name: ''
+        kind: work
+        city: City
+        state: St
+        zip: '10001'
+        updated_at: 2018-07-24 19:38:44.720000000 Z
+        created_at: 2018-07-24 19:38:44.720000000 Z
+      phone: !ruby/hash:BSON::Document
+        _id: !ruby/object:BSON::ObjectId
+          raw_data: !binary |-
+            W1eARMCdB98/qiTo
+        kind: main
+        country_code: ''
+        area_code: '111'
+        number: '1111111'
+        extension: ''
+        full_phone_number: '1111111111'
+        updated_at: 2018-07-24 19:38:44.720000000 Z
+        created_at: 2018-07-24 19:38:44.720000000 Z

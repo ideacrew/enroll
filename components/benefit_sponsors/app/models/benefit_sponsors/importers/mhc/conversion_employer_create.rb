@@ -14,7 +14,10 @@ module BenefitSponsors
             new_organization = BenefitSponsors::Organizations::GeneralOrganization.new(form_organizational_params)
             employer_profile = BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new(employer_profile_prams.merge(:organization => new_organization))
             benefit_sponsorship = employer_profile.add_benefit_sponsorship
-            benefit_sponsorship.update_attributes!(registered_on: registered_on, source_kind: :mid_plan_year_conversion)
+
+            source_kind = mid_year_conversion ? "mid_plan_year_conversion" : "conversion"
+
+            benefit_sponsorship.update_attributes!(registered_on: registered_on, source_kind: source_kind.to_sym)
             set_attestation_to_true(benefit_sponsorship)
           
             save_result = new_organization.save!

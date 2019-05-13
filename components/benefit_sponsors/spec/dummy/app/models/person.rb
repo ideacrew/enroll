@@ -95,6 +95,8 @@ class Person
 
   after_create :create_inbox
 
+  scope :by_hbx_id, ->(person_hbx_id) { where(hbx_id: person_hbx_id) }
+
   def move_encrypted_ssn_errors
     deleted_messages = errors.delete(:encrypted_ssn)
     if !deleted_messages.blank?
@@ -157,6 +159,14 @@ class Person
     end
     ssn_val = val.to_s.gsub(/\D/, '')
     SymmetricEncryption.encrypt(ssn_val)
+  end
+
+  def has_active_employer_staff_role?
+    employer_staff_roles.present? and employer_staff_roles.active.present?
+  end
+
+  def active_employer_staff_roles
+    employer_staff_roles.present? ? employer_staff_roles.active : []
   end
 
   def self.decrypt_ssn(val)

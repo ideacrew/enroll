@@ -13,7 +13,7 @@ class CensusEmployee < CensusMember
   EMPLOYMENT_TERMINATED_STATES = %w(employment_terminated cobra_terminated rehired)
   ELIGIBLE_STATES = %w(eligible newly_designated_eligible cobra_eligible employee_termination_pending cobra_termination_pending)
   PENDING_STATES = %w(employee_termination_pending cobra_termination_pending)
-
+  EMPLOYMENT_ACTIVE_ONLY = %w(eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked)
 
   field :is_business_owner, type: Boolean, default: false
   field :hired_on, type: Date
@@ -67,6 +67,7 @@ class CensusEmployee < CensusMember
   scope :benefit_application_unassigned,   ->(benefit_application) { where(:"benefit_group_assignments.benefit_package_id".nin => benefit_application.benefit_packages.pluck(:_id)) }
 
   scope :eligible_without_term_pending, ->{ any_in(aasm_state: (ELIGIBLE_STATES - PENDING_STATES)) }
+  scope :active_alone,      ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_ONLY) }
 
 
   def initialize(*args)
@@ -192,6 +193,11 @@ class CensusEmployee < CensusMember
 
   def inactive_benefit_group_assignments
     benefit_group_assignments.reject(&:is_active?)
+  end
+
+  def waived?
+    bga = renewal_benefit_group_assignment || active_benefit_group_assignment
+    return bga.present? ? bga.aasm_state == 'coverage_waived' : false
   end
 
   def active_benefit_group_assignment=(benefit_package_id)

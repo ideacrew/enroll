@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "employers/employer_profiles/my_account/_census_employees.html.erb" do
+RSpec.describe "employers/employer_profiles/my_account/_census_employees.html.erb", dbclean: :after_each do
   let(:employer_profile) { FactoryGirl.create(:employer_profile) }
   let(:census_employee) { FactoryGirl.create(:census_employee) }
 

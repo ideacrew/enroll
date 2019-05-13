@@ -255,6 +255,7 @@
 }
 
 #sponsorContributions {
+  border:1px solid $mhc-light-gray;
   background-color:$primary-white;
   height:330px;
   p {
@@ -264,7 +265,7 @@
   }
   .offered-heading {
     border-bottom: solid 1px #d5d5d5;
-    padding: 15px 0 25px;
+    padding: 15px 0 15px;
     font-size: 14px;
     color:$mhc-heading-gray;
   }
@@ -298,6 +299,7 @@
     width:45px;
     height:40px;
     margin-top:10px;
+    text-align:center;
   }
   input[type=number]::-webkit-inner-spin-button,
   input[type=number]::-webkit-outer-spin-button {
@@ -618,3 +620,4 @@
 .open-enr-date-line-height {
   line-height:1.1em;
 }
+

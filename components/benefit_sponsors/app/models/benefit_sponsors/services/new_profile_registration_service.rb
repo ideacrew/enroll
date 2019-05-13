@@ -70,6 +70,7 @@ module BenefitSponsors
       def load_profile_form(form)
         form.organization.profile.grouped_sic_code_options = Caches::SicCodesCache.load
         form.organization.profile.contact_method_options = ::BenefitMarkets::CONTACT_METHODS_HASH
+        form.organization.profile.referred_by_options = BenefitSponsors::Organizations::AcaShopCcaEmployerProfile::REFERRED_KINDS
         form
       end
 
@@ -130,7 +131,7 @@ module BenefitSponsors
           form.attributes.slice(:id, :market_kind, :home_page, :accept_new_clients, :languages_spoken, :working_hours, :ach_routing_number, :ach_account_number)
         elsif is_sponsor_profile?
           if is_cca_sponsor_profile?
-            form.attributes.slice(:contact_method, :id, :sic_code)
+            form.attributes.slice(:contact_method, :id, :sic_code, :referred_by, :referred_reason)
           else
             form.attributes.slice(:contact_method, :id)
           end
@@ -203,7 +204,7 @@ module BenefitSponsors
 
       def is_benefit_sponsor_already_registered?(user, form)
         if user.person.present? && user.person.has_active_employer_staff_role?
-          form.profile_id = user.person.active_employer_staff_roles.first.benefit_sponsor_employer_profile_id.to_s
+          form.profile_id = user.person.active_employer_staff_roles.where(:benefit_sponsor_employer_profile_id.exists => true).first.benefit_sponsor_employer_profile_id.to_s
           return false
         end
         true

@@ -9,7 +9,7 @@ describe TerminateACensusEmployee, dbclean: :after_each do
     let(:plan_year)                { FactoryGirl.build(:plan_year, benefit_groups: [benefit_group], start_on: Date.new(Date.today.year,Date.today.month,1)) }
     let(:employer_profile)         { FactoryGirl.create(:employer_profile, plan_years: [plan_year]) }
     let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group) }
-    let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile, benefit_group_assignments: [benefit_group_assignment] ) }
+    let(:census_employee) { FactoryGirl.create(:census_employee, :old_case, employer_profile: employer_profile, benefit_group_assignments: [benefit_group_assignment] ) }
     
     before(:each) do
       allow(ENV).to receive(:[]).with("id").and_return(census_employee.id)

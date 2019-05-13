@@ -52,7 +52,7 @@ RSpec.configure do |config|
 
   config.after(:example, :dbclean => :after_each) do
     DatabaseCleaner.clean
-    TimeKeeper.set_date_of_record_unprotected!(Date.current)
+#    TimeKeeper.set_date_of_record_unprotected!(Date.current)
   end
 
   config.around(:example, :dbclean => :around_each) do |example|

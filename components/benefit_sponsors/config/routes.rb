@@ -1,5 +1,4 @@
 BenefitSponsors::Engine.routes.draw do
-  resources :sites
 
   namespace :profiles do
     resources :registrations do
@@ -75,6 +74,7 @@ BenefitSponsors::Engine.routes.draw do
 
   resources :benefit_sponsorships do
     resources :benefit_applications, controller: "benefit_applications/benefit_applications" do
+      get 'late_rates_check', on: :collection
       post 'revert'
       post 'submit_application'
       post 'force_submit_application'
@@ -85,7 +85,18 @@ BenefitSponsors::Engine.routes.draw do
         get :calculate_employee_cost_details, on: :collection
         get :calculate_employee_cost_details, on: :member
         get :reference_product_summary, on: :collection
-        resources :sponsored_benefits, only: :new
+
+        resources :sponsored_benefits, controller: "sponsored_benefits/sponsored_benefits" do
+          member do
+            get :calculate_employee_cost_details
+            get :calculate_employer_contributions
+          end
+
+          collection do 
+            get :calculate_employee_cost_details
+            get :calculate_employer_contributions
+          end
+        end
       end
     end
   end

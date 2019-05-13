@@ -24,7 +24,8 @@ module Importers
       :subscriber_city,
       :subscriber_state,
       :default_hire_date,
-      :market
+      :market,
+      :sponsored_benefit_kind
 
       (1..8).to_a.each do |num|
         attr_converter "dep_#{num}_ssn".to_sym, :as => :optimistic_ssn
@@ -69,7 +70,7 @@ module Importers
     end
 
     def benefit_begin_date=(val)
-      @benefit_begin_date = val.blank? ? nil : (Date.strptime(val, "%m/%d/%Y") rescue nil)
+      @benefit_begin_date = val.blank? ? nil : (Date.strptime(val.to_s, "%m/%d/%Y") rescue nil)
     end
 
     def subscriber_zip=(val)

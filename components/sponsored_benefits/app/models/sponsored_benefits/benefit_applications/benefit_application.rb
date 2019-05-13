@@ -203,9 +203,9 @@ module SponsoredBenefits
       end
 
       def sanitize_benefit_group_attrs(benefit_group)
-        attributes = benefit_group.attributes.slice(
+        attributes = benefit_group.attributes.symbolize_keys.slice(
           :title, :description, :created_at, :updated_at, :is_active, :effective_on_kind, :effective_on_offset,
-          :plan_option_kind, :relationship_benefits, :dental_relationship_benefits
+          :plan_option_kind, :relationship_benefits, :dental_relationship_benefits, :dental_plan_option_kind
           )
 
         attributes[:is_default] = benefit_group.default

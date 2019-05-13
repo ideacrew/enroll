@@ -2,9 +2,9 @@
   <table class="benefit-group-contribution-table">
     <tr>
       <th>Offered</th>
-      <th>Employer Health Contribution</th>
+      <th>Employer <%= coverage_kind %> Contribution</th>
     </tr>
-    <% @benefit_group.relationship_benefits.each_with_index do |rb, i| %>
+    <% relationship_benefits.each_with_index do |rb, i| %>
     <tr class="<% if rb.offered %>offered<% else %>not-offered <% end %>">
       <td><%= rb.offered ? raw("<i class='far fa-check-square fa-lg'></i>") : raw("<i class='far fa-square fa-lg'></i>") %><%= rb.relationship.try(:humanize) %></td>
       <td id="pct">

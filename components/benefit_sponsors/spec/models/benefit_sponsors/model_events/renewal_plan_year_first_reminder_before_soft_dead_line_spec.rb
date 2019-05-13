@@ -1,18 +1,22 @@
 require 'rails_helper'
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployerReminderToPublishPlanYearNotification', dbclean: :around_each do
+  include_context "setup benefit market with market catalogs and product packages"
+  include_context "setup renewal application"
 
   let(:model_event) { "renewal_plan_year_first_reminder_before_soft_dead_line" }
-  let!(:start_on) { TimeKeeper.date_of_record.next_month.beginning_of_month}
-  let!(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-  let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile_renewal_draft_application, site: site) }
-  let(:employer_profile) { organization.employer_profile }
-  let(:benefit_sponsorship) { employer_profile.active_benefit_sponsorship }
-  let!(:model_instance) { benefit_sponsorship.renewal_benefit_application }
+
+  let(:renewal_effective_date)  { TimeKeeper.date_of_record.next_month.beginning_of_month }
+  let(:current_effective_date)  { renewal_effective_date.prev_year }
+  let(:employer_profile) { abc_profile }  
+  let(:model_instance) { renewal_application }
+
   let!(:date_mock_object) { double("Date", day: Settings.aca.shop_market.renewal_application.application_submission_soft_deadline - 2 )}
 
   before do
-    model_instance.update_attributes(:effective_period =>  start_on..(start_on + 1.year) - 1.day)
+    model_instance.update_attributes(:effective_period =>  renewal_effective_date..(renewal_effective_date + 1.year) - 1.day)
   end
   
   describe "ModelEvent" do

@@ -4,11 +4,15 @@ module BenefitSponsors
       include Mongoid::Document
       include Mongoid::Timestamps
 
+      SOURCE_KINDS  = [:benefit_sponsor_catalog, :conversion].freeze
+
+
       embedded_in :benefit_package, 
                   class_name: "::BenefitSponsors::BenefitPackages::BenefitPackage", inverse_of: :sponsored_benefits
 
       field :product_package_kind,  type: Symbol
       field :product_option_choice, type: String # carrier id / metal level
+      field :source_kind, type: Symbol, default: :benefit_sponsor_catalog
 
       belongs_to :reference_product, class_name: "::BenefitMarkets::Products::Product", inverse_of: nil
 
@@ -32,8 +36,10 @@ module BenefitSponsors
       validate :product_package_exists
 #      validates_presence_of :sponsor_contribution
 
+      default_scope { where(:source_kind.ne => :conversion) }
+
       def product_package_exists
-        if product_package.blank?
+        if product_package.blank? && source_kind == :benefit_sponsor_catalog
           self.errors.add(:base => "Unable to find mappable product package")
         end
       end

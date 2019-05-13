@@ -13,6 +13,15 @@ class HbxEnrollment
   include BenefitSponsors::ModelEvents::HbxEnrollment
 
   embedded_in :household
+  field :effective_on, type: Date
+  field :terminated_on, type: Date
+  field :kind, type: String
+  field :employee_role_id, type: BSON::ObjectId
+  field :benefit_sponsorship_id, type: BSON::ObjectId
+  field :sponsored_benefit_package_id, type: BSON::ObjectId
+  field :sponsored_benefit_id, type: BSON::ObjectId
+  field :benefit_group_assignment_id, type: BSON::ObjectId
+  field :aasm_state, type: String
 
   ENROLLMENT_CREATED_EVENT_NAME = "acapi.info.events.policy.created"
   ENROLLMENT_UPDATED_EVENT_NAME = "acapi.info.events.policy.updated"

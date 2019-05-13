@@ -1,6 +1,6 @@
 require "rails_helper"
 
-describe ::Importers::ConversionEmployerPlanYearSet, dbclean: :after_each do
+describe ::Importers::ConversionEmployerPlanYearSet, dbclean: :around_each do
   let(:out_stream) { StringIO.new }
   let(:employer_record) { instance_double("::Importers::ConversionEmployerPlanYearCreate", :save => record_save_result, :errors => record_errors, :warnings => record_warnings) }
   let(:record_errors) { { } }

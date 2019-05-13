@@ -23,6 +23,7 @@ gem 'devise', '>= 3.5.4'
 gem 'effective_datatables', path: './project_gems/effective_datatables-2.6.14'
 gem 'haml'
 gem 'httparty'
+gem 'i18n', '0.7.0'
 gem 'interactor', '3.1.0'
 gem 'interactor-rails', '2.0.2'
 gem 'jbuilder', '~> 2.0'
@@ -103,23 +104,19 @@ end
 group :development do
   gem "certified"
   gem 'overcommit'
-  gem 'rubocop', require: false
+  gem 'rubocop', "0.54.0", require: false
+  gem 'rubocop-git'
   gem 'web-console', '2.3.0'
 end
 
 group :development, :test do
-  gem 'byebug', '8.2.2'
   gem 'capistrano', '3.3.5'
   gem 'capistrano-rails', '1.1.6'
+  gem 'climate_control', '0.2.0'
   gem 'email_spec', '2.0.0'
   gem 'factory_girl_rails', '4.6.0'
   gem 'forgery'
-  gem 'parallel_tests'
-  gem 'pry'
-  gem 'pry-byebug'
-  gem 'pry-rails'
-  gem 'pry-remote'
-  gem 'pry-stack_explorer'
+  gem 'parallel_tests', '2.26.2'
   gem 'puma'
   gem 'railroady', '~> 1.5.2'
   gem 'rspec-rails', '~> 3.4.2'
@@ -140,7 +137,7 @@ group :test do
   gem 'mongoid-rspec', '3.0.0'
   gem 'poltergeist'
   gem 'rspec-instafail'
-  gem 'ruby-progressbar', '1.6.0'
+  gem 'ruby-progressbar', '~> 1.7'
   gem 'shoulda-matchers', '3.1.1'
   gem 'simplecov', '0.14.1', :require => false
   gem 'test-prof', '0.5.0'

@@ -7,15 +7,15 @@ module Effective
         row.employer_profile.present? ? row.employer_profile.legal_name : row.employer_name
         }, :sortable => false, :filter => false
         table_column :employer_type, proc: Proc.new { |row| row.employer_type }, label: 'Employer Type', :sortable => false, :filter => false
-      	table_column :quote, proc: Proc.new { |row|
-      	  link_to row.quote_name.titleize, broker_agencies_broker_role_quote_path(
-      	    row.broker_role_id, row),
-      	  data: { no_turbolink: true }      		},
-      	  :sortable => false, :filter => false
+        table_column :quote, proc: Proc.new { |row|
+          link_to row.quote_name.titleize, broker_agencies_broker_role_quote_path(
+            row.broker_role_id, row),
+          data: { no_turbolink: true }          },
+          :sortable => false, :filter => false
         table_column :effective_date, :proc => Proc.new { |row| row.start_on }, :filter => false
-      	table_column :claim_code, proc: Proc.new { |row| row.claim_code}, :sortable => false, :filter => false
-      	table_column :family_count, proc: Proc.new { |row| row.quote_households.count}, :sortable => false, :filter => false
-      	table_column :state, proc: Proc.new { |row| row.aasm_state}, :sortable => false, :filter => false
+        table_column :claim_code, proc: Proc.new { |row| row.claim_code}, :sortable => false, :filter => false
+        table_column :family_count, proc: Proc.new { |row| row.quote_households.count}, :sortable => false, :filter => false
+        table_column :state, proc: Proc.new { |row| row.aasm_state}, :sortable => false, :filter => false
         table_column :actions, :width => '50px', :proc => Proc.new { |row|
           dropdown= [
             ['Edit Roster',edit_broker_agencies_broker_role_quote_path(broker_role_id: row.broker_role_id, id: row.id),'static'],
@@ -38,7 +38,7 @@ module Effective
       end
 
       def global_search?
-      	true
+        true
       end
 
       def nested_filter_definition
@@ -67,7 +67,7 @@ module Effective
       end
 
       class << self
-      	attr_accessor :broker_role_id
+        attr_accessor :broker_role_id
       end
 
     end

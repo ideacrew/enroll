@@ -19,7 +19,7 @@ attributes: !ruby/hash:BSON::Document
   benefit_market_id: !ruby/object:BSON::ObjectId
     raw_data: !binary |-
       WxWP5p+ICzHOaecf
-  updated_at: 2018-08-16 19:51:10.183000000 Z
+  updated_at: 2018-08-25 18:00:57.379000000 Z
   created_at: 2018-07-05 15:58:18.600000000 Z
   product_packages:
   - !ruby/hash:BSON::Document
@@ -34,7 +34,7 @@ attributes: !ruby/hash:BSON::Document
     application_period: !ruby/hash:BSON::Document
       min: 2017-01-01 00:00:00.000000000 Z
       max: 2017-12-31 00:00:00.000000000 Z
-    updated_at: 2018-08-21 19:47:40.355000000 Z
+    updated_at: 2018-07-05 15:58:18.723000000 Z
     created_at: 2018-07-05 15:58:18.723000000 Z
     products:
     - !ruby/hash:BSON::Document
@@ -494,7 +494,7 @@ attributes: !ruby/hash:BSON::Document
         name: dependent
         display_name: Dependents
         order: 2
-        discounted_above_threshold: 3
+        discounted_above_threshold: 4
         eligible_for_threshold_discount: true
   - !ruby/hash:BSON::Document
     _id: !ruby/object:BSON::ObjectId
@@ -508,7 +508,7 @@ attributes: !ruby/hash:BSON::Document
     application_period: !ruby/hash:BSON::Document
       min: 2017-01-01 00:00:00.000000000 Z
       max: 2017-12-31 00:00:00.000000000 Z
-    updated_at: 2018-08-21 19:47:40.414000000 Z
+    updated_at: 2018-07-05 15:58:18.805000000 Z
     created_at: 2018-07-05 15:58:18.805000000 Z
     products:
     - !ruby/hash:BSON::Document
@@ -968,7 +968,7 @@ attributes: !ruby/hash:BSON::Document
         name: dependent
         display_name: Dependents
         order: 2
-        discounted_above_threshold: 3
+        discounted_above_threshold: 4
         eligible_for_threshold_discount: true
   - !ruby/hash:BSON::Document
     _id: !ruby/object:BSON::ObjectId

@@ -1,0 +1,131 @@
+#metal-level-select
+	#yourPlans
+		.float-right.mb-2
+			div#singleProductPlans
+				- carriers_hash = @sponsored_benefit_form.catalog.plan_options[:single_product]
+				- carriers_hash.each do |carrier_arr|
+					- carrier_name = carrier_arr.first
+					- products = carrier_arr.last
+					div id="carrierProducts#{carrier_name}" class="hidden"
+						.row.mb-1
+							span.pull-right.mr-3
+								strong Displaying: #{products.length} Plans
+						- products.each do |product|
+							.col-xs-4.reference-plans
+								.col-xs-12.p0.mb-1
+									label.container
+										= f.radio_button :reference_plan_id, product.id, :data => {plan_title: product.title, metal_level: product.metal_level_kind, carrier_name: product.carrier_name, plan_type: product.product_type}, :onclick => "newContributionAmounts(this)"
+										span.checkmark
+										p.heading-text.reference-plan-title.mb-1
+											= product.title
+										span.plan-label Type:
+										span.rp-plan-info.ml-1
+											= product.product_type
+										br
+										span.plan-label Carrier:
+										span.rp-plan-info.ml-1
+											= product.carrier_name
+										br
+										span.plan-label Level:
+										span.rp-plan-info.ml-1
+											= product.metal_level_kind
+										br
+                                        span.plan-label Network:
+                                        span.rp-plan-info
+                                          - if product.network_information.present?
+                                            a#myToolTip data-toggle="tooltip" data-placement="top" data-container="body" title="#{product.network_information}"
+                                                i.fas.fa-question-circle
+                                                = "NETWORK NOTES"
+										br
+										span.plan-label.mt-1.rp-view-summary onclick="viewSummary(this)" data-plan-title=product.title data-plan-id=product.id View Summary
+										br
+
+// view model details
+modal.fade#viewSummaryModal tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+  .modal-dialog role="document"
+    .modal-content
+      .modal-header
+        button.close type="button" data-dismiss="modal" aria-label="close" x
+        h4.heading-text.mt-0.mb-0.col-10#viewSummaryTitle
+      .modal-body
+        table.table.compare-table style="font-size:11px"
+          tr
+          tbody#modalSummaryData
+			.modal-footer
+				.pull-left
+					a href="/" id="sbcLink" target="_blank"
+						i.far.fa-file-pdf.fa-2x.mr-1
+						| Plan Summary
+				.pull-right
+					button.btn.btn-default.btn-sm#closeModal type="button" data-dismiss="modal" style="margin-top:-1px" Close
+
+javascript:
+    var selectedBenefitSponsorsID = "#{params[:benefit_sponsorship_id]}";
+    var selectedBenefitApplicationID = "#{params[:benefit_application_id]}";
+    var selectedBenefitPackageID = "#{params[:benefit_package_id]}";
+    var selectedSummaryTitle;
+    var selectedReferencePlanID;
+    var refreshPage = false;
+    var showLess = false;
+
+  // function newContributionAmounts(element) {
+  //   document.getElementById('yourReferencePlanDetails').innerHTML = '#{escape_javascript(render :partial => "./ui-components/v1/cards/reference_plan_details_shell")}'
+
+  //   var data = element.dataset
+
+  //   document.getElementById('referencePlanTitle').append(data.planTitle);
+  //   document.getElementById('rpType').append(data.planType);
+  //   document.getElementById('rpCarrier').append(data.carrierName);
+  //   document.getElementById('rpMetalLevel').append(data.metalLevel);
+  //   document.getElementById('rpNetwork').append('N/A');
+  // }
+
+  function viewSummary(element) {
+      selectedSummaryTitle = element.dataset.planTitle;
+      selectedReferencePlanID = element.dataset.planId;
+      document.getElementById('viewSummaryTitle').innerHTML = selectedSummaryTitle;
+      fetch('/benefit_sponsors/benefit_sponsorships/'+selectedBenefitSponsorsID+'/benefit_applications/'+selectedBenefitApplicationID+'/benefit_packages/reference_product_summary?reference_plan_id='+selectedReferencePlanID)
+          .then((res) => res.json())
+          .then((data) => {
+              data[1].map((s) => {
+                  document.getElementById('sbcLink').setAttribute('href', data[2]);
+              });
+          })
+          .then($('#viewSummaryModal').modal('show'))
+      showLess = false
+  }
+
+    function showMoreDetails() {
+        if (showLess) {
+            document.getElementById('modalSummaryData').innerHTML = '';
+            fetch('/benefit_sponsors/benefit_sponsorships/'+selectedBenefitSponsorsID+'/benefit_applications/'+selectedBenefitApplicationID+'/benefit_packages/reference_product_summary?reference_plan_id='+selectedReferencePlanID)
+                .then((res) => res.json())
+                .then((data) => {
+                    data[1].map((s) => {
+                        document.getElementById('sbcLink').setAttribute('href', data[2])
+                        var tr = document.createElement('tr');
+                        var tbody = document.getElementById('modalSummaryData');
+                        tr.innerHTML = `<td style="background-color:#f5f5f5">${s.visit_type}</td><td>${s.copay_in_network_tier_1}</td><td>${s.co_insurance_in_network_tier_1}</td>`;
+                        tbody.appendChild(tr)
+                    })
+                })
+                .then(document.getElementById('btnMoreDetails').innerHTML = "More Details")
+            showLess = false;
+        } else {
+            fetch('/benefit_sponsors/benefit_sponsorships/'+selectedBenefitSponsorsID+'/benefit_applications/'+selectedBenefitApplicationID+'/benefit_packages/reference_product_summary?reference_plan_id='+selectedReferencePlanID)
+                .then((res) => res.json())
+                .then((data) => {
+                    data[1].map((s) => {
+                        var tr = document.createElement('tr');
+                        var tbody = document.getElementById('modalSummaryData');
+                        tr.innerHTML = `<td style="background-color:#f5f5f5">${s.visit_type}</td><td>${s.copay_in_network_tier_1}</td><td>${s.co_insurance_in_network_tier_1}</td>`;
+                        tbody.appendChild(tr)
+                    })
+                })
+                .then(document.getElementById('btnMoreDetails').innerHTML = "Fewer Details")
+            showLess = true;
+        }
+    }
+
+
+		

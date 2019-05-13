@@ -37,7 +37,7 @@ namespace :migrations do
         end
 
         # Cancel any renewal benefit applications that are present.
-        if benefit_application.successor_applications.present?
+        if benefit_application.successors.present?
           successor_application = benefit_application.successor_applications.first
           enrollment_service = initialize_service(successor_application)
           enrollment_service.cancel

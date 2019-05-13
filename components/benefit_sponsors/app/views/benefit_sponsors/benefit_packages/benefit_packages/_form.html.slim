@@ -1,4 +1,7 @@
 - add_new_package = (params["add_new_benefit_package"] == "true")
+- action = f.object.has_dental_sponsored_benefits? ? "edit" : "add"
+- is_new_package = @benefit_package_form.is_new_package
+
 .reference-summary
 
 = f.hidden_field :benefit_application_id
@@ -17,18 +20,21 @@ h1.heading-text Benefit Package - Set Up
     = f.fields_for :sponsored_benefits, errors: {}, fieldset: false do |sb|
       = render "sponsored_benefit", f: sb
 
-  button.btn.btn-default#addBenefitPackage type="submit" name="add_new_benefit_package" value="true" Add Benefit Package
+  button.btn.btn-default.ml-1#addBenefitPackage type="submit" name="add_new_benefit_package" value="true" Add Benefit Package
+  - if f.object.is_dental_products_available?
+    button.btn.btn-default.ml-1#dentalBenefits type="submit" name="#{action}_dental_benefits" value="true" #{action.humanize} Dental Benefits
+  / button.btn.btn-default#editDentalBenefits type="submit" name="edit_dental_benefits" value="true" Edit Dental Benefits
   button.btn.btn-primary#submitBenefitPackage type="submit" name="add_new_benefit_package" value="false" class="pull-right" Create Plan Year
-  
+
 
   = link_to 'Cancel', profiles_employers_employer_profile_path(@benefit_package_form.service.employer_profile, :tab=>'benefits'), :class => 'btn btn-default pull-right mr-1', id:'cancelBenefitPackage'
-      
+
 javascript:
   var disableSelectric = false;
 
-- if add_new_package
+- if is_new_package || is_new_package.nil?
   javascript:
     window.onload = function(){
-      document.getElementById("addBenefitPackage").classList.add("hidden")
+      disableNewAddBenefitPackageButton()
+      disableDentalBenefitPackage()
     }
-

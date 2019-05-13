@@ -11,6 +11,8 @@ class FixOrganization< MongoidMigrationTask
         swap_fein(organization) if organization.present?
       when "approve_attestation"
         approve_attestation_for_employer(organization) if organization.present?
+      when "update_employer_broker_agency_account"
+        update_employer_broker_agency_account(organization) if organization.present?
       else
         puts"The Action defined is not performed in the rake task" unless Rails.env.test?
     end
@@ -25,7 +27,6 @@ class FixOrganization< MongoidMigrationTask
       return organization
     end
   end
-
 
   def update_fein(organization)
     correct_fein = ENV['correct_fein']
@@ -74,5 +75,27 @@ class FixOrganization< MongoidMigrationTask
       attestation.approve! if attestation.may_approve?
       attestation.save
       puts "Employer Attestation approved" unless Rails.env.test?
+  end
+
+  def update_employer_broker_agency_account(organization)
+    correct_npn = ENV['npn']
+    writing_agent = BrokerRole.by_npn(correct_npn).first
+    broker_agency_profile = writing_agent.broker_agency_profile if writing_agent.present?
+
+    if broker_agency_profile.present?
+        broker_agency_account = organization.active_benefit_sponsorship.active_broker_agency_account
+        if broker_agency_account.present?
+          hired_on = broker_agency_account.start_on
+          employer_profile = organization.employer_profile
+          employer_profile.broker_role_id = writing_agent.id
+          employer_profile.hire_broker_agency(broker_agency_profile, hired_on)
+          employer_profile.save!
+          puts "broker_agency_profile and writing_agent updated for broker_agency_account" unless Rails.env.test?
+        else
+          puts "No broker_agency_account found for organization fein:#{fein}" unless Rails.env.test?
+        end
+    else
+      puts "broker_agency_profile not found for broker" unless Rails.env.test?
+    end
   end
 end

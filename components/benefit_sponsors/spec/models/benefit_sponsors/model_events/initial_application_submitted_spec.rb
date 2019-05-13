@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module BenefitSponsors
-  RSpec.describe 'ModelEvents::InitialApplicationSubmitted', db_clean: :after_each do
+  RSpec.describe 'ModelEvents::InitialApplicationSubmitted', dbclean: :after_each do
 
     let(:model_event) { "application_submitted" }
     let(:current_effective_date)  { TimeKeeper.date_of_record }
@@ -12,7 +12,7 @@ module BenefitSponsors
     let!(:benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
                                             benefit_market: benefit_market,
                                             title: "SHOP Benefits for #{current_effective_date.year}",
-                                            application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year))
+                                            application_period: (start_on.beginning_of_year..start_on.end_of_year))
                                           }
     let(:organization)        { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let(:employer_profile)    { organization.employer_profile }
@@ -29,7 +29,7 @@ module BenefitSponsors
       DatabaseCleaner.clean
     end
 
-    describe "when initial employer's application is approved", db_clean: :after_each do
+    describe "when initial employer's application is approved", dbclean: :after_each do
       context "ModelEvent" do
 
         it "should trigger model event" do
@@ -43,7 +43,7 @@ module BenefitSponsors
         end
       end
 
-      context "Notice Trigger", db_clean: :after_each do
+      context "Notice Trigger", dbclean: :after_each do
         subject { BenefitSponsors::Observers::BenefitApplicationObserver.new }
 
         let(:model_event) { ::BenefitSponsors::ModelEvents::ModelEvent.new(:application_submitted, model_instance, {}) }
@@ -66,7 +66,7 @@ module BenefitSponsors
         end
       end
 
-      context "NoticeBuilder", db_clean: :after_each do
+      context "NoticeBuilder", dbclean: :after_each do
 
         let(:data_elements) {
           [

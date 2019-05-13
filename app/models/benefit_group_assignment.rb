@@ -114,6 +114,10 @@ class BenefitGroupAssignment
     @hbx_enrollment = new_hbx_enrollment
   end
 
+  def benefit_end_date
+     end_on || benefit_group.end_on
+  end
+
   def covered_families
     Family.where({
       "households.hbx_enrollments.benefit_group_assignment_id" => BSON::ObjectId.from_string(self.id)
@@ -286,7 +290,11 @@ class BenefitGroupAssignment
     census_employee.benefit_group_assignments.each do |benefit_group_assignment|
       if benefit_group_assignment.is_active? && benefit_group_assignment.id != self.id
         end_on = benefit_group_assignment.end_on || (start_on - 1.day)
-        end_on = benefit_group_assignment.benefit_application.end_on unless benefit_group_assignment.benefit_application.effective_period.cover?(end_on)
+        if is_case_old?
+          end_on = benefit_group_assignment.plan_year.end_on unless benefit_group_assignment.plan_year.coverage_period_contains?(end_on)
+        else
+          end_on = benefit_group_assignment.benefit_application.end_on unless benefit_group_assignment.benefit_application.effective_period.cover?(end_on)
+        end
         benefit_group_assignment.update_attributes(is_active: false, end_on: end_on)
       end
     end

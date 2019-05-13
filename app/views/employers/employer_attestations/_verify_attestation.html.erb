@@ -36,8 +36,8 @@
                 </div>
                 <div class="col-sm-4">
                   <div class="form-group">
-                    <% if @employer_profile.plan_years.non_canceled.present? %>
-                    <h3>Effective Date: <%= @employer_profile.plan_years.non_canceled.last.start_on.strftime('%m/%d/%Y') %></h3>
+                    <% if @employer_profile.plan_years.non_terminated.present? %>
+                    <h3>Effective Date: <%= @employer_profile.plan_years.non_terminated.last.start_on.strftime('%m/%d/%Y') %></h3>
                     <% end %>
                   </div>
                 </div>

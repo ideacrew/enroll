@@ -5,7 +5,7 @@ module BenefitSponsors
   RSpec.describe Organizations::OrganizationForms::ProfileForm, type: :model, dbclean: :after_each do
 
     subject { BenefitSponsors::Organizations::OrganizationForms::ProfileForm }
-    let(:model_attributes) { [:id, :market_kind, :is_benefit_sponsorship_eligible,:corporate_npn,:languages_spoken,:working_hours,:accept_new_clients,:home_page,:contact_method,:market_kind_options,:grouped_sic_code_options,:language_options,:contact_method_options,:profile_type,:sic_code,:inbox,:parent,:office_locations] }
+    let(:model_attributes) { [:id, :market_kind, :is_benefit_sponsorship_eligible,:corporate_npn,:languages_spoken,:working_hours,:accept_new_clients,:home_page,:contact_method,:market_kind_options,:grouped_sic_code_options,:language_options,:contact_method_options,:profile_type,:sic_code,:inbox,:parent,:office_locations,:referred_by,:referred_reason,:referred_by_options] }
 
     describe "profile form" do
 
@@ -27,6 +27,8 @@ module BenefitSponsors
           {
             "profile_type"=>"benefit_sponsor",
             "sic_code"=>"0279",
+            "referred_by"=>"Other",
+            "referred_reason"=>"Other Reason",
             "office_locations_attributes"=>
                 {"0"=>
                   {

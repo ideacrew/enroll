@@ -106,7 +106,7 @@
         end
 
         class << self
-        	attr_accessor :profile_id
+          attr_accessor :profile_id
         end
 
         def collection
