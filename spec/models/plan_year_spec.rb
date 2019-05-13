@@ -110,7 +110,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     let(:plan_year) { PlanYear.new(**valid_params) }
 
     it "contains the correct renewing states" do
-      expect(PlanYear::RENEWING).to eq %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled renewing_publish_pending)
+      expect(PlanYear::RENEWING).to eq %w(renewing_draft renewing_published renewing_enrolling renewing_enrollment_extended renewing_enrolled renewing_publish_pending)
     end
 
     it "census employees should not be matchable" do
@@ -2826,6 +2826,136 @@ describe "notify_employer_py_cancellation" do
         plan_year.cancel_employee_enrollments( true)
         expect(enrollment.aasm_state).to eq "coverage_canceled"
       end
+    end
+  end
+end
+
+describe '.extend_open_enrollment' do
+  let(:current_effective_date) { Date.new(Date.today.year, 4, 1) }
+  let(:today) { current_effective_date - 7.days }
+  let!(:employer_profile) {FactoryGirl.create(:employer_profile)}
+  let!(:plan_year) {FactoryGirl.create(:plan_year, employer_profile: employer_profile, aasm_state: aasm_state, start_on: current_effective_date)}
+
+  before(:each) do
+    TimeKeeper.set_date_of_record_unprotected!(today)
+  end
+
+  after(:each) do
+    TimeKeeper.set_date_of_record_unprotected!(Date.today)
+  end
+
+  context 'when plan year is ineligible' do
+    let(:aasm_state) { :application_ineligible }
+    let(:today) { current_effective_date - 7.days }
+    let(:oe_end_date) { current_effective_date - 5.days }
+
+    it 'should extend open enrollment' do
+      expect(plan_year.aasm_state).to eq "application_ineligible"
+      plan_year.extend_open_enrollment(oe_end_date)
+      plan_year.reload
+      expect(plan_year.aasm_state).to eq "enrollment_extended"
+      expect(plan_year.open_enrollment_end_on).to eq oe_end_date
+    end
+  end
+
+  context 'when plan year canceled due to ineligibility' do
+    let(:aasm_state) { :canceled }
+    let(:today) { current_effective_date + 2.days }
+    let(:oe_end_date) { current_effective_date + 5.days }
+
+    it 'should extend open enrollment' do
+      expect(plan_year.aasm_state).to eq "canceled"
+      plan_year.extend_open_enrollment(oe_end_date)
+      plan_year.reload
+      expect(plan_year.aasm_state).to eq "enrollment_extended"
+      expect(plan_year.open_enrollment_end_on).to eq oe_end_date
+    end
+  end
+
+  context 'when plan year canceled due to ineligibility' do
+    let(:aasm_state) { :renewing_canceled }
+    let(:today) { current_effective_date + 2.days }
+    let(:oe_end_date) { current_effective_date + 5.days }
+
+    it 'should extend open enrollment' do
+      expect(plan_year.aasm_state).to eq "renewing_canceled"
+      plan_year.extend_open_enrollment(oe_end_date)
+      plan_year.reload
+      expect(plan_year.aasm_state).to eq "renewing_enrollment_extended"
+      expect(plan_year.open_enrollment_end_on).to eq oe_end_date
+    end
+  end
+
+  context 'when plan year is in open enrollment' do
+    let(:aasm_state) { :enrolling }
+    let(:today) { current_effective_date - 8.days }
+    let(:oe_end_date) { current_effective_date - 5.days }
+
+    it 'should extend open enrollment' do
+      expect(plan_year.aasm_state).to eq "enrolling"
+      plan_year.extend_open_enrollment(oe_end_date)
+      plan_year.reload
+      expect(plan_year.aasm_state).to eq "enrollment_extended"
+      expect(plan_year.open_enrollment_end_on).to eq oe_end_date
+    end
+  end
+
+  context 'when plan year is in open enrollment' do
+    let(:aasm_state) { :renewing_enrolling }
+    let(:today) { current_effective_date - 8.days }
+    let(:oe_end_date) { current_effective_date - 5.days }
+
+    it 'should extend open enrollment' do
+      expect(plan_year.aasm_state).to eq "renewing_enrolling"
+      plan_year.extend_open_enrollment(oe_end_date)
+      plan_year.reload
+      expect(plan_year.aasm_state).to eq "renewing_enrollment_extended"
+      expect(plan_year.open_enrollment_end_on).to eq oe_end_date
+    end
+  end
+
+  context 'when plan year open enrollment entended' do
+    let(:aasm_state) { :enrollment_extended }
+    let(:today) { current_effective_date - 13.days }
+    let(:oe_end_date) { current_effective_date - 5.days }
+
+    it 'should extend open enrollment' do
+      expect(plan_year.aasm_state).to eq "enrollment_extended"
+      plan_year.extend_open_enrollment(oe_end_date)
+      plan_year.reload
+      expect(plan_year.aasm_state).to eq "enrollment_extended"
+      expect(plan_year.open_enrollment_end_on).to eq oe_end_date
+    end
+  end
+end
+
+describe ".end_open_enrollment" do
+  let(:oe_end_on) { TimeKeeper.date_of_record + 2.days }
+  let(:current_effective_date) { Date.new(TimeKeeper.date_of_record.year, 4, 1) }
+  let(:aasm_state) { :enrollment_extended }
+  let!(:employer_profile) {FactoryGirl.create(:employer_profile)}
+  let!(:plan_year) {FactoryGirl.create(:plan_year, employer_profile: employer_profile, aasm_state: aasm_state, start_on: current_effective_date)}
+
+  before(:each) do
+    TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 3, 24))
+  end
+
+  after(:each) do
+    TimeKeeper.set_date_of_record_unprotected!(Date.today)
+  end
+
+  context "open enrollment close invoked with earlier date" do
+    before do
+      plan_year.update(open_enrollment_end_on: oe_end_on)
+      allow(plan_year).to receive(:is_enrollment_valid?).and_return(true)
+    end
+
+    it "should close open enrollment and reset OE end date" do
+      expect(plan_year.open_enrollment_end_on).to eq oe_end_on
+      plan_year.end_open_enrollment(TimeKeeper.date_of_record)
+      plan_year.reload
+      expect(plan_year.open_enrollment_end_on).to eq TimeKeeper.date_of_record
+      expect(plan_year.aasm_state).to eq "enrolled"
     end
   end
 end

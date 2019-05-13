@@ -1,0 +1,8 @@
+$('.edit_open_enrollment_form').html("<%= escape_javascript(render "edit_open_enrollment") %>");
+
+$('#reviewClose').click(function() {
+    $('.edit_open_enrollment_form').hide();
+    event.preventDefault();
+    $('tr.child-row:visible').remove();
+    $('#extendable_applications_table').hide();
+});

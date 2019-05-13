@@ -1253,6 +1253,118 @@ describe EmployerProfile, "terminate_scheduled_plan_years", dbclean: :after_each
   end
 end
 
+describe EmployerProfile, "plan year Open Enrollment Extension", :dbclean => :after_each do
+  let(:this_year) { TimeKeeper.date_of_record.year }
+  let(:start_on) { Date.new(this_year,4,1) }
+  let(:aasm_state) { :active }
+  let!(:employer_profile) {FactoryGirl.create(:employer_profile)}
+  let!(:plan_year) {FactoryGirl.create(:plan_year, employer_profile: employer_profile, aasm_state: aasm_state, start_on: start_on)}
+
+  context '.oe_extendable_plan_years' do
+
+    let(:current_date)  { Date.new(this_year, 4, 10) }
+    before { TimeKeeper.set_date_of_record_unprotected!(current_date) }
+
+    context "when overlapping plan year present with status as" do
+      let(:new_start_on)            { Date.new(this_year,4,1) }
+      let!(:new_plan_year) {FactoryGirl.create(:plan_year, employer_profile: employer_profile, aasm_state: "canceled", start_on: new_start_on)}
+
+      context "terminted" do
+        let(:aasm_state) { :terminated }
+
+         it "should not return plan year for enrollment extension" do
+          expect(employer_profile.oe_extendable_plan_years).to be_empty
+        end
+      end
+
+      context "published" do
+        let(:aasm_state) { :published }
+
+        it "should not return plan year for enrollment extension" do
+          expect(employer_profile.oe_extendable_plan_years).to be_empty
+        end
+      end
+
+      context "enrollment_extended" do
+        let(:aasm_state) { :enrollment_extended }
+
+        it "should return only already extended plan year" do
+          expect(employer_profile.oe_extendable_plan_years).to be_present
+          expect(employer_profile.oe_extendable_plan_years).to eq [plan_year]
+        end
+      end
+
+      context "expired" do
+        let(:aasm_state) { :expired }
+
+        it "should not return plan year for enrollment extension" do
+          expect(employer_profile.oe_extendable_plan_years).to be_empty
+        end
+      end
+
+      context "draft" do
+        let(:aasm_state) { :draft }
+
+        it "should return plan year for enrollment extension" do
+          expect(employer_profile.oe_extendable_plan_years).to be_present
+          expect(employer_profile.oe_extendable_plan_years).to eq [new_plan_year]
+        end
+      end
+    end
+
+    context "when overlapping benefit plan year not present" do
+
+      let(:start_on)          { Date.new(this_year - 1,4,1) }
+      let(:new_start_on)            { Date.new(this_year,5,1) }
+
+      let!(:new_plan_year1)             {FactoryGirl.create(:plan_year, employer_profile: employer_profile, aasm_state: "canceled", start_on: new_start_on)} 
+
+      it "should return may plan year for enrollment extension" do
+        expect(employer_profile.oe_extendable_plan_years).to be_present
+        expect(employer_profile.oe_extendable_plan_years).to eq [new_plan_year1]
+      end
+    end
+  end
+
+  context '.oe_extended_plan_years' do
+
+    before {
+      TimeKeeper.set_date_of_record_unprotected!(current_date)
+    }
+
+    context "when open enrollment extended plan year present" do
+      let(:aasm_state) { :enrollment_extended }
+
+      context "and monthly open enrollment end date not passed" do
+        let(:aasm_state) { :terminated }
+        let(:current_date)  { PlanYear.calculate_open_enrollment_date(start_on)[:open_enrollment_end_on] - 2.days }
+
+        it "should not return plan year for close of open enrollment" do
+          expect(employer_profile.oe_extended_plan_years).to be_empty
+        end
+      end
+
+      context "and monthly open enrollment end date reached" do
+        let(:aasm_state) { :terminated }
+        let(:current_date)  { PlanYear.calculate_open_enrollment_date(start_on)[:open_enrollment_end_on] }
+
+        it "should not return plan year for close of open enrollment" do
+          expect(employer_profile.oe_extended_plan_years).to be_empty
+        end
+      end
+
+      context "and monthly open enrollment end date passed" do
+        let(:aasm_state) { :terminated }
+        let(:current_date)  { PlanYear.calculate_open_enrollment_date(start_on)[:open_enrollment_end_on] + 2.days }
+
+        it "should not return plan year for close of open enrollment" do
+          expect(employer_profile.oe_extended_plan_years).to be_empty
+        end
+      end
+    end
+  end
+end
+
 # describe "#advance_day" do
 #   let(:start_on) { (TimeKeeper.date_of_record + 60).beginning_of_month }
 #   let(:end_on) {start_on + 1.year - 1 }
