@@ -218,12 +218,6 @@ Then(/(.*) should not see a passive waiver/) do |named_person|
   expect(waiver.present?).to be_falsy
 end
 
-Then(/(.*) should not see a passive waiver/) do |named_person|
-  sleep(1)
-  waiver = page.all('.hbx-enrollment-panel').detect{|e| e.find('.panel-heading .text-right').text == 'Waived' }
-  expect(waiver.present?).to be_falsy
-end
-
 Then(/Employee should see \"not yet eligible\" error message/) do
   screenshot("new_hire_not_yet_eligible_exception")
   wait_for_ajax(2,2)
