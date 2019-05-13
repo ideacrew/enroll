@@ -91,6 +91,12 @@ namespace :permissions do
   DefinePermissions.define_task :hbx_admin_can_access_user_account_tab => :environment
 end
 
+#RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_extend_open_enrollment
+namespace :permissions do
+  desc 'hbx admin can access extend open enrollment button'
+  DefinePermissions.define_task :hbx_admin_can_extend_open_enrollment => :environment
+end
+
 # RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_force_publish
 namespace :permissions do
   desc 'hbx admin can force publish'
@@ -103,6 +109,7 @@ namespace :permissions do
   DefinePermissions.define_task :grant_super_admin_access => :environment
 end
 
+#RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_change_fein
 namespace :permissions do
   desc 'hbx system admin can change fein'
   DefinePermissions.define_task :hbx_admin_can_change_fein => :environment
@@ -123,4 +130,3 @@ end
 #rake permissions:hbx_admin_can_transition_family_members
 #rake permissions:hbx_admin_can_access_user_account_tab
 #rake permissions:hbx_admin_can_add_pdc
-#RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_change_fein

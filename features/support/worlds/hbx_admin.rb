@@ -34,14 +34,6 @@ Given(/^a Hbx admin with hbx_staff role exists$/) do
   hbx_admin_with_subrole 'hbx_staff'
 end
 
-Given(/^a Hbx admin with super_admin role exists$/) do
-  hbx_admin_with_subrole 'super_admin'
-end
-
-Given(/^a Hbx admin with hbx_tier3 role exists$/) do
-  hbx_admin_with_subrole 'hbx_tier3'
-end
-
 Given(/^a Hbx admin with hbx_read_only role exists$/) do
   hbx_admin_with_subrole 'hbx_read_only'
 end
@@ -56,6 +48,14 @@ end
 
 Given(/^a Hbx admin with hbx_csr_tier2 role exists$/) do
   hbx_admin_with_subrole 'hbx_csr_tier2'
+end
+
+Given(/^a Hbx admin with hbx_tier3 role exists$/) do
+  hbx_admin_with_subrole 'hbx_tier3'
+end
+
+Given(/^a Hbx admin with super_admin role exists$/) do
+  hbx_admin_with_subrole 'super_admin'
 end
 
 Given(/^a Hbx admin logs on to Portal$/) do

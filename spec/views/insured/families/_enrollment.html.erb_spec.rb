@@ -79,6 +79,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     let(:benefit_group) { FactoryGirl.create(:benefit_group) }
 
     before :each do
+      allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
       allow(hbx_enrollment).to receive(:is_special_enrollment?).and_return(false)
       allow(hbx_enrollment).to receive(:coverage_terminated?).and_return(false)
       allow(hbx_enrollment).to receive(:coverage_expired?).and_return(false)
@@ -196,6 +197,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
 
     before :each do
+      allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
       allow(hbx_enrollment).to receive(:coverage_canceled?).and_return(false)
       allow(hbx_enrollment).to receive(:coverage_expired?).and_return(false)
       allow(hbx_enrollment).to receive(:is_coverage_waived?).and_return(false)
@@ -242,6 +244,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     let(:benefit_group) { FactoryGirl.create(:benefit_group) }
 
     before :each do
+      allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
       allow(hbx_enrollment).to receive(:coverage_canceled?).and_return(false)
       allow(hbx_enrollment).to receive(:coverage_expired?).and_return(false)
       allow(hbx_enrollment).to receive(:is_coverage_waived?).and_return(false)

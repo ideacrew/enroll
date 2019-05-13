@@ -212,12 +212,6 @@ Then(/(.*) should see termination confirmation/) do |named_person|
   page.find('.interaction-click-control-terminate-plan').click
 end
 
-Then(/(.*) should see a waiver instead of passive renewal/) do |named_person|
-  sleep(1)
-  waiver = page.all('.hbx-enrollment-panel').detect{|e| e.find('.panel-heading .text-right').text == 'Waived' }
-  expect(waiver.present?).to be_truthy
-end
-
 Then(/(.*) should not see a passive waiver/) do |named_person|
   sleep(1)
   waiver = page.all('.hbx-enrollment-panel').detect{|e| e.find('.panel-heading .text-right').text == 'Waived' }
