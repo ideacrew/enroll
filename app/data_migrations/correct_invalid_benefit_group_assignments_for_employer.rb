@@ -60,6 +60,6 @@ class CorrectInvalidBenefitGroupAssignmentsForEmployer < MongoidMigrationTask
     assignment = census_employee.benefit_group_assignments.where(benefit_group_id:benefit_group.id)
     assignment.present? ? (return "There is already bga present for the ce.") : census_employee.benefit_group_assignments.build(benefit_group_id: benefit_group.id, start_on: benefit_group.start_on)
     census_employee.save!
-    puts "successfully built bga for the employee"
+    puts "successfully built bga for the employee" unless Rails.env.test?
   end
 end
