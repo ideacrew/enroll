@@ -1,4 +1,4 @@
-@ridp_disabled
+@wip
 Feature: Hbx Admin creates a New Consumer Application for ivl users
 
 Background: Hbx Admin navigates into the new consumer application with paper application option and goes forward till DOCUMENT UPLOAD page

@@ -109,6 +109,7 @@ PATH
       sass (~> 3.7.3)
       slim (~> 3.0.8)
       symmetric-encryption (~> 3.9.1)
+      webpacker (~> 4.0.2)
 
 PATH
   remote: components/transport_gateway
