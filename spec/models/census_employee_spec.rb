@@ -1718,6 +1718,78 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
+  context '.past_enrollments' do
+    include_context "setup renewal application"
+
+    before do
+      benefit_application.expire!
+    end
+
+    let(:census_employee) {
+      ce = FactoryGirl.create(:benefit_sponsors_census_employee,
+                              employer_profile: employer_profile,
+                              benefit_sponsorship: benefit_sponsorship,
+                              dob: TimeKeeper.date_of_record - 30.years
+      )
+
+      person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
+      employee_role = FactoryGirl.build(:benefit_sponsors_employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
+      renewal_benefit_group_assignment = FactoryGirl.create(:benefit_sponsors_benefit_group_assignment, benefit_group: renewal_application.benefit_packages.first, census_employee: ce, is_active: false)
+      ce.update_attributes({employee_role: employee_role})
+      family = Family.find_or_build_from_employee_role(employee_role)
+      ce
+    }
+
+    let(:past_benefit_group_assignment) { FactoryGirl.create(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_application.benefit_packages.first, census_employee: census_employee, is_active: false) }
+
+    let!(:enrollment) { FactoryGirl.create(:hbx_enrollment,
+                                 household: census_employee.employee_role.person.primary_family.active_household,
+                                 coverage_kind: "health",
+                                 kind: "employer_sponsored",
+                                 benefit_sponsorship_id: benefit_sponsorship.id,
+                                 sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
+                                 employee_role_id: census_employee.employee_role.id,
+                                 benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
+                                 aasm_state: "coverage_selected"
+      )
+    }
+    let!(:past_expired_enrollment) { FactoryGirl.create(:hbx_enrollment,
+                                 household: census_employee.employee_role.person.primary_family.active_household,
+                                 coverage_kind: "health",
+                                 kind: "employer_sponsored",
+                                 benefit_sponsorship_id: benefit_sponsorship.id,
+                                 sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
+                                 employee_role_id: census_employee.employee_role.id,
+                                 benefit_group_assignment_id: past_benefit_group_assignment.id,
+                                 aasm_state: "coverage_expired"
+      )
+    }
+
+    let!(:canceled_enrollment) { FactoryGirl.create(:hbx_enrollment,
+                                 household: census_employee.employee_role.person.primary_family.active_household,
+                                 coverage_kind: "health",
+                                 kind: "employer_sponsored",
+                                 benefit_sponsorship_id: benefit_sponsorship.id,
+                                 sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
+                                 employee_role_id: census_employee.employee_role.id,
+                                 benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
+                                 aasm_state: "coverage_canceled"
+      )
+    }
+
+    it 'should return past expired enrollment' do
+      expect(census_employee.past_enrollments.to_a.include?(past_expired_enrollment)).to eq true
+    end
+
+    it 'should NOT return current active enrollment' do
+      expect(census_employee.past_enrollments.to_a.include?(enrollment)).to eq false
+    end
+
+    it 'should NOT return canceled enrollment' do
+      expect(census_employee.past_enrollments.to_a.include?(canceled_enrollment)).to eq false
+    end
+  end
+
   context 'editing a CensusEmployee SSN/DOB that is in a linked status' do
 
     let(:census_employee) {FactoryGirl.create :benefit_sponsors_census_employee,

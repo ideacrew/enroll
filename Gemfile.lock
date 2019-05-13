@@ -805,6 +805,7 @@ DEPENDENCIES
   certified
   chosen-rails
   ckeditor
+  climate_control (= 0.2.0)
   coffee-rails (~> 4.1.0)
   combine_pdf
   config (~> 1.0.0)

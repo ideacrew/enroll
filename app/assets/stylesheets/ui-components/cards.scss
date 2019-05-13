@@ -265,7 +265,7 @@
   }
   .offered-heading {
     border-bottom: solid 1px #d5d5d5;
-    padding: 15px 0 25px;
+    padding: 15px 0 15px;
     font-size: 14px;
     color:$mhc-heading-gray;
   }
@@ -299,6 +299,7 @@
     width:45px;
     height:40px;
     margin-top:10px;
+    text-align:center;
   }
   input[type=number]::-webkit-inner-spin-button,
   input[type=number]::-webkit-outer-spin-button {

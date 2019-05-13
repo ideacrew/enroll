@@ -8,10 +8,8 @@
     </p>
   </div>
 
-  <div class="col-xs-12">
   <div class="pull-right upload-document-location">
     <%= link_to "<i class='fas fa-cloud-upload-alt' aria-hidden='true'></i> Upload".html_safe, main_app.new_document_employers_employer_profile_path(@employer_profile), remote: 'true', class: "btn #{@employer_profile.employer_attestation.editable? ? 'btn-default' : 'btn-default disabled' }" %>
-  </div>
   </div>
   </div>
 
@@ -58,7 +56,7 @@
           });
       })
   </script>
-<%else%> 
+<%else%>
   <div class="documents-tab">
     <h1>Documents</h1>
     <h4 class="starter">
@@ -93,3 +91,24 @@
     </table>
   </div>
 <% end %>
+
+<script>
+	// Fixes issue with datatables expanding past main container class
+  setTimeout(function() {
+    (function() {
+  		var container = document.getElementsByClassName('container');
+  		setTimeout(function() {
+  			container[2].classList.remove('container')
+  		})
+
+  		doc = document.getElementById('effective_datatable_wrapper').querySelectorAll('.row')[0];
+  		doc.classList.remove('row')
+  	})()
+  }, 200);
+</script>
+
+<style>
+	.dataTables_wrapper {
+		margin-left:20px;
+	}
+</style>
