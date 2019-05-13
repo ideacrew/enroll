@@ -26,6 +26,7 @@ When /^they complete the new general agency form and hit the 'Submit' button$/ d
   fill_in 'inputDOB', with: (Time.now - rand(20..50).years).strftime('%m/%d/%Y')
   fill_in 'inputEmail', with: Forgery(:email).address
   fill_in 'inputNPN', with: '2222222222'
+  select "Primary", from: "kindSelect"
   fill_in 'validationCustomLegalName', with: (company_name = Forgery(:name).company_name)
   fill_in 'validationCustomdba', with: company_name
   fill_in 'inputFein', with: '333333333'
@@ -33,7 +34,7 @@ When /^they complete the new general agency form and hit the 'Submit' button$/ d
   select "Small Business Marketplace ONLY", from: "agency_organization_profile_attributes_market_kind"
   fill_in 'inputAddress1', with: Forgery(:address).street_address
   fill_in 'agency_organization_profile_attributes_office_locations_attributes_0_address_attributes_city', with: 'Washington'
-  select "MA", from: "inputState" #needs to change it to DC
+  select Settings.aca.state_abbreviation, from: "inputState" #needs to change it to DC
   fill_in 'inputZip', with: '01002'
   wait_for_ajax
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][area_code]', with: '234'
