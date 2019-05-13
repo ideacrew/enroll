@@ -17,7 +17,7 @@ RSpec.describe "insured/show" do
   let(:person) {FactoryGirl.create(:person, :first_name=> 'wilma', :last_name=>'flintstone')}
   let(:consumer_role) {FactoryGirl.create(:consumer_role, person: person)}
   let(:current_broker_user) { FactoryGirl.create(:user, :roles => ['broker_agency_staff'],
- 		:person => broker_person) }
+     :person => broker_person) }
   let(:consumer_user){FactoryGirl.create(:user, :roles => ['consumer'], :person => person)}
 
   before :each do

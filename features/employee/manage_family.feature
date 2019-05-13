@@ -27,5 +27,5 @@ Feature: Employees can update their password or security questions
       Then Employee Soren White should click the Personal Tab
       Then Employee Soren White should click Update my security challenge responses
       When I select the all security question and give the answer
-      When I have submit the security questions
+      When I have submitted the security questions
       Then I should see a security response success message

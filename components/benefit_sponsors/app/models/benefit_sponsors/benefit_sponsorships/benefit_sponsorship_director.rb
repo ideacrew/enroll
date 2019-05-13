@@ -5,14 +5,21 @@ module BenefitSponsors
 
     def initialize(new_date = TimeKeeper.date_of_record)
       @new_date = new_date
+      initialize_logger
     end
 
-    def process(benefit_sponsorship, event)
-      begin
-        business_policy_name = policy_name(event)
-        business_policy = business_policy_for(benefit_sponsorship, business_policy_name)
-        sponsor_service_for(benefit_sponsorship).execute(benefit_sponsorship, event, business_policy)
-      rescue Exception => e 
+    def process(benefit_sponsorships, event)
+      business_policy_name = policy_name(event)
+
+      benefit_sponsorships.no_timeout.each do |benefit_sponsorship|
+        begin
+          business_policy = business_policy_for(benefit_sponsorship, business_policy_name)
+          sponsor_service_for(benefit_sponsorship).execute(benefit_sponsorship, event, business_policy)
+        rescue Exception => e
+          @logger.info "EXCEPTION: Event (#{event}) failed for Employer #{benefit_sponsorship.legal_name}(#{benefit_sponsorship.fein})"
+          @logger.error e.message
+          @logger.error e.backtrace.join("\n")
+        end
       end
     end
 
@@ -40,6 +47,10 @@ module BenefitSponsors
     def sponsor_policy
       return @sponsor_policy if defined?(@sponsor_policy)
       @sponsor_policy = BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipPolicy.new
+    end
+
+    def initialize_logger
+      @logger = Logger.new("#{Rails.root}/log/benefit_sponsorship_director.log") unless defined? @logger
     end
   end
 end

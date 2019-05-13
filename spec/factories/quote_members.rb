@@ -16,5 +16,5 @@ FactoryGirl.define do
     gender "female"
     dob 30.years.ago - 1.month
     employee_relationship 'spouse'
-	end
+  end
 end

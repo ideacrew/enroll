@@ -18,23 +18,23 @@ RSpec.describe 'Load sic codes data Task', :type => :task do
       invoke_sic_code_task
     end
 
-	context "it creates SicCode correctly" do
-	  subject { SicCode.where(sic_code: "0111").first }	
-	  it_should_behave_like "a sic codes data", { division_code: "A",
-	                                              division_label: "Agriculture, Forestry, And Fishing",
-	  	                                          major_group_code: "01",
-	  	                                          major_group_label: "Agricultural Production Crops",
-	  	                                          industry_group_code: "011",
-	  	                                          industry_group_label: "Cash Grains",
-	  	                                          sic_code: "0111",
-	  	                                          sic_label: "Wheat"
-	  	                                        }
-	end
+  context "it creates SicCode correctly" do
+    subject { SicCode.where(sic_code: "0111").first }	
+    it_should_behave_like "a sic codes data", { division_code: "A",
+                                                division_label: "Agriculture, Forestry, And Fishing",
+                                                major_group_code: "01",
+                                                major_group_label: "Agricultural Production Crops",
+                                                industry_group_code: "011",
+                                                industry_group_label: "Cash Grains",
+                                                sic_code: "0111",
+                                                sic_label: "Wheat"
+                                              }
+  end
 
-	private
+  private
 
     def invoke_sic_code_task
       Rake::Task["load_sic_code:update_sic_codes"].invoke
     end
   end
-end	
+end  

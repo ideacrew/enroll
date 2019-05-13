@@ -27,7 +27,7 @@ class EmployerStaffRole
   aasm do
     state :is_applicant    #Person has requested employer staff role with this company
     state :is_active     #Person has created a company, or been added, or request has been approved
-    state :is_closed	  #Person employer staff role is not active
+    state :is_closed    #Person employer staff role is not active
 
     event :approve do
       transitions from: [:is_applicant, :is_active], to: :is_active

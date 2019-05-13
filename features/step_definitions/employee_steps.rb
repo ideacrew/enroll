@@ -20,6 +20,20 @@ Given (/a matched Employee exists with only employee role/) do
   @employee_role.update_attributes(census_employee_id: ce.id, employer_profile_id: org.employer_profile.id)
 end
 
+Given (/(.*) has a matched employee role/) do |name|
+  steps %{
+    When Patrick Doe creates an HBX account
+    And I select the all security question and give the answer
+    When I have submitted the security questions
+    When Employee goes to register as an employee
+    Then Employee should see the employee search page
+    When Employee enters the identifying info of Patrick Doe
+    Then Employee should see the matched employee record form
+    When Employee accepts the matched employer
+    When Employee completes the matched employee form for Patrick Doe
+  }
+end
+
 Given (/a person exists with dual roles/) do
   FactoryGirl.create(:user)
   FactoryGirl.create(:person, :with_employee_role, :with_consumer_role, :with_family, first_name: "Dual Role Person", last_name: "E", user: user)
