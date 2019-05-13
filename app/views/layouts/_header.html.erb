@@ -1,5 +1,5 @@
 <div class='hide' id='dchbx_enroll_date_of_record'><%= TimeKeeper.date_of_record.iso8601 %></div>
-  <nav class="navbar navbar-default navbar-static-top <%= "pre_prod_nav_color" unless Settings.site.deployed_to_production == true %>">
+  <nav class="navbar navbar-default navbar-static-top <%= 'pre_prod_nav_color' if ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true' %>">
     <div class="container">
       <!-- Brand and toggle get grouped for better mobile display -->
       <div class="navbar-header">
