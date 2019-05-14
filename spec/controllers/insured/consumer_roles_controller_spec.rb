@@ -547,7 +547,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
         allow(person).to receive(:resident_role).and_return(resident_role)
         allow(person).to receive(:is_resident_role_active?).and_return(true)
 
-        post :match, :person => resident_parameters
+        post :match, params: { person: resident_parameters }
         expect(user.person.resident_role).not_to be_nil
         expect(response).to redirect_to(family_account_path)
       end
@@ -560,7 +560,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
         allow(person).to receive(:is_resident_role_active?).and_return(true)
         allow(person).to receive(:is_consumer_role_active?).and_return(true)
 
-        post :match, :person => resident_parameters
+        post :match, params: { person: resident_parameters }
         expect(user.person.consumer_role).not_to be_nil
         expect(user.person.resident_role).not_to be_nil
         expect(response).to redirect_to(family_account_path)
