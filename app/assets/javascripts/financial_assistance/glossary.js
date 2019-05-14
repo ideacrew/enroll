@@ -1063,9 +1063,16 @@ $(document).ready(function() {
     });
     $(terms).each(function(i, term) {
       $('.run-glossary:contains(' + term.term + ')').each(function(i, matchingEl) {
-        var regex = new RegExp(term.term, 'i');
+        // checks for start of line or whitespace character before the matched term
+        // to avoid matching terms like "Age" inside of "Coverage"
+        var regex = new RegExp("(^|\\s)(" + term.term + ")", "gi");
         var text = term.description;
-        $(matchingEl).html($(matchingEl).html().replace(regex, '<span class="glossary" data-toggle="tooltip" data-placement="auto top" data-trigger="click focus" data-boundary="window" data-fallbackPlacement="flip" data-html="true" title="' + text + '">' + term.term + '</span>'));
+        $(matchingEl).html($(matchingEl).html().replace(regex, function(match) {
+          var newEl = '<span class="glossary" data-toggle="tooltip" data-placement="auto top" data-trigger="click focus" data-boundary="window" data-fallbackPlacement="flip" data-html="true" title="' + text + '">' + term.term + '</span>';
+          // the regex will find whitespace before a term and replace it as well. This adds
+          // any removed whitespace back in.
+          return match[0] == ' ' ? ' ' + newEl : newEl;
+        }));
       });
     });
 
