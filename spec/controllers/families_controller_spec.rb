@@ -8,8 +8,8 @@ RSpec.describe FamiliesController do
     let(:user) { FactoryBot.create(:user, :person=>person) }
     let(:user_with_out_person) { FactoryBot.create(:user, :person=>nil) }
 
-    let!(:person2) {FactoryGirl.create(:person)}
-    let!(:family_member2) {FactoryGirl.create(:family_member, family: person.primary_family, person: person2) }
+    let!(:person2) {FactoryBot.create(:person)}
+    let!(:family_member2) {FactoryBot.create(:family_member, family: person.primary_family, person: person2) }
 
     let(:params) { {family:  person.primary_family.id.to_s } }
 

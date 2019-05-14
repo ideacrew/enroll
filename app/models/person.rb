@@ -619,7 +619,6 @@ class Person
   end
 
   class << self
-  class << self
     def default_search_order
       [[:last_name, 1],[:first_name, 1]]
     end

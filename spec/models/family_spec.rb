@@ -1072,11 +1072,11 @@ describe Family, "with 2 households a person and 2 extended family members", :db
 end
 
 describe Family, "given a primary applicant and a dependent", dbclean: :after_each do
-  let(:person) { FactoryGirl.create(:person)}
-  let(:individual_market_transition) { FactoryGirl.create(:individual_market_transition, person: person)}
-  let(:person_two) { FactoryGirl.create(:person) }
-  let(:family_member_dependent) { FactoryGirl.build(:family_member, person: person_two, family: family)}
-  let(:family) { FactoryGirl.build(:family, :with_primary_family_member, person: person)}
+  let(:person) { FactoryBot.create(:person)}
+  let(:individual_market_transition) { FactoryBot.create(:individual_market_transition, person: person)}
+  let(:person_two) { FactoryBot.create(:person) }
+  let(:family_member_dependent) { FactoryBot.build(:family_member, person: person_two, family: family)}
+  let(:family) { FactoryBot.build(:family, :with_primary_family_member, person: person)}
   let(:person) { FactoryBot.create(:person)}
   let(:person_two) { FactoryBot.create(:person) }
   let(:family_member_dependent) { FactoryBot.build(:family_member, person: person_two, family: family)}
@@ -1091,7 +1091,7 @@ describe Family, "given a primary applicant and a dependent", dbclean: :after_ea
   it "should build the consumer role for the dependents when primary has a consumer role" do
     allow(person).to receive(:is_consumer_role_active?).and_return(true)
     allow(family_member_dependent.person).to receive(:is_consumer_role_active?).and_return(true)
-    person.consumer_role = FactoryGirl.create(:consumer_role)
+    person.consumer_role = FactoryBot.create(:consumer_role)
     person.consumer_role = FactoryBot.create(:consumer_role)
     person.save
     expect(family_member_dependent.person.consumer_role).to eq nil
@@ -1101,7 +1101,7 @@ describe Family, "given a primary applicant and a dependent", dbclean: :after_ea
 
   it "should return the existing consumer roles if dependents already have a consumer role" do
     allow(person_two).to receive(:is_consumer_role_active?).and_return(true)
-    person.consumer_role = FactoryGirl.create(:consumer_role)
+    person.consumer_role = FactoryBot.create(:consumer_role)
     person.consumer_role = FactoryBot.create(:consumer_role)
     person.save
     cr = FactoryBot.create(:consumer_role)
@@ -1278,8 +1278,8 @@ describe "has_valid_e_case_id" do
 end
 
 describe "currently_enrolled_plans_ids" do
-  let!(:family100) { FactoryGirl.create(:family, :with_primary_family_member) }
-  let!(:enrollment100) { FactoryGirl.create(:hbx_enrollment, household: family100.active_household, kind: "individual") }
+  let!(:family100) { FactoryBot.create(:family, :with_primary_family_member) }
+  let!(:enrollment100) { FactoryBot.create(:hbx_enrollment, household: family100.active_household, kind: "individual") }
 
   it "should return a non-empty array of plan ids" do
     expect(family100.currently_enrolled_plans_ids(enrollment100).present?).to be_truthy

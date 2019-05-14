@@ -2,7 +2,7 @@ require "rails_helper"
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe VerificationHelper, :type => :helper do
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+  let(:person) { FactoryBot.create(:person, :with_consumer_role) }
   let(:type) { person.consumer_role.verification_types.first }
   before :each do
     assign(:person, person)
@@ -235,7 +235,7 @@ RSpec.describe VerificationHelper, :type => :helper do
     end
     it "returns true if any family members have verification types state as outstanding" do
       family.family_members.each do |member|
-        member.person = FactoryGirl.create(:person, :with_consumer_role)
+        member.person = FactoryBot.create(:person, :with_consumer_role)
         member.person.consumer_role.verification_types.each{|type| type.validation_status = "outstanding" }
         member.save
       end
@@ -244,7 +244,7 @@ RSpec.describe VerificationHelper, :type => :helper do
 
     it "returns false if all family members have verification types state as verified or pending " do
       family.family_members.each do |member|
-        member.person = FactoryGirl.create(:person, :with_consumer_role)
+        member.person = FactoryBot.create(:person, :with_consumer_role)
         member.person.consumer_role.verification_types.each{|type| type.validation_status = "verified" }
         member.save
       end
@@ -254,7 +254,7 @@ RSpec.describe VerificationHelper, :type => :helper do
     it "returns false if all family members have verification type state as curam" do
       family.family_members.each do |member|
         member.person = FactoryBot.create(:person, :with_consumer_role)
-        member.person = FactoryGirl.create(:person, :with_consumer_role)
+        member.person = FactoryBot.create(:person, :with_consumer_role)
         member.person.consumer_role.verification_types.each{|type| type.validation_status = "curam" }
         member.save
       end
@@ -263,7 +263,7 @@ RSpec.describe VerificationHelper, :type => :helper do
   end
 
   describe "#can_show_due_date?" do
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
 
     before do
       allow(person).to receive_message_chain("primary_family").and_return(family)
@@ -271,7 +271,7 @@ RSpec.describe VerificationHelper, :type => :helper do
     end
     it "returns true if any family members have verification types state as outstanding or pending " do
       family.family_members.each do |member|
-        member.person = FactoryGirl.create(:person, :with_consumer_role)
+        member.person = FactoryBot.create(:person, :with_consumer_role)
         member.person.consumer_role.verification_types.each{|type| type.validation_status = "outstanding" }
         member.save
       end
@@ -280,7 +280,7 @@ RSpec.describe VerificationHelper, :type => :helper do
 
     it "returns false if all family members have verification types state as verified " do
       family.family_members.each do |member|
-        member.person = FactoryGirl.create(:person, :with_consumer_role)
+        member.person = FactoryBot.create(:person, :with_consumer_role)
         member.person.consumer_role.verification_types.each{|type| type.validation_status = "verified" }
         member.save
       end
@@ -387,8 +387,8 @@ RSpec.describe VerificationHelper, :type => :helper do
   end
 
   describe '#get_person_v_type_status' do
-    let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
+    let(:person) { FactoryBot.create(:person, :with_consumer_role)}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, :person => person) }
     let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
     it 'returns verification types states of the person' do
       status = 'verified'

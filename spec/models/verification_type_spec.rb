@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe VerificationType, :type => :model, dbclean: :after_each do
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+  let(:person) { FactoryBot.create(:person, :with_consumer_role) }
 
   describe "verification_types creation" do
     it "creates types for person" do

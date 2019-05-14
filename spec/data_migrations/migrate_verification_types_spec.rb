@@ -2,8 +2,8 @@ require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "migrate_verification_types")
 describe MigrateVerificationTypes, dbclean: :after_each do
   let(:given_task_name) { "move_all_verification_types_to_model" }
-  let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
-  let(:vlp_doc) {FactoryGirl.build(:vlp_document)}
+  let(:person) {FactoryBot.create(:person, :with_consumer_role)}
+  let(:vlp_doc) {FactoryBot.build(:vlp_document)}
   subject { MigrateVerificationTypes.new(given_task_name, double(:current_scope => nil)) }
 
   shared_examples_for "verification types migrations" do |types_count, ssn, tribal_id, us_citizen, correct_type, wrong_type|

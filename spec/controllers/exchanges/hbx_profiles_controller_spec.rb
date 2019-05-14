@@ -627,11 +627,11 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
   end
 
   describe 'GET new_eligibility' do
-    let(:person) { FactoryGirl.create(:person, :with_family) }
+    let(:person) { FactoryBot.create(:person, :with_family) }
     let(:user) { double("user", person: person, :has_hbx_staff_role? => true) }
-    let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person) }
-    let(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
-    let(:permission_yes) { FactoryGirl.create(:permission, can_add_pdc: true) }
+    let(:hbx_staff_role) { FactoryBot.create(:hbx_staff_role, person: person) }
+    let(:hbx_profile) { FactoryBot.create(:hbx_profile) }
+    let(:permission_yes) { FactoryBot.create(:permission, can_add_pdc: true) }
     let(:params) do
       { person_id: person.id,
          family_actions_id: "family_actions_#{person.primary_family.id.to_s}",
@@ -659,9 +659,9 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
   end
 
   describe 'POST create_eligibility' do
-    let(:person) { FactoryGirl.create(:person, :with_family) }
+    let(:person) { FactoryBot.create(:person, :with_family) }
     let(:user) { double("user", person: person, :has_hbx_staff_role? => true) }
-    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+    let!(:hbx_profile) { FactoryBot.create(:hbx_profile) }
     let(:max_aptc) { 12 }
     let(:csr) { 100 }
     let(:reason) { 'Test reason' }

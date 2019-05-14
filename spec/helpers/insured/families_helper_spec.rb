@@ -224,8 +224,8 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
   end
 
   context "build consumer role" do
-    let(:person) { FactoryGirl.create(:person)}
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+    let(:person) { FactoryBot.create(:person)}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
 
     it "should build consumer role for a person" do
       helper.build_consumer_role(person,family)
@@ -234,8 +234,8 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
   end
 
   context "build resident role " do
-    let(:person) { FactoryGirl.create(:person)}
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+    let(:person) { FactoryBot.create(:person)}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
 
     it "should build consumer role for a person" do
       helper.build_resident_role(person,family)
@@ -244,7 +244,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
   end
 
   describe "show_download_tax_documents_button?" do
-    let(:person) { FactoryGirl.create(:person)}
+    let(:person) { FactoryBot.create(:person)}
 
     before do
       helper.instance_variable_set(:@person, person)

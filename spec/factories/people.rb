@@ -116,13 +116,13 @@ FactoryBot.define do
 
     trait :with_active_consumer_role do
       after(:create) do |person|
-        transition = FactoryGirl.create :individual_market_transition, person: person
+        transition = FactoryBot.create :individual_market_transition, person: person
       end
     end
 
     trait :with_active_resident_role do
       after(:create) do |person|
-        transition = FactoryGirl.create :individual_market_transition, :resident, person: person
+        transition = FactoryBot.create :individual_market_transition, :resident, person: person
       end
     end
 

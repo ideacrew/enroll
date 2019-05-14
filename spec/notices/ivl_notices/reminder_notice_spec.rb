@@ -22,9 +22,9 @@ RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
       :event_name => application_event.event_name,
       :template => application_event.notice_template
   }}
-  let (:citizenship_type) { FactoryGirl.build(:verification_type, type_name: 'Citizenship', due_date: TimeKeeper.date_of_record)}
-  let (:ssn_type) { FactoryGirl.build(:verification_type, type_name: 'Social Security Number', due_date: TimeKeeper.date_of_record)}
-  let(:immigration_type) { FactoryGirl.build(:verification_type, type_name: 'Immigration status', due_date: TimeKeeper.date_of_record) }
+  let (:citizenship_type) { FactoryBot.build(:verification_type, type_name: 'Citizenship', due_date: TimeKeeper.date_of_record)}
+  let (:ssn_type) { FactoryBot.build(:verification_type, type_name: 'Social Security Number', due_date: TimeKeeper.date_of_record)}
+  let(:immigration_type) { FactoryBot.build(:verification_type, type_name: 'Immigration status', due_date: TimeKeeper.date_of_record) }
 
 
   describe "New" do

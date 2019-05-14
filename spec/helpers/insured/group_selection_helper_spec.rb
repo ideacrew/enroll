@@ -17,7 +17,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
 
     context "with active consumer role" do
       let(:person) { FactoryBot.create(:person, :with_consumer_role) }
-      let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+      let(:person) { FactoryBot.create(:person, :with_consumer_role) }
 
       before(:each) do
         allow(person).to receive(:is_consumer_role_active?).and_return(true)
@@ -173,7 +173,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
   end
 
   describe "#view_market_places" do
-    let(:person) { FactoryGirl.create(:person) }
+    let(:person) { FactoryBot.create(:person) }
 
     it "should return shop & individual if can_shop_both_markets? return true" do
       allow(person).to receive(:is_consumer_role_active?).and_return(true)
@@ -300,7 +300,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
   end
 
   describe "disabling & checking market kinds, coverage kinds & kinds when user gets to plan shopping" do
-    let(:primary) { FactoryGirl.create(:person)}
+    let(:primary) { FactoryBot.create(:person)}
 
     context "#is_market_kind_disabled?" do
 
@@ -352,7 +352,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
       end
 
       context "when user selected a QLE" do
-        let(:primary) { FactoryGirl.create(:person)}
+        let(:primary) { FactoryBot.create(:person)}
 
         context "when user selected shop QLE" do
 

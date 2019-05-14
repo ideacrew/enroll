@@ -409,7 +409,7 @@ describe Person, :dbclean => :after_each do
       end
 
       context "is_consumer_role_active?" do
-        let(:person) {FactoryGirl.build(:person)}
+        let(:person) {FactoryBot.build(:person)}
         let(:consumer_role) {double(is_active?: true)}
 
         it "should return true" do
@@ -1007,9 +1007,9 @@ describe Person, :dbclean => :after_each do
   end
 
   describe ".add_employer_staff_role(first_name, last_name, dob, email, employer_profile)" do
-    let(:employer_profile){FactoryGirl.create(:employer_profile)}
+    let(:employer_profile){FactoryBot.create(:employer_profile)}
     let(:person_params) {{first_name: Forgery('name').first_name, last_name: Forgery('name').first_name, dob: '1990/05/01'}}
-    let(:person1) {FactoryGirl.create(:person, person_params)}
+    let(:person1) {FactoryBot.create(:person, person_params)}
 
     context 'duplicate person PII' do
       before do

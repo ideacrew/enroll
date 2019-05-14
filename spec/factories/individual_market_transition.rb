@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :individual_market_transition do
     association :person
 

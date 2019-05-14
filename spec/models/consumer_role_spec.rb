@@ -113,7 +113,7 @@ describe "#find_document" do
 end
 
 describe "#find_vlp_document_by_key" do
-  let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
+  let(:person) {FactoryBot.create(:person, :with_consumer_role)}
   let(:consumer_role) { person.consumer_role }
   let(:key) {"sample-key"}
   let(:vlp_document) {VlpDocument.new({subject: "Certificate of Citizenship", identifier:"urn:openhbx:terms:v1:file_storage:s3:bucket:bucket_name##{key}"})}
@@ -614,7 +614,7 @@ context "Verification process and notices" do
   end
 
   describe "verification types" do
-    let(:person) {FactoryGirl.create(:person, :with_consumer_role) }
+    let(:person) {FactoryBot.create(:person, :with_consumer_role) }
     let(:consumer) { person.consumer_role }
 
     shared_examples_for "collecting verification types for person" do |v_types, types_count, ssn, citizen, native, age|
@@ -689,7 +689,7 @@ context "Verification process and notices" do
 end
 
 describe "#revert_lawful_presence" do
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+  let(:person) { FactoryBot.create(:person, :with_consumer_role) }
   let(:consumer) { person.consumer_role }
   let(:verification_types) { consumer.verification_types }
   let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx" })}
@@ -705,12 +705,12 @@ describe "#revert_lawful_presence" do
 end
 
 describe "it should check the residency status" do
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+  let(:person) { FactoryBot.create(:person, :with_consumer_role)}
   let(:consumer) { person.consumer_role }
   let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx" })}
-  let!(:family) { FactoryGirl.create(:family, :with_primary_family_member_and_dependent, person: person) }
-  let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, aasm_state: "coverage_selected", kind: 'individual') }
-  let!(:hbx_enrollment_member) { FactoryGirl.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: hbx_enrollment) }
+  let!(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person) }
+  let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: family.active_household, aasm_state: "coverage_selected", kind: 'individual') }
+  let!(:hbx_enrollment_member) { FactoryBot.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: hbx_enrollment) }
   let!(:enrollment) {consumer.person.primary_family.active_household.hbx_enrollments.first}
   context "consumer role should check for eligibility" do
     it "should move the enrollment to unverified" do
@@ -770,7 +770,7 @@ describe "#find_document" do
 end
 
 describe "Indian tribe member" do
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+  let(:person) { FactoryBot.create(:person, :with_consumer_role) }
   let(:consumer_role) { person.consumer_role }
   let(:verification_types) { consumer.verification_types }
   let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx" })}
@@ -839,7 +839,7 @@ describe "Indian tribe member" do
 end
 
 describe "#find_vlp_document_by_key" do
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+  let(:person) { FactoryBot.create(:person, :with_consumer_role)}
   let(:consumer_role) { person.consumer_role }
   let(:key) {"sample-key"}
   let(:vlp_document) {VlpDocument.new({subject: "Certificate of Citizenship", identifier:"urn:openhbx:terms:v1:file_storage:s3:bucket:bucket_name##{key}"})}
@@ -894,10 +894,10 @@ describe "#build_nested_models_for_person" do
 end
 
 describe "can_trigger_residency?" do
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role)}
+  let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
   let(:consumer_role) { person.consumer_role }
   let(:residency_verification_type) {consumer_role.verification_types.by_name("DC Residency").first}
-  let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let(:enrollment) { double("HbxEnrollment", aasm_state: "coverage_selected")}
   let(:hub_request) {EventRequest.new}
 

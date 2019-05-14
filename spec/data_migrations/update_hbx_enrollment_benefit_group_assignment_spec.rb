@@ -14,33 +14,33 @@ describe UpdateHbxEnrollmentBenefitGroupAssignment do
 
   describe "update hbx_enrollment benefit_group_assignment id" do
 
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
   
     let!(:employer_profile){ create :employer_profile, aasm_state: "active"}
     let!(:person){ create :person}
-    let(:employee_role) {FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile)}
-    let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id, employer_profile_id: employer_profile.id) }
-    let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: TimeKeeper.date_of_record.beginning_of_year, :aasm_state => 'published' ) }
-    let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, is_congress: false, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
-    let(:benefit_group_assignment1)  { FactoryGirl.create(:benefit_group_assignment, census_employee: census_employee) }
-    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, :benefit_group_assignment => benefit_group_assignment1)}
+    let(:employee_role) {FactoryBot.create(:employee_role, person: person, employer_profile: employer_profile)}
+    let(:census_employee) { FactoryBot.create(:census_employee, employee_role_id: employee_role.id, employer_profile_id: employer_profile.id) }
+    let!(:plan_year) { FactoryBot.create(:plan_year, employer_profile: employer_profile, start_on: TimeKeeper.date_of_record.beginning_of_year, :aasm_state => 'published' ) }
+    let!(:active_benefit_group) { FactoryBot.create(:benefit_group, is_congress: false, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
+    let(:benefit_group_assignment1)  { FactoryBot.create(:benefit_group_assignment, census_employee: census_employee) }
+    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: family.active_household, :benefit_group_assignment => benefit_group_assignment1)}
 
     let(:hbx_enrollment) do
-      hbx = FactoryGirl.create(:hbx_enrollment, household: family.active_household, kind: "individual")
-      hbx.hbx_enrollment_members << FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record - 30.days)
+      hbx = FactoryBot.create(:hbx_enrollment, household: family.active_household, kind: "individual")
+      hbx.hbx_enrollment_members << FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record - 30.days)
       hbx.benefit_group_assignment = benefit_group_assignment1
       hbx.save
       hbx
     end
-    let(:family_member) { FactoryGirl.create(:family_member, family: family)} 
+    let(:family_member) { FactoryBot.create(:family_member, family: family)} 
 
     let!(:employer_profile1){ create :employer_profile, aasm_state: "active"}
     let!(:person1){ create :person}
-    let(:employee_role1) {FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile1)}
-    let(:census_employee1) { FactoryGirl.create(:census_employee, employee_role_id: employee_role1.id, employer_profile_id: employer_profile1.id) }
-    let!(:plan_year1) { FactoryGirl.create(:plan_year, employer_profile: employer_profile1, start_on: TimeKeeper.date_of_record.beginning_of_year, :aasm_state => 'published' ) }
-    let!(:active_benefit_group1) { FactoryGirl.create(:benefit_group, is_congress: false, plan_year: plan_year1, title: "Benefits #{plan_year1.start_on.year}") }
-    let(:benefit_group_assignment2)  { FactoryGirl.create(:benefit_group_assignment, census_employee: census_employee1) }
+    let(:employee_role1) {FactoryBot.create(:employee_role, person: person, employer_profile: employer_profile1)}
+    let(:census_employee1) { FactoryBot.create(:census_employee, employee_role_id: employee_role1.id, employer_profile_id: employer_profile1.id) }
+    let!(:plan_year1) { FactoryBot.create(:plan_year, employer_profile: employer_profile1, start_on: TimeKeeper.date_of_record.beginning_of_year, :aasm_state => 'published' ) }
+    let!(:active_benefit_group1) { FactoryBot.create(:benefit_group, is_congress: false, plan_year: plan_year1, title: "Benefits #{plan_year1.start_on.year}") }
+    let(:benefit_group_assignment2)  { FactoryBot.create(:benefit_group_assignment, census_employee: census_employee1) }
     
     before(:each) do
       allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id.to_s)

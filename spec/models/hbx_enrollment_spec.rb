@@ -324,13 +324,13 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     #   end
 
     context "when maket type is individual" do
-      let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
-      let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
-      let!(:tax_household) {FactoryGirl.create(:tax_household,  effective_ending_on: nil, household: family.households.first)}
-      let!(:eligibility_determination) {FactoryGirl.create(:eligibility_determination, csr_eligibility_kind: "csr_87", determined_on: TimeKeeper.date_of_record, tax_household: tax_household)}
+      let(:person) { FactoryBot.create(:person, :with_consumer_role)}
+      let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+      let!(:tax_household) {FactoryBot.create(:tax_household,  effective_ending_on: nil, household: family.households.first)}
+      let!(:eligibility_determination) {FactoryBot.create(:eligibility_determination, csr_eligibility_kind: "csr_87", determined_on: TimeKeeper.date_of_record, tax_household: tax_household)}
       let(:coverage_household) { family.households.first.coverage_households.first }
-      let(:hbx_profile) {FactoryGirl.create(:hbx_profile)}
-      let(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
+      let(:hbx_profile) {FactoryBot.create(:hbx_profile)}
+      let(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
       let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
       let(:benefit_package) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
       let(:enrollment) {
@@ -360,7 +360,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
 
     context "decorated_elected_plans" do
       let(:benefit_package) { BenefitPackage.new }
-      let(:consumer_role) { FactoryGirl.create(:consumer_role) }
+      let(:consumer_role) { FactoryBot.create(:consumer_role) }
       let(:person) { double(primary_family: family)}
       let(:family) { double }
       let(:enrollment) {
@@ -377,9 +377,9 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       let(:benefit_sponsorship) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months, renewal_benefit_coverage_period: renewal_bcp, current_benefit_coverage_period: bcp) }
       let(:renewal_bcp) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months) }
       let(:bcp) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months) }
-      let(:plan) { FactoryGirl.create(:plan) }
-      let(:plan2) { FactoryGirl.create(:plan) }
-      let(:plan1) { FactoryGirl.create(:plan) }
+      let(:plan) { FactoryBot.create(:plan) }
+      let(:plan2) { FactoryBot.create(:plan) }
+      let(:plan1) { FactoryBot.create(:plan) }
     #   context "decorated_elected_plans" do
     #     let(:benefit_package) {BenefitPackage.new}
     #     let(:consumer_role) {FactoryBot.create(:consumer_role)}
@@ -837,13 +837,13 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
         expect(hbx_enrollment.can_terminate_coverage?).to eq false
       end
   describe "when maket type is individual" do
-    let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
+    let(:person) { FactoryBot.create(:person, :with_consumer_role)}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
     let(:coverage_household) { family.households.first.coverage_households.first }
-    let(:hbx_profile) {FactoryGirl.create(:hbx_profile)}
+    let(:hbx_profile) {FactoryBot.create(:hbx_profile)}
     let(:active_year) {TimeKeeper.date_of_record.year}
     let(:plan) { Plan.new(active_year: active_year)}
-    let(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
+    let(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
     let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
     let(:benefit_package) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
     let(:enrollment) {
@@ -2358,9 +2358,9 @@ describe HbxEnrollment, type: :model, :dbclean => :around_each do
 end
 
 describe HbxEnrollment, dbclean: :after_all do
-  let!(:family100) { FactoryGirl.create(:family, :with_primary_family_member) }
-  let!(:enrollment100) { FactoryGirl.create(:hbx_enrollment, household: family100.active_household, kind: "individual") }
-  let!(:plan100) { FactoryGirl.create(:plan) }
+  let!(:family100) { FactoryBot.create(:family, :with_primary_family_member) }
+  let!(:enrollment100) { FactoryBot.create(:hbx_enrollment, household: family100.active_household, kind: "individual") }
+  let!(:plan100) { FactoryBot.create(:plan) }
 
   describe "is_an_existing_plan?" do
     context "for checking if a new plan is similar to the given enr's plan " do

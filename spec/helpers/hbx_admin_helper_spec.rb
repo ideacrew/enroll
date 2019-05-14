@@ -48,7 +48,7 @@ RSpec.describe HbxAdminHelper, :type => :helper do
   end
 
   context "#active_eligibility?" do
-    let!(:tax_household) { FactoryGirl.create(:tax_household, household: family.active_household) }
+    let!(:tax_household) { FactoryBot.create(:tax_household, household: family.active_household) }
 
     it "should return yes" do
       tax_household.update_attributes!(effective_ending_on: nil)

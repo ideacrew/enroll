@@ -277,10 +277,10 @@ describe "financial assistance eligibiltiy for a family", type: :model, dbclean:
 end
 
 describe Household, "for creating a new taxhousehold using create eligibility", type: :model, dbclean: :after_each do
-  let!(:person100)      { FactoryGirl.create(:person) }
-  let!(:family100)      { FactoryGirl.create(:family, :with_primary_family_member, person: person100) }
+  let!(:person100)      { FactoryBot.create(:person) }
+  let!(:family100)      { FactoryBot.create(:family, :with_primary_family_member, person: person100) }
   let(:household100)    { family100.active_household }
-  let!(:hbx_profile100) { FactoryGirl.create(:hbx_profile) }
+  let!(:hbx_profile100) { FactoryBot.create(:hbx_profile) }
   let(:current_date)    { TimeKeeper.date_of_record }
   let(:params)        {
                         {"person_id"=> person100.id.to_s,

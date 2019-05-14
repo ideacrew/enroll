@@ -1401,9 +1401,9 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
   end
 
   context "have_valid_date_for_cobra with current_user" do
-    let(:census_employee100) { FactoryGirl.create(:census_employee) }
-    let(:person100) { FactoryGirl.create(:person, :with_hbx_staff_role) }
-    let(:user100) { FactoryGirl.create(:user, person: person100) }
+    let(:census_employee100) { FactoryBot.create(:census_employee) }
+    let(:person100) { FactoryBot.create(:person, :with_hbx_staff_role) }
+    let(:user100) { FactoryBot.create(:user, person: person100) }
 
     it "should return true as the current_user is a valid admin" do
       expect(census_employee100.have_valid_date_for_cobra?(user100)).to eq true

@@ -116,7 +116,7 @@ Then(/^Hbx Admin should see an Transition family members link$/) do
 end
 
 When(/^Hbx Admin clicks on Transition family members link$/) do
-  FactoryGirl.create(:qualifying_life_event_kind, reason: 'eligibility_failed_or_documents_not_received_by_due_date', title: 'Not eligible for marketplace coverage due to citizenship or immigration status')
+  FactoryBot.create(:qualifying_life_event_kind, reason: 'eligibility_failed_or_documents_not_received_by_due_date', title: 'Not eligible for marketplace coverage due to citizenship or immigration status')
   click_link('Transition Family Members')
 end
 

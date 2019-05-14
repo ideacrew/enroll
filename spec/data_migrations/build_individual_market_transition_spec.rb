@@ -14,8 +14,8 @@ describe BuildIndividualMarketTransition do
 
   describe "build consumer individual market transitions with role_type consumer" do
 
-    let!(:person1) {FactoryGirl.create(:person, :with_consumer_role)}
-    let!(:person2) {FactoryGirl.create(:person, :with_consumer_role, :with_resident_role)}
+    let!(:person1) {FactoryBot.create(:person, :with_consumer_role)}
+    let!(:person2) {FactoryBot.create(:person, :with_consumer_role, :with_resident_role)}
 
     before(:each) do
       allow(ENV).to receive(:[]).with("action").and_return "consumer_role_people"
@@ -39,9 +39,9 @@ describe BuildIndividualMarketTransition do
 
   describe "build individual market transitions for resident role people with role_type resident" do
 
-    let!(:person1) {FactoryGirl.create(:person, :with_resident_role)}
-    let!(:person2) {FactoryGirl.create(:person, :with_consumer_role, :with_employee_role)}
-    let!(:person3) {FactoryGirl.create(:person, :with_consumer_role, :with_resident_role)}
+    let!(:person1) {FactoryBot.create(:person, :with_resident_role)}
+    let!(:person2) {FactoryBot.create(:person, :with_consumer_role, :with_employee_role)}
+    let!(:person3) {FactoryBot.create(:person, :with_consumer_role, :with_resident_role)}
 
     before(:each) do
       allow(ENV).to receive(:[]).with("action").and_return "resident_role_people"

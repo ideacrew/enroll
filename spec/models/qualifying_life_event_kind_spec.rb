@@ -74,15 +74,15 @@ RSpec.describe QualifyingLifeEventKind, :type => :model do
     end
 
     it 'should not display transition member action kind qle' do
-      qle1 = FactoryGirl.create(:qualifying_life_event_kind, market_kind: 'individual',action_kind: "transition_member")
-      qle2 = FactoryGirl.create(:qualifying_life_event_kind, market_kind: 'individual', action_kind: "add_member")
+      qle1 = FactoryBot.create(:qualifying_life_event_kind, market_kind: 'individual',action_kind: "transition_member")
+      qle2 = FactoryBot.create(:qualifying_life_event_kind, market_kind: 'individual', action_kind: "add_member")
       expect(QualifyingLifeEventKind.individual_market_events_without_transition_member_action).to include(qle2)
       expect(QualifyingLifeEventKind.individual_market_events_without_transition_member_action).not_to include(qle1)
     end
 
     it 'should display transition member action kind qle' do
-      qle1 = FactoryGirl.create(:qualifying_life_event_kind, market_kind: 'individual',action_kind: "transition_member")
-      qle2 = FactoryGirl.create(:qualifying_life_event_kind, market_kind: 'individual', action_kind: "add_member")
+      qle1 = FactoryBot.create(:qualifying_life_event_kind, market_kind: 'individual',action_kind: "transition_member")
+      qle2 = FactoryBot.create(:qualifying_life_event_kind, market_kind: 'individual', action_kind: "add_member")
       expect(QualifyingLifeEventKind.individual_market_events_admin.count). to eq 2
       expect(QualifyingLifeEventKind.individual_market_events_admin).to include(qle1, qle2)
     end

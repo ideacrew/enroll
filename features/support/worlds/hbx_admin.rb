@@ -14,9 +14,9 @@ module HbxAdminWorld
 
   def hbx_admin_with_subrole(subrole)
     @u1 = User.create( email: 'hbx_admin_role@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: 'hbx_admin_role@dc.gov', roles: ["hbx_staff"])
-    hbx_profile_id = FactoryGirl.create(:hbx_profile).id
+    hbx_profile_id = FactoryBot.create(:hbx_profile).id
     p1 = Person.create( first_name: 'staff', last_name: "amanda#{rand(1000000)}", user: @u1)
-    permission_hbx_staff = FactoryGirl.create(:permission, :hbx_staff)
+    permission_hbx_staff = FactoryBot.create(:permission, :hbx_staff)
     HbxStaffRole.create!( person: p1, permission_id: permission_hbx_staff.id, subrole: subrole, hbx_profile_id: hbx_profile_id)
   end
 end

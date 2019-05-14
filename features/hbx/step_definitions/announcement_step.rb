@@ -82,7 +82,7 @@ end
 Given(/^Consumer role exists$/) do
   user = FactoryBot.create :user, :with_family, :consumer, email: 'consumer@dc.gov', password: '1qaz@WSX', password_confirmation: '1qaz@WSX' ,identity_final_decision_code: 'acc'
   FactoryBot.create(:consumer_role, person: user.person)
-  user.person.individual_market_transitions << FactoryGirl.create(:individual_market_transition)
+  user.person.individual_market_transitions << FactoryBot.create(:individual_market_transition)
   user.person.save!
 end
 

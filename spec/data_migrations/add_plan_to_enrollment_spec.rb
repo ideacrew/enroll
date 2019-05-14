@@ -14,9 +14,9 @@ describe AddPlantoEnrollment do
 
   describe "enrollment with no plan" do
     
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
-    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household)}
-    let(:plan) { FactoryGirl.create(:plan, :with_premium_tables, active_year: TimeKeeper.date_of_record.year)}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
+    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: family.active_household)}
+    let(:plan) { FactoryBot.create(:plan, :with_premium_tables, active_year: TimeKeeper.date_of_record.year)}
 
 
     before(:each) do

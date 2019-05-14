@@ -13,7 +13,7 @@ describe AddingDependents do
   end
 
   describe "adding dependents" do
-    let(:family)  {FactoryGirl.create(:family, :with_primary_family_member)}
+    let(:family)  {FactoryBot.create(:family, :with_primary_family_member)}
     before do
       allow(ENV).to receive(:[]).with('family_id').and_return family.id
       allow(ENV).to receive(:[]).with('file_name').and_return "dependents.csv"

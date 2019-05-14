@@ -7,10 +7,10 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   context "set_current_user with no person" do
     let(:user) { FactoryBot.create(:user, person: person) }
     let(:person) { FactoryBot.create(:person) }
-    let(:user) { FactoryGirl.create(:user, person: person) }
-    let(:person) { FactoryGirl.create(:person) }
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
-    let!(:individual_market_transition) { FactoryGirl.create(:individual_market_transition, person: person) }
+    let(:user) { FactoryBot.create(:user, person: person) }
+    let(:person) { FactoryBot.create(:person) }
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
+    let!(:individual_market_transition) { FactoryBot.create(:individual_market_transition, person: person) }
 
 
     before :each do
@@ -356,9 +356,9 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   end
 
   describe "GET verification" do
-    let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
-    let(:user){ FactoryGirl.create(:user, person: person) }
+    let(:person) {FactoryBot.create(:person, :with_consumer_role)}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+    let(:user){ FactoryBot.create(:user, person: person) }
     let(:family_member) { FamilyMember.new(:person => person) }
 
     before :each do
@@ -653,8 +653,8 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         @qle = FactoryBot.create(:qualifying_life_event_kind)
         @family = FactoryBot.build(:family, :with_primary_family_member)
         allow(person).to receive(:is_consumer_role_active?).and_return(true)
-        @qle = FactoryGirl.create(:qualifying_life_event_kind)
-        @family = FactoryGirl.build(:family, :with_primary_family_member)
+        @qle = FactoryBot.create(:qualifying_life_event_kind)
+        @family = FactoryBot.build(:family, :with_primary_family_member)
         allow(person).to receive(:primary_family).and_return(@family)
       end
 
@@ -916,11 +916,11 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     end
 
     context "should transition consumer to resident" do
-      let(:consumer_person) {FactoryGirl.create(:person, :with_consumer_role)}
-      let(:consumer_family) { FactoryGirl.create(:family, :with_primary_family_member, person: consumer_person) }
-      let(:user){ FactoryGirl.create(:user, person: consumer_person) }
-      let!(:individual_market_transition) { FactoryGirl.create(:individual_market_transition, person: consumer_person) }
-      let(:qle) {FactoryGirl.create(:qualifying_life_event_kind, title: "Not eligible for marketplace coverage due to citizenship or immigration status", reason: "eligibility_failed_or_documents_not_received_by_due_date ")}
+      let(:consumer_person) {FactoryBot.create(:person, :with_consumer_role)}
+      let(:consumer_family) { FactoryBot.create(:family, :with_primary_family_member, person: consumer_person) }
+      let(:user){ FactoryBot.create(:user, person: consumer_person) }
+      let!(:individual_market_transition) { FactoryBot.create(:individual_market_transition, person: consumer_person) }
+      let(:qle) {FactoryBot.create(:qualifying_life_event_kind, title: "Not eligible for marketplace coverage due to citizenship or immigration status", reason: "eligibility_failed_or_documents_not_received_by_due_date ")}
 
       let(:consumer_params) {
         {
@@ -949,11 +949,11 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     end
 
     context "should transition resident to consumer" do
-      let(:resident_person) {FactoryGirl.create(:person, :with_resident_role)}
-      let(:resident_family) { FactoryGirl.create(:family, :with_primary_family_member, person: resident_person) }
-      let(:user){ FactoryGirl.create(:user, person: resident_person) }
-      let!(:individual_market_transition) { FactoryGirl.create(:individual_market_transition, :resident, person: resident_person) }
-      let(:qle) {FactoryGirl.create(:qualifying_life_event_kind, title: "Provided documents proving eligibility", reason: "eligibility_documents_provided ")}
+      let(:resident_person) {FactoryBot.create(:person, :with_resident_role)}
+      let(:resident_family) { FactoryBot.create(:family, :with_primary_family_member, person: resident_person) }
+      let(:user){ FactoryBot.create(:user, person: resident_person) }
+      let!(:individual_market_transition) { FactoryBot.create(:individual_market_transition, :resident, person: resident_person) }
+      let(:qle) {FactoryBot.create(:qualifying_life_event_kind, title: "Provided documents proving eligibility", reason: "eligibility_documents_provided ")}
       let(:resident_params) {
         {
             "transition_effective_date_#{resident_person.id}" => TimeKeeper.date_of_record.to_s,

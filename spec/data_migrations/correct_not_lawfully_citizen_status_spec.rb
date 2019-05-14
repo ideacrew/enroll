@@ -7,7 +7,7 @@ describe CorrectNotLawfullyCitizenStatus, dbclean: :after_each do
   let(:person) { FactoryBot.create(:person, :with_consumer_role) }
   let(:person2) { FactoryBot.create(:person, :with_consumer_role) }
   let(:person3) { FactoryBot.create(:person, :with_consumer_role) }
-  let(:verification_type) { FactoryGirl.build(:verification_type, :type_name => "Immigration status")}
+  let(:verification_type) { FactoryBot.build(:verification_type, :type_name => "Immigration status")}
   let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
   let(:enrollment) {
     FactoryBot.create(:hbx_enrollment,
