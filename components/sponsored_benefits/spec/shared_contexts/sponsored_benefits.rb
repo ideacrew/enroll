@@ -1,5 +1,5 @@
 RSpec.shared_context "set up broker agency profile for BQT, by using configuration settings", :shared_context => :metadata do
-  
+
   let(:plan_design_organization) { FactoryBot.create(:sponsored_benefits_plan_design_organization,
     owner_profile_id: owner_profile.id,
     sponsor_profile_id: sponsor_profile.id
@@ -150,19 +150,18 @@ RSpec.shared_context "set up broker agency profile for BQT, by using configurati
   end
 
   def broker_agency_profile
-    if Settings.aca.state_abbreviation == "DC" # toDo
-      FactoryBot.create(:broker_agency_profile)
-    else
-      FactoryBot.create(:benefit_sponsors_organizations_general_organization,
-        :with_site,
-        :with_broker_agency_profile
-      ).profiles.first
-    end
+    FactoryBot.create(:benefit_sponsors_organizations_general_organization,
+      :with_site,
+      :with_broker_agency_profile
+    ).profiles.first
   end
 
   def sponsor_profile
     if Settings.aca.state_abbreviation == "DC" # toDo
-      FactoryBot.create(:employer_profile)
+      FactoryBot.create(:benefit_sponsors_organizations_general_organization,
+        :with_site,
+        :with_aca_shop_dc_employer_profile
+      ).profiles.first
     else
       FactoryBot.create(:benefit_sponsors_organizations_general_organization,
         :with_site,
@@ -172,6 +171,9 @@ RSpec.shared_context "set up broker agency profile for BQT, by using configurati
   end
 
   def ga_profile
-    FactoryBot.create(:general_agency_profile)
+    FactoryBot.create(:benefit_sponsors_organizations_general_organization,
+      :with_site,
+      :with_general_agency_profile
+    ).profiles.first
   end
 end

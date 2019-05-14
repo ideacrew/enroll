@@ -80,7 +80,7 @@ module SponsoredBenefits
       end
 
       def broker_agency_profile
-        ::BrokerAgencyProfile.find(owner_profile_id) || ::BenefitSponsors::Organizations::Profile.find(owner_profile_id)
+        ::BrokerAgencyProfile.find(owner_profile_id) || ::BenefitSponsors::Organizations::BrokerAgencyProfile.find(owner_profile_id)
       end
 
       def general_agency_profile

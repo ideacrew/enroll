@@ -25,14 +25,14 @@ module SponsoredBenefits
 
         # belongs_to general_agency_profile
         def general_agency_profile=(profile)
-          raise ArgumentError.new("expected GeneralAgencyProfile") unless profile.is_a?(GeneralAgencyProfile)
+          raise ArgumentError.new("expected GeneralAgencyProfile") unless profile.is_a?(BenefitSponsors::Organizations::GeneralAgencyProfile)
           self.general_agency_profile_id = profile._id
           @general_agency_profile = profile
         end
 
         def general_agency_profile
           return @general_agency_profile if defined? @general_agency_profile
-          @general_agency_profile = ::GeneralAgencyProfile.find(general_agency_profile_id)
+          @general_agency_profile = BenefitSponsors::Organizations::GeneralAgencyProfile.find(general_agency_profile_id)
         end
 
         def broker_agency_profile

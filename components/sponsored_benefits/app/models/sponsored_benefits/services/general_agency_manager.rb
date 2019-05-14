@@ -4,7 +4,7 @@ module SponsoredBenefits
       include Acapi::Notifiers
 
       attr_accessor :form
-     
+
       def initialize(form)
         @form = form
       end
@@ -103,7 +103,7 @@ module SponsoredBenefits
       end
 
       def agencies
-        ::GeneralAgencyProfile.all
+        BenefitSponsors::Organizations::GeneralAgencyProfile.all
       end
 
       def plan_design_organization(id)
@@ -118,7 +118,7 @@ module SponsoredBenefits
 
       def general_agency_profile(id=form.general_agency_profile_id)
         return @general_agency_profile if defined? @general_agency_profile
-        @general_agency_profile = ::GeneralAgencyProfile.find(id) || BenefitSponsors::Organizations::Profile.find(id)
+        @general_agency_profile = ::GeneralAgencyProfile.find(id) || BenefitSponsors::Organizations::GeneralAgencyProfile.find(id)
       end
 
       def current_default_ga
@@ -127,7 +127,7 @@ module SponsoredBenefits
 
       def send_notice(opts={})
         begin
-          ShopNoticesNotifierJob.perform_later(opts[:modal_id].to_s, opts[:event], employer_profile_id: opts[:employer_profile_id].to_s)
+          # ShopNoticesNotifierJob.perform_later(opts[:modal_id].to_s, opts[:event], employer_profile_id: opts[:employer_profile_id].to_s)
         rescue Exception => e
           (Rails.logger.error {"Unable to deliver opts[:event] to General Agency ID: #{opts[:modal_id]} due to #{e}"}) unless Rails.env.test?
         end

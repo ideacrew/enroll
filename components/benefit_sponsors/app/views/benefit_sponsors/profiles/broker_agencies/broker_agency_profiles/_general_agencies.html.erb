@@ -46,15 +46,15 @@
             </td>
             <td><%= general_agency_profile.dba %></td>
             <td><%= general_agency_profile.fein %></td>
-            <td><%= general_agency_profile.entity_kind.split(" ").map{|word| word.capitalize}.join(" ") %></td>
-            <td><%= general_agency_profile.market_kind.to_s.split(" ").map{|word| word.capitalize}.join(" ") %></td>
+            <td><%= general_agency_profile.entity_kind.split(" ").map{|word| word.capitalize}.join(" ") if general_agency_profile.entity_kind.present? %></td>
+            <td><%= general_agency_profile.market_kind.to_s.split(" ").map{|word| word.capitalize}.join(" ") if general_agency_profile.market_kind.present? %></td>
             <td><%#= general_agency_profile.current_state %></td>
             <td>
               <% if show_default_ga?(general_agency_profile, @broker_agency_profile) %>
                 <div class="ga_status"><%#= l10n("broker_agencies.profiles.default_ga")%></div>
               <% else %>
                 <%= pundit_span HbxProfile, :modify_admin_tabs? %>
-                  <%= link_to "#{l10n('broker_agencies.profiles.select_default_ga')}", set_default_ga_profiles_broker_agencies_broker_agency_profile_path(id: @broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id), method: :post, remote: true, class: 'btn btn-min' %>
+                  <%= link_to "#{l10n('broker_agencies.profiles.select_default_ga')}", sponsored_benefits.set_default_organizations_general_agency_profiles_path(broker_agency_profile_id: @broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id), method: :post, remote: true, class: 'btn btn-min' %>
                 </span>
               <% end %>
             </td>
