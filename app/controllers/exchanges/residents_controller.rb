@@ -4,6 +4,7 @@ class Exchanges::ResidentsController < ApplicationController
   include VlpDoc
   include ErrorBubble
 
+  before_action :permit_params, only: [:match, :search]
   before_action :find_resident_role, only: [:edit, :update]
   before_action :authorize_user
 
@@ -152,6 +153,10 @@ class Exchanges::ResidentsController < ApplicationController
   end
 
   private
+
+  def permit_params
+    params.permit!
+  end
 
   def user_not_authorized(exception)
     policy_name = exception.policy.class.to_s.underscore
