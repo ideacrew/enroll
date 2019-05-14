@@ -205,6 +205,7 @@ class Insured::GroupSelectionController < ApplicationController
     @adapter.if_resident_role do |res_role|
       @resident_role = res_role
       @role = res_role
+    end
     if @hbx_enrollment.present? && @change_plan == "change_plan"
       if @hbx_enrollment.kind == "employer_sponsored"
         @mc_market_kind = "shop"
