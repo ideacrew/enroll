@@ -222,57 +222,22 @@ module BenefitSponsors
       end
 
       context 'for admin_datatable_action' do
-        let!(:ba2) { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship) }
+        let!(:ba)   { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, aasm_state: :imported) }
+        let!(:ba2)  { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, aasm_state: :active) }
 
         before :each do
           create_ba_params.merge!({ pte_count: '0', msp_count: '0', admin_datatable_action: true })
           @form = init_form_for_create
+          set_bs_for_service(@form)
+          @result = subject.create_or_cancel_draft_ba(@form, "")
         end
 
-        [:pending, :enrollment_open, :enrollment_closed, :enrollment_ineligible].each do |active_state|
-          let!(:ba) { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, aasm_state: :draft) }
-
-          context 'with dt in pending and enrollment states' do
-            it 'should return true and instance as ba succesfully created' do
-              ba2.update_attribute(:aasm_state, active_state)
-              set_bs_for_service(@form)
-              @model_attrs = subject.form_params_to_attributes(@form)
-              result = subject.create_or_cancel_draft_ba(@form, @model_attrs)
-              benefit_sponsorship.reload
-              expect(result).to eq [true, benefit_sponsorship.benefit_applications.last]
-            end
-
-            it 'the existing benefit application should be turned into cancelled state' do
-              ba2.update_attribute(:aasm_state, active_state)
-              set_bs_for_service(@form)
-              @model_attrs = subject.form_params_to_attributes(@form)
-              result = subject.create_or_cancel_draft_ba(@form, @model_attrs)
-              benefit_sponsorship.reload
-              expect(benefit_sponsorship.benefit_applications.first).to have_attributes(:aasm_state => :canceled)
-            end
-          end
+        it 'should return a combination of false and nil' do
+          expect(@result).to eq [false, nil]
         end
 
-        context 'with dt active state' do
-          # let!(:ba2) { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, aasm_state: :active) }
-
-          it 'should return true and instance as ba succesfully created' do
-            ba2.update_attribute(:aasm_state, :active)
-            set_bs_for_service(@form)
-            @model_attrs = subject.form_params_to_attributes(@form)
-            result = subject.create_or_cancel_draft_ba(@form, @model_attrs)
-            benefit_sponsorship.reload
-            expect(result).to eq [true, benefit_sponsorship.benefit_applications.last]
-          end
-
-          it 'the existing active application should be in turned into termination pending state' do
-            ba2.update_attribute(:aasm_state, :active)
-            set_bs_for_service(@form)
-            @model_attrs = subject.form_params_to_attributes(@form)
-            result = subject.create_or_cancel_draft_ba(@form, @model_attrs)
-            benefit_sponsorship.reload
-            expect(benefit_sponsorship.benefit_applications.first).to have_attributes(:aasm_state => :termination_pending)
-          end
+        it 'should add errors to form' do
+          expect(@form.errors.full_messages).to eq ['Existing plan year with overlapping coverage exists']
         end
       end
 
