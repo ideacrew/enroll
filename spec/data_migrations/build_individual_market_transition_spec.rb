@@ -17,22 +17,20 @@ describe BuildIndividualMarketTransition do
     let!(:person1) {FactoryBot.create(:person, :with_consumer_role)}
     let!(:person2) {FactoryBot.create(:person, :with_consumer_role, :with_resident_role)}
 
-    before(:each) do
-      allow(ENV).to receive(:[]).with("action").and_return "consumer_role_people"
-    end
-
     after(:each) do
       DatabaseCleaner.clean
     end
 
     it "should build individual market transitions for only people with consumer role" do
-      subject.migrate
-      person1.reload
-      person2.reload
-      expect(person1.individual_market_transitions.present?). to eq true
-      expect(person2.individual_market_transitions.present?). to eq false
-      expect(person1.individual_market_transitions.first.role_type). to eq "consumer"
-      expect(person1.individual_market_transitions.first.persisted?). to be_truthy
+      ClimateControl.modify :action => "consumer_role_people" do
+        subject.migrate
+        person1.reload
+        person2.reload
+        expect(person1.individual_market_transitions.present?). to eq true
+        expect(person2.individual_market_transitions.present?). to eq false
+        expect(person1.individual_market_transitions.first.role_type). to eq "consumer"
+        expect(person1.individual_market_transitions.first.persisted?). to be_truthy
+      end
     end
   end
 
@@ -43,24 +41,22 @@ describe BuildIndividualMarketTransition do
     let!(:person2) {FactoryBot.create(:person, :with_consumer_role, :with_employee_role)}
     let!(:person3) {FactoryBot.create(:person, :with_consumer_role, :with_resident_role)}
 
-    before(:each) do
-      allow(ENV).to receive(:[]).with("action").and_return "resident_role_people"
-    end
-
     after(:each) do
       DatabaseCleaner.clean
     end
 
     it "should build individual market transitions for resident role people" do
-      subject.migrate
-      person1.reload
-      person2.reload
-      person3.reload
-      expect(person1.individual_market_transitions.present?). to eq true
-      expect(person2.individual_market_transitions.present?). to eq false
-      expect(person3.individual_market_transitions.present?). to eq false
-      expect(person1.individual_market_transitions.first.role_type). to eq "resident"
-      expect(person1.individual_market_transitions.first.persisted?). to be_truthy
+      ClimateControl.modify :action => "resident_role_people" do
+        subject.migrate
+        person1.reload
+        person2.reload
+        person3.reload
+        expect(person1.individual_market_transitions.present?). to eq true
+        expect(person2.individual_market_transitions.present?). to eq false
+        expect(person3.individual_market_transitions.present?). to eq false
+        expect(person1.individual_market_transitions.first.role_type). to eq "resident"
+        expect(person1.individual_market_transitions.first.persisted?). to be_truthy
+      end
     end
   end
 end
