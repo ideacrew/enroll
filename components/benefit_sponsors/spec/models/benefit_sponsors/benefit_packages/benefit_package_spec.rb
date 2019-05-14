@@ -336,27 +336,29 @@ module BenefitSponsors
 
       let(:renewal_product_package)    { renewal_benefit_market_catalog.product_packages.detect { |package| package.package_kind == package_kind } }
       let(:product) { renewal_product_package.products[0] }
+      let(:reference_product) { current_benefit_package.sponsored_benefits[0].reference_product }
+      let(:current_enrolled_product) { product_package.products[2] }
 
       let!(:update_product){
-        reference_product = current_benefit_package.sponsored_benefits.first.reference_product
         reference_product.renewal_product = product
         reference_product.save!
       }
       
       let(:renewal_benefit_sponsor_catalog) { benefit_sponsorship.benefit_sponsor_catalog_for(benefit_sponsorship.service_areas_on(renewal_effective_date), renewal_effective_date) }
       let(:renewal_application)             { initial_application.renew(renewal_benefit_sponsor_catalog) }
-      let(:renewal_benefit_package)        { renewal_application.benefit_packages.build }
+      let(:renewal_benefit_package)         { renewal_application.benefit_packages.build }
 
       context "when renewal product missing" do
-        let(:hbx_enrollment) { double(product: product_package.products[2], is_coverage_waived?: false, coverage_kind: :health) }
-        let(:sponsored_benefit) { renewal_benefit_package.sponsored_benefits.build(             
+        let(:hbx_enrollment) { double(product: current_enrolled_product, is_coverage_waived?: false, coverage_kind: :health) }
+        let(:renewal_sponsored_benefit) do
+          renewal_benefit_package.sponsored_benefits.build(
             product_package_kind: :single_issuer
-          ) 
-        }
+          )
+        end
 
         before do
-          allow(sponsored_benefit).to receive(:products).and_return(renewal_product_package.products[0..1])
-          allow(renewal_benefit_package).to receive(:sponsored_benefit_for).and_return(sponsored_benefit) 
+          allow(current_enrolled_product).to receive(:renewal_product).and_return(nil)
+          allow(renewal_benefit_package).to receive(:sponsored_benefit_for).and_return(renewal_sponsored_benefit)
         end
 
         it 'should return false' do

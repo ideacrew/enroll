@@ -97,7 +97,7 @@ module BenefitSponsors
 
         def save(attributes)
           return self unless match_or_create_person
-          existing_org = get_existing_organization
+          existing_org = get_existing_organization unless is_broker_profile?
           return self if organization_validity_failed?(existing_org)
           self.organization = init_profile_organization(existing_org, attributes)
           return self if broker_agency_profile_validity_failed?
@@ -242,8 +242,7 @@ module BenefitSponsors
         end
 
         def build_organization_class
-          # Use GeneralOrganization for now
-          GeneralOrganization || ExemptOrganization
+          is_broker_profile? ? ExemptOrganization : GeneralOrganization
         end
 
         def build_person

@@ -9,7 +9,7 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
       And Soren White visits the employee portal
       When Soren White creates an HBX account
       And I select the all security question and give the answer
-      When I have submit the security questions
+      When I have submitted the security questions
       When Employee goes to register as an employee
       Then Employee should see the employee search page
       When Employee enters the identifying info of Soren White
@@ -66,9 +66,9 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
       And Soren White visits the employee portal
       When Soren White creates an HBX account
       And I select the all security question and give the answer
-      When I have submit the security questions
+      When I have submitted the security questions
       And I select the all security question and give the answer
-      When I have submit the security questions
+      When I have submitted the security questions
       When Employee goes to register as an employee
       Then Employee should see the employee search page
       When Employee enters the identifying info of Soren White

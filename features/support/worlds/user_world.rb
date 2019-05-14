@@ -158,3 +158,7 @@ end
 And(/^system date is between submission deadline & OE End date$/) do
   allow(TimeKeeper).to receive(:date_of_record).and_return((initial_application.open_enrollment_period.max - 1.day))
 end
+
+And(/^system date is between submission deadline & application effective date$/) do
+  allow(TimeKeeper).to receive(:date_of_record).and_return((initial_application.start_on - 3.days))
+end

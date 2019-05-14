@@ -65,12 +65,15 @@ PATH
       aasm (~> 4.8.0)
       active_model_serializers
       config
+      i18n (= 0.7.0)
+      mini_portile2 (= 2.0.0)
       mongoid (~> 5.4.0)
+      nokogiri (= 1.6.7.2)
       pundit (~> 1.0.1)
       rails (~> 4.2.7.1)
       slim (~> 3.0.9)
       symmetric-encryption (~> 3.6.0)
-      virtus
+      virtus (= 1.0.5)
 
 PATH
   remote: components/benefit_sponsors
@@ -130,9 +133,10 @@ PATH
   remote: components/transport_gateway
   specs:
     transport_gateway (0.0.1)
-      aws-sdk (>= 2.2.4)
+      aws-sdk (~> 2.2.4)
       net-sftp (~> 2.1, >= 2.1.2)
-      rails (>= 4.2.0)
+      net-ssh (= 4.2.0)
+      rails (>= 4.2.0, < 5.0)
 
 PATH
   remote: components/transport_profiles
@@ -140,8 +144,9 @@ PATH
     transport_profiles (0.0.1)
       acapi
       mongoid (= 5.4.0)
-      rails (>= 4.2.0)
-      rubyzip (>= 1.2.1)
+      nokogiri (= 1.6.7.2)
+      rails (>= 4.2.0, < 5.0)
+      rubyzip (= 1.2.1)
       symmetric-encryption (~> 3.6.0)
       transport_gateway
 
@@ -372,7 +377,7 @@ GEM
       railties (>= 3.0.0)
     fakeredis (0.7.0)
       redis (>= 3.2, < 5.0)
-    ffi (1.9.23)
+    ffi (1.10.0)
     forgery (0.7.0)
     gherkin (3.2.0)
     globalid (0.4.1)
@@ -511,7 +516,7 @@ GEM
       sprockets (>= 2.0)
     origin (2.3.1)
     orm_adapter (0.5.0)
-    overcommit (0.44.0)
+    overcommit (0.47.0)
       childprocess (~> 0.6, >= 0.6.3)
       iniparse (~> 1.4)
     parallel (1.12.1)
@@ -800,6 +805,7 @@ DEPENDENCIES
   certified
   chosen-rails
   ckeditor
+  climate_control (= 0.2.0)
   coffee-rails (~> 4.1.0)
   combine_pdf
   config (~> 1.0.0)
@@ -816,6 +822,7 @@ DEPENDENCIES
   forgery
   haml
   httparty
+  i18n (= 0.7.0)
   interactor (= 3.1.0)
   interactor-rails (= 2.0.2)
   jbuilder (~> 2.0)
@@ -897,4 +904,4 @@ DEPENDENCIES
   yard-mongoid (~> 0.1.0)
 
 BUNDLED WITH
-   1.16.0
+   1.16.6

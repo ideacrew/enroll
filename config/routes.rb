@@ -97,6 +97,7 @@ Rails.application.routes.draw do
         get :employer_datatable
         post :employer_invoice_datatable
         post :generate_invoice
+        get :edit_force_publish
         post :force_publish
         get :broker_agency_index
         get :general_agency_index if Settings.aca.general_agency_enabled
