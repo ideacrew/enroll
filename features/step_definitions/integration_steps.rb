@@ -644,7 +644,7 @@ end
 When(/^.+ enters? the identifying info of (.*)$/) do |named_person|
   person = people[named_person]
   person_ssn = "#{person[:ssn][0..2]}-#{person[:ssn][3..4]}-#{person[:ssn][5..8]}"
-  
+
   fill_in 'person[first_name]', :with => person[:first_name]
   fill_in 'person[last_name]', :with => person[:last_name]
   fill_in 'jq_datepicker_ignore_person[dob]', :with => person[:dob]
@@ -736,20 +736,22 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
 end
 
 And(/^.+ sees the (.*) page and clicks Continue$/) do |which_page|
-  find('.interaction-click-control-continue', text: 'CONTINUE', wait: 5)
-  expect(page).to have_content(which_page)
-  find('.interaction-click-control-continue', text: 'CONTINUE', wait: 5).click
+  # Whats the point of the below
+  # expect(page).to have_content(which_page)
+  continue = find('.interaction-click-control-continue', text: 'CONTINUE', wait:10)
+  continue.click
 end
 
 And(/^.+ clicks Confirm$/) do
+  find_link('Confirm', wait: 10)
   click_link 'Confirm'
 end
 
 And(/^.+ selects the first plan available$/) do
   links = page.all('a')
-  first_plan_html_class = "btn btn-default btn-right plan-select select interaction-click-control-select-plan"
-  first_plan_select_link = links.detect { |link| link.text == "Select Plan" }
-  first_plan_select_link.click
+  find('h1', text:'Choose Coverage for your Household', wait: 10)
+  find('.interaction-click-control-continue', text: 'CONTINUE').click
+  find('.plan-select', match: :first).click
 end
 
 Then(/^.+ should see the dependents page$/) do
