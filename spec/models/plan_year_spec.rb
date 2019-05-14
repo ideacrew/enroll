@@ -2505,10 +2505,12 @@ describe PlanYear, '.terminate_employee_benefit_packages', type: :model, dbclean
   let(:benefit_group_assignment1) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group, end_on: plan_year.end_on)}
   let!(:census_employee) { FactoryGirl.create(:census_employee, benefit_group_assignments: [benefit_group_assignment1],employee_role_id: employee_role1.id,employer_profile_id: employer_profile.id) }
   let(:new_end_on) { TimeKeeper.date_of_record.prev_day }
-  let!(:enrollment) { FactoryGirl.create(:hbx_enrollment, effective_on: start_on, household: family.active_household, benefit_group_id: benefit_group.id, aasm_state: 'coverage_selected', employee_role: census_employee.employee_role)}
+  let!(:enrollment) { FactoryGirl.create(:hbx_enrollment, effective_on: start_on, employee_role_id: employee_role1.id, household: family.active_household, benefit_group_id: benefit_group.id, aasm_state: 'coverage_selected', employee_role: census_employee.employee_role)}
 
   before do
-    plan_year.terminate_plan_year(new_end_on, TimeKeeper.date_of_record, 'nonpayment', false, 'nonpayment')
+    employee_role1.census_employee = census_employee
+    employee_role1.save
+    plan_year.terminate_plan_year(new_end_on, TimeKeeper.date_of_record, 'nonpayment', false, 'nonpayment', )
     plan_year.reload
     benefit_group_assignment1.reload
   end
@@ -2674,6 +2676,8 @@ describe PlanYear, '.terminate_employee_enrollments', type: :model, dbclean: :af
   context 'when plan year is terminated' do
 
     before do
+      employee_role.census_employee = census_employee
+      employee_role.save
       TimeKeeper.set_date_of_record_unprotected!(start_on.next_month)
       employee_role.update_attributes(census_employee_id: census_employee.id)
     end
@@ -2684,7 +2688,7 @@ describe PlanYear, '.terminate_employee_enrollments', type: :model, dbclean: :af
 
     py_termination_dates.each do |py_end_on|
       it "should move the enrollment to coverage terminated/pending status" do
-        plan_year.terminate_plan_year(py_end_on, TimeKeeper.date_of_record, 'voluntary', false, enrollment_term_reason: 'nonpayment')
+        plan_year.terminate_plan_year(py_end_on, TimeKeeper.date_of_record, 'voluntary', false, 'nonpayment')
         hbx_enrollment.reload
         if py_end_on < TimeKeeper.date_of_record
           expect(hbx_enrollment.aasm_state).to eq 'coverage_terminated'
@@ -2697,7 +2701,7 @@ describe PlanYear, '.terminate_employee_enrollments', type: :model, dbclean: :af
 
     it "should move the enrollment to canceled state if enrollment effective_on > py_end_on" do
       hbx_enrollment.update_attributes!(effective_on: start_on + 2.months)
-      plan_year.terminate_plan_year(py_termination_dates[1], TimeKeeper.date_of_record, 'voluntary', false)
+      plan_year.terminate_plan_year(py_termination_dates[1], TimeKeeper.date_of_record, 'voluntary', false, 'nonpayment')
       hbx_enrollment.reload
       expect(hbx_enrollment.aasm_state).to eq 'coverage_canceled'
       expect(hbx_enrollment.terminate_reason).to eq nil
