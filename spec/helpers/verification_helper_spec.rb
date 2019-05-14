@@ -292,7 +292,7 @@ RSpec.describe VerificationHelper, :type => :helper do
     let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
     it "returns true if any family member has uploaded docs" do
       family.family_members.each do |member|
-        member.person = FactoryBot.create(:person, :with_consumer_rol, :with_active_consumer_rolee)
+        member.person = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)
       end
       allow_any_instance_of(Person).to receive_message_chain("primary_family.active_family_members").and_return(family.family_members)
       expect(helper.documents_uploaded).to be_falsey
@@ -389,7 +389,6 @@ RSpec.describe VerificationHelper, :type => :helper do
   describe '#get_person_v_type_status' do
     let(:person) { FactoryBot.create(:person, :with_consumer_role)}
     let(:family) { FactoryBot.create(:family, :with_primary_family_member, :person => person) }
-    let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
     it 'returns verification types states of the person' do
       status = 'verified'
       allow(helper).to receive(:verification_type_status).and_return(status)
