@@ -75,7 +75,7 @@ Capybara::Screenshot.prune_strategy = :keep_last_run
 Webdrivers::Chromedriver.required_version = '2.46'
 Webdrivers.cache_time = 86_400
 
-Selenium::WebDriver::Chrome.path = '/opt/homebrew-cask/Caskroom/google-chrome/latest/Google Chrome.app/Contents/MacOS/Google Chrome'
+# Selenium::WebDriver::Chrome.path = '/opt/homebrew-cask/Caskroom/google-chrome/latest/Google Chrome.app/Contents/MacOS/Google Chrome'
 
 Capybara.register_driver :selenium_chrome do |app|
   options = Selenium::WebDriver::Chrome::Options.new
