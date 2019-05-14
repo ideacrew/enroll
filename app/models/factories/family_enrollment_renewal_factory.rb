@@ -142,6 +142,8 @@ module Factories
           Rails.logger.error { "Unable to deliver census employee notice for #{notice_name} to census_employee #{census_employee.id} due to #{e}" }
         end
       end
+    end
+    
     # relationship offered in renewal plan year and member active in enrollment.
     def is_relationship_offered_and_member_covered?(member,renewal_enrollment)
       return true if renewal_enrollment.composite_rated?
