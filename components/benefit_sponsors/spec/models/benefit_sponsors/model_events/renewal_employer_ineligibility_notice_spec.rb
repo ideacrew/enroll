@@ -128,13 +128,17 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployerIneligibilityNotice
         unless policy.is_satisfied?(model_instance)
           policy.fail_results.each do |k, _|
             case k.to_s
-            when "minimum_participation_rule"
-              enrollment_errors << "At least seventy-five (75) percent of your eligible employees enrolled in your group health coverage or waive due to having other coverage."
-            when "non_business_owner_enrollment_count"
-              enrollment_errors << "At least one non-owner employee enrolled in health coverage."
+            when 'minimum_eligible_member_count'
+              enrollment_errors << 'at least one employee must be eligible to enroll'
+            when 'non_business_owner_enrollment_count'
+              enrollment_errors << "at least #{Settings.aca.shop_market.non_owner_participation_count_minimum} non-owner employee must enroll"
+            when 'minimum_participation_rule'
+              unless model_instance.effective_date.yday == 1
+                enrollment_errors << "number of eligible participants enrolling (#{model_instance.all_enrolled_and_waived_member_count}) is less than minimum required #{model_instance.minimum_enrolled_count}"
+              end
             end
           end
-      end
+        end
         expect(merge_model.benefit_application.enrollment_errors).to eq (enrollment_errors.join(' AND/OR '))
       end
     end

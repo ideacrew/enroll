@@ -3,9 +3,10 @@ module Notifier
 
     include Config::SiteHelper
     # include Notifier::Builders::PlanYear
+    include Notifier::Builders::BenefitApplication
     include Notifier::Builders::Broker
 
-    attr_accessor :payload, :broker_agency_profile, :broker_agency_account, :merge_model
+    attr_accessor :payload, :broker_agency_profile, :broker_agency_account, :merge_model, :event_name
 
     def initialize
       data_object = Notifier::MergeDataModels::BrokerAgencyProfile.new
