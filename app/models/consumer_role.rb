@@ -137,11 +137,8 @@ class ConsumerRole
   delegate :tribal_id,          :tribal_id=,         to: :person, allow_nil: true
 
   embeds_many :documents, as: :documentable
-  embeds_many :vlp_documents, as: :documentable do #move to verification type
-    def uploaded
-      @target.select{|document| document.identifier }
-    end
-  end
+  embeds_many :vlp_documents, as: :documentable
+
   embeds_many :ridp_documents, as: :documentable
   embeds_many :workflow_state_transitions, as: :transitional
   embeds_many :special_verifications, cascade_callbacks: true, validate: true #move to verification type
@@ -783,6 +780,8 @@ class ConsumerRole
     if person_params.select{|k,v| VERIFICATION_SENSITIVE_ATTR.include?(k) }.any?{|field,v| sensitive_information_changed(field, person_params)}
       redetermine_verification!(verification_attr) if family.person_has_an_active_enrollment?(person)
     end
+  end
+
   def native_with_ssn?
     is_native? && ssn_applied?
   end
@@ -912,6 +911,7 @@ class ConsumerRole
   def residency_verified?
     is_state_resident? || residency_attested?
   end
+
   def residency_attested?
     local_residency_validation == "attested" || person.residency_eligible? || person.age_on(TimeKeeper.date_of_record) <= 18
   end
@@ -1091,7 +1091,7 @@ class ConsumerRole
   end
 
   def ensure_native_validation
-    if (tribal_id.nil? || tribal_id.empty?)
+    if tribal_id.nil? || tribal_id.empty?
       self.native_validation = "na"
     else
       self.native_validation = "outstanding" if native_validation == "na"
@@ -1134,4 +1134,5 @@ class ConsumerRole
                     :vlp_authority => authority
                    })
   end
+
 end
