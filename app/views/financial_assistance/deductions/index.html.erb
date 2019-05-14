@@ -38,7 +38,7 @@
     <br />
 
     <!--Deduction Kinds-->
-    <div class='deduction-kinds run-glossary'>
+    <div class='deduction-kinds'>
       <div class="instruction-row row row-form-wrapper no-buffer row-height">
         <div class="col-md-9">
           <h4 class="panel-title">
@@ -61,7 +61,7 @@
               <%=check_box_tag "deduction_kind", deduction_kind, @applicant.deductions.of_kind(deduction_kind).present?, class: "deduction-checkbox-#{deduction_kind}" %>
             </div>
 
-            <div class="col-md-9 no-pd <%= deduction_kind %>">
+            <div class="col-md-9 no-pd <%= deduction_kind %> run-glossary">
               <%= FinancialAssistance::Deduction::DEDUCTION_TYPE[deduction_kind.to_sym] %>
             </div>
           </div>
