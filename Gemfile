@@ -99,7 +99,7 @@ gem 'uglifier',                 '>= 4'
 gem 'virtus',                   '~> 1.0'
 gem 'wicked_pdf',               '~> 1.1.0'
 gem 'wkhtmltopdf-binary-edge',  '~> 0.12.3.0'
-gem 'webpacker',                '3.4.3'
+gem 'webpacker',                '~> 4.0.2'
 
 
 group :doc do
