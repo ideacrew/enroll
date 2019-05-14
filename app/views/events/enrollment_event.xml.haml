@@ -17,9 +17,6 @@
             %transaction_id
               %id= tix
             %type= "urn:openhbx:terms:v1:enrollment#initial" ## this is hardcoded for now but needs to be changed once we have the proper models
-            - states = %w(coverage_terminated coverage_termination_pending)
-            -if states.include?(hbx_enrollment.aasm_state) && hbx_enrollment.terminate_reason == "non_payment"
-              %qualifying_reason= "urn:openhbx:terms:v1:benefit_maintenance##{hbx_enrollment.terminate_reason}"
             -if %w(unassisted_qhp insurance_assisted_qhp individual).include?(hbx_enrollment.kind)
               %market= "urn:openhbx:terms:v1:aca_marketplace#individual"
             -elsif hbx_enrollment.kind == "employer_sponsored_cobra"

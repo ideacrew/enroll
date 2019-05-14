@@ -183,7 +183,7 @@ class PlanYear
     renewing_plan_year
   end
 
-  def terminate_plan_year(end_on, terminated_on, termination_kind, transmit_xml, enrollment_term_reason)
+  def terminate_plan_year(end_on, terminated_on, termination_kind, transmit_xml)
     renewing_plan_year = parent.plan_years.where(:aasm_state.in => RENEWING + ['renewing_application_ineligible']).first
 
     if renewing_plan_year
@@ -193,14 +193,14 @@ class PlanYear
       if may_schedule_termination?
         set_plan_year_termination_date(end_on, {termination_kind: termination_kind, terminated_on: terminated_on})
         schedule_termination!
-        terminate_employee_enrollments(end_on, {transmit_xml: transmit_xml, enrollment_term_reason: enrollment_term_reason})
+        terminate_employee_enrollments(end_on, {transmit_xml: transmit_xml})
         notify_employer_py_terminate(transmit_xml)
       end
     elsif may_terminate?
       set_plan_year_termination_date(end_on, {termination_kind: termination_kind, terminated_on: terminated_on})
       terminate!(end_on)
       notify_employer_py_terminate(transmit_xml)
-      terminate_employee_enrollments(end_on, {transmit_xml: transmit_xml, enrollment_term_reason: enrollment_term_reason})
+      terminate_employee_enrollments(end_on, {transmit_xml: transmit_xml})
       employer_profile.revert_application! if employer_profile.may_revert_application?
     end
   end
@@ -239,13 +239,11 @@ class PlanYear
 
   def cancel_employee_enrollments(transmit_xml = false)
     enrollments_for_plan_year.each do |hbx_enrollment|
-      if hbx_enrollment.may_cancel_coverage?
-        if hbx_enrollment.inactive?
-          hbx_enrollment.cancel_coverage!
-        else
-          hbx_enrollment.cancel_coverage!
-          hbx_enrollment.notify_enrollment_cancel_or_termination_event(transmit_xml) if eligible_for_export?
-        end
+      if hbx_enrollment.may_cancel_coverage? && hbx_enrollment.inactive?
+        hbx_enrollment.cancel_coverage!
+      else
+        hbx_enrollment.cancel_coverage!
+        hbx_enrollment.notify_enrollment_cancel_or_termination_event(transmit_xml) if eligible_for_export?
       end
     end
   end
@@ -262,14 +260,14 @@ class PlanYear
           if hbx_enrollment.may_terminate_coverage?
             if hbx_enrollment.terminated_on.nil? || (hbx_enrollment.terminated_on.present? && (hbx_enrollment.terminated_on > py_end_on))
               hbx_enrollment.terminate_coverage!(py_end_on)
-              hbx_enrollment.update_attributes!(termination_submitted_on: TimeKeeper.date_of_record, terminate_reason: options[:enrollment_term_reason])
+              hbx_enrollment.update_attributes!(termination_submitted_on: TimeKeeper.date_of_record)
               hbx_enrollment.notify_enrollment_cancel_or_termination_event(options[:transmit_xml])
             end
           end
         else
           if hbx_enrollment.may_schedule_coverage_termination?
             hbx_enrollment.schedule_coverage_termination!(py_end_on)
-            hbx_enrollment.update_attributes!(termination_submitted_on: TimeKeeper.date_of_record, terminate_reason: options[:enrollment_term_reason])
+            hbx_enrollment.update_attributes!(termination_submitted_on: TimeKeeper.date_of_record)
             hbx_enrollment.notify_enrollment_cancel_or_termination_event(options[:transmit_xml])
           end
         end

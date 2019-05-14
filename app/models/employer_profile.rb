@@ -507,18 +507,6 @@ class EmployerProfile
     end
   end
 
-  # employer_profiles_controller.rb#terminate_employee_roster_enrollments
-  def terminate_roster_enrollments(params)
-    termination_date = params["termination_date"].to_date
-    termination_reason = params["termination_reason"]
-    transmit_xml = params["transmit_xml"]
-    active_plan_year.terminate_employee_enrollments(
-      termination_date,
-      { transmit_xml: transmit_xml, enrollment_term_reason: termination_reason }
-    ) if active_plan_year.present?
-    renewing_plan_year.cancel_employee_enrollments(transmit_xml) if renewing_plan_year.present?
-  end
-
   ## Class methods
   class << self
 
