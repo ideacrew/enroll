@@ -576,7 +576,6 @@ class HbxEnrollment
 
   def update_existing_shop_coverage
     return if parent_enrollment.blank?
-
     if parent_enrollment.effective_on >= effective_on
       parent_enrollment.cancel_coverage! if parent_enrollment.may_cancel_coverage?
     else
@@ -602,17 +601,14 @@ class HbxEnrollment
   end
 
   def update_renewal_coverage
-    if is_shop?
-      if successor_benefit_package = sponsored_benefit_package.successor
-        successor_application = successor_benefit_package.benefit_application
-        passive_renewals_under(successor_application).each{|en| en.cancel_coverage! if en.may_cancel_coverage? }
-        if active_renewals_under(successor_application).blank?
-          if successor_application.coverage_renewable?
-            renew_benefit(successor_benefit_package)
-          end
-        end
-      end
-    end
+    return unless is_shop? && (successor_benefit_package = sponsored_benefit_package.successor)
+    successor_application = successor_benefit_package.benefit_application
+    passive_renewals_under(successor_application).each{|en| en.cancel_coverage! if en.may_cancel_coverage? }
+    renew_benefit(successor_benefit_package) if active_renewals_under(successor_application).blank? && successor_application.coverage_renewable? && non_inactive_transition?
+  end
+
+  def non_inactive_transition?
+    !(aasm.from_state == :inactive && aasm.to_state == :inactive)
   end
 
   def renewal_enrollments(successor_application)
