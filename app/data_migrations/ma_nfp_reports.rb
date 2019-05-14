@@ -50,7 +50,7 @@ class MaNfpReports < MongoidMigrationTask
             ["health", "dental"].each do |kind|
               enrollment_2018 = enrollment.where(coverage_kind: kind, :"effective_on".lt=> start_on).first
               enrollment_2019 = enrollment.where(coverage_kind: kind, :effective_on=> start_on).first
-              next unless enrollment_2019
+              next unless enrollment_2018 || enrollment_2019
               
               csv << [ben_spon.profile.legal_name,
                       ben_spon.profile.fein,
