@@ -627,7 +627,7 @@ context "Verification process and notices" do
         person.consumer_role.save
       end
       it "returns array of verification types" do
-        expect(person.verification_types).to be_a Array
+        expect(person.verification_types.class).to be Array
       end
 
       it "returns #{types_count} verification types" do
