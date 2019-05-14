@@ -11,8 +11,8 @@ site:
   nondiscrimination_notice_url: "https://www.MAhealthconnector.org/site-policies/nondiscrimination-notice"
   main_web_address_url: "https://www.MAhealthconnector.org"
   policies_url: "https://www.mahealthconnector.org/about/policy-center/policies"
-  invoice_bill_url: "https://ww2.e-billexpress.com/ebpp/maconnector/"
-  payment_pdf_url: "https://www.mahealthconnector.org/help-center-answers/how-to-pay-your-premiums-online"
+  invoice_bill_url: ""
+  payment_pdf_url: "pdf/employers_paying_your_premiums_online.pdf"
   user_sign_in_url: "https://business.mahealthconnector.org/users/sign_in"
   website_name: "MAhealthconnector.org"
   main_web_address: "www.MAhealthconnector.org"
@@ -31,7 +31,7 @@ site:
   s3_prefix: "dc"
   broker_quoting_enabled: false
   broker_claim_quoting_enabled: true
-  guidance_for_business_owners_url: "https://www.mahealthconnector.org/help-center-answers/guidance-for-business-owners"
+  guidance_for_business_owners_url: "https://dchealthlink.com/sites/default/files/v2/forms/Guidance_for_Business_Owners.pdf"
   use_default_devise_path: true
   plan_options_title_for_ma: true
   create_routes: ['/insured/employee/privacy','/employers/employer_profiles/new']
@@ -63,7 +63,7 @@ contact_center:
   alt_fax: "617-722-4033"
   tty_number: "711"
   alt_phone_number: "1-888-813-9220"
-  payment_phone_number: "1-888-813-9220"
+  payment_phone_number: "855-532-LINK"
   ivl_number: "1-877-623-6765"
   ivl_phone_number: "1-877-623-6765"
   email_address: "smallbusiness@mahealthconnector.org"
@@ -73,12 +73,12 @@ contact_center:
   appeals: "connector-appeals@state.ma.us"
 
   mailing_address:
-    name: "Commonwealth Health Insurance"
-    address_1: "PO Box 780833"
+    name: "DC Health Link"
+    address_1: "PO Box 97022"
     address_2:
-    city: "Philadelphia"
-    state: "PA"
-    zip_code: "19178-0833"
+    city: "Washington"
+    state: "DC"
+    zip_code: "20090"
 
   appeal_center:
     name: "Appeals Unit"
