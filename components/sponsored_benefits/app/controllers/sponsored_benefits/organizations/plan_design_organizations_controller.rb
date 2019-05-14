@@ -36,13 +36,14 @@ module SponsoredBenefits
     end
 
     def update
+      binding.pry
       pdo = SponsoredBenefits::Organizations::PlanDesignOrganization.find(params[:id])
 
       if pdo.is_prospect?
         pdo.assign_attributes(organization_params)
         ola = organization_params[:office_locations_attributes]
 
-        if ola.blank?
+        if ola.blank? && employer_has_sic_enabled?
           flash[:error] = "Prospect Employer must have one Primary Office Location."
           redirect_to employers_organizations_broker_agency_profile_path(@profile.id)
         elsif pdo.save
@@ -98,13 +99,16 @@ module SponsoredBenefits
     end
 
     def organization_params
+      # params :id is allowed because while form editing office_locations
+      # we just mass assigning the build params to model so every time when we
+      # editing and try to save office location end up having duplicate(accepts_nested_attributes_for)
       org_params = params.require(:organization).permit(
         :legal_name, :dba, :entity_kind, :sic_code,
         :office_locations_attributes => [
-          {:address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :county]},
-          {:phone_attributes => [:kind, :area_code, :number, :extension]},
+          {:address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :county, :id]},
+          {:phone_attributes => [:kind, :area_code, :number, :extension, :id]},
           {:email_attributes => [:kind, :address]},
-          :is_primary
+          :is_primary, :id
         ]
       )
 
