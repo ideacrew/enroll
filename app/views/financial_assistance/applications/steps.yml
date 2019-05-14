@@ -24,7 +24,7 @@
                     type: label_radio
                     id: 'disagree'
                     classNames: 'span-text'
-                    label: I Disagree
+                    label: I disagree
                     value: false
                     model: application
                     name: is_renewal_authorized
