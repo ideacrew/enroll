@@ -6,24 +6,20 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   context "set_current_user with no person" do
     let(:user) { FactoryBot.create(:user, person: person) }
-    let(:person) { FactoryBot.create(:person) }
-    let(:user) { FactoryBot.create(:user, person: person) }
-    let(:person) { FactoryBot.create(:person) }
+    let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
     let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
-    let!(:individual_market_transition) { FactoryBot.create(:individual_market_transition, person: person) }
-
 
     before :each do
       sign_in user
     end
 
     it "should assigns the family if user is hbx_staff and dependent consumer" do
-      get :home, {:family => family.id.to_s}
+      get :home, params: {:family => family.id.to_s}
       expect(assigns(:family)).to eq family
     end
 
     it "should redirect" do
-      get :home, {:family => family.id}
+      get :home, params: {:family => family.id}
       expect(response).to be_redirect
     end
   end
@@ -44,7 +40,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
   let(:hbx_enrollments) { double("HbxEnrollment") }
   let(:user) { FactoryBot.create(:user) }
-  let(:person) { double("Person", id: "test", addresses: [], no_dc_address: false, no_dc_address_reason: "" , has_active_consumer_role?: false, has_active_employee_role?: true) }
+  let(:person) { double("Person", id: "test", addresses: [], no_dc_address: false, no_dc_address_reason: "" , is_consumer_role_active?: false, has_active_employee_role?: true) }
   let(:family) { instance_double(Family, active_household: household, :model_name => "Family") }
   let(:household) { double("HouseHold", hbx_enrollments: hbx_enrollments) }
   let(:addresses) { [double] }
@@ -916,10 +912,9 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     end
 
     context "should transition consumer to resident" do
-      let(:consumer_person) {FactoryBot.create(:person, :with_consumer_role)}
+      let(:consumer_person) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
       let(:consumer_family) { FactoryBot.create(:family, :with_primary_family_member, person: consumer_person) }
       let(:user){ FactoryBot.create(:user, person: consumer_person) }
-      let!(:individual_market_transition) { FactoryBot.create(:individual_market_transition, person: consumer_person) }
       let(:qle) {FactoryBot.create(:qualifying_life_event_kind, title: "Not eligible for marketplace coverage due to citizenship or immigration status", reason: "eligibility_failed_or_documents_not_received_by_due_date ")}
 
       let(:consumer_params) {
@@ -935,13 +930,13 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       }
 
       it "should transition people" do
-        xhr :post, "transition_family_members_update", consumer_params, format: :js
+        post :transition_family_members_update, params: consumer_params, format: :js, xhr: true
         expect(response).to have_http_status(:success)
       end
 
       it "should transition people from consumer market to resident market" do
         expect(consumer_person.is_consumer_role_active?). to be_truthy
-        xhr :post, "transition_family_members_update", consumer_params, format: :js
+        post :transition_family_members_update, params: consumer_params, format: :js, xhr: true
         consumer_person.reload
         expect(consumer_person.is_resident_role_active?). to be_truthy
         expect(consumer_person.is_consumer_role_active?). to be_falsey
@@ -967,13 +962,13 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       }
 
       it "should transition people" do
-        xhr :post, "transition_family_members_update", resident_params, format: :js
+        post :transition_family_members_update, params: resident_params, format: :js, xhr: true
         expect(response).to have_http_status(:success)
       end
 
       it "should transition people from resident market to consumer market" do
         expect(resident_person.is_resident_role_active?). to be_truthy
-        xhr :post, "transition_family_members_update", resident_params, format: :js
+        post :transition_family_members_update, params: resident_params, format: :js, xhr: true
         resident_person.reload
         expect(resident_person.is_consumer_role_active?). to be_truthy
         expect(resident_person.is_resident_role_active?). to be_falsey
@@ -982,7 +977,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       it "should trigger_cdc_to_ivl_transition_notice in queue" do
         ActiveJob::Base.queue_adapter = :test
         ActiveJob::Base.queue_adapter.enqueued_jobs = []
-        xhr :post, "transition_family_members_update", resident_params, format: :js
+        post :transition_family_members_update, params: resident_params, format: :js, xhr: true
         queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
           job_info[:job] == IvlNoticesNotifierJob
         end

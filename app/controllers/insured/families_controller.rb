@@ -276,15 +276,15 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def transition_family_members_update
-    @row_id = params[:family_actions_id]
+    params_hash = params.permit!.to_h
+    @row_id = params_hash[:family_actions_id]
 
-    params_parser = ::Forms::BulkActionsForAdmin.new(params)
+    params_parser = ::Forms::BulkActionsForAdmin.new(params_hash)
     @result = params_parser.result
     @row = params_parser.row
     @family_id = params_parser.family_id
     params_parser.transition_family_members
-    @family = Family.find(params[:family])
-
+    @family = Family.find(params_hash[:family])
     @consumer_people = []
     @resident_people = []
     @result[:success].each do |person|
