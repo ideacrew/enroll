@@ -40,6 +40,10 @@ class EmployerAttestation
     event :revert, :after => :record_transition do
       transitions from: [:submitted,:denied,:pending], to: :unsubmitted
     end
+
+    event :resubmit, :after => :record_transition do
+      transitions from: :denied, to: :submitted
+    end
   end
 
   def under_review?
@@ -59,7 +63,7 @@ class EmployerAttestation
   end
 
   def editable?
-    unsubmitted? || submitted? || pending?
+    unsubmitted? || submitted? || pending? || denied?
   end
 
   private
