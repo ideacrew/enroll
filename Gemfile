@@ -99,7 +99,7 @@ gem 'uglifier',                 '>= 4'
 gem 'virtus',                   '~> 1.0'
 gem 'wicked_pdf',               '~> 1.1.0'
 gem 'wkhtmltopdf-binary-edge',  '~> 0.12.3.0'
-gem 'webpacker',                '~> 4.0.2'
+gem 'webpacker',                '3.4.3'
 
 
 group :doc do
@@ -157,7 +157,7 @@ group :test do
   gem 'test-prof',                    '~> 0.5.0'
   gem 'warden',                       '~> 1.2.7'
   gem 'watir',                        '~> 6.10.3'
-  gem 'webdrivers',                   '3.8.0'
+  gem 'webdrivers', '~> 3.0'
   gem 'webmock',                      '~> 3.0.1'
 end
 
