@@ -19,7 +19,10 @@ module Effective
         table_column :actions, :width => '50px', :proc => Proc.new { |row|
           dropdown = [
            # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
-           ['Add SEP', add_sep_form_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"), add_sep_link_type( pundit_allow(HbxProfile, :can_add_sep?) )],
+           ['Add SEP', add_sep_form_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"),
+             add_sep_link_type( pundit_allow(HbxProfile, :can_add_sep?) ) ],
+           ['Create Eligibility', new_eligibility_exchanges_hbx_profiles_path(person_id: row.primary_applicant.person.id,
+              family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"), new_eligibility_family_member_link_type(row, pundit_allow(HbxProfile, :can_add_pdc?) )],
            ['View SEP History', show_sep_history_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"), 'ajax'],
            ['Cancel Enrollment', cancel_enrollment_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"), cancel_enrollment_type(row, pundit_allow(Family, :can_update_ssn?))],
            #cancel_enrollment_type(row, pundit_allow(Family, :can_update_ssn?))],
@@ -39,8 +42,20 @@ module Effective
            end
           ['Phone', resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id, original_application_type: 'phone'), 'static']
 
+           ['Edit APTC / CSR', edit_aptc_csr_path(family_id: row.id, person_id: row.primary_applicant.person.id),
+            aptc_csr_link_type(row, pundit_allow(Family, :can_update_ssn?))],
+           ['Collapse Form', hide_form_exchanges_hbx_profiles_path(family_id: row.id, person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id.to_s}"),'ajax'],
+           ['Paper', resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id, original_application_type: 'paper'), 'static'],
+           ['View Username and Email', get_user_info_exchanges_hbx_profiles_path(person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id.to_s}"), pundit_allow(Family, :can_view_username_and_email?) ? 'ajax' : 'disabled'],
+           ['Transition Family Members', transition_family_members_insured_families_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"), transition_family_members_link_type(row, pundit_allow(Family, :can_transition_family_members?))]
+
+          ]
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "family_actions_#{row.id.to_s}"}, formats: :html
         }, :filter => false, :sortable => false
+      end
+
+      scopes do
+         scope :legal_name, "Hello"
       end
 
       def collection
@@ -75,6 +90,11 @@ module Effective
       def terminate_enrollment_type(family, allow)
         (family.all_enrollments.can_terminate.present? && allow) ? 'ajax' : 'disabled'
       end
+
+      def new_eligibility_family_member_link_type(row, allow)
+        allow && row.primary_applicant.person.has_active_consumer_role? ? 'ajax' : 'disabled'
+      end
+
 
       def nested_filter_definition
         families_tab = [

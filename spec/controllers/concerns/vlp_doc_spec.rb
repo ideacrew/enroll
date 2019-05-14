@@ -61,4 +61,34 @@ describe FakesController do
       it_behaves_like "returns vlp document subject", document, "eligible_immigration_status"
     end
   end
+
+  context "#sensitive_info_changed?" do
+
+    let(:person_params) { { person:  { no_dc_address: "true" } } }
+
+    let(:person) { FactoryGirl.create(:person, :with_consumer_role, :no_dc_address => false)}
+
+    before do
+      allow(subject).to receive(:params).and_return person_params
+    end
+
+    it "should return true for info_changed if sensitive_information changed" do
+      allow(person.consumer_role).to receive(:sensitive_information_changed?).with(person_params[:person]).and_return true
+      expect(subject.sensitive_info_changed?(person.consumer_role)[0]).to eq true
+    end
+
+    it "should return false for info_changed if sensitive_information not changed" do
+      allow(person.consumer_role).to receive(:sensitive_information_changed?).with(person_params[:person]).and_return false
+      expect(subject.sensitive_info_changed?(person.consumer_role)[0]).to eq false
+    end
+
+    it "should return false as dc_status if the past addreess is in dc" do
+      expect(subject.sensitive_info_changed?(person.consumer_role)[1]).to eq false
+    end
+
+    it "should return true as dc_status if the past addreess is in non-dc" do
+      person.update_attributes(no_dc_address: true)
+      expect(subject.sensitive_info_changed?(person.consumer_role)[1]).to eq true
+    end
+  end
 end

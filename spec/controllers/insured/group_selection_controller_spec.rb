@@ -139,6 +139,8 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     allow(person).to receive(:active_employee_roles).and_return [employee_role]
     allow(person).to receive(:has_active_employee_role?).and_return true
     allow(employee_role).to receive(:benefit_group).and_return benefit_group
+    allow(person).to receive(:current_individual_market_transition).and_return(individual_market_transition)
+    allow(individual_market_transition).to receive(:role_type).and_return(nil)
   end
 
   context "GET new" do
@@ -269,7 +271,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       before :each do
         allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
         allow(benefit_coverage_period).to receive(:benefit_packages).and_return [benefit_package]
-        allow(person).to receive(:has_active_consumer_role?).and_return true
+        allow(person).to receive(:is_consumer_role_active?).and_return true
         allow(person).to receive(:has_active_employee_role?).and_return false
         allow(HbxEnrollment).to receive(:find).and_return nil
         allow(HbxEnrollment).to receive(:calculate_effective_on_from).and_return TimeKeeper.date_of_record

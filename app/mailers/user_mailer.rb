@@ -152,7 +152,14 @@ class UserMailer < ApplicationMailer
       format.html {render "employer_invoice_generation", locals: {first_name: employer.person.first_name}}
     end
   end
-
+  
+  def broker_registration_guide(user)
+    attachments['Broker Registration Guide.pdf'] = File.read('public/new_broker_registration.pdf')
+    mail({to: user[:email], subject: "Broker Registration Guide"}) do |format|
+      format.html { render "broker_registration_guide", :locals => { :first_name => user[:first_name]}}
+    end
+  end
+  
   def broker_denied_notification(broker_role)
     if broker_role.email_address.present?
       mail({to: broker_role.email_address, subject: "Broker application denied"}) do |format|
@@ -168,7 +175,7 @@ class UserMailer < ApplicationMailer
       end
     end
   end
-
+  
   def broker_pending_notification(broker_role,unchecked_carriers)
     subject_sufix = unchecked_carriers.present? ? ", missing carrier appointments" : ", has all carrier appointments"
     subject_prefix = broker_role.training || broker_role.training == true ? "Action Needed - Broker License for #{site_short_name} for Business" : "Action Needed - Complete Broker Training for #{site_short_name} for Business"

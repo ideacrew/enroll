@@ -11,12 +11,22 @@ FactoryBot.define do
     view_admin_tabs  { true }
     can_lock_unlock { false }
     can_reset_password { false }
+    modify_family true
+    modify_employer true
+    revert_application true
+    list_enrollments true
+    send_broker_agency_message true
+    approve_broker true
+    approve_ga true
+    modify_admin_tabs true
+    view_admin_tabs  true
+    can_transition_family_members true
 
     trait :hbx_staff do
       name { 'hbx_staff' }
       can_complete_resident_application { true }
       can_add_sep { true }
-      view_the_configuration_tab { false } 
+      view_the_configuration_tab { false }
       can_submit_time_travel_request { false }
       can_access_new_consumer_application_sub_tab { true }
       can_access_identity_verification_sub_tab { true }
@@ -38,7 +48,7 @@ FactoryBot.define do
       approve_ga { false }
       modify_admin_tabs { false }
       view_admin_tabs  { true }
-      view_the_configuration_tab { false } 
+      view_the_configuration_tab { false }
       can_submit_time_travel_request { false }
       can_access_outstanding_verification_sub_tab { true }
     end
@@ -54,7 +64,7 @@ FactoryBot.define do
       approve_ga { false }
       modify_admin_tabs { false }
       view_admin_tabs  { false }
-      view_the_configuration_tab { false } 
+      view_the_configuration_tab { false }
       can_submit_time_travel_request { false }
       can_access_new_consumer_application_sub_tab { true }
     end
@@ -70,7 +80,7 @@ FactoryBot.define do
       approve_ga { false }
       modify_admin_tabs { false }
       view_admin_tabs { false }
-      view_the_configuration_tab { false } 
+      view_the_configuration_tab { false }
       can_submit_time_travel_request { false }
       can_access_new_consumer_application_sub_tab { true }
     end
@@ -86,7 +96,7 @@ FactoryBot.define do
       approve_ga { false }
       modify_admin_tabs { false }
       view_admin_tabs  { false }
-      view_the_configuration_tab { false } 
+      view_the_configuration_tab { false }
       can_submit_time_travel_request { false }
       can_access_new_consumer_application_sub_tab { true }
     end
@@ -116,7 +126,7 @@ FactoryBot.define do
       modify_admin_tabs { false }
       view_admin_tabs  { true }
       can_create_benefit_application { true }
-      view_the_configuration_tab { false } 
+      view_the_configuration_tab { false }
       can_submit_time_travel_request { false }
     end
 

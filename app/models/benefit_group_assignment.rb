@@ -302,10 +302,6 @@ class BenefitGroupAssignment
     update_attributes(is_active: true, activated_at: TimeKeeper.datetime_of_record) unless is_active?
   end
 
-  def renew_employee_enrollments
-
-  end
-
   private
 
   def can_be_expired?

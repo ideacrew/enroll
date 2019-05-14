@@ -53,7 +53,7 @@ module Factories
         ce.save!
       end
 
-      @employer_profile.census_employees.non_terminated.each do |ce|
+      @employer_profile.census_employees.non_terminated.no_timeout.each do |ce|
 
         begin
           if CensusEmployee::PENDING_STATES.include?(ce.aasm_state)

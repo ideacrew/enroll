@@ -323,6 +323,63 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     #     end
     #   end
 
+    context "when maket type is individual" do
+      let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+      let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
+      let!(:tax_household) {FactoryGirl.create(:tax_household,  effective_ending_on: nil, household: family.households.first)}
+      let!(:eligibility_determination) {FactoryGirl.create(:eligibility_determination, csr_eligibility_kind: "csr_87", determined_on: TimeKeeper.date_of_record, tax_household: tax_household)}
+      let(:coverage_household) { family.households.first.coverage_households.first }
+      let(:hbx_profile) {FactoryGirl.create(:hbx_profile)}
+      let(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
+      let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
+      let(:benefit_package) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
+      let(:enrollment) {
+        enrollment = household.new_hbx_enrollment_from(
+          consumer_role: person.consumer_role,
+          coverage_household: coverage_household,
+          benefit_package: benefit_package,
+          qle: true
+        )
+        enrollment.save
+        enrollment
+      }
+      let(:hbx_enrollment_members) { enrollment.hbx_enrollment_members}
+      let(:active_year) {TimeKeeper.date_of_record.year}
+
+      before :each do
+        allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
+        allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
+        allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
+      end
+
+      it "should return plans with csr kind when individual market is selected" do
+        decorated_plans = enrollment.decorated_elected_plans('health', enrollment.kind)
+        expect(decorated_plans). to eq (benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, 'health', tax_household))
+      end
+    end
+
+    context "decorated_elected_plans" do
+      let(:benefit_package) { BenefitPackage.new }
+      let(:consumer_role) { FactoryGirl.create(:consumer_role) }
+      let(:person) { double(primary_family: family)}
+      let(:family) { double }
+      let(:enrollment) {
+        enrollment = household.new_hbx_enrollment_from(
+          consumer_role: consumer_role,
+          coverage_household: coverage_household,
+          benefit_package: benefit_package,
+          qle: true
+        )
+        enrollment.save
+        enrollment
+      }
+      let(:hbx_profile) {double}
+      let(:benefit_sponsorship) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months, renewal_benefit_coverage_period: renewal_bcp, current_benefit_coverage_period: bcp) }
+      let(:renewal_bcp) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months) }
+      let(:bcp) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months) }
+      let(:plan) { FactoryGirl.create(:plan) }
+      let(:plan2) { FactoryGirl.create(:plan) }
+      let(:plan1) { FactoryGirl.create(:plan) }
     #   context "decorated_elected_plans" do
     #     let(:benefit_package) {BenefitPackage.new}
     #     let(:consumer_role) {FactoryBot.create(:consumer_role)}
@@ -476,7 +533,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       let(:ivl_enrollment) {FactoryBot.create(:hbx_enrollment, :individual_unassisted, household: family.active_household)}
       let(:existing_shop_enrollment) {FactoryBot.create(:hbx_enrollment, :shop, household: family.active_household)}
       let(:enrollment_for_waiver) {FactoryBot.create(:hbx_enrollment, household: family.active_household, predecessor_enrollment_id: existing_shop_enrollment.id, benefit_group_assignment_id: benefit_group_assignment.id)}
-      
+
       before do
         allow(census_employee).to receive(:benefit_group_assignments).and_return [benefit_group_assignment]
         # allow(package).to receive(:start_on).and_return :start_on_1
@@ -779,6 +836,79 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
         hbx_enrollment.aasm_state = 'inactive'
         expect(hbx_enrollment.can_terminate_coverage?).to eq false
       end
+  describe "when maket type is individual" do
+    let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
+    let(:coverage_household) { family.households.first.coverage_households.first }
+    let(:hbx_profile) {FactoryGirl.create(:hbx_profile)}
+    let(:active_year) {TimeKeeper.date_of_record.year}
+    let(:plan) { Plan.new(active_year: active_year)}
+    let(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
+    let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
+    let(:benefit_package) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
+    let(:enrollment) {
+      enrollment = family.latest_household.new_hbx_enrollment_from(
+          consumer_role: person.consumer_role,
+          coverage_household: coverage_household,
+          benefit_package: benefit_package,
+          qle: true
+      )
+      enrollment.save
+      enrollment
+    }
+    let(:hbx_enrollment_members) { enrollment.hbx_enrollment_members}
+
+    before :each do
+      allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
+      allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
+      allow(enrollment). to receive(:plan).and_return plan
+      allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
+      enrollment.update_attributes!(plan_id: plan.id)
+    end
+
+    context "ivl consumer role with unverified state purchased a plan" do
+      it "should return enrollment status as unverified" do
+        person.consumer_role.update_attribute("aasm_state","unverified")
+        enrollment.select_coverage!
+        enrollment.reload
+        expect(person.consumer_role.aasm_state).to eq "ssa_pending"
+        expect(enrollment.coverage_selected?).to be_falsy
+        expect(enrollment.aasm_state).to eq "unverified"
+      end
+    end
+
+    context "ivl user in fully verified state." do
+      it "should return enrollment status as coverage_selected" do
+        person.consumer_role.update_attribute("aasm_state","fully_verified")
+        enrollment.select_coverage!
+        enrollment.reload
+        expect(person.consumer_role.aasm_state).to eq "fully_verified"
+        expect(enrollment.coverage_selected?).to be_truthy
+        expect(enrollment.aasm_state).to eq "coverage_selected"
+      end
+    end
+
+    context "ivl user in verification outstanding state." do
+      it "should return enrollment status as enrolled_contingent" do
+        person.consumer_role.update_attribute("aasm_state","verification_outstanding")
+        enrollment.move_to_contingent!
+        enrollment.reload
+        expect(enrollment.coverage_selected?).to eq false
+        expect(enrollment.aasm_state).to eq "enrolled_contingent"
+      end
+    end
+  end
+
+  context "can_terminate_coverage?" do
+    let(:hbx_enrollment) {HbxEnrollment.new(
+                            kind: 'employer_sponsored',
+                            aasm_state: 'coverage_selected',
+                            effective_on: TimeKeeper.date_of_record - 10.days
+    )}
+    it "should return false when may not terminate_coverage" do
+      hbx_enrollment.aasm_state = 'inactive'
+      expect(hbx_enrollment.can_terminate_coverage?).to eq false
+    end
 
       context "when may_terminate_coverage is true" do
         before :each do
@@ -2222,6 +2352,24 @@ describe HbxEnrollment, type: :model, :dbclean => :around_each do
             aasm_state: status
             )
         end
+      end
+    end
+  end
+end
+
+describe HbxEnrollment, dbclean: :after_all do
+  let!(:family100) { FactoryGirl.create(:family, :with_primary_family_member) }
+  let!(:enrollment100) { FactoryGirl.create(:hbx_enrollment, household: family100.active_household, kind: "individual") }
+  let!(:plan100) { FactoryGirl.create(:plan) }
+
+  describe "is_an_existing_plan?" do
+    context "for checking if a new plan is similar to the given enr's plan " do
+      it "should return true as the compared plan has similar hios_id and same active year" do
+        expect(enrollment100.is_an_existing_plan?(enrollment100.plan)).to eq true
+      end
+
+      it "should return false as the compared plan has a different hios_id" do
+        expect(enrollment100.is_an_existing_plan?(plan100)).to eq false
       end
     end
   end

@@ -175,6 +175,10 @@ aca:
       days: 95
 
     open_enrollment:
+      start_on: <%= Date.new(2017,11,1) %>
+      end_on: <%= Date.new(2018,02,05) %>
+    dc_resident_application: true
+    transition_family_members_link: true
       start_on: <%= Date.new(2018,11,1) %>
       end_on: <%= Date.new(2019,02,8) %>
       # dc_resident_application: true
@@ -283,6 +287,19 @@ aca:
     - R-MA005
     - R-MA006
     - R-MA007
+
+notices:
+  individual_market:
+    mail_address:
+      address_1: "PO Box 44018"
+      city: "Washington"
+      zip_code: "20026"
+
+  shop_market:
+    mail_address:
+      address_1: "1225 I Street, NW"
+      address_2: "Suite 400"
+      zip_code: "20005"
 
 paper_notice: 'paper-notices'
 # Note: Remote Aceess keys ad URL's Provided by DC checkbook

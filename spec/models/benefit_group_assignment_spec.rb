@@ -271,4 +271,21 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
     it_behaves_like "active and waived enrollments", "coverage_selected", "", "active_enrollment"
     it_behaves_like "active and waived enrollments", "inactive", "", "active_enrollment"
   end
+
+  describe "make_active", dbclean: :after_each do
+    let!(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year)}
+    let(:plan_year) { FactoryGirl.create(:plan_year) }
+    let(:benefit_group_assignment) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group, start_on: TimeKeeper.date_of_record)}
+    let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile_id: plan_year.employer_profile.id, benefit_group_assignments:[benefit_group_assignment])}
+
+    before(:each) do
+      census_employee.benefit_group_assignments.last.update(is_active:false)
+    end
+
+    context "and benefit coverage activity occurs" do
+      it "should update the benfefit group assignment" do
+        expect(census_employee.benefit_group_assignments.first.make_active).to eq(true)
+      end
+    end
+  end
 end

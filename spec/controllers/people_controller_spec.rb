@@ -21,14 +21,14 @@ RSpec.describe PeopleController, dbclean: :after_each do
   end
 
   describe "POST create" do
-    context "with valid attributes" do 
-      it 'should add a new person' do 
+    context "with valid attributes" do
+      it 'should add a new person' do
         expect { post :create, params: {person: FactoryBot.attributes_for(:person)} }.to change(Person,:count).by(0)
       end
     end
 
     context "with invalid attributes"  do
-      it 'should not add a new person' do  
+      it 'should not add a new person' do
         expect { post :create, params: {person: FactoryBot.attributes_for(:person,:with_bad_mailing_address)} }.to_not change(Person,:count)
       end
     end
@@ -53,7 +53,7 @@ RSpec.describe PeopleController, dbclean: :after_each do
       allow(person).to receive(:consumer_role).and_return(consumer_role)
       allow(consumer_role).to receive(:check_for_critical_changes)
       allow(person).to receive(:update_attributes).and_return(true)
-      allow(person).to receive(:has_active_consumer_role?).and_return(false)
+      allow(person).to receive(:is_consumer_role_active?).and_return(false)
       person_attributes[:addresses_attributes] = addresses_attributes
       sign_in user
       post :update, params: {id: person.id, person: person_attributes}
@@ -74,8 +74,8 @@ RSpec.describe PeopleController, dbclean: :after_each do
     context "when individual" do
 
       before do
-        request.headers.merge!(referer: "insured/families/personal")
-        allow(person).to receive(:has_active_consumer_role?).and_return(true)
+        allow(request).to receive(:referer).and_return("insured/families/personal")
+        allow(person).to receive(:is_consumer_role_active?).and_return(true)
       end
       it "update person" do
         allow(consumer_role).to receive(:find_document).and_return(vlp_document)

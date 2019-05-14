@@ -52,4 +52,12 @@ module VlpDoc
     docs_for_status_uploaded = consumer_role.vlp_documents.where(:subject => {"$in" => docs_for_status})
     docs_for_status_uploaded.any? ? docs_for_status_uploaded.order_by(:updated_at => 'desc').first.subject : nil
   end
+
+  def sensitive_info_changed?(role)
+    if role
+      info_changed = role.sensitive_information_changed?(params[:person] || params[:dependent])
+      dc_status = role.person.no_dc_address
+      return info_changed, dc_status
+    end
+  end
 end

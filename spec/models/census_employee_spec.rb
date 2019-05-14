@@ -1400,6 +1400,20 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     end
   end
 
+  context "have_valid_date_for_cobra with current_user" do
+    let(:census_employee100) { FactoryGirl.create(:census_employee) }
+    let(:person100) { FactoryGirl.create(:person, :with_hbx_staff_role) }
+    let(:user100) { FactoryGirl.create(:user, person: person100) }
+
+    it "should return true as the current_user is a valid admin" do
+      expect(census_employee100.have_valid_date_for_cobra?(user100)).to eq true
+    end
+
+    it "should return false as census_employee doesn't meet the requirements" do
+      expect(census_employee100.have_valid_date_for_cobra?).to eq false
+    end
+  end
+
   context "have_valid_date_for_cobra?" do
     let(:hired_on) {TimeKeeper.date_of_record}
     let(:census_employee) {FactoryBot.create :benefit_sponsors_census_employee,

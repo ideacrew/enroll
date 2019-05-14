@@ -47,7 +47,7 @@ class Insured::GroupSelectionController < ApplicationController
     @adapter.if_change_plan_selected(params) do |new_effective_date|
       @new_effective_on = new_effective_date
     end
-    
+
     @waivable = @adapter.can_waive?(@hbx_enrollment, params)
   end
 
@@ -205,6 +205,15 @@ class Insured::GroupSelectionController < ApplicationController
     @adapter.if_resident_role do |res_role|
       @resident_role = res_role
       @role = res_role
+    if @hbx_enrollment.present? && @change_plan == "change_plan"
+      if @hbx_enrollment.kind == "employer_sponsored"
+        @mc_market_kind = "shop"
+      elsif @hbx_enrollment.kind == "coverall"
+        @mc_market_kind = "coverall"
+      else
+        @mc_market_kind = "individual"
+      end
+      @mc_coverage_kind = @hbx_enrollment.coverage_kind
     end
 
     @adapter.if_consumer_role do |c_role|
@@ -212,4 +221,16 @@ class Insured::GroupSelectionController < ApplicationController
       @role = c_role
     end
   end
+
+  def get_values_to_generate_resident_role(person)
+    options = {}
+    options[:is_applicant] = person.consumer_role.is_applicant
+    options[:bookmark_url] = person.consumer_role.bookmark_url
+    options[:is_state_resident] = person.consumer_role.is_state_resident
+    options[:residency_determined_at] = person.consumer_role.residency_determined_at
+    options[:contact_method] = person.consumer_role.contact_method
+    options[:language_preference] = person.consumer_role.language_preference
+    options
+  end
+
 end

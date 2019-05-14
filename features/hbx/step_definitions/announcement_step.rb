@@ -18,7 +18,6 @@ When(/Hbx admin enter announcement info for (.*?)$/) do |role|
   find('#announcement_audiences_ivl').click if role == "ivl"
   find('#announcement_audiences_employee').click if role == "employee"
   expect(page).to have_content "Announcements"
-  sleep 1
   find('.interaction-click-control-create-announcement').click
 end
 
@@ -30,7 +29,6 @@ When(/^Hbx admin enter announcement info with future date for (.*?)$/) do |role|
   find('#announcement_audiences_ivl').click if role == "ivl"
   find('#announcement_audiences_employee').click if role == "employee"
   expect(page).to have_content "Announcements"
-  sleep 1
   find('.interaction-click-control-create-announcement').click
 end
 
@@ -66,7 +64,6 @@ When(/^Hbx admin click the link of all$/) do
 end
 
 Then(/^Hbx admin should see the future announcement$/) do
-  sleep 3
   expect(page).to have_content('announcement for future')
 end
 
@@ -85,6 +82,8 @@ end
 Given(/^Consumer role exists$/) do
   user = FactoryBot.create :user, :with_family, :consumer, email: 'consumer@dc.gov', password: '1qaz@WSX', password_confirmation: '1qaz@WSX' ,identity_final_decision_code: 'acc'
   FactoryBot.create(:consumer_role, person: user.person)
+  user.person.individual_market_transitions << FactoryGirl.create(:individual_market_transition)
+  user.person.save!
 end
 
 Given(/^Employer role exists$/) do
