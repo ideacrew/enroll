@@ -22,7 +22,7 @@ describe 'ModelEvents::GroupTerminationConfirmationNotice', dbclean: :around_eac
             expect(model_event).to have_attributes(:event_key => :group_termination_confirmation_notice, :klass_instance => model_instance, :options => {})
           end
         end
-        model_instance.terminate_plan_year(end_on, TimeKeeper.date_of_record, 'nonpayment', false)
+        model_instance.terminate_plan_year(end_on, TimeKeeper.date_of_record, 'nonpayment', false, "nonpayment" )
       end
     end
   end
