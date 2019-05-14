@@ -12,6 +12,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   around_action :wrap_in_benefit_group_cache, only: [:show]
   skip_before_action :verify_authenticity_token, only: [:show], if: :check_origin?
   before_action :updateable?, only: [:create, :update]
+  before_action :modify_admin_tabs?, only: %i[terminate_employee_roster_enrollments]
   layout "two_column", except: [:new]
 
   def link_from_quote
@@ -296,8 +297,24 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   def redirect_to_first_allowed
     redirect_to employers_employer_profile_path(:id => current_user.person.employer_staff_roles.first.employer_profile_id)
   end
+  
+  def terminate_employee_roster_enrollments
+    employer_profile = EmployerProfile.find(params["employer_profile_id"])
+    if employer_profile.active_plan_year.present?
+      employer_profile.terminate_roster_enrollments(terminate_employee_roster_enrollments_params)
+      flash[:notice] = "Successfully terminated employee enrollments."
+    else
+      flash[:error] = "No Active Plan Year present, unable to terminate employee enrollments."
+    end
+
+    redirect_to employers_employer_profile_path(employer_profile) + "?tab=employees"
+  end
 
   private
+
+  def modify_admin_tabs?
+    authorize EmployerProfile, :modify_admin_tabs?
+  end
 
   def updateable?
     authorize EmployerProfile, :updateable?
@@ -328,8 +345,8 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     status_params = params.permit(:id, :status, :search)
     @status = status_params[:status] || 'active'
     @search = status_params[:search] || false
-    #@avaliable_employee_names ||= @employer_profile.census_employees.sorted.map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
-    #@avaliable_employee_names ||= @employer_profile.census_employees.where(last_name: => /^#{page_no}/i).limit(20).map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
+    #@available_employee_names ||= @employer_profile.census_employees.sorted.map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
+    #@available_employee_names ||= @employer_profile.census_employees.where(last_name: => /^#{page_no}/i).limit(20).map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
 
     census_employees = case @status
                        when 'terminated'
@@ -350,7 +367,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     if params[:page].present?
       page_no = cur_page_no(@page_alphabets.first)
       @census_employees = census_employees.where("last_name" => /^#{page_no}/i).page(params[:pagina])
-      #@avaliable_employee_names ||= @census_employees.limit(20).map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
+      #@available_employee_names ||= @census_employees.limit(20).map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
     else
       @total_census_employees_quantity = census_employees.count
       @census_employees = census_employees.limit(20).to_a
@@ -475,6 +492,10 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 #    end
 #    printer = RubyProf::MultiPrinter.new(prof_result)
 #    printer.print(:path => File.join(Rails.root, "rprof"), :profile => "profile")
+  end
+
+  def terminate_employee_roster_enrollments_params
+    params.permit(:employer_profile_id, :termination_date, :termination_reason, :transmit_xml)
   end
 
   def employer_params
