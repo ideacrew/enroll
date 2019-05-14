@@ -110,14 +110,6 @@ plan_option_descriptions:
   dental:
     single_plan: "For Dental coverage, you will choose one dental plan from one carrier as the option that all of your employees can enroll in."
 
-notices:
-  mailing_address:
-    address_1:
-    address_2:
-    city:
-    state: "MA"
-    zip:
-
   shop:
     attachments:
       envelope_without_address: "ma_envelope_without_address.pdf"
@@ -131,8 +123,6 @@ invoices:
   addendum: 'ma_non_discrimination_and_language_tags.pdf'
 
 aca:
-  state_name: "Massachusetts"
-  state_abbreviation: "MA"
   state_key : "dc"
   state_name: "District of Columbia"
   state_abbreviation: "DC"
@@ -179,8 +169,6 @@ aca:
       end_on: <%= Date.new(2018,02,05) %>
     dc_resident_application: true
     transition_family_members_link: true
-      start_on: <%= Date.new(2018,11,1) %>
-      end_on: <%= Date.new(2019,02,8) %>
       # dc_resident_application: true
       # transition_family_members_link: true
     upcoming_open_enrollment:
