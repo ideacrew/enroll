@@ -9,6 +9,7 @@ module BenefitSponsors
       attribute :kind, String
       attribute :product_option_choice, String
       attribute :product_package_kind, String, default: Settings.aca.default_dental_option_kind
+      attribute :elected_product_choices, Array # used for dental choice model
       
       # for employee cost details
       attribute :employees_cost, Array[EmployeeCostForm]
@@ -33,7 +34,9 @@ module BenefitSponsors
 
       attr_accessor :sponsor_contribution, :service, :catalog
 
-      validates_presence_of :product_package_kind, :product_option_choice, :reference_plan_id, :sponsor_contribution
+      validates_presence_of :product_package_kind, :reference_plan_id, :sponsor_contribution
+
+      validate :check_product_option_choice
 
       def sponsor_contribution_attributes=(attributes)
         attributes.permit! if attributes.is_a?(ActionController::Parameters)
@@ -53,6 +56,10 @@ module BenefitSponsors
         #form.sponsored_benefit = BenefitSponsors::Forms::SponsoredBenefitForm.new(kind: params[:kind])
         form.service = resolve_service(params)
         form.service.load_form_meta_data(form)
+      end
+
+      def load_meta_data
+        service.load_form_meta_data(self)
       end
 
       def self.resolve_service(attrs={})
@@ -135,6 +142,12 @@ module BenefitSponsors
         atts.each_pair do |k, v|
           self.send("#{k}=".to_sym, v)
         end
+      end
+
+      def check_product_option_choice
+        return true if product_package_kind == 'multi_product'
+
+        errors.add(:base, "product option choice can't be blank") if product_option_choice.blank?
       end
     end
   end

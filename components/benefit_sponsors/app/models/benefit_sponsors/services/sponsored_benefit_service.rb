@@ -42,6 +42,7 @@ module BenefitSponsors
 
       def store(form, sponsored_benefit)
         valid_according_to_factory = factory.validate(sponsored_benefit)
+
         if valid_according_to_factory
           return true if sponsored_benefit.save && package.save
           map_errors_for(sponsored_benefit, onto: form)
@@ -125,7 +126,9 @@ module BenefitSponsors
           reference_plan_id: sponsored_benefit.reference_product_id,
           reference_product: reference_product_attributes_to_form_params(sponsored_benefit.reference_product),
           sponsor_contribution_attributes: sponsor_contribution_attributes_to_form_params(sponsored_benefit.sponsor_contribution)
-        }
+        }.tap do |attrs|
+          attrs[:elected_product_choices] = sponsored_benefit.elected_product_choices if kind == 'dental'
+        end
       end
 
       def sponsor_contribution_attributes_to_form_params(sponsor_contribution)
@@ -168,11 +171,11 @@ module BenefitSponsors
       end
 
       def form_params_to_attributes(form)
-        attributes = sanitize_params(
-          form.attributes.slice(
-            :id, :kind, :product_option_choice, :product_package_kind, :reference_plan_id
-          )
-        )
+        fields = [:id, :kind, :product_option_choice, :product_package_kind, :reference_plan_id].tap do |attrs|
+          attrs << :elected_product_choices if kind == 'dental'
+        end
+
+        attributes = sanitize_params(form.attributes.slice(*fields))
 
         if form.sponsor_contribution.present?
           attributes.merge!({
