@@ -89,11 +89,17 @@ module BenefitSponsors
       end
 
       def plan_options_for(option_kind)
-        name_and_id_hash = {}
-        Hash[plan_options[option_kind].sort_by { |k, v| k }].each do |k, v|
-          name_and_id_hash[k] = (option_kind == :multi_product ? v.first["id"].to_s : v.first["issuer_id"].to_s)
+        if option_kind == :multi_product
+          plan_options[option_kind].inject({}) do |data, product|
+            data[product.id.to_s] = product
+            data
+          end
+        else
+          Hash[plan_options[option_kind].sort_by { |carrier_name, _products| carrier_name }].inject({}) do |data, (_carrier_name, products)|
+            data[products[0]["issuer_id"].to_s] = products[0]
+            data
+          end
         end
-        name_and_id_hash
       end
 
       # def single_issuer_options
@@ -123,7 +129,7 @@ module BenefitSponsors
           end
           @products[product_package.package_kind] = case product_package.package_kind
             when :multi_product
-              package_products.group_by(&:title) #package_products
+              package_products
             else
               package_products.group_by(&:carrier_name)
             end
