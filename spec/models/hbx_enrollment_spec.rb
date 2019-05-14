@@ -322,6 +322,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     #       expect(@enrollment7.aasm_state).to eq "shopping"
     #     end
     #   end
+    end
 
     context "when maket type is individual" do
       let(:person) { FactoryBot.create(:person, :with_consumer_role)}
@@ -461,7 +462,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     #       end
     #     end
     #   end
-
+    end
       context "status_step" do
         let(:hbx_enrollment) {HbxEnrollment.new}
 
