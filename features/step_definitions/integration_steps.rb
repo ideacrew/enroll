@@ -210,7 +210,7 @@ end
 Given(/^Hbx Admin Tier 3 exists$/) do
   p_staff=Permission.create(name: 'hbx_tier3', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
                             send_broker_agency_message: true, can_view_username_and_email: true, approve_broker: true, approve_ga: true,
-                            modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true)
+                            modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true,view_the_configuration_tab: true, can_submit_time_travel_request: false)
   person = people['Hbx Admin Tier 3']
   hbx_profile = FactoryGirl.create :hbx_profile
   user = FactoryGirl.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
@@ -219,8 +219,8 @@ end
 
 Given(/^Hbx Admin exists$/) do
   p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
-      send_broker_agency_message: true, approve_broker: true, approve_ga: true,
-      modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true)
+                            send_broker_agency_message: true, approve_broker: true, approve_ga: true, modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true,
+                            view_the_configuration_tab: true, can_submit_time_travel_request: false)
   person = people['Hbx Admin']
   hbx_profile = FactoryGirl.create :hbx_profile
   user = FactoryGirl.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
@@ -233,9 +233,10 @@ Given(/^Hbx Admin exists$/) do
 end
 
 Given(/^a Hbx admin with read and write permissions and broker agencies$/) do
-  p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
-      send_broker_agency_message: true, approve_broker: true, approve_ga: true,
-      modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true)
+  p_staff = Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true,
+                              list_enrollments: true, send_broker_agency_message: true, approve_broker: true,
+                              approve_ga: true, modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true,
+                              view_the_configuration_tab: true, can_submit_time_travel_request: false)
   person = people['Hbx AdminEnrollments']
   hbx_profile = FactoryGirl.create :hbx_profile
   user = FactoryGirl.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
@@ -250,8 +251,9 @@ end
 Given(/^a Hbx admin with read and write permissions exists$/) do
   #Note: creates an enrollment for testing purposes in the UI
   p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
-      send_broker_agency_message: true, approve_broker: true, approve_ga: true,
-      modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_access_outstanding_verification_sub_tab: true)
+                            send_broker_agency_message: true, approve_broker: true, approve_ga: true,
+                            modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_access_outstanding_verification_sub_tab: true,
+                            view_the_configuration_tab: true, can_submit_time_travel_request: false)
   person = people['Hbx Admin']
   hbx_profile = FactoryGirl.create :hbx_profile
   user = FactoryGirl.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
@@ -261,15 +263,54 @@ end
 
 Given(/^a Hbx admin with super admin access exists$/) do
   #Note: creates an enrollment for testing purposes in the UI
-  p_staff = Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
-      send_broker_agency_message: true, approve_broker: true, approve_ga: true,
-      modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_complete_resident_application: true)
+  p_staff = Permission.create(name: 'super_admin', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
+                              send_broker_agency_message: true, approve_broker: true, approve_ga: true,
+                              modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_complete_resident_application: true,
+                              view_the_configuration_tab: true, can_submit_time_travel_request: false)
   person = people['Hbx Admin']
   hbx_profile = FactoryGirl.create :hbx_profile, :no_open_enrollment_coverage_period
   user = FactoryGirl.create :user, :with_family, :with_hbx_staff_role, email: person[:email], password: person[:password], password_confirmation: person[:password]
   FactoryGirl.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
   FactoryGirl.create :hbx_enrollment, household:user.primary_family.active_household
 end
+
+When(/^a Super_Admin signs in to the Hbx Portal$/) do
+  visit "/users/sign_in"
+  fill_in "user[login]", :with => person[:email]
+  find('#user_login').set(person[:email])
+  fill_in "user[password]", :with => person[:password]
+  #TODO: this fixes the random login fails b/c of empty params on email
+  find('.interaction-click-control-sign-in').click
+  visit exchanges_hbx_profiles_root_path
+end
+
+Given(/^the user is on the Main Page$/) do
+  visit exchanges_hbx_profiles_root_path
+  expect(current_path).to eq exchanges_hbx_profiles_root_path
+end
+
+Then(/^the user will see the Config tab$/) do
+  expect(page).to have_content('Config')
+end
+
+Given(/^the user goes to the Config Page$/) do
+  click_link 'Config'
+  expect(page).to have_content('Configuration')
+end
+
+Then(/^the user will not see the Time Tavel option$/) do
+  expect(page).to have_button('Set Current Date', disabled: true)
+end
+
+Then(/^the user will see the Time Tavel option$/) do
+  expect(page).to have_button('Set Current Date', disabled: "")
+end
+
+When(/^the user with a HBX staff role updates permisssions to time travel and super admin$/) do
+  User.first.person.hbx_staff_role.permission.update_attributes!(can_submit_time_travel_request: true, name: "super_admin")
+end
+
+
 
 Given(/^a Hbx admin with read only permissions exists$/) do
   #Note: creates an enrollment for testing purposes in the UI
@@ -450,11 +491,9 @@ end
 
 When(/^(.*) logs on to the (.*)?/) do |named_person, portal|
   person = people[named_person]
-
   visit "/"
   portal_class = "interaction-click-control-#{portal.downcase.gsub(/ /, '-')}"
   portal_uri = find("a.#{portal_class}")["href"]
-
   visit "/users/sign_in"
   fill_in "user[login]", :with => person[:email]
   find('#user_login').set(person[:email])

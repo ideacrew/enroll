@@ -26,6 +26,18 @@ class DefinePermissions < MigrationTask
     Person.where(hbx_staff_role: {:$exists => true}).all.each{|p|p.hbx_staff_role.update_attributes(permission_id: permission.id, subrole:'hbx_staff')}
   end
 
+  def time_travel_permissions
+    Permission.find_or_initialize_by(name: 'hbx_staff').update_attributes!(can_submit_time_travel_request: false, list_enrollments: true)
+    Permission.find_or_initialize_by(name: 'hbx_read_only').update_attributes!(view_the_configuration_tab: true, can_submit_time_travel_request: false)
+    Permission.find_or_initialize_by(name: 'hbx_csr_supervisor').update_attributes!(view_the_configuration_tab: true, can_submit_time_travel_request: false)
+    Permission.find_or_initialize_by(name: 'hbx_tier3').update_attributes!(view_the_configuration_tab: true, can_submit_time_travel_request: false)
+    Permission.find_or_initialize_by(name: 'hbx_csr_tier2').update_attributes!(view_the_configuration_tab: true, can_submit_time_travel_request: false)
+    Permission.find_or_initialize_by(name: 'hbx_csr_tier1').update_attributes!(view_the_configuration_tab: true,  can_submit_time_travel_request: false)
+    Permission.find_or_initialize_by(name: 'developer').update_attributes!(view_the_configuration_tab: true, can_submit_time_travel_request: false)
+    Permission.find_or_initialize_by(name: 'super_admin').update_attributes!(view_the_configuration_tab: true,can_submit_time_travel_request: false)
+    puts 'permissions updated'
+  end
+  
   def build_test_roles
     User.where(email: /themanda.*dc.gov/).delete_all
     Person.where(last_name: /^amanda\d+$/).delete_all

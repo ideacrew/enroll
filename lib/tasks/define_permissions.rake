@@ -115,7 +115,13 @@ namespace :permissions do
   DefinePermissions.define_task :hbx_admin_can_change_fein => :environment
 end
 
+namespace :permissions do
+  desc 'updating time travel permissions'
+  DefinePermissions.define_task :time_travel_permissions => :environment
+end
+
 #RAILS_ENV=production bundle exec rake permissions:initial_hbx
+#RAILS_ENV=production bundle exec rake permissions:time_travel_permissions
 #RAILS_ENV=production bundle exec rake permissions:migrate_hbx
 #RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_update_ssn
 #RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_complete_resident_application

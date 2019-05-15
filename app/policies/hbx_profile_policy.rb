@@ -10,23 +10,24 @@ class HbxProfilePolicy < ApplicationPolicy
     role.permission.modify_admin_tabs
   end
 
+  def send_broker_agency_message?
+    return true unless role = user.person.hbx_staff_role
+    role.permission.send_broker_agency_message
+  end
+
   def view_the_configuration_tab?
-    role = user_hbx_staff_role
+    role = user.person.hbx_staff_role
     return false unless role
     role.permission.view_the_configuration_tab
   end
 
   def can_submit_time_travel_request?
-    role = user_hbx_staff_role
+    role = user.person.hbx_staff_role
     return false unless role
     return false unless role.permission.name == "super_admin"
     role.permission.can_submit_time_travel_request
   end
 
-  def send_broker_agency_message?
-    return true unless role = user.person.hbx_staff_role
-    role.permission.send_broker_agency_message
-  end
 
   def approve_broker?
     return true unless role = user.person.hbx_staff_role
