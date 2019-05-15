@@ -1,5 +1,21 @@
 - is_new_benefit = @sponsored_benefit_form.is_new_benefit
 = f.hidden_field :is_new_benefit, value: f.object.is_new_benefit
+
+- if !is_new_benefit && !is_new_benefit.nil?
+    #scEdit
+        = f.fields_for :sponsor_contribution, f.object.sponsor_contribution, errors: {}, fieldset: false do |sc|
+            = render "./ui-components/v1/cards/sponsor_contributions", f: sc
+    br
+    br
+
+- if !is_new_benefit && !is_new_benefit.nil?
+
+    #referencePlanEdit
+        = render "./ui-components/v1/cards/reference_plan", f: f
+        i.fas.fa-info-circle.mr-1 
+        | Your final monthly cost is based on final enrollment.
+    br
+    br
      
 #metal-level-select.card style="margin-bottom:20px"
 	.card-body
@@ -34,6 +50,10 @@
                                             span.plan-label Level: 
                                             span.rp-plan-info= product.metal_level_kind
                                             br/
+                                            span.plan-label Network:
+                                            span.rp-plan-info= product.network_information
+                                            br/
+                                            span.checkmark
                         - else
                             .col-xs-3.plans
                                 .col-xs-12 style="min-height:130px"
@@ -61,7 +81,8 @@
 
             #yourSponsorContributions
             #yourReferencePlanDetails
-	
+
+/ = render "products"
 = render "employee_costs_modal"
 
 - if !is_new_benefit && !is_new_benefit.nil?
@@ -69,6 +90,15 @@
     window.onload = function() {
       document.getElementById('metal-level-select').classList.add('hidden');
       loadEmployeeCosts();
+    }
+
+    function showPlanSelection() {
+      // document.getElementById('planSelection').classList.remove('hidden');
+      document.getElementById('referencePlanEdit').classList.add('hidden');
+      document.getElementById('scEdit').remove();
+      document.getElementById('metal-level-select').classList.remove('hidden');
+      document.getElementById('saveBenefitPackage').classList.add('hidden');
+      document.getElementById('submitDentalBenefits').classList.remove('hidden');
     }
 
     function loadEmployeeCosts() {
@@ -80,16 +110,17 @@
 
       var tr = document.createElement('tr')
       var estimate = #{@sponsored_benefit_form.employees_cost.to_json.html_safe};
-      var productOptionKind = 'single_product';
+      var productOptionKind = 'multi_product';
       var productsTotal;
       var planOptions = #{@sponsored_benefit_form.catalog.plan_options.to_json.html_safe};
       var element = document.querySelector("input[name='sponsored_benefits[reference_plan_id]']:checked");
-      var selectedName = element.dataset.carrierName;
-      var planTitle = element.dataset.planTitle;
-      filteredProducts = planOptions[productOptionKind][selectedName];
+
+      // var selectedName = element.dataset.carrierName;
+      // var planTitle = element.dataset.planTitle;
+      // filteredProducts = planOptions[productOptionKind][selectedName];
       
       document.getElementById('planOfferingsTitle').innerHTML = '';
-      document.getElementById('planOfferingsTitle').append(`Plan Offerings - ${planTitle} (${filteredProducts.length})`)
+      // document.getElementById('planOfferingsTitle').append(`Plan Offerings - ${planTitle} (${filteredProducts.length})`)
 
       tr.innerHTML =
         `
@@ -483,7 +514,7 @@ javascript:
       }
     })
 
-    if (document.getElementById('sponsored_benefits_is_new_benefit').value == "true") {
+    // if (document.getElementById('sponsored_benefits_is_new_benefit').value == "true") {
       if (eeContribution < erCL) {
         disableNewPlanYearButton()
       } else if (spouse < familyCL || domesticPartner < familyCL || childUnder26 < familyCL) {
@@ -493,7 +524,7 @@ javascript:
       } else {
         enableNewPlanYearButton()
       }
-    }
+    // }
 
     displayReferencePlanDetails(document.querySelector("input[name='sponsored_benefits[reference_plan_id]']:checked"));
   }
