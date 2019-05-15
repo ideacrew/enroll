@@ -7,7 +7,7 @@ module Notifier
 
       attribute :start_on, String
       attribute :title, String
-      attribute :sponsored_benefit, Array[MergeDataModels::SponsoredBenefit]
+      attribute :sponsored_benefits, Array[MergeDataModels::SponsoredBenefit]
 
       def self.stubbed_object
         benefit_package = Notifier::MergeDataModels::BenefitPackage.new({start_on: '12/1/2018',

@@ -125,7 +125,9 @@ notices:
       employee_appeal_rights: "ma_employee_appeal_rights.pdf"
     partials:
       template: "notifier/notice_kinds/template.html.erb"
-      header: "notifier/notice_kinds/header_with_page_numbers.html.erb"
+      header: "notices/shared/shop_header.html.erb"
+      footer: "notices/shared/shop_footer.html.erb"
+      layout: "notifier/pdf_layout.html.erb"
 
 invoices:
   addendum: 'ma_non_discrimination_and_language_tags.pdf'
