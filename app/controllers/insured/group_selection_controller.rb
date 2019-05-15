@@ -98,7 +98,7 @@ class Insured::GroupSelectionController < ApplicationController
     broker_role = current_user.person.broker_role
     hbx_enrollment.broker_agency_profile_id = broker_role.broker_agency_profile_id if broker_role
 
-    hbx_enrollment.validate_for_cobra_eligiblity(@employee_role)
+    hbx_enrollment.validate_for_cobra_eligiblity(@employee_role, current_user)
 
     if hbx_enrollment.save
       @adapter.assign_enrollment_to_benefit_package_assignment(@employee_role, hbx_enrollment)
