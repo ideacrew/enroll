@@ -787,7 +787,7 @@ class ConsumerRole
   end
 
   def sensitive_information_changed?(person_params)
-    person_params.select{|k,v| VERIFICATION_SENSITIVE_ATTR.include?(k) }.any?{|field,v| sensitive_information_changed(field, person_params)}
+    person_params.permit!.to_h.select{|k,v| VERIFICATION_SENSITIVE_ATTR.include?(k) }.any?{|field,v| sensitive_information_changed(field, person_params)}
   end
 
   def check_for_critical_changes(family, opts)
@@ -1111,7 +1111,7 @@ class ConsumerRole
 
   def sensitive_information_changed(field, person_params)
     if field == "dob"
-      person.send(field) != Date.strptime(person_params[field], "%Y-%m-%d")
+      person.send(field) != Date.strptime(person_params[field].gsub('/', '-'), "%Y-%m-%d")
     elsif field == "ssn"
       person.send(field).to_s != person_params[field].tr("-", "")
     else
