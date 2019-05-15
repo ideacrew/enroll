@@ -65,11 +65,12 @@ describe FakesController do
   context "#sensitive_info_changed?" do
 
     let(:person_params) { { person:  { no_dc_address: "true" } } }
+    let(:params) { ActionController::Parameters.new(person_params)}
 
     let(:person) { FactoryBot.create(:person, :with_consumer_role, :no_dc_address => false)}
 
     before do
-      allow(subject).to receive(:params).and_return person_params
+      allow(subject).to receive(:params).and_return params
     end
 
     it "should return true for info_changed if sensitive_information changed" do

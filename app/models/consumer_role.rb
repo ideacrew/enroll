@@ -776,18 +776,12 @@ class ConsumerRole
     self.application_validation == "na"
   end
 
-  def check_for_critical_changes(person_params, family)
-    if person_params.select{|k,v| VERIFICATION_SENSITIVE_ATTR.include?(k) }.any?{|field,v| sensitive_information_changed(field, person_params)}
-      redetermine_verification!(verification_attr) if family.person_has_an_active_enrollment?(person)
-    end
-  end
-
   def native_with_ssn?
     is_native? && ssn_applied?
   end
 
   def sensitive_information_changed?(person_params)
-    person_params.permit!.to_h.select{|k,v| VERIFICATION_SENSITIVE_ATTR.include?(k) }.any?{|field,v| sensitive_information_changed(field, person_params)}
+    person_params.select{|k,v| VERIFICATION_SENSITIVE_ATTR.include?(k) }.any?{|field,v| sensitive_information_changed(field, person_params)}
   end
 
   def check_for_critical_changes(family, opts)

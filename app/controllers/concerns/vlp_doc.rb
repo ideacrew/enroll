@@ -55,7 +55,8 @@ module VlpDoc
 
   def sensitive_info_changed?(role)
     if role
-      info_changed = role.sensitive_information_changed?(params[:person] || params[:dependent])
+      params_hash = params.permit!.to_h
+      info_changed = role.sensitive_information_changed?(params_hash[:person] || params_hash[:dependent])
       dc_status = role.person.no_dc_address
       return info_changed, dc_status
     end
