@@ -6,11 +6,21 @@ import 'bootstrap';
 import 'jquery-ui';
 import '../css/application.scss';
 import '@fortawesome/fontawesome-free';
-import '@fortawesome/fontawesome-free/scss/solid.scss';
-import '@fortawesome/fontawesome-free/scss/fontawesome.scss';
+import '@fortawesome/fontawesome-free/js/solid.js';
+import '@fortawesome/fontawesome-free/js/regular.js';
+import '@fortawesome/fontawesome-free/js/brands.js';
+import '@fortawesome/fontawesome-free/js/fontawesome.js';
+import '@fortawesome/fontawesome-free/svgs/regular/copyright.svg';
+import '@fortawesome/fontawesome-free/svgs/regular/envelope.svg';
+import '@fortawesome/fontawesome-free/svgs/solid/phone.svg';
+import '@fortawesome/fontawesome-free/svgs/solid/question.svg';
+
 
 Rails.start()
 Turbolinks.start()
+
+const importAll = (r) => r.keys().map(r)
+importAll(require.context('../images', false, /\.(png|jpe?g|svg|ico)$/));
 
 const application = Application.start()
 const context = require.context("controllers", true, /.js$/)
