@@ -20,18 +20,18 @@ describe AddPlantoEnrollment do
 
 
     before(:each) do
-      allow(ENV).to receive(:[]).with("enrollment_id").and_return(hbx_enrollment._id)
-      allow(ENV).to receive(:[]).with("plan_id").and_return(plan._id)
       hbx_enrollment.update(plan_id:'', carrier_profile_id:'')
     end
 
     it "should add a plan to enrollment" do
-      expect(hbx_enrollment.plan_id).to eq nil
-      expect(hbx_enrollment.carrier_profile_id).to eq nil
-      subject.migrate
-      hbx_enrollment.reload
-      expect(hbx_enrollment.plan_id).to eq plan.id
-      expect(hbx_enrollment.carrier_profile_id).to eq plan.carrier_profile_id
+      ClimateControl.modify :enrollment_id => hbx_enrollment._id, :plan_id => plan._id do
+        expect(hbx_enrollment.plan_id).to eq nil
+        expect(hbx_enrollment.carrier_profile_id).to eq nil
+        subject.migrate
+        hbx_enrollment.reload
+        expect(hbx_enrollment.plan_id).to eq plan.id
+        expect(hbx_enrollment.carrier_profile_id).to eq plan.carrier_profile_id
+      end
     end
   end
 end
