@@ -90,7 +90,7 @@ RSpec.describe CarrierProfile, :type => :model, dbclean: :after_each do
       end
 
       it "should return associated_carrier_profile" do
-        expect(carrier_profile.associated_carrier_profile).to be_a CarrierProfile
+        carrier_profile.associated_carrier_profile.should be_an_instance_of CarrierProfile
         expect(carrier_profile.associated_carrier_profile).to eq associated_carrier_profile
       end
 
