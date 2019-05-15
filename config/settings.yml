@@ -246,7 +246,7 @@ aca:
 
     open_enrollment:
       monthly_start_on: 1
-      monthly_end_on: 20
+      monthly_end_on: 10
 
       minimum_length:
         days: 5
