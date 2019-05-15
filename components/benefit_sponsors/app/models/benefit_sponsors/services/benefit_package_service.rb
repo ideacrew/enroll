@@ -35,7 +35,7 @@ module BenefitSponsors
               estimator = ::BenefitSponsors::Services::SponsoredBenefitCostEstimationService.new
               costs = estimator.calculate_estimates_for_package_edit(benefit_package.benefit_application, sponsored_benefit, sponsored_benefit.reference_product, sponsored_benefit.product_package)
             end
-            sponsored_benefit_form.employer_estimated_monthly_cost = costs.present? ? costs[:estimated_total_cost] : 0.00
+            sponsored_benefit_form.employer_estimated_monthly_cost = costs.present? ? costs[:estimated_sponsor_exposure] : 0.00
             sponsored_benefit_form.employer_estimated_min_monthly_cost = costs.present? ? costs[:estimated_enrollee_minimum] : 0.00
             sponsored_benefit_form.employer_estimated_max_monthly_cost = costs.present? ? costs[:estimated_enrollee_maximum] : 0.00
           end
