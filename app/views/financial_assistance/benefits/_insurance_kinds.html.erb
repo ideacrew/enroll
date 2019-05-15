@@ -1,6 +1,6 @@
 <div class="instruction-row row row-form-wrapper no-buffer row-height">
 	<div class="col-md-9 checklist-title">
-		<span> <b> <%= text %> </b></span>
+		<span> <b class="run-glossary"> <%= text %> </b></span>
 	</div>
 </div>
 <div class="instruction-row row row-form-wrapper lightgray no-buffer row-height">
@@ -16,7 +16,7 @@
     <div class="row row-form-wrapper radio-align fa-text-color lightgray no-buffer row-height">
       <div class="col-md-10 benefits-check">
         <%=check_box_tag "insurance_kind", insurance_kind, @applicant.benefits.where(kind: kind).of_insurance_kind(insurance_kind).present?, class: "benefit-checkbox" %> &nbsp
-        <%= FinancialAssistance::Benefit::INSURANCE_TYPE[insurance_kind.to_sym] %>
+        <span class="run-glossary"> <%= FinancialAssistance::Benefit::INSURANCE_TYPE[insurance_kind.to_sym] %> </span>
       </div>
     </div>
 

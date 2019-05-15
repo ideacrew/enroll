@@ -34,7 +34,7 @@
     </div>
     <br />
 
-    <div class='benefit-kinds run-glossary', id='enrolled-benefit-kinds'>
+    <div class='benefit-kinds', id='enrolled-benefit-kinds'>
       <%= render partial: 'financial_assistance/benefits/insurance_kinds', locals: { insurance_kinds: FinancialAssistance::Benefit::INSURANCE_KINDS, kind: "is_enrolled", text: "What type of coverage is this person currently enrolled in? *"} %>
     </div>
     <br/><br/>
@@ -61,7 +61,7 @@
     </div>
     <br />
 
-    <div class='benefit-kinds run-glossary', id='eligible-benefit-kinds'>
+    <div class='benefit-kinds', id='eligible-benefit-kinds'>
       <%= render partial: 'financial_assistance/benefits/insurance_kinds', locals: { insurance_kinds: FinancialAssistance::Benefit::INSURANCE_KINDS, kind: "is_eligible", text: "What type of coverage does this person have access to?"} %>
     </div>
 
