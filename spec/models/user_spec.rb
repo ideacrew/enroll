@@ -191,7 +191,7 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
       it "should build person" do
         user = User.new(**params)
         user.instantiate_person
-        expect(user.person).to be_an_instance_of Person
+        user.person.should be_an_instance_of Person
       end
     end
   end
