@@ -11,15 +11,13 @@
     if account.broker_role_id.to_s != broker_account.writing_agent_id.to_s
       if account.update_attributes(broker_role_id: broker_account.writing_agent_id)
         puts "Success - account #{id} GA-#{account.general_agency_profile.legal_name} BROKER-#{account.broker_role.broker_agency_profile.legal_name} ER-#{account.employer_profile.legal_name} -> Fixed GA Account(which has 1 of each type)"
-        next
       else
         puts "Failure - account #{id} GA-#{account.general_agency_profile.legal_name} BROKER-#{account.broker_role.broker_agency_profile.legal_name} ER-#{account.employer_profile.legal_name} -> Smashed Account Save failed"
-        next
       end
     else
       puts "Failure - account #{id} GA-#{account.general_agency_profile.legal_name} BROKER-#{account.broker_role.broker_agency_profile.legal_name} ER-#{account.employer_profile.legal_name} -> Smashed Accounts!"
-      next
     end
+    next
   end
 
   if !employer_profile.broker_agency_accounts.any? {|broker_account| broker_account.writing_agent_id.to_s == account.broker_role_id.to_s }
@@ -32,19 +30,13 @@
       end
       if account.update_attributes(broker_role_id: broker_account.writing_agent_id)
         puts "Success: account #{id} GA-#{account.general_agency_profile.legal_name} BROKER-#{account.broker_role.broker_agency_profile.legal_name} ER-#{account.employer_profile.legal_name} -> Updated Broker Role on GA account"
-        next
       else
         puts "Failure: account #{id} GA-#{account.general_agency_profile.legal_name} BROKER-#{account.broker_role.broker_agency_profile.legal_name} ER-#{account.employer_profile.legal_name} -> Failed to update Broker Role on GA account"
-        next
       end
+    elsif account.update_attributes(aasm_state: "inactive")
+      puts "Success: account #{id} GA-#{account.general_agency_profile.legal_name} BROKER-#{account.broker_role.broker_agency_profile.legal_name} ER-#{account.employer_profile.legal_name} -> No active broker assigned. Changed GA account status to inactive"
     else
-      if account.update_attributes(aasm_state: "inactive")
-        puts "Success: account #{id} GA-#{account.general_agency_profile.legal_name} BROKER-#{account.broker_role.broker_agency_profile.legal_name} ER-#{account.employer_profile.legal_name} -> No active broker assigned. Changed GA account status to inactive"
-        next
-      else
-        puts "Failure: account #{id} GA-#{account.general_agency_profile.legal_name} BROKER-#{account.broker_role.broker_agency_profile.legal_name} ER-#{account.employer_profile.legal_name} -> No active broker assigned. GA account status to inactive failed"
-        next
-      end
+      puts "Failure: account #{id} GA-#{account.general_agency_profile.legal_name} BROKER-#{account.broker_role.broker_agency_profile.legal_name} ER-#{account.employer_profile.legal_name} -> No active broker assigned. GA account status to inactive failed"
     end
   else
     puts "Nothing to fix -- #{id}"
