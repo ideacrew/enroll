@@ -19,7 +19,7 @@ module Notifier
                                                                              reference_product_name: 'Blue Cross Blue Shieldd HMO',
                                                                              reference_product_carrier_name: 'BCBS'})
 
-        sponsored_benefits.sponsor_contribution = Notifier::MergeDataModels::SponsorContribution.stubbed_object
+        sponsored_benefit.sponsor_contribution = Notifier::MergeDataModels::SponsorContribution.stubbed_object
         sponsored_benefit
       end
     end
