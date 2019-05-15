@@ -1,9 +1,6 @@
 class ApplicationMailer < ActionMailer::Base
 
-  include Config::SiteHelper
-  extend Config::SiteHelper
-
-  default from: "#{mail_address}"
+  default from: Settings.site.mail_address
 
   if Rails.env.production?
     self.delivery_method = :soa_mailer
