@@ -19,20 +19,19 @@
                         - if option_kind == 'multi_product'
             				.col-xs-4.plans.multiProductOptions
             					.col-xs-12.p0.mb-1
-                                    .col-xs-2
-                                        = check_box_tag "sponsored_benefits[elected_product_choices][]", product.id, true
-                                        span.checkmark
-                                    .col-xs-10
+                                    .col-xs-12
                                         label.container
+                                            = check_box_tag "sponsored_benefits[elected_product_choices][]", product.id, true
+                                            span.checkmark
                                             p.heading-text.reference-plan-title.mb-1
                                                 = product.title
-                                            span.plan-label Type:
+                                            span.plan-label Type: 
                                             span.rp-plan-info= product.product_type
                                             br/
-                                            span.plan-label Carrier:
+                                            span.plan-label Carrier: 
                                             span.rp-plan-info= product.carrier_name
                                             br/
-                                            span.plan-label Level:
+                                            span.plan-label Level: 
                                             span.rp-plan-info= product.metal_level_kind
                                             br/
                         - else
