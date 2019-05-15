@@ -48,7 +48,7 @@ module FormWorld
 
   def fill_in_registration_form_employer_personal_information_registration_form
     phone_number1 = page.all('input').select { |input| input[:id] == "inputNumber" }[0]
-    
+
     fill_in 'agency_staff_roles_attributes_0_first_name', :with => 'John'
     fill_in 'agency_staff_roles_attributes_0_last_name', :with => 'Doe'
     fill_in 'inputDOB', :with =>  "08/13/1979"
@@ -158,8 +158,7 @@ end
 
 Given(/^user goes to the Broker Registration form$/) do
   visit '/'
-  find(".interaction-click-control-broker-registration", wait: 10).click
-  wait_for_ajax
+  find(".broker-registration", wait: 10).click
   visit "/broker_registration"
 end
 
@@ -197,4 +196,3 @@ And(/^user (.*?) fills out personal information form$/) do |named_person|
   screenshot("register")
   find('.btn', text: 'CONTINUE').click
 end
-

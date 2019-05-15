@@ -15,7 +15,7 @@ WELCOME_INDEX_TRANSLATIONS = {
   "en.welcome.index.signed_in_as" => "Signed in as %{current_user}",
   "en.welcome.index.welcome_email" => "Welcome %{current_user}",
   "en.welcome.index.welcome_to_site_name" => "Welcome to %{short_name}",
-  "en.welcome.index.site_byline" => "The Right Place for the Right Plan",
+  "en.welcome.index.site_byline" => "Welcome to the District's Health Insurance Marketplace",
   "en.welcome.index.welcome_to_site_sub_header" => Settings.site.byline,
   "en.welcome.index.welcome_to_site_header" => Settings.site.header_message
 }

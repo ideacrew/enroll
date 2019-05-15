@@ -8,11 +8,10 @@ World(BrokerStepsHelper)
 
 When(/^.+ visits the HBX Broker Registration form$/) do
   visit '/'
-  find(".interaction-click-control-broker-registration", wait: 10).click
+  find(".broker-registration", wait: 10).click
 end
 
 When(/^Primary Broker should see the New Broker Agency form$/) do
-  wait_for_ajax
   expect(page).to have_css("#broker_registration_form")
   # Agency fields are part of the broker registration form
   expect(page).to have_content("Broker Agency Information")
@@ -100,7 +99,7 @@ And(/^.+ enters broker agency information for SHOP markets$/) do
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][number]', :with => location[:phone_number]
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][extension]', :with => location[:phone_extension]
   wait_for_ajax
-  # Clicking the 'Create Broker Agency' button 
+  # Clicking the 'Create Broker Agency' button
   find("#broker-btn").click
 end
 
@@ -109,7 +108,7 @@ And(/^.+ clicks? on Create Broker Agency$/) do
   wait_for_ajax
   page.find('h1', text: 'Broker Registration').click
   wait_for_ajax
-  # Clicking the 'Create Broker Agency' button 
+  # Clicking the 'Create Broker Agency' button
   find("#broker-btn").click
 end
 
@@ -127,8 +126,8 @@ end
 
 And(/^.+ should see the broker application with carrier appointments$/) do
   if (Settings.aca.broker_carrier_appointments_enabled)
-    find_all("[id^=person_broker_role_attributes_carrier_appointments_]").each do |checkbox| 
-      checkbox.should be_checked 
+    find_all("[id^=person_broker_role_attributes_carrier_appointments_]").each do |checkbox|
+      checkbox.should be_checked
     end
     expect(page).to have_content("Carrier appointments for broker are not necessary for participation in #{Settings.site.long_name}")
   end

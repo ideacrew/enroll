@@ -1,26 +1,23 @@
-.container
-  br
-  br
-  br
-  br
+.container.welcome
   h1.text-center.heading-text.mb-0
     strong
       = l10n('.welcome_to_site_name', short_name: Settings.site.short_name)
-  h3.text-center.mt-0.sub-text
+  h3.text-center.mt-1.sub-text
     = l10n('.welcome_to_site_sub_header')
   br
   .div#welcome-nav-options
-    = link_to l10n(".employee_portal"), privacy_insured_employee_index_path, class: "btn btn-default"
-    - if individual_market_is_enabled?
-      = link_to l10n(".consumer_family_portal"), privacy_insured_consumer_role_index_path(uqhp: true), class: "btn btn-default"
-      = link_to l10n(".assisted_consumer_family_portal"), privacy_insured_consumer_role_index_path(aqhp: true), class: "btn btn-default"
-    = link_to l10n(".returning_user"), family_account_path, class: "btn btn-default"
-    = link_to l10n(".employer_portal"), benefit_sponsors.new_profiles_registration_path(:profile_type => :benefit_sponsor), class: "btn btn-default"
-    = link_to l10n(".broker_agency_portal"), benefit_sponsors.new_profiles_registration_path(:profile_type => :broker_agency, portal: true), class: "btn btn-default"
-    = link_to l10n(".general_agency_portal"), benefit_sponsors.new_profiles_registration_path(:profile_type => :general_agency, portal: true), class: "btn btn-default" if general_agency_enabled?
-    = link_to l10n(".hbx_portal"), exchanges_hbx_profiles_root_path, class: "btn btn-default"
+    .row.justify-content-md-center
+      = link_to l10n(".employee_portal"), privacy_insured_employee_index_path, class: "btn btn-outline-primary mr-2 mb-2"
+      - if individual_market_is_enabled?
+        = link_to l10n(".consumer_family_portal"), privacy_insured_consumer_role_index_path(uqhp: true), class: "btn btn-outline-primary mr-2 mb-2"
+        = link_to l10n(".assisted_consumer_family_portal"), privacy_insured_consumer_role_index_path(aqhp: true), class: "btn btn-outline-primary mr-2 mb-2"
+      = link_to l10n(".returning_user"), family_account_path, class: "btn btn-outline-primary mr-2 mb-2"
+      = link_to l10n(".employer_portal"), benefit_sponsors.new_profiles_registration_path(:profile_type => :benefit_sponsor), class: "btn btn-outline-primary mr-2 mb-2"
+      = link_to l10n(".broker_agency_portal"), benefit_sponsors.new_profiles_registration_path(:profile_type => :broker_agency, portal: true), class: "btn btn-outline-primary mr-2 mb-2"
+      = link_to l10n(".general_agency_portal"), benefit_sponsors.new_profiles_registration_path(:profile_type => :general_agency, portal: true), class: "btn btn-outline-primary mr-2 mb-2" if general_agency_enabled?
+      = link_to l10n(".hbx_portal"), exchanges_hbx_profiles_root_path, class: "btn btn-outline-primary mr-2 mb-2 hbx-portal"
 
-    - if !user_signed_in?
-      = link_to l10n(".broker_registration"), benefit_sponsors.new_profiles_registration_path(:profile_type => :broker_agency), class: "btn btn-default"
+      - if !user_signed_in?
+        = link_to l10n(".broker_registration"), benefit_sponsors.new_profiles_registration_path(:profile_type => :broker_agency), class: "btn btn-outline-primary mr-2 mb-2 broker-registration"
 
-      = link_to l10n(".general_agency_registration"), benefit_sponsors.new_profiles_registration_path(:profile_type => :general_agency), class: "btn btn-default" if general_agency_enabled?
+        = link_to l10n(".general_agency_registration"), benefit_sponsors.new_profiles_registration_path(:profile_type => :general_agency), class: "btn btn-outline-primary mr-2 mb-2" if general_agency_enabled?
