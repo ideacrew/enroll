@@ -373,12 +373,12 @@ module BenefitSponsors
     end
 
     def open_enrollment_length
-      (open_enrollment_period.end - open_enrollment_period.begin).to_i
+      (open_enrollment_period.end.to_date - open_enrollment_period.begin.to_date).to_i
     end
 
     # This is being used by Open enrollment extension feature
     # Admin can't choose date before regular monthly open enrollment end date i.e, 20th
-    # Admin can't choose a date beyond the effective month of the application. 
+    # Admin can't choose a date beyond the effective month of the application.
     #   ex: For 1/1 application we limit calender from 12/20 to 1/31.
     def open_enrollment_date_bounds
       {
