@@ -1,6 +1,7 @@
 class ApplicationMailer < ActionMailer::Base
 
   include Config::SiteHelper
+  extend Config::SiteHelper
 
   default from: "#{mail_address}"
 
