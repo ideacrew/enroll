@@ -444,8 +444,6 @@ When(/(^.+) enters? office location for (.+)$/) do |role, location|
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][area_code]', :with => location[:phone_area_code]
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][number]', :with => location[:phone_number]
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][extension]', :with => location[:phone_extension]
-  wait_for_ajax
-  page.find('h4', text: "#{Settings.site.byline}").click
   find('#broker-btn').click
 end
 
@@ -493,7 +491,7 @@ When(/^(.*) logs on to the (.*)?/) do |named_person, portal|
   person = people[named_person]
 
   visit "/"
-  portal_class = "interaction-click-control-#{portal.downcase.gsub(/ /, '-')}"
+  portal_class = "#{portal.downcase.gsub(/ /, '-')}"
   portal_uri = find("a.#{portal_class}")["href"]
 
   visit "/users/sign_in"
@@ -511,7 +509,7 @@ end
 
 When(/^user visits the (.*)?/) do |portal|
   visit "/"
-  portal_class = "interaction-click-control-#{portal.downcase.gsub(/ /, '-')}"
+  portal_class = "#{portal.downcase.gsub(/ /, '-')}"
   portal_uri = find("a.#{portal_class}")["href"]
   sleep 10
   visit portal_uri
