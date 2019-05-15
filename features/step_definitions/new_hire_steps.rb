@@ -278,7 +278,7 @@ Then(/Employee should see \"not yet eligible\" error message/) do
   find('h1', text: 'Choose Coverage for your Household', wait: 10)
   find('#btn-continue', wait: 10).click
   find('.alert', wait: 10)
-  expect(page).to have_content("You're not yet eligible under your employer-sponsored benefits. Please return on #{TimeKeeper.date_of_record + 15.days} to enroll for coverage.")
+  expect(page).to have_content("You're not yet eligible under your employer-sponsored benefits. Please return on #{(TimeKeeper.date_of_record + 15.days).strftime('%m/%d/%Y')} to enroll for coverage.")
   visit '/families/home'
 end
 
@@ -303,6 +303,17 @@ end
 When(/Employee clicks continue on the family members page/) do
   click_link('btn_household_continue')
   wait_for_ajax
+end
+
+When(/(.*) clicks shop for new plan on the group selection page/) do |_named_person|
+  find('.interaction-click-control-shop-for-new-plan', wait: 10).click
+end
+
+Then(/Employee should see not yet eligible error message/) do
+  find('h1', text: 'Choose Coverage for your Household', wait: 10)
+  find('.alert', wait: 10)
+  expect(page).to have_content("You're not yet eligible under your employer-sponsored benefits. Please return on #{(TimeKeeper.date_of_record + 15.days).strftime('%m/%d/%Y')} to enroll for coverage.")
+  visit '/families/home'
 end
 
 And(/Employee has past created at date/) do

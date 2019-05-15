@@ -51,8 +51,8 @@ Feature: Employee with future date of hire
 
     When Employee enters Qualifying Life Event
     When Employee clicks continue on the family members page
-    When Employee clicks continue on the group selection page
-    Then Employee should see "not yet eligible" error message
+    When Employee clicks shop for new plan on the group selection page
+    Then Employee should see not yet eligible error message
 
     Given I reset employee to future enrollment window
     Then Employee tries to complete purchase of another plan
