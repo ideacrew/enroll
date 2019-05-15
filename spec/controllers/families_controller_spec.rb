@@ -3,10 +3,10 @@ require 'rails_helper'
 RSpec.describe FamiliesController do
 
  context "set_family before every action" do
-    
-    let(:person) {FactoryBot.create(:person);}
-    let(:user) { FactoryBot.create(:user, :person=>person) }
-    let(:user_with_out_person) { FactoryBot.create(:user, :person=>nil) }
+
+    let(:person) {FactoryBot.create(:person, :with_family)}
+    let(:user) { FactoryBot.create(:user, :person => person) }
+    let(:user_with_out_person) { FactoryBot.create(:user, :person => nil) }
 
     let!(:person2) {FactoryBot.create(:person)}
     let!(:family_member2) {FactoryBot.create(:family_member, family: person.primary_family, person: person2) }
