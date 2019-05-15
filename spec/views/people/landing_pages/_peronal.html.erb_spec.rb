@@ -4,6 +4,12 @@ RSpec.describe "people/landing_pages/_personal.html.erb" do
   let(:person) { FactoryBot.build(:person) }
   let(:person1) { FactoryBot.build(:invalid_person) }
   let(:consumer_role) { FactoryBot.build(:consumer_role) }
+
+  before(:each) do
+    stub_template 'devise/passwords/_edit.html.erb' => ''
+    stub_template 'users/security_question_responses/_edit_modal.html.erb' => ''
+  end
+
   context 'family is updateable' do
     before(:each) do
       allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: true))
