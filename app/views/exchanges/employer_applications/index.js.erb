@@ -1,0 +1,301 @@
+var containing_row = $("#<%= @element_to_replace_id %>").closest('TR');
+var $parent_row = containing_row;
+//var $parent_row = $(".table:first > tbody > tr:not(tr.child-row)").eq(<%= @row %>);
+if ( $('tr.child-row:visible').length > 0 ) {
+  $('tr.child-row:visible').remove();
+  $("li>a:contains('Collapse Form')").addClass('disabled');
+
+}
+
+var actionSelected = "";
+var applicationId = "";
+var employerId = "";
+var pyEndDate = "";
+var termKind = "";
+var termReason = "";
+
+if ( $parent_row.next().hasClass('child-row') ) {
+//
+} 
+else {
+  $parent_row.after('<tr class="child-row"><td colspan="100"><%= j render "index"%></td></tr>');
+  $("li>a:contains('Collapse Form')").eq(containing_row.index()).removeClass('disabled');
+  $('.dropdown.pull-right').removeClass('open');
+}
+
+$('input[name=plan_year_radio]').click(function() {
+  hidePlanYearActions();
+  clearDatePickerValue();
+  hideTerminationRadios();
+  $('.py-btn-grp').addClass('disabled');
+  var pyStatus = $(this).attr("status");
+  populateDropDown(pyStatus);
+  $('input[name=plan_year_radio]:checked').closest('td').siblings().find('.py-btn-grp').removeClass('disabled')
+});
+
+$('#plan-year-btn-group ul li').each(function() {
+  $(this).click(function() {
+    // Do Something
+  })
+});
+
+function populateDropDown(status) {
+
+  var cancel_states = ["approved", "pending", "draft", "imported", "enrollment_open", "enrollment_extended", "enrollment_closed", "enrollment_eligible", "binder_paid", "enrollment_ineligible", "active"]
+  var term_states = ["active", "suspended", "expired", "termination_pending"]
+  var reinstate_states = []
+
+  if (cancel_states.indexOf(status) > -1) {
+    $('li.cancel-py').removeClass('blocking');
+  }
+  else {
+   $('li.cancel-py').addClass('blocking');
+  }
+
+  if (term_states.indexOf(status) > -1) {
+    $('li.terminate-py').removeClass('blocking');
+  }
+  else {
+   $('li.terminate-py').addClass('blocking');
+  }
+
+  if (reinstate_states.indexOf(status) > -1) {
+    $('li.reinstate-py').removeClass('blocking');
+  }
+  else {
+   $('li.reinstate-py').addClass('blocking');
+  }
+}
+
+function hidePlanYearActions() {
+  $('.plan-year-actions').addClass('hidden');
+}
+
+function showPlanYearActions(id) {
+  $('#'+id).removeClass('hidden');
+}
+
+function disableDatePicker() {
+  $('input#datepicker').prop('disabled', true);
+}
+
+function initDatePicker() {
+  $('input.date').datepicker({dateFormat: "mm/dd/yy"})
+}
+
+function validateFormat(id, pyStartOn, pyEndOn) {
+  ele2 = $('#' + 'term_reason_'+ applicationId).val()
+  element = $('#' + 'date_picker_'+ applicationId).val()
+  applicationId = id
+  pyEndDate = element;
+
+  setTimeout(function() {
+    if (element.length != 10 || element.indexOf("/") != 2 || checkTermReason(ele2)) {
+      if (element.length > 0 && (checkTermReason(ele2) == false)) {
+        element = "";
+        alert("Please use mm/dd/yyyy format");
+      }
+      disableSubmitButton();
+    } else {
+      start = pyStartOn.split("/");
+      end = pyEndOn.split("/")
+      value = element.split("/")
+      startDate = new Date(start[2],start[0]-1,start[1]).setHours(0,0,0,0);
+      endDate = new Date(end[2],end[0]-1,end[1]).setHours(0,0,0,0);
+      currentDate = new Date(value[2],value[0]-1,value[1]).setHours(0,0,0,0);
+      // Checks if date is in range
+      if (startDate > currentDate || currentDate > endDate) {
+        element = "";
+        alert("Please select date within Start Date and End Date");
+        disableSubmitButton();
+      } else {
+        enableSubmitButton()
+      }
+    }
+  },400);
+}
+
+function enableDatePicker() {
+  $('input#datepicker').prop('disabled', false);
+}
+
+function clearDatePickerValue() {
+  $('input#datepicker').val('');
+  enableDatePicker()
+}
+
+function disableSubmitButton() {
+  $('.plan-year-submit').addClass('disabled')
+}
+
+function enableSubmitButton() {
+  $('.plan-year-submit').removeClass('disabled')
+}
+
+function showTerminationRadios() {
+  $('.term_action_radios').removeClass('hidden');
+}
+
+function hideEndDateField(startDate, applicationId) {
+  setTimeout(function() {
+    $('#' + applicationId).find('input.py-end-date').val(startDate);
+    $('#' + applicationId).find('input.py-end-date').prop('disabled', true);
+  },300)
+}
+
+function showEndDateField() {
+  $('input.py-end-date').removeClass('hidden')
+  $('#calendar_icon').removeClass('hidden')
+}
+
+function hideTerminationRadios() {
+  $('.term_action_radios').addClass('hidden');
+}
+
+function terminateValidations() {
+  if ($('input[name=term_actions]:checked').length) {
+    return true;
+  } else
+  return false;
+}
+
+function addDatePicker() {
+  $('tr.plan-year-actions').each(function() {
+    $('input.date').attr('id','datepicker');
+  })
+}
+
+function validTerminatePy() {
+  var endDates = document.querySelectorAll('.py-end-date')
+
+  for (date of endDates) {
+    if (date.value.length > 0) {
+      enableSubmitButton()
+    } else {
+      console.log("Missing Info")
+    }
+  }
+}
+
+function pyAction(action, id, employer_id, term_date, start_on) {
+  applicationId = id;
+  employerId = employer_id
+  actionSelected = action;
+  pyStartDate = start_on
+  showPlanYearActions(id);
+  showEndDateField();
+  if (action == "reinstate") {
+    disableDatePicker();
+    $('input#datepicker').val(<%= Date.today %>);
+    hideTerminationRadios();
+    enableSubmitButton()
+  }
+  
+  if (action == 'terminate') {
+    showTerminationRadios();
+    clearDatePickerValue();
+    disableSubmitButton();
+    updateDatePickerBasedOnTermReason('voluntary', id)
+  }
+  
+  if (action == 'cancel') {
+    hideEndDateField(pyStartDate, applicationId);
+    hideTerminationRadios();
+    enableSubmitButton();
+  }
+  // Clears all end dates from previous rows
+  var endDates = document.querySelectorAll('.py-end-date');
+  
+  for (date of endDates) {
+    date.value = "";
+  }
+}
+
+function showOnlyLastDate(id) {
+  $("#date_picker_" + id ).datepicker({
+    beforeShowDay: function(date){
+      if (date.getDate() == getLastDayOfYearAndMonth(date.getFullYear(), date.getMonth())){
+        return [true, ''];
+      }
+      return [false, ''];
+    }
+  });
+}
+
+function showAllDates(id) {
+  $("#date_picker_" + id ).datepicker({
+    changeMonth: true,
+    changeYear: true,
+    yearRange: (new Date).getFullYear()-5 + ":" + (new Date).getFullYear()+1
+  });
+  $("#date_picker_" + id ).datepicker( "option", "dateFormat", "mm/dd/yy" );
+}
+
+function getLastDayOfYearAndMonth(year, month){
+  return(new Date((new Date(year, month + 1, 1)) - 1)).getDate();
+}
+
+function updateDatePickerBasedOnTermReason(reason, id) {
+  var terminationReason = reason
+  if (terminationReason == 'nonpayment' && '<%= @allow_mid_month_non_payment_terms.to_s %>' == 'true') {
+    showAllDates(id);
+  } else if ((terminationReason == 'voluntary') && '<%= @allow_mid_month_voluntary_terms.to_s %>' == 'true') {
+    showAllDates(id);
+  } else {
+    showOnlyLastDate(id);
+  }
+}
+
+function addTermReasons(reason, id) {
+  applicationId = id
+  document.getElementById('term_reason_'+ applicationId).value = "";
+  document.getElementById('date_picker_'+ applicationId).value = "";
+  validateFormat(applicationId)
+  updateDatePickerBasedOnTermReason(reason.value, id)
+  $.ajax({
+    type: 'get',
+    datatype: 'js',
+    url: '/exchanges/employer_applications/get_term_reasons',
+    data: { reason_type_id: reason.id },
+    success: function (response) {
+      var select = document.getElementById('term_reason_'+ applicationId);
+      select.options.length = 1;
+      for (i = 0; i < response.length; i++) {
+        var newOption = document.createElement('option')
+        newOption.value = response[i]
+        newOption.innerHTML = response[i];
+        select.options.add(newOption)
+      }
+    }
+  });
+
+  return true
+}
+
+function checkTermReason(element) {
+  if (element == undefined || element == "") {
+    return true
+  }
+  else {
+    return false
+  }
+}
+
+// You can use the actionSelected here
+function submitPlanActions() {
+  termKind = actionSelected == "terminate" ? $('input[name=term_actions]:checked').val() : ""
+  termReason = $('#term_reason_' + applicationId).val()
+  transmit_to_carrier =  $('#' + applicationId).find('input[id=transmit_to_carrier]').is(":checked")
+  $.ajax({
+    url: "/exchanges/employer_applications/"+applicationId+"/"+actionSelected,
+    method: 'PUT',
+    data: { employer_id: employerId, end_on: pyEndDate, term_kind: termKind, term_reason: termReason, transmit_to_carrier: transmit_to_carrier }
+  });
+}
+
+$('#attestation_documents_table').mousemove(function() {
+  initDatePicker();
+  validTerminatePy()
+})
+
+applyJQDatePickers();
