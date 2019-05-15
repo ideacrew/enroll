@@ -16,12 +16,12 @@
           <%= link_to "Claim Quote", "", data: { toggle: "modal", target: "#{claim_modal_name}" }, class: 'btn btn-default btn-block' %>
 
           <% if claim_warnings.present? %>
-            <%= render "employers/plan_years/claim_quote_warnings", warnings: claim_warnings %>
+            <%= render "benefit_sponsors/profiles/employers/benefit_applications/claim_quote_warnings", warnings: claim_warnings %>
           <% end %>
         <% end %>
       <% end %>
       <%#= pundit_span EmployerProfile,:updateable? %>
-        <% if @benefit_applications.present? && @benefit_applications.published.blank? && !@benefit_applications.any?{|app| app.is_renewing?} %>
+        <% if @benefit_applications.present? && (@benefit_applications.published.blank? || (@benefit_applications.active.present? && @benefit_applications.canceled.select{ |ba| ba.start_on > @benefit_applications.active.first.end_on }.present?)) && !@benefit_applications.any?{|app| app.is_renewing?} %>
         <%= link_to "Add Plan Year", new_benefit_sponsorship_benefit_application_path(@benefit_sponsorship), class: "btn btn-default btn-block mt-1", data: {loading_text: "Loading..."}, onclick:"checkForDraftPlans(this)" %>
         <% end %>
       </span>
@@ -237,7 +237,7 @@
 
             <br class="clear"/>
           </div>
-            <%= pundit_span EmployerProfile, :updateable? %>
+            <%= pundit_span @employer_profile, :updateable? %>
                 <div class="below clear">
                   <%= link_to "Delete Benefit Package <i class='fas fa-trash-alt' aria-hidden='true'></i> ".html_safe, "", data: { toggle: "modal", target: "#deleteBenefitPackageModal-#{package.id.to_s}" }, class: 'btn btn-default' if benefit_application.aasm_state.to_s == "draft" || benefit_application.aasm_state.to_s == "renewing_draft" %>
                   <%= render partial: "benefit_sponsors/profiles/employers/benefit_packages/delete_benefit_package_modal", locals: { benefit_application: benefit_application, package: package } if benefit_application.aasm_state.to_s == "draft" || benefit_application.aasm_state.to_s == "renewing_draft" %>
@@ -260,7 +260,7 @@
         groups of employees.
       </h4>
       <br/>
-      <%=pundit_span EmployerProfile, :updateable?%>
+      <%=pundit_span @employer_profile, :updateable?%>
         <%= link_to "Add Plan Year", new_benefit_sponsorship_benefit_application_path(@benefit_sponsorship, tab: 'benefits'), class: "btn btn-primary btn-br", data: {loading_text: "Loading..."}, id:'AddPlanYearBtn' %>
       </span>
   <% end %>
