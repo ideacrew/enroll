@@ -2,7 +2,6 @@ require_dependency "sponsored_benefits/application_controller"
 
 module SponsoredBenefits
   class Organizations::PlanDesignOrganizationsController < ApplicationController
-    include Config::AcaConcern
     include Config::BrokerAgencyHelper
 
     before_action :load_broker_agency_profile, only: [:new, :create]
@@ -36,7 +35,6 @@ module SponsoredBenefits
     end
 
     def update
-      binding.pry
       pdo = SponsoredBenefits::Organizations::PlanDesignOrganization.find(params[:id])
 
       if pdo.is_prospect?
