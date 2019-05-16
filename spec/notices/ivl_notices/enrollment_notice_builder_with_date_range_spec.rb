@@ -105,9 +105,9 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilderWithDateRange, dbclean: :after
     end
 
     context "when special verification does not exist" do
-      it "should update the due date" do
+      it "should return nil due date" do
         @eligibility_notice.build
-        expect(@eligibility_notice.document_due_date(person, ssn_type)).to eq (TimeKeeper.date_of_record+Settings.aca.individual_market.verification_due.days)
+        expect(@eligibility_notice.document_due_date(person, ssn_type)).to eq nil
       end
     end
 
