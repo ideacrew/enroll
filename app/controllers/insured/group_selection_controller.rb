@@ -89,17 +89,13 @@ class Insured::GroupSelectionController < ApplicationController
         hbx_enrollment.special_enrollment_period_id = sep.id
       end
     end
-
     hbx_enrollment.generate_hbx_signature
-
     @adapter.family.hire_broker_agency(current_user.person.broker_role.try(:id))
     hbx_enrollment.writing_agent_id = current_user.person.try(:broker_role).try(:id)
     hbx_enrollment.original_application_type = session[:original_application_type]
     broker_role = current_user.person.broker_role
     hbx_enrollment.broker_agency_profile_id = broker_role.broker_agency_profile_id if broker_role
-
-    hbx_enrollment.validate_for_cobra_eligiblity(@employee_role, current_user)
-
+    hbx_enrollment.validate_for_cobra_eligiblity(@employee_role)
     if hbx_enrollment.save
       @adapter.assign_enrollment_to_benefit_package_assignment(@employee_role, hbx_enrollment)
       if @adapter.keep_existing_plan?(params) && @adapter.previous_hbx_enrollment.present?
