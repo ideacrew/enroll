@@ -432,29 +432,6 @@ describe Family do
     end
   end
 
-  context "contingent_enrolled_family_members_due_dates" do
-    let(:person) { FactoryBot.create(:person, :with_consumer_role) }
-    let(:person2) { FactoryBot.create(:person, :with_consumer_role) }
-    let(:family) { FactoryBot.create(:family, :with_primary_family_member, :person => person) }
-    let(:family_member) { FactoryBot.create(:family_member, :family => family, :person => person2) }
-    let(:primary_family_member) { family.primary_family_member }
-    before do 
-      allow(family).to receive(:contingent_enrolled_active_family_members).and_return([primary_family_member, family_member])
-      allow(person).to receive(:verification_types).and_return(["Immigration status"])
-      allow(person2).to receive(:verification_types).and_return(["Immigration status"])
-    end
-    it "should return uniq family members duedate" do
-      allow(family).to receive(:document_due_date).and_return(TimeKeeper.date_of_record)
-      expect(family.contingent_enrolled_family_members_due_dates).to eq [TimeKeeper.date_of_record]
-    end
-    it "should return sorted due dates" do
-      allow(family).to receive(:document_due_date).with(primary_family_member,"Immigration status").and_return(TimeKeeper.date_of_record)
-      allow(family).to receive(:document_due_date).with(family_member,"Immigration status").and_return(TimeKeeper.date_of_record+30)
-
-      expect(family.contingent_enrolled_family_members_due_dates).to eq [TimeKeeper.date_of_record,TimeKeeper.date_of_record+30]
-    end
-  end
-
   context "best_verification_due_date" do 
     let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
     
@@ -1276,15 +1253,15 @@ describe "has_valid_e_case_id" do
     expect(family1000.has_valid_e_case_id?).to be_truthy
   end
 end
-
-describe "currently_enrolled_plans_ids" do
-  let!(:family100) { FactoryBot.create(:family, :with_primary_family_member) }
-  let!(:enrollment100) { FactoryBot.create(:hbx_enrollment, household: family100.active_household, kind: "individual") }
-
-  it "should return a non-empty array of plan ids" do
-    expect(family100.currently_enrolled_plans_ids(enrollment100).present?).to be_truthy
-  end
-end
+#TODO: fix me when ivl plans refactored to products
+# describe "currently_enrolled_plans_ids" do
+#   let!(:family100) { FactoryBot.create(:family, :with_primary_family_member) }
+#   let!(:enrollment100) { FactoryBot.create(:hbx_enrollment, household: family100.active_household, kind: "individual") }
+#
+#   it "should return a non-empty array of plan ids" do
+#     expect(family100.currently_enrolled_plans_ids(enrollment100).present?).to be_truthy
+#   end
+# end
 
 describe "active dependents" do
   let!(:person) { FactoryBot.create(:person, :with_consumer_role)}
