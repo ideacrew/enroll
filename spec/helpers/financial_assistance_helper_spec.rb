@@ -41,4 +41,18 @@ RSpec.describe FinancialAssistanceHelper, :type => :helper, dbclean: :after_each
       end
     end
   end
+
+  describe 'format_phone' do
+    context 'for invalid phone number' do
+      it 'should return empty string' do
+        expect(helper.format_phone("2763")).to eq ""
+      end
+    end
+
+    context 'for valid phone number' do
+      it 'should return the expected format' do
+        expect(helper.format_phone("1234567890")).to eq "(123) 456-7890"
+      end
+    end
+  end
 end
