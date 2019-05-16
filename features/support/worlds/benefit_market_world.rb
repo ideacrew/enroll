@@ -172,8 +172,9 @@ end
 # Following step can be used to initialize benefit market catalog for initial employer with health/dental benefits
 # It will also create products needed for requested coverage kinds
 # ex: benefit market catalog exists for enrollment_open initial employer with health benefits
+#     benefit market catalog exists for enrollment_open initial employer with health & dental benefits
 Given(/^benefit market catalog exists for (.*) initial employer with (.*) benefits$/) do |status, coverage_kinds|
-  coverage_kinds = [:health]
+  coverage_kinds = coverage_kinds.split('&').map(&:strip).map(&:to_sym)
   set_initial_application_dates(status.to_sym)
   generate_initial_catalog_products_for(coverage_kinds)
   create_benefit_market_catalog_for(current_effective_date)
@@ -182,8 +183,9 @@ end
 # Following step can be used to initialize benefit market catalog for renewing employer with health/dental benefits
 # It will also create products needed for requested coverage kinds
 # ex: benefit market catalog exists for enrollment_open renewal employer with health benefits
+#     benefit market catalog exists for enrollment_open renewal employer with health & dental benefits
 Given(/^benefit market catalog exists for (.*) renewal employer with (.*) benefits$/) do |status, coverage_kinds|
-  coverage_kinds = [:health]
+  coverage_kinds = coverage_kinds.split('&').map(&:strip).map(&:to_sym)
   set_renewal_application_dates(status.to_sym)
   generate_renewal_catalog_products_for(coverage_kinds)
   create_benefit_market_catalog_for(current_effective_date)
