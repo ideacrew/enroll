@@ -146,7 +146,7 @@ module BenefitSponsors
         return if benefit_application.termination_pending? || benefit_application.terminated?
 
         deliver(recipient: hbx_enrollment.employer_profile, event_object: hbx_enrollment, notice_event: "employer_notice_for_employee_coverage_termination")
-        deliver(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "employee_notice_for_employee_coverage_termination") if hbx_enrollment.terminate_reason.present?
+        deliver(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "employee_notice_for_employee_coverage_termination")
       end
 
       def trigger_employee_terminated_from_roster_notice(_model_event, census_employee)
