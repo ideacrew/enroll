@@ -81,6 +81,18 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model, dbclean
       expect(cobra_enrollment.effective_on).to be >= cobra_enrollment.sponsored_benefit_package.benefit_application.start_on
       expect(cobra_enrollment.external_enrollment).to be_falsey
     end
+
+    context 'cobra effective date coincides with renewing benefit application date' do
+      let(:coverage_terminated_on) { renewal_application.start_on.prev_day }
+      it 'should create only one enrollment - no auto renewal' do
+        expect(family.enrollments.size).to eq 1
+        expect(family.enrollments.map(&:kind)).not_to include('employer_sponsored_cobra')
+        generate_cobra_enrollment
+        expect(family.enrollments.by_coverage_kind('health').size).to eq 3
+        expect(family.enrollments.map(&:kind)).to include('employer_sponsored_cobra')
+      end
+    end
+
   end
 
   context 'family under conversion employer' do
