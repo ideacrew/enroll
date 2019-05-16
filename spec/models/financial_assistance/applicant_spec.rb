@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe FinancialAssistance::Applicant, type: :model do
+RSpec.describe FinancialAssistance::Applicant, type: :model, dbclean: :after_each do
   before :each do
     allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
   end
@@ -28,7 +28,7 @@ RSpec.describe FinancialAssistance::Applicant, type: :model do
   let!(:applicant2) { FactoryGirl.create(:applicant, tax_household_id: tax_household1.id, application: application, family_member_id: family_member2.id, aasm_state: 'verification_outstanding') }
   let!(:assisted_verification) { FactoryGirl.create(:assisted_verification, applicant: applicant1, status: 'pending') }
 
-  describe '#modelFeilds' do
+  describe '#modelFields' do
     it { is_expected.to have_field(:assisted_income_validation).of_type(String).with_default_value_of('pending') }
     it { is_expected.to have_field(:assisted_mec_validation).of_type(String).with_default_value_of('pending') }
     it { is_expected.to have_field(:assisted_income_reason).of_type(String) }
@@ -199,6 +199,22 @@ RSpec.describe FinancialAssistance::Applicant, type: :model do
     it 'should have driver question attributes constant' do
       subject.class.should be_const_defined(:DRIVER_QUESTION_ATTRIBUTES)
       expect(described_class::DRIVER_QUESTION_ATTRIBUTES).to eq([:has_job_income, :has_self_employment_income, :has_other_income, :has_deductions, :has_enrolled_health_coverage, :has_eligible_health_coverage])
+    end
+  end
+
+  describe 'find' do
+    context 'when proper applicant id is sent' do
+      it 'should return the applicant instance' do
+        member = ::FinancialAssistance::Applicant.find applicant1.id
+        expect(member).to eq applicant1
+      end
+    end
+
+    context 'when wrong id is sent' do
+      it 'should return nil' do
+        member = ::FinancialAssistance::Applicant.find application.id
+        expect(member).to be_nil
+      end
     end
   end
 

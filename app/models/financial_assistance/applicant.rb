@@ -268,18 +268,23 @@ class FinancialAssistance::Applicant
     update_attributes!(assisted_income_validation: "outstanding")
   end
 
+  def family
+    application.family || family_member.family
+  end
+
+  def spouse_relationship
+    person.person_relationships.where(family_id: family.id, kind: 'spouse').first
+  end
+
   def has_spouse
-    application.family.primary_applicant.person.person_relationships.where(kind: 'spouse').first.present? ? true : false
+    spouse_relationship.present?
   end
 
   def tax_household_of_spouse
-    spouse_relationship  = self.person.person_relationships.where(kind: 'spouse').first
-    if spouse_relationship.present?
-      spouse = Person.find(spouse_relationship.successor_id)
-      spouse_applicant = application.active_applicants.detect {|applicant| spouse == applicant.person }
-      return spouse_applicant.tax_household
-    end
-    return nil
+    return nil unless has_spouse
+    spouse = Person.find(spouse_relationship.successor_id)
+    spouse_applicant = application.active_applicants.detect {|applicant| spouse == applicant.person }
+    spouse_applicant.tax_household
   end
 
   #### Use Person.consumer_role values for following
@@ -360,10 +365,6 @@ class FinancialAssistance::Applicant
     person.is_tobacco_user || "unknown"
   end
 
-  def family
-    family_member.family
-  end
-
   def tax_household=(thh)
     self.tax_household_id = thh.id
   end
@@ -376,7 +377,7 @@ class FinancialAssistance::Applicant
   def age_on_effective_date
     return @age_on_effective_date unless @age_on_effective_date.blank?
     dob = family_member.person.dob
-    coverage_start_on = Forms::TimeKeeper.new.date_of_record
+    coverage_start_on = ::Forms::TimeKeeper.new.date_of_record
     return unless coverage_start_on.present?
     age = coverage_start_on.year - dob.year
 
@@ -416,8 +417,17 @@ class FinancialAssistance::Applicant
     age_of_applicant
   end
 
+  def student_age_satisfied?
+    [18, 19].include? age_of_applicant
+  end
+
+  def foster_age_satisfied?
+    # Age greater than 18 and less than 26
+    (19..25).cover? age_of_applicant
+  end
+
   def other_questions_complete?
-    if age_of_the_applicant > 18 && age_of_the_applicant < 26
+    if foster_age_satisfied?
       (other_questions_answers << is_former_foster_care).include?(nil) ? false : true
     else
       other_questions_answers.include?(nil) ? false : true
@@ -600,6 +610,15 @@ class FinancialAssistance::Applicant
 
   def eligible_health_coverage_exists?
     benefits.eligible.present?
+  end
+
+  class << self
+    def find(id)
+      return nil unless id
+      bson_id = BSON::ObjectId.from_string(id.to_s)
+      applications = ::FinancialAssistance::Application.where("applicants._id" => bson_id)
+      applications.size == 1 ? applications.first.applicants.find(bson_id) : nil
+    end
   end
 
   private

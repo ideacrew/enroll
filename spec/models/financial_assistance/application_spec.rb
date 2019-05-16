@@ -1,7 +1,7 @@
 require 'rails_helper'
 require 'aasm/rspec'
 
-RSpec.describe FinancialAssistance::Application, type: :model do
+RSpec.describe FinancialAssistance::Application, type: :model, dbclean: :after_each do
 
   before :each do
     allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)

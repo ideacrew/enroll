@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe FinancialAssistance::Benefit, type: :model do
+RSpec.describe FinancialAssistance::Benefit, type: :model, dbclean: :after_each do
   let(:family) {FactoryGirl.create(:family, :with_primary_family_member)}
   let(:application) {FactoryGirl.create(:application, family: family)}
   let(:household) { family.households.first }
@@ -26,6 +26,26 @@ RSpec.describe FinancialAssistance::Benefit, type: :model do
     it "should save benefit step_1 and submit" do
       expect(FinancialAssistance::Benefit.create(valid_params).valid?(:step_1)).to be_truthy
       expect(FinancialAssistance::Benefit.create(valid_params).valid?(:submit)).to be_truthy
+    end
+  end
+
+  describe 'find' do
+    before :each do
+      benefit.save!
+    end
+
+    context 'when proper applicant id is sent' do
+      it 'should return the applicant instance' do
+        instance = ::FinancialAssistance::Benefit.find benefit.id
+        expect(instance).to eq benefit
+      end
+    end
+
+    context 'when wrong id is sent' do
+      it 'should return nil' do
+        instance = ::FinancialAssistance::Benefit.find application.id
+        expect(instance).to be_nil
+      end
     end
   end
 
