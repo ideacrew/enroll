@@ -3,7 +3,7 @@ require 'csv'
 require File.join(Rails.root, "app", "reports", "hbx_reports", "edi_enrollment_termination_report")
 require "#{Rails.root}/app/helpers/config/aca_helper"
 
-describe TerminatedHbxEnrollments, dbclean: :after_each do
+describe TerminatedHbxEnrollments, dbclean: :around_each do
 
   let(:given_task_name) { "enrollment_termination_on" }
   let(:person1) {FactoryBot.create(:person,
