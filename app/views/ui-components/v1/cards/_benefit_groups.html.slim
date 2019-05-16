@@ -52,7 +52,7 @@
                   span Employer Estimated Maximum Monthly Cost
                   - estimator = ::BenefitSponsors::Services::SponsoredBenefitCostEstimationService.new
                   - estimate = estimator.calculate_estimates_for_home_display(sb)
-                  h2 = number_to_currency(estimate[:estimated_total_cost])
+                  h2 = number_to_currency(estimate[:estimated_sponsor_exposure])
               .col-xs-8
                 .row
                   table
