@@ -61,9 +61,7 @@ describe HbxEnrollmentMember, dbclean: :after_all do
       end
 
       context "validate hbx_enrollment_members" do
-        before :all do
-          @enrollment.benefit_group.relationship_benefits = []
-        end
+        
         it "should not raise error if subscriber(primary applicant) is selected during enrollment" do
           expect(@enrollment.valid?).to be_truthy
           expect(@enrollment.hbx_enrollment_members.first.errors[:hbx_enrollment_members].any?).to be_falsey
