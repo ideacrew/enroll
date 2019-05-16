@@ -16,8 +16,8 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model, dbclean
   let!(:update_renewal_app) {renewal_application.update_attributes(aasm_state: :enrollment_eligible)}
   let(:coverage_terminated_on) { TimeKeeper.date_of_record.prev_month.end_of_month }
   let(:employee_role) { FactoryGirl.create :employee_role, employer_profile: employer_profile }
-  let!(:active_benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_package: sponsored_benefit_package)}
-  let!(:renewal_benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, start_on: benefit_package.start_on, benefit_package: benefit_package)}
+  let!(:active_benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_package: sponsored_benefit_package, start_on: predecessor_application.start_on, end_on: predecessor_application.end_on, benefit_group_id: nil)}
+  let!(:renewal_benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, start_on: renewal_application.start_on, end_on: renewal_application.end_on, benefit_package: benefit_package, benefit_group_id: nil)}
   let!(:ce) { FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile, employee_role_id: employee_role.id ,benefit_group_assignments:[active_benefit_group_assignment, renewal_benefit_group_assignment]}
   let!(:ce_update){ce.update_attributes(aasm_state: 'cobra_linked', cobra_begin_date: coverage_terminated_on.next_day, coverage_terminated_on: coverage_terminated_on)}
 
@@ -88,8 +88,14 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model, dbclean
         expect(family.enrollments.size).to eq 1
         expect(family.enrollments.map(&:kind)).not_to include('employer_sponsored_cobra')
         generate_cobra_enrollment
-        expect(family.enrollments.by_coverage_kind('health').size).to eq 3
+        expect(family.enrollments.by_coverage_kind('health').size).to eq 2
         expect(family.enrollments.map(&:kind)).to include('employer_sponsored_cobra')
+      end
+
+      it 'cobra enrollment should be linked to renewal benefit package' do
+        generate_cobra_enrollment
+        cobra_enrollment = family.enrollments.detect(&:is_cobra_status?)
+        expect(cobra_enrollment.sponsored_benefit_package_id).to eq benefit_package.id
       end
     end
 
