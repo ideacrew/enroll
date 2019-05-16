@@ -41,22 +41,18 @@ describe UpdateHbxEnrollmentBenefitGroupAssignment do
     let!(:plan_year1) { FactoryBot.create(:plan_year, employer_profile: employer_profile1, start_on: TimeKeeper.date_of_record.beginning_of_year, :aasm_state => 'published' ) }
     let!(:active_benefit_group1) { FactoryBot.create(:benefit_group, is_congress: false, plan_year: plan_year1, title: "Benefits #{plan_year1.start_on.year}") }
     let(:benefit_group_assignment2)  { FactoryBot.create(:benefit_group_assignment, census_employee: census_employee1) }
-    
-    before(:each) do
-      allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id.to_s)
-      allow(ENV).to receive(:[]).with("benefit_group_assignment_id").and_return(benefit_group_assignment2.id)
-    end
 
     context "activate_benefit_group_assignment", dbclean: :after_each do
       it "should activate_related_benefit_group_assignment" do
-        expect(hbx_enrollment.benefit_group_assignment_id).to eq benefit_group_assignment1.id
-        subject.migrate
-        hbx_enrollment.reload
-        hbx_enrollment.benefit_group_assignment.reload
-        expect(hbx_enrollment.benefit_group_assignment_id).to eq benefit_group_assignment2.id
+        ClimateControl.modify hbx_id: hbx_enrollment.hbx_id.to_s, benefit_group_assignment_id: benefit_group_assignment2.id do
+          expect(hbx_enrollment.benefit_group_assignment_id).to eq benefit_group_assignment1.id
+          subject.migrate
+          hbx_enrollment.reload
+          hbx_enrollment.benefit_group_assignment.reload
+          expect(hbx_enrollment.benefit_group_assignment_id).to eq benefit_group_assignment2.id
+          end
+        end
       end
-      
     end
   end
-end
 
