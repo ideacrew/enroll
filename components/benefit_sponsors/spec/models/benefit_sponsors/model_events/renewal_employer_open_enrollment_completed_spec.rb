@@ -143,7 +143,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployerOpenEnrollmentCompl
         "employee_profile.first_name",
         "employee_profile.last_name",
         "employee_profile.employer_name",
-        "employer_profile.notice_date"
+        "employee_profile.notice_date"
       ]
     end
     let(:merge_model) { subject.construct_notice_object }
