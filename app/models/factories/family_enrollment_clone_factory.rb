@@ -33,7 +33,6 @@ module Factories
     def clone_cobra_enrollment
       clone_enrollment = family.active_household.hbx_enrollments.new
 
-      clone_enrollment.sponsored_benefit_package_id = enrollment.sponsored_benefit_package_id
       clone_enrollment.employee_role_id = enrollment.employee_role_id
       clone_enrollment.product_id = enrollment.product_id
       clone_enrollment.coverage_kind = enrollment.coverage_kind
@@ -41,15 +40,16 @@ module Factories
       clone_enrollment.kind = 'employer_sponsored_cobra'
       effective_on = effective_on_for_cobra(enrollment)
       clone_enrollment.effective_on = effective_on
+      clone_enrollment.sponsored_benefit_package_id = sponsored_benefit_package.id
       clone_enrollment.external_enrollment = enrollment.external_enrollment
       clone_enrollment.benefit_sponsorship_id = enrollment.benefit_sponsorship_id
-      clone_enrollment.sponsored_benefit_id = enrollment.sponsored_benefit_id
+      clone_enrollment.sponsored_benefit_id = sponsored_benefit_package.sponsored_benefits.detect { |sb| sb.product_kind.to_s == enrollment.coverage_kind }.id
       clone_enrollment.rating_area_id = enrollment.rating_area_id
       clone_enrollment.issuer_profile_id = enrollment.issuer_profile_id
-      assignment = census_employee.benefit_group_assignment_by_package(enrollment.sponsored_benefit_package_id)
+      assignment = census_employee.benefit_group_assignment_by_package(sponsored_benefit_package.id)
       clone_enrollment.benefit_group_assignment_id = assignment.id
 
-      if enrollment.sponsored_benefit_package.benefit_application.is_renewing?
+      if sponsored_benefit_package.benefit_application.is_renewing?
         clone_enrollment.aasm_state = 'auto_renewing'
       else
         clone_enrollment.select_coverage
@@ -61,6 +61,10 @@ module Factories
       clone_enrollment.generate_hbx_signature
       clone_enrollment.hbx_enrollment_members = clone_enrollment_members
       clone_enrollment
+    end
+
+    def sponsored_benefit_package
+      census_employee.benefit_package_for_date(effective_on_for_cobra(enrollment))
     end
 
     def clone_enrollment_members
@@ -77,7 +81,7 @@ module Factories
     end
 
     def assign_enrollment_to_benefit_package_assignment(enrollment)
-      assignment = census_employee.benefit_group_assignment_by_package(enrollment.sponsored_benefit_package_id)
+      assignment = census_employee.benefit_group_assignment_by_package(sponsored_benefit_package.id)
       assignment.update_attributes(hbx_enrollment_id: enrollment.id)
       enrollment.update_attributes(benefit_group_assignment_id: assignment.id)
     end
