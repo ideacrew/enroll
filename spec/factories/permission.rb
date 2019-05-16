@@ -11,6 +11,7 @@ FactoryBot.define do
     view_admin_tabs  { true }
     can_lock_unlock { false }
     can_reset_password { false }
+    can_add_pdc { false }
     can_transition_family_members { true }
 
     trait :hbx_staff do

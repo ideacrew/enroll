@@ -225,7 +225,7 @@ describe BrokerRole, dbclean: :after_each do
     it 'returns Broker instance for the specified ID' do
       b0 = BrokerRole.create(person: person0, npn: npn0, provider_kind: provider_kind)
 
-      expect(BrokerRole.find(b0._id)).to be_an_instance_of BrokerRole
+      BrokerRole.find(b0._id).should be_an_instance_of BrokerRole
       expect(BrokerRole.find(b0._id).npn).to eq b0.npn
     end
   end
@@ -236,7 +236,7 @@ describe BrokerRole, dbclean: :after_each do
       b1 = BrokerRole.create(person: person1, npn: npn1, provider_kind: provider_kind)
 
       # expect(BrokerRole.all).to be_an_instance_of Mongoid::Criteria
-      expect(BrokerRole.all.last).to be_an_instance_of BrokerRole
+      BrokerRole.all.last.should be_an_instance_of BrokerRole
       expect(BrokerRole.all.size).to eq 2
     end
   end
@@ -270,7 +270,7 @@ describe BrokerRole, dbclean: :after_each do
       b1 = BrokerRole.create(person: person1, npn: npn1, provider_kind: provider_kind)
 
       # expect(BrokerRole.all).to be_an_instance_of Mongoid::Criteria
-      expect(BrokerRole.all.last).to be_an_instance_of BrokerRole
+      BrokerRole.all.last.should be_an_instance_of BrokerRole
       expect(BrokerRole.all.size).to eq 2
     end
   end

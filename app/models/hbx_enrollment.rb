@@ -484,13 +484,13 @@ class HbxEnrollment
     is_cobra_status? && future_active?
   end
 
-  def validate_for_cobra_eligiblity(role, current_user)
+  def validate_for_cobra_eligiblity(role)
     if self.is_shop?
       if role.present? && role.is_cobra_status?
         census_employee = role.census_employee
         self.kind = 'employer_sponsored_cobra'
         self.effective_on = census_employee.cobra_begin_date if census_employee.cobra_begin_date > self.effective_on
-        if census_employee.coverage_terminated_on.present? && !census_employee.have_valid_date_for_cobra?(current_user)
+        if census_employee.coverage_terminated_on.present? && !census_employee.have_valid_date_for_cobra?
           raise "You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated."
         end
       end

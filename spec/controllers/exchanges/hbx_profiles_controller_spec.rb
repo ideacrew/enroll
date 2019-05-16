@@ -642,7 +642,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     it "should render the new_eligibility partial" do
       allow(hbx_staff_role).to receive(:permission).and_return permission_yes
       sign_in(user)
-      xhr :get, :new_eligibility, params
+      get :new_eligibility, params: params, xhr: true, format: :js
 
       expect(response).to have_http_status(:success)
       expect(response).to render_template('new_eligibility')
@@ -651,7 +651,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     context 'when can_add_pdc permission is not given' do
       it "should not render the new_eligibility partial" do
         sign_in(user)
-        xhr :get, :new_eligibility, params
+        get :new_eligibility, params: params, xhr: true, format: :js
 
         expect(response).not_to render_template('new_eligibility')
       end
@@ -686,7 +686,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
     it "should render create_eligibility if save successful" do
       sign_in(user)
-      xhr :get, :create_eligibility, params
+      get :create_eligibility, params: params, xhr: true, format: :js
       active_household = person.primary_family.active_household
       latest_active_thh = active_household.reload.latest_active_thh
       eligibility_deter = latest_active_thh.eligibility_determinations.first
@@ -719,7 +719,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       allow(hbx_staff_role).to receive(:permission).and_return permission_yes
       sign_in(user)
       @params = {:person=>{:pid => person.id, :ssn => invalid_ssn, :dob => valid_dob},:jq_datepicker_ignore_person=>{:dob=> valid_dob}, :format => 'js'}
-      get :update_dob_ssn, params: @params, xhr: true
+      get :update_dob_ssn, xhr:  true, params:  @params
       expect(response).to render_template('edit_enrollment')
     end
 
@@ -728,7 +728,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       sign_in(user)
       expect(response).to have_http_status(:success)
       @params = {:person=>{:pid => person.id, :ssn => valid_ssn, :dob => valid_dob },:jq_datepicker_ignore_person=>{:dob=> valid_dob}, :format => 'js'}
-      get :update_dob_ssn, params: @params, xhr: true
+      get :update_dob_ssn, xhr:  true, params:  @params
       expect(response).to render_template('update_enrollment')
     end
 
@@ -737,7 +737,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       sign_in(user)
       expect(response).to have_http_status(:success)
       @params = {:person=>{:pid => person.id, :ssn => valid_ssn, :dob => valid_dob },:jq_datepicker_ignore_person=>{:dob=> valid_dob}, :format => 'js'}
-      xhr :get, :update_dob_ssn, @params
+      get :update_dob_ssn, xhr:  true, params:  @params
       expect(assigns(:info_changed)). to eq true
     end
 
@@ -746,7 +746,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       sign_in(user)
       expect(response).to have_http_status(:success)
       @params = {:person=>{:pid => person.id, :ssn => valid_ssn, :dob => valid_dob },:jq_datepicker_ignore_person=>{:dob=> valid_dob}, :format => 'js'}
-      xhr :get, :update_dob_ssn, @params
+      get :update_dob_ssn, xhr:  true, params:  @params
       expect(assigns(:dc_status)). to eq false
     end
 
@@ -754,8 +754,8 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       allow(hbx_staff_role).to receive(:permission).and_return permission_yes
       sign_in(user)
       expect(response).to have_http_status(:success)
-      @params = {:person=>{:pid => person1.id, :ssn => valid_ssn , :dob => valid_dob },:jq_datepicker_ignore_person=>{:dob=> valid_dob}, :format => 'js'}
-      get :update_dob_ssn, params: @params, xhr: true
+      @params = {:person=>{:pid => person1.id, :ssn => "" , :dob => valid_dob },:jq_datepicker_ignore_person=>{:dob=> valid_dob}, :format => 'js'}
+      get :update_dob_ssn, xhr:  true, params:  @params
       expect(response).to render_template('update_enrollment')
     end
 

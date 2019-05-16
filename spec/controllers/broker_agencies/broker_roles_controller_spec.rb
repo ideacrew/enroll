@@ -351,7 +351,7 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
     
     context "broker request registration guide" do
       before do
-        get :email_guide, {email:'Broker@test.com',first_name:'Broker'}
+        get :email_guide, params: {email:'Broker@test.com',first_name:'Broker'}
       end
       
       it "should send Registration Guide to Broker@test.com" do

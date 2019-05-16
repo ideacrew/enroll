@@ -164,6 +164,11 @@ class HbxProfilePolicy < ApplicationPolicy
     return false
   end
 
+  def can_add_pdc?
+    return false unless role = user.person && user.person.hbx_staff_role
+    role.permission.can_add_pdc
+  end
+
 
   private
 
@@ -171,11 +176,5 @@ class HbxProfilePolicy < ApplicationPolicy
     person = user.person
     return nil unless person
     person.hbx_staff_role
-  end
-
-
-  def can_add_pdc?
-    return false unless role = user.person && user.person.hbx_staff_role
-    role.permission.can_add_pdc
   end
 end

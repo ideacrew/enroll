@@ -184,7 +184,7 @@ class IvlNotices::EnrollmentNoticeBuilderWithDateRange < IvlNotice
   end
 
   def document_due_date(person, verification_type)
-    person.consumer_role.verification_types.by_name(verification_type).first.due_date
+    person.consumer_role.verification_types.by_name(verification_type.type_name).first.due_date
   end
 
   def phone_number(legal_name)
