@@ -154,6 +154,49 @@
                 <div class="col-md-6"><%= human_boolean applicant.has_job_income %></div>
               </div>
 
+              <% if @cfl_service.displayable_field?('applicant', applicant.id, :incomes_jobs) %>
+                <% applicant.incomes.jobs.each do |income| %>
+                  <div class="border-bottom border-sides form-content">
+                    <div class="row ptb no-buffer row-height">
+                      <div class="col-md-6">Employer Name</div>
+                      <div class="col-md-6"><%= income.employer_name %></div>
+                    </div>
+
+                    <div class="row ptb no-buffer row-height">
+                      <div class="col-md-6">EMPLOYER ADDRESSS LINE 1</div>
+                      <div class="col-md-6"><%= income.employer_address.address_1 %></div>
+                    </div>
+
+                    <% if income.employer_address.address_2.present? %>
+                      <div class="row ptb no-buffer row-height">
+                        <div class="col-md-6">EMPLOYER ADDRESSS LINE 2</div>
+                        <div class="col-md-6"><%= income.employer_address.address_2 %></div>
+                      </div>
+                    <% end %>
+
+                    <div class="row ptb no-buffer row-height">
+                      <div class="col-md-6">CITY</div>
+                      <div class="col-md-6"><%= income.employer_address.city %></div>
+                    </div>
+
+                    <div class="row ptb no-buffer row-height">
+                      <div class="col-md-6">STATE</div>
+                      <div class="col-md-6"><%= income.employer_address.state %></div>
+                    </div>
+
+                    <div class="row ptb no-buffer row-height">
+                      <div class="col-md-6">ZIP</div>
+                      <div class="col-md-6"><%= income.employer_address.zip %></div>
+                    </div>
+
+                    <div class="row ptb no-buffer row-height">
+                      <div class="col-md-6">EMPLOYER PHONE</div>
+                      <div class="col-md-6"><%= format_phone(income.employer_phone.full_phone_number) %></div>
+                    </div>
+                  </div>
+                <% end %>
+              <% end %>
+
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                 <div class="col-md-6">Is this person self-employed?</div>
                 <div class="col-md-6"><%= human_boolean applicant.has_self_employment_income %></div>

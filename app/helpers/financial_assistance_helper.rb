@@ -248,4 +248,8 @@ module FinancialAssistanceHelper
       'faa.curam_lookup'
     end
   end
+
+  def format_phone(phone)
+    number_to_phone(phone, area_code: true)
+  end
 end
