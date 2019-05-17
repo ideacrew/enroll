@@ -1105,7 +1105,7 @@ class ConsumerRole
 
   def sensitive_information_changed(field, person_params)
     if field == "dob"
-      person.send(field) != Date.strptime(person_params[field].gsub('/', '-'), "%Y-%m-%d")
+      person.send(field) != Date.strptime(person_params[field].gsub('/', '-'), "%m-%d-%Y")
     elsif field == "ssn"
       person.send(field).to_s != person_params[field].tr("-", "")
     else
