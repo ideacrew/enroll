@@ -243,11 +243,21 @@
                 <div class="col-md-6"><%= human_boolean applicant.has_enrolled_health_coverage %></div>
               </div>
 
+              <!-- Section to display benefits with kind is_enrolled-->
+              <% if applicant.has_enrolled_health_coverage %>
+                <%= render partial: 'financial_assistance/applications/review_benefits', locals: {kind: 'is_enrolled', applicant: applicant} %>
+              <% end %>
+
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                 <div class="col-md-6">Does this person currently have access to other health coverage, including through another person?
                 </div>
                 <div class="col-md-6"><%= human_boolean applicant.has_eligible_health_coverage %></div>
               </div>
+
+              <!-- Section to display benefits with kind is_eliglible-->
+              <% if applicant.has_eligible_health_coverage %>
+                <%= render partial: 'financial_assistance/applications/review_benefits', locals: {kind: 'is_eligible', applicant: applicant} %>
+              <% end %>
             </div>
 
             <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
