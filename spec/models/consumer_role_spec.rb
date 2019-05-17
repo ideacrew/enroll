@@ -682,7 +682,7 @@ context "Verification process and notices" do
       end
     end
     mask_hash.each do |field, action|
-      value = field == "dob" ? "2016-08-08" : "new filed record"
+      value = field == "dob" ? "08/08/2018" : "new filed record"
       it_behaves_like "reping the hub fo critical changes", field, action, {field => value}
     end
   end
