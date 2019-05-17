@@ -14,31 +14,58 @@ module SponsoredBenefits
         field :end_on, type: DateTime
         field :updated_by, type: String
         field :general_agency_profile_id, type: BSON::ObjectId
+        field :benefit_sponsrship_general_agency_profile_id, type: BSON::ObjectId
         field :aasm_state, type: Symbol, default: :active
         field :broker_role_id, type: BSON::ObjectId
         field :broker_agency_profile_id, type: BSON::ObjectId
+        field :benefit_sponsrship_broker_agency_profile_id, type: BSON::ObjectId
 
         scope :active, ->{ where(aasm_state: :active) }
         scope :inactive, ->{ where(aasm_state: :inactive) }
 
-        validates_presence_of :start_on, :general_agency_profile_id
+        validates_presence_of :start_on
+        validates_presence_of :general_agency_profile_id, :if => Proc.new { |m| m.benefit_sponsrship_general_agency_profile_id.blank? }
+        validates_presence_of :benefit_sponsrship_general_agency_profile_id, :if => Proc.new { |m| m.general_agency_profile_id.blank? }
 
         # belongs_to general_agency_profile
+
         def general_agency_profile=(profile)
-          raise ArgumentError.new("expected GeneralAgencyProfile") unless profile.is_a?(BenefitSponsors::Organizations::GeneralAgencyProfile)
-          self.general_agency_profile_id = profile._id
+          raise ArgumentError.new("expected GeneralAgencyProfile") unless profile.class.to_s.match(/GeneralAgencyProfile/)
+          if profile.kind_of?(GeneralAgencyProfile)
+            self.general_agency_profile_id = profile._id
+          else
+            self.benefit_sponsrship_general_agency_profile_id = profile._id
+          end
           @general_agency_profile = profile
         end
 
         def general_agency_profile
           return @general_agency_profile if defined? @general_agency_profile
-          @general_agency_profile = BenefitSponsors::Organizations::GeneralAgencyProfile.find(general_agency_profile_id)
+          if benefit_sponsrship_general_agency_profile_id.blank?
+            @general_agency_profile = GeneralAgencyProfile.find(self.general_agency_profile_id)
+          else
+            @general_agency_profile =  BenefitSponsors::Organizations::GeneralAgencyProfile.find(benefit_sponsrship_general_agency_profile_id)
+          end
+        end
+
+        def broker_agency_profile=(profile)
+          raise ArgumentError.new("expected BrokerAgencyProfile") unless profile.class.to_s.match(/BrokerAgencyProfile/)
+          if profile.kind_of?(BrokerAgencyProfile)
+            self.broker_agency_profile_id = profile._id
+          else
+            self.benefit_sponsrship_broker_agency_profile_id = profile._id
+          end
+          @broker_agency_profile = profile
         end
 
         def broker_agency_profile
-          ::BrokerAgencyProfile.find(broker_agency_profile_id) || BenefitSponsors::Organizations::Profile.find(broker_agency_profile_id)
+          return @broker_agency_profile if defined? @broker_agency_profile
+          if benefit_sponsrship_broker_agency_profile_id.blank?
+            @broker_agency_profile = BrokerAgencyProfile.find(self.broker_agency_profile_id)
+          else
+            @broker_agency_profile =  BenefitSponsors::Organizations::BrokerAgencyProfile.find(benefit_sponsrship_broker_agency_profile_id)
+          end
         end
-
 
         def ga_name
           Rails.cache.fetch("general-agency-name-#{self.general_agency_profile_id}", expires_in: 12.hour) do

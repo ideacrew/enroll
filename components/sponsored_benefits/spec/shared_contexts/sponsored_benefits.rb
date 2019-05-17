@@ -13,10 +13,12 @@ RSpec.shared_context "set up broker agency profile for BQT, by using configurati
   let(:plan_design_organization_with_assigned_ga) {
     plan_design_organization.general_agency_accounts.create(
       start_on: TimeKeeper.date_of_record,
-      general_agency_profile_id: general_agency_profile.id,
-      broker_agency_profile_id: owner_profile.id,
       broker_role_id: owner_profile.primary_broker_role.id
-    )
+    ).tap do |account|
+      account.general_agency_profile = general_agency_profile
+      account.broker_agency_profile = owner_profile
+      account.save
+    end
     plan_design_organization
   }
 

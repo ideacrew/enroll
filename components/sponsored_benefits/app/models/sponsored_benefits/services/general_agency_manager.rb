@@ -54,10 +54,10 @@ module SponsoredBenefits
       def create_general_agency_account(id, broker_role_id, start_on=TimeKeeper.datetime_of_record, general_agency_profile_id=form.general_agency_profile_id, broker_agency_profile_id=form.broker_agency_profile_id)
         plan_design_organization(id).general_agency_accounts.build(
           start_on: start_on,
-          general_agency_profile_id: general_agency_profile_id,
-          broker_agency_profile_id: broker_agency_profile_id,
           broker_role_id: broker_role_id
         ).tap do |account|
+          account.general_agency_profile = general_agency_profile(general_agency_profile_id)
+          account.broker_agency_profile = broker_agency_profile(broker_agency_profile_id)
           if account.save
             employer_profile = account.plan_design_organization.employer_profile
             if employer_profile
@@ -113,12 +113,12 @@ module SponsoredBenefits
 
       def broker_agency_profile(id=form.broker_agency_profile_id)
         return @broker_agency_profile if defined? @broker_agency_profile
-        @broker_agency_profile = ::BrokerAgencyProfile.find(id) || BenefitSponsors::Organizations::Profile.find(id)
+        @broker_agency_profile = BenefitSponsors::Organizations::BrokerAgencyProfile.find(id) || ::BrokerAgencyProfile.find(id)
       end
 
       def general_agency_profile(id=form.general_agency_profile_id)
         return @general_agency_profile if defined? @general_agency_profile
-        @general_agency_profile = ::GeneralAgencyProfile.find(id) || BenefitSponsors::Organizations::GeneralAgencyProfile.find(id)
+        @general_agency_profile = BenefitSponsors::Organizations::GeneralAgencyProfile.find(id) || ::GeneralAgencyProfile.find(id)
       end
 
       def current_default_ga
