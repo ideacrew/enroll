@@ -255,6 +255,7 @@ module FinancialAssistanceHelper
   end
 
   def format_benefit_cost(cost, frequency)
+    return '' if (cost.nil? || frequency.nil?)
     cost.to_s + " " + frequency.to_s.capitalize
   end
 end
