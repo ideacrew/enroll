@@ -492,12 +492,12 @@ describe Family, dbclean: :after_each do
       it "when original terminate date before hbx effective_on" do
         allow(family).to receive(:latest_shop_sep).and_return normal_sep
         allow(normal_sep).to receive(:qle_on).and_return date.end_of_month
-        allow(hbx).to receive(:effective_on).and_return (date.end_of_month)
-        expect(family.terminate_date_for_shop_by_enrollment(hbx)).to eq (TimeKeeper.date_of_record.end_of_month)
+        allow(hbx).to receive(:effective_on).and_return date.end_of_month
+        expect(family.terminate_date_for_shop_by_enrollment(hbx)).to eq hbx.effective_on
       end
 
       it "when qle_on is less than hbx effective_on" do
-        effective_on = date + 10.days
+        effective_on = date.end_of_month
         allow(family).to receive(:latest_shop_sep).and_return normal_sep
         allow(hbx).to receive(:effective_on).and_return effective_on
         expect(family.terminate_date_for_shop_by_enrollment(hbx)).to eq effective_on
@@ -1814,4 +1814,31 @@ describe "#outstanding_verification_datatable scope", dbclean: :after_each do
   end 
 end
 
+describe "terminated_enrollments", dbclean: :after_each do
+  let!(:person) { FactoryGirl.create(:person)}
+  let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+  let!(:household) { FactoryGirl.create(:household, family: family) }
+  let!(:termination_pending_enrollment) {
+    FactoryGirl.create(:hbx_enrollment,
+                       household: family.active_household,
+                       coverage_kind: "health",
+                       aasm_state: 'coverage_termination_pending'
+    )}
+  let!(:terminated_enrollment) {
+    FactoryGirl.create(:hbx_enrollment,
+                       household: family.active_household,
+                       coverage_kind: "health",
+                       aasm_state: 'coverage_terminated'
+    )}
+  let!(:expired_enrollment) {
+    FactoryGirl.create(:hbx_enrollment,
+                       household: family.active_household,
+                       coverage_kind: "health",
+                       aasm_state: 'coverage_expired'
+    )}
 
+  it "should include termination and termination pending enrollments only" do
+    expect(family.terminated_enrollments.count).to eq 2
+    expect(family.terminated_enrollments.map(&:aasm_state)).to eq ["coverage_terminated", "coverage_termination_pending"]
+  end
+end

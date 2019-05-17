@@ -2,6 +2,9 @@ class BrokerAgencyAccount
   include Mongoid::Document
   include SetCurrentUser
   include Mongoid::Timestamps
+  include Acapi::Notifiers
+  include Concerns::Observable
+  include ModelEvents::BrokerAgencyAccount
 
   embedded_in :employer_profile
   embedded_in :family
@@ -24,6 +27,7 @@ class BrokerAgencyAccount
 
   default_scope   ->{ where(:is_active => true) }
 
+  before_save :notify_before_save
 
   # belongs_to broker_agency_profile
   def broker_agency_profile=(new_broker_agency_profile)

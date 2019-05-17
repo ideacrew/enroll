@@ -1,5 +1,6 @@
 class EmployerInvoice
   include InvoiceHelper
+  include ApplicationHelper
 
   attr_reader :errors
 
@@ -66,8 +67,9 @@ class EmployerInvoice
   end
 
   def send_first_invoice_available_notice
-    if @organization.employer_profile.is_new_employer? && !@organization.employer_profile.is_converting? && (@organization.invoices.size < 1)
-      @organization.employer_profile.trigger_notices("initial_employer_first_invoice_available")
+    plan_year = @organization.employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED - ['suspended']).first
+    if @organization.employer_profile.is_new_employer? && !@organization.employer_profile.is_converting? && (@organization.invoices.size < 1) && plan_year
+      trigger_notice_observer(@organization.employer_profile, plan_year, "initial_employer_invoice_available")
     end
   end
 

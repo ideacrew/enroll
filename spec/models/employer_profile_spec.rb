@@ -482,10 +482,10 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
   before { organization0; organization1; organization2 }
 
   describe '.find_by_broker_agency_profile' do
-    let(:organization6)  {FactoryGirl.create(:organization, fein: "024897585")}
-    let(:broker_agency_profile)  {organization6.create_broker_agency_profile(market_kind: "both", primary_broker_role_id: "8754985")}
-    let(:organization7)  {FactoryGirl.create(:organization, fein: "724897585")}
-    let(:broker_agency_profile7)  {organization7.create_broker_agency_profile(market_kind: "both", primary_broker_role_id: "7754985")}
+    let(:broker_role6)   { FactoryGirl.create(:broker_role, aasm_state:'active') }
+    let(:broker_agency_profile)  { FactoryGirl.create(:broker_agency_profile, market_kind: "both", primary_broker_role_id: broker_role6.id)}
+    let(:broker_role7)   { FactoryGirl.create(:broker_role, aasm_state:'active') }
+    let(:broker_agency_profile7)  { FactoryGirl.create(:broker_agency_profile, market_kind: "both", primary_broker_role_id: broker_role7.id)}
     let(:organization3)  {FactoryGirl.create(:organization, fein: "034267123")}
     let(:organization4)  {FactoryGirl.create(:organization, fein: "027636010")}
     let(:organization5)  {FactoryGirl.create(:organization, fein: "076747654")}
@@ -518,8 +518,6 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
       expect(employers_with_broker7.size).to eq 1
       employer = Organization.find(employer.organization.id).employer_profile
       employer.hire_broker_agency(broker_agency_profile)
-      expect(employer).to receive(:employer_broker_fired)
-      employer.employer_broker_fired
       employer.save
       employers_with_broker7 = EmployerProfile.find_by_broker_agency_profile(broker_agency_profile7)
       expect(employers_with_broker7.size).to eq 0
@@ -533,21 +531,6 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
       employers_with_broker7 = EmployerProfile.find_by_broker_agency_profile(broker_agency_profile7)
       expect(employers_with_broker.size).to eq 2
       expect(employers_with_broker7.size).to eq 1
-    end
-
-    it "should send notification to GA when the broker is terminated on hiring other broker by employer" do
-      ActiveJob::Base.queue_adapter = :test
-      ActiveJob::Base.queue_adapter.enqueued_jobs = []
-      employer =  organization5.create_employer_profile(entity_kind: "partnership");
-      employer.hire_broker_agency(broker_agency_profile7)
-      employer.save
-      FactoryGirl.create(:general_agency_account, employer_profile: employer, aasm_state: 'active')
-      
-      employer = Organization.find(employer.organization.id).employer_profile
-      employer.hire_broker_agency(broker_agency_profile)
-      employer.save
-      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs
-      expect(queued_job.any? {|h| (h[:args].include?(employer.id.to_s) && h[:args].include?('general_agency_terminated') && h[:job] == ShopNoticesNotifierJob)}).to eq true
     end
 
     it 'works with multiple broker_agency_contacts'  do
@@ -836,25 +819,6 @@ describe EmployerProfile, "roster size" do
   end
 end
 
-describe EmployerProfile, "ER made binder payment, Admin user selected 'Mark Binder Paid' for group", dbclean: :after_each do
-  let!(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
-  let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'enrolled', start_on: start_on)}
-  let!(:benefit_group) { employer_profile.published_plan_year.benefit_groups.first}
-  let!(:organization) { employer_profile.organization }
-  let!(:census_employee){
-    employee = FactoryGirl.create :census_employee, employer_profile: employer_profile
-    employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
-    employee
-  }
-  let!(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
-  let!(:hbx_enrollment) { FactoryGirl.build(:hbx_enrollment, household: family.active_household, benefit_group_assignment_id: benefit_group.benefit_group_assignments.first.id, benefit_group_id: benefit_group.id, effective_on: start_on)}
-
-  it "should trigger notice" do
-    expect(EmployerProfile).to receive(:initial_employee_plan_selection_confirmation)
-    EmployerProfile.update_status_to_binder_paid([organization.id])
-  end
-end
-
 describe EmployerProfile, "when a binder premium is credited" do
   let(:hbx_id) { "some hbx id string value" }
   let(:employer) { EmployerProfile.new(:aasm_state => :eligible, :organization => Organization.new(:hbx_id => hbx_id)) }
@@ -973,18 +937,6 @@ describe EmployerProfile, "Renewal Queries" do
       expect(EmployerProfile.organizations_eligible_for_renewal(Date.new(calender_year+1, 2, 1)).to_a).to eq [organization2]
     end
   end
-
-  context '.organizations_for_low_enrollment_notice', dbclean: :after_each do
-    let(:date) { TimeKeeper.date_of_record }
-    let!(:low_organization)  {FactoryGirl.create(:organization, fein: "097936010")}
-    let!(:low_employer_profile) { FactoryGirl.create(:employer_profile, organization: low_organization) }
-    let!(:low_plan_year1) { FactoryGirl.create(:plan_year, aasm_state: "enrolling", employer_profile: low_employer_profile, :open_enrollment_end_on => date+2.days, start_on: (date+2.days).next_month.beginning_of_month)}
-    let!(:low_plan_year2) { FactoryGirl.create(:plan_year, aasm_state: "renewing_enrolling", employer_profile: low_employer_profile, :open_enrollment_end_on => date+2.days, start_on: (date+2.days).next_month.beginning_of_month)}
-
-    it 'should return organizations elgible low enrollment notice' do
-      expect(EmployerProfile.organizations_for_low_enrollment_notice(date).to_a).to eq [low_organization]
-    end
-  end
 end
 
 describe EmployerProfile, "For General Agency", dbclean: :after_each do
@@ -1053,20 +1005,6 @@ describe EmployerProfile, "For General Agency", dbclean: :after_each do
       FactoryGirl.create(:general_agency_account, employer_profile: employer_profile, aasm_state: 'active')
       expect(employer_profile.general_agency_accounts.active.count).to eq 2
       employer_profile.fire_general_agency!
-      expect(employer_profile.active_general_agency_account.blank?).to eq true
-    end
-
-    it "when with active general agency profile must send notification on broker termination" do
-      FactoryGirl.create(:general_agency_account, employer_profile: employer_profile, aasm_state: 'active')
-      expect(employer_profile.active_general_agency_account.blank?).to eq false
-      
-      ActiveJob::Base.queue_adapter = :test
-      ActiveJob::Base.queue_adapter.enqueued_jobs = []
-      employer_profile.fire_general_agency!
-      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
-        job_info[:job] == ShopNoticesNotifierJob
-      end
-      expect(queued_job[:args]).to include(employer_profile.id.to_s, 'general_agency_terminated')
       expect(employer_profile.active_general_agency_account.blank?).to eq true
     end
   end
@@ -1312,6 +1250,118 @@ describe EmployerProfile, "terminate_scheduled_plan_years", dbclean: :after_each
     plan_year.update_attributes!(:aasm_state => "active", :end_on => plan_year.start_on.next_year-1.days)
     plan_year.reload
     expect(plan_year.aasm_state).to eq "active"
+  end
+end
+
+describe EmployerProfile, "plan year Open Enrollment Extension", :dbclean => :after_each do
+  let(:this_year) { TimeKeeper.date_of_record.year }
+  let(:start_on) { Date.new(this_year,4,1) }
+  let(:aasm_state) { :active }
+  let!(:employer_profile) {FactoryGirl.create(:employer_profile)}
+  let!(:plan_year) {FactoryGirl.create(:plan_year, employer_profile: employer_profile, aasm_state: aasm_state, start_on: start_on)}
+
+  context '.oe_extendable_plan_years' do
+
+    let(:current_date)  { Date.new(this_year, 4, 10) }
+    before { TimeKeeper.set_date_of_record_unprotected!(current_date) }
+
+    context "when overlapping plan year present with status as" do
+      let(:new_start_on)            { Date.new(this_year,4,1) }
+      let!(:new_plan_year) {FactoryGirl.create(:plan_year, employer_profile: employer_profile, aasm_state: "canceled", start_on: new_start_on)}
+
+      context "terminted" do
+        let(:aasm_state) { :terminated }
+
+         it "should not return plan year for enrollment extension" do
+          expect(employer_profile.oe_extendable_plan_years).to be_empty
+        end
+      end
+
+      context "published" do
+        let(:aasm_state) { :published }
+
+        it "should not return plan year for enrollment extension" do
+          expect(employer_profile.oe_extendable_plan_years).to be_empty
+        end
+      end
+
+      context "enrollment_extended" do
+        let(:aasm_state) { :enrollment_extended }
+
+        it "should return only already extended plan year" do
+          expect(employer_profile.oe_extendable_plan_years).to be_present
+          expect(employer_profile.oe_extendable_plan_years).to eq [plan_year]
+        end
+      end
+
+      context "expired" do
+        let(:aasm_state) { :expired }
+
+        it "should not return plan year for enrollment extension" do
+          expect(employer_profile.oe_extendable_plan_years).to be_empty
+        end
+      end
+
+      context "draft" do
+        let(:aasm_state) { :draft }
+
+        it "should return plan year for enrollment extension" do
+          expect(employer_profile.oe_extendable_plan_years).to be_present
+          expect(employer_profile.oe_extendable_plan_years).to eq [new_plan_year]
+        end
+      end
+    end
+
+    context "when overlapping benefit plan year not present" do
+
+      let(:start_on)          { Date.new(this_year - 1,4,1) }
+      let(:new_start_on)            { Date.new(this_year,5,1) }
+
+      let!(:new_plan_year1)             {FactoryGirl.create(:plan_year, employer_profile: employer_profile, aasm_state: "canceled", start_on: new_start_on)} 
+
+      it "should return may plan year for enrollment extension" do
+        expect(employer_profile.oe_extendable_plan_years).to be_present
+        expect(employer_profile.oe_extendable_plan_years).to eq [new_plan_year1]
+      end
+    end
+  end
+
+  context '.oe_extended_plan_years' do
+
+    before {
+      TimeKeeper.set_date_of_record_unprotected!(current_date)
+    }
+
+    context "when open enrollment extended plan year present" do
+      let(:aasm_state) { :enrollment_extended }
+
+      context "and monthly open enrollment end date not passed" do
+        let(:aasm_state) { :terminated }
+        let(:current_date)  { PlanYear.calculate_open_enrollment_date(start_on)[:open_enrollment_end_on] - 2.days }
+
+        it "should not return plan year for close of open enrollment" do
+          expect(employer_profile.oe_extended_plan_years).to be_empty
+        end
+      end
+
+      context "and monthly open enrollment end date reached" do
+        let(:aasm_state) { :terminated }
+        let(:current_date)  { PlanYear.calculate_open_enrollment_date(start_on)[:open_enrollment_end_on] }
+
+        it "should not return plan year for close of open enrollment" do
+          expect(employer_profile.oe_extended_plan_years).to be_empty
+        end
+      end
+
+      context "and monthly open enrollment end date passed" do
+        let(:aasm_state) { :terminated }
+        let(:current_date)  { PlanYear.calculate_open_enrollment_date(start_on)[:open_enrollment_end_on] + 2.days }
+
+        it "should not return plan year for close of open enrollment" do
+          expect(employer_profile.oe_extended_plan_years).to be_empty
+        end
+      end
+    end
   end
 end
 

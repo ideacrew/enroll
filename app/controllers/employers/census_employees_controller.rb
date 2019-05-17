@@ -101,12 +101,10 @@ class Employers::CensusEmployeesController < ApplicationController
     authorize EmployerProfile, :updateable?
     status = params[:status]
     termination_date = params["termination_date"]
-
     if termination_date.present?
       termination_date = DateTime.strptime(termination_date, '%m/%d/%Y').try(:to_date)
       if termination_date >= (TimeKeeper.date_of_record - 60.days)
-        @fa = @census_employee.terminate_employment(termination_date) ? true : false
-        notify_employee_of_termination
+        @fa = @census_employee.terminate_employment(termination_date)
       end
     end
 
@@ -232,14 +230,6 @@ class Employers::CensusEmployeesController < ApplicationController
 
   def benefit_group
     @census_employee.benefit_group_assignments.build unless @census_employee.benefit_group_assignments.present?
-  end
-
-  def notify_employee_of_termination
-    begin
-      ShopNoticesNotifierJob.perform_later(@census_employee.id.to_s, "employee_termination_notice")
-    rescue Exception => e
-      (Rails.logger.error { "Unable to deliver termination notice to #{@census_employee.full_name} due to #{e.inspect}" }) unless Rails.env.test?
-    end
   end
 
   private

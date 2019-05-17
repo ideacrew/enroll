@@ -3,6 +3,12 @@ class SpecialEnrollmentPeriod
   include SetCurrentUser
   include Mongoid::Timestamps
   include TimeHelper
+  include Acapi::Notifiers
+  extend Acapi::Notifiers
+  include Concerns::Observable
+  include ModelEvents::SpecialEnrollmentPeriod
+
+  after_save :notify_on_save
 
   embedded_in :family
   embeds_many :comments, as: :commentable, cascade_callbacks: true
@@ -75,6 +81,8 @@ class SpecialEnrollmentPeriod
 
   scope :shop_market,         ->{ where(:qualifying_life_event_kind_id.in => QualifyingLifeEventKind.shop_market_events.map(&:id) + QualifyingLifeEventKind.shop_market_non_self_attested_events.map(&:id) ) }
   scope :individual_market,   ->{ where(:qualifying_life_event_kind_id.in => QualifyingLifeEventKind.individual_market_events.map(&:id) + QualifyingLifeEventKind.individual_market_non_self_attested_events.map(&:id)) }
+
+  after_save :notify_on_save
 
   after_initialize :set_submitted_at
 

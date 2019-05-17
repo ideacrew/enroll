@@ -52,7 +52,7 @@ describe ChangeRenewingPlanYearAasmState, dbclean: :after_each do
     end
 
     it "should update aasm_state of plan year to renewing_enrolled when ENV['py_state_to'] is set to newing_enrolled" do
-      allow_any_instance_of(PlanYear).to receive("renewal_employer_open_enrollment_completed").and_return(true)
+      # allow_any_instance_of(PlanYear).to receive("renewal_employer_open_enrollment_completed").and_return(true)
       allow_any_instance_of(PlanYear).to receive(:is_enrollment_valid?).and_return(true)
       allow(ENV).to receive(:[]).with("py_state_to").and_return('renewing_enrolled')
       census_employee.reload
@@ -62,7 +62,7 @@ describe ChangeRenewingPlanYearAasmState, dbclean: :after_each do
     end
 
     it "should update aasm_state of plan year to renewing_enrolled in exception case" do
-      allow_any_instance_of(PlanYear).to receive("renewal_employer_open_enrollment_completed").and_return(true)
+      # allow_any_instance_of(PlanYear).to receive("renewal_employer_open_enrollment_completed").and_return(true)
       allow_any_instance_of(PlanYear).to receive(:is_enrollment_valid?).and_return(false)  # exception case
       allow(ENV).to receive(:[]).with("py_state_to").and_return('renewing_enrolled')
       census_employee.reload
@@ -73,7 +73,7 @@ describe ChangeRenewingPlanYearAasmState, dbclean: :after_each do
 
 
     it "should update aasm_state of plan year to renewing_draft when ENV['py_state_to'] is set to renewing_draft" do
-      allow_any_instance_of(PlanYear).to receive("renewal_employer_open_enrollment_completed").and_return(true)
+      # allow_any_instance_of(PlanYear).to receive("renewal_employer_open_enrollment_completed").and_return(true)
       allow_any_instance_of(PlanYear).to receive(:is_enrollment_valid?).and_return(true)
       allow(ENV).to receive(:[]).with("py_state_to").and_return('renewing_draft')
       census_employee.reload
