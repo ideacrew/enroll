@@ -649,8 +649,8 @@ module BenefitSponsors
           let!(:april_eligible_benefit_sponsorhip_2)  { april_sponsors[1]}
           let(:transition_at) {TimeKeeper.start_of_exchange_day_from_utc(TimeKeeper.date_of_record)}
           let!(:create_workflow_state_transition){
-            april_eligible_benefit_sponsorhip_1.benefit_applications.first.workflow_state_transitions.create(from_state: :enrollment_closed, to_state: :enrollment_eligible, transition_at: transition_at)
-            april_eligible_benefit_sponsorhip_2.benefit_applications.first.workflow_state_transitions.create(from_state: :enrollment_closed, to_state: :enrollment_eligible, transition_at: transition_at - 1.day)
+            april_eligible_benefit_sponsorhip_1.benefit_applications.first.workflow_state_transitions.create(from_state: :enrollment_closed, to_state: :binder_paid, transition_at: transition_at)
+            april_eligible_benefit_sponsorhip_2.benefit_applications.first.workflow_state_transitions.create(from_state: :enrollment_closed, to_state: :binder_paid, transition_at: transition_at - 1.day)
           }
 
           it "should fetch only valid initial applications with matching transition state and time" do
