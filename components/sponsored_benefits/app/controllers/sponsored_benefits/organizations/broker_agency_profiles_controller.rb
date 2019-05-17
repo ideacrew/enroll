@@ -19,7 +19,7 @@ module SponsoredBenefits
 
     def general_agency_profiles
       return @general_agency_profiles if defined? @general_agency_profiles
-      @general_agency_profiles = ::GeneralAgencyProfile.all
+      @general_agency_profiles = BenefitSponsors::Organizations::GeneralAgencyProfile.all
     end
 
     def klass

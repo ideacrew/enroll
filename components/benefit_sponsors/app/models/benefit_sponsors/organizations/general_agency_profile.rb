@@ -86,7 +86,18 @@ module BenefitSponsors
         LanguageList::COMMON_LANGUAGES
       end
 
-      #old model
+      def primary_staff
+        general_agency_staff_roles.present? ? general_agency_staff_roles.last : nil
+      end
+
+      def current_staff_state
+        primary_staff.current_state rescue ""
+      end
+
+      def current_state
+        aasm_state.humanize.titleize
+      end
+
       def general_agency_staff_roles
         Person.where("general_agency_staff_roles.benefit_sponsors_general_agency_profile_id" => BSON::ObjectId.from_string(self.id)).map {|p| p.general_agency_staff_roles.detect {|s| s.benefit_sponsors_general_agency_profile_id == id}}
       end

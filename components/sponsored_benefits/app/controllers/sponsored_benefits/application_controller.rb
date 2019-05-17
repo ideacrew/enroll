@@ -50,7 +50,7 @@ module SponsoredBenefits
         if !is_profile_general_agency?
           @profile.primary_broker_role.person
         else
-          Person.where("general_agency_staff_roles.general_agency_profile_id" => BSON::ObjectId.from_string(@profile.id)).first
+          Person.where("general_agency_staff_roles.benefit_sponsors_general_agency_profile_id" => BSON::ObjectId.from_string(@profile.id)).first
         end
       end
   end

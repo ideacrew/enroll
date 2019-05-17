@@ -65,7 +65,7 @@ module SponsoredBenefits
       else
         flash[:notice] = "Clearing Default General Agency Failed: #{@form.errors.full_messages.join(",")}"
       end
-      redirect_to main_app.general_agency_index_broker_agencies_profile_path(id: @form.broker_agency_profile_id)
+      redirect_to benefit_sponsors.general_agency_index_profiles_broker_agencies_broker_agency_profiles_path(id: @form.broker_agency_profile_id)
     end
   end
 end
