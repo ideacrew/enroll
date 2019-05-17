@@ -115,7 +115,7 @@ Then(/^Hbx Admin should see an Transition family members link$/) do
   find_link('Transition Family Members').visible?
 end
 
-When(/^Hbx Admin clicks on Transition family members link$/) do
+When(/^Hbx Admin clicks Transition family members link$/) do
   FactoryBot.create(:qualifying_life_event_kind, reason: 'eligibility_failed_or_documents_not_received_by_due_date', title: 'Not eligible for marketplace coverage due to citizenship or immigration status')
   click_link('Transition Family Members')
 end
@@ -126,21 +126,22 @@ Then(/^Hbx Admin should see the form being rendered to transition each family me
 end
 
 When(/^Hbx Admin enter\/update information of each member individually$/) do
-  find(:xpath, "(//input[@type='checkbox'])[1]").trigger('click')
+  find("#transition_user", wait: 5).click
   find('input.date-picker').click
-  find(:xpath, '/html/body/div[4]/table/tbody/tr[3]/td[4]/a').click
+  find('.ui-state-highlight', wait: 5).click
 end
 
-When(/^Hbx Admin clicks on submit button$/) do
+When(/^Hbx Admin clicks submit button$/) do
   click_button 'Submit'
 end
 
 Then(/^Hbx Admin should show the Transition Results and the close button$/) do
+  page.driver.browser.switch_to.alert.accept
   expect(page).to have_content(/Market Transitions Added/i)
   expect(page).to have_content(/Close/i)
 end
 
-When(/^Hbx Admin clicks on close button$/) do
+When(/^Hbx Admin clicks close button$/) do
   click_link 'Close'
 end
 
