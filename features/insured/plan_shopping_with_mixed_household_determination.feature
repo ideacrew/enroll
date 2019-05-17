@@ -1,3 +1,4 @@
+@wip
 Feature: plan shopping with mixed household determination
 
   Background: Consumer work flow while plan shopping for mixed household determinations
@@ -10,8 +11,9 @@ Feature: plan shopping with mixed household determination
     When user clicks on continue button
     Then user should see heading labeled personal information
     Then Individual should see a form to enter personal information
-    When Individual clicks on Save and Exit
-    Then Individual resumes enrollment
+    #after save and exit , should login in back, no respective scenario found.
+#    When Individual clicks on Save and Exit
+#    Then Individual resumes enrollment
     Then Individual sees previously saved address
     Then Individual agrees to the privacy agreeement
     Then Individual should see identity verification page and clicks on submit
