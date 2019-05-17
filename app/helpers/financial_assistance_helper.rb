@@ -248,4 +248,13 @@ module FinancialAssistanceHelper
       'faa.curam_lookup'
     end
   end
+
+  def format_phone(phone)
+    return "" unless phone.size == 10
+    number_to_phone(phone, area_code: true)
+  end
+
+  def format_benefit_cost(cost, frequency)
+    cost.to_s + " " + frequency.to_s.capitalize
+  end
 end
