@@ -35,7 +35,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::GroupTerminationNotice', :dbclean 
         model_instance.class.observer_peers.keys.each do |observer|
           expect(observer).to receive(:notifications_send) do |instance, model_event|
             expect(model_event).to be_an_instance_of(::BenefitSponsors::ModelEvents::ModelEvent)
-            expect(model_event).to have_attributes(:event_key => :employee_notice_for_employee_terminated_from_roster, :klass_instance => model_instance, :options => {})
+            expect(model_event).to have_attributes(:event_key => :benefit_coverage_period_terminated_voluntary, :klass_instance => model_instance, :options => {})
           end
         end
         service.terminate(end_date, termination_date, "voluntary", false)

@@ -32,6 +32,9 @@ module BenefitSponsors
 
             if new_model_event.event_key == :employee_coverage_termination
               if hbx_enrollment.is_shop? && (::CensusEmployee::EMPLOYMENT_ACTIVE_STATES - ::CensusEmployee::PENDING_STATES).include?(hbx_enrollment.census_employee.aasm_state) && hbx_enrollment.sponsored_benefit_package.is_active
+                benefit_application = hbx_enrollment.sponsored_benefit_package.benefit_application
+                return if benefit_application.termination_pending? || benefit_application.terminated?
+
                 deliver(recipient: hbx_enrollment.employer_profile, event_object: hbx_enrollment, notice_event: "employer_notice_for_employee_coverage_termination")
                 deliver(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "employee_notice_for_employee_coverage_termination")
               end
