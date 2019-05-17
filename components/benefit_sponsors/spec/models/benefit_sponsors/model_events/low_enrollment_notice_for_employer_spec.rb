@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe 'BenefitSponsors::ModelEvents::LowEnrollmentNoticeForEmployer', dbclean: :around_each do
 
   let(:model_event) { "low_enrollment_notice_for_employer" }
-  let(:start_on) { TimeKeeper.date_of_record.next_month.beginning_of_month}
+  let(:start_on) { Date.today.next_month.beginning_of_month}
   let!(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
   let!(:organization)     { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
   let!(:employer_profile)    { organization.employer_profile }
@@ -12,9 +12,10 @@ RSpec.describe 'BenefitSponsors::ModelEvents::LowEnrollmentNoticeForEmployer', d
     :with_benefit_package,
     :benefit_sponsorship => benefit_sponsorship,
     :aasm_state => 'enrollment_open',
-    :effective_period =>  start_on..(start_on + 1.year) - 1.day
+    :effective_period =>  start_on..(start_on + 1.year) - 1.day,
+    :open_enrollment_period => start_on.prev_month..Date.new(start_on.prev_month.year, start_on.prev_month.month, Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on)
   )}
-  let!(:date_mock_object) { double("Date", day: (model_instance.open_enrollment_period.max - 2.days).day)}
+  let!(:date_mock_object) { model_instance.open_enrollment_period.max - 2.days }
 
   before do
     allow(TimeKeeper).to receive(:date_of_record).and_return model_instance.open_enrollment_period.max - 2.days
@@ -23,10 +24,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::LowEnrollmentNoticeForEmployer', d
   describe "ModelEvent" do
     it "should trigger model event" do
       model_instance.class.observer_peers.keys.each do |observer|
-          expect(observer).to receive(:notifications_send) do |instance, model_event|
-            expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
-          end
-          expect(observer).to receive(:notifications_send) do |instance, model_event|
+        expect(observer).to receive(:notifications_send) do |instance, model_event|
           expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
           expect(model_event).to have_attributes(:event_key => :low_enrollment_notice_for_employer, :klass_instance => model_instance, :options => {})
         end

@@ -59,41 +59,41 @@ module BenefitSponsors
       let(:april_effective_date)            { Date.new(this_year,4,1) }
 
       let!(:employer_A)                 { create(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile,
-                                                     :with_initial_benefit_application, initial_application_state: :enrollment_eligible,
-                                                     default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site, aasm_state: :initial_enrollment_eligible)
+                                                     :with_initial_benefit_application, initial_application_state: :binder_paid,
+                                                     default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site, aasm_state: :applicant)
       }
 
       let!(:employer_B)                 { create(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile,
                                                  :with_initial_benefit_application, initial_application_state: :enrollment_ineligible,
-                                                 default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site, aasm_state: :initial_enrollment_ineligible)
+                                                 default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site, aasm_state: :applicant)
       }
 
       let!(:employer_C)                 { create(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile,
                                                  :with_initial_benefit_application, initial_application_state: :enrollment_closed,
-                                                 default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site, aasm_state: :initial_enrollment_closed)
+                                                 default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site, aasm_state: :applicant)
 
       }
 
       let!(:employer_D)                 { create(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile,
                                                  :with_initial_benefit_application, initial_application_state: :enrollment_closed,
-                                                 default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site, aasm_state: :initial_enrollment_closed)
+                                                 default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site, aasm_state: :applicant)
       }
 
       let!(:employer_E)                 { create(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile,
                                                  :with_initial_benefit_application, initial_application_state: :enrollment_closed,
-                                                 default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site, aasm_state: :initial_enrollment_closed)
+                                                 default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site, aasm_state: :applicant)
       }
       let!(:employer_F)                 { create(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile,
                                                  :with_initial_benefit_application, initial_application_state: :enrollment_closed,
-                                                 default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site, aasm_state: :initial_enrollment_closed)
+                                                 default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site, aasm_state: :applicant)
       }
       let!(:employer_G)                 { create(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile,
                                                  :with_initial_benefit_application, initial_application_state: :enrollment_closed,
-                                                 default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site, aasm_state: :initial_enrollment_closed)
+                                                 default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site, aasm_state: :applicant)
       }
       let!(:employer_H)                 { create(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile,
                                                  :with_initial_benefit_application, initial_application_state: :enrollment_closed,
-                                                 default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site, aasm_state: :initial_enrollment_closed)
+                                                 default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site, aasm_state: :applicant)
       }
 
       before :each do
@@ -125,9 +125,9 @@ module BenefitSponsors
 
         before :each do
           allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year,3,27))
-          employer_C.approve_initial_enrollment_eligibility!
-          benefit_app = employer_C.benefit_applications.where(aasm_state: :enrollment_eligible).first
-          benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,26).to_time.utc)
+          employer_C.benefit_applications.first.credit_binder!
+          benefit_app = employer_C.benefit_applications.where(aasm_state: :binder_paid).first
+          benefit_app.workflow_state_transitions.where(to_state: :binder_paid).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,26).to_time.utc)
         end
 
         it "should transmit only employer_C " do
@@ -151,9 +151,9 @@ module BenefitSponsors
 
         before :each do
           allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year,3,28))
-          employer_D.approve_initial_enrollment_eligibility!
-          benefit_app = employer_D.benefit_applications.where(aasm_state: :enrollment_eligible).first
-          benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,27).to_time.utc)
+          employer_D.benefit_applications.first.credit_binder!
+          benefit_app = employer_D.benefit_applications.where(aasm_state: :binder_paid).first
+          benefit_app.workflow_state_transitions.where(to_state: :binder_paid).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,27).to_time.utc)
         end
 
 
@@ -178,9 +178,9 @@ module BenefitSponsors
 
         before :each do
           allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year,3,29))
-          employer_E.approve_initial_enrollment_eligibility!
-          benefit_app = employer_E.benefit_applications.where(aasm_state: :enrollment_eligible).first
-          benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,28).to_time.utc)
+          employer_E.benefit_applications.first.credit_binder!
+          benefit_app = employer_E.benefit_applications.where(aasm_state: :binder_paid).first
+          benefit_app.workflow_state_transitions.where(to_state: :binder_paid).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,28).to_time.utc)
         end
 
 
@@ -205,9 +205,9 @@ module BenefitSponsors
 
         before :each do
           allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year,3,30))
-          employer_F.approve_initial_enrollment_eligibility!
-          benefit_app = employer_F.benefit_applications.where(aasm_state: :enrollment_eligible).first
-          benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,29).to_time.utc)
+          employer_F.benefit_applications.first.credit_binder!
+          benefit_app = employer_F.benefit_applications.where(aasm_state: :binder_paid).first
+          benefit_app.workflow_state_transitions.where(to_state: :binder_paid).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,29).to_time.utc)
         end
 
 
@@ -232,9 +232,9 @@ module BenefitSponsors
 
         before :each do
           allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year,3,31))
-          employer_G.approve_initial_enrollment_eligibility!
-          benefit_app = employer_G.benefit_applications.where(aasm_state: :enrollment_eligible).first
-          benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,30).to_time.utc)
+          employer_G.benefit_applications.first.credit_binder!
+          benefit_app = employer_G.benefit_applications.where(aasm_state: :binder_paid).first
+          benefit_app.workflow_state_transitions.where(to_state: :binder_paid).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,30).to_time.utc)
         end
 
 
@@ -259,9 +259,9 @@ module BenefitSponsors
 
         before :each do
           allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year,4,1))
-          employer_H.approve_initial_enrollment_eligibility!
-          benefit_app = employer_H.benefit_applications.where(aasm_state: :enrollment_eligible).first
-          benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,31).to_time.utc)
+          employer_H.benefit_applications.first.credit_binder!
+          benefit_app = employer_H.benefit_applications.where(aasm_state: :binder_paid).first
+          benefit_app.workflow_state_transitions.where(to_state: :binder_paid).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,31).to_time.utc)
         end
 
 

@@ -71,7 +71,7 @@ class OutstandingMonthlyEnrollments < MongoidMigrationTask
           benefit_application_state = benefit_application.aasm_state
           benefit_sponsorship_aasm = benefit_sponsorship.aasm_state
           initial_renewal = benefit_application.predecessor.present? ? "renewal" : "initial"
-          binder_paid = %w(initial_enrollment_eligible active).include?(benefit_sponsorship_aasm.to_s)
+          binder_paid = benefit_application.binder_paid?
           eg_id = id
           product = hbx_enrollment.product rescue ""
           carrier = product.issuer_profile.legal_name rescue ""
