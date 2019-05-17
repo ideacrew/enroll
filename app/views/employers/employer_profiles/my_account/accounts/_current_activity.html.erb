@@ -33,7 +33,7 @@
           <% else %>
             <td>Payment Type: <%= payment.payment_method %></td>
           <% end %>
-          <td><%= number_to_currency(payment.amount) %></td>
+          <td <%= payment_amount_color_style(payment.amount) %>><%= number_to_currency(payment.amount) %></td>
         </tr>
       <% end %>
     <% end %>
