@@ -1679,6 +1679,20 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       )
     }
 
+    let!(:void_enrollment)   { FactoryGirl.create(:hbx_enrollment,
+      household: shop_family.latest_household,
+      coverage_kind: "health",
+      effective_on: effective_date - 2.years,
+      enrollment_kind: "open_enrollment",
+      kind: "employer_sponsored",
+      submitted_at: effective_date - 24.months,
+      benefit_group_id: expired_plan_year.benefit_groups.first.id,
+      employee_role_id: employee_role.id,
+      benefit_group_assignment_id: expired_benefit_group_assignment.id,
+      aasm_state: 'void'
+      )
+    }
+
     let!(:terminated_dental_enrollment)   { FactoryGirl.create(:hbx_enrollment,
       household: shop_family.latest_household,
       coverage_kind: "dental",
@@ -1765,6 +1779,10 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
       it 'should not return expired shop coverages' do
         expect(census_employee.enrollments_for_display).not_to include(expired_health_enrollment)
+      end
+
+      it 'should not return void shop coverages' do
+        expect(census_employee.enrollments_for_display).not_to include(void_enrollment)
       end
 
       it 'should not return terminated shop coverages' do
