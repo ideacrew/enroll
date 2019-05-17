@@ -108,7 +108,7 @@ Rails.application.routes.draw do
         get :edit_force_publish
         post :force_publish
         get :broker_agency_index
-        get :general_agency_index if Settings.aca.general_agency_enabled
+        get :general_agency_index
         get :issuer_index
         get :product_index
         get :configuration
@@ -432,9 +432,7 @@ Rails.application.routes.draw do
         get  :commission_statements
       end
       member do
-        if Settings.aca.general_agency_enabled
-          get :general_agency_index
-        end
+        get :general_agency_index
         get :manage_employers
         post :clear_assign_for_employer
         get :assign
@@ -508,32 +506,31 @@ Rails.application.routes.draw do
     end
   end
 
-  if Settings.aca.general_agency_enabled
-    match 'general_agency_registration', to: 'general_agencies/profiles#new_agency', via: [:get]
-    namespace :general_agencies do
-      root 'profiles#new'
-      resources :profiles do
-        collection do
-          get :new_agency_staff
-          get :search_general_agency
-          get :new_agency
-          get :messages
-          get :agency_messages
-          get :inbox
-          get :edit_staff
-          post :update_staff
-        end
-        member do
-          get :employers
-          get :families
-          get :staffs
-        end
+  match 'general_agency_registration', to: 'general_agencies/profiles#new_agency', via: [:get]
+  namespace :general_agencies do
+    root 'profiles#new'
+    resources :profiles do
+      collection do
+        get :new_agency_staff
+        get :search_general_agency
+        get :new_agency
+        get :messages
+        get :agency_messages
+        get :inbox
+        get :edit_staff
+        post :update_staff
       end
-      resources :inboxes, only: [:new, :create, :show, :destroy] do
-        get :msg_to_portal
+      member do
+        get :employers
+        get :families
+        get :staffs
       end
     end
+    resources :inboxes, only: [:new, :create, :show, :destroy] do
+      get :msg_to_portal
+    end
   end
+
   resources :translations
 
   namespace :api, :defaults => {:format => 'xml'} do
