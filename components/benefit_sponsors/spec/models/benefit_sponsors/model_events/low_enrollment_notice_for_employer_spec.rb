@@ -12,9 +12,10 @@ RSpec.describe 'BenefitSponsors::ModelEvents::LowEnrollmentNoticeForEmployer', d
     :with_benefit_package,
     :benefit_sponsorship => benefit_sponsorship,
     :aasm_state => 'enrollment_open',
-    :effective_period =>  start_on..(start_on + 1.year) - 1.day
+    :effective_period =>  start_on..(start_on + 1.year) - 1.day,
+    :open_enrollment_period => start_on.prev_month..Date.new(start_on.prev_month.year, start_on.prev_month.month, Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on)
   )}
-  let!(:date_mock_object) { double("Date", day: (model_instance.open_enrollment_period.max - 2.days).day)}
+  let!(:date_mock_object) { model_instance.open_enrollment_period.max - 2.days }
 
   before do
     allow(TimeKeeper).to receive(:date_of_record).and_return model_instance.open_enrollment_period.max - 2.days
@@ -23,9 +24,9 @@ RSpec.describe 'BenefitSponsors::ModelEvents::LowEnrollmentNoticeForEmployer', d
   describe "ModelEvent" do
     it "should trigger model event" do
       model_instance.class.observer_peers.keys.select { |ob| ob.is_a? BenefitSponsors::Observers::NoticeObserver }.each do |observer|
-        expect(observer).to receive(:process_application_events) do |_instance, model_event|
-          expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
-        end
+        # expect(observer).to receive(:process_application_events) do |_instance, model_event|
+        #   expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
+        # end
         expect(observer).to receive(:process_application_events) do |_instance, model_event|
           expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
           expect(model_event).to have_attributes(:event_key => :open_enrollment_end_reminder_and_low_enrollment, :klass_instance => model_instance, :options => {})

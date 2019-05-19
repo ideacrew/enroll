@@ -288,7 +288,6 @@ module BenefitSponsors
 
       def trigger_initial_employer_no_binder_payment_received_notice(_model_event)
         BenefitSponsors::Queries::NoticeQueries.initial_employers_in_ineligible_state.each do |benefit_sponsorship|
-          next unless benefit_sponsorship.initial_enrollment_ineligible?
 
           benefit_application = benefit_sponsorship.benefit_applications.where(:aasm_state => :enrollment_ineligible).first
           next unless benefit_application.present? && !benefit_application.is_renewing?

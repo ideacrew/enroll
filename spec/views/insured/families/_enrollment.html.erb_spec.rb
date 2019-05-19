@@ -68,8 +68,10 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         coverage_year: 2018,
         employer_profile: employer_profile,
         coverage_terminated?: false,
+        coverage_termination_pending?: true,
         coverage_expired?: false,
         total_premium: 200.00,
+        terminated_on: TimeKeeper.date_of_record.next_month.end_of_month,
         total_employer_contribution: 100.00,
         total_employee_cost: 100.00,
         benefit_group: nil,
@@ -134,11 +136,13 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         coverage_year: 2018,
         employer_profile: employer_profile,
         coverage_terminated?: false,
+        coverage_termination_pending?: true,
         coverage_expired?: false,
         total_premium: 200.00,
         total_employer_contribution: 100.00,
         total_employee_cost: 100.00,
         benefit_group: nil,
+        terminated_on: terminated_on,
         consumer_role_id: nil,
         consumer_role: nil,
         future_enrollment_termination_date: future_enrollment_termination_date, 
@@ -146,6 +150,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       )
     end
 
+    let(:terminated_on) { nil }
     let(:enrollment_aasm_state) { "coverage_selected" }
     let(:future_enrollment_termination_date) { "" }
 
@@ -228,10 +233,16 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
 
     context "coverage_termination_pending" do
+      let(:terminated_on) { TimeKeeper.date_of_record.next_month.end_of_month }
       let(:enrollment_aasm_state) { "coverage_termination_pending" }
       let(:future_enrollment_termination_date) { Date.today }
-      it "displays future_enrollment_termination_date when coverage_termination_pending" do
+
+      it 'displays future_enrollment_termination_date when enrollment is in coverage_termination_pending state' do
         expect(rendered).to match /Future enrollment termination date:/
+      end
+
+      it 'displays terminated_on when coverage_termination_pending and not future_enrollment_termination_date' do
+        expect(rendered).to have_text(/#{terminated_on.strftime("%m/%d/%Y")}/)
       end
     end
   end
@@ -243,12 +254,31 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     let(:plan) {FactoryBot.build(:benefit_markets_products_health_products_health_product, :created_at =>  TimeKeeper.date_of_record)}
     let(:employee_role) { FactoryBot.create(:employee_role) }
     let(:census_employee) { FactoryBot.create(:census_employee, employee_role_id: employee_role.id)}
-    let(:hbx_enrollment) {instance_double(HbxEnrollment, product: plan, id: "12345", total_premium: 200, kind: 'individual',
-                                 covered_members_first_names: ["name"], can_complete_shopping?: false,
-                                 enroll_step: 1, subscriber: nil, coverage_terminated?: false,
-                                 may_terminate_coverage?: true, effective_on: Date.new(2015,8,10),
-                                 consumer_role: double, applied_aptc_amount: 100, employee_role: employee_role, census_employee: census_employee,
-                                 status_step: 2, aasm_state: 'coverage_selected')}
+
+    let(:hbx_enrollment) do
+      instance_double(
+        HbxEnrollment,
+        product: plan,
+        id: "12345",
+        total_premium: 200,
+        kind: 'individual',
+        covered_members_first_names: ["name"],
+        can_complete_shopping?: false,
+        enroll_step: 1,
+        subscriber: nil,
+        coverage_terminated?: false,
+        coverage_termination_pending?: false,
+        may_terminate_coverage?: true,
+        effective_on: Date.new(2015,8,10),
+        consumer_role: double,
+        applied_aptc_amount: 100,
+        employee_role: employee_role,
+        census_employee: census_employee,
+        status_step: 2,
+        aasm_state: 'coverage_selected'
+      )
+    end
+
    let(:benefit_group) { FactoryBot.create(:benefit_group) }
 
     before :each do
@@ -308,6 +338,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         is_coverage_waived?: false,
         coverage_year: 2018,
         employer_profile: employer_profile,
+        coverage_termination_pending?: false,
         coverage_terminated?: true,
         coverage_expired?: false,
         total_premium: 200.00,
@@ -358,6 +389,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         coverage_year: 2018,
         employer_profile: employer_profile,
         coverage_terminated?: false,
+        coverage_termination_pending?: false,
         coverage_expired?: true,
         total_premium: 200.00,
         total_employer_contribution: 100.00,
@@ -416,6 +448,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         coverage_year: 2018,
         employer_profile: employer_profile,
         coverage_terminated?: false,
+        coverage_termination_pending?: false,
         coverage_expired?: false,
         total_premium: 200.00,
         total_employer_contribution: 100.00,

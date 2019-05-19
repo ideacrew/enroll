@@ -49,6 +49,11 @@ class HbxProfilePolicy < ApplicationPolicy
     role.permission.can_extend_open_enrollment
   end
 
+  def can_modify_plan_year?
+    return true unless role = user.person.hbx_staff_role
+    role.permission.can_modify_plan_year
+  end
+
   def can_create_benefit_application?
     role = user_hbx_staff_role
     return false unless role

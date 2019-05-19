@@ -117,7 +117,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerNoBinderPaymentRece
     end
   end
 
-   describe "NoticeBuilder employer" do
+  describe "NoticeBuilder employer" do
 
     let(:data_elements) {
       [
