@@ -16,11 +16,13 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeCoverageTermination', dbcl
                                   application_period: (start_on.beginning_of_year..start_on.end_of_year))
                                 }
   let!(:benefit_application) {
-    application = FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, :with_benefit_package,
-                                     benefit_sponsorship: benefit_sponsorship,
-                                     aasm_state: "active",
-                                     effective_period: start_on..start_on.next_year.prev_day,
-                                     open_enrollment_period: open_enrollment_start_on..(open_enrollment_start_on + 20.days)
+    application = FactoryGirl.create(
+      :benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, :with_benefit_package,
+      benefit_sponsorship: benefit_sponsorship,
+      aasm_state: "active",
+      effective_period: start_on..start_on.next_year.prev_day,
+      open_enrollment_period: open_enrollment_start_on..(open_enrollment_start_on + 20.days)
+    )
     application.benefit_sponsor_catalog.save!
     application
   }
@@ -76,23 +78,6 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeCoverageTermination', dbcl
         end
         subject.notifications_send(model_instance, model_event)
       end
-    end
-  end
-
-  context "should not trigger" do
-    subject { BenefitSponsors::Observers::HbxEnrollmentObserver.new }
-    let(:service) { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(benefit_application) }
-    let(:end_date) { TimeKeeper.date_of_record.end_of_month }
-    let(:termination_date) { TimeKeeper.date_of_record }
-    let(:model_event) { ::BenefitSponsors::ModelEvents::ModelEvent.new(:employee_coverage_termination, model_instance, {}) }
-
-    before do
-      service.terminate(end_date, termination_date, "voluntary", false)
-    end
-
-    it "should trigger notice event" do
-      expect(subject.notifier).not_to receive(:notify)
-      subject.notifications_send(model_instance, model_event)
     end
   end
 

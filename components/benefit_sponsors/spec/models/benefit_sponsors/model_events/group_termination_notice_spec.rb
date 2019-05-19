@@ -38,6 +38,10 @@ RSpec.describe 'BenefitSponsors::ModelEvents::GroupTerminationNotice', :dbclean 
             expect(model_event).to have_attributes(:event_key => :benefit_coverage_period_terminated_voluntary, :klass_instance => model_instance, :options => {})
           end
         end
+        # added spec for 42046.
+        hbx_enrollment.class.observer_peers.keys.each do |observer|
+          expect(observer).not_to receive(:notifications_send)
+        end
         service.terminate(end_date, termination_date, "voluntary", false)
       end
     end

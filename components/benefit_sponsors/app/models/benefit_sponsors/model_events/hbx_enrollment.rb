@@ -25,7 +25,7 @@ module BenefitSponsors
                                             :renewing_contingent_selected, :renewing_contingent_transmitted_to_carrier, :renewing_contingent_enrolled,
                                             :enrolled_contingent, :unverified],
                                      event: [:terminate_coverage, :schedule_coverage_termination])
-            @is_employee_coverage_termination = true
+            @is_employee_coverage_termination = true unless is_shop? && (sponsored_benefit_package.benefit_application.terminated? || sponsored_benefit_package.benefit_application.termination_pending?)
           end
 
           # TODO -- encapsulated notify_observers to recover from errors raised by any of the observers
