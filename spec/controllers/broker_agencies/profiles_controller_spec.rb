@@ -363,20 +363,6 @@ RSpec.describe BrokerAgencies::ProfilesController do
       expect(assigns(:broker_agency_profile).default_general_agency_profile).to eq general_agency_profile
     end
 
-    it "should call general_agency_hired_notice trigger " do
-      ActiveJob::Base.queue_adapter = :test
-      ActiveJob::Base.queue_adapter.enqueued_jobs = []
-      sign_in user
-      xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, format: :js
-      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
-        job_info[:job] == ShopNoticesNotifierJob
-      end
-
-      expect(queued_job[:args].include?('general_agency_hired_notice')).to be_truthy
-      expect(queued_job[:args].include?("#{general_agency_profile.id.to_s}")).to be_truthy
-      expect(queued_job[:args].third["employer_profile_id"]).to eq employer_profile.id.to_s
-    end
-
     it "should clear default general_agency_profile" do
       broker_agency_profile.default_general_agency_profile = general_agency_profile
       broker_agency_profile.save

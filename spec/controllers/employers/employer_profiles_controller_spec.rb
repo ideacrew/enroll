@@ -568,15 +568,6 @@ RSpec.describe Employers::EmployerProfilesController do
         expect(response).to have_http_status(:redirect)
       end
     end
-
-    context "after account creation" do
-      let(:validation_result) { true }
-
-      it "sends employer_account_creation_notice" do 
-        expect(controller).to receive(:employer_account_creation_notice)
-        controller.employer_account_creation_notice
-      end
-    end
   end
 
   describe "POST match" do

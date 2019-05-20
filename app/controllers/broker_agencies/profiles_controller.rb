@@ -197,12 +197,10 @@ class BrokerAgencies::ProfilesController < ApplicationController
     if @broker_agency_profile.present?
       old_default_ga_id = @broker_agency_profile.default_general_agency_profile.id.to_s rescue nil
       if params[:type] == 'clear'
+        @broker_agency_profile.update_attributes(default_general_agency_profile_id: nil)
         @broker_agency_profile.default_general_agency_profile = nil
       elsif @general_agency_profile.present?
         @broker_agency_profile.default_general_agency_profile = @general_agency_profile
-        @broker_agency_profile.employer_clients.each do |employer_profile|
-          @general_agency_profile.general_agency_hired_notice(employer_profile) # GA notice when broker selects a default GA 
-        end
       end
       @broker_agency_profile.save
       notify("acapi.info.events.broker.default_ga_changed", {:broker_id => @broker_agency_profile.primary_broker_role.hbx_id, :pre_default_ga_id => old_default_ga_id})
@@ -266,6 +264,69 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @draw = dt_query.draw
     @employer_profiles = employer_profiles.present? ? employer_profiles : []
     render
+  end
+
+  def assign
+
+    page_string = params.permit(:employers_page)[:employers_page]
+    page_no = page_string.blank? ? nil : page_string.to_i
+    if current_user.has_broker_agency_staff_role? || current_user.has_hbx_staff_role?
+      @orgs = Organization.by_broker_agency_profile(@broker_agency_profile._id)
+    else
+      broker_role_id = current_user.person.broker_role.id
+      @orgs = Organization.by_broker_role(broker_role_id)
+    end
+    @broker_role = current_user.person.broker_role || nil
+    @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role, approved_only: true)
+
+    @employers = @orgs.map(&:employer_profile)
+    @employers = Kaminari.paginate_array(@employers).page page_no
+  end
+
+  def update_assign
+    authorize HbxProfile, :modify_admin_tabs?
+    if params[:general_agency_id].present? && params[:employer_ids].present?
+      general_agency_profile = GeneralAgencyProfile.find(params[:general_agency_id])
+      case params[:type]
+      when 'fire'
+        params[:employer_ids].each do |employer_id|
+          employer_profile = EmployerProfile.find(employer_id) rescue next
+
+          employer_profile.fire_general_agency!
+          send_general_agency_assign_msg(general_agency_profile, employer_profile, 'Terminate')
+        end
+        notice = "Fire these employers successful."
+      else
+        params[:employer_ids].each do |employer_id|
+          employer_profile = EmployerProfile.find(employer_id) rescue nil
+          if employer_profile.present? #FIXME : Please move me to model
+            broker_role_id = current_user.person.broker_role.id rescue nil
+            broker_role_id ||= @broker_agency_profile.primary_broker_role_id
+            employer_profile.hire_general_agency(general_agency_profile, broker_role_id)
+            employer_profile.save
+            send_general_agency_assign_msg(general_agency_profile, employer_profile, 'Hire')
+          end
+        end
+        flash.now[:notice] ="Assign successful."
+        if params["from_assign"] == "true"
+          assign # calling this method as the latest copy of objects are needed.
+          render "assign" and return
+        else
+          employers # calling this method as the latest copy of objects are needed.
+          render "update_assign" and return
+        end
+      end
+    elsif params["commit"].try(:downcase) == "clear assignment"
+      params[:employer_ids].each do |employer_id|
+        employer_profile = EmployerProfile.find(employer_id) rescue next
+        if employer_profile.general_agency_profile.present?
+          send_general_agency_assign_msg(employer_profile.general_agency_profile, employer_profile, 'Terminate')
+          employer_profile.fire_general_agency!
+        end
+      end
+      notice = "Unassign successful."
+    end
+    redirect_to broker_agencies_profile_path(@broker_agency_profile), flash: {notice: notice}
   end
 
   def clear_assign_for_employer

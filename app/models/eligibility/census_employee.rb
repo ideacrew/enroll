@@ -13,7 +13,6 @@ module Eligibility
       end
     end
 
-
     def new_hire_enrollment_period
       start_on = [hired_on, created_at].max
       end_on = earliest_eligible_date.present? ? [start_on + 30.days, earliest_eligible_date].max : (start_on + 30.days)

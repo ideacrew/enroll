@@ -1,4 +1,3 @@
-
 module Effective
   module Datatables
     class EmployerDatatable < Effective::MongoidDatatable
@@ -66,7 +65,7 @@ module Effective
       end
 
       def generate_invoice_link_type(row)
-        row.current_month_invoice.present? ? 'disabled' : 'post_ajax'
+        (row.current_month_invoice.present? || !row.employer_profile.is_new_employer?) ? 'disabled' : 'post_ajax'
       end
 
       def extend_oe_link_type(row, allow)

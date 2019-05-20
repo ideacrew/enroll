@@ -21,7 +21,7 @@ RSpec.describe PortalHeaderHelper, :type => :helper do
       end
 
         it "should have I'm an Employee link when user has active employee_staff_role" do
-         
+
           allow(current_user.person).to receive(:active_employee_roles).and_return [employee_role]
           expect(portal_display_name('')).to eq  "<a class=\"portal\" href=\"/families/home\"><img src=\"/images/icons/icon-individual.png\" alt=\"Icon individual\" /> &nbsp; I'm an Employee</a>"
         end
@@ -31,7 +31,7 @@ RSpec.describe PortalHeaderHelper, :type => :helper do
         expect(portal_display_name(controller)).to eq "<a class='portal'>Welcome to the District's Health Insurance Marketplace</a>"
       end
 
-     
+
     end
 
     context "has_consumer_role?" do
@@ -52,17 +52,15 @@ RSpec.describe PortalHeaderHelper, :type => :helper do
       end
     end
 
-    context 'has_broker_agency_staff_role?' do
+    context 'has_broker_role?' do
       let(:broker_agency_profile){ FactoryGirl.build(:broker_agency_profile) }
-      let(:employer_profile2){ FactoryGirl.build(:employer_profile) }
-      let(:broker_agency_staff_role){ FactoryGirl.build(:broker_agency_staff_role, aasm_state: 'active', :broker_agency_profile_id => broker_agency_profile.id)}
-      let(:broker_agency_staff_role2){ FactoryGirl.build(:broker_agency_staff_role,aasm_state: 'broker_agency_pending', :broker_agency_profile_id => broker_agency_profile.id)}
-      let(:this_person) { FactoryGirl.build(:person, :broker_agency_staff_roles => [broker_agency_staff_role, broker_agency_staff_role2]) }
+      let(:broker_role){ FactoryGirl.build(:broker_role, aasm_state: 'active', :broker_agency_profile_id => broker_agency_profile.id)}
+      let(:this_person) { FactoryGirl.build(:person, broker_role: broker_role) }
       let(:current_user) { FactoryGirl.build(:user, :person=>this_person)}
-      let(:profile_id) {current_user.person.active_broker_staff_roles.first.broker_agency_profile_id}
+      let(:profile_id) {current_user.person.broker_role.broker_agency_profile_id}
       let(:params) {{id: profile_id}}
 
-      it "should have I'm an Broker link when user has active broker_agency_staff_role" do
+      it "should have I'm an Broker link when user has active broker_broker_role" do
         allow(controller).to receive(:controller_path).and_return("broker_agencies")
         allow(helper).to receive(:params).and_return(params)
         expect(portal_display_name(controller)).to eq "<a class=\"portal\" href=\"/broker_agencies/profiles/#{profile_id.to_s}\"><img src=\"/images/icons/icon-expert.png\" alt=\"Icon expert\" /> &nbsp; I'm a Broker</a>"

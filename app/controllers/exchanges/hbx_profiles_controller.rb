@@ -5,6 +5,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   include Pundit
   include SepAll
   include VlpDoc
+  include ApplicationHelper
 
   before_action :modify_admin_tabs?, only: [:binder_paid, :transmit_group_xml]
   before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index, :family_index, :update_cancel_enrollment, :update_terminate_enrollment, :identity_verification]
@@ -123,8 +124,10 @@ class Exchanges::HbxProfilesController < ApplicationController
     @organizations= Organization.where(:id.in => params[:ids]).all
 
     @organizations.each do |org|
-      @employer_invoice = EmployerInvoice.new(org)
-      @employer_invoice.save_and_notify_with_clean_up
+      if org.employer_profile.is_new_employer?
+        plan_year = org.employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED - ['suspended']).first
+        trigger_notice_observer(org.employer_profile, plan_year, "generate_initial_employer_invoice")
+      end
     end
 
     flash["notice"] = "Successfully submitted the selected employer(s) for invoice generation."

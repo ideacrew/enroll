@@ -1,4 +1,10 @@
 source 'https://rubygems.org'
+# Mount Enroll App component engines
+#not using transport_gateway, transport_profiles
+#gem "transport_gateway",  path: "components/transport_gateway"
+gem "notifier",           path: "components/notifier"
+#gem "transport_profiles", path: "components/transport_profiles"
+# Use CoffeeScript for .coffee assets and views
 
 gem "sponsored_benefits", path: "components/sponsored_benefits"
 
@@ -59,7 +65,7 @@ gem 'sprockets', '~> 2.12.3'
 gem 'symmetric-encryption', '~> 3.6.0'
 gem 'therubyracer', platforms: :ruby
 gem 'turbolinks','2.5.3'
-gem 'uglifier', '>= 1.3.0'
+gem 'uglifier', '>= 1.3.0', :require => 'uglifier'
 gem 'virtus'
 gem 'wicked_pdf', '1.0.6'
 gem 'wkhtmltopdf-binary-edge', '~> 0.12.3.0'
@@ -83,6 +89,12 @@ gem 'wkhtmltopdf-binary-edge', '~> 0.12.3.0'
 group :doc do
   gem 'sdoc', '~> 0.4.0'
 end
+
+gem 'ckeditor'
+gem 'redcarpet', '3.4.0'
+gem 'slim', '3.0.8'
+gem 'curl'
+gem 'non-stupid-digest-assets', '~> 1.0', '>= 1.0.9'
 
 group :development do
   gem 'overcommit'

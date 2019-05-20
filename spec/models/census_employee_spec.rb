@@ -873,8 +873,17 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       person.employee_roles.create!(ssn: census_employee.ssn,
                                     employer_profile_id: census_employee.employer_profile.id,
                                     hired_on: census_employee.hired_on)
-      expect(census_employee).to receive(:trigger_notices)
       census_employee.construct_employee_role_for_match_person
+    end
+  end
+
+  context '.send_invite!' do
+    let(:params)                  { valid_params }
+    let(:initial_census_employee) { CensusEmployee.new(**params) }
+
+    it 'should send invitation to employee' do
+      expect(initial_census_employee).to receive(:send_invite!)
+      initial_census_employee.save
     end
   end
 
@@ -976,11 +985,12 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
     context "change the aasm state & populates terminated on of enrollments" do
       let(:census_employee) { FactoryGirl.create(:census_employee) }
+      let(:employee_role) { FactoryGirl.create(:employee_role, census_employee_id: census_employee.id) }
       let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
 
-      let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, benefit_group: benefit_group, household: family.active_household, coverage_kind: 'health') }
-      let(:hbx_enrollment_two) { FactoryGirl.create(:hbx_enrollment, benefit_group: benefit_group, household: family.active_household, coverage_kind: 'dental') }
-      let(:hbx_enrollment_three) { FactoryGirl.create(:hbx_enrollment, benefit_group: benefit_group, household: family.active_household, aasm_state: 'renewing_waived') }
+      let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, benefit_group: benefit_group, household: family.active_household, coverage_kind: 'health', employee_role_id: employee_role.id) }
+      let(:hbx_enrollment_two) { FactoryGirl.create(:hbx_enrollment, benefit_group: benefit_group, household: family.active_household, coverage_kind: 'dental', employee_role_id: employee_role.id) }
+      let(:hbx_enrollment_three) { FactoryGirl.create(:hbx_enrollment, benefit_group: benefit_group, household: family.active_household, aasm_state: 'renewing_waived', employee_role_id: employee_role.id) }
 
       before do
         allow(census_employee).to receive(:active_benefit_group_assignment).and_return(double)
@@ -993,6 +1003,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
         context 'move the enrollment into proper state' do
 
           before do
+            census_employee.update_attributes(employee_role_id: employee_role.id)
             census_employee.terminate_employment!(terminated_on)
           end
 
@@ -1668,6 +1679,20 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       )
     }
 
+    let!(:void_enrollment)   { FactoryGirl.create(:hbx_enrollment,
+      household: shop_family.latest_household,
+      coverage_kind: "health",
+      effective_on: effective_date - 2.years,
+      enrollment_kind: "open_enrollment",
+      kind: "employer_sponsored",
+      submitted_at: effective_date - 24.months,
+      benefit_group_id: expired_plan_year.benefit_groups.first.id,
+      employee_role_id: employee_role.id,
+      benefit_group_assignment_id: expired_benefit_group_assignment.id,
+      aasm_state: 'void'
+      )
+    }
+
     let!(:terminated_dental_enrollment)   { FactoryGirl.create(:hbx_enrollment,
       household: shop_family.latest_household,
       coverage_kind: "dental",
@@ -1754,6 +1779,10 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
       it 'should not return expired shop coverages' do
         expect(census_employee.enrollments_for_display).not_to include(expired_health_enrollment)
+      end
+
+      it 'should not return void shop coverages' do
+        expect(census_employee.enrollments_for_display).not_to include(void_enrollment)
       end
 
       it 'should not return terminated shop coverages' do
