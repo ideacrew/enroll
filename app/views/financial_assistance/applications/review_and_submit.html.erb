@@ -156,7 +156,7 @@
 
               <% if @cfl_service.displayable_field?('applicant', applicant.id, :incomes_jobs) %>
                 <% applicant.incomes.jobs.each do |income| %>
-                  <div class="border-bottom border-sides form-content">
+                  <div class="border-sides form-content">
                     <div class="row ptb no-buffer row-height">
                       <div class="col-md-6">Employer Name</div>
                       <div class="col-md-6"><%= income.employer_name %></div>
@@ -189,7 +189,7 @@
                       <div class="col-md-6"><%= income.employer_address.zip %></div>
                     </div>
 
-                    <div class="row ptb no-buffer row-height">
+                    <div class="row ptb no-buffer row-height border-bottom">
                       <div class="col-md-6">EMPLOYER PHONE</div>
                       <div class="col-md-6"><%= format_phone(income.employer_phone.full_phone_number) %></div>
                     </div>
