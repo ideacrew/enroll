@@ -319,10 +319,25 @@ div#add-more-link {
   border: 1px solid #ddd;
   border-top: none;
   padding: 3px;
-  background-color: #F9F5E8;
-  transition: all 0.2s ease-in-out 0s;
+  background-color: rgba(206, 184, 136, 0.25);
 }
 
 .text-bold {
   font-weight: bold;
+}
+
+.verti-line-trans {
+  background: linear-gradient(to right,
+    transparent calc(50% - 0.4px),
+    #ddd calc(50% - 0.4px),
+    #ddd calc(50% + 0.4px),
+    transparent calc(50% + 0.4px));
+}
+
+.verti-line {
+  background: linear-gradient(to right,
+    rgba(206, 184, 136, 0.25) calc(50% - 0.4px),
+    #ddd calc(50% - 0.4px),
+    #ddd calc(50% + 0.4px),
+    rgba(206, 184, 136, 0.25) calc(50% + 0.4px));
 }
