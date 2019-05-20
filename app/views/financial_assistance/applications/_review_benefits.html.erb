@@ -2,14 +2,14 @@
 <% insurance_kinds.each do |insurance_kind| %>
   <% benefits = applicant.benefits.where(kind: kind).of_insurance_kind(insurance_kind) %>
   <% if benefits.present? %>
-    <div class="row ptb no-buffer row-height form-content row-form-wrapper text-bold">
+    <div class="row ptb no-buffer row-height form-content row-form-wrapper text-bold verti-line-trans">
       <div class="col-md-6">TYPE</div>
       <div class="col-md-6">DATES</div>
     </div>
   <% end %>
 
   <% benefits.each do |benefit| %>
-    <div class="row ptb no-buffer row-height form-content row-benefit-form-wrapper">
+    <div class="row ptb no-buffer row-height form-content row-benefit-form-wrapper verti-line">
       <div class="col-md-6 text-bold"><%= FinancialAssistance::Benefit::INSURANCE_TYPE[benefit.insurance_kind.to_sym] %></div>
       <div class="col-md-6"><%= start_to_end_dates(benefit) %></div>
     </div>
