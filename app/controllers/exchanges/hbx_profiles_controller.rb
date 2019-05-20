@@ -154,11 +154,10 @@ class Exchanges::HbxProfilesController < ApplicationController
   def force_publish
     @element_to_replace_id = params[:employer_actions_id]
     @benefit_application   = @benefit_sponsorship.benefit_applications.draft_state.last
-    
     if @benefit_application.present?
       @service = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(@benefit_application)
       if @service.may_force_submit_application? || params[:publish_with_warnings] == 'true'
-        @service.force_submit_application      
+        @service.force_submit_application
       end
     end
 
@@ -181,10 +180,13 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def employer_datatable
-  @datatable = Effective::Datatables::BenefitSponsorsEmployerDatatable.new
-    respond_to do |format|
-      format.js
-    end
+    # copy the link and open in new tab
+    last_visited_url = current_user.try(:last_portal_visited) || root_path if current_user.present?
+    @datatable = Effective::Datatables::BenefitSponsorsEmployerDatatable.new
+      respond_to do |format|
+       format.html { redirect_to(last_visited_url) }
+       format.js
+      end
   end
 
 def employer_poc
