@@ -4,8 +4,10 @@ module BenefitSponsors
 
       field :elected_product_choices, type: Array  # used for choice model to store employer preferences
 
+      validate :verify_elected_choices
+
       def lookup_package_products(coverage_date)
-        if product_package_kind == :multi_product
+        if multi_product?
           BenefitMarkets::Products::Product.by_coverage_date(elected_products, coverage_date)
         else
           super
@@ -25,8 +27,12 @@ module BenefitSponsors
         renewal_attributes = super
 
         renewal_attributes.tap do |attributes|
-          attributes[:elected_product_choices] = renewal_elected_products_for(new_benefit_package.start_on) if product_package_kind == :multi_product
+          attributes[:elected_product_choices] = renewal_elected_products_for(new_benefit_package.start_on) if multi_product?
         end
+      end
+
+      def verify_elected_choices
+        errors.add(:elected_product_choices, "can't be blank") if multi_product? && elected_product_choices.blank?
       end
     end
   end

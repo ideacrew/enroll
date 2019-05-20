@@ -62,6 +62,10 @@ module BenefitSponsors
         product_package_kind == :single_product
       end
 
+      def multi_product?
+        product_package_kind == :multi_product
+      end
+
       def products(coverage_date)
         lookup_package_products(coverage_date)
       end
@@ -72,7 +76,8 @@ module BenefitSponsors
       end
 
       def product_package
-        return nil if self.product_package_kind.blank?
+        return nil if product_package_kind.blank? || benefit_sponsor_catalog.blank?
+
         @product_package ||= benefit_sponsor_catalog.product_package_for(self)
       end
 
