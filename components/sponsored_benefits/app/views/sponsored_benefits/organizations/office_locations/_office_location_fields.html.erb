@@ -23,11 +23,7 @@
             </div>
 
             <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd delete_address">
-               <% if f.object.persisted? %>
-                  <%= link_to image_tag('delete.png'), delete_organizations_office_locations_path(id: f.object.id.to_s, plan_org_id: parent_object.id.to_s) %>
-              <% else %>
                 <%= link_to image_tag('delete.png'), 'javascript:void(0)', class: 'remove_fields close-2' %>
-              <% end %>
             </div>
           </div>
 

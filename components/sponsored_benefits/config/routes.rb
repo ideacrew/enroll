@@ -62,7 +62,6 @@ SponsoredBenefits::Engine.routes.draw do
     resource :office_locations do
       member do
         get :new
-        get :delete
       end
     end
   end

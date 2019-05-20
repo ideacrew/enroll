@@ -23,17 +23,5 @@ module SponsoredBenefits
         format.js
       end
     end
-
-    def delete
-      params.permit(:id, :plan_org_id)
-      plan_design_org = SponsoredBenefits::Organizations::PlanDesignOrganization.find(params[:plan_org_id])
-      office_location = plan_design_org.office_locations.find(params[:id])
-      office_location.destroy
-      plan_design_org.save!
-      respond_to do |format|
-        url = edit_organizations_plan_design_organization_path(plan_design_org, profile_id: plan_design_org.broker_agency_profile.id.to_s)
-        format.html {redirect_to url}
-      end
-    end
   end
 end
