@@ -106,13 +106,14 @@ class HbxEnrollmentMember
 
   def valid_enrolling_member?
     return true unless self.hbx_enrollment.employee_role.present?
-    health_offered_relationship_benefits, dental_offered_relationship_benefits =  shop_health_and_dental_relationship_benfits(self.hbx_enrollment.employee_role,self.hbx_enrollment.benefit_group)
-    if self.hbx_enrollment.coverage_kind == "health"
-      return false unless coverage_relationship_check(health_offered_relationship_benefits, self.family_member, self.hbx_enrollment.benefit_group.effective_on_for(self.hbx_enrollment.employee_role.hired_on))
+
+    health_relationship_benefits, dental_relationship_benefits = shop_health_and_dental_relationship_benefits(hbx_enrollment.employee_role, hbx_enrollment.benefit_group)
+    if hbx_enrollment.coverage_kind == 'health'
+      return false unless coverage_relationship_check(health_relationship_benefits, family_member, hbx_enrollment.benefit_group.effective_on_for(hbx_enrollment.employee_role.hired_on))
     else
-      return false unless coverage_relationship_check(dental_offered_relationship_benefits, self.family_member, self.hbx_enrollment.benefit_group.effective_on_for(self.hbx_enrollment.employee_role.hired_on))
+      return false unless coverage_relationship_check(dental_relationship_benefits, family_member, hbx_enrollment.benefit_group.effective_on_for(hbx_enrollment.employee_role.hired_on))
     end
-    return true
+    true
   end
 
   private

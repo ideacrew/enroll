@@ -1,4 +1,4 @@
-<table class="table-wrapper table-condensed group-selection-tbl">
+<table class="table table-wrapper table-condensed group-selection-tbl">
   <tbody>
     <% benefit_type = (@change_plan == "change_plan" && @hbx_enrollment.present?) ? @hbx_enrollment.coverage_kind : nil %>
     <% if benefit_type.present? && @hbx_enrollment.is_shop? %>
@@ -7,33 +7,22 @@
 
     <% @coverage_household.coverage_household_members.map(&:family_member).each_with_index do |family_member, index| %>
 
-        <% if @adapter.can_shop_shop?(@person) %>
-          <% is_health_coverage, is_dental_coverage = @adapter.shop_health_and_dental_attributes(family_member, (current_employee_role || @employee_role), @effective_on_date || @new_effective_on) %>
-        <% end %>
-
-        <% if (@adapter.can_shop_individual?(@person) || @adapter.can_shop_resident?(@person)) %>
+      <% if @adapter.can_shop_shop?(@person) %>
+        <% is_health_coverage, is_dental_coverage = @adapter.shop_health_and_dental_attributes(family_member, (current_employee_role || @employee_role), @effective_on_date || @new_effective_on) %>
+      <% end %>
+      <% if (@adapter.can_shop_individual?(@person)) || (@adapter.can_shop_resident?(@person)) %>
         <%
-            #Handle When Implementing - People with Both Consumer Role & Resident Role
-            if family_member.person.is_consumer_role_active?
-              role = family_member.person.consumer_role
-            elsif family_member.person.is_resident_role_active?
-              role = family_member.person.resident_role
-            end
-            family = family_member.family
-            #need this to generate errors for IVL for families with members who have different active individual roles
-            if can_shop_individual_or_resident?(@person)
-              rule = InsuredEligibleForBenefitRule.new(role, @benefit, {family: family, coverage_kind: @coverage_kind, new_effective_on: @new_effective_on, market_kind: "individual"})
-            else
-              rule = InsuredEligibleForBenefitRule.new(role, @benefit, {family: family, coverage_kind: @coverage_kind, new_effective_on: @new_effective_on, market_kind: @market_kind})
-            end
-            is_ivl_coverage, errors = rule.satisfied?
-            @show_residency_alert = !rule.is_residency_status_satisfied? if @show_residency_alert == false
-            errors = [incarceration_cannot_purchase(family_member)] if index==0 && errors && errors.flatten.detect{|err| err.match(/incarceration/)}
-          %>
-        <% end %>
+          #Handle When Implementing - People with Both Consumer Role & Resident Role
+          role = (family_member.person.consumer_role || family_member.person.resident_role)
+          family = family_member.family
+          rule = InsuredEligibleForBenefitRule.new(role, @benefit, {family: family, coverage_kind: @coverage_kind, new_effective_on: @new_effective_on})
+          is_ivl_coverage, errors = rule.satisfied?
+          @show_residency_alert = !rule.is_residency_status_satisfied? if @show_residency_alert == false
+          errors = [incarceration_cannot_purchase(family_member)] if index==0 && errors && errors.flatten.detect{|err| err.match(/incarceration/)}
+        %>
+      <% end %>
 
         <% is_checked = is_member_checked?(benefit_type, is_health_coverage, is_dental_coverage, is_ivl_coverage) %>
-
 
         <tr class='<%= @adapter.class_for_ineligible_row(family_member, is_ivl_coverage, (@effective_on_date || @new_effective_on)) %>'>
           <td width="20">
