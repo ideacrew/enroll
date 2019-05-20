@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Observers
     class BenefitSponsorshipObserver
@@ -5,8 +7,7 @@ module BenefitSponsors
 
       attr_accessor :notifier
 
-      def notifications_send(model_instance, new_model_event)
-      end
+      def notifications_send(model_instance, new_model_event); end
 
       private
 

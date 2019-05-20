@@ -149,8 +149,10 @@ module BenefitSponsors
     }
 
     scope :may_begin_benefit_coverage?, -> (compare_date = TimeKeeper.date_of_record) {
-      where(:benefit_applications => {
-        :$elemMatch => {:"effective_period.min".lte => compare_date, :aasm_state.in => [:enrollment_eligible, :binder_paid] }}
+      where(
+        :benefit_applications => {
+          :$elemMatch => {:"effective_period.min".lte => compare_date, :aasm_state.in => [:enrollment_eligible, :binder_paid] }
+        }
       )
     }
 
@@ -160,9 +162,11 @@ module BenefitSponsors
       )
     }
 
-    scope :may_terminate_pending_benefit_coverage?, -> (compare_date = TimeKeeper.date_of_record) {
-      where(:benefit_applications => {
-        :$elemMatch => {:"effective_period.max".lt => compare_date, :aasm_state => :termination_pending }}
+    scope :may_terminate_pending_benefit_coverage?, ->(compare_date = TimeKeeper.date_of_record) {
+      where(
+        :benefit_applications => {
+          :$elemMatch => {:"effective_period.max".lt => compare_date, :aasm_state => :termination_pending }
+        }
       )
     }
 
@@ -190,8 +194,10 @@ module BenefitSponsors
     }
 
     scope :may_transmit_initial_enrollment?, -> (compare_date = TimeKeeper.date_of_record) {
-      where(:benefit_applications => {
-        :$elemMatch => {:"effective_period.min" => compare_date, :aasm_state => :binder_paid}}
+      where(
+        :benefit_applications => {
+          :$elemMatch => {:"effective_period.min" => compare_date, :aasm_state => :binder_paid}
+        }
       )
     }
 
@@ -503,7 +509,7 @@ module BenefitSponsors
 
     # Workflow for self service
     aasm do
-      state :applicant, initial: true#, :after_enter => :publish_benefit_sponsor_event
+      state :applicant, initial: true #, :after_enter => :publish_benefit_sponsor_event
       # state :initial_application_under_review # Sponsor's first application is submitted invalid and under HBX review
       # state :initial_application_denied       # Sponsor's first application is rejected
       # state :initial_application_approved     # Sponsor's first application is submitted and approved
@@ -597,6 +603,7 @@ module BenefitSponsors
     # Notify BenefitApplication that
     def publish_benefit_sponsor_event
       return unless [:applicant].include?(aasm.to_state)
+
       begin
         benefit_applications.each do |benefit_application|
           benefit_application.benefit_sponsorship_event_subscriber(aasm)
@@ -706,13 +713,11 @@ module BenefitSponsors
 
     def employer_profile_to_benefit_sponsor_states_map
       {
-        :applicant            => :applicant,
-        # :registered           => :initial_application_approved,
-        # :eligible             => :initial_enrollment_closed,
-        :binder_paid          => :applicant,
-        :enrolled             => :active,
-        :suspended            => :suspended,
-        :ineligible           => :ineligible
+        :applicant => :applicant,
+        :binder_paid => :applicant,
+        :enrolled => :active,
+        :suspended => :suspended,
+        :ineligible => :ineligible
       }
     end
   end

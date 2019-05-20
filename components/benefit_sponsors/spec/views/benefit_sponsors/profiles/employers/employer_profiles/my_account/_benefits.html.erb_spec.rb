@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
@@ -32,13 +34,20 @@ RSpec.describe "views/benefit_sponsors/profiles/employers/employer_profiles/my_a
 
     context "renewals" do
 
-      let(:renewal_benefit_sponsor_catalog) { build(:benefit_markets_benefit_sponsor_catalog, effective_date: renewal_effective_date, effective_period: renewal_effective_date..renewal_effective_date.next_year.prev_day, open_enrollment_period: renewal_effective_date.prev_month..(renewal_effective_date - 15.days)) }
-      let!(:renewal_application) {
-          renewal_application = initial_application.renew(renewal_benefit_sponsor_catalog)
-          renewal_application.save
-          renewal_benefit_sponsor_catalog.save
-          renewal_application
-        }
+      let(:renewal_benefit_sponsor_catalog) do
+        build(
+          :benefit_markets_benefit_sponsor_catalog,
+          effective_date: renewal_effective_date,
+          effective_period: renewal_effective_date..renewal_effective_date.next_year.prev_day,
+          open_enrollment_period: renewal_effective_date.prev_month..(renewal_effective_date - 15.days)
+        )
+      end
+      let!(:renewal_application) do
+        renewal_application = initial_application.renew(renewal_benefit_sponsor_catalog)
+        renewal_application.save
+        renewal_benefit_sponsor_catalog.save
+        renewal_application
+      end
 
       context "when an active and draft benefit applications are present" do
 

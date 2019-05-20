@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe BenefitSponsors::Observers::BenefitApplicationObserver, dbclean: :after_each do
@@ -8,12 +10,15 @@ RSpec.describe BenefitSponsors::Observers::BenefitApplicationObserver, dbclean: 
   let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
   let!(:employer_profile)    { organization.employer_profile }
   let!(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
-  let!(:model_instance) { FactoryBot.create(:benefit_sponsors_benefit_application,
-                                             :with_benefit_package,
-                                             :benefit_sponsorship => benefit_sponsorship,
-                                             :aasm_state => 'active',
-                                             :effective_period =>  start_on..(start_on + 1.year) - 1.day
-  )}
+  let!(:model_instance) do
+    FactoryBot.create(
+      :benefit_sponsors_benefit_application,
+      :with_benefit_package,
+      :benefit_sponsorship => benefit_sponsorship,
+      :aasm_state => 'active',
+      :effective_period => start_on..(start_on + 1.year) - 1.day
+    )
+  end
 
   subject { BenefitSponsors::Observers::BenefitApplicationObserver.new }
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
@@ -118,7 +120,7 @@ RSpec.describe Exchanges::EmployerApplicationsController, dbclean: :after_each d
     before :each do
       allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', can_modify_plan_year: true))
       sign_in(user)
-      get :get_term_reasons, params: { reason_type_id: "term_actions_nonpayment" },  format: :js
+      get :term_reasons, params: { reason_type_id: "term_actions_nonpayment" },  format: :js
     end
 
     it "should be success" do

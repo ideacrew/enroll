@@ -115,7 +115,7 @@ class ModifyBenefitApplication< MongoidMigrationTask
     termination_reason = ENV['termination_reason']
     off_cycle_renewal = ENV['off_cycle_renewal']
     termination_date = Date.strptime(ENV['termination_date'], "%m/%d/%Y")
-    notify_trading_partner = (ENV['notify_trading_partner'] == "true" || ENV['notify_trading_partner'] == true) ? true : false
+    notify_trading_partner = ENV['notify_trading_partner'] == "true" || ENV['notify_trading_partner'] == true ? true : false
     end_on = Date.strptime(ENV['end_on'], "%m/%d/%Y")
     benefit_applications.each do |benefit_application|
       service = initialize_service(benefit_application)
@@ -136,7 +136,7 @@ class ModifyBenefitApplication< MongoidMigrationTask
 
   def cancel_benefit_application(benefit_application)
     service = initialize_service(benefit_application)
-    notify_trading_partner = (ENV['notify_trading_partner'] == "true" || ENV['notify_trading_partner'] == true) ? true : false
+    notify_trading_partner = ENV['notify_trading_partner'] == "true" || ENV['notify_trading_partner'] == true ? true : false
     service.cancel(notify_trading_partner)
   end
 

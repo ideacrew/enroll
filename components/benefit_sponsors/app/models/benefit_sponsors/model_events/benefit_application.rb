@@ -29,7 +29,7 @@ module BenefitSponsors
           :open_enrollment_end_reminder_and_low_enrollment
       ]
 
-      OTHER_EVENTS = []
+      OTHER_EVENTS = [].freeze
 
       # Events triggered by state changes on individual instances
       def notify_on_save
@@ -52,13 +52,9 @@ module BenefitSponsors
             is_application_denied = true
           end
 
-          if is_transition_matching?(to: :binder_paid, from: :enrollment_closed, event: :credit_binder)
-            is_initial_employee_plan_selection_confirmation = true
-          end
+          is_initial_employee_plan_selection_confirmation = true if is_transition_matching?(to: :binder_paid, from: :enrollment_closed, event: :credit_binder)
 
-          if is_transition_matching?(to: [:terminated, :termination_pending], from: [:active, :expired], event: [:terminate_enrollment, :schedule_enrollment_termination])
-            is_group_advance_termination_confirmation = true
-          end
+          is_group_advance_termination_confirmation = true if is_transition_matching?(to: [:terminated, :termination_pending], from: [:active, :expired], event: [:terminate_enrollment, :schedule_enrollment_termination])
 
           if is_transition_matching?(to: :approved, from: [:draft, :imported] + BenefitSponsors::BenefitApplications::BenefitApplication::APPLICATION_EXCEPTION_STATES, event: :auto_approve_application)
             is_renewal_application_autosubmitted = true

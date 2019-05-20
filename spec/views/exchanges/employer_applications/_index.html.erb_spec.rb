@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
@@ -28,17 +30,17 @@ RSpec.describe "exchanges/employer_applications/index.html.erb", dbclean: :after
     end
 
     it "should have plan year aasm_state" do
-      expect(rendered).to match /#{initial_application.aasm_state}/
+      expect(rendered).to match(/#{initial_application.aasm_state}/)
     end
 
     it "should have plan year start date" do
-      expect(rendered).to match /#{initial_application.start_on}/
+      expect(rendered).to match(/#{initial_application.start_on}/)
     end
 
     it "should have cancel, terminate, reinstate links" do
-      expect(rendered).to match /cancel/
-      expect(rendered).to match /terminate/
-      expect(rendered).to match /reinstate/
+      expect(rendered).to match(/cancel/)
+      expect(rendered).to match(/terminate/)
+      expect(rendered).to match(/reinstate/)
     end
   end
 
@@ -73,7 +75,8 @@ RSpec.describe "exchanges/employer_applications/index.html.erb", dbclean: :after
         organization: organization,
         profile_id: organization.profiles.first.id,
         benefit_market: benefit_market,
-        employer_attestation: employer_attestation)
+        employer_attestation: employer_attestation
+      )
     end
     let!(:employer_attestation)     { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
 
@@ -89,9 +92,9 @@ RSpec.describe "exchanges/employer_applications/index.html.erb", dbclean: :after
     end
 
     it "should have not cancel, terminate, reinstate links" do
-      expect(rendered).not_to match /cancel/
-      expect(rendered).not_to match /terminate/
-      expect(rendered).not_to match /reinstate/
+      expect(rendered).not_to match(/cancel/)
+      expect(rendered).not_to match(/terminate/)
+      expect(rendered).not_to match(/reinstate/)
     end
   end
 end

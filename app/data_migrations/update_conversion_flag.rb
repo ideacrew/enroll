@@ -19,12 +19,12 @@ class UpdateConversionFlag < MongoidMigrationTask
         next
       end
     end
-  rescue Exception => e
+  rescue StandardError => e
     puts e.message
   end
 
   def attestation_doc(employer)
-    attestation = employer.employer_attestation.blank? ? employer.build_employer_attestation : employer.employer_attestation
+    attestation = employer.employer_attestation.presence || employer.build_employer_attestation
     if attestation.present? && attestation.denied?
       attestation.revert! if attestation.may_revert?
       document = attestation.employer_attestation_documents.where(:aasm_state.ne => "accepted").first

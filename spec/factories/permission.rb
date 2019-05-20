@@ -128,7 +128,7 @@ FactoryBot.define do
       can_modify_plan_year true
       can_create_benefit_application true
       can_force_publish true
-      view_the_configuration_tab true 
+      view_the_configuration_tab true
       can_submit_time_travel_request false
     end
   end

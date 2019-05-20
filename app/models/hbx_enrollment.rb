@@ -171,7 +171,7 @@ class HbxEnrollment
   scope :without_aptc,        ->{lte("applied_aptc_amount.cents": 0) }
   scope :enrolled,            ->{ where(:aasm_state.in => ENROLLED_STATUSES ) }
   scope :can_terminate,       ->{ where(:aasm_state.in =>  CAN_TERMINATE_ENROLLMENTS) }
-  scope :enrolled_and_terminated,->{ where(:aasm_state.in =>  ENROLLED_STATUSES + TERMINATED_STATUSES) }
+  scope :enrolled_and_terminated,->{ where(:aasm_state.in => ENROLLED_STATUSES + TERMINATED_STATUSES) }
   scope :renewing,            ->{ where(:aasm_state.in => RENEWAL_STATUSES )}
   scope :enrolled_and_renewal, ->{where(:aasm_state.in => ENROLLED_AND_RENEWAL_STATUSES )}
   scope :enrolled_and_renewing, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES)) }
@@ -179,7 +179,7 @@ class HbxEnrollment
   scope :effective_asc,      -> { order(effective_on: :asc) }
   scope :effective_desc,      ->{ order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) }
   scope :waived,              ->{ where(:aasm_state.in => WAIVED_STATUSES )}
-  scope :expired,             ->{ where(:aasm_state => "coverage_expired" )}
+  scope :expired,             ->{ where(:aasm_state => "coverage_expired")}
   scope :cancel_eligible,     ->{ where(:aasm_state.in => ["coverage_selected","renewing_coverage_selected","coverage_enrolled","auto_renewing", "enrolled_contingent"] )}
   scope :changing,            ->{ where(changing: true) }
   scope :with_in,             ->(time_limit){ where(:created_at.gte => time_limit) }
@@ -303,11 +303,9 @@ class HbxEnrollment
       end
 
       enrollments_for_termination.each do |hbx_enrollment|
-        begin
-          hbx_enrollment.terminate_coverage!(hbx_enrollment.terminated_on)
-        rescue Exception => e
-          Rails.logger.error { "Error terminating scheduled enrollment hbx_id - #{hbx_enrollment.hbx_id} due to #{e.backtrace}" }
-        end
+        hbx_enrollment.terminate_coverage!(hbx_enrollment.terminated_on)
+      rescue StandardError => e
+        Rails.logger.error { "Error terminating scheduled enrollment hbx_id - #{hbx_enrollment.hbx_id} due to #{e.backtrace}" }
       end
     end
 
@@ -1735,18 +1733,17 @@ class HbxEnrollment
   end
 
   def notify_enrollment_cancel_or_termination_event(transmit_flag)
-
-    return unless self.coverage_terminated? || self.coverage_canceled? || self.coverage_termination_pending?
+    return unless coverage_terminated? || coverage_canceled? || coverage_termination_pending?
 
     config = Rails.application.config.acapi
     notify(
-        "acapi.info.events.hbx_enrollment.terminated",
-        {
-            :reply_to => "#{config.hbx_id}.#{config.environment_name}.q.glue.enrollment_event_batch_handler",
-            "hbx_enrollment_id" => self.hbx_id,
-            "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment",
-            "is_trading_partner_publishable" => transmit_flag
-        }
+      "acapi.info.events.hbx_enrollment.terminated",
+      {
+        :reply_to => "#{config.hbx_id}.#{config.environment_name}.q.glue.enrollment_event_batch_handler",
+        "hbx_enrollment_id" => hbx_id,
+        "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment",
+        "is_trading_partner_publishable" => transmit_flag
+      }
     )
   end
 

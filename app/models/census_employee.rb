@@ -1145,9 +1145,11 @@ def self.to_csv
   # Pull expired enrollments as well
   def past_enrollments
     if employee_role.present?
-      employee_role.person.primary_family.active_household.hbx_enrollments.shop_market.enrolled_and_terminated.where({
-        :"benefit_group_assignment_id".in => past_benefit_group_assignments.map(&:id)
-      })
+      employee_role.person.primary_family.active_household.hbx_enrollments.shop_market.enrolled_and_terminated.where(
+        {
+          :benefit_group_assignment_id.in => past_benefit_group_assignments.map(&:id)
+        }
+      )
     end
   end
 

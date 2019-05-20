@@ -50,7 +50,8 @@ class HbxProfilePolicy < ApplicationPolicy
   end
 
   def can_modify_plan_year?
-    return true unless role = user.person.hbx_staff_role
+    return true unless (role = user.person.hbx_staff_role)
+
     role.permission.can_modify_plan_year
   end
 

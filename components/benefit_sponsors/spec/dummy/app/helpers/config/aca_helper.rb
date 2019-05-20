@@ -23,5 +23,4 @@ module Config::AcaHelper
   def allow_mid_month_non_payment_terms?
     Settings.aca.shop_market.mid_month_benefit_application_terminations.non_payment
   end
-
 end

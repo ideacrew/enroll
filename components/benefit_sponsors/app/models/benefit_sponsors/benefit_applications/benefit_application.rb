@@ -42,33 +42,35 @@ module BenefitSponsors
                                                   canceled:   :cancel
                                                 }
 
-    VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT_TAG = "benefit_coverage_period_terminated_voluntary"
-    VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT = "acapi.info.events.employer.benefit_coverage_period_terminated_voluntary"
+    VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT_TAG = "benefit_coverage_period_terminated_voluntary".freeze
+    VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT = "acapi.info.events.employer.benefit_coverage_period_terminated_voluntary".freeze
 
-    NON_PAYMENT_TERMINATED_PLAN_YEAR_EVENT_TAG = "benefit_coverage_period_terminated_nonpayment"
-    NON_PAYMENT_TERMINATED_PLAN_YEAR_EVENT = "acapi.info.events.employer.benefit_coverage_period_terminated_nonpayment"
+    NON_PAYMENT_TERMINATED_PLAN_YEAR_EVENT_TAG = "benefit_coverage_period_terminated_nonpayment".freeze
+    NON_PAYMENT_TERMINATED_PLAN_YEAR_EVENT = "acapi.info.events.employer.benefit_coverage_period_terminated_nonpayment".freeze
 
-    INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT_TAG="benefit_coverage_renewal_carrier_dropped"
-    INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT="acapi.info.events.employer.benefit_coverage_renewal_carrier_dropped"
+    INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT_TAG = "benefit_coverage_renewal_carrier_dropped".freeze
+    INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT = "acapi.info.events.employer.benefit_coverage_renewal_carrier_dropped".freeze
 
-    VOLUNTARY_TERM_REASONS = [
-      "Company went out of business/bankrupt",
-      "Customer Service did not solve problem/poor experience",
-      "Connector website too difficult to use/navigate",
-      "Health Connector does not offer desired product",
-      "Group is now > 50 lives",
-      "Group no longer has employees",
-      "Went to carrier directly",
-      "Went to an association directly",
-      "Added/changed broker that does not work with Health Connector",
-      "Company is no longer offering insurance",
-      "Company moved out of Massachusetts",
-      "Other"
-    ]
+    VOLUNTARY_TERM_REASONS =
+      [
+        "Company went out of business/bankrupt",
+        "Customer Service did not solve problem/poor experience",
+        "Connector website too difficult to use/navigate",
+        "Health Connector does not offer desired product",
+        "Group is now > 50 lives",
+        "Group no longer has employees",
+        "Went to carrier directly",
+        "Went to an association directly",
+        "Added/changed broker that does not work with Health Connector",
+        "Company is no longer offering insurance",
+        "Company moved out of Massachusetts",
+        "Other"
+      ].freeze
 
-    NON_PAYMENT_TERM_REASONS = [
-      "Non-payment of premium"
-    ]
+    NON_PAYMENT_TERM_REASONS =
+      [
+        "Non-payment of premium"
+      ].freeze
 
     field :expiration_date,           type: Date
 
@@ -814,22 +816,22 @@ module BenefitSponsors
       end
 
       event :begin_open_enrollment do
-        transitions from:   [:approved, :enrollment_open, :enrollment_closed, :enrollment_eligible, :enrollment_ineligible],
+        transitions from: [:approved, :enrollment_open, :enrollment_closed, :enrollment_eligible, :enrollment_ineligible],
           to:     :enrollment_open
       end
 
       event :end_open_enrollment do
-        transitions from:   [:enrollment_open, :enrollment_extended],
+        transitions from: [:enrollment_open, :enrollment_extended],
           to:     :enrollment_closed
       end
 
       event :credit_binder do
         transitions from: :enrollment_closed,
-          to: :binder_paid
+                    to: :binder_paid
       end
 
       event :approve_enrollment_eligiblity do
-        transitions from:   [:enrollment_closed, :binder_paid],
+        transitions from: [:enrollment_closed, :binder_paid],
           to:     :enrollment_eligible
       end
 
@@ -839,7 +841,7 @@ module BenefitSponsors
       end
 
       event :reverse_enrollment_eligibility do
-        transitions from:   [:enrollment_eligible, :binder_paid],
+        transitions from: [:enrollment_eligible, :binder_paid],
           to:     :enrollment_closed
       end
 
@@ -854,9 +856,9 @@ module BenefitSponsors
       end
 
       event :activate_enrollment do
-        transitions from:   [:enrollment_eligible, :binder_paid],
+        transitions from: [:enrollment_eligible, :binder_paid],
           to:     :active
-        transitions from:   APPLICATION_DRAFT_STATES + ENROLLING_STATES,
+        transitions from: APPLICATION_DRAFT_STATES + ENROLLING_STATES,
           to:     :canceled
       end
 
@@ -865,13 +867,13 @@ module BenefitSponsors
       end
 
       event :expire do
-        transitions from:   [:approved, :enrollment_open, :enrollment_eligible, :binder_paid, :active],
+        transitions from: [:approved, :enrollment_open, :enrollment_eligible, :binder_paid, :active],
           to:     :expired
       end
 
       # Enrollment processed stopped due to missing binder payment
       event :cancel do
-        transitions from:   APPLICATION_DRAFT_STATES + ENROLLING_STATES + ENROLLMENT_ELIGIBLE_STATES + [:enrollment_ineligible, :active, :approved],
+        transitions from: APPLICATION_DRAFT_STATES + ENROLLING_STATES + ENROLLMENT_ELIGIBLE_STATES + [:enrollment_ineligible, :active, :approved],
           to:     :canceled
       end
 
@@ -934,7 +936,8 @@ module BenefitSponsors
 
     def is_application_trading_partner_publishable?
       return @notify if defined? @notify
-      return false
+
+      false
     end
 
     ### TODO FIX Move these methods to domain logic
@@ -946,7 +949,8 @@ module BenefitSponsors
               return false if self.aasm_state.blank?
               return false if self.imported?
               return false if self.effective_period.blank?
-              return true if self.enrollment_eligible? || self.binder_paid? || self.active?
+              return true if enrollment_eligible? || binder_paid? || active?
+
               terminated? || termination_pending? || expired?
             end
 

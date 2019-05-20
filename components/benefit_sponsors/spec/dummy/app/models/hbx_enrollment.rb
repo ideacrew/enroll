@@ -165,8 +165,8 @@ class HbxEnrollment
   scope :enrolled_and_renewing_and_shopping, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES + ['shopping'])) }
   scope :effective_asc,      -> { order(effective_on: :asc) }
   scope :effective_desc,      ->{ order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) }
-  scope :waived,              ->{ where(:aasm_state.in => WAIVED_STATUSES )}
-  scope :expired,             ->{ where(:aasm_state => "coverage_expired" )}
+  scope :waived,              ->{ where(:aasm_state.in => WAIVED_STATUSES)}
+  scope :expired,             ->{ where(:aasm_state => "coverage_expired")}
   scope :cancel_eligible,     ->{ where(:aasm_state.in => ["coverage_selected","renewing_coverage_selected","coverage_enrolled","auto_renewing", "enrolled_contingent"] )}
   scope :changing,            ->{ where(changing: true) }
   scope :with_in,             ->(time_limit){ where(:created_at.gte => time_limit) }
@@ -1490,8 +1490,7 @@ class HbxEnrollment
     )
   end
 
-  def notify_enrollment_cancel_or_termination_event(transmit_flag)
-  end
+  def notify_enrollment_cancel_or_termination_event(transmit_flag); end
 
   private
 

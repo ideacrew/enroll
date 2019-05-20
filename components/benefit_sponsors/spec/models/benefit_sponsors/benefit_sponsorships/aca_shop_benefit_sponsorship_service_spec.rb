@@ -29,18 +29,34 @@ module BenefitSponsors
     let(:renewal_sponsorship_state)       { :active }
     let(:renewal_current_application_state) { :active }
 
-    let!(:april_sponsors)                 { create_list(:benefit_sponsors_benefit_sponsorship, 2, :with_organization_cca_profile,
-      :with_initial_benefit_application, initial_application_state: initial_application_state,
-      default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site, aasm_state: sponsorship_state)
-    }
+    let!(:april_sponsors) do
+      create_list(
+        :benefit_sponsors_benefit_sponsorship,
+        2,
+        :with_organization_cca_profile,
+        :with_initial_benefit_application,
+        initial_application_state: initial_application_state,
+        default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)),
+        site: site,
+        aasm_state: sponsorship_state
+      )
+    end
 
-    let(:april_renewal_sponsors)         { create_list(:benefit_sponsors_benefit_sponsorship, 2, :with_organization_cca_profile,
-      :with_previous_year_rating_area, :with_previous_year_service_areas,
-      :with_renewal_benefit_application, initial_application_state: renewal_current_application_state,
-      renewal_application_state: renewal_application_state,
-      default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site,
-      aasm_state: renewal_sponsorship_state)
-    }
+    let(:april_renewal_sponsors) do
+      create_list(
+        :benefit_sponsors_benefit_sponsorship,
+        2,
+        :with_organization_cca_profile,
+        :with_previous_year_rating_area,
+        :with_previous_year_service_areas,
+        :with_renewal_benefit_application,
+        initial_application_state: renewal_current_application_state,
+        renewal_application_state: renewal_application_state,
+        default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)),
+        site: site,
+        aasm_state: renewal_sponsorship_state
+      )
+    end
 
     let(:current_date)                    { Date.new(this_year,3,14) }
 
@@ -81,7 +97,7 @@ module BenefitSponsors
             benefit_application = sponsor.benefit_applications.detect{|application| application.is_renewing?}
             benefit_application = sponsor.benefit_applications.first if benefit_application.blank?
 
-            expect(sponsor.applicant?).to be_truthy if !benefit_application.is_renewing?
+            expect(sponsor.applicant?).to be_truthy unless benefit_application.is_renewing?
             expect(benefit_application.enrollment_closed?).to be_truthy
             sponsorship_service = subject.new(benefit_sponsorship: sponsor)
             sponsorship_service.auto_cancel_ineligible

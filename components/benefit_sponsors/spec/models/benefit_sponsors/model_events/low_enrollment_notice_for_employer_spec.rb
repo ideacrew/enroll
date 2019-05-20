@@ -12,7 +12,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::LowEnrollmentNoticeForEmployer', d
     :with_benefit_package,
     :benefit_sponsorship => benefit_sponsorship,
     :aasm_state => 'enrollment_open',
-    :effective_period =>  start_on..(start_on + 1.year) - 1.day,
+    :effective_period => start_on..(start_on + 1.year) - 1.day,
     :open_enrollment_period => start_on.prev_month..Date.new(start_on.prev_month.year, start_on.prev_month.month, Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on)
   )}
   let!(:date_mock_object) { model_instance.open_enrollment_period.max - 2.days }

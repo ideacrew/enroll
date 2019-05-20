@@ -255,7 +255,7 @@ function addTermReasons(reason, id) {
   $.ajax({
     type: 'get',
     datatype: 'js',
-    url: '/exchanges/employer_applications/get_term_reasons',
+    url: '/exchanges/employer_applications/term_reasons',
     data: { reason_type_id: reason.id },
     success: function (response) {
       var select = document.getElementById('term_reason_'+ applicationId);

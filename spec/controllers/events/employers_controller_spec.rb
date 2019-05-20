@@ -16,10 +16,16 @@ describe Events::EmployersController do
     before :each do
       allow(BenefitSponsors::Organizations::Organization).to receive(:employer_by_hbx_id).with(employer_hbx_id).and_return(found_orgs)
       allow(controller).to receive(:render_to_string).with(
-        "events/v2/employers/updated", {:formats => ["xml"], :locals => {
-         :employer => employer_profile, manual_gen: false,
-         benefit_application_id: nil
-        }}).and_return(rendered_template)
+        "events/v2/employers/updated",
+        {
+          :formats => ["xml"],
+          :locals => {
+            :employer => employer_profile,
+            manual_gen: false,
+            benefit_application_id: nil
+          }
+        }
+      ).and_return(rendered_template)
     end
 
     describe "for an existing employer" do
@@ -58,19 +64,29 @@ describe Events::EmployersController do
       before :each do
         allow(BenefitSponsors::Organizations::Organization).to receive(:employer_by_hbx_id).with(employer_hbx_id).and_return(found_orgs)
         allow(controller).to receive(:render_to_string).with(
-                                 "events/v2/employers/updated", {:formats => ["xml"], :locals => {
-                                                                  :employer => employer_profile, benefit_application_id: "benefit_application_id", manual_gen: false
-                                                              }}).and_return(rendered_template)
+          "events/v2/employers/updated",
+          {
+            :formats => ["xml"],
+            :locals => {
+              :employer => employer_profile,
+              benefit_application_id: "benefit_application_id",
+              manual_gen: false
+            }
+          }
+        ).and_return(rendered_template)
       end
 
       it "should send out a message to the bus with the rendered employer object" do
-        expect(exchange).to receive(:publish).with(rendered_template, {
-                                                                        :routing_key => reply_to_key,
-                                                                        :headers => {
-                                                                            :employer_id => employer_hbx_id,
-                                                                            :return_status => "200"
-                                                                        }
-                                                                    })
+        expect(exchange).to receive(:publish).with(
+          rendered_template,
+          {
+            :routing_key => reply_to_key,
+            :headers => {
+              :employer_id => employer_hbx_id,
+              :return_status => "200"
+            }
+          }
+        )
         controller.resource(connection, di, props_with_plan_year_id, "")
       end
     end

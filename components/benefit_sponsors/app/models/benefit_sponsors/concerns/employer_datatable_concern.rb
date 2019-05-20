@@ -49,7 +49,7 @@ module BenefitSponsors
         }
 
         scope :benefit_application_initial_binder_paid, -> () {
-          where(:"benefit_applications" => {:$elemMatch => {:aasm_state => :binder_paid, :predecessor_id => {:$exists => false}}})
+          where(:benefit_applications => {:$elemMatch => {:aasm_state => :binder_paid, :predecessor_id => {:$exists => false}}})
         }
 
         scope :benefit_application_initial_binder_pending, -> () {
