@@ -1,4 +1,4 @@
-# Organization type with relaxed data entry/validation policies used for government agencies, 
+# Organization type with relaxed data entry/validation policies used for government agencies,
 # embassies and other types where FEIN is not assigned/available
 module BenefitSponsors
   module Organizations
@@ -41,6 +41,8 @@ module BenefitSponsors
 
       embeds_many :profiles,
                   class_name: "BenefitSponsors::Organizations::Profile", cascade_callbacks: true
+
+      scope :general_agency_profiles, ->{ where(:"profiles._type" => /.*GeneralAgencyProfile$/) }
 
       def employer_profile
         self.profiles.where(_type: /.*EmployerProfile$/).first
