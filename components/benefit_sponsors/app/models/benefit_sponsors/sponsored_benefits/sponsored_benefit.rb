@@ -99,18 +99,21 @@ module BenefitSponsors
 
         if new_product_package.present? && reference_product.present?
           if reference_product.renewal_product.present? && new_product_package.active_products.include?(reference_product.renewal_product)
-            new_sponsored_benefit = self.class.new(
-              product_package_kind: product_package_kind,
-              product_option_choice: product_option_choice,
-              reference_product: reference_product.renewal_product,
-              sponsor_contribution: sponsor_contribution.renew(new_product_package),
-              benefit_package: new_benefit_package
-              # pricing_determinations: renew_pricing_determinations(new_product_package)
-            )
+            new_sponsored_benefit = self.class.new(attributes_for_renewal(new_benefit_package, new_product_package))
             renew_pricing_determinations(new_sponsored_benefit)
             new_sponsored_benefit
           end
         end
+      end
+
+      def attributes_for_renewal(new_benefit_package, new_product_package)
+        {
+          product_package_kind: product_package_kind,
+          product_option_choice: product_option_choice,
+          reference_product: reference_product.renewal_product,
+          sponsor_contribution: sponsor_contribution.renew(new_product_package),
+          benefit_package: new_benefit_package
+        }
       end
 
       def renew_pricing_determinations(new_sponsored_benefit)
