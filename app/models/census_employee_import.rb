@@ -406,7 +406,7 @@ class CensusEmployeeImport
   private
   def sanitize_value(value)
     value = value.to_s.split('.')[0] if value.is_a? Float
-    value.gsub(/[[:cntrl:]]|^[\p{Space}]+|[\p{Space}]+$/, '')
+    value.to_s.gsub(/[[:cntrl:]]|^[\p{Space}]+|[\p{Space}]+$/, '')
   end
   def prepend_zeros(number, n)
     (n - number.to_s.size).times { number.prepend('0') }

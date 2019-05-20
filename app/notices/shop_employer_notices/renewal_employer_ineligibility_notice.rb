@@ -14,8 +14,7 @@ class ShopEmployerNotices::RenewalEmployerIneligibilityNotice < ShopEmployerNoti
 
   def append_data
     renewing_plan_year = employer_profile.plan_years.where(:aasm_state => "renewing_application_ineligible").first
-    active_plan_year = employer_profile.plan_years.where(:aasm_state => "active").first
-
+    active_plan_year = employer_profile.plan_years.where(:start_on => renewing_plan_year.start_on.prev_year.to_date, :aasm_state.in => ["active", "terminated", "expired"]).first
     plan_year_warnings = []
     renewing_plan_year.enrollment_errors.each do |k, v|
       case k.to_s

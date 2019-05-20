@@ -3,11 +3,11 @@ class IvlNotices::SecondIvlRenewalNotice < IvlNotice
   attr_accessor :family, :data,:identifier, :person
 
   def initialize(consumer_role, args = {})
-    args[:recipient] = consumer_role.person.families.first.primary_applicant.person
+    args[:recipient] = consumer_role.person
     args[:notice] = PdfTemplates::ConditionalEligibilityNotice.new
     args[:market_kind] = 'individual'
-    args[:recipient_document_store]= consumer_role.person.families.first.primary_applicant.person
-    args[:to] = consumer_role.person.families.first.primary_applicant.person.work_email_or_best
+    args[:recipient_document_store]= consumer_role.person
+    args[:to] = consumer_role.person.work_email_or_best
     self.person = args[:person]
     self.data = args[:data]
     self.identifier = args[:primary_identifier]
@@ -65,7 +65,7 @@ class IvlNotices::SecondIvlRenewalNotice < IvlNotice
         PdfTemplates::Individual.new({
           :first_name => datum["first_name"],
           :last_name => datum["last_name"],
-          :age => calculate_age_by_dob(Date.strptime(datum["dob"], '%m/%d/%Y')),
+          :age => calculate_age_by_dob(Date.strptime(datum["dob"], '%m-%d-%Y')),
           :incarcerated => datum["incarcerated"].upcase == "N" ? "No" : "Yes",
           :citizen_status => citizen_status(datum["citizen_status"]),
           :residency_verified => datum["resident"].upcase == "YES"  ? "Yes" : "No",

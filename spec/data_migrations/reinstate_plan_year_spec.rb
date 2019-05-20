@@ -71,6 +71,16 @@ describe ReinstatePlanYear, dbclean: :after_each do
         expect(plan_year.terminated_on).to eq terminated_on
       end
 
+      it "should pick the correct plan year" do
+        end_on = plan_year.end_on
+        terminated_on = plan_year.terminated_on
+        plan_year.update_attributes!(aasm_state:'expired')
+        subject.migrate
+        plan_year.reload
+        expect(plan_year.aasm_state).to eq 'expired'
+        expect(plan_year.terminated_on).to eq terminated_on
+      end
+
 
     end
 

@@ -432,29 +432,6 @@ describe Family do
     end
   end
 
-  context "contingent_enrolled_family_members_due_dates" do
-    let(:person) { FactoryBot.create(:person, :with_consumer_role) }
-    let(:person2) { FactoryBot.create(:person, :with_consumer_role) }
-    let(:family) { FactoryBot.create(:family, :with_primary_family_member, :person => person) }
-    let(:family_member) { FactoryBot.create(:family_member, :family => family, :person => person2) }
-    let(:primary_family_member) { family.primary_family_member }
-    before do 
-      allow(family).to receive(:contingent_enrolled_active_family_members).and_return([primary_family_member, family_member])
-      allow(person).to receive(:verification_types).and_return(["Immigration status"])
-      allow(person2).to receive(:verification_types).and_return(["Immigration status"])
-    end
-    it "should return uniq family members duedate" do
-      allow(family).to receive(:document_due_date).and_return(TimeKeeper.date_of_record)
-      expect(family.contingent_enrolled_family_members_due_dates).to eq [TimeKeeper.date_of_record]
-    end
-    it "should return sorted due dates" do
-      allow(family).to receive(:document_due_date).with(primary_family_member,"Immigration status").and_return(TimeKeeper.date_of_record)
-      allow(family).to receive(:document_due_date).with(family_member,"Immigration status").and_return(TimeKeeper.date_of_record+30)
-
-      expect(family.contingent_enrolled_family_members_due_dates).to eq [TimeKeeper.date_of_record,TimeKeeper.date_of_record+30]
-    end
-  end
-
   context "best_verification_due_date" do 
     let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
     
@@ -1073,6 +1050,11 @@ end
 
 describe Family, "given a primary applicant and a dependent", dbclean: :after_each do
   let(:person) { FactoryBot.create(:person)}
+  let(:individual_market_transition) { FactoryBot.create(:individual_market_transition, person: person)}
+  let(:person_two) { FactoryBot.create(:person) }
+  let(:family_member_dependent) { FactoryBot.build(:family_member, person: person_two, family: family)}
+  let(:family) { FactoryBot.build(:family, :with_primary_family_member, person: person)}
+  let(:person) { FactoryBot.create(:person)}
   let(:person_two) { FactoryBot.create(:person) }
   let(:family_member_dependent) { FactoryBot.build(:family_member, person: person_two, family: family)}
   let(:family) { FactoryBot.build(:family, :with_primary_family_member, person: person)}
@@ -1084,6 +1066,9 @@ describe Family, "given a primary applicant and a dependent", dbclean: :after_ea
   end
 
   it "should build the consumer role for the dependents when primary has a consumer role" do
+    allow(person).to receive(:is_consumer_role_active?).and_return(true)
+    allow(family_member_dependent.person).to receive(:is_consumer_role_active?).and_return(true)
+    person.consumer_role = FactoryBot.create(:consumer_role)
     person.consumer_role = FactoryBot.create(:consumer_role)
     person.save
     expect(family_member_dependent.person.consumer_role).to eq nil
@@ -1092,6 +1077,8 @@ describe Family, "given a primary applicant and a dependent", dbclean: :after_ea
   end
 
   it "should return the existing consumer roles if dependents already have a consumer role" do
+    allow(person_two).to receive(:is_consumer_role_active?).and_return(true)
+    person.consumer_role = FactoryBot.create(:consumer_role)
     person.consumer_role = FactoryBot.create(:consumer_role)
     person.save
     cr = FactoryBot.create(:consumer_role)
@@ -1249,180 +1236,6 @@ describe "min_verification_due_date", dbclean: :after_each do
   end
 end
 
-describe "#all_persons_vlp_documents_status" do
-
-  context "vlp documents status for single family member" do
-    let(:person) {FactoryBot.create(:person, :with_consumer_role)}
-    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
-    let(:family_person) {family.primary_applicant.person}
-
-    it "returns all_persons_vlp_documents_status is None when there is no document uploaded" do
-      family_person.consumer_role.vlp_documents.delete_all # Deletes all vlp documents if there is any
-      expect(family.all_persons_vlp_documents_status).to eq("None")
-    end
-
-    it "returns all_persons_vlp_documents_status is partially uploaded when single document is uploaded" do
-      family_person.consumer_role.vlp_documents << FactoryBot.build(:vlp_document)
-      family_person.save!
-      expect(family.all_persons_vlp_documents_status).to eq("Partially Uploaded")
-    end
-
-    it "returns all_persons_vlp_documents_status is fully uploaded when all documents are uploaded" do
-      family_person.consumer_role.vlp_documents << FactoryBot.build(:vlp_document, verification_type: "Citizenship")
-      family_person.consumer_role.update_attributes(ssn_validation: "valid")
-      expect(family.all_persons_vlp_documents_status).to eq("Fully Uploaded")
-    end
-
-    it "returns all_persons_vlp_documents_status is Fully Uploaded when documents status is verified" do
-      family_person.consumer_role.vlp_documents << FactoryBot.build(:vlp_document, verification_type: "Citizenship")
-      family_person.consumer_role.update_attributes(ssn_validation: "valid")
-      expect(family.all_persons_vlp_documents_status).to eq("Fully Uploaded")
-    end
-
-    it "returns all_persons_vlp_documents_status is partially uploaded when document is rejected" do
-      family_person.consumer_role.vlp_documents << FactoryBot.build(:vlp_document, verification_type: "Citizenship")
-      family_person.consumer_role.update_attributes(:ssn_rejected => true)
-      expect(family.all_persons_vlp_documents_status).to eq("Partially Uploaded")
-    end
-
-    it "returns all_persons_vlp_documents_status is Partially Uploaded when documents status is verified and other is not uploaded" do
-      family_person.consumer_role.vlp_documents << FactoryBot.build(:vlp_document, verification_type: "Citizenship")
-      family_person.consumer_role.update_attributes(ssn_validation: "valid")
-      allow(family_person).to receive(:verification_types).and_return ["social Security", "Citizenship"]
-      expect(family.all_persons_vlp_documents_status).to eq("Partially Uploaded")
-    end
-  end
-
-  context "vlp documents status for multiple family members" do
-    let(:person1) {FactoryBot.create(:person, :with_consumer_role)}
-    let(:person2) {FactoryBot.create(:person, :with_consumer_role)}
-    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person1)}
-    let(:family_member2) { FactoryBot.create(:family_member, person: person2, family: family)}
-    let(:doc1) { FactoryBot.build(:vlp_document, verification_type: "Social Security Number") }
-    let(:doc2) { FactoryBot.build(:vlp_document) }
-    let(:doc3) { FactoryBot.build(:vlp_document, verification_type: "DC Residency") }
-
-
-    it "returns all_persons_vlp_documents_status is None when there is no document uploaded" do
-      person1.consumer_role.vlp_documents.delete_all # Deletes all vlp documents if there is any
-      person2.consumer_role.vlp_documents.delete_all
-      expect(family.all_persons_vlp_documents_status).to eq("None")
-    end
-
-    it "returns all_persons_vlp_documents_status is partially uploaded when single document is uploaded on both" do
-      person1.consumer_role.vlp_documents << FactoryBot.build(:vlp_document, verification_type: "Citizenship")
-      allow(person1.consumer_role).to receive(:vlp_documents).and_return doc1
-      allow(person2.consumer_role).to receive(:vlp_documents).and_return doc1
-      expect(family.all_persons_vlp_documents_status).to eq("Partially Uploaded")
-    end
-
-    it "returns all_persons_vlp_documents_status is Fully uploaded when all document are uploaded on both" do
-      person1.consumer_role.vlp_documents << doc1
-      person1.consumer_role.vlp_documents << doc2
-      person1.consumer_role.vlp_documents << doc3
-      person2.consumer_role.vlp_documents << doc1
-      person2.consumer_role.vlp_documents << doc2
-      person2.consumer_role.vlp_documents << doc3
-      expect(family.all_persons_vlp_documents_status).to eq("Fully Uploaded")
-    end
-  end
-end
-
-describe "#document_due_date", dbclean: :after_each do
-  context "when special verifications exists" do
-    let(:special_verification) { FactoryBot.create(:special_verification, type: "admin")}
-    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: special_verification.consumer_role.person)}
-
-    it "should return the due date on the related latest special verification" do
-      expect(family.document_due_date(family.primary_family_member, special_verification.verification_type)).to eq special_verification.due_date.to_date
-    end
-  end
-
-  context "when special verifications not exist" do
-
-    let(:person) { FactoryBot.create(:person, :with_consumer_role)}
-    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
-
-    context "when the family member had an 'enrolled_contingent' policy" do
-
-      let(:enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members, household: family.active_household, aasm_state: "enrolled_contingent")}
-
-      before do
-        fm = family.primary_family_member
-        enrollment.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: fm.id, is_subscriber: fm.is_primary_applicant, eligibility_date: TimeKeeper.date_of_record , coverage_start_on: TimeKeeper.date_of_record)
-      end
-
-      #No longer updating special_verification_period on erollment. Due dates are moved to member level.
-      it "should return nil if special_verification_period on the enrollment is nil" do
-        enrollment.special_verification_period = nil
-        enrollment.save
-        expect(family.document_due_date(family.primary_family_member, "Citizenship")).to eq nil
-      end
-    end
-
-    context "when the family member had no policy" do
-      it "should return nil" do
-        expect(family.document_due_date(family.primary_family_member, "Citizenship")).to eq nil
-      end
-    end
-  end
-
-  describe "save application type in family model" do
-    context "person saves application type as Phone" do
-      let(:new_person) { FactoryBot.create(:person, :with_family) }
-      let(:person) { FactoryBot.create(:person) }
-      let(:current_user) {FactoryBot.create(:user, :hbx_staff, person: person)}
-      before do
-        new_person.primary_family.update_attributes(application_type: "Phone")
-      end
-      it "should save and disaply the person's application type as Phone" do
-        expect(new_person.primary_family.application_type).to eq "Phone"
-      end
-    end
-  end
-end
-
-describe Family, '#is_document_not_verified' do
-  let(:person) { FactoryBot.create(:person, :with_consumer_role)}
-  let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
-
-  it "return true when document is not verified" do
-    expect(family.is_document_not_verified("Citizenship", family.primary_family_member.person)).to eq true
-  end
-
-  it 'returns false when document is verified' do
-    person.consumer_role.vlp_documents << FactoryBot.build(:vlp_document, verification_type: "Social Security Number")
-    person.consumer_role.vlp_documents << FactoryBot.build(:vlp_document, verification_type: "DC Residency")
-    person.consumer_role.update_attributes(ssn_validation: "valid")
-    expect(family.is_document_not_verified("Social Security Number", family.primary_family_member.person)).to eq false
-
-  end
-
-  context 'when the consumer vlp authority is curam' do
-    before do
-      person.consumer_role.update_attributes(vlp_authority: "curam", aasm_state: "fully_verified")
-    end
-
-    context "when user is admin" do
-      let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_hbx_staff_role)}
-      it 'returns false when consumer is fully verified and admin' do
-        expect(family.is_document_not_verified("Social Security Number", family.primary_family_member.person)).to eq false
-      end
-
-      it 'returns true when consumer is not verified and admin' do
-        person.consumer_role.update_attributes(aasm_state: "unverified")
-        expect(family.is_document_not_verified("Social Security Number", family.primary_family_member.person)).to eq true
-      end
-    end
-
-    context 'when user is not admin' do
-      it 'returns false when consumer is fully verified and not an admin' do
-        expect(family.is_document_not_verified("Social Security Number", family.primary_family_member.person)).to eq false
-      end
-    end
-  end
-end
-
 describe "has_valid_e_case_id" do
   let!(:family1000) { FactoryBot.create(:family, :with_primary_family_member, e_case_id: nil) }
 
@@ -1440,6 +1253,15 @@ describe "has_valid_e_case_id" do
     expect(family1000.has_valid_e_case_id?).to be_truthy
   end
 end
+#TODO: fix me when ivl plans refactored to products
+# describe "currently_enrolled_plans_ids" do
+#   let!(:family100) { FactoryBot.create(:family, :with_primary_family_member) }
+#   let!(:enrollment100) { FactoryBot.create(:hbx_enrollment, household: family100.active_household, kind: "individual") }
+#
+#   it "should return a non-empty array of plan ids" do
+#     expect(family100.currently_enrolled_plans_ids(enrollment100).present?).to be_truthy
+#   end
+# end
 
 describe "active dependents" do
   let!(:person) { FactoryBot.create(:person, :with_consumer_role)}
