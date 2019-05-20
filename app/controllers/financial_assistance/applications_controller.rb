@@ -3,6 +3,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   before_action :set_primary_family
   before_action :check_eligibility, only: [:create, :get_help_paying_coverage_response, :copy]
   before_action :init_cfl_service, only: :review_and_submit
+  before_action :family_relationships, only: :review_and_submit
 
   include UIHelpers::WorkflowController
   include NavigationHelper
@@ -134,7 +135,6 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     save_faa_bookmark(@person, request.original_url)
     set_admin_bookmark_url
     @consumer_role = @person.consumer_role
-    @application = @person.primary_family.application_in_progress
     @applicants = @application.active_applicants if @application.present?
     if @application.blank?
       redirect_to financial_assistance_applications_path
@@ -199,6 +199,13 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   def init_cfl_service
     @cfl_service = ::FinancialAssistance::Services::ConditionalFieldsLookupService.new
+  end
+
+  def family_relationships
+    @application = @person.primary_family.application_in_progress
+    family = @application.family
+    matrix = family.build_relationship_matrix
+    @all_relationships = family.find_all_relationships(matrix)
   end
 
   def check_eligibility
