@@ -31,6 +31,10 @@ module FinancialAssistance
         end
       end
 
+      def incomes_jobs
+        @instance.has_job_income == true
+      end
+
       def is_joint_tax_filing
         @instance.is_required_to_file_taxes && @instance.has_spouse
       end

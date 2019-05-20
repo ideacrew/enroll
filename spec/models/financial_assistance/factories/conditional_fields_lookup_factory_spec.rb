@@ -360,5 +360,28 @@ RSpec.describe "::FinancialAssistance::Factories::ConditionalFieldsLookupFactory
         end
       end
     end
+
+    describe 'incomes_jobs' do
+      context 'when the current do not have any job incomes' do
+        before do
+          @instance = subject.new('applicant', applicant1.id, :incomes_jobs)
+        end
+
+        it 'should not return true' do
+          expect(@instance.conditionally_displayable?).to be_falsey
+        end
+      end
+
+      context 'when the current do have any job incomes' do
+        before do
+          applicant1.update_attributes!(has_job_income: true)
+          @instance = subject.new('applicant', applicant1.id, :incomes_jobs)
+        end
+
+        it 'should return true' do
+          expect(@instance.conditionally_displayable?).to be_truthy
+        end
+      end
+    end
   end
 end
