@@ -68,11 +68,6 @@ class MigrateDcBrokerAgencyProfiles < Mongoid::Migration
             BenefitSponsors::Organizations::Organization.skip_callback(:update, :after, :notify_observers, raise: false)
             BenefitSponsors::Organizations::Profile.skip_callback(:save, :after, :publish_profile_event, raise: false)
             new_organization.save!
-
-            #Roles Migration
-            person_records_with_old_staff_roles = find_staff_roles
-            link_existing_staff_roles_to_new_profile( person_records_with_old_staff_roles)
-
             print '.' unless Rails.env.test?
             success = success + 1
           end
@@ -84,6 +79,41 @@ class MigrateDcBrokerAgencyProfiles < Mongoid::Migration
           organization - #{new_organization.errors.messages}
           profile - #{@new_profile.errors.messages},
           #{e.inspect}" unless Rails.env.test?
+        end
+      end
+    end
+
+    say_with_time("Time taken to migrate broker staff roles and broker role") do
+      Person.or({:"broker_role".exists => true}, {:"broker_agency_staff_roles".exists => true}).each do |person|
+        person.broker_agency_staff_roles.unscoped.each do |staff|
+          broker_agency_profile = old_broker_agency_profile(staff.broker_agency_profile_id.to_s)
+
+          if broker_agency_profile.present?
+            new_org = BenefitSponsors::Organizations::Organization.where(hbx_id: broker_agency_profile.hbx_id).first
+            if new_org.present? && new_org.broker_agency_profile.present?
+              staff.update_attributes(benefit_sponsors_broker_agency_profile_id: new_org.broker_agency_profile.id)
+              print '.' unless Rails.env.test?
+            else
+              puts "New Organization Not Found for hbx_id:#{broker_agency_profile.hbx_id}"
+            end
+          else
+            puts "Broker Agency Profile Not Found for Staff person hbx_id:#{staff.person.hbx_id}"
+          end
+        end
+
+        if person.broker_role.present?
+          broker_agency_profile = old_broker_agency_profile(person.broker_role.broker_agency_profile_id.to_s)
+          if broker_agency_profile.present?
+            new_org = BenefitSponsors::Organizations::Organization.where(hbx_id: broker_agency_profile.hbx_id).first
+            if new_org.present? && new_org.broker_agency_profile.present?
+              person.broker_role.update_attributes(benefit_sponsors_broker_agency_profile_id: new_org.broker_agency_profile.id)
+              print '.' unless Rails.env.test?
+            else
+              puts "New Organization Not Found for hbx_id:#{broker_agency_profile.hbx_id}"
+            end
+          else
+            puts "Broker Agency Profile Not Found for broker person hbx_id:#{person.hbx_id}"
+          end
         end
       end
     end
@@ -110,7 +140,7 @@ class MigrateDcBrokerAgencyProfiles < Mongoid::Migration
   def self.build_documents(old_org, new_profile)
 
     @old_profile.documents.each do |document|
-      doc = new_profile.documents.new(document.attributes.except("_id", "_type", "identifier","size"))
+      doc = new_profile.documents.new(document.attributes.except("_type", "identifier","size"))
       doc.identifier = document.identifier if document.identifier.present?
       doc.save!
     end
@@ -152,19 +182,9 @@ class MigrateDcBrokerAgencyProfiles < Mongoid::Migration
     return exempt_organization
   end
 
-  def self.find_staff_roles
-    Person.or({:"broker_role.broker_agency_profile_id" => @old_profile.id},
-              {:"broker_agency_staff_roles.broker_agency_profile_id" => @old_profile.id})
-  end
-
-  def self.link_existing_staff_roles_to_new_profile( person_records_with_old_staff_roles)
-    person_records_with_old_staff_roles.each do |person|
-
-      old_broker_role = person.broker_role
-      old_broker_agency_staff_role = person.broker_agency_staff_roles.where(broker_agency_profile_id: @old_profile.id).first
-
-      old_broker_role.update_attributes(benefit_sponsors_broker_agency_profile_id: @new_profile.id) if old_broker_role.present?
-      old_broker_agency_staff_role.update_attributes(benefit_sponsors_broker_agency_profile_id: @new_profile.id) if old_broker_agency_staff_role.present?
+  def self.old_broker_agency_profile(id)
+    Rails.cache.fetch("broker_agency_profile_#{id}", expires_in: 2.hour) do
+      ::BrokerAgencyProfile.find(id)
     end
   end
 
