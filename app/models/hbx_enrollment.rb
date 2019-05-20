@@ -595,7 +595,9 @@ class HbxEnrollment
       benefit_group_assignment.hbx_enrollment = self
       benefit_group_assignment.save
     end
+  end
 
+  def handle_coverage_selection
     callback_context = { :hbx_enrollment => self }
     HandleCoverageSelected.call(callback_context)
   end
@@ -952,10 +954,18 @@ class HbxEnrollment
     end
   end
 
+  def is_an_existing_plan?(new_plan)
+    if is_shop?
+      self.family.currently_enrolled_plans_ids(self).include?(new_plan.id)
+    else
+      family.currently_enrolled_plans(self).select{ |plan| plan.is_same_plan_by_hios_id_and_active_year?(new_plan) }.present?
+    end
+  end
+
   def reset_dates_on_previously_covered_members(new_plan=nil)
     new_plan ||= self.plan
 
-    if self.family.currently_enrolled_plans(self).include?(new_plan.id)
+    if is_an_existing_plan?(new_plan)
       plan_selection = PlanSelection.new(self, self.plan)
       self.hbx_enrollment_members = plan_selection.same_plan_enrollment.hbx_enrollment_members
     end
@@ -992,8 +1002,8 @@ class HbxEnrollment
       benefit_coverage_period = benefit_sponsorship.current_benefit_period
     end
 
-    tax_household = household.latest_active_tax_household_with_year(effective_on.year)
-    elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_household)
+    tax_household = (market.present? && market == 'individual') ? household.latest_active_tax_household_with_year(effective_on.year) : nil
+    elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_household, market)
     elected_plans.collect {|plan| UnassistedPlanCostDecorator.new(plan, self)}
   end
 
@@ -1305,7 +1315,7 @@ class HbxEnrollment
 
   aasm do
     state :shopping, initial: true
-    state :coverage_selected, :after_enter => :update_renewal_coverage
+    state :coverage_selected, :after_enter => [:update_renewal_coverage, :handle_coverage_selection]
     state :transmitted_to_carrier
     state :coverage_enrolled
 
@@ -1446,12 +1456,12 @@ class HbxEnrollment
       transitions from: :enrolled_contingent, to: :coverage_selected
     end
 
-    event :move_to_contingent, :after => :record_transition do
+    event :move_to_contingent, :after => [:record_transition, :propagate_selection, :handle_coverage_selection] do
       transitions from: :shopping, to: :enrolled_contingent
       transitions from: :coverage_selected, to: :enrolled_contingent
       transitions from: :unverified, to: :enrolled_contingent
       transitions from: :coverage_enrolled, to: :enrolled_contingent
-      transitions from: :auto_renewing, to: :enrolled_contingent
+      transitions from: :auto_renewing, to: :enrolled_contingent, after: :propagate_selection
     end
 
     event :move_to_pending, :after => :record_transition do

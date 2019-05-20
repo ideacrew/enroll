@@ -16,7 +16,7 @@ FactoryBot.define do
     after(:create) do |user, evaluator|
       if evaluator.with_security_questions
 
-        3.times {|i| 
+        3.times {|i|
           security_question = create(:security_question, title: "Security Question #{i + 1}")
           create(:security_question_response, user: user, security_question: security_question)
         }
@@ -126,13 +126,13 @@ FactoryBot.define do
 
   trait :with_consumer_role do
     after :create do |user|
-      FactoryBot.create :person, :with_consumer_role, :with_family, :user => user
+      FactoryBot.create :person, :with_consumer_role, :with_family, :with_active_consumer_role, :user => user
     end
   end
 
   trait :with_resident_role do
     after :create do |user|
-      FactoryBot.create :person, :with_resident_role, :with_family, :user => user
+      FactoryBot.create :person, :with_resident_role, :with_active_resident_role, :with_family, :user => user
     end
   end
 

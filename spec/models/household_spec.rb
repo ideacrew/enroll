@@ -87,7 +87,6 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
     end
   end
 
-
   context "enrolled_including_waived_hbx_enrollments" do
     let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
     let(:household) {FactoryBot.create(:household, family: family)}
@@ -275,4 +274,40 @@ describe "financial assistance eligibiltiy for a family", type: :model, dbclean:
     expect(active_household.active_thh_with_year(TimeKeeper.date_of_record.year).count).to be 1
   end
 
+end
+
+describe Household, "for creating a new taxhousehold using create eligibility", type: :model, dbclean: :after_each do
+  let!(:person100)      { FactoryBot.create(:person) }
+  let!(:family100)      { FactoryBot.create(:family, :with_primary_family_member, person: person100) }
+  let(:household100)    { family100.active_household }
+  let!(:hbx_profile100) { FactoryBot.create(:hbx_profile) }
+  let(:current_date)    { TimeKeeper.date_of_record }
+  let(:params)        {
+                        {"person_id"=> person100.id.to_s,
+                          "family_actions_id"=>"family_actions_#{family100.id.to_s}",
+                          "max_aptc"=>"100.00",
+                          "csr"=>"94",
+                          "effective_date"=> "#{current_date.year}-#{current_date.month}-#{current_date.day}",
+                          "family_members"=>
+                            { family100.primary_applicant.person.hbx_id => {"pdc_type"=>"is_ia_eligible", "reason"=>"7hvgds"} }
+                        }
+                      }
+
+  context "create_new_tax_household" do
+    before :each do
+      household100.create_new_tax_household(params)
+    end
+
+    it "should create new tax_household instance" do
+      expect(household100.tax_households).not_to be []
+    end
+
+    it "should create new tax_household_member instance" do
+      expect(household100.tax_households[0].tax_household_members).not_to be []
+    end
+
+    it "should create new eligibility_determination instance" do
+      expect(household100.tax_households[0].eligibility_determinations).not_to be []
+    end
+  end
 end

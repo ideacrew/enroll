@@ -7,6 +7,7 @@ class Plan
   METAL_LEVEL_KINDS = %w[bronze silver gold platinum catastrophic dental]
   REFERENCE_PLAN_METAL_LEVELS = %w[bronze silver gold platinum dental]
   MARKET_KINDS = %w(shop individual)
+  INDIVIDUAL_MARKET_KINDS = %w(individual coverall)
   PLAN_TYPE_KINDS = %w[pos hmo epo ppo]
   DENTAL_METAL_LEVEL_KINDS = %w[high low]
 
@@ -548,12 +549,14 @@ class Plan
       REFERENCE_PLAN_METAL_LEVELS.map{|k| [k.humanize, k]}
     end
 
-    def individual_plans(coverage_kind:, active_year:, tax_household:)
+    def individual_plans(coverage_kind:, active_year:, tax_household:, hbx_enrollment:)
       case coverage_kind
       when 'dental'
         Plan.individual_dental_by_active_year(active_year).with_premium_tables
       when 'health'
-        csr_kind = tax_household.try(:latest_eligibility_determination).try(:csr_eligibility_kind)
+        shopping_family_member_ids = hbx_enrollment.hbx_enrollment_members.map(&:applicant_id) rescue nil
+        csr_kind = tax_household.latest_eligibility_determination.csr_eligibility_kind rescue nil
+        csr_kind = tax_household.tax_household_members.where(:applicant_id.in =>  shopping_family_member_ids).map(&:is_ia_eligible).include?(false) ? "csr_100" : csr_kind rescue nil
         if csr_kind.present?
           Plan.individual_health_by_active_year_and_csr_kind_with_catastrophic(active_year, csr_kind).with_premium_tables
         else

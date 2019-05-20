@@ -15,7 +15,11 @@ module Forms
         end
 
         def indian_tribe_member=(val)
-          @indian_tribe_member = (val.to_s == "true")
+          if val.to_s.present?
+          @indian_tribe_member =  (val.to_s == "true")
+          else
+            @indian_tribe_member = nil
+          end
         end
 
         def eligible_immigration_status=(val)
