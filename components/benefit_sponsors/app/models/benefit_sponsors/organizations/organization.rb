@@ -347,6 +347,15 @@ module BenefitSponsors
         end
       end
 
+      def self.valid_issuer_names_filters
+        Rails.cache.fetch("issuer-names-filters-at-#{TimeKeeper.date_of_record.year}", expires_in: 2.hours) do
+          issuer_profiles.inject({}) do |carrier_names, org|
+            carrier_names[org.issuer_profile.id.to_s] = org.issuer_profile.legal_name
+            carrier_names
+          end
+        end
+      end
+
       private
 
       def generate_hbx_id

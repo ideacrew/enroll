@@ -164,8 +164,8 @@ class BenefitCoveragePeriod
     end
 
     ivl_bgs = ivl_bgs.uniq
-    elected_plan_ids = ivl_bgs.map(&:benefit_ids).flatten.uniq
-    Plan.individual_plans(coverage_kind: coverage_kind, active_year: start_on.year, tax_household: tax_household, hbx_enrollment: hbx_enrollment).by_plan_ids(elected_plan_ids).entries
+    elected_product_ids = ivl_bgs.map(&:benefit_ids).flatten.uniq
+    ::BenefitMarkets::Products::Product.individual_products.by_product_ids(elected_product_ids).entries
   end
 
   ## Class methods
