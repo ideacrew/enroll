@@ -75,6 +75,9 @@ module BenefitMarkets
 
       scope :with_premium_tables, ->{ where(:premium_tables.exists => true) }
 
+      #TODO: for dental, csr-health
+      scope :individual_products, ->{ ivl_products_health_by_csr_kind_with_catastrophic.with_premium_tables }
+
       scope :by_product_ids, ->(product_ids) { where(:id => {"$in" => product_ids}) }
 
 
@@ -96,11 +99,6 @@ module BenefitMarkets
 
       def product_type
         health_plan_kind.to_s
-      end
-
-      def individual_products
-        #TODO: for dental, csr-health
-        BenefitMarkets::Products::Product.ivl_products_health_by_csr_kind_with_catastrophic.with_premium_tables
       end
 
       def can_use_aptc?
