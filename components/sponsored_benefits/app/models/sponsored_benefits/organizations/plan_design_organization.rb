@@ -4,8 +4,8 @@ module SponsoredBenefits
     class PlanDesignOrganization
       include Mongoid::Document
       include Mongoid::Timestamps
-      include Concerns::OrganizationConcern
-      include Concerns::AcaRatingAreaConfigConcern
+      include SponsoredBenefits::Concerns::OrganizationConcern
+      include SponsoredBenefits::Concerns::AcaRatingAreaConfigConcern
       include Config::AcaModelConcern
 
       belongs_to :broker_agency_profile, class_name: "SponsoredBenefits::Organizations::BrokerAgencyProfile", inverse_of: 'plan_design_organization'

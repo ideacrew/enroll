@@ -2,7 +2,7 @@
 module SponsoredBenefits
   module Organizations
     class Organization
-      include Concerns::OrganizationConcern
+      include SponsoredBenefits::Concerns::OrganizationConcern
       include Config::AcaModelConcern
 
 
