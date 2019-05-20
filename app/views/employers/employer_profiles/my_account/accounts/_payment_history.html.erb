@@ -31,6 +31,7 @@
         <% @payments.each do |payment| %>
           <tr>
             <td><%= payment.paid_on %></td>
+            <td <%= payment_amount_color_style(payment.amount) %>><%= number_to_currency(payment.amount) %></td>
             <td><%= number_to_currency(payment.amount) %></td>
             <% if payment.method_kind == "SCN" %>
               <td>CHK</td>
