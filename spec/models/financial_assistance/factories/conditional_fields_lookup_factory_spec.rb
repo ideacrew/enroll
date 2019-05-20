@@ -360,5 +360,80 @@ RSpec.describe "::FinancialAssistance::Factories::ConditionalFieldsLookupFactory
         end
       end
     end
+
+    describe 'is_requesting_voter_registration_application_in_mail' do
+      context 'when the current person did not answer is_requesting_voter_registration_application_in_mail' do
+        before do
+          @instance = subject.new('application', application.id, :is_requesting_voter_registration_application_in_mail)
+        end
+
+        it 'should not return true' do
+          expect(@instance.conditionally_displayable?).to be_falsey
+        end
+      end
+
+      [true, false].each do |result|
+        context 'when the current person answered is_requesting_voter_registration_application_in_mail' do
+          before do
+            application.update_attributes!(is_requesting_voter_registration_application_in_mail: result)
+            @instance = subject.new('application', application.id, :is_requesting_voter_registration_application_in_mail)
+          end
+
+          it 'should return true' do
+            expect(@instance.conditionally_displayable?).to be_truthy
+          end
+        end
+      end
+    end
+
+    describe 'years_to_renew' do
+      context 'when the current person did not answer years_to_renew' do
+        before do
+          @instance = subject.new('application', application.id, :years_to_renew)
+        end
+
+        it 'should not return true' do
+          expect(@instance.conditionally_displayable?).to be_falsey
+        end
+      end
+
+      (0..5).each do |result|
+        context 'when the current person answered years_to_renew' do
+          before do
+            application.update_attributes!(years_to_renew: result)
+            @instance = subject.new('application', application.id, :years_to_renew)
+          end
+
+          it 'should return true' do
+            expect(@instance.conditionally_displayable?).to be_truthy
+          end
+        end
+      end
+    end
+
+    describe 'parent_living_out_of_home_terms' do
+      context 'when the current person did not answer parent_living_out_of_home_terms' do
+        before do
+          @instance = subject.new('application', application.id, :parent_living_out_of_home_terms)
+        end
+
+        it 'should not return true' do
+          expect(@instance.conditionally_displayable?).to be_falsey
+        end
+      end
+
+      [true, false].each do |result|
+        context 'when the current person answered parent_living_out_of_home_terms' do
+          before do
+            application.update_attributes!(attestation_terms: result, parent_living_out_of_home_terms: result)
+            @instance = subject.new('application', application.id, :parent_living_out_of_home_terms)
+          end
+
+          it 'should return true' do
+            expect(@instance.conditionally_displayable?).to be_truthy
+          end
+        end
+      end
+    end
   end
 end
