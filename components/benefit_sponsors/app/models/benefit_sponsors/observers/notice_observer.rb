@@ -384,12 +384,11 @@ module BenefitSponsors
       end
 
       def trigger_initial_employee_plan_selection_confirmation_notice(model_event)
-        benefit_sponsorship = model_event.klass_instance
-        employer_profile = benefit_sponsorship.profile
+        benefit_application = model_event.klass_instance
+        employer_profile = benefit_application.sponsor_profile
         return unless employer_profile.is_new_employer?
 
-        census_employees = benefit_sponsorship.census_employees.non_terminated
-        census_employees.each do |ce|
+        employer_profile.census_employees.non_terminated.each do |ce|
           enrollment = ce.active_benefit_group_assignment.hbx_enrollment
           effective_on = employer_profile.active_benefit_sponsorship.benefit_applications.where(:aasm_state.in => [:enrollment_eligible, :enrollment_closed]).first.start_on
           next unless enrollment.present? && enrollment.effective_on == effective_on

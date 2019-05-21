@@ -5,7 +5,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerFinalRemainderToPub
   let(:model_event) { "initial_employer_final_reminder_to_publish_plan_year" }
   let(:notice_event) { "initial_employer_final_reminder_to_publish_plan_year" }
   let(:start_on) { TimeKeeper.date_of_record.next_month.beginning_of_month}
-  let!(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+  let!(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
   let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
   let!(:employer_profile)    { organization.employer_profile }
   let!(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
@@ -20,9 +20,6 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerFinalRemainderToPub
   describe "ModelEvent" do
     it "should trigger model event" do
       model_instance.class.observer_peers.keys.select{ |ob| ob.is_a? BenefitSponsors::Observers::NoticeObserver }.each do |observer|
-        expect(observer).to receive(:process_application_events) do |_instance, model_event|
-          expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
-        end
         expect(observer).to receive(:process_application_events) do |_instance, model_event|
           expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
         end

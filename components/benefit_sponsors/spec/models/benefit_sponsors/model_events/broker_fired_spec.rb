@@ -6,7 +6,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerFired', :dbclean => :after_e
 
   let!(:person) { create :person }
   let(:user)    { FactoryBot.create(:user, :person => person)}
-  let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+  let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
   let!(:organization_with_hbx_profile)  { site.owner_organization }
   let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
   let!(:employer_profile)    { organization.employer_profile }

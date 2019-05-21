@@ -5,7 +5,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployeePlanSelectionConfir
   let!(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
   let(:current_effective_date)  { TimeKeeper.date_of_record }
 
-  let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+  let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
   let!(:organization_with_hbx_profile)  { site.owner_organization }
   let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
   let!(:employer_profile)    { organization.employer_profile }
@@ -54,7 +54,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployeePlanSelectionConfir
 
     context "NoticeTrigger" do
       subject { BenefitSponsors::Observers::NoticeObserver.new }
-      let(:model_event) { ::BenefitSponsors::ModelEvents::ModelEvent.new(:initial_employee_plan_selection_confirmation, benefit_sponsorship, {}) }
+      let(:model_event) { ::BenefitSponsors::ModelEvents::ModelEvent.new(:initial_employee_plan_selection_confirmation, benefit_application, {}) }
 
       it "should trigger notice event" do
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
@@ -62,7 +62,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployeePlanSelectionConfir
           expect(payload[:event_object_kind]).to eq 'CensusEmployee'
           expect(payload[:event_object_id]).to eq census_employee.id.to_s
         end
-        subject.process_benefit_sponsorship_events(hbx_enrollment, model_event)
+        subject.process_application_events(benefit_application, model_event)
       end
     end
   end

@@ -6,7 +6,7 @@ module BenefitSponsors
     let(:model_event) { "application_submitted" }
     let(:current_effective_date)  { TimeKeeper.date_of_record }
     let!(:security_question)  { FactoryBot.create_default :security_question }
-    let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
 
     let(:benefit_market)      { site.benefit_markets.first }
     let!(:benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,

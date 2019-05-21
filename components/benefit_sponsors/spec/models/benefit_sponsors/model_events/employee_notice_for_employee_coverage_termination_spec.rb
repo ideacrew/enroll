@@ -5,8 +5,8 @@ require 'rails_helper'
 RSpec.describe 'ModelEvents::EmployeeNoticeForEmployeeCoverageTermination', dbclean: :around_each  do
   let(:current_effective_date)  { TimeKeeper.date_of_record }
   let(:start_on)                { (TimeKeeper.date_of_record - 2.months).beginning_of_month }
-  let!(:site)                   { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-  let!(:organization)           { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+  let!(:site)                   { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
+  let!(:organization)           { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
   let(:employer_profile)        { organization.employer_profile }
   let(:benefit_sponsorship)     { employer_profile.add_benefit_sponsorship }
   let!(:benefit_application) do
