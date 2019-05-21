@@ -125,7 +125,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::GroupTerminationNotice', :dbclean 
       end
 
       it 'should return plan year end date plus 60 days' do
-        expect(merge_model.benefit_application.current_py_plus_60_days).to eq(model_instance.end_on + 60.days).strftime('%m/%d/%Y')
+        expect(merge_model.benefit_application.current_py_plus_60_days).to eq((model_instance.end_on + 60.days).strftime('%m/%d/%Y'))
       end
 
       it 'should return false when there is no broker linked to employer' do
@@ -189,7 +189,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::GroupTerminationNotice', :dbclean 
       end
 
       it 'should return plan year end date plus 60 days' do
-        expect(merge_model.benefit_application.current_py_plus_60_days).to eq(model_instance.end_on + 60.days).strftime('%m/%d/%Y')
+        expect(merge_model.benefit_application.current_py_plus_60_days).to eq((model_instance.end_on + 60.days).strftime('%m/%d/%Y'))
       end
 
       it 'should return false when there is no broker linked to employer' do
