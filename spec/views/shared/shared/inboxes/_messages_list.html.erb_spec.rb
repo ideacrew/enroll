@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe "shared/inboxes/_message_list.html.erb" do
+describe "shared/inboxes/_message_list.html.erb", db_clean: :after_each do
   let(:shared_message_properties) do
      {
       :from => "somebody",
