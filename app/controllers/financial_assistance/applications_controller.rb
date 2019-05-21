@@ -135,6 +135,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     save_faa_bookmark(@person, request.original_url)
     set_admin_bookmark_url
     @consumer_role = @person.consumer_role
+    @application = @person.primary_family.application_in_progress
     @applicants = @application.active_applicants if @application.present?
     if @application.blank?
       redirect_to financial_assistance_applications_path
@@ -202,10 +203,8 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def family_relationships
-    @application = @person.primary_family.application_in_progress
-    family = @application.family
-    matrix = family.build_relationship_matrix
-    @all_relationships = family.find_all_relationships(matrix)
+    matrix = @family.build_relationship_matrix
+    @all_relationships = @family.find_all_relationships(matrix)
   end
 
   def check_eligibility
