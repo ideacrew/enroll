@@ -120,8 +120,6 @@ $(document).ready(function() {
     }
   });
 
-  /* Benefit Form Related */
-
   /* employer phone & zip validations */
   $('#employer_phone_full_phone_number').on('keyup keydown keypress', function (e) {
     var key = e.which || e.keyCode || e.charCode;
@@ -156,56 +154,6 @@ $(document).ready(function() {
       $('#is_eligible').parents(".row").next().removeClass('hide');
     }
   });
-
-
-  $('#benefit_insurance_kind').on('selectric-change', function(e){
-    if ($(this).val() == 'employer_sponsored_insurance') {
-      toggle_employer_contact_divs_benefit('show');
-    } else {
-      toggle_employer_contact_divs_benefit('hide');
-    }
-  });
-  /* This is to show/hide ESI fields on Page Load. Will show ESI related
-   * fields if InsuranceKind is selected as 'employer_sponsored_insurance'
-   * when page loads (possible on a page reload due to validation error) */
-
-  var selectedVal = $('#benefit_insurance_kind').val();
-  if (selectedVal == 'employer_sponsored_insurance') {
-    setTimeout(function() {
-      toggle_employer_contact_divs_benefit('show');
-    },300);
-  } else {
-    setTimeout(function() {
-      toggle_employer_contact_divs_benefit('hide');
-    },300);
-  };
-
-  function toggle_employer_contact_divs_benefit(hide_show) {
-    if (hide_show == 'show') {
-      $('#benefit_insurance_kind').parents(".row").next().removeClass('hide');
-      $('#benefit_insurance_kind').parents(".row").next().next().removeClass('hide');
-      $('#benefit_insurance_kind').parents(".row").next().next().next().removeClass('hide');
-      $('#benefit_insurance_kind').parents(".row").next().next().next().next().removeClass('hide');
-      $('#benefit_insurance_kind').parents(".row").next().next().next().next().next().removeClass('hide');
-      $('#benefit_insurance_kind').parents(".row").next().next().next().next().next().next().removeClass('hide');
-      $('#benefit_insurance_kind').parents(".row").next().next().next().next().next().next().next().removeClass('hide');
-      $('#benefit_insurance_kind').parents(".row").next().next().next().next().next().next().next().next().removeClass('hide');
-      $('#benefit_insurance_kind').parents(".row").next().next().next().next().next().next().next().next().next().removeClass('hide');
-      $('#benefit_insurance_kind').parents(".row").next().next().next().next().next().next().next().next().next().next().removeClass('hide');
-    } else {
-      $('#benefit_insurance_kind').parents(".row").next().addClass('hide');
-      $('#benefit_insurance_kind').parents(".row").next().next().addClass('hide');
-      $('#benefit_insurance_kind').parents(".row").next().next().next().addClass('hide');
-      $('#benefit_insurance_kind').parents(".row").next().next().next().next().addClass('hide');
-      $('#benefit_insurance_kind').parents(".row").next().next().next().next().next().addClass('hide');
-      $('#benefit_insurance_kind').parents(".row").next().next().next().next().next().next().addClass('hide');
-      $('#benefit_insurance_kind').parents(".row").next().next().next().next().next().next().next().addClass('hide');
-      $('#benefit_insurance_kind').parents(".row").next().next().next().next().next().next().next().next().addClass('hide');
-      $('#benefit_insurance_kind').parents(".row").next().next().next().next().next().next().next().next().next().addClass('hide');
-      $('#benefit_insurance_kind').parents(".row").next().next().next().next().next().next().next().next().next().next().addClass('hide');
-    }
-  }
-  /* Benefit Form Related */
 
   /* Submit Application Form Related */
 
