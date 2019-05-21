@@ -587,7 +587,7 @@ class HbxEnrollment
     if is_shop?
       update_existing_shop_coverage
     else
-      cancel_previous(self.plan.active_year)
+      cancel_previous(self.product.active_year)
     end
 
     if benefit_group_assignment

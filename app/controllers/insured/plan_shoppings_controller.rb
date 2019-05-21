@@ -45,7 +45,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def receipt
     @enrollment = HbxEnrollment.find(params.require(:id))
-    @plan = @enrollment.product
+    plan = @enrollment.product
 
     if @enrollment.is_shop?
       @employer_profile = @enrollment.employer_profile
@@ -55,8 +55,11 @@ class Insured::PlanShoppingsController < ApplicationController
       applied_aptc = @enrollment.applied_aptc_amount if @enrollment.applied_aptc_amount > 0
       @market_kind = "individual"
     end
-
-    @member_group = HbxEnrollmentSponsoredCostCalculator.new(@enrollment).groups_for_products([@plan]).first
+    if @enrollment.is_shop?
+      @member_group = HbxEnrollmentSponsoredCostCalculator.new(@enrollment).groups_for_products([@plan]).first
+    else
+      @plan = @enrollment.build_plan_premium(qhp_plan: plan, apply_aptc: applied_aptc.present?, elected_aptc: applied_aptc, tax_household: @shopping_tax_household)
+    end
 
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
@@ -90,8 +93,11 @@ class Insured::PlanShoppingsController < ApplicationController
     end
 
     # TODO Fix this stub
-    #@plan = @enrollment.build_plan_premium(qhp_plan: @plan, apply_aptc: can_apply_aptc?(@plan), elected_aptc: @elected_aptc, tax_household: @shopping_tax_household)
-    @member_group = HbxEnrollmentSponsoredCostCalculator.new(@enrollment).groups_for_products([@plan]).first
+    if @enrollment.is_shop?
+      @member_group = HbxEnrollmentSponsoredCostCalculator.new(@enrollment).groups_for_products([@plan]).first
+    else
+      @plan = @enrollment.build_plan_premium(qhp_plan: @plan, apply_aptc: can_apply_aptc?(@plan), elected_aptc: @elected_aptc, tax_household: @shopping_tax_household)
+    end
 
     @family = @person.primary_family
 
@@ -337,20 +343,22 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def enrolled_plans_by_hios_id_and_active_year
-    @enrolled_hbx_enrollment_plans = @hbx_enrollment.family.currently_enrolled_plans(@hbx_enrollment)
     if !@hbx_enrollment.is_shop?
+      @enrolled_hbx_enrollment_plans = @hbx_enrollment.family.currently_enrolled_products(@hbx_enrollment)
       (@plans.select{|plan| @enrolled_hbx_enrollment_plans.select {|existing_plan| plan.is_same_plan_by_hios_id_and_active_year?(existing_plan) }.present? }).collect(&:id)
     else
+      @enrolled_hbx_enrollment_plans = @hbx_enrollment.family.currently_enrolled_plans(@hbx_enrollment)
       (@plans.collect(&:id) & @enrolled_hbx_enrollment_plan_ids)
     end
   end
 
   def build_same_plan_premiums
+
     enrolled_plans = enrolled_plans_by_hios_id_and_active_year
     if enrolled_plans.present?
-      enrolled_plans = enrolled_plans.collect{|p| Plan.find(p)}
+      enrolled_plans = enrolled_plans.collect{|p| BenefitMarkets::Products::Product.find(p)}
 
-      plan_selection = PlanSelection.new(@hbx_enrollment, @hbx_enrollment.plan)
+      plan_selection = PlanSelection.new(@hbx_enrollment, @hbx_enrollment.product)
       same_plan_enrollment = plan_selection.same_plan_enrollment
 
       if @hbx_enrollment.is_shop?

@@ -323,6 +323,11 @@ module BenefitMarkets
       kind == :dental
     end
 
+    def is_same_plan_by_hios_id_and_active_year?(product)
+      #a combination of hios_id and active_year has to be considered as a Primary Key as hios_id alone cannot be considered as primary
+      ((self.hios_id.split("-")[0] == product.hios_id.split("-")[0]) && self.active_year == product.active_year )
+    end
+
     # private
     # self.class.new(attrs_without_tuples)
     # def attrs_without_tuples

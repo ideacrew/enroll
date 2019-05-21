@@ -30,7 +30,6 @@ class PlanSelection
   # FIXME: Needs to deactivate the parent enrollment, also, we set the sep here? WAT
   def select_plan_and_deactivate_other_enrollments(previous_enrollment_id, market_kind)
     hbx_enrollment.update_current(product_id: plan.id, issuer_profile_id: plan.issuer_profile_id)
-
     qle = hbx_enrollment.is_special_enrollment?
     if qle
       sep_id = hbx_enrollment.is_shop? ? hbx_enrollment.family.earliest_effective_shop_sep.id
@@ -39,11 +38,11 @@ class PlanSelection
       hbx_enrollment.special_enrollment_period_id = sep_id
     end
     hbx_enrollment.aasm_state = 'auto_renewing' if hbx_enrollment.is_active_renewal_purchase?
-#    if enrollment_members_verification_status(market_kind)
-#      hbx_enrollment.move_to_contingent!
-#    else
+   if enrollment_members_verification_status(market_kind)
+     hbx_enrollment.move_to_contingent!
+   else
     hbx_enrollment.select_coverage!(qle: qle) if hbx_enrollment.may_select_coverage?
-#    end
+   end
     hbx_enrollment.update_existing_shop_coverage
   end
 
@@ -72,7 +71,6 @@ class PlanSelection
     end
   end
 
-=begin
   def same_plan_enrollment
     return @same_plan_enrollment if defined? @same_plan_enrollment
 
@@ -82,7 +80,6 @@ class PlanSelection
 
     @same_plan_enrollment
   end
-=end
 
   def build_hbx_enrollment_members
     hbx_enrollment.hbx_enrollment_members.collect do |hbx_enrollment_member|
