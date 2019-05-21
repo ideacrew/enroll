@@ -10,6 +10,10 @@ RSpec.shared_context "setup benefit market with market catalogs and product pack
   let(:current_effective_date)  { (TimeKeeper.date_of_record + 2.months).beginning_of_month.prev_year }
   let(:renewal_effective_date)  { current_effective_date.next_year }
 
+
+  let(:catalog_health_package_kinds) { [:single_issuer, :metal_level, :single_product] }
+  let(:catalog_dental_package_kinds) { [:single_product] }
+
   let!(:prior_rating_area)   { create(:benefit_markets_locations_rating_area, active_year: current_effective_date.year - 1) }
   let!(:current_rating_area) { create(:benefit_markets_locations_rating_area, active_year: current_effective_date.year) }
   let!(:renewal_rating_area) { create(:benefit_markets_locations_rating_area, active_year: renewal_effective_date.year) }
@@ -28,7 +32,7 @@ RSpec.shared_context "setup benefit market with market catalogs and product pack
           5,
           :with_renewal_product,
           application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
-          product_package_kinds: [:single_issuer, :metal_level, :single_product],
+          product_package_kinds: catalog_health_package_kinds,
           service_area: service_area,
           renewal_service_area: renewal_service_area,
           metal_level_kind: :gold) }
@@ -37,7 +41,7 @@ RSpec.shared_context "setup benefit market with market catalogs and product pack
           5,
           :with_renewal_product,
           application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
-          product_package_kinds: [:single_product],
+          product_package_kinds: catalog_dental_package_kinds,
           service_area: service_area,
           renewal_service_area: renewal_service_area, 
           metal_level_kind: :dental) }
@@ -46,6 +50,8 @@ RSpec.shared_context "setup benefit market with market catalogs and product pack
     benefit_market: benefit_market,
     product_kinds: product_kinds,
     title: "SHOP Benefits for #{current_effective_date.year}",
+    health_product_package_kinds: catalog_health_package_kinds,
+    dental_product_package_kinds: catalog_dental_package_kinds,
     application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year))
   }
 
@@ -53,6 +59,8 @@ RSpec.shared_context "setup benefit market with market catalogs and product pack
     benefit_market: benefit_market,
     product_kinds: product_kinds,
     title: "SHOP Benefits for #{renewal_effective_date.year}",
+    health_product_package_kinds: catalog_health_package_kinds,
+    dental_product_package_kinds: catalog_dental_package_kinds,
     application_period: (renewal_effective_date.beginning_of_year..renewal_effective_date.end_of_year))
   }
 

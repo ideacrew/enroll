@@ -27,7 +27,7 @@ module BenefitSponsors
         renewal_attributes = super
 
         renewal_attributes.tap do |attributes|
-          attributes[:elected_product_choices] = renewal_elected_products_for(new_benefit_package.start_on) if multi_product?
+          attributes[:elected_product_choices] = renewal_elected_products_for(new_benefit_package.start_on).map(&:id) if multi_product?
         end
       end
 

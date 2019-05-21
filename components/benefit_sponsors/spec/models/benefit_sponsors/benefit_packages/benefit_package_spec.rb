@@ -345,6 +345,60 @@ module BenefitSponsors
             expect(sponsor_contribution.contribution_levels.size).to eq dental_sb.sponsor_contribution.contribution_levels.size
           end
         end
+
+        context "when employer has multi_product dental sponsored benefit" do
+          let(:catalog_dental_package_kinds)      { [:single_product, :multi_product, :single_issuer] }
+          let(:dental_package_kind)       { :multi_product }
+
+          let(:health_sb) { current_bp.sponsored_benefit_for(:health) }
+          let(:dental_sb) { current_bp.sponsored_benefits.detect{|sb| sb.product_kind == :dental } }
+
+          let(:renewed_dental_sb) { subject.sponsored_benefit_for(:dental) }
+          let(:renewal_products) { dental_sb.elected_products.map{|p| p.renewal_product.id} }
+
+          it 'should have multi_product current dental sponsored benefit' do
+            expect(dental_sb.product_package_kind).to eq :multi_product
+            expect(dental_sb.elected_product_choices.present?).to be_truthy
+          end
+
+          it "does build valid renewal benefit package" do
+            expect(subject.valid?).to be_truthy
+          end
+
+          it "does renew health sponsored benefit" do
+            expect(subject.sponsored_benefit_for(:health)).to be_present
+          end
+
+          it "does renew health reference product" do
+            expect(subject.sponsored_benefit_for(:health).reference_product).to eq health_sb.reference_product.renewal_product
+          end
+
+          it "does renew health sponsor contributions" do
+            sponsor_contribution = subject.sponsored_benefit_for(:health).sponsor_contribution
+            expect(sponsor_contribution).to be_present
+            expect(sponsor_contribution.contribution_levels.size).to eq health_sb.sponsor_contribution.contribution_levels.size
+          end
+
+          it "does renew dental sponsored benefit" do
+            expect(renewed_dental_sb).to be_present
+            expect(renewed_dental_sb.source_kind).to eq :benefit_sponsor_catalog
+          end
+
+          it "does renew dental reference product" do
+            expect(renewed_dental_sb.reference_product).to eq dental_sb.reference_product.renewal_product
+          end
+
+          it "does renew elected_product_choices" do
+            expect(renewed_dental_sb.product_package_kind).to eq dental_sb.product_package_kind
+            expect(renewed_dental_sb.elected_product_choices).to eq renewal_products
+          end
+
+          it "does renew dental sponsor contributions" do
+            sponsor_contribution = renewed_dental_sb.sponsor_contribution
+            expect(sponsor_contribution).to be_present
+            expect(sponsor_contribution.contribution_levels.size).to eq dental_sb.sponsor_contribution.contribution_levels.size
+          end
+        end
       end
     end
 
