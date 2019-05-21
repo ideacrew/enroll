@@ -509,7 +509,7 @@ class EmployerProfile
 
   # employer_profiles_controller.rb#terminate_employee_roster_enrollments
   def terminate_roster_enrollments(params)
-    termination_date = params["termination_date"].to_date
+    termination_date = Date.strptime(params["termination_date"], "%m/%d/%Y")
     termination_reason = params["termination_reason"]
     transmit_xml = params["transmit_xml"]
     active_plan_year.terminate_employee_enrollments(
