@@ -52,26 +52,6 @@ module BenefitSponsors
       scope :active,      ->{ any_in(aasm_state: ["is_applicant", "is_approved"]) }
       scope :inactive,    ->{ any_in(aasm_state: ["is_rejected", "is_suspended", "is_closed"]) }
 
-      # # has_one primary_broker_role
-      # def primary_broker_role=(new_primary_broker_role = nil)
-      #   if new_primary_broker_role.present?
-      #     raise ArgumentError.new("expected BrokerRole class") unless new_primary_broker_role.is_a? BrokerRole
-      #     self.primary_broker_role_id = new_primary_broker_role._id
-      #   else
-      #     unset("primary_broker_role_id")
-      #   end
-      #   @primary_broker_role = new_primary_broker_role
-      # end
-      #
-      # def primary_broker_role
-      #   return @primary_broker_role if defined? @primary_broker_role
-      #   @primary_broker_role = BrokerRole.find(self.primary_broker_role_id) unless primary_broker_role_id.blank?
-      # end
-      #
-      # def active_broker_roles
-        #   @active_broker_roles = BrokerRole.find_active_by_broker_agency_profile(self)
-      # end
-
       def employer_clients
       end
 
@@ -120,23 +100,6 @@ module BenefitSponsors
         office = primary_office_location
         office && office.phone.to_s
       end
-
-      # should not be here!
-      # def linked_employees
-      #   employer_profiles = BenefitSponsors::Concerns::EmployerProfileConcern.find_by_broker_agency_profile(self)
-      #   if employer_profiles
-      #     emp_ids = employer_profiles.map(&:id)
-      #     Person.where(:'employee_roles.benefit_sponsors_employer_profile_id'.in => emp_ids)
-      #   end
-      # end
-
-      # def families
-      #   linked_active_employees = linked_employees.select{ |person| person.has_active_employee_role? }
-      #   employee_families = linked_active_employees.map(&:primary_family).to_a
-      #   consumer_families = Family.by_broker_agency_profile_id(self.id).to_a
-      #   families = (consumer_families + employee_families).uniq
-      #   families.sort_by{|f| f.primary_applicant.person.last_name}
-      # end
 
       class << self
         def find(id)
