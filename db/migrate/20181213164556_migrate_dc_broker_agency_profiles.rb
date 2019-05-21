@@ -46,31 +46,28 @@ class MigrateDcBrokerAgencyProfiles < Mongoid::Migration
       old_organizations.batch_size(limit_count).no_timeout.all.each do |old_org|
         begin
           existing_new_organizations = find_new_organization(old_org)
-          if existing_new_organizations.count == 0
-            @old_profile = old_org.broker_agency_profile
-            json_data = @old_profile.to_json(:except => [:_id, :entity_kind, :aasm_state_set_on, :ach_routing_number, :ach_account_number, :inbox, :documents])
-            old_profile_params = JSON.parse(json_data)
+          @old_profile = old_org.broker_agency_profile
+          json_data = @old_profile.to_json(:except => [:_id, :entity_kind, :aasm_state_set_on, :ach_routing_number, :ach_account_number, :inbox, :documents])
+          old_profile_params = JSON.parse(json_data)
 
-            @new_profile = self.initialize_new_profile(old_org, old_profile_params)
+          @new_profile = self.initialize_new_profile(old_org, old_profile_params)
 
-            raise "Duplicate organization exists" if existing_new_organizations.present? && existing_new_organizations.count > 1
+          raise "Duplicate organization exists" if existing_new_organizations.present? && existing_new_organizations.count > 1
 
-            new_organization = if existing_new_organizations.present?
-                                 organization = existing_new_organizations.first
-                                 organization.profiles << @new_profile
-                                 organization
-                               else
-                                 self.initialize_new_organization(old_org, site)
-                               end
-
-            raise Exception unless new_organization.valid?
-            BenefitSponsors::Organizations::Organization.skip_callback(:create, :after, :notify_on_create, raise: false)
-            BenefitSponsors::Organizations::Organization.skip_callback(:update, :after, :notify_observers, raise: false)
-            BenefitSponsors::Organizations::Profile.skip_callback(:save, :after, :publish_profile_event, raise: false)
-            new_organization.save!
-            print '.' unless Rails.env.test?
-            success = success + 1
-          end
+          new_organization = if existing_new_organizations.present?
+                               organization = existing_new_organizations.first
+                               organization.profiles << @new_profile
+                               organization
+                             else
+                               self.initialize_new_organization(old_org, site)
+                             end
+          raise Exception unless new_organization.valid?
+          BenefitSponsors::Organizations::Organization.skip_callback(:create, :after, :notify_on_create, raise: false)
+          BenefitSponsors::Organizations::Organization.skip_callback(:update, :after, :notify_observers, raise: false)
+          BenefitSponsors::Organizations::Profile.skip_callback(:save, :after, :publish_profile_event, raise: false)
+          new_organization.save!
+          print '.' unless Rails.env.test?
+          success = success + 1
         rescue Exception => e
           failed = failed + 1
           print 'F' unless Rails.env.test?
@@ -140,12 +137,14 @@ class MigrateDcBrokerAgencyProfiles < Mongoid::Migration
   def self.build_documents(old_org, new_profile)
 
     @old_profile.documents.each do |document|
+      next if BenefitSponsors::Documents::Document.where(id: document.id).present?
       doc = new_profile.documents.new(document.attributes.except("_type", "identifier","size"))
       doc.identifier = document.identifier if document.identifier.present?
       doc.save!
     end
 
     old_org.documents.each do |document|
+      next if BenefitSponsors::Documents::Document.where(id: document.id).present?
       doc = new_profile.documents.new(document.attributes.except("_type", "identifier","size"))
       doc.identifier = document.identifier if document.identifier.present?
       doc.save!
