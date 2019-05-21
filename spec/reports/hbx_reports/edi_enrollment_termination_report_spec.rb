@@ -68,23 +68,21 @@ describe TerminatedHbxEnrollments do
   end
 
   shared_examples_for "returns csv file list with terminated hbx_enrollments" do |field_name, result|
+    let(:file) { Array.new }
+
     before :each do
+      allow(CSV).to receive(:open).and_yield(file)
       subject.migrate
-      @file = if individual_market_is_enabled?
-                Dir.glob(File.join(Rails.root, "/public/edi_enrollment_termination_report_*")).first
-              else
-                Dir.glob(File.join(Rails.root, "CCA_#{ENV["RAILS_ENV"]}_EDIENROLLMENTTERMINATION_*.csv"))
-              end
     end
 
     it "check the records included in file" do
-      file_context = CSV.read(@file)
-      expect(file_context.size).to be > 1
+      expect(file.size).to be > 1
     end
 
     it "returns correct #{field_name} in csv file" do
-      CSV.foreach(@file, :headers => true) do |csv_obj|
-        expect(csv_obj[field_name]).to eq result
+      file.map! { |line| line.map! { |field| "\"#{field}\"" }.join(',') }
+      CSV.parse(file.join("\n"), :headers => true) do |line|
+        expect(line[field_name]).to eq result
       end
     end
   end
