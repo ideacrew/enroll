@@ -29,10 +29,6 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployerReminderToPublishPl
 
         expect(observer).to receive(:process_application_events) do |_instance, model_event|
           expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
-        end
-
-        expect(observer).to receive(:process_application_events) do |_instance, model_event|
-          expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
           expect(model_event).to have_attributes(:event_key => :renewal_employer_third_reminder_to_publish_plan_year, :klass_instance => model_instance, :options => {})
         end
       end

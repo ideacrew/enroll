@@ -552,7 +552,7 @@ module BenefitSponsors
 
       let(:benefit_package)  { initial_application.benefit_packages.first }
       let(:benefit_group_assignment) {FactoryBot.build(:benefit_group_assignment, benefit_group: benefit_package)}
-      let(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: benefit_sponsorship.profile, census_employee_id: census_employee.id) }
+      let(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: benefit_sponsorship.profile, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: abc_profile.id) }
       let(:census_employee) do
         FactoryBot.create(
           :census_employee,
@@ -584,7 +584,7 @@ module BenefitSponsors
       end
 
       let(:benefit_group_assignment_1) {FactoryBot.build(:benefit_group_assignment, benefit_group: benefit_package)}
-      let(:employee_role_1) { FactoryBot.create(:benefit_sponsors_employee_role, person: person_1, employer_profile: benefit_sponsorship.profile, census_employee_id: census_employee_1.id) }
+      let(:employee_role_1) { FactoryBot.create(:benefit_sponsors_employee_role, person: person_1, employer_profile: benefit_sponsorship.profile, census_employee_id: census_employee_1.id, benefit_sponsors_employer_profile_id: abc_profile.id) }
       let(:census_employee_1) do
         FactoryBot.create(
           :census_employee,
@@ -693,7 +693,7 @@ module BenefitSponsors
 
       let(:benefit_package)  { initial_application.benefit_packages.first }
       let(:benefit_group_assignment) {FactoryBot.build(:benefit_group_assignment, benefit_group: benefit_package)}
-      let(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: benefit_sponsorship.profile, census_employee_id: census_employee.id) }
+      let(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: benefit_sponsorship.profile, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: abc_profile.id) }
       let(:census_employee) do
         FactoryBot.create(
           :census_employee,
@@ -724,7 +724,7 @@ module BenefitSponsors
         hbx_enrollment
       end
 
-      let(:employee_role_1) { FactoryBot.create(:benefit_sponsors_employee_role, person: person_1, employer_profile: benefit_sponsorship.profile, census_employee_id: census_employee_1.id) }
+      let(:employee_role_1) { FactoryBot.create(:benefit_sponsors_employee_role, person: person_1, employer_profile: benefit_sponsorship.profile, census_employee_id: census_employee_1.id, benefit_sponsors_employer_profile_id: abc_profile.id) }
       let(:census_employee_1) do
         FactoryBot.create(
           :census_employee,

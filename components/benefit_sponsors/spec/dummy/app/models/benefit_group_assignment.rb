@@ -82,6 +82,25 @@ class BenefitGroupAssignment
     @benefit_package = new_benefit_package
   end
 
+  def covered_families
+    Family.where(
+      {
+        "households.hbx_enrollments.benefit_group_assignment_id" => BSON::ObjectId.from_string(id)
+      }
+    )
+  end
+
+  def hbx_enrollments
+    covered_families.inject([]) do |enrollments, family|
+      family.households.each do |household|
+        enrollments += household.hbx_enrollments.show_enrollments_sans_canceled.select do |enrollment|
+          enrollment.benefit_group_assignment_id == id
+        end.to_a
+      end
+      enrollments
+    end
+  end
+
   def benefit_package
     return if benefit_package_id.nil?
     return @benefit_package if defined? @benefit_package
