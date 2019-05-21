@@ -20,7 +20,7 @@ class CreatePlanDesignOrganizations < Mongoid::Migration
           employer_profile_id: "$_id.employer_profile_id",
           id: "$_id.id"
         }}
-      ]).each do |record|
+      ],:allow_disk_use => true).each do |record|
         begin
           broker_agency = broker_agency_profile(record[:broker_agency_profile_id])
           broker_profile = init_sponsored_benefits_profile(broker_agency)
