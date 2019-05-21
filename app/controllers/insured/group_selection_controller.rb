@@ -47,7 +47,7 @@ class Insured::GroupSelectionController < ApplicationController
     @adapter.if_change_plan_selected(params) do |new_effective_date|
       @new_effective_on = new_effective_date
     end
-    
+
     @waivable = @adapter.can_waive?(@hbx_enrollment, params)
   end
 
@@ -89,17 +89,13 @@ class Insured::GroupSelectionController < ApplicationController
         hbx_enrollment.special_enrollment_period_id = sep.id
       end
     end
-
     hbx_enrollment.generate_hbx_signature
-
     @adapter.family.hire_broker_agency(current_user.person.broker_role.try(:id))
     hbx_enrollment.writing_agent_id = current_user.person.try(:broker_role).try(:id)
     hbx_enrollment.original_application_type = session[:original_application_type]
     broker_role = current_user.person.broker_role
     hbx_enrollment.broker_agency_profile_id = broker_role.broker_agency_profile_id if broker_role
-
     hbx_enrollment.validate_for_cobra_eligiblity(@employee_role)
-
     if hbx_enrollment.save
       @adapter.assign_enrollment_to_benefit_package_assignment(@employee_role, hbx_enrollment)
       if @adapter.keep_existing_plan?(params) && @adapter.previous_hbx_enrollment.present?
@@ -206,10 +202,32 @@ class Insured::GroupSelectionController < ApplicationController
       @resident_role = res_role
       @role = res_role
     end
+    if @hbx_enrollment.present? && @change_plan == "change_plan"
+      if @hbx_enrollment.kind == "employer_sponsored"
+        @mc_market_kind = "shop"
+      elsif @hbx_enrollment.kind == "coverall"
+        @mc_market_kind = "coverall"
+      else
+        @mc_market_kind = "individual"
+      end
+      @mc_coverage_kind = @hbx_enrollment.coverage_kind
+    end
 
     @adapter.if_consumer_role do |c_role|
       @consumer_role = c_role
       @role = c_role
     end
   end
+
+  def get_values_to_generate_resident_role(person)
+    options = {}
+    options[:is_applicant] = person.consumer_role.is_applicant
+    options[:bookmark_url] = person.consumer_role.bookmark_url
+    options[:is_state_resident] = person.consumer_role.is_state_resident
+    options[:residency_determined_at] = person.consumer_role.residency_determined_at
+    options[:contact_method] = person.consumer_role.contact_method
+    options[:language_preference] = person.consumer_role.language_preference
+    options
+  end
+
 end

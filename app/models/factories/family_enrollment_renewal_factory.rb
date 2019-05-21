@@ -133,6 +133,17 @@ module Factories
       }).renew_coverage
     end
 
+    def trigger_notice
+      if !disable_notifications && coverage_kind == 'health'
+        notice_name = yield
+        begin
+          ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, yield, "acapi_trigger" => true) unless Rails.env.test?
+        rescue Exception => e
+          Rails.logger.error { "Unable to deliver census employee notice for #{notice_name} to census_employee #{census_employee.id} due to #{e}" }
+        end
+      end
+    end
+    
     # relationship offered in renewal plan year and member active in enrollment.
     def is_relationship_offered_and_member_covered?(member,renewal_enrollment)
       return true if renewal_enrollment.composite_rated?
@@ -147,7 +158,7 @@ module Factories
         begin
           hbx_enrollment = HbxEnrollment.by_hbx_id(enrollment_id).first
           census_employee.update_attributes!(employee_role_id: hbx_enrollment.employee_role.id.to_s ) if !census_employee.employee_role.present? && hbx_enrollment.present?
-          ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, yield, :hbx_enrollment => enrollment_id) unless Rails.env.test?
+          ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, yield, :hbx_enrollment => enrollment_id, :acapi_trigger =>  true) unless Rails.env.test?
         rescue Exception => e
           Rails.logger.error { "Unable to deliver census employee notice for #{notice_name} to census_employee #{census_employee.id} due to #{e}" }
         end

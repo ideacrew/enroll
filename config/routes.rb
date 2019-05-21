@@ -108,7 +108,7 @@ Rails.application.routes.draw do
         get :edit_force_publish
         post :force_publish
         get :broker_agency_index
-        get :general_agency_index if Settings.aca.general_agency_enabled
+        get :general_agency_index
         get :issuer_index
         get :product_index
         get :configuration
@@ -146,6 +146,7 @@ Rails.application.routes.draw do
         post :update_fein
         get :identity_verification
         post :identity_verification_datatable
+        get :new_eligibility
       end
 
       member do
@@ -255,6 +256,8 @@ Rails.application.routes.draw do
         get 'family'
         get 'upload_notice_form'
         post 'upload_notice'
+        get 'transition_family_members'
+        post 'transition_family_members_update'
       end
 
       resources :people do
@@ -441,9 +444,7 @@ Rails.application.routes.draw do
         get  :commission_statements
       end
       member do
-        if Settings.aca.general_agency_enabled
-          get :general_agency_index
-        end
+        get :general_agency_index
         get :manage_employers
         post :clear_assign_for_employer
         get :assign
@@ -464,6 +465,7 @@ Rails.application.routes.draw do
         get :new_staff_member
         get :new_broker_agency
         get :search_broker_agency
+        post :email_guide
       end
       member do
         get :favorite
@@ -517,32 +519,31 @@ Rails.application.routes.draw do
     end
   end
 
-  if Settings.aca.general_agency_enabled
-    match 'general_agency_registration', to: 'general_agencies/profiles#new_agency', via: [:get]
-    namespace :general_agencies do
-      root 'profiles#new'
-      resources :profiles do
-        collection do
-          get :new_agency_staff
-          get :search_general_agency
-          get :new_agency
-          get :messages
-          get :agency_messages
-          get :inbox
-          get :edit_staff
-          post :update_staff
-        end
-        member do
-          get :employers
-          get :families
-          get :staffs
-        end
+  match 'general_agency_registration', to: 'general_agencies/profiles#new_agency', via: [:get]
+  namespace :general_agencies do
+    root 'profiles#new'
+    resources :profiles do
+      collection do
+        get :new_agency_staff
+        get :search_general_agency
+        get :new_agency
+        get :messages
+        get :agency_messages
+        get :inbox
+        get :edit_staff
+        post :update_staff
       end
-      resources :inboxes, only: [:new, :create, :show, :destroy] do
-        get :msg_to_portal
+      member do
+        get :employers
+        get :families
+        get :staffs
       end
     end
+    resources :inboxes, only: [:new, :create, :show, :destroy] do
+      get :msg_to_portal
+    end
   end
+
   resources :translations
 
   namespace :api, :defaults => {:format => 'xml'} do
@@ -588,6 +589,7 @@ Rails.application.routes.draw do
   match "hbx_profiles/edit_dob_ssn" => "exchanges/hbx_profiles#edit_dob_ssn", as: :edit_dob_ssn, via: [:get, :post]
   match "hbx_profiles/update_dob_ssn" => "exchanges/hbx_profiles#update_dob_ssn", as: :update_dob_ssn, via: [:get, :post], defaults: { format: 'js' }
   match "hbx_profiles/verify_dob_change" => "exchanges/hbx_profiles#verify_dob_change", as: :verify_dob_change, via: [:get], defaults: { format: 'js' }
+  match "hbx_profiles/create_eligibility" => "exchanges/hbx_profiles#create_eligibility", as: :create_eligibility, via: [:post], defaults: { format: 'js' }
 
   resources :families do
     get 'page/:page', :action => :index, :on => :collection

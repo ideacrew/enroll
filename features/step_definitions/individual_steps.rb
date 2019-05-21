@@ -96,7 +96,7 @@ Then(/Individual should see a form to enter personal information$/) do
   find('.interaction-choice-control-state-id', text: 'SELECT STATE *').click
   find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[3]/div/ul/li[10]').click
   fill_in "person[addresses_attributes][0][zip]", :with => "20002"
-  fill_in "person[phones_attributes][0][full_phone_number]", :with => "9999999999"
+  fill_in "person[phones_attributes][0][full_phone_number]", :with => "9999999999", :wait => 10
   screenshot("personal_form")
 end
 
@@ -190,7 +190,7 @@ And(/Individual clicks on add member button/) do
   fill_in "dependent[last_name]", :with => @u.last_name
   fill_in "jq_datepicker_ignore_dependent[dob]", :with => @u.adult_dob
   fill_in "dependent[ssn]", :with => @u.ssn
-  find(:xpath, "//p[@class='label'][contains(., 'This Person Is')]").click
+  find('.label', :text => 'This Person Is').click
   find(:xpath, '//*[@id="new_dependent"]/div[1]/div[4]/div[1]/div[1]/div[3]/div/ul/li[3]').click
   find(:xpath, '//label[@for="radio_female"]').click
   find(:xpath, '//label[@for="dependent_us_citizen_true"]').click
@@ -209,7 +209,7 @@ And(/Individual again clicks on add member button/) do
   fill_in "dependent[last_name]", :with => @u.last_name
   fill_in "jq_datepicker_ignore_dependent[dob]", :with => '01/15/2013'
   fill_in "dependent[ssn]", :with => @u.ssn
-  find(:xpath, "//p[@class='label'][contains(., 'This Person Is')]").click
+  find('.label', :text => 'This Person Is').click
   find(:xpath, '//*[@id="new_dependent"]/div[1]/div[4]/div[1]/div[1]/div[3]/div/ul/li[4]').click
   find(:xpath, '//label[@for="radio_female"]').click
   find(:xpath, '//label[@for="dependent_us_citizen_true"]').click

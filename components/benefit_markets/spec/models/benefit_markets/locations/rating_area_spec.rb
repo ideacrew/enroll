@@ -77,22 +77,34 @@ module BenefitMarkets
         )
       }
 
-      it "will not be found when given an address not in that county" do
+      it "will return rating area based on exchange when given an address not in that county" do
         rating_area
         rating_areas = ::BenefitMarkets::Locations::RatingArea.rating_area_for(address_outside_county)
-        expect(rating_areas.to_a).not_to include(rating_area)
+        if Settings.site.key == :cca
+          expect(rating_areas.to_a).not_to include(rating_area)
+        else
+          expect(rating_areas.to_a).to include(rating_area)
+        end
       end
 
-      it "will not be found when given an address not in that zip code" do
+      it "will return rating area based on exchange when given an address not in that zip code" do
         rating_area
         rating_areas = ::BenefitMarkets::Locations::RatingArea.rating_area_for(address_outside_zip)
-        expect(rating_areas.to_a).not_to include(rating_area)
+        if Settings.site.key == :cca
+          expect(rating_areas.to_a).not_to include(rating_area)
+        else
+          expect(rating_areas.to_a).to include(rating_area)
+        end
       end
 
-      it "will not be found when given an address not in that state" do
+      it "will return rating area based on exchange when given an address not in that state" do
         rating_area
         rating_areas = ::BenefitMarkets::Locations::RatingArea.rating_area_for(address_outside_state)
-        expect(rating_areas.to_a).not_to include(rating_area)
+        if Settings.site.key == :cca
+          expect(rating_areas.to_a).not_to include(rating_area)
+        else
+          expect(rating_areas.to_a).to include(rating_area)
+        end
       end
 
       it "is found when a matching address is provided" do
@@ -120,10 +132,14 @@ module BenefitMarkets
         )
       }
 
-      it "will not be found when given an address not in that state" do
+      it "will return rating area based on exchange when given an address not in that state" do
         rating_area
         rating_areas = ::BenefitMarkets::Locations::RatingArea.rating_area_for(address_outside_state)
-        expect(rating_areas.to_a).not_to include(rating_area)
+        if Settings.site.key == :cca
+          expect(rating_areas.to_a).not_to include(rating_area)
+        else
+          expect(rating_areas.to_a).to include(rating_area)
+        end
       end
 
       it "is found when a matching address is provided" do

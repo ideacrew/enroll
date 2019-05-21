@@ -6,23 +6,20 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   context "set_current_user with no person" do
     let(:user) { FactoryBot.create(:user, person: person) }
-    let(:person) { FactoryBot.create(:person) }
+    let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
 
     before :each do
       sign_in user
     end
 
-    it "should log the error" do
-      expect(subject).to receive(:log) do |msg, severity|
-        expect(severity[:severity]).to eq('error')
-        expect(msg[:message]).to eq('@family was set to nil')
-      end
-      get :home
-      expect(response).to redirect_to("/500.html")
+    it "should assigns the family if user is hbx_staff and dependent consumer" do
+      get :home, params: {:family => family.id.to_s}
+      expect(assigns(:family)).to eq family
     end
 
     it "should redirect" do
-      get :home
+      get :home, params: {:family => family.id}
       expect(response).to be_redirect
     end
   end
@@ -43,7 +40,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
   let(:hbx_enrollments) { double("HbxEnrollment") }
   let(:user) { FactoryBot.create(:user) }
-  let(:person) { double("Person", id: "test", addresses: [], no_dc_address: false, no_dc_address_reason: "" , has_active_consumer_role?: false, has_active_employee_role?: true) }
+  let(:person) { double("Person", id: "test", addresses: [], no_dc_address: false, no_dc_address_reason: "" , is_consumer_role_active?: false, has_active_employee_role?: true) }
   let(:family) { instance_double(Family, active_household: household, :model_name => "Family") }
   let(:household) { double("HouseHold", hbx_enrollments: hbx_enrollments) }
   let(:addresses) { [double] }
@@ -68,7 +65,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     allow(family).to receive_message_chain("family_members.active").and_return(family_members)
     allow(person).to receive(:consumer_role).and_return(consumer_role)
     allow(person).to receive(:active_employee_roles).and_return(employee_roles)
-    allow(person).to receive(:has_active_resident_role?).and_return(true)
+    allow(person).to receive(:is_resident_role_active?).and_return(true)
     allow(person).to receive(:resident_role).and_return(resident_role)
     allow(consumer_role).to receive(:bookmark_url=).and_return(true)
     sign_in(user)
@@ -113,7 +110,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         allow(consumer_role).to receive(:identity_verified?).and_return(false)
         allow(consumer_role).to receive(:application_verified?).and_return(false)
         allow(person).to receive(:has_active_employee_role?).and_return(false)
-        allow(person).to receive(:has_active_consumer_role?).and_return(true)
+        allow(person).to receive(:is_consumer_role_active?).and_return(true)
         allow(person).to receive(:active_employee_roles).and_return([])
         allow(person).to receive(:employee_roles).and_return([])
         allow(user).to receive(:get_announcements_by_roles_and_portal).and_return []
@@ -221,7 +218,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         allow(user).to receive(:last_portal_visited).and_return ''
         allow(person).to receive(:user).and_return(user)
         allow(person).to receive(:has_active_employee_role?).and_return(false)
-        allow(person).to receive(:has_active_consumer_role?).and_return(true)
+        allow(person).to receive(:is_consumer_role_active?).and_return(true)
         allow(person).to receive(:active_employee_roles).and_return([])
         allow(person).to receive(:employee_roles).and_return(nil)
         allow(family).to receive(:active_family_members).and_return(family_members)
@@ -260,7 +257,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
           allow(user).to receive(:last_portal_visited).and_return ''
           allow(person).to receive(:user).and_return(user)
           allow(person).to receive(:has_active_employee_role?).and_return(false)
-          allow(person).to receive(:has_active_consumer_role?).and_return(true)
+          allow(person).to receive(:is_consumer_role_active?).and_return(true)
           allow(person).to receive(:active_employee_roles).and_return([])
           sign_in user
           get :home
@@ -287,7 +284,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         allow(person).to receive(:active_employee_roles).and_return(employee_roles)
         allow(employee_roles).to receive(:first).and_return(employee_role)
         allow(employee_roles).to receive(:count).and_return(1)
-        allow(person).to receive(:has_active_consumer_role?).and_return(true)
+        allow(person).to receive(:is_consumer_role_active?).and_return(true)
         allow(employee_roles).to receive(:active).and_return([employee_role])
         allow(family).to receive(:coverage_waived?).and_return(true)
         allow(hbx_enrollments).to receive(:waived).and_return([waived_hbx])
@@ -355,6 +352,16 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   end
 
   describe "GET verification" do
+    let(:person) {FactoryBot.create(:person, :with_consumer_role)}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+    let(:user){ FactoryBot.create(:user, person: person) }
+    let(:family_member) { FamilyMember.new(:person => person) }
+
+    before :each do
+      allow(person).to receive(:primary_family).and_return (family)
+      allow(family). to receive(:has_active_consumer_family_members). and_return([family_member])
+      allow(person).to receive(:is_consumer_role_active?).and_return true
+    end
 
     it "should be success" do
       get :verification
@@ -369,7 +376,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     it "assign variables" do
       get :verification
       expect(assigns(:family_members)).to be_an_instance_of(Array)
-      expect(assigns(:family_members)).to eq(family_members)
+      expect(assigns(:family_members)).to eq([family_member])
     end
   end
 
@@ -443,6 +450,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
   describe "GET inbox" do
     before :each do
+      allow(family).to receive(:active_family_members).and_return(family_members)
       get :inbox
     end
 
@@ -469,7 +477,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     before :each do
       allow(person).to receive(:user).and_return(user)
       allow(person).to receive(:has_active_employee_role?).and_return(false)
-      allow(person).to receive(:has_active_consumer_role?).and_return(true)
+      allow(person).to receive(:is_consumer_role_active?).and_return(true)
       allow(person).to receive(:has_multiple_roles?).and_return(true)
       allow(user).to receive(:has_hbx_staff_role?).and_return(false)
       allow(person).to receive(:active_employee_roles).and_return(employee_role)
@@ -638,6 +646,9 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         allow(person).to receive(:user).and_return(user)
         allow(person).to receive(:has_active_employee_role?).and_return(true)
         allow(person).to receive(:has_active_consumer_role?).and_return(true)
+        @qle = FactoryBot.create(:qualifying_life_event_kind)
+        @family = FactoryBot.build(:family, :with_primary_family_member)
+        allow(person).to receive(:is_consumer_role_active?).and_return(true)
         @qle = FactoryBot.create(:qualifying_life_event_kind)
         @family = FactoryBot.build(:family, :with_primary_family_member)
         allow(person).to receive(:primary_family).and_return(@family)
@@ -893,6 +904,90 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       end
     end
   end
+
+  describe "POST transition_family_members_update" do
+
+    before :each do
+      sign_in(user)
+    end
+
+    context "should transition consumer to resident" do
+      let(:consumer_person) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
+      let(:consumer_family) { FactoryBot.create(:family, :with_primary_family_member, person: consumer_person) }
+      let(:user){ FactoryBot.create(:user, person: consumer_person) }
+      let(:qle) {FactoryBot.create(:qualifying_life_event_kind, title: "Not eligible for marketplace coverage due to citizenship or immigration status", reason: "eligibility_failed_or_documents_not_received_by_due_date ")}
+
+      let(:consumer_params) {
+        {
+            "transition_effective_date_#{consumer_person.id}" => TimeKeeper.date_of_record.to_s,
+            "transition_user_#{consumer_person.id}" => consumer_person.id,
+            "transition_market_kind_#{consumer_person.id}" => "resident",
+            "transition_reason_#{consumer_person.id}" => "eligibility_failed_or_documents_not_received_by_due_date",
+            "family_actions_id" => "family_actions_#{consumer_family.id}",
+            "family" => consumer_family.id,
+            "qle_id" => qle.id
+        }
+      }
+
+      it "should transition people" do
+        post :transition_family_members_update, params: consumer_params, format: :js, xhr: true
+        expect(response).to have_http_status(:success)
+      end
+
+      it "should transition people from consumer market to resident market" do
+        expect(consumer_person.is_consumer_role_active?). to be_truthy
+        post :transition_family_members_update, params: consumer_params, format: :js, xhr: true
+        consumer_person.reload
+        expect(consumer_person.is_resident_role_active?). to be_truthy
+        expect(consumer_person.is_consumer_role_active?). to be_falsey
+      end
+    end
+
+    context "should transition resident to consumer" do
+      let(:resident_person) {FactoryBot.create(:person, :with_resident_role)}
+      let(:resident_family) { FactoryBot.create(:family, :with_primary_family_member, person: resident_person) }
+      let(:user){ FactoryBot.create(:user, person: resident_person) }
+      let!(:individual_market_transition) { FactoryBot.create(:individual_market_transition, :resident, person: resident_person) }
+      let(:qle) {FactoryBot.create(:qualifying_life_event_kind, title: "Provided documents proving eligibility", reason: "eligibility_documents_provided ")}
+      let(:resident_params) {
+        {
+            "transition_effective_date_#{resident_person.id}" => TimeKeeper.date_of_record.to_s,
+            "transition_user_#{resident_person.id}" => resident_person.id,
+            "transition_market_kind_#{resident_person.id}" => "consumer",
+            "transition_reason_#{resident_person.id}" => "eligibility_documents_provided",
+            "family_actions_id" => "family_actions_#{resident_family.id}",
+            "family" => resident_family.id,
+            "qle_id" => qle.id
+        }
+      }
+
+      it "should transition people" do
+        post :transition_family_members_update, params: resident_params, format: :js, xhr: true
+        expect(response).to have_http_status(:success)
+      end
+
+      it "should transition people from resident market to consumer market" do
+        expect(resident_person.is_resident_role_active?). to be_truthy
+        post :transition_family_members_update, params: resident_params, format: :js, xhr: true
+        resident_person.reload
+        expect(resident_person.is_consumer_role_active?). to be_truthy
+        expect(resident_person.is_resident_role_active?). to be_falsey
+      end
+
+      it "should trigger_cdc_to_ivl_transition_notice in queue" do
+        ActiveJob::Base.queue_adapter = :test
+        ActiveJob::Base.queue_adapter.enqueued_jobs = []
+        post :transition_family_members_update, params: resident_params, format: :js, xhr: true
+        queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+          job_info[:job] == IvlNoticesNotifierJob
+        end
+        expect(queued_job[:args]).not_to be_empty
+        expect(queued_job[:args].include?(resident_person.id.to_s)).to be_truthy
+        expect(queued_job[:args].include?('coverall_to_ivl_transition_notice')).to be_truthy
+      end
+    end
+  end
+
 end
 
 RSpec.describe Insured::FamiliesController, dbclean: :after_each do

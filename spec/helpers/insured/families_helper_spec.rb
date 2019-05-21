@@ -223,7 +223,27 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     end
   end
 
-  describe "show_download_tax_documents_button?", dbclean: :after_each do
+  context "build consumer role" do
+    let(:person) { FactoryBot.create(:person)}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
+
+    it "should build consumer role for a person" do
+      helper.build_consumer_role(person,family)
+      expect(person.consumer_role.present?). to eq true
+    end
+  end
+
+  context "build resident role " do
+    let(:person) { FactoryBot.create(:person)}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
+
+    it "should build consumer role for a person" do
+      helper.build_resident_role(person,family)
+      expect(person.resident_role.present?). to eq true
+    end
+  end
+
+  describe "show_download_tax_documents_button?" do
     let(:person) { FactoryBot.create(:person)}
 
     before do

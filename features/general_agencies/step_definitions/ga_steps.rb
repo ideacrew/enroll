@@ -32,6 +32,7 @@ When /^they complete the new general agency form and hit the 'Submit' button$/ d
   fill_in 'inputFein', with: '333333333'
   find(:xpath, "//*[@id='agency_organization_profile_attributes_market_kind']").click
   select "Small Business Marketplace ONLY", from: "agency_organization_profile_attributes_market_kind"
+  select "Primary", from: "kindSelect"
   fill_in 'inputAddress1', with: Forgery(:address).street_address
   fill_in 'agency_organization_profile_attributes_office_locations_attributes_0_address_attributes_city', with: 'Washington'
   select Settings.aca.state_abbreviation, from: "inputState" #needs to change it to DC

@@ -115,48 +115,10 @@ module BenefitSponsors
           send_data Aws::S3Storage.find(@commission_statement.identifier) , options
         end
 
-        def employers
-        end
-
-        #TODO Implement when we move GeneralAgencyProfile in Engine.
         def general_agency_index
           @broker_agency_profile = BenefitSponsors::Organizations::BrokerAgencyProfile.find(params[:id])
           @broker_role = current_user.person.broker_role || nil
           @general_agency_profiles = BenefitSponsors::Organizations::GeneralAgencyProfile.all_by_broker_role(@broker_role, approved_only: true)
-        end
-
-        def set_default_ga
-          @current_user = current_user
-          authorize HbxProfile, :modify_admin_tabs?
-          @broker_management_form = BenefitSponsors::Organizations::OrganizationForms::BrokerManagementForm.for_default_ga(
-            broker_agency_profile_id: params[:id],
-            general_agency_profile_id: params[:general_agency_profile_id],
-            type: params[:type])
-          @broker_management_form.set_default_ga(@current_user)
-          @broker_agency_profile = @broker_management_form.broker_agency_profile
-          @general_agency_profiles = @broker_management_form.general_agency_profiles
-          @notice = @broker_management_form.notice
-          respond_to do |format|
-            format.js
-          end
-        end
-
-        def employer_datatable
-        end
-
-        def assign
-        end
-
-        def update_assign
-        end
-
-        def clear_assign_for_employer
-        end
-
-        def assign_history
-        end
-
-        def manage_employers
         end
 
         def messages

@@ -59,6 +59,14 @@ describe HbxEnrollmentMember, dbclean: :after_all do
           expect(@enrollment.hbx_enrollment_members.first.errors[:is_subscriber].any?).to be_falsey
         end
       end
+
+      context "validate hbx_enrollment_members" do
+        
+        it "should not raise error if subscriber(primary applicant) is selected during enrollment" do
+          expect(@enrollment.valid?).to be_truthy
+          expect(@enrollment.hbx_enrollment_members.first.errors[:hbx_enrollment_members].any?).to be_falsey
+        end
+      end
     end
 
     context "update_current" do

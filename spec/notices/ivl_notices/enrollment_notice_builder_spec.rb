@@ -2,7 +2,7 @@ require 'rails_helper'
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
-  let(:person) { FactoryBot.create(:person, :with_consumer_role)}
+  let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
   let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person, e_case_id: "family_test#1000")}
   let!(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, created_at: (TimeKeeper.date_of_record.in_time_zone("Eastern Time (US & Canada)") - 2.days), household: family.households.first, kind: "individual", aasm_state: "enrolled_contingent")}
   let!(:hbx_enrollment_member) {FactoryBot.create(:hbx_enrollment_member,hbx_enrollment: hbx_enrollment, applicant_id: family.family_members.first.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record.prev_month )}
@@ -14,13 +14,15 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
                             :mpi_indicator => 'IVL_ENR',
                             :title => "Enrollment notice"})
                           }
-    let(:valid_params) {{
-        :subject => application_event.title,
-        :mpi_indicator => application_event.mpi_indicator,
-        :event_name => application_event.event_name,
-        :template => application_event.notice_template
-    }}
-    let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
+  let(:valid_params) {{
+      :subject => application_event.title,
+      :mpi_indicator => application_event.mpi_indicator,
+      :event_name => application_event.event_name,
+      :template => application_event.notice_template
+  }}
+  let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
+  let(:citizenship_type) { FactoryBot.build(:verification_type, type_name: 'Citizenship')}
+  let(:ssn_type) { FactoryBot.build(:verification_type, type_name: 'Social Security Number')}
 
   describe "New" do
     before do
@@ -45,6 +47,7 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
   describe "Build" do
     before :each do
       allow(person).to receive("primary_family").and_return(family)
+      allow(person).to receive(:families).and_return([family])
       allow(person).to receive_message_chain("families.first.primary_applicant.person").and_return(person)
       @eligibility_notice = IvlNotices::EnrollmentNoticeBuilder.new(person.consumer_role, valid_params)
       bc_period = hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(TimeKeeper.date_of_record.next_year) }
@@ -76,22 +79,25 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
   describe "document_due_date", dbclean: :after_each do
     before do
       allow(person).to receive("primary_family").and_return(family)
+      allow(person).to receive(:families).and_return([family])
       allow(person).to receive_message_chain("families.first.primary_applicant.person").and_return(person)
       @eligibility_notice = IvlNotices::EnrollmentNoticeBuilder.new(person.consumer_role, valid_params)
     end
     context "when special verification already exists" do
+      let (:citizenship_type) { FactoryBot.build(:verification_type, type_name: 'Citizenship', due_date: Date.new(2017,5,5), due_date_type: 'notice')}
+
       it "should not update the due date" do
-        special_verification = SpecialVerification.new(due_date: Date.new(2017,5,5), verification_type: "Citizenship", type: "notice")
-        person.consumer_role.special_verifications << special_verification
+        person.consumer_role.verification_types.by_name('Citizenship').first.due_date = citizenship_type.due_date
+        person.consumer_role.verification_types.by_name('Citizenship').first.due_date_type = citizenship_type.due_date_type
         person.consumer_role.save!
         @eligibility_notice.build
-        expect(@eligibility_notice.document_due_date(person, "Citizenship")).to eq special_verification.due_date
+        expect(@eligibility_notice.document_due_date(person, citizenship_type)).to eq citizenship_type.due_date
       end
     end
     context "when special verification does not exist" do
       it "should update the due date" do
         @eligibility_notice.build
-        expect(@eligibility_notice.document_due_date(person, "Social Security Number")).to eq (TimeKeeper.date_of_record+Settings.aca.individual_market.verification_due.days)
+        expect(@eligibility_notice.document_due_date(person, ssn_type)).to eq (TimeKeeper.date_of_record+Settings.aca.individual_market.verification_due.days)
       end
     end
     context "when individual is fully verified" do
@@ -104,7 +110,7 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
         person.consumer_role.coverage_purchased!
         person.consumer_role.ssn_valid_citizenship_invalid!(args)
         @eligibility_notice.build
-        expect(@eligibility_notice.document_due_date(person, "Social Security Number")).to eq nil
+        expect(@eligibility_notice.document_due_date(person, ssn_type)).to eq nil
       end
     end
   end
@@ -112,6 +118,7 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
   describe "min_notice_due_date", dbclean: :after_each do
     before do
       allow(person).to receive("primary_family").and_return(family)
+      allow(person).to receive(:families).and_return([family])
       allow(person).to receive_message_chain("families.first.primary_applicant.person").and_return(person)
       @eligibility_notice = IvlNotices::EnrollmentNoticeBuilder.new(person.consumer_role, valid_params)
     end
@@ -121,22 +128,15 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
       let!(:family_member2) { FactoryBot.create(:family_member, family: family, is_active: true, person: person2) }
       let!(:hbx_enrollment_member2) {FactoryBot.create(:hbx_enrollment_member,hbx_enrollment: hbx_enrollment, applicant_id: family_member2.id, eligibility_date: TimeKeeper.date_of_record.prev_month)}
       it "should return a future date when present" do
-        special_verification = SpecialVerification.new(due_date: TimeKeeper.date_of_record.prev_day, verification_type: "Social Security Number", type: "notice")
-        person.consumer_role.special_verifications << special_verification
         person.consumer_role.save!
-        special_verification2 = SpecialVerification.new(due_date: TimeKeeper.date_of_record.next_month, verification_type: "Social Security Number", type: "notice")
-        person2.consumer_role.special_verifications << special_verification2
         person2.consumer_role.save!
         @eligibility_notice.build
-        expect(@eligibility_notice.notice.due_date).to eq special_verification2.due_date
+        expect(@eligibility_notice.notice.due_date).to eq @eligibility_notice.min_notice_due_date(family)
       end
 
       it "should return nil when no future dates are present" do
-        special_verification = SpecialVerification.new(due_date: TimeKeeper.date_of_record.prev_day, verification_type: "Social Security Number", type: "notice")
-        person.consumer_role.special_verifications << special_verification
+        allow(family).to receive(:contingent_enrolled_active_family_members).and_return([])
         person.consumer_role.save!
-        special_verification2 = SpecialVerification.new(due_date: TimeKeeper.date_of_record.prev_month, verification_type: "Social Security Number", type: "notice")
-        person2.consumer_role.special_verifications << special_verification2
         person2.consumer_role.save!
         @eligibility_notice.build
         expect(@eligibility_notice.notice.due_date).to eq nil
@@ -146,12 +146,13 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
     context "when there are no outstanding verification family members" do
       let(:payload) { "somepayload" }
       it "should return nil" do
+        allow(family).to receive(:contingent_enrolled_active_family_members).and_return([])
         args = OpenStruct.new
         args.determined_at = TimeKeeper.datetime_of_record - 1.month
         args.vlp_authority = "ssa"
         person.consumer_role.lawful_presence_determination.vlp_responses << EventResponse.new({received_at: args.determined_at, body: payload})
         person.consumer_role.coverage_purchased!
-        person.consumer_role.ssn_valid_citizenship_invalid!(args)
+        person.consumer_role.ssn_valid_citizenship_valid!(args)
         @eligibility_notice.build
         expect(@eligibility_notice.min_notice_due_date(family)).to eq nil
       end
@@ -161,6 +162,7 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
   describe "#attach_required_documents" do
     before do
       allow(person).to receive("primary_family").and_return(family)
+      allow(person).to receive(:families).and_return([family])
       allow(person).to receive_message_chain("families.first.primary_applicant.person").and_return(person)
       @eligibility_notice = IvlNotices::EnrollmentNoticeBuilder.new(person.consumer_role, valid_params)
     end
@@ -198,6 +200,7 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
   describe "render template and generate pdf" do
     before do
       allow(person).to receive("primary_family").and_return(family)
+      allow(person).to receive(:families).and_return([family])
       allow(person).to receive_message_chain("families.first.primary_applicant.person").and_return(person)
       @eligibility_notice = IvlNotices::EnrollmentNoticeBuilder.new(person.consumer_role, valid_params)
     end
@@ -214,6 +217,5 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
       expect(File.exist?(file.path)).to be true
     end
   end
-
 end
 end

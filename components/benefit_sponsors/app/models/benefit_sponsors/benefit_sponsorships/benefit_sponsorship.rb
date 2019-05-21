@@ -112,8 +112,8 @@ module BenefitSponsors
     embeds_many :broker_agency_accounts, class_name: "BenefitSponsors::Accounts::BrokerAgencyAccount",
       validate: true
 
-    embeds_many :general_agency_accounts, class_name: "BenefitSponsors::Accounts::GeneralAgencyAccount",
-      validate: true
+    # embeds_many :general_agency_accounts, class_name: "BenefitSponsors::Accounts::GeneralAgencyAccount",
+    #   validate: true
 
     embeds_one  :benefit_sponsorship_account, class_name: "BenefitSponsors::BenefitSponsorships::BenefitSponsorshipAccount"
 
@@ -432,7 +432,7 @@ module BenefitSponsors
     end
 
     def oe_extended_applications
-      benefit_applications.select do |application| 
+      benefit_applications.select do |application|
         application.enrollment_extended? && TimeKeeper.date_of_record > open_enrollment_period_for(application.effective_date).max
       end
     end
@@ -504,7 +504,7 @@ module BenefitSponsors
     def carriers_dropped_for(product_kind)
       renewal_benefit_application.predecessor.issuers_offered_for(product_kind) - renewal_benefit_application.issuers_offered_for(product_kind)
     end
-    
+
     ####
 
     # Workflow for self service

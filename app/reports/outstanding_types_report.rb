@@ -19,35 +19,9 @@ class OutstandingTypesReport < MongoidMigrationTask
     end
   end
 
-  def outstanding_verification_types(person)
-    verification_types(person).find_all do |type|
-      is_type_outstanding?(person, type)
-    end
-  end
-
-  def verification_types(person)
-    verification_types = []
-    verification_types << 'DC Residency'
-    verification_types << 'Social Security Number' if person.ssn
-    verification_types << 'American Indian Status' if !(person.tribal_id.nil? || person.tribal_id.empty?)
-    if person.us_citizen
-      verification_types << 'Citizenship'
-    else
-      verification_types << 'Immigration status'
-    end
-    verification_types
-  end
-
-  def is_type_outstanding?(person, type)
-    case type
-    when "DC Residency"
-      person.consumer_role.residency_denied?
-    when 'Social Security Number'
-      !person.consumer_role.ssn_verified?
-    when 'American Indian Status'
-      !person.consumer_role.native_verified?
-    else
-      !person.consumer_role.lawful_presence_authorized?
+  def outstanding_types(person)
+    person.verification_types.active.find_all do |type|
+      type.is_type_outstanding?
     end
   end
 
@@ -86,13 +60,8 @@ class OutstandingTypesReport < MongoidMigrationTask
     end
   end
 
-  def due_date_for_type(person, type, type_created)
-    if person.consumer_role.special_verifications.any?
-      sv = person.consumer_role.special_verifications.order_by(:created_at => 'desc').select{|sv| sv.verification_type == type }.first
-      sv.present? ? sv.due_date : type_created + 95.days
-    else
-      type_created + 95.days
-    end
+  def due_date_for_type(type)
+    type.due_date ||  TimeKeeper.date_of_record + 95.days
   end
 
   def no_active_enrollments(person)
@@ -101,7 +70,7 @@ class OutstandingTypesReport < MongoidMigrationTask
   end
 
   def people
-    Person.where(:"consumer_role.aasm_state" => "verification_outstanding")
+    Person.where(:"verification_types.validation_status" => "outstanding")
   end
 
   def migrate
@@ -110,22 +79,25 @@ class OutstandingTypesReport < MongoidMigrationTask
     CSV.open(file_name, "w", force_quotes: true) do |csv|
       csv << field_names
       people.each do |person|
-        next if no_active_enrollments(person)
-        if outstanding_verification_types(person).any?
-          outstanding_verification_types(person).each do |type|
-            csv << [
-                subscriber_id(person),
-                person.hbx_id,
-                person.first_name,
-                person.last_name,
-                type,
-                created_at(person).to_date,
-                "yes",
-                due_date_for_type(person, type, created_at(person)).to_date,
-                ivl_enrollment(person),
-                shop_enrollment(person)
-            ]
+        begin
+          next if no_active_enrollments(person)
+          if outstanding_types(person).any?
+            outstanding_types(person).each do |type|
+              csv << [  subscriber_id(person),
+                        person.hbx_id,
+                        person.first_name,
+                        person.last_name,
+                        type.type_name,
+                        created_at(person).to_date,
+                        "yes",
+                        due_date_for_type(type).to_date,
+                        ivl_enrollment(person),
+                        shop_enrollment(person)
+              ]
+            end
           end
+        rescue => e
+          puts "Invalid Person with HBX_ID: #{person.hbx_id}"
         end
       end
     end

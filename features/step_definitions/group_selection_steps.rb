@@ -1,4 +1,3 @@
-
 Given (/a matched Employee exists with multiple employee roles/) do
   org1 = FactoryBot.create :organization, :with_active_plan_year
   org2 = FactoryBot.create :organization, :with_active_plan_year_and_without_dental

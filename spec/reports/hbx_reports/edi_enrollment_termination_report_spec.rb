@@ -3,7 +3,7 @@ require 'csv'
 require File.join(Rails.root, "app", "reports", "hbx_reports", "edi_enrollment_termination_report")
 require "#{Rails.root}/app/helpers/config/aca_helper"
 
-describe TerminatedHbxEnrollments, dbclean: :around_each do
+describe TerminatedHbxEnrollments do
 
   let(:given_task_name) { "enrollment_termination_on" }
   let(:person1) {FactoryBot.create(:person,
@@ -86,10 +86,6 @@ describe TerminatedHbxEnrollments, dbclean: :around_each do
       CSV.foreach(@file, :headers => true) do |csv_obj|
         expect(csv_obj[field_name]).to eq result
       end
-    end
-
-    after(:each) do
-      FileUtils.rm_rf(@file)
     end
   end
 

@@ -62,12 +62,8 @@ module Effective
       def er_state(row)
         return 'N/A' if row.is_prospect?
         return 'Former Client' if row.broker_relationship_inactive?
-        if dc?
-          row.employer_profile.aasm_state.capitalize
-        else
           sponsorship = row.employer_profile.organization.active_benefit_sponsorship
           sponsorship.aasm_state.capitalize
-        end
       end
 
       def er_fein(row)
@@ -76,11 +72,7 @@ module Effective
       end
 
       def benefit_sponsor_home_url(row)
-        if dc?
-          "main_app.employers_employer_profile_path(row.sponsor_profile_id, :tab=>'home')"
-        else
-          "benefit_sponsors.profiles_employers_employer_profile_path(row.sponsor_profile_id, tab: 'home')"
-        end
+        "benefit_sponsors.profiles_employers_employer_profile_path(row.sponsor_profile_id, tab: 'home')"
       end
 
       def dc?

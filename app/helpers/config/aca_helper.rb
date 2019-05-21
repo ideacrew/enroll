@@ -266,4 +266,24 @@ module Config::AcaHelper
   def dental_offers_single_plan?
     Settings.aca.dental_plan_options_available.include?("single_plan")
   end
+
+  def aca_dental_plan_option_descriptions
+    Settings.plan_option_descriptions.dental.to_h
+  end
+
+  def aca_plan_option_titles
+    Settings.plan_option_titles.to_h
+  end
+
+  def aca_health_plan_options
+    Settings.aca.plan_options_available
+  end
+
+  def aca_dental_plan_options
+    Settings.aca.dental_plan_options_available
+  end
+
+  def aca_default_dental_plan_option
+    Settings.aca.default_dental_option_kind
+  end
 end

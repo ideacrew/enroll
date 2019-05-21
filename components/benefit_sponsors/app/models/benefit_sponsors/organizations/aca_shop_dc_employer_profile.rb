@@ -3,6 +3,12 @@ module BenefitSponsors
     class AcaShopDcEmployerProfile < BenefitSponsors::Organizations::Profile
       # include BenefitSponsors::Employers::EmployerHelper
       include BenefitSponsors::Concerns::EmployerProfileConcern
+      include BenefitSponsors::Concerns::Observable
+
+      add_observer BenefitSponsors::Observers::EmployerProfileObserver.new, [:update]
+      add_observer BenefitSponsors::Observers::NoticeObserver.new, [:process_employer_profile_events]
+
+      after_update :notify_observers
 
       def rating_area
         # FIX this

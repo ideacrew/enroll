@@ -7,7 +7,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::ZeroEmployeesOnRoster', dbclean: :
   let!(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 2.months}
 
   let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-  let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+  let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
   let!(:employer_profile)    { organization.employer_profile }
   let!(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
   let!(:model_instance) { FactoryBot.create(:benefit_sponsors_benefit_application,

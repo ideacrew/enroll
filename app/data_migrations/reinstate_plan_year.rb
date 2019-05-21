@@ -12,7 +12,7 @@ class ReinstatePlanYear < MongoidMigrationTask
       return
     end
 
-    plan_year = organizations.first.employer_profile.plan_years.where(start_on: plan_year_start_on).first
+    plan_year = organizations.first.employer_profile.plan_years.where(start_on: plan_year_start_on, aasm_state:"terminated").first
 
     if plan_year.present? && plan_year.may_reinstate_plan_year?
       begin

@@ -3,6 +3,7 @@ require "rails_helper"
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe VerificationHelper, :type => :helper do
   let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+  let(:type) { person.consumer_role.verification_types.first }
   before :each do
     assign(:person, person)
   end
@@ -229,24 +230,61 @@ RSpec.describe VerificationHelper, :type => :helper do
     let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
 
     before do
-      allow_any_instance_of(Person).to receive_message_chain("primary_family").and_return(family)
+      allow(person).to receive_message_chain("primary_family").and_return(family)
       allow(family).to receive(:contingent_enrolled_active_family_members).and_return family.family_members
     end
-    it "returns true if any family members has outstanding verification state" do
+    it "returns true if any family members have verification types state as outstanding" do
       family.family_members.each do |member|
         member.person = FactoryBot.create(:person, :with_consumer_role)
-        member.person.consumer_role.aasm_state="verification_outstanding"
+        member.person.consumer_role.verification_types.each{|type| type.validation_status = "outstanding" }
         member.save
       end
       expect(helper.enrollment_group_unverified?(person)).to eq true
     end
 
-    it "returns false if all family members are fully verified or pending" do
+    it "returns false if all family members have verification types state as verified or pending " do
       family.family_members.each do |member|
         member.person = FactoryBot.create(:person, :with_consumer_role)
+        member.person.consumer_role.verification_types.each{|type| type.validation_status = "verified" }
         member.save
       end
       expect(helper.enrollment_group_unverified?(person)).to eq false
+    end
+
+    it "returns false if all family members have verification type state as curam" do
+      family.family_members.each do |member|
+        member.person = FactoryBot.create(:person, :with_consumer_role)
+        member.person = FactoryBot.create(:person, :with_consumer_role)
+        member.person.consumer_role.verification_types.each{|type| type.validation_status = "curam" }
+        member.save
+      end
+      expect(helper.enrollment_group_unverified?(person)).to eq false
+    end
+  end
+
+  describe "#can_show_due_date?" do
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
+
+    before do
+      allow(person).to receive_message_chain("primary_family").and_return(family)
+      allow(family).to receive(:contingent_enrolled_active_family_members).and_return family.family_members
+    end
+    it "returns true if any family members have verification types state as outstanding or pending " do
+      family.family_members.each do |member|
+        member.person = FactoryBot.create(:person, :with_consumer_role)
+        member.person.consumer_role.verification_types.each{|type| type.validation_status = "outstanding" }
+        member.save
+      end
+      expect(helper.can_show_due_date?(person)).to eq true
+    end
+
+    it "returns false if all family members have verification types state as verified " do
+      family.family_members.each do |member|
+        member.person = FactoryBot.create(:person, :with_consumer_role)
+        member.person.consumer_role.verification_types.each{|type| type.validation_status = "verified" }
+        member.save
+      end
+      expect(helper.can_show_due_date?(person)).to eq false
     end
   end
 
@@ -254,7 +292,7 @@ RSpec.describe VerificationHelper, :type => :helper do
     let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
     it "returns true if any family member has uploaded docs" do
       family.family_members.each do |member|
-        member.person = FactoryBot.create(:person, :with_consumer_role)
+        member.person = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)
       end
       allow_any_instance_of(Person).to receive_message_chain("primary_family.active_family_members").and_return(family.family_members)
       expect(helper.documents_uploaded).to be_falsey
@@ -349,65 +387,48 @@ RSpec.describe VerificationHelper, :type => :helper do
   end
 
   describe '#get_person_v_type_status' do
-    let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
+    let(:person) { FactoryBot.create(:person, :with_consumer_role)}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, :person => person) }
     it 'returns verification types states of the person' do
       status = 'verified'
       allow(helper).to receive(:verification_type_status).and_return(status)
       persons = family.family_members.map(&:person)
-
-      expect(helper.get_person_v_type_status(persons)).to eq([status, status])
+      expect(helper.get_person_v_type_status(persons)).to eq([status, status, status])
     end
   end
 
-  describe "#show_v_type" do
-    context "curam" do
-      it "returns in review if documents for ssn uploaded" do
-        expect(helper.show_v_type('curam', person).gsub('&nbsp;', '')).to eq("External Source")
+  describe "#verification_type_class" do
+    shared_examples_for "verification type css_class method" do |status, css_class|
+      it "returns correct class" do
+        expect(helper.verification_type_class(status)).to eq css_class
       end
     end
-
-    context "not curam" do
-      it "returns in review if documents for ssn uploaded" do
-        expect(helper.show_v_type('valid', person).gsub('&nbsp;', '')).to eq("Verified")
-      end
-    end
+    it_behaves_like "verification type css_class method", "verified", "success"
+    it_behaves_like "verification type css_class method", "review", "warning"
+    it_behaves_like "verification type css_class method", "outstanding", "danger"
+    it_behaves_like "verification type css_class method", "curam", "default"
+    it_behaves_like "verification type css_class method", "attested", "default"
+    it_behaves_like "verification type css_class method", "valid", "success"
+    it_behaves_like "verification type css_class method", "pending", "info"
+    it_behaves_like "verification type css_class method", "expired", "default"
   end
 
-  describe '#show_ridp_type' do
-    context 'IDENTITY' do
-      it 'returns in review if documents for identity uploaded' do
-        person.consumer_role.ridp_documents << FactoryBot.build(:ridp_document, :ridp_verification_type => 'Identity')
-        expect(helper.show_ridp_type('Identity', person)).to eq("&nbsp;&nbsp;&nbsp;In Review&nbsp;&nbsp;&nbsp;")
+  describe "#build_admin_actions_list" do
+    shared_examples_for "build_admin_actions_list method" do |action, no_action, aasm_state, validation_status|
+      before do
+        person.consumer_role.aasm_state = aasm_state
+        type.validation_status = validation_status
       end
-
-      it 'returns verified if identity_validation is valid' do
-        person.consumer_role.identity_validation = 'valid'
-        expect(helper.show_ridp_type('Identity', person)).to eq("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
+      it "list includes #{action}" do
+        expect(helper.build_admin_actions_list(type, person)).to include action
       end
-
-      it 'returns outstanding if identity_validation is outstanding' do
-        person.consumer_role.ridp_documents = []
-        person.consumer_role.identity_validation = 'outstanding'
-        expect(helper.show_ridp_type('Identity', person)).to eq("&nbsp;&nbsp;Outstanding&nbsp;&nbsp;")
+      it "list not includes #{no_action}" do
+        expect(helper.build_admin_actions_list(type, person)).not_to include no_action
       end
     end
+    it_behaves_like "build_admin_actions_list method", "Verify", "Call Hub", "unverified", "any"
+    it_behaves_like "build_admin_actions_list method", "Reject", "Call Hub", "unverified", "any"
 
-    context 'APPLICATION' do
-      it 'returns in review if documents for applicationuploaded' do
-        person.consumer_role.ridp_documents << FactoryBot.build(:ridp_document, :ridp_verification_type => 'Application')
-        expect(helper.show_ridp_type('Application', person)).to eq("&nbsp;&nbsp;&nbsp;In Review&nbsp;&nbsp;&nbsp;")
-      end
-
-      it 'returns verified if identity_validation is valid' do
-        person.consumer_role.application_validation = 'valid'
-        expect(helper.show_ridp_type('Application', person)).to eq("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
-      end
-
-      it 'returns outstanding if identity_validation is outstanding' do
-        person.consumer_role.application_validation = 'outstanding'
-        expect(helper.show_ridp_type('Application', person)).to eq("&nbsp;&nbsp;Outstanding&nbsp;&nbsp;")
-      end
-    end
   end
 
   describe "#documents_list" do
