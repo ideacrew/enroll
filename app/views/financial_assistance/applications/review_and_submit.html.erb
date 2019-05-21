@@ -103,124 +103,130 @@
             </div>
 
             <div class="form-bottom-border">
-              <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
-                <div class="col-md-11 form-heading"> TAX INFO</div>
-                <div class="col-md-1">
-                  <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, applicant, 1) do %>
-                    <i class="fa fa-pencil fa-lg"></i>
-                  <% end %>
-                </div>
-              </div>
-
-              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                <div class="col-md-6">Will this person file taxes for <%= @application.family.application_applicable_year %>? *</div>
-                <div class="col-md-6"><%= human_boolean(applicant.is_required_to_file_taxes) %></div>
-              </div>
-
-              <% if @cfl_service.displayable_field?('applicant', applicant.id, :is_joint_tax_filing) %>
-                <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                  <div class="col-md-6">Will this person be filing jointly?</div>
-                  <div class="col-md-6"><%= human_boolean(applicant.is_joint_tax_filing) %></div>
-                </div>
-              <% end %>
-
-              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                <div class="col-md-6">Will this person be claimed as a tax dependent
-                  for <%= @application.family.application_applicable_year %>? *
-                </div>
-                <div class="col-md-6"><%= human_boolean(applicant.is_claimed_as_tax_dependent) %></div>
-              </div>
-
-              <% if @cfl_service.displayable_field?('applicant', applicant.id, :claimed_as_tax_dependent_by) %>
-                <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                  <div class="col-md-6">This person will be claimed as a dependent by</div>
-                  <div class="col-md-6"><%= applicant_name(applicant.claimed_as_tax_dependent_by.to_s) %></div>
-                </div>
-              <% end %>
-
-              <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
-                <div class="col-md-11">INCOME</div>
-                <div class="col-md-1">
-                  <%= link_to financial_assistance_application_applicant_incomes_path(@application, applicant) do %>
-                    <i class="fa fa-pencil fa-lg"></i>
-                  <% end %>
-                </div>
-              </div>
-
-              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                <div class="col-md-6">Does this person have income from an employer (wages, tips, bonuses, etc.)
-                    in <%= @application.family.application_applicable_year %>?
-                </div>
-                <div class="col-md-6"><%= human_boolean applicant.has_job_income %></div>
-              </div>
-
-              <% if @cfl_service.displayable_field?('applicant', applicant.id, :incomes_jobs) %>
-                <% applicant.incomes.jobs.each do |income| %>
-                  <div class="border-sides form-content">
-                    <div class="row ptb no-buffer row-height">
-                      <div class="col-md-6">Employer Name</div>
-                      <div class="col-md-6"><%= income.employer_name %></div>
-                    </div>
-
-                    <div class="row ptb no-buffer row-height">
-                      <div class="col-md-6">EMPLOYER ADDRESSS LINE 1</div>
-                      <div class="col-md-6"><%= income.employer_address.address_1 %></div>
-                    </div>
-
-                    <% if income.employer_address.address_2.present? %>
-                      <div class="row ptb no-buffer row-height">
-                        <div class="col-md-6">EMPLOYER ADDRESSS LINE 2</div>
-                        <div class="col-md-6"><%= income.employer_address.address_2 %></div>
-                      </div>
+              <div class="form-bottom-border">
+                <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
+                  <div class="col-md-11 form-heading"> TAX INFO</div>
+                  <div class="col-md-1">
+                    <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, applicant, 1) do %>
+                      <i class="fa fa-pencil fa-lg"></i>
                     <% end %>
+                  </div>
+                </div>
 
-                    <div class="row ptb no-buffer row-height">
-                      <div class="col-md-6">CITY</div>
-                      <div class="col-md-6"><%= income.employer_address.city %></div>
-                    </div>
+                <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                  <div class="col-md-6">Will this person file taxes for <%= @application.family.application_applicable_year %>? *</div>
+                  <div class="col-md-6"><%= human_boolean(applicant.is_required_to_file_taxes) %></div>
+                </div>
 
-                    <div class="row ptb no-buffer row-height">
-                      <div class="col-md-6">STATE</div>
-                      <div class="col-md-6"><%= income.employer_address.state %></div>
-                    </div>
-
-                    <div class="row ptb no-buffer row-height">
-                      <div class="col-md-6">ZIP</div>
-                      <div class="col-md-6"><%= income.employer_address.zip %></div>
-                    </div>
-
-                    <div class="row ptb no-buffer row-height border-bottom">
-                      <div class="col-md-6">EMPLOYER PHONE</div>
-                      <div class="col-md-6"><%= format_phone(income.employer_phone.full_phone_number) %></div>
-                    </div>
+                <% if @cfl_service.displayable_field?('applicant', applicant.id, :is_joint_tax_filing) %>
+                  <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                    <div class="col-md-6">Will this person be filing jointly?</div>
+                    <div class="col-md-6"><%= human_boolean(applicant.is_joint_tax_filing) %></div>
                   </div>
                 <% end %>
-              <% end %>
 
-              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                <div class="col-md-6">Is this person self-employed?</div>
-                <div class="col-md-6"><%= human_boolean applicant.has_self_employment_income %></div>
-              </div>
-
-              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                <div class="col-md-6">Does this person expect to have other types of income in <%= @application.family.application_applicable_year %>?
+                <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                  <div class="col-md-6">Will this person be claimed as a tax dependent
+                    for <%= @application.family.application_applicable_year %>? *
+                  </div>
+                  <div class="col-md-6"><%= human_boolean(applicant.is_claimed_as_tax_dependent) %></div>
                 </div>
-                <div class="col-md-6"><%= human_boolean applicant.has_other_income %></div>
+
+                <% if @cfl_service.displayable_field?('applicant', applicant.id, :claimed_as_tax_dependent_by) %>
+                  <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                    <div class="col-md-6">This person will be claimed as a dependent by</div>
+                    <div class="col-md-6"><%= applicant_name(applicant.claimed_as_tax_dependent_by.to_s) %></div>
+                  </div>
+                <% end %>
               </div>
 
-              <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
-                <div class="col-md-11">INCOME ADJUSTMENTS</div>
-                <div class="col-md-1">
-                  <%= link_to financial_assistance_application_applicant_deductions_path(@application, applicant) do %>
-                    <i class="fa fa-pencil fa-lg"></i>
+              <div class="form-bottom-border">
+                <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
+                  <div class="col-md-11">INCOME</div>
+                  <div class="col-md-1">
+                    <%= link_to financial_assistance_application_applicant_incomes_path(@application, applicant) do %>
+                      <i class="fa fa-pencil fa-lg"></i>
+                    <% end %>
+                  </div>
+                </div>
+
+                <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                  <div class="col-md-6">Does this person have income from an employer (wages, tips, bonuses, etc.)
+                      in <%= @application.family.application_applicable_year %>?
+                  </div>
+                  <div class="col-md-6"><%= human_boolean applicant.has_job_income %></div>
+                </div>
+
+                <% if @cfl_service.displayable_field?('applicant', applicant.id, :incomes_jobs) %>
+                  <% applicant.incomes.jobs.each do |income| %>
+                    <div class="border-sides form-content">
+                      <div class="row ptb no-buffer row-height">
+                        <div class="col-md-6">Employer Name</div>
+                        <div class="col-md-6"><%= income.employer_name %></div>
+                      </div>
+
+                      <div class="row ptb no-buffer row-height">
+                        <div class="col-md-6">EMPLOYER ADDRESSS LINE 1</div>
+                        <div class="col-md-6"><%= income.employer_address.address_1 %></div>
+                      </div>
+
+                      <% if income.employer_address.address_2.present? %>
+                        <div class="row ptb no-buffer row-height">
+                          <div class="col-md-6">EMPLOYER ADDRESSS LINE 2</div>
+                          <div class="col-md-6"><%= income.employer_address.address_2 %></div>
+                        </div>
+                      <% end %>
+
+                      <div class="row ptb no-buffer row-height">
+                        <div class="col-md-6">CITY</div>
+                        <div class="col-md-6"><%= income.employer_address.city %></div>
+                      </div>
+
+                      <div class="row ptb no-buffer row-height">
+                        <div class="col-md-6">STATE</div>
+                        <div class="col-md-6"><%= income.employer_address.state %></div>
+                      </div>
+
+                      <div class="row ptb no-buffer row-height">
+                        <div class="col-md-6">ZIP</div>
+                        <div class="col-md-6"><%= income.employer_address.zip %></div>
+                      </div>
+
+                      <div class="row ptb no-buffer row-height border-bottom">
+                        <div class="col-md-6">EMPLOYER PHONE</div>
+                        <div class="col-md-6"><%= format_phone(income.employer_phone.full_phone_number) %></div>
+                      </div>
+                    </div>
                   <% end %>
+                <% end %>
+
+                <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                  <div class="col-md-6">Is this person self-employed?</div>
+                  <div class="col-md-6"><%= human_boolean applicant.has_self_employment_income %></div>
+                </div>
+
+                <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                  <div class="col-md-6">Does this person expect to have other types of income in <%= @application.family.application_applicable_year %>?
+                  </div>
+                  <div class="col-md-6"><%= human_boolean applicant.has_other_income %></div>
                 </div>
               </div>
 
-              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                <div class="col-md-6">Does this person expect to have adjustments to income in <%= @application.family.application_applicable_year %>? *
+              <div class="form-bottom-border">
+                <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
+                  <div class="col-md-11">INCOME ADJUSTMENTS</div>
+                  <div class="col-md-1">
+                    <%= link_to financial_assistance_application_applicant_deductions_path(@application, applicant) do %>
+                      <i class="fa fa-pencil fa-lg"></i>
+                    <% end %>
+                  </div>
                 </div>
-                <div class="col-md-6"><%= human_boolean applicant.has_deductions %></div>
+
+                <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                  <div class="col-md-6">Does this person expect to have adjustments to income in <%= @application.family.application_applicable_year %>? *
+                  </div>
+                  <div class="col-md-6"><%= human_boolean applicant.has_deductions %></div>
+                </div>
               </div>
 
               <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
@@ -382,6 +388,88 @@
         </div>
         <br>
       <% end %>
+
+      <div class="row white-background">
+        <div class="col-md-12 pz">
+          <div class="row row-form-wrapper ptb no-buffer row-height main-heading form-bottom-border">
+            <div class="col-md-12"><span></span>
+              <i class="fa fa-user blue-icon"></i> <%= "Your Household" %>
+            </div>
+          </div>
+
+          <% if @all_relationships.present? %>
+            <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
+              <div class="col-md-11">FAMILY RELATIONSHIPS</div>
+              <div class="col-md-1">
+                <%= link_to insured_family_relationships_path do %>
+                  <i class="fa fa-pencil fa-lg"></i>
+                <% end %>
+              </div>
+            </div>
+
+            <% @all_relationships.each do |er| %>
+              <div class="review-relations">
+                <div class="row review-relation-headers">
+                  <div class="col-lg-3">Name</div>
+                  <div class="col-lg-5">RELATIONSHIP</div>
+                  <div class="col-lg-4">HOUSEHOLD MEMBER</div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-3"><%= member_name_by_id(er[:predecessor]) %></div>
+                  <div class="col-lg-5">
+                    <div class="select-relation rs_selection">
+                      <%= "is " + er[:relation] %>
+                    </div>
+                    <div style="float:left; margin-right: 10px;"> of</div>
+                    <div class="icon-rel">
+                      <i class="fa fa-user icn-out fa-2x" aria-hidden="true"></i>
+                      <i class="fa fa-link" aria-hidden="true"></i>
+                      <i class="fa fa-user icn-out fa-lg" aria-hidden="true"></i>
+                    </div>
+                  </div>
+                  <div class="col-lg-4">
+                    <%= member_name_by_id(er[:successor]) %>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          <% end %>
+
+          <!-- Your Preferences -->
+          <% unless [@application.is_requesting_voter_registration_application_in_mail, @application.years_to_renew].include?(nil) %>
+            <div class="row row-form-wrapper ptb no-buffer row-height form-heading form-top-border">
+              <div class="col-md-12">YOUR PREFERENCES</div>
+            </div>
+
+            <% if @cfl_service.displayable_field?('application', @application.id, :is_requesting_voter_registration_application_in_mail) %>
+              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                <div class="col-md-6">Would you like to register to vote in DC or update your current registration?</div>
+                <div class="col-md-6"><%= human_boolean(@application.is_requesting_voter_registration_application_in_mail) %></div>
+              </div>
+            <% end %>
+
+            <% if @cfl_service.displayable_field?('application', @application.id, :years_to_renew) %>
+              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                <div class="col-md-6">How long would you like your eligibility for help paying for coverage to be renewed?</div>
+                <div class="col-md-6"><%= @application.years_to_renew %></div>
+              </div>
+            <% end %>
+          <% end %>
+
+          <!-- More about your Household -->
+          <% if @cfl_service.displayable_field?('application', @application.id, :parent_living_out_of_home_terms) %>
+            <div class="row row-form-wrapper ptb no-buffer row-height form-heading form-top-border">
+              <div class="col-md-12">MORE ABOUT YOUR HOUSEHOLD</div>
+            </div>
+
+            <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+              <div class="col-md-6">Does any child on this application have a parent living outside of the home?</div>
+              <div class="col-md-6"><%= human_boolean(@application.parent_living_out_of_home_terms) %></div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      <br>
     </div>
   </div>
 

@@ -11,7 +11,7 @@ module FinancialAssistance
 
       def conditionally_displayable?
         return nil unless @class_name
-        send("display_#{@class_name}_field?")
+        display_field?
       end
 
       private
@@ -33,6 +33,18 @@ module FinancialAssistance
 
       def incomes_jobs
         @instance.has_job_income == true
+      end
+
+      def is_requesting_voter_registration_application_in_mail
+        !@instance.is_requesting_voter_registration_application_in_mail.nil?
+      end
+
+      def years_to_renew
+        !@instance.years_to_renew.nil?
+      end
+
+      def parent_living_out_of_home_terms
+        !@instance.parent_living_out_of_home_terms.nil?
       end
 
       def is_joint_tax_filing
@@ -93,7 +105,7 @@ module FinancialAssistance
         is_student && @instance.is_student
       end
 
-      def display_applicant_field?
+      def display_field?
         send(@attribute)
       end
     end
