@@ -67,7 +67,6 @@ module SponsoredBenefits
       FactoryGirl.create(:user, person: person)
     end
 
-
     describe "GET new" do
       USER_ROLES.each do |role|
 
@@ -148,6 +147,10 @@ module SponsoredBenefits
       let(:prospect_organization) {prospect_plan_design_organization}
       let(:updated_params) {valid_attributes.merge({legal_name: "TOYOTA"})}
 
+      def employer_has_sic_enabled?
+        Settings.aca.employer_has_sic_field
+      end
+
       USER_ROLES.each do |role|
         context "for user #{role} with with valid params" do
 
@@ -176,8 +179,16 @@ module SponsoredBenefits
           end
 
           it "should not update legal_name and throw flash error" do
+            next unless employer_has_sic_enabled? # MA
             expect(prospect_plan_design_organization.legal_name).not_to eq "TESLA"
             expect(flash[:error]).to match(/Prospect Employer must have one Primary Office Location./)
+            expect(subject).to redirect_to(employers_organizations_broker_agency_profile_path(prospect_organization.broker_agency_profile))
+          end
+
+          it "should save organization with out office location attributes" do
+            next if employer_has_sic_enabled? # DC
+            expect(prospect_plan_design_organization.reload.legal_name).to eq "TESLA"
+            expect(flash[:error]).not_to match(/Prospect Employer must have one Primary Office Location./)
             expect(subject).to redirect_to(employers_organizations_broker_agency_profile_path(prospect_organization.broker_agency_profile))
           end
         end

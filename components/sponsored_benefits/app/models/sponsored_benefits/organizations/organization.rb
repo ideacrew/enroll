@@ -3,7 +3,7 @@ module SponsoredBenefits
   module Organizations
     class Organization
       include Concerns::OrganizationConcern
-      include Config::AcaModelConcern
+      include Concerns::AcaRatingAreaConfigConcern
 
 
       embeds_one :broker_agency_profile, cascade_callbacks: true, validate: true

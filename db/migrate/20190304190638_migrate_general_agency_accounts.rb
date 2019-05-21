@@ -25,7 +25,7 @@ class MigrateGeneralAgencyAccounts < Mongoid::Migration
           updated_by: "$_id.updated_by",
           id: "$_id.id"
         }}
-      ]).each do |record|
+      ],:allow_disk_use => true).each do |record|
         begin
           broker_agency = broker_agency_profile(record[:broker_role_id])
           plan_design_organization = plan_design_organization(broker_agency.id, record[:employer_profile_id])
