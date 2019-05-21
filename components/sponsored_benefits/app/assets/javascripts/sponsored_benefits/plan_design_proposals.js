@@ -536,6 +536,8 @@ function proposalIsInvalid(data) {
 }
 
 function saveProposal(event) {
+  event.preventDefault();
+  event.stopImmediatePropagation();
   var data = buildBenefitGroupParams();
   if (proposalIsInvalid(data)) {
     // handle error messaging
