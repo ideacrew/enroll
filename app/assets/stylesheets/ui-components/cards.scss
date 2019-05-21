@@ -200,20 +200,14 @@
   .nav-tabs > li > a.active {
     background-color:$primary-blue;
   }
-  .tab-pane#carrier {
+  .tab-pane#carrier, .tab-pane#level, .tab-pane#plan, .tab-pane#multi_product, .tab-pane#single_issuer{
     background-color:$primary-white;
     padding:20px;
     min-height:370px;
   }
-  .tab-pane#level {
+  .select_choice_reference_plan {
     background-color:$primary-white;
     padding:20px;
-    min-height:370px;
-  }
-  .tab-pane#plan {
-    background-color:$primary-white;
-    padding:20px;
-    min-height:370px;
   }
   h5 {
     font-weight: bold;
@@ -251,6 +245,60 @@
       display:none;
     }
     
+  }
+}
+
+.multiProductOptions {
+   /* Hide the browser's default checkbox */
+  input {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+  }
+
+  /* Create a custom checkbox */
+  .checkmark {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 25px;
+      width: 25px;
+      background-color: #eee;
+  }
+
+  /* On mouse-over, add a grey background color */
+  .sc-container:hover input ~ .checkmark {
+      background-color: #ccc;
+  }
+
+  /* When the checkbox is checked, add a blue background */
+  input:checked ~ .checkmark {
+      background-color: $mhc-dark-blue;
+  }
+
+  /* Create the checkmark/indicator (hidden when not checked) */
+  .checkmark:after {
+      content: "";
+      position: absolute;
+      display: none;
+  }
+
+  /* Show the checkmark when checked */
+  input:checked ~ .checkmark:after {
+      display: block;
+  }
+
+  /* Style the checkmark/indicator */
+  .checkmark:after {
+      left: 9px;
+      top: 5px;
+      width: 6px;
+      height: 15px;
+      border: solid white;
+      border-width: 0 3px 3px 0;
+      -webkit-transform: rotate(45deg);
+      -ms-transform: rotate(45deg);
+      transform: rotate(45deg);
   }
 }
 
@@ -427,7 +475,7 @@
    
    input[type=range] {border:none !important;}
 
-.reference-plans {
+.reference-plans, .multiProductOptions {
   min-height:200px;
   .panel-heading {
     border-bottom: 1px solid transparent;
@@ -543,7 +591,7 @@
   }
 }
 
-#plan, #level, #carrier {
+#plan, #level, #carrier, #single_issuer {
   .col-xs-12 {
     min-height:80px;
   }

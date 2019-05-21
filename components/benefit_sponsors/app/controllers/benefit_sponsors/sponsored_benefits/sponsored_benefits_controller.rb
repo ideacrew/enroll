@@ -20,6 +20,7 @@ module BenefitSponsors
           redirect_to profiles_employers_employer_profile_path(@sponsored_benefit_form.service.profile, :tab=>'benefits')
         else
           flash[:error] = error_messages(@sponsored_benefit_form)
+          @sponsored_benefit_form.load_meta_data
           render :new
         end
       end
@@ -75,8 +76,9 @@ module BenefitSponsors
       end
 
       def sponsored_benefits_params
-        params.require(:sponsored_benefits).permit(:id, :kind, :product_option_choice,
-          :product_package_kind, :reference_plan_id,
+        params.require(:sponsored_benefits).permit(
+          :id, :kind, :product_option_choice,
+          :product_package_kind, :reference_plan_id, :elected_product_choices => [],
           :sponsor_contribution_attributes => [
             :contribution_levels_attributes => [:id, :is_offered, :display_name, :contribution_factor,:contribution_unit_id]
           ]

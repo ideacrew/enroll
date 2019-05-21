@@ -19,7 +19,6 @@ module SponsoredBenefits
         broker_agency_profile_id: params[:broker_agency_profile_id],
         general_agency_profile_id: params[:general_agency_profile_id]
       )
-
       if @form.assign
         flash[:success] = "Succesfully Assigned General Agency"
       else
@@ -53,7 +52,7 @@ module SponsoredBenefits
       else
         flash[:notice] = "Setting Default General Agency Failed: #{@form.errors.full_messages.join(",")}"
       end
-      redirect_to main_app.general_agency_index_broker_agencies_profile_path(id: @form.broker_agency_profile_id)
+      redirect_to benefit_sponsors.general_agency_index_profiles_broker_agencies_broker_agency_profiles_path(id: @form.broker_agency_profile_id)
     end
 
     def clear_default
@@ -66,7 +65,7 @@ module SponsoredBenefits
       else
         flash[:notice] = "Clearing Default General Agency Failed: #{@form.errors.full_messages.join(",")}"
       end
-      redirect_to main_app.general_agency_index_broker_agencies_profile_path(id: @form.broker_agency_profile_id)
+      redirect_to benefit_sponsors.general_agency_index_profiles_broker_agencies_broker_agency_profiles_path(id: @form.broker_agency_profile_id)
     end
   end
 end

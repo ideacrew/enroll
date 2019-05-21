@@ -11,14 +11,14 @@ site:
   nondiscrimination_notice_url: "https://www.MAhealthconnector.org/site-policies/nondiscrimination-notice"
   main_web_address_url: "https://www.MAhealthconnector.org"
   policies_url: "https://www.mahealthconnector.org/about/policy-center/policies"
-  invoice_bill_url: "https://ww2.e-billexpress.com/ebpp/maconnector/"
-  payment_pdf_url: "https://www.mahealthconnector.org/help-center-answers/how-to-pay-your-premiums-online"
+  invoice_bill_url: ""
+  payment_pdf_url: "pdf/employers_paying_your_premiums_online.pdf"
   user_sign_in_url: "https://business.mahealthconnector.org/users/sign_in"
   website_name: "MAhealthconnector.org"
   main_web_address: "www.MAhealthconnector.org"
   health_care_website: "www.healthcare.gov"
   health_care_website_url: "https://www.healthcare.gov"
-  short_name: "Health Connector"
+  short_name: "DC Health Link"
   byline: "The Right Place for the Right Plan"
   long_name: "Massachusetts Health Connector"
   copyright_period_start: "2017"
@@ -28,10 +28,10 @@ site:
   tab_icon: 'favicon.ico'
   mailer_logo_file_name: "health_connector.png"
   employer_application_deadline_link: "https://www.mahealthconnector.org/business/employers/employer-resources-and-information/employer-coverage-deadlines"
-  s3_prefix: "mhc"
+  s3_prefix: "dc"
   broker_quoting_enabled: false
   broker_claim_quoting_enabled: true
-  guidance_for_business_owners_url: "https://www.mahealthconnector.org/help-center-answers/guidance-for-business-owners"
+  guidance_for_business_owners_url: "https://dchealthlink.com/sites/default/files/v2/forms/Guidance_for_Business_Owners.pdf"
   use_default_devise_path: true
   plan_options_title_for_ma: true
   create_routes: ['/insured/employee/privacy','/employers/employer_profiles/new']
@@ -63,7 +63,7 @@ contact_center:
   alt_fax: "617-722-4033"
   tty_number: "711"
   alt_phone_number: "1-888-813-9220"
-  payment_phone_number: "1-888-813-9220"
+  payment_phone_number: "855-532-LINK"
   ivl_number: "1-877-623-6765"
   ivl_phone_number: "1-877-623-6765"
   email_address: "smallbusiness@mahealthconnector.org"
@@ -73,12 +73,12 @@ contact_center:
   appeals: "connector-appeals@state.ma.us"
 
   mailing_address:
-    name: "Commonwealth Health Insurance"
-    address_1: "PO Box 780833"
+    name: "DC Health Link"
+    address_1: "PO Box 97022"
     address_2:
-    city: "Philadelphia"
-    state: "PA"
-    zip_code: "19178-0833"
+    city: "Washington"
+    state: "DC"
+    zip_code: "20090"
 
   appeal_center:
     name: "Appeals Unit"
@@ -101,6 +101,8 @@ plan_option_titles:
   single_carrier: 'By Carrier'
   single_plan: 'Single Plan'
   plan_year_tooltip: "Employer premium contribution for Employee Only Health Plans must be at least"
+  multi_product: 'Custom'
+  single_issuer: 'By Carrier'
 
 plan_option_descriptions:
   sole_source: "Choose one plan and your contribution amount. All employees can enroll in that plan."
@@ -109,6 +111,8 @@ plan_option_descriptions:
   single_plan: "Select your preferred insurance company carrier. You will then select one plan and it'll be the only plan your participants can choose. It'll never cost you more to let your plan participants choose by carrier or by metal level. Are you sure you only want to offer a single plan?"
   dental:
     single_plan: "For Dental coverage, you will choose one dental plan from one carrier as the option that all of your employees can enroll in."
+    single_issuer: "Select your preferred insurance company carrier. Your plan participants will be able to choose any plan offered by the carrier you select. Your costs will be fixed to a specific plan you’ll choose in a minute."
+    multi_product: "Select your preferred insurance company carrier. Your plan participants will be able to choose any plan offered by the carrier you select. Your costs will be fixed to a specific plan you’ll choose in a minute."
 
 notices:
   mailing_address:
@@ -131,13 +135,13 @@ invoices:
   addendum: 'ma_non_discrimination_and_language_tags.pdf'
 
 aca:
-  state_name: "Massachusetts"
-  state_abbreviation: "MA"
   state_key : "dc"
-  market_kinds: ["shop"]
+  state_name: "District of Columbia"
+  state_abbreviation: "DC"
+  market_kinds: ["shop", "individual"]
   hbx_abbreviation: "DC Health Benefit Exchange"
   nationwide_markets: true
-  general_agency_enabled: false
+  general_agency_enabled: true
   broker_carrier_appointments_enabled: true
   dental_market_enabled: true
   calendar_enabled: true
@@ -150,7 +154,8 @@ aca:
   security_questions: false
   user_accounts_enabled: true
   plan_options_available: ["sole_source", "single_carrier", "metal_level"]
-  dental_plan_options_available: ["single_plan"]
+  dental_plan_options_available: ["multi_product", "single_issuer"]
+  default_dental_option_kind: 'multi_product'
   ## acceptable options are ["sole_source", "single_carrier", "metal_level", "single_plan"]
   enabled_metal_levels_for_single_carrier: ["silver", "gold", "dental"]
   carrier_hios_logo_variant:
@@ -164,7 +169,7 @@ aca:
 
   qle:
     with_in_sixty_days: 60
-#
+  #
   individual_market:
     monthly_enrollment_due_on: 15
     verification_outstanding_window:
@@ -173,24 +178,53 @@ aca:
       days: 95
 
     open_enrollment:
-      start_on: <%= Date.new(2017,11,1) %>
-      end_on: <%= Date.new(2018,02,05) %>
-    upcoming_open_enrollment:
       start_on: <%= Date.new(2018,11,1) %>
-      end_on: <%= Date.new(2019,01,31) %>
+      end_on: <%= Date.new(2019,02,8) %>
+      # dc_resident_application: true
+      # transition_family_members_link: true
+    upcoming_open_enrollment:
+      start_on: <%= Date.new(2019,11,1) %>
+      end_on: <%= Date.new(2020,01,31) %>
 
   shop_market:
     valid_employer_attestation_documents_url: 'https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist'
     small_market_employee_count_maximum: 50
     employer_contribution_percent_minimum: 50
     employer_family_contribution_percent_minimum: 33
-    employee_participation_ratio_minimum: <%= 3 / 4.0 %>
+    employee_participation_ratio_minimum: <%= 2 / 3.0 %>
     non_owner_participation_count_minimum: 1
-    binder_payment_due_on: 23
+    binder_payment_due_on: 12
     small_market_active_employee_limit: 200
     new_employee_paper_application: true
     census_employees_template_file: 'Health Connector - Employee Census Template'
     coverage_start_period: "2 months"
+
+    binder_payment_dates: [
+      {"2019-01-01": '2018,12,12'},
+      {"2019-02-01": '2019,1,14'},
+      {"2019-03-01": '2019,2,12'},
+      {"2019-04-01": '2019,3,12'},
+      {"2019-05-01": '2019,4,12'},
+      {"2019-06-01": '2019,5,14'},
+      {"2019-07-01": '2019,6,12'},
+      {"2019-08-01": '2019,7,12'},
+      {"2019-09-01": '2019,8,13'},
+      {"2019-10-01": '2019,9,12'},
+      {"2019-11-01": '2019,10,15'},
+      {"2019-12-01": '2019,11,13'},
+      {"2020-01-01": '2020,12,12'},
+      {"2020-02-01": '2020,1,14'},
+      {"2020-03-01": '2020,2,12'},
+      {"2020-04-01": '2020,3,12'},
+      {"2020-05-01": '2020,4,14'},
+      {"2020-06-01": '2020,5,12'},
+      {"2020-07-01": '2020,6,12'},
+      {"2020-08-01": '2020,7,14'},
+      {"2020-09-01": '2020,8,12'},
+      {"2020-10-01": '2020,9,14'},
+      {"2020-11-01": '2020,10,14'},
+      {"2020-12-01": '2020,11,13'},
+    ]
 
     earliest_enroll_prior_to_effective_on:
       days: -30
@@ -203,10 +237,10 @@ aca:
       days: -60
 
     initial_application:
-      publish_due_day_of_month: 15
-      advertised_deadline_of_month: 10
+      publish_due_day_of_month: 5
+      advertised_deadline_of_month: 1
       earliest_start_prior_to_effective_on:
-        months: -2
+        months: -3
         day_of_month: 0
       appeal_period_after_application_denial:
         days: 30
@@ -215,22 +249,22 @@ aca:
         days: 90
       quiet_period:
         month_offset: 0
-        mday: 8
+        mday: 28
 
     renewal_application:
       earliest_start_prior_to_effective_on:
-        months: -2
-        day_of_month: 21
-      monthly_open_enrollment_end_on: 20
-      publish_due_day_of_month: 15
-      application_submission_soft_deadline: 10
-      force_publish_day_of_month: 16
+        months: -3
+        day_of_month: 0
+      monthly_open_enrollment_end_on: 13
+      publish_due_day_of_month: 10
+      application_submission_soft_deadline: 5
+      force_publish_day_of_month: 11
       open_enrollment:
         minimum_length:
-          days: 5
+          days: 3
       quiet_period:
         month_offset: -1
-        mday: 25
+        mday: 15
 
     benefit_period:
       length_minimum:
@@ -240,7 +274,7 @@ aca:
 
     open_enrollment:
       monthly_start_on: 1
-      monthly_end_on: 20
+      monthly_end_on: 10
 
       minimum_length:
         days: 5

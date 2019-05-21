@@ -21,6 +21,7 @@ module BenefitSponsors
         end
       end
 
+
       def sponsor_contributions(benefit_package_id = nil)
         return @contributions if defined? @contributions
 
@@ -29,7 +30,7 @@ module BenefitSponsors
         end
 
 
-        @contributions = product_packages.by_product_kind(:dental).inject([]) do |contributions, product_package|
+        @contributions = product_packages.by_product_kind(:dental).inject({}) do |contributions, product_package|
           
           if benefit_package.present?
             if sponsored_benefit = benefit_package.sponsored_benefits.detect{|sb| sb.product_package == product_package}
@@ -42,35 +43,80 @@ module BenefitSponsors
             sponsor_contribution = contribution_service.build_sponsor_contribution(product_package)
           end
 
-          contributions << SponsorContribution.new(product_package.package_kind.to_s,
-            sponsor_contribution.contribution_levels.collect { |cl| 
+          contributions[product_package.package_kind.to_s] = {
+            id: nil,
+            contribution_levels: sponsor_contribution.contribution_levels.collect do |cl|
               ContributionLevel.new(cl.id.to_s, cl.display_name, cl.contribution_factor, true, cl.contribution_unit_id)
-            }
-          )
+            end
+          }
 
           contributions
         end
       end
 
+      # def sponsor_contributions(benefit_package_id = nil)
+      #   return @contributions if defined? @contributions
+
+      #   if benefit_package_id.present?
+      #     benefit_package = self.benefit_application.benefit_packages.detect{|bp| bp.id.to_s == benefit_package_id}
+      #   end
+
+
+      #   @contributions = product_packages.by_product_kind(:dental).inject([]) do |contributions, product_package|
+      #     if benefit_package.present?
+      #       if sponsored_benefit = benefit_package.sponsored_benefits.detect{|sb| sb.product_package == product_package}
+      #         sponsor_contribution = sponsored_benefit.sponsor_contribution
+      #       end
+      #     end
+
+      #     if sponsor_contribution.blank?
+      #       contribution_service = BenefitSponsors::SponsoredBenefits::ProductPackageToSponsorContributionService.new
+      #       sponsor_contribution = contribution_service.build_sponsor_contribution(product_package)
+      #     end
+
+      #     contributions << SponsorContribution.new(product_package.package_kind.to_s,
+      #       sponsor_contribution.contribution_levels.collect { |cl|
+      #         ContributionLevel.new(cl.id.to_s, cl.display_name, cl.contribution_factor, true, cl.contribution_unit_id)
+      #       }
+      #     )
+
+      #     contributions
+      #   end
+      # end
+
       def plan_option_kinds
         plan_options.keys
       end
 
-      def single_issuer_options
-        carrier_name_and_id_hash = {}
-        Hash[plan_options[:single_issuer].sort_by { |k, v| k }].each do |k, v|
-          carrier_name_and_id_hash[k] = v.first["issuer_id"].to_s
+      def plan_options_for(option_kind)
+        if option_kind == :multi_product
+          plan_options[option_kind].inject({}) do |data, product|
+            data[product.id.to_s] = product
+            data
+          end
+        else
+          Hash[plan_options[option_kind].sort_by { |carrier_name, _products| carrier_name }].inject({}) do |data, (_carrier_name, products)|
+            data[products[0]["issuer_id"].to_s] = products[0]
+            data
+          end
         end
-        carrier_name_and_id_hash
       end
 
-      def single_product_options
-        single_product_options_hash = {}
-        Hash[plan_options[:single_product].sort_by { |k, v| k }].each do |k, v|
-          single_product_options_hash[k] = v.first["issuer_id"].to_s
-        end
-        single_product_options_hash
-      end
+      # def single_issuer_options
+      #   carrier_name_and_id_hash = {}
+      #   Hash[plan_options[:single_issuer].sort_by { |k, v| k }].each do |k, v|
+      #     carrier_name_and_id_hash[k] = v.first["issuer_id"].to_s
+      #   end
+      #   carrier_name_and_id_hash
+      # end
+
+      # def single_product_options
+      #   single_product_options_hash = {}
+      #   Hash[plan_options[:single_product].sort_by { |k, v| k }].each do |k, v|
+      #     single_product_options_hash[k] = v.first["issuer_id"].to_s
+      #   end
+      #   single_product_options_hash
+      # end
 
       def plan_options
         return @products if defined? @products

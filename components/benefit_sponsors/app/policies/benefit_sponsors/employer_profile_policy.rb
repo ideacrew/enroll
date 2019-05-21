@@ -3,8 +3,7 @@ module BenefitSponsors
 
     def show?
       return false unless user.present?
-      return true if user.has_hbx_staff_role? || is_broker_for_employer?(record) || is_general_agency_staff_for_employer?(record)
-      is_staff_role_for_employer?(record)
+      user.has_hbx_staff_role? || is_broker_for_employer?(record) || is_general_agency_staff_for_employer?(record) || is_staff_role_for_employer?(record)
     end
 
     def show_pending?
@@ -38,8 +37,16 @@ module BenefitSponsors
     end
 
     def is_general_agency_staff_for_employer?(profile)
-      # TODO
-      return false
+      # TODO: Need to fix this after updating general agency account
+      if general_agency_staff_role = user.person.general_agency_staff_roles.first
+        general_agency_account = profile.general_agency_accounts.active.first
+        return false if general_agency_account.blank?
+        general_agency_profile = general_agency_account.general_agency_profile
+        return false if general_agency_profile.blank?
+        general_agency_profile.general_agency_staff_roles.select{|role| role.id == general_agency_staff_role.id}.present?
+      else
+        false
+      end
     end
 
     def updateable?

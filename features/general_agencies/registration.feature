@@ -1,4 +1,3 @@
-# @general_agency_enabled
 Feature: Create a General Agency Profile
 
   Scenario: A General Agency Submits Application

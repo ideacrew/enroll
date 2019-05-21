@@ -12,7 +12,7 @@ module SponsoredBenefits
       def set_broker_agency_profile_from_user
         current_uri = request.env['PATH_INFO']
         if current_person.broker_role.present?
-          @broker_agency_profile = ::BrokerAgencyProfile.find(current_person.broker_role.broker_agency_profile_id) # Deprecate this 
+          @broker_agency_profile = ::BrokerAgencyProfile.find(current_person.broker_role.broker_agency_profile_id) # Deprecate this
           @broker_agency_profile ||= BenefitSponsors::Organizations::Profile.find(current_person.broker_role.benefit_sponsors_broker_agency_profile_id)
         elsif active_user.has_hbx_staff_role? && params[:plan_design_organization_id].present?
            @broker_agency_profile = SponsoredBenefits::Organizations::PlanDesignOrganization.find(params[:plan_design_organization_id]).broker_agency_profile
@@ -43,14 +43,14 @@ module SponsoredBenefits
       end
 
       def is_profile_general_agency?
-        @profile.class.to_s == "GeneralAgencyProfile"
+        @profile.class.to_s == "BenefitSponsors::Organizations::GeneralAgencyProfile"
       end
 
       def provider
         if !is_profile_general_agency?
           @profile.primary_broker_role.person
         else
-          Person.where("general_agency_staff_roles.general_agency_profile_id" => BSON::ObjectId.from_string(@profile.id)).first
+          Person.where("general_agency_staff_roles.benefit_sponsors_general_agency_profile_id" => BSON::ObjectId.from_string(@profile.id)).first
         end
       end
   end

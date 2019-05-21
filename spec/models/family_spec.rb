@@ -54,7 +54,7 @@ describe Family, "given a primary applicant and a dependent" do
   end
 end
 
-describe Family, type: :model, dbclean: :after_each do
+describe Family, type: :model, dbclean: :around_each do
 
   let(:spouse)  { FactoryBot.create(:person)}
   let(:person) do
@@ -325,7 +325,7 @@ describe Family, type: :model, dbclean: :after_each do
 
 end
 
-describe Family do
+describe Family, dbclean: :around_each do
   let(:family) { Family.new }
 
   describe "with no special enrollment periods" do

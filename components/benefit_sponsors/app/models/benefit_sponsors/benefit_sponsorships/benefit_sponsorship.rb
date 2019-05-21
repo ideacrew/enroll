@@ -113,8 +113,8 @@ module BenefitSponsors
     embeds_many :broker_agency_accounts, class_name: "BenefitSponsors::Accounts::BrokerAgencyAccount",
       validate: true
 
-    embeds_many :general_agency_accounts, class_name: "BenefitSponsors::Accounts::GeneralAgencyAccount",
-      validate: true
+    # embeds_many :general_agency_accounts, class_name: "BenefitSponsors::Accounts::GeneralAgencyAccount",
+    #   validate: true
 
     embeds_one  :employer_attestation, class_name: "BenefitSponsors::Documents::EmployerAttestation"
 
@@ -416,7 +416,7 @@ module BenefitSponsors
     end
 
     def oe_extended_applications
-      benefit_applications.select do |application| 
+      benefit_applications.select do |application|
         application.enrollment_extended? && TimeKeeper.date_of_record > open_enrollment_period_for(application.effective_date).max
       end
     end
@@ -488,7 +488,7 @@ module BenefitSponsors
     def carriers_dropped_for(product_kind)
       renewal_benefit_application.predecessor.issuers_offered_for(product_kind) - renewal_benefit_application.issuers_offered_for(product_kind)
     end
-    
+
     ####
 
     # Workflow for self service
@@ -506,7 +506,7 @@ module BenefitSponsors
       state :suspended                        # Premium payment is 61-90 days past due and Sponsor's benefit coverage has lapsed
       state :terminated                       # Sponsor's ability to offer benefits under this BenefitSponsorship is permanently terminated
       state :ineligible                       # Sponsor is permanently banned from sponsoring benefits due to regulation or policy
-      
+
       event :approve_initial_application do
         transitions from: [:applicant, :initial_application_under_review], to: :initial_application_approved
       end
@@ -592,7 +592,7 @@ module BenefitSponsors
         :initial_enrollment_ineligible,
         :applicant
       ].include?(aasm.to_state)
-      
+
       begin
         benefit_applications.each do |benefit_application|
           benefit_application.benefit_sponsorship_event_subscriber(aasm)

@@ -24,6 +24,7 @@ module BenefitSponsors
 
         # delegate :legal_name, :end_on, :entity_kind, to: :organization
         delegate :roster_size, :broker_agency_accounts, to: :active_benefit_sponsorship
+        delegate :general_agency_accounts, to: :plan_design_organization
       end
 
       def parent
@@ -119,6 +120,19 @@ module BenefitSponsors
         active_broker_agency_account.ba_name if active_broker_agency_account
       end
 
+      def active_general_agency_account
+        general_agency_accounts.active.first
+      end
+
+      def general_agency_profile
+        return @general_agency_profile if defined? @general_agency_profile
+        @general_agency_profile = active_general_agency_account.general_agency_profile if active_general_agency_account.present?
+      end
+
+      def plan_design_organization
+        ::SponsoredBenefits::Organizations::PlanDesignOrganization.where(sponsor_profile_id: self.id).first
+      end
+
       def staff_roles
         Person.staff_for_employer(self)
       end
@@ -139,7 +153,7 @@ module BenefitSponsors
         if active_broker_agency_account.present?
           terminate_on = (start_on - 1.day).end_of_day
           fire_broker_agency(terminate_on)
-          # fire_general_agency!(terminate_on)
+          fire_general_agency!(terminate_on)
         end
 
         organization.employer_profile.active_benefit_sponsorship.broker_agency_accounts.create(broker_agency_profile: new_broker_agency, writing_agent_id: broker_role_id, start_on: start_on).save!
@@ -156,8 +170,18 @@ module BenefitSponsors
         # broker_fired_confirmation_to_broker
       end
 
+      def hire_general_agency(new_general_agency, broker_role_id = nil, start_on = TimeKeeper.datetime_of_record)
+        fire_general_agency!(TimeKeeper.datetime_of_record) if active_general_agency_account.present?
+        general_agency_accounts.build(general_agency_profile: new_general_agency, start_on: start_on, broker_role_id: broker_role_id)
+        @general_agency_profile = new_general_agency
+      end
+
       def fire_general_agency!(terminate_on = TimeKeeper.datetime_of_record)
-        return true unless general_agency_enabled?
+        return if active_general_agency_account.blank?
+        general_agency_accounts.active.update_all(aasm_state: "inactive", end_on: terminate_on)
+        # TODO fix these during notices implementation
+        # notify_general_agent_terminated
+        # self.trigger_notices("general_agency_terminated")
       end
 
       def broker_fired_confirmation_to_broker

@@ -8,7 +8,7 @@ module EmployerWorld
   # defaults to the first employer created
   def employer(legal_name=nil, *traits)
     attributes = traits.extract_options!
-    traits.push(:with_aca_shop_cca_employer_profile) unless traits.include? :with_aca_shop_cca_employer_profile_no_attestation
+    traits.push("with_aca_shop_#{Settings.site.key}_employer_profile".to_sym) unless traits.include? :with_aca_shop_cca_employer_profile_no_attestation
     @organization ||= {}
 
     # puts "running for legal_name: #{legal_name}"
@@ -38,7 +38,7 @@ module EmployerWorld
   def registering_employer
     @registering_organization ||= FactoryBot.build(
       :benefit_sponsors_organizations_general_organization,
-      :with_aca_shop_cca_employer_profile,
+      "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym,
       site: site
     )
   end

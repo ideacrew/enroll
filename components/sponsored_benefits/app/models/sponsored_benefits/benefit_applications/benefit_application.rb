@@ -362,7 +362,7 @@ module SponsoredBenefits
         end
 
         if open_enrollment_period.begin < (effective_period.begin - Settings.aca.shop_market.open_enrollment.maximum_length.months.months)
-          errors.add(:open_enrollment_period.begin, "can't occur earlier than 60 days before start date")
+          errors.add(:open_enrollment_period, "can't occur earlier than 60 days before start date")
         end
 
         if open_enrollment_period.end > (open_enrollment_period.begin + Settings.aca.shop_market.open_enrollment.maximum_length.months.months)

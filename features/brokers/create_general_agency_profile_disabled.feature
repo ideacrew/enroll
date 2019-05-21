@@ -1,4 +1,4 @@
-@general_agency_disabled
+@wip
 Feature: Create General Agency and General Agency Staff Role
   Scenario: General Agency has not signed up on the HBX
     When General Agency visit the main portal

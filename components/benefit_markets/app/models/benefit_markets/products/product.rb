@@ -33,6 +33,7 @@ module BenefitMarkets
     field :service_area_id, type: BSON::ObjectId
     field :network_information, type: String
     field :nationwide, type: Boolean # Nationwide
+    field :dc_in_network, type: Boolean
 
     embeds_one  :sbc_document, as: :documentable,
                 :class_name => "::Document"
