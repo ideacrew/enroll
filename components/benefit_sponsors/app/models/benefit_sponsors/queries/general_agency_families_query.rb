@@ -53,7 +53,7 @@ module BenefitSponsors
 
       def census_employee_ids
         @census_member_ids ||= CensusMember.collection.aggregate([
-          { "$match" => {aasm_state: {"$in"=> CensusEmployee::EMPLOYMENT_ACTIVE_STATES}, employer_profile_id: {"$in" => employer_ids}}},
+          { "$match" => {aasm_state: {"$in"=> CensusEmployee::EMPLOYMENT_ACTIVE_STATES}, benefit_sponsors_employer_profile_id: {"$in" => employer_ids}}},
           { "$group" => {"_id" => "$_id"}}
         ]).map { |rec| rec["_id"] }
       end
@@ -62,12 +62,14 @@ module BenefitSponsors
         @employee_person_ids ||= Person.unscoped.where("employee_roles.census_employee_id" => {"$in" => census_employee_ids}).pluck(:_id)
       end
 
-      def employer_ids
-        @employer_ids ||= Organization.collection.aggregate([
-          { "$match" => { :'employer_profile.general_agency_accounts' => {:$elemMatch => { aasm_state: 'active', general_agency_profile_id: @general_agency_id} } } },
-          { "$group" => { "_id" => "$employer_profile._id" }}
-        ]).map { |rec| rec["_id"] }
+      def plan_design_organizations
+        ::SponsoredBenefits::Organizations::PlanDesignOrganization.find_by_active_general_agency(@general_agency_id)
       end
+
+      def employer_ids
+        @employer_ids ||= plan_design_organizations.map { |org| org.employer_profile.id }
+      end
+
     end
   end
 end

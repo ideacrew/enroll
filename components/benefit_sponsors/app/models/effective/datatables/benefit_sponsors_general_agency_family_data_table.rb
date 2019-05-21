@@ -6,7 +6,7 @@ module Effective
       datatable do
         table_column :name, :label => 'Name', :proc => Proc.new { |row|
           pp = @effective_datatable.person_cache[row.primary_applicant.person_id]
-          link_to pp.full_name, resume_enrollment_exchanges_agents_path(person_id: pp.id)
+          link_to pp.full_name, main_app.resume_enrollment_exchanges_agents_path(person_id: pp.id)
            }, :filter => false, :sortable => false
 
         table_column :ssn, :label => 'SSN', :proc => Proc.new { |row|
