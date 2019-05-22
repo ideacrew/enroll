@@ -76,14 +76,14 @@ module BenefitSponsors
 
       context "#is_broker_agency_staff_profile?" do
 
-        let!(:params) {
+        let!(:params) do
           {
               profile_type: 'broker_agency_staff',
               first_name: person.first_name,
               last_name: person.last_name,
               dob: person.dob.to_s
           }
-        }
+        end
 
         it "should return true" do
           expect(subject.new(params).is_broker_agency_staff_profile?).to eq true
@@ -261,12 +261,12 @@ module BenefitSponsors
     describe '#for_broker_agency_search' do
 
       let!(:person) { FactoryBot.create(:person) }
-      let!(:params) {
+      let!(:params) do
         {
             filter_criteria: {"q" => broker_agency_profile.legal_name},
             is_broker_registration_page: "true"
         }
-      }
+      end
 
       context "with valid form attributes " do
 

@@ -32,7 +32,7 @@ Then(/^Broker staff submits his application and see successful message$/) do
   expect(page).to have_content('Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed.')
 end
 
-Given(/^that a Broker logs into a given (.*)$/) do |portal|
+Given(/^that a Broker logs into a given (.*)$/) do
   visit "/"
   find('a', :text => "Broker Agency Portal", wait: 5).click
   wait_for_ajax(3,4)

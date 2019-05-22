@@ -317,13 +317,13 @@ module BenefitSponsors
                 return filter_brokers_by_agencies(agencies_matching_advanced_criteria, brokers)
               end
             elsif value
-              return self.search_agencies_by_criteria(search_params)
+              return search_agencies_by_criteria(search_params)
             end
           elsif !search_params[:q].present? && value
             return []
           end
 
-          self.search_agencies_by_criteria(search_params)
+          search_agencies_by_criteria(search_params)
         end
 
         def filter_brokers_by_agencies(agencies, brokers)
