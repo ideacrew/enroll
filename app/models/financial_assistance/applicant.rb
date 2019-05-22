@@ -156,6 +156,7 @@ class FinancialAssistance::Applicant
   embeds_many :benefits,    class_name: "::FinancialAssistance::Benefit"
   embeds_many :assisted_verifications, class_name: "::FinancialAssistance::AssistedVerification"
   embeds_many :workflow_state_transitions, as: :transitional
+  embeds_many :verification_types, cascade_callbacks: true, validate: true
 
   accepts_nested_attributes_for :incomes, :deductions, :benefits
 
