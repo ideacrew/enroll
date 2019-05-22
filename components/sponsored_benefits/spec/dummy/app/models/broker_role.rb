@@ -39,6 +39,8 @@ class BrokerRole
   field :training, type: Boolean
   field :carrier_appointments, type: Hash , default: BROKER_CARRIER_APPOINTMENTS
 
+  delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
+
   def broker_agency_profile=(new_broker_agency)
     if new_broker_agency.is_a? BenefitSponsors::Organizations::BrokerAgencyProfile
       if new_broker_agency.nil?

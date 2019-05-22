@@ -70,6 +70,21 @@ module BenefitSponsors
         @primary_broker_role = BrokerRole.find(self.primary_broker_role_id) unless primary_broker_role_id.blank?
       end
 
+      def default_general_agency_profile=(new_default_general_agency_profile = nil)
+        if new_default_general_agency_profile.present?
+          raise ArgumentError.new("expected GeneralAgencyProfile class") unless new_default_general_agency_profile.is_a? BenefitSponsors::Organizations::GeneralAgencyProfile
+          self.default_general_agency_profile_id = new_default_general_agency_profile.id
+        else
+          unset("default_general_agency_profile_id")
+        end
+        @default_general_agency_profile = new_default_general_agency_profile
+      end
+
+      def default_general_agency_profile
+        return @default_general_agency_profile if defined? @default_general_agency_profile
+        @default_general_agency_profile = BenefitSponsors::Organizations::GeneralAgencyProfile.find(self.default_general_agency_profile_id) if default_general_agency_profile_id.present?
+      end
+
       private
 
       def build_nested_models

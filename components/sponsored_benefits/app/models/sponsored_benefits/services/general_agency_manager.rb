@@ -122,7 +122,7 @@ module SponsoredBenefits
       end
 
       def current_default_ga
-        broker_agency_profile.default_general_agency_profile
+        broker_agency_profile.default_general_agency_profile rescue nil
       end
 
       def send_notice(opts={})
