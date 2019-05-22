@@ -180,8 +180,8 @@ class FinancialAssistance::Application
     state :determination_response_error
     state :determined
 
-    event :submit, :after => :record_transition do
-      transitions from: :draft, to: :submitted, :after => :set_submit do
+    event :submit, :after => [:record_transition, :set_submit] do
+      transitions from: :draft, to: :submitted do
         guard do
           is_application_valid?
         end
@@ -194,8 +194,8 @@ class FinancialAssistance::Application
       end
     end
 
-    event :unsubmit, :after => :record_transition do
-      transitions from: :submitted, to: :draft, :after => :unset_submit do
+    event :unsubmit, :after => [:record_transition, :unset_submit] do
+      transitions from: :submitted, to: :draft do
         guard do
           true # add appropriate guard here
         end
@@ -729,15 +729,16 @@ private
   end
 
   def create_verification_documents
-    applicants.each do |applicant|
-      income_assisted_verification = applicant.assisted_verifications.create!(status: "submitted", verification_type: "Income")
-      mec_assisted_verification = applicant.assisted_verifications.create!(status: "submitted", verification_type: "MEC")
+    active_applicants.each do |applicant|
+      %w[Income MEC].each do |type|
+        applicant.verification_types << VerificationType.new(type_name: type, validation_status: 'pending' )
+      end
     end
   end
 
   def delete_verification_documents
-    applicants.each do |applicant|
-      applicant.assisted_verifications.destroy_all
+    active_applicants.each do |applicant|
+      applicant.verification_types.destroy_all
     end
   end
 end

@@ -645,4 +645,12 @@ RSpec.describe FinancialAssistance::Application, type: :model, dbclean: :after_e
     end
   end
 
+  describe '.create_verification_documents' do
+    it 'should create income and mec verification types' do
+      application.send(:create_verification_documents)
+      applicant1.reload
+      expect(applicant1.verification_types.count). to eq 2
+    end
+  end
+
 end
