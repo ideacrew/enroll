@@ -24,7 +24,7 @@ module BenefitSponsors
 
         # delegate :legal_name, :end_on, :entity_kind, to: :organization
         delegate :roster_size, :broker_agency_accounts, to: :active_benefit_sponsorship
-        delegate :general_agency_accounts, to: :plan_design_organization
+        delegate :general_agency_accounts, to: :plan_design_organization, allow_nil: true
       end
 
       def parent
@@ -121,7 +121,7 @@ module BenefitSponsors
       end
 
       def active_general_agency_account
-        general_agency_accounts.active.first
+        general_agency_accounts.active.first if general_agency_accounts.present?
       end
 
       def general_agency_profile
@@ -177,7 +177,7 @@ module BenefitSponsors
       end
 
       def fire_general_agency!(terminate_on = TimeKeeper.datetime_of_record)
-        return if active_general_agency_account.blank?
+        return unless active_general_agency_account
         general_agency_accounts.active.update_all(aasm_state: "inactive", end_on: terminate_on)
         # TODO fix these during notices implementation
         # notify_general_agent_terminated
