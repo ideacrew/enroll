@@ -37,8 +37,7 @@ module BenefitSponsors
 
       context "Broker Agency profile" do
         let(:staff_role_form) do
-          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new
-          (
+          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(
             profile_id: broker_agency_profile.id,
             profile_type: "broker_agency_staff"
           )
@@ -102,8 +101,7 @@ module BenefitSponsors
           person.broker_agency_staff_roles << broker_agency_staff_role
         end
         let(:staff_role_form) do
-          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new
-          (
+          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(
             profile_id: broker_agency_profile.id,
             profile_type: "broker_agency_staff",
             first_name: person.first_name,
@@ -202,8 +200,7 @@ module BenefitSponsors
         end
 
         let(:staff_role_form) do
-          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new
-          (
+          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(
             profile_id: broker_agency_profile.id,
             profile_type: "broker_agency_staff",
             first_name: "steve",
@@ -218,8 +215,7 @@ module BenefitSponsors
 
       context 'when no person matched' do
         let(:staff_role_form) do
-          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new
-          (
+          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(
             profile_id: broker_agency_profile.id,
             profile_type: "broker_agency_staff",
             first_name: "steve",
@@ -236,8 +232,7 @@ module BenefitSponsors
 
       context 'when only one person matched' do
         let(:staff_role_form) do
-          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new
-          (
+          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(
             profile_id: broker_agency_profile.id,
             profile_type: "broker_agency_staff",
             first_name: person.first_name,
@@ -257,8 +252,7 @@ module BenefitSponsors
       context 'when broker agency profile is in approved state' do
 
         let(:staff_role_form) do
-          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new
-          (
+          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(
             filter_criteria: {"q" => broker_agency_profile.legal_name},
             is_broker_registration_page: "true"
           )
@@ -271,8 +265,7 @@ module BenefitSponsors
 
       context 'when broker agency profile is not in approved state' do
         let(:staff_role_form) do
-          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new
-          (
+          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(
             filter_criteria: {"q" => broker_agency_profile.legal_name},
             is_broker_registration_page: "true"
           )

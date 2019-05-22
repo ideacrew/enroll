@@ -216,7 +216,6 @@ module BenefitSponsors
           broker_agency_staff_role.reload
           expect(broker_agency_staff_role.aasm_state).to eq "broker_agency_terminated"
         end
-
       end
 
       context "should not deactivate only staff role of broker" do
