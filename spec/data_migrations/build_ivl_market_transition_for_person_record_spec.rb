@@ -34,11 +34,14 @@ describe BuildIvlMarketTransitionForPersonRecord do
       allow(ENV).to receive(:[]).with("hbx_id").and_return person.hbx_id
     end
 
-    it "should build individual market transitions for only people with resident role" do
+    it "should build individual market transitions for people with resident role with no individual market transitions" do
+      person.individual_market_transitions.first.delete
       expect(person.individual_market_transitions.present?).to eq false
       subject.migrate
       person.reload
       expect(person.individual_market_transitions.present?).to eq true
+      expect(person.individual_market_transitions.size).to eq 1
+      expect(person.individual_market_transitions.first.role_type).to eq "resident"
     end
   end
 end

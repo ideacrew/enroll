@@ -226,6 +226,7 @@ RSpec.describe VerificationHelper, :type => :helper do
       expect(helper.has_active_consumer_dependent?(person1, dependent)).to eq true
     end
     it 'returns false the person has no active consumer dependent' do
+      person2.individual_market_transitions.first.delete
       expect(helper.has_active_consumer_dependent?(person2, dependent)).to eq false
     end
   end
