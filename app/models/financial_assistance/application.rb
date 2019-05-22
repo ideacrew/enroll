@@ -195,7 +195,7 @@ class FinancialAssistance::Application
     end
 
     event :unsubmit, :after => :record_transition do
-      transitions from: :submitted, to: :draft , :after => :unset_submit do
+      transitions from: :submitted, to: :draft, :after => :unset_submit do
         guard do
           true # add appropriate guard here
         end
