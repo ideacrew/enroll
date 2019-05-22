@@ -160,9 +160,9 @@ module BenefitSponsors
 
       def build_person(form)
         Person.new({
-                       :first_name => form[:first_name].strip,
-                       :last_name => form[:last_name].strip,
-                       :dob => form[:dob]
+                     :first_name => form[:first_name].strip,
+                     :last_name => form[:last_name].strip,
+                     :dob => form[:dob]
                    })
       end
 

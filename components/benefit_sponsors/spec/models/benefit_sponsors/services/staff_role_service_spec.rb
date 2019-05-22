@@ -37,10 +37,8 @@ module BenefitSponsors
 
       context "Broker Agency profile" do
         let(:staff_role_form) do
-          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(
-            profile_id: broker_agency_profile.id,
-            profile_type: "broker_agency_staff"
-          )
+          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(profile_id: broker_agency_profile.id,
+                                                                               profile_type: "broker_agency_staff")
         end
 
         it 'should return employer profile' do
@@ -101,14 +99,12 @@ module BenefitSponsors
           person.broker_agency_staff_roles << broker_agency_staff_role
         end
         let(:staff_role_form) do
-          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(
-            profile_id: broker_agency_profile.id,
-            profile_type: "broker_agency_staff",
-            first_name: person.first_name,
-            last_name: person.last_name,
-            dob: person.dob.to_s,
-            email: "steve@gmail.com"
-          )
+          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(profile_id: broker_agency_profile.id,
+                                                                               profile_type: "broker_agency_staff",
+                                                                               first_name: person.first_name,
+                                                                               last_name: person.last_name,
+                                                                               dob: person.dob.to_s,
+                                                                               email: "steve@gmail.com")
         end
 
 
@@ -200,13 +196,11 @@ module BenefitSponsors
         end
 
         let(:staff_role_form) do
-          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(
-            profile_id: broker_agency_profile.id,
-            profile_type: "broker_agency_staff",
-            first_name: "steve",
-            last_name: "smith",
-            dob: "10/10/1974"
-          )
+          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(profile_id: broker_agency_profile.id,
+                                                                               profile_type: "broker_agency_staff",
+                                                                               first_name: "steve",
+                                                                               last_name: "smith",
+                                                                               dob: "10/10/1974")
         end
         it "should raise an exception" do
           expect(subject.match_or_create_person(staff_role_form)).to eq [false, "too many people match the criteria provided for your identity.  Please contact HBX."]
@@ -215,14 +209,12 @@ module BenefitSponsors
 
       context 'when no person matched' do
         let(:staff_role_form) do
-          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(
-            profile_id: broker_agency_profile.id,
-            profile_type: "broker_agency_staff",
-            first_name: "steve",
-            last_name: "smith",
-            dob: "10/10/1974",
-            email: "steve@gmail.com"
-          )
+          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(profile_id: broker_agency_profile.id,
+                                                                               profile_type: "broker_agency_staff",
+                                                                               first_name: "steve",
+                                                                               last_name: "smith",
+                                                                               dob: "10/10/1974",
+                                                                               email: "steve@gmail.com")
         end
         it "should build a new person" do
           expect(subject.match_or_create_person(staff_role_form)).to eq true
@@ -232,14 +224,12 @@ module BenefitSponsors
 
       context 'when only one person matched' do
         let(:staff_role_form) do
-          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(
-            profile_id: broker_agency_profile.id,
-            profile_type: "broker_agency_staff",
-            first_name: person.first_name,
-            last_name: person.last_name,
-            dob: person.dob,
-            email: "steve@gmail.com"
-          )
+          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(profile_id: broker_agency_profile.id,
+                                                                               profile_type: "broker_agency_staff",
+                                                                               first_name: person.first_name,
+                                                                               last_name: person.last_name,
+                                                                               dob: person.dob,
+                                                                               email: "steve@gmail.com")
         end
         it "form should assign person to exisiting person" do
           expect(subject.match_or_create_person(staff_role_form)).to eq true
@@ -252,10 +242,8 @@ module BenefitSponsors
       context 'when broker agency profile is in approved state' do
 
         let(:staff_role_form) do
-          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(
-            filter_criteria: {"q" => broker_agency_profile.legal_name},
-            is_broker_registration_page: "true"
-          )
+          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(filter_criteria: {"q" => broker_agency_profile.legal_name},
+                                                                               is_broker_registration_page: "true")
         end
         it "should return result if broker profile is approved" do
           broker_agency_profile.update_attributes!(aasm_state: "is_approved")
@@ -265,10 +253,8 @@ module BenefitSponsors
 
       context 'when broker agency profile is not in approved state' do
         let(:staff_role_form) do
-          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(
-            filter_criteria: {"q" => broker_agency_profile.legal_name},
-            is_broker_registration_page: "true"
-          )
+          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(filter_criteria: {"q" => broker_agency_profile.legal_name},
+                                                                               is_broker_registration_page: "true")
         end
         it "should return empty result if broker profile is not approved" do
           expect(subject.broker_agency_search!(staff_role_form)).to eq []
