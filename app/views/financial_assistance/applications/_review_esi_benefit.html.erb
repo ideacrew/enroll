@@ -43,12 +43,12 @@
 
   <div class="row ptb no-buffer row-height">
     <div class="col-md-6">Is the employee currently in a waiting period and eligible to enroll in the next 3 months?</div>
-    <div class="col-md-6"><%= benefit.is_esi_waiting_period %></div>
+    <div class="col-md-6"><%= human_boolean(benefit.is_esi_waiting_period) %></div>
   </div>
 
   <div class="row ptb no-buffer row-height">
     <div class="col-md-6">Does this employer offer a health plan that meets the minimum value standard?</div>
-    <div class="col-md-6"><%= benefit.is_esi_mec_met %></div>
+    <div class="col-md-6"><%= human_boolean(benefit.is_esi_mec_met) %></div>
   </div>
 
   <div class="row ptb no-buffer row-height">
