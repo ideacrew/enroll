@@ -86,6 +86,7 @@ class MigrateDcBrokerAgencyProfiles < Mongoid::Migration
       end
     end
 
+    # TODO issue broker & staff role ids: 18942185, 19773538, 19793505, 19927494
     say_with_time("Time taken to migrate broker staff roles and broker role") do
       Person.or({:"broker_role".exists => true}, {:"broker_agency_staff_roles".exists => true}).each do |person|
         person.broker_agency_staff_roles.unscoped.each do |staff|
