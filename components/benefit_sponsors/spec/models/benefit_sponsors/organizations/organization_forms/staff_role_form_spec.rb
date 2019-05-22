@@ -78,10 +78,10 @@ module BenefitSponsors
 
         let!(:params) do
           {
-              profile_type: 'broker_agency_staff',
-              first_name: person.first_name,
-              last_name: person.last_name,
-              dob: person.dob.to_s
+            profile_type: 'broker_agency_staff',
+            first_name: person.first_name,
+            last_name: person.last_name,
+            dob: person.dob.to_s
           }
         end
 
@@ -110,10 +110,10 @@ module BenefitSponsors
       let!(:person) { FactoryBot.create(:person, :with_ssn) }
       let!(:params) {
         {
-            profile_id: employer_profile.id.to_s,
-            first_name: person.first_name,
-            last_name: person.last_name,
-            dob: Date.new(1972,04,04).to_s
+          profile_id: employer_profile.id.to_s,
+          first_name: person.first_name,
+          last_name: person.last_name,
+          dob: Date.new(1972,0o4,0o4).to_s
         }
       }
 
@@ -172,11 +172,11 @@ module BenefitSponsors
       let!(:person) { FactoryBot.create(:person, employer_staff_roles:[active_employer_staff_role]) }
       let!(:params) {
         {
-            profile_id: employer_profile.id.to_s,
-            first_name: person.first_name,
-            last_name: person.last_name,
-            dob: person.dob.to_s,
-            person_id:person.id
+          profile_id: employer_profile.id.to_s,
+          first_name: person.first_name,
+          last_name: person.last_name,
+          dob: person.dob.to_s,
+          person_id: person.id
         }
       }
 
@@ -218,11 +218,11 @@ module BenefitSponsors
       let!(:person2) { FactoryBot.create(:person, first_name:'y',employer_staff_roles:[active_employer_staff_role]) }
       let!(:params) {
         {
-            profile_id: employer_profile.id.to_s,
-            first_name: person2.first_name,
-            last_name: person2.last_name,
-            dob: person2.dob.to_s,
-            person_id:person2.id
+          profile_id: employer_profile.id.to_s,
+          first_name: person2.first_name,
+          last_name: person2.last_name,
+          dob: person2.dob.to_s,
+          person_id: person2.id
         }
       }
 
@@ -263,8 +263,8 @@ module BenefitSponsors
       let!(:person) { FactoryBot.create(:person) }
       let!(:params) do
         {
-            filter_criteria: {"q" => broker_agency_profile.legal_name},
-            is_broker_registration_page: "true"
+          filter_criteria: {"q" => broker_agency_profile.legal_name},
+          is_broker_registration_page: "true"
         }
       end
 

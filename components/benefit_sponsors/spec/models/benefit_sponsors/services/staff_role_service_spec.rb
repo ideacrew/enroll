@@ -37,7 +37,8 @@ module BenefitSponsors
 
       context "Broker Agency profile" do
         let(:staff_role_form) do
-          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(
+          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new
+          (
             profile_id: broker_agency_profile.id,
             profile_type: "broker_agency_staff"
           )
@@ -101,7 +102,8 @@ module BenefitSponsors
           person.broker_agency_staff_roles << broker_agency_staff_role
         end
         let(:staff_role_form) do
-          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(
+          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new
+          (
             profile_id: broker_agency_profile.id,
             profile_type: "broker_agency_staff",
             first_name: person.first_name,
@@ -200,7 +202,8 @@ module BenefitSponsors
         end
 
         let(:staff_role_form) do
-          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(
+          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new
+          (
             profile_id: broker_agency_profile.id,
             profile_type: "broker_agency_staff",
             first_name: "steve",
@@ -215,7 +218,8 @@ module BenefitSponsors
 
       context 'when no person matched' do
         let(:staff_role_form) do
-          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(
+          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new
+          (
             profile_id: broker_agency_profile.id,
             profile_type: "broker_agency_staff",
             first_name: "steve",
@@ -232,7 +236,8 @@ module BenefitSponsors
 
       context 'when only one person matched' do
         let(:staff_role_form) do
-          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(
+          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new
+          (
             profile_id: broker_agency_profile.id,
             profile_type: "broker_agency_staff",
             first_name: person.first_name,
@@ -252,7 +257,8 @@ module BenefitSponsors
       context 'when broker agency profile is in approved state' do
 
         let(:staff_role_form) do
-          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(
+          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new
+          (
             filter_criteria: {"q" => broker_agency_profile.legal_name},
             is_broker_registration_page: "true"
           )
@@ -265,7 +271,8 @@ module BenefitSponsors
 
       context 'when broker agency profile is not in approved state' do
         let(:staff_role_form) do
-          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(
+          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new
+          (
             filter_criteria: {"q" => broker_agency_profile.legal_name},
             is_broker_registration_page: "true"
           )
@@ -312,7 +319,7 @@ module BenefitSponsors
       end
 
       context 'matching one person PII' do
-        before {@status, @result = subject.add_broker_agency_staff_role(person1.first_name, person1.last_name, person1.dob,'#default@email.com', broker_agency_profile )}
+        before {@status, @result = subject.add_broker_agency_staff_role(person1.first_name, person1.last_name, person1.dob,'#default@email.com', broker_agency_profile)}
 
         it 'returns true' do
           expect(@status).to eq true
@@ -325,8 +332,8 @@ module BenefitSponsors
 
       context 'person already has broker role with this broker agency' do
         before do
-          subject.add_broker_agency_staff_role(person1.first_name, person1.last_name, person1.dob,'#default@email.com', broker_agency_profile )
-          @status, @result = subject.add_broker_agency_staff_role(person1.first_name, person1.last_name, person1.dob,'#default@email.com', broker_agency_profile )
+          subject.add_broker_agency_staff_role(person1.first_name, person1.last_name, person1.dob,'#default@email.com', broker_agency_profile)
+          @status, @result = subject.add_broker_agency_staff_role(person1.first_name, person1.last_name, person1.dob,'#default@email.com', broker_agency_profile)
         end
 
         it 'returns false' do

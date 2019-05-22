@@ -64,7 +64,7 @@ class BrokerAgencyStaffRole
   def approve
     broker_agency_accept!
   end
-  
+
   def current_state
     aasm_state.humanize.titleize
   end
@@ -94,7 +94,7 @@ class BrokerAgencyStaffRole
   def is_active?
     aasm_state == "active"
   end
-  
+
   ## Class methods
   class << self
     
