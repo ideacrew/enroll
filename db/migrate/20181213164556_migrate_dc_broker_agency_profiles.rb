@@ -56,8 +56,7 @@ class MigrateDcBrokerAgencyProfiles < Mongoid::Migration
 
           new_organization = if existing_new_organizations.present?
                                organization = existing_new_organizations.first
-                               organization.profiles << @new_profile
-                               organization
+                               @new_profile.organization = organization
                              else
                                self.initialize_new_organization(old_org, site)
                              end
@@ -65,6 +64,7 @@ class MigrateDcBrokerAgencyProfiles < Mongoid::Migration
           BenefitSponsors::Organizations::Organization.skip_callback(:create, :after, :notify_on_create, raise: false)
           BenefitSponsors::Organizations::Organization.skip_callback(:update, :after, :notify_observers, raise: false)
           BenefitSponsors::Organizations::Profile.skip_callback(:save, :after, :publish_profile_event, raise: false)
+          BenefitSponsors::Documents::Document.skip_callback(:create, :after, :notify_on_create, raise: false)
           new_organization.save!
           print '.' unless Rails.env.test?
           success = success + 1
