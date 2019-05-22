@@ -11,7 +11,7 @@ describe EmployerAttestation, dbclean: :after_each do
     let(:employer_organization)   { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile_no_attestation, site: site) }
     let(:employer_profile) { employer_organization.employer_profile }
     let(:site)                    { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-    let!(:employer_attestation) { FactoryGirl.build(:employer_attestation) }
+    let!(:employer_attestation) { FactoryGirl.create(:employer_attestation, employer_profile: employer_profile) }
 
     describe "Happy Path" do
 
@@ -98,7 +98,7 @@ describe EmployerAttestation, dbclean: :after_each do
 
   context ".revert" do
     let(:employer_profile) { FactoryGirl.create(:employer_profile)}
-    let!(:employer_attestation) { FactoryGirl.create(:employer_attestation,aasm_state:'denied',employer_profile:employer_profile) }
+    let!(:employer_attestation) { FactoryGirl.create(:employer_attestation, aasm_state: 'denied', employer_profile: employer_profile) }
         
     it 'should revert employer_attestation from denied to unsubmitted state' do
       employer_attestation.revert!
@@ -117,4 +117,15 @@ describe EmployerAttestation, dbclean: :after_each do
       expect(employer_attestation.aasm_state).to eq 'unsubmitted'
     end
   end
+
+  context ".resubmit" do
+    let(:employer_profile) { FactoryGirl.create(:employer_profile)}
+    let!(:employer_attestation) { FactoryGirl.create(:employer_attestation, aasm_state: 'denied', employer_profile: employer_profile) }
+
+    it 'should be updated employer_attestation from denied to submitted state' do
+      employer_attestation.resubmit!
+      expect(employer_attestation.aasm_state).to eq 'submitted'
+    end
+  end
+
 end
