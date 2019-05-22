@@ -1514,7 +1514,7 @@ class HbxEnrollment
   def decorated_hbx_enrollment
     if is_shop?
       @group_enrollment ||= HbxEnrollmentSponsoredCostCalculator.new(self).groups_for_products([product]).first.group_enrollment
-    elsif kind == 'individual'
+    else
       ivl_decorated_hbx_enrollment
     end
   end
@@ -1522,12 +1522,12 @@ class HbxEnrollment
   def ivl_decorated_hbx_enrollment
     return @cost_decorator if @cost_decorator
 
-    if plan.present? && consumer_role.present?
-      @cost_decorator = UnassistedPlanCostDecorator.new(plan, self)
-    elsif plan.present? && resident_role.present?
-      @cost_decorator = UnassistedPlanCostDecorator.new(plan, self)
+    if product.present? && consumer_role.present?
+      @cost_decorator = UnassistedPlanCostDecorator.new(product, self)
+    elsif product.present? && resident_role.present?
+      @cost_decorator = UnassistedPlanCostDecorator.new(product, self)
     else
-      log("#3835 hbx_enrollment without benefit_group and consumer_role. hbx_enrollment_id: #{id}, plan: #{plan}", {:severity => 'error'})
+      log("#3835 hbx_enrollment without benefit_group and consumer_role. hbx_enrollment_id: #{id}, plan: #{product}", {:severity => 'error'})
       @cost_decorator = OpenStruct.new(:total_premium => 0.00, :total_employer_contribution => 0.00, :total_employee_cost => 0.00)
     end
   end
