@@ -6,7 +6,7 @@ class Employers::CensusEmployeesController < ApplicationController
   def new
     @census_employee = build_census_employee(@employer_profile.try(:id))
     @no_ssn = @employer_profile.no_ssn || false
-
+    @broker_agency_profile_id = @employer_profile.active_broker_agency_account.broker_agency_profile_id if @employer_profile.active_broker_agency_account.present?
     if @no_ssn
       flash[:notice] = "SSN requirement is currently disabled. This means you are not required to input an SSN when adding new employees to your roster at this time."
     end
@@ -20,6 +20,7 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def create
+    @broker_agency_profile_id = @employer_profile.active_broker_agency_account.broker_agency_profile_id if @employer_profile.active_broker_agency_account.present?
     @census_employee = CensusEmployee.new(census_employee_params)
     @census_employee.assign_benefit_packages(benefit_group_id: benefit_group_id, renewal_benefit_group_id: renewal_benefit_group_id)
     @census_employee.employer_profile = @employer_profile
@@ -100,12 +101,10 @@ class Employers::CensusEmployeesController < ApplicationController
     authorize EmployerProfile, :updateable?
     status = params[:status]
     termination_date = params["termination_date"]
-
     if termination_date.present?
       termination_date = DateTime.strptime(termination_date, '%m/%d/%Y').try(:to_date)
       if termination_date >= (TimeKeeper.date_of_record - 60.days)
-        @fa = @census_employee.terminate_employment(termination_date) && @census_employee.save
-        notify_employee_of_termination
+        @fa = @census_employee.terminate_employment(termination_date)
       end
     end
 
@@ -192,15 +191,8 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def show
-    @family = @census_employee.employee_role.person.primary_family if @census_employee.employee_role.present?
     @no_ssn = @census_employee.no_ssn_allowed || false
 
-    past_enrollment_statuses = HbxEnrollment::TERMINATED_STATUSES
-    @past_enrollments = @census_employee.employee_role.person.primary_family.all_enrollments.select {
-        |hbx_enrollment| (past_enrollment_statuses.include? hbx_enrollment.aasm_state) && (@census_employee.benefit_group_assignments.map(&:id).include? hbx_enrollment.benefit_group_assignment_id)
-    } if @census_employee.employee_role.present?
-
-    @past_enrollments = @past_enrollments.reject { |r| r.coverage_expired?} if @census_employee.employee_role.present?
     @status = params[:status] || ''
 
     if @no_ssn && !@employer_profile.no_ssn && @census_employee.encrypted_ssn.nil?
@@ -238,14 +230,6 @@ class Employers::CensusEmployeesController < ApplicationController
 
   def benefit_group
     @census_employee.benefit_group_assignments.build unless @census_employee.benefit_group_assignments.present?
-  end
-
-  def notify_employee_of_termination
-    begin
-      ShopNoticesNotifierJob.perform_later(@census_employee.id.to_s, "employee_termination_notice")
-    rescue Exception => e
-      (Rails.logger.error { "Unable to deliver termination notice to #{@census_employee.full_name} due to #{e.inspect}" }) unless Rails.env.test?
-    end
   end
 
   private

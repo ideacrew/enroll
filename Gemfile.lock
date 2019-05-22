@@ -1,9 +1,9 @@
 GIT
   remote: https://github.com/dchbx/acapi.git
-  revision: 698345afa15dd2679ba864796e2c2abcb0ade03d
-  branch: 1.3.1
+  revision: 78549ede5f713283315a6eb0aead5b6f7a17ce90
+  branch: 1.3.2
   specs:
-    acapi (1.3.1)
+    acapi (1.3.2)
       activesupport (> 4.2.0)
       bunny (~> 1.7.0)
       sneakers
@@ -27,6 +27,25 @@ GIT
       pdf-reader (~> 1.2)
       ruby-rc4
       ttfunk (~> 1.0.3)
+
+PATH
+  remote: components/notifier
+  specs:
+    notifier (0.0.1)
+      aasm (~> 4.8.0)
+      acapi
+      ckeditor
+      combine_pdf
+      curl
+      mongoid (~> 5.0.1)
+      non-stupid-digest-assets
+      rails (~> 4.2.3)
+      redcarpet (~> 3.4.0)
+      roo (~> 2.1.0)
+      slim (= 3.0.8)
+      virtus (~> 1.0.5)
+      wicked_pdf (= 1.0.6)
+      wkhtmltopdf-binary-edge (~> 0.12.3.0)
 
 PATH
   remote: project_gems/effective_datatables-2.6.14
@@ -87,6 +106,8 @@ GEM
     animate-rails (1.0.10)
       rails
     arel (6.0.4)
+    awesome_print (1.8.0)
+    ast (2.4.0)
     aws-sdk (2.2.4)
       aws-sdk-resources (= 2.2.4)
     aws-sdk-core (2.2.4)
@@ -108,7 +129,6 @@ GEM
     builder (3.2.3)
     bunny (1.7.1)
       amq-protocol (~> 1.9.2)
-    byebug (8.2.2)
     capistrano (3.3.5)
       capistrano-stats (~> 1.1.0)
       i18n
@@ -162,8 +182,11 @@ GEM
       timers (>= 4.1.1)
     childprocess (0.8.0)
       ffi (~> 1.0, >= 1.0.11)
+    ckeditor (4.2.4)
+      cocaine
+      orm_adapter (~> 0.5.0)
+    climate_control (0.2.0)
     cliver (0.3.2)
-    coderay (1.1.2)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
     coffee-rails (4.1.1)
@@ -197,6 +220,9 @@ GEM
       nokogiri (~> 1.5)
       railties (>= 3, < 5)
     cucumber-wire (0.0.1)
+    curl (0.0.9)
+      awesome_print (>= 0.2.1)
+      unidecoder (>= 1.1.1)
     database_cleaner (1.5.3)
     debug_inspector (0.0.3)
     deep_merge (1.0.1)
@@ -210,6 +236,7 @@ GEM
       thread_safe (~> 0.1)
       warden (~> 1.2.3)
     diff-lcs (1.3)
+    docile (1.1.5)
     easy_diff (1.0.0)
     email_spec (2.0.0)
       htmlentities (~> 4.3.3)
@@ -260,6 +287,7 @@ GEM
       multi_xml (>= 0.5.2)
     i18n (0.7.0)
     ice_nine (0.11.2)
+    iniparse (1.4.4)
     interactor (3.1.0)
     interactor-rails (2.0.2)
       interactor (~> 3.0)
@@ -304,7 +332,6 @@ GEM
     mail (2.6.3)
       mime-types (>= 1.16, < 3)
     maskedinput-rails (1.4.1.0)
-    method_source (0.9.0)
     mime-types (2.99.3)
     mini_portile2 (2.0.0)
     minitest (5.10.3)
@@ -363,11 +390,18 @@ GEM
       mini_portile2 (~> 2.0.0.rc2)
     nokogiri-happymapper (0.6.0)
       nokogiri (~> 1.5)
+    non-stupid-digest-assets (1.0.9)
+      sprockets (>= 2.0)
     origin (2.3.1)
     orm_adapter (0.5.0)
+    overcommit (0.44.0)
+      childprocess (~> 0.6, >= 0.6.3)
+      iniparse (~> 1.4)
     parallel (1.12.1)
     parallel_tests (2.21.3)
       parallel
+    parser (2.6.0.0)
+      ast (~> 2.4.0)
     pdf-reader (1.4.1)
       Ascii85 (~> 1.0.0)
       afm (~> 0.2.1)
@@ -378,20 +412,7 @@ GEM
       capybara (~> 2.1)
       cliver (~> 0.3.1)
       websocket-driver (>= 0.2.0)
-    pry (0.11.3)
-      coderay (~> 1.1.0)
-      method_source (~> 0.9.0)
-    pry-byebug (3.3.0)
-      byebug (~> 8.0)
-      pry (~> 0.10)
-    pry-rails (0.3.6)
-      pry (>= 0.10.4)
-    pry-remote (0.1.8)
-      pry (~> 0.9)
-      slop (~> 3.0)
-    pry-stack_explorer (0.4.9.2)
-      binding_of_caller (>= 0.7)
-      pry (>= 0.9.11)
+    powerpack (0.1.2)
     pundit (1.0.1)
       activesupport (>= 3.0.0)
     rack (1.6.9)
@@ -427,6 +448,7 @@ GEM
       activesupport (= 4.2.7.1)
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
+    rainbow (3.0.0)
     raindrops (0.19.0)
     rake (12.3.0)
     rb-fsevent (0.10.2)
@@ -435,6 +457,7 @@ GEM
     rdoc (4.3.0)
     recaptcha (1.1.0)
       json
+    redcarpet (3.4.0)
     redis (3.3.5)
     redis-actionpack (5.0.2)
       actionpack (>= 4.0, < 6)
@@ -491,7 +514,16 @@ GEM
     rspec_junit_formatter (0.2.3)
       builder (< 4)
       rspec-core (>= 2, < 4, != 2.12.0)
-    ruby-progressbar (1.6.0)
+    rubocop (0.54.0)
+      parallel (~> 1.10)
+      parser (>= 2.5)
+      powerpack (~> 0.1)
+      rainbow (>= 2.2.2, < 4.0)
+      ruby-progressbar (~> 1.7)
+      unicode-display_width (~> 1.0, >= 1.0.1)
+    rubocop-git (0.1.3)
+      rubocop (>= 0.24.1)
+    ruby-progressbar (1.10.0)
     ruby-rc4 (0.1.5)
     ruby-saml (1.3.1)
       nokogiri (>= 1.5.10)
@@ -525,18 +557,22 @@ GEM
     simple_form (3.5.0)
       actionpack (> 4, < 5.2)
       activemodel (> 4, < 5.2)
+    simplecov (0.14.1)
+      docile (~> 1.1.0)
+      json (>= 1.8, < 3)
+      simplecov-html (~> 0.10.0)
+    simplecov-html (0.10.2)
     sinatra (1.4.8)
       rack (~> 1.5)
       rack-protection (~> 1.4)
       tilt (>= 1.3, < 3)
-    slim (3.0.9)
+    slim (3.0.8)
       temple (>= 0.7.6, < 0.9)
       tilt (>= 1.3.3, < 2.1)
     slim-rails (3.1.3)
       actionpack (>= 3.1)
       railties (>= 3.1)
       slim (~> 3.0)
-    slop (3.6.0)
     sneakers (1.1.2)
       bunny (>= 1.7.0, <= 2.0.0)
       serverengine (~> 1.5.5)
@@ -559,6 +595,8 @@ GEM
     symmetric-encryption (3.6.0)
       coercible (>= 1.0.0)
     temple (0.8.0)
+    terrapin (0.6.0)
+      climate_control (>= 0.0.3, < 1.0)
     therubyracer (0.12.3)
       libv8 (~> 3.16.14.15)
       ref
@@ -575,10 +613,12 @@ GEM
       thread_safe (~> 0.1)
     uglifier (4.0.2)
       execjs (>= 0.3.0, < 3)
+    unicode-display_width (1.4.1)
     unicorn (4.8.3)
       kgio (~> 2.6)
       rack
       raindrops (~> 0.7)
+    unidecoder (1.1.2)
     vegas (0.1.11)
       rack (>= 1.0.0)
     virtus (1.0.5)
@@ -619,17 +659,18 @@ DEPENDENCIES
   bootstrap-multiselect-rails (~> 0.9.9)
   bootstrap-slider-rails (= 6.0.17)
   bson (= 3.2.6)
-  byebug (= 8.2.2)
   capistrano (= 3.3.5)
   capistrano-rails (= 1.1.6)
   capybara (= 2.6.2)
   capybara-screenshot
   carrierwave-mongoid
+  ckeditor
   coffee-rails (~> 4.1.0)
   combine_pdf
   config (~> 1.0.0)
   cucumber (= 2.3.3)
   cucumber-rails (= 1.4.3)
+  curl
   database_cleaner (= 1.5.3)
   devise (~> 3.4.1)
   effective_datatables!
@@ -666,30 +707,33 @@ DEPENDENCIES
   newrelic_rpm
   nokogiri (= 1.6.7.2)
   nokogiri-happymapper
+  non-stupid-digest-assets (~> 1.0, >= 1.0.9)
+  notifier!
   openhbx_cv2!
+  overcommit
   parallel_tests (= 2.21.3)
   poltergeist
   prawn!
-  pry
-  pry-byebug
-  pry-rails
-  pry-remote
-  pry-stack_explorer
   pundit (~> 1.0.1)
   railroady (~> 1.5.2)
   rails (= 4.2.7.1)
   rails-i18n (= 4.0.8)
   recaptcha (= 1.1.0)
+  redcarpet (= 3.4.0)
   redis-rails
   resque
   roo (~> 2.1.0)
   rspec-rails (~> 3.4.2)
   rspec_junit_formatter (= 0.2.3)
-  ruby-progressbar (= 1.6.0)
+  rubocop (= 0.54.0)
+  rubocop-git
+  ruby-progressbar (~> 1.7)
   ruby-saml (~> 1.3.0)
   sass-rails (~> 5.0)
   sdoc (~> 0.4.0)
   shoulda-matchers (= 3.1.1)
+  slim (= 3.0.8)
+  simplecov (= 0.14.1)
   slim-rails
   spring (= 1.6.3)
   sprockets (~> 2.12.3)
@@ -708,4 +752,4 @@ DEPENDENCIES
   yard-mongoid (~> 0.1.0)
 
 BUNDLED WITH
-   1.16.0
+   1.17.1

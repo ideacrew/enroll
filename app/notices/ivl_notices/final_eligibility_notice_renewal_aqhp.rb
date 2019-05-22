@@ -1,6 +1,6 @@
 class IvlNotices::FinalEligibilityNoticeRenewalAqhp < IvlNotice
   include ApplicationHelper
-  attr_accessor :family, :data, :person, :enrollments
+  attr_accessor :family, :data, :person, :enrollments, :renewing_enrollments, :active_enrollments
 
   def initialize(consumer_role, args = {})
     args[:recipient] = consumer_role.person
@@ -9,7 +9,9 @@ class IvlNotices::FinalEligibilityNoticeRenewalAqhp < IvlNotice
     args[:recipient_document_store]= consumer_role.person
     args[:to] = consumer_role.person.work_email_or_best
     self.person = args[:person]
-    self.enrollments = args[:enrollments]
+    self.renewing_enrollments = args[:renewing_enrollments]
+    self.active_enrollments = args[:active_enrollments]
+    self.enrollments = args[:renewing_enrollments] + args[:active_enrollments]
     self.data = args[:data]
     self.header = "notices/shared/header_ivl.html.erb"
     super(args)
@@ -123,7 +125,7 @@ class IvlNotices::FinalEligibilityNoticeRenewalAqhp < IvlNotice
   end
 
   def append_enrollment_information
-    enrollments.each do |enrollment|
+    renewing_enrollments.each do |enrollment|
       plan = PdfTemplates::Plan.new({
                                         plan_name: enrollment.plan.name,
                                         is_csr: enrollment.plan.is_csr?,

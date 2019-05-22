@@ -188,7 +188,8 @@ describe EventsHelper, "transforming a qualifying event kind for external xml" d
     "new_eligibility_member" => "drop_family_member_due_to_new_eligibility",
     "new_eligibility_family" => "drop_family_member_due_to_new_eligibility",
     "employer_sponsored_coverage_termination" => "eligibility_change_employer_ineligible",
-    "divorce" => "divorce"
+    "divorce" => "divorce",
+    "unknown_sep" => "exceptional_circumstances"
   }
 
   subject { EventsHelperSlug.new }
@@ -214,6 +215,10 @@ describe EventsHelper, "selecting plan years to be exported" do
 
 
     context "draft plan year" do
+      before do
+        plan_year.update_attributes({:aasm_state => "draft"})
+      end
+
       it "should return []" do
         expect(subject.plan_years_for_manual_export(employer_profile)).to eq []
       end

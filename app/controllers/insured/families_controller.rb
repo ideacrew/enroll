@@ -17,7 +17,8 @@ class Insured::FamiliesController < FamiliesController
     set_bookmark_url
     set_admin_bookmark_url
     @active_sep = @family.latest_active_sep
-
+    @employer_profile = EmployerProfile.find(params[:employer_profile_id]) if params[:employer_profile_id].present?
+    @broker_agency_profile_id = @employer_profile.active_broker_agency_account.broker_agency_profile_id if @employer_profile.present?
     log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
 
     @hbx_enrollments = @family.enrollments.order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) || []
@@ -30,7 +31,7 @@ class Insured::FamiliesController < FamiliesController
     update_changing_hbxs(@hbx_enrollments)
 
     @hbx_enrollments = @hbx_enrollments.reject{ |r| !valid_display_enrollments.include? r._id }
-
+    @hbx_enrollments = @hbx_enrollments[0..3] if @hbx_enrollments.size > 4
     @employee_role = @person.active_employee_roles.first
     @tab = params['tab']
     @family_members = @family.active_family_members
@@ -89,6 +90,7 @@ class Insured::FamiliesController < FamiliesController
       special_enrollment_period.selected_effective_on = Date.strptime(params[:effective_on_date], "%m/%d/%Y") if params[:effective_on_date].present?
       special_enrollment_period.qualifying_life_event_kind = qle
       special_enrollment_period.qle_on = Date.strptime(params[:qle_date], "%m/%d/%Y")
+      special_enrollment_period.market_kind = qle.market_kind == "shop" ? "shop" : "ivl"
       special_enrollment_period.save
     end
 
@@ -119,10 +121,12 @@ class Insured::FamiliesController < FamiliesController
     @sent_box = false
     @provider = @person
     @family_members = @family.active_family_members
+    @broker_agency_profile_id = @person.broker_role.broker_agency_profile_id if @person.broker_role.present?
   end
 
   def verification
     @family_members = @person.primary_family.has_active_consumer_family_members
+    @broker_agency_profile_id = @person.broker_role.broker_agency_profile_id if @person.broker_role.present?
   end
 
   def upload_application
@@ -130,6 +134,7 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def check_qle_date
+    today = TimeKeeper.date_of_record
     @qle_date = Date.strptime(params[:date_val], "%m/%d/%Y")
     start_date = TimeKeeper.date_of_record - 30.days
     end_date = TimeKeeper.date_of_record + 30.days
@@ -142,7 +147,7 @@ class Insured::FamiliesController < FamiliesController
       @qle_reason_val = params[:qle_reason_val] if params[:qle_reason_val].present?
       @qle_end_on = @qle_date + @qle.post_event_sep_in_days.try(:days)
     end
-
+    
     @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
     if @person.has_active_employee_role? && !(@qle.present? && @qle.individual?)
       @future_qualified_date = (@qle_date > TimeKeeper.date_of_record) ? true : false
@@ -152,10 +157,11 @@ class Insured::FamiliesController < FamiliesController
       @resident_role_id = @person.resident_role.id
     end
 
-    if ((@qle.present? && @qle.shop?) && !@qualified_date && !@person.has_multiple_active_employers? )
-      sep_request_denial_notice
-    elsif is_ee_sep_request_accepted?
-      ee_sep_request_accepted_notice
+    if ((@qle.present? && @qle.shop?) && !@qualified_date && params[:qle_id].present? )
+      plan_year = @person.active_employee_roles.map(&:employer_profile).map(&:active_plan_year).compact.first
+      reporting_deadline = @qle_date > today ? today : @qle_date + 30.days
+      event_name = @person.has_multiple_active_employers? ? 'sep_denial_notice_for_ee_active_on_multiple_rosters' : 'sep_denial_notice_for_ee_active_on_single_roster'
+      trigger_notice_observer(@person.active_employee_roles.first, plan_year, event_name, qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: @qle_date.strftime("%m/%d/%Y"))
     end
   end
 
@@ -240,29 +246,6 @@ class Insured::FamiliesController < FamiliesController
     @family = Family.find(params[:id])
     if @family.current_broker_agency.destroy
       redirect_to :action => "home" , flash: {notice: "Successfully deleted."}
-    end
-  end
-
-  def sep_request_denial_notice
-    begin
-      ShopNoticesNotifierJob.perform_later(@person.active_employee_roles.first.census_employee.id.to_s, "sep_request_denial_notice",qle_reported_date: "#{@qle_date}", qle_title: @qle.title)
-    rescue Exception => e
-      log("#{e.message}; person_id: #{@person.id}")
-    end
-  end
-
-  def is_ee_sep_request_accepted?
-    !@person.has_multiple_active_employers? && @qle.present? && @qle.shop?
-  end
-
-  def ee_sep_request_accepted_notice
-    employee_role = @person.active_employee_roles.first
-    if employee_role.present? && employee_role.census_employee.present?
-      begin
-        ShopNoticesNotifierJob.perform_later(employee_role.census_employee.id.to_s, "ee_sep_request_accepted_notice", {title: @qle.title, end_on: "#{@qle_end_on}", qle_on: "#{@qle_date}"} )
-      rescue Exception => e
-        Rails.logger.error{"Unable to deliver employee SEP accepted notice to person_id: #{@person.id} due to #{e.message}"}
-      end
     end
   end
 

@@ -5,7 +5,7 @@ RSpec.describe "layouts/_header.html.erb" do
   let(:person_user){Person.new(first_name: 'fred', last_name: 'flintstone')}
   let(:current_user){FactoryGirl.create(:user, :person=>person_user)}
   let(:broker_role){FactoryGirl.build(:broker_role, broker_agency_profile_id: 98)}
-  let(:employer_profile){ FactoryGirl.build(:employer_profile) }
+  let(:employer_profile){ FactoryGirl.create(:employer_profile) }
   let(:employer_staff_role){ FactoryGirl.build(:employer_staff_role, :person=>person_user, :employer_profile_id=>employer_profile.id)}
   let(:signed_in?){ true }
   before(:each) do
@@ -19,6 +19,8 @@ RSpec.describe "layouts/_header.html.erb" do
   end
   it 'identifies Brokers' do
     current_user.roles=['broker_agency_staff']
+    controller.params[:id] = "100"
+    allow(controller).to receive(:controller_path).and_return("broker_agencies")
     person_user.broker_role = broker_role
     current_user.save
     render :template => 'layouts/_header.html.erb'
@@ -26,6 +28,7 @@ RSpec.describe "layouts/_header.html.erb" do
   end
   it 'identifies Employers' do
     allow(person_user).to receive(:employer_staff_roles).and_return([employer_staff_role])
+    allow(view).to receive(:controller_path).and_return("employer_profiles")
     current_user.roles=['employer_staff']
     current_user.save
     render :template => 'layouts/_header.html.erb'

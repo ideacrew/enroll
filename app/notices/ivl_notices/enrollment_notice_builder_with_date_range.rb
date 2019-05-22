@@ -5,13 +5,20 @@ class IvlNotices::EnrollmentNoticeBuilderWithDateRange < IvlNotice
 
   def initialize(consumer_role, args = {})
     @hbx_enrollment_hbx_ids = args[:options][:hbx_enrollment_hbx_ids]
-    args[:recipient] = consumer_role.person.families.first.primary_applicant.person
+    args[:recipient] = consumer_role.person
     args[:notice] = PdfTemplates::ConditionalEligibilityNotice.new
     args[:market_kind] = 'individual'
-    args[:recipient_document_store]= consumer_role.person.families.first.primary_applicant.person
-    args[:to] = consumer_role.person.families.first.primary_applicant.person.work_email_or_best
+    args[:recipient_document_store]= consumer_role.person
+    args[:to] = consumer_role.person.work_email_or_best
     self.header = "notices/shared/header_ivl.html.erb"
     super(args)
+  end
+
+  def attach_required_documents
+    generate_custom_notice('notices/ivl/documents_section')
+    attach_blank_page(custom_notice_path)
+    join_pdfs [notice_path, custom_notice_path]
+    clear_tmp
   end
 
   def deliver
@@ -49,12 +56,9 @@ class IvlNotices::EnrollmentNoticeBuilderWithDateRange < IvlNotice
     if recipient.mailing_address
       append_address(recipient.mailing_address)
     else
-      # @notice.primary_address = nil
       raise 'mailing address not present'
     end
   end
-
-
 
   def append_open_enrollment_data
     hbx = HbxProfile.current_hbx
@@ -132,59 +136,34 @@ class IvlNotices::EnrollmentNoticeBuilderWithDateRange < IvlNotice
 
   def update_individual_due_date(person, date)
     person.consumer_role.types_include_to_notices.each do |verification_type|
-      unless verification_type.due_date
+      unless verification_type.due_date && verification_type.due_date_type
         verification_type.update_attributes(due_date: (date + Settings.aca.individual_market.verification_due.days), due_date_type: "notice")
         person.consumer_role.save!
       end
     end
   end
 
-  def ssn_outstanding?(person)
-    person.consumer_role.types_include_to_notices.include?("Social Security Number")
-  end
-
-  def lawful_presence_outstanding?(person)
-    person.consumer_role.types_include_to_notices.include?('Citizenship')
-  end
-
-  def immigration_status_outstanding?(person)
-   person.consumer_role.types_include_to_notices.include?('Immigration status')
-  end
-
-  def american_indian_status_outstanding?(person)
-    person.consumer_role.types_include_to_notices.include?('American Indian Status')
-  end
-
-  def residency_outstanding?(person)
-    person.consumer_role.types_include_to_notices.include?('DC Residency')
-  end
-
   def append_unverified_individuals(people)
     people.each do |person|
-      if ssn_outstanding?(person)
-        notice.ssa_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
-      end
-
-      if lawful_presence_outstanding?(person)
-        notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
-      end
-
-      if immigration_status_outstanding?(person)
-        notice.immigration_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
-      end
-
-      if american_indian_status_outstanding?(person)
-        notice.american_indian_unverified  << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
-      end
-
-      if residency_outstanding?(person)
-        notice.residency_inconsistency  << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
+      person.consumer_role.outstanding_verification_types.each do |verification_type|
+        case verification_type.type_name
+        when "Social Security Number"
+          notice.ssa_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: document_due_date(person, verification_type), age: person.age_on(TimeKeeper.date_of_record) })
+        when "Immigration status"
+          notice.immigration_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: document_due_date(person, verification_type), age: person.age_on(TimeKeeper.date_of_record) })
+        when "Citizenship"
+          notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: document_due_date(person, verification_type), age: person.age_on(TimeKeeper.date_of_record) })
+        when "American Indian Status"
+          notice.american_indian_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: document_due_date(person, verification_type), age: person.age_on(TimeKeeper.date_of_record) })
+        when "DC Residency"
+          notice.residency_inconsistency << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: document_due_date(person, verification_type), age: person.age_on(TimeKeeper.date_of_record) })
+        end
       end
     end
   end
 
   def document_due_date(person, verification_type)
-    person.consumer_role.verification_types.by_name(verification_type).first.due_date
+    person.consumer_role.verification_types.by_name(verification_type.type_name).first.due_date
   end
 
   def phone_number(legal_name)

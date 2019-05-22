@@ -235,7 +235,15 @@ describe "#latest_active_tax_household_with_year" do
   it "should rerturn nil when can not found taxhousehold" do
     expect(consumer_role.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year, family)).to eq nil
   end
-end
+  context "vlp exist but document is NOT uploaded" do
+      let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
+        it "returns false for vlp doc without uploaded copy" do
+          unverified_types= person.verification_types.active.where(applied_roles: "consumer_role")
+          unverify_count= unverified_types.reject{|a| a.type_verified? == true}.size
+          expect(person.consumer_role.types_include_to_notices.count).to eq(unverify_count)
+        end   
+      end
+  end
 
 context "Verification process and notices" do
   let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
@@ -412,6 +420,23 @@ context "Verification process and notices" do
         it_behaves_like "IVL state machine transitions and workflow", nil, "alien_lawfully_present", false, "outstanding", :unverified, :dhs_pending, "coverage_purchased!"
         it_behaves_like "IVL state machine transitions and workflow", nil, "lawful_permanent_resident", false, "outstanding", :unverified, :dhs_pending, "coverage_purchased!"
         it_behaves_like "IVL state machine transitions and workflow", nil, "lawful_permanent_resident", true, "valid", :unverified, :dhs_pending, "coverage_purchased!"
+
+        context "not_lawfully_present_in_us" do
+
+          before do
+            allow(person).to receive(:ssn).and_return nil
+            allow(consumer).to receive(:citizen_status).and_return "not_lawfully_present_in_us"
+            consumer.lawful_presence_determination.update_attributes!(citizen_status: "not_lawfully_present_in_us")
+            consumer.coverage_purchased! verification_attr
+            consumer.reload
+            consumer.fail_dhs! verification_attr
+            consumer.reload
+          end
+
+          it "should store QNC result" do
+            expect(consumer.aasm_state).not_to be "unverified"
+          end
+        end
       end
 
       describe "indian tribe member with ssn" do
@@ -1074,6 +1099,26 @@ describe "#add_type_history_element" do
     person.consumer_role.verification_type_history_elements.delete_all
     person.consumer_role.add_type_history_element(attr)
     expect(person.consumer_role.verification_type_history_elements.size).to be > 0
+  end
+end
+
+describe 'coverage_purchased!' do
+  let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
+  let(:consumer) {person.consumer_role}
+  let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx" })}
+  let(:start_date) { person.consumer_role.requested_coverage_start_date}
+
+
+  it "should trigger call to ssa hub" do
+    expect_any_instance_of(LawfulPresenceDetermination).to receive(:notify).with("local.enroll.lawful_presence.ssa_verification_request", {:person => person})
+    person.consumer_role.coverage_purchased!
+  end
+
+  it "should trigger call to dhs hub if person is non native and no ssn " do
+    person.update_attributes(ssn: nil)
+    person.consumer_role.lawful_presence_determination.update_attributes(citizen_status: nil)
+    expect_any_instance_of(LawfulPresenceDetermination).to receive(:notify).with("local.enroll.lawful_presence.vlp_verification_request", {:person => person, :coverage_start_date => start_date})
+    person.consumer_role.coverage_purchased!
   end
 end
 

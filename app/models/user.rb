@@ -7,6 +7,7 @@ class User
   include Mongoid::Timestamps
   include Acapi::Notifiers
   include AuthorizationConcern
+  include Mongoid::History::Trackable
   include PermissionsConcern
 
   attr_accessor :login
@@ -162,6 +163,15 @@ class User
   index({oim_id: 1}, {sparse: true, unique: true})
   index({created_at: 1 })
 
+  track_history   :on => [:oim_id,
+                        :email],
+                  :modifier_field => :modifier,
+                  :version_field => :tracking_version,
+                  :track_create  => true,
+                  :track_update  => true,
+                  :track_destroy => true
+
+
 
   before_save :strip_empty_fields
 
@@ -266,7 +276,7 @@ class User
   end
 
   def has_broker_agency_staff_role?
-    has_role?(:broker_agency_staff)
+   person && person.has_active_broker_staff_role?
   end
 
   def has_general_agency_staff_role?

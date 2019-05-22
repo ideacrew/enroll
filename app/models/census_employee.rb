@@ -7,8 +7,12 @@ class CensusEmployee < CensusMember
   # include Validations::EmployeeInfo
   include Autocomplete
   include Acapi::Notifiers
+  extend Acapi::Notifiers
   include ::Eligibility::CensusEmployee
   include ::Eligibility::EmployeeBenefitPackages
+  include Insured::FamiliesHelper
+  include ModelEvents::CensusEmployee
+  include Concerns::Observable
 
   require 'roo'
 
@@ -70,6 +74,7 @@ class CensusEmployee < CensusMember
 
   before_save :allow_nil_ssn_updates_dependents
   after_save :construct_employee_role
+  after_save :notify_on_save
 
   index({aasm_state: 1})
   index({last_name: 1})
@@ -124,6 +129,8 @@ class CensusEmployee < CensusMember
   scope :by_benefit_group_assignment_ids, ->(benefit_group_assignment_ids) { any_in("benefit_group_assignments._id" => benefit_group_assignment_ids) }
   scope :by_benefit_group_ids,            ->(benefit_group_ids) { any_in("benefit_group_assignments.benefit_group_id" => benefit_group_ids) }
   scope :by_ssn,                          ->(ssn) { where(encrypted_ssn: CensusMember.encrypt_ssn(ssn)).and(:encrypted_ssn.nin => ["", nil]) }
+  scope :search_with_ssn_dob,              ->(ssn, dob) { unscoped.where(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob) }
+  scope :search_dependent_with_ssn_dob,    ->(ssn, dob) { unscoped.where(:"census_dependents.encrypted_ssn" => CensusMember.encrypt_ssn(ssn), :"census_dependents.dob" => dob) }
 
   scope :matchable, ->(ssn, dob) {
     matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: {"$in": ELIGIBLE_STATES })
@@ -314,14 +321,23 @@ class CensusEmployee < CensusMember
     email.address
   end
 
+  def can_be_reinstated?
+    self.employment_terminated? || self.cobra_terminated?
+  end
+
+  def reinstate_employment
+    if self.may_reinstate_eligibility?
+      self.update_attributes({:employment_terminated_on => nil, :coverage_terminated_on => nil})
+      reinstate_eligibility!
+    end
+  end
+
   def terminate_employment(employment_terminated_on)
     begin
       terminate_employment!(employment_terminated_on)
     rescue => e
       Rails.logger.error { e }
       false
-    else
-      self
     end
   end
 
@@ -378,8 +394,9 @@ class CensusEmployee < CensusMember
     end
   end
 
+  def terminate_employment!(employment_terminated_on)
+    success = false
 
-   def terminate_employment!(employment_terminated_on)
     if may_schedule_employee_termination?
       self.employment_terminated_on = employment_terminated_on
       self.coverage_terminated_on = earliest_coverage_termination_on(employment_terminated_on)
@@ -387,19 +404,19 @@ class CensusEmployee < CensusMember
 
     if employment_terminated_on < TimeKeeper.date_of_record
       if may_terminate_employee_role?
-        terminate_employee_role!
+        success = terminate_employee_role!
         # perform_employer_plan_year_count
       else
         message = "Error terminating employment: unable to terminate employee role for: #{self.full_name}"
         Rails.logger.error { message }
         raise CensusEmployeeError, message
       end
-    else # Schedule Future Terminations as employment_terminated_on is in the future
-      schedule_employee_termination! if may_schedule_employee_termination?
+    elsif may_schedule_employee_termination? # Schedule Future Terminations as employment_terminated_on is in the future
+      success = schedule_employee_termination!
     end
 
     terminate_employee_enrollments
-    self
+    success
   end
 
   def earliest_coverage_termination_on(employment_termination_date, submitted_date = TimeKeeper.date_of_record)
@@ -483,7 +500,7 @@ class CensusEmployee < CensusMember
     return false if person.blank? || (person.present? &&
                                       person.has_active_employee_role_for_census_employee?(self))
     Factories::EnrollmentFactory.build_employee_role(person, nil, employer_profile, self, hired_on)
-    self.trigger_notices("employee_eligibility_notice")#sends EE eligibility notice to census employee
+
     return true
   end
 
@@ -588,14 +605,13 @@ class CensusEmployee < CensusMember
       CensusEmployee.rebase_newly_designated_employees
       CensusEmployee.terminate_future_scheduled_census_employees(new_date)
       CensusEmployee.initial_employee_open_enrollment_notice(new_date)
-      CensusEmployee.census_employee_open_enrollment_reminder_notice(new_date)
     end
 
     def initial_employee_open_enrollment_notice(date)
       census_employees = CensusEmployee.where(:"hired_on" => date).non_terminated
       census_employees.each do |ce|
         begin
-          Invitation.invite_future_employee_for_open_enrollment!(ce)
+          Invitation.invite_employee_for_open_enrollment!(ce)
         rescue Exception => e
           (Rails.logger.error { "Unable to deliver open enrollment notice to #{ce.full_name} due to --- #{e}" }) unless Rails.env.test?
         end
@@ -631,25 +647,6 @@ class CensusEmployee < CensusMember
           census_employee.terminate_employee_role!
         rescue Exception => e
           (Rails.logger.error { "Error while terminating future scheduled cesus employee - #{census_employee.full_name} due to #{e}" }) unless Rails.env.test?
-        end
-      end
-    end
-
-    def census_employee_open_enrollment_reminder_notice(date)
-      organizations = Organization.where(:"employer_profile.plan_years" => {:$elemMatch => {:aasm_state.in => ["enrolling", "renewing_enrolling"], :open_enrollment_end_on => date+2.days}})
-      organizations.each do |org|
-        plan_year = org.employer_profile.plan_years.where(:aasm_state.in => ["enrolling", "renewing_enrolling"]).first
-        #exclude congressional employees
-        next if plan_year.benefit_groups.any?{|bg| bg.is_congress?}
-        census_employees = org.employer_profile.census_employees.non_terminated
-        census_employees.each do |ce|
-          begin
-            #exclude new hires
-            next if (ce.new_hire_enrollment_period.cover?(date) || ce.new_hire_enrollment_period.first > date)
-            ShopNoticesNotifierJob.perform_later(ce.id.to_s, "employee_open_enrollment_reminder")
-          rescue Exception => e
-            (Rails.logger.error { "Unable to deliver open enrollment reminder notice to #{ce.full_name} due to #{e}" }) unless Rails.env.test?
-          end
         end
       end
     end
@@ -916,6 +913,16 @@ class CensusEmployee < CensusMember
     end
   end
 
+  #sort and display latest expired enrollments in desc order
+  def past_enrollments
+    if employee_role.blank?
+      []
+    else
+      enrollments = employee_role.person.primary_family.all_enrollments.terminated.shop_market
+      enrollments.select{|e| e.benefit_group_assignment.present? && e.benefit_group_assignment.census_employee == self && !enrollments_for_display.include?(e) && !e.void?}.sort_by { |enr| enrollment_coverage_end(enr)}.reverse
+    end
+  end
+
   private
 
   def record_transition
@@ -966,7 +973,7 @@ class CensusEmployee < CensusMember
 
   def active_census_employee_is_unique
     potential_dups = CensusEmployee.by_ssn(ssn).by_employer_profile_id(employer_profile_id).active
-    if potential_dups.detect { |dup| dup.id != self.id  }
+    if potential_dups.detect { |dup| dup.id != self.id }
       message = "Employee with this identifying information is already active. "\
                 "Update or terminate the active record before adding another."
       errors.add(:base, message)

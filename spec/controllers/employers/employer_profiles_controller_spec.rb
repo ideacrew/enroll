@@ -236,6 +236,7 @@ RSpec.describe Employers::EmployerProfilesController do
         allow(employer_profile).to receive(:show_plan_year).and_return(plan_year)
         allow(employer_profile).to receive(:enrollments_for_billing).and_return([hbx_enrollment])
         allow(employer_profile).to receive(:broker_agency_accounts).and_return([broker_agency_account])
+        allow(employer_profile).to receive(:active_broker_agency_account).and_return(broker_agency_account)
         allow(employer_profile).to receive_message_chain(:organization ,:documents).and_return([])
         sign_in(user)
       end
@@ -554,15 +555,6 @@ RSpec.describe Employers::EmployerProfilesController do
 
       it "renders the 'edit' template" do
         expect(response).to have_http_status(:redirect)
-      end
-    end
-
-    context "after account creation" do
-      let(:validation_result) { true }
-
-      it "sends employer_account_creation_notice" do 
-        expect(controller).to receive(:employer_account_creation_notice)
-        controller.employer_account_creation_notice
       end
     end
   end

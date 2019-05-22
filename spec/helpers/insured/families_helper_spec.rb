@@ -300,5 +300,22 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
       end
     end
 
+
+    context "#Enrollment coverage" do
+      let!(:person) { FactoryGirl.build_stubbed(:person)}
+      let!(:family) { FactoryGirl.build_stubbed(:family, :with_primary_family_member, person: person) }
+      let!(:household) { FactoryGirl.build_stubbed(:household, family: family) }
+      let!(:hbx_enrollment) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household, aasm_state: "coverage_expired", effective_on: TimeKeeper.date_of_record) }
+      let!(:hbx_profile) { FactoryGirl.create(:hbx_profile)}
+      let!(:benefit_coverage_periods) { HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.by_date(hbx_enrollment.effective_on).first}
+
+      it "should return benefit coverage period" do
+        expect(benefit_coverage_periods.present?).to eq true
+      end
+
+      it "should return benefit coverage period end date" do
+        expect(enrollment_coverage_end(hbx_enrollment)).to eq hbx_enrollment.effective_on.end_of_year
+      end
+    end
   end
 end

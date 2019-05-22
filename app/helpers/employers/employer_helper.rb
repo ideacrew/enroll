@@ -16,7 +16,7 @@ module Employers::EmployerHelper
   end
   
   def enrollment_state(census_employee=nil)
-    humanize_enrollment_states(census_employee.active_benefit_group_assignment).gsub("Coverage Selected", "Enrolled").gsub("Coverage Waived", "Waived").gsub("Coverage Terminated", "Terminated").html_safe
+    humanize_enrollment_states(census_employee.active_benefit_group_assignment).gsub("Coverage Selected", "Enrolled").gsub("Coverage Waived", "Waived").gsub("Coverage Terminated", "Terminated").gsub("Coverage Termination Pending", "Coverage Termination Pending").html_safe
   end
 
   def renewal_enrollment_state(census_employee=nil)
@@ -45,7 +45,8 @@ module Employers::EmployerHelper
     assignment_mapping = {
       'coverage_renewing' => HbxEnrollment::RENEWAL_STATUSES,
       'coverage_terminated' => HbxEnrollment::TERMINATED_STATUSES,
-      'coverage_selected' => HbxEnrollment::ENROLLED_STATUSES,
+      'coverage_termination_pending' => ["coverage_termination_pending"],
+      'coverage_selected' => HbxEnrollment::ENROLLED_STATUSES - ["coverage_termination_pending"],
       'coverage_waived' => HbxEnrollment::WAIVED_STATUSES
     }
 

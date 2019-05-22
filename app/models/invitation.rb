@@ -189,10 +189,6 @@ class Invitation
     UserMailer.send_employee_open_enrollment_invitation(invitation_email, census_employee, self).deliver_now
   end
 
-  def send_future_employee_invitation_for_open_enrollment!(census_employee)
-    UserMailer.send_future_employee_open_enrollment_invitation(invitation_email, census_employee, self).deliver_now
-  end
-
   def send_renewal_invitation!(census_employee)
     UserMailer.renewal_invitation_email(invitation_email, census_employee, self).deliver_now
   end
@@ -203,6 +199,10 @@ class Invitation
 
   def send_broker_invitation!(invitee_name)
     UserMailer.broker_invitation_email(invitation_email, invitee_name, self).deliver_now
+  end
+
+  def send_broker_staff_invitation!(invitee_name, person_id)
+    UserMailer.broker_staff_invitation_email(invitation_email, invitee_name, self, person_id).deliver_now
   end
 
   def send_initial_employee_invitation!(census_employee)
@@ -231,19 +231,6 @@ class Invitation
         :invitation_email => census_employee.email_address
       )
       invitation.send_employee_invitation_for_open_enrollment!(census_employee)
-      invitation
-    end
-  end
-
-  def self.invite_future_employee_for_open_enrollment!(census_employee)
-    if !census_employee.email_address.blank?
-      invitation = self.create(
-        :role => "employee_role",
-        :source_kind => "census_employee",
-        :source_id => census_employee.id,
-        :invitation_email => census_employee.email_address
-      )
-      invitation.send_future_employee_invitation_for_open_enrollment!(census_employee)
       invitation
     end
   end
@@ -295,7 +282,7 @@ class Invitation
         :source_id => broker_role.id,
         :invitation_email => broker_role.email_address
       )
-      invitation.send_invitation!(broker_role.parent.full_name)
+      invitation.send_broker_staff_invitation!(broker_role.parent.full_name, broker_role.parent.id)
       invitation
     end
   end

@@ -114,6 +114,8 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
     if current_user.has_broker_role?
       @broker_agency_profile = BrokerAgencyProfile.find(current_user.person.broker_role.broker_agency_profile_id)
+    elsif current_user.has_broker_agency_staff_role?
+      @broker_agency_profile = BrokerAgencyProfile.find(BSON::ObjectId.from_string(id))
     elsif current_user.has_hbx_staff_role?
       @broker_agency_profile = BrokerAgencyProfile.find(BSON::ObjectId.from_string(id))
     else
@@ -143,6 +145,8 @@ class BrokerAgencies::ProfilesController < ApplicationController
     page = params.permit([:page])[:page]
     if current_user.has_broker_role?
       @broker_agency_profile = BrokerAgencyProfile.find(current_user.person.broker_role.broker_agency_profile_id)
+    elsif current_user.has_broker_agency_staff_role?
+      @broker_agency_profile = BrokerAgencyProfile.find(BSON::ObjectId.from_string(id))
     elsif current_user.has_hbx_staff_role?
       @broker_agency_profile = BrokerAgencyProfile.find(BSON::ObjectId.from_string(id))
     else
@@ -178,12 +182,12 @@ class BrokerAgencies::ProfilesController < ApplicationController
       @orgs = Organization.by_broker_role(broker_role_id)
     end
     @memo = {}
-    @broker_role = current_user.person.broker_role || nil
+    @broker_role = current_user.person.broker_role || @broker_agency_profile.primary_broker_role || nil
     @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role, approved_only: true)
   end
 
   def general_agency_index
-    @broker_role = current_user.person.broker_role || nil
+    @broker_role = current_user.person.broker_role || @broker_agency_profile.primary_broker_role || nil
     @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role, approved_only: true)
   end
 
@@ -193,12 +197,10 @@ class BrokerAgencies::ProfilesController < ApplicationController
     if @broker_agency_profile.present?
       old_default_ga_id = @broker_agency_profile.default_general_agency_profile.id.to_s rescue nil
       if params[:type] == 'clear'
+        @broker_agency_profile.update_attributes(default_general_agency_profile_id: nil)
         @broker_agency_profile.default_general_agency_profile = nil
       elsif @general_agency_profile.present?
         @broker_agency_profile.default_general_agency_profile = @general_agency_profile
-        @broker_agency_profile.employer_clients.each do |employer_profile|
-          @general_agency_profile.general_agency_hired_notice(employer_profile) # GA notice when broker selects a default GA 
-        end
       end
       @broker_agency_profile.save
       notify("acapi.info.events.broker.default_ga_changed", {:broker_id => @broker_agency_profile.primary_broker_role.hbx_id, :pre_default_ga_id => old_default_ga_id})
@@ -303,7 +305,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
             employer_profile.hire_general_agency(general_agency_profile, broker_role_id)
             employer_profile.save
             send_general_agency_assign_msg(general_agency_profile, employer_profile, 'Hire')
-            general_agency_profile.general_agency_hired_notice(employer_profile) #GA notice when broker Assign a GA to employers
           end
         end
         flash.now[:notice] ="Assign successful."
@@ -435,7 +436,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   def check_broker_agency_staff_role
     if current_user.has_broker_agency_staff_role?
-      redirect_to broker_agencies_profile_path(:id => current_user.person.broker_agency_staff_roles.first.broker_agency_profile_id)
+      redirect_to broker_agencies_profile_path(:id => current_user.person.broker_agency_staff_roles.active.first.broker_agency_profile_id)
     elsif current_user.has_broker_role?
       redirect_to broker_agencies_profile_path(id: current_user.person.broker_role.broker_agency_profile_id.to_s)
     else

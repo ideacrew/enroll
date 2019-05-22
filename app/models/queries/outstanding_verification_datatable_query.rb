@@ -13,12 +13,12 @@ module Queries
     end
 
     def person_search search_string
-      Family.outstanding_verification if search_string.blank?
+      Family.outstanding_verification_datatable   if search_string.blank?
     end
 
     def build_scope()
 
-      family = Family.outstanding_verification
+      family = Family.outstanding_verification_datatable
       person = Person
       family= family.send(@custom_attributes[:documents_uploaded]) if @custom_attributes[:documents_uploaded].present?
       if @custom_attributes[:custom_datatable_date_from].present? & @custom_attributes[:custom_datatable_date_to].present?
@@ -48,7 +48,7 @@ module Queries
     end
 
     def klass
-      Family.outstanding_verification
+      Family.outstanding_verification_datatable
     end
 
     def size

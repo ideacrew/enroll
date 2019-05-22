@@ -1,9 +1,11 @@
 class Exchanges::HbxProfilesController < ApplicationController
+  include Exchanges::HbxProfilesHelper
   include DataTablesAdapter
   include DataTablesSearch
   include Pundit
   include SepAll
   include VlpDoc
+  include ApplicationHelper
 
   before_action :modify_admin_tabs?, only: [:binder_paid, :transmit_group_xml]
   before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index, :family_index, :update_cancel_enrollment, :update_terminate_enrollment, :identity_verification]
@@ -12,6 +14,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   #before_action :authorize_for, except: [:edit, :update, :destroy, :request_help, :staff_index, :assister_index]
   #before_action :authorize_for_instance, only: [:edit, :update, :destroy]
   before_action :check_csr_or_hbx_staff, only: [:family_index]
+  before_action :find_employer_profile, only: [:oe_extendable_applications, :oe_extended_applications, :edit_open_enrollment, :extend_open_enrollment, :close_extended_open_enrollment]
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
   layout 'single_column'
@@ -19,6 +22,35 @@ class Exchanges::HbxProfilesController < ApplicationController
   def index
     @organizations = Organization.exists(hbx_profile: true)
     @hbx_profiles = @organizations.map {|o| o.hbx_profile}
+  end
+
+  def oe_extendable_applications
+    @plan_years  = @employer_profile.oe_extendable_plan_years
+    @element_to_replace_id = params[:employer_actions_id]
+  end
+
+  def oe_extended_applications
+    @plan_years  = @employer_profile.oe_extended_plan_years
+    @element_to_replace_id = params[:employer_actions_id]
+  end
+
+  def edit_open_enrollment
+    @plan_year = @employer_profile.plan_years.find(params[:plan_year_id])
+  end
+
+  def extend_open_enrollment
+    authorize HbxProfile, :can_extend_open_enrollment?
+    @plan_year = @employer_profile.plan_years.find(params[:plan_year_id])
+    open_enrollment_end_date = Date.strptime(params["open_enrollment_end_date"], "%m/%d/%Y")
+    @plan_year.extend_open_enrollment(open_enrollment_end_date)
+    redirect_to exchanges_hbx_profiles_root_path, :flash => { :success => "Successfully extended employer(s) open enrollment." }
+  end
+
+  def close_extended_open_enrollment
+    authorize HbxProfile, :can_extend_open_enrollment?
+    @plan_year = @employer_profile.plan_years.find(params[:plan_year_id])
+    @plan_year.end_open_enrollment(TimeKeeper.date_of_record)
+    redirect_to exchanges_hbx_profiles_root_path, :flash => { :success => "Successfully closed employer(s) open enrollment." }
   end
 
   def binder_paid
@@ -92,8 +124,10 @@ class Exchanges::HbxProfilesController < ApplicationController
     @organizations= Organization.where(:id.in => params[:ids]).all
 
     @organizations.each do |org|
-      @employer_invoice = EmployerInvoice.new(org)
-      @employer_invoice.save_and_notify_with_clean_up
+      if org.employer_profile.is_new_employer?
+        plan_year = org.employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED - ['suspended']).first
+        trigger_notice_observer(org.employer_profile, plan_year, "generate_initial_employer_invoice")
+      end
     end
 
     flash["notice"] = "Successfully submitted the selected employer(s) for invoice generation."
@@ -334,6 +368,28 @@ def employer_poc
     end
   end
 
+  def view_enrollment_to_update_end_date
+    @person = Person.find(params[:person_id])
+    @row = params[:family_actions_id]
+    @enrollments = @person.primary_family.terminated_enrollments
+  end
+
+  def update_enrollment_termianted_on_date
+    begin
+      enrollment = HbxEnrollment.find(params[:enrollment_id].strip)
+      @row = params[:family_actions_id]
+      termination_date = Date.strptime(params["new_termination_date"], "%m/%d/%Y")
+      if enrollment.present? && enrollment.reterm_enrollment_with_earlier_date(termination_date, params["edi_required"].present?)
+        message = {notice: "Enrollment Updated Successfully."}
+      else
+        message = {notice: "Unable to find/update Enrollment."}
+      end
+    rescue Exception => e
+      message = {error: e.to_s}
+    end
+    redirect_to exchanges_hbx_profiles_root_path, flash: message
+  end
+
   def broker_agency_index
 
     @datatable = Effective::Datatables::BrokerAgencyDatatable.new
@@ -428,6 +484,55 @@ def employer_poc
     end
   end
 
+  def view_terminated_hbx_enrollments
+    @person = Person.find(params[:person_id])
+    @element_to_replace_id = params[:family_actions_id]
+    @enrollments = @person.primary_family.terminated_enrollments
+  end
+
+  def reinstate_enrollment
+    enrollment = HbxEnrollment.find(params[:enrollment_id].strip)
+
+    if enrollment.present?
+      begin
+        reinstated_enrollment = enrollment.reinstate(edi: params['edi_required'].present?)
+        if reinstated_enrollment.present?
+          if params['comments'].present?
+            reinstated_enrollment.comments.create(:content => params[:comments].strip, :user => current_user.id)
+          end
+          message = {notice: "Enrollment Reinstated successfully."}
+        end
+      rescue Exception => e
+        message = {error: e.to_s}
+      end
+    else
+      message = {notice: "Unable to find Enrollment."}
+    end
+
+    redirect_to exchanges_hbx_profiles_root_path, flash: message
+  end
+
+  def edit_force_publish
+    authorize HbxProfile, :can_force_publish?
+    @element_to_replace_id = params[:row_actions_id]
+    @organization = Organization.find(@element_to_replace_id.split('_').last)
+    @plan_year = @organization.renewing_or_draft_py
+  end
+
+  def force_publish
+    authorize HbxProfile, :can_force_publish?
+    @element_to_replace_id = params[:row_actions_id]
+    @organization = Organization.find(@element_to_replace_id.split('_').last)
+    @plan_year = @organization.renewing_or_draft_py
+    if params[:publish_with_warnings] == 'true' || @plan_year.application_eligibility_warnings.blank?
+      @plan_year.force_publish! if @plan_year.may_force_publish?
+    end
+
+    respond_to do |format|
+      format.js
+    end
+  end
+
   def verify_dob_change
     @person = Person.find(params[:person_id])
     @element_to_replace_id = params[:family_actions_id]
@@ -438,7 +543,7 @@ def employer_poc
   end
 
   def update_dob_ssn
-    authorize  Family, :can_update_ssn?
+    authorize Family, :can_update_ssn?
     @element_to_replace_id = params[:person][:family_actions_id]
     @person = Person.find(params[:person][:pid]) if !params[:person].blank? && !params[:person][:pid].blank?
     @ssn_match = Person.find_by_ssn(params[:person][:ssn]) unless params[:person][:ssn].blank?
@@ -616,6 +721,36 @@ def employer_poc
 
   end
 
+  def edit_fein
+    authorize HbxProfile, :can_change_fein?
+    @organization = Organization.find(params[:id])
+    @element_to_replace_id = params[:row_actions_id]
+
+    respond_to do |format|
+      format.js { render "edit_fein" }
+    end
+  end
+
+  def update_fein
+    authorize HbxProfile, :can_change_fein?
+    @organization = Organization.find(params["id"])
+    @element_to_replace_id = params[:row_actions_id]
+
+    if @organization
+      begin
+        @organization.assign_attributes(fein: (params[:organization][:new_fein]))
+        @organization.save!
+      rescue => e
+        @errors_on_save = @organization.errors.messages
+      end
+    end
+
+    respond_to do |format|
+      format.js { render "edit_fein" } if @errors_on_save
+      format.js { render "update_fein" }
+    end
+  end
+
 private
 
    def modify_admin_tabs?
@@ -702,5 +837,9 @@ private
 
   def call_customer_service(first_name, last_name)
     "No match found for #{first_name} #{last_name}.  Please call Customer Service at: (855)532-5465 for assistance.<br/>"
+  end
+
+  def find_employer_profile
+    @employer_profile = EmployerProfile.find (params[:id])
   end
 end

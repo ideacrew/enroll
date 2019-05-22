@@ -22,7 +22,7 @@
       <% plan = hbx_enrollment.plan %>
       <tr>
         <td>
-          <%= hbx_enrollment.terminated_on %>
+          <%= enrollment_coverage_end(hbx_enrollment) %>
         </td>
         <td>
           <%= plan.name %>

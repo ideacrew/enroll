@@ -48,7 +48,7 @@ end
 
 def is_family_renewing(family)
   family.active_household.hbx_enrollments.where(
-    :aasm_state.in => ["coverage_selected", "unverified"],
+    :aasm_state.in => ["coverage_selected", "unverified", "coverage_terminated"],
     kind: "individual",
     :effective_on => {:"$gte" => Date.new(2018,1,1), :"$lte" =>  Date.new(2018,12,31)}
   ).present?

@@ -271,7 +271,7 @@ class ConsumerRole
   #use this method to check what verification types needs to be included to the notices
   def types_include_to_notices
     verification_types.find_all do |type|
-      type.unverified_no_docs?
+      type.type_unverified?
     end
   end
 
@@ -482,18 +482,17 @@ class ConsumerRole
       transitions from: :fully_verified, to: :fully_verified
     end
 
-    event :coverage_purchased, :after => [:record_transition ,:notify_of_eligibility_change, :invoke_residency_verification!]  do
+    event :coverage_purchased, :after => [:invoke_pending_verification!, :record_transition ,:notify_of_eligibility_change, :invoke_residency_verification!]  do
       transitions from: :unverified, to: :verification_outstanding, :guard => [:is_tribe_member_or_native_no_snn?], :after => [:handle_native_no_snn_or_indian_transition]
-      transitions from: :unverified, to: :dhs_pending, :guards => [:call_dhs?], :after => [:invoke_verification!, :move_types_to_pending]
-      transitions from: :unverified, to: :ssa_pending, :guards => [:call_ssa?], :after => [:invoke_verification!, :move_types_to_pending]
+      transitions from: :unverified, to: :dhs_pending, :guards => [:call_dhs?], :after => [:move_types_to_pending]
+      transitions from: :unverified, to: :ssa_pending, :guards => [:call_ssa?], :after => [:move_types_to_pending]
     end
 
-    event :coverage_purchased_no_residency, :after => [:record_transition, :move_types_to_pending, :notify_of_eligibility_change]  do
+    event :coverage_purchased_no_residency, :after => [:invoke_pending_verification!, :record_transition, :move_types_to_pending, :notify_of_eligibility_change]  do
       transitions from: :unverified, to: :verification_outstanding, :guard => [:is_tribe_member_or_native_no_snn?], :after => [:handle_native_no_snn_or_indian_transition]
-      transitions from: :unverified, to: :dhs_pending, :guards => [:call_dhs?], :after => [:invoke_verification!]
-      transitions from: :unverified, to: :ssa_pending, :guards => [:call_ssa?], :after => [:invoke_verification!]
+      transitions from: :unverified, to: :dhs_pending, :guards => [:call_dhs?]
+      transitions from: :unverified, to: :ssa_pending, :guards => [:call_ssa?]
     end
-
 
     event :ssn_invalid, :after => [:fail_ssn, :fail_lawful_presence, :record_transition, :notify_of_eligibility_change] do
       transitions from: [:ssa_pending, :verification_outstanding], to: :verification_outstanding
@@ -591,6 +590,11 @@ class ConsumerRole
     event :fourth_verifications_reminder, :after => [:record_transition] do
       transitions from: :verification_outstanding, to: :verification_outstanding
     end
+  end
+
+  #after hook not working in sub level, moved after hook to top level
+  def invoke_pending_verification!
+    invoke_verification! if [:dhs_pending, :ssa_pending].include?(aasm.current_state)
   end
 
   def invoke_verification!(*args)
@@ -841,14 +845,6 @@ class ConsumerRole
 
   def verification_types
     person.verification_types.active.where(applied_roles: "consumer_role") if person
-  end
-
-  #class methods
-  class << self
-    #this method will be used to check 90 days verification period for outstanding verification
-    def advance_day(check_date)
-      #handle all outstanding consumer who is unverified more than 90 days
-    end
   end
 
   private

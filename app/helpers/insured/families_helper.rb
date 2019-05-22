@@ -180,14 +180,18 @@ module Insured::FamiliesHelper
   end
 
   def enrollment_coverage_end(hbx_enrollment)
-    if hbx_enrollment.coverage_terminated?
+    if hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_termination_pending?
       hbx_enrollment.terminated_on
     elsif hbx_enrollment.coverage_expired?
       if hbx_enrollment.is_shop? && hbx_enrollment.benefit_group_assignment.present?
         hbx_enrollment.benefit_group_assignment.benefit_group.end_on
       else
         benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.by_date(hbx_enrollment.effective_on).first
-        benefit_coverage_period.end_on
+        if benefit_coverage_period
+          benefit_coverage_period.end_on
+        else
+          hbx_enrollment.effective_on.end_of_year
+        end
       end
     end
   end

@@ -272,6 +272,121 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     end
   end
 
+  describe "GET edit_force_publish" do
+    context "of an hbx super admin clicks Force Publish" do
+      let!(:organization){ FactoryGirl.create(:organization) }
+      let!(:employer_profile) { FactoryGirl.create(:employer_profile, organization: organization)}
+      let!(:draft_plan_year) { FactoryGirl.create(:future_plan_year, aasm_state: 'draft', employer_profile: employer_profile) }
+      let(:user) { FactoryGirl.create(:user, person: person) }
+      let(:person) do
+        FactoryGirl.create(:person, :with_hbx_staff_role).tap do |person|
+          FactoryGirl.create(:permission, :super_admin).tap do |permission|
+            person.hbx_staff_role.update_attributes(permission_id: permission.id)
+            person
+          end
+        end
+      end
+
+      it "renders edit_force_publish" do
+        sign_in(user)
+        xhr :get, :edit_force_publish, row_actions_id: "family_actions_#{organization.id.to_s}"
+        expect(response).to render_template('edit_force_publish')
+        expect(response).to have_http_status(:success)
+      end
+    end
+  end
+
+  describe "POST force_publish" do
+    context "of an hbx super admin clicks Submit in Force Publish window" do
+      let!(:organization) { FactoryGirl.create(:organization) }
+      let!(:employer_profile) { FactoryGirl.create(:employer_profile, organization: organization) }
+      let!(:draft_plan_year) { FactoryGirl.create(:next_month_plan_year, :with_benefit_group, aasm_state: 'draft', employer_profile: employer_profile) }
+      let(:user) { FactoryGirl.create(:user, person: person) }
+      let(:person) do
+        FactoryGirl.create(:person, :with_hbx_staff_role).tap do |person|
+          FactoryGirl.create(:permission, :super_admin).tap do |permission|
+            person.hbx_staff_role.update_attributes(permission_id: permission.id)
+            person
+          end
+        end
+      end
+      let(:params) { { row_actions_id: "family_actions_#{organization.id.to_s}", publish_with_warnings: 'true' } }
+
+      before :each do
+        sign_in(user)
+        allow(draft_plan_year).to receive(:is_application_invalid?).and_return(false)
+        xhr :post, :force_publish, params
+        draft_plan_year.reload
+      end
+
+      it 'should render template' do
+        expect(response).to render_template('force_publish')
+      end
+
+      it 'should return success' do
+        expect(response).to have_http_status(:success)
+      end
+
+      it 'should update plan year' do
+        expect(draft_plan_year.aasm_state).to eq 'enrolling'
+      end
+    end
+  end
+
+  describe 'force publish with eligibility warnings & publish_with_warnings param' do
+    context 'with only eligibility warnings' do
+      let!(:organization) { FactoryGirl.create(:organization) }
+      let!(:employer_profile) { FactoryGirl.create(:employer_profile, organization: organization) }
+      let!(:draft_plan_year) { FactoryGirl.create(:next_month_plan_year, :with_benefit_group, aasm_state: 'draft', employer_profile: employer_profile) }
+      let(:user) { FactoryGirl.create(:user, person: person) }
+      let(:person) do
+        FactoryGirl.create(:person, :with_hbx_staff_role).tap do |person|
+          FactoryGirl.create(:permission, :super_admin).tap do |permission|
+            person.hbx_staff_role.update_attributes(permission_id: permission.id)
+            person
+          end
+        end
+      end
+      let(:params) { { row_actions_id: "family_actions_#{organization.id.to_s}" } }
+      let(:params1) { { row_actions_id: "family_actions_#{organization.id.to_s}", publish_with_warnings: 'true' } }
+
+      before :each do
+        sign_in(user)
+      end
+
+      it 'should not update plan year aasm state' do
+        organization.office_locations.first.address.update_attributes!(state: 'CT')
+        xhr :post, :force_publish, params
+        draft_plan_year.reload
+        expect(draft_plan_year.aasm_state).to eq 'draft'
+      end
+
+      it 'should not force publish and still in draft' do
+        organization.office_locations.first.address.update_attributes!(state: 'CT')
+        xhr :post, :force_publish, params
+        draft_plan_year.reload
+        expect(draft_plan_year.aasm_state).to eq 'draft'
+      end
+
+      context 'with publish_with_warnings true & eligibility warnings' do
+        it 'should force publish and update plan year to enrolling' do
+          organization.office_locations.first.address.update_attributes!(state: 'CT')
+          xhr :post, :force_publish, params1
+          draft_plan_year.reload
+          expect(draft_plan_year.aasm_state).to eq 'publish_pending'
+        end
+      end
+
+      context 'with publish_with_warnings true & no eligibility warnings' do
+        it 'should force publish and update plan year to enrolling' do
+          xhr :post, :force_publish, params1
+          draft_plan_year.reload
+          expect(draft_plan_year.aasm_state).to eq 'enrolling'
+        end
+      end
+    end
+  end
+
   describe "CSR redirection from Show" do
     let(:user) { double("user", :has_hbx_staff_role? => false, :has_employer_staff_role? => false, :has_csr_role? => true)}
     let(:person) { double("person")}
@@ -632,6 +747,50 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
   end
 
+  describe "POST edit_fein" do
+    let(:organization){  FactoryGirl.create(:organization) }
+    let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
+    let(:user) { double("user", :person => person, :has_hbx_staff_role? => true) }
+    let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person)}
+    let(:permission_yes) { FactoryGirl.create(:permission, :can_change_fein => true)}
+    let(:new_invalid_fein) { "234-839" }
+    let(:new_valid_fein) { "23-4508390" }
+
+    it "should render edit_fein sucessful, when cahnge fein is clicked under Actions dropdown" do
+      allow(hbx_staff_role).to receive(:permission).and_return permission_yes
+      sign_in(user)
+      @params = {:id => organization.id, :row_actions_id => "family_actions_#{organization.id.to_s}"}
+      xhr :get, :edit_fein, @params
+      expect(response).to render_template('edit_fein')
+    end
+  end
+
+  describe "POST update_fein" do
+    let(:organization){  FactoryGirl.create(:organization) }
+    let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
+    let(:user) { double("user", :person => person, :has_hbx_staff_role? => true) }
+    let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person)}
+    let(:permission_yes) { FactoryGirl.create(:permission, :can_change_fein => true)}
+    let(:new_invalid_fein) { "234-839" }
+    let(:new_valid_fein) { "23-4508390" }
+
+    it "should render update_fein if fein is updated successful" do
+      allow(hbx_staff_role).to receive(:permission).and_return permission_yes
+      sign_in(user)
+      @params = { :organization => {:new_fein => new_valid_fein}, :id => organization.id, :row_actions_id => "family_actions_#{organization.id.to_s}"}
+      xhr :post, :update_fein, @params
+      expect(response).to render_template('update_fein')
+    end
+
+    it "should render back to edit_fein if there is a validation error on save" do
+      allow(hbx_staff_role).to receive(:permission).and_return permission_yes
+      sign_in(user)
+      @params = { :organization => {:new_fein => new_invalid_fein}, :id => organization.id, :row_actions_id => "family_actions_#{organization.id.to_s}"}
+      xhr :post, :update_fein, @params
+      expect(response).to render_template('edit_fein')
+    end
+  end
+
   describe "GET general_agency_index" do
     let(:user) { FactoryGirl.create(:user, roles: ["hbx_staff"]) }
     before :each do
@@ -650,13 +809,28 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     end
   end
 
+  describe "POST reinstate_enrollment" do
+    let(:user) { FactoryGirl.create(:user, roles: ["hbx_staff"]) }
+
+    before :each do
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      sign_in user
+    end
+
+    it "should redirect to root path" do
+      xhr :post, :reinstate_enrollment, enrollment_id: '', format: :js
+      expect(response).to have_http_status(:redirect)
+      expect(response).to redirect_to(exchanges_hbx_profiles_root_path)
+    end
+  end
+
   describe "GET get_user_info" do
     let(:user) { double("User", :has_hbx_staff_role? => true)}
     let(:person) { double("Person", id: double)}
     let(:family_id) { double("Family_ID")}
     let(:employer_id) { double("Employer_ID") }
     let(:organization) { double("Organization")}
-
+    
     before do
       sign_in user
       allow(Person).to receive(:find).with("#{person.id}").and_return person
@@ -698,6 +872,259 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
       it "should populate the row id to instance variable" do
         expect(assigns(:element_to_replace_id)).to eq "#{employer_id}"
+      end
+    end
+  end
+
+  describe "POST view_enrollment_to_update_end_date" do
+    let(:user) { FactoryGirl.create(:user, roles: ["hbx_staff"]) }
+    let!(:person) { FactoryGirl.create(:person)}
+    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+    let!(:household) { FactoryGirl.create(:household, family: family) }
+    let!(:enrollment) {
+      FactoryGirl.create(:hbx_enrollment,
+                         household: family.active_household,
+                         coverage_kind: "health",
+                         effective_on: TimeKeeper.date_of_record.last_month.beginning_of_month,
+                         aasm_state: 'coverage_termination_pending'
+      )}
+
+    before :each do
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      sign_in user
+    end
+
+    it "should render template" do
+      xhr :post, :view_enrollment_to_update_end_date, person_id: person.id.to_s, family_actions_id: family.id, format: :js
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template("view_enrollment_to_update_end_date")
+    end
+  end
+
+  describe "POST update_enrollment_termianted_on_date" do
+    let(:user) { FactoryGirl.create(:user, roles: ["hbx_staff"]) }
+    let!(:person) { FactoryGirl.create(:person)}
+    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+    let!(:household) { FactoryGirl.create(:household, family: family) }
+    let!(:enrollment) {
+      FactoryGirl.create(:hbx_enrollment,
+                         household: family.active_household,
+                         coverage_kind: "health",
+                         kind: 'employer_sponsored',
+                         effective_on: TimeKeeper.date_of_record.last_month.beginning_of_month,
+                         terminated_on: TimeKeeper.date_of_record.end_of_month,
+                         aasm_state: 'coverage_termination_pending'
+      )}
+    let!(:glue_event_queue_name) { "#{Rails.application.config.acapi.hbx_id}.#{Rails.application.config.acapi.environment_name}.q.glue.enrollment_event_batch_handler" }
+
+
+    before :each do
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      sign_in user
+    end
+
+    context "shop enrollment" do
+      context "with valid params" do
+
+        it "should render template " do
+          xhr :post, :update_enrollment_termianted_on_date, enrollment_id: enrollment.id.to_s, family_actions_id: family.id, new_termination_date: TimeKeeper.date_of_record.to_s, format: :js
+          expect(response).to have_http_status(:redirect)
+          expect(response).to redirect_to(exchanges_hbx_profiles_root_path)
+        end
+
+        context "enrollment that already terminated with past date" do
+          context "with new past or current termination date" do
+            it "should update enrollment with new end date and notify enrollment" do
+              expect_any_instance_of(HbxEnrollment).to receive(:notify).with("acapi.info.events.hbx_enrollment.terminated", {:reply_to=>glue_event_queue_name, "hbx_enrollment_id" => enrollment.hbx_id, "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment", "is_trading_partner_publishable" => false})
+              xhr :post, :update_enrollment_termianted_on_date, enrollment_id: enrollment.id.to_s, family_actions_id: family.id, new_termination_date: TimeKeeper.date_of_record.to_s, format: :js
+              enrollment.reload
+              expect(enrollment.aasm_state).to eq "coverage_terminated"
+              expect(enrollment.terminated_on).to eq TimeKeeper.date_of_record
+            end
+          end
+
+        end
+
+        context "enrollment that already terminated with future date" do
+          context "with new future termination date" do
+            it "should update enrollment with new end date and notify enrollment" do
+              expect_any_instance_of(HbxEnrollment).to receive(:notify).with("acapi.info.events.hbx_enrollment.terminated", {:reply_to=>glue_event_queue_name, "hbx_enrollment_id" => enrollment.hbx_id, "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment", "is_trading_partner_publishable" => false})
+              xhr :post, :update_enrollment_termianted_on_date, enrollment_id: enrollment.id.to_s, family_actions_id: family.id, new_termination_date: (TimeKeeper.date_of_record + 1.day).to_s, format: :js
+              enrollment.reload
+              expect(enrollment.aasm_state).to eq "coverage_termination_pending"
+              expect(enrollment.terminated_on).to eq TimeKeeper.date_of_record + 1.day
+            end
+          end
+        end
+      end
+    end
+
+    context "IVL enrollment" do
+
+      before do
+        enrollment.kind = "individual"
+        enrollment.save
+      end
+
+      context "with valid params" do
+
+        it "should render template " do
+          xhr :post, :update_enrollment_termianted_on_date, enrollment_id: enrollment.id.to_s, family_actions_id: family.id, new_termination_date: TimeKeeper.date_of_record.to_s, format: :js
+          expect(response).to have_http_status(:redirect)
+          expect(response).to redirect_to(exchanges_hbx_profiles_root_path)
+        end
+
+        context "enrollment that already terminated with past date" do
+          context "with new past or current termination date" do
+            it "should update enrollment with new end date and notify enrollment" do
+              expect_any_instance_of(HbxEnrollment).to receive(:notify).with("acapi.info.events.hbx_enrollment.terminated", {:reply_to=>glue_event_queue_name, "hbx_enrollment_id" => enrollment.hbx_id, "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment", "is_trading_partner_publishable" => false})
+              xhr :post, :update_enrollment_termianted_on_date, enrollment_id: enrollment.id.to_s, family_actions_id: family.id, new_termination_date: TimeKeeper.date_of_record.to_s, format: :js
+              enrollment.reload
+              expect(enrollment.aasm_state).to eq "coverage_terminated"
+              expect(enrollment.terminated_on).to eq TimeKeeper.date_of_record
+            end
+          end
+
+        end
+
+        context "enrollment that already terminated with future date" do
+          context "with new future termination date" do
+            it "should update enrollment with new end date and notify enrollment" do
+              expect_any_instance_of(HbxEnrollment).to receive(:notify).with("acapi.info.events.hbx_enrollment.terminated", {:reply_to=>glue_event_queue_name, "hbx_enrollment_id" => enrollment.hbx_id, "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment", "is_trading_partner_publishable" => false})
+              xhr :post, :update_enrollment_termianted_on_date, enrollment_id: enrollment.id.to_s, family_actions_id: family.id, new_termination_date: (TimeKeeper.date_of_record + 1.day).to_s, format: :js
+              enrollment.reload
+              expect(enrollment.aasm_state).to eq "coverage_terminated"
+              expect(enrollment.terminated_on).to eq TimeKeeper.date_of_record + 1.day
+            end
+          end
+        end
+      end
+    end
+
+    context "with invalid params" do
+      it "should redirect to root path" do
+        xhr :post, :update_enrollment_termianted_on_date, enrollment_id: '', family_actions_id:'', new_termination_date: '', format: :js
+        expect(response).to have_http_status(:redirect)
+        expect(response).to redirect_to(exchanges_hbx_profiles_root_path)
+      end
+    end
+  end
+   
+  describe "extend open enrollment" do
+
+    let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
+    let(:person) { double("person")}
+    let(:permission) { double(can_extend_open_enrollment: true) }
+    let(:hbx_staff_role) { double("hbx_staff_role", permission: permission)}
+    let(:hbx_profile) { double("HbxProfile")}
+    let(:employer_profile) { double(plan_years: plan_years) }
+    let(:plan_years) { [ double ]}
+
+     before :each do
+      allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
+      allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
+      allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
+      allow(EmployerProfile).to receive(:find).and_return(employer_profile)
+      sign_in(user)
+    end
+
+    context '.oe_extendable_applications' do
+      let(:plan_years) { [ double(may_extend_open_enrollment?: true) ]}
+
+      before do
+        allow(employer_profile).to receive(:oe_extendable_plan_years).and_return(plan_years)
+      end
+
+      it "renders open enrollment extendable plan years" do
+        xhr :get, :oe_extendable_applications
+
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("exchanges/hbx_profiles/oe_extendable_applications")
+      end
+    end
+
+    context '.oe_extended_applications' do
+      let(:plan_years) { [ double(enrollment_extended?: true) ]}
+
+      before do
+        allow(employer_profile).to receive(:oe_extended_plan_years).and_return(plan_years)
+      end
+
+      it "renders open enrollment extended plan years" do
+        xhr :get, :oe_extended_applications
+
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("exchanges/hbx_profiles/oe_extended_applications")
+      end
+    end
+
+    context '.edit_open_enrollment' do
+      let(:plan_year) { double }
+
+      before do
+        allow(plan_years).to receive(:find).and_return(plan_year)
+      end
+
+      it "renders edit open enrollment" do
+        xhr :get, :edit_open_enrollment
+
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("exchanges/hbx_profiles/edit_open_enrollment")
+      end
+    end
+
+    context '.extend_open_enrollment' do
+      let(:plan_year) { double }
+
+      before do
+        allow(plan_years).to receive(:find).and_return(plan_year)
+        allow(plan_year).to receive(:extend_open_enrollment).and_return(true)
+      end
+
+      it "renders index" do
+        post :extend_open_enrollment, open_enrollment_end_date: "02/18/2019"
+
+        expect(response).to have_http_status(:redirect)
+        expect(response).to redirect_to(exchanges_hbx_profiles_root_path)
+        expect(flash[:success]).to match("Successfully extended employer(s) open enrollment.")
+      end
+    end
+  end
+
+  describe "close open enrollment" do
+
+    let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
+    let(:person) { double("person")}
+    let(:permission) { double(can_extend_open_enrollment: true) }
+    let(:hbx_staff_role) { double("hbx_staff_role", permission: permission)}
+    let(:hbx_profile) { double("HbxProfile")}
+    let(:employer_profile) { double(plan_years: plan_years) }
+    let(:plan_years) { [ double ]}
+
+    before :each do
+      allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
+      allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
+      allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
+      allow(EmployerProfile).to receive(:find).and_return(employer_profile)
+      sign_in(user)
+    end
+
+    context '.close_extended_open_enrollment' do
+      let(:plan_year) { plan_years.first }
+
+      before do
+        allow(plan_years).to receive(:find).and_return(plan_year)
+        allow(plan_year).to receive(:end_open_enrollment).and_return(true)
+      end
+
+      it "renders index" do
+        post :close_extended_open_enrollment
+
+        expect(response).to have_http_status(:redirect)
+        expect(response).to redirect_to(exchanges_hbx_profiles_root_path)
+        expect(flash[:success]).to match("Successfully closed employer(s) open enrollment.")
       end
     end
   end
