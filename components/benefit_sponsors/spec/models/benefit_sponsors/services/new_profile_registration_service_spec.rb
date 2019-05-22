@@ -119,19 +119,19 @@ module BenefitSponsors
     describe ".has_broker_agency_staff_role_for_profile" do
       context "Person with Broker agency staff roles" do
 
-        it  "should return true if broker staff is assigned to a broker agency profile" do
+        it "should return true if broker staff is assigned to a broker agency profile" do
           params = { profile_id: broker_agency_profile.id, profile_type: "broker_agency_staff" }
           service = subject.new params
           expect(service.has_broker_agency_staff_role_for_profile(user, broker_agency_profile)). to eq true
         end
 
-        it  "should return true if broker staff is assigned to a broker agency profile" do
+        it "should return true if broker staff is assigned to a broker agency profile" do
           params = { profile_id: broker_agency_profile.id, profile_type: "broker_agency_staff" }
           service = subject.new params
           expect(service.has_broker_agency_staff_role_for_profile(user, broker_agency_profile)). to eq true
         end
 
-        it  "should return false if broker staff is not assigned to a broker agency profile" do
+        it "should return false if broker staff is not assigned to a broker agency profile" do
           person.broker_agency_staff_roles.each{|staff| staff.update_attributes(benefit_sponsors_broker_agency_profile_id: nil)}
           params = { profile_id: broker_agency_profile.id, profile_type: "broker_agency_staff" }
           service = subject.new params
@@ -165,13 +165,13 @@ module BenefitSponsors
     describe ".is_staff_for_agency?" do
       context "Staff for broker agency profile" do
 
-        it  "should return true if broker staff is assigned to a broker agency profile" do
+        it "should return true if broker staff is assigned to a broker agency profile" do
           params = { profile_id: broker_agency_profile.id, profile_type: "broker_agency_staff" }
           service = subject.new params
           expect(service.is_staff_for_agency?(user, nil)). to eq true
         end
 
-        it  "should return false if broker staff is not assigned to a broker agency profile" do
+        it "should return false if broker staff is not assigned to a broker agency profile" do
           person.broker_agency_staff_roles.each{|staff| staff.update_attributes(benefit_sponsors_broker_agency_profile_id: nil)}
           params = { profile_id: broker_agency_profile.id, profile_type: "broker_agency_staff" }
           service = subject.new params

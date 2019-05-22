@@ -49,9 +49,9 @@ module BenefitSponsors
 
         let!(:staff_params) do
           {
-              profile_type: "broker_agency_staff",
-              broker_registration_page: "true",
-              :staff => {:first_name => new_person_for_staff.first_name, :last_name => new_person_for_staff.last_name, :dob => new_person_for_staff.dob, email: "hello@hello.com",  :profile_id => bap_id}
+            profile_type: "broker_agency_staff",
+            broker_registration_page: "true",
+            :staff => {:first_name => new_person_for_staff.first_name, :last_name => new_person_for_staff.last_name, :dob => new_person_for_staff.dob, email: "hello@hello.com",  :profile_id => bap_id}
           }
         end
 
@@ -80,10 +80,9 @@ module BenefitSponsors
 
         let!(:staff_params) do
           {
-              profile_type: 'broker_agency_staff',
-              broker_registration_page: 'true',
-              :staff => {:first_name => new_person_for_staff1.first_name, :last_name => new_person_for_staff1.last_name, :dob => new_person_for_staff1.dob, email: "hello@hello.com",  :profile_id => bap_id}
-
+            profile_type: 'broker_agency_staff',
+            broker_registration_page: 'true',
+            :staff => {:first_name => new_person_for_staff1.first_name, :last_name => new_person_for_staff1.last_name, :dob => new_person_for_staff1.dob, email: "hello@hello.com",  :profile_id => bap_id}
           }
         end
 
@@ -103,14 +102,13 @@ module BenefitSponsors
 
       context 'creating staff role with new person params' do
 
-        let!(:staff_params) {
+        let!(:staff_params) do
           {
-              profile_type: 'broker_agency_staff',
-              broker_registration_page: 'true',
-              :staff => {:first_name => "hello", :last_name => "world", :dob => "10/10/1998", email: "hello@hello.com",  :profile_id => bap_id}
-
+            profile_type: 'broker_agency_staff',
+            broker_registration_page: 'true',
+            :staff => {:first_name => "hello", :last_name => "world", :dob => "10/10/1998", email: "hello@hello.com",  :profile_id => bap_id}
           }
-        }
+        end
 
         before :each do
           post :create, params: staff_params, format: :js, xhr: true
@@ -132,7 +130,7 @@ module BenefitSponsors
 
         let!(:staff_params) do
           {
-              :id => bap_id, :person_id => new_person_for_staff.id, :profile_id => bap_id
+            :id => bap_id, :person_id => new_person_for_staff.id, :profile_id => bap_id
           }
         end
 
@@ -151,7 +149,7 @@ module BenefitSponsors
         end
 
         it "should get an notice" do
-          expect(flash[:notice]).to match /Role approved sucessfully/
+          expect(flash[:notice]).to match 'Role approved successfully'
         end
 
         it "should update broker_agency_staff_role aasm_state to active" do
@@ -165,7 +163,7 @@ module BenefitSponsors
 
         let!(:staff_params) do
           {
-              :id => bap_id, :person_id => new_person_for_staff1.id, :profile_id => bap_id
+            :id => bap_id, :person_id => new_person_for_staff1.id, :profile_id => bap_id
           }
         end
 
@@ -180,7 +178,7 @@ module BenefitSponsors
         end
 
         it "should get an error" do
-          expect(flash[:error]).to match /Please contact HBX Admin to report this error/
+          expect(flash[:error]).to match 'Please contact HBX Admin to report this error'
         end
       end
     end
@@ -192,7 +190,7 @@ module BenefitSponsors
 
         let!(:staff_params) do
           {
-              :id => bap_id, :person_id => new_person_for_staff1.id, :profile_id => bap_id
+            :id => bap_id, :person_id => new_person_for_staff1.id, :profile_id => bap_id
           }
         end
 
@@ -211,7 +209,7 @@ module BenefitSponsors
         end
 
         it "should get an notice" do
-          expect(flash[:notice]).to match /Role removed succesfully/
+          expect(flash[:notice]).to match 'Role removed successfully'
         end
 
         it "should update broker_staff_rol aasm_state to broker_agency_terminated" do
@@ -225,7 +223,7 @@ module BenefitSponsors
 
         let!(:staff_params) do
           {
-              :id => second_broker_agency_profile.id, :person_id => new_person_for_staff1.id, :profile_id => second_broker_agency_profile.id
+            :id => second_broker_agency_profile.id, :person_id => new_person_for_staff1.id, :profile_id => second_broker_agency_profile.id
           }
         end
 
@@ -240,7 +238,7 @@ module BenefitSponsors
         end
 
         it "should get an error" do
-          expect(flash[:error]).to match /Role was not removed because/
+          expect(flash[:error]).to match(/Role was not removed because/i)
         end
       end
     end
@@ -258,8 +256,8 @@ module BenefitSponsors
 
         let!(:params) do
           {
-              q: broker_agency_profile1.legal_name,
-              broker_registration_page: "true"
+            q: broker_agency_profile1.legal_name,
+            broker_registration_page: "true"
           }
         end
 
@@ -280,8 +278,8 @@ module BenefitSponsors
 
         let!(:params) do
           {
-              q: "hello world",
-              broker_registration_page: "true"
+            q: "hello world",
+            broker_registration_page: "true"
           }
         end
 
