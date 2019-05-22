@@ -175,6 +175,7 @@ class ConsumerRole
   embeds_many :local_residency_requests, class_name:"EventRequest"
 
   after_initialize :setup_lawful_determination_instance
+  after_create :create_initial_market_transition
   before_validation :ensure_verification_types
 
   before_validation :ensure_validation_states, on: [:create, :update]
@@ -849,6 +850,17 @@ class ConsumerRole
   private
   def notify_of_eligibility_change(*args)
     CoverageHousehold.update_individual_eligibilities_for(self)
+  end
+
+  def create_initial_market_transition
+    return if person.individual_market_transitions.present?
+    transition = IndividualMarketTransition.new
+    transition.role_type = "consumer"
+    transition.submitted_at = TimeKeeper.datetime_of_record
+    transition.reason_code = "generating_consumer_role"
+    transition.effective_starting_on = TimeKeeper.datetime_of_record
+    transition.user_id = SAVEUSER[:current_user_id]
+    self.person.individual_market_transitions << transition
   end
 
   def mark_residency_denied(*args)

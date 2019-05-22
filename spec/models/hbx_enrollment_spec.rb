@@ -501,7 +501,7 @@ describe HbxEnrollment, dbclean: :after_all do
 
       it "should return plans with csr kind when individual market is selected" do
         decorated_plans = enrollment.decorated_elected_plans('health', enrollment.kind)
-        expect(decorated_plans). to eq (benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, 'health', tax_household))
+        expect(decorated_plans). to eq (benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, 'health', tax_household, enrollment.kind))
       end
     end
 

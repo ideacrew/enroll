@@ -56,5 +56,4 @@ class BuildIndividualMarketTransition < MongoidMigrationTask
   def get_resident_role_people
     Person.where(:"resident_role" => {:"$exists" => true}, :"consumer_role" => {:"$exists" => false})
   end
-
 end

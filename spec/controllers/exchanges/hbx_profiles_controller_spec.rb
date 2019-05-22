@@ -683,6 +683,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
     let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
     let!(:person1) { FactoryGirl.create(:person, :with_consumer_role) }
+    let(:family) {FactoryGirl.create(:family, :with_primary_family_member, person: person1) }
     let(:user) { double("user", :person => person, :has_hbx_staff_role? => true) }
     let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person)}
     let(:hbx_profile) { FactoryGirl.create(:hbx_profile)}
@@ -729,6 +730,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
     it "should render update enrollment if the save is successful" do
       allow(hbx_staff_role).to receive(:permission).and_return permission_yes
+      allow(person1).to receive(:primary_family).and_return family
       sign_in(user)
       expect(response).to have_http_status(:success)
       @params = {:person=>{:pid => person1.id, :ssn => "" , :dob => valid_dob },:jq_datepicker_ignore_person=>{:dob=> valid_dob}, :format => 'js'}

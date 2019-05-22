@@ -36,8 +36,6 @@ describe BuildIndividualMarketTransitionForResidentRole do
     end
 
     it "should build individual market transitions for only people with consumer role" do
-      expect(person1.individual_market_transitions.present?).to eq false
-      expect(person2.individual_market_transitions.present?).to eq false
       subject.migrate
       person1.reload
       person2.reload

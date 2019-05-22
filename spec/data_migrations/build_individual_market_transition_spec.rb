@@ -30,7 +30,7 @@ describe BuildIndividualMarketTransition do
       person1.reload
       person2.reload
       expect(person1.individual_market_transitions.present?). to eq true
-      expect(person2.individual_market_transitions.present?). to eq false
+      expect(person2.individual_market_transitions.present?). to eq true
       expect(person1.individual_market_transitions.first.role_type). to eq "consumer"
       expect(person1.individual_market_transitions.first.persisted?). to be_truthy
     end
@@ -57,8 +57,8 @@ describe BuildIndividualMarketTransition do
       person2.reload
       person3.reload
       expect(person1.individual_market_transitions.present?). to eq true
-      expect(person2.individual_market_transitions.present?). to eq false
-      expect(person3.individual_market_transitions.present?). to eq false
+      expect(person2.individual_market_transitions.present?). to eq true
+      expect(person3.individual_market_transitions.present?). to eq true
       expect(person1.individual_market_transitions.first.role_type). to eq "resident"
       expect(person1.individual_market_transitions.first.persisted?). to be_truthy
     end
