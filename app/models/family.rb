@@ -293,6 +293,11 @@ class Family
     primary_family_member
   end
 
+  def terminated_enrollments
+    return [] if  latest_household.blank?
+    enrollments.can_update_enrollments_end_date.order_by(:created_at => "DESC").select{|hbx| ["coverage_terminated", "coverage_termination_pending"].include?(hbx.aasm_state)}
+  end
+
   # @deprecated Use {primary_applicant}
   alias_method :primary_family_member, :primary_applicant
 
@@ -553,19 +558,18 @@ class Family
 
   def terminate_date_for_shop_by_enrollment(enrollment=nil)
     if latest_shop_sep.present?
-      terminate_date = if latest_shop_sep.qualifying_life_event_kind.reason == 'death'
-                         latest_shop_sep.qle_on
-                       else
-                         latest_shop_sep.qle_on.end_of_month
-                       end
+      coverage_end_date = if latest_shop_sep.qualifying_life_event_kind.reason == 'death'
+                            latest_shop_sep.qle_on
+                          else
+                            latest_shop_sep.qle_on.end_of_month
+                          end
+
       if enrollment.present?
-        if enrollment.effective_on > latest_shop_sep.qle_on
-          terminate_date = enrollment.effective_on
-        elsif enrollment.effective_on >= terminate_date
-          terminate_date = TimeKeeper.date_of_record.end_of_month
+        if enrollment.effective_on >= coverage_end_date
+          coverage_end_date = enrollment.effective_on
         end
       end
-      terminate_date
+      coverage_end_date
     else
       TimeKeeper.date_of_record.end_of_month
     end

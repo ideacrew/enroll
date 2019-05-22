@@ -1,5 +1,7 @@
 class Employers::EmployerProfilesController < Employers::EmployersController
 
+  include ApplicationHelper
+
   before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
                                        :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :show_invoice, :export_census_employees, :link_from_quote, :generate_checkbook_urls]
   before_action :check_show_permissions, only: [:show, :show_profile, :destroy, :inbox, :bulk_employee_upload, :bulk_employee_upload_form]
@@ -108,6 +110,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def show
     @tab = params['tab']
+    @broker_agency_profile_id = @employer_profile.active_broker_agency_account.broker_agency_profile_id if @employer_profile.active_broker_agency_account.present?
     if params[:q] || params[:page] || params[:commit] || params[:status]
       paginate_employees
     else
@@ -151,6 +154,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def show_profile
     @tab ||= params[:tab]
+    @broker_agency_profile_id = @employer_profile.active_broker_agency_account.broker_agency_profile_id if @employer_profile.active_broker_agency_account.present?
     if @tab == 'benefits'
       @current_plan_year = @employer_profile.active_plan_year
       @plan_years = @employer_profile.plan_years.order(id: :desc)
@@ -199,7 +203,6 @@ class Employers::EmployerProfilesController < Employers::EmployersController
           # flash[:notice] = 'Your Employer Staff application is pending'
           render action: 'show_pending'
         else
-          employer_account_creation_notice if @organization.employer_profile.present?
           redirect_to employers_employer_profile_path(@organization.employer_profile, tab: 'home')
         end
       end
@@ -259,7 +262,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def consumer_override
     session[:person_id] = params['person_id']
-    redirect_to family_account_path
+    redirect_to family_account_path(employer_profile_id: params['employer_profile_id'])
   end
 
   def export_census_employees
@@ -273,7 +276,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
 
   def generate_checkbook_urls
-    @employer_profile.generate_checkbook_notices
+    trigger_notice_observer(@employer_profile, @employer_profile, 'out_of_pocker_url_notifier')
     flash[:notice] = "Custom Plan Match instructions are being generated.  Check your secure Messages inbox shortly."
     redirect_to action: :show, :tab => :employees
   end
@@ -318,14 +321,6 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     redirect_to employers_employer_profile_path(:id => current_user.person.employer_staff_roles.first.employer_profile_id)
   end
 
-  def employer_account_creation_notice
-    begin
-      ShopNoticesNotifierJob.perform_later(@organization.employer_profile.id.to_s, "employer_account_creation_notice")
-    rescue Exception => e
-      Rails.logger.error { "Unable to deliver Employer Notice to #{@organization.employer_profile.legal_name} due to #{e}" }
-    end
-  end
-
   private
 
   def wells_fargo_sso
@@ -357,14 +352,15 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   def collect_and_sort_invoices(sort_order='ASC')
-    @invoices = @employer_profile.organization.try(:documents)
-    #@invoice_years = @invoices.map{|i| i.date.year}.uniq if @invoices
+    @invoices = @employer_profile.organization.try(:invoices)
     @invoice_years = (Settings.aca.shop_market.employer_profiles.minimum_invoice_display_year..TimeKeeper.date_of_record.year).to_a.reverse
-    sort_order == 'ASC' ? @invoices.sort_by!(&:date) : @invoices.sort_by!(&:date).reverse! unless @documents
+    if @invoices
+      sort_order == 'ASC' ? @invoices.sort_by!(&:date) : @invoices.sort_by!(&:date).reverse!
+    end
   end
 
   def check_and_download_invoice
-    @invoice = @employer_profile.organization.documents.find(params[:invoice_id])
+    @invoice = @employer_profile.organization.invoices.select{ |inv| inv.id.to_s == params[:invoice_id]}.first
   end
 
   def sort_plan_years(plans)

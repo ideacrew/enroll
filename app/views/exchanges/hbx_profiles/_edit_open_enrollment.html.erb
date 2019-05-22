@@ -1,0 +1,60 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <div class="row edit_open_enrollment_fields">
+          <div class="col-md-12">
+
+            <%= form_tag extend_open_enrollment_exchanges_hbx_profiles_path(id: @employer_profile.id, plan_year_id: @plan_year.id),:method => :post do |f| %>
+              <%= hidden_field_tag :employer_profile_id, @employer_profile.id %>
+
+              <div class='row'>
+                <div class="col-sm-12">
+                  <div class="form-group pull-left">
+                    <label for="empoyerName"><strong><%= l10n("hbx_profiles.employer_name") %>:</strong></label>
+                      <%= @employer_profile.organization.legal_name %>
+                  </div>
+                </div>
+                <div class="col-sm-12">
+                  <div class="form-group pull-left">
+                    <label for="effectiveDate"><strong><%= l10n("hbx_profiles.effective_date") %>:</strong></label>
+                      <%= @plan_year.start_on.strftime('%m/%d/%Y') %>
+                  </div>
+                </div>
+                <div class="col-sm-12">
+                  <div class="form-group pull-left">
+                    <label for="openEnrollmentEndDate"><strong><%= l10n("hbx_profiles.open_enrollment_end_date") %>:</strong></label>
+                      <%= @plan_year.open_enrollment_end_on.strftime('%m/%d/%Y') %>
+                  </div>
+                </div>
+              </div>
+              <div class='row'>
+                <div class="col-sm-12">
+                  <div class="form-group pull-left">
+                    <label for="newOpenEnrollmentEnd"><strong><%= l10n("hbx_profiles.please_choose_new_oe_date") %>:</strong></label>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<input name="open_enrollment_end_date" type="text" class="uidatepicker" placeholder="Select OE End Date" class="form-control" required autocomplete="off" onkeypress="return false;">
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-sm-12">
+                   <div class="form-group pull-right">
+                      <%= submit_tag l10n("hbx_profiles.extend_oe"), class: "btn btn-primary #{pundit_class HbxProfile, :can_extend_open_enrollment? }" %> 
+                      <button type="button" class="btn btn-default" id="reviewClose">Cancel</button>
+                  </div>
+                </div>
+              </div>
+              <% end %>
+            </div> 
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(".uidatepicker").datepicker({minDate: "<%= @plan_year.open_enrollment_date_bounds[:min] %>", maxDate: "<%= @plan_year.open_enrollment_date_bounds[:max] %>", changeMonth: true, changeYear: true, yearRange: (new Date).getFullYear() + ":" + (new Date).getFullYear()+1 });
+
+  $(".uidatepicker").datepicker( "option", "dateFormat", "mm/dd/yy" );
+</script>

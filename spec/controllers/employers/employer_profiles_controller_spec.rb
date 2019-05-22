@@ -243,6 +243,7 @@ RSpec.describe Employers::EmployerProfilesController do
         allow(employer_profile).to receive(:enrollments_for_billing).and_return([hbx_enrollment])
         allow(employer_profile).to receive(:broker_agency_accounts).and_return([broker_agency_account])
         allow(employer_profile).to receive(:staff_roles).and_return([])
+        allow(employer_profile).to receive(:active_broker_agency_account).and_return(broker_agency_account)
         allow(employer_profile).to receive_message_chain(:organization ,:documents).and_return([])
         # allow(NfpIntegration::SoapServices::Nfp).to receive(:new).and_return(nfp_response)
         # allow(nfp_response).to receive(:display_token).and_return(false)
@@ -565,15 +566,6 @@ RSpec.describe Employers::EmployerProfilesController do
 
       it "renders the 'edit' template" do
         expect(response).to have_http_status(:redirect)
-      end
-    end
-
-    context "after account creation" do
-      let(:validation_result) { true }
-
-      it "sends employer_account_creation_notice" do 
-        expect(controller).to receive(:employer_account_creation_notice)
-        controller.employer_account_creation_notice
       end
     end
   end

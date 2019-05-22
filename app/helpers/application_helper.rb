@@ -555,6 +555,11 @@ module ApplicationHelper
     end
   end
 
+  def trigger_notice_observer(recipient, event_object, notice_event, params={})
+    observer = Observers::NoticeObserver.new
+    observer.deliver(recipient: recipient, event_object: event_object, notice_event: notice_event, notice_params: params)
+  end
+
   def notify_employer_when_employee_terminate_coverage(hbx_enrollment)
     begin
       if hbx_enrollment.is_shop? && hbx_enrollment.census_employee.present? && hbx_enrollment.employer_profile.present?
@@ -621,8 +626,10 @@ module ApplicationHelper
     census_employee.new_hire_enrollment_period.present?
   end
 
-  def eligibility_criteria(employer)
-    if employer.show_plan_year.present?
+  def eligibility_criteria(resource)
+    return if resource.is_a?(Notifier::NoticeKind)
+    employer = resource.try(:employer_profile)
+    if employer.present? && employer.show_plan_year.present?
       participation_rule_text = participation_rule(employer)
       non_owner_participation_rule_text = non_owner_participation_rule(employer)
       text = (@participation_count == 0 && @non_owner_participation_rule == true ? "Yes" : "No")

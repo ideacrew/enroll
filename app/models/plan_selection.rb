@@ -72,7 +72,7 @@ class PlanSelection
   end
 
   def verify_and_set_member_coverage_start_dates
-    if existing_coverage.present? && (existing_coverage.plan.hios_id == plan.hios_id)
+    if existing_coverage.present? && (existing_coverage.plan.hios_id == plan.hios_id) && existing_coverage.employer_profile == hbx_enrollment.employer_profile
       hbx_enrollment = set_enrollment_member_coverage_start_dates
       hbx_enrollment.predecessor_enrollment_id = existing_coverage._id
     end

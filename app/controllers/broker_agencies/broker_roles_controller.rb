@@ -29,9 +29,14 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
   end
 
   def search_broker_agency
-    orgs = Organization.has_broker_agency_profile.or({legal_name: /#{params[:broker_agency_search]}/i}, {"fein" => /#{params[:broker_agency_search]}/i})
-
-    @broker_agency_profiles = orgs.present? ? orgs.map(&:broker_agency_profile) : []
+    @filter_criteria = params.permit(:q, :is_staff_registration)
+    results = Organization.broker_agencies_with_matching_agency_or_broker(@filter_criteria)
+    if results.first.is_a?(Person)
+      @filtered_broker_roles  = results.map(&:broker_role)
+      @broker_agency_profiles = results.map{|broker| broker.broker_role.broker_agency_profile}.uniq
+    else
+      @broker_agency_profiles = results.map(&:broker_agency_profile).uniq
+    end
   end
 
   def favorite
@@ -61,7 +66,7 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
       # if verify_recaptcha(model: @broker_candidate, message: failed_recaptcha_message) && @broker_candidate.save
       if @broker_candidate.save
         flash[:notice] = notice
-        render 'confirmation'
+        render 'staff_confirmation'
       else
         @filter = params[:person][:broker_applicant_type]
         render 'new'

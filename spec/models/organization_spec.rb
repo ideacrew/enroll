@@ -215,10 +215,10 @@ RSpec.describe Organization, dbclean: :after_each do
       end
 
       context 'by_broker_agency_profile' do  
-        let(:organization6)  {FactoryGirl.create(:organization, fein: "024897585")}
-        let(:broker_agency_profile)  {organization6.create_broker_agency_profile(market_kind: "both", primary_broker_role_id: "8754985")}
-        let(:organization7)  {FactoryGirl.create(:organization, fein: "724897585")}
-        let(:broker_agency_profile7)  {organization7.create_broker_agency_profile(market_kind: "both", primary_broker_role_id: "7754985")}
+        let(:broker_role6)   { FactoryGirl.create(:broker_role, aasm_state:'active') }
+        let(:broker_agency_profile)  { FactoryGirl.create(:broker_agency_profile, market_kind: "both", primary_broker_role_id: broker_role6.id)}
+        let(:broker_role7)   { FactoryGirl.create(:broker_role, aasm_state:'active') }
+        let(:broker_agency_profile7)  { FactoryGirl.create(:broker_agency_profile, market_kind: "both", primary_broker_role_id: broker_role7.id)}
         let(:organization3)  {FactoryGirl.create(:organization, fein: "034267123")}
 
         it 'should match employers with active broker agency_profile' do
@@ -370,6 +370,40 @@ RSpec.describe Organization, dbclean: :after_each do
             expect(agencies.first.legal_name).to eq(@agency1.legal_name)
           end
         end
+
+        context 'when searching by broker agency name from staff search' do
+          it 'should return matching agencies' do
+
+            agencies = Organization.broker_agencies_with_matching_agency_or_broker({q: @agent1.first_name})
+            expect(agencies.count).to eq(2)
+
+            agencies = Organization.broker_agencies_with_matching_agency_or_broker({ q: 'random', is_staff_registartion: 'true' })
+            expect(agencies.count).to eq(0)
+          end
+        end
+      end
+    end
+  end
+
+  describe 'build_query_params' do
+    context 'search params are passed' do
+
+      it 'should return search params with values' do
+        search_params = {q: 'hello' }
+        expect(Organization.build_query_params(search_params)).to eq [{'legal_name'=> /hello/i}]
+      end
+
+      it 'should return search params with languages' do
+        search_params = {languages: ['en'] }
+        expect(Organization.build_query_params(search_params)).to eq [{'broker_agency_profile.languages_spoken'=>{'$in'=>['en']}}]
+      end
+    end
+
+    context 'search params passed for broker staff' do
+
+      it 'should return search params with array of empty hash' do
+        search_params = {is_staff_registration: 'true'}
+        expect(Organization.build_query_params(search_params)).to eq [{}]
       end
     end
   end
@@ -517,4 +551,20 @@ RSpec.describe Organization, dbclean: :after_each do
     end
   end
 
+  describe 'renewing_or_draft_py' do
+    context 'get renewing draft or draft plan year' do
+      let!(:organization)     { FactoryGirl.create(:organization) }
+      let!(:employer_profile) { FactoryGirl.build(:employer_profile, organization: organization) }
+      let!(:draft_plan_year)  { FactoryGirl.create(:next_month_plan_year, :with_benefit_group, aasm_state: 'draft', employer_profile: employer_profile) }
+      let!(:non_draft_plan_year) { FactoryGirl.create(:next_month_plan_year, :with_benefit_group, aasm_state: 'enrolling', employer_profile: employer_profile) }
+
+      it 'should return draft plan year' do
+        expect(organization.renewing_or_draft_py).to eq(draft_plan_year)
+      end
+
+      it 'should not return enrolling plan year' do
+        expect(organization.renewing_or_draft_py).not_to eq(non_draft_plan_year)
+      end
+    end
+  end
 end

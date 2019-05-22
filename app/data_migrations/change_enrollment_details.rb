@@ -1,3 +1,4 @@
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class ChangeEnrollmentDetails < MongoidMigrationTask
@@ -31,6 +32,8 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
         change_enrollment_status(enrollments)
       when "move_enrollment_to_shopping"
         move_enr_to_shopping(enrollments)
+      when "change_consumer_role_id"
+        change_consumer_role_id(enrollments)
     end
   end
 
@@ -41,6 +44,19 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
         raise "Found no (OR) more than 1 enrollments with the #{hbx_id}" unless Rails.env.test?
       end
       enrollments << HbxEnrollment.by_hbx_id(hbx_id.to_s).first
+    end
+  end
+  
+  def change_consumer_role_id(enrollments)
+    consumer_role_id = ENV['consumer_role_id'].to_s
+    puts "no consumer role id is provided" unless consumer_role_id.present?
+    enrollments.each do |enrollment|
+      if enrollment.kind == 'individual'
+        enrollment.update_attributes(consumer_role_id: consumer_role_id)
+        puts "Changed consumer role id to for enrollment #{enrollment.hbx_id} to #{consumer_role_id}" unless Rails.env.test?
+      else
+        puts "The enrollment with hbx-id #{enrollment.hbx_id} is not ivl" unless Rails.env.test?
+      end
     end
   end
 
@@ -118,7 +134,7 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
   def cancel_enr(enrollments)
     enrollments.each do |enrollment|
       if enrollment.may_cancel_coverage?
-        enrollment.cancel_coverage!
+        enrollment.update_attributes(aasm_state:"coverage_canceled")
         puts "enrollment with hbx_id: #{enrollment.hbx_id} cancelled" unless Rails.env.test?
       else
         puts " Issue with enrollment with hbx_id: #{enrollment.hbx_id}" unless Rails.env.test?
@@ -137,7 +153,7 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
   def expire_enrollment(enrollments)
     enrollments.each do |enrollment|
       if enrollment.may_expire_coverage?
-        enrollment.expire_coverage!
+        enrollment.update_attributes(aasm_state:"coverage_expired")
         puts "expire enrollment with hbx_id: #{enrollment.hbx_id}" unless Rails.env.test?
       else
         puts "HbxEnrollment with hbx_id: #{enrollment.hbx_id} can not be expired" unless Rails.env.test?

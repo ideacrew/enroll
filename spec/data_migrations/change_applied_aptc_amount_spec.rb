@@ -30,4 +30,22 @@ describe ChangeAppliedAptcAmount, dbclean: :after_each do
       expect(hbx_enrollment.applied_aptc_amount.to_f).to eq 450.0
     end
   end
+  describe "not allowed updating applied aptc amount for a dental enrollment with a given hbx_id" do
+
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, coverage_kind: "dental")}
+
+    before(:each) do
+      allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)
+      allow(ENV).to receive(:[]).with("applied_aptc_amount").and_return(450)
+    end
+
+    it "should update the applied aptc amount" do
+      hbx_enrollment.applied_aptc_amount = 0
+      hbx_enrollment.save
+      subject.migrate
+      hbx_enrollment.reload
+      expect(hbx_enrollment.applied_aptc_amount.to_f).to eq 0
+    end
+  end
 end
