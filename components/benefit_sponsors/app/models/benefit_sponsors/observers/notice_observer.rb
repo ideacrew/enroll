@@ -174,9 +174,9 @@ module BenefitSponsors
         benefit_application = model_event.klass_instance
         trigger_zero_employees_on_roster_notice(benefit_application)
         if benefit_application.is_renewing?
-          deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "renewal_application_submitted")
+          deliver(recipient: benefit_application.sponsor_profile, event_object: benefit_application, notice_event: "renewal_application_submitted")
         else
-          deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "initial_application_submitted")
+          deliver(recipient: benefit_application.sponsor_profile, event_object: benefit_application, notice_event: "initial_application_submitted")
         end
       end
 
@@ -186,7 +186,7 @@ module BenefitSponsors
         return unless policy.is_satisfied?(benefit_application)
 
         notice_event = benefit_application.is_renewing? ? "renewal_employer_open_enrollment_completed" : "initial_employer_open_enrollment_completed"
-        deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: notice_event)
+        deliver(recipient: benefit_application.sponsor_profile, event_object: benefit_application, notice_event: notice_event)
 
         return unless benefit_application.is_renewing?
 
@@ -205,12 +205,12 @@ module BenefitSponsors
         if benefit_application.is_renewing?
           return unless policy.fail_results.include?(:employer_primary_office_location)
 
-          deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "employer_renewal_eligibility_denial_notice")
+          deliver(recipient: benefit_application.sponsor_profile, event_object: benefit_application, notice_event: "employer_renewal_eligibility_denial_notice")
           benefit_application.benefit_sponsorship.census_employees.non_terminated.each do |ce|
             deliver(recipient: ce.employee_role, event_object: benefit_application, notice_event: "termination_of_employers_health_coverage") if ce.employee_role.present?
           end
         elsif policy.fail_results.include?(:employer_primary_office_location) || policy.fail_results.include?(:benefit_application_fte_count)
-          deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "employer_initial_eligibility_denial_notice")
+          deliver(recipient: benefit_application.sponsor_profile, event_object: benefit_application, notice_event: "employer_initial_eligibility_denial_notice")
         end
       end
 
@@ -223,7 +223,7 @@ module BenefitSponsors
 
         employer_notice_event = benefit_application.is_renewing? ? "renewal_employer_ineligibility_notice" : "initial_employer_application_denied"
         employee_notice_event = benefit_application.is_renewing? ? "employee_renewal_employer_ineligibility_notice" : "group_ineligibility_notice_to_employee"
-        deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: employer_notice_event)
+        deliver(recipient: benefit_application.sponsor_profile, event_object: benefit_application, notice_event: employer_notice_event)
 
         benefit_application.benefit_sponsorship.census_employees.non_terminated.each do |ce|
           deliver(recipient: ce.employee_role, event_object: benefit_application, notice_event: employee_notice_event) if ce.employee_role.present?
@@ -232,7 +232,7 @@ module BenefitSponsors
 
       def trigger_renewal_application_created_notice(model_event)
         benefit_application = model_event.klass_instance
-        employer_profile = benefit_application.employer_profile
+        employer_profile = benefit_application.sponsor_profile
         if employer_profile.is_converting?
           deliver(recipient: employer_profile, event_object: benefit_application, notice_event: "conversion_group_renewal")
         else
@@ -242,7 +242,7 @@ module BenefitSponsors
 
       def trigger_renewal_application_autosubmitted_notice(model_event)
         benefit_application = model_event.klass_instance
-        deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "renewal_application_autosubmitted") if benefit_application.is_renewing?
+        deliver(recipient: benefit_application.sponsor_profile, event_object: benefit_application, notice_event: "renewal_application_autosubmitted") if benefit_application.is_renewing?
         trigger_zero_employees_on_roster_notice(benefit_application)
       end
 
@@ -310,7 +310,7 @@ module BenefitSponsors
           next unless benefit_application.present? && !benefit_application.is_renewing?
 
           #Notice to employer for missing binder payment
-          deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "initial_employer_no_binder_payment_received")
+          deliver(recipient: benefit_application.sponsor_profile, event_object: benefit_application, notice_event: "initial_employer_no_binder_payment_received")
 
           benefit_sponsorship.census_employees.active.each do |ce|
             #Notice to employee that there employer misses binder payment
@@ -319,12 +319,15 @@ module BenefitSponsors
         end
       end
 
-      def trigger_group_advance_termination_confirmation_notice(model_event)
+      def trigger_group_termination_confirmation_notice_notice(model_event)
         benefit_application = model_event.klass_instance
-        deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "group_advance_termination_confirmation")
+        employer_event_name = benefit_application.termination_kind.to_s == "nonpayment" ? 'notify_employer_of_group_non_payment_termination' : 'group_advance_termination_confirmation'
+        employee_event_name = benefit_application.termination_kind.to_s == "nonpayment" ? 'notify_employee_of_group_non_payment_termination' : 'notify_employee_of_group_advance_termination'
+
+        deliver(recipient: benefit_application.sponsor_profile, event_object: benefit_application, notice_event: employer_event_name)
 
         benefit_application.benefit_sponsorship.census_employees.non_terminated.each do |ce|
-          deliver(recipient: ce.employee_role, event_object: benefit_application, notice_event: "notify_employee_of_group_advance_termination") if ce.employee_role
+          deliver(recipient: ce.employee_role, event_object: benefit_application, notice_event: employee_event_name) if ce.employee_role
         end
       end
 

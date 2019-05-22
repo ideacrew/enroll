@@ -14,7 +14,7 @@ module BenefitSponsors
         :application_denied,
         :renewal_application_autosubmitted,
         :initial_employee_plan_selection_confirmation,
-        :group_advance_termination_confirmation
+        :group_termination_confirmation_notice
       ].freeze
 
       REGISTERED_EVENTS_ON_CREATE = [
@@ -57,7 +57,7 @@ module BenefitSponsors
 
           is_initial_employee_plan_selection_confirmation = true if is_transition_matching?(to: :binder_paid, from: :enrollment_closed, event: :credit_binder)
 
-          is_group_advance_termination_confirmation = true if is_transition_matching?(to: [:terminated, :termination_pending], from: [:active, :expired], event: [:terminate_enrollment, :schedule_enrollment_termination])
+          is_group_termination_confirmation_notice = true if is_transition_matching?(to: [:terminated, :termination_pending], from: [:active, :suspended, :expired], event: [:terminate_enrollment, :schedule_enrollment_termination])
 
           if is_transition_matching?(to: :approved, from: [:draft, :imported] + BenefitSponsors::BenefitApplications::BenefitApplication::APPLICATION_EXCEPTION_STATES, event: :auto_approve_application)
             is_renewal_application_autosubmitted = true

@@ -21,14 +21,14 @@ RSpec.describe 'ModelEvents::EmployeeOpenEnrollmentReminder', :dbclean => :after
   let(:census_employee)  { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile) }
   let(:date_mock_object) { Date.new(current_effective_date.year, current_effective_date.prev_month.month, (Settings.aca.shop_market.open_enrollment.monthly_end_on - 2))}
 
-  before do
+  before :each do
     census_employee.update_attributes(employee_role_id: employee_role.id)
     census_employee.update_attributes!(created_at: current_effective_date.prev_year)
     TimeKeeper.set_date_of_record_unprotected!(date_mock_object)
   end
 
-  after :all do
-    TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
+  after :each do
+    TimeKeeper.set_date_of_record_unprotected!(Time.zone.today)
   end
 
   describe "ModelEvent" do

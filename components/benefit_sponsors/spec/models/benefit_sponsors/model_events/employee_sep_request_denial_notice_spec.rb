@@ -54,7 +54,7 @@ RSpec.describe 'ModelEvents::EmployeeSepRequestDeniedNotice', :dbclean => :after
     end
   end
 
-  describe "NoticeBuilder" do
+  describe "NoticeBuilder", :dbclean => :around_each do
 
     let(:data_elements) do
       [
@@ -112,7 +112,7 @@ RSpec.describe 'ModelEvents::EmployeeSepRequestDeniedNotice', :dbclean => :after
       expect(merge_model.benefit_application.current_py_start_date_plus_one_year).to eq initial_application.start_on.next_year.strftime('%m/%d/%Y')
     end
 
-    context "with QLE data_elements" do
+    context "with QLE data_elements", :dbclean => :around_each do
       it "should return qle_title" do
         expect(merge_model.special_enrollment_period.title).to eq qle.title
       end
@@ -133,7 +133,7 @@ RSpec.describe 'ModelEvents::EmployeeSepRequestDeniedNotice', :dbclean => :after
         expect(merge_model.future_sep?).to be_truthy
       end
 
-      context 'with valid/past event on date' do
+      context 'with valid/past event on date', :dbclean => :around_each do
 
         let(:payload) do
           { "event_object_kind" => 'BenefitSponsors::BenefitApplications::BenefitApplication',

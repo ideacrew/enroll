@@ -4,7 +4,7 @@ require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
-RSpec.describe 'BenefitSponsors::ModelEvents::GroupTerminationNotice', :dbclean => :after_each do
+RSpec.describe 'BenefitSponsors::ModelEvents::GroupTerminationDueToNonpaymentNotice', :dbclean => :after_each do
   include_context "setup benefit market with market catalogs and product packages"
   include_context "setup initial benefit application"
 
@@ -37,7 +37,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::GroupTerminationNotice', :dbclean 
     census_employee.update_attributes(employee_role_id: employee_role.id)
   end
 
-  describe 'when employer is terminated from shop other than nonpayment' do
+  describe 'when employer is terminated from shop due to nonpayment' do
     context 'ModelEvent' do
       it 'should trigger model event' do
         model_instance.class.observer_peers.keys.select { |ob| ob.is_a? BenefitSponsors::Observers::NoticeObserver }.each do |observer|
@@ -46,23 +46,28 @@ RSpec.describe 'BenefitSponsors::ModelEvents::GroupTerminationNotice', :dbclean 
             expect(model_event).to have_attributes(:event_key => :group_termination_confirmation_notice, :klass_instance => model_instance, :options => {})
           end
         end
-        service.terminate(end_date, termination_date, "voluntary", false)
+        service.terminate(end_date, termination_date, "nonpayment", false)
       end
     end
 
     context 'NoticeTrigger' do
       subject { BenefitSponsors::Observers::NoticeObserver.new }
       let(:model_event) { ::BenefitSponsors::ModelEvents::ModelEvent.new(:group_termination_confirmation_notice, model_instance, {}) }
+
+      before do
+        service.terminate(end_date, termination_date, "nonpayment", false)
+      end
+
       it 'should trigger notice event' do
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
-          expect(event_name).to eq "acapi.info.events.employer.group_advance_termination_confirmation"
+          expect(event_name).to eq "acapi.info.events.employer.notify_employer_of_group_non_payment_termination"
           expect(payload[:employer_id]).to eq abc_profile.hbx_id.to_s
           expect(payload[:event_object_kind]).to eq "BenefitSponsors::BenefitApplications::BenefitApplication"
           expect(payload[:event_object_id]).to eq model_instance.id.to_s
         end
 
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
-          expect(event_name).to eq "acapi.info.events.employee.notify_employee_of_group_advance_termination"
+          expect(event_name).to eq "acapi.info.events.employee.notify_employee_of_group_non_payment_termination"
           expect(payload[:employee_role_id]).to eq census_employee.employee_role.id.to_s
           expect(payload[:event_object_kind]).to eq 'BenefitSponsors::BenefitApplications::BenefitApplication'
           expect(payload[:event_object_id]).to eq model_instance.id.to_s
