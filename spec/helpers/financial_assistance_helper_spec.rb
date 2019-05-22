@@ -55,4 +55,22 @@ RSpec.describe FinancialAssistanceHelper, :type => :helper, dbclean: :after_each
       end
     end
   end
+
+  describe 'format_benefit_cost' do
+    context 'for valid arguments' do
+      it 'should return a valid string' do
+        expect(helper.format_benefit_cost(100.12, 'daily')).to eq "$100.12 Daily"
+      end
+    end
+
+    context 'for invalid arguments' do
+      it 'should return empty string' do
+        expect(helper.format_benefit_cost(nil, 'daily')).to eq ''
+      end
+
+      it 'should return empty string' do
+        expect(helper.format_benefit_cost(100.13, nil)).to eq ''
+      end
+    end
+  end
 end

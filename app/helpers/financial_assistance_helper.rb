@@ -253,4 +253,9 @@ module FinancialAssistanceHelper
     return '' unless phone.size == 10
     number_to_phone(phone, area_code: true)
   end
+
+  def format_benefit_cost(cost, frequency)
+    return '' if cost.nil? || frequency.nil?
+    "$" + cost.to_s + " " + frequency.to_s.capitalize
+  end
 end
