@@ -44,13 +44,11 @@ module BenefitSponsors
 
       def approve_profile_representative!(form)
         person = Person.find(form[:person_id])
-
-        if (form[:is_broker_agency_staff_profile?])
-          role = person.broker_agency_staff_roles.detect{|role| role.agency_pending? && role.benefit_sponsors_broker_agency_profile_id.to_s == form[:profile_id]}
-        else
-          role = person.employer_staff_roles.detect{|role| role.is_applicant? && role.benefit_sponsor_employer_profile_id.to_s == form[:profile_id]}
-        end
-
+        role = if form[:is_broker_agency_staff_profile?]
+                 person.broker_agency_staff_roles.detect{|staff| staff.agency_pending? && staff.benefit_sponsors_broker_agency_profile_id.to_s == form[:profile_id]}
+               else
+                 person.employer_staff_roles.detect{|staff| staff.is_applicant? && staff.benefit_sponsor_employer_profile_id.to_s == form[:profile_id]}
+               end
         if role && role.approve && role.save!
           return true, 'Role is approved'
         else
@@ -62,9 +60,8 @@ module BenefitSponsors
       def match_or_create_person(form)
         matched_people = get_matched_people(form)
 
-        if matched_people.count > 1
-          return false, "too many people match the criteria provided for your identity.  Please contact HBX."
-        end
+        return false, "too many people match the criteria provided for your identity.  Please contact HBX." unless matched_people.empty?
+
         if matched_people.count == 1
           mp = matched_people.first
           self.person = mp
@@ -77,15 +74,13 @@ module BenefitSponsors
       end
 
       def get_matched_people(form)
-        Person.where(
-            first_name: regex_for(form[:first_name]),
-            last_name: regex_for(form[:last_name]),
-            dob: form[:dob])
+        Person.where(first_name: regex_for(form[:first_name]),
+                     last_name: regex_for(form[:last_name]),
+                     dob: form[:dob])
       end
 
       def persist_broker_agency_staff_role!(profile)
-
-        terminated_brokers_with_same_profile =  person.broker_agency_staff_roles.detect{|role| role if role.benefit_sponsors_broker_agency_profile_id == profile.id && role.aasm_state == "broker_agency_terminated"}
+        terminated_brokers_with_same_profile = person.broker_agency_staff_roles.detect{|role| role if role.benefit_sponsors_broker_agency_profile_id == profile.id && role.aasm_state == "broker_agency_terminated"}
         active_brokers_with_same_profile =  person.broker_agency_staff_roles.detect{|role| role if role.benefit_sponsors_broker_agency_profile_id == profile.id && role.aasm_state == "active"}
         pending_brokers_with_same_profile = person.broker_agency_staff_roles.detect{|role| role if role.benefit_sponsors_broker_agency_profile_id == profile.id && role.aasm_state == "broker_agency_pending"}
 
@@ -98,7 +93,7 @@ module BenefitSponsors
           return false,  "you are already associated with this Broker Agency"
         else
           person.broker_agency_staff_roles << ::BrokerAgencyStaffRole.new({
-                                                                              broker_agency_profile: profile
+                                                                            broker_agency_profile: profile
                                                                           })
           person.save!
           return true, person
@@ -115,7 +110,7 @@ module BenefitSponsors
         end
       end
 
-      def add_broker_agency_staff_role(first_name, last_name, dob, email, broker_agency_profile)
+      def add_broker_agency_staff_role(first_name, last_name, dob, _email, broker_agency_profile)
         person = Person.where(first_name: /^#{first_name}$/i, last_name: /^#{last_name}$/i, dob: dob)
 
         return false, 'Person does not exist on the Exchange' if person.count == 0
@@ -126,32 +121,28 @@ module BenefitSponsors
 
         if terminated_brokers_with_same_profile.present?
           terminated_brokers_with_same_profile.broker_agency_active!
-          return true, person.first
         else
           broker_agency_staff_role = BrokerAgencyStaffRole.new(person: person.first, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: "active")
           broker_agency_staff_role.save
-
-          return true, person.first
         end
+        [true, person.first]
       end
 
       def deactivate_broker_agency_staff_role(person_id, broker_agency_profile_id)
         begin
           person = Person.find(person_id)
-        rescue
+        rescue StandardError
           return false, 'Person not found'
         end
 
-        broker_agency_staff_role = person.broker_agency_staff_roles.detect{ |role|
+        broker_agency_staff_role = person.broker_agency_staff_roles.detect do |role|
           (role.benefit_sponsors_broker_agency_profile_id.to_s || role.broker_agency_profile_id.to_s) == broker_agency_profile_id.to_s && role.is_open?
-        }
-
-        if broker_agency_staff_role
-          broker_agency_staff_role.broker_agency_terminate!
-          return true, 'Broker Agency Staff Role is inactive'
-        else
-          return false, 'No matching Broker Agency Staff role'
         end
+
+        return false, 'No matching Broker Agency Staff role' if broker_agency_staff_role.blank?
+
+        broker_agency_staff_role.broker_agency_terminate!
+        [true, 'Broker Agency Staff Role is inactive']
       end
 
       def add_person_contact_info(form)
