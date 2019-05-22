@@ -14,7 +14,7 @@ module BenefitSponsors
         def create
           @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_create(broker_staff_params)
           begin
-            @status , @result = @staff.save
+            @status,@result = @staff.save
             unless @staff.is_broker_registration_page
               flash[:notice] = "Role added successfully" if @status
               flash[:error] = "Role was not added because " + @result unless @status
@@ -23,7 +23,7 @@ module BenefitSponsors
             flash[:error] = "Role was not added because " + e.message
           end
           respond_to do |format|
-            format.html  { redirect_to profiles_broker_agencies_broker_agency_profile_path(id:params[:profile_id])}
+            format.html  { redirect_to profiles_broker_agencies_broker_agency_profile_path(id: params[:profile_id])}
             format.js
           end
         end
@@ -41,7 +41,7 @@ module BenefitSponsors
           rescue Exception => e
             flash[:error] = "Role was not approved because " + e.message
           end
-          redirect_to profiles_broker_agencies_broker_agency_profile_path(id:params[:profile_id])
+          redirect_to profiles_broker_agencies_broker_agency_profile_path(id: params[:profile_id])
         end
 
         def destroy
@@ -57,18 +57,18 @@ module BenefitSponsors
           rescue Exception => e
             flash[:error] = "Role was not removed because " + e.message
           end
-          redirect_to profiles_broker_agencies_broker_agency_profile_path(id:params[:profile_id])
+          redirect_to profiles_broker_agencies_broker_agency_profile_path(id: params[:profile_id])
         end
 
         def search_broker_agency
           @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_broker_agency_search(broker_staff_params)
-          @broker_agency_profiles =   @staff.broker_agency_search
+          @broker_agency_profiles = @staff.broker_agency_search
         end
 
         private
 
         def broker_staff_params
-          params[:staff].present? ? params[:staff] :  params[:staff] = {}
+          params[:staff].presence || params[:staff] = {}
           params[:staff].merge!({profile_id: params["staff"]["profile_id"] || params["profile_id"] || params["id"], person_id: params["person_id"], profile_type: params[:profile_type] || "broker_agency_staff",
                                   filter_criteria: params.permit(:q), is_broker_registration_page: params[:broker_registration_page] || params["staff"]["is_broker_registration_page"]})
           params[:staff].permit!

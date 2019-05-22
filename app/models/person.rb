@@ -619,14 +619,13 @@ class Person
   end
 
   def has_pending_broker_staff_role?(broker_agency_profile_id)
-    self.broker_agency_staff_roles.where({ 
-          aasm_state: :broker_agency_pending,
-          '$or' => 
-            [
-              {benefit_sponsors_broker_agency_profile_id: broker_agency_profile_id},
-              {broker_agency_profile_id: broker_agency_profile_id}
-            ],
-      }).size > 0
+    broker_agency_staff_roles.where({
+                                      aasm_state: :broker_agency_pending,
+                                      '$or' => [
+                                        {benefit_sponsors_broker_agency_profile_id: broker_agency_profile_id},
+                                        {broker_agency_profile_id: broker_agency_profile_id}
+                                      ]
+                                    }).size > 0
   end
 
   def active_broker_staff_roles
