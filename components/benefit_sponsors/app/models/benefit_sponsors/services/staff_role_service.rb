@@ -11,12 +11,12 @@ module BenefitSponsors
 
       def find_profile(form)
         organization = BenefitSponsors::Organizations::Organization.where("profiles._id" => BSON::ObjectId.from_string(form[:profile_id])).first
-        if organization.present?
-          if form.is_broker_agency_staff_profile?
-            organization.broker_agency_profile
-          else
-            organization.employer_profile
-          end
+        return if organization.blank?
+
+        if form.is_broker_agency_staff_profile?
+          organization.broker_agency_profile
+        else
+          organization.employer_profile
         end
       end
 
@@ -26,9 +26,9 @@ module BenefitSponsors
           match_or_create_person(form)
           persist_broker_agency_staff_role!(profile)
         elsif form[:is_broker_agency_staff_profile?]
-          add_broker_agency_staff_role(form[:first_name], form[:last_name], form[:dob], form[:email] , profile)
+          add_broker_agency_staff_role(form[:first_name], form[:last_name], form[:dob], form[:email], profile)
         else
-          Person.add_employer_staff_role(form[:first_name], form[:last_name], form[:dob], form[:email] , profile)
+          Person.add_employer_staff_role(form[:first_name], form[:last_name], form[:dob], form[:email], profile)
         end
       end
 
@@ -59,8 +59,8 @@ module BenefitSponsors
 
       def match_or_create_person(form)
         matched_people = get_matched_people(form)
-
-        return false, "too many people match the criteria provided for your identity.  Please contact HBX." unless matched_people.empty?
+        
+        return false, "too many people match the criteria provided for your identity.  Please contact HBX." if matched_people.count > 1
 
         if matched_people.count == 1
           mp = matched_people.first
@@ -156,7 +156,6 @@ module BenefitSponsors
                      :dob => form[:dob]
                    })
       end
-
       def regex_for(str)
         clean_string = ::Regexp.escape(str.strip)
         /^#{clean_string}$/i
