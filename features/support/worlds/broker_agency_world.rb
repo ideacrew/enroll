@@ -37,7 +37,7 @@ module BrokerAgencyWorld
   def create_broker_agency
     person = FactoryBot.create(:person)
     @person2 = FactoryBot.create(:person, first_name: 'staff', last_name: 'member')
-    user2 = FactoryBot.create(:user, person: @person2)
+    FactoryBot.create(:user, person: @person2)
     @user ||= User.create(email: 'hbx_admin_role@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: 'hbx_admin_role@dc.gov', person: person)
     @user.update_attributes(last_portal_visited: "/benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/#{broker_agency_profile.id}")
     broker_agency_profile.update_attributes!(aasm_state: 'is_approved')

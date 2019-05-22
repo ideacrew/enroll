@@ -25,7 +25,6 @@ BenefitSponsors::Engine.routes.draw do
           get :show_commission_statement
         end
       end
-      
       resources :broker_applicants
 
       resources :broker_roles

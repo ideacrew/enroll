@@ -185,7 +185,6 @@ module BenefitSponsors
 
 
     describe "DELETE destroy", dbclean: :after_each do
-
       context "should deactivate staff role" do
 
         let!(:staff_params) do
