@@ -10,10 +10,10 @@ module BenefitSponsors
     let!(:general_org) {FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)}
     let!(:employer_profile) {general_org.employer_profile}
     let!(:user) { FactoryBot.create(:user)}
-    let!(:person) { FactoryBot.create(:person, emails:[ FactoryBot.build(:email, kind:'work') ], user: user) }
+    let!(:person) { FactoryBot.create(:person, emails: [FactoryBot.build(:email, kind: 'work')], user: user) }
     let!(:active_employer_staff_role) {FactoryBot.create(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id, person: person)}
     let!(:broker_role) { FactoryBot.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person) }
-    let!(:broker_agency_staff_role) { FactoryBot.build(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person )}
+    let!(:broker_agency_staff_role) { FactoryBot.build(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person)}
     let(:broker_agency) {FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site)}
     let!(:broker_agency_profile) {broker_agency.broker_agency_profile}
     let!(:general_agency) {FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, site: site)}
@@ -120,21 +120,18 @@ module BenefitSponsors
       context "Person with Broker agency staff roles" do
 
         it  "should return true if broker staff is assigned to a broker agency profile" do
-
           params = { profile_id: broker_agency_profile.id, profile_type: "broker_agency_staff" }
           service = subject.new params
           expect(service.has_broker_agency_staff_role_for_profile(user, broker_agency_profile)). to eq true
         end
 
         it  "should return true if broker staff is assigned to a broker agency profile" do
-
           params = { profile_id: broker_agency_profile.id, profile_type: "broker_agency_staff" }
           service = subject.new params
           expect(service.has_broker_agency_staff_role_for_profile(user, broker_agency_profile)). to eq true
         end
 
         it  "should return false if broker staff is not assigned to a broker agency profile" do
-
           person.broker_agency_staff_roles.each{|staff| staff.update_attributes(benefit_sponsors_broker_agency_profile_id: nil)}
           params = { profile_id: broker_agency_profile.id, profile_type: "broker_agency_staff" }
           service = subject.new params
@@ -169,14 +166,12 @@ module BenefitSponsors
       context "Staff for broker agency profile" do
 
         it  "should return true if broker staff is assigned to a broker agency profile" do
-
           params = { profile_id: broker_agency_profile.id, profile_type: "broker_agency_staff" }
           service = subject.new params
           expect(service.is_staff_for_agency?(user, nil)). to eq true
         end
 
         it  "should return false if broker staff is not assigned to a broker agency profile" do
-
           person.broker_agency_staff_roles.each{|staff| staff.update_attributes(benefit_sponsors_broker_agency_profile_id: nil)}
           params = { profile_id: broker_agency_profile.id, profile_type: "broker_agency_staff" }
           service = subject.new params

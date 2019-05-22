@@ -1362,18 +1362,18 @@ describe Person, :dbclean => :after_each do
     let(:terminated_staff_member) { FactoryBot.create(:person)}
     let(:pending_staff_member) { FactoryBot.create(:person)}
 
-    before{
+    before do
       broker_staff_people.each do |person|
         FactoryBot.create(:broker_agency_staff_role, broker_agency_profile_id: broker_agency_profile.id, person: person, broker_agency_profile: broker_agency_profile, aasm_state: 'active')
       end
       FactoryBot.create(:broker_agency_staff_role, broker_agency_profile_id: broker_agency_profile.id, person: terminated_staff_member, broker_agency_profile: broker_agency_profile, aasm_state: 'broker_agency_terminated')
       FactoryBot.create(:broker_agency_staff_role, broker_agency_profile_id: broker_agency_profile.id, person: pending_staff_member, broker_agency_profile: broker_agency_profile, aasm_state: 'broker_agency_pending')
-    }
+    end
 
     context 'finds all active staff for broker with same broker agency profile id' do
-      before {
+      before do
         @broker_staff = Person.staff_for_broker(broker_agency_profile)
-      }
+      end
       it "should return all active staff for broker" do
         expect(@broker_staff.size).to eq(5)
       end
@@ -1386,9 +1386,9 @@ describe Person, :dbclean => :after_each do
     end
 
     context "finds all active & pending broker staff" do
-      before {
+      before do
         @broker_staff = Person.staff_for_broker_including_pending(broker_agency_profile)
-      }
+      end
 
       it "should return all active staff for broker" do
         expect(@broker_staff.size).to eq(6)

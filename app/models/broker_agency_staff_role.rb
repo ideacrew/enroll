@@ -62,7 +62,7 @@ class BrokerAgencyStaffRole
   end
 
   def approve
-    self.broker_agency_accept!
+    broker_agency_accept!
   end
   
   def current_state
@@ -88,7 +88,7 @@ class BrokerAgencyStaffRole
   end
 
   def is_open?
-    self.agency_pending? || self.is_active?
+    agency_pending? || is_active?
   end
 
   def is_active?

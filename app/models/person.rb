@@ -630,11 +630,11 @@ class Person
   end
 
   def active_broker_staff_roles
-    self.broker_agency_staff_roles.where(:aasm_state => :active)
+    broker_agency_staff_roles.where(:aasm_state => :active)
   end
 
   def has_active_broker_staff_role?
-    active_broker_staff_roles.size > 0
+    !active_broker_staff_roles.empty?
   end
 
   class << self
@@ -825,13 +825,13 @@ class Person
                       '$or' =>
                           [
                               {benefit_sponsors_broker_agency_profile_id: broker_profile.id }
-                          ],
+                          ]
                   },
                   {'$or' =>
                        [
                            {aasm_state: :broker_agency_pending},
                            {aasm_state: :active}
-                       ],
+                       ]
                   }
               ]
 
@@ -957,7 +957,7 @@ class Person
   end
 
   def agent?
-    agent = self.csr_role || self.assister_role || self.broker_role || self.hbx_staff_role || self.general_agency_staff_roles.present? || self.broker_agency_staff_roles.present?
+    agent = csr_role || assister_role || broker_role || hbx_staff_role || general_agency_staff_roles.present? || broker_agency_staff_roles.present?
     !!agent
   end
 

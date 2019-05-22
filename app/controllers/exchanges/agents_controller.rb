@@ -59,9 +59,7 @@ class Exchanges::AgentsController < ApplicationController
   end
 
   def check_agent_role
-    unless user_permission_satisfied?
-      redirect_to root_path, :flash => { :error => "You must be an Agent:  CSR, CAC, IPA or a Broker" }
-    end
+    redirect_to root_path, :flash => { :error => "You must be an Agent:  CSR, CAC, IPA or a Broker" } unless user_permission_satisfied?
     current_user.last_portal_visited = home_exchanges_agents_path
     current_user.save!
   end

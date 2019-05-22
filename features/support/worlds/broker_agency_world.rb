@@ -38,12 +38,13 @@ module BrokerAgencyWorld
     person = FactoryBot.create(:person)
     @person2 = FactoryBot.create(:person, first_name: 'staff', last_name: 'member')
     user2 = FactoryBot.create(:user, person: @person2)
-    @user ||= User.create( email: 'hbx_admin_role@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: 'hbx_admin_role@dc.gov', last_portal_visited: "/benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/#{broker_agency_profile.id}", person: person)
+    @user ||= User.create(email: 'hbx_admin_role@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: 'hbx_admin_role@dc.gov', person: person)
+    @user.update_attributes(last_portal_visited: "/benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/#{broker_agency_profile.id}")
     broker_agency_profile.update_attributes!(aasm_state: 'is_approved')
     broker_role = FactoryBot.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: @broker_agency_profile.id, person: person)
     broker_agency_profile.update_attributes!(primary_broker_role_id: broker_role.id)
     @broker_agency_profile ||= broker_agency_profile
-    broker_agency_staff_role = FactoryBot.build(:broker_agency_staff_role, broker_agency_profile_id: @broker_agency_profile.id,)
+    broker_agency_staff_role = FactoryBot.build(:broker_agency_staff_role, broker_agency_profile_id: @broker_agency_profile.id)
     person.broker_agency_staff_roles << broker_agency_staff_role
   end
 end

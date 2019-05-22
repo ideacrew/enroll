@@ -47,13 +47,13 @@ module BenefitSponsors
 
       context "creating staff role with existing person params" do
 
-        let!(:staff_params) {
+        let!(:staff_params) do
           {
               profile_type: "broker_agency_staff",
               broker_registration_page: "true",
               :staff => {:first_name => new_person_for_staff.first_name, :last_name => new_person_for_staff.last_name, :dob => new_person_for_staff.dob, email: "hello@hello.com",  :profile_id => bap_id}
           }
-        }
+        end
 
         before :each do
           post :create, params: staff_params, format: :js, xhr: true
@@ -78,14 +78,14 @@ module BenefitSponsors
 
       context 'person is already assigned as a staff to broker' do
 
-        let!(:staff_params) {
+        let!(:staff_params) do
           {
               profile_type: 'broker_agency_staff',
               broker_registration_page: 'true',
               :staff => {:first_name => new_person_for_staff1.first_name, :last_name => new_person_for_staff1.last_name, :dob => new_person_for_staff1.dob, email: "hello@hello.com",  :profile_id => bap_id}
 
           }
-        }
+        end
 
         before :each do
           post :create, params: staff_params, format: :js, xhr: true
@@ -130,11 +130,11 @@ module BenefitSponsors
 
       context "approve applicant staff role" do
 
-        let!(:staff_params) {
+        let!(:staff_params) do
           {
               :id => bap_id, :person_id => new_person_for_staff.id, :profile_id => bap_id
           }
-        }
+        end
 
         before :each do
           sign_in user
@@ -163,11 +163,11 @@ module BenefitSponsors
 
       context "approving invalid staff role" do
 
-        let!(:staff_params) {
+        let!(:staff_params) do
           {
               :id => bap_id, :person_id => new_person_for_staff1.id, :profile_id => bap_id
           }
-        }
+        end
 
         before :each do
           sign_in user
@@ -186,15 +186,15 @@ module BenefitSponsors
     end
 
 
-   describe "DELETE destroy", dbclean: :after_each do
+    describe "DELETE destroy", dbclean: :after_each do
 
       context "should deactivate staff role" do
 
-        let!(:staff_params) {
+        let!(:staff_params) do
           {
               :id => bap_id, :person_id => new_person_for_staff1.id, :profile_id => bap_id
           }
-        }
+        end
 
         before :each do
           sign_in user
@@ -223,11 +223,11 @@ module BenefitSponsors
 
       context "should not deactivate only staff role of broker" do
 
-        let!(:staff_params) {
+        let!(:staff_params) do
           {
               :id => second_broker_agency_profile.id, :person_id => new_person_for_staff1.id, :profile_id => second_broker_agency_profile.id
           }
-        }
+        end
 
         before :each do
           broker_agency_staff_role.update_attributes(benefit_sponsors_broker_agency_profile_id: second_broker_agency_profile.id, aasm_state: 'active')
@@ -256,12 +256,12 @@ module BenefitSponsors
 
       context "return result if broker agency is present" do
 
-        let!(:params) {
+        let!(:params) do
           {
               q: broker_agency_profile1.legal_name,
               broker_registration_page: "true"
           }
-        }
+        end
 
         it 'should be a success' do
           expect(response).to have_http_status(:success)
@@ -278,12 +278,12 @@ module BenefitSponsors
 
       context "should not return result" do
 
-        let!(:params) {
+        let!(:params) do
           {
               q: "hello world",
               broker_registration_page: "true"
           }
-        }
+        end
 
         it 'should be a success' do
           expect(response).to have_http_status(:success)
