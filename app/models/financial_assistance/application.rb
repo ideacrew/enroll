@@ -180,8 +180,8 @@ class FinancialAssistance::Application
     state :determination_response_error
     state :determined
 
-    event :submit, :after => [:record_transition, :set_submit] do
-      transitions from: :draft, to: :submitted do
+    event :submit, :after => :record_transition do
+      transitions from: :draft, to: :submitted, :after => :set_submit do
         guard do
           is_application_valid?
         end
@@ -194,8 +194,8 @@ class FinancialAssistance::Application
       end
     end
 
-    event :unsubmit, :after => [:record_transition, :unset_submit] do
-      transitions from: :submitted, to: :draft do
+    event :unsubmit, :after => :record_transition do
+      transitions from: :submitted, to: :draft , :after => :unset_submit do
         guard do
           true # add appropriate guard here
         end
