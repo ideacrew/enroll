@@ -60,12 +60,18 @@ class MigrateDcBrokerAgencyProfiles < Mongoid::Migration
                              else
                                self.initialize_new_organization(old_org, site)
                              end
-          raise Exception unless new_organization.valid?
           BenefitSponsors::Organizations::Organization.skip_callback(:create, :after, :notify_on_create, raise: false)
           BenefitSponsors::Organizations::Organization.skip_callback(:update, :after, :notify_observers, raise: false)
           BenefitSponsors::Organizations::Profile.skip_callback(:save, :after, :publish_profile_event, raise: false)
           BenefitSponsors::Documents::Document.skip_callback(:create, :after, :notify_on_create, raise: false)
-          new_organization.save!
+
+          if migrate_invalid_broker_hbx_id.include?(old_org.hbx_id)
+            new_organization.save(validate: false)  # migrating invalid broker agency profiles.
+          else
+            raise Exception unless new_organization.valid?
+            new_organization.save!
+          end
+
           print '.' unless Rails.env.test?
           success = success + 1
         rescue Exception => e
@@ -185,6 +191,10 @@ class MigrateDcBrokerAgencyProfiles < Mongoid::Migration
     Rails.cache.fetch("broker_agency_profile_#{id}", expires_in: 2.hour) do
       ::BrokerAgencyProfile.find(id)
     end
+  end
+
+  def self.migrate_invalid_broker_hbx_id  # these organizations has no office locations
+    ["ef19926553d4467598fe2d5927c54657", "65b6c4098e7c4b2bad0a0853313e331f"]
   end
 
   def self.find_site
