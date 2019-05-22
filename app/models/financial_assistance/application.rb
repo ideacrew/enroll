@@ -729,15 +729,16 @@ private
   end
 
   def create_verification_documents
-    applicants.each do |applicant|
-      income_assisted_verification = applicant.assisted_verifications.create!(status: "submitted", verification_type: "Income")
-      mec_assisted_verification = applicant.assisted_verifications.create!(status: "submitted", verification_type: "MEC")
+    active_applicants.each do |applicant|
+      %w[Income MEC].each do |type|
+        applicant.verification_types << VerificationType.new(type_name: type, validation_status: 'pending' )
+      end
     end
   end
 
   def delete_verification_documents
-    applicants.each do |applicant|
-      applicant.assisted_verifications.destroy_all
+    active_applicants.each do |applicant|
+      applicant.verification_types.destroy_all
     end
   end
 end

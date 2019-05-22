@@ -5,7 +5,6 @@ RSpec.describe FinancialAssistance::Application, type: :model, dbclean: :after_e
 
   before :each do
     allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
-    allow_any_instance_of(FinancialAssistance::Application).to receive(:create_verification_documents).and_return(true)
   end
 
   let!(:primary_member) { FactoryGirl.create(:person, :with_consumer_role) }
@@ -642,6 +641,39 @@ RSpec.describe FinancialAssistance::Application, type: :model, dbclean: :after_e
     it 'should record transition on an invalid application submit' do
       expect(invalid_app).to receive(:record_transition)
       invalid_app.submit!
+    end
+  end
+
+  describe '.create_verification_documents' do
+
+    it 'should create income and mec verification types' do
+      application.send(:create_verification_documents)
+      expect(applicant1.verification_types.count). to eq 2
+      expect(applicant2.verification_types.count). to eq 2
+    end
+
+    it 'should have both income and mec in pending state' do
+      application.active_applicants.each do |applicant|
+        applicant.verification_types.each do |type|
+          expect(type.validation_status). to eq('pending')
+        end
+      end
+    end
+  end
+
+  describe '.delete_verification_documents' do
+
+    before do
+      application.send(:create_verification_documents)
+    end
+
+    it 'should delete income and mec verification types' do
+      expect(applicant1.verification_types.count). to eq 2
+      application.send(:delete_verification_documents)
+      application.active_applicants.each do |applicant|
+        expect(applicant.verification_types.count). to eq 0
+      end
+
     end
   end
 
