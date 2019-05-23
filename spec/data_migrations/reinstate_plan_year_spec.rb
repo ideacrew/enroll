@@ -161,12 +161,13 @@ describe ReinstatePlanYear, dbclean: :after_each do
       end
 
       it "renewing plan year not force published, plan year should be moved to renewing draft state " do
-        allow(ENV).to receive(:[]).with("renewing_force_publish").and_return(false)
-        expect(renewing_plan_year.aasm_state).to eq 'renewing_canceled'   # before update
-        subject.migrate
+        ClimateControl.modify renewing_force_publish: false do
+          expect(renewing_plan_year.aasm_state).to eq 'renewing_canceled'   # before update
+          subject.migrate
 
-        renewing_plan_year.reload
-        expect(renewing_plan_year.aasm_state).to eq 'renewing_draft'    # after update
+          renewing_plan_year.reload
+          expect(renewing_plan_year.aasm_state).to eq 'renewing_draft'    # after update
+        end
       end
     end
   end
