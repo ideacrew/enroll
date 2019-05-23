@@ -1,5 +1,8 @@
 require "rails_helper"
+
 require File.join(Rails.root, "app", "data_migrations", "products", "mapping_to_correct_hios_id")
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
   
 describe MappingToCorrectHiosId, dbclean: :after_each do
 
@@ -13,48 +16,18 @@ describe MappingToCorrectHiosId, dbclean: :after_each do
   end
 
   describe "update employee role id on the enrollments", dbclean: :after_each do
-    let(:current_effective_date)  { TimeKeeper.date_of_record }
-    let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-    let(:benefit_market)      { site.benefit_markets.first }
-    let!(:rating_area)   { FactoryBot.create_default :benefit_markets_locations_rating_area }
-    let!(:service_area)  { FactoryBot.create_default :benefit_markets_locations_service_area }
-    let!(:security_question)  { FactoryBot.create_default :security_question }
-    let(:start_on)  { current_effective_date.prev_month }
-    let(:effective_period)  { start_on..start_on.next_year.prev_day }
-    let(:organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
-    let(:benefit_sponsorship) { BenefitSponsors::BenefitSponsorships::BenefitSponsorship.new(profile: employer_organization.employer_profile) }
-    let!(:employer_profile) {benefit_sponsorship.profile}
-    let!(:employer_attestation)     { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
-    let!(:benefit_sponsorship) do
-      FactoryBot.create(
-        :benefit_sponsors_benefit_sponsorship,
-        :with_rating_area,
-        :with_service_areas,
-        supplied_rating_area: rating_area,
-        service_area_list: [service_area],
-        organization: organization,
-        profile_id: organization.profiles.first.id,
-        benefit_market: site.benefit_markets[0],
-        employer_attestation: employer_attestation)
-    end
-    let!(:benefit_sponsor_catalog) { FactoryBot.create(:benefit_markets_benefit_sponsor_catalog, service_areas: [service_area]) }
-    let!(:benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application, benefit_sponsor_catalog: benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, effective_period: effective_period, aasm_state: :active)
-    }
-    let!(:benefit_application_id) { benefit_application.id.to_s }
-    let!(:issuer_profile)  { FactoryBot.create :benefit_sponsors_organizations_issuer_profile, assigned_site: site}
-    let!(:product_package_kind) { :single_issuer }
-    let!(:update_product_package) { benefit_sponsor_catalog.product_packages.where(package_kind: product_package_kind).first.update_attributes(package_kind: :single_product) }
+    include_context 'setup benefit market with market catalogs and product packages'
+    include_context 'setup initial benefit application'
 
-    let!(:product_package) { benefit_sponsor_catalog.product_packages.where(package_kind: :single_product).first}
-    let!(:products){product_package.products.update_all(product_package_kinds: [:single_product])}
-    let!(:product) { product_package.products.first}
-    let!(:product2) {product_package.products.last}
-
-    let!(:benefit_package) { FactoryBot.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application, product_package: product_package) }
+    let(:start_on)  { TimeKeeper.date_of_record.beginning_of_month.prev_month }
+    let!(:employer_profile) { abc_profile }
+    let!(:benefit_application) { initial_application }
+    let(:single_product_package) { benefit_sponsor_catalog.product_packages.where(package_kind: :single_product).first }
+    let!(:product) { single_product_package.products.first}
+    let(:product2) { single_product_package.products.last }
+    let!(:benefit_package) { current_benefit_package }
     let(:benefit_group_assignment) {FactoryBot.build(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_package)}
-
     let!(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: employer_profile, census_employee_id: census_employee.id) }
-    let!(:benefit_group_assignment) {FactoryBot.build(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_package)}
     let!(:census_employee) { FactoryBot.create(:census_employee,
       employer_profile_id: nil,
       benefit_sponsors_employer_profile_id: employer_profile.id,
@@ -73,28 +46,23 @@ describe MappingToCorrectHiosId, dbclean: :after_each do
                          employee_role_id: employee_role.id,
                          sponsored_benefit_package_id: benefit_package.id,
                          benefit_group_assignment_id: benefit_group_assignment.id,
-                         sponsored_benefit_id: benefit_application.benefit_packages.first.health_sponsored_benefit.id,
+                         sponsored_benefit_id: benefit_package.health_sponsored_benefit.id,
                          aasm_state: 'coverage_selected'
       )
     end
 
-    before(:each) do
-      ENV["feins"] = organization.fein
-      ENV['hios_id'] = product2.hios_id
-      census_employee.update_attributes!(employee_role_id: employee_role.id)
+    around do |example|
+      current_benefit_market_catalog
+      ClimateControl.modify feins: abc_organization.fein, hios_id: product2.hios_id do
+        census_employee.update_attributes!(employee_role_id: employee_role.id)
+        example.run
+      end
     end
-
-    #around do |example|
-    #  ClimateControl.modify feins: organization.fein, hios_id: product2.hios_id do
-    #    census_employee.update_attributes!(employee_role_id: employee_role.id)
-    #    example.run
-    #  end
-    #end
 
     it "Mapping reference_product_id with other product_id" do
       subject.migrate
-      benefit_application.reload
-      expect(benefit_application.benefit_packages.first.health_sponsored_benefit.reference_product_id).to eq product2.id
+      benefit_package.reload
+      expect(benefit_package.health_sponsored_benefit.reference_product_id).to eq product2.id
     end
 
     it "Updating hbx_enrollment product_id with it's reference_product_id" do
