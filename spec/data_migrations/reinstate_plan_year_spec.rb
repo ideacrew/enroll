@@ -20,12 +20,14 @@ describe ReinstatePlanYear, dbclean: :after_each do
     let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
     let!(:census_employee) { FactoryBot.create(:census_employee,employer_profile: employer_profile)}
 
-    before(:each) do
-      allow(ENV).to receive(:[]).with("fein").and_return(employer_profile.parent.fein)
-      allow(ENV).to receive(:[]).with("plan_year_start_on").and_return(plan_year.start_on)
-      allow(ENV).to receive(:[]).with("update_current_enrollment").and_return(true)
-      allow(ENV).to receive(:[]).with("update_renewal_enrollment").and_return(true)
-      allow(ENV).to receive(:[]).with("renewing_force_publish").and_return(true)
+    around do |example|
+      ClimateControl.modify fein: employer_profile.parent.fein,
+                            plan_year_start_on: plan_year.start_on,
+                            update_current_enrollment: true,
+                            update_renewal_enrollment: true,
+                            renewing_force_publish: true do
+        example.run
+      end
     end
 
     context "when reinstating active plan year plan year" do

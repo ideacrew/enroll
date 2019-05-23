@@ -3,11 +3,12 @@ require 'rake'
 require 'csv'
 
 describe 'import conversion employer/employee details ', :dbclean => :after_each do
-
-  before do
-    load File.expand_path("#{Rails.root}/lib/tasks/conversion_import.rake", __FILE__)
-    ENV['feins_list'] = ""
-    Rake::Task.define_task(:environment)
+  around do |example|
+    ClimateControl.modify feins_list: '' do
+      load File.expand_path("#{Rails.root}/lib/tasks/conversion_import.rake", __FILE__)
+      Rake::Task.define_task(:environment)
+      example.run
+    end
   end
 
   context 'conversion_import:employers' do
@@ -32,7 +33,6 @@ describe 'import conversion employer/employee details ', :dbclean => :after_each
   end
 
   context 'conversion_import:employees' do
-
     after :all do
       File.delete(File.join("#{Rails.root}/public", "employees_export_conversion.csv")) if File.file?(File.join("#{Rails.root}/public", "employees_export_conversion.csv"))
     end
@@ -57,8 +57,5 @@ describe 'import conversion employer/employee details ', :dbclean => :after_each
       Rake::Task["conversion_import:employees"].invoke("")
       expect(File.exists?("#{Rails.root}/public/employees_export_conversion.csv")).to be true
     end
-
-
   end
-
 end

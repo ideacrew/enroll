@@ -77,11 +77,19 @@ describe MappingToCorrectHiosId, dbclean: :after_each do
                          aasm_state: 'coverage_selected'
       )
     end
+
     before(:each) do
       ENV["feins"] = organization.fein
       ENV['hios_id'] = product2.hios_id
       census_employee.update_attributes!(employee_role_id: employee_role.id)
     end
+
+    #around do |example|
+    #  ClimateControl.modify feins: organization.fein, hios_id: product2.hios_id do
+    #    census_employee.update_attributes!(employee_role_id: employee_role.id)
+    #    example.run
+    #  end
+    #end
 
     it "Mapping reference_product_id with other product_id" do
       subject.migrate

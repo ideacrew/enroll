@@ -18,6 +18,17 @@ RSpec.describe 'The employees of MA new groups received a notice in their accoun
     person1.reload
   end
 
+  #around do |example|
+  #  notice_date = TimeKeeper::date_of_record.strftime("%m/%d/%Y")
+  #  load File.expand_path("#{Rails.root}/lib/tasks/migrations/disregard_termination_of_coverage_notice_ee.rake", __FILE__)
+  #  Rake::Task.define_task(:environment)
+  #  ClimateControl.modify notice_date: notice_date, hbx_id: "3382429 3504641" do
+  #    Rake::Task["secure_message1:disregard_termination_of_coverage_notice_ee"].invoke(hbx_id: "3382429 3504641", notice_date: notice_date)
+  #    person1.reload
+  #    example.run
+  #  end
+  #end
+
   context "create employee messages" do
     it 'should create secure inbox message for employee' do
       allow(Person).to receive(:where).with(hbx_id: "3382429").and_return(person1)

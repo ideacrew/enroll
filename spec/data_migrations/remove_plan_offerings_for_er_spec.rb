@@ -16,10 +16,12 @@ describe RemovePlanOfferings, dbclean: :after_each do
     let(:benefit_group) { FactoryBot.build(:benefit_group, reference_plan_id:active_benefit_group_ref_plan.id, elected_plan_ids:[active_benefit_group_ref_plan.id, active_benefit_group_ref_plan2.id]) }
     let(:employer_profile) { FactoryBot.create(:employer_profile, organization: organization) }
     let(:plan_year) {FactoryBot.create(:plan_year, employer_profile: employer_profile, benefit_groups:[benefit_group])}
-    before(:each) do
-      ENV['fein'] = employer_profile.fein
-      ENV['aasm_state'] = plan_year.aasm_state
-      ENV['carrier_profile_id'] = benefit_group.elected_plans.last.carrier_profile_id
+    around do |example|
+      ClimateControl.modify fein: employer_profile.fein,
+                            aasm_state: plan_year.aasm_state,
+                            carrier_profile_id: benefit_group.elected_plans.last.carrier_profile.id do
+        example.run
+      end
     end
     it "should remove plan from er" do
       allow(EmployerProfile).to receive(:find).and_return(employer_profile)
