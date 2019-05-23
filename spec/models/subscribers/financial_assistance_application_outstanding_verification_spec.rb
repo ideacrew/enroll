@@ -192,9 +192,7 @@ describe Subscribers::FinancialAssistanceApplicationOutstandingVerification, dbc
   describe 'store_payload', dbclean: :after_each do
     let!(:person) { FactoryGirl.create(:person, :with_consumer_role) }
     let!(:family)  { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
-    let!(:application) {
-      FactoryGirl.create(:application, family: family, aasm_state: "determined")
-    }
+    let!(:application) { FactoryGirl.create(:application, family: family, aasm_state: "determined") }
     let!(:applicant) { FactoryGirl.create(:applicant, application: application, family_member_id: family.primary_applicant.id)}
 
     before do
@@ -202,7 +200,7 @@ describe Subscribers::FinancialAssistanceApplicationOutstandingVerification, dbc
     end
 
     ['Income', 'MEC'].each do |kind|
-      context "#{kind}" do
+      context kind.to_s do
         before do
           subject.send(:store_payload, kind, "sample payload xml")
         end

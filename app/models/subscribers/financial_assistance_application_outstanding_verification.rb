@@ -91,7 +91,7 @@ module Subscribers
         if assisted_verification.status == "pending"
           assisted_verification.update_attributes(status: status, verification_failed: verification_failed)
         else
-          new_assisted_verification = @applicant_in_context.assisted_verifications.create!(verification_type: kind, status: status, verification_failed: verification_failed)
+          @applicant_in_context.assisted_verifications.create!(verification_type: kind, status: status, verification_failed: verification_failed)
         end
 
         update_applicant(kind, @applicant_in_context, status)
