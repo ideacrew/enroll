@@ -2,8 +2,9 @@ $('#ivl_plans').html("<%= escape_javascript(render partial: "insured/plan_shoppi
 
 $(document).ready(function(){
   if ($('.aptc').length > 0){
-    var elected_aptc = $("input#elected_aptc").val();
-    var max_aptc = $("input#max_aptc").val();
+    //val() is returing empty, changed to attr('value')
+    var elected_aptc = $("input#elected_aptc").attr('value');
+    var max_aptc = $("input#max_aptc").attr('value');
     if (max_aptc == "" || parseFloat(max_aptc) == 0){
       elected_pct = 1;
     } else {

@@ -138,7 +138,7 @@ function applyPlanSort(sort_by){
   });
   $("#all-plans #plans").empty().append(plandivs);
 };
-
+*/
 function updatePlanCost(elected_aptc) {
   var elected_amount = parseFloat(elected_aptc);
   var plans = $('.plan-row');
@@ -180,18 +180,19 @@ $(function() {
 		}
   });
 
-  $(document).on('change', '.select-plan-for-comparison', function(){
-		maybeAddComparisonPlan(this);
-  });
+//  $(document).on('change', '.select-plan-for-comparison', function(){
+//		maybeAddComparisonPlan(this);
+//  });
 
-  $(document).on('click', '.compare-selected-plans-link', function(){
-		var base_url = $(this).attr("data-uri");
-		doPlanComparison(base_url);
-  });
+//  $(document).on('click', '.compare-selected-plans-link', function(){
+//		var base_url = $(this).attr("data-uri");
+//		doPlanComparison(base_url);
+//  });
 
   $(document).on('change', 'input[name="elected_pct"]', function(){
     var elected_pct = $("input[name='elected_pct']").val();
-    var elected_amount = parseFloat($('#max_aptc').val()).toFixed(2) * parseFloat(elected_pct).toFixed(2);
+    //val() is returing empty, changed to attr('value')
+    var elected_amount = parseFloat($('#max_aptc').attr('value')).toFixed(2) * parseFloat(elected_pct).toFixed(2);
     $('#elected_aptc').val(elected_amount.toFixed(2));
   });
 
@@ -207,7 +208,8 @@ $(function() {
   });
 
   $(document).on('click', '.all-filters-row .apply-btn', function(){
-		applyPlanFilters();
+//    TODO fix me for filtering options
+//		applyPlanFilters();
 
     if ($('.aptc').length > 0){
       var elected_aptc = $("input#elected_aptc").val();
@@ -215,7 +217,8 @@ $(function() {
       updatePlanCost(elected_aptc);
       $.ajax({
         type: "POST",
-        url: $('#set_elected_aptc_url').val(),
+        //val() is returing empty, changed to attr('value')
+        url: $('#set_elected_aptc_url').attr('value'),
         dataType: 'script',
         data: {
           'elected_aptc': elected_aptc
@@ -224,22 +227,22 @@ $(function() {
     };
   });
 
-  $(document).on('click', '.all-filters-row .reset-btn', function(){
-    $(".filter-sidebar input[type='checkbox']").attr("checked", false);
-    $(".filter-sidebar input[type='text'].plan-metal-premium-from-selection-filter").val("0");
-    $(".filter-sidebar input[type='text'].plan-metal-premium-to-selection-filter").val($('#max_total_employee_cost').val());
-    $(".filter-sidebar input[type='text'].plan-metal-deductible-from-selection-filter").val("0");
-    $(".filter-sidebar input[type='text'].plan-metal-deductible-to-selection-filter").val($('#max_deductible').val());
-    $(".filter-sidebar select.plan-carrier-selection-filter").prop('selectedIndex', 0).selectric('refresh');
-    $(".filter-sidebar select.plan-hsa-eligibility-selection-filter").prop('selectedIndex', 0).selectric('refresh');
-		applyPlanFilters();
-  });
+//  $(document).on('click', '.all-filters-row .reset-btn', function(){
+//    $(".filter-sidebar input[type='checkbox']").attr("checked", false);
+//    $(".filter-sidebar input[type='text'].plan-metal-premium-from-selection-filter").val("0");
+//    $(".filter-sidebar input[type='text'].plan-metal-premium-to-selection-filter").val($('#max_total_employee_cost').val());
+//    $(".filter-sidebar input[type='text'].plan-metal-deductible-from-selection-filter").val("0");
+//    $(".filter-sidebar input[type='text'].plan-metal-deductible-to-selection-filter").val($('#max_deductible').val());
+//    $(".filter-sidebar select.plan-carrier-selection-filter").prop('selectedIndex', 0).selectric('refresh');
+//    $(".filter-sidebar select.plan-hsa-eligibility-selection-filter").prop('selectedIndex', 0).selectric('refresh');
+//		applyPlanFilters();
+//  });
+//
+//  $(document).on('click', '#sort_by a', function(){
+//    applyPlanSort($(this).data('sort-by'));
+//  });
 
-  $(document).on('click', '#sort_by a', function(){
-    applyPlanSort($(this).data('sort-by'));
-  });
-
-  $(document).on('click', "#plans .plan-select.btn-default.select", function(e){
+  $(document).on('click', "#ivl_plans .plan-select.btn-default.select", function(e){
     var url = $(this).data('url');
     if ($('.aptc').length > 0){
       var elected_aptc = $("input#elected_aptc").val();
@@ -252,4 +255,4 @@ $(function() {
 
 $(document).on("click", ".reference_plan_info h4 span", function() {
   $(this).parents(".reference_plan_info").find('.content').toggle();
-});*/
+});

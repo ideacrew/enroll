@@ -31,11 +31,8 @@
                     a.btn.btn-default data-sort-by='plan-carrier' onclick="filterBy(this)" = l10n("carrier")
                 #ivl_plans
                   h3
-                      /= TODO: Fix when javascript
-                    /= l10n("loading")
-                    /| ...
-                    = render partial: "insured/plan_shoppings/plan_details", collection: @plans, as: :plan
-
+                    = l10n("loading")
+                    | ...
               - if @market_kind == "shop"
                 #plans
                   = render partial: "ui-components/v1/cards/plan_details", collection: @member_groups, as: :plan

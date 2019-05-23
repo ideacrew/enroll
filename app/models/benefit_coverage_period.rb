@@ -45,7 +45,7 @@ class BenefitCoveragePeriod
   #
   # @param new_plan [ Plan ] The reference plan.
   def second_lowest_cost_silver_plan=(new_plan)
-    raise ArgumentError.new("expected Plan") unless new_plan.is_a?(Plan)
+    raise ArgumentError, 'expected Plan' unless new_plan.is_a?(BenefitMarkets::Products::Product)
     raise ArgumentError.new("slcsp metal level must be silver") unless new_plan.metal_level == "silver"
     self.slcsp_id = new_plan._id
     self.slcsp = new_plan._id
@@ -57,7 +57,11 @@ class BenefitCoveragePeriod
   # @return [ Plan ] reference plan
   def second_lowest_cost_silver_plan
     return @second_lowest_cost_silver_plan if defined? @second_lowest_cost_silver_plan
-    @second_lowest_cost_silver_plan = Plan.find(slcsp_id) unless slcsp_id.blank?
+    @second_lowest_cost_silver_plan = find_product(slcsp_id) if slcsp_id.present?
+  end
+
+  def find_product(slcsp_id)
+    BenefitMarkets::Products::Product.find(slcsp_id)
   end
 
   # @todo Available products from which this sponsor may offer benefits during this benefit coverage period
