@@ -20,10 +20,12 @@ module BenefitSponsors
             @is_employee_waiver_confirmation = true
           end
 
-          if is_transition_matching?(to: [:coverage_terminated, :coverage_termination_pending], from: [:coverage_termination_pending, :coverage_selected, :coverage_enrolled, :auto_renewing,
-                           :renewing_coverage_selected,:auto_renewing_contingent, :renewing_contingent_selected, :renewing_contingent_transmitted_to_carrier,
-                           :renewing_contingent_enrolled, :enrolled_contingent, :unverified], event: [:terminate_coverage, :schedule_coverage_termination])
-            @is_employee_coverage_termination = true
+          if is_transition_matching?(to: [:coverage_terminated, :coverage_termination_pending],
+                                     from: [:coverage_selected, :coverage_enrolled, :auto_renewing, :renewing_coverage_selected, :auto_renewing_contingent,
+                                            :renewing_contingent_selected, :renewing_contingent_transmitted_to_carrier, :renewing_contingent_enrolled,
+                                            :enrolled_contingent, :unverified],
+                                     event: [:terminate_coverage, :schedule_coverage_termination])
+            @is_employee_coverage_termination = true unless is_shop? && (sponsored_benefit_package.benefit_application.terminated? || sponsored_benefit_package.benefit_application.termination_pending?)
           end
 
           # TODO -- encapsulated notify_observers to recover from errors raised by any of the observers
