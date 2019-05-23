@@ -24,9 +24,10 @@ describe "load_dummy_rates" do
   end
 
   context "load_rates" do
-    before :each do
-      ENV["start_date"] = @end_date.next_month.beginning_of_month.strftime("%Y-%m-%d")
-      ENV["action"] = 'load_rates'
+    around do |example|
+      ClimateControl.modify start_date: @end_date.next_month.beginning_of_month.strftime("%Y-%m-%d"), action: 'load_rates' do
+        example.run
+      end
     end
 
     it "should load the dummy data" do
@@ -51,9 +52,10 @@ describe "load_dummy_rates" do
   end
 
   context "cleanup_rates" do
-    before :each do
-      ENV["start_date"] = @end_date.next_month.beginning_of_month.strftime("%Y-%m-%d")
-      ENV["action"] = 'cleanup_rates'
+    around do |example|
+      ClimateControl.modify start_date: @end_date.next_month.beginning_of_month.strftime("%Y-%m-%d"), action: 'cleanup_rates' do
+        example.run
+      end
     end
 
     it "should cleanup the dummy data" do
