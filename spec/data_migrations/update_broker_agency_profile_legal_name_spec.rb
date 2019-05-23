@@ -6,9 +6,9 @@ describe UpdateBrokerAgencyProfileLegalName, dbclean: :after_each do
   let(:given_task_name) { "update_broker_agency_profile_legal_name" }
   subject { UpdateBrokerAgencyProfileLegalName.new(given_task_name, double(:current_scope => nil)) }
 
-  after :each do
-    ["fein", "new_legal_name"].each do |env_variable|
-      ENV[env_variable] = nil
+  around :each do |example|
+    ClimateControl.modify fein: nil, new_legal_name: nil do
+      example.run
     end
   end
 
@@ -24,9 +24,10 @@ describe UpdateBrokerAgencyProfileLegalName, dbclean: :after_each do
     let(:broker_agency_profile) { FactoryBot.create(:broker_agency_profile) }
     let(:organization) { broker_agency_profile.organization }
 
-    before(:each) do
-      ENV["fein"] =  organization.fein
-      ENV["new_legal_name"] = "agency2"
+    around(:each) do |example|
+      ClimateControl.modify fein: organization.fein, new_legal_name: "agency2" do
+        example.run
+      end
     end
 
     context "change the legal name of broker agency profile", dbclean: :after_each do
