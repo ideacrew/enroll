@@ -20,11 +20,14 @@ describe "UpdateDentalRelationshipBenefits", dbclean: :after_each do
 
   describe "change person relationships kind" do
     let!(:benefit_group)  {FactoryBot.create(:benefit_group, :with_valid_dental)}
-    before(:each) do
-     ENV["fein"] = benefit_group.employer_profile.organization.fein
-     ENV["plan_year_start_on"] = benefit_group.plan_year.start_on.to_s
-     ENV["benefit_group_id"] = benefit_group.id
-     ENV["relationship"] = 'spouse'
+
+    around do |example|
+     ClimateControl.modify fein: benefit_group.employer_profile.organization.fein,
+                           plan_year_start_on: benefit_group.plan_year.start_on.to_s,
+                           benefit_group_id: benefit_group.id,
+                           relationship: 'spouse'  do
+       example.run
+     end
     end
 
     it "should change person relationships kind" do

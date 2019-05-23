@@ -5,12 +5,6 @@ describe MovePhoneBetweenPersonAccounts do
   let(:given_task_name) { "move_phone_between_person_accounts" }
   subject { MovePhoneBetweenPersonAccounts.new(given_task_name, double(:current_scope => nil)) }
 
- after :each do
-  ["from_hbx_id", "to_hbx_id", "phone_id"].each do |env_variable|
-    ENV[env_variable] = nil
-   end
- end
-
   describe "given a task name" do
     it "has the given task name" do
       expect(subject.name).to eql given_task_name
@@ -21,10 +15,12 @@ describe MovePhoneBetweenPersonAccounts do
     let(:person1) { FactoryBot.create(:person)}
     let(:phone) {FactoryBot.create(:phone,:for_testing, person: person1)}
     let(:person2){FactoryBot.create(:person)}
-    before(:each) do
-       ENV["from_hbx_id"] = person1.hbx_id
-       ENV["to_hbx_id"] = person2.hbx_id
-       ENV["phone_id"] = phone.id.to_s
+    around do |example|
+     ClimateControl.modify from_hbx_id: person1.hbx_id,
+                           to_hbx_id: person2.hbx_id,
+                           phone_id: phone.id.to_s do
+       example.run
+     end
     end
 
     it "should move user from person1 to person2" do
@@ -42,10 +38,12 @@ describe MovePhoneBetweenPersonAccounts do
     let(:person1) { FactoryBot.create(:person)}
     let(:phone) {FactoryBot.create(:phone,:for_testing, person:person1)}
     let(:person2){FactoryBot.create(:person)}
-    before(:each) do
-      ENV["from_hbx_id"] = person1.hbx_id
-      ENV["to_hbx_id"] = person2.hbx_id
-      ENV["phone_id"] = ""
+    around do |example|
+     ClimateControl.modify from_hbx_id: person1.hbx_id,
+                           to_hbx_id: person2.hbx_id,
+                           phone_id: "" do
+       example.run
+     end
     end
     it "should move user from person1 to person2" do
       phone_1=person1.phones.size
@@ -62,10 +60,12 @@ describe MovePhoneBetweenPersonAccounts do
     let(:person1) { FactoryBot.create(:person)}
     let(:phone) {FactoryBot.create(:phone,:for_testing, person:person1)}
     let(:person2){FactoryBot.create(:person)}
-    before(:each) do
-      ENV["from_hbx_id"] = ""
-      ENV["to_hbx_id"] = person2.hbx_id
-      ENV["phone_id"] = phone.id
+    around do |example|
+     ClimateControl.modify from_hbx_id: "",
+                           to_hbx_id: person2.hbx_id,
+                           phone_id: phone.id do
+       example.run
+     end
     end
     it "should move user from person1 to person2" do
       phone_1=person1.phones.size
@@ -82,10 +82,12 @@ describe MovePhoneBetweenPersonAccounts do
     let(:person1) { FactoryBot.create(:person)}
     let(:phone) {FactoryBot.create(:phone,:for_testing, person:person1)}
     let(:person2){FactoryBot.create(:person)}
-    before(:each) do
-      ENV["from_hbx_id"] = person1.hbx_id
-      ENV["to_hbx_id"] = ""
-      ENV["phone_id"] = phone.id
+    around do |example|
+     ClimateControl.modify from_hbx_id: person1.hbx_id,
+                           to_hbx_id: "",
+                           phone_id: phone.id do
+       example.run
+     end
     end
     it "should move user from person1 to person2" do
       phone_1=person1.phones.size
