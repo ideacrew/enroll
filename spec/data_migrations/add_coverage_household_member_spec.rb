@@ -16,12 +16,11 @@ describe AddCoverageHouseholdMember, dbclean: :after_each do
 
     let(:person) { FactoryBot.create(:person) }
     let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
-
-    before do
-      ENV['hbx_id']= person.hbx_id
-      ENV['family_member_id'] = family.family_members.first.id
-      # allow(ENV).to receive(:[]).with('hbx_id').and_return person.hbx_id
-      # allow(ENV).to receive(:[]).with('family_member_id').and_return family.family_members.first.id
+    
+    around do |example|
+      ClimateControl.modify hbx_id: person.hbx_id, family_member_id: family.family_members.first.id do
+        example.run
+      end
     end
 
     it "should add a household" do
@@ -35,7 +34,6 @@ describe AddCoverageHouseholdMember, dbclean: :after_each do
       end
     end
 
-
     it "should not add a household if already exists" do
       ClimateControl.modify family_member_id: family.family_members.first.id, hbx_id: person.hbx_id do
         size = family.households.first.coverage_households.where(:is_immediate_family => true).first.coverage_household_members.size
@@ -45,5 +43,4 @@ describe AddCoverageHouseholdMember, dbclean: :after_each do
       end
     end
   end
-
 end

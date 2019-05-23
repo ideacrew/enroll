@@ -7,8 +7,10 @@ describe RemoveDependent, dbclean: :after_each do
   let(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent)}
   subject { RemoveDependent.new(given_task_name, double(:current_scope => nil)) }
 
-  before do
-    ENV["family_member_id"] = family.family_members.where(is_primary_applicant: false).first.id.to_s
+  around do |example|
+    ClimateControl.modify family_member_id: family.family_members.where(is_primary_applicant: false).first.id.to_s do
+      example.run
+    end
   end
 
   describe "given a task name" do
