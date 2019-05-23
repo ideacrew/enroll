@@ -24,6 +24,7 @@ describe 'Cancel employer plan year & enrollments', :dbclean => :around_each do
       active_benefit_group_assignment.update_attributes(hbx_enrollment_id:enrollment.id,aasm_state:'coverage_selected')
       load File.expand_path("#{Rails.root}/lib/tasks/migrations/cancel_employer_renewal.rake", __FILE__)
       Rake::Task.define_task(:environment)
+      Rake::Task["migrations:cancel_employer_incorrect_renewal"].reenable
       fein = organization.fein
       Rake::Task["migrations:cancel_employer_incorrect_renewal"].invoke(fein)
     end
