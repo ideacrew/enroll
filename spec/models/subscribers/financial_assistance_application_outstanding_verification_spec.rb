@@ -1,6 +1,10 @@
 require "rails_helper"
 
-describe Subscribers::FinancialAssistanceApplicationOutstandingVerification do
+describe Subscribers::FinancialAssistanceApplicationOutstandingVerification, dbclean: :after_each do
+
+  before :all do
+    DatabaseCleaner.clean
+  end
 
   before :each do
     allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
@@ -180,6 +184,31 @@ describe Subscribers::FinancialAssistanceApplicationOutstandingVerification do
             expect(applicant.assisted_income_validation).to eq "outstanding"
             expect(applicant.aasm_state).to eq "verification_outstanding"
           end
+        end
+      end
+    end
+  end
+
+  describe 'store_payload', dbclean: :after_each do
+    let!(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+    let!(:family)  { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
+    let!(:application) {
+      FactoryGirl.create(:application, family: family, aasm_state: "determined")
+    }
+    let!(:applicant) { FactoryGirl.create(:applicant, application: application, family_member_id: family.primary_applicant.id)}
+
+    before do
+      subject.instance_variable_set(:@applicant_in_context, applicant)
+    end
+
+    ['Income', 'MEC'].each do |kind|
+      context "#{kind}" do
+        before do
+          subject.send(:store_payload, kind, "sample payload xml")
+        end
+
+        it 'should return the object' do
+          expect(applicant.send(kind.downcase + '_response')).to be_an_instance_of(EventResponse)
         end
       end
     end
