@@ -8,13 +8,14 @@ RSpec.describe 'The employees of MA new groups received a notice in their accoun
   let(:employer_profile1)     { FactoryBot.build(:employer_profile) }
   let(:employer_profile2)     { FactoryBot.build(:employer_profile) }
 	let!(:organization1) { FactoryBot.create(:organization, fein: "876456787", employer_profile: employer_profile1) }
-	let!(:organization2) { FactoryBot.create(:organization, fein: "555123457", employer_profile:employer_profile2) }
+	let!(:organization2) { FactoryBot.create(:organization, fein: "555123457", employer_profile: employer_profile2) }
 
 	before do
     load File.expand_path("#{Rails.root}/lib/tasks/migrations/disregard_termination_of_coverage_notice_er.rake", __FILE__)
     Rake::Task.define_task(:environment)
-    ENV['fein'] = "876456787 555123457"
-    Rake::Task["secure_message:disregard_termination_of_coverage_notice_er"].invoke(fein: "876456787 555123457")
+    ClimateControl.modify fein: "876456787 555123457" do
+      Rake::Task["secure_message:disregard_termination_of_coverage_notice_er"].invoke(fein: "876456787 555123457")
+    end
     employer_profile1.reload
     employer_profile2.reload
   end

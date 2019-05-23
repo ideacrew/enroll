@@ -20,22 +20,24 @@ describe RemoveCongressCensusEmployee, dbclean: :after_each do
       let!(:active_benefit_group) { FactoryBot.create(:benefit_group, is_congress: false, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
       let(:benefit_group_assignment)  { FactoryBot.create(:benefit_group_assignment, benefit_group: active_benefit_group, census_employee: census_employee) }
       
-        before :each do
-          allow(ENV).to receive(:[]).with('census_employee_id').and_return census_employee.id
-        end
-        
-        it "should not remove census employee if they are NOT is_congress" do
-          expect(employer_profile.census_employees.count).to eq 1
-          subject.migrate
-          expect(employer_profile.census_employees.count).to eq 1
-        end
-        
-        it "should do remove census employee if benefit_group is_congress is set to true" do
-          active_benefit_group.update(is_congress:true)
-          expect(employer_profile.census_employees.count).to eq 1
-          subject.migrate
-          expect(employer_profile.census_employees.count).to eq 0
+      around do |example|
+        ClimateControl.modify census_employee_id: census_employee.id do
+          example.run
         end
       end
+        
+      it "should not remove census employee if they are NOT is_congress" do
+        expect(employer_profile.census_employees.count).to eq 1
+        subject.migrate
+        expect(employer_profile.census_employees.count).to eq 1
+      end
+      
+      it "should do remove census employee if benefit_group is_congress is set to true" do
+        active_benefit_group.update(is_congress:true)
+        expect(employer_profile.census_employees.count).to eq 1
+        subject.migrate
+        expect(employer_profile.census_employees.count).to eq 0
+      end
+    end
   end
 end

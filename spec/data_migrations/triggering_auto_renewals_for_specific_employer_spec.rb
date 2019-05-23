@@ -36,14 +36,20 @@ describe TriggeringAutoRenewalsForSpecificEmployer, dbclean: :after_each do
           :end_on => start_on + 1.year - 1.day, :open_enrollment_start_on => (start_on - 30).beginning_of_month,
           :open_enrollment_end_on => (start_on - 30).beginning_of_month + 1.weeks
           )
-        allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
       end
+
+      around gT
 
       after :all do
         TimeKeeper.set_date_of_record_unprotected!(Date.today)
       end
 
       context "triggering a new enrollment", dbclean: :after_each do
+        around do |example|
+          ClimateControl.modify fein: organization.fein do
+            example.run
+          end
+        end
 
         let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: family.active_household, effective_on: Date.new(2016,1,1), plan: plan)}
         let(:renewal_plan) { FactoryBot.create(:plan)}

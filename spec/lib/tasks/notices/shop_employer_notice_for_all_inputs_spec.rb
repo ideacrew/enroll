@@ -10,12 +10,6 @@ RSpec.describe 'Generate notices to employer by taking hbx_ids, feins, employer_
   let(:plan_year)        { employer_profile.plan_years.first }
   let(:params)           { {recipient: employer_profile, event_object: plan_year, notice_event: event_name} }
 
-  after :each do
-    ['event', 'hbx_ids', 'feins', 'employer_ids'].each do |env_key|
-      ENV[env_key] = nil
-    end
-  end
-
   context "when hbx_ids are given", dbclean: :after_each do
     it "should trigger notice" do
       ClimateControl.modify event: event_name, hbx_ids: employer_profile.hbx_id do

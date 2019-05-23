@@ -36,35 +36,32 @@ describe AddingEmployeeRole, dbclean: :after_each do
 
     context 'When params are missing/invalid' do
       context 'when census_employee_id not provided then' do
-        before(:each) do
-          ENV['action'] = 'Add'
-        end
         it 'should raise an error' do
-          expect(subject.migrate).to eq('Please provide census_employee_id.')
+          ClimateControl.modify action: 'Add' do
+            expect(subject.migrate).to eq('Please provide census_employee_id.')
+          end
         end
       end
 
       context 'when census employee id is invalid then' do
         it 'should raise an error' do
-          ClimateControl.modify action: 'Add',census_employee_id: '123abc987pqr' do 
-           expect(subject.migrate).to eq('No Census Employee found by 123abc987pqr') 
+          ClimateControl.modify action: 'Add',census_employee_id: '123abc987pqr' do
+           expect(subject.migrate).to eq('No Census Employee found by 123abc987pqr')
           end
         end
       end
 
       context 'when person_id not provided then' do
-        before(:each) do
-          ENV['action'] = 'Add'
-          ENV['census_employee_id'] = census_employee.id
-        end
         it 'should raise an error' do
-          expect(subject.migrate).to eq('Please provide person_id.')
+          ClimateControl.modify action: 'Add', census_employee_id: census_employee.id do
+            expect(subject.migrate).to eq('Please provide person_id.')
+          end
         end
       end
 
       context 'when census person_id is invalid then' do
         it 'should raise an error' do
-          ClimateControl.modify action: 'Add',census_employee_id: census_employee.id,person_id: '123abc987pqr' do 
+          ClimateControl.modify action: 'Add',census_employee_id: census_employee.id,person_id: '123abc987pqr' do
           expect(subject.migrate).to eq('Person not found by 123abc987pqr')
           end
         end
@@ -73,7 +70,7 @@ describe AddingEmployeeRole, dbclean: :after_each do
 
     context 'employee without an employee role' do
       it 'should link employee role' do
-        ClimateControl.modify action: 'Add',census_employee_id: census_employee.id,person_id: person.id do 
+        ClimateControl.modify action: 'Add',census_employee_id: census_employee.id,person_id: person.id do
           census_employee.update_attribute(:employer_profile_id, employer_profile.id)
           census_employee.benefit_group_assignments << benefit_group_assignment
           census_employee.save!
@@ -94,18 +91,17 @@ describe AddingEmployeeRole, dbclean: :after_each do
       context 'when action is invalid then' do
 
         it 'should raise an error' do
-          ClimateControl.modify action: 'Hello'do 
+          ClimateControl.modify action: 'Hello'do
             expect(subject.migrate).to eq('Invalid action Hello!')
           end
         end
       end
 
       context 'when ce ids not provided then' do
-        before(:each) do
-          ENV['action'] = 'Link'
-        end
         it 'should raise an error' do
-          expect(subject.migrate).to eq('Please provide census_employee_ids.')
+          ClimateControl.modify action: 'Link' do
+            expect(subject.migrate).to eq('Please provide census_employee_ids.')
+          end
         end
       end
 
@@ -148,7 +144,7 @@ describe AddingEmployeeRole, dbclean: :after_each do
           census_employee3.benefit_group_assignments << benefit_group_assignment3
           census_employee3.save!
           benefit_group_assignment3.save!
-          
+
           expect(census_employee.aasm_state).to eq 'eligible'
           expect(census_employee2.aasm_state).to eq 'eligible'
           expect(census_employee3.aasm_state).to eq 'eligible'

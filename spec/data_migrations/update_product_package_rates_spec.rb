@@ -74,14 +74,13 @@ describe UpdateEmployeeRoleId, dbclean: :after_each do
                          aasm_state: 'coverage_selected'
       )
     end
-    before(:each) do
-      ENV["feins"] = "123456789"
-    end
 
     it "should update the premium tables on the product" do
-      organization.employer_profile.benefit_applications.first.benefit_sponsor_catalog.product_packages.first.products.first.premium_tables = []
-      subject.migrate
-      expect(organization.employer_profile.benefit_applications.first.benefit_sponsor_catalog.product_packages.first.products.first.premium_tables).not_to eq nil
+      ClimateControl.modify feins: '123456789' do
+        organization.employer_profile.benefit_applications.first.benefit_sponsor_catalog.product_packages.first.products.first.premium_tables = []
+        subject.migrate
+        expect(organization.employer_profile.benefit_applications.first.benefit_sponsor_catalog.product_packages.first.products.first.premium_tables).not_to eq nil
+      end
     end
   end
 end
