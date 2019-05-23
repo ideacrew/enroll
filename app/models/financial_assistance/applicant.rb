@@ -158,6 +158,9 @@ class FinancialAssistance::Applicant
   embeds_many :workflow_state_transitions, as: :transitional
   embeds_many :verification_types, cascade_callbacks: true, validate: true
 
+  embeds_one :income_response, class_name:"EventResponse"
+  embeds_one :mec_response, class_name:"EventResponse"
+
   accepts_nested_attributes_for :incomes, :deductions, :benefits
 
   validate :presence_of_attr_step_1, on: [:step_1, :submission]
