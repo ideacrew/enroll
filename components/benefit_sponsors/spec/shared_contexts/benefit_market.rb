@@ -75,7 +75,7 @@ RSpec.shared_context "setup benefit market with market catalogs and product pack
 
         renewal_product_package.products.each_with_index do |renewal_product, i|
           current_product = product_package.products[i]
-          current_product.update(renewal_product_id: renewal_product.id)
+          current_product&.update(renewal_product_id: renewal_product.id)
         end
       end
     end
