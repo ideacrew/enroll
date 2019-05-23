@@ -131,6 +131,7 @@ aca:
   state_name: "District of Columbia"
   state_abbreviation: "DC"
   market_kinds: ["shop", "individual"]
+
   hbx_abbreviation: "DC Health Benefit Exchange"
   nationwide_markets: true
   general_agency_enabled: true
@@ -304,6 +305,7 @@ aca:
   employer_attestation: false
   enforce_employer_attestation: false
   plan_match_tool: true
+
   rating_areas:
     - R-MA001
     - R-MA002

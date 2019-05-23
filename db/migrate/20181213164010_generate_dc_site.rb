@@ -1,13 +1,14 @@
-class GenerateCcaSite < Mongoid::Migration
+class GenerateDcSite < Mongoid::Migration
   def self.up
-    if Settings.site.key.to_s == "cca"
-      say_with_time("Creating CCA Site") do
+    if Settings.site.key.to_s == "dc"
+      say_with_time("Creating DC Site") do
         @site = BenefitSponsors::Site.new(
-          site_key: :cca,
-          byline: "The Right Place for the Right Plan",
-          short_name: "Health Connector",
-          domain_name: "hbxshop.org",
-          long_name: "Massachusetts Health Connector")
+            site_key: :dc,
+            byline: "DC's Online Health Insurance Marketplace",
+            short_name: "DC Health Link",
+            domain_name: "https://enroll.dchealthlink.com",
+            long_name: "DC Health Exchange Benefit")
+        # TODO check on domain_name & long_name
 
         @old_org = Organization.unscoped.exists(hbx_profile: true).first
         @old_profile = @old_org.hbx_profile
@@ -20,20 +21,29 @@ class GenerateCcaSite < Mongoid::Migration
         @site.owner_organization = owner_organization
       end
 
-      say_with_time("Creating CCA ACA SHOP Benefit Market") do
+      say_with_time("Creating DC ACA SHOP Benefit Market") do
         inital_app_config = BenefitMarkets::Configurations::AcaShopInitialApplicationConfiguration.new
         renweal_app_config = BenefitMarkets::Configurations::AcaShopRenewalApplicationConfiguration.new
         configuration = BenefitMarkets::Configurations::AcaShopConfiguration.new initial_application_configuration: inital_app_config,
-          renewal_application_configuration: renweal_app_config,
-          binder_due_dom: 15
+                                                                                 renewal_application_configuration: renweal_app_config,
+                                                                                 binder_due_dom: 15
         @benefit_market = BenefitMarkets::BenefitMarket.new kind: :aca_shop,
-          site_urn: 'cca',
-          title: 'ACA SHOP',
-          description: 'CCA ACA Shop Market',
-          configuration: configuration
+                                                            site_urn: 'dc',
+                                                            title: 'ACA SHOP',
+                                                            description: 'DC ACA Shop Market',
+                                                            configuration: configuration
+
+        # TODO Need to verify whether to create new configuartion for congress (or) use shop configuration
+        @congress_benefit_market = BenefitMarkets::BenefitMarket.new kind: :fehb,
+                                                            site_urn: 'dc',
+                                                            title: 'ACA SHOP',
+                                                            description: 'DC ACA Shop Market',
+                                                            configuration: configuration
       end
 
-      @site.benefit_markets << @benefit_market
+      @site.benefit_markets = [@benefit_market, @congress_benefit_market]
+
+      # TODO ivl benefit_market
 
       if @site.valid?
         @site.save!
@@ -47,22 +57,36 @@ class GenerateCcaSite < Mongoid::Migration
       else
         puts @benefit_market.configuration.errors.full_messages.inspect
       end
+
+      if @congress_benefit_market.valid?
+        @congress_benefit_market.site = @site
+        @congress_benefit_market.save!
+      else
+        puts @congress_benefit_market.configuration.errors.full_messages.inspect
+      end
     else
-      say "Skipping for non-CCA site"
+      say "Skipping for non-DC site"
     end
   end
 
   def self.down
-    raise "Migration is not reversable."
+    if Settings.site.key.to_s == "dc"
+      ::BenefitSponsors::Organizations::Organization.hbx_profiles.delete_all
+      ::BenefitSponsors::Site.where(site_key: :dc).delete_all
+      ::BenefitMarkets::BenefitMarket.all.delete_all
+    else
+      say "Skipping for non-DC site"
+    end
   end
 
   def self.sanitize_hbx_params
+    # TODO check for benefit_sponsorship with IVL team
     json_data = @old_profile.to_json(:except => [:_id, :hbx_staff_roles, :updated_by_id, :enrollment_periods, :benefit_sponsorship, :inbox, :documents])
     JSON.parse(json_data)
   end
 
   def self.initialize_hbx_profile
-      profile = BenefitSponsors::Organizations::HbxProfile.new(self.sanitize_hbx_params)
+    profile = BenefitSponsors::Organizations::HbxProfile.new(self.sanitize_hbx_params)
     build_inbox_messages(profile)
     build_documents(profile)
     build_office_locations(profile)
