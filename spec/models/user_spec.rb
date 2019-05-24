@@ -423,7 +423,7 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
       end
 
       it "should return false when broker agency staff" do
-        user.roles = ['broker_agency_staff']
+        allow(person).to receive(:has_active_broker_staff_role?).and_return true
         expect(user.can_change_broker?).to eq false
       end
 

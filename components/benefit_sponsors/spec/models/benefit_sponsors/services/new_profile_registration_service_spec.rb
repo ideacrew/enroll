@@ -8,13 +8,14 @@ module BenefitSponsors
     let!(:security_question)  { FactoryBot.create_default :security_question }
     let!(:site) { ::BenefitSponsors::SiteSpecHelpers.create_cca_site_with_hbx_profile_and_benefit_market }
     let!(:general_org) {FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)}
-    let!(:employer_profile) { general_org.employer_profile }
+    let!(:employer_profile) {general_org.employer_profile}
+    let!(:user) { FactoryBot.create(:user)}
+    let!(:person) { FactoryBot.create(:person, emails: [FactoryBot.build(:email, kind: 'work')], user: user) }
+    let!(:active_employer_staff_role) {FactoryBot.create(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id, person: person)}
+    let!(:broker_role) { FactoryBot.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person) }
+    let!(:broker_agency_staff_role) { FactoryBot.build(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person)}
     let(:broker_agency) {FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site)}
     let!(:broker_agency_profile) {broker_agency.broker_agency_profile}
-    let!(:user) { FactoryBot.create(:user)}
-    let!(:person) { FactoryBot.create(:person, emails:[ FactoryBot.build(:email, kind:'work') ], user_id: user.id) }
-    let!(:active_employer_staff_role) {FactoryBot.create(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id, person: person)}
-    let!(:broker_role) { FactoryBot.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
     let!(:general_agency) {FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, site: site)}
     let!(:general_agency_profile) {general_agency.profiles.first }
     let(:general_role) {FactoryBot.create(:general_agency_staff_role, aasm_state: "active", benefit_sponsors_general_agency_profile_id: general_agency_profile.id)}
@@ -90,6 +91,7 @@ module BenefitSponsors
       it_behaves_like "should find profile and return form for profile", "general_agency"
     end
 
+
     describe ".is_benefit_sponsor_already_registered?" do
       context "Should return when person found" do
         before :each do
@@ -110,6 +112,70 @@ module BenefitSponsors
         let(:general_agency_user) { FactoryBot.create(:user, :person => general_agency_person)}
         it "has general_agency_staff_role" do
           expect(subject.new.has_general_agency_staff_role_for_profile?(general_agency_user,general_agency_profile)).to eq false
+        end
+      end
+    end
+
+    describe ".has_broker_agency_staff_role_for_profile" do
+      context "Person with Broker agency staff roles" do
+
+        it "should return true if broker staff is assigned to a broker agency profile" do
+          params = { profile_id: broker_agency_profile.id, profile_type: "broker_agency_staff" }
+          service = subject.new params
+          expect(service.has_broker_agency_staff_role_for_profile(user, broker_agency_profile)). to eq true
+        end
+
+        it "should return true if broker staff is assigned to a broker agency profile" do
+          params = { profile_id: broker_agency_profile.id, profile_type: "broker_agency_staff" }
+          service = subject.new params
+          expect(service.has_broker_agency_staff_role_for_profile(user, broker_agency_profile)). to eq true
+        end
+
+        it "should return false if broker staff is not assigned to a broker agency profile" do
+          person.broker_agency_staff_roles.each{|staff| staff.update_attributes(benefit_sponsors_broker_agency_profile_id: nil)}
+          params = { profile_id: broker_agency_profile.id, profile_type: "broker_agency_staff" }
+          service = subject.new params
+          expect(service.has_broker_agency_staff_role_for_profile(user, broker_agency_profile)). to eq false
+        end
+      end
+    end
+
+    describe ".is_broker_agency_registered?" do
+
+      let(:profile_form) {BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.new(profile_id: broker_agency_profile.id)}
+      let(:user1) { FactoryBot.create(:user)}
+      let(:person1) { FactoryBot.create(:person, emails: [FactoryBot.build(:email, kind: 'work')], user: user1) }
+      let!(:broker_agency_staff_role) { FactoryBot.build(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: "coverage_terminated",  person: person1)}
+
+
+      it 'should return false if broker staff role or broker role exists for the user' do
+        params = { profile_id: broker_agency_profile.id, profile_type: "broker_agency_staff"}
+        service = subject.new params
+        expect(service.is_broker_agency_registered?(user, profile_form)). to eq false
+      end
+
+      it 'should return true if broker staff role or broker role does not exists for the user' do
+        params = { profile_id: broker_agency_profile.id, profile_type: "broker_agency_staff"}
+        service = subject.new params
+        expect(service.is_broker_agency_registered?(user1, profile_form)). to eq true
+      end
+
+    end
+
+    describe ".is_staff_for_agency?" do
+      context "Staff for broker agency profile" do
+
+        it "should return true if broker staff is assigned to a broker agency profile" do
+          params = { profile_id: broker_agency_profile.id, profile_type: "broker_agency_staff" }
+          service = subject.new params
+          expect(service.is_staff_for_agency?(user, nil)). to eq true
+        end
+
+        it "should return false if broker staff is not assigned to a broker agency profile" do
+          person.broker_agency_staff_roles.each{|staff| staff.update_attributes(benefit_sponsors_broker_agency_profile_id: nil)}
+          params = { profile_id: broker_agency_profile.id, profile_type: "broker_agency_staff" }
+          service = subject.new params
+          expect(service.is_staff_for_agency?(user, nil)). to eq false
         end
       end
     end

@@ -4,7 +4,7 @@ module BenefitSponsors
       class BrokerAgencyProfilesControllerPolicy < ApplicationPolicy
 
         def family_index?
-          return user.has_hbx_staff_role? || user.has_broker_role?
+          user.has_hbx_staff_role? || user.has_broker_role? || user.has_broker_agency_staff_role?
         end
 
         def family_datatable?

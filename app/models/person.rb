@@ -618,7 +618,26 @@ class Person
      self.active_individual_market_role == "resident" ? true : false
   end
 
+  def has_pending_broker_staff_role?(broker_agency_profile_id)
+    broker_agency_staff_roles.where({
+                                      aasm_state: :broker_agency_pending,
+                                      '$or' => [
+                                        {benefit_sponsors_broker_agency_profile_id: broker_agency_profile_id},
+                                        {broker_agency_profile_id: broker_agency_profile_id}
+                                      ]
+                                    }).size > 0
+  end
+
+  def active_broker_staff_roles
+    broker_agency_staff_roles.where(:aasm_state => :active)
+  end
+
+  def has_active_broker_staff_role?
+    !active_broker_staff_roles.empty?
+  end
+
   class << self
+
     def default_search_order
       [[:last_name, 1],[:first_name, 1]]
     end
@@ -766,6 +785,20 @@ class Person
       end
     end
 
+    def staff_for_broker(broker_profile)
+      Person.where(:broker_agency_staff_roles =>
+                     {
+                       '$elemMatch' =>
+                         {
+                           aasm_state: :active,
+                           '$or' => [
+                             {benefit_sponsors_broker_agency_profile_id: broker_profile.id},
+                             {broker_agency_profile_id: broker_profile.id}
+                           ]
+                         }
+                     })
+    end
+
     def staff_for_employer_including_pending(employer_profile)
       if employer_profile.is_a? (EmployerProfile)
         self.where(:employer_staff_roles => {
@@ -782,6 +815,27 @@ class Person
             }
         })
       end
+    end
+
+    def staff_for_broker_including_pending(broker_profile)
+      Person.where(:broker_agency_staff_roles =>
+                     {
+                       '$elemMatch' => {
+                         '$and' => [
+                           {
+                             '$or' => [
+                               {benefit_sponsors_broker_agency_profile_id: broker_profile.id}
+                             ]
+                           },
+                           {
+                             '$or' => [
+                               {aasm_state: :broker_agency_pending},
+                               {aasm_state: :active}
+                             ]
+                           }
+                         ]
+                       }
+                     })
     end
 
     # Adds employer staff role to person
@@ -902,7 +956,7 @@ class Person
   end
 
   def agent?
-    agent = self.csr_role || self.assister_role || self.broker_role || self.hbx_staff_role || self.general_agency_staff_roles.present?
+    agent = csr_role || assister_role || broker_role || hbx_staff_role || general_agency_staff_roles.present? || broker_agency_staff_roles.present?
     !!agent
   end
 

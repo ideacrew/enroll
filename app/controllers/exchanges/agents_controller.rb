@@ -59,9 +59,7 @@ class Exchanges::AgentsController < ApplicationController
   end
 
   def check_agent_role
-    unless current_user.has_agent_role? || current_user.has_hbx_staff_role? || current_user.has_broker_role? || current_user.has_general_agency_staff_role?
-      redirect_to root_path, :flash => { :error => "You must be an Agent:  CSR, CAC, IPA or a Broker" }
-    end
+    redirect_to root_path, :flash => { :error => "You must be an Agent:  CSR, CAC, IPA or a Broker" } unless user_permission_satisfied?
     current_user.last_portal_visited = home_exchanges_agents_path
     current_user.save!
   end
@@ -84,5 +82,13 @@ class Exchanges::AgentsController < ApplicationController
     bookmark_path = uri.path
     bookmark_path += "?#{uri.query}" unless uri.query.blank?
     return bookmark_path
+  end
+
+  def user_permission_satisfied?
+    @roles = []
+    ['agent', 'hbx_staff', 'broker', 'broker_agency_staff', 'general_agency_staff'].each do |role|
+      @roles << current_user.public_send("has_#{role}_role?")
+    end
+    @roles.include?(true) ? true : false
   end
 end

@@ -43,13 +43,26 @@ class BrokerAgencyStaffRole
 
     event :broker_agency_terminate, :after => :record_transition do 
       transitions from: :active, to: :broker_agency_terminated
+      transitions from: :broker_agency_pending, to: :broker_agency_terminated
+    end
+
+    event :broker_agency_active, :after => :record_transition do
+      transitions from: :broker_agency_terminated, to: :active
+    end
+
+    event :broker_agency_pending, :after => :record_transition do
+      transitions from: :broker_agency_terminated, to: :broker_agency_pending
     end
   end
 
   def send_invitation
-    # TODO broker agency staff is not actively supported right now
+    # TODO: broker agency staff is not actively supported right now
     # Also this method call sends an employee invitation, which is bug 8028
-    # Invitation.invite_broker_agency_staff!(self)
+    Invitation.invite_broker_agency_staff!(self)
+  end
+
+  def approve
+    broker_agency_accept!
   end
 
   def current_state
@@ -67,11 +80,19 @@ class BrokerAgencyStaffRole
 
   def parent
     # raise "undefined parent: Person" unless self.person?
-    self.person
+    person
   end
 
   def agency_pending?
-    false
+    aasm_state == "broker_agency_pending"
+  end
+
+  def is_open?
+    agency_pending? || is_active?
+  end
+
+  def is_active?
+    aasm_state == "active"
   end
 
   ## Class methods
@@ -87,16 +108,14 @@ class BrokerAgencyStaffRole
   private
 
   def latest_transition_time
-    if self.workflow_state_transitions.any?
-      self.workflow_state_transitions.first.transition_at
-    end
+    return unless workflow_state_transitions.any?
+
+    workflow_state_transitions.first.transition_at
   end
 
   def record_transition
-    self.workflow_state_transitions << WorkflowStateTransition.new(
-      from_state: aasm.from_state,
-      to_state: aasm.to_state,
-      event: aasm.current_event
-    )
+    workflow_state_transitions << WorkflowStateTransition.new(from_state: aasm.from_state,
+                                                              to_state: aasm.to_state,
+                                                              event: aasm.current_event)
   end
 end

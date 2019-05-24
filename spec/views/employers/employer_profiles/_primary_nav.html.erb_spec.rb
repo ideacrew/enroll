@@ -2,7 +2,9 @@ require "rails_helper"
 
 RSpec.describe "employers/employer_profiles/_primary_nav AS BROKER AGENCY STAFF" do
   let(:employer_profile) { FactoryBot.create(:employer_profile) }
-  let(:person) { FactoryBot.create(:person, :first_name=>'fred', :last_name=>'flintstone'  )}
+  let(:person) { FactoryBot.create(:person, :first_name => 'fred', :last_name => 'flintstone')}
+  let(:broker_agency_profile) { FactoryBot.create(:broker_agency_profile) }
+  let(:broker_agency_staff_role) { FactoryBot.create(:broker_agency_staff_role, aasm_state: "active", benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id)}
   let(:current_user) { FactoryBot.create(:user, :roles => ['broker_agency_staff'], :person => person) }
   before :each do
     @employer_profile = employer_profile
@@ -12,6 +14,7 @@ RSpec.describe "employers/employer_profiles/_primary_nav AS BROKER AGENCY STAFF"
     current_user.person.broker_role.npn = rand(100000)
     current_user.person.broker_role.broker_agency_profile_id = 99
     current_user.person.broker_role.save!
+    current_user.person.broker_agency_staff_roles << broker_agency_staff_role
     allow(view).to receive(:policy_helper).and_return(double("EmployerProfilePolicy", updateable?: true, list_enrollments?: true))
   end
   it "should display the standard tabs for Employer [broker and employer control]" do

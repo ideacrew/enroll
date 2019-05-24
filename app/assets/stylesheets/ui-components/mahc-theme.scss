@@ -1,8 +1,8 @@
 @import "./_variables";
-@import url('https://fonts.googleapis.com/css?family=Roboto+Slab:300,400,700');
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,700');
 
 * {
-    font-family: 'Roboto Slab', sans-serif;
+    font-family: 'Open Sans', sans-serif;
 }
 
 a {
@@ -41,7 +41,7 @@ h1,h2,h3,h4,h5,h6 {
 }
 
 .heading-text {
-  color: $primary-orange;
+  color: #333333;
 }
 .sub-text {
   color: $mhc-darker-blue;
@@ -208,7 +208,7 @@ h1,h2,h3,h4,h5,h6 {
 #footer-uic {
   font-size: 14px;
   color: #ffffff;
-  background-color: #005e81;
+  background-color:#003260;
   padding: 15px;
   position: absolute;
   bottom: 0;

@@ -21,4 +21,13 @@ module BrokerAgencies::ProfilesHelper
     "#{date.prev_month.beginning_of_month.strftime('%b %Y')}" rescue nil
   end
 
+  def can_show_destroy?(current_user, staff)
+    return true if current_user.person == staff || staff.broker_role.present?
+  end
+
+  def disable_edit_broker_agency?(user)
+    return false if user.has_hbx_staff_role?
+    person = user.person
+    person.broker_role.present? ? false : true
+  end
 end

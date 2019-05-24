@@ -169,6 +169,14 @@ class Person
     employer_staff_roles.present? ? employer_staff_roles.active : []
   end
 
+  def active_broker_staff_roles
+    broker_agency_staff_roles.where(:aasm_state => :active)
+  end
+
+  def has_active_broker_staff_role?
+    !active_broker_staff_roles.empty?
+  end
+
   def self.decrypt_ssn(val)
     SymmetricEncryption.decrypt(val)
   end
@@ -307,6 +315,20 @@ class Person
                  }).to_a
     end
 
+    def staff_for_broker(broker_profile)
+      Person.where(:broker_agency_staff_roles =>
+                     {
+                       '$elemMatch' =>
+                         {
+                           aasm_state: :active,
+                           '$or' => [
+                             {benefit_sponsors_broker_agency_profile_id: broker_profile.id},
+                             {broker_agency_profile_id: broker_profile.id}
+                           ]
+                         }
+                     })
+    end
+
     def staff_for_employer_including_pending(employer_profile)
       self.where(:employer_staff_roles => {
                      '$elemMatch' => {
@@ -314,6 +336,27 @@ class Person
                          :aasm_state.ne => :is_closed
                      }
                  })
+    end
+
+    def staff_for_broker_including_pending(broker_profile)
+      Person.where(:broker_agency_staff_roles =>
+                     {
+                       '$elemMatch' => {
+                         '$and' => [
+                           {
+                             '$or' => [
+                               {benefit_sponsors_broker_agency_profile_id: broker_profile.id}
+                             ]
+                           },
+                           {
+                             '$or' => [
+                               {aasm_state: :broker_agency_pending},
+                               {aasm_state: :active}
+                             ]
+                           }
+                         ]
+                       }
+                     })
     end
 
     # Adds employer staff role to person

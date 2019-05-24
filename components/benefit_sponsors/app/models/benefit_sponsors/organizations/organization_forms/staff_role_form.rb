@@ -16,8 +16,12 @@ module BenefitSponsors
       attribute :number, String
       attribute :extension, String
       attribute :profile_id, String
+      attribute :agency_search, String
 
       attribute :profile_type, String
+
+      attribute :filter_criteria, Hash
+      attribute :is_broker_registration_page, Boolean, default: false
 
       validates_presence_of :dob, :if => Proc.new { |m| m.person_id.blank? }
       validates_presence_of :first_name, :if => Proc.new { |m| m.person_id.blank? }
@@ -55,6 +59,10 @@ module BenefitSponsors
         end
       end
 
+      def is_broker_registration_page=(val)
+        @is_broker_registration_page = val.blank? ? false : val == "true"
+      end
+
       def is_broker_profile?
         profile_type == "broker_agency"
       end
@@ -67,6 +75,10 @@ module BenefitSponsors
         profile_type == "benefit_sponsor"
       end
 
+      def is_broker_agency_staff_profile?
+        profile_type == "broker_agency_staff"
+      end
+
       # for new
       def self.for_new
         self.new
@@ -74,6 +86,10 @@ module BenefitSponsors
 
       # for create
       def self.for_create(attrs)
+        new(attrs)
+      end
+
+      def self.for_broker_agency_search(attrs)
         new(attrs)
       end
 
@@ -93,6 +109,10 @@ module BenefitSponsors
 
       def approve
         approve!
+      end
+
+      def broker_agency_search
+        service.broker_agency_search!(self)
       end
 
       def approve!
