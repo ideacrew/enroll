@@ -92,6 +92,16 @@ module Notifier
       recipient.to_s.split('::').last.underscore.to_sym
     end
 
+    def is_shop?
+      [
+        :employer_profile,
+        :employee_profile,
+        :broker_profile,
+        :broker_agency_profile,
+        :general_agency
+      ].include? recipient_klass_name
+    end
+
     def self.to_csv
       CSV.generate(headers: true) do |csv|
         csv << ['Notice Number', 'Title', 'Description', 'Recipient', 'Event Name', 'Notice Template']
