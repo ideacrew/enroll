@@ -1062,24 +1062,25 @@ $(document).ready(function() {
       };
     });
     $(terms).each(function(i, term) {
-      $('.run-glossary:contains(' + term.term + ')').each(function(i, matchingEl) {
-        // checks for word boundaries before and after glossary term
-        // to avoid matching terms like "Age" inside of "Coverage"
-        var regex = new RegExp("\\b" + term.term + "\\b", "gi");
-        var text = term.description;
-        $(matchingEl).html($(matchingEl).html().replace(regex, '<span class="glossary" data-toggle="tooltip" data-placement="auto top" data-trigger="click focus" data-boundary="window" data-fallbackPlacement="flip" data-html="true" title="' + text + '">' + term.term + '</span>'));
-      });
+        // finds the first instance of the term on the page
+        var matchingEl = $('.run-glossary:contains(' + term.term + ')').first();
+        if (matchingEl.length) {
+          // matches the exact or plural term
+          var regex = new RegExp("\\b(" + term.term + "[s]?)\\b", "i");
+          var text = term.description;
+          $(matchingEl).html($(matchingEl).html().replace(regex, '<span class="glossary" data-toggle="popover" data-placement="auto top" data-trigger="click focus" data-boundary="window" data-fallbackPlacement="flip" data-html="true" data-content="' + text + '" data-title="' + term.term + '<button data-dismiss=\'modal\' type=\'button\' class=\'close\' aria-label=\'Close\' onclick=\'hideGlossaryPopovers()\'></button>">$1</span>'));
+        }
     });
 
-    // Because of the change to tooltip on click instead of hover, you need to
-    // manually close each tooltip. This will close others if you click to open one
-    // or click outside of a tooltip.
+    // Because of the change to popover on click instead of hover, you need to
+    // manually close each popover. This will close others if you click to open one
+    // or click outside of a popover.
     $(document).click(function(e){
       if (e.target.className == 'glossary') {
-        $('.glossary').not($(e.target)).tooltip('hide');
+        $('.glossary').not($(e.target)).popover('hide');
       }
-      else if (!$(e.target).parents('.tooltip').length) {
-        $('.glossary').tooltip('hide');
+      else if (!$(e.target).parents('.popover').length) {
+        $('.glossary').popover('hide');
       }
     });
 
@@ -1092,3 +1093,7 @@ $(document).ready(function() {
     //});
   }
 });
+
+function hideGlossaryPopovers() {
+  $('.glossary').popover('hide');
+}
