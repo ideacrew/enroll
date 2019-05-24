@@ -445,7 +445,7 @@ When(/(^.+) enters? office location for (.+)$/) do |role, location|
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][number]', :with => location[:phone_number]
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][extension]', :with => location[:phone_extension]
   wait_for_ajax
-  page.find('h4', text: "#{Settings.site.byline}").click
+  page.find('h4', text: "#{Settings.site.header_message}").click
   find('#broker-btn').click
 end
 

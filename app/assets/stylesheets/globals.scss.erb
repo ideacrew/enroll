@@ -128,7 +128,13 @@
       vertical-align:middle;
       white-space: normal;
     }
-    span {
+    &>span {
+      display: inline-block !important;
+      width: auto !important;
+      font-size: 12px;
+      padding-top: 3px;
+    }
+    span:not(.label){
       width:100%;
       max-width: 25%;
       display: inline-block;
@@ -137,6 +143,7 @@
       text-transform: uppercase;
       text-align: left;
       line-height: 1.2;
+
       strong {
         font-weight: bold;
       }
