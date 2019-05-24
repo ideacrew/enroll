@@ -57,11 +57,7 @@ class BenefitCoveragePeriod
   # @return [ Plan ] reference plan
   def second_lowest_cost_silver_plan
     return @second_lowest_cost_silver_plan if defined? @second_lowest_cost_silver_plan
-    @second_lowest_cost_silver_plan = find_product(slcsp_id) if slcsp_id.present?
-  end
-
-  def find_product(slcsp_id)
-    BenefitMarkets::Products::Product.find(slcsp_id)
+    @second_lowest_cost_silver_plan = product_factory.new({product_id: slcsp_id}).product if slcsp_id.present?
   end
 
   # @todo Available products from which this sponsor may offer benefits during this benefit coverage period
@@ -234,4 +230,7 @@ private
     self.title = "#{market_name} Market Benefits #{start_on.year}"
   end
 
+  def product_factory
+    ::BenefitMarkets::Products::ProductFactory
+  end
 end
