@@ -1,4 +1,5 @@
 require 'rails_helper'
+require 'pry'
 require File.join(File.dirname(__FILE__), "..", "..", "..", "support/benefit_sponsors_site_spec_helpers")
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
@@ -804,6 +805,29 @@ module BenefitSponsors
           expect(benefit_application.expiration_date).not_to eq (benefit_application.effective_period.max)
         end
       end
+    end
+
+    describe ".open_enrollment_length" do
+      let!(:initial_application) { create(:benefit_sponsors_benefit_application, benefit_sponsor_catalog: benefit_sponsor_catalog, effective_period: effective_period,benefit_sponsorship:benefit_sponsorship, aasm_state: :active) }
+      let(:min_open_enrollment_length) { 5 }
+      let(:start_date) {Date.new(2019,11,16)}
+      let(:end_date) {Date.new(2019,11,20)}
+
+      it 'open_enrollment_length should be greater than min_open_enrollment_length' do
+        initial_application.update_attributes(open_enrollment_period: (start_date..(end_date + 1.day)))
+        expect(initial_application.open_enrollment_length).to be > min_open_enrollment_length
+      end
+
+      it 'open_enrollment_length should be equal to min_open_enrollment_length ' do
+        initial_application.update_attributes(open_enrollment_period: (start_date..end_date))
+        expect(initial_application.open_enrollment_length).to eq min_open_enrollment_length
+      end
+
+      it 'open_enrollment_length should be less than min_open_enrollment_length ' do
+        initial_application.update_attributes(open_enrollment_period: (start_date..(end_date - 1.day)))
+        expect(initial_application.open_enrollment_length).to be < min_open_enrollment_length
+      end
+
     end
   end
 end
