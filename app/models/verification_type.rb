@@ -25,6 +25,8 @@ class VerificationType
 
   scope :active, -> { where(:inactive.ne => true ) }
   scope :by_name, ->(type_name) { where(:type_name => type_name) }
+  scope :mec, ->{ where(:"type_name" => 'MEC') }
+  scope :income, ->{ where(:"type_name" => 'Income') }
 
   # embeds_many :external_service_responses  -> needs datamigration
   embeds_many :type_history_elements
