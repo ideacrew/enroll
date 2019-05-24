@@ -28,6 +28,8 @@ require 'ivl_helper'
 require 'aca_test_helper'
 require 'rails-controller-testing'
 
+log = File.open('order.log', 'w')
+
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
@@ -102,6 +104,13 @@ RSpec.configure do |config|
   # as the one that triggered the failure.
   Kernel.srand config.seed
 =end
+
+
+  config.around(:example) do |example|
+    log << example.location + "\n"
+    example.run
+  end
+
   RSpec.configure do |config|
     config.include FactoryBot::Syntax::Methods
   end
