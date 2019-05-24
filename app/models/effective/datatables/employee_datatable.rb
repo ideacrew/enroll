@@ -5,10 +5,18 @@ module Effective
 
       datatable do
 
-        bulk_actions_column do
-          bulk_action 'Employee will enroll',  main_app.change_expected_selection_employers_employer_profile_census_employees_path(@employer_profile,:expected_selection=>"enroll"), data: {confirm: 'These employees will be used to estimate your group size and participation rate', no_turbolink: true}
-          bulk_action 'Employee will not enroll with valid waiver', main_app.change_expected_selection_employers_employer_profile_census_employees_path(@employer_profile,:expected_selection=>"waive"), data: {confirm: 'Remember, your group size can affect your premium rates', no_turbolink: true}
-          bulk_action 'Employee will not enroll with invalid waiver', main_app.change_expected_selection_employers_employer_profile_census_employees_path(@employer_profile,:expected_selection=>"will_not_participate"), data: {confirm: 'Remember, your participation rate can affect your group premium rates', no_turbolink: true}
+        unless aca_state_abbreviation == "DC"
+          bulk_actions_column do
+            bulk_action 'Employee will enroll',
+                        main_app.change_expected_selection_employers_employer_profile_census_employees_path(@employer_profile,:expected_selection => "enroll"),
+                        data: {confirm: 'These employees will be used to estimate your group size and participation rate', no_turbolink: true}
+            bulk_action 'Employee will not enroll with valid waiver',
+                        main_app.change_expected_selection_employers_employer_profile_census_employees_path(@employer_profile,:expected_selection => "waive"),
+                        data: {confirm: 'Remember, your group size can affect your premium rates', no_turbolink: true}
+            bulk_action 'Employee will not enroll with invalid waiver',
+                        main_app.change_expected_selection_employers_employer_profile_census_employees_path(@employer_profile,:expected_selection => "will_not_participate"),
+                        data: {confirm: 'Remember, your participation rate can affect your group premium rates', no_turbolink: true}
+          end
         end
 
         table_column :employee_name, :width => '50px', :proc => Proc.new { |row|

@@ -531,6 +531,19 @@ Given /^the employer has broker agency profile$/ do
   employer.employer_profile.save!
 end
 
+Given(/^(.*?) employer is on Employee Roster page$/) do |legal_name|
+  employer_profile = employer_profile(legal_name)
+  visit benefit_sponsors.profiles_employers_employer_profile_path(employer_profile.id, :tab => 'employees')
+end
+
+Then(/^employer should (.*?) bulk actions dropdown in (.*?)$/) do |action, state|
+  if action == 'not see' && state == 'DC'
+    expect(page).not_to have_content('Bulk Actions')
+  else
+    expect(page).to have_content('Bulk Actions')
+  end
+end
+
 When /^they visit the Employer Home page$/ do
   visit employers_employer_profile_path(employer.employer_profile) + "?tab=home"
 end
