@@ -342,16 +342,16 @@ aptc_errors:
 #   ShopPlanYearPublishedDueDayOfMonth = ShopOpenEnrollmentBeginDueDayOfMonth
 
 style:
-  primary_orange: '#c56c24'
+  primary_orange: '#333333'
   brand_primary: '#005e81'
   primary_color: '#005e81'
-  primary_notification: '#c56c24'
-  primary_panel: '#c56c24'
+  primary_notification: '#333333'
+  primary_panel: '#333333'
   primary_button: '#337ab7'
   primary_button_color: '#286090'
   primary_button_disabled: '#337ab7'
   primary_button_border_disabled: '#2e6da4'
-  alternate_header_color: '#c56c24'
-  primary_icon_color: '#c56c24'
-  qle_header_color: '#c56c24'
-  primary_header_font: "'Roboto Slab', serif"
+  alternate_header_color: '#333333'
+  primary_icon_color: '#333333'
+  qle_header_color: '#333333'
+  primary_header_font: "'Open Sans', serif"
