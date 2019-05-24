@@ -536,8 +536,12 @@ Given(/^(.*?) employer is on Employee Roster page$/) do |legal_name|
   visit benefit_sponsors.profiles_employers_employer_profile_path(employer_profile.id, :tab => 'employees')
 end
 
-Then(/^employer should not see bulk actions dropdown$/) do
-  expect(page).not_to have_content('Bulk Actions')
+Then(/^employer should (.*?) bulk actions dropdown in (.*?)$/) do |action, state|
+  if action == 'not see' && state == 'DC'
+    expect(page).not_to have_content('Bulk Actions')
+  else
+    expect(page).to have_content('Bulk Actions')
+  end
 end
 
 When /^they visit the Employer Home page$/ do

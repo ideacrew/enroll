@@ -10,7 +10,7 @@ Feature: Employer can view their employees
 
   Scenario: Bulk actions dropdown in Employee Roster page is not in DC
     Given ABC Widgets employer is on Employee Roster page
-    Then employer should not see bulk actions dropdown
+    Then employer should not see bulk actions dropdown in DC
 
   Scenario: Employer views their employees and terminates one employee
     Given employer selects one of their employees on Employee Roster
