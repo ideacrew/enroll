@@ -13,13 +13,13 @@ module WellsFargo
 
 
       #TODO Move this to config/init files
-      API_URL = "https://demo.e-billexpress.com:443/PayIQ/Api/SSO"
-      API_KEY = "e2dab122-114a-43a3-aaf5-78caafbbec02"
-      BILLER_KEY = "3741"
-      SECRET = "dchbx 2017"
-      API_VERSION = "3000"
-      PRIVATE_KEY_LOCATION = "/wfpk.pem" #TEMP
-      DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.0000000%z"
+      API_URL = Rails.application.config.wells_fargo_api_url 
+      API_KEY = Rails.application.config.wells_fargo_api_key
+      BILLER_KEY = Rails.application.config.wells_fargo_biller_key
+      SECRET = Rails.application.config.wells_fargo_api_secret
+      API_VERSION = Rails.application.config.wells_fargo_api_version
+      PRIVATE_KEY_LOCATION = Rails.application.config.wells_fargo_private_key_location
+      DATE_FORMAT = Rails.application.config.wells_fargo_api_date_format
 
       def initialize(reference_number, external_id, company_name, email)
          @reference_number = reference_number
