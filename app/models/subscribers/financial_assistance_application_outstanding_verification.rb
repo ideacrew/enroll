@@ -85,13 +85,7 @@ module Subscribers
       end
 
       status = verified_verification.verifications.first.response_code.split('#').last
-
-      if assisted_verification.present?
-        update_applicant(kind, @applicant_in_context, status)
-      else
-        throw(:processing_issue, "ERROR: Failed to find #{kind} verification for the applicant") unless assisted_verification.present?
-      end
-
+      update_applicant(kind, @applicant_in_context, status)
       application_in_context.save!
     end
 
