@@ -435,7 +435,7 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
           model_instance.class.observer_peers.keys.each do |observer|
             expect(observer).to receive(:process_application_events) do |_instance, model_event|
               expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
-              expect(model_event).to have_attributes(:event_key => :group_advance_termination_confirmation, :klass_instance => model_instance, :options => {})
+              expect(model_event).to have_attributes(:event_key => :group_termination_confirmation_notice, :klass_instance => model_instance, :options => {})
             end
           end
           subject.migrate

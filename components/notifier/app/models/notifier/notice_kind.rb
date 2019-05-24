@@ -92,7 +92,7 @@ module Notifier
       recipient.to_s.split('::').last.underscore.to_sym
     end
 
-    def is_shop?
+    def shop?
       [
         :employer_profile,
         :employee_profile,
