@@ -3,6 +3,7 @@ class VerificationType
   include Mongoid::Timestamps
 
   embedded_in :person
+  embedded_in :applicant, class_name: "::FinancialAssistance::Applicant"
 
   ALL_VERIFICATION_TYPES = ["DC Residency", "Social Security Number", "American Indian Status", "Citizenship", "Immigration status"]
   NON_CITIZEN_IMMIGRATION_TYPES = ["DC Residency", "Social Security Number", "American Indian Status"]
