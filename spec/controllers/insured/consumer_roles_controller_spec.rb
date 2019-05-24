@@ -4,7 +4,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
 
   context "When individual market is disabled" do
     before do
-      Settings.aca.market_kinds = %W[shop]
+      allow(Settings.aca).to receive(:market_kinds).and_return(%W[shop])
       sign_in user
       get :search
     end

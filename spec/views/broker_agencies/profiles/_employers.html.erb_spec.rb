@@ -14,7 +14,7 @@ RSpec.describe "broker_agencies/profiles/_employers.html.erb", :dbclean => :afte
 
   describe 'with modify permissions for DC' do
     before :each do
-      Settings.aca.general_agency_enabled = true
+      allow(Settings.aca).to receive(:general_agency_enabled).and_return(true)
       render template: "broker_agencies/profiles/_employers.html.erb"
     end
     context "General Agency can be enabled or disabled via settings" do
@@ -37,7 +37,7 @@ RSpec.describe "broker_agencies/profiles/_employers.html.erb", :dbclean => :afte
 
   describe 'with modify permissions for MA' do
     before :each do
-      Settings.aca.general_agency_enabled = false
+      allow(Settings.aca).to receive(:general_agency_enabled).and_return(false)
       render template: "broker_agencies/profiles/_employers.html.erb"
     end
     context "General Agency can be enabled or disabled via settings" do
