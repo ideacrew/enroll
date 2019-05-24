@@ -26,7 +26,10 @@ RSpec.describe FinancialAssistance::Applicant, type: :model, dbclean: :after_eac
   let!(:eligibility_determination2) { FactoryGirl.create(:eligibility_determination, tax_household: tax_household1, source: 'Haven') }
   let!(:applicant1) { FactoryGirl.create(:applicant, tax_household_id: tax_household1.id, application: application, family_member_id: family_member1.id) }
   let!(:applicant2) { FactoryGirl.create(:applicant, tax_household_id: tax_household1.id, application: application, family_member_id: family_member2.id, aasm_state: 'verification_outstanding') }
-  let!(:assisted_verification) { FactoryGirl.create(:assisted_verification, applicant: applicant1, status: 'pending') }
+  let!(:income_verification_type) { FactoryGirl.create(:verification_type, applicant: applicant1, type_name: 'Income') }
+  let!(:mec_verification_type) { FactoryGirl.create(:verification_type, applicant: applicant1, type_name: 'MEC') }
+  let!(:income_verification_type) { FactoryGirl.create(:verification_type, applicant: applicant2, type_name: 'Income') }
+  let!(:mec_verification_type) { FactoryGirl.create(:verification_type, applicant: applicant2, type_name: 'MEC') }
 
   describe '#modelFields' do
     it { is_expected.to have_field(:assisted_income_validation).of_type(String).with_default_value_of('pending') }
@@ -170,19 +173,19 @@ RSpec.describe FinancialAssistance::Applicant, type: :model, dbclean: :after_eac
 
   describe '#Constants' do
     it 'should have tax filer kinds constant' do
-      subject.class.should be_const_defined(:TAX_FILER_KINDS)
+      expect(subject.class.constants.include?(:TAX_FILER_KINDS)).to be_truthy
       expect(described_class::TAX_FILER_KINDS).to eq(%w[tax_filer single joint separate dependent non_filer])
     end
 
     it 'should have student kinds constant' do
-      subject.class.should be_const_defined(:STUDENT_KINDS)
+      expect(subject.class.constants.include?(:STUDENT_KINDS)).to be_truthy
       student_kinds = %w[ dropped_out elementary english_language_institute full_time ged graduated graduate_school half_time junior_school
         not_in_school open_university part_time preschool primary secondary technical undergraduate vocational vocational_tech ]
         expect(described_class::STUDENT_KINDS).to eq(student_kinds)
     end
 
     it 'should have student school kinds constant' do
-      subject.class.should be_const_defined(:STUDENT_SCHOOL_KINDS)
+      expect(subject.class.constants.include?(:STUDENT_SCHOOL_KINDS)).to be_truthy
       school_student_kinds = %w[
         english_language_institute
         elementary
@@ -202,17 +205,17 @@ RSpec.describe FinancialAssistance::Applicant, type: :model, dbclean: :after_eac
     end
 
     it 'should have income validation states constant' do
-      subject.class.should be_const_defined(:INCOME_VALIDATION_STATES)
+      expect(subject.class.constants.include?(:INCOME_VALIDATION_STATES)).to be_truthy
       expect(described_class::INCOME_VALIDATION_STATES).to eq(%w[na valid outstanding pending])
     end
 
     it 'should have mec validation states constant' do
-      subject.class.should be_const_defined(:MEC_VALIDATION_STATES)
+      expect(subject.class.constants.include?(:MEC_VALIDATION_STATES)).to be_truthy
       expect(described_class::MEC_VALIDATION_STATES).to eq(%w[na valid outstanding pending])
     end
 
     it 'should have driver question attributes constant' do
-      subject.class.should be_const_defined(:DRIVER_QUESTION_ATTRIBUTES)
+      expect(subject.class.constants.include?(:DRIVER_QUESTION_ATTRIBUTES)).to be_truthy
       expect(described_class::DRIVER_QUESTION_ATTRIBUTES).to eq([:has_job_income, :has_self_employment_income, :has_other_income, :has_deductions, :has_enrolled_health_coverage, :has_eligible_health_coverage])
     end
   end
@@ -579,6 +582,8 @@ RSpec.describe FinancialAssistance::Applicant, type: :model, dbclean: :after_eac
 
         context 'for notify_of_eligibility_change and aasm_state changes on_event: income_outstanding, verification_outstanding' do
           before :each do
+            applicant1.verification_types << FactoryGirl.create(:verification_type, applicant: applicant1, type_name: 'Income', validation_status: 'pending')
+            applicant1.verification_types << FactoryGirl.create(:verification_type, applicant: applicant1, type_name: 'MEC', validation_status: 'pending')
             applicant1.income_outstanding!
           end
 
@@ -599,6 +604,8 @@ RSpec.describe FinancialAssistance::Applicant, type: :model, dbclean: :after_eac
 
         context 'for notify_of_eligibility_change and aasm_state changes on_event: income_valid, verification_pending' do
           before :each do
+            applicant1.verification_types << FactoryGirl.create(:verification_type, applicant: applicant1, type_name: 'Income', validation_status: 'pending')
+            applicant1.verification_types << FactoryGirl.create(:verification_type, applicant: applicant1, type_name: 'MEC', validation_status: 'pending')
             applicant1.income_valid!
           end
 
@@ -618,9 +625,9 @@ RSpec.describe FinancialAssistance::Applicant, type: :model, dbclean: :after_eac
         end
 
         context 'for notify_of_eligibility_change and aasm_state changes on_event: income_valid, fully_verified' do
-          let!(:assisted_verification) { FactoryGirl.create(:assisted_verification, applicant: applicant1, verification_type: 'MEC', status: 'verified') }
-
           before :each do
+            applicant1.verification_types << FactoryGirl.create(:verification_type, applicant: applicant1, type_name: 'Income', validation_status: 'verified')
+            applicant1.verification_types << FactoryGirl.create(:verification_type, applicant: applicant1, type_name: 'MEC', validation_status: 'verified')
             applicant1.income_valid!
           end
 
@@ -643,8 +650,9 @@ RSpec.describe FinancialAssistance::Applicant, type: :model, dbclean: :after_eac
         end
 
         it 'should transition to fully_verified' do
-          applicant2.assisted_verifications.create!(applicant: applicant2, verification_type: 'MEC', status: 'verified')
+          applicant2.verification_types << FactoryGirl.create(:verification_type, applicant: applicant2, type_name: 'MEC')
           expect(applicant2.aasm_state).to eq 'verification_outstanding'
+          applicant2.mec_verification.update_attributes!(validation_status: 'verified')
           applicant2.income_valid!
           expect(applicant2.aasm_state).to eq 'fully_verified'
         end
@@ -662,8 +670,9 @@ RSpec.describe FinancialAssistance::Applicant, type: :model, dbclean: :after_eac
         end
 
         it 'should transition to fully_verified' do
-          applicant2.assisted_verifications.create!(applicant: applicant2, verification_type: 'MEC', status: 'verified')
+          applicant2.verification_types << FactoryGirl.create(:verification_type, applicant: applicant2, type_name: 'MEC')
           expect(applicant2.aasm_state).to eq 'verification_pending'
+          applicant2.mec_verification.update_attributes!(validation_status: 'verified')
           applicant2.income_valid!
           expect(applicant2.aasm_state).to eq 'fully_verified'
         end
