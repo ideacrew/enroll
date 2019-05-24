@@ -76,13 +76,8 @@ module Subscribers
       @applicant_in_context = application_in_context.applicants.select { |applicant| applicant.person.hbx_id == person_in_context.hbx_id}.first
       throw(:processing_issue, "ERROR: Failed to find applicant in xml") unless @applicant_in_context.present?
 
-      if kind == "Income"
-        @applicant_in_context.update_attributes(has_income_verification_response: true)
-        verification_failed = verified_verification.verifications.first.income_verification_failed
-      elsif kind == "MEC"
-        @applicant_in_context.update_attributes(has_mec_verification_response: true)
-        verification_failed = verified_verification.verifications.first.mec_verification_failed
-      end
+      @applicant_in_context.update_attributes(has_income_verification_response: true) if kind == "Income"
+      @applicant_in_context.update_attributes(has_mec_verification_response: true) if kind == "MEC"
 
       status = verified_verification.verifications.first.response_code.split('#').last
       update_applicant(kind, @applicant_in_context, status)
