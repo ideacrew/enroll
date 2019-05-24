@@ -5,12 +5,12 @@ site:
   site_title: "DC's Online Health Insurance Marketplace"
   home_url: "https://www.dchealthlink.com/"
   home_business_url: "https://www.mahealthconnector.org/business/"
-  help_url: "https://www.mahealthconnector.org/business/help-center"
-  faqs_url: "https://www.mahealthconnector.org/business/help-center/faqs"
-  business_resource_center_url: "https://www.mahealthconnector.org/business/business-resource-center"
-  nondiscrimination_notice_url: "https://www.MAhealthconnector.org/site-policies/nondiscrimination-notice"
+  help_url: "https://www.dchealthlink.com/help"
+  faqs_url: "https://www.dchealthlink.com/Frequently-Asked-Questions"
+  business_resource_center_url: "https://dchealthlink.com/smallbusiness/"
+  nondiscrimination_notice_url: "https://www.dchealthlink.com/nondiscrimination"
   main_web_address_url: "https://www.dchealthlink.com/"
-  policies_url: "https://www.mahealthconnector.org/about/policy-center/policies"
+  policies_url: "https://dchealthlink.com/"
   invoice_bill_url: "https://www.e-billexpress.com/ebpp/DCHEALTHPAY/"
   payment_pdf_url: "pdf/employers_paying_your_premiums_online.pdf"
   user_sign_in_url: "https://www.dchealthlink.com/"
@@ -24,10 +24,10 @@ site:
   copyright_period_start: "2017"
   header_message: "Welcome to the District's Health Insurance Marketplace"
   logo_file_name: "mhc_logo.png"
-  make_their_premium_payments_online: "https://ww2.e-billexpress.com/ebpp/MAConnector/"
+  make_their_premium_payments_online: "https://www.e-billexpress.com/ebpp/DCHEALTHPAY/"
   tab_icon: 'favicon.ico'
   mailer_logo_file_name: "health_connector.png"
-  employer_application_deadline_link: "https://www.mahealthconnector.org/business/employers/employer-resources-and-information/employer-coverage-deadlines"
+  employer_application_deadline_link: "https://dchealthlink.com/smallbusiness/employer-coverage-deadlines"
   s3_prefix: "dc"
   broker_quoting_enabled: false
   broker_claim_quoting_enabled: true
@@ -36,7 +36,7 @@ site:
   plan_options_title_for_ma: true
   create_routes: ['/insured/employee/privacy','/employers/employer_profiles/new', '/insured/consumer_role/privacy']
   sign_in_routes: ['/families/home']
-  shop_find_your_doctor_url: "https://ma.checkbookhealth.org/mashop"
+  shop_find_your_doctor_url: "https://dc.checkbookhealth.org/dc/"
   document_verification_checklist_url: "https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist"
   terms_and_conditions_url: "https://www.mahealthconnector.org/business/brokers/certification/terms-and-conditions"
   certification_url: "https://www.mahealthconnector.org/business/brokers/certification"
@@ -365,7 +365,7 @@ style:
   primary_color:  '#007bc4'
   primary_notification: '#333333'
   primary_panel: '#333333'
-  primary_button: '#337ab7'
+  primary_button: '#e72b2d'
   primary_button_color: '#286090'
   primary_button_disabled: '#337ab7'
   primary_button_border_disabled: '#2e6da4'
