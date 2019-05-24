@@ -1,28 +1,28 @@
 site:
   key: :dc
-  subdomain: "mhc"
-  domain_name: "hbxshop.org"
-  site_title: "Massachusetts Health Connector for Business"
-  home_url: "https://business.mahealthconnector.org/"
+  subdomain: "dchbx"
+  domain_name: "dchealthlink.com"
+  site_title: "DC's Online Health Insurance Marketplace"
+  home_url: "https://www.dchealthlink.com/"
   home_business_url: "https://www.mahealthconnector.org/business/"
   help_url: "https://www.mahealthconnector.org/business/help-center"
   faqs_url: "https://www.mahealthconnector.org/business/help-center/faqs"
   business_resource_center_url: "https://www.mahealthconnector.org/business/business-resource-center"
   nondiscrimination_notice_url: "https://www.MAhealthconnector.org/site-policies/nondiscrimination-notice"
-  main_web_address_url: "https://www.MAhealthconnector.org"
+  main_web_address_url: "https://www.dchealthlink.com/"
   policies_url: "https://www.mahealthconnector.org/about/policy-center/policies"
-  invoice_bill_url: ""
+  invoice_bill_url: "https://www.e-billexpress.com/ebpp/DCHEALTHPAY/"
   payment_pdf_url: "pdf/employers_paying_your_premiums_online.pdf"
-  user_sign_in_url: "https://business.mahealthconnector.org/users/sign_in"
-  website_name: "MAhealthconnector.org"
-  main_web_address: "www.MAhealthconnector.org"
+  user_sign_in_url: "https://www.dchealthlink.com/"
+  website_name: "www.DCHealthLink.com"
+  main_web_address: "www.DCHealthLink.com"
   health_care_website: "www.healthcare.gov"
   health_care_website_url: "https://www.healthcare.gov"
   short_name: "DC Health Link"
-  byline: "The Right Place for the Right Plan"
-  long_name: "Massachusetts Health Connector"
+  byline: "DC's Online Health Insurance Marketplace"
+  long_name: ""
   copyright_period_start: "2017"
-  header_message: "The Right Place for the Right Plan"
+  header_message: "Welcome to the District's Health Insurance Marketplace"
   logo_file_name: "mhc_logo.png"
   make_their_premium_payments_online: "https://ww2.e-billexpress.com/ebpp/MAConnector/"
   tab_icon: 'favicon.ico'
@@ -46,31 +46,31 @@ site:
   healthcare_name: "www.healthcare.gov"
   healthcare_url: "https://www.healthcare.gov/"
   irs_url: "https://www.irs.gov/"
-  exchange_hbx_id: "MA0"
-  mail_address: "noreply@healthconnector.org"
-  privacy_policy: "https://www.mahealthconnector.org/site-policies/privacy-policy"
+  exchange_hbx_id: "DC0"
+  mail_address: "info@dchealthlink.com"
+  privacy_policy: "https://dchealthlink.com/"
   late_rates_message: "Due to a delay, premiums for some coverage effective dates are not available yet. Please check again soon to see if this information has been updated. You can also contact Customer Service or your broker if you need help."
 
-  exchange_name: "Massachusetts Health Connector"
+  exchange_name: "Washington DC Health Benefit Exchange"
   social_media:
     facebook_url: ""
 
 contact_center:
-  name: "Health Connector's Customer Care Center"
-  alt_name: "Health Connector Customer Service"
-  phone_number: "1-888-813-9220"
+  name: "DC Health Link's Customer Care Center"
+  alt_name: "DC Health Link Customer Service"
+  phone_number: "1-855-532-5465"
   fax: "1-617-933-3099"
   alt_fax: "617-722-4033"
   tty_number: "711"
-  alt_phone_number: "1-888-813-9220"
+  alt_phone_number: "1-855-532-LINK"
   payment_phone_number: "855-532-LINK"
   ivl_number: "1-877-623-6765"
   ivl_phone_number: "1-877-623-6765"
-  email_address: "smallbusiness@mahealthconnector.org"
-  small_business_email: "smallbusiness@MAhealthconnector.org"
-  non_discrimination_email: "Nondiscrimination@state.ma.us"
+  email_address: "info@dchealthlink.com"
+  small_business_email: "info@dchealthlink.com"
+  non_discrimination_email: "info@dchealthlink.com"
 
-  appeals: "connector-appeals@state.ma.us"
+  appeals: "info@dchealthlink.com"
 
   mailing_address:
     name: "DC Health Link"
@@ -81,18 +81,18 @@ contact_center:
     zip_code: "20090"
 
   appeal_center:
-    name: "Appeals Unit"
-    address_1: "PO Box 960189"
+    name: "DC Health Link"
+    address_1: "PO Box 97022"
     address_2:
-    city: "Boston"
-    state: "MA"
-    zip_code: "02196"
+    city: "Washington"
+    state: "DC"
+    zip_code: "20090"
 
   non_discrimination:
-    email: "Nondiscrimination@state.ma.us"
-    phone_1: "617-936-1037"
-    phone_2: "1-800-368-1019"
-    phone_3: "800-537-7697"
+    email: "info@dchealthlink.com"
+    phone_1: "1-855-532-5465"
+    phone_2: "1-855-532-5465"
+    phone_3: "1-855-532-5465"
     complaint_url: "https://www.hhs.gov/civil-rights/filing-a-complaint"
 
 plan_option_titles:
@@ -116,9 +116,9 @@ plan_option_descriptions:
 
   shop:
     attachments:
-      envelope_without_address: "ma_envelope_without_address.pdf"
-      non_discrimination_attachment: "ma_shop_non_discrimination_attachment.pdf"
-      employee_appeal_rights: "ma_employee_appeal_rights.pdf"
+      envelope_without_address: "envelope_without_address.pdf"
+      non_discrimination_attachment: "shop_non_discrimination_attachment.pdf"
+      employee_appeal_rights: "employee_appeal_rights.pdf"
     partials:
       template: "notifier/notice_kinds/template.html.erb"
       header: "notifier/notice_kinds/header_with_page_numbers.html.erb"
@@ -330,9 +330,9 @@ notices:
 
   shop:
     attachments:
-      envelope_without_address: "ma_envelope_without_address.pdf"
-      non_discrimination_attachment: "ma_shop_non_discrimination_attachment.pdf"
-      employee_appeal_rights: "ma_employee_appeal_rights.pdf"
+      envelope_without_address: "envelope_without_address.pdf"
+      non_discrimination_attachment: "shop_non_discrimination_attachment.pdf"
+      employee_appeal_rights: "employee_appeal_rights.pdf"
     partials:
       template: "notifier/notice_kinds/template.html.erb"
       header: "notifier/notice_kinds/header_with_page_numbers.html.erb"
