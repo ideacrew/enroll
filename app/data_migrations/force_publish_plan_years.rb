@@ -211,6 +211,9 @@ class ForcePublishPlanYears < MongoidMigrationTask
       end
     end 
 
+    start_on_date  = Date.new(2019,7,1)
+    system ("rm -rf '#{Rails.root}/detail_report_#{start_on_date.strftime('%m_%d')}.csv'")
+
     def detail_report(start_on_date)
       orgs = Organization.where(:"employer_profile.plan_years" => {:$elemMatch => {:start_on => start_on_date, :aasm_state.in => PlanYear::RENEWING}})
   
@@ -233,7 +236,8 @@ class ForcePublishPlanYears < MongoidMigrationTask
         "#{start_on_date.year} plan", 
         "#{start_on_date.year} effective_date",
         "#{start_on_date.year} enrollment kind",
-        "#{start_on_date.year} status"
+        "#{start_on_date.year} status",
+        "Failure Reason"
       ]
     orgs.each do |organization|
         puts "Processing #{organization.legal_name}"
@@ -292,9 +296,13 @@ class ForcePublishPlanYears < MongoidMigrationTask
               %w(health dental).each do |coverage_kind|
                 next if enrollments.where(:coverage_kind => coverage_kind).blank?
                 data = employer_employee_data
-                data += enrollment_details_by_coverage_kind(enrollments, coverage_kind)
+                data += enrollment_details_by_coverage_kind(enrollments, coverage_kind).flatten
                 if renewal_bg_ids.present?
-                  data += enrollment_details_by_coverage_kind(renewal_enrollments, coverage_kind)
+                  data += enrollment_details_by_coverage_kind(renewal_enrollments, coverage_kind).flatten
+                  data += find_failure_reason(renewal_enrollments, coverage_kind, '2019', employer_profile.renewing_plan_year)
+                else  
+                  data += [nil,nil,nil,nil,nil]
+                  data += find_failure_reason(enrollments, coverage_kind, '2018', employer_profile.renewing_plan_year)
                 end
                 csv << data
               end
@@ -311,16 +319,37 @@ class ForcePublishPlanYears < MongoidMigrationTask
     def enrollment_details_by_coverage_kind(enrollments, coverage_kind)
       enrollment = enrollments.where(:coverage_kind => coverage_kind).sort_by(&:submitted_at).last
       return [] if enrollment.blank?
-      [
+      data = []
+
+      data =[
         enrollment.hbx_id,
         enrollment.try(:plan).try(:hios_id),
         enrollment.effective_on.strftime("%m/%d/%Y"),
         enrollment.coverage_kind,
-        enrollment.aasm_state.humanize
-      ]
+        enrollment.aasm_state.humanize ]
+      end
+
+    def find_failure_reason(enrollments, coverage_kind, year, plan_year)
+      enrollment = enrollments.where(:coverage_kind => coverage_kind).sort_by(&:submitted_at).last
+      data = []
+      if  enrollment.try(:effective_on).try(:strftime,"%Y") == '2019' &&  enrollment.aasm_state == 'coverage_selected' 
+         data += ["Coverage was manually selected for the current year"]
+      elsif plan_year.aasm_state != 'renewing_enrolling' 
+        data += ["ER plan year not in renewing enrolling"]
+      elsif year == "2018" &&  enrollment.aasm_state.in?(HbxEnrollment::WAIVED_STATUSES)
+        data += ["2018 coverage was not active"]
+      else 
+        data += [""]
+      end
+      data
     end
 
+    detail_report(start_on_date)
    end
   
   
-  
+  # ar = ["86545CT1400004","86545CT1400005","86545CT1400003","86545CT1400004","86545CT1400005"]
+  # ar.map do |id|
+  #   plan = Plan.where(hios_plan_id:id).first 
+  #   plan.carrier
+  # end.compact
