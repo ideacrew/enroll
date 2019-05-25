@@ -444,8 +444,6 @@ When(/(^.+) enters? office location for (.+)$/) do |role, location|
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][area_code]', :with => location[:phone_area_code]
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][number]', :with => location[:phone_number]
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][extension]', :with => location[:phone_extension]
-  wait_for_ajax
-  page.find('h4', text: "#{Settings.site.header_message}").click
   find('#broker-btn').click
 end
 
@@ -493,7 +491,7 @@ When(/^(.*) logs on to the (.*)?/) do |named_person, portal|
   person = people[named_person]
 
   visit "/"
-  portal_class = "interaction-click-control-#{portal.downcase.gsub(/ /, '-')}"
+  portal_class = "#{portal.downcase.gsub(/ /, '-')}"
   portal_uri = find("a.#{portal_class}")["href"]
 
   visit "/users/sign_in"
@@ -502,7 +500,7 @@ When(/^(.*) logs on to the (.*)?/) do |named_person, portal|
   fill_in "user[password]", :with => person[:password]
   #TODO this fixes the random login fails b/c of empty params on email
   fill_in "user[login]", :with => person[:email] unless find(:xpath, '//*[@id="user_login"]').value == person[:email]
-  find('.interaction-click-control-sign-in').click
+  find('.sign-in-btn').click
   visit portal_uri
   # Adding sleep seems to help prevent the AuthenticityToken error
   # which apeared to be throwing in at least the
@@ -511,7 +509,7 @@ end
 
 When(/^user visits the (.*)?/) do |portal|
   visit "/"
-  portal_class = "interaction-click-control-#{portal.downcase.gsub(/ /, '-')}"
+  portal_class = "#{portal.downcase.gsub(/ /, '-')}"
   portal_uri = find("a.#{portal_class}")["href"]
   sleep 10
   visit portal_uri
@@ -621,8 +619,7 @@ When(/^(.*) creates an HBX account$/) do |named_person|
   fill_in "user[oim_id]", :with => person[:email]
   fill_in "user[password_confirmation]", :with => person[:password]
   fill_in "user[password]", :with => person[:password]
-  screenshot("create_account")
-  click_button "Create account"
+  find('.create-account-btn').click
 end
 
 And(/^Primary Broker select the all security question and give the answer$/) do

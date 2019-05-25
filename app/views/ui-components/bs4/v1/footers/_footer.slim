@@ -1,0 +1,24 @@
+footer.footer-wrapper
+  .container
+    .row.pt-3.pb-3
+      .col-md-6
+        = copyright_notice
+      .col-md-6.pl-5
+          ul.list-unstyled.list-group.list-group-horizontal
+            li.mr-3
+              a.call-customer-service href="tel:#{contact_center_phone_number}"
+                span
+                  i.fas.fa-phone.fa-lg.fa-rotate-90
+                  | &nbsp;
+                  = contact_center_phone_number
+            li.mr-3
+              = mail_to contact_center_email_address, target: '_blank' do
+                span
+                  i.fas.fa-envelope.fa-lg
+                  | &nbsp;
+                  = Settings.contact_center.email_address
+            li.mr-3
+              = link_to site_faqs_url, target: '_blank' do
+                i.fas.fa-question.fa-lg
+                | &nbsp;
+                | FAQs
