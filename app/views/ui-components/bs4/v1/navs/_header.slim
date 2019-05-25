@@ -1,6 +1,6 @@
 #dchbx_enroll_date_of_record.d-none = TimeKeeper.date_of_record.iso8601
 
-nav.navbar.navbar-expand-lg.navbar-main.pt-0.pb-0
+nav class=("navbar navbar-expand-lg navbar-main pt-0 pb-0 #{"pre_prod_nav_color" if ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true'}")
   .container
     a.navbar-brand.pr-3.pt-3.pb-3 href="#" = image_pack_tag 'logo.png'
     button.navbar-toggler aria-controls="navbarNav" aria-expanded="false" aria-label=("Toggle navigation") data-target="#navbarNav" data-toggle="collapse" type="button"

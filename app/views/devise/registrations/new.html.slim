@@ -11,7 +11,7 @@
         = f.hidden_field :referer, value: request.env["HTTP_REFERER"]
         .form-group
           = f.label :email_or_username
-          = f.text_field :oim_id, class: "form-control", placeholder: "Email or Username", required: true
+          = f.text_field :oim_id, class: "form-control", required: true
           .invalid-feedback
             | You can use your email address as your login. Using your email address will make it easier to recover your password if you ever forget it.
         .form-group
