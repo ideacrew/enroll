@@ -10,7 +10,7 @@ RSpec.describe 'ModelEvents::EmployeeSepRequestDeniedNotice', :dbclean => :after
 
   let(:person){ FactoryBot.create(:person, :with_family)}
   let(:family) {person.primary_family}
-  let(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id)}
+  let(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: abc_profile.id)}
   let(:census_employee)  { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile) }
   let(:qle) { FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date, market_kind: 'shop') }
   let(:notice_event1) {'sep_denial_notice_for_ee_active_on_single_roster'}
@@ -40,7 +40,7 @@ RSpec.describe 'ModelEvents::EmployeeSepRequestDeniedNotice', :dbclean => :after
 
   describe "NoticeTrigger when employee is active on single roster" do
     context "when employee sep is denied" do
-      let(:employee_role2) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id)}
+      let(:employee_role2) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: abc_profile.id)}
       subject { BenefitSponsors::Services::NoticeService.new }
 
       it "should trigger notice event" do

@@ -11,7 +11,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::GroupTerminationDueToNonpaymentNot
   let(:person)       { FactoryBot.create(:person, :with_family) }
   let(:family)       { person.primary_family }
   let!(:census_employee) { FactoryBot.create(:census_employee, :with_active_assignment,  benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile, benefit_group: current_benefit_package) }
-  let(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id)}
+  let(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: abc_profile.id)}
   let(:hbx_enrollment) do
     FactoryBot.create(
       :hbx_enrollment,

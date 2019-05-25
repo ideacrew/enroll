@@ -1,7 +1,7 @@
 class EmployeeRole
   include Mongoid::Document
   include Acapi::Notifiers
-  include ModelEvents::EmployeeRole
+  include BenefitSponsors::ModelEvents::EmployeeRole
   include ::BenefitSponsors::Concerns::Observable
 
   embedded_in :person

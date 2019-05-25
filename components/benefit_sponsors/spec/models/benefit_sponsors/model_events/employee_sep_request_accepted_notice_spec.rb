@@ -14,7 +14,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeSepRequestAccepted', :dbcl
   )}
   let!(:person){ FactoryBot.create(:person, :with_family)}
   let!(:family) {person.primary_family}
-  let!(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: employer_profile, census_employee_id: census_employee.id)}
+  let!(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: employer_profile, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: employer_profile.id)}
   let!(:census_employee)  { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile, first_name: person.first_name, last_name: person.last_name ) }
   let(:qle) { FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date, market_kind: "shop") }
   let(:model_instance) { FactoryBot.build(:special_enrollment_period, family: family, qualifying_life_event_kind_id: qle.id, title: "Married") }

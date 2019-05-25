@@ -17,7 +17,7 @@ module BenefitSponsors
     let(:person)                  { FactoryBot.create(:person, :with_family) }
     let(:family)                  { person.primary_family }
     let!(:census_employee)        { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile, first_name: person.first_name, last_name: person.last_name ) }
-    let!(:employee_role)          { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: employer_profile, census_employee_id: census_employee.id)}
+    let!(:employee_role)          { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: employer_profile, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: employer_profile.id)}
     let!(:model_instance)         { FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product, 
                                     household: family.active_household, 
                                     aasm_state: "shopping",

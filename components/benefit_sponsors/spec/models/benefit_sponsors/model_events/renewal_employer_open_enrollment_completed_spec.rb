@@ -13,8 +13,9 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployerOpenEnrollmentCompl
   let(:notice_event) { "renewal_employee_enrollment_confirmation" }
   let!(:person){ FactoryBot.create(:person, :with_family)}
   let!(:family) {person.primary_family}
-  let!(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id)}
+  let!(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: abc_profile.id)}
   let!(:census_employee)  { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile) }
+  let(:renewal_benefit_group_assignment) { FactoryBot.create(:benefit_group_assignment, benefit_group_id: nil, benefit_package_id: benefit_package.id, is_active: false, census_employee: census_employee, start_on: benefit_package.start_on) }
 
   let!(:model_instance) {renewal_application}
   let(:enrollment_policy) {instance_double("BenefitMarkets::BusinessRulesEngine::BusinessPolicy", success_results: "Success") }
@@ -27,7 +28,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployerOpenEnrollmentCompl
                                        sponsored_benefit_id: model_instance.benefit_packages.first.health_sponsored_benefit.id,
                                        sponsored_benefit_package_id: model_instance.benefit_packages.first.id,
                                        benefit_sponsorship_id: model_instance.benefit_sponsorship.id,
-                                       benefit_group_assignment_id: census_employee.renewal_benefit_group_assignment.id,
+                                       benefit_group_assignment_id: renewal_benefit_group_assignment.id,
                                        employee_role_id: employee_role.id)
     hbx_enrollment.benefit_sponsorship = benefit_sponsorship
     hbx_enrollment.save!

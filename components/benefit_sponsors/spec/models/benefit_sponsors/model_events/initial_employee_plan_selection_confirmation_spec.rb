@@ -20,7 +20,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployeePlanSelectionConfir
   let(:person)       { FactoryBot.create(:person, :with_family) }
   let(:family)       { person.primary_family }
   let!(:census_employee)  { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile, active_benefit_group_assignment: benefit_package.id ) }
-  let(:employee_role)     { FactoryBot.create(:benefit_sponsors_employee_role, employer_profile: employer_profile, person: person, census_employee_id: census_employee.id) }
+  let(:employee_role)     { FactoryBot.create(:benefit_sponsors_employee_role, employer_profile: employer_profile, person: person, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: employer_profile.id) }
   let!(:benefit_group_assignment) { census_employee.active_benefit_group_assignment }
 
   let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product, 

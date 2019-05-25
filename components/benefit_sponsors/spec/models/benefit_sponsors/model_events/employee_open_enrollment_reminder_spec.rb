@@ -17,7 +17,7 @@ RSpec.describe 'ModelEvents::EmployeeOpenEnrollmentReminder', :dbclean => :after
   let(:model_instance) {initial_application}
   let(:person){ FactoryBot.create(:person, :with_family)}
   let(:family) {person.primary_family}
-  let(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id)}
+  let(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: abc_profile.id)}
   let(:census_employee)  { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile) }
   let(:date_mock_object) { Date.new(current_effective_date.year, current_effective_date.prev_month.month, (Settings.aca.shop_market.open_enrollment.monthly_end_on - 2))}
 

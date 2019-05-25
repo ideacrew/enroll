@@ -12,7 +12,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeMatchesEmployerRooster', :
   let(:person) { FactoryBot.create :person, :with_family}
   let(:family) {person.primary_family}
   let(:census_employee)  { FactoryBot.create(:benefit_sponsors_census_employee, employer_profile: abc_profile, first_name: person.first_name, last_name: person.last_name) }
-  let(:model_instance) { FactoryBot.build(:benefit_sponsors_employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id)}
+  let(:model_instance) { FactoryBot.build(:benefit_sponsors_employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: abc_profile.id)}
 
   context 'ModelEvent' do
     it 'should trigger model event' do
