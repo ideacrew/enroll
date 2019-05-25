@@ -1,0 +1,37 @@
+#dchbx_enroll_date_of_record.d-none = TimeKeeper.date_of_record.iso8601
+
+nav.navbar.navbar-expand-lg.navbar-main.pt-0.pb-0
+  .container
+    a.navbar-brand.pr-3.pt-3.pb-3 href="#" = image_pack_tag 'logo.png'
+    button.navbar-toggler aria-controls="navbarNav" aria-expanded="false" aria-label=("Toggle navigation") data-target="#navbarNav" data-toggle="collapse" type="button"
+      span.navbar-toggler-icon
+
+    #navbarNav.collapse.navbar-collapse
+      ul.navbar-nav
+        li.nav-item.active
+          a.nav-link.pt-0.portal
+            = get_header_text(controller_name)
+
+    ul.list-group.list-group-flush
+      li.list-group-item.user-actions.pt-0.pb-0 href="tel: #{Settings.contact_center.phone_number}"
+        .header-text
+          = l10n(".call_customer_service")
+      li.list-group-item.user-actions.pt-0.pb-0
+        .float-right
+          .fas.fa-phone.mr-2.fa-rotate-90
+          strong.cc-number
+            = Settings.contact_center.phone_number
+    - if signed_in?
+      ul.list-group.list-group-flush.login-options
+        li.list-group-item.user-actions.pt-0.pb-0
+          = render partial: "shared/my_portal_links"
+          .mt-3
+          a.header-text href="https://dchealthlink.com/help" target="_blank" Help |
+          = link_to "Logout", main_app.destroy_user_session_path, method: "delete", class: "header-text"
+        li.list-group-item.user-actions.pt-0.pb-0
+          strong
+            = user_first_name_last_name_and_suffix
+          - unless current_user.try(:person).try(:hbx_id).nil?
+            = l10n(".my_id")
+            | :
+            = truncate(current_user.try(:person).try(:hbx_id).upcase, length: 8, omission: '')

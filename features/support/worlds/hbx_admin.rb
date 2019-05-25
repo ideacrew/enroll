@@ -1,9 +1,9 @@
 module HbxAdminWorld
   def hbx_admin(*traits)
     p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
-      send_broker_agency_message: true, approve_broker: true, approve_ga: true, modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, 
-      can_complete_resident_application: true,can_add_sep: true, can_view_username_and_email: true, can_view_application_types: true, view_personal_info_page: true, 
-      can_access_new_consumer_application_sub_tab: true, can_access_outstanding_verification_sub_tab: true, can_access_identity_verification_sub_tab: true, 
+      send_broker_agency_message: true, approve_broker: true, approve_ga: true, modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true,
+      can_complete_resident_application: true,can_add_sep: true, can_view_username_and_email: true, can_view_application_types: true, view_personal_info_page: true,
+      can_access_new_consumer_application_sub_tab: true, can_access_outstanding_verification_sub_tab: true, can_access_identity_verification_sub_tab: true,
       can_access_accept_reject_paper_application_documents: true, can_delete_identity_application_documents: true, can_access_accept_reject_identity_documents: true)
     attributes = traits.extract_options!
     @hbx_admin ||= FactoryBot.create :user, *traits, attributes
@@ -54,6 +54,6 @@ Given(/^a Hbx admin logs on to Portal$/) do
   visit "/users/sign_in"
   fill_in "user[login]", :with => @u1.oim_id
   fill_in "user[password]", :with => @u1.password
-  find('.interaction-click-control-sign-in').click
+  find('.sign-in-btn').click
   visit exchanges_hbx_profiles_root_path
 end

@@ -19,7 +19,7 @@ site:
   health_care_website: "www.healthcare.gov"
   health_care_website_url: "https://www.healthcare.gov"
   short_name: "DC Health Link"
-  byline: "DC's Online Health Insurance Marketplace"
+  byline: "Welcome to the District's Health Insurance Marketplace"
   long_name: ""
   copyright_period_start: "2017"
   header_message: "Welcome to the District's Health Insurance Marketplace"
@@ -28,7 +28,7 @@ site:
   tab_icon: 'favicon.ico'
   mailer_logo_file_name: "health_connector.png"
   employer_application_deadline_link: "https://dchealthlink.com/smallbusiness/employer-coverage-deadlines"
-  s3_prefix: "dc"
+  s3_prefix: "dchbx"
   broker_quoting_enabled: false
   broker_claim_quoting_enabled: true
   guidance_for_business_owners_url: "https://dchealthlink.com/sites/default/files/v2/forms/Guidance_for_Business_Owners.pdf"
