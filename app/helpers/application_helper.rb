@@ -113,6 +113,16 @@ module ApplicationHelper
     timestamp.present? ? timestamp.in_time_zone('Eastern Time (US & Canada)') : ""
   end
 
+  def amount_color_style(amount)
+    return "" if amount.blank?
+    amount > 0 ? "class=red" : ""
+  end
+
+  def payment_amount_color_style(amount)
+    return "" if amount.blank?
+    amount < 0 ? "class=red" : ""
+  end
+
   # Builds a Dropdown button
   def select_dropdown(input_id, list)
     return unless list.is_a? Array
