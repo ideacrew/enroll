@@ -268,7 +268,7 @@ module Config::AcaHelper
   end
 
   def dental_offers_single_carrier?
-    Settings.aca.dental_plan_options_available.include?("single_carrier")
+    Settings.aca.dental_plan_options_available.include?("single_issuer")
   end
 
   def dental_offers_sole_source?
@@ -280,6 +280,6 @@ module Config::AcaHelper
   end
 
   def dental_offers_custom_creation?
-    Settings.aca.dental_plan_options_available.include?("custom")
+    Settings.aca.dental_plan_options_available.include?("multi_product")
   end
 end
