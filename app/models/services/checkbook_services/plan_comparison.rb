@@ -129,16 +129,17 @@ module Services
       end
 
       def employer_effective_date
-        benefit_group_assignment  = @hbx_enrollment.effective_on < @census_employee.active_benefit_group_assignment.plan_year.end_on ? @census_employee.active_benefit_group_assignment : @census_employee.renewal_benefit_group_assignment
+        # benefit_group_assignment  = @hbx_enrollment.effective_on < @census_employee.active_benefit_group_assignment.plan_year.end_on ? @census_employee.active_benefit_group_assignment : @census_employee.renewal_benefit_group_assignment
         # benefit_group_assignment = @census_employee.renewal_benefit_group_assignment  || @census_employee.active_benefit_group_assignment
-        benefit_group_assignment.benefit_group.plan_year.start_on.strftime("%Y-%m-%d")
+        # benefit_group_assignment.benefit_group.plan_year.start_on.strftime("%Y-%m-%d")
+        @hbx_enrollment.sponsored_benefit_package.start_on.strftime("%Y-%m-%d")
       end
 
       def filter_value
-        case @hbx_enrollment.benefit_group.plan_option_kind
+        case @hbx_enrollment.sponsored_benefit_package.plan_option_kind
         when "single_plan"
           # @hbx_enrollment.benefit_group.reference_plan_id.to_s
-          @hbx_enrollment.benefit_group.reference_plan.hios_id.to_s
+          reference_plan.hios_id.to_s
         when "metal_level"
           reference_plan.metal_level
         else
@@ -147,10 +148,10 @@ module Services
       end
 
       def filter_option
-        case @hbx_enrollment.benefit_group.plan_option_kind
+        case @hbx_enrollment.sponsored_benefit_package.plan_option_kind
         when "single_plan"
           "Plan"
-        when "single_carrier"
+        when ("single_carrier" || "single_issuer")
           "Carrier"
         when "metal_level"
           "Metal"
@@ -160,16 +161,16 @@ module Services
 
       def employer_contributions
         premium_benefit_contributions = {}
-        @hbx_enrollment.benefit_group.relationship_benefits.each do |relationship_benefit|
-          next if ["child_26_and_over","nephew_or_niece","grandchild","child_26_and_over_with_disability"].include? relationship_benefit.relationship
-          relationship =  relationship_benefit.relationship == "child_under_26" ? "child" : relationship_benefit.relationship
-          premium_benefit_contributions[relationship] = relationship_benefit.premium_pct.to_i
+        @hbx_enrollment.sponsored_benefit_package.sorted_composite_tier_contributions.each do |relationship_benefit|
+          next if ["child_26_and_over","nephew_or_niece","grandchild","child_26_and_over_with_disability"].include? relationship_benefit.display_name
+          relationship =  relationship_benefit.relationship == "child_under_26" ? "child" : relationship_benefit.display_name
+          premium_benefit_contributions[relationship] = relationship_benefit.contribution_pct
         end
         premium_benefit_contributions
       end
 
       def reference_plan
-        @hbx_enrollment.benefit_group.reference_plan
+        @hbx_enrollment.sponsored_benefit_package.reference_plan
       end
 
       def consumer_build_family
