@@ -131,6 +131,21 @@ module BenefitMarkets
         ])
     }
 
+    scope :by_year, lambda {|year|
+      where('$and' => [{'application_period.min' => {'$lte' => Date.new(year)}},
+                       {'application_period.max' => {'$gte' => Date.new(year).end_of_year}}
+      ])
+    }
+
+    scope :with_premium_tables, ->{ where(:premium_tables.exists => true) }
+
+    scope :by_product_ids, ->(product_ids) { where(:id => {'$in' => product_ids}) }
+
+    scope :by_csr_kind_with_catastrophic, lambda { |csr_kind = 'csr_100'|
+      where('$and' => [{'$or' => [{:metal_level_kind.in => [:platinum, :gold, :bronze, :catastrophic], :csr_variant_id => '01'},
+                                  {:metal_level_kind => :silver, :csr_variant_id => EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]}]}])
+    }
+
     #Products retrieval by type
     scope :health_products,            ->{ where(:"_type" => /.*HealthProduct$/) }
     scope :dental_products,            ->{ where(:"_type" => /.*DentalProduct$/)}

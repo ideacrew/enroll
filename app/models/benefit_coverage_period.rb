@@ -147,6 +147,7 @@ class BenefitCoveragePeriod
   def elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_household=nil, market=nil)
     ivl_bgs = []
     hbx_enrollment = hbx_enrollment_members.first.hbx_enrollment
+    shopping_family_member_ids = hbx_enrollment_members.map(&:applicant_id)
     benefit_packages.each do |bg|
       satisfied = true
       family = hbx_enrollment.family
@@ -165,7 +166,10 @@ class BenefitCoveragePeriod
 
     ivl_bgs = ivl_bgs.uniq
     elected_product_ids = ivl_bgs.map(&:benefit_ids).flatten.uniq
-    ::BenefitMarkets::Products::HealthProducts::HealthProduct.individual_products.by_product_ids(elected_product_ids).entries
+    csr_kind = extract_csr_kind(tax_household, shopping_family_member_ids) if tax_household
+    market = market.nil? ? 'individual' : market
+    products = product_factory.new({market_kind: market})
+    products.by_coverage_kind_year_and_csr(coverage_kind, start_on.year, csr_kind: csr_kind).by_product_ids(elected_product_ids).entries
   end
 
   ## Class methods
@@ -217,7 +221,13 @@ class BenefitCoveragePeriod
 
   end
 
-private
+  private
+
+  def extract_csr_kind(tax_household, shopping_family_member_ids)
+    csr_kind = tax_household.latest_eligibility_determination.csr_eligibility_kind
+    tax_household.tax_household_members.where(:applicant_id.in => shopping_family_member_ids).map(&:is_ia_eligible).include?(false) ? 'csr_100' : csr_kind
+  end
+
   def end_date_follows_start_date
     return unless self.end_on.present?
     # Passes validation if end_on == start_date
