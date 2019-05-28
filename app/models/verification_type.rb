@@ -7,6 +7,7 @@ class VerificationType
 
   ALL_VERIFICATION_TYPES = ["DC Residency", "Social Security Number", "American Indian Status", "Citizenship", "Immigration status"]
   NON_CITIZEN_IMMIGRATION_TYPES = ["DC Residency", "Social Security Number", "American Indian Status"]
+  ASSISTED_VERIFICATION_TYPES = %W(Income MEC)
 
   VALIDATION_STATES = %w(na unverified pending review outstanding verified attested expired curam)
   OUTSTANDING_STATES = %w(outstanding)

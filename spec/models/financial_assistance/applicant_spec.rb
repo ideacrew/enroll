@@ -457,6 +457,69 @@ RSpec.describe FinancialAssistance::Applicant, type: :model, dbclean: :after_eac
     end
   end
 
+  describe "#admin_verification_action" do
+    let(:income_type) { VerificationType.new(type_name: 'Income', validation_status: "pending") }
+    let(:mec_type) { VerificationType.new(type_name: 'MEC', validation_status: "pending") }
+
+    before do
+      applicant1.verification_types << income_type
+      applicant1.verification_types << mec_type
+    end
+
+    it 'should update income verification type to verified' do
+
+      expect(applicant1.admin_verification_action("verify", income_type, "valid user")).to eq 'Income successfully approved'
+      expect(income_type.validation_status).to eq 'verified'
+    end
+
+    it 'should update MEC verification type to verified' do
+      expect(applicant1.admin_verification_action("reject", mec_type, "valid user")).to eq 'MEC was rejected'
+      expect(mec_type.validation_status).to eq 'outstanding'
+    end
+  end
+
+  describe "#update_verification_type" do
+    let(:income_type) { VerificationType.new(type_name: 'Income', validation_status: "pending") }
+    let(:mec_type) { VerificationType.new(type_name: 'MEC', validation_status: "pending") }
+
+    before do
+      applicant1.verification_types << income_type
+      applicant1.verification_types << mec_type
+    end
+
+    it 'should update income verification type to verified' do
+
+      expect(applicant1.update_verification_type(income_type, "valid user")).to eq 'Income successfully approved'
+      expect(income_type.validation_status).to eq 'verified'
+    end
+
+    it 'should update MEC verification type to verified' do
+      expect(applicant1.update_verification_type(mec_type, "valid user")).to eq 'MEC successfully approved'
+      expect(mec_type.validation_status).to eq 'verified'
+    end
+  end
+
+  describe "return_doc_for_deficiency" do
+    let(:income_type) { VerificationType.new(type_name: 'Income', validation_status: "pending") }
+    let(:mec_type) { VerificationType.new(type_name: 'MEC', validation_status: "pending") }
+
+    before do
+      applicant1.verification_types << income_type
+      applicant1.verification_types << mec_type
+    end
+
+    it 'should update income verification type to verified' do
+
+      expect(applicant1.return_doc_for_deficiency(income_type, "valid user")).to eq 'Income was rejected'
+      expect(income_type.validation_status).to eq 'outstanding'
+    end
+
+    it 'should update MEC verification type to verified' do
+      expect(applicant1.return_doc_for_deficiency(mec_type, "valid user")).to eq 'MEC was rejected'
+      expect(mec_type.validation_status).to eq 'outstanding'
+    end
+  end
+
   describe '#has_income?' do
     it 'should return true if has_job_income' do
       applicant1.update_attributes(has_job_income: true)

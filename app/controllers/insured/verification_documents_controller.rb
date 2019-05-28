@@ -73,7 +73,16 @@ class Insured::VerificationDocumentsController < ApplicationController
   end
 
   def find_docs_owner
-    @docs_owner = Person.find(params[:docs_owner]) if params[:docs_owner]
+    return unless params[:docs_owner].present?
+    fm_id = params[:docs_owner]
+    if %W[Income MEC].include?(params[:type_name])
+      application_in_context = @family.active_approved_application
+      applicant = application_in_context.active_applicants.where(family_member_id: params[:docs_owner]).first if application_in_context
+      @docs_owner = applicant
+    else
+      family_member = FamilyMember.find(fm_id)
+      @docs_owner = family_member.person
+    end
   end
 
   def update_vlp_documents(title, file_uri, applicant=nil)
