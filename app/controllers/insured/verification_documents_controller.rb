@@ -85,7 +85,7 @@ class Insured::VerificationDocumentsController < ApplicationController
 
   def update_vlp_documents(title, file_uri)
     document = @verification_type.vlp_documents.build
-    success = document.update_attributes({:identifier=>file_uri, :subject => title, :title=>title, :status=>"downloaded"})
+    success = document.update_attributes({:identifier => file_uri, :subject => title, :title => title, :status => "downloaded"})
     @verification_type.update_attributes(:rejected => false, :validation_status => "review", :update_reason => "document uploaded")
     @doc_errors = @document.errors.full_messages unless success
     @docs_owner.save
@@ -93,7 +93,7 @@ class Insured::VerificationDocumentsController < ApplicationController
 
   def update_paper_application(title, file_uri)
     document = @docs_owner.resident_role.vlp_documents.build
-    success = document.update_attributes({:identifier=>file_uri, :subject => title, :title=>title, :status=>"downloaded", :verification_type=>params[:verification_type]})
+    success = document.update_attributes({:identifier => file_uri, :subject => title, :title => title, :status => "downloaded", :verification_type => params[:verification_type]})
     @doc_errors = document.errors.full_messages unless success
     @docs_owner.save
   end
