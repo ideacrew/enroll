@@ -122,7 +122,7 @@ RSpec.describe TaxHousehold, type: :model do
 =end
 
   context "aptc_ratio_by_member" do
-    let!(:plan) {FactoryBot.build(:plan, :with_premium_tables)}
+    let!(:plan) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
     #let(:current_hbx) {double(benefit_sponsorship: double(current_benefit_period: double(second_lowest_cost_silver_plan: plan)))}
     let(:current_hbx) {double(benefit_sponsorship: double(benefit_coverage_periods: [benefit_coverage_period]))}
     let(:benefit_coverage_period) {double(contains?:true, second_lowest_cost_silver_plan: plan)}
@@ -131,7 +131,6 @@ RSpec.describe TaxHousehold, type: :model do
 
     it "can return ratio hash" do
       allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx)
-      allow(plan).to receive(:premium_for).and_return(110)
       tax_household = TaxHousehold.new(effective_starting_on: TimeKeeper.date_of_record)
       allow(tax_household).to receive(:aptc_members).and_return([tax_household_member1, tax_household_member2])
       expect(tax_household.aptc_ratio_by_member.class).to eq Hash
@@ -166,7 +165,7 @@ RSpec.describe TaxHousehold, type: :model do
     let(:hbx_member2) { double(applicant_id: 'member2') }
     let(:hbx_enrollment) { double(applied_aptc_amount: 30, hbx_enrollment_members: [hbx_member1, hbx_member2]) }
     let(:household) { double }
-    let!(:plan) {FactoryBot.build(:plan, :with_premium_tables)}
+    let!(:plan) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
     let(:decorated_plan) {double}
 
     before :each do
@@ -180,7 +179,7 @@ RSpec.describe TaxHousehold, type: :model do
     end
 
     it "can return result when plan is individual" do
-      allow(plan).to receive(:coverage_kind).and_return 'individual'
+      allow(plan).to receive(:kind).and_return 'individual'
       expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50).class).to eq Hash
       result = {'member1'=>30, 'member2'=>20}
       expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50)).to eq result
@@ -188,14 +187,14 @@ RSpec.describe TaxHousehold, type: :model do
 
     it "when ehb_premium > aptc_amount" do
       allow(decorated_plan).to receive(:premium_for).and_return(10)
-      allow(plan).to receive(:coverage_kind).and_return 'individual'
+      allow(plan).to receive(:kind).and_return 'individual'
       expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50).class).to eq Hash
       result = {'member1'=>9, 'member2'=>9}
       expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50)).to eq result
     end
 
     it "can return result when plan is dental" do
-      allow(plan).to receive(:coverage_kind).and_return 'dental'
+      allow(plan).to receive(:kind).and_return 'dental'
       expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50).class).to eq Hash
       result = {'member1'=>0, 'member2'=>0}
       expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50)).to eq result
@@ -204,7 +203,7 @@ RSpec.describe TaxHousehold, type: :model do
     it "can return result when total_aptc_available_amount is 0" do
       allow(@tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return 0
       allow(decorated_plan).to receive(:premium_for).and_return(10)
-      allow(plan).to receive(:coverage_kind).and_return 'individual'
+      allow(plan).to receive(:kind).and_return 'individual'
       expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50).class).to eq Hash
       result = {'member1'=>0, 'member2'=>0}
       expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50)).to eq result
