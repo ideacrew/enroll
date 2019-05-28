@@ -151,7 +151,7 @@ aca:
   recaptcha_enabled: false
   security_questions: false
   user_accounts_enabled: true
-  plan_options_available: ["sole_source", "single_carrier", "metal_level"]
+  plan_options_available: ["single_plan", "single_carrier", "metal_level"]
   dental_plan_options_available: ["single_plan"]
   ## acceptable options are ["sole_source", "single_carrier", "metal_level", "single_plan"]
   enabled_metal_levels_for_single_carrier: ["silver", "gold", "dental"]
