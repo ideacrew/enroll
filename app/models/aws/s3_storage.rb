@@ -79,7 +79,7 @@ module Aws
     end
 
     def env_bucket_name(bucket_name)
-      "#{Settings.site.s3_prefix}-enroll-#{bucket_name}-#{aws_env}"
+      "dchbx-enroll-#{bucket_name}-#{aws_env}"
     end
 
     def setup
