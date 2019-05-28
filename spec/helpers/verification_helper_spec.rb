@@ -287,6 +287,14 @@ RSpec.describe VerificationHelper, :type => :helper do
     end
   end
 
+  describe '#get_applicant_verification_types?' do
+    include_examples 'submitted application with one member and one applicant'
+    let(:applicant) {application.active_applicants.first}
+    it 'returns true the person has active consumer dependent' do
+      expect(helper.get_applicant_verification_types(applicant).present?).to eq true
+    end
+  end
+
   describe '#get_person_v_type_status' do
     let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
@@ -426,7 +434,7 @@ RSpec.describe VerificationHelper, :type => :helper do
   end
 
   describe "#build_admin_actions_list" do
-    shared_examples_for "admin actions dropdown list" do |type, status, state, actions|
+    shared_examples_for "admin actions dropdown list" do |status, state, actions|
       before do
         allow(helper).to receive(:verification_type_status).and_return status
       end
@@ -436,14 +444,14 @@ RSpec.describe VerificationHelper, :type => :helper do
       end
     end
 
-    it_behaves_like "admin actions dropdown list", "Citizenship", "outstanding","unverified", ["Verify","Reject", "View History", "Extend"]
-    it_behaves_like "admin actions dropdown list", "Citizenship", "verified","unverified", ["Verify", "Reject", "View History", "Extend"]
-    it_behaves_like "admin actions dropdown list", "Citizenship", "verified","verification_outstanding", ["Verify", "Reject", "View History", "Call HUB", "Extend"]
-    it_behaves_like "admin actions dropdown list", "Citizenship", "in review","unverified", ["Verify", "Reject", "View History", "Extend"]
-    it_behaves_like "admin actions dropdown list", "Citizenship", "outstanding","verification_outstanding", ["Verify", "View History", "Call HUB", "Extend"]
-    it_behaves_like "admin actions dropdown list", "DC Residency", "attested", "unverified",["Verify", "Reject", "View History", "Extend"]
-    it_behaves_like "admin actions dropdown list", "DC Residency", "outstanding", "verification_outstanding",["Verify", "View History", "Call HUB", "Extend"]
-    it_behaves_like "admin actions dropdown list", "DC Residency", "in review","verification_outstanding", ["Verify", "Reject", "View History", "Call HUB", "Extend"]
+    it_behaves_like "admin actions dropdown list", "outstanding","unverified", ["Verify","Reject", "View History", "Extend"]
+    it_behaves_like "admin actions dropdown list", "verified","unverified", ["Verify", "Reject", "View History", "Extend"]
+    it_behaves_like "admin actions dropdown list", "verified","verification_outstanding", ["Verify", "Reject", "View History", "Call HUB", "Extend"]
+    it_behaves_like "admin actions dropdown list", "in review","unverified", ["Verify", "Reject", "View History", "Extend"]
+    it_behaves_like "admin actions dropdown list", "outstanding","verification_outstanding", ["Verify", "View History", "Call HUB", "Extend"]
+    it_behaves_like "admin actions dropdown list", "attested", "unverified",["Verify", "Reject", "View History", "Extend"]
+    it_behaves_like "admin actions dropdown list", "outstanding", "verification_outstanding",["Verify", "View History", "Call HUB", "Extend"]
+    it_behaves_like "admin actions dropdown list", "in review","verification_outstanding", ["Verify", "Reject", "View History", "Call HUB", "Extend"]
   end
 
   describe "#request response details" do

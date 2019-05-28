@@ -501,17 +501,22 @@ class FinancialAssistance::Applicant
     assisted_verifications.where(verification_type: type).first.assisted_verification_documents.any?{ |doc| doc.identifier }
   end
 
-  # TODO: Admin action refactor
-  def update_verification_type(v_type, update_reason)
-    if v_type == "MEC"
-      update_attributes!(:assisted_mec_validation => "valid", :assisted_mec_reason => update_reason)
-      assisted_verifications.mec.first.update_attributes!(status: "verified")
-      mec_valid!
-    elsif v_type == "Income"
-      update_attributes(:assisted_income_validation => "valid", :assisted_income_reason => update_reason)
-      assisted_verifications.income.first.update_attributes!(status: "verified")
-      income_valid!
+  def admin_verification_action(action, v_type, update_reason)
+    if action == "verify"
+      update_verification_type(v_type, update_reason)
+    elsif action == "reject"
+      return_doc_for_deficiency(v_type, update_reason)
     end
+  end
+
+  def update_verification_type(v_type, update_reason)
+    v_type.update_attributes(validation_status: 'verified', update_reason: update_reason)
+    "#{v_type.type_name} successfully approved"
+  end
+
+  def return_doc_for_deficiency(v_type, update_reason)
+    v_type.update_attributes(validation_status: 'outstanding', update_reason: update_reason)
+    "#{v_type.type_name} was rejected"
   end
 
   def is_assistance_verified?
