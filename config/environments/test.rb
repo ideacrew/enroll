@@ -56,6 +56,14 @@ Rails.application.configure do
   config.checkbook_services_congress_url = "https://checkbook_url/congress/"
   config.checkbook_services_remote_access_key = "9876543210"
   config.checkbook_services_reference_id = "0123456789"
+  config.wells_fargo_api_url = "https://xyz:442/"
+  config.wells_fargo_api_key = "abdnh3-43nd-4ngemm-3432tf-45325365g"
+  config.wells_fargo_biller_key = "2345q"
+  config.wells_fargo_api_secret = "abscd 200"
+  config.wells_fargo_api_version = " 201s"
+  config.wells_fargo_private_key_location = "#{Rails.root.join("spec", "test_data")}" + "/test_wfpk.pem"
+  config.wells_fargo_api_date_format = "%Y-%m-%dT%H:%M:%S.0000000%z"
+
 
   #Queue adapter
   config.active_job.queue_adapter = :test
