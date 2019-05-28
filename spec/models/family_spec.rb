@@ -1603,7 +1603,7 @@ describe Family, "#get_faa_applicants", dbclean: :after_each do
     include_examples 'submitted application with one member and one applicant'
     it 'should return applicants on the determined application' do
        expect(family.get_faa_applicants.present?).to eq true
-     end
+    end
   end
 
   context 'when determined application is present for a family' do

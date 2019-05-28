@@ -38,7 +38,7 @@ class DocumentsController < ApplicationController
     admin_action = params[:admin_action]
 
     if params[:verification_reason].present?
-      if %W[ASSISTED_VERIFICATION_TYPES].include?(@verification_type.type_name)
+      if ::VerificationType::ASSISTED_VERIFICATION_TYPES.include?(@verification_type.type_name)
         verification_result = @docs_owner.admin_verification_action(admin_action, @verification_type, update_reason)
       else
         verification_result = @docs_owner.consumer_role.admin_verification_action(admin_action, @verification_type, update_reason)
@@ -200,7 +200,7 @@ class DocumentsController < ApplicationController
   def find_docs_owner
     return unless params[:family_member_id].present?
     fm_id = params[:family_member_id]
-    if %W[Income MEC].include?(params[:type_name])
+    if ::VerificationType::ASSISTED_VERIFICATION_TYPES.include?(params[:type_name])
       application_in_context = @family.active_approved_application
       applicant = application_in_context.active_applicants.where(family_member_id: params[:family_member_id]).first if application_in_context
       @docs_owner = applicant
@@ -219,10 +219,9 @@ class DocumentsController < ApplicationController
   end
 
   def set_family_member_and_family
-    if params[:family_member_id].present?
-      @family_member = FamilyMember.find(params[:family_member_id])
-      @family = @family_member.family
-    end
+    return unless params[:family_member_id].present?
+    @family_member = FamilyMember.find(params[:family_member_id])
+    @family = @family_member.family
   end
 
   def set_verification_type
