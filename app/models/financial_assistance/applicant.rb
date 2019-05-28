@@ -515,7 +515,7 @@ class FinancialAssistance::Applicant
   end
 
   def is_assistance_verified?
-    (!eligible_for_faa? || is_assistance_required_and_verified?) ? true : false
+    !eligible_for_faa? || is_assistance_required_and_verified? ? true : false
   end
 
   def is_assistance_required_and_verified?

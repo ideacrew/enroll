@@ -129,16 +129,16 @@ describe Subscribers::FinancialAssistanceApplicationOutstandingVerification, dbc
         }
         let!(:message) { { "body" => xml, "assistance_application_id" => parser.fin_app_id} }
         let!(:applicant) { FactoryGirl.create(:applicant, application: application, family_member_id: family.primary_applicant.id)}
-        let!(:income_assisted_verification) {
+        let!(:income_assisted_verification) do
           applicant.verification_types << FactoryGirl.create(:verification_type, applicant: applicant, type_name: 'Income', validation_status: "pending")
           applicant.verification_types.income.first
-        }
+        end
 
         context "for a valid import" do
-          let!(:income_assisted_verification) {
+          let!(:income_assisted_verification) do
             applicant.verification_types << FactoryGirl.create(:verification_type, applicant: applicant, type_name: 'Income', validation_status: "pending")
             applicant.verification_types.income.first
-          }
+          end
 
           it "should not log any errors and updates the existing verification_types" do
             allow(Person).to receive(:where).and_return([person])
