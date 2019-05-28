@@ -55,11 +55,12 @@ class MigrateDcBrokerAgencyProfiles < Mongoid::Migration
           raise "Duplicate organization exists" if existing_new_organizations.present? && existing_new_organizations.count > 1
 
           new_organization = if existing_new_organizations.present?
-                               organization = existing_new_organizations.first
-                               @new_profile.organization = organization
+                                existing_new_organizations.first.profiles << @new_profile
+                                existing_new_organizations.first
                              else
                                self.initialize_new_organization(old_org, site)
                              end
+
           BenefitSponsors::Organizations::Organization.skip_callback(:create, :after, :notify_on_create, raise: false)
           BenefitSponsors::Organizations::Organization.skip_callback(:update, :after, :notify_observers, raise: false)
           BenefitSponsors::Organizations::Profile.skip_callback(:save, :after, :publish_profile_event, raise: false)
@@ -71,6 +72,10 @@ class MigrateDcBrokerAgencyProfiles < Mongoid::Migration
             raise Exception unless new_organization.valid?
             new_organization.save!
           end
+
+          # build document for profile
+          profile = existing_new_organizations.first.broker_agency_profile
+          build_documents(old_org, profile)
 
           print '.' unless Rails.env.test?
           success = success + 1
@@ -135,7 +140,6 @@ class MigrateDcBrokerAgencyProfiles < Mongoid::Migration
   def self.initialize_new_profile(old_org, old_profile_params)
     new_profile = BenefitSponsors::Organizations::BrokerAgencyProfile.new(old_profile_params)
 
-    build_documents(old_org, new_profile)
     build_inbox_messages(new_profile)
     build_office_locations(old_org, new_profile)
     return new_profile
