@@ -310,6 +310,7 @@ Rails.application.routes.draw do
       post 'terminate_employee_roster_enrollments'
       member do
         get "download_invoice"
+        get 'show_invoice'
         post 'generate_checkbook_urls'
       end
       collection do
