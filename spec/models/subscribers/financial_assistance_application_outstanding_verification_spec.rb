@@ -1,6 +1,10 @@
 require "rails_helper"
 
-describe Subscribers::FinancialAssistanceApplicationOutstandingVerification do
+describe Subscribers::FinancialAssistanceApplicationOutstandingVerification, dbclean: :after_each do
+
+  before :all do
+    DatabaseCleaner.clean
+  end
 
   before :each do
     allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
@@ -83,43 +87,28 @@ describe Subscribers::FinancialAssistanceApplicationOutstandingVerification do
           end
         end
 
-        context "with an application, valid payload, missing Applicant" do
-          let(:message) { { "body" => xml, "assistance_application_id" => parser.fin_app_id} }
-          let!(:applicant) { FactoryGirl.create(:applicant, application: application, family_member_id: family.primary_applicant.id)}
-
-          it "logs the failed to find primary person in xml error" do
-            allow(Person).to receive(:where).and_return([person])
-            expect(subject).to receive(:log) do |arg1, arg2|
-              expect(arg1).to eq message["body"]
-              expect(arg2[:error_message]).to match("ERROR: Failed to find MEC verification for the applicant")
-              expect(arg2[:severity]).to eq("critical")
-            end
-            subject.call(nil, nil, nil, nil, message)
-          end
-        end
-
         context "for a valid import" do
           let(:message) { { "body" => xml, "assistance_application_id" => parser.fin_app_id} }
           let!(:applicant) { FactoryGirl.create(:applicant, application: application, family_member_id: family.primary_applicant.id)}
-          let!(:mec_assisted_verification) { FactoryGirl.create(:assisted_verification, applicant: applicant, verification_type: "MEC", status: "pending") }
+          let!(:mec_assisted_verification) { FactoryGirl.create(:verification_type, applicant: applicant, type_name: 'MEC', validation_status: "pending") }
 
-          it "should not log any errors and updates the existing assisted_verifications" do
+          it "should not log any errors and updates the existing verification_types" do
             allow(Person).to receive(:where).and_return([person])
             expect(subject).not_to receive(:log)
             subject.call(nil, nil, nil, nil, message)
             mec_assisted_verification.reload
-            expect(mec_assisted_verification.status).to eq "outstanding"
-            expect(applicant.assisted_verifications.mec.count).to eq 1
+            expect(mec_assisted_verification.validation_status).to eq "outstanding"
+            expect(applicant.verification_types.mec.count).to eq 1
           end
 
-          it "should not log any errors and creates new assisted_verifications for applicant" do
-            mec_assisted_verification.update_attributes(status: "unverified")
+          it "should not log any errors and creates new verification_types for applicant" do
+            mec_assisted_verification.update_attributes(validation_status: "unverified")
             allow(Person).to receive(:where).and_return([person])
             expect(subject).not_to receive(:log)
             subject.call(nil, nil, nil, nil, message)
-            expect(mec_assisted_verification.status).to eq "unverified"
+            expect(mec_assisted_verification.validation_status).to eq "unverified"
             applicant.reload
-            expect(applicant.assisted_verifications.mec.count).to eq 2
+            expect(applicant.verification_types.mec.count).to eq 1
           end
         end
       end
@@ -140,46 +129,63 @@ describe Subscribers::FinancialAssistanceApplicationOutstandingVerification do
         }
         let!(:message) { { "body" => xml, "assistance_application_id" => parser.fin_app_id} }
         let!(:applicant) { FactoryGirl.create(:applicant, application: application, family_member_id: family.primary_applicant.id)}
-
-        context "with an application, valid payload, missing Applicant" do
-
-          it "logs the failed to find primary person in xml error" do
-            allow(Person).to receive(:where).and_return([person])
-            expect(subject).to receive(:log) do |arg1, arg2|
-              expect(arg1).to eq message["body"]
-              expect(arg2[:error_message]).to match("ERROR: Failed to find Income verification for the applicant")
-              expect(arg2[:severity]).to eq("critical")
-            end
-            subject.call(nil, nil, nil, nil, message)
-          end
+        let!(:income_assisted_verification) do
+          applicant.verification_types << FactoryGirl.create(:verification_type, applicant: applicant, type_name: 'Income', validation_status: "pending")
+          applicant.verification_types.income.first
         end
 
         context "for a valid import" do
-          let!(:income_assisted_verification) { FactoryGirl.create(:assisted_verification, applicant: applicant, verification_type: "Income", status: "pending") }
+          let!(:income_assisted_verification) do
+            applicant.verification_types << FactoryGirl.create(:verification_type, applicant: applicant, type_name: 'Income', validation_status: "pending")
+            applicant.verification_types.income.first
+          end
 
-          it "should not log any errors and updates the existing assisted_verifications" do
+          it "should not log any errors and updates the existing verification_types" do
             allow(Person).to receive(:where).and_return([person])
             expect(subject).not_to receive(:log)
             subject.call(nil, nil, nil, nil, message)
             applicant.reload
             income_assisted_verification.reload
-            expect(income_assisted_verification.status).to eq "outstanding"
-            expect(applicant.assisted_verifications.income.count).to eq 1
+            expect(income_assisted_verification.validation_status).to eq "pending"
+            expect(applicant.verification_types.income.count).to eq 2
             expect(applicant.assisted_income_validation).to eq "outstanding"
             expect(applicant.aasm_state).to eq "verification_outstanding"
           end
 
-          it "should not log any errors and creates new assisted_verifications for applicant" do
-            income_assisted_verification.update_attributes(status: "unverified")
+          it "should not log any errors and creates new verification_types for applicant" do
+            income_assisted_verification.update_attributes(validation_status: "unverified")
             allow(Person).to receive(:where).and_return([person])
             expect(subject).not_to receive(:log)
             subject.call(nil, nil, nil, nil, message)
-            expect(income_assisted_verification.status).to eq "unverified"
+            expect(income_assisted_verification.validation_status).to eq "unverified"
             applicant.reload
-            expect(applicant.assisted_verifications.income.count).to eq 2
+            expect(applicant.verification_types.income.count).to eq 2
             expect(applicant.assisted_income_validation).to eq "outstanding"
             expect(applicant.aasm_state).to eq "verification_outstanding"
           end
+        end
+      end
+    end
+  end
+
+  describe 'store_payload', dbclean: :after_each do
+    let!(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+    let!(:family)  { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
+    let!(:application) { FactoryGirl.create(:application, family: family, aasm_state: "determined") }
+    let!(:applicant) { FactoryGirl.create(:applicant, application: application, family_member_id: family.primary_applicant.id)}
+
+    before do
+      subject.instance_variable_set(:@applicant_in_context, applicant)
+    end
+
+    ['Income', 'MEC'].each do |kind|
+      context kind.to_s do
+        before do
+          subject.send(:store_payload, kind, "sample payload xml")
+        end
+
+        it 'should return the object' do
+          expect(applicant.send(kind.downcase + '_response')).to be_an_instance_of(EventResponse)
         end
       end
     end
