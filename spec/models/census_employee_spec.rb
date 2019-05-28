@@ -1829,6 +1829,14 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       enrollment
       expect(census_employee.enrollments_for_display).to eq [enrollment, auto_renewing_health_enrollment, auto_renewing_dental_enrollment]
     end
+
+    it 'has renewal_benefit_group_enrollments' do 
+      renewal_application.approve_application! if renewal_application.may_approve_application?
+      benefit_sponsorship.benefit_applications << renewal_application
+      benefit_sponsorship.save
+      enrollment
+      expect(census_employee.renewal_benefit_group_enrollments.first.class).to eq HbxEnrollment
+    end
   end
 
   context '.past_enrollments' do
