@@ -1597,19 +1597,19 @@ describe Family, "#has_financial_assistance_verification", dbclean: :after_each 
   end
 end
 
-describe Family, "#get_faa_applicants", dbclean: :after_each do
+describe Family, "#faa_applicants", dbclean: :after_each do
 
   context 'when determined application is present for a family' do
     include_examples 'submitted application with one member and one applicant'
     it 'should return applicants on the determined application' do
-       expect(family.get_faa_applicants.present?).to eq true
+      expect(family.faa_applicants.present?).to eq true
     end
   end
 
   context 'when determined application is present for a family' do
     include_examples 'setup basic models'
     it 'should return applicants on the determined application' do
-      expect(family.get_faa_applicants.present?).to eq false
+      expect(family.faa_applicants.present?).to eq false
     end
   end
 
