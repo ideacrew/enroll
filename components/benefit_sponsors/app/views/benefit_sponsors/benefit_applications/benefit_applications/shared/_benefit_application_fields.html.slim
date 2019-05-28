@@ -82,17 +82,28 @@ javascript:
     var date = JSON.parse('#{@benefit_application_form.start_on_options.to_json.html_safe}');
     var latest_submitted_on = date[targetDate]["employer_initial_application_latest_submit_on"];
     var binder_payment_deadline = date[targetDate]["binder_payment_due_date"];
-    var submitByMonth = new Date(latest_submitted_on.split('-')).getMonth();
-    var deadlineMonth = new Date(binder_payment_deadline.split('-')).getMonth();
+    
+    var latest_submitted_on_date = stringToDate(latest_submitted_on);
+    var binder_payment_deadline_date = stringToDate(binder_payment_deadline);
+     
+    var submitByMonth = latest_submitted_on_date.getMonth();
+    var deadlineMonth = binder_payment_deadline_date.getMonth();
+
     document.querySelector('input#benefit_application_end_on').value = getFormattedDate(date[targetDate]["benefit_application_end_on"]);
     document.querySelector("input#benefit_application_open_enrollment_start_on").value = getFormattedDate(date[targetDate]["open_enrollment_start_on"]);
     document.querySelector("input#benefit_application_open_enrollment_end_on").value = getFormattedDate(date[targetDate]["open_enrollment_end_on"]);
-    setDueDates('benefit_application_latest_submitted_on_day', new Date(latest_submitted_on.split('-')).getDate());
+
+    setDueDates('benefit_application_latest_submitted_on_day', latest_submitted_on_date.getDate());
     setDueDates('benefit_application_latest_submitted_on_month', monthName[submitByMonth]);
-    setDueDates('binder_payment_deadline_day', new Date(binder_payment_deadline.split('-')).getDate());
+    setDueDates('binder_payment_deadline_day', binder_payment_deadline_date.getDate());
     setDueDates('binder_payment_deadline_month', monthName[deadlineMonth]);
 		dateOptions.oeStartOn = getFormattedDate(date[targetDate]["open_enrollment_start_on"]);
 		dateOptions.oeEndOn = getFormattedDate(date[targetDate]["open_enrollment_end_on"]);
+  }
+
+  function stringToDate(date_string) {
+    var dateArray = date_string.split('-');
+    return new Date(dateArray[0], dateArray[1], dateArray[2]);
   }
 
   var employeeCounts = {
