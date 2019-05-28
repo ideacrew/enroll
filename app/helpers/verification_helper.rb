@@ -215,7 +215,8 @@ module VerificationHelper
 
   def build_admin_actions_list(v_type, f_member)
     #TODO: need to refactor this
-    ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject!{ |el| el =~ /call hub|extend/i} if ::VerificationType::ASSISTED_VERIFICATION_TYPES.include?(v_type.type_name)
+    faa_verification = ::VerificationType::ASSISTED_VERIFICATION_TYPES.include?(v_type.type_name)
+    ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject!{ |el| el =~ /call hub|extend/i} if faa_verification
     if f_member.consumer_role.aasm_state == 'unverified'
       ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{ |el| el == 'Call HUB' }
     elsif verification_type_status(v_type, f_member) == 'outstanding'
