@@ -333,9 +333,11 @@ class ForcePublishPlanYears < MongoidMigrationTask
       enrollment = enrollments.where(:coverage_kind => coverage_kind).sort_by(&:submitted_at).last
       data = []
       if  enrollment.try(:effective_on).try(:strftime,"%Y") == '2019' &&  enrollment.aasm_state == 'coverage_selected' 
-         data += ["Coverage was manually selected for the current year"]
-      elsif plan_year.aasm_state != 'renewing_enrolling' 
-        data += ["ER plan year not in renewing enrolling"]
+         data += ["A different plan was manually selected for the current year"]
+      elsif plan_year.aasm_state == 'renewing_enrolled' 
+        data += ["The plan year was manually published by stakeholders"]
+      elsif plan_year.aasm_state == 'renewing_published_pending' 
+        data += ["ER zip code is not in DC"]
       elsif year == "2018" &&  enrollment.aasm_state.in?(HbxEnrollment::WAIVED_STATUSES)
         data += ["2018 coverage was not active"]
       else 
