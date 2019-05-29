@@ -9,7 +9,7 @@ require 'webmock/rspec'
 WebMock.allow_net_connect!
 
 require 'kaminari'
-require File.expand_path('app/models/services/checkbook_services')
+require File.expand_path('app/models/services/checkbook_services/plan_comparision')
 
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|
