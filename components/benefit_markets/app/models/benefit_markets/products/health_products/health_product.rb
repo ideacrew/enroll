@@ -87,14 +87,6 @@ module BenefitMarkets
         health_plan_kind.to_s
       end
 
-      def can_use_aptc?
-        metal_level != 'catastrophic'
-      end
-
-      def is_csr?
-        (EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.values - [EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.default]).include? csr_variant_id
-      end
-
       private
 
       def validate_product_package_kinds

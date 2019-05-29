@@ -427,7 +427,19 @@ module ApplicationHelper
   end
 
   def display_carrier_logo(plan, options = {:width => 50})
-    carrier_name = carrier_logo(plan)
+    return '' if plan.carrier_profile.extract_value.blank?
+
+    hios_id = plan.hios_id[0..6].extract_value
+    carrier_name = case hios_id
+                   when '75753DC'
+                     'oci'
+                   when '21066DC'
+                     'uhcma'
+                   when '41842DC'
+                     'uhic'
+                   else
+                     plan.carrier_profile.legal_name.extract_value
+                   end
     image_tag("logo/carrier/#{carrier_name.parameterize.underscore}.jpg", width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
   end
       
@@ -622,14 +634,9 @@ module ApplicationHelper
   end
 
   def display_dental_metal_level(plan)
-    if (plan.class == Plan || (plan.is_a?(Maybe) && plan.extract_value.class.to_s == "Plan"))
-      return plan.metal_level.to_s.titleize if plan.coverage_kind.to_s == "health"
-      (plan.active_year == 2015 ? plan.metal_level : plan.dental_level).try(:to_s).try(:titleize) || ""
-    else
-      return plan.metal_level_kind.to_s.titleize if plan.kind.to_s == "health"
-      # TODO Update this for dental plans
-      (plan.active_year == 2015 ? plan.metal_level_kind : plan.dental_level).try(:to_s).try(:titleize) || ""
-    end
+    return plan.metal_level.humanize if plan.kind.to_s == 'health'
+
+    (plan.active_year == 2015 ? plan.metal_level : plan.dental_level).try(:titleize) || ''
   end
 
   def make_binder_checkbox_disabled(employer)

@@ -958,7 +958,7 @@ class HbxEnrollment
     if is_shop?
       self.family.currently_enrolled_plans_ids(self).include?(new_plan.id)
     else
-      family.currently_enrolled_plans(self).select{ |plan| plan.is_same_plan_by_hios_id_and_active_year?(new_plan) }.present?
+      family.currently_enrolled_products(self).select{ |plan| plan.is_same_plan_by_hios_id_and_active_year?(new_plan) }.present?
     end
   end
 
@@ -966,7 +966,7 @@ class HbxEnrollment
     new_plan ||= self.plan
 
     if is_an_existing_plan?(new_plan)
-      plan_selection = PlanSelection.new(self, self.plan)
+      plan_selection = PlanSelection.new(self, product)
       self.hbx_enrollment_members = plan_selection.same_plan_enrollment.hbx_enrollment_members
     end
   end

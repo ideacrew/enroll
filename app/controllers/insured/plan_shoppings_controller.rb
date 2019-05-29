@@ -9,6 +9,7 @@ class Insured::PlanShoppingsController < ApplicationController
   include Aptc
   include Config::AcaHelper
 
+  before_action :find_hbx_enrollment, :only => [:show, :plans]
   before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show, :plans, :checkout, :terminate]
   before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show, :plans, :checkout, :receipt]
 
@@ -209,7 +210,6 @@ class Insured::PlanShoppingsController < ApplicationController
   def show_shop(hbx_enrollment_id)
     set_employee_bookmark_url(family_account_path) if params[:market_kind] == 'shop'
 
-    @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
     sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(@hbx_enrollment)
     products = @hbx_enrollment.sponsored_benefit.products(@hbx_enrollment.sponsored_benefit.rate_schedule_date)
     @issuer_profiles = []
@@ -281,6 +281,10 @@ class Insured::PlanShoppingsController < ApplicationController
 
   private
 
+  def find_hbx_enrollment
+    @hbx_enrollment = HbxEnrollment.find(params.require(:id))
+  end
+
   # no dental as of now
   def sort_member_groups(products)
     products.select { |prod| prod.group_enrollment.product.id.to_s == @enrolled_hbx_enrollment_plan_ids.first.to_s } + products.select { |prod| prod.group_enrollment.product.id.to_s != @enrolled_hbx_enrollment_plan_ids.first.to_s }.sort_by { |mg| (mg.group_enrollment.product_cost_total - mg.group_enrollment.sponsor_contribution_total) }
@@ -321,7 +325,6 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def set_plans_by(hbx_enrollment_id:)
     Caches::MongoidCache.allocate(CarrierProfile)
-    @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
     @enrolled_hbx_enrollment_plan_ids = @hbx_enrollment.family.currently_enrolled_product_ids(@hbx_enrollment)
 
     if @hbx_enrollment.blank?
