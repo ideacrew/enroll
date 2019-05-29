@@ -8,4 +8,16 @@ module Config::AcaHelper
     @individual_market_is_enabled ||= Settings.aca.market_kinds.include?("individual")
   end
 
+  def site_broker_claim_quoting_enabled?
+    Settings.site.broker_claim_quoting_enabled
+  end
+
+  def allow_mid_month_voluntary_terms?
+    Settings.aca.shop_market.mid_month_benefit_application_terminations.voluntary
+  end
+
+  def allow_mid_month_non_payment_terms?
+    Settings.aca.shop_market.mid_month_benefit_application_terminations.non_payment
+  end
+
 end

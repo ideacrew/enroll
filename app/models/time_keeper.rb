@@ -16,6 +16,14 @@ class TimeKeeper
     a_time.in_time_zone("Eastern Time (US & Canada)")
   end
 
+  def self.format_date(a_time)
+    local_time(a_time).strftime('%m/%d/%Y')
+  end
+
+  def self.format_date_time(a_time)
+    local_time(a_time).strftime('%m/%d/%Y %I:%M%p')
+  end
+
   def self.exchange_zone
     "Eastern Time (US & Canada)"
   end

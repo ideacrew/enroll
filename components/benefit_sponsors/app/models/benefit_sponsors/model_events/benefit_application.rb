@@ -11,6 +11,7 @@ module BenefitSponsors
         :application_denied,
         :renewal_application_created,
         :renewal_application_autosubmitted,
+        :initial_employee_plan_selection_confirmation,
 
         # :renewal_enrollment_confirmation,
         # :renewal_application_submitted,
@@ -18,6 +19,12 @@ module BenefitSponsors
         # :open_enrollment_began, #not being used
         # :renewal_application_denied,
         # :zero_employees_on_roster,
+      ]
+
+      EMPLOYER_EVENTS = [
+          :benefit_coverage_period_terminated_nonpayment,
+          :benefit_coverage_period_terminated_voluntary,
+          :benefit_coverage_renewal_carrier_dropped
       ]
 
       DATA_CHANGE_EVENTS = [
@@ -30,10 +37,6 @@ module BenefitSponsors
           :initial_employer_first_reminder_to_publish_plan_year,
           :initial_employer_second_reminder_to_publish_plan_year,
           :initial_employer_final_reminder_to_publish_plan_year
-      ]
-
-      OTHER_EVENTS = [
-        :group_advance_termination_confirmation
       ]
 
       # Events triggered by state changes on individual instances
@@ -57,8 +60,23 @@ module BenefitSponsors
             is_application_denied = true
           end
 
-          if is_transition_matching?(to: :terminated, from: :active, event: :terminate_enrollment)
+          if is_transition_matching?(to: :binder_paid, from: :enrollment_closed, event: :credit_binder)
+            is_initial_employee_plan_selection_confirmation = true
+          end
+
+          if is_transition_matching?(to: [:terminated, :termination_pending], from: [:active, :expired], event: [:terminate_enrollment, :schedule_enrollment_termination])
             is_group_advance_termination_confirmation = true
+            if self.termination_kind.to_s == "voluntary"
+              is_benefit_coverage_period_terminated_voluntary = true
+            end
+
+            if self.termination_kind.to_s == "nonpayment"
+              is_benefit_coverage_period_terminated_nonpayment = true
+            end
+          end
+
+          if is_transition_matching?(to: :canceled, from: [:enrollment_eligible, :active], event: :cancel)
+            is_benefit_coverage_renewal_carrier_dropped = true
           end
 
           if is_transition_matching?(to: :approved, from: [:draft, :imported] + BenefitSponsors::BenefitApplications::BenefitApplication::APPLICATION_EXCEPTION_STATES, event: :auto_approve_application)
@@ -94,7 +112,7 @@ module BenefitSponsors
           # end
 
           # TODO -- encapsulated notify_observers to recover from errors raised by any of the observers
-          REGISTERED_EVENTS.each do |event|
+          (REGISTERED_EVENTS + EMPLOYER_EVENTS).each do |event|
             begin
               if event_fired = instance_eval("is_" + event.to_s)
                 event_options = {}
@@ -122,13 +140,6 @@ module BenefitSponsors
           rescue Exception => e
             Rails.logger.info { "Benefit Application REGISTERED_EVENTS: #{event} unable to notify observers" }
           end
-        end
-      end
-
-      def trigger_model_event(event_name, event_options = {})
-        if OTHER_EVENTS.include?(event_name)
-          BenefitSponsors::BenefitApplications::BenefitApplication.add_observer(BenefitSponsors::Observers::BenefitApplicationObserver.new, [:notifications_send])
-          notify_observers(ModelEvent.new(event_name, self, event_options))
         end
       end
 

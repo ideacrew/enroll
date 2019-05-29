@@ -13,7 +13,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployeePlanSelectionConfir
   let!(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application,
                               :with_benefit_package,
                               :benefit_sponsorship => benefit_sponsorship,
-                              :aasm_state => 'enrollment_eligible',
+                              :aasm_state => :enrollment_closed,
                               :effective_period =>  start_on..(start_on + 1.year) - 1.day
   )}
   let!(:benefit_package)  {benefit_application.benefit_packages.first}
@@ -35,7 +35,6 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployeePlanSelectionConfir
   )}
 
   before do
-    benefit_sponsorship.update_attributes!(aasm_state: 'initial_enrollment_closed')
     census_employee.update_attributes(employee_role_id: employee_role.id)
     benefit_group_assignment.update_attributes!(hbx_enrollment_id: hbx_enrollment.id, benefit_package_id: benefit_package.id)
   end
@@ -43,19 +42,19 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployeePlanSelectionConfir
   describe "Plan selection confirmation when ER made binder payment" do
     context "ModelEvent" do
       it "should set to true after transition" do
-        benefit_sponsorship.class.observer_peers.keys.each do |observer|
+        benefit_application.class.observer_peers.keys.each do |observer|
           expect(observer).to receive(:notifications_send) do |model_instance, model_event|
             expect(model_event).to be_an_instance_of(::BenefitSponsors::ModelEvents::ModelEvent)
-            expect(model_event).to have_attributes(:event_key => :initial_employee_plan_selection_confirmation, :klass_instance => benefit_sponsorship, :options => {})
+            expect(model_event).to have_attributes(:event_key => :initial_employee_plan_selection_confirmation, :klass_instance => benefit_application, :options => {})
           end
         end
-        benefit_sponsorship.credit_binder!
+        benefit_application.credit_binder!
       end
     end
 
     context "NoticeTrigger" do
-      subject { BenefitSponsors::Observers::BenefitSponsorshipObserver.new }
-      let(:model_event) { ::BenefitSponsors::ModelEvents::ModelEvent.new(:initial_employee_plan_selection_confirmation, benefit_sponsorship, {}) }
+      subject { BenefitSponsors::Observers::BenefitApplicationObserver.new }
+      let(:model_event) { ::BenefitSponsors::ModelEvents::ModelEvent.new(:initial_employee_plan_selection_confirmation, benefit_application, {}) }
 
       it "should trigger notice event" do
         expect(subject.notifier).to receive(:notify) do |event_name, payload|

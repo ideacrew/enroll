@@ -19,39 +19,40 @@ module BenefitSponsors
 
         def show # TODO - Each when clause should be a seperate action.
           authorize @employer_profile
+
           @tab = params['tab']
-          if (params[:q] || params[:page] || params[:commit] || params[:status]).present?
-            # paginate_employees
+
+          case @tab
+          when 'benefits'
+            @benefit_sponsorship = @employer_profile.organization.active_benefit_sponsorship
+            @benefit_applications = @employer_profile.benefit_applications.non_imported.desc(:"start_on").asc(:predecessor_id)
+          when 'documents'
+            @datatable = ::Effective::Datatables::BenefitSponsorsEmployerDocumentsDataTable.new({employer_profile_id: @employer_profile.id})
+            load_documents
+          when 'employees'
+            @datatable = ::Effective::Datatables::EmployeeDatatable.new(employee_datatable_params)
+          when 'brokers'
+            @broker_agency_account = @employer_profile.active_broker_agency_account
+          when 'inbox'
+          when 'families'
+            # employer shouldn't have access to families
+            # Randomly sometimes employer receiving employer_profile_path with tab: families, 40549
+            redirect_to(profiles_employers_employer_profile_path(@employer_profile.id, tab: 'home'))
           else
-            case @tab
-            when 'benefits'
-              @benefit_sponsorship = @employer_profile.organization.active_benefit_sponsorship
-              @benefit_applications = @employer_profile.benefit_applications.non_imported.desc(:"start_on").asc(:predecessor_id)
-            when 'documents'
-              @datatable = ::Effective::Datatables::BenefitSponsorsEmployerDocumentsDataTable.new({employer_profile_id: @employer_profile.id})
-              load_documents
-            when 'employees'
-              @datatable = ::Effective::Datatables::EmployeeDatatable.new(employee_datatable_params)
-            when 'brokers'
-              @broker_agency_account = @employer_profile.active_broker_agency_account
-            when 'inbox'
+            @broker_agency_account = @employer_profile.active_broker_agency_account
+            @benefit_sponsorship = @employer_profile.latest_benefit_sponsorship
 
-            else
-              @broker_agency_account = @employer_profile.active_broker_agency_account
-              @benefit_sponsorship = @employer_profile.latest_benefit_sponsorship
+            if @benefit_sponsorship.present?
+              @broker_agency_accounts = @benefit_sponsorship.broker_agency_accounts
+              @current_plan_year = @benefit_sponsorship.submitted_benefit_application
+            end
 
-              if @benefit_sponsorship.present?
-                @broker_agency_accounts = @benefit_sponsorship.broker_agency_accounts
-                @current_plan_year = @benefit_sponsorship.submitted_benefit_application
-              end
+            collect_and_sort_invoices(params[:sort_order])
+            @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"
 
-              collect_and_sort_invoices(params[:sort_order])
-              @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"
-
-              respond_to do |format|
-                format.html
-                format.js
-              end
+            respond_to do |format|
+              format.html
+              format.js
             end
           end
         end

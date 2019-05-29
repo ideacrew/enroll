@@ -164,6 +164,11 @@ class Family
                                                     :"households.hbx_enrollments.sponsored_benefit_package_id" => benefit_package._id
                                                   ) }
 
+  scope :enrolled_and_terminated_through_benefit_package, ->(benefit_package) { unscoped.where(
+                                                    :"households.hbx_enrollments.aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::WAIVED_STATUSES + HbxEnrollment::TERMINATED_STATUSES),
+                                                    :"households.hbx_enrollments.sponsored_benefit_package_id" => benefit_package._id
+                                                  ) }
+
   scope :all_enrollments_by_benefit_sponsorship_id,   ->(benefit_sponsorship_id){where(:"households.hbx_enrollments.benefit_sponsorship_id" => benefit_sponsorship_id) }
   scope :enrolled_under_benefit_application,    ->(benefit_application) { unscoped.where(
                                                     :"households.hbx_enrollments" => {

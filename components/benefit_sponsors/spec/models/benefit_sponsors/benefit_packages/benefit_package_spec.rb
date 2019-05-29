@@ -332,6 +332,71 @@ module BenefitSponsors
       end
     end
 
+    describe '.renew_member_benefit' do
+      include_context "setup renewal application"
+
+      let(:renewed_enrollment) { double("hbx_enrollment")}
+      let(:ra) {renewal_application}
+      let(:ia) {predecessor_application}
+      let(:bs) { ra.predecessor.benefit_sponsorship}
+      let(:cbp){ra.predecessor.benefit_packages.first}
+      let(:rbp){ra.benefit_packages.first}
+      let(:roster_size) { 5 }
+      let(:enrollment_kinds) { ['health'] }
+      let!(:census_employees) { create_list(:census_employee, roster_size, :with_active_assignment, benefit_sponsorship: bs, employer_profile: bs.profile, benefit_group: cbp) }
+      let!(:person) { FactoryGirl.create(:person) }
+      let!(:family) {FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+      let!(:employee_role) { FactoryGirl.create(:benefit_sponsors_employee_role, person: person)}
+      let!(:census_employee) { census_employees.first }
+      let(:hbx_enrollment) { FactoryGirl.build(:hbx_enrollment, :shop,
+                                                household: family.active_household,
+                                                product: cbp.sponsored_benefits.first.reference_product,
+                                                coverage_kind: :health,
+                                                employee_role_id: census_employee.employee_role.id,
+                                                sponsored_benefit_package_id: cbp.id,
+                                                benefit_group_assignment_id: census_employee.benefit_group_assignments.last.id
+                                                ) }
+
+      let(:renewal_product_package)    { renewal_benefit_market_catalog.product_packages.detect { |package| package.package_kind == package_kind } }
+      let(:product) { renewal_product_package.products[0] }
+
+      let!(:update_product){
+        reference_product = current_benefit_package.sponsored_benefits.first.reference_product
+        reference_product.renewal_product = product
+        reference_product.save!
+      }
+
+      before do
+        census_employee.update_attributes(employee_role_id: employee_role.id)
+        census_employee.employee_role.primary_family.active_household.hbx_enrollments << hbx_enrollment
+        census_employee.employee_role.primary_family.save
+        predecessor_application.update_attributes({:aasm_state => "active"})
+        ra.update_attributes({:aasm_state => "enrollment_eligible"})
+        hbx_enrollment.benefit_group_assignment_id = census_employee.benefit_group_assignments[0].id
+        rbp.renew_member_benefit(census_employee)
+        allow(rbp).to receive(:is_renewal_benefit_available?).and_return(true)
+        allow(rbp).to receive(:trigger_renewal_model_event).and_return nil
+        allow(hbx_enrollment).to receive(:renew_benefit).with(rbp).and_return(renewed_enrollment)
+      end
+
+      it "should have renewing enrollment" do
+        hbx_enrollment.update_attributes(benefit_sponsorship: bs, aasm_state: 'coverage_enrolled')
+        hbx_enrollment.save
+        expect(benefit_sponsorship).not_to eq nil
+        expect(family.active_household.hbx_enrollments.enrolled_and_waived.by_benefit_sponsorship(benefit_sponsorship)
+          .by_effective_period(predecessor_application.effective_period).count).to eq 1
+        expect(census_employee.benefit_group_assignments[0].hbx_enrollments.first.aasm_state).to eq "coverage_enrolled"
+      end
+
+      it "when active enrollment terminated for initial application" do
+        hbx_enrollment.update_attributes(benefit_sponsorship: bs, aasm_state: 'coverage_terminated')
+        hbx_enrollment.save
+        expect(family.active_household.hbx_enrollments.enrolled_and_waived.by_benefit_sponsorship(benefit_sponsorship)
+          .by_effective_period(predecessor_application.effective_period).count).to eq 0
+        expect(census_employee.benefit_group_assignments[0].hbx_enrollments.first.aasm_state).to eq "coverage_terminated"
+      end
+    end
+
     describe '.is_renewal_benefit_available?' do
 
       let(:renewal_product_package)    { renewal_benefit_market_catalog.product_packages.detect { |package| package.package_kind == package_kind } }
@@ -357,6 +422,7 @@ module BenefitSponsors
         end
 
         before do
+          allow(renewal_sponsored_benefit).to receive(:products).and_return(renewal_product_package.products.reject{ |prod| prod.id == hbx_enrollment.product.renewal_product.id })#removing hbx_enrollment.product.renewal_product from renewal_product_package
           allow(current_enrolled_product).to receive(:renewal_product).and_return(nil)
           allow(renewal_benefit_package).to receive(:sponsored_benefit_for).and_return(renewal_sponsored_benefit)
         end
@@ -459,6 +525,241 @@ module BenefitSponsors
       context 'when application not canceled due to ineligble state' do 
 
         it 'should not process any reinstatements on enrollments' do 
+        end
+      end
+    end
+
+    describe '.terminate_member_benefits', :dbclean => :after_each do
+
+      include_context "setup initial benefit application" do
+        let(:current_effective_date) { (TimeKeeper.date_of_record - 2.months).beginning_of_month }
+      end
+
+      let(:benefit_package)  { initial_application.benefit_packages.first }
+      let(:benefit_group_assignment) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_package)}
+      let(:employee_role) { FactoryGirl.create(:benefit_sponsors_employee_role, person: person, employer_profile: benefit_sponsorship.profile, census_employee_id: census_employee.id) }
+      let(:census_employee) { FactoryGirl.create(:census_employee,
+        employer_profile: benefit_sponsorship.profile,
+        benefit_sponsorship: benefit_sponsorship,
+        benefit_group_assignments: [benefit_group_assignment]
+      )}
+      let(:person)       { FactoryGirl.create(:person, :with_family) }
+      let!(:family)       { person.primary_family }
+      let!(:hbx_enrollment) {
+        hbx_enrollment = FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+                            household: family.active_household,
+                            aasm_state: "coverage_selected",
+                            effective_on: initial_application.start_on,
+                            rating_area_id: initial_application.recorded_rating_area_id,
+                            sponsored_benefit_id: initial_application.benefit_packages.first.health_sponsored_benefit.id,
+                            sponsored_benefit_package_id:initial_application.benefit_packages.first.id,
+                            benefit_sponsorship_id:initial_application.benefit_sponsorship.id,
+                            employee_role_id: employee_role.id)
+        hbx_enrollment.benefit_sponsorship = benefit_sponsorship
+        hbx_enrollment.save!
+        hbx_enrollment
+      }
+
+      let(:benefit_group_assignment_1) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_package)}
+      let(:employee_role_1) { FactoryGirl.create(:benefit_sponsors_employee_role, person: person_1, employer_profile: benefit_sponsorship.profile, census_employee_id: census_employee_1.id) }
+      let(:census_employee_1) { FactoryGirl.create(:census_employee,
+        employer_profile: benefit_sponsorship.profile,
+        benefit_sponsorship: benefit_sponsorship,
+        benefit_group_assignments: [benefit_group_assignment_1]
+      )}
+      let(:person_1)       { FactoryGirl.create(:person, :with_family) }
+      let!(:family_1)       { person_1.primary_family }
+      let!(:hbx_enrollment_1) {
+        hbx_enrollment = FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+                            household: family_1.active_household,
+                            aasm_state: "coverage_selected",
+                            effective_on: TimeKeeper.date_of_record.next_month,
+                            rating_area_id: initial_application.recorded_rating_area_id,
+                            sponsored_benefit_id: initial_application.benefit_packages.first.health_sponsored_benefit.id,
+                            sponsored_benefit_package_id:initial_application.benefit_packages.first.id,
+                            benefit_sponsorship_id:initial_application.benefit_sponsorship.id,
+                            employee_role_id: employee_role_1.id)
+        hbx_enrollment.benefit_sponsorship = benefit_sponsorship
+        hbx_enrollment.save!
+        hbx_enrollment
+      }
+
+      let(:end_on) { TimeKeeper.date_of_record.prev_month }
+
+      context "when coverage_selected enrollments are present", :dbclean => :after_each do
+
+        before do
+          initial_application.update_attributes!(aasm_state: :terminated, effective_period: initial_application.start_on..end_on, terminated_on: TimeKeeper.date_of_record)
+          benefit_package.terminate_member_benefits
+          hbx_enrollment.reload
+          hbx_enrollment_1.reload
+        end
+
+        it 'should move valid enrollments to terminated state' do
+          expect(hbx_enrollment.aasm_state).to eq "coverage_terminated"
+        end
+
+        it 'should update terminated_on field on hbx_enrollment' do
+          expect(hbx_enrollment.terminated_on).to eq initial_application.end_on
+        end
+
+        it 'should move future enrollments to canceled state' do
+          expect(hbx_enrollment_1.aasm_state).to eq "coverage_canceled"
+        end
+      end
+
+      context "when an employee has coverage_termination_pending enrollment", :dbclean => :after_each do
+
+        let(:hbx_enrollment_terminated_on) { end_on.prev_month }
+
+        before do
+          initial_application.update_attributes!(aasm_state: :terminated, effective_period: initial_application.start_on..end_on, terminated_on: TimeKeeper.date_of_record)
+          hbx_enrollment.update_attributes!(effective_on: initial_application.start_on, aasm_state: "coverage_termination_pending", terminated_on: hbx_enrollment_terminated_on)
+          hbx_enrollment_1.update_attributes!(effective_on: initial_application.start_on, aasm_state: "coverage_termination_pending", terminated_on: end_on+2.months)
+          benefit_package.terminate_member_benefits
+          hbx_enrollment.reload
+          hbx_enrollment_1.reload
+        end
+
+        it "should not update hbx_enrollment terminated_on if terminated_on < benefit_application end on" do
+          expect(hbx_enrollment.terminated_on).to eq hbx_enrollment_terminated_on
+          expect(hbx_enrollment.terminated_on).not_to eq end_on
+        end
+
+        it "should update hbx_enrollment terminated_on if terminated_on > benefit_application end on" do
+          expect(hbx_enrollment_1.terminated_on).to eq end_on
+        end
+      end
+
+      context "when an employee has coverage_terminated enrollment", :dbclean => :after_each do
+
+        let(:hbx_enrollment_terminated_on) { end_on.prev_month }
+
+        before do
+          initial_application.update_attributes!(aasm_state: :terminated, effective_period: initial_application.start_on..end_on, terminated_on: TimeKeeper.date_of_record)
+          hbx_enrollment.update_attributes!(effective_on: initial_application.start_on, aasm_state: "coverage_terminated", terminated_on: hbx_enrollment_terminated_on)
+          hbx_enrollment_1.update_attributes!(effective_on: initial_application.start_on, aasm_state: "coverage_terminated", terminated_on: end_on+2.months)
+          benefit_package.terminate_member_benefits
+          hbx_enrollment.reload
+          hbx_enrollment_1.reload
+        end
+
+        it "should update terminated_on date on enrollment if terminated_on > benefit_application end_on" do
+          expect(hbx_enrollment_1.terminated_on).to eq end_on
+        end
+
+        it "should NOT update terminated_on date on enrollment if terminated_on < benefit_application end_on" do
+          expect(hbx_enrollment.terminated_on).to eq hbx_enrollment_terminated_on
+        end
+      end
+    end
+
+    describe '.termination_pending_member_benefits' do
+
+      include_context "setup initial benefit application" do
+        let(:current_effective_date) { (TimeKeeper.date_of_record - 2.months).beginning_of_month }
+      end
+
+      let(:benefit_package)  { initial_application.benefit_packages.first }
+      let(:benefit_group_assignment) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_package)}
+      let(:employee_role) { FactoryGirl.create(:benefit_sponsors_employee_role, person: person, employer_profile: benefit_sponsorship.profile, census_employee_id: census_employee.id) }
+      let(:census_employee) { FactoryGirl.create(:census_employee,
+        employer_profile: benefit_sponsorship.profile,
+        benefit_sponsorship: benefit_sponsorship,
+        benefit_group_assignments: [benefit_group_assignment]
+      )}
+      let(:person)       { FactoryGirl.create(:person, :with_family) }
+      let!(:family)       { person.primary_family }
+      let!(:hbx_enrollment) {
+        hbx_enrollment = FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+                            household: family.active_household,
+                            aasm_state: "coverage_selected",
+                            effective_on: initial_application.start_on,
+                            rating_area_id: initial_application.recorded_rating_area_id,
+                            sponsored_benefit_id: initial_application.benefit_packages.first.health_sponsored_benefit.id,
+                            sponsored_benefit_package_id:initial_application.benefit_packages.first.id,
+                            benefit_sponsorship_id:initial_application.benefit_sponsorship.id,
+                            employee_role_id: employee_role.id)
+        hbx_enrollment.benefit_sponsorship = benefit_sponsorship
+        hbx_enrollment.save!
+        hbx_enrollment
+      }
+
+      let(:employee_role_1) { FactoryGirl.create(:benefit_sponsors_employee_role, person: person_1, employer_profile: benefit_sponsorship.profile, census_employee_id: census_employee_1.id) }
+      let(:census_employee_1) { FactoryGirl.create(:census_employee,
+        employer_profile: benefit_sponsorship.profile,
+        benefit_sponsorship: benefit_sponsorship,
+        benefit_group_assignments: [benefit_group_assignment]
+      )}
+      let(:person_1)       { FactoryGirl.create(:person, :with_family) }
+      let!(:family_1)       { person_1.primary_family }
+      let!(:hbx_enrollment_1) {
+        hbx_enrollment = FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+                            household: family_1.active_household,
+                            aasm_state: "coverage_selected",
+                            effective_on: initial_application.start_on,
+                            rating_area_id: initial_application.recorded_rating_area_id,
+                            sponsored_benefit_id: initial_application.benefit_packages.first.health_sponsored_benefit.id,
+                            sponsored_benefit_package_id:initial_application.benefit_packages.first.id,
+                            benefit_sponsorship_id:initial_application.benefit_sponsorship.id,
+                            employee_role_id: employee_role_1.id)
+        hbx_enrollment.benefit_sponsorship = benefit_sponsorship
+        hbx_enrollment.save!
+        hbx_enrollment
+      }
+
+      let(:end_on) { TimeKeeper.date_of_record.next_month }
+
+      before do
+        initial_application.update_attributes!(aasm_state: :termination_pending, effective_period: initial_application.start_on..end_on, terminated_on: TimeKeeper.date_of_record)
+        benefit_package.termination_pending_member_benefits
+        hbx_enrollment.reload
+      end
+
+      it 'should move valid enrollments to termination pending state' do
+        expect(hbx_enrollment.aasm_state).to eq "coverage_termination_pending"
+      end
+
+      it 'should update terminated_on field on hbx_enrollment' do
+        expect(hbx_enrollment.terminated_on).to eq initial_application.end_on
+      end
+
+      context "when an employee has coverage_termination_pending enrollment", :dbclean => :after_each do
+
+        let(:hbx_enrollment_terminated_on) { end_on.prev_month }
+
+        before do
+          initial_application.update_attributes!(aasm_state: :termination_pending, effective_period: initial_application.start_on..end_on, terminated_on: TimeKeeper.date_of_record)
+          hbx_enrollment.update_attributes!(effective_on: initial_application.start_on, aasm_state: "coverage_termination_pending", terminated_on: hbx_enrollment_terminated_on)
+          hbx_enrollment_1.update_attributes!(effective_on: initial_application.start_on, aasm_state: "coverage_termination_pending", terminated_on: end_on+2.months)
+          benefit_package.termination_pending_member_benefits
+          hbx_enrollment.reload
+          hbx_enrollment_1.reload
+        end
+
+        it "should not update hbx_enrollment terminated_on if terminated_on < benefit_application end on" do
+          expect(hbx_enrollment.terminated_on).to eq hbx_enrollment_terminated_on
+          expect(hbx_enrollment.terminated_on).not_to eq end_on
+        end
+
+        it "should update hbx_enrollment terminated_on if terminated_on > benefit_application end on" do
+          expect(hbx_enrollment_1.terminated_on).to eq end_on
+        end
+      end
+
+      context "when an employee has coverage_terminated enrollment", :dbclean => :after_each do
+
+        let(:hbx_enrollment_terminated_on) { end_on.prev_month }
+
+        before do
+          initial_application.update_attributes!(aasm_state: :termination_pending, effective_period: initial_application.start_on..end_on, terminated_on: TimeKeeper.date_of_record)
+          hbx_enrollment.update_attributes!(effective_on: initial_application.start_on, aasm_state: "coverage_terminated", terminated_on: hbx_enrollment_terminated_on)
+          benefit_package.termination_pending_member_benefits
+          hbx_enrollment.reload
+        end
+
+        it "should NOT update terminated_on date on enrollment if terminated_on < benefit_application end_on" do
+          expect(hbx_enrollment.terminated_on).to eq hbx_enrollment_terminated_on
         end
       end
     end

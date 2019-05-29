@@ -16,7 +16,7 @@ module BenefitSponsors
         initialize_logger
         shop_daily_events
         auto_submit_renewal_applications
-        process_applications_missing_binder_payment
+        # process_applications_missing_binder_payment #refs 39124 - Had to comment out as we got rid of states on BS.
         auto_cancel_ineligible_applications
         auto_transmit_monthly_benefit_sponsors
         close_enrollment_quiet_period
@@ -28,6 +28,7 @@ module BenefitSponsors
         process_events_for { benefit_begin }
         process_events_for { benefit_end }
         process_events_for { benefit_termination }
+        process_events_for { benefit_termination_pending }
         process_events_for { benefit_renewal }
       end
 
@@ -54,6 +55,14 @@ module BenefitSponsors
       def benefit_termination
         benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_terminate_benefit_coverage?(new_date)
         execute_sponsor_event(benefit_sponsorships, :terminate_sponsor_benefit)
+      end
+
+      def benefit_termination_pending
+        benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_terminate_pending_benefit_coverage?(new_date)
+
+        benefit_sponsorships.each do |benefit_sponsorship|
+          execute_sponsor_event(benefit_sponsorship, :terminate_pending_sponsor_benefit)
+        end
       end
 
       def benefit_renewal
@@ -95,22 +104,24 @@ module BenefitSponsors
 
       def auto_transmit_monthly_benefit_sponsors
         if aca_shop_market_transmit_scheduled_employers
-          if (new_date.prev_day.mday + 1) == aca_shop_market_employer_transmission_day_of_month
+           # [26, 27, 28, 29, 30, 31] >= 26
+          if (new_date.prev_day.mday + 1) >= aca_shop_market_employer_transmission_day_of_month
             transmit_scheduled_benefit_sponsors(new_date)
           end
         end
       end
 
       def transmit_scheduled_benefit_sponsors(new_date, feins=[])
-        start_on = new_date.next_month.beginning_of_month
+        start_on = new_date.prev_day.next_month.beginning_of_month
+        transition_at = (new_date.prev_day.mday + 1) == aca_shop_market_employer_transmission_day_of_month ? nil : new_date.prev_day
         benefit_sponsors = BenefitSponsors::BenefitSponsorships::BenefitSponsorship
         benefit_sponsors = benefit_sponsors.find_by_feins(feins) if feins.any?
 
-        renewal_benefit_sponsorships = benefit_sponsors.may_transmit_renewal_enrollment?(start_on)
+        renewal_benefit_sponsorships = benefit_sponsors.may_transmit_renewal_enrollment?(start_on, transition_at)
         execute_sponsor_event(renewal_benefit_sponsorships, :transmit_renewal_eligible_event)
         execute_sponsor_event(renewal_benefit_sponsorships, :transmit_renewal_carrier_drop_event)
 
-        initial_benefit_sponsorships = benefit_sponsors.may_transmit_initial_enrollment?(start_on)
+        initial_benefit_sponsorships = benefit_sponsors.may_transmit_initial_enrollment?(start_on, transition_at)
         execute_sponsor_event(initial_benefit_sponsorships, :transmit_initial_eligible_event)
       end
 
