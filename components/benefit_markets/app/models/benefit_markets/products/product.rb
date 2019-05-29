@@ -181,6 +181,15 @@ module BenefitMarkets
       end
     end
 
+    def can_use_aptc?
+      metal_level != 'catastrophic'
+    end
+
+    def is_csr?
+      csr_kinds_mapping = EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP
+      (csr_kinds_mapping.values - [csr_kinds_mapping.default]).include? csr_variant_id
+    end
+
     def ehb
       percent = read_attribute(:ehb)
       (percent && percent > 0) ? percent : 1

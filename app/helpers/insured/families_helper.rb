@@ -55,7 +55,7 @@ module Insured::FamiliesHelper
   end
 
   def render_plan_type_details(plan)
-    plan_details = [ plan.try(:plan_type).try(:upcase) ].compact
+    plan_details = [plan.try(:product_type).try(:upcase)].compact
 
     metal_level = display_dental_metal_level(plan)
 
