@@ -2,6 +2,6 @@
   <%= v.text_field :alien_number, :placeholder => l10n("insured.consumer_roles.docs_shared.alien_number"),
                    :pattern => "\\d{9}",
                    :class => "doc_fields",
-                   :title => l10n("insured.consumer_roles.docs_shared.alien_number_req") %>
+                   :title => l10n("insured.consumer_roles.docs_shared.alien_number_req").gsub("-li-", "") %>
   <%= render :partial => "insured/consumer_roles/docs_shared/vlp_doc_requirements", locals: {req: l10n("insured.consumer_roles.docs_shared.alien_number_req")} %>
 </div>
