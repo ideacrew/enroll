@@ -106,8 +106,8 @@ GEM
     animate-rails (1.0.10)
       rails
     arel (6.0.4)
-    awesome_print (1.8.0)
     ast (2.4.0)
+    awesome_print (1.8.0)
     aws-sdk (2.2.4)
       aws-sdk-resources (= 2.2.4)
     aws-sdk-core (2.2.4)
@@ -187,6 +187,8 @@ GEM
       orm_adapter (~> 0.5.0)
     climate_control (0.2.0)
     cliver (0.3.2)
+    cocaine (0.6.0)
+      terrapin (= 0.6.0)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
     coffee-rails (4.1.1)
@@ -732,8 +734,8 @@ DEPENDENCIES
   sass-rails (~> 5.0)
   sdoc (~> 0.4.0)
   shoulda-matchers (= 3.1.1)
-  slim (= 3.0.8)
   simplecov (= 0.14.1)
+  slim (= 3.0.8)
   slim-rails
   spring (= 1.6.3)
   sprockets (~> 2.12.3)
@@ -752,4 +754,4 @@ DEPENDENCIES
   yard-mongoid (~> 0.1.0)
 
 BUNDLED WITH
-   1.17.1
+   1.17.3
