@@ -1,4 +1,31 @@
-require 'services/checkbook_services/plan_comparision.rb'
+require 'services/checkbook_services'
+
+# An instance of the CensusEmployee is an employee that belongs to a Benefit Sponsor.
+# It is the primary way for us to refer to the employee of an employer.
+# This is different from a person, though it references the person through the employee_role model.
+# Dependents of the census employee (CensusDependents) are embedded in the CensusEmployee.
+# Embeded document BenefitGroupAssignment is the model responsible for connecting the CensusEmployee with the approriate coverage.
+#                            ,------------------.                        ,------.
+#                            |BenefitSponsorship|                        |person|
+#                            |------------------|                        |------|
+#                            |------------------|                        |------|
+#                            `------------------'                        `------'
+#                              |                |                             |
+#                              |                |                             |
+#  ,------------------------------------.       |                             |
+#  |CensusEmployee                      |  ,---------------------.   ,------------.
+#  |------------------------------------|  |BenefitCoveragePeriod|   |EmployeeRole|
+#  |benefit_sponsors_employer_profile_id|  |---------------------|   |------------|
+#  |employee_role_id                    |  |---------------------|   |------------|
+#  |------------------------------------|  `---------------------'   `------------'
+#  `------------------------------------'       |                            |
+#                 |                   |_________|____________________________|
+#                 |                             |
+#  ,----------------------.     ,--------------.
+#  |BenefitGroupAssignment|     |BenefitPackage|
+#  |----------------------|     |--------------|
+#  |----------------------|-----|--------------|
+#  `----------------------'     `--------------'
 
 class CensusEmployee < CensusMember
   include AASM
@@ -16,6 +43,7 @@ class CensusEmployee < CensusMember
 
   require 'roo'
 
+  # @!group AASM state groupings
   EMPLOYMENT_ACTIVE_STATES = %w(eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked cobra_eligible cobra_linked cobra_termination_pending)
   EMPLOYMENT_TERMINATED_STATES = %w(employment_terminated cobra_terminated rehired)
   EMPLOYMENT_ACTIVE_ONLY = %w(eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked)
@@ -28,6 +56,7 @@ class CensusEmployee < CensusMember
 
   EMPLOYEE_TERMINATED_EVENT_NAME = "acapi.info.events.census_employee.terminated"
   EMPLOYEE_COBRA_TERMINATED_EVENT_NAME = "acapi.info.events.census_employee.cobra_terminated"
+  # @!endgroup
 
   field :is_business_owner, type: Boolean, default: false
   field :hired_on, type: Date
@@ -37,7 +66,10 @@ class CensusEmployee < CensusMember
   field :expected_selection, type: String, default: "enroll"
 
   # Employer for this employee
+  # @return [EmployerProfile]
   field :employer_profile_id, type: BSON::ObjectId
+  # Employer for this employee
+  # @return [BenefitSponsors::Organizations::AcaShopCcaEmployerProfile]
   field :benefit_sponsors_employer_profile_id, type: BSON::ObjectId
 
   # Employee linked to this roster record
@@ -169,29 +201,45 @@ class CensusEmployee < CensusMember
    unclaimed_person ? linked_matched : unscoped.and(id: {:$exists => false})
   }
 
+  # This initializes a new CensusEmploye with the given +args+, the method
+  # has been overriden to write the attribute +:employee_relationship+ to +"self"+
+  # @param args [Hash]
+  # @return [CensusEmployee]
   def initialize(*args)
     super(*args)
     write_attribute(:employee_relationship, "self")
   end
 
+  # Retrieves the benefit_group_assignment for a given +benefit_package+ with
+  # a specific +effecitive_on+ date. If no date is specified +TimeKeeper.date_of_record+ is used.
+  # @param benefit_package [BenefitPackage]
+  # @param effective_on [Date]
+  # @return [BenefitGroupAssignment]
   def benefit_group_assignment_for(benefit_package, effective_on = TimeKeeper.date_of_record)
     benefit_group_assignments.by_benefit_package_and_assignment_on(benefit_package, effective_on).first
   end
 
+  # Returns the family associated with the associated +employee_role+'s +person+.
+  # @return [Family]
   def family
     return nil if employee_role.blank?
     person_rec = employee_role.person
     person_rec.primary_family
   end
 
+  # Evalutes whether the +CensusEmployee+ is linked or not by checking +aasm_states+.
+  # @return [Boolean]
   def is_linked?
     LINKED_STATES.include?(aasm_state)
   end
 
+  # Evalutes whether the +CensusEmployee+ is eligible or not by checking +aasm_states+.
+  # @return [Boolean]
   def is_eligible?
     ELIGIBLE_STATES.include?(aasm_state)
   end
 
+  # Loops though +census_dependents+ and if their SSN is blank nils the +encrypted_ssn+ field.
   def allow_nil_ssn_updates_dependents
     census_dependents.each do |cd|
       if cd.ssn.blank?
@@ -200,6 +248,8 @@ class CensusEmployee < CensusMember
     end
   end
 
+  # Deactuives benefit group assignments for the given +benefit_package_ids+.
+  # @param benefit_package_ids [Array<Integer>]
   def deactive_benefit_group_assignments(benefit_package_ids)
     assignments = benefit_group_assignments.where(:benefit_package_id.in => benefit_package_ids)
     assignments.each do |assignment|
@@ -210,6 +260,10 @@ class CensusEmployee < CensusMember
     end
   end
 
+  # Assigns census employee to +benefit_package+ with +start_on+ being set to +assignment_on+.
+  # @param benefit_package [BenefitPackage]
+  # @param assignment_on [Date]
+  # @return [BenefitGroupAssignment]
   def assign_to_benefit_package(benefit_package, assignment_on)
     return if benefit_package.blank?
 
@@ -221,6 +275,9 @@ class CensusEmployee < CensusMember
     )
   end
 
+  # Finds benefit group assignments for a given +benefit_package+.
+  # @param benefit_package [BenefitPackage]
+  # @return [Array<BenefitGroupAssignment>]
   def benefit_package_assignment_for(benefit_package)
     benefit_group_assignments.effective_on(benefit_package.effective_period.min).detect{ |assignment|
       assignment.benefit_package_id == benefit_package.id
@@ -248,17 +305,6 @@ class CensusEmployee < CensusMember
     return nil if self.employment_terminated_on.nil?
     self.employment_terminated_on.next_month.beginning_of_month
   end
-
-  # def employer_profile=(new_employer_profile)
-  #   raise ArgumentError.new("expected EmployerProfile") unless new_employer_profile.is_a?(EmployerProfile)
-  #   self.employer_profile_id = new_employer_profile._id
-  #   @employer_profile = new_employer_profile
-  # end
-
-  # def employer_profile
-  #   return @employer_profile if defined? @employer_profile
-  #   @employer_profile = EmployerProfile.find(self.employer_profile_id) unless self.employer_profile_id.blank?
-  # end
 
   def is_case_old?(employer_profile=nil)
     employer_profile = employer_profile || self.employer_profile
@@ -360,15 +406,6 @@ class CensusEmployee < CensusMember
     result << renewal_benefit_group_assignment if !renewal_benefit_group_assignment.nil?
     result
   end
-
-  # def add_default_benefit_group_assignment # Deprecated
-  #   if plan_year = (self.employer_profile.plan_years.published_plan_years_by_date(hired_on).first || self.employer_profile.published_plan_year)
-  #     add_benefit_group_assignment(plan_year.benefit_groups.first)
-  #     if self.employer_profile.renewing_plan_year.present?
-  #       add_renew_benefit_group_assignment(self.employer_profile.renewing_plan_year.benefit_groups.first)
-  #     end
-  #   end
-  # end
 
   def active_benefit_package
     if active_benefit_group_assignment.present?
@@ -542,24 +579,6 @@ class CensusEmployee < CensusMember
   def employee_relationship
     "employee"
   end
-
-  # Deprecated
-  # def assign_benefit_packages(benefit_group_id: nil, renewal_benefit_group_id: nil)
-    # if benefit_group_id.present?
-    #   benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(benefit_group_id))
-
-    #   if active_benefit_group_assignment.blank? || (active_benefit_group_assignment.benefit_group_id != benefit_group.id)
-    #     find_or_create_benefit_group_assignment([benefit_group])
-    #   end
-    # end
-
-    # if renewal_benefit_group_id.present?
-    #   benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(renewal_benefit_group_id))
-    #   if renewal_benefit_group_assignment.blank? || (renewal_benefit_group_assignment.benefit_group_id != benefit_group.id)
-    #     add_renew_benefit_group_assignment(benefit_group)
-    #   end
-    # end
-  # end
 
   def assign_benefit_packages
     return true if is_case_old?
@@ -743,6 +762,13 @@ class CensusEmployee < CensusMember
       end
     end
 
+    # Advances the day for the employer and does the following:
+    #   terminate_scheduled_census_employees
+    #   rebase_newly_designated_employees
+    #   terminate_future_scheduled_census_employees
+    #   initial_employee_open_enrollment_notice
+    #
+    # @param new_date [Date]
     def advance_day(new_date)
       CensusEmployee.terminate_scheduled_census_employees
       CensusEmployee.rebase_newly_designated_employees
@@ -751,6 +777,8 @@ class CensusEmployee < CensusMember
       # CensusEmployee.census_employee_open_enrollment_reminder_notice(new_date)
     end
 
+    # Sends the initial open enrollment notices for all of the employers employees
+    # @param new_date [Date]
     def initial_employee_open_enrollment_notice(date)
       census_employees = CensusEmployee.where(:"hired_on" => date).non_terminated
       census_employees.each do |ce|
@@ -1055,11 +1083,12 @@ def self.to_csv
     employee_role.present?
   end
 
-  ##
-  # This method is to verify whether roster employee is cobra eligible or not
-  # = Rules for employee cobra eligibility
-  #   * Employee must be in a terminated status
-  #   * Must be a covered employee on the date of their employment termination
+  # Verifies whether roster employee is cobra eligible or not
+  #
+  # Rules for employee cobra eligibility:
+  # * Employee must be in a terminated status
+  # * Must be a covered employee on the date of their employment termination
+  # @return [Boolean]
   def is_cobra_coverage_eligible?
     return false unless self.employment_terminated?
 
@@ -1210,6 +1239,9 @@ def self.to_csv
     (active_benefit_group_cobra_eligible_enrollments + renewal_benefit_group_cobra_eligible_enrollments).flatten
   end
 
+  # Retrieves the last updated benefit_group_assignment with a given +package_id+
+  # @param package_id [Integer]
+  # @return [BenefitGroupAssignment]
   def benefit_group_assignment_by_package(package_id)
     benefit_group_assignments.where(benefit_package_id: package_id).order_by(:'updated_at'.desc).first
   end
@@ -1224,12 +1256,17 @@ def self.to_csv
     (benefit_package.present? && benefit_package.is_conversion?) ? nil : benefit_package
   end
 
+  # Retrieves the benefit_group_assignment that covers the passed +coverage_date+
+  # and returns the first active one or the first one found.
+  # @param coverage_date [Date]
+  # @return [BenefitGroupAssignment]
   def benefit_group_assignment_for_date(coverage_date)
     assignments = benefit_group_assignments.select do |assignment|
       (assignment.start_on..assignment.benefit_end_date).cover?(coverage_date) && assignment.benefit_package.is_active
     end
     assignments.detect{|assignment| assignment.is_active} || assignments.first
   end
+
 
   def earliest_benefit_package_after(coverage_date)
     active_benefit_group_assignment.benefit_package.earliest_benefit_package_after(coverage_date)
