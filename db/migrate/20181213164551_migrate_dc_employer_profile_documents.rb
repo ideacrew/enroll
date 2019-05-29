@@ -106,7 +106,7 @@ class MigrateDcEmployerProfileDocuments < Mongoid::Migration
   def self.build_inbox_messages(old_profile, new_profile)
     old_profile.inbox.messages.each do |message|
       msg = new_profile.inbox.messages.new(message.attributes.except("_id"))
-      msg.body.gsub!("EmployerProfile", new_profile._type.split('::').last)
+      msg.body.gsub!("EmployerProfile", new_profile.class.to_s)
       msg.body.gsub!(old_profile.id.to_s, new_profile.id.to_s)
     end
   end

@@ -139,7 +139,10 @@ class MigrateDcBrokerAgencyProfiles < Mongoid::Migration
 
   def self.initialize_new_profile(old_org, old_profile_params)
     new_profile = BenefitSponsors::Organizations::BrokerAgencyProfile.new(old_profile_params)
-
+    if old_org.broker_agency_profile.default_general_agency_profile_id.present?
+      old_default_general_agency_profile_id = old_org.broker_agency_profile.default_general_agency_profile_id
+      new_profile.default_general_agency_profile_id = new_general_agency_for_old_profile_id(old_default_general_agency_profile_id.to_s).id
+    end
     build_inbox_messages(new_profile)
     build_office_locations(old_org, new_profile)
     return new_profile
@@ -165,7 +168,7 @@ class MigrateDcBrokerAgencyProfiles < Mongoid::Migration
   def self.build_inbox_messages(new_profile)
     @old_profile.inbox.messages.each do |message|
       msg = new_profile.inbox.messages.new(message.attributes.except("_id"))
-      msg.body.gsub!("BrokerAgencyProfile", "BenefitSponsorsBrokerAgencyProfile")
+      msg.body.gsub!("BrokerAgencyProfile", new_profile.class.to_s)
       msg.body.gsub!(@old_profile.id.to_s, new_profile.id.to_s)
     end
   end
@@ -195,6 +198,19 @@ class MigrateDcBrokerAgencyProfiles < Mongoid::Migration
   def self.old_broker_agency_profile(id)
     Rails.cache.fetch("broker_agency_profile_#{id}", expires_in: 2.hour) do
       ::BrokerAgencyProfile.find(id)
+    end
+  end
+
+  def self.old_general_agency_profile(id)
+    Rails.cache.fetch("general_agency_profile_#{id}", expires_in: 2.hour) do
+      ::GeneralAgencyProfile.find(id)
+    end
+  end
+
+  def self.new_general_agency_for_old_profile_id(id)
+    Rails.cache.fetch("new_general_agency_#{id}", expires_in: 2.hour) do
+      old_org = old_general_agency_profile(id)
+      BenefitSponsors::Organizations::Organization.where(hbx_id: old_org.hbx_id).first.general_agency_profile
     end
   end
 
