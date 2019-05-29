@@ -191,6 +191,8 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def show
+    authorize @census_employee, :show?
+    # authorize @census_employee, :show?
     @no_ssn = @census_employee.no_ssn_allowed || false
 
     @status = params[:status] || ''
