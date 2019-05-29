@@ -222,9 +222,11 @@ module Queries
     end
 
     def collect_benefit_group_ids(effective_on = nil)
+      puts "feins = #{@feins}"
       @feins.collect{|e| prepend_zeros(e.to_s, 9) }.inject([]) do |id_list, fein|
-        benefit_sponsorship = BenefitSponsors::Organizations::Organization.where(fein:  fein).first.active_benefit_sponsorship
-
+        puts "id-list #{id_list}"
+        benefit_sponsorship = BenefitSponsors::Organizations::Organization.where(fein: fein).try(:first).try(:active_benefit_sponsorship)
+        # puts "benefit_sponsorship = #{benefit_sponsorship}"
         if benefit_sponsorship.present?
           benefit_application = benefit_sponsorship.benefit_applications.where(:predecessor_id => nil, :"effective_period.min" => effective_on || @effective_on , :aasm_state => :active).first
         end
