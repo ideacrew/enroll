@@ -6,13 +6,15 @@ class Exchanges::HbxProfilesController < ApplicationController
   include ::Config::AcaHelper
 
   before_action :modify_admin_tabs?, only: [:binder_paid, :transmit_group_xml]
-  before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index, :family_index, :update_cancel_enrollment, :update_terminate_enrollment]
+  before_action :check_hbx_staff_role, except: [:request_help, :configuration, :show, :assister_index, :family_index, :update_cancel_enrollment, :update_terminate_enrollment]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
-  before_action :find_hbx_profile, only: [:employer_index, :broker_agency_index, :inbox, :configuration, :show, :binder_index]
+  before_action :view_the_configuration_tab?, only: [:configuration, :set_date]
+  before_action :can_submit_time_travel_request?, only: [:set_date]
+  before_action :find_hbx_profile, only: [:employer_index, :configuration, :broker_agency_index, :inbox, :show, :binder_index]
   #before_action :authorize_for, except: [:edit, :update, :destroy, :request_help, :staff_index, :assister_index]
   #before_action :authorize_for_instance, only: [:edit, :update, :destroy]
   before_action :check_csr_or_hbx_staff, only: [:family_index]
-  before_action :find_benefit_sponsorship, only: [:oe_extendable_applications, :oe_extended_applications, :edit_open_enrollment, :extend_open_enrollment, :close_extended_open_enrollment, :edit_fein, :update_fein]
+  before_action :find_benefit_sponsorship, only: [:oe_extendable_applications, :oe_extended_applications, :edit_open_enrollment, :extend_open_enrollment, :close_extended_open_enrollment, :edit_fein, :update_fein, :force_publish, :edit_force_publish]
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
   layout 'single_column'
@@ -140,14 +142,28 @@ class Exchanges::HbxProfilesController < ApplicationController
      end
   end
 
+  def edit_force_publish
+    @element_to_replace_id = params[:employer_actions_id]
+    @benefit_application = @benefit_sponsorship.benefit_applications.draft_state.last
+
+    respond_to do |format|
+     format.js
+   end
+  end
+
   def force_publish
-      @benfit_sponsorships = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:"_id".in => params[:ids])
-      benefit_application = @benfit_sponsorships.first.benefit_applications.draft_state.last
-      @service = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(benefit_application)
-      @service.force_submit_application
-      respond_to do |format|
-       format.js
-     end
+    @element_to_replace_id = params[:employer_actions_id]
+    @benefit_application   = @benefit_sponsorship.benefit_applications.draft_state.last
+    if @benefit_application.present?
+      @service = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(@benefit_application)
+      if @service.may_force_submit_application? || params[:publish_with_warnings] == 'true'
+        @service.force_submit_application
+      end
+    end
+
+    respond_to do |format|
+      format.js
+    end
   end
 
   def employer_invoice
@@ -164,10 +180,13 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def employer_datatable
-  @datatable = Effective::Datatables::BenefitSponsorsEmployerDatatable.new
-    respond_to do |format|
-      format.js
-    end
+    # copy the link and open in new tab
+    last_visited_url = current_user.try(:last_portal_visited) || root_path if current_user.present?
+    @datatable = Effective::Datatables::BenefitSponsorsEmployerDatatable.new
+      respond_to do |format|
+       format.html { redirect_to(last_visited_url) }
+       format.js
+      end
   end
 
 def employer_poc
@@ -472,7 +491,6 @@ def employer_poc
 
   def configuration
     @time_keeper = Forms::TimeKeeper.new
-
     respond_to do |format|
       format.html { render partial: "configuration_index" }
       format.js {}
@@ -547,53 +565,57 @@ def employer_poc
   def edit
   end
 
+# FIXME: I have removed all writes to the HBX Profile models as we
+#        don't seem to have functionality that requires them nor
+#        permission checks around them.
+
   # GET /exchanges/hbx_profiles/1/inbox
-  def inbox
-    @inbox_provider = current_user.person.hbx_staff_role.hbx_profile
-    @folder = params[:folder] || 'inbox'
-    @sent_box = true
-  end
+#  def inbox
+#    @inbox_provider = current_user.person.hbx_staff_role.hbx_profile
+#    @folder = params[:folder] || 'inbox'
+#    @sent_box = true
+#  end
 
   # POST /exchanges/hbx_profiles
   # POST /exchanges/hbx_profiles.json
-  def create
-    @organization = Organization.new(organization_params)
-    @hbx_profile = @organization.build_hbx_profile(hbx_profile_params.except(:organization))
+#  def create
+#    @organization = Organization.new(organization_params)
+#    @hbx_profile = @organization.build_hbx_profile(hbx_profile_params.except(:organization))
 
-    respond_to do |format|
-      if @hbx_profile.save
-        format.html { redirect_to exchanges_hbx_profile_path @hbx_profile, notice: 'HBX Profile was successfully created.' }
-        format.json { render :show, status: :created, location: @hbx_profile }
-      else
-        format.html { render :new }
-        format.json { render json: @hbx_profile.errors, status: :unprocessable_entity }
-      end
-    end
-  end
+#    respond_to do |format|
+#      if @hbx_profile.save
+#        format.html { redirect_to exchanges_hbx_profile_path @hbx_profile, notice: 'HBX Profile was successfully created.' }
+#        format.json { render :show, status: :created, location: @hbx_profile }
+#      else
+#        format.html { render :new }
+#        format.json { render json: @hbx_profile.errors, status: :unprocessable_entity }
+#      end
+#    end
+#  end
 
   # PATCH/PUT /exchanges/hbx_profiles/1
   # PATCH/PUT /exchanges/hbx_profiles/1.json
-  def update
-    respond_to do |format|
-      if @hbx_profile.update(hbx_profile_params)
-        format.html { redirect_to exchanges_hbx_profile_path @hbx_profile, notice: 'HBX Profile was successfully updated.' }
-        format.json { render :show, status: :ok, location: @hbx_profile }
-      else
-        format.html { render :edit }
-        format.json { render json: @hbx_profile.errors, status: :unprocessable_entity }
-      end
-    end
-  end
+#  def update
+#    respond_to do |format|
+#      if @hbx_profile.update(hbx_profile_params)
+#        format.html { redirect_to exchanges_hbx_profile_path @hbx_profile, notice: 'HBX Profile was successfully updated.' }
+#        format.json { render :show, status: :ok, location: @hbx_profile }
+#      else
+#        format.html { render :edit }
+#        format.json { render json: @hbx_profile.errors, status: :unprocessable_entity }
+#      end
+#    end
+#  end
 
   # DELETE /exchanges/hbx_profiles/1
   # DELETE /exchanges/hbx_profiles/1.json
-  def destroy
-    @hbx_profile.destroy
-    respond_to do |format|
-      format.html { redirect_to exchanges_hbx_profiles_path, notice: 'HBX Profile was successfully destroyed.' }
-      format.json { head :no_content }
-    end
-  end
+#  def destroy
+#    @hbx_profile.destroy
+#    respond_to do |format|
+#      format.html { redirect_to exchanges_hbx_profiles_path, notice: 'HBX Profile was successfully destroyed.' }
+#      format.json { head :no_content }
+#    end
+#  end
 
   def set_date
     authorize HbxProfile, :modify_admin_tabs?
@@ -660,6 +682,12 @@ private
 
   def modify_admin_tabs?
     authorize HbxProfile, :modify_admin_tabs?
+  end
+
+  def can_submit_time_travel_request?
+    unless authorize HbxProfile, :can_submit_time_travel_request?
+      redirect_to root_path, :flash => { :error => "Access not allowed" }
+    end
   end
 
   def view_admin_tabs?
@@ -730,6 +758,12 @@ private
     end
   end
 
+  def view_the_configuration_tab?
+    unless authorize HbxProfile, :view_the_configuration_tab?
+      redirect_to root_path, :flash => { :error => "Access not allowed" }
+    end
+  end
+
   def check_csr_or_hbx_staff
     unless current_user.has_hbx_staff_role? || (current_user.person.csr_role && !current_user.person.csr_role.cac)
       redirect_to root_path, :flash => { :error => "You must be an HBX staff member or a CSR" }
@@ -748,4 +782,5 @@ private
     @benefit_sponsorship = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.find(params[:benefit_sponsorship_id] || params[:id])
     raise "Unable to find benefit sponsorship" if @benefit_sponsorship.blank?
   end
+
 end

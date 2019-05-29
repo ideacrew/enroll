@@ -15,4 +15,14 @@ class EmployerProfilePolicy < ApplicationPolicy
     return true unless role = user.person.hbx_staff_role
     role.permission.revert_application
   end
+
+  def fire_general_agency?
+    return false unless user.person
+    return true if user.person.hbx_staff_role
+    broker_role = user.person.broker_role
+    return false unless broker_role
+    assigned_broker = record.broker_agency_accounts.any? { |account| account.writing_agent_id == broker_role.id }
+    return true if assigned_broker
+    record.general_agency_accounts.any? { |account| account.broker_role_id == broker_role.id }
+  end
 end

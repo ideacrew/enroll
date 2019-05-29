@@ -18,4 +18,5 @@ Given(/^a (.*?) site exists with a benefit market$/) do |key|
   map_products
   reset_product_cache
   make_all_permissions
+  generate_sic_codes
 end

@@ -70,8 +70,12 @@ module Effective
            ['Generate Invoice', generate_invoice_exchanges_hbx_profiles_path(ids: [row.id]), generate_invoice_link_type(@employer_profile)],
            ['Create Plan Year', main_app.new_benefit_application_exchanges_hbx_profiles_path(benefit_sponsorship_id: row.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), pundit_allow(HbxProfile, :can_create_benefit_application?) ? 'ajax' : 'hide'],
            ['Change FEIN', edit_fein_exchanges_hbx_profiles_path(id: row.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), pundit_allow(HbxProfile, :can_change_fein?) ? "ajax" : "hide"],
-           ['Force Publish', force_publish_exchanges_hbx_profiles_path(ids: [row]), *force_publish_link_type(row, pundit_allow(HbxProfile, :can_force_publish?))]
+           ['Force Publish', edit_force_publish_exchanges_hbx_profiles_path(id: @employer_profile.latest_benefit_sponsorship.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), force_publish_link_type(row, pundit_allow(HbxProfile, :can_force_publish?))]
           ]
+
+          if pundit_allow(HbxProfile, :can_modify_plan_year?)
+            dropdown.insert(2,['Plan Years', exchanges_employer_applications_path(employer_id: row, employers_action_id: "employer_actions_#{@employer_profile.id}"), 'ajax'])
+          end
 
           if individual_market_is_enabled?
             people_id = Person.where({"employer_staff_roles.employer_profile_id" => @employer_profile._id}).map(&:id)
@@ -110,20 +114,13 @@ module Effective
       end
 
       def business_policy_accepted?(draft_application)
-        current_date = TimeKeeper.date_of_record
-        current_date <= draft_application.open_enrollment_period.max && current_date.day > publish_due_day_of_month && current_date > (draft_application.effective_period.min - 2.months)
+        TimeKeeper.date_of_record > draft_application.last_day_to_publish && TimeKeeper.date_of_record < draft_application.start_on
       end
 
       def force_publish_link_type(benefit_sponsorship, allow)
         draft_application = get_latest_draft_benefit_application(benefit_sponsorship)
         policy_accepted_and_allow = draft_application.present? && business_policy_accepted?(draft_application) && allow
-        if policy_accepted_and_allow
-          ['post_ajax_with_confirmation', 'Can not publish due to fte count out range or primary office location out of MA, Publish anyway?']
-        elsif policy_accepted_and_allow
-          ['post_ajax']
-        else
-          ['hide']
-        end
+        policy_accepted_and_allow ? 'ajax' : 'hide'
       end
 
       def eligible_for_publish?(benefit_application)

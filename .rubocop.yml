@@ -49,6 +49,9 @@ Rails/Validation:
 Rails:
   Enabled: false
 
+Layout/CommentIndentation:
+  Enabled: false
+
 Layout/EmptyLines:
   Enabled: false
 
@@ -122,6 +125,9 @@ Naming/VariableNumber:
 Style/AndOr:
   Enabled: true
 
+Style/BlockComments:
+  Enabled: false
+
 Style/BracesAroundHashParameters:
   Enabled: false
 
@@ -148,6 +154,12 @@ Style/SymbolArray:
   Enabled: false
 
 Style/WordArray:
+  Enabled: false
+
+Bundler/OrderedGems:
+  Enabled: false
+
+Gemspec/OrderedDependencies:
   Enabled: false
 
 require:

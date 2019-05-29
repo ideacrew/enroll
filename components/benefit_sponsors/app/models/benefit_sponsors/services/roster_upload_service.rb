@@ -215,8 +215,7 @@ module BenefitSponsors
       end
 
       def init_census_record(member, form)
-        params = sanitize_params(form).merge!({
-          hired_on: form.hired_on,
+        params = sanitize_params(form).merge!({  hired_on: parse_date(form.hired_on),
           is_business_owner: is_business_owner?(form),
           email: build_email(form),
           employee_relationship: form.employee_relationship,
@@ -326,9 +325,8 @@ module BenefitSponsors
 
       def parse_date(cell)
         return nil if cell.blank?
-        return DateTime.strptime(sanitize_value(cell), "%d/%m/%Y") rescue raise ImportErrorValue, cell if cell.class == String
+        return Date.strptime(sanitize_value(cell), "%m/%d/%Y") rescue raise ImportErrorValue, cell if cell.class == String
         return sanitize_value(cell.to_s).to_time.strftime("%m-%d-%Y") rescue raise ImportErrorDate, cell if cell.class == String
-
         cell.blank? ? nil : cell
       end
 

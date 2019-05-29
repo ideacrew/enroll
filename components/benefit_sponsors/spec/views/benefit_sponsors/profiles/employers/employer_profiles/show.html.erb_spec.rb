@@ -23,7 +23,6 @@ RSpec.describe "views/benefit_sponsors/profiles/employers/employer_profiles/_sho
     @employer_profile = employer_profile
     assign(:census_employees, [census_employee1, census_employee2, census_employee3])
     sign_in user
-    allow(view).to receive(:benefit_sponsor_display_families_tab).and_return(false)
     allow(view).to receive(:employer_attestation_is_enabled?).and_return(false)
   end
 

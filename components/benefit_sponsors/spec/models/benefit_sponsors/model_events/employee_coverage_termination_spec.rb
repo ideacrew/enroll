@@ -16,10 +16,13 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeCoverageTermination', dbcl
                                   application_period: (start_on.beginning_of_year..start_on.end_of_year))
                                 }
   let!(:benefit_application) {
-    application = FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, :with_benefit_package,
-      benefit_sponsorship: benefit_sponsorship, 
-      effective_period: start_on..start_on.next_year.prev_day, 
-      open_enrollment_period: open_enrollment_start_on..open_enrollment_start_on+20.days)
+    application = FactoryGirl.create(
+      :benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, :with_benefit_package,
+      benefit_sponsorship: benefit_sponsorship,
+      aasm_state: "active",
+      effective_period: start_on..start_on.next_year.prev_day,
+      open_enrollment_period: open_enrollment_start_on..(open_enrollment_start_on + 20.days)
+    )
     application.benefit_sponsor_catalog.save!
     application
   }

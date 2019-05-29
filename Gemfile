@@ -23,6 +23,7 @@ gem 'devise', '>= 3.5.4'
 gem 'effective_datatables', path: './project_gems/effective_datatables-2.6.14'
 gem 'haml'
 gem 'httparty'
+gem 'i18n', '0.7.0'
 gem 'interactor', '3.1.0'
 gem 'interactor-rails', '2.0.2'
 gem 'jbuilder', '~> 2.0'
@@ -104,12 +105,14 @@ group :development do
   gem "certified"
   gem 'overcommit'
   gem 'rubocop', "0.54.0", require: false
+  gem 'rubocop-git'
   gem 'web-console', '2.3.0'
 end
 
 group :development, :test do
   gem 'capistrano', '3.3.5'
   gem 'capistrano-rails', '1.1.6'
+  gem 'climate_control', '0.2.0'
   gem 'email_spec', '2.0.0'
   gem 'factory_girl_rails', '4.6.0'
   gem 'forgery'

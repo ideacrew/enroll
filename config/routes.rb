@@ -97,6 +97,7 @@ Rails.application.routes.draw do
         get :employer_datatable
         post :employer_invoice_datatable
         post :generate_invoice
+        get :edit_force_publish
         post :force_publish
         get :broker_agency_index
         get :general_agency_index if Settings.aca.general_agency_enabled
@@ -147,6 +148,15 @@ Rails.application.routes.draw do
       # resources :hbx_staff_roles, shallow: true do
       resources :hbx_staff_roles do
         # root 'hbx_profiles/hbx_staff_roles#show'
+      end
+    end
+
+    resources :employer_applications do
+      put :terminate
+      put :cancel
+      put :reinstate
+      collection do
+        get :get_term_reasons
       end
     end
 
