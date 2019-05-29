@@ -1,6 +1,39 @@
 require 'services/checkbook_services/plan_comparision.rb'
 
 class CensusEmployee < CensusMember
+  # An instance of the CensusEmployee is an employee that belongs to a Benefit Sponsor. 
+  # It is the primary way for us to refer to the employee of an employer. 
+  # This is different from a person, though it references the person through the employee_role model
+  # Dependents of the census employee (CensusDependents) are embedded in the CensusEmployee 
+  # Embeded document BenefitGroupAssignment is the model responsible for connecting the CensusEmployee with the approriate coverage
+
+#                          ,------------------.                        ,------.   
+#                          |BenefitSponsorship|                        |person|   
+#                          |------------------|                        |------|   
+#                          |------------------|                        |------|   
+#                          `------------------'                        `------'   
+#                            |                |                             |      
+#                            |                |                             |      
+#,------------------------------------.       |                             |      
+#|CensusEmployee                      |  ,---------------------.   ,------------.
+#|------------------------------------|  |BenefitCoveragePeriod|   |EmployeeRole|
+#|benefit_sponsors_employer_profile_id|  |---------------------|   |------------|
+#|employee_role_id                    |  |---------------------|   |------------|
+#|------------------------------------|  `---------------------'   `------------'
+#`------------------------------------'       |                            |       
+#               |                   |_________|____________________________|          
+#               |                             |           
+#,----------------------.     ,--------------.                       
+#|BenefitGroupAssignment|     |BenefitPackage|                       
+#|----------------------|     |--------------|                       
+#|----------------------|-----|--------------|                       
+#`----------------------'     `--------------'                       
+                                        
+                   
+
+
+
+
   include AASM
   include Sortable
   include Searchable
@@ -15,6 +48,8 @@ class CensusEmployee < CensusMember
   include Ssn
 
   require 'roo'
+
+  # Groupings for the potential AASM states for Census Employees
 
   EMPLOYMENT_ACTIVE_STATES = %w(eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked cobra_eligible cobra_linked cobra_termination_pending)
   EMPLOYMENT_TERMINATED_STATES = %w(employment_terminated cobra_terminated rehired)
@@ -49,6 +84,7 @@ class CensusEmployee < CensusMember
     cascade_callbacks: true,
     validate: true
 
+  
   embeds_many :benefit_group_assignments,
     cascade_callbacks: true,
     validate: true
@@ -249,17 +285,6 @@ class CensusEmployee < CensusMember
     self.employment_terminated_on.next_month.beginning_of_month
   end
 
-  # def employer_profile=(new_employer_profile)
-  #   raise ArgumentError.new("expected EmployerProfile") unless new_employer_profile.is_a?(EmployerProfile)
-  #   self.employer_profile_id = new_employer_profile._id
-  #   @employer_profile = new_employer_profile
-  # end
-
-  # def employer_profile
-  #   return @employer_profile if defined? @employer_profile
-  #   @employer_profile = EmployerProfile.find(self.employer_profile_id) unless self.employer_profile_id.blank?
-  # end
-
   def is_case_old?(employer_profile=nil)
     employer_profile = employer_profile || self.employer_profile
     employer_profile.present? && employer_profile.is_a?(EmployerProfile)
@@ -360,15 +385,6 @@ class CensusEmployee < CensusMember
     result << renewal_benefit_group_assignment if !renewal_benefit_group_assignment.nil?
     result
   end
-
-  # def add_default_benefit_group_assignment # Deprecated
-  #   if plan_year = (self.employer_profile.plan_years.published_plan_years_by_date(hired_on).first || self.employer_profile.published_plan_year)
-  #     add_benefit_group_assignment(plan_year.benefit_groups.first)
-  #     if self.employer_profile.renewing_plan_year.present?
-  #       add_renew_benefit_group_assignment(self.employer_profile.renewing_plan_year.benefit_groups.first)
-  #     end
-  #   end
-  # end
 
   def active_benefit_package
     if active_benefit_group_assignment.present?
@@ -542,24 +558,6 @@ class CensusEmployee < CensusMember
   def employee_relationship
     "employee"
   end
-
-  # Deprecated
-  # def assign_benefit_packages(benefit_group_id: nil, renewal_benefit_group_id: nil)
-    # if benefit_group_id.present?
-    #   benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(benefit_group_id))
-
-    #   if active_benefit_group_assignment.blank? || (active_benefit_group_assignment.benefit_group_id != benefit_group.id)
-    #     find_or_create_benefit_group_assignment([benefit_group])
-    #   end
-    # end
-
-    # if renewal_benefit_group_id.present?
-    #   benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(renewal_benefit_group_id))
-    #   if renewal_benefit_group_assignment.blank? || (renewal_benefit_group_assignment.benefit_group_id != benefit_group.id)
-    #     add_renew_benefit_group_assignment(benefit_group)
-    #   end
-    # end
-  # end
 
   def assign_benefit_packages
     return true if is_case_old?
