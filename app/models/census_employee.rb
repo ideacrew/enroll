@@ -1,4 +1,4 @@
-require 'services/checkbook_services'
+require 'services/checkbook_services/plan_comparision.rb'
 
 class CensusEmployee < CensusMember
   include AASM
