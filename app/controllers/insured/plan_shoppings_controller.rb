@@ -196,7 +196,7 @@ class Insured::PlanShoppingsController < ApplicationController
     end
 
     if params[:market_kind] == 'shop' && plan_match_dc
-      is_congress_employee = @hbx_enrollment.benefit_group.is_congress
+      is_congress_employee = @hbx_enrollment.benefit_group.is_congress # toDo
       @dc_checkbook_url = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment, is_congress_employee).generate_url
     elsif @hbx_enrollment.kind == "individual"
       if @hbx_enrollment.effective_on.year == Settings.checkbook_services.current_year
@@ -217,7 +217,8 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def plan_selection_callback
-    selected_plan = Plan.where(:hios_id => params[:hios_id], active_year: Settings.checkbook_services.current_year).first
+    selected_plan = BenefitMarkets::Products::Product.where(:"hios_id" => params[:hios_id], :"application_period.min" => Date.new(Settings.checkbook_services.current_year, 1, 1)).first
+    # selected_plan = Plan.where(:hios_id => params[:hios_id], active_year: Settings.checkbook_services.current_year).first
     if selected_plan.present?
       redirect_to thankyou_insured_plan_shopping_path({plan_id: selected_plan.id.to_s, id: params[:id],coverage_kind: params[:coverage_kind], market_kind: params[:market_kind], change_plan: params[:change_plan]})
     else
