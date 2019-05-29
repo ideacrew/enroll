@@ -17,11 +17,11 @@ module BrokerAgencyWorld
   end
 
   def broker_role
-    @broker_role = FactoryBot.build(:broker_role)
+    @broker_role = FactoryBot.create(:broker_role)
   end
 
   def assign_broker_agency_account
-    employer_profile.benefit_sponsorships << broker_agency_account
+    employer_profile.benefit_sponsorships.first.broker_agency_accounts << broker_agency_account
     employer_profile.organization.save!
   end
 
@@ -35,7 +35,7 @@ module BrokerAgencyWorld
   end
 
   def create_broker_agency
-    person = FactoryBot.create(:person)
+    person = FactoryBot.create(:person, :with_work_email)
     @person2 = FactoryBot.create(:person, first_name: 'staff', last_name: 'member')
     FactoryBot.create(:user, person: @person2)
     @user ||= User.create(email: 'hbx_admin_role@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: 'hbx_admin_role@dc.gov', person: person)
@@ -47,6 +47,16 @@ module BrokerAgencyWorld
     broker_agency_staff_role = FactoryBot.build(:broker_agency_staff_role, broker_agency_profile_id: @broker_agency_profile.id)
     person.broker_agency_staff_roles << broker_agency_staff_role
   end
+
+  def plan_design_organization
+    @plan_design_organization ||= FactoryBot.create(:sponsored_benefits_plan_design_organization,
+    owner_profile_id: broker_agency_profile.id,
+    sponsor_profile_id: employer_profile.id)
+  end
+end
+
+def has_active_broker_relationship
+  plan_design_organization.update_attributes!(has_active_broker_relationship: true)
 end
 
 World(BrokerAgencyWorld)
@@ -56,8 +66,18 @@ Given(/^there is a Broker (.*?)$/) do |legal_name|
              dba: legal_name
 end
 
+Given(/^there is a Broker$/) do
+  broker_organization
+end
+
 And(/^the broker is assigned to a broker agency$/) do
   assign_person_to_broker_agency
+end
+
+And(/^the broker is assigned to the employer$/) do
+  plan_design_organization
+  has_active_broker_relationship
+  assign_broker_agency_account
 end
 
 And(/^Hbx Admin is on Broker Index of the Admin Dashboard$/) do

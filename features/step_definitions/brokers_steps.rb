@@ -141,6 +141,11 @@ Then(/^.+ should see the broker successfully approved message$/) do
   expect(page).to have_content('Broker applicant approved successfully.')
 end
 
+When(/^(.*?) go[es]+ to the brokers tab$/) do |legal_name|
+  profile = @organization[legal_name].employer_profile
+  visit  benefit_sponsors.profiles_employers_employer_profile_path(profile.id, :tab=>'brokers')
+end
+
 And(/^.+ should receive an invitation email$/) do
   open_email(
     "ricky.martin@example.com",
@@ -200,13 +205,13 @@ end
 When(/^.+ searches broker agency by name$/) do
   find('.broker_agencies_search')
 
-  fill_in 'q', with: 'Logistics'
+  fill_in 'q', with: 'First Legal Name'
 
   find('.search-wp .btn').click
 end
 
 Then(/^.+ should see broker agency$/) do
-  expect(page).to have_content('Logistics Inc')
+  expect(page).to have_content('First Legal Name')
 end
 
 Then(/^.+ clicks? select broker button$/) do
@@ -229,8 +234,8 @@ Then(/^.+ should see broker selected successful message$/) do
 end
 
 And (/^.+ should see broker active for the employer$/) do
-  expect(page).to have_content('Logistics Inc')
-  expect(page).to have_content(/RICKY MARTIN/i)
+  expect(page).to have_content('First Legal Name')
+  expect(page).to have_content(/john smith/i)
 end
 
 When(/^.+ terminates broker$/) do
@@ -246,7 +251,7 @@ Then(/^.+ should see broker terminated message$/) do
 end
 
 Then(/^.+ should see Employer and click on legal name$/) do
-  click_link 'Legal LLC'
+  click_link 'ABC Widgets'
 end
 
 Then(/^.+ should see the Employer Profile page as Broker$/) do
