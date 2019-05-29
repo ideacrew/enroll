@@ -13,9 +13,7 @@ class PremiumPayment
   # Payment instrument
   field :method_kind, type: String
 
-  # For Payment by check
-
-  # Confirmation ID or similar
+  # Confirmation ID or similar 
   field :reference_id, type: String
 
   # Network reference to the payment document

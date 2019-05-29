@@ -85,22 +85,17 @@ RSpec.describe Employers::EmployerProfilesController do
     ) }
     let(:person) { double("person", :employer_staff_roles => [employer_staff_role]) }
     let(:employer_staff_role) { double(:employer_profile_id => employer_profile.id) }
-
+    
     let(:benefit_group)     { FactoryGirl.build(:benefit_group)}
     let(:plan_year)         { FactoryGirl.create(:plan_year, benefit_groups: [benefit_group]) }
     let(:employer_profile) { plan_year.employer_profile}
 
     let(:policy) {double("policy")}
-    let(:nfp_response) {double("response")}
     before(:each) do
       allow(::AccessPolicies::EmployerProfile).to receive(:new).and_return(policy)
       allow(policy).to receive(:is_broker_for_employer?).and_return(false)
       allow(policy).to receive(:authorize_show).and_return(true)
       allow(user).to receive(:last_portal_visited=).and_return("true")
-      # allow(NfpIntegration::SoapServices::Nfp).to receive(:new).and_return(nfp_response)
-      # allow(nfp_response).to receive(:display_token).and_return(false)
-      # allow(nfp_response).to receive(:payment_history).and_return(false)
-      # allow(nfp_response).to receive(:statement_summary).and_return(false)
       employer_profile.plan_years = [plan_year]
       sign_in(user)
     end
@@ -212,7 +207,7 @@ RSpec.describe Employers::EmployerProfilesController do
   describe "GET show" do
     let(:user) { FactoryGirl.create(:user) }
     let(:person){ FactoryGirl.create(:person) }
-    let(:employer_profile) {instance_double("EmployerProfile", id: double("id"), hbx_id: double("1234"))}
+    let(:employer_profile) {instance_double("EmployerProfile", id: double("id"))}
     let(:hbx_enrollment) {
       instance_double("HbxEnrollment",
         total_premium: 345,
@@ -228,7 +223,6 @@ RSpec.describe Employers::EmployerProfilesController do
     }
 
     let(:policy) {double("policy")}
-    let(:nfp_response) {double("response")}
 
     context "it should return published plan year " do
       let(:broker_agency_account) { FactoryGirl.build_stubbed(:broker_agency_account) }
@@ -242,13 +236,8 @@ RSpec.describe Employers::EmployerProfilesController do
         allow(employer_profile).to receive(:show_plan_year).and_return(plan_year)
         allow(employer_profile).to receive(:enrollments_for_billing).and_return([hbx_enrollment])
         allow(employer_profile).to receive(:broker_agency_accounts).and_return([broker_agency_account])
-        allow(employer_profile).to receive(:staff_roles).and_return([])
         allow(employer_profile).to receive(:active_broker_agency_account).and_return(broker_agency_account)
         allow(employer_profile).to receive_message_chain(:organization ,:documents).and_return([])
-        # allow(NfpIntegration::SoapServices::Nfp).to receive(:new).and_return(nfp_response)
-        # allow(nfp_response).to receive(:display_token).and_return(false)
-        # allow(nfp_response).to receive(:payment_history).and_return(false)
-        # allow(nfp_response).to receive(:statement_summary).and_return(false)
         sign_in(user)
       end
 
@@ -477,12 +466,12 @@ RSpec.describe Employers::EmployerProfilesController do
       @user = FactoryGirl.create(:user)
       p=FactoryGirl.create(:person, user: @user)
       @hbx_staff_role = FactoryGirl.create(:hbx_staff_role, person: p)
-
+      
 
       allow(@user).to receive(:switch_to_idp!)
       allow(Forms::EmployerProfile).to receive(:new).and_return(organization)
       allow(organization).to receive(:save).and_return(save_result)
-
+      
     end
 
     describe 'updateable organization' do
@@ -524,7 +513,7 @@ RSpec.describe Employers::EmployerProfilesController do
         sign_in @user
         post :create, :organization => organization_params
       end
-
+      
 
       describe "given a valid employer profile" do
         let(:save_result) { true }
@@ -552,11 +541,11 @@ RSpec.describe Employers::EmployerProfilesController do
     before(:each) do
       @user = FactoryGirl.create(:user)
       p=FactoryGirl.create(:person, user: @user)
-      @hbx_staff_role = FactoryGirl.create(:hbx_staff_role, person: p)
+      @hbx_staff_role = FactoryGirl.create(:hbx_staff_role, person: p)    
       allow(@hbx_staff_role).to receive_message_chain('permission.modify_employer').and_return(true)
       sign_in @user
       allow(Forms::EmployerProfile).to receive(:new).and_return(found_employer)
-
+      
       allow(@user).to receive(:switch_to_idp!)
       post :create, :organization => employer_parameters
     end
