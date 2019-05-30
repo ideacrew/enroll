@@ -244,7 +244,16 @@ RSpec.describe TaxHousehold, type: :model do
     let(:eligibility_determination) {EligibilityDetermination.new(csr_eligibility_kind: 'csr_87', determined_on: TimeKeeper.date_of_record)}
     let(:tax_household_member1) {double(is_ia_eligible?: true, age_on_effective_date: 28, applicant_id: 'tax_member1')}
     let(:tax_household_member2) {double(is_ia_eligible?: true, age_on_effective_date: 26, applicant_id: 'tax_member2')}
-    let(:tax_household) {TaxHousehold.new}
+    let(:tax_household) do
+      tax_household = TaxHousehold.new
+      tax_household.tax_household_members.build(is_ia_eligible: true, applicant_id: 'tax_member1')
+      tax_household.tax_household_members.build(is_ia_eligible: true, applicant_id: 'tax_member2')
+      tax_household
+    end
+
+    before do
+      allow(tax_household).to receive(:eligibility_determinations).and_return([eligibility_determination])
+    end
 
     it "should equal to the csr_kind of latest_eligibility_determination" do
       tax_household.eligibility_determinations = [eligibility_determination]
