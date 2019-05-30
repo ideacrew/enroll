@@ -39,10 +39,9 @@ def matching_plan_details(enrollment, other_hbx_enrollment, product_cache)
   return false if other_hbx_enrollment.product_id.blank?
   new_plan = product_cache[enrollment.product_id]
   old_plan = product_cache[other_hbx_enrollment.product_id]
-  return false if old_plan.kind == :dental && old_plan.active_year == 2018
- (old_plan.issuer_profile_id == new_plan.issuer_profile_id) && (old_plan.active_year == new_plan.active_year - 1) && (old_plan.kind == new_plan.kind)
+  (old_plan.issuer_profile_id == new_plan.issuer_profile_id) &&
+    (old_plan.active_year == new_plan.active_year - 1)
 end
-
 
 def initial_or_renewal(enrollment,product_cache,predecessor_id)
   return "initial" if predecessor_id.blank?
