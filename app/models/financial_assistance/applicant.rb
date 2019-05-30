@@ -524,7 +524,7 @@ class FinancialAssistance::Applicant
   def admin_verification_action(action, v_type, update_reason)
     if action == "verify"
       update_verification_type(v_type, update_reason)
-    elsif action == "reject"
+    elsif action == "return_for_deficiency"
       return_doc_for_deficiency(v_type, update_reason)
     end
   end

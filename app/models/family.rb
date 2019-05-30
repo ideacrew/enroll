@@ -1329,10 +1329,6 @@ class Family
     self.active_family_members.select { |member| member if member.person.is_resident_role_active? }
   end
 
-  def faa_applicants
-    active_approved_application.active_applicants if active_approved_application.present?
-  end
-
   def update_family_document_status!
     update_attributes(vlp_documents_status: self.all_persons_vlp_documents_status)
   end
