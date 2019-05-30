@@ -47,7 +47,7 @@ class TaxHousehold
     csr_kind = latest_eligibility_determination.csr_eligibility_kind
     shopping_family_member_ids = hbx_enrollment.hbx_enrollment_members.map(&:applicant_id)
     ia_eligible = tax_household_members.where(:applicant_id.in => shopping_family_member_ids).map(&:is_ia_eligible)
-    ia_eligible.empty? && ia_eligible.include?(false) ? "csr_100" : csr_kind
+    ia_eligible.empty? || ia_eligible.include?(false) ? "csr_100" : csr_kind
   end
 
   def current_csr_percent

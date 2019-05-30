@@ -113,7 +113,7 @@ describe Services::CheckbookServices::PlanComparision do
     let!(:ivl_ed)           { FactoryBot.create(:eligibility_determination, tax_household: ivl_tax_household) }
     let!(:thh_start_on)     { ivl_tax_household.effective_starting_on }
     let!(:ivl_enrollment)   { FactoryBot.create(:hbx_enrollment, effective_on: thh_start_on, kind: 'individual', household: ivl_household, consumer_role_id: ivl_person.consumer_role.id.to_s) }
-    let!(:ivl_enr_member)   { FactoryBot.create(:hbx_enrollment_member, applicant_id: primary_fm_id, hbx_enrollment: ivl_enrollment) }
+    let!(:ivl_enr_member)   { FactoryBot.create(:hbx_enrollment_member, applicant_id: primary_fm_id, hbx_enrollment: ivl_enrollment, eligibility_date: thh_start_on) }
     let!(:ivl_thhm)         { ivl_tax_household.tax_household_members << TaxHouseholdMember.new(applicant_id: primary_fm_id, is_ia_eligible: true) }
 
     subject { ::Services::CheckbookServices::PlanComparision.new(ivl_enrollment,false) }
@@ -130,7 +130,7 @@ describe Services::CheckbookServices::PlanComparision do
 
     context 'when at least one of the members are aptc ineligible' do
       let!(:ivl_thhm1)          { ivl_tax_household.tax_household_members << TaxHouseholdMember.new(applicant_id: dependent_fm_id, is_medicaid_chip_eligible: true) }
-      let!(:ivl_enr_member1)    { FactoryBot.create(:hbx_enrollment_member, applicant_id: dependent_fm_id, hbx_enrollment: ivl_enrollment, is_subscriber: false) }
+      let!(:ivl_enr_member1)    { FactoryBot.create(:hbx_enrollment_member, applicant_id: dependent_fm_id, hbx_enrollment: ivl_enrollment, is_subscriber: false, eligibility_date: thh_start_on) }
 
       it 'should return -01' do
         expect(subject.csr_value).to eq '-01'
