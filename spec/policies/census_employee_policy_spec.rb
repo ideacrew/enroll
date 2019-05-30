@@ -6,6 +6,8 @@ describe CensusEmployeePolicy do
   let(:person) { FactoryGirl.create(:person) }
   let(:admin_person) { FactoryGirl.create(:person, :with_hbx_staff_role) }
   let(:broker_person) { FactoryGirl.create(:person, :with_broker_role) }
+  let(:employer_staff_person) {FactoryGirl.create(:person,:with_employer_staff_role)}
+  let(:general_agency_person) {FactoryGril.create(:person,:with_general_agency_staff_role)}
 
   before do 
     allow_any_instance_of(CensusEmployee).to receive(:generate_and_deliver_checkbook_url).and_return(true)
@@ -219,6 +221,8 @@ describe CensusEmployeePolicy do
         end
       end
     end
+
+
     context "when is general agency user", dbclean: :after_each do
       let(:user) { FactoryGirl.create(:user, :general_agency_staff, person: person) }
       context "current user is broker of employer_profile" do
@@ -356,7 +360,7 @@ describe CensusEmployeePolicy do
           before :each do
             allow(person).to receive(:employer_staff_roles).and_return employer_staff_roles
             allow(user).to receive(:person).and_return person
-            allow(employee).to receive(:employer_profile).and_return employer_profile
+            allow(employer_staff_role).to receive(:active).and_return true
           end
           it "denies access when employee is not staff of current user" do
             expect(subject).not_to permit(user, employee)

@@ -193,15 +193,14 @@ RSpec.describe Employers::CensusEmployeesController do
   end
 
   describe "GET show" do
-    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
-    let(:user) { FactoryGirl.create(:user, :employer_staff) }
+    let(:user) { FactoryGirl.create(:user, :hbx_staff) }
      it "should be render show template" do
       sign_in @user
 
-      allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
+      allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(census_employee.employer_profile_id)
       allow(CensusEmployee).to receive(:find).and_return(census_employee)
-
-      get :show, :id => census_employee.id, :employer_profile_id => employer_profile_id
+      allow(controller).to receive(:authorize).and_return(true)
+      get :show, :id => census_employee.id, :employer_profile_id => census_employee.employer_profile_id
       expect(response).to render_template("show")
     end
 
