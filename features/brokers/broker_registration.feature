@@ -12,7 +12,7 @@ Feature: Broker Agency Registration
 
     Given Hbx Admin exists
     When Hbx Admin logs on to the Hbx Portal
-    And Hbx Admin clicks on the Brokers tab
+    And Hbx Admin is on Broker Index of the Admin Dashboard
     Then Hbx Admin is on Broker Index and clicks Broker Applicants
     When Hbx Admin the clicks on current broker applicant show button
     Then Hbx Admin should see the broker application with carrier appointments
