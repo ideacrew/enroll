@@ -67,20 +67,6 @@ module BenefitMarkets
       scope :platinum_plans,      ->{ where(metal_level_kind: :platinum) }
       scope :catastrophic_plans,  ->{ where(metal_level_kind: :catastrophic) }
 
-      scope :ivl_products_health_by_csr_kind_with_catastrophic, lambda {
-        where('$and' => [{:benefit_market_kind => :aca_individual, :kind => :health},
-                         {'$or' => [{:metal_level_kind.in => [:platinum, :gold, :bronze, :catastrophic], :csr_variant_id => '01'},
-                                    {:metal_level_kind => :silver, :csr_variant_id => '01'}]}])
-      }
-
-      scope :with_premium_tables, ->{ where(:premium_tables.exists => true) }
-
-      #TODO: for dental, csr-health
-      scope :individual_products, ->{ ivl_products_health_by_csr_kind_with_catastrophic.with_premium_tables }
-
-      scope :by_product_ids, ->(product_ids) { where(:id => {"$in" => product_ids}) }
-
-
       validates :health_plan_kind,
                 presence: true,
                 inclusion: {in: HEALTH_PLAN_MAP.keys, message: "%{value} is not a valid health product kind"}

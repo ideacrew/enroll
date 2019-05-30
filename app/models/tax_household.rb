@@ -87,7 +87,8 @@ class TaxHousehold
     benchmark_member_cost_hash = {}
     aptc_members.each do |member|
       #TODO use which date to calculate premiums by slcp
-      premium = slcsp.premium_for(effective_starting_on, member.age_on_effective_date)
+      product = product_factory.new({product_id: slcsp.id})
+      premium = product.cost_for(effective_starting_on, member.age_on_effective_date)
       benchmark_member_cost_hash[member.applicant_id.to_s] = premium
     end
 
@@ -149,7 +150,7 @@ class TaxHousehold
     hbx_enrollment.hbx_enrollment_members.each do |enrollment_member|
       given_aptc = (aptc_available_amount_by_member[enrollment_member.applicant_id.to_s] || 0) * elected_pct
       ehb_premium = decorated_plan.premium_for(enrollment_member) * plan.ehb
-      if plan.coverage_kind == "dental"
+      if plan.kind == 'dental'
         aptc_available_amount_hash_for_enrollment[enrollment_member.applicant_id.to_s] = 0
       else
         aptc_available_amount_hash_for_enrollment[enrollment_member.applicant_id.to_s] = [given_aptc, ehb_premium].min
@@ -198,5 +199,11 @@ class TaxHousehold
     tax_household_members.detect do |tax_household_member|
       tax_household_member.is_subscriber == true
     end
+  end
+
+  private
+
+  def product_factory
+    ::BenefitMarkets::Products::ProductFactory
   end
 end
