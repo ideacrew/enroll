@@ -17,6 +17,8 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       assign(:max_total_employee_cost, 1000)
       assign(:max_deductible, 998)
       assign(:hbx_enrollment, hbx_enrollment)
+      assign(:market_kind, 'shop')
+      assign(:coverage_kind, 'health')
       allow(benefit_group).to receive(:plan_option_kind).and_return("single_carrier")
       allow(view).to receive(:offers_nationwide_plans?).and_return(offers_nationwide_plans)
       allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
@@ -25,7 +27,6 @@ RSpec.describe "insured/_plan_filters.html.erb" do
 
     it 'should display find your doctor link' do
       expect(rendered).to have_selector('a', text: /estimate your costs/i)
-      expect(rendered).to have_selector("a[href='https://dc.checkbookhealth.org/hie/dc/#{hbx_enrollment.plan.active_year}/']")
     end
 
     it 'should display filter selections' do
