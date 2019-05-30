@@ -3,6 +3,10 @@ require "rails_helper"
 RSpec.describe "insured/_plan_filters.html.erb" do
   let(:benefit_group){ double("BenefitGroup") }
   let(:hbx_enrollment) { FactoryBot.build_stubbed(:hbx_enrollment) }
+  before do
+    assign(:dc_individual_checkbook_url, "http://checkbook_url")
+    assign(:dc_checkbook_url, "http://checkbook_url")
+  end
   context "without consumer_role" do
     let(:offers_nationwide_plans) { true }
     let(:person) {double(is_consumer_role_active?: false)}
