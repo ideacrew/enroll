@@ -287,6 +287,30 @@ RSpec.describe VerificationHelper, :type => :helper do
     end
   end
 
+  describe '#verification_types' do
+    include_examples 'draft application with 2 applicants'
+
+    before do
+      allow_any_instance_of(FinancialAssistance::Application).to receive(:is_application_valid?).and_return(true)
+      application.submit!
+    end
+
+    context 'family member present on application' do
+
+      it 'should return income and mec verifications' do
+        expect(helper.verification_types(second_applicant.family_member).count).to eq 5
+        expect(helper.verification_types(second_applicant.family_member).map(&:type_name)).to include('Income')
+      end
+    end
+
+    context 'family member not present on application' do
+      it 'should not return income and mec verification types' do
+        expect(helper.verification_types(family_member_not_on_application).count).to eq 3
+        expect(helper.verification_types(family_member_not_on_application).map(&:type_name)).not_to include('Income')
+      end
+    end
+  end
+
   describe '#get_person_v_type_status' do
     let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
@@ -426,7 +450,7 @@ RSpec.describe VerificationHelper, :type => :helper do
   end
 
   describe "#build_admin_actions_list" do
-    shared_examples_for "admin actions dropdown list" do |type, status, state, actions|
+    shared_examples_for "admin actions dropdown list" do |status, state, actions|
       before do
         allow(helper).to receive(:verification_type_status).and_return status
       end
@@ -436,14 +460,14 @@ RSpec.describe VerificationHelper, :type => :helper do
       end
     end
 
-    it_behaves_like "admin actions dropdown list", "Citizenship", "outstanding","unverified", ["Verify","Reject", "View History", "Extend"]
-    it_behaves_like "admin actions dropdown list", "Citizenship", "verified","unverified", ["Verify", "Reject", "View History", "Extend"]
-    it_behaves_like "admin actions dropdown list", "Citizenship", "verified","verification_outstanding", ["Verify", "Reject", "View History", "Call HUB", "Extend"]
-    it_behaves_like "admin actions dropdown list", "Citizenship", "in review","unverified", ["Verify", "Reject", "View History", "Extend"]
-    it_behaves_like "admin actions dropdown list", "Citizenship", "outstanding","verification_outstanding", ["Verify", "View History", "Call HUB", "Extend"]
-    it_behaves_like "admin actions dropdown list", "DC Residency", "attested", "unverified",["Verify", "Reject", "View History", "Extend"]
-    it_behaves_like "admin actions dropdown list", "DC Residency", "outstanding", "verification_outstanding",["Verify", "View History", "Call HUB", "Extend"]
-    it_behaves_like "admin actions dropdown list", "DC Residency", "in review","verification_outstanding", ["Verify", "Reject", "View History", "Call HUB", "Extend"]
+    it_behaves_like "admin actions dropdown list", "outstanding","unverified", ["Verify","Reject", "View History", "Extend"]
+    it_behaves_like "admin actions dropdown list", "verified","unverified", ["Verify", "Reject", "View History", "Extend"]
+    it_behaves_like "admin actions dropdown list", "verified","verification_outstanding", ["Verify", "Reject", "View History", "Call HUB", "Extend"]
+    it_behaves_like "admin actions dropdown list", "in review","unverified", ["Verify", "Reject", "View History", "Extend"]
+    it_behaves_like "admin actions dropdown list", "outstanding","verification_outstanding", ["Verify", "View History", "Call HUB", "Extend"]
+    it_behaves_like "admin actions dropdown list", "attested", "unverified",["Verify", "Reject", "View History", "Extend"]
+    it_behaves_like "admin actions dropdown list", "outstanding", "verification_outstanding",["Verify", "View History", "Call HUB", "Extend"]
+    it_behaves_like "admin actions dropdown list", "in review","verification_outstanding", ["Verify", "Reject", "View History", "Call HUB", "Extend"]
   end
 
   describe "#request response details" do

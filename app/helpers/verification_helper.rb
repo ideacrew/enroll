@@ -214,6 +214,9 @@ module VerificationHelper
   end
 
   def build_admin_actions_list(v_type, f_member)
+    #TODO: need to refactor this
+    faa_verification = ::VerificationType::ASSISTED_VERIFICATION_TYPES.include?(v_type.type_name)
+    ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject!{ |el| el =~ /call hub|extend/i} if faa_verification
     if f_member.consumer_role.aasm_state == 'unverified'
       ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{ |el| el == 'Call HUB' }
     elsif verification_type_status(v_type, f_member) == 'outstanding'
@@ -301,5 +304,10 @@ module VerificationHelper
 
   def has_active_resident_dependent?(person,dependent)
     (dependent.try(:family_member).try(:person).nil? || dependent.try(:family_member).try(:person).is_resident_role_active?)
+  end
+
+  def verification_types(f_member)
+    application = f_member.application_for_verifications
+    f_member.person.verification_types.active + (application ? f_member.applicant_of_application(application).verification_types : [])
   end
 end

@@ -21,7 +21,7 @@ RSpec.describe DocumentsController, :type => :controller do
   describe "destroy" do
     before :each do
       person.verification_types.each{|type| type.vlp_documents << document}
-      delete :destroy, person_id: person.id, id: document.id, verification_type: citizenship_type.id
+      delete :destroy, person_id: person.id, family_member_id: family.primary_applicant.id, id: document.id, verification_type: citizenship_type.id
     end
     it "redirects_to verification page" do
       expect(response).to redirect_to verification_insured_families_path
@@ -39,7 +39,7 @@ RSpec.describe DocumentsController, :type => :controller do
     end
     context 'Call Hub for SSA verification' do
       it 'should redirect if verification type is SSN or Citozenship' do
-        post :fed_hub_request, verification_type: ssn_type.id, person_id: person.id, id: document.id
+        post :fed_hub_request, verification_type: ssn_type.id, person_id: person.id, id: document.id, family_member_id: family.primary_applicant.id
         expect(response).to redirect_to :back
         expect(flash[:success]).to eq('Request was sent to FedHub.')
       end
@@ -47,7 +47,7 @@ RSpec.describe DocumentsController, :type => :controller do
     context 'Call Hub for Residency verification' do
       it 'should redirect if verification type is Residency' do
         person.consumer_role.update_attributes(aasm_state: 'verification_outstanding')
-        post :fed_hub_request, verification_type: dc_type.id, person_id: person.id, id: document.id
+        post :fed_hub_request, verification_type: dc_type.id, person_id: person.id, id: document.id, family_member_id: family.primary_applicant.id
         expect(response).to redirect_to :back
         expect(flash[:success]).to eq('Request was sent to Local Residency.')
       end
@@ -74,7 +74,8 @@ RSpec.describe DocumentsController, :type => :controller do
         post :update_verification_type, { person_id: person.id,
                                           verification_type: send(type).id,
                                           verification_reason: reason,
-                                          admin_action: admin_action}
+                                          admin_action: admin_action,
+                                          family_member_id: family.primary_applicant.id}
         person.reload
         if attribute == "validation"
           expect(person.verification_types.find(send(type).id).validation_status).to eq(result)
@@ -106,7 +107,7 @@ RSpec.describe DocumentsController, :type => :controller do
     end
 
     it 'updates verification type if verification reason is expired' do
-      params = { person_id: person.id, verification_type: citizenship_type.id, verification_reason: 'Expired', admin_action: 'return_for_deficiency'}
+      params = { person_id: person.id, verification_type: citizenship_type.id, verification_reason: 'Expired', admin_action: 'return_for_deficiency', family_member_id: family.primary_applicant.id}
       put :update_verification_type, params
       person.reload
 
@@ -125,7 +126,8 @@ RSpec.describe DocumentsController, :type => :controller do
         post :update_verification_type, { person_id: person.id,
                                           verification_type: citizenship_type.id,
                                           verification_reason: "",
-                                          admin_action: "verify"}
+                                          admin_action: "verify",
+                                          family_member_id: family.primary_applicant.id}
         person.reload
         expect(person.consumer_role.lawful_presence_update_reason).to eq nil
       end

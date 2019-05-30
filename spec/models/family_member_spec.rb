@@ -29,6 +29,24 @@ describe FamilyMember, "given a person" do
   end
 end
 
+describe "application_for_verifications" do
+  include_examples 'draft application with 2 applicants'
+
+  before do
+    allow_any_instance_of(FinancialAssistance::Application).to receive(:is_application_valid?).and_return(true)
+    allow(family).to receive(:application_applicable_year).and_return application.assistance_year
+    application.submit!
+  end
+
+  it 'should return application if family member is present' do
+    expect(second_family_member.application_for_verifications).to eq application
+  end
+
+  it 'should not return application if family member is not present' do
+    expect(family_member_not_on_application.application_for_verifications).to eq nil
+  end
+end
+
 
 describe FamilyMember, "given a person" do
   let(:person) { create :person ,:with_family }
