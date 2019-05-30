@@ -177,7 +177,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
     it "when enrollment does not have change plan" do
       sign_in(user)
-      allow(enrollment).to receive(:is_special_enrollment?).and_return true
+      allow(hbx_enrollment).to receive(:is_special_enrollment?).and_return true
       get :thankyou, params: { id: "id", plan_id: "plan_id" }
       expect(assigns(:change_plan)).to eq "change_plan"
     end
@@ -196,7 +196,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
     it "when is_special_enrollment " do
       sign_in(user)
-      allow(enrollment).to receive(:is_special_enrollment?).and_return true
+      allow(hbx_enrollment).to receive(:is_special_enrollment?).and_return true
       get :thankyou, params: { id: "id", plan_id: "plan_id" }
       expect(assigns(:enrollment_kind)).to eq "sep"
     end
@@ -382,6 +382,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       allow(hbx_enrollment).to receive(:family).and_return(family)
       allow(hbx_enrollment).to receive(:coverage_kind).and_return('health')
       allow(hbx_enrollment).to receive(:sponsored_benefit).and_return(sponsored_benefit)
+      allow(hbx_enrollment).to receive(:employee_role).and_return employee_role
       allow(cost_calculator).to receive(:groups_for_products).with(products).and_return(product_groups)
       allow_any_instance_of(Insured::PlanShoppingsController).to receive(:sort_member_groups).with(product_groups).and_return(member_group)
       allow(hbx_enrollment).to receive(:product).and_return(product_1)
@@ -393,7 +394,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     context "normal" do
       before :each do
         allow(hbx_enrollment).to receive(:can_waive_enrollment?).and_return(true)
-        get :show, params: {id: "hbx_id"}
+        get :show, params: {id: "hbx_id", market_kind: "shop"}
       end
 
       it "should be success" do
@@ -530,18 +531,16 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     describe "plan_selection_callback" do
       let(:coverage_kind){"health"}
       let(:market_kind){"individual"}
-      let(:hios_id){"77422DC0110002-01"}
-      let(:person) { FactoryGirl.create(:person, :with_active_consumer_role, :with_consumer_role) }
-      let(:user)  { FactoryGirl.create(:user, person: person) }
-      let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
-      let(:plan) { FactoryGirl.create(:plan) }
-      let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, kind: 'individual', effective_on: TimeKeeper.date_of_record.beginning_of_month.to_date, plan_id: plan.id) }
+      let(:person) { FactoryBot.create(:person, :with_active_consumer_role, :with_consumer_role) }
+      let(:user)  { FactoryBot.create(:user, person: person) }
+      let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+      let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual) }
+      let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: family.active_household, kind: 'individual', effective_on: TimeKeeper.date_of_record.beginning_of_month.to_date, product_id: product.id) }
 
       context "When a callback is received" do
         before do
           sign_in user
-          allow(Plan).to receive(:where).and_return([plan])
-          get :plan_selection_callback, params: { id: hbx_enrollment.id, hios_id: hios_id, market_kind: market_kind, coverage_kind: coverage_kind }
+          get :plan_selection_callback, params: { id: hbx_enrollment.id, hios_id: product.hios_id, market_kind: market_kind, coverage_kind: coverage_kind }
         end
 
         it "should assign market kind and coverage_kind" do

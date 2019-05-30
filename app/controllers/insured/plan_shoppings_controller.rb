@@ -196,7 +196,7 @@ class Insured::PlanShoppingsController < ApplicationController
     end
 
     if params[:market_kind] == 'shop' && plan_match_dc
-      is_congress_employee = @hbx_enrollment.benefit_group.is_congress # toDo
+      is_congress_employee = nil # toDo - set this after implementing congress
       @dc_checkbook_url = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment, is_congress_employee).generate_url
     elsif @hbx_enrollment.kind == "individual"
       if @hbx_enrollment.effective_on.year == Settings.checkbook_services.current_year
