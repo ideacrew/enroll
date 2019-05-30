@@ -299,10 +299,10 @@ class ForcePublishPlanYears < MongoidMigrationTask
                 data += enrollment_details_by_coverage_kind(enrollments, coverage_kind).flatten
                 if renewal_bg_ids.present?
                   data += enrollment_details_by_coverage_kind(renewal_enrollments, coverage_kind).flatten
-                  data += find_failure_reason(renewal_enrollments, coverage_kind, '2019', employer_profile.renewing_plan_year)
+                  # data += find_failure_reason(renewal_enrollments, coverage_kind, '2019', employer_profile.renewing_plan_year)
                 else  
                   data += [nil,nil,nil,nil,nil]
-                  data += find_failure_reason(enrollments, coverage_kind, '2018', employer_profile.renewing_plan_year)
+                  # data += find_failure_reason(enrollments, coverage_kind, '2018', employer_profile.renewing_plan_year)
                 end
                 csv << data
               end
@@ -346,7 +346,7 @@ class ForcePublishPlanYears < MongoidMigrationTask
       data
     end
 
-    detail_report(start_on_date)
+    # detail_report(start_on_date)
    end
   
   
