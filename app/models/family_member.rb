@@ -154,6 +154,11 @@ class FamilyMember
     end
   end
 
+  def application_for_verifications
+    return nil unless family.applications.present?
+    family.applications.by_year(family.application_applicable_year).for_verifications.where(:"applicants.family_member_id" => id).order_by(:submitted_at => 'desc').first
+  end
+
   def applicant_of_application(application)
     return nil unless application
     application.active_applicants.where(family_member_id: self.id).first

@@ -287,11 +287,27 @@ RSpec.describe VerificationHelper, :type => :helper do
     end
   end
 
-  describe '#get_applicant_verification_types?' do
-    include_examples 'submitted application with one member and one applicant'
-    let(:applicant) {application.active_applicants.first}
-    it 'returns true the person has active consumer dependent' do
-      expect(helper.get_applicant_verification_types(applicant).present?).to eq true
+  describe '#verification_types' do
+    include_examples 'draft application with 2 applicants'
+
+    before do
+      allow_any_instance_of(FinancialAssistance::Application).to receive(:is_application_valid?).and_return(true)
+      application.submit!
+    end
+
+    context 'family member present on application' do
+
+      it 'should return income and mec verifications' do
+        expect(helper.verification_types(second_applicant.family_member).count).to eq 5
+        expect(helper.verification_types(second_applicant.family_member).map(&:type_name)).to include('Income')
+      end
+    end
+
+    context 'family member not present on application' do
+      it 'should not return income and mec verification types' do
+        expect(helper.verification_types(family_member_not_on_application).count).to eq 3
+        expect(helper.verification_types(family_member_not_on_application).map(&:type_name)).not_to include('Income')
+      end
     end
   end
 

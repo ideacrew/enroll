@@ -473,7 +473,7 @@ RSpec.describe FinancialAssistance::Applicant, type: :model, dbclean: :after_eac
     end
 
     it 'should update MEC verification type to verified' do
-      expect(applicant1.admin_verification_action("reject", mec_type, "valid user")).to eq 'MEC was rejected'
+      expect(applicant1.admin_verification_action("return_for_deficiency", mec_type, "valid user")).to eq 'MEC was rejected'
       expect(mec_type.validation_status).to eq 'outstanding'
     end
   end

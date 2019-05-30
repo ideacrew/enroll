@@ -15,15 +15,9 @@
 
 <div class="table table-sm">
   <div class="module verification-process col-md-12">
-    <%  if @applicants.present? %>
-      <% @applicants.each do |applicant| %>
-        <%= render :partial => '/insured/families/verification/ivl_verifications', locals: { f_member: applicant.family_member, verification_types: (applicant.family_member.person.verification_types.active + applicant.verification_types) } %>
-      <% end %>
-    <% else %>
       <% @family_members.each do |f_member| %>
-        <%= render :partial => '/insured/families/verification/ivl_verifications', locals: { f_member: f_member, verification_types: f_member.person.verification_types.active } %>
+        <%= render :partial => '/insured/families/verification/ivl_verifications', locals: { f_member: f_member, verification_types: verification_types(f_member) } %>
       <% end %>
-    <% end %>
   </div>
 </div>
 

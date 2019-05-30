@@ -144,7 +144,6 @@ class Insured::FamiliesController < FamiliesController
 
   def verification
     @family_members = @person.primary_family.has_active_consumer_family_members
-    @applicants = @person.primary_family.faa_applicants
     @broker_agency_profile_id = @person.broker_role.broker_agency_profile_id if @person.broker_role.present?
   end
 

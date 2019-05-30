@@ -1597,24 +1597,6 @@ describe Family, "#has_financial_assistance_verification", dbclean: :after_each 
   end
 end
 
-describe Family, "#faa_applicants", dbclean: :after_each do
-
-  context 'when determined application is present for a family' do
-    include_examples 'submitted application with one member and one applicant'
-    it 'should return applicants on the determined application' do
-      expect(family.faa_applicants.present?).to eq true
-    end
-  end
-
-  context 'when determined application is present for a family' do
-    include_examples 'setup basic models'
-    it 'should return applicants on the determined application' do
-      expect(family.faa_applicants.present?).to eq false
-    end
-  end
-
-end
-
 describe "min_verification_due_date", dbclean: :after_each do
   let!(:today) { Date.today }
   let!(:family) { create(:family, :with_primary_family_member, min_verification_due_date: 5.days.ago) }

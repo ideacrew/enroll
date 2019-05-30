@@ -149,6 +149,13 @@ RSpec.describe FinancialAssistance::Application, type: :model, dbclean: :after_e
     end
   end
 
+  describe '.Scopes' do
+    it 'should not return draft applications' do
+      expect(FinancialAssistance::Application.all.for_verifications.map(&:aasm_state)).not_to include 'draft'
+      expect(FinancialAssistance::Application.all.for_verifications.map(&:aasm_state)).to include 'determined'
+    end
+  end
+
   describe '.compute_actual_days_worked' do
     it 'returns actual working days between start_date and end_date' do
       start_date = Date.new(year, 2, 14)
