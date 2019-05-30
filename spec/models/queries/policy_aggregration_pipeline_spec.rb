@@ -41,14 +41,22 @@ describe Queries::PolicyAggregationPipeline, "Policy Queries", dbclean: :after_e
     end
 
     it 'filter_to_employers_hbx_ids' do
+      orgs = BenefitSponsors::Organizations::Organization.where(:hbx_id => {"$in" => hbx_id_list}) 
+      benefit_group_ids = orgs.map(&:active_benefit_sponsorship).flat_map(&:benefit_applications).flat_map(&:benefit_packages).map(&:_id)
+      
       expect(instance.pipeline.count).to be 4
       instance.filter_to_employers_hbx_ids(hbx_id_list)
       expect(instance.pipeline.count).to be 5
+      expect([instance.pipeline[4]]).to eq [{"$match"=> {"households.hbx_enrollments.sponsored_benefit_package_id"=>
+                                                        {"$in"=>
+                                                        [benefit_group_ids[0],
+                                                        benefit_group_ids[1],
+                                                        benefit_group_ids[2]]}}}]
     end
 
     it 'exclude_employers_by_hbx_ids' do
       expect(instance.pipeline.count).to be 4
-      instance.exclude_employers_by_hbx_ids(hbx_id_list)
+      value = instance.exclude_employers_by_hbx_ids(hbx_id_list)
       expect(instance.pipeline.count).to be 5
     end
   end
