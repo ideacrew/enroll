@@ -23,8 +23,8 @@ module BenefitSponsors
         build_inbox
         welcome_subject = "Welcome to #{Settings.site.short_name}"
         welcome_body = "#{Settings.site.short_name} is the #{Settings.aca.state_name}'s online marketplace where benefit sponsors may select and offer products that meet their member's needs and budget."
-        unless inbox.messages.where(subject: welcome_subject).present?
-          inbox.messages.new(subject: welcome_subject, body: welcome_body)
+        unless inbox.messages.where(body: welcome_body).present?
+          inbox.messages.new(subject: welcome_subject, body: welcome_body, from: Settings.site.short_name, created_at: Time.now.utc)
         end
       end
     end
