@@ -1,4 +1,4 @@
-@general_agency_enabled
+@wip
 Feature: Broker Assigns a General Agency to an Employer
 
   Background:

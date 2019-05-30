@@ -54,8 +54,6 @@ Feature: Create Primary Broker and Broker Agency
       Then Primary Broker should see Employer and click on legal name
       Then Primary Broker should see the Employer Profile page as Broker
       Then Primary Broker logs out
-
-      # TODO: need to fix it
       # When Primary Broker creates and publishes a plan year
       # Then Primary Broker should see a published success message without employee
       # When Primary Broker clicks on the Employees tab
@@ -63,30 +61,32 @@ Feature: Create Primary Broker and Broker Agency
       # Then Primary Broker creates Broker Assisted as a roster employee
       # Then Primary Broker sees employer census family created
       # And I log out
-      #
-      # When I go to the employee account creation page
-      # When Broker Assisted creates an HBX account
-      # #Then Broker Assisted should be logged on as an unlinked employee
-      # When Broker Assisted goes to register as an employee
-      # Then Broker Assisted should see the employee search page
-      # When Broker Assisted enter the identifying info of Broker Assisted
-      # Then Broker Assisted should see the matched employee record form
-      # When Broker Assisted accepts the matched employer
-      # Then Broker Assisted completes the matched employee form for Broker Assisted
-      # And I log out
-      #
-      # Then Primary Broker logs on to the Broker Agency Portal
-      # And Primary Broker clicks on the Employers tab
-      # Then Primary Broker should see Employer and click on legal name
-      # Then Primary should see the Employer Profile page as Broker
-      # When Primary Broker clicks on the Families tab
-      # Then Broker Assisted is a family
-      # Then Primary Broker goes to the Consumer page
-      # # Then Primary Broker is on the consumer home page
-      # # Then Primary Broker shops for plans
-      # # Then Primary Broker sees covered family members
-      # # Then Primary Broker should see the list of plans
-      # # Then Primary Broker selects a plan on the plan shopping page
-      # # And Primary Broker clicks on purchase button on the coverage summary page
-      # # And Primary Broker should see the receipt page
-      # Then Primary Broker logs out
+
+    @wip
+    Scenario: Broker creates employee and shop for plans
+      When I go to the employee account creation page
+      When Broker Assisted creates an HBX account
+      #Then Broker Assisted should be logged on as an unlinked employee
+      When Broker Assisted goes to register as an employee
+      Then Broker Assisted should see the employee search page
+      When Broker Assisted enter the identifying info of Broker Assisted
+      Then Broker Assisted should see the matched employee record form
+      When Broker Assisted accepts the matched employer
+      Then Broker Assisted completes the matched employee form for Broker Assisted
+      And I log out
+
+      Then Primary Broker logs on to the Broker Agency Portal
+      And Primary Broker clicks on the Employers tab
+      Then Primary Broker should see Employer and click on legal name
+      Then Primary should see the Employer Profile page as Broker
+      When Primary Broker clicks on the Families tab
+      Then Broker Assisted is a family
+      Then Primary Broker goes to the Consumer page
+      # Then Primary Broker is on the consumer home page
+      # Then Primary Broker shops for plans
+      # Then Primary Broker sees covered family members
+      # Then Primary Broker should see the list of plans
+      # Then Primary Broker selects a plan on the plan shopping page
+      # And Primary Broker clicks on purchase button on the coverage summary page
+      # And Primary Broker should see the receipt page
+      Then Primary Broker logs out
