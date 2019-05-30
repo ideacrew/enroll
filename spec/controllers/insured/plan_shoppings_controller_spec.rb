@@ -392,7 +392,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       :aasm_state => "coverage_selected",
       :benefit_group_id => benefit_group.id,
       :benefit_group_assignment_id => benefit_group_assignment.id,
-      :employee_role_id => employee_role.id)}
+      :employee_role_id => employee_role.id,
+      :effective_on => coverage_end_on - 1.day)}
 
     let!(:waiver_enrollment) { FactoryGirl.create(:hbx_enrollment,
       :aasm_state => 'inactive',
