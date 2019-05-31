@@ -29,7 +29,6 @@ module BenefitSponsors
         REGISTERED_EVENTS.each do |event|
           next unless (event_fired = instance_eval("is_" + event.to_s))
 
-          event_options = {}
           notify_observers(ModelEvent.new(event, self, event_options))
         rescue StandardError => e
           Rails.logger.info { "BrokerAgencyProfile REGISTERED_EVENTS: #{event} unable to notify observers" }

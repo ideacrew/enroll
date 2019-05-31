@@ -248,7 +248,7 @@ module Notifier
 
       if benefit_application.blank?
         benefit_application = enrollment.sponsored_benefit_package.benefit_application if enrollment.present? && enrollment.sponsored_benefit_package
-        benefit_application = employer_profile.benefit_applications.published_or_renewing_published.first if event_name == 'out_of_pocker_url_notifier'
+        benefit_application = employer_profile.benefit_applications.published_or_renewing_published.first if event_name == 'out_of_pocket_url_notifier'
       end
       benefit_application
     end

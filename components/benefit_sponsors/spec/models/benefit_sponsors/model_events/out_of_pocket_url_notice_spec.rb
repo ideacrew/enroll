@@ -8,15 +8,15 @@ RSpec.describe 'BenefitSponsors::ModelEvents::OutOfPocketNotice', dbclean: :afte
   include_context 'setup benefit market with market catalogs and product packages'
   include_context 'setup initial benefit application'
 
-  let(:notice_event) { 'out_of_pocker_url_notifier' }
+  let(:notice_event) { 'out_of_pocket_url_notifier' }
 
   describe "NoticeTrigger" do
 
-    subject { Services::NoticeService.new }
+    subject { BenefitSponsors::Services::NoticeService.new }
 
     it "should trigger model event" do
       expect(subject).to receive(:notify) do |event_name, payload|
-        expect(event_name).to eq "acapi.info.events.employer.out_of_pocker_url_notifier"
+        expect(event_name).to eq "acapi.info.events.employer.out_of_pocket_url_notifier"
         expect(payload[:event_object_kind]).to eq "BenefitSponsors::Organizations::AcaShop#{Settings.site.key.capitalize}EmployerProfile"
         expect(payload[:event_object_id]).to eq abc_profile.id.to_s
       end
