@@ -28,14 +28,11 @@ module SponsoredBenefits
 
       def employee_costs_for_reference_plan(plan = reference_plan)
           employee_costs = census_employees.active.inject({}) do |census_employees, employee|
-            puts employee.full_name
             costs = {
               ref_plan_cost: employee_cost_for_plan(employee, plan)
             }
 
-            puts 'here'
             if !single_plan_type?
-              puts 'there'
               costs.merge!({
                 lowest_plan_cost: employee_cost_for_plan(employee, lowest_cost_plan),
                 highest_plan_cost: employee_cost_for_plan(employee, highest_cost_plan)
