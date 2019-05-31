@@ -79,14 +79,24 @@ FactoryGirl.define do
     end
 
     trait :with_complex_premium_tables do
-      after :create do |plan, evaluator|
+      transient do
+        premium_tables_count 1
+      end
+
+      after(:create) do |plan, evaluator|
         start_on = Date.new(plan.active_year,1,1)
         end_on = start_on + 1.year - 1.day
-        plan.service_area_id = CarrierServiceArea.for_issuer(plan.carrier_profile.issuer_hios_ids).first.service_area_id
-        plan.save!
-        RatingArea.all.each do |rating_area|
+
+        unless Settings.aca.rating_areas.empty?
+          plan.service_area_id = CarrierServiceArea.for_issuer(plan.carrier_profile.issuer_hios_ids).first.service_area_id
+          plan.save!
+          rating_area = RatingArea.first.try(:rating_area) || FactoryGirl.create(:rating_area, rating_area: Settings.aca.rating_areas.first).rating_area
           (14..65).each do |age|
-            create(:premium_table, age: age, plan: plan, start_on: start_on, end_on: end_on, rating_area: rating_area)
+            create_list(:premium_table, evaluator.premium_tables_count, plan: plan, age: age, start_on: start_on, end_on: end_on, rating_area: rating_area)
+          end
+        else
+          (14..65).each do |age|
+            create_list(:premium_table, evaluator.premium_tables_count, plan: plan, age: age, start_on: start_on, end_on: end_on)
           end
         end
       end

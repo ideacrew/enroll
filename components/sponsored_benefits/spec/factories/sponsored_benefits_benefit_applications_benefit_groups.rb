@@ -14,5 +14,11 @@ FactoryGirl.define do
     ] }
     reference_plan {FactoryGirl.create(:plan, :with_premium_tables, :with_rating_factors)}
     elected_plans { [ self.reference_plan ]}
+
+    trait :with_complex_plans do
+      plan_option_kind {'single_carrier'}
+      lowest_cost_plan_id { FactoryGirl.create(:plan, :with_complex_premium_tables, :with_rating_factors) }
+      highest_cost_plan_id { FactoryGirl.create(:plan, :with_complex_premium_tables, :with_rating_factors) }
+    end
   end
 end
