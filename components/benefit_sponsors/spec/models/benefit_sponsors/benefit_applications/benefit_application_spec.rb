@@ -349,21 +349,62 @@ module BenefitSponsors
               end
 
               context "and binder payment is made" do
-                before { benefit_application.approve_enrollment_eligiblity! }
+                before {benefit_application.credit_binder!}
 
-                it "should transition to state: :enrollment_eligible" do
-                  expect(benefit_application.aasm_state).to eq :enrollment_eligible
+                it "should transition to state :binder_paid" do
+                  expect(benefit_application.aasm_state).to eq :binder_paid
                 end
 
-                context "and effective period begins" do
-                  before { benefit_application.activate_enrollment! }
+                context "and application is eligible" do
+                  before { benefit_application.approve_enrollment_eligiblity! }
 
-                  it "should transition to state: :approved" do
-                    expect(benefit_application.aasm_state).to eq :active
+                  it "should transition to state: :enrollment_eligible" do
+                    expect(benefit_application.aasm_state).to eq :enrollment_eligible
+                  end
+
+                  context "and effective period begins" do
+                    before { benefit_application.activate_enrollment! }
+
+                    it "should transition to state: :approved" do
+                      expect(benefit_application.aasm_state).to eq :active
+                    end
                   end
                 end
               end
             end
+          end
+        end
+
+        context 'revert reverse_enrollment_eligibility' do
+          before do
+            benefit_application.update_attributes(aasm_state: :binder_paid)
+            benefit_application.reverse_enrollment_eligibility!
+          end
+
+          it "should transition to state: :enrollment_closed" do
+            expect(benefit_application.aasm_state).to eq :enrollment_closed
+          end
+        end
+
+        context 'revert benefit_application' do
+          before do
+            benefit_application.update_attributes(aasm_state: :binder_paid)
+            benefit_application.revert_application!
+          end
+
+          it "should transition to state: :draft" do
+            expect(benefit_application.aasm_state).to eq :draft
+          end
+        end
+
+        context 'activate_enrollment' do
+          before do
+            benefit_application.update_attributes(aasm_state: :binder_paid)
+            benefit_application.activate_enrollment!
+          end
+
+          it "should transition to state: :active" do
+            expect(benefit_application.aasm_state).to eq :active
           end
         end
       end
