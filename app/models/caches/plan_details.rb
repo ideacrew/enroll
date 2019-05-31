@@ -31,7 +31,7 @@ module Caches
       $plan_age_bounds = {}
       $plan_age_lookup = {}
       $plan_age_lookup_with_rating_area = {}
-      Plan.all.each do |plan|
+      Plan.all.where(:"active_year".gte => TimeKeeper.date_of_record.year).each do |plan|
         $plan_age_bounds[plan.id] = {
           :minimum => plan.minimum_age,
           :maximum => plan.maximum_age
