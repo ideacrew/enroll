@@ -78,6 +78,20 @@ FactoryGirl.define do
       end
     end
 
+    trait :with_complex_premium_tables do
+      after :create do |plan, evaluator|
+        start_on = Date.new(plan.active_year,1,1)
+        end_on = start_on + 1.year - 1.day
+        plan.service_area_id = CarrierServiceArea.for_issuer(plan.carrier_profile.issuer_hios_ids).first.service_area_id
+        plan.save!
+        RatingArea.all.each do |rating_area|
+          (14..65).each do |age|
+            create(:premium_table, age: age, plan: plan, start_on: start_on, end_on: end_on, rating_area: rating_area)
+          end
+        end
+      end
+    end
+
     trait :csr_00 do
       coverage_kind   "health"
       metal_level     "silver"

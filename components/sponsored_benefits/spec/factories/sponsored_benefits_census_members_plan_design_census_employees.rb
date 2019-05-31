@@ -41,5 +41,13 @@ FactoryGirl.define do
     trait :blank_email do
       email nil
     end
+
+    trait :with_random_age do
+      dob { rand(65.years.ago..18.years.ago) }
+
+      after :create do |census_employee, evaluator|
+        census_employee.census_dependents.create(employee_relationship: 'spouse', dob: rand(census_employee.dob..census_employee.dob + 5.years))
+      end
+    end
   end
 end
