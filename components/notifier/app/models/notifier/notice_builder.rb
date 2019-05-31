@@ -20,7 +20,7 @@ module Notifier
       builder_klass = ['Notifier', 'Builders', recipient.split('::').last].join('::')
       builder = builder_klass.constantize.new
       builder.resource = resource
-      builder.event_name = event_name if resource.is_a?(EmployeeRole)
+      builder.event_name = event_name if is_employee? || is_employer?
       builder.payload = payload
       builder.append_contact_details
       template.data_elements.each do |element|

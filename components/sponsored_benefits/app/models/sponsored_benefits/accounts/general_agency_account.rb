@@ -1,31 +1,38 @@
 module SponsoredBenefits
   module Accounts
     class GeneralAgencyAccount
-        include Mongoid::Document
-        include Mongoid::Timestamps
-        include AASM
+      include Mongoid::Document
+      include Mongoid::Timestamps
+      include AASM
+      include Acapi::Notifiers
+      include ::BenefitSponsors::Concerns::Observable
+      include ::BenefitSponsors::ModelEvents::GeneralAgencyAccount
 
-        embedded_in :plan_design_organization, class_name: "SponsoredBenefits::Organizations::PlanDesignOrganization"
-        embeds_many :workflow_state_transitions, as: :transitional, class_name: "::WorkflowStateTransition"
+      embedded_in :plan_design_organization, class_name: "SponsoredBenefits::Organizations::PlanDesignOrganization"
+      embeds_many :workflow_state_transitions, as: :transitional, class_name: "::WorkflowStateTransition"
 
-        # Begin date of relationship
-        field :start_on, type: DateTime
-        # End date of relationship
-        field :end_on, type: DateTime
-        field :updated_by, type: String
-        field :general_agency_profile_id, type: BSON::ObjectId
-        field :benefit_sponsrship_general_agency_profile_id, type: BSON::ObjectId
-        field :aasm_state, type: Symbol, default: :active
-        field :broker_role_id, type: BSON::ObjectId
-        field :broker_agency_profile_id, type: BSON::ObjectId
-        field :benefit_sponsrship_broker_agency_profile_id, type: BSON::ObjectId
+      # Begin date of relationship
+      field :start_on, type: DateTime
+      # End date of relationship
+      field :end_on, type: DateTime
+      field :updated_by, type: String
+      field :general_agency_profile_id, type: BSON::ObjectId
+      field :benefit_sponsrship_general_agency_profile_id, type: BSON::ObjectId
+      field :aasm_state, type: Symbol, default: :active
+      field :broker_role_id, type: BSON::ObjectId
+      field :broker_agency_profile_id, type: BSON::ObjectId
+      field :benefit_sponsrship_broker_agency_profile_id, type: BSON::ObjectId
 
-        scope :active, ->{ where(aasm_state: :active) }
-        scope :inactive, ->{ where(aasm_state: :inactive) }
+      scope :active, ->{ where(aasm_state: :active) }
+      scope :inactive, ->{ where(aasm_state: :inactive) }
 
-        validates_presence_of :start_on
-        validates_presence_of :general_agency_profile_id, :if => Proc.new { |m| m.benefit_sponsrship_general_agency_profile_id.blank? }
-        validates_presence_of :benefit_sponsrship_general_agency_profile_id, :if => Proc.new { |m| m.general_agency_profile_id.blank? }
+      validates_presence_of :start_on
+      validates_presence_of :general_agency_profile_id, :if => proc { |m| m.benefit_sponsrship_general_agency_profile_id.blank? }
+      validates_presence_of :benefit_sponsrship_general_agency_profile_id, :if => proc { |m| m.general_agency_profile_id.blank? }
+
+      before_save :notify_before_save
+
+      add_observer ::BenefitSponsors::Observers::NoticeObserver.new, [:process_ga_account_events]
 
         # belongs_to general_agency_profile
 
