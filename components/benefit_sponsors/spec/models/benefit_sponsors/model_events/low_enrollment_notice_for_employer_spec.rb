@@ -54,6 +54,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::LowEnrollmentNoticeForEmployer', d
         "employer_profile.employer_name",
         "employer_profile.benefit_application.current_py_start_date",
         "employer_profile.benefit_application.current_py_oe_end_date",
+        "employer_profile.benefit_application.binder_payment_due_date",
         "employer_profile.broker.primary_fullname",
         "employer_profile.broker.organization",
         "employer_profile.broker.phone",
@@ -66,8 +67,8 @@ RSpec.describe 'BenefitSponsors::ModelEvents::LowEnrollmentNoticeForEmployer', d
     let(:recipient) { "Notifier::MergeDataModels::EmployerProfile" }
     let(:template)  { Notifier::Template.new(data_elements: data_elements) }
 
-    let(:payload) { "event_object_kind" => "BenefitSponsors::BenefitApplications::BenefitApplication",
-                    "event_object_id" => initial_application.id }
+    let(:payload) {{ "event_object_kind" => "BenefitSponsors::BenefitApplications::BenefitApplication",
+                     "event_object_id" => initial_application.id }}
 
     context "when notice event received for initial employer" do
 
@@ -115,6 +116,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::LowEnrollmentNoticeForEmployer', d
           "employer_profile.employer_name",
           "employer_profile.benefit_application.current_py_start_date",
           "employer_profile.benefit_application.current_py_oe_end_date",
+          "employer_profile.benefit_application.binder_payment_due_date",
           "employer_profile.broker.primary_fullname",
           "employer_profile.broker.organization",
           "employer_profile.broker.phone",
@@ -129,8 +131,8 @@ RSpec.describe 'BenefitSponsors::ModelEvents::LowEnrollmentNoticeForEmployer', d
       let(:aasm_state) { :active }
       let(:renewal_state) {:enrollment_open }
       let(:predecessor_application) { initial_application }
-      let(:payload) { "event_object_kind" => "BenefitSponsors::BenefitApplications::BenefitApplication",
-                      "event_object_id" => renewal_application.id }
+      let(:payload) {{ "event_object_kind" => "BenefitSponsors::BenefitApplications::BenefitApplication",
+                       "event_object_id" => renewal_application.id }}
 
       subject { Notifier::NoticeKind.new(template: template, recipient: recipient, event_name: notice_event) }
 
@@ -149,6 +151,11 @@ RSpec.describe 'BenefitSponsors::ModelEvents::LowEnrollmentNoticeForEmployer', d
 
       it 'should return plan year open enrollment end date' do
         expect(merge_model.benefit_application.current_py_oe_end_date).to eq renewal_application.open_enrollment_period.max.strftime('%m/%d/%Y')
+      end
+
+      it "should return binder payment due date" do
+        schedular = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
+        expect(merge_model.benefit_application.binder_payment_due_date).to eq schedular.map_binder_payment_due_date_by_start_on(renewal_application.start_on).strftime('%m/%d/%Y')
       end
     end
   end
