@@ -195,6 +195,12 @@ class CensusEmployee < CensusMember
     benefit_group_assignments.reject(&:is_active?)
   end
 
+  def benefit_package_assignment_for(benefit_package)
+    benefit_group_assignments.effective_on(benefit_package.effective_period.min).detect do |assignment|
+      assignment.benefit_package_id == benefit_package.id
+    end
+  end
+
   def waived?
     bga = renewal_benefit_group_assignment || active_benefit_group_assignment
     return bga.present? ? bga.aasm_state == 'coverage_waived' : false

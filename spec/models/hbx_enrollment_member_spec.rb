@@ -1,11 +1,14 @@
 require 'rails_helper'
 
-describe HbxEnrollmentMember, dbclean: :after_all do
-  context "an hbx_enrollment with members exists" do
+describe HbxEnrollmentMember, dbclean: :around_each do
+
+  context "an hbx_enrollment with members exists", dbclean: :around_each do
     include_context "BradyWorkAfterAll"
 
     attr_reader :household, :coverage_household, :enrollment, :family_member_ids
+
     before :all do
+      TimeKeeper.set_date_of_record_unprotected!(Time.zone.today)
       create_brady_census_families
       @household = mikes_family.households.first
       @coverage_household = household.coverage_households.first
@@ -76,13 +79,12 @@ describe HbxEnrollmentMember, dbclean: :after_all do
       end
 
       it "member should update applied_aptc_amount" do
-        @member.reload
         expect(@member.applied_aptc_amount.to_f).to eq 11.1.to_f
       end
     end
   end
 
-  context "given a family member" do
+  context "given a family member", dbclean: :around_each do
     let(:person) { double }
     let(:family_member) { instance_double(FamilyMember, :person => person ) }
     subject { HbxEnrollmentMember.new }

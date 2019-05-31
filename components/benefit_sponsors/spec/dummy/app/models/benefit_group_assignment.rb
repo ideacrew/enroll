@@ -121,6 +121,11 @@ class BenefitGroupAssignment
     update_attributes(is_active: true, activated_at: TimeKeeper.datetime_of_record) unless is_active?
   end
 
+  def self.find(id)
+    ee = CensusEmployee.where(:"benefit_group_assignments._id" => id).first
+    ee.benefit_group_assignments.detect { |bga| bga._id == id } if ee.present?
+  end
+
   aasm do
     state :initialized, initial: true
     state :coverage_selected
@@ -130,5 +135,8 @@ class BenefitGroupAssignment
     state :coverage_renewing
     state :coverage_expired
 
+    event :renew_coverage do
+      transitions from: :initialized, to: :coverage_renewing
+    end
   end
 end

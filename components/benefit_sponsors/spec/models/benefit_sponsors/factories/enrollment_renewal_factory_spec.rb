@@ -23,16 +23,17 @@ module BenefitSponsors
     let(:hired_on)        { TimeKeeper.date_of_record - 2.years }
     let(:person)          { FactoryBot.create(:person) }
     let(:shop_family)     { FactoryBot.create(:family, :with_primary_family_member, person: person)}
-    let(:employee_role)   { FactoryBot.create(:employee_role, benefit_sponsors_employer_profile_id: abc_profile.id, hired_on: hired_on, person: person) }
+    let(:employee_role)   { FactoryBot.create(:employee_role, benefit_sponsors_employer_profile_id: abc_profile.id, hired_on: hired_on, person: person, census_employee: census_employee) }
     let(:enrollment_kind) { "open_enrollment" }
 
     let(:census_employee) do
-      create(:census_employee, :with_active_assignment,
+      census_employee = create(:census_employee, :with_active_assignment,
              benefit_sponsorship: benefit_sponsorship,
              employer_profile: benefit_sponsorship.profile,
              benefit_group: current_benefit_package,
-             hired_on: hired_on,
-             employee_role_id: employee_role.id)
+             hired_on: hired_on)
+      census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: benefit_package, census_employee: census_employee, is_active: false)
+      census_employee
     end
 
     let!(:enrollment) do
@@ -47,7 +48,7 @@ module BenefitSponsors
                         sponsored_benefit_package_id: current_benefit_package.id,
                         sponsored_benefit_id: current_benefit_package.sponsored_benefits[0].id,
                         employee_role_id: employee_role.id,
-                        benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
+                        benefit_group_assignment: census_employee.active_benefit_group_assignment,
                         product_id: current_benefit_package.sponsored_benefits[0].reference_product.id,
                         aasm_state: enrollment_status)
     end
