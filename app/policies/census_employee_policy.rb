@@ -25,8 +25,10 @@ class CensusEmployeePolicy < ApplicationPolicy
     elsif @user.has_role?(:employer_staff)
       return true if @user.person.employer_staff_roles.map(&:employer_profile_id).map(&:to_s).include? @record.employer_profile_id.to_s       
     elsif @user.has_role?(:general_agency_staff)
-      emp_ids = EmployerProfile.find_by_general_agency_profile(@user.person.general_agency_staff_roles.first.general_agency_profile).map(&:id)
-      return true if emp_ids.include?(@record.employer_profile.id)
+      linked_general_agency = @record.employer_profile.general_agency_profile
+      return false if linked_general_agency.nil?
+      general_agency_profile_ids = @user.person.active_general_agency_staff_roles.map{|a| a.general_agency_profile_id}
+      return true if general_agency_profile_ids.include?(linked_general_agency.id)
     else
       return false
     end
