@@ -192,6 +192,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def show_ivl(hbx_enrollment_id)
     set_consumer_bookmark_url(family_account_path) if params[:market_kind] == 'individual'
+    set_admin_bookmark_url if params[:market_kind] == 'individual'
     set_resident_bookmark_url(family_account_path) if params[:market_kind] == 'coverall'
 
     set_plans_by(hbx_enrollment_id: hbx_enrollment_id)
