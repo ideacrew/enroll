@@ -2,6 +2,7 @@ require 'rails_helper'
 
 module SponsoredBenefits
   RSpec.describe Organizations::PlanDesignProposals::ContributionsController, type: :controller, dbclean: :around_each do
+    render_views
     routes { SponsoredBenefits::Engine.routes }
     let(:valid_session) { {} }
     let(:current_person) { double(:current_person) }
@@ -55,34 +56,6 @@ module SponsoredBenefits
 
 		let(:organization) { plan_design_organization.sponsor_profile.organization }
 
-		let!(:health_product) do
-				FactoryGirl.create(:benefit_markets_products_health_products_health_product,
-					:with_renewal_product,
-					application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
-					product_package_kinds: [:single_issuer, :metal_level, :single_product],
-					service_area: service_area,
-					renewal_service_area: renewal_service_area,
-					metal_level_kind: :gold
-				)
-		end
-
-		let!(:service_area) do
-			return @service_area if defined? @service_area
-			@service_area = FactoryGirl.create(:benefit_markets_locations_service_area,
-				county_zip_ids: [FactoryGirl.create(:benefit_markets_locations_county_zip, county_name: 'Middlesex', zip: '01754', state: 'MA').id],
-				active_year: current_effective_date.year
-			)
-		end
-
-		let!(:renewal_service_area) do
-			return @renewal_service_area if defined? @renewal_service_area
-
-			@renewal_service_area = FactoryGirl.create(:benefit_markets_locations_service_area,
-				county_zip_ids: service_area.county_zip_ids,
-				active_year: service_area.active_year + 1
-			)
-		end
-
 		let!(:current_effective_date) do
 			(TimeKeeper.date_of_record + 2.months).beginning_of_month.prev_year
 		end
@@ -115,23 +88,25 @@ module SponsoredBenefits
       allow(subject).to receive(:current_person).and_return(current_person)
       allow(subject).to receive(:active_user).and_return(active_user)
       allow(current_person).to receive(:broker_role).and_return(broker_role)
-      puts "benefit_group: #{benefit_group.inspect}"
-      puts "relationship_benefit: #{relationship_benefit.inspect}"
+      allow(broker_role).to receive(:broker_agency_profile_id).and_return(broker_agency_profile.id)
+      allow(broker_role).to receive(:benefit_sponsors_broker_agency_profile_id).and_return(broker_agency_profile.id)
       get :index, {
+        plan_design_proposal_id: plan_design_proposal.id,
         benefit_group: {
-          reference_plan_id: benefit_group.reference_plan.id,
+          reference_plan_id: benefit_group.reference_plan_id.to_s,
           plan_option_kind: benefit_group.plan_option_kind,
-          relationship_benefits_attributes: {
+          relationship_benefits_attributes: [{ "0" => {
             relationship: relationship_benefit.relationship,
             premium_pct: relationship_benefit.premium_pct,
             offered: relationship_benefit.offered
-          }
+          }}]
         },
+        format: :js
       }, valid_session
     end
 
     it 'works' do
-      expect(true).to be_truthy
+      expect(response.body).to match(/#{benefit_group.reference_plan.name}/)
     end
   end
 end
