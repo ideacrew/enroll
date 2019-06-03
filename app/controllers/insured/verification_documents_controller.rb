@@ -73,12 +73,12 @@ class Insured::VerificationDocumentsController < ApplicationController
   def find_docs_owner
     return unless params[:docs_owner].present?
     fm_id = params[:docs_owner]
+    family_member = FamilyMember.find(fm_id)
     if ::VerificationType::ASSISTED_VERIFICATION_TYPES.include?(params[:type_name])
-      application_in_context = @family.active_approved_application
+      application_in_context = family_member.application_for_verifications
       applicant = application_in_context.active_applicants.where(family_member_id: params[:docs_owner]).first if application_in_context
       @docs_owner = applicant
     else
-      family_member = FamilyMember.find(fm_id)
       @docs_owner = family_member.person
     end
   end
