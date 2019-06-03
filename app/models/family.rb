@@ -827,10 +827,10 @@ class Family
       send_enrollment_notice_for_ivl(new_date)
     end
 
-    def send_enrollment_notice_for_ivl(new_date)
+    def enrollment_notice_for_ivl_families(new_date)
       start_time = (new_date - 2.days).in_time_zone("Eastern Time (US & Canada)").beginning_of_day
       end_time = (new_date - 2.days).in_time_zone("Eastern Time (US & Canada)").end_of_day
-      families = Family.where({
+      Family.where({
         "households.hbx_enrollments" => {
           "$elemMatch" => {
             "kind" => "individual",
@@ -838,6 +838,10 @@ class Family
             "created_at" => { "$gte" => start_time, "$lte" => end_time},
         } }
       })
+    end
+
+    def send_enrollment_notice_for_ivl(new_date)
+      families = enrollment_notice_for_ivl_families(new_date)
       families.each do |family|
         begin
           person = family.primary_applicant.person
