@@ -237,7 +237,7 @@ module Queries
 
       benefit_sponsorships.flat_map do |bs|
         bs.benefit_applications.select do |ba|
-          (ba.start_on == effective_on) && ["active", "enrollment_eligible"].include?(ba.aasm_state.to_s)
+          (ba.start_on == effective_on) && ["active","binder_paid", "enrollment_eligible"].include?(ba.aasm_state.to_s)
         end
       end.flat_map(&:benefit_packages).flat_map(&:sponsored_benefits)
     end
