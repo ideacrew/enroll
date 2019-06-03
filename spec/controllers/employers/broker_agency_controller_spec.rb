@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Employers::BrokerAgencyController, dbclean: :after_each do
+RSpec.describe Employers::BrokerAgencyController do
 
   before(:all) do
     @employer_profile = FactoryGirl.create(:employer_profile)
@@ -26,7 +26,7 @@ RSpec.describe Employers::BrokerAgencyController, dbclean: :after_each do
     DatabaseCleaner.clean
   end
 
-  describe ".index", dbclean: :after_each do
+  describe ".index" do
 
     it "should render js template" do
       sign_in(@user)
@@ -34,7 +34,7 @@ RSpec.describe Employers::BrokerAgencyController, dbclean: :after_each do
       expect(response.content_type).to eq Mime::JS
     end
 
-    context 'with out search string', dbclean: :after_each do
+    context 'with out search string' do
       before(:each) do
         sign_in(@user)
         xhr :get, :index, employer_profile_id: @employer_profile.id, format: :js
