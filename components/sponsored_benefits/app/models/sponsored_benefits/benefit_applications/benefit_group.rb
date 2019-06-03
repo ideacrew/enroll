@@ -26,7 +26,7 @@ module SponsoredBenefits
         )
       end
 
-      def employee_costs_for_reference_plan(plan = reference_plan)
+      def employee_costs_for_reference_plan(service, plan = reference_plan)
           employee_costs = census_employees.active.inject({}) do |census_employees, employee|
             costs = {
               ref_plan_cost: employee_cost_for_plan(employee, plan)
@@ -43,9 +43,9 @@ module SponsoredBenefits
           end
 
           employee_costs.merge!({
-            ref_plan_employer_cost: monthly_employer_contribution_amount(plan),
-            lowest_plan_employer_cost: monthly_employer_contribution_amount(lowest_cost_plan),
-            highest_plan_employer_cost: monthly_employer_contribution_amount(highest_cost_plan)
+            ref_plan_employer_cost: service.monthly_employer_contribution_amount(plan),
+            lowest_plan_employer_cost: service.monthly_employer_contribution_amount(lowest_cost_plan),
+            highest_plan_employer_cost: service.monthly_employer_contribution_amount(highest_cost_plan)
             })
       end
 

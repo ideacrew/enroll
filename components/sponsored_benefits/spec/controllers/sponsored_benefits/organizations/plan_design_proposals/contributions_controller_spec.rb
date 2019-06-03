@@ -126,11 +126,11 @@ module SponsoredBenefits
           benefit_group: {
             reference_plan_id: benefit_group.reference_plan_id.to_s,
             plan_option_kind: benefit_group.plan_option_kind,
-            relationship_benefits_attributes: [{ "0" => {
+            relationship_benefits_attributes: [{
               relationship: relationship_benefit.relationship,
               premium_pct: relationship_benefit.premium_pct,
               offered: relationship_benefit.offered
-            }}]
+            }]
           },
           format: :js
         }, valid_session

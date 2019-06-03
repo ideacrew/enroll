@@ -1,10 +1,12 @@
 class PlanCostService
+  include ::Config::AcaHelper
 
-  attr_accessor :benefit_group
+  attr_accessor :benefit_group, :plan
 
   def initialize(attrs={})
     @benefit_group = attrs[:benefit_group]
     @reference_plan_id = @benefit_group.reference_plan_id
+    @composite_tiers = {}
   end
 
   def reference_plan
@@ -12,17 +14,23 @@ class PlanCostService
   end
 
   def active_census_employees
+    @active_census_employees ||= benefit_group.targeted_census_employees.active
   end
 
   def perform
   end
 
-  def monthly_employer_contribution_amount
+  def composite?
+    @composite ||=  (benefit_group.plan_option_kind == 'sole_source' && plan.coverage_kind == "health")
+  end
 
+  def monthly_employer_contribution_amount(plan = reference_plan)
+    self.plan = plan
     active_census_employees.inject(0.00) do |acc, census_employee|
-
       per_employee_cost = if census_employee.is_cobra_status?
         0
+      elsif composite?
+        (composite_total_premium(census_employee) * employer_contribution_factor).round(2)
       else
         (members(census_employee).reduce(0.00) do |sum, member|
           (sum + employer_contribution_for(member, census_employee)).round(2)
@@ -32,23 +40,65 @@ class PlanCostService
     end
   end
 
-  def employer_contribution_for(member, census_employee)
-    # return 0 if census_employee.is_cobra_status?
-    ([max_employer_contribution(member, census_employee), premium_for(member)].min * large_family_factor(member, census_employee)).round(2)
+  def monthly_min_employee_cost(plan=reference_plan)
+    self.plan = plan
+    monthly_employee_costs.min
   end
 
-  def premium_for(member)
-    # toDo - Handle __getObj__
-    if contribution_offered_hash[relationship_for(member)]
-      value = rate_lookup(age_of(member), member, census_employee, __getobj__)
-      BigDecimal.new("#{value}").round(2).to_f
-    else
-      0.00
+  def monthly_max_employee_cost(plan=reference_plan)
+    self.plan = plan
+    monthly_employee_costs.max
+  end
+
+  def monthly_employee_costs
+    @monthly_employee_costs ||= active_census_employees.collect do |census_employee|
+      per_employee_cost = if composite?
+        (composite_total_premium(census_employee) - (composite_total_premium(census_employee) * employer_contribution_factor).round(2)).round(2)
+      else
+        (members(census_employee).reduce(0.00) do |sum, member|
+          (sum + employee_cost_for(member, census_employee)).round(2)
+        end).round(2)
+      end
+      BigDecimal.new((per_employee_cost).to_s).round(2)
     end
   end
 
-  def max_employer_contribution(member)
-    ((large_family_factor(member, census_employee) * reference_premium_for(member, census_employee) * employer_contribution_percent(member)) / 100.00).round(2)
+  def employee_cost_for(member, census_employee)
+    (premium_for(member, census_employee) - employer_contribution_for(member, census_employee) * large_family_factor(member, census_employee)).round(2)
+  end
+
+  def effective_composite_tier(census_employee)
+    @composite_tiers[census_employee.id] ||= benefit_group.effective_composite_tier(census_employee)
+  end
+
+  def composite_total_premium(census_employee)
+    benefit_group.composite_rating_tier_premium_for(effective_composite_tier(census_employee))
+  end
+
+  def employer_contribution_factor
+    benefit_group.composite_employer_contribution_factor_for(effective_composite_tier(census_employee))
+  end
+
+  def employer_contribution_for(member, census_employee)
+    return 0 if census_employee.is_cobra_status?
+    ([max_employer_contribution(member, census_employee), premium_for(member, census_employee)].min * large_family_factor(member, census_employee)).round(2)
+  end
+
+  def premium_for(member, census_employee)
+    Rails.cache.fetch("premium_for_#{member.id}_#{plan.id}") do
+      if contribution_offered_hash[relationship_for(member)]
+        value = rate_lookup(age_of(member), member, census_employee, plan)
+        BigDecimal.new("#{value}").round(2).to_f
+      else
+        0.00
+      end
+    end
+  end
+
+  def max_employer_contribution(member, census_employee)
+    Rails.cache.fetch("employer_contribution_#{reference_plan.id}_#{member.id}", expires_in: 15.minutes) do
+      ((large_family_factor(member, census_employee) * reference_premium_for(member, census_employee) * employer_contribution_percent(member)) / 100.00).round(2)
+    end
   end
 
   def employer_contribution_percent(member)
@@ -82,7 +132,7 @@ class PlanCostService
   end
 
   def relationship_for(member)
-    Rails.cache.fetch("relationship_for_#{member.id}") do
+    Rails.cache.fetch("relationship_for_#{member.id}", expires_in: 15.minutes) do
       case member.class
       when SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee
         'employee'
@@ -133,7 +183,7 @@ class PlanCostService
   end
 
   def child_index(member, census_employee)
-    Rails.cache.fetch("census_children_#{census_employee_id}") do
+    Rails.cache.fetch("census_children_#{census_employee.id}", expires_in: 15.minutes) do
       members(census_employee).select(){|member| age_of(member) < 21}.map(&:id)
     end.index(member.id)
   end
@@ -143,7 +193,7 @@ class PlanCostService
   end
 
   def members(census_employee)
-    Rails.cache.fetch("census_employee_#{census_employee.id}") do
+    Rails.cache.fetch("census_employee_#{census_employee.id}", expires_in: 15.minutes) do
       [census_employee] + census_employee.census_dependents
     end
   end
