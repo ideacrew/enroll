@@ -1,4 +1,4 @@
-class PlanCostService
+class SponsoredBenefits::Services::PlanCostService
   include ::Config::AcaHelper
 
   attr_accessor :benefit_group, :plan
@@ -15,9 +15,6 @@ class PlanCostService
 
   def active_census_employees
     @active_census_employees ||= benefit_group.targeted_census_employees.active
-  end
-
-  def perform
   end
 
   def composite?
@@ -200,17 +197,5 @@ class PlanCostService
 
   def start_on
     @start_on ||= benefit_group.start_on
-  end
-
-  def employer_contribution_amount
-  end
-
-  def min_employee_cost
-  end
-
-  def max_employee_cost
-  end
-
-  def benefit_group_costs
   end
 end
