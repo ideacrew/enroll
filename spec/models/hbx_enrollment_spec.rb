@@ -2912,7 +2912,7 @@ describe HbxEnrollment, dbclean: :after_all do
       end
 
       it "should return true if future active enrollment exists" do
-        ivl_enrollment2.update_attributes(aasm_state: "coverage_selected", effective_on: TimeKeeper.date_of_record.beginning_of_year + 5.months)
+        ivl_enrollment2.update_attributes(aasm_state: "coverage_selected", effective_on: TimeKeeper.date_of_record.beginning_of_month + 1.month)
         ivl_enrollment2.reload
         expect(ivl_enrollment.has_active_or_term_exists_for_reinstated_date?).to be_truthy
       end
