@@ -204,4 +204,34 @@ RSpec.describe DocumentsController, :type => :controller do
     #   end
     # end
   end
+
+  describe '#find_docs_owner' do
+
+    include_examples 'draft application with 2 applicants'
+    before do
+      sign_in user
+      allow_any_instance_of(FinancialAssistance::Application).to receive(:is_application_valid?).and_return(true)
+      application.submit!
+    end
+
+    context 'find docs owner if FAA application is not present' do
+      let(:params) {{family_member_id: family_member_not_on_application.id, type_name: "Citizenship"}}
+
+      it 'should return person object as a docs owner' do
+        allow_any_instance_of(DocumentsController).to receive(:params).and_return params
+        response = subject.send(:find_docs_owner)
+        expect(response.class).to eq Person
+      end
+    end
+
+    context 'find docs owner if FAA application is present' do
+      let(:params) {{family_member_id: second_family_member.id, type_name: "Income"}}
+
+      it 'should return applicant object as a docs owner' do
+        allow_any_instance_of(DocumentsController).to receive(:params).and_return params
+        response = subject.send(:find_docs_owner)
+        expect(response.class).to eq FinancialAssistance::Applicant
+      end
+    end
+  end
 end
