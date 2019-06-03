@@ -60,4 +60,16 @@ RSpec.describe HbxAdminController, :type => :controller do
       expect(subject).to render_template("hbx_admin/update_aptc_csr")
     end
   end
+
+  describe "GET calculate_aptc_csr" do
+    before do
+      allow(HbxProfile).to receive(:current_hbx).and_return(organization)
+      allow(Admin::Aptc).to receive(:calculate_slcsp_value).with(2019, family).and_return('100')
+      allow(Admin::Aptc).to receive(:years_with_tax_household).with(family).and_return(2019)
+    end
+
+    it "should initialize the variables for the method and render the proper template" do
+      get(:calculate_aptc_csr, params: { person_id: person_with_family.id, family_id: family.id, year: 2019, max_aptc: 100 }, format: :js)
+    end
+  end
 end
