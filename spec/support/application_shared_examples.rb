@@ -39,3 +39,19 @@ RSpec.shared_examples 'submitted application with one active member and two appl
   let!(:family_member1) {FactoryGirl.create(:family_member, family: family, person: person2, is_active: false)}
   let!(:applicant2) { FactoryGirl.create(:applicant, tax_household_id: tax_household.id, application: application, family_member_id: family_member1.id) }
 end
+
+RSpec.shared_examples 'draft application with 2 applicants' do
+  include_examples 'setup basic models'
+
+  before :each do
+    allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
+  end
+  let!(:second_person) {FactoryGirl.create(:person, :with_consumer_role)}
+  let!(:second_family_member) {FactoryGirl.create(:family_member, family: family, person: second_person, is_active: true)}
+  let!(:third_person) {FactoryGirl.create(:person, :with_consumer_role)}
+  let!(:family_member_not_on_application) {FactoryGirl.create(:family_member, family: family, person: third_person, is_active: true)}
+  let!(:application) {FactoryGirl.create(:application, aasm_state: 'draft', family: family)}
+  let!(:first_applicant) {FactoryGirl.create(:applicant, tax_household_id: tax_household.id, application: application, family_member_id: family.primary_applicant.id)}
+  let!(:second_applicant) { FactoryGirl.create(:applicant, tax_household_id: tax_household.id, application: application, family_member_id: second_family_member.id) }
+end
+

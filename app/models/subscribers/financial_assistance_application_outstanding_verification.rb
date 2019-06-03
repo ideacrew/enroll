@@ -46,6 +46,12 @@ module Subscribers
     end
 
     # private
+    def store_payload(kind, xml)
+      @applicant_in_context.build_income_response({received_at: Time.now, body: xml}) if kind == 'Income'
+      @applicant_in_context.build_mec_response({received_at: Time.now, body: xml}) if kind == 'MEC'
+
+      @applicant_in_context.save!
+    end
 
     def haven_verifications_import_from_xml(xml)
       if xml.include?('income_verification_result')
@@ -53,11 +59,13 @@ module Subscribers
         verified_income_verification.parse(xml)
         verified_person = verified_income_verification.verifications.first.individual
         import_assisted_verification("Income", verified_person, verified_income_verification)
+        store_payload("Income", xml)
       elsif xml.include?('mec_verification_result')
         verified_mec_verfication = Parsers::Xml::Cv::OutstandingMecVerificationParser.new
         verified_mec_verfication.parse(xml)
         verified_person = verified_mec_verfication.verifications.first.individual
         import_assisted_verification("MEC", verified_person, verified_mec_verfication)
+        store_payload("MEC", xml)
       end
     end
 
@@ -65,32 +73,14 @@ module Subscribers
       person_in_context = search_person(verified_person)
       throw(:processing_issue, "ERROR: Failed to find primary person in xml") unless person_in_context.present?
       application_in_context = FinancialAssistance::Application.find(verified_verification.fin_app_id)
-      applicant_in_context = application_in_context.applicants.select { |applicant| applicant.person.hbx_id == person_in_context.hbx_id}.first
-      throw(:processing_issue, "ERROR: Failed to find applicant in xml") unless applicant_in_context.present?
+      @applicant_in_context = application_in_context.applicants.select { |applicant| applicant.person.hbx_id == person_in_context.hbx_id}.first
+      throw(:processing_issue, "ERROR: Failed to find applicant in xml") unless @applicant_in_context.present?
 
-      if kind == "Income"
-        applicant_in_context.update_attributes(has_income_verification_response: true)
-        verification_failed = verified_verification.verifications.first.income_verification_failed
-      elsif kind == "MEC"
-        applicant_in_context.update_attributes(has_mec_verification_response: true)
-        verification_failed = verified_verification.verifications.first.mec_verification_failed
-      end
+      @applicant_in_context.update_attributes(has_income_verification_response: true) if kind == "Income"
+      @applicant_in_context.update_attributes(has_mec_verification_response: true) if kind == "MEC"
 
       status = verified_verification.verifications.first.response_code.split('#').last
-      assisted_verification = applicant_in_context.assisted_verifications.where(verification_type: kind).first
-
-      if assisted_verification.present?
-        if assisted_verification.status == "pending"
-          assisted_verification.update_attributes(status: status, verification_failed: verification_failed)
-        else
-          new_assisted_verification = applicant_in_context.assisted_verifications.create!(verification_type: kind, status: status, verification_failed: verification_failed)
-        end
-
-        update_applicant(kind, applicant_in_context, status)
-      else
-        throw(:processing_issue, "ERROR: Failed to find #{kind} verification for the applicant") unless assisted_verification.present?
-      end
-
+      update_applicant(kind, @applicant_in_context, status)
       application_in_context.save!
     end
 

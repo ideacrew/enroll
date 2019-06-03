@@ -52,7 +52,7 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:file_path).and_return(file_path)
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:file_name).and_return("sample-filename")
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:params_clean_vlp_documents).and_return(cleaned_params)
-        allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:update_vlp_documents).with(cleaned_params, "sample-filename", doc_id).and_return(true)
+        allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:update_vlp_documents).with("sample-filename", doc_id).and_return(true)
         allow(Aws::S3Storage).to receive(:save).with(file_path, bucket_name).and_return(doc_id)
         sign_in user
         post :upload, params
@@ -84,7 +84,7 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
         allow(Aws::S3Storage).to receive(:save).with(file_path, bucket_name).and_return(doc_uri)
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:file_path).with('temp_file').and_return(file_path)
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:file_name).with('temp_file').and_return("sample-filename")
-        allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:update_vlp_documents).with("sample-filename", doc_uri,applicant).and_return(true)
+        allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:update_vlp_documents).with("sample-filename", doc_uri).and_return(true)
         allow(person.primary_family).to receive(:update_family_document_status!).and_return(true)
         controller.instance_variable_set(:"@family", person.primary_family)
         sign_in user
@@ -122,6 +122,36 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
         get :download, key:"sample-key"
         expect(flash[:error]).to be_nil
         expect(response.status).to eq(200)
+      end
+    end
+
+    describe '#find_docs_owner' do
+
+      include_examples 'draft application with 2 applicants'
+      before do
+        sign_in user
+        allow_any_instance_of(FinancialAssistance::Application).to receive(:is_application_valid?).and_return(true)
+        application.submit!
+      end
+
+      context 'find docs owner if FAA application is not present' do
+        let(:params) {{docs_owner: family_member_not_on_application.id, type_name: "Citizenship"}}
+
+        it 'should return person object as a docs owner' do
+          allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:params).and_return params
+          response = subject.send(:find_docs_owner)
+          expect(response.class).to eq Person
+        end
+      end
+
+      context 'find docs owner if FAA application is present' do
+        let(:params) {{docs_owner: second_family_member.id, type_name: "Income"}}
+
+        it 'should return applicant object as a docs owner' do
+          allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:params).and_return params
+          response = subject.send(:find_docs_owner)
+          expect(response.class).to eq FinancialAssistance::Applicant
+        end
       end
     end
 

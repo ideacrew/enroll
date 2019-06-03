@@ -5,8 +5,8 @@ class FinancialAssistance::Applicant
 
   embedded_in :application
 
-  TAX_FILER_KINDS = %W(tax_filer single joint separate dependent non_filer)
-  STUDENT_KINDS = %w(
+  TAX_FILER_KINDS = %w[tax_filer single joint separate dependent non_filer].freeze
+  STUDENT_KINDS = %w[
     dropped_out
     elementary
     english_language_institute
@@ -26,9 +26,9 @@ class FinancialAssistance::Applicant
     undergraduate
     vocational
     vocational_tech
-  )
+  ].freeze
 
-  STUDENT_SCHOOL_KINDS = %w(
+  STUDENT_SCHOOL_KINDS = %w[
     english_language_institute
     elementary
     equivalent_vocational_tech
@@ -42,12 +42,12 @@ class FinancialAssistance::Applicant
     technical
     undergraduate
     vocational
-  )
-  INCOME_VALIDATION_STATES = %w(na valid outstanding pending)
-  MEC_VALIDATION_STATES = %w(na valid outstanding pending)
+  ].freeze
+  INCOME_VALIDATION_STATES = %w[na valid outstanding pending].freeze
+  MEC_VALIDATION_STATES = %w[na valid outstanding pending].freeze
 
   DRIVER_QUESTION_ATTRIBUTES = [:has_job_income, :has_self_employment_income, :has_other_income,
-                                :has_deductions, :has_enrolled_health_coverage, :has_eligible_health_coverage]
+                                :has_deductions, :has_enrolled_health_coverage, :has_eligible_health_coverage].freeze
 
   field :assisted_income_validation, type: String, default: "pending"
   validates_inclusion_of :assisted_income_validation, :in => INCOME_VALIDATION_STATES, :allow_blank => false
@@ -156,6 +156,10 @@ class FinancialAssistance::Applicant
   embeds_many :benefits,    class_name: "::FinancialAssistance::Benefit"
   embeds_many :assisted_verifications, class_name: "::FinancialAssistance::AssistedVerification"
   embeds_many :workflow_state_transitions, as: :transitional
+  embeds_many :verification_types, cascade_callbacks: true, validate: true
+
+  embeds_one :income_response, class_name: "EventResponse"
+  embeds_one :mec_response, class_name: "EventResponse"
 
   accepts_nested_attributes_for :incomes, :deductions, :benefits
 
@@ -168,11 +172,9 @@ class FinancialAssistance::Applicant
   validate :strictly_boolean
 
   validates :tax_filer_kind,
-    inclusion: { in: TAX_FILER_KINDS, message: "%{value} is not a valid tax filer kind" },
-    allow_blank: true
+            inclusion: { in: TAX_FILER_KINDS, message: "%{value} is not a valid tax filer kind" },
+            allow_blank: true
 
-  alias_method :is_ia_eligible?, :is_ia_eligible
-  alias_method :is_medicaid_chip_eligible?, :is_medicaid_chip_eligible
   alias_method :is_medicare_eligible?, :is_medicare_eligible
   alias_method :is_joint_tax_filing?, :is_joint_tax_filing
 
@@ -193,13 +195,8 @@ class FinancialAssistance::Applicant
   end
 
   def strictly_boolean
-    unless is_ia_eligible.is_a? Boolean
-      self.errors.add(:base, "is_ia_eligible should be a boolean")
-    end
-
-    unless is_medicaid_chip_eligible.is_a? Boolean
-      self.errors.add(:base, "is_medicaid_chip_eligible should be a boolean")
-    end
+    errors.add(:base, 'is_ia_eligible should be a boolean') unless is_ia_eligible.is_a?(Boolean)
+    errors.add(:base, 'is_medicaid_chip_eligible should be a boolean') unless is_medicaid_chip_eligible.is_a? Boolean
   end
 
   def tax_filing?
@@ -211,7 +208,7 @@ class FinancialAssistance::Applicant
   end
 
   def is_not_in_a_tax_household?
-    self.tax_household.blank?
+    tax_household.blank?
   end
 
   aasm do
@@ -220,33 +217,33 @@ class FinancialAssistance::Applicant
     state :verification_pending #One of the Verifications is Pending and the other Verification is Verified.
     state :fully_verified #Both Income and MEC are Verified.
 
-    event :income_outstanding do
-      transitions from: :verification_pending, to: :verification_outstanding, :after => [ :record_transition, :notify_of_eligibility_change]
-      transitions from: :unverified, to: :verification_outstanding, :after => [:record_transition, :notify_of_eligibility_change]
-      transitions from: :verification_outstanding, to: :verification_outstanding, :after => [:record_transition]
+    event :income_outstanding, :after => [:record_transition, :change_validation_status, :notify_of_eligibility_change] do
+      transitions from: :verification_pending, to: :verification_outstanding
+      transitions from: :unverified, to: :verification_outstanding
+      transitions from: :verification_outstanding, to: :verification_outstanding
     end
 
-    event :mec_outstanding do
-      transitions from: :verification_pending, to: :verification_outstanding, :after => [ :record_transition, :notify_of_eligibility_change]
-      transitions from: :unverified, to: :verification_outstanding, :after => [:record_transition, :notify_of_eligibility_change]
-      transitions from: :verification_outstanding, to: :verification_outstanding, :after => [:record_transition]
+    event :mec_outstanding, :after => [:record_transition, :change_validation_status, :notify_of_eligibility_change] do
+      transitions from: :verification_pending, to: :verification_outstanding
+      transitions from: :unverified, to: :verification_outstanding
+      transitions from: :verification_outstanding, to: :verification_outstanding
     end
 
-    event :income_valid do
-      transitions from: :unverified, to: :fully_verified, :guard => :is_mec_verified?, :after => [ :record_transition, :notify_of_eligibility_change]
-      transitions from: :unverified, to: :verification_pending, :after => [ :record_transition, :notify_of_eligibility_change]
-      transitions from: :verification_pending, to: :fully_verified, :guard => :is_mec_verified?, :after => [ :record_transition, :notify_of_eligibility_change]
-      transitions from: :verification_outstanding, to: :fully_verified, :guard => :is_mec_verified?, :after => [ :record_transition, :notify_of_eligibility_change]
-      transitions from: :verification_outstanding, to: :verification_outstanding, :after => [:record_transition]
+    event :income_valid, :after => [:record_transition, :change_validation_status, :notify_of_eligibility_change] do
+      transitions from: :unverified, to: :fully_verified, :guard => :is_mec_verified?
+      transitions from: :unverified, to: :verification_pending
+      transitions from: :verification_pending, to: :fully_verified, :guard => :is_mec_verified?
+      transitions from: :verification_outstanding, to: :fully_verified, :guard => :is_mec_verified?
+      transitions from: :verification_outstanding, to: :verification_outstanding
       transitions from: :fully_verified, to: :fully_verified
     end
 
-    event :mec_valid do
-      transitions from: :unverified, to: :fully_verified, :guard => :is_income_verified?, :after => [ :record_transition, :notify_of_eligibility_change]
-      transitions from: :unverified, to: :verification_pending, :after => [ :record_transition, :notify_of_eligibility_change]
-      transitions from: :verification_pending, to: :fully_verified, :guard => :is_income_verified?, :after => [ :record_transition, :notify_of_eligibility_change]
-      transitions from: :verification_outstanding, to: :fully_verified, :guard => :is_income_verified?, :after => [ :record_transition, :notify_of_eligibility_change]
-      transitions from: :verification_outstanding, to: :verification_outstanding, :after => [:record_transition]
+    event :mec_valid, :after => [:record_transition, :change_validation_status, :notify_of_eligibility_change] do
+      transitions from: :unverified, to: :fully_verified, :guard => :is_income_verified?
+      transitions from: :unverified, to: :verification_pending
+      transitions from: :verification_pending, to: :fully_verified, :guard => :is_income_verified?
+      transitions from: :verification_outstanding, to: :fully_verified, :guard => :is_income_verified?
+      transitions from: :verification_outstanding, to: :verification_outstanding
       transitions from: :fully_verified, to: :fully_verified
     end
   end
@@ -371,7 +368,7 @@ class FinancialAssistance::Applicant
 
   def tax_household
     return nil unless tax_household_id
-    self.application.tax_households.find(tax_household_id) if application.tax_households.present?
+    application.tax_households.find(tax_household_id) if application.tax_households.present?
   end
 
   def age_on_effective_date
@@ -384,8 +381,8 @@ class FinancialAssistance::Applicant
     # Shave off one year if coverage starts before birthday
     if coverage_start_on.month == dob.month
       age -= 1 if coverage_start_on.day < dob.day
-    else
-      age -= 1 if coverage_start_on.month < dob.month
+    elsif coverage_start_on.month < dob.month
+      age -= 1
     end
 
     @age_on_effective_date = age
@@ -402,11 +399,11 @@ class FinancialAssistance::Applicant
   end
 
   def applicant_validation_complete?
-    self.valid?(:submission) &&
-      self.incomes.all? { |income| income.valid? :submission } &&
-      self.benefits.all? { |benefit| benefit.valid? :submission } &&
-      self.deductions.all? { |deduction| deduction.valid? :submission } &&
-      self.other_questions_complete?
+    valid?(:submission) &&
+      incomes.all? { |income| income.valid? :submission } &&
+      benefits.all? { |benefit| benefit.valid? :submission } &&
+      deductions.all? { |deduction| deduction.valid? :submission } &&
+      other_questions_complete?
   end
 
   def clean_conditional_params(model_params)
@@ -440,25 +437,25 @@ class FinancialAssistance::Applicant
   end
 
   def incomes_complete?
-    self.incomes.all? do |income|
+    incomes.all? do |income|
       income.valid? :submission
     end
   end
 
   def other_incomes_complete?
-    self.incomes.all? do |other_incomes|
+    incomes.all? do |other_incomes|
       other_incomes.valid? :submission
     end
   end
 
   def benefits_complete?
-    self.benefits.all? do |benefit|
+    benefits.all? do |benefit|
       benefit.valid? :submission
     end
   end
 
   def deductions_complete?
-    self.deductions.all? do |deduction|
+    deductions.all? do |deduction|
       deduction.valid? :submission
     end
   end
@@ -471,40 +468,24 @@ class FinancialAssistance::Applicant
     case embedded_document
     when :income
       return false if has_job_income.nil? || has_self_employment_income.nil?
-      if has_job_income && has_self_employment_income
-        return incomes.jobs.present? && incomes.self_employment.present?
-      elsif has_job_income && !has_self_employment_income
-        return incomes.jobs.present? && incomes.self_employment.blank?
-      elsif !has_job_income && has_self_employment_income
-        return incomes.jobs.blank? && incomes.self_employment.present?
-      else
-        return incomes.jobs.blank? && incomes.self_employment.blank?
-      end
+      return incomes.jobs.present? && incomes.self_employment.present? if has_job_income && has_self_employment_income
+      return incomes.jobs.present? && incomes.self_employment.blank? if has_job_income && !has_self_employment_income
+      return incomes.jobs.blank? && incomes.self_employment.present? if !has_job_income && has_self_employment_income
+      incomes.jobs.blank? && incomes.self_employment.blank?
     when :other_income
       return false if has_other_income.nil?
-      if has_other_income
-        return incomes.other.present?
-      else
-        return incomes.other.blank?
-      end
+      return incomes.other.present? if has_other_income
+      incomes.other.blank?
     when :income_adjustment
       return false if has_deductions.nil?
-      if has_deductions
-        return deductions.present?
-      else
-        return deductions.blank?
-      end
+      return deductions.present? if has_deductions
+      deductions.blank?
     when :health_coverage
       return false if has_enrolled_health_coverage.nil? || has_eligible_health_coverage.nil?
-      if has_enrolled_health_coverage && has_eligible_health_coverage
-        return benefits.enrolled.present? && benefits.eligible.present?
-      elsif has_enrolled_health_coverage && !has_eligible_health_coverage
-        return benefits.enrolled.present? && benefits.eligible.blank?
-      elsif !has_enrolled_health_coverage && has_eligible_health_coverage
-        return benefits.enrolled.blank? && benefits.eligible.present?
-      else
-        return benefits.enrolled.blank? && benefits.eligible.blank?
-      end
+      return benefits.enrolled.present? && benefits.eligible.present? if has_enrolled_health_coverage && has_eligible_health_coverage
+      return benefits.enrolled.present? && benefits.eligible.blank? if has_enrolled_health_coverage && !has_eligible_health_coverage
+      return benefits.enrolled.blank? && benefits.eligible.present? if !has_enrolled_health_coverage && has_eligible_health_coverage
+      benefits.enrolled.blank? && benefits.eligible.blank?
     end
   end
 
@@ -517,23 +498,29 @@ class FinancialAssistance::Applicant
   end
 
   def has_faa_docs_for_type?(type)
-    self.assisted_verifications.where(verification_type: type).first.assisted_verification_documents.any?{ |doc| doc.identifier }
+    assisted_verifications.where(verification_type: type).first.assisted_verification_documents.any?{ |doc| doc.identifier }
   end
 
-  def update_verification_type(v_type, update_reason)
-    if v_type == "MEC"
-      update_attributes!(:assisted_mec_validation => "valid", :assisted_mec_reason => update_reason)
-      assisted_verifications.mec.first.update_attributes!(status: "verified")
-      self.mec_valid!
-    else v_type == "Income"
-      update_attributes(:assisted_income_validation => "valid", :assisted_income_reason => update_reason)
-      assisted_verifications.income.first.update_attributes!(status: "verified")
-      self.income_valid!
+  def admin_verification_action(action, v_type, update_reason)
+    if action == "verify"
+      update_verification_type(v_type, update_reason)
+    elsif action == "return_for_deficiency"
+      return_doc_for_deficiency(v_type, update_reason)
     end
   end
 
+  def update_verification_type(v_type, update_reason)
+    v_type.update_attributes(validation_status: 'verified', update_reason: update_reason)
+    "#{v_type.type_name} successfully approved"
+  end
+
+  def return_doc_for_deficiency(v_type, update_reason)
+    v_type.update_attributes(validation_status: 'outstanding', update_reason: update_reason)
+    "#{v_type.type_name} was rejected"
+  end
+
   def is_assistance_verified?
-    ((!eligible_for_faa?) || is_assistance_required_and_verified?) ? true : false
+    !eligible_for_faa? || is_assistance_required_and_verified? ? true : false
   end
 
   def is_assistance_required_and_verified?
@@ -560,32 +547,27 @@ class FinancialAssistance::Applicant
     assisted_doument_pending?("MEC")
   end
 
+  def income_verification
+    verification_types.by_name('Income').first
+  end
+
+  def mec_verification
+    verification_types.by_name('MEC').first
+  end
+
   def assisted_doument_pending?(kind)
-    if eligible_for_faa? && assisted_verifications.where(verification_type: kind).present? && assisted_verifications.select{|assisted_verification| assisted_verification.verification_type == kind }.first.status == "pending"
-      return true
-    elsif !eligible_for_faa?
-      return false
-    else
-      return false
-    end
+    return true if eligible_for_faa? && verification_types.by_name(kind).present? && verification_types.by_name(kind).first.validation_status == "pending"
+    false
   end
 
   def is_income_verified?
-    assisted_income_verification = assisted_verifications.select{|verification| verification.verification_type == "Income" }.first
-    if assisted_income_verification.present? && assisted_income_verification.status == "verified"
-      return true
-    end
-
-    return false
+    return true if income_verification.present? && income_verification.validation_status == "verified"
+    false
   end
 
   def is_mec_verified?
-    assisted_mec_verification = assisted_verifications.select{|verification| verification.verification_type == "MEC" }.first
-    if assisted_mec_verification.present? && assisted_mec_verification.status == "verified"
-      return true
-    end
-
-    return false
+    return true if mec_verification.present? && mec_verification.validation_status == 'verified'
+    false
   end
 
   def job_income_exists?
@@ -622,6 +604,12 @@ class FinancialAssistance::Applicant
   end
 
   private
+
+  def change_validation_status
+    kind = aasm.current_event.to_s.include?('income') ? 'Income' : 'MEC'
+    status = aasm.current_event.to_s.include?('outstanding') ? 'outstanding' : 'verified'
+    verification_types.by_name(kind).first.update_attributes!(validation_status: status)
+  end
 
   def other_questions_answers
     [:has_daily_living_help, :need_help_paying_bills, :is_ssn_applied].inject([]) do |array, question|
@@ -687,7 +675,7 @@ class FinancialAssistance::Applicant
       errors.add(:pregnancy_end_on, "' Pregnency End on date' should be answered") if is_post_partum_period.nil?
     end
 
-    if (age_of_applicant > 18 && age_of_applicant < 26)
+    if age_of_applicant > 18 && age_of_applicant < 26
       if is_former_foster_care.nil?
         errors.add(:is_former_foster_care, "' Was this person in foster care at age 18 or older?' should be answered")
       end
@@ -749,7 +737,7 @@ class FinancialAssistance::Applicant
   end
 
   def record_transition
-    self.workflow_state_transitions << WorkflowStateTransition.new(
+    workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
       to_state: aasm.to_state
     )

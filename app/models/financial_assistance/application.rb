@@ -26,6 +26,8 @@ class FinancialAssistance::Application
 
   FAA_SCHEMA_FILE_PATH     = File.join(Rails.root, 'lib', 'schemas', 'financial_assistance.xsd')
 
+  STATES_FOR_VERIFICATIONS = %w(submitted determination_response_error determined)
+
   # TODO: Need enterprise ID assignment call for Assisted Application
   field :hbx_id, type: String
 
@@ -112,6 +114,8 @@ class FinancialAssistance::Application
   scope :submitted, ->{ any_in(aasm_state: SUBMITTED_STATUS) }
   scope :determined, ->{ any_in(aasm_state: "determined") }
   scope :by_hbx_id, ->(hbx_id) { where(hbx_id: hbx_id) }
+  scope :for_verifications, -> { where(:aasm_state.in => STATES_FOR_VERIFICATIONS)}
+  scope :by_year, ->(year) { where(:assistance_year => year) }
 
   alias_method :is_joint_tax_filing?, :is_joint_tax_filing
   alias_method :is_renewal_authorized?, :is_renewal_authorized
@@ -729,15 +733,16 @@ private
   end
 
   def create_verification_documents
-    applicants.each do |applicant|
-      income_assisted_verification = applicant.assisted_verifications.create!(status: "submitted", verification_type: "Income")
-      mec_assisted_verification = applicant.assisted_verifications.create!(status: "submitted", verification_type: "MEC")
+    active_applicants.each do |applicant|
+      %w[Income MEC].each do |type|
+        applicant.verification_types << VerificationType.new(type_name: type, validation_status: 'pending' )
+      end
     end
   end
 
   def delete_verification_documents
-    applicants.each do |applicant|
-      applicant.assisted_verifications.destroy_all
+    active_applicants.each do |applicant|
+      applicant.verification_types.destroy_all
     end
   end
 end
