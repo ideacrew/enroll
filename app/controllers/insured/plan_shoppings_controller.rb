@@ -198,6 +198,7 @@ class Insured::PlanShoppingsController < ApplicationController
     set_plans_by(hbx_enrollment_id: hbx_enrollment_id)
     @metal_levels = @plans.map(&:metal_level).uniq
     @plan_types = @plans.map(&:product_type).uniq
+    @networks = ['Nationwide', 'DC-Metro']
 
     generate_eligibility_data
     generate_checkbook_service
@@ -227,7 +228,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @member_groups = sort_member_groups(sponsored_cost_calculator.groups_for_products(products))
     @products = @member_groups.map(&:group_enrollment).map(&:product)
     extract_from_shop_products
-    # @networks = []
+    @networks = @products.map(&:network_information).uniq.compact if offers_nationwide_plans?
     @carrier_names = @issuer_profiles.map(&:legal_name)
     @use_family_deductable = (@hbx_enrollment.hbx_enrollment_members.count > 1)
     @waivable = @hbx_enrollment.can_waive_enrollment?
@@ -246,12 +247,6 @@ class Insured::PlanShoppingsController < ApplicationController
       @plan_types = []
       @metal_levels = []
     end
-    @networks = @products.map(&:network_information).uniq.compact if offers_nationwide_plans?
-    @carrier_names = @issuer_profiles.map{|ip| ip.legal_name}
-    @use_family_deductable = (@hbx_enrollment.hbx_enrollment_members.count > 1)
-    @waivable = @hbx_enrollment.can_waive_enrollment?
-    render "show"
-    ::Caches::CustomCache.release(::BenefitSponsors::Organizations::Organization, :plan_shopping)
   end
 
   def set_elected_aptc

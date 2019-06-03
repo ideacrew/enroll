@@ -639,6 +639,14 @@ module ApplicationHelper
     (plan.active_year == 2015 ? plan.metal_level : plan.dental_level).try(:titleize) || ''
   end
 
+  def ivl_metal_network(plan)
+    (plan.nationwide ? 'nationwide' : 'dc metro') if plan.benefit_market_kind == :aca_individual
+  end
+
+  def ivl_hsa_status(plan_hsa_status, plan)
+    (plan_hsa_status[plan.id.to_s]) if plan.benefit_market_kind == :aca_individual
+  end
+
   def make_binder_checkbox_disabled(employer)
     eligibility_criteria(employer)
     (@participation_count == 0 && @non_owner_participation_rule == true) ? false : true
