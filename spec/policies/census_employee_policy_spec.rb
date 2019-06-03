@@ -368,7 +368,7 @@ describe CensusEmployeePolicy do
         end
       end
     end
-    context "when is general agency user", dbclean: :after_each do
+    context "when is general agency user not linked to the employer", dbclean: :after_each do
       let(:user) { FactoryGirl.create(:user, :general_agency_staff, person: person) }
       context "current user is broker of employer_profile" do
         let(:person) { FactoryGirl.create(:person, :with_general_agency_staff_role) }
@@ -376,7 +376,7 @@ describe CensusEmployeePolicy do
           allow(EmployerProfile).to receive(:find_by_general_agency_profile).and_return [employee.employer_profile]
         end
         it "grants access for general acency user" do
-          expect(subject).to permit(user, employee)
+          expect(subject).not_to permit(user, employee)
         end
       end
 
