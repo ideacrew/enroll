@@ -54,7 +54,8 @@ class Insured::GroupSelectionController < ApplicationController
   def create
     @market_kind = @adapter.create_action_market_kind(params)
     return redirect_to purchase_insured_families_path(change_plan: @change_plan, terminate: 'terminate') if params[:commit] == "Terminate Plan"
-    if @employee_role.census_employee.present?
+    
+    if @employee_role.present? && @employee_role.census_employee.present?
       new_hire_enrollment_period = @employee_role.census_employee.new_hire_enrollment_period
       if new_hire_enrollment_period.begin > TimeKeeper.date_of_record
         raise "You're not yet eligible under your employer-sponsored benefits. Please return on #{new_hire_enrollment_period.begin.strftime("%m/%d/%Y")} to enroll for coverage."
@@ -69,9 +70,7 @@ class Insured::GroupSelectionController < ApplicationController
         BSON::ObjectId.from_string(family_member_id)
       end
     end
-
     hbx_enrollment = build_hbx_enrollment(family_member_ids)
-
     if @adapter.is_waiving?(params)
       if hbx_enrollment.save
         @adapter.assign_enrollment_to_benefit_package_assignment(@employee_role, hbx_enrollment)
@@ -97,7 +96,7 @@ class Insured::GroupSelectionController < ApplicationController
     hbx_enrollment.broker_agency_profile_id = broker_role.broker_agency_profile_id if broker_role
     hbx_enrollment.validate_for_cobra_eligiblity(@employee_role)
     if hbx_enrollment.save
-      @adapter.assign_enrollment_to_benefit_package_assignment(@employee_role, hbx_enrollment)
+      @adapter.assign_enrollment_to_benefit_package_assignment(@employee_role, hbx_enrollment) if @employee_role.present?
       if @adapter.keep_existing_plan?(params) && @adapter.previous_hbx_enrollment.present?
         redirect_to thankyou_insured_plan_shopping_path(change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @adapter.coverage_kind, id: hbx_enrollment.id, plan_id: @adapter.previous_hbx_enrollment.product_id)
       elsif @change_plan.present?
@@ -192,7 +191,6 @@ class Insured::GroupSelectionController < ApplicationController
     @enrollment_kind = @adapter.enrollment_kind
     @shop_for_plans = @adapter.shop_for_plans
     @optional_effective_on = @adapter.optional_effective_on
-
     @adapter.if_employee_role do |emp_role|
       @employee_role = emp_role
       @role = emp_role
