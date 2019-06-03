@@ -426,6 +426,8 @@ module BenefitSponsors
           end
 
           it "should redirect" do
+            expect(flash[:error]).to match(/Broker Agency information not saved. .*/) if profile_type == "broker_agency"
+            expect(flash[:error]).to match(/Employer information not saved. .*/) if profile_type == "benefit_sponsor"
             expect(response).to have_http_status(:redirect)
           end
 
