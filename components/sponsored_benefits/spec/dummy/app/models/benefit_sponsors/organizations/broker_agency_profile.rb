@@ -124,7 +124,7 @@ module BenefitSponsors
       end
 
       def build_nested_models
-        build_inbox if inbox.nil?
+        # build_inbox if inbox.nil?
       end
 
     end
