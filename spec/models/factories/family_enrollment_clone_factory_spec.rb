@@ -64,6 +64,23 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model, dbclean
     allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(100.0)
   end
 
+  describe "methods" do
+    let(:external_enrollment) { true }
+    let(:enrollment_factory) {
+      factory = Factories::FamilyEnrollmentCloneFactory.new
+      factory.family = family
+      factory.census_employee = ce
+      factory.enrollment = family.enrollments.first
+      factory
+    }
+
+    context "#clone_cobra_enrollment" do
+      it "should successfully clone the enrollment" do
+        expect(enrollment_factory.clone_cobra_enrollment.class).to eq(HbxEnrollment)
+      end
+    end
+  end
+
   context 'family under renewing employer' do
     let(:external_enrollment) { false }
 
