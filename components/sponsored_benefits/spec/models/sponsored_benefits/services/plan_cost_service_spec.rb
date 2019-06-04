@@ -103,7 +103,7 @@ RSpec.describe SponsoredBenefits::Services::PlanCostService, type: :model, dbcle
       allow(Caches::PlanDetails).to receive(:lookup_rate).and_return 78.0
       subject.plan = benefit_group.reference_plan
     end
-    it "should return total monthly employer contribution amount" do
+    it "should return total monthly employee contribution amount" do
       # ER contribution is 80%. EE contribution is 20%
       expect(subject.monthly_employee_costs).to eq [0.2*78.0, 0.2*78.0]
     end

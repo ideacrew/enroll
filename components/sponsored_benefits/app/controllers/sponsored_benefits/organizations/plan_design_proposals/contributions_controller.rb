@@ -7,7 +7,7 @@ module SponsoredBenefits
           benefit_group.build_estimated_composite_rates
         end
         benefit_group.set_bounding_cost_plans
-        @service = PlanCostService.new({benefit_group: benefit_group})
+        @service = SponsoredBenefits::Services::PlanCostService.new({benefit_group: benefit_group})
 
         @employer_contribution_amount = @service.monthly_employer_contribution_amount
         @min_employee_cost = @service.monthly_min_employee_cost

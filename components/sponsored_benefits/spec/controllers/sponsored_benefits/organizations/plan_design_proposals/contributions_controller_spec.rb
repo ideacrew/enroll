@@ -119,7 +119,7 @@ module SponsoredBenefits
     end
 
     it 'finished in under 10 seconds' do
-      Caches::PlanDetails.load_record_cache!
+      Caches::PlanDetails.load_record_cache! if Caches::PlanDetails.respond_to? :load_record_cache!
       expect do
         get :index, {
           plan_design_proposal_id: plan_design_proposal.id,
