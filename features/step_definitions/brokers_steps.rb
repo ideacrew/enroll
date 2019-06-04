@@ -185,7 +185,7 @@ end
 
 Then(/^.+ should see successful message with broker agency home page$/) do
  #expect(page).to have_content("Welcome to #{Settings.site.short_name}. Your account has been created.")
-  expect(page).to have_content('Broker Agency : First Legal Name')
+  expect(page).to have_content("Broker Agency : #{broker_agency_profile.legal_name}")
 end
 
 Then(/^.+ should see no active broker$/) do
@@ -197,21 +197,27 @@ When(/^.+ clicks? on Browse Brokers button$/) do
 end
 
 Then(/^.+ should see broker agencies index view$/) do
-  #TODO add AJAX handling
-  wait_for_ajax(3)
-  expect(page).to have_content('Broker Agencies', :wait => 5)
+  @broker_agency_profiles.keys.each do |broker_agency_name|
+    element = find("div#broker_agencies_listing a", text: /#{broker_agency_name}/i, wait: 5)
+    expect(element).to be_present
+  end
 end
 
-When(/^.+ searches broker agency by name$/) do
+When(/^.+ searches broker agency (.*?)$/) do |legal_name|
   find('.broker_agencies_search')
-
-  fill_in 'q', with: 'First Legal Name'
-
+  fill_in 'q', with: (legal_name || broker_agency_profile.legal_name)
   find('.search-wp .btn').click
 end
 
-Then(/^.+ should see broker agency$/) do
-  expect(page).to have_content('First Legal Name')
+When(/^.+ searches primary broker (.*?)$/) do |broker_name|
+  find('.broker_agencies_search')
+  fill_in 'q', with: broker_name
+  find('.search-wp .btn').click
+end
+
+Then(/^.+ should see broker agency (.*?)$/) do |legal_name|
+  element = find("div#broker_agencies_listing a", text: /#{legal_name || broker_agency_profile.legal_name}/i, wait: 5)
+  expect(element).to be_present
 end
 
 Then(/^.+ clicks? select broker button$/) do
@@ -233,14 +239,15 @@ Then(/^.+ should see broker selected successful message$/) do
   expect(page).to have_content("Your broker has been notified of your selection and should contact you shortly. You can always call or email them directly. If this is not the broker you want to use, select 'Change Broker'.")
 end
 
-And (/^.+ should see broker active for the employer$/) do
-  expect(page).to have_content('First Legal Name')
-  expect(page).to have_content(/john smith/i)
+And(/^.+ should see broker (.*?) and agency (.*?) active for the employer$/) do |broker_name, agency_name|
+  find('#active_broker_tab #employer-broker-card', text: /Active Broker/i, wait: 5)
+  expect(page).to have_content(/#{broker_name}/i)
+  expect(page).to have_content(/#{agency_name}/i)
 end
 
 When(/^.+ terminates broker$/) do
   find('.interaction-click-control-change-broker').click
-  wait_for_ajax(2,2)
+  find('.modal-title', text: 'Broker Termination Confirmation', wait: 5)
   within '.modal-dialog' do
     click_link 'Terminate Broker'
   end
@@ -250,11 +257,12 @@ Then(/^.+ should see broker terminated message$/) do
   expect(page).to have_content('Broker terminated successfully.')
 end
 
-Then(/^.+ should see Employer and click on legal name$/) do
-  click_link 'ABC Widgets'
+Then(/^.+ should see Employer (.*?) and click on legal name$/) do |legal_name|
+  click_link legal_name
 end
 
-Then(/^.+ should see the Employer Profile page as Broker$/) do
+Then(/^.+ should see the Employer (.*?) page as Broker$/) do |legal_name|
+  find('#home h4', text: legal_name, wait: 5)
   expect(page).to have_content("I'm a Broker")
 end
 
@@ -321,14 +329,19 @@ end
 #   expect(page).to have_content('Legal LLC')
 # end
 
-Then(/^Broker Assisted is a family$/) do
+Then(/^.+ should see (.*?) as family and click on name$/) do |name|
   find(:xpath, "//li[contains(., 'Families')]/a").click
-  expect(page).to have_content('Broker Assisted')
+  expect(page).to have_content(name)
+  click_link name
 end
 
 Then(/^.+ goes to the Consumer page$/) do
-  click_link 'Broker Assisted'
   expect(page).to have_content("My #{Settings.site.short_name}")
+end
+
+Then(/^Primary Broker should see (.*?) account$/) do |name|
+  find('.family_members h1', text: 'Household Info: Family Members', wait: 5)
+  find('.family_members span', text: name, wait: 5)
 end
 
 # Then(/^.+ is on the consumer home page$/) do
