@@ -1337,44 +1337,38 @@ describe Family, "given a primary applicant and a dependent", dbclean: :after_ea
     let!(:created_at) { ivl_enrollment.created_at + 2.days }
 
   context '.enrolled_policy' do 
-
     it "should return the enrolled policy for a family member" do
       family.enrollments.first.update_attributes!(aasm_state:"enrolled_contingent")
       family.enrollments.first.hbx_enrollment_members.new(applicant_id:family_member.id,eligibility_date:TimeKeeper.date_of_record, coverage_start_on:TimeKeeper.date_of_record + 1.day)
       expect(family.enrolled_policy(family_member)).to eq  family.enrollments.first
     end
-
   end
 
   context 'scopes' do 
+    it '.by_enrollment_updated_datetime_range' do
+      expect(Family.by_enrollment_updated_datetime_range(start_date, end_date).to_a).to include family
+    end
 
-      it '.by_enrollment_updated_datetime_range' do
-          expect(Family.by_enrollment_updated_datetime_range(start_date, end_date).to_a).to include family
-      end
+    it '.with_enrollment_hbx_id' do
+      expect(Family.with_enrollment_hbx_id(enrollment.hbx_id)).to include family
+    end
 
-      it '.with_enrollment_hbx_id' do
-        expect(Family.with_enrollment_hbx_id(enrollment.hbx_id)).to include family
-      end
+    it '.enrolled_through_benefit_package' do
+      expect(Family.enrolled_through_benefit_package(current_benefit_package)).to include family
+    end
 
-      it '.enrolled_through_benefit_package' do
-        expect(Family.enrolled_through_benefit_package(current_benefit_package)).to include family
-      end
+    it '.enrolled_under_benefit_application' do
+      expect(Family.enrolled_under_benefit_application(initial_application)).to include family
+    end
 
-      it '.enrolled_under_benefit_application' do
-        expect(Family.enrolled_under_benefit_application(initial_application)).to include family
-      end
-
-      it '.by_enrollment_shop_market' do
-        expect(Family.by_enrollment_shop_market).to include family
-      end
-
+    it '.by_enrollment_shop_market' do
+      expect(Family.by_enrollment_shop_market).to include family
+    end
   end
 
   context 'send_enrollment_notice_for_ivl ' do 
-
     it '.enrollment_notice_for_ivl_families' do 
       expect(Family.send_enrollment_notice_for_ivl(created_at)).to include family
     end
-
   end
 end
