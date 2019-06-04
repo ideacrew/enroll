@@ -3,7 +3,7 @@
   .row.justify-content-md-center
     #registration-form-container.col-md-6.col-sm-8.col-xs-12
       h2.text-center.heading-text Create Account
-      = form_for(resource, as: resource_name, url: registration_path(resource_name), html: {class: 'needs-validation', data: {controller:'signup'}, novalidate: true }) do |f|
+      = form_for(resource, as: resource_name, url: registration_path(resource_name), html: {class: 'needs-validation', data: {controller:'signup', action: "keyup->signup#validateInput"}, novalidate: true }) do |f|
         = devise_error_messages!
         .row.error-block.d-none
           .col-xs-12
@@ -11,20 +11,26 @@
         = f.hidden_field :referer, value: request.env["HTTP_REFERER"]
         .form-group
           = f.label :email_or_username
-          = f.text_field :oim_id, class: "form-control", required: true
+          = f.text_field :oim_id, class: "form-control", required: true, data: {action: "focus->signup#emailTooltip click->signup#emailTooltip", toggle: "tooltip", placement: "right", trigger: 'click', title: "You can use your email address as your login. Using your email address will make it easier to recover your password if you ever forget it.", target: 'signup.usernameField' }
           .invalid-feedback
             | You can use your email address as your login. Using your email address will make it easier to recover your password if you ever forget it.
         .form-group
-          = f.label :password
-          small.pl-2.text-muted
-            = User.validators.select{|v| v.attributes == [:password] && v.options.has_key?(:minimum) }.first.options[:minimum]
-            |  characters minimum
-          = f.password_field :password, autocomplete: "off", class: "form-control", minlength:"8", required: true
+          .row.pl-3.pr-3
+            .col-8.p-0
+              = f.label :password
+              small.pl-2.text-muted
+                = User.validators.select{|v| v.attributes == [:password] && v.options.has_key?(:minimum) }.first.options[:minimum]
+                |  characters minimum
+            .col-4.p-0
+              .float-right
+                span#pass_strength
+                span#complexity
+          = f.password_field :password, autocomplete: "off", class: "form-control", minlength:"8", maxlength:"20", required: true, data: { action: "focus->signup#passwordTooltip", toggle: "tooltip", placement: "right", trigger: 'click', html: true, target: 'signup.passwordField' }
           .invalid-feedback
             | Must be at least 8 characters and cannot contain username
         .form-group
           = f.label :password_confirmation, "Password Confirmation"
-          = f.password_field :password_confirmation, autocomplete: "off", class: "form-control", minlength:"8", required: true
+          = f.password_field :password_confirmation, autocomplete: "off", class: "form-control", minlength:"8", required: true, data: {action: "focus->signup#hideTooltips click->signup#hideTooltips"}
           .invalid-feedback
             | Must be at least 8 characters and cannot contain username
         .form-group
