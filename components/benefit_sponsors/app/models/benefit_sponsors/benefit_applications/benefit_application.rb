@@ -1130,7 +1130,7 @@ module BenefitSponsors
 
         :enrollment_closed        => :enrollment_closed,
 
-        :enrolled                 => :enrollment_eligible,
+        :enrolled                 => :binder_paid,
         :renewing_enrolled        => :enrollment_eligible,
 
         :application_ineligible           => :enrollment_ineligible,

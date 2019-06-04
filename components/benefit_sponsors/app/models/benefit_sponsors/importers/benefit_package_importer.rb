@@ -39,17 +39,23 @@ module BenefitSponsors
           sponsored_benefit  = BenefitSponsors::SponsoredBenefits::DentalSponsoredBenefit.new
         end
 
-        sponsored_benefit.product_package_kind = map_product_package_kind(sponsored_benefit_attrs[:plan_option_kind])
+        package_kind = sponsored_benefit_attrs[:product_kind] == :dental && sponsored_benefit_attrs[:plan_option_kind] == "single_plan" ? :multi_product : map_product_package_kind(sponsored_benefit_attrs[:plan_option_kind])
+        sponsored_benefit.product_package_kind = package_kind
         sponsored_benefit.benefit_package = benefit_package
         
         if sponsored_benefit.product_package.present?
           sponsored_benefit.reference_product = sponsored_benefit.product_package.products.where(hios_id: sponsored_benefit_attrs[:reference_plan_hios_id]).first
           raise StandardError, "Unable find reference product" if sponsored_benefit.reference_product.blank?
           sponsored_benefit.product_option_choice = product_package_choice_for(sponsored_benefit)
+
           if sole_source? && sponsored_benefit_attrs[:product_kind] == :health
             sponsor_contribution_attrs = sponsored_benefit_attrs[:composite_tier_contributions]
           else
             sponsor_contribution_attrs = sponsored_benefit_attrs[:relationship_benefits]
+          end
+
+          if sponsored_benefit_attrs[:product_kind] == :dental && sponsored_benefit.product_package_kind == :multi_product
+            sponsored_benefit.elected_product_choices = sponsored_benefit.product_package.products.where(:hios_id => {"$in" => sponsored_benefit_attrs[:elected_dental_plan_hios_ids]}).map(&:_id)
           end
 
           build_sponsor_contribution(sponsored_benefit, sponsor_contribution_attrs)
@@ -162,7 +168,8 @@ module BenefitSponsors
             product_kind: :dental,
             plan_option_kind: attributes[:dental_plan_option_kind],
             reference_plan_hios_id: attributes[:dental_reference_plan_hios_id],
-            relationship_benefits: attributes[:dental_relationship_benefits]
+            relationship_benefits: attributes[:dental_relationship_benefits],
+            elected_dental_plan_hios_ids: attributes[:elected_dental_plan_hios_ids]
           }
         end
 

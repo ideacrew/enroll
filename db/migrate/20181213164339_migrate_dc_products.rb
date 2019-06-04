@@ -149,7 +149,7 @@ class MigrateDcProducts < Mongoid::Migration
         say_with_time("Create DC congress products") do
           products = BenefitMarkets::Products::Product.where(metal_level_kind: :gold, :benefit_market_kind => :aca_shop)
           products.each do |product|
-            congress_product = product.dup
+            congress_product = product.deep_dup
             congress_product.benefit_market_kind = "fehb".to_sym
             congress_product._id = BSON::ObjectId.new
             congress_product.sbc_document._id = BSON::ObjectId.new if product.sbc_document.present?
