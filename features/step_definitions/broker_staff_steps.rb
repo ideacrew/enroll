@@ -28,17 +28,6 @@ Then(/^Broker staff submits his application and see successful message$/) do
   expect(page).to have_content('Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed.')
 end
 
-# Given(/^that a Broker  logs into a given (.*)$/) do |portal|
-
-#   person = people[name]
-#   visit "/"
-#   find('a', :text => portal.to_s, wait: 5).click
-#   fill_in "user[login]", :with => @user.oim_id
-#   fill_in "user[password]", :with => @user.password
-#   find('.sign-in-btn').click
-# end
-
-
 And(/^there is a Staff with a “pending” broker staff role in the table$/) do
   #find('a', :text => "Broker Agency Portal", wait: 5).click
   expect(page).to have_content('approve')
