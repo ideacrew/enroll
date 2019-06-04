@@ -91,6 +91,17 @@ class Plan
   # scope :national_network,  ->{ where(nationwide: "true") }
   # scope :local_network,     ->{ where(nationwide: "false") }
 
+  field :plan_type, type: String  # "POS", "HMO", "EPO", "PPO"
+  field :ehb, type: Float, default: 0.0
+
+  field :minimum_age, type: Integer, default: 0
+  field :maximum_age, type: Integer, default: 120
+
+  field :deductible, type: String # Deductible
+  field :family_deductible, type: String
+
+  belongs_to :carrier_profile
+
   scope :by_active_year,        ->(active_year = TimeKeeper.date_of_record.year) { where(active_year: active_year) }
   scope :by_metal_level,        ->(metal_level) { where(metal_level: metal_level) }
   scope :by_dental_level,       ->(dental_level) { where(dental_level: dental_level) }

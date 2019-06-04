@@ -5,7 +5,7 @@ class RelationshipBenefit
 
   field :relationship, type: String
   field :premium_pct, type: Float, default: 0.0
-  field :employer_max_amt
+  field :employer_max_amt, type: Float, default: 0.0
   field :offered, type: Boolean, default: true
 
   # Indicates whether employer offers coverage for this relationship

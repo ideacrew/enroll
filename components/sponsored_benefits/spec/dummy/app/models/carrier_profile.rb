@@ -1,5 +1,6 @@
 class CarrierProfile
   include Mongoid::Document
+  include Config::AcaModelConcern
   include Mongoid::Timestamps
 
   embedded_in :organization
@@ -29,6 +30,11 @@ class CarrierProfile
   delegate :fein, :fein=, to: :organization, allow_nil: false
   delegate :is_active, :is_active=, to: :organization, allow_nil: false
   delegate :updated_by, :updated_by=, to: :organization, allow_nil: false
+
+
+  def self.for_issuer_hios_id(issuer_id)
+    Organization.where("carrier_profile.issuer_hios_ids" => issuer_id).map(&:carrier_profile)
+  end
 
   class << self
     def find(id)
