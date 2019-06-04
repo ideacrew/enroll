@@ -261,6 +261,14 @@ class Plan
     coverage_kind && coverage_kind.downcase == "dental"
   end
 
+  def health?
+    coverage_kind && coverage_kind.downcase == "health"
+  end
+
+  def is_dental_only?
+    dental?
+  end
+
   def self.for_service_areas_and_carriers(service_area_carrier_pairs, active_year, metal_level = nil, coverage_kind = 'health')
     plan_criteria_set = service_area_carrier_pairs.map do |sap|
       criteria = {

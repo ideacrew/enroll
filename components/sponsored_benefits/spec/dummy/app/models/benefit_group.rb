@@ -266,4 +266,12 @@ class BenefitGroup
       composite_tier_contributions.build(composite_rating_tier: rating_tier, offered: true)
     end
   end
+
+  def sic_factor_for(plan)
+    return 1.0
+  end
+
+  def group_size_factor_for(plan)
+    return 1.0
+  end
 end
