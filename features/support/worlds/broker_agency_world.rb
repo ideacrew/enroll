@@ -1,30 +1,5 @@
 module BrokerAgencyWorld
 
-  # def broker_organization
-  #   @broker_organization ||= FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, legal_name: 'First Legal Name', site: site)
-  # end
-
-  # def broker_agency_profile
-  #   @broker_agency_profile = broker_organization.broker_agency_profile
-  # end
-
-  # def broker_agency_account
-  #   @broker_agency_account ||= FactoryBot.build(:benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: broker_agency_profile)
-  # end
-
-  # def assign_person_to_broker_agency(broker_agency_name)
-  #   broker_agency_profile = broker_agency_profile(broker_agency_name)
-  #   broker_agency_profile.active_broker_roles.first
-
-  #   broker_agency_profile.broker_agency_staff_role
-  #   broker_agency_profile.update_attributes!(primary_broker_role_id: broker_role.id)
-  #   broker_agency_profile.approve! if broker_agency_profile.may_approve?
-  # end
-
-  # def broker_role
-  #   @broker_role = FactoryBot.create(:broker_role)
-  # end
-
   def assign_broker_agency_account(broker_name, broker_agency_name)
     broker_agency_profile = broker_agency_profile(broker_agency_name)
     sponsorship = employer_profile.benefit_sponsorships.first
@@ -56,15 +31,6 @@ module BrokerAgencyWorld
     broker_agency_organization(legal_name).broker_agency_profile if broker_agency_organization(legal_name).present?
   end
 
-  # def new_broker(*traits)
-  #   attributes = traits.extract_options!
-  #   @new_broker ||= FactoryBot.create(
-  #     :benefit_sponsors_organizations_general_organization,
-  #     :with_broker_agency_profile,
-  #     attributes.merge(site: site)
-  #   )
-  # end
-
   def assign_broker_to_broker_agency(broker_name, legal_name)
     @brokers ||= {}
     return @brokers[broker_name] if @brokers[:broker_name]
@@ -76,20 +42,6 @@ module BrokerAgencyWorld
     @broker_agency_staff = create(:user, person: person, email: people[broker_name][:email], password: people[broker_name][:password], password_confirmation: people[broker_name][:password])
     @broker_agency_staff.update_attributes(last_portal_visited: "/benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/#{broker_agency_profile.id}")
   end
-
-  # def create_broker_agency
-  #   person = FactoryBot.create(:person, :with_work_email)
-  #   @person2 = FactoryBot.create(:person, first_name: 'staff', last_name: 'member')
-  #   FactoryBot.create(:user, person: @person2)
-  #   @user ||= User.create(email: 'hbx_admin_role@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: 'hbx_admin_role@dc.gov', person: person)
-  #   @user.update_attributes(last_portal_visited: "/benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/#{broker_agency_profile.id}")
-  #   broker_agency_profile.update_attributes!(aasm_state: 'is_approved')
-  #   broker_role = FactoryBot.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: @broker_agency_profile.id, person: person)
-  #   broker_agency_profile.update_attributes!(primary_broker_role_id: broker_role.id)
-  #   @broker_agency_profile ||= broker_agency_profile
-  #   broker_agency_staff_role = FactoryBot.build(:broker_agency_staff_role, broker_agency_profile_id: @broker_agency_profile.id)
-  #   person.broker_agency_staff_roles << broker_agency_staff_role
-  # end
 
   def plan_design_organization(employer_name, broker_agency_name = nil)
     sponsor = employer_profile(employer_name)
@@ -116,10 +68,6 @@ Given(/^there is a Broker Agency exists for (.*?)$/) do |broker_agency_name|
 
   broker_agency_profile(broker_agency_name).update_attributes!(aasm_state: 'is_approved')
 end
-
-# Given(/^there is a Broker$/) do
-#   broker_organization
-# end
 
 And(/^the broker (.*?) is primary broker for (.*?)$/) do |broker_name, broker_agency_name|
   assign_broker_to_broker_agency(broker_name, broker_agency_name)
