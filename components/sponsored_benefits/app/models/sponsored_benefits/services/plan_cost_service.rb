@@ -7,6 +7,7 @@ class SponsoredBenefits::Services::PlanCostService
     @benefit_group = attrs[:benefit_group]
     @reference_plan_id = @benefit_group.reference_plan_id
     @composite_tiers = {}
+    @monthly_employee_costs = {}
   end
 
   def reference_plan
@@ -37,6 +38,11 @@ class SponsoredBenefits::Services::PlanCostService
     end
   end
 
+  def employee_cost_for_plan(plan=reference_plan)
+    self.plan = plan
+    monthly_employee_costs.sum
+  end
+
   def monthly_min_employee_cost(plan=reference_plan)
     self.plan = plan
     monthly_employee_costs.min
@@ -48,7 +54,7 @@ class SponsoredBenefits::Services::PlanCostService
   end
 
   def monthly_employee_costs
-    @monthly_employee_costs ||= active_census_employees.collect do |census_employee|
+    @monthly_employee_costs[self.plan.id] ||= active_census_employees.collect do |census_employee|
       per_employee_cost = if composite?
         (composite_total_premium(census_employee) - (composite_total_premium(census_employee) * employer_contribution_factor).round(2)).round(2)
       else

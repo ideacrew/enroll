@@ -22,7 +22,14 @@ class CarrierProfile
   field :market_coverage, type: String, default: "shop (small group)" # or individual
   field :dental_only_plan, type: Boolean, default: false
 
+  delegate :legal_name, :legal_name=, to: :organization, allow_nil: false
+
   def self.for_issuer_hios_id(issuer_id)
     Organization.where("carrier_profile.issuer_hios_ids" => issuer_id).map(&:carrier_profile)
+  end
+
+  def self.find(id)
+    organizations = Organization.where("carrier_profile._id" => BSON::ObjectId.from_string(id.to_s)).to_a
+    organizations.size > 0 ? organizations.first.carrier_profile : nil
   end
 end

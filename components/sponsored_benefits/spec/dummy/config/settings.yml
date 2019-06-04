@@ -73,6 +73,12 @@ contact_center:
     phone_2: "1-800-368-1019"
     phone_3: "800-537-7697"
     complaint_url: "https://www.hhs.gov/civil-rights/filing-a-complaint"
+plan_option_titles:
+  sole_source: 'One Plan'
+  metal_level: 'One Level'
+  single_carrier: 'One Carrier'
+  single_plan: 'One Plan'
+  plan_year_tooltip: "Employer premium contribution for Employee Only Health Plans must be at least"
 
 notices:
   mailing_address:

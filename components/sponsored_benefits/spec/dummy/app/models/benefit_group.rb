@@ -22,6 +22,8 @@ class BenefitGroup
   field :effective_on_kind, type: String, default: "first_of_month"
   field :terminate_on_kind, type: String, default: "end_of_month"
   field :effective_on_offset, type: Integer, default: 0
+  field :lowest_cost_plan_id, type: BSON::ObjectId
+  field :highest_cost_plan_id, type: BSON::ObjectId
 
   field :elected_dental_plan_ids, type: Array, default: []
   field :elected_plan_ids, type: Array, default: []
@@ -108,6 +110,9 @@ class BenefitGroup
 
   def set_bounding_cost_plans
     true
+    # toDo
+    self.lowest_cost_plan_id  = Plan.all[-1]
+    self.highest_cost_plan_id = Plan.all[-1]
   end
 
   def set_bounding_cost_dental_plans
@@ -124,6 +129,10 @@ class BenefitGroup
 
   def start_on
     benefit_application.start_on
+  end
+
+  def single_plan_type?
+    plan_option_kind == "single_plan"
   end
 
   def sic_factor_for(plan)

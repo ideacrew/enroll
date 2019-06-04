@@ -33,8 +33,6 @@ class Plan
   field :deductible, type: String # Deductible
   field :family_deductible, type: String
 
-  belongs_to :carrier_profile
-
   scope :by_active_year,        ->(active_year = TimeKeeper.date_of_record.year) { where(active_year: active_year) }
   scope :shop_market,           ->{ where(market: "shop") }
   scope :health_coverage,       ->{ where(coverage_kind: "health") }
@@ -52,5 +50,20 @@ class Plan
 
   def is_dental_only?
     dental?
+  end
+
+  def carrier_profile=(new_carrier_profile)
+    if new_carrier_profile.nil?
+      self.carrier_profile_id = nil
+    else
+      raise ArgumentError.new("expected CarrierProfile ") unless new_carrier_profile.is_a? CarrierProfile
+      self.carrier_profile_id = new_carrier_profile._id
+      @carrier_profile = new_carrier_profile
+    end
+  end
+
+  def carrier_profile
+    return @carrier_profile if defined? @carrier_profile
+    @carrier_profile = CarrierProfile.find(carrier_profile_id) unless carrier_profile_id.blank?
   end
 end
