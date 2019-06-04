@@ -17,6 +17,12 @@ FactoryGirl.define do
       end
     end
 
+    trait :with_aca_shop_cca_employer_profile do
+      after :build do |organization, evaluator|
+        build(:benefit_sponsors_organizations_aca_shop_cca_employer_profile, organization: organization)
+      end
+    end
+
     trait :with_site do
       after :build do |organization, evaluator|
       end

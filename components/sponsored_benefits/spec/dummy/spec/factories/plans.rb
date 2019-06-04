@@ -37,6 +37,9 @@ FactoryGirl.define do
     end
     trait :with_rating_factors do
     end
+
+    trait :with_complex_premium_tables do
+    end
   end
 
   factory :premium_table do
