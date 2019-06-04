@@ -3,6 +3,7 @@ require 'rails_helper'
 RSpec.describe Employers::BrokerAgencyController do
 
   before(:all) do
+    DatabaseCleaner.clean
     @employer_profile = FactoryGirl.create(:employer_profile)
 
     @broker_role =  FactoryGirl.create(:broker_role, aasm_state: 'active')
