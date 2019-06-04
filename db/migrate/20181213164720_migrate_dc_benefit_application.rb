@@ -102,7 +102,7 @@ class MigrateDcBenefitApplication < Mongoid::Migration
       @benefit_sponsor_catalog._id = BSON::ObjectId.new
       @benefit_sponsor_catalog.product_packages.map {|pt| pt._id = BSON::ObjectId.new}
       @benefit_sponsor_catalog.new_record = true
-      @benefit_sponsor_catalog.benefit_application = benefit_application
+      @benefit_sponsor_catalog.benefit_application_id = benefit_application.id
       @benefit_sponsor_catalog.save(validate: false)
     else
       @benefit_sponsor_catalog = BenefitMarkets::BenefitSponsorCatalog.find_by(effective_date: benefit_application.start_on) rescue nil
@@ -123,12 +123,12 @@ class MigrateDcBenefitApplication < Mongoid::Migration
       # self.set_predecessor_for_benefit_package(benefit_application, importer.benefit_package)
     end
 
-    set_plan_year_aasm_state(plan_year)
+    set_plan_year_aasm_state(benefit_application, plan_year)
     construct_workflow_state_transitions(benefit_application, plan_year)
     benefit_application
   end
 
-  def self.set_plan_year_aasm_state(plan_year)
+  def self.set_plan_year_aasm_state(benefit_application, plan_year)
     benefit_application.aasm_state = benefit_application.matching_state_for(plan_year)
     if benefit_application.aasm_state == :binder_paid && plan_year.employer_profile.aasm_state.to_sym != :binder_paid
       benefit_application.aasm_state = :enrollment_closed
