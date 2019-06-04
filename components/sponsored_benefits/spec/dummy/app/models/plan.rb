@@ -24,9 +24,21 @@ class Plan
 
   field :name, type: String
 
+  field :plan_type, type: String  # "POS", "HMO", "EPO", "PPO"
+  field :ehb, type: Float, default: 0.0
+
+  field :minimum_age, type: Integer, default: 0
+  field :maximum_age, type: Integer, default: 120
+
+  field :deductible, type: String # Deductible
+  field :family_deductible, type: String
+
+  belongs_to :carrier_profile
+
   scope :by_active_year,        ->(active_year = TimeKeeper.date_of_record.year) { where(active_year: active_year) }
   scope :shop_market,           ->{ where(market: "shop") }
   scope :health_coverage,       ->{ where(coverage_kind: "health") }
   scope :dental_coverage,       ->{ where(coverage_kind: "dental") }
 
+  embeds_many :premium_tables
 end

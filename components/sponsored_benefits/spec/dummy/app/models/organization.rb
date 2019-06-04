@@ -11,5 +11,6 @@ class Organization
   field :home_page, type: String
 
   embeds_one :employer_profile, cascade_callbacks: true, validate: true
-      
+
+  embeds_one :carrier_profile, cascade_callbacks: true, validate: true
 end
