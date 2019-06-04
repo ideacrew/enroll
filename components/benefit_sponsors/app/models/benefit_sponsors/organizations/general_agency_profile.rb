@@ -67,7 +67,12 @@ module BenefitSponsors
       end
 
       def primary_staff
+        # TODO: need replace this with general_agency_primary_staff
         general_agency_staff_roles.present? ? general_agency_staff_roles.last : nil
+      end
+
+      def general_agency_primary_staff
+        general_agency_staff_roles.present? ? general_agency_staff_roles.select { |role| role.is_primary }.first : nil
       end
 
       def current_staff_state
