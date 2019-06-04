@@ -125,4 +125,12 @@ class BenefitGroup
   def start_on
     benefit_application.start_on
   end
+
+  def sic_factor_for(plan)
+    return 1.0
+  end
+
+  def group_size_factor_for(plan)
+    return 1.0
+  end
 end

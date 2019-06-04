@@ -63,7 +63,6 @@ RSpec.describe SponsoredBenefits::Services::PlanCostService, type: :model, dbcle
   end
 
   let!(:broker_agency_profile) do
-    puts 'yo'
     if Settings.aca.state_abbreviation == "DC" # toDo
       FactoryGirl.create(:broker_agency_profile)
     else
@@ -90,7 +89,6 @@ RSpec.describe SponsoredBenefits::Services::PlanCostService, type: :model, dbcle
 
   context "#monthly_employer_contribution_amount" do
     before :each do
-      puts broker_agency_profile
       allow(Caches::PlanDetails).to receive(:lookup_rate).and_return 78.0 
     end
     it "should return total monthly employer contribution amount" do

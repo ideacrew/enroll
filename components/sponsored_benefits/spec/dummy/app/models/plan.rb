@@ -41,4 +41,16 @@ class Plan
   scope :dental_coverage,       ->{ where(coverage_kind: "dental") }
 
   embeds_many :premium_tables
+
+  def dental?
+    coverage_kind && coverage_kind.downcase == "dental"
+  end
+
+  def health?
+    coverage_kind && coverage_kind.downcase == "health"
+  end
+
+  def is_dental_only?
+    dental?
+  end
 end
