@@ -4,6 +4,9 @@ module BenefitSponsors
       include ::SetCurrentUser
       include AASM
       include ::Config::AcaModelConcern
+      include Acapi::Notifiers
+      include ::BenefitSponsors::Concerns::Observable
+      include ::BenefitSponsors::ModelEvents::BrokerAgencyProfile
 
       MARKET_KINDS = individual_market_is_enabled? ? [:individual, :shop, :both] : [:shop]
 
@@ -48,6 +51,10 @@ module BenefitSponsors
       validates :market_kind,
         inclusion: { in: Organizations::BrokerAgencyProfile::MARKET_KINDS, message: "%{value} is not a valid practice area" },
         allow_blank: false
+
+      before_save :notify_before_save
+
+      add_observer ::BenefitSponsors::Observers::NoticeObserver.new, [:process_broker_agency_profile_events]
 
       after_initialize :build_nested_models
 

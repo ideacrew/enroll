@@ -116,6 +116,49 @@ module BenefitSponsors
         __send__(method_name, model_event)
       end
 
+      def process_broker_agency_profile_events(_model_instance, model_event)
+        raise ArgumentError, "expected BenefitSponsors::ModelEvents::ModelEvent" unless model_event.present? && model_event.is_a?(BenefitSponsors::ModelEvents::ModelEvent)
+
+        method_name = "trigger_#{model_event.event_key}_notice"
+        raise StandardError, "unable to find method name: #{method_name}" unless respond_to?(method_name)
+
+        broker_agency_profile = model_event.klass_instance
+        __send__(method_name, model_event, broker_agency_profile)
+      end
+
+      def process_ga_account_events(_model_instance, model_event)
+        raise ArgumentError, "expected BenefitSponsors::ModelEvents::ModelEvent" unless model_event.present? && model_event.is_a?(BenefitSponsors::ModelEvents::ModelEvent)
+
+        method_name = "trigger_#{model_event.event_key}_notice"
+        raise StandardError, "unable to find method name: #{method_name}" unless respond_to?(method_name)
+
+        general_agency_account = model_event.klass_instance
+        __send__(method_name, model_event, general_agency_account)
+      end
+
+      def trigger_default_general_agency_hired_notice(_model_event, broker_agency_profile)
+        general_agency_profile = broker_agency_profile.default_general_agency_profile
+        deliver(recipient: general_agency_profile, event_object: broker_agency_profile, notice_event: 'default_ga_hired_notice_to_general_agency')
+      end
+
+      def trigger_default_general_agency_fired_notice(model_event, broker_agency_profile)
+        general_agency_profile_id = model_event.options[:old_general_agency_profile_id]
+        general_agency_profile = BenefitSponsors::Organizations::GeneralAgencyProfile.find general_agency_profile_id
+        deliver(recipient: general_agency_profile, event_object: broker_agency_profile, notice_event: 'default_ga_fired_notice_to_general_agency')
+      end
+
+      def trigger_general_agency_hired_notice(_model_event, general_agency_account)
+        employer_profile = general_agency_account.plan_design_organization.employer_profile
+        general_agency_profile = general_agency_account.general_agency_profile
+        deliver(recipient: general_agency_profile, event_object: employer_profile, notice_event: "general_agency_hired_confirmation_to_agency", notice_params: { general_agency_account_id: general_agency_account.id.to_s })
+      end
+
+      def trigger_general_agency_fired_notice(_model_event, general_agency_account)
+        employer_profile = general_agency_account.plan_design_organization.employer_profile
+        general_agency_profile = general_agency_account.general_agency_profile
+        deliver(recipient: general_agency_profile, event_object: employer_profile, notice_event: "general_agency_fired_confirmation_to_agency", notice_params: { general_agency_account_id: general_agency_account.id.to_s })
+      end
+
       def trigger_welcome_notice_to_employer_notice(model_event)
         employer_profile = model_event.klass_instance.employer_profile
         deliver(recipient: employer_profile, event_object: employer_profile, notice_event: "welcome_notice_to_employer")

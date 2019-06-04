@@ -1,5 +1,6 @@
 class Employers::EmployerProfilesController < Employers::EmployersController
   include ::Config::AcaConcern
+  include ApplicationHelper
 
   before_action :redirect_new_model, only: [:show, :welcome, :index, :new, :show_profile, :edit, :generate_sic_tree, :create]
 
@@ -188,7 +189,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
 
   def generate_checkbook_urls
-    @employer_profile.generate_checkbook_notices
+    trigger_notice_observer(@employer_profile, @employer_profile, 'out_of_pocket_url_notifier')
     flash[:notice] = "Custom Plan Match instructions are being generated.  Check your secure Messages inbox shortly."
     redirect_to action: :show, :tab => :employees
   end

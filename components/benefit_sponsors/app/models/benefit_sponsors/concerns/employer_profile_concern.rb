@@ -178,10 +178,11 @@ module BenefitSponsors
 
       def fire_general_agency!(terminate_on = TimeKeeper.datetime_of_record)
         return unless active_general_agency_account
-        general_agency_accounts.active.update_all(aasm_state: "inactive", end_on: terminate_on)
-        # TODO fix these during notices implementation
-        # notify_general_agent_terminated
-        # self.trigger_notices("general_agency_terminated")
+        general_agency_accounts.active.each do |ga_account|
+          ga_account.aasm_state = "inactive"
+          ga_account.end_on = terminate_on
+          ga_account.save!
+        end
       end
 
       def broker_fired_confirmation_to_broker
