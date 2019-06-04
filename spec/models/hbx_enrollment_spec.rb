@@ -924,7 +924,7 @@ describe HbxProfile, "class methods", type: :model do
        TimeKeeper.set_date_of_record_unprotected!(Date.today) if TimeKeeper.date_of_record.month == 1 || TimeKeeper.date_of_record.month == 12
     end
 
-    it "should cancel hbx enrollemnt plan1 from carrier1 when choosing plan2 from carrier2" do
+    it "should cancel hbx enrollment plan1 from carrier1 when choosing plan2 from carrier2" do
       hbx_enrollment1.effective_on = date + 1.day
       hbx_enrollment2.effective_on = date
       # This gets processed on 31st Dec
@@ -938,7 +938,7 @@ describe HbxProfile, "class methods", type: :model do
       expect(hbx_enrollment2.coverage_selected?).to be_truthy
     end
 
-    it "should not cancel hbx enrollemnt of previous plan year enrollment" do
+    it "should not cancel hbx enrollment of previous plan year enrollment" do
       hbx_enrollment1.effective_on = date + 1.year
       hbx_enrollment2.effective_on = date
       hbx_enrollment2.select_coverage!
@@ -946,7 +946,7 @@ describe HbxProfile, "class methods", type: :model do
       expect(hbx_enrollment2.coverage_selected?).to be_truthy
     end
 
-    it "should terminate hbx enrollemnt plan1 from carrier1 when choosing hbx enrollemnt plan2 from carrier2" do
+    it "should terminate hbx enrollment plan1 from carrier1 when choosing hbx enrollment plan2 from carrier2" do
       hbx_enrollment1.effective_on = date - 1.day
       hbx_enrollment2.effective_on = date
       hbx_enrollment2.select_coverage!
@@ -956,7 +956,7 @@ describe HbxProfile, "class methods", type: :model do
       expect(hbx_enrollment1_from_db.terminated_on).to eq hbx_enrollment2.effective_on - 1.day
     end
 
-    it "should terminate hbx enrollment plan1 from carrier1 in enrolled contingent state when choosing hbx enrollemnt plan2" do
+    it "should terminate hbx enrollment plan1 from carrier1 in enrolled contingent state when choosing hbx enrollment plan2" do
       person1.consumer_role.update_attributes(aasm_state: 'verification_outstanding')
       hbx_enrollment3.effective_on = date
       hbx_enrollment2.effective_on = date + 1.day
@@ -979,7 +979,7 @@ describe HbxProfile, "class methods", type: :model do
 
   end
 
-  describe "when maket type is individual" do
+  describe "when market type is individual" do
     let(:person) { FactoryGirl.create(:person, :with_active_consumer_role,  :with_consumer_role)}
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
     let(:coverage_household) { family.households.first.coverage_households.first }
@@ -1010,9 +1010,9 @@ describe HbxProfile, "class methods", type: :model do
       enrollment.update_attributes!(plan_id: plan.id)
     end
 
-    context "ivl consumer role with unverified state purchased a plan" do
+    context "ivl consumer role with pending state purchased a plan" do
       it "should return enrollment status as unverified" do
-        person.consumer_role.update_attribute("aasm_state","unverified")
+        person.consumer_role.trigger_hub_call
         enrollment.select_coverage!
         enrollment.reload
         expect(person.consumer_role.aasm_state).to eq "ssa_pending"
@@ -1034,6 +1034,7 @@ describe HbxProfile, "class methods", type: :model do
 
     context "ivl user in verification outstanding state." do
       it "should return enrollment status as coverage_selected and set is_any_enrollment_member_outstanding to true " do
+        person.consumer_role.trigger_hub_call
         enrollment.select_coverage!
         person.consumer_role.ssn_invalid!(verification_attr)
         enrollment.reload

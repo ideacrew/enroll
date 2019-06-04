@@ -713,6 +713,10 @@ class HbxEnrollment
     HandleCoverageSelected.call(callback_context)
   end
 
+  def notify_of_eligibility_change
+    CoverageHousehold.update_eligibility_for_family(family) unless is_shop?
+  end
+
   def is_applicable_for_renewal?
     is_shop? && self.benefit_group.present? && self.benefit_group.plan_year.is_published?
   end
@@ -1360,7 +1364,7 @@ class HbxEnrollment
 
   aasm do
     state :shopping, initial: true
-    state :coverage_selected, :after_enter => [:update_renewal_coverage, :handle_coverage_selection]
+    state :coverage_selected, :after_enter => [:update_renewal_coverage, :handle_coverage_selection, :notify_of_eligibility_change]
     state :transmitted_to_carrier
     state :coverage_enrolled, :after_enter => :update_renewal_coverage
 

@@ -23,9 +23,9 @@ describe FamilyMember, "given a person" do
   let(:person) { Person.new }
   subject { FamilyMember.new(:person => person) }
 
-  it "delegates #ivl_coverage_selected to person" do
-    expect(person).to receive(:ivl_coverage_selected)
-    subject.ivl_coverage_selected
+  it "delegates #trigger_hub_call to person" do
+    expect(person).to receive(:trigger_hub_call)
+    subject.trigger_hub_call
   end
 end
 

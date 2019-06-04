@@ -1272,17 +1272,17 @@ describe Person do
     let(:consumer_role) { ConsumerRole.new }
     let(:subject) { Person.new(:consumer_role => consumer_role) }
 
-    it "delegates #ivl_coverage_selected to consumer role" do
-      expect(consumer_role).to receive(:ivl_coverage_selected)
-      subject.ivl_coverage_selected
+    it "delegates #trigger_hub_call to consumer role" do
+      expect(consumer_role).to receive(:trigger_hub_call)
+      subject.trigger_hub_call
     end
   end
 
   describe "without a consumer role" do
     let(:subject) { Person.new }
 
-    it "delegates #ivl_coverage_selected to nowhere" do
-      expect { subject.ivl_coverage_selected }.not_to raise_error
+    it "delegates #trigger_hub_call to nowhere" do
+      expect { subject.trigger_hub_call }.not_to raise_error
     end
   end
 

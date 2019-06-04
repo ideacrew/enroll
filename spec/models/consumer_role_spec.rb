@@ -1061,33 +1061,33 @@ describe "can_trigger_residency?" do
   end
 end
 
-RSpec.shared_examples "a consumer role unchanged by ivl_coverage_selected" do |c_state|
+RSpec.shared_examples "a consumer role unchanged by trigger_hub_call" do |c_state|
   let(:current_state) { c_state }
 
   describe "in #{c_state} status" do
     it "does not invoke coverage_selected!" do
       expect(subject).not_to receive(:coverage_purchased!)
-      subject.ivl_coverage_selected
+      subject.trigger_hub_call
     end
   end
 end
 
-describe ConsumerRole, "receiving a notification of ivl_coverage_selected" do
+describe ConsumerRole, "receiving a notification of trigger_hub_call" do
   let(:person) {Person.new}
   subject { ConsumerRole.new(:aasm_state => current_state, :person => person) }
   describe "in unverified status" do
     let(:current_state) { "unverified" }
     it "fires coverage_selected!" do
       expect(subject).to receive(:coverage_purchased!)
-      subject.ivl_coverage_selected
+      subject.trigger_hub_call
     end
   end
 
-  it_behaves_like "a consumer role unchanged by ivl_coverage_selected", :ssa_pending
-  it_behaves_like "a consumer role unchanged by ivl_coverage_selected", :dhs_pending
-  it_behaves_like "a consumer role unchanged by ivl_coverage_selected", :verification_outstanding
-  it_behaves_like "a consumer role unchanged by ivl_coverage_selected", :fully_verified
-  it_behaves_like "a consumer role unchanged by ivl_coverage_selected", :verification_period_ended
+  it_behaves_like "a consumer role unchanged by trigger_hub_call", :ssa_pending
+  it_behaves_like "a consumer role unchanged by trigger_hub_call", :dhs_pending
+  it_behaves_like "a consumer role unchanged by trigger_hub_call", :verification_outstanding
+  it_behaves_like "a consumer role unchanged by trigger_hub_call", :fully_verified
+  it_behaves_like "a consumer role unchanged by trigger_hub_call", :verification_period_ended
 end
 
 describe "#add_type_history_element" do

@@ -223,7 +223,7 @@ class ConsumerRole
   #list of the collections we want to track under consumer role model
   COLLECTIONS_TO_TRACK = %w- Person consumer_role vlp_documents lawful_presence_determination hbx_enrollments -
 
-  def ivl_coverage_selected
+  def trigger_hub_call
     if unverified?
       coverage_purchased!(verification_attr)
     end
