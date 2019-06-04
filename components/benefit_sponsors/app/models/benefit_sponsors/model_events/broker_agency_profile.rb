@@ -11,7 +11,7 @@ module BenefitSponsors
 
       def notify_before_save
         event_options = {}
-        if is_dafault_ga_update?
+        if is_dafault_ga_updated?
           is_default_general_agency_hired = true if is_default_ga_hired?
 
           if is_default_ga_deleted? || is_default_ga_changed?
@@ -30,7 +30,7 @@ module BenefitSponsors
         end
       end
 
-      def is_dafault_ga_update?
+      def is_dafault_ga_updated?
         changed? && valid? && changed_attributes.include?('default_general_agency_profile_id')
       end
 
