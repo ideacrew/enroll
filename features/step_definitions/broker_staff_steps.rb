@@ -1,5 +1,4 @@
 When(/^Broker staff enters his personal information$/) do
-  visit "/broker_registration"
   find('a', :text => "Broker Agency Staff", wait: 5).click
   fill_in 'staff[first_name]', with: 'Ricky'
   fill_in 'staff[last_name]', with: 'Martin'
@@ -9,17 +8,18 @@ When(/^Broker staff enters his personal information$/) do
 end
 
 Then(/^Broker Staff should see the Broker Staff Registration form$/) do
+  find('#broker_agency_form', wait: 10)
   expect(page).to have_css("#broker_agency_form")
 end
 
 When(/^Broker staff searches for Broker Agency which exists in EA$/) do
   find('#staff_agency_search').click
-  fill_in 'staff_agency_search', with: @broker_agency_profile.organization.legal_name
+  fill_in 'staff_agency_search', with: broker_agency_profile.legal_name
   find('.search').click
 end
 
 When(/^Broker staff should see a list of Broker Agencies searched and selects his agency$/) do
-  find('.select-broker-agency').click
+  find('.select-broker-agency', wait: 10).click
 end
 
 Then(/^Broker staff submits his application and see successful message$/) do
@@ -28,13 +28,15 @@ Then(/^Broker staff submits his application and see successful message$/) do
   expect(page).to have_content('Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed.')
 end
 
-Given(/^that a Broker logs into a given (.*)$/) do |portal|
-  visit "/"
-  find('a', :text => portal.to_s, wait: 5).click
-  fill_in "user[login]", :with => @user.oim_id
-  fill_in "user[password]", :with => @user.password
-  find('.sign-in-btn').click
-end
+# Given(/^that a Broker  logs into a given (.*)$/) do |portal|
+
+#   person = people[name]
+#   visit "/"
+#   find('a', :text => portal.to_s, wait: 5).click
+#   fill_in "user[login]", :with => @user.oim_id
+#   fill_in "user[password]", :with => @user.password
+#   find('.sign-in-btn').click
+# end
 
 
 And(/^there is a Staff with a “pending” broker staff role in the table$/) do
@@ -75,10 +77,11 @@ And(/^a form appears that requires the Broker to input First Name, Last Name, an
   expect(page).to have_css('#staff_dob')
 end
 
-When(/^the Broker enters the First Name, Last Name, and DOB of an existing user in EA$/) do
-  fill_in 'staff[first_name]', with: @person2.first_name
-  fill_in 'staff[last_name]', with: @person2.last_name
-  fill_in 'staff[dob]', with: @person2.dob
+When(/^the Broker enters the First Name, Last Name, and DOB of existing user (.*?)$/) do |person_name|
+  person = people[person_name]
+  fill_in 'staff[first_name]', with: person[:first_name]
+  fill_in 'staff[last_name]', with: person[:last_name]
+  fill_in 'staff[dob]', with: person[:dob]
 end
 
 Then(/^the Broker will be given a broker staff role with the given Broker Agency$/) do
