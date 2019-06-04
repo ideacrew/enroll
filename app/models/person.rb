@@ -283,7 +283,7 @@ class Person
   end
 
   delegate :citizen_status, :citizen_status=, :to => :consumer_role, :allow_nil => true
-  delegate :ivl_coverage_selected, :to => :consumer_role, :allow_nil => true
+  delegate :trigger_hub_call, :to => :consumer_role, :allow_nil => true
   delegate :all_types_verified?, :to => :consumer_role
 
   def notify_created
