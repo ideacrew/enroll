@@ -3,20 +3,17 @@ Feature: can Transition family members
     
   Background: Hbx Admin can Transition family members
 		Given a Hbx admin with hbx_staff role exists
-		And a Hbx admin logs on to Portal
 		And a consumer exists
-		And the HBX admin visits the Dashboard page
+		And a Hbx admin logs on to Portal
 
 		Scenario: Only Hbx Admin can view Transition family members link actions dropdown in families index page
-			When Hbx Admin clicks on Families
-			And Hbx Admin clicks Families Link
+			When Hbx Admin click Families link
 			Then Hbx Admin should see the list of primary applicants and an Action button
 			When Hbx Admin clicks Action button
 			Then Hbx Admin should see an Transition family members link
 
 		Scenario: Transition family member from consumer role to cover all
-			When Hbx Admin clicks on Families
-			And Hbx Admin clicks Families Link
+			When Hbx Admin click Families Link
 			Then Hbx Admin should see the list of primary applicants and an Action button
 			When Hbx Admin clicks Action button
 			Then Hbx Admin should see an Transition family members link
