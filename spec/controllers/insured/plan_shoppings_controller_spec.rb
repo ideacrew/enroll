@@ -422,6 +422,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       allow(enrollment).to receive(:terminate_reason).and_return("terminate_reason")
       allow(person).to receive(:primary_family).and_return(Family.new)
       allow(waiver_enrollment).to receive(:parent_enrollment).and_return(enrollment)
+      request.env["HTTP_REFERER"] = terminate_insured_plan_shopping_url(1)
       sign_in user
     end
 
@@ -431,7 +432,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     end
 
     it "goes back" do
-      request.env["HTTP_REFERER"] = terminate_insured_plan_shopping_url(1)
       allow(enrollment).to receive(:may_schedule_coverage_termination?).and_return(false)
       allow(enrollment).to receive(:may_terminate_coverage?).and_return(false)
       post :terminate, id: "hbx_id"

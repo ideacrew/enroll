@@ -4,7 +4,7 @@ FactoryGirl.define do
     qle_on  { 10.days.ago.to_date }
     qualifying_life_event_kind_id { FactoryGirl.create(:qualifying_life_event_kind)._id }
     start_on { qle_on }
-    end_on  { qle_on + 30.days }
+    end_on  { qle_on.next_month.end_of_month }
     effective_on  { qle_on.end_of_month + 1 }
     submitted_at  { TimeKeeper.datetime_of_record }
     effective_on_kind { "date_of_event" }
