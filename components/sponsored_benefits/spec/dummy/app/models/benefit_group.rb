@@ -36,6 +36,8 @@ class BenefitGroup
 
   # Number of days following date of hire
   field :effective_on_offset, type: Integer, default: 0
+  field :lowest_cost_plan_id, type: BSON::ObjectId
+  field :highest_cost_plan_id, type: BSON::ObjectId
 
   # Non-congressional
   # belongs_to :reference_plan, class_name: "Plan"
@@ -265,6 +267,10 @@ class BenefitGroup
     composite_tier_contributions = CompositeRatingTier::NAMES.map do |rating_tier|
       composite_tier_contributions.build(composite_rating_tier: rating_tier, offered: true)
     end
+  end
+
+  def single_plan_type?
+    plan_option_kind == "single_plan"
   end
 
   def sic_factor_for(plan)

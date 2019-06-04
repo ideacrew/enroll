@@ -100,8 +100,6 @@ class Plan
   field :deductible, type: String # Deductible
   field :family_deductible, type: String
 
-  belongs_to :carrier_profile
-
   scope :by_active_year,        ->(active_year = TimeKeeper.date_of_record.year) { where(active_year: active_year) }
   scope :by_metal_level,        ->(metal_level) { where(metal_level: metal_level) }
   scope :by_dental_level,       ->(dental_level) { where(dental_level: dental_level) }

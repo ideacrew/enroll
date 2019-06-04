@@ -32,6 +32,8 @@ class CarrierProfile
   delegate :updated_by, :updated_by=, to: :organization, allow_nil: false
 
 
+  delegate :legal_name, :legal_name=, to: :organization, allow_nil: false
+
   def self.for_issuer_hios_id(issuer_id)
     Organization.where("carrier_profile.issuer_hios_ids" => issuer_id).map(&:carrier_profile)
   end
