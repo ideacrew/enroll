@@ -257,10 +257,11 @@ class Person
   scope :general_agency_staff_certified,     -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :active })}
   scope :general_agency_staff_decertified,   -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :decertified })}
   scope :general_agency_staff_denied,        -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :denied })}
+  # scope :general_agency_primary_staff,     -> { where("general_agency_staff_roles.is_primary" => { "$eq" => true })}
+
   scope :outstanding_identity_validation, -> { where(:'consumer_role.identity_validation' => { "$in" => [:pending] })}
   scope :outstanding_application_validation, -> { where(:'consumer_role.application_validation' => { "$in" => [:pending] })}
   scope :for_admin_approval, -> { any_of([outstanding_identity_validation.selector, outstanding_application_validation.selector]) }
-
 
 #  ViewFunctions::Person.install_queries
 
@@ -637,6 +638,10 @@ class Person
     !active_broker_staff_roles.empty?
   end
 
+  def general_agency_primary_staff
+    general_agency_staff_roles.present? ? general_agency_staff_roles.where(is_primary: true).first : nil
+  end
+
   class << self
 
     def default_search_order
@@ -674,7 +679,8 @@ class Person
         "$or" => ([
           {"first_name" => s_rex},
           {"last_name" => s_rex},
-          {"broker_role.npn" => s_rex}
+          {"broker_role.npn" => s_rex},
+          {"general_agency_staff_roles.npn" => s_rex}
           ] + additional_exprs(clean_str))
         })
     end

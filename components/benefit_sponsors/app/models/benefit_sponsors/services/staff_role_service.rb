@@ -59,7 +59,7 @@ module BenefitSponsors
 
       def match_or_create_person(form)
         matched_people = get_matched_people(form)
-        
+
         return false, "too many people match the criteria provided for your identity.  Please contact HBX." if matched_people.count > 1
 
         if matched_people.count == 1
@@ -107,6 +107,16 @@ module BenefitSponsors
           @broker_agency_profiles = results.map{|broker| broker.broker_role.broker_agency_profile}.uniq
         else
           @broker_agency_profiles = results.map(&:broker_agency_profile).uniq
+        end
+      end
+
+      def general_agency_search!(form)
+        results = BenefitSponsors::Organizations::Organization.general_agencies_with_matching_ga(form[:filter_criteria].symbolize_keys!, form.is_general_agency_registration_page)
+        if results.first.is_a?(Person)
+          # @filtered_broker_roles  = results.map(&:broker_role)
+          @general_agency_profiles = results.map{|ga| ga.general_agency_primary_staff.general_agency_profile}.uniq
+        else
+          @general_agency_profiles = results.map(&:general_agency_profile).uniq
         end
       end
 

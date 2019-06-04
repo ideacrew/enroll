@@ -131,6 +131,7 @@ module BenefitSponsors
 
       scope :broker_agencies_by_market_kind,  ->( market_kind ) { broker_agency_profiles.any_in(:"profiles.market_kind" => market_kind) }
       scope :approved_broker_agencies,        ->{ broker_agency_profiles.where(:"profiles.aasm_state" => 'is_approved') }
+      scope :approved_general_agencies,        ->{ general_agency_profiles.where(:"profiles.aasm_state" => 'is_approved') }
 
       scope :by_employer_profile,             ->( profile_id ){ where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)) }
       scope :employer_by_hbx_id,              ->( hbx_id ){ where(:"profiles._type" => /.*EmployerProfile$/, hbx_id: hbx_id)}
@@ -329,6 +330,36 @@ module BenefitSponsors
         def filter_brokers_by_agencies(agencies, brokers)
           agency_ids = agencies.map{|org| org.broker_agency_profile.id}
           brokers.select{ |broker| agency_ids.include?(broker.broker_role.benefit_sponsors_broker_agency_profile_id) }
+        end
+
+        def general_agencies_with_matching_ga(search_params, value = nil)
+          if search_params[:q].present?
+            general_agencies = GeneralAgencyStaffRole.general_agencies_matching_search_criteria(search_params[:q])
+            orgs2 = self.general_agency_profiles.approved_general_agencies.where({
+              :"profiles._id" => {
+                "$in" => general_agencies.map(&:general_agency_staff_roles).flatten.map(&:benefit_sponsors_general_agency_profile_id)
+              }
+            })
+
+            if general_agencies.any?
+              search_params.delete(:q)
+              if search_params.empty?
+                return filter_general_agencies_by_primary_roles(orgs2, general_agencies)
+              else
+                agencies_matching_advanced_criteria = orgs2.where({ "$and" => build_query_params(search_params) })
+                return filter_general_agencies_by_primary_roles(agencies_matching_advanced_criteria, general_agencies)
+              end
+            elsif value
+              return self.general_agency_profiles.approved_general_agencies.where({ "$and" => build_query_params(search_params) })
+            end
+          elsif !search_params[:q].present? && value
+            return []
+          end
+        end
+
+        def filter_general_agencies_by_primary_roles(agencies, general_agencies)
+          agency_ids = agencies.map{|org| org.general_agency_profile.id}
+          general_agencies.select{ |ga| agency_ids.include?(ga.general_agency_primary_staff.benefit_sponsors_general_agency_profile_id) }
         end
 
         def build_query_params(search_params)
