@@ -13,7 +13,7 @@ module Notifier
     attribute :email, String
     attribute :broker, MergeDataModels::Broker
     attribute :legal_name, String
-    attribute :assignment_date, Date
+    attribute :assignment_date, String
     attribute :termination_date, String
     attribute :employer_name, String
     attribute :employer_poc_firstname, String

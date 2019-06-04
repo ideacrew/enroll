@@ -36,7 +36,8 @@ RSpec.describe 'BenefitSponsors::ModelEvents::DefaultGeneralAgencyHiredNotice', 
 
     context 'broker has a default GA and selects another GA as default' do
 
-      let(:general_agency_profile2) { FactoryBot.create(:general_agency_profile) }
+      let(:general_agency2) {FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, site: site)}
+      let(:general_agency_profile2) {general_agency2.profiles.first }
 
       before do
         broker_agency_profile.update_attributes(default_general_agency_profile_id: general_agency_profile2.id)
