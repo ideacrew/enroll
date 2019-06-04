@@ -560,7 +560,8 @@ module ApplicationHelper
   end
 
   def show_oop_pdf_link(aasm_state)
-    (PlanYear::PUBLISHED + PlanYear::RENEWING_PUBLISHED_STATE).include?(aasm_state)
+    return false if aasm_state.blank?
+    (BenefitSponsors::BenefitApplications::BenefitApplication::SUBMITTED_STATES).include?(aasm_state.to_sym)
   end
 
   def calculate_age_by_dob(dob)
