@@ -366,6 +366,7 @@ Rails.application.routes.draw do
       post 'bulk_employee_upload'
       member do
         get "download_invoice"
+        get 'show_invoice'
         post 'generate_checkbook_urls'
       end
       collection do

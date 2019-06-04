@@ -919,7 +919,7 @@ class CensusEmployee < CensusMember
       []
     else
       enrollments = employee_role.person.primary_family.all_enrollments.terminated.shop_market
-      enrollments.select{|e| e.benefit_group_assignment.present? && e.benefit_group_assignment.census_employee == self && !enrollments_for_display.include?(e)}.sort_by { |enr| enrollment_coverage_end(enr)}.reverse
+      enrollments.select{|e| e.benefit_group_assignment.present? && e.benefit_group_assignment.census_employee == self && !enrollments_for_display.include?(e) && !e.void?}.sort_by { |enr| enrollment_coverage_end(enr)}.reverse
     end
   end
 

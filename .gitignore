@@ -75,3 +75,6 @@ plan_xmls.zip
 *.xlsx
 *.doc
 *.docx
+
+# Ignore Wells Fargo Key
+config/ssl

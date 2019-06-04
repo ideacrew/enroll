@@ -32,6 +32,8 @@ contact_center:
   tty: "771"
   alt_phone_number: "1-855-532-LINK"
   email_address: "info@dchealthlink.com"
+  mailing_address: "PO Box 97022"
+  city_state_zip: "Washington, DC 20090"
   po_box: "PO Box 97022"
   city: "Washington"
   state: "DC"
@@ -170,6 +172,9 @@ aca:
     group_file:
       new_enrollment_transmit_on: 16
       update_transmit_day_of_week: "friday"
+
+    employer_profiles:
+      minimum_invoice_display_year: 2015
 
     transmit_employers_immediately: false
     transmit_scheduled_employers: true
