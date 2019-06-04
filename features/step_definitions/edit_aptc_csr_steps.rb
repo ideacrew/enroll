@@ -1,9 +1,9 @@
-
 Then (/^Hbx Admin sees Families link$/) do
   expect(page).to have_text("Families")
 end
 
 When(/^Hbx Admin click Families link$/) do
+  visit exchanges_hbx_profiles_path
   find('.interaction-click-control-families').click
   wait_for_ajax
   find(:xpath, "//*[@id='myTab']/li[2]/ul/li[2]/a", :wait => 10).click

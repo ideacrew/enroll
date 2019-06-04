@@ -68,6 +68,14 @@ def people
       email: 'ricky.martin@example.com',
       password: 'aA1!aA1!aA1!'
     },
+    "Max Planck" => {
+      email: 'max.plank@example.com',
+      password: 'aA1!aA1!aA1!'
+    },
+    "Jane Goodall" => {
+      email: 'jane.goodall@example.com',
+      password: 'aA1!aA1!aA1!'
+    },
     "CareFirst Broker" => {
       first_name: 'Broker',
       last_name: 'martin',
@@ -137,16 +145,6 @@ def people
     },
     "CSR" => {
       email: "sherry.buckner@dc.gov",
-      password: 'aA1!aA1!aA1!'
-    },
-    "Hbx AdminEnrollments" => {
-      first_name: "Hbx Admin",
-      last_name: "Enrollments#{rand(1000)}",
-      dob: defined?(@u) ?  @u.adult_dob : "08/13/1979",
-      legal_name: "Tronics",
-      dba: "Tronics",
-      fein: defined?(@u) ? @u.fein : '123123123',
-      email: defined?(@u) ? @u.email : 'hxadmin_enroll@example.com',
       password: 'aA1!aA1!aA1!'
     }
   }
@@ -227,21 +225,6 @@ Given(/^Hbx Admin exists$/) do
   year = (Date.today + 2.months).year
   plan = FactoryBot.create :plan, :with_premium_tables, :with_rating_factors, active_year: year, market: 'shop', coverage_kind: 'health', deductible: 4000
   plan2 = FactoryBot.create :plan, :with_premium_tables, :with_rating_factors, active_year: (year - 1), market: 'shop', coverage_kind: 'health', deductible: 4000, carrier_profile_id: plan.carrier_profile_id
-end
-
-Given(/^a Hbx admin with read and write permissions and broker agencies$/) do
-  p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
-      send_broker_agency_message: true, approve_broker: true, approve_ga: true,
-      modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true)
-  person = people['Hbx AdminEnrollments']
-  hbx_profile = FactoryBot.create :hbx_profile
-  user = FactoryBot.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
-  FactoryBot.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
-  FactoryBot.create :hbx_enrollment, household:user.primary_family.active_household
-  org1 = FactoryBot.create(:organization, legal_name: 'ACME Agency')
-  broker_agency_profile1 = FactoryBot.create(:broker_agency_profile, organization: org1)
-        org2 = FactoryBot.create(:organization, legal_name: 'Chase & Assoc')
-        broker_agency_profile2 = FactoryBot.create(:broker_agency_profile, organization: org2)
 end
 
 Given(/^a Hbx admin with read and write permissions exists$/) do
@@ -491,8 +474,9 @@ When(/^(.*) logs on to the (.*)?/) do |named_person, portal|
   person = people[named_person]
 
   visit "/"
-  portal_class = "#{portal.downcase.gsub(/ /, '-')}"
-  portal_uri = find("a.#{portal_class}")["href"]
+  # portal_class = "#{portal.downcase.gsub(/ /, '-')}"
+
+  # portal_uri = find('a', text: portal, wait: 5)["href"]#find("a.#{portal_class}")["href"]
 
   visit "/users/sign_in"
   fill_in "user[login]", :with => person[:email]
@@ -501,7 +485,8 @@ When(/^(.*) logs on to the (.*)?/) do |named_person, portal|
   #TODO this fixes the random login fails b/c of empty params on email
   fill_in "user[login]", :with => person[:email] unless find(:xpath, '//*[@id="user_login"]').value == person[:email]
   find('.sign-in-btn').click
-  visit portal_uri
+
+  # visit portal_uri
   # Adding sleep seems to help prevent the AuthenticityToken error
   # which apeared to be throwing in at least the
   # add_sep_read_and_write_feature cucumber.
@@ -584,7 +569,10 @@ end
 When (/^(.*) logs? out$/) do |someone|
   click_link "Logout"
   visit "/"
-  sleep 5 #FIX ME: remove sleep and replace with find & wait
+  find('.container.welcome', wait: 5) do |element|
+    element.find('.heading-text', text: /Welcome to #{Settings.site.short_name}/i)
+    element.find('.sub-text', text: /#{Settings.site.byline}/i)
+  end
 end
 
 When(/^.+ go(?:es)? to register as an employee$/) do
