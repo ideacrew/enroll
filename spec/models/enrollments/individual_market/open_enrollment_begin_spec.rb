@@ -20,10 +20,31 @@ RSpec.describe Enrollments::IndividualMarket::OpenEnrollmentBegin, type: :model 
     let(:renewal_individual_catastophic_plan)  { FactoryBot.create(:renewal_individual_catastophic_plan) }
     let(:renewal_csr_87_plan)                  { FactoryBot.create(:renewal_csr_87_plan) } 
     let(:renewal_csr_00_plan)                  { FactoryBot.create(:renewal_csr_00_plan) }
+    let!(:plan) { FactoryBot.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01", csr_variant_id: "01")}
+    let(:person) {FactoryBot.create(:person)}
+    let(:family_member) {family.family_members.first}
+    subject {Enrollments::IndividualMarket::OpenEnrollmentBegin.new}
+  
+    let!(:enrollment) {
+      FactoryBot.create(:hbx_enrollment,
+        household: family.active_household,
+        coverage_kind: "health",
+        effective_on: TimeKeeper.date_of_record,
+        enrollment_kind: "open_enrollment",
+        kind: "individual",
+        submitted_at: TimeKeeper.date_of_record.prev_month,
+        plan_id: plan.id,
+  
+        )
+      }
 
     # let(:family_health_and_dental)      
 
     it "the collection should include ten or more Families" do
+      # expect(Family.all.size).to be >= 10
+    end
+    it ".active_enrollment_from_family" do
+      expect(subject.active_enrollment_from_family(enrollment).first).to eq enrollment
       # expect(Family.all.size).to be >= 10
     end
 
