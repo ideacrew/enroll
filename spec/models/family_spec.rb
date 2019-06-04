@@ -1100,6 +1100,9 @@ describe Family, "given a primary applicant and a dependent", dbclean: :after_ea
     family_member_dependent.family.check_for_consumer_role
     expect(family_member_dependent.person.consumer_role).to eq cr
   end
+
+
+
 end
 
 describe Family, ".expire_individual_market_enrollments", dbclean: :after_each do
@@ -1185,6 +1188,7 @@ describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
   let!(:plan) { FactoryBot.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01", csr_variant_id: "01")}
   let!(:dental_plan) { FactoryBot.create(:plan, :with_dental_coverage, market: 'individual', active_year: TimeKeeper.date_of_record.year)}
   let!(:hbx_profile) { FactoryBot.create(:hbx_profile) }
+
 
   let!(:enrollments) {
     FactoryBot.create(:hbx_enrollment,
@@ -1327,6 +1331,7 @@ describe Family, "given a primary applicant and a dependent", dbclean: :after_ea
   let!(:census_employee) { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile, benefit_group: current_benefit_package ) }
   let!(:employee_role) { FactoryBot.create(:employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id) }
   let!(:benefit_group_assignment) { FactoryBot.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee)}
+  let(:family_member) {family.family_members.first}
 
   let!(:enrollment) {
     FactoryBot.create(:hbx_enrollment,
@@ -1360,7 +1365,16 @@ describe Family, "given a primary applicant and a dependent", dbclean: :after_ea
     let!(:end_date) { enrollment.updated_at + 1.day}
     let!(:created_at) { ivl_enrollment.created_at + 2.days }
 
-    
+  context '.enrolled_policy' do 
+
+    it "should return the enrolled policy for a family member" do
+      family.enrollments.first.update_attributes!(aasm_state:"enrolled_contingent")
+      family.enrollments.first.hbx_enrollment_members.new(applicant_id:family_member.id,eligibility_date:TimeKeeper.date_of_record, coverage_start_on:TimeKeeper.date_of_record + 1.day)
+      expect(family.enrolled_policy(family_member)).to eq  family.enrollments.first
+    end
+
+  end
+
   context 'scopes' do 
 
       it '.by_enrollment_updated_datetime_range' do
