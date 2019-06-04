@@ -12,8 +12,8 @@ module BenefitSponsors
       def notify_before_save
         return if plan_design_organization.employer_profile.blank?
 
-        is_general_agency_fired = true if ga_hired
-        is_general_agency_hired = true if ga_fired
+        is_general_agency_fired = true if is_ga_fired?
+        is_general_agency_hired = true if is_ga_hired?
 
         REGISTERED_EVENTS.each do |event|
           next unless (event_fired = instance_eval("is_" + event.to_s))
@@ -26,11 +26,11 @@ module BenefitSponsors
         end
       end
 
-      def ga_hired
+      def is_ga_fired?
         changed? && changed_attributes.include?('aasm_state') && changed_attributes.include?('end_on')
       end
 
-      def ga_fired
+      def is_ga_hired?
         valid? && changed_attributes.include?('broker_role_id') && changed_attributes.include?('start_on')
       end
     end

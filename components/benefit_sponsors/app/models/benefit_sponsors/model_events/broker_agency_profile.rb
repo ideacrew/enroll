@@ -11,16 +11,10 @@ module BenefitSponsors
 
       def notify_before_save
         event_options = {}
-        if dafault_ga_update
-          if default_ga_hired
-            is_default_general_agency_hired = true
-          else
-            is_default_general_agency_fired = true
-            event_options = { :old_general_agency_profile_id => changed_attributes["default_general_agency_profile_id"].to_s }
-          end
+        if is_dafault_ga_update?
+          is_default_general_agency_hired = true if is_default_ga_hired?
 
-           # This will be triggered when a broker with an existing default general agency selects a new one.
-          if default_ga_fired
+          if is_default_ga_deleted? || is_default_ga_changed?
             is_default_general_agency_fired = true
             event_options = { :old_general_agency_profile_id => changed_attributes["default_general_agency_profile_id"].to_s }
           end
@@ -36,15 +30,19 @@ module BenefitSponsors
         end
       end
 
-      def dafault_ga_update
+      def is_dafault_ga_update?
         changed? && valid? && changed_attributes.include?('default_general_agency_profile_id')
       end
 
-      def default_ga_hired
+      def is_default_ga_hired?
         default_general_agency_profile_id.present?
       end
 
-      def default_ga_fired
+      def is_default_ga_deleted?
+        default_general_agency_profile_id.blank?
+      end
+
+      def is_default_ga_changed?
         default_general_agency_profile_id.present? && changed_attributes["default_general_agency_profile_id"].present?
       end
     end
