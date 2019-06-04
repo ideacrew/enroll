@@ -35,6 +35,28 @@ class BenefitGroup
   embeds_many :composite_tier_contributions, cascade_callbacks: true
   accepts_nested_attributes_for :composite_tier_contributions, reject_if: :all_blank, allow_destroy: true
 
+  def reference_plan=(new_reference_plan)
+    raise ArgumentError.new("expected Plan") unless new_reference_plan.is_a? Plan
+    self.reference_plan_id = new_reference_plan._id
+    @reference_plan = new_reference_plan
+  end
+
+  def dental_reference_plan=(new_reference_plan)
+    raise ArgumentError.new("expected Plan") unless new_reference_plan.is_a? Plan
+    self.dental_reference_plan_id = new_reference_plan._id
+    @dental_reference_plan = new_reference_plan
+  end
+
+  def reference_plan
+    return @reference_plan if defined? @reference_plan
+    @reference_plan = Plan.find(reference_plan_id) unless reference_plan_id.nil?
+  end
+
+  def dental_reference_plan
+    return @dental_reference_plan if defined? @dental_reference_plan
+    @dental_reference_plan = Plan.find(dental_reference_plan_id) if dental_reference_plan_id.present?
+  end
+
 
   def self.find(id)
   end
