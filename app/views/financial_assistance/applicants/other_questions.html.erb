@@ -264,7 +264,7 @@
 
         <div class="row row-form-wrapper no-buffer row-height">
           <div class='col-md-6'>
-            <span class="fa-text-color">Does this person have a disability? *</span>
+            <span class="fa-text-color"><%= l10n("faa.other_ques.disability_question") %></span>
           </div>
           <div class='col-md-2'>
             <%= f.radio_button("is_physically_disabled", true, class: "radio-yml", id: 'radio_physically_disabled_yes', required: true) %>
