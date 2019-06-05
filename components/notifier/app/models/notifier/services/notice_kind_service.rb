@@ -1,6 +1,6 @@
 module Notifier
   class Services::NoticeKindService
-    include TokenBuilder
+    include Notifier::Services::TokenBuilder
 
     attr_accessor :market_kind, :model_builder
 
