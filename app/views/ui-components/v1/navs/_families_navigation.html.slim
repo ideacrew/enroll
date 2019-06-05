@@ -5,13 +5,13 @@ nav
     - if ( @person.has_active_employee_role? && @employee_role.employer_profile.broker_agency_profile.present?) || ( @person.has_active_consumer_role? &&  @person.primary_family.current_broker_agency.present? )
       li 
         = link_to l10n("my_broker"), brokers_insured_families_path(tab: 'broker')
-    - if @person.has_consumer_role?
+    - if any_members_with_consumer_role?(@family_members)
       li
         = link_to verification_insured_families_path(tab: 'verification') do
           = l10n("documents")
-          - if enrollment_group_unverified?(@person) && verification_needed?(@person) && !documents_uploaded
+          - if enrollment_group_unverified?(@person)
             span.badge.message-unread = l10n("action_needed")
-    - if current_user.has_hbx_staff_role? && @person.has_resident_role?
+    - if current_user.has_hbx_staff_role? && has_active_resident_members?(@family_members)
       li
         = link_to upload_application_insured_families_path(tab: 'verification') do
           = l10n("upload_paper_application")

@@ -286,8 +286,8 @@ module VerificationHelper
     raw_request.any? ? Nokogiri::XML(raw_request.first.body) : "no response record"
   end
 
-  def has_active_consumer_or_resident_members?(family_members)
-    family_members.present? && (family_members.map(&:person).any?(&:is_consumer_role_active?) || family_members.map(&:person).any?(&:is_resident_role_active?))
+  def any_members_with_consumer_role?(family_members)
+    family_members.present? && family_members.map(&:person).any?(&:has_active_consumer_role?)
   end
 
   def has_active_resident_members?(family_members)

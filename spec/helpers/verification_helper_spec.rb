@@ -627,3 +627,22 @@ describe "#build_ridp_admin_actions_list" do
   # it_behaves_like "ridp admin actions dropdown list", "Identity", "in review", ["Verify", "Reject"]
   end
 end
+
+describe '#any_members_with_consumer_role?' do
+
+  let(:first_consumer) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
+  let(:second_consumer) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
+  let(:resident)  { FactoryBot.create(:person, :with_resident_role, :with_active_resident_role) }
+
+  let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: first_consumer)}
+  let(:second_family_member) { FactoryBot.create(:family_member, person: second_consumer, family: family, is_active: true)}
+  let(:third_family_member) { FactoryBot.create(:family_member, person: resident, family: family, is_active: true)}
+
+  it 'should return true if any of members in a family have consumer role' do
+    expect(helper.any_members_with_consumer_role?(family.family_members)).to eq true
+  end
+
+  it 'should return false if no members in a family have consumer role' do
+    expect(helper.any_members_with_consumer_role?([third_family_member])).to eq false
+  end
+end
