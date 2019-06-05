@@ -1,13 +1,14 @@
 class SponsoredBenefits::Services::PlanCostService
   include ::Config::AcaHelper
 
-  attr_accessor :benefit_group, :plan
+  attr_accessor :benefit_group, :plan, :census_employee_costs
 
   def initialize(attrs={})
     @benefit_group = attrs[:benefit_group]
     @reference_plan_id = @benefit_group.reference_plan_id
     @composite_tiers = {}
     @monthly_employee_costs = {}
+    @census_employee_costs = {}
   end
 
   def reference_plan
@@ -54,11 +55,12 @@ class SponsoredBenefits::Services::PlanCostService
   end
 
   def monthly_employee_costs
+    @census_employee_costs[self.plan.id] ||= {}
     @monthly_employee_costs[self.plan.id] ||= active_census_employees.collect do |census_employee|
       per_employee_cost = if composite?
-        (composite_total_premium(census_employee) - (composite_total_premium(census_employee) * employer_contribution_factor).round(2)).round(2)
+        @census_employee_costs[self.plan.id][census_employee.id] = (composite_total_premium(census_employee) - (composite_total_premium(census_employee) * employer_contribution_factor).round(2)).round(2)
       else
-        (members(census_employee).reduce(0.00) do |sum, member|
+        @census_employee_costs[self.plan.id][census_employee.id] = (members(census_employee).reduce(0.00) do |sum, member|
           (sum + employee_cost_for(member, census_employee)).round(2)
         end).round(2)
       end
