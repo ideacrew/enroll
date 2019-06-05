@@ -104,8 +104,6 @@ class Insured::GroupSelectionController < ApplicationController
     hbx_enrollment.coverage_kind = @coverage_kind
     hbx_enrollment.validate_for_cobra_eligiblity(@employee_role)
 
-    validate_enrolling_members(hbx_enrollment)
-
     hbx_enrollment.kind = @market_kind if (hbx_enrollment.kind != @market_kind) && (@market_kind != 'shop')
 
     if hbx_enrollment.save
@@ -168,11 +166,6 @@ class Insured::GroupSelectionController < ApplicationController
     hbx_enrollment.hbx_enrollment_members = hbx_enrollment.hbx_enrollment_members.select do |member|
       family_member_ids.include? member.applicant_id
     end
-  end
-
-  def validate_enrolling_members(hbx_enrollment)
-    invalid_member_exist = hbx_enrollment.hbx_enrollment_members.map(&:valid_enrolling_member?).include?(false)
-    raise "Please select valid enrolling members" if invalid_member_exist
   end
 
   def build_hbx_enrollment(family_member_ids)

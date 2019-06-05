@@ -26,7 +26,7 @@ module BenefitMarkets
         end
 
         it 'should raise error if premium table is not present for given coverage effective date' do
-          expect {@product.cost_for(Date.new(2018, 2, 1), 20)}.to raise_error
+          expect {@product.cost_for(Date.new(2018, 2, 1), 20)}.to raise_error StandardError
         end
       end
 

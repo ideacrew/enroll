@@ -769,14 +769,32 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
           let(:family1) {FactoryBot.create(:family, :with_primary_family_member, :person => person1)}
           let(:household) {FactoryBot.create(:household, family: family1)}
           let(:date) {TimeKeeper.date_of_record}
-          let!(:carrier_profile1) {FactoryBot.build(:carrier_profile)}
-          let!(:carrier_profile2) {FactoryBot.create(:carrier_profile, organization: organization)}
           let!(:organization) {FactoryBot.create(:organization, legal_name: "CareFirst", dba: "care")}
-          let(:plan1) {Plan.new(active_year: date.year, market: "individual", carrier_profile: carrier_profile1)}
-          let(:plan2) {Plan.new(active_year: date.year, market: "individual", carrier_profile: carrier_profile2)}
-
-          let(:hbx_enrollment1) {HbxEnrollment.new(kind: "individual", plan: plan1, household: family1.latest_household, enrollment_kind: "open_enrollment", aasm_state: 'coverage_selected', consumer_role: person1.consumer_role, enrollment_signature: true)}
-          let(:hbx_enrollment2) {HbxEnrollment.new(kind: "individual", plan: plan2, household: family1.latest_household, enrollment_kind: "open_enrollment", aasm_state: 'shopping', consumer_role: person1.consumer_role, enrollment_signature: true, effective_on: date)}
+          let!(:carrier_profile1) {FactoryBot.create(:benefit_sponsors_organizations_issuer_profile)}
+          let!(:carrier_profile2) {FactoryBot.create(:benefit_sponsors_organizations_issuer_profile)}
+          let!(:product1) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
+          let!(:product2) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
+          let(:hbx_enrollment1) do
+            FactoryBot.create(:hbx_enrollment,
+                              kind: "individual",
+                              product: product1,
+                              household: family1.latest_household,
+                              enrollment_kind: "open_enrollment",
+                              aasm_state: 'coverage_selected',
+                              consumer_role: person1.consumer_role,
+                              enrollment_signature: true)
+          end
+          let(:hbx_enrollment2) do
+            FactoryBot.create(:hbx_enrollment,
+                              kind: 'individual',
+                              product: product2,
+                              household: family1.latest_household,
+                              enrollment_kind: 'open_enrollment',
+                              aasm_state: 'shopping',
+                              consumer_role: person1.consumer_role,
+                              enrollment_signature: true,
+                              effective_on: date)
+          end
 
           before do
             TimeKeeper.set_date_of_record_unprotected!(Date.today + 20.days) if TimeKeeper.date_of_record.month == 1 || TimeKeeper.date_of_record.month == 12
@@ -844,7 +862,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     let(:coverage_household) { family.households.first.coverage_households.first }
     let(:hbx_profile) {FactoryBot.create(:hbx_profile)}
     let(:active_year) {TimeKeeper.date_of_record.year}
-    let(:plan) { Plan.new(active_year: active_year)}
+    let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
     let(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
     let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
     let(:benefit_package) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
@@ -863,9 +881,9 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     before :each do
       allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
       allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
-      allow(enrollment). to receive(:plan).and_return plan
+      allow(enrollment). to receive(:product).and_return product
       allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
-      enrollment.update_attributes!(plan_id: plan.id)
+      enrollment.update_attributes!(product_id: product.id)
     end
 
     context "ivl consumer role with unverified state purchased a plan" do
@@ -1905,7 +1923,8 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
 
   describe HbxEnrollment, 'state machine', dbclean: :around_each do
     let(:family) {FactoryBot.build(:individual_market_family)}
-    subject {FactoryBot.build(:hbx_enrollment, :individual_unassisted, household: family.active_household)}
+    let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
+    subject {FactoryBot.build(:hbx_enrollment, :individual_unassisted, household: family.active_household, product: product)}
 
     events = [:move_to_enrolled, :move_to_contingent, :move_to_pending]
 

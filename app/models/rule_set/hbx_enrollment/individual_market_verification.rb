@@ -8,7 +8,7 @@ module RuleSet
       end
 
       def applicable?
-        (!hbx_enrollment.plan_id.nil?) &&
+        !hbx_enrollment.product_id.nil? &&
           hbx_enrollment.affected_by_verifications_made_today? && (!hbx_enrollment.benefit_sponsored?)
       end
 

@@ -21,15 +21,17 @@ describe FixHbxEnrollments, dbclean: :after_each do
   end
 
   let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
+  let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
   let(:enrollment) {
     FactoryBot.create(:hbx_enrollment,
-                       household: family.active_household,
-                       coverage_kind: "health",
-                       effective_on: TimeKeeper.date_of_record.next_month.beginning_of_month,
-                       enrollment_kind: "open_enrollment",
-                       kind: "individual",
-                       submitted_at: TimeKeeper.date_of_record,
-                       aasm_state: 'shopping')
+                      product: product,
+                      household: family.active_household,
+                      coverage_kind: "health",
+                      effective_on: TimeKeeper.date_of_record.next_month.beginning_of_month,
+                      enrollment_kind: "open_enrollment",
+                      kind: "individual",
+                      submitted_at: TimeKeeper.date_of_record,
+                      aasm_state: 'shopping')
   }
 
   context "assigns proper states for people" do

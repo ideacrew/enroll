@@ -57,7 +57,7 @@ class Insured::PlanShoppingsController < ApplicationController
       @market_kind = "individual"
     end
     if @enrollment.is_shop?
-      @member_group = HbxEnrollmentSponsoredCostCalculator.new(@enrollment).groups_for_products([@plan]).first
+      @member_group = HbxEnrollmentSponsoredCostCalculator.new(@enrollment).groups_for_products([plan]).first
     else
       @plan = @enrollment.build_plan_premium(qhp_plan: plan, apply_aptc: applied_aptc.present?, elected_aptc: applied_aptc, tax_household: @shopping_tax_household)
     end

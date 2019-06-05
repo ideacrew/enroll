@@ -106,6 +106,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     it "when kind is individual" do
       allow(hbx_enrollment).to receive(:kind).and_return('individual')
       allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
+      allow(hbx_enrollment).to receive(:applied_aptc_amount).and_return(100.0)
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
       expect(rendered).to have_content('Individual & Family')
       expect(rendered).to have_selector('strong', text: "#{HbxProfile::ShortName}")

@@ -1,4 +1,4 @@
-- if params[:market_kind] == 'shop'
+- if @hbx_enrollment.kind == 'employer_sponsored'
   - member_enrollment = @member_group.group_enrollment
   - @plan = member_enrollment.product
 - else
@@ -18,10 +18,10 @@
       .col-xs-6
         span.pull-right
           span style=("font-size: 24px;")
-          - if params[:market_kind] == 'shop'
+          - if @hbx_enrollment.kind == 'employer_sponsored'
             = number_to_currency(member_enrollment.product_cost_total - member_enrollment.sponsor_contribution_total)
           - else
-            - if (@hbx_enrollment.present? && @hbx_enrollment.coverage_kind == 'health') || @plan.kind == 'health'
+            - if (@hbx_enrollment.present? && @hbx_enrollment.coverage_kind == 'health') || @plan.kind == :health
               = number_to_currency(current_cost(@plan.total_employee_cost, @plan.ehb, @hbx_enrollment, @source, @plan.can_use_aptc?))
             - else
               = number_to_currency(@plan.total_employee_cost)
