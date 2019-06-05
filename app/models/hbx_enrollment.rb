@@ -13,7 +13,7 @@ class HbxEnrollment
   include BenefitSponsors::Concerns::Observable
   include BenefitSponsors::ModelEvents::HbxEnrollment
 
-  belongs_to :household
+  embedded_in :household
 
   ENROLLMENT_CREATED_EVENT_NAME = "acapi.info.events.policy.created"
   ENROLLMENT_UPDATED_EVENT_NAME = "acapi.info.events.policy.updated"
