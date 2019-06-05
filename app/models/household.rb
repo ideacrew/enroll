@@ -17,7 +17,7 @@ class Household
   field :submitted_at, type: DateTime
   field :is_active, type: Boolean, default: true
 
-  has_many :hbx_enrollments
+  embeds_many :hbx_enrollments
   embeds_many :tax_households
   embeds_many :coverage_households, cascade_callbacks: true
 
