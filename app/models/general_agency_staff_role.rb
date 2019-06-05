@@ -32,6 +32,7 @@ class GeneralAgencyStaffRole
     state :decertified
     state :general_agency_declined
     state :general_agency_terminated
+    state :general_agency_pending, initial: true
 
     event :approve, :after => [:record_transition, :send_invitation, :update_general_agency_profile] do
       transitions from: :applicant, to: :active
@@ -48,6 +49,10 @@ class GeneralAgencyStaffRole
     # Attempt to achieve or return to good standing with HBX
     event :reapply, :after => :record_transition  do
       transitions from: [:applicant, :decertified, :denied], to: :applicant
+    end
+
+    event :general_agency_pending, :after => :record_transition do
+      transitions from: :general_agency_terminated, to: :general_agency_pending
     end
   end
 
