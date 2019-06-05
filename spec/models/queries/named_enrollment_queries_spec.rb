@@ -1,5 +1,4 @@
 require "rails_helper"
-
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
@@ -9,19 +8,6 @@ describe Queries::NamedEnrollmentQueries, "Enrollment Queries", dbclean: :after_
   include_context "setup renewal application"
   include_context "setup employees with benefits"
 
-
-    let(:instance) { Queries::PolicyAggregationPipeline.new }
-    let(:aggregation) { [
-                    { "$unwind" => "$households"},
-                    { "$unwind" => "$households.hbx_enrollments"},
-                    { "$match" => {"households.hbx_enrollments" => {"$ne" => nil}}},
-                    { "$match" => {"households.hbx_enrollments.hbx_enrollment_members" => {"$ne" => nil}, "households.hbx_enrollments.external_enrollment" => {"$ne" => true}}}
-                    ] }
-    let(:step) { {'rspec' => "test"}}
-    let(:open_enrollment_query) {{
-                                "$match" => {
-                                      "households.hbx_enrollments.enrollment_kind" => "open_enrollment" }
-                                }}
   describe "Shope enrollments" do
     let!(:effective_on) {effective_period.min}
     let!(:organization) {abc_organization}
@@ -118,23 +104,11 @@ describe Queries::NamedEnrollmentQueries, "Enrollment Queries", dbclean: :after_
       hbx_enrollment
     }
 
-      it '.shop_initial_enrollments' do 
-        ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.by_profile(abc_organization.employer_profile).first.benefit_applications.first.update_attributes(aasm_state:"binder_paid",effective_period:predecessor_application.effective_period)
-        query =  ::Queries::NamedEnrollmentQueries.shop_initial_enrollments(abc_organization,predecessor_application.effective_period.min)
-        expect(query.map{|er|er}).to include (enrollment.hbx_id)
-      end
-      
-      it '.find_simulated_renewal_enrollments' do 
-        ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.by_profile(abc_organization.employer_profile).first.benefit_applications.first.update_attributes(aasm_state:"binder_paid",effective_period:predecessor_application.effective_period)
-        query =  ::Queries::NamedEnrollmentQueries.find_simulated_renewal_enrollments(current_benefit_package.sponsored_benefits, predecessor_application.effective_period.min, as_of_time = ::TimeKeeper.date_of_record)
-        expect(query.map{|er|er}).to include (enrollment.hbx_id)
-      end
     let(:subject) {::Queries::NamedEnrollmentQueries}
 
     before do
       ce.update_attributes(:employee_role_id => employee_role.id )
     end
-
 
     it '.renewal_gate_lifted_enrollments' do 
       value = subject.renewal_gate_lifted_enrollments(organization, effective_on, as_of_time = ::TimeKeeper.date_of_record)
