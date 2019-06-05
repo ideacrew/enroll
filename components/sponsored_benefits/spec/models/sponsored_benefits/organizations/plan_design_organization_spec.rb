@@ -137,7 +137,7 @@ module SponsoredBenefits
       end
 
       describe ".general_agency_profile" do
-
+        let(:employer_profile) { sponsor_profile }
         let(:pdo_with_general_agency) { plan_design_organization_with_assigned_ga }
         let(:pdo_without_general_agency) { prospect_plan_design_organization }
 
