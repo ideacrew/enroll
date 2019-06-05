@@ -31,7 +31,17 @@ module FinancialAssistance
           create_applicant(applicant, new_application)
         end
 
+        update_claimed_as_tax_dependent_by(new_application)
+
         new_application
+      end
+
+      def update_claimed_as_tax_dependent_by(new_application)
+        claimed_applicants = new_application.applicants.where(:claimed_as_tax_dependent_by.ne => nil)
+        claimed_applicants.each do |appl|
+          old_applicant = matching_old_applicant(appl)
+          appl.update_attributes(claimed_as_tax_dependent_by: old_applicant.id) if old_applicant
+        end
       end
 
       def create_applicant(applicant, new_application)
@@ -88,6 +98,11 @@ module FinancialAssistance
       end
 
       private
+
+      def matching_old_applicant(appl)
+        person_id = appl.person.id
+        @application.applicants.detect{ |app| app.person.id.to_s == person_id.to_s } if person_id
+      end
 
       def application_params
         application.attributes.reject {|attr| reject_application_params.include?(attr)}

@@ -76,7 +76,6 @@ RSpec.describe "ApplicationFactory" do
       end
     end
 
-
     context 'when application has only two applicants and one family member' do
       include_examples 'submitted application with one active member and two applicant'
 
@@ -89,6 +88,27 @@ RSpec.describe "ApplicationFactory" do
         it 'should have one active applicant' do
           expect(@draft_application.active_applicants.count).to eq 1
         end
+      end
+    end
+  end
+
+  describe '.update_claimed_as_tax_dependent_by' do
+    include_examples 'submitted application with two active members and two applicants'
+
+    subject do
+      FinancialAssistance::Factories::ApplicationFactory.new(application)
+    end
+
+    before do
+      subject.copy_application
+      @draft_application = family.application_in_progress
+    end
+
+    context 'different applicant ids must be set for claimed_as_tax_dependent_by' do
+      it 'should retun a different applicant id and not the old applicant id' do
+        old_claimed_applicant = subject.application.applicants.where(:claimed_as_tax_dependent_by.ne => nil).first
+        new_claimed_applicant = @draft_application.applicants.where(:claimed_as_tax_dependent_by.ne => nil).first
+        expect(new_claimed_applicant.claimed_as_tax_dependent_by).not_to eq old_claimed_applicant
       end
     end
   end
