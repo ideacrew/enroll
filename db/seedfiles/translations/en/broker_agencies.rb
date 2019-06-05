@@ -22,6 +22,7 @@ BROKER_AGENCIES_TRANSLATIONS = {
 	"en.assign" => "Assign",
 	"en.general_agencies" => "General Agencies",
 	"en.select_general_agency" => "Select General Agency",
+	"en.general_agencies.general_agency_staff_role_success" => "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed.",
 	"en.clear_assignment" => "Clear Assignment",
 	"en.hbx_acct" => "HBX Acct",
 	"en.ee_ct" => "EE Ct",
