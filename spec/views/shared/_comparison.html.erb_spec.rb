@@ -49,6 +49,7 @@ describe "shared/_comparison.html.erb", dbclean: :after_each do
 
     before :each do
       assign :coverage_kind, "dental"
+      assign :plans, [hbx_enrollment.product]
       render "shared/comparison", :qhps => mock_qhps
     end
 
@@ -71,6 +72,7 @@ describe "shared/_comparison.html.erb", dbclean: :after_each do
 
     before :each do
       assign :coverage_kind, "health"
+      assign :plans, [hbx_enrollment.product]
       allow(product).to receive(:sbc_document).and_return double("Document", :identifier => "identifier")
       render "shared/comparison", :qhps => mock_qhps
     end
@@ -131,6 +133,7 @@ describe "shared/_comparison.html.erb", dbclean: :after_each do
   context "provider_directory_url and rx_formulary_url" do
     # View file is checking for both Plan & Product instances. Does this needs to be fixed?
     before do
+      assign :plans, [hbx_enrollment.product]
       allow(product).to receive(:rx_formulary_url).and_return plan.rx_formulary_url
     end
 

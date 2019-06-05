@@ -485,7 +485,7 @@ class ConsumerRole
       transitions from: :fully_verified, to: :fully_verified
     end
 
-    event :coverage_purchased, :after => [:record_transition ,:notify_of_eligibility_change, :invoke_residency_verification!]  do
+    event :coverage_purchased, :after => [:record_transition, :notify_of_eligibility_change, :invoke_residency_verification!]  do
       transitions from: :unverified, to: :verification_outstanding, :guard => [:is_tribe_member_or_native_no_snn?], :after => [:handle_native_no_snn_or_indian_transition]
       transitions from: :unverified, to: :dhs_pending, :guards => [:call_dhs?], :after => [:invoke_verification!, :move_types_to_pending]
       transitions from: :unverified, to: :ssa_pending, :guards => [:call_ssa?], :after => [:invoke_verification!, :move_types_to_pending]
