@@ -658,7 +658,7 @@ def employer_poc
 
   def set_date
     authorize HbxProfile, :modify_admin_tabs?
-    forms_time_keeper = Forms::TimeKeeper.new(params[:forms_time_keeper])
+    forms_time_keeper = Forms::TimeKeeper.new(timekeeper_params)
     begin
       forms_time_keeper.set_date_of_record(forms_time_keeper.forms_date_of_record)
       flash[:notice] = "Date of record set to " + TimeKeeper.date_of_record.strftime("%m/%d/%Y")
@@ -717,6 +717,10 @@ private
     params.merge!({ pte_count: '0', msp_count: '0', admin_datatable_action: true })
     params.permit(:start_on, :end_on, :fte_count, :pte_count, :msp_count,
                   :open_enrollment_start_on, :open_enrollment_end_on, :benefit_sponsorship_id, :admin_datatable_action)
+  end
+
+  def timekeeper_params
+    params.require(:forms_time_keeper).permit(:date_of_record)
   end
 
   def modify_admin_tabs?
