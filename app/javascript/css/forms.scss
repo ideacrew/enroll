@@ -1,0 +1,31 @@
+#new_user {
+  #pass_strength {
+    font-size: 12px;
+  }
+  span#complexity {
+    padding: 3px 0;
+    height: 5px;
+    color: #000;
+    font-size: 12px;
+    text-align: center;
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 5px;
+  }
+  .strong {
+    background-color: #FAD054;
+    width: 40px;
+  }
+  .weak {
+    background-color: #e72b2d;
+    width: 20px;
+  }
+  .stronger {
+    background-color: #93C9F4;
+    width: 60px;
+  }
+  .strongest {
+    background-color: #005fd6;
+    width: 70px;
+  }
+}

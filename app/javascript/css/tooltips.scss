@@ -1,0 +1,28 @@
+
+  .tooltip > .tooltip-inner {
+    background-color: $dc-dark-blue;
+    color: $white;
+  }
+
+  .tooltip-inner {
+    min-width: 340px;
+    padding: 15px;
+    text-align: left;
+    font-size: .875em;
+  }
+
+  .tooltip.bs-tooltip-right .arrow:before {
+    border-right-color: $dc-dark-blue;
+  }
+
+  .pwHelper {
+    li {
+      list-style-type: none;
+    }
+    .fa-check {
+      color: #bef470;
+    }
+    .fa-times {
+      color: $dc-red;
+    }
+  }
