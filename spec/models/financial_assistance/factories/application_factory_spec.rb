@@ -102,13 +102,17 @@ RSpec.describe "ApplicationFactory" do
     before do
       subject.copy_application
       @draft_application = family.application_in_progress
+      @old_claimed_applicant = subject.application.applicants.where(:claimed_as_tax_dependent_by.ne => nil).first
+      @new_claimed_applicant = @draft_application.applicants.where(:claimed_as_tax_dependent_by.ne => nil).first
     end
 
     context 'different applicant ids must be set for claimed_as_tax_dependent_by' do
       it 'should retun a different applicant id and not the old applicant id' do
-        old_claimed_applicant = subject.application.applicants.where(:claimed_as_tax_dependent_by.ne => nil).first
-        new_claimed_applicant = @draft_application.applicants.where(:claimed_as_tax_dependent_by.ne => nil).first
-        expect(new_claimed_applicant.claimed_as_tax_dependent_by).not_to eq old_claimed_applicant
+        expect(@new_claimed_applicant.claimed_as_tax_dependent_by).not_to eq @old_claimed_applicant.id
+      end
+
+      it 'should retun a id matching to the applicant id of the new application' do
+        expect(@new_claimed_applicant.claimed_as_tax_dependent_by).to eq @draft_application.applicants.first.id
       end
     end
   end

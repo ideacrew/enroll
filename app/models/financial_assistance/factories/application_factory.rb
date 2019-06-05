@@ -100,8 +100,9 @@ module FinancialAssistance
       private
 
       def matching_old_applicant(appl)
-        person_id = appl.person.id
-        @application.applicants.detect{ |app| app.person.id.to_s == person_id.to_s } if person_id
+        old_applicant = @application.applicants.find(appl.claimed_as_tax_dependent_by)
+        person_id = old_applicant.person.id
+        appl.application.applicants.detect{ |app| app.person.id.to_s == person_id.to_s } if person_id
       end
 
       def application_params
