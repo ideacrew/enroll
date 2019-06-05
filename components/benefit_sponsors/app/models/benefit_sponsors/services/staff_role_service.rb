@@ -15,6 +15,8 @@ module BenefitSponsors
 
         if form.is_broker_agency_staff_profile?
           organization.broker_agency_profile
+        elsif form.is_general_agency_staff_profile?
+          organization.general_agency_profile
         else
           organization.employer_profile
         end
@@ -27,6 +29,9 @@ module BenefitSponsors
           persist_broker_agency_staff_role!(profile)
         elsif form[:is_broker_agency_staff_profile?]
           add_broker_agency_staff_role(form[:first_name], form[:last_name], form[:dob], form[:email], profile)
+        elsif form.is_general_agency_staff_profile? && form.email.present?
+          match_or_create_person(form)
+          persist_general_agency_staff_role!(profile)
         else
           Person.add_employer_staff_role(form[:first_name], form[:last_name], form[:dob], form[:email], profile)
         end
@@ -94,6 +99,28 @@ module BenefitSponsors
         else
           person.broker_agency_staff_roles << ::BrokerAgencyStaffRole.new({
                                                                             broker_agency_profile: profile
+                                                                          })
+          person.save!
+          return true, person
+        end
+      end
+
+      def persist_general_agency_staff_role!(profile)
+        terminated_general_agencies_with_same_profile = person.general_agency_staff_roles.detect{|role| role if role.benefit_sponsors_general_agency_profile_id == profile.id && role.aasm_state == "general_agency_terminated"}
+        active_general_agencies_with_same_profile =  person.general_agency_staff_roles.detect{|role| role if role.benefit_sponsors_general_agency_profile_id == profile.id && role.aasm_state == "active"}
+        pending_general_agencies_with_same_profile = person.general_agency_staff_roles.detect{|role| role if role.benefit_sponsors_general_agency_profile_id == profile.id && role.aasm_state == "general_agency_pending"}
+
+        if terminated_general_agencies_with_same_profile.present?
+          terminated_general_agencies_with_same_profile.general_agency_pending!
+          return true, person
+        elsif pending_general_agencies_with_same_profile.present?
+          return false,  "your application status was in pending with this General Agency"
+        elsif active_general_agencies_with_same_profile.present?
+          return false,  "you are already associated with this General Agency"
+        else
+          person.general_agency_staff_roles << ::GeneralAgencyStaffRole.new({
+                                                                            general_agency_profile: profile,
+                                                                            npn: profile.general_agency_primary_staff.npn
                                                                           })
           person.save!
           return true, person
