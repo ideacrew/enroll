@@ -84,6 +84,10 @@ module BenefitSponsors
         profile_type == "broker_agency_staff"
       end
 
+      def is_general_agency_staff_profile?
+        profile_type == "general_agency_staff"
+      end
+
       # for new
       def self.for_new
         self.new

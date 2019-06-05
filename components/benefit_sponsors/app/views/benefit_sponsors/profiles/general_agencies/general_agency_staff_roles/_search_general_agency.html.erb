@@ -9,7 +9,7 @@
         <th style='width: 18%'> <%= l10n("select_this_general_agency") %></th>
       </thead>
       <% @general_agency_profiles.each do |agency| %>
-      <tbody class="select-general-agency">
+      <tbody class="select-ga">
           <td><%= agency.legal_name %></td>
           <td><%= agency.general_agency_primary_staff.npn %></td>
           <td><%= agency.general_agency_primary_staff.person.full_name %></td>

@@ -47,15 +47,16 @@ javascript:
 
   }
 
-  // function selectBrokereAgency(element) {
-  //   var result = document.querySelectorAll('.result');
-  //   result.forEach(function (result) {
-  //       var element = result.querySelectorAll('.select-broker')
-  //       element.forEach(function (ele) {
-  //           ele.classList.remove("agency-selected");
-  //       })
-  //   });
-  //   document.getElementById('staff_profile_id').value = element.dataset.broker_agency_profile_id;
-  //   element.closest(".select-broker").classList.add('agency-selected')
-  //     document.getElementById('broker-staff-btn').disabled = false;
-  // }
+  function selectGeneralAgency(element) {
+    var result = document.querySelectorAll('.result');
+    result.forEach(function (result) {
+        var element = result.querySelectorAll('.select-ga')
+        element.forEach(function (ele) {
+            ele.classList.remove("agency-selected");
+        })
+    });
+    debugger;
+    document.getElementById('staff_profile_id').value = element.dataset.general_agency_profile_id;
+    element.closest(".select-ga").classList.add('agency-selected')
+      document.getElementById('general-agency-staff-btn').disabled = false;
+  }

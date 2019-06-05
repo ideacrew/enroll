@@ -15,7 +15,7 @@ module BenefitSponsors
           @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_create(general_agency_staff_params)
           begin
             @status,@result = @staff.save
-            unless @staff.is_broker_registration_page
+            unless @staff.is_general_agency_registration_page
               flash[:notice] = "Role added successfully" if @status
               flash[:error] = "Role was not added because " + @result unless @status
             end
@@ -69,7 +69,7 @@ module BenefitSponsors
 
         def general_agency_staff_params
           params[:staff].presence || params[:staff] = {}
-          params[:staff].merge!({profile_id: params["staff"]["profile_id"] || params["profile_id"] || params["id"], person_id: params["person_id"], profile_type: params[:profile_type] || "general_agency_agency_staff",
+          params[:staff].merge!({profile_id: params["staff"]["profile_id"] || params["profile_id"] || params["id"], person_id: params["person_id"], profile_type: params[:profile_type] || "general_agency_staff",
                                   filter_criteria: params.permit(:q), is_general_agency_registration_page: params[:general_agency_registration_page] || params["staff"]["is_general_agency_registration_page"]})
           params[:staff].permit!
         end
