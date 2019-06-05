@@ -465,7 +465,7 @@ function fetch_data_title(min_employee_contribution, minimum_family_contribution
   if (minimum_family_contribution === "0"){
     return "Employer premium contribution for Employee Only Health Plans must be at least " + min_employee_contribution + "%"
   } else {
-    return "Employer premium contribution for Family Health Plans must be at least " + minimum_family_contribution + "%, and Employee Only Health Plans must be at least " + minimum_employee_contribution + "%"
+    return "Employer premium contribution for Family Health Plans must be at least " + minimum_family_contribution + "%, and Employee Only Health Plans must be at least " + min_employee_contribution + "%"
   }
 }
 
