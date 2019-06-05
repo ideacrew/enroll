@@ -57,7 +57,7 @@
               </td>
               <td>
                 <% if offers_nationwide_plans? %>
-                  <%= plan.nationwide ? "Nationwide" : "DC-Metro" %>
+                  <%= network_type(plan) %>
                 <% else %>
                   <% if plan.network_information.present? %>
                       Network Notes

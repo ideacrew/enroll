@@ -641,6 +641,20 @@ module ApplicationHelper
     (plan_hsa_status[plan.id.to_s]) if plan.benefit_market_kind == :aca_individual
   end
 
+  def products_count(products)
+    return 0 unless products
+
+    products.count
+  end
+
+  def network_type(product)
+    if product.nationwide
+      'Nationwide'
+    elsif product.dc_in_network
+      'DC-Metro'
+    end
+  end
+
   def make_binder_checkbox_disabled(employer)
     eligibility_criteria(employer)
     (@participation_count == 0 && @non_owner_participation_rule == true) ? false : true

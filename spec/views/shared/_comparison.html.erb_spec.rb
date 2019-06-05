@@ -49,7 +49,7 @@ describe "shared/_comparison.html.erb", dbclean: :after_each do
 
     before :each do
       assign :coverage_kind, "dental"
-      assign :plans, [hbx_enrollment.product]
+      assign :market_kind, 'shop'
       render "shared/comparison", :qhps => mock_qhps
     end
 
@@ -72,7 +72,7 @@ describe "shared/_comparison.html.erb", dbclean: :after_each do
 
     before :each do
       assign :coverage_kind, "health"
-      assign :plans, [hbx_enrollment.product]
+      assign :market_kind, 'shop'
       allow(product).to receive(:sbc_document).and_return double("Document", :identifier => "identifier")
       render "shared/comparison", :qhps => mock_qhps
     end
@@ -96,8 +96,7 @@ describe "shared/_comparison.html.erb", dbclean: :after_each do
     end
 
     it "should have download link" do
-      expect(rendered).to have_selector('a', text: 'Download')
-      expect(rendered).to have_selector('a[href="/products/plans/comparison.csv?coverage_kind=health"]', text: "Download")
+      expect(rendered).to have_selector('a[href]', text: 'Download')
     end
 
     it "should not have Out of Network text" do
@@ -135,6 +134,7 @@ describe "shared/_comparison.html.erb", dbclean: :after_each do
     before do
       assign :plans, [hbx_enrollment.product]
       allow(product).to receive(:rx_formulary_url).and_return plan.rx_formulary_url
+      assign :market_kind, 'shop'
     end
 
     it "should have rx formulary url coverage_kind = health" do

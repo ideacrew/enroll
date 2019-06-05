@@ -26,7 +26,7 @@ class Products::QhpController < ApplicationController
       end
     else
       tax_household = get_shopping_tax_household_from_person(current_user.person, @hbx_enrollment.effective_on.year)
-      @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind)
+      @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, 'individual')
       @qhps = find_qhp_cost_share_variances
 
       @qhps = @qhps.each do |qhp|
