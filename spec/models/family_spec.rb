@@ -54,6 +54,7 @@ describe Family, "given a primary applicant and a dependent" do
   context "enrollments_for_display" do
     let(:expired_enrollment) {
     FactoryBot.create(:hbx_enrollment,
+                       family: family,
                        household: household,
                        coverage_kind: "health",
                        enrollment_kind: "open_enrollment",
@@ -1117,6 +1118,7 @@ describe Family, ".expire_individual_market_enrollments", dbclean: :after_each d
   let!(:hbx_profile) { FactoryBot.create(:hbx_profile) }
   let!(:enrollments) {
     FactoryBot.create(:hbx_enrollment,
+                       family: family,
                        household: family.active_household,
                        coverage_kind: "health",
                        effective_on: current_effective_date,
@@ -1126,6 +1128,7 @@ describe Family, ".expire_individual_market_enrollments", dbclean: :after_each d
                        plan_id: plan.id
     )
     FactoryBot.create(:hbx_enrollment,
+                       family: family,
                        household: family.active_household,
                        coverage_kind: "health",
                        effective_on: current_effective_date - 1.year,
@@ -1135,6 +1138,7 @@ describe Family, ".expire_individual_market_enrollments", dbclean: :after_each d
                        plan_id: prev_year_plan.id
     )
     FactoryBot.create(:hbx_enrollment,
+                       family: family,
                        household: family.active_household,
                        coverage_kind: "dental",
                        effective_on: sep_effective_date,
@@ -1144,6 +1148,7 @@ describe Family, ".expire_individual_market_enrollments", dbclean: :after_each d
                        plan_id: dental_plan.id
     )
     FactoryBot.create(:hbx_enrollment,
+                       family: family,
                        household: family.active_household,
                        coverage_kind: "dental",
                        effective_on: current_effective_date - 2.years,
@@ -1163,17 +1168,17 @@ describe Family, ".expire_individual_market_enrollments", dbclean: :after_each d
       family.reload
     end
     it "should expire previous year coverages" do
-      enrollment = family.active_household.hbx_enrollments.where(:effective_on => current_effective_date - 1.year).first
+      enrollment = HbxEnrollment.where(:effective_on => current_effective_date - 1.year).first
       expect(enrollment.coverage_expired?).to be_truthy
-      enrollment = family.active_household.hbx_enrollments.where(:effective_on => current_effective_date - 2.years).first
+      enrollment = HbxEnrollment.where(:effective_on => current_effective_date - 2.years).first
       expect(enrollment.coverage_expired?).to be_truthy
     end
     it "should expire coverage with begin date less than 60 days" do
-      enrollment = family.active_household.hbx_enrollments.where(:effective_on => sep_effective_date).first
+      enrollment = HbxEnrollment.where(:effective_on => sep_effective_date).first
       expect(enrollment.coverage_expired?).to be_truthy
     end
     it "should not expire coverage for current year" do
-      enrollment = family.active_household.hbx_enrollments.where(:effective_on => current_effective_date).first
+      enrollment = HbxEnrollment.where(:effective_on => current_effective_date).first
       expect(enrollment.coverage_expired?).to be_falsey
     end
   end
@@ -1192,6 +1197,7 @@ describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
 
   let!(:enrollments) {
     FactoryBot.create(:hbx_enrollment,
+                       family: family,
                        household: family.active_household,
                        coverage_kind: "health",
                        effective_on: current_effective_date,
@@ -1203,6 +1209,7 @@ describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
     )
 
     FactoryBot.create(:hbx_enrollment,
+                       family: family,
                        household: family.active_household,
                        coverage_kind: "dental",
                        effective_on: current_effective_date,
@@ -1335,6 +1342,7 @@ describe Family, "given a primary applicant and a dependent", dbclean: :after_ea
 
   let!(:enrollment) {
     FactoryBot.create(:hbx_enrollment,
+      family: family,
       household: family.active_household,
       coverage_kind: "health",
       effective_on: current_effective_date,
@@ -1349,6 +1357,7 @@ describe Family, "given a primary applicant and a dependent", dbclean: :after_ea
 
     let!(:ivl_enrollment) {
       FactoryBot.create(:hbx_enrollment,
+        family: family,
         household: family.active_household,
         coverage_kind: "health",
         effective_on: current_effective_date,
@@ -1368,7 +1377,10 @@ describe Family, "given a primary applicant and a dependent", dbclean: :after_ea
   context '.enrolled_policy' do 
     it "should return the enrolled policy for a family member" do
       family.enrollments.first.update_attributes!(aasm_state:"enrolled_contingent")
-      family.enrollments.first.hbx_enrollment_members.new(applicant_id:family_member.id,eligibility_date:TimeKeeper.date_of_record, coverage_start_on:TimeKeeper.date_of_record + 1.day)
+      member = family.enrollments.first.hbx_enrollment_members.build(applicant_id:family_member.id,eligibility_date:TimeKeeper.date_of_record, coverage_start_on:TimeKeeper.date_of_record + 1.day)
+      member.save!
+      family.save!
+      family.reload
       expect(family.enrolled_policy(family_member)).to eq  family.enrollments.first
     end
   end
