@@ -14,6 +14,12 @@ class HbxEnrollment
   include BenefitSponsors::ModelEvents::HbxEnrollment
 
   belongs_to :household
+  # Override attribute accessor as well
+  # Migrate all the family ids to that
+  # When we assign a household to the enrollment,
+  # assign the family as well.
+  # override the method where we do household_id == etc.
+  belongs_to :family
 
   ENROLLMENT_CREATED_EVENT_NAME = "acapi.info.events.policy.created"
   ENROLLMENT_UPDATED_EVENT_NAME = "acapi.info.events.policy.updated"
