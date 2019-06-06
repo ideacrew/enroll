@@ -137,7 +137,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
 
   if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     context "coverage selection with incarcerated" do
-      let(:jail_person) { FactoryBot.create(:person, is_incarcerated: true) }
+      let!(:jail_person) { FactoryBot.create(:person, is_incarcerated: true) }
+      let!(:individual_market_transition) { FactoryBot.create(:individual_market_transition, person: jail_person)}
       let(:person2) { FactoryBot.create(:person, dob: TimeKeeper.date_of_record - 1.year) }
       let(:person3) { FactoryBot.create(:person, :with_consumer_role) }
       let(:consumer_role) { FactoryBot.create(:consumer_role, person: jail_person, is_incarcerated: 'yes') }
@@ -194,7 +195,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       end
 
       context "base area" do
-        before :each do
+        before do
           render :template => "insured/group_selection/new.html.erb"
         end
 
@@ -218,12 +219,11 @@ RSpec.describe "insured/group_selection/new.html.erb" do
           expect(rendered).to have_selector('input[value="health"]')
           expect(rendered).to have_selector('label', text: 'Health')
         end
-      end
 
-      it "should have dental radio button when has consumer_role" do
-        render :template => "insured/group_selection/new.html.erb"
-        expect(rendered).to have_selector('input[value="dental"]')
-        expect(rendered).to have_selector('label', text: 'Dental')
+        it "should have dental radio button when has consumer_role" do
+          expect(rendered).to have_selector('input[value="dental"]')
+          expect(rendered).to have_selector('label', text: 'Dental')
+        end
       end
 
       # it "should not have dental radio button" do
@@ -425,6 +425,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       allow(adapter).to receive(:can_shop_shop?).with(person).and_return(true)
       allow(adapter).to receive(:can_shop_both_markets?).with(person).and_return(false)
+      allow(adapter).to receive(:can_shop_resident?).with(person).and_return(false)
+      allow(adapter).to receive(:can_shop_individual?).with(person).and_return(false)
       allow(adapter).to receive(:is_eligible_for_dental?).with(employee_role, true, hbx_enrollment).and_return(true)
       sign_in current_user
     end
@@ -522,6 +524,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       allow(adapter).to receive(:can_shop_shop?).with(person).and_return(true)
       allow(adapter).to receive(:can_shop_both_markets?).and_return(false)
+      allow(adapter).to receive(:can_shop_resident?).with(person).and_return(false)
+      allow(adapter).to receive(:can_shop_individual?).with(person).and_return(false)
       allow(adapter).to receive(:is_eligible_for_dental?).and_return(true)
     end
 
@@ -554,6 +558,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(view).to receive(:can_employee_shop?).and_return(false)
       allow(adapter).to receive(:can_shop_shop?).with(person).and_return(true)
       allow(adapter).to receive(:can_shop_both_markets?).and_return(false)
+      allow(adapter).to receive(:can_shop_resident?).with(person).and_return(false)
+      allow(adapter).to receive(:can_shop_individual?).with(person).and_return(false)
       allow(adapter).to receive(:is_eligible_for_dental?).with(employee_role, true, hbx_enrollment).and_return(true)
 
     end
@@ -586,6 +592,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
   if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     context "change plan with consumer role" do
       let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+      let!(:individual_market_transition) { FactoryBot.create(:individual_market_transition, person: person)}
       let(:employee_role) { FactoryBot.create(:employee_role) }
       let(:benefit_group) { FactoryBot.create(:benefit_group) }
       let(:coverage_household) { double("coverage household", coverage_household_members: []) }
@@ -623,7 +630,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
 
       it "shouldn't see marketplace options" do
         render file: "insured/group_selection/new.html.erb"
-        expect(rendered).to_not have_selector('h3', text: 'Marketplace')
+        expect(rendered).to have_selector('h3', text: 'Marketplace')
       end
     end
   end
@@ -651,7 +658,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       allow(adapter).to receive(:can_shop_shop?).with(person).and_return(true)
       allow(adapter).to receive(:can_shop_both_markets?).and_return(false)
-      allow(adapter).to receive(:can_shop_resident?).with(person).and_return(true)
+      allow(adapter).to receive(:can_shop_resident?).with(person).and_return(false)
+      allow(adapter).to receive(:can_shop_individual?).with(person).and_return(false)
       allow(adapter).to receive(:is_eligible_for_dental?).with(employee_role, nil, hbx_enrollment).and_return(true)
     end
 
@@ -663,7 +671,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
 
   context "#can_shop_shop?", dbclean: :after_each do
     let(:census_employee) { double("CensusEmployee", id: 'ce_id', employer_profile: double("EmployerProfile", legal_name: "acme, Inc"))}
-    let(:person) { double("Person", id: 'person_id')}
+    let(:person) { FactoryBot.create(:person) }
     let(:enrollment) { double("HbxEnrollment", id: 'enr_id', employee_role: nil, benefit_group: benefit_group)}
     let(:employee_role) { double("EmployeeRole", id: 'er_id', person: person, census_employee: census_employee)}
     let(:benefit_group) { FactoryBot.create(:benefit_group) }
@@ -684,6 +692,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(adapter).to receive(:can_shop_shop?).with(person).and_return(true)
       allow(adapter).to receive(:can_shop_both_markets?).with(person).and_return(false)
       allow(adapter).to receive(:can_shop_resident?).with(person).and_return(false)
+      allow(adapter).to receive(:can_shop_individual?).with(person).and_return(false)
       allow(adapter).to receive(:is_eligible_for_dental?).and_return(false)
     end
 
@@ -700,6 +709,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
   if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     context "change plan with both roles" do
       let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_employee_role) }
+      let!(:individual_market_transition) { FactoryBot.create(:individual_market_transition, person: person)}
       let(:employee_role) { FactoryBot.build_stubbed(:employee_role) }
       let(:census_employee) { FactoryBot.build_stubbed(:census_employee, benefit_group_assignments: [benefit_group_assignment]) }
       let(:benefit_group_assignment) { FactoryBot.build_stubbed(:benefit_group_assignment, benefit_group: benefit_group) }
@@ -757,18 +767,19 @@ RSpec.describe "insured/group_selection/new.html.erb" do
         expect(rendered).to have_selector('#market_kind_individual')
       end
 
-      it "shouldn't see marketplace options" do
+      it "should see marketplace options" do
         allow(adapter).to receive(:can_shop_both_markets?).with(person).and_return(false)
         allow(adapter).to receive(:can_shop_shop?).with(person).and_return(false)
         allow(adapter).to receive(:can_shop_resident?).with(person).and_return(false)
         render file: "insured/group_selection/new.html.erb"
-        expect(rendered).not_to have_selector('h3', text: 'Marketplace')
+        expect(rendered).to have_selector('h3', text: 'Marketplace')
       end
 
       it "should not see employer-sponsored coverage radio option" do
         allow(adapter).to receive(:can_shop_both_markets?).with(person).and_return(false)
         allow(adapter).to receive(:can_shop_shop?).with(person).and_return(false)
         allow(adapter).to receive(:can_shop_resident?).with(person).and_return(false)
+        allow(person).to receive(:has_employer_benefits?).and_return(false)
         render file: "insured/group_selection/new.html.erb"
         expect(rendered).not_to have_selector('#market_kind_shop')
       end

@@ -1,5 +1,9 @@
-- member_enrollment = @member_group.group_enrollment
-- @plan = member_enrollment.product
+- if @hbx_enrollment.kind == 'employer_sponsored'
+  - member_enrollment = @member_group.group_enrollment
+  - @plan = member_enrollment.product
+- else
+  - @plan = @member_group
+
 - if @hbx_enrollment.shopping?
 - else
   = link_to '<i class="fa fa-chevron-left"></i> Back to My Account'.html_safe, family_account_path, class: 'btn btn-default all-plans'
@@ -14,7 +18,13 @@
       .col-xs-6
         span.pull-right
           span style=("font-size: 24px;")
+          - if @hbx_enrollment.kind == 'employer_sponsored'
             = number_to_currency(member_enrollment.product_cost_total - member_enrollment.sponsor_contribution_total)
+          - else
+            - if (@hbx_enrollment.present? && @hbx_enrollment.coverage_kind == 'health') || @plan.kind == :health
+              = number_to_currency(current_cost(@plan.total_employee_cost, @plan.ehb, @hbx_enrollment, @source, @plan.can_use_aptc?))
+            - else
+              = number_to_currency(@plan.total_employee_cost)
           br/
           span.lg per month
       .col-xs-12
@@ -71,7 +81,7 @@
             .col-xs-4
               = render partial: "shared/plan_shoppings/sbc_link", locals: { plan: @plan }
             .col-xs-4
-              - if @plan.kind == "health" && @plan.rx_formulary_url.present?
+              - if @plan.kind == :health && @plan.rx_formulary_url.present?
                 = link_to "RX FORMULARY URL", @plan.rx_formulary_url, target: "_blank"
             .col-xs-4
               - if offers_nationwide_plans?

@@ -287,16 +287,17 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def can_shop_individual?(person)
-    false
+    person.try(:has_active_consumer_role?)
   end
 
   def can_shop_resident?(person)
-    false
+    person.try(:has_active_resident_role?)
   end
 
   def can_shop_both_markets?(person)
-    false
+    can_shop_individual?(person) && can_shop_shop?(person)
   end
+
 
   def is_eligible_for_dental?(employee_role, change_plan, enrollment)
     if change_plan == "change_by_qle"

@@ -394,7 +394,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     context "normal" do
       before :each do
         allow(hbx_enrollment).to receive(:can_waive_enrollment?).and_return(true)
-        get :show, params: {id: "hbx_id", market_kind: "shop"}
+        get :show, params: {id: "hbx_id", market_kind: 'shop'}
       end
 
       it "should be success" do

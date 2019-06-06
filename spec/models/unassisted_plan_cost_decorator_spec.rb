@@ -23,7 +23,7 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
     end
 
     before do
-      allow(Caches::PlanDetails).to receive(:lookup_rate) {|id, start, age| age * 1.0}
+      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) {|_id, _start, age| age * 1.0}
     end
 
     it "should be possible to construct a new plan cost decorator" do

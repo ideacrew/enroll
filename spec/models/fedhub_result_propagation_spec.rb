@@ -6,16 +6,16 @@ describe "A new consumer role with an individual market enrollment", :dbclean =>
   let(:person) { FactoryBot.create(:person, :with_consumer_role) }
   let(:family) { FactoryBot.create(:individual_market_family, primary_person: person) }
   let(:hbx_profile) { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
+  let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01') }
   let(:enrollment) do
     benefit_sponsorship = hbx_profile.benefit_sponsorship
     benefit_package = benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first
-    plan = Plan.find(benefit_package.benefit_ids.first)
     enrollment = family.households.first.create_hbx_enrollment_from(
       coverage_household: family.households.first.coverage_households.first,
       consumer_role: person.consumer_role,
       benefit_package: hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first
     )
-    enrollment.plan = plan
+    enrollment.product = product
     enrollment.select_coverage!
     enrollment
   end

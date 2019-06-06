@@ -288,6 +288,15 @@ class Family
     enrolled_plans.collect(&:product_id)
   end
 
+  def currently_enrolled_products(enrollment)
+    enrolled_enrollments = active_household.hbx_enrollments.enrolled_and_renewing.by_coverage_kind(enrollment.coverage_kind)
+    enrolled_enrollments.map(&:product)
+  end
+
+  def currently_enrolled_product_ids(enrollment)
+    currently_enrolled_products(enrollment).collect(&:id)
+  end
+
   def enrollments
     return [] if  latest_household.blank?
     latest_household.hbx_enrollments.show_enrollments_sans_canceled

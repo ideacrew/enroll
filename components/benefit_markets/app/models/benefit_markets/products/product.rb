@@ -130,6 +130,21 @@ module BenefitMarkets
         ])
     }
 
+    scope :by_year, lambda {|year|
+      where('$and' => [{'application_period.min' => {'$lte' => Date.new(year)}},
+                       {'application_period.max' => {'$gte' => Date.new(year).end_of_year}}
+      ])
+    }
+
+    scope :with_premium_tables, ->{ where(:premium_tables.exists => true) }
+
+    scope :by_product_ids, ->(product_ids) { where(:id => {'$in' => product_ids}) }
+
+    scope :by_csr_kind_with_catastrophic, lambda { |csr_kind = 'csr_100'|
+      where('$and' => [{'$or' => [{:metal_level_kind.in => [:platinum, :gold, :bronze, :catastrophic], :csr_variant_id => '01'},
+                                  {:metal_level_kind => :silver, :csr_variant_id => EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]}]}])
+    }
+
     #Products retrieval by type
     scope :health_products,            ->{ where(:"_type" => /.*HealthProduct$/) }
     scope :dental_products,            ->{ where(:"_type" => /.*DentalProduct$/)}
@@ -163,6 +178,15 @@ module BenefitMarkets
       else
         write_attribute(:service_area_id, val.id)
       end
+    end
+
+    def can_use_aptc?
+      metal_level != 'catastrophic'
+    end
+
+    def is_csr?
+      csr_kinds_mapping = EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP
+      (csr_kinds_mapping.values - [csr_kinds_mapping.default]).include? csr_variant_id
     end
 
     def ehb
@@ -321,6 +345,11 @@ module BenefitMarkets
 
     def dental?
       kind == :dental
+    end
+
+    def is_same_plan_by_hios_id_and_active_year?(product)
+      #a combination of hios_id and active_year has to be considered as a Primary Key as hios_id alone cannot be considered as primary
+      ((self.hios_id.split("-")[0] == product.hios_id.split("-")[0]) && self.active_year == product.active_year )
     end
 
     # private

@@ -1,4 +1,3 @@
-/* Remove on plan_filter.js is completed
 function hidePlanTabs() {
   $(".all-filters-row").hide();
   $("ul[role='tablist'] li[role='presentation']").each(function(idx, ele) {
@@ -64,9 +63,9 @@ function applyPlanFilterCBs(cbKlass, cbFilterKlass, planValueTag) {
 
 function applyPlanFilters() {
   var all_selectors = [
-    applyPlanFilterCBs("plan-type-selection-filter", "data-plan-category-filter", "data-plan-category"),
-    applyPlanFilterCBs("plan-metal-level-selection-filter", "data-plan-metal-level-filter", "data-plan-metal-level"),
-    applyPlanFilterCBs("plan-metal-network-selection-filter", "data-plan-metal-network-filter", "data-plan-metal-network")
+    applyPlanFilterCBs("plan-type-selection-filter", "data-plan-type", "data-plan-category"),
+    applyPlanFilterCBs("plan-metal-level-selection-filter", "data-plan-metal-level", "data-plan-metal-level"),
+    applyPlanFilterCBs("plan-metal-network-selection-filter", "data-plan-network", "data-plan-metal-network")
   ];
   combineAllPlanSelectors(all_selectors);
   $("strong#plans-count").text($(".plan-row:visible").length);
@@ -125,7 +124,7 @@ function doPlanComparison(action_uri) {
 }
 
 function applyPlanSort(sort_by){
-  var plandivs = $('#all-plans #plans .plan-row');
+  var plandivs = $('#all-plans #ivl_plans .plan-row');
   plandivs.sort(function(a, b){
     if (sort_by == "plan-metal-premium" || sort_by == "plan-metal-deductible"){
       var keyA = parseFloat($(a).data(sort_by).toString().replace(/[^\d\.]/g,''));
@@ -136,7 +135,7 @@ function applyPlanSort(sort_by){
     }
     return (keyA > keyB) ? 1 : -1;
   });
-  $("#all-plans #plans").empty().append(plandivs);
+  $("#all-plans #ivl_plans").empty().append(plandivs);
 };
 
 function updatePlanCost(elected_aptc) {
@@ -191,7 +190,8 @@ $(function() {
 
   $(document).on('change', 'input[name="elected_pct"]', function(){
     var elected_pct = $("input[name='elected_pct']").val();
-    var elected_amount = parseFloat($('#max_aptc').val()).toFixed(2) * parseFloat(elected_pct).toFixed(2);
+    //val() is returing empty, changed to attr('value')
+    var elected_amount = parseFloat($('#max_aptc').attr('value')).toFixed(2) * parseFloat(elected_pct).toFixed(2);
     $('#elected_aptc').val(elected_amount.toFixed(2));
   });
 
@@ -215,7 +215,8 @@ $(function() {
       updatePlanCost(elected_aptc);
       $.ajax({
         type: "POST",
-        url: $('#set_elected_aptc_url').val(),
+        //val() is returing empty, changed to attr('value')
+        url: $('#set_elected_aptc_url').attr('value'),
         dataType: 'script',
         data: {
           'elected_aptc': elected_aptc
@@ -225,13 +226,13 @@ $(function() {
   });
 
   $(document).on('click', '.all-filters-row .reset-btn', function(){
-    $(".filter-sidebar input[type='checkbox']").attr("checked", false);
-    $(".filter-sidebar input[type='text'].plan-metal-premium-from-selection-filter").val("0");
-    $(".filter-sidebar input[type='text'].plan-metal-premium-to-selection-filter").val($('#max_total_employee_cost').val());
-    $(".filter-sidebar input[type='text'].plan-metal-deductible-from-selection-filter").val("0");
-    $(".filter-sidebar input[type='text'].plan-metal-deductible-to-selection-filter").val($('#max_deductible').val());
-    $(".filter-sidebar select.plan-carrier-selection-filter").prop('selectedIndex', 0).selectric('refresh');
-    $(".filter-sidebar select.plan-hsa-eligibility-selection-filter").prop('selectedIndex', 0).selectric('refresh');
+    $("#filter-sidebar input[type='checkbox']").attr("checked", false);
+    $("#filter-sidebar input[type='text'].plan-metal-premium-from-selection-filter").val("0");
+    $("#filter-sidebar input[type='text'].plan-metal-premium-to-selection-filter").val($('#max_total_employee_cost').val());
+    $("#filter-sidebar input[type='text'].plan-metal-deductible-from-selection-filter").val("0");
+    $("#filter-sidebar input[type='text'].plan-metal-deductible-to-selection-filter").val($('#max_deductible').val());
+    $("#filter-sidebar select.plan-carrier-selection-filter").prop('selectedIndex', 0).selectric('refresh');
+    $("#filter-sidebar select.plan-hsa-eligibility-selection-filter").prop('selectedIndex', 0).selectric('refresh');
 		applyPlanFilters();
   });
 
@@ -239,7 +240,7 @@ $(function() {
     applyPlanSort($(this).data('sort-by'));
   });
 
-  $(document).on('click', "#plans .plan-select.btn-default.select", function(e){
+  $(document).on('click', "#ivl_plans .plan-select.btn-default.select", function(e){
     var url = $(this).data('url');
     if ($('.aptc').length > 0){
       var elected_aptc = $("input#elected_aptc").val();
@@ -252,4 +253,4 @@ $(function() {
 
 $(document).on("click", ".reference_plan_info h4 span", function() {
   $(this).parents(".reference_plan_info").find('.content').toggle();
-});*/
+});

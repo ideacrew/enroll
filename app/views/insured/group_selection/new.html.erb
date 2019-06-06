@@ -13,12 +13,10 @@
         <%end%>
         </div>
         <h3><%= l10n("insured.group_selection.new.who_needs_coverage") %></h3>
-	  <%= hidden_field_tag(:waiver_reason, nil, id: "waiver_reason_hidden_value_field") %>
-	  <%= hidden_field_tag(:is_waiving, nil, id: "is_waiving_hidden_value_field") %>
-          <%= hidden_field_tag(:person_id, @person.id) %>
-          <%= hidden_field_tag(:coverage_household_id, @coverage_household_id) %>
-          <%= hidden_field_tag(:enrollment_kind, @enrollment_kind) %>
-          <%= hidden_field_tag(:hbx_enrollment_id, @hbx_enrollment.id) if @hbx_enrollment.present? %>
+        <%= hidden_field_tag(:person_id, @person.id) %>
+        <%= hidden_field_tag(:coverage_household_id, @coverage_household_id) %>
+        <%= hidden_field_tag(:enrollment_kind, @enrollment_kind) %>
+        <%= hidden_field_tag(:hbx_enrollment_id, @hbx_enrollment.id) if @hbx_enrollment.present? %>
 
           <% if @adapter.can_shop_shop?(@person) || @adapter.can_shop_individual?(@person) || @adapter.can_shop_resident?(@person) %>
             <div id="coverage-household" class='row no-buffer'>
@@ -31,69 +29,93 @@
             </div>
           <% end %>
 
-          <% if @adapter.can_shop_both_markets?(@person) %>
-            <div id="market_kinds" class='row no-buffer'>
-                <h3><%= l10n("insured.group_selection.new.marketplace") %></h3>
-              <span class="clear" style="display: il"></span>
-
-              <div class="n-radio-group">
-                <% Plan::MARKET_KINDS.each_with_index do |kind, index| %>
-                  <div class="n-radio-row">
-                    <label class="n-radio" for="market_kind_<%= kind %>">
-                      <%= radio_button_tag 'market_kind', kind, index == 0, id: "market_kind_#{kind}", required: true, class: "n-radio", checked: is_market_kind_checked?(kind, @person), disabled: is_market_kind_disabled?(kind, @person) %>
-                      <span class="n-radio">
-                      </span>
-                      <% if kind=="shop" %>
-                        <%= l10n("insured.group_selection.new.employee_sponsored_benifits") %>
-                      <% else %>
-                        <%= l10n("insured.group_selection.new.individual_benifits") %>
-                      <% end %>
-                    </label>
-                  </div>
-                <% end %>
-              </div>
-            </div>
-          <% elsif @adapter.can_shop_shop?(@person) %>
-             <%= hidden_field_tag 'market_kind', 'shop' %>
-          <% elsif @adapter.can_shop_individual?(@person) && !@adapter.can_shop_resident?(@person) %>
-             <%= hidden_field_tag 'market_kind', 'individual' %>
-          <% elsif @adapter.can_shop_resident?(@person) %>
-             <%= hidden_field_tag 'market_kind', 'coverall' %>
-          <% else %>
-            <% if @market_kind.present? %>
-              <%= hidden_field_tag 'market_kind', @market_kind %>
-            <% end %>
-          <% end %>
-
-          <% if @adapter.can_shop_shop?(@person) %>
-            <%= render 'select_employer' %>
-          <% end %>
-
-          <div id="coverage_kinds" class='row no-buffer'>
-              <h3><%= l10n("benefit_type") %></h3>
-
-              <div class="n-radio-group">
+        <% if @adapter.can_shop_both_markets?(@person) || @adapter.can_shop_individual?(@person) || @adapter.can_shop_resident?(@person) %>
+          <div id="market_kinds" class='row no-buffer'>
+            <h3><%= l10n("insured.group_selection.new.marketplace") %></h3>
+            <span class="clear" style="display: il"></span>
+            <div class="n-radio-group">
+              <% view_market_places(@person).each_with_index do |kind, index| %>
                 <div class="n-radio-row">
-                  <label class="n-radio" for="coverage_kind_health">
-                    <%= radio_button_tag 'coverage_kind', 'health', is_coverage_kind_checked?("health"), disabled: is_coverage_kind_disabled?("health"),id: 'coverage_kind_health', class: 'n-radio' %>
+                  <label class="n-radio" for="market_kind_<%= kind %>">
+                    <%= radio_button_tag 'market_kind', kind, index == 0, id: "market_kind_#{kind}", required: true, class: "n-radio", checked: is_market_kind_checked?(kind, @person), disabled: is_market_kind_disabled?(kind, @person) %>
                     <span class="n-radio">
-                    </span>
-                    <%= l10n(".health") %>
+                </span>
+                  <% if kind=="shop" %>
+                    <%= l10n("insured.group_selection.new.employee_sponsored_benefits") %>
+                  <% elsif kind=="individual"  %>
+                    <%= l10n("insured.group_selection.new.individual_benefits") %>
+                  <% elsif kind=="coverall"  %>
+                    <%= l10n("insured.group_selection.new.coverall_benefits") %>
+                  <% end %>
                   </label>
                 </div>
-
-                <% if dental_market_enabled? %>
-                  <div id="dental-radio-button" class="n-radio-row <%= 'dn' if @adapter.can_shop_shop?(@person) && !@adapter.is_eligible_for_dental?(@employee_role, @change_plan, @hbx_enrollment) %>">
-                    <label class="n-radio" for="coverage_kind_dental">
-                      <%= radio_button_tag 'coverage_kind', 'dental', is_coverage_kind_checked?("dental"), disabled: is_coverage_kind_disabled?("dental"), id: 'coverage_kind_dental', class: 'n-radio' %>
-                      <span class="n-radio">
-                      </span>
-                      <%= l10n("dental") %>
-                    </label>
+                <div class="modal fade" id="WarningOnCoverAllSelection" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Some people are eligible for DC Health Link</h4>
+                      </div>
+                      <div class="modal-body">
+                        This group includes people who are eligible to enroll in a plan through DC Health Link. If you choose to enroll these people in a plan through Cover All DC, they will:
+                        <ul>
+                          <li>
+                            not get a Form 1095-A at tax time.
+                          </li>
+                          <li>
+                            not qualify for cost savings like the advance premium tax credit.
+                          </li>
+                        </ul>
+                        <strong>You can enroll these people in the same plan through DC Health Link separately.</strong>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-default modal-cancel-button" data-dismiss="modal">close</button>
+                      </div>
+                    </div>
                   </div>
-                <% end %>
-              </div>
+                </div>
+              <% end %>
+            </div>
           </div>
+        <% elsif @adapter.can_shop_shop?(@person) %>
+          <%= hidden_field_tag 'market_kind', 'shop' %>
+        <% elsif @adapter.can_shop_individual?(@person) && !@adapter.can_shop_resident?(@person) %>
+          <%= hidden_field_tag 'market_kind', 'individual' %>
+        <% elsif @adapter.can_shop_resident?(@person) %>
+          <%= hidden_field_tag 'market_kind', 'coverall' %>
+        <% else %>
+          <% if @market_kind.present? %>
+            <%= hidden_field_tag 'market_kind', @market_kind %>
+          <% end %>
+        <% end %>
+
+        <% if @adapter.can_shop_shop?(@person) %>
+          <%= render 'select_employer' %>
+        <% end %>
+
+        <div id="coverage_kinds" class='row no-buffer'>
+          <h3><%= l10n("benefit_type") %></h3>
+
+          <div class="n-radio-group">
+            <div class="n-radio-row">
+              <label class="n-radio" for="coverage_kind_health">
+                <%= radio_button_tag 'coverage_kind', 'health', is_coverage_kind_checked?("health"), disabled: is_coverage_kind_disabled?("health"),id: 'coverage_kind_health', class: 'n-radio' %>
+                <span class="n-radio">
+                  </span>
+                <%= l10n(".health") %>
+              </label>
+            </div>
+
+            <div id="dental-radio-button" class="n-radio-row <%= 'dn' if @adapter.can_shop_shop?(@person) && !@adapter.is_eligible_for_dental?(@employee_role, @change_plan, @hbx_enrollment) %>">
+              <label class="n-radio" for="coverage_kind_dental">
+                <%= radio_button_tag 'coverage_kind', 'dental', is_coverage_kind_checked?("dental"), disabled: is_coverage_kind_disabled?("dental"), id: 'coverage_kind_dental', class: 'n-radio' %>
+                <span class="n-radio">
+                  </span>
+                <%= l10n("dental") %>
+              </label>
+            </div>
+          </div>
+        </div>
 
           <% if @market_kind == 'individual' && is_under_open_enrollment? %>
             <div class='row top-pd'>
@@ -119,39 +141,37 @@
               <%= submit_tag l10n('shop_for_new_plan'), class: 'btn btn-primary  btn-lg'+ pundit_class(Family, :updateable?) %>
             <% if @hbx_enrollment.present? && @hbx_enrollment.may_terminate_coverage? %>
               <%= submit_tag l10n('keep_existing_plan'), class: 'btn btn-primary  btn-lg' + pundit_class(Family, :updateable?) if show_keep_existing_plan(@shop_for_plans, @hbx_enrollment, @new_effective_on) %>
-              <% if @hbx_enrollment.effective_on <= TimeKeeper.date_of_record %>
-	              <%= link_to l10n('select_plan_to_terminate'), '#', data: {toggle: "modal", target: "#waive_confirm"}, class: ('btn btn-primary btn-lg' + pundit_class(Family, :updateable?)) %>
-              <% end %>
+              <%= link_to 'Select Plan to Terminate', terminate_selection_insured_group_selections_path(person_id: @person.id, change_plan: @change_plan),
+                          class: ('btn btn-primary ' + pundit_class(Family, :updateable?)) if @hbx_enrollment.effective_on <= TimeKeeper.date_of_record %>
             <% end %>
-          <% else %>
+        <% else %>
             <!--<h3>Select a plan</h3>-->
             <!--<p class="text-justify"><%#= t('welcome.employee.select_plan') %></p>-->
-          <% end %>
-          <br/>
+        <% end %>
         <br/>
-          <%= link_to l10n("back_to_my_account"), family_account_path, class: 'btn btn-default btn btn-lg' %>
-        </div>
+        <br/>
+        <%= link_to l10n("back_to_my_account"), family_account_path, class: 'btn btn-default btn btn-lg' %>
+      </div>
       <div class="col-xs-3 right-section pull-right">
-          <% if @change_plan.blank?  && @market_kind == "individual" %>
-            <% if @enrollment_kind.blank? && is_under_open_enrollment? %>
-              <%= render  partial: 'shared/individual_progress', locals: {step: '3'} %>
-            <% else %>
-              <%= render  partial: 'shared/sep_progress', locals: {step: '4', continue_disabled: false, button_continue: true } %>
-            <% end %>
-          <% elsif @change_plan.blank? && @adapter.can_shop_resident?(@person) %>
-            <%= render partial: 'shared/coverall_progress', locals: {step: '4'} %>
-          <% elsif @change_plan.blank? %>
-            <%= render  partial: 'shared/signup_progress', locals: {step: '4'} %>
-          <% elsif @change_plan == "change_by_qle" %>
-            <%= render partial: 'shared/qle_progress', locals: {step: '2',show_button:false} %>
-          <% elsif @change_plan == "change_plan" %>
-            <% if (@market_kind == "individual" && !is_under_open_enrollment?) || @enrollment_kind == 'sep' %>
-              <%= render  partial: 'shared/sep_shop_for_plans_progress', locals: {step: '2'} %>
-            <% else %>
-              <%= render partial: 'shared/shop_for_plans_progress', locals: {step: '1', show_waive: true} %>
-            <% end %>
+        <% if @change_plan.blank?  && @market_kind == "individual" %>
+          <% if @enrollment_kind.blank? && is_under_open_enrollment? %>
+            <%= render  partial: 'shared/individual_progress', locals: {step: '3'} %>
+          <% else %>
+            <%= render  partial: 'shared/sep_progress', locals: {step: '4', continue_disabled: false, button_continue: true } %>
           <% end %>
-        </div>
+        <% elsif @change_plan.blank? && can_shop_resident?(@person) %>
+          <%= render partial: 'shared/coverall_progress', locals: {step: '4'} %>
+        <% elsif @change_plan.blank? %>
+          <%= render  partial: 'shared/signup_progress', locals: {step: '4'} %>
+        <% elsif @change_plan == "change_by_qle" %>
+          <%= render partial: 'shared/qle_progress', locals: {step: '2',show_button:false} %>
+        <% elsif @change_plan == "change_plan" %>
+          <% if (@market_kind == "individual" && !is_under_open_enrollment?) || @enrollment_kind == 'sep' %>
+              <%= render  partial: 'shared/sep_shop_for_plans_progress', locals: {step: '2'} %>
+          <% else %>
+              <%= render partial: 'shared/shop_for_plans_progress', locals: {step: '1', show_waive: true} %>
+          <% end %>
+        <% end %>
       </div>
     <% end %>
   </div>

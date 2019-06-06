@@ -622,13 +622,36 @@ module ApplicationHelper
   end
 
   def display_dental_metal_level(plan)
-    if (plan.class == Plan || (plan.is_a?(Maybe) && plan.extract_value.class.to_s == "Plan"))
-      return plan.metal_level.to_s.titleize if plan.coverage_kind.to_s == "health"
+    if plan.class == Plan || (plan.is_a?(Maybe) && plan.extract_value.class.to_s == 'Plan')
+      return plan.metal_level.to_s.titleize if plan.coverage_kind.to_s == 'health'
+
       (plan.active_year == 2015 ? plan.metal_level : plan.dental_level).try(:to_s).try(:titleize) || ""
     else
-      return plan.metal_level_kind.to_s.titleize if plan.kind.to_s == "health"
-      # TODO Update this for dental plans
+      return plan.metal_level_kind.to_s.titleize if plan.kind.to_s == 'health'
+
       (plan.active_year == 2015 ? plan.metal_level_kind : plan.dental_level).try(:to_s).try(:titleize) || ""
+    end
+  end
+
+  def ivl_metal_network(plan)
+    (plan.nationwide ? 'nationwide' : 'dc metro') if plan.benefit_market_kind == :aca_individual
+  end
+
+  def ivl_hsa_status(plan_hsa_status, plan)
+    (plan_hsa_status[plan.id.to_s]) if plan.benefit_market_kind == :aca_individual
+  end
+
+  def products_count(products)
+    return 0 unless products
+
+    products.count
+  end
+
+  def network_type(product)
+    if product.nationwide
+      'Nationwide'
+    elsif product.dc_in_network
+      'DC-Metro'
     end
   end
 

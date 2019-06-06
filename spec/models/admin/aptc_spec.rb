@@ -15,10 +15,32 @@ RSpec.describe Admin::Aptc, :type => :model do
   let(:sample_csr_percent_2) {94}
   let(:eligibility_determination_1) {EligibilityDetermination.new(determined_at: TimeKeeper.date_of_record.beginning_of_year, max_aptc: sample_max_aptc_1, csr_percent_as_integer: sample_csr_percent_1 )}
   let(:eligibility_determination_2) {EligibilityDetermination.new(determined_at: TimeKeeper.date_of_record.beginning_of_year + 4.months, max_aptc: sample_max_aptc_2, csr_percent_as_integer: sample_csr_percent_2 )}
+  let(:product1) { FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01') }
+  let(:product2) { FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01') }
 
   # Enrollments
-  let!(:hbx_with_aptc_1) {FactoryBot.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_selected', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month - 40.days), kind: "individual", applied_aptc_amount: 100)}
-  let!(:hbx_with_aptc_2) {FactoryBot.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_selected', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), kind: "individual", applied_aptc_amount: 210)}
+  let!(:hbx_with_aptc_1) do
+    FactoryBot.create(:hbx_enrollment,
+                      product: product1,
+                      household: household,
+                      is_active: true,
+                      aasm_state: 'coverage_selected',
+                      changing: false,
+                      effective_on: (TimeKeeper.date_of_record.beginning_of_month - 40.days),
+                      kind: "individual",
+                      applied_aptc_amount: 100)
+  end
+  let!(:hbx_with_aptc_2) do
+    FactoryBot.create(:hbx_enrollment,
+                      product: product2,
+                      household: household,
+                      is_active: true,
+                      aasm_state: 'coverage_selected',
+                      changing: false,
+                      effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days),
+                      kind: "individual",
+                      applied_aptc_amount: 210)
+  end
   let!(:hbx_enrollments) {[hbx_with_aptc_1, hbx_with_aptc_2]}
   let(:hbx_enrollment_member_1){ FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month, applied_aptc_amount: 70)}
   let(:hbx_enrollment_member_2){ FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month, applied_aptc_amount: 30)}
