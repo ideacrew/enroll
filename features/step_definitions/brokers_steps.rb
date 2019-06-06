@@ -266,6 +266,10 @@ Then(/^.+ should see the Employer (.*?) page as Broker$/) do |legal_name|
   expect(page).to have_content("I'm a Broker")
 end
 
+When(/^Primary Broker publishes the benefit application$/) do
+  find('.interaction-click-control-publish-plan-year').click
+end
+
 Then(/^.* creates and publishes a plan year$/) do
   find('.interaction-click-control-benefits').click
   find('.interaction-click-control-add-plan-year').click
