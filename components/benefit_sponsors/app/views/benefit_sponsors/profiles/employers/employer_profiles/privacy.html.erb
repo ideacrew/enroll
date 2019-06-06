@@ -1,0 +1,22 @@
+<%# this is sample page once we receive transalations from stake holders we can add translations %>
+<div class="container privacy">
+  <br>
+  <h1><%= l10n("your_information") %></h1>
+    <p class="starter">
+      <%= l10n(".keep_private") %>
+      <br/><br/>
+      <%= l10n(".creation_notes") %>
+      <br/><br/>
+      <%= l10n(".privacy_verification_statement") %>
+      <br/><br/>
+      <%= link_to l10n(".learn_info"), "https://www.dchealthlink.com/privacy", target: "_blank" %><br>
+      <%= link_to l10n(".privacy_statement"), "https://www.dchealthlink.com/privacy-act-statement", target: "_blank" %>
+      <br/><br/>
+      <%= l10n(".authorization") %>
+    </p>
+  <br>
+  <div>
+    <%= link_to 'CONTINUE', profiles_employers_employer_profile_path(@employer_profile.id.to_s, tab: 'home'), :class => "btn btn-lg btn-primary  interaction-click-control-continue" %>
+  </div>
+  <br><br>
+</div>

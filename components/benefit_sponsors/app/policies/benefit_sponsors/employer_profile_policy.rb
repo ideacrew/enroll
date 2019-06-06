@@ -11,6 +11,10 @@ module BenefitSponsors
       true
     end
 
+    def privacy?
+      user.blank? ? false : true
+    end
+
     def coverage_reports?
       return false unless user.present?
       return true if (user.has_hbx_staff_role? && can_list_enrollments?) || is_broker_for_employer?(record) || is_general_agency_staff_for_employer?(record) || is_broker_staff_role_for_employer?(record)
