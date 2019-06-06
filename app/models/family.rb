@@ -148,8 +148,9 @@ class Family
  # after_save :update_family_search_collection
  # after_destroy :remove_family_search_record
 
-  scope :with_enrollment_hbx_id, ->(enrollment_hbx_id) {
-      where("households.hbx_enrollments.hbx_id" => enrollment_hbx_id)
+  scope :with_enrollment_hbx_id, ->(enrollment_hbx_id) { where(
+    :"_id".in => HbxEnrollment.where(hbx_id: enrollment_hbx_id).pluck(:family_id)
+      )
     }
 
   scope :all_with_single_family_member,     ->{ exists({:'family_members.1' => false}) }
@@ -194,23 +195,23 @@ class Family
   scope :all_with_hbx_enrollments,              -> { exists(:"households.hbx_enrollments" => true) }
   scope :by_datetime_range,                     ->(start_at, end_at){ where(:created_at.gte => start_at).and(:created_at.lte => end_at) }
   scope :all_enrollments,                       ->{  where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::ENROLLED_STATUSES) }
-  scope :all_enrollments_by_writing_agent_id,   ->(broker_id){ where(:"households.hbx_enrollments.writing_agent_id" => broker_id) }
-  scope :all_enrollments_by_benefit_group_id,   ->(benefit_group_id){where(:"households.hbx_enrollments.benefit_group_id" => benefit_group_id) }
-  scope :all_enrollments_by_benefit_sponsorship_id,   ->(benefit_sponsorship_id){where(:"households.hbx_enrollments.benefit_sponsorship_id" => benefit_sponsorship_id) }
-  scope :by_enrollment_individual_market,       ->{ where(:"households.hbx_enrollments.kind".in => ["individual", "unassisted_qhp", "insurance_assisted_qhp", "streamlined_medicaid", "emergency_medicaid", "hcr_chip"]) }
-  scope :by_enrollment_shop_market,             ->{ where(:"households.hbx_enrollments.kind".in => ["employer_sponsored", "employer_sponsored_cobra"]) }
-  scope :by_enrollment_renewing,                ->{ where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::RENEWAL_STATUSES) }
-  scope :by_enrollment_created_datetime_range,  ->(start_at, end_at){ where(:"households.hbx_enrollments.created_at" => { "$gte" => start_at, "$lte" => end_at} )}
-  scope :by_enrollment_updated_datetime_range,  ->(start_at, end_at){ where(HbxEnrollment.where(updated_at: { "$gte" => start_at, "$lte" => end_at }).pluck(:family_id))}
-  scope :by_enrollment_effective_date_range,    ->(start_on, end_on){ where(HbxEnrollment.where(effective_on: { "$gte" => start_on, "$lte" => end_on }).pluck(:family_id))}
-  scope :non_enrolled,                          ->{ where(HbxEnrollment.where(:"aasm_state".nin => HbxEnrollment::ENROLLED_STATUSES).pluck(:family_id))}
+  scope :all_enrollments_by_writing_agent_id,   ->(broker_id) { where(:"_id".in => HbxEnrollment.where(writing_agent_id: broker_id).pluck(:family_id)) }
+  scope :all_enrollments_by_benefit_group_id,   ->(benefit_group_id) { where(:"_id".in => HbxEnrollment.where(benefit_group_id: benefit_group_id).pluck(:family_id)) }
+  scope :all_enrollments_by_benefit_sponsorship_id,   ->(benefit_sponsorship_id){ where(:"_id".in => HbxEnrollment.where(benefit_sponsorship_id: benefit_sponsorship_id).pluck(:family_id))}
+  scope :by_enrollment_individual_market,       ->{ where(:"_id".in => HbxEnrollment.where(:"kind".in => ["individual", "unassisted_qhp", "insurance_assisted_qhp", "streamlined_medicaid", "emergency_medicaid", "hcr_chip"]).pluck(:family_id))}
+  scope :by_enrollment_shop_market,             ->{ where(:"_id".in => HbxEnrollment.where(:"kind".in => ["employer_sponsored", "employer_sponsored_cobra"]).pluck(:family_id))}
+  scope :by_enrollment_renewing,                ->{ where(:"_id".in => HbxEnrollment.where(:"aasm_state".in => HbxEnrollment::RENEWAL_STATUSES).pluck(:family_id))}
+  scope :by_enrollment_created_datetime_range,  ->(start_at, end_at){ where(:"_id".in => HbxEnrollment.where(created_at: { "$gte" => start_at, "$lte" => end_at }).pluck(:family_id))}
+  scope :by_enrollment_updated_datetime_range,  ->(start_at, end_at){ where(:"_id".in => HbxEnrollment.where(updated_at: { "$gte" => start_at, "$lte" => end_at }).pluck(:family_id))}
+  scope :by_enrollment_effective_date_range,    ->(start_on, end_on){ where(:"_id".in => HbxEnrollment.where(effective_on: { "$gte" => start_on, "$lte" => end_on }).pluck(:family_id))}
+  scope :non_enrolled,                          ->{ where(:"_id".in => HbxEnrollment.where(:"aasm_state".nin => HbxEnrollment::ENROLLED_STATUSES).pluck(:family_id))}
   scope :sep_eligible,                          ->{ where(:"active_seps.count".gt => 0) }
-  scope :coverage_waived,                       ->{ where(HbxEnrollment.where(:"aasm_state".in => HbxEnrollment::WAIVED_STATUSES).pluck(:family_id))}
-  scope :having_unverified_enrollment,          ->{ where(HbxEnrollment.where(aasm_state: "enrolled_contingent").pluck(:family_id))}
-  scope :with_all_verifications,                ->{ where(HbxEnrollment.where(aasm_state: "enrolled_contingent", :"review_status" => "ready").pluck(:family_id))}
-  scope :with_partial_verifications,            ->{ where(HbxEnrollment.where(aasm_state: "enrolled_contingent", :"review_status" => "in review").pluck(:family_id))}
-  scope :with_no_verifications,                 ->{ where(HbxEnrollment.where(aasm_state: "enrolled_contingent", :"review_status" => "incomplete").pluck(:family_id))}
-  scope :with_reset_verifications,              ->{ where(HbxEnrollment.where(aasm_state: "enrolled_contingent").pluck(:family_id))}
+  scope :coverage_waived,                       ->{ where(:"_id".in => HbxEnrollment.where(:"aasm_state".in => HbxEnrollment::WAIVED_STATUSES).pluck(:family_id))}
+  scope :having_unverified_enrollment,          ->{ where(:"_id".in => HbxEnrollment.where(aasm_state: "enrolled_contingent").pluck(:family_id))}
+  scope :with_all_verifications,                ->{ where(:"_id".in => HbxEnrollment.where(aasm_state: "enrolled_contingent", :"review_status" => "ready").pluck(:family_id))}
+  scope :with_partial_verifications,            ->{ where(:"_id".in => HbxEnrollment.where(aasm_state: "enrolled_contingent", :"review_status" => "in review").pluck(:family_id))}
+  scope :with_no_verifications,                 ->{ where(:"_id".in => HbxEnrollment.where(aasm_state: "enrolled_contingent", :"review_status" => "incomplete").pluck(:family_id))}
+  scope :with_reset_verifications,              ->{ where(:"_id".in => HbxEnrollment.where(aasm_state: "enrolled_contingent").pluck(:family_id))}
   scope :vlp_fully_uploaded,                    ->{ where(vlp_documents_status: "Fully Uploaded")}
   scope :vlp_partially_uploaded,                ->{ where(vlp_documents_status: "Partially Uploaded")}
   scope :vlp_none_uploaded,                     ->{ where(:vlp_documents_status.in => ["None",nil])}
@@ -798,36 +799,30 @@ class Family
 
     def expire_individual_market_enrollments
       current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
-      query = {
-          :effective_on.lt => current_benefit_period.start_on,
-          :kind => 'individual',
-          :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES - ['coverage_termination_pending', 'enrolled_contingent', 'unverified']
-      }
-      families = Family.where("households.hbx_enrollments" => {:$elemMatch => query})
-      families.each do |family|
-        begin
-          family.active_household.hbx_enrollments.where(query).each do |enrollment|
-            enrollment.expire_coverage! if enrollment.may_expire_coverage?
-          end
-        rescue Exception => e
-          Rails.logger.error "Unable to expire enrollments for family #{family.e_case_id}"
+      individual_market_enrollments = HbxEnrollment.where(
+        :effective_on.lt => current_benefit_period.start_on,
+        kind: 'individual',
+        :"aasm_state".in => HbxEnrollment::ENROLLED_STATUSES - ['coverage_termination_pending', 'enrolled_contingent', 'unverified']
+      )
+      begin
+        individual_market_enrollments.each do |enrollment|
+          enrollment.expire_coverage! if enrollment.may_expire_coverage?
         end
+      rescue Exception => e
+        family = Family.find(individual_market_enrollments.family_id)
+        Rails.logger.error "Unable to expire enrollments for family #{family.e_case_id}"
       end
     end
 
     def begin_coverage_for_ivl_enrollments
       current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
-      query = {
-          :effective_on => current_benefit_period.start_on,
-          :kind => 'individual',
-          :aasm_state => 'auto_renewing'
-        }
-      families = Family.where("households.hbx_enrollments" => {:$elemMatch => query})
-
-      families.each do |family|
-        family.active_household.hbx_enrollments.where(query).each do |enrollment|
-          enrollment.begin_coverage! if enrollment.may_begin_coverage?
-        end
+      ivl_enrollments = HbxEnrollment.where(
+        effective_on: current_benefit_period.start_on,
+        kind: 'individual',
+        aasm_state: 'auto_renewing'
+      )
+      ivl_enrollments.each do |enrollment|
+        enrollment.begin_coverage! if enrollment.may_begin_coverage?
       end
     end
 
@@ -841,14 +836,13 @@ class Family
     def enrollment_notice_for_ivl_families(new_date)
       start_time = (new_date - 2.days).in_time_zone("Eastern Time (US & Canada)").beginning_of_day
       end_time = (new_date - 2.days).in_time_zone("Eastern Time (US & Canada)").end_of_day
-      Family.where({
-        "households.hbx_enrollments" => {
-          "$elemMatch" => {
-            "kind" => "individual",
-            "aasm_state" => { "$in" => HbxEnrollment::ENROLLED_STATUSES },
-            "created_at" => { "$gte" => start_time, "$lte" => end_time},
-        } }
-      })
+      Family.where(
+        :"_id".in => HbxEnrollment.where(
+          kind: "individual",
+          :"aasm_state".in => HbxEnrollment::ENROLLED_STATUSES,
+          created_at: { "$gte" => start_time, "$lte" => end_time}
+        ).pluck(:family_id)
+      )
     end
 
     def send_enrollment_notice_for_ivl(new_date)
