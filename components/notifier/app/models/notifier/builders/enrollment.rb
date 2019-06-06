@@ -4,7 +4,7 @@ module Notifier
     def enrollment
       return @enrollment if defined? @enrollment
       if payload['event_object_kind'].constantize == HbxEnrollment
-        @enrollment = HbxEnrollment.find(payload['event_object_id'])
+        @enrollment = HbxEnrollment.where(id: payload['event_object_id']).first
       elsif event_matched?
         @enrollment = health_enrollment
       end
