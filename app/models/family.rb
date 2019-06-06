@@ -224,11 +224,7 @@ class Family
   scope :vlp_fully_uploaded,                    ->{ where(vlp_documents_status: "Fully Uploaded")}
   scope :vlp_partially_uploaded,                ->{ where(vlp_documents_status: "Partially Uploaded")}
   scope :vlp_none_uploaded,                     ->{ where(:vlp_documents_status.in => ["None",nil])}
-  scope :outstanding_verification,              ->{ by_enrollment_individual_market.where(:"households.hbx_enrollments" => {"$elemMatch" => {:is_any_enrollment_member_outstanding => true, :effective_on => { :"$gte" => TimeKeeper.date_of_record.beginning_of_year, :"$lte" => TimeKeeper.date_of_record.end_of_year }}}) }
-  scope :enrolled_through_benefit_package,      ->(benefit_package) { unscoped.where(
-                                                    :"households.hbx_enrollments.aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::WAIVED_STATUSES),
-                                                    :"households.hbx_enrollments.sponsored_benefit_package_id" => benefit_package._id
-                                                  ) }
+  scope :outstanding_verification,              ->{ by_enrollment_individual_market.where(:"households.hbx_enrollments"=>{"$elemMatch"=>{:aasm_state => "enrolled_contingent", :effective_on => { :"$gte" => TimeKeeper.date_of_record.beginning_of_year, :"$lte" =>  TimeKeeper.date_of_record.end_of_year }}}) }
 
   scope :enrolled_and_terminated_through_benefit_package, ->(benefit_package) {
     unscoped.where(
@@ -254,6 +250,17 @@ class Family
                                                         :coverage_kind => "health"
                                                       }
                                                   })}
+  
+  # Replaced scopes for moving HbxEnrollment to top level
+  # The following methods are rewrites of scopes that were being called before HbxEnrollment was a top level document.
+
+  scope :enrolled_through_benefit_package, ->(benefit_package) { where(:"_id".in => HbxEnrollment.where(
+      :"aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::WAIVED_STATUSES),
+      sponsored_benefit_package_id: benefit_package._id
+    ).pluck(:family_id)
+  ) }
+
+  # End new scopes
 
   def active_broker_agency_account
     broker_agency_accounts.detect { |baa| baa.is_active? }
