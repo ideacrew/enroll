@@ -257,8 +257,12 @@ module BenefitSponsors
             expect(response).to have_http_status(:redirect)
           end
 
-          it "should redirect to home page of benefit_sponsor" do
-            expect(response.location.include?("tab=home")).to eq true if profile_type == "benefit_sponsor"
+          it "should redirect to home page of benefit_sponsor", :if => (profile_type == "benefit_sponsor") do
+            if site.site_key == :dc
+              expect(response.location.include?("privacy")).to eq true
+            else
+              expect(response.location.include?("tab=home")).to eq true
+            end
           end
 
           it "should redirect to new for broker agency or general agency" do
