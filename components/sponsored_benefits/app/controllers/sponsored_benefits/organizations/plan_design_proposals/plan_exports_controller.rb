@@ -10,10 +10,11 @@ module SponsoredBenefits
         @census_employees = sponsorship.census_employees
 
         if @benefit_group
+          @service = SponsoredBenefits::Services::PlanCostService.new({benefit_group: @benefit_group})
           @benefit_group.build_estimated_composite_rates if @benefit_group.sole_source?
           @plan = @benefit_group.reference_plan
-          @employer_contribution_amount = @benefit_group.monthly_employer_contribution_amount
-          @benefit_group_costs = @benefit_group.employee_costs_for_reference_plan
+          @employer_contribution_amount = @service.monthly_employer_contribution_amount(@plan)
+          @benefit_group_costs = @benefit_group.employee_costs_for_reference_plan(@service)
           @qhps = ::Products::QhpCostShareVariance.find_qhp_cost_share_variances(plan_array(@plan), plan_design_proposal.effective_date.year, "Health")
         end
 
