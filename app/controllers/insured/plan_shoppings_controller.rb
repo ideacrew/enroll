@@ -240,6 +240,12 @@ class Insured::PlanShoppingsController < ApplicationController
     @member_groups = sort_member_groups(sponsored_cost_calculator.groups_for_products(products))
     @products = @member_groups.map(&:group_enrollment).map(&:product)
     extract_from_shop_products
+
+    if plan_match_dc
+      is_congress_employee = nil # TODO: - set this after implementing congress
+      @dc_checkbook_url = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment, is_congress_employee).generate_url
+    end
+
     @networks = @products.map(&:network_information).uniq.compact if offers_nationwide_plans?
     @carrier_names = @issuer_profiles.map(&:legal_name)
     @use_family_deductable = (@hbx_enrollment.hbx_enrollment_members.count > 1)
