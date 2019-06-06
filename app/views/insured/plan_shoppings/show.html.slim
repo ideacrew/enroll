@@ -39,7 +39,7 @@
                     a.btn.btn-default data-sort-by='plan-metal-premium' onclick="filterBy(this)" = l10n("premium_amount")
                     a.btn.btn-default data-sort-by='plan-metal-deductible' onclick="filterBy(this)" = l10n("deductible")
                     a.btn.btn-default data-sort-by='plan-carrier' onclick="filterBy(this)" = l10n("carrier")
-                - if @market_kind == 'individual'
+                - if @market_kind == 'individual' || @market_kind == 'coverall'
                   #ivl_plans
                     h3
                       = l10n("loading")
@@ -412,7 +412,7 @@ javascript:
     }
   }
 
-  if (marketKind === 'individual') {
+  if (marketKind === 'individual' || marketKind === 'coverall') {
     $(document).ready(function () {
       var coverageKind = "#{@hbx_enrollment.coverage_kind}";
       if (coverageKind === "dental") {
