@@ -50,8 +50,6 @@ module Notifier
       mailing_address
     end
 
-    private
-
     def shop?
       true
     end

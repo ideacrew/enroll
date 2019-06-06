@@ -3,6 +3,10 @@ module Config::ContactCenterHelper
     Settings.contact_center.mailing_address.address_1
   end
 
+  def contact_center_po_box
+    Settings.contact_center.po_box
+  end
+
   def contact_center_alt_name
     Settings.contact_center.alt_name
   end

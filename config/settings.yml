@@ -23,10 +23,10 @@ site:
   long_name: ""
   copyright_period_start: "2017"
   header_message: "Welcome to the District's Health Insurance Marketplace"
-  logo_file_name: "mhc_logo.png"
+  logo_file_name: "logo.png"
   make_their_premium_payments_online: "https://www.e-billexpress.com/ebpp/DCHEALTHPAY/"
   tab_icon: 'favicon.ico'
-  mailer_logo_file_name: "health_connector.png"
+  mailer_logo_file_name: "dc_health.png"
   employer_application_deadline_link: "https://dchealthlink.com/smallbusiness/employer-coverage-deadlines"
   s3_prefix: "dchbx"
   broker_quoting_enabled: false
@@ -58,6 +58,7 @@ site:
 contact_center:
   name: "DC Health Link's Customer Care Center"
   alt_name: "DC Health Link Customer Service"
+  po_box: "PO Box 97022"
   phone_number: "1-855-532-5465"
   fax: "1-617-933-3099"
   alt_fax: "617-722-4033"
