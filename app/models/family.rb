@@ -239,8 +239,8 @@ class Family
   scope :enrolled_and_terminated_through_benefit_package, ->(benefit_package) {
     where(:"_id".in => HbxEnrollment.where(
       :"aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::WAIVED_STATUSES + HbxEnrollment::TERMINATED_STATUSES),
-      :"sponsored_benefit_package_id" => benefit_package._id
-    )
+      sponsored_benefit_package_id: => benefit_package._id
+    ).pluck(:family_id)
   ) }
 
   scope :enrolled_through_benefit_package, ->(benefit_package) { where(:"_id".in => HbxEnrollment.where(
