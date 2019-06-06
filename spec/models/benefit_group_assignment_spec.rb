@@ -255,7 +255,7 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
 
     shared_examples_for "active, waived and terminated enrollments" do |state, status, result|
 
-      let!(:enrollment) { FactoryBot.create(:hbx_enrollment, household: household,
+      let!(:enrollment) { FactoryBot.create(:hbx_enrollment, household: household, family:family,
                           benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
                           aasm_state: state
                           )}
@@ -281,7 +281,7 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
 
     shared_examples_for "active and waived enrollments" do |state, status, result|
 
-      let!(:enrollment) { FactoryBot.create(:hbx_enrollment, household: household,
+      let!(:enrollment) { FactoryBot.create(:hbx_enrollment, household: household, family:family,
                           benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
                           aasm_state: state
                           )}
@@ -306,7 +306,7 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
 
     shared_examples_for "active enrollments" do |state, status, result|
 
-      let!(:enrollment) { FactoryBot.create(:hbx_enrollment, household: household,
+      let!(:enrollment) { FactoryBot.create(:hbx_enrollment, household: household, family:family,
                           benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
                           aasm_state: state
                           )}
