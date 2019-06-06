@@ -142,12 +142,21 @@ module BenefitMarkets
 
     scope :by_csr_kind_with_catastrophic, lambda { |csr_kind = 'csr_100'|
       where('$and' => [{'$or' => [{:metal_level_kind.in => [:platinum, :gold, :bronze, :catastrophic], :csr_variant_id => '01'},
-                                  {:metal_level_kind => :silver, :csr_variant_id => EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]}]}])
+                                  {:metal_level_kind => :silver, :csr_variant_id => CSR_KIND_TO_PRODUCT_VARIANT_MAP[csr_kind]}]}])
     }
 
     #Products retrieval by type
     scope :health_products,            ->{ where(:"_type" => /.*HealthProduct$/) }
     scope :dental_products,            ->{ where(:"_type" => /.*DentalProduct$/)}
+
+    CSR_KIND_TO_PRODUCT_VARIANT_MAP = {
+        "csr_100" => "01",
+        "csr_94"  => "06",
+        "csr_87"  => "05",
+        "csr_73"  => "04",
+        "csr_0"   => "02",
+        "limited" => "03"
+    }
 
     # Highly nested scopes don't behave in a way I entirely understand with
     # respect to the $elemMatch operator.  Since we are only invoking this
@@ -185,7 +194,7 @@ module BenefitMarkets
     end
 
     def is_csr?
-      csr_kinds_mapping = EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP
+      csr_kinds_mapping = CSR_KIND_TO_PRODUCT_VARIANT_MAP
       (csr_kinds_mapping.values - [csr_kinds_mapping.default]).include? csr_variant_id
     end
 
