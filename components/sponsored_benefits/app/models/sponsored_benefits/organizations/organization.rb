@@ -2,8 +2,8 @@
 module SponsoredBenefits
   module Organizations
     class Organization
-      include Concerns::OrganizationConcern
-      include Concerns::AcaRatingAreaConfigConcern
+      include SponsoredBenefits::Concerns::OrganizationConcern
+      include SponsoredBenefits::Concerns::AcaRatingAreaConfigConcern
 
 
       embeds_one :broker_agency_profile, cascade_callbacks: true, validate: true
