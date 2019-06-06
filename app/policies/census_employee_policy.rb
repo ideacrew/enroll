@@ -20,18 +20,19 @@ class CensusEmployeePolicy < ApplicationPolicy
 
   def show?
     return true if @user.has_role? :hbx_staff
-    if @user.has_role? :broker
+    if @user.has_role? :broker 
       return true if @record.employer_profile.try(:active_broker) == @user.person
-    elsif @user.has_role?(:employer_staff)
-      return true if @user.person.employer_staff_roles.map(&:employer_profile_id).map(&:to_s).include? @record.employer_profile_id.to_s       
-    elsif @user.has_role?(:general_agency_staff)
+    end
+    if @user.has_role?(:employer_staff) 
+      return true if @user.person.employer_staff_roles.map(&:employer_profile_id).map(&:to_s).include? @record.employer_profile_id.to_s     
+    end  
+    if @user.has_role?(:general_agency_staff)
       linked_general_agency = @record.employer_profile.general_agency_profile
       return false if linked_general_agency.nil?
       general_agency_profile_ids = @user.person.active_general_agency_staff_roles.map{|a| a.general_agency_profile_id}
       return true if general_agency_profile_ids.include?(linked_general_agency.id)
-    else
-      return false
     end
+    return false
   end
 
   def delink?
