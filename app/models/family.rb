@@ -201,16 +201,16 @@ class Family
   scope :by_enrollment_shop_market,             ->{ where(:"households.hbx_enrollments.kind".in => ["employer_sponsored", "employer_sponsored_cobra"]) }
   scope :by_enrollment_renewing,                ->{ where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::RENEWAL_STATUSES) }
   scope :by_enrollment_created_datetime_range,  ->(start_at, end_at){ where(:"households.hbx_enrollments.created_at" => { "$gte" => start_at, "$lte" => end_at} )}
-  scope :by_enrollment_updated_datetime_range,  ->(start_at, end_at){ where(:"households.hbx_enrollments.updated_at" => { "$gte" => start_at, "$lte" => end_at} )}
-  scope :by_enrollment_effective_date_range,    ->(start_on, end_on){ where(:"households.hbx_enrollments.effective_on" => { "$gte" => start_on, "$lte" => end_on} )}
-  scope :non_enrolled,                          ->{ where(:"households.hbx_enrollments.aasm_state".nin => HbxEnrollment::ENROLLED_STATUSES) }
+  scope :by_enrollment_updated_datetime_range,  ->(start_at, end_at){ where(HbxEnrollment.where(updated_at: { "$gte" => start_at, "$lte" => end_at }).pluck(:family_id))}
+  scope :by_enrollment_effective_date_range,    ->(start_on, end_on){ where(HbxEnrollment.where(effective_on: { "$gte" => start_on, "$lte" => end_on }).pluck(:family_id))}
+  scope :non_enrolled,                          ->{ where(HbxEnrollment.where(:"aasm_state".nin => HbxEnrollment::ENROLLED_STATUSES).pluck(:family_id))}
   scope :sep_eligible,                          ->{ where(:"active_seps.count".gt => 0) }
-  scope :coverage_waived,                       ->{ where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::WAIVED_STATUSES) }
-  scope :having_unverified_enrollment,          ->{ where(:"households.hbx_enrollments.aasm_state" => "enrolled_contingent")}
-  scope :with_all_verifications,                ->{ where(:"households.hbx_enrollments" => {:"$elemMatch" => {:"aasm_state" => "enrolled_contingent", :"review_status" => "ready"}})}
-  scope :with_partial_verifications,            ->{ where(:"households.hbx_enrollments" => {:"$elemMatch" => {:"aasm_state" => "enrolled_contingent", :"review_status" => "in review"}})}
-  scope :with_no_verifications,                 ->{ where(:"households.hbx_enrollments" => {:"$elemMatch" => {:"aasm_state" => "enrolled_contingent", :"review_status" => "incomplete"}})}
-  scope :with_reset_verifications,              ->{ where(:"households.hbx_enrollments.aasm_state" => "enrolled_contingent")}
+  scope :coverage_waived,                       ->{ where(HbxEnrollment.where(:"aasm_state".in => HbxEnrollment::WAIVED_STATUSES).pluck(:family_id))}
+  scope :having_unverified_enrollment,          ->{ where(HbxEnrollment.where(aasm_state: "enrolled_contingent").pluck(:family_id))}
+  scope :with_all_verifications,                ->{ where(HbxEnrollment.where(aasm_state: "enrolled_contingent", :"review_status" => "ready").pluck(:family_id))}
+  scope :with_partial_verifications,            ->{ where(HbxEnrollment.where(aasm_state: "enrolled_contingent", :"review_status" => "in review").pluck(:family_id))}
+  scope :with_no_verifications,                 ->{ where(HbxEnrollment.where(aasm_state: "enrolled_contingent", :"review_status" => "incomplete").pluck(:family_id))}
+  scope :with_reset_verifications,              ->{ where(HbxEnrollment.where(aasm_state: "enrolled_contingent").pluck(:family_id))}
   scope :vlp_fully_uploaded,                    ->{ where(vlp_documents_status: "Fully Uploaded")}
   scope :vlp_partially_uploaded,                ->{ where(vlp_documents_status: "Partially Uploaded")}
   scope :vlp_none_uploaded,                     ->{ where(:vlp_documents_status.in => ["None",nil])}
