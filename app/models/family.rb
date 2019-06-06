@@ -194,7 +194,7 @@ class Family
 
   scope :all_with_hbx_enrollments,              -> { exists(:"households.hbx_enrollments" => true) }
   scope :by_datetime_range,                     ->(start_at, end_at){ where(:created_at.gte => start_at).and(:created_at.lte => end_at) }
-  scope :all_enrollments,                       ->{  where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::ENROLLED_STATUSES) }
+  scope :all_enrollments,                       ->{  where(:"_id".in => HbxEnrollment.where(":aasm_state".in => HbxEnrollment::ENROLLED_STATUSES)) }
   scope :all_enrollments_by_writing_agent_id,   ->(broker_id) { where(:"_id".in => HbxEnrollment.where(writing_agent_id: broker_id).pluck(:family_id)) }
   scope :all_enrollments_by_benefit_group_id,   ->(benefit_group_id) { where(:"_id".in => HbxEnrollment.where(benefit_group_id: benefit_group_id).pluck(:family_id)) }
   scope :all_enrollments_by_benefit_sponsorship_id,   ->(benefit_sponsorship_id){ where(:"_id".in => HbxEnrollment.where(benefit_sponsorship_id: benefit_sponsorship_id).pluck(:family_id))}
