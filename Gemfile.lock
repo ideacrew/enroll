@@ -873,6 +873,7 @@ DEPENDENCIES
   newrelic_rpm (~> 5.0)
   nokogiri (~> 1.10)
   nokogiri-happymapper (~> 0.8.0)
+  non-stupid-digest-assets
   notifier!
   openhbx_cv2!
   overcommit (~> 0.47)
