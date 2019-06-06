@@ -1,5 +1,6 @@
 BROKER_AGENCIES_TRANSLATIONS = {
 	"en.broker_agencies.broker_roles.select_your_broker_agency" => "Select Your Broker Agency",
+	"en.broker_agencies.broker_roles.select_your_broker" => "Select Your Broker",
 	"en.search" => "Search",
 	"en.submit_application" => "Submit Application",
   "en.broker_agencies.broker_roles.new_broker_agency_form.broker_agency_information" => "Broker Agency Information",
@@ -33,7 +34,7 @@ BROKER_AGENCIES_TRANSLATIONS = {
 	"en.broker_agencies.profiles.new_clients" => "New Clients",
 	"en.broker_agencies.profiles.weekend_evening_hours" => "Weekend/Evening Hours",
 	"en.broker_agencies.profiles.warning_for_existing_broker"=> "Warning: if you already have an existing Broker, they will be terminated effective immediately.",
-	"en.broker_agencies.profiles.select_this_broker" => "Select this Broker",
+	"en.broker_agencies.profiles.select_this_broker" => "Select This Broker",
 	"en.broker_agencies.profiles.brokers_list" => "Brokers List",
 	"en.broker_agencies.profiles.remove_general_agency_assignment" => "This will remove this General Agency assignment.  Are you sure?",
 	"en.broker_agencies.profiles.ee_count" => "EE Count",

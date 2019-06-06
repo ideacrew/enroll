@@ -192,4 +192,39 @@ describe Invitation do
       end
     end
   end
+
+  context 'broker staff role invitation email' do
+    let(:broker_agency_staff_role) { FactoryGirl.create(:broker_agency_staff_role) }
+    let(:person) { broker_agency_staff_role.person }
+    let(:invitation) { Invitation.new }
+    before :each do
+      person.add_work_email('test@dc.com') if person.work_email.blank?
+      person.save
+    end
+
+    describe 'invite_broker_agency_staff!' do
+
+      it 'returns an Invitation' do
+        expect(Invitation.invite_broker_agency_staff!(broker_agency_staff_role)).to be_a_kind_of(Invitation)
+      end
+
+      it 'should call send_broker_staff_invitation' do
+        allow(Invitation).to receive(:create).and_return invitation
+        expect(invitation).to receive(:send_broker_staff_invitation!)
+        Invitation.invite_broker_agency_staff!(broker_agency_staff_role)
+      end
+    end
+  end
+
+  context '.invite_employee_for_open_enrollment' do
+    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+    let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id,  hired_on: "2014-11-11") }
+    let(:invitation) { Invitation.new }
+
+    it 'should send invitation' do
+      allow(Invitation).to receive(:create).and_return invitation
+      expect(invitation).to receive(:send_employee_invitation_for_open_enrollment!)
+      Invitation.invite_employee_for_open_enrollment!(census_employee)
+    end
+  end
 end

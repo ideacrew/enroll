@@ -136,6 +136,16 @@ module ApplicationHelper
     timestamp.present? ? timestamp.in_time_zone('Eastern Time (US & Canada)') : ""
   end
 
+  def amount_color_style(amount)
+    return "" if amount.blank?
+    amount > 0 ? "class=red" : ""
+  end
+
+  def payment_amount_color_style(amount)
+    return "" if amount.blank?
+    amount < 0 ? "class=red" : ""
+  end
+
   # Builds a Dropdown button
   def select_dropdown(input_id, list)
     return unless list.is_a? Array
@@ -568,6 +578,11 @@ module ApplicationHelper
     end
   end
 
+  def trigger_notice_observer(recipient, event_object, notice_event, params={})
+    observer = Observers::NoticeObserver.new
+    observer.deliver(recipient: recipient, event_object: event_object, notice_event: notice_event, notice_params: params)
+  end
+
   def notify_employer_when_employee_terminate_coverage(hbx_enrollment)
     begin
       if hbx_enrollment.is_shop? && hbx_enrollment.census_employee.present? && hbx_enrollment.employer_profile.present?
@@ -634,7 +649,9 @@ module ApplicationHelper
     census_employee.new_hire_enrollment_period.present?
   end
 
-  def eligibility_criteria(employer)
+  def eligibility_criteria(resource)
+    return if resource.is_a?(Notifier::NoticeKind)
+    employer = resource.try(:employer_profile)
     return unless employer.respond_to?(:show_plan_year)
     if employer.show_plan_year.present?
       participation_rule_text = participation_rule(employer)

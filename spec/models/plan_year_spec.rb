@@ -29,7 +29,6 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   before do
     TimeKeeper.set_date_of_record_unprotected!(Date.current)
     allow_any_instance_of(CensusEmployee).to receive(:generate_and_deliver_checkbook_url).and_return(true)
-    allow_any_instance_of(PlanYear).to receive(:trigger_renewal_notice).and_return(true)
   end
 
   context ".new" do
@@ -111,7 +110,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     let(:plan_year) { PlanYear.new(**valid_params) }
 
     it "contains the correct renewing states" do
-      expect(PlanYear::RENEWING).to eq %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled renewing_publish_pending)
+      expect(PlanYear::RENEWING).to eq %w(renewing_draft renewing_published renewing_enrolling renewing_enrollment_extended renewing_enrolled renewing_publish_pending)
     end
 
     it "census employees should not be matchable" do
@@ -2382,7 +2381,6 @@ describe PlanYear, "plan year schedule changes" do
     context 'on force publish date' do
 
       before do
-        allow_any_instance_of(PlanYear).to receive(:trigger_renewal_notice).and_return(true)
         TimeKeeper.set_date_of_record_unprotected!(Date.new(2016, 10, Settings.aca.shop_market.renewal_application.force_publish_day_of_month))
       end
 
@@ -2493,21 +2491,16 @@ describe PlanYear, '.update_employee_benefit_packages', type: :model, dbclean: :
 
       expect(census_employee.active_benefit_group_assignment.start_on).to eq modified_start_on
     end
-  end
-end
-
-describe "#trigger renewal_employee_enrollment_confirmation", type: :model, dbclean: :after_all do
-  let!(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
-  let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'renewing_enrolled', start_on: start_on)}
-  let!(:benefit_group) { employer_profile.plan_years.first.benefit_groups.first}
-  let!(:census_employee){ FactoryGirl.create :census_employee, employer_profile: employer_profile }
-  let!(:plan_year1) { employer_profile.plan_years.first }
-  let!(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
-  let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, benefit_group_assignment_id: benefit_group.benefit_group_assignments.first.id, benefit_group_id: benefit_group.id, effective_on: start_on, aasm_state: "renewing_coverage_enrolled")}
-
-   it "should trigger renewal_employee_enrollment_confirmation" do
-    expect(ShopNoticesNotifierJob).to receive(:perform_later).with(census_employee.id.to_s, "renewal_employee_enrollment_confirmation", {"acapi_trigger" => true})
-    plan_year1.send(:renewal_employee_enrollment_confirmation)
+    it "should update benefit group assignment dates" do
+      plan_year = employer_profile.active_plan_year
+      plan_year.start_on = modified_start_on
+      plan_year.end_on = modified_end_on
+      plan_year.save
+      census_employee.reload
+      expect(plan_year.census_employees_within_play_year.size).to eq 1
+      census_employee.update_attributes(aasm_state:'employment_terminated')
+      expect(plan_year.census_employees_within_play_year.size).to eq 0
+    end
   end
 end
 
@@ -2521,7 +2514,7 @@ describe PlanYear, '.terminate_employee_benefit_packages', type: :model, dbclean
   let(:benefit_group_assignment1) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group, end_on: plan_year.end_on)}
   let!(:census_employee) { FactoryGirl.create(:census_employee, benefit_group_assignments: [benefit_group_assignment1],employee_role_id: employee_role1.id,employer_profile_id: employer_profile.id) }
   let(:new_end_on) { TimeKeeper.date_of_record.prev_day }
-
+  let!(:census_employee1){FactoryGirl.create(:census_employee, :termination_details, benefit_group_assignments: [benefit_group_assignment1],employee_role_id: employee_role1.id,employer_profile_id: employer_profile.id)}
   before do
     plan_year.terminate_plan_year(new_end_on, TimeKeeper.date_of_record, 'nonpayment', false)
     plan_year.reload
@@ -2529,6 +2522,11 @@ describe PlanYear, '.terminate_employee_benefit_packages', type: :model, dbclean
   end
 
   context 'when plan year is terminated' do
+    it "should include only the non-terminated census employee" do
+      census_employee1.update_attributes(aasm_state:'employment_terminated')
+      expect(employer_profile.census_employees.size).to eq 2
+      expect(plan_year.census_employees_within_play_year.size).to eq 1
+    end
     it "should terminate employee benefit group assignments" do
       expect(benefit_group_assignment1.end_on).to eq plan_year.end_on
     end
@@ -2547,6 +2545,7 @@ describe PlanYear, 'Cancel plan year', type: :model, dbclean: :after_each do
   let(:active_benefit_group_assignment) {FactoryGirl.build(:benefit_group_assignment, start_on: active_plan_year.start_on, benefit_group_id: benefit_group.id)}
   let(:renewal_benefit_group_assignment) {FactoryGirl.build(:benefit_group_assignment, start_on: renewal_plan_year.start_on, benefit_group_id: benefit_group1.id)}
   let(:census_employee)   { FactoryGirl.create(:census_employee, employer_profile: employer_profile, benefit_group_assignments:[active_benefit_group_assignment, renewal_benefit_group_assignment]) }
+  let(:census_employee1)   { FactoryGirl.create(:census_employee, :termination_details, employer_profile: employer_profile, benefit_group_assignments:[active_benefit_group_assignment, renewal_benefit_group_assignment]) }
   let(:employee_role)   { FactoryGirl.build(:employee_role, employer_profile: employer_profile )}
   let(:enrollment) { FactoryGirl.build(:hbx_enrollment, household: family.active_household, employee_role: census_employee.employee_role)}
   let(:enrollment2) { FactoryGirl.build(:hbx_enrollment, household: family.active_household, employee_role: census_employee.employee_role,aasm_state:'auto_renewing')}
@@ -2561,6 +2560,11 @@ describe PlanYear, 'Cancel plan year', type: :model, dbclean: :after_each do
     end
 
     context '.cancel_employee_benefit_packages' do
+      it "should include only the non-terminated census employee" do
+      census_employee1.update_attributes(aasm_state:'employment_terminated')
+      expect(employer_profile.census_employees.size).to eq 2
+      expect(active_plan_year.census_employees_within_play_year.size).to eq 1
+    end
 
       it "should cancel employee benefit group assignments" do
         expect(active_benefit_group_assignment.aasm_state).to eq "initialized"
@@ -2669,7 +2673,7 @@ end
 
 describe PlanYear, '.terminate_employee_enrollments', type: :model, dbclean: :after_each do
   let(:person) { FactoryGirl.create(:person, :with_family)}
-  let(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
+  let(:start_on) { TimeKeeper.date_of_record.beginning_of_month.prev_month }
   let(:employer_profile) { FactoryGirl.create(:employer_profile) }
   let(:employee_role) {FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile)}
   let!(:plan_year) {FactoryGirl.create(:plan_year, employer_profile: employer_profile, aasm_state: 'active', start_on: start_on)}
@@ -2677,7 +2681,7 @@ describe PlanYear, '.terminate_employee_enrollments', type: :model, dbclean: :af
   let(:benefit_group_assignment1) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group, end_on: plan_year.end_on)}
   let!(:census_employee) { FactoryGirl.create(:census_employee, benefit_group_assignments: [benefit_group_assignment1],employee_role_id: employee_role.id,employer_profile_id: employer_profile.id) }
   let(:household) { FactoryGirl.create(:household, family: person.primary_family)}
-  let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: census_employee.employee_role.person.primary_family.households.first, benefit_group_id: benefit_group.id)}
+  let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: census_employee.employee_role.person.primary_family.households.first, benefit_group_id: benefit_group.id, employee_role_id: employee_role.id)}
 
   py_termination_dates = [TimeKeeper.date_of_record - 8.days, TimeKeeper.date_of_record, TimeKeeper.date_of_record + 14.days]
 
@@ -2685,6 +2689,7 @@ describe PlanYear, '.terminate_employee_enrollments', type: :model, dbclean: :af
 
     before do
       TimeKeeper.set_date_of_record_unprotected!(start_on.next_month)
+      employee_role.update_attributes(census_employee_id: census_employee.id)
     end
 
     after do
@@ -2693,7 +2698,7 @@ describe PlanYear, '.terminate_employee_enrollments', type: :model, dbclean: :af
 
     py_termination_dates.each do |py_end_on|
       it "should move the enrollment to coverage terminated/pending status" do
-        plan_year.schedule_termination!(py_end_on)
+        plan_year.terminate_plan_year(py_end_on, TimeKeeper.date_of_record, 'voluntary', false)
         hbx_enrollment.reload
         if py_end_on < TimeKeeper.date_of_record
           expect(hbx_enrollment.aasm_state).to eq 'coverage_terminated'
@@ -2704,8 +2709,8 @@ describe PlanYear, '.terminate_employee_enrollments', type: :model, dbclean: :af
     end
 
     it "should move the enrollment to canceled state if enrollment effective_on > py_end_on" do
-      hbx_enrollment.update_attributes!(effective_on: start_on.next_month)
-      plan_year.schedule_termination!(py_termination_dates[1])
+      hbx_enrollment.update_attributes!(effective_on: start_on + 2.months)
+      plan_year.terminate_plan_year(py_termination_dates[1], TimeKeeper.date_of_record, 'voluntary', false)
       hbx_enrollment.reload
       expect(hbx_enrollment.aasm_state).to eq 'coverage_canceled'
     end
@@ -2842,6 +2847,136 @@ describe "notify_employer_py_cancellation" do
         plan_year.cancel_employee_enrollments( true)
         expect(enrollment.aasm_state).to eq "coverage_canceled"
       end
+    end
+  end
+end
+
+describe '.extend_open_enrollment' do
+  let(:current_effective_date) { Date.new(Date.today.year, 4, 1) }
+  let(:today) { current_effective_date - 7.days }
+  let!(:employer_profile) {FactoryGirl.create(:employer_profile)}
+  let!(:plan_year) {FactoryGirl.create(:plan_year, employer_profile: employer_profile, aasm_state: aasm_state, start_on: current_effective_date)}
+
+  before(:each) do
+    TimeKeeper.set_date_of_record_unprotected!(today)
+  end
+
+  after(:each) do
+    TimeKeeper.set_date_of_record_unprotected!(Date.today)
+  end
+
+  context 'when plan year is ineligible' do
+    let(:aasm_state) { :application_ineligible }
+    let(:today) { current_effective_date - 7.days }
+    let(:oe_end_date) { current_effective_date - 5.days }
+
+    it 'should extend open enrollment' do
+      expect(plan_year.aasm_state).to eq "application_ineligible"
+      plan_year.extend_open_enrollment(oe_end_date)
+      plan_year.reload
+      expect(plan_year.aasm_state).to eq "enrollment_extended"
+      expect(plan_year.open_enrollment_end_on).to eq oe_end_date
+    end
+  end
+
+  context 'when plan year canceled due to ineligibility' do
+    let(:aasm_state) { :canceled }
+    let(:today) { current_effective_date + 2.days }
+    let(:oe_end_date) { current_effective_date + 5.days }
+
+    it 'should extend open enrollment' do
+      expect(plan_year.aasm_state).to eq "canceled"
+      plan_year.extend_open_enrollment(oe_end_date)
+      plan_year.reload
+      expect(plan_year.aasm_state).to eq "enrollment_extended"
+      expect(plan_year.open_enrollment_end_on).to eq oe_end_date
+    end
+  end
+
+  context 'when plan year canceled due to ineligibility' do
+    let(:aasm_state) { :renewing_canceled }
+    let(:today) { current_effective_date + 2.days }
+    let(:oe_end_date) { current_effective_date + 5.days }
+
+    it 'should extend open enrollment' do
+      expect(plan_year.aasm_state).to eq "renewing_canceled"
+      plan_year.extend_open_enrollment(oe_end_date)
+      plan_year.reload
+      expect(plan_year.aasm_state).to eq "renewing_enrollment_extended"
+      expect(plan_year.open_enrollment_end_on).to eq oe_end_date
+    end
+  end
+
+  context 'when plan year is in open enrollment' do
+    let(:aasm_state) { :enrolling }
+    let(:today) { current_effective_date - 8.days }
+    let(:oe_end_date) { current_effective_date - 5.days }
+
+    it 'should extend open enrollment' do
+      expect(plan_year.aasm_state).to eq "enrolling"
+      plan_year.extend_open_enrollment(oe_end_date)
+      plan_year.reload
+      expect(plan_year.aasm_state).to eq "enrollment_extended"
+      expect(plan_year.open_enrollment_end_on).to eq oe_end_date
+    end
+  end
+
+  context 'when plan year is in open enrollment' do
+    let(:aasm_state) { :renewing_enrolling }
+    let(:today) { current_effective_date - 8.days }
+    let(:oe_end_date) { current_effective_date - 5.days }
+
+    it 'should extend open enrollment' do
+      expect(plan_year.aasm_state).to eq "renewing_enrolling"
+      plan_year.extend_open_enrollment(oe_end_date)
+      plan_year.reload
+      expect(plan_year.aasm_state).to eq "renewing_enrollment_extended"
+      expect(plan_year.open_enrollment_end_on).to eq oe_end_date
+    end
+  end
+
+  context 'when plan year open enrollment entended' do
+    let(:aasm_state) { :enrollment_extended }
+    let(:today) { current_effective_date - 13.days }
+    let(:oe_end_date) { current_effective_date - 5.days }
+
+    it 'should extend open enrollment' do
+      expect(plan_year.aasm_state).to eq "enrollment_extended"
+      plan_year.extend_open_enrollment(oe_end_date)
+      plan_year.reload
+      expect(plan_year.aasm_state).to eq "enrollment_extended"
+      expect(plan_year.open_enrollment_end_on).to eq oe_end_date
+    end
+  end
+end
+
+describe ".end_open_enrollment" do
+  let(:oe_end_on) { TimeKeeper.date_of_record + 2.days }
+  let(:current_effective_date) { Date.new(TimeKeeper.date_of_record.year, 4, 1) }
+  let(:aasm_state) { :enrollment_extended }
+  let!(:employer_profile) {FactoryGirl.create(:employer_profile)}
+  let!(:plan_year) {FactoryGirl.create(:plan_year, employer_profile: employer_profile, aasm_state: aasm_state, start_on: current_effective_date)}
+
+  before(:each) do
+    TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 3, 24))
+  end
+
+  after(:each) do
+    TimeKeeper.set_date_of_record_unprotected!(Date.today)
+  end
+
+  context "open enrollment close invoked with earlier date" do
+    before do
+      plan_year.update(open_enrollment_end_on: oe_end_on)
+      allow(plan_year).to receive(:is_enrollment_valid?).and_return(true)
+    end
+
+    it "should close open enrollment and reset OE end date" do
+      expect(plan_year.open_enrollment_end_on).to eq oe_end_on
+      plan_year.end_open_enrollment(TimeKeeper.date_of_record)
+      plan_year.reload
+      expect(plan_year.open_enrollment_end_on).to eq TimeKeeper.date_of_record
+      expect(plan_year.aasm_state).to eq "enrolled"
     end
   end
 end

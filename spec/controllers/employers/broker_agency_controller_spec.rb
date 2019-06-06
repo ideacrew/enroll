@@ -3,6 +3,7 @@ require 'rails_helper'
 RSpec.describe Employers::BrokerAgencyController do
 
   before(:all) do
+    DatabaseCleaner.clean
     @employer_profile = FactoryGirl.create(:employer_profile)
 
     @broker_role =  FactoryGirl.create(:broker_role, aasm_state: 'active')
@@ -48,7 +49,7 @@ RSpec.describe Employers::BrokerAgencyController do
         expect(response).to render_template("index")
       end
 
-      it "should assign variables" do
+      it "should assign variables", :dbclean => :before_each do
         expect(assigns(:broker_agency_profiles).count).to eq 2
         expect(assigns(:broker_agency_profiles)).to include(@org1.broker_agency_profile)
       end
@@ -125,29 +126,6 @@ RSpec.describe Employers::BrokerAgencyController do
 
       it "should be a success" do
         expect(flash[:error]).to match(/Access not allowed/)
-      end
-    end
-
-    context '#trigger notice' do
-      let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
-      let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, default_general_agency_profile_id: general_agency_profile.id) }
-      let(:broker_role) { FactoryGirl.create(:broker_role, :aasm_state => 'active', broker_agency_profile: broker_agency_profile) }
-      let(:person) { broker_role.person }
-      let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
-      let(:organization) { FactoryGirl.create(:organization) }
-      let(:employer_profile) { FactoryGirl.create(:employer_profile, general_agency_profile: general_agency_profile, organization: organization) }
-      let(:broker_agency_account) { FactoryGirl.create(:broker_agency_account, employer_profile: employer_profile, broker_agency_profile_id: broker_agency_profile.id) }
-
-      it "should call general_agency_hired_notice trigger " do
-        ActiveJob::Base.queue_adapter = :test
-        ActiveJob::Base.queue_adapter.enqueued_jobs = []
-        allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
-        sign_in(@user)
-        post :create, employer_profile_id: employer_profile.id, broker_role_id: broker_role.id, broker_agency_id: broker_agency_profile.id
-        queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs
-        expect(queued_job.any? {|h| (h[:args].include?('general_agency_hired_notice') && h[:job] == ShopNoticesNotifierJob)}).to eq true
-        expect(queued_job.any? {|h| (h[:args].include?("#{general_agency_profile.id.to_s}") && h[:job] == ShopNoticesNotifierJob)}).to eq true
-        expect(queued_job.any? {|h| (h[:args].third["employer_profile_id"]) == employer_profile.id.to_s if h[:args].include?('general_agency_hired_notice')}).to eq true
       end
     end
   end
@@ -241,21 +219,6 @@ RSpec.describe Employers::BrokerAgencyController do
       expect(controller).to receive(:send_general_agency_assign_msg)
       post :create, employer_profile_id: @employer_profile.id, broker_role_id: @broker_role2.id, broker_agency_id: @org2.broker_agency_profile.id
 
-    end
-
-    it "should send notice to employer, broker and agency" do
-      @org2.broker_agency_profile.default_general_agency_profile = general_agency_profile
-      @org2.broker_agency_profile.save
-      ActiveJob::Base.queue_adapter = :test
-      ActiveJob::Base.queue_adapter.enqueued_jobs = []
-      post :create, employer_profile_id: @employer_profile.id, broker_role_id: @broker_role2.id, broker_agency_id: @org2.broker_agency_profile.id
-      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.each do |job_info|
-        job_info[:job] == ShopNoticesNotifierJob
-      end
-
-      expect(queued_job.any? {|j| j[:args].include?(@employer_profile.id.to_s) && j[:args].include?("broker_hired")}).to eq true
-      expect(queued_job.any? {|j| j[:args].include?(@employer_profile.id.to_s) && j[:args].include?("broker_agency_hired")}).to eq true
-      expect(queued_job.any? {|j| j[:args].include?(@employer_profile.id.to_s) && j[:args].include?("broker_hired_confirmation_notice")}).to eq true
     end
 
     context "send_broker_assigned_msg" do

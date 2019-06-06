@@ -1,4 +1,9 @@
 Rails.application.routes.draw do
+
+  #mount TransportGateway::Engine, at: "/transport_gateway"
+  #mount TransportProfiles::Engine, at: "/transport_profiles"
+  mount Notifier::Engine, at: "/notifier" 
+  #mount RocketJobMissionControl::Engine => 'rocketjob'
   require 'resque/server'
 #  mount Resque::Server, at: '/jobs'
   mount SponsoredBenefits::Engine,      at: "/sponsored_benefits"
@@ -7,10 +12,12 @@ Rails.application.routes.draw do
   get 'check_time_until_logout' => 'session_timeout#check_time_until_logout', :constraints => { :only_ajax => true }
   get 'reset_user_clock' => 'session_timeout#reset_user_clock', :constraints => { :only_ajax => true }
 
+  match "hbx_admin/about_us" => "hbx_admin#about_us", as: :about_us, via: :get
   match "hbx_admin/update_aptc_csr" => "hbx_admin#update_aptc_csr", as: :update_aptc_csr, via: [:get, :post]
   match "hbx_admin/edit_aptc_csr" => "hbx_admin#edit_aptc_csr", as: :edit_aptc_csr, via: [:get, :post], defaults: { format: 'js' }
   match "hbx_admin/calculate_aptc_csr" => "hbx_admin#calculate_aptc_csr", as: :calculate_aptc_csr, via: :get
   post 'show_hints' => 'welcome#show_hints', :constraints => { :only_ajax => true }
+  post 'submit_notice' => "hbx_admin#submit_notice", as: :submit_notice
 
   namespace :users do
     resources :orphans, only: [:index, :show, :destroy]
@@ -55,7 +62,9 @@ Rails.application.routes.draw do
     resources :hbx_profiles do
       root 'hbx_profiles#show'
 
+
       collection do
+        post :reinstate_enrollment
         get :family_index
         get :family_index_dt
         get :outstanding_verification_dt
@@ -91,11 +100,24 @@ Rails.application.routes.draw do
         get :add_sep_form
         get :hide_form
         get :show_sep_history
+        get :view_terminated_hbx_enrollments
         get :get_user_info
+        get :view_enrollment_to_update_end_date
+        post :update_enrollment_termianted_on_date
+        get :edit_force_publish
+        post :force_publish
+        get :edit_fein
+        post :update_fein
         get :identity_verification
         post :identity_verification_datatable
         get :user_account_index
         get :new_eligibility
+        get :oe_extendable_applications
+        get :oe_extended_applications
+        get :edit_open_enrollment
+        post :extend_open_enrollment
+        post :close_extended_open_enrollment
+
       end
 
       member do
@@ -287,6 +309,7 @@ Rails.application.routes.draw do
       post 'bulk_employee_upload'
       member do
         get "download_invoice"
+        get 'show_invoice'
         post 'generate_checkbook_urls'
       end
       collection do
@@ -378,6 +401,12 @@ Rails.application.routes.draw do
       end
       member do
         get :favorite
+      end
+    end
+
+    resources :broker_agency_staff_roles, :only => [:new, :create, :destroy] do
+      member do
+        get :approve
       end
     end
 
