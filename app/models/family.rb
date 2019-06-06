@@ -249,6 +249,13 @@ class Family
     ).pluck(:family_id)
   ) }
 
+  scope :enrolled_under_benefit_application, ->(benefit_application) { where(:"_id".in => HbxEnrollment.where(
+    :"sponsored_benefit_package_id".in => benefit_application.benefit_packages.pluck(:_id),
+    :"aasm_state".nin => %w(coverage_canceled shopping coverage_terminated),
+    :"coverage_kind" => "health"
+    ).pluck(:family_id)
+  ) }
+
   # End new scopes
 
   def active_broker_agency_account
