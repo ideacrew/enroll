@@ -4,7 +4,7 @@ module SponsoredBenefits
     class PlanDesignOrganization
       include Mongoid::Document
       include Mongoid::Timestamps
-      include Concerns::OrganizationConcern
+      include SponsoredBenefits::Concerns::OrganizationConcern
       include Concerns::AcaRatingAreaConfigConcern
       include Config::AcaModelConcern
 
