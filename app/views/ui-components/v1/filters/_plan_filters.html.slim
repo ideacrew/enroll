@@ -66,7 +66,8 @@
     ul.list-unstyled
       li
         .filter-input-block
-          = select_tag :carrier, options_for_select(@carriers), class: "plan-carrier-selection-filter", include_blank: "All", onchange:"filterPlanCarriers(this)"
+          - issuer_names = @market_kind == 'shop' ? @carrier_names : @carriers
+          = select_tag :carrier, options_for_select(issuer_names), class: "plan-carrier-selection-filter", include_blank: "All", onchange:"filterPlanCarriers(this)"
   .checkbox-filter-wrapper-uc
     h5
       strong = l10n('hsa_eligible')
