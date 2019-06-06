@@ -510,16 +510,17 @@ Then(/^.+ creates (.+) as a roster employee$/) do |named_person|
 
   find('label[for=census_employee_gender_male]').click
   fill_in 'jq_datepicker_ignore_census_employee[hired_on]', with: (Time.now - 1.week).strftime('%m/%d/%Y')
-  find(:xpath, '//label[input[@name="census_employee[is_business_owner]"]]').click
+  find('#census_employee_is_business_owner', wait: 5).click
 
   fill_in 'census_employee[address_attributes][address_1]', :with => '1026 Potomac'
   fill_in 'census_employee[address_attributes][address_2]', :with => 'Apt ABC'
   fill_in 'census_employee[address_attributes][city]', :with => 'Alpharetta'
-  find(:xpath, '//p[@class="label"][contains(., "SELECT STATE")]').click
-  find(:xpath, '//div[div/p[contains(., "SELECT STATE")]]//li[contains(., "GA")]').click
+
+  find(:xpath, '//span[@class="label"][contains(., "SELECT STATE")]').click
+  find(:xpath, '//div[div/span[contains(., "SELECT STATE")]]//li[contains(., "GA")]').click
   fill_in 'census_employee[address_attributes][zip]', :with => '30228'
-  find(:xpath, '//p[@class="label"][contains(., "SELECT KIND")]').click
-  find(:xpath, '//div[div/p[contains(., "SELECT KIND")]]//li[contains(., "home")]').click
+  find(:xpath, '//span[@class="label"][contains(., "SELECT KIND")]').click
+  find(:xpath, '//div[div/span[contains(., "SELECT KIND")]]//li[contains(., "home")]').click
 
   fill_in 'census_employee[email_attributes][address]', with: 'broker.assist@dc.gov'
   screenshot("broker_create_census_employee_with_data")
@@ -957,10 +958,7 @@ When(/^.+ should see a published success message without employee$/) do
 end
 
 When(/^.+ clicks? on the add employee button$/) do
-  evaluate_script(<<-JSCODE)
-  $('.interaction-click-control-add-new-employee')[0].click()
-  JSCODE
-  wait_for_ajax
+  find('.interaction-click-control-add-new-employee', wait: 5).click
 end
 
 When(/^.+ clicks? to add the first employee$/) do
@@ -969,7 +967,6 @@ end
 
 When(/^(?:General){0}.+ clicks? on the ((?:General|Staff){0}.+) tab$/) do |tab_name|
   find(:xpath, "//li[contains(., '#{tab_name}')]", :wait => 10).click
-  wait_for_ajax
 end
 
 When(/^(?:General){0}.+ clicks? on the ((?:General|Staff){0}.+) dropdown$/) do |tab_name|
