@@ -1,0 +1,73 @@
+<div class="container">
+  <div class="tab-content" id="myTabContent">
+    <div class="row">
+      <div id= 'message_form'></div>
+      <div class="top-pd" id="inbox_provider_form">
+        <% if flash[:notice].present? %>
+          <p class='alert alert-success'><%= flash[:notice] %></p>
+        <% elsif flash[:error].present? %>
+          <p class='alert alert-danger'><%= flash[:error] %></p>
+        <%end%>
+        <span class="flash_message"></span>
+      </div>
+      <div class='hide' id='collection_scope'><%= @profile._id %> </div>
+      <div class="row container">
+        <div class="pull-right">
+          <%= link_to "Add Prospect Employer", new_organizations_plan_design_organization_path(broker_agency_id: @profile.id), class:"btn btn-primary prospective-employer" if @profile.class.to_s != "GeneralAgencyProfile" %>
+        </div>
+      </div>
+      <br>
+      <%= render_datatable(@datatable) %>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="assign_ga" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel"><strong>Assign General Agency</strong></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <%= form_tag sponsored_benefits.assign_organizations_general_agency_profiles_path, method: :post, id: "assign_modal_form" do %>
+          <%= hidden_field_tag "broker_agency_profile_id", @profile.id %>
+          <div class="row">
+            <div class="col col-sm-12">
+              <div class="col col-sm-4 mrg-top">
+                <strong><%= label_tag "Select A General Agency:" %></strong>
+              </div>
+              <div class="col col-sm-6">
+                <%= select_tag "general_agency_profile_id", options_for_select(@general_agency_profiles.collect {|agency| [agency.legal_name, agency.id]}), prompt: "Select a General Agency" %>
+              </div>
+              <%= submit_tag "Submit", class: "btn btn-default", id:"submit_ga_assignment" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+      <div class="modal-footer">
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  initializeDataTables();
+
+  $("#bulk_action_assign").on('click', function(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    var ids = []
+    $(".individual_checkbox:checked").each(function(){
+      ids.push($(this).val());
+    })
+
+    $('form#assign_modal_form').prepend("<input type='hidden' id='ids' name='ids' />");
+    $("#ids").val(JSON.stringify(ids));
+
+    $("#assign_ga").modal("show");
+  });
+</script>
+

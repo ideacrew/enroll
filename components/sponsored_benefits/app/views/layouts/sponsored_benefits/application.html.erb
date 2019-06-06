@@ -1,0 +1,29 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= content_for?(:title) ? yield(:title) : "Welcome to #{Settings.site.short_name} | #{Settings.site.short_name}" %></title>
+  <%= stylesheet_link_tag    "application", media: "all" %>
+	<%= stylesheet_link_tag    "sponsored_benefits/application", media: "all" %>
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+	<%= javascript_include_tag "application" %>
+	<%= javascript_include_tag "sponsored_benefits/application" %>
+  <%= csrf_meta_tags %>
+</head>
+<body class="font">
+    <%= render './ui-components/v1/navs/header' %>
+    <% general_agency = (@profile || @broker_agency_profile).class.to_s == "GeneralAgencyProfile" %>
+    <% unless general_agency %>
+      <%= render 'shared/engines/broker_menu' %>
+    <% else %>
+      <%= render 'general_agencies/profiles/menu' %>
+    <% end %>
+    <%= yield :horizontal_menu %>
+    <%= render_flash %>
+    <div class="content <%= controller_name %>">
+      <%= yield %>
+    </div>
+
+</body>
+</html>
+
