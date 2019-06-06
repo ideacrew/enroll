@@ -192,6 +192,7 @@ class Person
   index({"broker_role._id" => 1})
   index({"broker_role.provider_kind" => 1})
   index({"broker_role.broker_agency_id" => 1})
+  index({"broker_role.benefit_sponsors_broker_agency_profile_id" => 1})
   index({"broker_role.npn" => 1}, {sparse: true, unique: true})
 
   # Employer role index
