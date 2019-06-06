@@ -423,6 +423,7 @@ module BenefitSponsors
           :hbx_enrollment,
           :shop,
           household: family.active_household,
+          family:family,
           product: cbp.sponsored_benefits.first.reference_product,
           coverage_kind: :health,
           employee_role_id: census_employee.employee_role.id,
@@ -458,7 +459,7 @@ module BenefitSponsors
         hbx_enrollment.save
         expect(benefit_sponsorship).not_to eq nil
         expect(family.active_household.hbx_enrollments.enrolled_and_waived.by_benefit_sponsorship(benefit_sponsorship)
-          .by_effective_period(predecessor_application.effective_period).count).to eq 1
+        .by_effective_period(predecessor_application.effective_period).count).to eq 1
         expect(census_employee.benefit_group_assignments[0].hbx_enrollments.first.aasm_state).to eq "coverage_enrolled"
       end
 
