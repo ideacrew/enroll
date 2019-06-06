@@ -40,6 +40,7 @@ class Family
   field :vlp_documents_status, type: String
 
   belongs_to  :person, optional: true
+  has_many :hbx_enrollments
 
   # Collection of insured:  employees, consumers, residents
 
@@ -228,8 +229,8 @@ class Family
 
   scope :all_enrollments_by_benefit_package,    ->(benefit_package) {
     unscoped.where(
-      :"households.hbx_enrollments" => {
-        :$elemMatch => { :sponsored_benefit_package_id => benefit_package._id, :aasm_state.ne => :shopping }
+      :"hbx_enrollments" => {
+        :$elemMatch => { :sponsored_benefit_package_id => benefit_package._id }
       }
     )
   }

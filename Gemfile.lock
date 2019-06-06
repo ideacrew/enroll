@@ -292,6 +292,7 @@ GEM
     cliver (0.3.2)
     cocaine (0.6.0)
       terrapin (= 0.6.0)
+    coderay (1.1.2)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
     coffee-rails (4.2.2)
@@ -548,6 +549,9 @@ GEM
       capybara (>= 2.1, < 4)
       cliver (~> 0.3.1)
       websocket-driver (>= 0.2.0)
+    pry (0.12.2)
+      coderay (~> 1.1.0)
+      method_source (~> 0.9.0)
     public_suffix (3.0.3)
     puma (3.12.1)
     pundit (2.0.1)
@@ -594,6 +598,7 @@ GEM
     rb-fsevent (0.10.3)
     rb-inotify (0.10.0)
       ffi (~> 1.0)
+    rb-readline (0.5.5)
     rdoc (6.1.1)
     recaptcha (4.14.0)
       json
@@ -879,11 +884,13 @@ DEPENDENCIES
   parallel_tests (~> 2.26.2)
   poltergeist (~> 1.18.0)
   prawn!
+  pry
   puma (~> 3.11)
   pundit (~> 2.0)
   railroady (~> 1.5.3)
   rails (~> 5.2.3)
   rails-controller-testing
+  rb-readline
   recaptcha (~> 4.13)
   recurring_select
   redcarpet (~> 3.4)

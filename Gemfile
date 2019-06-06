@@ -124,6 +124,8 @@ group :development do
 end
 
 group :development, :test do
+gem 'pry'
+gem 'rb-readline'
   # gem 'bundler-audit',          '~> 0.6'
   gem 'capistrano',             '~> 3.1'
   gem 'capistrano-rails',       '1.4'
