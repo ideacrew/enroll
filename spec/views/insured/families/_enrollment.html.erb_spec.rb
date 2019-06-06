@@ -384,6 +384,32 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 >>>>>>> a9619997ea... refs #33617 remove enrolled contingent aasm state in EA
   end
 
+  context "when the enrollment is coverage_selected" do
+    let(:plan) {FactoryGirl.create(:plan)}
+    let!(:person) { FactoryGirl.create(:person, last_name: 'John', first_name: 'Doe') }
+    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
+
+    let!(:enrollment) {
+      FactoryGirl.create(:hbx_enrollment,
+                       household: family.active_household,
+                       coverage_kind: "health",
+                       effective_on: TimeKeeper.date_of_record.beginning_of_month,
+                       enrollment_kind: "open_enrollment",
+                       kind: "individual",
+                       submitted_at: TimeKeeper.date_of_record.prev_month,
+                       aasm_state: 'coverage_selected',
+                       plan_id: plan.id
+    )}
+
+    before :each do
+      render partial: "insured/families/enrollment", collection: [enrollment], as: :hbx_enrollment, locals: { read_only: false }
+    end
+
+    it "should display terminate plan option tile" do
+      expect(rendered).to have_text(/Terminate Plan/)
+    end
+  end
+
   context "when the enrollment is coverage_terminated" do
     let(:hbx_enrollment) do
       instance_double(
@@ -431,6 +457,9 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     it "should display as Terminated" do
       expect(rendered).to have_text(/Terminated/)
+    end
+    it "should not display terminate plan option tile" do
+      expect(rendered).not_to have_text(/Terminate Plan/)
     end
   end
 
@@ -489,6 +518,10 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     it "should display coverage end date for expired enrollment" do
       expect(rendered).to have_text(/Coverage End/)
       expect(rendered).to have_text(/#{end_on.strftime("%m/%d/%Y")}/)
+    end
+
+    it "should not display terminate plan option tile" do
+      expect(rendered).not_to have_text(/Terminate Plan/)
     end
   end
 
