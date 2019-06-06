@@ -213,7 +213,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @networks = ['Nationwide', 'DC-Metro']
 
     generate_eligibility_data
-    generate_checkbook_service
+    generate_checkbook_service if params[:market_kind] == 'individual'
 
     @carriers = @carrier_names_map.values
     @waivable = @hbx_enrollment.try(:can_complete_shopping?)
