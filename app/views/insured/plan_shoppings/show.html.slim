@@ -41,7 +41,9 @@
                     a.btn.btn-default data-sort-by='plan-carrier' onclick="filterBy(this)" = l10n("carrier")
                 - if @market_kind == 'individual'
                   #ivl_plans
-                    = render partial: "insured/plan_shoppings/plan_details", collection: @plans, as: :plan
+                    h3
+                      = l10n("loading")
+                      | ...
                 - if @market_kind == "shop"
                   #plans
                     = render partial: "ui-components/v1/cards/plan_details", collection: @member_groups, as: :plan
@@ -408,12 +410,6 @@ javascript:
           element.append(div)
         });
     }
-
-    function removeDuplicates(data) {
-      return data.filter((item, index, arr) = > {
-        var c = arr.map(item = > item.product_cost_total);
-        return index === c.indexOf(item.product_cost_total)});
-    }
   }
 
   if (marketKind === 'individual') {
@@ -422,6 +418,7 @@ javascript:
       if (coverageKind === "dental") {
         $(".plan-metal-level-selection-filter").attr("disabled", true);
       }
+
       $.ajax({
         url: "#{plans_insured_plan_shopping_path(id: @hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind) if @hbx_enrollment.present?}",
         type: "GET"
