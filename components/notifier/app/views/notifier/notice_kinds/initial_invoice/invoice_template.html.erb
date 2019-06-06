@@ -1,1 +1,1 @@
-<%= render 'notifier/notice_kinds/cover', recipient: recipient, notice_number: notice_number %>
+<%= render partial: 'layouts/notifier/dc_cover_page', :locals => {notice: notice, recipient: recipient, notice_recipient: notice_recipient } %>
