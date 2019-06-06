@@ -12,7 +12,8 @@
     <% end %>
     <span class="ttu lg twelve">Plans:</span>
     &nbsp;
-    <strong id='plans-count'><%= @member_groups.count %></strong>
+    <% products = @market_kind == 'shop' ? @member_groups : @plans %>
+    <strong id='plans-count'><%= products_count(products)%></strong>
     &nbsp;&nbsp;
     <span class="ttu lg twelve">Effective Date:</span>
     &nbsp;

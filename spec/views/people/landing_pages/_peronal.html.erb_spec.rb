@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "people/landing_pages/_personal.html.erb" do
+RSpec.describe "people/landing_pages/_personal.html.erb", dbclean: :around_each do
   let(:person) { FactoryBot.build(:person) }
   let(:person1) { FactoryBot.build(:invalid_person) }
   let(:consumer_role) { FactoryBot.build(:consumer_role) }

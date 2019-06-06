@@ -1,6 +1,6 @@
-<% plan_carrier = Caches::MongoidCache.lookup(CarrierProfile, plan.carrier_profile_id) { plan.carrier_profile } %>
+<% plan_carrier = Caches::MongoidCache.lookup(BenefitSponsors::Organizations::Organization.issuer_profiles, plan.issuer_profile_id) { plan.issuer_profile } %>
 
-<div class="module plan-row panel panel-default" data-plan-id="<%= plan.id %>" data-plan-category="<%= plan.plan_type ? plan.plan_type.downcase : "" %>" data-plan-metal-level="<%= plan.metal_level.downcase %>" data-plan-metal-network="<%= plan.nationwide ? "nationwide" : "dc metro" %>" data-plan-metal-premium="<%= plan.total_employee_cost %>" data-plan-metal-deductible="<%= plan.deductible == "Not Applicable" ? "$0" : plan.deductible %>" data-plan-name="<%= plan.name %>" data-plan-carrier="<%= plan_carrier.try(:legal_name) %>" data-plan-hsa-eligibility="<%= @plan_hsa_status[plan.id.to_s] %>" data-plan-ehb="<%= plan.ehb %>" data-can-use-aptc="<%= plan.can_use_aptc? %>">
+<div class="module plan-row panel panel-default" data-plan-id="<%= plan.id %>" data-plan-category="<%= plan.product_type ? plan.product_type.downcase : '' %>" data-plan-metal-level="<%= plan.metal_level.downcase %>" data-plan-metal-network="<%= ivl_metal_network(plan) %>" data-plan-metal-premium="<%= plan.total_employee_cost %>" data-plan-metal-deductible="<%= plan.deductible == 'Not Applicable' ? '$0' : plan.deductible %>" data-plan-name="<%= plan.name %>" data-plan-carrier="<%= plan_carrier.try(:legal_name) %>" data-plan-hsa-eligibility="<%= ivl_hsa_status(@plan_hsa_status, plan) %>" data-plan-ehb="<%= plan.ehb %>" data-can-use-aptc="<%= plan.can_use_aptc? %>">
   <div class="panel-body">
     <div class="row">
       <% if plan.try(:is_standard_plan) %>
@@ -48,7 +48,7 @@
           </thead>
           <tbody>
             <tr>
-              <td><%= plan.plan_type ? plan.plan_type.upcase : "" %></td>
+              <td><%= plan.product_type ? plan.product_type.upcase : "" %></td>
               <td>
                 <% plan_level = plan.metal_level.titleize %>
                 <span class="<%= plan_level.downcase %>-icon">
@@ -57,7 +57,7 @@
               </td>
               <td>
                 <% if offers_nationwide_plans? %>
-                  <%= plan.nationwide ? "Nationwide" : "DC-Metro" %>
+                  <%= network_type(plan) %>
                 <% else %>
                   <% if plan.network_information.present? %>
                       Network Notes
@@ -92,7 +92,7 @@
               <%= link_to l10n("select_plan"), "javascript:void(0)", class: 'btn btn-default btn-right', data: {'toggle': 'modal', 'target': "#csrEligibleReminder-#{plan.id}"} %> &nbsp;
               <%= link_to(l10n("select_plan"), "javascript:void(0)", {class: 'dn btn btn-default btn-right plan-select select', data: {url: thankyou_insured_plan_shopping_path(@hbx_enrollment, plan_id: plan.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)}}) %>
               <%= render partial: "shared/csr_eligible_reminder_modal", locals: { plan: plan } %>
-              <% else %>
+            <% else %>
               <%= link_to(l10n("select_plan"), "javascript:void(0)", {class: 'btn btn-default btn-right plan-select select', data: {url: thankyou_insured_plan_shopping_path(@hbx_enrollment, plan_id: plan.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)}}) %>
             <% end %>
           <% else %>

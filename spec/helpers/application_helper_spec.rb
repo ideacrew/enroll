@@ -129,6 +129,33 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
   end
 
+  describe '#network_type , #plans_count', :dbclean => :after_each do
+    let!(:nationwide_product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, nationwide: true, dc_in_network: false) }
+    let!(:dcmetro_product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, nationwide: false, dc_in_network: true) }
+    let!(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, nationwide: false, dc_in_network: false) }
+    let(:all_products) {[nationwide_product, dcmetro_product, product]}
+    let(:no_products) {[]}
+
+    it 'should display Nationwide if product is nationwide' do
+      expect(network_type(nationwide_product)).to eq 'Nationwide'
+    end
+
+    it 'should display DC-Metro if product is DC-Metro' do
+      expect(network_type(dcmetro_product)).to eq 'DC-Metro'
+    end
+
+    it 'should display empty if metal level if its a 2016 plan' do
+      expect(network_type(product)).to eq nil
+    end
+
+    it 'should display Nationwide if product is nationwide' do
+      expect(products_count(all_products)).to eq 3
+    end
+
+    it 'should display DC-Metro if product is DC-Metro' do
+      expect(products_count(no_products)).to eq 0
+    end
+  end
 
   describe "#enrollment_progress_bar", :dbclean => :after_each  do
     include_context "setup benefit market with market catalogs and product packages"

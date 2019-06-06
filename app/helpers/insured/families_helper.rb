@@ -14,7 +14,13 @@ module Insured::FamiliesHelper
   end
 
   def current_premium hbx_enrollment
-    hbx_enrollment.total_employee_cost
+    if hbx_enrollment.is_shop?
+      hbx_enrollment.total_employee_cost
+    elsif hbx_enrollment.kind == 'coverall'
+      hbx_enrollment.total_premium
+    else
+      hbx_enrollment.total_premium > hbx_enrollment.applied_aptc_amount.to_f ? hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f : 0
+    end
   end
 
   def hide_policy_selected_date?(hbx_enrollment)
@@ -49,7 +55,7 @@ module Insured::FamiliesHelper
   end
 
   def render_plan_type_details(plan)
-    plan_details = [ plan.try(:plan_type).try(:upcase) ].compact
+    plan_details = [plan.try(:product_type).try(:upcase)].compact
 
     metal_level = display_dental_metal_level(plan)
 

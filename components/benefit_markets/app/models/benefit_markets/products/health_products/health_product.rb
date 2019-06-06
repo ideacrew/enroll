@@ -67,7 +67,6 @@ module BenefitMarkets
       scope :platinum_plans,      ->{ where(metal_level_kind: :platinum) }
       scope :catastrophic_plans,  ->{ where(metal_level_kind: :catastrophic) }
 
-
       validates :health_plan_kind,
                 presence: true,
                 inclusion: {in: HEALTH_PLAN_MAP.keys, message: "%{value} is not a valid health product kind"}

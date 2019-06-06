@@ -26,12 +26,12 @@ class Products::QhpController < ApplicationController
       end
     else
       tax_household = get_shopping_tax_household_from_person(current_user.person, @hbx_enrollment.effective_on.year)
-      @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind)
+      @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, 'individual')
       @qhps = find_qhp_cost_share_variances
 
       @qhps = @qhps.each do |qhp|
         qhp.hios_plan_and_variant_id = qhp.hios_plan_and_variant_id[0..13] if @coverage_kind == "dental"
-        qhp[:total_employee_cost] = UnassistedPlanCostDecorator.new(qhp.plan, @hbx_enrollment, session[:elected_aptc], tax_household).total_employee_cost
+        qhp[:total_employee_cost] = UnassistedPlanCostDecorator.new(qhp.product, @hbx_enrollment, session[:elected_aptc], tax_household).total_employee_cost
       end
 
     end
@@ -51,9 +51,13 @@ class Products::QhpController < ApplicationController
     @qhp = find_qhp_cost_share_variances.first
     @source = params[:source]
     @qhp.hios_plan_and_variant_id = @qhp.hios_plan_and_variant_id[0..13] if @coverage_kind == "dental"
-    # @hbx_enrollment.reset_dates_on_previously_covered_members(@qhp.plan)
-    sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(@hbx_enrollment)
-    @member_group = sponsored_cost_calculator.groups_for_products([@qhp.product]).first
+    if params[:market_kind] == 'shop'
+      sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(@hbx_enrollment)
+      @member_group = sponsored_cost_calculator.groups_for_products([@qhp.product]).first
+    else
+      @hbx_enrollment.reset_dates_on_previously_covered_members(@qhp.product)
+      @member_group = @hbx_enrollment.build_plan_premium(qhp_plan: @qhp.product)
+    end
 
     respond_to do |format|
       format.html

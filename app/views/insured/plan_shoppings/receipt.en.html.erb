@@ -23,7 +23,8 @@
             <strong><%= @plan.issuer_profile.legal_name %> <%= @plan.title %></strong><br>
             Benefit: <%= @enrollment.coverage_kind.titleize %><br>
             Market: <%= show_market_name_by_enrollment @enrollment %><br>
-            Metal level : <%= display_dental_metal_level @plan %>
+            <!-- #TODO: FIX me  -->
+            Metal level : <%#= display_dental_metal_level @plan %>
           </p>
 
           <% if @enrollment.employee_role.present? %>

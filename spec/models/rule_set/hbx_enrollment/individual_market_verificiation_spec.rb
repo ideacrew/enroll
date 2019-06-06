@@ -6,17 +6,18 @@ describe RuleSet::HbxEnrollment::IndividualMarketVerification do
 
   let(:effective_on) { TimeKeeper.date_of_record.beginning_of_year }
   let(:enrollment_status) { 'coverage_selected' }
+  let(:product) {FactoryBot.build(:benefit_markets_products_product, benefit_market_kind: 'aca_individual') }
 
-  let(:family)        { create(:family, :with_primary_family_member) }
-  let(:enrollment)    { create(:hbx_enrollment, household: family.latest_household,
-                                                 effective_on: effective_on,
-                                                 kind: "individual",
-                                                 submitted_at: effective_on - 10.days,
-                                                 aasm_state: enrollment_status
-                                                 ) }
+  let(:family)        { FactoryBot.create(:family, :with_primary_family_member) }
+  let(:enrollment)    { FactoryBot.create(:hbx_enrollment,
+                                          household: family.latest_household,
+                                          effective_on: effective_on,
+                                          kind: "individual",
+                                          submitted_at: effective_on - 10.days,
+                                          aasm_state: enrollment_status,
+                                          product: product )}
 
   describe "for a shop policy" do
-
     it "should not be applicable" do
       allow(enrollment).to receive(:benefit_sponsored?).and_return(true)
       expect(subject.applicable?).to eq false
@@ -25,7 +26,6 @@ describe RuleSet::HbxEnrollment::IndividualMarketVerification do
 
   describe "for an inactive individual policy" do
     let(:enrollment_status) { 'shopping' }
-  
     it "should not be applicable" do
       expect(subject.applicable?).to eq false
     end
