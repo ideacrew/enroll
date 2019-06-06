@@ -119,9 +119,10 @@ class BenefitGroupAssignment
   end
 
   def covered_families
-    Family.where({
-      "households.hbx_enrollments.benefit_group_assignment_id" => BSON::ObjectId.from_string(self.id)
-    })
+    Family.where(:"_id".in => HbxEnrollment.where(
+      benefit_group_assignment_id: BSON::ObjectId.from_string(self.id) 
+    ).pluck(:family_id)
+  )
   end
 
   def hbx_enrollments
