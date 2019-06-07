@@ -44,9 +44,8 @@ module RuleSet
       def any_pending?
         roles_for_determination.any?(&:ssa_pending?) ||
           roles_for_determination.any?(&:dhs_pending?) ||
-            roles_for_determination.any?(&:sci_verified?) ||
-              applicants_for_determination.any?(&:income_pending?) ||
-                applicants_for_determination.any?(&:mec_pending?)
+          roles_for_determination.any?(&:sci_verified?) ||
+          applicants_for_determination.any?(&:verification_pending?)
       end
     end
   end

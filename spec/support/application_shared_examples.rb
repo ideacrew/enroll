@@ -1,5 +1,5 @@
 RSpec.shared_examples 'setup basic models' do
-  let!(:primary_person) {FactoryGirl.create(:person, :with_consumer_role)}
+  let!(:primary_person) {FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role)}
   let!(:family) {FactoryGirl.create(:family, :with_primary_family_member, person: primary_person)}
   let!(:household) {family.households.first}
   let!(:tax_household) {FactoryGirl.create(:tax_household, household: household)}
@@ -27,7 +27,7 @@ end
 RSpec.shared_examples 'submitted application with two active members and one applicant' do
   include_examples 'submitted application with one member and one applicant'
 
-  let!(:person2) {FactoryGirl.create(:person, :with_consumer_role)}
+  let!(:person2) {FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role)}
   let!(:family_member1) {FactoryGirl.create(:family_member, family: family, person: person2)}
 end
 
@@ -35,7 +35,7 @@ end
 RSpec.shared_examples 'submitted application with one active member and two applicant' do
   include_examples 'submitted application with one member and one applicant'
 
-  let!(:person2) {FactoryGirl.create(:person, :with_consumer_role)}
+  let!(:person2) {FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role)}
   let!(:family_member1) {FactoryGirl.create(:family_member, family: family, person: person2, is_active: false)}
   let!(:applicant2) { FactoryGirl.create(:applicant, tax_household_id: tax_household.id, application: application, family_member_id: family_member1.id) }
 end
@@ -45,13 +45,17 @@ RSpec.shared_examples 'draft application with 2 applicants' do
 
   before :each do
     allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
+    primary_person.add_relationship(second_person, "spouse", family.id)
+    primary_person.add_relationship(third_person, "child", family.id)
   end
-  let!(:second_person) {FactoryGirl.create(:person, :with_consumer_role)}
+
+  let!(:second_person) {FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role)}
   let!(:second_family_member) {FactoryGirl.create(:family_member, family: family, person: second_person, is_active: true)}
   let!(:third_person) {FactoryGirl.create(:person, :with_consumer_role)}
   let!(:family_member_not_on_application) {FactoryGirl.create(:family_member, family: family, person: third_person, is_active: true)}
   let!(:application) {FactoryGirl.create(:application, aasm_state: 'draft', family: family)}
   let!(:first_applicant) {FactoryGirl.create(:applicant, tax_household_id: tax_household.id, application: application, family_member_id: family.primary_applicant.id)}
   let!(:second_applicant) { FactoryGirl.create(:applicant, tax_household_id: tax_household.id, application: application, family_member_id: second_family_member.id) }
+
 end
 
