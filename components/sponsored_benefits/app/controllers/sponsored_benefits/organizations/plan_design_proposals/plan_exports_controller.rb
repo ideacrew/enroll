@@ -13,7 +13,9 @@ module SponsoredBenefits
           @service = SponsoredBenefits::Services::PlanCostService.new({benefit_group: @benefit_group})
           @benefit_group.build_estimated_composite_rates if @benefit_group.sole_source?
           @plan = @benefit_group.reference_plan
+          dental_plan = @benefit_group.dental_reference_plan
           @employer_contribution_amount = @service.monthly_employer_contribution_amount(@plan)
+          @employer_dental_contribution_amount = @service.monthly_employer_contribution_amount(dental_plan) if dental_plan.present?
           @benefit_group_costs = @benefit_group.employee_costs_for_reference_plan(@service)
           @qhps = ::Products::QhpCostShareVariance.find_qhp_cost_share_variances(plan_array(@plan), plan_design_proposal.effective_date.year, "Health")
         end

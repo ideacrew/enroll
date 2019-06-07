@@ -73,7 +73,7 @@
           <div class="col-xs-4">
             <div class="row">
               <span><b>Employer Estimated Maximum Monthly Cost</b></span>
-              <h2 class="main-title emp-cost"><%= number_to_currency(@benefit_group.monthly_employer_contribution_amount) %></h2>
+              <h2 class="main-title emp-cost"><%= number_to_currency(@employer_contribution_amount) %></h2>
             </div>
           </div>
           <div class="col-xs-8 monthly-cost">
@@ -86,8 +86,8 @@
                 </tr>
                 <tr>
                   <td colspan="2"><b>Total Estimated Monthly Cost for Plan Participants</b></td>
-                  <td><%= number_to_currency(@benefit_group.monthly_min_employee_cost) %></td>
-                  <td><%= number_to_currency(@benefit_group.monthly_max_employee_cost) %></td>
+                  <td><%= number_to_currency(@service.monthly_min_employee_cost) %></td>
+                  <td><%= number_to_currency(@service.monthly_max_employee_cost) %></td>
                 </tr>
               </table>
             </div>
@@ -133,7 +133,7 @@
           <div class="col-xs-4">
             <div class="row">
               <span><b>Employer Estimated Maximum Monthly Cost</b></span>
-              <h2 class="main-title emp-cost"><%= number_to_currency(@benefit_group.monthly_employer_contribution_amount(@benefit_group.dental_reference_plan)) %></h2>
+              <h2 class="main-title emp-cost"><%= number_to_currency(@employer_dental_contribution_amount) %></h2>
             </div>
           </div>
           <div class="col-xs-8 monthly-cost">
@@ -146,8 +146,8 @@
                 </tr>
                 <tr>
                   <td colspan="2"><b>Total Estimated Monthly Cost for Plan Participants</b></td>
-                  <td><%= number_to_currency(@benefit_group.monthly_min_employee_cost('dental')) %></td>
-                  <td><%= number_to_currency(@benefit_group.monthly_max_employee_cost('dental')) %></td>
+                  <td><%= number_to_currency(@service.monthly_min_employee_cost(@dental_plan)) %></td>
+                  <td><%= number_to_currency(@service.monthly_max_employee_cost(@dental_plan)) %></td>
                 </tr>
               </table>
             </div>
