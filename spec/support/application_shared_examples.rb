@@ -31,6 +31,12 @@ RSpec.shared_examples 'submitted application with two active members and one app
   let!(:family_member1) {FactoryGirl.create(:family_member, family: family, person: person2)}
 end
 
+RSpec.shared_examples 'submitted application with two active members and two applicants' do
+  include_examples 'submitted application with two active members and one applicant'
+
+  let!(:applicant2) { FactoryGirl.create(:applicant, tax_household_id: tax_household.id, application: application, family_member_id: family_member1.id, is_claimed_as_tax_dependent: true, claimed_as_tax_dependent_by: applicant1.id) }
+end
+
 # this example has one submitted application with one active member and two applicant
 RSpec.shared_examples 'submitted application with one active member and two applicant' do
   include_examples 'submitted application with one member and one applicant'
