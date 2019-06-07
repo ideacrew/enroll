@@ -81,7 +81,7 @@ module SponsoredBenefits
       @broker_agency_profile = broker_agency_profile
 
       if @benefit_group
-        @service = SponsoredBenefits::Services::PlanCostService.new({benefit_group: benefit_group})
+        @service = SponsoredBenefits::Services::PlanCostService.new({benefit_group: @benefit_group})
         @plan = @benefit_group.reference_plan
         @dental_plan = @benefit_group.dental_reference_plan
         @employer_health_contribution_amount = @service.monthly_employer_contribution_amount(@plan)
