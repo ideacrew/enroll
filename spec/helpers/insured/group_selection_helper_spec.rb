@@ -211,6 +211,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
         sep
       }
       let(:active_enrollment) { FactoryBot.create(:hbx_enrollment,
+                         family: family,
                          household: family.active_household,
                          kind: "employer_sponsored",
                          employee_role_id: employee_role.id,
@@ -219,6 +220,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
       )}
       let(:renewal_enrollment) { FactoryBot.create(:hbx_enrollment,
                          household: family.active_household,
+                         family: family,
                          kind: "employer_sponsored",
                          employee_role_id: employee_role.id,
                          enrollment_kind: "special_enrollment",
