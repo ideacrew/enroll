@@ -214,31 +214,54 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
         sep.save
         sep
       }
-      let!(:active_enrollment) do
-        FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
-                          household: family.active_household,
-                          aasm_state: "coverage_selected",
-                          kind: "employer_sponsored",
-                          effective_on: predecessor_application.start_on,
-                          rating_area_id: predecessor_application.recorded_rating_area_id,
-                          sponsored_benefit_id: predecessor_application.benefit_packages.first.health_sponsored_benefit.id,
-                          sponsored_benefit_package_id: predecessor_application.benefit_packages.first.id,
-                          benefit_sponsorship_id: predecessor_application.benefit_sponsorship.id,
-                          employee_role_id: employee_role.id)
-      end
 
-      let!(:renewal_enrollment) do
-        FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
-                          household: family.active_household,
-                          aasm_state: "renewing_coverage_selected",
-                          kind: "employer_sponsored",
-                          effective_on: renewal_application.start_on,
-                          rating_area_id: renewal_application.recorded_rating_area_id,
-                          sponsored_benefit_id: renewal_application.benefit_packages.first.health_sponsored_benefit.id,
-                          sponsored_benefit_package_id: renewal_application.benefit_packages.first.id,
-                          benefit_sponsorship_id: renewal_application.benefit_sponsorship.id,
-                          employee_role_id: employee_role.id)
-      end
+      # let!(:active_enrollment) do
+      #   FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+      #                     household: family.active_household,
+      #                     family: family,
+      #                     aasm_state: "coverage_selected",
+      #                     kind: "employer_sponsored",
+      #                     effective_on: predecessor_application.start_on,
+      #                     rating_area_id: predecessor_application.recorded_rating_area_id,
+      #                     sponsored_benefit_id: predecessor_application.benefit_packages.first.health_sponsored_benefit.id,
+      #                     sponsored_benefit_package_id: predecessor_application.benefit_packages.first.id,
+      #                     benefit_sponsorship_id: predecessor_application.benefit_sponsorship.id,
+      #                     employee_role_id: employee_role.id)
+      # end
+
+      # let!(:renewal_enrollment) do
+      #   FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+      #                     household: family.active_household,
+      #                     family: family,
+      #                     aasm_state: "renewing_coverage_selected",
+      #                     kind: "employer_sponsored",
+      #                     effective_on: renewal_application.start_on,
+      #                     rating_area_id: renewal_application.recorded_rating_area_id,
+      #                     sponsored_benefit_id: renewal_application.benefit_packages.first.health_sponsored_benefit.id,
+      #                     sponsored_benefit_package_id: renewal_application.benefit_packages.first.id,
+      #                     benefit_sponsorship_id: renewal_application.benefit_sponsorship.id,
+      #                     employee_role_id: employee_role.id)
+      # end
+
+      let(:active_enrollment) { FactoryBot.create(:hbx_enrollment,
+                         family: family,
+                         household: family.active_household,
+                         kind: "employer_sponsored",
+                         employee_role_id: employee_role.id,
+                         enrollment_kind: "special_enrollment",
+                         aasm_state: 'coverage_selected'
+      )}
+      let(:renewal_enrollment) { FactoryBot.create(:hbx_enrollment,
+                         household: family.active_household,
+                         family: family,
+                         kind: "employer_sponsored",
+                         employee_role_id: employee_role.id,
+                         enrollment_kind: "special_enrollment",
+                         aasm_state: 'renewing_coverage_selected'
+      )}
+
+      let(:active_benefit_group) { organization.employer_profile.plan_years.where(aasm_state: "active").first.benefit_groups.first }
+      let(:renewal_benefit_group) { organization.employer_profile.plan_years.where(aasm_state: "renewing_enrolling").first.benefit_groups.first }
 
       before do
         allow(family).to receive(:current_sep).and_return sep
