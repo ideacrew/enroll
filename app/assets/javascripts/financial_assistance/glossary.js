@@ -1,4 +1,6 @@
-$(document).ready(function() {
+// page:change accounts for turbolinks affecting JS on document ready
+// ajax:success accounts for glossary terms in consumer forms after document ready
+$(document).on("page:change ajax:success", function() {
   if ($('.run-glossary').length) {
     var terms = [
       {
@@ -1063,20 +1065,24 @@ $(document).ready(function() {
     });
     $(terms).each(function(i, term) {
         // finds the first instance of the term on the page
-        var matchingEl = $('.run-glossary:contains(' + term.term + ')').first();
-        if (matchingEl.length) {
+        // var matchingEl = $('.run-glossary:contains(' + term.term + ')').first();
+        // if (matchingEl.length) {
+        // finds every instance of the term on the page
+        $('.run-glossary:contains(' + term.term + ')').each(function(i, matchingEl) {
           // matches the exact or plural term
           var regex = new RegExp("\\b(" + term.term + "[s]?)\\b", "i");
           var text = term.description;
           $(matchingEl).html($(matchingEl).html().replace(regex, '<span class="glossary" data-toggle="popover" data-placement="auto top" data-trigger="click focus" data-boundary="window" data-fallbackPlacement="flip" data-html="true" data-content="' + text + '" data-title="' + term.term + '<button data-dismiss=\'modal\' type=\'button\' class=\'close\' aria-label=\'Close\' onclick=\'hideGlossaryPopovers()\'></button>">$1</span>'));
-        }
+        });
     });
+    $('[data-toggle="popover"]').popover();
 
     // Because of the change to popover on click instead of hover, you need to
     // manually close each popover. This will close others if you click to open one
     // or click outside of a popover.
     $(document).click(function(e){
       if (e.target.className == 'glossary') {
+        e.preventDefault();
         $('.glossary').not($(e.target)).popover('hide');
       }
       else if (!$(e.target).parents('.popover').length) {
