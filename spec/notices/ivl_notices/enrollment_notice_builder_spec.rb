@@ -4,8 +4,8 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
   let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
   let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person, e_case_id: "family_test#1000")}
-  let!(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, created_at: (TimeKeeper.date_of_record.in_time_zone("Eastern Time (US & Canada)") - 2.days), household: family.households.first, kind: "individual", aasm_state: "enrolled_contingent")}
-  let!(:hbx_enrollment_member) {FactoryBot.create(:hbx_enrollment_member,hbx_enrollment: hbx_enrollment, applicant_id: family.family_members.first.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record.prev_month )}
+  let!(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, created_at: (TimeKeeper.date_of_record.in_time_zone("Eastern Time (US & Canada)") - 2.days), family: family, household: family.households.first, kind: "individual", aasm_state: "enrolled_contingent")}
+  let!(:hbx_enrollment_member) {FactoryBot.create(:hbx_enrollment_member,hbx_enrollment: hbx_enrollment, applicant_id: family.family_members.first.id,is_subscriber: true, eligibility_date: TimeKeeper.date_of_record.prev_month )}
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Enrollment Notice',
                             :notice_template => 'notices/ivl/enrollment_notice',
