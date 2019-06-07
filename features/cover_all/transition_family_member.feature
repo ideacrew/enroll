@@ -13,7 +13,7 @@ Feature: can Transition family members
 			Then Hbx Admin should see an Transition family members link
 
 		Scenario: Transition family member from consumer role to cover all
-			When Hbx Admin click Families Link
+			When Hbx Admin click Families link
 			Then Hbx Admin should see the list of primary applicants and an Action button
 			When Hbx Admin clicks Action button
 			Then Hbx Admin should see an Transition family members link
