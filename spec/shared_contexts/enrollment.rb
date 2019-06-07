@@ -8,6 +8,7 @@ RSpec.shared_context "setup families enrollments", :shared_context => :metadata 
   let!(:current_calender_year) {current_calender_date.year}
   let!(:family_unassisted) {FactoryBot.create(:individual_market_family)}
   let!(:enrollment_unassisted) {FactoryBot.create(:hbx_enrollment, :individual_unassisted, :with_enrollment_members,
+                                                   family: family_unassisted,
                                                    household: family_unassisted.active_household,
                                                    enrollment_members: [family_unassisted.family_members.first],
                                                    plan: active_individual_health_plan, effective_on: current_calender_date)}
@@ -20,6 +21,7 @@ RSpec.shared_context "setup families enrollments", :shared_context => :metadata 
                                                                             is_ia_eligible: true)}
   let!(:enrollment_assisted) {FactoryBot.create(:hbx_enrollment, :individual_assisted, :with_enrollment_members,
                                                  applied_aptc_amount: 110,
+                                                 family: family_assisted,
                                                  consumer_role_id: family_assisted.primary_family_member.person.consumer_role.id,
                                                  household: family_assisted.active_household,
                                                  enrollment_members: [family_assisted.family_members.first],
