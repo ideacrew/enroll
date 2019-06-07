@@ -54,17 +54,18 @@ module SponsoredBenefits
           })
       end
 
-      def employee_costs_for_dental_reference_plan
+      def employee_costs_for_dental_reference_plan(service)
         plan = dental_reference_plan
+        service.employee_cost_for_plan(plan) # To initialize census_employee_costs
         employee_costs = census_employees.active.inject({}) do |census_employees, employee|
           census_employees[employee.id] = {
-            ref_plan_cost: employee_cost_for_plan(employee, plan)
+            ref_plan_cost: service.census_employee_costs[plan.id][employee.id]
           }
           census_employees
         end
 
         employee_costs.merge!({
-          ref_plan_employer_cost: monthly_employer_contribution_amount(plan)
+          ref_plan_employer_cost: service.monthly_employer_contribution_amount(plan)
           })
       end
 
