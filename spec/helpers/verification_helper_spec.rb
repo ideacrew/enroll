@@ -360,8 +360,8 @@ RSpec.describe VerificationHelper, :type => :helper do
   describe '#review button class' do
     let(:obj) { double }
     let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
+    let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, aasm_state: "enrolled_contingent", family: family) }
     before :each do
-      family.active_household.hbx_enrollments << HbxEnrollment.new(:aasm_state => "enrolled_contingent")
       allow(obj).to receive_message_chain("family.active_household.hbx_enrollments.verification_needed.any?").and_return(true)
     end
 
