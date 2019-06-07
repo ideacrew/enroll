@@ -12,7 +12,9 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       let!(:family) { FactoryBot.create(:individual_market_family) }
       let(:household) {FactoryBot.create(:household, family: family)}
       let!(:enrollment) {
-                          FactoryBot.create(:hbx_enrollment,
+                          FactoryBot.create(
+                            :hbx_enrollment,
+                            family: family,
                             household: household,
                             hbx_enrollment_members: [hbx_enrollment_member],
                             is_active: true,
