@@ -16,8 +16,8 @@ describe Services::CheckbookServices::PlanComparision do
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: consumer_person) }
   let(:plan_year){ FactoryBot.create(:next_month_plan_year, :with_benefit_group)}
   let(:benefit_group){ plan_year.benefit_groups.first }
-  let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: census_employee.employee_role.person.primary_family.households.first, employee_role_id: employee_role.id, benefit_group_id: benefit_group.id)}
-  let!(:hbx_enrollment1) { FactoryBot.create(:hbx_enrollment, kind: "individual", consumer_role_id: consumer_person.consumer_role.id, household: family.active_household)}
+  let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: census_employee.employee_role.person.primary_family.households.first, employee_role_id: employee_role.id, benefit_group_id: benefit_group.id)}
+  let!(:hbx_enrollment1) { FactoryBot.create(:hbx_enrollment,family: family, kind: "individual", consumer_role_id: consumer_person.consumer_role.id, household: family.active_household)}
 
   describe "when employee is not congress" do
     subject { Services::CheckbookServices::PlanComparision.new(hbx_enrollment,false) }
@@ -112,7 +112,7 @@ describe Services::CheckbookServices::PlanComparision do
     let!(:ivl_tax_household){ FactoryBot.create(:tax_household, household: ivl_household, effective_ending_on: nil) }
     let!(:ivl_ed)           { FactoryBot.create(:eligibility_determination, tax_household: ivl_tax_household) }
     let!(:thh_start_on)     { ivl_tax_household.effective_starting_on }
-    let!(:ivl_enrollment)   { FactoryBot.create(:hbx_enrollment, effective_on: thh_start_on, kind: 'individual', household: ivl_household, consumer_role_id: ivl_person.consumer_role.id.to_s) }
+    let!(:ivl_enrollment)   { FactoryBot.create(:hbx_enrollment, effective_on: thh_start_on, family: family,kind: 'individual', household: ivl_household, consumer_role_id: ivl_person.consumer_role.id.to_s) }
     let!(:ivl_enr_member)   { FactoryBot.create(:hbx_enrollment_member, applicant_id: primary_fm_id, hbx_enrollment: ivl_enrollment, eligibility_date: thh_start_on) }
     let!(:ivl_thhm)         { ivl_tax_household.tax_household_members << TaxHouseholdMember.new(applicant_id: primary_fm_id, is_ia_eligible: true) }
 
