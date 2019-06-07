@@ -167,7 +167,7 @@ class Family
   scope :all_assistance_applying,           ->{ unscoped.exists(:"households.tax_households.eligibility_determinations" => true).order(
                                                   :"households.tax_households.eligibility_determinations.determined_at".desc) }
 
-  scope :all_aptc_hbx_enrollments,      ->{ unscoped.where(:"households.hbx_enrollments.applied_aptc_amount.cents".gt => 0)}
+  scope :all_aptc_hbx_enrollments,      ->{ where(:"_id".in => HbxEnrollment.where(:"applied_aptc_amount.cents".gt => 0).pluck(:family_id)) }
   scope :all_unassisted,                ->{ exists(:"households.tax_households.eligibility_determinations" => false) }
 
   scope :all_eligible_for_assistance,   ->{ exists(:"households.tax_households.eligibility_determinations" => true) }
@@ -183,7 +183,8 @@ class Family
                                                       }
 
   scope :active_assistance_receiving,   ->{ all_assistance_receiving.where(:"households.tax_households.effective_ending_on" => nil) }
-  scope :all_plan_shopping,             ->{ exists(:"households.hbx_enrollments" => true) }
+  # Note: all_plan_shopping was using the same exact criteria as all_with_hbx_enrollments
+  scope :all_plan_shopping,             ->{ all_with_hbx_enrollments }
 
 
   scope :by_eligibility_determination_date_range, ->(start_at, end_at){ where(
@@ -192,7 +193,7 @@ class Family
                                                       )
                                                     }
 
-  scope :all_with_hbx_enrollments,              -> { exists(:"households.hbx_enrollments" => true) }
+  scope :all_with_hbx_enrollments,              -> { exists(hbx_enrollments: true) }
   scope :by_datetime_range,                     ->(start_at, end_at){ where(:created_at.gte => start_at).and(:created_at.lte => end_at) }
   scope :all_enrollments,                       ->{  where(:"_id".in => HbxEnrollment.where(":aasm_state".in => HbxEnrollment::ENROLLED_STATUSES)) }
   scope :all_enrollments_by_writing_agent_id,   ->(broker_id) { where(:"_id".in => HbxEnrollment.where(writing_agent_id: broker_id).pluck(:family_id)) }
@@ -224,14 +225,7 @@ class Family
   }
 
 
-  scope :all_enrollments_by_benefit_package, ->(benefit_package) {
-    where(
-      :"_id".in => HbxEnrollment.where(
-        sponsored_benefit_package_id => benefit_package._id,
-        :aasm_state.ne => :shopping
-      ).pluck(:family_id) 
-    )
-  }
+  scope :all_enrollments_by_benefit_package, ->(benefit_package) { where(:"_id".in => HbxEnrollment.where(sponsored_benefit_package_id => benefit_package._id, :aasm_state.ne => :shopping).pluck(:family_id))}
 
   scope :all_enrollments_by_benefit_sponsorship_id,  ->(benefit_sponsorship_id) {
     where(:"_id".in => HbxEnrollment.where(benefit_sponsorship_id: benefit_sponsorship_id).pluck(:family_id))
