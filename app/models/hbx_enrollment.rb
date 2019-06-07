@@ -1789,10 +1789,22 @@ class HbxEnrollment
 
   def set_is_any_enrollment_member_outstanding
     if kind == "individual"
-      active_consumer_role_people = hbx_enrollment_members.flat_map(&:person).select{|per| per if per.is_consumer_role_active?}
-      true_or_false = active_consumer_role_people.present? ? active_consumer_role_people.map(&:consumer_role).any?(&:verification_outstanding?) : false
+      application = family.latest_applicable_submitted_application
+      applicants_outstanding = any_outstanding_applicants(application.applicants) if application
+      consumer_status = active_consumer_people_status
+      true_or_false = applicants_outstanding || consumer_status
       self.assign_attributes({:is_any_enrollment_member_outstanding => true_or_false})
     end
+  end
+
+  def any_outstanding_applicants(applicants)
+    return false unless applicants
+    applicants.any?(&:verification_outstanding?)
+  end
+
+  def active_consumer_people_status
+    consumer_role_people = hbx_enrollment_members.flat_map(&:person).select{|per| per if per.is_consumer_role_active?}
+    consumer_role_people.present? ? consumer_role_people.map(&:consumer_role).any?(&:verification_outstanding?) : false
   end
 
   # NOTE - Mongoid::Timestamps does not generate created_at time stamps.

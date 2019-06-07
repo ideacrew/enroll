@@ -89,7 +89,7 @@ describe Subscribers::FinancialAssistanceApplicationOutstandingVerification, dbc
 
         context "for a valid import" do
           let(:message) { { "body" => xml, "assistance_application_id" => parser.fin_app_id} }
-          let!(:applicant) { FactoryGirl.create(:applicant, application: application, family_member_id: family.primary_applicant.id)}
+          let!(:applicant) { FactoryGirl.create(:applicant, application: application, family_member_id: family.primary_applicant.id, aasm_state: 'verification_pending')}
           let!(:mec_assisted_verification) { FactoryGirl.create(:verification_type, applicant: applicant, type_name: 'MEC', validation_status: "pending") }
 
           it "should not log any errors and updates the existing verification_types" do
@@ -115,6 +115,72 @@ describe Subscribers::FinancialAssistanceApplicationOutstandingVerification, dbc
     end
   end
 
+  describe "Did not receive response within 24 hours", dbclean: :after_each do
+    let!(:xml) { File.read(Rails.root.join("spec", "test_data", "haven_outstanding_verification_response", "external_verifications_mec_sample.xml")) }
+    let!(:parser) { Parsers::Xml::Cv::OutstandingMecVerificationParser.new.parse(xml) }
+    let!(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+    let!(:family)  { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
+    let!(:application) do
+      FactoryGirl.create(:application, id: parser.fin_app_id.to_s, family: family, aasm_state: "determined")
+    end
+    let(:message) { { "return_status" => 503, "body" => xml, "assistance_application_id" => parser.fin_app_id} }
+    let!(:applicant) { FactoryGirl.create(:applicant, application: application, family_member_id: family.primary_applicant.id, aasm_state: 'verification_pending')}
+    let!(:mec_assisted_verification) { FactoryGirl.create(:verification_type, applicant: applicant, type_name: 'MEC', validation_status: "pending") }
+    let!(:income_assisted_verification) { FactoryGirl.create(:verification_type, applicant: applicant, type_name: 'Income', validation_status: "pending") }
+
+
+    context 'no response for MEC within 24 hours' do
+
+      before do
+        applicant.update_attributes(has_income_verification_response: true)
+        income_assisted_verification.update_attributes(validation_status: 'verified')
+      end
+
+      it 'should move applicant to outstanding status' do
+        allow(Person).to receive(:where).and_return([person])
+        expect(subject).not_to receive(:log)
+        subject.call(nil, nil, nil, nil, message)
+        applicant.reload
+        mec_assisted_verification.reload
+        expect(mec_assisted_verification.validation_status).to eq "outstanding"
+        expect(applicant.aasm_state).to eq "verification_outstanding"
+      end
+    end
+
+    context 'no response for Income within 24 hours' do
+
+      before do
+        applicant.update_attributes(has_mec_verification_response: true)
+        mec_assisted_verification.update_attributes(validation_status: 'verified')
+      end
+
+      it 'should move applicant to outstanding status' do
+        allow(Person).to receive(:where).and_return([person])
+        expect(subject).not_to receive(:log)
+        subject.call(nil, nil, nil, nil, message)
+        applicant.reload
+        income_assisted_verification.reload
+        expect(income_assisted_verification.validation_status).to eq "outstanding"
+        expect(applicant.aasm_state).to eq "verification_outstanding"
+      end
+    end
+
+    context 'no response for both Income and MEC within 24 hours' do
+
+      it 'should move applicant to outstanding status' do
+        allow(Person).to receive(:where).and_return([person])
+        expect(subject).not_to receive(:log)
+        subject.call(nil, nil, nil, nil, message)
+        applicant.reload
+        income_assisted_verification.reload
+        mec_assisted_verification.reload
+        expect(income_assisted_verification.validation_status).to eq "outstanding"
+        expect(mec_assisted_verification.validation_status).to eq "outstanding"
+        expect(applicant.aasm_state).to eq "verification_outstanding"
+      end
+    end
+  end
+
   describe "given a valid payload for Income Verification" do
     let!(:xml) { File.read(Rails.root.join("spec", "test_data", "haven_outstanding_verification_response", "external_verifications_income_sample.xml")) }
 
@@ -128,7 +194,7 @@ describe Subscribers::FinancialAssistanceApplicationOutstandingVerification, dbc
           FactoryGirl.create(:application, id: "#{parser.fin_app_id}", family: family, aasm_state: "determined")
         }
         let!(:message) { { "body" => xml, "assistance_application_id" => parser.fin_app_id} }
-        let!(:applicant) { FactoryGirl.create(:applicant, application: application, family_member_id: family.primary_applicant.id)}
+        let!(:applicant) { FactoryGirl.create(:applicant, application: application, family_member_id: family.primary_applicant.id, aasm_state: 'verification_pending')}
         let!(:income_assisted_verification) do
           applicant.verification_types << FactoryGirl.create(:verification_type, applicant: applicant, type_name: 'Income', validation_status: "pending")
           applicant.verification_types.income.first
@@ -172,7 +238,7 @@ describe Subscribers::FinancialAssistanceApplicationOutstandingVerification, dbc
     let!(:person) { FactoryGirl.create(:person, :with_consumer_role) }
     let!(:family)  { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
     let!(:application) { FactoryGirl.create(:application, family: family, aasm_state: "determined") }
-    let!(:applicant) { FactoryGirl.create(:applicant, application: application, family_member_id: family.primary_applicant.id)}
+    let!(:applicant) { FactoryGirl.create(:applicant, application: application, family_member_id: family.primary_applicant.id, aasm_state: 'verification_pending')}
 
     before do
       subject.instance_variable_set(:@applicant_in_context, applicant)
