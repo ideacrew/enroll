@@ -29,6 +29,32 @@ module FormWorld
     end
   end
 
+  def fill_in_full_info_based_on_role(role)
+    case role
+    when /^Employer$/
+      fill_in_registration_form_employer_personal_information_registration_form
+      fill_in_employer_registration_form
+    end
+  end
+
+  def fill_in_partial_info_based_on_role(role)
+    case role
+    when /^Employer$/
+      fill_in_employer_registration_form
+    end
+  end
+
+  def config_based_page_content(sponsor)
+    case sponsor
+    when /^Employer$/
+      if site.site_key == :dc
+        expect(page).to have_content("Your Information")
+      else
+        expect(page).to have_content("My Health Benefits Program")
+      end
+    end
+  end
+
   def fill_in_employer_registration_form
     phone_number2 = page.all('input').select { |input| input[:id] == "inputNumber" }[1]
 
@@ -87,11 +113,6 @@ end
 
 World(FormWorld)
 
-Given(/^all required fields have valid inputs on the Employer Registration Form$/) do
-  fill_in_registration_form_employer_personal_information_registration_form
-  fill_in_employer_registration_form
-end
-
 Then(/^the Create Plan Year form will auto-populate the available dates fields$/) do
   expect(find('#end_on').value.blank?).to eq false
   expect(find('#open_enrollment_end_on').value.blank?).to eq false
@@ -145,8 +166,38 @@ And(/^the user is on the Employer Registration page$/) do
   sleep(3)
 end
 
-And(/^the user is registering a new Employer$/) do
-  registering_employer
+Given(/^I'm on the Registration form for a (\S+)$/) do |sponsor|
+  login_as user
+  case sponsor
+  when /^Employer$/
+    url = benefit_sponsors.new_profiles_registration_path(:profile_type => :benefit_sponsor)
+  end
+  visit url
+end
+
+When(/^I (\S+) fill out the (\S+) form$/) do |state, sponsor|
+  if state =~ Regexp.new("completely")
+    fill_in_full_info_based_on_role(sponsor)
+  elsif state =~ Regexp.new("partially")
+    fill_in_partial_info_based_on_role(sponsor)
+  end
+end
+
+And(/^I submit the (\S+) Registration form$/) do |sponsor|
+  case sponsor
+  when /^Employer$/
+    find('form#new_agency input[type="submit"]').click
+  end
+end
+
+Then(/^I (should|shouldn't) see a confirmation message for (\S+)$/) do |has_content, sponsor|
+  if has_content =~ Regexp.new("shouldn't")
+    ["first name", "last name", "date of birth", "email address", "valid area code"].each do |filed_content|
+      expect(page).to have_content("Please provide a #{filed_content}")
+    end
+  else
+    config_based_page_content(sponsor)
+  end
 end
 
 When(/^the user clicks the 'Confirm' button on the Employer Registration Form$/) do
