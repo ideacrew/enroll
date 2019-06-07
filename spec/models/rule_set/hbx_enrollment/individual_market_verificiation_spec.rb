@@ -12,6 +12,7 @@ describe RuleSet::HbxEnrollment::IndividualMarketVerification do
                                                  effective_on: effective_on,
                                                  kind: "individual",
                                                  submitted_at: effective_on - 10.days,
+                                                 family: family,
                                                  aasm_state: enrollment_status
                                                  ) }
 
