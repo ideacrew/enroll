@@ -17,6 +17,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
   let(:member_enrollment) {BenefitSponsors::Enrollments::MemberEnrollment.new(member_id:hbx_enrollment_member.id, product_price:BigDecimal(100),sponsor_contribution:BigDecimal(100))}
   let(:group_enrollment) {BenefitSponsors::Enrollments::GroupEnrollment.new(product: product, member_enrollments:[member_enrollment], product_cost_total:'')}
   let(:hbx_enrollment){ FactoryBot.create(:hbx_enrollment, :with_product, sponsored_benefit_package_id: benefit_group_assignment.benefit_group.id,
+                                           family: household.family,
                                            household: household,
                                            hbx_enrollment_members: [hbx_enrollment_member],
                                            coverage_kind: "health",
@@ -535,7 +536,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       let(:user)  { FactoryBot.create(:user, person: person) }
       let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
       let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual) }
-      let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: family.active_household, kind: 'individual', effective_on: TimeKeeper.date_of_record.beginning_of_month.to_date, product_id: product.id) }
+      let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, kind: 'individual', effective_on: TimeKeeper.date_of_record.beginning_of_month.to_date, product_id: product.id) }
 
       context "When a callback is received" do
         before do
