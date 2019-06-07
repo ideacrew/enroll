@@ -68,6 +68,14 @@ describe GeneralAgencyStaffRole, dbclean: :after_each do
         end
       end
     end
+
+    describe '.is_primary' do
+      let(:staff_role) {GeneralAgencyStaffRole.new(valid_params)}
+
+      it 'new staff_role defaults to false' do
+        expect(staff_role.is_primary).to be_falsey
+      end
+    end
   end
 
   context "aasm" do
@@ -126,6 +134,13 @@ describe GeneralAgencyStaffRole, dbclean: :after_each do
           expect(staff_role.general_agency_profile.aasm_state).to eq('is_closed')
         end
       end
+      context "general_agency_pending" do
+        it "should update the state of staff role to general_agency_pending" do
+          staff_role.update_attributes!(aasm_state: :general_agency_terminated)
+          staff_role.general_agency_pending!
+          expect(staff_role.aasm_state).to eq('general_agency_pending')
+        end
+      end
     end
   end
 
@@ -144,7 +159,7 @@ describe GeneralAgencyStaffRole, dbclean: :after_each do
       end
     end
   end
-    
+
   describe ".has_general_agency_profile?" do
     context "with_staff_role" do
       let(:staff_role) { FactoryBot.create(:general_agency_staff_role, benefit_sponsors_general_agency_profile_id: general_agency_profile.id) }

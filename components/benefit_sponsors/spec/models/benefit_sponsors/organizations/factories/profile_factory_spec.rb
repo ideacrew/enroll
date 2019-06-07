@@ -108,7 +108,7 @@ module BenefitSponsors
         :organization =>
         {
           :entity_kind => :s_corporation,
-          :fein => nil,
+          :fein => fein,
           :dba => "Doing Business As",
           :legal_name => "Lannister Army",
           :profiles_attributes =>
@@ -242,12 +242,16 @@ module BenefitSponsors
           expect(profile_factory.organization.class).to eq BenefitSponsors::Organizations::GeneralOrganization
         end
 
-        it 'should create broker agency profile' do
+        it 'should create general agency profile' do
           expect(profile_factory.profile.class).to eq BenefitSponsors::Organizations::GeneralAgencyProfile
         end
 
         it 'should create person with given data' do
           expect(profile_factory.person.full_name).to eq "Tyrion Lannister"
+        end
+
+        it 'should create general agency staff role with is_primary true' do
+          expect( profile_factory.person.general_agency_staff_roles.first.is_primary).to be_truthy
         end
 
         it 'should return redirection url' do
