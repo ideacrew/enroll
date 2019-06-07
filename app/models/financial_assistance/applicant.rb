@@ -219,19 +219,16 @@ class FinancialAssistance::Applicant
 
     event :income_outstanding, :after => [:record_transition, :change_validation_status, :notify_of_eligibility_change] do
       transitions from: :verification_pending, to: :verification_outstanding
-      transitions from: :unverified, to: :verification_outstanding
       transitions from: :verification_outstanding, to: :verification_outstanding
     end
 
     event :mec_outstanding, :after => [:record_transition, :change_validation_status, :notify_of_eligibility_change] do
       transitions from: :verification_pending, to: :verification_outstanding
-      transitions from: :unverified, to: :verification_outstanding
       transitions from: :verification_outstanding, to: :verification_outstanding
     end
 
     event :income_valid, :after => [:record_transition, :change_validation_status, :notify_of_eligibility_change] do
-      transitions from: :unverified, to: :fully_verified, :guard => :is_mec_verified?
-      transitions from: :unverified, to: :verification_pending
+      transitions from: :verification_pending, to: :verification_pending, unless: :is_mec_verified?
       transitions from: :verification_pending, to: :fully_verified, :guard => :is_mec_verified?
       transitions from: :verification_outstanding, to: :fully_verified, :guard => :is_mec_verified?
       transitions from: :verification_outstanding, to: :verification_outstanding
@@ -239,12 +236,32 @@ class FinancialAssistance::Applicant
     end
 
     event :mec_valid, :after => [:record_transition, :change_validation_status, :notify_of_eligibility_change] do
-      transitions from: :unverified, to: :fully_verified, :guard => :is_income_verified?
-      transitions from: :unverified, to: :verification_pending
+      transitions from: :verification_pending, to: :verification_pending, unless: :is_income_verified?
       transitions from: :verification_pending, to: :fully_verified, :guard => :is_income_verified?
       transitions from: :verification_outstanding, to: :fully_verified, :guard => :is_income_verified?
       transitions from: :verification_outstanding, to: :verification_outstanding
       transitions from: :fully_verified, to: :fully_verified
+    end
+
+    event :reject, :after => [:record_transition, :notify_of_eligibility_change] do
+      transitions from: :unverified, to: :verification_outstanding
+      transitions from: :verification_pending, to: :verification_outstanding
+      transitions from: :verification_outstanding, to: :verification_outstanding
+      transitions from: :fully_verified, to: :verification_outstanding
+    end
+
+    event :move_to_pending, :after => [:record_transition, :notify_of_eligibility_change] do
+      transitions from: :unverified, to: :verification_pending
+      transitions from: :verification_pending, to: :verification_pending
+      transitions from: :verification_outstanding, to: :verification_pending
+      transitions from: :fully_verified, to: :verification_pending
+    end
+
+    event :move_to_unverified, :after => [:record_transition, :notify_of_eligibility_change] do
+      transitions from: :unverified, to: :unverified
+      transitions from: :verification_pending, to: :unverified
+      transitions from: :verification_outstanding, to: :unverified
+      transitions from: :fully_verified, to: :unverified
     end
   end
 
@@ -511,11 +528,24 @@ class FinancialAssistance::Applicant
 
   def update_verification_type(v_type, update_reason)
     v_type.update_attributes(validation_status: 'verified', update_reason: update_reason)
-    "#{v_type.type_name} successfully approved"
+    all_types_verified? && !fully_verified? ? verify_ivl_by_admin(v_type) : "#{v_type.type_name} successfully verified."
+  end
+
+  def verify_ivl_by_admin(v_type)
+    if v_type.type_name == 'Income'
+      income_valid!
+    else
+      mec_valid!
+    end
+  end
+
+  def all_types_verified?
+    verification_types.all?(&:type_verified?)
   end
 
   def return_doc_for_deficiency(v_type, update_reason)
     v_type.update_attributes(validation_status: 'outstanding', update_reason: update_reason)
+    reject!
     "#{v_type.type_name} was rejected"
   end
 
@@ -739,7 +769,9 @@ class FinancialAssistance::Applicant
   def record_transition
     workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
-      to_state: aasm.to_state
+      to_state: aasm.to_state,
+      event: aasm.current_event,
+      user_id: SAVEUSER[:current_user_id]
     )
   end
 

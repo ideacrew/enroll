@@ -11,8 +11,16 @@ module Subscribers
     def call(event_name, e_start, e_end, msg_id, payload)
       stringed_key_payload = payload.stringify_keys
       xml = stringed_key_payload["body"]
+      return_status = stringed_key_payload["return_status"].to_s
 
       application = FinancialAssistance::Application.where(id: stringed_key_payload["assistance_application_id"]).first if stringed_key_payload["assistance_application_id"].present?
+
+
+      if return_status.to_s == "503"
+        move_applicants_to_outstanding(application)
+        return
+      end
+
       if application.present? && application.aasm_state == "determined"
 
         if verification_payload_schema_valid?(xml)
@@ -57,15 +65,19 @@ module Subscribers
       if xml.include?('income_verification_result')
         verified_income_verification = Parsers::Xml::Cv::OutstandingIncomeVerificationParser.new
         verified_income_verification.parse(xml)
-        verified_person = verified_income_verification.verifications.first.individual
-        import_assisted_verification("Income", verified_person, verified_income_verification)
-        store_payload("Income", xml)
+        verified_income_verification.verifications.each do |verification|
+          verified_person = verification.individual
+          import_assisted_verification("Income", verified_person, verified_income_verification)
+          store_payload("Income", xml)
+        end
       elsif xml.include?('mec_verification_result')
         verified_mec_verfication = Parsers::Xml::Cv::OutstandingMecVerificationParser.new
         verified_mec_verfication.parse(xml)
-        verified_person = verified_mec_verfication.verifications.first.individual
-        import_assisted_verification("MEC", verified_person, verified_mec_verfication)
-        store_payload("MEC", xml)
+        verified_mec_verfication.verifications.each do |verification|
+          verified_person = verification.individual
+          import_assisted_verification("MEC", verified_person, verified_mec_verfication)
+          store_payload("MEC", xml)
+        end
       end
     end
 
@@ -82,6 +94,20 @@ module Subscribers
       status = verified_verification.verifications.first.response_code.split('#').last
       update_applicant(kind, @applicant_in_context, status)
       application_in_context.save!
+    end
+
+    def move_applicants_to_outstanding(application)
+      return unless application.present?
+      application.active_applicants.each do |applicant|
+        if !applicant.has_income_verification_response
+          applicant.income_outstanding!
+        elsif !applicant.has_mec_verification_response
+          applicant.mec_outstanding!
+        else
+          applicant.income_outstanding!
+          applicant.mec_outstanding!
+        end
+      end
     end
 
     def update_applicant(kind, applicant, status)

@@ -184,8 +184,8 @@ class FinancialAssistance::Application
     state :determination_response_error
     state :determined
 
-    event :submit, :after => :record_transition do
-      transitions from: :draft, to: :submitted, :after => :set_submit do
+    event :submit, :after => [:record_transition, :set_submit] do
+      transitions from: :draft, to: :submitted do
         guard do
           is_application_valid?
         end
@@ -679,6 +679,7 @@ private
   end
 
   def set_submit
+    return unless submitted?
     set_submission_date
     set_assistance_year
     set_effective_date
@@ -736,6 +737,7 @@ private
     active_applicants.each do |applicant|
       %w[Income MEC].each do |type|
         applicant.verification_types << VerificationType.new(type_name: type, validation_status: 'pending' )
+        applicant.move_to_pending!
       end
     end
   end
@@ -743,6 +745,7 @@ private
   def delete_verification_documents
     active_applicants.each do |applicant|
       applicant.verification_types.destroy_all
+      applicant.move_to_unverified!
     end
   end
 end

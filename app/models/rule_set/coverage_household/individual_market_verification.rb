@@ -22,7 +22,7 @@ module RuleSet
       end
 
       def determine_next_state
-        return(:move_to_pending!) if (roles_for_determination.any?(&:ssa_pending?) || roles_for_determination.any?(&:dhs_pending?) || applicants_for_determination.any?(&:income_pending?) || applicants_for_determination.any?(&:mec_pending?))
+        return(:move_to_pending!) if roles_for_determination.any?(&:ssa_pending?) || roles_for_determination.any?(&:dhs_pending?) || applicants_for_determination.any?(&:verification_pending?)
         return(:move_to_contingent!) if roles_for_determination.any?(&:verification_outstanding?) || roles_for_determination.any?(&:verification_period_ended?) || applicants_for_determination.any?(&:verification_outstanding?)
         :move_to_enrolled!
       end
