@@ -97,7 +97,10 @@ describe CorrectEmployeesWithIncorrectWaivers, dbclean: :after_each do
 
     def create_enrollment(family: nil, benefit_group_assignment: nil, employee_role: nil, status: 'coverage_selected', submitted_at: nil, enrollment_kind: 'open_enrollment', effective_date: nil, coverage_kind: 'health', created_at: nil)
       benefit_group = benefit_group_assignment.benefit_group
-      FactoryBot.create(:hbx_enrollment,:with_enrollment_members,
+      FactoryBot.create(
+        :hbx_enrollment,
+        :with_enrollment_members,
+        family: family,
         enrollment_members: [family.primary_applicant],
         household: family.active_household,
         coverage_kind: coverage_kind,
