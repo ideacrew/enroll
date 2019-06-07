@@ -1,5 +1,4 @@
   require 'csv'
-  
   field_names  = %w(
                      user_name
                      email  
@@ -16,5 +15,5 @@
       processed_count += 1
     end
     offset = offset + batch_size
-    puts "#{org_count} orphan user listed in #{file_name}" unless Rails.env.test?
+    puts "#{processed_count} orphan user listed in #{file_name}" unless Rails.env.test?
   end
