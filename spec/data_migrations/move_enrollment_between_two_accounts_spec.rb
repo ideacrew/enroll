@@ -28,6 +28,7 @@ describe MoveEnrollmentBetweenTwoAccount, dbclean: :after_each do
                            kind: "individual",
                            submitted_at: TimeKeeper.date_of_record,
                            consumer_role: consumer_role,
+                           family: family1,
                            aasm_state: 'shopping')
                         }
     let!(:consumer_role) {FactoryBot.create(:consumer_role,person: family1.family_members[0].person)}
@@ -73,6 +74,7 @@ describe MoveEnrollmentBetweenTwoAccount, dbclean: :after_each do
                          household: family1.active_household,
                          coverage_kind: "health",
                          kind: "employer_sponsored",
+                         family: family1,
                          submitted_at: TimeKeeper.date_of_record,
                          employee_role: employee_role,
                          aasm_state: 'shopping',
