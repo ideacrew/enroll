@@ -124,8 +124,6 @@ group :development do
 end
 
 group :development, :test do
-gem 'pry'
-gem 'rb-readline'
   # gem 'bundler-audit',          '~> 0.6'
   gem 'capistrano',             '~> 3.1'
   gem 'capistrano-rails',       '1.4'
@@ -141,6 +139,12 @@ gem 'rb-readline'
   gem 'yard-mongoid',           '~> 0.1',     require: false
   gem 'rails-controller-testing'
   gem 'climate_control', '~> 0.2.0'
+  gem 'pry'
+  gem 'pry-byebug'
+  gem 'pry-rails'
+  gem 'pry-remote'
+  gem 'pry-stack_explorer'
+  gem 'rb-readline'
 end
 
 group :test do
