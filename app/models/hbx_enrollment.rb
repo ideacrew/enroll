@@ -1254,28 +1254,28 @@ class HbxEnrollment
     may_terminate_coverage? and effective_on <= TimeKeeper.date_of_record
   end
 
-  def self.find(id)
-    id = BSON::ObjectId.from_string(id) if id.is_a? String
-    families = Family.where({
-                              "households.hbx_enrollments._id" => id
-                            })
-    found_value = catch(:found) do
-      families.each do |family|
-        family.households.each do |household|
-          household.hbx_enrollments.each do |enrollment|
-            if enrollment.id == id
-              throw :found, enrollment
-            end
-          end
-        end
-      end
-      raise Mongoid::Errors::DocumentNotFound.new(self, id)
-    end
-    return found_value
-  rescue
-    log("Can not find hbx_enrollments with id #{id}", {:severity => "error"})
-    nil
-  end
+  # def self.find(id)
+  #   id = BSON::ObjectId.from_string(id) if id.is_a? String
+  #   families = Family.where({
+  #                             "households.hbx_enrollments._id" => id
+  #                           })
+  #   found_value = catch(:found) do
+  #     families.each do |family|
+  #       family.households.each do |household|
+  #         household.hbx_enrollments.each do |enrollment|
+  #           if enrollment.id == id
+  #             throw :found, enrollment
+  #           end
+  #         end
+  #       end
+  #     end
+  #     raise Mongoid::Errors::DocumentNotFound.new(self, id)
+  #   end
+  #   return found_value
+  # rescue
+  #   log("Can not find hbx_enrollments with id #{id}", {:severity => "error"})
+  #   nil
+  # end
 
   def self.find_by_benefit_groups(benefit_groups = [])
     id_list = benefit_groups.collect(&:_id).uniq
