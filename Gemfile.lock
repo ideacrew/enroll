@@ -228,12 +228,15 @@ GEM
     backports (3.15.0)
     bcrypt (3.1.13)
     bindex (0.7.0)
+    binding_of_caller (0.8.0)
+      debug_inspector (>= 0.0.1)
     bootsnap (1.4.4)
       msgpack (~> 1.0)
     bson (4.5.0)
     builder (3.2.3)
     bunny (1.7.1)
       amq-protocol (~> 1.9.2)
+    byebug (11.0.1)
     capistrano (3.11.0)
       airbrussh (>= 1.0.0)
       i18n
@@ -343,6 +346,7 @@ GEM
       awesome_print (>= 0.2.1)
       unidecoder (>= 1.1.1)
     database_cleaner (1.7.0)
+    debug_inspector (0.0.3)
     deep_merge (1.2.1)
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
@@ -743,6 +747,7 @@ GEM
       actionpack (>= 3.1)
       railties (>= 3.1)
       slim (>= 3.0, < 5.0)
+    slop (3.6.0)
     sneakers (1.1.2)
       bunny (>= 1.7.0, <= 2.0.0)
       serverengine (~> 1.5.5)
@@ -897,6 +902,10 @@ DEPENDENCIES
   poltergeist (~> 1.18.0)
   prawn!
   pry
+  pry-byebug
+  pry-rails
+  pry-remote
+  pry-stack_explorer
   puma (~> 3.11)
   pundit (~> 2.0)
   railroady (~> 1.5.3)
