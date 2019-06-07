@@ -5,7 +5,7 @@ $(document).ready(function() {
     $('.confirmation').addClass('hidden');
     $('#terminate-confirm').removeClass('hidden');
     $('#calendar-div').removeClass('hidden');
-    $('#btn-terminate').val('Terminate');
+    // $('#btn-terminate').val('Terminate');
     $('#enter-text').removeClass('hidden').html('Enter the date of termination');
     $('#term_date').val('');
     $('#applied-aptc-text').addClass('hidden');
@@ -16,7 +16,7 @@ $(document).ready(function() {
     $('.confirmation').addClass('hidden');
     $('#cancel-confirm').removeClass('hidden');
     $('#calendar-div').removeClass('hidden');
-    $('#btn-terminate').val('Cancel');
+    // $('#btn-terminate').val('Cancel');
     $('#enter-text').removeClass('hidden').html('Enter the date of cancellation');
     $('#term_date').val('');
     $('#applied-aptc-text').addClass('hidden');
@@ -27,7 +27,7 @@ $(document).ready(function() {
     $('.confirmation').addClass('hidden');
     $('#aptc-confirm').removeClass('hidden');
     $('#calendar-div').removeClass('hidden');
-    $('#btn-terminate').val('Confirm APTC');
+    // $('#btn-terminate').val('Confirm APTC');
     $('#enter-text').addClass('hidden');
     $('#term_date').val('07/01/2019');
     $('#applied-aptc-text').removeClass('hidden');
