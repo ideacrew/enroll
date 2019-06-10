@@ -183,10 +183,31 @@ class MigrateDcBenefitApplication < Mongoid::Migration
       attributes[:dental_plan_option_kind] = benefit_group.dental_plan_option_kind
       attributes[:elected_dental_plan_hios_ids] = benefit_group.elected_dental_plans.map(&:hios_id)
       if attributes[:dental_plan_option_kind].blank? &&  # TODO fix prod data.
-        attributes[:dental_plan_option_kind] = benefit_group.elected_dental_plans.pluck(:carrier_profile_id).uniq.count == 1 ? "single_carrier" : "single_plan"
+        attributes[:dental_plan_option_kind] = get_dental_plan_option_kind(benefit_group)
       end
     end
     attributes.symbolize_keys
+  end
+
+  def self.get_dental_plan_option_kind(benefit_group)
+    year = benefit_group.start_on.year
+    dental_hios_id = case year
+               when 2019
+                 ["78079DC0330001", "78079DC0340001"]
+               when 2018
+                ["78079DC0330001", "78079DC0340001", "92479DC0040004", "92479DC0040005", "92479DC0030004"]
+               when 2017
+                ["78079DC0330001", "78079DC0340001", "92479DC0040004", "92479DC0040005", "81334DC0020006", "81334DC0020004", "81334DC0040006", "81334DC0040004", "43849DC0080001", "43849DC0090001", "92479DC0030004"]
+               when 2016
+                ["92479DC0040004", "92479DC0040005", "78079DC0330001", "78079DC0340001", "81334DC0020006", "81334DC0020004", "81334DC0040006", "81334DC0040004", "96156DC0020006", "96156DC0020004", "43849DC0080001", "43849DC0090001", "92479DC0030004"]
+               when 2014
+                ["92479DC0020002", "81334DC0010006", "81334DC0010004", "81334DC0030006", "81334DC0030004", "96156DC0010006", "96156DC0010004", "92479DC0010002"]
+               else
+                 []
+               end
+    bg_dental_carrier = benefit_group.elected_dental_plans.pluck(:carrier_profile_id)
+    bg_plan_hios_id =  benefit_group.elected_dental_plans.pluck(:hios_id)
+    bg_dental_carrier.uniq.count == 1 && dental_hios_id - bg_plan_hios_id == [] ? "single_carrier" : "single_plan"
   end
 
   def self.construct_workflow_state_transitions(plan_year)
