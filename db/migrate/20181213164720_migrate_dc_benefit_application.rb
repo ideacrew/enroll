@@ -150,7 +150,6 @@ class MigrateDcBenefitApplication < Mongoid::Migration
 
     @benefit_application.aasm_state = set_benefit_application_state(plan_year)
     @benefit_application.predecessor_id = set_predecessor_application
-    set_predecessor_for_benefit_package
     construct_workflow_state_transitions(plan_year)
     @benefit_application
   end
@@ -169,26 +168,6 @@ class MigrateDcBenefitApplication < Mongoid::Migration
     benefit_applications =  @benefit_sponsorship.benefit_applications.select{ |app| app.start_on == @benefit_application.start_on.prev_day && [:active, :terminated, :expired, :imported].include?(app.aasm_state) }
     raise Standard, "More than One Predecessor application found, benefit_sponsorship: #{@benefit_sponsorship.id}" if benefit_applications.count > 1
     benefit_applications.present? ? benefit_applications.first.id : nil
-  end
-
-  def self.set_predecessor_for_benefit_package
-    return unless @benefit_application.predecessor_id.present?
-    return unless @benefit_application.start_on >= Date.new(2019,6,1) # set benefit package for latest application
-
-    predecessor_benefit_packages = @benefit_application.predecessor.benefit_packages
-
-    if predecessor_benefit_packages.count < 2
-      benefit_package =  @benefit_application.benefit_packages.first
-      benefit_package.predecessor_id = predecessor_benefit_packages.first.id
-    else
-      @benefit_application.benefit_packages.each do |benefit_package|
-        predecessor_package = predecessor_benefit_packages.select{|predecessor_package| predecessor_package.reference_product == benefit_package.reference_product }
-        raise Standard, "More than One Predecessor benefit package found, benefit_application: #{@benefit_application.id}" if predecessor_package.count > 1
-        raise Standard, "Predecessor benefit package not found, benefit_application: #{@benefit_application.id}" if predecessor_package.count == 0
-
-        benefit_package.predecessor_id  = predecessor_package.first.id
-      end
-    end
   end
 
   def self.sanitize_benefit_group_attrs(benefit_group)
