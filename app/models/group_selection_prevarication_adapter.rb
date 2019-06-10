@@ -199,7 +199,7 @@ class GroupSelectionPrevaricationAdapter
   def select_benefit_group(params)
     return unless select_market(params) == "shop"
 
-    if @change_plan.present? && @previous_hbx_enrollment.present?
+    if @change_plan.present? && @previous_hbx_enrollment.present? && @previous_hbx_enrollment.is_shop?
       @previous_hbx_enrollment.sponsored_benefit_package 
     else
       if (select_market(params) == "shop") && possible_employee_role.present?
