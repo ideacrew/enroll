@@ -853,7 +853,7 @@ class ConsumerRole
   end
 
   def create_initial_market_transition
-    return if person.individual_market_transitions.present?
+    return if !person.individual_market_transitions.where(role_type:"consumer").first.nil?
     transition = IndividualMarketTransition.new
     transition.role_type = "consumer"
     transition.submitted_at = TimeKeeper.datetime_of_record
