@@ -885,7 +885,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
     before :all do
       family = FactoryBot.create(:family, :with_primary_family_member)
-      @enrollment = FactoryBot.create(:hbx_enrollment, household: family.active_household)
+      @enrollment = FactoryBot.create(:hbx_enrollment, family: household.family, household: family.active_household)
     end
 
     it "should update employee_role hired_on" do
@@ -1107,9 +1107,9 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       let(:employee_role) {FactoryBot.create(:benefit_sponsors_employee_role, employer_profile: employer_profile)}
       let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
 
-      let(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, sponsored_benefit_package_id: benefit_group.id, household: family.active_household, coverage_kind: 'health', employee_role_id: employee_role.id)}
-      let(:hbx_enrollment_two) {FactoryBot.create(:hbx_enrollment, sponsored_benefit_package_id: benefit_group.id, household: family.active_household, coverage_kind: 'dental', employee_role_id: employee_role.id)}
-      let(:hbx_enrollment_three) {FactoryBot.create(:hbx_enrollment, sponsored_benefit_package_id: benefit_group.id, household: family.active_household, aasm_state: 'renewing_waived', employee_role_id: employee_role.id)}
+      let(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, family: family, sponsored_benefit_package_id: benefit_group.id, household: family.active_household, coverage_kind: 'health', employee_role_id: employee_role.id)}
+      let(:hbx_enrollment_two) {FactoryBot.create(:hbx_enrollment, family: family, sponsored_benefit_package_id: benefit_group.id, household: family.active_household, coverage_kind: 'dental', employee_role_id: employee_role.id)}
+      let(:hbx_enrollment_three) {FactoryBot.create(:hbx_enrollment, family: family, sponsored_benefit_package_id: benefit_group.id, household: family.active_household, aasm_state: 'renewing_waived', employee_role_id: employee_role.id)}
       let(:assignment) {double("BenefitGroupAssignment", benefit_package: benefit_group)}
 
       before do
