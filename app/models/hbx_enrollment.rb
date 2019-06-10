@@ -811,12 +811,12 @@ class HbxEnrollment
     end
   end
 
-  def subscriber
-    hbx_enrollment_members.detect(&:is_subscriber)
+  def household
+    family.households.where(id: self.household_id).first
   end
 
-  def family
-    household.family if household.present?
+  def subscriber
+    hbx_enrollment_members.detect(&:is_subscriber)
   end
 
   def applicant_ids
