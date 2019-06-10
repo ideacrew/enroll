@@ -1140,6 +1140,7 @@ module BenefitSponsors
         :suspended                => :suspended,
         :terminated               => :terminated,
         :expired                  => :expired,
+        :migration_expired        => :expired,
         :conversion_expired       => :expired,    # Conversion employers who did not establish eligibility in a timely manner
         :canceled                 => :canceled,
         :renewing_canceled        => :canceled,
