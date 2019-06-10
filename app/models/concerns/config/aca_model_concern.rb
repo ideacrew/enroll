@@ -162,5 +162,9 @@ module Config::AcaModelConcern
     def offerings_constrained_to_service_areas?
       @@offerings_constrained_to_service_areas ||= Settings.aca.offerings_constrained_to_service_areas
     end
+
+    def offers_nationwide_plans?
+      @offers_nationwide_plans ||= Settings.aca.nationwide_markets
+    end
   end
 end

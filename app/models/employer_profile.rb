@@ -24,6 +24,12 @@ class EmployerProfile
   RENEWAL_APPLICATION_CARRIER_DROP_EVENT_TAG="benefit_coverage_renewal_carrier_dropped"
   RENEWAL_EMPLOYER_CARRIER_DROP_EVENT="acapi.info.events.employer.benefit_coverage_renewal_carrier_dropped"
 
+  NFP_ENROLLMENT_DATA_REQUEST = "acapi.info.events.employer.nfp_enrollment_data_request"
+  NFP_PAYMENT_HISTORY_REQUEST = "acapi.info.events.employer.nfp_payment_history_request"
+  NFP_PDF_REQUEST = "acapi.info.events.employer.nfp_pdf_request"
+  NFP_STATEMENT_SUMMARY_REQUEST = "acapi.info.events.employer.nfp_statement_summary_request"
+
+
   ACTIVE_STATES   = ["applicant", "registered", "eligible", "binder_paid", "enrolled"]
   INACTIVE_STATES = ["suspended", "ineligible"]
 
@@ -144,6 +150,7 @@ class EmployerProfile
 
   # for broker agency
   def hire_broker_agency(new_broker_agency, start_on = today)
+    SponsoredBenefits::Organizations::BrokerAgencyProfile.assign_employer(broker_agency: new_broker_agency, employer: self) if organization
     start_on = start_on.to_date.beginning_of_day
     if active_broker_agency_account.present?
       terminate_on = (start_on - 1.day).end_of_day
@@ -156,6 +163,7 @@ class EmployerProfile
 
   def fire_broker_agency(terminate_on = today)
     return unless active_broker_agency_account
+    SponsoredBenefits::Organizations::BrokerAgencyProfile.unassign_broker(broker_agency: active_broker_agency_account.broker_agency_profile, employer: self) if organization
     active_broker_agency_account.end_on = terminate_on
     active_broker_agency_account.is_active = false
     active_broker_agency_account.save!
@@ -252,6 +260,14 @@ class EmployerProfile
 
   def notify_general_agent_terminated
     notify("acapi.info.events.employer.general_agent_terminated", {employer_id: self.hbx_id, event_name: "general_agent_terminated"})
+  end
+
+  def has_premium_payments?
+    try(:employer_profile_account).try(:premium_payments) ? true : false
+  end
+
+  def premium_payments
+    try(:employer_profile_account).try(:premium_payments) || nil
   end
 
   # TODO - turn this in to counter_cache -- see: https://gist.github.com/andreychernih/1082313
@@ -1019,6 +1035,22 @@ class EmployerProfile
 
   def notify_broker_terminated
     notify("acapi.info.events.employer.broker_terminated", {employer_id: self.hbx_id, event_name: "broker_terminated"})
+  end
+
+  def notify_enrollment_data_request
+    notify(NFP_ENROLLMENT_DATA_REQUEST, {employer_id: self.hbx_id, event_name: "nfp_enrollment_data_request"})
+  end
+
+  def notify_payment_history_request
+    notify(NFP_PAYMENT_HISTORY_REQUEST, {employer_id: self.hbx_id, event_name: "nfp_payment_history_request"})
+  end
+
+  def notify_pdf_request
+    notify(NFP_PDF_REQUEST, {employer_id: self.hbx_id, event_name: "nfp_pdf_request"})
+  end
+
+  def notify_statement_summary_request
+    notify(NFP_STATEMENT_SUMMARY_REQUEST, {employer_id: self.hbx_id, event_name: "nfp_statement_summary_request"})
   end
 
   def notify_general_agent_added

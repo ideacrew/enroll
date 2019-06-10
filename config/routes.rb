@@ -5,8 +5,8 @@ Rails.application.routes.draw do
   mount Notifier::Engine, at: "/notifier" 
   #mount RocketJobMissionControl::Engine => 'rocketjob'
   require 'resque/server'
-  # mount Resque::Server, at: '/jobs'
-
+#  mount Resque::Server, at: '/jobs'
+  mount SponsoredBenefits::Engine,      at: "/sponsored_benefits"
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions' }
 
   get 'check_time_until_logout' => 'session_timeout#check_time_until_logout', :constraints => { :only_ajax => true }
@@ -309,6 +309,7 @@ Rails.application.routes.draw do
       post 'bulk_employee_upload'
       member do
         get "download_invoice"
+        get 'show_invoice'
         post 'generate_checkbook_urls'
       end
       collection do
@@ -373,7 +374,6 @@ Rails.application.routes.draw do
 
       collection do
         get :family_index
-        get :employers
         get :messages
         get :staff_index
         get :agency_messages
@@ -383,8 +383,6 @@ Rails.application.routes.draw do
         get :general_agency_index
         get :manage_employers
         post :clear_assign_for_employer
-        get :assign
-        post :update_assign
         post :employer_datatable
         post :family_datatable
         post :set_default_ga
