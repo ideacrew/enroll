@@ -8,6 +8,14 @@ module BenefitSponsors
       field :enable_ssn_date, type: DateTime
       field :disable_ssn_date, type: DateTime
 
+      def rating_area
+        # FIX this
+      end
+
+      def sic_code
+        # Fix this
+      end
+
       private
 
       def initialize_profile

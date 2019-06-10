@@ -44,13 +44,45 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
     site = sites.first
 
     old_organizations = Organization.unscoped.exists(:employer_profile => true)
-
-    #counters
     total_organizations = old_organizations.count
     existing_organization = 0
     success =0
     failed = 0
     limit_count = 1000
+
+
+    say_with_time("Time taken to create benefit sposonsorship") do # TODO check with trey creating empty benefit applications
+      Organization.collection.aggregate([
+        {"$match" => {"employer_profile" => { "$exists" => true }}},
+        {"$project" => {"hbx_id"=> 1, "employer_profile.profile_source"=> 1,
+                        "employer_profile.registered_on"=> 1,"employer_profile.plan_years" => 1}},
+
+        {"$unwind" => {"path": "$employer_profile.plan_years", "preserveNullAndEmptyArrays": true}},
+
+        {"$project" => {
+            "hbx_id" => 1, 'employer_profile.profile_source'=> 1, "employer_profile.registered_on" => 1,
+            "benefit_application" => {"fte_count" => "$employer_profile.plan_years.fte_count",
+                                      "_id" => "$employer_profile.plan_years._id",
+                                      "pte_count"=> "$employer_profile.plan_years.pte_count",
+                                      "msp_count"=> "$employer_profile.plan_years.msp_count",
+                                      "created_at"=> "$employer_profile.plan_years.created_at",
+                                      "updated_at"=>"$employer_profile.plan_years.updated_at",
+                                      "terminated_on"=>"$employer_profile.plan_years.terminated_on",
+                                      "aasm_state" => '$employer_profile.plan_years.aasm_state',
+                                      "effective_period" => { "min": "$employer_profile.plan_years.start_on","max": "$employer_profile.plan_years.end_on" },
+                                      "open_enrollment_period" => { "min": "$employer_profile.plan_years.open_enrollment_start_on","max": "$employer_profile.plan_years.open_enrollment_end_on" }}}},
+        {"$group"=>{"_id" =>  "$_id","hbx_id" => {"$last" => "$hbx_id"},
+                    "source_kind" => {"$last"=> "$employer_profile.profile_source"},
+                    "registered_on" => {"$last" => "$employer_profile.registered_on"},
+                    "benefit_applications" => {"$push" => "$benefit_application"}}},
+        {"$out" => "benefit_sponsors_benefit_sponsorships_benefit_sponsorships"}
+    ]).each
+    end
+
+    # "benefit_applications" => {"$push" => {"$cond" => { if: { "$ne": [ "$benefit_application.effective_period", {}]},
+    #                                                     then: "$benefit_application", else: [],}
+
+
 
     say_with_time("Time taken to migrate organizations") do
       old_organizations.batch_size(limit_count).no_timeout.each do |old_org|
@@ -59,21 +91,30 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
           if existing_new_organizations.count == 0
             @old_profile = old_org.employer_profile
 
-            # TODO Adding enable_ssn_date & disable_ssn_date
-            # TODO check except _id
-            json_data = @old_profile.to_json(:except => [:sic_code, :xml_transmitted_timestamp, :entity_kind, :profile_source, :aasm_state, :registered_on, :contact_method, :employer_attestation, :broker_agency_accounts, :general_agency_accounts, :employer_profile_account, :plan_years, :updated_by_id, :workflow_state_transitions, :inbox, :documents])
+            json_data = @old_profile.to_json(:except => [:_id, :sic_code, :xml_transmitted_timestamp, :entity_kind, :profile_source, :aasm_state, :registered_on, :contact_method, :employer_attestation, :broker_agency_accounts, :general_agency_accounts, :employer_profile_account, :plan_years, :updated_by_id, :workflow_state_transitions, :inbox, :documents])
             old_profile_params = JSON.parse(json_data)
 
             @new_profile = initialize_new_profile(old_org, old_profile_params)
             new_organization = initialize_new_organization(old_org, site)
-
             market = is_congress?(old_org) ? site.benefit_market_for(:fehb): benefit_market
-            @benefit_sponsorship = new_organization.benefit_sponsorships.build(profile: @new_profile, benefit_market: market)
-            @benefit_sponsorship.source_kind = @old_profile.profile_source.to_sym
 
-            raise Exception unless @benefit_sponsorship.valid?
+            @benefit_sponsorship = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(hbx_id: old_org.hbx_id).first
+            @benefit_sponsorship.benefit_applications = [] if @benefit_sponsorship.benefit_applications.any?{|b| b.effective_period.min.blank?}
+            @benefit_sponsorship.profile_id = @new_profile.id
+            @benefit_sponsorship.benefit_market = market
+            @benefit_sponsorship.source_kind = @old_profile.profile_source.to_sym
+            @benefit_sponsorship.organization_id = new_organization.id
+            hbx_id = @benefit_sponsorship.send(:generate_hbx_id)
+            @benefit_sponsorship.hbx_id = hbx_id
+
+            set_benefit_sponsorship_state
+            set_benefit_sponsorship_effective_on
+            construct_workflow_state_for_benefit_sponsorship
+
+            #raise Exception unless @benefit_sponsorship.valid?
             BenefitSponsors::BenefitSponsorships::BenefitSponsorship.skip_callback(:save, :after, :notify_on_save, raise: false)
-            @benefit_sponsorship.save!
+            BenefitSponsors::BenefitSponsorships::BenefitSponsorship.skip_callback(:create, :before, :generate_hbx_id, raise: false)
+            @benefit_sponsorship.save(validate:false)
 
             raise Exception unless new_organization.valid?
             BenefitSponsors::Organizations::Organization.skip_callback(:create, :after, :notify_on_create, raise: false)
@@ -178,7 +219,7 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
   end
 
   def self.find_census_employees
-    CensusEmployee.where(employer_profile_id: @old_profile.id)
+    CensusEmployee.unscoped.where(employer_profile_id: @old_profile.id)
   end
 
   def self.link_existing_census_employees_to_new_profile(census_employees_with_old_id)
@@ -191,6 +232,28 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
 
   def self.is_exempt_org?(organization)
     ['governmental_employer','foreign_embassy_or_consulate'].include?(organization.employer_profile.entity_kind)
+  end
+
+  def self.set_benefit_sponsorship_state
+    @benefit_sponsorship.aasm_state = @benefit_sponsorship.send(:employer_profile_to_benefit_sponsor_states_map)[@old_profile.aasm_state.to_sym]
+  end
+
+  def self.set_benefit_sponsorship_effective_on
+    effective_begin_on = if @old_profile.plan_years.present?
+                           @old_profile.plan_years.asc(:start_on).first.start_on
+                         else
+                           nil
+                         end
+    @benefit_sponsorship.effective_begin_on = effective_begin_on
+  end
+
+  def self.construct_workflow_state_for_benefit_sponsorship
+    @old_profile.workflow_state_transitions.unscoped.asc(:transition_at).each do |wst|
+      attributes = wst.attributes.except(:_id)
+      attributes[:from_state] = @benefit_sponsorship.send(:employer_profile_to_benefit_sponsor_states_map)[wst.from_state.to_sym]
+      attributes[:to_state] = @benefit_sponsorship.send(:employer_profile_to_benefit_sponsor_states_map)[wst.to_state.to_sym]
+      @benefit_sponsorship.workflow_state_transitions.build(attributes)
+    end
   end
 
   def self.find_site(site_key)
