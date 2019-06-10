@@ -76,7 +76,7 @@ module SponsoredBenefits
           benefit_group.update_attributes({
             dental_plan_option_kind: attrs[:plan_option_kind],
             dental_reference_plan_id: attrs[:reference_plan_id],
-            dental_relationship_benefits_attributes: attrs[:relationship_benefits_attributes]
+            dental_relationship_benefits_attributes: attrs[:relationship_benefits_attributes].as_json
           })
         else
           benefit_group.update_attributes(attrs)

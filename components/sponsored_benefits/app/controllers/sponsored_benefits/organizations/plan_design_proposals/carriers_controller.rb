@@ -24,7 +24,7 @@ module SponsoredBenefits
         end
 
         def active_year
-          params[:active_year]
+          params[:active_year] || Timekeeper.date_of_record.year
         end
 
         def kind
