@@ -197,6 +197,8 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def select_benefit_group(params)
+    return unless select_market(params) == "shop"
+
     if @change_plan.present? && @previous_hbx_enrollment.present?
       @previous_hbx_enrollment.sponsored_benefit_package 
     else
@@ -228,9 +230,9 @@ class GroupSelectionPrevaricationAdapter
     end
     if person.has_active_employee_role?
       'shop'
-    elsif person.has_active_consumer_role? && !person.has_active_resident_role?
+    elsif person.is_consumer_role_active?
       'individual'
-    elsif person.has_active_resident_role?
+    elsif person.is_resident_role_active?
       'coverall'
     else
       nil
