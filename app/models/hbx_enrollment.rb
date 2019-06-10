@@ -216,7 +216,15 @@ class HbxEnrollment
                                                           :"effective_on".gte => effective_period.min,
                                                           :"effective_on".lte => effective_period.max
                                                         )}
-
+  
+  scope :by_benefit_application_and_sponsored_benefit,  ->(benefit_application, sponsored_benefit, end_date) do 
+    where(
+      :"sponsored_benefit_id" => sponsored_benefit._id,
+      :"aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES),
+      :"effective_on".lte => end_date,
+      :"effective_on".gte => benefit_application.effective_period.min
+    )
+  end
   embeds_many :workflow_state_transitions, as: :transitional
 
   belongs_to :benefit_sponsorship, class_name: "::BenefitSponsors::BenefitSponsorships::BenefitSponsorship", optional: true
