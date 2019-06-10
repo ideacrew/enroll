@@ -709,7 +709,7 @@ describe "it should check the residency status" do
   let(:consumer) { person.consumer_role }
   let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx" })}
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person) }
-  let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: family.active_household, aasm_state: "coverage_selected", kind: 'individual') }
+  let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, aasm_state: "coverage_selected", kind: 'individual') }
   let!(:hbx_enrollment_member) { FactoryBot.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: hbx_enrollment) }
   let!(:enrollment) {consumer.person.primary_family.active_household.hbx_enrollments.first}
   context "consumer role should check for eligibility" do
