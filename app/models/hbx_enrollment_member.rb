@@ -37,7 +37,7 @@ class HbxEnrollmentMember
   end
 
   def family_member
-    self.hbx_enrollment.household.family.family_members.detect do |fm|
+    self.hbx_enrollment.family.family_members.detect do |fm|
       fm.id == applicant_id
     end
   end
