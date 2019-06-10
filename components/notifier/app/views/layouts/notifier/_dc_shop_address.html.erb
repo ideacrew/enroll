@@ -4,9 +4,15 @@
     <tr>
       <td><br></br></td>
     </tr>
-    <tr>
-      <td><%= notice_recipient.full_name %></td>
-    </tr>
+    <% if (recipient.shop? && recipient.general_agency?) %>
+      <tr class="fssize1">
+        <td><%= recipient.legal_name %></td>
+      </tr>
+    <% else %>
+      <tr>
+        <td><%= recipient.first_name %> <%= recipient.last_name %></td>
+      </tr>
+    <% end %>
 
     <% if (recipient.shop? && !recipient.employee_notice? && !recipient.general_agency? && !recipient.broker?) %>
       <tr class="fssize1">
@@ -49,6 +55,6 @@
         <br></br>
       </td>
     </tr>
-    
+
   </tbody>
 </table>

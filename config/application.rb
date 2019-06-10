@@ -65,7 +65,6 @@ module Enroll
       config.acapi.add_async_subscription("Subscribers::PolicyTerminationsSubscriber")
       config.acapi.add_async_subscription("Subscribers::EmployeeEnrollmentInvitationsSubscriber")
       config.acapi.add_async_subscription("Subscribers::EmployeePassiveRenewalsSubscriber")
-      config.acapi.add_async_subscription("Subscribers::LegacyNotificationSubscriber")
       config.acapi.add_async_subscription("Subscribers::EmployeeInitialEnrollmentInvitationsSubscriber")
       config.acapi.add_async_subscription("Subscribers::EmployeeRenewalInvitationsSubscriber")
       config.acapi.add_amqp_worker("TransportProfiles::Subscribers::TransportArtifactSubscriber")
