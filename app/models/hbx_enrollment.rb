@@ -14,7 +14,6 @@ class HbxEnrollment
   include BenefitSponsors::ModelEvents::HbxEnrollment
 
   belongs_to :household
-
   # Override attribute accessor as well
   # Migrate all the family ids to that
   # When we assign a household to the enrollment,
