@@ -946,8 +946,7 @@ class HbxEnrollment
   end
 
   def update_current(updates)
-
-    household && household.hbx_enrollments.where(id: id).update_all(updates)
+    HbxEnrollment.where(id: id).first.update_attributes(updates)
   end
 
   def update_hbx_enrollment_members_premium(decorated_plan)
