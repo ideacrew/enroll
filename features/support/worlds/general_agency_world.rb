@@ -9,13 +9,13 @@ module GeneralAgencyWorld
 end
 
 def assign_roles_to_general_agency
-  general_agency_profile.general_agency_staff_roles << general_agency_staff_role
+  general_agency_profile.general_agency_staff_roles << primary_general_agency_staff_role
   general_agency_profile.save!
 end
 
-def general_agency_staff_role
+def primary_general_agency_staff_role
   @general_agency_staff_role = FactoryBot.create(:general_agency_staff_role,
-    benefit_sponsors_general_agency_profile_id: general_agency_profile.id)
+    benefit_sponsors_general_agency_profile_id: general_agency_profile.id, is_primary: true)
 end
 
 World(GeneralAgencyWorld)
