@@ -885,7 +885,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
     before :all do
       family = FactoryBot.create(:family, :with_primary_family_member)
-      @enrollment = FactoryBot.create(:hbx_enrollment, family: household.family, household: family.active_household)
+      @enrollment = FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household)
     end
 
     it "should update employee_role hired_on" do
