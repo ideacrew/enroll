@@ -1135,6 +1135,7 @@ class HbxEnrollment
   def self.new_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil, resident_role: nil, external_enrollment: false, coverage_start: nil, opt_effective_on: nil )
     enrollment = HbxEnrollment.new
     enrollment.household = coverage_household.household
+    enrollment.family = coverage_household.household.family
 
     enrollment.submitted_at = submitted_at
 

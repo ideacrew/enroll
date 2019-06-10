@@ -54,7 +54,7 @@ class Insured::GroupSelectionController < ApplicationController
   def create
     @market_kind = @adapter.create_action_market_kind(params)
     return redirect_to purchase_insured_families_path(change_plan: @change_plan, terminate: 'terminate') if params[:commit] == "Terminate Plan"
-    
+
     if @employee_role.present? && @employee_role.census_employee.present?
       new_hire_enrollment_period = @employee_role.census_employee.new_hire_enrollment_period
       if new_hire_enrollment_period.begin > TimeKeeper.date_of_record
