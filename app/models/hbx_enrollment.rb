@@ -13,14 +13,14 @@ class HbxEnrollment
   include BenefitSponsors::Concerns::Observable
   include BenefitSponsors::ModelEvents::HbxEnrollment
 
-  belongs_to :household, optional: true
+  belongs_to :household
   # Override attribute accessor as well
   # Migrate all the family ids to that
   # When we assign a household to the enrollment,
   # assign the family as well.
   # override the method where we do household_id == etc.
 
-  belongs_to :family, optional: true
+  belongs_to :family
 
   ENROLLMENT_CREATED_EVENT_NAME = "acapi.info.events.policy.created"
   ENROLLMENT_UPDATED_EVENT_NAME = "acapi.info.events.policy.updated"
@@ -706,8 +706,8 @@ class HbxEnrollment
     hbx_enrollment_members.detect(&:is_subscriber)
   end
 
-  def family
-    household.family if household.present?
+  def household
+    family.households.where(id: self.household_id).first
   end
 
   def applicant_ids
