@@ -21,9 +21,10 @@ RSpec.describe "insured/group_selection/_enrollment.html.erb", dbclean: :after_e
     let(:benefit_group_assignment) { census_employee.active_benefit_group_assignment }
     let(:active_household) {family.active_household}
     let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: active_household )}
-    let(:mock_product) { double("Product", kind: "health" ) }
+    let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
 
     before :each do
+      allow(hbx_enrollment).to receive(:product).and_return(product)
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return false
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return true
       allow(hbx_enrollment).to receive(:is_shop?).and_return true
@@ -38,7 +39,7 @@ RSpec.describe "insured/group_selection/_enrollment.html.erb", dbclean: :after_e
     end
 
     it 'should have title' do
-      title = "#{hbx_enrollment.coverage_year} #{mock_product.kind.capitalize} Coverage"
+      title = "#{hbx_enrollment.coverage_year} #{product.kind.capitalize} Coverage"
       expect(rendered).to have_content(title)
     end
 
@@ -75,8 +76,10 @@ RSpec.describe "insured/group_selection/_enrollment.html.erb", dbclean: :after_e
       let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
       let(:hbx_enrollment) { FactoryBot.build(:hbx_enrollment, :with_enrollment_members, household: family.active_household, kind: kind)}
       let(:person) { FactoryBot.build(:person) }
+      let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
 
       before :each do
+        allow(hbx_enrollment).to receive(:product).and_return(product)
         allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return false
         allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return true
         allow(hbx_enrollment).to receive(:is_shop?).and_return false
