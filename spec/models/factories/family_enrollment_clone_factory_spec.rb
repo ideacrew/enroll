@@ -23,14 +23,16 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model, dbclean
 
 
   let!(:family) {
-    person = FactoryBot.create(:person, last_name: ce.last_name, first_name: ce.first_name)
+    person = FactoryBot.create(:person, :with_family, last_name: ce.last_name, first_name: ce.first_name)
     employee_role = FactoryBot.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
-    ce.update_attributes({employee_role: employee_role})
-    family_rec = Family.find_or_build_from_employee_role(employee_role)
-    hbx_enrollment_mem=FactoryBot.build(:hbx_enrollment_member, eligibility_date:Time.now,applicant_id:person.primary_family.family_members.first.id,coverage_start_on:ce.active_benefit_group_assignment.benefit_package.start_on)
-
-     FactoryBot.create(:hbx_enrollment,
-      household: person.primary_family.active_household,
+    ce.update_attributes!({employee_role: employee_role})
+    family_rec = person.primary_family
+    hbx_enrollment_mem = FactoryBot.build(:hbx_enrollment_member, eligibility_date:Time.now,applicant_id:person.primary_family.family_members.first.id,coverage_start_on:ce.active_benefit_group_assignment.benefit_package.start_on)
+    family_rec.save!
+    FactoryBot.create(
+      :hbx_enrollment,
+      family: family_rec,
+      household: family_rec.active_household,
       coverage_kind: "health",
       effective_on: ce.active_benefit_group_assignment.benefit_package.start_on,
       enrollment_kind: "open_enrollment",
@@ -45,8 +47,7 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model, dbclean
       aasm_state: 'coverage_terminated',
       external_enrollment: external_enrollment,
       hbx_enrollment_members:[hbx_enrollment_mem]
-      )
-
+    )
     family_rec.reload
   }
 

@@ -1259,21 +1259,13 @@ class HbxEnrollment
 
     return benefit_group_assignment.benefit_group, benefit_group_assignment
   end
-
-<<<<<<< HEAD
-def self.new_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil, resident_role: nil, external_enrollment: false, coverage_start: nil, opt_effective_on: nil, family: nil)
-=======
+  
   def self.new_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil, resident_role: nil, external_enrollment: false, coverage_start: nil, opt_effective_on: nil, family: nil)
->>>>>>> passing    spec/models/household_spec.rb
     enrollment = HbxEnrollment.new
     enrollment.household = coverage_household.household
     enrollment.family = family || coverage_household.household.family
 
     enrollment.submitted_at = submitted_at
-<<<<<<< HEAD
-
-=======
->>>>>>> passing    spec/models/household_spec.rb
     case
       when employee_role.present?
         if benefit_group.blank? || benefit_group_assignment.blank?
