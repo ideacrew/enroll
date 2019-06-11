@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Config
-  class SiteModelConcern
+  module SiteModelConcern
     extend ActiveSupport::Concern
 
     included do
