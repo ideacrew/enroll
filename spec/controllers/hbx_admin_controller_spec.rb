@@ -34,6 +34,7 @@ RSpec.describe HbxAdminController, :type => :controller do
   describe "POST update_aptc_csr" do
     before do
       person_with_fam_hbx_enrollment.kind = 'individual'
+      person_with_fam_hbx_enrollment.family = person_with_family.primary_family
       person_with_fam_hbx_enrollment.aasm_state = 'coverage_selected'
       person_with_fam_hbx_enrollment.effective_on = Date.today
       person_with_fam_hbx_enrollment.coverage_kind = 'health'
