@@ -12,7 +12,7 @@ namespace :reports do
         families.each do |family|
           next if family.has_valid_e_case_id?
           enrollments = family.enrollments.enrolled.where(:is_any_enrollment_member_outstanding => true, :effective_on => { :"$gte" => TimeKeeper.date_of_record.beginning_of_year, :"$lte" =>  TimeKeeper.date_of_record.end_of_year }, :kind => "individual")
-          nexf if enrollments.size <1
+          next if enrollments.size <1
           family_members = enrollments.inject([]) do |family_members, enrollment|
             family_members += enrollment.hbx_enrollment_members.map(&:family_member)
           end.uniq
