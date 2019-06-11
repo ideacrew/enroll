@@ -99,7 +99,8 @@ module Notifier
     end
 
     def total_amount_due
-      merge_model.total_amount_due = number_to_currency(employer_profile.plan_years.enrolled.first.hbx_enrollments.map(&:total_premium).sum)
+      plan_year = employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED - ['suspended']).max_by{:created_at}
+      merge_model.total_amount_due = number_to_currency(plan_year.hbx_enrollments.map(&:total_premium).sum)
     end
 
     def date_due
