@@ -9,7 +9,7 @@
           <% end %>
         </li>
         <li role="presentation" id="employers-tab" <%= menu_tab_class(active_tab, "employers-tab") %>>
-          <%= link_to(employers_broker_agencies_profiles_path(id: @broker_agency_profile.id), "aria-expanded" => "true", :remote => true, "aria-controls" => "employers", "role" => "tab" ) do  %>
+          <%= link_to(sponsored_benefits.employers_organizations_broker_agency_profile_path(id: @broker_agency_profile.id), "aria-expanded" => "true", :remote => true, "aria-controls" => "employers", "role" => "tab" ) do  %>
             <span class="hidden-xs"><%= l10n("employers")%></span>
             <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Employers"></span>
           <% end %>
@@ -42,18 +42,12 @@
             <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="General Agencies"></span>
           <% end %>
         </li>
-        <li role="presentation" id="assign-tab" <%= menu_tab_class(active_tab, "assign-tab") %>>
-          <%= link_to(assign_broker_agencies_profile_path(id: @id), "aria-expanded" => "true", :remote => true, "aria-controls" => "assign", "role" => "tab" ) do  %>
-            <span class="hidden-xs">Assign</span>
-            <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Assign"></span>
-          <% end %>
-        </li>
-        <li role="presentation" id="quote-roster-tab" <%= menu_tab_class(active_tab, "quote-roster-tab") %>>
+<!--         <li role="presentation" id="quote-roster-tab" <%= menu_tab_class(active_tab, "quote-roster-tab") %>>
          <%= link_to my_quotes_broker_agencies_broker_role_quotes_path(@broker_agency_profile.primary_broker_role), "aria-expanded" => "true",  "role" => "tab", 'data-no-turbolink' => true  do  %>
             <span class="hidden-xs">Quoting Tool</span>
             <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Quoting Tool"></span>
           <% end %>
-        </li>
+        </li> -->
         <!--
         <li role="presentation" id="assign-history-tab" <%= menu_tab_class(active_tab, "assign-history-tab") %>>
          <%= link_to(assign_history_broker_agencies_profiles_path(id: @id), "aria-expanded" => "true", :remote => true, "aria-controls" => "assign", "role" => "tab" ) do  %>
