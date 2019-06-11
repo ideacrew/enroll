@@ -11,29 +11,17 @@ describe Queries::NamedEnrollmentQueries, "Enrollment Queries", dbclean: :after_
   describe "Shope enrollments" do
     let!(:effective_on) {effective_period.min}
     let!(:organization) {abc_organization}
-    let!(:hbx_id_list) {[abc_organization.hbx_id]}
     let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }
-    let(:market_inception) { TimeKeeper.date_of_record.year }
     let!(:current_effective_date) { Date.new(TimeKeeper.date_of_record.last_year.year, TimeKeeper.date_of_record.month, 1) }
-    let(:aasm_state) { :active }
     let!(:save_catalog){ benefit_market.benefit_market_catalogs.map(&:save)}
-    let(:business_policy) { instance_double("some_policy", success_results: "validated successfully")}
-    let!(:benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, start_on: current_benefit_package.start_on, benefit_group_id:nil, benefit_package: current_benefit_package, is_active:false)}
     let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product)}
-    let(:employee_role) { FactoryBot.build(:employee_role, benefit_sponsors_employer_profile_id:abc_profile.id)}
-    let(:census_employee) { FactoryBot.create(:census_employee, dob: TimeKeeper.date_of_record - 21.year, employer_profile_id: nil, benefit_sponsors_employer_profile_id: abc_profile.id, benefit_sponsorship: benefit_sponsorship, :benefit_group_assignments => [benefit_group_assignment],employee_role_id:employee_role.id) }
-    let(:person) {FactoryBot.create(:person, first_name: census_employee.first_name, last_name: census_employee.last_name, dob: TimeKeeper.date_of_record - 21.year, ssn:census_employee.ssn)}
-    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person:person)}
     let(:active_household) {family.active_household}
     let(:sponsored_benefit) {current_benefit_package.sponsored_benefits.first}
-    let(:reference_product) {current_benefit_package.sponsored_benefits.first.reference_product}
-    let(:hbx_enrollment_member){ FactoryBot.build(:hbx_enrollment_member, is_subscriber:true, coverage_start_on: current_benefit_package.start_on, eligibility_date: current_benefit_package.start_on, applicant_id: family.family_members.first.id) }
     let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
-    let!(:update_reference_product) {reference_product.update_attributes(issuer_profile_id:issuer_profile.id)}
     let!(:benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, start_on: current_benefit_package.start_on, benefit_group_id:nil, benefit_package: current_benefit_package, is_active:false)}
     let(:reference_product) {current_benefit_package.sponsored_benefits.first.reference_product}
     let(:hbx_enrollment_member){ FactoryBot.build(:hbx_enrollment_member, is_subscriber:true, coverage_start_on: current_benefit_package.start_on, eligibility_date: current_benefit_package.start_on, applicant_id: family.family_members.first.id) }
-    let(:enrollment) { FactoryBot.create(:hbx_enrollment, hbx_enrollment_members:[hbx_enrollment_member],product: reference_product,sponsored_benefit_id:sponsored_benefit.id, sponsored_benefit_package_id: current_benefit_package.id, effective_on:predecessor_application.effective_period.min, household:family.active_household,benefit_group_assignment_id: benefit_group_assignment.id, employee_role_id:employee_role.id, benefit_sponsorship_id:benefit_sponsorship.id, submitted_at:Date.new(2018,6,21))}
+    let(:enrollment) { FactoryBot.create(:hbx_enrollment, family: family, hbx_enrollment_members:[hbx_enrollment_member],product: reference_product,sponsored_benefit_id:sponsored_benefit.id, sponsored_benefit_package_id: current_benefit_package.id, effective_on:predecessor_application.effective_period.min, household:family.active_household,benefit_group_assignment_id: benefit_group_assignment.id, employee_role_id:employee_role.id, benefit_sponsorship_id:benefit_sponsorship.id, submitted_at:Date.new(2018,6,21))}
     let!(:person) {FactoryBot.create(:person, first_name: ce.first_name, last_name: ce.last_name, ssn:ce.ssn)}
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person:person)}
     let!(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: abc_profile, census_employee_id: ce.id, benefit_sponsors_employer_profile_id: abc_profile.id)}
@@ -77,6 +65,7 @@ describe Queries::NamedEnrollmentQueries, "Enrollment Queries", dbclean: :after_
       hbx_enrollment = FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product, 
                           household: family.active_household, 
                           aasm_state: "coverage_enrolled",
+                          family: family,
                           rating_area_id: predecessor_application.recorded_rating_area_id,
                           sponsored_benefit_id: predecessor_application.benefit_packages.first.health_sponsored_benefit.id,
                           sponsored_benefit_package_id: predecessor_application.benefit_packages.first.id,
@@ -92,6 +81,7 @@ describe Queries::NamedEnrollmentQueries, "Enrollment Queries", dbclean: :after_
     let!(:renewal_enrollment) { 
       hbx_enrollment = FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product, 
                           household: family.active_household, 
+                          family: family,
                           aasm_state: "coverage_selected",
                           rating_area_id: renewal_application.recorded_rating_area_id,
                           sponsored_benefit_id: renewal_application.benefit_packages.first.health_sponsored_benefit.id,
