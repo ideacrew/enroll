@@ -99,7 +99,7 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
             market = is_congress?(old_org) ? site.benefit_market_for(:fehb): benefit_market
 
             @benefit_sponsorship = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(hbx_id: old_org.hbx_id).first
-            @benefit_sponsorship.benefit_applications = [] if @benefit_sponsorship.benefit_applications.any?{|b| b.effective_period.min.blank?}
+            @benefit_sponsorship.benefit_applications = [] if @benefit_sponsorship.benefit_applications.any?{|b| b.start_on.blank?}
             @benefit_sponsorship.profile_id = @new_profile.id
             @benefit_sponsorship.benefit_market = market
             @benefit_sponsorship.source_kind = @old_profile.profile_source.to_sym
