@@ -19,6 +19,10 @@ module BenefitSponsors
         @hbx_enrollment = household.hbx_enrollments.new
       end
 
+      def set_family(household)
+        @hbx_enrollment.family = household.family
+      end
+
       def set_product(product)
         @hbx_enrollment.product = product
       end
