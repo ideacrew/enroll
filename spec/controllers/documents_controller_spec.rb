@@ -38,6 +38,7 @@ RSpec.describe DocumentsController, :type => :controller do
   describe 'GET show_docs' do
     before :each do
       allow(user).to receive(:person).and_return(person_with_family)
+      person_with_fam_hbx_enrollment.family = person_with_family.primary_family
       person_with_fam_hbx_enrollment.kind = 'individual'
       person_with_fam_hbx_enrollment.save!
       user.person.stub_chain(
