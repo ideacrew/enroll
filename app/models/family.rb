@@ -1039,27 +1039,29 @@ class Family
   # @see waivers_for_display
   # @return [ Array<HbxEnrollment> ] The {HbxEnrollment HbxEnrollments} filtered by display criteria
   def enrollments_for_display
-    Family.collection.aggregate([
-      {"$match" => {'_id' => self._id}},
-      {"$unwind" => '$households'},
-      {"$unwind" => '$households.hbx_enrollments'},
-      {"$match" => {"households.hbx_enrollments.aasm_state" => {"$nin" => ['void', "coverage_canceled"]} }},
-      {"$match" => {"households.hbx_enrollments.external_enrollment" => {"$ne" => true}}},
-      {"$sort" => {"households.hbx_enrollments.submitted_at" => -1 }},
-      {"$group" => {'_id' => {
-                  'year' => { "$year" => '$households.hbx_enrollments.effective_on'},
-                  'month' => { "$month" => '$households.hbx_enrollments.effective_on'},
-                  'day' => { "$dayOfMonth" => '$households.hbx_enrollments.effective_on'},
-                  'subscriber_id' => '$households.hbx_enrollments.enrollment_signature',
-                  'provider_id'   => '$households.hbx_enrollments.carrier_profile_id',
-                  'benefit_group_id' => '$households.hbx_enrollments.benefit_group_id',
-                  'state' => '$households.hbx_enrollments.aasm_state',
-                  'market' => '$households.hbx_enrollments.kind',
-                  'coverage_kind' => '$households.hbx_enrollments.coverage_kind'},
-                  "hbx_enrollment" => { "$first" => '$households.hbx_enrollments'}}},
-      {"$project" => {'hbx_enrollment._id' => 1, '_id' => 1}}
+    HbxEnrollment.collection.aggregate(
+      [
+        {'$match' => {
+          'aasm_state' => {'$nin' => ['void', "coverage_canceled"]},
+          'external_enrollment' => {'$ne' => true},
+          'family_id' => self._id,
+        }},
+      {"$sort" => {"submitted_at" => -1 }},
+        {'$group' => {
+          '_id' => {
+            'year' =>  '$effective_on',
+            'month' =>  '$effective_on',
+            'day' => '$effective_on',
+            'subscriber_id' => 'enrollment_signature',
+            'provider_id'   => 'carrier_profile_id',
+            'benefit_group_id' => 'benefit_group_id',
+            'state' => 'aasm_state',
+            'market' => 'kind',
+            'coverage_kind' => 'coverage_kind'}},
+        },
       ],
-      :allow_disk_use => true)
+      :allow_disk_use => true
+    ).to_a
   end
 
 

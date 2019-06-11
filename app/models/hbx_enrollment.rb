@@ -682,6 +682,7 @@ class HbxEnrollment
       if same_signatures(previous_enrollment) && !previous_enrollment.is_shop?
         if self.effective_on > previous_enrollment.effective_on && previous_enrollment.may_terminate_coverage?
           previous_enrollment.terminate_coverage!(effective_on - 1.day)
+
         else
           previous_enrollment.cancel_coverage! if previous_enrollment.may_cancel_coverage?
         end
@@ -1065,7 +1066,7 @@ class HbxEnrollment
   end
 
   def update_current(updates)
-    HbxEnrollment.where(id: id).first.update_attributes(updates)
+    HbxEnrollment.where(id: id).update_all(updates)
   end
 
   def update_hbx_enrollment_members_premium(decorated_plan)
@@ -1259,6 +1260,7 @@ class HbxEnrollment
     return benefit_group_assignment.benefit_group, benefit_group_assignment
   end
 
+<<<<<<< HEAD
   def self.new_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil, resident_role: nil, external_enrollment: false, coverage_start: nil, opt_effective_on: nil, family: nil)
     enrollment = HbxEnrollment.new
     enrollment.household = coverage_household.household
@@ -1266,6 +1268,12 @@ class HbxEnrollment
 
     enrollment.submitted_at = submitted_at
 
+=======
+  def self.new_from(family: nil, employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil, resident_role: nil, external_enrollment: false, coverage_start: nil, opt_effective_on: nil )
+    enrollment = HbxEnrollment.new(household: coverage_household.household,
+                                   family: coverage_household.household.family,
+                                   submitted_at: submitted_at)
+>>>>>>> passing  spec/models/hbx_enrollment_spec.rb
     case
       when employee_role.present?
         if benefit_group.blank? || benefit_group_assignment.blank?
@@ -1337,7 +1345,6 @@ class HbxEnrollment
       enrollment_member.coverage_start_on = enrollment.effective_on
       enrollment.hbx_enrollment_members << enrollment_member
     end
-
     enrollment
   end
 
@@ -1423,16 +1430,7 @@ class HbxEnrollment
   def self.find_enrollments_by_benefit_group_assignment(benefit_group_assignment)
     return [] if benefit_group_assignment.blank?
     benefit_group_assignment_id = benefit_group_assignment.id
-    families = Family.where(:"households.hbx_enrollments.benefit_group_assignment_id" => benefit_group_assignment_id)
-    enrollment_list = []
-    families.each do |family|
-      family.households.each do |household|
-        household.hbx_enrollments.show_enrollments_sans_canceled.non_terminated.shop_market.to_a.each do |enrollment|
-          enrollment_list << enrollment if benefit_group_assignment_id.to_s == enrollment.benefit_group_assignment_id.to_s
-        end
-      end
-    end rescue ''
-    enrollment_list
+    HbxEnrollment.where(:"benefit_group_assignment_id" => benefit_group_assignment_id).show_enrollments_sans_canceled.non_terminated.shop_market.to_a
   end
 
   # def self.covered(enrollments)
@@ -1602,7 +1600,6 @@ class HbxEnrollment
 
   def can_select_coverage?(qle: false)
     return true if is_cobra_status?
-
     if is_shop?
       if employee_role.can_enroll_as_new_hire?
         coverage_effective_date = employee_role.coverage_effective_on(current_benefit_group: sponsored_benefit_package, qle: qle)
@@ -1843,6 +1840,7 @@ class HbxEnrollment
     if previous_enrollment
       previous_product = previous_enrollment.product
     end
+    
     hbx_enrollment_members.each do |hem|
       person = hem.person
       roster_member = EnrollmentMemberAdapter.new(
