@@ -17,8 +17,6 @@ Gem::Specification.new do |s|
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
   s.test_files = Dir["spec/**/*"]
 
-  s.add_dependency "rails",                     "~> 5.2.3"
-
   s.add_dependency "mongoid",                   "~> 7.0.2"
   s.add_dependency 'mongoid-autoinc',           '~> 6.0'
 
@@ -36,6 +34,10 @@ Gem::Specification.new do |s|
   s.add_dependency "slim",                      "~> 3.0"
   s.add_dependency 'symmetric-encryption',      '~> 3.9.1'
   s.add_dependency 'webpacker',                 '~> 4.0.2'
+  s.add_dependency 'dry-types'
+  s.add_dependency 'dry-initializer', '~> 1.4.1'
+  s.add_dependency 'dry-validation', '~> 0.12.1'
+  s.add_dependency 'mail'
 
   # s.add_development_dependency 'bundler-audit',           '~> 0.6'
   s.add_development_dependency 'capybara',                  '~> 3.12'

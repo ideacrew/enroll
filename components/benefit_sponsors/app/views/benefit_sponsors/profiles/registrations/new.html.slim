@@ -1,13 +1,24 @@
 - if @profile_type == "broker_agency"
-  #broker_agency_form
-    ul
-      li
-        a href="#broker_registration"  = l10n("broker")
-      li
-        a href="#broker_agency_staff"  = l10n("broker_agency_staff")
-    #broker_registration
-      = render :partial => "benefit_sponsors/profiles/registrations/broker_registration_form"
-    #broker_agency_staff
+  .broker-registration-container.mt-4.pt-4.pl-3.pr-3.pb-3
+    - language_list =  LanguageList::COMMON_LANGUAGES.sort_by {|lan| lan.common_name}.map do |lang| 
+      - { common_name: lang.common_name, code: lang.iso_639_1 }
+
+    - practice_area_list = Array.new
+    - BenefitSponsors::Organizations::BrokerAgencyProfile::MARKET_KINDS_OPTIONS.each_pair do |k, v|
+      - practice_area_list << {code: v, label: k}
+    - practice_area_list = [{code: "", label: "Select Practice Area"}] + practice_area_list
+
+    - state_list = ["SELECT STATE"] + State::NAME_IDS.map(&:last).sort_by {|c| c }
+
+    - broker_registration_text = l10n("broker_agencies.broker_roles.broker_registration_text", site_short_name: site_short_name, site_brokers_agreement_path: site_brokers_agreement_path)
+
+    broker-agency-profile-create{
+      data-broker-registration-text="#{broker_registration_text.to_json}"
+      data-language-list="#{language_list.to_json}"
+      data-practice-area-list="#{practice_area_list.to_json}"
+      data-state-list="#{state_list.to_json}"
+      data-submit-uri="#{profiles_broker_agencies_broker_agency_profiles_path.to_json}"
+      }
 
 - elsif @profile_type == "general_agency"
   .general-agency-registration-container.mt-4.pt-4.pl-3.pr-3.pb-3

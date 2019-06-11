@@ -13,6 +13,8 @@ module BenefitSponsors
         before_action :set_current_person, only: [:staff_index]
         before_action :check_and_download_commission_statement, only: [:download_commission_statement, :show_commission_statement]
 
+        skip_before_filter :verify_authenticity_token, only: :create
+
         layout 'single_column'
 
         EMPLOYER_DT_COLUMN_TO_FIELD_MAP = {
@@ -20,6 +22,19 @@ module BenefitSponsors
           "4"     => "employer_profile.aasm_state",
           "5"     => "employer_profile.plan_years.start_on"
         }
+
+        def create
+          json = request.body.read
+          body_json = JSON.parse(json)
+          result = ::BenefitSponsors::Requests::BrokerAgencyProfileCreateRequest.create(body_json["data"], current_user)
+          respond_to do |format|
+            if result.success?
+              format.json { render :status => 201, json: { :message => "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed." } }
+            else
+              format.json { render :status => 422, :json => { errors: result.messages } }
+            end
+          end
+        end
 
         def index
           authorize self
