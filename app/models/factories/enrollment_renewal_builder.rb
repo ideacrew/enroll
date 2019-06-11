@@ -4,6 +4,7 @@ module Factories
     def generate_passive_renewal(options = {})
       if renewal_plan_offered_by_er?(enrollment)
         renewal_enrollment = family.active_household.hbx_enrollments.new
+        renewal_enrollment.family = family
         renewal_enrollment = assign_common_attributes(enrollment, renewal_enrollment)
         renewal_enrollment = clone_shop_enrollment(enrollment, renewal_enrollment)
         renewal_enrollment.send(options.fetch(:aasm_event, :renew_enrollment))
