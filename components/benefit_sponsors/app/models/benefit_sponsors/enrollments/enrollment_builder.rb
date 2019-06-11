@@ -27,6 +27,10 @@ module BenefitSponsors
         @hbx_enrollment.effective_on = effective_on
       end
 
+      def set_family(household)
+        @hbx_enrollment.family = household.family
+      end
+
       def set_kind(kind)
         @hbx_enrollment.kind = kind 
       end
