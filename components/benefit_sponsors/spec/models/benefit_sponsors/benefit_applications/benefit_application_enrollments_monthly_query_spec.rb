@@ -52,6 +52,7 @@ RSpec.describe BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmen
   	before :each do
   	  person_with_fam_hbx_enrollment.benefit_sponsorship = benefit_application.benefit_sponsorship
       person_with_fam_hbx_enrollment.kind = 'individual'
+      person_with_fam_hbx_enrollment.family = person_with_family.primary_family
       person_with_fam_hbx_enrollment.save!
       allow(person_with_fam_hbx_enrollment).to receive(:benefit_group_id).and_return(query.benefit_package_ids.first)
       allow(person_with_fam_hbx_enrollment).to receive(:aasm_state).and_return(:coverage_selected)
