@@ -1,7 +1,7 @@
 include VerificationHelper
 
 puts "-------------------------------------- Start of rake: #{TimeKeeper.datetime_of_record} --------------------------------------" unless Rails.env.test?
-InitialEvents = ["final_eligibility_notice_uqhp", "final_eligibility_notice_renewal_uqhp"]
+InitialEvents = ["final_eligibility_notice_uqhp", "final_eligibility_notice_renewal_uqhp","ivl_backlog_verification_notice_uqhp"]
 unless ARGV[0].present? && ARGV[1].present?
   puts "Please include mandatory arguments: File name and Event name. Example: rails runner script/ivl_renewal_notices.rb <file_name> <event_name>" unless Rails.env.test?
   puts "Event Names: ivl_renewal_notice_2, ivl_renewal_notice_3, ivl_renewal_notice_4, final_eligibility_notice_uqhp, final_eligibility_notice_aqhp, final_eligibility_notice_renewal_uqhp, final_eligibility_notice_renewal_aqhp" unless Rails.env.test?
