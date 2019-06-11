@@ -1260,20 +1260,13 @@ class HbxEnrollment
     return benefit_group_assignment.benefit_group, benefit_group_assignment
   end
 
-<<<<<<< HEAD
-  def self.new_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil, resident_role: nil, external_enrollment: false, coverage_start: nil, opt_effective_on: nil, family: nil)
+def self.new_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil, resident_role: nil, external_enrollment: false, coverage_start: nil, opt_effective_on: nil, family: nil)
     enrollment = HbxEnrollment.new
     enrollment.household = coverage_household.household
-    enrollment.family = family
+    enrollment.family = family || coverage_household.household.family
 
     enrollment.submitted_at = submitted_at
 
-=======
-  def self.new_from(family: nil, employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil, resident_role: nil, external_enrollment: false, coverage_start: nil, opt_effective_on: nil )
-    enrollment = HbxEnrollment.new(household: coverage_household.household,
-                                   family: coverage_household.household.family,
-                                   submitted_at: submitted_at)
->>>>>>> passing  spec/models/hbx_enrollment_spec.rb
     case
       when employee_role.present?
         if benefit_group.blank? || benefit_group_assignment.blank?
@@ -1345,10 +1338,11 @@ class HbxEnrollment
       enrollment_member.coverage_start_on = enrollment.effective_on
       enrollment.hbx_enrollment_members << enrollment_member
     end
+
     enrollment
   end
 
-  def self.create_from(employee_role: nil, coverage_household:, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, family: nil)
+  def self.create_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, family: nil)
     enrollment = self.new_from(
         employee_role: employee_role,
         coverage_household: coverage_household,
@@ -1361,6 +1355,7 @@ class HbxEnrollment
     enrollment.save
     enrollment
   end
+
 
   def self.purge_enrollments
   end
