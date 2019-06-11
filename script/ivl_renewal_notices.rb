@@ -141,6 +141,7 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
             person: primary_person,
             renewing_enrollments: renewing_enrollments,
             active_enrollments: active_enrollments,
+            family: primary_person.primary_family,
             data: members
             }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)
             )
