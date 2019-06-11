@@ -1140,10 +1140,10 @@ class HbxEnrollment
     return benefit_group_assignment.benefit_group, benefit_group_assignment
   end
 
-  def self.new_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil, resident_role: nil, external_enrollment: false, coverage_start: nil, opt_effective_on: nil )
+  def self.new_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil, resident_role: nil, external_enrollment: false, coverage_start: nil, opt_effective_on: nil, family: nil)
     enrollment = HbxEnrollment.new
     enrollment.household = coverage_household.household
-    enrollment.family = coverage_household.household.family
+    enrollment.family = family
 
     enrollment.submitted_at = submitted_at
 
@@ -1221,14 +1221,15 @@ class HbxEnrollment
     enrollment
   end
 
-  def self.create_from(employee_role: nil, coverage_household:, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil)
+  def self.create_from(employee_role: nil, coverage_household:, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, family: nil)
     enrollment = self.new_from(
         employee_role: employee_role,
         coverage_household: coverage_household,
         benefit_group: benefit_group,
         benefit_group_assignment: benefit_group_assignment,
         consumer_role: consumer_role,
-        benefit_package: benefit_package
+        benefit_package: benefit_package,
+        family: family
     )
     enrollment.save
     enrollment
