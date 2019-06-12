@@ -780,7 +780,7 @@ RSpec.describe FinancialAssistance::Applicant, type: :model, dbclean: :after_eac
 
       context 'state machine events' do
         let(:applicant) {application.active_applicants.first}
-        all_states = %w(unverified verification_outstanding verification_pending fully_verified)
+        all_states = %w[unverified verification_outstanding verification_pending fully_verified]
         shared_examples_for "Applicant state machine transitions and workflow" do |from_state, to_state, event|
           it "moves from #{from_state} to #{to_state} on #{event}" do
             expect(applicant).to transition_from(from_state).to(to_state).on_event(event.to_sym)
