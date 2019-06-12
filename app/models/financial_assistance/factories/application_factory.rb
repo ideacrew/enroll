@@ -146,7 +146,7 @@ module FinancialAssistance
       end
 
       def reject_applicant_params
-        %w[_id created_at updated_at workflow_state_transitions incomes benefits deductions assisted_verifications]
+        %w[_id created_at updated_at workflow_state_transitions incomes benefits deductions verification_types]
       end
 
       def reject_embed_params
