@@ -19,8 +19,4 @@ webpack_environment.module.rules.push(
 
 webpack_environment.entry.incremental_angular = "./app/javascript/incremental_angular/main.ts";
 
-webpack_environment.externals = {
-  jquery: 'jQuery'
-};
-
 module.exports = webpack_environment;

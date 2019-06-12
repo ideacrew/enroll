@@ -33,8 +33,4 @@ webpack_environment.plugins.push(
 		})
 )
 
-webpack_environment.externals = {
-  jquery: 'jQuery'
-};
-
 module.exports = webpack_environment;
