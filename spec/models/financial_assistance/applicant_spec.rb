@@ -1,4 +1,5 @@
 require 'rails_helper'
+require 'aasm/rspec'
 
 RSpec.describe FinancialAssistance::Applicant, type: :model, dbclean: :after_each do
   before :each do
@@ -774,6 +775,34 @@ RSpec.describe FinancialAssistance::Applicant, type: :model, dbclean: :after_eac
           expect(applicant2.aasm_state).to eq 'fully_verified'
           applicant2.income_valid!
           expect(applicant2.aasm_state).to eq 'fully_verified'
+        end
+      end
+
+      context 'state machine events' do
+        let(:applicant) {application.active_applicants.first}
+        all_states = %w(unverified verification_outstanding verification_pending fully_verified)
+        shared_examples_for "Applicant state machine transitions and workflow" do |from_state, to_state, event|
+          it "moves from #{from_state} to #{to_state} on #{event}" do
+            expect(applicant).to transition_from(from_state).to(to_state).on_event(event.to_sym)
+          end
+        end
+
+        context 'reject' do
+          all_states.each do |state|
+            it_behaves_like "Applicant state machine transitions and workflow", state, :verification_outstanding, "reject!"
+          end
+        end
+
+        context 'move_to_pending' do
+          all_states.each do |state|
+            it_behaves_like "Applicant state machine transitions and workflow", state, :verification_pending, "move_to_pending!"
+          end
+        end
+
+        context 'move_to_unverified' do
+          all_states.each do |state|
+            it_behaves_like "Applicant state machine transitions and workflow", state, :unverified, "move_to_unverified!"
+          end
         end
       end
     end
