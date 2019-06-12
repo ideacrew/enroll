@@ -87,9 +87,13 @@ RSpec.describe SponsoredBenefits::Services::PlanCostService, type: :model, dbcle
   let!(:relationship_benefit) { benefit_group.relationship_benefits.first }
   let(:subject) { SponsoredBenefits::Services::PlanCostService.new(benefit_group: benefit_group)}
 
+  it "should have multiple_rating_areas instance variable true" do
+    expect(subject.instance_variable_get("@multiple_rating_areas")).to eq true
+  end
+
   context "#monthly_employer_contribution_amount" do
     before :each do
-      allow(Caches::PlanDetails).to receive(:lookup_rate).and_return 78.0 
+      allow(Caches::PlanDetails).to receive(:lookup_rate_with_area).and_return 78.0 
     end
     it "should return total monthly employer contribution amount" do
       # Er contribution 80%. No.of Employees = 2
@@ -100,7 +104,7 @@ RSpec.describe SponsoredBenefits::Services::PlanCostService, type: :model, dbcle
   context "#monthly_employee_costs" do
 
     before :each do
-      allow(Caches::PlanDetails).to receive(:lookup_rate).and_return 78.0
+      allow(Caches::PlanDetails).to receive(:lookup_rate_with_area).and_return 78.0
       subject.plan = benefit_group.reference_plan
     end
     it "should return total monthly employee contribution amount" do
