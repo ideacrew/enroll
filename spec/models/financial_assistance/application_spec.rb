@@ -649,6 +649,14 @@ RSpec.describe FinancialAssistance::Application, type: :model, dbclean: :after_e
       expect(invalid_app).to receive(:record_transition)
       invalid_app.submit!
     end
+
+    it 'should not create verification documents for schema invalid application' do
+      invalid_app.update_attributes!(hbx_id: nil)
+      expect(invalid_app).to receive(:report_invalid)
+      invalid_app.submit!
+      expect(invalid_app.aasm_state).to eq 'draft'
+      expect(applicant_primary2.verification_types.count).to eq 0
+    end
   end
 
   describe '.create_verification_documents' do
