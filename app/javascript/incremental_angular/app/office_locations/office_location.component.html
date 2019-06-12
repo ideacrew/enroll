@@ -4,7 +4,7 @@
     </div>
     <h4>Office Location</h4>
     <div class="row">
-        <div class="{{address1Classes()}} col-xs-12{{errorClassFor(officeLocation.controls.address.controls.address_1)}}" [formGroup]="addressGroup()">
+        <div class="{{address1Classes()}} col-xs-12{{errorClassFor(officeLocation.controls.address.get('address_1'))}}" [formGroup]="addressGroup()">
             <label for="location_address_1_{{index}}_field">Address *</label>
             <input id="location_address_1_{{index}}_field" type="text" formControlName="address_1" class="form-control" required>
             <field-errors [errorControl]="officeLocation.get('address').get('address_1')"></field-errors>
@@ -24,7 +24,7 @@
     </div>
 </fieldset>
 <div class="row" [formGroup]="addressGroup()">
-        <div class="col-md-3 col-sm-12 col-xs-12{{errorClassFor(officeLocation.controls.address.controls.city)}}">
+        <div class="col-md-3 col-sm-12 col-xs-12{{errorClassFor(officeLocation.controls.address.get('city'))}}">
                 <label for="location_city_{{index}}_field">City *</label>
                 <input id="location_city_{{index}}_field" type="text" formControlName="city" class="form-control" required>
                 <field-errors [errorControl]="officeLocation.get('address').get('city')"></field-errors>
@@ -36,7 +36,7 @@
                 </select>
                 <field-errors [errorControl]="officeLocation.get('address').get('state')"></field-errors>
         </div>
-        <div class="col-md-3 col-sm-12 col-xs-12{{errorClassFor(officeLocation.controls.address.controls.zip)}}">
+        <div class="col-md-3 col-sm-12 col-xs-12{{errorClassFor(officeLocation.controls.address.get('zip'))}}">
                 <label for="location_zip_{{index}}_field">Zip *</label>
                 <input id="location_zip_{{index}}_field" type="text" formControlName="zip" class="form-control" required>
                 <field-errors [errorControl]="officeLocation.get('address').get('zip')"></field-errors>
