@@ -36,12 +36,33 @@ class MigrateDcHbxEnrollments < Mongoid::Migration
         end
       end
 
-      @plan_hash ={}
-      BenefitMarkets::Products::Product.where(benefit_market_kind: :aca_shop).each do |product|
+      @plan_to_product_hash ={aca_shop: {}, aca_individual: {}, fehb:{}}
+
+      BenefitMarkets::Products::Product.aca_shop_market.each do |product|
+        plan_hash = {}
         hios_id = product.hios_id
         year = product.active_year
-        plan = Plan.where(hios_id: hios_id, active_year: year).first
-        @plan_hash[plan.id] = {"product_id" => product.id, "carrier_profile_id" => product.issuer_profile_id}
+        plan = Plan.where(hios_id: hios_id, active_year: year, market: "shop").first
+        plan_hash[plan.id] = {"product_id" => product.id, "carrier_profile_id" => product.issuer_profile_id}
+        @plan_to_product_hash[:aca_shop].merge!(plan_hash)
+      end
+
+      BenefitMarkets::Products::Product.aca_individual_market.each do |product|
+        plan_hash = {}
+        hios_id = product.hios_id
+        year = product.active_year
+        plan = Plan.where(hios_id: hios_id, active_year: year, market: "individual").first
+        plan_hash[plan.id] = {"product_id" => product.id, "carrier_profile_id" => product.issuer_profile_id}
+        @plan_to_product_hash[:aca_individual].merge!(plan_hash)
+      end
+
+      BenefitMarkets::Products::Product.where(benefit_market_kind: :fehb).each do |product|
+        plan_hash = {}
+        hios_id = product.hios_id
+        year = product.active_year
+        plan = Plan.where(hios_id: hios_id, active_year: year, market: "shop", metal_level: 'gold').first
+        plan_hash[plan.id] = {"product_id" => product.id, "carrier_profile_id" => product.issuer_profile_id}
+        @plan_to_product_hash[:fehb].merge!(plan_hash)
       end
     end
 
@@ -50,6 +71,8 @@ class MigrateDcHbxEnrollments < Mongoid::Migration
       ce_count = CensusEmployee.all.exists(benefit_group_assignments: true).count
       offset_count = 0
       limit_count = 1000
+      fehb_plan_hash = @plan_to_product_hash[:fehb]
+      shop_plan_hash = @plan_to_product_hash[:aca_shop]
 
       while (offset_count <= ce_count) do
         puts "offset_count: #{offset_count}"
@@ -58,8 +81,11 @@ class MigrateDcHbxEnrollments < Mongoid::Migration
             ce.benefit_group_assignments.each do |bga|
               benefit_package_id = bga.benefit_package_id
               get_hbx_enrollments(bga).each do |hbx|
+
+                plan_hash = hbx.benefit_group.is_congress ? fehb_plan_hash : shop_plan_hash
+                product_data = plan_hash[hbx.plan_id]
                 benefit_app_data = @benefit_app_hash[benefit_package_id]
-                product_data = @plan_hash[hbx.plan_id]
+
                 if benefit_app_data && product_data
                   hbx.update_attributes(
                       product_id: product_data['product_id'],
@@ -90,14 +116,16 @@ class MigrateDcHbxEnrollments < Mongoid::Migration
       f_count = Family.where(:'households.hbx_enrollments'.exists=>true, :"households.hbx_enrollments.kind".nin=> ['employer_sponsored', 'employer_sponsored_cobra']).count
       offset_count = 0
       limit_count = 1000
+      ivl_plan_hash = @plan_to_product_hash[:aca_individual]
+      kind = %w(individual coverall unassisted_qhp insurance_assisted_qhp streamlined_medicaid emergency_medicaid hcr_chip)
 
       while (offset_count <= f_count) do
         puts "offset_count: #{offset_count}"
-        Family.where(:'households.hbx_enrollments'.exists=>true, :"households.hbx_enrollments.kind".nin=> ['employer_sponsored', 'employer_sponsored_cobra']).limit(limit_count).offset(offset_count).each do |fam|
+        Family.where(:'households.hbx_enrollments'.exists=>true, :"households.hbx_enrollments.kind".in=> kind).limit(limit_count).offset(offset_count).each do |fam|
           begin
             fam.active_household.hbx_enrollments.each do |hbx|
               next if hbx.is_shop?
-              product_data = @plan_hash[hbx.plan_id]
+              product_data = ivl_plan_hash[hbx.plan_id]
               if product_data
                 hbx.update_attributes(
                     product_id: product_data['product_id'],
@@ -133,7 +161,7 @@ class MigrateDcHbxEnrollments < Mongoid::Migration
   end
 
   def self.reset_hash
-    @plan_hash ={}
+    @plan_to_product_hash ={}
     @benefit_app_hash ={}
   end
 
