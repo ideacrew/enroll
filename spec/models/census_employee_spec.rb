@@ -74,7 +74,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     end
   end
 
-  describe "Model initialization" do
+  describe "Model initialization", dbclean: :after_each do
     context "with no arguments" do
       let(:params) {{}}
 
@@ -926,7 +926,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     end
   end
 
-  describe 'construct_employee_role' do
+  describe 'construct_employee_role', dbclean: :after_each do
     let(:user)  { FactoryBot.create(:user) }
     context 'when employee_role present' do
       let(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, employer_profile: employer_profile ) }
