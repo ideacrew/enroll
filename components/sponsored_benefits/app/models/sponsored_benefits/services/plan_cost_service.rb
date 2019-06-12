@@ -9,6 +9,7 @@ class SponsoredBenefits::Services::PlanCostService
     @composite_tiers = {}
     @monthly_employee_costs = {}
     @census_employee_costs = {}
+    @multiple_rating_areas = multiple_market_rating_areas?
   end
 
   def reference_plan
