@@ -653,7 +653,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
         sign_in(user)
         get :new_eligibility, params: params, xhr: true, format: :js
 
-        expect(response).not_to render_template('new_eligibility')
+        expect(response).to have_http_status(:forbidden)
       end
     end
   end
