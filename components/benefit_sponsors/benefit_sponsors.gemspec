@@ -36,7 +36,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'webpacker',                 '~> 4.0.2'
   s.add_dependency 'dry-types'
   s.add_dependency 'dry-initializer', '~> 1.4.1'
-  s.add_dependency 'dry-validation', '~> 0.12.1'
+  s.add_dependency 'dry-validation', '~> 0.13'
   s.add_dependency 'mail'
 
   # s.add_development_dependency 'bundler-audit',           '~> 0.6'
