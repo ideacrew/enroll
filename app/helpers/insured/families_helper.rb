@@ -199,7 +199,8 @@ module Insured::FamiliesHelper
        qle_link_generator_for_an_existing_qle(qle, link_title)
     else
       # Take straight to the Plan Shopping - Add Members Flow. No date choices.
-      link_to link_title.present? ? link_title: 'Shop for Plans', insured_family_members_path(sep_id: sep.id, qle_id: qle.id), class: "btn btn-default"
+      # Use turbolinks: false, to avoid calling controller action twice.
+      link_to link_title.presence || 'Shop for Plans', insured_family_members_path(sep_id: sep.id, qle_id: qle.id), class: 'btn btn-default', data: {turbolinks: false}
     end
   end
 

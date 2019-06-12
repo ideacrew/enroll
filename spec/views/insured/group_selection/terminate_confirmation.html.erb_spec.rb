@@ -15,11 +15,13 @@ RSpec.describe "app/views/insured/group_selection/terminate_confirm.html.erb" do
     let(:benefit_sponsorship) { FactoryBot.create :benefit_sponsors_benefit_sponsorship, :with_benefit_market, :with_organization_cca_profile, :with_initial_benefit_application}
     let(:benefit_application) { benefit_sponsorship.benefit_applications.first }
     let(:employer_profile) { benefit_sponsorship.organization.employer_profile }
+    let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
     let(:employee_names) { ["fname1 sname1", "fname2 sname2"] }
 
     let(:current_user) {FactoryBot.create(:user)}
 
     before(:each) do
+      allow(hbx_enrollment).to receive(:product).and_return(product)
       allow(hbx_enrollment).to receive(:covered_members_first_names).and_return(employee_names)
       allow(hbx_enrollment).to receive(:total_employee_cost).and_return(100.00)
       @hbx_enrollment = hbx_enrollment
