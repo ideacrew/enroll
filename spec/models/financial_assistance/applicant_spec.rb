@@ -1,4 +1,5 @@
 require 'rails_helper'
+require 'aasm/rspec'
 
 RSpec.describe FinancialAssistance::Applicant, type: :model, dbclean: :after_each do
   before :each do
@@ -457,66 +458,96 @@ RSpec.describe FinancialAssistance::Applicant, type: :model, dbclean: :after_eac
     end
   end
 
-  describe "#admin_verification_action" do
-    let(:income_type) { VerificationType.new(type_name: 'Income', validation_status: "pending") }
-    let(:mec_type) { VerificationType.new(type_name: 'MEC', validation_status: "pending") }
+  describe '#admin_verification_action' do
 
     before do
-      applicant1.verification_types << income_type
-      applicant1.verification_types << mec_type
+      coverage_household1.update_attributes!(aasm_state: 'unverified')
+      coverage_household2.update_attributes!(aasm_state: 'unverified')
+      allow(application).to receive(:is_application_valid?).and_return(true)
+      application.update_attributes(aasm_state: 'draft')
+      application.submit!
     end
 
     it 'should update income verification type to verified' do
-
-      expect(applicant1.admin_verification_action("verify", income_type, "valid user")).to eq 'Income successfully approved'
+      income_type = applicant1.income_verification
+      expect(applicant1.admin_verification_action("verify", income_type, "valid user")).to eq 'Income successfully verified.'
       expect(income_type.validation_status).to eq 'verified'
     end
 
     it 'should update MEC verification type to verified' do
+      mec_type = applicant1.mec_verification
       expect(applicant1.admin_verification_action("return_for_deficiency", mec_type, "valid user")).to eq 'MEC was rejected'
       expect(mec_type.validation_status).to eq 'outstanding'
     end
   end
 
-  describe "#update_verification_type" do
-    let(:income_type) { VerificationType.new(type_name: 'Income', validation_status: "pending") }
-    let(:mec_type) { VerificationType.new(type_name: 'MEC', validation_status: "pending") }
+  describe '#update_verification_type' do
 
     before do
-      applicant1.verification_types << income_type
-      applicant1.verification_types << mec_type
+      coverage_household1.update_attributes!(aasm_state: 'unverified')
+      coverage_household2.update_attributes!(aasm_state: 'unverified')
+      allow(application).to receive(:is_application_valid?).and_return(true)
+      application.update_attributes(aasm_state: 'draft')
+      application.submit!
     end
 
-    it 'should update income verification type to verified' do
-
-      expect(applicant1.update_verification_type(income_type, "valid user")).to eq 'Income successfully approved'
-      expect(income_type.validation_status).to eq 'verified'
+    context "income verified and mec is pending" do
+      it 'should update income verification type to verified' do
+        income_type = applicant1.income_verification
+        expect(applicant1.aasm_state).to eq 'verification_pending'
+        expect(applicant1.update_verification_type(income_type, "valid user")).to eq 'Income successfully verified.'
+        expect(income_type.validation_status).to eq 'verified'
+        expect(applicant1.aasm_state).to eq 'verification_pending'
+      end
     end
 
-    it 'should update MEC verification type to verified' do
-      expect(applicant1.update_verification_type(mec_type, "valid user")).to eq 'MEC successfully approved'
-      expect(mec_type.validation_status).to eq 'verified'
+    context 'income verified and mec is pending' do
+      it 'should update MEC verification type to verified' do
+        mec_type = applicant1.mec_verification
+        expect(applicant1.aasm_state).to eq 'verification_pending'
+        expect(applicant1.update_verification_type(mec_type, "valid user")).to eq 'MEC successfully verified.'
+        expect(mec_type.validation_status).to eq 'verified'
+        expect(applicant1.aasm_state).to eq 'verification_pending'
+      end
     end
+
+    context 'income and mec are verified but applicant state is in pending' do
+      it 'should update applicant state to fully verified' do
+        income_type = applicant1.income_verification
+        income_type.update_attributes(validation_status: 'verified')
+        mec_type = applicant1.mec_verification
+        mec_type.update_attributes(validation_status: 'verified')
+        expect(applicant1.aasm_state).to eq 'verification_pending'
+        applicant1.update_verification_type(mec_type, "valid user")
+        expect(mec_type.validation_status).to eq 'verified'
+        expect(applicant1.aasm_state).to eq 'fully_verified'
+      end
+    end
+
   end
 
-  describe "return_doc_for_deficiency" do
-    let(:income_type) { VerificationType.new(type_name: 'Income', validation_status: "pending") }
-    let(:mec_type) { VerificationType.new(type_name: 'MEC', validation_status: "pending") }
+  describe 'return_doc_for_deficiency' do
 
     before do
-      applicant1.verification_types << income_type
-      applicant1.verification_types << mec_type
+      coverage_household1.update_attributes!(aasm_state: 'unverified')
+      coverage_household2.update_attributes!(aasm_state: 'unverified')
+      allow(application).to receive(:is_application_valid?).and_return(true)
+      application.update_attributes(aasm_state: 'draft')
+      application.submit!
     end
 
     it 'should update income verification type to verified' do
-
+      income_type = applicant1.income_verification
       expect(applicant1.return_doc_for_deficiency(income_type, "valid user")).to eq 'Income was rejected'
       expect(income_type.validation_status).to eq 'outstanding'
+      expect(applicant1.aasm_state).to eq 'verification_outstanding'
     end
 
     it 'should update MEC verification type to verified' do
+      mec_type = applicant1.mec_verification
       expect(applicant1.return_doc_for_deficiency(mec_type, "valid user")).to eq 'MEC was rejected'
       expect(mec_type.validation_status).to eq 'outstanding'
+      expect(applicant1.aasm_state).to eq 'verification_outstanding'
     end
   end
 
@@ -637,16 +668,19 @@ RSpec.describe FinancialAssistance::Applicant, type: :model, dbclean: :after_eac
     end
 
     context 'state transitions and eligibility notification for hbx_enrollment and coverage_household' do
+      before(:each) do
+        allow(application).to receive(:is_application_valid?).and_return(true)
+        application.update_attributes(aasm_state: 'draft')
+        application.submit!
+      end
 
-      context 'from state unverified' do
-        it 'should return unverified state as a default state' do
-          expect(applicant1.aasm_state).to eq 'unverified'
+      context 'from state verification_pending' do
+        it 'should return verification_pending state on application submission' do
+          expect(applicant1.aasm_state).to eq 'verification_pending'
         end
 
         context 'for notify_of_eligibility_change and aasm_state changes on_event: income_outstanding, verification_outstanding' do
           before :each do
-            applicant1.verification_types << FactoryGirl.create(:verification_type, applicant: applicant1, type_name: 'Income', validation_status: 'pending')
-            applicant1.verification_types << FactoryGirl.create(:verification_type, applicant: applicant1, type_name: 'MEC', validation_status: 'pending')
             applicant1.income_outstanding!
           end
 
@@ -660,19 +694,17 @@ RSpec.describe FinancialAssistance::Applicant, type: :model, dbclean: :after_eac
           end
 
           it 'should also add the transition to workflow_state_transitions of the applicant' do
-            expect(applicant1.workflow_state_transitions.last.from_state).to eq 'unverified'
+            expect(applicant1.workflow_state_transitions.last.from_state).to eq 'verification_pending'
             expect(applicant1.workflow_state_transitions.last.to_state).to eq 'verification_outstanding'
           end
         end
 
         context 'for notify_of_eligibility_change and aasm_state changes on_event: income_valid, verification_pending' do
           before :each do
-            applicant1.verification_types << FactoryGirl.create(:verification_type, applicant: applicant1, type_name: 'Income', validation_status: 'pending')
-            applicant1.verification_types << FactoryGirl.create(:verification_type, applicant: applicant1, type_name: 'MEC', validation_status: 'pending')
             applicant1.income_valid!
           end
 
-          it 'should transition from unverified to verification_outstanding' do
+          it 'should transition from verification_pending to verification_pending' do
             expect(applicant1.aasm_state).to eq 'verification_pending'
           end
 
@@ -682,24 +714,23 @@ RSpec.describe FinancialAssistance::Applicant, type: :model, dbclean: :after_eac
           end
 
           it 'should also add the transition to workflow_state_transitions of the applicant' do
-            expect(applicant1.workflow_state_transitions.last.from_state).to eq 'unverified'
+            expect(applicant1.workflow_state_transitions.last.from_state).to eq 'verification_pending'
             expect(applicant1.workflow_state_transitions.last.to_state).to eq 'verification_pending'
           end
         end
 
         context 'for notify_of_eligibility_change and aasm_state changes on_event: income_valid, fully_verified' do
           before :each do
-            applicant1.verification_types << FactoryGirl.create(:verification_type, applicant: applicant1, type_name: 'Income', validation_status: 'verified')
-            applicant1.verification_types << FactoryGirl.create(:verification_type, applicant: applicant1, type_name: 'MEC', validation_status: 'verified')
+            applicant1.mec_verification.update_attributes(validation_status: 'verified')
             applicant1.income_valid!
           end
 
-          it 'should transition from unverified to verification_outstanding' do
+          it 'should transition from verification_pending to fully_verified' do
             expect(applicant1.aasm_state).to eq 'fully_verified'
           end
 
           it 'should also add the transition to workflow_state_transitions of the applicant' do
-            expect(applicant1.workflow_state_transitions.last.from_state).to eq 'unverified'
+            expect(applicant1.workflow_state_transitions.last.from_state).to eq 'verification_pending'
             expect(applicant1.workflow_state_transitions.last.to_state).to eq 'fully_verified'
           end
         end
@@ -707,14 +738,11 @@ RSpec.describe FinancialAssistance::Applicant, type: :model, dbclean: :after_eac
 
       context 'from state verification_outstanding' do
         it 'should transition to verification_outstanding' do
-          expect(applicant2.aasm_state).to eq 'verification_outstanding'
           applicant2.income_outstanding!
           expect(applicant2.aasm_state).to eq 'verification_outstanding'
         end
 
         it 'should transition to fully_verified' do
-          applicant2.verification_types << FactoryGirl.create(:verification_type, applicant: applicant2, type_name: 'MEC')
-          expect(applicant2.aasm_state).to eq 'verification_outstanding'
           applicant2.mec_verification.update_attributes!(validation_status: 'verified')
           applicant2.income_valid!
           expect(applicant2.aasm_state).to eq 'fully_verified'
@@ -747,6 +775,34 @@ RSpec.describe FinancialAssistance::Applicant, type: :model, dbclean: :after_eac
           expect(applicant2.aasm_state).to eq 'fully_verified'
           applicant2.income_valid!
           expect(applicant2.aasm_state).to eq 'fully_verified'
+        end
+      end
+
+      context 'state machine events' do
+        let(:applicant) {application.active_applicants.first}
+        all_states = %w[unverified verification_outstanding verification_pending fully_verified]
+        shared_examples_for "Applicant state machine transitions and workflow" do |from_state, to_state, event|
+          it "moves from #{from_state} to #{to_state} on #{event}" do
+            expect(applicant).to transition_from(from_state).to(to_state).on_event(event.to_sym)
+          end
+        end
+
+        context 'reject' do
+          all_states.each do |state|
+            it_behaves_like "Applicant state machine transitions and workflow", state, :verification_outstanding, "reject!"
+          end
+        end
+
+        context 'move_to_pending' do
+          all_states.each do |state|
+            it_behaves_like "Applicant state machine transitions and workflow", state, :verification_pending, "move_to_pending!"
+          end
+        end
+
+        context 'move_to_unverified' do
+          all_states.each do |state|
+            it_behaves_like "Applicant state machine transitions and workflow", state, :unverified, "move_to_unverified!"
+          end
         end
       end
     end

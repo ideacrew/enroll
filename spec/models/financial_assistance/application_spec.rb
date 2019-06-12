@@ -5,9 +5,12 @@ RSpec.describe FinancialAssistance::Application, type: :model, dbclean: :after_e
 
   before :each do
     allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
+    primary_member.add_relationship(person3, "spouse", family.id)
+    primary_member.add_relationship(person4, "child", family.id)
+    primary_member.add_relationship(person2, "child", family.id)
   end
 
-  let!(:primary_member) { FactoryGirl.create(:person, :with_consumer_role) }
+  let!(:primary_member) { FactoryGirl.create(:person, :with_consumer_role, first_name: "hello") }
   let(:user) { FactoryGirl.create(:user, person: primary_member) }
   let!(:family)  { FactoryGirl.create(:family, :with_primary_family_member, person: primary_member) }
   let!(:person2) { FactoryGirl.create(:person, :with_consumer_role) }
@@ -609,11 +612,10 @@ RSpec.describe FinancialAssistance::Application, type: :model, dbclean: :after_e
 
     let!(:valid_app) { FactoryGirl.create(:application, aasm_state: 'draft', family: family, applicants: [applicant_primary]) }
     let!(:invalid_app) { FactoryGirl.create(:application, family: family, aasm_state: 'draft', applicants: [applicant_primary2]) }
-    let!(:applicant_primary) { FactoryGirl.create(:applicant, tax_household_id: thh1.id, application: application, family_member_id: family_member.id) }
-    let!(:applicant_primary2) { FactoryGirl.create(:applicant, tax_household_id: thh2.id, application: application, family_member_id: family_member.id) }
+    let!(:applicant_primary) { FactoryGirl.create(:applicant, tax_household_id: thh1.id, application: application, family_member_id: family_member1.id) }
+    let!(:applicant_primary2) { FactoryGirl.create(:applicant, tax_household_id: thh2.id, application: application, family_member_id: family_member1.id) }
     let!(:thh1) { FactoryGirl.create(:tax_household, household: household) }
     let!(:thh2) { FactoryGirl.create(:tax_household, household: household) }
-    let(:family_member) { FactoryGirl.create(:family_member, :primary, family: family) }
 
     it 'should allow a sucessful state transition for valid application' do
       allow(valid_app).to receive(:is_application_valid?).and_return(true)
@@ -631,12 +633,10 @@ RSpec.describe FinancialAssistance::Application, type: :model, dbclean: :after_e
 
     it 'should invoke submit_application on a submit of an valid application' do
       allow(valid_app).to receive(:is_application_valid?).and_return(true)
-      expect(valid_app).to receive(:set_submit)
       valid_app.submit!
     end
 
     it 'should not invoke submit_application for invalid application' do
-      expect(invalid_app).to_not receive(:set_submit)
       invalid_app.submit!
     end
 
@@ -648,6 +648,14 @@ RSpec.describe FinancialAssistance::Application, type: :model, dbclean: :after_e
     it 'should record transition on an invalid application submit' do
       expect(invalid_app).to receive(:record_transition)
       invalid_app.submit!
+    end
+
+    it 'should not create verification documents for schema invalid application' do
+      invalid_app.update_attributes!(hbx_id: nil)
+      expect(invalid_app).to receive(:report_invalid)
+      invalid_app.submit!
+      expect(invalid_app.aasm_state).to eq 'draft'
+      expect(applicant_primary2.verification_types.count).to eq 0
     end
   end
 

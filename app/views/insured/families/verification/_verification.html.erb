@@ -16,7 +16,7 @@
 <div class="table table-sm">
   <div class="module verification-process col-md-12">
       <% @family_members.each do |f_member| %>
-        <%= render :partial => '/insured/families/verification/ivl_verifications', locals: { f_member: f_member, verification_types: verification_types(f_member) } %>
+        <%= render :partial => '/insured/families/verification/ivl_verifications', locals: { f_member: f_member, verification_types: verification_types_of_member(f_member) } %>
       <% end %>
   </div>
 </div>
