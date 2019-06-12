@@ -29,7 +29,7 @@ class SponsoredBenefits::Services::PlanCostService
       per_employee_cost = if census_employee.is_cobra_status?
         0
       elsif composite?
-        (composite_total_premium(census_employee) * employer_contribution_factor).round(2)
+        (composite_total_premium(census_employee) * employer_contribution_factor(census_employee)).round(2)
       else
         (members(census_employee).reduce(0.00) do |sum, member|
           (sum + employer_contribution_for(member, census_employee)).round(2)
@@ -58,7 +58,7 @@ class SponsoredBenefits::Services::PlanCostService
     @census_employee_costs[self.plan.id] ||= {}
     @monthly_employee_costs[self.plan.id] ||= active_census_employees.collect do |census_employee|
       per_employee_cost = if composite?
-        @census_employee_costs[self.plan.id][census_employee.id] = (composite_total_premium(census_employee) - (composite_total_premium(census_employee) * employer_contribution_factor).round(2)).round(2)
+        @census_employee_costs[self.plan.id][census_employee.id] = (composite_total_premium(census_employee) - (composite_total_premium(census_employee) * employer_contribution_factor(census_employee)).round(2)).round(2)
       else
         @census_employee_costs[self.plan.id][census_employee.id] = (members(census_employee).reduce(0.00) do |sum, member|
           (sum + employee_cost_for(member, census_employee)).round(2)
@@ -80,7 +80,7 @@ class SponsoredBenefits::Services::PlanCostService
     benefit_group.composite_rating_tier_premium_for(effective_composite_tier(census_employee))
   end
 
-  def employer_contribution_factor
+  def employer_contribution_factor(census_employee)
     benefit_group.composite_employer_contribution_factor_for(effective_composite_tier(census_employee))
   end
 

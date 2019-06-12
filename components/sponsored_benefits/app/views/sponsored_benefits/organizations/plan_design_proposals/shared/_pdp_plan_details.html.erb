@@ -1,7 +1,7 @@
 <% plan_export_default_class ||= "plan-not-saved" %>
 <% kind ||= nil %>
 <% plan_option_kind ||= @benefit_group.plan_option_kind.to_sym %>
-<% plan ||= @service.plan %>
+<% plan ||= @service.reference_plan %>
 <div class="col-md-8">
   <table class="table table-striped">
     <tbody>
