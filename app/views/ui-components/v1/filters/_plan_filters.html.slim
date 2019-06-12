@@ -1,10 +1,10 @@
 #filter-sidebar.col-lg-3.col-md-3.co-sm-3.col-xs-12.pl-0
   .checkbox-filter-wrapper-uc
-    - if !@hbx_enrollment.is_shop?
+    - if @market_kind == 'individual'
       h4 = link_to l10n('estimate_your_costs'), "https://dc.checkbookhealth.org/hie/dc/#{@hbx_enrollment.coverage_year}/", target: '_blank'
     h4 = find_my_doctor
   h3.header-title Filter Results
-  - if @market_kind == "individual" || @market_kind == "coverall" || @benefit_group.try(:plan_option_kind) == "single_carrier"
+  - if @market_kind == 'individual' || @benefit_group.try(:plan_option_kind) == 'single_carrier'
     .checkbox-filter-wrapper-uc
       h5
         strong Metal Level

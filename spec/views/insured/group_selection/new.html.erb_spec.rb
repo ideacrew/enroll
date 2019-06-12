@@ -715,7 +715,19 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       let(:benefit_group_assignment) { FactoryBot.build_stubbed(:benefit_group_assignment, benefit_group: benefit_group) }
       let(:benefit_group) { FactoryBot.create(:benefit_group, :with_valid_dental, dental_reference_plan_id: "9182391823912", elected_dental_plan_ids: ['12313213','123132321']) }
       let(:coverage_household) { double("coverage household", coverage_household_members: []) }
-      let(:hbx_enrollment) {double("hbx enrollment", coverage_selected?: true, id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, benefit_group: benefit_group, is_shop?: false)}
+      let(:hbx_enrollment) do
+        double(
+          'hbx enrollment',
+          coverage_selected?: true,
+          id: 'hbx_id',
+          kind: 'individual',
+          effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day),
+          employee_role: employee_role,
+          benefit_group: benefit_group,
+          is_shop?: false
+        )
+      end
+
       let(:adapter) { instance_double(GroupSelectionPrevaricationAdapter) }
 
       before :each do

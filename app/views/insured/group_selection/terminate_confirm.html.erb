@@ -11,7 +11,7 @@
         <div class="row">
           <div class="col-xs-9">
             <% hbx_enrollment = @hbx_enrollment %>
-            <% plan = hbx_enrollment.try(:plan) %>
+            <% plan = hbx_enrollment.try(:product) %>
             <div class="hbx-enrollment-panel module">
             <div class="panel panel-default min-h">
 
@@ -104,7 +104,7 @@
         </div>
 
         <script type="text/javascript">
-          $(document).ready(function(){
+          $(document).on('ready page:load turbolinks:load', function () {
             $(".interaction-choice-control-value-agreement-terminate-confirm-yes").click(function(){
               $(".interaction-click-control-terminate").attr("disabled", false);
               $("#term-date-confirm-date").attr("hidden", false);
@@ -115,6 +115,6 @@
             });
           });
         </script>
-
+      </div>
     </div>
 </div>
