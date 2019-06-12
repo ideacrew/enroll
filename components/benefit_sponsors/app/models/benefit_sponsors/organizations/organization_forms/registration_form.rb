@@ -34,6 +34,11 @@ module BenefitSponsors
         false
       end
 
+      def self.merge_profile_type(attrs)
+        attrs['organization']['profile_type'] = attrs['profile_type'] if attrs['profile_type'].present?
+        attrs['organization']['profile_attributes']['profile_type'] = attrs['profile_type'] if attrs['profile_type'].present?
+      end
+
       def self.for_new(attrs)
         service = resolve_service(profile_type: attrs[:profile_type])
         form_params = service.build(profile_type: attrs[:profile_type])
@@ -44,6 +49,7 @@ module BenefitSponsors
 
       def self.for_create(attrs)
         service = resolve_service(profile_type: attrs[:profile_type])
+        merge_profile_type(attrs)
         form_params = service.load_form_metadata(new(attrs))
         new(form_params)
       end
