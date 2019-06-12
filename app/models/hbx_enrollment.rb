@@ -340,11 +340,12 @@ class HbxEnrollment
     end
 
     def by_hbx_id(policy_hbx_id)
-      families = Family.with_enrollment_hbx_id(policy_hbx_id)
-      households = families.flat_map(&:households)
-      households.flat_map(&:hbx_enrollments).select do |hbxe|
-        hbxe.hbx_id == policy_hbx_id
-      end
+      self.where(hbx_id: policy_hbx_id)
+      # families = Family.with_enrollment_hbx_id(policy_hbx_id)
+      # households = families.flat_map(&:households)
+      # households.flat_map(&:hbx_enrollments).select do |hbxe|
+      #   hbxe.hbx_id == policy_hbx_id
+      # end
     end
 
     def process_verification_reminders(date_passed)
