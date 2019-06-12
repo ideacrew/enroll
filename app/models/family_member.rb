@@ -61,7 +61,7 @@ class FamilyMember
   delegate :naturalized_citizen, to: :person, allow_nil: true
   delegate :eligible_immigration_status, to: :person, allow_nil: true
   delegate :is_dc_resident?, to: :person, allow_nil: true
-  delegate :ivl_coverage_selected, to: :person
+  delegate :trigger_hub_call, to: :person
   delegate :is_applying_coverage, to: :person, allow_nil: true
 
   validates_presence_of :person_id, :is_primary_applicant, :is_coverage_applicant
