@@ -8,6 +8,7 @@
     "@angular/platform-browser": "^7.2.15",
     "@angular/platform-browser-dynamic": "^7.2.15",
     "@babel/plugin-syntax-dynamic-import": "^7.2.0",
+    "@babel/polyfill": "^7.4.4",
     "@fortawesome/fontawesome-free": "^5.8.2",
     "@fortawesome/free-brands-svg-icons": "^5.8.1",
     "@fortawesome/free-regular-svg-icons": "^5.8.1",
@@ -15,10 +16,10 @@
     "@rails/webpacker": "^4.0.4",
     "awesome-typescript-loader": "^5.2.0",
     "axios": "^0.18.0",
-    "babel-polyfill": "^6.26.0",
     "bootstrap": "^4.3.1",
     "browserslist": "^4.6.0",
     "core-js": "2",
+    "jest": "^24.8.0",
     "jquery": "^3.4.0",
     "jquery-ui": "^1.12.1",
     "ngx-mask": "^7.9.9",
@@ -37,16 +38,15 @@
     "@angular-devkit/build-angular": "~0.13.0",
     "@angular/cli": "^7.2.15",
     "@angular/compiler-cli": "^7.2.15",
+    "@babel/core": "^7.4.5",
     "@babel/plugin-syntax-dynamic-import": "^7.2.0",
     "@ngtools/webpack": "^7.3.9",
     "@types/jasmine": "~2.8.8",
     "@types/node": "^12.0.2",
     "@webcomponents/webcomponentsjs": "^2.2.10",
     "angular2-template-loader": "^0.6.2",
-    "babel-jest": "^22.4.3",
     "html-loader": "^0.5.5",
     "jasmine-core": "~2.99.1",
-    "jest": "^22.4.3",
     "jsdom-mount": "0.1.0",
     "karma": "~4.0.0",
     "karma-chrome-launcher": "~2.2.0",
@@ -68,8 +68,8 @@
     "test-watch": "jest --watch"
   },
   "jest": {
+    "testURL": "http://localhost",
     "roots": [
-      "app/javascript/packs",
       "spec/javascript"
     ],
     "moduleDirectories": [
