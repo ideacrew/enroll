@@ -50,7 +50,9 @@ module BenefitSponsors
       def approve_profile_representative!(form)
         person = Person.find(form[:person_id])
         role = if form[:is_broker_agency_staff_profile?]
-                 person.broker_agency_staff_roles.detect{|staff| staff.agency_pending? && staff.benefit_sponsors_broker_agency_profile_id.to_s == form[:profile_id]}
+                 person.broker_agency_staff_roles.detect{|staff| staff.agency_pending? && staff.benefit_sponsors_general_agency_profile_id.to_s == form[:profile_id]}
+               elsif form[:is_general_agency_staff_profile?]
+                 person.general_agency_staff_roles.detect{|staff| staff.agency_pending? && staff.benefit_sponsors_general_agency_profile_id.to_s == form[:profile_id]}
                else
                  person.employer_staff_roles.detect{|staff| staff.is_applicant? && staff.benefit_sponsor_employer_profile_id.to_s == form[:profile_id]}
                end
@@ -118,10 +120,12 @@ module BenefitSponsors
         elsif active_general_agencies_with_same_profile.present?
           return false,  "you are already associated with this General Agency"
         else
-          person.general_agency_staff_roles << ::GeneralAgencyStaffRole.new({
-                                                                            general_agency_profile: profile,
-                                                                            npn: profile.general_agency_primary_staff.npn
-                                                                          })
+          staff_member = ::GeneralAgencyStaffRole.new({
+                                                        general_agency_profile: profile,
+                                                        npn: profile.general_agency_primary_staff.npn
+                                                      })
+          person.general_agency_staff_roles << staff_member
+          staff_member.general_agency_pending!
           person.save!
           return true, person
         end
