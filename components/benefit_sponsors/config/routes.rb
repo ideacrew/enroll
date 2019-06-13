@@ -68,9 +68,9 @@ BenefitSponsors::Engine.routes.draw do
         collection do
           get :search_general_agency
         end
-        # member do
-        #   get :approve
-        # end
+        member do
+          get :approve
+        end
       end
     end
     namespace :employers do
