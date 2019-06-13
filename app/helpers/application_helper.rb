@@ -802,7 +802,8 @@ module ApplicationHelper
     member_groups.map do |member_group|
       member_group_hash = JSON.parse(member_group.group_enrollment.to_json)
       member_group_hash['product'].merge!(
-        "issuer_name" => member_group.group_enrollment.product.issuer_profile.legal_name
+        "issuer_name" => member_group.group_enrollment.product.issuer_profile.legal_name,
+        "product_type" => member_group.group_enrollment.product.product_type
       )
       member_group_hash
     end.to_json
