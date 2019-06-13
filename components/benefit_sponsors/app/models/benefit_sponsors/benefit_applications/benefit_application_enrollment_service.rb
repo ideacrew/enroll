@@ -43,6 +43,7 @@ module BenefitSponsors
       if benefit_application.may_approve_application?
         if is_application_eligible?
           if business_policy_satisfied_for?(:submit_benefit_application)
+            benefit_application.update_attributes(recorded_sic_code: benefit_application.employer_profile.sic_code)
             benefit_application.approve_application!
             oe_period = benefit_application.open_enrollment_period
 
@@ -78,6 +79,7 @@ module BenefitSponsors
 
     def force_submit_application
       if business_policy_satisfied_for?(:force_submit_benefit_application) && is_application_eligible?
+        benefit_application.update_attributes(recorded_sic_code: benefit_application.employer_profile.sic_code)
         if benefit_application.may_approve_application?
           benefit_application.auto_approve_application!
           
