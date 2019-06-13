@@ -112,7 +112,8 @@ module Importers
         errors.add(:base, "plan year missing")
         return false
       end
-      enrollments = HbxEnrollment.where({
+      
+      enrollments = family.hbx_enrollments.where({
         :benefit_group_id.in => plan_year.benefit_group_ids,
         :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES + ["coverage_expired"]
         }).by_coverage_kind('health').order(created_at: :desc).to_a
