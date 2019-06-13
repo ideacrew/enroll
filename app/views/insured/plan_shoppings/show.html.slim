@@ -88,7 +88,7 @@
 = render :partial => "ui-components/v1/modals/help_with_plan", :locals => {:enrollment => @hbx_enrollment}
 
 javascript:
-  var marketKind = "#{@hbx_enrollment.kind}";
+  var marketKind = "#{@hbx_enrollment.is_shop? ? 'shop' : @hbx_enrollment.kind}";
 
   if (marketKind === "shop") {
     var availableEnrollments = [];
@@ -154,6 +154,7 @@ javascript:
 
     function filteredPlans(type) {
       filteredArray = [];
+
 
       if (type == "plan-name") {
         // Filters by Title
@@ -307,7 +308,6 @@ javascript:
     function showFilteredResults() {
       var element = document.getElementById('filteredPlans');
       filteredArray.forEach(function (result) {
-        console.log(result)
         var logo = carrierLogos[result.product.issuer_name];
         if (result.product.kind == 'health') {
           var plan_kind = result.product.health_plan_kind
@@ -424,4 +424,11 @@ javascript:
         type: "GET"
       });
     });
+  }
+
+  function removeDuplicates(data) {
+    return data.filter((item, index,arr)=>{
+      var c = arr.map(item=> item.product_cost_total);
+      return  index === c.indexOf(item.product_cost_total)
+    })
   }
