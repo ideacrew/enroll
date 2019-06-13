@@ -39,11 +39,18 @@ module BenefitSponsors
 
       def deactivate_profile_representative!(form)
         profile = find_profile(form)
-        person_ids = form[:is_broker_agency_staff_profile?] ? Person.staff_for_broker(profile).map(&:id) : Person.staff_for_employer(profile).map(&:id)
-        if person_ids.count == 1 && person_ids.first.to_s == form[:person_id]
-          return false, 'Please add another staff role before deleting this role'
+        if form[:is_broker_agency_staff_profile?]
+          person_ids = Person.staff_for_broker(profile).map(&:id)
+          validate_person_count(person_ids)
+          deactivate_broker_agency_staff_role(form[:person_id], form[:profile_id])
+        elsif form[:is_general_agency_staff_profile?]
+          person_ids = Person.staff_for_ga(profile).map(&:id)
+          validate_person_count(person_ids)
+          deactivate_general_agency_staff_role(form[:person_id], form[:profile_id])
         else
-          form[:is_broker_agency_staff_profile?] ? deactivate_broker_agency_staff_role(form[:person_id], form[:profile_id]) : Person.deactivate_employer_staff_role(form[:person_id], form[:profile_id])
+          person_ids = Person.staff_for_employer(profile).map(&:id)
+          validate_person_count(person_ids)
+          Person.deactivate_employer_staff_role(form[:person_id], form[:profile_id])
         end
       end
 
@@ -186,8 +193,31 @@ module BenefitSponsors
         [true, 'Broker Agency Staff Role is inactive']
       end
 
+      def deactivate_general_agency_staff_role(person_id, general_agency_profile_id)
+        begin
+          person = Person.find(person_id)
+        rescue StandardError
+          return false, 'Person not found'
+        end
+
+        general_agency_staff_role = person.general_agency_staff_roles.detect do |role|
+          (role.benefit_sponsors_general_agency_profile_id.to_s || role.general_agency_profile_id.to_s) == general_agency_profile_id.to_s && role.is_open?
+        end
+
+        return false, 'No matching General Agency Staff role' if general_agency_staff_role.blank?
+
+        general_agency_staff_role.general_agency_terminate!
+        [true, 'General Agency Staff Role is inactive']
+      end
+
       def add_person_contact_info(form)
         person.add_work_email(form.email)
+      end
+
+      def validate_person_count(ids)
+        if ids.count == 1 && ids.first.to_s == form[:person_id]
+          return false, 'Please add another staff role before deleting this role'
+        end
       end
 
       def build_person(form)
