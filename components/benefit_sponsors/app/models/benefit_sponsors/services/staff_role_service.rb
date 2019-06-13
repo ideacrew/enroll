@@ -41,15 +41,15 @@ module BenefitSponsors
         profile = find_profile(form)
         if form[:is_broker_agency_staff_profile?]
           person_ids = Person.staff_for_broker(profile).map(&:id)
-          validate_person_count(person_ids)
+          return false, 'Please add another staff role before deleting this role' if invalid_person_count?(person_ids, form)
           deactivate_broker_agency_staff_role(form[:person_id], form[:profile_id])
         elsif form[:is_general_agency_staff_profile?]
           person_ids = Person.staff_for_ga(profile).map(&:id)
-          validate_person_count(person_ids)
+          return false, 'Please add another staff role before deleting this role' if invalid_person_count?(person_ids, form)
           deactivate_general_agency_staff_role(form[:person_id], form[:profile_id])
         else
           person_ids = Person.staff_for_employer(profile).map(&:id)
-          validate_person_count(person_ids)
+          return false, 'Please add another staff role before deleting this role' if invalid_person_count?(person_ids, form)
           Person.deactivate_employer_staff_role(form[:person_id], form[:profile_id])
         end
       end
@@ -214,10 +214,8 @@ module BenefitSponsors
         person.add_work_email(form.email)
       end
 
-      def validate_person_count(ids)
-        if ids.count == 1 && ids.first.to_s == form[:person_id]
-          return false, 'Please add another staff role before deleting this role'
-        end
+      def invalid_person_count?(ids, form)
+        ids.count == 1 && ids.first.to_s == form[:person_id]
       end
 
       def build_person(form)
