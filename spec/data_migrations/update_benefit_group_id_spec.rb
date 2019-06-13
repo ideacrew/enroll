@@ -31,8 +31,8 @@ describe UpdateBenefitGroupId, dbclean: :after_each do
     
     it "should update benefit group id" do
       subject.migrate
-      person.primary_family.active_household.hbx_enrollments.first.reload
-      expect(person.primary_family.active_household.hbx_enrollments.first.benefit_group_id).to be_present
+      person.primary_family.hbx_enrollments.first.reload
+      expect(person.primary_family.hbx_enrollments.first.benefit_group_id).to be_present
     end
   end
 end
