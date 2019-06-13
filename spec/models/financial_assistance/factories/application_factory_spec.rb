@@ -3,6 +3,7 @@ require 'rails_helper'
 RSpec.describe "ApplicationFactory" do
   describe 'copy_application' do
     subject do
+      application.applicants.first.verification_types << VerificationType.new
       FinancialAssistance::Factories::ApplicationFactory.new(application)
     end
 
@@ -56,6 +57,8 @@ RSpec.describe "ApplicationFactory" do
         end
 
         it 'should not copy assisted verification types' do
+          old_verification_types = application.applicants.first.verification_types
+          expect(old_verification_types.count).to eq 1
           verification_types = @draft_application.applicants.first.verification_types
           expect(verification_types.count).to eq 0
         end
