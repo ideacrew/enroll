@@ -19,7 +19,7 @@ PATH
       transport_gateway
 
 PATH
-  remote: /Users/tevans/proj/enroll_ma_cucumbers/components/transport_gateway
+  remote: /Users/tevans/proj/enroll/components/transport_gateway
   specs:
     transport_gateway (0.0.1)
       aws-sdk (~> 2.2.4)
