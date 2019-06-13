@@ -283,6 +283,7 @@ And(/^employees for (.*?) have a selected coverage$/) do |legal_name|
 
   build_enrollment({household: coverage_household,
                     benefit_group_assignment: bga,
+                    family:person.primary_family,
                     employee_role: @census_employees.first.employee_role,
                     sponsored_benefit_package_id: benefit_package.id,
                     rating_area_id: rating_area_id,
