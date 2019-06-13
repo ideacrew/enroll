@@ -79,7 +79,7 @@ describe GeneralAgencyStaffRole, dbclean: :after_each do
   end
 
   context "aasm" do
-    let(:staff_role) { FactoryBot.create(:general_agency_staff_role, benefit_sponsors_general_agency_profile_id: general_agency_profile.id) }
+    let(:staff_role) { FactoryBot.create(:general_agency_staff_role, benefit_sponsors_general_agency_profile_id: general_agency_profile.id, is_primary: true) }
 
     context "applicant?" do
       it "should return true" do
@@ -139,6 +139,13 @@ describe GeneralAgencyStaffRole, dbclean: :after_each do
           staff_role.update_attributes!(aasm_state: :general_agency_terminated)
           staff_role.general_agency_pending!
           expect(staff_role.aasm_state).to eq('general_agency_pending')
+        end
+      end
+      context "general_agency_terminate" do
+        it "should update the state of staff role to general_agency_terminated" do
+          staff_role.update_attributes!(aasm_state: :general_agency_pending)
+          staff_role.general_agency_terminate!
+          expect(staff_role.aasm_state).to eq('general_agency_terminated')
         end
       end
     end
