@@ -26,7 +26,7 @@ class HbxEnrollment
   ENROLLMENT_KINDS    = %w(open_enrollment special_enrollment)
   COVERAGE_KINDS      = %w(health dental)
 
-  ENROLLED_STATUSES   = %w[coverage_selected transmitted_to_carrier coverage_enrolled coverage_termination_pe unverified].freeze
+  ENROLLED_STATUSES   = %w[coverage_selected transmitted_to_carrier coverage_enrolled coverage_termination_pending unverified].freeze
   SELECTED_AND_WAIVED = %w(coverage_selected inactive)
   TERMINATED_STATUSES = %w(coverage_terminated unverified coverage_expired void)
   CANCELED_STATUSES   = %w(coverage_canceled)
@@ -1679,12 +1679,21 @@ class HbxEnrollment
     ENROLLED_STATUSES.include?(aasm_state)
   end
 
+  def is_ivl_and_outstanding?
+    is_ivl_by_kind? && is_any_enrollment_member_outstanding? && ENROLLED_AND_RENEWAL_STATUSES.include?(self.aasm_state)
+  end
+
   def is_effective_in_current_year?
     (TimeKeeper.date_of_record.beginning_of_year..TimeKeeper.date_of_record.end_of_year).include?(effective_on)
   end
 
   def is_ivl_actively_outstanding?
     is_ivl_by_kind? && is_enrolled_by_aasm_state? && is_effective_in_current_year? && is_any_enrollment_member_outstanding?
+  end
+
+  def is_any_member_outstanding?
+    active_consumer_role_people =  hbx_enrollment_members.flat_map(&:person).select{|per| per if per.is_consumer_role_active?}
+    active_consumer_role_people.present? ? active_consumer_role_people.map(&:consumer_role).any?(&:verification_outstanding?) : false
   end
 
   EnrollmentMemberAdapter = Struct.new(:member_id, :dob, :relationship, :is_primary_member, :is_disabled) do

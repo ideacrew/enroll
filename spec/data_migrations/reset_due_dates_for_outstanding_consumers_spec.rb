@@ -12,23 +12,23 @@ describe ResetDueDatesForOutstandingConsumers, dbclean: :after_each do
   end
 
   describe "reset due date for outstanding consumer" do
-    let!(:person)           { FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role) }
+    let!(:person)           { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
     let(:consumer_role)     { person.consumer_role }
-    let!(:family)           { FactoryGirl.create(:family, :with_primary_family_member_and_dependent, person: person) }
-    let!(:hbx_enrollment)   { FactoryGirl.create(:hbx_enrollment, aasm_state: "coverage_selected",
-                                                  household: family.active_household, kind: "individual") }
-    let!(:hbx_enrollment_member) { FactoryGirl.create(:hbx_enrollment_member, :hbx_enrollment => hbx_enrollment,
-      eligibility_date: (TimeKeeper.date_of_record - 2.months), coverage_start_on: (TimeKeeper.date_of_record - 2.months),
-      is_subscriber: true, applicant_id: family.primary_applicant.id) }
-    let!(:hbx_enrollment_member1) { FactoryGirl.create(:hbx_enrollment_member, :hbx_enrollment => hbx_enrollment,
-      eligibility_date: (TimeKeeper.date_of_record - 2.months), coverage_start_on: (TimeKeeper.date_of_record - 2.months),
-      is_subscriber: false, applicant_id: family.family_members[1].id) }
+    let!(:family)           { FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person) }
+    let!(:hbx_enrollment)   { FactoryBot.create(:hbx_enrollment, aasm_state: "coverage_selected", effective_on: TimeKeeper.date_of_record,
+                                                 household: family.active_household, kind: "individual") }
+    let!(:hbx_enrollment_member) { FactoryBot.create(:hbx_enrollment_member, :hbx_enrollment => hbx_enrollment,
+                                                      eligibility_date: (TimeKeeper.date_of_record - 2.months), coverage_start_on: (TimeKeeper.date_of_record - 2.months),
+                                                      is_subscriber: true, applicant_id: family.primary_applicant.id) }
+    let!(:hbx_enrollment_member1) { FactoryBot.create(:hbx_enrollment_member, :hbx_enrollment => hbx_enrollment,
+                                                       eligibility_date: (TimeKeeper.date_of_record - 2.months), coverage_start_on: (TimeKeeper.date_of_record - 2.months),
+                                                       is_subscriber: false, applicant_id: family.family_members[1].id) }
     let(:dep_person) { family.family_members[1].person }
-    let!(:dep_consumer_role) { FactoryGirl.create(:consumer_role, person: dep_person) }
-    let!(:dep_imt) { FactoryGirl.create :individual_market_transition, person: dep_person }
+    let!(:dep_consumer_role) { FactoryBot.create(:consumer_role, person: dep_person) }
+    let!(:dep_imt) { FactoryBot.create :individual_market_transition, person: dep_person }
     let!(:dep_person1) { family.family_members[2].person }
-    let!(:dep_consumer_role1) { FactoryGirl.create(:consumer_role, person: dep_person1) }
-    let!(:dep_imt1) { FactoryGirl.create :individual_market_transition, person: dep_person1 }
+    let!(:dep_consumer_role1) { FactoryBot.create(:consumer_role, person: dep_person1) }
+    let!(:dep_imt1) { FactoryBot.create :individual_market_transition, person: dep_person1 }
 
     context "it should update the due. date and enrollment state" do 
       before :each do
@@ -43,7 +43,7 @@ describe ResetDueDatesForOutstandingConsumers, dbclean: :after_each do
         expect(hbx_enrollment.aasm_state).to eq "coverage_selected"
       end
 
-      it "should update the verifcation_types" do
+      it "should update the verification_types" do
         expect(consumer_role.verification_types[0].due_date).to be_truthy
       end
     end

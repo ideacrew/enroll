@@ -9,7 +9,7 @@ Given(/^oustanding verfications users exists$/) do
                     :is_any_enrollment_member_outstanding => true,
                     :kind => "individual",
                     :effective_on => TimeKeeper.date_of_record.beginning_of_year)
-  FactoryGirl.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, eligibility_date: (TimeKeeper.date_of_record - 2.months), hbx_enrollment: enrollment)
+  FactoryBot.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, eligibility_date: (TimeKeeper.date_of_record - 2.months), hbx_enrollment: enrollment)
   enrollment.save!
   Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.is_any_enrollment_member_outstanding' => true)
 end

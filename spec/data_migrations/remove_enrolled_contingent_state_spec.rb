@@ -13,9 +13,9 @@ describe RemoveEnrolledContingentState, dbclean: :after_each do
   end
 
   describe "migrate hbx enrollment" do
-    let!(:person)           { FactoryGirl.create(:person, :with_consumer_role) }
-    let!(:family)           { FactoryGirl.create(:family, :with_primary_family_member) }
-    let!(:hbx_enrollment)   { FactoryGirl.create(:hbx_enrollment, aasm_state: "enrolled_contingent",
+    let!(:person)           { FactoryBot.create(:person, :with_consumer_role) }
+    let!(:family)           { FactoryBot.create(:family, :with_primary_family_member) }
+    let!(:hbx_enrollment)   { FactoryBot.create(:hbx_enrollment, aasm_state: "enrolled_contingent",
                               household: family.active_household, kind: "individual") }
 
     context "for successful migration" do

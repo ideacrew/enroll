@@ -78,6 +78,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         consumer_role_id: nil,
         consumer_role: nil,
         future_enrollment_termination_date: "",
+        :is_ivl_actively_outstanding? => false,
         covered_members_first_names: []
       )
     end
@@ -284,16 +285,16 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
    let(:benefit_group) { FactoryBot.create(:benefit_group) }
 =======
-    let(:plan) {FactoryGirl.build(:plan, :created_at =>  TimeKeeper.date_of_record)}
-    let(:employee_role) { FactoryGirl.create(:employee_role) }
-    let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id)}
+    let(:plan) {FactoryBot.build(:plan, :created_at =>  TimeKeeper.date_of_record)}
+    let(:employee_role) { FactoryBot.create(:employee_role) }
+    let(:census_employee) { FactoryBot.create(:census_employee, employee_role_id: employee_role.id)}
     let(:hbx_enrollment) {instance_double("HbxEnrollment", plan: plan, id: "12345", total_premium: 200, kind: 'individual',
                                  covered_members_first_names: ["name"], can_complete_shopping?: false,
                                  enroll_step: 1, subscriber: nil, coverage_terminated?: false,
                                  may_terminate_coverage?: true, effective_on: Date.new(2015,8,10),
                                  consumer_role: double, applied_aptc_amount: 100, employee_role: employee_role, census_employee: census_employee,
                                   aasm_state: 'coverage_selected', :is_ivl_actively_outstanding? => false)}
-   let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+   let(:benefit_group) { FactoryBot.create(:benefit_group) }
 >>>>>>> a9619997ea... refs #33617 remove enrolled contingent aasm state in EA
 
     before :each do
@@ -333,16 +334,16 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 =======
 
   context "about covered_members_first_names of hbx_enrollment" do
-    let(:plan) {FactoryGirl.build(:plan, :created_at => TimeKeeper.date_of_record)}
-    let(:employee_role) { FactoryGirl.create(:employee_role) }
-    let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id)}
+    let(:plan) {FactoryBot.build(:plan, :created_at => TimeKeeper.date_of_record)}
+    let(:employee_role) { FactoryBot.create(:employee_role) }
+    let(:census_employee) { FactoryBot.create(:census_employee, employee_role_id: employee_role.id)}
     let(:hbx_enrollment) {double(plan: plan, id: "12345", total_premium: 200, kind: 'individual',
                                  covered_members_first_names: [], can_complete_shopping?: false,
                                  enroll_step: 1, subscriber: nil, coverage_terminated?: false,
                                  may_terminate_coverage?: true, effective_on: Date.new(2015,8,10),
                                  consumer_role: double, applied_aptc_amount: 100, employee_role: employee_role, census_employee: census_employee,
                                   aasm_state: 'coverage_selected', :is_ivl_actively_outstanding? => true)}
-    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+    let(:benefit_group) { FactoryBot.create(:benefit_group) }
 
     before :each do
       allow(hbx_enrollment).to receive(:coverage_canceled?).and_return(false)
