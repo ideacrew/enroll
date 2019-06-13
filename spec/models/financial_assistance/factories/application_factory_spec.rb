@@ -19,6 +19,7 @@ RSpec.describe "ApplicationFactory" do
           subject.copy_application
           @draft_application = family.application_in_progress
         end
+
         it 'should have 2 application' do
           expect(family.applications.count).to eq 2
         end
@@ -54,9 +55,9 @@ RSpec.describe "ApplicationFactory" do
           expect(deductions.count).to eq 1
         end
 
-        it 'should not have assisted verifications' do
-          assisted_verifications = @draft_application.applicants.first.assisted_verifications
-          expect(assisted_verifications.count).to eq 0
+        it 'should not copy assisted verification types' do
+          verification_types = @draft_application.applicants.first.verification_types
+          expect(verification_types.count).to eq 0
         end
       end
     end
