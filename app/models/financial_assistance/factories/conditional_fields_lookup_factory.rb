@@ -16,6 +16,7 @@ module FinancialAssistance
 
       private
 
+      # TODO: This factory will be refactored to remove the following method.
       def model_instance
         case @class_name
         when "applicant"
