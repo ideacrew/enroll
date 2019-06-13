@@ -177,5 +177,124 @@ module BenefitSponsors
       end
     end
 
+    describe "GET approve", dbclean: :after_each do
+
+      context "approve applicant staff role" do
+
+        let!(:staff_params) do
+          {
+            :id => gap_id, :person_id => new_person_for_staff.id, :profile_id => gap_id
+          }
+        end
+
+        before :each do
+          sign_in user
+          general_agency_staff_role1.update_attributes(aasm_state: 'general_agency_pending')
+          get :approve, params: staff_params
+        end
+
+        it "should initialize staff" do
+          expect(assigns(:staff).class).to eq staff_class
+        end
+
+        it "should redirect" do
+          expect(response).to have_http_status(:redirect)
+        end
+
+        it "should get an notice" do
+          expect(flash[:notice]).to match 'Role approved successfully'
+        end
+
+        it "should update general_agency_staff_role aasm_state to active" do
+          general_agency_staff_role1.reload
+          expect(general_agency_staff_role1.aasm_state).to eq "active"
+        end
+
+      end
+
+      context "approving invalid staff role" do
+
+        let!(:staff_params) do
+          {
+            :id => gap_id, :person_id => new_person_for_staff1.id, :profile_id => gap_id
+          }
+        end
+
+        before :each do
+          sign_in user
+          general_agency_staff_role.update_attributes(aasm_state: 'active')
+          get :approve, params: staff_params
+        end
+
+        it "should redirect" do
+          expect(response).to have_http_status(:redirect)
+        end
+
+        it "should get an error" do
+          expect(flash[:error]).to match 'Please contact HBX Admin to report this error'
+        end
+      end
+    end
+
+
+    describe "DELETE destroy", dbclean: :after_each do
+      context "should deactivate staff role" do
+
+        let!(:staff_params) do
+          {
+            :id => gap_id, :person_id => new_person_for_staff1.id, :profile_id => gap_id
+          }
+        end
+        let!(:general_agency_staff_role2) { FactoryBot.create(:general_agency_staff_role, benefit_sponsors_general_agency_profile_id: gap_id, person: new_person_for_staff, is_primary: true, aasm_state: :active) }
+
+        before :each do
+          sign_in user
+          general_agency_profile1.general_agency_staff_roles << general_agency_staff_role2
+          general_agency_staff_role.update_attributes(aasm_state: 'active')
+          delete :destroy, params: staff_params
+        end
+
+        it "should initialize staff" do
+          expect(assigns(:staff).class).to eq staff_class
+        end
+
+        it "should redirect" do
+          expect(response).to have_http_status(:redirect)
+        end
+
+        it "should get an notice" do
+          expect(flash[:notice]).to match 'Role removed successfully'
+        end
+
+        it "should update broker_staff_rol aasm_state to broker_agency_terminated" do
+          general_agency_staff_role.reload
+          expect(general_agency_staff_role.aasm_state).to eq "general_agency_terminated"
+        end
+      end
+
+      context "should not deactivate only staff role of general agency" do
+
+        let!(:staff_params) do
+          {
+            :id => second_general_agency_profile.id, :person_id => new_person_for_staff1.id, :profile_id => second_general_agency_profile.id
+          }
+        end
+
+        before :each do
+          general_agency_staff_role.update_attributes(benefit_sponsors_general_agency_profile_id: second_general_agency_profile.id, aasm_state: 'active')
+          sign_in user
+          delete :destroy, params: staff_params
+        end
+
+        it "should redirect" do
+          expect(response).to have_http_status(:redirect)
+        end
+
+        it "should get an error" do
+          expect(flash[:error]).to match(/Role was not removed because/i)
+        end
+      end
+    end
+
   end
 end
