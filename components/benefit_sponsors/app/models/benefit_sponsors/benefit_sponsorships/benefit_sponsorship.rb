@@ -718,7 +718,6 @@ module BenefitSponsors
         :binder_paid => :applicant,
         :enrolled => :active,
         :suspended => :suspended,
-        :ineligible => :ineligible,
         :registered => :applicant,
         :eligible => :applicant
       }
