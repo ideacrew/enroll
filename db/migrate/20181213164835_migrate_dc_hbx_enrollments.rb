@@ -82,18 +82,17 @@ class MigrateDcHbxEnrollments < Mongoid::Migration
         Family.where(:'households.hbx_enrollments'.exists=>true).limit(limit_count).offset(offset_count).each do |fam|
           begin
             fam.active_household.hbx_enrollments.each do |hbx|
-              next if (hbx.shopping? || hbx.inactive? ||hbx.renewing_waived?)
-              next if hbx.coverage_canceled? && hbx.plan_id.blank?
+              next if hbx.shopping?
 
               if hbx.benefit_group_id.present?
                 plan_hash = shop_plan_hash
                 product_data = plan_hash[hbx.plan_id]
                 benefit_app_data = @benefit_app_hash[hbx.benefit_group_id]
 
-                if benefit_app_data && product_data
+                if benefit_app_data
                   hbx.update_attributes(
-                      product_id: product_data['product_id'],
-                      issuer_profile_id: product_data['carrier_profile_id'],
+                      product_id: product_data ? product_data['product_id'] : nil,
+                      issuer_profile_id: product_data ? product_data['carrier_profile_id'] : nil,
                       benefit_sponsorship_id: benefit_app_data['benefit_sponsorship_id'],
                       sponsored_benefit_package_id: benefit_app_data['benefit_package_id'],
                       sponsored_benefit_id: hbx.coverage_kind == "health" ? benefit_app_data['health_sponsored_benefit_id'] : benefit_app_data['dental_sponsored_benefit_id'],
@@ -132,8 +131,7 @@ class MigrateDcHbxEnrollments < Mongoid::Migration
         org.active_benefit_sponsorship.census_employees.unscoped.each do |ce|
           ce.benefit_group_assignments.each do |bga|
             get_hbx_enrollments(bga).each do |hbx|
-              next if (hbx.shopping? || hbx.inactive? ||hbx.renewing_waived?)
-              next if hbx.coverage_canceled? && hbx.plan_id.blank?
+              next if hbx.shopping?
               product_data = fehb_plan_hash[hbx.plan_id]
               if product_data
                 hbx.update_attributes(
