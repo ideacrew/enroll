@@ -24,8 +24,8 @@ class Insured::FamiliesController < FamiliesController
       @hbx_enrollments = @family.enrollments.non_external.order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) || []
       @enrollment_filter = @family.enrollments_for_display
 
-      valid_display_enrollments = Array.new
-      @enrollment_filter.each  { |e| valid_display_enrollments.push e['hbx_enrollment']['_id'] }
+    valid_display_enrollments = Array.new
+    @enrollment_filter.each  { |e| valid_display_enrollments.push e['_id'] }
 
       log("#3860 person_id: #{@person.id}", {:severity => "error"}) if @hbx_enrollments.any?{|hbx| !hbx.is_coverage_waived? && hbx.product.blank?}
       update_changing_hbxs(@hbx_enrollments)
