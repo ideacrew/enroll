@@ -50,8 +50,7 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
     failed = 0
     limit_count = 1000
 
-
-    say_with_time("Time taken to create benefit sposonsorship") do # TODO check with trey creating empty benefit applications
+    say_with_time("Time taken to create benefit sposonsorship") do
       Organization.collection.aggregate([
         {"$match" => {"employer_profile" => { "$exists" => true }}},
         {"$project" => {"hbx_id"=> 1, "employer_profile.profile_source"=> 1,
@@ -74,15 +73,11 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
         {"$group"=>{"_id" =>  "$_id","hbx_id" => {"$last" => "$hbx_id"},
                     "source_kind" => {"$last"=> "$employer_profile.profile_source"},
                     "registered_on" => {"$last" => "$employer_profile.registered_on"},
-                    "benefit_applications" => {"$push" => "$benefit_application"}}},
-        {"$out" => "benefit_sponsors_benefit_sponsorships_benefit_sponsorships"}
-    ]).each
+                    "benefit_applications" => {"$push" => {"$cond" => { if: { "$ne": [ "$benefit_application.effective_period", {}]},
+                                                                        then: "$benefit_application", else: [],}}}}},
+        {"$out" => "benefit_sponsors_benefit_sponsorships_benefit_sponsorships"}]).each
+      BenefitSponsors::BenefitSponsorships::BenefitSponsorship.collection.update_many({:benefit_applications => [[]]}, {"$set" => {"benefit_applications" => []}})
     end
-
-    # "benefit_applications" => {"$push" => {"$cond" => { if: { "$ne": [ "$benefit_application.effective_period", {}]},
-    #                                                     then: "$benefit_application", else: [],}
-
-
 
     say_with_time("Time taken to migrate organizations") do
       old_organizations.batch_size(limit_count).no_timeout.each do |old_org|
@@ -99,7 +94,6 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
             market = is_congress?(old_org) ? site.benefit_market_for(:fehb): benefit_market
 
             @benefit_sponsorship = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(hbx_id: old_org.hbx_id).first
-            @benefit_sponsorship.benefit_applications = [] if @benefit_sponsorship.benefit_applications.any?{|b| b.start_on.blank?}
             @benefit_sponsorship.profile_id = @new_profile.id
             @benefit_sponsorship.benefit_market = market
             @benefit_sponsorship.source_kind = @old_profile.profile_source.to_sym
