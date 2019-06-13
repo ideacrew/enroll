@@ -1,4 +1,4 @@
-require 'services/checkbook_services'
+require 'services/checkbook_services/plan_comparision'
 
 # An instance of the CensusEmployee is an employee that belongs to a Benefit Sponsor.
 # It is the primary way for us to refer to the employee of an employer.
