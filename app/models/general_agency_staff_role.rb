@@ -62,6 +62,10 @@ class GeneralAgencyStaffRole
       transitions from: [:applicant, :decertified, :denied], to: :applicant
     end
 
+    event :general_agency_terminate, :after => :record_transition do
+      transitions from: [:active, :general_agency_pending], to: :general_agency_terminated
+    end
+
     event :general_agency_pending, :after => :record_transition do
       transitions from: [:general_agency_terminated, :applicant], to: :general_agency_pending
     end
@@ -111,6 +115,10 @@ class GeneralAgencyStaffRole
 
   def agency_pending?
     aasm_state == "general_agency_pending"
+  end
+
+  def is_open?
+    agency_pending? || active?
   end
 
   class << self
