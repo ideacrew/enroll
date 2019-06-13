@@ -639,6 +639,16 @@ class Person
                                     }).size > 0
   end
 
+  def has_pending_ga_staff_role?(general_agency_profile_id)
+    general_agency_staff_roles.where({
+                                      aasm_state: :general_agency_pending,
+                                      '$or' => [
+                                        {benefit_sponsors_general_agency_profile_id: general_agency_profile_id},
+                                        {general_agency_profile_id: general_agency_profile_id}
+                                      ]
+                                    }).size > 0
+  end
+
   def active_broker_staff_roles
     broker_agency_staff_roles.where(:aasm_state => :active)
   end
@@ -853,6 +863,27 @@ class Person
                            {
                              '$or' => [
                                {aasm_state: :broker_agency_pending},
+                               {aasm_state: :active}
+                             ]
+                           }
+                         ]
+                       }
+                     })
+    end
+
+    def staff_for_ga_including_pending(general_agency_profile)
+      Person.where(:general_agency_staff_roles =>
+                     {
+                       '$elemMatch' => {
+                         '$and' => [
+                           {
+                             '$or' => [
+                               {benefit_sponsors_general_agency_profile_id: general_agency_profile.id}
+                             ]
+                           },
+                           {
+                             '$or' => [
+                               {aasm_state: :general_agency_pending},
                                {aasm_state: :active}
                              ]
                            }
