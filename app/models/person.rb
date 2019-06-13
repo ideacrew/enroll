@@ -832,6 +832,20 @@ class Person
                      })
     end
 
+    def staff_for_ga(general_agency_profile)
+      Person.where(:general_agency_staff_roles =>
+                     {
+                       '$elemMatch' =>
+                         {
+                           aasm_state: :active,
+                           '$or' => [
+                             {benefit_sponsors_general_agency_profile_id: general_agency_profile.id},
+                             {general_agency_profile_id: general_agency_profile.id}
+                           ]
+                         }
+                     })
+    end
+
     def staff_for_employer_including_pending(employer_profile)
       if employer_profile.is_a? (EmployerProfile)
         self.where(:employer_staff_roles => {
