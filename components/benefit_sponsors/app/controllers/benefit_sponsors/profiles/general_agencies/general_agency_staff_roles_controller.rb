@@ -27,23 +27,23 @@ module BenefitSponsors
             format.js
           end
         end
-        #
-        # def approve
-        #   @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_approve(broker_staff_params)
-        #   authorize @staff
-        #   begin
-        #     @status, @result = @staff.approve
-        #     if @status
-        #       flash[:notice] = "Role approved successfully"
-        #     else
-        #       flash[:error] = "Role was not approved because " + @result
-        #     end
-        #   rescue Exception => e
-        #     flash[:error] = "Role was not approved because " + e.message
-        #   end
-        #   redirect_to profiles_broker_agencies_broker_agency_profile_path(id: params[:profile_id])
-        # end
-        #
+
+        def approve
+          @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_approve(general_agency_staff_params)
+          authorize @staff
+          begin
+            @status, @result = @staff.approve
+            if @status
+              flash[:notice] = "Role approved successfully"
+            else
+              flash[:error] = "Role was not approved because " + @result
+            end
+          rescue Exception => e
+            flash[:error] = "Role was not approved because " + e.message
+          end
+          redirect_to profiles_general_agencies_general_agency_profile_path(id: params[:staff][:profile_id])
+        end
+
         # def destroy
         #   @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_destroy(broker_staff_params)
         #   authorize @staff
@@ -59,7 +59,7 @@ module BenefitSponsors
         #   end
         #   redirect_to profiles_broker_agencies_broker_agency_profile_path(id: params[:profile_id])
         # end
-        #
+
         def search_general_agency
           @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_broker_agency_search(general_agency_staff_params)
           @general_agency_profiles = @staff.general_agency_search
