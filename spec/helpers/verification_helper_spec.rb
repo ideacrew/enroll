@@ -287,7 +287,7 @@ RSpec.describe VerificationHelper, :type => :helper do
     end
   end
 
-  describe '#verification_types' do
+  describe '#verification_types_of_member' do
     include_examples 'draft application with 2 applicants'
 
     before do
@@ -298,15 +298,15 @@ RSpec.describe VerificationHelper, :type => :helper do
     context 'family member present on application' do
 
       it 'should return income and mec verifications' do
-        expect(helper.verification_types(second_applicant.family_member).count).to eq 5
-        expect(helper.verification_types(second_applicant.family_member).map(&:type_name)).to include('Income')
+        expect(helper.verification_types_of_member(second_applicant.family_member).count).to eq 5
+        expect(helper.verification_types_of_member(second_applicant.family_member).map(&:type_name)).to include('Income')
       end
     end
 
     context 'family member not present on application' do
       it 'should not return income and mec verification types' do
-        expect(helper.verification_types(family_member_not_on_application).count).to eq 3
-        expect(helper.verification_types(family_member_not_on_application).map(&:type_name)).not_to include('Income')
+        expect(helper.verification_types_of_member(family_member_not_on_application).count).to eq 3
+        expect(helper.verification_types_of_member(family_member_not_on_application).map(&:type_name)).not_to include('Income')
       end
     end
   end

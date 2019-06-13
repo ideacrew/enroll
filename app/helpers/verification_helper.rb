@@ -306,7 +306,7 @@ module VerificationHelper
     (dependent.try(:family_member).try(:person).nil? || dependent.try(:family_member).try(:person).is_resident_role_active?)
   end
 
-  def verification_types(f_member)
+  def verification_types_of_member(f_member)
     application = f_member.application_for_verifications
     f_member.person.verification_types.active + (application ? f_member.applicant_of_application(application).verification_types : [])
   end

@@ -713,6 +713,10 @@ class HbxEnrollment
     HandleCoverageSelected.call(callback_context)
   end
 
+  def notify_of_eligibility_change
+    CoverageHousehold.update_eligibility_for_family(family) unless is_shop?
+  end
+
   def is_applicable_for_renewal?
     is_shop? && self.benefit_group.present? && self.benefit_group.plan_year.is_published?
   end
@@ -1360,7 +1364,7 @@ class HbxEnrollment
 
   aasm do
     state :shopping, initial: true
-    state :coverage_selected, :after_enter => [:update_renewal_coverage, :handle_coverage_selection]
+    state :coverage_selected, :after_enter => [:update_renewal_coverage, :handle_coverage_selection, :notify_of_eligibility_change]
     state :transmitted_to_carrier
     state :coverage_enrolled, :after_enter => :update_renewal_coverage
 
@@ -1785,10 +1789,22 @@ class HbxEnrollment
 
   def set_is_any_enrollment_member_outstanding
     if kind == "individual"
-      active_consumer_role_people = hbx_enrollment_members.flat_map(&:person).select{|per| per if per.is_consumer_role_active?}
-      true_or_false = active_consumer_role_people.present? ? active_consumer_role_people.map(&:consumer_role).any?(&:verification_outstanding?) : false
+      application = family.latest_applicable_submitted_application
+      applicants_outstanding = any_outstanding_applicants(application.applicants) if application
+      consumer_status = active_consumer_people_status
+      true_or_false = applicants_outstanding || consumer_status
       self.assign_attributes({:is_any_enrollment_member_outstanding => true_or_false})
     end
+  end
+
+  def any_outstanding_applicants(applicants)
+    return false unless applicants
+    applicants.any?(&:verification_outstanding?)
+  end
+
+  def active_consumer_people_status
+    consumer_role_people = hbx_enrollment_members.flat_map(&:person).select{|per| per if per.is_consumer_role_active?}
+    consumer_role_people.present? ? consumer_role_people.map(&:consumer_role).any?(&:verification_outstanding?) : false
   end
 
   # NOTE - Mongoid::Timestamps does not generate created_at time stamps.
