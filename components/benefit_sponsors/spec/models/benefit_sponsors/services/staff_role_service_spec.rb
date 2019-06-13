@@ -436,5 +436,50 @@ module BenefitSponsors
         end
       end
     end
+
+    describe ".deactivate_general_agency_staff_role" do
+      let(:person) {FactoryBot.create(:person)}
+      let!(:ga_organization)  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, site: site) }
+      let(:general_agency_profile) { ga_organization.general_agency_profile }
+      let!(:ga_organization_second) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, site: site) }
+      let(:general_agency_profile_second) { ga_organization_second.general_agency_profile }
+      before do
+        FactoryBot.create(:general_agency_staff_role, benefit_sponsors_general_agency_profile_id: general_agency_profile.id, person: person, general_agency_profile: general_agency_profile, aasm_state: 'active')
+      end
+
+      context 'finds the person and deactivates the role' do
+        before do
+          @status, @result = subject.deactivate_general_agency_staff_role(person.id, general_agency_profile.id)
+        end
+        it 'returns true' do
+          expect(@status).to be true
+        end
+
+        it 'returns msg' do
+          expect(@result).to be_instance_of String
+        end
+
+        it 'should terminate general agency staff role' do
+          expect(person.reload.general_agency_staff_roles.first.aasm_state).to eq "general_agency_terminated"
+        end
+      end
+
+      context 'person does not have general agency staff role' do
+        before do
+          @status, @result = subject.deactivate_general_agency_staff_role(person.id, general_agency_profile_second.id)
+        end
+        it 'returns false' do
+          expect(@status).to eq false
+        end
+
+        it 'returns msg' do
+          expect(@result).to be_instance_of String
+        end
+
+        it 'should not terminate other broker agency staff role' do
+          expect(person.reload.general_agency_staff_roles.first.aasm_state).to eq "active"
+        end
+      end
+    end
   end
 end
