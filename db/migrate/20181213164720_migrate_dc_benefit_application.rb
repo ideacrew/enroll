@@ -145,6 +145,8 @@ class MigrateDcBenefitApplication < Mongoid::Migration
       params = sanitize_benefit_group_attrs(benefit_group)
       importer = BenefitSponsors::Importers::BenefitPackageImporter.call(@benefit_application, params)
       raise Standard, "Benefit Package creation failed" if importer.benefit_package.blank?
+      importer.benefit_package.probation_period_kind = :date_of_hire if benefit_group.effective_on_kind == "first_of_month" && benefit_group.effective_on_offset == 1
+      # ^^ exception case for ["100102","100101","118510","245011","179334","1051104","1051260","1051300","1051569","1051885","1051889","1052163"]
       @benefit_package_map[benefit_group.id] = importer.benefit_package.id
     end
 
@@ -242,5 +244,23 @@ class MigrateDcBenefitApplication < Mongoid::Migration
 
   def self.new_org(old_org)
     BenefitSponsors::Organizations::Organization.where(hbx_id: old_org.hbx_id).first
+  end
+
+  def self.skip_validation_for_invalid_py(id)
+    # TODO py has invalid inactive benefit group, latest py # 1057125 # high
+    # TODO 2017 dental plan pointing to 2018 PY # 1055030  # high
+    # TODO 2016 dental plan pointing to 2015 PY # 1055006
+    # TODO 2016 health plan pointing to 2017 py #1050755
+    # TODO 2015 health plan pointing to 2016 py #1050202
+    # TODO 2015 health plan poinitng to 2016 py #1050123
+    # TODO 2016 dental plan poinitng to 2019 py #1050953  #high
+    [BSON::ObjectId('5a1429b350526c7cd90000a1'),
+     BSON::ObjectId('582f06ea082e76425e000016'),
+     BSON::ObjectId('582b5efdfaca1450e0000006'),
+     BSON::ObjectId('56aa5836faca1465b1000036'),
+     BSON::ObjectId('562ff9d269702d359b390000'),
+     BSON::ObjectId('561fe0cd69702d0ad8b90000'),
+     BSON::ObjectId('56e095c0082e76472d000116')
+    ].include?(id)
   end
 end
