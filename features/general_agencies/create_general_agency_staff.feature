@@ -2,7 +2,8 @@ Feature: Assign General Agency Staff to General Agency
 
   Scenario: General Staff has not signed up on the HBX
     Given a CCA site exists with a benefit market
-    And a general agency, approved, awaiting account creation, exists
+    Given there is a General Agency exists for District Agency Inc
+    And the staff Max Planck is primary ga staff for District Agency Inc
     Given a general agency agent visits the DCHBX
     When they click the 'New General Agency' button
 
@@ -12,3 +13,14 @@ Feature: Assign General Agency Staff to General Agency
     And GA staff searches for General Agency which exists in EA
     And GA staff should see a list of General Agencies searched and selects his agency
     Then GA staff submits his application and see successful message
+
+    And Max Planck logs on to the General Agency Portal
+    And there is a Staff with a “pending” general agency staff role in the table
+    When the primary staff clicks on the approve button
+    Then the primary staff should see the staff successfully approved message
+    And the primary staff logs out
+
+    And Max Planck logs on to the General Agency Portal
+    When the primary staff removes ga staff from ga staff table
+    Then the primary staff should see the staff successfully removed message
+    And the primary staff logs out
