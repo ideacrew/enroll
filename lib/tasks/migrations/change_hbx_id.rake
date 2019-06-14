@@ -3,6 +3,9 @@ require File.join(Rails.root, "app", "data_migrations", "change_hbx_id")
 # When a user is having an incorrect hbx_id
 # This rake task is to change hbx_id 
 # RAILS_ENV=production bundle exec rake migrations:change_hbx_id person_hbx_id=34323 new_hbx_id=9087879
+# to change the hbx_id to a new random one
+# RAILS_ENV=production bundle exec rake migrations:change_hbx_id person_hbx_id=34323 new_hbx_id=""
+
 
 namespace :migrations do
   desc "change hbx id"
