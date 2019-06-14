@@ -14,6 +14,10 @@ module FinancialAssistance
 
       private
 
+      def applicant_section
+        @instance.is_applying_coverage == true
+      end
+
       def incomes_jobs
         @instance.has_job_income == true
       end

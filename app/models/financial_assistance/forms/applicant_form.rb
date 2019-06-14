@@ -48,6 +48,8 @@ module FinancialAssistance
       attribute :no_ssn, String
       attribute :foster_age_satisfied, Boolean
       attribute :student_age_satisfied, Boolean
+      attribute :is_applying_coverage, Boolean
+      attribute :has_spouse, Boolean
 
       attribute :is_active, Boolean
 

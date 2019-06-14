@@ -10,7 +10,8 @@ module FinancialAssistance
                  :is_enrolled_on_medicaid, :is_former_foster_care, :foster_care_us_state, :age_left_foster_care,
                  :had_medicaid_during_foster_care, :is_student, :student_kind, :student_status_end_on,
                  :student_school_kind, :is_self_attested_blind, :has_daily_living_help, :is_physically_disabled,
-                 :is_active, :no_ssn, :foster_age_satisfied, :student_age_satisfied
+                 :is_active, :no_ssn, :foster_age_satisfied, :student_age_satisfied, :is_applying_coverage,
+                 :has_spouse
 
       has_many :incomes, serializer: ::FinancialAssistance::Serializers::IncomeSerializer
       has_many :deductions, serializer: ::FinancialAssistance::Serializers::DeductionSerializer

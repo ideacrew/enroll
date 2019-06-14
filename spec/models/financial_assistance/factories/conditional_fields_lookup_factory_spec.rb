@@ -1,6 +1,11 @@
 require 'rails_helper'
+require 'pry'
 
-RSpec.describe "::FinancialAssistance::Factories::ConditionalFieldsLookupFactory" do
+RSpec.describe ::FinancialAssistance::Factories::ConditionalFieldsLookupFactory, dbclean: :after_each do
+  before :all do
+    DatabaseCleaner.clean
+  end
+
   subject do
     ::FinancialAssistance::Factories::ConditionalFieldsLookupFactory
   end
