@@ -17,7 +17,8 @@
       <% if broker_and_agency_present %>
       <br/>
       <span class="word-break">
-        <%=  @person.primary_family.current_broker_agency.broker_agency_profile.legal_name.capitalize %>
+        <!-- adding temporary try until data fixed.-->
+        <%=  @person.primary_family.current_broker_agency.try(:broker_agency_profile).try(:legal_name).try(:capitalize) %>
       </span>
       <% else %>
       <br/>
