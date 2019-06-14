@@ -1272,9 +1272,9 @@ end
 # end
 
 describe "set_due_date_on_verification_types" do
-  let!(:person)           { FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role) }
+  let!(:person)           { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
   let(:consumer_role)     { person.consumer_role }
-  let!(:family)           { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
+  let!(:family)           { FactoryBot.create(:family, :with_primary_family_member, person: person) }
 
   it 'should set the due date on verfification type' do
     person.consumer_role.update_attribute('aasm_state','verification_outstanding')
