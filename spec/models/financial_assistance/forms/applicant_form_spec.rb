@@ -93,7 +93,7 @@ RSpec.describe ::FinancialAssistance::Forms::ApplicantForm, dbclean: :after_each
 
     context '.attributes' do
       it 'should respond to the attributes that are defined in the class' do
-        [:id, :full_name, :age_of_the_applicant].each do |attribute|
+        [:id, :full_name, :age_of_the_applicant, :is_applying_coverage, :has_spouse].each do |attribute|
           expect(@applicant_form).to respond_to(attribute)
         end
       end
