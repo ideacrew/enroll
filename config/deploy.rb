@@ -43,6 +43,7 @@ set :assets_roles, [:web, :app]
 # set :keep_releases, 5
 
 # FIXME: Fix when assets are generated and linked
+before "assets:refresh", "deploy:yarn_install"
 
 namespace :assets do
   desc "Kill all the assets"
@@ -73,6 +74,14 @@ namespace :deploy do
     end
   end
 
+  desc 'Run rake yarn:install'
+  task :yarn_install do
+    on roles(:web) do
+      within release_path do
+        execute("cd #{release_path} && yarn install")
+      end
+    end
+  end
 end
 
 after "deploy:publishing", "deploy:restart"
