@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module FinancialAssistance
   module Serializers
     class ApplicantSerializer < ::ActiveModel::Serializer

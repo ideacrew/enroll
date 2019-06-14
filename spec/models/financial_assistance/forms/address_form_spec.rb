@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe ::FinancialAssistance::Forms::AddressForm, dbclean: :after_each do
