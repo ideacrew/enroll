@@ -127,6 +127,8 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
             census_employees_with_old_id = find_census_employees
             link_existing_census_employees_to_new_profile(census_employees_with_old_id)
 
+            mark_all_census_as_enroll
+
             print '.' unless Rails.env.test?
             success = success + 1
           end
@@ -218,6 +220,10 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
 
   def self.link_existing_census_employees_to_new_profile(census_employees_with_old_id)
     census_employees_with_old_id.update_all(benefit_sponsors_employer_profile_id: @new_profile.id, benefit_sponsorship_id: @benefit_sponsorship.id)
+  end
+
+  def self.mark_all_census_as_enroll # by default to enroll in DC
+    CensusEmployee.unscoped.all.update_all(expected_selection: 'enroll')
   end
 
   def self.is_congress?(organization)
