@@ -324,6 +324,14 @@ class FinancialAssistance::Applicant
   def immigration_date?
   end
 
+  def format_citizen
+    person.format_citizen
+  end
+
+  def citizen_status
+    person.citizen_status
+  end
+
   #### Collect insurance from Benefit model
   def is_enrolled_in_insurance?
     benefits.where(kind: 'is_enrolled').present?
@@ -361,6 +369,10 @@ class FinancialAssistance::Applicant
     @family_member ||= FamilyMember.find(family_member_id)
   end
 
+  def relationship
+    family_member.relationship
+  end
+
   def consumer_role
     return @consumer_role if defined?(@consumer_role)
     @consumer_role = person.consumer_role
@@ -368,6 +380,26 @@ class FinancialAssistance::Applicant
 
   def person
     @person ||= family_member.person
+  end
+
+  def no_ssn
+    person.no_ssn
+  end
+
+  def full_name
+    person.full_name
+  end
+
+  def gender
+    person.gender
+  end
+
+  def is_incarcerated
+    person.is_incarcerated
+  end
+
+  def is_applying_coverage
+    person.is_applying_coverage
   end
 
   # Use income entries to determine hours worked
@@ -431,17 +463,17 @@ class FinancialAssistance::Applicant
     age_of_applicant
   end
 
-  def student_age_satisfied?
+  def student_age_satisfied
     [18, 19].include? age_of_applicant
   end
 
-  def foster_age_satisfied?
+  def foster_age_satisfied
     # Age greater than 18 and less than 26
     (19..25).cover? age_of_applicant
   end
 
   def other_questions_complete?
-    if foster_age_satisfied?
+    if foster_age_satisfied
       (other_questions_answers << is_former_foster_care).include?(nil) ? false : true
     else
       other_questions_answers.include?(nil) ? false : true

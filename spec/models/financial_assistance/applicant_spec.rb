@@ -913,4 +913,33 @@ RSpec.describe FinancialAssistance::Applicant, type: :model, dbclean: :after_eac
       end
     end
   end
+
+  describe 'newly added methods' do
+    context 'should return values matching from the respective models' do
+
+      it 'should return value from person for no_ssn attr' do
+        expect(applicant1.no_ssn).to eq person1.no_ssn
+      end
+
+      it 'should return value from person for full_name attr' do
+        expect(applicant1.full_name).to eq person1.full_name
+      end
+
+      it 'should return value from person for gender attr' do
+        expect(applicant1.gender).to eq person1.gender
+      end
+
+      it 'should return value from person for is_incarcerated attr' do
+        expect(applicant1.is_incarcerated).to eq person1.is_incarcerated
+      end
+
+      it 'should return value from person for is_applying_coverage attr' do
+        expect(applicant1.is_applying_coverage).to eq person1.is_applying_coverage
+      end
+
+      it 'should return value from family member for relationship attr' do
+        expect(applicant1.relationship).to eq family_member1.relationship
+      end
+    end
+  end
 end

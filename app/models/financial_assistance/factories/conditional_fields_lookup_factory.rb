@@ -2,35 +2,17 @@ module FinancialAssistance
   module Factories
     class ConditionalFieldsLookupFactory
 
-      def initialize(class_name, bson_id, attribute)
-        @class_name = class_name.to_s.downcase if class_name
-        @bson_id = bson_id
+      def initialize(model_instance, attribute)
         @attribute = attribute
         @instance = model_instance
       end
 
       def conditionally_displayable?
-        return nil unless @class_name
+        return nil unless @instance
         display_field?
       end
 
       private
-
-      # TODO: This factory will be refactored to remove the following method.
-      def model_instance
-        case @class_name
-        when "applicant"
-          ::FinancialAssistance::Applicant.find @bson_id
-        when "application"
-          ::FinancialAssistance::Application.find @bson_id
-        when "benefit"
-          ::FinancialAssistance::Benefit.find @bson_id
-        when "income"
-          ::FinancialAssistance::Income.find @bson_id
-        when "deduction"
-          ::FinancialAssistance::Deduction.find @bson_id
-        end
-      end
 
       def incomes_jobs
         @instance.has_job_income == true
@@ -57,7 +39,7 @@ module FinancialAssistance
       end
 
       def has_no_ssn?
-        @instance.person.no_ssn == '1'
+        @instance.no_ssn == '1'
       end
 
       def is_ssn_applied
@@ -89,7 +71,7 @@ module FinancialAssistance
       end
 
       def is_former_foster_care
-        @instance.foster_age_satisfied?
+        @instance.foster_age_satisfied
       end
 
       # method to check for foster_care_us_state, age_left_foster_care and had_medicaid_during_foster_care
@@ -98,7 +80,7 @@ module FinancialAssistance
       end
 
       def is_student
-        @instance.student_age_satisfied?
+        @instance.student_age_satisfied
       end
 
       # method to check for student_kind, student_status_end_on and student_school_kind
