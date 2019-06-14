@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module FinancialAssistance
   module Services
     class FaaReviewService
