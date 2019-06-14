@@ -1,4 +1,5 @@
-$(document).ready(function() {
+// Use turbolinks load for rails 5 instead of ready()
+$(document).on('turbolinks:load', function() {
  setGroupSelectionHandlers();
 });
 

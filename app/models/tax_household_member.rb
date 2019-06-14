@@ -4,7 +4,7 @@ class TaxHouseholdMember
   include BelongsToFamilyMember
   include ApplicationHelper
 
-  PDC_TYPES = [['Assisted', 'is_ia_eligible'], ['Medicaid', 'is_medicaid_chip_eligible'], ['Totally Ineligible', 'is_totally_ineligible'], ['UQHP', 'is_uqhp_eligible'] ]
+  PDC_TYPES = [['Assisted','is_ia_eligible'], ['Medicaid','is_medicaid_chip_eligible'], ['Totally Ineligible','is_totally_ineligible'], ['UQHP','is_uqhp_eligible']].freeze
 
   embedded_in :tax_household
   embeds_many :financial_statements
