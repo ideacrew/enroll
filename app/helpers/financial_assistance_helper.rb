@@ -218,13 +218,13 @@ module FinancialAssistanceHelper
   end
 
   def income_and_deductions_edit(application, applicant, embedded_document)
-    if embedded_document.class == FinancialAssistance::Deduction
-      financial_assistance_application_applicant_deductions_path(application, applicant)
+    if embedded_document.class == FinancialAssistance::Forms::DeductionForm
+      financial_assistance_application_applicant_deductions_path(application.id, applicant.id)
     else
       if [FinancialAssistance::Income::JOB_INCOME_TYPE_KIND, FinancialAssistance::Income::NET_SELF_EMPLOYMENT_INCOME_KIND].include? embedded_document.kind
-        financial_assistance_application_applicant_incomes_path(application, applicant)
+        financial_assistance_application_applicant_incomes_path(application.id, applicant.id)
       else
-        other_financial_assistance_application_applicant_incomes_path(application, applicant)
+        other_financial_assistance_application_applicant_incomes_path(application.id, applicant.id)
       end
     end
   end
@@ -272,6 +272,15 @@ module FinancialAssistanceHelper
       financial_assistance_application_applicant_benefits_path(application, applicant)
     else
       financial_assistance_application_applicant_deductions_path(application, applicant)
+    end
+  end
+
+  def display_benefits(applicant, kind, insurance_kind)
+    benefits = applicant.enrolled_benefits if kind == 'is_enrolled'
+    benefits = applicant.eligible_benefits if kind == 'is_eligible'
+    benefits.inject([]) do |array, benefit|
+      array << benefit if benefit.insurance_kind == insurance_kind
+      array
     end
   end
 end

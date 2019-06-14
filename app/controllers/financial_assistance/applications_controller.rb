@@ -55,13 +55,13 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     if params.key?(model_name)
       if @model.save
         @current_step = @current_step.next_step if @current_step.next_step.present?
+        @model.update_attributes!(workflow: { current_step: @current_step.to_i })
         if params[:commit] == "Submit Application"
-          @model.update_attributes!(workflow: { current_step: @current_step.to_i })
           dummy_data_5_year_bar(@application)
           @application.submit! if @application.complete?
           payload = generate_payload(@application)
           if @application.publish(payload)
-            #dummy_data_for_demo(params) if @application.complete? && @application.is_submitted? #For_Populating_dummy_ED_for_DEMO #temporary
+            #dummy_data_for_demo if @application.complete? && @application.is_submitted? #For_Populating_dummy_ED_for_DEMO #temporary
             redirect_to wait_for_eligibility_response_financial_assistance_application_path(@application)
           else
             @application.unsubmit!
@@ -69,7 +69,6 @@ class FinancialAssistance::ApplicationsController < ApplicationController
           end
 
         else
-          @model.update_attributes!(workflow: { current_step: @current_step.to_i })
           render 'workflow/step', layout: 'financial_assistance'
         end
       else
@@ -83,7 +82,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     end
   end
 
-  def generate_payload application
+  def generate_payload(application)
     render_to_string "events/financial_assistance_application", :formats => ["xml"], :locals => { :financial_assistance_application => application }
   end
 
@@ -132,12 +131,12 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def review_and_submit
+    @review_form = ::FinancialAssistance::Forms::FaaReviewForm.for_view(params)
     save_faa_bookmark(@person, request.original_url)
     set_admin_bookmark_url
-    @consumer_role = @person.consumer_role
-    @application = @person.primary_family.application_in_progress
-    @applicants = @application.active_applicants if @application.present?
-    if @application.blank?
+
+    @application = @person.primary_family.applications.find(params[:id])
+    if @review_form.application.blank?
       redirect_to financial_assistance_applications_path
     else
       render layout: 'financial_assistance'
@@ -164,7 +163,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     @family = @person.primary_family
     @application = @person.primary_family.applications.find(params[:id])
 
-    render layout: 'financial_assistance' if params.keys.include?"cur"
+    render layout: 'financial_assistance' if params.keys.include?("cur")
   end
 
   def application_publish_error
@@ -189,9 +188,9 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   def check_eligibility_results_received
     application = @person.primary_family.applications.find(params[:id])
-    render :text => "#{application.success_status_codes?(application.determination_http_status_code)}"
+    render :text => application.success_status_codes?(application.determination_http_status_code).to_s
   end
-  
+
   def checklist_pdf
     send_file(Rails.root.join("public", "ivl_checklist.pdf").to_s, :disposition => "inline", :type => "application/pdf")
   end
@@ -238,29 +237,29 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     redirect_to application_checklist_financial_assistance_applications_path
   end
 
-  def dummy_data_for_demo(params)
+  def dummy_data_for_demo
     #Dummy_ED
     coverage_year = @person.primary_family.application_applicable_year
-    @model.update_attributes!(aasm_state: "determined", assistance_year: coverage_year, determination_http_status_code: 200)
+    @model.update_attributes!(aasm_state: 'determined', assistance_year: coverage_year, determination_http_status_code: 200)
 
     @model.tax_households.each do |txh|
-      txh.update_attributes!(allocated_aptc: 200.00, is_eligibility_determined: true, effective_starting_on: Date.new(coverage_year, 01, 01))
+      txh.update_attributes!(allocated_aptc: 200.00, is_eligibility_determined: true, effective_starting_on: Date.new(coverage_year, 1, 1))
       txh.eligibility_determinations.build(max_aptc: 200.00,
-                                              csr_percent_as_integer: 73,
-                                              csr_eligibility_kind: "csr_73",
-                                              determined_on: TimeKeeper.datetime_of_record - 30.days,
-                                              determined_at: TimeKeeper.datetime_of_record - 30.days,
-                                              premium_credit_strategy_kind: "allocated_lump_sum_credit",
-                                              e_pdc_id: "3110344",
-                                              source: "Haven").save!
+                                           csr_percent_as_integer: 73,
+                                           csr_eligibility_kind: 'csr_73',
+                                           determined_on: TimeKeeper.datetime_of_record - 30.days,
+                                           determined_at: TimeKeeper.datetime_of_record - 30.days,
+                                           premium_credit_strategy_kind: 'allocated_lump_sum_credit',
+                                           e_pdc_id: '3110344',
+                                           source: 'Haven').save!
       txh.applicants.first.update_attributes!(is_medicaid_chip_eligible: false, is_ia_eligible: false, is_without_assistance: true) if txh.applicants.count > 0
       txh.applicants.second.update_attributes!(is_medicaid_chip_eligible: false, is_ia_eligible: true, is_without_assistance: false) if txh.applicants.count > 1
       txh.applicants.third.update_attributes!(is_medicaid_chip_eligible: true, is_ia_eligible: false, is_without_assistance: false) if txh.applicants.count > 2
 
       #Update the Income and MEC verifications to Outstanding
       @model.applicants.each do |applicant|
-        applicant.update_attributes!(:assisted_income_validation => "outstanding", :assisted_mec_validation => "outstanding", aasm_state: "verification_outstanding")
-        applicant.assisted_verifications.each { |verification| verification.update_attributes!(status: "outstanding", verification_failed: true) }
+        applicant.update_attributes!(:assisted_income_validation => 'outstanding', :assisted_mec_validation => 'outstanding', aasm_state: 'verification_outstanding')
+        applicant.assisted_verifications.each { |verification| verification.update_attributes!(status: 'outstanding', verification_failed: true) }
       end
     end
   end
@@ -275,12 +274,12 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     model.valid? ? nil : model.errors.messages.first.flatten.flatten.join(',').gsub(",", " ").titleize
   end
 
-  def hash_to_param param_hash
+  def hash_to_param(param_hash)
     ActionController::Parameters.new(param_hash)
   end
 
   def load_support_texts
-   @support_texts = YAML.load_file("app/views/financial_assistance/shared/support_text.yml")
+    @support_texts = YAML.load_file("app/views/financial_assistance/shared/support_text.yml")
   end
 
   def permit_params(attributes)
