@@ -105,16 +105,11 @@ class MigrateDcHbxEnrollments < Mongoid::Migration
                 end
               else
                 product_data = ivl_plan_hash[hbx.plan_id]
-                if product_data
-                  hbx.update_attributes(
-                      product_id: product_data['product_id'],
-                      issuer_profile_id: product_data['carrier_profile_id']
-                  )
-                  print '.' unless Rails.env.test?
-                else
-                  print 'F' unless Rails.env.test?
-                  @logger.error "IVL enrollment reference not found hbx_id: #{hbx.hbx_id}---#{hbx.aasm_state}"
-                end
+                hbx.update_attributes(
+                    product_id: product_data ? product_data['product_id'] : nil,
+                    issuer_profile_id: product_data ? product_data['carrier_profile_id'] : nil
+                )
+                print '.' unless Rails.env.test?
               end
             end
           rescue => e
@@ -133,16 +128,11 @@ class MigrateDcHbxEnrollments < Mongoid::Migration
             get_hbx_enrollments(bga).each do |hbx|
               next if hbx.shopping?
               product_data = fehb_plan_hash[hbx.plan_id]
-              if product_data
-                hbx.update_attributes(
-                    product_id: product_data['product_id'],
-                    issuer_profile_id: product_data['carrier_profile_id']
-                )
-                print '.' unless Rails.env.test?
-              else
-                print 'F' unless Rails.env.test?
-                @logger.error "Plan id not found: #{hbx.hbx_id}---#{hbx.aasm_state}"
-              end
+              hbx.update_attributes(
+                  product_id: product_data ? product_data['product_id'] : nil,
+                  issuer_profile_id: product_data ? product_data['carrier_profile_id'] : nil
+              )
+              print '.' unless Rails.env.test?
             end
           end
         end
