@@ -27,3 +27,26 @@ Then(/^GA staff submits his application and see successful message$/) do
   find('#general-agency-staff-btn').click
   expect(page).to have_content('Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed.')
 end
+
+And(/^there is a Staff with a “pending” general agency staff role in the table$/) do
+  #find('a', :text => "Broker Agency Portal", wait: 5).click
+  expect(page).to have_content('approve')
+  expect(page).to have_content('General Agency Staff')
+  expect(page).to have_content('Ricky')
+end
+
+When(/^the primary staff clicks on the approve button$/) do
+  page.execute_script("document.querySelector('.approve').click()")
+end
+
+Then(/^the primary staff should see the staff successfully approved message$/) do
+  expect(page).to have_content('Role approved successfully')
+end
+
+When(/^the primary staff removes ga staff from ga staff table$/) do
+  page.execute_script("document.querySelector('#destroy').click()")
+end
+
+Then(/^the primary staff should see the staff successfully removed message$/) do
+  expect(page).to have_content('Role removed successfully')
+end
