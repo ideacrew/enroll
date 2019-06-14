@@ -1,7 +1,6 @@
 class FinancialAssistance::ApplicantsController < ApplicationController
 
   before_action :set_current_person
-  before_action :init_cfl_service, only: :other_questions
 
   include UIHelpers::WorkflowController
   include FinancialAssistanceHelper
@@ -82,10 +81,6 @@ class FinancialAssistance::ApplicantsController < ApplicationController
   end
 
   private
-
-  def init_cfl_service
-    @cfl_service = ::FinancialAssistance::Services::ConditionalFieldsLookupService.new
-  end
 
   def load_support_texts
     raw_support_text = YAML.load_file("app/views/financial_assistance/shared/support_text.yml")
