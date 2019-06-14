@@ -370,15 +370,15 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     end
 
     context "when outstanding member is present" do
-      let(:person)                    { FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role)}
-      let(:family)                    { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
-      let(:hbx_profile)               {FactoryGirl.create(:hbx_profile)}
-      let(:benefit_sponsorship)       { FactoryGirl.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
+      let(:person)                    { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
+      let(:family)                    { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+      let(:hbx_profile)               {FactoryBot.create(:hbx_profile)}
+      let(:benefit_sponsorship)       { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
       let(:benefit_coverage_period)   { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
       let(:benefit_package)           { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
-      let!(:hbx_enrollment)           { FactoryGirl.create(:hbx_enrollment, aasm_state: "enrolled_contingent",
+      let!(:hbx_enrollment)           { FactoryBot.create(:hbx_enrollment, aasm_state: "enrolled_contingent",
                                           household: family.active_household, kind: "individual") }
-      let!(:hbx_enrollment_member)     { FactoryGirl.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, hbx_enrollment: hbx_enrollment) }
+      let!(:hbx_enrollment_member)     { FactoryBot.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, hbx_enrollment: hbx_enrollment) }
       let(:active_year)               {TimeKeeper.date_of_record.year}
 
       before :each do
