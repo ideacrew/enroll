@@ -56,6 +56,7 @@ RSpec.describe FinancialAssistance::ApplicantsController, type: :controller do
   context "GET other questions" do
     it "should assign applications", dbclean: :after_each do
       get :other_questions, application_id: application.id, id: applicant.id
+      expect(assigns(:cfl_service)).to be_an_instance_of(::FinancialAssistance::Services::ConditionalFieldsLookupService)
       expect(assigns(:applicant).id).to eq applicant.id
       expect(response).to render_template(:financial_assistance)
     end
