@@ -67,7 +67,7 @@ RSpec.describe VitalSign, :dbclean => :around_each do
     end
   end
 
-  context "New VitalSign query is created without date/time constraints" do
+  xcontext "New VitalSign query is created without date/time constraints" do
     let(:vital_sign)  { VitalSign.new }
 
     before :each do
@@ -77,15 +77,15 @@ RSpec.describe VitalSign, :dbclean => :around_each do
       ivl_current_enrollments
     end
 
-    it "should find all enrollments" do
+    xit "should find all enrollments" do
       expect(vital_sign.all_enrollments.size).to eq (shop_total_enrollment_count + ivl_total_enrollment_count)
     end
 
-    it "should find all individual enrollments" do
+    xit "should find all individual enrollments" do
       expect(vital_sign.all_individual_enrollments.size).to eq ivl_total_enrollment_count
     end
 
-    it "should find all SHOP enrollments" do
+    xit "should find all SHOP enrollments" do
       expect(vital_sign.all_shop_enrollments.size).to eq shop_total_enrollment_count
     end
 
