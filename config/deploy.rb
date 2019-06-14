@@ -42,9 +42,6 @@ set :assets_roles, [:web, :app]
 # Default value for keep_releases is 5
 # set :keep_releases, 5
 
-# FIXME: Fix when assets are generated and linked
-before "deploy:assets:precompile", "deploy:yarn_install"
-
 namespace :assets do
   desc "Kill all the assets"
   task :refresh do
