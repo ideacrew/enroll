@@ -20,7 +20,7 @@ module Notifier
       end
 
       attr_accessor :is_uqhp_notice, :payload_member, :age, :is_aqhp_eligible, :is_magi_medicaid_eligibile
-      attr_accessor :person, :is_toatally_ineligible, :is_uqhp_eligible
+      attr_accessor :person, :is_totally_ineligible, :is_uqhp_eligible
       attr_accessor :first_name, :last_name
 
       private

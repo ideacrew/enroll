@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Notifier::Builders::ConsumerRole', :dbclean => :after_each do
 
   describe "A new model instance" do
-    let(:payload) {
+    let(:payload) do
       file = Rails.root.join("spec", "test_data", "notices", "proj_elig_report_aqhp_2019_test_data.csv")
       csv = CSV.open(file, "r", :headers => true)
       data = csv.to_a
@@ -17,8 +17,8 @@ RSpec.describe 'Notifier::Builders::ConsumerRole', :dbclean => :after_each do
                            "primary_member" => data.detect{ |m| m["dependent"].casecmp('NO').zero? }.to_hash}}
     end
 
-    let!(:person) { FactoryGirl.create(:person, :with_consumer_role, hbx_id: "a16f4029916445fcab3dbc44bb7aadd0", first_name: "Samules", last_name: "Park") }
-    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
+    let!(:person) { FactoryBot.create(:person, :with_consumer_role, hbx_id: "a16f4029916445fcab3dbc44bb7aadd0", first_name: "Test", last_name: "Data") }
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
 
     subject do
       consumer = Notifier::Builders::ConsumerRole.new
@@ -155,8 +155,8 @@ RSpec.describe 'Notifier::Builders::ConsumerRole', :dbclean => :after_each do
       }
     }
 
-    let!(:person2) { FactoryGirl.create(:person, :with_consumer_role, hbx_id: "a16f4029916445fcab3dbc44bb7aadd1", first_name: "Test2", last_name: "Data2") }
-    let!(:family2) { FactoryGirl.create(:family, :with_primary_family_member, person: person2) }
+    let!(:person2) { FactoryBot.create(:person, :with_consumer_role, hbx_id: "a16f4029916445fcab3dbc44bb7aadd1", first_name: "Test2", last_name: "Data2") }
+    let!(:family2) { FactoryBot.create(:family, :with_primary_family_member, person: person2) }
 
     let(:subject2) {
       consumer = Notifier::Builders::ConsumerRole.new
