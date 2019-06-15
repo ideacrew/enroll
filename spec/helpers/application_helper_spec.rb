@@ -418,11 +418,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
    describe "#show_oop_pdf_link" , dbclean: :after_each do
        context 'valid aasm_state' do
          it "should return true" do
-           PlanYear::PUBLISHED.each do |state|
-             expect(helper.show_oop_pdf_link(state)).to be true
-           end
-
-          PlanYear::RENEWING_PUBLISHED_STATE.each do |state|
+           BenefitSponsors::BenefitApplications::BenefitApplication::SUBMITTED_STATES.each do |state|
              expect(helper.show_oop_pdf_link(state)).to be true
            end
          end

@@ -163,10 +163,19 @@ module Services
         premium_benefit_contributions = {}
         @hbx_enrollment.sponsored_benefit_package.sorted_composite_tier_contributions.each do |relationship_benefit|
           next if ["child_26_and_over","nephew_or_niece","grandchild","child_26_and_over_with_disability"].include? relationship_benefit.display_name
-          relationship =  relationship_benefit.relationship == "child_under_26" ? "child" : relationship_benefit.display_name
+          relationship = shop_relationship_benefit_hash[relationship_benefit.display_name]
           premium_benefit_contributions[relationship] = relationship_benefit.contribution_pct
         end
         premium_benefit_contributions
+      end
+
+      def shop_relationship_benefit_hash
+        @shop_relationship_benefit_hash ||= {
+          "Child Under 26" => "child",
+          "Employee" => "employee",
+          "Spouse" => "spouse",
+          "Domestic Partner" => "domestic_partner"
+        }
       end
 
       def reference_plan
