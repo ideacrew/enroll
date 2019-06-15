@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Notifier::Builders::DependentService', :dbclean => :after_each do
 
   describe "A new model instance" do
-    let(:payload) {
+    let(:payload) do
       file = Rails.root.join("spec", "test_data", "notices", "proj_elig_report_aqhp_2019_test_data.csv")
       csv = CSV.open(file, "r", :headers => true)
       data = csv.to_a
@@ -18,10 +18,10 @@ RSpec.describe 'Notifier::Builders::DependentService', :dbclean => :after_each d
     end
 
     let!(:person) {
-      FactoryGirl.create(:person, :with_consumer_role, hbx_id: "3117597607a14ef085f9220f4d189356", first_name: "Samules", last_name: "Park")
+      FactoryBot.create(:person, :with_consumer_role, hbx_id: "3117597607a14ef085f9220f4d189356", first_name: "Samules", last_name: "Park")
     }
 
-    let!(:family){ FactoryGirl.create(:family, :with_primary_family_member, person: person) }
+    let!(:family){ FactoryBot.create(:family, :with_primary_family_member, person: person) }
 
     let(:member) do
       payload['notice_params']['dependents'].select{ |m| m['member_id'] == person.hbx_id}.first
