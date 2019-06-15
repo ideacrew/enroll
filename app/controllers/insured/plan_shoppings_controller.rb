@@ -246,7 +246,7 @@ class Insured::PlanShoppingsController < ApplicationController
       @dc_checkbook_url = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment, is_congress_employee).generate_url
     end
 
-    @networks = @products.map(&:network_information).uniq.compact if offers_nationwide_plans?
+    @networks = @products.map(&:network).uniq.compact if offers_nationwide_plans?
     @carrier_names = @issuer_profiles.map(&:legal_name)
     @use_family_deductable = (@hbx_enrollment.hbx_enrollment_members.count > 1)
     @waivable = @hbx_enrollment.can_waive_enrollment?

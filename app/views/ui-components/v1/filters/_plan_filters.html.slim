@@ -133,8 +133,8 @@
             li
               checkbox
                 label
-                  input id="checkbox-#{13+i}" class="plan-metal-network-selection-filter checkbox-custom" name="checkbox-#{13+i}" type="checkbox" data-plan-network="#{network}" onClick="filterPlanNetwork(this)" data-category="planNetwork"
-                  label for="checkbox-#{13+i}" class="checkbox-custom-label"
+                  input id="checkbox-#{15+i}" class="plan-metal-network-selection-filter checkbox-custom" name="checkbox-#{15+i}" type="checkbox" data-plan-network="#{network}" onClick="filterPlanNetwork(this)" data-category="planNetwork"
+                  label for="checkbox-#{15+i}" class="checkbox-custom-label"
                     span data-toggle="tooltip" data-placement="right" data-container="body" title="#{l10n('insured.plan_shoppings.plan_shoppings_'"#{network}"'_title_info')}"
                     = l10n("#{network}")
         - else
@@ -142,8 +142,8 @@
             li
               checkbox
                 label
-                  input id="checkbox-#{13+i}" class="plan-metal-network-selection-filter checkbox-custom" name="checkbox-#{13+i}" type="checkbox" data-plan-network="#{network.gsub('-', ' ').downcase!}" onClick="filterPlanNetwork(this)" data-category="planNetwork"
-                  label for="checkbox-#{13+i}" class="checkbox-custom-label"
+                  input id="checkbox-#{15+i}" class="plan-metal-network-selection-filter checkbox-custom" name="checkbox-#{15+i}" type="checkbox" data-plan-network="#{network.gsub('-', ' ').downcase!}" onClick="filterPlanNetwork(this)" data-category="planNetwork"
+                  label for="checkbox-#{15+i}" class="checkbox-custom-label"
                     span data-toggle="tooltip" data-placement="right" data-container="body" title="#{l10n('insured.plan_shoppings.plan_shoppings_' "#{network}" '_title_info')}"
                     = l10n("#{network}")
   .checkbox-filter-wrapper-uc
