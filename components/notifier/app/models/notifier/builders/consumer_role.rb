@@ -81,7 +81,7 @@ module Notifier
 
       def dependents
         payload['notice_params']['dependents'].each do |member|
-          dependent = Notifier::Services::DependentService.new(uqhp_notice?, member)
+          dependent = ::Notifier::Services::DependentService.new(uqhp_notice?, member)
           merge_model.dependents << dependent_hash(dependent, member)
         end
       end
@@ -95,7 +95,7 @@ module Notifier
         family_members.each do |member|
           next if member["magi_medicaid"] != "Yes"
 
-          fam_member = Notifier::Services::DependentService.new(uqhp_notice?, member)
+          fam_member = ::Notifier::Services::DependentService.new(uqhp_notice?, member)
           merge_model.magi_medicaid_members << member_hash(fam_member)
         end
       end
@@ -109,7 +109,7 @@ module Notifier
         family_members.each do |member|
           next unless member["aqhp_eligible"] == "Yes" || member["non_magi_medicaid"] == "Yes"
 
-          fam_member = Notifier::Services::DependentService.new(uqhp_notice?, member)
+          fam_member = ::Notifier::Services::DependentService.new(uqhp_notice?, member)
           merge_model.aqhp_or_non_magi_medicaid_members << member_hash(fam_member)
         end
       end
@@ -123,7 +123,7 @@ module Notifier
         family_members.each do |member|
           next unless member["uqhp_eligible"] == "Yes" || member["non_magi_medicaid"] == "Yes"
 
-          fam_member = Notifier::Services::DependentService.new(uqhp_notice?, member)
+          fam_member = ::Notifier::Services::DependentService.new(uqhp_notice?, member)
           merge_model.uqhp_or_non_magi_medicaid_members << member_hash(fam_member)
         end
       end

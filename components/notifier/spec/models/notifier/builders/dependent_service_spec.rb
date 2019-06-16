@@ -34,7 +34,7 @@ RSpec.describe 'Notifier::Builders::DependentService', :dbclean => :after_each d
     }
 
     let(:aqhp_dependent) {
-      Notifier::Services::DependentService.new(false, member)
+      ::Notifier::Services::DependentService.new(false, member)
     }
 
     context "Model attributes" do

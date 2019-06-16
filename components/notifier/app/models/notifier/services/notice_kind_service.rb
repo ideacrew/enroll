@@ -1,32 +1,30 @@
-module Notifier
-  module Services
-    class NoticeKindService
-      include Notifier::Services::TokenBuilder
+# frozen_string_literal: true
 
-      attr_accessor :market_kind, :model_builder
+class Notifier::Services::NoticeKindService
+  include Notifier::Services::TokenBuilder
 
-      delegate :recipients, to: :service
-      delegate :setting_placeholders, to: :service
+  attr_accessor :market_kind, :model_builder
 
-      def initialize(market_kind)
-        @market_kind = market_kind.to_sym
-      end
+  delegate :recipients, to: :service
+  delegate :setting_placeholders, to: :service
 
-      def builder=(builder_str)
-        @model_builder = builder_str.constantize.new
-      end
+  def initialize(market_kind)
+    @market_kind = market_kind.to_sym
+  end
 
-      def service
-        if aca_individual?
-          Notifier::Services::IndividualNoticeService.new
-        else
-          Notifier::Services::ShopNoticeService.new
-        end
-      end
+  def builder=(builder_str)
+    @model_builder = builder_str.constantize.new
+  end
 
-      def aca_individual?
-        market_kind == :aca_individual
-      end
+  def service
+    if aca_individual?
+      Notifier::Services::IndividualNoticeService.new
+    else
+      Notifier::Services::ShopNoticeService.new
     end
+  end
+
+  def aca_individual?
+    market_kind == :aca_individual
   end
 end
