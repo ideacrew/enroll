@@ -860,6 +860,29 @@ Then(/^.+ should see the list of plans$/) do
   screenshot("plan_shopping")
 end
 
+When(/^.+ sorts by (.*)/) do |sort|
+  @plan_names = find_all('.plan-row').collect{|row| row.find('h3 a', wait: 5).text}
+  find(".interaction-click-control-#{sort.downcase.gsub(/\s/, '-')}", wait: 5).click
+end
+
+Then(/^.+ should see plans sorted by (.*)/) do
+  expect(find_all('.plan-row').collect{|row| row.find('h3 a', wait: 5).text}).to eq @plan_names.sort
+end
+
+When(/^.+ filters plans by Carrier/) do
+  find('.selectric-interaction-choice-control-carrier').click
+  carrier_option = find('li.interaction-choice-control-carrier-1', wait: 5)
+  @carrier_selected = carrier_option.text
+  carrier_option.click
+  find(".interaction-click-control-apply", wait: 5).click
+end
+
+Then(/^.+ should see plans filtered by Carrier/) do
+  find_all('.plan-row').each do |row|
+    expect(row.find('h3 small', wait: 5).text).to eq @carrier_selected
+  end
+end
+
 And (/(.*) should see the plans from the (.*) plan year$/) do |named_person, plan_year_state|
   benefit_sponsorship = CensusEmployee.where(first_name: people[named_person][:first_name]).first.benefit_sponsorship
   # cannot select a SEP date from expired plan year on 31st.
