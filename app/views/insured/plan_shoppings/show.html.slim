@@ -256,7 +256,7 @@ javascript:
         filtered = true;
         networkTypes.forEach(function (networkType) {
           availableEnrollments.forEach(function (enrollment) {
-            if (networkType == 'dc-metro') {
+            if (networkType.toLowerCase() == 'dc-metro') {
               if (enrollment.product.dc_in_network) {
                 resultsArray.push(enrollment);
               }
@@ -467,7 +467,7 @@ javascript:
 
   function removeDuplicates(data) {
     return data.filter((item, index,arr)=>{
-      var c = arr.map(item=> item.product_cost_total);
-      return  index === c.indexOf(item.product_cost_total)
+      var c = arr.map(item=> item.product._id);
+      return index === c.indexOf(item.product._id)
     })
   }
