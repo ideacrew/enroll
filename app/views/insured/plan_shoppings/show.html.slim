@@ -178,8 +178,8 @@ javascript:
           filteredArray.push(enrollment)
         })
         filteredArray.sort(function (a, b) {
-          var priceA = parseFloat(a.product_cost_total - a.sponsor_contribution_total).toFixed(2);
-          var priceB = parseFloat(b.product_cost_total - b.sponsor_contribution_total).toFixed(2);
+          var priceA = parseAmount(a.product_cost_total, 2) - parseAmount(a.sponsor_contribution_total, 2);
+          var priceB = parseAmount(b.product_cost_total, 2) - parseAmount(b.sponsor_contribution_total, 2);
           if (Number(priceA) < Number(priceB)) //sort string ascending
             return -1
           if (Number(priceA) > Number(priceB))
@@ -193,9 +193,10 @@ javascript:
         availableEnrollments.forEach(function (enrollment) {
             filteredArray.push(enrollment)
         })
+
         filteredArray.sort(function (a, b) {
-          var priceA = parseFloat(a.product.deductible).toFixed(0);
-          var priceB = parseFloat(b.product.deductible).toFixed(0);
+          var priceA = parseAmount(a.product.deductible, 0);
+          var priceB = parseAmount(b.product.deductible, 0);
           if (Number(priceA) < Number(priceB)) //sort string ascending
             return -1
           if (Number(priceA) > Number(priceB))
@@ -221,6 +222,10 @@ javascript:
       }
 
       showFilteredResults()
+    }
+
+    function parseAmount(str, decimals){
+      return parseFloat(str.replaceAll(/$|,/g, '')).toFixed(decimals);
     }
 
     function filterResultsSelections(selections) {
@@ -471,3 +476,11 @@ javascript:
       return index === c.indexOf(item.product._id)
     })
   }
+
+  String.prototype.replaceAll = function(search, replace) {
+    if (replace === undefined) {
+      return this.toString();
+    }
+
+    return this.replace(new RegExp('[' + search + ']', 'g'), replace);
+  };
