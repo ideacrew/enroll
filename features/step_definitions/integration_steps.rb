@@ -865,7 +865,7 @@ When(/^.+ sorts by (.*)/) do |sort|
   find(".interaction-click-control-#{sort.downcase.gsub(/\s/, '-')}", wait: 5).click
 end
 
-Then(/^.+ should see plans sorted by (.*)/) do
+Then(/^.+ should see plans sorted by Plan Name/) do
   expect(find_all('.plan-row').collect{|row| row.find('h3 a', wait: 5).text}).to eq @plan_names.sort
 end
 
