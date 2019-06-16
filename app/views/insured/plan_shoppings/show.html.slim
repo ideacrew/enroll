@@ -228,125 +228,174 @@ javascript:
       return parseFloat(str.replaceAll(/$|,/g, '')).toFixed(decimals);
     }
 
-    function filterResultsSelections(selections) {
-      var resultsArray = [];
-      var filtered = false;
-      // Filters based on Metal Level
-      metalLevels = selections.selectedMetalLevels;
-      if (metalLevels.length) {
-        filtered = true;
-        metalLevels.forEach(function (metalLevel) {
-          availableEnrollments.forEach(function (enrollment) {
-            if (enrollment.product.metal_level_kind.toLowerCase() == metalLevel.toLowerCase()) {
-              resultsArray.push(enrollment);
-            }
+    function filterByMetalLevels(metalLevels, dataArray) {
+      var resultsData = [];
+      metalLevels.forEach(function (metalLevel) {
+          dataArray.forEach(function (enrollment) {
+              if (enrollment.product.metal_level_kind.toLowerCase() == metalLevel.toLowerCase()) {
+                  resultsData.push(enrollment);
+              }
           })
-        })
-      }
-      // Filters based on Plan Type
-      planTypes = selections.selectedPlanTypes;
-      if (planTypes.length) {
-        filtered = true;
-        planTypes.forEach(function (plan) {
-          availableEnrollments.forEach(function (enrollment) {
-            if (enrollment.product.product_type.toLowerCase() == plan.toLowerCase()) {
-              resultsArray.push(enrollment);
-            }
-          })
-        })
-      }
+      })
+      return resultsData;
+    }
 
-      networkTypes = selections.selectedPlanNetworks;
-      if (networkTypes.length) {
-        filtered = true;
+    function filterByPlanTypes(planTypes, dataArray) {
+        var resultsData = [];
+        planTypes.forEach(function (plan) {
+            dataArray.forEach(function (enrollment) {
+                if (enrollment.product.health_plan_kind.toLowerCase() == plan.toLowerCase()) {
+                    resultsData.push(enrollment);
+                }
+            })
+        })
+        return resultsData;
+    }
+    
+    function filterByCarrier(carrier, dataArray) {
+        var resultsData = [];
+        dataArray.forEach(function (enrollment) {
+          if (enrollment.product.issuer_name.toLowerCase() == carrier.toLowerCase()) {
+            resultsData.push(enrollment);
+          }
+        })
+        return resultsData;
+    }
+  
+    function filterByHSA(selectedHSA, dataArray) {
+        var resultsData = [];
+        var hsa = Boolean;
+        if (selectedHSA == "Yes") {
+            hsa = true;
+        } else {
+            hsa = false;
+        }
+
+        dataArray.filter(function (enrollment) {
+            if (enrollment.product.hsa_eligibility == hsa) {
+                resultsData.push(enrollment);
+            }
+        })
+        return resultsData;
+    }
+
+    function filterByPremiumAmountRange(selections, dataArray) {
+        var resultsData = [];
+        premiumFrom = parseFloat(selections.premiumFromAmountValue || 0).toFixed(2);
+        premiumTo = parseFloat(selections.premiumToAmountValue || 0).toFixed(2);
+
+        dataArray.forEach(function (enrollment) {
+            premiumTotal = parseFloat(enrollment.product_cost_total - enrollment.sponsor_contribution_total).toFixed(2);
+            if ((Number(premiumFrom) > 0 && Number(premiumTo) > 0) && (Number(premiumTotal) >= Number(premiumFrom) && Number(premiumTotal) <= Number(premiumTo))) {
+                resultsData.push(enrollment);
+            }
+            else if ((Number(premiumFrom) > 0 && Number(premiumTo) == 0) && (Number(premiumTotal) >= Number(premiumFrom))) {
+                resultsData.push(enrollment);
+            }
+            else if ((Number(premiumFrom) == 0 && Number(premiumTo) > 0) && (Number(premiumTotal) <= Number(premiumTo))) {
+                resultsData.push(enrollment);
+            }
+        })
+        return resultsData;
+    }
+
+    function filterByDeductibleAmountRange(selections, dataArray) {
+        var resultsData = [];
+        deductibleFrom = parseFloat(selections.deductibleFromAmountValue || 0).toFixed(0);
+        deductibleTo = parseFloat(selections.deductibleToAmountValue || 0).toFixed(0);
+
+        dataArray.forEach(function (enrollment) {
+            deductible = parseFloat(enrollment.product.deductible.replace(',', '').replace('$', '')).toFixed(0);
+            if ((Number(deductibleFrom) > 0 && Number(deductibleTo) > 0) && (Number(deductible) >= Number(deductibleFrom) && Number(deductible) <= Number(deductibleTo))) {
+                resultsData.push(enrollment);
+            }
+            else if ((Number(deductibleFrom) > 0 && Number(deductibleTo) == 0) && (Number(deductible) >= Number(deductibleFrom))) {
+                resultsData.push(enrollment);
+            }
+            else if ((Number(deductibleTo) > 0 && Number(deductibleFrom) == 0) && (Number(deductible) <= Number(deductibleTo))) {
+                resultsData.push(enrollment);
+            }
+        })
+        return resultsData;
+    }
+
+    function filterByNetworkTypes(networkTypes, dataArray) {
+        var resultsData = [];
+
         networkTypes.forEach(function (networkType) {
-          availableEnrollments.forEach(function (enrollment) {
+          dataArray.forEach(function (enrollment) {
             if (networkType.toLowerCase() == 'dc-metro') {
               if (enrollment.product.dc_in_network) {
-                resultsArray.push(enrollment);
+                resultsData.push(enrollment);
               }
             }
             if (networkType == 'nationwide') {
               if (enrollment.product.nationwide) {
-                resultsArray.push(enrollment);
+                resultsData.push(enrollment);
               }
             }
           })
         })
-      }
+        return resultsData;
+    }
 
-      // Filters based on Premium Amount
-      maxPremium = selections.premiumToAmountValue;
-      if (maxPremium) {
-        filtered = true;
-        premiumFrom = parseFloat(selections.premiumFromAmountValue || 0).toFixed(2);
-        premiumTo = parseFloat(maxPremium || 0).toFixed(2);
+    function filterResultsSelections(selections) {
+      var resultsArray;
+      var filtered = false;
 
-        availableEnrollments.filter(function (enrollment) {
-          premiumTotal = parseFloat(enrollment.product_cost_total - enrollment.sponsor_contribution_total).toFixed(2);
-          if (Number(premiumTotal) >= Number(premiumFrom) && Number(premiumTotal) <= Number(premiumTo)) {
-            resultsArray.push(enrollment);
-          }
-        })
-      }
-
-      // Filters based on Deductible Amount
-      maxDeductible = selections.deductibleToAmountValue;
-      if (maxDeductible) {
-        filtered = true;
-        deductibleFrom = parseFloat(selections.deductibleFromAmountValue || 0).toFixed(0);
-        deductibleTo = parseFloat(maxDeductible || 0).toFixed(0);
-
-        if (selections.deductibleFromAmountValue != "") {
-          availableEnrollments.filter(function (enrollment) {
-            deductible = parseFloat(enrollment.product.deductible.replace(',', '').replace('$', '')).toFixed(0);
-            if (Number(deductible) >= Number(deductibleFrom) && Number(deductible) <= Number(deductibleTo)) {
-              resultsArray.push(enrollment);
-            }
-          })
-        }
-      }
-
-      // Filters based on Carrier
+      metalLevels = selections.selectedMetalLevels;
+      planTypes = selections.selectedPlanTypes;
+      networkTypes = selections.selectedPlanNetworks;
       carrier = selections.selectedCarrier;
+      selectedHSA = selections.selectedHSA;
+
+      resultsArray = availableEnrollments;
+
+      if (metalLevels.length) {
+        filtered = true;
+        resultsArray = filterByMetalLevels(metalLevels, resultsArray)
+      }
+
+      if (planTypes.length) {
+        filtered = true;
+        resultsArray = filterByPlanTypes(planTypes, resultsArray)
+      }
+
+      if (networkTypes.length) {
+        filtered = true;
+        resultsArray = filterByNetworkTypes(networkTypes, resultsArray)
+      }
+
       if (carrier) {
         filtered = true;
-        availableEnrollments.forEach(function (enrollment) {
-          if (enrollment.product.issuer_name.toLowerCase() == carrier.toLowerCase()) {
-            resultsArray.push(enrollment);
-          }
-        })
+        resultsArray = filterByCarrier(carrier, resultsArray)
       }
 
-      hsaSelected = selections.selectedHSA;
-      if (hsaSelected) {
+      if (selectedHSA) {
         filtered = true;
-        var hsa = Boolean;
-        if (hsaSelected == "Yes") {
-          hsa = true;
-        } else {
-          hsa = false;
-        }
-
-        availableEnrollments.filter(function (enrollment) {
-          if (enrollment.product.hsa_eligibility == hsa) {
-            resultsArray.push(enrollment);
-          }
-        })
+        resultsArray = filterByHSA(selectedHSA, resultsArray)
       }
 
-      // Removes duplicates from results array
-      filteredArray = removeDuplicates(resultsArray);
+      if (selections.premiumFromAmountValue != "" || selections.premiumToAmountValue != "") {
+        filtered = true;
+        resultsArray = filterByPremiumAmountRange(selections, resultsArray)
+      }
+
+      if (selections.deductibleFromAmountValue != "" || selections.deductibleToAmountValue != "") {
+        filtered = true;
+        resultsArray = filterByDeductibleAmountRange(selections, resultsArray)
+      }
       
+      // Removes duplicates from results array
+      filteredArray = removeDuplicates(resultsArray)
       if (filteredArray.length == 0 && !filtered) {
         filteredArray = availableEnrollments;
       }
-      
       // Shows results in the view
       $("#plans-count").text(filteredArray.length);
       clearSelections();
       applyFilter();
-      showFilteredResults();
+      showFilteredResults()
     }
 
     function showFilteredResults() {
