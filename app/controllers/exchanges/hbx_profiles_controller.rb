@@ -387,7 +387,7 @@ def employer_poc
   end
 
   def update_cancel_enrollment
-    params_parser = ::Forms::BulkActionsForAdmin.new(params)
+    params_parser = ::Forms::BulkActionsForAdmin.new(params.permit!.except(:utf8, :commit, :controller, :action).to_h)
     @result = params_parser.result
     @row = params_parser.row
     @family_id = params_parser.family_id
@@ -407,7 +407,7 @@ def employer_poc
   end
 
   def update_terminate_enrollment
-    params_parser = ::Forms::BulkActionsForAdmin.new(params)
+    params_parser = ::Forms::BulkActionsForAdmin.new(params.permit!.except(:utf8, :commit, :controller, :action).to_h)
     @result = params_parser.result
     @row = params_parser.row
     @family_id = params_parser.family_id
