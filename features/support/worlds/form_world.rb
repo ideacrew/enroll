@@ -48,7 +48,7 @@ module FormWorld
     case sponsor
     when /^Employer$/
       if site.site_key == :dc
-        expect(page).to have_content("Your Information")
+        expect(page).to have_content("Are you an eligible small employer?")
       else
         expect(page).to have_content("My Health Benefits Program")
       end

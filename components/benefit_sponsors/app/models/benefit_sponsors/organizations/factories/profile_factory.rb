@@ -63,8 +63,8 @@ module BenefitSponsors
         def initialize(attrs)
           self.profile_type = attrs[:profile_type]
           self.profile_id = attrs[:profile_id]
-          @handler = attrs[:handler]
-          @handler.site_key = site_key if attrs[:handler]
+          self.handler = attrs[:handler]
+          handler.site_key = site_key if attrs[:handler]
           initialize_attributes(attrs)
         end
 

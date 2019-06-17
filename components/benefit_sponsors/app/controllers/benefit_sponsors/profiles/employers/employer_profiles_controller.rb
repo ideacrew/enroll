@@ -8,7 +8,7 @@ module BenefitSponsors
         before_action :find_employer, only: [:show, :privacy, :inbox, :bulk_employee_upload, :export_census_employees, :coverage_reports, :download_invoice]
         before_action :load_group_enrollments, only: [:coverage_reports], if: :is_format_csv?
         before_action :check_and_download_invoice, only: [:download_invoice]
-        layout "two_column", except: [:new]
+        layout "two_column", except: [:new, :privacy]
 
         #New profile registration with existing organization and approval request submitted to employer
         def show_pending

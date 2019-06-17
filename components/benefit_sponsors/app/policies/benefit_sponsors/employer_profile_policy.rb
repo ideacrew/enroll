@@ -12,7 +12,9 @@ module BenefitSponsors
     end
 
     def privacy?
-      user.blank? ? false : true
+      return false if user.blank?
+
+      is_staff_role_for_employer?(record)
     end
 
     def coverage_reports?
