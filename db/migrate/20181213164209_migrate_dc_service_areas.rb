@@ -6,16 +6,17 @@ class MigrateDcServiceAreas < Mongoid::Migration
           ::BenefitSponsors::Organizations::Organization.issuer_profiles.each do |issuer_organization|
             # Todo check on issuer_provided_code, for now set with issuer profile hbx_id
             issuer_profile = issuer_organization.issuer_profile
-            issuer_profile.issuer_hios_ids.each do |issuer_hios_id|
-              next if carrier_exists_in_the_year(issuer_profile, year)
-
-              ::BenefitMarkets::Locations::ServiceArea.create!({  active_year: year,
-                                                                  issuer_provided_code: "DCS001",
-                                                                  covered_states: ["DC"],
-                                                                  county_zip_ids: [],
-                                                                  issuer_profile_id: issuer_profile.id,
-                                                                  issuer_hios_id: issuer_hios_id,
-                                                                  issuer_provided_title: issuer_profile.legal_name })
+            if self.carrier_exists_in_the_year(issuer_profile, year)
+              # issuer_hios_id not required for DC so set as nil
+              ::BenefitMarkets::Locations::ServiceArea.create!({
+                                                                   active_year: year,
+                                                                   issuer_provided_code: "DCS001",
+                                                                   covered_states: ["DC"],
+                                                                   county_zip_ids: [],
+                                                                   issuer_profile_id: issuer_profile.id,
+                                                                   issuer_hios_id: nil,
+                                                                   issuer_provided_title: issuer_profile.legal_name
+                                                               })
             end
           end
         end
