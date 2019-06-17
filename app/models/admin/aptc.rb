@@ -363,7 +363,7 @@ class Admin::Aptc < ApplicationController
             # Cancel or Terminate Coverage.
             if original_hbx.may_terminate_coverage? && (duplicate_hbx.effective_on > original_hbx.effective_on)
               original_hbx.terminate_coverage!
-              original_hbx.update_current(terminated_on: duplicate_hbx.effective_on - 1.day)
+              original_hbx.update_attributes!(terminated_on: duplicate_hbx.effective_on - 1.day)
             else
               original_hbx.cancel_coverage! if original_hbx.may_cancel_coverage?
             end

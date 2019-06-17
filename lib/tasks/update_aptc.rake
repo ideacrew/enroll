@@ -9,7 +9,7 @@ namespace :update_aptc do
         hbxs = household.hbx_enrollments.gt("elected_amount.cents"=> 0).to_a
         hbxs.each do |hbx|
           if hbx.elected_amount > 0 and hbx.applied_aptc_amount == 0
-            hbx.update_current(applied_aptc_amount: hbx.elected_amount.to_f) 
+            hbx.update_attributes!(applied_aptc_amount: hbx.elected_amount.to_f) 
             count += 1
           end
         end

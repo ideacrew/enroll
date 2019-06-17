@@ -9,7 +9,7 @@ namespace :update_hbx do
         hbxs = household.hbx_enrollments.ne('plan_id' => nil).where('carrier_profile_id'=> nil)
         hbxs.each do |hbx|
           if hbx.carrier_profile_id.blank? and hbx.plan_id.present?
-            hbx.update_current(carrier_profile_id: hbx.plan.try(:carrier_profile_id)) 
+            hbx.update_attributes!(carrier_profile_id: hbx.plan.try(:carrier_profile_id)) 
             count += 1
           end
         end

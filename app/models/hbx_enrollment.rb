@@ -696,7 +696,7 @@ class HbxEnrollment
       schedule_coverage_termination!(termination_date) if may_schedule_coverage_termination?
     else
       if may_terminate_coverage?
-        update_current(terminated_on: termination_date)
+        update_attributes!(terminated_on: termination_date)
         terminate_coverage!
       end
     end
@@ -1066,16 +1066,12 @@ class HbxEnrollment
            end
   end
 
-  def update_current(updates)
-    HbxEnrollment.where(id: id).update_all(updates)
-  end
-
   def update_hbx_enrollment_members_premium(decorated_plan)
     return if decorated_plan.blank? && hbx_enrollment_members.blank?
 
     hbx_enrollment_members.each do |member|
       #TODO update applied_aptc_amount error like hbx_enrollment
-      member.update_current(applied_aptc_amount: decorated_plan.aptc_amount(member))
+      member.update_attributes!(applied_aptc_amount: decorated_plan.aptc_amount(member))
     end
   end
 
@@ -1089,7 +1085,7 @@ class HbxEnrollment
 
   def set_special_enrollment_period
     if is_special_enrollment? && special_enrollment_period_id.blank?
-      update_current(special_enrollment_period_id: earlier_effective_sep_by_market_kind.id) if earlier_effective_sep_by_market_kind
+      update_attributes!(special_enrollment_period_id: earlier_effective_sep_by_market_kind.id) if earlier_effective_sep_by_market_kind
     end
   end
 
@@ -1171,7 +1167,7 @@ class HbxEnrollment
     return if pre_hbx_id.blank?
     pre_hbx = HbxEnrollment.find(pre_hbx_id)
     if self.consumer_role.present? && self.consumer_role_id == pre_hbx.consumer_role_id
-      pre_hbx.update_current(is_active: false, changing: false)
+      pre_hbx.update_attributes!(is_active: false, changing: false)
     end
   end
 
