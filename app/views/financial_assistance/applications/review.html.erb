@@ -11,6 +11,7 @@
             <div class="col-md-1">
             </div>
           </div>
+
           <table class="table table-border-line mb0 table-grey-border" border="1" >
             <thead>
               <tr class="form-heading">
@@ -45,6 +46,7 @@
               <% end %>
             </tbody>
           </table>
+
           <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bg-primary" style="padding: 0px; height: 20px">
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6"></div>
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6"></div>
@@ -133,55 +135,66 @@
               <div class="col-md-6"><%= human_boolean applicant.has_deductions %></div>
             </div>
 
-            <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
-              <div class="col-md-11">HEALTH COVERAGE</div>
-            </div>
-
-            <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-              <div class="col-md-6">Is this person currently enrolled in health coverage?</div>
-              <div class="col-md-6"><%= human_boolean applicant.has_enrolled_health_coverage %></div>
-            </div>
-
-            <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-              <div class="col-md-6">Does this person currently have access to other health coverage, including through
-                another person?
+            <% if applicant.applicant? %>
+              <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
+                <div class="col-md-11">HEALTH COVERAGE</div>
               </div>
-              <div class="col-md-6"><%= human_boolean applicant.has_eligible_health_coverage %></div>
-            </div>
+
+              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                <div class="col-md-6">Is this person currently enrolled in health coverage?</div>
+                <div class="col-md-6"><%= human_boolean applicant.has_enrolled_health_coverage %></div>
+              </div>
+
+              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                <div class="col-md-6">Does this person currently have access to other health coverage, including through
+                  another person?
+                </div>
+                <div class="col-md-6"><%= human_boolean applicant.has_eligible_health_coverage %></div>
+              </div>
+            <% end %>
           </div>
 
           <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
             <div class="col-md-11">OTHER QUESTIONS</div>
           </div>
+
           <div class="row row-form-wrapper ptb no-buffer row-height form-content">
             <div class="col-md-6">Is the Person pregnant?</div>
             <div class="col-md-6"><%= human_boolean applicant.is_pregnant %></div>
           </div>
-          <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-            <div class="col-md-6">Is the Person blind?</div>
-            <div class="col-md-6"><%= human_boolean applicant.is_self_attested_blind %></div>
-          </div>
-          <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-            <div class="col-md-6">Does this person need help with daily life activities, such as dressing or
-              bathing?
+
+          <% if applicant.applicant? %>
+            <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+              <div class="col-md-6">Is the Person blind?</div>
+              <div class="col-md-6"><%= human_boolean applicant.is_self_attested_blind %></div>
             </div>
-            <div class="col-md-6"><%= human_boolean applicant.has_daily_living_help %></div>
-          </div>
-          <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-            <div class="col-md-6">Does this person need help paying for any medical bills from the last 3 months?
+
+            <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+              <div class="col-md-6">Does this person need help with daily life activities, such as dressing or
+                bathing?
+              </div>
+              <div class="col-md-6"><%= human_boolean applicant.has_daily_living_help %></div>
             </div>
-            <div class="col-md-6"><%= human_boolean applicant.has_daily_living_help %></div>
-          </div>
-          <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-            <div class="col-md-6">Has this person ever been in foster care?</div>
-            <div class="col-md-6"><%= human_boolean applicant.is_former_foster_care %></div>
-          </div>
+
+            <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+              <div class="col-md-6">Does this person need help paying for any medical bills from the last 3 months?
+              </div>
+              <div class="col-md-6"><%= human_boolean applicant.has_daily_living_help %></div>
+            </div>
+
+            <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+              <div class="col-md-6">Has this person ever been in foster care?</div>
+              <div class="col-md-6"><%= human_boolean applicant.is_former_foster_care %></div>
+            </div>
+          <% end %>
+
         </div>
         <br>
       <% end %>
       <div class=""> <%= link_to "View my Applications", financial_assistance_applications_path, class: "btn btn-small btn-primary" %> </div>
     </div>
-  <div class='col-md-3'>
+
+    <div class='col-md-3'>
       <%= render partial: 'financial_assistance/shared/right_nav', locals: {
           previous_url: financial_assistance_applications_path,
           next_url: find_sep_insured_families_path(consumer_role_id: @person.consumer_role.id)
