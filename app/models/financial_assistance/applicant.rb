@@ -167,7 +167,8 @@ class FinancialAssistance::Applicant
 
   validate :presence_of_attr_other_qns, on: :other_qns
   validate :driver_question_responses, on: :submission
-  validates :validate_applicant_information, presence: true, on: :submission
+  validate :validate_applicant_information, on: :submission
+  validates :validate_applicant_level_information, presence: true, on: :submission
 
   validate :strictly_boolean
 
@@ -370,6 +371,18 @@ class FinancialAssistance::Applicant
     @person ||= family_member.person
   end
 
+  def non_applicant?
+    is_applying_coverage == false
+  end
+
+  def applicant?
+    is_applying_coverage
+  end
+
+  def is_applying_coverage
+    person.is_applying_coverage
+  end
+
   # Use income entries to determine hours worked
   def total_hours_worked_per_week
     incomes.reduce(0) { |sum_hours, income| sum_hours + income.hours_worked_per_week }
@@ -416,11 +429,11 @@ class FinancialAssistance::Applicant
   end
 
   def applicant_validation_complete?
-    valid?(:submission) &&
-      incomes.all? { |income| income.valid? :submission } &&
-      benefits.all? { |benefit| benefit.valid? :submission } &&
-      deductions.all? { |deduction| deduction.valid? :submission } &&
-      other_questions_complete?
+    result = valid?(:submission) &&
+             incomes.all? { |income| income.valid? :submission } &&
+             deductions.all? { |deduction| deduction.valid? :submission } &&
+             other_questions_complete?
+    applicant? ? (result && benefits.all? { |benefit| benefit.valid? :submission }) : result
   end
 
   def clean_conditional_params(model_params)
@@ -441,7 +454,7 @@ class FinancialAssistance::Applicant
   end
 
   def other_questions_complete?
-    if foster_age_satisfied?
+    if applicant? && foster_age_satisfied?
       (other_questions_answers << is_former_foster_care).include?(nil) ? false : true
     else
       other_questions_answers.include?(nil) ? false : true
@@ -642,18 +655,28 @@ class FinancialAssistance::Applicant
   end
 
   def other_questions_answers
-    [:has_daily_living_help, :need_help_paying_bills, :is_ssn_applied].inject([]) do |array, question|
+    other_questions = [:has_daily_living_help, :need_help_paying_bills, :is_ssn_applied] if applicant?
+    other_questions = [:is_ssn_applied] if non_applicant?
+
+    other_questions.inject([]) do |array, question|
       array << send(question) if question != :is_ssn_applied || (question == :is_ssn_applied && consumer_role.no_ssn == '1')
       array
     end
   end
 
+  def validate_applicant_level_information
+    validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temp_out_of_state, :family_member_id #, :tax_household_id
+  end
+
   def validate_applicant_information
-    validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temp_out_of_state, :family_member_id, :is_pregnant, :is_self_attested_blind, :has_daily_living_help, :need_help_paying_bills #, :tax_household_id
+    [:is_pregnant, :has_daily_living_help, :need_help_paying_bills, :is_self_attested_blind].each do |attribute|
+      errors.add(attribute, 'should be answered') if send(attribute).nil?
+    end if applicant?
   end
 
   def driver_question_responses
     DRIVER_QUESTION_ATTRIBUTES.each do |attribute|
+      next if (non_applicant? && [:has_enrolled_health_coverage, :has_eligible_health_coverage].include?(attribute))
       instance_type = attribute.to_s.gsub('has_', '')
       instance_check_method = instance_type + "_exists?"
 
