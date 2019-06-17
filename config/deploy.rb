@@ -51,7 +51,7 @@ namespace :assets do
 #      execute "rm -rf #{shared_path}/public/assets/*"
       within release_path do
         with rails_env: fetch(:rails_env) do
-          execute("cd #{release_path} && rm -rf node_modules")
+          execute("cd #{release_path} && rm -rf node_modules && rm package.lock")
           execute("cd #{release_path} && nvm use 10 && yarn install")
           execute :rake, "assets:clobber"
           execute("cd #{release_path} && nvm use 10 && RAILS_ENV=production NODE_ENV=production bundle exec rake assets:precompile")
