@@ -258,4 +258,20 @@ module FinancialAssistanceHelper
     return '' if cost.nil? || frequency.nil?
     "$" + cost.to_s + " " + frequency.to_s.capitalize
   end
+
+  def deductions_next_url(application, applicant)
+    if applicant.applicant?
+      financial_assistance_application_applicant_benefits_path(application, applicant)
+    else
+      other_questions_financial_assistance_application_applicant_path(application, applicant)
+    end
+  end
+
+  def other_questions_previous_url(application, applicant)
+    if applicant.applicant?
+      financial_assistance_application_applicant_benefits_path(application, applicant)
+    else
+      financial_assistance_application_applicant_deductions_path(application, applicant)
+    end
+  end
 end
