@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'Notifier::Builders::ConsumerRole', :dbclean => :after_each do
+RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :after_each do
 
   describe "A new model instance" do
     let(:payload) do
