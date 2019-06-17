@@ -2,7 +2,7 @@ require 'rails_helper'
 
 module BenefitMarkets
   RSpec.describe Products::ProductPackageForm, type: :model do
-    describe '::for_new' do
+    describe '::for_new', dbclean: :after_each do
       let(:catalog) { create :benefit_markets_benefit_market_catalog }
       subject { BenefitMarkets::Products::ProductPackageForm.for_new }
 
