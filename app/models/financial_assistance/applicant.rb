@@ -669,14 +669,15 @@ class FinancialAssistance::Applicant
   end
 
   def validate_applicant_information
+    return if non_applicant?
     [:is_pregnant, :has_daily_living_help, :need_help_paying_bills, :is_self_attested_blind].each do |attribute|
       errors.add(attribute, 'should be answered') if send(attribute).nil?
-    end if applicant?
+    end
   end
 
   def driver_question_responses
     DRIVER_QUESTION_ATTRIBUTES.each do |attribute|
-      next if (non_applicant? && [:has_enrolled_health_coverage, :has_eligible_health_coverage].include?(attribute))
+      next if non_applicant? && [:has_enrolled_health_coverage, :has_eligible_health_coverage].include?(attribute)
       instance_type = attribute.to_s.gsub('has_', '')
       instance_check_method = instance_type + "_exists?"
 
