@@ -48,7 +48,7 @@ RSpec.describe BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmen
   let(:person_with_fam_hbx_enrollment) { person_with_family.primary_family.active_household.hbx_enrollments.build }
 
 
-  describe "#call" do
+  describe "#call", dbclean: :after_each do
   	before :each do
   	  person_with_fam_hbx_enrollment.benefit_sponsorship = benefit_application.benefit_sponsorship
       person_with_fam_hbx_enrollment.kind = 'individual'
