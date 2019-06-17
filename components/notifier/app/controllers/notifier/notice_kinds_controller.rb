@@ -55,10 +55,15 @@ module Notifier
     def preview
       notice_kind = Notifier::NoticeKind.find(params[:id])
       notice_kind.generate_pdf_notice
-
-      send_file "#{Rails.root}/tmp/#{notice_kind.title.titleize.gsub(/\s+/, '_')}.pdf", 
-        :type => 'application/pdf', 
-        :disposition => 'inline'
+      if notice_kind.market_kind.to_s == "aca_shop"
+        send_file "#{Rails.root}/tmp/#{notice_kind.title.titleize.gsub(/\s+/, '_')}.pdf",
+                  :type => 'application/pdf',
+                  :disposition => 'inline'
+      else
+        send_file "#{Rails.root}/tmp/#{notice_kind.title.titleize.gsub(/\s+/, '_')}_#{notice_kind.notice_recipient.hbx_id}.pdf",
+                  :type => 'application/pdf',
+                  :disposition => 'inline'
+      end
     end
 
     def delete_notices
