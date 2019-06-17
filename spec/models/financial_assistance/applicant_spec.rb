@@ -289,8 +289,20 @@ RSpec.describe FinancialAssistance::Applicant, type: :model, dbclean: :after_eac
         expect(applicant1.other_questions_complete?).to eq true
       end
 
-      it 'should return true as applicant is applying for coverage' do
+      it 'should return false as applicant is applying for coverage' do
         expect(applicant1.other_questions_complete?).to eq false
+      end
+    end
+
+    context 'embedded_document_section_entry_complete?' do
+      it 'should return true as applicant is not applying for coverage' do
+        applicant1.person.consumer_role.update_attributes!(is_applying_coverage: false)
+        expect(applicant1.embedded_document_section_entry_complete?(:health_coverage)).to eq true
+      end
+
+      it 'should return false as applicant is applying for coverage' do
+        applicant1.person.consumer_role.update_attributes!(has_enrolled_health_coverage: false)
+        expect(applicant1.embedded_document_section_entry_complete?(:health_coverage)).to eq false
       end
     end
   end
