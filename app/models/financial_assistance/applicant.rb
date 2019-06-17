@@ -511,6 +511,7 @@ class FinancialAssistance::Applicant
       return deductions.present? if has_deductions
       deductions.blank?
     when :health_coverage
+      return true if non_applicant?
       return false if has_enrolled_health_coverage.nil? || has_eligible_health_coverage.nil?
       return benefits.enrolled.present? && benefits.eligible.present? if has_enrolled_health_coverage && has_eligible_health_coverage
       return benefits.enrolled.present? && benefits.eligible.blank? if has_enrolled_health_coverage && !has_eligible_health_coverage
