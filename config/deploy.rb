@@ -43,7 +43,6 @@ set :assets_roles, [:web, :app]
 # set :keep_releases, 5
 
 # FIXME: Fix when assets are generated and linked
-before "assets:refresh", "deploy:yarn_install"
 
 namespace :assets do
   desc "Kill all the assets"
@@ -52,6 +51,7 @@ namespace :assets do
 #      execute "rm -rf #{shared_path}/public/assets/*"
       within release_path do
         with rails_env: fetch(:rails_env) do
+          execute("cd #{release_path} && yarn install")
           execute :rake, "assets:clobber"
           execute :rake, "assets:precompile"
         end
@@ -71,15 +71,6 @@ namespace :deploy do
 
   after :restart, :clear_cache do
     on roles(:web), in: :groups, limit: 3, wait: 10 do
-    end
-  end
-
-  desc 'Run rake yarn:install'
-  task :yarn_install do
-    on roles(:web) do
-      within release_path do
-        execute("cd #{release_path} && yarn install")
-      end
     end
   end
 end
