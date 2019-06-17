@@ -23,7 +23,7 @@ class PlanSelection
     if can_apply_aptc?(shopping_tax_household, elected_aptc)
       decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment, elected_aptc, shopping_tax_household)
       hbx_enrollment.update_hbx_enrollment_members_premium(decorated_plan)
-      hbx_enrollment.update_current(applied_aptc_amount: decorated_plan.total_aptc_amount, elected_aptc_pct: elected_aptc/max_aptc)
+      hbx_enrollment.update_attributes!(applied_aptc_amount: decorated_plan.total_aptc_amount, elected_aptc_pct: elected_aptc/max_aptc)
     end
   end
 

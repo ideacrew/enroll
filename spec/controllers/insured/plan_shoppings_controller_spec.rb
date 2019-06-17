@@ -49,7 +49,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       allow(usermailer).to receive(:deliver_now).and_return(true)
       allow(hbx_enrollment).to receive(:employee_role).and_return(employee_role)
       allow(employee_role).to receive(:hired_on).and_return(TimeKeeper.date_of_record + 10.days)
-      allow(hbx_enrollment).to receive(:update_current).and_return(true)
 
       sign_in user
     end

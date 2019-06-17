@@ -297,7 +297,7 @@ class CensusEmployee < CensusMember
       enrollments.each do |enrollment|
         if hired_on > enrollment.effective_on
           effective_on = enrollment.benefit_group.effective_on_for(hired_on)
-          enrollment.update_current(effective_on: effective_on)
+          enrollment.update_attributes!(effective_on: effective_on)
         end
       end
     end
