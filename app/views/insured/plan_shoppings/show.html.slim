@@ -329,7 +329,7 @@ javascript:
                 resultsData.push(enrollment);
               }
             }
-            if (networkType == 'nationwide') {
+            if (networkType.toLowerCase() == 'nationwide') {
               if (enrollment.product.nationwide) {
                 resultsData.push(enrollment);
               }
@@ -423,6 +423,16 @@ javascript:
           var sbc_url = "";
         }
 
+        var network = "";
+
+        if (result.product.dc_in_network) {
+          network = 'DC-Metro';
+        }
+ 
+        if (result.product.nationwide) {
+          network = 'Nationwide';
+        }
+
         var div = document.createElement('div')
         div.setAttribute('class', 'myfilteredPlans')
         div.innerHTML =
@@ -466,12 +476,7 @@ javascript:
                           <tr>
                             <td>${plan_kind.toUpperCase()}</td>
                             <td><span class="${result.product.metal_level_kind}-icon">${result.product.metal_level_kind.toUpperCase()}</td>
-                            <td>
-                              NETWORK NOTES
-                              <a data-container="body" href="#" data-toggle="tooltip" data-placement="right" title='${result.product.network_information}'>
-                                <i aria-hidden="true" class="fas fa-question-circle fa-lg pl-1"></i>
-                              </a>
-                            </td>
+                            <td>${network}</td>
                             <td>${deductible}</td>
                           </tr>
                         </tbody>
