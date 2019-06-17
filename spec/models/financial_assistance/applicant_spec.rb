@@ -264,8 +264,7 @@ RSpec.describe FinancialAssistance::Applicant, type: :model, dbclean: :after_eac
           benefit = applicant1.benefits.new
           benefit.save(validate: false)
           applicant1.person.consumer_role.update_attributes!(is_applying_coverage: false)
-          applicant1.update_attributes!({is_required_to_file_taxes: true,
-                                         has_job_income: false,
+          applicant1.update_attributes!({has_job_income: false,
                                          has_self_employment_income: false,
                                          has_other_income: false,
                                          has_deductions: false,
