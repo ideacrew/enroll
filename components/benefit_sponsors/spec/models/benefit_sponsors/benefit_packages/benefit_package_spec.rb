@@ -4,6 +4,9 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 
 module BenefitSponsors
   RSpec.describe BenefitPackages::BenefitPackage, type: :model, :dbclean => :after_each do
+    before do
+      DatabaseCleaner.clean
+    end
 
     let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }
 
