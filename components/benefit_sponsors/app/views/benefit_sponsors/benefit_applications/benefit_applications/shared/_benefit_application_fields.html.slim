@@ -94,9 +94,9 @@ javascript:
     document.querySelector("input#benefit_application_open_enrollment_end_on").value = getFormattedDate(date[targetDate]["open_enrollment_end_on"]);
 
     setDueDates('benefit_application_latest_submitted_on_day', latest_submitted_on_date.getDate());
-    setDueDates('benefit_application_latest_submitted_on_month', monthName[submitByMonth]);
+    setDueDates('benefit_application_latest_submitted_on_month', monthName[submitByMonth - 1]);
     setDueDates('binder_payment_deadline_day', binder_payment_deadline_date.getDate());
-    setDueDates('binder_payment_deadline_month', monthName[deadlineMonth]);
+    setDueDates('binder_payment_deadline_month', monthName[deadlineMonth - 1]);
 		dateOptions.oeStartOn = getFormattedDate(date[targetDate]["open_enrollment_start_on"]);
 		dateOptions.oeEndOn = getFormattedDate(date[targetDate]["open_enrollment_end_on"]);
   }
