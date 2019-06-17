@@ -52,6 +52,11 @@ module BenefitMarketWorld
     )
   end
 
+  def issuer_profiles(legal_name)
+    @issuer_profiles = {} unless defined? @issuer_profiles
+    @issuer_profiles[legal_name] ||= FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, legal_name: legal_name, assigned_site: site)
+  end
+
   def issuer_profile(carrier=:default)
     @issuer_profile[carrier] ||= FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, carrier, assigned_site: site)
   end
@@ -89,24 +94,31 @@ module BenefitMarketWorld
     end
   end
 
+  def health_issuers
+    ['CareFirst', 'Kaiser']
+  end
+
   def health_products
-    create_list(:benefit_markets_products_health_products_health_product,
-        5,
-        application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
-        product_package_kinds: [:single_issuer, :metal_level, :single_product],
-        service_area: service_area,
-        issuer_profile_id: issuer_profile.id,
-        metal_level_kind: :gold)
+    health_issuers.each do |issuer_name|
+      create_list(:benefit_markets_products_health_products_health_product,
+                  3,
+                  application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
+                  product_package_kinds: [:single_issuer, :metal_level, :single_product],
+                  service_area: service_area,
+                  issuer_profile_id: issuer_profiles(issuer_name).id,
+                  issuer_name: issuer_name,
+                  metal_level_kind: :gold)
+    end
   end
 
   def dental_products
     create_list(:benefit_markets_products_dental_products_dental_product,
-        5,
-        application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
-        product_package_kinds: [:single_product],
-        service_area: service_area,
-        issuer_profile_id: dental_issuer_profile.id,
-        metal_level_kind: :dental)
+                5,
+                application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
+                product_package_kinds: [:single_product],
+                service_area: service_area,
+                issuer_profile_id: dental_issuer_profile.id,
+                metal_level_kind: :dental)
   end
 
   def generate_initial_catalog_products_for(coverage_kinds)

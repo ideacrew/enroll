@@ -280,7 +280,7 @@ aca:
       minimum_commission_statement_year: 2017
 
     transmit_scheduled_employers: true
-    employer_transmission_day_of_month: 26
+    employer_transmission_day_of_month: 16
 
     mid_month_benefit_application_terminations:
       voluntary: false

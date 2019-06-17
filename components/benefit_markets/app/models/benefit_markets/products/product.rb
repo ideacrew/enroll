@@ -181,6 +181,11 @@ module BenefitMarkets
       end
     end
 
+    def network
+      return 'nationwide' if nationwide
+      return 'dc-metro' if dc_in_network
+    end
+
     def can_use_aptc?
       metal_level != 'catastrophic'
     end

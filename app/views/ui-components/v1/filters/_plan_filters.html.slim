@@ -2,9 +2,97 @@
   .checkbox-filter-wrapper-uc
     - if @market_kind == 'individual'
       h4 = link_to l10n('estimate_your_costs'), "https://dc.checkbookhealth.org/hie/dc/#{@hbx_enrollment.coverage_year}/", target: '_blank'
+    
     h4 = find_my_doctor
+    - if aca_state_abbreviation == "DC"
+      - if @market_kind == "individual" && @coverage_kind == "health"
+        h4 = link_to l10n("estimate_your_cost"), "", data: {toggle: "modal", target: "#plan_match_redirection"}
+      - if @market_kind == "individual" && @coverage_kind == "dental" && @hbx_enrollment.effective_on.year == Settings.checkbook_services.current_year
+        h4 = link_to l10n("estimate_your_cost"), '',data: {toggle: "modal", target: "#plan_match_dental_redirection"}
+        br
+      - if plan_match_dc
+        h4 = estimate_your_costs
+
+  #plan_match_redirection.modal.fade role="document" tabindex="-1"
+    .modal-dialog
+      .modal-content
+        .modal-header style="height:50px"
+          button.close aria-label="Close" data-dismiss="modal" type="button"
+            span aria-hidden="true"  &times;
+        div style="margin-left:20px;"
+          p style="margin-bottom:0px" = l10n("modal_onscreen")
+          p style="margin-bottom:0px" = l10n("modal_onscreen1")
+          p style="margin-bottom:0px" = l10n("modal_onscreen2")
+        .modal-footer style="padding:10px"
+          center
+            button.btn.btn-default.btn-default data-dismiss="modal" type="button"  Cancel
+            - if @hbx_enrollment.effective_on.year == 2019
+              = link_to l10n("confirm") , @dc_individual_checkbook_url, class: "btn btn-primary checkbook_url"
+            - elsif @hbx_enrollment.effective_on.year == 2018
+              = link_to l10n("confirm") , @dc_individual_checkbook_previous_year , class: "btn btn-primary"
+
+  #plan_match_dental_redirection.modal.fade role="document" tabindex="-1"
+    .modal-dialog
+      .modal-content
+        .modal-header style="height:50px"
+          button.close aria-label="Close" data-dismiss="modal" type="button"
+            span aria-hidden="true" &times;
+        div style="margin-left:20px;"
+          p style="margin-bottom:0px" = l10n("modal_onscreen")
+          p style="margin-bottom:0px" = l10n("modal_onscreen1")
+          p style="margin-bottom:0px" = l10n("modal_onscreen2")
+        .modal-footer style="padding:10px"
+          center
+            button.btn.btn-default.btn-default data-dismiss="modal" type="button"  Cancel
+            = link_to l10n("confirm") , 'https://dc.checkbookhealth.org/sadpi/dc/2019/', class: "btn btn-primary"
+
+  #plan_match_family.modal.fade role="document" tabindex="-1"
+    .modal-dialog
+      .modal-content
+        .modal-header style="height:50px"
+          button.close aria-label="Close" data-dismiss="modal" type="button"
+            span aria-hidden="true" &times;
+        div style="margin-left:20px;"
+          p style="margin-bottom:0px" = l10n("modal_onscreen")
+          p style="margin-bottom:0px" = l10n("modal_onscreen1")
+          p style="margin-bottom:0px" = l10n("modal_onscreen2")
+        .modal-footer style="padding:10px"
+          center
+            button.btn.btn-default.btn-default data-dismiss="modal" type="button"  Cancel
+            = link_to l10n("confirm") , 'https://dc.checkbookhealth.org/dc/', class: "btn btn-primary  mtz", target: '_blank'
+
+  #plan_match_doctor_shop.modal.fade role="document" tabindex="-1"
+    .modal-dialog
+      .modal-content
+        .modal-header style="height:50px"
+          button.close aria-label="Close" data-dismiss="modal" type="button"
+            span aria-hidden="true" &times;
+        div style="margin-left:20px;"
+          p style="margin-bottom:0px" = l10n("modal_onscreen")
+          p style="margin-bottom:0px" = l10n("modal_onscreen1")
+          p style="margin-bottom:0px" = l10n("modal_onscreen2")
+        .modal-footer style="padding:10px"
+          center
+            button.btn.btn-default.btn-default data-dismiss="modal" type="button" Cancel
+            = link_to l10n("confirm") , Rails.application.config.checkbook_services_base_url + '/dcshopnationwide/' , class: "btn btn-primary",target: '_blank'
+  #plan_match_shop.modal.fade role="document" tabindex="-1"
+    .modal-dialog
+      .modal-content
+        .modal-header style="height:50px"
+          button.close aria-label="Close" data-dismiss="modal" type="button"
+            span aria-hidden="true" &times;
+        div style="margin-left:20px;"
+          p style="margin-bottom:0px" = l10n("modal_onscreen")
+          p style="margin-bottom:0px" = l10n("modal_onscreen1")
+          p style="margin-bottom:0px" = l10n("modal_onscreen2")
+        .modal-footer style="padding:10px"
+          center
+            button.btn.btn-default.btn-default data-dismiss="modal" type="button" Cancel
+            =link_to l10n("confirm"), @dc_checkbook_url , class: "btn btn-primary"
+
+
   h3.header-title Filter Results
-  - if @market_kind == 'individual' || @benefit_group.try(:plan_option_kind) == 'single_carrier'
+  - if @market_kind == 'individual' || @sponsored_benefit.try(:product_package_kind) == :single_issuer
     .checkbox-filter-wrapper-uc
       h5
         strong Metal Level
@@ -45,8 +133,8 @@
             li
               checkbox
                 label
-                  input id="checkbox-#{13+i}" class="plan-metal-network-selection-filter checkbox-custom" name="checkbox-#{13+i}" type="checkbox" data-plan-network="#{network}" onClick="filterPlanNetwork(this)" data-category="planNetwork"
-                  label for="checkbox-#{13+i}" class="checkbox-custom-label"
+                  input id="checkbox-#{15+i}" class="plan-metal-network-selection-filter checkbox-custom" name="checkbox-#{15+i}" type="checkbox" data-plan-network="#{network}" onClick="filterPlanNetwork(this)" data-category="planNetwork"
+                  label for="checkbox-#{15+i}" class="checkbox-custom-label"
                     span data-toggle="tooltip" data-placement="right" data-container="body" title="#{l10n('insured.plan_shoppings.plan_shoppings_'"#{network}"'_title_info')}"
                     = l10n("#{network}")
         - else
@@ -54,8 +142,8 @@
             li
               checkbox
                 label
-                  input id="checkbox-#{13+i}" class="plan-metal-network-selection-filter checkbox-custom" name="checkbox-#{13+i}" type="checkbox" data-plan-network="#{network.gsub('-', ' ').downcase!}" onClick="filterPlanNetwork(this)" data-category="planNetwork"
-                  label for="checkbox-#{13+i}" class="checkbox-custom-label"
+                  input id="checkbox-#{15+i}" class="plan-metal-network-selection-filter checkbox-custom" name="checkbox-#{15+i}" type="checkbox" data-plan-network="#{network.gsub('-', ' ').downcase!}" onClick="filterPlanNetwork(this)" data-category="planNetwork"
+                  label for="checkbox-#{15+i}" class="checkbox-custom-label"
                     span data-toggle="tooltip" data-placement="right" data-container="body" title="#{l10n('insured.plan_shoppings.plan_shoppings_' "#{network}" '_title_info')}"
                     = l10n("#{network}")
   .checkbox-filter-wrapper-uc
