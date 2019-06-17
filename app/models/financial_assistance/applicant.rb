@@ -370,18 +370,6 @@ class FinancialAssistance::Applicant
     @person ||= family_member.person
   end
 
-  def non_applicant?
-    is_applying_coverage == false
-  end
-
-   def applicant?
-    is_applying_coverage
-  end
-
-  def is_applying_coverage
-    person.is_applying_coverage
-  end
-
   # Use income entries to determine hours worked
   def total_hours_worked_per_week
     incomes.reduce(0) { |sum_hours, income| sum_hours + income.hours_worked_per_week }
