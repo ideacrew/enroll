@@ -374,7 +374,7 @@ class FinancialAssistance::Applicant
     is_applying_coverage == false
   end
 
-   def applicant?
+  def applicant?
     is_applying_coverage
   end
 
