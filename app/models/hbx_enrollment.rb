@@ -223,6 +223,9 @@ class HbxEnrollment
       :"effective_on".gte => benefit_application.effective_period.min
     )
   end
+  scope :all_hbx_enrollments_by_family, ->(family) do 
+    where(family_id: family.id).order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc)
+  end
   embeds_many :workflow_state_transitions, as: :transitional
 
   belongs_to :benefit_sponsorship, class_name: "::BenefitSponsors::BenefitSponsorships::BenefitSponsorship", optional: true

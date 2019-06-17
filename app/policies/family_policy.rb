@@ -79,4 +79,8 @@ class FamilyPolicy < ApplicationPolicy
     role.permission.can_transition_family_members
   end
 
+  def can_view_entire_family_enrollment_history?
+    return true if user.person.hbx_staff_role
+  end
+
 end

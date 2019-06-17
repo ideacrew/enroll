@@ -9,6 +9,8 @@ class Insured::FamiliesController < FamiliesController
   before_action :check_employee_role
   before_action :find_or_build_consumer_role, only: [:home]
   before_action :calculate_dates, only: [:check_move_reason, :check_marriage_reason, :check_insurance_reason]
+  before_action :display_all_hbx_enrollments, only: %i[home]
+  before_action :can_view_entire_family_enrollment_history?, only: %i[display_all_hbx_enrollments]
 
   def home
     authorize @family, :show?
@@ -23,7 +25,7 @@ class Insured::FamiliesController < FamiliesController
     @hbx_enrollments = @family.enrollments.non_external.order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) || []
     @enrollment_filter = @family.enrollments_for_display
 
-    valid_display_enrollments = Array.new
+    valid_display_enrollments = []
     @enrollment_filter.each  { |e| valid_display_enrollments.push e['_id'] }
 
     log("#3860 person_id: #{@person.id}", {:severity => "error"}) if @hbx_enrollments.any?{|hbx| !hbx.is_coverage_waived? && hbx.product.blank?}
@@ -306,6 +308,14 @@ class Insured::FamiliesController < FamiliesController
   end
 
   private
+
+  def display_all_hbx_enrollments_for_admin
+    @display_all_hbx_enrollments_for_admin = HbxEnrollment.all_hbx_enrollments_by_family(@family)
+  end
+
+  def can_view_entire_family_enrollment_history?
+    authorize Family, :can_view_entire_family_enrollment_history?
+  end
 
   def trigger_ivl_to_cdc_transition_notice
     person =  @family.primary_applicant.person
