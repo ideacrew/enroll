@@ -113,7 +113,12 @@ end
 
 namespace :permissions do
   desc 'hbx admin can view outstanding verification link tab'
-  DefinePermissions.define_task :hbx_admin_access_outstanding_verification_sub_tab => :environment
+  DefinePermissions.define_task :hbx_admin_can_access_outstanding_verification_sub_tab => :environment
+end
+
+namespace :permissions do
+  desc 'hbx admin can access accept reject identity documents'
+  DefinePermissions.define_task :hbx_admin_can_access_accept_reject_identity_documents => :environment
 end
 
 namespace :permissions do
