@@ -36,7 +36,7 @@
       - if assistance_tax_household_member.deductions.size > 0
         = render :partial => "events/financial_assistance/deduction", :collection => assistance_tax_household_member.deductions, as: :deduction
     %benefits
-      - if assistance_tax_household_member.benefits.size > 0
+      - if assistance_tax_household_member.applicant? && assistance_tax_household_member.benefits.size > 0
         = render :partial => "events/financial_assistance/benefit", :collection => assistance_tax_household_member.benefits, as: :benefit
 
 
