@@ -133,7 +133,7 @@
               <span>Employer Estimated Maximum Monthly Cost</span>
               <% estimator = ::BenefitSponsors::Services::SponsoredBenefitCostEstimationService.new %>
 	            <% estimate = estimator.calculate_estimates_for_benefit_display(sponsored_benefit) %>
-              <h2><%= number_to_currency(estimate[:estimated_total_cost]) %></h2>
+              <h2><%= number_to_currency(estimate[:estimated_sponsor_exposure]) %></h2>
             </div>
           </div>
           <div class="col-xs-8">

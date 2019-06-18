@@ -75,6 +75,27 @@ module BenefitSponsors
         BenefitMarkets::Products::Product.by_coverage_date(product_package.products_for_plan_option_choice(product_option_choice).by_service_areas(recorded_service_area_ids), coverage_date)
       end
 
+      def lowest_cost_product(effective_date)
+        return @lowest_cost_product if defined? @lowest_cost_product
+        sponsored_products =  products(effective_date)
+        @lowest_cost_product = load_base_products(sponsored_products).min_by { |product|
+          product.min_cost_for_application_period(effective_date)
+        }
+      end
+
+      def highest_cost_product(effective_date)
+        return @highest_cost_product if defined? @highest_cost_product
+        sponsored_products =  products(effective_date)
+        @highest_cost_product ||= load_base_products(sponsored_products).max_by { |product|
+          product.max_cost_for_application_period(effective_date)
+        }
+      end
+
+      def load_base_products(sponsored_products)
+        return [] if sponsored_products.empty?
+        @loaded_base_products ||= BenefitMarkets::Products::Product.find(sponsored_products.pluck(:_id))
+      end
+
       def product_package
         return nil if product_package_kind.blank? || benefit_sponsor_catalog.blank?
 
