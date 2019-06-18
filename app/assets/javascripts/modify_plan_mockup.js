@@ -3,7 +3,9 @@ $(document).ready(function() {
   $('#terminate-button').click(function(e){
     e.preventDefault();
     $('.confirmation').addClass('hidden');
-    $('#terminate-confirm').removeClass('hidden');
+    $('#action-confirm').removeClass('hidden');
+    $('.action-msg').addClass('hidden');
+    $('#term-msg').removeClass('hidden');
     $('#calendar-div').removeClass('hidden');
     $('#enter-text').removeClass('hidden').html('Enter the date of termination');
     $('#term_date').val('');
@@ -13,7 +15,9 @@ $(document).ready(function() {
   $('#cancel-button').click(function(e){
     e.preventDefault();
     $('.confirmation').addClass('hidden');
-    $('#cancel-confirm').removeClass('hidden');
+    $('#action-confirm').removeClass('hidden');
+    $('.action-msg').addClass('hidden');
+    $('#cancel-msg').removeClass('hidden');
     $('#calendar-div').removeClass('hidden');
     $('#enter-text').removeClass('hidden').html('Enter the date of cancellation');
     $('#term_date').val('');
@@ -23,7 +27,9 @@ $(document).ready(function() {
   $('#aptc-button').click(function(e){
     e.preventDefault();
     $('.confirmation').addClass('hidden');
-    $('#aptc-confirm').removeClass('hidden');
+    $('#action-confirm').removeClass('hidden');
+    $('.action-msg').addClass('hidden');
+    $('#aptc-msg').removeClass('hidden');
     $('#calendar-div').removeClass('hidden');
     $('#enter-text').addClass('hidden');
     $('#term_date').val('07/01/2019');

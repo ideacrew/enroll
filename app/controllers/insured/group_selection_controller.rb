@@ -80,7 +80,7 @@ class Insured::GroupSelectionController < ApplicationController
     # it assumes the primary and dependent are in either IVL or coverall
     # TODO will need to account for shop market as well with coverall phase 3 when
     # people will be able to receive a transition from shop to coverall, etc.
-    
+
     if ((hbx_enrollment.kind != @market_kind) && (@market_kind != "shop"))
       hbx_enrollment.kind = @market_kind
     end
@@ -114,6 +114,10 @@ class Insured::GroupSelectionController < ApplicationController
 
   def terminate_confirm
     @hbx_enrollment = HbxEnrollment.find(params.require(:hbx_enrollment_id))
+    # TODO: Remove these declarations, already in self_service_confirm
+    @family = Family.find(params.require(:family_id))
+    @sep = @family.try(:latest_active_sep)
+    # ^^^
   end
 
   def terminate
@@ -126,6 +130,25 @@ class Insured::GroupSelectionController < ApplicationController
     else
       redirect_to :back
     end
+  end
+
+  # TODO: Move to new controller?
+  def self_service_confirm
+    @hbx_enrollment = HbxEnrollment.find(params.require(:hbx_enrollment_id))
+    family = Family.find(params.require(:family_id))
+    @sep = family.try(:latest_active_sep)
+  end
+
+  def cancel
+    hbx = HbxEnrollment.find(params.require(:hbx_enrollment_id))
+    hbx.cancel_coverage! if hbx.may_cancel_coverage?
+    # TODO: Decide how transmit will be handled
+    # BulkActionsForAdmin.handle_edi_transmissions(@hbx_enrollment.id, transmit_flag)
+    redirect_to family_account_path
+  end
+
+  def edit_aptc
+    #
   end
 
   private

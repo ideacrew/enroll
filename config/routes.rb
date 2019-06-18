@@ -2,7 +2,7 @@ Rails.application.routes.draw do
 
   #mount TransportGateway::Engine, at: "/transport_gateway"
   #mount TransportProfiles::Engine, at: "/transport_profiles"
-  mount Notifier::Engine, at: "/notifier" 
+  mount Notifier::Engine, at: "/notifier"
   #mount RocketJobMissionControl::Engine => 'rocketjob'
   require 'resque/server'
   # mount Resque::Server, at: '/jobs'
@@ -22,7 +22,7 @@ Rails.application.routes.draw do
   namespace :users do
     resources :orphans, only: [:index, :show, :destroy]
   end
-  
+
   resources :users do
     member do
       get :reset_password, :lockable, :confirm_lock, :login_history, :change_username_and_email, :edit
@@ -270,6 +270,7 @@ Rails.application.routes.draw do
 
     resources :group_selections, controller: "group_selection", only: [:new, :create] do
       collection do
+        post :cancel
         post :terminate
         get :terminate_selection
         get :terminate_confirm
