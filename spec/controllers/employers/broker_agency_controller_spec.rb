@@ -3,6 +3,7 @@ require 'rails_helper'
 RSpec.describe Employers::BrokerAgencyController do
 
   before(:all) do
+    DatabaseCleaner.clean
     @employer_profile = FactoryGirl.create(:employer_profile)
 
     @broker_role =  FactoryGirl.create(:broker_role, aasm_state: 'active')
@@ -48,7 +49,7 @@ RSpec.describe Employers::BrokerAgencyController do
         expect(response).to render_template("index")
       end
 
-      it "should assign variables" do
+      it "should assign variables", :dbclean => :before_each do
         expect(assigns(:broker_agency_profiles).count).to eq 2
         expect(assigns(:broker_agency_profiles)).to include(@org1.broker_agency_profile)
       end

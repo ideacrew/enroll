@@ -1,0 +1,7 @@
+/* This style sheet is getting invoked through sponsored benefits
+   Engine application.scss
+   When we try to bring sponsored benefits engine code alone into DC, this file is added which
+   will also helpful on code merge of DC and MA.
+   Need UI research here and make sure work for both DC and MA
+ */
+@import "jquery-ui";

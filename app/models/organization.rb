@@ -1,4 +1,5 @@
 class Organization
+  include Config::AcaModelConcern
   include Mongoid::Document
   include SetCurrentUser
   include Mongoid::Timestamps
@@ -242,8 +243,7 @@ class Organization
   def self.valid_dental_carrier_names
     Rails.cache.fetch("dental-carrier-names-at-#{TimeKeeper.date_of_record.year}", expires_in: 2.hour) do
       Organization.exists(carrier_profile: true).inject({}) do |carrier_names, org|
-
-        carrier_names[org.carrier_profile.id.to_s] = org.carrier_profile.legal_name if Plan.valid_shop_dental_plans("carrier", org.carrier_profile.id, 2016).present?
+        carrier_names[org.carrier_profile.id.to_s] = org.carrier_profile.legal_name if Plan.shop_dental_by_active_year(TimeKeeper.date_of_record.year).by_carrier_profile(org.carrier_profile.id).present?
         carrier_names
       end
     end
@@ -255,6 +255,14 @@ class Organization
         carrier_names[org.carrier_profile.id.to_s] = org.carrier_profile.legal_name
         carrier_names
       end
+    end
+  end
+
+  def self.load_carriers(filters = { sole_source_only: false, primary_office_location: nil, selected_carrier_level: nil, active_year: nil, kind: nil })
+    unless constrain_service_areas?
+      return Plan.shop_dental_by_active_year(filters[:active_year]) if filters[:selected_carrier_level] == "custom"
+      return self.valid_dental_carrier_names if filters[:kind] == "dental"
+      return self.valid_carrier_names
     end
   end
 

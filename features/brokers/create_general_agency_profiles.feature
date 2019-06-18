@@ -74,6 +74,7 @@ Feature: Create General Agency and General Agency Staff Role
     Then CareFirst Broker logs on to the Broker Agency Portal
       Then CareFirst Broker should see the page of Broker Agency
       And CareFirst Broker clicks on the Employers tab
+      Given PENDING: This needs to be fixed after finishing with General Agency Implementation
       Then CareFirst Broker should see list of employers and assign portal
       When CareFirst Broker assign employer to general agency
       Then CareFirst Broker should see assign successful message

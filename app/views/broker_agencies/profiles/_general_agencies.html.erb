@@ -3,7 +3,7 @@
     <div class="col-md-12">
       <h3 class="title-inline"><%= l10n("general_agencies")%></h3>
       <%=pundit_span HbxProfile, :modify_admin_tabs? %>
-        <%= link_to "#{l10n('broker_agencies.profiles.clear_default_ga')}", set_default_ga_broker_agencies_profile_path(id: @broker_agency_profile.id, type: 'clear'), method: :post, remote: true, class: "btn btn-min pull-right" %>
+        <%= link_to "#{l10n('broker_agencies.profiles.clear_default_ga')}", sponsored_benefits.clear_default_organizations_general_agency_profiles_path(broker_agency_profile_id: @broker_agency_profile.id), method: :post, remote: true, class: "btn btn-min pull-right" %>
       </span>  
     </div>
     <div class="col-md-12">
@@ -55,7 +55,7 @@
                 <div class="ga_status"><%= l10n("broker_agencies.profiles.default_ga")%></div>
               <% else %>
                 <%= pundit_span HbxProfile, :modify_admin_tabs? %>
-                  <%= link_to "#{l10n('broker_agencies.profiles.select_default_ga')}", set_default_ga_broker_agencies_profile_path(id: @broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id), method: :post, remote: true, class: 'btn btn-min' %>
+                  <%= link_to "#{l10n('broker_agencies.profiles.select_default_ga')}", sponsored_benefits.set_default_organizations_general_agency_profiles_path(broker_agency_profile_id: @broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id), method: :post, remote: true, class: 'btn btn-min' %>
                 </span>
               <% end %>
             </td>
