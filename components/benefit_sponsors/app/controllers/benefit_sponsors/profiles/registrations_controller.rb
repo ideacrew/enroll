@@ -60,7 +60,8 @@ module BenefitSponsors
         else
           org_error_msg = @agency.errors.full_messages.join(",").humanize if @agency.errors.present?
 
-          flash[:error] = "Employer information not saved. #{org_error_msg}."
+          flash[:error] = "Employer information not saved. #{org_error_msg}." if is_employer_profile?
+          flash[:error] = "Broker Agency information not saved. #{org_error_msg}." if is_broker_profile?
         end
         redirect_to result_url
       end
