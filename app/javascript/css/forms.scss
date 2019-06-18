@@ -1,5 +1,5 @@
 #new_user {
-  #pass_strength {
+  #pass_strength, #pass_match {
     font-size: 12px;
   }
   span#complexity {
@@ -27,5 +27,11 @@
   .strongest {
     background-color: #005fd6;
     width: 70px;
+  }
+  .fa-check {
+    color: $dc-lime-green;
+  }
+  .fa-times {
+    color: $dc-red;
   }
 }

@@ -22,7 +22,7 @@ webpack_environment.module.rules.push({
 webpack_environment.plugins.push(
 		new ngw.AngularCompilerPlugin({
 			tsConfigPath: "./app/javascript/incremental_angular/tsconfig.prod.json",
-			entryModule: "./app/javascript/incremental_angular/app/app.module#AppModule",
+			entryModule: "./app/javascript/incremental_angular/app/app.module#AppModule"
 		})
 )
 webpack_environment.plugins.push(

@@ -182,8 +182,8 @@ module BenefitMarkets
     end
 
     def network
-      return 'nationwide' if nationwide
-      return 'dc-metro' if dc_in_network
+      return 'Nationwide' if nationwide
+      return 'DC-Metro' if dc_in_network
     end
 
     def can_use_aptc?

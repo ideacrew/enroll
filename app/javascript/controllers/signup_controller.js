@@ -3,7 +3,7 @@ import { Controller } from "stimulus"
 
 export default class extends Controller {
 
-  static targets = [ "passwordField", "usernameField" ]
+  static targets = [ "passwordField", "usernameField", "passwordConfirmationField" ]
 
 connect() {
   // Equivalent to document ready
@@ -258,7 +258,25 @@ resetTooltips(items) {
     document.querySelector(`.${item}`).classList.add('fa-times');
     document.getElementById(`${item}`).style.color = '';
   })
+}
 
+checkMatch() {
+  let password = this.passwordFieldTarget.value;
+  let password_confirmation = this.passwordConfirmationFieldTarget.value;
+  const pass_match = document.getElementById('pass_match');
+  const pass_icon = document.getElementById('match_icon');
+  if (password && password_confirmation) {
+    pass_match.innerText = 'Match';
+    if (password === password_confirmation) {
+      pass_icon.innerHTML = '<i class="fas fa-check ml-2"></i>'
+    } else {
+      pass_icon.innerHTML = '<i class="fas fa-times ml-2"></i>'
+    }
+  } else {
+    pass_match.innerText = '';
+    pass_icon.innerHTML = '';
+    pass_icon.innerHTML = '';
+  }
 }
 
 }
