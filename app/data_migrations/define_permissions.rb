@@ -108,9 +108,6 @@ class DefinePermissions < MigrationTask
     Permission.super_admin.update_attributes!(can_add_sep: true)
     Permission.hbx_tier3.update_attributes!(can_add_sep: true)
   end
-  def hbx_admin_can_add_pdc
-    Permission.hbx_staff.update_attributes!(can_add_pdc: true)
-  end
 
   def hbx_admin_can_lock_unlock
     Permission.hbx_staff.update_attributes(can_lock_unlock: true)
