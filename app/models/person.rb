@@ -969,20 +969,16 @@ class Person
       if email
         email.update_attributes!(address: email_address)
       else
-        email= Email.new(kind: 'work', address: email_address)
-        emails.append(email)
-        self.update_attributes!(emails: emails)
-        save!
+        emails.build(kind: 'work', address: email_address)
+        save
       end
     end
     phone = phones.detect{|p|p.kind == 'work'}
     if phone
       phone.update_attributes!(area_code: area_code, number: number, extension: extension)
     else
-      phone = Phone.new(kind: 'work', area_code: area_code, number: number, extension: extension)
-      phones.append(phone)
-      self.update_attributes!(phones: phones)
-      save!
+      phones.build(kind: 'work', area_code: area_code, number: number, extension: extension)
+      save
     end
   end
 
