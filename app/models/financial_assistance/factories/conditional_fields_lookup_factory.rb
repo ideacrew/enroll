@@ -16,6 +16,10 @@ module FinancialAssistance
 
       private
 
+      def applicant_section
+        @instance.is_applying_coverage == true
+      end
+
       # TODO: This factory will be refactored to remove the following method.
       def model_instance
         case @class_name
