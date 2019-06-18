@@ -110,7 +110,8 @@ module BenefitSponsors
       class_name: "::BenefitMarkets::Locations::ServiceArea"
 
     embeds_many :broker_agency_accounts, class_name: "BenefitSponsors::Accounts::BrokerAgencyAccount",
-      validate: true
+                                         validate: true,
+                                         inverse_of: :benefit_sponsorship
 
     # embeds_many :general_agency_accounts, class_name: "BenefitSponsors::Accounts::GeneralAgencyAccount",
     #   validate: true
