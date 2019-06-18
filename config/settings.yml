@@ -299,13 +299,7 @@ aca:
   plan_match_tool: true
 
   rating_areas:
-    - R-MA001
-    - R-MA002
-    - R-MA003
-    - R-MA004
-    - R-MA005
-    - R-MA006
-    - R-MA007
+    - R-DC001
 
 notices:
   individual_market:
