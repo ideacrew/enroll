@@ -136,7 +136,7 @@ module Services
       end
 
       def filter_value
-        case @hbx_enrollment.sponsored_benefit_package.plan_option_kind
+        case @hbx_enrollment.sponsored_benefit_package.plan_option_kind.to_s
         when "single_plan"
           # @hbx_enrollment.benefit_group.reference_plan_id.to_s
           reference_plan.hios_id.to_s
@@ -148,10 +148,12 @@ module Services
       end
 
       def filter_option
-        case @hbx_enrollment.sponsored_benefit_package.plan_option_kind
+        case @hbx_enrollment.sponsored_benefit_package.plan_option_kind.to_s
         when "single_plan"
           "Plan"
-        when ("single_carrier" || "single_issuer")
+        when "single_carrier"
+          "Carrier"
+        when "single_issuer"
           "Carrier"
         when "metal_level"
           "Metal"
@@ -164,7 +166,7 @@ module Services
         @hbx_enrollment.sponsored_benefit_package.sorted_composite_tier_contributions.each do |relationship_benefit|
           next if ["child_26_and_over","nephew_or_niece","grandchild","child_26_and_over_with_disability"].include? relationship_benefit.display_name
           relationship = shop_relationship_benefit_hash[relationship_benefit.display_name]
-          premium_benefit_contributions[relationship] = relationship_benefit.contribution_pct
+          premium_benefit_contributions[relationship] = relationship_benefit.contribution_pct.to_i
         end
         premium_benefit_contributions
       end
