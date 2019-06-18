@@ -99,12 +99,13 @@
       ul.list-unstyled
         - for level in @metal_levels do
           li
-            checkbox
-              label
-                input id="plan-metal-level-#{level}" class="plan-metal-level-selection-filter checkbox-custom" name="plan-metal-level-#{level}" type="checkbox" onClick="filterMetalLevel(this)" data-plan-metal-level="#{level}" data-category="planMetalLevel"
-                label for="plan-metal-level-#{level}" class="checkbox-custom-label"
-                  span data-toggle="tooltip" data-placement="right" data-container="body" title="#{l10n('insured.plan_shoppings.plan_filters_'"#{level}"'_title_info')}"
-                  = l10n("#{level}")
+            .filter-input-block style="text-align:left"
+              checkbox
+                label
+                  input id="plan-metal-level-#{level}" class="plan-metal-level-selection-filter checkbox-custom" name="plan-metal-level-#{level}" type="checkbox" onClick="filterMetalLevel(this)" data-plan-metal-level="#{level}" data-category="planMetalLevel"
+                  label for="plan-metal-level-#{level}" class="checkbox-custom-label"
+                    span data-toggle="tooltip" data-placement="right" data-container="body" title="#{l10n('insured.plan_shoppings.plan_filters_'"#{level}"'_title_info')}"
+                    = l10n("#{level}")
   .checkbox-filter-wrapper-uc
     h5
       strong = l10n(".plan_type")
@@ -113,12 +114,13 @@
     ul.list-unstyled
       - @plan_types.each_with_index do |type, i|
         li
-          checkbox
-            label
-              input id="checkbox-#{10+i}" class="plan-type-selection-filter checkbox-custom" name="checkbox-#{10+i}" type="checkbox" data-plan-type="#{type}" onClick="filterPlanType(this)" data-category="planType"
-              label for="checkbox-#{10+i}" class="checkbox-custom-label"
-                span data-toggle="tooltip" data-placement="right" data-container="body" title="#{l10n('insured.plan_shoppings.'"#{type}"'_title_info')}"
-                = l10n("#{type}")
+          .filter-input-block style="text-align:left"
+            checkbox
+              label
+                input id="checkbox-#{10+i}" class="plan-type-selection-filter checkbox-custom" name="checkbox-#{10+i}" type="checkbox" data-plan-type="#{type}" onClick="filterPlanType(this)" data-category="planType"
+                label for="checkbox-#{10+i}" class="checkbox-custom-label"
+                  span data-toggle="tooltip" data-placement="right" data-container="body" title="#{l10n('insured.plan_shoppings.'"#{type}"'_title_info')}"
+                  = l10n("#{type}")
   - if offers_nationwide_plans?
     .checkbox-filter-wrapper-uc
       h5
@@ -129,21 +131,23 @@
         - if @market_kind == "shop"
           - @networks.each_with_index do |network, i|
             li
-              checkbox
-                label
-                  input id="checkbox-#{15+i}" class="plan-metal-network-selection-filter checkbox-custom" name="checkbox-#{15+i}" type="checkbox" data-plan-network="#{network}" onClick="filterPlanNetwork(this)" data-category="planNetwork"
-                  label for="checkbox-#{15+i}" class="checkbox-custom-label"
-                    span data-toggle="tooltip" data-placement="right" data-container="body" title="#{l10n('insured.plan_shoppings.plan_shoppings_'"#{network}"'_title_info')}"
-                    = l10n("#{network}")
+              .filter-input-block style="text-align:left"
+                checkbox
+                  label
+                    input id="checkbox-#{15+i}" class="plan-metal-network-selection-filter checkbox-custom" name="checkbox-#{15+i}" type="checkbox" data-plan-network="#{network}" onClick="filterPlanNetwork(this)" data-category="planNetwork"
+                    label for="checkbox-#{15+i}" class="checkbox-custom-label"
+                      span data-toggle="tooltip" data-placement="right" data-container="body" title="#{l10n('insured.plan_shoppings.plan_shoppings_'"#{network}"'_title_info')}"
+                      = l10n("#{network}")
         - else
           - @networks.each_with_index do |network, i|
             li
-              checkbox
-                label
-                  input id="checkbox-#{15+i}" class="plan-metal-network-selection-filter checkbox-custom" name="checkbox-#{15+i}" type="checkbox" data-plan-network="#{network.gsub('-', ' ').downcase!}" onClick="filterPlanNetwork(this)" data-category="planNetwork"
-                  label for="checkbox-#{15+i}" class="checkbox-custom-label"
-                    span data-toggle="tooltip" data-placement="right" data-container="body" title="#{l10n('insured.plan_shoppings.plan_shoppings_' "#{network}" '_title_info')}"
-                    = l10n("#{network}")
+              .filter-input-block style="text-align:left"
+                checkbox
+                  label
+                    input id="checkbox-#{15+i}" class="plan-metal-network-selection-filter checkbox-custom" name="checkbox-#{15+i}" type="checkbox" data-plan-network="#{network.gsub('-', ' ').downcase!}" onClick="filterPlanNetwork(this)" data-category="planNetwork"
+                    label for="checkbox-#{15+i}" class="checkbox-custom-label"
+                      span data-toggle="tooltip" data-placement="right" data-container="body" title="#{l10n('insured.plan_shoppings.plan_shoppings_' "#{network}" '_title_info')}"
+                      = l10n("#{network}")
   .checkbox-filter-wrapper-uc
     h5
       strong = l10n("carrier")
