@@ -116,6 +116,7 @@ javascript:
     function resetAllFilters() {
       clearAll()
       clearSelections()
+      resetComparePlan()
       total_plans = $('#plans .plan-row').length
       $("#plans-count").text(total_plans);
     }
@@ -395,6 +396,7 @@ javascript:
       $("#plans-count").text(filteredArray.length);
       clearSelections();
       applyFilter();
+      resetComparePlan();
       showFilteredResults()
     }
 
