@@ -19,14 +19,14 @@ class CensusEmployeePolicy < ApplicationPolicy
   end
 
   def show?
-    return true if @user.has_role? :hbx_staff
-    if @user.has_role? :broker 
+    return true if (@user.has_role? :hbx_staff || @user.has_hbx_staff_role?)
+    if @user.has_role? :broker || @user.has_broker_role?
       return true if @record.employer_profile.try(:active_broker) == @user.person
     end
-    if @user.has_role?(:employer_staff) 
+    if @user.has_role?(:employer_staff) || @user.has_employer_staff_role?
       return true if @user.person.employer_staff_roles.map(&:employer_profile_id).map(&:to_s).include? @record.employer_profile_id.to_s     
     end  
-    if @user.has_role?(:general_agency_staff)
+    if @user.has_role?(:general_agency_staff) || @user.has_general_agency_staff_role?
       linked_general_agency = @record.employer_profile.general_agency_profile
       return false if linked_general_agency.nil?
       general_agency_profile_ids = @user.person.active_general_agency_staff_roles.map{|a| a.general_agency_profile_id}
