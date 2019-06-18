@@ -89,7 +89,7 @@ function maybeAddComparisonPlan(cb) {
       $("#ivl-plans-compare-alert").modal("show");
 			var removed_id = plansToCompareArray.shift();
 			var lookup_string = "input[data-hios-id='" +
-				removed_id + "'].select-plan-for-comparison";
+				removed_id + "'].ivl-select-plan-for-comparison";
 			$(lookup_string).each(function(idx, ele) {
 				$(ele).attr("checked", false);
 			});
@@ -179,8 +179,9 @@ $(function() {
 		}
   });
 
-  $(document).on('change', '.select-plan-for-comparison', function(){
-		maybeAddComparisonPlan(this);
+  
+  $(document).on('change', '.ivl-select-plan-for-comparison', function(){
+	  maybeAddComparisonPlan(this);
   });
 
   $(document).on('click', '.ivl-compare-selected-plans-link', function(){
