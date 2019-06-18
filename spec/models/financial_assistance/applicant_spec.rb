@@ -221,6 +221,92 @@ RSpec.describe FinancialAssistance::Applicant, type: :model, dbclean: :after_eac
     end
   end
 
+  describe 'validations' do
+    context 'validate_applicant_information' do
+      [:is_pregnant, :has_daily_living_help, :need_help_paying_bills, :is_self_attested_blind].each do |attribute|
+        before :each do
+          applicant1.update_attributes(attribute => nil)
+        end
+
+        it 'should return false' do
+          expect(applicant1.valid?(:submission)).to eq false
+        end
+
+        it 'should return true' do
+          applicant1.person.consumer_role.update_attributes(is_applying_coverage: false)
+          applicant1.valid?(:submission)
+          error_messages = applicant1.errors.full_messages
+          expect(error_messages).not_to include(/#{attribute.to_s.titleize} should be answered/i)
+        end
+      end
+    end
+
+    context 'applicant_validation_complete?' do
+      [:is_pregnant, :has_daily_living_help, :need_help_paying_bills, :is_self_attested_blind].each do |attribute|
+        before :each do
+          applicant1.update_attributes(attribute => nil)
+        end
+
+        it 'should return false' do
+          expect(applicant1.applicant_validation_complete?).to eq false
+        end
+
+        it 'should return true' do
+          applicant1.person.consumer_role.update_attributes(is_applying_coverage: false)
+          applicant1.applicant_validation_complete?
+          error_messages = applicant1.errors.full_messages
+          expect(error_messages).not_to include(/#{attribute.to_s.titleize} should be answered/i)
+        end
+      end
+
+      context 'benefits should not be considered for submission validation' do
+        before :each do
+          benefit = applicant1.benefits.new
+          benefit.save(validate: false)
+          applicant1.person.consumer_role.update_attributes!(is_applying_coverage: false)
+          applicant1.update_attributes!({has_job_income: false,
+                                         has_self_employment_income: false,
+                                         has_other_income: false,
+                                         has_deductions: false,
+                                         is_required_to_file_taxes: false,
+                                         is_claimed_as_tax_dependent: false})
+        end
+
+        it { expect(applicant1.benefits.first.valid?(:submission)).to be false }
+
+        it { expect(applicant1.applicant_validation_complete?).to be true }
+      end
+    end
+
+    context 'other_questions_complete?' do
+      before :each do
+        person1.update_attributes(dob: TimeKeeper.date_of_record - 20.years)
+        applicant1.update_attributes(is_former_foster_care: nil)
+      end
+
+      it 'should return true as applicant is not applying for coverage' do
+        applicant1.person.consumer_role.update_attributes!(is_applying_coverage: false)
+        expect(applicant1.other_questions_complete?).to eq true
+      end
+
+      it 'should return false as applicant is applying for coverage' do
+        expect(applicant1.other_questions_complete?).to eq false
+      end
+    end
+
+    context 'embedded_document_section_entry_complete?' do
+      it 'should return true as applicant is not applying for coverage' do
+        applicant1.person.consumer_role.update_attributes!(is_applying_coverage: false)
+        expect(applicant1.embedded_document_section_entry_complete?(:health_coverage)).to eq true
+      end
+
+      it 'should return false as applicant is applying for coverage' do
+        applicant1.person.consumer_role.update_attributes!(has_enrolled_health_coverage: false)
+        expect(applicant1.embedded_document_section_entry_complete?(:health_coverage)).to eq false
+      end
+    end
+  end
+
   describe 'find' do
     context 'when proper applicant id is sent' do
       it 'should return the applicant instance' do
@@ -238,23 +324,23 @@ RSpec.describe FinancialAssistance::Applicant, type: :model, dbclean: :after_eac
   end
 
   describe '#is_ia_eligible?' do
-    it 'should return true if is_ia_eligible attirbute is true' do
+    it 'should return true if is_ia_eligible attribute is true' do
       applicant1.update_attributes(is_ia_eligible: true)
       expect(applicant1.is_ia_eligible?).to be_truthy
     end
-    it 'should return false if is_ia_eligible attirbute is false' do
+    it 'should return false if is_ia_eligible attribute is false' do
       applicant1.update_attributes(is_ia_eligible: false)
       expect(applicant1.is_ia_eligible?).to be_falsey
     end
   end
 
   describe '#non_ia_eligible?' do
-    it 'should return true if is_ia_eligible attirbute is false' do
+    it 'should return true if is_ia_eligible attribute is false' do
       applicant1.update_attributes(is_ia_eligible: false)
       applicant1.update_attributes(is_medicaid_chip_eligible: true)
       expect(applicant1.non_ia_eligible?).to be_truthy
     end
-    it 'should return false if is_ia_eligible attirbute is true' do
+    it 'should return false if is_ia_eligible attribute is true' do
       applicant1.update_attributes(is_ia_eligible: true)
       applicant1.update_attributes(is_medicaid_chip_eligible: true)
       expect(applicant1.is_ia_eligible?).to be_falsey
@@ -262,42 +348,42 @@ RSpec.describe FinancialAssistance::Applicant, type: :model, dbclean: :after_eac
   end
 
   describe '#is_medicaid_chip_eligible?' do
-    it 'should return true if is_medicaid_chip_eligible attirbute is true' do
+    it 'should return true if is_medicaid_chip_eligible attribute is true' do
       applicant1.update_attributes(is_medicaid_chip_eligible: true)
       expect(applicant1.is_medicaid_chip_eligible?).to be_truthy
     end
-    it 'should return false if is_medicaid_chip_eligible attirbute is false' do
+    it 'should return false if is_medicaid_chip_eligible attribute is false' do
       applicant1.update_attributes(is_medicaid_chip_eligible: false)
       expect(applicant1.is_medicaid_chip_eligible?).to be_falsey
     end
   end
 
   describe '#is_tax_dependent?' do
-    it 'should return true if is_tax_dependent attirbute is preseent' do
+    it 'should return true if is_tax_dependent attribute is preseent' do
       applicant1.update_attributes(tax_filer_kind: "tax_dependent")
       expect(applicant1.is_tax_dependent?).to be_truthy
     end
-    it 'should return false if is_tax_dependent attirbute is not preseent' do
+    it 'should return false if is_tax_dependent attribute is not preseent' do
       expect(applicant1.is_tax_dependent?).to be_falsey
     end
   end
 
   describe '#tax_filing?' do
-    it 'should return true if tax_filing attirbute is true' do
+    it 'should return true if tax_filing attribute is true' do
       applicant1.update_attributes(is_required_to_file_taxes: true)
       expect(applicant1.tax_filing?).to be_truthy
     end
-    it 'should return false if tax_filing attirbute is false' do
+    it 'should return false if tax_filing attribute is false' do
       expect(applicant1.tax_filing?).to be_falsey
     end
   end
 
   describe '#is_claimed_as_tax_dependent?' do
-    it 'should return true if is_claimed_as_tax_dependent attirbute is true' do
+    it 'should return true if is_claimed_as_tax_dependent attribute is true' do
       applicant1.update_attributes(is_claimed_as_tax_dependent: true)
       expect(applicant1.is_claimed_as_tax_dependent?).to be_truthy
     end
-    it 'should return false if is_claimed_as_tax_dependent attirbute is false' do
+    it 'should return false if is_claimed_as_tax_dependent attribute is false' do
       expect(applicant1.is_claimed_as_tax_dependent?).to be_falsey
     end
   end
@@ -327,14 +413,14 @@ RSpec.describe FinancialAssistance::Applicant, type: :model, dbclean: :after_eac
   end
 
   describe '#valid_income_response' do
-    it 'should return true if assisted_income_validation attirbute is valid' do
+    it 'should return true if assisted_income_validation attribute is valid' do
       applicant1.valid_income_response
       expect(applicant1.assisted_income_validation).to eq 'valid'
     end
   end
 
   describe '#invalid_income_response' do
-    it 'should return true if assisted_income_validation attirbute is outstanding' do
+    it 'should return true if assisted_income_validation attribute is outstanding' do
       applicant1.invalid_income_response
       expect(applicant1.assisted_income_validation).to eq "outstanding"
     end
@@ -397,6 +483,28 @@ RSpec.describe FinancialAssistance::Applicant, type: :model, dbclean: :after_eac
       it 'should return person2' do
         expect(applicant2.person).to eq(person2)
       end
+    end
+  end
+
+  describe '#applicant?' do
+    it 'should return true if is_applying_coverage is true' do
+      expect(applicant1.applicant?).to be_truthy
+    end
+
+    it 'should return false if is_applying_coverage is false/nil' do
+      applicant1.person.consumer_role.update_attributes(is_applying_coverage: false)
+      expect(applicant1.applicant?).to be_falsey
+    end
+  end
+
+  describe '#non_applicant?' do
+    it 'should return true if is_applying_coverage is true' do
+      expect(applicant1.non_applicant?).to be_falsey
+    end
+
+    it 'should return false if is_applying_coverage is false/nil' do
+      applicant1.person.consumer_role.update_attributes(is_applying_coverage: false)
+      expect(applicant1.non_applicant?).to be_truthy
     end
   end
 
@@ -567,21 +675,21 @@ RSpec.describe FinancialAssistance::Applicant, type: :model, dbclean: :after_eac
   end
 
   describe '#assisted_income_verified?' do
-    it 'should return true if assisted_income_validation attirbute is valid' do
+    it 'should return true if assisted_income_validation attribute is valid' do
       applicant1.update_attributes(assisted_income_validation: 'valid')
       expect(applicant1.assisted_income_verified?).to be_truthy
     end
   end
 
   describe '#assisted_mec_verified?' do
-    it 'should return true if assisted_mec_validation attirbute is valid' do
+    it 'should return true if assisted_mec_validation attribute is valid' do
       applicant1.update_attributes(assisted_mec_validation: 'valid')
       expect(applicant1.assisted_mec_verified?).to be_truthy
     end
   end
 
   describe '#income_valid?' do
-    context 'when assisted_income_validation attirbute is valid' do
+    context 'when assisted_income_validation attribute is valid' do
       it 'should return true' do
         applicant1.update_attributes(assisted_income_validation: 'valid')
         expect(applicant1.income_valid?).to be_truthy
@@ -590,8 +698,8 @@ RSpec.describe FinancialAssistance::Applicant, type: :model, dbclean: :after_eac
   end
 
   describe '#mec_valid?' do
-    context 'when assisted_mec_validation attirbute is valid' do
-      it 'should return true if assisted_mec_validation attirbute is valid' do
+    context 'when assisted_mec_validation attribute is valid' do
+      it 'should return true if assisted_mec_validation attribute is valid' do
         applicant1.update_attributes(assisted_mec_validation: 'valid')
         expect(applicant1.mec_valid?).to be_truthy
       end
