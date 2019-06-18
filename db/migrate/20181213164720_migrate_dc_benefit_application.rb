@@ -167,7 +167,7 @@ class MigrateDcBenefitApplication < Mongoid::Migration
   end
 
   def self.set_predecessor_application
-    benefit_applications =  @benefit_sponsorship.benefit_applications.select{ |app| app.start_on == @benefit_application.start_on.prev_day && [:active, :terminated, :expired, :imported].include?(app.aasm_state) }
+    benefit_applications =  @benefit_sponsorship.benefit_applications.select{ |app| app.end_on == @benefit_application.start_on.prev_day && [:active, :terminated, :expired, :imported].include?(app.aasm_state) }
     raise Standard, "More than One Predecessor application found, benefit_sponsorship: #{@benefit_sponsorship.id}" if benefit_applications.count > 1
     benefit_applications.present? ? benefit_applications.first.id : nil
   end
