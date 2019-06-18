@@ -15,7 +15,7 @@ RSpec.describe "app/views/insured/group_selection/terminate_confirm.html.erb" do
     let(:benefit_sponsorship) { FactoryBot.create :benefit_sponsors_benefit_sponsorship, :with_benefit_market, :with_organization_cca_profile, :with_initial_benefit_application}
     let(:benefit_application) { benefit_sponsorship.benefit_applications.first }
     let(:employer_profile) { benefit_sponsorship.organization.employer_profile }
-    let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
+    let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile) }
     let(:employee_names) { ["fname1 sname1", "fname2 sname2"] }
 
     let(:current_user) {FactoryBot.create(:user)}
