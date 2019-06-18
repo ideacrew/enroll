@@ -73,4 +73,40 @@ RSpec.describe FinancialAssistanceHelper, :type => :helper, dbclean: :after_each
       end
     end
   end
+
+
+  describe 'redirection urls' do
+    before :each do
+      allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
+    end
+
+    let!(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
+    let!(:application) { FactoryGirl.create(:application, family: family) }
+    let!(:applicant) { FactoryGirl.create(:applicant, family_member_id: family.primary_applicant.id, application: application) }
+    let(:application_id) { application.id.to_s}
+    let(:applicant_id) { applicant.id.to_s}
+
+    describe 'deductions_next_url' do
+      it 'should return other_questions index url for non_applicant' do
+        person.consumer_role.update_attributes!(is_applying_coverage: false)
+        expect(helper.deductions_next_url(application, applicant)).to eq "/financial_assistance/applications/#{application_id}/applicants/#{applicant_id}/other_questions"
+      end
+
+      it 'should return benefits index url for applicant' do
+        expect(helper.deductions_next_url(application, applicant)).to eq "/financial_assistance/applications/#{application_id}/applicants/#{applicant_id}/benefits"
+      end
+    end
+
+    describe 'other_questions_previous_url' do
+      it 'should return deductions index url for non_applicant' do
+        person.consumer_role.update_attributes!(is_applying_coverage: false)
+        expect(helper.other_questions_previous_url(application, applicant)).to eq "/financial_assistance/applications/#{application_id}/applicants/#{applicant_id}/deductions"
+      end
+
+      it 'should return benefits index url for applicant' do
+        expect(helper.other_questions_previous_url(application, applicant)).to eq "/financial_assistance/applications/#{application_id}/applicants/#{applicant_id}/benefits"
+      end
+    end
+  end
 end
