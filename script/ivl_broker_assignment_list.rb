@@ -21,7 +21,7 @@
     csv << field_names
     while offset <= ppl_count
       Family.exists("broker_agency_accounts" =>true).all.offset(offset).limit(batch_size).each do |family|
-        next if family.primary_person.nil? 
+        next if family.primary_person.nil? || family.broker_agency_accounts.empty?
         primary_person = family.primary_person
         history = family.broker_agency_accounts.map{|a| [a.broker_agency_profile.primary_broker_role.person.full_name,a.broker_agency_profile.primary_broker_role.npn,a.start_on,a.end_on]}
 
@@ -31,6 +31,7 @@
             primary_person.hbx_id,
             history
           ]
+          puts @processed_count if @processed_count % 100 ==0
 
 
         # family.broker_agency_accounts.each do |ba_account|
@@ -52,5 +53,5 @@
       end
       offset = offset + batch_size
     end
-    puts "For period #{date_range.first} - #{date_range.last}, #{processed_count} brokers to output file: #{file_name}" unless Rails.env.test?
+    puts "For period #{date_range.first} - #{date_range.last}, #{@processed_count} brokers to output file: #{file_name}" unless Rails.env.test?
   end
