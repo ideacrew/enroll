@@ -74,7 +74,6 @@ RSpec.describe FinancialAssistanceHelper, :type => :helper, dbclean: :after_each
     end
   end
 
-
   describe 'redirection urls' do
     before :each do
       allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
@@ -106,6 +105,41 @@ RSpec.describe FinancialAssistanceHelper, :type => :helper, dbclean: :after_each
 
       it 'should return benefits index url for applicant' do
         expect(helper.other_questions_previous_url(application, applicant)).to eq "/financial_assistance/applications/#{application_id}/applicants/#{applicant_id}/benefits"
+      end
+    end
+  end
+
+  describe 'display_benefits' do
+    let(:enr_benefit) { double(kind: 'is_enrolled', insurance_kind: 'acf_refugee_medical_assistance') }
+    let(:eli_benefit) { double(kind: 'is_eligible', insurance_kind: 'acf_refugee_medical_assistance') }
+    let(:applicant) { double(:has_hbx_staff_role? => true, :benefits => [enr_benefit, eli_benefit]) }
+
+    before :each do
+      allow(applicant).to receive(:enrolled_benefits).and_return([enr_benefit])
+      allow(applicant).to receive(:eligible_benefits).and_return([eli_benefit])
+    end
+
+    context 'for matching kind and matching insurance_kind' do
+      it 'should return array with matching eligible benefits' do
+        matching_benefits = helper.display_benefits(applicant, 'is_eligible', "acf_refugee_medical_assistance")
+        expect(matching_benefits).to eq [eli_benefit]
+      end
+
+      it 'should return array with matching enrolled benefits' do
+        matching_benefits = helper.display_benefits(applicant, 'is_enrolled', "acf_refugee_medical_assistance")
+        expect(matching_benefits).to eq [enr_benefit]
+      end
+    end
+
+    context 'for matching kind and different insurance_kind' do
+      it 'should return empty array' do
+        matching_benefits = helper.display_benefits(applicant, 'is_eligible', "test")
+        expect(matching_benefits).to eq []
+      end
+
+      it 'should return empty array' do
+        matching_benefits = helper.display_benefits(applicant, 'is_enrolled', "test")
+        expect(matching_benefits).to eq []
       end
     end
   end

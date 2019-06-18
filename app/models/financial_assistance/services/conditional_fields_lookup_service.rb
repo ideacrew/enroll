@@ -5,11 +5,11 @@ module FinancialAssistance
 
       APPLICANT_DRIVER_QUES = [:is_required_to_file_taxes, :is_claimed_as_tax_dependent].freeze
 
-      def displayable_field?(class_name, bson_id, attribute)
+      def displayable_field?(class_name, object, attribute)
         return false unless class_name.present?
         class_name.downcase!
         return true if driver_que?(class_name, attribute)
-        @factory = factory_klass.new(class_name, bson_id, attribute)
+        @factory = factory_klass.new(object, attribute)
         @factory.conditionally_displayable?
       end
 

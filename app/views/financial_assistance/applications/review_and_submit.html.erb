@@ -5,7 +5,7 @@
       <p><strong> You're almost done! </strong>Review the application summary below and make sure it's correct. Select the
       pencil icon to go back to any item and make change. When you're finished, select CONTINUE.</p>
 
-      <% if income_and_deductions_for_any(@application).present? %>
+      <% if income_and_deductions_for_any(@review_form.application).present? %>
         <h3 class="darkblue">Income and Adjustments</h3>
         <div class="row white-background">
           <div class="col-md-12 pz">
@@ -26,10 +26,10 @@
                 </tr>
               </thead>
               <tbody>
-                <% @applicants.each do |applicant| %>
+                <% @review_form.application.applicants.each do |applicant| %>
                   <% income_and_deductions_for(applicant).each do |embedded_document| %>
                     <tr>
-                      <td> <%= applicant.person.full_name %> </td>
+                      <td> <%= applicant.full_name %> </td>
                       <td> <%= embedded_document.kind.humanize %> </td>
                       <td> <%= embedded_document.frequency_kind.humanize %> </td>
                       <td>
@@ -43,7 +43,7 @@
                       <td>
                         <%= start_to_end_dates(embedded_document) %>
                         <span class= "ml10">
-                          <%= link_to income_and_deductions_edit(@application, applicant, embedded_document) do %>
+                          <%= link_to income_and_deductions_edit(@review_form.application, applicant, embedded_document) do %>
                             <i class="fa fa-pencil fa-lg"></i>
                           <% end %>
                         </span>
@@ -65,12 +65,12 @@
       <% end %>
       <br><br>
 
-      <% @applicants.each do |applicant| %>
+      <% @review_form.application.applicants.each do |applicant| %>
         <div class="row white-background">
           <div class="col-md-12 pz">
             <div class="row row-form-wrapper ptb no-buffer row-height main-heading form-bottom-border">
               <div class="col-md-11"><span></span>
-                <i class="fa fa-user blue-icon"></i> <%= applicant.person.full_name %>
+                <i class="fa fa-user blue-icon"></i> <%= applicant.full_name %>
               </div>
               <div class="col-md-1">
                 <!-- <a><span class="fa fa-pencil fa-lg" aria-hidden="true"></span></a> -->
@@ -92,11 +92,11 @@
                 <tbody>
                   <tr class="noBorder">
                     <td><%= applicant.age_of_the_applicant %></td>
-                    <td><%= applicant.person.gender.humanize %></td>
-                    <td><%= applicant.family_member.relationship.humanize %></td>
-                    <td><%= applicant.person.format_citizen if applicant.person.citizen_status.present? %></td>
-                    <td><%= human_boolean applicant.person.is_incarcerated %></td>
-                    <td><%= human_boolean applicant.person.is_applying_coverage %></td>
+                    <td><%= applicant.gender.humanize %></td>
+                    <td><%= applicant.relationship.humanize %></td>
+                    <td><%= applicant.format_citizen if applicant.citizen_status.present? %></td>
+                    <td><%= human_boolean applicant.is_incarcerated %></td>
+                    <td><%= human_boolean applicant.is_applying_coverage %></td>
                   </tr>
                 </tbody>
               </table>
@@ -107,18 +107,18 @@
                 <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
                   <div class="col-md-11 form-heading"> TAX INFO</div>
                   <div class="col-md-1">
-                    <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, applicant, 1) do %>
+                    <%= link_to go_to_step_financial_assistance_application_applicant_path(@review_form.application.id, applicant.id, 1) do %>
                       <i class="fa fa-pencil fa-lg"></i>
                     <% end %>
                   </div>
                 </div>
 
                 <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                  <div class="col-md-6">Will this person file taxes for <%= @application.family.application_applicable_year %>? *</div>
+                  <div class="col-md-6">Will this person file taxes for <%= @review_form.application_applicable_year %>? *</div>
                   <div class="col-md-6"><%= human_boolean(applicant.is_required_to_file_taxes) %></div>
                 </div>
 
-                <% if @cfl_service.displayable_field?('applicant', applicant.id, :is_joint_tax_filing) %>
+                <% if @cfl_service.displayable_field?('applicant', applicant, :is_joint_tax_filing) %>
                   <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                     <div class="col-md-6">Will this person be filing jointly?</div>
                     <div class="col-md-6"><%= human_boolean(applicant.is_joint_tax_filing) %></div>
@@ -127,12 +127,12 @@
 
                 <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                   <div class="col-md-6">Will this person be claimed as a tax dependent
-                    for <%= @application.family.application_applicable_year %>? *
+                    for <%= @review_form.application_applicable_year %>? *
                   </div>
                   <div class="col-md-6"><%= human_boolean(applicant.is_claimed_as_tax_dependent) %></div>
                 </div>
 
-                <% if @cfl_service.displayable_field?('applicant', applicant.id, :claimed_as_tax_dependent_by) %>
+                <% if @cfl_service.displayable_field?('applicant', applicant, :claimed_as_tax_dependent_by) %>
                   <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                     <div class="col-md-6">This person will be claimed as a dependent by</div>
                     <div class="col-md-6"><%= applicant_name(applicant.claimed_as_tax_dependent_by.to_s) %></div>
@@ -144,7 +144,7 @@
                 <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
                   <div class="col-md-11">INCOME</div>
                   <div class="col-md-1">
-                    <%= link_to financial_assistance_application_applicant_incomes_path(@application, applicant) do %>
+                    <%= link_to financial_assistance_application_applicant_incomes_path(@review_form.application.id, applicant.id) do %>
                       <i class="fa fa-pencil fa-lg"></i>
                     <% end %>
                   </div>
@@ -152,13 +152,13 @@
 
                 <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                   <div class="col-md-6">Does this person have income from an employer (wages, tips, bonuses, etc.)
-                      in <%= @application.family.application_applicable_year %>?
+                      in <%= @review_form.application_applicable_year %>?
                   </div>
                   <div class="col-md-6"><%= human_boolean applicant.has_job_income %></div>
                 </div>
 
-                <% if @cfl_service.displayable_field?('applicant', applicant.id, :incomes_jobs) %>
-                  <% applicant.incomes.jobs.each do |income| %>
+                <% if @cfl_service.displayable_field?('applicant', applicant, :incomes_jobs) %>
+                  <% applicant.job_incomes.each do |income| %>
                     <div class="border-sides form-content">
                       <div class="row ptb no-buffer row-height">
                         <div class="col-md-6">Employer Name</div>
@@ -206,7 +206,7 @@
                 </div>
 
                 <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                  <div class="col-md-6">Does this person expect to have other types of income in <%= @application.family.application_applicable_year %>?
+                  <div class="col-md-6">Does this person expect to have other types of income in <%= @review_form.application_applicable_year %>?
                   </div>
                   <div class="col-md-6"><%= human_boolean applicant.has_other_income %></div>
                 </div>
@@ -216,67 +216,69 @@
                 <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
                   <div class="col-md-11">INCOME ADJUSTMENTS</div>
                   <div class="col-md-1">
-                    <%= link_to financial_assistance_application_applicant_deductions_path(@application, applicant) do %>
+                    <%= link_to financial_assistance_application_applicant_deductions_path(@review_form.application.id, applicant.id) do %>
                       <i class="fa fa-pencil fa-lg"></i>
                     <% end %>
                   </div>
                 </div>
 
                 <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                  <div class="col-md-6">Does this person expect to have adjustments to income in <%= @application.family.application_applicable_year %>? *
+                  <div class="col-md-6">Does this person expect to have adjustments to income in <%= @review_form.application_applicable_year %>? *
                   </div>
                   <div class="col-md-6"><%= human_boolean applicant.has_deductions %></div>
                 </div>
               </div>
 
-              <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
-                <div class="col-md-11">HEALTH COVERAGE</div>
-                <div class="col-md-1">
-                  <%= link_to financial_assistance_application_applicant_benefits_path(@application, applicant) do %>
-                    <i class="fa fa-pencil fa-lg"></i>
-                  <% end %>
+              <% if @cfl_service.displayable_field?('applicant', applicant, :applicant_section) %>
+                <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
+                  <div class="col-md-11">HEALTH COVERAGE</div>
+                  <div class="col-md-1">
+                    <%= link_to financial_assistance_application_applicant_benefits_path(@review_form.application.id, applicant.id) do %>
+                      <i class="fa fa-pencil fa-lg"></i>
+                    <% end %>
+                  </div>
                 </div>
-              </div>
 
-              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                <div class="col-md-6">Is this person currently enrolled in health coverage?</div>
-                <div class="col-md-6"><%= human_boolean applicant.has_enrolled_health_coverage %></div>
-              </div>
-
-              <!-- Section to display benefits with kind is_enrolled-->
-              <% if applicant.has_enrolled_health_coverage %>
-                <%= render partial: 'financial_assistance/applications/review_benefits', locals: {kind: 'is_enrolled', applicant: applicant} %>
-              <% end %>
-
-              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                <div class="col-md-6">Does this person currently have access to other health coverage, including through another person?
+                <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                  <div class="col-md-6">Is this person currently enrolled in health coverage?</div>
+                  <div class="col-md-6"><%= human_boolean applicant.has_enrolled_health_coverage %></div>
                 </div>
-                <div class="col-md-6"><%= human_boolean applicant.has_eligible_health_coverage %></div>
-              </div>
 
-              <!-- Section to display benefits with kind is_eliglible-->
-              <% if applicant.has_eligible_health_coverage %>
-                <%= render partial: 'financial_assistance/applications/review_benefits', locals: {kind: 'is_eligible', applicant: applicant} %>
+                <!-- Section to display benefits with kind is_enrolled-->
+                <% if applicant.has_enrolled_health_coverage %>
+                  <%= render partial: 'financial_assistance/applications/review_benefits', locals: {kind: 'is_enrolled', applicant: applicant} %>
+                <% end %>
+
+                <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                  <div class="col-md-6">Does this person currently have access to other health coverage, including through another person?
+                  </div>
+                  <div class="col-md-6"><%= human_boolean applicant.has_eligible_health_coverage %></div>
+                </div>
+
+                <!-- Section to display benefits with kind is_eliglible-->
+                <% if applicant.has_eligible_health_coverage %>
+                  <%= render partial: 'financial_assistance/applications/review_benefits', locals: {kind: 'is_eligible', applicant: applicant} %>
+                <% end %>
               <% end %>
             </div>
 
             <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
               <div class="col-md-11">OTHER QUESTIONS</div>
               <div class="col-md-1">
-                <%= link_to other_questions_financial_assistance_application_applicant_path(@application, applicant) do %>
+                <%= link_to other_questions_financial_assistance_application_applicant_path(@review_form.application.id, applicant.id) do %>
                   <i class="fa fa-pencil fa-lg"></i>
                 <% end %>
               </div>
             </div>
 
-            <% if @cfl_service.displayable_field?('applicant', applicant.id, :is_ssn_applied) %>
+            <% if @cfl_service.displayable_field?('applicant', applicant, :is_ssn_applied) %>
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                 <div class="col-md-6">Has this person applied for an SSN</div>
                 <div class="col-md-6"><%= human_boolean applicant.is_ssn_applied %></div>
               </div>
             <% end %>
 
-            <% if @cfl_service.displayable_field?('applicant', applicant.id, :non_ssn_apply_reason) %>
+            <% if @cfl_service.displayable_field?('applicant', applicant, :non_ssn_apply_reason) %>
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                 <div class="col-md-6">Why doesn't this person have an SSN?</div>
                 <div class="col-md-6"><%= applicant.non_ssn_apply_reason.to_s %></div>
@@ -289,7 +291,7 @@
             </div>
 
             <!-- Case where the applicant is Pregnant(fields: :pregnancy_due_on and :children_expected_count) -->
-            <% if @cfl_service.displayable_field?('applicant', applicant.id, :pregnancy_due_on) %>
+            <% if @cfl_service.displayable_field?('applicant', applicant, :pregnancy_due_on) %>
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                 <div class="col-md-6">Pregnancy due date?</div>
                 <div class="col-md-6"><%= applicant.pregnancy_due_on.to_s %></div>
@@ -301,99 +303,101 @@
               </div>
             <% end %>
 
-            <% if @cfl_service.displayable_field?('applicant', applicant.id, :is_post_partum_period) %>
+            <% if @cfl_service.displayable_field?('applicant', applicant, :is_post_partum_period) %>
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                 <div class="col-md-6">Was this person pregnant in the last 60 days?</div>
                 <div class="col-md-6"><%= human_boolean applicant.is_post_partum_period %></div>
               </div>
             <% end %>
 
-            <% if @cfl_service.displayable_field?('applicant', applicant.id, :pregnancy_end_on) %>
+            <% if @cfl_service.displayable_field?('applicant', applicant, :pregnancy_end_on) %>
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                 <div class="col-md-6">Pregnancy end on date</div>
                 <div class="col-md-6"><%= applicant.pregnancy_end_on.to_s %></div>
               </div>
             <% end %>
 
-            <% if @cfl_service.displayable_field?('applicant', applicant.id, :is_enrolled_on_medicaid) %>
+            <% if @cfl_service.displayable_field?('applicant', applicant, :applicant_section) %>
+              <% if @cfl_service.displayable_field?('applicant', applicant, :is_enrolled_on_medicaid) %>
+                <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                  <div class="col-md-6">Was this person on Medicaid during pregnancy?</div>
+                  <div class="col-md-6"><%= human_boolean applicant.is_enrolled_on_medicaid %></div>
+                </div>
+              <% end %>
+
+              <% if @cfl_service.displayable_field?('applicant', applicant, :is_former_foster_care) %>
+                <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                  <div class="col-md-6">Was this person in foster care at age 18 or older?</div>
+                  <div class="col-md-6"><%= human_boolean applicant.is_former_foster_care %></div>
+                </div>
+              <% end %>
+
+              <!-- Case where the applicant was in Foster Care(fields: :foster_care_us_state, :age_left_foster_care, :had_medicaid_during_foster_care) -->
+              <% if @cfl_service.displayable_field?('applicant', applicant, :foster_care_us_state) %>
+                <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                  <div class="col-md-6">Where was this person in foster care?</div>
+                  <div class="col-md-6"><%= applicant.foster_care_us_state %></div>
+                </div>
+
+                <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                  <div class="col-md-6">How old was this person when they left foster care?</div>
+                  <div class="col-md-6"><%= applicant.age_left_foster_care %></div>
+                </div>
+
+                <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                  <div class="col-md-6">Was this person enrolled in Medicaid when they left foster care?</div>
+                  <div class="col-md-6"><%= human_boolean applicant.had_medicaid_during_foster_care %></div>
+                </div>
+              <% end %>
+
+              <% if @cfl_service.displayable_field?('applicant', applicant, :is_student) %>
+                <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                  <div class="col-md-6">Is this person a student?</div>
+                  <div class="col-md-6"><%= human_boolean applicant.is_student %></div>
+                </div>
+              <% end %>
+
+              <!-- Case where the applicant is a student(fields: :student_kind, :student_status_end_on, :student_school_kind) -->
+              <% if @cfl_service.displayable_field?('applicant', applicant, :student_kind) %>
+                <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                  <div class="col-md-6">What is the type of student?</div>
+                  <div class="col-md-6"><%= applicant.student_kind %></div>
+                </div>
+
+                <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                  <div class="col-md-6">Student status end on date?</div>
+                  <div class="col-md-6"><%= applicant.student_status_end_on %></div>
+                </div>
+
+                <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                  <div class="col-md-6">What type of school do you go to?</div>
+                  <div class="col-md-6"><%= human_boolean applicant.student_school_kind %></div>
+                </div>
+              <% end %>
+
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                <div class="col-md-6">Was this person on Medicaid during pregnancy?</div>
-                <div class="col-md-6"><%= human_boolean applicant.is_enrolled_on_medicaid %></div>
+                <div class="col-md-6">Is this person blind?</div>
+                <div class="col-md-6"><%= human_boolean applicant.is_self_attested_blind %></div>
+              </div>
+
+              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                <div class="col-md-6">Does this person need help with daily life activities, such as dressing or
+                  bathing?
+                </div>
+                <div class="col-md-6"><%= human_boolean applicant.has_daily_living_help %></div>
+              </div>
+
+              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                <div class="col-md-6">Does this person need help paying for any medical bills from the last 3 months?
+                </div>
+                <div class="col-md-6"><%= human_boolean applicant.has_daily_living_help %></div>
+              </div>
+
+              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                <div class="col-md-6"><%= l10n("faa.other_ques.disability_question") %></div>
+                <div class="col-md-6"><%= human_boolean applicant.is_physically_disabled %></div>
               </div>
             <% end %>
-
-            <% if @cfl_service.displayable_field?('applicant', applicant.id, :is_former_foster_care) %>
-              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                <div class="col-md-6">Was this person in foster care at age 18 or older?</div>
-                <div class="col-md-6"><%= human_boolean applicant.is_former_foster_care %></div>
-              </div>
-            <% end %>
-
-            <!-- Case where the applicant was in Foster Care(fields: :foster_care_us_state, :age_left_foster_care, :had_medicaid_during_foster_care) -->
-            <% if @cfl_service.displayable_field?('applicant', applicant.id, :foster_care_us_state) %>
-              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                <div class="col-md-6">Where was this person in foster care?</div>
-                <div class="col-md-6"><%= applicant.foster_care_us_state %></div>
-              </div>
-
-              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                <div class="col-md-6">How old was this person when they left foster care?</div>
-                <div class="col-md-6"><%= applicant.age_left_foster_care %></div>
-              </div>
-
-              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                <div class="col-md-6">Was this person enrolled in Medicaid when they left foster care?</div>
-                <div class="col-md-6"><%= human_boolean applicant.had_medicaid_during_foster_care %></div>
-              </div>
-            <% end %>
-
-            <% if @cfl_service.displayable_field?('applicant', applicant.id, :is_student) %>
-              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                <div class="col-md-6">Is this person a student?</div>
-                <div class="col-md-6"><%= human_boolean applicant.is_student %></div>
-              </div>
-            <% end %>
-
-            <!-- Case where the applicant is a student(fields: :student_kind, :student_status_end_on, :student_school_kind) -->
-            <% if @cfl_service.displayable_field?('applicant', applicant.id, :student_kind) %>
-              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                <div class="col-md-6">What is the type of student?</div>
-                <div class="col-md-6"><%= applicant.student_kind %></div>
-              </div>
-
-              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                <div class="col-md-6">Student status end on date?</div>
-                <div class="col-md-6"><%= applicant.student_status_end_on %></div>
-              </div>
-
-              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                <div class="col-md-6">What type of school do you go to?</div>
-                <div class="col-md-6"><%= human_boolean applicant.student_school_kind %></div>
-              </div>
-            <% end %>
-
-            <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-              <div class="col-md-6">Is this person blind?</div>
-              <div class="col-md-6"><%= human_boolean applicant.is_self_attested_blind %></div>
-            </div>
-
-            <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-              <div class="col-md-6">Does this person need help with daily life activities, such as dressing or
-                bathing?
-              </div>
-              <div class="col-md-6"><%= human_boolean applicant.has_daily_living_help %></div>
-            </div>
-
-            <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-              <div class="col-md-6">Does this person need help paying for any medical bills from the last 3 months?
-              </div>
-              <div class="col-md-6"><%= human_boolean applicant.has_daily_living_help %></div>
-            </div>
-
-            <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-              <div class="col-md-6"><%= l10n("faa.other_ques.disability_question") %></div>
-              <div class="col-md-6"><%= human_boolean applicant.is_physically_disabled %></div>
-            </div>
           </div>
         </div>
         <br>
@@ -446,35 +450,35 @@
           <% end %>
 
           <!-- Your Preferences -->
-          <% unless [@application.is_requesting_voter_registration_application_in_mail, @application.years_to_renew].include?(nil) %>
+          <% unless [@review_form.application.is_requesting_voter_registration_application_in_mail, @review_form.application.years_to_renew].include?(nil) %>
             <div class="row row-form-wrapper ptb no-buffer row-height form-heading form-top-border">
               <div class="col-md-12">YOUR PREFERENCES</div>
             </div>
 
-            <% if @cfl_service.displayable_field?('application', @application.id, :is_requesting_voter_registration_application_in_mail) %>
+            <% if @cfl_service.displayable_field?('application', @review_form.application, :is_requesting_voter_registration_application_in_mail) %>
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                 <div class="col-md-6">Would you like to register to vote in DC or update your current registration?</div>
-                <div class="col-md-6"><%= human_boolean(@application.is_requesting_voter_registration_application_in_mail) %></div>
+                <div class="col-md-6"><%= human_boolean(@review_form.application.is_requesting_voter_registration_application_in_mail) %></div>
               </div>
             <% end %>
 
-            <% if @cfl_service.displayable_field?('application', @application.id, :years_to_renew) %>
+            <% if @cfl_service.displayable_field?('application', @review_form.application, :years_to_renew) %>
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                 <div class="col-md-6">How long would you like your eligibility for help paying for coverage to be renewed?</div>
-                <div class="col-md-6"><%= @application.years_to_renew %></div>
+                <div class="col-md-6"><%= @review_form.application.years_to_renew %></div>
               </div>
             <% end %>
           <% end %>
 
           <!-- More about your Household -->
-          <% if @cfl_service.displayable_field?('application', @application.id, :parent_living_out_of_home_terms) %>
+          <% if @cfl_service.displayable_field?('application', @review_form.application, :parent_living_out_of_home_terms) %>
             <div class="row row-form-wrapper ptb no-buffer row-height form-heading form-top-border">
               <div class="col-md-12">MORE ABOUT YOUR HOUSEHOLD</div>
             </div>
 
             <div class="row row-form-wrapper ptb no-buffer row-height form-content">
               <div class="col-md-6">Does any child on this application have a parent living outside of the home?</div>
-              <div class="col-md-6"><%= human_boolean(@application.parent_living_out_of_home_terms) %></div>
+              <div class="col-md-6"><%= human_boolean(@review_form.application.parent_living_out_of_home_terms) %></div>
             </div>
           <% end %>
         </div>
@@ -484,6 +488,6 @@
   </div>
 
   <div class='col-md-3'>
-    <%= render partial: 'financial_assistance/shared/right_nav', locals: {previous_url: @application.active_applicants.count > 1 ? insured_family_relationships_path(@person.consumer_role.id) : edit_financial_assistance_application_path(@application), next_url: go_to_step_financial_assistance_application_path(@application, 1)} %>
+    <%= render partial: 'financial_assistance/shared/right_nav', locals: {previous_url: @review_form.application.active_applicants.count > 1 ? insured_family_relationships_path(@person.consumer_role.id) : edit_financial_assistance_application_path(@review_form.application.id), next_url: go_to_step_financial_assistance_application_path(@review_form.application.id, 1)} %>
   </div>
 </div>

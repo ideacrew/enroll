@@ -1,6 +1,6 @@
 <% insurance_kinds = FinancialAssistance::Benefit::INSURANCE_KINDS %>
 <% insurance_kinds.each do |insurance_kind| %>
-  <% benefits = applicant.benefits.where(kind: kind).of_insurance_kind(insurance_kind) %>
+  <% benefits = display_benefits(applicant, kind, insurance_kind) %>
   <% if benefits.present? %>
     <div class="row ptb no-buffer row-height form-heading row-form-wrapper text-bold verti-line-trans">
       <div class="col-md-6">TYPE</div>
