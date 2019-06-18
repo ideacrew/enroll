@@ -19,6 +19,10 @@ module FinancialAssistance
       has_many :deductions, serializer: ::FinancialAssistance::Serializers::DeductionSerializer
       has_many :benefits, serializer: ::FinancialAssistance::Serializers::BenefitSerializer
 
+      def format_citizen
+        object.citizen_status.nil? ? "" : object.format_citizen
+      end
+
       # provide defaults(if any needed) that were not set on Model
       def attributes(*args)
         hash = super

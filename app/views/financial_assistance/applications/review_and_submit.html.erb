@@ -94,7 +94,7 @@
                     <td><%= applicant.age_of_the_applicant %></td>
                     <td><%= applicant.gender.humanize %></td>
                     <td><%= applicant.relationship.humanize %></td>
-                    <td><%= applicant.format_citizen if applicant.citizen_status.present? %></td>
+                    <td><%= applicant.citizen_status.present? ? applicant.format_citizen : 'N/A' %></td>
                     <td><%= human_boolean applicant.is_incarcerated %></td>
                     <td><%= human_boolean applicant.is_applying_coverage %></td>
                   </tr>

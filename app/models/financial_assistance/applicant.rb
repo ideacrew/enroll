@@ -675,6 +675,18 @@ class FinancialAssistance::Applicant
     end
   end
 
+  def applicant?
+    is_applying_coverage
+  end
+
+  def non_applicant?
+    is_applying_coverage == false
+  end
+
+  def is_applying_coverage
+    person.is_applying_coverage
+  end
+
   private
 
   def change_validation_status
@@ -757,6 +769,8 @@ class FinancialAssistance::Applicant
       errors.add(:is_post_partum_period, "' Was this person pregnant in the last 60 days?' should be answered") if is_post_partum_period.nil?
       errors.add(:pregnancy_end_on, "' Pregnency End on date' should be answered") if is_post_partum_period.nil?
     end
+
+    return if non_applicant?
 
     if age_of_applicant > 18 && age_of_applicant < 26
       if is_former_foster_care.nil?

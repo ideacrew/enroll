@@ -305,6 +305,24 @@ RSpec.describe FinancialAssistance::Applicant, type: :model, dbclean: :after_eac
         expect(applicant1.embedded_document_section_entry_complete?(:health_coverage)).to eq false
       end
     end
+
+    context 'presence_of_attr_other_qns' do
+      before :each do
+        person1.update_attributes!(dob: TimeKeeper.date_of_record - 20.years)
+        applicant1.update_attributes!(is_former_foster_care: nil, is_pregnant: true,
+                                      pregnancy_due_on: TimeKeeper.date_of_record,
+                                      children_expected_count: 2)
+      end
+
+      it 'should return false as applicant is applying for coverage' do
+        expect(applicant1.save(context: :other_qns)).to eq false
+      end
+
+      it 'should return true as applicant is not applying for coverage' do
+        applicant1.person.consumer_role.update_attributes!(is_applying_coverage: false)
+        expect(applicant1.save(context: :other_qns)).to eq true
+      end
+    end
   end
 
   describe 'find' do
