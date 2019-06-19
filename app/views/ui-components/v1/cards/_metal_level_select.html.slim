@@ -179,6 +179,9 @@ javascript:
 
     document.getElementById('yourSponsorContributions').innerHTML = '#{escape_javascript(render :partial => "./ui-components/v1/cards/sponsor_contributions_shell")}'
 
+    // Replace below statement with plain Javascript
+    $('[data-toggle="tooltip"]').tooltip();
+    
     // Makes reference plans visible
     document.getElementById('referencePlans').classList.remove('hidden');
     // Removes reference plans if metal level changes
