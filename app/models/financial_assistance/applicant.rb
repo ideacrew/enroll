@@ -675,18 +675,6 @@ class FinancialAssistance::Applicant
     end
   end
 
-  def applicant?
-    is_applying_coverage
-  end
-
-  def non_applicant?
-    is_applying_coverage == false
-  end
-
-  def is_applying_coverage
-    person.is_applying_coverage
-  end
-
   private
 
   def change_validation_status
