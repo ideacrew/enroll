@@ -553,7 +553,7 @@ class HbxEnrollment
   def construct_waiver_enrollment(waiver_reason = nil)
     qle = (family.is_under_special_enrollment_period? && family.latest_shop_sep.present?)
     coverage_hh = employee_role.person.primary_family.active_household.immediate_family_coverage_household
-    waived_enrollment = coverage_hh.household.new_hbx_enrollment_from(employee_role: employee_role, coverage_household: coverage_household, benefit_package: sponsored_benefit_package, benefit_group_assignment: benefit_group_assignment, qle: qle)
+    waived_enrollment = coverage_hh.household.new_hbx_enrollment_from(employee_role: employee_role, coverage_household: coverage_hh, benefit_package: sponsored_benefit_package, benefit_group_assignment: benefit_group_assignment, qle: qle)
     waived_enrollment.coverage_kind = coverage_kind
     waived_enrollment.enrollment_kind = (qle ? 'special_enrollment' : 'open_enrollment')
     waived_enrollment.kind = 'employer_sponsored_cobra' if employee_role.present? && employee_role.is_cobra_status?
@@ -636,9 +636,9 @@ class HbxEnrollment
     return unless is_shop? && (coverage_termination_pending? || coverage_terminated? || coverage_canceled?)
 
     return if waiver_enrollment_present?
-      waiver = construct_waiver_enrollment
-      waiver.waive_coverage! if waiver.may_waive_coverage?
-    end
+
+    waiver = construct_waiver_enrollment
+    waiver.waive_coverage! if waiver.may_waive_coverage?
   end
 
   def term_or_cancel_enrollment(enrollment, coverage_end_date, term_reason = nil)
@@ -1272,7 +1272,7 @@ class HbxEnrollment
 
         enrollment.benefit_group_id = benefit_group.id
         enrollment.benefit_group_assignment_id = benefit_group_assignment.id
-        enrollment.sponsored_benefit_package_id = benefit_package.id
+        enrollment.sponsored_benefit_package_id = benefit_package.id if benefit_package
       when consumer_role.present?
         enrollment.consumer_role = consumer_role
         enrollment.kind = "individual"

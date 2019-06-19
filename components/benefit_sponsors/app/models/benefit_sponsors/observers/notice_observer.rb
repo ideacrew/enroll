@@ -178,9 +178,9 @@ module BenefitSponsors
         deliver(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "employee_plan_selection_confirmation_sep_new_hire")
       end
 
-      # def trigger_employee_waiver_confirmation_notice(hbx_enrollment)
-      #    deliver(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "employee_waiver_confirmation")
-      # end
+      def trigger_employee_waiver_confirmation_notice(hbx_enrollment)
+        deliver(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "employee_waiver_confirmation")
+      end
 
       def trigger_employee_coverage_termination_notice(hbx_enrollment)
         return unless hbx_enrollment.is_shop? && (::CensusEmployee::EMPLOYMENT_ACTIVE_STATES - ::CensusEmployee::PENDING_STATES).include?(hbx_enrollment.census_employee.aasm_state) && hbx_enrollment.sponsored_benefit_package.is_active
