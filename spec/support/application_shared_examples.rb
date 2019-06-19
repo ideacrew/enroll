@@ -21,7 +21,7 @@ RSpec.shared_examples 'submitted application with one member and one applicant' 
   let!(:income) {FactoryGirl.create(:financial_assistance_income, applicant: applicant1, employer_address: address, employer_phone: phone)}
   let!(:benefit) {FactoryGirl.create(:financial_assistance_benefit, applicant: applicant1, employer_address: address, employer_phone: phone)}
   let!(:deduction) {FactoryGirl.create(:financial_assistance_deduction, applicant: applicant1)}
-  let!(:assisted_verification) {FactoryGirl.create(:assisted_verification, applicant: applicant1, verification_type: 'MEC', status: 'verified')}
+  let!(:verification_type) {FactoryGirl.create(:verification_type, applicant: applicant1, type_name: 'MEC', validation_status: 'verified')}
 end
 
 RSpec.shared_examples 'submitted application with two active members and one applicant' do
