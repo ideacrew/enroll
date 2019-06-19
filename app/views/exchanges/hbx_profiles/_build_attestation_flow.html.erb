@@ -1,0 +1,12 @@
+  <%= form_for @question, url: "exchanges/hbx_profiles/build_attestation_flow" , action:'build_attestation_flow', method: "post", class: "form" do |q| %>
+    <table class="table table-border" id ='custom-sep-container' >
+      <thead>
+      </thead>
+      <tbody>
+           <span> <%= q.text_field :question, class: "form-control", required: true, placeholder: 'Question Title', autocomplete: :off %></span>
+      </tbody>
+    </table>
+    <div class="row no-buffer child-row">
+        <%= q.submit "Submit", :class => "btn btn-primary create_eligibility", :size => '100px'%>
+    </div>
+  <% end %>
