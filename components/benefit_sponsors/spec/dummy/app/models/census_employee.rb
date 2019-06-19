@@ -60,6 +60,7 @@ class CensusEmployee < CensusMember
 
 
   scope :non_terminated,     ->{ where(:aasm_state.nin => EMPLOYMENT_TERMINATED_STATES) }
+  scope :non_term_and_pending,->{ where(:aasm_state.nin => (EMPLOYMENT_TERMINATED_STATES + PENDING_STATES)) }
   scope :active,             ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_STATES) }
   scope :pending,           ->{ any_in(aasm_state: PENDING_STATES) }
   scope :non_business_owner, ->{ where(is_business_owner: false) }
@@ -417,6 +418,12 @@ end
       :"employee_role_id" => self.employee_role_id,
       :"aasm_state".ne => "shopping"
     )
+  end
+
+  def benefit_package_assignment_for(benefit_package)
+    benefit_group_assignments.effective_on(benefit_package.effective_period.min).detect do |assignment|
+      assignment.benefit_package_id == benefit_package.id
+    end
   end
 
   def benefit_package_assignment_on(effective_date)

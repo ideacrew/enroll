@@ -261,6 +261,7 @@ module BenefitSponsors
 
       def is_renewal_benefit_available?(enrollment)
         return true if (enrollment.present? && enrollment.is_coverage_waived?)
+        return false if enrollment.present? && enrollment.coverage_termination_pending?
         return false if enrollment.blank? || enrollment.product.blank? || enrollment.product.renewal_product.blank?
         sponsored_benefit = sponsored_benefit_for(enrollment.coverage_kind)
         sponsored_benefit.products(start_on).include?(enrollment.product.renewal_product)
@@ -454,7 +455,7 @@ module BenefitSponsors
       end
 
       def census_employees_assigned_on(effective_date, is_active = true)
-        CensusEmployee.by_benefit_package_and_assignment_on(self, effective_date, is_active).non_terminated
+        CensusEmployee.by_benefit_package_and_assignment_on(self, effective_date, is_active).non_term_and_pending
       end
 
       def self.find(id)
