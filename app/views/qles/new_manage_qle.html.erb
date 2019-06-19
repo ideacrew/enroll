@@ -1,0 +1,41 @@
+ <div class="container" style="padding-top: 1px">
+  <div class='row'>
+    <div class='col-md-9'>
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <center><strong>Manage Qualifying Life Events</strong></center>
+        </div>
+          <div class="panel-body">
+            <%= form_for @manage_qle, as: :manage_qle, url: create_manage_qle_qles_path, method: :post do |f| %>
+              <div class="radio_option">
+                <div>
+                  <%= f.radio_button :action, :new_qle, class: "required floatlabel"  %>
+                  <label><span>Create a custom QLE</span></label>
+                </div>
+                <hr/>
+              <div>
+                <%= f.radio_button :action, :modify_qle, value: '', class: "required floatlabel"  %>
+                <label><span>Modify existing QLE</span></label>
+              </div>
+              <div>
+                <%= select_tag("which_qle_kind_to_modify", options_for_select(QualifyingLifeEventKind.all.collect { |qle| [qle.title, qle.id] }.unshift(["Select QLE to modify", nil])))%>
+              </div>
+              <hr/>
+              <div>
+                <%= f.radio_button :action, :deactivate_qle, value: '', class: "required floatlabel"  %>
+                <label><span>Deactivate active QLE</span></label>
+              </div>
+              <div>
+                <%= select_tag("which_qle_kind_to_deactivate", options_for_select(QualifyingLifeEventKind.all.collect { |qle| [qle.title, qle.id] }.unshift(["Select QLE to deactivate", nil])))%>
+              </div>
+              <hr/>
+              <div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+              </div>
+            </div>
+          <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
