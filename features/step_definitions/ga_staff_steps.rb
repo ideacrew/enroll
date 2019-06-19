@@ -50,3 +50,28 @@ end
 Then(/^the primary staff should see the staff successfully removed message$/) do
   expect(page).to have_content('Role removed successfully')
 end
+
+Then /^new ga staff should receive an email$/ do
+  staff = general_agency_organization.general_agency_profile.general_agency_staff_roles.last
+  open_email(staff.email_address)
+end
+
+When /^new ga staff visits the link received in the approval email$/ do
+  staff = general_agency_organization.general_agency_profile.general_agency_staff_roles.last
+  email_address = staff.email_address
+
+  open_email(email_address)
+  expect(current_email.to).to eq([email_address])
+
+  invitation_link = links_in_email(current_email).first
+  invitation_link.sub!(/http\:\/\/127\.0\.0\.1\:3000/, '')
+  visit(invitation_link)
+end
+
+When /^new ga staff completes the account creation form and hit the 'Submit' button$/ do
+  email_address = general_agency_organization.general_agency_profile.general_agency_staff_roles.last.email_address
+  fill_in "user[oim_id]", with: email_address
+  fill_in "user[password]", with: "aA1!aA1!aA1!"
+  fill_in "user[password_confirmation]", with: "aA1!aA1!aA1!"
+  find('.create-account-btn', wait: 10).click
+end
