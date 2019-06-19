@@ -112,6 +112,10 @@ Rails.application.routes.draw do
         get :issuer_index
         get :product_index
         get :configuration
+        get :custom_sep
+        post :custom_sep
+        get :build_attestation_flow
+        post :build_attestation_flow
         post :set_date
         post :update_setting
         get :staff_index

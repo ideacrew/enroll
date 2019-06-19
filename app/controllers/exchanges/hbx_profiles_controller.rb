@@ -512,6 +512,23 @@ def employer_poc
     end
   end
 
+  def custom_sep
+    @qle = QualifyingLifeEventKind.new
+    @question = CustomQleQuestion.new(qualifying_life_event_kind: @qle)
+
+    # binding.pry
+    # respond_to do |format|
+    #   format.html { render partial: "custom_sep" }
+    #   format.js {}
+    # end
+  end
+
+  def build_attestation_flow 
+    @question = CustomQleQuestion.new
+
+    binding.pry
+  end
+
   def edit_dob_ssn
     authorize Family, :can_update_ssn?
     @person = Person.find(params[:id])
