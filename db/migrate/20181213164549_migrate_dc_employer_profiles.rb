@@ -127,8 +127,6 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
             census_employees_with_old_id = find_census_employees
             link_existing_census_employees_to_new_profile(census_employees_with_old_id)
 
-            mark_all_census_as_enroll
-
             print '.' unless Rails.env.test?
             success = success + 1
           end
@@ -144,6 +142,11 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
         end
       end
     end
+
+    say_with_time("Time taken to update all census employee record to default value.") do
+      mark_all_census_as_enroll
+    end
+
     logger.info " Total #{total_organizations} old organizations for type: employer profile" unless Rails.env.test?
     logger.info " #{failed} organizations failed to migrated to new DB at this point." unless Rails.env.test?
     logger.info " #{success} organizations migrated to new DB at this point." unless Rails.env.test?

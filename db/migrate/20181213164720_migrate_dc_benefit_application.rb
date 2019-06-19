@@ -184,7 +184,7 @@ class MigrateDcBenefitApplication < Mongoid::Migration
       attributes[:dental_reference_plan_hios_id] = benefit_group.dental_reference_plan.hios_id
       attributes[:dental_plan_option_kind] = benefit_group.dental_plan_option_kind
       attributes[:elected_dental_plan_hios_ids] = benefit_group.elected_dental_plans.map(&:hios_id)
-      if attributes[:dental_plan_option_kind].blank? &&  # TODO fix prod data.
+      if attributes[:dental_plan_option_kind].blank?  # TODO fix prod data.
         attributes[:dental_plan_option_kind] = get_dental_plan_option_kind(benefit_group)
       end
     end

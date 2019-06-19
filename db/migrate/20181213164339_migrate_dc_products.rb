@@ -1,6 +1,12 @@
 class MigrateDcProducts < Mongoid::Migration
   def self.up
     if Settings.site.key.to_s.downcase == "dc"
+
+      say_with_time("Updating network data for plans") do
+        hios_ids = ["94506DC0350012-01", "94506DC0360001-01", "94506DC0350014-01", "94506DC0350015-01", "94506DC0350018-01", "94506DC0350019-01", "94506DC0360003-01", "94506DC0350028-01", "94506DC0350020-01", "94506DC0350022-01", "94506DC0350001-01", "94506DC0350016-01", "94506DC0350002-01", "94506DC0350017-01", "94506DC0350023-01", "94506DC0350010-01", "94506DC0350008-01", "94506DC0350011-01", "94506DC0350009-01", "94506DC0360002-01", "94506DC0350027-01"]
+        Plan.where(active_year: 2019, :hios_id.in=> hios_ids).update_all(dc_in_network: true, nationwide: false)
+      end
+
       say_with_time("Migrating plans for DC") do
 
         old_carrier_profile_map = {}
