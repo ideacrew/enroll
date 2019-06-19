@@ -48,7 +48,6 @@ module Notifier
     def update
       notice_kind = Notifier::NoticeKind.find(params['id'])
       notice_kind.update_attributes(notice_params)
-
       flash[:notice] = 'Notice content updated successfully'
       redirect_to notice_kinds_path
     end
@@ -56,10 +55,15 @@ module Notifier
     def preview
       notice_kind = Notifier::NoticeKind.find(params[:id])
       notice_kind.generate_pdf_notice
-
-      send_file "#{Rails.root}/tmp/#{notice_kind.title.titleize.gsub(/\s+/, '_')}.pdf", 
-        :type => 'application/pdf', 
-        :disposition => 'inline'
+      if notice_kind.market_kind.to_s == "aca_shop"
+        send_file "#{Rails.root}/tmp/#{notice_kind.title.titleize.gsub(/\s+/, '_')}.pdf",
+                  :type => 'application/pdf',
+                  :disposition => 'inline'
+      else
+        send_file "#{Rails.root}/tmp/#{notice_kind.title.titleize.gsub(/\s+/, '_')}_#{notice_kind.notice_recipient.hbx_id}.pdf",
+                  :type => 'application/pdf',
+                  :disposition => 'inline'
+      end
     end
 
     def delete_notices
@@ -72,30 +76,33 @@ module Notifier
     end
 
     def download_notices
-      # notices = Notifier::NoticeKind.where(:id.in => params['ids'])
-
-      send_data Notifier::NoticeKind.to_csv, 
+      notices = Notifier::NoticeKind.where(:id.in => params['ids'].split(","))
+      
+      send_data notices.to_csv,
         :filename => "notices_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv",
         :disposition => 'attachment',
         :type => 'text/csv'
     end
 
     def upload_notices
-      notices = Roo::Spreadsheet.open(params[:file].tempfile.path)
       @errors = []
 
-      notices.each do |notice_row|
-        next if notice_row[0] == 'Notice Number'
+      if file_content_type == 'text/csv'
+        notices = Roo::Spreadsheet.open(params[:file].tempfile.path)
 
-        if Notifier::NoticeKind.where(notice_number: notice_row[0]).blank?
-          notice = Notifier::NoticeKind.new(notice_number: notice_row[0], title: notice_row[1], description: notice_row[2], recipient: notice_row[3], event_name: notice_row[4])
-          notice.template = Template.new(raw_body: notice_row[5])
-          unless notice.save
-            @errors << "Notice #{notice_row[0]} got errors: #{notice.errors.to_s}"
+        notices.each do |notice_row|
+          next if notice_row[1] == 'Notice Number'
+
+          if Notifier::NoticeKind.where(notice_number: notice_row[1]).blank?
+            notice = Notifier::NoticeKind.new(market_kind: notice_row[0], notice_number: notice_row[1], title: notice_row[2], description: notice_row[3], recipient: notice_row[4], event_name: notice_row[5])
+            notice.template = Template.new(raw_body: notice_row[6])
+            @errors << "Notice #{notice_row[1]} got errors: #{notice.errors}" unless notice.save
+          else
+            @errors << "Notice #{notice_row[1]} already exists."
           end
-        else
-          @errors << "Notice #{notice_row[0]} already exists."
         end
+      else
+        @errors << 'Please upload csv format files only.'
       end
 
       if @errors.empty?
@@ -109,27 +116,39 @@ module Notifier
     end
 
     def get_tokens
-      builder = params['builder'] || 'Notifier::MergeDataModels::EmployerProfile'
-      token_builder = builder.constantize.new
-      tokens = token_builder.editor_tokens
-      # placeholders = token_builder.place_holders
-
+      service = Notifier::Services::NoticeKindService.new(params['market_kind'])
+      service.builder = builder_param
       respond_to do |format|
         format.html
-        format.json { render json: {tokens: tokens} }
+        format.json { render json: {tokens: service.editor_tokens} }
       end
     end
 
     def get_placeholders
-      placeholders = Notifier::MergeDataModels::EmployerProfile.new.place_holders
+      service = Notifier::Services::NoticeKindService.new(params['market_kind'])
+      service.builder = builder_param
+      respond_to do |format|
+        format.html
+        format.json { render json: { 
+          placeholders: service.placeholders, setting_placeholders: service.setting_placeholders
+        } }
+      end
+    end
+
+    def get_recipients
+      recipients = Notifier::Services::NoticeKindService.new(params['market_kind']).recipients
 
       respond_to do |format|
         format.html
-        format.json {render json: placeholders}
+        format.json { render json: {recipients: recipients} }
       end
     end
 
     private
+
+    def file_content_type
+      params[:file].content_type
+    end
 
     def check_hbx_staff_role
       if current_user.blank? || !current_user.has_hbx_staff_role?
@@ -138,7 +157,11 @@ module Notifier
     end
 
     def notice_params
-      params.require(:notice_kind).permit(:title, :description, :notice_number, :recipient, :event_name, {:template => [:raw_body]})
+      params.require(:notice_kind).permit(:title, :market_kind, :description, :notice_number, :recipient, :event_name, {:template => [:raw_body]})
+    end
+
+    def builder_param
+      params['builder'] || 'Notifier::MergeDataModels::EmployerProfile'
     end
   end
 end

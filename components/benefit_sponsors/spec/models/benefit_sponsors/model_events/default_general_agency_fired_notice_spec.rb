@@ -34,7 +34,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::GeneralAgencyFiredNotice', dbclean
       end
 
       def update_broker_agency_profile
-        broker_agency_profile.update_attributes(default_general_agency_profile_id: nil)
+        broker_agency_profile.default_general_agency_profile = nil
         broker_agency_profile.save
       end
 
@@ -51,7 +51,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::GeneralAgencyFiredNotice', dbclean
 
     context "NoticeTrigger" do
       before do
-        broker_agency_profile.update_attributes(default_general_agency_profile_id: general_agency_profile.id)
+        broker_agency_profile.default_general_agency_profile = nil
       end
 
       let(:subject)     { BenefitSponsors::Observers::NoticeObserver.new }
@@ -71,7 +71,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::GeneralAgencyFiredNotice', dbclean
   describe "NoticeBuilder" do
 
     before do
-      broker_agency_profile.update_attributes(default_general_agency_profile_id: general_agency_profile.id)
+      broker_agency_profile.default_general_agency_profile = nil
       broker_agency_profile.primary_broker_role.update_attributes(broker_agency_profile_id: broker_agency_profile.id)
     end
 

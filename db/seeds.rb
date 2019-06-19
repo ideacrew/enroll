@@ -86,13 +86,6 @@ if (ENV["type"] != "fixtures") && missing_plan_dumps
   system "bundle exec rake migrations:load_issuer_profiles"
   puts "::: complete :::"
 
-  unless Settings.aca.use_simple_employer_calculation_model
-    puts "*"*80
-    puts "Importing Rating Factors."
-    system "bundle exec rake load_rating_factors:run_all_rating_factors"
-    puts "::: complete :::"
-  end
-
   if Settings.aca.offerings_constrained_to_service_areas
     puts "*"*80
     puts "Loading Carrier Service Areas."
@@ -105,6 +98,13 @@ if (ENV["type"] != "fixtures") && missing_plan_dumps
   Products::Qhp.delete_all
   system "bundle exec rake xml:plans"
   puts "::: complete :::"
+
+  unless Settings.aca.use_simple_employer_calculation_model
+    puts "*" * 80
+    puts "Importing Rating Factors."
+    system "bundle exec rake load_rating_factors:run_all_rating_factors"
+    puts "::: complete :::"
+  end
 
   puts "Loading super group ids ..."
   system "bundle exec rake supergroup:update_plan_id"
@@ -128,15 +128,15 @@ if (ENV["type"] != "fixtures") && missing_plan_dumps
   puts "*"*80
 
   puts "Loading Contribution and Pricing models"
-  pricing_and_contribution_models_seed_glob_pattern = File.join(Rails.root, "db/seedfiles/cca/pricing_and_contribution_models_seed.rb")
+  pricing_and_contribution_models_seed_glob_pattern = File.join(Rails.root, "db/seedfiles/dc/pricing_and_contribution_models_seed.rb")
   load pricing_and_contribution_models_seed_glob_pattern
-  load_cca_pricing_models_seed
-  load_cca_contribution_models_seed
+  load_dc_shop_pricing_models_seed
+  load_dc_shop_contribution_models_seed
   puts "Loading Contribution and Pricing models done"
 
   puts "*"*80
-  system "bundle exec rake load:benefit_market_catalog[2018]"
-  system "bundle exec rake load:benefit_market_catalog[2019]"
+  # system "bundle exec rake load:benefit_market_catalog[2018]"
+  system "bundle exec rake load:dc_benefit_market_catalog"
   puts "::: complete :::"
   puts "*"*80
 

@@ -34,11 +34,6 @@ module SponsoredBenefits
             account.terminate!
             employer_profile = account.plan_design_organization.employer_profile
             if employer_profile
-              send_notice({
-                modal_id: employer_profile.id,
-                event: "general_agency_terminated"
-              }) if dc? # In MA these were handled through Notice Engine
-
               send_message({
                 employer_profile: employer_profile,
                 general_agency_profile: account.general_agency_profile,
@@ -61,12 +56,6 @@ module SponsoredBenefits
           if account.save
             employer_profile = account.plan_design_organization.employer_profile
             if employer_profile
-              send_notice({
-                modal_id: general_agency_profile_id,
-                employer_profile_id: employer_profile.id,
-                event: "general_agency_hired_notice"
-              }) if dc? # In MA these were handled through Notice Engine
-
               send_message({
                 employer_profile: employer_profile,
                 general_agency_profile: general_agency_profile(general_agency_profile_id),

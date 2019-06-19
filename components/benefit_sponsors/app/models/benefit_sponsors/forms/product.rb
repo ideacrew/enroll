@@ -10,6 +10,7 @@ module BenefitSponsors
       attribute :plan_kind, String
       attribute :metal_level_kind, String
       attribute :network_information, String
+      attribute :network, String
 
     end
   end

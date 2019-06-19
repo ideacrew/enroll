@@ -51,7 +51,7 @@
                                             span.rp-plan-info= product.metal_level_kind
                                             br/
                                             span.plan-label Network:
-                                            span.rp-plan-info= product.network_information
+                                            span.rp-plan-info= product.network
                                             br/
                                             span.checkmark
                         - else
@@ -243,6 +243,9 @@ javascript:
 
     document.getElementById('yourSponsorContributions').innerHTML = '#{escape_javascript(render :partial => "./ui-components/v1/cards/sponsor_contributions_shell")}'
 
+    // Replace below statement with plain Javascript
+    $('[data-toggle="tooltip"]').tooltip();
+
     // Makes reference plans visible
     document.getElementById('referencePlans').classList.remove('hidden');
     // Removes reference plans if metal level changes
@@ -271,9 +274,9 @@ javascript:
               <span class="plan-label">Type:</span> <span class="rp-plan-info">${plan.product_type}</span><br>
               <span class="plan-label">Carrier:</span> <span class="rp-plan-info">${plan.carrier_name}</span><br>
               <span class="plan-label">Level:</span> <span class="rp-plan-info">${plan.metal_level_kind}</span><br>
-              <span class="plan-label">Network:</span> <span class="rp-plan-info">${network}</span><br>
+              <span class="plan-label">Network:</span> <span class="rp-plan-info">${plan.network}</span><br>
               <span class="plan-label mt-1 rp-view-summary" onclick="viewSummary(this)" data-plan-title="${plan.title}" data-plan-id="${plan.id}">View Summary</span><br>
-              <input type="radio" name="sponsored_benefits[reference_plan_id]" id="${plan.id}" onclick="newContributionAmounts()" value="${plan.id}" data-plan-title="${plan.title}" data-plan-carrier="${plan.carrier_name}" data-plan-id="${plan.id}" data-plan-metal-level="${plan.metal_level_kind}" data-plan-type="${plan.product_type}">
+              <input type="radio" name="sponsored_benefits[reference_plan_id]" id="${plan.id}" onclick="newContributionAmounts()" value="${plan.id}" data-plan-title="${plan.title}" data-plan-carrier="${plan.carrier_name}" data-plan-id="${plan.id}" data-plan-metal-level="${plan.metal_level_kind}" data-plan-type="${plan.product_type}" data-network="${plan.network}">
               <span class="checkmark"></span>
             </label>
           </div>
@@ -421,6 +424,7 @@ javascript:
     carrierName = element.dataset.planCarrier;
     planType = element.dataset.planType;
     referencePlanID = element.value;
+    network = element.dataset.network;
 
     if (productsTotal === undefined){
       if (element) {
@@ -440,7 +444,7 @@ javascript:
     document.getElementById('rpType').append(planType);
     document.getElementById('rpCarrier').append(carrierName);
     document.getElementById('rpMetalLevel').append(metalLevel);
-    document.getElementById('rpNetwork').append('N/A');
+    document.getElementById('rpNetwork').append(network);
 
     document.getElementById('planOfferingsTitle').innerHTML = '';
     document.getElementById('planOfferingsTitle').append(`Plan Offerings - ${planTitle} (${productsTotal})`)

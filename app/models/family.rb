@@ -312,6 +312,10 @@ class Family
     family_members.detect { |family_member| family_member.is_primary_applicant? && family_member.is_active? }
   end
 
+  def primary_person
+    primary_applicant&.person
+  end
+
   def primary_family_member=(new_primary_family_member)
     self.primary_family_member.is_primary_applicant = false unless primary_family_member.blank?
 

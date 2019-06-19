@@ -138,7 +138,7 @@ module BenefitSponsors
           raise ArgumentError.new("expected GeneralAgencyProfile class") unless new_default_general_agency_profile.is_a? BenefitSponsors::Organizations::GeneralAgencyProfile
           self.default_general_agency_profile_id = new_default_general_agency_profile.id
         else
-          unset("default_general_agency_profile_id")
+          self.default_general_agency_profile_id = nil
         end
         @default_general_agency_profile = new_default_general_agency_profile
       end

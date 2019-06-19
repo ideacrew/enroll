@@ -107,7 +107,7 @@ module SponsoredBenefits
           state :active, initial: true
           state :inactive
 
-          event :terminate, after: :record_transition do
+          event :terminate, after: :record_transition, before: :set_termination_date do
             transitions from: :active, to: :inactive
           end
         end
@@ -119,6 +119,10 @@ module SponsoredBenefits
             event: aasm.current_event,
             user_id: SAVEUSER[:current_user_id]
           )
+        end
+
+        def set_termination_date
+          self.end_on = TimeKeeper.datetime_of_record
         end
 
         class << self

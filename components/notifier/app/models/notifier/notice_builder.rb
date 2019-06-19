@@ -13,18 +13,21 @@ module Notifier
 
     def notice_recipient
       return OpenStruct.new(hbx_id: "100009") if resource.blank?
-      (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole)) ? resource.person : resource
+      sub_resource? ? resource.person : resource
     end
 
     def construct_notice_object
       builder_klass = ['Notifier', 'Builders', recipient.split('::').last].join('::')
       builder = builder_klass.constantize.new
       builder.resource = resource
-      builder.event_name = event_name if is_employee? || is_employer?
+      builder.event_name = event_name if is_employee? || is_employer? || is_consumer?
       builder.payload = payload
       builder.append_contact_details
+      builder.dependents if resource.is_a?(ConsumerRole)
       template.data_elements.each do |element|
         elements = element.split('.')
+        next if resource.is_a?(ConsumerRole) && elements.first == 'dependent'
+
         date_element = elements.detect{|ele| Notifier::MergeDataModels::EmployerProfile::DATE_ELEMENTS.any?{|date| ele.match(/#{date}/i).present?}}
 
         if date_element.present?
@@ -39,10 +42,10 @@ module Notifier
     end
 
     def render_envelope(params)
-      template_location = if self.event_name == 'generate_initial_employer_invoice'
+      template_location = if initial_invoice?
                             'notifier/notice_kinds/initial_invoice/invoice_template.html.erb'
                           else
-                            Settings.notices.shop.partials.template
+                            envelope
                           end
        Notifier::NoticeKindsController.new.render_to_string({
         :template => template_location,
@@ -54,7 +57,7 @@ module Notifier
     def render_notice_body(params)
       Notifier::NoticeKindsController.new.render_to_string({
         :inline => template.raw_body.gsub('${', '<%=').gsub('#{', '<%=').gsub('}','%>').gsub('[[', '<%').gsub(']]', '%>'),
-        :layout => 'notifier/pdf_layout',
+        :layout => layout,
         :locals => params
       })
     end
@@ -75,9 +78,16 @@ module Notifier
         file << self.to_pdf
       end
 
-      attach_envelope
-      non_discrimination_attachment
-      # clear_tmp
+      if shop_market?
+        attach_envelope
+        non_discrimination_attachment
+        # clear_tmp
+      else
+        ivl_blank_page
+        ivl_non_discrimination
+        ivl_attach_envelope
+        voter_application
+      end
     end
 
     def pdf_options
@@ -95,7 +105,7 @@ module Notifier
         encoding: 'utf8',
         header: {
           content: ApplicationController.new.render_to_string({
-            template: Settings.notices.shop.partials.header,
+            template: header,
             layout: false,
             locals: {notice: self, recipient: notice_recipient}
             }),
@@ -105,7 +115,7 @@ module Notifier
       if dc_exchange?
         options.merge!({footer: {
           content: ApplicationController.new.render_to_string({
-            template: Settings.notices.shop.partials.footer,
+            template: footer,
             layout: false,
             locals: {notice: self}
           })
@@ -122,12 +132,36 @@ module Notifier
       title
     end
 
+    def layout
+      shop_market? ? Settings.notices.shop.partials.layout : Settings.notices.individual.partials.layout
+    end
+
     def notice_filename
-      "#{subject.titleize.gsub(/\s+/, '_')}"
+      if shop_market?
+        "#{subject.titleize.gsub(/\s+/, '_')}"
+      else
+        "#{subject.titleize.gsub(/\s+/, '_')}_#{notice_recipient.hbx_id}"
+      end
     end
 
     def non_discrimination_attachment
       join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', shop_non_discrimination_attachment)]
+    end
+
+    def ivl_non_discrimination
+      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', ivl_non_discrimination)] if ['projected_eligibility_notice'].include?(event_name)
+    end
+
+    def ivl_attach_envelope
+      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', ivl_envelope)] if ['projected_eligibility_notice'].include?(event_name)
+    end
+
+    def voter_application
+      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', voter_application)] if ['projected_eligibility_notice'].include?(event_name)
+    end
+
+    def ivl_blank_page
+      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', blank)] if ['projected_eligibility_notice'].include?(event_name)
     end
 
     def attach_envelope
@@ -147,11 +181,11 @@ module Notifier
     def upload_and_send_secure_message
       doc_uri = upload_to_amazonS3
       notice  = create_recipient_document(doc_uri)
-      create_secure_inbox_message(notice) unless self.event_name == 'generate_initial_employer_invoice'
+      create_secure_inbox_message(notice)
     end
 
     def upload_to_amazonS3
-      if self.event_name == 'generate_initial_employer_invoice'
+      if initial_invoice?
         Aws::S3Storage.save(notice_path, 'invoices', file_name)
       else
         Aws::S3Storage.save(notice_path, 'notices')
@@ -161,7 +195,7 @@ module Notifier
     end
 
     def file_name
-      if self.event_name == 'generate_initial_employer_invoice'
+      if initial_invoice?
         "#{resource.organization.hbx_id}_#{TimeKeeper.datetime_of_record.strftime("%m%d%Y")}_INVOICE_R.pdf"
       end
     end
@@ -174,13 +208,13 @@ module Notifier
     def recipient_name
       return resource.staff_roles.first.full_name.titleize if is_employer?
 
-      return resource.person.full_name.titleize if is_employee?
+      return resource.person.full_name.titleize if is_employee? || is_consumer?
     end
 
     def recipient_to
       return resource.staff_roles.first.work_email_or_best if is_employer?
 
-      return resource.person.work_email_or_best if is_employee?
+      return resource.person.work_email_or_best if is_employee? || is_consumer?
     end
 
     def is_employer?
@@ -191,22 +225,46 @@ module Notifier
       resource.is_a?(EmployeeRole)
     end
 
+    def is_consumer?
+      resource.is_a?(ConsumerRole)
+    end
+
     # @param recipient is a Person object
     def send_generic_notice_alert
       UserMailer.generic_notice_alert(recipient_name,subject,recipient_to).deliver_now
     end
 
-    def send_generic_notice_alert_to_broker
-      return unless is_employer? && resource.broker_agency_profile.present?
+    def send_generic_notice_alert_to_broker_and_ga
+      if is_employer?
+        if resource.broker_agency_profile.present?
+          broker_name = resource.broker_agency_profile.primary_broker_role.person.full_name
+          broker_email = resource.broker_agency_profile.primary_broker_role.person.work_email_or_best
+          UserMailer.generic_notice_alert_to_ba_and_ga(broker_name, broker_email, resource.legal_name.titleize).deliver_now
+        end
+        if resource.general_agency_profile.present?
+          general_agent_name = resource.general_agency_profile.primary_staff.person.full_name
+          ga_email = resource.general_agency_profile.primary_staff.person.work_email_or_best
+          UserMailer.generic_notice_alert_to_ba_and_ga(general_agent_name, ga_email, resource.legal_name.titleize).deliver_now
+        end
+      end
 
-      broker_name = resource.broker_agency_profile.primary_broker_role.person.full_name
-      broker_email = resource.broker_agency_profile.primary_broker_role.email_address
-      UserMailer.generic_notice_alert_to_ba(broker_name, broker_email, resource.legal_name.titleize).deliver_now
+      if is_employee?
+        if resource.employer_profile.broker_agency_profile.present?
+          broker_name = resource.employer_profile.broker_agency_profile.primary_broker_role.person.full_name
+          broker_email = resource.employer_profile.broker_agency_profile.primary_broker_role.person.work_email_or_best
+          UserMailer.generic_notice_alert_to_ba_and_ga(broker_name, broker_email, resource.person.full_name.titleize).deliver_now
+        end
+        if resource.employer_profile.general_agency_profile.present?
+          general_agent_name = resource.employer_profile.general_agency_profile.primary_staff.person.full_name
+          ga_email = resource.employer_profile.general_agency_profile.primary_staff.person.work_email_or_best
+          UserMailer.generic_notice_alert_to_ba_and_ga(general_agent_name, ga_email, resource.person.full_name.titleize).deliver_now
+        end
+      end
     end
 
     def store_paper_notice
-      bucket_name= Settings.paper_notice
-      notice_filename_for_paper_notice = "#{recipient.hbx_id}_#{subject.titleize.gsub(/\s+/, '_')}"
+      bucket_name = Settings.paper_notice
+      notice_filename_for_paper_notice = "#{@resource.person.hbx_id}_#{subject.titleize.gsub(/\s+/, '_')}"
       notice_path_for_paper_notice = Rails.root.join("tmp", "#{notice_filename_for_paper_notice}.pdf")
       begin
         FileUtils.cp(notice_path, notice_path_for_paper_notice)
@@ -222,7 +280,7 @@ module Notifier
 
     def create_recipient_document(doc_uri)
       receiver = resource
-      receiver = resource.person if (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole))
+      receiver = resource.person if sub_resource?
 
       title = (self.event_name == 'generate_initial_employer_invoice') ? file_name : notice_filename
 
@@ -234,7 +292,7 @@ module Notifier
         format: "application/pdf"
       }
 
-      doc_params[:date] = invoice_date if self.event_name == 'generate_initial_employer_invoice'
+      doc_params[:date] = invoice_date if initial_invoice?
       notice = receiver.documents.build(doc_params)
 
       if notice.save
@@ -245,20 +303,20 @@ module Notifier
     end
 
     def document_subject
-      if self.event_name == 'generate_initial_employer_invoice'
-        'initial_invoice'
-      else
-        'notice'
-      end
+      initial_invoice? ? 'initial_invoice' : 'notice'
     end
 
     def create_secure_inbox_message(notice)
       receiver = resource
-      receiver = resource.person if (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole))
+      receiver = resource.person if sub_resource?
 
+      if initial_invoice?
+        body = "Your Initial invoice is now available in your employer profile under Billing tab. Thank You"
+      else
         body = "<br>You can download the notice by clicking this link " +
                "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(receiver.class.to_s,
         receiver.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title.gsub(/[^0-9a-z]/i,'') + "</a>"
+      end
 
       message = receiver.inbox.messages.build({ subject: subject, body: body, from: site_short_name })
       message.save!
@@ -266,6 +324,26 @@ module Notifier
 
     def clear_tmp
       File.delete(notice_path)
+    end
+
+    def initial_invoice?
+      self.event_name == 'generate_initial_employer_invoice'
+    end
+
+    def sub_resource?
+      (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole))
+    end
+
+    def envelope
+      shop_market? ? Settings.notices.shop.partials.template : Settings.notices.individual.partials.template
+    end
+
+    def header
+      shop_market? ? Settings.notices.shop.partials.header : Settings.notices.individual.partials.header
+    end
+
+    def footer
+      shop_market? ? Settings.notices.shop.partials.footer : Settings.notices.individual.partials.footer
     end
   end
 end

@@ -4,7 +4,7 @@ site:
   domain_name: "dchealthlink.com"
   site_title: "DC's Online Health Insurance Marketplace"
   home_url: "https://www.dchealthlink.com/"
-  home_business_url: "https://www.mahealthconnector.org/business/"
+  home_business_url: "https://www.dchealthlink.com/smallbusiness/overview"
   help_url: "https://www.dchealthlink.com/help"
   faqs_url: "https://www.dchealthlink.com/Frequently-Asked-Questions"
   business_resource_center_url: "https://dchealthlink.com/smallbusiness/"
@@ -21,7 +21,7 @@ site:
   short_name: "DC Health Link"
   byline: "Welcome to the District's Health Insurance Marketplace"
   long_name: ""
-  copyright_period_start: "2017"
+  copyright_period_start: "2013"
   header_message: "Welcome to the District's Health Insurance Marketplace"
   logo_file_name: "logo.png"
   make_their_premium_payments_online: "https://www.e-billexpress.com/ebpp/DCHEALTHPAY/"
@@ -38,11 +38,14 @@ site:
   sign_in_routes: ['/families/home']
   shop_find_your_doctor_url: "https://dc.checkbookhealth.org/dc/"
   document_verification_checklist_url: "https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist"
-  terms_and_conditions_url: "https://www.mahealthconnector.org/business/brokers/certification/terms-and-conditions"
-  certification_url: "https://www.mahealthconnector.org/business/brokers/certification"
-  registration_path: "https://www.mahealthconnector.org/business/create-a-business-account"
+  terms_and_conditions_url: "https://www.dchealthlink.com/terms"
+  certification_url: "https://www.dchealthlink.com/brokers/overview"
+  registration_path: "https://www.dchealthlink.com/smallbusiness"
   home_forms_url: "https://dchealthlink.com/forms"
   forms_name: "DCHealthLink.com/forms"
+  short_url: "dchealthlink.com"
+  forms: "https://dchealthlink.com/forms#en"
+  website_url: "www.healthcare.gov"
   healthcare_name: "www.healthcare.gov"
   healthcare_url: "https://www.healthcare.gov/"
   irs_url: "https://www.irs.gov/"
@@ -63,6 +66,8 @@ contact_center:
   fax: "1-617-933-3099"
   alt_fax: "617-722-4033"
   tty_number: "711"
+  short_number: "(855) 532-5465"
+  tty: "771"
   alt_phone_number: "1-855-532-LINK"
   payment_phone_number: "855-532-LINK"
   ivl_number: "1-877-623-6765"
@@ -299,13 +304,7 @@ aca:
   plan_match_tool: true
 
   rating_areas:
-    - R-MA001
-    - R-MA002
-    - R-MA003
-    - R-MA004
-    - R-MA005
-    - R-MA006
-    - R-MA007
+    - R-DC001
 
 notices:
   individual_market:
@@ -330,6 +329,18 @@ notices:
       header: "notices/shared/shop_header.html.erb"
       footer: "notices/shared/shop_footer.html.erb"
       layout: "notifier/pdf_layout.html.erb"
+
+  individual:
+    attachments:
+      blank_page_attachment: "blank.pdf"
+      envelope_without_address: "taglines.pdf"
+      non_discrimination_attachment: "ivl_non_discrimination.pdf"
+      voter_application: "voter_application.pdf"
+    partials:
+      template: "notifier/notice_kinds/ivl_template.html.erb"
+      header: "notices/shared/header_ivl.html.erb"
+      footer: "notices/shared/footer_ivl.html.erb"
+      layout: "notifier/ivl_pdf_layout.html.erb"
 
 paper_notice: 'paper-notices'
 # Note: Remote Aceess keys ad URL's Provided by DC checkbook
