@@ -1,0 +1,38 @@
+<div class="row js-answer hidden" data-answer-type="boolean">
+  <%= render :partial => "boolean_response", :locals => { f: f, value: 'true' } %>
+  <%= render :partial => "boolean_response", :locals => { f: f, value: 'false' } %>
+</div>
+<div class="row js-answer hidden" data-answer-type="date">
+  <div class="js-date-responses">
+    <% f.object.responses.each do |response| %>
+      <%= f.fields_for :responses, response do |response_fields| %>
+      <% end %>
+    <% end %>
+  <%= f.fields_for :responses, f.object.new_response do |response_fields| %>
+    <%=render :partial => "date_response", :locals => {f: response_fields}%>
+  <% end %>
+    <div class= "col-md-12 create-question-form">
+      <a data-action="qle#addDateResponse">Add Responses to this question</a>
+    </div>
+  </div>
+</div>
+<div class="row js-answer hidden" data-answer-type="multiple_choice">
+  <div class="js-multiple-choice-responses">
+  <div class='row create-question-form'>
+    <h5 class='col-md-4'>Answers allowed for this question</h5>
+    <h5 class='col-md-4'>Action if this answer is chosen</h5>
+
+  </div>
+    <% f.object.responses.each do |response| %>
+      <%= f.fields_for :responses, response do |response_fields| %>
+        <%=render :partial => "multiple_choice_response", :locals => {response_fields: response_fields}%>
+      <% end %>
+    <% end %>
+  </div>
+  <%= f.fields_for :responses, f.object.new_response do |response_fields| %>
+    <%=render :partial => "multiple_choice_response", :locals => {response_fields: response_fields}%>
+  <% end %>
+    <div class="col-md-12 create-question-form">
+      <a class="create-question-form" data-action="qle#addMultipleChoiceResponse">Add Responses to this question</a>
+    </div>
+</div>

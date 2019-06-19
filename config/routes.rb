@@ -93,11 +93,16 @@ Rails.application.routes.draw do
 
     resources :hbx_profiles do
       root 'hbx_profiles#show'
-
       collection do
         post :reinstate_enrollment
         get :family_index
         get :family_index_dt
+        get :custom_qle_answer
+        post :custom_qle_answer
+        get :build_attestation_flow
+        post :build_attestation_flow
+        get :create_qle_answer
+        post :create_qle_answer
         get :outstanding_verification_dt
         post :families_index_datatable
         get :employer_index
@@ -617,6 +622,16 @@ Rails.application.routes.draw do
     end
   end
   resources :office_locations, only: [:new]
+
+  resources :qles do
+    collection do
+      get :new_manage_qle
+      post :create_manage_qle
+      get :new
+      post :create
+      post :edit_manage_qle
+    end
+  end
 
   get "document/download/:bucket/:key" => "documents#download", as: :document_download
   get "document/authorized_download/:model/:model_id/:relation/:relation_id" => "documents#authorized_download", as: :authorized_document_download
