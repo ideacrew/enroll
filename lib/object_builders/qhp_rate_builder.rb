@@ -52,7 +52,7 @@ class QhpRateBuilder
     (20..65).each do |metlife_age|
       @metlife_age = metlife_age
       key = "#{@rate[:plan_id]},#{@rate[:effective_date].to_date.year}"
-      rating_area = Settings.aca.state_abbreviation.upcase == "MA" ? @rate[:rate_area_id].gsub("Rating Area ", "R-MA00") : nil
+      rating_area = @rate[:rate_area_id].gsub("Rating Area ", "R-DC00")
       @results[key] << {
         age: metlife_age,
         start_on: @rate[:effective_date],
@@ -128,7 +128,7 @@ class QhpRateBuilder
   def build_product_premium_tables
     active_year = @rate[:effective_date].to_date.year
     applicable_range = @rate[:effective_date].to_date..@rate[:expiration_date].to_date
-    rating_area = Settings.aca.state_abbreviation.upcase == "MA" ? @rate[:rate_area_id].gsub("Rating Area ", "R-MA00") : nil
+    rating_area = @rate[:rate_area_id].gsub("Rating Area ", "R-DC00")
     rating_area_id = @rating_area_id_cache[[active_year, rating_area]]
     @premium_table_cache[[@rate[:plan_id], rating_area_id, applicable_range]][assign_age] = @rate[:primary_enrollee]
     @results_array << "#{@rate[:plan_id]},#{active_year}"

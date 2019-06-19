@@ -96,6 +96,7 @@ class ProductBuilder
           family_deductible: cost_share_variance.qhp_deductable.in_network_tier_1_family,
           is_reference_plan_eligible: true,
           metal_level_kind: retrieve_metal_level.to_sym,
+          product_package_kinds: [:metal_level, :single_issuer, :single_product]
         }
 
         all_attributes = if is_health_product?
@@ -107,7 +108,7 @@ class ProductBuilder
           {
             dental_plan_kind: @qhp.plan_type.downcase,
             dental_level: @qhp.metal_level.downcase,
-            product_package_kinds: ::BenefitMarkets::Products::DentalProducts::DentalProduct::PRODUCT_PACKAGE_KINDS
+            product_package_kinds: [:multi_product, :single_issuer]
           }
         end.merge(shared_attributes)
 
@@ -122,6 +123,7 @@ class ProductBuilder
           end
           if new_product.valid?
             new_product.save!
+            create_congressional_products(new_product)
             @success_plan_counter += 1
             cost_share_variance.product_id = new_product.id
           else
@@ -129,6 +131,16 @@ class ProductBuilder
           end
         end
       end
+    end
+  end
+
+  def create_congressional_products(new_product)
+    if new_product.benefit_market_kind == :aca_shop && new_product.metal_level_kind == :gold
+      congress_product = new_product.dup
+      congress_product.benefit_market_kind = "fehb".to_sym
+      congress_product.save!
+    else
+      new_product
     end
   end
 
