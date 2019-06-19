@@ -146,11 +146,6 @@ RSpec.describe FinancialAssistance::Applicant, type: :model, dbclean: :after_eac
       expect(assc.macro).to eq :embeds_many
     end
 
-    it 'embeds many assisted_verifications' do
-      assc = described_class.reflect_on_association(:assisted_verifications)
-      expect(assc.macro).to eq :embeds_many
-    end
-
     it 'embeds many workflow_state_transitions' do
       assc = described_class.reflect_on_association(:workflow_state_transitions)
       expect(assc.macro).to eq :embeds_many

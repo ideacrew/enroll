@@ -99,17 +99,16 @@ module Subscribers
     def move_applicants_to_outstanding(application)
       return unless application.present?
       application.active_applicants.each do |applicant|
-        if !applicant.has_income_verification_response
+        if !applicant.has_income_verification_response && !applicant.has_mec_verification_response
           applicant.income_outstanding!
+          applicant.mec_outstanding!
         elsif !applicant.has_mec_verification_response
           applicant.mec_outstanding!
-        else
+        elsif !applicant.has_income_verification_response
           applicant.income_outstanding!
-          applicant.mec_outstanding!
         end
       end
     end
-
     def update_applicant(kind, applicant, status)
       if kind == "Income"
         if status == "outstanding"

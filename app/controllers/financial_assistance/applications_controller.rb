@@ -260,7 +260,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
       #Update the Income and MEC verifications to Outstanding
       @model.applicants.each do |applicant|
         applicant.update_attributes!(:assisted_income_validation => "outstanding", :assisted_mec_validation => "outstanding", aasm_state: "verification_outstanding")
-        applicant.assisted_verifications.each { |verification| verification.update_attributes!(status: "outstanding", verification_failed: true) }
+        applicant.verification_types.each { |verification| verification.update_attributes!(validation_status: "outstanding") }
       end
     end
   end

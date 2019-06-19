@@ -58,7 +58,7 @@ namespace :fixture_dump do
       address_class_4_1 = ::Address
       phone_class_4_2 = ::Phone
       deduction_class = ::FinancialAssistance::Deduction
-      assisted_verification_class = ::FinancialAssistance::AssistedVerification
+      assisted_verification_class = ::VerificationType
 
       yaml_str = File.read(f_name)
       @app_fixture = YAML.load(yaml_str)
@@ -154,17 +154,13 @@ def load_app_data applicant
     deduction.assign_attributes(basic_params)
   end
 
-  applicant.assisted_verifications.each do |assisted_verification|
-    assisted_verification.assign_attributes(basic_params)
+  applicant.verification_types.each do |verification_type|
+    verification_type.assign_attributes(basic_params)
 
-    if assisted_verification.assisted_verification_documents.present?
-      assisted_verification.assisted_verification_documents.each do |assisted_verification_document|
-        assisted_verification_document.assign_attributes(basic_params)
+    if verification_type.vlp_documents.present?
+      verification_type.vlp_documents.each do |vlp_doc|
+        vlp_doc.assign_attributes(basic_params)
       end
-    end
-
-    if assisted_verification.verification_response.present?
-      assisted_verification.verification_response.assign_attributes(basic_params)
     end
   end
 
