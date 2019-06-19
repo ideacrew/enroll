@@ -129,6 +129,8 @@ group :development, :test do
   gem 'capistrano',             '~> 3.1'
   gem 'capistrano-rails',       '1.4'
   gem 'email_spec',             '~> 2'
+  gem 'pry'
+  gem 'rb-readline'
   gem 'factory_bot_rails',      '~> 4.11'
   gem 'forgery',                '~> 0.7.0'
   gem 'parallel_tests',         '~> 2.26.2'

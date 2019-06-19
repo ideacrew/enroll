@@ -1,0 +1,12 @@
+  <%= form_for @question, url: "exchanges/hbx_profiles/custom_sep" , action: 'custom_sep', method: "post", class: "form" do |q| %>
+    <table class= "table table-border" id = 'custom-sep-container' >
+      <tbody>
+          <div id= "qle-question"></div>
+        <span> <%= q.text_field :content, class: "form-control", id: "qle-question-form", required: true, placeholder: 'Question', autocomplete: :off %> </span>
+      </tbody>
+    </table>
+    <div class="row no-buffer child-row">
+        <%= q.submit "Create Question", :class => "btn btn-primary", id: "qle-question-submit", :size => '100px', :onclick => "showQleQuestion($('#qle-question-form').val())"%>
+    </div>
+    <div id = "qle-answer"></div>
+  <% end %>

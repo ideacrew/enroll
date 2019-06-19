@@ -17,7 +17,6 @@ class QualifyingLifeEventKind
   ## added event_kind_label -- use to populate label for collecting event_on date
   ## renamed property: kind to action_kind (also renamed associated constant)
 
-
   ACTION_KINDS = %w[add_benefit add_member drop_member change_benefit terminate_benefit administrative transition_member]
   MarketKinds = %w[shop individual]
 
@@ -61,6 +60,9 @@ class QualifyingLifeEventKind
     "eligibility_failed_or_documents_not_received_by_due_date",
     "eligibility_documents_provided"
   ]
+
+  embeds_many :custom_qle_question, as: :questionable
+
 
   field :event_kind_label, type: String
   field :action_kind, type: String

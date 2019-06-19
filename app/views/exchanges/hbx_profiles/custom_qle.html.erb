@@ -5,7 +5,7 @@
 
 <div class="container"  >
   <div id ='custom-sep-container' >
-  <%= form_for @qle, remote: true, url: custom_sep_exchanges_hbx_profiles_path , method: "post", class: "form" do |f| %>
+  <%= form_for @qle, remote: true, url:  custom_qle_exchanges_hbx_profiles_path , method: "post", class: "form" do |f| %>
     <table class="table table-border" id ='custom-sep-container' >
       <thead>
         <th>Custom Qualifying Life Event</th>
@@ -35,17 +35,17 @@
           <td>
             <p><%= label_tag "Visibility" %><p>
               <% ["User Self Service", "Admin Only"].each do |c| %>
-             <p> <%=label_tag "#{c}"%>
-              <%= check_box_tag "qle[visibility]", "#{c}"%></p>
+                <p> <%=label_tag "#{c}"%>
+                <%= check_box_tag "qle[visibility]", "#{c}"%></p>
               <% end %>
           </td>
         </tr>
         <tr>
          <th>
-            <%= link_to "Create QLE Questions", nil, onclick: "build_attestation_flow();", class:"" %>
+            <%= link_to "Create QLE Questions", nil, onclick: "create_qle_question();", class:"" %>
           </th>
-            <tr class = 'build_attestation_flow'>
-        </tr>
+          <tr class = 'create_qle_question'>
+          </tr>
         </tr>
         <tr>
           <td >
@@ -79,10 +79,22 @@
 </div>
 <script type="text/javascript" charset="utf-8">
 $(".uidatepicker").datepicker({maxDate: "-1D", changeMonth: true, changeYear: true, dateFormat: 'mm/dd/yy',  yearRange: (new Date).getFullYear()-110 + ":" + (new Date).getFullYear()});
- function build_attestation_flow() {
+ function create_qle_question() {
      event.preventDefault();
-   $(".build_attestation_flow").html("<%= escape_javascript render "exchanges/hbx_profiles/build_attestation_flow" %>").toggle()
+   $(".create_qle_question").html("<%= escape_javascript render "exchanges/hbx_profiles/shared/create_question" %>").toggle()
  }
+ function showQleQuestion(question) {
+   $('#qle-question').html("<h4>"+question +"</h4>")
+   $('#qle-question-submit').hide()
+   $('#qle-question-form').hide()
+   $("#qle-answer").html("<%= escape_javascript render "exchanges/hbx_profiles/shared/create_answer_type" %>")
+
+ }
+ function createPossibleAnswers(answer){
+   $('custom-answer-type').hide()
+   $("#qle-answer").html("<%= escape_javascript render "exchanges/hbx_profiles/shared/create_possible_answers", locals: @answer  %>")
+ } 
+
 
 </script>
 
