@@ -101,9 +101,13 @@ namespace :new_model do
     puts "mapping sbc docs for 2020" unless Rails.env.test?
     Plan.where(active_year: 2019).each do |old_plan|
       new_plan = Plan.where(active_year: 2020, hios_id: old_plan.hios_id).first
-      new_plan.sbc_document = old_plan.sbc_document
-      new_plan.save
-      puts "updated sbc document for old model 2020 #{new_plan.hios_id}" unless Rails.env.test?
+      if new_plan.present?
+        new_plan.sbc_document = old_plan.sbc_document
+        new_plan.save
+        puts "updated sbc document for old model 2020 #{new_plan.hios_id}" unless Rails.env.test?
+      else
+        puts "no plan present #{old_plan.hios_id}" unless Rails.env.test?
+      end
     end
 
     ::BenefitMarkets::Products::Product.by_year(2019).each do |old_product|
@@ -129,9 +133,11 @@ namespace :new_model do
     # old plans
     Plan.where(active_year: 2019).each do |old_plan|
       new_plan = Plan.where(active_year: 2020, hios_id: old_plan.hios_id).first
-      old_plan.renewal_plan_id = new_plan.id
-      old_plan.save
-      puts "Old #{old_plan.active_year} plan hios_id #{old_plan.hios_id} renewed with New #{new_plan.hios_id} plan hios_id: #{new_plan.hios_id}" unless Rails.env.test?
+      if new_plan.present?
+        old_plan.renewal_plan_id = new_plan.id
+        old_plan.save
+        puts "Old #{old_plan.active_year} plan hios_id #{old_plan.hios_id} renewed with New #{new_plan.hios_id} plan hios_id: #{new_plan.hios_id}" unless Rails.env.test?
+      end
     end
     # end old plans
     ::BenefitMarkets::Products::Product.by_year(2019).each do |old_product|

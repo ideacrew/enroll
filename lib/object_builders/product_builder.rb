@@ -140,7 +140,7 @@ class ProductBuilder
       congress_product.benefit_market_kind = "fehb".to_sym
       congress_product.save!
     else
-      puts "not saved" unless Rails.env.test?
+      new_product
     end
   end
 
