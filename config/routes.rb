@@ -97,6 +97,8 @@ Rails.application.routes.draw do
         get :family_index_dt
         get :custom_qle
         post :custom_qle
+        get :custom_qle_answer
+        post :custom_qle_answer
         get :build_attestation_flow
         post :build_attestation_flow
         get :create_qle_answer

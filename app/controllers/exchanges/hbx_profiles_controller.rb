@@ -515,13 +515,17 @@ def employer_poc
   def custom_qle
     @qle = QualifyingLifeEventKind.new
     @question = CustomQleQuestion.new(qualifying_life_event_kind: @qle)
-    @answer =  @question.try(:custom_qle_answer).try(:new) || CustomQleAnswer.new
+    @answer ||=  @question.try(:custom_qle_answers).try(:new) || CustomQleAnswer.new
     create_qle_question(params['custom_qle_question']['content'],@qle) if params['custom_qle_question'].present?
-    create_qle_answer(params, @qle) if params['answer'].present?
+    update_qle_answer if params['custom_qle_answer'].present?
   end
   
-  def create_qle_answer(params) 
-    @answer  = @question.custom_qle_answer.create!(type:params['answer']['type'])
+  def create_qle_answer 
+    @answer = @question.custom_qle_answers.create(type: params['answer']['type'])
+  end
+
+  def update_qle_answer
+    binding.pry
   end
   
   def create_qle_question(params, qle) 

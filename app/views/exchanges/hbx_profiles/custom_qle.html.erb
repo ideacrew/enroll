@@ -83,16 +83,19 @@ $(".uidatepicker").datepicker({maxDate: "-1D", changeMonth: true, changeYear: tr
      event.preventDefault();
    $(".create_qle_question").html("<%= escape_javascript render "exchanges/hbx_profiles/shared/create_question" %>").toggle()
  }
- function showQleQuestion(question) {
-   $('#qle-question').html("<h4>"+question +"</h4>")
+
+function showQleQuestion(question) {
+   $('#qle-question').html("<h4>"+ question +"</h4>")
    $('#qle-question-submit').hide()
    $('#qle-question-form').hide()
    $("#qle-answer").html("<%= escape_javascript render "exchanges/hbx_profiles/shared/create_answer_type" %>")
 
  }
- function createPossibleAnswers(answer){
+ function createPossibleAnswers(){
    $('custom-answer-type').hide()
-   $("#qle-answer").html("<%= escape_javascript render "exchanges/hbx_profiles/shared/create_possible_answers", locals: @answer  %>")
+   $("#qle-answer").html("<%= escape_javascript render partial: 'exchanges/hbx_profiles/shared/create_possible_answers'%>")
+ } 
+  function updateAnswer(){
  } 
 
 
