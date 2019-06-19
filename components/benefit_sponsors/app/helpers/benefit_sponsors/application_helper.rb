@@ -146,5 +146,16 @@ module BenefitSponsors
       sir_name  = content_tag(:strong, mixed_case(last_name))
       raw([mixed_case(given_name), sir_name, name_sfx].reject(&:nil? || empty?).join(' '))
     end
+
+    def metal_levels_sorted(metal_levels)
+      metal_levels_order = {
+        bronze: 0,
+        silver: 1,
+        gold: 2,
+        platinum: 3
+      }
+
+      metal_levels.sort_by{|level| metal_levels_order[level]}
+    end
   end
 end

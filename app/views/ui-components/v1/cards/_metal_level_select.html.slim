@@ -54,7 +54,7 @@
             h4
               = fetch_health_product_option_choice_description_for_metal_level
             br
-            - @benefit_package_form.catalog.metal_levels.each do |kind|
+            - metal_levels_sorted(@benefit_package_form.catalog.metal_levels).each do |kind|
               .col-xs-3.metals
                 .col-xs-12
                   label.container
@@ -207,9 +207,9 @@ javascript:
               <span class="plan-label">Type:</span> <span class="rp-plan-info">${plan.product_type}</span><br>
               <span class="plan-label">Carrier:</span> <span class="rp-plan-info">${plan.carrier_name}</span><br>
               <span class="plan-label">Level:</span> <span class="rp-plan-info">${plan.metal_level_kind}</span><br>
-              <span class="plan-label">Network:</span> <span class="rp-plan-info">${network}</span><br>
+              <span class="plan-label">Network:</span> <span class="rp-plan-info">${plan.network}</span><br>
               <span class="plan-label mt-1 rp-view-summary" onclick="viewSummary(this)" data-plan-title="${plan.title}" data-plan-id="${plan.id}">View Summary</span><br>
-              <input type="radio" name="benefit_package[sponsored_benefits_attributes][0][reference_plan_id]" id="${plan.id}" onclick="newContributionAmounts()" value="${plan.id}" data-plan-title="${plan.title}" data-plan-carrier="${plan.carrier_name}" data-plan-id="${plan.id}" data-plan-metal-level="${plan.metal_level_kind}" data-plan-type="${plan.product_type}">
+              <input type="radio" name="benefit_package[sponsored_benefits_attributes][0][reference_plan_id]" id="${plan.id}" onclick="newContributionAmounts()" value="${plan.id}" data-plan-title="${plan.title}" data-plan-carrier="${plan.carrier_name}" data-plan-id="${plan.id}" data-plan-metal-level="${plan.metal_level_kind}" data-plan-type="${plan.product_type}" data-network="${plan.network}">
               <span class="checkmark"></span>
             </label>
           </div>
@@ -267,11 +267,13 @@ javascript:
     if(!(element || options)) {
       return
     }
+
     options = options || {};
     planTitle = options.planTitle || element.dataset.planTitle;
     metalLevel = options.metalLevel || element.dataset.planMetalLevel;
     carrierName = options.carrierName || element.dataset.planCarrier;
     planType = options.planType || element.dataset.planType;
+    network = options.network || element.dataset.network;
     referencePlanID = options.referencePlanID || element.id;
     sponsoredBenefitId = options.sponsoredBenefitId;
     showFormButtons();
@@ -282,7 +284,7 @@ javascript:
     document.getElementById('rpType').append(planType);
     document.getElementById('rpCarrier').append(carrierName);
     document.getElementById('rpMetalLevel').append(metalLevel);
-    document.getElementById('rpNetwork').append('N/A');
+    document.getElementById('rpNetwork').append(network);
     document.getElementById('planOfferingsTitle').innerHTML = '';
     document.getElementById('planOfferingsTitle').append(`Plan Offerings - ${planTitle} (${productsTotal})`)
     calculateEmployerContributions(productOptionKind, referencePlanID, sponsoredBenefitId)
@@ -642,7 +644,8 @@ javascript:
         metalLevel: "#{@benefit_package_form.sponsored_benefits.first.reference_product.metal_level_kind}",
         carrierName: "#{@benefit_package_form.sponsored_benefits.first.reference_product.issuer_name}",
         planType: "#{@benefit_package_form.sponsored_benefits.first.product_package_kind}",
-        referencePlanID: "#{@benefit_package_form.sponsored_benefits.first.reference_plan_id}"
+        referencePlanID: "#{@benefit_package_form.sponsored_benefits.first.reference_plan_id}",
+        network: "#{@benefit_package_form.sponsored_benefits.first.reference_product.network}"
       });
     });
 
