@@ -95,7 +95,7 @@ Then /^they should see an account creation form$/ do
 end
 
 When /^they complete the account creation form and hit the 'Submit' button$/ do
-  email_address = general_agency_organization.general_agency_profile.general_agency_staff_roles.last.email_address
+  email_address = general_agency_organization.general_agency_profile.general_agency_primary_staff.email_address
   fill_in "user[oim_id]", with: email_address
   fill_in "user[password]", with: "aA1!aA1!aA1!"
   fill_in "user[password_confirmation]", with: "aA1!aA1!aA1!"
