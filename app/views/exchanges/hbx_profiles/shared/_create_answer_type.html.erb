@@ -1,0 +1,15 @@
+  <div class = 'container' id='custom-answer-type'>
+  <h5>Please select the type of answer that is allowed for this question</h5>
+  <%= fields_for @answer, method: "post", class: "form" do |q| %>
+    <table class="table table-border" id="custom-sep-container" >
+      <tbody>
+        <% ["Date", "Multiple Choice", "True/False"].each do |c| %>
+          <p> <%=label_tag "#{c}"%> <%= check_box_tag "answer[type]", "#{c}"%></p>
+         <% end %>
+      </tbody>
+    </table>
+    <div class="row no-buffer child-row">
+        <%= q.submit "Create Answer", :class => "btn btn-primary", id: "qle-question-submit", :size => '100px', :onclick => "createPossibleAnswers(@answer)"%>
+    </div>
+  <% end %>
+  </div>

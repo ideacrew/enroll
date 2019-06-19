@@ -88,10 +88,15 @@ Rails.application.routes.draw do
 
     resources :hbx_profiles do
       root 'hbx_profiles#show'
-
       collection do
         get :family_index
         get :family_index_dt
+        get :custom_qle
+        post :custom_qle
+        get :build_attestation_flow
+        post :build_attestation_flow
+        get :create_qle_answer
+        post :create_qle_answer
         get :outstanding_verification_dt
         post :families_index_datatable
         get :employer_index
@@ -108,10 +113,6 @@ Rails.application.routes.draw do
         get :issuer_index
         get :product_index
         get :configuration
-        get :custom_sep
-        post :custom_sep
-        get :build_attestation_flow
-        post :build_attestation_flow
         post :set_date
         post :update_setting
         get :staff_index

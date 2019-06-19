@@ -61,6 +61,9 @@ class QualifyingLifeEventKind
     "eligibility_documents_provided"
   ]
 
+  embeds_many :custom_qle_question, as: :questionable
+
+
   field :event_kind_label, type: String
   field :action_kind, type: String
 

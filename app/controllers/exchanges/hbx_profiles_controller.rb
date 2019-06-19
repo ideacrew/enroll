@@ -502,21 +502,20 @@ def employer_poc
     end
   end
 
-  def custom_sep
+  def custom_qle
     @qle = QualifyingLifeEventKind.new
     @question = CustomQleQuestion.new(qualifying_life_event_kind: @qle)
-
-    # binding.pry
-    # respond_to do |format|
-    #   format.html { render partial: "custom_sep" }
-    #   format.js {}
-    # end
+    @answer =  @question.try(:custom_qle_answer).try(:new) || CustomQleAnswer.new
+    create_qle_question(params['custom_qle_question']['content'],@qle) if params['custom_qle_question'].present?
+    create_qle_answer(params, @qle) if params['answer'].present?
   end
-
-  def build_attestation_flow 
-    @question = CustomQleQuestion.new
-
-    binding.pry
+  
+  def create_qle_answer(params) 
+    @answer  = @question.custom_qle_answer.create!(type:params['answer']['type'])
+  end
+  
+  def create_qle_question(params, qle) 
+    @question = CustomQleQuestion.create(qualifying_life_event_kind: qle, content: params) 
   end
 
   def edit_dob_ssn

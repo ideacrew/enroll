@@ -1,0 +1,14 @@
+  <div class = 'container' id='custom-answer-type'>
+  <h5>Please select the type of answer that is allowed for this question</h5>
+  <%= fields_for @answer, method: "post", class: "form" do |q| %>
+    <table class="table table-border" id="custom-sep-container" >
+    <%binding.pry%>
+      <tbody>
+          <p> <%=text_field_tag :option_1, nil,class:'form-control' %></p>
+      </tbody>
+    </table>
+    <div class="row no-buffer child-row">
+        <%= q.submit "Create Answer", :class => "btn btn-primary", id: "qle-question-submit", :size => '100px'%>
+    </div>
+  <% end %>
+  </div>
