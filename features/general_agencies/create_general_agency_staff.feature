@@ -18,6 +18,14 @@ Feature: Assign General Agency Staff to General Agency
     And there is a Staff with a “pending” general agency staff role in the table
     When the primary staff clicks on the approve button
     Then the primary staff should see the staff successfully approved message
+    And new ga staff should receive an email
+    And the primary staff logs out
+
+    When new ga staff visits the link received in the approval email
+    Then they should see an account creation form
+    When new ga staff completes the account creation form and hit the 'Submit' button
+    Then they should see a welcome message
+    And they see the General Agency homepage
     And the primary staff logs out
 
     And Max Planck logs on to the General Agency Portal

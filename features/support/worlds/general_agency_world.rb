@@ -73,19 +73,19 @@ Then /^they should see the name of staff$/ do
 end
 
 Then /^the general agency should receive an email$/ do
-  staff = general_agency_organization.general_agency_profile.general_agency_staff_roles.last
+  staff = general_agency_organization.general_agency_profile.general_agency_primary_staff
   open_email(staff.email_address)
 end
 
 Given /^a general agency, approved, awaiting account creation, exists$/ do
   assign_roles_to_general_agency
-  staff = general_agency_organization.general_agency_profile.general_agency_staff_roles.last
+  staff = general_agency_organization.general_agency_profile.general_agency_primary_staff
   staff.person.emails.last.update(kind: 'work')
   staff.approve!
 end
 
 When /^the HBX admin visits the link received in the approval email$/ do
-  staff = general_agency_organization.general_agency_profile.general_agency_staff_roles.last
+  staff = general_agency_organization.general_agency_profile.general_agency_primary_staff
   email_address = staff.email_address
 
   open_email(email_address)
