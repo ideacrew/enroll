@@ -147,9 +147,14 @@ When(/^(.*?) go[es]+ to the brokers tab$/) do |legal_name|
 end
 
 And(/^.+ should receive an invitation email$/) do
+  subject = if Settings.site.key == :dc
+              "Invitation to create your Broker account on #{Settings.site.short_name}"
+            else
+              "Important information for accessing your new broker account through the #{Settings.site.short_name}"
+            end
   open_email(
     "ricky.martin@example.com",
-    :with_subject => "Important information for accessing your new broker account through the #{Settings.site.short_name}"
+    :with_subject => subject
   )
   expect(current_email.to).to eq(["ricky.martin@example.com"])
 end
