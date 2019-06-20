@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require Rails.root.join('lib', 'object_builders', 'product_builder')
 require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers', 'plan_benefit_template_parser')
@@ -27,29 +29,35 @@ describe "qhp builder" do
       expect(Products::Qhp.all.where(:"qhp_cost_share_variances.hios_plan_and_variant_id" => @product.hios_id).count).to eq 0
     end
 
-    it "should run the builder" do
-      xml = Nokogiri::XML(File.open(@files.first))
-      product_parser = Parser::PlanBenefitTemplateParser.parse(xml.root.canonicalize, :single => true)
-      product = ProductBuilder.new({})
-      product.add(product_parser.to_hash)
-      product.run
-    end
+    context "when new product is imported" do
+      before(:all) do
+        xml = Nokogiri::XML(File.open(@files.first))
+        product_parser = Parser::PlanBenefitTemplateParser.parse(xml.root.canonicalize, :single => true)
+        product = ProductBuilder.new({})
+        product.add(product_parser.to_hash)
+        product.run
+      end
 
-    it "should load/update 2 aca_shop products from file" do
-      expect(BenefitMarkets::Products::Product.aca_shop_market.count).to eq 2
-    end
+      it "should load/update 2 aca_shop products from file" do
+        expect(BenefitMarkets::Products::Product.aca_shop_market.count).to eq 2
+      end
 
-    it "should load 2 QHP records from the file" do
-      expect(Products::Qhp.all.count).to eq 2
-    end
+      it "should load/update 1 congressional_market products from file" do
+        expect(BenefitMarkets::Products::Product.congressional_market.count).to eq 1
+      end
 
-    it "should assign qhp_cost_share_variances from file to the existing products" do
-      expect(Products::Qhp.all.where(:"qhp_cost_share_variances.hios_plan_and_variant_id" => @product.hios_id).count).to eq 1
-    end
+      it "should load 2 QHP records from the file" do
+        expect(Products::Qhp.all.count).to eq 2
+      end
 
-    it "should have all qhp_cost_share_variances for all the products" do
-      BenefitMarkets::Products::Product.all.each do |product|
-        expect(Products::Qhp.all.where(:"qhp_cost_share_variances.hios_plan_and_variant_id" => product.hios_id).count).to eq 1
+      it "should assign qhp_cost_share_variances from file to the existing products" do
+        expect(Products::Qhp.all.where(:"qhp_cost_share_variances.hios_plan_and_variant_id" => @product.hios_id).count).to eq 1
+      end
+
+      it "should have all qhp_cost_share_variances for all the products" do
+        BenefitMarkets::Products::Product.all.each do |product|
+          expect(Products::Qhp.all.where(:"qhp_cost_share_variances.hios_plan_and_variant_id" => product.hios_id).count).to eq 1
+        end
       end
     end
   end
@@ -73,33 +81,35 @@ describe "qhp builder" do
       expect(Products::Qhp.all.where(:"qhp_cost_share_variances.hios_plan_and_variant_id" => @product2.hios_id).count).to eq 1
     end
 
-    it "should run the builder" do
-      xml = Nokogiri::XML(File.open(@files.first))
-      product_parser = Parser::PlanBenefitTemplateParser.parse(xml.root.canonicalize, :single => true)
-      product = ProductBuilder.new({})
-      product.add(product_parser.to_hash)
-      product.run
-    end
+    context "when new product is imported" do
+      before(:all) do
+        xml = Nokogiri::XML(File.open(@files.first))
+        product_parser = Parser::PlanBenefitTemplateParser.parse(xml.root.canonicalize, :single => true)
+        product = ProductBuilder.new({})
+        product.add(product_parser.to_hash)
+        product.run
+      end
 
-    it "should load/update 2 aca_shop products from file" do
-      expect(BenefitMarkets::Products::Product.aca_shop_market.count).to eq 2
-    end
+      it "should load/update 2 aca_shop products from file" do
+        expect(BenefitMarkets::Products::Product.aca_shop_market.count).to eq 2
+      end
 
-    it "should load/update 1 congressional_market products from file" do
-      expect(BenefitMarkets::Products::Product.congressional_market.count).to eq 1
-    end
+      it "should load/update 1 congressional_market products from file" do
+        expect(BenefitMarkets::Products::Product.congressional_market.count).to eq 1
+      end
 
-    it "should load 2 QHP records from the file" do
-      expect(Products::Qhp.all.count).to eq 2
-    end
+      it "should load 2 QHP records from the file" do
+        expect(Products::Qhp.all.count).to eq 2
+      end
 
-    it "should not create new qhp_cost_share_variances, but update from file to the existing one" do
-      expect(Products::Qhp.all.where(:"qhp_cost_share_variances.hios_plan_and_variant_id" => @product2.hios_id).count).to eq 1
-    end
+      it "should not create new qhp_cost_share_variances, but update from file to the existing one" do
+        expect(Products::Qhp.all.where(:"qhp_cost_share_variances.hios_plan_and_variant_id" => @product2.hios_id).count).to eq 1
+      end
 
-    it "should have all qhp_cost_share_variances for all the products" do
-      BenefitMarkets::Products::Product.all.each do |product|
-        expect(Products::Qhp.all.where(:"qhp_cost_share_variances.hios_plan_and_variant_id" => product.hios_id).count).to eq 1
+      it "should have all qhp_cost_share_variances for all the products" do
+        BenefitMarkets::Products::Product.all.each do |product|
+          expect(Products::Qhp.all.where(:"qhp_cost_share_variances.hios_plan_and_variant_id" => product.hios_id).count).to eq 1
+        end
       end
     end
   end
