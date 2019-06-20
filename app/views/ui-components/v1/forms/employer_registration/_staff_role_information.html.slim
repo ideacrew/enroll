@@ -24,7 +24,7 @@
   .row.mt-1
     .col-md-3
       label for="inputEmail"  Email *
-      = f.text_field :email, class: "floatlabel form-control interaction-field-control-person-email", required: true, placeholder: 'john@example.com'
+      = f.text_field :email, class: "floatlabel form-control interaction-field-control-person-email", required: true, placeholder: 'john@example.com', onblur:'validateEmailFormat(this)'
       .invalid-feedback
         |
           Please provide a email address.
@@ -55,12 +55,12 @@ javascript:
 		document.getElementById('inputExtension').remove()
 	}
 	})();
-	
+
 	var cleave = new Cleave('#inputDOB', {
 	    date: true,
 	    datePattern: ['m', 'd', 'Y']
 	});
-	
+
 	function validDob(element) {
 		if (element.value && element.value.length < 10) {
 			swal({
@@ -71,4 +71,3 @@ javascript:
 			element.value = ''
 		}
 	}
-

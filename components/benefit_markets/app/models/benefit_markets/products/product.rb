@@ -93,6 +93,7 @@ module BenefitMarkets
 
     scope :aca_shop_market,             ->{ where(benefit_market_kind: :aca_shop) }
     scope :aca_individual_market,       ->{ where(benefit_market_kind: :aca_individual) }
+    scope :congressional_market,        ->{ where(benefit_market_kind: :fehb) }
     scope :by_issuer_profile,           ->(issuer_profile){ where(issuer_profile_id: issuer_profile.id) }
     scope :by_kind,                     ->(kind){ where(kind: kind) }
     scope :by_service_area,             ->(service_area){ where(service_area: service_area) }

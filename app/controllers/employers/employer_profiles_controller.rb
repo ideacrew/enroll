@@ -191,7 +191,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   def generate_checkbook_urls
     trigger_notice_observer(@employer_profile, @employer_profile, 'out_of_pocket_url_notifier')
     flash[:notice] = "Custom Plan Match instructions are being generated.  Check your secure Messages inbox shortly."
-    redirect_to action: :show, :tab => :employees
+    redirect_to benefit_sponsors.profiles_employers_employer_profile_path(tab: 'employees')
   end
 
   def download_invoice

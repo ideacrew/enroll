@@ -5,8 +5,8 @@ module Notifier
     module BenefitPackage
       include ActionView::Helpers::NumberHelper
 
-      def benefit_packages
-        benefit_packages = load_benefit_application.benefit_packages
+      def benefit_application_benefit_packages
+        benefit_packages = employer_profile.benefit_applications.published_or_renewing_published.first.benefit_packages
         merge_model.benefit_packages = build_benefit_packages(benefit_packages)
       end
 
