@@ -137,6 +137,7 @@ group :test do
   gem 'mongoid-rspec', '3.0.0'
   gem 'poltergeist'
   gem 'rspec-instafail'
+  gem 'rspec-benchmark'
   gem 'ruby-progressbar', '~> 1.7'
   gem 'shoulda-matchers', '3.1.1'
   gem 'simplecov', '0.14.1', :require => false

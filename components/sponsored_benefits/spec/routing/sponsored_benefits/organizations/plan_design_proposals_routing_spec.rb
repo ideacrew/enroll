@@ -1,8 +1,5 @@
 require "rails_helper"
 
-module DataTablesAdapter
-end
-
 module SponsoredBenefits
   RSpec.describe Organizations::PlanDesignProposalsController, type: :routing do
     routes { SponsoredBenefits::Engine.routes }

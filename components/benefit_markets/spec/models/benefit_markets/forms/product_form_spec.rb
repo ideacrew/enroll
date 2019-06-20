@@ -2,7 +2,7 @@ require 'rails_helper'
 
 module BenefitMarkets
   RSpec.describe Forms::ProductForm do
-    describe '::for_new' do
+    describe '::for_new', dbclean: :after_each do
       let(:product) { create :benefit_markets_products_product }
       let(:future_product) { create :benefit_markets_products_product }
       let(:date) { TimeKeeper.date_of_record }

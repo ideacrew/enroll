@@ -846,5 +846,28 @@ module BenefitSponsors
         end
       end
     end
+
+    describe ".open_enrollment_length" do
+      let!(:initial_application) { create(:benefit_sponsors_benefit_application, benefit_sponsor_catalog: benefit_sponsor_catalog, effective_period: effective_period,benefit_sponsorship:benefit_sponsorship, aasm_state: :active) }
+      let(:min_open_enrollment_length) { 5 }
+      let(:start_date) {Date.new(2019,11,16)}
+      let(:end_date) {Date.new(2019,11,20)}
+
+      it 'open_enrollment_length should be greater than min_open_enrollment_length' do
+        initial_application.update_attributes(open_enrollment_period: (start_date..(end_date + 1.day)))
+        expect(initial_application.open_enrollment_length).to be > min_open_enrollment_length
+      end
+
+      it 'open_enrollment_length should be equal to min_open_enrollment_length ' do
+        initial_application.update_attributes(open_enrollment_period: (start_date..end_date))
+        expect(initial_application.open_enrollment_length).to eq min_open_enrollment_length
+      end
+
+      it 'open_enrollment_length should be less than min_open_enrollment_length ' do
+        initial_application.update_attributes(open_enrollment_period: (start_date..(end_date - 1.day)))
+        expect(initial_application.open_enrollment_length).to be < min_open_enrollment_length
+      end
+
+    end
   end
 end

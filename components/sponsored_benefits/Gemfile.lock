@@ -52,6 +52,9 @@ GEM
     addressable (2.5.2)
       public_suffix (>= 2.0.2, < 4.0)
     arel (6.0.4)
+    benchmark-malloc (0.1.0)
+    benchmark-perf (0.5.0)
+    benchmark-trend (0.3.0)
     bson (4.3.0)
     builder (3.2.3)
     capybara (2.16.1)
@@ -164,6 +167,15 @@ GEM
     roo (2.1.1)
       nokogiri (~> 1)
       rubyzip (~> 1.1, < 2.0.0)
+    rspec (3.7.0)
+      rspec-core (~> 3.7.0)
+      rspec-expectations (~> 3.7.0)
+      rspec-mocks (~> 3.7.0)
+    rspec-benchmark (0.5.0)
+      benchmark-malloc (~> 0.1.0)
+      benchmark-perf (~> 0.5.0)
+      benchmark-trend (~> 0.3.0)
+      rspec (>= 3.0.0, < 4.0.0)
     rspec-core (3.7.0)
       rspec-support (~> 3.7.0)
     rspec-expectations (3.7.0)
@@ -213,9 +225,10 @@ DEPENDENCIES
   database_cleaner
   factory_girl_rails
   forgery
+  rspec-benchmark
   rspec-rails
   shoulda-matchers
   sponsored_benefits!
 
 BUNDLED WITH
-   1.16.0
+   1.16.6

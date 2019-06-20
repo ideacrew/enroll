@@ -1664,6 +1664,19 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
             passive_waiver = shop_family.reload.enrollments.where(:aasm_state => 'renewing_waived').first
             expect(passive_waiver.present?).to be_truthy
           end
+
+          it 'should cancel passive renewal and should not generate a duplicate waiver' do
+            expect(passive_renewal).not_to be_nil
+            new_enrollment.waive_coverage!
+            new_enrollment.schedule_coverage_termination!
+            passive_renewal.reload
+            enrollment.reload
+            new_enrollment.reload
+            expect(new_enrollment.inactive?).to be_truthy
+            expect(passive_renewal.coverage_canceled?).to be_truthy
+            passive_waiver = shop_family.reload.enrollments.where(:aasm_state => 'renewing_waived').first
+            expect(passive_waiver.present?).to be_falsey
+          end
         end
       end
     end
