@@ -211,7 +211,7 @@ class FinancialAssistance::Application
     end
 
     event :determine, :after => :record_transition do
-      transitions from: :submitted, to: :determined, :after => [:verification_update_for_applicants]
+      transitions from: :submitted, to: :determined
     end
 
   end
@@ -669,12 +669,6 @@ private
       elsif has_atleast_one_assisted_but_no_medicaid_applicant?
         update_verifications_of_applicants("pending")
       end
-    end
-  end
-
-  def update_verifications_of_applicants(status)
-    active_applicants.each do |applicant|
-      applicant.assisted_verifications.each { |verification| verification.update_attributes(status: status) }
     end
   end
 

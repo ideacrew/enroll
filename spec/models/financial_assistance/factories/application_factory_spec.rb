@@ -58,7 +58,7 @@ RSpec.describe "ApplicationFactory" do
 
         it 'should not copy assisted verification types' do
           old_verification_types = application.applicants.first.verification_types
-          expect(old_verification_types.count).to eq 1
+          expect(old_verification_types.count).to eq 2
           verification_types = @draft_application.applicants.first.verification_types
           expect(verification_types.count).to eq 0
         end

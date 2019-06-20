@@ -146,8 +146,8 @@ RSpec.describe FinancialAssistance::Applicant, type: :model, dbclean: :after_eac
       expect(assc.macro).to eq :embeds_many
     end
 
-    it 'embeds many assisted_verifications' do
-      assc = described_class.reflect_on_association(:assisted_verifications)
+    it 'embeds many verification_types' do
+      assc = described_class.reflect_on_association(:verification_types)
       expect(assc.macro).to eq :embeds_many
     end
 

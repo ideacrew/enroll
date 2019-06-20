@@ -154,7 +154,6 @@ class FinancialAssistance::Applicant
   embeds_many :incomes,     class_name: "::FinancialAssistance::Income"
   embeds_many :deductions,  class_name: "::FinancialAssistance::Deduction"
   embeds_many :benefits,    class_name: "::FinancialAssistance::Benefit"
-  embeds_many :assisted_verifications, class_name: "::FinancialAssistance::AssistedVerification"
   embeds_many :workflow_state_transitions, as: :transitional
   embeds_many :verification_types, cascade_callbacks: true, validate: true
 
@@ -512,10 +511,6 @@ class FinancialAssistance::Applicant
 
   def assisted_mec_verified?
     assisted_mec_validation == "valid"
-  end
-
-  def has_faa_docs_for_type?(type)
-    assisted_verifications.where(verification_type: type).first.assisted_verification_documents.any?{ |doc| doc.identifier }
   end
 
   def admin_verification_action(action, v_type, update_reason)

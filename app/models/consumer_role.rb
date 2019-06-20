@@ -143,7 +143,6 @@ class ConsumerRole
   delegate :tribal_id,          :tribal_id=,         to: :person, allow_nil: true
 
   embeds_many :documents, as: :documentable
-  embeds_many :assisted_verification_documents, as: :documentable
 
   embeds_many :ridp_documents, as: :documentable
   embeds_many :vlp_documents, as: :documentable do #move to verification type
