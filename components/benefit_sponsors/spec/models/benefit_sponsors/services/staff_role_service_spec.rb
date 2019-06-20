@@ -13,7 +13,7 @@ module BenefitSponsors
     let(:broker_agency_profile) { broker_organization.broker_agency_profile }
     let!(:general_agency_organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, site: site) }
     let(:general_agency_profile) { general_agency_organization.general_agency_profile }
-    let!(:primary_general_agency_staff_role) {FactoryBot.build(:general_agency_staff_role, benefit_sponsors_general_agency_profile_id: general_agency_profile.id, is_primary: true, aasm_state: 'active')}
+    let!(:primary_general_agency_staff_role) {FactoryBot.create(:general_agency_staff_role, benefit_sponsors_general_agency_profile_id: general_agency_profile.id, is_primary: true, aasm_state: 'active')}
 
     # let!(:employer_profile) {benefit_sponsor.employer_profile}
     let!(:active_employer_staff_role) {FactoryBot.build(:benefit_sponsor_employer_staff_role, aasm_state: 'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
@@ -378,6 +378,64 @@ module BenefitSponsors
         before do
           subject.add_broker_agency_staff_role(person1.first_name, person1.last_name, person1.dob,'#default@email.com', broker_agency_profile)
           @status, @result = subject.add_broker_agency_staff_role(person1.first_name, person1.last_name, person1.dob,'#default@email.com', broker_agency_profile)
+        end
+
+        it 'returns false' do
+          expect(@status).to eq false
+        end
+
+        it 'returns the person' do
+          expect(@result).to be_instance_of String
+        end
+      end
+    end
+
+    describe ".add_general_agency_staff_role", dbclean: :after_each  do
+      let(:person_params) {{first_name: Forgery('name').first_name, last_name: Forgery('name').first_name, dob: '1990/05/01'}}
+      let(:person1) {FactoryBot.create(:person, person_params)}
+
+      context 'duplicate person PII' do
+        before do
+          FactoryBot.create(:person, person_params)
+          @status, @result = subject.add_general_agency_staff_role(person1.first_name, person1.last_name, person1.dob,'#default@email.com', general_agency_profile)
+        end
+        it 'returns false' do
+          expect(@status).to eq false
+        end
+
+        it 'returns msg' do
+          expect(@result).to be_instance_of String
+        end
+      end
+
+      context 'zero matching person PII' do
+        before {@status, @result = subject.add_general_agency_staff_role('sam', person1.last_name, person1.dob,'#default@email.com', general_agency_profile)}
+
+        it 'returns false' do
+          expect(@status).to eq false
+        end
+
+        it 'returns msg' do
+          expect(@result).to be_instance_of String
+        end
+      end
+
+      context 'matching one person PII' do
+        before {@status, @result = subject.add_general_agency_staff_role(person1.first_name, person1.last_name, person1.dob,'#default@email.com', general_agency_profile)}
+
+        it 'returns true' do
+          expect(@status).to eq true
+        end
+
+        it 'returns the person' do
+          expect(@result).to eq person1
+        end
+      end
+
+      context 'person already has general agency staff role with this general agency' do
+        before do
+          subject.add_general_agency_staff_role(person1.first_name, person1.last_name, person1.dob,'#default@email.com', general_agency_profile)
+          @status, @result = subject.add_general_agency_staff_role(person1.first_name, person1.last_name, person1.dob,'#default@email.com', general_agency_profile)
         end
 
         it 'returns false' do
