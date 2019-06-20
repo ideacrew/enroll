@@ -614,7 +614,7 @@ Rails.application.routes.draw do
   end
   resources :office_locations, only: [:new]
 
-  resources :qle do
+  resources :qles do
     collection do
       get :new_manage_qle
       post :create_manage_qle
