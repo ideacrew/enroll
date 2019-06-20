@@ -29,14 +29,17 @@ module Effective
           table_column :general_agency, :label => 'General Agency', :proc => proc {
             @employer_profile.try(:active_ga_legal_name).try(:titleize)
           }, :filter => false
+
+          table_column :source_kind, :label => 'Conversion', :proc => proc {|row|
+            boolean_to_glyph(row.is_conversion?)
+          }, :filter => {include_blank: false, :as => :select, :collection => [['All', :all], ['Yes', :conversion], ['No', :self_serve]], :selected => 'all'}
         end
 
-        # table_column :conversion, :proc => Proc.new { |row|
-        #   boolean_to_glyph(row.is_conversion?)}, :filter => {include_blank: false, :as => :select, :collection => ['All','Yes', 'No'], :selected => 'All'}
-
-        table_column :source_kind, :proc => Proc.new { |row|
-          row.source_kind.to_s.humanize},
-                     :filter => {include_blank: false, :as => :select, :collection => SOURCE_KINDS, :selected => "all"}
+        if aca_state_abbreviation == 'MA'
+          table_column :source_kind, :proc => proc {|row|
+            row.source_kind.to_s.humanize
+          }, :filter => {include_blank: false, :as => :select, :collection => SOURCE_KINDS, :selected => 'all'}
+        end
 
         table_column :plan_year_state, :proc => Proc.new { |row|
           if row.latest_benefit_application.present?
