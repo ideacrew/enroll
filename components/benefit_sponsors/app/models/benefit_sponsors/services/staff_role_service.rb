@@ -32,6 +32,8 @@ module BenefitSponsors
         elsif form.is_general_agency_staff_profile? && form.email.present?
           match_or_create_person(form)
           persist_general_agency_staff_role!(profile)
+        elsif form[:is_general_agency_staff_profile?]
+          add_general_agency_staff_role(form[:first_name], form[:last_name], form[:dob], form[:email], profile)
         else
           Person.add_employer_staff_role(form[:first_name], form[:last_name], form[:dob], form[:email], profile)
         end
@@ -172,6 +174,23 @@ module BenefitSponsors
         else
           broker_agency_staff_role = BrokerAgencyStaffRole.new(person: person.first, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: "active")
           broker_agency_staff_role.save
+        end
+        [true, person.first]
+      end
+
+      def add_general_agency_staff_role(first_name, last_name, dob, _email, general_agency_profile)
+        person = Person.where(first_name: /^#{first_name}$/i, last_name: /^#{last_name}$/i, dob: dob)
+
+        return false, 'Person does not exist on the Exchange' if person.count == 0
+        return false, 'Person count too high, please contact HBX Admin' if person.count > 1
+        return false, 'Person already has a staff role for this General Agency' if Person.staff_for_ga_including_pending(general_agency_profile).include?(person.first)
+
+        terminated_agencies_with_same_profile =  person.first.general_agency_staff_roles.detect{|role| role if role.benefit_sponsors_general_agency_profile_id == general_agency_profile.id && role.aasm_state == "general_agency_terminated"}
+        if terminated_agencies_with_same_profile.present?
+          terminated_agencies_with_same_profile.general_agency_active!
+        else
+          general_agency_staff_role = GeneralAgencyStaffRole.new(person: person.first, benefit_sponsors_general_agency_profile_id: general_agency_profile.id, aasm_state: "active", npn: general_agency_profile.general_agency_primary_staff.npn)
+          general_agency_staff_role.save
         end
         [true, person.first]
       end
