@@ -33,6 +33,8 @@ class Insured::GroupSelectionController < ApplicationController
     end
     @qle = @adapter.is_qle?
 
+    insure_hbx_enrollment_for_shop_qle_flow
+
     # Benefit group is what we will need to change
     @benefit_group = @adapter.select_benefit_group(params)
     @new_effective_on = @adapter.calculate_new_effective_on(params)

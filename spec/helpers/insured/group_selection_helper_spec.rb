@@ -1,4 +1,6 @@
 require "rails_helper"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_each do
   let(:subject)  { Class.new { extend Insured::GroupSelectionHelper } }
@@ -196,12 +198,14 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
   describe "#selected_enrollment" do
 
     context "selelcting the enrollment" do
-      let(:person) { FactoryBot.create(:person) }
-      let(:employee_role) { FactoryBot.create(:employee_role, person: person, employer_profile: organization.employer_profile, census_employee_id: census_employee.id)}
-      let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
-      let(:organization) { FactoryBot.create(:organization, :with_active_and_renewal_plan_years)}
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup renewal application"
+
+      let(:person)       { FactoryBot.create(:person, :with_family) }
+      let(:family)       { person.primary_family }
+      let!(:census_employee)  { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile, active_benefit_group_assignment: current_benefit_package.id) }
+      let(:employee_role)     { FactoryBot.create(:benefit_sponsors_employee_role, employer_profile: abc_profile, person: person, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: abc_profile.id) }
       let(:qle_kind) { FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date) }
-      let(:census_employee) { FactoryBot.create(:census_employee, employer_profile: organization.employer_profile)}
       let(:sep){
         sep = family.special_enrollment_periods.new
         sep.effective_on_kind = 'date_of_event'
@@ -210,47 +214,54 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
         sep.save
         sep
       }
-      let(:active_enrollment) { FactoryBot.create(:hbx_enrollment,
-                         household: family.active_household,
-                         kind: "employer_sponsored",
-                         employee_role_id: employee_role.id,
-                         enrollment_kind: "special_enrollment",
-                         aasm_state: 'coverage_selected'
-      )}
-      let(:renewal_enrollment) { FactoryBot.create(:hbx_enrollment,
-                         household: family.active_household,
-                         kind: "employer_sponsored",
-                         employee_role_id: employee_role.id,
-                         enrollment_kind: "special_enrollment",
-                         aasm_state: 'renewing_coverage_selected'
-      )}
+      let!(:active_enrollment) do
+        FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+                          household: family.active_household,
+                          aasm_state: "coverage_selected",
+                          kind: "employer_sponsored",
+                          effective_on: predecessor_application.start_on,
+                          rating_area_id: predecessor_application.recorded_rating_area_id,
+                          sponsored_benefit_id: predecessor_application.benefit_packages.first.health_sponsored_benefit.id,
+                          sponsored_benefit_package_id: predecessor_application.benefit_packages.first.id,
+                          benefit_sponsorship_id: predecessor_application.benefit_sponsorship.id,
+                          employee_role_id: employee_role.id)
+      end
 
-      let(:active_benefit_group) { organization.employer_profile.plan_years.where(aasm_state: "active").first.benefit_groups.first }
-      let(:renewal_benefit_group) { organization.employer_profile.plan_years.where(aasm_state: "renewing_enrolling").first.benefit_groups.first }
+      let!(:renewal_enrollment) do
+        FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+                          household: family.active_household,
+                          aasm_state: "renewing_coverage_selected",
+                          kind: "employer_sponsored",
+                          effective_on: renewal_application.start_on,
+                          rating_area_id: renewal_application.recorded_rating_area_id,
+                          sponsored_benefit_id: renewal_application.benefit_packages.first.health_sponsored_benefit.id,
+                          sponsored_benefit_package_id: renewal_application.benefit_packages.first.id,
+                          benefit_sponsorship_id: renewal_application.benefit_sponsorship.id,
+                          employee_role_id: employee_role.id)
+      end
 
       before do
         allow(family).to receive(:current_sep).and_return sep
-        active_enrollment.update_attribute(:benefit_group_id, active_benefit_group.id)
-        renewal_enrollment.update_attribute(:benefit_group_id, renewal_benefit_group.id)
+        active_enrollment.update_attribute(:sponsored_benefit_package_id, current_benefit_package.id)
+        renewal_enrollment.update_attribute(:sponsored_benefit_package_id, benefit_package.id)
       end
 
       it "should return active enrollment if the coverage effective on covers active plan year" do
-        allow(employee_role.census_employee).to receive(:active_benefit_group).and_return(active_benefit_group)
+        allow(employee_role.census_employee).to receive(:active_benefit_package).and_return(current_benefit_package)
         expect(subject.selected_enrollment(family, employee_role)).to eq active_enrollment
       end
 
       it "should return renewal enrollment if the coverage effective on covers renewal plan year" do
-        allow(employee_role.census_employee).to receive(:renewal_published_benefit_group).and_return(renewal_benefit_group)
-        renewal_plan_year = organization.employer_profile.plan_years.where(aasm_state: "renewing_enrolling").first
-        sep.update_attribute(:effective_on, renewal_plan_year.start_on + 2.days)
+        allow(employee_role.census_employee).to receive(:renewal_published_benefit_package).and_return(benefit_package)
+        sep.update_attribute(:effective_on, renewal_application.start_on + 2.days)
         expect(subject.selected_enrollment(family, employee_role)).to eq renewal_enrollment
       end
 
       context 'it should not return any enrollment' do
 
         before do
-          allow(employee_role.census_employee).to receive(:active_benefit_group).and_return nil
-          allow(employee_role.census_employee).to receive(:renewal_published_benefit_group).and_return nil
+          allow(employee_role.census_employee).to receive(:active_benefit_package).and_return nil
+          allow(employee_role.census_employee).to receive(:renewal_published_benefit_package).and_return nil
         end
 
         it "should not return active enrollment although if the coverage effective on covers active plan year & if not belongs to the assigned benefit group" do
@@ -258,8 +269,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
         end
 
         it "should not return renewal enrollment although if the coverage effective on covers renewal plan year & if not belongs to the assigned benefit group" do
-          renewal_plan_year = organization.employer_profile.plan_years.where(aasm_state: "renewing_enrolling").first
-          sep.update_attribute(:effective_on, renewal_plan_year.start_on + 2.days)
+          sep.update_attribute(:effective_on, renewal_application.start_on + 2.days)
           expect(subject.selected_enrollment(family, employee_role)).to eq nil
         end
       end
