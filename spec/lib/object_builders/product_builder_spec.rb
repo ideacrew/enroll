@@ -85,7 +85,7 @@ describe "qhp builder" do
       expect(BenefitMarkets::Products::Product.aca_shop_market.count).to eq 2
     end
 
-    it "should load/update 2 congressional_market products from file" do
+    it "should load/update 1 congressional_market products from file" do
       expect(BenefitMarkets::Products::Product.congressional_market.count).to eq 1
     end
 
