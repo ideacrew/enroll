@@ -11,10 +11,11 @@ class QlesController < ApplicationController
   end
 
   def new
-    @qle = ::Forms::QleForm.for_new(params.permit!.to_h)
+    @qle = QualifyingLifeEventKind.new
   end
 
   def create
-    @qle = ::Forms::QleForm.for_create(params)
+    binding.pry
+    # @qle = ::Forms::QleForm.for_create(params)
   end
 end

@@ -622,6 +622,8 @@ Rails.application.routes.draw do
     collection do
       get :new_manage_qle
       post :create_manage_qle
+      get :new
+      post :create
     end
   end
 

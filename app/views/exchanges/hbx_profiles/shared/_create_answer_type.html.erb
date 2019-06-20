@@ -2,16 +2,11 @@
   <h5>Please select the type of answer that is allowed for this question</h5>
   <%= fields_for @answer, method: "post", class: "form" do |s| %>
     <tr>
-      <p > <%=label_tag  "date"%> <%= s.check_box :type,  :class =>"answer_type_date", :onclick => "checkChecked(this.val())" %></p>
-      <p> <%=label_tag  "multiple Choice"%> <%= s.check_box :type, :id => "Multiple Choice", :onclick => "checkChecked(this.val())" %></p>
-      <p> <%=label_tag "true/False"%> <%= s.check_box  :type,  :id => "True/False", :onclick => "checkChecked(this.val())" %></p>
+      <p > <%=label_tag  "date"%> 
+      <input type="radio" id="huey" name="drone" value="huey"
+         checked>
+      
+      
     </tr>
   </div>
   <% end %>
-
-  <script type="text/javascript" charset="utf-8">
-  function checkChecked(va){
-    console.log('hit')
- } 
-
-</script>
