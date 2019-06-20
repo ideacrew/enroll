@@ -41,11 +41,14 @@
           </th>
           <tr class = 'create_qle_question'>
           </tr>
-        </tr>
-        <tr>
+          <tr>
+            <td> <%= render partial: "exchanges/hbx_profiles/shared/create_question", :locals => {f: f} %></td>
+          </tr>
+          <tr>
           <td >
-           <span> <%= f.text_field :start_on, class: " form-control-custom-qle uidatepicker", placeholder: 'Effective From', autocomplete: :off %></span>
+            <%= f.text_field :start_on, class: " form-control-custom-qle uidatepicker", placeholder: 'Effective From', autocomplete: :off %>
           </td>
+
         </tr>
         <tr>
           <td>
@@ -76,23 +79,41 @@
 $(".uidatepicker").datepicker({maxDate: "-1D", changeMonth: true, changeYear: true, dateFormat: 'mm/dd/yy',  yearRange: (new Date).getFullYear()-110 + ":" + (new Date).getFullYear()});
  function create_qle_question() {
      event.preventDefault();
+<<<<<<< HEAD:app/views/qles/new.html.erb
    $(".create_qle_question").html("<%#= escape_javascript render "exchanges/hbx_profiles/shared/create_question" %>").toggle()
+=======
+  //  $(".create_qle_question").html("<%= escape_javascript render "exchanges/hbx_profiles/shared/create_question" %>").toggle()
+>>>>>>> updating qle creation form:app/views/exchanges/hbx_profiles/custom_qle.html.erb
  }
 
 function showQleQuestion(question) {
    $('#qle-question').html("<h4>"+ question +"</h4>")
    $('#qle-question-submit').hide()
    $('#qle-question-form').hide()
+<<<<<<< HEAD:app/views/qles/new.html.erb
    $("#qle-answer").html("<%#= escape_javascript render "exchanges/hbx_profiles/shared/create_answer_type" %>")
+=======
+  //  $("#qle-answer").html("<%= escape_javascript render "exchanges/hbx_profiles/shared/create_answer_type" %>")
+>>>>>>> updating qle creation form:app/views/exchanges/hbx_profiles/custom_qle.html.erb
 
  }
  function createPossibleAnswers(){
    $('custom-answer-type').hide()
+<<<<<<< HEAD:app/views/qles/new.html.erb
    $("#qle-answer").html("<%#= escape_javascript render partial: 'exchanges/hbx_profiles/shared/create_possible_answers'%>")
+=======
+    sleep(2000)
+  //  $("#qle-answer").html("<%= escape_javascript render partial: 'exchanges/hbx_profiles/shared/create_possible_answers'%>")
+>>>>>>> updating qle creation form:app/views/exchanges/hbx_profiles/custom_qle.html.erb
  } 
-  function updateAnswer(){
+  function checkChecked(va){
+    console.log('hit')
  } 
 
+<<<<<<< HEAD:app/views/qles/new.html.erb
 
 </script> -->
+=======
+</script>
+>>>>>>> updating qle creation form:app/views/exchanges/hbx_profiles/custom_qle.html.erb
 
