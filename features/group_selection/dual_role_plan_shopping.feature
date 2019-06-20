@@ -1,5 +1,12 @@
-@wip
 Feature: EE with consumer role plan purchase
+
+  # TODO: revisit code for background scenarios
+  Background: Setup permissions, HBX Admin, users, and organizations and employer profiles
+    Given a consumer role person with family
+    Given an employer with initial application
+    Given all products with issuer profile
+    Then  an application provides health and dental packages
+    Then there are sponsored benefit offerings for spouse and child
 
   Scenario: when user purchase plan for self & having ineligible family member
     Given a matched Employee exists with consumer role
@@ -45,7 +52,7 @@ Feature: EE with consumer role plan purchase
     And user did not apply coverage for child as ivl
     And employee also has a dental enrollment with primary covered under first employer
     Then Employee sign in to portal
-    Then employee should see the enrollment with make changes button
+    Then employee should see the dental enrollment with make changes button
     When employee clicked on make changes button
     Then employee should see the ineligible family member disabled and unchecked
     And employee should see the eligible family member enabled and checked

@@ -39,27 +39,19 @@ Given (/a matched Employee exists with multiple employee roles/) do
 end
 
 Given (/a matched Employee exists with consumer role/) do
-  org = FactoryBot.create :organization, :with_active_plan_year
-  benefit_group = org.employer_profile.plan_years[0].benefit_groups[0]
-  bga = FactoryBot.build :benefit_group_assignment, benefit_group: benefit_group
-  FactoryBot.create(:user)
-  @person = FactoryBot.create(:person, :with_family, :with_consumer_role, first_name: "Employee", last_name: "E", user: user)
-  employee_role = FactoryBot.create :employee_role, person: @person, employer_profile: org.employer_profile
-  ce =  FactoryBot.build(:census_employee,
-          first_name: @person.first_name,
-          last_name: @person.last_name,
-          dob: @person.dob,
-          ssn: @person.ssn,
-          employee_role_id: employee_role.id,
-          employer_profile: org.employer_profile
-        )
-
-  ce.benefit_group_assignments << bga
-  ce.link_employee_role!
+  FactoryBot.create(:employee_role, person: @person, employer_profile: @profile, benefit_sponsors_employer_profile_id: @profile.id)
+  ce = FactoryBot.build(
+    :benefit_sponsors_census_employee_with_active_assignment,
+    first_name: @person.first_name,
+    last_name: @person.last_name,
+    dob: @person.dob,
+    ssn: @person.ssn,
+    employer_profile: @profile,
+    employee_role_id: @person.employee_roles.first.id,
+    benefit_sponsorship: @sponsorship
+  )
   ce.save!
-
-  employee_role.update_attributes!(census_employee_id: ce.id, employer_profile_id: org.employer_profile.id)
-  ce.employee_role.reload
+  @person.employee_roles.first.update_attributes(census_employee_id: ce.id)
   FactoryBot.create(:hbx_profile)
 end
 
@@ -75,11 +67,12 @@ And(/(.*) has a dependent in (.*) relationship with age (.*) than 26/) do |role,
                 FactoryBot.create :person, :with_consumer_role, :with_active_consumer_role, dob: dob
               end
   fm = FactoryBot.create :family_member, family: @family, person: dependent
-  user.person.person_relationships << PersonRelationship.new(kind: kind, relative_id: dependent.id)
+  final_person = @person || user.person
+  final_person.person_relationships << PersonRelationship.new(kind: kind, relative_id: dependent.id)
   ch = @family.active_household.immediate_family_coverage_household
   ch.coverage_household_members << CoverageHouseholdMember.new(family_member_id: fm.id)
   ch.save
-  user.person.save
+  final_person.save
 end
 
 And(/(.*) also has a health enrollment with primary person covered/) do |role|
@@ -103,12 +96,18 @@ end
 
 And(/employee also has a (.*) enrollment with primary covered under (.*) employer/) do |coverage_kind, var|
   sep = FactoryBot.create :special_enrollment_period, family: @person.primary_family
+  product = if coverage_kind == 'dental'
+              FactoryBot.create(:benefit_markets_products_dental_products_dental_product, :with_issuer_profile, dental_level: 'low', dental_plan_kind: 'ppo')
+            else
+              FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile)
+            end
   benefit_group = if var == "first"
                     @person.active_employee_roles[0].employer_profile.plan_years[0].benefit_groups[0]
                   else
                     @person.active_employee_roles[1].employer_profile.plan_years[0].benefit_groups[0]
                   end
-  enrollment = FactoryBot.create(:hbx_enrollment,
+  benefit_package =  @person.active_employee_roles.first.employer_profile.benefit_sponsorships.first.benefit_applications.first.benefit_packages.first
+  enrollment = FactoryBot.create(:hbx_enrollment, product: product,
                                   household: @person.primary_family.active_household,
                                   kind: "employer_sponsored",
                                   effective_on: TimeKeeper.date_of_record,
@@ -116,7 +115,10 @@ And(/employee also has a (.*) enrollment with primary covered under (.*) employe
                                   enrollment_kind: "special_enrollment",
                                   special_enrollment_period_id: sep.id,
                                   employee_role_id: (var == "first" ? @person.active_employee_roles[0].id : @person.active_employee_roles[1].id),
-                                  benefit_group_id: benefit_group.id
+                                  benefit_group_id: benefit_group.id,
+                                  rating_area_id: benefit_package.rating_area.id,
+                                  sponsored_benefit_package_id: benefit_package.id,
+                                  sponsored_benefit: benefit_package.sponsored_benefits[1]
                                 )
   enrollment.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: @person.primary_family.primary_applicant.id,
     eligibility_date: TimeKeeper.date_of_record - 2.months,
@@ -158,8 +160,8 @@ end
 And(/(.*) should see the (.*) family member (.*) and (.*)/) do |employee, type, disabled, checked|
   wait_for_ajax
   if type == "ineligible"
-    expect(find("#family_member_ids_1", wait: 5)).to be_disabled
-    expect(find("#family_member_ids_1")).not_to be_checked
+    expect(find("input[type='checkbox']:disabled", wait: 5)).to be_disabled
+    expect(find("input[type='checkbox']:disabled")).not_to be_checked
   else
     expect(find("#family_member_ids_0", wait: 5)).not_to be_disabled
     expect(find("#family_member_ids_0")).to be_checked
@@ -179,6 +181,7 @@ end
 And(/(.*) should also see the reason for ineligibility/) do |named_person|
   person_hash = people[named_person]
   person = person_hash ? Person.where(:first_name => /#{person_hash[:first_name]}/i, :last_name => /#{person_hash[:last_name]}/i).first : ''
+  person = person.empty? ? @person : ''
   role = named_person
 
   if role == 'employee' && person.active_employee_roles.present?
@@ -301,13 +304,12 @@ When(/employee switched to (.*) employer/) do |employer|
 end
 
 When(/employee clicked on shop for plans/) do
-  find(".interaction-click-control-shop-for-plans").click
-  wait_for_ajax
+  find(".interaction-click-control-shop-for-plans", :wait => 10).click
 end
 
 When(/employee switched for (.*) benefits/) do |market_kind|
   if market_kind == "individual"
-    find(:xpath, '//*[@id="market_kinds"]/div/div[2]/label').click
+    find(:label, 'Individual Benefits').click
   else
     find(:xpath, '//*[@id="market_kinds"]/div/div[1]/label').click
   end
