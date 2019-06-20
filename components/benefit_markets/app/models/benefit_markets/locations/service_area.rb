@@ -24,6 +24,7 @@ module BenefitMarkets
       validates_presence_of :issuer_profile_id, allow_nil: false
       validate :location_specified
 
+      index({active_year: 1})
       index({county_zip_ids: 1})
       index({covered_state_codes: 1})
 

@@ -57,6 +57,12 @@ class MigrateDcBenefitApplication < Mongoid::Migration
         {"$out"=> "benefit_markets_benefit_sponsor_catalogs"}
       ],:allow_disk_use => true).each
 
+      # update product package ids.
+      # BenefitMarkets::BenefitSponsorCatalog.each do |bsc|
+      #   bsc.product_packages.map {|pp| pp._id = BSON::ObjectId.new}
+      #   bsc.save(validate: false)
+      # end
+
       # congress
       Organization.where(:'hbx_id'.in=>["100101", "118510", "100102"]).each do |org|
         org.employer_profile.plan_years.each do |plan_year|
@@ -64,8 +70,14 @@ class MigrateDcBenefitApplication < Mongoid::Migration
           service_areas = ::BenefitMarkets::Locations::ServiceArea.where("active_year" => benefit_catalog.product_active_year).to_a
           catalog = BenefitMarkets::BenefitSponsorCatalogFactory.call(plan_year.start_on, benefit_catalog, service_areas)
           catalog.benefit_application_id = plan_year.id
-          catalog.save
+          catalog.save(validate: false)
         end
+      end
+
+      @rating_service_area_hash ={2014 => {}, 2015 => {}, 2016 => {}, 2017 => {}, 2018 => {}, 2019 => {}}
+      ::BenefitMarkets::Locations::RatingArea.all.each do |rating_area|
+        @rating_service_area_hash[rating_area.active_year]['rating_area'] = rating_area.id
+        @rating_service_area_hash[rating_area.active_year]['service_area'] = ::BenefitMarkets::Locations::ServiceArea.where(active_year: rating_area.active_year).map(&:_id)
       end
 
       BenefitMarkets::BenefitSponsorCatalog.create_indexes
@@ -134,7 +146,9 @@ class MigrateDcBenefitApplication < Mongoid::Migration
     raise "Plan year not found #{plan_year.employer_profile.organization.hbx_id}" if benefit_applications.count == 0
 
     @benefit_application = benefit_applications.first
-    @benefit_application.pull_benefit_sponsorship_attributes
+
+    @benefit_application.recorded_rating_area_id = @rating_service_area_hash[plan_year.start_on.year]['rating_area']
+    @benefit_application.recorded_service_area_ids = @rating_service_area_hash[plan_year.start_on.year]['service_area']
 
     benefit_sponsor_catalog = BenefitMarkets::BenefitSponsorCatalog.where(benefit_application_id: plan_year.id).first rescue nil
     raise "@benefit_sponsor_catalog not found #{plan_year.employer_profile.organization.hbx_id}" if benefit_sponsor_catalog.blank?
@@ -226,7 +240,7 @@ class MigrateDcBenefitApplication < Mongoid::Migration
     @benefit_package_map.each do |benefit_group, benefit_package|
       census_employees = CensusEmployee.unscoped.where("benefit_group_assignments.benefit_group_id" => benefit_group)
 
-      ce = census_employees.select{|ce| ce.benefit_sponsorship_id.blank?}
+      ce = census_employees.where(benefit_sponsorship_id: nil)
       ce.update_all(benefit_sponsorship_id: @benefit_sponsorship, benefit_sponsors_employer_profile_id: @benefit_sponsorship.profile.id) if ce.present?
 
       census_employees.each do |census_employee|

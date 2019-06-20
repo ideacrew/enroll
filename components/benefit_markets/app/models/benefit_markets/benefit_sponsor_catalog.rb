@@ -31,6 +31,7 @@ module BenefitMarkets
     # the seed for both of these on benefit market catalog.
 
     index({"benefit_application_id" => 1})
+    index({"product_packages._id" => 1})
 
 
     def benefit_application=(benefit_application)

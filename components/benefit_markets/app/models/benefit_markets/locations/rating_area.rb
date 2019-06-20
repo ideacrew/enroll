@@ -20,6 +20,7 @@ module BenefitMarkets
     validate :location_specified
 
     index({county_zip_ids: 1})
+    index({active_year: 1})
     index({covered_state_codes: 1})
 
     def location_specified
