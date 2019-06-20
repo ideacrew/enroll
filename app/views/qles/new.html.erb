@@ -1,119 +1,71 @@
+
 <div class="container"  >
   <div id ='custom-sep-container' >
-  <%= form_for @qle, as: :qle, url: {action: "create"}, method: "post", class: "form" do |f| %>
-    <table class="table table-border" id ='custom-sep-container' >
-      <thead>
-        <th>Custom Qualifying Life Event</th>
-      </thead>
-      <tbody>
-        <tr>
-          <td>
-           <span> <%= f.text_field :title, class: "form-control-custom-qle", placeholder: 'Title', autocomplete: :off %></span>
-          </td>
-        </tr>
-        <tr>
-          <td>
-           <span> <%= f.text_field :event_kind_label, class: "form-control-custom-qle", placeholder: 'Event Kind Label', autocomplete: :off %></span>
-          </td>
-        </tr>
-        <tr>
-          <td>
-           <span> <%= f.text_field :tool_tip, class: "form-control-custom-qle", placeholder: 'Tool tip text', autocomplete: :off %></span>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <span> <%= f.text_field :reason, class: " form-control-custom-qle", placeholder: 'Reason', autocomplete: :off %></span>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <p><%= label_tag "Visibility" %><p>
-              <% ["User Self Service", "Admin Only"].each do |c| %>
-                <p> <%=label_tag "#{c}"%>
-                <%= check_box_tag "qle[visibility]", "#{c}"%></p>
-              <% end %>
-          </td>
-        </tr>
-        <tr>
-         <th>
-            <%= link_to "Create QLE Questions", nil, onclick: "create_qle_question();", class:"" %>
-          </th>
-          <tr class = 'create_qle_question'>
+    <%= form_for @qle, url:  qles_path , method: "post", class: "form" do |f| %>
+      <table class="table table-border" id ='custom-sep-container' >
+        <thead>
+          <th>Custom Qualifying Life Event</th>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+            <span> <%= f.text_field :title, class: "form-control-custom-qle", placeholder: 'Title', autocomplete: :off %></span>
+            </td>
+          </tr>
+          <tr>
+            <td>
+            <span> <%= f.text_field :event_kind_label, class: "form-control-custom-qle", placeholder: 'Event Kind Label', autocomplete: :off %></span>
+            </td>
+          </tr>
+          <tr>
+            <td>
+            <span> <%= f.text_field :tool_tip, class: "form-control-custom-qle", placeholder: 'Tool tip text', autocomplete: :off %></span>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <span> <%= f.text_field :reason, class: " form-control-custom-qle", placeholder: 'Reason', autocomplete: :off %></span>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <p><%= label_tag "Visibility" %><p>
+                <% ["User Self Service", "Admin Only"].each do |c| %>
+                  <p> <%=label_tag "#{c}"%>
+                  <%= radio_button_tag "qle[visibility]", "#{c}"%></p>
+                <% end %>
+            </td>
           </tr>
           <tr>
             <td> <%= render partial: "exchanges/hbx_profiles/shared/create_question", :locals => {f: f} %></td>
           </tr>
           <tr>
-          <td >
-            <%= f.text_field :start_on, class: " form-control-custom-qle uidatepicker", placeholder: 'Effective From', autocomplete: :off %>
-          </td>
-
-        </tr>
-        <tr>
-          <td>
-           <span> <%= f.text_field :end_on, class: " form-control-custom-qle uidatepicker ", placeholder: 'Effective Until', autocomplete: :off %></span>
-          </td>
-        </tr>
-        <tr>
-          <td>
-           <span> <%= f.select :is_self_attested, ['Is Self Attested', 'yes', 'no'], class: " form-control-custom-qle  ", placeholder: 'Self Attested' %></span>
-          </td>
+            <td >
+              <%= f.text_field :start_on, class: " form-control-custom-qle uidatepicker", placeholder: 'Effective From', autocomplete: :off %>
+            </td>
           </tr>
           <tr>
+            <td>
+            <span> <%= f.text_field :end_on, class: " form-control-custom-qle uidatepicker ", placeholder: 'Effective Until', autocomplete: :off %></span>
+            </td>
           </tr>
-        </tr>
-  
-      </tbody>
-    </table>
-    <div class="row no-buffer child-row">
-      <div class="col-md-12 no-pd col-sm-12 col-xs-12">
-        <%= f.submit "Submit", :class => "btn btn-primary create_eligibility", id: 'create_eligibility', :size => '100px'%>
+          <tr>
+            <td>
+            <span> <%= f.select :is_self_attested, ['Is Self Attested', 'yes', 'no'], class: " form-control-custom-qle  ", placeholder: 'Self Attested' %></span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="row no-buffer child-row">
+        <div class="col-md-12 no-pd col-sm-12 col-xs-12">
+          <%= f.submit "Submit", :class => "btn btn-primary create_eligibility", id: 'create_eligibility', :size => '100px'%>
+        </div>
       </div>
-    </div>
-  <% end %>
-     
+    <% end %>
   </div>
 </div>
-<!-- <script type="text/javascript" charset="utf-8">
-$(".uidatepicker").datepicker({maxDate: "-1D", changeMonth: true, changeYear: true, dateFormat: 'mm/dd/yy',  yearRange: (new Date).getFullYear()-110 + ":" + (new Date).getFullYear()});
- function create_qle_question() {
-     event.preventDefault();
-<<<<<<< HEAD:app/views/qles/new.html.erb
-   $(".create_qle_question").html("<%#= escape_javascript render "exchanges/hbx_profiles/shared/create_question" %>").toggle()
-=======
-  //  $(".create_qle_question").html("<%= escape_javascript render "exchanges/hbx_profiles/shared/create_question" %>").toggle()
->>>>>>> updating qle creation form:app/views/exchanges/hbx_profiles/custom_qle.html.erb
- }
+<script type="text/javascript" charset="utf-8">
+  $(".uidatepicker").datepicker({maxDate: "-1D", changeMonth: true, changeYear: true, dateFormat: 'mm/dd/yy',  yearRange: (new Date).getFullYear()-110 + ":" + (new Date).getFullYear()});
 
-function showQleQuestion(question) {
-   $('#qle-question').html("<h4>"+ question +"</h4>")
-   $('#qle-question-submit').hide()
-   $('#qle-question-form').hide()
-<<<<<<< HEAD:app/views/qles/new.html.erb
-   $("#qle-answer").html("<%#= escape_javascript render "exchanges/hbx_profiles/shared/create_answer_type" %>")
-=======
-  //  $("#qle-answer").html("<%= escape_javascript render "exchanges/hbx_profiles/shared/create_answer_type" %>")
->>>>>>> updating qle creation form:app/views/exchanges/hbx_profiles/custom_qle.html.erb
-
- }
- function createPossibleAnswers(){
-   $('custom-answer-type').hide()
-<<<<<<< HEAD:app/views/qles/new.html.erb
-   $("#qle-answer").html("<%#= escape_javascript render partial: 'exchanges/hbx_profiles/shared/create_possible_answers'%>")
-=======
-    sleep(2000)
-  //  $("#qle-answer").html("<%= escape_javascript render partial: 'exchanges/hbx_profiles/shared/create_possible_answers'%>")
->>>>>>> updating qle creation form:app/views/exchanges/hbx_profiles/custom_qle.html.erb
- } 
-  function checkChecked(va){
-    console.log('hit')
- } 
-
-<<<<<<< HEAD:app/views/qles/new.html.erb
-
-</script> -->
-=======
 </script>
->>>>>>> updating qle creation form:app/views/exchanges/hbx_profiles/custom_qle.html.erb
 
