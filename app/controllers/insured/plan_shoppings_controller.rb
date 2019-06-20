@@ -173,7 +173,7 @@ class Insured::PlanShoppingsController < ApplicationController
       waiver_enrollment = household.hbx_enrollments.where(predecessor_enrollment_id: hbx_enrollment.id).first
       redirect_to print_waiver_insured_plan_shopping_path(waiver_enrollment), notice: "Waive Coverage Successful"
     else
-      redirect_back(fallback_location: :back)
+      redirect_back(fallback_location: :root_path)
     end
   end
 
