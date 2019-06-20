@@ -55,7 +55,7 @@ function getFormattedDate(date){
 }
 
 function validateEmailFormat(element) {
-  var emailAddress = element.value
+  var emailAddress = element.value;
   if (!isEmail(emailAddress)) {
     swal({
       icon: 'error',
