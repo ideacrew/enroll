@@ -23,9 +23,6 @@ FactoryBot.define do
           ),
         BenefitMarkets::ContributionModels::MemberRelationship.new(
           relationship_name: "dependent",
-          age_threshold: 26,
-          age_comparison: :>=,
-          disability_qualifier: true,
           relationship_kinds: ["child", "adopted_child", "foster_child", "stepchild", "ward"]
           )
       ]

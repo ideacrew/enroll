@@ -39,9 +39,7 @@
             raise "Unable to find enrollment #{eg_id}"
           end
 
-          if !['coverage_selected', 'auto_renewing', 'enrolled_contingent'].include?(hbx_enrollment.aasm_state)
-             raise "Hbx Enrollment #{hbx_enrollment.hbx_id} is in #{hbx_enrollment.aasm_state}"
-          end
+          raise "Hbx Enrollment #{hbx_enrollment.hbx_id} is in #{hbx_enrollment.aasm_state}"  unless ['coverage_selected', 'auto_renewing'].include?(hbx_enrollment.aasm_state)
 
           if hbx_enrollment.auto_renewing?
             active_renewal = hbx_enrollment.family.active_household.hbx_enrollments.where({

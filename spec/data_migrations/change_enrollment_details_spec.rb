@@ -120,8 +120,8 @@ describe ChangeEnrollmentDetails do
 
       
       it "should change the aasm state " do
-        ClimateControl.modify hbx_id:"#{hbx_enrollment.hbx_id}", action: "change_enrollment_status",new_aasm_state: "move_to_enrolled" do 
-          hbx_enrollment.update_attribute("aasm_state","enrolled_contingent")
+        ClimateControl.modify hbx_id: hbx_enrollment.hbx_id.to_s, action: "change_enrollment_status", new_aasm_state: "move_to_enrolled" do
+          hbx_enrollment.update_attribute('aasm_state', 'unverified')
           hbx_enrollment.reload
           allow(::BenefitSponsors::BenefitPackages::BenefitPackage).to receive(:find).and_return(benefit_package)
           allow(benefit_package).to receive(:successor).and_return(nil)

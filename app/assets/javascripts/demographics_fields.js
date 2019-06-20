@@ -337,7 +337,7 @@ var PersonValidations = (function(window, undefined) {
 
 })(window);
 
-$(document).on('ready page:load turbolinks:load', function () {
+$(document).on('turbolinks:load', function () {
   applyListeners();
   validationForIndianTribeMember();
 

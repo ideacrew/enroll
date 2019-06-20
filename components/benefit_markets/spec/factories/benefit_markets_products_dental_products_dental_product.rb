@@ -38,6 +38,14 @@ FactoryBot.define do
       end
     end
 
+    trait :with_issuer_profile do
+      transient do
+        assigned_site { nil }
+      end
+
+      issuer_profile { create(:benefit_sponsors_organizations_issuer_profile, assigned_site: assigned_site) }
+    end
+
     after(:build) do |product, evaluator|
       product.premium_tables << build_list(:benefit_markets_products_premium_table, 1, effective_period: product.application_period)
     end

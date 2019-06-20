@@ -21,7 +21,7 @@ RSpec.describe "insured/group_selection/_enrollment.html.erb", dbclean: :after_e
     let(:benefit_group_assignment) { census_employee.active_benefit_group_assignment }
     let(:active_household) {family.active_household}
     let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: active_household )}
-    let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
+    let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile) }
 
     before :each do
       allow(hbx_enrollment).to receive(:product).and_return(product)
@@ -76,7 +76,7 @@ RSpec.describe "insured/group_selection/_enrollment.html.erb", dbclean: :after_e
       let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
       let(:hbx_enrollment) { FactoryBot.build(:hbx_enrollment, :with_enrollment_members, household: family.active_household, kind: kind)}
       let(:person) { FactoryBot.build(:person) }
-      let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
+      let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile) }
 
       before :each do
         allow(hbx_enrollment).to receive(:product).and_return(product)
