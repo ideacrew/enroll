@@ -1,11 +1,6 @@
-
-
-
-
-
 <div class="container"  >
   <div id ='custom-sep-container' >
-  <%= form_for @qle, remote: true, url:  custom_qle_exchanges_hbx_profiles_path , method: "post", class: "form" do |f| %>
+  <%= form_for @qle, as: :qle, url: {action: "create"}, method: "post", class: "form" do |f| %>
     <table class="table table-border" id ='custom-sep-container' >
       <thead>
         <th>Custom Qualifying Life Event</th>
@@ -77,27 +72,27 @@
      
   </div>
 </div>
-<script type="text/javascript" charset="utf-8">
+<!-- <script type="text/javascript" charset="utf-8">
 $(".uidatepicker").datepicker({maxDate: "-1D", changeMonth: true, changeYear: true, dateFormat: 'mm/dd/yy',  yearRange: (new Date).getFullYear()-110 + ":" + (new Date).getFullYear()});
  function create_qle_question() {
      event.preventDefault();
-   $(".create_qle_question").html("<%= escape_javascript render "exchanges/hbx_profiles/shared/create_question" %>").toggle()
+   $(".create_qle_question").html("<%#= escape_javascript render "exchanges/hbx_profiles/shared/create_question" %>").toggle()
  }
 
 function showQleQuestion(question) {
    $('#qle-question').html("<h4>"+ question +"</h4>")
    $('#qle-question-submit').hide()
    $('#qle-question-form').hide()
-   $("#qle-answer").html("<%= escape_javascript render "exchanges/hbx_profiles/shared/create_answer_type" %>")
+   $("#qle-answer").html("<%#= escape_javascript render "exchanges/hbx_profiles/shared/create_answer_type" %>")
 
  }
  function createPossibleAnswers(){
    $('custom-answer-type').hide()
-   $("#qle-answer").html("<%= escape_javascript render partial: 'exchanges/hbx_profiles/shared/create_possible_answers'%>")
+   $("#qle-answer").html("<%#= escape_javascript render partial: 'exchanges/hbx_profiles/shared/create_possible_answers'%>")
  } 
   function updateAnswer(){
  } 
 
 
-</script>
+</script> -->
 

@@ -34,21 +34,11 @@
         </tbody>
       </table>
     <% end %>
+    <br/>
+    <br/>
 
-
-    <%= form_for Setting.get_individual_market_monthly_enrollment_due_on, {url: update_setting_exchanges_hbx_profiles_path, method: :post, class: 'form'} do |f| %>
-      <table class="table table-border <%= pundit_class HbxProfile, :modify_admin_tabs?%> ">
-        <tbody>
-          <td width="50%" style="padding: 18px;font-weight: bold;">Create Custom SEP%
-          </td>
-          <td>
-           <%= link_to  "custom sep",  custom_qle_exchanges_hbx_profiles_path %>
-            <button type="submit" class="btn btn-primary pull-right display-on-mobile">Customer sep</button>
-          </td>
-          <td class="hide-on-mobile"><button type="submit" class="btn btn-primary pull-right">Update</button></td>
-        </tbody>
-      </table>
-    <% end %>
+    <h2 class="heading-text">Manage SEP's/QLE's</h2>
+    <%= link_to "IVL/COVERALL QLE's", new_manage_qle_qle_index_path(market_kind: 'ivl'), {class: 'btn btn-default'} %>
+    <%= link_to "SHOP QLE's", new_manage_qle_qle_index_path(market_kind: 'shop'), {class: 'btn btn-default'} %>
   </div>
-
 </div>

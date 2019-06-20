@@ -95,8 +95,6 @@ Rails.application.routes.draw do
       collection do
         get :family_index
         get :family_index_dt
-        get :custom_qle
-        post :custom_qle
         get :custom_qle_answer
         post :custom_qle_answer
         get :build_attestation_flow
@@ -619,6 +617,13 @@ Rails.application.routes.draw do
     end
   end
   resources :office_locations, only: [:new]
+
+  resources :qle do
+    collection do
+      get :new_manage_qle
+      post :create_manage_qle
+    end
+  end
 
   get "document/download/:bucket/:key" => "documents#download", as: :document_download
   get "document/authorized_download/:model/:model_id/:relation/:relation_id" => "documents#authorized_download", as: :authorized_document_download

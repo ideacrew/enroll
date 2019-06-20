@@ -1,4 +1,4 @@
-  <%= form_for @question, url: "exchanges/hbx_profiles/custom_sep" , action: 'custom_sep', method: "post", class: "form" do |q| %>
+  <%= form_for @question, as: :question, url: "exchanges/hbx_profiles/custom_sep" , action: 'custom_sep', method: "post", class: "form" do |q| %>
     <table class= "table table-border" id = 'custom-sep-container' >
       <tbody>
           <div id= "qle-question"></div>
