@@ -129,8 +129,6 @@ group :development, :test do
   gem 'capistrano',             '~> 3.1'
   gem 'capistrano-rails',       '1.4'
   gem 'email_spec',             '~> 2'
-  gem 'pry'
-  gem 'rb-readline'
   gem 'factory_bot_rails',      '~> 4.11'
   gem 'forgery',                '~> 0.7.0'
   gem 'parallel_tests',         '~> 2.26.2'
@@ -142,6 +140,12 @@ group :development, :test do
   gem 'yard-mongoid',           '~> 0.1',     require: false
   gem 'rails-controller-testing'
   gem 'climate_control', '~> 0.2.0'
+  gem 'rb-readline'
+  gem 'pry'
+  gem 'pry-byebug'
+  gem 'pry-rails'
+  gem 'pry-remote'
+  gem 'pry-stack_explorer'
 end
 
 group :test do
