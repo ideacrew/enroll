@@ -590,7 +590,8 @@ class HbxEnrollment
                                                             :coverage_kind => coverage_kind}).renewing
 
     # waive only renewal enrollments if waives coverage after clicking "make changes" on renewing coverage
-    enrollments = if RENEWAL_STATUSES.include?(parent_enrollment.aasm_state)
+    aasm_state = parent_enrollment.aasm_state if parent_enrollment
+    enrollments = if RENEWAL_STATUSES.include?(aasm_state)
                     parent_enrollment.to_a
                   elsif is_open_enrollment? && renewing_enrollments.present?
                     update(predecessor_enrollment_id: renewing_enrollments.first.id)
@@ -624,7 +625,6 @@ class HbxEnrollment
 
   def waive_enrollment
     return unless is_shop? && may_waive_coverage?
-
     waive_coverage!
     set_predecessor_if_exists if predecessor_enrollment_id.blank?
     term_existing_shop_enrollments
