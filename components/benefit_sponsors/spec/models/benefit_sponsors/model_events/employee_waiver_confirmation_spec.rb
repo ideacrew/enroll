@@ -30,10 +30,9 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeWaiverConfirmation', dbcle
     hbx_enrollment
   }
 
-  # Need to fix once waiver functionality is ready
   describe "ModelEvent", dbclean: :around_each  do
     context "when employee waives coverage" do
-      xit "should trigger model event" do
+      it "should trigger model event" do
         model_instance.class.observer_peers.keys.select{ |ob| ob.is_a? BenefitSponsors::Observers::NoticeObserver }.each do |observer|
           expect(observer).to receive(:process_enrollment_events) do |_model_instance, model_event|
             expect(model_event).to be_an_instance_of(::BenefitSponsors::ModelEvents::ModelEvent)
@@ -45,13 +44,12 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeWaiverConfirmation', dbcle
     end
   end
 
-  # Need to fix once waiver functionality is ready
   describe "NoticeTrigger", dbclean: :around_each  do
     context "when employee waives coverage" do
       subject { BenefitSponsors::Observers::NoticeObserver.new  }
       let(:model_event) { BenefitSponsors::ModelEvents::ModelEvent.new(:employee_waiver_confirmation, model_instance, {}) }
 
-      xit "should trigger notice event" do
+      it "should trigger notice event" do
         allow(model_instance).to receive(:is_shop?).and_return(true)
         allow(model_instance).to receive(:census_employee).and_return(census_employee)
         allow(census_employee).to receive(:employee_role).and_return(employee_role)

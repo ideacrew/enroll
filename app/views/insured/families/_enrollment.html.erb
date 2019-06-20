@@ -30,7 +30,7 @@
             <%= number_to_currency(current_premium(hbx_enrollment), precision: 2) %>/month
           </p>
         </div>
-        <% if hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_expired? %>
+        <% if hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_expired? || hbx_enrollment.coverage_termination_pending? %>
         <div class="enrollment-effective info vertical-align-top">
           <strong><%= l10n("effective_date") %>:
           </strong>

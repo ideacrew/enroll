@@ -128,43 +128,60 @@ class Insured::PlanShoppingsController < ApplicationController
 
   # Waives against an existing enrollment
   def waive
-    person = @person
     hbx_enrollment = HbxEnrollment.find(params.require(:id))
-    hbx_enrollment.waive_coverage_by_benefit_group_assignment(params.require(:waiver_reason))
+    waiver_success = false
 
-    redirect_to print_waiver_insured_plan_shopping_path(hbx_enrollment), notice: "Waive Coverage Successful"
-  rescue => e
-    log(e.message, :severity=>'error')
-    redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), alert: "Waive Coverage Failed"
+    begin
+      if hbx_enrollment.shopping?
+        @waiver_enrollment = hbx_enrollment
+      else
+        @waiver_enrollment = hbx_enrollment.construct_waiver_enrollment(params[:waiver_reason]) unless hbx_enrollment.waiver_enrollment_present?
+      end
+
+      if @waiver_enrollment.present?
+        if @waiver_enrollment.may_waive_coverage?
+          @waiver_enrollment.waiver_reason = params[:waiver_reason]
+          @waiver_enrollment.waive_enrollment
+        end
+
+        waiver_success = true if @waiver_enrollment.inactive?
+      end
+
+      if waiver_success
+        redirect_to print_waiver_insured_plan_shopping_path(@waiver_enrollment), notice: "Waive Coverage Successful"
+      else
+        redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), alert: "Waive Coverage Failed"
+      end
+    rescue StandardError => e
+      log(e.message, :severity => 'error')
+      redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), alert: "Waive Coverage Failed"
+    end
   end
 
   def print_waiver
     @hbx_enrollment = HbxEnrollment.find(params.require(:id))
   end
 
-    def employee_mid_year_plan_change(person,change_plan)
-     begin
-      ce = person.active_employee_roles.first.census_employee
-      if change_plan.present? or ce.new_hire_enrollment_period.present?
-        trigger_notice_observer(ce.employer_profile, @enrollment, 'employee_mid_year_plan_change_notice_to_employer')
-      end
-     rescue Exception => e
-       log("#{e.message}; person_id: #{person.id}")
-     end
-    end
-
   def terminate
     hbx_enrollment = HbxEnrollment.find(params.require(:id))
-
-    if hbx_enrollment.may_schedule_coverage_termination?
-      hbx_enrollment.termination_submitted_on = TimeKeeper.datetime_of_record
-      hbx_enrollment.terminate_reason = params[:terminate_reason] if params[:terminate_reason].present?
-      hbx_enrollment.schedule_coverage_termination!(@person.primary_family.terminate_date_for_shop_by_enrollment(hbx_enrollment))
+    coverage_end_date = @person.primary_family.terminate_date_for_shop_by_enrollment(hbx_enrollment)
+    hbx_enrollment.terminate_enrollment(coverage_end_date, params[:terminate_reason])
+    if hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_termination_pending? || hbx_enrollment.coverage_canceled?
       hbx_enrollment.update_renewal_coverage
-      redirect_back(fallback_location: family_account_path) 
+      household = @person.primary_family.active_household
+      household.reload
+      waiver_enrollment = household.hbx_enrollments.where(predecessor_enrollment_id: hbx_enrollment.id).first
+      redirect_to print_waiver_insured_plan_shopping_path(waiver_enrollment), notice: "Waive Coverage Successful"
     else
-      redirect_back(fallback_location: root_path) 
+      redirect_back(fallback_location: :root_path)
     end
+  end
+
+  def employee_mid_year_plan_change(person,change_plan)
+    ce = person.active_employee_roles.first.census_employee
+    trigger_notice_observer(ce.employer_profile, @enrollment, 'employee_mid_year_plan_change_notice_to_employer') if change_plan.present? || ce.new_hire_enrollment_period.present?
+  rescue StandardError => e
+    log("#{e.message}; person_id: #{person.id}")
   end
 
   def generate_eligibility_data
