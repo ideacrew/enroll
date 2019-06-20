@@ -16,6 +16,9 @@
                 <div class="row no-buffer row-form-wrapper">
                   <%= render "benefit_sponsors/shared/organizations/entity_name_and_type_fields", f: f, readonly: 'readonly' %>
                 </div>
+                <div class="col-md-4 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+                  <%= f.text_field :fein, class: "fien_field floatlabel form-control", required: true, placeholder: 'FEIN*', :readonly => true %>
+                </div>
                 <%= f.fields_for :profile, @agency.organization.profile, errors: {}, fieldset: false do |f| %>
                   <%= f.hidden_field :id, value: f.object.id %>
                   <div class="row no-buffer row-form-wrapper">
