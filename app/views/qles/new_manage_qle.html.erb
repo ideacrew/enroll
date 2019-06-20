@@ -1,4 +1,4 @@
-<%= form_for @manage_qle,as: :manage_qle, url: create_manage_qle_qle_index_path, method: :post, class: "form" do |f| %>
+<%= form_for @manage_qle,as: :manage_qle, url: create_manage_qle_qles_path, method: :post, class: "form" do |f| %>
   <div class="radio skinned-form-controls skinned-form-controls-mac">
     <%= radio_button_tag "market_kind", "#{f.object.market_kind}", value: true, class: "required floatlabel"  %>
     <label><span>Creating a custom QLE's</span></label>
