@@ -35,8 +35,8 @@ describe "qhp builder" do
       product.run
     end
 
-    it "should load/update 2 products from file" do
-      expect(BenefitMarkets::Products::Product.all.count).to eq 2
+    it "should load/update 2 aca_shop products from file" do
+      expect(BenefitMarkets::Products::Product.aca_shop_market.count).to eq 2
     end
 
     it "should load 2 QHP records from the file" do
@@ -81,8 +81,12 @@ describe "qhp builder" do
       product.run
     end
 
-    it "should load/update 2 products from file" do
-      expect(BenefitMarkets::Products::Product.all.count).to eq 2
+    it "should load/update 2 aca_shop products from file" do
+      expect(BenefitMarkets::Products::Product.aca_shop_market.count).to eq 2
+    end
+
+    it "should load/update 2 congressional_market products from file" do
+      expect(BenefitMarkets::Products::Product.congressional_market.count).to eq 1
     end
 
     it "should load 2 QHP records from the file" do
