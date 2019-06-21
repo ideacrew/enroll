@@ -3,6 +3,8 @@
 // Rails 5 event: 'turbolinks:load' instead of 'page:change'
 $(document).on("page:change ajax:success", function() {
   if ($('.run-glossary').length) {
+    // Certain glossary terms have been rearranged to avoid a smaller word being given a popover instead of the
+    // full glossary term (e.g. Premium/ Premium Tax Credit)
     var terms = [
       {
         "term": "ACA",
@@ -316,13 +318,14 @@ $(document).on("page:change ajax:success", function() {
         "term": "Exclusive Provider Organization",
         "description": "A type of <a href='\/glossary#health_insurance' target='_blank'>health insurance<\/a> plan where you can only use <a href='\/glossary#in-network' target='_blank'>in-network<\/a> doctors, hospitals, specialists and other <a href='\/glossary#service_provider' target='_blank'>service providers<\/a> except in an emergency."
       },
-      {
-        "term": "Exemption",
-        "description": "If you don't want to or forgot to buy <a href='\/glossary#health_insurance' target='_blank'>health insurance<\/a>, or don't believe you can afford it, you must get a formal exemption or you may have to pay a penalty when you file your taxes (the <a href='\/glossary#individual_shared_responsibility_payment' target='_blank'>Individual Shared Responsibility Payment<\/a>). Some exemptions can be claimed when you file your tax return, but others must be granted in advance by the <a href='\/glossary#us_department_of_health_and_human_services' target='_blank'>U.S. Department of Health and Human Services<\/a>. If you're not required to file a federal tax return because your gross income is below the filing threshold, you automatically have an exemption and don't need to do anything. <a class='ext' href='https:\/\/www.irs.gov\/affordable-care-act\/individuals-and-families\/aca-individual-shared-responsibility-provision-exemptions' target='_blank'>See exemptions and who grants them<\/a> to find out whether you need to <a class='ext' href='https:\/\/www.healthcare.gov\/health-coverage-exemptions\/forms-how-to-apply\/' target='_blank'>apply for an exemption<\/a> in advance. Exemptions are claimed on <a href='\/glossary#irs_form_8965' target='_blank'>IRS Form 8965<\/a> when you file your taxes."
-      },
+      // Rearranged so RegExp searches for larger terms first
       {
         "term": "Exemption Certificate Number",
         "description": "If you qualify for an <a href='\/glossary#exemption' target='_blank'>exemption<\/a>, you'll receive an exemption certificate number (ECN), a unique identification number that you'll need when you file your federal tax return. This number is used to complete <a href='\/glossary#irs_form_8965' target='_blank'>IRS Form 8965<\/a> for the year or time period when you didn't have <a href='\/glossary#health_insurance' target='_blank'>health insurance<\/a>. If more than one person in your household qualifies for an exemption, each person will be assigned their own ECN."
+      },
+      {
+        "term": "Exemption",
+        "description": "If you don't want to or forgot to buy <a href='\/glossary#health_insurance' target='_blank'>health insurance<\/a>, or don't believe you can afford it, you must get a formal exemption or you may have to pay a penalty when you file your taxes (the <a href='\/glossary#individual_shared_responsibility_payment' target='_blank'>Individual Shared Responsibility Payment<\/a>). Some exemptions can be claimed when you file your tax return, but others must be granted in advance by the <a href='\/glossary#us_department_of_health_and_human_services' target='_blank'>U.S. Department of Health and Human Services<\/a>. If you're not required to file a federal tax return because your gross income is below the filing threshold, you automatically have an exemption and don't need to do anything. <a class='ext' href='https:\/\/www.irs.gov\/affordable-care-act\/individuals-and-families\/aca-individual-shared-responsibility-provision-exemptions' target='_blank'>See exemptions and who grants them<\/a> to find out whether you need to <a class='ext' href='https:\/\/www.healthcare.gov\/health-coverage-exemptions\/forms-how-to-apply\/' target='_blank'>apply for an exemption<\/a> in advance. Exemptions are claimed on <a href='\/glossary#irs_form_8965' target='_blank'>IRS Form 8965<\/a> when you file your taxes."
       },
       {
         "term": "Family",
@@ -412,17 +415,18 @@ $(document).on("page:change ajax:success", function() {
         "term": "Health Care and Education Reconciliation Act",
         "description": "One of the health care laws commonly referred to as the <a href='\/glossary#affordable_care_act' target='_blank'>Affordable Care Act<\/a>."
       },
+      // Rearranged so RegExp searches for larger terms first
       {
-        "term": "Health Insurance",
-        "description": "A contract (also called a plan or policy) that requires the health insurance company that issues the plan to pay some of your health care costs in exchange for the <a href='\/glossary#premium' target='_blank'>premium<\/a> payment you make. If you don't make your premium payments on time, your health insurance company can cancel your plan. "
+        "term": "Health Insurance Marketplace Statement",
+        "description": "Another name for <a href='\/glossary#irs_form_1095-a' target='_blank'>IRS Form 1095-A<\/a>."
       },
       {
         "term": "Health Insurance Marketplace",
         "description": "A state-based or federally-facilitated exchange where individuals, families, small businesses and their employees can get quality, affordable <a href='\/glossary#health_insurance' target='_blank'>health insurance<\/a>. The District of Columbia's health insurance marketplace is available at <a class='ext' href='http:\/\/www.dchealthlink.com\/' target='_blank'>dchealthlink.com<\/a>. "
       },
       {
-        "term": "Health Insurance Marketplace Statement",
-        "description": "Another name for <a href='\/glossary#irs_form_1095-a' target='_blank'>IRS Form 1095-A<\/a>."
+        "term": "Health Insurance",
+        "description": "A contract (also called a plan or policy) that requires the health insurance company that issues the plan to pay some of your health care costs in exchange for the <a href='\/glossary#premium' target='_blank'>premium<\/a> payment you make. If you don't make your premium payments on time, your health insurance company can cancel your plan. "
       },
       {
         "term": "Health Insurance Plan",
@@ -780,21 +784,23 @@ $(document).on("page:change ajax:success", function() {
         "term": "Preferred Broker",
         "description": "Preferred Brokers are trusted partners of DC Health Link that complete additional training to expand their expertise, and have committed to meet responsive service requirements. Preferred Brokers are licensed under District law to sell <a href='\/glossary#health_insurance' target='_blank'>health insurance<\/a> through DC Health Link to individuals, families, small businesses and their employees. They can recommend plans or <a href='\/glossary#plan_type' target='_blank'>plan types<\/a>, and perform activities on behalf of their clients as part of their professional licensing and training. There is no cost to use a Preferred Broker."
       },
-      {
-        "term": "Preferred Provider",
-        "description": "Another way of saying a provider is <a href='\/glossary#in-network' target='_blank'>in-network<\/a>."
-      },
+      // Rearranged so RegExp searches for larger terms first
       {
         "term": "Preferred Provider Organization",
         "description": "A PPO (Preferred Provider Organization) plan covers care from <a href='\/glossary#in-network' target='_blank'>in-network<\/a> and <a href='\/glossary#out-of-network' target='_blank'>out-of-network<\/a> providers. You pay less if you use providers that belong to the plan\u2019s network. You can use providers outside of the network for an additional cost. "
       },
       {
-        "term": "Premium",
-        "description": "The amount you must pay to have a <a href='\/glossary#health_insurance' target='_blank'>health insurance<\/a> contract or plan. You and\/or your employer pay it monthly. Premium costs are calculated based on your age, not on your <a href='\/glossary#health_status' target='_blank'>health status<\/a>. "
+        "term": "Preferred Provider",
+        "description": "Another way of saying a provider is <a href='\/glossary#in-network' target='_blank'>in-network<\/a>."
       },
+      // Rearranged so RegExp searches for larger terms first
       {
         "term": "Premium Tax Credit",
         "description": "A less formal way of saying <a href='\/glossary#advance_premium_tax_credit' target='_blank'>Advance Premium Tax Credit<\/a>."
+      },
+      {
+        "term": "Premium",
+        "description": "The amount you must pay to have a <a href='\/glossary#health_insurance' target='_blank'>health insurance<\/a> contract or plan. You and\/or your employer pay it monthly. Premium costs are calculated based on your age, not on your <a href='\/glossary#health_status' target='_blank'>health status<\/a>. "
       },
       {
         "term": "Prescription Drug Coverage",
@@ -808,10 +814,7 @@ $(document).on("page:change ajax:success", function() {
         "term": "Preventive Services",
         "description": "Health care to prevent or detect illness or other health problems at an early stage, when treatment is likely to work best. All health plans available through DC Health Link include certain preventive services at no cost to you. When you use DC Health Link's <a href='\/glossary#plan_match' target='_blank'>Plan Match<\/a> tool, you'll find information on preventive services included in your plan when you select the 'Plan Details' page."
       },
-      {
-        "term": "Primary Care",
-        "description": "Health services that cover a range of prevention, wellness, and treatment for common illnesses. "
-      },
+      // Rearranged so RegExp searches for larger terms first
       {
         "term": "Primary Care Physician",
         "description": "A physician (M.D. \u2013 Medical Doctor or D.O. \u2013 Doctor of Osteopathic Medicine) who directly provides or coordinates a range of health care services for a patient. Some health plans require that you select an <a href='\/glossary#in-network' target='_blank'>in-network<\/a> primary care physician for routine care and coordination of any specialized care. "
@@ -819,6 +822,10 @@ $(document).on("page:change ajax:success", function() {
       {
         "term": "Primary Care Provider",
         "description": "Doctors, nurses, nurse practitioners, and physician assistants. "
+      },
+      {
+        "term": "Primary Care",
+        "description": "Health services that cover a range of prevention, wellness, and treatment for common illnesses. "
       },
       {
         "term": "Prior Authorization",
@@ -908,10 +915,7 @@ $(document).on("page:change ajax:success", function() {
         "term": "SLCSP",
         "description": "The acronym for <a href='\/glossary#second_lowest_cost_silver_plan' target='_blank'>Second Lowest Cost Silver Plan<\/a>."
       },
-      {
-        "term": "Small Business",
-        "description": "At DC Health Link, a small business is defined as having at least 1 but no more than 50 <a href='\/glossary#full-time_equivalent_employee' target='_blank'>full-time equivalent employees<\/a>. "
-      },
+      // Rearranged so RegExp searches for larger terms first
       {
         "term": "Small Business Health Options Program",
         "description": "The name used to describe the federal and state <a href='\/glossary#health_insurance_marketplace' target='_blank'>health insurance marketplaces<\/a> for small businesses. "
@@ -921,16 +925,21 @@ $(document).on("page:change ajax:success", function() {
         "description": "Small businesses that have fewer than 25 <a href='\/glossary#full-time_equivalent_employee' target='_blank'>full-time equivalent employees<\/a>, pay an average wage of less than $50,000 a year, and pay at least half of employee <a href='\/glossary#health_insurance' target='_blank'>health insurance<\/a> <a href='\/glossary#premium' target='_blank'>premiums<\/a> are eligible for a federal tax credit when they purchase health insurance through DC Health Link. Use the <a class='ext' href='https:\/\/dchealthlink.com\/smallbusiness\/tax-credit-calculator' target='_blank'>small business tax credit calculator<\/a> to learn more and estimate your credit."
       },
       {
+        "term": "Small Business",
+        "description": "At DC Health Link, a small business is defined as having at least 1 but no more than 50 <a href='\/glossary#full-time_equivalent_employee' target='_blank'>full-time equivalent employees<\/a>. "
+      },
+      {
         "term": "SNAP",
         "description": "The acronym for <a href='\/glossary#supplemental_nutrition_assistance_program' target='_blank'>Supplemental Nutrition Assistance Program<\/a>."
+      },
+      // Rearranged so RegExp searches for larger terms first
+      {
+        "term": "Social Security Administration",
+        "description": "The federal agency that assigns social security numbers; administers the retirement, survivors, and disability insurance programs known as <a href='\/glossary#social_security' target='_blank'>Social Security<\/a>; and administers the <a href='\/glossary#supplemental_security_income' target='_blank'>Supplemental Security Income<\/a> program for the aged, blind, and disabled."
       },
       {
         "term": "Social Security",
         "description": "A federal benefits program that taxes your income while you work, so that when you retire or if you become disabled, you, your spouse and your dependent children receive monthly benefits based on your reported earnings. Survivors can also collect benefits if you die. "
-      },
-      {
-        "term": "Social Security Administration",
-        "description": "The federal agency that assigns social security numbers; administers the retirement, survivors, and disability insurance programs known as <a href='\/glossary#social_security' target='_blank'>Social Security<\/a>; and administers the <a href='\/glossary#supplemental_security_income' target='_blank'>Supplemental Security Income<\/a> program for the aged, blind, and disabled."
       },
       {
         "term": "Special Enrollment Period",
@@ -1073,14 +1082,15 @@ $(document).on("page:change ajax:success", function() {
           // matches the exact or plural term
           var termRegex    = new RegExp("\\b(" + term.term + "[s]?)\\b", "gi");
           var popoverRegex = new RegExp("(<span class=\"glossary\".+<\/span>)");
-          var description = term.description;
-          var newElement = "";
+          var description  = term.description;
+          var newElement   = "";
           $(matchingEl).html().toString().split(popoverRegex).forEach(function(text){
-            // if a term has already been given a popover, do not search it again
+            // if a matching term has not yet been given a popover, replace it with the popover element
             if (!text.includes("class=\"glossary\"")) {
               newElement += text.replace(termRegex, '<span class="glossary" data-toggle="popover" data-placement="auto top" data-trigger="click focus" data-boundary="window" data-fallbackPlacement="flip" data-html="true" data-content="' + description + '" data-title="' + term.term + '<button data-dismiss=\'modal\' type=\'button\' class=\'close\' aria-label=\'Close\' onclick=\'hideGlossaryPopovers()\'></button>">$1</span>');
             }
             else {
+              // if the term has already been given a popover, do not search it again
               newElement += text;
             }
             $(matchingEl).html(newElement);
