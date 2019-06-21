@@ -14,6 +14,7 @@ class QlesController < ApplicationController
 
   def new
     @qle = QualifyingLifeEventKind.new
+    @qle.custom_qle_questions.build
   end
 
   def create
