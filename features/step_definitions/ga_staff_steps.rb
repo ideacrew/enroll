@@ -75,3 +75,40 @@ When /^new ga staff completes the account creation form and hit the 'Submit' but
   fill_in "user[password_confirmation]", with: "aA1!aA1!aA1!"
   find('.create-account-btn', wait: 10).click
 end
+
+And(/^the primary staff clicks on the “Add General Agency Staff Role” button$/) do
+  find('.interaction-click-control-add-general-agency-staff-role').click
+end
+
+And(/^a form appears that requires the primary staff to input First Name, Last Name, and DOB to submit$/) do
+  expect(page).to have_css('#staff_first_name')
+  expect(page).to have_css('#staff_last_name')
+  expect(page).to have_css('#staff_dob')
+end
+
+When(/^the primary staff enters the First Name, Last Name, and DOB of existing user (.*?)$/) do |person_name|
+  person = people[person_name]
+  fill_in 'staff[first_name]', with: person[:first_name]
+  fill_in 'staff[last_name]', with: person[:last_name]
+  fill_in 'staff[dob]', with: person[:dob]
+end
+
+Then(/^the primary staff will be given a general agency staff role with the given General Agency Agency$/) do
+  find(:xpath, '//*[@id="myTabContent"]/div/form/button').click
+end
+
+And(/^the primary staff will now appear within the “General Agency Staff” table as Active and Linked$/) do
+  expect(page).to have_content('Role added successfully')
+  expect(page).to have_content('Active Linked')
+end
+
+When(/^the primary staff enters the First Name, Last Name, and DOB of an non existing user in EA$/) do
+  fill_in 'staff[first_name]', with: 'hello'
+  fill_in 'staff[last_name]', with: 'world'
+  fill_in 'staff[dob]', with: '10/10/1984'
+end
+
+Then(/^the primary staff will not be given a general agency staff role with the given General Agency Agency$/) do
+  find(:xpath, '//*[@id="myTabContent"]/div/form/button').click
+  expect(page).to have_content('Role was not added because Person does not exist on the Exchange')
+end
