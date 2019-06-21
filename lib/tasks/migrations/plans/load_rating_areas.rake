@@ -48,8 +48,9 @@ namespace :load_rate_reference do
       @result_hash.each do |rating_area_id, locations|
 
         location_ids = locations.map do |loc_record|
+          zip_code = loc_record['zip'].to_s.gsub('.0','')
           county_zip = ::BenefitMarkets::Locations::CountyZip.where({
-                                                                      zip: loc_record['zip'],
+                                                                      zip: zip_code,
                                                                       county_name: loc_record['county_name']
                                                                     }).first
           county_zip._id
