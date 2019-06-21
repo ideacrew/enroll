@@ -229,7 +229,8 @@ module Effective
             upcoming_dates:
                 [
                     {scope: @next_30_day, label: @next_30_day },
-                    {scope: @next_60_day, label: @next_60_day }
+                    {scope: @next_60_day, label: @next_60_day },
+                    {scope: @next_90_day, label: @next_90_day }
                 ],
             enrolling:
                 [
