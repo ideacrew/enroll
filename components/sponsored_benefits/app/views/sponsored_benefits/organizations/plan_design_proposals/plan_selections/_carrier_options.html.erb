@@ -1,0 +1,9 @@
+<% offering_id = f.object.proposal.profile.benefit_sponsorships.first.benefit_applications.first.benefit_groups.first.id %>
+
+<div class="plan-design benefits-setup-tab quote-setup-tab">
+  <% unless plan_design_form.is_dental? %>
+    <%= render 'health_carrier_options', f: f, offering_id: offering_id %>
+  <% else %>
+    <%= render 'dental_carrier_options', f: f, offering_id: offering_id %>
+  <% end %>
+</div>

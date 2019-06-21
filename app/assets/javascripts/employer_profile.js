@@ -82,25 +82,28 @@ var EmployerProfile = ( function( window, undefined ) {
         }
 
     });
-    if ( $('#plan_year_start_on').val().substring($('#plan_year_start_on').val().length - 5) == "01-01" ) {
-      editvalidatedbgemployeepremiums = true;
-      editvalidated = true;
-    } else {
-      editbgemployeepremiums.each(function() {
-        if ( $(this).closest('.benefit-group-fields').hasClass('edit-additional') && $(this).closest('.select-dental-plan').length ) {
-        } else {
-          if ( parseInt($(this).val() ) >= parseInt(50) ) {
-            editvalidatedbgemployeepremiums = true
-            editvalidated = true;
+      if ($('#plan_year_start_on').val()) {
+          if ($('#plan_year_start_on').val().substring($('#plan_year_start_on').val().length - 5) == "01-01") {
+              editvalidatedbgemployeepremiums = true;
+              editvalidated = true;
           } else {
-            $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employee premium must be atleast 50%');
-            editvalidatedbgemployeepremiums = false;
-            editvalidated = false;
-            return false;
+              editbgemployeepremiums.each(function () {
+                  if ($(this).closest('.benefit-group-fields').hasClass('edit-additional') && $(this).closest('.select-dental-plan').length) {
+                  } else {
+                      if (parseInt($(this).val()) >= parseInt(50)) {
+                          editvalidatedbgemployeepremiums = true
+                          editvalidated = true;
+                      } else {
+                          $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employee premium must be atleast 50%');
+                          editvalidatedbgemployeepremiums = false;
+                          editvalidated = false;
+                          return false;
+                      }
+                  }
+              });
           }
-        }
-      });
-    }
+
+      }
 
     if ( editreferenceplanselections.length != $('.benefit-group-fields').length ) {
       editvalidatedreferenceplanselections = true
@@ -208,6 +211,12 @@ var EmployerProfile = ( function( window, undefined ) {
   }
 
   function validatePlanYear() {
+      /* handle refereceErrors from BQT */
+      var validatedbgtitles;
+      var validatedbgemployeepremiums;
+      var validatedreferenceplanselections;
+      var validated_all_premiums;
+
     bgtitles = $('.plan-title').find('label.title').parents('.form-group').find('input');
     bgemployeepremiums = $('.benefits-fields').find('input[value=employee]').closest('fieldset').find('input.hidden-param.premium-storage-input');
     all_premiums = $('.benefits-fields').find('input').closest('fieldset').find('input.hidden-param.premium-storage-input');
@@ -239,22 +248,26 @@ var EmployerProfile = ( function( window, undefined ) {
         return false;
       }
     });
-    if ( $('#plan_year_start_on').val().substring($('#plan_year_start_on').val().length - 5) == "01-01" ) {
-      validatedbgemployeepremiums = true;
-      validated = true;
-    } else {
-      bgemployeepremiums.each(function() {
-        if ( parseInt($(this).val()) >= parseInt(50) ) {
-          validatedbgemployeepremiums = true;
-          validated = true;
-        } else {
-          $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Employee premium for Health must be atleast 50%');
-          validatedbgemployeepremiums = false;
-          validated = false;
-          return false;
-        }
-      });
-    }
+
+      if ($('#plan_year_start_on').val()) {
+          if ($('#plan_year_start_on').val().substring($('#plan_year_start_on').val().length - 5) == "01-01") {
+              validatedbgemployeepremiums = true;
+              validated = true;
+          } else {
+              bgemployeepremiums.each(function () {
+                  if (parseInt($(this).val()) >= parseInt(50)) {
+                      validatedbgemployeepremiums = true;
+                      validated = true;
+                  } else {
+                      $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Employee premium for Health must be atleast 50%');
+                      validatedbgemployeepremiums = false;
+                      validated = false;
+                      return false;
+                  }
+              });
+          }
+
+      }
 
     all_premiums.each(function() {
       if ( parseInt($(this).val()) >= parseInt(0) && parseInt($(this).val()) <= parseInt(100)) {

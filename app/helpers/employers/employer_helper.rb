@@ -107,12 +107,12 @@ module Employers::EmployerHelper
     return kind.titleize
   end
 
-  def render_plan_offerings(benefit_group, coverage_type)
+    def render_plan_offerings(benefit_group, coverage_type)
     reference_plan = benefit_group.reference_plan
-    if coverage_type == ".dental" && benefit_group.dental_plan_option_kind == "single_plan"
+    if coverage_type == "dental" && benefit_group.plan_option_kind == "single_plan"
       plan_count = benefit_group.elected_dental_plan_ids.count
       "#{plan_count} Plans"
-    elsif coverage_type == ".dental" && benefit_group.dental_plan_option_kind == "single_carrier"
+    elsif coverage_type == "dental" && benefit_group.plan_option_kind == "single_carrier"
       plan_count = Plan.shop_dental_by_active_year(reference_plan.active_year).by_carrier_profile(reference_plan.carrier_profile).count
       "All #{reference_plan.carrier_profile.legal_name} Plans (#{plan_count})"
     else

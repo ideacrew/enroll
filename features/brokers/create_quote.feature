@@ -30,6 +30,7 @@ Feature: Create Employee Roster
     And Broker logs out
 
   Scenario: Broker should be able to delete an existing Roster
+    Given PENDING: This needs to be removed. This belongs to Legacy BQT
     Given that a broker exists
     And the broker is signed in
     When he visits the Roster Quoting tool
@@ -60,6 +61,7 @@ Feature: Create Employee Roster
     And Broker logs out
 
   Scenario: Broker should create a quote with health and dental plans
+    Given PENDING: This needs to be removed. This belongs to Legacy BQT
     Given that a broker exists
     And the Plans exist
     And the broker is signed in

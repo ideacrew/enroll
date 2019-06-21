@@ -129,4 +129,77 @@ RSpec.describe PlanCostDecorator, dbclean: :after_each do
       end
     end
   end
+
+  describe ".relationship_benefit_for" do
+    let(:health_plan) {FactoryGirl.build :plan, :with_premium_tables, coverage_kind: "health"}
+    let(:dental_plan) {FactoryGirl.build :plan, :with_premium_tables, coverage_kind: "dental"}
+
+
+    context "while estimating BQT, Estimated Maximum for monthly employer cost" do
+      let(:bqt_benefit_group) { FactoryGirl.build(:sponsored_benefits_benefit_applications_benefit_group) }
+      let(:plan_design_census_employee) {FactoryGirl.build :plan_design_census_employee}
+      let(:employee_relation_benefit) {bqt_benefit_group.relationship_benefits.where(relationship: "employee").first}
+      let(:relation_benefits) {FactoryGirl.build :relationship_benefit}
+
+      it "should find relationship for employee when employee_relationship is 'self'" do
+        bqt_benefit_group.dental_relationship_benefits << relation_benefits
+        [health_plan, dental_plan].each do |plan|
+          plan_cost_decorator = PlanCostDecorator.new(nil, plan_design_census_employee, bqt_benefit_group, plan)
+          expect(plan_cost_decorator.relationship_for(plan_design_census_employee)).to eq "employee"
+
+          if plan.coverage_kind == "health"
+            expect(plan_cost_decorator.relationship_benefit_for(plan_design_census_employee)).to eq employee_relation_benefit
+          else
+            expect(plan_cost_decorator.relationship_benefit_for(plan_design_census_employee)).to eq relation_benefits
+          end
+
+        end
+      end
+    end
+
+    context "while estimating for enroll employee" do
+      let(:enroll_benefit_group) {  FactoryGirl.build(:benefit_group, :with_valid_dental)}
+      let(:census_employee) { FactoryGirl.build :census_employee }
+      let(:health_employee_relation_benefit) { enroll_benefit_group.relationship_benefits.where(relationship: "employee").first}
+      let(:dental_employee_relation_benefit) { enroll_benefit_group.dental_relationship_benefits.where(relationship: "employee").first }
+
+      it "should  find relationship for employee when employee_relationship is 'self'" do
+        [health_plan, dental_plan].each do |plan|
+          plan_cost_decorator = PlanCostDecorator.new(nil, census_employee, enroll_benefit_group, plan)
+          expect(plan_cost_decorator.relationship_for(census_employee)).to eq "employee"
+
+          if plan.coverage_kind == "health"
+            expect(plan_cost_decorator.relationship_benefit_for(census_employee)).to eq health_employee_relation_benefit
+          else
+            expect(plan_cost_decorator.relationship_benefit_for(census_employee)).to eq dental_employee_relation_benefit
+          end
+
+        end
+
+      end
+    end
+
+    context "while estimating DC Quote for quote Benefit Group" do
+      let(:quote_benefit_group) {   FactoryGirl.build :quote_benefit_group, :with_valid_dental }
+      let(:census_employee) { FactoryGirl.build :census_employee }
+      let(:health_quote_employee_relation_benefit) { quote_benefit_group.quote_relationship_benefits.where(relationship: "employee").first}
+      let(:dental_quote_employee_relation_benefit) { quote_benefit_group.quote_dental_relationship_benefits.where(relationship: "employee").first }
+
+      it "should  find relationship for employee when employee_relationship is 'self'" do
+
+        [health_plan, dental_plan].each do |plan|
+          plan_cost_decorator = PlanCostDecorator.new(nil, census_employee, quote_benefit_group, plan)
+          expect(plan_cost_decorator.relationship_for(census_employee)).to eq "employee"
+
+          if plan.coverage_kind == "health"
+            expect(plan_cost_decorator.relationship_benefit_for(census_employee)).to eq health_quote_employee_relation_benefit
+          else
+            expect(plan_cost_decorator.relationship_benefit_for(census_employee)).to eq dental_quote_employee_relation_benefit
+          end
+
+        end
+      end
+
+    end
+  end
 end

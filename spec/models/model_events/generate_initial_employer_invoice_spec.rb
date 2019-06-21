@@ -20,7 +20,6 @@ RSpec.describe 'ModelEvents::GenerateInitialEmployerInvoice', dbclean: :after_ea
     effective_on: start_on
   )}
 
-
   describe "NoticeTrigger" do
     context "when initial invoice is generated" do
       subject { Services::NoticeService.new }
@@ -54,13 +53,14 @@ RSpec.describe 'ModelEvents::GenerateInitialEmployerInvoice', dbclean: :after_ea
     let(:recipient) { "Notifier::MergeDataModels::EmployerProfile" }
     let(:template)  { Notifier::Template.new(data_elements: data_elements) }
 
-    let(:payload)   { {
-        "event_object_kind" => "PlanYear",
-        "event_object_id" => plan_year.id
-    } }
-
     context "when notice event received" do
 
+      let(:payload) do
+        {
+          "event_object_kind" => "PlanYear",
+          "event_object_id" => plan_year.id
+        }
+      end
       subject { Notifier::NoticeKind.new(template: template, recipient: recipient) }
 
       before do
@@ -91,6 +91,28 @@ RSpec.describe 'ModelEvents::GenerateInitialEmployerInvoice', dbclean: :after_ea
       it "should retrun due date" do
         due_date = PlanYear.calculate_open_enrollment_date(plan_year.start_on)[:binder_payment_due_date]
         expect(merge_model.date_due).to eq due_date.strftime("%m/%d/%Y")
+      end
+
+      it "should return total amount due" do
+        currency = ActionView::Base.new
+        expect(merge_model.total_amount_due).to eq currency.number_to_currency(hbx_enrollment.total_premium)
+      end
+    end
+
+    context "if invoice is generated for initial employer with active plan year" do
+      let(:start_on) { TimeKeeper.date_of_record.beginning_of_month}
+      let(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, aasm_state: 'active') }
+      let(:subject) { Notifier::NoticeKind.new(template: template, recipient: recipient) }
+      let(:payload) do
+        {
+          "event_object_kind" => "PlanYear",
+          "event_object_id" => plan_year.id
+        }
+      end
+
+      before do
+        allow(subject).to receive(:resource).and_return(employer_profile)
+        allow(subject).to receive(:payload).and_return(payload)
       end
 
       it "should return total amount due" do
