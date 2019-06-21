@@ -37,13 +37,13 @@
           <% @qle.custom_qle_questions.each do |question| %>
             <%= f.fields_for :custom_qle_questions, question do |question_fields| %>
               <tr>
-                <td> <%= render partial: "exchanges/hbx_profiles/shared/create_question", :locals => { f: question_fields } %></td>
+                <td> <%= render partial: "question", :locals => { f: question_fields } %></td>
               </tr>
             <% end %>
           <% end %>
           <%= f.fields_for :custom_qle_questions, @qle.custom_qle_questions.build do |question_fields| %>
             <tr data-target="qle.question" class="hidden">
-              <td><%= render partial: "exchanges/hbx_profiles/shared/create_question", :locals => { f: question_fields } %></td>
+              <td><%= render partial: "question", :locals => { f: question_fields } %></td>
             </tr>
           <% end %>
           <tr>

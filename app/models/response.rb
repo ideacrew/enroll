@@ -1,6 +1,8 @@
 class Response
   include Mongoid::Document
 
+  embedded_in :custom_qle_answer
+
   field :name, type: String
   field :operator, type: String
   field :value, type: Date

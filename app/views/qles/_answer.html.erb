@@ -1,43 +1,16 @@
-<div class="row js-answer hidden" data-answer-type="boolean">
-  <%= f.fields_for :responses, f.object.responses.find_or_initialize_by(name: 'true') do |response_fields| %>
-    <%= response_fields.hidden_field :name, value: 'true' %>
-    True: <%= response_fields.select :name, {"Contact Call Center" => :contact_call_center, "Proceed" => :proceed, "Follow Up Question" => :follow_up_question } %>
-  <% end %>
-  <%= f.fields_for :responses, f.object.responses.find_or_initialize_by(name: 'false') do |response_fields| %>
-    <%= response_fields.hidden_field :name, value: 'false' %>
-    False: <%= response_fields.select :name, {"Contact Call Center" => :contact_call_center, "Proceed" => :proceed, "Follow Up Question" => :follow_up_question } %>
-  <% end %>
-</div>
-
+<%= render :partial => "boolean_response", :locals => {f: f} %>
 <div class="row js-answer hidden" data-answer-type="date">
   <p><h5>Please specify the acceptable boundary dates for this question</h5></p>
   <div class="js-date-responses">
     <% f.object.responses.each do |response| %>
       <%= f.fields_for :responses, response do |response_fields| %>
+        <%= render :partial => "boolean_response", :locals => {f: response_fields} %>
       <% end %>
     <% end %>
   </div>
   <%= f.fields_for :responses, f.object.responses.build do |response_fields| %>
-    <div class="row js-new-date-response hidden">
-      <div class="col-md-3">
-        <%= response_fields.select :operator, { "Before" => :before, "After" => :after, "Between" => :between }, {}, data: { action: 'qle#changeDateOperator' } %>
-      </div>
-      <div class="col-md-4">
-        <%= response_fields.text_field :value, class: " form-control-custom-qle uidatepicker", autocomplete: :off %>
-      </div>
-      <div class="col-md-4 js-value-2 hidden">
-        <%= response_fields.text_field :value_2, class: " form-control-custom-qle uidatepicker", autocomplete: :off %>
-      </div>
-      <div class="col-md-3">
-        <span>
-          <a data-action="qle#removeResponse" title="Remove Response">
-            <i class="fa fa-trash" aria-hidden="true"></i>
-          </a>
-        </span>
-      </div>
-    </div>
+    <%= render :partial => "boolean_response", :locals => {f: response_fields} %>
   <% end %>
-
   <div class="row">
     <div class="col-md-12">
       <a data-action="qle#addDateResponse">Add Response</a>

@@ -19,7 +19,7 @@
 
   <%= f.fields_for :answer, f.object.build_custom_qle_answer do |answer_field| %>
     <div class="row">
-      <%= render partial: "exchanges/hbx_profiles/shared/answer", locals: { f: answer_field } %>
+      <%= render partial: "answer", locals: { f: answer_field } %>
     </div>
   <% end %>
 </div>
