@@ -109,6 +109,7 @@ module Subscribers
         end
       end
     end
+
     def update_applicant(kind, applicant, status)
       if kind == "Income"
         if status == "outstanding"
