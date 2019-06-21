@@ -61,7 +61,7 @@ class QualifyingLifeEventKind
     "eligibility_documents_provided"
   ]
 
-  embeds_many :custom_qle_question, as: :questionable
+  embeds_many :custom_qle_questions, as: :questionable
 
 
   field :event_kind_label, type: String
@@ -85,11 +85,14 @@ class QualifyingLifeEventKind
   field :coverage_effective_on, type: Date
   field :start_on, type: Date
   field :end_on, type: Date
+  field :visibility, type: Symbol
 
 
   index({action_kind: 1})
   index({market: 1, ordinal_position: 1 })
   index({start_on: 1, end_on: 1})
+
+  accepts_nested_attributes_for :custom_qle_questions
 
   # validates :effective_on_kinds,
   #           presence: true,

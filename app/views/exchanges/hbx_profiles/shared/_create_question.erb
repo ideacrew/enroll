@@ -1,18 +1,25 @@
-  <%= javascript_pack_tag 'qle_form', 'data-turbolinks-track': 'reload' %>
-  <%= fields_for @question, method: "post", class: "form" do |q| %>
-      <span> <%= q.text_field :question_content, class: "form-control", id: "qle-question-form", required: true, placeholder: 'Question', autocomplete: :off,:data_action => "blur->qle#showQuestion"  %> </span>
-        <div class='container' id='custom-answer-type'  data-controller= "qle">
-          <h5>Please select the type of answer that is allowed for this question</h5>
-          <%= fields_for @answer, method: "post", class: "form" do |s| %>
-            <%= label_tag "Date"%>  <input data-action="change->qle#showDate" type="radio" name="answer[type]" id="date" value="Date" class="interaction-choice-control-value-answer-type"></p>
-            <%= label_tag "Multiple Choice"%> <input data-action="change->qle#showMc"  type="radio" name="answer[type]" id="multiple-choice" value="Multiple Choice" class="interaction-choice-control-value-answer-type"></p>
-            <%= label_tag "True/False"%> <input data-action="change->qle#showBoolean"  type="radio" name="answer[type]" id="true-false" value="True/False"  class="interaction-choice-control-value-answer-type"></p>
-            <tr id="create-multiple-choice-answers">
-              <td > <%= render partial: "exchanges/hbx_profiles/shared/create_multiple_choice_answers"%></td>
-            </tr>
-            <tr id="create-date-answers">
-              <td><%= render partial: "exchanges/hbx_profiles/shared/create_date_answers"%></td>
-            </tr>
-          <% end %>
-        </div>
+<span>
+  <%= f.text_field :content, class: "form-control", id: "qle-question-form", required: true, placeholder: 'Question', autocomplete: :off ,:data_action => "blur->qle#showQuestion" %>
+</span>
+
+<div class='container js-question'>
+  <h5>Please select the type of answer that is allowed for this question</h5>
+
+  <%= label_tag "Date"%>
+  <%= f.radio_button :type, :date, data: { action: 'qle#showAnswer' } %>
+  </p>
+
+  <%= label_tag "Multiple Choice"%>
+  <%= f.radio_button :type, :multiple_choice, data: { action: 'qle#showAnswer' } %>
+  </p>
+
+  <%= label_tag "True/False"%>
+  <%= f.radio_button :type, :boolean, data: { action: 'qle#showAnswer' } %>
+  </p>
+
+  <%= f.fields_for :answer, f.object.build_custom_qle_answer do |answer_field| %>
+    <div class="row">
+      <%= render partial: "exchanges/hbx_profiles/shared/answer", locals: { f: answer_field } %>
+    </div>
   <% end %>
+</div>

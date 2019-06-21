@@ -1,6 +1,7 @@
+<%= javascript_pack_tag 'qle_form', 'data-turbolinks-track': 'reload' %>
 
 <div class="container"  >
-  <div id ='custom-sep-container' >
+  <div id ='custom-sep-container' data-controller= "qle">
     <%= form_for @qle, url:  qles_path , method: "post", class: "form" do |f| %>
       <table class="table table-border" id ='custom-sep-container' >
         <thead>
@@ -30,17 +31,26 @@
           <tr>
             <td>
               <p><%= label_tag "Visibility" %><p>
-                <% ["User Self Service", "Admin Only"].each do |c| %>
-                  <p> <%=label_tag "#{c}"%>
-                  <%= radio_button_tag "qle[visibility]", "#{c}"%></p>
-                <% end %>
+              <%= f.select :visibility, { 'User Self Service' => :user_self_service, "Admin Only" => :admin_only } %>
             </td>
           </tr>
+          <% @qle.custom_qle_questions.each do |question| %>
+            <%= f.fields_for :custom_qle_questions, question do |question_fields| %>
+              <tr>
+                <td> <%= render partial: "exchanges/hbx_profiles/shared/create_question", :locals => { f: question_fields } %></td>
+              </tr>
+            <% end %>
+          <% end %>
+          <%= f.fields_for :custom_qle_questions, @qle.custom_qle_questions.build do |question_fields| %>
+            <tr data-target="qle.question" class="hidden">
+              <td><%= render partial: "exchanges/hbx_profiles/shared/create_question", :locals => { f: question_fields } %></td>
+            </tr>
+          <% end %>
           <tr>
-            <td> <%= render partial: "exchanges/hbx_profiles/shared/create_question", :locals => {f: f} %></td>
+            <td><a data-action="qle#addQuestion">Add Question</a></td>
           </tr>
           <tr>
-            <td >
+            <td>
               <%= f.text_field :start_on, class: " form-control-custom-qle uidatepicker", placeholder: 'Effective From', autocomplete: :off %>
             </td>
           </tr>
