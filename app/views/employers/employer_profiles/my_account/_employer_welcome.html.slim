@@ -26,7 +26,7 @@
             .col-xs-12
               .row
                 | Select
-                = link_to "\"Brokers\"", employers_employer_profile_path(@employer_profile, tab: 'brokers') 
+                = link_to "\"Brokers\"", employers_employer_profile_path(@employer_profile, tab: 'brokers')
                 | on the blue menu to the left and follow the instructions. Once you've confirmed your selection, you can logout. Your Broker will be in touch shortly and will help you do everything else.
 
   .left-icon-section.section
@@ -36,7 +36,7 @@
           = image_tag('ui/gearsgreen_50.png')
       .col-xs-11
         h3.no-buffer Set Up Your Health Benefits Program Yourself
-        p.twenty If you want to set up your Health Benefits Program yourself, we'll walk you through it step-by-step. 
+        p.twenty If you want to set up your Health Benefits Program yourself, we'll walk you through it step-by-step.
         a#showMoreBenefits role="button" data-toggle="collapse" href="#collapseMore" aria-expanded="false" aria-controls="collapseMore" View More
         br
         br
@@ -58,12 +58,12 @@
         - if individual_market_is_enabled?
           .icon-left-download
             = link_to "https://dchealthlink.com/sites/default/files/v2/forms/Initial-Employers-Creating-an-Account.pdf", target: '_blank' do
-              i.fa.fa-download 
+              i.fa.fa-download
               |  Download Step-by-Step Instructions for New Employers
         - else
-          .icon-left-download 
+          .icon-left-download
             = link_to "https://www.mahealthconnector.org/help-center-answers/how-to-enroll-new-employees-in-health-coverage", target: '_blank' do
-              i.fa.fa-download 
+              i.fa.fa-download
               |  Download Step-by-Step Instructions for New Employers
       - if individual_market_is_enabled?
         .col-xs-2.pdf-image.full-width
@@ -74,8 +74,7 @@ javascript:
   $('#collapseMore').on('hide.bs.collapse', function () {
     $('#showMoreBenefits').text('View More ').append('<i class="fa fa-chevron-down fa-lg"></i>')
   })
-  
+
   $('#collapseMore').on('show.bs.collapse', function () {
     $('#showMoreBenefits').text('View Less ').append('<i class="fa fa-chevron-up fa-lg"></i>')
   })
-
