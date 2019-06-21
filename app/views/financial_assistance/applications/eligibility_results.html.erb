@@ -11,7 +11,7 @@
               <h3>Medicaid</h3>
             </div>
             <div class="border-bottom-2px"></div>
-            <div class="er-medicaid-prsn">
+            <div class="er-medicaid-prsn run-glossary">
               <p>These people <span>appear to be eligible</span> for Medicaid:</p>
 
               <%eligible_applicants(params[:id], :is_medicaid_chip_eligible).each do |applicant_name| %>
@@ -24,7 +24,7 @@
             <div class="border-bottom-1px"></div>
             <div class="er-warning bg-warning">
               <div><i class="fa fa-exclamation-triangle fa-lg text-warning" aria-hidden="true"></i></div>
-              <div class="text-warning">
+              <div class="text-warning run-glossary">
                 <span>PLEASE NOTE: The DC Department of Human Services (DHS) will make a final decision on whether those listed qualify for Medicaid.</span> They will send you a letter, and may ask you to provide documents. If you haven’t heard from DHS within 45 days, you may want to ask for an update by calling us at (855) 532-5465.
               </div>
             </div>
