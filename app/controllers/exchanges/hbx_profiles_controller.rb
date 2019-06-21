@@ -502,28 +502,6 @@ def employer_poc
     end
   end
 
-  def custom_qle
-    @qle = QualifyingLifeEventKind.new
-    @question ||= CustomQleQuestion.new(qualifying_life_event_kind: @qle)
-    @answer ||= CustomQleAnswer.new(custom_qle_question: @question)
-    # create_qle_answer(params['custom_qle_question']['content']) if params['answer'].present?
-    # find_or_create_qle_question(params['custom_qle_question']['content'],@qle) if params['custom_qle_question'].present?
-  end
-  
-  def create_qle_answer(params)
-    binding.pry
-    @question = CustomQleQuestion.where(content: params).first
-    @answer = @question.custom_qle_answers.create(type: params['answer']['type'])
-  end
-
-  def update_qle_answer
-  end
-  
-  def find_or_create_qle_question(params, qle) 
-    binding.pry
-    @question = CustomQleQuestion.find_or_create_by(content: params, qualifying_life_event_kind: qle)
-  end
-
   def edit_dob_ssn
     authorize Family, :can_update_ssn?
     @person = Person.find(params[:id])
