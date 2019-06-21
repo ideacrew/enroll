@@ -274,7 +274,7 @@ def employer_poc
     end
     @person = Person.find(params[:person])
     broker_view = render_to_string 'insured/families/_consumer_brokers_widget', :layout => false
-    render :text => {broker: broker_view, status: status_text}.to_json, layout: false
+    render :plain => {broker: broker_view, status: status_text}.to_json, layout: false
   end
 
   def family_index
