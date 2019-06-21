@@ -1,52 +1,31 @@
-<%= render :partial => "boolean_response", :locals => {f: f} %>
+
+<%=render :partial => "boolean_response", :locals => {f:f }%>
 <div class="row js-answer hidden" data-answer-type="date">
-  <p><h5>Please specify the acceptable boundary dates for this question</h5></p>
   <div class="js-date-responses">
     <% f.object.responses.each do |response| %>
       <%= f.fields_for :responses, response do |response_fields| %>
-        <%= render :partial => "boolean_response", :locals => {f: response_fields} %>
       <% end %>
     <% end %>
-  </div>
   <%= f.fields_for :responses, f.object.responses.build do |response_fields| %>
-    <%= render :partial => "boolean_response", :locals => {f: response_fields} %>
+    <%=render :partial => "date_response", :locals => {f: response_fields}%>
   <% end %>
-  <div class="row">
-    <div class="col-md-12">
-      <a data-action="qle#addDateResponse">Add Response</a>
+    <div class= "col-md-12">
+      <a data-action="qle#addDateResponse">Add Responses to this question</a>
     </div>
   </div>
 </div>
-
-<h5>Please input three possible options for answers to this question</h5>
 <div class="row js-answer hidden" data-answer-type="multiple_choice">
   <div class="js-multiple-choice-responses">
     <% f.object.responses.each do |response| %>
       <%= f.fields_for :responses, response do |response_fields| %>
+        <%=render :partial => "multiple_choice_response", :locals => {response_fields: response_fields}%>
       <% end %>
     <% end %>
   </div>
   <%= f.fields_for :responses, f.object.responses.build do |response_fields| %>
-    <div class="row js-new-multiple-choice-response hidden">
-      <div class="col-md-4">
-        <%= response_fields.text_field :name %>
-      </div>
-      <div class="col-md-4">
-        <%= response_fields.select :result, { 'Proceed' => :proceed, 'Contact Call Center' => :contact_call_center, 'Follow Up Question' => 'follow_up_question'}, {}, data: { action: 'qle#changeMultipleChoiceResult' } %>
-      </div>
-      <div class="col-md-4">
-        <span>
-          <a data-action="qle#removeResponse" title="Remove Response">
-            <i class="fa fa-trash" aria-hidden="true"></i>
-          </a>
-        </span>
-      </div>
-    </div>
+    <%=render :partial => "multiple_choice_response", :locals => {response_fields: response_fields}%>
   <% end %>
-
-  <div class="row">
     <div class="col-md-12">
-      <a data-action="qle#addMultipleChoiceResponse">Add Response</a>
+      <a data-action="qle#addMultipleChoiceResponse">Add Responses to this question</a>
     </div>
-  </div>
 </div>

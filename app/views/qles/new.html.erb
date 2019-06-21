@@ -1,69 +1,73 @@
 <%= javascript_pack_tag 'qle_form', 'data-turbolinks-track': 'reload' %>
-
 <div class="container"  >
-  <div id ='custom-sep-container' data-controller= "qle">
+  <div id='custom-sep-container' data-controller="qle">
     <%= form_for @qle, url:  qles_path , method: "post", class: "form" do |f| %>
-      <table class="table table-border" id ='custom-sep-container' >
-        <thead>
-          <th>Custom Qualifying Life Event</th>
-        </thead>
-        <tbody>
-          <tr>
-            <td>
-            <span> <%= f.text_field :title, class: "form-control-custom-qle", placeholder: 'Title', autocomplete: :off %></span>
-            </td>
-          </tr>
-          <tr>
-            <td>
+      <div >
+        <div class='row'>
+          <h4 class= 'col-md-6'>Create a Qualifying Life Event</h4>
+        </div>
+        <div>
+          <div class='row'>
+            <div class = 'col-md-6'>
+              <span> <%= f.text_field :title, class: "form-control-custom-qle", placeholder: 'Title', autocomplete: :off %></span>
+            </div>
+          </div>
+          <div class= "row">
+            <div class = 'col-md-6'>
             <span> <%= f.text_field :event_kind_label, class: "form-control-custom-qle", placeholder: 'Event Kind Label', autocomplete: :off %></span>
-            </td>
-          </tr>
-          <tr>
-            <td>
-            <span> <%= f.text_field :tool_tip, class: "form-control-custom-qle", placeholder: 'Tool tip text', autocomplete: :off %></span>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <span> <%= f.text_field :reason, class: " form-control-custom-qle", placeholder: 'Reason', autocomplete: :off %></span>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <p><%= label_tag "Visibility" %><p>
+            </div>
+          </div>
+          <div class ='row' >
+            <div class='col-md-6'>
+              <span> <%= f.text_field :tool_tip, class: "form-control-custom-qle", placeholder: 'Tool tip text', autocomplete: :off %></span>
+            </div>
+          </div>
+          <div class='row'>
+            <div class ='col-md-6'>
+              <span> <%= f.text_field :reason, class: "form-control-custom-qle", placeholder: 'Reason', autocomplete: :off %></span>
+            </div>
+          </div>
+          <div class='row'>
+            <div class ='col-md-6'>
+              <%= label_tag "Visibility" %>
               <%= f.select :visibility, { 'User Self Service' => :user_self_service, "Admin Only" => :admin_only } %>
-            </td>
-          </tr>
-          <% @qle.custom_qle_questions.each do |question| %>
-            <%= f.fields_for :custom_qle_questions, question do |question_fields| %>
-              <tr>
-                <td> <%= render partial: "question", :locals => { f: question_fields } %></td>
-              </tr>
+            </div>
+          </div>
+          <%= link_to "Create Attestation for this QLE", nil , data: { action: "qle#showQuestions" } %>
+          <div id="question-container">
+            <% @qle.custom_qle_questions.each do |question| %>
+              <%= f.fields_for :custom_qle_questions, question do |question_fields| %>
+                <div class='row'>
+                  <div class ='col-md-6'>
+                    <%= render partial: "question", :locals => { f: question_fields } %>
+                  </div>
+                </div>
+              <% end %>
             <% end %>
-          <% end %>
-          <%= f.fields_for :custom_qle_questions, @qle.custom_qle_questions.build do |question_fields| %>
-            <tr data-target="qle.question" class="hidden">
-              <td><%= render partial: "question", :locals => { f: question_fields } %></td>
-            </tr>
-          <% end %>
-          <tr>
-            <td><a data-action="qle#addQuestion">Add Question</a></td>
-          </tr>
-          <tr>
-            <td>
+            <%= f.fields_for :custom_qle_questions, @qle.custom_qle_questions.build do |question_fields| %>
+              <div data-target="qle.question" class="hidden row">
+                <div class='col-md-6'><%= render partial: "question", :locals => { f: question_fields } %></div>
+              </div>
+            <% end %>
+            <div class='row'>
+              <div class ='col-md-6'><a data-action="qle#addQuestion" >Create a new Question</a></div>
+            </div>
+          </div>
+          <div class='row'>
+            <div class='col-md-6'>
               <%= f.text_field :start_on, class: " form-control-custom-qle uidatepicker", placeholder: 'Effective From', autocomplete: :off %>
-            </td>
-          </tr>
-          <tr>
-            <td>
+            </div>
+          </div>
+          <div class='row'>
+            <div class='col-md-6'>
             <span> <%= f.text_field :end_on, class: " form-control-custom-qle uidatepicker ", placeholder: 'Effective Until', autocomplete: :off %></span>
-            </td>
-          </tr>
-          <tr>
-            <td>
+            </div>
+          </div>
+          <div class='row'>
+            <div class='col-md-6'>
             <span> <%= f.select :is_self_attested, ['Is Self Attested', 'yes', 'no'], class: " form-control-custom-qle  ", placeholder: 'Self Attested' %></span>
-            </td>
-          </tr>
+            </div>
+          </div>
         </tbody>
       </table>
       <div class="row no-buffer child-row">
@@ -76,6 +80,5 @@
 </div>
 <script type="text/javascript" charset="utf-8">
   $(".uidatepicker").datepicker({maxDate: "-1D", changeMonth: true, changeYear: true, dateFormat: 'mm/dd/yy',  yearRange: (new Date).getFullYear()-110 + ":" + (new Date).getFullYear()});
-
 </script>
 
