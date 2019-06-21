@@ -100,8 +100,11 @@ describe BenefitGroup, "instance methods" do
       benefit_group.plan_option_kind = "metal_level"
       benefit_group.metal_level_for_elected_plan = "silver"
     end
-    it "should include the same census_employees" do
+    it "should include the plans from the same metal level" do
       expect(benefit_group.elected_plans_by_option_kind.sort).to eq [plan1,plan2]
+    end
+    it "should not include the plans from other  metal levels" do
+      expect(benefit_group.elected_plans_by_option_kind).not_to include(plan3)
     end
   end
 
