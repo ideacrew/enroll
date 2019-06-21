@@ -37,6 +37,11 @@ export default class extends Controller {
     response.remove();
   }
 
+  showQuestions(e){
+    console.log(e.currentTarget.closest('#question-container'))
+   e.currentTarget
+
+  }
   showAnswer(e){
     var question = e.currentTarget.closest('.js-question')
     question.querySelectorAll('.js-answer').forEach(function(element) {
