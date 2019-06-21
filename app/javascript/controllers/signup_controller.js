@@ -282,7 +282,7 @@ checkMatch() {
 validateEmail() {
   const email = this.usernameFieldTarget.value;
   let optionalemailField = document.getElementById('optionalEmail');
-  if (this.isEmail(email)) {
+  if (this.isEmail(email) || !email) {
     optionalemailField.classList.add('d-none');
   } else {
     optionalemailField.classList.remove('d-none');
