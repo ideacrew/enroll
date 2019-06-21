@@ -32,3 +32,23 @@ Feature: Assign General Agency Staff to General Agency
     When the primary staff removes ga staff from ga staff table
     Then the primary staff should see the staff successfully removed message
     And the primary staff logs out
+
+  Scenario: Adding Existing person as General Agency Staff to General Agency
+    Given there is a General Agency exists for District Agency Inc
+    And the staff Max Planck is primary ga staff for District Agency Inc
+    And person record exists for John Doe
+    And Max Planck logs on to the General Agency Portal
+    And the primary staff clicks on the “Add General Agency Staff Role” button
+    And a form appears that requires the primary staff to input First Name, Last Name, and DOB to submit
+    When the primary staff enters the First Name, Last Name, and DOB of existing user John Doe
+    Then the primary staff will be given a general agency staff role with the given General Agency Agency
+    And the primary staff will now appear within the “General Agency Staff” table as Active and Linked
+
+  Scenario: Adding Non Existing person as General Agency Staff to General Agency
+    Given there is a General Agency exists for District Agency Inc
+    And the staff Max Planck is primary ga staff for District Agency Inc
+    And Max Planck logs on to the General Agency Portal
+    And the primary staff clicks on the “Add General Agency Staff Role” button
+    And a form appears that requires the primary staff to input First Name, Last Name, and DOB to submit
+    When the primary staff enters the First Name, Last Name, and DOB of an non existing user in EA
+    Then the primary staff will not be given a general agency staff role with the given General Agency Agency
