@@ -66,7 +66,7 @@
               <h3>Does not qualify</h3>
             </div>
             <div class="border-bottom-2px"></div>
-            <div class="er-medicaid-prsn">
+            <div class="er-medicaid-prsn run-glossary">
               <p> These people <span> likely don't qualify for Medicaid, </span> and don't qualify for private health insurance through DC Health Link: </p>
               <%eligible_applicants(params[:id], :is_totally_ineligible).each do |applicant_name| %>
                 <div class='er-prsn mb'>
@@ -84,7 +84,7 @@
               <h3>Private health insurance</h3>
             </div>
             <div class="border-bottom-2px"></div>
-            <div class="er-medicaid-prsn">
+            <div class="er-medicaid-prsn run-glossary">
               <p> These people <span> qualify to enroll </span> in a private health insurance plan:</p>
               <%eligible_applicants(params[:id], :is_without_assistance).each do |applicant_name| %>
                 <div class='er-prsn mb'>
