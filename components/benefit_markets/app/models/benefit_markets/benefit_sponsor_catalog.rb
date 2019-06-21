@@ -30,6 +30,8 @@ module BenefitMarkets
     # :sponsor_market_policy, :member_market_policy - commenting out the validations until we have
     # the seed for both of these on benefit market catalog.
 
+    index({"benefit_application_id" => 1})
+
 
     def benefit_application=(benefit_application)
       raise "Expected Benefit Application" unless benefit_application.kind_of?(BenefitSponsors::BenefitApplications::BenefitApplication)

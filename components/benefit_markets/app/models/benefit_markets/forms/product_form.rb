@@ -8,7 +8,7 @@ module BenefitMarkets
       attribute :date
 
       def factory(param)
-        @factory = ::BenefitMarkets::Products::ProductFactory.new(param)
+        @factory = ::BenefitMarkets::Products::ProductFactory.new({date: param})
       end
 
       def self.for_new(param)

@@ -14,16 +14,13 @@ describe ChangePersonPhoneNumber do
   describe "changing the phone number of a given person with country code ", dbclean: :after_each do
     let(:person) { FactoryBot.create(:person) }
     let(:phone) {FactoryGril.create(:phone,:for_testing, person:person)}
-    before(:each) do
-      ENV['hbx_id'] = person.hbx_id
-      ENV['phone_kind'] = "home"
-      ENV['full_phone_number'] = "20212345678"
-      ENV['country_code'] = '1'
-
-      # allow(ENV).to receive(:[]).with("hbx_id").and_return(person.hbx_id)
-      # allow(ENV).to receive(:[]).with("phone_kind").and_return("home")
-      # allow(ENV).to receive(:[]).with("full_phone_number").and_return("20212345678")
-      # allow(ENV).to receive(:[]).with("country_code").and_return("1")
+    around do |example|
+      ClimateControl.modify hbx_id: person.hbx_id,
+                            phone_kind: 'home',
+                            full_phone_number: "20212345678",
+                            country_code: '1' do
+        example.run
+      end
     end
     it "should have the correct country code" do
       subject.migrate
@@ -36,12 +33,6 @@ describe ChangePersonPhoneNumber do
       person.reload
       phone = person.phones.first
       expect(phone.extension).to eq "8"
-    end
-    it "should have the correct country code" do
-      subject.migrate
-      person.reload
-      phone = person.phones.first
-      expect(phone.country_code).to eq "1"
     end
     it "should have the correct area code" do
       subject.migrate
@@ -59,16 +50,13 @@ describe ChangePersonPhoneNumber do
   describe "changing the phone number of a given person with no country code ", dbclean: :after_each do
     let(:person) { FactoryBot.create(:person) }
     let(:phone) {FactoryGril.create(:phone,:for_testing, person:person)}
-    before(:each) do
-      ENV['hbx_id'] = person.hbx_id
-      ENV['phone_kind'] = "home"
-      ENV['full_phone_number'] = "20212345678"
-      ENV['country_code'] = ''
-
-      # allow(ENV).to receive(:[]).with("hbx_id").and_return(person.hbx_id)
-      # allow(ENV).to receive(:[]).with("phone_kind").and_return("home")
-      # allow(ENV).to receive(:[]).with("full_phone_number").and_return("20212345678")
-      # allow(ENV).to receive(:[]).with("country_code").and_return("")
+    around do |example|
+      ClimateControl.modify hbx_id: person.hbx_id,
+                            phone_kind: 'home',
+                            full_phone_number: "20212345678",
+                            country_code: '' do
+        example.run
+      end
     end
 
     it "should have the correct extension" do

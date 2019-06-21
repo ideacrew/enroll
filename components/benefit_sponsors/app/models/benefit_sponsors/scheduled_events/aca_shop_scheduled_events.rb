@@ -16,7 +16,7 @@ module BenefitSponsors
         initialize_logger
         shop_daily_events
         auto_submit_renewal_applications
-        process_applications_missing_binder_payment
+        # process_applications_missing_binder_payment #refs 39124 - Had to comment out as we got rid of states on BS.
         auto_cancel_ineligible_applications
         auto_transmit_monthly_benefit_sponsors
         close_enrollment_quiet_period
@@ -28,6 +28,7 @@ module BenefitSponsors
         process_events_for { benefit_begin }
         process_events_for { benefit_end }
         process_events_for { benefit_termination }
+        process_events_for { benefit_termination_pending }
         process_events_for { benefit_renewal }
       end
 
@@ -54,6 +55,14 @@ module BenefitSponsors
       def benefit_termination
         benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_terminate_benefit_coverage?(new_date)
         execute_sponsor_event(benefit_sponsorships, :terminate_sponsor_benefit)
+      end
+
+      def benefit_termination_pending
+        benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_terminate_pending_benefit_coverage?(new_date)
+
+        benefit_sponsorships.each do |benefit_sponsorship|
+          execute_sponsor_event(benefit_sponsorship, :terminate_pending_sponsor_benefit)
+        end
       end
 
       def benefit_renewal

@@ -3,7 +3,6 @@ module Notifier
 
     include Virtus.model
     include ActiveModel::Model
-    include Notifier::MergeDataModels::TokenBuilder
 
     attribute :notice_date, String
     attribute :first_name, String
@@ -43,6 +42,30 @@ module Notifier
 
     def conditions
       []
+    end
+
+    def primary_address
+      mailing_address
+    end
+
+    def broker_present?
+      false
+    end
+
+    def shop?
+      true
+    end
+
+    def employee_notice?
+      false
+    end
+
+    def general_agency?
+      false
+    end
+
+    def broker?
+      false
     end
   end
 end

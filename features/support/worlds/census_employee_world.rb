@@ -242,6 +242,7 @@ And(/^employees for (.*?) have a selected coverage$/) do |legal_name|
   step "Employees for #{legal_name} have both Benefit Group Assignments Employee role"
 
   person = @census_employees.first.employee_role.person
+  @census_employees.first.employee_role.update_attributes(census_employee_id: @census_employees.first.id)
   bga =  @census_employees.first.active_benefit_group_assignment
   benefit_package = fetch_benefit_group(legal_name)
   coverage_household = person.primary_family.households.first

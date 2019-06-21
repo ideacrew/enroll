@@ -7,8 +7,10 @@ describe RemoveDependent, dbclean: :after_each do
   let(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent)}
   subject { RemoveDependent.new(given_task_name, double(:current_scope => nil)) }
 
-  before do
-    ENV["family_member_id"] = family.family_members.where(is_primary_applicant: false).first.id.to_s
+  around do |example|
+    ClimateControl.modify family_member_id: family.family_members.where(is_primary_applicant: false).first.id.to_s do
+      example.run
+    end
   end
 
   describe "given a task name" do
@@ -17,28 +19,27 @@ describe RemoveDependent, dbclean: :after_each do
     end
   end
 
-  describe "Should not remove duplicate dependents", dbclean: :after_each do
-
-    it "should not remove duplicate family member" do
-      expect(family.family_members.size).to eq 3
-      subject.migrate
-      family.reload
-      expect(family.family_members.size).to eq 3
-    end
-
-  end
-
   describe "Should remove duplicate dependents", dbclean: :after_each do
-    before do
-      fm = family.family_members.where(is_primary_applicant: false).first
-      family.remove_family_member(fm.person)
-    end
 
     it "should remove duplicate family member" do
-      expect(family.family_members.size).to eq 3
+      size = family.households.first.coverage_households.where(:is_immediate_family => true).first.coverage_household_members.size
+      family.households.first.coverage_households.where(:is_immediate_family => false).first.coverage_household_members.each do |chm|
+        chm.delete
+        subject.migrate
+        family.households.first.reload
+        expect(family.households.first.coverage_households.where(:is_immediate_family => true).first.coverage_household_members.count).not_to eq(size)
+      end
+    end
+  end
+
+  describe "Should not remove duplicate dependents", dbclean: :after_each do
+
+    it "should not remove family member" do
+      size = family.households.first.coverage_households.where(:is_immediate_family => true).first.coverage_household_members.size
+      expect(size).to eq 3
       subject.migrate
       family.reload
-      expect(family.family_members.size).to eq 2
+      expect(family.households.first.coverage_households.where(:is_immediate_family => true).first.coverage_household_members.size).to eq (size)
     end
   end
 end

@@ -54,6 +54,7 @@ end
 Then (/(.*) sign in to portal/) do |name|
   user = Person.where(first_name: "#{name}").first.user
   login_as user
+  BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
   visit "/families/home"
 end
 

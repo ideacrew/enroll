@@ -1,7 +1,7 @@
 = content_for :navigation do
   = render :partial => "ui-components/v1/navs/employers_navigation", :locals => {:active_tab=>params[:tab], organization: @sponsored_benefit_form.service.organization, profile: @sponsored_benefit_form.service.profile}
 
-.container
+.col-md-12.col-xs-12
   h1.heading-text Dental - Edit Benefit Package
   h4 Let's start by creating a benefit package. As you complete the fields below, you can scroll up or down to change your choices at any time to see how it impacts your costs.
   .row#change_reference_product
@@ -14,7 +14,8 @@
       = render "sponsored_benefit", f: f
       = link_to "Cancel", profiles_employers_employer_profile_path(f.object.service.profile, :tab=>'benefits'), class: "btn btn-default btn-primary"
       = link_to "Remove Dental Benefits <i class='fa fa-trash-o' aria-hidden='true'></i> ".html_safe, benefit_sponsorship_benefit_application_benefit_package_sponsored_benefit_path(id: f.object.id), method: :delete, class: 'btn btn-primary mtz btn-br'
-      = f.submit "Save Benefit Package", class: "btn btn-default btn-primary pull-right"
+      = f.submit "Submit Dental Benefits", class: "btn btn-default pull-right hidden", id: "submitDentalBenefits"
+      = f.submit "Save Benefit Package", class: "btn btn-default btn-primary pull-right", id: "saveBenefitPackage"
       = pundit_span EmployerProfile, :updateable?
 
 

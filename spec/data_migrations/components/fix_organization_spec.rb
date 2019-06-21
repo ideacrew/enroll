@@ -17,14 +17,14 @@ describe FixOrganization, dbclean: :after_each do
     let(:employer_organization)  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let(:employer_organization_2)  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let(:site)  { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-    before(:each) do
-      ENV["action"] = "update_fein"
-      ENV["organization_fein"] = employer_organization.fein
-      ENV["correct_fein"] = "987654321"
-    end
+
     context "updating the fein when the correct information is provided" do
       it "should change fein" do
-        subject.migrate
+        ClimateControl.modify action: 'update_fein',
+                              organization_fein: employer_organization.fein,
+                              correct_fein: "987654321" do
+          subject.migrate
+        end
         employer_organization.reload
         expect(employer_organization.fein).to eq "987654321"
       end
@@ -33,35 +33,36 @@ describe FixOrganization, dbclean: :after_each do
       it "should not change fein" do
         employer_organization_2.fein=("987654321")
         employer_organization_2.save!
-        subject.migrate
+        ClimateControl.modify action: 'update_fein',
+                              organization_fein: employer_organization.fein,
+                              correct_fein: "987654321" do
+          subject.migrate
+        end
         employer_organization.reload
         expect(employer_organization.fein).not_to eq "987654321"
       end
     end
     context "not updating the fein when there is no organization with the fein" do
       it "should not change fein" do
+        old_fein = employer_organization.fein
         employer_organization.fein=("111111111")
         employer_organization.save!
-        subject.migrate
+        ClimateControl.modify action: 'update_fein',
+                              organization_fein: old_fein,
+                              correct_fein: "987654321" do
+          subject.migrate
+        end
         employer_organization.reload
         expect(employer_organization.fein).not_to eq "987654321"
       end
     end
     context "not updating the fein when there is no organization with the fein" do
       it "should not change fein" do
-        employer_organization.fein=("111111111")
-        employer_organization.save!
-        subject.migrate
-        employer_organization.reload
-        expect(employer_organization.fein).not_to eq "987654321"
-      end
-    end
-    context "not updating the fein when there is no organization with the fein" do
-      it "should not change fein" do
-        ENV["action"]= "some_other_action"
-        subject.migrate
-        employer_organization.reload
-        expect(employer_organization.fein).not_to eq "987654321"
+        ClimateControl.modify action: 'some_other_action' do
+          subject.migrate
+          employer_organization.reload
+          expect(employer_organization.fein).not_to eq "987654321"
+        end
       end
     end
   end
@@ -71,16 +72,16 @@ describe FixOrganization, dbclean: :after_each do
     let(:employer_organization)  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site, fein: "111111111") }
     let(:employer_organization_2)  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site, fein: "987654321") }
     let(:site)  { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-    before(:each) do
-      ENV["action"] = "swap_fein"
-      ENV["organization_fein"] = employer_organization.fein
-      ENV["correct_fein"] = employer_organization_2.fein
-    end
+
     context "updating the fein when the correct information is provided" do
       it "should swap fein when organization is present" do
         expect(employer_organization.fein).to eq "111111111"
         expect(employer_organization_2.fein).to eq "987654321"
-        subject.migrate
+        ClimateControl.modify action: 'swap_fein',
+                              organization_fein: employer_organization.fein,
+                              correct_fein: employer_organization_2.fein do
+          subject.migrate
+        end
         employer_organization.reload
         employer_organization_2.reload
         expect(employer_organization.fein).to eq "987654321"
@@ -89,10 +90,15 @@ describe FixOrganization, dbclean: :after_each do
     end
     context "updating the fein when the incorrect information is provided" do
       it "should not swap fein when organization is not present" do
+        old_fein = employer_organization_2.fein
         employer_organization_2.update_attributes(:fein => "222222222")
         expect(employer_organization.fein).to eq "111111111"
         expect(employer_organization_2.fein).to eq "222222222"
-        subject.migrate
+        ClimateControl.modify action: 'swap_fein',
+                              organization_fein: employer_organization.fein,
+                              correct_fein: old_fein do
+          subject.migrate
+        end
         employer_organization.reload
         employer_organization_2.reload
         expect(employer_organization.fein).to eq "111111111"
@@ -109,13 +115,10 @@ describe FixOrganization, dbclean: :after_each do
     let!(:employer_attestation)   { FactoryBot.build(:employer_attestation, aasm_state:'unsubmitted') }
     let!(:benefit_sponsorship)   { employer_profile.add_benefit_sponsorship }
     before(:each) do
-      ENV["action"] = "approve_attestation"
-      ENV["organization_fein"] = employer_organization.fein
       employer_profile.employer_attestation = employer_attestation
       benefit_sponsorship.save
       employer_profile.save
     end
-
 
     context "when employer has an attestation is in unsubmitted state and document in submitted state" do
 
@@ -127,7 +130,10 @@ describe FixOrganization, dbclean: :after_each do
       it "should accept the document and approve the attestation" do
         expect(employer_attestation.aasm_state).to eq "unsubmitted"
         expect(employer_attestation.employer_attestation_documents.first.aasm_state).to eq "submitted"
-        subject.migrate
+        ClimateControl.modify action: 'approve_attestation',
+                            organization_fein: employer_organization.fein do
+          subject.migrate
+        end
         employer_profile.reload
         employer_attestation.reload
         expect(employer_attestation.aasm_state).to eq "approved"
@@ -145,7 +151,10 @@ describe FixOrganization, dbclean: :after_each do
       it "should approve the attestation when no documents are present for conversion group" do
         expect(employer_attestation.aasm_state).to eq "denied"
         expect(employer_attestation.employer_attestation_documents.first.aasm_state).to eq "rejected"
-        subject.migrate
+        ClimateControl.modify action: 'approve_attestation',
+                            organization_fein: employer_organization.fein do
+          subject.migrate
+        end
         employer_profile.reload
         employer_attestation.reload
         expect(employer_attestation.aasm_state).to eq "approved"
@@ -163,7 +172,10 @@ describe FixOrganization, dbclean: :after_each do
       it "should approve the attestation when no documents are present for mid plan year conversion group" do
         expect(employer_attestation.aasm_state).to eq "unsubmitted"
         expect(employer_attestation.employer_attestation_documents).to eq []
-        subject.migrate
+        ClimateControl.modify action: 'approve_attestation',
+                            organization_fein: employer_organization.fein do
+          subject.migrate
+        end
         employer_profile.reload
         employer_attestation.reload
         expect(employer_attestation.aasm_state).to eq "approved"
@@ -179,7 +191,10 @@ describe FixOrganization, dbclean: :after_each do
       it "should approve the attestation when no documents are present for conversion group" do
         expect(employer_attestation.aasm_state).to eq "unsubmitted"
         expect(employer_attestation.employer_attestation_documents).to eq []
-        subject.migrate
+        ClimateControl.modify action: 'approve_attestation',
+                            organization_fein: employer_organization.fein do
+          subject.migrate
+        end
         employer_profile.reload
         employer_attestation.reload
         expect(employer_attestation.aasm_state).to eq "approved"
@@ -204,15 +219,13 @@ describe FixOrganization, dbclean: :after_each do
     let!(:broker_role) { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile1.id) }
 
     context "updating broker agency account details to correct information is provided" do
-      before(:each) do
-        ENV['action'] = 'update_employer_broker_agency_account'
-        ENV['organization_fein'] = organization.fein
-        ENV['npn'] = broker_role.npn
-      end
-
       it "should update broker agency account when organization is present" do
         expect(active_benefit_sponsorship.active_broker_agency_account.is_active).to eq true
-        subject.migrate
+        ClimateControl.modify action: 'update_employer_broker_agency_account',
+                              organization_fein: organization.fein,
+                              npn: broker_role.npn do
+          subject.migrate
+        end
         active_benefit_sponsorship.reload
         expect(active_benefit_sponsorship.broker_agency_accounts.unscoped.first.is_active).to eq false
         expect(active_benefit_sponsorship.active_broker_agency_account.writing_agent_id).to eq broker_role.id
@@ -221,15 +234,12 @@ describe FixOrganization, dbclean: :after_each do
     end
 
     context "updating broker agency account details to correct information is provided" do
-
-      before(:each) do
-        ENV['action'] = 'update_employer_broker_agency_account'
-        ENV['organization_fein'] = active_benefit_sponsorship.organization.fein
-        ENV['npn'] = ""
-      end
-
       it "should not update broker agency account when organization is present" do
-        subject.migrate
+        ClimateControl.modify action: 'update_employer_broker_agency_account',
+                              organization_fein: organization.fein,
+                              npn: '' do
+          subject.migrate
+        end
         active_benefit_sponsorship.reload
         expect(active_benefit_sponsorship.active_broker_agency_account.writing_agent_id).not_to eq broker_role.id
         expect(active_benefit_sponsorship.active_broker_agency_account.benefit_sponsors_broker_agency_profile_id).not_to eq broker_agency_profile1.id

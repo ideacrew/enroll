@@ -11,16 +11,16 @@ module BenefitSponsors
         end
       end
 
-      def notifications_send(model_instance, new_model_event)
-        if new_model_event.present? &&  new_model_event.is_a?(BenefitSponsors::ModelEvents::ModelEvent)
-          if new_model_event.event_key == :generate_initial_employer_invoice
-            employer_profile = new_model_event.klass_instance
-            submitted_states = BenefitSponsors::BenefitApplications::BenefitApplication::SUBMITTED_STATES - [:termination_pending]
-            benefit_application = employer_profile.benefit_applications.where(:aasm_state.in => submitted_states).sort_by(&:created_at).last
-            deliver(recipient: employer_profile, event_object: benefit_application, notice_event: "generate_initial_employer_invoice") if benefit_application.present?
-          end
-        end
-      end
+      # def notifications_send(model_instance, new_model_event)
+      #   if new_model_event.present? &&  new_model_event.is_a?(BenefitSponsors::ModelEvents::ModelEvent)
+      #     if new_model_event.event_key == :generate_initial_employer_invoice
+      #       employer_profile = new_model_event.klass_instance
+      #       submitted_states = BenefitSponsors::BenefitApplications::BenefitApplication::SUBMITTED_STATES - [:termination_pending]
+      #       benefit_application = employer_profile.benefit_applications.where(:aasm_state.in => submitted_states).sort_by(&:created_at).last
+      #       deliver(recipient: employer_profile, event_object: benefit_application, notice_event: "generate_initial_employer_invoice") if benefit_application.present?
+      #     end
+      #   end
+      # end
 
       private
 

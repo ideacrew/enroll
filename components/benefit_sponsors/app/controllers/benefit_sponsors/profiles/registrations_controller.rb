@@ -57,6 +57,7 @@ module BenefitSponsors
         if updated
           flash[:notice] = 'Employer successfully Updated.' if is_employer_profile?
           flash[:notice] = 'Broker Agency Profile successfully Updated.' if is_broker_profile?
+          flash[:notice] = 'General Agency Profile successfully Updated.' if is_general_agency_profile?
         else
           org_error_msg = @agency.errors.full_messages.join(",").humanize if @agency.errors.present?
 
@@ -87,6 +88,10 @@ module BenefitSponsors
 
       def is_broker_profile?
         profile_type == "broker_agency"
+      end
+
+      def is_general_agency_profile?
+        profile_type == "general_agency"
       end
 
       def registration_params

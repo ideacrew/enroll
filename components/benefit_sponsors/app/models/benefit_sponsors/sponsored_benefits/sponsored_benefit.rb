@@ -62,6 +62,10 @@ module BenefitSponsors
         product_package_kind == :single_product
       end
 
+      def multi_product?
+        product_package_kind == :multi_product
+      end
+
       def products(coverage_date)
         lookup_package_products(coverage_date)
       end
@@ -71,8 +75,30 @@ module BenefitSponsors
         BenefitMarkets::Products::Product.by_coverage_date(product_package.products_for_plan_option_choice(product_option_choice).by_service_areas(recorded_service_area_ids), coverage_date)
       end
 
+      def lowest_cost_product(effective_date)
+        return @lowest_cost_product if defined? @lowest_cost_product
+        sponsored_products =  products(effective_date)
+        @lowest_cost_product = load_base_products(sponsored_products).min_by { |product|
+          product.min_cost_for_application_period(effective_date)
+        }
+      end
+
+      def highest_cost_product(effective_date)
+        return @highest_cost_product if defined? @highest_cost_product
+        sponsored_products =  products(effective_date)
+        @highest_cost_product ||= load_base_products(sponsored_products).max_by { |product|
+          product.max_cost_for_application_period(effective_date)
+        }
+      end
+
+      def load_base_products(sponsored_products)
+        return [] if sponsored_products.empty?
+        @loaded_base_products ||= BenefitMarkets::Products::Product.find(sponsored_products.pluck(:_id))
+      end
+
       def product_package
-        return nil if self.product_package_kind.blank?
+        return nil if product_package_kind.blank? || benefit_sponsor_catalog.blank?
+
         @product_package ||= benefit_sponsor_catalog.product_package_for(self)
       end
 
@@ -99,18 +125,21 @@ module BenefitSponsors
 
         if new_product_package.present? && reference_product.present?
           if reference_product.renewal_product.present? && new_product_package.active_products.include?(reference_product.renewal_product)
-            new_sponsored_benefit = self.class.new(
-              product_package_kind: product_package_kind,
-              product_option_choice: product_option_choice,
-              reference_product: reference_product.renewal_product,
-              sponsor_contribution: sponsor_contribution.renew(new_product_package),
-              benefit_package: new_benefit_package
-              # pricing_determinations: renew_pricing_determinations(new_product_package)
-            )
+            new_sponsored_benefit = self.class.new(attributes_for_renewal(new_benefit_package, new_product_package))
             renew_pricing_determinations(new_sponsored_benefit)
             new_sponsored_benefit
           end
         end
+      end
+
+      def attributes_for_renewal(new_benefit_package, new_product_package)
+        {
+          product_package_kind: product_package_kind,
+          product_option_choice: product_option_choice,
+          reference_product: reference_product.renewal_product,
+          sponsor_contribution: sponsor_contribution.renew(new_product_package),
+          benefit_package: new_benefit_package
+        }
       end
 
       def renew_pricing_determinations(new_sponsored_benefit)

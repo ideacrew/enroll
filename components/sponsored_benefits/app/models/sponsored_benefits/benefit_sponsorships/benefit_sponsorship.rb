@@ -51,8 +51,8 @@ module SponsoredBenefits
         inclusion: { in: 1..12 },
         allow_blank: true
 
-      delegate :sic_code, to: :benefit_sponsorable
-      delegate :rating_area, to: :benefit_sponsorable
+      # delegate :sic_code, to: :benefit_sponsorable
+      # delegate :rating_area, to: :benefit_sponsorable
       delegate :plan_design_organization, to: :benefit_sponsorable
       # Prevent changes to immutable fields. Instantiate a new model instead
       # before_validation {
@@ -103,6 +103,14 @@ module SponsoredBenefits
         if !plan_year.blank?
           plan_year.start_on
         end
+      end
+
+      def sic_code
+        benefit_sponsorable.sic_code if Settings.aca.state_abbreviation != "DC"
+      end
+
+      def rating_area
+        benefit_sponsorable.rating_area if Settings.aca.state_abbreviation != "DC"
       end
 
       class << self

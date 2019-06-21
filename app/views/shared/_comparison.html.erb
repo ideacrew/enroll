@@ -41,13 +41,26 @@
       <tr>
         <th>Provider Network</th>
         <% qhps.each do |qhp|%>
-          <th colspan="2">
             <%= render partial: "shared/network_data", locals: {plan: qhp.product} %>
-          </th>
         <% end %>
       </tr>
 
-      <%= render partial: "shared/plan_shoppings/provider_directory_url", locals: {qhps: qhps}%>
+      <% if qhps.map(&:product).map(&:benefit_market_kind) == :aca_individual %>
+        <% if qhps.map(&:product).map(&:nationwide).compact.uniq.include?(true) %>
+          <tr>
+            <th></th>
+            <% qhps.each do |qhp| %>
+              <th colspan="2">
+                <% if qhp.product.nationwide %>
+                  <%= link_to 'DOCTOR DIRECTORY', qhp.plan.provider_directory_url, target: '_blank' %>
+                <% end %>
+              </th>
+            <% end %>
+          </tr>
+        <% end %>
+      <% else %>
+        <%= render partial: "shared/plan_shoppings/provider_directory_url", locals: {qhps: qhps} %>
+      <% end %>
 
       <% if qhps.map(&:plan).map(&:rx_formulary_url).compact.present? %>
         <tr>

@@ -332,7 +332,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
     let(:user) { FactoryBot.create(:user, person: person, roles: ['broker']) }
     context "when general agency is enabled via settings",dbclean: :after_each do
       before :each do
-        Settings.aca.general_agency_enabled = true
+        allow(Settings.aca).to receive(:general_agency_enabled).and_return(true)
         sign_in user
         get :assign, params: {id: broker_agency_profile.id}, format: :js, xhr: true
       end
@@ -352,7 +352,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
 
     context "when general agency is disabled via settings",dbclean: :after_each do
       before :each do
-        Settings.aca.general_agency_enabled = false
+        allow(Settings.aca).to receive(:general_agency_enabled).and_return(false)
         sign_in user
         get :assign, params: {id: broker_agency_profile.id}, format: :js, xhr: true
       end
@@ -454,7 +454,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
     let(:employer_profile) { FactoryBot.create(:employer_profile, general_agency_profile: general_agency_profile) }
     context "when general agency is enabled via settings",dbclean: :after_each do
       before do
-        Settings.aca.general_agency_enabled = true
+        allow(Settings.aca).to receive(:general_agency_enabled).and_return(true)
       end
       context "when we Assign agency" do
         before :each do
@@ -492,7 +492,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
 
     context "when general agency is enabled via settings",dbclean: :after_each do
       before do
-        Settings.aca.general_agency_enabled = true
+        allow(Settings.aca).to receive(:general_agency_enabled).and_return(true)
       end
       context "when we Assign agency" do
         before :each do
@@ -530,7 +530,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
 
     context "when general agency is disabled via settings",dbclean: :after_each do
       before do
-        Settings.aca.general_agency_enabled = false
+        allow(Settings.aca).to receive(:general_agency_enabled).and_return(false)
       end
       context "when we Assign agency",dbclean: :after_each do
         before :each do

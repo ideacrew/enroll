@@ -1,4 +1,5 @@
 class Exchanges::HbxProfilesController < ApplicationController
+  include VlpDoc
   include ::DataTablesAdapter
   include ::DataTablesSearch
   include ::Pundit
@@ -157,11 +158,11 @@ class Exchanges::HbxProfilesController < ApplicationController
   def force_publish
     @element_to_replace_id = params[:employer_actions_id]
     @benefit_application   = @benefit_sponsorship.benefit_applications.draft_state.last
-    
+
     if @benefit_application.present?
       @service = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(@benefit_application)
       if @service.may_force_submit_application? || params[:publish_with_warnings] == 'true'
-        @service.force_submit_application      
+        @service.force_submit_application
       end
     end
 
@@ -299,9 +300,17 @@ def employer_poc
     @datatable = Effective::Datatables::FamilyDataTable.new(params[:scopes])
     #render '/exchanges/hbx_profiles/family_index_datatable'
   end
-  
+
   def identity_verification
     @datatable = Effective::Datatables::IdentityVerificationDataTable.new(params[:scopes])
+  end
+
+  def identity_verification
+    @datatable = Effective::Datatables::IdentityVerificationDataTable.new(params[:scopes])
+  end
+
+  def user_account_index
+    @datatable = Effective::Datatables::UserAccountDatatable.new
   end
 
   def user_account_index
@@ -322,6 +331,7 @@ def employer_poc
     getActionParams
     @element_to_replace_id = params[:family_actions_id]
   end
+
 
   def show_sep_history
     getActionParams
@@ -377,7 +387,7 @@ def employer_poc
   end
 
   def update_cancel_enrollment
-    params_parser = ::Forms::BulkActionsForAdmin.new(params)
+    params_parser = ::Forms::BulkActionsForAdmin.new(params.permit!.except(:utf8, :commit, :controller, :action).to_h)
     @result = params_parser.result
     @row = params_parser.row
     @family_id = params_parser.family_id
@@ -397,7 +407,7 @@ def employer_poc
   end
 
   def update_terminate_enrollment
-    params_parser = ::Forms::BulkActionsForAdmin.new(params)
+    params_parser = ::Forms::BulkActionsForAdmin.new(params.permit!.except(:utf8, :commit, :controller, :action).to_h)
     @result = params_parser.result
     @row = params_parser.row
     @family_id = params_parser.family_id
@@ -426,11 +436,11 @@ def employer_poc
 
     status_params = params.permit(:status)
     @status = status_params[:status] || 'is_applicant'
-    @general_agency_profiles = GeneralAgencyProfile.filter_by(@status)
+    @general_agency_profiles = BenefitSponsors::Organizations::GeneralAgencyProfile.filter_by(@status)
     @general_agency_profiles = Kaminari.paginate_array(@general_agency_profiles).page(page_no)
 
     respond_to do |format|
-      format.html { render 'general_agency' }
+      # format.html { render 'general_agency' }
       format.js
     end
   end
@@ -525,12 +535,13 @@ def employer_poc
     @element_to_replace_id = params[:person][:family_actions_id]
     @person = Person.find(params[:person][:pid]) if !params[:person].blank? && !params[:person][:pid].blank?
     @ssn_match = Person.find_by_ssn(params[:person][:ssn]) unless params[:person][:ssn].blank?
-
+    @info_changed, @dc_status = sensitive_info_changed?(@person.consumer_role) if @person.consumer_role
     if !@ssn_match.blank? && (@ssn_match.id != @person.id) # If there is a SSN match with another person.
       @dont_allow_change = true
     else
       begin
         @person.update_attributes!(dob: Date.strptime(params[:jq_datepicker_ignore_person][:dob], '%m/%d/%Y').to_date, encrypted_ssn: Person.encrypt_ssn(params[:person][:ssn]))
+        @person.consumer_role.check_for_critical_changes(@person.primary_family, info_changed: @info_changed, no_dc_address: "false", dc_status: @dc_status) if @person.consumer_role && @person.is_consumer_role_active?
         CensusEmployee.update_census_employee_records(@person, current_user)
       rescue Exception => e
         @error_on_save = @person.errors.messages
@@ -540,6 +551,29 @@ def employer_poc
     respond_to do |format|
       format.js { render "edit_enrollment", person: @person, :family_actions_id => params[:person][:family_actions_id]  } if @error_on_save
       format.js { render "update_enrollment", person: @person, :family_actions_id => params[:person][:family_actions_id] }
+    end
+  end
+
+  def new_eligibility
+    authorize  HbxProfile, :can_add_pdc?
+    @person = Person.find(params[:person_id])
+    @element_to_replace_id = params[:family_actions_id]
+    respond_to do |format|
+      format.js { render "new_eligibility", person: @person, :family_actions_id => params[:family_actions_id]  }
+    end
+  end
+
+  def create_eligibility
+    @element_to_replace_id = params[:person][:family_actions_id]
+    family = Person.find(params[:person][:person_id]).primary_family
+    family.active_household.create_new_tax_household(params[:person]) rescue nil
+  end
+
+  def eligibility_kinds_hash(value)
+    if value['pdc_type'] == 'is_medicaid_chip_eligible'
+      { is_medicaid_chip_eligible: true, is_ia_eligible: false }.with_indifferent_access
+    elsif value['pdc_type'] == 'is_ia_eligible'
+      { is_ia_eligible: true, is_medicaid_chip_eligible: false }.with_indifferent_access
     end
   end
 
@@ -624,7 +658,7 @@ def employer_poc
 
   def set_date
     authorize HbxProfile, :modify_admin_tabs?
-    forms_time_keeper = Forms::TimeKeeper.new(params[:forms_time_keeper])
+    forms_time_keeper = Forms::TimeKeeper.new(timekeeper_params)
     begin
       forms_time_keeper.set_date_of_record(forms_time_keeper.forms_date_of_record)
       flash[:notice] = "Date of record set to " + TimeKeeper.date_of_record.strftime("%m/%d/%Y")
@@ -683,6 +717,10 @@ private
     params.merge!({ pte_count: '0', msp_count: '0', admin_datatable_action: true })
     params.permit(:start_on, :end_on, :fte_count, :pte_count, :msp_count,
                   :open_enrollment_start_on, :open_enrollment_end_on, :benefit_sponsorship_id, :admin_datatable_action)
+  end
+
+  def timekeeper_params
+    params.require(:forms_time_keeper).permit(:date_of_record)
   end
 
   def modify_admin_tabs?

@@ -38,6 +38,8 @@ module SponsoredBenefits
       field :has_active_broker_relationship, type: Boolean, default: false
 
       embeds_many :plan_design_proposals, class_name: "SponsoredBenefits::Organizations::PlanDesignProposal", cascade_callbacks: true
+      embeds_many :general_agency_accounts, class_name: "SponsoredBenefits::Accounts::GeneralAgencyAccount", cascade_callbacks: true
+
 
       validates_presence_of   :legal_name, :has_active_broker_relationship
       validates_presence_of :sic_code, if: :sic_code_exists_for_employer?
@@ -58,6 +60,9 @@ module SponsoredBenefits
 
       scope :find_by_proposal,    -> (proposal) { where(:"plan_design_proposal._id" => BSON::ObjectId.from_string(proposal)) }
 
+      scope :find_by_general_agency, -> (general_agency_profile_id) {where(:"general_agency_accounts.benefit_sponsrship_general_agency_profile_id" => BSON::ObjectId.from_string(general_agency_profile_id))}
+      scope :find_by_active_general_agency, -> (general_agency_profile_id) {where(:"general_agency_accounts" => {:"$elemMatch" => { benefit_sponsrship_general_agency_profile_id: BSON::ObjectId.from_string(general_agency_profile_id), aasm_state: :active}} )}
+
       scope :active_sponsors,     -> { where(:has_active_broker_relationship => true) }
       scope :inactive_sponsors,   -> { where(:has_active_broker_relationship => false) }
       scope :prospect_sponsors,   -> { where(:sponsor_profile_id => nil) }
@@ -70,15 +75,21 @@ module SponsoredBenefits
 
 
       def employer_profile
+        return nil if is_prospect?
         ::EmployerProfile.find(sponsor_profile_id) || ::BenefitSponsors::Organizations::Profile.find(sponsor_profile_id)
       end
 
       def broker_agency_profile
-        ::BrokerAgencyProfile.find(owner_profile_id) || ::BenefitSponsors::Organizations::Profile.find(owner_profile_id)
+        ::BrokerAgencyProfile.find(owner_profile_id) || ::BenefitSponsors::Organizations::BrokerAgencyProfile.find(owner_profile_id)
       end
 
       def general_agency_profile
-        self.try(:employer_profile).try(:active_general_agency_account)
+        general_agency_account = general_agency_accounts.active.first
+        general_agency_account.general_agency_profile if general_agency_account
+      end
+
+      def active_general_agency_account
+        general_agency_accounts.active.first
       end
 
       def active_employer_benefit_sponsorship

@@ -191,7 +191,7 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
       it "should build person" do
         user = User.new(**params)
         user.instantiate_person
-        expect(user.person).to be_an_instance_of Person
+        user.person.should be_an_instance_of Person
       end
     end
   end
@@ -423,7 +423,7 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
       end
 
       it "should return false when broker agency staff" do
-        user.roles = ['broker_agency_staff']
+        allow(person).to receive(:has_active_broker_staff_role?).and_return true
         expect(user.can_change_broker?).to eq false
       end
 

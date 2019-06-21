@@ -146,7 +146,7 @@ RSpec.describe Exchanges::BrokerApplicantsController do
           end
 
           before :each do
-            Settings.aca.broker_carrier_appointments_enabled = true
+            allow(Settings.aca).to receive(:broker_carrier_appointments_enabled).and_return(true)
             broker_role.update_attributes({ broker_agency_profile_id: @broker_agency_profile.id })
             put :update, params:{id: broker_role.person.id, pending: true, person:  { broker_role_attributes: { training: true , carrier_appointments: {}} }} , format: :js
             broker_role.reload

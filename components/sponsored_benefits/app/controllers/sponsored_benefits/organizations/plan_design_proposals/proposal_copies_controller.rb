@@ -17,7 +17,7 @@ module SponsoredBenefits
         else
           flash[:error] = "Something went wrong"
         end
-        response_url = edit_organizations_plan_design_organization_plan_design_proposal_path(plan_design_organization, new_plan_design_proposal.proposal.id)
+        response_url = edit_organizations_plan_design_organization_plan_design_proposal_path(plan_design_organization, new_plan_design_proposal.proposal.id, profile_id: params[:profile_id])
         respond_to do |format|
           format.html { redirect_to response_url }
           format.js { render json: { url: response_url }.to_json, content_type: 'application/json' }
@@ -68,9 +68,10 @@ module SponsoredBenefits
           elected_plans: bg.elected_plans,
           elected_dental_plan_ids: bg.elected_dental_plan_ids
         })
-
-        bg.composite_tier_contributions.each do |contribution|
-          new_bg.composite_tier_contributions << contribution.clone
+        if bg.sole_source?
+          bg.composite_tier_contributions.each do |contribution|
+            new_bg.composite_tier_contributions << contribution.clone
+          end
         end
         bg.relationship_benefits.each do |rb|
           new_bg.relationship_benefits << rb.clone
@@ -79,9 +80,10 @@ module SponsoredBenefits
         bg.dental_relationship_benefits.each do |rb|
           new_bg.dental_relationship_benefits << rb.clone
         end
-
-        new_bg.estimate_composite_rates
-        new_application.benefit_sponsorship.benefit_sponsorable.save!
+        if new_bg.sole_source?
+          new_bg.estimate_composite_rates
+          new_application.benefit_sponsorship.benefit_sponsorable.save!
+        end
       end
 
       def plan_design_proposal

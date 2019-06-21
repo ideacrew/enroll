@@ -5,7 +5,7 @@ RSpec.describe "general_agencies/profiles/_staffs.html.erb" do
   let(:staff) { FactoryBot.create(:general_agency_staff_role) }
   before :each do
     assign :staffs, [staff]
-    Settings.aca.general_agency_enabled = true
+    allow(Settings.aca).to receive(:general_agency_enabled).and_return(true)
     Enroll::Application.reload_routes!
     render template: "general_agencies/profiles/_staffs.html.erb"
   end

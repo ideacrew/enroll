@@ -11,5 +11,8 @@ $('.tab-container').hide();
   $('#singleCarrierCarrierList').html("<%= escape_javascript(render partial: 'carriers_list', locals: { carrier_names: @carrier_names, search_level: selected_carrier_level, active_year: active_year, kind: kind }) %>");
 <% when 'metal_level' %>
   $('.metals-tab').show();
-  $('#metalLevelCarrierList').html("<%= escape_javascript(render partial: 'carriers_list', locals: { carrier_names: @carrier_names, search_level: selected_carrier_level, active_year: active_year, kind: kind }) %>")
+  $('#metalLevelCarrierList').html("<%= escape_javascript(render partial: 'carriers_list', locals: { carrier_names: @carrier_names, search_level: selected_carrier_level, active_year: active_year, kind: kind }) %>");
+<% when 'custom' %>
+$('.carrier-custom-plan-tab').show();
+$('#CustomCarrierList').html("<%= escape_javascript(render partial: 'carriers_list', locals: { carrier_names: @carrier_names, search_level: selected_carrier_level, active_year: active_year, kind: kind }) %>");
 <% end %>

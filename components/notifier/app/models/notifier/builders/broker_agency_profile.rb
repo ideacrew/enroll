@@ -1,10 +1,12 @@
 module Notifier
   class Builders::BrokerAgencyProfile
 
+    include Config::SiteHelper
     # include Notifier::Builders::PlanYear
+    include Notifier::Builders::BenefitApplication
     include Notifier::Builders::Broker
 
-    attr_accessor :payload, :broker_agency_profile, :broker_agency_account, :merge_model
+    attr_accessor :payload, :broker_agency_profile, :broker_agency_account, :merge_model, :event_name
 
     def initialize
       data_object = Notifier::MergeDataModels::BrokerAgencyProfile.new
@@ -50,9 +52,9 @@ module Notifier
     end
 
     def employer
-      if payload['event_object_kind'].constantize == BenefitSponsors::Organizations::AcaShopCcaEmployerProfile
-        employer = BenefitSponsors::Organizations::Profile.find payload['event_object_id']
-      end
+      return unless payload['event_object_kind'].constantize == "BenefitSponsors::Organizations::AcaShop#{site_key.capitalize}EmployerProfile".constantize
+
+      BenefitSponsors::Organizations::Profile.find payload['event_object_id']
     end
 
     def employer_name

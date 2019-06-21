@@ -19,10 +19,15 @@ class Permission
   field :can_update_ssn, type: Boolean, default: false
   field :can_complete_resident_application, type: Boolean, default: false
   field :can_add_sep, default: false
+  field :can_add_pdc, default: false
   field :can_lock_unlock, type: Boolean, default: false
+  field :can_add_pdc, default: false
   field :can_view_username_and_email, type: Boolean, default: false
+  field :can_transition_family_members, type: Boolean, default: false
+
   field :can_reset_password, type: Boolean, default: false
   field :can_extend_open_enrollment, type: Boolean, default: false
+  field :can_modify_plan_year, type: Boolean, default: false
   field :can_create_benefit_application, type: Boolean, default: false
   field :can_change_fein, type: Boolean, default: false
   field :can_force_publish, type: Boolean, default: false
@@ -32,7 +37,6 @@ class Permission
   field :view_personal_info_page, type: Boolean, default: false
   field :can_access_new_consumer_application_sub_tab, type: Boolean, default: false
   field :can_access_outstanding_verification_sub_tab, type: Boolean, default: false
-  field :can_access_resident_application_sub_tab, type: Boolean, default: false
   field :can_access_identity_verification_sub_tab, type: Boolean, default: false
   field :can_access_accept_reject_identity_documents, type: Boolean, default: false
   field :can_access_accept_reject_paper_application_documents, type: Boolean, default: false

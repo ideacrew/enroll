@@ -420,7 +420,8 @@ module ApplicationHelper
       issuer_hios_id = plan.hios_id[0..4].extract_value
       Settings.aca.carrier_hios_logo_variant[issuer_hios_id] || plan.carrier_profile.legal_name.extract_value
     else
-      return "" if !plan.issuer_profile.legal_name.extract_value.present?
+      return '' if plan.extract_value.issuer_profile.legal_name.nil?
+
       issuer_hios_id = plan.hios_id[0..4].extract_value
       Settings.aca.carrier_hios_logo_variant[issuer_hios_id] || plan.issuer_profile.legal_name.extract_value
     end
@@ -430,14 +431,14 @@ module ApplicationHelper
     carrier_name = carrier_logo(plan)
     image_tag("logo/carrier/#{carrier_name.parameterize.underscore}.jpg", width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
   end
-      
+
   def digest_logos
     carrier_logo_hash = Hash.new(carriers:{})
     carriers = ::BenefitSponsors::Organizations::Organization.issuer_profiles
     carriers.each do |car|
       if Rails.env == "production"
         image = "logo/carrier/#{car.legal_name.parameterize.underscore}.jpg"
-        digest_image = "/assets/#{Rails.application.assets.find_asset(image).digest_path}"
+        digest_image = "/assets/#{::Sprockets::Railtie.build_environment(Rails.application).find_asset(image).digest_path}"
         carrier_logo_hash[car.legal_name] = digest_image
       else
         image = "/assets/logo/carrier/#{car.legal_name.parameterize.underscore}.jpg"
@@ -484,7 +485,7 @@ module ApplicationHelper
   end
 
   def relationship_options(dependent, referer)
-    relationships = referer.include?("consumer_role_id") || @person.try(:has_active_consumer_role?) ?
+    relationships = referer.include?("consumer_role_id") || @person.try(:is_consumer_role_active?) ?
       BenefitEligibilityElementGroup::Relationships_UI - ["self"] :
       PersonRelationship::Relationships_UI
     options_for_select(relationships.map{|r| [r.to_s.humanize, r.to_s] }, selected: dependent.try(:relationship))
@@ -560,7 +561,9 @@ module ApplicationHelper
   end
 
   def show_oop_pdf_link(aasm_state)
-    (PlanYear::PUBLISHED + PlanYear::RENEWING_PUBLISHED_STATE).include?(aasm_state)
+    return false if aasm_state.blank?
+
+    BenefitSponsors::BenefitApplications::BenefitApplication::SUBMITTED_STATES.include?(aasm_state.to_sym)
   end
 
   def calculate_age_by_dob(dob)
@@ -601,7 +604,7 @@ module ApplicationHelper
   end
 
   def trigger_notice_observer(recipient, event_object, notice_event, params={})
-    observer = Observers::NoticeObserver.new
+    observer = BenefitSponsors::Observers::NoticeObserver.new
     observer.deliver(recipient: recipient, event_object: event_object, notice_event: notice_event, notice_params: params)
   end
 
@@ -618,17 +621,40 @@ module ApplicationHelper
 
   def env_bucket_name(bucket_name)
     aws_env = ENV['AWS_ENV'] || "qa"
-    "#{Settings.site.s3_prefix}-enroll-#{bucket_name}-#{aws_env}"
+    "dchbx-enroll-#{bucket_name}-#{aws_env}"
   end
 
   def display_dental_metal_level(plan)
-    if (plan.class == Plan || (plan.is_a?(Maybe) && plan.extract_value.class.to_s == "Plan"))
-      return plan.metal_level.to_s.titleize if plan.coverage_kind.to_s == "health"
+    if plan.class == Plan || (plan.is_a?(Maybe) && plan.extract_value.class.to_s == 'Plan')
+      return plan.metal_level.to_s.titleize if plan.coverage_kind.to_s == 'health'
+
       (plan.active_year == 2015 ? plan.metal_level : plan.dental_level).try(:to_s).try(:titleize) || ""
     else
-      return plan.metal_level_kind.to_s.titleize if plan.kind.to_s == "health"
-      # TODO Update this for dental plans
+      return plan.metal_level_kind.to_s.titleize if plan.kind.to_s == 'health'
+
       (plan.active_year == 2015 ? plan.metal_level_kind : plan.dental_level).try(:to_s).try(:titleize) || ""
+    end
+  end
+
+  def ivl_metal_network(plan)
+    (plan.nationwide ? 'nationwide' : 'dc metro') if plan.benefit_market_kind == :aca_individual
+  end
+
+  def ivl_hsa_status(plan_hsa_status, plan)
+    (plan_hsa_status[plan.id.to_s]) if plan.benefit_market_kind == :aca_individual
+  end
+
+  def products_count(products)
+    return 0 unless products
+
+    products.count
+  end
+
+  def network_type(product)
+    if product.nationwide
+      'Nationwide'
+    elsif product.dc_in_network
+      'DC-Metro'
     end
   end
 
@@ -653,7 +679,7 @@ module ApplicationHelper
   end
 
   def asset_data_base64(path)
-    asset = Rails.application.assets.find_asset(path)
+    asset = ::Sprockets::Railtie.build_environment(Rails.application).find_asset(path)
     throw "Could not find asset '#{path}'" if asset.nil?
     base64 = Base64.encode64(asset.to_s).gsub(/\s+/, "")
     "data:#{asset.content_type};base64,#{Rack::Utils.escape(base64)}"
@@ -727,6 +753,22 @@ module ApplicationHelper
     TimeKeeper.date_of_record.prev_year.year
   end
 
+  def resident_application_enabled?
+    if Settings.aca.individual_market.dc_resident_application
+      policy(:family).hbx_super_admin_visible?
+    else
+      false
+    end
+  end
+
+  def transition_family_members_link_type row, allow
+    if Settings.aca.individual_market.transition_family_members_link
+      allow && row.primary_applicant.person.has_consumer_or_resident_role? ? 'ajax' : 'disabled'
+    else
+      "disabled"
+    end
+  end
+
   def convert_to_bool(val)
     return true if val == true || val == 1  || val =~ (/^(true|t|yes|y|1)$/i)
     return false if val == false || val == 0 || val =~ (/^(false|f|no|n|0)$/i)
@@ -748,6 +790,7 @@ module ApplicationHelper
       :draft => :draft,
       :enrollment_open => :enrolling,
       :enrollment_eligible => :enrolled,
+      :binder_paid => :enrolled,
       :approved => :published,
       :pending => :publish_pending
     }
@@ -762,7 +805,8 @@ module ApplicationHelper
     member_groups.map do |member_group|
       member_group_hash = JSON.parse(member_group.group_enrollment.to_json)
       member_group_hash['product'].merge!(
-        "issuer_name" => member_group.group_enrollment.product.issuer_profile.legal_name
+        "issuer_name" => member_group.group_enrollment.product.issuer_profile.legal_name,
+        "product_type" => member_group.group_enrollment.product.product_type
       )
       member_group_hash
     end.to_json

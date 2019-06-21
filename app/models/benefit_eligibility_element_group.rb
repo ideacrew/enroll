@@ -58,6 +58,7 @@ class BenefitEligibilityElementGroup
   field :ethnicity,              type: Array, default: ["any"]   # %w[any indian_tribe_member],
   field :cost_sharing,           type: String, default: ""
   field :lawful_presence_status, type: String, default: ""
+  field :active_individual_role, type: Boolean, default: false
 
 
   # validates :eligible_relationship_categories,

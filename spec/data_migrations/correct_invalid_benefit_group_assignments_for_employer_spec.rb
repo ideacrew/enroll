@@ -25,7 +25,7 @@ describe CorrectInvalidBenefitGroupAssignmentsForEmployer, dbclean: :after_each 
 
     let(:census_employee) { employer_profile.census_employees.non_business_owner.first }
     let!(:benefit_group_assignment) {
-      census_employee.active_benefit_group_assignment.update(is_active: false) 
+      census_employee.active_benefit_group_assignment.update(is_active: false)
       ce = build(:benefit_group_assignment, census_employee: census_employee, start_on: benefit_start_on, end_on: benefit_end_on)
       ce.save(:validate => false)
       ce
@@ -34,8 +34,10 @@ describe CorrectInvalidBenefitGroupAssignmentsForEmployer, dbclean: :after_each 
     let(:benefit_start_on) { benefit_group.start_on }
     let(:benefit_end_on) { nil }
 
-    before(:each) do
-      allow(ENV).to receive(:[]).with("fein").and_return(employer_profile.fein)
+    around do |example|
+     ClimateControl.modify fein: employer_profile.fein do
+       example.run
+     end
     end
 
     context "checking benefit group assignments", dbclean: :after_each do

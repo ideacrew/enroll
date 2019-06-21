@@ -1,4 +1,3 @@
-<%= stylesheet_link_tag "http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css", media: "all", "data-turbolinks-track" => true %>
 <%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
 <%= render partial: 'notices/shared/logo_and_address_shop', :locals => {notice: notice} %>
 <br>
@@ -10,11 +9,11 @@
     <tr>
       <% if notice.notification_type == "projected_eligibility_notice_2" && !notice.irs_consent_needed %>
         <td>
-          <h3>UPDATE YOUR INFORMATION AT <%= Settings.site.short_name.upcase %> BY OCTOBER 15, 2017<br>
+          <h3>UPDATE YOUR INFORMATION AT <%= Settings.site.short_name.upcase %> BY OCTOBER 15, <%= notice.coverage_year.to_i - 1 %><br>
             IT'S URGENT THAT YOU CALL US IF YOU NEED HELP PAYING FOR COVERAGE IN <%= notice.coverage_year %></h3>
         </td>
       <% else %>
-        <td><h3>UPDATE YOUR INFORMATION AT <%= Settings.site.short_name.upcase %> BY OCTOBER 15, 2017</h3></td>
+        <td><h3>UPDATE YOUR INFORMATION AT <%= Settings.site.short_name.upcase %> BY OCTOBER 15, <%= notice.coverage_year.to_i - 1 %></h3></td>
       <% end %>
     </tr>
   </tbody>
@@ -38,7 +37,7 @@
 <% if notice.notification_type == "projected_eligibility_notice_1" %>
     <%= render partial: 'notices/shared/unordered_list', locals: {
     listings: ["Review your household information, and make sure it’s correct",
-               "Let us know by October 15, 2017 if you need to update your household information for #{notice.coverage_year}",
+               "Let us know by October 15, #{notice.coverage_year.to_i - 1 } if you need to update your household information for #{notice.coverage_year}",
                "Review your projected eligibility results for #{notice.coverage_year}"]} %>
 <% end %>
 
@@ -46,13 +45,13 @@
   <% if notice.irs_consent_needed %>
     <%= render partial: 'notices/shared/unordered_list', locals: {
     listings: ["Review your household information, and make sure it’s correct",
-               "Let us know by October 15, 2017 if you need to update your household information for #{notice.coverage_year}",
+               "Let us know by October 15, #{notice.coverage_year.to_i - 1 } if you need to update your household information for #{notice.coverage_year}",
                "Review your projected eligibility results for #{notice.coverage_year}"]} %>
   <% else %>
     <%= render partial: 'notices/shared/unordered_list', locals: {
       listings: ["Call us as soon as possible if you still need help paying for coverage in #{notice.coverage_year}",
                  "Review your household information, and make sure it’s correct",
-                 "Let us know by October 15, 2017 if you need to update your household information for #{notice.coverage_year}",
+                 "Let us know by October 15, #{notice.coverage_year.to_i - 1 } if you need to update your household information for #{notice.coverage_year}",
                  "Review your projected eligibility results for #{notice.coverage_year}"]} %>
     <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
        contents: ["The federal government requires us to verify your household income every year to see if you’re still eligible for help paying for coverage. We do this by checking tax data from the Internal Revenue Service (IRS), but need your consent. If you do not give us permission to check IRS data, you can’t get help paying for coverage.", "If you want to continue to receive a tax credit to help pay your monthly premiums, or cost-sharing reductions that lower other health care costs in #{notice.coverage_year}, call DC Health Link as soon as possible at #{notice.hbe.phone}. Tell customer service that you want to update your IRS consent."],
@@ -66,7 +65,7 @@
 
 <% if notice.notification_type == "projected_eligibility_notice_1"%>
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-   content: "Each year, the federal government requires us to confirm that you still qualify to get coverage through DC Health Link. Please review your household information. If it’s correct, you don’t need to do anything right now. If this information needs to be updated for #{notice.coverage_year}, or if you need to add or remove someone, please let us know by October 15, 2017. To make updates, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> or call us at #{notice.hbe.phone}."} %>
+   content: "Each year, the federal government requires us to confirm that you still qualify to get coverage through DC Health Link. Please review your household information. If it’s correct, you don’t need to do anything right now. If this information needs to be updated for #{notice.coverage_year}, or if you need to add or remove someone, please let us know by October 15, #{notice.coverage_year.to_i - 1 }. To make updates, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> or call us at #{notice.hbe.phone}."} %>
 
   <% notice.uqhp_individuals.each do |member| %>
     <%= render partial: 'notices/shared/table_for_ivlr_notices', locals: {
@@ -80,7 +79,7 @@
 
 <% if notice.notification_type == "projected_eligibility_notice_2"%>
   <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-   contents: ["Each year, the federal government requires us to confirm that you still qualify to get coverage through DC Health Link. We also need to verify any cost savings you may qualify for in #{notice.coverage_year}.","Please review your household information. If it’s correct, you don’t need to do anything right now. If this information needs to be updated for #{notice.coverage_year}, or if you need to add or remove someone, please let us know by #{(TimeKeeper.date_of_record + 35.days).strftime("%B %d, %Y")}. To make updates, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> or call us at #{notice.hbe.phone}."], heading: '', sub_heading: '', bottom_margin: '5px'} %>
+   contents: ["Each year, the federal government requires us to confirm that you still qualify to get coverage through DC Health Link. We also need to verify any cost savings you may qualify for in #{notice.coverage_year}.","Please review your household information. If it’s correct, you don’t need to do anything right now. If this information needs to be updated for #{notice.coverage_year}, or if you need to add or remove someone, please let us know by October 15, #{notice.coverage_year.to_i - 1 }. To make updates, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> or call us at #{notice.hbe.phone}."], heading: '', sub_heading: '', bottom_margin: '5px'} %>
   <% notice.individuals.each do |member| %>
     <%= render partial: 'notices/shared/table_for_ivlr_notices', locals: {
                                rows: [['Household Member:', "#{member.first_name.titleize} #{member.last_name.titleize}  Age: #{member.age}"],
@@ -112,19 +111,20 @@
       previous: "<strong>Qualify for Private Health Insurance with Savings:</strong>",
       listings: notice.aqhp_or_non_magi_medicaid_eligible} %>
     <% notice.tax_households.each do |thh|%>
-      <% if thh.max_aptc.present? && thh.max_aptc.to_i > 0 %>
+    <%# Skipped two cases for APTC as per Sarah's request for 2018(29688#note-22)%>
+      <% if false && thh.max_aptc.present? && thh.max_aptc.to_i > 0 %>
         <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
           content: "<strong>Advance Premium Tax Credit Savings:</strong> &nbsp;&nbsp&nbsp;&nbsp&nbsp;&nbsp #{thh.max_aptc.to_f}/month", bottom_margin: '5px'} %>
         <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
           content: "This tax credit is used to help pay the monthly premium – the amount you pay each month to the insurance company to have a health plan.", bottom_margin: '5px'} %>
-      <% elsif thh.max_aptc.present? && thh.max_aptc.to_i == 0 %>
+      <% elsif false && thh.max_aptc.present? && thh.max_aptc.to_i == 0 %>
         <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
           content: "<strong>Advance Premium Tax Credit Savings:</strong> &nbsp;&nbsp&nbsp;&nbsp&nbsp;&nbsp #{thh.max_aptc.to_f}/month", bottom_margin: '5px'} %>
         <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
           content: "This tax credit is used to help pay the monthly premium – the amount you pay each month to the insurance company to have a health plan. The value of your tax credit is projected to be $0, because a silver plan will cost you less than what the federal government expects you to spend each month on health insurance.", bottom_margin: '5px'} %>
       <% else %>
         <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-          content: "<strong>Advance Premium Tax Credit Savings:</strong> The people listed above are projected to be eligible for a tax credit to help pay the monthly premium – the amount you pay each month to the insurance company to have a health plan. We’ll let you know the amount of your tax credit before open enrollment begins.", bottom_margin: '5px'} %>
+          content: "<strong>Advance Premium Tax Credit Savings:</strong> The people listed above are projected to be eligible for a tax credit to help pay the monthly premium – the amount you pay each month to the insurance company to have a health plan. We’ll let you know the amount of your tax credit when open enrollment begins.", bottom_margin: '5px'} %>
       <% end %>
     <% end %>
   <% end %>

@@ -1,4 +1,4 @@
-$:.push File.expand_path("../lib", __FILE__)
+$LOAD_PATH.push File.expand_path("../lib", __FILE__)
 
 # Maintain your gem's version:
 require "sponsored_benefits/version"
@@ -28,6 +28,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'ffi', '~> 1.9'
   s.add_dependency 'kaminari', '~> 0.17.0'
   s.add_dependency 'sass', '~> 3.7.3'
+  s.add_dependency 'webpacker',                 '~> 4.0.2'
 
   s.test_files = Dir["spec/**/*"]
 

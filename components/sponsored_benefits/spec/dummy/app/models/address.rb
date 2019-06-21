@@ -3,6 +3,7 @@
   include Mongoid::Timestamps
 
   embedded_in :office_location
+  embedded_in :person
 
   # The type of address
   field :kind, type: String

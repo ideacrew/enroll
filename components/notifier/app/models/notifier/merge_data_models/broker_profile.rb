@@ -3,7 +3,6 @@ module Notifier
 
     include Virtus.model
     include ActiveModel::Model
-    include Notifier::MergeDataModels::TokenBuilder
 
     attribute :notice_date, String
     attribute :first_name, String
@@ -13,7 +12,7 @@ module Notifier
     attribute :email, String
     attribute :broker_agency_name, String
     attribute :assignment_date, String
-    attribute :termination_date, Date
+    attribute :termination_date, String
     attribute :employer_name, String
     attribute :employer_poc_firstname, String
     attribute :employer_poc_lastname, String
@@ -45,6 +44,10 @@ module Notifier
 
     def primary_address
       mailing_address
+    end
+
+    def broker_present?
+      false
     end
 
     def shop?

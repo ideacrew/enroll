@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe BrokerRole, dbclean: :after_each do
+describe BrokerRole, dbclean: :around_each do
 
   let(:address) {FactoryBot.build(:address)}
   let(:saved_person) {FactoryBot.create(:person, addresses: [address])}
@@ -105,20 +105,14 @@ describe BrokerRole, dbclean: :after_each do
       end
     end
 
-    context "with duplicate npn number" do
-      let(:params) {valid_params}
+    context "validate uniqueness of npn" do
       let!(:broker_person) { FactoryBot.create(:person)}
-      let!(:broker_role_with_same_npn) {FactoryBot.build(:broker_role, npn: npn0, person: broker_person, provider_kind: provider_kind)}
+      let!(:broker_role) {FactoryBot.build(:broker_role, npn: "7775588", person: broker_person, provider_kind: provider_kind)}
 
-      it "should raise" do
-        expect(BrokerRole.create(**params)).to be_truthy
-        expect(BrokerRole.by_npn(npn0)).not_to be_nil
-        monogid_exception_class = begin
-                                    broker_role_with_same_npn.save!
-                                  rescue Mongo::Error::OperationFailure => e
-                                     e.class
-        end
-        expect(monogid_exception_class).to eq(Mongo::Error::OperationFailure)
+      it { should validate_uniqueness_of(:npn) }
+
+      it "validate uniqueness of npn" do
+        expect(broker_role.valid?).to be_truthy
       end
     end
 
@@ -221,27 +215,7 @@ describe BrokerRole, dbclean: :after_each do
     end
   end
 
-  describe BrokerRole, '.find', :dbclean => :after_each do
-    it 'returns Broker instance for the specified ID' do
-      b0 = BrokerRole.create(person: person0, npn: npn0, provider_kind: provider_kind)
-
-      expect(BrokerRole.find(b0._id)).to be_an_instance_of BrokerRole
-      expect(BrokerRole.find(b0._id).npn).to eq b0.npn
-    end
-  end
-
-  describe BrokerRole, '.all', :dbclean => :after_each do
-    it 'returns all Broker instances' do
-      b0 = BrokerRole.create(person: person0, npn: npn0, provider_kind: provider_kind)
-      b1 = BrokerRole.create(person: person1, npn: npn1, provider_kind: provider_kind)
-
-      # expect(BrokerRole.all).to be_an_instance_of Mongoid::Criteria
-      expect(BrokerRole.all.last).to be_an_instance_of BrokerRole
-      expect(BrokerRole.all.size).to eq 2
-    end
-  end
-
-  describe BrokerRole, '.find_by_npn', :dbclean => :after_each do
+  describe BrokerRole, '.find_by_npn', :dbclean => :around_each do
     it 'returns Broker instance for the specified National Producer Number' do
       b0 = BrokerRole.create(person: person0, npn: npn0, provider_kind: provider_kind)
       b1 = BrokerRole.create(person: person1, npn: npn1, provider_kind: provider_kind)
@@ -250,7 +224,7 @@ describe BrokerRole, dbclean: :after_each do
     end
   end
 
-  describe BrokerRole, '.find_by_broker_agency_profile', :dbclean => :after_each do
+  describe BrokerRole, '.find_by_broker_agency_profile', :dbclean => :around_each do
     before :each do
       @ba = FactoryBot.create(:broker_agency).broker_agency_profile
     end
@@ -261,17 +235,6 @@ describe BrokerRole, dbclean: :after_each do
 
       expect(BrokerRole.find_by_broker_agency_profile(@ba).size).to eq 2
       expect(BrokerRole.find_by_broker_agency_profile(@ba).first.broker_agency_profile_id).to eq @ba._id
-    end
-  end
-
-  describe BrokerRole, '.all', :dbclean => :after_each do
-    it 'returns all Broker instances' do
-      b0 = BrokerRole.create(person: person0, npn: npn0, provider_kind: provider_kind)
-      b1 = BrokerRole.create(person: person1, npn: npn1, provider_kind: provider_kind)
-
-      # expect(BrokerRole.all).to be_an_instance_of Mongoid::Criteria
-      expect(BrokerRole.all.last).to be_an_instance_of BrokerRole
-      expect(BrokerRole.all.size).to eq 2
     end
   end
 

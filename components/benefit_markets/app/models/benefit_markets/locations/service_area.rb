@@ -1,8 +1,10 @@
 module BenefitMarkets
   module Locations
     class ServiceArea
+
       include Mongoid::Document
       include Mongoid::Timestamps
+      include ::Config::SiteModelConcern
 
       field :active_year, type: Integer
       field :issuer_provided_title, type: String
@@ -33,24 +35,29 @@ module BenefitMarkets
       end
 
       def self.service_areas_for(address, during: TimeKeeper.date_of_record)
-        county_name = address.county.blank? ? "" : address.county.titlecase
-        zip_code = address.zip
-        state_abbrev = address.state.blank? ? "" : address.state.upcase
+        if site_key == :dc
+          self.where(
+            "active_year" => during.year
+          )
+        else
+          county_name = address.county.blank? ? "" : address.county.titlecase
+          zip_code = address.zip
+          state_abbrev = address.state.blank? ? "" : address.state.upcase
 
-        county_zip_ids = ::BenefitMarkets::Locations::CountyZip.where(
-          :county_name => county_name,
-          :zip => zip_code,
-          :state => state_abbrev
-        ).map(&:id).uniq
+          county_zip_ids = ::BenefitMarkets::Locations::CountyZip.where(
+            :county_name => county_name,
+            :zip => zip_code,
+            :state => state_abbrev
+          ).map(&:id).uniq
 
-        service_areas = self.where(
-          "active_year" => during.year,
-          "$or" => [
-            {"county_zip_ids" => { "$in" => county_zip_ids }},
-            {"covered_states" =>  state_abbrev}
-          ]
-        )
-        service_areas
+          self.where(
+            "active_year" => during.year,
+            "$or" => [
+              {"county_zip_ids" => { "$in" => county_zip_ids }},
+              {"covered_states" =>  state_abbrev}
+            ]
+          )
+        end
       end
     end
   end

@@ -3,6 +3,16 @@ module BenefitSponsors
     class AcaShopDcEmployerProfile < BenefitSponsors::Organizations::Profile
       # include BenefitSponsors::Employers::EmployerHelper
       include BenefitSponsors::Concerns::EmployerProfileConcern
+      include BenefitSponsors::Concerns::Observable
+
+      add_observer BenefitSponsors::Observers::EmployerProfileObserver.new, [:update]
+      add_observer BenefitSponsors::Observers::NoticeObserver.new, [:process_employer_profile_events]
+
+      after_update :notify_observers
+
+      field :no_ssn, type: Boolean, default: false
+      field :enable_ssn_date, type: DateTime
+      field :disable_ssn_date, type: DateTime
 
       def rating_area
         # FIX this
@@ -33,11 +43,13 @@ module BenefitSponsors
       end
 
       def build_nested_models
-        build_inbox if inbox.blank?
-        #TODO: After migration uncomment the lines below to get Welcome message for Initial Inbox creation
-        # welcome_subject = "Welcome to #{Settings.site.short_name}"
-        # welcome_body = "#{Settings.site.short_name} is the #{Settings.aca.state_name}'s online marketplace where benefit sponsors may select and offer products that meet their member's needs and budget."
-        # inbox.messages.new(subject: welcome_subject, body: welcome_body)
+        return if inbox.present?
+        build_inbox
+        welcome_subject = "Welcome to #{Settings.site.short_name}"
+        welcome_body = "#{Settings.site.short_name} is the #{Settings.aca.state_name}'s online marketplace where benefit sponsors may select and offer products that meet their member's needs and budget."
+        unless inbox.messages.where(body: welcome_body).present?
+          inbox.messages.new(subject: welcome_subject, body: welcome_body, from: Settings.site.short_name, created_at: Time.now.utc)
+        end
       end
     end
   end

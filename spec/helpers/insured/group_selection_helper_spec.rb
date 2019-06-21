@@ -1,4 +1,6 @@
 require "rails_helper"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_each do
   let(:subject)  { Class.new { extend Insured::GroupSelectionHelper } }
@@ -6,12 +8,22 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
   describe "#can shop individual" do
     let(:person) { FactoryBot.create(:person) }
 
+    before(:each) do
+      allow(person).to receive(:is_consumer_role_active?).and_return(false)
+    end
+
+
     it "should not have an active consumer role" do
       expect(subject.can_shop_individual?(person)).not_to be_truthy
     end
 
     context "with active consumer role" do
       let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+      let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+
+      before(:each) do
+        allow(person).to receive(:is_consumer_role_active?).and_return(true)
+      end
       it "should have active consumer role" do
         expect(subject.can_shop_individual?(person)).to be_truthy
       end
@@ -57,6 +69,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
       let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_employee_role) }
       before do
         allow(person).to receive(:has_active_employee_role?).and_return(true)
+        allow(person).to receive(:is_consumer_role_active?).and_return(true)
       end
       it "should have both active consumer and employee role" do
         expect(subject.can_shop_both_markets?(person)).not_to be_truthy
@@ -68,6 +81,8 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
       before do
         allow(person).to receive(:has_active_employee_role?).and_return(true)
         allow(person).to receive(:has_employer_benefits?).and_return(true)
+        allow(person).to receive(:is_consumer_role_active?).and_return(true)
+
       end
       it "should have both active consumer and employee role" do
         expect(subject.can_shop_both_markets?(person)).to be_truthy
@@ -159,16 +174,38 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
     end
   end
 
+  describe "#view_market_places" do
+    let(:person) { FactoryBot.create(:person) }
+
+    it "should return shop & individual if can_shop_both_markets? return true" do
+      allow(person).to receive(:is_consumer_role_active?).and_return(true)
+      allow(person).to receive(:has_employer_benefits?).and_return(true)
+      expect(helper.view_market_places(person)).to eq Plan::MARKET_KINDS
+      expect(helper.view_market_places(person)).to eq ["shop", "individual"]
+    end
+
+    it "should return individual & coverall if can_shop_individual? return true" do
+      allow(person).to receive(:is_consumer_role_active?).and_return(true)
+      expect(helper.view_market_places(person)).to eq ["individual"]
+    end
+
+    it "should return coverall if can_shop_resident? return true" do
+      allow(person).to receive(:is_resident_role_active?).and_return(true)
+      expect(helper.view_market_places(person)).to eq ["coverall"]
+    end
+  end
 
   describe "#selected_enrollment" do
 
     context "selelcting the enrollment" do
-      let(:person) { FactoryBot.create(:person) }
-      let(:employee_role) { FactoryBot.create(:employee_role, person: person, employer_profile: organization.employer_profile, census_employee_id: census_employee.id)}
-      let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
-      let(:organization) { FactoryBot.create(:organization, :with_active_and_renewal_plan_years)}
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup renewal application"
+
+      let(:person)       { FactoryBot.create(:person, :with_family) }
+      let(:family)       { person.primary_family }
+      let!(:census_employee)  { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile, active_benefit_group_assignment: current_benefit_package.id) }
+      let(:employee_role)     { FactoryBot.create(:benefit_sponsors_employee_role, employer_profile: abc_profile, person: person, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: abc_profile.id) }
       let(:qle_kind) { FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date) }
-      let(:census_employee) { FactoryBot.create(:census_employee, employer_profile: organization.employer_profile)}
       let(:sep){
         sep = family.special_enrollment_periods.new
         sep.effective_on_kind = 'date_of_event'
@@ -177,47 +214,54 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
         sep.save
         sep
       }
-      let(:active_enrollment) { FactoryBot.create(:hbx_enrollment,
-                         household: family.active_household,
-                         kind: "employer_sponsored",
-                         employee_role_id: employee_role.id,
-                         enrollment_kind: "special_enrollment",
-                         aasm_state: 'coverage_selected'
-      )}
-      let(:renewal_enrollment) { FactoryBot.create(:hbx_enrollment,
-                         household: family.active_household,
-                         kind: "employer_sponsored",
-                         employee_role_id: employee_role.id,
-                         enrollment_kind: "special_enrollment",
-                         aasm_state: 'renewing_coverage_selected'
-      )}
+      let!(:active_enrollment) do
+        FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+                          household: family.active_household,
+                          aasm_state: "coverage_selected",
+                          kind: "employer_sponsored",
+                          effective_on: predecessor_application.start_on,
+                          rating_area_id: predecessor_application.recorded_rating_area_id,
+                          sponsored_benefit_id: predecessor_application.benefit_packages.first.health_sponsored_benefit.id,
+                          sponsored_benefit_package_id: predecessor_application.benefit_packages.first.id,
+                          benefit_sponsorship_id: predecessor_application.benefit_sponsorship.id,
+                          employee_role_id: employee_role.id)
+      end
 
-      let(:active_benefit_group) { organization.employer_profile.plan_years.where(aasm_state: "active").first.benefit_groups.first }
-      let(:renewal_benefit_group) { organization.employer_profile.plan_years.where(aasm_state: "renewing_enrolling").first.benefit_groups.first }
+      let!(:renewal_enrollment) do
+        FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+                          household: family.active_household,
+                          aasm_state: "renewing_coverage_selected",
+                          kind: "employer_sponsored",
+                          effective_on: renewal_application.start_on,
+                          rating_area_id: renewal_application.recorded_rating_area_id,
+                          sponsored_benefit_id: renewal_application.benefit_packages.first.health_sponsored_benefit.id,
+                          sponsored_benefit_package_id: renewal_application.benefit_packages.first.id,
+                          benefit_sponsorship_id: renewal_application.benefit_sponsorship.id,
+                          employee_role_id: employee_role.id)
+      end
 
       before do
         allow(family).to receive(:current_sep).and_return sep
-        active_enrollment.update_attribute(:benefit_group_id, active_benefit_group.id)
-        renewal_enrollment.update_attribute(:benefit_group_id, renewal_benefit_group.id)
+        active_enrollment.update_attribute(:sponsored_benefit_package_id, current_benefit_package.id)
+        renewal_enrollment.update_attribute(:sponsored_benefit_package_id, benefit_package.id)
       end
 
       it "should return active enrollment if the coverage effective on covers active plan year" do
-        allow(employee_role.census_employee).to receive(:active_benefit_group).and_return(active_benefit_group)
+        allow(employee_role.census_employee).to receive(:active_benefit_package).and_return(current_benefit_package)
         expect(subject.selected_enrollment(family, employee_role)).to eq active_enrollment
       end
 
       it "should return renewal enrollment if the coverage effective on covers renewal plan year" do
-        allow(employee_role.census_employee).to receive(:renewal_published_benefit_group).and_return(renewal_benefit_group)
-        renewal_plan_year = organization.employer_profile.plan_years.where(aasm_state: "renewing_enrolling").first
-        sep.update_attribute(:effective_on, renewal_plan_year.start_on + 2.days)
+        allow(employee_role.census_employee).to receive(:renewal_published_benefit_package).and_return(benefit_package)
+        sep.update_attribute(:effective_on, renewal_application.start_on + 2.days)
         expect(subject.selected_enrollment(family, employee_role)).to eq renewal_enrollment
       end
 
       context 'it should not return any enrollment' do
 
         before do
-          allow(employee_role.census_employee).to receive(:active_benefit_group).and_return nil
-          allow(employee_role.census_employee).to receive(:renewal_published_benefit_group).and_return nil
+          allow(employee_role.census_employee).to receive(:active_benefit_package).and_return nil
+          allow(employee_role.census_employee).to receive(:renewal_published_benefit_package).and_return nil
         end
 
         it "should not return active enrollment although if the coverage effective on covers active plan year & if not belongs to the assigned benefit group" do
@@ -225,8 +269,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
         end
 
         it "should not return renewal enrollment although if the coverage effective on covers renewal plan year & if not belongs to the assigned benefit group" do
-          renewal_plan_year = organization.employer_profile.plan_years.where(aasm_state: "renewing_enrolling").first
-          sep.update_attribute(:effective_on, renewal_plan_year.start_on + 2.days)
+          sep.update_attribute(:effective_on, renewal_application.start_on + 2.days)
           expect(subject.selected_enrollment(family, employee_role)).to eq nil
         end
       end
@@ -267,22 +310,38 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
   end
 
   describe "disabling & checking market kinds, coverage kinds & kinds when user gets to plan shopping" do
+    let(:primary) { FactoryBot.create(:person)}
 
     context "#is_market_kind_disabled?" do
 
       context "when user clicked on 'make changes' on the enrollment in open enrollment" do
         context "when user clicked on IVL enrollment" do
+          describe "family with IVL and resident roles" do
+            before do
+              helper.instance_variable_set("@mc_market_kind", "individual")
+              allow(helper).to receive(:can_shop_individual_or_resident?).and_return true
+            end
+
+            it "should disable the shop market kind if user clicked on 'make changes' for IVL enrollment" do
+              expect(helper.is_market_kind_disabled?("shop", primary)).to eq nil
+            end
+
+            it "should not disable the IVL market kind if user clicked on 'make changes' for IVL enrollment" do
+              expect(helper.is_market_kind_disabled?("individual", primary)).to eq nil
+            end
+
+          end
 
           before do
             helper.instance_variable_set("@mc_market_kind", "individual")
           end
 
           it "should disable the shop market kind if user clicked on 'make changes' for IVL enrollment" do
-            expect(helper.is_market_kind_disabled?("shop")).to eq true
+            expect(helper.is_market_kind_disabled?("shop", primary)).to eq true
           end
 
           it "should not disable the IVL market kind if user clicked on 'make changes' for IVL enrollment" do
-            expect(helper.is_market_kind_disabled?("individual")).to eq false
+            expect(helper.is_market_kind_disabled?("individual", primary)).to eq false
           end
         end
 
@@ -293,16 +352,17 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
           end
 
           it "should disable the IVL market kind if user clicked on 'make changes' for shop enrollment" do
-            expect(helper.is_market_kind_disabled?("individual")).to eq true
+            expect(helper.is_market_kind_disabled?("individual", primary)).to eq true
           end
 
           it "should not disable the shop market kind if user clicked on 'make changes' for shop enrollment" do
-            expect(helper.is_market_kind_disabled?("shop")).to eq false
+            expect(helper.is_market_kind_disabled?("shop", primary)).to eq false
           end
         end
       end
 
       context "when user selected a QLE" do
+        let(:primary) { FactoryBot.create(:person)}
 
         context "when user selected shop QLE" do
 
@@ -311,11 +371,11 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
           end
 
           it "should disable the IVL market if user selected shop based QLE" do
-            expect(helper.is_market_kind_disabled?("individual")).to eq true
+            expect(helper.is_market_kind_disabled?("individual", primary)).to eq true
           end
 
           it "should not disable the shop market if user selected shop based QLE" do
-            expect(helper.is_market_kind_disabled?("shop")).to eq false
+            expect(helper.is_market_kind_disabled?("shop", primary)).to eq false
           end
         end
 
@@ -326,11 +386,11 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
           end
 
           it "should disable the shop market if user selected IVL based QLE" do
-            expect(helper.is_market_kind_disabled?("shop")).to eq true
+            expect(helper.is_market_kind_disabled?("shop", primary)).to eq true
           end
 
           it "should not disable the shop market if user selected shop based QLE" do
-            expect(helper.is_market_kind_disabled?("individual")).to eq false
+            expect(helper.is_market_kind_disabled?("individual", primary)).to eq false
           end
         end
       end
@@ -346,11 +406,11 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
           end
 
           it "should not check the shop market kind if user clicked on 'make changes' for IVL enrollment" do
-            expect(helper.is_market_kind_checked?("shop")).to eq false
+            expect(helper.is_market_kind_checked?("shop", nil)).to eq false
           end
 
           it "should check the IVL market kind if user clicked on 'make changes' for IVL enrollment" do
-            expect(helper.is_market_kind_checked?("individual")).to eq true
+            expect(helper.is_market_kind_checked?("individual", nil)).to eq true
           end
         end
 
@@ -361,11 +421,11 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
           end
 
           it "should not check the IVL market kind if user clicked on 'make changes' for shop enrollment" do
-            expect(helper.is_market_kind_checked?("individual")).to eq false
+            expect(helper.is_market_kind_checked?("individual", nil)).to eq false
           end
 
           it "should check the shop market kind if user clicked on 'make changes' for shop enrollment" do
-            expect(helper.is_market_kind_checked?("shop")).to eq true
+            expect(helper.is_market_kind_checked?("shop", nil)).to eq true
           end
         end
       end
@@ -380,7 +440,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
        )}
 
       let(:employer_profile) { organization.employer_profile }
-  
+
       let(:employee_role_one) { FactoryBot.create(:employee_role, employer_profile: employer_profile)}
       let(:employee_role_two) { FactoryBot.create(:employee_role, employer_profile: employer_profile)}
       let!(:hbx_enrollment) { double("HbxEnrollment", employee_role: employee_role_one)}

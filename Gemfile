@@ -81,6 +81,7 @@ gem 'money-rails',              '~> 1.13'
 gem 'net-ssh',                  '= 4.2.0'
 gem 'nokogiri',                 '~> 1.10'
 gem 'nokogiri-happymapper',     '~> 0.8.0', :require => 'happymapper'
+gem 'non-stupid-digest-assets'
 gem 'pundit',                   '~> 2.0'
 gem "recaptcha",                '~> 4.13', require: 'recaptcha/rails'
 gem 'redcarpet',                '~> 3.4'
@@ -157,7 +158,7 @@ group :test do
   gem 'test-prof',                    '~> 0.5.0'
   gem 'warden',                       '~> 1.2.7'
   gem 'watir',                        '~> 6.10.3'
-  gem 'webdrivers',                   '3.8.0'
+  gem 'webdrivers', '~> 3.0'
   gem 'webmock',                      '~> 3.0.1'
 end
 

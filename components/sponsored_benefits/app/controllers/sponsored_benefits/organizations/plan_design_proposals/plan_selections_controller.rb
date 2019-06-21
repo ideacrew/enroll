@@ -1,7 +1,10 @@
+require_dependency "sponsored_benefits/application_controller"
+
 module SponsoredBenefits
   module Organizations
     class PlanDesignProposals::PlanSelectionsController < ApplicationController
       before_action :published_plans_are_view_only
+      before_action :load_profile, only: [:new]
 
       def new
         plan_design_form.for_new
@@ -22,6 +25,12 @@ module SponsoredBenefits
 
       def plan_design_organization
         @plan_design_organization ||= plan_design_proposal.plan_design_organization
+      end
+
+      def load_profile
+        @profile = ::BrokerAgencyProfile.find(params[:profile_id]) || ::GeneralAgencyProfile.find(params[:profile_id])
+        @profile ||= BenefitSponsors::Organizations::Profile.find(params[:profile_id])
+        @provider = provider
       end
 
       def plan_design_form

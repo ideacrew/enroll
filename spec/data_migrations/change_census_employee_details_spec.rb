@@ -62,9 +62,11 @@ describe ChangeCensusEmployeeDetails, dbclean: :after_each do
     describe "change_ssn" do
       let(:census_employee) { FactoryBot.create :census_employee}
 
-      before :each do
-        allow(ENV).to receive(:[]).with("encrypted_ssn").and_return census_employee.encrypted_ssn
-        allow(ENV).to receive(:[]).with("new_encrypted_ssn").and_return SymmetricEncryption.encrypt("123111222")
+      around do |example|
+        ClimateControl.modify encrypted_ssn: census_employee.encrypted_ssn,
+                              new_encrypted_ssn: SymmetricEncryption.encrypt("123111222") do
+          example.run
+        end
       end
 
       it "should change the SSN of census employee if in eligible status" do
@@ -86,9 +88,11 @@ describe ChangeCensusEmployeeDetails, dbclean: :after_each do
       let(:census_employee) { FactoryBot.create :census_employee}
       let(:employee_role) { FactoryBot.create :employee_role}
 
-      before :each do
-        allow(ENV).to receive(:[]).with("encrypted_ssn").and_return census_employee.encrypted_ssn
-        census_employee.update_attributes(aasm_state: "employee_role_linked", employee_role_id: employee_role.id)
+      around do |example|
+        ClimateControl.modify encrypted_ssn: census_employee.encrypted_ssn do
+          census_employee.update_attributes(aasm_state: "employee_role_linked", employee_role_id: employee_role.id)
+          example.run
+        end
       end
 
       it "should delink the employee role" do
@@ -110,13 +114,15 @@ describe ChangeCensusEmployeeDetails, dbclean: :after_each do
       let(:benefit_group) { FactoryBot.create :benefit_group}
       let(:employer_profile) { FactoryBot.create :employer_profile}
 
-      before :each do
-        allow(ENV).to receive(:[]).with("ssn").and_return census_employee.ssn
-        allow(ENV).to receive(:[]).with("employer_fein").and_return employer_profile.organization.fein
+      around do |example|
         allow(census_employee).to receive(:has_benefit_group_assignment?).and_return true
         census_employee.active_benefit_group_assignment.update_attributes(benefit_group_id: benefit_group.id)
-        benefit_group.plan_year.update_attributes(aasm_state: "active")
-        census_employee.update_attributes(:employer_profile_id => employer_profile.id, aasm_state: "eligible")
+        ClimateControl.modify ssn: census_employee.ssn,
+                              employer_fein: employer_profile.organization.fein do
+          benefit_group.plan_year.update_attributes(aasm_state: "active")
+          census_employee.update_attributes(:employer_profile_id => employer_profile.id, aasm_state: "eligible")
+          example.run
+        end
       end
 
       it "should construct the employee role" do

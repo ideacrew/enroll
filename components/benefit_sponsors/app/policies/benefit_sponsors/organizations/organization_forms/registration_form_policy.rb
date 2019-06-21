@@ -63,6 +63,10 @@ module BenefitSponsors
           profile_type == "benefit_sponsor"
         end
 
+        def is_general_agency_profile?
+          profile_type == "general_agency"
+        end
+
         def profile_type
           service.profile_type
         end

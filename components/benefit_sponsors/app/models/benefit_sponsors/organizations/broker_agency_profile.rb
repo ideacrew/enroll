@@ -4,6 +4,9 @@ module BenefitSponsors
       include ::SetCurrentUser
       include AASM
       include ::Config::AcaModelConcern
+      include Acapi::Notifiers
+      include ::BenefitSponsors::Concerns::Observable
+      include ::BenefitSponsors::ModelEvents::BrokerAgencyProfile
 
       MARKET_KINDS = individual_market_is_enabled? ? [:individual, :shop, :both] : [:shop]
 
@@ -49,6 +52,10 @@ module BenefitSponsors
         inclusion: { in: Organizations::BrokerAgencyProfile::MARKET_KINDS, message: "%{value} is not a valid practice area" },
         allow_blank: false
 
+      before_save :notify_before_save
+
+      add_observer ::BenefitSponsors::Observers::NoticeObserver.new, [:process_broker_agency_profile_events]
+
       after_initialize :build_nested_models
 
       scope :active,      ->{ any_in(aasm_state: ["is_applicant", "is_approved"]) }
@@ -75,6 +82,9 @@ module BenefitSponsors
       end
 
       def employer_clients
+        # return unless (MARKET_KINDS - ["individual"]).include?(market_kind)
+        return @employer_clients if defined? @employer_clients
+        @employer_clients = BenefitSponsors::Concerns::EmployerProfileConcern.find_by_broker_agency_profile(self)
       end
 
       def family_clients
@@ -121,6 +131,21 @@ module BenefitSponsors
         consumer_families = Family.by_broker_agency_profile_id(self.id).to_a
         families = (consumer_families + employee_families).uniq
         families.sort_by{|f| f.primary_applicant.person.last_name}
+      end
+
+      def default_general_agency_profile=(new_default_general_agency_profile = nil)
+        if new_default_general_agency_profile.present?
+          raise ArgumentError.new("expected GeneralAgencyProfile class") unless new_default_general_agency_profile.is_a? BenefitSponsors::Organizations::GeneralAgencyProfile
+          self.default_general_agency_profile_id = new_default_general_agency_profile.id
+        else
+          self.default_general_agency_profile_id = nil
+        end
+        @default_general_agency_profile = new_default_general_agency_profile
+      end
+
+      def default_general_agency_profile
+        return @default_general_agency_profile if defined? @default_general_agency_profile
+        @default_general_agency_profile = BenefitSponsors::Organizations::GeneralAgencyProfile.find(self.default_general_agency_profile_id) if default_general_agency_profile_id.present?
       end
 
       aasm do #no_direct_assignment: true do

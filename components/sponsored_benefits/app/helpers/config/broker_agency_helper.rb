@@ -11,4 +11,12 @@ module Config::BrokerAgencyHelper
    Settings.site.broker_quoting_enabled
   end
 
+  def employer_has_sic_enabled?
+    Settings.aca.employer_has_sic_field
+  end
+
+  def employer_has_county_validation?
+    Settings.aca.employer_has_county_validation
+  end
+
 end

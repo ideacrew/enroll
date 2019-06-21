@@ -12,8 +12,8 @@
 
 namespace :import do
   task :common_data_from_master_xml, [:file] => :environment do |task, args|
-    NATIONWIDE_NETWORK = ["Nationwide In-Network"]
-    DC_IN_NETWORK = ["DC Metro In-Network"]
+    NATIONWIDE_NETWORK = ["Nationwide In-Network", "Nationwide"]
+    DC_IN_NETWORK = ["DC Metro In-Network", "DC-Metro In-Network", "DC-Metro", "DC, MD (not available in VA)"]
     files = Rails.env.test? ? [args[:file]] : Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{Settings.aca.state_abbreviation.downcase}/master_xml", "**", "*.xlsx"))
 
     if Settings.aca.state_abbreviation.downcase == "dc" # DC
@@ -31,12 +31,13 @@ namespace :import do
 
             @header_row = sheet_data.row(1)
             assign_headers
-
             last_row = sheet_data.last_row
+
             (2..last_row).each do |row_number| # data starts from row 2, row 1 has headers
               row_info = sheet_data.row(row_number)
               hios_id = row_info[@headers["hios/standard component id"]].squish
               provider_directory_url = row_info[@headers["provider directory url"] || @headers["provider network url"]]
+
               plans = Plan.where(hios_id: /#{hios_id}/, active_year: year)
               plans.each do |plan|
                 plan.nationwide, plan.dc_in_network = [true, false] if NATIONWIDE_NETWORK.include?(row_info[@headers["network"]])
@@ -50,6 +51,21 @@ namespace :import do
                   end
                 end
                 plan.save
+              end
+
+              products = ::BenefitMarkets::Products::Product.where(hios_id: /#{hios_id}/).select{|a| a.active_year == year}
+              products.each do |product|
+                product.nationwide, product.dc_in_network = [true, false] if NATIONWIDE_NETWORK.include?(row_info[@headers["network"]])
+                product.dc_in_network, product.nationwide = [true, false] if DC_IN_NETWORK.include?(row_info[@headers["network"]])
+                product.provider_directory_url = provider_directory_url
+                if !["Dental SHOP", "IVL Dental"].include?(sheet_name)
+                  rx_formulary_url = row_info[@headers["rx formulary url"]]
+                  product.rx_formulary_url =  rx_formulary_url.include?("http") ? rx_formulary_url : "http://#{rx_formulary_url}"
+                  if sheet_name == "IVL" && year > 2017
+                    product.is_standard_plan = row_info[@headers["standard plan?"]]
+                  end
+                end
+                product.save
               end
             end
           end

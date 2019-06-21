@@ -3,8 +3,7 @@ module BenefitSponsors
 
     def show?
       return false unless user.present?
-      return true if user.has_hbx_staff_role? || is_broker_for_employer?(record) || is_general_agency_staff_for_employer?(record)
-      is_staff_role_for_employer?(record)
+      user.has_hbx_staff_role? || is_broker_for_employer?(record) || is_general_agency_staff_for_employer?(record) || is_broker_staff_role_for_employer?(record) || is_staff_role_for_employer?(record)
     end
 
     def show_pending?
@@ -14,7 +13,7 @@ module BenefitSponsors
 
     def coverage_reports?
       return false unless user.present?
-      return true if (user.has_hbx_staff_role? && can_list_enrollments?) || is_broker_for_employer?(record) || is_general_agency_staff_for_employer?(record)
+      return true if (user.has_hbx_staff_role? && can_list_enrollments?) || is_broker_for_employer?(record) || is_general_agency_staff_for_employer?(record) || is_broker_staff_role_for_employer?(record)
       is_staff_role_for_employer?(record)
     end
 
@@ -31,6 +30,12 @@ module BenefitSponsors
       staff_roles.any? {|role| role.benefit_sponsor_employer_profile_id == record.id }
     end
 
+    def is_broker_staff_role_for_employer?(profile)
+      staff_roles = user.person.broker_agency_staff_roles
+      broker_profiles = staff_roles.map(&:benefit_sponsors_broker_agency_profile_id)
+      profile.broker_agency_accounts.any? {|acc|  broker_profiles.include?(acc.benefit_sponsors_broker_agency_profile_id)}
+    end
+
     def is_broker_for_employer?(profile)
       broker_role = user.person.broker_role
       return false unless broker_role
@@ -38,8 +43,16 @@ module BenefitSponsors
     end
 
     def is_general_agency_staff_for_employer?(profile)
-      # TODO
-      return false
+      # TODO: Need to fix this after updating general agency account
+      if general_agency_staff_role = user.person.general_agency_staff_roles.first
+        general_agency_account = profile.general_agency_accounts.active.first
+        return false if general_agency_account.blank?
+        general_agency_profile = general_agency_account.general_agency_profile
+        return false if general_agency_profile.blank?
+        general_agency_profile.general_agency_staff_roles.select{|role| role.id == general_agency_staff_role.id}.present?
+      else
+        false
+      end
     end
 
     def updateable?

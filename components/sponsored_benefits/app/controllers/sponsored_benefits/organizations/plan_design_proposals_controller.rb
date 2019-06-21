@@ -1,7 +1,10 @@
+require_dependency "sponsored_benefits/application_controller"
+
 module SponsoredBenefits
   class Organizations::PlanDesignProposalsController < ApplicationController
     include SponsoredBenefits::ApplicationHelper
     include ApplicationHelper
+    include Config::AcaHelper
 
     include Config::BrokerAgencyHelper
     include DataTablesAdapter
@@ -9,6 +12,7 @@ module SponsoredBenefits
     before_action :load_plan_design_proposal, only: [:edit, :update, :destroy, :publish, :show]
     before_action :published_plans_are_view_only, only: [:edit]
     before_action :claimed_quotes_are_view_only, only: [:edit]
+    before_action :load_profile, only: [:new, :edit, :index]
 
     def index
       @datatable = effective_datatable
@@ -17,13 +21,14 @@ module SponsoredBenefits
     def claim
       # TODO FIXME: Raghuram suggested to move this action into employer_profiles_controller.rb in main app as the button exists in the employer portal.
       employer_profile_id = params.fetch(:employer_profile_id, nil)
-      organization =  BenefitSponsors::Organizations::Organization.where(:"profiles._id" => BSON::ObjectId.from_string(employer_profile_id)).first
+      employer_profile = EmployerProfile.find(employer_profile_id)
+      employer_profile ||=  BenefitSponsors::Organizations::Organization.where(:"profiles._id" => BSON::ObjectId.from_string(employer_profile_id)).first
 
       quote_claim_code = params.fetch(:claim_code, nil).try(:upcase)
 
       claim_code_status, quote = SponsoredBenefits::Organizations::PlanDesignProposal.claim_code_status?(quote_claim_code)
 
-      error_message = quote.present? ? check_if_county_zip_are_same(quote, organization.employer_profile) : ""
+      error_message = quote.present? && aca_state_abbreviation == "MA" ? check_if_county_zip_are_same(quote, employer_profile) : " "
 
       if error_message.present?
         flash[:error] = error_message
@@ -33,14 +38,14 @@ module SponsoredBenefits
         flash[:error] = "Quote claim code already claimed."
       else
         begin
-          SponsoredBenefits::Organizations::PlanDesignProposal.build_plan_year_from_quote(organization, quote)
+          SponsoredBenefits::Organizations::PlanDesignProposal.build_plan_year_from_quote(employer_profile, quote)
           flash[:notice] = "Code claimed with success. Your Plan Year has been created."
         rescue Exception => e
           flash[:error] = "There was an issue claiming this quote. #{e.to_s}"
         end
       end
 
-      redirect_to benefit_sponsors.profiles_employers_employer_profile_path(organization.employer_profile, :tab=>'benefits')
+      aca_state_abbreviation == "DC" ? (redirect_to main_app.employers_employer_profile_path(employer_profile, tab: "benefits")) : (redirect_to benefit_sponsors.profiles_employers_employer_profile_path(employer_profile, :tab=>'benefits'))
     end
 
     def publish
@@ -51,8 +56,8 @@ module SponsoredBenefits
         flash[:error] = "Quote failed to publish.".html_safe
       end
       respond_to do |format|
-        format.js { render json: { url: organizations_plan_design_proposal_path(@plan_design_proposal) } }
-        format.html { redirect_to organizations_plan_design_proposal_path(@plan_design_proposal) }
+        format.js { render json: { url: organizations_plan_design_proposal_path(@plan_design_proposal, profile_id: params[:profile_id]) } }
+        format.html { redirect_to organizations_plan_design_proposal_path(@plan_design_proposal, profile_id: params[:profile_id]) }
       end
     end
 
@@ -61,7 +66,7 @@ module SponsoredBenefits
         begin
           plan_design_proposal = @plan_design_organization.build_proposal_from_existing_employer_profile
           flash[:success] = "Imported quote and employee information from your client #{@plan_design_organization.employer_profile.legal_name}."
-          redirect_to action: :edit, id: plan_design_proposal.id
+          redirect_to action: :edit, id: plan_design_proposal.id, profile_id: params[:profile_id]
         rescue Exception => e
           flash[:error] = e.to_s
           @plan_design_proposal = SponsoredBenefits::Forms::PlanDesignProposal.new(organization: @plan_design_organization)
@@ -86,7 +91,7 @@ module SponsoredBenefits
         @employer_health_contribution_amount = @benefit_group.monthly_employer_contribution_amount(@plan)
         @employer_dental_contribution_amount = @benefit_group.monthly_employer_contribution_amount(@dental_plan) if @dental_plan.present?
         @benefit_group_costs = @benefit_group.employee_costs_for_reference_plan
-        @benefit_group_dental_costs = @benefit_group.employee_costs_for_dental_reference_plan if @dental_plan.present?
+        @benefit_group_dental_costs = @benefit_group.employee_costs_for_reference_plan(@dental_plan) if @dental_plan.present?
       end
     end
 
@@ -106,8 +111,7 @@ module SponsoredBenefits
         else
           flash[:error] = "Quote information save failed."
         end
-
-        format.js
+        format.js {render :js => "window.location.href='"+edit_organizations_plan_design_organization_plan_design_proposal_path(@plan_design_organization, @plan_design_proposal.proposal, profile_id: params[:profile_id])+"'"}
       end
     end
 
@@ -129,13 +133,13 @@ module SponsoredBenefits
 
     def destroy
       @plan_design_proposal.destroy!
-      redirect_to organizations_plan_design_organization_plan_design_proposals_path(@plan_design_proposal.plan_design_organization._id)
+      redirect_to organizations_plan_design_organization_plan_design_proposals_path(@plan_design_proposal.plan_design_organization._id, profile_id: params[:profile_id])
     end
 
     private
 
     def effective_datatable
-      ::Effective::Datatables::PlanDesignProposalsDatatable.new(organization_id: @plan_design_organization._id)
+      ::Effective::Datatables::PlanDesignProposalsDatatable.new(organization_id: @plan_design_organization._id, profile_id: params[:profile_id])
     end
 
     def load_plan_design_organization
@@ -197,6 +201,12 @@ module SponsoredBenefits
       if @plan_design_proposal.claimed?
         redirect_to organizations_plan_design_proposal_path(@plan_design_proposal)
       end
+    end
+
+    def load_profile
+      @profile = ::BrokerAgencyProfile.find(params[:profile_id]) || ::GeneralAgencyProfile.find(params[:profile_id])
+      @profile ||= BenefitSponsors::Organizations::Profile.find(params[:profile_id])
+      @provider = provider
     end
   end
 end

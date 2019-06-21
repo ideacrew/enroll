@@ -82,22 +82,34 @@ module BenefitMarkets
         service_area.destroy
       end
 
-      it "will not be found when given an address not in that county" do
+      it "will return service_area based on exchange when given an address not in that county" do
         service_area
         service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address_outside_county)
-        expect(service_areas.to_a).not_to include(service_area)
+        if Settings.site.key == :cca
+          expect(service_areas.to_a).not_to include(service_area)
+        else
+          expect(service_areas.to_a).to include(service_area)
+        end
       end
 
-      it "will not be found when given an address not in that zip code" do
+      it "will return service_area based on exchange when given an address not in that zip code" do
         service_area
         service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address_outside_zip)
-        expect(service_areas.to_a).not_to include(service_area)
+        if Settings.site.key == :cca
+          expect(service_areas.to_a).not_to include(service_area)
+        else
+          expect(service_areas.to_a).to include(service_area)
+        end
       end
 
-      it "will not be found when given an address not in that state" do
+      it "will return service_area based on exchange when given an address not in that state" do
         service_area
         service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address_outside_state)
-        expect(service_areas.to_a).not_to include(service_area)
+        if Settings.site.key == :cca
+          expect(service_areas.to_a).not_to include(service_area)
+        else
+          expect(service_areas.to_a).to include(service_area)
+        end
       end
 
       it "is found when a matching address is provided" do
@@ -129,10 +141,14 @@ module BenefitMarkets
         service_area.destroy
       end
 
-      it "will not be found when given an address not in that state" do
+      it "will return service_area based on exchange when given an address not in that state" do
         service_area
         service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address_outside_state)
-        expect(service_areas.to_a).not_to include(service_area)
+        if Settings.site.key == :cca
+          expect(service_areas.to_a).not_to include(service_area)
+        else
+          expect(service_areas.to_a).to include(service_area)
+        end
       end
 
       it "is found when a matching address is provided" do

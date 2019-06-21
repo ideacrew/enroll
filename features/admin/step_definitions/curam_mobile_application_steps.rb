@@ -14,21 +14,20 @@ end
 
 Then(/^EA will automatically populate the Application Type as CURAM$/) do
   expect(page).to have_content("Curam")
-  find(:xpath, "//p[@class='label'][contains(., 'Curam')]").click
+  find("span", :text => "Curam").click
 end
 
 Then(/^EA will display all the Application Types$/) do
-  expect(page).to have_css("#application_type_id")
-  find(:xpath, "//p[@class='label'][contains(., 'choose')]").click
-  find(:xpath, "//select[@name='person[family][application_type]']/option[@value='Phone']")
-  find(:xpath, "//select[@name='person[family][application_type]']/option[@value='In Person']")
-  find(:xpath, "//select[@name='person[family][application_type]']/option[@value='Paper']")
-  find(:xpath, "//select[@name='person[family][application_type]']/option[@value='Curam']")
-  find(:xpath, "//select[@name='person[family][application_type]']/option[@value='Mobile']")
+  find("span", :text => "choose").click
+  find("li", :text => "Phone")
+  find("li", :text => "In Person")
+  find("li", :text => "Paper")
+  find("li", :text => "Curam")
+  find("li", :text => "Mobile")
 end
 
 When(/^the Admin selects the Curam application option$/) do
-  find(:xpath, "//select[@name='person[family][application_type]']/option[@value='Curam']")
+  find("li", :text => "Curam").click
 end
 
 Then(/^the Admin should navigate to Household Info Page$/) do
@@ -36,5 +35,5 @@ Then(/^the Admin should navigate to Household Info Page$/) do
 end
 
 When(/^the Admin selects the Mobile application option$/) do
-  find(:xpath, "//select[@name='person[family][application_type]']/option[@value='Mobile']")
+  find("li", :text => "Mobile").click
 end

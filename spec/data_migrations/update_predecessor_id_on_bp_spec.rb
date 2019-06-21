@@ -63,14 +63,13 @@ describe UpdateEmployeeRoleId, dbclean: :after_each do
 
     let!(:old_benefit_package) { FactoryBot.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: old_benefit_application, product_package: product_package_1) }
     let!(:renewing_benefit_package) { FactoryBot.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: renewing_benefit_application, product_package: product_package_1) }
-    before(:each) do
-      ENV["old_benefit_package_id"] = organization.employer_profile.benefit_applications.first.benefit_packages.first.id
-      ENV["renewing_benefit_package_id"] = organization.employer_profile.benefit_applications.second.benefit_packages.first.id
-    end
 
     it "should update the predecessor_id on benefit_package with the correct one" do
       expect(organization.employer_profile.benefit_applications.second.benefit_packages.first.predecessor_id).to eq nil
-      subject.migrate
+      ClimateControl.modify old_benefit_package_id: organization.employer_profile.benefit_applications.first.benefit_packages.first.id,
+                            renewing_benefit_package_id: organization.employer_profile.benefit_applications.second.benefit_packages.first.id do
+        subject.migrate
+      end
       organization.employer_profile.benefit_applications.second.benefit_packages.first.reload
       expect(organization.employer_profile.benefit_applications.second.benefit_packages.first.predecessor_id).to_not eq nil
       expect(organization.employer_profile.benefit_applications.second.benefit_packages.first.predecessor_id).to eq (organization.employer_profile.benefit_applications.first.benefit_packages.first.id)
@@ -78,7 +77,10 @@ describe UpdateEmployeeRoleId, dbclean: :after_each do
 
     it "should not change the ee_role_id of hbx_enrollment if the EE Role id matches with the correct one" do
       organization.employer_profile.benefit_applications.second.update_attributes!(predecessor_id: nil)
-      subject.migrate
+      ClimateControl.modify old_benefit_package_id: organization.employer_profile.benefit_applications.first.benefit_packages.first.id,
+                            renewing_benefit_package_id: organization.employer_profile.benefit_applications.second.benefit_packages.first.id do
+        subject.migrate
+      end
       organization.employer_profile.benefit_applications.second.benefit_packages.first.reload
       expect(organization.employer_profile.benefit_applications.second.benefit_packages.first.predecessor_id).to eq nil
     end

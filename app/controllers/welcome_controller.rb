@@ -1,4 +1,5 @@
 class WelcomeController < ApplicationController
+  layout 'bootstrap_4'
   skip_before_action :require_login
 
   def show_hints

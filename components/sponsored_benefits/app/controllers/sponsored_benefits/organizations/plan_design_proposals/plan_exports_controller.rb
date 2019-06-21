@@ -2,13 +2,12 @@ module SponsoredBenefits
   module Organizations
     class PlanDesignProposals::PlanExportsController < ApplicationController
 
-      #skip_before_action :verify_authenticity_token
+      # skip_before_action :verify_authenticity_token
 
       def create
         @plan_design_organization = plan_design_organization
         find_or_build_benefit_group
         @census_employees = sponsorship.census_employees
-
         if @benefit_group
           @benefit_group.build_estimated_composite_rates if @benefit_group.sole_source?
           @plan = @benefit_group.reference_plan

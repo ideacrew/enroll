@@ -132,6 +132,7 @@ module SponsoredBenefits
       end
 
       def to_benefit_sponsors_benefit_application(organization)
+        # Fix Spec after fixing this method!
         return unless(benefit_sponsorship.present? && effective_period.present? && open_enrollment_period.present?)
         raise "Invalid number of benefit_groups: #{benefit_groups.size}" if benefit_groups.size != 1
 
@@ -149,6 +150,22 @@ module SponsoredBenefits
         end
 
         new_benefit_application
+      end
+
+      def to_plan_year(organization)
+        return unless benefit_sponsorship.present? && effective_period.present? && open_enrollment_period.present?
+        raise "Invalid number of benefit_groups: #{benefit_groups.size}" if benefit_groups.size != 1
+        copied_benefit_groups = []
+        benefit_groups.each do |benefit_group|
+          benefit_group.attributes.delete("_type")
+          new_benefit_group = ::BenefitGroup.new(benefit_group.attributes)
+          new_benefit_group.relationship_benefits = benefit_group.relationship_benefits
+          copied_benefit_groups << new_benefit_group
+        end
+        ::PlanYear.new(start_on: effective_period.begin, end_on: effective_period.end,
+                       open_enrollment_start_on: open_enrollment_period.begin,
+                       open_enrollment_end_on: open_enrollment_period.end,
+                       benefit_groups: copied_benefit_groups)
       end
 
       def set_predecessor_applications_if_present(new_benefit_sponsorship, new_benefit_application)
@@ -299,7 +316,7 @@ module SponsoredBenefits
 
 
         def open_enrollment_period_by_effective_date(effective_date)
-          earliest_begin_date = effective_date + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months
+          earliest_begin_date = effective_date - Settings.aca.shop_market.open_enrollment.maximum_length.months.months # toDo - check
           prior_month = effective_date - 1.month
 
           begin_on = Date.new(earliest_begin_date.year, earliest_begin_date.month, 1)
@@ -345,7 +362,7 @@ module SponsoredBenefits
         end
 
         if open_enrollment_period.begin < (effective_period.begin - Settings.aca.shop_market.open_enrollment.maximum_length.months.months)
-          errors.add(:open_enrollment_period.begin, "can't occur earlier than 60 days before start date")
+          errors.add(:open_enrollment_period, "can't occur earlier than 60 days before start date")
         end
 
         if open_enrollment_period.end > (open_enrollment_period.begin + Settings.aca.shop_market.open_enrollment.maximum_length.months.months)

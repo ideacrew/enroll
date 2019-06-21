@@ -86,7 +86,7 @@
   h4 {
       margin: 0;
       line-height: 1.4em;
-      color: #c56c24;
+      color: #333333;
       font-size: 18px;
           font-weight: 600;
   }
@@ -200,20 +200,14 @@
   .nav-tabs > li > a.active {
     background-color:$primary-blue;
   }
-  .tab-pane#carrier {
+  .tab-pane#carrier, .tab-pane#level, .tab-pane#plan, .tab-pane#multi_product, .tab-pane#single_issuer{
     background-color:$primary-white;
     padding:20px;
     min-height:370px;
   }
-  .tab-pane#level {
+  .select_choice_reference_plan {
     background-color:$primary-white;
     padding:20px;
-    min-height:370px;
-  }
-  .tab-pane#plan {
-    background-color:$primary-white;
-    padding:20px;
-    min-height:370px;
   }
   h5 {
     font-weight: bold;
@@ -254,6 +248,60 @@
   }
 }
 
+.multiProductOptions {
+   /* Hide the browser's default checkbox */
+  input {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+  }
+
+  /* Create a custom checkbox */
+  .checkmark {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 25px;
+      width: 25px;
+      background-color: #eee;
+  }
+
+  /* On mouse-over, add a grey background color */
+  .sc-container:hover input ~ .checkmark {
+      background-color: #ccc;
+  }
+
+  /* When the checkbox is checked, add a blue background */
+  input:checked ~ .checkmark {
+      background-color: $mhc-dark-blue;
+  }
+
+  /* Create the checkmark/indicator (hidden when not checked) */
+  .checkmark:after {
+      content: "";
+      position: absolute;
+      display: none;
+  }
+
+  /* Show the checkmark when checked */
+  input:checked ~ .checkmark:after {
+      display: block;
+  }
+
+  /* Style the checkmark/indicator */
+  .checkmark:after {
+      left: 9px;
+      top: 5px;
+      width: 6px;
+      height: 15px;
+      border: solid white;
+      border-width: 0 3px 3px 0;
+      -webkit-transform: rotate(45deg);
+      -ms-transform: rotate(45deg);
+      transform: rotate(45deg);
+  }
+}
+
 #sponsorContributions {
   border:1px solid $mhc-light-gray;
   background-color:$primary-white;
@@ -265,7 +313,7 @@
   }
   .offered-heading {
     border-bottom: solid 1px #d5d5d5;
-    padding: 15px 0 25px;
+    padding: 15px 0 15px;
     font-size: 14px;
     color:$mhc-heading-gray;
   }
@@ -299,6 +347,7 @@
     width:45px;
     height:40px;
     margin-top:10px;
+    text-align:center;
   }
   input[type=number]::-webkit-inner-spin-button,
   input[type=number]::-webkit-outer-spin-button {
@@ -427,7 +476,7 @@
    
    input[type=range] {border:none !important;}
 
-.reference-plans {
+.reference-plans, .multiProductOptions {
   min-height:200px;
   .panel-heading {
     border-bottom: 1px solid transparent;
@@ -543,7 +592,7 @@
   }
 }
 
-#plan, #level, #carrier {
+#plan, #level, #carrier, #single_issuer {
   .col-xs-12 {
     min-height:80px;
   }
@@ -618,5 +667,17 @@
 }
 .open-enr-date-line-height {
   line-height:1.1em;
+}
+
+.agency-selected {
+  border: 2px solid $mhc-href;
+}
+
+.broker-staff th {
+  text-align: center;
+}
+
+.broker-staff td {
+  text-align: center;
 }
 

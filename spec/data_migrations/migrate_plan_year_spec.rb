@@ -2,7 +2,6 @@ require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "migrate_plan_year")
 
 describe MigratePlanYear, dbclean: :after_each do
-
   let(:given_task_name) { "migrate_plan_year" }
   subject { MigratePlanYear.new(given_task_name, double(:current_scope => nil)) }
 
@@ -18,12 +17,13 @@ describe MigratePlanYear, dbclean: :after_each do
     let(:plan_year)         { FactoryBot.build(:plan_year, benefit_groups: [benefit_group], aasm_state: "active", is_conversion: true) }
     let(:employer_profile)  { FactoryBot.create(:employer_profile, plan_years: [plan_year], profile_source: "conversion") }
 
-    before(:each) do
-      ENV["feins"] = employer_profile.parent.fein
+    around do |example|
+      ClimateControl.modify feins: employer_profile.parent.fein do
+        example.run
+      end
     end
 
     context "giving a new state" do
-
       it "should change its aasm state when active" do
         subject.migrate
         plan_year.reload
@@ -37,7 +37,6 @@ describe MigratePlanYear, dbclean: :after_each do
         plan_year.reload
         expect(plan_year.aasm_state).to eq "renewing_enrolling"
       end
-
     end
   end
 end

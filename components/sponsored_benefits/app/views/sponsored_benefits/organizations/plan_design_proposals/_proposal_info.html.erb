@@ -1,12 +1,3 @@
-<% if can_employee_shop?(f.object.effective_date.try(:to_date)) %>
- <div class="alert alert-info" role="alert">
-   <strong><i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-      <%= Settings.site.late_rates_message %>
-   </strong>
- </div>
-<% end %>
-
-
 <div class="row no-buffer row-form-wrapper">
   <div class="col-md-4 col-md-4 col-xs-12 form-group form-group-lg no-pd">
     <%= f.text_field :title, class: "floatlabel form-control", disabled: read_only, required: true, placeholder: 'Quote Name' %>
@@ -20,17 +11,21 @@
     <%= f.text_field :quote_date, class: "floatlabel form-control", disabled: true, placeholder: 'Quote Date' %>
   </div>
 
-  <div class="col-md-4 col-md-4 col-xs-12 form-group form-group-lg no-pd">
-    <%= f.text_field :sic_code, class: "floatlabel form-control", disabled: true, placeholder: 'SIC' %>
-  </div>
+  <% if employer_has_sic_enabled? %>
+    <div class="col-md-4 col-md-4 col-xs-12 form-group form-group-lg no-pd">
+      <%= f.text_field :sic_code, class: "floatlabel form-control", disabled: true, placeholder: 'SIC' %>
+    </div>
+  <% end %>
 
   <div class="col-md-4 col-md-4 col-xs-12 form-group form-group-lg no-pd">
     <%= f.text_field :zip_code, class: "floatlabel form-control", required: true, disabled: true, placeholder: 'ZIP Code' %>
   </div>
 
-  <div class="col-md-4 col-md-4 col-xs-12 form-group form-group-lg no-pd">
-    <%= f.text_field :county, class: "floatlabel form-control", required: true, disabled: true, placeholder: 'County' %>
-  </div>
+  <% if employer_has_county_validation? %>
+    <div class="col-md-4 col-md-4 col-xs-12 form-group form-group-lg no-pd">
+      <%= f.text_field :county, class: "floatlabel form-control", required: true, disabled: true, placeholder: 'County' %>
+    </div>
+  <% end %>
 </div>
 
 <script>
@@ -42,7 +37,7 @@ $(function() {
       $.ajax({
         type: "POST",
         url: $("#new_forms_plan_design_proposal").attr('action'),
-        data: $("#new_forms_plan_design_proposal").serialize(),
+        data: $("#new_forms_plan_design_proposal").serialize() + "profile_id=" + $("#profile_id").val(),
         dataType: "script",
         success: function(data) {
         }

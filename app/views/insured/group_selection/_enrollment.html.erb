@@ -1,10 +1,10 @@
-<% plan = hbx_enrollment.try(:plan) %>
+<% plan = hbx_enrollment.try(:product) %>
 <div class="hbx-enrollment-panel module">
 <div class="panel panel-default min-h">
 
   <div class="panel-heading">
     <h4>
-      <%= hbx_enrollment.coverage_year %> <%= plan.coverage_kind.capitalize %> <%= l10n("coverage") %>
+      <%= hbx_enrollment.coverage_year %> <%= plan.kind.capitalize %> <%= l10n("coverage") %>
       <span class="separator">
         <%= hbx_enrollment.is_shop? ? hbx_enrollment.employer_profile.legal_name : l10n("insured.families.individual_and_family") %>
       </span>

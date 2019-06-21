@@ -2,6 +2,7 @@ module BenefitMarkets
   class Locations::RatingArea
     include Mongoid::Document
     include Mongoid::Timestamps
+    include ::Config::SiteModelConcern
 
     field :active_year, type: Integer
     field :exchange_provided_code, type: String
@@ -29,26 +30,32 @@ module BenefitMarkets
     end
 
     def self.rating_area_for(address, during: TimeKeeper.date_of_record)
-      county_name = address.county.blank? ? "" : address.county.titlecase
-      zip_code = address.zip
-      state_abbrev = address.state.blank? ? "" : address.state.upcase
+      if site_key == :dc
+        self.where(
+          "active_year" => during.year
+        ).first
+      else
+        county_name = address.county.blank? ? "" : address.county.titlecase
+        zip_code = address.zip
+        state_abbrev = address.state.blank? ? "" : address.state.upcase
+        
+        county_zip_ids = ::BenefitMarkets::Locations::CountyZip.where(
+          :zip => zip_code,
+          :county_name => county_name,
+          :state => state_abbrev
+        ).map(&:id)
       
-      county_zip_ids = ::BenefitMarkets::Locations::CountyZip.where(
-        :zip => zip_code,
-        :county_name => county_name,
-        :state => state_abbrev
-      ).map(&:id)
-      
-      # TODO FIX
-      # raise "Multiple Rating Areas Returned" if area.count > 1
-      
-      self.where(
-        "active_year" => during.year,
-        "$or" => [
-          {"county_zip_ids" => { "$in" => county_zip_ids }},
-          {"covered_states" => state_abbrev}
-        ]
-      ).first
+        # TODO FIX
+        # raise "Multiple Rating Areas Returned" if area.count > 1
+        
+        self.where(
+          "active_year" => during.year,
+          "$or" => [
+            {"county_zip_ids" => { "$in" => county_zip_ids }},
+            {"covered_states" => state_abbrev}
+          ]
+        ).first
+      end
     end
   end
 end

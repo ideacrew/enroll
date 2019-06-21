@@ -317,7 +317,7 @@ class BenefitApplicationMigration < Mongoid::Migration
       end
 
       if old_org.employer_profile.published_plan_year.present? && old_org.employer_profile.published_plan_year.enrolling?
-        benefit_sponsorship.aasm_state = :initial_enrollment_open
+        benefit_sponsorship.aasm_state = :applicant
       else
         benefit_sponsorship.aasm_state = benefit_sponsorship.send(:employer_profile_to_benefit_sponsor_states_map)[old_org.employer_profile.aasm_state.to_sym]
       end

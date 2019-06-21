@@ -1,9 +1,9 @@
-$mhc-dark-blue: #005e81;
+$mhc-dark-blue:#003260;
 $mhc-blue: #247dc5;
 $mhc-dark-gray: #706f6d;
 $mhc-gray: #6d6e70;
 $mhc-light-gray:#9b9b9b;
-$mhc-orange: #c56c24;
+$mhc-orange: #333333;
 $mhc-red: #812200;
 
 $primary-orange: $mhc-orange;
@@ -39,7 +39,7 @@ $secondary-button-text-casing: capitalize;
 $background-hover: #eeeeee;
 
 $font-family-base: 'arial';
-$headings-font-family: 'Roboto Slab';
+$headings-font-family: 'Open Sans';
 $headings-color: $primary-orange;
 $gray: #4b7c2b;
 $brand-success: #5cb85c;
@@ -477,7 +477,7 @@ $brand-primary: $mhc-dark-blue;
 }
 
 .pdp-titles-class {
-  color:$mhc-orange;
+  color:#000000;
 }
 .pdp-titles-class:hover {
   cursor:pointer;
@@ -524,6 +524,36 @@ $brand-primary: $mhc-dark-blue;
         border-bottom: none;
         display: none;
       }
+    }
+  }
+}
+
+.carrier-custom-plan-tab {
+  .carrier-custom-plans {
+    padding-left: 0px;
+    margin-bottom: 25px;
+  }
+  .cc-reference-plans {
+    font-size: 12px;
+    font-weight: 300;
+    margin-top: 5px;
+    margin-bottom: 0px;
+  }
+  .cc-reference-card {
+    .plan-label {
+      color: #b7b7b7;
+      font-size: 10px;
+      text-transform: uppercase;
+    }
+  }
+}
+.di {
+  font-size: 12px;
+}
+#pdp-bms {
+  .nav-tabs {
+    input[type="radio"] {
+      display: none;
     }
   }
 }

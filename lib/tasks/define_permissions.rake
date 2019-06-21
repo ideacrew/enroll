@@ -35,6 +35,11 @@ namespace :permissions do
 end
 
 namespace :permissions do
+  desc 'hbx admin can add pdc'
+  DefinePermissions.define_task :hbx_admin_can_add_pdc => :environment
+end
+
+namespace :permissions do
   desc 'hbx admin can view username and email'
   DefinePermissions.define_task :hbx_admin_can_view_username_and_email => :environment
 end
@@ -57,9 +62,15 @@ namespace :permissions do
   DefinePermissions.define_task :hbx_admin_can_extend_open_enrollment => :environment
 end
 
+# RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_modify_plan_year
+namespace :permissions do
+  desc 'hbx admin can update plan years'
+  DefinePermissions.define_task :hbx_admin_can_modify_plan_year => :environment
+end
+
 # RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_create_benefit_application
 namespace :permissions do
-  desc 'hbx admin can extend open enrollment'
+  desc 'hbx admin can create benefit application'
   DefinePermissions.define_task :hbx_admin_can_create_benefit_application => :environment
 end
 
@@ -102,7 +113,7 @@ end
 
 namespace :permissions do
   desc 'hbx admin can view outstanding verification link tab'
-  DefinePermissions.define_task :hbx_admin_access_outstanding_verification_sub_tab => :environment
+  DefinePermissions.define_task :hbx_admin_can_access_outstanding_verification_sub_tab => :environment
 end
 
 namespace :permissions do
@@ -120,13 +131,17 @@ namespace :permissions do
   DefinePermissions.define_task :hbx_admin_can_delete_identity_application_documents => :environment
 end
 
+namespace :permissions do
+  desc 'hbx admin can transition family members'
+  DefinePermissions.define_task :hbx_admin_can_transition_family_members => :environment
+end
+
 
 #rake permissions:hbx_admin_can_reset_password
 
 #rake permissions:hbx_admin_access_new_consumer_application_sub_tab
 #rake permissions:hbx_admin_access_identity_verification_sub_tab
 #rake permissions:hbx_admin_access_outstanding_verification_sub_tab
-#rake permissions:hbx_admin_can_access_resident_application_sub_tab
 
 #RAILS_ENV=production bundle exec rake permissions:initial_hbx
 #RAILS_ENV=production bundle exec rake permissions:migrate_hbx
@@ -141,5 +156,5 @@ end
 #RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_access_accept_reject_identity_documents
 #RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_access_accept_reject_paper_application_documents
 #RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_delete_identity_application_documents
-
-
+#RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_modify_plan_year
+#rake permissions:hbx_admin_can_add_pdc

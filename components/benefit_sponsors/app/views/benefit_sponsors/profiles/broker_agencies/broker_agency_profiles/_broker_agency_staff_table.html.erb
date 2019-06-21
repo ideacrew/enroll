@@ -1,0 +1,43 @@
+<h3> Broker Agency Staff</h3>
+
+<% if broker_staff %>
+  <div class="table-border">
+    <table class="table">
+      <thead>
+        <th><%= l10n("first_name")%></th>
+        <th><%= l10n("last_name")%></th>
+        <th><%= l10n("email")%></th>
+        <th><%= l10n("phone")%></th>
+        <th><%= l10n("status")%></th>
+        <th><%= l10n("remove_role")%></th>
+      </thead>
+      <% broker_staff.each do |staff| %>
+            <tbody>
+              <td><%= staff.first_name.capitalize %></td>
+              <td><%= staff.last_name.capitalize %></td>
+              <td><%= staff.work_email_or_best %></td>
+              <td><%= staff.work_phone %></td>
+              <td>
+                <%= staff.has_pending_broker_staff_role?(@broker_agency_profile.id) ? "Pending" : "Active"%>
+                <%= staff.user_id ? ' Linked  ' : ' Unlinked  ' %>
+                 <% if staff.has_pending_broker_staff_role?(@broker_agency_profile.id) %>         
+                  <%=  link_to(approve_profiles_broker_agencies_broker_agency_staff_role_path(profile_id:@broker_agency_profile.id, person_id: staff.id), :class => "approve") do %>
+                      approve
+                  <% end %>
+                <% end %>
+              </td>
+
+              <td> 
+                 <%=  link_to(profiles_broker_agencies_broker_agency_staff_role_path(profile_id:@broker_agency_profile.id, person_id: staff.id), :id => "destroy", hidden: can_show_destroy?(current_user, staff), method: 'delete') do %>
+                       <i class="far fa-trash-alt fa-2x role-trashcan right center"></i>
+                  <% end %>
+             </td>
+                             
+            </tbody>
+      <% end %>
+    </table>
+  </div>
+<% end %>
+
+
+<%= link_to 'Add Broker Staff Role', new_profiles_broker_agencies_broker_agency_staff_role_path(profile_id:@broker_agency_profile.id), id: "add_staff", remote: true, class: 'btn btn-default pull-left col-12' %>

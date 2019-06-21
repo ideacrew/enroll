@@ -6,7 +6,7 @@ module BenefitSponsors
     let(:model_event) { "application_submitted" }
     let(:current_effective_date)  { TimeKeeper.date_of_record }
     let!(:security_question)  { FactoryBot.create_default :security_question }
-    let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
 
     let(:benefit_market)      { site.benefit_markets.first }
     let!(:benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
@@ -14,7 +14,7 @@ module BenefitSponsors
                                             title: "SHOP Benefits for #{current_effective_date.year}",
                                             application_period: (start_on.beginning_of_year..start_on.end_of_year))
                                           }
-    let(:organization)        { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+    let(:organization)        { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
     let(:employer_profile)    { organization.employer_profile }
     let(:benefit_sponsorship) { employer_profile.add_benefit_sponsorship }
     let!(:model_instance) {
@@ -33,8 +33,8 @@ module BenefitSponsors
       context "ModelEvent" do
 
         it "should trigger model event" do
-          model_instance.class.observer_peers.keys.each do |observer|
-            expect(observer).to receive(:notifications_send) do |instance, model_event|
+          model_instance.class.observer_peers.keys.select{ |ob| ob.is_a? BenefitSponsors::Observers::NoticeObserver }.each do |observer|
+            expect(observer).to receive(:process_application_events) do |_instance, model_event|
               expect(model_event).to be_an_instance_of(::BenefitSponsors::ModelEvents::ModelEvent)
               expect(model_event).to have_attributes(:event_key => :application_submitted, :klass_instance => model_instance, :options => {})
             end
@@ -44,7 +44,7 @@ module BenefitSponsors
       end
 
       context "Notice Trigger", dbclean: :after_each do
-        subject { BenefitSponsors::Observers::BenefitApplicationObserver.new }
+        subject { BenefitSponsors::Observers::NoticeObserver.new }
 
         let(:model_event) { ::BenefitSponsors::ModelEvents::ModelEvent.new(:application_submitted, model_instance, {}) }
 
@@ -62,7 +62,7 @@ module BenefitSponsors
             expect(payload[:event_object_kind]).to eq 'BenefitSponsors::BenefitApplications::BenefitApplication'
             expect(payload[:event_object_id]).to eq model_instance.id.to_s
           end
-          subject.notifications_send(model_instance, model_event)
+          subject.process_application_events(model_instance, model_event)
         end
       end
 

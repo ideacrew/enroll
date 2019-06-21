@@ -35,6 +35,7 @@ default: &default
 
   extensions:
     - .mjs
+    - .ts
     - .js
     - .sass
     - .scss
@@ -86,7 +87,7 @@ production:
   <<: *default
 
   # Production depends on precompilation of packs prior to booting for performance.
-  compile: false
+  compile: false 
 
   # Extract and emit a css file
   extract_css: true

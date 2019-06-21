@@ -28,7 +28,7 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def large_family_factor(member)
-    if (age_of(member) > 20) || (coverage_kind == "dental")
+    if (age_of(member) > 20) || (kind == "dental")
       1.00
     else
       if child_index(member) > 2
@@ -39,8 +39,9 @@ class UnassistedPlanCostDecorator < SimpleDelegator
     end
   end
 
+  #TODO: FIX me to refactor hard coded rating area
   def premium_for(member)
-    (Caches::PlanDetails.lookup_rate(__getobj__.id, schedule_date, age_of(member)) * large_family_factor(member)).round(2)
+    (::BenefitMarkets::Products::ProductRateCache.lookup_rate(__getobj__, schedule_date, age_of(member), "R-DC001") * large_family_factor(member)).round(2)
   end
 
   def employer_contribution_for(member)

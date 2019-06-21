@@ -29,11 +29,13 @@ module Effective
           row.aasm_state.titleize
         }, :sortable => false, :filter => false
         
-        unless individual_market_is_enabled?
-          table_column :est_participation, :proc => Proc.new { |row|
-            row.expected_selection.titleize if row.expected_selection
-          }, :sortable => false, :filter => false
-        end
+        table_column :est_participation, :proc => Proc.new { |row|
+          row.expected_selection.titleize if row.expected_selection
+        }, :sortable => false, :filter => false
+
+        table_column :census_dependents, :label => 'No. of Dependents', :proc => Proc.new { |row|
+          row.census_dependents_count
+        }, :sortable => false, :filter => false
 
         table_column :actions, label: "", :width => '50px', :proc => Proc.new { |row|
           # @employer_profile = row.employer_profile
@@ -49,7 +51,7 @@ module Effective
       end
 
       def collection
-        unless (defined? @employees) && @employees.present? #memoize the wrapper class to persist @search_string
+        unless  (defined? @employees) && @employees.present?   #memoize the wrapper class to persist @search_string
           @employees = Queries::PlanDesignEmployeeQuery.new(attributes)
         end
         @employees

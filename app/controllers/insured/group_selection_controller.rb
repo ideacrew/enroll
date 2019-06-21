@@ -1,6 +1,7 @@
 class Insured::GroupSelectionController < ApplicationController
   include Insured::GroupSelectionHelper
 
+  before_action :permit_params, only: [:create]
   before_action :initialize_common_vars, only: [:new, :create, :terminate_selection]
   # before_action :set_vars_for_market, only: [:new]
   # before_action :is_under_open_enrollment, only: [:new]
@@ -32,6 +33,8 @@ class Insured::GroupSelectionController < ApplicationController
     end
     @qle = @adapter.is_qle?
 
+    insure_hbx_enrollment_for_shop_qle_flow
+
     # Benefit group is what we will need to change
     @benefit_group = @adapter.select_benefit_group(params)
     @new_effective_on = @adapter.calculate_new_effective_on(params)
@@ -47,14 +50,16 @@ class Insured::GroupSelectionController < ApplicationController
     @adapter.if_change_plan_selected(params) do |new_effective_date|
       @new_effective_on = new_effective_date
     end
-    
+
     @waivable = @adapter.can_waive?(@hbx_enrollment, params)
   end
 
   def create
+    keep_existing_plan = @adapter.keep_existing_plan?(params)
     @market_kind = @adapter.create_action_market_kind(params)
     return redirect_to purchase_insured_families_path(change_plan: @change_plan, terminate: 'terminate') if params[:commit] == "Terminate Plan"
-    if @employee_role.census_employee.present?
+
+    if @market_kind == 'shop' && @employee_role.census_employee.present?
       new_hire_enrollment_period = @employee_role.census_employee.new_hire_enrollment_period
       if new_hire_enrollment_period.begin > TimeKeeper.date_of_record
         raise "You're not yet eligible under your employer-sponsored benefits. Please return on #{new_hire_enrollment_period.begin.strftime("%m/%d/%Y")} to enroll for coverage."
@@ -63,16 +68,13 @@ class Insured::GroupSelectionController < ApplicationController
 
     unless @adapter.is_waiving?(params)
       raise "You must select at least one Eligible applicant to enroll in the healthcare plan" if params[:family_member_ids].blank?
-      family_member_params = params.require(:family_member_ids)
-      family_member_params.permit! if family_member_params.kind_of?(ActionController::Parameters)
-      family_member_ids = family_member_params.to_h.collect do |index, family_member_id|
+      family_member_ids = params.require(:family_member_ids).to_h.collect do |_index, family_member_id|
         BSON::ObjectId.from_string(family_member_id)
       end
     end
 
     hbx_enrollment = build_hbx_enrollment(family_member_ids)
-
-    if @adapter.is_waiving?(params)
+    if @market_kind == 'shop' && @adapter.is_waiving?(params)
       if hbx_enrollment.save
         @adapter.assign_enrollment_to_benefit_package_assignment(@employee_role, hbx_enrollment)
         redirect_to waive_insured_plan_shopping_path(:id => hbx_enrollment.id, :waiver_reason => hbx_enrollment.waiver_reason)
@@ -88,21 +90,35 @@ class Insured::GroupSelectionController < ApplicationController
       if sep.present?
         hbx_enrollment.special_enrollment_period_id = sep.id
       end
+
+      hbx_enrollment.plan = @hbx_enrollment.plan
     end
 
-    hbx_enrollment.generate_hbx_signature
+    select_enrollment_members(hbx_enrollment, family_member_ids) if @market_kind == 'individual' || @market_kind == 'coverall'
 
+    hbx_enrollment.generate_hbx_signature
     @adapter.family.hire_broker_agency(current_user.person.broker_role.try(:id))
     hbx_enrollment.writing_agent_id = current_user.person.try(:broker_role).try(:id)
     hbx_enrollment.original_application_type = session[:original_application_type]
     broker_role = current_user.person.broker_role
     hbx_enrollment.broker_agency_profile_id = broker_role.broker_agency_profile_id if broker_role
 
+    hbx_enrollment.coverage_kind = @coverage_kind
     hbx_enrollment.validate_for_cobra_eligiblity(@employee_role)
 
+    hbx_enrollment.kind = @market_kind if (hbx_enrollment.kind != @market_kind) && (@market_kind != 'shop')
+
     if hbx_enrollment.save
-      @adapter.assign_enrollment_to_benefit_package_assignment(@employee_role, hbx_enrollment)
-      if @adapter.keep_existing_plan?(params) && @adapter.previous_hbx_enrollment.present?
+      if @market_kind == 'individual' || @market_kind == 'coverall'
+        hbx_enrollment.inactive_related_hbxs # FIXME: bad name, but might go away
+      elsif @market_kind == 'shop'
+        @adapter.assign_enrollment_to_benefit_package_assignment(@employee_role, hbx_enrollment)
+      end
+
+      if (@market_kind == 'individual' || @market_kind == 'coverall') && keep_existing_plan
+        hbx_enrollment.update_coverage_kind_by_plan
+        redirect_to purchase_insured_families_path(change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, hbx_enrollment_id: hbx_enrollment.id)
+      elsif @market_kind == 'shop' && keep_existing_plan && @adapter.previous_hbx_enrollment.present?
         redirect_to thankyou_insured_plan_shopping_path(change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @adapter.coverage_kind, id: hbx_enrollment.id, plan_id: @adapter.previous_hbx_enrollment.product_id)
       elsif @change_plan.present?
         redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @adapter.coverage_kind, enrollment_kind: @adapter.enrollment_kind)
@@ -143,6 +159,16 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   private
+
+  def permit_params
+    params.permit!
+  end
+
+  def select_enrollment_members(hbx_enrollment, family_member_ids)
+    hbx_enrollment.hbx_enrollment_members = hbx_enrollment.hbx_enrollment_members.select do |member|
+      family_member_ids.include? member.applicant_id
+    end
+  end
 
   def build_hbx_enrollment(family_member_ids)
     case @market_kind
@@ -206,10 +232,32 @@ class Insured::GroupSelectionController < ApplicationController
       @resident_role = res_role
       @role = res_role
     end
+    if @hbx_enrollment.present? && @change_plan == "change_plan"
+      if @hbx_enrollment.kind == "employer_sponsored"
+        @mc_market_kind = "shop"
+      elsif @hbx_enrollment.kind == "coverall"
+        @mc_market_kind = "coverall"
+      else
+        @mc_market_kind = "individual"
+      end
+      @mc_coverage_kind = @hbx_enrollment.coverage_kind
+    end
 
     @adapter.if_consumer_role do |c_role|
       @consumer_role = c_role
       @role = c_role
     end
   end
+
+  def get_values_to_generate_resident_role(person)
+    options = {}
+    options[:is_applicant] = person.consumer_role.is_applicant
+    options[:bookmark_url] = person.consumer_role.bookmark_url
+    options[:is_state_resident] = person.consumer_role.is_state_resident
+    options[:residency_determined_at] = person.consumer_role.residency_determined_at
+    options[:contact_method] = person.consumer_role.contact_method
+    options[:language_preference] = person.consumer_role.language_preference
+    options
+  end
+
 end

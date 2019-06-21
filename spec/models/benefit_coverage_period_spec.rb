@@ -73,20 +73,25 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
         end
 
         context "and a second lowest cost silver plan is specified" do
-          let(:silver_plan) { FactoryBot.create(:plan, metal_level: "silver") }
-          let(:bronze_plan) { FactoryBot.create(:plan, metal_level: "bronze") }
+          let!(:silver_product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
+          let!(:bronze_product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
           let(:benefit_package) { double }
+
+          before :each do
+            bronze_product.update_attributes(metal_level_kind: 'bronze')
+            silver_product.update_attributes(metal_level_kind: 'silver')
+          end
 
           context "and a silver plan is provided" do
             it "should set/get the assigned silver plan" do
-              expect(benefit_coverage_period.second_lowest_cost_silver_plan = silver_plan).to eq silver_plan
-              expect(benefit_coverage_period.second_lowest_cost_silver_plan).to eq silver_plan
+              benefit_coverage_period.second_lowest_cost_silver_plan =  silver_product
+              expect(benefit_coverage_period.second_lowest_cost_silver_plan).to eq silver_product
             end
           end
 
           context "and a non-silver plan is provided" do
             it "should raise an error" do
-              expect{benefit_coverage_period.second_lowest_cost_silver_plan = bronze_plan}.to raise_error(ArgumentError)
+              expect{benefit_coverage_period.second_lowest_cost_silver_plan = bronze_product}.to raise_error(ArgumentError)
             end
           end
 
@@ -185,19 +190,20 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
   end
 
   context "elected_plans_by_enrollment_members", dbclean: :before_each do
-    let(:benefit_coverage_period) { BenefitCoveragePeriod.new(start_on: (TimeKeeper.date_of_record - 2.months).to_date) }
+    let(:benefit_coverage_period) { BenefitCoveragePeriod.new(start_on: Date.new(2019,1,1)) }
     let(:c1) {FactoryBot.create(:consumer_role)}
     let(:c2) {FactoryBot.create(:consumer_role)}
     let(:r1) {FactoryBot.create(:resident_role)}
     let(:r2) {FactoryBot.create(:resident_role)}
     let(:family) { FactoryBot.build(:family, :with_primary_family_member_and_dependent)}
-    let(:member1) {double(person: double(consumer_role: c1),hbx_enrollment: hbx_enrollment,family_member:family.family_members.where(is_primary_applicant: true).first)}
-    let(:member2) {double(person: double(consumer_role: c2),hbx_enrollment: hbx_enrollment,family_member: family.family_members.where(is_primary_applicant: false).first)}
-    let(:hbx_enrollment){ HbxEnrollment.new(kind: "individual", plan: plan1, effective_on: TimeKeeper.date_of_record, household: family.latest_household, enrollment_signature: true) }
-    let(:plan1) { FactoryBot.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', csr_variant_id: '01', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01") }
-    let(:plan2) { FactoryBot.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', csr_variant_id: '01', active_year: TimeKeeper.date_of_record.year - 1, hios_id: "11111111122303-01") }
-    let(:plan3) { FactoryBot.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', csr_variant_id: '01', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122304-01") }
-    let(:plan4) { FactoryBot.create(:plan, market: 'individual', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122305-02") }
+    let(:member1) {double(person: double(consumer_role: c1),hbx_enrollment: hbx_enrollment,family_member:family.family_members.where(is_primary_applicant: true).first, applicant_id: family.family_members[0].id)}
+    let(:member2) {double(person: double(consumer_role: c2),hbx_enrollment: hbx_enrollment,family_member: family.family_members.where(is_primary_applicant: false).first, applicant_id: family.family_members[1].id)}
+    let(:hbx_enrollment){ HbxEnrollment.new(kind: "individual", product: plan1, effective_on: TimeKeeper.date_of_record, household: family.latest_household, enrollment_signature: true) }
+    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
+    let(:plan1) { FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile)}
+    let(:plan2) { FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile)}
+    let(:plan3) { FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile)}
+    let(:plan4) { FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile)}
     let(:benefit_package1) {double(benefit_ids: [plan1.id, plan2.id])}
     let(:benefit_package2) {double(benefit_ids: [plan3.id, plan4.id])}
     let(:benefit_packages)  { [benefit_package1, benefit_package2] }
@@ -208,6 +214,10 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
       Plan.delete_all
       allow(benefit_coverage_period).to receive(:benefit_packages).and_return [benefit_package1, benefit_package2]
       allow(InsuredEligibleForBenefitRule).to receive(:new).and_return rule
+      plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'gold', csr_variant_id: '01')
+      plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'gold', csr_variant_id: '01', application_period: {"min"=>Date.new(2018,01,01), "max"=>Date.new(2018,12,31)})
+      plan3.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'gold', csr_variant_id: '01')
+      plan4.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'gold', csr_variant_id: '01')
     end
 
     after do

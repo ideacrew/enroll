@@ -27,7 +27,7 @@ describe CreateNewInitialPlanYearUsingAnother, dbclean: :around_each do
       before do
         plan_year = benefit_group.plan_year
         plan_year.fte_count = 3
-        allow(plan_year).to receive(:application_errors).and_return({})
+        allow(plan_year).to receive(:is_application_invalid?).and_return(false)
       end
       it "sets the plan year in enrolling state" do
         enrolling_plan_year = subject.force_publish!(benefit_group.plan_year)

@@ -44,7 +44,7 @@ class CensusEmployee < CensusMember
 
   after_save :notify_on_save
 
-  add_observer ::BenefitSponsors::Observers::CensusEmployeeObserver.new, [:notifications_send]
+  add_observer ::BenefitSponsors::Observers::NoticeObserver.new, [:process_census_employee_events]
 
   accepts_nested_attributes_for :census_dependents, :benefit_group_assignments
 
@@ -193,6 +193,12 @@ class CensusEmployee < CensusMember
 
   def inactive_benefit_group_assignments
     benefit_group_assignments.reject(&:is_active?)
+  end
+
+  def benefit_package_assignment_for(benefit_package)
+    benefit_group_assignments.effective_on(benefit_package.effective_period.min).detect do |assignment|
+      assignment.benefit_package_id == benefit_package.id
+    end
   end
 
   def waived?

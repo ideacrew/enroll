@@ -3,7 +3,7 @@ require 'csv'
 require File.join(Rails.root, "app", "reports", "hbx_reports", "edi_enrollment_termination_report")
 require "#{Rails.root}/app/helpers/config/aca_helper"
 
-describe TerminatedHbxEnrollments, dbclean: :after_each do
+describe TerminatedHbxEnrollments do
 
   let(:given_task_name) { "enrollment_termination_on" }
   let(:person1) {FactoryBot.create(:person,
@@ -27,19 +27,19 @@ describe TerminatedHbxEnrollments, dbclean: :after_each do
   let(:valid_params2) { {from_state: from_state, to_state: to_state2, transition_at: transition_at} }
   let(:params2) { valid_params2 }
   let(:workflow_state_transition2) { WorkflowStateTransition.new(params2) }
-  let!(:family1) { FactoryBot.create(:family, :with_primary_family_member, :person => person1)}
-  let!(:site)                  { build(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-  let!(:issuer_profile)  { FactoryBot.create :benefit_sponsors_organizations_issuer_profile, assigned_site: site}
-  let!(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile)}
-  let!(:hbx_enrollment1) { FactoryBot.create(:hbx_enrollment,
-                                             household: family1.active_household,
-                                              product: product,
-                                             aasm_state:"coverage_terminated",
-                                             hbx_enrollment_members: [hbx_enrollment_member1],
-                                             termination_submitted_on: Date.yesterday.midday,
-                                             workflow_state_transitions: [workflow_state_transition1])}
-  let!(:family2) { FactoryBot.create(:family, :with_primary_family_member, :person => person2)}
-  let!(:hbx_enrollment2) { FactoryBot.create(:hbx_enrollment,
+  let(:family1) { FactoryBot.create(:family, :with_primary_family_member, :person => person1)}
+  let(:site)                  { build(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+  let(:issuer_profile)  { FactoryBot.create :benefit_sponsors_organizations_issuer_profile, assigned_site: site}
+  let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile)}
+  let(:hbx_enrollment1) { FactoryBot.create(:hbx_enrollment,
+                                            household: family1.active_household,
+                                             product: product,
+                                            aasm_state:"coverage_terminated",
+                                            hbx_enrollment_members: [hbx_enrollment_member1],
+                                            termination_submitted_on: Date.yesterday.midday,
+                                            workflow_state_transitions: [workflow_state_transition1])}
+  let(:family2) { FactoryBot.create(:family, :with_primary_family_member, :person => person2)}
+  let(:hbx_enrollment2) { FactoryBot.create(:hbx_enrollment,
                                              household: family2.active_household,
                                               product: product,
                                              aasm_state:"coverage_termination_pending",
@@ -68,28 +68,26 @@ describe TerminatedHbxEnrollments, dbclean: :after_each do
   end
 
   shared_examples_for "returns csv file list with terminated hbx_enrollments" do |field_name, result|
+    let(:file) { Array.new }
+
     before :each do
+      family1
+      family2
+      hbx_enrollment1
+      hbx_enrollment2
+      allow(CSV).to receive(:open).and_yield(file)
       subject.migrate
-      @file = if individual_market_is_enabled?
-                Dir.glob(File.join(Rails.root, "/public/edi_enrollment_termination_report_*")).first
-              else
-                Dir.glob(File.join(Rails.root, "CCA_#{ENV["RAILS_ENV"]}_EDIENROLLMENTTERMINATION_*.csv"))
-              end
     end
 
     it "check the records included in file" do
-      file_context = CSV.read(@file)
-      expect(file_context.size).to be > 1
+      expect(file.length).to be > 1
     end
 
     it "returns correct #{field_name} in csv file" do
-      CSV.foreach(@file, :headers => true) do |csv_obj|
-        expect(csv_obj[field_name]).to eq result
+      file.map! { |line| line.map! { |field| "\"#{field}\"" }.join(',') }
+      CSV.parse(file.join("\n"), :headers => true) do |line|
+        expect(line[field_name]).to eq result
       end
-    end
-
-    after(:each) do
-      FileUtils.rm_rf(@file)
     end
   end
 

@@ -15,7 +15,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployeeAutoRenewalNotifica
 
   let!(:person){ FactoryBot.create(:person, :with_family)}
   let!(:family) {person.primary_family}
-  let!(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: employer_profile, census_employee_id: census_employee.id)}
+  let!(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: employer_profile, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: employer_profile.id)}
   let!(:census_employee)  { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile ) }
   let!(:open_enrollment_start_date) { renewal_application.open_enrollment_period.min }
   let!(:hbx_enrollment) {  FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
@@ -35,8 +35,8 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployeeAutoRenewalNotifica
 
   describe "ModelEvent" do
     it "should trigger model event" do
-      census_employee.class.observer_peers.keys.each do |observer|
-        expect(observer).to receive(:notifications_send) do |instance, model_event|
+      census_employee.class.observer_peers.keys.select { |ob| ob.is_a? BenefitSponsors::Observers::NoticeObserver }.each do |observer|
+        expect(observer).to receive(:process_census_employee_events) do |_instance, model_event|
           expect(model_event).to be_an_instance_of(::BenefitSponsors::ModelEvents::ModelEvent)
           expect(model_event).to have_attributes(:event_key => :employee_coverage_passively_renewed, :klass_instance => census_employee, :options => {event_object: renewal_application})
         end
@@ -47,7 +47,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployeeAutoRenewalNotifica
 
   describe "NoticeTrigger" do
     context "when renewal employee auto renewal" do
-      subject { BenefitSponsors::Observers::CensusEmployeeObserver.new }
+      subject { BenefitSponsors::Observers::NoticeObserver.new }
 
       let(:model_event) { ::BenefitSponsors::ModelEvents::ModelEvent.new(:employee_coverage_passively_renewed, census_employee, {event_object:renewal_application}) }
 
@@ -58,7 +58,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployeeAutoRenewalNotifica
           expect(payload[:event_object_kind]).to eq 'BenefitSponsors::BenefitApplications::BenefitApplication'
           expect(payload[:event_object_id]).to eq renewal_application.id.to_s
         end
-        subject.notifications_send(census_employee, model_event)
+        subject.process_census_employee_events(census_employee, model_event)
       end
     end
   end

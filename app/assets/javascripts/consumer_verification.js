@@ -78,7 +78,7 @@ var Verification = (function(){
    }
 })();
 
-$(document).ready(function(){
+$(document).on("ready turbolinks:load", function() {
    $('.v-type-actions').on('change', Verification.check_selected_action);
    $('.verification-update-reason').delegate('a', "click", Verification.confirm_v_type );
 });

@@ -13,6 +13,7 @@ BenefitSponsors::Engine.routes.draw do
           get :staff_index
           get :agency_messages
           get :commission_statements
+          get :general_agency_index
         end
         member do
           post :clear_assign_for_employer
@@ -25,8 +26,44 @@ BenefitSponsors::Engine.routes.draw do
         end
       end
       resources :broker_applicants
+
+      resources :broker_roles
+
+      resources :broker_agency_staff_roles do
+        collection do
+          get :search_broker_agency
+        end
+        member do
+          get :approve
+        end
+      end
     end
 
+    namespace :general_agencies do
+      resources :general_agency_profiles, only: [:new, :create, :show, :index, :edit, :update] do
+        collection do
+          get :families
+          get :messages
+          get :staff_index
+          get :agency_messages
+          get :commission_statements
+          get :employers
+          get :staffs
+          get :edit_staff
+          post :update_staff
+        end
+        member do
+          post :clear_assign_for_employer
+          get :assign
+          post :update_assign
+          post :family_datatable
+          get :inbox
+          get :download_commission_statement
+          get :show_commission_statement
+        end
+      end
+
+    end
     namespace :employers do
       resources :employer_profiles, only: [:show] do
         get :export_census_employees
@@ -74,7 +111,7 @@ BenefitSponsors::Engine.routes.draw do
   resources :benefit_sponsorships do
     resources :benefit_applications, controller: "benefit_applications/benefit_applications" do
       get :late_rates_check, on: :collection
-   
+
       post :revert
       post :submit_application
       post :force_submit_application

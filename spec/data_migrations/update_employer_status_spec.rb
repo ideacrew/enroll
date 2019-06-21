@@ -46,9 +46,9 @@ describe UpdateEmployerStatus, dbclean: :after_each do
 
     it "should not should update aasm_state of plan year when ENV['plan_year_start_on'] is empty" do
       ClimateControl.modify fein:organization.fein, plan_year_start_on:"" do
-      subject.migrate
-      plan_year.reload
-      expect(plan_year.aasm_state).to eq "application_ineligible"
+        subject.migrate
+        plan_year.reload
+        expect(plan_year.aasm_state).to eq "application_ineligible"
       end
     end
   end

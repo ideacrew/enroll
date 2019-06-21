@@ -26,7 +26,7 @@ $(document).on('page:load', pageInit);
 
 function pageInit() {
   var kind = fetchBenefitKind();
-  
+
   if(kind == "dental") {
     var dental_reference_plan_id = $("#dental_reference_plan_id").val();
     if(dental_reference_plan_id != '' && dental_reference_plan_id != undefined) {
@@ -34,7 +34,7 @@ function pageInit() {
       calcPlanDesignContributions();
     } else {
       setTimeout(function() {
-        $('li.single-plan-tab').find('label').trigger('click');
+        $(".plan-design .nav-tabs li label:first").trigger('click');
       },600)
     }
   } else {
@@ -43,7 +43,7 @@ function pageInit() {
     } else {
       disableActionButtons();
       setTimeout(function() {
-        $('li.sole-source-tab').find('label').trigger('click');
+        $(".plan-design .nav-tabs li label:first").trigger('click');
       },600)
     }
     initSlider();
@@ -62,6 +62,31 @@ function attachEmployerHealthContributionShowHide() {
     $("div[data-offering-target='composite_" + offering_id + "']").removeClass("enabled");
     $("div[data-offering-target='" + offering_id + "']").addClass("enabled");
   }
+}
+
+function fetchDentalCustom(){
+    var plan_design_organization_id = $('#plan_design_organization_id').val();
+    var active_year = $("#forms_plan_design_proposal_effective_date").val().substr(0,4);
+    var dental_plan_ids = [];
+    $.each($("input[name='Dental Plan']:checked"), function(){
+        dental_plan_ids.push($(this).val());
+    });
+
+    if(!dental_plan_ids.length){
+        return alert("Please Select One of Plan Under Custom Carrier Filter");
+    }
+    $.ajax({
+        type: "POST",
+        data:{
+          active_year: active_year,
+          plans_ids: dental_plan_ids,
+          kind: "dental"
+        },
+        success: function() {
+
+        },
+        url: "/sponsored_benefits/organizations/plan_design_organizations/" + plan_design_organization_id + "/dental_reference_plans"
+    });
 }
 
 function fetchCarriers() {
@@ -90,24 +115,6 @@ function fetchCarriers() {
   toggleSliders(selected_carrier_level);
   clearComparisons();
 }
-
-// function fetchDentalCarriers() {
-//   alert("Nisanth");
-//   var active_year = $("#forms_plan_design_proposal_effective_date").val().substr(0,4);
-//   var selected_carrier_level = $(this).siblings('input').val();
-//   var plan_design_organization_id = $('#plan_design_organization_id').val();
-//   $.ajax({
-//     type: "GET",
-//     data:{
-//       active_year: active_year,
-//       selected_carrier_level: selected_carrier_level,
-//       kind: "dental"
-//     },
-//     url: "/sponsored_benefits/organizations/plan_design_organizations/" + plan_design_organization_id + "/carriers"
-//   });
-
-//   displayActiveDentalCarriers();
-// }
 
 function setSBC(element, plan) {
   var kind = fetchBenefitKind();
@@ -160,7 +167,7 @@ function sendPdf(event) {
   window.location.href = $(this).attr('href');
 }
 
-function checkIfSbcIncluded(event) {
+function checkIfSbcIncluded(event)  {
   var elem_id = $(this).attr('id');
   var obj = $('#'+elem_id);
   if(obj.hasClass('plan-not-saved')) {
@@ -210,11 +217,20 @@ function carrierSelected() {
 
   var kind = fetchBenefitKind();
   if (kind == "dental") {
-    $("#dental_elected_plan_kind").val(elected_plan_kind);
+    if(elected_plan_kind == "custom") {
+      $("#dental_elected_plan_kind").val("single_plan");
+    } else {
+      $("#dental_elected_plan_kind").val(elected_plan_kind);
+    }
     $("#dental_reference_plan_id").val("");
   }else {
     $("#elected_plan_kind").val(elected_plan_kind);
     $("#reference_plan_id").val("");
+  }
+
+  if (elected_plan_kind == "custom") {
+    $(this).closest('.plan-design').find('.carrier-custom-plan-tab').show();
+    $(this).closest('.plan-design').find('.plan-options').slideDown();
   }
 
   if (elected_plan_kind == "single_carrier") {
@@ -235,27 +251,9 @@ function carrierSelected() {
   }
 }
 
-/*
-// Will Remove with refactor
-function planSelected() {
-  toggleSliders($("#elected_plan_kind").val());
-
-  var reference_plan_id = $(this).siblings('input').val();
-  $("#reference_plan_id").val(reference_plan_id);
-  $(this).closest('.benefit-group-fields').find('.health-plan-design .selected-plan').html("<br/><br/><div class=\'col-xs-12\'><i class=\'fa fa-spinner fa-spin fa-2x\'></i><h4 style='text-align: center;'>Loading your reference plan preview...</h4></div>");
-
-  if (reference_plan_id != "" && reference_plan_id != undefined){
-    $('.health-plan-design .selected-plan').show();
-    calcPlanDesignContributions();
-    $(this).siblings('input').prop('checked', true);
-    console.log($(this).siblings('input'))
-  };
-
-  clearComparisons();
-}*/
 function setMyPlans(element) {
   // Need to remove jQuery Selectors
-  
+
   var reference_plan_id = element.dataset.planid.replace(/['"]+/g, '');
   var kind = fetchBenefitKind();
 
@@ -278,10 +276,11 @@ function setMyPlans(element) {
     $('.plan-design .selected-plan').show();
     calcPlanDesignContributions();
   };
-  clearComparisons();
 }
 
 function setSliderDisplayVal(slideEvt) {
+  slideEvt.preventDefault();
+  slideEvt.stopImmediatePropagation();
   $(this).closest('.form-group').find('.hidden-param').val(slideEvt.value).attr('value', slideEvt.value);
   $(this).closest('.form-group').find('.slide-label').text(slideEvt.value + "%");
   calcPlanDesignContributions();
@@ -323,7 +322,7 @@ function calcPlanDesignContributions() {
 }
 
 function fetchBenefitKind() {
-  if(window.location.href.includes("kind=dental")) {
+  if(window.location.href.indexOf("kind=dental") > -1) {
     return "dental"
   } else {
     return "health"
@@ -383,11 +382,17 @@ function buildBenefitGroupParams() {
   }
 
   var data = {
+    'profile_id': $("#profile_id").val(),
     'benefit_group': {
       "reference_plan_id": reference_plan_id,
       "plan_option_kind": plan_option_kind,
       "kind": kind
     }
+  }
+
+  var elected_dental_plans = $("#elected_dental_plans").val()
+  if(elected_dental_plans) {
+    data['benefit_group']['elected_dental_plans'] = elected_dental_plans
   }
 
   if(plan_option_kind == 'sole_source') {
@@ -418,11 +423,11 @@ function setRadioBtn(element) {
   dotIcons = document.querySelectorAll('.fa-dot-circle');
   icons = document.querySelectorAll('.fa-circle');
   iconId = element.target.dataset.tempId;
-  
+
   dotIcons.forEach(function(icon) {
     icon.classList.add('fa-circle')
   });
-  
+
   icons.forEach(function(icon) {
     if (icon.dataset.tempId == iconId) {
       icon.classList.add('fa-dot-circle')
@@ -446,8 +451,21 @@ function disableActionButtons() {
     $('.plan_design_proposals .plan-selection-button-group').attr({
      'data-toggle': "tooltip",
      'data-placement': "top",
-      'data-title':"Employer premium contribution for Family Health Plans must be at least " + minimum_family_contribution + "%, and Employee Only Health Plans must be at least " + minimum_employee_contribution + "%"
+      'data-title': fetch_data_title(minimum_employee_contribution, minimum_family_contribution)
    })
+  }
+}
+
+function fetch_data_title(min_employee_contribution, minimum_family_contribution) {
+  /* when it runs first time but did not load minimum_employee_contribution hidden_filed_tag page yet */
+  if (typeof min_employee_contribution === "undefined"){
+    return "";
+  }
+
+  if (minimum_family_contribution === "0"){
+    return "Employer premium contribution for Employee Only Health Plans must be at least " + min_employee_contribution + "%"
+  } else {
+    return "Employer premium contribution for Family Health Plans must be at least " + minimum_family_contribution + "%, and Employee Only Health Plans must be at least " + min_employee_contribution + "%";
   }
 }
 
@@ -540,6 +558,8 @@ function saveProposal(event) {
 }
 
 function saveProposalAndCopy(event) {
+  event.preventDefault();
+  event.stopImmediatePropagation();
   var data = buildBenefitGroupParams();
   if (proposalIsInvalid(data)) {
 
@@ -554,9 +574,12 @@ function saveProposalAndCopy(event) {
       $.ajax({
         url: copy_url,
         type: 'POST',
+        data: {
+          profile_id: $("#profile_id").val()
+        },
         dataType: 'json',
         success: function(data) {
-          window.location.href = data.url;
+          window.location.href = data.url + "&profile_id=" + $("#profile_id").val();
         },
         error: function(data) {
           resp = $.parseJSON(data.responseText);
@@ -567,6 +590,8 @@ function saveProposalAndCopy(event) {
 }
 
 function saveProposalAndPublish(event) {
+  event.preventDefault();
+  event.stopImmediatePropagation();
   data = buildBenefitGroupParams();
   if (proposalIsInvalid(data)) {
 
@@ -581,12 +606,15 @@ function saveProposalAndPublish(event) {
       $.ajax({
         url: publish_url,
         type: 'POST',
+        data: {
+          profile_id: $("#profile_id").val()
+        },
         success: function(data) {
-          window.location.href = data.url;
+          window.location.href = data.url + "&profile_id=" + $("#profile_id").val();
         },
         error: function(data) {
           var resp = $.parseJSON(data.responseText);
-          window.location.href = resp.url;
+          window.location.href = resp.url + "&profile_id=" + $("#profile_id").val();
         }
       });
     });
@@ -594,12 +622,16 @@ function saveProposalAndPublish(event) {
 }
 
 function AddDentalToPlanDesignProposal(event) {
+  event.preventDefault();
+  event.stopImmediatePropagation();
   saveProposal(event);
   var url = $("#add_dental_url").val()
-  window.location.href = url
+  window.location.href = url + "&profile_id=" + $("#profile_id").val()
 }
 
 function saveProposalAndNavigateToReview(event) {
+  event.preventDefault();
+  event.stopImmediatePropagation();
   var data = buildBenefitGroupParams();
   if (proposalIsInvalid(data)) {
 
@@ -610,7 +642,7 @@ function saveProposalAndNavigateToReview(event) {
       data: data,
       url: url
     }).done(function(data) {
-      window.location.href = data.url;
+      window.location.href = data.url + "&profile_id=" + $("#profile_id").val();
     });
   }
 }
@@ -657,14 +689,13 @@ function viewComparisons() {
 function clearComparisons() {
   $('.reference-plan').each(function() {
     var checkboxes = $(this).find('input[type=checkbox]');
-    //checkboxes.attr('checked', false);
+    checkboxes.attr('checked', false);
     removeA($.unique(selected_rpids), checkboxes.val());
     disableCompareButton();
   });
 }
 
 function hideDetailComparisons() {
-  selected_rpids = [];
   $('.plan-comparison-container').hide();
 }
 
@@ -734,3 +765,18 @@ function setCarrierRadio(element) {
   element.checked = true;
 }
 
+function handleReferencePlanSelection(element) {
+  if($(".reference-plans").children().length) {
+    target = $("input#reference_plan_" + element.value)
+    if(element.checked) {
+      target.parents('div.reference-plan').show();
+    } else {
+      if(target.prop('checked')) {
+        target.prop('checked', false);
+        $("#dental_reference_plan_id").val('')
+      }
+      target.parents('div.reference-plan').hide();
+      disableActionButtons();
+    }
+  }
+}

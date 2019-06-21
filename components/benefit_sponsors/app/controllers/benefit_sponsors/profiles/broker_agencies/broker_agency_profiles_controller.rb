@@ -13,6 +13,8 @@ module BenefitSponsors
         before_action :set_current_person, only: [:staff_index]
         before_action :check_and_download_commission_statement, only: [:download_commission_statement, :show_commission_statement]
 
+        skip_before_action :verify_authenticity_token, only: :create
+
         layout 'single_column'
 
         EMPLOYER_DT_COLUMN_TO_FIELD_MAP = {
@@ -20,6 +22,19 @@ module BenefitSponsors
           "4"     => "employer_profile.aasm_state",
           "5"     => "employer_profile.plan_years.start_on"
         }
+
+        def create
+          json = request.body.read
+          body_json = JSON.parse(json)
+          result = ::BenefitSponsors::Requests::BrokerAgencyProfileCreateRequest.create(body_json["data"], current_user)
+          respond_to do |format|
+            if result.success?
+              format.json { render :status => 201, json: { :message => "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed." } }
+            else
+              format.json { render :status => 422, :json => { errors: result.messages } }
+            end
+          end
+        end
 
         def index
           authorize self
@@ -31,6 +46,7 @@ module BenefitSponsors
           set_flash_by_announcement
           @broker_agency_profile = ::BenefitSponsors::Organizations::BrokerAgencyProfile.find(params[:id])
           @provider = current_user.person
+          @id=params[:id]
         end
 
         def staff_index
@@ -80,7 +96,7 @@ module BenefitSponsors
         def commission_statements
           permitted = params.permit(:id)
           @id = permitted[:id]
-          if current_user.has_broker_role?
+          if current_user.has_broker_agency_staff_role?
             id = BSON::ObjectId(params[:id]) || current_user.person.broker_role.benefit_sponsors_broker_agency_profile_id
             find_broker_agency_profile(id)
           elsif current_user.has_hbx_staff_role?
@@ -114,32 +130,10 @@ module BenefitSponsors
           send_data Aws::S3Storage.find(@commission_statement.identifier) , options
         end
 
-        def employers
-        end
-
-        #TODO Implement when we move GeneralAgencyProfile in Engine.
         def general_agency_index
-        end
-
-        def set_default_ga
-        end
-
-        def employer_datatable
-        end
-
-        def assign
-        end
-
-        def update_assign
-        end
-
-        def clear_assign_for_employer
-        end
-
-        def assign_history
-        end
-
-        def manage_employers
+          @broker_agency_profile = BenefitSponsors::Organizations::BrokerAgencyProfile.find(params[:id])
+          @broker_role = current_user.person.broker_role || nil
+          @general_agency_profiles = BenefitSponsors::Organizations::GeneralAgencyProfile.all_by_broker_role(@broker_role, approved_only: true)
         end
 
         def messages

@@ -58,6 +58,22 @@ describe '.can_publish_enrollment?', :dbclean => :after_each do
       end
     end
 
+
+    context 'when plan year is in coverage_termination_pending' do
+
+      before do
+        allow(hbx_enrollment).to receive(:new_hire_enrollment_for_shop?).and_return(false)
+        initial_application.update_attributes(aasm_state: "termination_pending")
+        hbx_enrollment.update_attributes(aasm_state: "coverage_termination_pending")
+      end
+
+      context 'coverage_termination_pending enrollment' do
+        it 'should publish enrollment' do
+          expect(can_publish_enrollment?(hbx_enrollment, submitted_at)).to be_truthy
+        end
+      end
+    end
+
     context 'when plan year is valid' do
 
       before do

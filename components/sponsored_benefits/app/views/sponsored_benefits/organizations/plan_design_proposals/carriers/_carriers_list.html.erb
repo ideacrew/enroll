@@ -7,7 +7,7 @@
     <%= link_to organizations_plan_design_organization_plans_path(plan_design_organization,
     carrier_id: "#{ck}",
     selected_carrier_level: selected_carrier_level,
-    active_year: active_year), remote: true, :id => "sole_source_#{ck}_link" do %><% end %>
+    active_year: active_year, kind: kind), remote: true, :id => "sole_source_#{ck}_link" do %><% end %>
     <div class="col-xs-9">
         <label for="sole_source_<%= ck %>"><h3 class="pdp-titles-class"><%= cv %></h3></label>
     </div>
@@ -25,7 +25,7 @@
     <%= link_to organizations_plan_design_organization_plans_path(plan_design_organization,
     carrier_id: "#{ck}",
     selected_carrier_level: selected_carrier_level,
-    active_year: active_year), remote: true, :id => "single_carrier_#{ck}_link" do %><% end %>
+    active_year: active_year, kind: kind), remote: true, :id => "single_carrier_#{ck}_link" do %><% end %>
     <div class="col-xs-9">
         <label for="single_carrier_<%= ck %>"><h3 class="pdp-titles-class"><%= cv %></h3></label>
     </div>
@@ -44,12 +44,38 @@
     carrier_id: "#{ck}",
     selected_carrier_level: selected_carrier_level,
     kind: kind,
-    active_year: active_year), remote: true, :id => "single_plan_#{ck}_link" do %><% end %>
+    active_year: active_year, kind: kind), remote: true, :id => "single_plan_#{ck}_link" do %><% end %>
     <div class="col-xs-9">
         <label for="single_plan_<%= ck %>"><h3 class="pdp-titles-class"><%= cv %></h3></label>
     </div>
   </div>
 <% end %>
+<% elsif selected_carrier_level == 'custom' %>
+  <% carrier_names.each do |plan| %>
+    <div class="col-xs-6 carrier-custom-plans">
+      <div class="col-xs-2">
+        <%= check_box_tag "Dental Plan", plan.id, true, :onclick => "handleReferencePlanSelection(this)" %>
+      </div>
+      <div class="col-xs-10 cc-reference-card">
+        <h3 class="cc-reference-plans"><%= plan.name %></h3>
+        <span class="plan-label">Type: </span><span><%= plan.plan_type %></span><br>
+        <span class="plan-label">Carrier: </span><span><%= plan.carrier_profile.legal_name %></span><br>
+        <span class="plan-label">Level: </span><span><%= display_dental_metal_level(plan) %></span><br>
+        <span class="plan-label">Network: </span><span><%= plan.nationwide ? 'Nationwide' : 'DC Metro' %></span><br/>
+        <%#= link_to 'View Summary', main_app.reference_plan_summary_employers_employer_profile_plan_years_path(ref_plan_id: plan.id, hios_id: plan.hios_id, coverage_kind: plan.coverage_kind), remote: 'true', class: "view-summary fourteen" %>
+      </div>
+    </div>
+  <% end %>
+  <br />
+  <br />
+  <div class="row cc-footer">
+    <div class="col-xs-8">
+      <h4 class="di">After selecting offered plans, click "Select Reference Plan"</h4>
+    </div>
+    <div class="col-xs-3 text-center">
+      <span class="btn btn-default btn-sm" onclick = "fetchDentalCustom();" >Select Reference Plan</span>
+    </div>
+  </div>
 <% else %>
   <% metal_levels = ::Plan::REFERENCE_PLAN_METAL_LEVELS %>
   <% if check_plan_options_title %>

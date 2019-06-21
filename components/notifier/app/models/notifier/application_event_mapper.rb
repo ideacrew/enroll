@@ -6,20 +6,24 @@ module Notifier
     EVENT_PREFIX = "acapi.info.events."
 
     EVENT_MAP = {
-      employer: {
-        binder_paid: :benefit_coverage_initial_binder_paid,        
+      employer:
+      {
+        binder_paid: :benefit_coverage_initial_binder_paid
+      },
+      consumer_role: {
+        projected_eligibility_notice: :projected_eligibility_notice
       }
     }
 
     RESOURCE_MAP = {
       "BenefitSponsors::Organizations::BrokerAgencyProfile" => Resource.new(:broker_agency, :id, :broker_agency_id, :find),
-      "BenefitSponsors::Organizations::AcaShopCcaEmployerProfile" => Resource.new(:employer, :hbx_id, :employer_id, :by_hbx_id),
+      "BenefitSponsors::Organizations::AcaShopDcEmployerProfile" => Resource.new(:employer, :hbx_id, :employer_id, :by_hbx_id),
       "BrokerAgencyProfile" => Resource.new(:broker_agency, :id, :broker_agency_id, :find),
       "ConsumerRole" => Resource.new(:consumer_role, :id, :consumer_role_id, :find),
       "CensusEmployee" => Resource.new(:census_employee, :id, :census_employee_id, :find),
       "BrokerRole" => Resource.new(:broker, :id, :broker_role_id, :find),
       "EmployeeRole" => Resource.new(:employee, :id, :employee_role_id, :find),
-      "GeneralAgencyProfile" => Resource.new(:general_agency, :id, :general_agency_profile_id, :find)
+      "BenefitSponsors::Organizations::GeneralAgencyProfile" => Resource.new(:general_agency, :id, :general_agency_profile_id, :find)
     }
 
     REVERSE_LOOKUP_MAP = RESOURCE_MAP.inject({}) do |acc, vals|

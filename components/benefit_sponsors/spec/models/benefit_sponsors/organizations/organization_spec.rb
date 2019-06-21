@@ -108,6 +108,63 @@ module BenefitSponsors
 
     end
 
+    context "search for broker agencies" do
+      let!(:site)                          { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+      let(:organization_with_hbx_profile)  { site.owner_organization }
+      let!(:organization)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+      let!(:broker_agency_profile1) { organization.broker_agency_profile }
 
-  end
+      let!(:second_organization)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+      let!(:second_broker_agency_profile) { second_organization.broker_agency_profile }
+      let!(:subject) { BenefitSponsors::Organizations::Organization }
+      let!(:new_person_for_staff) { FactoryBot.create(:person) }
+      let!(:broker_role) { FactoryBot.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile1.id, person: new_person_for_staff) }
+
+
+      let(:bap_id) { organization.broker_agency_profile.id }
+
+      context "search for broker agencies from employer portal" do
+
+        before do
+          organization.update_attributes(legal_name: 'org1')
+          broker_agency_profile1.update_attributes(aasm_state: 'is_approved')
+        end
+
+        it "should return searched broker agency profile" do
+          search_params = {q: organization.legal_name}
+          expect(subject.broker_agencies_with_matching_agency_or_broker(search_params, nil).count). to eq 1
+          expect(subject.broker_agencies_with_matching_agency_or_broker(search_params, nil).first.legal_name). to eq organization.legal_name
+        end
+
+        it "should return all broker agency profiles if no search string is passed" do
+          second_organization.update_attributes(legal_name: 'org2')
+          second_broker_agency_profile.update_attributes(aasm_state: 'is_approved')
+          search_params = {q: ''}
+          expect(subject.broker_agencies_with_matching_agency_or_broker(search_params, nil).count). to eq 2
+          expect(subject.broker_agencies_with_matching_agency_or_broker(search_params, nil).first.legal_name). to eq organization.legal_name
+        end
+
+      end
+
+      context "search for broker agencies from broker staff portal" do
+
+        before do
+          organization.update_attributes(legal_name: 'org1')
+          broker_agency_profile1.update_attributes(aasm_state: 'is_approved')
+        end
+
+        it "should return searched broker agency profile" do
+          search_params = {q: organization.legal_name}
+          expect(subject.broker_agencies_with_matching_agency_or_broker(search_params, true).count). to eq 1
+          expect(subject.broker_agencies_with_matching_agency_or_broker(search_params, true).first.legal_name). to eq organization.legal_name
+        end
+
+        it "should not return any broker agency profiles if no search string is passed" do
+          second_organization.update_attributes(legal_name: 'org2')
+          second_broker_agency_profile.update_attributes(aasm_state: 'is_approved')
+          search_params = {q: ''}
+          expect(subject.broker_agencies_with_matching_agency_or_broker(search_params, true).count). to eq 0
+        end
+      end
+    end end
 end

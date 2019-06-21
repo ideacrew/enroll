@@ -1,9 +1,7 @@
 module Notifier
   class MergeDataModels::GeneralAgency
-
     include Virtus.model
     include ActiveModel::Model
-    include Notifier::MergeDataModels::TokenBuilder
 
     attribute :notice_date, String
     attribute :first_name, String
@@ -13,7 +11,8 @@ module Notifier
     attribute :email, String
     attribute :broker, MergeDataModels::Broker
     attribute :legal_name, String
-    attribute :assignment_date, Date
+    attribute :assignment_date, String
+    attribute :termination_date, String
     attribute :employer_name, String
     attribute :employer_poc_firstname, String
     attribute :employer_poc_lastname, String
@@ -26,7 +25,8 @@ module Notifier
         last_name: 'Pepper',
         email: 'johnnypepper@ypomail.com',
         legal_name: 'Best General Agency LLC',
-        assignment_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y') ,
+        assignment_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
+        termination_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
         employer_name: 'North America Football Federation',
         employer_poc_firstname: 'David',
         employer_poc_lastname: 'Samules'
@@ -44,8 +44,24 @@ module Notifier
       []
     end
 
+    def primary_address
+      mailing_address
+    end
+
     def shop?
       true
+    end
+
+    def general_agency?
+      true
+    end
+
+    def broker?
+      false
+    end
+
+    def broker_present?
+      broker.present?
     end
 
     def employee_notice?

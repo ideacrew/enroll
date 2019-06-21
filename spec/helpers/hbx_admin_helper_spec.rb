@@ -45,8 +45,19 @@ RSpec.describe HbxAdminHelper, :type => :helper do
         expect(helper.inactive_enrollments(family, TimeKeeper.date_of_record.year).selector["aasm_state"]["$in"]).to include("coverage_canceled", "coverage_terminated")
       end
     end
-
   end
 
+  context "#active_eligibility?" do
+    let!(:tax_household) { FactoryBot.create(:tax_household, household: family.active_household) }
+
+    it "should return yes" do
+      tax_household.update_attributes!(effective_ending_on: nil)
+      expect(helper.active_eligibility?(family)).to eq 'Yes'
+    end
+
+    it "should return no" do
+      expect(helper.active_eligibility?(family)).to eq 'No'
+    end
+  end
 end
 end

@@ -5,6 +5,7 @@ FactoryBot.define do
     corporate_npn { "0989898981" }
     ach_routing_number { '123456789' }
     ach_account_number { '9999999999999999' }
+    association :primary_broker_role, factory: :broker_role
     transient do
       legal_name { nil }
       office_locations_count { 1 }
@@ -22,6 +23,14 @@ FactoryBot.define do
         else
           profile.organization = FactoryBot.build(:benefit_sponsors_organizations_general_organization, :with_site)
         end
+      end
+    end
+
+    after(:build) do |profile, evaluator|
+      broker_role = profile.primary_broker_role
+      if broker_role.present? && broker_role.benefit_sponsors_broker_agency_profile_id.blank?
+        broker_role.benefit_sponsors_broker_agency_profile_id = profile.id
+        broker_role.save && profile.save
       end
     end
   end

@@ -87,6 +87,8 @@ When(/^.+ clicks continue on waiver summary page/) do
 end
 
 Then("Employee should able to see Waiver tile") do
+  find('.interaction-click-control-shop-for-plans', wait: 5)
+
   expect(page).to have_content 'Waived'
   expect(page).to have_content 'Waived Date'
   expect(page).to have_content 'Reason Waived'
@@ -105,7 +107,7 @@ Then(/(.+) should see \"my account\" page with waiver and passive renewal should
   statuses = enrollments.collect{|e| e.find('.panel-heading').find('.label-success').text()}
 
   expect(statuses).to include('Waived')
-  expect(statuses).to include('Coverage Selected')
+  expect(statuses).to include('Coverage Termination Pending')
   expect(statuses).not_to include('Auto Renewing')
 end
 

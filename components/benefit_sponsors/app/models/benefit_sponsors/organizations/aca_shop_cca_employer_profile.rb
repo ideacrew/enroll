@@ -14,7 +14,8 @@ module BenefitSponsors
 
       embeds_one  :employer_attestation, class_name: '::EmployerAttestation'
 
-      add_observer BenefitSponsors::Observers::EmployerProfileObserver.new, [:update, :notifications_send]
+      add_observer BenefitSponsors::Observers::EmployerProfileObserver.new, [:update]
+      add_observer BenefitSponsors::Observers::NoticeObserver.new, [:process_employer_profile_events]
 
       after_update :notify_observers
 

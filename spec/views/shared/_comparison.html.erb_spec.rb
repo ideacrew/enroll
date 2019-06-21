@@ -26,7 +26,7 @@ describe "shared/_comparison.html.erb", dbclean: :after_each do
     eligibility_date: hbx_enrollment.effective_on
   )}
 
-  let(:product) {health_products[0]}
+  let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile) }
 
   let(:plan) { FactoryBot.create(:plan,
    provider_directory_url: "http://www.example1.com",
@@ -49,6 +49,7 @@ describe "shared/_comparison.html.erb", dbclean: :after_each do
 
     before :each do
       assign :coverage_kind, "dental"
+      assign :market_kind, 'shop'
       render "shared/comparison", :qhps => mock_qhps
     end
 
@@ -71,6 +72,7 @@ describe "shared/_comparison.html.erb", dbclean: :after_each do
 
     before :each do
       assign :coverage_kind, "health"
+      assign :market_kind, 'shop'
       allow(product).to receive(:sbc_document).and_return double("Document", :identifier => "identifier")
       render "shared/comparison", :qhps => mock_qhps
     end
@@ -94,8 +96,7 @@ describe "shared/_comparison.html.erb", dbclean: :after_each do
     end
 
     it "should have download link" do
-      expect(rendered).to have_selector('a', text: 'Download')
-      expect(rendered).to have_selector('a[href="/products/plans/comparison.csv?coverage_kind=health"]', text: "Download")
+      expect(rendered).to have_selector('a[href]', text: 'Download')
     end
 
     it "should not have Out of Network text" do
@@ -131,7 +132,9 @@ describe "shared/_comparison.html.erb", dbclean: :after_each do
   context "provider_directory_url and rx_formulary_url" do
     # View file is checking for both Plan & Product instances. Does this needs to be fixed?
     before do
+      assign :plans, [hbx_enrollment.product]
       allow(product).to receive(:rx_formulary_url).and_return plan.rx_formulary_url
+      assign :market_kind, 'shop'
     end
 
     it "should have rx formulary url coverage_kind = health" do
@@ -143,7 +146,7 @@ describe "shared/_comparison.html.erb", dbclean: :after_each do
 
     if aca_state_abbreviation == "DC" # There is no plan comparision for MA dental
       context 'for dental coverage' do
-        let!(:dental_product) { FactoryBot.create(:benefit_markets_products_dental_products_dental_product) }
+        let!(:dental_product) { FactoryBot.create(:benefit_markets_products_dental_products_dental_product, :with_issuer_profile) }
         let!(:dental_plan) { FactoryBot.create(:plan, market: 'shop', metal_level: 'dental', hios_id: "91111111122302", coverage_kind: 'dental', dental_level: 'high') }
         let!(:mock_qhp){instance_double("Products::QhpCostShareVariance", :product => dental_product, :plan => dental_plan, :plan_marketing_name => dental_product.title)}
         let(:mock_qhps) {[mock_qhp]}

@@ -68,6 +68,14 @@ def people
       email: 'ricky.martin@example.com',
       password: 'aA1!aA1!aA1!'
     },
+    "Max Planck" => {
+      email: 'max.plank@example.com',
+      password: 'aA1!aA1!aA1!'
+    },
+    "Jane Goodall" => {
+      email: 'jane.goodall@example.com',
+      password: 'aA1!aA1!aA1!'
+    },
     "CareFirst Broker" => {
       first_name: 'Broker',
       last_name: 'martin',
@@ -138,16 +146,6 @@ def people
     "CSR" => {
       email: "sherry.buckner@dc.gov",
       password: 'aA1!aA1!aA1!'
-    },
-    "Hbx AdminEnrollments" => {
-      first_name: "Hbx Admin",
-      last_name: "Enrollments#{rand(1000)}",
-      dob: defined?(@u) ?  @u.adult_dob : "08/13/1979",
-      legal_name: "Tronics",
-      dba: "Tronics",
-      fein: defined?(@u) ? @u.fein : '123123123',
-      email: defined?(@u) ? @u.email : 'hxadmin_enroll@example.com',
-      password: 'aA1!aA1!aA1!'
     }
   }
 end
@@ -217,7 +215,7 @@ Given(/^Hbx Admin exists$/) do
   p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true,
                             list_enrollments: true, send_broker_agency_message: true, approve_broker: true, approve_ga: true,
                             modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_lock_unlock: true,
-                            can_reset_password: true, view_the_configuration_tab: true)
+                            can_reset_password: true, view_the_configuration_tab: true, can_access_new_consumer_application_sub_tab: true)
   person = people['Hbx Admin']
   hbx_profile = FactoryBot.create :hbx_profile
   user = FactoryBot.create :user, :with_family, :hbx_staff, with_security_questions: false, email: person[:email], password: person[:password], password_confirmation: person[:password]
@@ -229,26 +227,11 @@ Given(/^Hbx Admin exists$/) do
   plan2 = FactoryBot.create :plan, :with_premium_tables, :with_rating_factors, active_year: (year - 1), market: 'shop', coverage_kind: 'health', deductible: 4000, carrier_profile_id: plan.carrier_profile_id
 end
 
-Given(/^a Hbx admin with read and write permissions and broker agencies$/) do
-  p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
-      send_broker_agency_message: true, approve_broker: true, approve_ga: true,
-      modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true)
-  person = people['Hbx AdminEnrollments']
-  hbx_profile = FactoryBot.create :hbx_profile
-  user = FactoryBot.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
-  FactoryBot.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
-  FactoryBot.create :hbx_enrollment, household:user.primary_family.active_household
-  org1 = FactoryBot.create(:organization, legal_name: 'ACME Agency')
-  broker_agency_profile1 = FactoryBot.create(:broker_agency_profile, organization: org1)
-        org2 = FactoryBot.create(:organization, legal_name: 'Chase & Assoc')
-        broker_agency_profile2 = FactoryBot.create(:broker_agency_profile, organization: org2)
-end
-
 Given(/^a Hbx admin with read and write permissions exists$/) do
   #Note: creates an enrollment for testing purposes in the UI
   p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
       send_broker_agency_message: true, approve_broker: true, approve_ga: true,
-      modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_add_sep: true)
+      modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_access_outstanding_verification_sub_tab: true)
   person = people['Hbx Admin']
   hbx_profile = FactoryBot.create :hbx_profile
   user = FactoryBot.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
@@ -258,7 +241,7 @@ end
 
 Given(/^a Hbx admin with super admin access exists$/) do
   #Note: creates an enrollment for testing purposes in the UI
-  p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
+  p_staff = Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
       send_broker_agency_message: true, approve_broker: true, approve_ga: true,
       modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_complete_resident_application: true)
   person = people['Hbx Admin']
@@ -435,7 +418,7 @@ When(/(^.+) enters? office location for (.+)$/) do |role, location|
   select "MA", from: "inputState"
   # agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][state]
   # find(:xpath, "//div[contains(@class, 'selectric-scroll')]/ul/li[contains(text(), '#{location[:state]}')]").click
-
+  select "Primary", from: "kindSelect"
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][zip]', :with => location[:zip]
   if role.include? 'Employer'
     wait_for_ajax
@@ -444,8 +427,7 @@ When(/(^.+) enters? office location for (.+)$/) do |role, location|
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][area_code]', :with => location[:phone_area_code]
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][number]', :with => location[:phone_number]
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][extension]', :with => location[:phone_extension]
-  wait_for_ajax
-  page.find('h4', text: "#{Settings.site.byline}").click
+  find('#broker-btn').click
 end
 
 When(/^.+ updates office location from (.+) to (.+)$/) do |old_add, new_add|
@@ -492,8 +474,9 @@ When(/^(.*) logs on to the (.*)?/) do |named_person, portal|
   person = people[named_person]
 
   visit "/"
-  portal_class = "interaction-click-control-#{portal.downcase.gsub(/ /, '-')}"
-  portal_uri = find("a.#{portal_class}")["href"]
+  # portal_class = "#{portal.downcase.gsub(/ /, '-')}"
+
+  # portal_uri = find('a', text: portal, wait: 5)["href"]#find("a.#{portal_class}")["href"]
 
   visit "/users/sign_in"
   fill_in "user[login]", :with => person[:email]
@@ -501,11 +484,20 @@ When(/^(.*) logs on to the (.*)?/) do |named_person, portal|
   fill_in "user[password]", :with => person[:password]
   #TODO this fixes the random login fails b/c of empty params on email
   fill_in "user[login]", :with => person[:email] unless find(:xpath, '//*[@id="user_login"]').value == person[:email]
-  find('.interaction-click-control-sign-in').click
-  visit portal_uri
+  find('.sign-in-btn').click
+
+  # visit portal_uri
   # Adding sleep seems to help prevent the AuthenticityToken error
   # which apeared to be throwing in at least the
   # add_sep_read_and_write_feature cucumber.
+end
+
+When(/^user visits the (.*)?/) do |portal|
+  visit "/"
+  portal_class = "#{portal.downcase.gsub(/ /, '-')}"
+  portal_uri = find("a.#{portal_class}")["href"]
+  sleep 10
+  visit portal_uri
 end
 
 Then(/^.+ creates (.+) as a roster employee$/) do |named_person|
@@ -518,16 +510,17 @@ Then(/^.+ creates (.+) as a roster employee$/) do |named_person|
 
   find('label[for=census_employee_gender_male]').click
   fill_in 'jq_datepicker_ignore_census_employee[hired_on]', with: (Time.now - 1.week).strftime('%m/%d/%Y')
-  find(:xpath, '//label[input[@name="census_employee[is_business_owner]"]]').click
+  find('#census_employee_is_business_owner', wait: 5).click
 
   fill_in 'census_employee[address_attributes][address_1]', :with => '1026 Potomac'
   fill_in 'census_employee[address_attributes][address_2]', :with => 'Apt ABC'
   fill_in 'census_employee[address_attributes][city]', :with => 'Alpharetta'
-  find(:xpath, '//p[@class="label"][contains(., "SELECT STATE")]').click
-  find(:xpath, '//div[div/p[contains(., "SELECT STATE")]]//li[contains(., "GA")]').click
+
+  find(:xpath, '//span[@class="label"][contains(., "SELECT STATE")]').click
+  find(:xpath, '//div[div/span[contains(., "SELECT STATE")]]//li[contains(., "GA")]').click
   fill_in 'census_employee[address_attributes][zip]', :with => '30228'
-  find(:xpath, '//p[@class="label"][contains(., "SELECT KIND")]').click
-  find(:xpath, '//div[div/p[contains(., "SELECT KIND")]]//li[contains(., "home")]').click
+  find(:xpath, '//span[@class="label"][contains(., "SELECT KIND")]').click
+  find(:xpath, '//div[div/span[contains(., "SELECT KIND")]]//li[contains(., "home")]').click
 
   fill_in 'census_employee[email_attributes][address]', with: 'broker.assist@dc.gov'
   screenshot("broker_create_census_employee_with_data")
@@ -577,7 +570,10 @@ end
 When (/^(.*) logs? out$/) do |someone|
   click_link "Logout"
   visit "/"
-  sleep 5 #FIX ME: remove sleep and replace with find & wait
+  find('.container.welcome', wait: 5) do |element|
+    element.find('.heading-text', text: /Welcome to #{Settings.site.short_name}/i)
+    element.find('.sub-text', text: /#{Settings.site.byline}/i)
+  end
 end
 
 When(/^.+ go(?:es)? to register as an employee$/) do
@@ -612,8 +608,7 @@ When(/^(.*) creates an HBX account$/) do |named_person|
   fill_in "user[oim_id]", :with => person[:email]
   fill_in "user[password_confirmation]", :with => person[:password]
   fill_in "user[password]", :with => person[:password]
-  screenshot("create_account")
-  click_button "Create account"
+  find('.create-account-btn').click
 end
 
 And(/^Primary Broker select the all security question and give the answer$/) do
@@ -635,7 +630,7 @@ end
 When(/^.+ enters? the identifying info of (.*)$/) do |named_person|
   person = people[named_person]
   person_ssn = "#{person[:ssn][0..2]}-#{person[:ssn][3..4]}-#{person[:ssn][5..8]}"
-  
+
   fill_in 'person[first_name]', :with => person[:first_name]
   fill_in 'person[last_name]', :with => person[:last_name]
   fill_in 'jq_datepicker_ignore_person[dob]', :with => person[:dob]
@@ -691,7 +686,7 @@ end
 
 Then(/^Employee (.+) should see coverage effective date/) do |named_person|
   census_employee = CensusEmployee.where(:first_name => /#{people[named_person][:first_name]}/i, :last_name => /#{people[named_person][:last_name]}/i).first
-  find('p', text: census_employee.benefit_sponsorship.legal_name)
+  find('p', text: census_employee.benefit_sponsorship.legal_name, wait: 10)
   find('.coverage_effective_date', text: census_employee.earliest_eligible_date.strftime("%m/%d/%Y"))
 end
 
@@ -723,27 +718,30 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   fill_in "person[phones_attributes][0][full_phone_number]", :with => phone_number
   screenshot("personal_info_complete")
   expect(page).to have_field("HOME PHONE", with: phone_number) if person[:home_phone].present?
-  find('.interaction-click-control-continue', text: 'CONTINUE', wait: 5)
+  find('.interaction-click-control-continue', text: 'CONTINUE', wait: 5).click
 end
 
 And(/^.+ sees the (.*) page and clicks Continue$/) do |which_page|
-  find('.interaction-click-control-add-member', wait: 10)
-  expect(page).to have_content(which_page)
-  find('.family_members .interaction-click-control-continue', text: 'CONTINUE', wait: 5)
+  # Whats the point of the below
+  # expect(page).to have_content(which_page)
+  continue = find('.interaction-click-control-continue', text: 'CONTINUE', wait:10)
+  continue.click
 end
 
 And(/^.+ clicks Confirm$/) do
+  find_link('Confirm', wait: 10)
   click_link 'Confirm'
 end
 
 And(/^.+ selects the first plan available$/) do
   links = page.all('a')
-  first_plan_html_class = "btn btn-default btn-right plan-select select interaction-click-control-select-plan"
-  first_plan_select_link = links.detect { |link| link.text == "Select Plan" }
-  first_plan_select_link.click
+  find('h1', text:'Choose Coverage for your Household', wait: 10)
+  find('.interaction-click-control-continue', text: 'CONTINUE').click
+  find('.plan-select', match: :first).click
 end
 
 Then(/^.+ should see the dependents page$/) do
+  find('.interaction-click-control-add-member', wait: 10)
   expect(page).to have_content('Add Member')
   screenshot("dependents_page")
 end
@@ -763,7 +761,7 @@ When(/^.+ clicks? delete on baby Soren$/) do
   @browser.button(text: /Confirm Member/i).wait_while_present
 end
 
-Then(/^.+ should see (\d+) dependents*$/) do |n|
+Then(/^.+ should see ([^"]*) dependents*$/) do |n|
   expect(page).to have_selector('li.dependent_list', :count => n.to_i)
 end
 
@@ -860,6 +858,29 @@ Then(/^.+ should see the list of plans$/) do
   find('#planContainer', wait: 10)
   expect(page).to have_link('Select')
   screenshot("plan_shopping")
+end
+
+When(/^.+ sorts by (.*)/) do |sort|
+  @plan_names = find_all('.plan-row').collect{|row| row.find('h3 a', wait: 5).text}
+  find(".interaction-click-control-#{sort.downcase.gsub(/\s/, '-')}", wait: 5).click
+end
+
+Then(/^.+ should see plans sorted by Plan Name/) do
+  expect(find_all('.plan-row').collect{|row| row.find('h3 a', wait: 5).text}).to eq @plan_names.sort
+end
+
+When(/^.+ filters plans by Carrier/) do
+  find('.selectric-interaction-choice-control-carrier').click
+  carrier_option = find('li.interaction-choice-control-carrier-1', wait: 5)
+  @carrier_selected = carrier_option.text
+  carrier_option.click
+  find(".interaction-click-control-apply", wait: 5).click
+end
+
+Then(/^.+ should see plans filtered by Carrier/) do
+  find_all('.plan-row').each do |row|
+    expect(row.find('h3 small', wait: 5).text).to eq @carrier_selected
+  end
 end
 
 And (/(.*) should see the plans from the (.*) plan year$/) do |named_person, plan_year_state|
@@ -960,10 +981,7 @@ When(/^.+ should see a published success message without employee$/) do
 end
 
 When(/^.+ clicks? on the add employee button$/) do
-  evaluate_script(<<-JSCODE)
-  $('.interaction-click-control-add-new-employee')[0].click()
-  JSCODE
-  wait_for_ajax
+  find('.interaction-click-control-add-new-employee', wait: 5).click
 end
 
 When(/^.+ clicks? to add the first employee$/) do
@@ -972,7 +990,6 @@ end
 
 When(/^(?:General){0}.+ clicks? on the ((?:General|Staff){0}.+) tab$/) do |tab_name|
   find(:xpath, "//li[contains(., '#{tab_name}')]", :wait => 10).click
-  wait_for_ajax
 end
 
 When(/^(?:General){0}.+ clicks? on the ((?:General|Staff){0}.+) dropdown$/) do |tab_name|
@@ -982,7 +999,7 @@ When(/^(?:General){0}.+ clicks? on the ((?:General|Staff){0}.+) dropdown$/) do |
 end
 
 When(/^(?:General){0}.+ clicks? on the ((?:General|Staff){0}.+) option$/) do |tab_name|
-  find(".interaction-click-control-#{tab_name.downcase.gsub(' ','-')}").click
+  find(".interaction-click-control-#{tab_name.downcase.gsub(' ','-')}", wait: 5).click
   wait_for_ajax
   find('#myTabContent').click
 end
@@ -1036,7 +1053,6 @@ When(/^I select a past qle date$/) do
   expect(page).to have_content "Married"
   screenshot("past_qle_date")
   fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
-  find(".navbar-brand").click #to stop datepicker blocking shit
   within '#qle-date-chose' do
     click_link "CONTINUE"
   end
@@ -1157,18 +1173,22 @@ Then(/Devops can verify session logs/) do
   expect(user.person.consumer_role).not_to be nil
 end
 
-Given(/^a Hbx admin with read and write permissions and employers$/) do
-  p_staff=FactoryBot.create :permission, :hbx_update_ssn
-  person = people['Hbx AdminEnrollments']
-  hbx_profile = FactoryBot.create :hbx_profile
-  user = FactoryBot.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
-  @user_1 = FactoryBot.create :user, :with_family, :employer_staff, oim_id: "Employer1"
-  @user_2 = FactoryBot.create :user, :with_family, :employer_staff, oim_id: "Employer2"
-  FactoryBot.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
-  org1 = FactoryBot.create(:organization, legal_name: 'Acme Agency', hbx_id: "123456")
-  employer_profile = FactoryBot.create :employer_profile, organization: org1
-  org2 = FactoryBot.create(:organization, legal_name: 'Chase & Assoc', hbx_id: "67890")
-  employer_profile = FactoryBot.create :employer_profile, organization: org2
+Given(/^(.*) admin user with read and write permissions present/) do |hbx_admin_person|
+  p_staff = FactoryBot.create(:permission, :hbx_update_ssn)
+  hbx_profile = FactoryBot.create(:hbx_profile)
+  person = people[hbx_admin_person]
+  user = FactoryBot.create(:user,
+    :with_family,
+    :hbx_staff,
+    email: person[:email],
+    password: person[:password],
+    password_confirmation: person[:password]
+  )
+  FactoryBot.create(:hbx_staff_role,
+    person: user.person,
+    hbx_profile: hbx_profile,
+    permission_id: p_staff.id
+  )
 end
 
 And(/^Hbx Admin click on Employers/) do

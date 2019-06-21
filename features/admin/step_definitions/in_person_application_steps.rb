@@ -1,18 +1,21 @@
 When(/^the Admin selects the In Person application option$/) do
-  find("li", :text => "In Person").click
+  find('li', :text => 'In Person').click
 end
 
 When(/^the Admin clicks CONTINUE after uploading and verifying an Identity$/) do
-	find('#upload_identity').click
-  find('#select_upload_identity').click
+  find('#upload_identity').click
+  find('#select_upload_identity')
   within '#select_upload_identity' do
-    attach_file("file[]", "#{Rails.root}/lib/pdf_templates/blank.pdf", visible:false)
+    attach_file('file[]', "#{Rails.root}/lib/pdf_templates/blank.pdf", visible: false)
   end
-  wait_for_ajax(10,2)
-  find(:xpath,"//*[@id='Identity']/div/div[4]/div").click
+  wait_for_ajax(10, 2)
+  within('#Identity') do
+    find('.label', :text => "Action").click
+  end
   find('.interaction-choice-control-verification-reason-1').click
+  wait_for_ajax(10, 2)
   find('.selectric-interaction-choice-control-verification-reason').click
-  find("li", :text => "Document in EnrollApp").click
+  find('li', :text => 'Document in EnrollApp').click
   find('.v-type-confirm-button').click
   expect(page).to have_content('Identity successfully verified.')
   find('.button', text: 'Continue').click

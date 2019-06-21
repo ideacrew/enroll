@@ -7,9 +7,18 @@ FactoryBot.define do
     end
 
     after(:build) do |sponsored_benefit, evaluator|
-      if evaluator.product_package
-        sponsored_benefit.product_package_kind = evaluator.product_package.package_kind
-        sponsored_benefit.reference_product_id = evaluator.product_package.products[0].id
+      product_package = evaluator.product_package
+
+      if product_package
+        sponsored_benefit.product_package_kind = product_package.package_kind
+        sponsored_benefit.reference_product_id = product_package.products[0].id
+
+        if product_package.package_kind == :multi_product
+          sponsored_benefit.elected_product_choices = product_package.products.pluck(:id)[0..1]
+        else
+          sponsored_benefit.product_option_choice = evaluator.product_package.products[0].issuer_profile_id
+        end
+
         sponsored_benefit.sponsor_contribution = build(:benefit_sponsors_sponsored_benefits_sponsor_contribution, sponsored_benefit: sponsored_benefit, product_package: evaluator.product_package)
       end
     end

@@ -5,9 +5,9 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerAgencyHiredConfirmation', db
   
   let!(:person) { create :person }
   let(:user)    { FactoryBot.create(:user, :person => person)}
-  let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+  let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
   let!(:organization_with_hbx_profile)  { site.owner_organization }
-  let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+  let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
   let!(:employer_profile)    { organization.employer_profile }
   let!(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
 
@@ -16,20 +16,19 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerAgencyHiredConfirmation', db
   let!(:broker_agency_organization1) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, legal_name: 'First Legal Name', site: site) }
   let!(:broker_agency_profile) { broker_agency_organization1.broker_agency_profile}
   let!(:model_instance) { create :benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: broker_agency_profile, benefit_sponsorship: benefit_sponsorship }
-  let!(:broker_role1) { FactoryBot.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person1) }
+  let!(:broker_role1) { broker_agency_profile.primary_broker_role }
   
   before do
     broker_agency_profile.update_attributes(primary_broker_role_id: broker_role1.id)
-
   end
 
   describe "when ER successfully hires a broker" do
     let(:model_event) { ::BenefitSponsors::ModelEvents::ModelEvent.new(:broker_hired, model_instance, {}) }
-    subject { BenefitSponsors::Observers::BrokerAgencyAccountObserver.new }
+    subject { BenefitSponsors::Observers::NoticeObserver.new }
 
     context "ModelEvent" do
       it "should trigger model event" do
-        allow(subject).to receive(:notifications_send).and_return(model_instance, model_event)
+        allow(subject).to receive(:process_broker_agency_events).and_return(model_instance, model_event)
         expect(model_event).to be_an_instance_of(::BenefitSponsors::ModelEvents::ModelEvent)
         expect(model_event).to have_attributes(:event_key => :broker_hired, :klass_instance => model_instance, :options => {})
         model_instance.save!
@@ -41,23 +40,23 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerAgencyHiredConfirmation', db
 
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.broker.broker_hired_notice_to_broker"
-          expect(payload[:event_object_kind]).to eq 'BenefitSponsors::Organizations::AcaShopCcaEmployerProfile'
+          expect(payload[:event_object_kind]).to eq "BenefitSponsors::Organizations::AcaShop#{Settings.site.key.capitalize}EmployerProfile"
           expect(payload[:event_object_id]).to eq employer_profile.id.to_s
         end
 
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.broker_agency.broker_agency_hired_confirmation"
-          expect(payload[:event_object_kind]).to eq 'BenefitSponsors::Organizations::AcaShopCcaEmployerProfile'
+          expect(payload[:event_object_kind]).to eq "BenefitSponsors::Organizations::AcaShop#{Settings.site.key.capitalize}EmployerProfile"
           expect(payload[:event_object_id]).to eq employer_profile.id.to_s
         end
         
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employer.broker_hired_confirmation_to_employer"
-          expect(payload[:event_object_kind]).to eq 'BenefitSponsors::Organizations::AcaShopCcaEmployerProfile'
+          expect(payload[:event_object_kind]).to eq "BenefitSponsors::Organizations::AcaShop#{Settings.site.key.capitalize}EmployerProfile"
           expect(payload[:event_object_id]).to eq employer_profile.id.to_s
         end
 
-        subject.notifications_send(model_instance, model_event)
+        subject.process_broker_agency_events(model_instance, model_event)
       end
     end
   end
@@ -80,10 +79,13 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerAgencyHiredConfirmation', db
 
       let(:recipient) { "Notifier::MergeDataModels::BrokerProfile" }
       let(:template)  { Notifier::Template.new(data_elements: data_elements) }
-      let(:payload)   { {
-          "event_object_kind" => "BenefitSponsors::Organizations::AcaShopCcaEmployerProfile",
+      let(:payload) do
+        {
+          "event_object_kind" => "BenefitSponsors::Organizations::AcaShop#{Settings.site.key.capitalize}EmployerProfile",
           "event_object_id" => employer_profile.id
-      } }
+        }
+      end
+
       let(:subject) { Notifier::NoticeKind.new(template: template, recipient: recipient) }
       let(:merge_model) { subject.construct_notice_object }
 
@@ -149,10 +151,13 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerAgencyHiredConfirmation', db
 
       let(:recipient) { "Notifier::MergeDataModels::BrokerAgencyProfile" }
       let(:template)  { Notifier::Template.new(data_elements: data_elements) }
-      let(:payload)   { {
-          "event_object_kind" => "BenefitSponsors::Organizations::AcaShopCcaEmployerProfile",
+      let(:payload) do
+        {
+          "event_object_kind" => "BenefitSponsors::Organizations::AcaShop#{Settings.site.key.capitalize}EmployerProfile",
           "event_object_id" => employer_profile.id
-      } }
+        }
+      end
+
       let(:subject) { Notifier::NoticeKind.new(template: template, recipient: recipient) }
       let(:merge_model) { subject.construct_notice_object }
 
@@ -216,10 +221,13 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerAgencyHiredConfirmation', db
       }
       let(:recipient) { "Notifier::MergeDataModels::EmployerProfile" }
       let(:template)  { Notifier::Template.new(data_elements: data_elements) }
-      let(:payload)   { {
-          "event_object_kind" => "BenefitSponsors::Organizations::AcaShopCcaEmployerProfile",
+      let(:payload) do
+        {
+          "event_object_kind" => "BenefitSponsors::Organizations::AcaShop#{Settings.site.key.capitalize}EmployerProfile",
           "event_object_id" => employer_profile.id
-      } }
+        }
+      end
+
       let(:subject) { Notifier::NoticeKind.new(template: template, recipient: recipient) }
       let(:merge_model) { subject.construct_notice_object }
 
@@ -249,7 +257,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerAgencyHiredConfirmation', db
       end
 
       it "should return broker assignment date" do
-        expect(merge_model.broker.assignment_date).to eq model_instance.start_on
+        expect(merge_model.broker.assignment_date).to eq model_instance.start_on.strftime('%m/%d/%Y')
       end
 
       it "should return broker agency name " do

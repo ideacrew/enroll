@@ -6,49 +6,15 @@ module BenefitSponsors
 
     describe "#map_binder_payment_due_date_by_start_on" do
       let(:benefit_application_schedular) { BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new }
-      let(:date_hash) do
-        {
-
-          "2018-08-01" => '2018,7,24',
-          "2018-09-01" => '2018,8,23',
-          "2018-10-01" => '2018,9,24',
-          "2018-11-01" => '2018,10,23',
-          "2018-12-01" => '2018,11,26',
-          "2019-01-01" => '2018,12,26',
-          "2019-02-01" => '2019,1,24',
-          "2019-03-01" => '2019,2,25',
-          "2019-04-01" => '2019,3,25',
-          "2019-05-01" => '2019,4,23',
-          "2019-06-01" => '2019,5,23',
-          "2019-07-01" => '2019,6,24',
-          "2019-08-01" => '2019,7,23',
-          "2019-09-01" => '2019,8,23',
-          "2019-10-01" => '2019,9,23',
-          "2019-11-01" => '2019,10,23',
-          "2019-12-01" => '2019,11,25',
-          "2020-01-01" => '2019,12,24',
-          "2020-02-01" => '2020,1,23',
-          "2020-03-01" => '2020,2,24',
-          "2020-04-01" => '2020,3,23',
-          "2020-05-01" => '2020,4,23',
-          "2020-06-01" => '2020,5,22',
-          "2020-07-01" => '2020,6,23',
-          "2020-08-01" => '2020,7,23',
-          "2020-09-01" => '2020,8,24',
-          "2020-10-01" => '2020,9,23',
-          "2020-11-01" => '2020,10,23',
-          "2020-12-01" => '2020,11,24',
-          "2021-01-01" => '2020,12,23'
-        }
-      end
+      let(:date_hash) { Settings.aca.shop_market.binder_payment_dates }
 
       context 'when start on in hash key' do
         it 'should return the corresponding value' do
-          date_hash.each do |k, v|
-            expect(benefit_application_schedular.map_binder_payment_due_date_by_start_on(Date.parse(k))).to eq(Date.strptime(v, '%Y,%m,%d'))
+          date_hash.each do |pair|
+            expect(benefit_application_schedular.map_binder_payment_due_date_by_start_on(Date.parse(pair.first[0].to_s))).to eq(Date.strptime(pair.first[1], '%Y,%m,%d'))
           end
         end
-        it { expect(benefit_application_schedular.map_binder_payment_due_date_by_start_on(Date.parse('2018-11-01'))).to eq(Date.parse('2018-10-23')) }
+        it { expect(benefit_application_schedular.map_binder_payment_due_date_by_start_on(Date.parse('2018-11-01'))).to eq(Date.new(2018, 10, Settings.aca.shop_market.binder_payment_due_on)) }
       end
     end
 
@@ -74,27 +40,32 @@ module BenefitSponsors
 
       context "if the TimeKeeper's day is after monthly_end_on" do
         before :each do
-          allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(2019, 01, 29))
+          allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(2019, 1, 29))
         end
 
         it 'should return hash with 2 date keys' do
           ba_schedular = subject.start_on_options_with_schedule(true)
-          [Date.new(2019, 02, 01), Date.new(2019, 03, 01)].each do |date|
+          [Date.new(2019, 2, 1), Date.new(2019, 3, 1)].each do |date|
             expect(ba_schedular.keys.include?(date)).to be_truthy
           end
         end
 
-        it 'should return hash with only 1 date key' do
+        it 'should return hash with dates based on exchange' do
           ba_schedular = subject.start_on_options_with_schedule(false)
-          expect(ba_schedular.keys).to eq [Date.new(2019, 03, 01)]
+          if Settings.site.key == :cca
+            expect(ba_schedular.keys).to eq [Date.new(2019, 3, 1)]
+          else
+            expect(ba_schedular.keys).to eq [Date.new(2019, 3, 1), Date.new(2019, 4, 1)]
+          end
         end
       end
     end
 
     describe 'calculate_start_on_dates' do
-      let(:previous_date) { Date.new(2019, 01, 02) }
-      let(:later_date) { Date.new(2019, 01, 28) }
-      let(:both_dates) { [Date.new(2019, 02, 01), Date.new(2019, 03, 01)] }
+      let(:previous_date) { Date.new(2019, 1, 2) }
+      let(:later_date) { Date.new(2019, 1, 28) }
+      let(:both_dates) { [Date.new(2019, 2, 1), Date.new(2019, 3, 1)] }
+      let(:dc_dates) { [Date.new(2019, 2, 1), Date.new(2019, 3, 1), Date.new(2019, 4, 1)] }
 
       context 'after open_enrollment_minimum_begin_day_of_month' do
         before :each do
@@ -102,14 +73,22 @@ module BenefitSponsors
         end
 
         context 'not an admin data table action' do
-          it 'should return 1 date' do
-            expect(subject.calculate_start_on_dates).to eq [Date.new(2019, 03, 01)]
+          it 'should return dates based on exchange' do
+            if Settings.site.key == :cca
+              expect(subject.calculate_start_on_dates).to eq [Date.new(2019, 3, 1)]
+            else
+              expect(subject.calculate_start_on_dates).to eq [Date.new(2019, 3, 1), Date.new(2019, 4, 1)]
+            end
           end
         end
 
         context 'not an admin data table action' do
-          it 'should return 2 dates' do
-            expect(subject.calculate_start_on_dates(true)).to eq both_dates
+          it 'should return dates based on exchange' do
+            if Settings.site.key == :cca
+              expect(subject.calculate_start_on_dates(true)).to eq both_dates
+            else
+              expect(subject.calculate_start_on_dates(true)).to eq dc_dates
+            end
           end
         end
       end
@@ -120,24 +99,32 @@ module BenefitSponsors
         end
 
         context 'not an admin data table action' do
-          it 'should return 1 date' do
-            expect(subject.calculate_start_on_dates).to eq both_dates
+          it 'should return dates based on exchange' do
+            if Settings.site.key == :cca
+              expect(subject.calculate_start_on_dates).to eq both_dates
+            else
+              expect(subject.calculate_start_on_dates).to eq dc_dates
+            end
           end
         end
 
         context 'not an admin data table action' do
-          it 'should return 2 dates' do
-            expect(subject.calculate_start_on_dates(true)).to eq both_dates
+          it 'should return correct dates based on exchange' do
+            if Settings.site.key == :cca
+              expect(subject.calculate_start_on_dates(true)).to eq both_dates
+            else
+              expect(subject.calculate_start_on_dates(true)).to eq dc_dates
+            end
           end
         end
       end
     end
 
     describe 'open_enrollment_period_by_effective_date' do
-      let(:start_on) { Date.new(2019, 02, 01) }
-      let(:previous_date) { Date.new(2019, 01, 02) }
-      let(:later_date) { Date.new(2019, 01, 28) }
-      let(:default_monthly_end_on_date) { Date.new(2019, 01, Settings.aca.shop_market.open_enrollment.monthly_end_on) }
+      let(:start_on) { Date.new(2019, 2, 1) }
+      let(:previous_date) { Date.new(2019, 1, 2) }
+      let(:later_date) { Date.new(2019, 1, 28) }
+      let(:default_monthly_end_on_date) { Date.new(2019, 1, Settings.aca.shop_market.open_enrollment.monthly_end_on) }
       let(:oe_min_days) { Settings.aca.shop_market.open_enrollment.minimum_length.days }
       let(:oe_start_date) { (start_on - Settings.aca.shop_market.open_enrollment.maximum_length.months.months) }
 

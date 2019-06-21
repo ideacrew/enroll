@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe "products/qhp/summary.js.erb" do
  let(:benefit_group) { double("BenefitGroup") }
- let(:hbx_enrollment) { instance_double(HbxEnrollment, shopping?: false) }
+ let(:hbx_enrollment) { instance_double(HbxEnrollment, shopping?: false, kind: 'employer_sponsored') }
  let(:member_enrollment) { double(product: double, product_cost_total: 300.00, sponsor_contribution_total: 240.00) }
  let(:member_group) { double(group_enrollment: member_enrollment) }
   before :each do

@@ -128,7 +128,7 @@ Then(/(.*) should see \"my account\" page with enrollment/) do |named_person|
   sleep 1 #wait for e-mail nonsense
   enrollments = Person.where(first_name: people[named_person][:first_name]).first.try(:primary_family).try(:active_household).try(:hbx_enrollments) if people[named_person].present?
   sep_enr = enrollments.order_by(:'created_at'.asc).detect{|e| e.enrollment_kind == "special_enrollment"} if enrollments.present?
-  enrollment = all('.hbx-enrollment-panel')
+  enrollment = find_all('.hbx-enrollment-panel', wait: 10)
   qle  = sep_enr ? true : false
   wait_for_condition_until(5) do
     enrollment_selection_badges.count > 0
@@ -169,6 +169,7 @@ Then(/(.*) click on make changes button on passive renewal/) do |named_person|
 end
 
 Then(/Employee (.*) should see confirm your plan selection page/) do |named_person|
+  find('.interaction-click-control-confirm', wait: 5)
   expect(page).to have_content "Confirm Your Plan Selection"
 end
 
@@ -204,12 +205,12 @@ Then(/(.*) should see updated renewal with his daughter/) do |named_person|
 end
 
 Then(/(.*) selects make changes on active enrollment/) do |named_person|
-  enrollment = page.all('.hbx-enrollment-panel').detect{|e| e.find('.panel-heading .text-right').text == 'Coverage Selected' }
+  enrollment = find_all('.hbx-enrollment-panel', wait: 10).detect{|e| e.find('.panel-heading .text-right').text == 'Coverage Selected' }
   enrollment.find('.interaction-click-control-make-changes').click
 end
 
 Then(/(.*) should see page with SelectPlanToTerminate button/) do |named_person|
-  sleep(1)
+  find('.interaction-click-control-select-plan-to-terminate', wait: 10)
   expect(page).to have_content('Choose Coverage for your Household')
   expect(page.find('.interaction-click-control-select-plan-to-terminate')).to be_truthy
 end
@@ -273,9 +274,11 @@ Then(/(.*) should see a waiver instead of passive renewal/) do |named_person|
 end
 
 Then(/Employee should see \"not yet eligible\" error message/) do
-  screenshot("new_hire_not_yet_eligible_exception")
-  find('.alert.alert-error', wait: 10)
-  expect(page).to have_content("You're not yet eligible under your employer-sponsored benefits. Please return on #{TimeKeeper.date_of_record + 15.days} to enroll for coverage.")
+  find('#btn-continue', wait: 10).click
+  find('h1', text: 'Choose Coverage for your Household', wait: 10)
+  find('#btn-continue', wait: 10).click
+  find('.alert', wait: 10)
+  expect(page).to have_content("You're not yet eligible under your employer-sponsored benefits. Please return on #{(TimeKeeper.date_of_record + 15.days).strftime('%m/%d/%Y')} to enroll for coverage.")
   visit '/families/home'
 end
 
@@ -300,6 +303,17 @@ end
 When(/Employee clicks continue on the family members page/) do
   click_link('btn_household_continue')
   wait_for_ajax
+end
+
+When(/(.*) clicks shop for new plan on the group selection page/) do |_named_person|
+  find('.interaction-click-control-shop-for-new-plan', wait: 10).click
+end
+
+Then(/Employee should see not yet eligible error message/) do
+  find('h1', text: 'Choose Coverage for your Household', wait: 10)
+  find('.alert', wait: 10)
+  expect(page).to have_content("You're not yet eligible under your employer-sponsored benefits. Please return on #{(TimeKeeper.date_of_record + 15.days).strftime('%m/%d/%Y')} to enroll for coverage.")
+  visit '/families/home'
 end
 
 And(/Employee has past created at date/) do

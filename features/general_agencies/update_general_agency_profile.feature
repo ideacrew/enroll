@@ -1,4 +1,4 @@
-@general_agency_enabled
+@wip
 Feature: update general agency profile
 
   Background: A general agency clicks on edit general agency and updates information
@@ -22,5 +22,3 @@ Feature: update general agency profile
     And the ga should see updated informaton on page
     When the ga clicks on EDIT GENERAL AGENCY button/link
     Then the ga should see updated informaton on page
-
-

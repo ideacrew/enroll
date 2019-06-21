@@ -1,9 +1,10 @@
 <div class="container bottom-pd">
   <h3><%= l10n("broker_agency")%> : <%= @broker_agency_profile.organization.legal_name %></h3>
   <% if current_user.has_broker_agency_staff_role? || current_user.has_hbx_staff_role? %>
-    <%= link_to "#{l10n('broker_agencies.profiles.edit_broker_agency_profile')}", edit_profiles_registration_path(@broker_agency_profile.id), class: 'btn btn-primary ' %>
+    <%= link_to "#{l10n('broker_agencies.profiles.edit_broker_agency_profile')}", edit_profiles_registration_path(@broker_agency_profile.id), class: 'btn btn-primary ', disabled: disable_edit_broker_agency?(current_user) %>
   <% end %>
   <p></p>
+
   <div class="table-border table-responsive">
     <table class="table">
       <thead>
@@ -23,4 +24,6 @@
 
   <%= render "benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/broker_agency_contacts", broker_agency_contacts: @broker_agency_profile.broker_agency_contacts %>
   <%= render "benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/office_locations", office_locations: @broker_agency_profile.office_locations %>
+  <%= render "benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/broker_agency_staff_table", broker_staff: Person.staff_for_broker_including_pending(@broker_agency_profile) %>
+  
 </div>

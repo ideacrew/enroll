@@ -58,7 +58,7 @@ module BenefitSponsors
           @inbox_provider = person.first
         elsif find_profile.present?
           @inbox_provider = find_profile
-          @inbox_provider_name = @inbox_provider.legal_name if /.*EmployerProfile$/.match(@inbox_provider._type)
+          @inbox_provider_name = @inbox_provider.legal_name if /.*EmployerProfile$/.match(@inbox_provider._type) || /.*GeneralAgencyProfile$/.match(@inbox_provider._type)
         end
       end
 

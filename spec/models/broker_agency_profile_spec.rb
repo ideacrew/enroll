@@ -130,7 +130,7 @@ RSpec.describe BrokerAgencyProfile, dbclean: :after_each do
           end
 
           it "should return employer profile objects" do
-            expect(broker_agency_profile.employer_clients.first).to be_a EmployerProfile
+            broker_agency_profile.employer_clients.first.should be_an_instance_of EmployerProfile
           end
         end
 

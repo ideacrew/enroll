@@ -408,18 +408,22 @@ describe Person, :dbclean => :after_each do
         it_behaves_like "validate consumer_fields_validations private", nil, nil, nil, nil, nil, nil, false, [errors[:citizenship], errors[:native], errors[:incarceration]]
       end
 
-      context "has_active_consumer_role?" do
+      context "is_consumer_role_active?" do
         let(:person) {FactoryBot.build(:person)}
         let(:consumer_role) {double(is_active?: true)}
 
         it "should return true" do
           allow(person).to receive(:consumer_role).and_return(consumer_role)
-          expect(person.has_active_consumer_role?).to eq true
+          allow(person).to receive(:is_consumer_role_active?).and_return(true)
+
+          expect(person.is_consumer_role_active?).to eq true
         end
 
         it "should return false" do
           allow(person).to receive(:consumer_role).and_return(nil)
-          expect(person.has_active_consumer_role?).to eq false
+          allow(person).to receive(:is_consumer_role_active?).and_return(false)
+
+          expect(person.is_consumer_role_active?).to eq false
         end
       end
 
@@ -1002,89 +1006,10 @@ describe Person, :dbclean => :after_each do
     end
   end
 
-  describe "verification types" do
-    let(:person) {FactoryBot.create(:person, :with_consumer_role) }
-
-    shared_examples_for "collecting verification types for person" do |v_types, types_count, ssn, citizen, native, age|
-      before do
-        allow(person).to receive(:ssn).and_return(nil) unless ssn
-        allow(person).to receive(:us_citizen).and_return(citizen)
-        allow(person).to receive(:dob).and_return(TimeKeeper.date_of_record - age.to_i.years)
-        allow(person).to receive(:tribal_id).and_return("444444444") if native
-        allow(person).to receive(:citizen_status).and_return("indian_tribe_member") if native
-      end
-      it "returns array of verification types" do
-        expect(person.verification_types).to be_a Array
-      end
-
-      it "returns #{types_count} verification types" do
-        expect(person.verification_types.count).to eq types_count
-      end
-
-      it "contains #{v_types} verification types" do
-        expect(person.verification_types).to eq v_types
-      end
-    end
-
-    context "SSN + Citizen" do
-      it_behaves_like "collecting verification types for person", ["DC Residency", "Social Security Number", "Citizenship"], 3, "2222222222", true, nil, 25
-    end
-
-    context "SSN + Immigrant" do
-      it_behaves_like "collecting verification types for person", ["DC Residency", "Social Security Number", "Immigration status"], 3, "2222222222", false, nil, 20
-    end
-
-    context "SSN + Native Citizen" do
-      it_behaves_like "collecting verification types for person", ["DC Residency", "Social Security Number", "American Indian Status", "Citizenship"], 4, "2222222222", true, "native", 20
-    end
-
-    context "Citizen with NO SSN" do
-      it_behaves_like "collecting verification types for person", ["DC Residency", "Citizenship"], 2, nil, true, nil, 20
-    end
-
-    context "Immigrant with NO SSN" do
-      it_behaves_like "collecting verification types for person", ["DC Residency", "Immigration status"], 2, nil, false, nil, 20
-    end
-
-    context "Native Citizen with NO SSN" do
-      it_behaves_like "collecting verification types for person", ["DC Residency", "American Indian Status", "Citizenship"], 3, nil, true, "native", 20
-    end
-  end
-
-  describe 'ridp_verification_types' do
-    let(:user) {FactoryBot.create(:user)}
-    let(:person) {FactoryBot.create(:person, :with_consumer_role, user: user) }
-
-    shared_examples_for 'collecting ridp verification types for person' do |ridp_types, types_count, is_applicant|
-      before do
-        allow(person).to receive(:completed_identity_verification?).and_return(false)
-        person.consumer_role.update_attributes!(is_applicant: is_applicant)
-      end
-      it 'returns array of verification types' do
-        expect(person.ridp_verification_types).to be_a Array
-      end
-
-      it "returns #{types_count} verification types" do
-        expect(person.ridp_verification_types.count).to eq types_count
-      end
-
-      it "contains #{ridp_types} verification types" do
-        expect(person.ridp_verification_types).to eq ridp_types
-      end
-    end
-    context 'ridp verification types for person' do
-      it_behaves_like 'collecting ridp verification types for person', ['Identity', 'Application'], 2, true
-      it_behaves_like 'collecting ridp verification types for person', ['Identity', 'Application'], 2, false
-    end
-  end
-
-
-  describe ".add_employer_staff_role(first_name, last_name, dob, email, employer_profile)", dbclean: :around_each do
-    include_context "setup benefit market with market catalogs and product packages"
-    include_context "setup initial benefit application"
-    let(:employer_profile) { abc_profile }
-    let(:person_params) { {first_name: Forgery('name').first_name, last_name: Forgery('name').first_name, dob: '1990/05/01'} }
-    let(:person1) { FactoryBot.create(:person, person_params) }
+  describe ".add_employer_staff_role(first_name, last_name, dob, email, employer_profile)" do
+    let(:employer_profile){FactoryBot.create(:employer_profile)}
+    let(:person_params) {{first_name: Forgery('name').first_name, last_name: Forgery('name').first_name, dob: '1990/05/01'}}
+    let(:person1) {FactoryBot.create(:person, person_params)}
 
     context 'duplicate person PII' do
       before do
@@ -1428,6 +1353,53 @@ describe Person, :dbclean => :after_each do
           expect(Person.staff_for_employer(employer_profile2)).to eq [person]
         end
       end
+    end
+  end
+
+  describe 'get staff for broker' do
+    let(:broker_agency_profile) {FactoryBot.create(:broker_agency_profile)}
+    let(:broker_staff_people) { FactoryBot.create_list(:person, 5)}
+    let(:terminated_staff_member) { FactoryBot.create(:person)}
+    let(:pending_staff_member) { FactoryBot.create(:person)}
+
+    before do
+      broker_staff_people.each do |person|
+        FactoryBot.create(:broker_agency_staff_role, broker_agency_profile_id: broker_agency_profile.id, person: person, broker_agency_profile: broker_agency_profile, aasm_state: 'active')
+      end
+      FactoryBot.create(:broker_agency_staff_role, broker_agency_profile_id: broker_agency_profile.id, person: terminated_staff_member, broker_agency_profile: broker_agency_profile, aasm_state: 'broker_agency_terminated')
+      FactoryBot.create(:broker_agency_staff_role, broker_agency_profile_id: broker_agency_profile.id, person: pending_staff_member, broker_agency_profile: broker_agency_profile, aasm_state: 'broker_agency_pending')
+    end
+
+    context 'finds all active staff for broker with same broker agency profile id' do
+      before do
+        @broker_staff = Person.staff_for_broker(broker_agency_profile)
+      end
+      it "should return all active staff for broker" do
+        expect(@broker_staff.size).to eq(5)
+      end
+
+      it "should only return active staff for broker" do
+        @broker_staff.each do |staff|
+          expect(staff.broker_agency_staff_roles.first.is_active?).to be true
+        end
+      end
+    end
+
+    context "finds all active & pending broker staff" do
+      before do
+        @broker_staff = Person.staff_for_broker_including_pending(broker_agency_profile)
+      end
+
+      it "should return all active staff for broker" do
+        expect(@broker_staff.size).to eq(6)
+      end
+
+      it "should only return active & pending staff for broker" do
+        @broker_staff.each do |staff|
+          expect(staff.broker_agency_staff_roles.first.is_open?).to be true
+        end
+      end
+
     end
   end
 end

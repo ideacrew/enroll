@@ -101,7 +101,8 @@ module BenefitSponsors
 
 
       accepts_nested_attributes_for :profiles
-      add_observer BenefitSponsors::Observers::OrganizationObserver.new, [:update, :notifications_send]
+      add_observer BenefitSponsors::Observers::OrganizationObserver.new, [:update]
+      add_observer BenefitSponsors::Observers::NoticeObserver.new, [:process_organization_events]
 
       validates_presence_of :legal_name, :site_id, :profiles
       # validates_presence_of :benefit_sponsorships, if: :is_benefit_sponsor?
@@ -126,6 +127,7 @@ module BenefitSponsors
       scope :broker_agency_profiles,  ->{ where(:"profiles._type" => /.*BrokerAgencyProfile$/) }
       scope :general_agency_profiles, ->{ where(:"profiles._type" => /.*GeneralAgencyProfile$/) }
       scope :issuer_profiles,         ->{ where(:"profiles._type" => /.*IssuerProfile$/) }
+      scope :by_general_agency_profile,       ->( general_agency_profile_id ) { where(:'employer_profile.general_agency_accounts' => {:$elemMatch => { aasm_state: "active", general_agency_profile_id: general_agency_profile_id } }) }
 
       scope :broker_agencies_by_market_kind,  ->( market_kind ) { broker_agency_profiles.any_in(:"profiles.market_kind" => market_kind) }
       scope :approved_broker_agencies,        ->{ broker_agency_profiles.where(:"profiles.aasm_state" => 'is_approved') }
@@ -232,6 +234,10 @@ module BenefitSponsors
         self.profiles.where(_type: /.*BrokerAgencyProfile$/).first
       end
 
+      def general_agency_profile
+        self.profiles.where(_type: /.*GeneralAgencyProfile$/).first
+      end
+
       def hbx_profile
         self.profiles.where(_type: /.*HbxProfile$/).first
       end
@@ -293,7 +299,7 @@ module BenefitSponsors
           end
         end
 
-        def broker_agencies_with_matching_agency_or_broker(search_params)
+        def broker_agencies_with_matching_agency_or_broker(search_params, value = nil)
           if search_params[:q].present?
             orgs2 = self.broker_agency_profiles.approved_broker_agencies.broker_agencies_by_market_kind(['both', 'shop']).where({
               :"profiles._id" => {
@@ -310,10 +316,14 @@ module BenefitSponsors
                 agencies_matching_advanced_criteria = orgs2.where({ "$and" => build_query_params(search_params) })
                 return filter_brokers_by_agencies(agencies_matching_advanced_criteria, brokers)
               end
+            elsif value
+              return search_agencies_by_criteria(search_params)
             end
+          elsif !search_params[:q].present? && value
+            return []
           end
 
-          self.search_agencies_by_criteria(search_params)
+          search_agencies_by_criteria(search_params)
         end
 
         def filter_brokers_by_agencies(agencies, brokers)
@@ -338,6 +348,15 @@ module BenefitSponsors
           end
 
           query_params
+        end
+      end
+
+      def self.valid_issuer_names_filters
+        Rails.cache.fetch("issuer-names-filters-at-#{TimeKeeper.date_of_record.year}", expires_in: 2.hours) do
+          issuer_profiles.inject({}) do |carrier_names, org|
+            carrier_names[org.issuer_profile.id.to_s] = org.issuer_profile.legal_name
+            carrier_names
+          end
         end
       end
 

@@ -36,7 +36,7 @@
       .invalid-feedback
         | Please provide a valid zipcode.
 
-    - if (aca_address_query_county && @agency.profile_type != "broker_agency")
+    - if (aca_address_query_county && @agency.profile_type != "broker_agency" && @agency.profile_type != "general_agency")
       .col-md-3.col-sm-12.col-xs-12
         label for="inputCounty" County
         = f.select :county, options_for_select([]), {include_blank: "SELECT COUNTY"}, class:'form-control mb-1', id:'inputCounty', data: { options: BenefitMarkets::Locations::CountyZip.all.map(&:county_name).uniq }
@@ -47,10 +47,9 @@ javascript:
   function checkKind(element) {
     checkOLKind(element)
   }
-  
+
   $(function() {
     var element = document.getElementById('kindSelect');
     var value = element.value;
     checkKind(element, value)
   });
-  

@@ -16,7 +16,7 @@ describe PopulateEmployeeRoleOnEnrollments do
     describe "employee exists with waived coverages" do
 
       let(:effective_on) { TimeKeeper.date_of_record.end_of_month.next_day }
-   
+
       let!(:renewal_plan) { FactoryBot.create(:plan, market: 'shop', metal_level: 'gold', active_year: effective_on.year, hios_id: "11111111122302-01", csr_variant_id: "01", coverage_kind: 'health') }
       let!(:plan) { FactoryBot.create(:plan, market: 'shop', metal_level: 'gold', active_year: effective_on.year - 1, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_plan_id: renewal_plan.id, coverage_kind: 'health') }
 
@@ -24,11 +24,11 @@ describe PopulateEmployeeRoleOnEnrollments do
       let!(:dental_plan) { FactoryBot.create(:plan, market: 'shop', metal_level: 'dental', active_year: effective_on.year - 1, hios_id: "91111111122302",  renewal_plan_id: dental_renewal_plan.id, coverage_kind: 'dental', dental_level: 'high') }
 
       let(:renewing_employer) {
-        FactoryBot.create(:employer_with_renewing_planyear, start_on: effective_on, 
+        FactoryBot.create(:employer_with_renewing_planyear, start_on: effective_on,
           renewal_plan_year_state: 'renewing_enrolling',
           reference_plan_id: plan.id,
           renewal_reference_plan_id: renewal_plan.id,
-          dental_reference_plan_id: dental_plan.id, 
+          dental_reference_plan_id: dental_plan.id,
           dental_renewal_reference_plan_id: dental_renewal_plan.id,
           with_dental: true
           )
@@ -36,7 +36,7 @@ describe PopulateEmployeeRoleOnEnrollments do
       let(:benefit_group) { renewing_employer.active_plan_year.benefit_groups.first }
       let(:renewal_benefit_group) { renewing_employer.renewing_plan_year.benefit_groups.first }
       let(:renewing_employees) {
-        FactoryBot.create_list(:census_employee_with_active_and_renewal_assignment, 2, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: renewing_employer, 
+        FactoryBot.create_list(:census_employee_with_active_and_renewal_assignment, 2, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: renewing_employer,
           benefit_group: benefit_group, renewal_benefit_group: renewal_benefit_group)
       }
 
@@ -51,11 +51,13 @@ describe PopulateEmployeeRoleOnEnrollments do
       let!(:family) { FactoryBot.create(:family, :with_family_members, person: person, people: [person]) }
       let(:person) { FactoryBot.create(:person, last_name: ce.last_name, first_name: ce.first_name) }
 
-      before do
-        allow(ENV).to receive(:[]).with('effective_on').and_return effective_on.strftime('%m/%d/%Y')
+      around do |example|
+       ClimateControl.modify effective_on: effective_on.strftime('%m/%d/%Y') do
+         example.run
+       end
       end
 
-      context 'missing employee role on health waiver' do 
+      context 'missing employee role on health waiver' do
 
         let(:health_waiver) { FactoryBot.create(:hbx_enrollment,
           household: family.active_household,
@@ -78,7 +80,7 @@ describe PopulateEmployeeRoleOnEnrollments do
         end
       end
 
-      context 'missing employee role on dental waiver' do 
+      context 'missing employee role on dental waiver' do
 
         let(:dental_waiver) { FactoryBot.create(:hbx_enrollment,
           household: family.active_household,

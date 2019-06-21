@@ -608,10 +608,10 @@ describe BenefitGroup, type: :model, dbclean: :after_each do
         it "should contain 4 plans which are gold and silver." do
           if constrain_service_areas?
             expect(benefit_group.elected_plans_by_option_kind.size).to eq 4
-            expect(benefit_group.elected_plans_by_option_kind.map(&:metal_level).uniq).to eq ["gold", "silver"]
+            expect(benefit_group.elected_plans_by_option_kind.map(&:metal_level).uniq.sort).to eq ["gold", "silver"]
           else
             expect(benefit_group.elected_plans_by_option_kind.size).to eq 5
-            expect(benefit_group.elected_plans_by_option_kind.map(&:metal_level).uniq).to eq ["gold", "silver", "bronze"]
+            expect(benefit_group.elected_plans_by_option_kind.map(&:metal_level).uniq.sort).to eq ["bronze", "gold", "silver"]
           end
         end
       end

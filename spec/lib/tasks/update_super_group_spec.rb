@@ -14,10 +14,10 @@ describe 'update_super_group' do
     Rake::Task.define_task(:environment)
   end
 
-  before :context do
-    ENV["active_year"] = "2018"
-    ENV["hios_id"] = "88806MA0040003-01"
-    ENV["super_group_id"] = "NHPHM5-86DV"
+  around do |example|
+    ClimateControl.modify active_year: '2018', 'hios_id': "88806MA0040003-01", super_group_id: "NHPHM5-86DV" do
+      example.run
+    end
   end
 
   context "it should update super_group_id correctly" do

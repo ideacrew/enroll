@@ -2,6 +2,9 @@ class HbxEnrollmentMember
   include Mongoid::Document
   include Mongoid::Timestamps
   include BelongsToFamilyMember
+  include Insured::GroupSelectionHelper
+  include Insured::EmployeeRolesHelper
+  include ApplicationHelper
 
   embedded_in :hbx_enrollment
 
@@ -99,6 +102,18 @@ class HbxEnrollmentMember
     else
       true
     end
+  end
+
+  def valid_enrolling_member?
+    return true unless self.hbx_enrollment.employee_role.present?
+
+    health_relationship_benefits, dental_relationship_benefits = shop_health_and_dental_relationship_benefits(hbx_enrollment.employee_role, hbx_enrollment.benefit_group)
+    if hbx_enrollment.coverage_kind == 'health'
+      return false unless coverage_relationship_check(health_relationship_benefits, family_member, hbx_enrollment.benefit_group.effective_on_for(hbx_enrollment.employee_role.hired_on))
+    else
+      return false unless coverage_relationship_check(dental_relationship_benefits, family_member, hbx_enrollment.benefit_group.effective_on_for(hbx_enrollment.employee_role.hired_on))
+    end
+    true
   end
 
   private

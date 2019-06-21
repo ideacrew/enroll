@@ -47,10 +47,12 @@ describe CancelDentalOfferingsFromPlanYear, dbclean: :after_each do
         ce
       }
 
-    before(:each) do
-      allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
-      allow(ENV).to receive(:[]).with("aasm_state").and_return(organization.employer_profile.renewing_plan_year.aasm_state)
-      allow(ENV).to receive(:[]).with("benefit_group_id").and_return(organization.employer_profile.renewing_plan_year.benefit_groups.first.id)
+    around do |example|
+      ClimateControl.modify fein: organization.fein,
+                                  aasm_state: organization.employer_profile.renewing_plan_year.aasm_state,
+                                  benefit_group_id: organization.employer_profile.renewing_plan_year.benefit_groups.first.id do
+        example.run
+      end
     end
 
     it "should cancel the dental enrollment" do

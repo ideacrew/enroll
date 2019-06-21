@@ -36,6 +36,7 @@ RSpec.describe Exchanges::AgentsController do
   end
 
   describe "resume enrollment method behavior", dbclean: :after_each do
+    let!(:individual_market_transition) { FactoryBot.create(:individual_market_transition, :person => person_user)}
     let!(:consumer_role) { FactoryBot.create(:consumer_role, bookmark_url: nil, person: person_user) }
 
     before(:each) do

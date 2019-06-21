@@ -1,11 +1,5 @@
 module BenefitSponsors
   module ApplicationHelper
-    include ::Webpacker::Helper
-
-    def current_webpacker_instance
-      BenefitSponsors.webpacker
-    end
-
     def bootstrap_class_for flash_type
       case flash_type
         when "notice"
@@ -117,7 +111,7 @@ module BenefitSponsors
         when "BrokerAgencyProfile"
           inbox_profiles_broker_agencies_broker_agency_profile_path(id: provider.id.to_s, folder: folder)
         when "GeneralAgencyProfile"
-          #TODO FIX IT for GA
+          inbox_profiles_general_agencies_general_agency_profile_path(id: provider.id.to_s, folder: folder)
       end
     end
 
@@ -151,6 +145,17 @@ module BenefitSponsors
       given_name = [first_name, middle_name].reject(&:nil? || empty?).join(' ')
       sir_name  = content_tag(:strong, mixed_case(last_name))
       raw([mixed_case(given_name), sir_name, name_sfx].reject(&:nil? || empty?).join(' '))
+    end
+
+    def metal_levels_sorted(metal_levels)
+      metal_levels_order = {
+        bronze: 0,
+        silver: 1,
+        gold: 2,
+        platinum: 3
+      }
+
+      metal_levels.sort_by{|level| metal_levels_order[level]}
     end
   end
 end

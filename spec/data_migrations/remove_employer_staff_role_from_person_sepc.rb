@@ -5,6 +5,7 @@ describe RemoveEmployerStaffRoleFromPerson do
   let(:given_task_name) { "remove_employer_staff_role_from_person" }
   subject { RemoveEmployerStaffRoleFromPerson.new(given_task_name, double(:current_scope => nil)) }
 
+
   describe "given a task name" do
     it "has the given task name" do
       expect(subject.name).to eql given_task_name
@@ -12,11 +13,13 @@ describe RemoveEmployerStaffRoleFromPerson do
   end
 
   describe "remove_employer_staff_role_from_person" do
-
     let(:employer_staff_role) {FactoryBot.create(:employer_staff_role)}
-    before(:each) do
-      allow(ENV).to receive(:[]).with("person_hbx_id").and_return(employer_staff_role.person.hbx_id)
-      allow(ENV).to receive(:[]).with("employer_staff_role_id").and_return(employer_staff_role.id.to_s)
+    let!(:employer_params) {{person_hbx_id: employer_staff_role.person.hbx_id, employer_staff_role_id: employer_staff_role.id.to_s}}
+
+    around do |example|
+      ClimateControl.modify employer_params do
+        example.run
+      end
     end
 
     it "should remove employer staff role from the person" do

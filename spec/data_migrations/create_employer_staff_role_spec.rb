@@ -20,12 +20,17 @@ describe CreateEmployerStaffRole, dbclean: :after_each do
     let!(:organization)                 { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let!(:employer_profile)             { organization.employer_profile }
 
+    around do |example|
+      ClimateControl.modify person_hbx_id: person.hbx_id,
+                            employer_profile_id: employer_profile.id.to_s do
+        example.run
+      end
+    end
+
     context 'for successful data_migration' do
       let!(:user)                        { FactoryBot.create(:user, person: person) }
 
       before :each do
-        ENV['person_hbx_id'] = person.hbx_id
-        ENV['employer_profile_id'] = employer_profile.id.to_s
         subject.migrate
         person.reload
         user.reload
@@ -47,8 +52,6 @@ describe CreateEmployerStaffRole, dbclean: :after_each do
 
     context 'for unsuccessful data migration' do
       before :each do
-        ENV['person_hbx_id'] = person.hbx_id
-        ENV['employer_profile_id'] = employer_profile.id.to_s
         subject.migrate
         person.reload
         @staff_role ||= person.employer_staff_roles.first
@@ -56,7 +59,7 @@ describe CreateEmployerStaffRole, dbclean: :after_each do
 
       it 'should return nil as there is no user' do
         expect(@staff_role).to eq nil
-      end      
+      end
     end
   end
 end

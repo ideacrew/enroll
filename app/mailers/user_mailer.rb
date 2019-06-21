@@ -81,9 +81,17 @@ class UserMailer < ApplicationMailer
 
   def broker_invitation_email(email, person_name, invitation)
     if email.present?
-      mail({to: email, subject: "Important information for accessing your new broker account through the #{site_short_name}"}) do |format|
+      mail({to: email, subject: "Invitation to create your Broker account on #{site_short_name}"}) do |format|
         format.html { render "broker_invitation_email", :locals => { :person_name => person_name, :invitation => invitation }}
       end
+    end
+  end
+
+  def broker_staff_invitation_email(email, person_name, invitation, person_id)
+    return if email.blank?
+
+    mail({to: email, subject: "Invitation to create your Broker Staff account on #{Settings.site.short_name} "}) do |format|
+      format.html { render "broker_staff_invitation_email", :locals => { :person_name => person_name, :invitation => invitation, :person_id => person_id }}
     end
   end
 
@@ -152,7 +160,14 @@ class UserMailer < ApplicationMailer
       format.html {render "employer_invoice_generation", locals: {first_name: employer.person.first_name}}
     end
   end
-
+  
+  def broker_registration_guide(user)
+    attachments['Broker Registration Guide.pdf'] = File.read('public/new_broker_registration.pdf')
+    mail({to: user[:email], subject: "Broker Registration Guide"}) do |format|
+      format.html { render "broker_registration_guide", :locals => { :first_name => user[:first_name]}}
+    end
+  end
+  
   def broker_denied_notification(broker_role)
     if broker_role.email_address.present?
       mail({to: broker_role.email_address, subject: "Broker application denied"}) do |format|
@@ -163,12 +178,12 @@ class UserMailer < ApplicationMailer
 
   def broker_application_confirmation(person)
     if person.emails.find_by(kind: 'work').address.present?
-      mail({to: person.emails.find_by(kind: 'work').try(:address) , subject: "Thank you for submitting your broker application through the #{site_short_name} for Business"}) do |format|
+      mail({to: person.emails.find_by(kind: 'work').try(:address), subject: "Thank you for submitting your broker application to #{site_short_name}"}) do |format|
         format.html { render "broker_application_confirmation", :locals => { :person => person }}
       end
     end
   end
-
+  
   def broker_pending_notification(broker_role,unchecked_carriers)
     subject_sufix = unchecked_carriers.present? ? ", missing carrier appointments" : ", has all carrier appointments"
     subject_prefix = broker_role.training || broker_role.training == true ? "Action Needed - Broker License for #{site_short_name} for Business" : "Action Needed - Complete Broker Training for #{site_short_name} for Business"

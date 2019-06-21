@@ -70,7 +70,7 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
       # if verify_recaptcha(model: @broker_candidate, message: failed_recaptcha_message) && @broker_candidate.save
       if @broker_candidate.save
         flash[:notice] = notice
-        redirect_to broker_registration_path
+        render 'confirmation'
       else
         @filter = params[:person][:broker_applicant_type]
         render 'new'
@@ -81,12 +81,19 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
       # if verify_recaptcha(model: @organization, message: failed_recaptcha_message) && @organization.save
       if @organization.save
         flash[:notice] = notice
-        redirect_to broker_registration_path
+        render 'confirmation'
       else
         @agency_type = 'new'
         render "new"
       end
     end
+  end
+  
+  def email_guide
+    notice = "A copy of the Broker Registration Guide has been emailed to #{params[:email]}"
+    flash[:notice] = notice
+    UserMailer.broker_registration_guide(params).deliver_now
+    render 'confirmation'
   end
 
   private

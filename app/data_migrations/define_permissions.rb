@@ -99,6 +99,8 @@ class DefinePermissions < MigrationTask
 
   def hbx_admin_can_complete_resident_application
     Permission.hbx_staff.update_attributes!(can_complete_resident_application: true)
+    Permission.super_admin.update_attributes!(can_complete_resident_application: true)
+    Permission.hbx_tier3.update_attributes!(can_complete_resident_application: true)
   end
 
   def hbx_admin_can_add_sep
@@ -111,6 +113,10 @@ class DefinePermissions < MigrationTask
     Permission.hbx_staff.update_attributes(can_lock_unlock: true)
     Permission.super_admin.update_attributes(can_lock_unlock: true)
     Permission.hbx_tier3.update_attributes(can_lock_unlock: true)
+  end
+
+  def hbx_admin_can_add_pdc
+    Permission.hbx_staff.update_attributes!(can_add_pdc: true)
   end
 
   def hbx_admin_can_view_username_and_email
@@ -137,6 +143,11 @@ class DefinePermissions < MigrationTask
   def hbx_admin_can_force_publish
     Permission.super_admin.update_attributes(can_force_publish: true)
     Permission.hbx_tier3.update_attributes(can_force_publish: true)
+  end
+
+  def hbx_admin_can_modify_plan_year
+    Permission.super_admin.update_attributes(can_modify_plan_year: true)
+    Permission.hbx_tier3.update_attributes(can_modify_plan_year: true)
   end
 
   def hbx_admin_can_extend_open_enrollment
@@ -198,7 +209,10 @@ class DefinePermissions < MigrationTask
     Permission.hbx_staff.update_attributes!(can_access_accept_reject_paper_application_documents: true)
     Permission.hbx_csr_supervisor.update_attributes!(can_access_accept_reject_paper_application_documents: true)
     Permission.hbx_csr_tier1.update_attributes!(can_access_accept_reject_paper_application_documents: true)
-    Permission.hbx_csr_tier2.update_attributes!(can_access_accept_reject_paper_application_documents: true)  
+    Permission.hbx_csr_tier2.update_attributes!(can_access_accept_reject_paper_application_documents: true)
+  end
+  def hbx_admin_can_transition_family_members
+   Permission.hbx_staff.update_attributes!(can_transition_family_members: true)
   end
 
   def hbx_admin_can_delete_identity_application_documents

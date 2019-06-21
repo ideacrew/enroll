@@ -1,0 +1,27 @@
+@import 'variables';
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700');
+
+body {
+  background-color: $medium-gray;
+  -webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+  font-family: 'Open Sans', sans-serif;
+}
+
+footer {
+  font-size: 14px;
+  color: $white;
+  background-color: $dc-dark-blue;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  a, a:hover {
+    color: $white;
+    text-decoration: none;
+  }
+}
+
+.welcome {
+  margin-top: 90px;
+}

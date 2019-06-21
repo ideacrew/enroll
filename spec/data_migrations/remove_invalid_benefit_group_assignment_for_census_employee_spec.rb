@@ -20,8 +20,10 @@ describe RemoveInvalidBenefitGroupAssignmentForCensusEmployee, dbclean: :after_e
       let!(:plan_year)         { FactoryBot.create(:plan_year, employer_profile: employee_role.employer_profile) }
       let(:census_employee) { FactoryBot.create(:census_employee, employer_profile_id: employee_role.employer_profile.id)}
 
-      before(:each) do
-        allow(ENV).to receive(:[]).with("employee_role_id").and_return(employee_role.id.to_s)
+      around(:each) do |example|
+        ClimateControl.modify employee_role_id: employee_role.id.to_s do
+          example.run
+        end
         employee_role.update_attribute(:census_employee_id, census_employee.id)
       end
 

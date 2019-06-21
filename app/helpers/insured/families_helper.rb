@@ -14,7 +14,13 @@ module Insured::FamiliesHelper
   end
 
   def current_premium hbx_enrollment
-    hbx_enrollment.total_employee_cost
+    if hbx_enrollment.is_shop?
+      hbx_enrollment.total_employee_cost
+    elsif hbx_enrollment.kind == 'coverall'
+      hbx_enrollment.total_premium
+    else
+      hbx_enrollment.total_premium > hbx_enrollment.applied_aptc_amount.to_f ? hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f : 0
+    end
   end
 
   def hide_policy_selected_date?(hbx_enrollment)
@@ -49,7 +55,7 @@ module Insured::FamiliesHelper
   end
 
   def render_plan_type_details(plan)
-    plan_details = [ plan.try(:plan_type).try(:upcase) ].compact
+    plan_details = [plan.try(:product_type).try(:upcase)].compact
 
     metal_level = display_dental_metal_level(plan)
 
@@ -159,6 +165,8 @@ module Insured::FamiliesHelper
   def display_aasm_state?(enrollment)
     if enrollment.is_shop?
       true
+    elsif enrollment.is_ivl_actively_outstanding?
+      false
     else
       ['coverage_selected', 'coverage_canceled', 'coverage_terminated', 'auto_renewing', 'renewing_coverage_selected', 'coverage_expired'].include?(enrollment.aasm_state.to_s)
     end
@@ -172,7 +180,7 @@ module Insured::FamiliesHelper
   end
 
   def enrollment_coverage_end(hbx_enrollment)
-    if hbx_enrollment.coverage_terminated?
+    if hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_termination_pending?
       hbx_enrollment.terminated_on
     elsif hbx_enrollment.coverage_expired?
       if hbx_enrollment.is_shop? && hbx_enrollment.benefit_group_assignment.present?
@@ -193,7 +201,8 @@ module Insured::FamiliesHelper
        qle_link_generator_for_an_existing_qle(qle, link_title)
     else
       # Take straight to the Plan Shopping - Add Members Flow. No date choices.
-      link_to link_title.present? ? link_title: 'Shop for Plans', insured_family_members_path(sep_id: sep.id, qle_id: qle.id), class: "btn btn-default"
+      # Use turbolinks: false, to avoid calling controller action twice.
+      link_to link_title.presence || 'Shop for Plans', insured_family_members_path(sep_id: sep.id, qle_id: qle.id), class: 'btn btn-default', data: {turbolinks: false}
     end
   end
 
@@ -234,5 +243,53 @@ module Insured::FamiliesHelper
       second_checked = !person.consumer_role.is_applying_coverage
     end
     return first_checked, second_checked
+  end
+
+  def current_market_kind(person)
+    if person.is_consumer_role_active? || person.is_resident_role_active?
+      person.active_individual_market_role
+    else
+      "No Consumer/CoverAll Market"
+    end
+  end
+
+  def new_market_kind(person)
+    if person.is_consumer_role_active?
+      "resident"
+    elsif person.is_resident_role_active?
+      "consumer"
+    else
+      " - "
+    end
+  end
+
+  def build_consumer_role(person, family)
+    if family.primary_applicant.person == person
+      person.build_consumer_role({:is_applicant => true})
+      person.save!
+    else
+      person.build_consumer_role({:is_applicant => false})
+      person.save!
+    end
+  end
+
+  def build_resident_role(person, family)
+    if family.primary_applicant.person == person
+      person.build_resident_role({:is_applicant => true})
+      person.save!
+    else
+      person.build_resident_role({:is_applicant => false})
+      person.save!
+    end
+  end
+
+  def transition_reason(person)
+    if person.is_consumer_role_active?
+    @qle = QualifyingLifeEventKind.where(reason: 'eligibility_failed_or_documents_not_received_by_due_date').first
+      { @qle.title => @qle.reason }
+    elsif person.is_resident_role_active?
+     @qle = QualifyingLifeEventKind.where(reason: 'eligibility_documents_provided').first
+     { @qle.title => @qle.reason }
+    end
   end
 end

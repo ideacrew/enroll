@@ -36,6 +36,10 @@ class EmployerProfile
 
   field :entity_kind, type: String
   field :sic_code, type: String
+  # Adding DC field for data migartion
+  field :no_ssn, type: Boolean, default: false
+  field :enable_ssn_date, type: DateTime
+  field :disable_ssn_date, type: DateTime
 
 #  field :converted_from_carrier_at, type: DateTime, default: nil
 #  field :conversion_carrier_id, type: BSON::ObjectId, default: nil
@@ -142,7 +146,7 @@ class EmployerProfile
 
   # for broker agency
   def hire_broker_agency(new_broker_agency, start_on = today)
-    SponsoredBenefits::Organizations::BrokerAgencyProfile.assign_employer(broker_agency: new_broker_agency, employer: self, office_locations: parent.office_locations) if organization
+    SponsoredBenefits::Organizations::BrokerAgencyProfile.assign_employer(broker_agency: new_broker_agency, employer: self) if organization
     start_on = start_on.to_date.beginning_of_day
     if active_broker_agency_account.present?
       terminate_on = (start_on - 1.day).end_of_day

@@ -6,7 +6,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
   include_context "setup benefit market with market catalogs and product packages"
   include_context "setup initial benefit application"
 
-  let(:person) {FactoryBot.create(:person)}
+  let(:person) {FactoryBot.create(:person, :with_family)}
   let(:user) { FactoryBot.create(:user, person: person) }
   let(:family){ FactoryBot.create(:family, :with_primary_family_member_and_dependent) }
   let(:family_members){ family.family_members.where(is_primary_applicant: false).to_a }
@@ -169,10 +169,42 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       expect(response).to have_http_status(:success)
     end
 
+    it "when enrollment has change plan" do
+      sign_in(user)
+      get :thankyou, params: { id: "id", plan_id: "plan_id", change_plan: "rspec" }
+      expect(assigns(:change_plan)).to eq "rspec"
+    end
+
+    it "when enrollment does not have change plan" do
+      sign_in(user)
+      allow(hbx_enrollment).to receive(:is_special_enrollment?).and_return true
+      get :thankyou, params: { id: "id", plan_id: "plan_id" }
+      expect(assigns(:change_plan)).to eq "change_plan"
+    end
+
     it "should be enrollable" do
       sign_in(user)
       get :thankyou, params: {id: "id", plan_id: "plan_id"}
       expect(assigns(:enrollable)).to be_truthy
+    end
+
+    it "When enrollment kind receives" do
+      sign_in(user)
+      get :thankyou, params: { id: "id", plan_id: "plan_id", enrollment_kind: "shop" }
+      expect(assigns(:enrollment_kind)).to eq "shop"
+    end
+
+    it "when is_special_enrollment " do
+      sign_in(user)
+      allow(hbx_enrollment).to receive(:is_special_enrollment?).and_return true
+      get :thankyou, params: { id: "id", plan_id: "plan_id" }
+      expect(assigns(:enrollment_kind)).to eq "sep"
+    end
+
+    it "when no special_enrollment" do
+      sign_in(user)
+      get :thankyou, params: { id: "id", plan_id: "plan_id" }
+      expect(assigns(:enrollment_kind)).to eq ""
     end
 
     it "should be waivable" do
@@ -254,15 +286,42 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
   end
 
   context "POST terminate", :dbclean => :around_each do
+    let(:coverage_start_on) {TimeKeeper.date_of_record.last_month.beginning_of_month}
+    let(:hbx_enrollment) do
+      FactoryBot.create(:hbx_enrollment, :with_product,
+                        sponsored_benefit_package_id: benefit_group_assignment.benefit_group.id,
+                        household: household,
+                        hbx_enrollment_members: [hbx_enrollment_member],
+                        coverage_kind: "health",
+                        effective_on: coverage_start_on,
+                        external_enrollment: false,
+                        sponsored_benefit_id: sponsored_benefit.id,
+                        rating_area_id: rating_area.id)
+    end
+
+    let(:waiver_enrollment) do
+      FactoryBot.create(:hbx_enrollment, :with_product,
+                        sponsored_benefit_package_id: benefit_group_assignment.benefit_group.id,
+                        household: household,
+                        hbx_enrollment_members: [hbx_enrollment_member],
+                        coverage_kind: "health",
+                        external_enrollment: false,
+                        sponsored_benefit_id: sponsored_benefit.id,
+                        predecessor_enrollment_id: hbx_enrollment.id,
+                        rating_area_id: rating_area.id)
+    end
+    let(:coverage_end_on) {TimeKeeper.date_of_record.end_of_month}
+
     before do
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
-      allow(hbx_enrollment).to receive(:may_schedule_coverage_termination?).and_return(true)
-      allow(hbx_enrollment).to receive(:schedule_coverage_termination!).and_return(true)
+      allow(hbx_enrollment).to receive(:employee_role_id).and_return(employee_role.id)
       allow(person).to receive(:primary_family).and_return(family)
       allow(hbx_enrollment).to receive(:rating_area).and_return(rating_area)
       allow(hbx_enrollment).to receive(:sponsored_benefit).and_return(sponsored_benefit)
       allow(sponsored_benefit).to receive(:rate_schedule_date).and_return(rate_schedule_date)
       allow(HbxEnrollmentSponsoredCostCalculator).to receive(:new).with(hbx_enrollment).and_return(cost_calculator)
+      allow(waiver_enrollment).to receive(:parent_enrollment).and_return(hbx_enrollment)
+      request.env["HTTP_REFERER"] = terminate_insured_plan_shopping_url(1)
       sign_in user
     end
 
@@ -272,35 +331,59 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     end
 
     it "goes back" do
-      request.env["HTTP_REFERER"] = terminate_insured_plan_shopping_url(1)
-      allow(hbx_enrollment).to receive(:may_schedule_coverage_termination?).and_return(false)
       post :terminate, params: {id: "hbx_id"}
-      expect(response).to be_redirect
+      expect(response).to have_http_status(:redirect)
     end
 
     it "should record termination submitted date on terminate of hbx_enrollment" do
       expect(hbx_enrollment.termination_submitted_on).to eq nil
-      post :terminate, params: {id: "hbx_id"}
+      post :terminate, params: {id: "hbx_id", terminate_reason: "Because"}
+      expect(hbx_enrollment.terminated_on).to eq coverage_end_on
       expect(hbx_enrollment.termination_submitted_on).to be_within(1.second).of TimeKeeper.datetime_of_record
-      expect(response).to be_redirect
+      expect(response).to have_http_status(:redirect)
+    end
+
+    it "should create a new inactive enrollment" do
+      post :terminate, params: {id: "hbx_id", terminate_reason: "Because"}
+      hbx_enrollment.reload
+      expect(hbx_enrollment.terminate_reason).to eq "Because"
     end
   end
 
   context "GET waive", :dbclean => :around_each do
     before :each do
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
+      allow(hbx_enrollment).to receive(:may_waive_coverage?).and_return(true)
+      allow(hbx_enrollment).to receive(:waive_enrollment).and_return(true)
+      allow(hbx_enrollment).to receive(:shopping?).and_return(true)
       sign_in user
     end
 
     it "should get success flash message" do
-      allow(hbx_enrollment).to receive(:waive_coverage_by_benefit_group_assignment).with("Because").and_return(true)
+      allow(hbx_enrollment).to receive(:valid?).and_return(true)
+      allow(hbx_enrollment).to receive(:save).and_return(true)
+      allow(hbx_enrollment).to receive(:waive_coverage).and_return(true)
+      allow(hbx_enrollment).to receive(:waiver_reason=).with("Because").and_return(true)
+      allow(hbx_enrollment).to receive(:inactive?).and_return(true)
+      get :waive, params: {id: "hbx_id", waiver_reason: "Because"}
+      expect(flash[:notice]).to eq "Waive Coverage Successful"
+      expect(response).to be_redirect
+    end
+
+    it "should get success flash mesage when enrollment is terminated" do
+      allow(hbx_enrollment).to receive(:coverage_termination_pending?).and_return(true)
+      allow(hbx_enrollment).to receive(:waiver_reason=).with("Because").and_return(true)
+      allow(hbx_enrollment).to receive(:valid?).and_return(true)
+      allow(hbx_enrollment).to receive(:inactive?).and_return(true)
       get :waive, params: {id: "hbx_id", waiver_reason: "Because"}
       expect(flash[:notice]).to eq "Waive Coverage Successful"
       expect(response).to be_redirect
     end
 
     it "should get failure flash message" do
-      allow(hbx_enrollment).to receive(:waive_coverage_by_benefit_group_assignment).with("Because").and_raise(StandardError.new("WAIVE FAILED"))
+      allow(hbx_enrollment).to receive(:waiver_reason=).with("Because").and_return(false)
+      allow(hbx_enrollment).to receive(:valid?).and_return(false)
+      allow(hbx_enrollment).to receive(:inactive?).and_return(false)
       get :waive, params: {id: "hbx_id", waiver_reason: "Because"}
       expect(flash[:alert]).to eq "Waive Coverage Failed"
       expect(response).to be_redirect
@@ -314,6 +397,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     let(:products) {[hbx_enrollment.sponsored_benefit.reference_product]}
     let(:coverage_kind){"health"}
     let(:cost_calculator) { HbxEnrollmentSponsoredCostCalculator.new(hbx_enrollment) }
+    let(:consumer_person) { FactoryBot.create(:person, :with_consumer_role) }
     let(:product_groups) { products }
     let(:family_group_enrollment) do
       BenefitSponsors::Enrollments::GroupEnrollment.new(
@@ -341,12 +425,15 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       allow(user).to receive(:person).and_return(person)
       allow(person).to receive(:primary_family).and_return(family)
       allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
+      allow(hbx_enrollment).to receive(:kind).and_return("employer_sponsored")
+      allow(hbx_enrollment).to receive(:consumer_role).and_return(consumer_person.consumer_role)
       allow(benefit_group).to receive(:plan_option_kind).and_return("single_plan")
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return(true)
       allow(hbx_enrollment).to receive(:effective_on).and_return(Date.new(2015))
       allow(hbx_enrollment).to receive(:family).and_return(family)
       allow(hbx_enrollment).to receive(:coverage_kind).and_return('health')
       allow(hbx_enrollment).to receive(:sponsored_benefit).and_return(sponsored_benefit)
+      allow(hbx_enrollment).to receive(:employee_role).and_return employee_role
       allow(cost_calculator).to receive(:groups_for_products).with(products).and_return(product_groups)
       allow_any_instance_of(Insured::PlanShoppingsController).to receive(:sort_member_groups).with(product_groups).and_return(member_group)
       allow(hbx_enrollment).to receive(:product).and_return(product_1)
@@ -358,7 +445,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     context "normal" do
       before :each do
         allow(hbx_enrollment).to receive(:can_waive_enrollment?).and_return(true)
-        get :show, params: {id: "hbx_id"}
+        get :show, params: {id: "hbx_id", market_kind: 'shop'}
       end
 
       it "should be success" do
@@ -367,6 +454,10 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
       it "should be waivable" do
         expect(assigns(:waivable)).to be_truthy
+      end
+
+      it "should get the checkbook_url" do
+        expect(assigns(:dc_checkbook_url)).to eq "http://checkbook_url"
       end
     end
 
@@ -482,6 +573,30 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
           # it "should get default selected_aptc_pct" do
           #   expect(session[:elected_aptc]).to eq 0
           # end
+        end
+      end
+    end
+  end
+
+  if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
+    describe "plan_selection_callback" do
+      let(:coverage_kind){"health"}
+      let(:market_kind){"individual"}
+      let(:person) { FactoryBot.create(:person, :with_active_consumer_role, :with_consumer_role) }
+      let(:user)  { FactoryBot.create(:user, person: person) }
+      let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+      let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual) }
+      let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: family.active_household, kind: 'individual', effective_on: TimeKeeper.date_of_record.beginning_of_month.to_date, product_id: product.id) }
+
+      context "When a callback is received" do
+        before do
+          sign_in user
+          get :plan_selection_callback, params: { id: hbx_enrollment.id, hios_id: product.hios_id, market_kind: market_kind, coverage_kind: coverage_kind }
+        end
+
+        it "should assign market kind and coverage_kind" do
+          expect(assigns(:market_kind)).to be_truthy
+          expect(assigns(:coverage_kind)).to be_truthy
         end
       end
     end

@@ -1,8 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
-  let!(:default_plan)            { double("Plan", id: "default_plan_id", coverage_kind: "health") }
-  let!(:dental_plan)             { double("DentalPlan", id: "dental_plan_id", coverage_kind: "dental") }
+  let!(:default_plan)            { double("Product", id: "default_plan_id", kind: "health") }
+  let!(:dental_plan)             { double("Product", id: "dental_plan_id", kind: "dental") }
   let(:plan_cost_decorator)     { UnassistedPlanCostDecorator.new(plan, member_provider) }
   context "rating a large family" do
     let(:plan)            {default_plan}
@@ -23,7 +23,7 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
     end
 
     before do
-      allow(Caches::PlanDetails).to receive(:lookup_rate) {|id, start, age| age * 1.0}
+      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) {|_id, _start, age| age * 1.0}
     end
 
     it "should be possible to construct a new plan cost decorator" do

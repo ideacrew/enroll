@@ -37,11 +37,9 @@ module SponsoredBenefits
       @plan_design_census_employee.benefit_sponsorship_id = @plan_design_proposal.profile.benefit_sponsorships.first.id
 
       if @plan_design_census_employee.save
-        flash[:success] = 'Employee record created successfully.'
-        redirect_back(fallback_location: :back)
+        redirect_back fallback_location: main_app.root_path, flash: {:success => "Employee record created successfully."}
       else
-        flash[:error] = "Unable to create employee record. #{@plan_design_census_employee.errors.full_messages}"
-        redirect_back(fallback_location: :back)
+        redirect_back fallback_location: main_app.root_path, flash: {:error => "Unable to create employee record. #{@plan_design_census_employee.errors.full_messages}"}
       end
     end
 

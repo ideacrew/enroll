@@ -3,14 +3,13 @@
 module BrokerWorld
   def broker(*traits)
     attributes = traits.extract_options!
-    @broker ||= FactoryBot.create :user, *traits, attributes
+    @broker ||= FactoryBot.create(:user, :broker_with_person, *traits, attributes)
   end
 
   def broker_agency(*traits)
     attributes = traits.extract_options!
     @broker_agency ||= FactoryBot.create :broker, *traits, attributes
   end
-
 end
 
 World(BrokerWorld)

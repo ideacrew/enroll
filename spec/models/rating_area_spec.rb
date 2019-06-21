@@ -41,12 +41,12 @@ RSpec.describe RatingArea, type: :model, dbclean: :after_each do
       context "with a valid search param" do
         let(:first_address) { build(:address, county: "County One", zip: "10001") }
         let(:second_address) { build(:address, county: "County One", zip: "10002") }
-        let!(:first_county_region) { create(:rating_area, county_name: first_address.county, zip_code: first_address.zip, rating_area: "R-MA001") }
-        let!(:same_county_second_region) { create(:rating_area, county_name: second_address.county, zip_code: second_address.zip, rating_area: "R-MA002") }
+        let!(:first_county_region) { create(:rating_area, county_name: first_address.county, zip_code: first_address.zip, rating_area: "R-DC001") }
+        let!(:same_county_second_region) { create(:rating_area, county_name: second_address.county, zip_code: second_address.zip, rating_area: "R-DC001") }
 
         it "returns the rating area" do
-          expect(subject.rating_area_for(first_address)).to eq("R-MA001")
-          expect(subject.rating_area_for(second_address)).to eq("R-MA002")
+          expect(subject.rating_area_for(first_address)).to eq("R-DC001")
+          expect(subject.rating_area_for(second_address)).to eq("R-DC001")
         end
       end
 

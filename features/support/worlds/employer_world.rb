@@ -8,7 +8,7 @@ module EmployerWorld
   # defaults to the first employer created
   def employer(legal_name=nil, *traits)
     attributes = traits.extract_options!
-    traits.push(:with_aca_shop_cca_employer_profile) unless traits.include? :with_aca_shop_cca_employer_profile_no_attestation
+    traits.push("with_aca_shop_#{Settings.site.key}_employer_profile".to_sym) unless traits.include? :with_aca_shop_cca_employer_profile_no_attestation
     @organization ||= {}
 
     # puts "running for legal_name: #{legal_name}"
@@ -38,7 +38,7 @@ module EmployerWorld
   def registering_employer
     @registering_organization ||= FactoryBot.build(
       :benefit_sponsors_organizations_general_organization,
-      :with_aca_shop_cca_employer_profile,
+      "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym,
       site: site
     )
   end
@@ -90,4 +90,45 @@ end
 
 And(/^staff role person logged in$/) do
   login_as @staff_role
+end
+
+Given(/a consumer role person with family/) do
+  person = people['Patrick Doe']
+  @person = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, first_name: 'Employee', last_name: person[:last_name], ssn: person[:ssn], dob: person[:dob])
+  FactoryBot.create :family, :with_primary_family_member, person: @person
+  FactoryBot.create(:user, person: @person, email: person[:email], password: person[:password], password_confirmation: person[:password])
+end
+
+Given(/all products with issuer profile/) do
+  @issuer_profile = FactoryBot.create :benefit_sponsors_organizations_issuer_profile
+  BenefitMarkets::Products::Product.all.each {|product| product.update_attributes(issuer_profile: @issuer_profile)}
+  BenefitMarkets::Products::Product.all.dental_products.each {|dp| dp.update_attributes(dental_level: 'high', dental_plan_kind: 'ppo')}
+end
+
+Given(/an employer with initial application/) do
+  @sponsorship = employer(nil, :with_aca_shop_dc_employer_profile_initial_application).benefit_sponsorships.first
+  @profile = @sponsorship.profile
+end
+
+Then(/an application provides health and dental packages/) do
+  benefit_application = @sponsorship.benefit_applications.first
+  product_package = benefit_application.benefit_sponsor_catalog.product_packages.by_product_kind(:health).first
+  dental_product_package = benefit_application.benefit_sponsor_catalog.product_packages.by_product_kind(:dental).first
+  benefit_application.benefit_packages = [create(:benefit_sponsors_benefit_packages_benefit_package,
+                                                 benefit_application: benefit_application,
+                                                 product_package: product_package,
+                                                 dental_product_package: dental_product_package,
+                                                 dental_sponsored_benefit: true)]
+  benefit_application.save!
+  product_package.products.each {|product| product.update_attributes(issuer_profile: @issuer_profile)}
+end
+
+Then(/there are sponsored benefit offerings for spouse and child/) do
+  benefit_application = @sponsorship.benefit_applications.first
+  product_package = benefit_application.benefit_sponsor_catalog.product_packages.by_product_kind(:health).first
+  benefit_group = @sponsorship.profile.plan_years[0].benefit_groups[0]
+  benefit_group.dental_sponsored_benefit.sponsor_contribution.contribution_levels.where(display_name: 'Spouse').first.update_attributes(is_offered: false)
+  benefit_group.dental_sponsored_benefit.sponsor_contribution.contribution_levels.where(display_name: 'Child Under 26').first.update_attributes(is_offered: true)
+  benefit_group.health_sponsored_benefit.sponsor_contribution.contribution_levels.where(display_name: 'Child Under 26').first.update_attributes(is_offered: true)
+  benefit_group.health_sponsored_benefit.update_attributes(product_option_choice: product_package.products.first.issuer_profile.id)
 end

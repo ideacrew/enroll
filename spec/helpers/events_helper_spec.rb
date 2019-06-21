@@ -43,7 +43,7 @@ describe EventsHelper, "given an address_kind", dbclean: :after_each do
         end
 
         it "should return active plan year" do
-          expect(subject.employer_plan_years(abc_profile)).to eq [predecessor_application]
+          expect(subject.employer_plan_years(abc_profile, nil)).to eq [predecessor_application]
         end
       end
 
@@ -56,7 +56,7 @@ describe EventsHelper, "given an address_kind", dbclean: :after_each do
         end
 
         it "should not return plan years" do
-          expect(subject.employer_plan_years(abc_profile)).to eq []
+          expect(subject.employer_plan_years(abc_profile, nil)).to eq []
         end
       end
     end
@@ -72,7 +72,7 @@ describe EventsHelper, "given an address_kind", dbclean: :after_each do
         end
 
         it "should return active and renewal plan year" do
-          expect(subject.employer_plan_years(abc_profile)).to eq [renewal_application,predecessor_application]
+          expect(subject.employer_plan_years(abc_profile, renewal_application.id.to_s)).to eq [renewal_application,predecessor_application]
         end
       end
 
@@ -85,7 +85,7 @@ describe EventsHelper, "given an address_kind", dbclean: :after_each do
         end
 
         it "should return active plan year" do
-          expect(subject.employer_plan_years(abc_profile)).to eq [predecessor_application]
+          expect(subject.employer_plan_years(abc_profile, nil)).to eq [predecessor_application]
         end
       end
     end
@@ -102,7 +102,7 @@ describe EventsHelper, "given an address_kind", dbclean: :after_each do
         it "should return active plan year" do
           abc_profile.benefit_applications.first.benefit_sponsorship.source_kind = "conversion"
           abc_profile.save
-          expect(subject.employer_plan_years(abc_profile)).to eq [predecessor_application]
+          expect(subject.employer_plan_years(abc_profile, nil)).to eq [predecessor_application]
         end
       end
 
@@ -116,7 +116,7 @@ describe EventsHelper, "given an address_kind", dbclean: :after_each do
         it "should not return plan years" do
           abc_profile.benefit_applications.first.benefit_sponsorship.source_kind = "conversion"
           abc_profile.save
-          expect(subject.employer_plan_years(abc_profile)).to eq []
+          expect(subject.employer_plan_years(abc_profile, nil)).to eq []
         end
       end
     end
@@ -133,7 +133,7 @@ describe EventsHelper, "given an address_kind", dbclean: :after_each do
         it "should return active and renewal plan year" do
           abc_profile.benefit_applications.first.benefit_sponsorship.source_kind = "conversion"
           abc_profile.save
-          expect(subject.employer_plan_years(abc_profile)).to eq [renewal_application,predecessor_application]
+          expect(subject.employer_plan_years(abc_profile, renewal_application.id.to_s)).to eq [renewal_application,predecessor_application]
         end
       end
 
@@ -147,7 +147,7 @@ describe EventsHelper, "given an address_kind", dbclean: :after_each do
         it "should not return plan years" do
           abc_profile.benefit_applications.first.benefit_sponsorship.source_kind = "conversion"
           abc_profile.save
-          expect(subject.employer_plan_years(abc_profile)).to eq []
+          expect(subject.employer_plan_years(abc_profile, nil)).to eq []
         end
       end
     end
@@ -165,7 +165,7 @@ describe EventsHelper, "given an address_kind", dbclean: :after_each do
         it "should return active and renewal plan year" do
           abc_profile.benefit_applications.first.benefit_sponsorship.source_kind = "conversion"
           abc_profile.save
-          expect(subject.employer_plan_years(abc_profile)).to eq [renewal_application,predecessor_application]
+          expect(subject.employer_plan_years(abc_profile, renewal_application.id.to_s)).to eq [renewal_application,predecessor_application]
         end
       end
 
@@ -179,7 +179,7 @@ describe EventsHelper, "given an address_kind", dbclean: :after_each do
         it "should return active_plan_year" do
           abc_profile.benefit_applications.first.benefit_sponsorship.source_kind = "conversion"
           abc_profile.save
-          expect(subject.employer_plan_years(abc_profile)).to eq [predecessor_application]
+          expect(subject.employer_plan_years(abc_profile, nil)).to eq [predecessor_application]
         end
       end
     end
@@ -234,7 +234,7 @@ describe EventsHelper, "given an address_kind", dbclean: :after_each do
 
 end
 
-describe EventsHelper, "transforming a qualifying event kind for external xml" do
+describe EventsHelper, "transforming a qualifying event kind for external xml", dbclean: :after_each do
 
   RESULT_PAIR = {
     "relocate" => "location_change",
@@ -316,6 +316,70 @@ describe EventsHelper, "selecting plan years to be exported", dbclean: :after_ea
 
       it "should not return the plan year" do
         expect(subject.plan_years_for_manual_export(abc_profile)).to eq [predecessor_application]
+      end
+    end
+  end
+end
+
+describe EventsHelper, "employer_plan_years", dbclean: :after_each do
+  subject { EventsHelperSlug.new }
+
+  describe "should export valid plan years" do
+
+
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup renewal application"
+
+
+    context "employer with active and renewing enrolled plan year" do
+
+      before do
+        predecessor_application.update_attributes({:aasm_state => "active"})
+        renewal_application.update_attributes({:aasm_state => "enrollment_eligible"})
+      end
+
+      it "should return active and renewing plan year" do
+        expect(subject.employer_plan_years(abc_profile, nil)).to eq [renewal_application,predecessor_application]
+      end
+    end
+
+    context "employer with active and canceled plan year" do
+
+      before do
+        predecessor_application.update_attributes({:aasm_state => "active"})
+        renewal_application.update_attributes({:aasm_state => "canceled"})  # renewal application cancelled
+      end
+
+      it "should return active plan year when canceled plan id not passed to export" do
+        expect(subject.employer_plan_years(abc_profile, nil)).to eq [predecessor_application]
+      end
+
+      context "when canceled plan year id passed to export" do
+        it "should return active & canceled plan year" do
+          expect(subject.employer_plan_years(abc_profile, renewal_application.id.to_s)).to eq [renewal_application, predecessor_application]
+        end
+      end
+    end
+
+    context "employer with terminated plan year" do
+      before do
+        predecessor_application.update_attributes({:aasm_state => "terminated"}) # active application terminated
+        renewal_application.update_attributes({:aasm_state => "canceled"})
+      end
+
+      it "should return terminated plan year" do
+        expect(subject.employer_plan_years(abc_profile, nil)).to eq [predecessor_application]
+      end
+    end
+
+    context "employer with terminated pending plan year " do
+      before do
+        predecessor_application.update_attributes({:aasm_state => "termination_pending"})
+        renewal_application.update_attributes({:aasm_state => "canceled"})
+      end
+
+      it "should return the terminated pending plan year" do
+        expect(subject.employer_plan_years(abc_profile, nil)).to eq [predecessor_application]
       end
     end
   end

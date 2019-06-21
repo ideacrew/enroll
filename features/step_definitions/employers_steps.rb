@@ -531,6 +531,19 @@ Given /^the employer has broker agency profile$/ do
   employer.employer_profile.save!
 end
 
+Given(/^(.*?) employer is on Employee Roster page$/) do |legal_name|
+  employer_profile = employer_profile(legal_name)
+  visit benefit_sponsors.profiles_employers_employer_profile_path(employer_profile.id, :tab => 'employees')
+end
+
+Then(/^employer should (.*?) bulk actions dropdown in (.*?)$/) do |action, state|
+  if action == 'not see' && state == 'DC'
+    expect(page).not_to have_content('Bulk Actions')
+  else
+    expect(page).to have_content('Bulk Actions')
+  end
+end
+
 When /^they visit the Employer Home page$/ do
   visit employers_employer_profile_path(employer.employer_profile) + "?tab=home"
 end
@@ -646,6 +659,7 @@ And /^employer clicks on linked employee without address$/ do
 end
 
 Then /^employer should see the address on the roster$/ do
+  find('.edit_census_employee', text: 'Address', wait: 5)
   expect(page).to have_content /Address/
 end
 
@@ -665,16 +679,17 @@ end
 
 And /^employer clicks on non-linked employee with address$/ do
   @census_employees.first.update_attributes(aasm_state: "eligible")
-  click_link @census_employees.first.full_name
+  find(semantic_link_class(@census_employees.first.full_name), wait: 5).click
 end
 
 And /^employer clicks on non-linked employee without address$/ do
   @census_employees.first.address.delete
   @census_employees.first.update_attributes(aasm_state: "eligible")
-  click_link @census_employees.first.full_name
+  find(semantic_link_class(@census_employees.first.full_name), wait: 5).click
 end
 
 Then /^employer should see employee roaster$/ do
+  find('.employees-tab .heading-text', text: 'Employee Roster', wait: 5)
   expect(page).to have_content "Employee Roster"
 end
 
@@ -704,7 +719,7 @@ And /^employer click on pencil symbol next to employee status bar$/ do
 end
 
 Then /^employer should see the (.*) button$/ do |status|
-  find_link(status.capitalize).visible?
+  find_link(status.capitalize, wait: 10).visible?
 end
 
 When /^employer clicks on (.*) button$/ do |status|
@@ -712,7 +727,7 @@ When /^employer clicks on (.*) button$/ do |status|
 end
 
 When /^employer clicks on the (.*) link$/ do |status|
-  click_link(status.titleize)
+  find(semantic_link_class(status), wait: 5).click
 end
 
 # Then /^employer should see the field to enter (.*) date$/ do |status|

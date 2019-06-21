@@ -5,7 +5,7 @@ class Exchanges::BrokerApplicantsController < ApplicationController
   before_action :find_broker_applicant, only: [:edit, :update]
 
   def index
-    @people = Person.exists(broker_role: true).broker_role_having_agency
+    @people = Person.broker_role_having_agency
 
     status_params = params.permit(:status)
     @status = status_params[:status] || 'applicant'

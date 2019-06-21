@@ -21,7 +21,8 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
   csv << field_names
 
   while offset < org_count
-    Organization.offset(offset).limit(batch_size).where("employer_profile" => {"$exists" => true}).map(&:employer_profile).each do |employer|
+    Organization.offset(offset).limit(batch_size).where("employer_profile" => {"$exists" => true}).all.each do |org|
+      employer = org.employer_profile
       employer.general_agency_accounts.unscoped.all.each do |ga_account|
         next if  (ga_account.nil? || ga_account.general_agency_profile.nil?) ||  ga_account.general_agency_profile.market_kind == "individual"
         csv << [

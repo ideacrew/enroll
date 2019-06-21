@@ -10,6 +10,7 @@ Notifier::Engine.routes.draw do
       get :download_notices
       get :get_tokens
       get :get_placeholders
+      get :get_recipients
       post :delete_notices
       post :upload_notices
     end

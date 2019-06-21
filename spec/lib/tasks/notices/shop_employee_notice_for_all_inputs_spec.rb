@@ -19,9 +19,6 @@ RSpec.describe 'Generate notices to employee by taking hbx_ids, census_ids and e
   before :each do
     $stdout = StringIO.new
     ActiveJob::Base.queue_adapter = :test
-    ENV['event'] = nil
-    ENV['employee_ids'] = nil
-    ENV['hbx_ids'] = nil
   end
 
   after(:each) do
@@ -31,38 +28,35 @@ RSpec.describe 'Generate notices to employee by taking hbx_ids, census_ids and e
 
   context "Trigger Notice to employees", dbclean: :after_each do
     it "when multiple hbx_ids input is given should trigger twice" do
-      ENV['event'] = "rspec-event"
-      ENV['hbx_ids'] = "#{person.hbx_id} #{person2.hbx_id}"
-      Rake::Task['notice:shop_employee_notice_event'].invoke
-      expect(ActiveJob::Base.queue_adapter.enqueued_jobs.count).to eq 2
-      expect($stdout.string).to match(/Notice Triggered Successfully/)
+      ClimateControl.modify event: 'rspec-event', hbx_ids: "#{person.hbx_id} #{person2.hbx_id}" do
+        Rake::Task['notice:shop_employee_notice_event'].invoke
+        expect(ActiveJob::Base.queue_adapter.enqueued_jobs.count).to eq 2
+        expect($stdout.string).to match(/Notice Triggered Successfully/)
+      end
     end
 
     it "should not trigger notice" do
-      ENV['event'] = nil
-      Rake::Task['notice:shop_employee_notice_event'].invoke(hbx_ids: '1231 131323')
-      expect($stdout.string).to match(/Please specify the type of event name/)
+      ClimateControl.modify event: nil do
+        Rake::Task['notice:shop_employee_notice_event'].invoke(hbx_ids: '1231 131323')
+        expect($stdout.string).to match(/Please specify the type of event name/)
+      end
     end
 
     it "when census_employee_id(s) are given" do
-      ENV['event'] = "rspec-event"
       census_employee_role_id = census_employee.id.to_s
       census_employee_2_rol_id = census_employee_2.id.to_s
-      ENV['employee_ids'] = "#{census_employee_role_id} #{census_employee_2_rol_id}"
-      Rake::Task['notice:shop_employee_notice_event'].invoke(employee_ids: "#{census_employee_role_id} #{census_employee_2_rol_id}", event: "rspec-event")
-      expect(ActiveJob::Base.queue_adapter.enqueued_jobs.count).to eq 2
+      ClimateControl.modify event: 'rspec-event', employee_ids: "#{census_employee_role_id} #{census_employee_2_rol_id}" do
+        Rake::Task['notice:shop_employee_notice_event'].invoke(employee_ids: "#{census_employee_role_id} #{census_employee_2_rol_id}", event: "rspec-event")
+        expect(ActiveJob::Base.queue_adapter.enqueued_jobs.count).to eq 2
+      end
     end
 
     it "should trigger only once when one employee_id and one hbx_ids are given" do
-      ENV['event'] = "rspec-event"
-      ENV['employee_ids'] = "#{census_employee.id.to_s}"
-      ENV['hbx_ids'] = "#{person.hbx_id}"
-      person_hbx_id =  "#{person.hbx_id}"
-      census_id = "#{census_employee.id.to_s}"
-      allow(EmployerProfile).to receive(:find).with("987").and_return(employer_profile)
-      Rake::Task['notice:shop_employee_notice_event'].invoke(employee_ids: census_id, hbx_ids:person_hbx_id, event: "rpsec-event")
-      expect(ActiveJob::Base.queue_adapter.enqueued_jobs.count).to eq 1
+      ClimateControl.modify event: 'rspec-event', employee_ids: census_employee.id.to_s, hbx_ids: person.hbx_id do
+        allow(EmployerProfile).to receive(:find).with("987").and_return(employer_profile)
+        Rake::Task['notice:shop_employee_notice_event'].invoke(employee_ids: census_employee.id.to_s, hbx_ids: person.hbx_id, event: "rpsec-event")
+        expect(ActiveJob::Base.queue_adapter.enqueued_jobs.count).to eq 1
+      end
     end
   end
-
 end

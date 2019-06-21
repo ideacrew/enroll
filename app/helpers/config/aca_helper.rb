@@ -11,6 +11,14 @@ module Config::AcaHelper
     Settings.aca.market_kinds.first
   end
 
+  def allow_mid_month_voluntary_terms?
+    Settings.aca.shop_market.mid_month_benefit_application_terminations.voluntary
+  end
+
+  def allow_mid_month_non_payment_terms?
+    Settings.aca.shop_market.mid_month_benefit_application_terminations.non_payment
+  end
+
   def aca_shop_market_employer_family_contribution_percent_minimum
     @aca_shop_market_employer_family_contribution_percent_minimum ||= Settings.aca.shop_market.employer_family_contribution_percent_minimum
   end
@@ -257,5 +265,41 @@ module Config::AcaHelper
 
   def dental_offers_single_plan?
     Settings.aca.dental_plan_options_available.include?("single_plan")
+  end
+
+  def dental_offers_single_carrier?
+    Settings.aca.dental_plan_options_available.include?("single_issuer")
+  end
+
+  def dental_offers_sole_source?
+    Settings.aca.dental_plan_options_available.include?("sole_source")
+  end
+
+  def dental_offers_metal_level?
+    Settings.aca.dental_plan_options_available.include?("metal_level")
+  end
+
+  def dental_offers_custom_creation?
+    Settings.aca.dental_plan_options_available.include?("multi_product")
+  end
+
+  def aca_dental_plan_option_descriptions
+    Settings.plan_option_descriptions.dental.to_h
+  end
+
+  def aca_plan_option_titles
+    Settings.plan_option_titles.to_h
+  end
+
+  def aca_health_plan_options
+    Settings.aca.plan_options_available
+  end
+
+  def aca_dental_plan_options
+    Settings.aca.dental_plan_options_available
+  end
+
+  def aca_default_dental_plan_option
+    Settings.aca.default_dental_option_kind
   end
 end

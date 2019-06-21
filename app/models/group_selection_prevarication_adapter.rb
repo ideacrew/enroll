@@ -197,7 +197,9 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def select_benefit_group(params)
-    if @change_plan.present? && @previous_hbx_enrollment.present?
+    return unless select_market(params) == "shop"
+
+    if @change_plan.present? && @previous_hbx_enrollment.present? && @previous_hbx_enrollment.is_shop?
       @previous_hbx_enrollment.sponsored_benefit_package 
     else
       if (select_market(params) == "shop") && possible_employee_role.present?
@@ -228,9 +230,9 @@ class GroupSelectionPrevaricationAdapter
     end
     if person.has_active_employee_role?
       'shop'
-    elsif person.has_active_consumer_role? && !person.has_active_resident_role?
+    elsif person.is_consumer_role_active?
       'individual'
-    elsif person.has_active_resident_role?
+    elsif person.is_resident_role_active?
       'coverall'
     else
       nil
@@ -287,16 +289,17 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def can_shop_individual?(person)
-    false
+    person.try(:has_active_consumer_role?)
   end
 
   def can_shop_resident?(person)
-    false
+    person.try(:has_active_resident_role?)
   end
 
   def can_shop_both_markets?(person)
-    false
+    can_shop_individual?(person) && can_shop_shop?(person)
   end
+
 
   def is_eligible_for_dental?(employee_role, change_plan, enrollment)
     if change_plan == "change_by_qle"

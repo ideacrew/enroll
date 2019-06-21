@@ -84,7 +84,7 @@ class SpecialEnrollmentPeriod
 
   after_initialize :set_submitted_at
 
-  add_observer ::BenefitSponsors::Observers::SpecialEnrollmentPeriodObserver.new, [:notifications_send]
+  add_observer ::BenefitSponsors::Observers::NoticeObserver.new, [:process_special_enrollment_events]
 
   def start_on=(new_date)
     new_date = Date.parse(new_date) if new_date.is_a? String

@@ -14,6 +14,11 @@ describe UpdateBenefitGroupAssignmentStartDate, dbclean: :after_each do
 
   describe "update benefit group assignment start date" do
 
+    around do |example|
+      ClimateControl.modify fein: plan_year.employer_profile.parent.fein do
+        example.run
+      end
+    end
 
     let!(:benefit_group) { FactoryBot.create(:benefit_group, plan_year: plan_year)}
     let(:plan_year) { FactoryBot.create(:plan_year) }
@@ -23,14 +28,12 @@ describe UpdateBenefitGroupAssignmentStartDate, dbclean: :after_each do
     let(:census_employee) { FactoryBot.create(:census_employee, employer_profile_id: plan_year.employer_profile.id)}
 
     before(:each) do
-      ENV["fein"] = plan_year.employer_profile.parent.fein
       allow(benefit_group_assignment).to receive(:plan_year).and_return(plan_year)
       benefit_group_assignments = [benefit_group_assignment]
       allow(CensusEmployee).to receive(:find).and_return(census_employee)
       allow(census_employee).to receive(:benefit_group_assignments).and_return benefit_group_assignments
       allow(benefit_group_assignment).to receive(:benefit_group).and_return(benefit_group)
       allow(benefit_group_assignment).to receive_message_chain(:hbx_enrollment, :benefit_group).and_return(benefit_group)
-
     end
 
 

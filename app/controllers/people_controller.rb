@@ -192,22 +192,24 @@ class PeopleController < ApplicationController
     @person = find_person(params[:id])
     @family = @person.primary_family
     @person.updated_by = current_user.oim_id unless current_user.nil?
-    if @person.has_active_consumer_role? && request.referer.include?("insured/families/personal")
+    if @person.is_consumer_role_active? && request.referer.include?("insured/families/personal")
       update_vlp_documents(@person.consumer_role, 'person')
       redirect_path = personal_insured_families_path
     else
       redirect_path = family_account_path
     end
-    if @person.has_active_consumer_role?
-      @person.consumer_role.check_for_critical_changes(person_params, @family)
-    end
+    @info_changed, @dc_status = sensitive_info_changed?(@person.consumer_role)
     respond_to do |format|
       if @person.update_attributes(person_params.except(:is_applying_coverage))
+        if @person.is_consumer_role_active?
+          @person.consumer_role.check_for_critical_changes(@family, info_changed: @info_changed, no_dc_address: person_params["no_dc_address"], dc_status: @dc_status)
+        end
         @person.consumer_role.update_attribute(:is_applying_coverage, person_params[:is_applying_coverage]) if @person.consumer_role.present?
         format.html { redirect_to redirect_path, notice: 'Person was successfully updated.' }
         format.json { head :no_content }
       else
-        if @person.has_active_consumer_role?
+        @person.addresses = @old_addresses
+        if @person.is_consumer_role_active?
           bubble_consumer_role_errors_by_person(@person)
           @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@person.consumer_role)
         end
@@ -223,7 +225,7 @@ class PeopleController < ApplicationController
   def create
     sanitize_person_params
     @person = Person.find_or_initialize_by(encrypted_ssn: Person.encrypt_ssn(params[:person][:ssn]), date_of_birth: params[:person][:dob])
-    
+
     # person_params
     respond_to do |format|
       if @person.update_attributes(person_params)

@@ -110,3 +110,41 @@ Then(/HBX Admin should see the home page with text coverage selected/) do
   expect(page).to have_content('Coverage Selected')
   screenshot("home_page")
 end
+
+Then(/^Hbx Admin should see an Transition family members link$/) do
+  find_link('Transition Family Members').visible?
+end
+
+When(/^Hbx Admin clicks Transition family members link$/) do
+  FactoryBot.create(:qualifying_life_event_kind, reason: 'eligibility_failed_or_documents_not_received_by_due_date', title: 'Not eligible for marketplace coverage due to citizenship or immigration status')
+  click_link('Transition Family Members')
+end
+
+Then(/^Hbx Admin should see the form being rendered to transition each family members seperately$/) do
+  expect(page).to have_content(/Transition Family Members/i)
+  expect(page).to have_content(/Transition User?/i)
+end
+
+When(/^Hbx Admin enter\/update information of each member individually$/) do
+  find("#transition_user", wait: 5).click
+  find('input.date-picker').click
+  find('.ui-state-highlight', wait: 5).click
+end
+
+When(/^Hbx Admin clicks submit button$/) do
+  click_button 'Submit'
+end
+
+Then(/^Hbx Admin should show the Transition Results and the close button$/) do
+  page.driver.browser.switch_to.alert.accept
+  expect(page).to have_content(/Market Transitions Added/i)
+  expect(page).to have_content(/Close/i)
+end
+
+When(/^Hbx Admin clicks close button$/) do
+  click_link 'Close'
+end
+
+Then(/^Transition family members form should be closed$/) do
+  expect(page).not_to have_content(/Transition Family Members/i)
+end

@@ -21,18 +21,22 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerNoBinderPaymentRece
   let!(:date_mock_object) { BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new.calculate_open_enrollment_date(TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date].next_day }
   let!(:person) { FactoryBot.create(:person, :with_family) }
   let!(:census_employee)  { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile ) }
-  let!(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: employer_profile, census_employee_id: census_employee.id)}
+  let!(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: employer_profile, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: employer_profile.id)}
 
   before do
     census_employee.update_attributes(employee_role_id: employee_role.id)
   end
 
-  describe "ModelEvent" do
+  describe "ModelEvent", :dbclean => :after_each do
     it "should trigger model event" do
-      benefit_application.class.observer_peers.keys.each do |observer|
-        expect(observer).to receive(:notifications_send) do |instance, model_event|
+      benefit_application.class.observer_peers.keys.select { |ob| ob.is_a? BenefitSponsors::Observers::NoticeObserver }.each do |observer|
+        expect(observer).to receive(:process_application_events) do |_instance, model_event|
           expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
           expect(model_event).to have_attributes(:event_key => :initial_employer_no_binder_payment_received, :klass_instance => benefit_application, :options => {})
+        end
+
+        expect(observer).to receive(:process_application_events) do |_instance, model_event|
+          expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
         end
       end
       BenefitSponsors::BenefitApplications::BenefitApplication.date_change_event(date_mock_object)
@@ -41,9 +45,8 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerNoBinderPaymentRece
 
   describe "NoticeTrigger" do
     context "whne binder payment is missed" do
-      subject { BenefitSponsors::Observers::BenefitApplicationObserver.new  }
-
-      let(:model_event) { BenefitSponsors::ModelEvents::ModelEvent.new(:initial_employer_no_binder_payment_received, PlanYear, {}) }
+      subject { BenefitSponsors::Observers::NoticeObserver.new  }
+      let(:model_event) { BenefitSponsors::ModelEvents::ModelEvent.new(:initial_employer_no_binder_payment_received, BenefitSponsors::BenefitApplications::BenefitApplication, {}) }
 
       it "should trigger notice event for initial employer and employees" do
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
@@ -59,7 +62,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerNoBinderPaymentRece
           expect(payload[:event_object_kind]).to eq 'BenefitSponsors::BenefitApplications::BenefitApplication'
           expect(payload[:event_object_id]).to eq benefit_application.id.to_s
         end
-        subject.notifications_send(benefit_application, model_event)
+        subject.process_application_events(benefit_application, model_event)
       end
     end
   end
@@ -114,7 +117,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerNoBinderPaymentRece
     end
   end
 
-   describe "NoticeBuilder employer" do
+  describe "NoticeBuilder employer" do
 
     let(:data_elements) {
       [

@@ -4,6 +4,10 @@ Then(/^Hbx Admin should see the list of primary applicants and an Action button$
   end
 end
 
+When("Hbx Admin clicks Families Link") do
+  find('#families', wait: 10).click
+end
+
 Then(/^Hbx Admin should see the list of user accounts and an Action button$/) do
   within('.effective-datatable') do
     expect(page).to have_css('.dropdown-toggle', count: 2)
@@ -11,8 +15,8 @@ Then(/^Hbx Admin should see the list of user accounts and an Action button$/) do
 end
 
 # FIXME: Make this take a 'for' argument, that way we can select which user
-When(/^Hbx Admin clicks on the Action button$/) do
-  find(:xpath, "//*[@id='dropdownMenu1']", :wait => 10).trigger("click")
+When(/^Hbx Admin clicks Action button$/) do
+  find_all('.dropdown.pull-right', text: 'Actions')[0].click
 end
 
 When(/^Hbx Admin click Action button$/) do
