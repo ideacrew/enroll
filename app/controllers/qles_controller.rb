@@ -1,5 +1,7 @@
 class QlesController < ApplicationController
 
+  # before_action :can_view_manage_qle?
+
   def new_manage_qle
     @manage_qle = ::Forms::ManageQleForm.for_new(params.permit!.to_h)
   end
@@ -15,7 +17,14 @@ class QlesController < ApplicationController
   end
 
   def create
-    binding.pry
     # @qle = ::Forms::QleForm.for_create(params)
   end
+
+  private
+
+  # def can_view_manage_qle?
+  #   unless authorize @manage_qle, :view_manage_qle?, policy_class: QlePolicy
+  #    redirect_to root_path, :flash => { :error => "Access view/manage qles not allowed." }
+  #   end
+  # end
 end
