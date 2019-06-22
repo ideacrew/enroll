@@ -1,5 +1,4 @@
 module Mongorder
-
   def build_search_order_expression(s_field, s_order)
     base_fields = self.default_search_order
     return base_fields unless s_field
@@ -10,7 +9,6 @@ module Mongorder
   end
 
   def search(search_string, s_field = nil, s_order = nil)
-    search_order_expr = build_search_order_expression(s_field, s_order)
     search_scope = if search_string
                      self.where(
                        self.search_hash(search_string)
@@ -18,7 +16,5 @@ module Mongorder
                    else
                      self
                    end
-    search_scope.order_by(search_order_expr)
   end
-
 end
