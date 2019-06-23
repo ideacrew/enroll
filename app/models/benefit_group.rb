@@ -432,6 +432,8 @@ class BenefitGroup
         Plan.valid_shop_health_plans("carrier", carrier_for_elected_plan, start_on.year).to_a
       end
     when "metal_level"
+      metal_level_for_elected_plan = reference_plan.metal_level if metal_level_for_elected_plan.blank?
+
       if constrain_service_areas?
         Plan.valid_shop_health_plans_for_service_area("metal_level", metal_level_for_elected_plan, start_on.year, @profile_and_service_area_pairs).to_a
       else
