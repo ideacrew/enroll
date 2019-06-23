@@ -14,6 +14,7 @@ import '@fortawesome/fontawesome-free/svgs/regular/copyright.svg';
 import '@fortawesome/fontawesome-free/svgs/regular/envelope.svg';
 import '@fortawesome/fontawesome-free/svgs/solid/phone.svg';
 import '@fortawesome/fontawesome-free/svgs/solid/question.svg';
+import 'sweetalert2';
 
 
 Rails.start()

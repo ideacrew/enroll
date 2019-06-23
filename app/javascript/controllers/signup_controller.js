@@ -1,9 +1,9 @@
-
-import { Controller } from "stimulus"
+import { Controller } from "stimulus";
+import Swal from 'sweetalert2';
 
 export default class extends Controller {
 
-  static targets = [ "passwordField", "usernameField", "passwordConfirmationField" ]
+  static targets = [ "passwordField", "usernameField", "passwordConfirmationField", "optionalEmail" ]
 
 connect() {
   // Equivalent to document ready
@@ -286,6 +286,18 @@ validateEmail() {
     optionalemailField.classList.add('d-none');
   } else {
     optionalemailField.classList.remove('d-none');
+  }
+}
+
+validateEmailFormat() {
+  let email = this.optionalEmailTarget.value;
+  if (!this.isEmail(email)) {
+    Swal.fire({
+      title: 'Inproper email format detected',
+      type: 'error',
+      text: 'Please enter a valid email address.'
+    });
+    this.optionalEmailTarget.value = '';
   }
 }
 
