@@ -1067,10 +1067,6 @@ describe Family, "given a primary applicant and a dependent", dbclean: :after_ea
   let(:person_two) { FactoryBot.create(:person) }
   let(:family_member_dependent) { FactoryBot.build(:family_member, person: person_two, family: family)}
   let(:family) { FactoryBot.build(:family, :with_primary_family_member, person: person)}
-  let(:person) { FactoryBot.create(:person)}
-  let(:person_two) { FactoryBot.create(:person) }
-  let(:family_member_dependent) { FactoryBot.build(:family_member, person: person_two, family: family)}
-  let(:family) { FactoryBot.build(:family, :with_primary_family_member, person: person)}
 
   it "should not build the consumer role for the dependents if primary do not have a consumer role" do
     expect(family_member_dependent.person.consumer_role).to eq nil
@@ -1101,9 +1097,6 @@ describe Family, "given a primary applicant and a dependent", dbclean: :after_ea
     family_member_dependent.family.check_for_consumer_role
     expect(family_member_dependent.person.consumer_role).to eq cr
   end
-
-
-
 end
 
 describe Family, ".expire_individual_market_enrollments", dbclean: :after_each do
@@ -1325,15 +1318,14 @@ describe "active dependents" do
   end
 end
 
-describe Family, "given a primary applicant and a dependent", dbclean: :after_each do
+describe Family, "scopes", dbclean: :after_each do
   include_context "setup benefit market with market catalogs and product packages"
   include_context "setup initial benefit application"
 
-  let!(:person) { FactoryBot.create(:person, last_name: 'John', first_name: 'Doe') }
+  let!(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, last_name: 'John', first_name: 'Doe') }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, :person => person) }
   let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_year }
   let!(:plan) { FactoryBot.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01", csr_variant_id: "01")}
-  let(:person) {FactoryBot.create(:person)}
   let!(:benefit_group) { current_benefit_package }
   let!(:census_employee) { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile, benefit_group: current_benefit_package ) }
   let!(:employee_role) { FactoryBot.create(:employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id) }
@@ -1370,18 +1362,22 @@ describe Family, "given a primary applicant and a dependent", dbclean: :after_ea
   
         )
       }
+
+    let!(:ivl_enr_member) {
+      FactoryBot.create(:hbx_enrollment_member,
+        hbx_enrollment: ivl_enrollment,
+        applicant_id: family_member.id)
+    }
+
     let!(:start_date) { enrollment.updated_at}
     let!(:end_date) { enrollment.updated_at + 1.day}
     let!(:created_at) { ivl_enrollment.created_at + 2.days }
 
-  context '.enrolled_policy' do 
+  context '.enrolled_policy' do
     it "should return the enrolled policy for a family member" do
-      family.enrollments.first.update_attributes!(aasm_state:"enrolled_contingent")
-      member = family.enrollments.first.hbx_enrollment_members.build(applicant_id:family_member.id,eligibility_date:TimeKeeper.date_of_record, coverage_start_on:TimeKeeper.date_of_record + 1.day)
-      member.save!
-      family.save!
-      family.reload
-      expect(family.enrolled_policy(family_member)).to eq  family.enrollments.first
+      person.consumer_role.update_attributes(aasm_state: 'verification_outstanding')
+      ivl_enrollment.save!
+      expect(family.enrolled_policy(family_member)).to eq family.enrollments.first
     end
   end
 
