@@ -98,6 +98,7 @@ class MigrateDcBrokerAgencyProfiles < Mongoid::Migration
           broker_agency_profile = old_broker_agency_profile(staff.broker_agency_profile_id.to_s)
 
           if broker_agency_profile.present?
+            # TODO refactor
             new_org = BenefitSponsors::Organizations::Organization.where(hbx_id: broker_agency_profile.hbx_id).first
             if new_org.present? && new_org.broker_agency_profile.present?
               staff.update_attributes(benefit_sponsors_broker_agency_profile_id: new_org.broker_agency_profile.id)
@@ -113,6 +114,7 @@ class MigrateDcBrokerAgencyProfiles < Mongoid::Migration
         if person.broker_role.present?
           broker_agency_profile = old_broker_agency_profile(person.broker_role.broker_agency_profile_id.to_s)
           if broker_agency_profile.present?
+            # TODO refactor
             new_org = BenefitSponsors::Organizations::Organization.where(hbx_id: broker_agency_profile.hbx_id).first
             if new_org.present? && new_org.broker_agency_profile.present?
               person.broker_role.update_attributes(benefit_sponsors_broker_agency_profile_id: new_org.broker_agency_profile.id)
@@ -196,19 +198,26 @@ class MigrateDcBrokerAgencyProfiles < Mongoid::Migration
   end
 
   def self.old_broker_agency_profile(id)
-    Rails.cache.fetch("broker_agency_profile_#{id}", expires_in: 2.hour) do
+    Rails.cache.fetch("broker_agency_profile_#{id}", expires_in: 6.hour) do
       ::BrokerAgencyProfile.find(id)
     end
   end
 
+  def self.new_broker_agency_for_old_profile_id(id)
+    Rails.cache.fetch("new_broker_agency_#{id}", expires_in: 6.hour) do
+      old_org = old_broker_agency_profile(id)
+      BenefitSponsors::Organizations::Organization.where(hbx_id: old_org.hbx_id).first.broker_agency_profile
+    end
+  end
+
   def self.old_general_agency_profile(id)
-    Rails.cache.fetch("general_agency_profile_#{id}", expires_in: 2.hour) do
+    Rails.cache.fetch("general_agency_profile_#{id}", expires_in: 6.hour) do
       ::GeneralAgencyProfile.find(id)
     end
   end
 
   def self.new_general_agency_for_old_profile_id(id)
-    Rails.cache.fetch("new_general_agency_#{id}", expires_in: 2.hour) do
+    Rails.cache.fetch("new_general_agency_#{id}", expires_in: 6.hour) do
       old_org = old_general_agency_profile(id)
       BenefitSponsors::Organizations::Organization.where(hbx_id: old_org.hbx_id).first.general_agency_profile
     end

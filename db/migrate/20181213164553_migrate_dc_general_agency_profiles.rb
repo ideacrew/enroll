@@ -174,13 +174,13 @@ class MigrateDcGeneralAgencyProfiles < Mongoid::Migration
   end
 
   def self.old_general_agency_profile(id)
-    Rails.cache.fetch("general_agency_profile_#{id}", expires_in: 2.hour) do
+    Rails.cache.fetch("general_agency_profile_#{id}", expires_in: 6.hour) do
       ::GeneralAgencyProfile.find(id)
     end
   end
 
   def self.new_general_agency_for_old_profile_id(id)
-    Rails.cache.fetch("new_general_agency_#{id}", expires_in: 2.hour) do
+    Rails.cache.fetch("new_general_agency_#{id}", expires_in: 6.hour) do
       old_org = old_general_agency_profile(id)
       BenefitSponsors::Organizations::Organization.where(hbx_id: old_org.hbx_id).first.general_agency_profile
     end
