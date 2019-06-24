@@ -9,12 +9,12 @@
             <%= form_for @manage_qle, as: :manage_qle, url: create_manage_qle_qles_path, method: :post do |f| %>
               <div class="radio_option">
                 <div>
-                  <%= radio_button_tag "market_kind", "#{f.object.market_kind}", value: true, class: "required floatlabel"  %>
+                  <%= f.radio_button :action, :new_qle, class: "required floatlabel"  %>
                   <label><span>Create a custom QLE</span></label>
                 </div>
                 <hr/>
               <div>
-                <%= radio_button_tag "market_kind", "#{f.object.market_kind}", value: true, class: "required floatlabel"  %>
+                <%= f.radio_button :action, :modify_qle, value: '', class: "required floatlabel"  %>
                 <label><span>Modify existing QLE</span></label>
               </div>
               <div>
@@ -22,8 +22,8 @@
               </div>
               <hr/>
               <div>
-                <%= radio_button_tag "market_kind", "#{f.object.market_kind}", value: true, class: "required floatlabel"  %>
-                <label><span>Deactivate active QLE's</span></label>
+                <%= f.radio_button :action, :deactivate_qle, value: '', class: "required floatlabel"  %>
+                <label><span>Deactivate active QLE</span></label>
               </div>
               <div>
                 <%= select_tag("which_qle_kind_to_deactivate", options_for_select(QualifyingLifeEventKind.all.collect { |qle| [qle.title, qle.id] }.unshift(["Select QLE to deactivate", nil])))%>
