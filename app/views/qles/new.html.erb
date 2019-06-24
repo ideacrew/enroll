@@ -29,12 +29,15 @@
           </div>
           <div class='row'>
             <div class ='col-md-6'>
-              <%= label_tag "Visibility" %>
-              <%= f.select :visibility, { 'User Self Service' => :user_self_service, "Admin Only" => :admin_only } %>
+              <p><%= label_tag "Visibility" %><p>
+              <p><%= label_tag "Self Service" %>
+              <%= f.radio_button :visibility, :self_service %></p>
+              <p><%= label_tag "Admin Only" %>
+              <%= f.radio_button :visibility,:admin_only %></p>
             </div>
           </div>
-          <%= link_to "Create Attestation for this QLE", nil , data: { action: "qle#showQuestions" } %>
-          <div id="question-container">
+          <%= link_to "Create Attestation for this QLE", nil , data: { action: "qle#showQuestions" }, class: "create-question-form"%>
+          <div id = "question-container" class="question-container hidden">
             <% @qle.custom_qle_questions.each do |question| %>
               <%= f.fields_for :custom_qle_questions, question do |question_fields| %>
                 <div class='row'>
@@ -46,11 +49,12 @@
             <% end %>
             <%= f.fields_for :custom_qle_questions, @qle.custom_qle_questions.build do |question_fields| %>
               <div data-target="qle.question" class="hidden row">
-                <div class='col-md-6'><%= render partial: "question", :locals => { f: question_fields } %></div>
+                <div class='col-md-6 create-question-form'><%= render partial: "question", :locals => { f: question_fields } %></div>
               </div>
             <% end %>
+            
             <div class='row'>
-              <div class ='col-md-6'><a data-action="qle#addQuestion" >Create a new Question</a></div>
+              <div class ='col-md-6 create-question-form' ><a data-action="qle#addQuestion" >Create a new Question</a></div>
             </div>
           </div>
           <div class='row'>

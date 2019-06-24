@@ -1,13 +1,13 @@
 
-  <div class="row js-new-date-response hidden">
-    <div class="col-md-3">
-      <span><%= f.select "operator", { "Before" => :before, "After" => :after, "Between" => :between }, data: { action: 'qle#changeDateOperator' } , :class => 'form-control'%></span>
+  <div class="row js-new-date-response ">
+    <div class="col-md-2 create-question-form">
+      <%= f.select "operator", { "Before" => :before, "After" => :after, "Between" => :between}, data: { action: "qle#changeDateOperator" }, :class => 'form-control' %>
     </div>
     <div class="col-md-3">
       <%= f.text_field :value, class: "form-control-custom-qle uidatepicker", autocomplete: :off %>
     </div>
     <div class="col-md-3 js-value-2 hidden">
-      <%= f.text_field :value_2, class: "form-control-custom-qle uidatepicker", autocomplete: :off %>
+      <%= f.text_field :value_2, class: " form-control-custom-qle uidatepicker", autocomplete: :off %>
     </div>
     <div class="col-md-3">
       <span>
