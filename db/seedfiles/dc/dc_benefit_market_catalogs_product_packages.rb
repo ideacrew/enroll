@@ -25,55 +25,28 @@ Mongoid::Migration.say_with_time("Load DC Benefit Market Catalogs") do
         product_class.by_product_package(product_package).collect { |prod| prod.create_copy_for_embedding }
       end
 
+      def product_packages(market, product_kind)
+        if market == :aca_shop
+          product_kind == :health ? BenefitMarkets::Products::HealthProducts::HealthProduct::PRODUCT_PACKAGE_KINDS : BenefitMarkets::Products::DentalProducts::DentalProduct::PRODUCT_PACKAGE_KINDS
+        else
+          product_kind == :health ? BenefitMarkets::Products::HealthProducts::HealthProduct::CONGRESSIONAL_PRODUCT_PACKAGE_KINDS : []
+        end
+      end
+
       [:health, :dental].each do |product_kind|
 
         puts "Creating #{product_kind.to_s} Product Packages..."
-        product_package = benefit_market_catalog.product_packages.new({
-                                                                          benefit_kind: kind, product_kind: product_kind, title: 'Single Issuer',
-                                                                          package_kind: :single_issuer,
-                                                                          application_period: benefit_market_catalog.application_period,
-                                                                          contribution_model: contribution_model,
-                                                                          pricing_model: pricing_model
-                                                                      })
-
-        product_package.products = products_for(product_package, calender_year)
-        product_package.save! if product_package.valid?
-
-        if product_kind.to_s == "health"
+        product_packages(kind, product_kind).each do |package_kind|
           product_package = benefit_market_catalog.product_packages.new({
-                                                                            benefit_kind: kind, product_kind: product_kind, title: 'Metal Level',
-                                                                            package_kind: :metal_level,
+                                                                            benefit_kind: kind, product_kind: product_kind, title: package_kind.to_s,
+                                                                            package_kind: package_kind,
                                                                             application_period: benefit_market_catalog.application_period,
                                                                             contribution_model: contribution_model,
                                                                             pricing_model: pricing_model
                                                                         })
 
           product_package.products = products_for(product_package, calender_year)
-          product_package.save! if product_package.valid?
-
-          product_package = benefit_market_catalog.product_packages.new({
-                                                                            benefit_kind: kind, product_kind: product_kind, title: 'Single Product',
-                                                                            package_kind: :single_product,
-                                                                            application_period: benefit_market_catalog.application_period,
-                                                                            contribution_model: contribution_model,
-                                                                            pricing_model: pricing_model
-                                                                        })
-
-          product_package.products = products_for(product_package, calender_year)
-          product_package.save! if product_package.valid?
-        end
-
-        if product_kind.to_s == "dental"
-          product_package = benefit_market_catalog.product_packages.new({
-                                                                            benefit_kind: kind, product_kind: product_kind, title: 'Multi Product',
-                                                                            package_kind: :multi_product,
-                                                                            application_period: benefit_market_catalog.application_period,
-                                                                            contribution_model: contribution_model,
-                                                                            pricing_model: pricing_model
-                                                                        })
-
-          product_package.products = products_for(product_package, calender_year)
-          product_package.save! if product_package.valid?
+          product_package.save! if product_package.valid? && product_package.products.present?
         end
       end
     end
