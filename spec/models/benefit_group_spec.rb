@@ -92,6 +92,22 @@ describe BenefitGroup, "instance methods" do
     end
   end
 
+  context "#elected_plans_by_option_kind" do
+    let!(:plan1) {FactoryGirl.create(:plan, active_year: benefit_group.start_on.year)}
+    let!(:plan2) {FactoryGirl.create(:plan,active_year: benefit_group.start_on.year)}
+    let!(:plan3) {FactoryGirl.create(:plan,metal_level: "gold", active_year: benefit_group.start_on.year)}
+    before do
+      benefit_group.plan_option_kind = "metal_level"
+      benefit_group.metal_level_for_elected_plan = "silver"
+    end
+    it "should include the plans from the same metal level" do
+      expect(benefit_group.elected_plans_by_option_kind.sort).to eq [plan1,plan2]
+    end
+    it "should not include the plans from other  metal levels" do
+      expect(benefit_group.elected_plans_by_option_kind).not_to include(plan3)
+    end
+  end
+
   describe "should check if valid for census_employees" do
     let(:terminated_on_date) { Date.new(2015, 7, 31) }
     let(:hired_on_date) { Date.new(2015, 6, 1) }
