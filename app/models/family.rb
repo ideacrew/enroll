@@ -235,8 +235,7 @@ class Family
     :"_id".in => HbxEnrollment.where(
       aasm_state: "enrolled_contingent",
       effective_on: { :"$gte" => TimeKeeper.date_of_record.beginning_of_year, :"$lte" =>  TimeKeeper.date_of_record.end_of_year }
-      )
-    )
+      ).pluck(:family_id))
   }
   
   # Replaced scopes for moving HbxEnrollment to top level
