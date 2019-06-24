@@ -104,7 +104,11 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
       end
     end
     context "when special verification does not exist" do
+      let (:ssn_type) { FactoryBot.build(:verification_type, type_name: 'Social Security Number', due_date: (Date.today + 95.days), due_date_type: 'notice')}
       it "should update the due date" do
+        person.consumer_role.verification_types.by_name('Social Security Number').first.due_date = ssn_type.due_date
+        person.consumer_role.verification_types.by_name('Social Security Number').first.due_date_type = ssn_type.due_date_type
+        person.consumer_role.save!
         @eligibility_notice.build
         expect(@eligibility_notice.document_due_date(person, ssn_type)).to eq (TimeKeeper.date_of_record+Settings.aca.individual_market.verification_due.days)
       end
