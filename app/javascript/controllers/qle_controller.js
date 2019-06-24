@@ -12,6 +12,18 @@ export default class extends Controller {
     addButtonRow.parentNode.insertBefore(newQuestion, addButtonRow);
   }
 
+  changeDateOperator(e){
+  }
+
+  showQuestion(e){
+    var question = e.currentTarget.value;
+    document.getElementById('question-show').innerHTML =  question
+  //  console.log(e.currentTarget.closest('.question-show'))
+
+    e.currentTarget.closest('#qle-question-form').classList.add('hidden')
+    document.getElementById('js-question').classList.remove('hidden')
+
+  }
   addDateResponse(e) {
     var answer = e.currentTarget.closest('.js-answer');
     var newResponse = document.importNode(answer.querySelector('.js-new-date-response'), true);
@@ -20,6 +32,11 @@ export default class extends Controller {
     newResponse.classList.add('js-response');
     this.uniqueInputs(newResponse);
     answer.querySelector('.js-date-responses').appendChild(newResponse);
+  }
+  changeMultipleChoiceResult(e){
+    console.log("hit")
+
+
   }
 
   addMultipleChoiceResponse(e) {
@@ -38,8 +55,8 @@ export default class extends Controller {
   }
 
   showQuestions(e){
-    console.log(e.currentTarget.closest('#question-container'))
-   e.currentTarget
+    e.preventDefault()
+    document.getElementById('question-container').classList.remove('hidden')
 
   }
   showAnswer(e){
