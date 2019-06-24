@@ -624,6 +624,7 @@ Rails.application.routes.draw do
       post :create_manage_qle
       get :new
       post :create
+      post :edit_manage_qle
     end
   end
 

@@ -17,5 +17,12 @@ module Forms
       new(params)
     end
 
+    def self.for_edit(params)
+      new(params)
+    end
+
+    def self.for_deactivate(params)
+      new(params)
+    end
   end
 end

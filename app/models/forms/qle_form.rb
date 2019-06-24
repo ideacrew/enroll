@@ -3,13 +3,13 @@ module Forms
   	include Virtus.model
 
     attribute :action_kind_options, String
-	  attribute :event_kind_label, String
-	  attribute :action_kind, String
-	  attribute :title, String
-	  attribute :action_kind, String
-	  attribute :effective_on_kinds, Array
-	  attribute :reason, String
-	  attribute :edi_code, String
+	attribute :event_kind_label, String
+	attribute :action_kind, String
+	attribute :title, String
+	attribute :action_kind, String
+	attribute :effective_on_kinds, Array
+	attribute :reason, String
+	attribute :edi_code, String
 	  attribute :market_kind, String
 	  attribute :tool_tip, String
 	  attribute :pre_event_sep_in_days, Integer
