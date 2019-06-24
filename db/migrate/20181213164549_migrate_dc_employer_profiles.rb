@@ -54,12 +54,14 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
       Organization.collection.aggregate([
         {"$match" => {"employer_profile" => { "$exists" => true }}},
         {"$project" => {"hbx_id"=> 1, "employer_profile.profile_source"=> 1,
+                        "employer_profile.broker_agency_accounts" => 1,
                         "employer_profile.registered_on"=> 1,"employer_profile.plan_years" => 1}},
 
         {"$unwind" => {"path": "$employer_profile.plan_years", "preserveNullAndEmptyArrays": true}},
 
         {"$project" => {
             "hbx_id" => 1, 'employer_profile.profile_source'=> 1, "employer_profile.registered_on" => 1,
+            "employer_profile.broker_agency_accounts" => { "$ifNull" => [ "$employer_profile.broker_agency_accounts", []]},
             "benefit_application" => {"fte_count" => "$employer_profile.plan_years.fte_count",
                                       "_id" => "$employer_profile.plan_years._id",
                                       "pte_count"=> "$employer_profile.plan_years.pte_count",
@@ -73,10 +75,12 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
         {"$group"=>{"_id" =>  "$_id","hbx_id" => {"$last" => "$hbx_id"},
                     "source_kind" => {"$last"=> "$employer_profile.profile_source"},
                     "registered_on" => {"$last" => "$employer_profile.registered_on"},
+                    "broker_agency_accounts" => {"$last" => "$employer_profile.broker_agency_accounts"},
                     "benefit_applications" => {"$push" => {"$cond" => { if: { "$ne": [ "$benefit_application.effective_period", {}]},
                                                                         then: "$benefit_application", else: [],}}}}},
         {"$out" => "benefit_sponsors_benefit_sponsorships_benefit_sponsorships"}]).each
-      BenefitSponsors::BenefitSponsorships::BenefitSponsorship.collection.update_many({:benefit_applications => [[]]}, {"$set" => {"benefit_applications" => []}})
+      BenefitSponsors::BenefitSponsorships::BenefitSponsorship.collection.update_many({:benefit_applications => [[]]}, {"$unset" => {"benefit_applications" => []}})
+      BenefitSponsors::BenefitSponsorships::BenefitSponsorship.collection.update_many({:broker_agency_accounts => []}, {"$unset" => {"broker_agency_accounts"=> 1 }})
     end
 
     say_with_time("Time taken to migrate organizations") do
@@ -98,8 +102,8 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
             @benefit_sponsorship.benefit_market = market
             @benefit_sponsorship.source_kind = @old_profile.profile_source.to_sym
             @benefit_sponsorship.organization_id = new_organization.id
-            hbx_id = @benefit_sponsorship.send(:generate_hbx_id)
-            @benefit_sponsorship.hbx_id = hbx_id
+            @benefit_sponsorship.unset(:hbx_id)
+            @benefit_sponsorship.send(:generate_hbx_id)
 
             set_benefit_sponsorship_state
             set_benefit_sponsorship_effective_on
