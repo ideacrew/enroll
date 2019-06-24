@@ -2,8 +2,7 @@ module BenefitMarkets
   module Products
     class HealthProducts::HealthProduct < BenefitMarkets::Products::Product
 
-      PRODUCT_PACKAGE_KINDS = [:single_issuer, :metal_level, :single_product]  #shop by default
-      CONGRESSIONAL_PRODUCT_PACKAGE_KINDS  = [:metal_level]
+      PRODUCT_PACKAGE_KINDS = [:single_issuer, :metal_level, :single_product]
       METAL_LEVEL_KINDS     = [:bronze, :silver, :gold, :platinum, :catastrophic]
 
       HEALTH_PLAN_MAP  = {
