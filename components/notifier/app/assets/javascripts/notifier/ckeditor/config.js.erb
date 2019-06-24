@@ -46,8 +46,14 @@ CKEDITOR.editorConfig = function( config )
   CKEDITOR.dtd.$removeEmpty.span = 0;
   CKEDITOR.dtd.$removeEmpty.i = 0;
   config.allowedContent = true;
-
-
+  config.font_names =
+    'Open Sans;'+
+    'Georgia;' +
+    'Lucida Sans Unicode;' +
+    'Tahoma;'+
+    'Times New Roman/Times New Roman, Times, serif;' +
+    'Trebuchet MS;'+
+    'Verdana;';
   config.language = 'en';
 
   config.tokenStart = '#{';
