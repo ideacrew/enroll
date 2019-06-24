@@ -3,32 +3,32 @@
     <div class='col-md-9'>
       <div class="panel panel-primary">
         <div class="panel-heading">
-          <center><strong>Manage QLE</strong></center>
+          <center><strong>Manage Qualifying Life Events</strong></center>
         </div>
           <div class="panel-body">
             <%= form_for @manage_qle, as: :manage_qle, url: create_manage_qle_qles_path, method: :post do |f| %>
               <div class="radio_option">
                 <div>
                   <%= radio_button_tag "market_kind", "#{f.object.market_kind}", value: true, class: "required floatlabel"  %>
-                  <label><span>Creating a custom QLE's</span></label>
+                  <label><span>Create a custom QLE</span></label>
                 </div>
-                <br/>
+                <hr/>
               <div>
                 <%= radio_button_tag "market_kind", "#{f.object.market_kind}", value: true, class: "required floatlabel"  %>
-                <label><span>EDIT active QLE's</span></label>
+                <label><span>Modify existing QLE</span></label>
               </div>
               <div>
-                <%= select_tag("which_qle_kind", options_for_select(QualifyingLifeEventKind.all.collect { |qle| [qle.title, qle.id] }.unshift(["Select QLE to modify", nil])))%>
+                <%= select_tag("which_qle_kind_to_modify", options_for_select(QualifyingLifeEventKind.all.collect { |qle| [qle.title, qle.id] }.unshift(["Select QLE to modify", nil])))%>
               </div>
-              <br/>
+              <hr/>
               <div>
                 <%= radio_button_tag "market_kind", "#{f.object.market_kind}", value: true, class: "required floatlabel"  %>
                 <label><span>Deactivate active QLE's</span></label>
               </div>
               <div>
-                <%= select_tag("which_qle_kind", options_for_select(QualifyingLifeEventKind.all.collect { |qle| [qle.title, qle.id] }.unshift(["Select QLE to deactivate", nil])))%>
+                <%= select_tag("which_qle_kind_to_deactivate", options_for_select(QualifyingLifeEventKind.all.collect { |qle| [qle.title, qle.id] }.unshift(["Select QLE to deactivate", nil])))%>
               </div>
-              <br/>
+              <hr/>
               <div>
                 <button type="submit" class="btn btn-primary">Submit</button>
               </div>
