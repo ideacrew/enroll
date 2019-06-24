@@ -494,6 +494,21 @@ class HbxEnrollment
     self.is_active
   end
 
+  def status_step
+    case
+      when coverage_selected?  #submitted
+        1
+      when transmitted_to_carrier? #transmitted
+        2
+      when enrolled_contingent? #acknowledged
+        3
+      when coverage_enrolled? #enrolled
+        4
+      when coverage_canceled? || coverage_terminated? #canceled/terminated
+        5
+    end
+  end
+
   def currently_active?
     return false if shopping?
     return false unless (effective_on <= TimeKeeper.date_of_record)
