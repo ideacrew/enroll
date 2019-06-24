@@ -1130,19 +1130,23 @@ module BenefitSponsors
 
         :enrollment_closed        => :enrollment_closed,
 
-        :enrolled                 => :enrollment_eligible,
+        :enrolled                 => :binder_paid,
         :renewing_enrolled        => :enrollment_eligible,
 
         :application_ineligible           => :enrollment_ineligible,
         :renewing_application_ineligible  => :enrollment_ineligible,
-
+        :enrollment_extended      =>:enrollment_extended,
+        :renewing_enrollment_extended => :enrollment_extended,
         :active                   => :active,
         :suspended                => :suspended,
         :terminated               => :terminated,
         :expired                  => :expired,
+        :migration_expired        => :expired,
         :conversion_expired       => :expired,    # Conversion employers who did not establish eligibility in a timely manner
         :canceled                 => :canceled,
         :renewing_canceled        => :canceled,
+        :cancelled                 => :canceled, #some plan year in old modal have typo in aasm_state
+        :renewing_cancelled       => :canceled,
         :termination_pending      => :termination_pending
       }
     end

@@ -104,6 +104,16 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     end
   end
 
+  context "for verifying newly added attribute" do
+    let!(:person100)          { FactoryBot.create(:person, :with_consumer_role) }
+    let!(:family100)          { FactoryBot.create(:family, :with_primary_family_member, person: person100) }
+    let!(:hbx_enrollment100)  { FactoryBot.create(:hbx_enrollment, household: family100.active_household) }
+
+    it "should not raise error" do
+      expect{hbx_enrollment100.is_any_enrollment_member_outstanding}.not_to raise_error
+    end
+  end
+
   describe HbxEnrollment, dbclean: :around_each do
 
     include_context "BradyWorkAfterAll"
@@ -323,7 +333,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     #   end
     end
 
-    context "when maket type is individual" do
+    context "when market type is individual" do
       let(:person) { FactoryBot.create(:person, :with_consumer_role)}
       let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
       let!(:tax_household) {FactoryBot.create(:tax_household,  effective_ending_on: nil, household: family.households.first)}
@@ -359,11 +369,36 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       end
     end
 
+    context "when outstanding member is present" do
+      let(:person)                    { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
+      let(:family)                    { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+      let(:hbx_profile)               {FactoryBot.create(:hbx_profile)}
+      let(:benefit_sponsorship)       { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
+      let(:benefit_coverage_period)   { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
+      let(:benefit_package)           { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
+      let!(:hbx_enrollment)           { FactoryBot.create(:hbx_enrollment, aasm_state: "enrolled_contingent",
+                                          household: family.active_household, kind: "individual") }
+      let!(:hbx_enrollment_member)     { FactoryBot.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, hbx_enrollment: hbx_enrollment) }
+      let(:active_year)               {TimeKeeper.date_of_record.year}
+
+      before :each do
+        allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
+        allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
+      end
+
+      it "should check for outstanding members" do
+        person.consumer_role.update_attribute("aasm_state","verification_outstanding")
+        person.consumer_role.verification_types[2].update_attribute("validation_status","verification_outstanding")
+        hbx_enrollment.reload
+        expect(hbx_enrollment.is_any_member_outstanding?).to be_truthy
+      end
+    end
+
     context "decorated_elected_plans" do
       let(:benefit_package) { BenefitPackage.new }
       let(:consumer_role) { FactoryBot.create(:consumer_role) }
-      let(:person) { double(primary_family: family)}
-      let(:family) { double }
+      let(:person) { household.family.primary_applicant.person}
+      let(:family) { household.family }
       let(:enrollment) {
         enrollment = household.new_hbx_enrollment_from(
           consumer_role: consumer_role,
@@ -463,67 +498,6 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     #     end
     #   end
     end
-      context "status_step" do
-        let(:hbx_enrollment) {HbxEnrollment.new}
-
-        it "return 1 when coverage_selected" do
-          hbx_enrollment.aasm_state = "coverage_selected"
-          expect(hbx_enrollment.status_step).to eq 1
-        end
-
-        it "return 2 when transmitted_to_carrier" do
-          hbx_enrollment.aasm_state = "transmitted_to_carrier"
-          expect(hbx_enrollment.status_step).to eq 2
-        end
-
-        it "return 3 when enrolled_contingent" do
-          hbx_enrollment.aasm_state = "enrolled_contingent"
-          expect(hbx_enrollment.status_step).to eq 3
-        end
-
-        it "return 4 when coverage_enrolled" do
-          hbx_enrollment.aasm_state = "coverage_enrolled"
-          expect(hbx_enrollment.status_step).to eq 4
-        end
-
-        it "return 5 when coverage_canceled" do
-          hbx_enrollment.aasm_state = "coverage_canceled"
-          expect(hbx_enrollment.status_step).to eq 5
-        end
-
-        it "return 5 when coverage_terminated" do
-          hbx_enrollment.aasm_state = "coverage_terminated"
-          expect(hbx_enrollment.status_step).to eq 5
-        end
-      end
-
-      context "enrollment_kind" do
-        let(:hbx_enrollment) {HbxEnrollment.new}
-        it "should fail validation when blank" do
-          hbx_enrollment.enrollment_kind = ""
-          expect(hbx_enrollment.valid?).to eq false
-          expect(hbx_enrollment.errors[:enrollment_kind].any?).to eq true
-        end
-
-        it "should fail validation when not in ENROLLMENT_KINDS" do
-          hbx_enrollment.enrollment_kind = "test"
-          expect(hbx_enrollment.valid?).to eq false
-          expect(hbx_enrollment.errors[:enrollment_kind].any?).to eq true
-        end
-
-        it "is_open_enrollment?" do
-          hbx_enrollment.enrollment_kind = "open_enrollment"
-          expect(hbx_enrollment.is_open_enrollment?).to eq true
-          expect(hbx_enrollment.is_special_enrollment?).to eq false
-        end
-
-        it "is_special_enrollment?" do
-          hbx_enrollment.enrollment_kind = "special_enrollment"
-          expect(hbx_enrollment.is_open_enrollment?).to eq false
-          expect(hbx_enrollment.is_special_enrollment?).to eq true
-        end
-      end
-    end
 
     context "#propogate_waiver", dbclean: :around_each do
       let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
@@ -559,12 +533,6 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
         enrollment_for_waiver.propogate_waiver
         expect(benefit_group_assignment.aasm_state).not_to eq "coverage_waived"
       end
-
-      it "should cancel the shop enrollment" do
-        enrollment_for_waiver.propogate_waiver
-        existing_shop_enrollment.reload
-        expect(existing_shop_enrollment.aasm_state).to eq "coverage_canceled"
-      end
     end
   end
 
@@ -594,7 +562,8 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       let(:benefit_package) {BenefitPackage.new}
       let(:consumer_role) {FactoryBot.create(:consumer_role)}
       let(:person) {double(primary_family: family)}
-      let(:family) {double(current_sep: double(effective_on: TimeKeeper.date_of_record))}
+      let(:family) {@household.family}
+      let(:sep) {SpecialEnrollmentPeriod.new(effective_on: TimeKeeper.date_of_record)}
       let(:hbx_profile) {double}
       let(:benefit_sponsorship) {double(earliest_effective_date: TimeKeeper.date_of_record - 2.months, renewal_benefit_coverage_period: renewal_bcp, current_benefit_coverage_period: bcp)}
       let(:bcp) {double(earliest_effective_date: TimeKeeper.date_of_record - 2.months)}
@@ -607,6 +576,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
         allow(consumer_role).to receive(:person).and_return(person)
         allow(household).to receive(:family).and_return family
         allow(family).to receive(:is_under_ivl_open_enrollment?).and_return true
+        allow(family).to receive(:current_sep).and_return sep
       end
 
       shared_examples_for "new enrollment from" do |qle, sep, enrollment_period, error|
@@ -729,6 +699,12 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       let(:benefit_group) {double()}
       let(:employee_role) {double(hired_on: date)}
 
+      before :each do
+        allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
+        allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
+        allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(bcp)
+      end
+
       context "shop" do
         it "special_enrollment" do
           expect(HbxEnrollment.calculate_effective_on_from(market_kind: 'shop', qle: true, family: family, employee_role: nil, benefit_group: benefit_group, benefit_sponsorship: nil)).to eq date
@@ -743,12 +719,6 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       end
 
       context "individual" do
-        before :each do
-          allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
-          allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
-          allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(bcp)
-        end
-
         it "special_enrollment" do
           expect(HbxEnrollment.calculate_effective_on_from(market_kind: 'individual', qle: true, family: family, employee_role: nil, benefit_group: nil, benefit_sponsorship: nil)).to eq date
         end
@@ -845,21 +815,12 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
         end
     end
 
-    context "can_terminate_coverage?" do
-      let(:hbx_enrollment) {HbxEnrollment.new(
-          kind: 'employer_sponsored',
-          aasm_state: 'coverage_selected',
-          effective_on: TimeKeeper.date_of_record - 10.days
-      )}
-      it "should return false when may not terminate_coverage" do
-        hbx_enrollment.aasm_state = 'inactive'
-        expect(hbx_enrollment.can_terminate_coverage?).to eq false
-      end
-  describe "when maket type is individual" do
-    let(:person) { FactoryBot.create(:person, :with_consumer_role)}
+  describe "when market type is individual" do
+    let(:person) { FactoryBot.create(:person, :with_active_consumer_role, :with_consumer_role)}
     let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
     let(:coverage_household) { family.households.first.coverage_households.first }
     let(:hbx_profile) {FactoryBot.create(:hbx_profile)}
+    let(:verification_attr) { OpenStruct.new({ :determined_at => Time.zone.now, :vlp_authority => "hbx" })}
     let(:active_year) {TimeKeeper.date_of_record.year}
     let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
     let(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
@@ -908,12 +869,13 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     end
 
     context "ivl user in verification outstanding state." do
-      it "should return enrollment status as enrolled_contingent" do
-        person.consumer_role.update_attribute("aasm_state","verification_outstanding")
-        enrollment.move_to_contingent!
+      it "should return enrollment status as coverage_selected and set is_any_enrollment_member_outstanding to true " do
+        enrollment.select_coverage!
+        person.consumer_role.ssn_invalid!(verification_attr)
         enrollment.reload
-        expect(enrollment.coverage_selected?).to eq false
-        expect(enrollment.aasm_state).to eq "enrolled_contingent"
+        expect(enrollment.coverage_selected?).to eq true
+        expect(enrollment.aasm_state).to eq "coverage_selected"
+        expect(enrollment.is_any_enrollment_member_outstanding?). to be_truthy
       end
     end
   end
@@ -1925,8 +1887,6 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
     subject {FactoryBot.build(:hbx_enrollment, :individual_unassisted, household: family.active_household, product: product)}
 
-    events = [:move_to_enrolled, :move_to_contingent, :move_to_pending]
-
     shared_examples_for "state machine transitions" do |current_state, new_state, event|
       it "transition #{current_state} to #{new_state} on #{event} event" do
         expect(subject).to transition_from(current_state).to(new_state).on_event(event)
@@ -1935,21 +1895,11 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
 
     context "move_to_enrolled event" do
       it_behaves_like "state machine transitions", :unverified, :coverage_selected, :move_to_enrolled
-      it_behaves_like "state machine transitions", :enrolled_contingent, :coverage_selected, :move_to_enrolled
-    end
-
-    context "move_to_contingent event" do
-      it_behaves_like "state machine transitions", :shopping, :enrolled_contingent, :move_to_contingent!
-      it_behaves_like "state machine transitions", :coverage_selected, :enrolled_contingent, :move_to_contingent!
-      it_behaves_like "state machine transitions", :unverified, :enrolled_contingent, :move_to_contingent!
-      it_behaves_like "state machine transitions", :coverage_enrolled, :enrolled_contingent, :move_to_contingent!
-      it_behaves_like "state machine transitions", :auto_renewing, :enrolled_contingent, :move_to_contingent!
     end
 
     context "move_to_pending event" do
       it_behaves_like "state machine transitions", :shopping, :unverified, :move_to_pending!
       it_behaves_like "state machine transitions", :coverage_selected, :unverified, :move_to_pending!
-      it_behaves_like "state machine transitions", :enrolled_contingent, :unverified, :move_to_pending!
       it_behaves_like "state machine transitions", :coverage_enrolled, :unverified, :move_to_pending!
       it_behaves_like "state machine transitions", :auto_renewing, :unverified, :move_to_pending!
     end
@@ -2110,10 +2060,10 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       let(:hbx_profile) {FactoryBot.create(:hbx_profile)}
       let(:benefit_package) {hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first}
       let(:benefit_coverage_period) {hbx_profile.benefit_sponsorship.benefit_coverage_periods.first}
-      let(:family) {FactoryBot.build(:family)}
 
       before :each do
         @household = mikes_family.households.first
+        family =  @household.family
         @coverage_household = household.coverage_households.first
         allow(benefit_coverage_period).to receive(:earliest_effective_date).and_return TimeKeeper.date_of_record
         allow(coverage_household).to receive(:household).and_return household
@@ -2375,6 +2325,8 @@ describe HbxEnrollment, type: :model, :dbclean => :around_each do
       end
     end
   end
+end
+
 
   describe "#notify_enrollment_cancel_or_termination_event", :dbclean => :after_each do
     let(:family) { FactoryBot.build(:family, :with_primary_family_member_and_dependent)}
@@ -2407,8 +2359,6 @@ describe HbxEnrollment, type: :model, :dbclean => :around_each do
       hbx_enrollment.notify_enrollment_cancel_or_termination_event(false)
     end
   end
-
-end
 #TODO: fix me when ivl plans refactored to products
 # describe HbxEnrollment, dbclean: :after_all do
 #   let!(:family100) { FactoryBot.create(:family, :with_primary_family_member) }
@@ -2427,3 +2377,39 @@ end
 #     end
 #   end
 # end
+
+describe HbxEnrollment, dbclean: :after_all do
+  let!(:ivl_person)       { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+  let!(:ivl_family)       { FactoryBot.create(:family, :with_primary_family_member, person: ivl_person) }
+  let!(:ivl_enrollment)   { FactoryBot.create(:hbx_enrollment, household: ivl_family.active_household,
+                            kind: "individual", is_any_enrollment_member_outstanding: true, aasm_state: "coverage_selected") }
+  let!(:ivl_enrollment_member)  { FactoryBot.create(:hbx_enrollment_member, is_subscriber: true,
+                                  applicant_id: ivl_family.primary_applicant.id, hbx_enrollment: ivl_enrollment,
+                                  eligibility_date: TimeKeeper.date_of_record, coverage_start_on: TimeKeeper.date_of_record) }
+
+  context ".is_ivl_actively_outstanding?" do
+    it "should return true" do
+      ivl_person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
+      ivl_enrollment.save!
+      expect(ivl_enrollment.is_ivl_actively_outstanding?).to be_truthy
+    end
+
+    it "should return false" do
+      expect(ivl_enrollment.is_ivl_actively_outstanding?).to be_falsey
+    end
+  end
+
+  context "for set_is_any_enrollment_member_outstanding" do
+
+    it "should return true for is_any_enrollment_member_outstanding" do
+      ivl_person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
+      ivl_enrollment.save!
+      expect(ivl_enrollment.is_any_enrollment_member_outstanding).to be_truthy
+    end
+
+    it "should return false for is_any_enrollment_member_outstanding" do
+      ivl_enrollment.save!
+      expect(ivl_enrollment.is_any_enrollment_member_outstanding).to be_falsey
+    end
+  end
+end

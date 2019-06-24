@@ -3,7 +3,7 @@ require "rails_helper"
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
 describe "A new consumer role with an individual market enrollment", :dbclean => :around_each do
-  let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+  let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
   let(:family) { FactoryBot.create(:individual_market_family, primary_person: person) }
   let(:hbx_profile) { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
   let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01') }
@@ -35,9 +35,10 @@ describe "A new consumer role with an individual market enrollment", :dbclean =>
         person.consumer_role.ssn_invalid!(denial_information)
       end
 
-      it "puts the enrollment in enrolled_contingent state" do
-          enroll = HbxEnrollment.by_hbx_id(enrollment.hbx_id).first
-          expect(enroll.aasm_state).to eql "enrolled_contingent"
+      it "sets is_any_enrollment_member_outstanding field to true" do
+        enroll = HbxEnrollment.by_hbx_id(enrollment.hbx_id).first
+        expect(enroll.aasm_state).to eql "coverage_selected"
+        expect(enroll.is_any_enrollment_member_outstanding).to eql true
       end
     end
 
@@ -48,8 +49,8 @@ describe "A new consumer role with an individual market enrollment", :dbclean =>
       end
 
       it "does not change the state of the enrollment" do
-          enroll = HbxEnrollment.by_hbx_id(enrollment.hbx_id).first
-          expect(enroll.aasm_state).to eql "coverage_terminated"
+        enroll = HbxEnrollment.by_hbx_id(enrollment.hbx_id).first
+        expect(enroll.aasm_state).to eql "coverage_terminated"
       end
     end
   end

@@ -492,7 +492,7 @@ describe Family, dbclean: :around_each do
       end
 
       it "when qle_on is less than hbx effective_on" do
-        effective_on = date + 10.days
+        effective_on = date.end_of_month
         allow(family).to receive(:latest_shop_sep).and_return normal_sep
         allow(hbx).to receive(:effective_on).and_return effective_on
         expect(family.terminate_date_for_shop_by_enrollment(hbx)).to eq effective_on
@@ -1091,7 +1091,6 @@ describe Family, "given a primary applicant and a dependent", dbclean: :after_ea
   end
 end
 
-
 describe Family, ".expire_individual_market_enrollments", dbclean: :after_each do
   let!(:person) { FactoryBot.create(:person, last_name: 'John', first_name: 'Doe') }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, :person => person) }
@@ -1140,8 +1139,12 @@ describe Family, ".expire_individual_market_enrollments", dbclean: :after_each d
                        plan_id: two_years_old_plan.id
     )
   }
+
+  let(:logger) { Logger.new("#{Rails.root}/log/test_family_advance_day_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log") }
+
   context 'when family exists with current & previous year coverages' do
     before do
+      Family.instance_variable_set(:@logger, logger)
       Family.expire_individual_market_enrollments
       family.reload
     end
@@ -1195,8 +1198,12 @@ describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
     )
 
   }
+
+  let(:logger) { Logger.new("#{Rails.root}/log/test_family_advance_day_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log") }
+
   context 'when family exists with passive renewals ' do
     before do
+      Family.instance_variable_set(:@logger, logger)
       Family.begin_coverage_for_ivl_enrollments
       family.reload
     end
@@ -1263,6 +1270,17 @@ end
 #     expect(family100.currently_enrolled_plans_ids(enrollment100).present?).to be_truthy
 #   end
 # end
+
+describe "set_due_date_on_verification_types" do
+  let!(:person)           { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+  let(:consumer_role)     { person.consumer_role }
+  let!(:family)           { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+
+  it 'should set the due date on verfification type' do
+    person.consumer_role.update_attribute('aasm_state','verification_outstanding')
+    expect(family.set_due_date_on_verification_types).to be_truthy
+  end
+end
 
 describe "active dependents" do
   let!(:person) { FactoryBot.create(:person, :with_consumer_role)}

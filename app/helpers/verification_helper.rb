@@ -118,20 +118,6 @@ module VerificationHelper
     family.family_members.map(&:person).flat_map(&:consumer_role).flat_map(&:vlp_documents).select{|doc| doc.identifier}.count
   end
 
-  def review_button_class(family)
-    if family.active_household.hbx_enrollments.verification_needed.any?
-      people = family.family_members.map(&:person)
-      v_types_list = get_person_v_type_status(people)
-      if !v_types_list.include?('outstanding')
-        'success'
-      elsif v_types_list.include?('review') && v_types_list.include?('outstanding')
-        'info'
-      else
-        'default'
-      end
-    end
-  end
-
   def get_person_v_type_status(people)
     v_type_status_list = []
     people.each do |person|

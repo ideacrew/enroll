@@ -106,9 +106,9 @@ module Insured
 
     def selected_enrollment(family, employee_role)
       employer_profile = employee_role.employer_profile
-      plan_year = employer_profile.plan_years.detect { |py| is_covered_plan_year?(py, family.current_sep.effective_on)} || employer_profile.published_plan_year
+      benefit_application = employer_profile.benefit_applications.detect { |ba| is_covered_plan_year?(ba, family.current_sep.effective_on)} || employer_profile.published_benefit_application
       enrollments = family.active_household.hbx_enrollments
-      if plan_year.present? && plan_year.is_renewing?
+      if benefit_application.present? && benefit_application.is_renewing?
         renewal_enrollment(enrollments, employee_role)
       else
         active_enrollment(enrollments, employee_role)
@@ -116,17 +116,13 @@ module Insured
     end
 
     def renewal_enrollment(enrollments, employee_role)
-      enrollments.where({
-        :"benefit_group_id" => employee_role.census_employee.renewal_published_benefit_group.try(:id),
-        :"aasm_state".in => HbxEnrollment::RENEWAL_STATUSES
-        }).first
+      enrollments.where({:sponsored_benefit_package_id => employee_role.census_employee.renewal_published_benefit_package.try(:id),
+                         :aasm_state.in => HbxEnrollment::RENEWAL_STATUSES}).first
     end
 
     def active_enrollment(enrollments, employee_role)
-      enrollments.where({
-        :"benefit_group_id" => employee_role.census_employee.active_benefit_group.try(:id),
-        :"aasm_state".in => HbxEnrollment::ENROLLED_STATUSES
-        }).first
+      enrollments.where({:sponsored_benefit_package_id => employee_role.census_employee.active_benefit_package.try(:id),
+                         :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES}).first
     end
 
     def benefit_group_assignment_by_plan_year(employee_role, benefit_group, change_plan, enrollment_kind)

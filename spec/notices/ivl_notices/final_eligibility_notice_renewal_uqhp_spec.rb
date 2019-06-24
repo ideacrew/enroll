@@ -3,7 +3,6 @@ require 'csv'
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe IvlNotices::FinalEligibilityNoticeRenewalUqhp, :dbclean => :after_each do
-
   file = "#{Rails.root}/spec/test_data/notices/final_eligibility_notice_uqhp_test_data.csv"
   csv = CSV.open(file,"r",:headers =>true)
   data = csv.to_a
@@ -14,7 +13,13 @@ RSpec.describe IvlNotices::FinalEligibilityNoticeRenewalUqhp, :dbclean => :after
   let!(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, household: family.households.first, kind: "individual", plan: plan, aasm_state: "auto_renewing", effective_on: Date.new(year,1,1))}
   let!(:hbx_enrollment_member) {FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: hbx_enrollment, applicant_id: family.family_members.first.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record.prev_month )}
   let!(:hbx_enrollment_member_1) {FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: hbx_enrollment_1, applicant_id: family.family_members.first.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record.prev_month )}
-  let!(:hbx_enrollment_1) {FactoryBot.create(:hbx_enrollment, household: family.households.first, kind: "individual", plan: plan, aasm_state: "enrolled_contingent", special_verification_period: TimeKeeper.date_of_record+95.days, effective_on: Date.new(TimeKeeper.date_of_record.year,1,1))}
+  let!(:hbx_enrollment_1) do
+    FactoryBot.create(:hbx_enrollment,
+                      :created_at => (TimeKeeper.date_of_record.in_time_zone("Eastern Time (US & Canada)") - 2.days),
+                      :household => family.households.first,
+                      :kind => "individual",
+                      :is_any_enrollment_member_outstanding => true)
+  end
   let(:application_event){ double("ApplicationEventKind",{
       :name =>'Final Eligibility Notice for UQHP/AQHP individuals',
       :notice_template => 'notices/ivl/final_eligibility_notice_uqhp_aqhp',

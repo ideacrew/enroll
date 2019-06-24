@@ -165,6 +165,8 @@ module Insured::FamiliesHelper
   def display_aasm_state?(enrollment)
     if enrollment.is_shop?
       true
+    elsif enrollment.is_ivl_actively_outstanding?
+      false
     else
       ['coverage_selected', 'coverage_canceled', 'coverage_terminated', 'auto_renewing', 'renewing_coverage_selected', 'coverage_expired'].include?(enrollment.aasm_state.to_s)
     end
@@ -178,7 +180,7 @@ module Insured::FamiliesHelper
   end
 
   def enrollment_coverage_end(hbx_enrollment)
-    if hbx_enrollment.coverage_terminated?
+    if hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_termination_pending?
       hbx_enrollment.terminated_on
     elsif hbx_enrollment.coverage_expired?
       if hbx_enrollment.is_shop? && hbx_enrollment.benefit_group_assignment.present?

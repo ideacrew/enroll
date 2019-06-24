@@ -39,6 +39,7 @@ module BenefitSponsors::Importers
     let(:reference_plan) { health_products[0] }
 
     let(:product_kinds)  { [:health, :dental] }
+    let(:catalog_dental_package_kinds) { [:multi_product] }
 
     let(:new_application) {
       application = benefit_sponsorship.benefit_applications.new(
@@ -93,7 +94,8 @@ module BenefitSponsors::Importers
         {
           dental_plan_option_kind: "single_plan",
           dental_reference_plan_hios_id: dental_reference_plan.hios_id,
-          dental_relationship_benefits: dental_relationship_benefits
+          dental_relationship_benefits: dental_relationship_benefits,
+          elected_dental_plan_hios_ids: dental_products.pluck(:hios_id)
         }
       }
 
@@ -120,7 +122,7 @@ module BenefitSponsors::Importers
         end
 
         it "should map to correct product package kind" do
-          expect(subject.benefit_package.dental_sponsored_benefit.product_package.package_kind).to eq :single_product
+          expect(subject.benefit_package.dental_sponsored_benefit.product_package.package_kind).to eq :multi_product
         end
 
         it "should map to correct product kind" do

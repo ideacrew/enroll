@@ -78,6 +78,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         consumer_role_id: nil,
         consumer_role: nil,
         future_enrollment_termination_date: "",
+        :is_ivl_actively_outstanding? => false,
         covered_members_first_names: []
       )
     end
@@ -109,6 +110,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx_enrollment).to receive(:kind).and_return('individual')
       allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
       allow(hbx_enrollment).to receive(:applied_aptc_amount).and_return(100.0)
+      allow(hbx_enrollment).to receive(:is_any_enrollment_member_outstanding).and_return false
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
       expect(rendered).to have_content('Individual & Family')
       expect(rendered).to have_selector('strong', text: "#{HbxProfile::ShortName}")
@@ -137,7 +139,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         coverage_year: 2018,
         employer_profile: employer_profile,
         coverage_terminated?: false,
-        coverage_termination_pending?: true,
+        coverage_termination_pending?: false,
         coverage_expired?: false,
         total_premium: 200.00,
         total_employer_contribution: 100.00,
@@ -234,9 +236,19 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
 
     context "coverage_termination_pending" do
-      let(:terminated_on) { TimeKeeper.date_of_record.next_month.end_of_month }
+      let(:terminated_on) { TimeKeeper.date_of_record.end_of_month }
       let(:enrollment_aasm_state) { "coverage_termination_pending" }
       let(:future_enrollment_termination_date) { Date.today }
+
+      before :each do
+        allow(hbx_enrollment).to receive(:kind).and_return('employer_sponsored')
+        allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
+        allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
+        allow(view).to receive(:disable_make_changes_button?).with(hbx_enrollment).and_return(false)
+        allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
+        allow(hbx_enrollment).to receive(:coverage_termination_pending?).and_return(true)
+        render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+      end
 
       it 'displays future_enrollment_termination_date when enrollment is in coverage_termination_pending state' do
         expect(rendered).to match /Future enrollment termination date:/
@@ -252,6 +264,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
   These scenarios need to be refactored for the IVL market in DC new model - refs#41775
   if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
   context "with consumer_role", dbclean: :before_each do
+<<<<<<< HEAD
     let(:plan) {FactoryBot.build(:benefit_markets_products_health_products_health_product, :created_at =>  TimeKeeper.date_of_record)}
     let(:employee_role) { FactoryBot.create(:employee_role) }
     let(:census_employee) { FactoryBot.create(:census_employee, employee_role_id: employee_role.id)}
@@ -281,6 +294,18 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
 
    let(:benefit_group) { FactoryBot.create(:benefit_group) }
+=======
+    let(:plan) {FactoryBot.build(:plan, :created_at =>  TimeKeeper.date_of_record)}
+    let(:employee_role) { FactoryBot.create(:employee_role) }
+    let(:census_employee) { FactoryBot.create(:census_employee, employee_role_id: employee_role.id)}
+    let(:hbx_enrollment) {instance_double("HbxEnrollment", plan: plan, id: "12345", total_premium: 200, kind: 'individual',
+                                 covered_members_first_names: ["name"], can_complete_shopping?: false,
+                                 enroll_step: 1, subscriber: nil, coverage_terminated?: false,
+                                 may_terminate_coverage?: true, effective_on: Date.new(2015,8,10),
+                                 consumer_role: double, applied_aptc_amount: 100, employee_role: employee_role, census_employee: census_employee,
+                                  aasm_state: 'coverage_selected', :is_ivl_actively_outstanding? => false)}
+   let(:benefit_group) { FactoryBot.create(:benefit_group) }
+>>>>>>> a9619997ea... refs #33617 remove enrolled contingent aasm state in EA
 
     before :each do
       allow(hbx_enrollment).to receive(:coverage_canceled?).and_return(false)
@@ -315,6 +340,43 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
 
   end
+<<<<<<< HEAD
+=======
+
+  context "about covered_members_first_names of hbx_enrollment" do
+    let(:plan) {FactoryBot.build(:plan, :created_at => TimeKeeper.date_of_record)}
+    let(:employee_role) { FactoryBot.create(:employee_role) }
+    let(:census_employee) { FactoryBot.create(:census_employee, employee_role_id: employee_role.id)}
+    let(:hbx_enrollment) {double(plan: plan, id: "12345", total_premium: 200, kind: 'individual',
+                                 covered_members_first_names: [], can_complete_shopping?: false,
+                                 enroll_step: 1, subscriber: nil, coverage_terminated?: false,
+                                 may_terminate_coverage?: true, effective_on: Date.new(2015,8,10),
+                                 consumer_role: double, applied_aptc_amount: 100, employee_role: employee_role, census_employee: census_employee,
+                                  aasm_state: 'coverage_selected', :is_ivl_actively_outstanding? => true)}
+    let(:benefit_group) { FactoryBot.create(:benefit_group) }
+
+    before :each do
+      allow(hbx_enrollment).to receive(:coverage_canceled?).and_return(false)
+      allow(hbx_enrollment).to receive(:coverage_expired?).and_return(false)
+      allow(hbx_enrollment).to receive(:is_coverage_waived?).and_return(false)
+      allow(hbx_enrollment).to receive(:coverage_year).and_return(plan.active_year)
+      allow(hbx_enrollment).to receive(:created_at).and_return(plan.created_at)
+      allow(hbx_enrollment).to receive(:hbx_id).and_return(true)
+      allow(hbx_enrollment).to receive(:in_time_zone).and_return(true)
+      allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
+      allow(hbx_enrollment).to receive(:consumer_role_id).and_return(person.id)
+      allow(census_employee.employee_role).to receive(:is_under_open_enrollment?).and_return(true)
+      allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
+      allow(hbx_enrollment).to receive(:coverage_termination_pending?).and_return(false)
+      allow(hbx_enrollment).to receive(:future_enrollment_termination_date).and_return(nil)
+      allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
+      render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+    end
+
+    it "should not disable the Make Changes button" do
+      expect(rendered).to_not have_selector('.cna')
+    end
+>>>>>>> a9619997ea... refs #33617 remove enrolled contingent aasm state in EA
   end
 
   context "when the enrollment is coverage_terminated" do

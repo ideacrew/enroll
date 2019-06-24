@@ -26,7 +26,7 @@ describe "shared/_comparison.html.erb", dbclean: :after_each do
     eligibility_date: hbx_enrollment.effective_on
   )}
 
-  let(:product) {health_products[0]}
+  let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile) }
 
   let(:plan) { FactoryBot.create(:plan,
    provider_directory_url: "http://www.example1.com",
@@ -146,7 +146,7 @@ describe "shared/_comparison.html.erb", dbclean: :after_each do
 
     if aca_state_abbreviation == "DC" # There is no plan comparision for MA dental
       context 'for dental coverage' do
-        let!(:dental_product) { FactoryBot.create(:benefit_markets_products_dental_products_dental_product) }
+        let!(:dental_product) { FactoryBot.create(:benefit_markets_products_dental_products_dental_product, :with_issuer_profile) }
         let!(:dental_plan) { FactoryBot.create(:plan, market: 'shop', metal_level: 'dental', hios_id: "91111111122302", coverage_kind: 'dental', dental_level: 'high') }
         let!(:mock_qhp){instance_double("Products::QhpCostShareVariance", :product => dental_product, :plan => dental_plan, :plan_marketing_name => dental_product.title)}
         let(:mock_qhps) {[mock_qhp]}

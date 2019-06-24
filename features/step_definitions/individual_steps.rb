@@ -70,8 +70,7 @@ When(/user goes to register as an individual$/) do
 end
 
 When(/^\w+ clicks? on continue button$/) do
-  wait_for_ajax
-  find('.interaction-click-control-continue', text: 'Continue').click
+  find('.interaction-click-control-continue', text: 'Continue', :wait => 10).click
 end
 
 Then(/^.+ should see heading labeled personal information/) do
@@ -89,7 +88,7 @@ Then(/Individual should see a form to enter personal information$/) do
   find(:xpath, '//label[@for="person_naturalized_citizen_false"]').click
   find(:xpath, '//label[@for="indian_tribe_member_no"]').click
 
-  find(:xpath, '//label[@for="radio_incarcerated_no"]').click
+  find(:xpath, '//label[@for="radio_incarcerated_no"]', :wait => 10).click
   fill_in "person_addresses_attributes_0_address_1", :with => "4900 USAA BLVD"
   fill_in "person_addresses_attributes_0_address_2", :with => "212"
   fill_in "person_addresses_attributes_0_city", :with=> "Washington"
@@ -229,12 +228,12 @@ And(/I click on continue button on household info form/) do
 end
 
 Then(/Individual creates a new HBX account$/) do
-  find('.interaction-click-control-create-account').click
+  # find('.interaction-click-control-create-account').click
   fill_in "user[oim_id]", :with => "testflow@test.com"
   fill_in "user[password]", :with => "aA1!aA1!aA1!"
   fill_in "user[password_confirmation]", :with => "aA1!aA1!aA1!"
   screenshot("create_account")
-  click_button "Create account"
+  click_button "Create Account"
 end
 
 When(/I click on none of the situations listed above apply checkbox$/) do
@@ -258,7 +257,7 @@ end
 
 And(/^.+ click on sign in existing account$/) do
   expect(page).to have_content "Welcome to the District's Health Insurance Marketplace"
-  find('.interaction-click-control-sign-in-existing-account').click
+  find('.btn-link', :text => 'Sign In Existing Account').click
 end
 
 And(/I signed in$/) do

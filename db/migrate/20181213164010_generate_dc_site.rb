@@ -127,7 +127,12 @@ class GenerateDcSite < Mongoid::Migration
   def self.update_hbx_staff_roles(new_profile)
     Person.where(:'hbx_staff_role'.exists=>true).each do |person|
       person.hbx_staff_role.benefit_sponsor_hbx_profile_id = new_profile.id
-      person.save!
+      if person.valid? #TODO verify validation failed person
+        person.save!
+      else
+        person.save!(validate: false)
+        puts "validation failed for person hbx_id: #{person.hbx_id}"
+      end
     end
   end
 end

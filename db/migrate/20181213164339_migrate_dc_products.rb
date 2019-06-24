@@ -1,6 +1,12 @@
 class MigrateDcProducts < Mongoid::Migration
   def self.up
     if Settings.site.key.to_s.downcase == "dc"
+
+      say_with_time("Updating network data for plans") do
+        hios_ids = ["94506DC0350012-01", "94506DC0360001-01", "94506DC0350014-01", "94506DC0350015-01", "94506DC0350018-01", "94506DC0350019-01", "94506DC0360003-01", "94506DC0350028-01", "94506DC0350020-01", "94506DC0350022-01", "94506DC0350001-01", "94506DC0350016-01", "94506DC0350002-01", "94506DC0350017-01", "94506DC0350023-01", "94506DC0350010-01", "94506DC0350008-01", "94506DC0350011-01", "94506DC0350009-01", "94506DC0360002-01", "94506DC0350027-01"]
+        Plan.where(active_year: 2019, :hios_id.in=> hios_ids).update_all(dc_in_network: true, nationwide: false)
+      end
+
       say_with_time("Migrating plans for DC") do
 
         old_carrier_profile_map = {}
@@ -149,7 +155,7 @@ class MigrateDcProducts < Mongoid::Migration
         say_with_time("Create DC congress products") do
           products = BenefitMarkets::Products::Product.where(metal_level_kind: :gold, :benefit_market_kind => :aca_shop)
           products.each do |product|
-            congress_product = product.dup
+            congress_product = product.deep_dup
             congress_product.benefit_market_kind = "fehb".to_sym
             congress_product._id = BSON::ObjectId.new
             congress_product.sbc_document._id = BSON::ObjectId.new if product.sbc_document.present?
