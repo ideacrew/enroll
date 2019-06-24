@@ -1,11 +1,12 @@
 module Forms
   class ManageQleForm
   	include Virtus.model
-
+    
+    attribute :action, String
     attribute :market_kind, String
-    attribute :create, Boolean
-    attribute :modify, Boolean
-    attribute :deactivate, Boolean
+    attribute :new_qle, Boolean
+    attribute :modify_qle, Boolean
+    attribute :deactivate_qle, Boolean
     attribute :qle_options, Array
 
     def self.for_new(params)
