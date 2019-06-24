@@ -107,7 +107,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
   context "for verifying newly added attribute" do
     let!(:person100)          { FactoryBot.create(:person, :with_consumer_role) }
     let!(:family100)          { FactoryBot.create(:family, :with_primary_family_member, person: person100) }
-    let!(:hbx_enrollment100)  { FactoryBot.create(:hbx_enrollment, household: family100.active_household) }
+    let!(:hbx_enrollment100)  { FactoryBot.create(:hbx_enrollment, household: family100.active_household, family: family100) }
 
     it "should not raise error" do
       expect{hbx_enrollment100.is_any_enrollment_member_outstanding}.not_to raise_error
@@ -377,7 +377,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       let(:benefit_coverage_period)   { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
       let(:benefit_package)           { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
       let!(:hbx_enrollment)           { FactoryBot.create(:hbx_enrollment, aasm_state: "enrolled_contingent",
-                                          household: family.active_household, kind: "individual") }
+                                          household: family.active_household, kind: "individual", family: family) }
       let!(:hbx_enrollment_member)     { FactoryBot.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, hbx_enrollment: hbx_enrollment) }
       let(:active_year)               {TimeKeeper.date_of_record.year}
 
@@ -398,12 +398,12 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       let(:benefit_package) { BenefitPackage.new }
       let(:consumer_role) { FactoryBot.create(:consumer_role) }
       let(:person) { household.family.primary_applicant.person}
-      let(:family) { household.family }
       let(:enrollment) {
         enrollment = household.new_hbx_enrollment_from(
           consumer_role: consumer_role,
           coverage_household: coverage_household,
           benefit_package: benefit_package,
+          family: family,
           qle: true
         )
         enrollment.save
@@ -499,7 +499,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     #   end
 
       context "status_step" do
-        let(:hbx_enrollment) {HbxEnrollment.new}
+        let(:hbx_enrollment) {HbxEnrollment.new()}
 
         it "return 1 when coverage_selected" do
           hbx_enrollment.aasm_state = "coverage_selected"
@@ -644,7 +644,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
 
       shared_examples_for "new enrollment from" do |qle, sep, enrollment_period, error|
         context "#{enrollment_period} period" do
-          let(:enrollment) {HbxEnrollment.new_from(consumer_role: consumer_role, coverage_household: coverage_household, benefit_package: benefit_package, qle: qle)}
+          let(:enrollment) {HbxEnrollment.new_from(consumer_role: consumer_role, family: family, coverage_household: coverage_household, benefit_package: benefit_package, qle: qle)}
           before do
             allow(family).to receive(:is_under_special_enrollment_period?).and_return sep
             allow(family).to receive(:current_sep).and_return special_enrollment_period
@@ -722,7 +722,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       end
 
       it "should return a sep with an effective date that equals to sep date" do
-        enrollment = HbxEnrollment.new_from(employee_role: employee_role, coverage_household: coverage_household, benefit_group: nil, benefit_package: nil, benefit_group_assignment: nil, qle: true)
+        enrollment = HbxEnrollment.new_from(employee_role: employee_role, family: family, coverage_household: coverage_household, benefit_group: nil, benefit_package: nil, benefit_group_assignment: nil, qle: true)
         expect(enrollment.effective_on).to eq sep.qle_on
       end
     end
