@@ -1,36 +1,41 @@
  <div class="container" style="padding-top: 1px">
-  <%#= render "exchanges/hbx_profiles/shared/primary_nav", :active_tab => "home-tab" %>
-  <div class="panel panel-primary">
-    <div class="panel-heading">Manage QLE</div>
-    <div class="panel-body">
-      <%= form_for @manage_qle, as: :manage_qle, url: create_manage_qle_qles_path, method: :post do |f| %>
-        <div class="radio_option">
-          <div class="">
-            <%= radio_button_tag "market_kind", "#{f.object.market_kind}", value: true, class: "required floatlabel"  %>
-            <label><span>Creating a custom QLE's</span></label>
+  <div class='row'>
+    <div class='col-md-9'>
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <center><strong>Manage QLE</strong></center>
+        </div>
+          <div class="panel-body">
+            <%= form_for @manage_qle, as: :manage_qle, url: create_manage_qle_qles_path, method: :post do |f| %>
+              <div class="radio_option">
+                <div>
+                  <%= radio_button_tag "market_kind", "#{f.object.market_kind}", value: true, class: "required floatlabel"  %>
+                  <label><span>Creating a custom QLE's</span></label>
+                </div>
+                <br/>
+              <div>
+                <%= radio_button_tag "market_kind", "#{f.object.market_kind}", value: true, class: "required floatlabel"  %>
+                <label><span>EDIT active QLE's</span></label>
+              </div>
+              <div>
+                <%= select_tag("which_qle_kind", options_for_select(QualifyingLifeEventKind.all.collect { |qle| [qle.title, qle.id] }.unshift(["Select QLE to modify", nil])))%>
+              </div>
+              <br/>
+              <div>
+                <%= radio_button_tag "market_kind", "#{f.object.market_kind}", value: true, class: "required floatlabel"  %>
+                <label><span>Deactivate active QLE's</span></label>
+              </div>
+              <div>
+                <%= select_tag("which_qle_kind", options_for_select(QualifyingLifeEventKind.all.collect { |qle| [qle.title, qle.id] }.unshift(["Select QLE to deactivate", nil])))%>
+              </div>
+              <br/>
+              <div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+              </div>
+            </div>
+          <% end %>
           </div>
-          <br/>
-        <div>
-          <%= radio_button_tag "market_kind", "#{f.object.market_kind}", value: true, class: "required floatlabel"  %>
-          <label><span>EDIT active QLE's</span></label>
-        </div>
-        <div>
-          <%= select_tag "which_qle_kind", options_from_collection_for_select(QualifyingLifeEventKind.all, "id", "title") %>
-        </div>
-        <br/>
-        <div>
-          <%= radio_button_tag "market_kind", "#{f.object.market_kind}", value: true, class: "required floatlabel"  %>
-          <label><span>Deactivate active QLE's</span></label>
-        </div>
-        <div>
-          <%= select_tag "which_qle_kind", options_from_collection_for_select(QualifyingLifeEventKind.all, "id", "title") %>
-        </div>
-        <br/>
-        <div>
-          <button type="submit" class="btn btn-primary">Submit</button>
         </div>
       </div>
-    <% end %>
     </div>
   </div>
-</div>
