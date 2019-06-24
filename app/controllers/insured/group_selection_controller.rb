@@ -90,8 +90,7 @@ class Insured::GroupSelectionController < ApplicationController
       if sep.present?
         hbx_enrollment.special_enrollment_period_id = sep.id
       end
-
-      hbx_enrollment.plan = @hbx_enrollment.plan
+      hbx_enrollment.product = @hbx_enrollment.product
     end
 
     select_enrollment_members(hbx_enrollment, family_member_ids) if @market_kind == 'individual' || @market_kind == 'coverall'
