@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require File.join(Rails.root, 'spec/shared_contexts/ivl_eligibility')
 
@@ -34,7 +36,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
       end
     end
 
-    it { expect(@available_eligibility[:aptc]["#{family_member.id.to_s}"]).to eq 100.00 }
+    it { expect(@available_eligibility[:aptc][family_member.id.to_s]).to eq 100.00 }
     it { expect(@available_eligibility[:total_available_aptc]).to eq 100.00 }
     it { expect(@available_eligibility[:csr]).to eq 'csr_87' }
   end
