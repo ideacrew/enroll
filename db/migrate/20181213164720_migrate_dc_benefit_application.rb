@@ -151,6 +151,9 @@ class MigrateDcBenefitApplication < Mongoid::Migration
     @benefit_application.recorded_service_area_ids = @rating_service_area_hash[plan_year.start_on.year]['service_area']
 
     benefit_sponsor_catalog = BenefitMarkets::BenefitSponsorCatalog.where(benefit_application_id: plan_year.id).first rescue nil
+    # benefit_sponsor_catalog.product_packages.map {|pp| pp._id = BSON::ObjectId.new}
+    # benefit_sponsor_catalog.save(validate: false)
+
     raise "@benefit_sponsor_catalog not found #{plan_year.employer_profile.organization.hbx_id}" if benefit_sponsor_catalog.blank?
 
     @benefit_application.benefit_sponsor_catalog_id = benefit_sponsor_catalog.id
