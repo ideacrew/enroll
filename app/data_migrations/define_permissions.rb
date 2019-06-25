@@ -90,8 +90,16 @@ class DefinePermissions < MigrationTask
     Permission.hbx_tier3.update_attributes!(can_update_ssn: true)
   end
 
+  def hbx_admin_can_access_user_account_tab
+    Permission.hbx_staff.update_attributes!(can_access_user_account_tab: true)
+    Permission.super_admin.update_attributes!(can_access_user_account_tab: true)
+    Permission.hbx_tier3.update_attributes!(can_access_user_account_tab: true)
+  end
+
   def hbx_admin_csr_view_personal_info_page
     Permission.hbx_staff.update_attributes!(view_personal_info_page: true)
+    Permission.super_admin.update_attributes!(view_personal_info_page: true)
+    Permission.hbx_tier3.update_attributes!(view_personal_info_page: true)
     Permission.hbx_csr_supervisor.update_attributes!(view_personal_info_page: true)
     Permission.hbx_csr_tier2.update_attributes!(view_personal_info_page: true)
     Permission.hbx_csr_tier1.update_attributes!(view_personal_info_page: true)
@@ -117,6 +125,8 @@ class DefinePermissions < MigrationTask
 
   def hbx_admin_can_add_pdc
     Permission.hbx_staff.update_attributes!(can_add_pdc: true)
+    Permission.super_admin.update_attributes!(can_add_pdc: true)
+    Permission.hbx_tier3.update_attributes!(can_add_pdc: true)
   end
 
   def hbx_admin_can_view_username_and_email
@@ -151,6 +161,7 @@ class DefinePermissions < MigrationTask
   end
 
   def hbx_admin_can_extend_open_enrollment
+    Permission.super_admin.update_attributes!(can_extend_open_enrollment: true)
     Permission.hbx_tier3.update_attributes(can_extend_open_enrollment: true)
   end
 
@@ -181,10 +192,14 @@ class DefinePermissions < MigrationTask
 
   def hbx_admin_can_view_application_types
     Permission.hbx_staff.update_attributes!(can_view_application_types: true)
+    Permission.super_admin.update_attributes!(can_view_application_types: true)
+    Permission.hbx_tier3.update_attributes!(can_view_application_types: true)
   end
 
   def hbx_admin_can_access_new_consumer_application_sub_tab
     Permission.hbx_staff.update_attributes!(can_access_new_consumer_application_sub_tab: true)
+    Permission.super_admin.update_attributes!(can_access_new_consumer_application_sub_tab: true)
+    Permission.hbx_tier3.update_attributes!(can_access_new_consumer_application_sub_tab: true)
     Permission.hbx_csr_supervisor.update_attributes!(can_access_new_consumer_application_sub_tab: true)
     Permission.hbx_csr_tier1.update_attributes!(can_access_new_consumer_application_sub_tab: true)
     Permission.hbx_csr_tier2.update_attributes!(can_access_new_consumer_application_sub_tab: true)
@@ -192,6 +207,8 @@ class DefinePermissions < MigrationTask
 
   def hbx_admin_can_access_identity_verification_sub_tab
     Permission.hbx_staff.update_attributes!(can_access_identity_verification_sub_tab: true)
+    Permission.super_admin.update_attributes!(can_access_identity_verification_sub_tab: true)
+    Permission.hbx_tier3.update_attributes!(can_access_identity_verification_sub_tab: true)
     Permission.hbx_csr_supervisor.update_attributes!(can_access_identity_verification_sub_tab: true)
     Permission.hbx_csr_tier1.update_attributes!(can_access_identity_verification_sub_tab: true)
     Permission.hbx_csr_tier2.update_attributes!(can_access_identity_verification_sub_tab: true)
@@ -199,24 +216,34 @@ class DefinePermissions < MigrationTask
 
   def hbx_admin_can_access_outstanding_verification_sub_tab
     Permission.hbx_staff.update_attributes!(can_access_outstanding_verification_sub_tab: true)
+    Permission.super_admin.update_attributes!(can_access_outstanding_verification_sub_tab: true)
+    Permission.hbx_tier3.update_attributes!(can_access_outstanding_verification_sub_tab: true)
   end
 
   def hbx_admin_can_access_accept_reject_identity_documents
     Permission.hbx_staff.update_attributes!(can_access_accept_reject_identity_documents: true)
+    Permission.super_admin.update_attributes!(can_access_accept_reject_identity_documents: true)
+    Permission.hbx_tier3.update_attributes!(can_access_accept_reject_identity_documents: true)
   end
 
   def hbx_admin_can_access_accept_reject_paper_application_documents
     Permission.hbx_staff.update_attributes!(can_access_accept_reject_paper_application_documents: true)
+    Permission.super_admin.update_attributes!(can_access_accept_reject_paper_application_documents: true)
+    Permission.hbx_tier3.update_attributes!(can_access_accept_reject_paper_application_documents: true)
     Permission.hbx_csr_supervisor.update_attributes!(can_access_accept_reject_paper_application_documents: true)
     Permission.hbx_csr_tier1.update_attributes!(can_access_accept_reject_paper_application_documents: true)
     Permission.hbx_csr_tier2.update_attributes!(can_access_accept_reject_paper_application_documents: true)
   end
   def hbx_admin_can_transition_family_members
    Permission.hbx_staff.update_attributes!(can_transition_family_members: true)
+   Permission.super_admin.update_attributes!(can_transition_family_members: true)
+   Permission.hbx_tier3.update_attributes!(can_transition_family_members: true)
   end
 
   def hbx_admin_can_delete_identity_application_documents
     Permission.hbx_staff.update_attributes!(can_delete_identity_application_documents: true)
+    Permission.super_admin.update_attributes!(can_delete_identity_application_documents: true)
+    Permission.hbx_tier3.update_attributes!(can_delete_identity_application_documents: true)
   end
 
 end

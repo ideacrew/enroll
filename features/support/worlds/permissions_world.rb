@@ -36,9 +36,13 @@ module PermissionsWorld
 
   def hbx_admin_can_complete_resident_application
     Permission.hbx_staff.update_attributes!(can_complete_resident_application: true)
+    Permission.super_admin.update_attributes!(can_complete_resident_application: true)
+    Permission.hbx_tier3.update_attributes!(can_complete_resident_application: true)
   end
   def hbx_admin_can_add_sep
     Permission.hbx_staff.update_attributes!(can_add_sep: true)
+    Permission.super_admin.update_attributes!(can_add_sep: true)
+    Permission.hbx_tier3.update_attributes!(can_add_sep: true)
   end
 
   def hbx_admin_can_lock_unlock
@@ -47,10 +51,12 @@ module PermissionsWorld
 
   def hbx_admin_can_view_username_and_email
     Permission.hbx_staff.update_attributes!(can_view_username_and_email: true)
+    Permission.super_admin.update_attributes!(can_view_username_and_email: true)
+    Permission.hbx_tier3.update_attributes!(can_view_username_and_email: true)
     Permission.hbx_read_only.update_attributes!(can_view_username_and_email: true)
     Permission.hbx_csr_supervisor.update_attributes!(can_view_username_and_email: true)
-    Permission.hbx_csr_tier2.update_attributes!(can_view_username_and_email: true)
     Permission.hbx_csr_tier1.update_attributes!(can_view_username_and_email: true)
+    Permission.hbx_csr_tier2.update_attributes!(can_view_username_and_email: true)
   end
 
   def hbx_admin_can_reset_password
@@ -76,6 +82,12 @@ module PermissionsWorld
     Permission.hbx_tier3.update_attributes(can_create_benefit_application: true)
   end
 
+  def hbx_admin_can_access_user_account_tab
+    Permission.hbx_staff.update_attributes!(can_access_user_account_tab: true)
+    Permission.super_admin.update_attributes!(can_access_user_account_tab: true)
+    Permission.hbx_tier3.update_attributes!(can_access_user_account_tab: true)
+  end
+
   def make_all_permissions
     define_permissions
     hbx_admin_can_update_ssn
@@ -88,6 +100,7 @@ module PermissionsWorld
     hbx_admin_can_force_publish
     hbx_admin_can_extend_open_enrollment
     hbx_admin_can_create_benefit_application
+    hbx_admin_can_access_user_account_tab
   end
 end
 
@@ -95,4 +108,5 @@ World(PermissionsWorld)
 
 Given(/all permissions are present$/) do
   define_permissions
+  make_all_permissions
 end
