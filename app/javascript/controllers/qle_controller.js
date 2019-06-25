@@ -1,7 +1,7 @@
 import { Controller } from "stimulus"
 
 export default class extends Controller {
-  static targets = [ "question" ]
+  static targets = [ "question", "questionContainer" ]
 
   initialize() {
     console.log("initialized")
@@ -14,7 +14,9 @@ export default class extends Controller {
   addQuestion(e) {
     var newQuestion = document.importNode(this.questionTarget, true)
     newQuestion.classList.remove('hidden')
+    newQuestion.classList.add('js-question')
     document.getElementById('question-container').classList.remove('hidden')
+  
 
     this.uniqueInputs(newQuestion);
     var addButtonRow = e.currentTarget.parentNode.parentNode;
@@ -22,19 +24,15 @@ export default class extends Controller {
   }
 
   changeDateOperator(e){
-    $('select').selectric('destroy');
-    console.log("hit")
+    console.log("hit change date")
   }
 
   showQuestion(e){
-    console.log("Hitting show question.");
-    var question = e.currentTarget.value;
-    document.getElementById('question-show').innerHTML =  question
-    e.currentTarget.closest('#qle-question-form').classList.add('hidden')
-    document.getElementById('js-question').classList.remove('hidden')
-    document.getElementById('question-text').classList.remove('hidden')
-    document.getElementById('create-question-text').classList.remove('hidden')
-
+    e.currentTarget.classList.add('hidden')
+    var question = e.currentTarget.closest('.js-question')
+    question.querySelector('.js-question-text span').innerHTML = e.currentTarget.value
+    question.querySelector('.js-question-text').classList.remove('hidden')
+    question.querySelector('.js-question-type').classList.remove('hidden')
   }
   addDateResponse(e) {
     var answer = e.currentTarget.closest('.js-answer');
@@ -66,8 +64,12 @@ export default class extends Controller {
   }
 
   showQuestions(e){
-    e.preventDefault()
-    document.getElementById('question-container').classList.remove('hidden')
+    // e.preventDefault()
+    console.log(this.questionContainerTarget.querySelector("#create-question-text a"))
+    debugger
+    this.questionContainerTarget.classList.remove('hidden')
+    this.addQuestion({currentTarget: this.questionContainerTarget.querySelector("#create-question-text a")})
+    // document.getElementById('question-container').classList.remove('hidden')
 
   }
   showAnswer(e){

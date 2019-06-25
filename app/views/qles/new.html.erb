@@ -34,11 +34,11 @@
           <%= f.radio_button :visibility,:admin_only %></p>
         </div>
       </div>
-      <%= link_to "Create Attestation for this QLE", nil, id: "qle-question-form",  data: { action: "qle#showQuestions" } %>
-      <div id = "question-container" class="question-container hidden">
+      <a data-action="qle#showQuestions" id="qle-question-form">Create Attestation for this QLE</a>
+      <div id="question-container" data-target="qle.questionContainer" class="question-container hidden">
         <% @qle.questions.each do |question| %>
           <%= f.fields_for :questions, question do |question_fields| %>
-            <div class='row'>
+            <div class='row js-question'>
               <div class ='col-md-6'>
                 <%= render partial: "question", :locals => { f: question_fields } %>
               </div>
