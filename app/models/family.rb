@@ -73,65 +73,6 @@ class Family
   index({"family_members.broker_role_id" => 1})
   index({"family_members.is_primary_applicant" => 1})
   index({"family_members.hbx_enrollment_exemption.certificate_number" => 1})
-
-  index({"households.hbx_enrollments.broker_agency_profile_id" => 1}, {sparse: true})
-  index({"households.hbx_enrollments.effective_on" => 1})
-  index({"households.hbx_enrollments.benefit_group_assignment_id" => 1})
-  index({"households.hbx_enrollments.benefit_group_id" => 1})
-
-  index({"households.hbx_enrollments.aasm_state" => 1,
-         "households.hbx_enrollments.created_at" => 1},
-         {name: "state_and_created"})
-
-    index({"households.hbx_enrollments.kind" => 1,
-         "households.hbx_enrollments.aasm_state" => 1,
-         "households.hbx_enrollments.effective_on" => 1,
-         "households.hbx_enrollments.terminated_on" => 1
-         },
-         {name: "kind_and_state_and_created_and_terminated"})
-
-  index({"households.hbx_enrollments.is_any_enrollment_member_outstanding" => 1})
-  index({"households.hbx_enrollments.is_any_enrollment_member_outstanding" => 1,
-       "households.hbx_enrollments.aasm_state" => 1,
-       "households.hbx_enrollments.terminated_on" => 1
-       },
-       {name: "is_any_enrollment_member_outstanding_and_aasm_state_and_terminated_on"})
-
-  index({"households.hbx_enrollments.kind" => 1,
-       "households.hbx_enrollments.aasm_state" => 1,
-       "households.hbx_enrollments.is_any_enrollment_member_outstanding" => 1,
-       "households.hbx_enrollments.effective_on" => 1
-       },
-       {name: "kind_and_aasm_state_and_is_any_enrollment_member_outstanding_and_effective_on"})
-
-  index({"households.hbx_enrollments._id" => 1})
-  index({"households.hbx_enrollments.kind" => 1,
-         "households.hbx_enrollments.aasm_state" => 1,
-         "households.hbx_enrollments.coverage_kind" => 1,
-         "households.hbx_enrollments.effective_on" => 1
-         },
-         {name: "kind_and_state_and_coverage_kind_effective_date"})
-
-  index({
-    "households.hbx_enrollments.sponsored_benefit_package_id" => 1,
-    "households.hbx_enrollments.sponsored_benefit_id" => 1,
-    "households.hbx_enrollments.effective_on" => 1,
-    "households.hbx_enrollments.submitted_at" => 1,
-    "households.hbx_enrollments.terminated_on" => 1,
-    "households.hbx_enrollments.employee_role_id" => 1,
-    "households.hbx_enrollments.aasm_state" => 1,
-    "households.hbx_enrollments.kind" => 1
-  }, {name: "hbx_enrollment_sb_package_lookup"})
-
-  index({"households.hbx_enrollments.plan_id" => 1}, { sparse: true })
-  index({"households.hbx_enrollments.writing_agent_id" => 1}, { sparse: true })
-  index({"households.hbx_enrollments.hbx_id" => 1})
-  index({"households.hbx_enrollments.kind" => 1})
-  index({"households.hbx_enrollments.submitted_at" => 1})
-  index({"households.hbx_enrollments.effective_on" => 1})
-  index({"households.hbx_enrollments.terminated_on" => 1}, { sparse: true })
-  index({"households.hbx_enrollments.applied_aptc_amount" => 1})
-
   index({"households.tax_households.hbx_assigned_id" => 1})
   index({"households.tax_households.effective_starting_on" => 1})
   index({"households.tax_households.effective_ending_on" => 1})
