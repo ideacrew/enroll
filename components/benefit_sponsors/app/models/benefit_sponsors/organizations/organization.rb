@@ -267,6 +267,10 @@ module BenefitSponsors
         self.profiles.where(_type: /.*IssuerProfile$/).present?
       end
 
+      def is_a_fehb_profile?
+        profiles.where(_type: /.*FehbEmployerProfile$/).present?
+      end
+
       def active_benefit_sponsorship
         #TODO pull the correct benefit sponsorship
         benefit_sponsorships.first
