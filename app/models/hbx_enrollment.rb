@@ -180,21 +180,24 @@ class HbxEnrollment
   index({"is_any_enrollment_member_outstanding" => 1})
   index({"is_any_enrollment_member_outstanding" => 1,
        "aasm_state" => 1,
-       "terminated_on" => 1
+       "terminated_on" => 1,
+       "family_id" =>  1
        },
        {name: "is_any_enrollment_member_outstanding_and_aasm_state_and_terminated_on"})
 
   index({"kind" => 1,
        "aasm_state" => 1,
        "is_any_enrollment_member_outstanding" => 1,
-       "effective_on" => 1
+       "effective_on" => 1,
+       "family_id" => 1
        },
        {name: "kind_and_aasm_state_and_is_any_enrollment_member_outstanding_and_effective_on"})
 
   index({"kind" => 1,
          "aasm_state" => 1,
          "coverage_kind" => 1,
-         "effective_on" => 1
+         "effective_on" => 1,
+         "family_id" => 1
          },
          {name: "kind_and_state_and_coverage_kind_effective_date"})
 
@@ -208,6 +211,15 @@ class HbxEnrollment
     "aasm_state" => 1,
     "kind" => 1
   }, {name: "hbx_enrollment_sb_package_lookup"})
+
+  index(
+    {
+      "is_active" => 1,
+      "aasm_state" => 1,
+      "family_id" => 1
+    },
+    {name: "hbx_enrollment_active_and_state_and_family"}
+  )
 
   index({"plan_id" => 1}, { sparse: true })
   index({"writing_agent_id" => 1}, { sparse: true })
