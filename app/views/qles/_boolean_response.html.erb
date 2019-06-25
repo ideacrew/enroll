@@ -1,10 +1,4 @@
-<div class="row js-answer hidden" data-answer-type="boolean">
-  <%= f.fields_for :responses, f.object.responses.find_or_initialize_by(name: 'true') do |response_fields| %>
-    <%= response_fields.hidden_field :name, value: 'true' %>
-    True: <%= response_fields.select :name, {"Contact Call Center" => :contact_call_center, "Proceed" => :proceed, "Follow Up Question" => :follow_up_question } %>
-  <% end %>
-  <%= f.fields_for :responses, f.object.responses.find_or_initialize_by(name: 'false') do |response_fields| %>
-    <%= response_fields.hidden_field :name, value: 'false' %>
-    False: <%= response_fields.select :name, {"Contact Call Center" => :contact_call_center, "Proceed" => :proceed, "Follow Up Question" => :follow_up_question } %>
-  <% end %>
-</div>
+<%= f.fields_for :responses, f.object.new_response do |response_fields| %>
+  <%= response_fields.hidden_field :name, value: value %>
+  <%= value.capitalize %>: <%= response_fields.select :result, {"Contact Call Center" => :contact_call_center, "Proceed" => :proceed, "Follow Up Question" => :follow_up_question } %>
+<% end %>

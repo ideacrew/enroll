@@ -27,7 +27,7 @@ class QlesController < ApplicationController
   def new
     @qle = QualifyingLifeEventKind.new
     @qle.custom_qle_questions.build
-    @qle = ::Forms::QleForm.for_new(permitted_params)
+    @qle = ::Forms::QleForms::QleForm.for_new
   end
 
   def create

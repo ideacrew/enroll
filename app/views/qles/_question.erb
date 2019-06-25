@@ -18,7 +18,7 @@
   <%= f.radio_button :type, :boolean, data: { action: 'qle#showAnswer' } %>
   </p>
 
-  <%= f.fields_for :answer, f.object.build_custom_qle_answer do |answer_field| %>
+  <%= f.fields_for :answer, f.object.new_answer do |answer_field| %>
     <div class="row">
       <%= render partial: "answer", locals: { f: answer_field } %>
     </div>

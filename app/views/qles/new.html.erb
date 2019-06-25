@@ -36,8 +36,8 @@
       </div>
       <%= link_to "Create Attestation for this QLE", nil, id: "qle-question-form",  data: { action: "qle#showQuestions" } %>
       <div id = "question-container" class="question-container hidden">
-        <% @qle.custom_qle_questions.each do |question| %>
-          <%= f.fields_for :custom_qle_questions, question do |question_fields| %>
+        <% @qle.questions.each do |question| %>
+          <%= f.fields_for :questions, question do |question_fields| %>
             <div class='row'>
               <div class ='col-md-6'>
                 <%= render partial: "question", :locals => { f: question_fields } %>
@@ -45,7 +45,7 @@
             </div>
           <% end %>
         <% end %>
-        <%= f.fields_for :custom_qle_questions, @qle.custom_qle_questions.build do |question_fields| %>
+        <%= f.fields_for :questions, @qle.new_question do |question_fields| %>
           <div data-target="qle.question" class="hidden row">
             <div class='col-md-6 create-question-form'><%= render partial: "question", :locals => { f: question_fields } %></div>
           </div>
