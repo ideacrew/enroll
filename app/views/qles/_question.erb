@@ -1,7 +1,8 @@
-<h4 id="question-show">
+<h4 class="hidden" id="question-text">Question:
+  <span id="question-show"></span>
 </h4>
 <span >
-  <%= f.text_field :content, class: "form-control", id: "qle-question-form", required: true, placeholder: 'Question', autocomplete: :off , data: {action: "focusout->qle#showQuestion"} %>
+  <%= f.text_field :content, class: "form-control create-question-form", id: "qle-question-form", placeholder: 'Question', autocomplete: :off , data: {action: "focusout->qle#showQuestion"} %>
 </span>
 <div class='container js-question hidden' id="js-question">
   <h5>Please select the type of answer that is expected for this question</h5>

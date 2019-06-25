@@ -2,78 +2,96 @@
 <div class="container"  >
   <div id='custom-sep-container' data-controller="qle">
     <%= form_for @qle, url:  qles_path , method: "post", class: "form" do |f| %>
-      <div >
-        <div class='row'>
-          <h4 class= 'col-md-6'>Create a Qualifying Life Event</h4>
+      <div class='row'>
+        <h4 class='col-md-6' >Create a Qualifying Life Event</h4>
+      </div>
+      <div class='row'>
+        <div class = 'col-md-6'>
+          <span> <%= f.text_field :title, class: "form-control-custom-qle", placeholder: 'Title', autocomplete: :off %></span>
         </div>
-        <div>
-          <div class='row'>
-            <div class = 'col-md-6'>
-              <span> <%= f.text_field :title, class: "form-control-custom-qle", placeholder: 'Title', autocomplete: :off %></span>
-            </div>
-          </div>
-          <div class= "row">
-            <div class = 'col-md-6'>
-            <span> <%= f.text_field :event_kind_label, class: "form-control-custom-qle", placeholder: 'Event Kind Label', autocomplete: :off %></span>
-            </div>
-          </div>
-          <div class ='row' >
-            <div class='col-md-6'>
-              <span> <%= f.text_field :tool_tip, class: "form-control-custom-qle", placeholder: 'Tool tip text', autocomplete: :off %></span>
-            </div>
-          </div>
-          <div class='row'>
-            <div class ='col-md-6'>
-              <span> <%= f.text_field :reason, class: "form-control-custom-qle", placeholder: 'Reason', autocomplete: :off %></span>
-            </div>
-          </div>
-          <div class='row'>
-            <div class ='col-md-6'>
-              <p><%= label_tag "Visibility" %><p>
-              <p><%= label_tag "Self Service" %>
-              <%= f.radio_button :visibility, :self_service %></p>
-              <p><%= label_tag "Admin Only" %>
-              <%= f.radio_button :visibility,:admin_only %></p>
-            </div>
-          </div>
-          <%= link_to "Create Attestation for this QLE", nil , data: { action: "qle#showQuestions" }, class: "create-question-form"%>
-          <div id = "question-container" class="question-container hidden">
-            <% @qle.custom_qle_questions.each do |question| %>
-              <%= f.fields_for :custom_qle_questions, question do |question_fields| %>
-                <div class='row'>
-                  <div class ='col-md-6'>
-                    <%= render partial: "question", :locals => { f: question_fields } %>
-                  </div>
-                </div>
-              <% end %>
-            <% end %>
-            <%= f.fields_for :custom_qle_questions, @qle.custom_qle_questions.build do |question_fields| %>
-              <div data-target="qle.question" class="hidden row">
-                <div class='col-md-6 create-question-form'><%= render partial: "question", :locals => { f: question_fields } %></div>
-              </div>
-            <% end %>
-            
+      </div>
+      <div class= "row">
+        <div class = 'col-md-6'>
+        <span> <%= f.text_field :event_kind_label, class: "form-control-custom-qle", placeholder: 'Event Kind Label', autocomplete: :off %></span>
+        </div>
+      </div>
+      <div class ='row' >
+        <div class='col-md-6'>
+          <span> <%= f.text_field :tool_tip, class: "form-control-custom-qle", placeholder: 'Tool tip text', autocomplete: :off %></span>
+        </div>
+      </div>
+      <div class='row'>
+        <div class ='col-md-6'>
+          <span> <%= f.text_field :reason, class: "form-control-custom-qle", placeholder: 'Reason', autocomplete: :off %></span>
+        </div>
+      </div>
+      <div class='row'>
+        <div class ='col-md-6 create-question-form'>
+          <p><%= label_tag "Visibility" %><p>
+          <p><%= label_tag "Self Service" %>
+          <%= f.radio_button :visibility, :self_service %></p>
+          <p><%= label_tag "Admin Only" %>
+          <%= f.radio_button :visibility,:admin_only %></p>
+        </div>
+      </div>
+      <%= link_to "Create Attestation for this QLE", nil, id: "qle-question-form",  data: { action: "qle#showQuestions" } %>
+      <div id = "question-container" class="question-container hidden">
+        <% @qle.custom_qle_questions.each do |question| %>
+          <%= f.fields_for :custom_qle_questions, question do |question_fields| %>
             <div class='row'>
-              <div class ='col-md-6 create-question-form' ><a data-action="qle#addQuestion" >Create a new Question</a></div>
+              <div class ='col-md-6'>
+                <%= render partial: "question", :locals => { f: question_fields } %>
+              </div>
             </div>
+          <% end %>
+        <% end %>
+        <%= f.fields_for :custom_qle_questions, @qle.custom_qle_questions.build do |question_fields| %>
+          <div data-target="qle.question" class="hidden row">
+            <div class='col-md-6 create-question-form'><%= render partial: "question", :locals => { f: question_fields } %></div>
           </div>
-          <div class='row'>
-            <div class='col-md-6'>
-              <%= f.text_field :start_on, class: " form-control-custom-qle uidatepicker", placeholder: 'Effective From', autocomplete: :off %>
-            </div>
-          </div>
-          <div class='row'>
-            <div class='col-md-6'>
-            <span> <%= f.text_field :end_on, class: " form-control-custom-qle uidatepicker ", placeholder: 'Effective Until', autocomplete: :off %></span>
-            </div>
-          </div>
-          <div class='row'>
-            <div class='col-md-6'>
-            <span> <%= f.select :is_self_attested, ['Is Self Attested', 'yes', 'no'], class: " form-control-custom-qle  ", placeholder: 'Self Attested' %></span>
-            </div>
-          </div>
-        </tbody>
-      </table>
+        <% end %>
+        <div class='row'>
+          <div class="col-md-6 hidden create-question-form" id="create-question-text" ><a data-action="qle#addQuestion" >Create a new Question</a></div>
+        </div>
+      </div>
+      <div class='row create-question-form'>
+        <div class="col-md-6">
+          <h5 class=""><%= label_tag "Effective on Options" %></h5>
+          <p><%= label_tag "Date of Event" %>
+           <%= check_box_tag "Date of Event" %></p>
+          <p><%= label_tag "First of Next Month" %>
+           <%= check_box_tag "First of Next Month" %></p>
+          <p><%= label_tag "First of Month" %>
+           <%= check_box_tag "First of Month" %></p>
+          <p><%= label_tag "Fixed First of Next Month" %>
+           <%= check_box_tag "Fixed First of Next Month" %></p>
+          <p><%= label_tag "Next 15 of the Month" %>
+           <%= check_box_tag "Next 15 of the Month" %></p>
+          <p><%= label_tag "Exact Date" %>
+           <%= check_box_tag "Exact Date" %></p>
+          <p><%= label_tag "Date Options Available" %>
+           <%= check_box_tag "Date Options Available" %></p>
+        </div>
+      </div>
+      <div class='row'>
+        <div class='col-md-6'>
+          <%= f.text_field :start_on, class: " form-control-custom-qle uidatepicker", placeholder: 'Available from', autocomplete: :off %>
+        </div>
+      </div>
+      <div class='row'>
+        <div class='col-md-6'>
+        <span> <%= f.text_field :end_on, class: " form-control-custom-qle uidatepicker ", placeholder: 'Available until', autocomplete: :off %></span>
+        </div>
+      </div>
+      <div class='row'>
+        <div class ='col-md-6 create-question-form'>
+          <p><%= label_tag "Is Self Attested" %><p>
+          <p><%= label_tag "Yes" %>
+          <%= f.radio_button :is_self_attested, :self_service %></p>
+          <p><%= label_tag "No" %>
+          <%= f.radio_button :is_self_attested,:admin_only %></p>
+        </div>
+      </div>
       <div class="row no-buffer child-row">
         <div class="col-md-12 no-pd col-sm-12 col-xs-12">
           <%= f.submit "Submit", :class => "btn btn-primary create_eligibility", id: 'create_eligibility', :size => '100px'%>

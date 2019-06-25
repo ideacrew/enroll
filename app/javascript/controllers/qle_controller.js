@@ -6,6 +6,7 @@ export default class extends Controller {
   addQuestion(e) {
     var newQuestion = document.importNode(this.questionTarget, true)
     newQuestion.classList.remove('hidden')
+    document.getElementById('question-container').classList.remove('hidden')
 
     this.uniqueInputs(newQuestion);
     var addButtonRow = e.currentTarget.parentNode.parentNode;
@@ -13,15 +14,17 @@ export default class extends Controller {
   }
 
   changeDateOperator(e){
+    $('select').selectric('destroy');
+    console.log("hit")
   }
 
   showQuestion(e){
     var question = e.currentTarget.value;
     document.getElementById('question-show').innerHTML =  question
-  //  console.log(e.currentTarget.closest('.question-show'))
-
     e.currentTarget.closest('#qle-question-form').classList.add('hidden')
     document.getElementById('js-question').classList.remove('hidden')
+    document.getElementById('question-text').classList.remove('hidden')
+    document.getElementById('create-question-text').classList.remove('hidden')
 
   }
   addDateResponse(e) {
@@ -36,7 +39,6 @@ export default class extends Controller {
   changeMultipleChoiceResult(e){
     console.log("hit")
 
-
   }
 
   addMultipleChoiceResponse(e) {
@@ -50,7 +52,7 @@ export default class extends Controller {
   }
 
   removeResponse(e) {
-    var response = e.currentTarget.closest('.js-response');
+    var response = e.currentTarget.closest('.js-new-multiple-choice-response');
     response.remove();
   }
 
