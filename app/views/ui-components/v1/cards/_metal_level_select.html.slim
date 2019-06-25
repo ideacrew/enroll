@@ -59,6 +59,7 @@
                 .col-xs-12
                   label.container
                     = kind.capitalize
+                    = f.hidden_field :kind, value: "health"
                     = f.radio_button :product_option_choice, kind, class: 'product_option_choice', onclick:"getPlanInfo(this)", data: {name: kind}
                     span.checkmark
 
@@ -71,6 +72,7 @@
                 .col-xs-12
                   label.container
                     = carrier_name
+                    = f.hidden_field :kind, value: "health"
                     = f.radio_button :product_option_choice, carrier_id, class: 'product_option_choice', onclick:"getPlanInfo(this)", data: {name: carrier_name}
                     span.checkmark
 
