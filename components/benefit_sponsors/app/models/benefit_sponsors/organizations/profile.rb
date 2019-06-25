@@ -112,6 +112,14 @@ module BenefitSponsors
       def invoices
         documents.select{ |document| ["invoice", "initial_invoice"].include? document.subject }
       end
+      
+      def can_receive_paper_communication?
+        [:paper_only, :paper_and_electronic].include?(contact_method)
+      end
+      
+      def can_receive_electronic_communication?
+        [:electronic_only, :paper_and_electronic].include?(contact_method)
+      end
 
       class << self
         def find(id)
