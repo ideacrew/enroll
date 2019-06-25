@@ -3,14 +3,6 @@ import { Controller } from "stimulus"
 export default class extends Controller {
   static targets = [ "question", "questionContainer" ]
 
-  initialize() {
-    console.log("initialized")
-  }
-
-  connect() {
-    console.log("conected to DOM")
-  }
-
   addQuestion(e) {
     var newQuestion = document.importNode(this.questionTarget, true)
     newQuestion.classList.remove('hidden')
@@ -44,7 +36,6 @@ export default class extends Controller {
     answer.querySelector('.js-date-responses').appendChild(newResponse);
   }
   changeMultipleChoiceResult(e){
-    console.log("hit")
 
   }
 
@@ -59,17 +50,13 @@ export default class extends Controller {
   }
 
   removeResponse(e) {
-    var response = e.currentTarget.closest('.js-new-multiple-choice-response');
+    var response = e.currentTarget.closest('.js-response');
     response.remove();
   }
 
   showQuestions(e){
-    // e.preventDefault()
-    console.log(this.questionContainerTarget.querySelector("#create-question-text a"))
-    debugger
     this.questionContainerTarget.classList.remove('hidden')
     this.addQuestion({currentTarget: this.questionContainerTarget.querySelector("#create-question-text a")})
-    // document.getElementById('question-container').classList.remove('hidden')
 
   }
   showAnswer(e){
