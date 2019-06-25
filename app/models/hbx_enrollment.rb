@@ -161,6 +161,66 @@ class HbxEnrollment
   delegate :premium_for, to: :decorated_hbx_enrollment, allow_nil: true
 
 
+  #indexes
+  index({"broker_agency_profile_id" => 1}, {sparse: true})
+  index({"effective_on" => 1})
+  index({"benefit_group_assignment_id" => 1})
+  index({"benefit_group_id" => 1})
+
+  index({"aasm_state" => 1,
+         "created_at" => 1},
+         {name: "state_and_created"})
+
+    index({"kind" => 1,
+         "aasm_state" => 1,
+         "effective_on" => 1,
+         "terminated_on" => 1
+         },
+         {name: "kind_and_state_and_created_and_terminated"})
+
+  index({"is_any_enrollment_member_outstanding" => 1})
+  index({"is_any_enrollment_member_outstanding" => 1,
+       "aasm_state" => 1,
+       "terminated_on" => 1
+       },
+       {name: "is_any_enrollment_member_outstanding_and_aasm_state_and_terminated_on"})
+
+  index({"kind" => 1,
+       "aasm_state" => 1,
+       "is_any_enrollment_member_outstanding" => 1,
+       "effective_on" => 1
+       },
+       {name: "kind_and_aasm_state_and_is_any_enrollment_member_outstanding_and_effective_on"})
+
+  index({"_id" => 1})
+  index({"kind" => 1,
+         "aasm_state" => 1,
+         "coverage_kind" => 1,
+         "effective_on" => 1
+         },
+         {name: "kind_and_state_and_coverage_kind_effective_date"})
+
+  index({
+    "sponsored_benefit_package_id" => 1,
+    "sponsored_benefit_id" => 1,
+    "effective_on" => 1,
+    "submitted_at" => 1,
+    "terminated_on" => 1,
+    "employee_role_id" => 1,
+    "aasm_state" => 1,
+    "kind" => 1
+  }, {name: "hbx_enrollment_sb_package_lookup"})
+
+  index({"plan_id" => 1}, { sparse: true })
+  index({"writing_agent_id" => 1}, { sparse: true })
+  index({"hbx_id" => 1})
+  index({"kind" => 1})
+  index({"submitted_at" => 1})
+  index({"effective_on" => 1})
+  index({"terminated_on" => 1}, { sparse: true })
+  index({"applied_aptc_amount" => 1})
+
+
   scope :active,              ->{ where(is_active: true).where(:created_at.ne => nil) } # Depricated scope
   scope :open_enrollments,    ->{ where(enrollment_kind: "open_enrollment") }
   scope :special_enrollments, ->{ where(enrollment_kind: "special_enrollment") }
