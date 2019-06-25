@@ -11,6 +11,10 @@ module Forms
       attribute :type, String
       attribute :answer, Forms::QleForms::AnswerForm
 
+      def answer_attributes=(answer_params)
+        self.answer = answer_params
+      end
+
       def new_answer
         Forms::QleForms::AnswerForm.new
       end

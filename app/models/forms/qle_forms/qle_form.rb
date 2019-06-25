@@ -6,6 +6,9 @@ module Forms
       include ActiveModel::Conversion
       include ActiveModel::Model
       include ActiveModel::Validations
+      
+      # Quick workaround for params not being allowed
+      attr_accessor :service
 
       attribute :action_kind_options, String
   	  attribute :event_kind_label, String
@@ -31,12 +34,26 @@ module Forms
   	  attribute :title, String
   	  attribute :questions, Array[Forms::QleForms::QuestionForm]
 
+      def questions_attributes=(questions_params)
+        self.questions = questions_params.values
+      end
+
       def new_question
         Forms::QleForms::QuestionForm.new
       end
 
       def self.for_new
         new
+      end
+
+      def self.for_create(params)
+        form = self.new(params)
+        form.service = resolve_service(params, "create")
+        form
+      end
+
+      def self.resolve_service(attrs={}, find_or_create)
+        @service = Forms::QleForms::QleFormService.new(attrs, find_or_create)
       end
     end
   end

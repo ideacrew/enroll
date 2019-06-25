@@ -9,6 +9,10 @@ module Forms
 
       attribute :responses, Array[Forms::QleForms::ResponseForm]
 
+      def responses_attributes=(responses_params)
+        self.responses = responses_params.values
+      end
+
       def new_response
         Forms::QleForms::ResponseForm.new
       end
