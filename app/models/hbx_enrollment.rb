@@ -160,7 +160,6 @@ class HbxEnrollment
   delegate :total_premium, :total_employer_contribution, :total_employee_cost, to: :decorated_hbx_enrollment, allow_nil: true
   delegate :premium_for, to: :decorated_hbx_enrollment, allow_nil: true
 
-
   #indexes
   index({"broker_agency_profile_id" => 1}, {sparse: true})
   index({"effective_on" => 1})
@@ -192,7 +191,6 @@ class HbxEnrollment
        },
        {name: "kind_and_aasm_state_and_is_any_enrollment_member_outstanding_and_effective_on"})
 
-  index({"_id" => 1})
   index({"kind" => 1,
          "aasm_state" => 1,
          "coverage_kind" => 1,
