@@ -140,12 +140,6 @@ group :development, :test do
   gem 'yard-mongoid',           '~> 0.1',     require: false
   gem 'rails-controller-testing'
   gem 'climate_control', '~> 0.2.0'
-  gem 'rb-readline'
-  gem 'pry'
-  gem 'pry-byebug'
-  gem 'pry-rails'
-  gem 'pry-remote'
-  gem 'pry-stack_explorer'
 end
 
 group :test do
