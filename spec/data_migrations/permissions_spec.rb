@@ -73,6 +73,41 @@ describe DefinePermissions, dbclean: :after_each do
       end
     end
 
+    describe 'update permissions for hbx staff role to be able to access user accounts tab' do
+      let(:given_task_name) {':hbx_admin_can_access_user_account_tab'}
+
+      before do
+        User.all.delete
+        Person.all.delete
+        @hbx_staff_person = FactoryBot.create(:person)
+        @super_admin = FactoryBot.create(:person)
+        @hbx_tier3 = FactoryBot.create(:person)
+        @hbx_read_only_person = FactoryBot.create(:person)
+        @hbx_csr_supervisor_person = FactoryBot.create(:person)
+        @hbx_csr_tier1_person = FactoryBot.create(:person)
+        @hbx_csr_tier2_person = FactoryBot.create(:person)
+        FactoryBot.create(:hbx_staff_role, person: @hbx_staff_person, subrole: "hbx_staff", permission_id: Permission.hbx_staff.id)
+        FactoryBot.create(:hbx_staff_role, person: @hbx_read_only_person, subrole: "hbx_read_only", permission_id: Permission.hbx_read_only.id)
+        FactoryBot.create(:hbx_staff_role, person: @hbx_csr_supervisor_person, subrole: "hbx_csr_supervisor", permission_id: Permission.hbx_csr_supervisor.id)
+        FactoryBot.create(:hbx_staff_role, person: @hbx_csr_tier1_person, subrole: "hbx_csr_tier1", permission_id: Permission.hbx_csr_tier1.id)
+        FactoryBot.create(:hbx_staff_role, person: @hbx_csr_tier2_person, subrole: "hbx_csr_tier2", permission_id: Permission.hbx_csr_tier2.id)
+        FactoryBot.create(:hbx_staff_role, person: @super_admin, subrole: "super_admin", permission_id: Permission.super_admin.id)
+        FactoryBot.create(:hbx_staff_role, person: @hbx_tier3, subrole: "hbx_tier3", permission_id: Permission.hbx_tier3.id)
+        subject.hbx_admin_can_access_user_account_tab
+      end
+
+      it "updates can_access_user_account_tab to true" do
+        expect(Person.all.count).to eq(7)
+        expect(@hbx_staff_person.hbx_staff_role.permission.can_access_user_account_tab).to be true
+        expect(@super_admin.hbx_staff_role.permission.can_access_user_account_tab).to be true
+        expect(@hbx_tier3.hbx_staff_role.permission.can_access_user_account_tab).to be true
+        expect(@hbx_read_only_person.hbx_staff_role.permission.can_access_user_account_tab).to be false
+        expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_access_user_account_tab).to be false
+        expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_access_user_account_tab).to be false
+        expect(@hbx_csr_tier2_person.hbx_staff_role.permission.can_access_user_account_tab).to be false
+      end
+    end
+
     describe 'update permissions for super admin role to be able to force publish' do
       let(:given_task_name) {':hbx_admin_can_force_publish'}
 
@@ -952,19 +987,27 @@ describe DefinePermissions, dbclean: :after_each do
       @hbx_csr_supervisor_person = FactoryBot.create(:person)
       @hbx_csr_tier1_person = FactoryBot.create(:person)
       @hbx_csr_tier2_person = FactoryBot.create(:person)
+      @super_admin = FactoryBot.create(:person)
+      @hbx_tier3 = FactoryBot.create(:person)
       permission_hbx_staff = FactoryBot.create(:permission, :hbx_staff)
       permission_hbx_csr_supervisor = FactoryBot.create(:permission, :hbx_csr_supervisor)
       permission_hbx_csr_tier2 = FactoryBot.create(:permission, :hbx_csr_tier2)
       permission_hbx_csr_tier1 = FactoryBot.create(:permission, :hbx_csr_tier1)
-      hbx_staff_role = FactoryBot.create(:hbx_staff_role, person: @hbx_staff_person, subrole: "hbx_staff", permission_id: permission_hbx_staff.id)
-      hbx_csr_supervisor_role = FactoryBot.create(:hbx_staff_role, person: @hbx_csr_supervisor_person, subrole: "hbx_csr_supervisor", permission_id: permission_hbx_csr_supervisor.id)
-      hbx_csr_tier1_role = FactoryBot.create(:hbx_staff_role, person: @hbx_csr_tier2_person, subrole: "hbx_csr_tier1", permission_id: permission_hbx_csr_tier2.id)
-      hbx_csr_tier2_role = FactoryBot.create(:hbx_staff_role, person: @hbx_csr_tier1_person, subrole: "hbx_csr_tier2", permission_id: permission_hbx_csr_tier1.id)
+      FactoryBot.create(:permission, :hbx_tier3)
+      FactoryBot.create(:permission, :super_admin)
+      FactoryBot.create(:hbx_staff_role, person: @hbx_staff_person, subrole: "hbx_staff", permission_id: permission_hbx_staff.id)
+      FactoryBot.create(:hbx_staff_role, person: @hbx_csr_supervisor_person, subrole: "hbx_csr_supervisor", permission_id: permission_hbx_csr_supervisor.id)
+      FactoryBot.create(:hbx_staff_role, person: @hbx_csr_tier2_person, subrole: "hbx_csr_tier1", permission_id: permission_hbx_csr_tier2.id)
+      FactoryBot.create(:hbx_staff_role, person: @hbx_csr_tier1_person, subrole: "hbx_csr_tier2", permission_id: permission_hbx_csr_tier1.id)
+      FactoryBot.create(:hbx_staff_role, person: @super_admin, subrole: "super_admin", permission_id: Permission.super_admin.id)
+      FactoryBot.create(:hbx_staff_role, person: @hbx_tier3, subrole: "hbx_tier3", permission_id: Permission.hbx_tier3.id)
       subject.hbx_admin_csr_view_personal_info_page
     end
     it "updates hbx_admin_csr_view_personal_info_page to true" do
-      expect(Person.all.count).to eq(4)
+      expect(Person.all.count).to eq(6)
       expect(@hbx_staff_person.hbx_staff_role.permission.view_personal_info_page).to be true
+      expect(@super_admin.hbx_staff_role.permission.view_personal_info_page).to be true
+      expect(@hbx_tier3.hbx_staff_role.permission.view_personal_info_page).to be true
       expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.view_personal_info_page).to be true
       expect(@hbx_csr_tier2_person.hbx_staff_role.permission.view_personal_info_page).to be true
       expect(@hbx_csr_tier1_person.hbx_staff_role.permission.view_personal_info_page).to be true
