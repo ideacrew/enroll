@@ -46,9 +46,17 @@ module Forms
         new
       end
 
+      # TODO: A few attributes have to be added to the form,
+      # such as event_kind_label
       def self.for_create(params)
         form = self.new(params)
         form.service = resolve_service(params, "create")
+        form
+      end
+
+      def self.for_update(params)
+        form = self.new(params)
+        form.service = resolve_service(params, "update")
         form
       end
 
