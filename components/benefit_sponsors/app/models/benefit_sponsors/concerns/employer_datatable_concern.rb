@@ -26,14 +26,21 @@ module BenefitSponsors
           orgs =  BenefitSponsors::Organizations::Organization.employer_profiles.where(:"profiles.employer_attestation.aasm_state".in => EmployerAttestation::ATTESTATION_KINDS)
           self.where(:"organization".in => orgs.collect{|org| org.id.to_s}) }
 
-        scope :benefit_sponsorship_applicant, -> () { where(:"aasm_state" => :applicant) }
+        scope :benefit_sponsorship_applicant, lambda {
+          where({"$or":
+            [
+              {:aasm_state => :applicant, :"benefit_applications.aasm_state".in => [:draft, :expired, :terminated, :canceled, :enrollment_ineligible, :approved, :pending], :"benefit_applications.predecessor_id" => {:$exists => false}},
+              {:benefit_applications => {:$exists => false}}
+            ]
+          })
+        }
 
         scope :benefit_application_enrolling, -> () {
-          where(:"benefit_applications.aasm_state".in => [:draft, :enrollment_open, :enrollment_extended, :enrollment_closed, :enrollment_eligible])
+          where(:"benefit_applications.aasm_state".in => [:draft, :enrollment_open, :enrollment_extended, :enrollment_closed, :enrollment_eligible, :binder_paid])
         }
 
         scope :benefit_application_enrolling_initial, -> () {
-          where(:"benefit_applications.aasm_state".in => [:draft, :enrollment_open, :enrollment_extended, :enrollment_closed, :enrollment_eligible], :"benefit_applications.predecessor_id" => {:$exists => false})
+          where(:"benefit_applications.aasm_state".in => [:draft, :enrollment_open, :enrollment_extended, :enrollment_closed, :enrollment_eligible, :binder_paid], :"benefit_applications.predecessor_id" => {:$exists => false})
         }
 
         scope :benefit_application_enrolling_renewing, -> () {
@@ -98,11 +105,6 @@ module BenefitSponsors
         }
 
       end
-
-
-
-
-
     end
   end
 end
