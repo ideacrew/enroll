@@ -1148,6 +1148,14 @@ class Family
     end
   end
 
+  def set_active_admin_dt_enrollments(enrollment_set)
+    @active_admin_dt_enrollments = enrollment_set
+  end
+
+  def active_admin_dt_enrollments
+    @active_admin_dt_enrollments || []
+  end
+
 private
   def build_household
     if households.size == 0

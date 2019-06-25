@@ -10,7 +10,7 @@ module Effective
         table_column :dob, :label => 'DOB', :proc => Proc.new { |row| format_date(row.primary_applicant.person.dob)}, :filter => false, :sortable => false
         table_column :hbx_id, :label => 'HBX ID', :proc => Proc.new { |row| row.primary_applicant.person.hbx_id }, :filter => false, :sortable => false
         table_column :count, :label => 'Count', :width => '100px', :proc => Proc.new { |row| row.active_family_members.size }, :filter => false, :sortable => false
-        table_column :active_enrollments, :label => 'Active Enrollments?', :proc => Proc.new { |row| row.active_household.hbx_enrollments.active.enrolled_and_renewing.present? ? "Yes" : "No"}, :filter => false, :sortable => false
+        table_column :active_enrollments, :label => 'Active Enrollments?', :proc => Proc.new { |row| row.active_admin_dt_enrollments.any? ? "Yes" : "No"}, :filter => false, :sortable => false
         table_column :registered?, :width => '100px', :proc => Proc.new { |row| row.primary_applicant.person.user.present? ? "Yes" : "No"} , :filter => false, :sortable => false
         if individual_market_is_enabled?
           table_column :consumer?, :width => '100px', :proc => Proc.new { |row| row.primary_applicant.person.consumer_role.present?  ? "Yes" : "No"}, :filter => false, :sortable => false
