@@ -59,6 +59,18 @@ class MigrateDcBrokerAgencyAccounts < Mongoid::Migration
       end
     end
 
+    # TODO Fix
+    #ivl family broker agency accounts with deleted broker agency profile id(BSON::ObjectId('561bf307547265b236d11400')
+    # ["5619c9ff54726532e53b8a00", "5619c9ff54726532e53b8a00", "5619ca7e54726532e5f16701",
+    #  "5619ca7e54726532e5f16701", "5619cb5754726532e535ca02", "5619cb5754726532e535ca02",
+    #  "5619cb5754726532e535ca02", "5619cb5754726532e535ca02", "564ce6c969702d16e3624800",
+    #  "564ce6c969702d16e3624800", "564ce6c969702d16e3624800", "564ce6c969702d16e3624800",
+    #  "564ce6c969702d16e3624800", "564ce6c969702d16e3624800", "564ce6c969702d16e3624800",
+    #  "564ce6c969702d16e3624800", "564ce6c969702d16e3624800", "564ce6c969702d16e3624800",
+    #  "5669f34769702d2572340300", "5669f34769702d2572340300", "5669f34769702d2572340300",
+    #  "5669f34769702d2572340300", "5669f34769702d2572340300", "566b474669702d6d24c70000",
+    #  "566b474669702d6d24c70000", "566b474669702d6d24c70000"]
+
     say_with_time("Time taken to migrate family broker agency accounts") do
       Family.where(:'broker_agency_accounts'.exists=>true).each do |fam|
         begin
