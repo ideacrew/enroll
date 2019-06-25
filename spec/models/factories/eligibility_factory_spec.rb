@@ -24,7 +24,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
     end
 
     [:aptc, :csr, :total_available_aptc].each do |keyy|
-      it { expect(@available_eligibility.has_key?(keyy)).to be_truthy }
+      it { expect(@available_eligibility.key?(keyy)).to be_truthy }
     end
 
     it 'should have all the aptc shopping member ids' do
@@ -52,7 +52,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
     end
 
     [:aptc, :csr, :total_available_aptc].each do |keyy|
-      it { expect(@available_eligibility.has_key?(keyy)).to be_truthy }
+      it { expect(@available_eligibility.key?(keyy)).to be_truthy }
     end
 
     it 'should have all the aptc shopping member ids' do
@@ -62,8 +62,8 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
       end
     end
 
-    it { expect(@available_eligibility[:aptc]["#{family_member.id.to_s}"]).to eq 100.00 }
-    it { expect(@available_eligibility[:aptc]["#{family_member2.id.to_s}"]).to eq 200.0 }
+    it { expect(@available_eligibility[:aptc][family_member.id.to_s]).to eq 100.00 }
+    it { expect(@available_eligibility[:aptc][family_member2.id.to_s]).to eq 200.0 }
     it { expect(@available_eligibility[:total_available_aptc]).to eq 300.00 }
     it { expect(@available_eligibility[:csr]).to eq 'csr_87' }
   end
@@ -82,10 +82,10 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
     end
 
     [:aptc, :csr, :total_available_aptc].each do |keyy|
-      it { expect(@available_eligibility.has_key?(keyy)).to be_truthy }
+      it { expect(@available_eligibility.key?(keyy)).to be_truthy }
     end
 
-    it { expect(@available_eligibility[:aptc]["#{family_member.id.to_s}"]).to eq 100.00 }
+    it { expect(@available_eligibility[:aptc][family_member.id.to_s]).to eq 100.00 }
     it { expect(@available_eligibility[:total_available_aptc]).to eq 100.00 }
     it { expect(@available_eligibility[:csr]).to eq 'csr_100' }
   end
@@ -105,7 +105,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
     end
 
     [:aptc, :csr, :total_available_aptc].each do |keyy|
-      it { expect(@available_eligibility.has_key?(keyy)).to be_truthy }
+      it { expect(@available_eligibility.key?(keyy)).to be_truthy }
     end
 
     it 'should have all the aptc shopping member ids' do
@@ -115,8 +115,8 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
       end
     end
 
-    it { expect(@available_eligibility[:aptc]["#{family_member.id.to_s}"]).to eq 50.00 }
-    it { expect(@available_eligibility[:aptc]["#{family_member2.id.to_s}"]).to eq 200.0 }
+    it { expect(@available_eligibility[:aptc][family_member.id.to_s]).to eq 50.00 }
+    it { expect(@available_eligibility[:aptc][family_member2.id.to_s]).to eq 200.0 }
     it { expect(@available_eligibility[:total_available_aptc]).to eq 250.00 }
     it { expect(@available_eligibility[:csr]).to eq 'csr_87' }
   end

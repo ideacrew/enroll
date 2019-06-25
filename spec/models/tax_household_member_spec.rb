@@ -11,7 +11,7 @@ RSpec.describe TaxHouseholdMember, type: :model do
 
   context 'validations' do
     context 'strictly_one_pdc_only' do
-       it { expect(tax_household_member1.save).to eq false }
+      it { expect(tax_household_member1.save).to eq false }
 
       it 'should return error messages' do
         tax_household_member1.valid?
