@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_context 'setup initial family with one member', :shared_context => :metadata do
 
   let!(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
@@ -8,7 +10,7 @@ end
 RSpec.shared_context 'setup one tax household with one ia member', :shared_context => :metadata do
   include_context 'setup initial family with one member'
 
-  let!(:person2) do 
+  let!(:person2) do
     member = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)
     person.ensure_relationship_with(member, 'spouse')
     member.save!
@@ -33,7 +35,7 @@ end
 RSpec.shared_context 'setup initial family with primary and spouse', :shared_context => :metadata do
   include_context 'setup initial family with one member'
 
-  let!(:person2) do 
+  let!(:person2) do
     member = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)
     person.ensure_relationship_with(member, 'spouse')
     member.save!
