@@ -17,7 +17,7 @@ class TaxHouseholdMember
   field :is_subscriber, type: Boolean, default: false
   field :reason, type: String
 
-  validate :strictly_boolean
+  validate :strictly_boolean, :strictly_one_pdc_only
 
   def eligibility_determinations
     return nil unless tax_household
@@ -40,11 +40,11 @@ class TaxHouseholdMember
   end
 
   def is_ia_eligible?
-    is_ia_eligible
+    is_ia_eligible && !is_medicaid_chip_eligible && !is_totally_ineligible && !is_uqhp_eligible
   end
 
   def is_medicaid_chip_eligible?
-    is_medicaid_chip_eligible
+    !is_ia_eligible && is_medicaid_chip_eligible && !is_totally_ineligible && !is_uqhp_eligible
   end
 
   def is_subscriber?
@@ -67,6 +67,11 @@ class TaxHouseholdMember
     unless is_subscriber.is_a? Boolean
       self.errors.add(:base, "is_subscriber should be a boolean")
     end
+  end
+
+  def strictly_one_pdc_only
+    pdc_values = [is_ia_eligible, is_medicaid_chip_eligible, is_totally_ineligible, is_uqhp_eligible]
+    errors.add(:base, "only one of the all pdcs types should be applicable") unless pdc_values.count(true) == 1
   end
 
   def person
