@@ -1,6 +1,6 @@
 require "rails_helper"
 
-describe AccessPolicies::EmployerProfile, :dbclean => :after_each do
+describe AccessPolicies::EmployerProfile, :dbclean => :before_each do
   subject { AccessPolicies::EmployerProfile.new(user) }
   let(:user) { FactoryGirl.create(:user, person: person) }
   let(:controller) { Employers::EmployerProfilesController.new }
@@ -139,11 +139,17 @@ describe AccessPolicies::EmployerProfile, :dbclean => :after_each do
       let(:user) { FactoryGirl.create(:user, person: person, roles: ["general_agency_staff"]) }
       let(:person) { FactoryGirl.create(:person, :with_general_agency_staff_role) }
       let(:general_agency_staff) { person.general_agency_staff_roles.last }
-      let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+      let(:general_agency_profile) { person.general_agency_staff_roles.first.general_agency_profile }
+      let(:broker_person) { FactoryGirl.create(:person) }
+      let(:broker_role) { FactoryGirl.create(:broker_role, person: broker_person)}
+      let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, primary_broker_role: broker_role) }
+      let!(:plan_design_organization) { FactoryGirl.create(:sponsored_benefits_plan_design_organization, owner_profile_id: broker_agency_profile.id, sponsor_profile_id: employer_profile.id)}
+      let!(:plan_design_organization_with_ga){
+                                              plan_design_organization.general_agency_accounts.create(start_on: TimeKeeper.date_of_record, general_agency_profile_id: general_agency_profile.id, broker_agency_profile_id: broker_agency_profile.id, broker_role_id: broker_agency_profile.primary_broker_role.id)
+                                              plan_design_organization
+                                             }
 
       it "should authorize" do
-        allow(general_agency_staff).to receive(:general_agency_profile).and_return general_agency_profile
-        allow(general_agency_profile).to receive(:employer_clients).and_return([employer_profile])
         expect(subject.authorize_edit(employer_profile, controller)).to be_truthy
       end
     end

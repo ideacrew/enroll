@@ -3,7 +3,6 @@ require "rails_helper"
 describe AccessPolicies::EmployeeRole, :dbclean => :after_each do
   subject { AccessPolicies::EmployeeRole.new(user) }
   let(:user) { FactoryGirl.create(:user, person: person)}
-  let(:random_user) { FactoryGirl.create(:user)}
   let(:person) {FactoryGirl.create(:person, :with_employee_role) }
   let(:controller) { Insured::EmployeeRolesController.new }
   let(:another_employer) { FactoryGirl.create(:employer_profile) }
@@ -105,7 +104,6 @@ describe AccessPolicies::EmployeeRole, :dbclean => :after_each do
     let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
 
     it "should redirect you to your bookmark employee role page if the user has employee role match the employee" do
-      # subject { AccessPolicies::EmployeeRole.new(random_user) }
       EmployerProfile.find_by_general_agency_profile(general_agency_profile).each{ |employer_profile| employer_profile.destroy }
       expect(controller).to receive(:redirect_to_check_employee_role)
       subject.authorize_employee_role(person.employee_roles.first, controller)
