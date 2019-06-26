@@ -205,22 +205,13 @@ describe FamilyMember, "aptc_benchmark_amount" do
   let(:person) { FactoryBot.create(:person, :with_consumer_role)}
   let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person, e_case_id: "family_test#1000")}
   let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
-  let(:plan) do
-    FactoryBot.create(
-      :benefit_markets_products_health_products_health_product,
-      benefit_market_kind: :aca_individual,
-      kind: :health, csr_variant_id: '01',
-      metal_level: 'gold',
-      active_year: TimeKeeper.date_of_record.year,
-      hios_id: '11111111122302-01'
-    )
-  end
+  let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
   before do
-    hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}.update_attributes!(slcsp_id: plan.id)
+    hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}.update_attributes!(slcsp_id: product.id)
   end
 
   it 'should return valid benchmark value' do
     family_member = FamilyMember.new(:person => person)
-    expect(family_member.aptc_benchmark_amount.round(2)).to eq 508.70
+    expect(family_member.aptc_benchmark_amount.round(2)).to eq 198.86
   end
 end
