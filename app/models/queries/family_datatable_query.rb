@@ -66,18 +66,18 @@ module Queries
 
     def each
       return to_enum(:each) unless block_given?
-      limited_scope, active_enrollment_cache = build_iteration_caches
+      limited_scope, enrollment_cache = build_iteration_caches
       limited_scope.each do |fam|
-        fam.set_active_admin_dt_enrollments(active_enrollment_cache[fam.active_household.id])
+        fam.set_admin_dt_enrollments(enrollment_cache[fam.id])
         yield fam
       end
     end
 
     def each_with_index
       return to_enum(:each_with_index) unless block_given?
-      limited_scope, active_enrollment_cache = build_iteration_caches
+      limited_scope, enrollment_cache = build_iteration_caches
       limited_scope.each_with_index do |fam, idx|
-        fam.set_active_admin_dt_enrollments(active_enrollment_cache[fam.active_household.id])
+        fam.set_admin_dt_enrollments(enrollment_cache[fam.id])
         yield fam, idx if block_given?
       end
     end
@@ -111,14 +111,14 @@ module Queries
       skipped_scope = apply_skip(build_scope)
       limited_scope = apply_limit(skipped_scope)
       family_ids = limited_scope.pluck(:id)
-      active_enrollment_cache = load_active_enrollment_cache_for(family_ids)
-      [limited_scope, active_enrollment_cache]
+      enrollment_cache = load_enrollment_cache_for(family_ids)
+      [limited_scope, enrollment_cache]
     end
 
-    def load_active_enrollment_cache_for(family_ids)
+    def load_enrollment_cache_for(family_ids)
       enrollment_cache = Hash.new { |h, k| h[k] = Array.new }
-      HbxEnrollment.active.enrolled_and_renewing.where(:family_id => {"$in" => family_ids}).each do |en|
-        enrollment_cache[en.household_id] = enrollment_cache[en.household_id] + [en]
+      HbxEnrollment.where(:family_id => {"$in" => family_ids}).each do |en|
+        enrollment_cache[en.family_id] = enrollment_cache[en.family_id] + [en]
       end
       enrollment_cache
     end
