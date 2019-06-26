@@ -7,8 +7,10 @@ class QlesController < ApplicationController
   # whether or not theyh're a member of the right market kind, whether or not
   # they're eligible for deactivation, etc. We're going to switch the stimulus to
   # Angular to facilitate this.
-  def new_manage_qle
-    @manage_qle = ::Forms::ManageQleForm.for_new(permitted_params)
+  def manage
+    # TODO: Fix these scopes, probably hide them behind a JSON serializer
+    @editable_qles = QualifyingLifeEventKind.all
+    @deactivatable_qles = QualifyingLifeEventKind.all
   end
 
   def create_manage_qle

@@ -14,6 +14,7 @@ import { OfficeLocationComponent } from './office_locations/office_location.comp
 import { AchInformationComponent } from './financial/ach_information.component';
 import { BrokerAgencyProfileResourceService } from './broker_agency_profile/broker_agency_profile_resource.service'
 import { FieldErrorsComponent } from './errors/field_errors.component';
+import { QleKindWizardComponent } from  './admin/qle_kinds/qle_kind_wizard.component';
 import { ErrorLocalizer } from './error_localizer';
 
 @NgModule({
@@ -23,9 +24,13 @@ import { ErrorLocalizer } from './error_localizer';
     FieldErrorsComponent,
     PhoneComponent,
     OfficeLocationComponent,
+    QleKindWizardComponent,
     TrustedHtmlPipe
   ],
-  entryComponents: [BrokerAgencyProfileCreateComponent],
+  entryComponents: [
+    BrokerAgencyProfileCreateComponent,
+    QleKindWizardComponent
+  ],
   imports: [
     BrowserModule,
     HttpClientModule,
@@ -45,5 +50,7 @@ export class AppModule {
   ngDoBootstrap() {
     const bapc_custom = createCustomElement(BrokerAgencyProfileCreateComponent, {injector: this.injector });
     customElements.define("broker-agency-profile-create",bapc_custom);
+    const qlewk_custom = createCustomElement(QleKindWizardComponent, {injector: this.injector });
+    customElements.define("admin-qle-management-wizard",qlewk_custom);
   }
 }
