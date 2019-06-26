@@ -1,0 +1,62 @@
+ <div class="container" style="padding-top: 1px">
+  <div class='row'>
+    <div class='col-md-9'>
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <center><strong>Manage Qualifying Life Events</strong></center>
+        </div>
+          <div class="panel-body">
+            <%= form_for @manage_qle, as: :manage_qle, url: create_manage_qle_qles_path, method: :post do |f| %>
+              <div class="radio_option">
+                <div>
+                  <%= f.radio_button :action, :new_qle, checked: true, class: "required floatlabel show_qle_select_radio hide_qle_select_radio"  %>
+                  <label><span>Create a custom QLE</span></label>
+                  &nbsp;&nbsp;&nbsp;
+                  <%= f.radio_button :action, :modify_qle, value: '', class: "required floatlabel show_qle_select_radio"  %>
+                  <label><span>Modify existing QLE</span></label>
+                  &nbsp;&nbsp;&nbsp;
+                  <%= f.radio_button :action, :deactivate_qle, value: '', class: "required floatlabel show_qle_select_radio"  %>
+                  <label><span>Deactivate active QLE</span></label>
+                </div>
+              </div>
+              <hr/>
+              <div id="qle_select_div">
+                <label><span>Select QLE</span></label>
+                <%= select_tag(:id, options_for_select(QualifyingLifeEventKind.all.collect { |qle| [qle.title, qle.id] }.unshift(["Select QLE to modify", nil])))%>
+              </div>
+              <hr/>
+              <div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+              </div>
+            </div>
+          <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+<script>
+  var qleVisibleRadioOptions = document.getElementsByClassName("show_qle_select_radio")
+  var qle_select_div = document.getElementById("qle_select_div");
+  function toggleDisplayQleSelect(event) {
+    if (event.target.checked && event.target.classList.contains("hide_qle_select_radio")) {
+      qle_select_div.classList.add("hidden");
+    } else {
+      qle_select_div.classList.remove("hidden");
+    }
+  };
+
+  if (qleVisibleRadioOptions != null || qleVisibleRadioOptions != undefined) {
+    qle_select_div.addEventListener('click', toggleDisplayQleSelect);
+  };
+
+  document.addEventListener("DOMContentLoaded", function() {
+    var qle_select_div = document.getElementById("qle_select_div");
+    qle_select_div.classList.add("hidden");
+    for (i = 0; i < qleVisibleRadioOptions.length; i ++) {
+      qleVisibleRadioOptions[i].addEventListener('click', toggleDisplayQleSelect);
+    }
+  })
+</script>

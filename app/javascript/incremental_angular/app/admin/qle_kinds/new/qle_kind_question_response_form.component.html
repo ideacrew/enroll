@@ -1,0 +1,13 @@
+<div [formGroup]="responseFormGroup">
+    <div class="form-group">
+        <label for="qle_kind_response_title" class="control-label col-sm-2">Acceptable Response</label>
+        <div class="col-sm-2">
+        <select id="qle_kind_response_title" formControlName="response_title"type="select" class="form-control" >
+            <option value="">Choose...</option>
+            <option value="true">True</option>
+            <option value="false">False</option>
+        </select>
+        </div>
+        <button (click)="selectResponse()" class='btn btn-primary'>Add Question</button>
+    </div>
+</div>
