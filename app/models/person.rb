@@ -283,6 +283,10 @@ class Person
     general_agency_staff_roles.select(&:active?)
   end
 
+  def has_active_general_agency_staff_role?
+    !active_general_agency_staff_roles.empty?
+  end
+
   def contact_addresses
     existing_addresses = addresses.to_a
     home_address = existing_addresses.detect { |addy| addy.kind == "home" }
