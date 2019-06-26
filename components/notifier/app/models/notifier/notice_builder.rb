@@ -230,9 +230,7 @@ module Notifier
 
     # @param recipient is a Person object
     def send_generic_notice_alert
-      unless has_contact_method? && !@resource.can_receive_electronic_communication?
-        UserMailer.generic_notice_alert(recipient_name,subject,recipient_to).deliver_now
-      end
+      UserMailer.generic_notice_alert(recipient_name,subject,recipient_to).deliver_now unless has_contact_method? && !resource.can_receive_electronic_communication?
     end
 
     def send_generic_notice_alert_to_broker_and_ga
@@ -268,9 +266,13 @@ module Notifier
     end
 
     def store_paper_notice
-      if has_contact_method? && @resource.can_receive_paper_communication?
+      if has_contact_method? && resource.can_receive_paper_communication?
         bucket_name = Settings.paper_notice
-        notice_filename_for_paper_notice = "#{@resource.person.hbx_id}_#{subject.titleize.gsub(/\s+/, '_')}"
+        if is_employer?
+          notice_filename_for_paper_notice = "#{resource.id.to_s}_#{subject.titleize.gsub(/\s+/, '_')}"
+        else
+          notice_filename_for_paper_notice = "#{resource.person.hbx_id}_#{subject.titleize.gsub(/\s+/, '_')}"
+        end
         notice_path_for_paper_notice = Rails.root.join("tmp", "#{notice_filename_for_paper_notice}.pdf")
         begin
           FileUtils.cp(notice_path, notice_path_for_paper_notice)
