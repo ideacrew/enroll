@@ -117,7 +117,7 @@ module Queries
 
     def load_enrollment_cache_for(family_ids)
       enrollment_cache = Hash.new { |h, k| h[k] = Array.new }
-      HbxEnrollment.where(:family_id => {"$in" => family_ids}).each do |en|
+      HbxEnrollment.where(:family_id => {"$in" => family_ids}).without(:enrollment_members).each do |en|
         enrollment_cache[en.family_id] = enrollment_cache[en.family_id] + [en]
       end
       enrollment_cache

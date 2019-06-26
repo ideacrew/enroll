@@ -183,7 +183,7 @@ class HbxEnrollment
        "terminated_on" => 1,
        "family_id" =>  1
        },
-       {name: "is_any_enrollment_member_outstanding_and_aasm_state_and_terminated_on"})
+       {name: "hbx_en_is_member_outstanding_and_aasm_state_and_terminated_on"})
 
   index({"kind" => 1,
        "aasm_state" => 1,
@@ -222,6 +222,8 @@ class HbxEnrollment
   )
 
   index({"plan_id" => 1}, { sparse: true })
+  index({"product_id" => 1}, { sparse: true })
+  index({"family_id" => 1})
   index({"writing_agent_id" => 1}, { sparse: true })
   index({"hbx_id" => 1})
   index({"kind" => 1})
