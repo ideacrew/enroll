@@ -180,7 +180,7 @@ RSpec.describe TaxHousehold, type: :model do
 
     it "can return result when plan is individual" do
       allow(plan).to receive(:kind).and_return 'individual'
-      allow(@tax_household).to receive(:deduct_aptc_available_amount_for_unenrolled).and_return 20
+      #allow(@tax_household).to receive(:deduct_aptc_available_amount_for_unenrolled).and_return 20
       expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50).class).to eq Hash
       result = {'member1'=>30, 'member2'=>20}
       expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50)).to eq result
@@ -189,7 +189,7 @@ RSpec.describe TaxHousehold, type: :model do
     it "when ehb_premium > aptc_amount" do
       allow(decorated_plan).to receive(:premium_for).and_return(10)
       allow(plan).to receive(:kind).and_return 'individual'
-      allow(@tax_household).to receive(:deduct_aptc_available_amount_for_unenrolled).and_return 20
+      #allow(@tax_household).to receive(:deduct_aptc_available_amount_for_unenrolled).and_return 20
       expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50).class).to eq Hash
       result = {'member1'=>9, 'member2'=>9}
       expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50)).to eq result
@@ -197,7 +197,7 @@ RSpec.describe TaxHousehold, type: :model do
 
     it "can return result when plan is dental" do
       allow(plan).to receive(:kind).and_return 'dental'
-      allow(@tax_household).to receive(:deduct_aptc_available_amount_for_unenrolled).and_return 20
+      #allow(@tax_household).to receive(:deduct_aptc_available_amount_for_unenrolled).and_return 20
       expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50).class).to eq Hash
       result = {'member1'=>0, 'member2'=>0}
       expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50)).to eq result
@@ -207,7 +207,7 @@ RSpec.describe TaxHousehold, type: :model do
       allow(@tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return 0
       allow(decorated_plan).to receive(:premium_for).and_return(10)
       allow(plan).to receive(:kind).and_return 'individual'
-      allow(@tax_household).to receive(:deduct_aptc_available_amount_for_unenrolled).and_return 20
+      #allow(@tax_household).to receive(:deduct_aptc_available_amount_for_unenrolled).and_return 20
       expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50).class).to eq Hash
       result = {'member1'=>0, 'member2'=>0}
       expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50)).to eq result
@@ -357,8 +357,12 @@ RSpec.describe TaxHousehold, type: :model do
       let!(:hbx_enrollment_member1) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: TimeKeeper.date_of_record, coverage_start_on: TimeKeeper.date_of_record, hbx_enrollment: hbx_enrollment)}
       let!(:hbx_enrollment_member2) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members.second.id, eligibility_date: TimeKeeper.date_of_record, coverage_start_on: TimeKeeper.date_of_record, hbx_enrollment: hbx_enrollment)}
       let!(:hbx_enrollment_member3) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members.last.id, eligibility_date: TimeKeeper.date_of_record, coverage_start_on: TimeKeeper.date_of_record, hbx_enrollment: hbx_enrollment)}
+      let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
       let!(:hbx_enrollment) do
-        FactoryBot.create(:hbx_enrollment, waiver_reason: nil, kind: 'individual', enrollment_kind: 'special_enrollment', coverage_kind: 'health', submitted_at: TimeKeeper.date_of_record - 6.months, household: family.active_household)
+        FactoryBot.create(:hbx_enrollment,  :with_health_product,
+                          waiver_reason: nil, kind: 'individual', enrollment_kind: 'special_enrollment',
+                          coverage_kind: 'health', submitted_at: TimeKeeper.date_of_record - 6.months,
+                          household: family.active_household, product: product)
       end
       let!(:tax_household) {FactoryBot.create(:tax_household, household: family.active_household, created_at: TimeKeeper.date_of_record - 5.months)}
       let!(:tax_household_member1) {tax_household.tax_household_members.create!(is_ia_eligible: true, applicant_id: person.primary_family.family_members[0].id)}
@@ -367,7 +371,7 @@ RSpec.describe TaxHousehold, type: :model do
       let!(:eligibility_determination) {FactoryBot.create(:eligibility_determination, max_aptc: 500, tax_household: tax_household)}
 
       before do
-        hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}.update_attributes!(slcsp_id: plan.id)
+        hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}.update_attributes!(slcsp_id: product.id)
         person.update_attributes!(dob: TimeKeeper.date_of_record - 38.years)
         person.primary_family.family_members[1].person.update_attributes!(dob: TimeKeeper.date_of_record - 28.years)
         person.primary_family.family_members[2].person.update_attributes!(dob: TimeKeeper.date_of_record - 18.years)
@@ -377,7 +381,8 @@ RSpec.describe TaxHousehold, type: :model do
         context 'when one family_member in plan shopping' do
 
           let(:shopping_hbx_enrollment_member) {FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id)}
-          let(:shopping_hbx_enrollment) {FactoryBot.build(:hbx_enrollment, aasm_state: 'shopping', hbx_enrollment_members: [shopping_hbx_enrollment_member], household: family.active_household)}
+          let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
+          let(:shopping_hbx_enrollment) {FactoryBot.build(:hbx_enrollment, aasm_state: 'shopping', hbx_enrollment_members: [shopping_hbx_enrollment_member], household: family.active_household, product: product)}
 
           it 'should return available APTC amount' do
             result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment)
@@ -389,7 +394,8 @@ RSpec.describe TaxHousehold, type: :model do
 
           let(:shopping_hbx_enrollment_member) {FactoryBot.build(:hbx_enrollment_member, eligibility_date: TimeKeeper.date_of_record+1.month, applicant_id: family.family_members.first.id)}
           let(:shopping_hbx_enrollment_member1) {FactoryBot.build(:hbx_enrollment_member, eligibility_date: TimeKeeper.date_of_record+1.month, applicant_id: family.family_members.second.id)}
-          let(:shopping_hbx_enrollment) {FactoryBot.build(:hbx_enrollment, aasm_state: 'shopping', hbx_enrollment_members: [shopping_hbx_enrollment_member, shopping_hbx_enrollment_member1], household: family.active_household)}
+          let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
+          let(:shopping_hbx_enrollment) {FactoryBot.build(:hbx_enrollment, aasm_state: 'shopping', hbx_enrollment_members: [shopping_hbx_enrollment_member, shopping_hbx_enrollment_member1], household: family.active_household, product: product)}
 
           it 'should return available APTC amount' do
             result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment)
@@ -402,8 +408,9 @@ RSpec.describe TaxHousehold, type: :model do
           let(:shopping_hbx_enrollment_member) {FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id)}
           let(:shopping_hbx_enrollment_member1) {FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.second.id)}
           let(:shopping_hbx_enrollment_member2) {FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.last.id)}
+          let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
           let(:shopping_hbx_enrollment) do
-            FactoryBot.build(:hbx_enrollment, aasm_state: 'shopping', hbx_enrollment_members: [shopping_hbx_enrollment_member, shopping_hbx_enrollment_member1, shopping_hbx_enrollment_member2], household: family.active_household)
+            FactoryBot.build(:hbx_enrollment, aasm_state: 'shopping', hbx_enrollment_members: [shopping_hbx_enrollment_member, shopping_hbx_enrollment_member1, shopping_hbx_enrollment_member2], household: family.active_household, product: product)
           end
 
           it 'should return available APTC amount' do
@@ -417,13 +424,16 @@ RSpec.describe TaxHousehold, type: :model do
 
           let!(:hbx_enrollment_member1) do
             FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: TimeKeeper.date_of_record, coverage_start_on: TimeKeeper.date_of_record, hbx_enrollment: aptc_enrollment1, applied_aptc_amount: 278.68)
+          end
           let!(:hbx_enrollment_member2) do
             FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members.second.id, eligibility_date: TimeKeeper.date_of_record, coverage_start_on: TimeKeeper.date_of_record, hbx_enrollment: aptc_enrollment1, applied_aptc_amount: 221.32)
+          end
           let!(:hbx_enrollment_member3) do
             FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members.last.id, eligibility_date: TimeKeeper.date_of_record, coverage_start_on: TimeKeeper.date_of_record, hbx_enrollment: aptc_enrollment1)
+          end
           let!(:aptc_enrollment1) do
             FactoryBot.create(:hbx_enrollment, submitted_at: TimeKeeper.date_of_record + 1.months, household: family.active_household, is_active: true, aasm_state: 'coverage_selected', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), kind: 'individual', applied_aptc_amount: 500.00)
-
+          end
           let(:shopping_hbx_enrollment_member1) {FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: TimeKeeper.date_of_record+1.month)}
           let(:shopping_hbx_enrollment_member2) {FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.second.id, eligibility_date: TimeKeeper.date_of_record+1.month)}
           let(:shopping_hbx_enrollment_member3) {FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.last.id, eligibility_date: TimeKeeper.date_of_record+1.month)}
