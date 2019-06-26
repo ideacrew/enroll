@@ -25,6 +25,7 @@ module Factories
       @family = @enrollment.family
       @product = fetch_product
       return unless @product
+
       @premium_amount = @enrollment.total_premium
       @ehb_premium = @enrollment.total_premium * @product.ehb
     end
@@ -38,7 +39,7 @@ module Factories
     end
 
     def tax_households
-      @family.active_household.tax_households
+      @family.active_household.latest_active_tax_household_with_year(@enrollment.effective_on.year).to_a
     end
 
     def shopping_tax_members
@@ -49,20 +50,22 @@ module Factories
       shopping_tax_members.map(&:is_ia_eligible?).include?(false)
     end
 
-    def fetch_available_aptc
-      # TODO: Refactor accordingly once BenchMark code is merged to Base branch
-      # 1. What if one of the shopping members does not exist in any tax_households
-      aptc = tax_households.inject({}) do |aptc_hash, tax_h|
+    def tax_members_aptc_breakdown
+      tax_households.inject({}) do |aptc_hash, tax_h|
         aptc_hash_thh = tax_h.aptc_available_amount_by_member
         aptc_hash.merge!(aptc_hash_thh) unless aptc_hash_thh.empty?
         aptc_hash
       end
+    end
 
-      final_aptc = shopping_member_ids.inject({}) do |required_aptc_hash, member_id|
-        required_aptc_hash.merge!(aptc.slice(member_id.to_s))
-      end
+    def fetch_available_aptc
+      # TODO: Refactor accordingly once BenchMark code is merged to Base branch
+      # 1. What if one of the shopping members does not exist in any tax_households
+      aptc = tax_members_aptc_breakdown
 
-      {:aptc => final_aptc}
+      {:aptc => shopping_member_ids.inject({}) do |required_aptc_hash, member_id|
+                  required_aptc_hash.merge!(aptc.slice(member_id.to_s))
+                end}
     end
 
     def prioritized_csr(csr_kinds)
