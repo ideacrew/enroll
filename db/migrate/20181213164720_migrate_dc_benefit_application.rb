@@ -151,6 +151,7 @@ class MigrateDcBenefitApplication < Mongoid::Migration
     @benefit_application.recorded_service_area_ids = @rating_service_area_hash[plan_year.start_on.year]['service_area']
 
     benefit_sponsor_catalog = BenefitMarkets::BenefitSponsorCatalog.where(benefit_application_id: plan_year.id).first rescue nil
+    # TODO update ids
     # benefit_sponsor_catalog.product_packages.map {|pp| pp._id = BSON::ObjectId.new}
     # benefit_sponsor_catalog.save(validate: false)
 
@@ -271,6 +272,8 @@ class MigrateDcBenefitApplication < Mongoid::Migration
     # TODO 2015 health plan pointing to 2016 py #1050202
     # TODO 2015 health plan poinitng to 2016 py #1050123
     # TODO 2016 dental plan poinitng to 2019 py #1050953  #high
+    # 244561
+    # 1050123
     [BSON::ObjectId('5a1429b350526c7cd90000a1'),
      BSON::ObjectId('582f06ea082e76425e000016'),
      BSON::ObjectId('582b5efdfaca1450e0000006'),

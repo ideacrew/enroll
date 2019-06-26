@@ -95,7 +95,7 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
 
             @new_profile = initialize_new_profile(old_org, old_profile_params)
             new_organization = initialize_new_organization(old_org, site)
-            market = is_congress?(old_org) ? site.benefit_market_for(:fehb): benefit_market
+            market = is_congress?(old_org) ? fehb_benefit_market: benefit_market
 
             @benefit_sponsorship = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(hbx_id: old_org.hbx_id).first
             @benefit_sponsorship.profile_id = @new_profile.id
@@ -234,7 +234,7 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
   end
 
   def self.is_congress?(organization)
-    organization.employer_profile.plan_years.any?{|p| p.benefit_groups.any?{|bg| bg.is_congress?}}
+    ["100101", "118510", "100102"].include?(organization.hbx_id)
   end
 
   def self.is_exempt_org?(organization)
@@ -271,5 +271,10 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
   def self.benefit_market
     return @benefit_market if defined? @benefit_market
     @benefit_market  = find_site('dc').first.benefit_market_for(:aca_shop)
+  end
+
+  def self.fehb_benefit_market
+    return @fehb_benefit_market if defined? @fehb_benefit_market
+    @benefit_market  = find_site('dc').first.benefit_market_for(:fehb)
   end
 end
