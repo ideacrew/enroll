@@ -22,7 +22,7 @@ module BrokerAgencies::ProfilesHelper
   end
 
   def can_show_destroy?(current_user, staff)
-    return true if current_user.person == staff || staff.broker_role.present?
+    return true if current_user.person == staff || staff.broker_role.present? || staff.general_agency_primary_staff.present?
   end
 
   def disable_edit_broker_agency?(user)
