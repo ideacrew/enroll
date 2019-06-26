@@ -97,11 +97,11 @@ module BenefitSponsors
             if @roster_upload_form.save
               redirect_to @roster_upload_form.redirection_url
             else
-              render :partial => @roster_upload_form.redirection_url
+              render @roster_upload_form.redirection_url
             end
           rescue Exception => e
             @roster_upload_form.errors.add(:base, e.message)
-            render :partial => (@roster_upload_form.redirection_url || default_url)
+            render (@roster_upload_form.redirection_url || default_url)
           end
         end
 
@@ -191,7 +191,7 @@ module BenefitSponsors
         end
 
         def default_url
-          "/benefit_sponsors/profiles/employers/employer_profiles/employee_csv_upload_errors"
+          "/benefit_sponsors/profiles/employers/employer_profiles/_employee_csv_upload_errors"
         end
 
         def csv_for(groups)
