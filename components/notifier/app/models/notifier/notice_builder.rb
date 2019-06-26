@@ -230,7 +230,7 @@ module Notifier
 
     # @param recipient is a Person object
     def send_generic_notice_alert
-      UserMailer.generic_notice_alert(recipient_name,subject,recipient_to).deliver_now unless has_contact_method? && !resource.can_receive_electronic_communication?
+      UserMailer.generic_notice_alert(recipient_name,subject,recipient_to).deliver_now unless has_valid_resource? && !resource.can_receive_electronic_communication?
     end
 
     def send_generic_notice_alert_to_broker_and_ga
@@ -266,22 +266,22 @@ module Notifier
     end
 
     def store_paper_notice
-      if has_contact_method? && resource.can_receive_paper_communication?
+      return unless has_valid_resource? && resource.can_receive_paper_communication?
+
         bucket_name = Settings.paper_notice
         if is_employer?
-          notice_filename_for_paper_notice = "#{resource.id.to_s}_#{subject.titleize.gsub(/\s+/, '_')}"
+          notice_filename_for_paper_notice = "#{resource.id}_#{subject.titleize.gsub(/\s+/, '_')}"
         else
           notice_filename_for_paper_notice = "#{resource.person.hbx_id}_#{subject.titleize.gsub(/\s+/, '_')}"
         end
         notice_path_for_paper_notice = Rails.root.join("tmp", "#{notice_filename_for_paper_notice}.pdf")
         begin
           FileUtils.cp(notice_path, notice_path_for_paper_notice)
-          doc_uri = Aws::S3Storage.save(notice_path_for_paper_notice,bucket_name,"#{notice_filename_for_paper_notice}.pdf")
+          Aws::S3Storage.save(notice_path_for_paper_notice,bucket_name,"#{notice_filename_for_paper_notice}.pdf")
           File.delete(notice_path_for_paper_notice)
         rescue Exception => e
           puts "Unable to upload paper notices to Amazon"
         end
-      end
       # paper_notices_folder = "#{Rails.root.to_s}/public/paper_notices/"
       # FileUtils.cp(notice_path, "#{Rails.root.to_s}/public/paper_notices/")
       # File.rename(paper_notices_folder + , paper_notices_folder + "#{recipient.hbx_id}_" + notice_filename + File.extname(notice_path))
@@ -338,10 +338,10 @@ module Notifier
     def initial_invoice?
       self.event_name == 'generate_initial_employer_invoice'
     end
-    
-    def has_contact_method?
-       (is_employee? || is_consumer? || is_employer?)
-    end 
+
+    def has_valid_resource?
+      (is_employee? || is_consumer? || is_employer?)
+    end
 
     def sub_resource?
       (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole))
