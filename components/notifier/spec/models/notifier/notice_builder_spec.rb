@@ -29,7 +29,7 @@ module Notifier
       let(:subject) do
         Notifier::NoticeBuilder::DummyNoticeKind.new(event_name: event_name, title: 'Test')
       end
-    
+
       describe ".store_paper_notice" do
         let(:bucket_name) { 'paper-notices' }
         let(:notice_filename_for_paper_notice) { "#{employer_profile.id}_Test.pdf" }
