@@ -15,7 +15,7 @@ module Notifier
 
     RSpec.describe NoticeBuilder, dbclean: :around_each do
       let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
-      let!(:model_instance)     { FactoryBot.build(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
+      let!(:model_instance)     { FactoryBot.build(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site, hbx_id: "38739472") }
       let(:employer_profile)    { model_instance.employer_profile }
       let(:event_name) {"acapi.info.events.employer.welcome_notice_to_employer"}
       let(:resource) {model_instance.employer_profile }
@@ -32,7 +32,7 @@ module Notifier
 
       describe ".store_paper_notice" do
         let(:bucket_name) { 'paper-notices' }
-        let(:notice_filename_for_paper_notice) { "#{employer_profile.id}_Test.pdf" }
+        let(:notice_filename_for_paper_notice) { "#{employer_profile.organization.hbx_id}_Test.pdf" }
         let(:doc_uri) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}#sample-key" }
         let(:notice_path_for_paper_notice) { Rails.root.join("tmp", notice_filename_for_paper_notice) }
 

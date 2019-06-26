@@ -268,20 +268,20 @@ module Notifier
     def store_paper_notice
       return unless has_valid_resource? && resource.can_receive_paper_communication?
 
-        bucket_name = Settings.paper_notice
-        if is_employer?
-          notice_filename_for_paper_notice = "#{resource.id}_#{subject.titleize.gsub(/\s+/, '_')}"
-        else
-          notice_filename_for_paper_notice = "#{resource.person.hbx_id}_#{subject.titleize.gsub(/\s+/, '_')}"
-        end
-        notice_path_for_paper_notice = Rails.root.join("tmp", "#{notice_filename_for_paper_notice}.pdf")
-        begin
-          FileUtils.cp(notice_path, notice_path_for_paper_notice)
-          Aws::S3Storage.save(notice_path_for_paper_notice,bucket_name,"#{notice_filename_for_paper_notice}.pdf")
-          File.delete(notice_path_for_paper_notice)
-        rescue Exception => e
-          puts "Unable to upload paper notices to Amazon"
-        end
+      bucket_name = Settings.paper_notice
+      notice_filename_for_paper_notice = if is_employer?
+                                           "#{resource.organization.hbx_id}_#{subject.titleize.gsub(/\s+/, '_')}"
+                                         else
+                                           "#{resource.person.hbx_id}_#{subject.titleize.gsub(/\s+/, '_')}"
+                                         end
+      notice_path_for_paper_notice = Rails.root.join("tmp", "#{notice_filename_for_paper_notice}.pdf")
+      begin
+        FileUtils.cp(notice_path, notice_path_for_paper_notice)
+        Aws::S3Storage.save(notice_path_for_paper_notice,bucket_name,"#{notice_filename_for_paper_notice}.pdf")
+        File.delete(notice_path_for_paper_notice)
+      rescue Exception => e
+        puts "Unable to upload paper notices to Amazon"
+      end
       # paper_notices_folder = "#{Rails.root.to_s}/public/paper_notices/"
       # FileUtils.cp(notice_path, "#{Rails.root.to_s}/public/paper_notices/")
       # File.rename(paper_notices_folder + , paper_notices_folder + "#{recipient.hbx_id}_" + notice_filename + File.extname(notice_path))
