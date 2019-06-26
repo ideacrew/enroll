@@ -3,18 +3,37 @@
 module Factories
   class EligibilityFactory
 
-    def initialize(enrollment_id)
+    def initialize(enrollment_id, selected_aptc = nil)
       @enrollment = HbxEnrollment.find(enrollment_id)
-      @family = @enrollment.family
+      @selected_aptc = selected_aptc
+      set_initializers
     end
 
     def fetch_available_eligibility
-      available_eligibility_hash = fetch_aptc.merge(fetch_csr)
+      available_eligibility_hash = fetch_available_aptc.merge(fetch_csr)
       total_aptc = available_eligibility_hash[:aptc].values.inject(0, :+)
       available_eligibility_hash.merge({:total_available_aptc => total_aptc})
     end
 
+    def fetch_applicable_aptc
+      if @product && @selected_aptc
+        [@selected_aptc, @ehb_premium].min
+      end
+    end
+
     private
+
+    def set_initializers
+      @family = @enrollment.family
+      @product = fetch_product
+      return unless @product
+      @premium_amount = @enrollment.total_premium
+      @ehb_premium = @enrollment.total_premium * @product.ehb
+    end
+
+    def fetch_product
+      @enrollment.product_id ? @enrollment.product : nil
+    end
 
     def shopping_member_ids
       @enrollment.hbx_enrollment_members.pluck(:applicant_id).map(&:to_s)
@@ -32,7 +51,8 @@ module Factories
       shopping_tax_members.map(&:is_ia_eligible?).include?(false)
     end
 
-    def fetch_aptc
+    def fetch_available_aptc
+      # TODO: Refactor accordingly once BenchMark code is merged to Base branch
       # 1. What if one of the shopping members does not exist in any tax_households
       aptc = tax_households.inject({}) do |aptc_hash, tax_h|
         aptc_hash_thh = tax_h.aptc_available_amount_by_member
