@@ -16,9 +16,7 @@ module Factories
     end
 
     def fetch_applicable_aptc
-      if @product && @selected_aptc
-        [@selected_aptc, @ehb_premium].min
-      end
+      [@selected_aptc, @ehb_premium].min if @product && @selected_aptc
     end
 
     private
