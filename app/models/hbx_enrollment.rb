@@ -1965,6 +1965,18 @@ class HbxEnrollment
     active_consumer_role_people.present? ? active_consumer_role_people.map(&:consumer_role).any?(&:verification_outstanding?) : false
   end
 
+  def is_admin_active_enrolled_and_renewing?
+    is_active && (ENROLLED_STATUSES + RENEWAL_STATUSES).map(&:to_s).include?(aasm_state.to_s)
+  end
+
+  def is_admin_cancel_eligible?
+    ["coverage_selected","renewing_coverage_selected","coverage_enrolled","auto_renewing"].include?(aasm_state.to_s)
+  end
+
+  def is_admin_terminate_eligible?
+    CAN_TERMINATE_ENROLLMENTS.map(&:to_s).include(aasm_state.to_s)
+  end
+
   private
 
   def set_is_any_enrollment_member_outstanding
