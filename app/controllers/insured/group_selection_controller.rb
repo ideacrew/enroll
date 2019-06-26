@@ -132,8 +132,7 @@ class Insured::GroupSelectionController < ApplicationController
     end
   end
 
-  # TODO: Move to new controller?
-  def self_service_confirm
+  def edit_plan
     @hbx_enrollment = HbxEnrollment.find(params.require(:hbx_enrollment_id))
     family = Family.find(params.require(:family_id))
     @sep = family.try(:latest_active_sep)
@@ -148,7 +147,8 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   def edit_aptc
-    #
+    #aptc build_eligible_members
+    # if build_eligible_members.count == family.count AND enrollment is eligible, show aptc button
   end
 
   private

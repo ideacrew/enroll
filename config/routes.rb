@@ -272,8 +272,10 @@ Rails.application.routes.draw do
       collection do
         post :cancel
         post :terminate
+        post :edit_aptc
         get :terminate_selection
         get :terminate_confirm
+        get :edit_plan
       end
     end
 
