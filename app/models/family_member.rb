@@ -91,7 +91,8 @@ class FamilyMember
     benefit_coverage_period = benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}
     slcsp = benefit_coverage_period.second_lowest_cost_silver_plan
     ehb = benefit_coverage_period.second_lowest_cost_silver_plan.ehb
-    cost = slcsp.premium_for(TimeKeeper.datetime_of_record, person.age_on(TimeKeeper.datetime_of_record))
+    product = product_factory.new({product_id: slcsp.id})
+    cost = product.cost_for(TimeKeeper.datetime_of_record, person.age_on(TimeKeeper.datetime_of_record))
     cost * ehb
   end
 
@@ -150,7 +151,11 @@ class FamilyMember
     family.family_members.detect { |member| member._id.to_s == family_member_id.to_s } unless family.blank?
   end
 
-  private 
+  private
+
+  def product_factory
+    ::BenefitMarkets::Products::ProductFactory
+  end
 
   def no_duplicate_family_members
     return unless family
