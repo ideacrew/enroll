@@ -18,6 +18,10 @@ module Config::AcaConcern
     end
   end
 
+  def fehb_market_is_enabled?
+    @fehb_market_is_enabled ||= Settings.aca.market_kinds.include?("fehb")
+  end
+
   def general_agency_is_enabled?
      Settings.aca.general_agency_enabled
   end

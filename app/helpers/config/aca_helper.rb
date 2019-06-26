@@ -63,6 +63,10 @@ module Config::AcaHelper
     @individual_market_is_enabled ||= Settings.aca.market_kinds.include?("individual")
   end
 
+  def fehb_market_is_enabled?
+    @fehb_market_is_enabled ||= Settings.aca.market_kinds.include?("fehb")
+  end
+
   def offer_sole_source?
     @offer_sole_source ||= Settings.aca.plan_options_available.include?("sole_source")
   end

@@ -12,6 +12,7 @@ module Config::AcaModelConcern
     delegate :aca_shop_market_employer_transmission_day_of_month, to: :class
     delegate :aca_shop_market_census_employees_template_file, to: :class
     delegate :individual_market_is_enabled?, to: :class
+    delegate :fehb_market_is_enabled?, to: :class
     delegate :general_agency_enabled?, to: :class
     delegate :use_simple_employer_calculation_model?, to: :class
     delegate :market_rating_areas, to: :class
@@ -79,6 +80,10 @@ module Config::AcaModelConcern
 
     def individual_market_is_enabled?
       @@individual_market_is_enabled ||= Settings.aca.market_kinds.include? "individual"
+    end
+
+    def fehb_market_is_enabled?
+      @fehb_market_is_enabled ||= Settings.aca.market_kinds.include?("fehb")
     end
 
     def general_agency_enabled?

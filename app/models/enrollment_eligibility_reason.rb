@@ -1,4 +1,5 @@
 class EnrollmentEligibilityReason
+
   attr_reader :reason_provider, :date_of_reason
   delegate :type, :reason, to: :reason_provider
 
@@ -13,17 +14,25 @@ class EnrollmentEligibilityReason
   private
 
   class ReasonProvider
+    include Config::AcaModelConcern
+
     def initialize(provider)
       case provider.class
       when SpecialEnrollmentPeriod
         SpecialEnrollmentPeriodReasonProvider.new(provider)
-      when "BenefitSponsors::Organizations::AcaShop#{Settings.site.key.capitalize}EmployerProfile".constantize
+      when ->(klass) { benefit_sponsors.include?(klass) }
         EmployerProfileReasonProvider.new(provider)
       when BenefitSponsorship
         BenefitSponsorshipReasonProvider.new(provider)
       else
-        raise ArgumentError.new("invalid provider class: #{provider.class}")
+        raise ArgumentError.new, "invalid provider class: #{provider.class}"
       end
+    end
+
+    def benefit_sponsors
+      sponsor_classes = ["BenefitSponsors::Organizations::AcaShop#{Settings.site.key.capitalize}EmployerProfile".constantize]
+      sponsor_classes << "BenefitSponsors::Organizations::FehbEmployerProfile".constantize if fehb_market_is_enabled?
+      sponsor_classes
     end
   end
 
