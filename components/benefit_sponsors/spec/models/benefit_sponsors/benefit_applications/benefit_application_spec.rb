@@ -349,21 +349,62 @@ module BenefitSponsors
               end
 
               context "and binder payment is made" do
-                before { benefit_application.approve_enrollment_eligiblity! }
+                before {benefit_application.credit_binder!}
 
-                it "should transition to state: :enrollment_eligible" do
-                  expect(benefit_application.aasm_state).to eq :enrollment_eligible
+                it "should transition to state :binder_paid" do
+                  expect(benefit_application.aasm_state).to eq :binder_paid
                 end
 
-                context "and effective period begins" do
-                  before { benefit_application.activate_enrollment! }
+                context "and application is eligible" do
+                  before { benefit_application.approve_enrollment_eligiblity! }
 
-                  it "should transition to state: :approved" do
-                    expect(benefit_application.aasm_state).to eq :active
+                  it "should transition to state: :enrollment_eligible" do
+                    expect(benefit_application.aasm_state).to eq :enrollment_eligible
+                  end
+
+                  context "and effective period begins" do
+                    before { benefit_application.activate_enrollment! }
+
+                    it "should transition to state: :approved" do
+                      expect(benefit_application.aasm_state).to eq :active
+                    end
                   end
                 end
               end
             end
+          end
+        end
+
+        context 'revert reverse_enrollment_eligibility' do
+          before do
+            benefit_application.update_attributes(aasm_state: :binder_paid)
+            benefit_application.reverse_enrollment_eligibility!
+          end
+
+          it "should transition to state: :enrollment_closed" do
+            expect(benefit_application.aasm_state).to eq :enrollment_closed
+          end
+        end
+
+        context 'revert benefit_application' do
+          before do
+            benefit_application.update_attributes(aasm_state: :binder_paid)
+            benefit_application.revert_application!
+          end
+
+          it "should transition to state: :draft" do
+            expect(benefit_application.aasm_state).to eq :draft
+          end
+        end
+
+        context 'activate_enrollment' do
+          before do
+            benefit_application.update_attributes(aasm_state: :binder_paid)
+            benefit_application.activate_enrollment!
+          end
+
+          it "should transition to state: :active" do
+            expect(benefit_application.aasm_state).to eq :active
           end
         end
       end
@@ -804,6 +845,29 @@ module BenefitSponsors
           expect(benefit_application.expiration_date).not_to eq (benefit_application.effective_period.max)
         end
       end
+    end
+
+    describe ".open_enrollment_length" do
+      let!(:initial_application) { create(:benefit_sponsors_benefit_application, benefit_sponsor_catalog: benefit_sponsor_catalog, effective_period: effective_period,benefit_sponsorship:benefit_sponsorship, aasm_state: :active) }
+      let(:min_open_enrollment_length) { 5 }
+      let(:start_date) {Date.new(2019,11,16)}
+      let(:end_date) {Date.new(2019,11,20)}
+
+      it 'open_enrollment_length should be greater than min_open_enrollment_length' do
+        initial_application.update_attributes(open_enrollment_period: (start_date..(end_date + 1.day)))
+        expect(initial_application.open_enrollment_length).to be > min_open_enrollment_length
+      end
+
+      it 'open_enrollment_length should be equal to min_open_enrollment_length ' do
+        initial_application.update_attributes(open_enrollment_period: (start_date..end_date))
+        expect(initial_application.open_enrollment_length).to eq min_open_enrollment_length
+      end
+
+      it 'open_enrollment_length should be less than min_open_enrollment_length ' do
+        initial_application.update_attributes(open_enrollment_period: (start_date..(end_date - 1.day)))
+        expect(initial_application.open_enrollment_length).to be < min_open_enrollment_length
+      end
+
     end
   end
 end

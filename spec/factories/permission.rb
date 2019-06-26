@@ -112,6 +112,7 @@ FactoryGirl.define do
       can_complete_resident_application true
       can_add_sep true
       can_extend_open_enrollment true
+      can_modify_plan_year true
       can_create_benefit_application true
       can_force_publish true
       view_the_configuration_tab true 

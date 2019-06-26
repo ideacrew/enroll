@@ -97,7 +97,7 @@
 
       <%# It is been moved since we are using this page in edit action as well. %>
     <%= render 'dependents_fields', f: f %>
-
+    <% if @census_employee.active_benefit_group_assignment.present? && @census_employee.active_benefit_group_assignment.persisted? %>
       <% @census_employee.enrollments_for_display.compact.each do |enrollment| %>
       <div class="col-xs-12">
         <h3>
@@ -107,9 +107,8 @@
         <%= render "insured/families/enrollment", read_only: true, hbx_enrollment: enrollment %>
       </div>
       <% end %>
-
-    <%= render partial: 'shared/past_enrollments', locals: { hbx_enrollments: @census_employee.past_enrollments } %>
-
+    <% end %>
+    <%= render partial: 'shared/past_enrollments' %>
     <div class="col-xs-12">
       <div class="row">
         <div class="col-sm-6 text-left">

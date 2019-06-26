@@ -34,7 +34,8 @@ module BenefitSponsors
       default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site, aasm_state: sponsorship_state)
     }
 
-    let!(:april_renewal_sponsors)         { create_list(:benefit_sponsors_benefit_sponsorship, 2, :with_organization_cca_profile,
+    let(:april_renewal_sponsors)         { create_list(:benefit_sponsors_benefit_sponsorship, 2, :with_organization_cca_profile,
+      :with_previous_year_rating_area, :with_previous_year_service_areas,
       :with_renewal_benefit_application, initial_application_state: renewal_current_application_state,
       renewal_application_state: renewal_application_state,
       default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site,
@@ -46,42 +47,42 @@ module BenefitSponsors
     before { TimeKeeper.set_date_of_record_unprotected!(current_date) }
     subject { BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipService }
 
-    describe '.mark_initial_ineligible' do 
-      let(:sponsorship_state)               { :initial_enrollment_closed }
+    # We are not moving benefit applications to ineligible status automatically if binder payment is missed
+    # describe '.mark_initial_ineligible' do
+    #   let(:sponsorship_state)               { :applicant }
+    #   let(:initial_application_state)       { :enrollment_closed }
+
+    #   context  'when initial employer missed binder payment' do
+
+    #     it "should move applications into ineligible state" do
+    #       april_sponsors.each do |sponsor|
+
+    #         sponsorship_service = subject.new(benefit_sponsorship: sponsor)
+    #         sponsorship_service.mark_initial_ineligible
+
+    #         sponsor.reload
+
+    #         expect(sponsor.applicant?).to be_truthy
+    #         expect(sponsor.benefit_applications.first.enrollment_ineligible?).to be_truthy
+    #       end
+    #     end
+    #   end
+    # end
+
+    describe '.auto_cancel_enrollment_closed' do
+      let(:sponsorship_state)               { :applicant }
       let(:initial_application_state)       { :enrollment_closed }
+      let(:renewal_application_state)       { :enrollment_closed }
 
       context  'when initial employer missed binder payment' do 
 
-        it "should move applications into ineligible state" do 
-          april_sponsors.each do |sponsor|
-
-            sponsorship_service = subject.new(benefit_sponsorship: sponsor)
-            sponsorship_service.mark_initial_ineligible
-
-            sponsor.reload
-
-            expect(sponsor.initial_enrollment_ineligible?).to be_truthy
-            expect(sponsor.benefit_applications.first.enrollment_ineligible?).to be_truthy
-          end
-        end
-      end
-    end
-
-    describe '.auto_cancel_ineligible' do 
-      let(:sponsorship_state)               { :initial_enrollment_ineligible }
-      let(:initial_application_state)       { :enrollment_ineligible }
-      let(:renewal_application_state)       { :enrollment_ineligible }
-
-      context  'when initial employer missed binder payment' do 
-
-        it "should move applications into ineligible state" do 
+        it "should move applications into ineligible state" do
           (april_sponsors + april_renewal_sponsors).each do |sponsor|
             benefit_application = sponsor.benefit_applications.detect{|application| application.is_renewing?}
             benefit_application = sponsor.benefit_applications.first if benefit_application.blank?
 
-            expect(sponsor.initial_enrollment_ineligible?).to be_truthy if !benefit_application.is_renewing?
-            expect(benefit_application.enrollment_ineligible?).to be_truthy
-
+            expect(sponsor.applicant?).to be_truthy if !benefit_application.is_renewing?
+            expect(benefit_application.enrollment_closed?).to be_truthy
             sponsorship_service = subject.new(benefit_sponsorship: sponsor)
             sponsorship_service.auto_cancel_ineligible
 
@@ -95,8 +96,29 @@ module BenefitSponsors
       end
     end
 
+    describe '.terminate_pending_sponsor_benefit' do
+
+      let(:initial_application_state)   { :termination_pending }
+      let(:ba_start_on) { (current_date.beginning_of_month - 2.months) }
+
+      it 'terminate pending benefit application should be terminated when the end on is reached' do
+        april_sponsors.each do |sponsor|
+          sponsor.benefit_applications.each do |ba|
+            ba.update_attributes!(effective_period: ba_start_on..current_date.prev_day, terminated_on: current_date.prev_month)
+          end
+          benefit_application = sponsor.benefit_applications.termination_pending.first
+          service = subject.new(benefit_sponsorship: sponsor)
+          service.terminate_pending_sponsor_benefit
+          sponsor.reload
+          benefit_application.reload
+
+          expect(benefit_application.aasm_state).to eq :terminated
+        end
+      end
+    end
+
     describe '.end_open_enrollment' do 
-      let(:sponsorship_state)               { :initial_enrollment_open }
+      let(:sponsorship_state)               { :applicant }
       let(:business_policy) { double(success_results: [], fail_results: []) }
 
       before do
@@ -112,7 +134,7 @@ module BenefitSponsors
           (april_sponsors).each do |sponsor|
             benefit_application = sponsor.benefit_applications.first
 
-            expect(sponsor.initial_enrollment_open?).to be_truthy
+            expect(sponsor.applicant?).to be_truthy
             expect(benefit_application.enrollment_extended?).to be_truthy
 
             sponsorship_service = subject.new(benefit_sponsorship: sponsor)
@@ -121,7 +143,7 @@ module BenefitSponsors
             sponsor.reload
             benefit_application.reload
 
-            expect(sponsor.initial_enrollment_closed?).to be_truthy
+            expect(sponsor.applicant?).to be_truthy
             expect(benefit_application.enrollment_closed?).to be_truthy
           end
         end

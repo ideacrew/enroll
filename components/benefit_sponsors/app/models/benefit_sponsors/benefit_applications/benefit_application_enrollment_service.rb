@@ -161,10 +161,10 @@ module BenefitSponsors
       end
     end
 
-    def cancel
+    def cancel(notify_trading_partner = false)
       if business_policy_satisfied_for?(:cancel_benefit)
         if benefit_application.may_cancel?
-          benefit_application.cancel!
+          benefit_application.cancel!(notify_trading_partner)
         else
           raise StandardError, "Benefit cancel state transition failed"
         end
@@ -185,15 +185,37 @@ module BenefitSponsors
       end
     end
 
-    def terminate(end_on, termination_date)
-      if business_policy_satisfied_for?(:terminate_benefit)
-        if benefit_application.may_terminate_enrollment?
+    def terminate(end_on, termination_date, termination_kind, termination_reason, notify_trading_partner = false)
+      result, errors = validate_benefit_application_termination_date(end_on, termination_kind)
+      if result
+        if business_policy_satisfied_for?(:terminate_benefit)
+          if benefit_application.may_terminate_enrollment?
             updated_dates = benefit_application.effective_period.min.to_date..end_on
-            benefit_application.update_attributes!(:effective_period => updated_dates, :terminated_on => termination_date)
-            benefit_application.terminate_enrollment!
+            benefit_application.update_attributes!(:effective_period => updated_dates, :terminated_on => termination_date, termination_kind: termination_kind, termination_reason: termination_reason)
+            benefit_application.terminate_enrollment!(notify_trading_partner)
           end
+        else
+          [false, benefit_application, business_policy.fail_results]
+        end
       else
-        [false, benefit_application, business_policy.fail_results]
+        [false, benefit_application, errors]
+      end
+    end
+
+    def schedule_termination(end_on, termination_date, termination_kind, termination_reason, notify_trading_partner = false)
+      result, errors = validate_benefit_application_termination_date(end_on, termination_kind)
+      if result
+        if business_policy_satisfied_for?(:terminate_benefit)
+          if benefit_application.may_schedule_enrollment_termination?
+            updated_dates = benefit_application.effective_period.min.to_date..end_on
+            benefit_application.update_attributes!(:effective_period => updated_dates, :terminated_on => termination_date, termination_kind: termination_kind, termination_reason: termination_reason)
+            benefit_application.schedule_enrollment_termination!(notify_trading_partner)
+          end
+        else
+          [false, benefit_application, business_policy.fail_results]
+        end
+      else
+        [false, benefit_application, errors]
       end
     end
 
@@ -319,6 +341,23 @@ module BenefitSponsors
       submit_warnings += business_policy.fail_results.values unless business_policy.fail_results.values.blank?
       submit_warnings += submit_application_warnings unless submit_application_warnings.blank?
       submit_warnings
+    end
+
+    def validate_benefit_application_termination_date(end_on, termination_kind)
+      errors = {}
+      result = true
+      if termination_kind == 'voluntary'
+        if !allow_mid_month_voluntary_terms? && end_on != end_on.end_of_month
+          result = false
+          errors[:mid_month_voluntary_term] = "Exchange doesn't allow mid month voluntary terminations"
+        end
+      elsif termination_kind == 'nonpayment'
+        if !allow_mid_month_non_payment_terms? && end_on != end_on.end_of_month
+          result = false
+          errors[:mid_month_non_payment_term] = "Exchange doesn't allow mid month non payment terminations"
+        end
+      end
+      [result, errors]
     end
 
     def business_policy_satisfied_for?(event_name)

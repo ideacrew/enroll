@@ -37,24 +37,38 @@ module BenefitSponsors
     end
 
     describe "GET show" do
-      let!(:employees) {
-        FactoryGirl.create_list(:census_employee, 2, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship)
-      }
+      context "tab: employees" do
+        let!(:employees) {
+          FactoryGirl.create_list(:census_employee, 2, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship)
+        }
 
-      before do
-        benefit_sponsorship.save!
-        allow(controller).to receive(:authorize).and_return(true)
-        sign_in user
-        get :show, id: benefit_sponsor.profiles.first.id, tab: 'employees'
-        allow(employer_profile).to receive(:active_benefit_sponsorship).and_return benefit_sponsorship
+        before do
+          benefit_sponsorship.save!
+          allow(controller).to receive(:authorize).and_return(true)
+          sign_in user
+          get :show, id: benefit_sponsor.profiles.first.id, tab: 'employees'
+          allow(employer_profile).to receive(:active_benefit_sponsorship).and_return benefit_sponsorship
+        end
+
+        it "should render show template" do
+          expect(response).to render_template("show")
+        end
+
+        it "should return http success" do
+          expect(response).to have_http_status(:success)
+        end
       end
 
-      it "should render show template" do
-        expect(response).to render_template("show")
-      end
+      context "tab: families" do
+        before do
+          sign_in user
+          get :show, id: benefit_sponsor.profiles.first.id, tab: 'families'
+        end
 
-      it "should return http success" do
-        expect(response).to have_http_status(:success)
+        it "should redirect_to home page" do
+          home_url = profiles_employers_employer_profile_path(tab: 'home')
+          expect(subject).to redirect_to(home_url)
+        end
       end
     end
 

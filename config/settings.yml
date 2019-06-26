@@ -260,6 +260,11 @@ aca:
 
     transmit_scheduled_employers: true
     employer_transmission_day_of_month: 26
+
+    mid_month_benefit_application_terminations:
+      voluntary: false
+      non_payment: false
+
   transmit_employers_immediately: false
   employer_has_sic_field: true
   validate_county: true

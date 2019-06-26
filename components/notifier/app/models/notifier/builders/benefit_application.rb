@@ -64,9 +64,15 @@ module Notifier
     end
 
     def benefit_application_current_py_oe_end_date
-      if current_benefit_application.present?
-        merge_model.benefit_application.current_py_oe_end_date = format_date(current_benefit_application.open_enrollment_period.max)
-      end
+      benefit_application =
+        if ['zero_employees_on_roster_notice', 'low_enrollment_notice_for_employer'].include? event_name
+          load_benefit_application
+        else
+          current_benefit_application
+        end
+      return if benefit_application.blank?
+
+      merge_model.benefit_application.current_py_oe_end_date = format_date(benefit_application.open_enrollment_period.max)
     end
 
     def benefit_application_renewal_py_oe_start_date
@@ -110,10 +116,16 @@ module Notifier
     end
 
     def benefit_application_binder_payment_due_date
-      if current_benefit_application.present?
-        schedular = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
-        merge_model.benefit_application.binder_payment_due_date = format_date(schedular.map_binder_payment_due_date_by_start_on(current_benefit_application.start_on))
-      end
+      benefit_application =
+        if ['zero_employees_on_roster_notice', 'low_enrollment_notice_for_employer'].include? event_name
+          load_benefit_application
+        else
+          current_benefit_application
+        end
+      return if benefit_application.blank?
+
+      schedular = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
+      merge_model.benefit_application.binder_payment_due_date = format_date(schedular.map_binder_payment_due_date_by_start_on(benefit_application.start_on))
     end
 
     def benefit_application_current_py_start_on

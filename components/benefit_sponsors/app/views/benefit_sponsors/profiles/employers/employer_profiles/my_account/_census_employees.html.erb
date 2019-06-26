@@ -71,3 +71,14 @@
     </div>
   </div>
 <%end%>
+
+<script>
+	// Fixes issue with datatables expanding past main container class
+	(function() {
+		var container = document.getElementsByClassName('container');
+		setTimeout(function() {
+			container[2].classList.remove('container')
+		})
+	})()
+</script>
+
