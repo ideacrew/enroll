@@ -111,7 +111,13 @@ class QualifyingLifeEventKind
                         :post_event_sep_in_days
 
   scope :active, ->{ where(is_active: true).where(:created_at.ne => nil).order(ordinal_position: :asc) }
-  scope :by_market_kind, ->(market_kind){ where(market_kind: market_kind) }
+  
+  # TODO: This scope should be updated depending on what the business rule for editable QLE Kind is
+  scope :editable, ->{ all.sort_by_title_alphabetical }
+  # TODO: This scope should be update depdning on what the business definition of deactivation is
+  # At the moment, setting 'end on' is how they are deactivated.
+  scope :not_set_for_deactivation, ->{ where(end_on: nil).sort_by_title_alphabetical }
+  scope :sort_by_title_alphabetical, ->{ order('title ASC') }
 
   # Business rules for EmployeeGainingMedicare
   # If coverage ends on last day of month and plan selected before loss of coverage:
@@ -189,6 +195,11 @@ class QualifyingLifeEventKind
 
   def is_loss_of_other_coverage?
     reason == "lost_access_to_mec"
+  end
+
+  # TODO: This can be updated depending on business requirements
+  def qle_dropdown_label
+    edi_code.to_s + " | " + title.to_s
   end
 
   class << self

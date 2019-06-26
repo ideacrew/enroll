@@ -1,0 +1,129 @@
+<div class='container'>
+  <form [formGroup]="creationFormGroup" class='form form-horizontal'>
+    <div class='panel panel-primary'>
+      <div class='panel-heading'>
+        <strong>
+          Create a Qualifying Life Event Kind
+        </strong>
+      </div>
+      <div class='panel-body'>
+        <div class="form-group">
+          <field-errors [errorControl]="creationFormGroup" errorHeader="Your QLE Kind could not be Created for the following reasons:"></field-errors>
+              <span for="qle_kind_creation_form_title" class="col-sm-2 control-label">Title</span>
+              <div class="col-sm-4">
+                <input type='text' formControlName="title" id='qle_kind_creation_form_title' class='form-control' required>
+                <field-errors [errorControl]="creationFormGroup.get('title')"></field-errors>
+              </div>
+            </div>
+            <div class="form-group">
+                <span for="qle_kind_creation_form_tool_tip" class="col-sm-2 control-label">Tool Tip </span>
+                <div class="col-sm-4">
+                    <input
+                    type='text'
+                    formControlName="tool_tip"
+                    id='qle_kind_creation_form_tool_tip'
+                    class='form-control' required>
+                </div>
+            </div>
+            <div class="form-group"> 
+            <span for="qle_kind_creation_form_action_kind" class="col-sm-2 control-label">Action Kind </span>
+              <div class="col-md-2 " >        
+                <select formControlName="action_kind" type="select">
+                  <option value="not-applicable">Not Applicable</option>
+                  <option value="drop-member">Drop Member</option>
+                  <option value="adminstrative">Adminstrative</option>
+                  <option value="add-member">Add Member</option>
+                  <option value="add-benefit">Add Benefit</option>
+                  <option value="change-benefit">Change Benefit</option>
+                  <option value="transition-member">Transition Member</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+                <span for="qle_kind_creation_form_reason" class="col-sm-2 control-label">Reason </span>
+                <div class="col-sm-4">
+                    <input
+                    type='text'
+                    formControlName="reason"
+                    id='qle_kind_creation_form_reason'
+                    class='form-control' required>
+                </div>
+            </div>
+            <div class="form-group">
+                <span for="qle_kind_creation_form_market_kind" class="col-sm-2 control-label">Market Kind</span>
+                <div class="col-sm-4">
+                  <select id="qle_kind_creation_form_market_kind" formControlName="market_kind" class="form-control">
+                    <option *ngFor="let marketKind of marketKindsList" [value]="marketKind">{{marketKind}}</option>
+                  </select>
+                </div>
+            </div>
+            <div class= 'form-group'>
+              <span for="qle_kind_creation_form_is_self_attested" class="col-sm-2 control-label">Self-Attestion Option </span>
+                <div class="col-md-2">
+                <label class="control-label">User Self Service
+                  <input type='radio' class='' formControlName="is_self_attested" id='qle_kind_creation_form_is_self_attested' value = "Yes" required>
+                </label>
+                <label class=" control-label">Admin Only 
+                  <input type='radio' class='' formControlName="is_self_attested" id='qle_kind_creation_form_is_self_attested' value = "No" required>   
+                </label>
+              </div>
+            </div>
+            <div class='form-group'>
+              <span for="qle_kind_creation_form_action_kind" class="col-sm-2 control-label">Questions </span>
+                <button (click)="addQuestion()" class='btn btn-primary'>
+                    Create a new question for this QLE
+                </button>
+                <div *ngIf="showQuestions()">
+                  <qle-question-form
+                    *ngFor="let question of questionControls(); let i = index"
+                    [questionFormGroup]="question"
+                    [questionIndex]="i"
+                    [questionComponentParent]="this">
+                  </qle-question-form>
+                </div>
+              </div >
+              <div class='form-group'>
+                <span for="qle_kind_creation_form_effective_on_options" class="col-sm-2 control-label">Effective on Options</span>
+                  <div formArrayName="effective_on_options" *ngFor="let option of getOptions(); let i = index">
+                <span *ngIf='i != 0' class="col-sm-2 control-label"></span>
+                    <label class='control-label'>{{option.name}}
+                      <input type="checkbox" [formControlName]='i'>
+                    </label>
+                  </div>
+              </div>
+              <div class="form-group">
+                <span for="qle_kind_creation_form_pre_event_sep_eligibility" class="col-sm-2 control-label">Pre-event Sep/Qle Eligibility</span>
+                <div class='col-md-5'>
+                    up to
+                    <input type='number'formControlName="pre_event_sep_eligibility" id='qle_kind_creation_form_pre_event_sep_eligibility'/>
+                    days post event
+                </div>
+              </div>
+              <div class="form-group">
+                  <span for="qle_kind_creation_form_post_event_sep_eligibility" class="col-sm-2 control-label">Post-event Sep/Qle Eligibility</span>
+                  <div class='col-md-5'>
+                      up to
+                      <input type='number'formControlName="post_event_sep_eligibility" id='qle_kind_creation_form_post_event_sep_eligibility'/>
+                      days prior to event
+                  </div>
+              </div>
+              <div class="form-group">
+                  <span for="qle_kind_creation_form_post_event_sep_eligibility" class="col-sm-2 control-label">Sep/Qle Available in system from</span>
+                  <div class='col-md-5'>
+                      <input type='text' formControlName="available_in_system_from" id='qle_kind_creation_available_in_system_from' placeholder="MM/DD/YYYY" mask="M0/d0/0000" [dropSpecialCharacters]="false" [validation]="true" required> <br>
+                  </div>
+              </div>
+              <div class="form-group">
+                  <span for="qle_kind_creation_form_post_event_sep_eligibility" class="col-sm-2 control-label">Sep/Qle Available in system until</span>
+                  <div class='col-md-5'>
+                      <input type='text' formControlName="available_in_system_until" id='qle_kind_creation_available_in_system_until' placeholder="MM/DD/YYYY" mask="M0/d0/0000" [dropSpecialCharacters]="false" [validation]="true" required> <br>
+                  </div>
+              </div>
+              <div class="form-group col-md-4 mb-2{{errorClassFor(creationFormGroup.get('title'))}}">
+                <button class="btn btn-primary " (click)="submitCreation()">Create QLE Kind</button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+  
