@@ -614,12 +614,17 @@ Rails.application.routes.draw do
   end
   resources :office_locations, only: [:new]
 
-  resources :qles do
-    collection do
+  resources :qles, only: [:new, :create, :edit, :update] do
+    member do
+      get :deactivation_form
+      put :deactivate
+    end
+    # TODO: We need to discuss renaming these
+    # essentially they're a redirect wizard and not
+    # creating anything
+    collection do      
       get :new_manage_qle
       post :create_manage_qle
-      get :new
-      post :create
       post :edit_manage_qle
     end
   end

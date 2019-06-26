@@ -3,7 +3,7 @@
   <div id='custom-sep-container' data-controller="qle">
     <%= form_for @qle, url:  qles_path , method: "post", class: "form" do |f| %>
       <div class='row'>
-        <h4 class='col-md-6' >Create a Qualifying Life Event</h4>
+        <h4 class='col-md-6' >Modify an Existing Qualifying Life Event</h4>
       </div>
       <div class='row'>
         <div class = 'col-md-6'>
@@ -37,7 +37,7 @@
       <a data-action="qle#showQuestions" id="qle-question-form">Create Attestation for this QLE</a>
       <div id="question-container" data-target="qle.questionContainer" class="question-container hidden">
         <% @qle.custom_qle_questions.each do |question| %>
-          <%= f.fields_for :questions, question do |question_fields| %>
+          <%= f.fields_for :custom_qle_questions, question do |question_fields| %>
             <div class='row js-question'>
               <div class ='col-md-6'>
                 <%= render partial: "question", :locals => { f: question_fields } %>
@@ -45,7 +45,7 @@
             </div>
           <% end %>
         <% end %>
-        <%= f.fields_for :questions, @qle.new_question do |question_fields| %>
+        <%= f.fields_for :custom_qle_questions, @qle.new_question do |question_fields| %>
           <div data-target="qle.question" class="hidden row">
             <div class='col-md-6 create-question-form'><%= render partial: "question", :locals => { f: question_fields } %></div>
           </div>
@@ -73,6 +73,7 @@
            <%= check_box_tag "Date Options Available" %></p>
         </div>
       </div>
+      <% # For the Deactivate Action, available from and available until will be the only options available. Other fields will be deactivated but visible %>
       <div class='row'>
         <div class='col-md-6'>
           <%= f.text_field :start_on, class: " form-control-custom-qle uidatepicker", placeholder: 'Available from', autocomplete: :off %>

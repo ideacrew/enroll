@@ -9,24 +9,20 @@
             <%= form_for @manage_qle, as: :manage_qle, url: create_manage_qle_qles_path, method: :post do |f| %>
               <div class="radio_option">
                 <div>
-                  <%= f.radio_button :action, :new_qle, class: "required floatlabel"  %>
+                  <%= f.radio_button :action, :new_qle, checked: true, class: "required floatlabel"  %>
                   <label><span>Create a custom QLE</span></label>
+                  &nbsp;&nbsp;&nbsp;
+                  <%= f.radio_button :action, :modify_qle, value: '', class: "required floatlabel show_qle_select"  %>
+                  <label><span>Modify existing QLE</span></label>
+                  &nbsp;&nbsp;&nbsp;
+                  <%= f.radio_button :action, :deactivate_qle, value: '', class: "required floatlabel show_qle_select"  %>
+                  <label><span>Deactivate active QLE</span></label>
+              </div>
                 </div>
                 <hr/>
               <div>
-                <%= f.radio_button :action, :modify_qle, value: '', class: "required floatlabel"  %>
-                <label><span>Modify existing QLE</span></label>
-              </div>
-              <div>
-                <%= select_tag("which_qle_kind_to_modify", options_for_select(QualifyingLifeEventKind.all.collect { |qle| [qle.title, qle.id] }.unshift(["Select QLE to modify", nil])))%>
-              </div>
-              <hr/>
-              <div>
-                <%= f.radio_button :action, :deactivate_qle, value: '', class: "required floatlabel"  %>
-                <label><span>Deactivate active QLE</span></label>
-              </div>
-              <div>
-                <%= select_tag("which_qle_kind_to_deactivate", options_for_select(QualifyingLifeEventKind.all.collect { |qle| [qle.title, qle.id] }.unshift(["Select QLE to deactivate", nil])))%>
+                <% # TODO: Make sure these are rendered to reflect the market TODO: Add javascript to show display tag only if modify or deactivate are selected (see the show_qle_select class added to those radios, and add to it accordingly) %>
+                <%= select_tag(:id, options_for_select(QualifyingLifeEventKind.all.collect { |qle| [qle.title, qle.id] }.unshift(["Select QLE to modify", nil])))%>
               </div>
               <hr/>
               <div>

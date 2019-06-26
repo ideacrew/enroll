@@ -1,35 +1,39 @@
 module Services
   class QleFormService
 
-    attr_accessor :qle, :factory, :qle_form_params
+  attr_accessor :qle, :factory
 
     def initialize(attrs={}, find_or_create)
       @factory = qle_factory(attrs, find_or_create)
-      @qle = find_qle_kind(attrs[:_id])
-      @qle_form_params = attrs
+      @qle = find_qle_kind(attrs[:title])
     end
     
     # TODO: Edit params will probably contain ID, so likely
     # this will be updated to change to ID
-    def find_qle_kind(attrs)
-      QualifyingLifeEventKind.where(_id: attrs[:_id]).first
+    def find_qle_kind(qle_title)
+      QualifyingLifeEventKind.where(title: qle_title).first
     end
 
     # TODO: Move factory functionality to another file
     def qle_factory(attrs={}, find_or_create)
-      binding.pry
       case find_or_create
       when "create"
         create_qle_and_questions(attrs)
-      when "edit"
-        edit_qle_and_questions(attrs)
       when "update"
         update_qle_and_questions(attrs)
+      when "deactivate"
+        deactivate_qle(attrs)
       end
     end
 
-    def edit_qle_and_questions(attrs)
-      find_qle_kind(attrs)
+    def deactivate_qle(attrs)
+     attributes = clean_qle_attributes(attrs)
+     qle_title = attributes["title"]
+     find_qle_kind(qle_title).update_attributes!(attributes)
+    end
+
+    def edit_qle_and_questions(qle_title)
+      find_qle_kind(qle_title)
     end
 
     def update_qle_and_questions(attrs)
