@@ -94,7 +94,7 @@ module Effective
       def terminate_enrollment_type(family, allow)
         return 'disabled' unless allow
         terminate_eligibles = family.admin_dt_enrollments.any? do |en|
-          en.is_admin_termination_eligible?
+          en.is_admin_terminate_eligible?
         end
         terminate_eligibles ? 'ajax' : 'disabled'
       end

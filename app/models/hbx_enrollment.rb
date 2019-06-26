@@ -1969,7 +1969,7 @@ class HbxEnrollment
   end
 
   def is_admin_terminate_eligible?
-    CAN_TERMINATE_ENROLLMENTS.map(&:to_s).include(aasm_state.to_s)
+    CAN_TERMINATE_ENROLLMENTS.map(&:to_s).include?(aasm_state.to_s)
   end
 
   private
