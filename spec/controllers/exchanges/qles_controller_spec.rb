@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe QlesController, :type => :controller do
+RSpec.describe Exchanges::QlesController, :type => :controller do
   let(:qle_creation_params) do
     {
       "title"=>"Got a New Dog",

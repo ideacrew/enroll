@@ -24,5 +24,11 @@ module Forms
     def self.for_deactivate(params)
       new(params)
     end
+
+     # Note: for form_for
+    # https://stackoverflow.com/a/36441749/5331859
+    def model_name
+      QualifyingLifeEventKind.model_name
+    end
   end
 end

@@ -1,0 +1,76 @@
+<div class='container'>
+    <div class="row">
+    <h1 class="heading-text">
+      Modify an Existing QualifyingLifeEventKind
+    </h1>
+    <form [formGroup]="editFormGroup" class='form form-horizontal'>
+      <field-errors [errorControl]="editFormGroup" errorHeader="Your QLE Kind could not be updated for the following reasons:"></field-errors>
+        <div class="form-group">
+          <label for="qle_kind_edit_form_title" class="col-sm-1 control-label">Title</label>
+          <div class="col-sm-4">
+            <input type='text' formControlName="title" id='qle_kind_edit_form_title' class='form-control' required>
+          </div>
+        </div>
+        <div class="form-group">
+            <label for="qle_kind_edit_form_tool_tip" class="col-sm-1 control-label">Tool Tip </label>
+            <div class="col-sm-4">
+                <input
+                 type='text'
+                 formControlName="tool_tip"
+                 id='qle_kind_edit_form_tool_tip'
+                 class='form-control' required>
+            </div>
+        </div>
+        <div class="form-group"> 
+        <label for="qle_kind_edit_form_action_kind" class="col-sm-1 control-label">Action Kind </label>
+          <div class="col-md-2">        
+            <select formControlName="action_kind" class="form-control" type='select' id="qle_kind_edit_form_action_kind">
+              <option value="drop-member">Drop Member</option>
+              <option value="administrative">Administrative</option>
+              <option value="add-member">Add Member</option>
+              <option value="add-benefit">Add Benefit</option>
+              <option value="change-benefit">Change Benefit</option>
+              <option value="transition-member">Transition Member</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+            <label for="qle_kind_edit_form_reason" class="col-sm-1 control-label">Reason </label>
+            <div class="col-sm-4">
+                <input
+                 type='text'
+                 formControlName="reason"
+                 id='qle_kind_edit_form_reason'
+                 class='form-control' required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="qle_kind_edit_form_market_kind" class="col-sm-1 control-label">Market Kind</label>
+            <div class="col-sm-4">
+                <input
+                 type='text'
+                 formControlName="market_kind"
+                 id='qle_kind_edit_form_market_kind'
+                 class='form-control' required>
+            </div>
+        </div>
+        <div>
+          <div class= 'form-group'>
+            <label for="qle_kind_edit_form_is_self_attested" class="col-sm-1 control-label">Self-Attestion Option </label>
+              <div class="col-md-2">
+              <label class=" control-label">User Self Service
+                <input type='radio' class='' formControlName="is_self_attested" id='qle_kind_edit_form_is_self_attested' value = "Yes" required>
+              </label>
+              <label class=" control-label">Admin Only 
+                <input type='radio' class='' formControlName="is_self_attested" id='qle_kind_edit_form_is_self_attested' value = "No" required>   
+              </label>
+            </div>
+          </div>
+        </div>
+      <div class="form-group col-md-4">
+        <button class="btn btn-primary " (click)="submitEdit()">Update QLE Kind</button>
+      </div>
+    </form>
+    </div>
+  </div>
+  

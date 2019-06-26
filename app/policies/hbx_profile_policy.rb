@@ -25,6 +25,13 @@ class HbxProfilePolicy < ApplicationPolicy
     role.permission.can_submit_time_travel_request
   end
 
+  def can_add_custom_qle?
+    role = user_hbx_staff_role
+    return false unless role
+    return false unless role
+    role.permission.can_add_custom_qle
+  end
+
   def send_broker_agency_message?
     role = user_hbx_staff_role
     return false unless role
