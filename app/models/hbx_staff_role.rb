@@ -24,7 +24,7 @@ class HbxStaffRole
   field :subrole, type: String, default: ""
   field :permission_id, type: BSON::ObjectId
   def permission
-    Permission.find(permission_id)
+    @permission ||= Permission.find(permission_id)
   end
 
   def self.find(id)
