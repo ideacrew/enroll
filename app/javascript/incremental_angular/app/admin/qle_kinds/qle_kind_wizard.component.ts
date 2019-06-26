@@ -8,7 +8,7 @@ import { DropdownOption } from 'app/dropdown_option';
 export class QleKindWizardComponent {
   public editableList : Array<DropdownOption> = [];
   public deactivatableList : Array<DropdownOption> = [];
-  private newLocation : string | null = null;
+  public newLocation : string | null = null;
   private selectedAction : string | null = null;
   @ViewChild('editSelection') editSelection : ElementRef;
   @ViewChild('deactivateSelection') deactivateSelection : ElementRef;
