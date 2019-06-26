@@ -49,9 +49,9 @@ RSpec.shared_context 'setup one tax household with two ia members', :shared_cont
   include_context 'setup initial family with primary and spouse'
 
   let!(:tax_household) { FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil) }
-  let!(:tax_household_member) { FactoryBot.create(:tax_household_member, applicant_id: family_member.id) }
-  let!(:eligibilty_determination) { FactoryBot.create(:eligibility_determination, max_aptc: 200.00) }
-  let!(:tax_household_member2) { FactoryBot.create(:tax_household_member, applicant_id: family_member2.id) }
+  let!(:tax_household_member) { FactoryBot.create(:tax_household_member, applicant_id: family_member.id, tax_household: tax_household) }
+  let!(:eligibilty_determination) { FactoryBot.create(:eligibility_determination, max_aptc: 200.00, tax_household: tax_household) }
+  let!(:tax_household_member2) { FactoryBot.create(:tax_household_member, applicant_id: family_member2.id, tax_household: tax_household) }
 end
 
 RSpec.shared_context 'setup one tax household with one ia member and one medicaid member', :shared_context => :metadata do
