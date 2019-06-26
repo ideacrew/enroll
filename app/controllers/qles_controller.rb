@@ -2,6 +2,11 @@ class QlesController < ApplicationController
   before_action :set_qle_and_attributes, only: [:deactivation_form, :edit]
   # TODO: We need to discuss the design/naming conventions used here
   # the new/create manage is essentially just a redirect wizard.
+
+  # TODO: The QLE's will have to be generated as instance variables based on
+  # whether or not theyh're a member of the right market kind, whether or not
+  # they're eligible for deactivation, etc. We're going to switch the stimulus to
+  # Angular to facilitate this.
   def new_manage_qle
     @manage_qle = ::Forms::ManageQleForm.for_new(permitted_params)
   end
