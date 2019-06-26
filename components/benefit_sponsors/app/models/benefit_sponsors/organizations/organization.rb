@@ -5,6 +5,7 @@ module BenefitSponsors
     class Organization
       include Mongoid::Document
       include Mongoid::Timestamps
+      include Config::AcaConcern
       include BenefitSponsors::Concerns::Observable
       include BenefitSponsors::ModelEvents::Organization
 
@@ -23,6 +24,18 @@ module BenefitSponsors
         :foreign_embassy_or_consulate,
         :health_insurance_exchange,
       ]
+
+      DC_ENTITY_KINDS = [
+        :tax_exempt_organization,
+        :c_corporation,
+        :s_corporation,
+        :partnership,
+        :limited_liability_corporation,
+        :limited_liability_partnership,
+        :household_employer,
+        :governmental_employer,
+        :foreign_embassy_or_consulate
+      ].freeze
 
       FIELD_AND_EVENT_NAMES_MAP = {"legal_name" => "name_changed", "fein" => "fein_corrected"}
 
@@ -223,7 +236,11 @@ module BenefitSponsors
       end
 
       def entity_kinds
-        ENTITY_KINDS
+        if aca_state_abbreviation == "DC"
+          DC_ENTITY_KINDS
+        else
+          ENTITY_KINDS
+        end
       end
 
       def employer_profile
