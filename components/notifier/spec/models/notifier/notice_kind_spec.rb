@@ -61,9 +61,9 @@ module Notifier
 
       let(:finder_mapping) do
         double "finder_mapping",
-        mapped_class: double("mapped_class", search: resource),
-        search_method: "search",
-        identifier_key: "employer_id"
+               mapped_class: double("mapped_class", search: resource),
+               search_method: "search",
+               identifier_key: "employer_id"
       end
       let(:subject) { Notifier::NoticeKind.new(event_name: event_name) }
 
