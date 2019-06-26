@@ -185,6 +185,39 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
     end
   end
 
+  context ".next_poss_effective_date_within_range" do
+    let(:shop_qle_sep) { FactoryGirl.create(:special_enrollment_period, family: family) }
+    let(:past_date) { TimeKeeper.date_of_record - 3.months }
+    let(:shop_qle_sep_past_effective_on) { FactoryGirl.build(:special_enrollment_period, family: family, next_poss_effective_date: past_date) }
+    let(:ivl_qle_sep) { SpecialEnrollmentPeriod.create(**valid_params)}
+    let(:min_date) { TimeKeeper.date_of_record - 1.month}
+    let(:max_date) { TimeKeeper.date_of_record + 1.month}
+
+    it "should receive nil when next_poss_effective_date is blank" do
+      expect(shop_qle_sep.send(:next_poss_effective_date_within_range)).to eq nil
+    end
+
+    it "should return true if SEP is QLE event kind is IVL" do
+      ivl_qle_sep.update_attributes(next_poss_effective_date: TimeKeeper.date_of_record)
+      expect(ivl_qle_sep.send(:next_poss_effective_date_within_range)).to eq true
+    end
+
+    it "should return nil with SHOP SEP and next_poss_effective_date present" do
+      # since module method invokes in class
+      allow_any_instance_of(SpecialEnrollmentPeriod).to receive(:sep_optional_date).with(ivl_qle_sep.family, "min", "shop").and_return(min_date)
+      allow_any_instance_of(SpecialEnrollmentPeriod).to receive(:sep_optional_date).with(ivl_qle_sep.family, "max", "shop").and_return(max_date)
+      shop_qle_sep.update_attributes(next_poss_effective_date: TimeKeeper.date_of_record)
+      expect(shop_qle_sep.send(:next_poss_effective_date_within_range)).to eq nil
+    end
+
+    it "should not throw out of range error message" do
+      # since module method invokes in class
+      allow_any_instance_of(SpecialEnrollmentPeriod).to receive(:sep_optional_date).with(ivl_qle_sep.family, "min", "shop").and_return(min_date)
+      allow_any_instance_of(SpecialEnrollmentPeriod).to receive(:sep_optional_date).with(ivl_qle_sep.family, "max", "shop").and_return(max_date)
+      expect(shop_qle_sep_past_effective_on.valid?).to eq false
+      expect(shop_qle_sep_past_effective_on.errors.full_messages).to include "Next poss effective date out of range."
+    end
+  end
 
   context "for an Individual Qualifying Life Event" do
     let(:ivl_qle_sep) { family.special_enrollment_periods.build(qualifying_life_event_kind: ivl_qle) }

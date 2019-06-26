@@ -8,7 +8,7 @@ class SpecialEnrollmentPeriod
   include BenefitSponsors::ModelEvents::SpecialEnrollmentPeriod
 
   after_save :notify_on_save
-  
+
   embedded_in :family
   embeds_many :comments, as: :commentable, cascade_callbacks: true
 
@@ -68,7 +68,7 @@ class SpecialEnrollmentPeriod
   # ADMIN FLAG
   field :admin_flag, type:Boolean
 
-  validate :optional_effective_on_dates_within_range, :next_poss_effective_date_within_range
+  validate :optional_effective_on_dates_within_range, :next_poss_effective_date_within_range, on: :create
 
   validates :csl_num,
     length: { minimum: 5, maximum: 10, message: "should be a minimum of 5 digits" },
@@ -153,8 +153,8 @@ private
   def next_poss_effective_date_within_range
     return if next_poss_effective_date.blank?
     return true unless is_shop?
-    min_date = sep_optional_date family, 'min', self.market_kind
-    max_date = sep_optional_date family, 'max', self.market_kind
+    min_date = sep_optional_date family, 'min', qualifying_life_event_kind.market_kind
+    max_date = sep_optional_date family, 'max', qualifying_life_event_kind.market_kind
     errors.add(:next_poss_effective_date, "out of range.") if not next_poss_effective_date.between?(min_date, max_date)
   end
 
@@ -162,8 +162,8 @@ private
     return true unless is_shop?
     optional_effective_on.each_with_index do |date_option, index|
       date_option = Date.strptime(date_option, "%m/%d/%Y")
-      min_date = sep_optional_date family, 'min', self.market_kind
-      max_date = sep_optional_date family, 'max', self.market_kind
+      min_date = sep_optional_date family, 'min', qualifying_life_event_kind.market_kind
+      max_date = sep_optional_date family, 'max', qualifying_life_event_kind.market_kind
       errors.add(:optional_effective_on, "Date #{index+1} option out of range.") if not date_option.between?(min_date, max_date)
     end
   end
@@ -269,7 +269,7 @@ private
 
     person = family.primary_applicant.person
     person.active_employee_roles.any? do |employee_role|
-      eligible_date = employee_role.census_employee.earliest_eligible_date 
+      eligible_date = employee_role.census_employee.earliest_eligible_date
       eligible_date <= TimeKeeper.date_of_record
     end
   end
