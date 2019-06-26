@@ -45,7 +45,7 @@ module BenefitSponsors
     def is_general_agency_staff_for_employer?(profile)
       # TODO: Need to fix this after updating general agency account
       if general_agency_staff_role = user.person.general_agency_staff_roles.first
-        general_agency_account = profile.general_agency_accounts.active.first
+        general_agency_account = profile.general_agency_accounts.active.first if profile.general_agency_accounts.present?
         return false if general_agency_account.blank?
         general_agency_profile = general_agency_account.general_agency_profile
         return false if general_agency_profile.blank?
