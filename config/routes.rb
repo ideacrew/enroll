@@ -62,6 +62,23 @@ Rails.application.routes.draw do
 
   namespace :exchanges do
 
+    resources :qles, only: [:new, :create, :edit, :update] do
+      member do
+        get :deactivation_form
+        get :question_flow
+        post :question_flow
+        get :creation_form
+        put :deactivate
+      end
+      # TODO: We need to discuss renaming these
+      # essentially they're a redirect wizard and not
+      # creating anything
+      collection do      
+        get :manage
+        post :manage_qle
+      end
+    end
+
     resources :inboxes, only: [:show, :destroy]
     resources :announcements, only: [:index, :create, :destroy] do
       get :dismiss, on: :collection
@@ -622,16 +639,6 @@ Rails.application.routes.draw do
     end
   end
   resources :office_locations, only: [:new]
-
-  resources :qles do
-    collection do
-      get :new_manage_qle
-      post :create_manage_qle
-      get :new
-      post :create
-      post :edit_manage_qle
-    end
-  end
 
   get "document/download/:bucket/:key" => "documents#download", as: :document_download
   get "document/authorized_download/:model/:model_id/:relation/:relation_id" => "documents#authorized_download", as: :authorized_document_download

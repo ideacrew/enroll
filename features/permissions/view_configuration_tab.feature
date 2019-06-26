@@ -34,5 +34,18 @@ Scenario: HBX Staff with Super Admin subroles and a time travel ability enabled 
   And the user goes to the Config Page
   Then the user will see the Time Tavel option
 
+Scenario Outline: HBX Staff with <subrole> subroles <action> the manage qle button
+  Given that a user with a HBX staff role with <subrole> subrole exists and is logged in
+  And the user is on the Main Page
+  And the user goes to the Config Page
+  Then the user will <action> the Manage QLEs link
+
+  Examples:
+    | subrole       | action  |
+    | Super Admin   | see     |
+    | HBX Tier3     | see     |
+    | HBX Staff     | see     |
+    | HBX Read Only | not see |
+    | Developer     | not see |
 
 

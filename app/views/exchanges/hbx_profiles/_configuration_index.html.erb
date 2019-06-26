@@ -36,9 +36,8 @@
     <% end %>
     <br/>
     <br/>
-
-    <h2 class="heading-text">Manage SEP's/QLE's</h2>
-    <%= link_to "IVL/COVERALL QLE's", new_manage_qle_qles_path(market_kind: 'ivl'), data: { turbolinks: false }, class: "btn btn-default" %>
-    <%= link_to "SHOP QLE's", new_manage_qle_qles_path(market_kind: 'shop'), data: { turbolinks: false } , class: "btn btn-default" %>
+    <%=pundit_span HbxProfile, :can_add_custom_qle? %>
+      <%= link_to "Manage QLEs", manage_exchanges_qles_path, data: { turbolinks: false }, class: "btn btn-default" %>
+    </span>
   </div>
 </div>
