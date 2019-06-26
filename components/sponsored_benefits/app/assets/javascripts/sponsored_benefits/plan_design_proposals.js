@@ -24,6 +24,25 @@ $(document).on('click', '.downloadReferencePlanDetailsButton.plan-saved', sendPd
 $(document).on('ready', pageInit);
 $(document).on('page:load', pageInit);
 
+function loadContentOnChange() {
+  var checkInt = setInterval(isPageLoaded, 1000);
+
+  function stopPageLoadCheck() {
+    clearInterval(checkInt);
+  }
+
+  function isPageLoaded() {
+    var benefitModelSelection = document.getElementById('pdp-bms');
+    if (benefitModelSelection) {
+      stopPageLoadCheck();
+      setTimeout(function() {
+        pageInit();
+      },500);
+    }
+  }
+}
+
+
 function pageInit() {
   var kind = fetchBenefitKind();
 
