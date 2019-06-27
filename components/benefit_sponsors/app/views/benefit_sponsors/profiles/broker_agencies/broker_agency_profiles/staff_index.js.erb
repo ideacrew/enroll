@@ -1,4 +1,4 @@
-$('#inbox .col-md-10').html(("<%= escape_javascript render "benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/staff"%>"))
+$("#inbox .col-md-10").html("<%= escape_javascript render "benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/staff" %>");
 $('#inbox').removeClass("hide")
 $('#help_list').addClass('hide')
 $('#help_type').html('Broker')
@@ -10,9 +10,10 @@ function show_broker(broker_id) {
   $("#help_index_status").html('')
 }
 
-$('.broker_select_button').click(function(){
+$('.broker_select_button').click(function(e) {
   show_broker(this.getAttribute('data-broker'))
   $('#help_index_status').html('')
+  e.stopPropagation();
 })
 $('.close_broker_select').click(function(){
   $("#broker_index_view").removeClass('hide')

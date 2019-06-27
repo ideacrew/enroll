@@ -49,9 +49,9 @@ RSpec.describe PeopleController, dbclean: :after_each do
       allow(Person).to receive(:find).and_return(person)
       allow(Person).to receive(:where).and_return(Person)
       allow(Person).to receive(:first).and_return(person)
-      # allow(controller).to receive(:sanitize_person_params).and_return(true)
+      allow(controller).to receive(:sanitize_person_params).and_return(true)
       allow(person).to receive(:consumer_role).and_return(consumer_role)
-      allow(consumer_role).to receive(:check_for_critical_changes)
+      allow_any_instance_of(VlpDoc).to receive(:sensitive_info_changed?).and_return([false, false])
       allow(person).to receive(:update_attributes).and_return(true)
       allow(person).to receive(:is_consumer_role_active?).and_return(false)
       person_attributes[:addresses_attributes] = addresses_attributes
@@ -78,6 +78,7 @@ RSpec.describe PeopleController, dbclean: :after_each do
       end
       it "update person" do
         allow(consumer_role).to receive(:find_document).and_return(vlp_document)
+        allow(consumer_role).to receive(:check_for_critical_changes).and_return(true)
         allow(vlp_document).to receive(:save).and_return(true)
         consumer_role_attributes[:vlp_documents_attributes] = vlp_documents_attributes
         person_attributes[:consumer_role_attributes] = consumer_role_attributes
@@ -89,6 +90,7 @@ RSpec.describe PeopleController, dbclean: :after_each do
 
       it "should update is_applying_coverage" do
         allow(person).to receive(:update_attributes).and_return(true)
+        allow(consumer_role).to receive(:check_for_critical_changes).and_return(true)
         person_attributes.merge!({"is_applying_coverage" => "false"})
 
         post :update, params: {id: person.id, person: person_attributes}

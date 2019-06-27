@@ -714,11 +714,12 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     let(:invalid_ssn) { "234-45-839" }
     let(:valid_ssn) { "234-45-8390" }
     let(:valid_dob) { "03/17/1987" }
+    let(:valid_dob2) {'1987-03-17'}
 
     it "should render back to edit_enrollment if there is a validation error on save" do
       allow(hbx_staff_role).to receive(:permission).and_return permission_yes
       sign_in(user)
-      @params = {:person=>{:pid => person.id, :ssn => invalid_ssn, :dob => valid_dob},:jq_datepicker_ignore_person=>{:dob=> valid_dob}, :format => 'js'}
+      @params = {:person => {:pid => person.id, :ssn => invalid_ssn, :dob => valid_dob2}, :jq_datepicker_ignore_person => {:dob => valid_dob}, :format => 'js'}
       get :update_dob_ssn, xhr:  true, params:  @params
       expect(response).to render_template('edit_enrollment')
     end
@@ -727,7 +728,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       allow(hbx_staff_role).to receive(:permission).and_return permission_yes
       sign_in(user)
       expect(response).to have_http_status(:success)
-      @params = {:person=>{:pid => person.id, :ssn => valid_ssn, :dob => valid_dob },:jq_datepicker_ignore_person=>{:dob=> valid_dob}, :format => 'js'}
+      @params = {:person => {:pid => person.id, :ssn => valid_ssn, :dob => valid_dob2}, :jq_datepicker_ignore_person => {:dob => valid_dob}, :format => 'js'}
       get :update_dob_ssn, xhr:  true, params:  @params
       expect(response).to render_template('update_enrollment')
     end
@@ -736,7 +737,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       allow(hbx_staff_role).to receive(:permission).and_return permission_yes
       sign_in(user)
       expect(response).to have_http_status(:success)
-      @params = {:person=>{:pid => person.id, :ssn => valid_ssn, :dob => valid_dob },:jq_datepicker_ignore_person=>{:dob=> valid_dob}, :format => 'js'}
+      @params = {:person => {:pid => person.id, :ssn => valid_ssn, :dob => valid_dob2}, :jq_datepicker_ignore_person => {:dob => valid_dob}, :format => 'js'}
       get :update_dob_ssn, xhr:  true, params:  @params
       expect(assigns(:info_changed)). to eq true
     end
@@ -745,7 +746,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       allow(hbx_staff_role).to receive(:permission).and_return permission_yes
       sign_in(user)
       expect(response).to have_http_status(:success)
-      @params = {:person=>{:pid => person.id, :ssn => valid_ssn, :dob => valid_dob },:jq_datepicker_ignore_person=>{:dob=> valid_dob}, :format => 'js'}
+      @params = {:person => {:pid => person.id, :ssn => valid_ssn, :dob => valid_dob2}, :jq_datepicker_ignore_person => {:dob => valid_dob}, :format => 'js'}
       get :update_dob_ssn, xhr:  true, params:  @params
       expect(assigns(:dc_status)). to eq false
     end
@@ -754,7 +755,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       allow(hbx_staff_role).to receive(:permission).and_return permission_yes
       sign_in(user)
       expect(response).to have_http_status(:success)
-      @params = {:person=>{:pid => person1.id, :ssn => "" , :dob => valid_dob },:jq_datepicker_ignore_person=>{:dob=> valid_dob}, :format => 'js'}
+      @params = {:person => {:pid => person1.id, :ssn => "", :dob => valid_dob2}, :jq_datepicker_ignore_person => {:dob => valid_dob}, :format => 'js'}
       get :update_dob_ssn, xhr:  true, params:  @params
       expect(response).to render_template('update_enrollment')
     end

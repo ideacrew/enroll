@@ -20,6 +20,8 @@ Feature: Insured Plan Shopping on Individual market
     Then Individual should see a form to enter personal information
     When Individual clicks on Save and Exit
     Then Individual resumes enrollment
+    And Individual click on sign in existing account
+    And I signed in
     Then Individual sees previously saved address
     Then Individual agrees to the privacy agreeement
     Then Individual should see identity verification page and clicks on submit
