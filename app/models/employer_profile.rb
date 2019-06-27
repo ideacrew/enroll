@@ -102,7 +102,6 @@ class EmployerProfile
 
   scope :active,      ->{ any_in(aasm_state: ACTIVE_STATES) }
   scope :inactive,    ->{ any_in(aasm_state: INACTIVE_STATES) }
-
   scope :all_renewing, ->{ Organization.all_employers_renewing }
   scope :all_with_next_month_effective_date,  ->{ Organization.all_employers_by_plan_year_start_on(TimeKeeper.date_of_record.end_of_month + 1.day) }
 

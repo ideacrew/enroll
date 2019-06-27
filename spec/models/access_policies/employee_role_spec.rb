@@ -74,6 +74,7 @@ describe AccessPolicies::EmployeeRole, :dbclean => :after_each do
     let(:broker_agency_staff_role) { FactoryGirl.create(:broker_agency_staff_role, person: broker_person, broker_agency_profile_id: broker_agency_profile.id)}
     let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
 
+
     before do
       broker_agency_staff_role.save
       broker_agency_account = BrokerAgencyAccount.create(employer_profile: person.employee_roles.first.employer_profile, start_on: TimeKeeper.date_of_record, broker_agency_profile_id: broker_agency_profile.id)
@@ -93,8 +94,8 @@ describe AccessPolicies::EmployeeRole, :dbclean => :after_each do
       end
     end
   end
-  
-  context "with general agency staff role user" do
+
+  context "who doesn't match employer_profile_id" do
     include ActiveSupport::Concern
     subject { AccessPolicies::EmployeeRole.new(general_user) }
     let(:general_user) { FactoryGirl.create(:user, person: general_person, roles: ["general_agency_staff"]) }
@@ -102,19 +103,26 @@ describe AccessPolicies::EmployeeRole, :dbclean => :after_each do
     let(:general_agency_staff_role) { FactoryGirl.create(:general_agency_staff_role, person: general_person, general_agency_profile_id: general_agency_profile.id)}
     let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
 
-    before do
-      general_agency_staff_role.save
-      general_agency_account = GeneralAgencyAccount.create(employer_profile: person.employee_roles.first.employer_profile, start_on: TimeKeeper.date_of_record, general_agency_profile_id: general_agency_profile.id)
+    it "should redirect you to your bookmark employee role page if the user has employee role match the employee" do
+      EmployerProfile.find_by_general_agency_profile(general_agency_profile).each{ |employer_profile| employer_profile.destroy }
+      expect(controller).to receive(:redirect_to_check_employee_role)
+      subject.authorize_employee_role(person.employee_roles.first, controller)
     end
-    
-    context "who doesn't match employer_profile_id" do
-      it "should redirect you to your bookmark employee role page or families home" do
-        EmployerProfile.find_by_general_agency_profile(general_agency_profile).each { |employer_profile| employer_profile.destroy }
-        expect(controller).to receive(:redirect_to_check_employee_role)
-        subject.authorize_employee_role(person.employee_roles.first, controller)
-      end
-    end
-    
+  end
+
+  context "with general agency staff role user" do
+    include ActiveSupport::Concern
+    subject { AccessPolicies::EmployeeRole.new(user) }
+    let(:general_agency_staff_role) { FactoryGirl.create(:general_agency_staff_role, person: general_person, general_agency_profile_id: general_agency_profile.id)}
+    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+    let(:broker_person) { FactoryGirl.create(:person) }
+    let(:broker_role) { FactoryGirl.create(:broker_role, person: broker_person)}
+    let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, primary_broker_role: broker_role) }
+    let(:plan_design_organization) { FactoryGirl.create(:sponsored_benefits_plan_design_organization, owner_profile_id: broker_agency_profile.id, sponsor_profile_id: person.employee_roles.first.employer_profile.id)}
+    let(:plan_design_organization_with_ga){
+                                            plan_design_organization.general_agency_accounts.create(start_on: TimeKeeper.date_of_record, general_agency_profile_id: general_agency_profile.id, broker_agency_profile_id: broker_agency_profile.id, broker_role_id: broker_agency_profile.primary_broker_role.id)
+                                            plan_design_organization
+                                           }
     context "who matches employer_profile_id by genearl agent role" do
       it "should be ok with the action" do
         expect(subject.authorize_employee_role(person.employee_roles.first, controller)).to be_truthy
