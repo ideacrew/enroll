@@ -19,6 +19,8 @@ class TaxHouseholdMember
 
   validate :strictly_boolean, :strictly_one_pdc_only
 
+  alias_method :family_member_id, :applicant_id
+
   def eligibility_determinations
     return nil unless tax_household
     tax_household.eligibility_determinations
