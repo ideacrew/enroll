@@ -257,7 +257,7 @@ class Insured::PlanShoppingsController < ApplicationController
     extract_from_shop_products
 
     if plan_match_dc
-      is_congress_employee = nil # TODO: - set this after implementing congress
+      is_congress_employee = @hbx_enrollment.fehb_profile ? true : false
       @dc_checkbook_url = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment, is_congress_employee).generate_url
     end
 

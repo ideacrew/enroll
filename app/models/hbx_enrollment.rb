@@ -826,6 +826,10 @@ class HbxEnrollment
     end
   end
 
+  def fehb_profile
+    employer_profile.is_a?(BenefitSponsors::Organizations::FehbEmployerProfile) ? employer_profile : nil
+  end
+
   def mid_year_plan_change_notice
     if self.census_employee.present?
       begin
