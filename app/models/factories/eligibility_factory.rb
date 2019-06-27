@@ -11,12 +11,14 @@ module Factories
       set_applicable_aptc_attrs(selected_aptc, product_ids) if product_ids.present? && selected_aptc
     end
 
+    # returns hash of total_aptc, aptc_breakdown_by_member and csr_value
     def fetch_available_eligibility
       available_eligibility_hash = fetch_available_aptc.merge(fetch_csr)
       total_aptc = available_eligibility_hash[:aptc].values.inject(0, :+)
       available_eligibility_hash.merge({:total_available_aptc => total_aptc})
     end
 
+    # returns hash of product_id to applicable_aptc mappings
     def fetch_applicable_aptcs
       raise "Cannot process without #{@selected_aptc} and #{@product_ids}" if @selected_aptc.nil? || @product_ids.empty?
 
