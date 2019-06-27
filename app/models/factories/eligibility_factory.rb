@@ -13,7 +13,7 @@ module Factories
 
     # returns hash of total_aptc, aptc_breakdown_by_member and csr_value
     def fetch_available_eligibility
-      available_eligibility_hash = fetch_available_aptc.merge(fetch_csr)
+      available_eligibility_hash = fetch_enrolling_available_aptcs.merge(fetch_csr)
       total_aptc = available_eligibility_hash[:aptc].values.inject(0, :+)
       available_eligibility_hash.merge({:total_available_aptc => total_aptc})
     end
@@ -69,22 +69,40 @@ module Factories
       shopping_tax_members.map(&:is_ia_eligible?).include?(false)
     end
 
-    def tax_members_aptc_breakdown
-      tax_households.inject({}) do |aptc_hash, tax_h|
-        aptc_hash_thh = tax_h.aptc_available_amount_by_member
-        aptc_hash.merge!(aptc_hash_thh) unless aptc_hash_thh.empty?
-        aptc_hash
+    def aptc_enrollment_members(aptc_thhms)
+      aptc_thhms.select { |thhm| shopping_member_ids.include?(thhm.applicant_id.to_s) && thhm.is_ia_eligible? }
+    end
+
+    def enrollment_eligible_benchmark_hash(aptc_thhms)
+      aptc_thhms.inject({}) do |benchmark_hash, thhm|
+        benchmark_hash.merge!({ thhm.applicant_id.to_s => thhm.family_member.aptc_benchmark_amount })
       end
     end
 
-    def fetch_available_aptc
-      # TODO: Refactor accordingly once BenchMark code is merged to Base branch
-      # 1. What if one of the shopping members does not exist in any tax_households
-      aptcs_hash = tax_members_aptc_breakdown
+    def tax_members_aptc_breakdown(tax_household)
+      total_thh_available_aptc = tax_household.total_aptc_available_amount_for_enrollment(@enrollment)
+      aptc_thhms = tax_household.aptc_members
+      member_aptc_benchmark_hash = enrollment_eligible_benchmark_hash(aptc_thhms)
+      total_eligible_member_benchmark = member_aptc_benchmark_hash.values.sum
+      enrolling_aptc_members = aptc_enrollment_members(aptc_thhms)
 
-      {:aptc => shopping_member_ids.inject({}) do |required_aptc_hash, member_id|
-                  required_aptc_hash.merge!(aptcs_hash.slice(member_id.to_s))
-                end}
+      enrolling_aptc_members.inject({}) do |thh_hash, thh_member|
+        fm_id = thh_member.applicant_id.to_s
+        member_ratio = (member_aptc_benchmark_hash[fm_id] / total_eligible_member_benchmark)
+        thh_hash.merge!({ fm_id => (total_thh_available_aptc * member_ratio) })
+      end
+    end
+
+    def fetch_enrolling_available_aptcs
+      # 1. What if one of the shopping members does not exist in any tax_households
+
+      aptc_breakdowns = tax_households.inject({}) do |tax_members_aptcs, tax_household|
+        aptc_hash = tax_members_aptc_breakdown(tax_household)
+        tax_members_aptcs.merge!(aptc_hash) unless aptc_hash.empty?
+        tax_members_aptcs
+      end
+
+      { :aptc => aptc_breakdowns}
     end
 
     def prioritized_csr(csr_kinds)

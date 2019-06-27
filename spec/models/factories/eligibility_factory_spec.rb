@@ -2,7 +2,6 @@
 
 require 'rails_helper'
 require File.join(Rails.root, 'spec/shared_contexts/ivl_eligibility')
-require 'pry'
 
 RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each do
 
@@ -197,8 +196,8 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
             end
           end
 
-          it { expect(@available_eligibility[:aptc][family_member.id.to_s]).to eq 100.00 }
-          it { expect(@available_eligibility[:total_available_aptc]).to eq 100.00 }
+          it { expect(@available_eligibility[:aptc][family_member.id.to_s]).to eq 150.57 }
+          it { expect(@available_eligibility[:total_available_aptc]).to eq 150.57 }
           it { expect(@available_eligibility[:csr]).to eq 'csr_94' }
         end
 
@@ -225,9 +224,9 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
             end
           end
 
-          it { expect(@available_eligibility[:aptc][family_member.id.to_s]).to eq 100.00 }
-          it { expect(@available_eligibility[:aptc][family_member2.id.to_s]).to eq 100.0 }
-          it { expect(@available_eligibility[:total_available_aptc]).to eq 200.00 }
+          it { expect(@available_eligibility[:aptc][family_member.id.to_s]).to eq 250.00 }
+          it { expect(@available_eligibility[:aptc][family_member2.id.to_s]).to eq 250.0 }
+          it { expect(@available_eligibility[:total_available_aptc]).to eq 500.00 }
           it { expect(@available_eligibility[:csr]).to eq 'csr_94' }
         end
 
@@ -256,9 +255,9 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
             end
           end
 
-          it { expect(@available_eligibility[:aptc][family_member.id.to_s]).to eq 50.00 }
-          it { expect(@available_eligibility[:aptc][family_member2.id.to_s]).to eq 100.0 }
-          it { expect(@available_eligibility[:total_available_aptc]).to eq 150.00 }
+          it { expect(@available_eligibility[:aptc][family_member.id.to_s]).to eq 225.00 }
+          it { expect(@available_eligibility[:aptc][family_member2.id.to_s]).to eq 225.00 }
+          it { expect(@available_eligibility[:total_available_aptc]).to eq 450.00 }
           it { expect(@available_eligibility[:csr]).to eq 'csr_94' }
         end
       end
