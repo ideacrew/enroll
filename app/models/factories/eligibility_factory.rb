@@ -3,9 +3,10 @@
 module Factories
   class EligibilityFactory
 
-    def initialize(enrollment_id, selected_aptc = nil, product_ids=[])
+    def initialize(enrollment_id, selected_aptc = nil, product_ids = [])
       @enrollment = HbxEnrollment.find(enrollment_id)
       raise "Cannot find a valid enrollment with given enrollment id" unless @enrollment
+
       @family = @enrollment.family
       set_applicable_aptc_attrs(selected_aptc, product_ids) if product_ids.present? && selected_aptc
     end
@@ -18,8 +19,8 @@ module Factories
 
     def fetch_applicable_aptcs
       raise "Cannot process without #{@selected_aptc} and #{@product_ids}" if @selected_aptc.nil? || @product_ids.empty?
-      # TODO: Return a has of plan_id, applicable aptcs.
 
+      # TODO: Return a has of plan_id, applicable aptcs.
       @product_ids.inject({}) do |products_aptcs_hash, product_id|
         product_aptc = applicable_aptc_hash(product_id)
         products_aptcs_hash.merge!(product_aptc) unless product_aptc.empty?

@@ -1718,9 +1718,9 @@ class HbxEnrollment
     end
   end
 
-  def ivl_decorated_hbx_enrollment(enrollment_product=nil)
+  def ivl_decorated_hbx_enrollment(enrollment_product = nil)
     return @cost_decorator if @cost_decorator
-    enrollment_product = enrollment_product ? enrollment_product : product
+    enrollment_product ||= product
 
     if enrollment_product.present? && (resident_role.present? || consumer_role.present?)
       @cost_decorator = UnassistedPlanCostDecorator.new(enrollment_product, self)
