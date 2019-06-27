@@ -3,10 +3,11 @@
 module Factories
   class EligibilityFactory
 
-    def initialize(enrollment_id, selected_aptc = nil)
+    def initialize(enrollment_id, selected_aptc = nil, product_ids=[])
       @enrollment = HbxEnrollment.find(enrollment_id)
-      @selected_aptc = selected_aptc
-      set_initializers
+      raise "Cannot find a valid enrollment with given enrollment id" unless @enrollment
+      @family = @enrollment.family
+      set_applicable_aptc_attrs(selected_aptc, product_ids) if product_ids.present? && selected_aptc
     end
 
     def fetch_available_eligibility
@@ -15,23 +16,38 @@ module Factories
       available_eligibility_hash.merge({:total_available_aptc => total_aptc})
     end
 
-    def fetch_applicable_aptc
-      [@selected_aptc, @ehb_premium].min if @product && @selected_aptc
+    def fetch_applicable_aptcs
+      raise "Cannot process without #{@selected_aptc} and #{@product_ids}" if @selected_aptc.nil? || @product_ids.empty?
+      # TODO: Return a has of plan_id, applicable aptcs.
+
+      @product_ids.inject({}) do |products_aptcs_hash, product_id|
+        product_aptc = applicable_aptc_hash(product_id)
+        products_aptcs_hash.merge!(product_aptc) unless product_aptc.empty?
+        products_aptcs_hash
+      end
     end
 
     private
 
-    def set_initializers
-      @family = @enrollment.family
-      @product = fetch_product
-      return unless @product
-
-      @premium_amount = @enrollment.total_premium
-      @ehb_premium = @enrollment.total_premium * @product.ehb
+    def applicable_aptc_hash(product_id)
+      applicable_aptc = [@selected_aptc, ehb_premium(product_id)].min
+      { product_id => applicable_aptc }
     end
 
-    def fetch_product
-      @enrollment.product_id ? @enrollment.product : nil
+    def set_applicable_aptc_attrs(selected_aptc, product_ids)
+      @selected_aptc = selected_aptc
+      @product_ids = product_ids
+    end
+
+    def ehb_premium(product_id)
+      premium_amount = fetch_total_premium(product_id)
+      product = ::BenefitMarkets::Products::Product.find(product_id)
+      @ehb_premium = premium_amount * product.ehb.round(2)
+    end
+
+    def fetch_total_premium(product_id)
+      @cost_decorator = @enrollment.ivl_decorated_hbx_enrollment(product_id)
+      @cost_decorator.total_premium
     end
 
     def shopping_member_ids
@@ -61,10 +77,10 @@ module Factories
     def fetch_available_aptc
       # TODO: Refactor accordingly once BenchMark code is merged to Base branch
       # 1. What if one of the shopping members does not exist in any tax_households
-      aptc = tax_members_aptc_breakdown
+      aptcs_hash = tax_members_aptc_breakdown
 
       {:aptc => shopping_member_ids.inject({}) do |required_aptc_hash, member_id|
-                  required_aptc_hash.merge!(aptc.slice(member_id.to_s))
+                  required_aptc_hash.merge!(aptcs_hash.slice(member_id.to_s))
                 end}
     end
 

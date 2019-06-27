@@ -2,6 +2,7 @@
 
 require 'rails_helper'
 require File.join(Rails.root, 'spec/shared_contexts/ivl_eligibility')
+require 'pry'
 
 RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each do
 
@@ -265,34 +266,45 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
       context 'for ApplicableAptcService' do
         context 'for one member enrollment' do
           before :each do
+            @product_id = @product.id.to_s
             allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) {|_id, _start, age| age * 1.0}
             enrollment1.update_attributes!(product_id: @product.id, aasm_state: 'coverage_selected', consumer_role_id: person.consumer_role.id)
           end
 
           context 'for ehb_premium less than selected_aptc' do
             before do
-              @eligibility_factory = described_class.new(enrollment1.id, 150.00)
-              @applicable_aptc = @eligibility_factory.fetch_applicable_aptc
+              @eligibility_factory = described_class.new(enrollment1.id, 150.00, [@product_id])
+              @applicable_aptc = @eligibility_factory.fetch_applicable_aptcs
+            end
+
+            it 'should return a Hash' do
+              expect(@applicable_aptc.class).to eq Hash
             end
 
             it 'should return ehb_premium' do
-              expect(@applicable_aptc.round).to eq enrollment_member1.age_on_effective_date.round
+              premium = enrollment1.ivl_decorated_hbx_enrollment.premium_for(enrollment_member1).round
+              expect(@applicable_aptc.keys.first).to eq @product_id
+              expect(@applicable_aptc.values.first.round).to eq premium
             end
           end
 
           context 'for selected_aptc less than ehb_premium' do
             before do
-              @eligibility_factory = described_class.new(enrollment1.id, 35.00)
-              @applicable_aptc = @eligibility_factory.fetch_applicable_aptc
+              @eligibility_factory = described_class.new(enrollment1.id, 35.00, [@product_id])
+              @applicable_aptc = @eligibility_factory.fetch_applicable_aptcs
+            end
+
+            it 'should return a Hash' do
+              expect(@applicable_aptc.class).to eq Hash
             end
 
             it 'should return selected_aptc' do
-              expect(@applicable_aptc.round).to eq 35.00
+              product_aptc = {@product_id => 35.00}
+              expect(@applicable_aptc).to eq product_aptc
             end
           end
         end
       end
     end
   end
-
 end
