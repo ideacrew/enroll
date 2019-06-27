@@ -21,7 +21,7 @@ RSpec.shared_context 'setup one tax household with one ia member', :shared_conte
 
   let!(:tax_household) { FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil) }
   let!(:tax_household_member) { FactoryBot.create(:tax_household_member, applicant_id: family_member2.id, tax_household: tax_household) }
-  let!(:eligibilty_determination) { FactoryBot.create(:eligibility_determination, max_aptc: 200.00, tax_household: tax_household, csr_eligibility_kind: 'csr_73') }
+  let!(:eligibilty_determination) { FactoryBot.create(:eligibility_determination, max_aptc: 500.00, tax_household: tax_household, csr_eligibility_kind: 'csr_73') }
 end
 
 RSpec.shared_context 'setup two tax households with one ia member each', :shared_context => :metadata do
@@ -29,7 +29,7 @@ RSpec.shared_context 'setup two tax households with one ia member each', :shared
 
   let!(:tax_household2) { FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil) }
   let!(:tax_household_member2) { FactoryBot.create(:tax_household_member, applicant_id: family_member.id, tax_household: tax_household2) }
-  let!(:eligibilty_determination2) { FactoryBot.create(:eligibility_determination, max_aptc: 100.00, tax_household: tax_household2, csr_eligibility_kind: 'csr_87') }
+  let!(:eligibilty_determination2) { FactoryBot.create(:eligibility_determination, max_aptc: 250.00, tax_household: tax_household2, csr_eligibility_kind: 'csr_87') }
 end
 
 RSpec.shared_context 'setup initial family with primary and spouse', :shared_context => :metadata do
@@ -50,7 +50,7 @@ RSpec.shared_context 'setup one tax household with two ia members', :shared_cont
 
   let!(:tax_household) { FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil) }
   let!(:tax_household_member) { FactoryBot.create(:tax_household_member, applicant_id: family_member.id, tax_household: tax_household) }
-  let!(:eligibilty_determination) { FactoryBot.create(:eligibility_determination, max_aptc: 200.00, tax_household: tax_household) }
+  let!(:eligibilty_determination) { FactoryBot.create(:eligibility_determination, max_aptc: 500.00, tax_household: tax_household) }
   let!(:tax_household_member2) { FactoryBot.create(:tax_household_member, applicant_id: family_member2.id, tax_household: tax_household) }
 end
 
