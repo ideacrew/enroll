@@ -399,6 +399,46 @@ class HbxEnrollment
       end
     end
 
+    def enrollments_for_display(family_id)
+      HbxEnrollment.collection.aggregate(
+        [
+          {'$match' => {
+            'aasm_state' => {'$nin' => ['void', "coverage_canceled"]},
+            'external_enrollment' => {'$ne' => true},
+            'family_id' => family_id,
+          }},
+        {"$sort" => {"submitted_at" => -1 }},
+          {'$group' => {
+            '_id' => {
+              'year' =>  '$effective_on',
+              'month' =>  '$effective_on',
+              'day' => '$effective_on',
+              'subscriber_id' => 'enrollment_signature',
+              'provider_id'   => 'carrier_profile_id',
+              'benefit_group_id' => 'benefit_group_id',
+              'state' => 'aasm_state',
+              'market' => 'kind',
+              'coverage_kind' => 'coverage_kind'}},
+          },
+        ],
+        :allow_disk_use => true
+      ).to_a
+    end
+     
+    def waivers_for_display(family_id)
+      HbxEnrollment.collection.aggregate([
+        {"$match" => {'family_id' => family_id}},
+        {"$match" => {'aasm_state' => 'inactive'}},
+        {"$sort" => {"submitted_at" => -1 }},
+        {"$group" => {'_id' => {'year' => { "$year" => '$effective_on'},
+                      'state' => '$aasm_state',
+                      'kind' => '$kind',
+                      'coverage_kind' => '$coverage_kind'}}},
+        {"$project" => {'hbx_enrollment._id' => 1, '_id' => 0}}
+        ],
+        :allow_disk_use => true)
+    end
+
     def families_with_contingent_enrollments
       Family.by_enrollment_individual_market.where(:'households.hbx_enrollments' => {
         :$elemMatch => {
