@@ -974,54 +974,18 @@ class Family
     latest_household.try(:enrolled_including_waived_hbx_enrollments)
   end
 
-
   # Get {HbxEnrollment HbxEnrollments} that meet application criteria for display in the UI
   # @see waivers_for_display
   # @return [ Array<HbxEnrollment> ] The {HbxEnrollment HbxEnrollments} filtered by display criteria
   def enrollments_for_display
-    HbxEnrollment.collection.aggregate(
-      [
-        {'$match' => {
-          'aasm_state' => {'$nin' => ['void', "coverage_canceled"]},
-          'external_enrollment' => {'$ne' => true},
-          'family_id' => self._id,
-        }},
-      {"$sort" => {"submitted_at" => -1 }},
-        {'$group' => {
-          '_id' => {
-            'year' =>  '$effective_on',
-            'month' =>  '$effective_on',
-            'day' => '$effective_on',
-            'subscriber_id' => 'enrollment_signature',
-            'provider_id'   => 'carrier_profile_id',
-            'benefit_group_id' => 'benefit_group_id',
-            'state' => 'aasm_state',
-            'market' => 'kind',
-            'coverage_kind' => 'coverage_kind'}},
-        },
-      ],
-      :allow_disk_use => true
-    ).to_a
+    HbxEnrollment.enrollments_for_display(_id)
   end
-
 
   # Get waived {HbxEnrollment HbxEnrollments} that meet application criteria for display in the UI
   # @see enrollments_for_display
   # @return [ Array<HbxEnrollment> ] The {HbxEnrollment HbxEnrollments} filtered by display criteria
   def waivers_for_display
-    Family.collection.aggregate([
-      {"$match" => {'_id' => self._id}},
-      {"$unwind" => '$households'},
-      {"$unwind" => '$households.hbx_enrollments'},
-      {"$match" => {'households.hbx_enrollments.aasm_state' => 'inactive'}},
-      {"$sort" => {"households.hbx_enrollments.submitted_at" => -1 }},
-      {"$group" => {'_id' => {'year' => { "$year" => '$households.hbx_enrollments.effective_on'},
-                    'state' => '$households.hbx_enrollments.aasm_state',
-                    'kind' => '$households.hbx_enrollments.kind',
-                    'coverage_kind' => '$households.hbx_enrollments.coverage_kind'}, "hbx_enrollment" => { "$first" => '$households.hbx_enrollments'}}},
-      {"$project" => {'hbx_enrollment._id' => 1, '_id' => 0}}
-      ],
-      :allow_disk_use => true)
+    HbxEnrollment.waivers_for_display(_id)
   end
 
   def generate_family_search
