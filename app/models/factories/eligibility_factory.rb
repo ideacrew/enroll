@@ -62,7 +62,7 @@ module Factories
     end
 
     def shopping_tax_members
-      tax_households.flat_map(&:tax_household_members).select { |thhm| shopping_member_ids.include?(thhm.applicant_id.to_s) }
+      tax_households.flat_map(&:tax_members).select { |thhm| shopping_member_ids.include?(thhm.applicant_id.to_s) }
     end
 
     def any_aptc_ineligible?

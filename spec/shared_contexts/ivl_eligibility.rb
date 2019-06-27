@@ -11,7 +11,7 @@ RSpec.shared_context 'setup one tax household with one ia member', :shared_conte
   include_context 'setup initial family with one member'
 
   let!(:person2) do
-    member = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)
+    member = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, dob: (person.dob - 10.years))
     person.ensure_relationship_with(member, 'spouse')
     member.save!
     member
@@ -36,7 +36,7 @@ RSpec.shared_context 'setup initial family with primary and spouse', :shared_con
   include_context 'setup initial family with one member'
 
   let!(:person2) do
-    member = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)
+    member = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, dob: (person.dob - 10.years))
     person.ensure_relationship_with(member, 'spouse')
     member.save!
     member
