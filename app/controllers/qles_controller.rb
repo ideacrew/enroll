@@ -13,7 +13,7 @@ class QlesController < ApplicationController
     @deactivatable_qles = QualifyingLifeEventKind.all
   end
 
-  def create_manage_qle
+  def manage_qle
     @manage_qle = ::Forms::ManageQleForm.for_create(permitted_params)
     attrs = {market_kind: @manage_qle.market_kind}
     if params[:manage_qle][:action] == 'new_qle'

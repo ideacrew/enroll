@@ -623,9 +623,8 @@ Rails.application.routes.draw do
     # essentially they're a redirect wizard and not
     # creating anything
     collection do      
-      get :new_manage_qle
-      post :create_manage_qle
-      post :edit_manage_qle
+      get :manage
+      post :manage_qle
     end
   end
 
