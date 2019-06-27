@@ -12,6 +12,12 @@ deactivatable_list = @deactivatable_qles.map do |qle|
      value: deactivation_form_qle_path(qle)
    }
 end
+
+createable_qle = @createable_qle.new do |qle|
+   {
+     label: qle.title,
+     value: new_qle_path(qle)
+   }
  %>
  
  <admin-qle-management-wizard
