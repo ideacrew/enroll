@@ -702,7 +702,7 @@ module BenefitSponsors
     end
 
     def pull_organization_attributes
-      key = organization.is_a_fehb_profile? ? :fehb : :aca_shop
+      key = (organization &. is_a_fehb_profile?) ? :fehb : :aca_shop
       self.benefit_market = organization.site.benefit_market_for(key) if organization.present?
     end
 
