@@ -11,15 +11,12 @@ describe Queries::PolicyAggregationPipeline, "Policy Queries", dbclean: :after_e
 
   let(:subject) { Queries::PolicyAggregationPipeline.new }
   let(:aggregation) { [
-                    { "$unwind" => "$households"},
-                    { "$unwind" => "$households.hbx_enrollments"},
-                    { "$match" => {"households.hbx_enrollments" => {"$ne" => nil}}},
-                    { "$match" => {"households.hbx_enrollments.hbx_enrollment_members" => {"$ne" => nil}, "households.hbx_enrollments.external_enrollment" => {"$ne" => true}}}
-                    ] }
+                             { "$match" => {"hbx_enrollment_members" => {"$ne" => nil}, "external_enrollment" => {"$ne" => true}}}
+  ] }
    let(:step) { {'rspec' => "test"}}
    let(:open_enrollment_query) {{
                                 "$match" => {
-                                      "households.hbx_enrollments.enrollment_kind" => "open_enrollment" }
+                                      "enrollment_kind" => "open_enrollment" }
                                 }}
   let(:hbx_id_list) {[abc_organization.hbx_id]}
   let(:renewal_state) { :enrollment_eligible }
@@ -37,6 +34,7 @@ describe Queries::PolicyAggregationPipeline, "Policy Queries", dbclean: :after_e
                         household: family.active_household, 
                         aasm_state: "coverage_enrolled",
                         family: family,
+                        effective_on: effective_on,
                         rating_area_id: predecessor_application.recorded_rating_area_id,
                         sponsored_benefit_id: predecessor_application.benefit_packages.first.health_sponsored_benefit.id,
                         sponsored_benefit_package_id: predecessor_application.benefit_packages.first.id,
@@ -48,11 +46,12 @@ describe Queries::PolicyAggregationPipeline, "Policy Queries", dbclean: :after_e
     hbx_enrollment.save!
     hbx_enrollment
   }
-
+  let!(:initial_hbx_enrollment_member) {FactoryBot.create(:hbx_enrollment_member, applicant_id: person.id, hbx_enrollment: initial_enrollment) }
   let!(:renewal_enrollment) { 
     hbx_enrollment = FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product, 
                         household: family.active_household, 
                         family: family,
+                        effective_on: effective_on,
                         aasm_state: "coverage_selected",
                         rating_area_id: renewal_application.recorded_rating_area_id,
                         sponsored_benefit_id: renewal_application.benefit_packages.first.health_sponsored_benefit.id,
@@ -64,7 +63,8 @@ describe Queries::PolicyAggregationPipeline, "Policy Queries", dbclean: :after_e
     hbx_enrollment.save!
     hbx_enrollment
   }
-
+  let!(:renewal_hbx_enrollment_member) {FactoryBot.create(:hbx_enrollment_member, applicant_id: person.id, hbx_enrollment: renewal_enrollment) }
+  let!(:enrollment_hbx_ids){HbxEnrollment.all.map(&:hbx_id)}
   before do
     ce.update_attributes(:employee_role_id => employee_role.id )
   end
@@ -75,33 +75,69 @@ describe Queries::PolicyAggregationPipeline, "Policy Queries", dbclean: :after_e
       expect(subject.pipeline).to eq (aggregation)
       expect(subject.base_pipeline).to eq (aggregation)
     end
-
+    
     it 'add' do
       value = subject.add(step)
       expect(value.length).to eq aggregation.length + 1
     end
-
+    
     it 'open_enrollment' do
       value = subject.open_enrollment
-      expect(value.pipeline[4]).to eq (open_enrollment_query)
+      expect(value.pipeline[1]).to eq (open_enrollment_query)  
     end
 
-    it 'filter_to_employers_hbx_ids' do
+    it '.filter_to_employers_hbx_ids' do
       orgs = BenefitSponsors::Organizations::Organization.where(:hbx_id => {"$in" => hbx_id_list}) 
       benefit_group_ids = orgs.map(&:active_benefit_sponsorship).flat_map(&:benefit_applications).flat_map(&:benefit_packages).map(&:_id)
-      expect(subject.pipeline.count).to be 4
+      expect(subject.pipeline.count).to be 1
       subject.filter_to_employers_hbx_ids(hbx_id_list)
-      expect(subject.pipeline.count).to be 5
-      expect([subject.pipeline[4]]).to eq [{"$match"=> {"households.hbx_enrollments.sponsored_benefit_package_id"=>
+      expect(subject.pipeline.count).to be 2
+      expect([subject.pipeline[1]]).to eq [{"$match"=> {"sponsored_benefit_package_id"=>
                                                         {"$in"=>
                                                         [benefit_group_ids[0], benefit_group_ids[1]]}}}]
+                                                          
+                                                        expect(subject.evaluate.map{|a|a['_id']}).to eq [family.id]                                                   
     end
 
-    it 'exclude_employers_by_hbx_ids' do
-      expect(subject.pipeline.count).to be 4
+    it '.exclude_employers_by_hbx_ids' do
+      expect(subject.pipeline.count).to be 1
       value = subject.exclude_employers_by_hbx_ids(hbx_id_list)
-      expect(subject.pipeline.count).to be 5
+      expect(subject.pipeline.count).to be 2
     end
+
+    it '.filter_to_active' do
+      expect(subject.pipeline.count).to be 1
+      value = subject.filter_to_active
+      expect(subject.pipeline.count).to be 2
+    expect(subject.evaluate.map{|a|a['_id']}).to eq [family.id] 
+    end
+
+    it '.with_effective_date' do
+      value = subject.with_effective_date(effective_on)
+    expect(subject.evaluate.map{|a|a['_id']}).to eq [family.id] 
+    end
+
+    it '.filter_to_shop' do
+      value = subject.filter_to_shop
+    expect(subject.evaluate.map{|a|a['_id']}).to eq [family.id] 
+    end
+
+    it '.list_of_hbx_ids' do
+      expect(subject.list_of_hbx_ids).to eq enrollment_hbx_ids 
+    end
+
+
+
+    it '.filter_to_shopping_completed' do
+      subject.filter_to_shopping_completed
+      expect(subject.evaluate.map{|a|a['_id']}).to eq [family.id] 
+    end
+
+    it '.eliminate_family_duplicates' do
+      expect(subject.eliminate_family_duplicates).to eq enrollment_mongo_ids 
+    end
+
+
   end
 end
 
