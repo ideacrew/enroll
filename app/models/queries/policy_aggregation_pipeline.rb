@@ -19,17 +19,7 @@ module Queries
     end
 
     def evaluate
-
-      Family.collection.aggregate([{"$match" => {"_id" => {"$in"=>family_ids}}}
-      ])
-    end
-
-    def evaluate_hbx_enrollment
       HbxEnrollment.collection.aggregate(@pipeline, {allow_disk_use: true})
-    end
-
-    def family_ids
-      evaluate_hbx_enrollment.map{|a|a['family_id']}
     end
 
     def count
@@ -137,7 +127,7 @@ module Queries
     end
 
     def list_of_hbx_ids
-      evaluate_hbx_enrollment.map{|a|a['hbx_id']}
+      evaluate.map{|a|a['hbx_id']}
     end
 
     def hbx_id_with_purchase_date_and_time
@@ -210,6 +200,7 @@ module Queries
         project_property("policy_start_on", "$effective_on") +
         project_property("policy_end_on", "$terminated_on") +
         project_property("family_created_at", "$created_at") +
+        project_property("sponsored_benefit_id", "$sponsored_benefit_id") +
         project_property("policy_purchased_at", { "$ifNull" => ["$created_at", "$submitted_at"] }) +
 =begin
         Not supported by mongo < 3.0!
@@ -224,8 +215,8 @@ module Queries
         project_property("aasm_state", "$aasm_state") +
         project_property("hbx_id", "$hbx_id") +
         project_property("coverage_kind", "$coverage_kind") +
-        project_property("family_id", "$_id") +
-        rp_ids_expression +
+        project_property("family_id", "$family_id") +
+        # rp_ids_expression +
         state_transitions_expression
     end
 
@@ -289,7 +280,11 @@ module Queries
     def eliminate_family_duplicates
       flow = (
         filter_criteria_expression >>
+        sort_on({"policy_purchased_at" => 1}) >>
         group_by(
+          {"family_id" => "$family_id", "coverage_kind" => "$coverage_kind", "rp_ids" => "$rp_ids", "policy_start_on" => "$policy_start_on","sponsored_benefit_id" => "$sponsored_benefit_id"},
+          last("policy_purchased_at") +
+          last("policy_purchased_on") +
           last("hbx_id") +
           last("product_id") +
           last("aasm_state") +
@@ -297,10 +292,11 @@ module Queries
           last("coverage_kind") +
           last("hbx_enrollment_members")
         ))
-        binding.pry
+
       @pipeline = @pipeline + flow.to_pipeline
       self
     end
+
 
     def remove_duplicates_by_family
       eliminate_family_duplicates
