@@ -308,7 +308,10 @@ Rails.application.routes.draw do
 
     resources :group_selections, controller: "group_selection", only: [:new, :create] do
       collection do
+        post :cancel
+        post :edit_aptc
         post :terminate
+        get :edit_plan
         get :terminate_selection
         get :terminate_confirm
       end
