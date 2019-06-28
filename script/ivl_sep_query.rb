@@ -29,17 +29,6 @@ purchases = HbxEnrollment.collection.aggregate([
            "$lt" => end_time
         }
       }
-    }
-  }},
-  {"$match" => {
-    "workflow_state_transitions" => {
-      "$elemMatch" => {
-        "to_state" => {"$in" => active_statuses},
-        "transition_at" => {
-           "$gte" => start_time,
-           "$lt" => end_time
-        }
-      }
     },
     "kind" => {"$nin" => enrollment_kinds}
   }},
@@ -54,17 +43,6 @@ purchases = HbxEnrollment.collection.aggregate([
 ])
 
 terms = HbxEnrollment.collection.aggregate([
-  {"$match" => {
-    "workflow_state_transitions" => {
-      "$elemMatch" => {
-        "to_state" => {"$in" => ["coverage_terminated","coverage_canceled"]},
-        "transition_at" => {
-           "$gte" => start_time,
-           "$lt" => end_time
-        }
-      }
-    }
-  }},
   {"$match" => {
     "workflow_state_transitions" => {
       "$elemMatch" => {
