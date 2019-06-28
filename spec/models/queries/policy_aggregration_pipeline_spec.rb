@@ -134,7 +134,9 @@ describe Queries::PolicyAggregationPipeline, "Policy Queries", dbclean: :after_e
     end
 
     it '.eliminate_family_duplicates' do
-      expect(subject.eliminate_family_duplicates).to eq enrollment_mongo_ids 
+      binding.pry
+      subject.eliminate_family_duplicates.evaluate
+      expect(subject.eliminate_family_duplicates).to eq enrollment_hbx_ids 
     end
 
 
