@@ -221,6 +221,15 @@ class HbxEnrollment
     {name: "hbx_enrollment_active_and_state_and_family"}
   )
 
+  index(
+    {
+      "family_id" => 1,
+      "external_enrollment" => 1,
+      "aasm_state" => 1
+    },
+    {name: "hbx_enrollment_enrollments_for_display"}
+  )
+
   index({"plan_id" => 1}, { sparse: true })
   index({"product_id" => 1}, { sparse: true })
   index({"family_id" => 1})
@@ -407,19 +416,7 @@ class HbxEnrollment
             'external_enrollment' => {'$ne' => true},
             'family_id' => family_id,
           }},
-        {"$sort" => {"submitted_at" => -1 }},
-          {'$group' => {
-            '_id' => {
-              'year' =>  '$effective_on',
-              'month' =>  '$effective_on',
-              'day' => '$effective_on',
-              'subscriber_id' => 'enrollment_signature',
-              'provider_id'   => 'carrier_profile_id',
-              'benefit_group_id' => 'benefit_group_id',
-              'state' => 'aasm_state',
-              'market' => 'kind',
-              'coverage_kind' => 'coverage_kind'}},
-          },
+          {"$project" => {"_id": 1}}
         ],
         :allow_disk_use => true
       ).to_a
