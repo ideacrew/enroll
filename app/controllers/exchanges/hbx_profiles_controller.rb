@@ -332,7 +332,6 @@ def employer_poc
     @element_to_replace_id = params[:family_actions_id]
   end
 
-
   def show_sep_history
     getActionParams
     @element_to_replace_id = params[:family_actions_id]
@@ -369,12 +368,10 @@ def employer_poc
   end
 
   def add_new_sep
-    if params[:qle_id].present?
-      @element_to_replace_id = params[:family_actions_id]
-      createSep
-      respond_to do |format|
-        format.js { render :file => "sep/approval/add_sep_result.js.erb", name: @name }
-      end
+    @element_to_replace_id = sep_params[:family_actions_id]
+    createSep
+    respond_to do |format|
+      format.js { render :file => "sep/approval/add_sep_result.js.erb", name: @name }
     end
   end
 
@@ -717,6 +714,12 @@ private
     params.merge!({ pte_count: '0', msp_count: '0', admin_datatable_action: true })
     params.permit(:start_on, :end_on, :fte_count, :pte_count, :msp_count,
                   :open_enrollment_start_on, :open_enrollment_end_on, :benefit_sponsorship_id, :admin_datatable_action)
+  end
+
+  def sep_params
+    params.except(:utf8, :commit).permit(:market_kind, :person, :firstName, :lastName, :family_actions_id,
+                                         :effective_on_kind, :qle_id, :event_date, :effective_on_date, :csl_num,
+                                         :start_on, :end_on, :next_poss_effective_date, :option1_date, :option2_date, :option3_date, :admin_comment)
   end
 
   def timekeeper_params

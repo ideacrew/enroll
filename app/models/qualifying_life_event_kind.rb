@@ -17,7 +17,6 @@ class QualifyingLifeEventKind
   ## added event_kind_label -- use to populate label for collecting event_on date
   ## renamed property: kind to action_kind (also renamed associated constant)
 
-
   ACTION_KINDS = %w[add_benefit add_member drop_member change_benefit terminate_benefit administrative transition_member]
   MarketKinds = %w[shop individual]
 
@@ -70,7 +69,8 @@ class QualifyingLifeEventKind
   field :effective_on_kinds, type: Array, default: []
   field :reason, type: String
   field :edi_code, type: String
-  field :market_kind, type: String
+  field :market_kind, type: String # Deprecated
+  field :market_kinds, type: Array, default: []
   field :tool_tip, type: String
   field :pre_event_sep_in_days, type: Integer
   field :is_self_attested, type: Mongoid::Boolean
@@ -83,7 +83,6 @@ class QualifyingLifeEventKind
   field :coverage_effective_on, type: Date
   field :start_on, type: Date
   field :end_on, type: Date
-
 
   index({action_kind: 1})
   index({market: 1, ordinal_position: 1 })
@@ -107,6 +106,7 @@ class QualifyingLifeEventKind
                         :post_event_sep_in_days
 
   scope :active, ->{ where(is_active: true).where(:created_at.ne => nil).order(ordinal_position: :asc) }
+  scope :by_market_kinds, ->(market_kinds){ all_in(market_kinds: market_kinds) }
 
   # Business rules for EmployeeGainingMedicare
   # If coverage ends on last day of month and plan selected before loss of coverage:
@@ -166,11 +166,15 @@ class QualifyingLifeEventKind
   end
 
   def individual?
-    market_kind == "individual"
+    market_kinds.include?("individual")
   end
 
   def shop?
-    market_kind == "shop"
+    market_kinds.include?("shop")
+  end
+
+  def fehb?
+    market_kinds.include?("fehb")
   end
 
   def family_structure_changed?
@@ -184,31 +188,57 @@ class QualifyingLifeEventKind
 
   class << self
     def shop_market_events
-      where(:market_kind => "shop").and(:is_self_attested.ne => false).active.to_a
-    end
-
-    def individual_market_events
-      where(:market_kind => "individual").and(:is_self_attested.ne => false).active.to_a
-    end
-
-    def individual_market_non_self_attested_events
-      where(:market_kind => "individual").and(:is_self_attested.ne => true).active.to_a
+      by_market_kinds(['shop']).and(:is_self_attested.ne => false).active.to_a
     end
 
     def shop_market_events_admin
-      where(:market_kind => "shop").active.to_a
+      by_market_kinds(['shop']).active.to_a
     end
 
     def shop_market_non_self_attested_events
-      where(:market_kind => "shop").and(:is_self_attested.ne => true).active.to_a
+      by_market_kinds(['shop']).and(:is_self_attested.ne => true).active.to_a
+    end
+
+    def fehb_market_events
+      by_market_kinds(['fehb']).and(:is_self_attested.ne => false).active.to_a
+    end
+
+    def fehb_market_events_admin
+      by_market_kinds(['fehb']).active.to_a
+    end
+
+    def fehb_market_non_self_attested_events
+      by_market_kinds(['fehb']).and(:is_self_attested.ne => true).active.to_a
+    end
+
+    def individual_market_events
+      by_market_kinds(['individual']).and(:is_self_attested.ne => false).active.to_a
     end
 
     def individual_market_events_admin
-      where(:market_kind => "individual").active.to_a
+      by_market_kinds(['individual']).active.to_a
+    end
+
+    def individual_market_non_self_attested_events
+      by_market_kinds(['individual']).and(:is_self_attested.ne => true).active.to_a
     end
 
     def individual_market_events_without_transition_member_action
-      where(:market_kind => "individual").active.to_a.reject {|qle| qle.action_kind == "transition_member"}
+      by_market_kinds(['individual']).active.to_a.reject {|qle| qle.action_kind == "transition_member"}
+    end
+
+    def qualifying_life_events_for(role, hbx_staff = false)
+      return [] if role.blank?
+
+      market_kind = 'shop'
+      market_kind = 'individual' if role.is_a?(ConsumerRole)
+      market_kind = 'fehb' if role.is_a?(EmployeeRole) && role.employer_profile.is_a?(BenefitSponsors::Organizations::FehbEmployerProfile)
+
+      if hbx_staff
+        __send__(market_kind + '_market_events_admin')
+      else
+        __send__(market_kind + '_market_events')
+      end
     end
   end
 

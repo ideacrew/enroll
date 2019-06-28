@@ -47,19 +47,18 @@ module SepAll
   end
 
   def getMarket(family)
-    @is_consumer = family.primary_applicant.person.consumer_role.present?
-    @is_employee = family.primary_applicant.person.employee_roles.present?
-    @qle_ivl = QualifyingLifeEventKind.individual_market_events_admin
-    @qle_shop = QualifyingLifeEventKind.shop_market_events_admin
+    consumer_role = family.primary_applicant.person.consumer_role
+    employee_roles = family.primary_applicant.person.active_employee_roles
 
-    if @is_employee == true && @is_consumer == false
-      @qle = @qle_shop
-    elsif @is_employee == false && @is_consumer == true
-      @qle = @qle_ivl
-    else
-      @qle = @qle_ivl
-      @market = 'both'
+    @qle_ivl = QualifyingLifeEventKind.qualifying_life_events_for(consumer_role, true)
+    @qle_shop = QualifyingLifeEventKind.qualifying_life_events_for(employee_roles.first, true)
+
+    if employee_roles.present?
+      @qle = @qle_shop if consumer_role.blank?
     end
+
+    @qle = @qle_ivl  if consumer_role.present?
+    @market = 'both' if consumer_role.present? && employee_roles.present?
   end
 
   def includeBothMarkets
@@ -132,25 +131,25 @@ module SepAll
   end
 
   def createSep
-    qle = QualifyingLifeEventKind.find(params[:qle_id])
-    @family = Family.find(params[:person])
-    @name = params.permit(:firstName)[:firstName] + " " + params.permit(:lastName)[:lastName]
-    special_enrollment_period = @family.special_enrollment_periods.new(effective_on_kind: params[:effective_on_kind].downcase)
+    qle = QualifyingLifeEventKind.find(sep_params[:qle_id])
+    @family = Family.find(sep_params[:person])
+    @name = sep_params[:firstName] + " " + sep_params[:lastName]
+    special_enrollment_period = @family.special_enrollment_periods.new(effective_on_kind: sep_params[:effective_on_kind].downcase)
     special_enrollment_period.qualifying_life_event_kind = qle
-    special_enrollment_period.qle_on = Date.strptime(params[:event_date], "%m/%d/%Y") if params[:event_date].present?
-    special_enrollment_period.start_on = Date.strptime(params[:start_on], "%m/%d/%Y") if params[:start_on].present?
-    special_enrollment_period.end_on = Date.strptime(params[:end_on], "%m/%d/%Y") if params[:end_on].present?
-    special_enrollment_period.selected_effective_on = params.permit(:effective_on_date)[:effective_on_date] if params[:effective_on_date].present?
-    # special_enrollment_period.admin_comment = params.permit(:admin_comment)[:admin_comment] if params[:admin_comment].present?
-    special_enrollment_period.comments << Comment.new(content: params[:admin_comment], user: current_user.email) if params[:admin_comment].present?
-    special_enrollment_period.csl_num = params.permit(:csl_num)[:csl_num] if params[:csl_num].present?
-    special_enrollment_period.next_poss_effective_date = Date.strptime(params[:next_poss_effective_date], "%m/%d/%Y") if params[:next_poss_effective_date].present?
+    special_enrollment_period.qle_on = Date.strptime(sep_params[:event_date], "%m/%d/%Y") if sep_params[:event_date].present?
+    special_enrollment_period.start_on = Date.strptime(sep_params[:start_on], "%m/%d/%Y") if sep_params[:start_on].present?
+    special_enrollment_period.end_on = Date.strptime(sep_params[:end_on], "%m/%d/%Y") if sep_params[:end_on].present?
+    special_enrollment_period.selected_effective_on = sep_params[:effective_on_date] if sep_params[:effective_on_date].present?
+    # special_enrollment_period.admin_comment = params.permit(:admin_comment)[:admin_comment] if sep_params[:admin_comment].present?
+    special_enrollment_period.comments << Comment.new(content: sep_params[:admin_comment], user: current_user.email) if sep_params[:admin_comment].present?
+    special_enrollment_period.csl_num = sep_params[:csl_num] if sep_params[:csl_num].present?
+    special_enrollment_period.next_poss_effective_date = Date.strptime(sep_params[:next_poss_effective_date], "%m/%d/%Y") if sep_params[:next_poss_effective_date].present?
     date_arr = Array.new
-    date_arr.push(Date.strptime(params[:option1_date], "%m/%d/%Y").to_s) if params[:option1_date].present?
-    date_arr.push(Date.strptime(params[:option2_date], "%m/%d/%Y").to_s) if params[:option2_date].present?
-    date_arr.push(Date.strptime(params[:option3_date], "%m/%d/%Y").to_s) if params[:option3_date].present?
+    date_arr.push(Date.strptime(sep_params[:option1_date], "%m/%d/%Y").to_s) if sep_params[:option1_date].present?
+    date_arr.push(Date.strptime(sep_params[:option2_date], "%m/%d/%Y").to_s) if sep_params[:option2_date].present?
+    date_arr.push(Date.strptime(sep_params[:option3_date], "%m/%d/%Y").to_s) if sep_params[:option3_date].present?
     special_enrollment_period.optional_effective_on = date_arr if date_arr.length > 0
-    special_enrollment_period.market_kind = params.permit(:market_kind)[:market_kind] if params[:market_kind].present?
+    special_enrollment_period.market_kind = sep_params[:market_kind] if sep_params[:market_kind].present?
     special_enrollment_period.admin_flag = true
     
     if special_enrollment_period.save
