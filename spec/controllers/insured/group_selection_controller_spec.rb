@@ -327,13 +327,13 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     end
   end
 
-  context "GET terminate_confirm" do
+  context "GET edit_plan" do
     it "return http success and render" do
       sign_in
       allow(HbxEnrollment).to receive(:find).and_return(hbx_enrollment)
-      get :terminate_confirm, params: { person_id: person.id, hbx_enrollment_id: hbx_enrollment.id }
+      get :edit_plan, params: { person_id: person.id, family_id: person.primary_family.id, hbx_enrollment_id: hbx_enrollment.id }
       expect(response).to have_http_status(:success)
-      expect(response).to render_template(:terminate_confirm)
+      expect(response).to render_template(:edit_plan)
     end
   end
 
@@ -341,7 +341,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
     before do
       sign_in
-      request.env["HTTP_REFERER"] = terminate_confirm_insured_group_selections_path(person_id: person.id, hbx_enrollment_id: hbx_enrollment.id)
+      request.env["HTTP_REFERER"] = edit_plan_insured_group_selections_path(person_id: person.id, hbx_enrollment_id: hbx_enrollment.id)
       allow(HbxEnrollment).to receive(:find).and_return(hbx_enrollment)
     end
 
@@ -359,7 +359,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       hbx_enrollment.assign_attributes(aasm_state: "shopping")
       post :terminate, params: { term_date: TimeKeeper.date_of_record, hbx_enrollment_id: hbx_enrollment.id }
       expect(hbx_enrollment.may_terminate_coverage?).to be_falsey
-      expect(response).to redirect_to(terminate_confirm_insured_group_selections_path(person_id: person.id, hbx_enrollment_id: hbx_enrollment.id))
+      expect(response).to redirect_to(edit_plan_insured_group_selections_path(person_id: person.id, hbx_enrollment_id: hbx_enrollment.id))
     end
 
 
@@ -367,7 +367,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       allow(hbx_enrollment).to receive(:terminate_benefit)
       post :terminate, params: { term_date: TimeKeeper.date_of_record - 10.days, hbx_enrollment_id: hbx_enrollment.id }
       expect(hbx_enrollment.may_terminate_coverage?).to be_truthy
-      expect(response).to redirect_to(terminate_confirm_insured_group_selections_path(person_id: person.id, hbx_enrollment_id: hbx_enrollment.id))
+      expect(response).to redirect_to(edit_plan_insured_group_selections_path(person_id: person.id, hbx_enrollment_id: hbx_enrollment.id))
     end
 
   end
