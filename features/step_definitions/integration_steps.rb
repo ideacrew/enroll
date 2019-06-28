@@ -876,9 +876,8 @@ end
 And(/^clicks on the person in families tab$/) do
   login_as hbx_admin
   visit exchanges_hbx_profiles_root_path
-  page.find('.families.dropdown-toggle.interaction-click-control-families').click
-  find(:xpath, "//a[@href='/exchanges/hbx_profiles/family_index_dt']").click
-  wait_for_ajax(10,2)
+  page.find('#families_dropdown').click
+  find('#families', wait: 5).click
   family_member = page.find('a', :text => "#{user.person.full_name}")
   family_member.click
   visit verification_insured_families_path
