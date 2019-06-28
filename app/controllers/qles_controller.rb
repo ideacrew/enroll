@@ -5,14 +5,17 @@ class QlesController < ApplicationController
 
   # TODO: The QLE's will have to be generated as instance variables based on
   # whether or not theyh're a member of the right market kind, whether or not
-  # they're eligible for deactivation, etc. We're going to switch the stimulus to
-  # Angular to facilitate this.
+  # they're eligible for deactivation, etc.
   def manage
     # TODO: Fix these scopes, probably hide them behind a JSON serializer
+    # TODO: Consider adding a blank option, and then assure in the qle_kind_wizard
+    # that the submit button doesn't work unless a option with a value is selected.
     @editable_qles = QualifyingLifeEventKind.all
     @deactivatable_qles = QualifyingLifeEventKind.all
   end
-
+  
+  # TODO: All of these forms will be found in
+  # app/javascript/incremental_angular/app/admin/qle_kinds/
   def manage_qle
     @manage_qle = ::Forms::ManageQleForm.for_create(permitted_params)
     attrs = {market_kind: @manage_qle.market_kind}
@@ -22,7 +25,6 @@ class QlesController < ApplicationController
       qle = QualifyingLifeEventKind.find(params[:id])
       redirect_to edit_qle_path(qle, attrs) and return
     elsif params[:manage_qle][:action] == 'deactivate_qle'
-      # TODO: should redirect to deactivation_form_qle_path(qle, attrs)
       qle = QualifyingLifeEventKind.find(params[:id])
       redirect_to deactivation_form_qle_path(qle, attrs) and return
     end
