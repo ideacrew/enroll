@@ -3,7 +3,7 @@ require 'rails_helper'
 module OneLogin
   RSpec.describe RubySaml::SamlGenerator do
     let(:transaction_id)   { '1234' }
-    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member_and_dependent) }
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent) }
     let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, aasm_state: 'shopping') }
     let!(:hbx_enrollment_member1) { FactoryGirl.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, is_subscriber: true, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: hbx_enrollment) }
     let!(:hbx_enrollment_member2) { FactoryGirl.create(:hbx_enrollment_member, applicant_id: family.family_members[1].id, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: hbx_enrollment) }
