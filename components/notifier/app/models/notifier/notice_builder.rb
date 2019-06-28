@@ -2,7 +2,6 @@ module Notifier
   module NoticeBuilder
     include Config::SiteConcern
     include Config::SiteHelper
-    include Notifier::ApplicationHelper
     include ApplicationHelper
     include Notifier::ApplicationHelper
 
@@ -23,10 +22,10 @@ module Notifier
       builder.event_name = event_name if is_employee? || is_employer? || is_consumer?
       builder.payload = payload
       builder.append_contact_details
-      builder.dependents if resource.is_a?(ConsumerRole)
+      builder.dependents if is_consumer?
       template.data_elements.each do |element|
         elements = element.split('.')
-        next if resource.is_a?(ConsumerRole) && elements.first == 'dependent'
+        next if is_consumer? && elements.first == 'dependent'
 
         date_element = elements.detect{|ele| Notifier::MergeDataModels::EmployerProfile::DATE_ELEMENTS.any?{|date| ele.match(/#{date}/i).present?}}
 
@@ -64,12 +63,12 @@ module Notifier
 
     def save_html
       File.open(Rails.root.join("tmp", "notice.html"), 'wb') do |file|
-        file << self.to_html({kind: 'pdf'})
+        file << execute_html_pdf_render
       end
     end
 
     def to_pdf
-      WickedPdf.new.pdf_from_string(self.to_html({kind: 'pdf'}), pdf_options)
+      WickedPdf.new.pdf_from_string(execute_html_pdf_render, pdf_options)
     end
 
     def generate_pdf_notice
@@ -206,15 +205,15 @@ module Notifier
     end
 
     def recipient_name
-      return resource.staff_roles.first.full_name.titleize if is_employer?
+      return nil unless recipient_target
 
-      return resource.person.full_name.titleize if is_employee? || is_consumer?
+      recipient_target.full_name.titleize
     end
 
     def recipient_to
-      return resource.staff_roles.first.work_email_or_best if is_employer?
+      return nil unless recipient_target
 
-      return resource.person.work_email_or_best if is_employee? || is_consumer?
+      recipient_target.work_email_or_best
     end
 
     def is_employer?
@@ -237,26 +236,30 @@ module Notifier
     def send_generic_notice_alert_to_broker_and_ga
       if is_employer?
         if resource.broker_agency_profile.present?
-          broker_name = resource.broker_agency_profile.primary_broker_role.person.full_name
-          broker_email = resource.broker_agency_profile.primary_broker_role.person.work_email_or_best
+          broker_person = resource.broker_agency_profile.primary_broker_role.person
+          broker_name = broker_person.full_name
+          broker_email = broker_person.work_email_or_best
           UserMailer.generic_notice_alert_to_ba_and_ga(broker_name, broker_email, resource.legal_name.titleize).deliver_now
         end
         if resource.general_agency_profile.present?
-          general_agent_name = resource.general_agency_profile.primary_staff.person.full_name
-          ga_email = resource.general_agency_profile.primary_staff.person.work_email_or_best
+          general_agency_staff_person = resource.general_agency_profile.primary_staff.person
+          general_agent_name = general_agency_staff_person.full_name
+          ga_email = general_agency_staff_person.work_email_or_best
           UserMailer.generic_notice_alert_to_ba_and_ga(general_agent_name, ga_email, resource.legal_name.titleize).deliver_now
         end
       end
 
       if is_employee?
         if resource.employer_profile.broker_agency_profile.present?
-          broker_name = resource.employer_profile.broker_agency_profile.primary_broker_role.person.full_name
-          broker_email = resource.employer_profile.broker_agency_profile.primary_broker_role.person.work_email_or_best
+          broker_person = resource.employer_profile.broker_agency_profile.primary_broker_role.person
+          broker_name = broker_person.full_name
+          broker_email = broker_person.work_email_or_best
           UserMailer.generic_notice_alert_to_ba_and_ga(broker_name, broker_email, resource.person.full_name.titleize).deliver_now
         end
         if resource.employer_profile.general_agency_profile.present?
-          general_agent_name = resource.employer_profile.general_agency_profile.primary_staff.person.full_name
-          ga_email = resource.employer_profile.general_agency_profile.primary_staff.person.work_email_or_best
+          general_agency_staff_person = resource.employer_profile.general_agency_profile.primary_staff.person
+          general_agent_name = general_agency_staff_person.full_name
+          ga_email = general_agency_staff_person.work_email_or_best
           UserMailer.generic_notice_alert_to_ba_and_ga(general_agent_name, ga_email, resource.person.full_name.titleize).deliver_now
         end
       end
@@ -344,6 +347,22 @@ module Notifier
 
     def footer
       shop_market? ? Settings.notices.shop.partials.footer : Settings.notices.individual.partials.footer
+    end
+
+    protected
+
+    def execute_html_pdf_render
+      @execute_html_pdf_render ||= self.to_html({kind: 'pdf'})
+    end
+
+    def recipient_target
+      @recipient_target ||= begin
+        if is_employer?
+          resource.staff_roles.first
+        elsif is_employee? || is_consumer?
+          resource.person
+        end
+      end
     end
   end
 end
