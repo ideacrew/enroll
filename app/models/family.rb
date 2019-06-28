@@ -262,7 +262,7 @@ class Family
 
   def enrollments
     return [] if  latest_household.blank?
-    latest_household.hbx_enrollments.show_enrollments_sans_canceled
+    @enrollment_list ||= latest_household.hbx_enrollments.show_enrollments_sans_canceled
   end
 
   # The {FamilyMember} who is head and 'owner' of this family instance.
@@ -978,7 +978,7 @@ class Family
   # @see waivers_for_display
   # @return [ Array<HbxEnrollment> ] The {HbxEnrollment HbxEnrollments} filtered by display criteria
   def enrollments_for_display
-    HbxEnrollment.enrollments_for_display(_id)
+    @enrollments_for_display ||= HbxEnrollment.enrollments_for_display(_id) || []
   end
 
   # Get waived {HbxEnrollment HbxEnrollments} that meet application criteria for display in the UI
