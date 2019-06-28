@@ -10,10 +10,7 @@ module Queries
 
     def base_pipeline
       [
-        { "$unwind" => "$households"},
-        { "$unwind" => "$households.hbx_enrollments"},
-        { "$match" => {"households.hbx_enrollments" => {"$ne" => nil}}},
-        { "$match" => {"households.hbx_enrollments.hbx_enrollment_members" => {"$ne" => nil}, "households.hbx_enrollments.external_enrollment" => {"$ne" => true}}}
+        { "$match" => {"hbx_enrollment_members" => {"$ne" => nil}, "external_enrollment" => {"$ne" => true}}}
       ]
     end
 
@@ -22,7 +19,12 @@ module Queries
     end
 
     def evaluate
-      Family.collection.aggregate(@pipeline, {allow_disk_use: true})
+      Family.collection.aggregate([{"$match" => {"_id" => {"$in"=>family_ids}}}
+      ])
+    end
+
+    def family_ids
+      HbxEnrollment.collection.aggregate(@pipeline, {allow_disk_use: true}).map{|en|en ["family_id"]}
     end
 
     def count
@@ -32,7 +34,7 @@ module Queries
     def open_enrollment
       add({
           "$match" => {
-                "households.hbx_enrollments.enrollment_kind" => "open_enrollment"
+                "enrollment_kind" => "open_enrollment"
           }
       })
       self
@@ -43,7 +45,8 @@ module Queries
       benefit_group_ids = orgs.map(&:active_benefit_sponsorship).flat_map(&:benefit_applications).flat_map(&:benefit_packages).map(&:_id)
       add({
           "$match" => {
-                "households.hbx_enrollments.sponsored_benefit_package_id" => { "$in" => benefit_group_ids }
+
+                "sponsored_benefit_package_id" => { "$in" => benefit_group_ids }
                   }
       })
       self
@@ -54,7 +57,7 @@ module Queries
       benefit_group_ids = orgs.map(&:active_benefit_sponsorship).flat_map(&:benefit_applications).flat_map(&:benefit_packages).map(&:_id)
       add({
           "$match" => {
-                "households.hbx_enrollments.sponsored_benefit_package_id" => { "$nin" => benefit_group_ids }
+                "sponsored_benefit_package_id" => { "$nin" => benefit_group_ids }
           }
       })
       self
@@ -65,7 +68,7 @@ module Queries
       benefit_group_ids = orgs.map(&:active_benefit_sponsorship).flat_map(&:benefit_applications).flat_map(&:benefit_packages).map(&:_id)
       add({
           "$match" => {
-                "households.hbx_enrollments.sponsored_benefit_package_id" => { "$in" => benefit_group_ids }
+                "sponsored_benefit_package_id" => { "$in" => benefit_group_ids }
                   }
       })
       self
@@ -74,8 +77,8 @@ module Queries
     def filter_to_shopping_completed
       add({
         "$match" => {
-          "households.hbx_enrollments.product_id" => { "$ne" => nil},
-          "households.hbx_enrollments.aasm_state" => { "$nin" => [
+          "product_id" => { "$ne" => nil},
+          "aasm_state" => { "$nin" => [
             "shopping", "inactive"
           ]}
         }
@@ -88,8 +91,8 @@ module Queries
     def filter_to_active
       add({
         "$match" => {
-          "households.hbx_enrollments.product_id" => { "$ne" => nil},
-          "households.hbx_enrollments.aasm_state" => { "$in" => 
+          "product_id" => { "$ne" => nil},
+          "aasm_state" => { "$in" => 
             (HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES)
           }
         }
@@ -100,8 +103,8 @@ module Queries
     def filter_to_individual
       add({
         "$match" => {
-          "households.hbx_enrollments.consumer_role_id" => {"$ne" => nil},
-          "households.hbx_enrollments.aasm_state" => { "$ne" => "shopping" } }
+          "consumer_role_id" => {"$ne" => nil},
+          "aasm_state" => { "$ne" => "shopping" } }
       })
       self
     end
@@ -109,7 +112,7 @@ module Queries
     def with_effective_date(criteria)
       add({
         "$match" => {
-          "households.hbx_enrollments.effective_on" => criteria
+          "effective_on" => criteria
         }
       })
       self
@@ -118,10 +121,10 @@ module Queries
     def filter_to_shop
       add({
         "$match" => {
-          "households.hbx_enrollments.aasm_state" => { "$ne" => "shopping" },
+          "aasm_state" => { "$ne" => "shopping" },
           "$or" => [
-            {"households.hbx_enrollments.consumer_role_id" => {"$exists" => false}},
-            {"households.hbx_enrollments.consumer_role_id" => nil}
+            {"consumer_role_id" => {"$exists" => false}},
+            {"consumer_role_id" => nil}
           ]
         }
       })
@@ -129,25 +132,19 @@ module Queries
     end
 
     def list_of_hbx_ids
-      add({
-        "$group" => {"_id" => "$households.hbx_enrollments.hbx_id"}
-      })
-      results = evaluate
-      results.map do |h|
-        h["_id"]
-      end
+      HbxEnrollment.collection.aggregate(@pipeline, {allow_disk_use: true}).map{|a|a['hbx_id']}
     end
 
     def hbx_id_with_purchase_date_and_time
       add({
         "$project" => {
-          "policy_purchased_at" => { "$ifNull" => ["$households.hbx_enrollments.created_at", "$households.hbx_enrollments.submitted_at"] },
+          "policy_purchased_at" => { "$ifNull" => ["$created_at", "$submitted_at"] },
           "policy_purchased_on" => {
             "$dateToString" => {"format" => "%Y-%m-%d",
-                                "date" => { "$ifNull" => ["$households.hbx_enrollments.created_at", "$households.hbx_enrollments.submitted_at"] }
+                                "date" => { "$ifNull" => ["$created_at", "$submitted_at"] }
           }
           },
-          "hbx_id" => "$households.hbx_enrollments.hbx_id"
+          "hbx_id" => "$hbx_id"
         }})
       yield self if block_given?
       results = self.evaluate
@@ -191,37 +188,37 @@ module Queries
 
     def dental
       add({
-        "$match" => {"households.hbx_enrollments.coverage_kind" => "dental"}
+        "$match" => {"coverage_kind" => "dental"}
       })
       self
     end
 
     def health
       add({
-        "$match" => {"households.hbx_enrollments.coverage_kind" => "health"}
+        "$match" => {"coverage_kind" => "health"}
       })
       self
     end
 
     def filter_criteria_expression
-        project_property("hbx_enrollment_members", "$households.hbx_enrollments.hbx_enrollment_members") +
-        project_property("policy_start_on", "$households.hbx_enrollments.effective_on") +
-        project_property("policy_end_on", "$households.hbx_enrollments.terminated_on") +
+        project_property("hbx_enrollment_members", "$hbx_enrollment_members") +
+        project_property("policy_start_on", "$effective_on") +
+        project_property("policy_end_on", "$terminated_on") +
         project_property("family_created_at", "$created_at") +
-        project_property("policy_purchased_at", { "$ifNull" => ["$households.hbx_enrollments.created_at", "$households.hbx_enrollments.submitted_at"] }) +
+        project_property("policy_purchased_at", { "$ifNull" => ["$created_at", "$submitted_at"] }) +
 =begin
         Not supported by mongo < 3.0!
         project_property("policy_purchased_on", {
           "$dateToString" => {"format" => "%Y-%m-%d",
-                              "date" => { "$ifNull" => ["$households.hbx_enrollments.created_at", "$households.hbx_enrollments.submitted_at"] }
+                              "date" => { "$ifNull" => ["$created_at", "$submitted_at"] }
         }}) +
 =end
-        project_property("member_count", {"$size" => "$households.hbx_enrollments.hbx_enrollment_members"}) + 
-        project_property("product_id", "$households.hbx_enrollments.product_id") +
-        project_property("enrollment_kind", "$households.hbx_enrollments.enrollment_kind") +
-        project_property("aasm_state", "$households.hbx_enrollments.aasm_state") +
-        project_property("hbx_id", "$households.hbx_enrollments.hbx_id") +
-        project_property("coverage_kind", "$households.hbx_enrollments.coverage_kind") +
+        project_property("member_count", {"$size" => "$hbx_enrollment_members"}) + 
+        project_property("product_id", "$product_id") +
+        project_property("enrollment_kind", "$enrollment_kind") +
+        project_property("aasm_state", "$aasm_state") +
+        project_property("hbx_id", "$hbx_id") +
+        project_property("coverage_kind", "$coverage_kind") +
         project_property("family_id", "$_id") +
         rp_ids_expression +
         state_transitions_expression
@@ -232,9 +229,9 @@ module Queries
         "state_transitions",
           { "$cond" =>
             [
-              "$households.hbx_enrollments.workflow_state_transitions",
+              "$workflow_state_transitions",
               {"$map" => {
-                 "input" => "$households.hbx_enrollments.workflow_state_transitions",
+                 "input" => "$workflow_state_transitions",
                  "as" => "state_trans",
                  "in" => "$$state_trans.from_state"
               }},
@@ -250,13 +247,13 @@ module Queries
         { "$cond" =>
           [          
               {"$anyElementTrue" => {"$map" => {
-                 "input" => "$households.hbx_enrollments.hbx_enrollment_members",
+                 "input" => "$hbx_enrollment_members",
                  "as" => "en_member",
                  "in" => {"$eq" => ["$$en_member.is_subscriber", true]}
                }}},
                nil,
                {"$map" => {
-                 "input" => "$households.hbx_enrollments.hbx_enrollment_members",
+                 "input" => "$hbx_enrollment_members",
                  "as" => "en_member",
                  "in" => "$$en_member.applicant_id"
                }}
@@ -273,11 +270,11 @@ module Queries
 
     def denormalized_properties
       filter_criteria_expression + 
-        project_property("_id", "$households.hbx_enrollments._id")  +
-        project_property("hbx_id", "$households.hbx_enrollments.hbx_id")  +
-        project_property("consumer_role_id", "$households.hbx_enrollments.consumer_role_id") +
-        project_property("benefit_group_id", "$households.hbx_enrollments.sponsored_benefit_package_id") +
-        project_property("benefit_group_assignment_id", "$households.hbx_enrollments.benefit_group_assignment_id")
+        project_property("_id", "$_id")  +
+        project_property("hbx_id", "$hbx_id")  +
+        project_property("consumer_role_id", "$consumer_role_id") +
+        project_property("benefit_group_id", "$sponsored_benefit_package_id") +
+        project_property("benefit_group_assignment_id", "$benefit_group_assignment_id")
     end
 
     def expand_filter_criteria
@@ -312,10 +309,10 @@ module Queries
     def group_by_purchase_date
       add({
         "$project" => {
-          "policy_purchased_at" => { "$ifNull" => ["$households.hbx_enrollments.created_at", "$households.hbx_enrollments.submitted_at"] },
+          "policy_purchased_at" => { "$ifNull" => ["$created_at", "$submitted_at"] },
           "policy_purchased_on" => {
             "$dateToString" => {"format" => "%Y-%m-%d",
-                                "date" => { "$ifNull" => ["$households.hbx_enrollments.created_at", "$households.hbx_enrollments.submitted_at"] }
+                                "date" => { "$ifNull" => ["$created_at", "$submitted_at"] }
           }
           }
         }})
