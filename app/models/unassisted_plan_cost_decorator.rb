@@ -41,7 +41,8 @@ class UnassistedPlanCostDecorator < SimpleDelegator
 
   #TODO: FIX me to refactor hard coded rating area
   def premium_for(member)
-    (::BenefitMarkets::Products::ProductRateCache.lookup_rate(__getobj__, schedule_date, age_of(member), "R-DC001") * large_family_factor(member)).round(2)
+    rating_area = ::BenefitMarkets::Locations::RatingArea.all.where(active_year: TimeKeeper.date_of_record.year).first
+    (::BenefitMarkets::Products::ProductRateCache.lookup_rate(__getobj__, schedule_date, age_of(member), rating_area.exchange_provided_code) * large_family_factor(member)).round(2)
   end
 
   def employer_contribution_for(member)

@@ -4,15 +4,14 @@ When(/^\w+ visits? the Insured portal during open enrollment$/) do
   FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)
   FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual")
   FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date_and_first_month, market_kind: "individual")
-
-  Caches::PlanDetails.load_record_cache!
+  BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
   screenshot("individual_start")
 end
 
 When(/^\w+ visits? the Insured portal outside of open enrollment$/) do
   FactoryBot.create(:hbx_profile, :no_open_enrollment_coverage_period)
   FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual")
-  Caches::PlanDetails.load_record_cache!
+  BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
 
   visit "/"
   click_link 'Consumer/Family Portal'
@@ -28,14 +27,13 @@ And(/Individual asks how to make an email account$/) do
 end
 
 Then(/Individual creates HBX account$/) do
-  click_button 'Create account', :wait => 10
+  #click_button 'Create account', :wait => 10
   fill_in "user[oim_id]", :with => (@u.email :email)
   fill_in "user[password]", :with => "aA1!aA1!aA1!"
   fill_in "user[password_confirmation]", :with => "aA1!aA1!aA1!"
   screenshot("create_account")
-  click_button "Create account"
+  find('.create-account-btn').click
 end
-
 And(/^I can see the select effective date$/) do
   expect(page).to have_content "SELECT EFFECTIVE DATE"
 end
@@ -95,7 +93,6 @@ Then(/Individual should see a form to enter personal information$/) do
   find('.interaction-choice-control-state-id', text: 'SELECT STATE *').click
   find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[3]/div/ul/li[10]').click
   fill_in "person[addresses_attributes][0][zip]", :with => "20002"
-  fill_in "person[phones_attributes][0][full_phone_number]", :with => "9999999999", :wait => 10
   screenshot("personal_form")
 end
 
@@ -282,10 +279,8 @@ And(/^I click on continue button on group selection page$/) do
   #wait_for_ajax(2,2)
   screenshot("test1")
   #click_link "Continue" #Get
-  click_button "CONTINUE"
   screenshot("test2")
-  wait_for_ajax
-  find(:xpath, '//*[@id="btn-continue"]').click
+  click_button "CONTINUE"
   #click_button "Continue" #Post
   screenshot("test3")
   #Goes off the see the wizard at /I select three plans to compare/ for now
@@ -293,7 +288,7 @@ end
 
 And(/I select a plan on plan shopping page/) do
    screenshot("plan_shopping")
-   find(:xpath, '//*[@id="plans"]/div[1]/div/div[5]/div[3]/a[1]').click
+   find_all('.plan-select')[0].click
 end
 
 And(/I click on purchase button on confirmation page/) do

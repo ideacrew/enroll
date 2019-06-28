@@ -1,4 +1,3 @@
-@wip
 Feature: Consumer verification process
 
   Scenario: Outstanding verification
@@ -12,8 +11,6 @@ Feature: Consumer verification process
     * user should see heading labeled personal information
     * Individual should click on Individual market for plan shopping
     * Individual should see a form to enter personal information
-    * Individual clicks on Save and Exit
-    * Individual resumes enrollment
     * Individual click continue button
     * Individual agrees to the privacy agreeement
     * Individual should see identity verification page and clicks on submit
