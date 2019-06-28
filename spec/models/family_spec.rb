@@ -255,9 +255,9 @@ describe Family, type: :model, dbclean: :around_each do
 
     context "when a broker account is created for the Family" do
       let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile)}
-      let(:writing_agent)         { FactoryBot.create(:broker_role, broker_agency_profile_id: broker_agency_profile.id) }
+      let(:writing_agent)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
       let(:broker_agency_profile2) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile)}
-      let(:writing_agent2)         { FactoryBot.create(:broker_role, broker_agency_profile_id: broker_agency_profile2.id) }
+      let(:writing_agent2)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile2.id) }
 
       it "adds a broker agency account" do
         carols_family.hire_broker_agency(writing_agent.id)
