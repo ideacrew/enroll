@@ -25,7 +25,7 @@ Feature: Employee Sign Up when Employer exists and has a matching roster employe
 
 #  Scenario: New employee with existing person
 #    Given staff role person logged in
-#    And employer Acme Inc. has enrollment_open benefit application
+#    And initial employer Acme Inc. has enrollment_open benefit application
 #    And Acme Inc. employer visit the Employee Roster
 #    And there is a census employee record for Patrick Doe for employer Acme Inc.
 #    Then Employer logs out

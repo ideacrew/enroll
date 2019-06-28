@@ -5,7 +5,7 @@ Feature: As a Super Admin I will be the only user
     Given a CCA site exists with a benefit market
     And there is an employer ABC Widgets
     Given benefit market catalog exists for ABC Widgets initial employer with health benefits
-    And employer ABC Widgets has enrollment_open benefit application 
+    And initial employer ABC Widgets has enrollment_open benefit application 
 
 
   Scenario Outline: HBX Staff with <subrole> subroles should <action> the config tab

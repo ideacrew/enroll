@@ -5,7 +5,7 @@ Feature: Employer should claim a quote from his broker
       Given benefit market catalog exists for draft initial employer with health benefits
       And it has an employer ABC Widgets with no attestation submitted
       And ABC Widgets employer has a staff role
-      And employer ABC Widgets has draft benefit application
+      And initial employer ABC Widgets has draft benefit application
       And staff role person logged in
       And ABC Widgets goes to the benefits tab I should see plan year information
 

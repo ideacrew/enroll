@@ -24,7 +24,7 @@ Feature: Census Employee COBRA functionality
 
   Scenario: Employer terminates and Initiate COBRA to enrolled employee
     Given staff role person logged in
-    And employer EnterPrise Limited has active benefit application
+    And initial employer EnterPrise Limited has active benefit application
     And employees for EnterPrise Limited have a selected coverage
     And EnterPrise Limited employer visit the Employee Roster
     And EnterPrise Limited employer terminates employees
@@ -42,7 +42,7 @@ Feature: Census Employee COBRA functionality
 
   Scenario: Employer terminates and Initiate COBRA to linked employee
     Given staff role person logged in
-    And employer EnterPrise Limited has active benefit application
+    And initial employer EnterPrise Limited has active benefit application
     And Employees for EnterPrise Limited have both Benefit Group Assignments Employee role
     And EnterPrise Limited employer visit the Employee Roster
     And EnterPrise Limited employer terminates employees

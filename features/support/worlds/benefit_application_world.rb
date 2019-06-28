@@ -164,22 +164,21 @@ And(/this employer (.*) has (.*) rule/) do |legal_name, rule|
 end
 
 # Following step will create renewal benefit application and predecessor application with given states
-# ex: employer Acme Inc. has imported and renewing enrollment_open benefit applications
-#     employer Acme Inc. has expired  and renewing draft benefit applications
-#     employer Acme Inc. has expired  and renewing enrollment_eligible benefit applications
-#     employer Acme Inc. has expired  and renewing active benefit applications
-And(/^employer (.*) has (.*) and renewing (.*) benefit applications$/) do |legal_name, earlier_application_status, new_application_status|
+# ex: renewal employer Acme Inc. has imported and renewal enrollment_open benefit applications
+#     renewal employer Acme Inc. has expired  and renewal draft benefit applications
+#     renewal employer Acme Inc. has expired  and renewal enrollment_eligible benefit applications
+#     renewal employer Acme Inc. has expired  and renewal active benefit applications
+And(/^renewal employer (.*) has (.*) and renewal (.*) benefit applications$/) do |legal_name, earlier_application_status, new_application_status|
   @employer_profile = employer_profile(legal_name)
   create_applications(predecessor_status: earlier_application_status.to_sym, new_application_status: new_application_status.to_sym)
 end
 
-
 # Following step will create initial benefit application with given state
-# ex: employer Acme Inc. has enrollment_open benefit application 
-#     employer Acme Inc. has active benefit application 
-#     employer Acme Inc. has expired benefit application 
-#     employer Acme Inc. has draft benefit application
-And(/^employer (.*) has (.*) benefit application$/) do |legal_name, new_application_status|
+# ex: initial employer Acme Inc. has enrollment_open benefit application
+#     initial employer Acme Inc. has active benefit application
+#     initial employer Acme Inc. has expired benefit application
+#     initial employer Acme Inc. has draft benefit application
+And(/^initial employer (.*) has (.*) benefit application$/) do |legal_name, new_application_status|
   @employer_profile = employer_profile(legal_name)
   create_application(new_application_status: new_application_status.to_sym)
 end

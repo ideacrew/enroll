@@ -6,7 +6,7 @@ Feature: Passive renewal should be updated when EE updates his current coverage
     Given Qualifying life events are present
     And there is an employer ABC Widgets
     And ABC Widgets employer has a staff role
-    And employer ABC Widgets has active and renewing enrollment_open benefit applications
+    And renewal employer ABC Widgets has active and renewal enrollment_open benefit applications
     And this employer renewal application is under open enrollment
 
   Scenario: Employee enters a SEP

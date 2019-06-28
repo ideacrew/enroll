@@ -3,7 +3,7 @@ Feature: Employee of a Sole Source Employer Shopping During Open Enrollment
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for enrollment_open initial employer with health benefits
     And there is an employer Acme Inc.
-    And employer Acme Inc. has enrollment_open benefit application
+    And initial employer Acme Inc. has enrollment_open benefit application
     And Acme Inc. employer has a staff role
     And there is a census employee record for Patrick Doe for employer Acme Inc.
     And employee Patrick Doe already matched with employer Acme Inc. and logged into employee portal

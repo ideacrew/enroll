@@ -11,7 +11,7 @@ Feature: Newly designated employees can purchase coverage only through renewing 
 
 # Scenario: Newly designated should see the shop market place workflow as default
 #   Given Employer exists and logs in and adds and employee
-#    And employer Acme Inc. has enrollment_open benefit application
+#    And initial employer Acme Inc. has enrollment_open benefit application
 #    And there is a census employee record for Patrick Doe for employer Acme Inc.
 #    And Acme Inc. employer visit the Employee Roster
 #    Then Employer logs out
@@ -28,7 +28,7 @@ Feature: Newly designated employees can purchase coverage only through renewing 
 #
 #Scenario: Newly designated should not see the individual market place workflow #We don't support IVL functionality
 #    Given Employer exists and logs in and adds and employee
-#    And employer Acme Inc. has enrollment_open benefit application
+#    And initial employer Acme Inc. has enrollment_open benefit application
 #    And there is a census employee record for Patrick Doe for employer Acme Inc.
 #    And Acme Inc. employer visit the Employee Roster
 #    Then Employer logs out

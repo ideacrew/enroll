@@ -6,7 +6,7 @@ Background: Setup site, employer, and benefit application
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for enrollment_open renewal employer with health benefits
     And there is an employer Acme Inc.
-    And employer Acme Inc. has active and renewing enrollment_open benefit applications
+    And renewal employer Acme Inc. has active and renewal enrollment_open benefit applications
     And Acme Inc. employer has a staff role 
     And there is a census employee record for Patrick Doe for employer Acme Inc.
 

@@ -9,7 +9,7 @@ Feature: Broker Manages Employer Account
     And the broker Max Planck is primary broker for District Brokers Inc
     Given there is an employer ABC Widgets
     And ABC Widgets employer has a staff role
-    And employer ABC Widgets has draft benefit application
+    And initial employer ABC Widgets has draft benefit application
     And employer ABC Widgets hired broker Max Planck from District Brokers Inc
 
     Scenario: Broker manages employer account

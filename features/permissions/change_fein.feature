@@ -5,7 +5,7 @@ Feature: As a Super Admin I will be the only user
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for enrollment_open initial employer with health benefits
     And there is an employer ABC Widgets
-    And employer ABC Widgets has enrollment_open benefit application
+    And initial employer ABC Widgets has enrollment_open benefit application
 
   Scenario Outline: HBX Staff with <subrole> subroles should <action> Change FEIN button
     Given that a user with a HBX staff role with <subrole> subrole exists and is logged in

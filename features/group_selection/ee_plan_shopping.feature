@@ -10,7 +10,7 @@ Feature: EE plan purchase
 #    Given there is an employer Acme Inc.
 #    And Acme Inc. employer has a staff role
 #    When staff role person logged in
-#    And employer Acme Inc. has enrollment_open benefit application
+#    And initial employer Acme Inc. has enrollment_open benefit application
 #    And Acme Inc. employer visit the Employee Roster
 #    And there is a census employee record for Patrick Doe for employer Acme Inc.
 #    Then Employer logs out
@@ -39,7 +39,7 @@ Feature: EE plan purchase
 #    Given there is an employer Acme Inc.
 #    And Acme Inc. employer has a staff role
 #    When staff role person logged in
-#    And employer Acme Inc. has enrollment_open benefit application
+#    And initial employer Acme Inc. has enrollment_open benefit application
 #    And Acme Inc. employer visit the Employee Roster
 #    And there is a census employee record for Patrick Doe for employer Acme Inc.
 #    Then Employer logs out
@@ -73,7 +73,7 @@ Feature: EE plan purchase
 #    Given there is an employer Acme Inc.
 #    And Acme Inc. employer has a staff role
 #    When staff role person logged in
-#    And employer Acme Inc. has enrollment_open benefit application
+#    And initial employer Acme Inc. has enrollment_open benefit application
 #    And Acme Inc. employer visit the Employee Roster
 #    And there is a census employee record for Patrick Doe for employer Acme Inc.
 #    Then Employer logs out
@@ -110,7 +110,7 @@ Feature: EE plan purchase
 #    Given there is an employer Acme Inc.
 #    And Acme Inc. employer has a staff role
 #    When staff role person logged in
-#    And employer Acme Inc. has enrollment_open benefit application
+#    And initial employer Acme Inc. has enrollment_open benefit application
 #    And Acme Inc. employer visit the Employee Roster
 #    And there is a census employee record for Patrick Doe for employer Acme Inc.
 #    Then Employer logs out
@@ -135,7 +135,7 @@ Feature: EE plan purchase
   Scenario: EE having an ineligible family member & doing plan shop for renewals
     Then there is an employer ABC Widgets
     And ABC Widgets employer has a staff role
-    And employer ABC Widgets has active and renewing enrollment_open benefit applications
+    And renewal employer ABC Widgets has active and renewal enrollment_open benefit applications
     And this employer renewal application is under open enrollment
     And there is a census employee record for Patrick Doe for employer ABC Widgets
     And employee Patrick Doe has current hired on date

@@ -11,7 +11,7 @@ Feature: Employer hires borker
     And the broker Jane Goodall is primary broker for Browns Inc
     Given there is an employer ABC Widgets
     And ABC Widgets employer has a staff role
-    And employer ABC Widgets has draft benefit application
+    And initial employer ABC Widgets has draft benefit application
 
     Scenario: Employer assigns broker agency
       And staff role person logged in

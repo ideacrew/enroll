@@ -11,7 +11,7 @@ Feature: Employee with past date of hire
     Given benefit market catalog exists for enrollment_open initial employer with health benefits
     Given Qualifying life events are present
     And there is an employer Acme Inc.
-    And employer Acme Inc. has enrollment_open benefit application
+    And initial employer Acme Inc. has enrollment_open benefit application
     And Acme Inc. employer has a staff role
     And there is a census employee record for Patrick Doe for employer Acme Inc.
 

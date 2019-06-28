@@ -7,7 +7,7 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
     Given benefit market catalog exists for enrollment_open renewal employer with health benefits
     Given Qualifying life events are present
     And there is an employer ACME Widgets, Inc.
-    And employer ACME Widgets, Inc. has imported and renewing enrollment_open benefit applications
+    And renewal employer ACME Widgets, Inc. has imported and renewal enrollment_open benefit applications
     And ACME Widgets, Inc. employer has a staff role
     And there is a census employee record for Patrick Doe for employer ACME Widgets, Inc.
     
@@ -36,7 +36,7 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for enrollment_open renewal employer with health benefits
     And there is an employer ABC Widgets
-    And employer ABC Widgets has imported and renewing enrollment_open benefit applications
+    And renewal employer ABC Widgets has imported and renewal enrollment_open benefit applications
 
     Given there exists Patrick Doe employee for employer ABC Widgets
     And employee Patrick Doe has current hired on date
@@ -54,7 +54,7 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
     Given benefit market catalog exists for enrollment_open renewal employer with health benefits
     And there is an employer ABC Widgets
     And ABC Widgets employer has a staff role
-    And employer ABC Widgets has imported and renewing enrollment_open benefit applications
+    And renewal employer ABC Widgets has imported and renewal enrollment_open benefit applications
 
     Given there exists Patrick Doe employee for employer ABC Widgets
     And employee Patrick Doe has current hired on date
@@ -71,7 +71,7 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
     Given benefit market catalog exists for enrollment_open renewal employer with health benefits
     Given Qualifying life events are present
     And there is an employer ABC Widgets
-    And employer ABC Widgets has imported and renewing enrollment_open benefit applications
+    And renewal employer ABC Widgets has imported and renewal enrollment_open benefit applications
     
     Given there exists Patrick Doe employee for employer ABC Widgets
     And employee Patrick Doe has current hired on date
@@ -91,7 +91,7 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
     Given benefit market catalog exists for enrollment_open renewal employer with health benefits
     And there is an employer ABC Widgets
     And ABC Widgets employer has a staff role
-    And employer ABC Widgets has imported and renewing enrollment_open benefit applications
+    And renewal employer ABC Widgets has imported and renewal enrollment_open benefit applications
 
     Given there exists Patrick Doe employee for employer ABC Widgets
     And employee Patrick Doe has current hired on date
@@ -152,7 +152,7 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
     Given benefit market catalog exists for enrollment_open renewal employer with health benefits
     Given Qualifying life events are present
     And there is an employer ABC Widgets
-    And employer ABC Widgets has imported and renewing enrollment_open benefit applications
+    And renewal employer ABC Widgets has imported and renewal enrollment_open benefit applications
     
     Given there exists Patrick Doe employee for employer ABC Widgets
     And employee Patrick Doe has current hired on date
@@ -190,7 +190,7 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
 #    Given a CCA site exists with a benefit market
 #    Given benefit market catalog exists for enrollment_open renewal employer with health benefits
 #    And there is an employer ABC Widgets
-#    And employer ABC Widgets has imported and renewing enrollment_open benefit applications
+#    And renewal employer ABC Widgets has imported and renewal enrollment_open benefit applications
 #    Given there is a census employee record for Patrick Doe for employer ABC Widgets
 #
 #    And there is an employer ACME Inc

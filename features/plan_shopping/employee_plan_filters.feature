@@ -9,7 +9,7 @@ Feature: Employee products sorted when employee click on Plan name, Premium Amou
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for enrollment_open initial employer with health benefits
     And there is an employer Acme Inc.
-    And employer Acme Inc. has enrollment_open benefit application with Metal Level plan options
+    And initial employer Acme Inc. has enrollment_open benefit application with Metal Level plan options
     And there is a census employee record for Patrick Doe for employer Acme Inc.
 
   Scenario: Employee sort plans by Plan name

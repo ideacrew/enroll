@@ -6,8 +6,8 @@ Feature: EE with multiple employers plan purchase
     Given Qualifying life events are present
     And there is an employer ABC Widgets
     And there is an employer DEF Sales
-    And employer ABC Widgets has active benefit application
-    And employer DEF Sales has active benefit application
+    And initial employer ABC Widgets has active benefit application
+    And initial employer DEF Sales has active benefit application
     Then person has multiple employee roles with benefits from employers ABC Widgets and DEF Sales
 
   Scenario: when EE purchase plan for self & having ineligible family member -

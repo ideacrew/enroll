@@ -11,7 +11,7 @@ Feature: Employer terminates borker and hires new broker
     And the broker Jane Goodall is primary broker for Browns Inc
     Given there is an employer ABC Widgets
     And ABC Widgets employer has a staff role
-    And employer ABC Widgets has draft benefit application
+    And initial employer ABC Widgets has draft benefit application
     And employer ABC Widgets hired broker Jane Goodall from Browns Inc
 
     Scenario: Employer terminates broker agency and hires new agency

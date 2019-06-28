@@ -8,7 +8,7 @@ Feature: Employee goes through plan shopping with dependents when employer offer
 
   Scenario: New employee with existing person
     Given staff role person logged in
-    And employer Acme Inc. has enrollment_open benefit application
+    And initial employer Acme Inc. has enrollment_open benefit application
     And there is a census employee record for Patrick Doe for employer Acme Inc.
     And Acme Inc. employer visit the Employee Roster
     Then Employer logs out

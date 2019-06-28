@@ -5,7 +5,7 @@ Feature: Employee termination and Re-hire functionality
     Given benefit market catalog exists for active initial employer with health benefits
     And there is an employer ABC Widgets
     And ABC Widgets employer has a staff role
-    And employer ABC Widgets has active benefit application
+    And initial employer ABC Widgets has active benefit application
     And there are 2 employees for ABC Widgets
     And Employees for ABC Widgets have both Benefit Group Assignments Employee role
 

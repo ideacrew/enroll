@@ -5,7 +5,7 @@ Feature: Only Super Admin HBX Staff HBX Tier3 will be able to see & access the E
     Given benefit market catalog exists for enrollment_open initial employer with health benefits
     And Qualifying life events are present
     And there is an employer ACME Widgets, Inc.
-    And employer ACME Widgets, Inc. has enrollment_open benefit application
+    And initial employer ACME Widgets, Inc. has enrollment_open benefit application
     And there is a census employee record for Patrick Doe for employer ACME Widgets, Inc.
     And ACME Widgets, Inc. employer has a staff role
     And staff role person logged in

@@ -10,7 +10,7 @@ Feature: Broker Manages Employee Account
     Given there is an employer ABC Widgets
     And ABC Widgets employer has a staff role
     And employer ABC Widgets hired broker Max Planck from District Brokers Inc
-    And employer ABC Widgets has enrollment_open benefit application
+    And initial employer ABC Widgets has enrollment_open benefit application
     And there is a census employee record for Patrick Doe for employer ABC Widgets
 
     Scenario: Broker manages employer account
