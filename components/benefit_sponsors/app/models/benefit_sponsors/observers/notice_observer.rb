@@ -424,7 +424,7 @@ module BenefitSponsors
 
       def trigger_generate_initial_employer_invoice(model_event)
         employer_profile = model_event.klass_instance
-        submitted_states = BenefitSponsors::BenefitApplications::BenefitApplication::SUBMITTED_STATES - [:termination_pending]
+        submitted_states = BenefitSponsors::BenefitApplications::BenefitApplication::SUBMITTED_STATES - [:termination_pending, :enrollment_open]
         benefit_application = employer_profile.benefit_applications.where(:aasm_state.in => submitted_states).max_by(&:created_at)
         deliver(recipient: employer_profile, event_object: benefit_application, notice_event: "generate_initial_employer_invoice") if benefit_application.present?
       end

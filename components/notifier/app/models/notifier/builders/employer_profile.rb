@@ -25,7 +25,7 @@ module Notifier
     end
 
     def resource=(resource)
-      @employer_profile = resource
+      @employer_profile ||= resource
     end
 
     def append_contact_details
@@ -51,36 +51,48 @@ module Notifier
       end
     end
 
+    def current_sys_date
+      @current_sys_date ||= TimeKeeper.date_of_record
+    end
+
     def notice_date
-      merge_model.notice_date = format_date(TimeKeeper.date_of_record)
+      merge_model.notice_date = format_date(current_sys_date)
     end
 
     def notice_date_plus_31_days
-      merge_model.notice_date_plus_31_days = format_date(TimeKeeper.date_of_record + 31.days)
+      merge_model.notice_date_plus_31_days = format_date(current_sys_date + 31.days)
     end
 
     def employer_name
       merge_model.employer_name = employer_profile.legal_name
     end
 
+    def employer_staff_role
+      return nil unless employer_profile.staff_roles
+
+      @employer_staff_role ||= employer_profile.staff_roles.first
+    end
+
     def email
-      merge_model.email = employer_profile.staff_roles.first.work_email_or_best
+      return nil unless employer_staff_role
+
+      merge_model.email = employer_staff_role.work_email_or_best
     end
 
     def first_name
-      if employer_profile.staff_roles.present?
-        merge_model.first_name = employer_profile.staff_roles.first.first_name
-      end
+      return nil unless employer_staff_role
+
+      merge_model.first_name = employer_staff_role.first_name
     end
 
     def last_name
-      if employer_profile.staff_roles.present?
-        merge_model.last_name = employer_profile.staff_roles.first.last_name
-      end
+      return nil unless employer_staff_role
+
+      merge_model.last_name = employer_staff_role.last_name
     end
 
     def invoice_month
-      merge_model.invoice_month = TimeKeeper.date_of_record.next_month.strftime('%B')
+      merge_model.invoice_month = current_sys_date.next_month.strftime('%B')
     end
 
     def account_number
@@ -92,7 +104,7 @@ module Notifier
     end
 
     def invoice_date
-      merge_model.invoice_date = TimeKeeper.date_of_record.strftime("%m/%d/%Y")
+      merge_model.invoice_date = current_sys_date.strftime("%m/%d/%Y")
     end
 
     def active_benefit_sponsorship
@@ -100,20 +112,21 @@ module Notifier
     end
 
     def coverage_month
-      merge_model.coverage_month = TimeKeeper.date_of_record.next_month.strftime("%m/%Y")
+      merge_model.coverage_month = current_sys_date.next_month.strftime("%m/%Y")
     end
 
-    def enrolled_benefit_application
-      active_benefit_sponsorship.benefit_applications.where(:"aasm_state".in => ["enrollment_closed", "enrollment_eligible", "enrollment_open"]).first
+    def submitted_benefit_application
+      submitted_states = BenefitSponsors::BenefitApplications::BenefitApplication::SUBMITTED_STATES - [:termination_pending, :enrollment_open]
+      active_benefit_sponsorship.benefit_applications.where(:aasm_state.in => submitted_states).max_by(&:created_at)
     end
 
     def total_amount_due
-      merge_model.total_amount_due = number_to_currency(enrolled_benefit_application.enrollments_till_given_effective_on(TimeKeeper.date_of_record.next_month.beginning_of_month).map(&:total_premium).sum)
+      merge_model.total_amount_due = number_to_currency(submitted_benefit_application.enrollments_till_given_effective_on(current_sys_date.next_month.beginning_of_month).map(&:total_premium).sum)
     end
 
     def date_due
       schedular = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
-      merge_model.date_due = schedular.calculate_open_enrollment_date(TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date].strftime("%m/%d/%Y")
+      merge_model.date_due = schedular.calculate_open_enrollment_date(current_sys_date.next_month.beginning_of_month)[:binder_payment_due_date].strftime("%m/%d/%Y")
     end
   end
 end

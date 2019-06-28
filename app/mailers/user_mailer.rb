@@ -138,14 +138,13 @@ class UserMailer < ApplicationMailer
     end
   end
 
+  def generic_notice_alert_to_ba_and_ga(first_name, email, employer_name)
+    return if email.blank?
 
-  # def generic_notice_alert_to_ba_and_ga(first_name, email, employer_name)
-  #   if email.present?
-  #     message = mail({to: email, subject: "You have a new message from DC Health Link", from: 'no-reply@individual.dchealthlink.com'}) do |format|
-  #       format.html {render "generic_notice_alert_to_broker_and_ga", locals: {first_name: first_name, employer_name: employer_name}}
-  #     end
-  #   end
-  # end
+    message = mail({to: email, subject: "You have a new message from DC Health Link", from: 'no-reply@individual.dchealthlink.com'}) do |format|
+      format.html {render "generic_notice_alert_to_broker_and_ga", locals: {first_name: first_name, employer_name: employer_name}}
+    end
+  end
 
   def generic_notice_alert_to_ba(first_name, email, employer_name)
     if email.present?
