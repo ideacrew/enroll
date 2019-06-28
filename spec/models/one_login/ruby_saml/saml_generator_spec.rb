@@ -4,20 +4,20 @@ module OneLogin
   RSpec.describe RubySaml::SamlGenerator do
     let(:transaction_id)   { '1234' }
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent) }
-    let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, aasm_state: 'shopping') }
-    let!(:hbx_enrollment_member1) { FactoryGirl.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, is_subscriber: true, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: hbx_enrollment) }
-    let!(:hbx_enrollment_member2) { FactoryGirl.create(:hbx_enrollment_member, applicant_id: family.family_members[1].id, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: hbx_enrollment) }
+    let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: family.active_household, aasm_state: 'shopping') }
+    let!(:hbx_enrollment_member1) { FactoryBot.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, is_subscriber: true, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: hbx_enrollment) }
+    let!(:hbx_enrollment_member2) { FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[1].id, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: hbx_enrollment) }
     let(:saml_generator) { OneLogin::RubySaml::SamlGenerator.new(transaction_id,hbx_enrollment) }
-    let(:test_priv_key) { OpenSSL::PKey::RSA.new(File.read("#{Rails.root.join("spec", "test_data")}" + "/test_wfpk.pem")) }
-    let(:test_x509_cert) { OpenSSL::X509::Certificate.new(File.read("#{Rails.root.join("spec", "test_data")}" + "/test_x509.pem")) }
+    let(:test_priv_key) { OpenSSL::PKey::RSA.new(File.read(Rails.root.join('spec', 'test_data').to_s + '/test_wfpk.pem')) }
+    let(:test_x509_cert) { OpenSSL::X509::Certificate.new(File.read(Rails.root.join('spec', 'test_data').to_s + '/test_x509.pem')) }
 
     before :each do
       saml_generator.instance_variable_set(:@private_key, test_priv_key)
       saml_generator.instance_variable_set(:@cert, test_x509_cert)
       hbx_enrollment.update_attributes(kind: 'individual')
       @saml_response = saml_generator.build_saml_response
-      @noko = Nokogiri.parse(@saml_response.to_s) do |options|
-        options = XMLSecurity::BaseDocument::NOKOGIRI_OPTIONS
+      @noko = Nokogiri.parse(@saml_response.to_s) do
+        XMLSecurity::BaseDocument::NOKOGIRI_OPTIONS
       end
     end
 
