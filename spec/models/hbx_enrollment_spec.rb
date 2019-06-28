@@ -696,8 +696,9 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       let(:hbx_profile) {double}
       let(:benefit_sponsorship) {double}
       let(:bcp) {double}
-      let(:benefit_group) {double()}
-      let(:employee_role) {double(hired_on: date)}
+      let(:benefit_group) { double }
+      let(:census_employee) { double }
+      let(:employee_role) { double(hired_on: date, census_employee: census_employee) }
 
       before :each do
         allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
@@ -712,7 +713,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
 
         it "open_enrollment" do
           effective_on = date - 10.days
-          allow(benefit_group).to receive(:effective_on_for).and_return(effective_on)
+          allow(census_employee).to receive(:coverage_effective_on).and_return(effective_on)
           allow(family).to receive(:is_under_special_enrollment_period?).and_return(false)
           expect(HbxEnrollment.calculate_effective_on_from(market_kind: 'shop', qle: false, family: family, employee_role: employee_role, benefit_group: benefit_group, benefit_sponsorship: nil)).to eq effective_on
         end

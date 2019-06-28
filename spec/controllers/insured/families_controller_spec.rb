@@ -662,7 +662,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       end
 
       it "future_qualified_date should return nil when qle market kind is indiviual" do
-        qle = FactoryBot.build(:qualifying_life_event_kind, market_kind: "individual")
+        qle = FactoryBot.build(:qualifying_life_event_kind, market_kind: "individual", market_kinds: ["individual"])
         allow(QualifyingLifeEventKind).to receive(:find).and_return(qle)
         date = TimeKeeper.date_of_record.strftime("%m/%d/%Y")
         get :check_qle_date, params: {date_val: date, qle_id: qle.id, format: :js}
