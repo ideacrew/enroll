@@ -40,6 +40,7 @@ module BenefitSponsors
       end
 
       def set_benefit_group_assignment(new_benefit_package_assignment)
+        @hbx_enrollment.benefit_group_assignment = new_benefit_package_assignment # set object to
         @hbx_enrollment.benefit_group_assignment_id = new_benefit_package_assignment.id
       end
 

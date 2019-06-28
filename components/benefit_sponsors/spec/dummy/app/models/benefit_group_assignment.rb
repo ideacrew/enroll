@@ -145,5 +145,9 @@ class BenefitGroupAssignment
     state :coverage_renewing
     state :coverage_expired
 
+    event :renew_coverage do
+      transitions from: :initialized, to: :coverage_renewing
+    end
+
   end
 end
