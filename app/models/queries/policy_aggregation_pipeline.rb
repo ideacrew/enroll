@@ -19,12 +19,17 @@ module Queries
     end
 
     def evaluate
+
       Family.collection.aggregate([{"$match" => {"_id" => {"$in"=>family_ids}}}
       ])
     end
 
+    def evaluate_hbx_enrollment
+      HbxEnrollment.collection.aggregate(@pipeline, {allow_disk_use: true})
+    end
+
     def family_ids
-      HbxEnrollment.collection.aggregate(@pipeline, {allow_disk_use: true}).map{|en|en ["family_id"]}
+      evaluate_hbx_enrollment.map{|a|a['family_id']}
     end
 
     def count
@@ -132,7 +137,7 @@ module Queries
     end
 
     def list_of_hbx_ids
-      HbxEnrollment.collection.aggregate(@pipeline, {allow_disk_use: true}).map{|a|a['hbx_id']}
+      evaluate_hbx_enrollment.map{|a|a['hbx_id']}
     end
 
     def hbx_id_with_purchase_date_and_time
@@ -284,19 +289,15 @@ module Queries
     def eliminate_family_duplicates
       flow = (
         filter_criteria_expression >>
-        sort_on({"policy_purchased_at" => 1}) >>
         group_by(
-          {"family_id" => "$family_id", "coverage_kind" => "$coverage_kind", "rp_ids" => "$rp_ids", "policy_start_on" => "$policy_start_on"},
-          last("policy_purchased_at") +
-          last("policy_purchased_on") +
           last("hbx_id") +
           last("product_id") +
           last("aasm_state") +
           last("enrollment_kind") +
           last("coverage_kind") +
-          last("family_created_at") +
           last("hbx_enrollment_members")
         ))
+        binding.pry
       @pipeline = @pipeline + flow.to_pipeline
       self
     end
