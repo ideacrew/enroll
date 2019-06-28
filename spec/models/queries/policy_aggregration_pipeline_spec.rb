@@ -40,7 +40,7 @@ describe Queries::PolicyAggregationPipeline, "Policy Queries", dbclean: :after_e
                         sponsored_benefit_package_id: predecessor_application.benefit_packages.first.id,
                         benefit_sponsorship_id: predecessor_application.benefit_sponsorship.id,
                         employee_role_id: employee_role.id,
-                        submitted_at:Date.new(2018,6,21)
+                        submitted_at: Date.new(2018,6,21)
                         ) 
     hbx_enrollment.benefit_sponsorship = benefit_sponsorship
     hbx_enrollment.save!
@@ -63,8 +63,28 @@ describe Queries::PolicyAggregationPipeline, "Policy Queries", dbclean: :after_e
     hbx_enrollment.save!
     hbx_enrollment
   }
+
+  let!(:bad_enrollment) { 
+    hbx_enrollment = FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product, 
+                        household: family.active_household, 
+                        aasm_state: "inactive",
+                        family: family,
+                        effective_on: (effective_on - 2.years),
+                        rating_area_id: predecessor_application.recorded_rating_area_id,
+                        sponsored_benefit_id: "12121212",
+                        sponsored_benefit_package_id:"2323232323",
+                        benefit_sponsorship_id: predecessor_application.benefit_sponsorship.id,
+                        employee_role_id: employee_role.id,
+                        submitted_at: Date.new(2015,6,21)
+                        ) 
+    hbx_enrollment.benefit_sponsorship = benefit_sponsorship
+    hbx_enrollment.save!
+    hbx_enrollment
+  }
   let!(:renewal_hbx_enrollment_member) {FactoryBot.create(:hbx_enrollment_member, applicant_id: person.id, hbx_enrollment: renewal_enrollment) }
-  let!(:enrollment_hbx_ids){HbxEnrollment.all.map(&:hbx_id)}
+  let!(:good_enrollment_hbx_ids) {HbxEnrollment.where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES).map(&:hbx_id)}
+  let!(:bad_enrollment_hbx_ids) {HbxEnrollment.where(:aasm_state.in => HbxEnrollment::SELECTED_AND_WAIVED).map(&:hbx_id)}
+  
   before do
     ce.update_attributes(:employee_role_id => employee_role.id )
   end
@@ -96,7 +116,7 @@ describe Queries::PolicyAggregationPipeline, "Policy Queries", dbclean: :after_e
                                                         {"$in"=>
                                                         [benefit_group_ids[0], benefit_group_ids[1]]}}}]
                                                           
-                                                        expect(subject.evaluate.map{|a|a['_id']}).to eq [family.id]                                                   
+                                                        expect(subject.evaluate.map{|a|a['hbx_id']}).to eq good_enrollment_hbx_ids                                                
     end
 
     it '.exclude_employers_by_hbx_ids' do
@@ -109,36 +129,32 @@ describe Queries::PolicyAggregationPipeline, "Policy Queries", dbclean: :after_e
       expect(subject.pipeline.count).to be 1
       value = subject.filter_to_active
       expect(subject.pipeline.count).to be 2
-    expect(subject.evaluate.map{|a|a['_id']}).to eq [family.id] 
+    expect(subject.evaluate.map{|a|a['hbx_id']}).to eq good_enrollment_hbx_ids 
     end
 
     it '.with_effective_date' do
       value = subject.with_effective_date(effective_on)
-    expect(subject.evaluate.map{|a|a['_id']}).to eq [family.id] 
+    expect(subject.evaluate.map{|a|a['hbx_id']}).to eq good_enrollment_hbx_ids
     end
 
     it '.filter_to_shop' do
       value = subject.filter_to_shop
-    expect(subject.evaluate.map{|a|a['_id']}).to eq [family.id] 
+    expect(subject.evaluate.map{|a|a['hbx_id']}).to eq good_enrollment_hbx_ids
     end
 
     it '.list_of_hbx_ids' do
-      expect(subject.list_of_hbx_ids).to eq enrollment_hbx_ids 
+      expect(subject.list_of_hbx_ids).to eq good_enrollment_hbx_ids 
     end
-
-
 
     it '.filter_to_shopping_completed' do
       subject.filter_to_shopping_completed
-      expect(subject.evaluate.map{|a|a['_id']}).to eq [family.id] 
+      expect(subject.evaluate.map{|a|a['hbx_id']}).to eq good_enrollment_hbx_ids
     end
 
     it '.eliminate_family_duplicates' do
-      binding.pry
-      subject.eliminate_family_duplicates.evaluate
-      expect(subject.eliminate_family_duplicates).to eq enrollment_hbx_ids 
+      expect(good_enrollment_hbx_ids).to include subject.eliminate_family_duplicates.evaluate.map{|a|a['hbx_id']}.first
+      expect(bad_enrollment_hbx_ids).to_not include subject.eliminate_family_duplicates.evaluate.map{|a|a['hbx_id']}.first
     end
-
 
   end
 end
