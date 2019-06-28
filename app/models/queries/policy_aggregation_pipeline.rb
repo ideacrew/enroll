@@ -290,7 +290,8 @@ module Queries
           last("aasm_state") +
           last("enrollment_kind") +
           last("coverage_kind") +
-          last("hbx_enrollment_members")
+          last("hbx_enrollment_members") +
+          last("family_id") 
         ))
 
       @pipeline = @pipeline + flow.to_pipeline
