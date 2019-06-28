@@ -170,6 +170,25 @@ class Insured::GroupSelectionController < ApplicationController
     end
   end
 
+  def edit_plan
+    @hbx_enrollment = HbxEnrollment.find(params.require(:hbx_enrollment_id))
+    family = Family.find(params.require(:family_id))
+    @sep = family.try(:latest_active_sep)
+  end
+
+  def cancel
+    hbx = HbxEnrollment.find(params.require(:hbx_enrollment_id))
+    hbx.cancel_coverage! if hbx.may_cancel_coverage?
+    # TODO: Decide how transmit will be handled
+    # BulkActionsForAdmin.handle_edi_transmissions(@hbx_enrollment.id, transmit_flag)
+    redirect_to family_account_path
+  end
+
+  def edit_aptc
+    #aptc build_eligible_members
+    # if build_eligible_members.count == family.count AND enrollment is eligible, show aptc button
+  end
+
   private
 
   def permit_params
