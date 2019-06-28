@@ -7,14 +7,68 @@ FactoryBot.define do
     benefit_categories { ["health"]}
 
     after :build do |bp|
-      ivl_bronze = FactoryBot.create :plan, :with_premium_tables, name: 'IVL Test Plan Bronze', market: 'individual', coverage_kind: 'health', deductible: 3000, metal_level: "bronze", csr_variant_id: "01"
-      ivl_silver = FactoryBot.create :plan, :with_premium_tables, name: 'IVL Test Plan Silver', market: 'individual', coverage_kind: 'health', deductible: 2000, metal_level: "silver", csr_variant_id: "01"
-      ivl_gold = FactoryBot.create :plan, :with_premium_tables, name: 'IVL Test Plan Gold', market: 'individual', coverage_kind: 'health', deductible: 1000, metal_level: "gold", csr_variant_id: "01"
-      ivl_plat = FactoryBot.create :plan, :with_premium_tables, name: 'IVL Test Plan Plat', market: 'individual', coverage_kind: 'health', deductible: 500, metal_level: "platinum", csr_variant_id: "01"
-      future_ivl_bronze = FactoryBot.create :plan, :with_premium_tables, active_year: TimeKeeper.date_of_record.year + 1, name: 'IVL Test Plan Bronze', market: 'individual', coverage_kind: 'health', deductible: 3000, metal_level: "bronze", csr_variant_id: "01"
-      future_ivl_silver = FactoryBot.create :plan, :with_premium_tables, active_year: TimeKeeper.date_of_record.year + 1, name: 'IVL Test Plan Silver', market: 'individual', coverage_kind: 'health', deductible: 2000, metal_level: "silver", csr_variant_id: "01"
-      future_ivl_gold = FactoryBot.create :plan, :with_premium_tables, active_year: TimeKeeper.date_of_record.year + 1, name: 'IVL Test Plan Gold', market: 'individual', coverage_kind: 'health', deductible: 1000, metal_level: "gold", csr_variant_id: "01"
-      future_ivl_plat = FactoryBot.create :plan, :with_premium_tables, active_year: TimeKeeper.date_of_record.year + 1, name: 'IVL Test Plan Plat', market: 'individual', coverage_kind: 'health', deductible: 500, metal_level: "platinum", csr_variant_id: "01"
+      issuer_profile = FactoryBot.create(:benefit_sponsors_organizations_issuer_profile)
+      ivl_bronze = FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                                     title: 'IVL Test Plan Bronze',
+                                     benefit_market_kind: :aca_individual,
+                                     kind: 'health', deductible: 3000,
+                                     metal_level_kind: "bronze",
+                                     csr_variant_id: "01",
+                                     issuer_profile: issuer_profile)
+      ivl_silver = FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                                     title: 'IVL Test Plan Silver',
+                                     benefit_market_kind: :aca_individual,
+                                     kind: 'health',
+                                     deductible: 2000,
+                                     metal_level_kind: "silver",
+                                     csr_variant_id: "01",
+                                     issuer_profile: issuer_profile)
+      ivl_gold = FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                                   title: 'IVL Test Plan Gold',
+                                   benefit_market_kind: :aca_individual,
+                                   kind: 'health', deductible: 1000,
+                                   metal_level_kind: "gold",
+                                   csr_variant_id: "01",
+                                   issuer_profile: issuer_profile)
+      ivl_plat = FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                                   title: 'IVL Test Plan Plat',
+                                   benefit_market_kind: :aca_individual,
+                                   kind: 'health',
+                                   deductible: 500,
+                                   metal_level_kind: "platinum",
+                                   csr_variant_id: "01",
+                                   issuer_profile: issuer_profile)
+      future_ivl_bronze = FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                                            title: 'IVL Test Plan Bronze',
+                                            benefit_market_kind: :aca_individual,
+                                            kind: 'health',
+                                            deductible: 3000,
+                                            metal_level_kind: "bronze",
+                                            csr_variant_id: "01",
+                                            issuer_profile: issuer_profile)
+      future_ivl_silver = FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                                            title: 'IVL Test Plan Silver',
+                                            benefit_market_kind: :aca_individual,
+                                            kind: 'health', deductible: 2000,
+                                            metal_level_kind: "silver",
+                                            csr_variant_id: "01",
+                                            issuer_profile: issuer_profile)
+      future_ivl_gold = FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                                          title: 'IVL Test Plan Gold',
+                                          benefit_market_kind: :aca_individual,
+                                          kind: 'health',
+                                          deductible: 1000,
+                                          metal_level_kind: "gold",
+                                          csr_variant_id: "01",
+                                          issuer_profile: issuer_profile)
+      future_ivl_plat = FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                                          title: 'IVL Test Plan Plat',
+                                          benefit_market_kind: :aca_individual,
+                                          kind: 'health',
+                                          deductible: 500,
+                                          metal_level_kind: "platinum",
+                                          csr_variant_id: "01",
+                                          issuer_profile: issuer_profile)
       bp.benefit_ids = [ivl_bronze.id, ivl_silver.id, ivl_gold.id, ivl_plat.id, future_ivl_bronze.id, future_ivl_silver.id, future_ivl_gold.id, future_ivl_plat.id ]
     end
 
