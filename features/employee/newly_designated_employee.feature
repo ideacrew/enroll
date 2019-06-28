@@ -9,15 +9,18 @@ Background: Setup site, employer, and benefit application
     And renewal employer Acme Inc. has active and renewal enrollment_open benefit applications
     And Acme Inc. employer has a staff role 
     And there is a census employee record for Patrick Doe for employer Acme Inc.
+    And census employee Patric Doe is a newly_designated_eligible employee
+    And this employer Acme Inc. has first_of_month rule
 
   Scenario: Newly designated should not get effective date before renewing plan year start date
-   Given Employer exists and logs in and adds and employee
-    And Acme Inc. employer visit the Employee Roster
-    Then Employer logs out
-    And Employee has not signed up as an HBX user
-    And Patrick Doe visits the employee portal
-    When Patrick Doe creates an HBX account
-    When Employee goes to register as an employee
-    Then Employee should see the employee search page
-    When Employee enters the identifying info of Patrick Doe
-    Then Employee should see the matched employee record form
+    Given Employee has not signed up as an HBX user
+    And employee Patrick Doe already matched with employer Acme Inc. and logged into employee portal
+    When Employee clicks "Shop for Plans" on my account page
+    And employee Patrick Doe has earliest eligible date under current active plan year
+    Then Employee should see the group selection page
+    And employee Patrick Doe should see renewing benefit application start date as effective date
+    When Employee clicks continue on the group selection page
+    Then Employee should see the list of plans
+    When Patrick Doe selects a plan on the plan shopping page
+    Then Patrick Doe should see coverage summary page with renewing benefit application start date as effective date
+    Then Patrick Doe should see the receipt page with renewing plan year start date as effective date

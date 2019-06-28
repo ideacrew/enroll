@@ -84,11 +84,23 @@ module CensusEmployeeWorld
     end
   end
 
-  def create_census_employee_from_person(person, legal_name = nil)
+  def census_employee(named_person = nil)
+    @census_employee ||= {}
+
+    if named_person.present?
+      @census_employee[named_person]
+    else
+      @census_employee.values.first
+    end
+  end
+
+  def create_census_employee_from_person(named_person, legal_name = nil)
+    person = people[named_person]
     organization = employer(legal_name)
     sponsorship = benefit_sponsorship(organization)
     benefit_group = fetch_benefit_group(organization.legal_name)
-    FactoryBot.create(
+    @census_employee ||= {}
+    @census_employee[named_person] ||= FactoryBot.create(
       :census_employee,
       :with_active_assignment,
       first_name: person[:first_name],
@@ -120,8 +132,12 @@ And(/^there (are|is) (\d+) (employee|employees) for (.*?)$/) do |_, roster_count
 end
 
 And(/^there is a census employee record for (.*?) for employer (.*?)$/) do |named_person, legal_name|
+  create_census_employee_from_person(named_person, legal_name)
+end
+
+And(/^census employee (.*?) is a (.*) employee$/) do |named_person, state|
   person = people[named_person]
-  create_census_employee_from_person(person, legal_name)
+  census_employee.update(aasm_state: state)
 end
 
 Given(/^there exists (.*?) employee for employer (.*?)(?: and (.*?))?$/) do |named_person, legal_name, legal_name2|
@@ -152,6 +168,21 @@ And(/employee (.*?) has (.*?) hired on date/) do |named_person, ee_hire_date|
   person = people[named_person]
   CensusEmployee.where(:first_name => /#{person[:first_name]}/i,
                        :last_name => /#{person[:last_name]}/i).first.update_attributes(:hired_on => date, :created_at => date)
+end
+
+And(/employee (.*) has earliest eligible date under current active plan year/) do |named_person|
+  census_employee = census_employee(named_person)
+  sponsorship = census_employee.benefit_sponsorship
+  renewal_application = sponsorship.renewal_benefit_application
+  expect(census_employee.earliest_eligible_date < renewal_application.start_on).to be_truthy
+end
+
+And(/employee (.*) should see renewing benefit application start date as effective date/) do |named_person|
+  census_employee = census_employee(named_person)
+  sponsorship = census_employee.benefit_sponsorship
+  renewal_application = sponsorship.renewal_benefit_application
+
+  find('#group-selection-form', wait: 5, text: renewal_application.start_on.strftime('%m/%d/%Y'))
 end
 
 And(/employee (.*) already matched with employer (.*?)(?: and (.*?))? and logged into employee portal/) do |named_person, legal_name, legal_name2|
