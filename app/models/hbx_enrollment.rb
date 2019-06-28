@@ -161,6 +161,7 @@ class HbxEnrollment
   delegate :premium_for, to: :decorated_hbx_enrollment, allow_nil: true
 
   #indexes
+  index({"household_id" => 1})
   index({"broker_agency_profile_id" => 1}, {sparse: true})
   index({"effective_on" => 1})
   index({"benefit_group_assignment_id" => 1})
