@@ -121,12 +121,12 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
       allow(view).to receive(:show_pay_now?).and_return false
     end
     it "doesn't have a Pay now button" do
-      render file: "insured/plan_shoppings/receipt.html.erb"
+      render file: "insured/plan_shoppings/receipt.en.html.erb"
       expect(rendered).to_not have_selector('btn-btn-default', text: /Pay Now/)
     end
 
     it "doesn't have Pay Now messaging" do
-      render file: "insured/plan_shoppings/receipt.html.erb"
+      render file: "insured/plan_shoppings/receipt.en.html.erb"
       expect(rendered).to_not have_content(/Select PAY NOW to make your first premium payment online/)
       expect(rendered).to_not have_content(/You only have the option to PAY NOW while you’re on this page/)
       expect(rendered).to_not have_content(/Select PAY NOW to make your first premium payment directly to Kaiser Permanente/)
@@ -141,15 +141,15 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
       allow(view).to receive(:show_pay_now?).and_return true
     end
     it "should have a Pay now button" do
-      render file: "insured/plan_shoppings/receipt.html.erb"
+      render file: "insured/plan_shoppings/receipt.en.html.erb"
       expect(rendered).to have_selector('button', text: /Pay Now/)
     end
 
     it "have Pay Now messaging" do
-      render file: "insured/plan_shoppings/receipt.html.erb"
+      render file: "insured/plan_shoppings/receipt.en.html.erb"
       expect(rendered).to have_selector('strong', text: /You only have the option to PAY NOW while you’re on this page./)
-      expect(rendered).to have_text(/If you leave this page without selecting PAY NOW,/)
       expect(rendered).to have_text(/You only have the option to PAY NOW while you’re on this page/)
+      expect(rendered).to have_text(/If you leave this page without selecting PAY NOW,/)
     end
   end
 end

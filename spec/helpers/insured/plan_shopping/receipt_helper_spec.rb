@@ -8,8 +8,17 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
   let(:individual_plans) { FactoryBot.create_list(:plan, 5, :with_premium_tables, market: 'individual') }
 
   describe "Carrier with payment options" do
-    let(:carrier_profile) { FactoryBot.create(:carrier_profile, legal_name: 'Kaiser') }
-    let(:plan) { FactoryBot.create(:plan, carrier_profile: carrier_profile) }
+    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
+    let(:product) do
+      FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                        title: 'IVL Test Plan Silver',
+                        benefit_market_kind: :aca_individual,
+                        kind: 'health',
+                        deductible: 2000,
+                        metal_level_kind: "silver",
+                        csr_variant_id: "01",
+                        issuer_profile: issuer_profile)
+    end
 
     HbxEnrollment::Kinds.each do |market|
       context "#{market} market" do
@@ -18,7 +27,7 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
                             :with_enrollment_members,
                             enrollment_members: family.family_members,
                             household: household,
-                            plan: plan,
+                            product: product,
                             effective_on: TimeKeeper.date_of_record.beginning_of_year,
                             kind: market)
         end
@@ -35,14 +44,23 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
   end
 
   describe "Carrier with NO payment options" do
-    let(:carrier_profile) { FactoryBot.create(:carrier_profile, legal_name: 'ANY OTHER') }
-    let(:plan) { FactoryBot.create(:plan, carrier_profile: carrier_profile) }
+    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
+    let(:product) do
+      FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                        title: 'IVL Test Plan Silver',
+                        benefit_market_kind: :aca_individual,
+                        kind: 'health',
+                        deductible: 2000,
+                        metal_level_kind: "silver",
+                        csr_variant_id: "01",
+                        issuer_profile: issuer_profile)
+    end
     let!(:hbx_enrollment) do
       FactoryBot.create(:hbx_enrollment,
                         :with_enrollment_members,
                         enrollment_members: family.family_members,
                         household: household,
-                        plan: plan,
+                        product: product,
                         effective_on: TimeKeeper.date_of_record.beginning_of_year,
                         kind: 'individual')
     end
@@ -55,14 +73,23 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
   end
 
   describe "Check family has Kaiser enrollments or not" do
-    let(:carrier_profile) { FactoryBot.create(:carrier_profile, legal_name: 'Kaiser') }
-    let(:plan) { FactoryBot.create(:plan, carrier_profile: carrier_profile) }
+    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, legal_name: 'Kaiser') }
+    let(:product) do
+      FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                        title: 'IVL Test Plan Silver',
+                        benefit_market_kind: :aca_individual,
+                        kind: 'health',
+                        deductible: 2000,
+                        metal_level_kind: "silver",
+                        csr_variant_id: "01",
+                        issuer_profile: issuer_profile)
+    end
     let!(:hbx_enrollment) do
       FactoryBot.create(:hbx_enrollment,
                         :with_enrollment_members,
                         enrollment_members: family.family_members,
                         household: household,
-                        plan: plan,
+                        product: product,
                         effective_on: TimeKeeper.date_of_record.beginning_of_year + 1.month,
                         kind: 'individual')
     end
@@ -72,7 +99,7 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
                         :with_enrollment_members,
                         enrollment_members: family.family_members,
                         household: household,
-                        plan: plan,
+                        product: product,
                         effective_on: TimeKeeper.date_of_record.beginning_of_year,
                         kind: 'individual')
     end
@@ -85,7 +112,7 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
     end
 
     it 'return false if household has kaiser enrollments in current benefit coverage period' do
-      carrier_profile.update_attributes(legal_name: 'Something')
+      issuer_profile.update_attributes(legal_name: 'Something')
       expect(helper.has_any_previous_kaiser_enrollments?).to eq false
     end
 
@@ -95,20 +122,29 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
     end
 
     it 'return false if household had no kaiser enrollments in current benefit coverage period' do
-      carrier_profile.update_attributes(legal_name: 'Something')
+      issuer_profile.update_attributes(legal_name: 'Something')
       expect(helper.has_any_previous_kaiser_enrollments?).to eq false
     end
   end
 
-  describe "Whether family has break in covergae enrollments" do
-    let(:carrier_profile) { FactoryBot.create(:carrier_profile, legal_name: 'Kaiser') }
-    let(:plan) { FactoryBot.create(:plan, carrier_profile: carrier_profile) }
+  describe 'Whether family has break in coverage enrollments' do
+    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, legal_name: 'Kaiser') }
+    let(:product) do
+      FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                        title: 'IVL Test Plan Silver',
+                        benefit_market_kind: :aca_individual,
+                        kind: 'health',
+                        deductible: 2000,
+                        metal_level_kind: "silver",
+                        csr_variant_id: "01",
+                        issuer_profile: issuer_profile)
+    end
     let!(:hbx_enrollment) do
       FactoryBot.create(:hbx_enrollment,
                         :with_enrollment_members,
                         enrollment_members: family.family_members,
                         household: household,
-                        plan: plan,
+                        product: product,
                         effective_on: TimeKeeper.date_of_record.beginning_of_year + 1.month,
                         kind: 'individual')
     end
@@ -118,7 +154,7 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
                         :with_enrollment_members,
                         enrollment_members: family.family_members,
                         household: household,
-                        plan: plan,
+                        product: product,
                         effective_on: TimeKeeper.date_of_record.beginning_of_year,
                         kind: 'individual')
     end
@@ -156,17 +192,23 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
   end
 
   describe 'Pay Now button should be available only for limited time' do
-
-    let(:carrier_profile) { FactoryBot.create(:carrier_profile, legal_name: 'Kaiser') }
-    let(:plan) do
-      FactoryBot.create(:plan, carrier_profile: carrier_profile)
+    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
+    let(:product) do
+      FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                        title: 'IVL Test Plan Silver',
+                        benefit_market_kind: :aca_individual,
+                        kind: 'health',
+                        deductible: 2000,
+                        metal_level_kind: "silver",
+                        csr_variant_id: "01",
+                        issuer_profile: issuer_profile)
     end
     let!(:hbx_enrollment) do
       FactoryBot.create(:hbx_enrollment,
                         :with_enrollment_members,
                         enrollment_members: family.family_members,
                         household: household,
-                        plan: plan,
+                        product: product,
                         effective_on: TimeKeeper.date_of_record.beginning_of_year + 1.month,
                         kind: 'individual')
     end
@@ -176,7 +218,7 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
                         :with_enrollment_members,
                         enrollment_members: family.family_members,
                         household: household,
-                        plan: plan,
+                        product: product,
                         effective_on: TimeKeeper.date_of_record.beginning_of_year,
                         kind: 'individual')
     end

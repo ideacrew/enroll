@@ -1,8 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe PaymentTransaction, :type => :model, dbclean: :after_each do
-  let!(:family) { FactoryGirl.create(:family, :with_primary_family_member_and_dependent) }
-  let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, aasm_state: 'shopping') }
+  let!(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent) }
+  let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: family.active_household, aasm_state: 'shopping') }
 
   context 'with generated payment transactions' do
     it 'should set submitted_at' do
