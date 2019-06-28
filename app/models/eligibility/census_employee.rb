@@ -4,12 +4,8 @@ module Eligibility
     def coverage_effective_on(package = nil)
       package = possible_benefit_package if (package.blank? || package.is_conversion?) # cautious
       if package.present?
-        
         effective_on_date = package.effective_on_for(hired_on)
-        if newly_designated_eligible? || newly_designated_linked?
-          effective_on_date = [effective_on_date, newly_eligible_earlist_eligible_date].max
-        end
-
+        effective_on_date = [effective_on_date, newly_eligible_earlist_eligible_date].max if newly_designated?
         effective_on_date
       end
     end

@@ -372,6 +372,10 @@ class CensusEmployee < CensusMember
     @employee_role = EmployeeRole.find(self.employee_role_id)
   end
 
+  def newly_designated?
+    newly_designated_eligible? || newly_designated_linked?
+  end
+
   def benefit_sponsorship=(benefit_sponsorship)
     return "expected Benefit Sponsorship" unless defined?(BenefitSponsors::BenefitSponsorships::BenefitSponsorship)
     self.benefit_sponsorship_id = benefit_sponsorship.id
@@ -1254,7 +1258,7 @@ def self.to_csv
 
   def benefit_package_for_date(coverage_date)
     benefit_assignment = benefit_group_assignment_for_date(coverage_date)
-    benefit_package = benefit_assignment.benefit_package  if benefit_assignment.present?
+    benefit_package = benefit_assignment.benefit_package if benefit_assignment.present?
     (benefit_package.present? && benefit_package.is_conversion?) ? nil : benefit_package
   end
 

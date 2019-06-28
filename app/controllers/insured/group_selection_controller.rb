@@ -74,13 +74,25 @@ class Insured::GroupSelectionController < ApplicationController
     end
 
     hbx_enrollment = build_hbx_enrollment(family_member_ids)
-    if @market_kind == 'shop' && @adapter.is_waiving?(params)
-      if hbx_enrollment.save
+
+    if @market_kind == 'shop'
+
+      raise "Unable to find employer-sponsored benefits for enrollment year #{hbx_enrollment.effective_on.year}" unless hbx_enrollment.sponsored_benefit_package.shoppable?
+
+      if @employee_role.census_employee.newly_designated?
+        newly_designated_effective_on = @employee_role.census_employee.coverage_effective_on(hbx_enrollment.sponsored_benefit_package)
+        if newly_designated_effective_on > hbx_enrollment.effective_on
+          raise 'You are attempting to purchase coverage through Qualifying Life Event prior to your eligibility date.'\
+                ' Please contact your Employer for assistance. You are eligible for employer benefits from ' + newly_designated_effective_on.strftime('%m/%d/%Y')
+        end
+      end
+
+      if @adapter.is_waiving?(params)
+        raise "Waive Coverage Failed" unless hbx_enrollment.save
+
         @adapter.assign_enrollment_to_benefit_package_assignment(@employee_role, hbx_enrollment)
         redirect_to waive_insured_plan_shopping_path(:id => hbx_enrollment.id, :waiver_reason => hbx_enrollment.waiver_reason)
         return
-      else
-        raise "Waive Coverage Failed"
       end
     end
 
