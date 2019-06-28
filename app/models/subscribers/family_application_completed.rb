@@ -160,15 +160,7 @@ module Subscribers
 
     def update_broker_for_family(family, npn)
       broker = BrokerRole.find_by_npn(npn)
-      if broker.present?
-        if broker.broker_agency_profile_id.present?
-          family.hire_broker_agency(broker.id)
-        else
-          throw(:processing_issue, "ERROR: Broker with npn: #{npn} has no broker agency profile id")
-        end
-      else
-        throw(:processing_issue, "ERROR: Failed to match broker with npn: #{npn}")
-      end
+      family.hire_broker_agency(broker.id) if broker.present? && broker.benefit_sponsors_broker_agency_profile_id.present?
     end
 
     def find_or_build_consumer_role(person)
