@@ -280,7 +280,7 @@ class Person
 
 
   def active_general_agency_staff_roles
-    general_agency_staff_roles.select(&:active?)
+    general_agency_staff_roles.where(:aasm_state => :active)
   end
 
   def has_active_general_agency_staff_role?
