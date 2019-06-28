@@ -1,18 +1,22 @@
-import { Component, Input } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, Injector, ElementRef } from '@angular/core';
 
 @Component({
   selector: 'admin-qle-deactivation-form',
   templateUrl: './qle_deactivation_form.component.html'
 })
 export class QleDeactivationFormComponent {
-  public parentForm: FormGroup;
-  public deactivateQleKindForm: FormGroup;
+  public qleToDeactivate : string | null = null;
+  constructor(injector: Injector, private _elementRef : ElementRef) {
 
+  }
   ngOnInit() {
-    var qle_deactivation_fields = new FormGroup({
-      start_on: new FormControl('', Validators.required),
-      end_on: new FormControl('', Validators.required),
-    });
+    var qleToDeactivateJson = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-qle-to-deactivate");
+    if (qleToDeactivateJson != null) {
+      this.qleToDeactivate = JSON.parse(qleToDeactivateJson)
+    }
+  }
+
+  submitDeactivation() {
+    alert("Submitted deactivation!")
   }
 }
