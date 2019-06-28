@@ -231,7 +231,7 @@ class QualifyingLifeEventKind
       return [] if role.blank?
 
       market_kind = 'shop'
-      market_kind = 'individual' if role.is_a?(ConsumerRole)
+      market_kind = 'individual' if role.is_a?(ConsumerRole) || role.is_a?(ResidentRole)
       market_kind = 'fehb' if role.is_a?(EmployeeRole) && role.employer_profile.is_a?(BenefitSponsors::Organizations::FehbEmployerProfile)
 
       if hbx_staff

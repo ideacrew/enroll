@@ -2,8 +2,8 @@ When(/^\w+ visits? the Insured portal during open enrollment$/) do
   visit "/"
   click_link 'Consumer/Family Portal'
   FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)
-  FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual")
-  FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date_and_first_month, market_kind: "individual")
+  FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual", market_kinds: ["individual"])
+  FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date_and_first_month, market_kind: "individual", market_kinds: ["individual"])
 
   Caches::PlanDetails.load_record_cache!
   screenshot("individual_start")
@@ -11,7 +11,7 @@ end
 
 When(/^\w+ visits? the Insured portal outside of open enrollment$/) do
   FactoryBot.create(:hbx_profile, :no_open_enrollment_coverage_period)
-  FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual")
+  FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual", market_kinds: ["individual"])
   Caches::PlanDetails.load_record_cache!
 
   visit "/"
@@ -623,7 +623,7 @@ end
 When(/consumer visits home page after successful ridp/) do
   user.identity_final_decision_code = "acc"
   user.save
-  FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual")
+  FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual", market_kinds: ["individual"])
   FactoryBot.create(:hbx_profile, :no_open_enrollment_coverage_period)
   visit "/families/home"
 end

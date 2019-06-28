@@ -69,7 +69,7 @@ module BenefitMarketWorld
     @qualifying_life_events ||= [
       :effective_on_event_date,
       :effective_on_first_of_month
-    ].map { |event_trait| FactoryBot.create(:qualifying_life_event_kind, event_trait, market_kind: "shop", post_event_sep_in_days: 90) }
+    ].map { |event_trait| FactoryBot.create(:qualifying_life_event_kind, event_trait, market_kind: "shop", market_kinds: ['shop'], post_event_sep_in_days: 90) }
   end
 
   def set_initial_application_dates(status)

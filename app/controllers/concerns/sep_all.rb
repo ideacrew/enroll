@@ -58,6 +58,8 @@ module SepAll
     end
 
     @qle = @qle_ivl  if consumer_role.present?
+    @qle ||= @qle_ivl
+
     @market = 'both' if consumer_role.present? && employee_roles.present?
   end
 

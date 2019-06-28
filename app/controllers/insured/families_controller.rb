@@ -376,8 +376,9 @@ class Insured::FamiliesController < FamiliesController
           @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role + '_admin' if @manually_picked_role
         end
       end
-    elsif @person.active_employee_roles.present? || @person.consumer_role.present?
-      @qualifying_life_events += QualifyingLifeEventKind.qualifying_life_events_for(@person.active_employee_roles.first || @person.consumer_role, current_user.has_hbx_staff_role?)
+    elsif @person.active_employee_roles.present? || @person.consumer_role.present? || @person.resident_role.present?
+      role = @person.active_employee_roles.first || @person.consumer_role || @person.resident_role
+      @qualifying_life_events += QualifyingLifeEventKind.qualifying_life_events_for(role, current_user.has_hbx_staff_role?)
     end
   end
 
