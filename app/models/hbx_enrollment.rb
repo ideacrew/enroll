@@ -1873,7 +1873,8 @@ class HbxEnrollment
   def composite_rated?
     return false if dental?
     return false if sponsored_benefit_package_id.blank?
-    sponsored_benefit.single_plan_type?
+    return false if sponsored_benefit.blank?
+    sponsored_benefit.single_plan_type? && sponsored_benefit.pricing_determinations.any?
   end
 
   # def ee_plan_selection_confirmation_sep_new_hire
