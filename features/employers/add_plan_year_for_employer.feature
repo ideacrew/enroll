@@ -1,18 +1,23 @@
 Feature: Add Plan Year For Employer
-#  Scenario: Setup site, employer, and benefit market
-#    Given a CCA site exists with a benefit market
-#    Given benefit market catalog exists for enrollment_open initial employer with health benefits
-#    Given the user is on the Employer Registration page
-#    And Jack Doe create a new account for employer
-#    And the user is registering a new Employer
-#    And all required fields have valid inputs on the Employer Registration Form
-#    And the user clicks the 'Confirm' button on the Employer Registration Form
-#    Then ACME Widgets, Inc. Employer visit the benefits page
-#    And Employer should see a button to create new plan year
-#    When Employer try to create plan year with less than 33% contribution for spouse, domestic partner and child under 26
-#    Then Employer can not create plan year
-#    When ACME Widgets, Inc. Employer visit the benefits page
-#    And Employer should see a button to create new plan year
-#    And ACME Widgets, Inc. should be able to set up benefit aplication
-#    And Employer should be able to enter plan year, benefits, relationship benefits for employer
-#    And Employer should see a success message after clicking on create plan year button
+  Scenario: Setup site, employer, and benefit market
+    Given a DC site exists with a benefit market
+    And there is an employer ABC Widgets
+    And ABC Widgets employer has a staff role
+    And staff role person logged in
+    And ABC Widgets is logged in and on the home page
+    And staff role person clicked on benefits tab
+    Then employer should see add plan year button
+    And employer clicked on add plan year button
+    Then employer should see continue button disabled
+    And employer filled all the fields on benefit application form
+    And employer clicked on continue button
+    Then employer should see form for benefit package
+    And employer filled all the fields on benefit package form
+    And employer selected by metal level plan offerings
+    Then employer should see gold metal level type
+    And employer clicked on gold metal level
+    Then employer should see create plan year button disabled
+    And employer selected contribution levels for the application
+    Then employer should see your estimated montly cost
+    And employer clicked on create plan year button
+    Then employer should see a draft benefit application

@@ -1,4 +1,5 @@
 module SiteWorld
+
   def site(*traits)
     attributes = traits.extract_options!
     @site ||= FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key, attributes)

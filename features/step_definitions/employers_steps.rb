@@ -575,6 +575,75 @@ Then /^employer should see Bulk Actions$/ do
   expect(page).to have_content "Bulk Actions"
 end
 
+Then /^employer should see add plan year button$/ do
+  expect(page).to have_content "Add Plan Year"
+end
+
+And /^employer clicked on add plan year button$/ do
+  find("#AddPlanYearBtn").click
+end
+
+Then /^employer should see continue button disabled$/ do
+  expect(find("#benefitContinueBtn")[:class].include?('disabled')).to eql true
+end
+
+And /^employer filled all the fields on benefit application form$/ do
+  find(:xpath, "/html/body/div[3]/div/div/div[2]/form/div/div/div/div/div[3]/div/div/div[1]/div/div[2]").click
+  find('li[data-index="1"]').click
+  fill_in 'benefit_application[fte_count]', with: 5
+  fill_in 'benefit_application[pte_count]', with: 5
+end
+
+And /^employer clicked on continue button$/ do
+  find("#benefitContinueBtn").click
+end
+
+And /^employer should see form for benefit package$/ do
+  expect(page).to have_content "Benefit Package - Set Up"
+end
+
+And /^employer filled all the fields on benefit package form$/ do
+  fill_in 'benefit_package[title]', with: "Benefit Package"
+  fill_in 'benefit_package[description]', with: "Benefit Package"
+end
+
+And /^employer selected by metal level plan offerings$/ do
+  find(".interaction-click-control-by-metal-level").click
+end
+
+Then /^employer should see gold metal level type$/ do
+  expect(page).to have_content("Gold")
+end
+
+And /^employer clicked on gold metal level$/ do
+  find("#benefit_package_sponsored_benefits_attributes_0_product_option_choice_gold", :visible => false).click
+end
+
+And /^employer selected contribution levels for the application$/ do
+  fill_in "benefit_package[sponsored_benefits_attributes][0][sponsor_contribution_attributes][contribution_levels_attributes][1][contribution_factor]", with: 100
+  fill_in "benefit_package[sponsored_benefits_attributes][0][sponsor_contribution_attributes][contribution_levels_attributes][2][contribution_factor]", with: 100
+  fill_in "benefit_package[sponsored_benefits_attributes][0][sponsor_contribution_attributes][contribution_levels_attributes][3][contribution_factor]", with: 100
+  fill_in "benefit_package[sponsored_benefits_attributes][0][sponsor_contribution_attributes][contribution_levels_attributes][4][contribution_factor]", with: 100
+  find_all('input[data-displayname="Child Under 26"]')[0].send_keys(:tab)
+end
+
+Then /^employer should see create plan year button disabled$/ do
+  expect(find("#submitBenefitPackage")[:class].include?('disabled')).to eql true
+end
+
+Then /^employer should see your estimated montly cost$/ do
+  expect(page).to have_content("Your Estimated Monthly Cost")
+end
+
+And /^employer clicked on create plan year button$/ do
+  find("#submitBenefitPackage").click
+end
+
+Then /^employer should see a draft benefit application$/ do
+  expect(page).to have_content("Benefit Package")
+  expect(page).to have_content("Draft")
+end
+
 And /^clicks on terminate employee$/ do
   expect(page).to have_content 'Employee Roster'
   employees.first

@@ -97,6 +97,10 @@ And(/^staff role person logged in$/) do
   login_as @staff_role
 end
 
+And /^staff role person clicked on (.*?) tab$/ do |key|
+  find(".interaction-click-control-#{key}").click
+end
+
 Given(/a consumer role person with family/) do
   person = people['Patrick Doe']
   @person = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, first_name: 'Employee', last_name: person[:last_name], ssn: person[:ssn], dob: person[:dob])
