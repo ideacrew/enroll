@@ -44,8 +44,10 @@ namespace :recurring do
         if relations.present?
           aged_off_dependents = relations.select{|dep| (new_date.month == (dep.relative.dob.month)) && (dep.relative.age_on(new_date.end_of_month) >= 26)}.flat_map(&:relative)
           next if aged_off_dependents.empty?
+
           dep_hbx_ids = aged_off_dependents.map(&:hbx_id)
-          event_name ="employee_notice_dependent_age_off_termination_non_congressional"
+          organization = employee_role.employer_profile.organization
+          event_name = organization.is_a_fehb_profile? ? "employee_notice_dependent_age_off_termination_congressional" : "employee_notice_dependent_age_off_termination_non_congressional"
           observer = BenefitSponsors::Observers::NoticeObserver.new
           observer.deliver(recipient: employee_role, event_object: employee_role.census_employee, notice_event: event_name,  notice_params: {dep_hbx_ids: dep_hbx_ids})
           puts "Delivered employee_dependent_age_off_termination notice to #{employee_role.census_employee.full_name}" unless Rails.env.test?

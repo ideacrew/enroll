@@ -42,7 +42,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::ApplicationCoverageSelected', :dbc
       end
     end
 
-    context "NoticeTrigger" do
+    context "NoticeTrigger for non_congress employers" do
       subject { BenefitSponsors::Observers::NoticeObserver.new }
       let(:model_event) { ::BenefitSponsors::ModelEvents::ModelEvent.new(:application_coverage_selected, model_instance, {}) }
 
@@ -54,6 +54,33 @@ RSpec.describe 'BenefitSponsors::ModelEvents::ApplicationCoverageSelected', :dbc
 
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employer.employee_mid_year_plan_change_non_congressional_notice"
+          expect(payload[:employer_id]).to eq model_instance.employer_profile.hbx_id.to_s
+          expect(payload[:event_object_kind]).to eq 'HbxEnrollment'
+          expect(payload[:event_object_id]).to eq model_instance.id.to_s
+        end
+        expect(subject.notifier).to receive(:notify) do |event_name, payload|
+          expect(event_name).to eq "acapi.info.events.employee.employee_plan_selection_confirmation_sep_new_hire"
+          expect(payload[:employee_role_id]).to eq model_instance.employee_role.id.to_s
+          expect(payload[:event_object_kind]).to eq 'HbxEnrollment'
+          expect(payload[:event_object_id]).to eq model_instance.id.to_s
+        end
+        subject.process_enrollment_events(model_instance, model_event)
+      end
+    end
+
+    context "NoticeTrigger for congress employers" do
+      subject { BenefitSponsors::Observers::NoticeObserver.new }
+      let(:model_event) { ::BenefitSponsors::ModelEvents::ModelEvent.new(:application_coverage_selected, model_instance, {}) }
+
+      it "should trigger notice event" do
+        allow(model_instance).to receive(:is_shop?).and_return(true)
+        allow(model_instance).to receive(:enrollment_kind).and_return('special_enrollment')
+        allow(model_instance).to receive(:census_employee).and_return(census_employee)
+        allow(census_employee).to receive(:employee_role).and_return(employee_role)
+        allow(model_instance.employer_profile.organization).to receive(:is_a_fehb_profile?).and_return(true)
+
+        expect(subject.notifier).to receive(:notify) do |event_name, payload|
+          expect(event_name).to eq "acapi.info.events.employer.employee_mid_year_plan_change_congressional_notice"
           expect(payload[:employer_id]).to eq model_instance.employer_profile.hbx_id.to_s
           expect(payload[:event_object_kind]).to eq 'HbxEnrollment'
           expect(payload[:event_object_id]).to eq model_instance.id.to_s

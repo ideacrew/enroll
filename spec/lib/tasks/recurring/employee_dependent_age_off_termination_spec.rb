@@ -1,14 +1,17 @@
 require 'rails_helper'
 require 'rake'
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application"
 
 describe 'recurring:employee_dependent_age_off_termination', :dbclean => :after_each do
+  include_context "setup benefit market with market catalogs and product packages"
+  include_context "setup initial benefit application"
+
   let!(:person) { FactoryBot.create(:person) }
-  let(:employer_profile) { FactoryBot.create(:employer_profile) }
-  let(:employee_role) {FactoryBot.create(:employee_role, person: person, employer_profile: employer_profile, benefit_group_id: active_benefit_group.id)}
-  let!(:census_employee) { FactoryBot.create(:census_employee, aasm_state: "eligible", employee_role_id: employee_role.id,) }
-  let(:plan_year) {FactoryBot.create(:plan_year, employer_profile: employer_profile, :aasm_state => 'active')}
-  let!(:active_benefit_group) { FactoryBot.create(:benefit_group, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
-  let!(:benefit_group_assignment)  { FactoryBot.create(:benefit_group_assignment, benefit_group: active_benefit_group, census_employee: census_employee) }
+  let!(:census_employee)  { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile, active_benefit_group_assignment: current_benefit_package.id) }
+  let!(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: abc_profile.id)}
+
+  let!(:benefit_group_assignment)  { census_employee.active_benefit_group_assignment }
   let!(:person2) { FactoryBot.create(:person, dob: TimeKeeper.date_of_record - 30.years) }
   let!(:person3) { FactoryBot.create(:person, dob: TimeKeeper.date_of_record - 30.years) }
   let!(:family) {
@@ -21,6 +24,7 @@ describe 'recurring:employee_dependent_age_off_termination', :dbclean => :after_
                 family.save!
                 family
               }
+
   let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: family.households.first, kind: "employer_sponsored", aasm_state: "coverage_selected", benefit_group_assignment_id: benefit_group_assignment.id) }
   let!(:hbx_enrollment_member1){ FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: hbx_enrollment, applicant_id: family.family_members[0].id, eligibility_date: TimeKeeper.date_of_record.prev_month) }
   let!(:hbx_enrollment_member2){ FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: hbx_enrollment, applicant_id: family.family_members[1].id, eligibility_date: TimeKeeper.date_of_record.prev_month, is_subscriber: false) }
@@ -45,6 +49,5 @@ describe 'recurring:employee_dependent_age_off_termination', :dbclean => :after_
       Rake::Task["recurring:dependent_age_off_termination_notification_manual"].invoke(person.hbx_id)
     end
   end
-
-
 end
+
