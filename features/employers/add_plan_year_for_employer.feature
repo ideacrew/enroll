@@ -1,10 +1,14 @@
 Feature: Add Plan Year For Employer
-  Scenario: Setup site, employer, and benefit market
+
+  Background: Setup site, employer
     Given a DC site exists with a benefit market
+    Given benefit market catalog exists for enrollment_open initial employer with health benefits
     And there is an employer ABC Widgets
     And ABC Widgets employer has a staff role
     And staff role person logged in
-    And ABC Widgets is logged in and on the home page
+
+  Scenario: adding a new plan year
+    When ABC Widgets is logged in and on the home page
     And staff role person clicked on benefits tab
     Then employer should see add plan year button
     And employer clicked on add plan year button
