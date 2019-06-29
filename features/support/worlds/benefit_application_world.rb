@@ -183,7 +183,7 @@ And(/^initial employer (.*) has (.*) benefit application$/) do |legal_name, new_
   create_application(new_application_status: new_application_status.to_sym)
 end
 
-And(/^employer (.*) has (.*) benefit application with (.*) plan options$/) do |legal_name, new_application_status, plan_option|
+And(/^initial employer (.*) has (.*) benefit application with (.*) plan options$/) do |legal_name, new_application_status, plan_option|
   @package_kind = plan_option.downcase.gsub(/\s/, '_')
   @employer_profile = employer_profile(legal_name)
   create_application(new_application_status: new_application_status.to_sym)
