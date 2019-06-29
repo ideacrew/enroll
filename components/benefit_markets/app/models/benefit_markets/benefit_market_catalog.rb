@@ -55,6 +55,7 @@ module BenefitMarkets
 
     validate :validate_probation_periods
     validate :unique_application_period_range
+    delegate :kind, to: :benefit_market, allow_nil: false
 
     scope :by_application_date,     ->(date){ where(:"application_period.min".lte => date, :"application_period.max".gte => date) }
 

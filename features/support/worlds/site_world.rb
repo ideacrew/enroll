@@ -1,6 +1,7 @@
 module SiteWorld
-  def site
-    @site ||= FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key)
+  def site(*traits)
+    attributes = traits.extract_options!
+    @site ||= FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key, attributes)
   end
 
   def reset_product_cache
@@ -20,4 +21,11 @@ Given(/^a (.*?) site exists with a benefit market$/) do |key|
   make_all_permissions
   generate_sic_codes
 end
+
+Given(/^a (.*?) site exists with a fehb benefit market$/) do |_key|
+  site kind: :fehb
+  make_all_permissions
+  generate_sic_codes
+end
+
 

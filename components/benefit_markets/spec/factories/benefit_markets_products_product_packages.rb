@@ -33,23 +33,25 @@ FactoryBot.define do
         product_package.products = BenefitMarkets::Products::HealthProducts::HealthProduct.by_product_package(product_package).to_a
         if product_package.products.blank?
           product_package.products = create_list(:benefit_markets_products_health_products_health_product,
-            evaluator.number_of_products,
-            application_period: product_package.application_period,
-            product_package_kinds: [ product_package.package_kind ],
-            service_area: service_area,
-            issuer_profile_id: evaluator.issuer_profile.try(:id),
-            metal_level_kind: :gold)
+                                                 evaluator.number_of_products,
+                                                 benefit_market_kind: product_package.benefit_kind,
+                                                 application_period: product_package.application_period,
+                                                 product_package_kinds: [product_package.package_kind],
+                                                 service_area: service_area,
+                                                 issuer_profile_id: evaluator.issuer_profile.try(:id),
+                                                 metal_level_kind: :gold)
         end
       when :dental
         product_package.products = BenefitMarkets::Products::DentalProducts::DentalProduct.by_product_package(product_package).to_a
         if product_package.products.blank?
           product_package.products = create_list(:benefit_markets_products_dental_products_dental_product,
-            evaluator.number_of_products,
-            application_period: product_package.application_period,
-            product_package_kinds: [ product_package.package_kind ],
-            service_area: service_area,
-            issuer_profile_id: evaluator.issuer_profile.try(:id),
-            metal_level_kind: :dental)
+                                                 evaluator.number_of_products,
+                                                 benefit_market_kind: product_package.benefit_kind,
+                                                 application_period: product_package.application_period,
+                                                 product_package_kinds: [product_package.package_kind],
+                                                 service_area: service_area,
+                                                 issuer_profile_id: evaluator.issuer_profile.try(:id),
+                                                 metal_level_kind: :dental)
         end
       end
     end

@@ -7,11 +7,11 @@ FactoryBot.define do
     description { "Health Insurance Marketplace for District Employers and Employees" }
 
     after :build do |benefit_market|
-      if benefit_market.kind == :aca_shop
-        benefit_market.configuration = build :benefit_markets_aca_shop_configuration
-      else
-        benefit_market.configuration = build :benefit_markets_aca_individual_configuration
-      end
+      benefit_market.configuration = if [:aca_shop, :fehb].include?(benefit_market.kind)
+                                       build(:benefit_markets_aca_shop_configuration)
+                                     else
+                                       build(:benefit_markets_aca_individual_configuration)
+                                     end
     end
 
     trait :with_site do

@@ -51,6 +51,11 @@ And(/^there is an employer (.*?)$/) do |legal_name|
   benefit_sponsorship(employer(legal_name))
 end
 
+And(/^there is an fehb employer (.*?)$/) do |legal_name|
+  employer legal_name, :with_fehb_employer_profile, legal_name: legal_name, dba: legal_name
+  benefit_sponsorship(employer(legal_name))
+end
+
 And(/^it has an employer (.*?) with no attestation submitted$/) do |legal_name|
   employer legal_name, :with_aca_shop_cca_employer_profile_no_attestation, legal_name: legal_name, dba: legal_name
   benefit_sponsorship(employer(legal_name))

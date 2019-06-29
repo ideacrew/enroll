@@ -749,6 +749,19 @@ And (/(.*) should see the plans from the (.*) plan year$/) do |named_person, pla
   end
 end
 
+Then(/(.*?) should see (.*?) page with (.*?) plan year start as coverage effective date/) do |_named_person, screen, status|
+  @applications_by_state ||= {}
+  @applications_by_state[status] ||= benefit_sponsorship.benefit_applications.where(aasm_state: status).first
+  start_on = @applications_by_state[status].start_on
+  find('.coverage_effective_date', text: start_on.strftime("%m/%d/%Y"), wait: 5)
+
+  if screen == "coverage summary"
+    find('.interaction-click-control-confirm').click
+  else
+    click_link "CONTINUE"
+  end
+end
+
 When(/^.+ selects? a plan on the plan shopping page$/) do
   find_all('.interaction-click-control-select-plan', wait: 5)[0].click
 end

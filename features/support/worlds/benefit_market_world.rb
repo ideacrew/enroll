@@ -102,6 +102,7 @@ module BenefitMarketWorld
     health_issuers.each do |issuer_name|
       create_list(:benefit_markets_products_health_products_health_product,
                   3,
+                  benefit_market_kind: benefit_market.kind,
                   application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
                   product_package_kinds: [:single_issuer, :metal_level, :single_product],
                   service_area: service_area,
@@ -114,6 +115,7 @@ module BenefitMarketWorld
   def dental_products
     create_list(:benefit_markets_products_dental_products_dental_product,
                 5,
+                benefit_market_kind: benefit_market.kind,
                 application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
                 product_package_kinds: [:single_product],
                 service_area: service_area,
