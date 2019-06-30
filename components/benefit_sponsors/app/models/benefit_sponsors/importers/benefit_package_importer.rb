@@ -139,12 +139,14 @@ module BenefitSponsors
       def probation_period_kind_for(effective_on_kind, effective_on_offset)
         if effective_on_kind == 'first_of_month'
           case effective_on_offset
-          when 0
-            :first_of_month
-          when 30
-            :first_of_month_after_30_days
-          when 60
-            :first_of_month_after_60_days
+            when 0
+              :first_of_month
+            when 1
+              :first_of_month_following
+            when 30
+              :first_of_month_after_30_days
+            when 60
+              :first_of_month_after_60_days
           end
         elsif effective_on_kind == 'date_of_hire'
           :date_of_hire

@@ -163,7 +163,7 @@ class MigrateDcBenefitApplication < Mongoid::Migration
       params = sanitize_benefit_group_attrs(benefit_group)
       importer = BenefitSponsors::Importers::BenefitPackageImporter.call(@benefit_application, params)
       raise Standard, "Benefit Package creation failed" if importer.benefit_package.blank?
-      importer.benefit_package.probation_period_kind = :date_of_hire if benefit_group.effective_on_kind == "first_of_month" && benefit_group.effective_on_offset == 1
+      # importer.benefit_package.probation_period_kind = :date_of_hire if benefit_group.effective_on_kind == "first_of_month" && benefit_group.effective_on_offset == 1
       # ^^ exception case for ["100102","100101","118510","245011","179334","1051104","1051260","1051300","1051569","1051885","1051889","1052163"]
       @benefit_package_map[benefit_group.id] = importer.benefit_package.id
     end
