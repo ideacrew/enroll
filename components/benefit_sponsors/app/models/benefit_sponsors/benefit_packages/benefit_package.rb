@@ -52,9 +52,13 @@ module BenefitSponsors
       end
 
       def eligible_on(date_of_hire) # date_of_hire probation type is deprecated
-        return (date_of_hire + effective_on_offset.days) if (date_of_hire + effective_on_offset.days).day == 1
+        if effective_on_offset == 1
+          date_of_hire.end_of_month + 1.day
+        else
+          return (date_of_hire + effective_on_offset.days) if (date_of_hire + effective_on_offset.days).day == 1
 
-        (date_of_hire + effective_on_offset.days).end_of_month + 1.day
+          (date_of_hire + effective_on_offset.days).end_of_month + 1.day
+        end
       end
 
       def effective_on_for(date_of_hire)
@@ -102,9 +106,9 @@ module BenefitSponsors
         effective_on_kind_mapping = {
           date_of_hire: 'date_of_hire',
           first_of_month: 'first_of_month',
+          first_of_month_following: 'first_of_month',
           first_of_month_after_30_days: 'first_of_month',
           first_of_month_after_60_days: 'first_of_month'
-
         }
 
         effective_on_kind_mapping[probation_period_kind]
@@ -112,7 +116,9 @@ module BenefitSponsors
 
       def effective_on_offset
         offset_mapping = {
+          date_of_hire: 0,
           first_of_month: 0,
+          first_of_month_following: 1,
           first_of_month_after_30_days: 30,
           first_of_month_after_60_days: 60
         }
@@ -180,7 +186,9 @@ module BenefitSponsors
 
       def probation_period_display_name
         probation_period_display_texts = {
+          date_of_hire: "Date of hire",
           first_of_month: "First of the month following or coinciding with date of hire",
+          first_of_month_following: "First of the month following date of hire",
           first_of_month_after_30_days: "First of the month following 30 days",
           first_of_month_after_60_days: "First of the month following 60 days"
         }
