@@ -2515,8 +2515,9 @@ describe PlanYear, '.terminate_employee_benefit_packages', type: :model, dbclean
   let(:benefit_group_assignment1) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group, end_on: plan_year.end_on)}
   let!(:census_employee) { FactoryGirl.create(:census_employee, benefit_group_assignments: [benefit_group_assignment1],employee_role_id: employee_role1.id,employer_profile_id: employer_profile.id) }
   let(:new_end_on) { TimeKeeper.date_of_record.prev_day }
-  let!(:enrollment) { FactoryGirl.create(:hbx_enrollment, effective_on: start_on, employee_role_id: employee_role1.id, household: family.active_household, benefit_group_id: benefit_group.id, aasm_state: 'coverage_selected', employee_role: census_employee.employee_role)}
   let!(:census_employee1){FactoryGirl.create(:census_employee, :termination_details, benefit_group_assignments: [benefit_group_assignment1],employee_role_id: employee_role1.id,employer_profile_id: employer_profile.id)}
+  let!(:enrollment) { FactoryGirl.create(:hbx_enrollment, effective_on: start_on, employee_role_id: employee_role1.id, household: family.active_household, benefit_group_id: benefit_group.id, aasm_state: 'coverage_selected', employee_role: census_employee.employee_role)}
+
   before do
     employee_role1.census_employee = census_employee
     employee_role1.save

@@ -1099,8 +1099,8 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     let(:permission) { double(can_extend_open_enrollment: true) }
     let(:hbx_staff_role) { double("hbx_staff_role", permission: permission)}
     let(:hbx_profile) { double("HbxProfile")}
-    let(:employer_profile) { double(plan_years: plan_years) }
-    let(:plan_years) { [ double ]}
+    let(:employer_profile){FactoryGirl.create(:employer_with_planyear)}
+    let(:plan_years) { employer_profile.plan_years}
 
     before :each do
       allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
@@ -1113,15 +1113,14 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
     context '.close_extended_open_enrollment' do
       let(:plan_year) { plan_years.first }
-
       before do
         allow(plan_years).to receive(:find).and_return(plan_year)
         allow(plan_year).to receive(:end_open_enrollment).and_return(true)
+        employer_profile.update_attributes!(aasm_state: "registered")
       end
 
       it "renders index" do
         post :close_extended_open_enrollment
-
         expect(response).to have_http_status(:redirect)
         expect(response).to redirect_to(exchanges_hbx_profiles_root_path)
         expect(flash[:success]).to match("Successfully closed employer(s) open enrollment.")

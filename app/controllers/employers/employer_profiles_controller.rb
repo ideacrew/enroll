@@ -12,8 +12,8 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   around_action :wrap_in_benefit_group_cache, only: [:show]
   skip_before_action :verify_authenticity_token, only: [:show], if: :check_origin?
   before_action :updateable?, only: [:create, :update]
-  before_action :modify_admin_tabs?, only: %i[terminate_employee_roster_enrollments]
   before_action :wells_fargo_sso, only: [:show]
+  before_action :modify_admin_tabs?, only: %i[terminate_employee_roster_enrollments]
   layout "two_column", except: [:new]
 
   def link_from_quote
@@ -337,10 +337,6 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   private
 
-  def modify_admin_tabs?
-    authorize EmployerProfile, :modify_admin_tabs?
-  end
-
   def wells_fargo_sso
     id_params = params.permit(:id, :employer_profile_id, :tab)
     id = id_params[:id] || id_params[:employer_profile_id]
@@ -363,6 +359,10 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     if @payments = @employer_profile.premium_payments
       @payments = @payments.order_by(:paid_on => 'desc').skip((page_no.to_i - 1)*10).limit(10)
     end
+  end
+
+  def modify_admin_tabs?
+    authorize EmployerProfile, :modify_admin_tabs?
   end
 
   def updateable?

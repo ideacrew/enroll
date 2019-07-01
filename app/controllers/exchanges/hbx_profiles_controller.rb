@@ -49,6 +49,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   def close_extended_open_enrollment
     authorize HbxProfile, :can_extend_open_enrollment?
     @plan_year = @employer_profile.plan_years.find(params[:plan_year_id])
+    @employer_profile.enrollment_ratified!
     @plan_year.end_open_enrollment(TimeKeeper.date_of_record)
     redirect_to exchanges_hbx_profiles_root_path, :flash => { :success => "Successfully closed employer(s) open enrollment." }
   end
