@@ -14,10 +14,12 @@ When(/^hbx admin uploads application document and verifies application$/) do
   wait_for_ajax(2)
   expect(page).to have_content('File Saved')
   expect(page).to have_content('In Review')
-  find(:xpath, "/html/body/div[2]/div[3]/div/div/div[1]/div[2]/div/div/div/div[2]/div[5]/div/div[4]/div/div[2]").click
+  within('#Application') do
+    find('.label', :text => 'Action').click
+  end
   find('.interaction-choice-control-verification-reason-1').click
-  find('.interaction-choice-control-verification-reason', :text => /\ASelect Reason\z/).click
-  select('Document in EnrollApp', :from => 'verification_reason')
+  find('.selectric-interaction-choice-control-verification-reason').click
+  find('li', :text => 'Document in EnrollApp').click
   find('.v-type-confirm-button').click
 
   expect(page).to have_content('Application successfully verified.')
@@ -60,10 +62,9 @@ When(/^clicks on Individual in Families tab$/) do
   login_as hbx_admin
   visit exchanges_hbx_profiles_root_path
   find(:xpath, "//li[contains(., '#{"Families"}')]", :wait => 10).click
-  find(:xpath,'//*[@id="myTab"]/li[2]/ul/li[1]/a/span[1]', :wait => 10).trigger('click')
-  wait_for_ajax(10,2)
+  find('li', :text => 'Families', :class => 'tab-second', :wait => 10).click
   family_member = find('a', :text => /\AJohn Smith\z/)
-  family_member.trigger("click")
+  family_member.click
   expect(page).to have_content('Identity')
 end
 
