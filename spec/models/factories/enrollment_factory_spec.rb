@@ -352,7 +352,7 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
       end
     end
   end
-  
+
   describe ".add_employee_role" do
     context "when employee has existing consumer_role" do
       let(:census_employee) {FactoryBot.create(:census_employee, employer_profile_id: employer_profile.id)}
@@ -371,11 +371,11 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
         PlanYear.find(plan_year.id).update_attributes({:aasm_state => 'published'})
         existing_person.consumer_role.update_attributes(:contact_method => 'Paper Only')
       end
-          
-        it "updates employee role contact method to match consumer role" do
-          @employee_role, @family = Factories::EnrollmentFactory.add_employee_role(**params)
-          expect(@employee_role.contact_method).to eq(existing_person.consumer_role.contact_method)
-        end
+
+      it "updates employee role contact method to match consumer role" do
+        @employee_role, @family = Factories::EnrollmentFactory.add_employee_role(**params)
+        expect(@employee_role.contact_method).to eq(existing_person.consumer_role.contact_method)
+      end
     end
   end
 
