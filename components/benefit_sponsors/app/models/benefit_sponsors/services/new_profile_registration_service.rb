@@ -255,7 +255,7 @@ module BenefitSponsors
 
       def is_general_agency_staff_for_employer?(user, form)
         person = user.person
-        staff_roles = person.general_agency_staff_roles
+        staff_roles = person.active_general_agency_staff_roles
         return false unless staff_roles.present?
         profile = load_profile
         if staff_roles
