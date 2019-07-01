@@ -291,14 +291,14 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
         expect(person.addresses.count).to eq 2
       end
     end
-    
-    context "updates active employee roles if active employee roles are present for dual roles" do 
+
+    context "updates active employee roles if active employee roles are present for dual roles" do
       before :each do
         allow(controller).to receive(:update_vlp_documents).and_return(true)
         allow(person).to receive(:employee_roles).and_return [employee_role]
         put :update, params: { person: person_params, id: "test" }
-      end 
-      
+      end
+
       it "should update employee role contact method" do
         expect(person.consumer_role.contact_method).to eq(person.employee_roles.first.contact_method)
       end
