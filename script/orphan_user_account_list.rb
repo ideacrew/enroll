@@ -27,8 +27,8 @@
           user.oim_id,
           user.email
         ]
-
-      processed_count += 1
+        processed_count += 1
+      end
     end
     puts "#{processed_count} orphan user listed in #{file_name}" unless Rails.env.test?
   end
