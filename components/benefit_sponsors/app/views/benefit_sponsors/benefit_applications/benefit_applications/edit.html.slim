@@ -31,7 +31,7 @@
             td
               header
                 | Coverage Year
-            td #{benefit_package_form.catalog.effective_period}
+            td #{benefit_package_form.catalog.effective_period.min.to_date.to_formatted_s :long_ordinal} - #{benefit_package_form.catalog.effective_period.max.to_date.to_formatted_s :long_ordinal}
           tr
             td
               header
