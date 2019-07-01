@@ -21,7 +21,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
   let(:person){ FactoryBot.build(:person) }
   let(:family){ double("Family") }
   let(:family_member){ double("FamilyMember") }
-  let(:consumer_role){ FactoryBot.build(:consumer_role) }
+  let(:consumer_role){ FactoryBot.build(:consumer_role, :contact_method => "Paper Only") }
   let(:bookmark_url) {'localhost:3000'}
 
   before do
@@ -253,8 +253,12 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
   context "PUT update" do
     let(:addresses_attributes) { {"0"=>{"kind"=>"home", "address_1"=>"address1_a", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"22211", "id"=> person.addresses[0].id.to_s},
     "1"=>{"kind"=>"mailing", "address_1"=>"address1_b", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"22211", "id"=> person.addresses[1].id.to_s} } }
+    let(:consumer_role_attributes) {consumer_role.attributes.to_hash }
     let(:person_params){{"family"=>{"application_type"=>"Phone"}, "dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"468389102","user_id"=>"xyz", us_citizen:"true", naturalized_citizen: "true"}}
     let(:person){ FactoryBot.create(:person, :with_family) }
+    let(:census_employee){FactoryBot.build(:census_employee)}
+    let(:employee_role){FactoryBot.build(:employee_role, :census_employee => census_employee)}
+
 
     before(:each) do
       allow(ConsumerRole).to receive(:find).and_return(consumer_role)
@@ -263,6 +267,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       allow(user).to receive(:person).and_return person
       allow(person).to receive(:consumer_role).and_return consumer_role
       person_params[:addresses_attributes] = addresses_attributes
+      person_params[:consumer_role_attributes] = consumer_role_attributes
       sign_in user
     end
 
@@ -286,6 +291,19 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
         expect(person.addresses.count).to eq 2
       end
     end
+    
+    context "updates active employee roles if active employee roles are present for dual roles" do 
+      before :each do
+        allow(controller).to receive(:update_vlp_documents).and_return(true)
+        allow(person).to receive(:employee_roles).and_return [employee_role]
+        put :update, params: { person: person_params, id: "test" }
+      end 
+      
+      it "should update employee role contact method" do
+        expect(person.consumer_role.contact_method).to eq(person.employee_roles.first.contact_method)
+      end
+    end
+
 
     it "should update existing person" do
       allow(consumer_role).to receive(:update_by_person).and_return(true)
