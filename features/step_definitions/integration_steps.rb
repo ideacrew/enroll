@@ -880,7 +880,6 @@ And(/^clicks on the person in families tab$/) do
   find('#families', wait: 5).click
   family_member = page.find('a', :text => "#{user.person.full_name}")
   family_member.click
-  visit verification_insured_families_path
   find(".interaction-click-control-documents", wait: 5).click
 end
 
