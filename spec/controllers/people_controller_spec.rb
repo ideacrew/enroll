@@ -68,7 +68,7 @@ RSpec.describe PeopleController, dbclean: :after_each do
         expect(person.addresses).not_to eq []
       end
     end
-    
+
     context "employee roles are updated" do
       it "should update active employee role's contact method to match consumer role contact method" do
         expect(person.consumer_role.contact_method).to eq(person.employee_roles.first.contact_method)
