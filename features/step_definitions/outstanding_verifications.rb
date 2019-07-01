@@ -20,10 +20,9 @@ When(/^Admin clicks Outstanding Verifications$/) do
 end
 
 When(/^Admin clicks Families tab$/) do
-  page.find('.families.dropdown-toggle.interaction-click-control-families').click
-  within('.dropdown-menu') do
-    find('.interaction-click-control-families').click
-  end
+  visit exchanges_hbx_profiles_root_path
+  find(:xpath, "//li[contains(., 'Families')]", :wait => 10).click
+  find('li', :text => 'Families', :class => 'tab-second', :wait => 10).click
 end
 
 Then(/^the Admin is navigated to the Families screen$/) do
