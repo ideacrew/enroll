@@ -395,7 +395,7 @@ end
 
 Then(/^(?:.+) should see a successful sign up message$/) do
   FactoryBot.create(:sic_code, sic_code: "0111")
-  expect(page).to have_content("Welcome!")
+  expect(page).to have_content("Welcome to DC Health Link")
   screenshot("employer_sign_up_welcome")
 end
 
@@ -881,7 +881,7 @@ And(/^clicks on the person in families tab$/) do
   family_member = page.find('a', :text => "#{user.person.full_name}")
   family_member.click
   visit verification_insured_families_path
-  find(:xpath, "//ul/li/a[contains(@class, 'interaction-click-control-documents')]").click
+  find(".interaction-click-control-documents", wait: 5).click
 end
 
 When(/^.+ clicks? on the tab for (.+)$/) do |tab_name|
