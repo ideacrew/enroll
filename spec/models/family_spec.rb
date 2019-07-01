@@ -486,9 +486,8 @@ describe Family, dbclean: :around_each do
 
       it "when original terminate date before hbx effective_on" do
         allow(family).to receive(:latest_shop_sep).and_return normal_sep
-        allow(normal_sep).to receive(:qle_on).and_return date.end_of_month
         allow(hbx).to receive(:effective_on).and_return (date.end_of_month)
-        expect(family.terminate_date_for_shop_by_enrollment(hbx)).to eq (TimeKeeper.date_of_record.end_of_month)
+        expect(family.terminate_date_for_shop_by_enrollment(hbx)).to eq normal_sep.qle_on.end_of_month
       end
 
       it "when qle_on is less than hbx effective_on" do
