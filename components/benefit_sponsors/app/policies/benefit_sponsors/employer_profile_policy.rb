@@ -43,7 +43,7 @@ module BenefitSponsors
     end
 
     def is_general_agency_staff_for_employer?(profile)
-      staff_roles = user.person.general_agency_staff_roles
+      staff_roles = user.person.active_general_agency_staff_roles
       if staff_roles
         ga_profiles = staff_roles.map(&:benefit_sponsors_general_agency_profile_id)
         return false if profile.general_agency_accounts.blank?
