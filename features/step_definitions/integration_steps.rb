@@ -925,6 +925,7 @@ When(/^I select a past qle date$/) do
   expect(page).to have_content "Married"
   screenshot("past_qle_date")
   fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
+  click_link((TimeKeeper.date_of_record - 5.days).day)
   within '#qle-date-chose' do
     click_link "CONTINUE"
   end
