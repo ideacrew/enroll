@@ -52,9 +52,9 @@
         <td>
           <p>
             <% if sponsored_benefit.product_package_kind == :single_issuer %>
-              One Carrier
+              All plans from a given carrier
             <% elsif sponsored_benefit.product_package_kind == :metal_level %>
-              One Level
+              All plans with a given metal level
             <% elsif sponsored_benefit.product_package_kind == :single_product %>
               A Single Plan
              <% elsif sponsored_benefit.product_package_kind == :multi_product %>
