@@ -55,7 +55,8 @@ module Effective
       def collection
         return @collection if defined? @collection
         @employer_profile = BenefitSponsors::Organizations::Profile.find(attributes[:id])
-        return BenefitSponsors::LegacyCoverageReportAdapter.new([]) if @employer_profile.nil?
+        return BenefitSponsors::LegacyCoverageReportAdapter.new([]) if (@employer_profile.nil? || @employer_profile.is_a_fehb_profile?)
+
         query = BenefitSponsors::Queries::CoverageReportsQuery.new(@employer_profile, attributes[:billing_date])
         @products_hash ||= load_products
         @collection = query.execute
