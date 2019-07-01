@@ -1,14 +1,14 @@
 FactoryBot.define do
   factory :sponsored_benefits_email, class: 'SponsoredBenefits::Email' do
-    kind 'home'
+    kind { 'home' }
     sequence(:address) { |n| "example#{n}@example.com" }
 
     trait :without_email_type do
-      kind ' '
+      kind { ' ' }
     end
 
     trait :without_email_address do
-      kind ' '
+      kind { ' ' }
     end
 
     factory :sponsored_benefits_invalid_email, traits: [:without_email_type, :without_email_address]
