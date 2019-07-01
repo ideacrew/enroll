@@ -46,9 +46,22 @@ FactoryBot.define do
       issuer_profile { create(:benefit_sponsors_organizations_issuer_profile, assigned_site: assigned_site) }
     end
 
+    trait :ivl_product do
+      benefit_market_kind  { :aca_individual }
+    end
+
+    trait :next_year do
+      application_period do
+        year = Time.zone.today.next_year.year
+        Date.new(year, 1, 1)..Date.new(year, 12, 31)
+      end
+    end
+
     after(:build) do |product, evaluator|
       product.premium_tables << build_list(:benefit_markets_products_premium_table, 1, effective_period: product.application_period)
     end
 
+    factory :active_individual_dental_product,       traits: [:ivl_product]
+    factory :renewal_individual_dental_product,      traits: [:ivl_product, :next_year]
   end
 end

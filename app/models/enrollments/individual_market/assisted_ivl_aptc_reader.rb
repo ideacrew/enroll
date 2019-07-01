@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Enrollments::IndividualMarket::AssistedIvlAptcReader
   require 'csv'
 
@@ -10,14 +12,8 @@ class Enrollments::IndividualMarket::AssistedIvlAptcReader
 
     CSV.foreach(file_name, headers: true, header_converters: :symbol) do |row|
       row_hash = row.to_hash
-
-      if row_hash[:ssn].present? && row_hash[:ssn] != '#N/A' && row_hash[:ssn] != "0"
-        person = Person.by_ssn(row_hash[:ssn]).first
-      end
-
-      if person.blank? && row_hash[:hbx_id].present?
-        person = Person.by_hbx_id(row_hash[:hbx_id]).first
-      end
+      person = Person.by_ssn(row_hash[:ssn]).first if row_hash[:ssn].present? && row_hash[:ssn] != '#N/A' && row_hash[:ssn] != "0"
+      person = Person.by_hbx_id(row_hash[:hbx_id]).first if person.blank? && row_hash[:hbx_id].present?
 
       if person.blank?
         family = Family.where(:e_case_id => /#{row_hash[:icacaseref]}/i).first
@@ -27,15 +23,15 @@ class Enrollments::IndividualMarket::AssistedIvlAptcReader
       next if person.blank?
 
       @all_assisted_individuals[person.hbx_id] = {
-        applied_percentage: row_hash[:applied_pct], 
-        applied_aptc: row_hash[:"#{calender_year}_applied"], 
+        applied_percentage: row_hash[:applied_pct],
+        applied_aptc: row_hash[:"#{calender_year}_applied"],
         csr_amt: row_hash[:"#{calender_year}_csr"]
       }
     end
   end
 
   def call
-    file_name = "#{Rails.root}/pids/2018_FA_Renewals.csv"
+    file_name = "#{Rails.root}/pids/#{calender_year}_FA_Renewals.csv"
     @assisted_individuals = {}
 
     CSV.foreach(file_name, headers: true, header_converters: :symbol) do |row|
@@ -47,10 +43,10 @@ class Enrollments::IndividualMarket::AssistedIvlAptcReader
         row_hash[:"#{calender_year}_applied"] = "0"
         row_hash[:"#{calender_year}_csr"] = "0"
       end
-     
+
       @assisted_individuals[row_hash[:subscriber]] = {
-        applied_percentage: row_hash[:applied_pct], 
-        applied_aptc: row_hash[:"#{calender_year}_applied"], 
+        applied_percentage: row_hash[:applied_pct],
+        applied_aptc: row_hash[:"#{calender_year}_applied"],
         csr_amt: row_hash[:"#{calender_year}_csr"],
         max_aptc: row_hash[:"#{calender_year}_aptc"]
       }
