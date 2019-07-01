@@ -2,9 +2,9 @@
   .modal-dialog style='min-height: 600px; width: 720px'
     .modal-content
       .modal-header
-        button.close type="button" data-dismiss="modal" aria-label="Close"
-        span aria-hidden="true"
-        | &times;
+        button type="button" class="close" data-dismiss="modal" aria-label="Close"
+          span aria-hidden="true"
+            | &times;
       .modal-body style='height: 650px; overflow-y: scroll'
         #help_list style='font-size: 140%; margin: 140px 100px 0px'
           b = l10n("insured.plan_shoppings.help_me_sign_up_options")

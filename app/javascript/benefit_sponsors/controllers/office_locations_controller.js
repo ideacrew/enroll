@@ -12,6 +12,12 @@ import { Controller } from "stimulus"
 export default class extends Controller {
   static targets = [ "officeLocations", "officeLocation" ];
 
+  connect() {
+    // Remove space in primary select option and phone option
+    document.getElementById('kindSelect')[0].remove();
+    document.getElementById('agency_organization_profile_attributes_office_locations_attributes_0_phone_attributes_kind')[0].remove();
+  }
+
   addLocation() {
       event.preventDefault();
     //clone new location node, unhide remove button, modify name attribute
@@ -42,11 +48,11 @@ export default class extends Controller {
       if (input.value != "phone main" && input.id != "kindSelect") {
         input.value = ''
       }
-      
+
       if (input.id == "kindSelect") {
         input[0].remove();
       }
-      
+
     })
 
     this.officeLocationsTarget.appendChild(newLocation)
