@@ -1,10 +1,10 @@
 FactoryBot.define do
   factory :sponsored_benefits_benefit_applications_benefit_group, class: 'SponsoredBenefits::BenefitApplications::BenefitGroup' do
-    effective_on_kind "date_of_hire"
-    terminate_on_kind "end_of_month"
-    plan_option_kind "single_plan"
-    description "my first benefit group"
-    effective_on_offset 0
+    effective_on_kind { "date_of_hire" }
+    terminate_on_kind { "end_of_month" }
+    plan_option_kind { "single_plan" }
+    description { "my first benefit group" }
+    effective_on_offset { 0 }
     benefit_application class: "SponsoredBenefits::BenefitApplications::BenefitApplication"
     relationship_benefits { [
       FactoryBot.build(:relationship_benefit, benefit_group: self, relationship: :employee,                   premium_pct: 80, employer_max_amt: 1000.00),

@@ -18,7 +18,7 @@ FactoryBot.define do
     service_area { create(:benefit_markets_locations_service_area) }
 
     transient do
-      issuer_name 'BlueChoice'
+      issuer_name { 'BlueChoice' }
     end
 
     trait :with_issuer_profile do
