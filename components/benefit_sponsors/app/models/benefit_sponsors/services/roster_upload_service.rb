@@ -288,7 +288,7 @@ module BenefitSponsors
       end
 
       def sanitize_params(form)
-        form.attributes.slice(:employer_assigned_family_id, :employee_relationship, :last_name, :first_name, :middle_name, :name_sfx, :ssn, :gender).merge({dob: form.dob})
+        form.attributes.slice(:employer_assigned_family_id, :employee_relationship, :last_name, :first_name, :middle_name, :name_sfx, :ssn, :gender).merge({dob: form.dob.is_a?(Date) ? Date.strptime(form.dob, "%m/%d/%Y") : form.dob})
       end
 
       def sanitize_primary_params(form)
