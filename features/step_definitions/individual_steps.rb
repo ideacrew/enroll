@@ -185,8 +185,9 @@ And(/Individual clicks on add member button/) do
   fill_in "dependent[first_name]", :with => @u.first_name
   fill_in "dependent[last_name]", :with => @u.last_name
   fill_in "jq_datepicker_ignore_dependent[dob]", :with => @u.adult_dob
+  click_link(@u.adult_dob.to_date.day)
   fill_in "dependent[ssn]", :with => @u.ssn
-  find('.label', :text => 'This Person Is').click
+  find('.label', :text => 'This Person Is', :wait => 10).click
   find(:xpath, '//*[@id="new_dependent"]/div[1]/div[4]/div[1]/div[1]/div[3]/div/ul/li[3]').click
   find(:xpath, '//label[@for="radio_female"]').click
   find(:xpath, '//label[@for="dependent_us_citizen_true"]').click
@@ -204,8 +205,9 @@ And(/Individual again clicks on add member button/) do
   fill_in "dependent[first_name]", :with => @u.first_name
   fill_in "dependent[last_name]", :with => @u.last_name
   fill_in "jq_datepicker_ignore_dependent[dob]", :with => '01/15/2013'
-  fill_in "dependent[ssn]", :with => @u.ssn
-  find('.label', :text => 'This Person Is').click
+  click_link('15')
+  fill_in 'dependent[ssn]', :with => @u.ssn
+  find('.label', :text => 'This Person Is', :wait => 10).click
   find(:xpath, '//*[@id="new_dependent"]/div[1]/div[4]/div[1]/div[1]/div[3]/div/ul/li[4]').click
   find(:xpath, '//label[@for="radio_female"]').click
   find(:xpath, '//label[@for="dependent_us_citizen_true"]').click
@@ -221,7 +223,7 @@ end
 
 And(/I click on continue button on household info form/) do
   screenshot("line 161")
-  click_link "Continue"
+  click_link 'Continue', :wait => 10
 end
 
 Then(/Individual creates a new HBX account$/) do
@@ -275,15 +277,7 @@ Then(/I click on back to my account$/) do
 end
 
 And(/^I click on continue button on group selection page$/) do
-  #TODO This some group selection nonsense
-  #wait_for_ajax(2,2)
-  screenshot("test1")
-  #click_link "Continue" #Get
-  screenshot("test2")
-  click_button "CONTINUE"
-  #click_button "Continue" #Post
-  screenshot("test3")
-  #Goes off the see the wizard at /I select three plans to compare/ for now
+  click_button 'CONTINUE', :wait => 10
 end
 
 And(/I select a plan on plan shopping page/) do
