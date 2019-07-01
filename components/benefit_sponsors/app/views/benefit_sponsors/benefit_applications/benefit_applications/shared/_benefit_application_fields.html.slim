@@ -38,12 +38,15 @@ h1.heading-text Add Benefit Package
     .row.row-form-wrapper#uic-wrapper
       .col-md-4.col-sm-12
         label for="inputFTE" Full Time Employees
+        br
         = f.text_field :fte_count, class: "", required: true, placeholder: 'FULL TIME EMPLOYEES', id:'fteEmployee', onblur:'checkEmployeeCount(this)'
       .col-md-4.col-sm-12
         label for="inputPTE" Part Time Employees
+        br
         = f.text_field :pte_count, class: "", required: true, placeholder: 'PART TIME EMPLOYEES', id:'pteEmployee', onblur:'checkEmployeeCount(this)'
       .col-md-4.col-sm-12
         label for="inputMSP" Medicare Second Payers
+        br
         = f.text_field :msp_count, class: "", required: true, placeholder: 'MEDICARE SECOND PAYERS', id:'medSecPayers', onblur:'checkEmployeeCount(this)'
 
 #recommend_dates.hidden.mt-1
@@ -86,10 +89,10 @@ javascript:
     var date = JSON.parse('#{@benefit_application_form.start_on_options.to_json.html_safe}');
     var latest_submitted_on = date[targetDate]["employer_initial_application_latest_submit_on"];
     var binder_payment_deadline = date[targetDate]["binder_payment_due_date"];
-    
+
     var latest_submitted_on_date = stringToDate(latest_submitted_on);
     var binder_payment_deadline_date = stringToDate(binder_payment_deadline);
-     
+
     var submitByMonth = latest_submitted_on_date.getMonth();
     var deadlineMonth = binder_payment_deadline_date.getMonth();
 
