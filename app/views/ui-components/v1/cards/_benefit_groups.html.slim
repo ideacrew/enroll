@@ -50,9 +50,10 @@
               .col-xs-4
                 .row
                   span Employer Estimated Maximum Monthly Cost
-                  - estimator = ::BenefitSponsors::Services::SponsoredBenefitCostEstimationService.new
-                  - estimate = estimator.calculate_estimates_for_home_display(sb)
-                  h2 = number_to_currency(estimate[:estimated_sponsor_exposure])
+                  - unless @employer_profile.is_a_fehb_profile?
+                    - estimator = ::BenefitSponsors::Services::SponsoredBenefitCostEstimationService.new
+                    - estimate = estimator.calculate_estimates_for_home_display(sb)
+                  h2 = number_to_currency(estimate ? estimate[:estimated_sponsor_exposure] : 0)
               .col-xs-8
                 .row
                   table
@@ -62,8 +63,8 @@
                       th Max
                     tr
                       td colspan="2" Total Estimated Monthly Cost for Plan Participants
-                      td= number_to_currency(estimate[:estimated_enrollee_minimum])
-                      td= number_to_currency(estimate[:estimated_enrollee_maximum])
+                      td= number_to_currency(estimate ? estimate[:estimated_enrollee_minimum] : 0)
+                      td= number_to_currency(estimate ? estimate[:estimated_enrollee_maximum] : 0)
 
 javascript:
   $('#collapseHealth').on('hide.bs.collapse', function () {
