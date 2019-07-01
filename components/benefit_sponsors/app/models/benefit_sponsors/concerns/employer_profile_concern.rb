@@ -233,6 +233,10 @@ module BenefitSponsors
         return nil, nil
       end
 
+      def is_a_fehb_profile?
+        is_a?(BenefitSponsors::Organizations::FehbEmployerProfile)
+      end
+
       # Deprecate below methods in future
 
       def profile_source
