@@ -1,10 +1,9 @@
-@wip
 Feature: Insured Plan Shopping on Individual market
 
   Scenario: New insured user purchases on individual market
     Given Individual has not signed up as an HBX user
     When Individual visits the Insured portal during open enrollment
-    Then Individual creates HBX account
+    Then Individual creates a new HBX account
     Then I should see a successful sign up message
     And user should see your information page
     When user goes to register as an individual
@@ -14,6 +13,8 @@ Feature: Insured Plan Shopping on Individual market
     Then Individual should see a form to enter personal information
     When Individual clicks on Save and Exit
     Then Individual resumes enrollment
+    And Individual click on sign in existing account
+    And I signed in
     Then Individual sees previously saved address
     Then Individual agrees to the privacy agreeement
     Then Individual should see identity verification page and clicks on submit
@@ -26,7 +27,7 @@ Feature: Insured Plan Shopping on Individual market
   Scenario: New insured user should be on privacy agreeement/verification page on clicking Individual and Family link on respective pages.
     Given Individual has not signed up as an HBX user
     When Individual visits the Insured portal during open enrollment
-    Then Individual creates HBX account
+    Then Individual creates a new HBX account
     Then I should see a successful sign up message
     And user should see your information page
     When user goes to register as an individual
@@ -36,6 +37,8 @@ Feature: Insured Plan Shopping on Individual market
     Then Individual should see a form to enter personal information
     When Individual clicks on Save and Exit
     Then Individual resumes enrollment
+    And Individual click on sign in existing account
+    And I signed in
     Then Individual sees previously saved address
     When Individual clicks on Individual and Family link should be on privacy agreeement page
     Then Individual agrees to the privacy agreeement

@@ -318,8 +318,9 @@ Then(/^Individual fills in the form$/) do
   fill_in 'dependent[first_name]', :with => (@u.first_name :first_name)
   fill_in 'dependent[last_name]', :with => (@u.last_name :last_name)
   fill_in 'jq_datepicker_ignore_dependent[dob]', :with => (@u.adult_dob :dob)
+  click_link(@u.adult_dob.to_date.day)
   fill_in 'dependent[ssn]', :with => (@u.ssn :ssn)
-  find('.house .selectric p.label').click
+  find('.label', :text => 'This Person Is', :wait => 10).click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Sibling')]").click
   find(:xpath, '//label[@for="radio_male"]').click
   find(:xpath, '//label[@for="dependent_us_citizen_true"]').click
@@ -332,7 +333,7 @@ Then(/^Individual ads address for dependent$/) do
   find(:xpath, '//label[@for="dependent_same_with_primary"]').click
   fill_in 'dependent[addresses][0][address_1]', :with => '36 Campus Lane'
   fill_in 'dependent[addresses][0][city]', :with => 'Washington'
-  find('#address_info .selectric p.label').click
+  find(:xpath, "//span[@class='label'][contains(., 'SELECT STATE')]").click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'DC')]").click
   fill_in 'dependent[addresses][0][zip]', :with => "20002"
   all(:css, ".mz").last.click
