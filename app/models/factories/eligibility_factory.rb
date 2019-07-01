@@ -21,6 +21,7 @@ module Factories
     # returns hash of product_id to applicable_aptc mappings
     def fetch_applicable_aptcs
       raise "Cannot process without #{@selected_aptc} and #{@product_ids}" if @selected_aptc.nil? || @product_ids.empty?
+      @available_aptc ||= fetch_available_eligibility[:total_available_aptc]
 
       # TODO: Return a has of plan_id, applicable aptcs.
       @product_ids.inject({}) do |products_aptcs_hash, product_id|
@@ -33,7 +34,11 @@ module Factories
     private
 
     def applicable_aptc_hash(product_id)
-      applicable_aptc = [@selected_aptc, ehb_premium(product_id)].min
+      # We still consider AvailableAptc in this calculation because the
+      # :applied_aptc(ElectedAptc) is given externally for Passive Renewals
+      # and not calculated by the EA.
+
+      applicable_aptc = [@available_aptc, @selected_aptc, ehb_premium(product_id)].min
       { product_id => applicable_aptc }
     end
 
@@ -45,12 +50,12 @@ module Factories
     def ehb_premium(product_id)
       premium_amount = fetch_total_premium(product_id)
       product = ::BenefitMarkets::Products::Product.find(product_id)
-      @ehb_premium = premium_amount * product.ehb.round(2)
+      premium_amount * product.ehb
     end
 
     def fetch_total_premium(product_id)
-      @cost_decorator = @enrollment.ivl_decorated_hbx_enrollment(product_id)
-      @cost_decorator.total_premium
+      cost_decorator = @enrollment.ivl_decorated_hbx_enrollment(product_id)
+      cost_decorator.total_premium
     end
 
     def shopping_member_ids
@@ -102,7 +107,7 @@ module Factories
         tax_members_aptcs
       end
 
-      { :aptc => aptc_breakdowns}
+      {:aptc => aptc_breakdowns}
     end
 
     def prioritized_csr(csr_kinds)

@@ -27,7 +27,7 @@ module Services
       raise "Provide aptc values {applied_aptc: , applied_percentage: , max_aptc: , csr_amt:}" if aptc_values.empty?
 
       applied_aptc_amt = calculate_applied_aptc(aptc_values)
-      enrollment.applied_aptc_amount = applied_aptc_amt
+      enrollment.applied_aptc_amount = applied_aptc_amt.round(2)
 
       enrollment.elected_aptc_pct = if applied_aptc_amt == aptc_values[:applied_aptc].to_f
                                       (aptc_values[:applied_percentage].to_f / 100.0)
@@ -61,10 +61,7 @@ module Services
     end
 
     def calculate_applied_aptc(aptc_values)
-      # We still consider AvailableAptc in this calculation because the
-      # :applied_aptc(ElectedAptc) is given externally and not calculated by the EA.
-
-      @calculate_applied_aptc ||= [calculate_available_aptc, applicable_aptc(aptc_values)].min
+      @calculate_applied_aptc ||= applicable_aptc(aptc_values)
     end
 
     private
