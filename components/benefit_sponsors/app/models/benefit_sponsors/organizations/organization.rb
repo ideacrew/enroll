@@ -5,7 +5,7 @@ module BenefitSponsors
     class Organization
       include Mongoid::Document
       include Mongoid::Timestamps
-      include Config::AcaConcern
+      include Config::AcaModelConcern
       include BenefitSponsors::Concerns::Observable
       include BenefitSponsors::ModelEvents::Organization
 
