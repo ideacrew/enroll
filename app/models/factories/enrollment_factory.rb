@@ -224,6 +224,7 @@ module Factories
 
     def self.build_employee_role(person, person_new, employer_profile, census_employee, hired_on)
       role = find_or_build_employee_role(person, employer_profile, census_employee, hired_on)
+      role.update_attributes(contact_method: person.consumer_role[:contact_method]) if person.has_active_consumer_role?
       self.link_census_employee(census_employee, role, employer_profile)
       family, primary_applicant = self.initialize_family(person, census_employee.census_dependents)
       family.family_members.map(&:__association_reload_on_person)
