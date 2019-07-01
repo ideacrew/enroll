@@ -382,6 +382,7 @@ module BenefitSponsors
             Person.where(:"general_agency_staff_roles" => {
               '$elemMatch' => {
                 :benefit_sponsors_general_agency_profile_id => BSON::ObjectId(profile_id),
+                :is_primary => true
               }
             })
           end
