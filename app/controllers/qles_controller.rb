@@ -31,7 +31,7 @@ class QlesController < ApplicationController
   end
 
   def deactivation_form
-    @qle = ::Forms::QleForms::QleForm.for_deactivation_form(@qle_form_attributes)
+    @qle = QualifyingLifeEventKind.find(params[:id])
   end
 
   def deactivate

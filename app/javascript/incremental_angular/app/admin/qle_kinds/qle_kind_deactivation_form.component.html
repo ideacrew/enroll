@@ -1,0 +1,48 @@
+<div class='container'>
+  <h1 class="heading-text">
+    Deactivate an Existing Qualifying Life Event Kind
+  </h1>
+  <form *ngIf="hasResource()" [formGroup]="deactivationFormGroup" class='form'>
+    <input type="hidden" formControlName="id">
+    <dl class="">
+      <dt>
+        Title 
+      </dt>
+      <dd>
+        {{qleKindToDeactivate.title}}
+      </dd>
+      <dt>
+        Tool Tip 
+      </dt>
+      <dd>
+        {{qleKindToDeactivate.tool_tip}}
+      </dd>
+      <dt>
+        Action Kind 
+      </dt>
+      <dd>
+        {{qleKindToDeactivate.action_kind}}
+      </dd>
+      <dt>
+        Reason 
+      </dt>
+      <dd>
+        {{qleKindToDeactivate.reason}}
+      </dd>
+      <dt>
+        Market Kind 
+      </dt>
+      <dd>
+        {{qleKindToDeactivate.market_kind}}
+      </dd>
+
+    </dl>
+
+    <div class="form-group">
+      <label for="qle_kind_deactivation_form_end_on"> QLE Kind Deactivation Date</label> <br>
+      <input type='text' formControlName="end_on" id='qle_kind_deactivation_form_end_on' placeholder="MM/DD/YYYY" mask="M0/d0/0000" [dropSpecialCharacters]="false" [validation]="true" required> <br>
+
+      <button class="btn btn-primary" (click)="submitDeactivation()">Deactivate QLE Kind</button>
+    </div>
+  </form>
+</div>
