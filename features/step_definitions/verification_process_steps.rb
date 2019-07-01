@@ -38,7 +38,7 @@ end
 
 Then(/^the consumer visits verification page$/) do
   visit verification_insured_families_path
-  find(:xpath, "//ul/li/a[contains(@class, 'interaction-click-control-documents')]").click
+  find(".interaction-click-control-documents", wait: 5).click
 end
 
 When(/^the consumer should see documents verification page$/) do

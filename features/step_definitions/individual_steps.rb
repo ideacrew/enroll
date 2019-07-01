@@ -620,6 +620,7 @@ When(/consumer visits home page after successful ridp/) do
   user.save
   FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual")
   FactoryBot.create(:hbx_profile, :no_open_enrollment_coverage_period)
+  BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
   visit "/families/home"
 end
 

@@ -355,6 +355,7 @@ When(/Resident visits home page with qle/) do
   # we have only shop & ivl as market kinds for qle
   FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual")
   FactoryBot.create(:hbx_profile, :no_open_enrollment_coverage_period)
+  BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
   visit "/families/home"
 end
 
