@@ -242,7 +242,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             family_assisted.active_household.reload
             enrollments = family_assisted.active_household.hbx_enrollments
             expect(enrollments.size).to eq 2
-            expect(enrollments[1].applied_aptc_amount.to_f.round).to eq((enrollments[1].total_premium * enrollments[1].product.ehb).round)
+            expect(enrollments[1].applied_aptc_amount.to_f).to eq((enrollments[1].total_premium * enrollments[1].product.ehb).round(2))
           end
 
           it "should generate renewal enrollment for unassisted family" do

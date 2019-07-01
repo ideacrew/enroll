@@ -43,8 +43,6 @@ RSpec.describe Services::IvlRenewalService, type: :model do
                    end
         bcp.update_attributes!(slcsp_id: slcsp_id)
       end
-
-      # hbx_profile.save!
       hbx_profile.reload
 
       family_assisted.active_household.reload
@@ -59,7 +57,7 @@ RSpec.describe Services::IvlRenewalService, type: :model do
 
     it "should append APTC values" do
       renewel_enrollment = subject.assign(aptc_values)
-      expect(renewel_enrollment.applied_aptc_amount.to_f.round).to eq((renewel_enrollment.total_premium * renewel_enrollment.product.ehb).round)
+      expect(renewel_enrollment.applied_aptc_amount.to_f).to eq((renewel_enrollment.total_premium * renewel_enrollment.product.ehb).round(2))
     end
 
     it "should get min on given applied, ehb premium and available aptc" do
