@@ -6,7 +6,7 @@ require 'csv'
 @start_date = Date.strptime(ARGV[0], "%m/%d/%Y").beginning_of_day
 @end_date  = Date.strptime(ARGV[1], "%m/%d/%Y").end_of_day
 
-@carriers = CarrierProfile.all.inject({}){|data, c| data[c.id.to_s] = c.legal_name; data }
+@issuer_profile = BenefitSponsors::Organizations::Organization.issuer_profiles.all.inject({}){|data, c| data[c.id.to_s] = c.legal_name; data }
 
 
 def enrollment_reason(enrollment)
@@ -26,11 +26,11 @@ def sep_or_newhire_date(enrollment)
 end
 
 def get_plan_details(enrollment, employer)
-  plan = enrollment.plan
+  product = enrollment.product
   data = [
     employer.legal_name,
     employer.fein,
-    enrollment.benefit_group.start_on.strftime("%m/%d/%Y"),
+    enrollment.benefit_package.start_on.strftime("%m/%d/%Y"),
     enrollment.hbx_id,
     enrollment.time_of_purchase.strftime("%m/%d/%Y"),
     enrollment.effective_on.strftime("%m/%d/%Y"),
@@ -38,11 +38,11 @@ def get_plan_details(enrollment, employer)
     enrollment.aasm_state.titleize,
     enrollment.total_premium,
     enrollment.total_employer_contribution,
-    plan.name,
-    plan.hios_id,
-    @carriers[plan.carrier_profile_id.to_s],
-    plan.plan_type,
-    plan.metal_level,
+    product.name,
+    product.hios_id,
+    @issuer_profile[product.issuer_profile_id.to_s],
+    product.health_plan_kind,
+    product.metal_level
     enrollment_reason(enrollment),
     sep_or_newhire_date(enrollment)
   ]
@@ -145,10 +145,10 @@ CSV.open("#{Rails.root.to_s}/sep_newhire_enrollment_report.csv", "w") do |csv|
   csv << header_rows
   count = 0
 
-  families = Family.where(:"households.hbx_enrollments" => {:$elemMatch => sep_query_expression})
-  puts "Found #{families.size} families in the system"
+  sep_families = Family.where(:"_id".in => HbxEnrollment.where(sep_query_expression).pluck(:family_id))
+  puts "Found #{sep_families.size} families in the system"
 
-  families.each do |family|
+  sep_families.each do |family|
     count += 1
     if count % 100 == 0
       puts "process #{count}"
@@ -186,10 +186,12 @@ CSV.open("#{Rails.root.to_s}/sep_newhire_enrollment_report.csv", "w") do |csv|
     end
   end
 
-  families = Family.where(:"households.hbx_enrollments" => {:$elemMatch => newhire_query_expression})
-  puts "Found #{families.size} families in the system"
+  newhire_families = Family.where(:"_id".in => HbxEnrollment.where(newhire_query_expression).pluck(:family_id))
 
-  families.each do |family|
+
+  puts "Found #{newhire_families.size} families in the system"
+
+  newhire_families.each do |family|
     count += 1
     if count % 100 == 0
       puts "process #{count}"
@@ -199,7 +201,7 @@ CSV.open("#{Rails.root.to_s}/sep_newhire_enrollment_report.csv", "w") do |csv|
     next if active_enrollments.blank?
 
     active_enrollments.each do |enrollment|
-      employer = enrollment.benefit_group.plan_year.employer_profile
+      employer = enrollment.employer_profile
       next unless enrollment.benefit_group_assignment.census_employee.new_hire_enrollment_period.cover?(enrollment.created_at)
 
       begin

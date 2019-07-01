@@ -105,7 +105,7 @@ def query_expression
 end
 
 
-families = Family.where(:"households.hbx_enrollments" => {:$elemMatch => query_expression})
+query_families = Family.where(:"_id".in => HbxEnrollment.where(query_expression).pluck(:family_id))
 puts "Found #{families.size} families in the system"
 
 CSV.open("#{Rails.root.to_s}/cobra_enrollment_report.csv", "w") do |csv|
