@@ -14,7 +14,7 @@ class QlesController < ApplicationController
     # TODO: Consider adding a blank option, and then assure in the qle_kind_wizard
     # that the submit button doesn't work unless a option with a value is selected.
     @editable_qles = QualifyingLifeEventKind.all
-    @deactivatable_qles = QualifyingLifeEventKind.all
+    @deactivatable_qles = QualifyingLifeEventKind.not_set_for_deactivation
   end
   
   # TODO: All of these forms will be found in

@@ -113,6 +113,8 @@ class QualifyingLifeEventKind
   scope :active, ->{ where(is_active: true).where(:created_at.ne => nil).order(ordinal_position: :asc) }
   scope :by_market_kind, ->(market_kind){ where(market_kind: market_kind) }
 
+  scope :not_set_for_deactivation, ->{ where(end_on: nil) }
+
   # Business rules for EmployeeGainingMedicare
   # If coverage ends on last day of month and plan selected before loss of coverage:
   #   effective date is first day of the month after other coverage will end
