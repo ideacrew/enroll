@@ -270,9 +270,9 @@ module Notifier
 
       bucket_name = Settings.paper_notice
       notice_filename_for_paper_notice = if is_employer?
-                                           "#{resource.organization.hbx_id}_#{subject.titleize.gsub(/\s+/, '_')}"
+                                           "#{resource.organization.hbx_id}_#{subject.titleize.gsub(/\s+/, '')}_#{notice_number.gsub('_', '')}_#{notice_type}"
                                          else
-                                           "#{resource.person.hbx_id}_#{subject.titleize.gsub(/\s+/, '_')}"
+                                           "#{resource.person.hbx_id}_#{subject.titleize.gsub(/\s+/, '')}_#{notice_number.gsub('_', '')}_#{notice_type}"
                                          end
       notice_path_for_paper_notice = Rails.root.join("tmp", "#{notice_filename_for_paper_notice}.pdf")
       begin
@@ -337,6 +337,12 @@ module Notifier
 
     def initial_invoice?
       self.event_name == 'generate_initial_employer_invoice'
+    end
+
+    def notice_type
+      "IVL" if is_consumer?
+      "EE" if is_employee?
+      "ER" if is_employer?
     end
 
     def has_valid_resource?
