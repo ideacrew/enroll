@@ -26,11 +26,13 @@ describe Family, "given a primary applicant and a dependent" do
 
   context "payment_transactions" do
     it "should match with has_many association" do
-      expect(Family.reflect_on_association(:payment_transactions).macro).to eq :has_many
+      association = Family.reflect_on_association(:payment_transactions)
+      expect(association.class).to eq Mongoid::Association::Referenced::HasMany
     end
 
-    it "should not match with has_many association" do
-      expect(Family.reflect_on_association(:payment_transactions).macro).not_to eq :embeds_many
+    it "should not match with embeds_many association" do
+      association = Family.reflect_on_association(:payment_transactions)
+      expect(association.class).not_to eq Mongoid::Association::Embedded::EmbedsMany
     end
   end
 
