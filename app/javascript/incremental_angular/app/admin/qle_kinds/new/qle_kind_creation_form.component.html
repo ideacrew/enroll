@@ -1,0 +1,52 @@
+<div class='container'>
+    <h1 class="heading-text">
+      Create an Existing Qualifying Life Event Kind
+    </h1>
+    <form *ngIf="hasResource()" [formGroup]="creationFormGroup" class='form'>
+      <field-errors [errorControl]="creationFormGroup" errorHeader="Your QLE Kind could not be Created for the following reasons:"></field-errors>
+      <input type="hidden" formControlName="id">
+      <dl class="">
+        <dt>
+          Title 
+        </dt>
+        <dd>
+          {{qleKindToCreate.title}}
+        </dd>
+        <dt>
+          Tool Tip 
+        </dt>
+        <dd>
+          {{qleKindToCreate.tool_tip}}
+        </dd>
+        <dt>
+          Action Kind 
+        </dt>
+        <dd>
+          {{qleKindToCreate.action_kind}}
+        </dd>
+        <dt>
+          Reason 
+        </dt>
+        <dd>
+          {{qleKindToCreate.reason}}
+        </dd>
+        <dt>
+          Market Kind 
+        </dt>
+        <dd>
+          {{qleKindToCreate.market_kind}}
+        </dd>
+  
+      </dl>
+  
+      <div class="form-group col-md-4 mb-2{{errorClassFor(creationFormGroup.get('end_on'))}}">
+        <label for="qle_kind_creation_form_end_on"> QLE Kind creation Date</label> <br>
+        <input type='text' formControlName="end_on" id='qle_kind_creation_form_end_on' placeholder="MM/DD/YYYY" mask="M0/d0/0000" [dropSpecialCharacters]="false" [validation]="true" required> <br>
+        <field-errors [errorControl]="creationFormGroup.get('end_on')"></field-errors>
+  
+  
+        <button class="btn btn-primary" (click)="submitcreation()">Create QLE Kind</button>
+      </div>
+    </form>
+  </div>
+  

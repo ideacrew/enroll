@@ -8,10 +8,14 @@ import { DropdownOption } from 'app/dropdown_option';
 export class QleKindWizardComponent {
   public editableList : Array<DropdownOption> = [];
   public deactivatableList : Array<DropdownOption> = [];
+  public creatableList : Array<DropdownOption> = [];
+
   public newLocation : string | null = null;
   private selectedAction : string | null = null;
   @ViewChild('editSelection') editSelection : ElementRef;
   @ViewChild('deactivateSelection') deactivateSelection : ElementRef;
+  @ViewChild('createSelection') createSelection : ElementRef;
+
 
   constructor(injector: Injector, private _elementRef : ElementRef) {
 
@@ -26,6 +30,10 @@ export class QleKindWizardComponent {
     if (deactivatableListJson != null) {
       this.deactivatableList = JSON.parse(deactivatableListJson);
     }
+    var creatableListJson = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-creatable-list");
+    if (creatableListJson != null) {
+      this.creatableList = JSON.parse(creatableListJson);
+    }
     var newLocationAttribute = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-new-location");
     if (newLocationAttribute != null) {
       this.newLocation = newLocationAttribute;
@@ -37,12 +45,18 @@ export class QleKindWizardComponent {
   }
 
   submit() {
+    console.log(this.selectedAction)
     if (this.selectedAction == "new") {
-      if (this.newLocation != null) {
-        window.location.href = this.newLocation;
+      console.log(this.createSelection)
+      var createLocation = this.createSelection.nativeElement.value;
+      if (createLocation != null) {
+        window.location.href = createLocation;
       }
     } else if (this.selectedAction == "edit") {
+      console.log(this.editSelection)
+
       var editLocation = this.editSelection.nativeElement.value;
+
       if (editLocation != null) {
         window.location.href = editLocation;
       }
@@ -60,5 +74,8 @@ export class QleKindWizardComponent {
 
   showDeactivate() {
     return(this.selectedAction == "deactivate");
+  }
+  showCreate() {
+    return(this.selectedAction == "create");
   }
 }

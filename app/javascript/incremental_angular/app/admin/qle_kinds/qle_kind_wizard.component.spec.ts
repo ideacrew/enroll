@@ -40,12 +40,20 @@ describe('QleKindWizardComponent', () => {
         value: "Deactivatable Value"
       }
     ];
+    var creatables = [
+      {
+        label: "Creatable Label",
+        value: "Creatable Value"
+      }
+    ];
     var element = {
       getAttribute: function(st: String) {
         if (st == "data-new-location") {
           return newLocation;
         } else if (st == "data-editable-list") {
           return JSON.stringify(editables);
+        } else if (st == "data-creatable-list") {
+          return JSON.stringify(creatables);
         } else if (st == "data-deactivatable-list") {
           return JSON.stringify(deactivatables);
         }
@@ -57,6 +65,7 @@ describe('QleKindWizardComponent', () => {
 
     expect(component.newLocation).toEqual(newLocation);
     expect(component.editableList).toEqual(editables);
+    // expect(component.createableList).toEqual(createables);
     expect(component.deactivatableList).toEqual(deactivatables);
   })
 });

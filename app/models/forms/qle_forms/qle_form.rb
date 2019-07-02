@@ -86,6 +86,24 @@ module Forms
         form
       end
 
+      def self.for_creation_form(params)
+        creation_form_params = {
+          start_on: params[:start_on],
+          end_on: params[:end_on]
+        }
+        form = self.new(creation_form_params)
+        form
+      end
+
+      def self.for_create(params)
+        create_params = {
+          start_on: params[:start_on],
+          end_on: params[:end_on]
+        }
+        form = self.new(create_params)
+        form
+      end
+
       def self.for_deactivate(params)
         deactivate_params = {
           start_on: params[:start_on],

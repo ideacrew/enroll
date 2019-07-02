@@ -617,6 +617,7 @@ Rails.application.routes.draw do
   resources :qles, only: [:new, :create, :edit, :update] do
     member do
       get :deactivation_form
+      get :creation_form
       put :deactivate
     end
     # TODO: We need to discuss renaming these
