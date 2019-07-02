@@ -66,6 +66,8 @@ export class QleKindDeactivationFormComponent {
           function(data: HttpResponse<any>) {
             var location_header = data.headers.get("Location");
             if (location_header != null) {
+              // TODO: Can we add a div append here to show the success or decline message
+              // or should we add a new function?
               window.location.href = location_header;
             }
           },
