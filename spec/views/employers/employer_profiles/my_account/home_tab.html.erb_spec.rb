@@ -49,14 +49,15 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
     end
 
     def employer_profile
-      instance_double(
+      double(
         "EmployerProfile",
         legal_name: "My silly name",
         organization: new_organization,
         fein: "098111000",
         entity_kind: "my entity kind",
         broker_agency_profile: new_broker_agency_profile,
-        published_plan_year: plan_year
+        published_plan_year: plan_year,
+        is_a_fehb_profile?: false
         )
     end
 

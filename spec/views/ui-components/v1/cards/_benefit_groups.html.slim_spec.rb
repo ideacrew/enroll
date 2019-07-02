@@ -17,6 +17,7 @@ RSpec.describe "_benefit_groups.html.slim", :type => :view, dbclean: :after_each
     let!(:issuer_profile) {BenefitSponsors::Organizations::IssuerProfile.new}
 
     before :each do
+      assign :employer_profile, sponsorship.profile
       allow(BenefitSponsors::Organizations::IssuerProfile).to receive(:find).and_return issuer_profile
       allow(issuer_profile).to receive(:legal_name).and_return "rspec-carrier_legal_name"
       stub_template 'ui-components/v1/tables/benefit_package_summary' => "Do nothing"
