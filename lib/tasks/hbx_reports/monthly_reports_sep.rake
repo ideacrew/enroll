@@ -24,12 +24,12 @@ namespace :reports do
     file_name = "#{Rails.root}/monthly_sep_enrollments_report_#{date.gsub(" ", "").split(",").join("_")}.csv"
     puts "Created file and trying to import the data #{file_name}" 
 
-    families = Family.where(:"households.hbx_enrollments" => {"$elemMatch" => {
+    families = Family.where(:"_id".in => HbxEnrollment.where({
       :aasm_state => {"$in" => HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES },
       :enrollment_kind => "special_enrollment",
       :created_at => {:"$gte" => start_date, :"$lt" => end_date},
       :kind => 'individual'
-    }})
+    }).pluck(:family_id))
 
     CSV.open(file_name,"w") do |csv|
       csv <<  ["Subscriber ID",
@@ -61,8 +61,8 @@ namespace :reports do
               enrollment.created_at.in_time_zone('Eastern Time (US & Canada)'),
               covered_people,
               enrollment.coverage_kind,
-              enrollment.plan.name,
-              enrollment.plan.hios_id,
+              enrollment.product.name,
+              enrollment.product.hios_id,
               enrollment.hbx_enrollment_members.count
             ]
           end
