@@ -124,40 +124,13 @@ class MigrateDcProducts < Mongoid::Migration
           end
         end
 
-        say_with_time("Migrate catastrophic and renewal reference plan data") do
-          products = BenefitMarkets::Products::Product.all
-          products.each do |product|
-            year = product.application_period.first.year
-            plan = Plan.where(active_year: year, hios_id: product.hios_id).first
-
-            renewal_plan_hios_id = plan.renewal_plan_id.present? ? plan.renewal_plan.hios_id : nil
-            catastrophic_plan_hios_id = plan.cat_age_off_renewal_plan_id.present? ? plan.cat_age_off_renewal_plan.hios_id : nil
-
-            renewal_product = if renewal_plan_hios_id.present?
-              BenefitMarkets::Products::Product.where(hios_id: renewal_plan_hios_id).select{|product| product.application_period.first.year == plan.renewal_plan.active_year}.last
-            else
-              nil
-            end
-
-            catastrophic_product = if catastrophic_plan_hios_id.present?
-              BenefitMarkets::Products::Product.where(hios_id: catastrophic_plan_hios_id).select{|product| product.application_period.first.year == plan.cat_age_off_renewal_plan.active_year}.last
-            else
-              nil
-            end
-            product.renewal_product = renewal_product
-            product.catastrophic_age_off_product = catastrophic_product unless plan.coverage_kind == "dental"
-            product.save
-          end
-          # Now that all the plans moved over, cross-map the catastropic, age-off,
-          # and renewal plans from the original data
-        end
-
         say_with_time("Create DC congress products") do
           products = BenefitMarkets::Products::Product.where(metal_level_kind: :gold, :benefit_market_kind => :aca_shop)
           products.each do |product|
             congress_product = product.deep_dup
-            congress_product.benefit_market_kind = "fehb".to_sym
             congress_product._id = BSON::ObjectId.new
+            congress_product.product_package_kinds = [:metal_level]
+            congress_product.benefit_market_kind = "fehb".to_sym
             congress_product.sbc_document._id = BSON::ObjectId.new if product.sbc_document.present?
             congress_product.premium_tables.map {|pt| pt._id = BSON::ObjectId.new}
             congress_product.premium_tables.each do |pt|
@@ -169,6 +142,34 @@ class MigrateDcProducts < Mongoid::Migration
               raise "congress product not saved #{congress_product.hios_id}."
             end
           end
+        end
+
+        say_with_time("Migrate catastrophic and renewal reference plan data") do
+          products = BenefitMarkets::Products::Product.all
+          products.each do |product|
+            year = product.application_period.first.year
+            plan = Plan.where(active_year: year, hios_id: product.hios_id).first
+
+            renewal_plan_hios_id = plan.renewal_plan_id.present? ? plan.renewal_plan.hios_id : nil
+            catastrophic_plan_hios_id = plan.cat_age_off_renewal_plan_id.present? ? plan.cat_age_off_renewal_plan.hios_id : nil
+
+            renewal_product = if renewal_plan_hios_id.present?
+                                BenefitMarkets::Products::Product.where(hios_id: renewal_plan_hios_id, benefit_market_kind: product.benefit_market_kind).select{|product| product.application_period.first.year == plan.renewal_plan.active_year}.last
+                              else
+                                nil
+                              end
+
+            catastrophic_product = if catastrophic_plan_hios_id.present?
+                                     BenefitMarkets::Products::Product.where(hios_id: catastrophic_plan_hios_id, benefit_market_kind: product.benefit_market_kind).select{|product| product.application_period.first.year == plan.cat_age_off_renewal_plan.active_year}.last
+                                   else
+                                     nil
+                                   end
+            product.renewal_product = renewal_product
+            product.catastrophic_age_off_product = catastrophic_product unless plan.coverage_kind == "dental"
+            product.save
+          end
+          # Now that all the plans moved over, cross-map the catastropic, age-off,
+          # and renewal plans from the original data
         end
 
       end
