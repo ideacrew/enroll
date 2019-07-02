@@ -19,6 +19,19 @@ Mongoid::Migration.say_with_time("Load DC Benefit Market Catalogs") do
       pricing_model = BenefitMarkets::PricingModels::PricingModel.where(:name => "DC Shop Simple List Bill Pricing Model").first.create_copy_for_embedding
 
 
+      def set_congress_contribution_cap(contribution_model, calender_year)
+        return if calender_year == 2014
+        # we need set default_contribution_cap just congress
+        default_cont_cap = {2015 => {employee_only: 437.69, employee_plus_one: 971.90, family: 971.90},
+                                    2016 => {employee_only: 462.3, employee_plus_one: 998.88, family: 1058.42},
+                                    2017 => {employee_only: 480.29, employee_plus_one: 1030.88, family: 1094.64},
+                                    2018 => {employee_only: 496.71, employee_plus_one: 1063.83, family: 1130.09},
+                                    2019 => {employee_only: 498.72, employee_plus_one: 1066.59, family: 1138.19}}
+        contribution_model.contribution_units.each do |unit|
+          unit.default_contribution_cap = default_cont_cap[calender_year][unit.name.to_sym]
+        end
+      end
+
       def products_for(product_package, calender_year)
         product_class = product_package.product_kind.to_s== "health" ? BenefitMarkets::Products::HealthProducts::HealthProduct : BenefitMarkets::Products::DentalProducts::DentalProduct
         puts "Found #{product_class.by_product_package(product_package).count} #{product_package.product_kind.to_s} products for #{calender_year} #{product_package.package_kind.to_s}"
@@ -37,6 +50,7 @@ Mongoid::Migration.say_with_time("Load DC Benefit Market Catalogs") do
 
         puts "Creating #{product_kind.to_s} Product Packages..."
         product_packages(kind, product_kind).each do |package_kind|
+          set_congress_contribution_cap(contribution_model, calender_year) if kind == :fehb
           product_package = benefit_market_catalog.product_packages.new({
                                                                             benefit_kind: kind, product_kind: product_kind, title: package_kind.to_s,
                                                                             package_kind: package_kind,
