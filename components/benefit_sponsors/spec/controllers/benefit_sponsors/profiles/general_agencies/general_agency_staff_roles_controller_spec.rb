@@ -17,7 +17,7 @@ module BenefitSponsors
     let(:user) { FactoryBot.create(:user)}
     let!(:new_person_for_staff) { FactoryBot.create(:person) }
     let!(:new_person_for_staff1) { FactoryBot.create(:person, user: user) }
-    let!(:general_agency_staff_role) { FactoryBot.create(:general_agency_staff_role, benefit_sponsors_general_agency_profile_id: gap_id, person: new_person_for_staff1) }
+    let!(:general_agency_staff_role) { FactoryBot.create(:general_agency_staff_role, benefit_sponsors_general_agency_profile_id: gap_id, person: new_person_for_staff1, aasm_state: 'active', is_primary: true) }
     let!(:general_agency_staff_role1) { FactoryBot.create(:general_agency_staff_role, benefit_sponsors_general_agency_profile_id: gap_id, person: new_person_for_staff) }
 
     let(:staff_class) { BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm }
