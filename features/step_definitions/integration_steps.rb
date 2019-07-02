@@ -351,6 +351,7 @@ When(/^(.*) logs on to the (.*)?/) do |named_person, portal|
   # Adding sleep seems to help prevent the AuthenticityToken error
   # which apeared to be throwing in at least the
   # add_sep_read_and_write_feature cucumber.
+  BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
 end
 
 When(/^user visits the (.*)?/) do |portal|

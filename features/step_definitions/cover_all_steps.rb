@@ -6,6 +6,10 @@ Then(/^Hbx Admin should not see an New DC Resident Application link$/) do
   expect(page).not_to have_content('New DC Resident Application')
 end
 
+Then(/^Hbx Admin should see a DC Resident Application link disabled$/) do
+  find_link('DC Resident Application')[:class].include?("blocking") == false
+end
+
 When(/^Hbx Admin clicks on New DC Resident Application link$/) do
   find(:xpath, "//*[@id='inbox']/div/div[3]/div/span/div[1]/ul/li[3]/a").click
 end
@@ -16,7 +20,7 @@ Then(/^Hbx Admin should not see an New Consumer Phone Application link and New C
 end
 
 When(/^Hbx Admin clicks on DC Resident Application link$/) do
-  find(:xpath, '//*[@id="myTab"]/li[2]/ul/li[5]/a').trigger('click')
+  find_link('DC Resident Application').click
 end
 
 Then(/^Hbx Admin should see DC Resident Personal Information page$/) do
@@ -42,8 +46,8 @@ Then(/HBX Admin should see a form to enter personal information$/) do
   fill_in "person_addresses_attributes_0_address_1", :with => "4900 USAA BLVD"
   fill_in "person_addresses_attributes_0_address_2", :with => "212"
   fill_in "person_addresses_attributes_0_city", :with=> "Washington"
-  find(:xpath, "//p[@class='label'][contains(., 'SELECT STATE')]").click
-  find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[3]/div/ul/li[10]').click
+  find(:xpath, "//span[@class='label'][contains(., 'SELECT STATE')]").click
+  find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'DC')]").click
   fill_in "person[addresses_attributes][0][zip]", :with => "20002"
   find('.btn', text: 'CONTINUE').click
 end
@@ -52,7 +56,7 @@ Then(/^Hbx Admin should see text Household Info$/) do
   expect(page).to have_content('Household Info')
   expect(page).to have_content('get insurance coverage for other members of your household')
   find_link('Add Member').visible?
-  find('.btn', text: 'CONTINUE').click
+  find('.btn', text: 'Continue').click
 end
 
 Then(/^Hbx Admin should see text Special Enrollment Period$/) do
@@ -82,7 +86,7 @@ Then(/Hbx Admin should see confirmation and clicks continue/) do
 end
 
 When(/HBX Admin selects a plan from shopping plan page/) do
-  find(:xpath, '//*[@id="plans"]/div[1]/div/div[5]/div[3]/a[1]').click
+  find(:xpath, '//*[@id="ivl_plans"]/div[1]/div/div[5]/div[3]/a[1]').click
 end
 
 Then(/HBX Admin should see the summary page of plan selection/) do
@@ -94,7 +98,7 @@ When(/HBX Admin clicks on Confirm button on the summary page of plan selection/)
   find(:xpath, '//*[@id="terms_check_thank_you"]').click
   fill_in 'first_name_thank_you', :with => "Carlos"
   fill_in 'last_name_thank_you', :with => "Devina"
-  find('.btn', text: 'CONFIRM').click
+  find('.btn', text: 'Confirm').click
 end
 
 Then(/HBX Admin should see the enrollment receipt page/) do
@@ -104,6 +108,10 @@ end
 
 When(/HBX Admin clicks go to my account button/) do
   find('.btn', text: 'GO TO MY ACCOUNT').click
+end
+
+When(/(.*) is clicked by HBX Admin/) do |btn|
+  find('.btn', text: btn).click
 end
 
 Then(/HBX Admin should see the home page with text coverage selected/) do
