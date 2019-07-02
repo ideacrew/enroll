@@ -16,6 +16,7 @@ import { BrokerAgencyProfileResourceService } from './broker_agency_profile/brok
 import { FieldErrorsComponent } from './errors/field_errors.component';
 import { QleKindWizardComponent } from  './admin/qle_kinds/qle_kind_wizard.component';
 import { QleKindDeactivationFormComponent } from  './admin/qle_kinds/qle_kind_deactivation_form.component';
+import { QleKindResourceService } from  './admin/qle_kinds/qle_kind_resource.service';
 
 import { ErrorLocalizer } from './error_localizer';
 
@@ -45,6 +46,7 @@ import { ErrorLocalizer } from './error_localizer';
   providers: 
   [
     BrokerAgencyProfileResourceService.provides('BrokerAgencyProfileCreationService'),
+    QleKindResourceService.provides("QleKindDeactivationService"),
     ErrorLocalizer
   ]
 })

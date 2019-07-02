@@ -6,6 +6,9 @@ class QlesController < ApplicationController
   # TODO: The QLE's will have to be generated as instance variables based on
   # whether or not theyh're a member of the right market kind, whether or not
   # they're eligible for deactivation, etc.
+
+  skip_before_action :verify_authenticity_token, only: [:deactivate]
+
   def manage
     # TODO: Fix these scopes, probably hide them behind a JSON serializer
     # TODO: Consider adding a blank option, and then assure in the qle_kind_wizard
@@ -35,7 +38,9 @@ class QlesController < ApplicationController
   end
 
   def deactivate
-    @qle = ::Forms::QleForm.for_deactivate(permitted_params)
+    respond_to do |format|
+      format.json { head :no_content, :location => manage_qles_path }
+    end
   end
 
   def edit
