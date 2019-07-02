@@ -1,5 +1,5 @@
 ## Pass the date range as given below to generate cobra report
-## rails r script/cobra_enrollment_report.rb "11/01/2017" "12/10/2017"
+## rails r script/cobra_enrollment_report.rb -e production "12/31/2018" "7/10/2019"
 
 require 'csv'
 
@@ -106,13 +106,13 @@ end
 
 
 query_families = Family.where(:"_id".in => HbxEnrollment.where(query_expression).pluck(:family_id))
-puts "Found #{families.size} families in the system"
+puts "Found #{query_families.size} families in the system" unless Rails.env.test?
 
 CSV.open("#{Rails.root.to_s}/cobra_enrollment_report.csv", "w") do |csv|
   csv << header_rows
   count = 0
 
-  families.each do |family|
+  query_families.each do |family|
 
     count += 1
     if count % 100 == 0
@@ -147,7 +147,7 @@ CSV.open("#{Rails.root.to_s}/cobra_enrollment_report.csv", "w") do |csv|
 
         csv << data
       rescue Exception => e
-        puts "bad enrollment #{e.to_s} #{enrollment.hbx_id}"
+        puts "bad enrollment #{e.to_s} #{enrollment.hbx_id}" unless Rails.env.test?
       end
     end
   end

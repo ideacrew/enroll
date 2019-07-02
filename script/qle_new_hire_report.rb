@@ -1,5 +1,5 @@
 ## Pass the date range as given below to generate cobra report
-## rails r script/qle_new_hire_report.rb "11/01/2017" "12/10/2017"
+## rails r script/qle_new_hire_report.rb -e production "1/01/2019" "7/10/2019"
 
 require 'csv'
 
@@ -27,10 +27,16 @@ end
 
 def get_plan_details(enrollment, employer)
   product = enrollment.product
+  if product.kind == :health
+     product_kind = product.health_plan_kind
+  elsif product.kind == :dental
+    product_kind = product.dental_plan_kind
+  end
+  benefit_application = enrollment.sponsored_benefit_package.benefit_application
   data = [
     employer.legal_name,
     employer.fein,
-    enrollment.benefit_package.start_on.strftime("%m/%d/%Y"),
+    benefit_application.start_on.to_s,
     enrollment.hbx_id,
     enrollment.time_of_purchase.strftime("%m/%d/%Y"),
     enrollment.effective_on.strftime("%m/%d/%Y"),
@@ -41,8 +47,8 @@ def get_plan_details(enrollment, employer)
     product.name,
     product.hios_id,
     @issuer_profile[product.issuer_profile_id.to_s],
-    product.health_plan_kind,
-    product.metal_level
+    product_kind,
+    product.metal_level,
     enrollment_reason(enrollment),
     sep_or_newhire_date(enrollment)
   ]
@@ -62,7 +68,7 @@ def get_member_details(enrollment_member, enrollment)
     person.last_name,
     person.mailing_address.try(:zip),
     relationship,
-    enrollment.premium_for(enrollment_member)
+    enrollment.decorated_hbx_enrollment.member_enrollments.find { |enrollment| enrollment.member_id == enrollment_member.id }.product_price.round(2).to_f
   ]
 end
 
@@ -158,7 +164,7 @@ CSV.open("#{Rails.root.to_s}/sep_newhire_enrollment_report.csv", "w") do |csv|
     next if active_enrollments.blank?
 
     active_enrollments.each do |enrollment|
-      employer = enrollment.benefit_group.plan_year.employer_profile
+      employer = enrollment.employer_profile
 
       begin
         data = get_plan_details(enrollment, employer)
