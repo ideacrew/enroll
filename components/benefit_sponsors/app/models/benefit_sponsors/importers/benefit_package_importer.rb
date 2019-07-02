@@ -73,10 +73,17 @@ module BenefitSponsors
         end
 
         sponsored_benefit.sponsor_contribution.contribution_levels.each do |new_contribution_level|
-          contribution_match = sponsor_contribution_attrs.detect{|contribution| (((contribution[:relationship] == "child_under_26") ? "dependent" : contribution[:relationship]) == new_contribution_level.contribution_unit.name)}
-          if contribution_match.present?
-            new_contribution_level.is_offered = contribution_match[:offered]
-            new_contribution_level.contribution_factor = (contribution_match[:premium_pct].to_f / 100)
+          profile = @benefit_application.sponsor_profile
+          if profile._type == "BenefitSponsors::Organizations::FehbEmployerProfile"
+            # For congress, all contributions are offered and contribution percent 75%
+            new_contribution_level.is_offered = true
+            new_contribution_level.contribution_factor = 0.75
+          else
+            contribution_match = sponsor_contribution_attrs.detect{|contribution| (((contribution[:relationship] == "child_under_26") ? "dependent" : contribution[:relationship]) == new_contribution_level.contribution_unit.name)}
+            if contribution_match.present?
+              new_contribution_level.is_offered = contribution_match[:offered]
+              new_contribution_level.contribution_factor = (contribution_match[:premium_pct].to_f / 100)
+            end
           end
         end
       end
