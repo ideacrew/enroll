@@ -72,6 +72,10 @@ class EmployeeRole
     Family.find_by_employee_role(self)
   end
 
+  def market_kind
+    employer_profile.is_a_fehb_profile? ? "fehb" : "shop"
+  end
+
   # belongs_to Employer
   # def employer_profile=(new_employer)
   #   raise ArgumentError.new("expected EmployerProfile") unless new_employer.is_a? EmployerProfile

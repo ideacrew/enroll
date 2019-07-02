@@ -63,7 +63,7 @@ class SpecialEnrollmentPeriod
   field :csl_num, type: String
 
   # MARKET KIND
-  field :market_kind, type:String
+  field :market_kind, type: String # Deprecated. Instead use QualifyingLifeEventKind#market_kind
 
   # ADMIN FLAG
   field :admin_flag, type:Boolean

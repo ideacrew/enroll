@@ -38,6 +38,9 @@ end
 
 RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
+  include_context "setup benefit market with market catalogs and product packages"
+  include_context "setup initial benefit application"
+
   let(:hbx_enrollments) { double("HbxEnrollment") }
   let(:user) { FactoryBot.create(:user) }
   let(:person) { double("Person", id: "test", addresses: [], no_dc_address: false, no_dc_address_reason: "" , is_consumer_role_active?: false, has_active_employee_role?: true) }
@@ -45,8 +48,8 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   let(:household) { double("HouseHold", hbx_enrollments: hbx_enrollments) }
   let(:addresses) { [double] }
   let(:family_members) { [double("FamilyMember")] }
-  let(:census_employee) { FactoryBot.create(:census_employee)}
-  let(:employee_roles) { [double("EmployeeRole", :census_employee => census_employee)] }
+  let(:census_employee) { FactoryBot.create(:census_employee, employer_profile: abc_profile) }
+  let(:employee_roles) { [double("EmployeeRole", :census_employee => census_employee, market_kind: 'shop')] }
   let(:resident_role) { FactoryBot.create(:resident_role) }
   let(:consumer_role) { double("ConsumerRole", bookmark_url: "/families/home") }
   # let(:coverage_wavied) { double("CoverageWavied") }
@@ -168,9 +171,9 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
     context "for SHOP market", dbclean: :after_each do
 
-      let(:employee_roles) { double }
-      let(:employee_role) { FactoryBot.create(:employee_role, bookmark_url: "/families/home") }
-      let(:census_employee) { FactoryBot.create(:census_employee, employee_role_id: employee_role.id) }
+      let(:employee_roles) { double(market_kind: 'shop') }
+      let(:employee_role) { FactoryBot.create(:employee_role, bookmark_url: "/families/home", employer_profile: abc_profile) }
+      let(:census_employee) { FactoryBot.create(:census_employee, employee_role_id: employee_role.id, employer_profile: abc_profile) }
 
       before :each do
         FactoryBot.create(:announcement, content: "msg for Employee", audiences: ['Employee'])
@@ -210,7 +213,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
     context "for IVL market" do
       let(:user) { FactoryBot.create(:user) }
-      let(:employee_roles) { double }
+      let(:employee_roles) { double(market_kind: 'shop') }
 
       before :each do
         allow(user).to receive(:idp_verified?).and_return true
@@ -270,11 +273,11 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     end
 
     context "for both ivl and shop", dbclean: :after_each do
-      let(:employee_roles) { double }
+      let(:employee_roles) { double(market_kind: 'shop') }
       let(:employee_role) { double("EmployeeRole", bookmark_url: "/families/home") }
       let(:enrollments) { double }
-      let(:employee_role2) { FactoryBot.create(:employee_role) }
-      let(:census_employee) { FactoryBot.create(:census_employee, employee_role_id: employee_role2.id) }
+      let(:employee_role2) { FactoryBot.create(:employee_role2, employer_profile: abc_profile) }
+      let(:census_employee) { FactoryBot.create(:census_employee, employee_role_id: employee_role2.id, employer_profile: abc_profile) }
 
       before :each do
         sign_in user
@@ -300,8 +303,8 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       context "with waived_hbx when display_hbx is employer_sponsored" do
         let(:waived_hbx) { HbxEnrollment.new(kind: 'employer_sponsored', effective_on: TimeKeeper.date_of_record) }
         let(:display_hbx) { HbxEnrollment.new(kind: 'employer_sponsored', aasm_state: 'coverage_selected', effective_on: TimeKeeper.date_of_record) }
-        let(:employee_role) { FactoryBot.create(:employee_role) }
-        let(:census_employee) { FactoryBot.create(:census_employee, employee_role_id: employee_role.id) }
+        let(:employee_role) { FactoryBot.create(:employee_role, employer_profile: abc_profile) }
+        let(:census_employee) { FactoryBot.create(:census_employee, employee_role_id: employee_role.id, employer_profile: abc_profile) }
         before :each do
           allow(family).to receive(:waivers_for_display).and_return([{"hbx_enrollment"=>{"_id"=>waived_hbx.id}}])
           allow(family).to receive(:active_family_members).and_return(family_members)
@@ -326,8 +329,8 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       context "with waived_hbx when display_hbx is individual" do
         let(:waived_hbx) { HbxEnrollment.new(kind: 'employer_sponsored', effective_on: TimeKeeper.date_of_record) }
         let(:display_hbx) { HbxEnrollment.new(kind: 'individual', aasm_state: 'coverage_selected', effective_on: TimeKeeper.date_of_record) }
-        let(:employee_role) { FactoryBot.create(:employee_role) }
-        let(:census_employee) { FactoryBot.create(:census_employee, employee_role_id: employee_role.id) }
+        let(:employee_role) { FactoryBot.create(:employee_role, employer_profile: abc_profile) }
+        let(:census_employee) { FactoryBot.create(:census_employee, employee_role_id: employee_role.id, employer_profile: abc_profile) }
         before :each do
           allow(family).to receive(:waivers_for_display).and_return([{"hbx_enrollment"=>{"_id"=>waived_hbx.id}}])
           allow(family).to receive(:active_family_members).and_return(family_members)
@@ -382,7 +385,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
   describe "GET manage_family" do
     let(:employee_roles) { double }
-    let(:employee_role) { [double("EmployeeRole")] }
+    let(:employee_role) { double("EmployeeRole", market_kind: 'shop') }
 
     before :each do
       allow(person).to receive(:active_employee_roles).and_return([employee_role])
@@ -471,7 +474,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   describe "GET find_sep" do
     let(:user) { double(identity_verified?: true, idp_verified?: true) }
     let(:employee_roles) { double }
-    let(:employee_role) { [double("EmployeeRole")] }
+    let(:employee_role) { [double("EmployeeRole", market_kind: 'shop')] }
     let(:special_enrollment_period) {[double("SpecialEnrollmentPeriod")]}
 
     before :each do
@@ -662,7 +665,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       end
 
       it "future_qualified_date should return nil when qle market kind is indiviual" do
-        qle = FactoryBot.build(:qualifying_life_event_kind, market_kind: "individual", market_kinds: ["individual"])
+        qle = FactoryBot.build(:qualifying_life_event_kind, market_kind: "individual")
         allow(QualifyingLifeEventKind).to receive(:find).and_return(qle)
         date = TimeKeeper.date_of_record.strftime("%m/%d/%Y")
         get :check_qle_date, params: {date_val: date, qle_id: qle.id, format: :js}

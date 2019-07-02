@@ -18,7 +18,7 @@ class QualifyingLifeEventKind
   ## renamed property: kind to action_kind (also renamed associated constant)
 
   ACTION_KINDS = %w[add_benefit add_member drop_member change_benefit terminate_benefit administrative transition_member]
-  MarketKinds = %w[shop individual]
+  MARKET_KINDS = %w[shop individual fehb].freeze
 
   # first_of_next_month: not subject to 15th of month effective date rule
   EffectiveOnKinds = %w(date_of_event first_of_month first_of_next_month fixed_first_of_next_month exact_date)
@@ -70,7 +70,6 @@ class QualifyingLifeEventKind
   field :reason, type: String
   field :edi_code, type: String
   field :market_kind, type: String # Deprecated
-  field :market_kinds, type: Array, default: []
   field :tool_tip, type: String
   field :pre_event_sep_in_days, type: Integer
   field :is_self_attested, type: Mongoid::Boolean
@@ -98,7 +97,7 @@ class QualifyingLifeEventKind
             presence: true,
             allow_blank: false,
             allow_nil:   false,
-            inclusion: {in: MarketKinds}
+            inclusion: {in: MARKET_KINDS}
 
   # before_create :activate_household_sep
   # before_save :activate_household_sep
@@ -106,7 +105,7 @@ class QualifyingLifeEventKind
                         :post_event_sep_in_days
 
   scope :active, ->{ where(is_active: true).where(:created_at.ne => nil).order(ordinal_position: :asc) }
-  scope :by_market_kinds, ->(market_kinds){ all_in(market_kinds: market_kinds) }
+  scope :by_market_kind, ->(market_kind){ where(market_kind: market_kind) }
 
   # Business rules for EmployeeGainingMedicare
   # If coverage ends on last day of month and plan selected before loss of coverage:
@@ -166,15 +165,15 @@ class QualifyingLifeEventKind
   end
 
   def individual?
-    market_kinds.include?("individual")
+    market_kind == "individual"
   end
 
   def shop?
-    market_kinds.include?("shop")
+    market_kind == "shop"
   end
 
   def fehb?
-    market_kinds.include?("fehb")
+    market_kind == "fehb"
   end
 
   def family_structure_changed?
@@ -188,43 +187,43 @@ class QualifyingLifeEventKind
 
   class << self
     def shop_market_events
-      by_market_kinds(['shop']).and(:is_self_attested.ne => false).active.to_a
+      by_market_kind('shop').and(:is_self_attested.ne => false).active.to_a
     end
 
     def shop_market_events_admin
-      by_market_kinds(['shop']).active.to_a
+      by_market_kind('shop').active.to_a
     end
 
     def shop_market_non_self_attested_events
-      by_market_kinds(['shop']).and(:is_self_attested.ne => true).active.to_a
+      by_market_kind('shop').and(:is_self_attested.ne => true).active.to_a
     end
 
     def fehb_market_events
-      by_market_kinds(['fehb']).and(:is_self_attested.ne => false).active.to_a
+      by_market_kind('fehb').and(:is_self_attested.ne => false).active.to_a
     end
 
     def fehb_market_events_admin
-      by_market_kinds(['fehb']).active.to_a
+      by_market_kind('fehb').active.to_a
     end
 
     def fehb_market_non_self_attested_events
-      by_market_kinds(['fehb']).and(:is_self_attested.ne => true).active.to_a
+      by_market_kind('fehb').and(:is_self_attested.ne => true).active.to_a
     end
 
     def individual_market_events
-      by_market_kinds(['individual']).and(:is_self_attested.ne => false).active.to_a
+      by_market_kind('individual').and(:is_self_attested.ne => false).active.to_a
     end
 
     def individual_market_events_admin
-      by_market_kinds(['individual']).active.to_a
+      by_market_kind('individual').active.to_a
     end
 
     def individual_market_non_self_attested_events
-      by_market_kinds(['individual']).and(:is_self_attested.ne => true).active.to_a
+      by_market_kind('individual').and(:is_self_attested.ne => true).active.to_a
     end
 
     def individual_market_events_without_transition_member_action
-      by_market_kinds(['individual']).active.to_a.reject {|qle| qle.action_kind == "transition_member"}
+      by_market_kind('individual').active.to_a.reject {|qle| qle.action_kind == "transition_member"}
     end
 
     def qualifying_life_events_for(role, hbx_staff = false)

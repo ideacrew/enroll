@@ -12,7 +12,6 @@ RSpec.describe QualifyingLifeEventKind, :type => :model do
       {
         title: "Married",
         market_kind: "shop",
-        market_kinds: ["shop"],
         reason: "marriage",
         effective_on_kinds: ["first_of_month"],
         pre_event_sep_in_days: 0,
@@ -33,7 +32,7 @@ RSpec.describe QualifyingLifeEventKind, :type => :model do
     end
 
     context "should return a individual event kind" do
-      let(:params){ valid_params.deep_merge(market_kind: "individual", market_kinds: ["individual"]) }
+      let(:params){ valid_params.deep_merge(market_kind: "individual") }
       let(:qlek){ QualifyingLifeEventKind.create(**params)}
       before do
         qlek.valid?
@@ -75,15 +74,15 @@ RSpec.describe QualifyingLifeEventKind, :type => :model do
     end
 
     it 'should not display transition member action kind qle' do
-      qle1 = FactoryBot.create(:qualifying_life_event_kind, market_kind: 'individual', market_kinds: ['individual'], action_kind: "transition_member")
-      qle2 = FactoryBot.create(:qualifying_life_event_kind, market_kind: 'individual', market_kinds: ['individual'], action_kind: "add_member")
+      qle1 = FactoryBot.create(:qualifying_life_event_kind, market_kind: 'individual', action_kind: "transition_member")
+      qle2 = FactoryBot.create(:qualifying_life_event_kind, market_kind: 'individual', action_kind: "add_member")
       expect(QualifyingLifeEventKind.individual_market_events_without_transition_member_action).to include(qle2)
       expect(QualifyingLifeEventKind.individual_market_events_without_transition_member_action).not_to include(qle1)
     end
 
     it 'should display transition member action kind qle' do
-      qle1 = FactoryBot.create(:qualifying_life_event_kind, market_kind: 'individual', market_kinds: ['individual'], action_kind: "transition_member")
-      qle2 = FactoryBot.create(:qualifying_life_event_kind, market_kind: 'individual', market_kinds: ['individual'], action_kind: "add_member")
+      qle1 = FactoryBot.create(:qualifying_life_event_kind, market_kind: 'individual', action_kind: "transition_member")
+      qle2 = FactoryBot.create(:qualifying_life_event_kind, market_kind: 'individual', action_kind: "add_member")
       expect(QualifyingLifeEventKind.individual_market_events_admin.count). to eq 2
       expect(QualifyingLifeEventKind.individual_market_events_admin).to include(qle1, qle2)
     end
@@ -115,12 +114,12 @@ RSpec.describe QualifyingLifeEventKind, :type => :model do
 
     context "individual?" do
       it "return true" do
-        qle = FactoryBot.build(:qualifying_life_event_kind, market_kind: "individual", market_kinds: ['individual'])
+        qle = FactoryBot.build(:qualifying_life_event_kind, market_kind: "individual")
         expect(qle.individual?).to eq true
       end
 
       it "return false" do
-        qle = FactoryBot.build(:qualifying_life_event_kind, market_kind: "shop", market_kinds: ['shop'])
+        qle = FactoryBot.build(:qualifying_life_event_kind, market_kind: "shop")
         expect(qle.individual?).to eq false
       end
     end
