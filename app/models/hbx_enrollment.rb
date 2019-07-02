@@ -836,6 +836,14 @@ class HbxEnrollment
     enrollment.update(terminate_reason: term_reason, termination_submitted_on: TimeKeeper.datetime_of_record) if term_reason.present?
   end
 
+  def should_term_or_cancel(coverage_end_date)
+    if self.effective_on >= coverage_end_date
+      'cancel'
+    elsif (coverage_end_date >= TimeKeeper.date_of_record || self.may_terminate_coverage?)
+      'terminate'
+    end
+  end
+
   def waiver_enrollment_present?
     return false if employee_role.blank?
 
@@ -923,11 +931,13 @@ class HbxEnrollment
   end
 
   def renewal_enrollments(successor_application)
-    HbxEnrollment.where({:sponsored_benefit_package_id.in => successor_application.benefit_packages.pluck(:_id),
-                         :coverage_kind => coverage_kind,
-                         :kind => kind,
-                         :family_id => family_id,
-                         :effective_on => successor_application.start_on})
+    HbxEnrollment.where({
+      :sponsored_benefit_package_id.in => successor_application.benefit_packages.pluck(:_id),
+      :coverage_kind => coverage_kind,
+      :kind => kind,
+      :family_id => family_id,
+      :effective_on => successor_application.start_on
+    })
   end
 
   def active_renewals_under(successor_application)
