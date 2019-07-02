@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# This factory can be used for all eligibilities related projects.
+# Currently Applied: Passive Renewals.
+# Future Applicable locations: Plan Shopping Controller, APTC tool, Self Service.
 module Factories
   class EligibilityFactory
 
@@ -63,6 +66,7 @@ module Factories
     end
 
     def tax_households
+      # TODO: Refactor this accordingly once FAA is enabled.
       @family.active_household.latest_active_tax_household_with_year(@enrollment.effective_on.year).to_a
     end
 

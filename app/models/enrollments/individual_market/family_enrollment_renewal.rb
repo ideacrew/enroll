@@ -36,7 +36,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     renewal_enrollment.kind = "individual"
     renewal_enrollment.elected_aptc_pct = @enrollment.elected_aptc_pct
     renewal_enrollment.hbx_enrollment_members = clone_enrollment_members
-    renewal_enrollment.product_id = (can_renew_assisted_product?(renewal_enrollment) ? assisted_renewal_product : renewal_product)
+    renewal_enrollment.product_id = fetch_product_id(renewal_enrollment)
     renewal_enrollment.is_any_enrollment_member_outstanding = @enrollment.is_any_enrollment_member_outstanding
     save_renewal_enrollment(renewal_enrollment)
 
@@ -44,6 +44,13 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     renewal_enrollment = assisted_enrollment(renewal_enrollment) if @assisted
 
     renewal_enrollment
+  end
+
+  def fetch_product_id(renewal_enrollment)
+    # TODO: Fetch proper csr product as the family might be eligible for a
+    # different csr value than that of given externally.
+
+    (can_renew_assisted_product?(renewal_enrollment) ? assisted_renewal_product : renewal_product)
   end
 
   def can_renew_assisted_product?(renewal_enrollment)
@@ -58,10 +65,9 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   end
 
   def assisted_enrollment(renewal_enrollment)
-    eligibility_service = Services::IvlRenewalService.new(renewal_enrollment)
-    eligibility_service.process
-    eligibility_service.assign(@aptc_values)
-    eligibility_service.hbx_enrollment
+    renewal_service = Services::IvlRenewalService.new(renewal_enrollment)
+    renewal_service.assign(@aptc_values)
+    renewal_service.hbx_enrollment
   end
 
   def is_dependent_dropped?
