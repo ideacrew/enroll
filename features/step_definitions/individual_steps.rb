@@ -260,9 +260,10 @@ And(/^.+ click on sign in existing account$/) do
 end
 
 And(/I signed in$/) do
+  click_link 'Sign In Existing Account'
   fill_in "user[login]", :with => "testflow@test.com"
   fill_in "user[password]", :with => "aA1!aA1!aA1!"
-  click_button 'Sign in'
+  find('.sign-in-btn').click
 end
 
 
