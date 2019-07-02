@@ -1,29 +1,11 @@
 module BenefitSponsors
   module Services
     class BrokerRegistrationService
-      # Here we invoke the service with a set of parameters, we assume that
-      # syntactic validation has already been performed.
-      def self.call_with_no_params_validation(service_params, user)
-        creation_request = resolve_virtual_model.new(service_params)
-        domain_validation = resolve_create_request_domain_validator.call(user: user, request: creation_request)
-        return domain_validation unless domain_validation.success?
-        broker_agency_profile = find_or_create_profile_and_organization(creation_request)
-        person = find_or_create_person_for_broker(creation_request, broker_agency_profile)
-        ServiceResponse.new(person)
-      end
-
-      # Here we invoke using the params directly, checking the
-      # syntactic validity ourselves.  Note how we also expose the
-      # method that takes the virtual model, allowing us to
-      # invoke the service directly outside of a controller, but
-      # ensuring that our params have been put into a valid virtual
-      # model (i.e. that type casting and syntactic validation have already)
-      # happened.
-      def self.call_with_params_and_validate(params, user)
+      def self.call(params, user)
         params_validation = resolve_create_request_params_validator.call(params)
         return params_validation unless params_validation.success?
         creation_request = resolve_virtual_model.new(params_validation.output)
-        call_with_virtual_model(creation_request, user)
+        process_request(creation_request, user)
       end
 
       # Take a Creation Request and build the underlying broker agency profile
@@ -31,7 +13,7 @@ module BenefitSponsors
       # @param creation_request [::BenefitSponsors::Requests::BrokerAgencyProfileCreateRequest]
       # @param user [User]
       # @return [::BenefitSponsors::Services::ServiceResponse, ::Dry::Validation::Result]
-      def self.call_with_virtual_model(creation_request, user)
+      def self.process_request(creation_request, user)
         domain_validation = resolve_create_request_domain_validator.call(user: user, request: creation_request)
         return domain_validation unless domain_validation.success?
         broker_agency_profile = find_or_create_profile_and_organization(creation_request)
@@ -60,15 +42,14 @@ module BenefitSponsors
 
       private
 
-      # Dependency injection is isolated here ONLY when we
-      # choose to check the params ourselves.
-      def resolve_create_request_params_validator
-        BenefitSponsors::BrokerAgencyRegistration::CreateRequestWithAchValidators::PARAMS
-      end
 
       # The following methods provide an avenue for dependency injection.
+      def resolve_create_request_params_validator
+        BenefitSponsors::BrokerAgencyRegistration::CreateRequestWithAchValidators::PARAMS.new
+      end
+
       def resolve_create_request_domain_validator
-        ::BenefitSponsors::BrokerAgencyRegistration::CreateRequestValidators::DOMAIN
+        ::BenefitSponsors::BrokerAgencyRegistration::CreateRequestValidators::DOMAIN.new
       end
 
       def resolve_virtual_model

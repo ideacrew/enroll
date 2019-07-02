@@ -23,50 +23,18 @@ module BenefitSponsors
           "5"     => "employer_profile.plan_years.start_on"
         }
         
-        # ===========================================
-        # EXAMPLE CONTROLLER FOR VALIDATION
-
-        def create_with_params_check_in_controller
+        def create
           json = request.body.read
           body_json = JSON.parse(json)
-          # Notice how our dependency resolution has leaked into the controller
-          params_result = resolve_create_request_params_validator.call(body_json["data"])
-          respond_to do |format|
-            if params_result.success?
-              result = ::BenefitSponsors::Services::BrokerRegistrationService.call_with_no_params_validation(params_result.output, current_user)
-              if result.success?
-                format.json { render :status => 201, json: { :message => "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed." } }
-              else
-                format.json { render :status => 422, :json => { errors: result.messages } }
-              end
-            else
-              format.json { render :status => 422, :json => { errors: params_result.messages } }
-            end
-          end     
-          result = ::BenefitSponsors::Services::BrokerRegistrationService.call_with_no_params_validation(body_json["data"], current_user)     
-        end
-
-        def resolve_create_request_params_validator
-          BenefitSponsors::BrokerAgencyRegistration::CreateRequestWithAchValidators::PARAMS
-        end
-
-        # Direct service invocation
-        # All DI is collected in the service,
-        # controller has less dependencies and is easier to test.
-        def create_with_raw_service_call
-          json = request.body.read
-          body_json = JSON.parse(json)
-          result = ::BenefitSponsors::Services::BrokerRegistrationService.call_with_params_and_validate(body_json["data"], current_user)
+          result = ::BenefitSponsors::Services::BrokerRegistrationService.call(body_json["data"], current_user)
           respond_to do |format|
             if result.success?
               format.json { render :status => 201, json: { :message => "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed." } }
             else
-              format.json { render :status => 422, :json => { errors: result.messages } }
+              format.json { render :status => 422, :json => { errors: result.errors.to_h } }
             end
           end
         end
-
-        # ===========================================
 
         def index
           authorize self

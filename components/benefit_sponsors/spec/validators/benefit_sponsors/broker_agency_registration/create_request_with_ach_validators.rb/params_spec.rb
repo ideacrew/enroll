@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe BenefitSponsors::BrokerAgencyRegistration::CreateRequestWithAchValidators::PARAMS do
-  subject { BenefitSponsors::BrokerAgencyRegistration::CreateRequestWithAchValidators::PARAMS.call(data) }
+  subject { BenefitSponsors::BrokerAgencyRegistration::CreateRequestWithAchValidators::PARAMS.new.call(data) }
   
   let(:base_valid_data) do
     {
@@ -13,7 +13,7 @@ RSpec.describe BenefitSponsors::BrokerAgencyRegistration::CreateRequestWithAchVa
       "languages" => ["en"],
       "practice_area" => "shop",
       "evening_weekend_hours" => "no",
-      "accepts_new_clients" => "false",
+      "accepts_new_clients" => "y",
       "email" => "asdf@dude.com",
       "ach_information" => {
         "ach_account" => "1234",

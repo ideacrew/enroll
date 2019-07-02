@@ -63,7 +63,7 @@ gem 'bootsnap',                 '>= 1.1', require: false
 gem 'ckeditor',                 '~> 4.2.4'
 gem 'coffee-rails',             '~> 4.2.2'
 gem 'combine_pdf',              '~> 1.0'
-gem 'config',                   '~> 1.0'
+gem 'config',                   '~> 2.0'
 gem 'curl',                     '~> 0.0.9'
 gem 'devise',                   '~> 4.5'
 gem 'haml',                     '~> 5.0'

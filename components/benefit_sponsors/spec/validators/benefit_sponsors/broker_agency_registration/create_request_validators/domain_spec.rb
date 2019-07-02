@@ -9,7 +9,7 @@ RSpec.describe BenefitSponsors::BrokerAgencyRegistration::CreateRequestValidator
     )
   end
 
-  subject { BenefitSponsors::BrokerAgencyRegistration::CreateRequestValidators::DOMAIN.call(user: user, request: request) }
+  subject { BenefitSponsors::BrokerAgencyRegistration::CreateRequestValidators::DOMAIN.new.call(user: user, request: request) }
 
   let(:broker_is_claimable) { true }
   let(:office_locations) { [mailing_office_location] }
@@ -41,7 +41,7 @@ RSpec.describe BenefitSponsors::BrokerAgencyRegistration::CreateRequestValidator
 
     it "is invalid because of the broker identity information" do
       expect(subject.success?).to be_falsey
-      expect(subject.messages).to have_key(:broker_person_identity_available)
+      expect(subject.errors.to_h).to have_key(:broker_person_identity_available)
     end
   end
 
@@ -57,7 +57,7 @@ RSpec.describe BenefitSponsors::BrokerAgencyRegistration::CreateRequestValidator
 
     it "is invalid because more than one mailing office location" do
       expect(subject.success?).to be_falsey
-      expect(subject.messages).to have_key(:only_one_mailing_office_location)
+      expect(subject.errors.to_h).to have_key(:only_one_mailing_office_location)
     end
   end
 end
