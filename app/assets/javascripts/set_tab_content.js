@@ -3,11 +3,6 @@ function set_tab_content(partial) {
   $('#inbox > #tabContent').html(partial);
 }
 
-function set_csr_tab_content(partial) {
-    $('.flash').remove();
-    $('#inbox > .col-xs-12').html(partial);
-}
-
 function set_active_ontab(tab_id) {
   $(tab_id).siblings().each(function(){
     $(this).removeClass('active');
