@@ -11,20 +11,16 @@ module BenefitSponsors
       # attribute :rating_area_id, if: :is_cca_employer_profile?
       attribute :sic_code, if: :is_cca_employer_profile?
       attribute :grouped_sic_code_options, if: :is_cca_employer_profile?
-      attribute :languages_spoken, if: :is_broker_profile?
       attribute :working_hours, if: :is_broker_profile?
-      attribute :accept_new_clients, if: :is_broker_profile?
       attribute :market_kind_options, if: :is_broker_profile?
-      attribute :market_kind, if: :is_broker_profile?
       attribute :language_options, if: :is_broker_profile?
-      attribute :home_page, if: :is_broker_profile?
       attribute :id, if: :is_persisted?
       attribute :ach_account_number, if: :is_broker_profile?
       attribute :ach_routing_number, if: :is_broker_profile?
-      attribute :market_kind, if: :is_general_agency_profile?
-      attribute :home_page, if: :is_general_agency_profile?
-      attribute :accept_new_clients, if: :is_general_agency_profile?
-      attribute :languages_spoken, if: :is_general_agency_profile?
+      attribute :market_kind, if: :is_broker_or_general_agency?
+      attribute :home_page, if: :is_broker_or_general_agency?
+      attribute :accept_new_clients, if: :is_broker_or_general_agency?
+      attribute :languages_spoken, if: :is_broker_or_general_agency?
 
       has_many :office_locations, serializer: ::BenefitSponsors::Serializers::OfficeLocationSerializer
       has_one :inbox, serializer: ::BenefitSponsors::Serializers::InboxSerializer
@@ -51,6 +47,10 @@ module BenefitSponsors
 
       def is_general_agency_profile?
         object.kind_of?(BenefitSponsors::Organizations::GeneralAgencyProfile)
+      end
+
+      def is_broker_or_general_agency?
+        is_broker_profile? || is_general_agency_profile?
       end
 
       def market_kind_options
