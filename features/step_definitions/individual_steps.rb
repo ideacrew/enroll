@@ -378,7 +378,7 @@ Then(/Individual asks for help$/) do
   find('.container .row div div.btn', text: 'Help').click
   wait_for_ajax
   expect(page).to have_content "Help"
-  click_link "Help from a Customer Service Representative"
+  find(:id => "CSR", :wait => 10).click
   wait_for_ajax(5,2.5)
   expect(page).to have_content "First Name"
   #TODO bombs on help_first_name sometimes

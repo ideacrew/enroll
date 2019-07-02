@@ -864,6 +864,7 @@ When(/^.+ clicks? to add the first employee$/) do
 end
 
 When(/^(?:General){0}.+ clicks? on the ((?:General|Staff){0}.+) tab$/) do |tab_name|
+  click_link 'HBX Portal'
   find(:xpath, "//li[contains(., '#{tab_name}')]", :wait => 10).click
 end
 

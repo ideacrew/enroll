@@ -2,9 +2,9 @@
   .modal-dialog style='min-height: 600px; width: 720px'
     .modal-content
       .modal-header
-        button type="button" class="close" data-dismiss="modal" aria-label="Close"
+        button.close type="button" data-dismiss="modal" aria-label="Close"
           span aria-hidden="true"
-            | &times;
+          | ×
       .modal-body style='height: 650px; overflow-y: scroll'
         #help_list style='font-size: 140%; margin: 140px 100px 0px'
           b = l10n("insured.plan_shoppings.help_me_sign_up_options")
@@ -19,9 +19,13 @@
               a = l10n("insured.plan_shoppings.help_from_a_certified_applicant_counselor")
         #help_search.help_reset
           h4 = l10n("search_by_name")
+          = l10n('first_name')
+          | :
+          br
           input#help_first_name type="text"
           br
-          = l10n("last_name")
+          = l10n('last_name')
+          | :
           br
           input#help_last_name type="text"
           button.btn.btn-primary#search_for_plan_shopping_help = l10n("search_for_help")
