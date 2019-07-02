@@ -173,7 +173,17 @@ class Insured::GroupSelectionController < ApplicationController
   def edit_plan
     @hbx_enrollment = HbxEnrollment.find(params.require(:hbx_enrollment_id))
     family = Family.find(params.require(:family_id))
+    @coverage_end_date = family.terminate_date_for_shop_by_enrollment(@hbx_enrollment)
     @sep = family.try(:latest_active_sep)
+    @should_term_or_cancel = @hbx_enrollment.should_term_or_cancel(@coverage_end_date)
+    @calendar_enabled = @should_term_or_cancel == 'cancel' ? false : true
+  end
+
+  def term_or_cancel
+    hbx_enrollment = HbxEnrollment.find(params.require(:hbx_enrollment_id))
+    term_date = Date.strptime(params.require(:term_date), '%m/%d/%Y')
+    hbx_enrollment.term_or_cancel_enrollment(hbx_enrollment, term_date)
+    redirect_to family_account_path
   end
 
   def cancel
