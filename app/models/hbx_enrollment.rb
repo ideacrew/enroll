@@ -807,6 +807,14 @@ class HbxEnrollment
     enrollment.update(terminate_reason: term_reason, termination_submitted_on: TimeKeeper.datetime_of_record) if term_reason.present?
   end
 
+  def should_term_or_cancel(coverage_end_date)
+    if self.effective_on >= coverage_end_date
+      'cancel'
+    elsif (coverage_end_date >= TimeKeeper.date_of_record || self.may_terminate_coverage?)
+      'terminate'
+    end
+  end
+
   def waiver_enrollment_present?
     return false if employee_role.blank?
 
@@ -895,7 +903,7 @@ class HbxEnrollment
 
   def renewal_enrollments(successor_application)
     HbxEnrollment.where({
-      :sponsored_benefit_package_id.in => successor_application.benefit_packages.pluck(:_id), 
+      :sponsored_benefit_package_id.in => successor_application.benefit_packages.pluck(:_id),
       :coverage_kind => coverage_kind,
       :kind => kind,
       :family_id => family_id,
@@ -1072,13 +1080,13 @@ class HbxEnrollment
 
   def sponsored_benefit
     return @sponsored_benefit if defined? @sponsored_benefit
-    @sponsored_benefit = sponsored_benefit_package.sponsored_benefits.detect{ |sb| sb.id == sponsored_benefit_id }    
+    @sponsored_benefit = sponsored_benefit_package.sponsored_benefits.detect{ |sb| sb.id == sponsored_benefit_id }
   end
 
   def sponsored_benefit=(sponsored_benefit)
     raise ArgumentError.new("expected BenefitSponsors::SponsoredBenefits::SponsoredBenefit") unless sponsored_benefit.is_a? ::BenefitSponsors::SponsoredBenefits::SponsoredBenefit
     self.sponsored_benefit_id = sponsored_benefit._id
-    @sponsored_benefit = sponsored_benefit    
+    @sponsored_benefit = sponsored_benefit
   end
 
   def rating_area
