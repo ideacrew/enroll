@@ -6,8 +6,10 @@ require 'csv'
 @start_date = Date.strptime(ARGV[0], "%m/%d/%Y").beginning_of_day
 @end_date  = Date.strptime(ARGV[1], "%m/%d/%Y").end_of_day
 
-@issuer_profile = BenefitSponsors::Organizations::Organization.issuer_profiles.all.inject({}){|data, c| data[c.id.to_s] = c.legal_name; data }
-
+@issuer_profile = BenefitSponsors::Organizations::Organization.issuer_profiles.all.inject({}) do |data, c|
+  data[c.id.to_s] = c.legal_name
+  data
+end
 
 def enrollment_reason(enrollment)
   if enrollment.is_special_enrollment?
@@ -33,10 +35,11 @@ def get_plan_details(enrollment, employer)
     product_kind = product.dental_plan_kind
   end
   ba = enrollment.sponsored_benefit_package.benefit_application
+
   data = [
     employer.legal_name,
     employer.fein,
-    ba.start_on.to_s,
+    enrollment.sponsored_benefit_package.start_on.strftime("%m/%d/%Y"),
     enrollment.hbx_id,
     enrollment.time_of_purchase.strftime("%m/%d/%Y"),
     enrollment.effective_on.strftime("%m/%d/%Y"),
@@ -207,6 +210,7 @@ CSV.open("#{Rails.root.to_s}/sep_newhire_enrollment_report.csv", "w") do |csv|
     next if active_enrollments.blank?
 
     active_enrollments.each do |enrollment|
+
       begin
         employer = enrollment.employer_profile
         next unless enrollment.benefit_group_assignment.census_employee.new_hire_enrollment_period.cover?(enrollment.created_at)

@@ -7,7 +7,7 @@ namespace :reports do
     task :employer_plan_year_status => :environment do
 
       effective_date = Date.new(2015,1,1)
-      organizations = Organization.all_employers_by_plan_year_start_on(effective_date)
+      benefit_sponsorships = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.benefit_application_start_on_or_after(effective_date)
 
       field_names  = %w(
         fein legal_name dba employer_status plan_year_start_on plan_year_status benefit_package plan_option ref_plan_year 
@@ -16,23 +16,23 @@ namespace :reports do
 
       CSV.open("#{Rails.root}/public/er_plan_year_status.csv", "w", force_quotes: true) do |csv|
         csv << field_names
-        organizations.each do |organization|
-          organization.employer_profile.plan_years.each do |plan_year|
-            plan_year.benefit_groups.each do |benefit_group|
-              fein                = plan_year.employer_profile.organization.fein
-              legal_name          = plan_year.employer_profile.organization.legal_name.gsub(',','')
-              dba                 = plan_year.employer_profile.organization.dba.gsub(',','')
-              employer_status     = plan_year.employer_profile.aasm_state
-              plan_year_start_on  = plan_year.start_on
-              plan_year_status    = plan_year.aasm_state
-              benefit_package     = benefit_group.title.gsub(',','')
-              plan_option         = benefit_group.plan_option_kind
-              ref_plan_name       = benefit_group.reference_plan.name.gsub(',','')
-              ref_plan_hios_id    = benefit_group.reference_plan.hios_id
-              ref_plan_year       = benefit_group.reference_plan.active_year
+        benefit_sponsorships.each do |benefit_sponsorship|
+          benefit_sponsorship.benefit_applications.each do |benefit_application|
+            benefit_application.benefit_packages.each do |benefit_package|
+              fein                = benefit_application.employer_profile.organization.fein
+              legal_name          = benefit_application.employer_profile.organization.legal_name.gsub(',','')
+              dba                 = benefit_application.employer_profile.organization.dba.gsub(',','')
+              employer_status     = benefit_application.employer_profile.aasm_state
+              plan_year_start_on  = benefit_application.start_on
+              plan_year_status    = benefit_application.aasm_state
+              benefit_package     = benefit_package.title.gsub(',','')
+              plan_option         = benefit_package.plan_option_kind
+              ref_plan_name       = benefit_package.reference_plan.name.gsub(',','')
+              ref_plan_hios_id    = benefit_package.reference_plan.hios_id
+              ref_plan_year       = benefit_package.reference_plan.active_year
 
-              if plan_year.employer_profile.staff_roles.size > 0
-                staff_role = plan_year.employer_profile.staff_roles.first
+              if benefit_application.employer_profile.staff_roles.size > 0
+                staff_role = benefit_application.employer_profile.staff_roles.first
                 staff_name = staff_role.full_name
 
                 if staff_role.phones.present? && staff_role.phones.where(kind: "work").size > 0
@@ -43,8 +43,8 @@ namespace :reports do
                 end
               end
 
-              if plan_year.employer_profile.active_broker.present?
-                broker = plan_year.employer_profile.active_broker
+              if benefit_application.employer_profile.active_broker.present?
+                broker = benefit_application.employer_profile.active_broker
                 broker_name = broker.full_name
 
                 if broker.phones.present? && broker.phones.where(kind: "work").size > 0
