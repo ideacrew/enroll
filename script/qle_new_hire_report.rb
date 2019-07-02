@@ -32,11 +32,11 @@ def get_plan_details(enrollment, employer)
   elsif product.kind == :dental
     product_kind = product.dental_plan_kind
   end
-  benefit_application = enrollment.sponsored_benefit_package.benefit_application
+  ba = enrollment.sponsored_benefit_package.benefit_application
   data = [
     employer.legal_name,
     employer.fein,
-    benefit_application.start_on.to_s,
+    ba.start_on.to_s,
     enrollment.hbx_id,
     enrollment.time_of_purchase.strftime("%m/%d/%Y"),
     enrollment.effective_on.strftime("%m/%d/%Y"),
@@ -207,10 +207,9 @@ CSV.open("#{Rails.root.to_s}/sep_newhire_enrollment_report.csv", "w") do |csv|
     next if active_enrollments.blank?
 
     active_enrollments.each do |enrollment|
-      employer = enrollment.employer_profile
-      next unless enrollment.benefit_group_assignment.census_employee.new_hire_enrollment_period.cover?(enrollment.created_at)
-
       begin
+        employer = enrollment.employer_profile
+        next unless enrollment.benefit_group_assignment.census_employee.new_hire_enrollment_period.cover?(enrollment.created_at)
         data = get_plan_details(enrollment, employer)
 
         next if enrollment.hbx_enrollment_members.blank?
