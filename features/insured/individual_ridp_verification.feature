@@ -1,4 +1,3 @@
-@wip
 Feature: Consumer RIDP verification process
 
   Background: Individual RIDP Verification process

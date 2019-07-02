@@ -80,17 +80,18 @@ And(/^an uploaded identity verification in REVIEW status is present$/) do
 end
 
 And(/^an uploaded application in VERIFIED status is present$/) do
-	login_as hbx_admin
-	visit exchanges_hbx_profiles_root_path
-	find(:xpath, "//li[contains(., '#{"Families"}')]", :wait => 10).click
-  find('.interaction-click-control-identity-verification').click
-  wait_for_ajax(10,2)
+  login_as hbx_admin
+  visit exchanges_hbx_profiles_root_path
+  find('#families_dropdown', wait: 5).click
+  find('.interaction-click-control-identity-verification', wait: 5).click
   find('a', :text => /First*/i).click
-	expect(page).to have_content('Application')
-  find(:xpath, "/html/body/div[2]/div[2]/div/div/div[1]/div[2]/div/div/div/div[2]/div[5]/div/div[4]/div").click
+  expect(page).to have_content('Application')
+  within('#Application') do
+    find('.label', :text => 'Action').click
+  end
   find('.interaction-choice-control-verification-reason-1').click
-  find('.interaction-choice-control-verification-reason', :text => /\ASelect Reason\z/).click
-  select('Document in EnrollApp', :from => 'verification_reason')
+  find('.selectric-interaction-choice-control-verification-reason').click
+  find('li', :text => 'Document in EnrollApp').click
   find('.v-type-confirm-button').click
   expect(page).to have_content('Application successfully verified.')
 end
@@ -98,16 +99,16 @@ end
 And(/^an uploaded Identity verification in VERIFIED status is present$/) do
   login_as hbx_admin
   visit exchanges_hbx_profiles_root_path
-  find(:xpath, "//li[contains(., '#{"Families"}')]", :wait => 10).click
-  find(:xpath,'//*[@id="myTab"]/li[2]/ul/li[1]/a/span[1]', :wait => 10).trigger('click')
-  wait_for_ajax(10,2)
-  family_member = find('a', :text => /First/)
-  family_member.trigger("click")
+  find('#families_dropdown', wait: 5).click
+  find('.interaction-click-control-identity-verification', wait: 5).click
+  find('a', :text => /First*/i).click
   expect(page).to have_content('Identity')
-  find(:xpath, "/html/body/div[2]/div[2]/div/div/div[1]/div[2]/div/div/div/div[2]/div[1]/div/div[4]/div").click
+  within('#Identity') do
+    find('.label', :text => 'Action').click
+  end
   find('.interaction-choice-control-verification-reason-1').click
-  find('.interaction-choice-control-verification-reason', :text => /\ASelect Reason\z/).click
-  select('Document in EnrollApp', :from => 'verification_reason')
+  find('.selectric-interaction-choice-control-verification-reason').click
+  find('li', :text => 'Document in EnrollApp').click
   find('.v-type-confirm-button').click
   expect(page).to have_content('Identity successfully verified.')
 end
@@ -123,15 +124,14 @@ end
 When(/^the Admin clicks “Continue” on the doc upload page$/) do
   login_as hbx_admin
   visit exchanges_hbx_profiles_root_path
-  find(:xpath, "//li[contains(., '#{"Families"}')]", :wait => 10).click
-  find('.interaction-click-control-identity-verification').click
-  wait_for_ajax(10,2)
-  family_member = find('a', :text => /First/)
-  family_member.trigger("click")
+  find('#families_dropdown', wait: 5).click
+  find('li', :text => 'Families', :class => 'tab-second', :wait => 10).click
+  family_member = find('a', :text => /First*/i)
+  family_member.click
 end
 
 Then(/^the Admin is unable to complete the application for the consumer until ID is verified$/) do
-  find('.interaction-click-control-continue')['disabled'].should == "disabled"
+  find('.interaction-click-control-continue')['disabled'].should == "true"
 end
 
 
@@ -166,16 +166,16 @@ end
 When(/^an uploaded Identity verification in VERIFIED status is present on failed experian screen$/) do
   login_as hbx_admin
   visit exchanges_hbx_profiles_root_path
-  find(:xpath, "//li[contains(., '#{"Families"}')]", :wait => 10).click
-  find(:xpath,'//*[@id="myTab"]/li[2]/ul/li[1]/a/span[1]', :wait => 10).trigger('click')
-  wait_for_ajax(10,2)
-  family_member = find('a', :text => /First/)
-  family_member.trigger("click")
+  find('#families_dropdown', wait: 5).click
+  find('.interaction-click-control-identity-verification', wait: 5).click
+  find('a', :text => /First*/i).click
   expect(page).to have_content('Identity')
-  find(:xpath, "/html/body/div[2]/div[2]/div/div/div[1]/div[3]/div[1]/div/div/div/div[2]/div[1]/div/div[4]/div").click
+  within('#Identity') do
+    find('.label', :text => 'Action').click
+  end
   find('.interaction-choice-control-verification-reason-1').click
-  find('.interaction-choice-control-verification-reason', :text => /\ASelect Reason\z/).click
-  select('Document in EnrollApp', :from => 'verification_reason')
+  find('.selectric-interaction-choice-control-verification-reason').click
+  find('li', :text => 'Document in EnrollApp').click
   find('.v-type-confirm-button').click
   expect(page).to have_content('Identity successfully verified.')
 end
@@ -183,16 +183,16 @@ end
 When(/^an uploaded application in VERIFIED status is present on failed experian screen$/) do
   login_as hbx_admin
   visit exchanges_hbx_profiles_root_path
-  find(:xpath, "//li[contains(., '#{"Families"}')]", :wait => 10).click
-  find(:xpath,'//*[@id="myTab"]/li[2]/ul/li[1]/a/span[1]', :wait => 10).trigger('click')
-  wait_for_ajax(10,2)
-  family_member = find('a', :text => /First/)
-  family_member.trigger("click")
+  find('#families_dropdown', wait: 5).click
+  find('.interaction-click-control-identity-verification', wait: 5).click
+  find('a', :text => /First*/i).click
   expect(page).to have_content('Application')
-  find(:xpath, "/html/body/div[2]/div[2]/div/div/div[1]/div[3]/div[1]/div/div/div/div[2]/div[5]/div/div[4]/div").click
+  within('#Application') do
+    find('.label', :text => 'Action').click
+  end
   find('.interaction-choice-control-verification-reason-1').click
-  find('.interaction-choice-control-verification-reason', :text => /\ASelect Reason\z/).click
-  select('Document in EnrollApp', :from => 'verification_reason')
+  find('.selectric-interaction-choice-control-verification-reason').click
+  find('li', :text => 'Document in EnrollApp').click
   find('.v-type-confirm-button').click
   expect(page).to have_content('Application successfully verified.')
 end
