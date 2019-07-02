@@ -33,7 +33,7 @@ module Notifier
 
       describe ".store_paper_notice" do
         let(:bucket_name) { 'paper-notices' }
-        let(:notice_filename_for_paper_notice) { "#{employer_profile.organization.hbx_id}_#{subject.title}_#{subject.notice_number.gsub('_','')}_#{subject.notice_type}.pdf" }
+        let(:notice_filename_for_paper_notice) { "#{employer_profile.organization.hbx_id}_#{subject.title}_#{subject.notice_number.delete('_')}_#{subject.notice_type}.pdf" }
         let(:doc_uri) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}#sample-key" }
         let(:notice_path_for_paper_notice) { Rails.root.join("tmp", notice_filename_for_paper_notice) }
 
