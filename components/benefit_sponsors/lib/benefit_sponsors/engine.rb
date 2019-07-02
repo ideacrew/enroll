@@ -15,6 +15,8 @@ module BenefitSponsors
       FactoryBot.definition_file_paths << File.expand_path('../../../spec/factories', __FILE__) if defined?(FactoryBot)
     end
 
+    config.autoload_paths << File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "app/validators"))
+
     config.generators do |g|
       g.orm :mongoid
       g.template_engine :slim

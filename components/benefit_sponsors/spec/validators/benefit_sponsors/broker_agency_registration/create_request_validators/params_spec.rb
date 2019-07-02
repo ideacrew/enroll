@@ -1,7 +1,7 @@
 require "rails_helper"
 
-RSpec.describe BenefitSponsors::Validators::BrokerAgencyProfileCreateRequest::PARAMS do
-  subject { BenefitSponsors::Validators::BrokerAgencyProfileCreateRequest::PARAMS.call(data) }
+RSpec.describe BenefitSponsors::BrokerAgencyRegistration::CreateRequestValidators::PARAMS do
+  subject { BenefitSponsors::BrokerAgencyRegistration::CreateRequestValidators::PARAMS.call(data) }
   
   let(:base_valid_data) do
     {
@@ -15,10 +15,6 @@ RSpec.describe BenefitSponsors::Validators::BrokerAgencyProfileCreateRequest::PA
       "evening_weekend_hours" => "no",
       "accepts_new_clients" => "false",
       "email" => "asdf@dude.com",
-      "ach_information" => {
-        "ach_account" => "1234",
-        "ach_confirmation" => "1234"
-      },
       "phone" => {
         "phone_area_code" => "000",
         "phone_number" => "1234567",
@@ -31,6 +27,18 @@ RSpec.describe BenefitSponsors::Validators::BrokerAgencyProfileCreateRequest::PA
         "zip" => "20002"
       }
     }
+  end
+
+  context "with valid data, but no address" do
+    let(:data) do
+      new_data = base_valid_data.dup
+      new_data.delete("address")
+      new_data
+    end
+
+    it "is invalid" do
+      expect(subject.success?).to be_falsey
+    end
   end
 
   context "with valid data, but no office locations" do

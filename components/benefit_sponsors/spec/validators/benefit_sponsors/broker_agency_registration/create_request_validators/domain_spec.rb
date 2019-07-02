@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe BenefitSponsors::Validators::BrokerAgencyProfileCreateRequest::DOMAIN do
+RSpec.describe BenefitSponsors::BrokerAgencyRegistration::CreateRequestValidators::DOMAIN do
   let(:user) { double }
   let(:request) do
     instance_double(
@@ -9,7 +9,7 @@ RSpec.describe BenefitSponsors::Validators::BrokerAgencyProfileCreateRequest::DO
     )
   end
 
-  subject { BenefitSponsors::Validators::BrokerAgencyProfileCreateRequest::DOMAIN.call(user: user, request: request) }
+  subject { BenefitSponsors::BrokerAgencyRegistration::CreateRequestValidators::DOMAIN.call(user: user, request: request) }
 
   let(:broker_is_claimable) { true }
   let(:office_locations) { [mailing_office_location] }
