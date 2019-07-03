@@ -1,4 +1,5 @@
 require File.join(Rails.root, "lib/mongoid_migration_task")
+
 class UpdateBenefitGroupId < MongoidMigrationTask
   def migrate
     begin
@@ -10,12 +11,9 @@ class UpdateBenefitGroupId < MongoidMigrationTask
       else
         if hbx_enrollment.first.benefit_group.present?
           puts " This HbxEnrollment has a benefit group which is not nil" unless Rails.env.test?
-          else
-            hbx_enrollment.first.update_attributes(benefit_group_id: benefit_group_id)
-              if hbx_enrollment.first.valid?
-                 hbx_enrollment.first.save!
-                 hbx_enrollment.first.hbx_id
-              end
+        else
+          hbx_enrollment.first.update_attributes!(benefit_group_id: benefit_group_id)
+          puts("This HBX enrollment's benefit ID was not nil and was updated.") unless Rails.env.test?
         end  
       end
     rescue => e
