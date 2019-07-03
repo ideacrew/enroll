@@ -2,10 +2,10 @@ module BenefitSponsors
   module Serializers
     class OrganizationSerializer < ActiveModel::Serializer
       attributes :legal_name, :dba, :entity_kind, :entity_kind_options
-      attribute :fein, if: :can_fein?
+      attribute :fein, if: :is_non_exempt_benefit_sponsor?
       attribute :entity_kind_options
 
-      def can_fein?
+      def is_non_exempt_benefit_sponsor?
         is_general_organization? || is_congress?
       end
 
