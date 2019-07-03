@@ -1,6 +1,5 @@
 require 'rails_helper'
 require "#{Rails.root}/spec/shared_contexts/enrollment.rb"
-require 'pry'
 
 RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :model do
 
