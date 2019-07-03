@@ -1,13 +1,18 @@
 <div class='container'>
-  <form *ngIf="hasResource()" [formGroup]="deactivationFormGroup" class='form'>
+  <form [formGroup]="deactivationFormGroup" class='form'>
     <h1 class="heading-text" #headerRef>
       Deactivate an Existing Qualifying Life Event Kind
     </h1>
     <field-errors [errorControl]="deactivationFormGroup" errorHeader="Your QLE Kind could not be deactivated for the following reasons:"></field-errors>
     <hr>
     <div class="form-group col-md-4 mb-2{{errorClassFor(deactivationFormGroup.get('end_on'))}}">
-      <input type="hidden" formControlName="id">
       <dl class="">
+        <dt>
+          ID:
+        </dt>
+        <dd>
+          {{qleKindToDeactivate._id}}
+        </dd>
         <dt>
           Title:
         </dt>
@@ -38,7 +43,10 @@
         <dd class='capitalize-text'>
           {{qleKindToDeactivate.market_kind}}
         </dd>
-      </dl>
+      </dl> 
+
+      <input formControlName="_id" type="text" id="qle_kind_deactivation_form__id" [value]="qleKindToDeactivate._id">
+
       <label for="qle_kind_deactivation_form_end_on"> QLE Kind Deactivation Date</label> <br>
       <input type='text' formControlName="end_on" id='qle_kind_deactivation_form_end_on' placeholder="MM/DD/YYYY" mask="M0/d0/0000" [dropSpecialCharacters]="false" [validation]="true" required> <br>
       <field-errors [errorControl]="deactivationFormGroup.get('end_on')"></field-errors>

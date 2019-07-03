@@ -1,7 +1,7 @@
 // Minimum of what the deactivation form needs to draw itself
 
 export interface QleKindDeactivationResource {
-  id: string;
+  _id: string;
   effective_on_kinds: Array<string>;
   title: string;
   tool_tip: string | null;
@@ -18,6 +18,6 @@ export interface QleKindDeactivationResource {
 // The maximum data being sent to the server
 
 export interface QleKindDeactivationRequest {
-  id: string;
+  _id: string;
   end_on: string;
 }

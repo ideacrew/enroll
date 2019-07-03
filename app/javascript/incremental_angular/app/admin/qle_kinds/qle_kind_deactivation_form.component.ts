@@ -37,8 +37,8 @@ export class QleKindDeactivationFormComponent {
       this.qleKindToDeactivate = JSON.parse(qleKindToDeactivateJson)
       if (this.qleKindToDeactivate != null) {
         this.deactivationFormGroup.addControl(
-          "id",
-          new FormControl(this.qleKindToDeactivate.id),
+          "_id",
+          new FormControl(""),
         )
         this.deactivationFormGroup.addControl(
           "end_on",

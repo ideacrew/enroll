@@ -8,6 +8,7 @@ export class QleKindResourceService {
 
   public submitDeactivate(post_uri: string, obj_data : object) : Observable<HttpResponse<any>> {
     var json = JSON.stringify({ data: obj_data });
+    alert("Json is " + json)
     return this.http.put(
       post_uri + ".json",
       json,
