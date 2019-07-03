@@ -552,7 +552,7 @@ class HbxEnrollment
   end
 
   def construct_waiver_enrollment(waiver_reason = nil)
-    qle = (family.is_under_special_enrollment_period? && family.latest_shop_sep.present?)
+    qle = family.is_under_special_enrollment_period? && (family.earliest_effective_shop_sep.present? || family.earliest_effective_fehb_sep.present?)
     coverage_hh = employee_role.person.primary_family.active_household.immediate_family_coverage_household
     waived_enrollment = coverage_hh.household.new_hbx_enrollment_from(employee_role: employee_role, coverage_household: coverage_hh, benefit_package: sponsored_benefit_package, benefit_group_assignment: benefit_group_assignment, qle: qle)
     waived_enrollment.coverage_kind = coverage_kind
@@ -1065,10 +1065,17 @@ class HbxEnrollment
     end
   end
 
+  def earlier_effective_sep_by_market_kind
+    if is_shop?
+      fehb_profile ? family.earliest_effective_fehb_sep : family.earliest_effective_shop_sep
+    else
+      family.earliest_effective_ivl_sep
+    end
+  end
+
   def set_special_enrollment_period
-    if is_special_enrollment?
-      sep_id = is_shop? ? self.family.earliest_effective_shop_sep.id : self.family.earliest_effective_ivl_sep.id
-      self.update_current(special_enrollment_period_id: sep_id)
+    if is_special_enrollment? && special_enrollment_period_id.blank?
+      update_current(special_enrollment_period_id: earlier_effective_sep_by_market_kind.id) if earlier_effective_sep_by_market_kind
     end
   end
 
@@ -1201,7 +1208,7 @@ class HbxEnrollment
     if employee_role.can_enroll_as_new_hire?
       employee_role.coverage_effective_on(qle: qle)
     elsif qle
-      hbx_enrollment.family.earliest_effective_shop_sep.effective_on
+      hbx_enrollment.earlier_effective_sep_by_market_kind.effective_on
     else
       active_plan_year = employee_role.employer_profile.show_plan_year
 

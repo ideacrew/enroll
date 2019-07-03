@@ -97,11 +97,12 @@ class Insured::GroupSelectionController < ApplicationController
     end
 
     if (@adapter.keep_existing_plan?(params) && @adapter.previous_hbx_enrollment.present?)
-      sep = @hbx_enrollment.is_shop? ? @hbx_enrollment.family.earliest_effective_shop_sep : @hbx_enrollment.family.earliest_effective_ivl_sep
+      sep = @hbx_enrollment.earlier_effective_sep_by_market_kind
 
       if sep.present?
         hbx_enrollment.special_enrollment_period_id = sep.id
       end
+
       hbx_enrollment.product = @hbx_enrollment.product
     end
 

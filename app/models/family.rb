@@ -570,6 +570,10 @@ class Family
     special_enrollment_periods.shop_market.order_by(:effective_on.asc).to_a.detect{ |sep| sep.is_active? }
   end
 
+  def earliest_effective_fehb_sep
+    special_enrollment_periods.fehb_market.order_by(:effective_on.asc).to_a.detect{ |sep| sep.is_active? }
+  end
+
   # Get the Individual market {SpecialEnrollmentPeriod} (SEP) eligibility currently available to this
   # family with the earliest coverage effective date. This is a method to obtain the 'most advantageous' coverage,
   # based on earliest start date
@@ -596,12 +600,17 @@ class Family
     special_enrollment_periods.shop_market.order_by(:submitted_at.desc).to_a.detect{ |sep| sep.is_active? }
   end
 
+  def latest_fehb_sep
+    special_enrollment_periods.fehb_market.order_by(:submitted_at.desc).to_a.detect{ |sep| sep.is_active? }
+  end
+
   def terminate_date_for_shop_by_enrollment(enrollment=nil)
-    if latest_shop_sep.present?
-      coverage_end_date = if latest_shop_sep.qualifying_life_event_kind.reason == 'death'
-                            latest_shop_sep.qle_on
+    latest_sep = latest_shop_sep || latest_fehb_sep
+    if latest_sep.present?
+      coverage_end_date = if latest_sep.qualifying_life_event_kind.reason == 'death'
+                            latest_sep.qle_on
                           else
-                            latest_shop_sep.qle_on.end_of_month
+                            latest_sep.qle_on.end_of_month
                           end
 
       if enrollment.present?
