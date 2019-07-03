@@ -81,7 +81,6 @@ module Queries
       self
     end
 
-
     # TODO: Fix me to use the master list of statuses
     def filter_to_active
       add({
@@ -172,7 +171,6 @@ module Queries
       purchased_on_grouping
     end
 
-
     def remove_duplicates_by_family_as_open_enrollment
       eliminate_family_duplicates
       add({
@@ -202,13 +200,6 @@ module Queries
         project_property("family_created_at", "$created_at") +
         project_property("sponsored_benefit_id", "$sponsored_benefit_id") +
         project_property("policy_purchased_at", { "$ifNull" => ["$created_at", "$submitted_at"] }) +
-=begin
-        Not supported by mongo < 3.0!
-        project_property("policy_purchased_on", {
-          "$dateToString" => {"format" => "%Y-%m-%d",
-                              "date" => { "$ifNull" => ["$created_at", "$submitted_at"] }
-        }}) +
-=end
         project_property("member_count", {"$size" => "$hbx_enrollment_members"}) + 
         project_property("product_id", "$product_id") +
         project_property("enrollment_kind", "$enrollment_kind") +
