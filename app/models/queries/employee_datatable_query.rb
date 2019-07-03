@@ -18,6 +18,7 @@ module Queries
       return [] if @employer_profile.nil?
       collection = nil
       case @custom_attributes[:employers]
+
         when "active"
           collection = @employer_profile.census_employees.active
         when "active_alone"
@@ -33,10 +34,10 @@ module Queries
       end
 
       if @search_string.present?
-        return collection.any_of(CensusEmployee.search_hash(@search_string))
+        return collection.any_of(CensusEmployee.search_hash(@search_string)).order_by(:last_name.asc, :first_name.asc)
       end
 
-      return collection
+      collection.order_by(:last_name.asc, :first_name.asc)
     end
 
 
