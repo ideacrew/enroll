@@ -1,5 +1,5 @@
 <div class='container'>
-  <form [formGroup]="deactivationFormGroup" class='form'>
+  <form *ngIf="hasResource()" [formGroup]="deactivationFormGroup" class='form'>
     <h1 class="heading-text" #headerRef>
       Deactivate an Existing Qualifying Life Event Kind
     </h1>
