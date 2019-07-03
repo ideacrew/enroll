@@ -69,6 +69,7 @@ class GroupSelectionPrevaricationAdapter
   def if_previous_enrollment_was_special_enrollment
     return nil unless @previous_hbx_enrollment.present?
     if @previous_hbx_enrollment.is_special_enrollment?
+      @change_plan = 'change_by_qle'
       yield
     end
   end
