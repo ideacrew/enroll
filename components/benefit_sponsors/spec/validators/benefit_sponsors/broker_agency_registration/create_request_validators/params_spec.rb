@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe BenefitSponsors::BrokerAgencyRegistration::CreateRequestValidators::PARAMS do
-  subject { BenefitSponsors::BrokerAgencyRegistration::CreateRequestValidators::PARAMS.call(data) }
+  subject { BenefitSponsors::BrokerAgencyRegistration::CreateRequestValidators::PARAMS.new.call(data) }
   
   let(:base_valid_data) do
     {

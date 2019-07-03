@@ -1,7 +1,7 @@
 module BenefitSponsors
   module Locations
     module AddressValidators
-      PARAMS = Dry::Validation.Params do
+      PARAMS = Dry::Schema.Params do
         required(:address_1).value(:filled?)
         optional(:address_2).maybe(:str?)
         required(:city).value(:filled?)

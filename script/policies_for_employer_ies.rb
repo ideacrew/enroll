@@ -14,8 +14,10 @@ end
 
 start_on_date = window.end.next_month.beginning_of_month.to_time.utc.beginning_of_day
 
-feins = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:benefit_applications => {"$elemMatch" => {"effective_period.min" => start_on_date, :aasm_state => {"$in" => ["enrollment_eligible", "approved", "enrollment_eligible", "active"],"enrollment_open"}}}).map(&:organization).map(&:fein)
+kollection = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:benefit_applications => {"$elemMatch" => {"effective_period.min" => start_on_date,
+                                                                                                                       :aasm_state => {"$in" => ["enrollment_eligible", "approved", "enrollment_eligible", "active","enrollment_open"]}}})
 
+feins = kollection.map(&:organization).map(&:fein)
 clean_feins = feins.map do |f|
   f.gsub(/\D/,"")
 end
@@ -59,7 +61,7 @@ csv << ["policy_id", "member_id", "status", "added", "removed", "old_policy_id",
 f = File.open("policies_to_pull.txt","w")
 
 clean_pol_ids.each do |p_id|
-  
+
   enrollment = HbxEnrollment.by_hbx_id(p_id).first
   # if enrollment.benefit_group.employer_profile.is_conversion?
   #   puts enrollment.hbx_id
@@ -67,7 +69,7 @@ clean_pol_ids.each do |p_id|
   # end
 
   # if PlanYear::PUBLISHED.include?(enrollment.benefit_group.plan_year.aasm_state)
-  #   puts enrollment.hbx_id 
+  #   puts enrollment.hbx_id
   #   next
   # end
 

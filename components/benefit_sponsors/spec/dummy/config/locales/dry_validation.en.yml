@@ -1,7 +1,5 @@
 en:
   errors:
-    broker_person_identity_available: 'broker identity unavailable'
-    only_one_mailing_office_location: 'must have only one mailing office location'
     or: "or"
     array?: "must be an array"
 
@@ -93,3 +91,7 @@ en:
           arg:
             default: "length must be %{size}"
             range: "length must be within %{size_left} - %{size_right}"
+  dry_validation:
+    errors:
+      broker_person_identity_available: 'broker identity unavailable'
+      only_one_mailing_office_location: 'must have only one mailing office location'

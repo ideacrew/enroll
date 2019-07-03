@@ -21,6 +21,7 @@ module BenefitSponsors
           @previous_product = r_coverage.previous_product
           @primary_member_id = nil
           @is_contribution_prohibited = contribution_banhammered
+          @roster_coverage = r_coverage
         end
 
         def add(member)
@@ -38,6 +39,10 @@ module BenefitSponsors
 
         def finalize_results
           if !@is_contribution_prohibited
+            member_prices = Hash.new
+            @roster_coverage.member_enrollments.each do |me|
+              member_prices[me.member_id] = me.product_price
+            end
             contribution_unit = @contribution_model.contribution_units.detect do |cu|
               cu.match?(@relationship_totals)
             end
@@ -45,14 +50,14 @@ module BenefitSponsors
             c_factor = cu.contribution_factor
             max_contribution = BigDecimal.new((@total_price * c_factor).to_s).round(2)
             @total_contribution = [max_contribution, @total_price].min
+            distribution_remaining = @total_contribution
             members_total_price = 0.00
-            @member_ids.each do |m_id|
-              member_price = BigDecimal.new((@total_contribution / @member_total).to_s).floor(2)
-              members_total_price = BigDecimal.new((members_total_price + member_price).to_s).round(2)
-              @member_contributions[m_id] = member_price
+            @member_ids.reverse.each do |m_id|
+              member_price = member_prices[m_id]
+              member_discount = [distribution_remaining, member_price].min
+              distribution_remaining = BigDecimal.new((distribution_remaining - member_discount).to_s).round(2)
+              @member_contributions[m_id] = member_discount
             end
-            member_discrepency = BigDecimal.new((@total_contribution - members_total_price).to_s).round(2)
-            @member_contributions[@primary_member_id] = BigDecimal.new((@member_contributions[@primary_member_id] + member_discrepency).to_s).round(2) 
           else
             @member_ids.each do |m_id|
               @member_contributions[m_id] = 0.00

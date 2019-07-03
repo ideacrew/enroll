@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency "aasm",                      "~> 4.8"
   s.add_dependency 'active_model_serializers',  '~> 0.10'
-  s.add_dependency 'config',                    '~> 1.7'
+  s.add_dependency 'config',                    '~> 2.0'
   s.add_dependency 'language_list',             '~> 1'
   s.add_dependency 'money-rails',               '~> 1.13'
   s.add_dependency 'pundit',                    '~> 2.0'
