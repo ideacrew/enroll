@@ -63,8 +63,7 @@ When(/^clicks on Individual in Families tab$/) do
   visit exchanges_hbx_profiles_root_path
   find(:xpath, "//li[contains(., '#{"Families"}')]", :wait => 10).click
   find('li', :text => 'Families', :class => 'tab-second', :wait => 10).click
-  family_member = find('a', :text => /\AJohn Smith\z/)
-  family_member.click
+  find('a', :text => /\AJohn Smith\z/, :wait => 10).click
   expect(page).to have_content('Identity')
 end
 
