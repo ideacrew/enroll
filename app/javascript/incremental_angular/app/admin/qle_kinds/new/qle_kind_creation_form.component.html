@@ -15,29 +15,42 @@
           <input type='text' formControlName="tool_tip" id='qle_kind_creation_form_tool_tip' class='form-control-custom-qle' required>
         </dt>
           Applicable Questions
-          <button (click)="showQuestions()">
+          <button (click)="showQuestions()" class='btn btn-primary'>
             Create a new question
           </button>
-          <!-- <div *ngIf="showQuestion" class="row container-fluid">
+          <div *ngIf='showQuestionContainer' class="row container-fluid">
             <div formArrayName="questions">
               <div *ngFor="let question of creationFormGroup.controls.questions.controls; let i=index">
-                <div>
-                  <span>Question {{i + 1}}</span>
+                <div *ngIf='showQuestionInput' >
+                  <span>Question</span>
                   <span *ngIf="creationFormGroup.controls.questions.controls.length > 1" 
                       (click)="removeAddress(i)">
                   </span>
                 </div>
                 <div [formGroupName]="i">
-                  <div>
-                    <label>title</label>
-                    <input type="text" formControlName="street">
-                    <small [hidden]="creationFormGroup.controls.questions.controls[i].controls.title.valid">
-                        title is required
-                    </small>
+                  <div *ngIf="showQuestionInput">
+                    <input type="text" formControlName="id" name="i" value='i' style="display: none;"/>
+                    <input type="text" formControlName="questionTitle" (focusout)="showQuestionTypes()">
                   </div>
-                <div>
+                  <div *ngIf="showQuestionType" class="container-fluid">
+                      <h4>Please choose Question Type for this question</h4>
+                      <div class= ''>
+                          <p class="">Date
+                            <input type='radio' formControlName="questionType" id='qle_kind_question_tpye' value = "Date" required>
+                          </p>
+                          <p class="">True/False
+                            <input type='radio' formControlName="questionType" id='qle_kind_question_tpye' value = "True/False" required>   
+                          </p>
+                          <p class="">Multiple Choice
+                              <input type='radio' formControlName="questionType" id='qle_kind_question_tpye' value = "MultipleChoice" required>   
+                             </p>  
+                        </div>
+                  </div>
+                </div>
               </div>
-            </div> -->
+
+              </div>
+            </div>
         <dt>
           Action Kind
           <select  formControlName="action_kind" class='form-control-custom-qle'>
