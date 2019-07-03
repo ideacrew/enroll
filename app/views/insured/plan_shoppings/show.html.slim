@@ -10,7 +10,7 @@
           h1.heading-text = l10n("choose_plan")
           h4.switch-header = l10n(".choose_plan_filter_results_header")
           h4.swtich-header
-          - if @market_kind == "shop"
+          - if @market_kind == "shop" && aca_state_abbreviation == "MA"
             - if @hbx_enrollment.sponsored_benefit.single_plan_type?
               strong Please note your final cost may change based on the final enrollment of all employees.
             - if display_plan_cost_warning(@benefit_group)
