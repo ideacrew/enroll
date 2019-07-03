@@ -12,17 +12,10 @@ deactivatable_list = @deactivatable_qles.map do |qle|
      value: deactivation_form_qle_path(qle)
    }
 end
-
-createable_qle = @createable_qle.new do |qle|
-   {
-     label: qle.title,
-     value: new_qle_path(qle)
-   }
-   end
  %>
  
  <admin-qle-management-wizard
-   data-creatable-list="<%= createable_qle.to_json %>"
+   data-creatable-path="<%= new_qle_path %>"
    data-editable-list="<%= editable_list.to_json %>"
    data-deactivatable-list="<%= deactivatable_list.to_json %>"
  >

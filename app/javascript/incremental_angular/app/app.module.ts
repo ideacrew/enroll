@@ -17,6 +17,7 @@ import { FieldErrorsComponent } from './errors/field_errors.component';
 import { QleKindWizardComponent } from  './admin/qle_kinds/qle_kind_wizard.component';
 import { QleKindDeactivationFormComponent } from  './admin/qle_kinds/qle_kind_deactivation_form.component';
 import { QleKindResourceService } from  './admin/qle_kinds/qle_kind_resource.service';
+import { QleKindCreationFormComponent } from  './admin/qle_kinds/new/qle_kind_creation_form.component';
 
 import { ErrorLocalizer } from './error_localizer';
 
@@ -25,6 +26,7 @@ import { ErrorLocalizer } from './error_localizer';
     AchInformationComponent,
     BrokerAgencyProfileCreateComponent,
     FieldErrorsComponent,
+    QleKindCreationFormComponent,
     PhoneComponent,
     OfficeLocationComponent,
     QleKindWizardComponent,
@@ -33,6 +35,7 @@ import { ErrorLocalizer } from './error_localizer';
   ],
   entryComponents: [
     BrokerAgencyProfileCreateComponent,
+    QleKindCreationFormComponent,
     QleKindWizardComponent,
     QleKindDeactivationFormComponent
   ],
@@ -47,6 +50,8 @@ import { ErrorLocalizer } from './error_localizer';
   [
     BrokerAgencyProfileResourceService.provides('BrokerAgencyProfileCreationService'),
     QleKindResourceService.provides("QleKindDeactivationService"),
+    QleKindResourceService.provides("QleKindCreationService"),
+
     ErrorLocalizer
   ]
 })
@@ -60,6 +65,8 @@ export class AppModule {
     customElements.define("admin-qle-management-wizard",qlewk_custom);
     const qle_kind_deactivation_form_custom = createCustomElement(QleKindDeactivationFormComponent, { injector: this.injector });
     customElements.define("admin-qle-kind-deactivation-form",qle_kind_deactivation_form_custom);
+    const qle_kind_creation_form_custom = createCustomElement(QleKindCreationFormComponent, { injector: this.injector });
+    customElements.define("admin-qle-kind-creation-form",qle_kind_creation_form_custom);
   
   }
 }

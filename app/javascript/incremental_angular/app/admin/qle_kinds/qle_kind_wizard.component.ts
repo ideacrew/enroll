@@ -8,7 +8,7 @@ import { DropdownOption } from 'app/dropdown_option';
 export class QleKindWizardComponent {
   public editableList : Array<DropdownOption> = [];
   public deactivatableList : Array<DropdownOption> = [];
-  public creatableList : Array<DropdownOption> = [];
+  public creatablePath : string | null = null;
 
   public newLocation : string | null = null;
   private selectedAction : string | null = null;
@@ -30,14 +30,11 @@ export class QleKindWizardComponent {
     if (deactivatableListJson != null) {
       this.deactivatableList = JSON.parse(deactivatableListJson);
     }
-    var creatableListJson = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-creatable-list");
-    if (creatableListJson != null) {
-      this.creatableList = JSON.parse(creatableListJson);
-    }
-    var newLocationAttribute = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-new-location");
-    if (newLocationAttribute != null) {
-      this.newLocation = newLocationAttribute;
-    }
+    this.creatablePath = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-creatable-path");
+    // var newLocationAttribute = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-new-location");
+    // if (newLocationAttribute != null) {
+    //   this.newLocation = newLocationAttribute;
+    // }
   }
 
   selectAction(action : string) {
@@ -47,10 +44,8 @@ export class QleKindWizardComponent {
   submit() {
     console.log(this.selectedAction)
     if (this.selectedAction == "new") {
-      console.log(this.createSelection)
-      var createLocation = this.createSelection.nativeElement.value;
-      if (createLocation != null) {
-        window.location.href = createLocation;
+      if (this.creatablePath != null) {
+        window.location.href = this.creatablePath
       }
     } else if (this.selectedAction == "edit") {
       console.log(this.editSelection)

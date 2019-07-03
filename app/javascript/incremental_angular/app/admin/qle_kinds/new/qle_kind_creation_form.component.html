@@ -1,51 +1,63 @@
-<div class='container'>
+<div class='container '>
     <h1 class="heading-text">
       Create an Existing Qualifying Life Event Kind
     </h1>
-    <form *ngIf="hasResource()" [formGroup]="creationFormGroup" class='form'>
+    <form [formGroup]="creationFormGroup" class='form'>
       <field-errors [errorControl]="creationFormGroup" errorHeader="Your QLE Kind could not be Created for the following reasons:"></field-errors>
-      <input type="hidden" formControlName="id">
+      <input type="hidden">
       <dl class="">
         <dt>
           Title 
         </dt>
-        <dd>
-          {{qleKindToCreate.title}}
-        </dd>
+          <input type='text' formControlName="title" id='qle_kind_creation_form_title' required>
         <dt>
           Tool Tip 
         </dt>
         <dd>
-          {{qleKindToCreate.tool_tip}}
+          <input type='text' formControlName="tool_tip" id='qle_kind_creation_form_tool_tip' required>
         </dd>
         <dt>
           Action Kind 
         </dt>
         <dd>
-          {{qleKindToCreate.action_kind}}
+            <select  formControlName="action_kind" >
+              <option value="drop-member">Drop Member</option>
+              <option value="adminstrative">Adminstrative</option>
+              <option value="add-member">Add Member</option>
+              <option value="add-benefit">Add Benefit</option>
+              <option value="change-benefit">Change Benefit</option>
+              <option value="transition-member">Transition Member</option>
+            </select>
         </dd>
         <dt>
           Reason 
         </dt>
         <dd>
-          {{qleKindToCreate.reason}}
+          <input type='text' formControlName="reason" id='qle_kind_creation_form_reason' required>
         </dd>
         <dt>
           Market Kind 
         </dt>
         <dd>
-          {{qleKindToCreate.market_kind}}
+          <input type='text' formControlName="market_kind" id='qle_kind_creation_form_market_kind' required>
         </dd>
-  
+        <dt>
+          Is Self Attested
+        </dt>
+        <dd>
+        <div class= 'form-group'>
+          <label class="radio-inline">Yes
+            <input type='radio' formControlName="is_self_attested" id='qle_kind_creation_form_is_self_attested' value = "Yes" required>
+          </label>
+          <label class="radio-inline">No
+            <input type='radio' formControlName="is_self_attested" id='qle_kind_creation_form_is_self_attested' value = "No" required>   
+          </label>     
+        </div>
+        </dd>
       </dl>
   
-      <div class="form-group col-md-4 mb-2{{errorClassFor(creationFormGroup.get('end_on'))}}">
-        <label for="qle_kind_creation_form_end_on"> QLE Kind creation Date</label> <br>
-        <input type='text' formControlName="end_on" id='qle_kind_creation_form_end_on' placeholder="MM/DD/YYYY" mask="M0/d0/0000" [dropSpecialCharacters]="false" [validation]="true" required> <br>
-        <field-errors [errorControl]="creationFormGroup.get('end_on')"></field-errors>
-  
-  
-        <button class="btn btn-primary" (click)="submitcreation()">Create QLE Kind</button>
+      <div class="form-group col-md-4 mb-2{{errorClassFor(creationFormGroup.get('title'))}}">
+        <button class="btn btn-primary" (click)="submitCreation()">Create QLE Kind</button>
       </div>
     </form>
   </div>

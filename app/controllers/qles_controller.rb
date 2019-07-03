@@ -63,7 +63,10 @@ class QlesController < ApplicationController
   end
 
   def create
-    @qle = ::Forms::QleForm.for_create(permitted_params)
+    binding.pry
+    respond_to do |format|
+      format.json { head :no_content, :location => manage_qles_path }
+    end
   end
 
   private
