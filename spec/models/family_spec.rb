@@ -24,6 +24,18 @@ describe Family, "given a primary applicant and a dependent" do
     subject.remove_family_member(dependent)
   end
 
+  context "payment_transactions" do
+    it "should match with has_many association" do
+      association = Family.reflect_on_association(:payment_transactions)
+      expect(association.class).to eq Mongoid::Association::Referenced::HasMany
+    end
+
+    it "should not match with embeds_many association" do
+      association = Family.reflect_on_association(:payment_transactions)
+      expect(association.class).not_to eq Mongoid::Association::Embedded::EmbedsMany
+    end
+  end
+
   context "with enrolled hbx enrollments" do
     let(:mock_hbx_enrollment) { instance_double(HbxEnrollment) }
     before do
