@@ -1,3 +1,5 @@
+#RAILS_ENV=production bundle exec rake employers:export
+
 require 'csv'
 
 namespace :employers do
@@ -20,36 +22,38 @@ namespace :employers do
       application.workflow_state_transitions.where(:"event".in => ["approve_application", "approve_application!", "publish", "force_publish", "publish!", "force_publish!"]).first.try(:transition_at)
     end
 
-    def import_to_csv(csv, profile, package=nil)
+    def import_to_csv(csv, profile, package=nil, sponsored_benefit=nil)
+
       primary_ol = profile.primary_office_location
       primary_address = primary_ol.address if primary_ol
 
       mailing_address = profile.office_locations.where(:"address.kind" => "mailing").first.try(:address)
 
-      if package.present? && package.health_sponsored_benefit.present?
-        sb = package.health_sponsored_benefit # Only Health in CCA
-        health_contribution_levels = sb.sponsor_contribution.contribution_levels
-        reference_product = sb.reference_product
+      if package.present? && sponsored_benefit.present?
+        contribution_levels = sponsored_benefit.sponsor_contribution.contribution_levels
+        reference_product = sponsored_benefit.reference_product
         application = package.benefit_application
 
-        if health_contribution_levels.size > 2
-          employee_cl = health_contribution_levels.where(display_name: /Employee/i).first
-          spouse_cl = health_contribution_levels.where(display_name: /Spouse/i).first
-          domestic_partner_cl = health_contribution_levels.where(display_name: /Domestic Partner/i).first
-          child_under_26_cl = health_contribution_levels.where(display_name: /Child Under 26/i).first
+        if contribution_levels.size > 2
+          employee_cl = contribution_levels.where(display_name: /Employee/i).first
+          spouse_cl = contribution_levels.where(display_name: /Spouse/i).first
+          domestic_partner_cl = contribution_levels.where(display_name: /Domestic Partner/i).first
+          child_under_26_cl = contribution_levels.where(display_name: /Child Under 26/i).first
         else
-          employee_cl = health_contribution_levels.where(display_name: /Employee Only/i).first
-          spouse_cl = domestic_partner_cl = child_under_26_cl = health_contribution_levels.where(display_name: /Family/i).first
+          employee_cl = contribution_levels.where(display_name: /Employee Only/i).first
+          spouse_cl = domestic_partner_cl = child_under_26_cl = contribution_levels.where(display_name: /Family/i).first
         end
 
         benefit_sponsorship = application.benefit_sponsorship
-        broker_account = benefit_sponsorship.broker_agency_accounts.first
-        broker_role = broker_account.broker_agency_profile.primary_broker_role if broker_account.present?
       end
 
       benefit_sponsorship ||= profile.active_benefit_sponsorship
-      broker_account ||= benefit_sponsorship.broker_agency_accounts.first
-      broker_role ||= broker_account.broker_agency_profile.primary_broker_role if broker_account.present?
+
+      broker_account = benefit_sponsorship.broker_agency_accounts.first
+      broker_role = broker_account.broker_agency_profile.primary_broker_role if broker_account.present?
+      
+      plan_design_organization = SponsoredBenefits::Organizations::PlanDesignOrganization.find_by_sponsor(profile.id).where(has_active_broker_relationship: true).first
+      general_agency_account = plan_design_organization.active_general_agency_account if plan_design_organization.present?
 
       staff_role = profile.staff_roles.detect {|person| person.user.present? }
 
@@ -59,14 +63,11 @@ namespace :employers do
         profile.fein,
         profile.hbx_id,
         profile.entity_kind,
-        profile.sic_code,
         profile.profile_source,
-        profile.referred_by,
-        profile.referred_reason,
         benefit_sponsorship.aasm_state,
-        "", # GA related TODO for DC
-        "", # GA related TODO for DC
-        "", # GA related TODO for DC
+        general_agency_account.try(:general_agency_profile).try(:legal_name),
+        general_agency_account.try(:general_agency_profile).try(:fein),
+        general_agency_account.try(:start_on),
         primary_ol.try(:is_primary),
         primary_address.try(:address_1),
         primary_address.try(:address_2),
@@ -119,7 +120,7 @@ namespace :employers do
 
     CSV.open(file_name, "w") do |csv|
 
-      headers = %w(employer.legal_name employer.dba employer.fein employer.hbx_id employer.entity_kind employer.sic_code employer_profile.profile_source employer.referred_by employer.referred_reason employer.status ga_fein ga_agency_name ga_start_on
+      headers = %w(employer.legal_name employer.dba employer.fein employer.hbx_id employer.entity_kind employer_profile.profile_source employer.status ga_fein ga_agency_name ga_start_on
                                 office_location.is_primary office_location.address.address_1 office_location.address.address_2
                                 office_location.address.city office_location.address.state office_location.address.zip mailing_location.address_1 mailing_location.address_2 mailing_location.city mailing_location.state mailing_location.zip
                                 office_location.phone.full_phone_number staff.name staff.phone staff.email
@@ -142,7 +143,9 @@ namespace :employers do
 
           if packages.present?
             packages.each do |package|
-              import_to_csv(csv, profile, package)
+              package.sponsored_benefits.each do |sponsored_benefit|
+                import_to_csv(csv, profile, package, sponsored_benefit)
+              end
             end
           else
             import_to_csv(csv, profile)
@@ -153,10 +156,11 @@ namespace :employers do
       end
 
     end
-    if Rails.env.production?
-      pubber = Publishers::Legacy::EmployerExportPublisher.new
-      pubber.publish URI.join("file://", file_name)
-    end
+
+    # if Rails.env.production?
+    #   pubber = Publishers::Legacy::EmployerExportPublisher.new
+    #   pubber.publish URI.join("file://", file_name)
+    # end
 
     puts "Output written to #{file_name}"
     puts "************ Report Finished *********"
