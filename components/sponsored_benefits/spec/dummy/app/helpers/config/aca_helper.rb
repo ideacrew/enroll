@@ -19,6 +19,10 @@ module Config::AcaHelper
     @aca_shop_market_employer_contribution_percent_minimum ||= Settings.aca.shop_market.employer_contribution_percent_minimum
   end
 
+  def aca_shop_market_employer_dental_contribution_percent_minimum
+    @aca_shop_market_employer_dental_contribution_percent_minimum ||= Settings.aca.shop_market.employer_dental_contribution_percent_minimum
+  end
+
   def aca_shop_market_valid_employer_attestation_documents_url
     @aca_shop_market_valid_employer_attestation_documents_url ||= Settings.aca.shop_market.valid_employer_attestation_documents_url
   end
