@@ -4,7 +4,7 @@ FactoryBot.define do
     transient do
       office_locations_count { 1 }
       assigned_site { nil }
-      legal_name "Blue Cross Blue Shield"
+      legal_name { "Blue Cross Blue Shield" }
     end
 
     after(:build) do |profile, evaluator|
