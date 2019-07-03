@@ -67,9 +67,6 @@ class FixPlanYear < MongoidMigrationTask
 
   def find_by_benefit_groups(benefit_groups)
     id_lists = benefit_groups.collect(&:_id).uniq
-    families = Family.all_enrollments_by_benefit_group_ids(id_lists)
-    families.inject([]) do |enrollments, family|
-      enrollments += family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_lists).to_a
-    end
+      HbxEnrollment.where(:benefit_group_id.in => id_lists).to_a
   end
 end
