@@ -21,6 +21,17 @@ class HbxEnrollment
   # override the method where we do household_id == etc.
   belongs_to :family
 
+  module AssociationExtensions
+    def household=(hh)
+      super(hh)
+      if hh.family
+        self.family = hh.family
+      end
+    end
+  end
+
+  prepend AssociationExtensions
+
   ENROLLMENT_CREATED_EVENT_NAME = "acapi.info.events.policy.created"
   ENROLLMENT_UPDATED_EVENT_NAME = "acapi.info.events.policy.updated"
 
