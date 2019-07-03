@@ -812,4 +812,10 @@ module ApplicationHelper
     end.to_json
   end
 
+  def can_access_pay_now_button
+    hbx_staff_role = current_user.person.hbx_staff_role
+    return true if hbx_staff_role.blank?
+
+    hbx_staff_role.permission.can_access_pay_now
+  end
 end

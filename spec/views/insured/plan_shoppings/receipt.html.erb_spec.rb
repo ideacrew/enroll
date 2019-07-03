@@ -20,6 +20,7 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
       plan: new_plan,
       is_cobra_status?: false,
       coverage_kind: 'health',
+      hbx_id: "3939393",
       is_shop?: true,
       employee_role: double("EmployeeRole"),
       composite_rated?: true
@@ -39,7 +40,8 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
     double(
       "Plan",
       title: "My Silly Plan",
-      name: "plan name"
+      name: "My Silly Plan",
+      carrier_profile: carrier_profile
     )
   end
 
@@ -63,6 +65,7 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
   end
 
   let(:members) { [new_member, new_member] }
+  let(:carrier_profile){ double("CarrierProfile", legal_name: "my legal name") }
 
   let(:member_enrollment) {BenefitSponsors::Enrollments::MemberEnrollment.new(member_id:'',product_price:BigDecimal(100),sponsor_contribution:BigDecimal(100))}
   let(:group_enrollment) {double(member_enrollments:[member_enrollment], product_cost_total:0.0,sponsor_contribution_total:0.0, employee_cost_total:0.0)}
@@ -72,8 +75,10 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
     assign :enrollment, enrollment
     assign :member_group, member_group
     @plan = plan_cost_decorator
+
     allow(@plan).to receive(:sole_source?).and_return(true)
-    allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: true)) 
+    allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: true))
+    allow(view).to receive(:show_pay_now?).and_return false
     render file: "insured/plan_shoppings/receipt.en.html.erb"
   end
 
@@ -109,5 +114,42 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
 
   it "should not have cobra msg" do
     expect(rendered).not_to match("Your employer may charge an additional administration fee for your COBRA/Continuation coverage. If you have any questions, please direct them to the Employer")
+  end
+
+  context "doesn't have a Pay Now option and messaging" do
+    before do
+      allow(view).to receive(:show_pay_now?).and_return false
+    end
+    it "doesn't have a Pay now button" do
+      render file: "insured/plan_shoppings/receipt.en.html.erb"
+      expect(rendered).to_not have_selector('btn-btn-default', text: /Pay Now/)
+    end
+
+    it "doesn't have Pay Now messaging" do
+      render file: "insured/plan_shoppings/receipt.en.html.erb"
+      expect(rendered).to_not have_content(/Select PAY NOW to make your first premium payment online/)
+      expect(rendered).to_not have_content(/You only have the option to PAY NOW while you’re on this page/)
+      expect(rendered).to_not have_content(/Select PAY NOW to make your first premium payment directly to Kaiser Permanente/)
+    end
+  end
+
+  context "have Pay Now options and messaging" do
+    let!(:user){FactoryBot.create(:user)}
+    let!(:person){FactoryBot.create(:person, user: user)}
+    before do
+      sign_in(user)
+      allow(view).to receive(:show_pay_now?).and_return true
+    end
+    it "should have a Pay now button" do
+      render file: "insured/plan_shoppings/receipt.en.html.erb"
+      expect(rendered).to have_selector('button', text: /Pay Now/)
+    end
+
+    it "have Pay Now messaging" do
+      render file: "insured/plan_shoppings/receipt.en.html.erb"
+      expect(rendered).to have_selector('strong', text: /You only have the option to PAY NOW while you’re on this page./)
+      expect(rendered).to have_text(/You only have the option to PAY NOW while you’re on this page/)
+      expect(rendered).to have_text(/If you leave this page without selecting PAY NOW,/)
+    end
   end
 end

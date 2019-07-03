@@ -24,6 +24,18 @@ describe Family, "given a primary applicant and a dependent" do
     subject.remove_family_member(dependent)
   end
 
+  context "payment_transactions" do
+    it "should match with has_many association" do
+      association = Family.reflect_on_association(:payment_transactions)
+      expect(association.class).to eq Mongoid::Association::Referenced::HasMany
+    end
+
+    it "should not match with embeds_many association" do
+      association = Family.reflect_on_association(:payment_transactions)
+      expect(association.class).not_to eq Mongoid::Association::Embedded::EmbedsMany
+    end
+  end
+
   context "with enrolled hbx enrollments" do
     let(:mock_hbx_enrollment) { instance_double(HbxEnrollment) }
     before do
@@ -243,9 +255,9 @@ describe Family, type: :model, dbclean: :around_each do
 
     context "when a broker account is created for the Family" do
       let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile)}
-      let(:writing_agent)         { FactoryBot.create(:broker_role, broker_agency_profile_id: broker_agency_profile.id) }
+      let(:writing_agent)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
       let(:broker_agency_profile2) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile)}
-      let(:writing_agent2)         { FactoryBot.create(:broker_role, broker_agency_profile_id: broker_agency_profile2.id) }
+      let(:writing_agent2)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile2.id) }
 
       it "adds a broker agency account" do
         carols_family.hire_broker_agency(writing_agent.id)

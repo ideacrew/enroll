@@ -1,10 +1,9 @@
-@wip
 Feature: CSR finishes shopping for Individual
   Scenario: New insured user purchases on individual market
     Given Individual has not signed up as an HBX user
       When a CSR exists
       When Individual visits the Insured portal outside of open enrollment
-      Then Individual creates HBX account
+      Then Individual creates a new HBX account
       Then I should see a successful sign up message
       And user should see your information page
       When user goes to register as an individual
@@ -14,6 +13,8 @@ Feature: CSR finishes shopping for Individual
       Then Individual should see a form to enter personal information
       When Individual clicks on Save and Exit
       Then Individual resumes enrollment
+      And Individual click on sign in existing account
+      And I signed in
       Then Individual sees previously saved address
       Then Individual asks for help
       Then Individual logs out

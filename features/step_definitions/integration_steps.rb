@@ -215,7 +215,12 @@ Given(/^Hbx Admin exists$/) do
   p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true,
                             list_enrollments: true, send_broker_agency_message: true, approve_broker: true, approve_ga: true,
                             modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_lock_unlock: true,
-                            can_reset_password: true, view_the_configuration_tab: true, can_access_new_consumer_application_sub_tab: true)
+                            can_reset_password: true, view_the_configuration_tab: true, can_access_new_consumer_application_sub_tab: true,
+                            can_complete_resident_application: true, can_add_sep: true, can_view_username_and_email: true, can_view_application_types: true,
+                            view_personal_info_page: true, can_access_outstanding_verification_sub_tab: true, can_access_identity_verification_sub_tab: true,
+                            can_access_accept_reject_paper_application_documents: true, can_delete_identity_application_documents: true,
+                            can_access_accept_reject_identity_documents: true)
+
   person = people['Hbx Admin']
   hbx_profile = FactoryBot.create :hbx_profile
   user = FactoryBot.create :user, :with_family, :hbx_staff, with_security_questions: false, email: person[:email], password: person[:password], password_confirmation: person[:password]
@@ -346,6 +351,7 @@ When(/^(.*) logs on to the (.*)?/) do |named_person, portal|
   # Adding sleep seems to help prevent the AuthenticityToken error
   # which apeared to be throwing in at least the
   # add_sep_read_and_write_feature cucumber.
+  BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
 end
 
 When(/^user visits the (.*)?/) do |portal|
@@ -395,7 +401,7 @@ end
 
 Then(/^(?:.+) should see a successful sign up message$/) do
   FactoryBot.create(:sic_code, sic_code: "0111")
-  expect(page).to have_content("Welcome!")
+  expect(page).to have_content("Welcome to DC Health Link")
   screenshot("employer_sign_up_welcome")
 end
 
@@ -858,6 +864,7 @@ When(/^.+ clicks? to add the first employee$/) do
 end
 
 When(/^(?:General){0}.+ clicks? on the ((?:General|Staff){0}.+) tab$/) do |tab_name|
+  click_link 'HBX Portal' if page.has_link?('HBX Portal')
   find(:xpath, "//li[contains(., '#{tab_name}')]", :wait => 10).click
 end
 
@@ -876,13 +883,11 @@ end
 And(/^clicks on the person in families tab$/) do
   login_as hbx_admin
   visit exchanges_hbx_profiles_root_path
-  page.find('.families.dropdown-toggle.interaction-click-control-families').click
-  find(:xpath, "//a[@href='/exchanges/hbx_profiles/family_index_dt']").click
-  wait_for_ajax(10,2)
+  page.find('#families_dropdown').click
+  find('#families', wait: 5).click
   family_member = page.find('a', :text => "#{user.person.full_name}")
   family_member.click
-  visit verification_insured_families_path
-  find(:xpath, "//ul/li/a[contains(@class, 'interaction-click-control-documents')]").click
+  find(".interaction-click-control-documents", wait: 5).click
 end
 
 When(/^.+ clicks? on the tab for (.+)$/) do |tab_name|
@@ -922,6 +927,7 @@ When(/^I select a past qle date$/) do
   expect(page).to have_content "Married"
   screenshot("past_qle_date")
   fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
+  click_link((TimeKeeper.date_of_record - 5.days).day)
   within '#qle-date-chose' do
     click_link "CONTINUE"
   end
@@ -969,7 +975,7 @@ And(/I select three plans to compare/) do
     page.all("span.checkbox-custom-label")[0].click
     page.all("span.checkbox-custom-label")[1].click
     page.all("span.checkbox-custom-label")[2].click
-    all('.compare-selected-plans-link')[1].click
+    find('.ivl-compare-selected-plans-link').click
 
     wait_for_ajax(10)
     expect(page).to have_content("Choose Plan - Compare Selected Plans")

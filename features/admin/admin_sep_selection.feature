@@ -12,8 +12,6 @@ Feature: Update DOB and SSN
     Then user should see heading labeled personal information
     Then Individual should click on Individual market for plan shopping #TODO re-write this step
     Then Individual should see a form to enter personal information
-    When Individual clicks on Save and Exit
-    Then Individual resumes enrollment
     Then Individual sees previously saved address
     Then Individual agrees to the privacy agreeement
     Then Individual should see identity verification page and clicks on submit
@@ -36,8 +34,6 @@ Feature: Update DOB and SSN
     When I click the "Had a baby" in qle carousel
     And I select a past qle date
     Then I should see confirmation and continue
-    And I can see the select effective date
-    When I click on continue button on select effective date
     Then I can see the error message Please Select Effective Date
     And I select a effective date from list
     And I click on continue button on select effective date

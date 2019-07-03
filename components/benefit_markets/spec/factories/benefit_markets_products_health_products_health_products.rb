@@ -11,6 +11,7 @@ FactoryBot.define do
     ehb                  { 0.9943 }
     metal_level_kind     { BenefitMarkets::Products::HealthProducts::HealthProduct::METAL_LEVEL_KINDS.sample }
     dc_in_network        { true }
+    family_deductible    { "$500 per person | $1000 per group" }
 
     product_package_kinds { [:single_product, :single_issuer, :metal_level] }
     sequence(:hios_id, (10..99).cycle)  { |n| "41842DC04000#{n}-01" }

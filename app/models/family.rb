@@ -52,6 +52,7 @@ class Family
   embeds_many :broker_agency_accounts, class_name: "BenefitSponsors::Accounts::BrokerAgencyAccount"
   embeds_many :general_agency_accounts
   embeds_many :documents, as: :documentable
+  has_many :payment_transactions
 
   after_initialize :build_household
   before_save :clear_blank_fields
@@ -756,11 +757,22 @@ class Family
     return unless broker_role_id
     existing_agency = current_broker_agency
     broker_role = BrokerRole.find(broker_role_id)
-    broker_agency_profile_id = broker_role.benefit_sponsors_broker_agency_profile_id.present? ? broker_role.benefit_sponsors_broker_agency_profile_id : broker_role.broker_agency_profile_id
+
+    # Removed code which checks and assigns for old broker profile.
+    # Instead log missing new broker profile scenario and avoid the hire of broker by family.
+    if broker_role.benefit_sponsors_broker_agency_profile_id.present?
+      broker_agency_profile_id = broker_role.benefit_sponsors_broker_agency_profile_id
+    elsif Rails.env.production?
+      logger = Logger.new("#{Rails.root}/log/family_hire_broker_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
+      logger.info "Unable to find benefit sponsor broker profile for broker role,
+                    broker_role_id: #{broker_role_id},
+                    broker_agency_profile_id: #{broker_role.broker_agency_profile_id},
+                    benefit sponsor broker_agency_profile_id: #{broker_role.benefit_sponsors_broker_agency_profile_id}"
+    end
+
     terminate_broker_agency if existing_agency
     start_on = Time.now
-    broker_agency_account =  BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile_id, writing_agent_id: broker_role_id, start_on: start_on, is_active: true)
-    broker_agency_accounts.push(broker_agency_account)
+    broker_agency_accounts.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile_id, writing_agent_id: broker_role_id, start_on: start_on, is_active: true)
     self.save
   end
 
