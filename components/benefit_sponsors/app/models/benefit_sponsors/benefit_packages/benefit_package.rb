@@ -290,7 +290,7 @@ module BenefitSponsors
         activate_benefit_group_assignments if predecessor.present?
 
         enrolled_families.each do |family| 
-          enrollments = family.enrollments.by_benefit_package(self).enrolled_and_waived
+          enrollments = HbxEnrollment.by_benefit_package(self).enrolled_and_waived
 
           sponsored_benefits.each do |sponsored_benefit|
             hbx_enrollment = enrollments.by_coverage_kind(sponsored_benefit.product_kind).first
@@ -301,7 +301,7 @@ module BenefitSponsors
 
       def expire_member_benefits
         enrolled_families.each do |family|
-          enrollments = family.enrollments.by_benefit_package(self).enrolled_and_waived
+          enrollments = HbxEnrollment.by_benefit_package(self).enrolled_and_waived
 
           sponsored_benefits.each do |sponsored_benefit|
             hbx_enrollment = enrollments.by_coverage_kind(sponsored_benefit.product_kind).first
@@ -312,7 +312,7 @@ module BenefitSponsors
  
       def terminate_member_benefits
         enrolled_and_terminated_families.each do |family|
-          enrollments = family.enrollments.by_benefit_package(self).enrolled_waived_terminated_and_expired
+          enrollments = HbxEnrollment.by_benefit_package(self).enrolled_and_waived.enrolled_waived_terminated_and_expired
           sponsored_benefits.each do |sponsored_benefit|
             hbx_enrollment = enrollments.by_coverage_kind(sponsored_benefit.product_kind).first
             if hbx_enrollment
@@ -337,7 +337,7 @@ module BenefitSponsors
 
       def termination_pending_member_benefits
         enrolled_families.each do |family|
-          enrollments = family.enrollments.by_benefit_package(self).enrolled_and_waived
+          enrollments = HbxEnrollment.by_benefit_package(self).enrolled_and_waived
 
           sponsored_benefits.each do |sponsored_benefit|
             hbx_enrollment = enrollments.by_coverage_kind(sponsored_benefit.product_kind).first
@@ -364,7 +364,7 @@ module BenefitSponsors
         deactivate_benefit_group_assignments
 
         enrolled_families.each do |family|
-          enrollments = family.enrollments.by_benefit_package(self).enrolled_and_waived
+          enrollments = HbxEnrollment.by_benefit_package(self).enrolled_and_waived
 
           sponsored_benefits.each do |sponsored_benefit|
             hbx_enrollment = enrollments.by_coverage_kind(sponsored_benefit.product_kind).first
