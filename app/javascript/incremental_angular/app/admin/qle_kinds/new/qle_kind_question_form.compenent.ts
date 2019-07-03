@@ -1,7 +1,7 @@
 import { Component, Injector, ElementRef, Inject, ViewChild  } from '@angular/core';
-import { QleKindCreationResource } from './qle_kind_creation_data';
+import { QleKindQuestionResource } from './qle_kind_creation_data';
 import { FormGroup, FormControl, AbstractControl, Validators } from '@angular/forms';
-import { QleKindCreationService } from '../qle_kind_services';
+import { QleKindQuestionService } from '../qle_kind_services';
 import { ErrorLocalizer } from '../../../error_localizer';
 import { ErrorMapper, ErrorResponse } from '../../../error_mapper';
 import { HttpResponse } from "@angular/common/http";
@@ -11,16 +11,16 @@ import { HttpResponse } from "@angular/common/http";
   selector: 'admin-qle-kind-creation-form',
   templateUrl: './qle_kind_creation_form.component.html'
 })
-export class QleKindCreationFormComponent {
-  public qleKindToCreate : QleKindCreationResource | null = null;
+export class QleKindQuestionFormComponent {
+  public qleKindToCreate : QleKindQuestionResource | null = null;
   public creationFormGroup : FormGroup = new FormGroup({});
   public creationUri : string | "";
   @ViewChild('headerRef') headerRef: ElementRef;
 
   constructor(
-      injector: Injector,
+     injector: Injector,
      private _elementRef : ElementRef,
-     @Inject("QleKindCreationService") private CreationService : QleKindCreationService,
+     @Inject("QleKindQuestionService") private QuestionService : QleKindQuestionService,
      ) {
 
   }
@@ -62,13 +62,13 @@ export class QleKindCreationFormComponent {
       }
     }
 
-  submitCreation() {
+  submitQuestion() {
     var form = this;
     var errorMapper = new ErrorMapper();
     if (this.creationFormGroup != null) {
       if (this.creationFormGroup.valid) {
         console.log(this.creationFormGroup.value)
-        // var invocation = this.CreationService.submitCreation(this.creationUri, this.creationFormGroup.value);
+        // var invocation = this.QuestionService.submitQuestion(this.creationUri, this.creationFormGroup.value);
         // invocation.subscribe(
         //   function(data: HttpResponse<any>) {
         //     var location_header = data.headers.get("Location");

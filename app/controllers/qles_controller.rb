@@ -20,7 +20,6 @@ class QlesController < ApplicationController
   # TODO: All of these forms will be found in
   # app/javascript/incremental_angular/app/admin/qle_kinds/
   def manage_qle
-    binding.pry
     @manage_qle = ::Forms::ManageQleForm.for_create(permitted_params)
     attrs = {market_kind: @manage_qle.market_kind}
     if params[:manage_qle][:action] == 'new_qle'

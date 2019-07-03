@@ -8,56 +8,49 @@
       <dl class="">
         <dt>
           Title 
+          <input type='text' formControlName="title" id='qle_kind_creation_form_title' class='form-control-custom-qle' required>
         </dt>
-          <input type='text' formControlName="title" id='qle_kind_creation_form_title' required>
         <dt>
           Tool Tip 
+          <input type='text' formControlName="tool_tip" id='qle_kind_creation_form_tool_tip' class='form-control-custom-qle' required>
         </dt>
-        <dd>
-          <input type='text' formControlName="tool_tip" id='qle_kind_creation_form_tool_tip' required>
-        </dd>
         <dt>
-          Action Kind 
+          Applicable Questions
+          <input type='text' formControlName="market_kind" id='qle_kind_creation_form_market_kind' class='form-control-custom-qle' required>
         </dt>
-        <dd>
-            <select  formControlName="action_kind" >
-              <option value="drop-member">Drop Member</option>
-              <option value="adminstrative">Adminstrative</option>
-              <option value="add-member">Add Member</option>
-              <option value="add-benefit">Add Benefit</option>
-              <option value="change-benefit">Change Benefit</option>
-              <option value="transition-member">Transition Member</option>
-            </select>
-        </dd>
+        <dt>
+          Action Kind
+          <select  formControlName="action_kind" class='form-control-custom-qle'>
+            <option value="drop-member">Drop Member</option>
+            <option value="adminstrative">Adminstrative</option>
+            <option value="add-member">Add Member</option>
+            <option value="add-benefit">Add Benefit</option>
+            <option value="change-benefit">Change Benefit</option>
+            <option value="transition-member">Transition Member</option>
+          </select>
+        </dt>
         <dt>
           Reason 
+          <input type='text' formControlName="reason" id='qle_kind_creation_form_reason' class='form-control-custom-qle' required>
         </dt>
-        <dd>
-          <input type='text' formControlName="reason" id='qle_kind_creation_form_reason' required>
-        </dd>
         <dt>
           Market Kind 
+          <input type='text' formControlName="market_kind" id='qle_kind_creation_form_market_kind' class='form-control-custom-qle' required>
         </dt>
-        <dd>
-          <input type='text' formControlName="market_kind" id='qle_kind_creation_form_market_kind' required>
-        </dd>
         <dt>
           Is Self Attested
+          <div class= 'form-group'>
+            <label class="radio-inline">Yes
+              <input type='radio' formControlName="is_self_attested" id='qle_kind_creation_form_is_self_attested' value = "Yes" required>
+            </label>
+            <label class="radio-inline">No
+              <input type='radio' formControlName="is_self_attested" id='qle_kind_creation_form_is_self_attested' value = "No" required>   
+            </label>     
+          </div>
         </dt>
-        <dd>
-        <div class= 'form-group'>
-          <label class="radio-inline">Yes
-            <input type='radio' formControlName="is_self_attested" id='qle_kind_creation_form_is_self_attested' value = "Yes" required>
-          </label>
-          <label class="radio-inline">No
-            <input type='radio' formControlName="is_self_attested" id='qle_kind_creation_form_is_self_attested' value = "No" required>   
-          </label>     
-        </div>
-        </dd>
       </dl>
-  
       <div class="form-group col-md-4 mb-2{{errorClassFor(creationFormGroup.get('title'))}}">
-        <button class="btn btn-primary" (click)="submitCreation()">Create QLE Kind</button>
+        <button class="btn btn-primary " (click)="submitCreation()">Create QLE Kind</button>
       </div>
     </form>
   </div>
