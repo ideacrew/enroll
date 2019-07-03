@@ -1,10 +1,11 @@
 import { Component, Injector, ElementRef, Inject, ViewChild  } from '@angular/core';
 import { QleKindCreationResource } from './qle_kind_creation_data';
-import { FormGroup, FormControl, AbstractControl, Validators } from '@angular/forms';
+import { FormGroup, FormControl, AbstractControl, FormArray, FormBuilder, Validators } from '@angular/forms';
 import { QleKindCreationService } from '../qle_kind_services';
 import { ErrorLocalizer } from '../../../error_localizer';
 import { ErrorMapper, ErrorResponse } from '../../../error_mapper';
 import { HttpResponse } from "@angular/common/http";
+import { QleKindQuestionFormComponent } from './qle_kind_question_form.component';
 
 
 @Component({
@@ -14,12 +15,15 @@ import { HttpResponse } from "@angular/common/http";
 export class QleKindCreationFormComponent {
   public qleKindToCreate : QleKindCreationResource | null = null;
   public creationFormGroup : FormGroup = new FormGroup({});
+
   public creationUri : string | "";
+  public showQuestion : boolean | false;
   @ViewChild('headerRef') headerRef: ElementRef;
 
   constructor(
-      injector: Injector,
+     injector: Injector,
      private _elementRef : ElementRef,
+     private _creationForm: FormBuilder,
      @Inject("QleKindCreationService") private CreationService : QleKindCreationService,
      ) {
 
@@ -30,6 +34,7 @@ export class QleKindCreationFormComponent {
   public errorClassFor(control : AbstractControl) : String {
     return (this.hasErrors(control) ? " has-error" : "");
   }
+
   ngOnInit() {
     var qleKindToCreateJson = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-qle-kind-create-url");
         this.creationFormGroup.addControl(
@@ -56,32 +61,49 @@ export class QleKindCreationFormComponent {
           "is_self_attested",
           new FormControl(""),  
         )
+        questions: this._creationForm.array([
+          this.initQuestion(),
+      ]);
     var submissionUriAttribute = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-qle-kind-creation-url");
       if (submissionUriAttribute != null) {
         this.creationUri = submissionUriAttribute;
       }
-    }
+  }
+
+  initQuestion(){
+    return this._creationForm.group({
+      title: ['', Validators.required],
+    });
+  }
+
+  showQuestions(){
+    return this.showQuestion = true
+  }
+
+  addQuestion(){
+    const control = <FormArray>this.creationFormGroup.controls['questions'];
+    control.push(this.initQuestion());
+  }
 
   submitCreation() {
     var form = this;
     var errorMapper = new ErrorMapper();
     if (this.creationFormGroup != null) {
       if (this.creationFormGroup.valid) {
-        console.log(this.creationFormGroup.value)
-        // var invocation = this.CreationService.submitCreation(this.creationUri, this.creationFormGroup.value);
-        // invocation.subscribe(
-        //   function(data: HttpResponse<any>) {
-        //     var location_header = data.headers.get("Location");
-        //     if (location_header != null) {
-        //       window.location.href = location_header;
-        //     }
-        //   },
-        //   function(error) {
-        //     errorMapper.mapParentErrors(form.creationFormGroup, <ErrorResponse>(error.error.errors));
-        //     errorMapper.processErrors(form.creationFormGroup, <ErrorResponse>(error.error.errors));
-        //     form.headerRef.nativeElement.scrollIntoView();
-        //   }
-        // )
+        var invocation = this.CreationService.submitCreation(this.creationUri, this.creationFormGroup.value);
+        invocation.subscribe(
+          function(data: HttpResponse<any>) {
+            var location_header = data.headers.get("Location");
+            if (location_header != null) {
+              window.location.href = location_header;
+            }
+          },
+          function(error) {
+            errorMapper.mapParentErrors(form.creationFormGroup, <ErrorResponse>(error.error.errors));
+            errorMapper.processErrors(form.creationFormGroup, <ErrorResponse>(error.error.errors));
+            form.headerRef.nativeElement.scrollIntoView();
+          }
+        )
       }
     }
   }

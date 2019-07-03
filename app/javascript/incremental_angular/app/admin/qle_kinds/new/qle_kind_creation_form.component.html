@@ -14,10 +14,30 @@
           Tool Tip 
           <input type='text' formControlName="tool_tip" id='qle_kind_creation_form_tool_tip' class='form-control-custom-qle' required>
         </dt>
-        <dt>
           Applicable Questions
-          <input type='text' formControlName="market_kind" id='qle_kind_creation_form_market_kind' class='form-control-custom-qle' required>
-        </dt>
+          <button (click)="showQuestions()">
+            Create a new question
+          </button>
+          <!-- <div *ngIf="showQuestion" class="row container-fluid">
+            <div formArrayName="questions">
+              <div *ngFor="let question of creationFormGroup.controls.questions.controls; let i=index">
+                <div>
+                  <span>Question {{i + 1}}</span>
+                  <span *ngIf="creationFormGroup.controls.questions.controls.length > 1" 
+                      (click)="removeAddress(i)">
+                  </span>
+                </div>
+                <div [formGroupName]="i">
+                  <div>
+                    <label>title</label>
+                    <input type="text" formControlName="street">
+                    <small [hidden]="creationFormGroup.controls.questions.controls[i].controls.title.valid">
+                        title is required
+                    </small>
+                  </div>
+                <div>
+              </div>
+            </div> -->
         <dt>
           Action Kind
           <select  formControlName="action_kind" class='form-control-custom-qle'>

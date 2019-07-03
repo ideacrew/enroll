@@ -18,6 +18,7 @@ import { QleKindWizardComponent } from  './admin/qle_kinds/qle_kind_wizard.compo
 import { QleKindDeactivationFormComponent } from  './admin/qle_kinds/qle_kind_deactivation_form.component';
 import { QleKindResourceService } from  './admin/qle_kinds/qle_kind_resource.service';
 import { QleKindCreationFormComponent } from  './admin/qle_kinds/new/qle_kind_creation_form.component';
+import { QleKindQuestionFormComponent } from './admin/qle_kinds/new/qle_kind_question_form.component';
 
 import { ErrorLocalizer } from './error_localizer';
 
@@ -31,12 +32,14 @@ import { ErrorLocalizer } from './error_localizer';
     OfficeLocationComponent,
     QleKindWizardComponent,
     TrustedHtmlPipe,
+    QleKindQuestionFormComponent,
     QleKindDeactivationFormComponent
   ],
   entryComponents: [
     BrokerAgencyProfileCreateComponent,
     QleKindCreationFormComponent,
     QleKindWizardComponent,
+    QleKindQuestionFormComponent,
     QleKindDeactivationFormComponent
   ],
   imports: [
@@ -51,7 +54,6 @@ import { ErrorLocalizer } from './error_localizer';
     BrokerAgencyProfileResourceService.provides('BrokerAgencyProfileCreationService'),
     QleKindResourceService.provides("QleKindDeactivationService"),
     QleKindResourceService.provides("QleKindCreationService"),
-
     ErrorLocalizer
   ]
 })
@@ -67,6 +69,8 @@ export class AppModule {
     customElements.define("admin-qle-kind-deactivation-form",qle_kind_deactivation_form_custom);
     const qle_kind_creation_form_custom = createCustomElement(QleKindCreationFormComponent, { injector: this.injector });
     customElements.define("admin-qle-kind-creation-form",qle_kind_creation_form_custom);
+    const qle_kind_question_form_custom = createCustomElement(QleKindQuestionFormComponent, { injector: this.injector });
+    customElements.define('qle-question-form', qle_kind_question_form_custom);
   
   }
 }
