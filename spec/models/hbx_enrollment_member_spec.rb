@@ -71,6 +71,7 @@ describe HbxEnrollmentMember, dbclean: :around_each do
         end
       end
     end
+  end
 
   context "given a family member", dbclean: :around_each do
     let(:person) { double }
