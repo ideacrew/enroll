@@ -42,6 +42,8 @@ module Parsers::Xml::Cv::Importers
       enrollee = policy.enrollees.detect {|enrollee| enrollee.is_subscriber == 'true'}
       effective_on = enrollee.benefit.begin_date rescue ''
       terminated_on = enrollee.benefit.end_date rescue ''
+      household = get_household_by_policy_xml(policy)
+
       HbxEnrollment.new(
         hbx_id: policy.id,
         kind: kind,
@@ -52,11 +54,11 @@ module Parsers::Xml::Cv::Importers
         #writing_agent_id: broker_link.id,
         #terminated_on: ,
         coverage_kind: coverage_type,
-        family: get_family_by_policy_xml(policy),
+        family: household.family,
         #enrollment_kind: ,
         #count_of_members: policy.enrollees.length,
         hbx_enrollment_members: hbx_enrollment_members,
-        household_id: get_household_by_policy_xml(policy).id,
+        household: get_household_by_policy_xml(policy),
         effective_on: effective_on,
         terminated_on: terminated_on,
         employee_role: get_employee_role_by_shop_market_xml(enrollment.shop_market),
@@ -107,7 +109,7 @@ module Parsers::Xml::Cv::Importers
       )
     end
 
-    def get_family_by_policy_xml(policy)
+    def get_household_by_policy_xml(policy)
       family_members = []
       policy.enrollees.each do |enrollee|
         member = enrollee.member
@@ -116,13 +118,9 @@ module Parsers::Xml::Cv::Importers
           is_primary_applicant: enrollee.is_subscriber == 'true',
           is_coverage_applicant: member.is_coverage_applicant == 'true',
           person: get_person_object_by_enrollee_member_xml(member),
-          )
+        )
       end
-      Family.new(family_members: family_members)
-    end
-
-    def get_household_by_policy_xml(policy)
-      family = get_family_by_policy_xml(policy)
+      family = Family.new(family_members: family_members)
       Household.new(family: family)
     end
 
