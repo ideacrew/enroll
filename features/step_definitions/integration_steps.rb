@@ -241,7 +241,7 @@ Given(/^a Hbx admin with read and write permissions exists$/) do
   hbx_profile = FactoryBot.create :hbx_profile
   user = FactoryBot.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
   FactoryBot.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
-  FactoryBot.create :hbx_enrollment,family:user.primary_family, household:user.primary_family.active_household
+  FactoryBot.create :hbx_enrollment,family: user.primary_family, household: user.primary_family.active_household
 end
 
 Given(/^a Hbx admin with super admin access exists$/) do

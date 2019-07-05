@@ -498,39 +498,6 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     #     end
     #   end
 
-      # context "status_step" do
-      #   let(:hbx_enrollment) {HbxEnrollment.new()}
-
-      #   it "return 1 when coverage_selected" do
-      #     hbx_enrollment.aasm_state = "coverage_selected"
-      #     expect(hbx_enrollment.status_step).to eq 1
-      #   end
-
-      #   it "return 2 when transmitted_to_carrier" do
-      #     hbx_enrollment.aasm_state = "transmitted_to_carrier"
-      #     expect(hbx_enrollment.status_step).to eq 2
-      #   end
-
-      #   it "return 3 when enrolled_contingent" do
-      #     hbx_enrollment.aasm_state = "enrolled_contingent"
-      #     expect(hbx_enrollment.status_step).to eq 3
-      #   end
-
-      #   it "return 4 when coverage_enrolled" do
-      #     hbx_enrollment.aasm_state = "coverage_enrolled"
-      #     expect(hbx_enrollment.status_step).to eq 4
-      #   end
-
-      #   it "return 5 when coverage_canceled" do
-      #     hbx_enrollment.aasm_state = "coverage_canceled"
-      #     expect(hbx_enrollment.status_step).to eq 5
-      #   end
-
-      #   it "return 5 when coverage_terminated" do
-      #     hbx_enrollment.aasm_state = "coverage_terminated"
-      #     expect(hbx_enrollment.status_step).to eq 5
-      #   end
-      # end
 
       context "enrollment_kind" do
         let(:person) { FactoryBot.create(:person, :with_consumer_role)}
