@@ -312,7 +312,7 @@ module BenefitSponsors
  
       def terminate_member_benefits
         enrolled_and_terminated_families.each do |family|
-          enrollments = HbxEnrollment.by_benefit_package(self).enrolled_and_waived.enrolled_waived_terminated_and_expired
+          enrollments = HbxEnrollment.by_benefit_package(self).enrolled_waived_terminated_and_expired.where(family_id: family.id)
           sponsored_benefits.each do |sponsored_benefit|
             hbx_enrollment = enrollments.by_coverage_kind(sponsored_benefit.product_kind).first
             if hbx_enrollment
@@ -337,7 +337,7 @@ module BenefitSponsors
 
       def termination_pending_member_benefits
         enrolled_families.each do |family|
-          enrollments = HbxEnrollment.by_benefit_package(self).enrolled_and_waived
+          enrollments = HbxEnrollment.by_benefit_package(self).where(family_id: family.id)
 
           sponsored_benefits.each do |sponsored_benefit|
             hbx_enrollment = enrollments.by_coverage_kind(sponsored_benefit.product_kind).first
