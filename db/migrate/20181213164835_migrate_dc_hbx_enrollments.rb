@@ -106,8 +106,7 @@ class MigrateDcHbxEnrollments < Mongoid::Migration
               else
                 product_data = ivl_plan_hash[hbx.plan_id]
                 hbx.update_attributes(
-                    product_id: product_data ? product_data['product_id'] : nil,
-                    issuer_profile_id: product_data ? product_data['carrier_profile_id'] : nil
+                    product_id: product_data['product_id'], issuer_profile_id: product_data['carrier_profile_id']
                 )
                 print '.' unless Rails.env.test?
               end
