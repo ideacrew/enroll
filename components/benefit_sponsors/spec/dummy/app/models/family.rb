@@ -28,6 +28,7 @@ class Family
   field :vlp_documents_status, type: String
 
   belongs_to  :person, optional: true
+  has_many :hbx_enrollments
 
   embeds_many :family_members, cascade_callbacks: true
   embeds_many :special_enrollment_periods, cascade_callbacks: true

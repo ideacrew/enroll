@@ -12,7 +12,8 @@ class HbxEnrollment
   include BenefitSponsors::Concerns::Observable
   include BenefitSponsors::ModelEvents::HbxEnrollment
 
-  embedded_in :household
+  belongs_to :family
+  belongs_to :household
   field :effective_on, type: Date
   field :terminated_on, type: Date
   field :kind, type: String
