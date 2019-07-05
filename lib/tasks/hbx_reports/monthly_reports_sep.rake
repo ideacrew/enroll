@@ -20,16 +20,10 @@ namespace :reports do
     Date.parse(date).next_month
   end
 
-
     file_name = "#{Rails.root}/monthly_sep_enrollments_report_#{date.gsub(" ", "").split(",").join("_")}.csv"
     puts "Created file and trying to import the data #{file_name}" 
 
-    families = Family.where(:"_id".in => HbxEnrollment.where({
-      :aasm_state => {"$in" => HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES },
-      :enrollment_kind => "special_enrollment",
-      :created_at => {:"$gte" => start_date, :"$lt" => end_date},
-      :kind => 'individual'
-    }).pluck(:family_id))
+    families = Family.monthly_reports_scope
 
     CSV.open(file_name,"w") do |csv|
       csv <<  ["Subscriber ID",
@@ -47,7 +41,7 @@ namespace :reports do
 
       families.each do |family|
         begin
-          hbx_enrollments = family.active_household.hbx_enrollments.special_enrollments.individual_market.show_enrollments_sans_canceled.where(:"created_at" => {:"$gte" => start_date, :"$lt" => end_date})
+          hbx_enrollments = HbxEnrollment.enrollments_for_monthly_report_sep_scope(start_date, end_date, family.id)
           hbx_enrollments.each do |enrollment|
             primary_person = enrollment.family.primary_applicant.person
             covered_people = enrollment.hbx_enrollment_members.map(&:family_member).map(&:person).map(&:full_name)

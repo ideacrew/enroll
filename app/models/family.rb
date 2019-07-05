@@ -178,6 +178,18 @@ class Family
       effective_on: { :"$gte" => TimeKeeper.date_of_record.beginning_of_year, :"$lte" =>  TimeKeeper.date_of_record.end_of_year }
       ).pluck(:family_id))
   }
+
+  scope :monthly_reports_scope, -> do
+    where(
+      :"_id".in => HbxEnrollment.where(
+      {
+        :aasm_state => {"$in" => HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES },
+        :enrollment_kind => "special_enrollment",
+        :created_at => {:"$gte" => start_date, :"$lt" => end_date},
+        :kind => 'individual'
+      }
+    ).pluck(:family_id))
+  end
   
   # Replaced scopes for moving HbxEnrollment to top level
   # The following methods are rewrites of scopes that were being called before HbxEnrollment was a top level document.

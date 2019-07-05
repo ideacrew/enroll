@@ -321,6 +321,11 @@ class HbxEnrollment
       :"effective_on".gte => benefit_application.effective_period.min
     )
   end
+  scope :enrollments_for_monthly_report_sep_scope, ->(start_date, end_date, family) do
+    where(family_id: family.id).special_enrollments.individual_market.show_enrollments_sans_canceled.where(
+      :"created_at" => {:"$gte" => start_date, :"$lt" => end_date}
+    )
+  end
   embeds_many :workflow_state_transitions, as: :transitional
 
   belongs_to :benefit_sponsorship, class_name: "::BenefitSponsors::BenefitSponsorships::BenefitSponsorship", optional: true
