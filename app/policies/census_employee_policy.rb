@@ -27,10 +27,11 @@ class CensusEmployeePolicy < ApplicationPolicy
       return true if @user.person.employer_staff_roles.map(&:employer_profile_id).map(&:to_s).include? @record.employer_profile_id.to_s     
     end  
     if @user.has_role?(:general_agency_staff) || @user.has_general_agency_staff_role?
-      linked_general_agency = @record.employer_profile.general_agency_profile
-      return false if linked_general_agency.nil?
-      general_agency_profile_ids = @user.person.active_general_agency_staff_roles.map{|a| a.general_agency_profile_id}
-      return true if general_agency_profile_ids.include?(linked_general_agency.id)
+      ga_id = @user.person.general_agency_staff_roles.last.general_agency_profile.id
+      employer_id = @record.employer_profile.id
+      return false if ga_id.nil? || employer_id.nil?
+      plan_design_organizations = SponsoredBenefits::Organizations::PlanDesignOrganization.find_by_sponsor(employer_id)
+      plan_design_organizations.map{|a| a.general_agency_profile.id}.include? ga_id
     end
     return false
   end
