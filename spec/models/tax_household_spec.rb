@@ -373,7 +373,7 @@ RSpec.describe TaxHousehold, type: :model do
       let!(:tax_household) {FactoryBot.create(:tax_household, household: family.active_household, created_at: TimeKeeper.date_of_record - 5.months)}
       let!(:tax_household_member1) {tax_household.tax_household_members.create!(is_ia_eligible: true, applicant_id: person.primary_family.family_members[0].id)}
       let!(:tax_household_member2) {tax_household.tax_household_members.create!(is_ia_eligible: true, applicant_id: person.primary_family.family_members[1].id)}
-      let!(:tax_household_member3) {tax_household.tax_household_members.create!(is_ia_eligible: false, applicant_id: person.primary_family.family_members[2].id)}
+      let!(:tax_household_member3) {tax_household.tax_household_members.create!(is_ia_eligible: false, is_medicaid_chip_eligible: true, applicant_id: person.primary_family.family_members[2].id)}
       let!(:eligibility_determination) {FactoryBot.create(:eligibility_determination, max_aptc: 500, tax_household: tax_household)}
 
       before do
