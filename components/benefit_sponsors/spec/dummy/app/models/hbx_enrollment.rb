@@ -1982,16 +1982,6 @@ class HbxEnrollment
   def notify_enrollment_cancel_or_termination_event(transmit_flag)
     return unless coverage_terminated? || coverage_canceled? || coverage_termination_pending?
 
-    config = Rails.application.config.acapi
-    notify(
-      "acapi.info.events.hbx_enrollment.terminated",
-      {
-        :reply_to => "#{config.hbx_id}.#{config.environment_name}.q.glue.enrollment_event_batch_handler",
-        "hbx_enrollment_id" => hbx_id,
-        "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment",
-        "is_trading_partner_publishable" => transmit_flag
-      }
-    )
   end
 
   def is_any_member_outstanding?
