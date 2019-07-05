@@ -43,9 +43,4 @@ class CensusEmployeePolicy < ApplicationPolicy
       false
     end
   end
-
-  def plan_design_orgaization_for_employer
-    SponsoredBenefits::Organizations::PlanDesignOrganization.find_by_sponsor(@record.employer_profile.id)
-  end
-
 end
