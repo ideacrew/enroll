@@ -78,6 +78,7 @@ module BenefitSponsors
             # For congress, all contributions are offered and contribution percent 75%
             new_contribution_level.is_offered = true
             new_contribution_level.contribution_factor = 0.75
+            new_contribution_level.contribution_cap = congress_contribution_cap(new_contribution_level.contribution_unit.name, @benefit_application.start_on.year)
           else
             contribution_match = sponsor_contribution_attrs.detect{|contribution| (((contribution[:relationship] == "child_under_26") ? "dependent" : contribution[:relationship]) == new_contribution_level.contribution_unit.name)}
             if contribution_match.present?
@@ -86,6 +87,17 @@ module BenefitSponsors
             end
           end
         end
+      end
+
+      def congress_contribution_cap(unit_name, calender_year)
+        # set contribution_cap for congress
+        default_cont_cap = {2014 => {employee_only: 0.0, employee_plus_one: 0.0, family: 0.0},
+                            2015 => {employee_only: 437.69, employee_plus_one: 971.90, family: 971.90},
+                            2016 => {employee_only: 462.3, employee_plus_one: 998.88, family: 1058.42},
+                            2017 => {employee_only: 480.29, employee_plus_one: 1030.88, family: 1094.64},
+                            2018 => {employee_only: 496.71, employee_plus_one: 1063.83, family: 1130.09},
+                            2019 => {employee_only: 498.72, employee_plus_one: 1066.59, family: 1138.19}}
+        default_cont_cap[calender_year][unit_name.to_sym]
       end
 
       def build_pricing_determinations(sponsored_benefit, sponsor_contribution_attrs)
