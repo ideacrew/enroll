@@ -238,5 +238,19 @@ module BenefitSponsors
         end
       end
     end
+
+    describe 'GET export_census_employees' do
+      let!(:employee) do
+        FactoryBot.create(:census_employee, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship)
+      end
+
+      it 'should render the view successfully with content as CSV' do
+        benefit_sponsorship.save!
+        sign_in user
+        get :export_census_employees, params: {employer_profile_id: employer_profile.id.to_s}, format: :csv
+        assert_response :success
+        expect(response.header['Content-Type']).to eq 'text/csv'
+      end
+    end
   end
 end
