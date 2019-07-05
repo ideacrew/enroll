@@ -98,12 +98,12 @@ export class QleKindCreationFormComponent {
     var title =  this.creationFormGroup.value.questions[i].questionTitle;
     console.log(title)
   }
-  removeQuestionInput(){
-    return this.showQuestionInput = false
-  }
+
   showQuestionTypes(){
-    this.removeQuestionInput()
-    return this.showQuestionType = true
+           this.showQuestionInput = false
+           this.showQuestionType = true
+           this.showQuestionTitle = true
+           debugger;
 
   }
   showQuestions(){

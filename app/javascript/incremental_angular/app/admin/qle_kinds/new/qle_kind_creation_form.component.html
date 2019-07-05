@@ -22,7 +22,7 @@
             <div formArrayName="questions">
               <div *ngFor="let question of creationFormGroup.controls.questions.controls; let i=index">
                 <div *ngIf='showQuestionInput' >
-                  <span>Question</span>
+                  <span>Question Title</span>
                   <span *ngIf="creationFormGroup.controls.questions.controls.length > 1" 
                       (click)="removeAddress(i)">
                   </span>
@@ -31,6 +31,9 @@
                   <div *ngIf="showQuestionInput">
                     <input type="text" formControlName="id" name="i" value='i' style="display: none;"/>
                     <input type="text" formControlName="questionTitle" (focusout)="showQuestionTypes()">
+                  </div>
+                  <div *ngIf="showQuestionTitle" class="container-fluid">
+                    dfgjkdlgkfm
                   </div>
                   <div *ngIf="showQuestionType" class="container-fluid">
                       <h4>Please choose Question Type for this question</h4>
