@@ -30,6 +30,10 @@ module BenefitSponsors
         end
       end
 
+      private
+
+      def build_nested_models
+      end
     end
   end
 end
