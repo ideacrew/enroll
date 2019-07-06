@@ -24,6 +24,10 @@ module BenefitSponsors
         profiles_employers_employer_profile_path(profile_id, tab: 'home')
       end
 
+      def sponsor_profiles_privacy_url(profile_id)
+        privacy_profiles_employers_employer_profile_path(profile_id)
+      end
+
       def agency_edit_registration_url
         edit_profiles_registration_path(@agency.organization.profile.id)
       end

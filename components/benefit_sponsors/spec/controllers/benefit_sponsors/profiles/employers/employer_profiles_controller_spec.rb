@@ -80,5 +80,19 @@ module BenefitSponsors
         assert_response :success
       end
     end
+
+    describe "GET privacy" do
+      it "should render view successfully", :if => (Settings.site.key == :dc) do
+        sign_in user
+        get :privacy, params: {id: benefit_sponsor.profiles.first.id.to_s}
+        assert_response :success
+      end
+
+      it "not signed in should redirect to sign in", :if => (Settings.site.key == :dc) do
+        get :privacy, params: {id: benefit_sponsor.profiles.first.id.to_s}
+        assert_response :redirect
+        expect(response.redirect_url.match?(/sign_up/)).to be_truthy
+      end
+    end
   end
 end

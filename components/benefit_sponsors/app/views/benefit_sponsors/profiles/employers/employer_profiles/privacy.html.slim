@@ -1,0 +1,32 @@
+.container
+  br
+  h2
+    strong = l10n(".elibile_note")
+  .col-xs-12.col-sm-12.col-md-8.col-lg-8
+    ul style="font-size:15px"
+       li = l10n(".has_work_site_note")
+       li = l10n(".has_fte_coverage_offering")
+       li = l10n(".has_fte_count_note")
+       li = l10n(".has_non_owner_coverage")
+    br
+    .p style ="font-size:15px"
+       = l10n(".fte_count_note")
+    ol style="font-size:15px"
+       li = l10n(".count_all_ftes")
+       li = l10n(".count_hours_for_part_time_ees")
+       li = l10n(".calculate_hours_for_ees")
+       li = l10n(".adding_line_1_and_2")
+    .p  style="font-size:15px"
+       = l10n(".total_result_for_fte_count")
+    h4
+      strong = "NOTE:"
+    ol style = "font-size:15px" type="i"
+      li = l10n(".non_owner_rule_for_SHOP_ers")
+      li = l10n(".minimum_participation_percentage")
+      li = l10n(".special_offerings_for_Jan_1st")
+    br
+    p style="font-size:15px"
+      = l10n(".broker_selection_note")
+    br
+    .row
+       = link_to "CONTINUE", profiles_employers_employer_profile_path(@employer_profile.id.to_s, tab: 'home'), :class => "btn btn-lg btn-primary interaction-click-control-continue"
