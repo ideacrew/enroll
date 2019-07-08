@@ -5,10 +5,10 @@ module BenefitSponsors
 
         include Config::AcaHelper
 
-        before_action :find_employer, only: [:show, :inbox, :bulk_employee_upload, :export_census_employees, :coverage_reports, :download_invoice]
+        before_action :find_employer, only: [:show, :privacy, :inbox, :bulk_employee_upload, :export_census_employees, :coverage_reports, :download_invoice]
         before_action :load_group_enrollments, only: [:coverage_reports], if: :is_format_csv?
         before_action :check_and_download_invoice, only: [:download_invoice]
-        layout "two_column", except: [:new]
+        layout "two_column", except: [:new, :privacy]
 
         #New profile registration with existing organization and approval request submitted to employer
         def show_pending
@@ -79,6 +79,13 @@ module BenefitSponsors
           authorize @employer_profile
           respond_to do |format|
             format.csv { send_data @employer_profile.census_employees.sorted.to_csv, filename: "#{@employer_profile.legal_name.parameterize.underscore}_census_employees_#{TimeKeeper.date_of_record}.csv" }
+          end
+        end
+
+        def privacy
+          authorize @employer_profile
+          respond_to do |format|
+            format.html
           end
         end
 
@@ -198,7 +205,7 @@ module BenefitSponsors
                 sponsored_benefit = primary.sponsored_benefit
                 product = @product_info[element.group_enrollment.product[:id]]
                 next if census_employee.blank?
-                csv << [  
+                csv << [
                           census_employee.full_name,
                           census_employee.ssn,
                           census_employee.dob,
