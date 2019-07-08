@@ -35,9 +35,14 @@ module SponsoredBenefits
           @benefit_group_costs = @benefit_group.employee_costs_for_reference_plan(@service)
           @min_employee_cost = @service.monthly_min_employee_cost
           @max_employee_cost = @service.monthly_max_employee_cost
+          @dental_plan = @benefit_group.dental_reference_plan
+          if @dental_plan.present?
+            @benefit_group_dental_costs = @benefit_group.employee_costs_for_dental_reference_plan(@service)
+            @employer_dental_contribution_amount = @service.monthly_employer_contribution_amount(@dental_plan)
+          end
           @qhps = ::Products::QhpCostShareVariance.find_qhp_cost_share_variances(plan_array(@plan), plan_design_proposal.effective_date.year, "Health")
         end
-        render pdf: 'plan_review_export',
+        render pdf: 'plan_review_export', dpi: 72,
                template: 'sponsored_benefits/organizations/plan_design_proposals/plan_reviews/show.html.erb',
                disposition: 'attachment'
       end

@@ -22,26 +22,7 @@ $(document).on('click', '.downloadReferencePlanDetailsButton.plan-saved', sendPd
 
 
 $(document).on('ready', pageInit);
-$(document).on('page:load', pageInit);
-
-function loadContentOnChange() {
-  var checkInt = setInterval(isPageLoaded, 1000);
-
-  function stopPageLoadCheck() {
-    clearInterval(checkInt);
-  }
-
-  function isPageLoaded() {
-    var benefitModelSelection = document.getElementById('pdp-bms');
-    if (benefitModelSelection) {
-      stopPageLoadCheck();
-      setTimeout(function() {
-        pageInit();
-      },500);
-    }
-  }
-}
-
+$(document).on('turbolinks:load', pageInit);
 
 function pageInit() {
   var kind = fetchBenefitKind();
@@ -52,6 +33,7 @@ function pageInit() {
       enableRemoveDentalBenefits();
       calcPlanDesignContributions();
     } else {
+      disableActionButtons();
       setTimeout(function() {
         $(".plan-design .nav-tabs li label:first").trigger('click');
       },600)

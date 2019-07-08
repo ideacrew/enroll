@@ -11,7 +11,7 @@ FactoryBot.define do
 
     trait :with__complex_benefit_group do
       after(:create) do |application, evaluator|
-        FactoryGirl.build(:sponsored_benefits_benefit_applications_benefit_group, :with_complex_plans, benefit_application: application)
+        FactoryBot.build(:sponsored_benefits_benefit_applications_benefit_group, :with_complex_plans, benefit_application: application)
       end
     end
   end
