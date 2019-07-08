@@ -76,6 +76,7 @@ end
 Given(/^consumer has outstanding verification and unverified enrollments$/) do
   family = user.person.primary_family
   enr = FactoryBot.create(:hbx_enrollment,
+                           family: family,
                            household: family.active_household,
                            coverage_kind: "health",
                            effective_on: TimeKeeper.date_of_record - 2.months,
