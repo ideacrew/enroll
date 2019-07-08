@@ -94,16 +94,42 @@ export class QleKindCreationFormComponent {
     });
 
   }
-  displayQuestionTitle(i:number){
-    var title =  this.creationFormGroup.value.questions[i].questionTitle;
-    console.log(title)
+  displayQuestionTitle(){
+    var title =  this.creationFormGroup.value.questions[0].questionTitle;
+    return title
+  }
+
+  showDateQuestionTypeForm(){
+
+  }
+
+  showMultipleChoiceQuestionTypeForm(){
+
+  }
+
+  showBooleanQuestionTypeForm(){
+
+  }
+
+
+  questionTypeSelected(type){
+    this.showQuestionType = false
+    if (type=="date"){
+      this.showDateQuestionTypeForm()
+    }
+    else if(type=="boolean"){
+      this.showBooleanQuestionTypeForm()
+    }  
+    else if(type=="multipleChoice"){
+      this.showMultipleChoiceQuestionTypeForm()
+    }
   }
 
   showQuestionTypes(){
            this.showQuestionInput = false
            this.showQuestionType = true
            this.showQuestionTitle = true
-           debugger;
+
 
   }
   showQuestions(){

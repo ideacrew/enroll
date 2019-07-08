@@ -33,22 +33,25 @@
                     <input type="text" formControlName="questionTitle" (focusout)="showQuestionTypes()">
                   </div>
                   <div *ngIf="showQuestionTitle" class="container-fluid">
-                    dfgjkdlgkfm
+                    Question: {{displayQuestionTitle()}}
                   </div>
                   <div *ngIf="showQuestionType" class="container-fluid">
                       <h4>Please choose Question Type for this question</h4>
                       <div class= ''>
                           <p class="">Date
-                            <input type='radio' formControlName="questionType" id='qle_kind_question_tpye' value = "Date" required>
+                            <input type='radio' formControlName="questionType" id='qle_kind_question_tpye' value = "Date"  (change)="questionTypeSelected('date')" required>
                           </p>
                           <p class="">True/False
-                            <input type='radio' formControlName="questionType" id='qle_kind_question_tpye' value = "True/False" required>   
+                            <input type='radio' formControlName="questionType" id='qle_kind_question_tpye' value = "True/False" (change)="questionTypeSelected('boolean')" required>   
                           </p>
                           <p class="">Multiple Choice
-                              <input type='radio' formControlName="questionType" id='qle_kind_question_tpye' value = "MultipleChoice" required>   
+                              <input type='radio' formControlName="questionType" id='qle_kind_question_tpye' value = "MultipleChoice" (change)="questionTypeSelected('multipleChoice')" required>   
                              </p>  
                         </div>
                   </div>
+                </div>
+                <div *ngIf="showQuestionDateForm">
+                  
                 </div>
               </div>
 
