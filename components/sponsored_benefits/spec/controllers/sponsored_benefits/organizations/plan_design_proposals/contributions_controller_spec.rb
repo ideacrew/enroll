@@ -34,7 +34,7 @@ module SponsoredBenefits
 			end
 		end
 
-    let(:ofice_location) { proposal_profile.primary_office_location }
+    let(:ofice_location) { proposal_profile.office_locations.where(is_primary: true).first }
 
 		let(:proposal_profile) { plan_design_proposal.profile }
 
@@ -123,7 +123,7 @@ module SponsoredBenefits
     it 'finished in under 10 seconds' do
       Caches::PlanDetails.load_record_cache! if Caches::PlanDetails.respond_to? :load_record_cache!
       expect do
-        get :index, {
+        get :index, params: {
           plan_design_proposal_id: plan_design_proposal.id,
           benefit_group: {
             reference_plan_id: benefit_group.reference_plan_id.to_s,
@@ -135,7 +135,7 @@ module SponsoredBenefits
             }]
           },
           format: :js
-        }, valid_session
+        }
       end.to perform_under(10).sec
     end
   end

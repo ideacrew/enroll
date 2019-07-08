@@ -18,7 +18,7 @@ RSpec.describe SponsoredBenefits::Services::PlanCostService, type: :model, dbcle
     end
   end
 
-  let(:ofice_location) { proposal_profile.primary_office_location }
+  let(:ofice_location) { proposal_profile.office_locations.where(is_primary: true).first }
 
   let(:proposal_profile) { plan_design_proposal.profile }
 
@@ -87,13 +87,18 @@ RSpec.describe SponsoredBenefits::Services::PlanCostService, type: :model, dbcle
   let!(:relationship_benefit) { benefit_group.relationship_benefits.first }
   let(:subject) { SponsoredBenefits::Services::PlanCostService.new(benefit_group: benefit_group)}
 
-  it "should have multiple_rating_areas instance variable true" do
-    expect(subject.instance_variable_get("@multiple_rating_areas")).to eq true
+  it "should have multiple_rating_areas instance variable" do
+    if Settings.aca.state_abbreviation == "DC"
+      expect(subject.instance_variable_get("@multiple_rating_areas")).to eq false
+    else
+      expect(subject.instance_variable_get("@multiple_rating_areas")).to eq true
+    end
   end
 
   context "#monthly_employer_contribution_amount" do
     before :each do
-      allow(Caches::PlanDetails).to receive(:lookup_rate_with_area).and_return 78.0 
+      allow(Caches::PlanDetails).to receive(:lookup_rate_with_area).and_return 78.0
+      allow(Caches::PlanDetails).to receive(:lookup_rate).and_return 78.0
     end
     it "should return total monthly employer contribution amount" do
       # Er contribution 80%. No.of Employees = 2
@@ -105,6 +110,7 @@ RSpec.describe SponsoredBenefits::Services::PlanCostService, type: :model, dbcle
 
     before :each do
       allow(Caches::PlanDetails).to receive(:lookup_rate_with_area).and_return 78.0
+      allow(Caches::PlanDetails).to receive(:lookup_rate).and_return 78.0
       subject.plan = benefit_group.reference_plan
     end
     it "should return total monthly employee contribution amount" do

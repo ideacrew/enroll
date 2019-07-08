@@ -52,8 +52,11 @@ module SponsoredBenefits
               elected_plans: persisted_benefit_group.elected_plans_by_option_kind.to_a,
               plan_option_kind: persisted_benefit_group.plan_option_kind
             })
-          else
+          elsif benefit_group_params.present?
             @benefit_group = sponsorship.benefit_applications.first.benefit_groups.build(benefit_group_params.as_json)
+            @benefit_group.elected_plans = @benefit_group.elected_plans_by_option_kind.to_a
+          else
+            @benefit_group = sponsorship.benefit_applications.first.benefit_groups.build(persisted_benefit_group.as_json)
             @benefit_group.elected_plans = @benefit_group.elected_plans_by_option_kind.to_a
           end
         end
