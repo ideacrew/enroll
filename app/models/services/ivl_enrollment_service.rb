@@ -5,6 +5,12 @@ module Services
       @logger = Logger.new("#{Rails.root}/log/family_advance_day_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
     end
 
+    def process_enrollments(new_date)
+      expire_individual_market_enrollments
+      begin_coverage_for_ivl_enrollments
+      send_enrollment_notice_for_ivl(new_date)
+    end
+
     def expire_individual_market_enrollments
       @logger.info "Started expire_individual_market_enrollments process at #{TimeKeeper.datetime_of_record.to_s}"
       current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
@@ -45,12 +51,6 @@ module Services
         @logger.info "Unable to begin coverage(enrollments) for family #{family.id}, error: #{e.backtrace}"
       end
       @logger.info "Ended begin_coverage_for_ivl_enrollments process at #{TimeKeeper.datetime_of_record.to_s}"
-    end
-
-    def advance_day(new_date)
-      expire_individual_market_enrollments
-      begin_coverage_for_ivl_enrollments
-      send_enrollment_notice_for_ivl(new_date)
     end
 
     def enrollment_notice_for_ivl_families(new_date)

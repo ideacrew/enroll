@@ -802,7 +802,8 @@ class Family
 
     # Manage: SEPs, FamilyMemberAgeOff
     def advance_day(new_date)
-      initialize_ivl_enrollment_service.advance_day(new_date)
+      ies = initialize_ivl_enrollment_service
+      ies.process_enrollments(new_date)
     end
 
     def enrollment_notice_for_ivl_families(new_date)
