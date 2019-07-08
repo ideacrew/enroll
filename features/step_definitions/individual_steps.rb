@@ -260,7 +260,7 @@ And(/^.+ click on sign in existing account$/) do
 end
 
 And(/I signed in$/) do
-  click_link 'Sign In Existing Account'
+  click_link 'Sign In Existing Account', :wait => 10
   fill_in "user[login]", :with => "testflow@test.com"
   fill_in "user[password]", :with => "aA1!aA1!aA1!"
   find('.sign-in-btn').click
@@ -438,7 +438,7 @@ Then(/CSR clicks on New Consumer Paper Application/) do
 end
 
 Then(/CSR starts a new enrollment/) do
-  expect(page).to have_content("Personal Information")
+  expect(page).to have_content('Personal Information', :wait => 10)
 end
 
 Then(/^click continue again$/) do
