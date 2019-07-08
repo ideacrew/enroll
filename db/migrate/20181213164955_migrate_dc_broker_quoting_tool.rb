@@ -45,12 +45,15 @@ class MigrateDcBrokerQuotingTool < Mongoid::Migration
       SponsoredBenefits::Organizations::PlanDesignOrganization.batch_size(1000).no_timeout.each do |pdo|
         begin
 
-          raise "old profile not found" unless pdo.owner_profile_id.present? || pdo.sponsor_profile_id.present?
+          # TODO check raise, commenting for now to migrate data.
+          # raise "owner profile not found" if pdo.owner_profile_id.blank?
 
           new_owner_profile_id = broker_agency[pdo.owner_profile_id]
           new_sponsor_profile_id = employer[pdo.sponsor_profile_id]
 
-          raise "mapping not found #{pdo.id}" unless new_owner_profile_id.present? && new_sponsor_profile_id.present?
+          # TODO fix raise
+          # raise "mapping not found for owner profile #{pdo.id}, profile_id: #{pdo.owner_profile_id}" if new_owner_profile_id.blank?
+          # raise "mapping not found for sponsor profile  #{pdo.id}, profile_id: #{pdo.sponsor_profile_id}" if employer[pdo.sponsor_profile_id].present? && new_owner_profile_id.blank?
 
           pdo.past_owner_profile_id = pdo.owner_profile_id
           pdo.past_owner_profile_class_name = "::BrokerAgencyProfile"
@@ -64,18 +67,27 @@ class MigrateDcBrokerQuotingTool < Mongoid::Migration
 
           pdo.general_agency_accounts.unscoped.each do |account|
 
-            raise "old profile not found for account" unless account.general_agency_profile_id.present? || account.broker_agency_profile_id.present?
+            puts "old general agency profile not found for account" unless account.general_agency_profile_id.present?
+            puts "old broker agency profile not found for account" unless account.broker_agency_profile_id.present?
 
             new_general_agency=  general_agency[account.general_agency_profile_id]
             new_broker_agency =  broker_agency[account.broker_agency_profile_id]
 
-            raise "mapping not found for account #{account.id}" unless new_general_agency.present? && new_broker_agency.present?
+            puts "mapping not found for account #{account.id}, old general agency: #{account.general_agency_profile_id}" if new_general_agency.blank?
+            puts "mapping not found for account #{account.id}, old broker agency: #{account.broker_agency_profile_id}," if new_broker_agency.blank?
 
             account.benefit_sponsrship_general_agency_profile_id = new_general_agency
             account.benefit_sponsrship_broker_agency_profile_id = new_broker_agency
             account.save!
           end
-          pdo.save!
+
+          unless pdo.valid?
+            pdo.save!(validate: false) # TODO verify this
+            puts "plan design orgnaization not valid #{pdo.id}"
+          else
+            pdo.save!
+          end
+
           success += 1
           print '.' unless Rails.env.test?
         rescue Exception => e
