@@ -163,7 +163,7 @@ class Family
   scope :non_enrolled,                          ->{ where(:"_id".in => HbxEnrollment.non_enrolled.pluck(:family_id))}
   scope :sep_eligible,                          ->{ where(:"active_seps.count".gt => 0) }
   scope :coverage_waived,                       ->{ where(:"_id".in => HbxEnrollment.waived.pluck(:family_id))}
-  scope :having_unverified_enrollment,          ->{ where(:"_id".in => HbxEnrollment.unverified).pluck(:family_id) }
+  scope :having_unverified_enrollment,          ->{ where(:"_id".in => HbxEnrollment.by_unverified.pluck(:family_id)) }
   scope :with_all_verifications,                ->{ where(:"_id".in => HbxEnrollment.verified.pluck(:family_id))}
   scope :with_partial_verifications,            ->{ where(:"_id".in => HbxEnrollment.partially_verified.pluck(:family_id))}
   scope :with_no_verifications,                 ->{ where(:"_id".in => HbxEnrollment.not_verified.pluck(:family_id))}

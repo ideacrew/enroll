@@ -335,7 +335,7 @@ class HbxEnrollment
   scope :by_benefit_group_ids, ->(benefit_group_ids) { where(:"benefit_group_id".in => benefit_group_ids) }
   scope :by_benefit_sponsorship_id, ->(benefit_sponsorship_id) { where(benefit_sponsorship_id: benefit_sponsorship_id) }
   scope :verified, ->{ where(aasm_state: "enrolled_contingent", :"review_status" => "ready") }
-  scope :unverified, -> { where(aasm_state: "enrolled_contingent").pluck(:family_id) }
+  scope :by_unverified, -> { where(aasm_state: "enrolled_contingent")}
   scope :partially_verified, -> { where(aasm_state: "enrolled_contingent", :"review_status" => "ready") }
   scope :not_verified, -> { where(aasm_state: "enrolled_contingent", :"review_status" => "in review") }
   scope :reset_verifications, -> { where(aasm_state: "enrolled_contingent", :"review_status" => "incomplete") }
