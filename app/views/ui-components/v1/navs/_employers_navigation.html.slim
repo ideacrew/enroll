@@ -1,7 +1,7 @@
 nav
   ul#uic-employers-right-menu
     li
-      = link_to "My #{Settings.site.short_name}", benefit_sponsors.profiles_employers_employer_profile_path(profile.id, :tab=>'home'), "aria-expanded" => "true"
+      = link_to "My #{Settings.site.short_name}", benefit_sponsors.profiles_employers_employer_profile_path(profile.id, :tab=>'home'), "aria-expanded" => "true", data: {turbolinks: false}
     li 
       = link_to 'Employees', benefit_sponsors.profiles_employers_employer_profile_path(profile.id, :tab=>'employees'), "aria-expanded" => "true"
     li
