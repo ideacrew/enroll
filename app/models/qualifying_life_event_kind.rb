@@ -193,6 +193,10 @@ class QualifyingLifeEventKind
     reason == "lost_access_to_mec"
   end
 
+  def qle_dropdown_label
+    "#{market_kind.capitalize}: #{edi_code + " | "}#{title}"
+  end
+
   class << self
     def shop_market_events
       by_market_kind('shop').and(:is_self_attested.ne => false).active.to_a
