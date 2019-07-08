@@ -1,21 +1,20 @@
 import { Component, Injector, ElementRef, ViewChild } from '@angular/core';
-import { DropdownOption } from 'app/dropdown_option';
+import { CategorizedDropdownOption } from '../../dropdown_option';
+import { QleKindWizardSelectionComponent } from './wizard/qle_kind_wizard_selection.component';
 
 @Component({
   selector: 'admin-qle-management-wizard',
   templateUrl: './qle_kind_wizard.component.html'
 })
 export class QleKindWizardComponent {
-  public editableList : Array<DropdownOption> = [];
-  public deactivatableList : Array<DropdownOption> = [];
-  public creatablePath : string | null = null;
+  public editableList : Array<CategorizedDropdownOption> = [];
+  public deactivatableList : Array<CategorizedDropdownOption> = [];
 
   public newLocation : string | null = null;
   private selectedAction : string | null = null;
-  @ViewChild('editSelection') editSelection : ElementRef;
-  @ViewChild('deactivateSelection') deactivateSelection : ElementRef;
+  @ViewChild('editSelection') editSelection : QleKindWizardSelectionComponent;
+  @ViewChild('deactivateSelection') deactivateSelection : QleKindWizardSelectionComponent;
   @ViewChild('createSelection') createSelection : ElementRef;
-
 
   constructor(injector: Injector, private _elementRef : ElementRef) {
 
@@ -30,11 +29,10 @@ export class QleKindWizardComponent {
     if (deactivatableListJson != null) {
       this.deactivatableList = JSON.parse(deactivatableListJson);
     }
-    this.creatablePath = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-creatable-path");
-    // var newLocationAttribute = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-new-location");
-    // if (newLocationAttribute != null) {
-    //   this.newLocation = newLocationAttribute;
-    // }
+    var newLocationAttribute = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-new-location");
+    if (newLocationAttribute != null) {
+      this.newLocation = newLocationAttribute;
+    }
   }
 
   selectAction(action : string) {
@@ -44,19 +42,18 @@ export class QleKindWizardComponent {
   submit() {
     console.log(this.selectedAction)
     if (this.selectedAction == "new") {
-      if (this.creatablePath != null) {
-        window.location.href = this.creatablePath
+      if (this.newLocation != null) {
+        window.location.href = this.newLocation;
       }
     } else if (this.selectedAction == "edit") {
       console.log(this.editSelection)
 
-      var editLocation = this.editSelection.nativeElement.value;
-
+      var editLocation = this.editSelection.getSelection();
       if (editLocation != null) {
         window.location.href = editLocation;
       }
     } else if (this.selectedAction == "deactivate") {
-      var deactivateLocation = this.deactivateSelection.nativeElement.value;;
+      var deactivateLocation = this.deactivateSelection.getSelection();
       if (deactivateLocation != null) {
         window.location.href = deactivateLocation;
       }

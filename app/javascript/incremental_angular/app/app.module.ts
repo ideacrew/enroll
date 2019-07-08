@@ -19,6 +19,7 @@ import { QleKindDeactivationFormComponent } from  './admin/qle_kinds/qle_kind_de
 import { QleKindResourceService } from  './admin/qle_kinds/qle_kind_resource.service';
 import { QleKindCreationFormComponent } from  './admin/qle_kinds/new/qle_kind_creation_form.component';
 import { QleKindQuestionFormComponent } from './admin/qle_kinds/new/qle_kind_question_form.component';
+import { QleKindWizardSelectionComponent } from './admin/qle_kinds/wizard/qle_kind_wizard_selection.component';
 
 import { ErrorLocalizer } from './error_localizer';
 
@@ -33,7 +34,8 @@ import { ErrorLocalizer } from './error_localizer';
     QleKindWizardComponent,
     TrustedHtmlPipe,
     QleKindQuestionFormComponent,
-    QleKindDeactivationFormComponent
+    QleKindDeactivationFormComponent,
+    QleKindWizardSelectionComponent
   ],
   entryComponents: [
     BrokerAgencyProfileCreateComponent,

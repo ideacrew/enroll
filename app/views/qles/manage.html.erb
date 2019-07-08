@@ -2,20 +2,21 @@
 editable_list = @editable_qles.map do |qle|
    {
      label: qle.qle_dropdown_label,
-     value: edit_qle_path(qle)
+     category: qle.market_kind,
+     value: edit_exchanges_qle_path(qle)
    }
 end
-
 deactivatable_list = @deactivatable_qles.map do |qle|
    {
      label: qle.qle_dropdown_label,
-     value: deactivation_form_qle_path(qle)
+     category: qle.market_kind,
+     value: deactivation_form_exchanges_qle_path(qle)
    }
 end
  %>
 
  <admin-qle-management-wizard
-   data-creatable-path="<%= new_qle_path %>"
+   data-new-location="<%= new_exchanges_qle_path %>"
    data-editable-list="<%= editable_list.to_json %>"
    data-deactivatable-list="<%= deactivatable_list.to_json %>"
  >

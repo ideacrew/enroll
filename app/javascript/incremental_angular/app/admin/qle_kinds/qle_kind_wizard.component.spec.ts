@@ -31,19 +31,15 @@ describe('QleKindWizardComponent', () => {
     var editables = [
       {
         label: "Editable Label",
+        category: "shop",
         value: "Editable Value"
       }
     ];
     var deactivatables = [
       {
         label: "Deactivatable Label",
+        category: "shop",
         value: "Deactivatable Value"
-      }
-    ];
-    var creatables = [
-      {
-        label: "Creatable Label",
-        value: "Creatable Value"
       }
     ];
     var element = {
@@ -52,8 +48,6 @@ describe('QleKindWizardComponent', () => {
           return newLocation;
         } else if (st == "data-editable-list") {
           return JSON.stringify(editables);
-        } else if (st == "data-creatable-list") {
-          return JSON.stringify(creatables);
         } else if (st == "data-deactivatable-list") {
           return JSON.stringify(deactivatables);
         }

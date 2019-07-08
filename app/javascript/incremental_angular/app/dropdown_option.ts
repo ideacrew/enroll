@@ -1,4 +1,8 @@
 export interface DropdownOption {
-  label: String;
-  value: String | null;
+  label: string;
+  value: string | null;
+}
+
+export interface CategorizedDropdownOption extends DropdownOption {
+  category: string | null;
 }
