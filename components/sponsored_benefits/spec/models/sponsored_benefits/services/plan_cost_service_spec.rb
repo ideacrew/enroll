@@ -1,5 +1,11 @@
 RSpec.describe SponsoredBenefits::Services::PlanCostService, type: :model, dbclean: :after_each do
-  let!(:rating_area) { FactoryBot.create(:rating_area, zip_code: ofice_location.address.zip, county_name: ofice_location.address.county)}
+  let!(:rating_area) do
+    if Settings.aca.state_abbreviation == "DC"
+      nil
+    else
+      FactoryBot.create(:rating_area, zip_code: ofice_location.address.zip, county_name: ofice_location.address.county)
+    end
+  end
 
   let(:plan_design_organization) do
     FactoryBot.create :sponsored_benefits_plan_design_organization,
