@@ -258,9 +258,11 @@ class HbxEnrollment
   scope :open_enrollments,    ->{ where(enrollment_kind: "open_enrollment") }
   scope :special_enrollments, ->{ where(enrollment_kind: "special_enrollment") }
   scope :my_enrolled_plans,   ->{ where(:aasm_state.ne => "shopping", :plan_id.ne => nil ) } # a dummy plan has no plan id
-  scope :by_created_datetime_range,  ->(start_at, end_at){ where(:created_at => { "$gte" => start_at, "$lte" => end_at} )}
-  scope :by_submitted_datetime_range,  ->(start_at, end_at){ where(:submitted_at => { "$gte" => start_at, "$lte" => end_at} )}
-  scope :by_submitted_after_datetime,  ->(start_at){ where(:submitted_at => { "$gte" => start_at} )}
+  scope :by_created_datetime_range,  ->(start_at, end_at) { where(:created_at => { "$gte" => start_at, "$lte" => end_at }) }
+  scope :by_submitted_datetime_range,  ->(start_at, end_at) { where(:submitted_at => { "$gte" => start_at, "$lte" => end_at }) }
+  scope :by_submitted_after_datetime,  ->(start_at) { where(:submitted_at => { "$gte" => start_at} )}
+  scope :by_updated_datetime_range, ->(start_at, end_at) { where(updated_at: { "$gte" => start_at, "$lte" => end_at }) } 
+  scope :by_effective_date_range, ->(start_on, end_on) { where(effective_on: { "$gte" => start_on, "$lte" => end_on }) }
   scope :current_year,        ->{ where(:effective_on.gte => TimeKeeper.date_of_record.beginning_of_year, :effective_on.lte => TimeKeeper.date_of_record.end_of_year) }
   scope :by_year,             ->(year) { where(effective_on: (Date.new(year)..Date.new(year).end_of_year)) }
   scope :by_hbx_id,            ->(hbx_id) { where(hbx_id: hbx_id) }
@@ -272,6 +274,7 @@ class HbxEnrollment
   scope :with_aptc,           ->{ gt("applied_aptc_amount.cents": 0) }
   scope :without_aptc,        ->{lte("applied_aptc_amount.cents": 0) }
   scope :enrolled,            ->{ where(:aasm_state.in => ENROLLED_STATUSES ) }
+  scope :non_enrolled,        ->{ where(:"aasm_state".nin => HbxEnrollment::ENROLLED_STATUSES) }
   scope :can_terminate,       ->{ where(:aasm_state.in =>  CAN_TERMINATE_ENROLLMENTS) }
   scope :enrolled_and_terminated,->{ where(:aasm_state.in => ENROLLED_STATUSES + TERMINATED_STATUSES) }
   scope :renewing,            ->{ where(:aasm_state.in => RENEWAL_STATUSES )}
@@ -316,7 +319,7 @@ class HbxEnrollment
   scope :by_benefit_application_and_sponsored_benefit,  ->(benefit_application, sponsored_benefit, end_date) do 
     where(
       :"sponsored_benefit_id" => sponsored_benefit._id,
-      :"aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES),
+      :"aasm_state".in => (ENROLLED_STATUSES + RENEWAL_STATUSES + TERMINATED_STATUSES),
       :"effective_on".lte => end_date,
       :"effective_on".gte => benefit_application.effective_period.min
     )
@@ -326,6 +329,23 @@ class HbxEnrollment
       :"created_at" => {:"$gte" => start_date, :"$lt" => end_date}
     )
   end
+  # Rewritten from family scopes
+  scope :enrolled_statuses, -> { where(:"aasm_state".in => ENROLLED_STATUSES) }
+  scope :by_writing_agent_id, ->(broker_id) { where(writing_agent_id: broker_id)}
+  scope :by_benefit_group_ids, ->(benefit_group_ids) { where(:"benefit_group_id".in => benefit_group_ids) }
+  scope :by_benefit_sponsorship_id, ->(benefit_sponsorship_id) { where(benefit_sponsorship_id: benefit_sponsorship_id) }
+  scope :verified, ->{ where(aasm_state: "enrolled_contingent", :"review_status" => "ready") }
+  scope :unverified, -> { where(aasm_state: "enrolled_contingent").pluck(:family_id) }
+  scope :partially_verified, -> { where(aasm_state: "enrolled_contingent", :"review_status" => "ready") }
+  scope :not_verified, -> { where(aasm_state: "enrolled_contingent", :"review_status" => "in review") }
+  scope :reset_verifications, -> { where(aasm_state: "enrolled_contingent", :"review_status" => "incomplete") }
+  scope :verification_outstanding, -> do
+    where(
+      aasm_state: "enrolled_contingent",
+      effective_on: { :"$gte" => TimeKeeper.date_of_record.beginning_of_year, :"$lte" =>  TimeKeeper.date_of_record.end_of_year }
+    )
+  end
+
   embeds_many :workflow_state_transitions, as: :transitional
 
   belongs_to :benefit_sponsorship, class_name: "::BenefitSponsors::BenefitSponsorships::BenefitSponsorship", optional: true
