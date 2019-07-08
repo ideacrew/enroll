@@ -13,6 +13,7 @@ Feature: Consumer RIDP verification process
     Then Individual should see a form to enter personal information
     When Individual clicks on Save and Exit
     Then Individual resumes enrollment
+    And Individual click on sign in existing account
     And I signed in
 
   Scenario: New insured user chooses I Disagree on Auth and Consent Page
@@ -62,6 +63,7 @@ Feature: Consumer RIDP verification process
     And an uploaded application in VERIFIED status is present
     And HBX admin logs out
     And Individual resumes enrollment
+    And Individual click on sign in existing account
     And I signed in
     Then the CONTINUE button is functionally DISABLED
     And visibly DISABLED
@@ -84,6 +86,7 @@ Feature: Consumer RIDP verification process
     And an uploaded Identity verification in VERIFIED status is present
     And HBX admin logs out
     And Individual resumes enrollment
+    And Individual click on sign in existing account
     And I signed in
     Then the CONTINUE button is functionally ENABLED
     And visibly ENABLED
@@ -99,6 +102,7 @@ Feature: Consumer RIDP verification process
     And an uploaded application in VERIFIED status is present
     And HBX admin logs out
     And Individual resumes enrollment
+    And Individual click on sign in existing account
     And I signed in
     Then the CONTINUE button is functionally ENABLED
     And visibly ENABLED
@@ -150,6 +154,7 @@ Feature: Consumer RIDP verification process
     And an uploaded application in VERIFIED status is present on failed experian screen
     And HBX admin logs out
     And Individual resumes enrollment
+    And Individual click on sign in existing account
     And I signed in
     Then the CONTINUE button is functionally ENABLED
     And visibly ENABLED
@@ -166,6 +171,7 @@ Feature: Consumer RIDP verification process
     And an uploaded application in VERIFIED status is present on failed experian screen
     And HBX admin logs out
     And Individual resumes enrollment
+    And Individual click on sign in existing account
     And I signed in
     Then the CONTINUE button is functionally DISABLED
     And visibly DISABLED
@@ -182,6 +188,7 @@ Feature: Consumer RIDP verification process
     And an uploaded Identity verification in VERIFIED status is present on failed experian screen
     And HBX admin logs out
     And Individual resumes enrollment
+    And Individual click on sign in existing account
     And I signed in
     Then the CONTINUE button is functionally ENABLED
     And visibly ENABLED
@@ -203,6 +210,7 @@ Feature: Consumer RIDP verification process
     Then HBX admin should land on home page
     And HBX admin logs out
     And Individual resumes enrollment
+    And Individual click on sign in existing account
     And I signed in
     Then I should land on home page
     
