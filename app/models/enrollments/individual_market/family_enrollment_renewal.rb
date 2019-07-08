@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   attr_accessor :enrollment, :renewal_coverage_start, :assisted, :aptc_values
 

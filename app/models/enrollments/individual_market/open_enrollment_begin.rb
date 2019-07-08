@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Enrollments::IndividualMarket::OpenEnrollmentBegin
   # Active IVL hbx enrollments
   # without a termination date in the current year
