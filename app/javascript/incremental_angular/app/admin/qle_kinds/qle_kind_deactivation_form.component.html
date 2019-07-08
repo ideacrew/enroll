@@ -1,49 +1,39 @@
 <div class='container'>
-  <form *ngIf="hasResource()" [formGroup]="deactivationFormGroup" class='form'>
-    <h1 class="heading-text" #headerRef>
-      Deactivate an Existing Qualifying Life Event Kind
-    </h1>
-    <field-errors [errorControl]="deactivationFormGroup" errorHeader="Your QLE Kind could not be deactivated for the following reasons:"></field-errors>
-    <hr>
+  <form *ngIf="hasResource()" [formGroup]="deactivationFormGroup" class="form-group col-md-10 mb-2{{errorClassFor(deactivationFormGroup.get('end_on'))}}">
+  <div class='panel panel-primary'>
+    <div class='panel-heading'>
+      <strong>
+        Deactivate an Existing Qualifying Life Event Kind
+      </strong>
+    </div>
+    <div class='panel-body'>
     <div class="form-group col-md-4 mb-2{{errorClassFor(deactivationFormGroup.get('end_on'))}}">
-      <dl class="">
-        <dt>
-          Title:
-        </dt>
-        <dd class='capitalize-text'>
-          {{qleKindToDeactivate.title}}
-        </dd>
-        <dt>
-          Tool Tip: 
-        </dt>
-        <dd>
-          {{qleKindToDeactivate.tool_tip}}
-        </dd>
-        <dt>
-          Action Kind:
-        </dt>
-        <dd class='capitalize-text'>
-          {{qleKindToDeactivate.action_kind}}
-        </dd>
-        <dt>
-          Reason:
-        </dt>
-        <dd class='capitalize-text'>
-          {{qleKindToDeactivate.reason}}
-        </dd>
-        <dt>
-          Market Kind:
-        </dt>
-        <dd class='capitalize-text'>
-          {{qleKindToDeactivate.market_kind}}
-        </dd>
-      </dl> 
+        <field-errors [errorControl]="deactivationFormGroup" errorHeader="Your QLE Kind could not be deactivated for the following reasons:"></field-errors>
+          <dl>
+            <p>
+              <strong> Title: </strong> {{qleKindToDeactivate.title}}
+            </p>
+            <p>
+              <strong> Tool Tip: </strong> {{qleKindToDeactivate.tool_tip}}
+            </p>
+            <p>
+              <strong> Action Kind: </strong> {{qleKindToDeactivate.action_kind}}
+            </p>
+            <p>
+              <strong> Reason: </strong> {{qleKindToDeactivate.reason}}
+            </p>
+            <p>
+              <strong> Market Kind: </strong> {{qleKindToDeactivate.market_kind}}
+            </p>
 
-      <label for="qle_kind_deactivation_form_end_on"> QLE Kind Deactivation Date</label> <br>
-      <input type='text' formControlName="end_on" id='qle_kind_deactivation_form_end_on' placeholder="MM/DD/YYYY" mask="M0/d0/0000" [dropSpecialCharacters]="false" [validation]="true" required> <br>
-      <field-errors [errorControl]="deactivationFormGroup.get('end_on')"></field-errors>
-      <br>
-      <button class="btn btn-primary" (click)="submitDeactivation()">Deactivate QLE Kind</button>
+            <label for="qle_kind_deactivation_form_end_on"> QLE Kind Deactivation Date</label> <br>
+            <input type='text' formControlName="end_on" id='qle_kind_deactivation_form_end_on' placeholder="MM/DD/YYYY" mask="M0/d0/0000" [dropSpecialCharacters]="false" [validation]="true" required> <br>
+            <field-errors [errorControl]="deactivationFormGroup.get('end_on')"></field-errors>
+            <br>
+            <button class="btn btn-primary" (click)="submitDeactivation()">Deactivate QLE Kind</button>
+          </dl>
+        </div>
+      </div>
     </div>
   </form>
 </div>

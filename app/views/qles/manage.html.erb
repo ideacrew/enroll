@@ -1,14 +1,14 @@
  <%
 editable_list = @editable_qles.map do |qle|
    {
-     label: qle.title,
+     label: "#{qle.edi_code} | #{qle.title}",
      value: edit_qle_path(qle)
    }
 end
 
 deactivatable_list = @deactivatable_qles.map do |qle|
    {
-     label: qle.title,
+     label: "#{qle.edi_code} | #{qle.title}",
      value: deactivation_form_qle_path(qle)
    }
 end
