@@ -24,6 +24,7 @@ module Factories
     # returns hash of product_id to applicable_aptc mappings
     def fetch_applicable_aptcs
       raise "Cannot process without #{@selected_aptc} and #{@product_ids}" if @selected_aptc.nil? || @product_ids.empty?
+
       @available_aptc ||= fetch_available_eligibility[:total_available_aptc]
 
       # TODO: Return a has of plan_id, applicable aptcs.

@@ -1,249 +1,251 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require "#{Rails.root}/spec/shared_contexts/enrollment.rb"
 
-RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :model do
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
+  RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :model do
 
-  let(:current_date) { Date.new(calender_year, 11, 1) }
+    let(:current_date) { Date.new(calender_year, 11, 1) }
 
-  let(:current_benefit_coverage_period) { OpenStruct.new(start_on: current_date.beginning_of_year, end_on: current_date.end_of_year) }
-  let(:renewal_benefit_coverage_period) { OpenStruct.new(start_on: current_date.next_year.beginning_of_year, end_on: current_date.next_year.end_of_year) }
+    let(:current_benefit_coverage_period) { OpenStruct.new(start_on: current_date.beginning_of_year, end_on: current_date.end_of_year) }
+    let(:renewal_benefit_coverage_period) { OpenStruct.new(start_on: current_date.next_year.beginning_of_year, end_on: current_date.next_year.end_of_year) }
 
-  let(:aptc_values) {{}}
-  let(:assisted) { nil }
+    let(:aptc_values) {{}}
+    let(:assisted) { nil }
 
-  let!(:family) {
-    primary = FactoryBot.create(:person, :with_consumer_role, dob: primary_dob)
-    FactoryBot.create(:family, :with_primary_family_member, :person => primary)
-  }
+    let!(:family) do
+      primary = FactoryBot.create(:person, :with_consumer_role, dob: primary_dob)
+      FactoryBot.create(:family, :with_primary_family_member, :person => primary)
+    end
 
-  let!(:spouse_rec) { 
-    FactoryBot.create(:person, dob: spouse_dob)
-  }
+    let!(:spouse_rec) do
+      FactoryBot.create(:person, dob: spouse_dob)
+    end
 
-  let!(:spouse) { 
-    FactoryBot.create(:family_member, person: spouse_rec, family: family)
-  }
+    let!(:spouse) do
+      FactoryBot.create(:family_member, person: spouse_rec, family: family)
+    end
 
-  let!(:child1) { 
-    child = FactoryBot.create(:person, dob: child1_dob)
-    FactoryBot.create(:family_member, person: child, family: family)
-  }
+    let!(:child1) do
+      child = FactoryBot.create(:person, dob: child1_dob)
+      FactoryBot.create(:family_member, person: child, family: family)
+    end
 
-  let!(:child2) { 
-    child = FactoryBot.create(:person, dob: child2_dob)
-    FactoryBot.create(:family_member, person: child, family: family)
-  }
+    let!(:child2) do
+      child = FactoryBot.create(:person, dob: child2_dob)
+      FactoryBot.create(:family_member, person: child, family: family)
+    end
 
-  let(:primary_dob){ current_date.next_month - 57.years }
-  let(:spouse_dob) { current_date.next_month - 55.years }
-  let(:child1_dob) { current_date.next_month - 26.years }
-  let(:child2_dob) { current_date.next_month - 20.years }
+    let(:primary_dob){ current_date.next_month - 57.years }
+    let(:spouse_dob) { current_date.next_month - 55.years }
+    let(:child1_dob) { current_date.next_month - 26.years }
+    let(:child2_dob) { current_date.next_month - 20.years }
 
-  let!(:enrollment) {
-    FactoryBot.create(
-      :hbx_enrollment,
-      :with_enrollment_members,
-      family: family,
-      enrollment_members: enrollment_members,
-      household: family.active_household,
-      coverage_kind: coverage_kind,
-      effective_on: current_benefit_coverage_period.start_on,
-      kind: "individual",
-      product_id: current_product.id,
-      aasm_state: 'coverage_selected'
-    )
-  }
-  let(:enrollment_members) { family.family_members }
-  let(:calender_year) { TimeKeeper.date_of_record.year }
-  let(:coverage_kind) { 'health' }
-  let(:current_product) { FactoryBot.create(:active_ivl_gold_health_product, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_product_id: renewal_product.id) }
-  let(:renewal_product) { FactoryBot.create(:renewal_ivl_gold_health_product, hios_id: "11111111122302-01", csr_variant_id: "01") }
+    let!(:enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        :with_enrollment_members,
+                        family: family,
+                        enrollment_members: enrollment_members,
+                        household: family.active_household,
+                        coverage_kind: coverage_kind,
+                        effective_on: current_benefit_coverage_period.start_on,
+                        kind: "individual",
+                        product_id: current_product.id,
+                        aasm_state: 'coverage_selected')
+    end
+    let(:enrollment_members) { family.family_members }
+    let(:calender_year) { TimeKeeper.date_of_record.year }
+    let(:coverage_kind) { 'health' }
+    let(:current_product) { FactoryBot.create(:active_ivl_gold_health_product, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_product_id: renewal_product.id) }
+    let(:renewal_product) { FactoryBot.create(:renewal_ivl_gold_health_product, hios_id: "11111111122302-01", csr_variant_id: "01") }
 
-  subject do
-    enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
-    enrollment_renewal.enrollment = enrollment
-    enrollment_renewal.assisted = assisted
-    enrollment_renewal.aptc_values = aptc_values
-    enrollment_renewal.renewal_coverage_start = renewal_benefit_coverage_period.start_on
-    enrollment_renewal
-  end
-
-  before do
-    TimeKeeper.set_date_of_record_unprotected!(current_date)
-  end
-
-  describe ".clone_enrollment_members" do
+    subject do
+      enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
+      enrollment_renewal.enrollment = enrollment
+      enrollment_renewal.assisted = assisted
+      enrollment_renewal.aptc_values = aptc_values
+      enrollment_renewal.renewal_coverage_start = renewal_benefit_coverage_period.start_on
+      enrollment_renewal
+    end
 
     before do
-      allow(child1).to receive(:relationship).and_return('child')
-      allow(child2).to receive(:relationship).and_return('child')
+      TimeKeeper.set_date_of_record_unprotected!(current_date)
     end
 
-    context "When a child is aged off" do
-      it "should not include child" do
+    describe ".clone_enrollment_members" do
 
-        applicant_ids = subject.clone_enrollment_members.collect{|m| m.applicant_id}
-
-        expect(applicant_ids).to include(family.primary_applicant.id)
-        expect(applicant_ids).to include(spouse.id)
-        expect(applicant_ids).not_to include(child1.id)
-        expect(applicant_ids).to include(child2.id)
+      before do
+        allow(child1).to receive(:relationship).and_return('child')
+        allow(child2).to receive(:relationship).and_return('child')
       end
 
-      it "should generate passive renewal in coverage_selected state" do
-        renewal = subject.renew
-        expect(renewal.coverage_selected?).to be_truthy
-      end
-    end
+      context "When a child is aged off" do
+        it "should not include child" do
 
-    # Don't we need this for all the dependents
-    # Are we using is_disabled flag in the system
-    context "When a child person record is disabled" do
-      let!(:spouse_rec) { 
-        FactoryBot.create(:person, dob: spouse_dob, is_disabled: true)
-      }
+          applicant_ids = subject.clone_enrollment_members.collect(&:applicant_id)
 
-      it "should not include child person record" do
-        applicant_ids = subject.clone_enrollment_members.collect{|m| m.applicant_id}
-        expect(applicant_ids).not_to include(spouse.id)
-      end
-    end
-  end
+          expect(applicant_ids).to include(family.primary_applicant.id)
+          expect(applicant_ids).to include(spouse.id)
+          expect(applicant_ids).not_to include(child1.id)
+          expect(applicant_ids).to include(child2.id)
+        end
 
-  describe ".renew" do
-
-    before do
-      allow(child1).to receive(:relationship).and_return('child')
-      allow(child2).to receive(:relationship).and_return('child')
-    end
-
-    context "when all the covered housedhold eligible for renewal" do
-      let(:child1_dob) { current_date.next_month - 24.years }
-
-
-      it "should generate passive renewal in auto_renewing state" do
-        renewal = subject.renew
-        expect(renewal.auto_renewing?).to be_truthy
-      end
-    end
-  end
-
-
-  describe ".renewal_product" do
-    context "When consumer covered under catastrophic product" do
-      let!(:renewal_cat_age_off_product) { FactoryBot.create(:renewal_ivl_silver_health_product, hios_id: "11111111122300-01", csr_variant_id: "01") }
-      let!(:renewal_product) { FactoryBot.create(:renewal_individual_catastophic_product, hios_id: "11111111122302-01", csr_variant_id: "01") }
-      let!(:current_product) { FactoryBot.create(:active_individual_catastophic_product, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_product_id: renewal_product.id, catastrophic_age_off_product_id: renewal_cat_age_off_product.id) }
-
-      let(:enrollment_members) { [child1, child2] }
-
-      context "When one of the covered individuals aged off(30 years)" do
-        let(:child1_dob) { current_date.next_month - 30.years }
-
-        it "should return catastrophic aged off product" do
-          expect(subject.renewal_product).to eq renewal_cat_age_off_product.id
+        it "should generate passive renewal in coverage_selected state" do
+          renewal = subject.renew
+          expect(renewal.coverage_selected?).to be_truthy
         end
       end
 
-      context "When all the covered individuals under 30" do
-        let(:child1_dob) { current_date.next_month - 25.years }
+      # Don't we need this for all the dependents
+      # Are we using is_disabled flag in the system
+      context "When a child person record is disabled" do
+        let!(:spouse_rec) do
+          FactoryBot.create(:person, dob: spouse_dob, is_disabled: true)
+        end
 
-        it "should return renewal product" do
-          expect(subject.renewal_product).to eq renewal_product.id
-        end 
+        it "should not include child person record" do
+          applicant_ids = subject.clone_enrollment_members.collect(&:applicant_id)
+          expect(applicant_ids).not_to include(spouse.id)
+        end
       end
     end
-  end
 
-  describe ".assisted_renewal_product", dbclean: :after_each do
-    context "When individual currently enrolled under CSR product" do
-      let!(:renewal_product) { FactoryBot.create(:renewal_ivl_silver_health_product,  hios_id: "11111111122302-04", hios_base_id: "11111111122302", csr_variant_id: "04") }
-      let!(:current_product) { FactoryBot.create(:active_ivl_silver_health_product, hios_id: "11111111122302-04", hios_base_id: "11111111122302", csr_variant_id: "04", renewal_product_id: renewal_product.id) }
-      let!(:csr_product) { FactoryBot.create(:renewal_ivl_silver_health_product, hios_id: "11111111122302-05", hios_base_id: "11111111122302", csr_variant_id: "05") }
-      let!(:csr_01_product) { FactoryBot.create(:active_ivl_silver_health_product, hios_id: "11111111122302-01", hios_base_id: "11111111122302", csr_variant_id: "01") }
+    describe ".renew" do
 
-      context "and have different CSR amount for renewal product year" do
-        let(:aptc_values) {{ csr_amt: "87" }}
+      before do
+        allow(child1).to receive(:relationship).and_return('child')
+        allow(child2).to receive(:relationship).and_return('child')
+      end
 
-        it "should be renewed into new CSR variant product" do
-          expect(subject.assisted_renewal_product).to eq csr_product.id
+      context "when all the covered housedhold eligible for renewal" do
+        let(:child1_dob) { current_date.next_month - 24.years }
+
+
+        it "should generate passive renewal in auto_renewing state" do
+          renewal = subject.renew
+          expect(renewal.auto_renewing?).to be_truthy
+        end
+      end
+    end
+
+
+    describe ".renewal_product" do
+      context "When consumer covered under catastrophic product" do
+        let!(:renewal_cat_age_off_product) { FactoryBot.create(:renewal_ivl_silver_health_product, hios_id: "11111111122300-01", csr_variant_id: "01") }
+        let!(:renewal_product) { FactoryBot.create(:renewal_individual_catastophic_product, hios_id: "11111111122302-01", csr_variant_id: "01") }
+        let!(:current_product) { FactoryBot.create(:active_individual_catastophic_product, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_product_id: renewal_product.id, catastrophic_age_off_product_id: renewal_cat_age_off_product.id) }
+
+        let(:enrollment_members) { [child1, child2] }
+
+        context "When one of the covered individuals aged off(30 years)" do
+          let(:child1_dob) { current_date.next_month - 30.years }
+
+          it "should return catastrophic aged off product" do
+            expect(subject.renewal_product).to eq renewal_cat_age_off_product.id
+          end
+        end
+
+        context "When all the covered individuals under 30" do
+          let(:child1_dob) { current_date.next_month - 25.years }
+
+          it "should return renewal product" do
+            expect(subject.renewal_product).to eq renewal_product.id
+          end
+        end
+      end
+    end
+
+    describe ".assisted_renewal_product", dbclean: :after_each do
+      context "When individual currently enrolled under CSR product" do
+        let!(:renewal_product) { FactoryBot.create(:renewal_ivl_silver_health_product,  hios_id: "11111111122302-04", hios_base_id: "11111111122302", csr_variant_id: "04") }
+        let!(:current_product) { FactoryBot.create(:active_ivl_silver_health_product, hios_id: "11111111122302-04", hios_base_id: "11111111122302", csr_variant_id: "04", renewal_product_id: renewal_product.id) }
+        let!(:csr_product) { FactoryBot.create(:renewal_ivl_silver_health_product, hios_id: "11111111122302-05", hios_base_id: "11111111122302", csr_variant_id: "05") }
+        let!(:csr_01_product) { FactoryBot.create(:active_ivl_silver_health_product, hios_id: "11111111122302-01", hios_base_id: "11111111122302", csr_variant_id: "01") }
+
+        context "and have different CSR amount for renewal product year" do
+          let(:aptc_values) {{ csr_amt: "87" }}
+
+          it "should be renewed into new CSR variant product" do
+            expect(subject.assisted_renewal_product).to eq csr_product.id
+          end
+        end
+
+        context "and have CSR amount as 0 for renewal product year" do
+          let(:aptc_values) {{ csr_amt: "0" }}
+
+          it "should map to csr variant 01 product" do
+            expect(subject.assisted_renewal_product).to eq csr_01_product.id
+          end
+        end
+
+        context "and have same CSR amount for renewal product year" do
+          let(:aptc_values) {{ csr_amt: "73" }}
+
+          it "should be renewed into same CSR variant product" do
+            expect(subject.assisted_renewal_product).to eq renewal_product.id
+          end
         end
       end
 
-      context "and have CSR amount as 0 for renewal product year" do
-        let(:aptc_values) {{ csr_amt: "0" }}
+      context "When individual not enrolled under CSR product" do
+        let!(:renewal_product) { FactoryBot.create(:renewal_ivl_gold_health_product, hios_id: "11111111122302-01", csr_variant_id: "01") }
+        let!(:current_product) { FactoryBot.create(:active_ivl_gold_health_product, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_product_id: renewal_product.id) }
 
-        it "should map to csr variant 01 product" do
-          expect(subject.assisted_renewal_product).to eq csr_01_product.id
-        end
-      end
-
-      context "and have same CSR amount for renewal product year" do
-        let(:aptc_values) {{ csr_amt: "73" }}
-
-        it "should be renewed into same CSR variant product" do
+        it "should return regular renewal product" do
           expect(subject.assisted_renewal_product).to eq renewal_product.id
         end
       end
     end
 
-    context "When individual not enrolled under CSR product" do
-      let!(:renewal_product) { FactoryBot.create(:renewal_ivl_gold_health_product, hios_id: "11111111122302-01", csr_variant_id: "01") }
-      let!(:current_product) { FactoryBot.create(:active_ivl_gold_health_product, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_product_id: renewal_product.id) }
-
-      it "should return regular renewal product" do
-        expect(subject.assisted_renewal_product).to eq renewal_product.id
-      end
-    end
-  end
-
-  describe ".clone_enrollment" do
-    context "For QHP enrollment" do
-      it "should set enrollment atrributes" do 
-      end 
-    end
-
-    context "Assisted enrollment" do
-      include_context "setup families enrollments"
-
-      subject do
-        enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
-        enrollment_renewal.enrollment = enrollment_assisted
-        enrollment_renewal.assisted = true
-        enrollment_renewal.aptc_values = {applied_percentage: 87,
-                                          applied_aptc: 150,
-                                          csr_amt: 87,
-                                          max_aptc: 200}
-        enrollment_renewal.renewal_coverage_start = renewal_benefit_coverage_period.start_on
-        enrollment_renewal
-      end
-
-      before do
-        hbx_profile.benefit_sponsorship.benefit_coverage_periods.each do |bcp|
-          slcsp_id = if bcp.start_on.year == renewal_csr_87_product.application_period.min.year
-                       renewal_csr_87_product.id
-                     else
-                       active_csr_87_product.id
-                     end
-          bcp.update_attributes!(slcsp_id: slcsp_id)
+    describe ".clone_enrollment" do
+      context "For QHP enrollment" do
+        it "should set enrollment atrributes" do
         end
-        hbx_profile.reload
-
-        family_assisted.active_household.reload
-        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) {|_id, _start, age| age * 1.0}
       end
 
-      it "should append APTC values" do
-        enr = subject.clone_enrollment
-        enr.save!
-        renewel_enrollment = subject.assisted_enrollment(enr)
-        expect(renewel_enrollment.applied_aptc_amount.to_f).to eq((renewel_enrollment.total_premium * renewel_enrollment.product.ehb).round(2))
-      end
+      context "Assisted enrollment" do
+        include_context "setup families enrollments"
 
-      it "should append APTC values" do
-        enr = subject.clone_enrollment
-        enr.save!
-        expect(subject.can_renew_assisted_product?(enr)).to eq true
+        subject do
+          enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
+          enrollment_renewal.enrollment = enrollment_assisted
+          enrollment_renewal.assisted = true
+          enrollment_renewal.aptc_values = {applied_percentage: 87,
+                                            applied_aptc: 150,
+                                            csr_amt: 87,
+                                            max_aptc: 200}
+          enrollment_renewal.renewal_coverage_start = renewal_benefit_coverage_period.start_on
+          enrollment_renewal
+        end
+
+        before do
+          hbx_profile.benefit_sponsorship.benefit_coverage_periods.each do |bcp|
+            slcsp_id = if bcp.start_on.year == renewal_csr_87_product.application_period.min.year
+                         renewal_csr_87_product.id
+                       else
+                         active_csr_87_product.id
+                       end
+            bcp.update_attributes!(slcsp_id: slcsp_id)
+          end
+          hbx_profile.reload
+
+          family_assisted.active_household.reload
+          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) {|_id, _start, age| age * 1.0}
+        end
+
+        it "should append APTC values" do
+          enr = subject.clone_enrollment
+          enr.save!
+          renewel_enrollment = subject.assisted_enrollment(enr)
+          expect(renewel_enrollment.applied_aptc_amount.to_f).to eq((renewel_enrollment.total_premium * renewel_enrollment.product.ehb).round(2))
+        end
+
+        it "should append APTC values" do
+          enr = subject.clone_enrollment
+          enr.save!
+          expect(subject.can_renew_assisted_product?(enr)).to eq true
+        end
       end
     end
   end
