@@ -109,42 +109,18 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
   end
 
   describe "GET edit" do
-    let(:user) { double("User") }
-    let(:person) { double("Person", broker_role: BrokerRole.new) }
+    let!(:person) {FactoryGirl.create(:person, :with_hbx_staff_role)}
+    let!(:user){FactoryGirl.create(:user, roles: ["hbx_staff"], person: person)}
+    let!(:employee_role){FactoryGirl.create(:employee_role)}
     let(:census_employee) { double("CensusEmployee") }
     let(:address) { double("Address") }
     let(:addresses) { [address] }
-    let(:employee_role) { double("EmployeeRole", id: double("id"), employer_profile_id: "3928392", :person => person) }
-    let(:general_agency_staff_role) { double("GeneralAgencyStaffRole", id: double("id"), employer_profile_id: "3928392", :person => person) }
-    let(:general_agency_profile) { double "GeneralAgencyProfile", id: double("id")}
-    let(:employer_profile) { double "EmployerProfile", id: double("id")}
-    let(:family) { double("Family") }
-    let(:email){ double("Email", address: "test@example.com", kind: "home") }
-    let(:id){ EmployeeRole.new.id }
+    # let(:id){ EmployeeRole.new.id }
 
     before :each do
-      allow(EmployeeRole).to receive(:find).and_return(employee_role)
-      allow(user).to receive(:person).and_return(person)
-      allow(Forms::EmployeeRole).to receive(:new).and_return(person)
-      allow(employee_role).to receive(:new_census_employee).and_return(census_employee)
-      allow(census_employee).to receive(:address).and_return(address)
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
       allow(person).to receive(:addresses).and_return(addresses)
-      allow(person).to receive(:primary_family).and_return(family)
-      allow(person).to receive(:emails=).and_return([email])
-      allow(census_employee).to receive(:email).and_return(email)
-      allow(email).to receive(:address=).and_return("test@example.com")
-      allow(controller).to receive(:build_nested_models).and_return(true)
-      allow(user).to receive(:has_hbx_staff_role?).and_return(false)
-      allow(person).to receive(:general_agency_staff_roles).and_return([general_agency_staff_role])
-      allow(general_agency_staff_role).to receive(:general_agency_profile).and_return(general_agency_staff_role)
-      allow(general_agency_staff_role).to receive(:employer_clients).and_return([employer_profile])
-      allow(general_agency_profile).to receive(:employer_clients).and_return([employer_profile])
-      allow(employer_profile).to receive(:_id).and_return(employer_profile.id)
-      allow(user).to receive(:has_csr_subrole?).and_return(false)
-      allow(person).to receive(:employee_roles).and_return([employee_role])
-      allow(employee_role).to receive(:bookmark_url=).and_return(true)
       sign_in user
-
       get :edit, id: employee_role.id
 
     end
@@ -170,6 +146,8 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       expect(person.addresses.empty?).to eq true
     end
   end
+
+
 
   describe "POST create" do
     let(:person) { Person.new }
