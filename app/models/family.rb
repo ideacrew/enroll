@@ -992,9 +992,6 @@ class Family
   # Get waived {HbxEnrollment HbxEnrollments} that meet application criteria for display in the UI
   # @see enrollments_for_display
   # @return [ Array<HbxEnrollment> ] The {HbxEnrollment HbxEnrollments} filtered by display criteria
-  def waivers_for_display
-    HbxEnrollment.waivers_for_display(_id)
-  end
 
   def generate_family_search
     ::MapReduce::FamilySearchForFamily.populate_for(self)

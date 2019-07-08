@@ -458,21 +458,7 @@ class HbxEnrollment
         :allow_disk_use => true
       ).to_a
     end
-     
-    def waivers_for_display(family_id)
-      HbxEnrollment.collection.aggregate([
-        {"$match" => {'family_id' => family_id}},
-        {"$match" => {'aasm_state' => 'inactive'}},
-        {"$sort" => {"submitted_at" => -1 }},
-        {"$group" => {'_id' => {'year' => { "$year" => '$effective_on'},
-                      'state' => '$aasm_state',
-                      'kind' => '$kind',
-                      'coverage_kind' => '$coverage_kind'}}},
-        {"$project" => {'hbx_enrollment._id' => 1, '_id' => 0}}
-        ],
-        :allow_disk_use => true)
-    end
-
+    
     def families_with_contingent_enrollments
       Family.by_enrollment_individual_market.where(:'households.hbx_enrollments' => {
         :$elemMatch => {
@@ -844,7 +830,6 @@ class HbxEnrollment
       if same_signatures(previous_enrollment) && !previous_enrollment.is_shop?
         if self.effective_on > previous_enrollment.effective_on && previous_enrollment.may_terminate_coverage?
           previous_enrollment.terminate_coverage!(effective_on - 1.day)
-
         else
           previous_enrollment.cancel_coverage! if previous_enrollment.may_cancel_coverage?
         end
@@ -1421,9 +1406,9 @@ class HbxEnrollment
   def self.new_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil, resident_role: nil, external_enrollment: false, coverage_start: nil, opt_effective_on: nil, family: nil)
     enrollment = HbxEnrollment.new
     enrollment.household = coverage_household.household
-    enrollment.family = family || coverage_household.household.family
-
+    enrollment.family = coverage_household.household.family
     enrollment.submitted_at = submitted_at
+    
     case
       when employee_role.present?
         if benefit_group.blank? || benefit_group_assignment.blank?
@@ -1499,7 +1484,7 @@ class HbxEnrollment
     enrollment
   end
 
-  def self.create_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, family: nil)
+  def self.create_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil)
     enrollment = self.new_from(
         employee_role: employee_role,
         coverage_household: coverage_household,
@@ -1507,14 +1492,9 @@ class HbxEnrollment
         benefit_group_assignment: benefit_group_assignment,
         consumer_role: consumer_role,
         benefit_package: benefit_package,
-        family: family
     )
     enrollment.save
     enrollment
-  end
-
-
-  def self.purge_enrollments
   end
 
   def covered_members_first_names
@@ -1526,29 +1506,6 @@ class HbxEnrollment
   def can_terminate_coverage?
     may_terminate_coverage? and effective_on <= TimeKeeper.date_of_record
   end
-
-  # def self.find(id)
-  #   id = BSON::ObjectId.from_string(id) if id.is_a? String
-  #   families = Family.where({
-  #                             "households.hbx_enrollments._id" => id
-  #                           })
-  #   found_value = catch(:found) do
-  #     families.each do |family|
-  #       family.households.each do |household|
-  #         household.hbx_enrollments.each do |enrollment|
-  #           if enrollment.id == id
-  #             throw :found, enrollment
-  #           end
-  #         end
-  #       end
-  #     end
-  #     raise Mongoid::Errors::DocumentNotFound.new(self, id)
-  #   end
-  #   return found_value
-  # rescue
-  #   log("Can not find hbx_enrollments with id #{id}", {:severity => "error"})
-  #   nil
-  # end
 
   def self.find_by_benefit_groups(benefit_groups = [])
     id_list = benefit_groups.collect(&:_id).uniq

@@ -321,7 +321,6 @@ class Household
       resident_role: resident_role,
       coverage_household: coverage_household,
       benefit_group: benefit_group,
-      family:family,
       benefit_group_assignment: benefit_group_assignment,
       consumer_role: consumer_role,
       benefit_package: benefit_package,

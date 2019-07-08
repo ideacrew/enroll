@@ -688,7 +688,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       end
 
       it "should return a sep with an effective date that equals to sep date" do
-        enrollment = HbxEnrollment.new_from(employee_role: employee_role, family: family, coverage_household: coverage_household, benefit_group: nil, benefit_package: nil, benefit_group_assignment: nil, qle: true)
+        enrollment = HbxEnrollment.new_from(employee_role: employee_role, coverage_household: coverage_household, benefit_group: nil, benefit_package: nil, benefit_group_assignment: nil, qle: true)
         expect(enrollment.effective_on).to eq sep.qle_on
       end
     end
@@ -2428,6 +2428,7 @@ end
 #   end
 # end
 
+
 describe HbxEnrollment, dbclean: :after_all do
   let!(:ivl_person)       { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
   let!(:ivl_family)       { FactoryBot.create(:family, :with_primary_family_member, person: ivl_person) }
@@ -2448,9 +2449,14 @@ describe HbxEnrollment, dbclean: :after_all do
       expect(ivl_enrollment.is_ivl_actively_outstanding?).to be_falsey
     end
   end
+  
+  context ".enrollments_for_display" do
+    it "should return enrollments for display matching the family id" do
+      expect(HbxEnrollment.enrollments_for_display(ivl_family.id).map{|a|a['_id']}).to include (ivl_enrollment.id)
+    end
+  end
 
   context "for set_is_any_enrollment_member_outstanding" do
-
     it "should return true for is_any_enrollment_member_outstanding" do
       ivl_person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
       ivl_enrollment.save!

@@ -415,20 +415,6 @@ class HbxEnrollment
         :allow_disk_use => true
       ).to_a
     end
-     
-    def waivers_for_display(family_id)
-      HbxEnrollment.collection.aggregate([
-        {"$match" => {'family_id' => family_id}},
-        {"$match" => {'aasm_state' => 'inactive'}},
-        {"$sort" => {"submitted_at" => -1 }},
-        {"$group" => {'_id' => {'year' => { "$year" => '$effective_on'},
-                      'state' => '$aasm_state',
-                      'kind' => '$kind',
-                      'coverage_kind' => '$coverage_kind'}}},
-        {"$project" => {'hbx_enrollment._id' => 1, '_id' => 0}}
-        ],
-        :allow_disk_use => true)
-    end
 
     def families_with_contingent_enrollments
       Family.by_enrollment_individual_market.where(:'households.hbx_enrollments' => {
