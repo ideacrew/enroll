@@ -21,6 +21,8 @@ export class QleKindCreationFormComponent {
   public showQuestionType : boolean | false;
   public showQuestionTitle : boolean | false;
   public showQuestionContainer : boolean | false;
+  public showQuestionDateForm : boolean | false;
+
 
 
 
@@ -77,7 +79,7 @@ export class QleKindCreationFormComponent {
           is_self_attested: [''],
           questions: this._creationForm.array([
             this.initQuestion(),
-          ])
+          ]),
         })
       
     var submissionUriAttribute = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-qle-kind-creation-url");
@@ -86,21 +88,46 @@ export class QleKindCreationFormComponent {
       }
   }
 
+  getresponseDateFirst(){
+    console.log()
+  }
+
+  responseOperatorChosen(o:number){
+    console.log( this.creationFormGroup.value)
+
+  }
+
   initQuestion(){
-    return this._creationForm.group({
+    const question =  this._creationForm.group({
       id: "",
       questionTitle: ['', Validators.required],
       questionType:[''],
+      responses: this._creationForm.array([
+        this.initResponse(),
+      ]),
     });
-
+    return question
   }
-  displayQuestionTitle(){
-    var title =  this.creationFormGroup.value.questions[0].questionTitle;
+
+  displayQuestionTitle(i:number){
+    var title = this.creationFormGroup.value.questions[i].questionTitle;
     return title
   }
 
-  showDateQuestionTypeForm(){
+  initResponse(){
+    const response = this._creationForm.group({
+      id: "",
+      responseBoolean: [false],
+      responseMultipleChoice:[''],
+      responseDateFirst:[''],
+      responseDateLast:[''],
+      responseDateOperator:[''],
+    });
+    return response
+  }
 
+  showDateQuestionTypeForm(){
+    this.showQuestionDateForm = true;
   }
 
   showMultipleChoiceQuestionTypeForm(){
@@ -114,13 +141,13 @@ export class QleKindCreationFormComponent {
 
   questionTypeSelected(type){
     this.showQuestionType = false
-    if (type=="date"){
+    if (type == "date"){
       this.showDateQuestionTypeForm()
     }
-    else if(type=="boolean"){
+    else if(type == "boolean"){
       this.showBooleanQuestionTypeForm()
     }  
-    else if(type=="multipleChoice"){
+    else if(type == "multipleChoice"){
       this.showMultipleChoiceQuestionTypeForm()
     }
   }
@@ -129,19 +156,20 @@ export class QleKindCreationFormComponent {
            this.showQuestionInput = false
            this.showQuestionType = true
            this.showQuestionTitle = true
-
-
   }
   showQuestions(){
        this.showQuestionContainer = true
-    return this.showQuestionInput = true
+        this.showQuestionInput = true
 
+  }
+  addResponse(){
+    const control = <FormArray>this.creationFormGroup.controls.questions['responses'];
+    control.push(this.initResponse());
   }
 
   addQuestion(){
     const control = <FormArray>this.creationFormGroup.controls['questions'];
     control.push(this.initQuestion());
-    console.log(control)
   }
 
   submitCreation() {

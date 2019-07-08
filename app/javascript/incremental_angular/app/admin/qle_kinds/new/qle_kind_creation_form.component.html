@@ -21,19 +21,13 @@
           <div *ngIf='showQuestionContainer' class="row container-fluid">
             <div formArrayName="questions">
               <div *ngFor="let question of creationFormGroup.controls.questions.controls; let i=index">
-                <div *ngIf='showQuestionInput' >
-                  <span>Question Title</span>
-                  <span *ngIf="creationFormGroup.controls.questions.controls.length > 1" 
-                      (click)="removeAddress(i)">
-                  </span>
-                </div>
                 <div [formGroupName]="i">
                   <div *ngIf="showQuestionInput">
                     <input type="text" formControlName="id" name="i" value='i' style="display: none;"/>
-                    <input type="text" formControlName="questionTitle" (focusout)="showQuestionTypes()">
+                    <input type="text" formControlName="questionTitle" (focusout)="showQuestionTypes()" >
                   </div>
                   <div *ngIf="showQuestionTitle" class="container-fluid">
-                    Question: {{displayQuestionTitle()}}
+                    Question: {{displayQuestionTitle(i)}}
                   </div>
                   <div *ngIf="showQuestionType" class="container-fluid">
                       <h4>Please choose Question Type for this question</h4>
@@ -48,13 +42,25 @@
                               <input type='radio' formControlName="questionType" id='qle_kind_question_tpye' value = "MultipleChoice" (change)="questionTypeSelected('multipleChoice')" required>   
                              </p>  
                         </div>
-                  </div>
-                </div>
-                <div *ngIf="showQuestionDateForm">
-                  
+                   </div>
                 </div>
               </div>
-
+              <div *ngIf="showQuestionDateForm">
+                <div formArrayName="responses">
+                  <div>
+                    <div *ngFor="let response of creationFormGroup.controls.responses.controls; let o=index"  [formGroupName]="o">
+                      <input placeholder="MM/DD/YYYY" id="" type="text" formControlName="responseDateFirst" class="form-control-custom-qle" mask="M0/d0/0000" [validation]="true" required>
+                    </div>
+                  </div>
+                </div>
+                  <div >
+                    <select  formControlName="" class='form-control-custom-qle' formControlName="responseDateOperator" (change)="responseOperatorChosen(o)" >
+                        <option value="drop-member">Before</option>
+                        <option value="drop-member">Between</option>
+                        <option value="drop-member">After</option>
+                    </select>
+                  </div>
+                </div>
               </div>
             </div>
         <dt>
