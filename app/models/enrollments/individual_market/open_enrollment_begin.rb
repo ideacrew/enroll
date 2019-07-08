@@ -37,7 +37,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
   def log_message
     @logger.info yield unless Rails.env.test?
   end
-   
+
   def query_criteria
     {
       :kind => 'individual',

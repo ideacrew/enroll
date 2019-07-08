@@ -67,7 +67,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   end
 
   def assisted_enrollment(renewal_enrollment)
-    renewal_service = Services::IvlRenewalService.new(renewal_enrollment)
+    renewal_service = Services::IvlEnrollmentRenewalService.new(renewal_enrollment)
     renewal_service.assign(@aptc_values)
     renewal_service.hbx_enrollment
   end

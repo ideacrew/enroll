@@ -3,7 +3,7 @@
 require 'rails_helper'
 require "#{Rails.root}/spec/shared_contexts/enrollment.rb"
 
-RSpec.describe Services::IvlRenewalService, type: :model, :dbclean => :after_each do
+RSpec.describe Services::IvlEnrollmentRenewalService, type: :model, :dbclean => :after_each do
 
   before :all do
     DatabaseCleaner.clean
@@ -22,7 +22,7 @@ RSpec.describe Services::IvlRenewalService, type: :model, :dbclean => :after_eac
     end
 
     subject do
-      Services::IvlRenewalService.new(renewal_enrollment_assisted)
+      Services::IvlEnrollmentRenewalService.new(renewal_enrollment_assisted)
     end
 
     let(:aptc_values) do
@@ -57,7 +57,7 @@ RSpec.describe Services::IvlRenewalService, type: :model, :dbclean => :after_eac
 
     context 'invalid arguments' do
       it 'should raise error as enrollment is not valid' do
-        expect{Services::IvlRenewalService.new(nil)}.to raise_error(RuntimeError, 'Hbx Enrollment Missing!!!')
+        expect{Services::IvlEnrollmentRenewalService.new(nil)}.to raise_error(RuntimeError, 'Hbx Enrollment Missing!!!')
       end
 
       it 'should raise error if any of the arguments are not valid' do

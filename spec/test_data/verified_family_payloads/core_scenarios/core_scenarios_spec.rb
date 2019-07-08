@@ -1,17 +1,24 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
   describe Subscribers::FamilyApplicationCompleted do
     let(:hbx_profile_organization) { double("HbxProfile", benefit_sponsorship:  double(current_benefit_coverage_period: double(slcsp: Plan.new.id)))}
-    let(:max_aptc) { parser.households.select do |h|
-      h.integrated_case_id == parser.integrated_case_id
-    end.first.tax_households.select do |th|
-      th.primary_applicant_id == parser.family_members.detect do |fm|
-        fm.id == parser.primary_family_member_id
-      end.id.split('#').last
-    end.select do |th|
-      th.id == th.primary_applicant_id && th.primary_applicant_id == parser.primary_family_member_id.split('#').last
-    end.first.eligibility_determinations.max_by(&:determination_date).maximum_aptc.to_f.round(1) }
+    let(:max_aptc) do
+      household = parser.households.select do |h|
+        h.integrated_case_id == parser.integrated_case_id
+      end.first
+      tax_households = household.tax_households.select do |th|
+        th.primary_applicant_id == parser.family_members.detect do |fm|
+          fm.id == parser.primary_family_member_id
+        end.id.split('#').last
+      end
+      tax_household = tax_households.select do |th|
+        th.id == th.primary_applicant_id && th.primary_applicant_id == parser.primary_family_member_id.split('#').last
+      end.first
+      tax_household.eligibility_determinations.max_by(&:determination_date).maximum_aptc.to_f.round(1)
+    end
 
     it "should subscribe to the correct event" do
       expect(Subscribers::FamilyApplicationCompleted.subscription_details).to eq ["acapi.info.events.family.application_completed"]
@@ -62,7 +69,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           let(:consumer_role_db) { person_db.consumer_role }
 
           it "should not log any errors initially" do
-            person.primary_family.update_attribute(:e_case_id, "curam_landing_for#{person.id}")
+            person.primary_family.update_attributes!(e_case_id: "curam_landing_for#{person.id}")
             expect(subject).not_to receive(:log)
             subject.call(nil, nil, nil, nil, message)
           end

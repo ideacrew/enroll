@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Services
-  class IvlRenewalService
+  class IvlEnrollmentRenewalService
     attr_accessor :hbx_enrollment
 
     def initialize(enrollment)
