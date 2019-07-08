@@ -1382,6 +1382,17 @@ describe Family, "scopes", dbclean: :after_each do
   end
 
   context 'scopes' do 
+    context '.all_with_hbx_enrollments' do
+      it "works on family class" do
+        expect(Family.all_with_hbx_enrollments).to include(ivl_enrollment.family)
+      end
+
+      it "works in conjunction with other scopes" do
+        scope = Family.by_enrollment_individual_market.all_with_hbx_enrollments
+        expect(Family.all_with_hbx_enrollments).to include(ivl_enrollment.family)
+      end
+    end
+
     it '.by_enrollment_updated_datetime_range' do
       expect(Family.by_enrollment_updated_datetime_range(start_date, end_date).to_a).to include family
     end
