@@ -93,6 +93,9 @@ class User
   # Enable polymorphic associations
   belongs_to :profile, polymorphic: true, optional: true
 
+  has_one :person, inverse_of: :user
+  accepts_nested_attributes_for :person, :allow_destroy => true
+
   attr_accessor :invitation_id
   #  validate :ensure_valid_invitation, :on => :create
 
