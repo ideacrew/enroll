@@ -2,9 +2,6 @@ module PermissionsConcern
   extend ActiveSupport::Concern
 
   included do
-    has_one :person
-    accepts_nested_attributes_for :person, :allow_destroy => true
-
     # after_initialize :instantiate_person
     #  after_create :send_welcome_email
 

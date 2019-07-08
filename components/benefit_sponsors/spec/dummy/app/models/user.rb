@@ -120,7 +120,7 @@ class User
   field :last_portal_visited, type: String
   field :idp_verified, type: Boolean, default: false
 
-  has_one :person
+  has_one :person, inverse_of: :user
   accepts_nested_attributes_for :person, :allow_destroy => true
 
   def has_hbx_staff_role?
