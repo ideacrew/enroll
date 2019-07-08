@@ -38,6 +38,13 @@ class QlesController < ApplicationController
   end
 
   def deactivate
+    @qle = QualifyingLifeEventKind.find(params[:data]["_id"])
+    end_on_date = Date.strptime(params[:data][:end_on], '%m/%d/%Y')
+    if @qle.update_attributes!(end_on: end_on_date)
+      flash[:notice] = "Successfully deactivated QualifyingLifeEventKind."
+    else
+      flash[:error] = "Unable to update QualifyingLifeEventKind."
+    end
     respond_to do |format|
       format.json { head :no_content, :location => manage_qles_path }
     end
@@ -62,7 +69,6 @@ class QlesController < ApplicationController
   end
 
   def create
-    binding.pry
     respond_to do |format|
       format.json { head :no_content, :location => manage_qles_path }
     end

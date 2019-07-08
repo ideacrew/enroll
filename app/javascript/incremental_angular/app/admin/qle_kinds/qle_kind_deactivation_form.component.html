@@ -8,12 +8,6 @@
     <div class="form-group col-md-4 mb-2{{errorClassFor(deactivationFormGroup.get('end_on'))}}">
       <dl class="">
         <dt>
-          ID:
-        </dt>
-        <dd>
-          {{qleKindToDeactivate._id}}
-        </dd>
-        <dt>
           Title:
         </dt>
         <dd class='capitalize-text'>
@@ -44,8 +38,6 @@
           {{qleKindToDeactivate.market_kind}}
         </dd>
       </dl> 
-
-      <input formControlName="_id" type="text" id="qle_kind_deactivation_form__id" [value]="qleKindToDeactivate._id">
 
       <label for="qle_kind_deactivation_form_end_on"> QLE Kind Deactivation Date</label> <br>
       <input type='text' formControlName="end_on" id='qle_kind_deactivation_form_end_on' placeholder="MM/DD/YYYY" mask="M0/d0/0000" [dropSpecialCharacters]="false" [validation]="true" required> <br>

@@ -38,7 +38,7 @@ export class QleKindDeactivationFormComponent {
       if (this.qleKindToDeactivate != null) {
         this.deactivationFormGroup.addControl(
           "_id",
-          new FormControl(""),
+          new FormControl(this.qleKindToDeactivate._id),
         )
         this.deactivationFormGroup.addControl(
           "end_on",
