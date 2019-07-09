@@ -89,14 +89,13 @@ class User
   index({oim_id: 1}, {sparse: true, unique: true})
   index({created_at: 1 })
 
-  track_history   :on => [:oim_id,
-                        :email],
-                  :modifier_field => :modifier,
-                  :modifier_field_optional => true,
-                  :version_field => :tracking_version,
-                  :track_create  => true,
-                  :track_update  => true,
-                  :track_destroy => true
+  track_history :on => [:oim_id, :email],
+                :modifier_field => :modifier,
+                :modifier_field_optional => true,
+                :version_field => :tracking_version,
+                :track_create  => true,
+                :track_update  => true,
+                :track_destroy => true
 
   before_save :strip_empty_fields
 
