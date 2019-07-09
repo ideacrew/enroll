@@ -38,6 +38,8 @@ Background: General Agency registration
     Then the broker should see the home of broker
     When the broker visits their general agencies page
     Then the broker should see the Clear Default GA in the list of general agencies
+
+    #### following scenarios are currently not working in the dc_new_model_base_branch
     # When the broker set default ga
     # Then the broker should see default ga msg
     # Then the broker logs out
