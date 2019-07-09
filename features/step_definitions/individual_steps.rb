@@ -542,27 +542,26 @@ end
 
 
 Then(/^Aptc user create consumer role account$/) do
-  @browser.button(class: /interaction-click-control-create-account/).wait_until_present
-  @browser.text_field(class: /interaction-field-control-user-email/).set("aptc@dclink.com")
-  @browser.text_field(class: /interaction-field-control-user-password/).set("aA1!aA1!aA1!")
-  @browser.text_field(class: /interaction-field-control-user-password-confirmation/).set("aA1!aA1!aA1!")
-  screenshot("aptc_create_account")
-  scroll_then_click(@browser.input(value: "Create account"))
+  fill_in "user[oim_id]", :with => "aptc@dclink.com"
+  fill_in "user[password]", :with => "aA1!aA1!aA1!"
+  fill_in "user[password_confirmation]", :with => "aA1!aA1!aA1!"
+  screenshot("create_account")
+  click_button "Create Account"
 end
 
 Then(/^Aptc user goes to register as individual/) do
   step "user should see your information page"
   step "user goes to register as an individual"
-  @browser.text_field(class: /interaction-field-control-person-first-name/).set("Aptc")
-  @browser.text_field(class: /interaction-field-control-person-ssn/).set(@u.ssn :ssn3)
+  fill_in 'person[first_name]', :with => "Aptc"
+  fill_in 'person[ssn]', :with => (@u.ssn :ssn)
   screenshot("aptc_register")
 
 end
 
 Then(/^Aptc user should see a form to enter personal information$/) do
   step "Individual should see a form to enter personal information"
-  @browser.text_field(class: /interaction-field-control-person-emails-attributes-0-address/).set("aptc@dclink.com")
   screenshot("aptc_personal")
+  find('.btn', text: 'CONTINUE').click
 end
 
 Then(/^Prepare taxhousehold info for aptc user$/) do
@@ -577,40 +576,37 @@ Then(/^Prepare taxhousehold info for aptc user$/) do
     household.tax_households.last.tax_household_members.create(applicant_id: fm_id, is_ia_eligible: true, is_medicaid_chip_eligible: true, is_subscriber: true)
     household.tax_households.last.eligibility_determinations.create(max_aptc: 80, determined_on: Time.now, csr_percent_as_integer: 40)
   end
-
+  benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
+  product = BenefitMarkets::Products::Product.all.where(metal_level_kind: :silver).first
+  benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}.update_attributes!(slcsp_id: product.id)
   screenshot("aptc_householdinfo")
 end
 
 And(/Aptc user set elected amount and select plan/) do
-  @browser.text_field(id: /elected_aptc/).wait_until_present
-  @browser.text_field(id: "elected_aptc").set("20")
-
-  click_when_present(@browser.a(text: /Select Plan/))
+  fill_in 'elected_aptc', with: "20"
+  find_all('.plan-select')[0].click
   screenshot("aptc_setamount")
 end
 
-Then(/Aptc user should see aptc amount and click on confirm button on thanyou page/) do
-  click_when_present(@browser.checkbox(class: /interaction-choice-control-value-terms-check-thank-you/))
-  expect(@browser.td(text: "$20.00").visible?).to be_truthy
-  @browser.checkbox(id: "terms_check_thank_you").set(true)
-  @browser.text_field(class: /interaction-field-control-first-name-thank-you/).set("Aptc")
-  @browser.text_field(class: /interaction-field-control-last-name-thank-you/).set(@u.find :last_name1)
+Then(/Aptc user should see aptc amount and click on confirm button on thankyou page/) do
+  find('.interaction-choice-control-value-terms-check-thank-you').click
+  fill_in 'first_name_thank_you', :with => (@u.find :first_name)
+  fill_in 'last_name_thank_you', :with => (@u.find :last_name)
   screenshot("aptc_purchase")
-  click_when_present(@browser.a(text: /confirm/i))
+  click_link "Confirm"
 end
 
 Then(/Aptc user should see aptc amount on receipt page/) do
-  @browser.h1(text: /Enrollment Submitted/).wait_until_present
-  expect(@browser.td(text: "$20.00").visible?).to be_truthy
+  expect(page).to have_content 'Enrollment Submitted'
+  expect(page).to have_content '$20.00'
   screenshot("aptc_receipt")
-
 end
 
 Then(/Aptc user should see aptc amount on individual home page/) do
-  @browser.h1(text: /My #{Settings.site.short_name}/).wait_until_present
-  expect(@browser.strong(text: "$20.00").visible?).to be_truthy
-  expect(@browser.label(text: /APTC AMOUNT/).visible?).to be_truthy
-  screenshot("aptc_ivl_home")
+  expect(page).to have_content "My #{Settings.site.short_name}"
+  expect(page).to have_content '$20.00'
+  expect(page).to have_content 'APTC amount'
+  screenshot("my_account")
 end
 
 When(/consumer visits home page after successful ridp/) do
