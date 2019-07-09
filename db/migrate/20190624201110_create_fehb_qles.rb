@@ -23,7 +23,7 @@ class CreateFehbQles < Mongoid::Migration
 
     say_with_time("Time taken to create fehb QLE's") do
       QualifyingLifeEventKind.where(market_kind: 'shop').each do |qle|
-        new_qle = QualifyingLifeEventKind.new(qle.attributes.except("_id", "id", "created_at", "updated_at", "market_kinds"))
+        new_qle = QualifyingLifeEventKind.new(qle.attributes.except("_id", "created_at", "updated_at"))
         new_qle.market_kind = "fehb"
         new_qle.save!
       end
