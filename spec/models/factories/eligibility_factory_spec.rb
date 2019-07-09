@@ -182,58 +182,118 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
 
       context 'for AvailableEligibilityService' do
         context 'for one member enrollment' do
-          before :each do
-            @eligibility_factory ||= described_class.new(enrollment1.id)
-            @available_eligibility ||= @eligibility_factory.fetch_available_eligibility
-          end
-
-          it 'should return a Hash' do
-            expect(@available_eligibility.class).to eq Hash
-          end
-
-          [:aptc, :csr, :total_available_aptc].each do |keyy|
-            it { expect(@available_eligibility.key?(keyy)).to be_truthy }
-          end
-
-          it 'should have all the aptc shopping member ids' do
-            aptc_keys = @available_eligibility[:aptc].keys
-            enrollment1.hbx_enrollment_members.map(&:applicant_id).each do |member_id|
-              expect(aptc_keys).to include(member_id.to_s)
+          context 'tax_household exists' do
+            before :each do
+              @eligibility_factory ||= described_class.new(enrollment1.id)
+              @available_eligibility ||= @eligibility_factory.fetch_available_eligibility
             end
+
+            it 'should return a Hash' do
+              expect(@available_eligibility.class).to eq Hash
+            end
+
+            [:aptc, :csr, :total_available_aptc].each do |keyy|
+              it { expect(@available_eligibility.key?(keyy)).to be_truthy }
+            end
+
+            it 'should have all the aptc shopping member ids' do
+              aptc_keys = @available_eligibility[:aptc].keys
+              enrollment1.hbx_enrollment_members.map(&:applicant_id).each do |member_id|
+                expect(aptc_keys).to include(member_id.to_s)
+              end
+            end
+
+            it { expect(@available_eligibility[:aptc][family_member.id.to_s].round(2)).to eq 200.35 }
+            it { expect(@available_eligibility[:total_available_aptc].round(2)).to eq 200.35 }
+            it { expect(@available_eligibility[:csr]).to eq 'csr_94' }
           end
 
-          it { expect(@available_eligibility[:aptc][family_member.id.to_s].round(2)).to eq 200.35 }
-          it { expect(@available_eligibility[:total_available_aptc].round(2)).to eq 200.35 }
-          it { expect(@available_eligibility[:csr]).to eq 'csr_94' }
+          context 'tax_household does not exists' do
+            before :each do
+              family.active_household.tax_households = []
+              family.active_household.save!
+              @eligibility_factory ||= described_class.new(enrollment1.id)
+              @available_eligibility ||= @eligibility_factory.fetch_available_eligibility
+            end
+
+            it 'should return a Hash' do
+              expect(@available_eligibility.class).to eq Hash
+            end
+
+            [:aptc, :csr, :total_available_aptc].each do |keyy|
+              it { expect(@available_eligibility.key?(keyy)).to be_truthy }
+            end
+
+            it 'should have all the aptc shopping member ids' do
+              aptc_keys = @available_eligibility[:aptc].keys
+              enrollment1.hbx_enrollment_members.map(&:applicant_id).each do |member_id|
+                expect(aptc_keys).to include(member_id.to_s)
+              end
+            end
+
+            it { expect(@available_eligibility[:aptc][family_member.id.to_s]).to eq 0.00 }
+            it { expect(@available_eligibility[:total_available_aptc]).to eq 0.00 }
+            it { expect(@available_eligibility[:csr]).to eq 'csr_100' }
+          end
         end
 
         context 'for two members enrollment' do
           let!(:enrollment_member2) { FactoryBot.create(:hbx_enrollment_member, is_subscriber: false, hbx_enrollment: enrollment1, applicant_id: family_member2.id) }
 
-          before :each do
-            @eligibility_factory ||= described_class.new(enrollment1.id)
-            @available_eligibility ||= @eligibility_factory.fetch_available_eligibility
-          end
-
-          it 'should return a Hash' do
-            expect(@available_eligibility.class).to eq Hash
-          end
-
-          [:aptc, :csr, :total_available_aptc].each do |keyy|
-            it { expect(@available_eligibility.key?(keyy)).to be_truthy }
-          end
-
-          it 'should have all the aptc shopping member ids' do
-            aptc_keys = @available_eligibility[:aptc].keys
-            enrollment1.hbx_enrollment_members.map(&:applicant_id).each do |member_id|
-              expect(aptc_keys).to include(member_id.to_s)
+          context 'with valid tax household for all the shopping members' do
+            before :each do
+              @eligibility_factory ||= described_class.new(enrollment1.id)
+              @available_eligibility ||= @eligibility_factory.fetch_available_eligibility
             end
+
+            it 'should return a Hash' do
+              expect(@available_eligibility.class).to eq Hash
+            end
+
+            [:aptc, :csr, :total_available_aptc].each do |keyy|
+              it { expect(@available_eligibility.key?(keyy)).to be_truthy }
+            end
+
+            it 'should have all the aptc shopping member ids' do
+              aptc_keys = @available_eligibility[:aptc].keys
+              enrollment1.hbx_enrollment_members.map(&:applicant_id).each do |member_id|
+                expect(aptc_keys).to include(member_id.to_s)
+              end
+            end
+
+            it { expect(@available_eligibility[:aptc][family_member.id.to_s].round(2)).to eq 225.96 }
+            it { expect(@available_eligibility[:aptc][family_member2.id.to_s].round(2)).to eq 274.04 }
+            it { expect(@available_eligibility[:total_available_aptc]).to eq 500.00 }
+            it { expect(@available_eligibility[:csr]).to eq 'csr_94' }
           end
 
-          it { expect(@available_eligibility[:aptc][family_member.id.to_s].round(2)).to eq 225.96 }
-          it { expect(@available_eligibility[:aptc][family_member2.id.to_s].round(2)).to eq 274.04 }
-          it { expect(@available_eligibility[:total_available_aptc]).to eq 500.00 }
-          it { expect(@available_eligibility[:csr]).to eq 'csr_94' }
+          context 'without valid tax household for all the shopping members' do
+            before :each do
+              family.active_household.tax_households.first.tax_household_members.second.destroy
+              @eligibility_factory ||= described_class.new(enrollment1.id)
+              @available_eligibility ||= @eligibility_factory.fetch_available_eligibility
+            end
+
+            it 'should return a Hash' do
+              expect(@available_eligibility.class).to eq Hash
+            end
+
+            [:aptc, :csr, :total_available_aptc].each do |keyy|
+              it { expect(@available_eligibility.key?(keyy)).to be_truthy }
+            end
+
+            it 'should have all the aptc shopping member ids' do
+              aptc_keys = @available_eligibility[:aptc].keys
+              enrollment1.hbx_enrollment_members.map(&:applicant_id).each do |member_id|
+                expect(aptc_keys).to include(member_id.to_s)
+              end
+            end
+
+            it { expect(@available_eligibility[:aptc][family_member.id.to_s].round(2)).to eq 500.00 }
+            it { expect(@available_eligibility[:aptc][family_member2.id.to_s].round(2)).to eq 0.00 }
+            it { expect(@available_eligibility[:total_available_aptc]).to eq 500.00 }
+            it { expect(@available_eligibility[:csr]).to eq 'csr_100' }
+          end
         end
 
         context 'with an existing enrollment' do
@@ -241,30 +301,60 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
           let!(:enrollment2) { FactoryBot.create(:hbx_enrollment, :individual_assisted, applied_aptc_amount: 50.00, household: family.active_household) }
           let!(:enrollment_member21) { FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: enrollment2, applicant_id: family_member.id, applied_aptc_amount: 50.00) }
 
-          before :each do
-            @eligibility_factory ||= described_class.new(enrollment1.id)
-            @available_eligibility ||= @eligibility_factory.fetch_available_eligibility
-          end
-
-          it 'should return a Hash' do
-            expect(@available_eligibility.class).to eq Hash
-          end
-
-          [:aptc, :csr, :total_available_aptc].each do |keyy|
-            it { expect(@available_eligibility.key?(keyy)).to be_truthy }
-          end
-
-          it 'should have all the aptc shopping member ids' do
-            aptc_keys = @available_eligibility[:aptc].keys
-            enrollment1.hbx_enrollment_members.map(&:applicant_id).each do |member_id|
-              expect(aptc_keys).to include(member_id.to_s)
+          context 'with valid tax household for all the shopping members' do
+            before :each do
+              @eligibility_factory ||= described_class.new(enrollment1.id)
+              @available_eligibility ||= @eligibility_factory.fetch_available_eligibility
             end
+
+            it 'should return a Hash' do
+              expect(@available_eligibility.class).to eq Hash
+            end
+
+            [:aptc, :csr, :total_available_aptc].each do |keyy|
+              it { expect(@available_eligibility.key?(keyy)).to be_truthy }
+            end
+
+            it 'should have all the aptc shopping member ids' do
+              aptc_keys = @available_eligibility[:aptc].keys
+              enrollment1.hbx_enrollment_members.map(&:applicant_id).each do |member_id|
+                expect(aptc_keys).to include(member_id.to_s)
+              end
+            end
+
+            it { expect(@available_eligibility[:aptc][family_member.id.to_s].round(2)).to eq 203.37 }
+            it { expect(@available_eligibility[:aptc][family_member2.id.to_s].round(2)).to eq 246.63 }
+            it { expect(@available_eligibility[:total_available_aptc]).to eq 450.00 }
+            it { expect(@available_eligibility[:csr]).to eq 'csr_94' }
           end
 
-          it { expect(@available_eligibility[:aptc][family_member.id.to_s].round(2)).to eq 203.37 }
-          it { expect(@available_eligibility[:aptc][family_member2.id.to_s].round(2)).to eq 246.63 }
-          it { expect(@available_eligibility[:total_available_aptc]).to eq 450.00 }
-          it { expect(@available_eligibility[:csr]).to eq 'csr_94' }
+          context 'without valid tax household for all the shopping members' do
+            before :each do
+              family.active_household.tax_households.first.tax_household_members.second.destroy
+              @eligibility_factory ||= described_class.new(enrollment1.id)
+              @available_eligibility ||= @eligibility_factory.fetch_available_eligibility
+            end
+
+            it 'should return a Hash' do
+              expect(@available_eligibility.class).to eq Hash
+            end
+
+            [:aptc, :csr, :total_available_aptc].each do |keyy|
+              it { expect(@available_eligibility.key?(keyy)).to be_truthy }
+            end
+
+            it 'should have all the aptc shopping member ids' do
+              aptc_keys = @available_eligibility[:aptc].keys
+              enrollment1.hbx_enrollment_members.map(&:applicant_id).each do |member_id|
+                expect(aptc_keys).to include(member_id.to_s)
+              end
+            end
+
+            it { expect(@available_eligibility[:aptc][family_member.id.to_s].round(2)).to eq 450.00 }
+            it { expect(@available_eligibility[:aptc][family_member2.id.to_s].round(2)).to eq 0 }
+            it { expect(@available_eligibility[:total_available_aptc]).to eq 450.00 }
+            it { expect(@available_eligibility[:csr]).to eq 'csr_100' }
+          end
         end
       end
 
@@ -276,7 +366,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
             enrollment1.update_attributes!(product_id: @product.id, aasm_state: 'coverage_selected', consumer_role_id: person.consumer_role.id)
           end
 
-          context 'for ehb_premium less than selected_aptc' do
+          context 'where ehb_premium less than selected_aptc and available_aptc' do
             before do
               @eligibility_factory = described_class.new(enrollment1.id, 150.00, [@product_id])
               @applicable_aptc = @eligibility_factory.fetch_applicable_aptcs
@@ -293,7 +383,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
             end
           end
 
-          context 'for selected_aptc less than ehb_premium' do
+          context 'where selected_aptc less than ehb_premium and available_aptc' do
             before do
               @eligibility_factory = described_class.new(enrollment1.id, 35.00, [@product_id])
               @applicable_aptc = @eligibility_factory.fetch_applicable_aptcs
@@ -305,6 +395,23 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
 
             it 'should return selected_aptc' do
               product_aptc = {@product_id => 35.00}
+              expect(@applicable_aptc).to eq product_aptc
+            end
+          end
+
+          context 'where available_aptc less than ehb_premium and selected_aptc' do
+            before do
+              family.active_household.tax_households.first.destroy
+              @eligibility_factory = described_class.new(enrollment1.id, 100.00, [@product_id])
+              @applicable_aptc = @eligibility_factory.fetch_applicable_aptcs
+            end
+
+            it 'should return a Hash' do
+              expect(@applicable_aptc.class).to eq Hash
+            end
+
+            it 'should return selected_aptc' do
+              product_aptc = {@product_id => 0.00}
               expect(@applicable_aptc).to eq product_aptc
             end
           end

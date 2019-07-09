@@ -68,7 +68,7 @@ module Factories
 
     def tax_households
       # TODO: Refactor this accordingly once FAA is enabled.
-      @family.active_household.latest_active_tax_household_with_year(@enrollment.effective_on.year).to_a
+      @family.active_household.latest_active_tax_household_with_year(@enrollment.effective_on.year).to_a.compact
     end
 
     def shopping_tax_members
@@ -104,12 +104,16 @@ module Factories
     end
 
     def fetch_enrolling_available_aptcs
-      # 1. What if one of the shopping members does not exist in any tax_households
-
       aptc_breakdowns = tax_households.inject({}) do |tax_members_aptcs, tax_household|
         aptc_hash = tax_members_aptc_breakdown(tax_household)
         tax_members_aptcs.merge!(aptc_hash) unless aptc_hash.empty?
         tax_members_aptcs
+      end
+
+      # If any of the shopping members does not exist in any of
+      # the tax households then member is assigned with 0 aptc value
+      shopping_member_ids.each do |member_id|
+        aptc_breakdowns[member_id] = 0.00 unless aptc_breakdowns.keys.include?(member_id)
       end
 
       {:aptc => aptc_breakdowns}
