@@ -221,7 +221,8 @@ class Admin::Aptc < ApplicationController
         aptc_members = family.active_household.latest_active_tax_household.aptc_members
       end
       cost = aptc_members.map do |member|
-        slcsp.premium_for(TimeKeeper.datetime_of_record, member.age_on_effective_date)
+        product = ::BenefitMarkets::Products::ProductFactory.new({product_id: slcsp.id})
+        product.cost_for(TimeKeeper.datetime_of_record, member.age_on_effective_date)
       end.inject(:+) || 0
       return '%.2f' % cost
     end
