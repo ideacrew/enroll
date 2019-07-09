@@ -87,6 +87,14 @@ module BenefitSponsors
 
       private
 
+      def initialize_profile
+        return unless is_benefit_sponsorship_eligible.blank?
+
+        write_attribute(:is_benefit_sponsorship_eligible, false)
+        @is_benefit_sponsorship_eligible = false
+        self
+      end
+
       def build_nested_models
         build_inbox if inbox.nil?
       end

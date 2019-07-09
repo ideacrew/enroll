@@ -1,6 +1,7 @@
 class PremiumTable
   include Mongoid::Document
   include Mongoid::Timestamps
+  include Config::AcaModelConcern
 
   embedded_in :plan
 
