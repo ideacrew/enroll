@@ -1492,6 +1492,7 @@ class HbxEnrollment
         benefit_group_assignment: benefit_group_assignment,
         consumer_role: consumer_role,
         benefit_package: benefit_package,
+        family: coverage_household.family
     )
     enrollment.save
     enrollment
