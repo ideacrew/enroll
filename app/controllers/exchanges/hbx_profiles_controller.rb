@@ -42,6 +42,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     authorize HbxProfile, :can_extend_open_enrollment?
     @plan_year = @employer_profile.plan_years.find(params[:plan_year_id])
     open_enrollment_end_date = Date.strptime(params["open_enrollment_end_date"], "%m/%d/%Y")
+    register_employer(@employer_profile)
     @plan_year.extend_open_enrollment(open_enrollment_end_date)
     redirect_to exchanges_hbx_profiles_root_path, :flash => { :success => "Successfully extended employer(s) open enrollment." }
   end
@@ -753,6 +754,14 @@ def employer_poc
   end
 
 private
+   def register_employer(employer_profile)
+    from_state = employer_profile.aasm_state
+    employer_profile.update_attributes(aasm_state: :registered)
+    employer_profile.workflow_state_transitions << WorkflowStateTransition.new(
+            from_state: from_state,
+            to_state: "registered"
+        )
+   end
 
    def modify_admin_tabs?
      authorize HbxProfile, :modify_admin_tabs?
