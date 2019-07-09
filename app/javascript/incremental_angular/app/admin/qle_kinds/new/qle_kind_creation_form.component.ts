@@ -4,7 +4,6 @@ import { FormGroup, FormControl, AbstractControl, FormArray, FormBuilder, Valida
 import { QleKindCreationService } from '../qle_kind_services';
 import { ErrorLocalizer } from '../../../error_localizer';
 import { ErrorMapper, ErrorResponse } from '../../../error_mapper';
-import { HttpResponse } from "@angular/common/http";
 import { QleKindQuestionFormComponent } from './qle_kind_question_form.component';
 import { __core_private_testing_placeholder__ } from '@angular/core/testing';
 
@@ -22,8 +21,9 @@ export class QleKindCreationFormComponent {
   public showQuestionTitle : boolean | false;
   public showQuestionContainer : boolean | false;
   public showQuestionDateForm : boolean | false;
-
-
+  public showBetweenOperator : boolean | false;
+  public showBeforeOperator : boolean | false;
+  public showAfterOperator : boolean | false;
 
 
   @ViewChild('headerRef') headerRef: ElementRef;
@@ -32,6 +32,7 @@ export class QleKindCreationFormComponent {
      injector: Injector,
      private _elementRef : ElementRef,
      private _creationForm: FormBuilder,
+
 
      @Inject("QleKindCreationService") private CreationService : QleKindCreationService,
      ) {
@@ -46,30 +47,6 @@ export class QleKindCreationFormComponent {
 
   ngOnInit() {
     var qleKindToCreateJson = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-qle-kind-create-url");
-        // this.creationFormGroup.addControl(
-        //   "title",
-        //   new FormControl(""),
-        // )
-        // this.creationFormGroup.addControl(
-        //   "tool_tip",
-        //   new FormControl(""), 
-        // )
-        // this.creationFormGroup.addControl(
-        //   "action_kind",
-        //   new FormControl(""),  
-        // )
-        // this.creationFormGroup.addControl(
-        //   "reason",
-        //   new FormControl(""),  
-        // )
-        // this.creationFormGroup.addControl(
-        //   "market_kind",
-        //   new FormControl(""),  
-        // )
-        // this.creationFormGroup.addControl(
-        //   "is_self_attested",
-        //   new FormControl(""),  
-        // )
         this.creationFormGroup = this._creationForm.group({
           title: ['', [Validators.required, Validators.minLength(1)]],
           tool_tip: ['', [Validators.required, Validators.minLength(1)]],
@@ -78,7 +55,7 @@ export class QleKindCreationFormComponent {
           market_kind: ['', [Validators.required, Validators.minLength(1)]],
           is_self_attested: [''],
           questions: this._creationForm.array([
-            this.initQuestion(),
+            // this.initQuestion()
           ]),
         })
       
@@ -89,24 +66,67 @@ export class QleKindCreationFormComponent {
   }
 
   getresponseDateFirst(){
-    console.log()
   }
 
   responseOperatorChosen(o:number){
-    console.log( this.creationFormGroup.value)
-
   }
 
   initQuestion(){
-    const question =  this._creationForm.group({
+   return  this._creationForm.group({
       id: "",
       questionTitle: ['', Validators.required],
       questionType:[''],
       responses: this._creationForm.array([
-        this.initResponse(),
+        this.initElement('responses')
       ]),
     });
-    return question
+  }
+
+  checkOperator(questionIndex:number,responseIndex:number){
+    const operator = this.creationFormGroup.value.questions[questionIndex].responses[responseIndex].responseDateOperator
+    if (operator === "between"){
+      this.showBetweenOperator = true
+    }
+    else if (operator === "before"){
+      this.showBeforeOperator = true
+    }    
+    else if (operator === "after"){
+      this.showAfterOperator = true
+    }
+  }
+
+  initElement(elementName: string): FormGroup {
+      if(elementName === 'questions') {
+      return this._creationForm.group({
+        id: "",
+        questionTitle: ['', Validators.required],
+        questionType:[''],
+        responses: this._creationForm.array([
+          this.initElement('responses')
+        ])
+      })
+    } else if (elementName === 'responses') {
+    console.log(this.creationFormGroup.value)
+
+      return this._creationForm.group({
+        id: "",
+        responseBoolean: [false],
+        responseMultipleChoice:[''],
+        responseDateFirst:[''],
+        responseDateLast:[''],
+        responseDateOperator:[''],
+      })
+    }
+    else {
+      return this._creationForm.group({
+      })
+    };
+  }
+
+
+  addElement(formGroup: FormGroup, elementName: string): void {
+    const control = < FormArray > formGroup.controls[elementName];
+    control.push(this.initElement(elementName));
   }
 
   displayQuestionTitle(i:number){
@@ -126,29 +146,14 @@ export class QleKindCreationFormComponent {
     return response
   }
 
-  showDateQuestionTypeForm(){
-    this.showQuestionDateForm = true;
-  }
-
-  showMultipleChoiceQuestionTypeForm(){
-
-  }
-
-  showBooleanQuestionTypeForm(){
-
-  }
-
-
-  questionTypeSelected(type){
+  questionTypeSelected(type:string){
     this.showQuestionType = false
     if (type == "date"){
-      this.showDateQuestionTypeForm()
+      this.showQuestionDateForm = true;
     }
     else if(type == "boolean"){
-      this.showBooleanQuestionTypeForm()
     }  
     else if(type == "multipleChoice"){
-      this.showMultipleChoiceQuestionTypeForm()
     }
   }
 
@@ -159,18 +164,9 @@ export class QleKindCreationFormComponent {
   }
   showQuestions(){
        this.showQuestionContainer = true
-        this.showQuestionInput = true
-
-  }
-  addResponse(){
-    const control = <FormArray>this.creationFormGroup.controls.questions['responses'];
-    control.push(this.initResponse());
+      this.showQuestionInput = true
   }
 
-  addQuestion(){
-    const control = <FormArray>this.creationFormGroup.controls['questions'];
-    control.push(this.initQuestion());
-  }
 
   submitCreation() {
     var form = this;
@@ -196,3 +192,85 @@ export class QleKindCreationFormComponent {
     }
   }
 }
+
+
+// import { FormGroup, FormArray, tslib, FormBuilder, Validators, FormControl, NgControl  } from '@angular/forms'
+// import { Component, OnInit } from '@angular/core';
+
+// @Component({
+//   selector: 'admin-qle-kind-creation-form',
+//   templateUrl: './qle_kind_creation_form.component.html'
+// })
+// export class QleKindCreationFormComponent {
+        
+//     proxyMedia: FormArray;
+//     formGroup: FormGroup;
+    
+//     constructor(
+//     public formBuilder: FormBuilder
+//     ) {}
+    
+//     ngOnInit() {
+//         this.formGroup = this.formBuilder.group({
+//         test_name: ['', [Validators.required]],
+//         tests: this.formBuilder.array([
+//             this.initTestsForm()
+//             ])
+//         });
+//     }
+    
+//     initTestsForm(): any {
+//         return this.formBuilder.group({
+//         test_num: '',
+//         categorie: '',
+//         responses: this.formBuilder.array([
+//             this.initElement('responses')
+//             ])
+//         });
+//     }
+    
+//     initElement(elementName: string): FormGroup {
+//         if(elementName === 'proxy_media') {
+//             return this.formBuilder.group(
+//             {
+//             prefixe: 'prefixe',
+//             confid: 'confid'
+//             }
+//             );
+//         } else if(elementName === 'tests') {
+//             return this.formBuilder.group({
+//             test_num: ['test_num', [Validators.required, Validators.minLength(2)]],
+//             categorie: ['categorie', [Validators.required, Validators.minLength(2)]],
+//             responses: this.formBuilder.array([
+//                 this.initElement('responses')
+//                 ])
+//             });
+//         } else if(elementName === 'responses') {
+//             return this.formBuilder.group({
+//             code_response: ['code_response', Validators.required],
+//             log_level: ['log_level', Validators.required]
+//             });
+//         }
+//     }
+    
+//     addElement(formGroup: FormGroup, elementName: string): void {
+//         const control = < FormArray > formGroup.controls[elementName];
+//         control.push(this.initElement(elementName));
+//     }
+    
+//     removeElement(formGroup: FormGroup, elementName: string, index: number): void {
+//         const control = <FormArray>formGroup.controls[elementName];
+//         control.removeAt(index);
+//     }
+    
+//     onSubmit(o: any) {
+//         console.log(o);
+//     }
+    
+//     debug(data: any) {
+//         console.warn('debug: data ');
+//         console.warn(data);
+//         console.warn('stop');
+//     }
+    
+// }
