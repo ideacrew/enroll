@@ -105,7 +105,7 @@ class Family
  # after_destroy :remove_family_search_record
 
   scope :with_enrollment_hbx_id, ->(enrollment_hbx_id) { where(
-    :"_id".in => HbxEnrollment.where(hbx_id: enrollment_hbx_id).pluck(:family_id)
+    :"_id".in => HbxEnrollment.where(hbx_id: enrollment_hbx_id).distinct(:family_id)
       )
     }
 
@@ -123,7 +123,7 @@ class Family
   scope :all_assistance_applying,           ->{ unscoped.exists(:"households.tax_households.eligibility_determinations" => true).order(
                                                   :"households.tax_households.eligibility_determinations.determined_at".desc) }
 
-  scope :all_aptc_hbx_enrollments,      ->{ where(:"_id".in => HbxEnrollment.where(:"applied_aptc_amount.cents".gt => 0).pluck(:family_id)) }
+  scope :all_aptc_hbx_enrollments,      ->{ where(:"_id".in => HbxEnrollment.where(:"applied_aptc_amount.cents".gt => 0).distinct(:family_id)) }
   scope :all_unassisted,                ->{ exists(:"households.tax_households.eligibility_determinations" => false) }
 
   scope :all_eligible_for_assistance,   ->{ exists(:"households.tax_households.eligibility_determinations" => true) }
@@ -150,29 +150,29 @@ class Family
   scope :all_with_hbx_enrollments, -> { where(:"_id".in => HbxEnrollment.all.distinct(:family_id)) }
   scope :all_with_plan_shopping, -> { all_with_hbx_enrollments }
   scope :by_datetime_range,                     ->(start_at, end_at){ where(:created_at.gte => start_at).and(:created_at.lte => end_at) }
-  scope :all_enrollments,                       ->{  where(:"_id".in => HbxEnrollment.enrolled_statuses.pluck(:family_id)) }
-  scope :all_enrollments_by_writing_agent_id,   ->(broker_id) { where(:"_id".in => HbxEnrollment.by_writing_agent_id(broker_id).pluck(:family_id)) }
-  scope :all_enrollments_by_benefit_group_ids,   ->(benefit_group_ids) { where(:"_id".in => HbxEnrollment.by_benefit_group_ids(benefit_group_ids).pluck(:family_id)) }
-  scope :all_enrollments_by_benefit_sponsorship_id, ->(benefit_sponsorship_id){ where(:"_id".in => HbxEnrollment.by_benefit_sponsorship_id(benefit_sponsorship_id).pluck(:family_id))}
-  scope :by_enrollment_individual_market,       ->{ where(:"_id".in => HbxEnrollment.individual_market.pluck(:family_id))}
-  scope :by_enrollment_shop_market,             ->{ where(:"_id".in => HbxEnrollment.shop_market.pluck(:family_id))}
-  scope :by_enrollment_renewing,                ->{ where(:"_id".in => HbxEnrollment.renewing.pluck(:family_id))}
-  scope :by_enrollment_created_datetime_range,  ->(start_at, end_at){ where(:"_id".in => HbxEnrollment.by_created_datetime_range(start_at, end_at).pluck(:family_id))}
-  scope :by_enrollment_updated_datetime_range,  ->(start_at, end_at){ where(:"_id".in => HbxEnrollment.by_updated_datetime_range(start_at, end_at).pluck(:family_id))}
-  scope :by_enrollment_effective_date_range,    ->(start_on, end_on){ where(:"_id".in => HbxEnrollment.by_effective_date_range(start_on, end_on).pluck(:family_id))}
-  scope :non_enrolled,                          ->{ where(:"_id".in => HbxEnrollment.non_enrolled.pluck(:family_id))}
+  scope :all_enrollments,                       ->{  where(:"_id".in => HbxEnrollment.enrolled_statuses.distinct(:family_id)) }
+  scope :all_enrollments_by_writing_agent_id,   ->(broker_id) { where(:"_id".in => HbxEnrollment.by_writing_agent_id(broker_id).distinct(:family_id)) }
+  scope :all_enrollments_by_benefit_group_ids,   ->(benefit_group_ids) { where(:"_id".in => HbxEnrollment.by_benefit_group_ids(benefit_group_ids).distinct(:family_id)) }
+  scope :all_enrollments_by_benefit_sponsorship_id, ->(benefit_sponsorship_id){ where(:"_id".in => HbxEnrollment.by_benefit_sponsorship_id(benefit_sponsorship_id).distinct(:family_id))}
+  scope :by_enrollment_individual_market,       ->{ where(:"_id".in => HbxEnrollment.individual_market.distinct(:family_id))}
+  scope :by_enrollment_shop_market,             ->{ where(:"_id".in => HbxEnrollment.shop_market.distinct(:family_id))}
+  scope :by_enrollment_renewing,                ->{ where(:"_id".in => HbxEnrollment.renewing.distinct(:family_id))}
+  scope :by_enrollment_created_datetime_range,  ->(start_at, end_at){ where(:"_id".in => HbxEnrollment.by_created_datetime_range(start_at, end_at).distinct(:family_id))}
+  scope :by_enrollment_updated_datetime_range,  ->(start_at, end_at){ where(:"_id".in => HbxEnrollment.by_updated_datetime_range(start_at, end_at).distinct(:family_id))}
+  scope :by_enrollment_effective_date_range,    ->(start_on, end_on){ where(:"_id".in => HbxEnrollment.by_effective_date_range(start_on, end_on).distinct(:family_id))}
+  scope :non_enrolled,                          ->{ where(:"_id".in => HbxEnrollment.non_enrolled.distinct(:family_id))}
   scope :sep_eligible,                          ->{ where(:"active_seps.count".gt => 0) }
-  scope :coverage_waived,                       ->{ where(:"_id".in => HbxEnrollment.waived.pluck(:family_id))}
-  scope :having_unverified_enrollment,          ->{ where(:"_id".in => HbxEnrollment.by_unverified.pluck(:family_id)) }
-  scope :with_all_verifications,                ->{ where(:"_id".in => HbxEnrollment.verified.pluck(:family_id))}
-  scope :with_partial_verifications,            ->{ where(:"_id".in => HbxEnrollment.partially_verified.pluck(:family_id))}
-  scope :with_no_verifications,                 ->{ where(:"_id".in => HbxEnrollment.not_verified.pluck(:family_id))}
-  scope :with_reset_verifications,              ->{ where(:"_id".in => HbxEnrollment.reset_verifications.pluck(:family_id))}
+  scope :coverage_waived,                       ->{ where(:"_id".in => HbxEnrollment.waived.distinct(:family_id))}
+  scope :having_unverified_enrollment,          ->{ where(:"_id".in => HbxEnrollment.by_unverified.distinct(:family_id)) }
+  scope :with_all_verifications,                ->{ where(:"_id".in => HbxEnrollment.verified.distinct(:family_id))}
+  scope :with_partial_verifications,            ->{ where(:"_id".in => HbxEnrollment.partially_verified.distinct(:family_id))}
+  scope :with_no_verifications,                 ->{ where(:"_id".in => HbxEnrollment.not_verified.distinct(:family_id))}
+  scope :with_reset_verifications,              ->{ where(:"_id".in => HbxEnrollment.reset_verifications.distinct(:family_id))}
   scope :vlp_fully_uploaded,                    ->{ where(vlp_documents_status: "Fully Uploaded")}
   scope :vlp_partially_uploaded,                ->{ where(vlp_documents_status: "Partially Uploaded")}
   scope :vlp_none_uploaded,                     ->{ where(:vlp_documents_status.in => ["None",nil])}
   scope :outstanding_verification,   ->{ by_enrollment_individual_market.where(
-    :"_id".in => HbxEnrollment.verification_outstanding.pluck(:family_id))
+    :"_id".in => HbxEnrollment.verification_outstanding.distinct(:family_id))
   }
 
   scope :monthly_reports_scope, -> do
@@ -184,36 +184,36 @@ class Family
         :created_at => {:"$gte" => start_date, :"$lt" => end_date},
         :kind => 'individual'
       }
-    ).pluck(:family_id))
+    ).distinct(:family_id))
   end
   
   # Replaced scopes for moving HbxEnrollment to top level
   # The following methods are rewrites of scopes that were being called before HbxEnrollment was a top level document.
 
-  scope :all_enrollments_by_benefit_package, ->(benefit_package) { where(:"_id".in => HbxEnrollment.where(sponsored_benefit_package_id => benefit_package._id, :aasm_state.ne => :shopping).pluck(:family_id))}
+  scope :all_enrollments_by_benefit_package, ->(benefit_package) { where(:"_id".in => HbxEnrollment.where(sponsored_benefit_package_id => benefit_package._id, :aasm_state.ne => :shopping).distinct(:family_id))}
 
   scope :all_enrollments_by_benefit_sponsorship_id,  ->(benefit_sponsorship_id) {
-    where(:"_id".in => HbxEnrollment.where(benefit_sponsorship_id: benefit_sponsorship_id).pluck(:family_id))
+    where(:"_id".in => HbxEnrollment.where(benefit_sponsorship_id: benefit_sponsorship_id).distinct(:family_id))
   }
 
   scope :enrolled_and_terminated_through_benefit_package, ->(benefit_package) {
     where(:"_id".in => HbxEnrollment.where(
       :"aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::WAIVED_STATUSES + HbxEnrollment::TERMINATED_STATUSES),
       sponsored_benefit_package_id: benefit_package._id
-    ).pluck(:family_id)
+    ).distinct(:family_id)
   ) }
 
   scope :enrolled_through_benefit_package, ->(benefit_package) { where(:"_id".in => HbxEnrollment.where(
       :"aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::WAIVED_STATUSES),
       sponsored_benefit_package_id: benefit_package._id
-    ).pluck(:family_id)
+    ).distinct(:family_id)
   ) }
 
   scope :enrolled_under_benefit_application, ->(benefit_application) { where(:"_id".in => HbxEnrollment.where(
     :"sponsored_benefit_package_id".in => benefit_application.benefit_packages.pluck(:_id),
     :"aasm_state".nin => %w(coverage_canceled shopping coverage_terminated),
     coverage_kind: "health"
-    ).pluck(:family_id)
+    ).distinct(:family_id)
   ) }
 
   def active_broker_agency_account
