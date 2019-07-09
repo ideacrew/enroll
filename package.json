@@ -48,6 +48,7 @@
     "@types/jasmine": "~2.8.8",
     "angular2-template-loader": "^0.6.2",
     "jasmine-core": "~2.99.1",
+    "jest-junit": "^6.4.0",
     "jsdom-mount": "0.1.0",
     "karma": "~4.0.0",
     "karma-chrome-launcher": "~2.2.0",
@@ -71,6 +72,10 @@
   },
   "jest": {
     "testURL": "http://localhost",
+    "reporters": [
+      "default",
+      "jest-junit"
+    ],
     "roots": [
       "spec/javascript"
     ],
@@ -78,5 +83,14 @@
       "node_modules",
       "app/javascript"
     ]
+  },
+  "jest-junit": {
+    "suiteName": "jest tests",
+    "outputDirectory": "./tmp",
+    "outputName": "jest_junit.xml",
+    "classNameTemplate": "{classname}",
+    "titleTemplate": "{classname}-{title}",
+    "ancestorSeparator": " › ",
+    "usePathForSuiteName": "true"
   }
 }
