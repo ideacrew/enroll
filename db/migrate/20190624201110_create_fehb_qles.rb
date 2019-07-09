@@ -56,7 +56,7 @@ class CreateFehbQles < Mongoid::Migration
                 print '.' unless Rails.env.test?
               end
             end
-            if person.primary_family.latest_active_sep.present?
+            if person.primary_family.latest_active_sep.present? && person.primary_family.latest_active_sep.qualifying_life_event_kind.market_kind == "shop"
               if person.active_employee_roles.count == 1 && profile_ids.include?(person.active_employee_roles.first.benefit_sponsors_employer_profile_id)
                 person.primary_family.latest_active_sep.update_attributes(qualifying_life_event_kind_id: @qle_map[person.primary_family.latest_active_sep.qualifying_life_event_kind_id])
                 print '.' unless Rails.env.test?
