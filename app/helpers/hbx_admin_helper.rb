@@ -5,7 +5,7 @@ module HbxAdminHelper
   end
 
   def ehb_percent_for_enrollment(hbx_id)
-    ehb = find_enrollment(hbx_id).plan.ehb
+    ehb = find_enrollment(hbx_id).product.ehb
     enb_percent = (ehb*100).round(2)
   end
   
