@@ -73,14 +73,14 @@ module SponsoredBenefits
         prev_default_ga_id = current_default_ga.id if current_default_ga
         broker_agency_profile.default_general_agency_profile = general_agency_profile
         broker_agency_profile.save!
-        notify("acapi.info.events.broker.default_ga_changed", {:broker_id => broker_agency_profile.primary_broker_role.hbx_id, :pre_default_ga_id => prev_default_ga_id})
+        notify("acapi.info.events.broker.default_ga_changed", {:broker_id => broker_agency_profile.primary_broker_role.hbx_id, :pre_default_ga_id => prev_default_ga_id.to_s}) if broker_agency_profile.primary_broker_role
       end
 
       def clear_default_general_agency
         prev_default_ga_id = current_default_ga.id if current_default_ga
         broker_agency_profile.default_general_agency_profile = nil
         broker_agency_profile.save!
-        notify("acapi.info.events.broker.default_ga_changed", {:broker_id => broker_agency_profile.primary_broker_role.hbx_id, :pre_default_ga_id => prev_default_ga_id})
+        notify("acapi.info.events.broker.default_ga_changed", {:broker_id => broker_agency_profile.primary_broker_role.hbx_id, :pre_default_ga_id => prev_default_ga_id.to_s}) if broker_agency_profile.primary_broker_role
       end
 
       def fire_previous_general_agency(id)
