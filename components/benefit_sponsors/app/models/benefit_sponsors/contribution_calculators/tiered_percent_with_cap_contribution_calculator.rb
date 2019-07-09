@@ -31,7 +31,7 @@ module BenefitSponsors
           coverage_age = @contribution_calculator.calc_coverage_age_for(member, @product, @coverage_start, @eligibility_dates, @previous_product)
           relationship = member.is_primary_member? ? "self" : member.relationship
           rel_name = @contribution_model.map_relationship_for(relationship, coverage_age, member.is_disabled?)
-          @relationship_totals[rel_name.to_s] = @relationship_totals[rel_name] + 1
+          @relationship_totals[rel_name.to_s] = @relationship_totals[rel_name.to_s] + 1
           @member_total = @member_total + 1
           @member_ids = @member_ids + [member.member_id]
           self
