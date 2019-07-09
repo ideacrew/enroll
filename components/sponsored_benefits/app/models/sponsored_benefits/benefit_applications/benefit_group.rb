@@ -26,47 +26,46 @@ module SponsoredBenefits
         )
       end
 
-      def employee_costs_for_reference_plan(plan = reference_plan)
+      def employee_costs_for_reference_plan(service, plan = reference_plan)
+          service.employee_cost_for_plan(plan) # To initialize census_employee_costs
+          if !single_plan_type?
+            service.employee_cost_for_plan(lowest_cost_plan)
+            service.employee_cost_for_plan(highest_cost_plan)
+          end
           employee_costs = census_employees.active.inject({}) do |census_employees, employee|
             costs = {
-              ref_plan_cost: employee_cost_for_plan(employee, plan)
+              ref_plan_cost: service.census_employee_costs[plan.id][employee.id]
             }
 
-            if !single_plan_type? && !plan.dental?
+            if !single_plan_type?
               costs.merge!({
-                lowest_plan_cost: employee_cost_for_plan(employee, lowest_cost_plan),
-                highest_plan_cost: employee_cost_for_plan(employee, highest_cost_plan)
-                })
+                lowest_plan_cost: service.census_employee_costs[lowest_cost_plan.id][employee.id],
+                highest_plan_cost: service.census_employee_costs[highest_cost_plan.id][employee.id]
+              })
             end
             census_employees[employee.id] = costs
             census_employees
           end
 
-          employer_costs = {
-            ref_plan_employer_cost: monthly_employer_contribution_amount(plan)
-          }
-
-          if !plan.dental?
-            employer_costs.merge!({
-              lowest_plan_employer_cost: monthly_employer_contribution_amount(lowest_cost_plan),
-              highest_plan_employer_cost: monthly_employer_contribution_amount(highest_cost_plan)
-            })
-          end
-
-          employee_costs.merge!(employer_costs)
+          employee_costs.merge!({
+            ref_plan_employer_cost: service.monthly_employer_contribution_amount(plan),
+            lowest_plan_employer_cost: service.monthly_employer_contribution_amount(lowest_cost_plan),
+            highest_plan_employer_cost: service.monthly_employer_contribution_amount(highest_cost_plan)
+          })
       end
 
-      def employee_costs_for_dental_reference_plan
+      def employee_costs_for_dental_reference_plan(service)
         plan = dental_reference_plan
+        service.employee_cost_for_plan(plan) # To initialize census_employee_costs
         employee_costs = census_employees.active.inject({}) do |census_employees, employee|
           census_employees[employee.id] = {
-            ref_plan_cost: employee_cost_for_plan(employee, plan)
+            ref_plan_cost: service.census_employee_costs[plan.id][employee.id]
           }
           census_employees
         end
 
         employee_costs.merge!({
-          ref_plan_employer_cost: monthly_employer_contribution_amount(plan)
+          ref_plan_employer_cost: service.monthly_employer_contribution_amount(plan)
           })
       end
 
@@ -172,7 +171,6 @@ module SponsoredBenefits
 
       def set_bounding_cost_dental_plans
         return if reference_plan_id.nil?
-
         option_kind = self.persisted? ? dental_plan_option_kind : plan_option_kind
         if option_kind == "single_plan"
           plans = elected_dental_plans
@@ -180,7 +178,7 @@ module SponsoredBenefits
           plans = Plan.shop_dental_by_active_year(reference_plan.active_year).by_carrier_profile(reference_plan.carrier_profile)
         end
 
-        # set_lowest_and_highest(plans)
+        set_lowest_and_highest(plans)
       end
 
       def set_lowest_and_highest(plans)

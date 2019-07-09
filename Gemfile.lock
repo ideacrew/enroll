@@ -227,6 +227,9 @@ GEM
       thread_safe (~> 0.3, >= 0.3.1)
     backports (3.15.0)
     bcrypt (3.1.13)
+    benchmark-malloc (0.1.0)
+    benchmark-perf (0.5.0)
+    benchmark-trend (0.3.0)
     bindex (0.7.0)
     bootsnap (1.4.4)
       msgpack (~> 1.0)
@@ -654,6 +657,11 @@ GEM
       rspec-core (~> 3.8.0)
       rspec-expectations (~> 3.8.0)
       rspec-mocks (~> 3.8.0)
+    rspec-benchmark (0.5.0)
+      benchmark-malloc (~> 0.1.0)
+      benchmark-perf (~> 0.5.0)
+      benchmark-trend (~> 0.3.0)
+      rspec (>= 3.0.0, < 4.0.0)
     rspec-core (3.8.0)
       rspec-support (~> 3.8.0)
     rspec-expectations (3.8.4)
@@ -906,6 +914,7 @@ DEPENDENCIES
   redis-rails (~> 5.0.2)
   resque (~> 2.0)
   roo (~> 2.1)
+  rspec-benchmark
   rspec-instafail (~> 1)
   rspec-rails
   rspec_junit_formatter

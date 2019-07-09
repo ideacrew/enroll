@@ -74,12 +74,12 @@ module SponsoredBenefits
       respond_to do |format|
         begin
           if @census_employee_import.save
-            format.html { redirect_to :back, :flash => { :success => "Roster uploaded successfully."} }
+            format.html { redirect_back fallback_location: main_app.root_path, flash: {:success => "Roster uploaded successfully."} }
           else
-            format.html { redirect_to :back, :flash => { :error => "Roster upload failed."} }
+            format.html { redirect_back fallback_location: main_app.root_path, flash: {:error => "Roster upload failed."} }
           end
         rescue Exception => e
-          format.html { redirect_to :back, :flash => { :error => e.to_s} }
+          format.html { redirect_back fallback_location: main_app.root_path, flash: {:error => e.to_s} }
         end
       end
     end

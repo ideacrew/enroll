@@ -56,13 +56,18 @@
       <div class="col-xs-2">
         <%= check_box_tag "Dental Plan", plan.id, true, :onclick => "handleReferencePlanSelection(this)" %>
       </div>
-      <div class="col-xs-10 cc-reference-card">
-        <h3 class="cc-reference-plans"><%= plan.name %></h3>
-        <span class="plan-label">Type: </span><span><%= plan.plan_type %></span><br>
-        <span class="plan-label">Carrier: </span><span><%= plan.carrier_profile.legal_name %></span><br>
-        <span class="plan-label">Level: </span><span><%= display_dental_metal_level(plan) %></span><br>
-        <span class="plan-label">Network: </span><span><%= plan.nationwide ? 'Nationwide' : 'DC Metro' %></span><br/>
-        <%#= link_to 'View Summary', main_app.reference_plan_summary_employers_employer_profile_plan_years_path(ref_plan_id: plan.id, hios_id: plan.hios_id, coverage_kind: plan.coverage_kind), remote: 'true', class: "view-summary fourteen" %>
+      <div class="col-xs-10">
+
+        <div class="card" style="width: 18rem;">
+          <div class="card-body">
+            <h5 class="card-title"><%= plan.name %></h5>
+
+            <p class="card-text">Type: <%= plan.plan_type %></p>
+            <p class="card-text">Carrier: <%= plan.carrier_profile.legal_name %></p>
+            <p class="card-text">Level: <%= display_dental_metal_level(plan) %></p>
+            <p class="card-text">Network: <%= plan.nationwide ? 'Nationwide' : 'DC Metro' %></p>
+          </div>
+        </div>
       </div>
     </div>
   <% end %>
