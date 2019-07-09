@@ -24,6 +24,7 @@ export class QleKindCreationFormComponent {
   public showBetweenOperator : boolean | false;
   public showBeforeOperator : boolean | false;
   public showAfterOperator : boolean | false;
+  public questionCreated : boolean | false;
 
 
   @ViewChild('headerRef') headerRef: ElementRef;
@@ -55,7 +56,6 @@ export class QleKindCreationFormComponent {
           market_kind: ['', [Validators.required, Validators.minLength(1)]],
           is_self_attested: [''],
           questions: this._creationForm.array([
-            // this.initQuestion()
           ]),
         })
       
@@ -106,8 +106,6 @@ export class QleKindCreationFormComponent {
         ])
       })
     } else if (elementName === 'responses') {
-    console.log(this.creationFormGroup.value)
-
       return this._creationForm.group({
         id: "",
         responseBoolean: [false],
@@ -158,15 +156,22 @@ export class QleKindCreationFormComponent {
   }
 
   showQuestionTypes(){
-           this.showQuestionInput = false
-           this.showQuestionType = true
-           this.showQuestionTitle = true
-  }
-  showQuestions(){
-       this.showQuestionContainer = true
-      this.showQuestionInput = true
+      this.showQuestionInput = false
+      this.showQuestionType = true
+      this.showQuestionTitle = true
   }
 
+  showQuestions(){
+    this.showQuestionContainer = true
+    this.showQuestionInput = true
+  }
+
+  submitQuestion(){
+    this.showQuestionDateForm = false
+    this.questionCreated = true 
+    this.showQuestionTitle = false
+    this.creationFormGroup.value.questions.d
+  }
 
   submitCreation() {
     var form = this;
