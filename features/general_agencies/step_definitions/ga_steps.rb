@@ -401,8 +401,8 @@ Then(/^the ga should see ga profile form to update informaton$/) do
 end
 
 When(/^the ga enters personal information or general agency information or office location$/) do
-  fill_in "organization[npn]", with: "3457684567"
-  fill_in "organization[legal_name]", with: "Sample General LLc"
+  fill_in "agency_staff_roles_attributes_0_npn", with: "3457684567"
+  fill_in "agency_organization_legal_name", with: "Sample General LLc"
 end
 
 And(/^the ga clicks update general agency$/) do
@@ -410,7 +410,7 @@ And(/^the ga clicks update general agency$/) do
 end
 
 Then(/^the ga should see successful message\.$/) do
-  expect(page).to have_content('Successfully Update General Agency Profile')
+  expect(page).to have_content('General Agency Profile successfully Updated.')
 end
 
 Then(/^the ga should see updated informaton on page$/) do
