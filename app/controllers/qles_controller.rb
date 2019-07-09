@@ -13,7 +13,7 @@ class QlesController < ApplicationController
     # TODO: Fix these scopes, probably hide them behind a JSON serializer
     # TODO: Consider adding a blank option, and then assure in the qle_kind_wizard
     # that the submit button doesn't work unless a option with a value is selected.
-    @editable_qles = QualifyingLifeEventKind.all
+    @editable_qles = QualifyingLifeEventKind.editable
     @deactivatable_qles = QualifyingLifeEventKind.not_set_for_deactivation
   end
   
