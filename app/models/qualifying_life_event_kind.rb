@@ -199,7 +199,7 @@ class QualifyingLifeEventKind
 
   # TODO: This can be updated depending on business requirements
   def qle_dropdown_label
-    title
+    edi_code + " | " + title
   end
 
   class << self
