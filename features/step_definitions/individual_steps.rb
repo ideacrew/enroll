@@ -256,10 +256,11 @@ end
 
 And(/^.+ click on sign in existing account$/) do
   expect(page).to have_content "Welcome to the District's Health Insurance Marketplace"
-  find('.btn-link', :text => 'Sign In Existing Account', :wait => 10).click
 end
 
 And(/I signed in$/) do
+  find('.btn-link', :text => 'Sign In Existing Account').click
+  sleep 1
   fill_in "user[login]", :with => "testflow@test.com"
   fill_in "user[password]", :with => "aA1!aA1!aA1!"
   find('.sign-in-btn').click
