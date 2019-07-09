@@ -9,10 +9,13 @@ module SponsoredBenefits
         find_or_build_benefit_group
         @census_employees = sponsorship.census_employees
         if @benefit_group
+          @service = SponsoredBenefits::Services::PlanCostService.new({benefit_group: @benefit_group})
           @benefit_group.build_estimated_composite_rates if @benefit_group.sole_source?
           @plan = @benefit_group.reference_plan
-          @employer_contribution_amount = @benefit_group.monthly_employer_contribution_amount
-          @benefit_group_costs = @benefit_group.employee_costs_for_reference_plan
+          dental_plan = @benefit_group.dental_reference_plan
+          @employer_contribution_amount = @service.monthly_employer_contribution_amount(@plan)
+          @employer_dental_contribution_amount = @service.monthly_employer_contribution_amount(dental_plan) if dental_plan.present?
+          @benefit_group_costs = @benefit_group.employee_costs_for_reference_plan(@service)
           @qhps = ::Products::QhpCostShareVariance.find_qhp_cost_share_variances(plan_array(@plan), plan_design_proposal.effective_date.year, "Health")
         end
 
@@ -38,24 +41,24 @@ module SponsoredBenefits
         end
 
         def find_or_build_benefit_group
-          @benefit_group = sponsorship.benefit_applications.first.benefit_groups.first
+          persisted_benefit_group = sponsorship.benefit_applications.first.benefit_groups.first
 
-          if @benefit_group.present?
-            if kind == 'dental'
-              @benefit_group.dental_relationship_benefits = []
-              @benefit_group.assign_attributes(dental_benefit_params)
-              @benefit_group.elected_dental_plans = @benefit_group.elected_dental_plans_by_option_kind
-            else
-              @benefit_group.relationship_benefits = []
-              @benefit_group.assign_attributes(benefit_group_params)
-            end
+          if persisted_benefit_group.present? && kind == 'dental'
+            @benefit_group = sponsorship.benefit_applications.first.benefit_groups.build(dental_benefit_params.as_json)
+            @benefit_group.assign_attributes({
+              relationship_benefits: persisted_benefit_group.relationship_benefits,
+              reference_plan_id: persisted_benefit_group.reference_plan_id,
+              elected_dental_plans: @benefit_group.elected_dental_plans_by_option_kind,
+              elected_plans: persisted_benefit_group.elected_plans_by_option_kind.to_a,
+              plan_option_kind: persisted_benefit_group.plan_option_kind
+            })
+          elsif benefit_group_params.present?
+            @benefit_group = sponsorship.benefit_applications.first.benefit_groups.build(benefit_group_params.as_json)
+            @benefit_group.elected_plans = @benefit_group.elected_plans_by_option_kind.to_a
+          else
+            @benefit_group = sponsorship.benefit_applications.first.benefit_groups.build(persisted_benefit_group.as_json)
+            @benefit_group.elected_plans = @benefit_group.elected_plans_by_option_kind.to_a
           end
-
-          if @benefit_group.blank? && benefit_group_params.present?
-            @benefit_group = sponsorship.benefit_applications.first.benefit_groups.build(benefit_group_params)
-          end
-
-          @benefit_group.elected_plans = @benefit_group.elected_plans_by_option_kind.to_a
         end
 
         def plan_array(plan)
