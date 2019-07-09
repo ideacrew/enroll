@@ -114,7 +114,7 @@
             </div>
 
             <div id="cancel-form" class="hidden">
-              <%= form_tag term_or_cancel_insured_group_selections_path(hbx_enrollment_id: @hbx_enrollment.id, coverage_end_date: @coverage_end_date), :method => :post do %>
+              <%= form_tag term_or_cancel_insured_group_selections_path(hbx_enrollment_id: @hbx_enrollment.id, term_or_cancel: @should_term_or_cancel), :method => :post do %>
                 <div class="col-xs-3" style="float:right;">
                   <% if @calendar_enabled %>
                     <h5 id="enter-text">Enter the date of cancellation</h5>
