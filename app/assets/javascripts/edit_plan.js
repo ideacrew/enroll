@@ -1,7 +1,6 @@
 $(document).on("ready ajax:success", function() {
 
   $("#agreement_action-confirm-yes").click(function(){
-    console.log('asdfasdf')
     $(".interaction-click-control-action-confirm").attr("disabled", false);
     $("#action-confirm-date").attr("hidden", false);
   });
