@@ -13,13 +13,13 @@ module Effective
                                dropdown = [
                                    # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
                                    if row.email.present?
-                                     ['Reset Password', reset_password_user_path(row), 'disabled']
+                                     ['Reset Password', reset_password_user_path(row),  individual_market_is_enabled? ? 'disabled' : 'ajax']
                                    else
-                                     ['Reset Password', edit_user_path(row.id), 'disabled']
+                                     ['Reset Password', edit_user_path(row.id), individual_market_is_enabled? ? 'disabled' : 'ajax']
                                    end,
-                                   ['Unlock / Lock Account', confirm_lock_user_path(row.id, user_action_id: "user_action_#{row.id.to_s}"), 'disabled'],
-                                   ['View Login History',login_history_user_path(id: row.id), 'disabled'],
-                                   ['Edit User', change_username_and_email_user_path(row.id, user_id: row.id.to_s), 'ajax']
+                                   ['Unlock / Lock Account', confirm_lock_user_path(row.id, user_action_id: "user_action_#{row.id.to_s}"), individual_market_is_enabled? ? 'disabled' : 'ajax'],
+                                   ['View Login History',login_history_user_path(id: row.id), individual_market_is_enabled? ? 'disabled' : 'ajax'],
+                                   ['Edit User', change_username_and_email_user_path(row.id, user_id: row.id.to_s), individual_market_is_enabled? ? 'ajax' : 'disabled']
                                ]
                                render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "user_action_#{row.id.to_s}"}, formats: :html
                              }, :filter => false, :sortable => false
