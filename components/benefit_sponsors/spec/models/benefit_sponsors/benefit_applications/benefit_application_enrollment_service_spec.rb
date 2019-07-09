@@ -63,7 +63,7 @@ module BenefitSponsors
 
         include_context "setup initial benefit application" do
           let(:current_effective_date) { Date.new(TimeKeeper.date_of_record.year, 8, 1) }
-          let(:open_enrollment_period) { open_enrollment_begin..(effective_period.min - 10.days) }
+          let(:open_enrollment_period) { open_enrollment_begin..(open_enrollment_begin + 5.days) }
           let(:aasm_state) { :draft }
         end
 
@@ -451,7 +451,7 @@ module BenefitSponsors
 
         include_context "setup initial benefit application" do
           let(:current_effective_date) { Date.new(TimeKeeper.date_of_record.year, 8, 1) }
-          let(:open_enrollment_period) { open_enrollment_begin..(effective_period.min - 10.days) }
+          let(:open_enrollment_period) { open_enrollment_begin..(open_enrollment_begin + 5.days) }
           let(:aasm_state) { :draft }
         end
 

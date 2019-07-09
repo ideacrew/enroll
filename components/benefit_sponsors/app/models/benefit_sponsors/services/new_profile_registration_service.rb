@@ -63,7 +63,7 @@ module BenefitSponsors
       end
 
       def load_organization_form(form)
-        form.organization.entity_kind_options = BenefitSponsors::Organizations::Organization::ENTITY_KINDS
+        form.organization.entity_kind_options = "BenefitSponsors::Organizations::Organization::#{site_key.upcase}_ENTITY_KINDS".constantize
         form
       end
 

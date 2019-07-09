@@ -22,6 +22,9 @@ module BenefitSponsors
     MIN_BENEFIT_GROUPS = 1
     EMPLOYEE_MINIMUM_COUNT = 1
     EMPLOYEE_MAXIMUM_COUNT = 50
+    INITIAL_OE_END_DAY = Settings.aca.shop_market.open_enrollment.monthly_end_on
+    RENEWAL_OE_END_DAY = Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on
+
 
     rule  :open_enrollment_period_minimum,
             validate: -> (benefit_application){
@@ -32,6 +35,24 @@ module BenefitSponsors
               number_of_days = benefit_application.open_enrollment_length
               "open enrollment period length #{number_of_days} day(s) is less than #{OPEN_ENROLLMENT_DAYS_MIN} day(s) minimum"
             }
+
+    rule :validate_open_enrollment_dates,
+         validate: ->(benefit_application){
+           benefit_application.open_enrollment_end_on <= if benefit_application.is_renewing?
+                                                           Date.new(benefit_application.start_on.prev_month.year, benefit_application.start_on.prev_month.month, RENEWAL_OE_END_DAY)
+                                                         else
+                                                           Date.new(benefit_application.start_on.prev_month.year, benefit_application.start_on.prev_month.month, INITIAL_OE_END_DAY)
+                                                         end
+         },
+         success: ->(_benfit_application) { "validated successfully" },
+         fail: ->(benefit_application) {
+           day = if benefit_application.is_renewing?
+                   RENEWAL_OE_END_DAY
+                 else
+                   INITIAL_OE_END_DAY
+                 end
+           "Open Enrollment must end on or before the #{day.ordinalize} day of the month prior to effective date"
+         }
 
     rule  :benefit_application_fte_count,
             validate: -> (benefit_application){
@@ -117,6 +138,7 @@ module BenefitSponsors
 
     business_policy :submit_benefit_application,
             rules: [:open_enrollment_period_minimum,
+                    :validate_open_enrollment_dates,
                     :benefit_application_contains_benefit_packages,
                     :benefit_packages_contains_reference_plans,
                     :all_employees_are_assigned_benefit_package,

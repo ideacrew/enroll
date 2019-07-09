@@ -37,6 +37,8 @@ module BenefitSponsors
         :foreign_embassy_or_consulate
       ].freeze
 
+      MA_ENTITY_KINDS = ENTITY_KINDS
+
       FIELD_AND_EVENT_NAMES_MAP = {"legal_name" => "name_changed", "fein" => "fein_corrected"}
 
       field :hbx_id, type: String
