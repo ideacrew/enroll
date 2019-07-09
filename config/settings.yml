@@ -147,7 +147,7 @@ aca:
   dental_plan_options_available: ["multi_product", "single_issuer"]
   default_dental_option_kind: 'multi_product'
   ## acceptable options are ["sole_source", "single_carrier", "metal_level", "single_plan"]
-  enabled_metal_levels_for_single_carrier: ["silver", "gold", "dental"]
+  enabled_metal_levels_for_single_carrier: ["bronze", "silver", "gold", "platinum", "dental"]
   carrier_hios_logo_variant:
     '': ""
   ## acceptable options are ["platinum", "gold", "silver", "dental"]
