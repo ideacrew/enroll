@@ -836,10 +836,10 @@ class HbxEnrollment
     enrollment.update(terminate_reason: term_reason, termination_submitted_on: TimeKeeper.datetime_of_record) if term_reason.present?
   end
 
-  def should_term_or_cancel(coverage_end_date)
-    if self.effective_on >= coverage_end_date
+  def should_term_or_cancel_ivl
+    if self.effective_on > TimeKeeper.date_of_record
       'cancel'
-    elsif (coverage_end_date >= TimeKeeper.date_of_record || self.may_terminate_coverage?)
+    elsif (self.effective_on <= TimeKeeper.date_of_record || self.may_terminate_coverage?)
       'terminate'
     end
   end
