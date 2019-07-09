@@ -36,6 +36,8 @@ class BenefitGroup
 
   # Number of days following date of hire
   field :effective_on_offset, type: Integer, default: 0
+  field :lowest_cost_plan_id, type: BSON::ObjectId
+  field :highest_cost_plan_id, type: BSON::ObjectId
 
   # Non-congressional
   # belongs_to :reference_plan, class_name: "Plan"
@@ -72,6 +74,28 @@ class BenefitGroup
   field :carrier_for_elected_dental_plan, type: BSON::ObjectId
   embeds_many :composite_tier_contributions, cascade_callbacks: true
   accepts_nested_attributes_for :composite_tier_contributions, reject_if: :all_blank, allow_destroy: true
+
+  def reference_plan=(new_reference_plan)
+    raise ArgumentError.new("expected Plan") unless new_reference_plan.is_a? Plan
+    self.reference_plan_id = new_reference_plan._id
+    @reference_plan = new_reference_plan
+  end
+
+  def dental_reference_plan=(new_reference_plan)
+    raise ArgumentError.new("expected Plan") unless new_reference_plan.is_a? Plan
+    self.dental_reference_plan_id = new_reference_plan._id
+    @dental_reference_plan = new_reference_plan
+  end
+
+  def reference_plan
+    return @reference_plan if defined? @reference_plan
+    @reference_plan = Plan.find(reference_plan_id) unless reference_plan_id.nil?
+  end
+
+  def dental_reference_plan
+    return @dental_reference_plan if defined? @dental_reference_plan
+    @dental_reference_plan = Plan.find(dental_reference_plan_id) if dental_reference_plan_id.present?
+  end
 
 
   def self.find(id)
@@ -243,5 +267,17 @@ class BenefitGroup
     composite_tier_contributions = CompositeRatingTier::NAMES.map do |rating_tier|
       composite_tier_contributions.build(composite_rating_tier: rating_tier, offered: true)
     end
+  end
+
+  def single_plan_type?
+    plan_option_kind == "single_plan"
+  end
+
+  def sic_factor_for(plan)
+    return 1.0
+  end
+
+  def group_size_factor_for(plan)
+    return 1.0
   end
 end
