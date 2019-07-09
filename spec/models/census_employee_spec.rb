@@ -891,6 +891,40 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
+  describe 'scopes' do
+    context 'by_benefit_package_and_assignment_on_or_later' do
+      include_context "setup employees"
+      before do
+        date = TimeKeeper.date_of_record.beginning_of_month
+        bga = census_employees.first.benefit_group_assignments.first
+        bga.assign_attributes(start_on: date + 1.month)
+        bga.save(validate: false)
+        bga2 = census_employees.second.benefit_group_assignments.first
+        bga2.assign_attributes(start_on: date - 1.month)
+        bga2.save(validate: false)
+        census_employees.third.benefit_group_assignments.first.update_attributes(is_active: false)
+
+        @census_employees = CensusEmployee.by_benefit_package_and_assignment_on_or_later(initial_application.benefit_packages.first, date, true)
+      end
+
+      it "should return more than one" do
+        expect(@census_employees.count).to eq 3
+      end
+
+      it 'Should include CE' do
+        [census_employees.first.id, census_employees[3].id, census_employees[4].id].each do |ce_id|
+          expect(@census_employees.pluck(:id)).to include(ce_id)
+        end
+      end
+
+      it 'should not include CE' do
+        [census_employees[1].id, census_employees[2].id].each do |ce_id|
+          expect(@census_employees.pluck(:id)).not_to include(ce_id)
+        end
+      endg
+    end
+  end
+
   describe 'construct_employee_role' do
     let(:user)  { FactoryGirl.create(:user) }
     context 'when employee_role present' do
