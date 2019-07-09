@@ -227,7 +227,8 @@ Given(/^Hbx Admin Tier 3 exists$/) do
                               approve_ga: true,
                               modify_admin_tabs: true,
                               view_admin_tabs: true,
-                              can_update_ssn: true)
+                              can_update_ssn: true,
+                              can_access_user_account_tab: true)
   person = people['Hbx Admin Tier 3']
   hbx_profile = FactoryBot.create :hbx_profile
   user = FactoryBot.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]

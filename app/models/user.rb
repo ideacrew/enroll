@@ -92,6 +92,7 @@ class User
   track_history   :on => [:oim_id,
                         :email],
                   :modifier_field => :modifier,
+                  :modifier_field_optional => true,
                   :version_field => :tracking_version,
                   :track_create  => true,
                   :track_update  => true,
