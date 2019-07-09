@@ -26,11 +26,11 @@ class MigrateDcHbxEnrollments < Mongoid::Migration
       @benefit_app_hash ={}
       BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:'benefit_applications'.exists=>true).each do |bs|
         bs.benefit_applications.each do |ba|
-          ba.benefit_groups.each do |bg|
+          ba.benefit_groups.unscoped.each do |bg|
             plan_year = PlanYear.find(ba.id)
             raise "Plan year not found" unless plan_year.present?
             old_bg =  plan_year.benefit_groups.unscoped.select{|b| b.title == bg.title}
-            raise "Issue with benefit group" unless bg.present? || bg.count > 1
+            raise "Issue with benefit group" unless old_bg.present? || old_bg.count > 1
             bg_hash = {}
             bg_hash[old_bg.first.id] = {'benefit_package_id' => bg.id, 'benefit_sponsorship_id' => bs.id,'health_sponsored_benefit_id' => bg.health_sponsored_benefit.id, "rating_area_id" => ba.recorded_rating_area_id}
             bg_hash[old_bg.first.id].merge!({'dental_sponsored_benefit_id' => bg.dental_sponsored_benefit.id }) if bg.dental_sponsored_benefit.present?
@@ -69,74 +69,74 @@ class MigrateDcHbxEnrollments < Mongoid::Migration
       end
     end
 
-    say_with_time("Time taken to migrate enrollments") do
-      f_count = Family.where(:'households.hbx_enrollments'.exists=>true).count
-      offset_count = 0
-      limit_count = 1000
-      ivl_plan_hash = @plan_to_product_hash[:aca_individual]
-      fehb_plan_hash = @plan_to_product_hash[:fehb]
-      shop_plan_hash = @plan_to_product_hash[:aca_shop]
-
-      while (offset_count <= f_count) do
-        puts "offset_count: #{offset_count}"
-        Family.where(:'households.hbx_enrollments'.exists=>true).limit(limit_count).offset(offset_count).each do |fam|
-          begin
-            fam.active_household.hbx_enrollments.each do |hbx|
-              next if hbx.shopping?
-
-              if hbx.benefit_group_id.present?
-                plan_hash = shop_plan_hash
-                product_data = plan_hash[hbx.plan_id]
-                benefit_app_data = @benefit_app_hash[hbx.benefit_group_id]
-
-                if benefit_app_data
-                  hbx.update_attributes(
-                      product_id: product_data ? product_data['product_id'] : nil,
-                      issuer_profile_id: product_data ? product_data['carrier_profile_id'] : nil,
-                      benefit_sponsorship_id: benefit_app_data['benefit_sponsorship_id'],
-                      sponsored_benefit_package_id: benefit_app_data['benefit_package_id'],
-                      sponsored_benefit_id: hbx.coverage_kind == "health" ? benefit_app_data['health_sponsored_benefit_id'] : benefit_app_data['dental_sponsored_benefit_id'],
-                      rating_area_id: benefit_app_data["rating_area_id"]
-                  )
-                  print '.' unless Rails.env.test?
-                else
-                  print 'F' unless Rails.env.test?
-                  @logger.error "benefit application reference not found enrollment: #{hbx.hbx_id} --- #{hbx.aasm_state} --- #{hbx.try(:employer_profile).try(:hbx_id)} --- #{hbx.try(:employer_profile).try(:legal_name)}"
-                end
-              else
-                product_data = ivl_plan_hash[hbx.plan_id]
-                hbx.update_attributes(
-                    product_id: product_data['product_id'], issuer_profile_id: product_data['carrier_profile_id']
-                )
-                print '.' unless Rails.env.test?
-              end
-            end
-          rescue => e
-            print 'F' unless Rails.env.test?
-            @logger.error "Update failed for enrollment family id: #{fam.id},
-            #{e.message}" unless Rails.env.test?
-          end
-        end
-        offset_count += limit_count
-      end
-
-      # update congress product id
-      BenefitSponsors::Organizations::Organization.where(:"profiles._type" => /.*FehbEmployerProfile$/).each do |org|
-        org.active_benefit_sponsorship.census_employees.unscoped.each do |ce|
-          ce.benefit_group_assignments.each do |bga|
-            get_hbx_enrollments(bga).each do |hbx|
-              next if hbx.shopping?
-              product_data = fehb_plan_hash[hbx.plan_id]
-              hbx.update_attributes(
-                  product_id: product_data ? product_data['product_id'] : nil,
-                  issuer_profile_id: product_data ? product_data['carrier_profile_id'] : nil
-              )
-              print '.' unless Rails.env.test?
-            end
-          end
-        end
-      end
-    end
+    # say_with_time("Time taken to migrate enrollments") do
+    #   f_count = Family.where(:'households.hbx_enrollments'.exists=>true).count
+    #   offset_count = 0
+    #   limit_count = 1000
+    #   ivl_plan_hash = @plan_to_product_hash[:aca_individual]
+    #   fehb_plan_hash = @plan_to_product_hash[:fehb]
+    #   shop_plan_hash = @plan_to_product_hash[:aca_shop]
+    #
+    #   while (offset_count <= f_count) do
+    #     puts "offset_count: #{offset_count}"
+    #     Family.where(:'households.hbx_enrollments'.exists=>true).limit(limit_count).offset(offset_count).each do |fam|
+    #       begin
+    #         fam.active_household.hbx_enrollments.each do |hbx|
+    #           next if hbx.shopping?
+    #
+    #           if hbx.benefit_group_id.present?
+    #             plan_hash = shop_plan_hash
+    #             product_data = plan_hash[hbx.plan_id]
+    #             benefit_app_data = @benefit_app_hash[hbx.benefit_group_id]
+    #
+    #             if benefit_app_data
+    #               hbx.update_attributes(
+    #                   product_id: product_data ? product_data['product_id'] : nil,
+    #                   issuer_profile_id: product_data ? product_data['carrier_profile_id'] : nil,
+    #                   benefit_sponsorship_id: benefit_app_data['benefit_sponsorship_id'],
+    #                   sponsored_benefit_package_id: benefit_app_data['benefit_package_id'],
+    #                   sponsored_benefit_id: hbx.coverage_kind == "health" ? benefit_app_data['health_sponsored_benefit_id'] : benefit_app_data['dental_sponsored_benefit_id'],
+    #                   rating_area_id: benefit_app_data["rating_area_id"]
+    #               )
+    #               print '.' unless Rails.env.test?
+    #             else
+    #               print 'F' unless Rails.env.test?
+    #               @logger.error "benefit application reference not found enrollment: #{hbx.hbx_id} --- #{hbx.aasm_state} --- #{hbx.try(:employer_profile).try(:hbx_id)} --- #{hbx.try(:employer_profile).try(:legal_name)}"
+    #             end
+    #           else
+    #             product_data = ivl_plan_hash[hbx.plan_id]
+    #             hbx.update_attributes(
+    #                 product_id: product_data['product_id'], issuer_profile_id: product_data['carrier_profile_id']
+    #             )
+    #             print '.' unless Rails.env.test?
+    #           end
+    #         end
+    #       rescue => e
+    #         print 'F' unless Rails.env.test?
+    #         @logger.error "Update failed for enrollment family id: #{fam.id},
+    #         #{e.message}" unless Rails.env.test?
+    #       end
+    #     end
+    #     offset_count += limit_count
+    #   end
+    #
+    #   # update congress product id
+    #   BenefitSponsors::Organizations::Organization.where(:"profiles._type" => /.*FehbEmployerProfile$/).each do |org|
+    #     org.active_benefit_sponsorship.census_employees.unscoped.each do |ce|
+    #       ce.benefit_group_assignments.each do |bga|
+    #         get_hbx_enrollments(bga).each do |hbx|
+    #           next if hbx.shopping?
+    #           product_data = fehb_plan_hash[hbx.plan_id]
+    #           hbx.update_attributes(
+    #               product_id: product_data ? product_data['product_id'] : nil,
+    #               issuer_profile_id: product_data ? product_data['carrier_profile_id'] : nil
+    #           )
+    #           print '.' unless Rails.env.test?
+    #         end
+    #       end
+    #     end
+    #   end
+    # end
 
     say_with_time("Migrate enrollments to it's own collection") do
       Family.collection.aggregate([
@@ -206,20 +206,54 @@ class MigrateDcHbxEnrollments < Mongoid::Migration
     ]).each
     end
 
+    say_with_time("Update enrollment with benefit application reference's ") do
+      @benefit_app_hash.each do |benefit_hash|
+        HbxEnrollment.where(benefit_group_id: benefit_hash[0], coverage_kind: 'health').
+            update_all(benefit_sponsorship_id: benefit_hash[1]['benefit_sponsorship_id'],
+                       sponsored_benefit_package_id: benefit_hash[1]['benefit_package_id'],
+                       rating_area_id: benefit_hash[1]["rating_area_id"],
+                       sponsored_benefit_id: benefit_hash[1]['health_sponsored_benefit_id'])
+
+        HbxEnrollment.where(benefit_group_id: benefit_hash[0], coverage_kind: 'dental').
+            update_all(sponsored_benefit_id: benefit_hash[1]['dental_sponsored_benefit_id'],
+                       benefit_sponsorship_id: benefit_hash[1]['benefit_sponsorship_id'],
+                       sponsored_benefit_package_id: benefit_hash[1]['benefit_package_id'],
+                       rating_area_id: benefit_hash[1]["rating_area_id"])
+      end
+    end
+
+    say_with_time("Update enrollment with product ids ") do
+      ivl_plan_hash = @plan_to_product_hash[:aca_individual]
+      fehb_plan_hash = @plan_to_product_hash[:fehb]
+      shop_plan_hash = @plan_to_product_hash[:aca_shop]
+      benefit_sponsorship_ids = BenefitSponsors::Organizations::Organization.where(:"profiles._type" => /.*FehbEmployerProfile/).map(&:active_benefit_sponsorship).map(&:_id)
+
+      ivl_plan_hash.each do |product_data|
+        HbxEnrollment.where(plan_id: product_data[0]).update_all(product_id: product_data[1]['product_id'], issuer_profile_id: product_data[1]['carrier_profile_id'])
+      end
+
+      shop_plan_hash.each do |product_data|
+        HbxEnrollment.where(plan_id: product_data[0]).update_all(product_id: product_data[1]['product_id'], issuer_profile_id: product_data[1]['carrier_profile_id'])
+      end
+
+      fehb_plan_hash.each do |product_data|
+        HbxEnrollment.where(:benefit_sponsorship_id.in=> benefit_sponsorship_ids, plan_id: product_data[0]).update_all(product_id: product_data[1]['product_id'], issuer_profile_id: product_data[1]['carrier_profile_id'])
+      end
+    end
 
     reset_hash
   end
 
-  def self.get_hbx_enrollments(bga)
-    bga.covered_families.inject([]) do |enrollments, family|
-      family.households.each do |household|
-        enrollments += household.hbx_enrollments.select do |enrollment|
-          enrollment.benefit_group_assignment_id == bga.id
-        end.to_a
-      end
-      enrollments
-    end
-  end
+  # def self.get_hbx_enrollments(bga)
+  #   bga.covered_families.inject([]) do |enrollments, family|
+  #     family.households.each do |household|
+  #       enrollments += household.hbx_enrollments.select do |enrollment|
+  #         enrollment.benefit_group_assignment_id == bga.id
+  #       end.to_a
+  #     end
+  #     enrollments
+  #   end
+  # end
 
   def self.reset_hash
     @plan_to_product_hash ={}
