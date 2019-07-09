@@ -61,16 +61,16 @@ Then(/^Hbx Admin is on Broker Index and clicks General Agencies$/) do
 end
 
 Then /^they should see the pending general agency$/ do
-  expect(page).to have_content(@general_agency_organization.legal_name)
+  expect(page).to have_content(general_agency_organization.legal_name)
   screenshot("general_agency_list")
 end
 
 When /^they click the link of general agency$/ do
-  click_link @general_agency_organization.legal_name
+  click_link general_agency_organization.legal_name
 end
 
 Then /^they should see the home of general agency$/ do
-  expect(page).to have_content("General Agency : #{@general_agency_organization.legal_name}")
+  expect(page).to have_content("General Agency : #{general_agency_organization.legal_name}")
   screenshot("general_agency_homepage")
 end
 
@@ -95,7 +95,7 @@ Then /^they should see an account creation form$/ do
 end
 
 When /^they complete the account creation form and hit the 'Submit' button$/ do
-  email_address = @general_agency_organization.general_agency_profile.general_agency_staff_roles.last.email_address
+  email_address = general_agency_organization.general_agency_profile.general_agency_staff_roles.last.email_address
   fill_in "user[oim_id]", with: email_address
   fill_in "user[password]", with: "aA1!aA1!aA1!"
   fill_in "user[password_confirmation]", with: "aA1!aA1!aA1!"
@@ -108,7 +108,7 @@ Then /^they should see a welcome message$/ do
 end
 
 Then /^they see the General Agency homepage$/ do
-  expect(page).to have_content(@general_agency_organization.legal_name)
+  expect(page).to have_content(general_agency_organization.legal_name)
 end
 
 Given /^a general agency, approved, confirmed, exists$/ do
@@ -199,7 +199,7 @@ When /^the broker login in$/ do
 end
 
 Then /^the broker should see the home of broker$/ do
-  expect(page).to have_content('Broker Agency : Acarehouse')
+  expect(page).to have_content('Broker Agency : Browns Inc')
 end
 
 When /^the broker visits their Employers page$/ do
@@ -207,18 +207,24 @@ When /^the broker visits their Employers page$/ do
 end
 
 And /^selects the general agency from dropdown for the employer$/ do
-  expect(page).to have_content('EmployerA')
-  find(:xpath, "//*[@id='datatable_filter_bulk_actions']").click
-  find(:xpath, "//p[@class='label'][contains(., 'Select General Agency')]").click
-  find(:xpath, "//li[contains(., 'Rooxo')]").click
-  find("#assign_general_agency").click
+  find_all('.dropdown-toggle', :wait => 10).last.click
+  find_link('Assign General Agency').click
+  find("#general_agency_profile_id").click
+  find(:xpath, "//*[@id='general_agency_profile_id']/option[2]").click
+  click_button "Submit"
+  # expect(page).to have_content('EmployerA')
+  # find(:xpath, "//*[@id='datatable_filter_bulk_actions']").click
+  # find(:xpath, "//p[@class='label'][contains(., 'Select General Agency')]").click
+  # find(:xpath, "//li[contains(., 'Rooxo')]").click
+  # find("#assign_general_agency").click
 end
 
 Then /^the employer is assigned to general agency$/ do
-  expect(page).to have_content('Employers')
-  expect(page).to have_content('EmployerA Inc')
-  expect(page).to have_content('General Agencies')
-  expect(page).to have_content('Rooxo')
+  # expect(page).to have_content('Employers')
+  # expect(page).to have_content('EmployerA Inc')
+  # expect(page).to have_content('General Agencies')
+  # expect(page).to have_content('Rooxo')
+  expect(page).to have_content(general_agency_profile.legal_name)
 end
 
 Then /^the employer is assigned to GA2$/ do
@@ -286,7 +292,7 @@ When /^the ga login in$/ do
 end
 
 Then /^the ga should see the home of ga$/ do
-  expect(page).to have_content('General Agency : Rooxo')
+  expect(page).to have_content('General Agency : District Agency Inc')
 end
 
 When /^the ga visits their Employers page$/ do
@@ -294,11 +300,11 @@ When /^the ga visits their Employers page$/ do
 end
 
 Then /^the ga should see the employer$/ do
-  expect(page).to have_content('EmployerA Inc')
+  expect(page).to have_content('ABC Widgets')
 end
 
 When /^the ga click the name of employer$/ do
-  click_link "EmployerA Inc"
+  click_link "ABC Widgets"
 end
 
 Then /^the ga should see the home of employer$/ do
@@ -306,9 +312,9 @@ Then /^the ga should see the home of employer$/ do
 end
 
 Then /^the ga should see the broker$/ do
-  expect(page).to have_content('Acarehouse')
-  expect(page).to have_selector('.disabled', text: 'Change Broker')
-  expect(page).to have_selector('.disabled', text: 'Browse Brokers')
+  expect(page).to have_content('Browns Inc')
+  # expect(page).to have_selector('.disabled', text: 'Change Broker')
+  # expect(page).to have_selector('.disabled', text: 'Browse Brokers')
 end
 
 When /^the ga click the back link$/ do
@@ -346,9 +352,7 @@ end
 
 Then /^the broker should see the Clear Default GA in the list of general agencies$/ do
   expect(page).to have_content('General Agencies')
-  expect(page).to have_content('Clear Default GA')
-  #expect(page).to have_content('Zooxy')
-  #expect(page).to have_content('Rooxo')
+  expect(page).to have_link('CLEAR DEFAULT GA')
 end
 
 When /^the ga2 login in$/ do
