@@ -2,7 +2,6 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class ResetDueDatesForOutstandingConsumers < MongoidMigrationTask
   def migrate
-    # binding.pry
     families = Family.by_enrollment_individual_market.where(
     :"_id".in => HbxEnrollment.where(
       aasm_state: "coverage_selected",
