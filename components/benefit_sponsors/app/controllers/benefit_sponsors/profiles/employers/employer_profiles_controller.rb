@@ -96,8 +96,9 @@ module BenefitSponsors
 
         def export_census_employees
           authorize @employer_profile
+          employee_export = BenefitSponsors::Exporters::CensusEmployeeExport.new(@employer_profile, {action: "download"})
           respond_to do |format|
-            format.csv { send_data @employer_profile.census_employees.sorted.to_csv, filename: "#{@employer_profile.legal_name.parameterize.underscore}_census_employees_#{TimeKeeper.date_of_record}.csv" }
+            format.csv { send_data employee_export.to_csv, filename: "#{@employer_profile.legal_name.parameterize.underscore}_census_employees_#{TimeKeeper.date_of_record}.csv" }
           end
         end
 
@@ -287,7 +288,7 @@ module BenefitSponsors
                 sponsored_benefit = primary.sponsored_benefit
                 product = @product_info[element.group_enrollment.product[:id]]
                 next if census_employee.blank?
-                csv << [  
+                csv << [
                           census_employee.full_name,
                           census_employee.ssn,
                           census_employee.dob,
