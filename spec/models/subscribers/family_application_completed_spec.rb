@@ -310,6 +310,12 @@ describe Subscribers::FamilyApplicationCompleted do
       it "updates the address for the primary applicant's person" do
         expect(person_db.addresses).to be_truthy
       end
+
+      it "creates the Individual market transitions after building consumer role" do
+        expect(person.individual_market_transitions.present?).to be_truthy
+        expect(person.individual_market_transitions.count).to be_eql 1
+        expect(person.individual_market_transitions.first.role_type).to be_eql "consumer"
+      end
     end
   end
 

@@ -733,6 +733,7 @@ context "Verification process and notices" do
     shared_examples_for "reping the hub fo critical changes" do |field, call, params|
       it "#{call} the hub if #{field} record was changed" do
         allow(Person).to receive(:person_has_an_active_enrollment?).and_return true
+        allow(subject.person).to receive(:is_consumer_role_active?).and_return false
         if call == "call"
           expect(subject).to receive(:redetermine_verification!)
         else
