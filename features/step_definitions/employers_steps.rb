@@ -435,14 +435,16 @@ module EmployeeWorld
 
   def employees(*traits)
     attributes = traits.extract_options!
-    @employees ||= FactoryGirl.create_list :census_employee, 5, *traits, attributes
-    # :employer_profile, *traits, attributes.merge(:employer_profiles_traits => :with_staff)
+     @employees ||= FactoryGirl.create_list :census_employee, 5, *traits, attributes
+     @employees.each do |ce|
+      ce.update_attributes(employer_profile_id:  @employer.employer_profile.id)
+     end
   end
 end
 World(EmployeeWorld)
 
 Given /^an employer exists$/ do
-  owner :with_family, :employer, organization: employer
+  owner :with_family, :employer,:employer_staff, organization: employer
 end
 
 Given /^the employer has (.*?) plan year$/ do |aasm_state|
