@@ -167,7 +167,7 @@ describe BenefitGroup, "being asked for a sic code factor" do
       expect(subject.sic_factor_for(plan)).to eq 1.0
     end
   end
-  else
+
   describe "when the rating model is not simple" do
     before :each do
       allow(subject).to receive(:use_simple_employer_calculation_model?).and_return(false)
