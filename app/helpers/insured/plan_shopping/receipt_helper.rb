@@ -15,7 +15,7 @@ module Insured
       end
 
       def has_any_previous_kaiser_enrollments?
-        all_kaiser_enrollments = @enrollment.family.enrollments.select { |enr| enr.product.issuer_profile.legal_name == 'Kaiser' && enr.effective_on.year == @enrollment.effective_on.year }
+        all_kaiser_enrollments = @enrollment.family.hbx_enrollments.select { |enr| enr.product.issuer_profile.legal_name == 'Kaiser' && enr.effective_on.year == @enrollment.effective_on.year }
         enrollments = all_kaiser_enrollments - @enrollment.to_a
         enrollments.present? ? true : false
       end

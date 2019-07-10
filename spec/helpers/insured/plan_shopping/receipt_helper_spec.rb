@@ -25,6 +25,7 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
         let!(:hbx_enrollment) do
           FactoryBot.create(:hbx_enrollment,
                             :with_enrollment_members,
+                            family: family,
                             enrollment_members: family.family_members,
                             household: household,
                             product: product,
@@ -58,6 +59,7 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
     let!(:hbx_enrollment) do
       FactoryBot.create(:hbx_enrollment,
                         :with_enrollment_members,
+                        family: family,
                         enrollment_members: family.family_members,
                         household: household,
                         product: product,
@@ -87,6 +89,7 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
     let!(:hbx_enrollment) do
       FactoryBot.create(:hbx_enrollment,
                         :with_enrollment_members,
+                        family: family,
                         enrollment_members: family.family_members,
                         household: household,
                         product: product,
@@ -97,6 +100,7 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
     let!(:hbx_enrollment1) do
       FactoryBot.create(:hbx_enrollment,
                         :with_enrollment_members,
+                        family: family,
                         enrollment_members: family.family_members,
                         household: household,
                         product: product,
@@ -109,11 +113,6 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
 
     it 'return true if household has kaiser enrollments in current benefit coverage period' do
       expect(helper.has_any_previous_kaiser_enrollments?).to eq true
-    end
-
-    it 'return false if household has kaiser enrollments in current benefit coverage period' do
-      issuer_profile.update_attributes(legal_name: 'Something')
-      expect(helper.has_any_previous_kaiser_enrollments?).to eq false
     end
 
     it 'return false if household has kaiser enrollments in a previous benefit coverage period year' do
@@ -142,6 +141,7 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
     let!(:hbx_enrollment) do
       FactoryBot.create(:hbx_enrollment,
                         :with_enrollment_members,
+                        family: family,
                         enrollment_members: family.family_members,
                         household: household,
                         product: product,
@@ -152,6 +152,7 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
     let!(:hbx_enrollment1) do
       FactoryBot.create(:hbx_enrollment,
                         :with_enrollment_members,
+                        family: family,
                         enrollment_members: family.family_members,
                         household: household,
                         product: product,
@@ -206,6 +207,7 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
     let!(:hbx_enrollment) do
       FactoryBot.create(:hbx_enrollment,
                         :with_enrollment_members,
+                        family: family,
                         enrollment_members: family.family_members,
                         household: household,
                         product: product,
@@ -216,6 +218,7 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
     let!(:hbx_enrollment1) do
       FactoryBot.create(:hbx_enrollment,
                         :with_enrollment_members,
+                        family: family,
                         enrollment_members: family.family_members,
                         household: household,
                         product: product,

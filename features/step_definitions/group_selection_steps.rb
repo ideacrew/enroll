@@ -58,7 +58,7 @@ end
 
 And(/(.*) has a dependent in (.*) relationship with age (.*) than 26/) do |role, kind, var|
   dob = (var == "greater" ? TimeKeeper.date_of_record - 35.years : TimeKeeper.date_of_record - 5.years)
-  @family = Family.all.first
+  family = Family.all.first
   dependent = if role == 'employee'
                 FactoryBot.create :person, dob: dob
               elsif role == 'Resident'
@@ -66,20 +66,22 @@ And(/(.*) has a dependent in (.*) relationship with age (.*) than 26/) do |role,
               else
                 FactoryBot.create :person, :with_consumer_role, :with_active_consumer_role, dob: dob
               end
-  fm = FactoryBot.create :family_member, family: @family, person: dependent
+  fm = FactoryBot.create :family_member, family: family, person: dependent
   final_person = @person || user.person
   final_person.person_relationships << PersonRelationship.new(kind: kind, relative_id: dependent.id)
-  ch = @family.active_household.immediate_family_coverage_household
+  ch = family.active_household.immediate_family_coverage_household
   ch.coverage_household_members << CoverageHouseholdMember.new(family_member_id: fm.id)
   ch.save
   final_person.save
 end
 
 And(/(.*) also has a health enrollment with primary person covered/) do |role|
-  sep = FactoryBot.create :special_enrollment_period, family: @family
+  family = Family.all.first
+  sep = FactoryBot.create :special_enrollment_period, family: family
   product = FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile)
   enrollment = FactoryBot.create(:hbx_enrollment, product: product,
-                                  household: @family.active_household,
+                                  household: family.active_household,
+                                  family: family,
                                   kind: (@employee_role.present? ? "employer_sponsored" : (role == "Resident" ? "coverall" : "individual")),
                                   effective_on: TimeKeeper.date_of_record,
                                   enrollment_kind: "special_enrollment",
@@ -87,7 +89,7 @@ And(/(.*) also has a health enrollment with primary person covered/) do |role|
                                   employee_role_id: (@employee_role.id if @employee_role.present?),
                                   benefit_group_id: (@benefit_group.id if @benefit_group.present?)
                                 )
-  enrollment.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: @family.primary_applicant.id,
+  enrollment.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: family.primary_applicant.id,
     eligibility_date: TimeKeeper.date_of_record - 2.months,
     coverage_start_on: TimeKeeper.date_of_record - 2.months
   )
@@ -96,6 +98,7 @@ end
 
 And(/employee also has a (.*) enrollment with primary covered under (.*) employer/) do |coverage_kind, var|
   sep = FactoryBot.create :special_enrollment_period, family: @person.primary_family
+  family = Family.all.first
   product = if coverage_kind == 'dental'
               FactoryBot.create(:benefit_markets_products_dental_products_dental_product, :with_issuer_profile, dental_level: 'low', dental_plan_kind: 'ppo')
             else
@@ -112,6 +115,7 @@ And(/employee also has a (.*) enrollment with primary covered under (.*) employe
                                   kind: "employer_sponsored",
                                   effective_on: TimeKeeper.date_of_record,
                                   coverage_kind: coverage_kind,
+                                  family: family,
                                   enrollment_kind: "special_enrollment",
                                   special_enrollment_period_id: sep.id,
                                   employee_role_id: (var == "first" ? @person.active_employee_roles[0].id : @person.active_employee_roles[1].id),
@@ -260,7 +264,8 @@ And(/(.*) clicked on shop for new plan/) do |role|
 end
 
 And(/user did not apply coverage for child as ivl/) do
-  @family.family_members.detect { |fm| fm.primary_relationship == "child"}.person.consumer_role.update_attributes(is_applying_coverage: false)
+  family = Family.all.first
+  family.family_members.detect { |fm| fm.primary_relationship == "child"}.person.consumer_role.update_attributes(is_applying_coverage: false)
 end
 
 And(/employee has a valid "(.*)" qle/) do |qle|

@@ -42,6 +42,8 @@ module Parsers::Xml::Cv::Importers
       enrollee = policy.enrollees.detect {|enrollee| enrollee.is_subscriber == 'true'}
       effective_on = enrollee.benefit.begin_date rescue ''
       terminated_on = enrollee.benefit.end_date rescue ''
+      household = get_household_by_policy_xml(policy)
+
       HbxEnrollment.new(
         hbx_id: policy.id,
         kind: kind,
@@ -52,6 +54,7 @@ module Parsers::Xml::Cv::Importers
         #writing_agent_id: broker_link.id,
         #terminated_on: ,
         coverage_kind: coverage_type,
+        family: household.family,
         #enrollment_kind: ,
         #count_of_members: policy.enrollees.length,
         hbx_enrollment_members: hbx_enrollment_members,

@@ -17,7 +17,7 @@ class Household
   field :submitted_at, type: DateTime
   field :is_active, type: Boolean, default: true
 
-  embeds_many :hbx_enrollments
+  has_many :hbx_enrollments
   embeds_many :tax_households
   embeds_many :coverage_households, cascade_callbacks: true
 
@@ -314,7 +314,7 @@ class Household
     true
   end
 
-  def new_hbx_enrollment_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, resident_role: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil, coverage_start: nil, enrollment_kind:nil, external_enrollment: false, opt_effective_on: nil)
+  def new_hbx_enrollment_from(family: nil,employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, resident_role: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil, coverage_start: nil, enrollment_kind:nil, external_enrollment: false, opt_effective_on: nil)
     coverage_household = latest_coverage_household unless coverage_household.present?
     HbxEnrollment.new_from(
       employee_role: employee_role,

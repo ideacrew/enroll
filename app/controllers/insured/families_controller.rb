@@ -25,7 +25,7 @@ class Insured::FamiliesController < FamiliesController
       @enrollment_filter = @family.enrollments_for_display
 
       valid_display_enrollments = Array.new
-      @enrollment_filter.each  { |e| valid_display_enrollments.push e['hbx_enrollment']['_id'] }
+      @enrollment_filter.each  { |e| valid_display_enrollments.push e['_id'] }
 
       log("#3860 person_id: #{@person.id}", {:severity => "error"}) if @hbx_enrollments.any?{|hbx| !hbx.is_coverage_waived? && hbx.product.blank?}
       update_changing_hbxs(@hbx_enrollments)

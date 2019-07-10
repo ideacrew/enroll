@@ -6,8 +6,9 @@ Given(/^oustanding verfications users exists$/) do
   issuer_profile = FactoryBot.create(:benefit_sponsors_organizations_issuer_profile)
   product = FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: 'aca_individual', issuer_profile: issuer_profile)
   enrollment = FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
+                                 :family => family,
                                  :household => family.active_household,
-                                 :aasm_state => 'coverage_selected',
+                                 :aasm_state => 'enrolled_contingent',
                                  :is_any_enrollment_member_outstanding => true,
                                  :kind => 'individual',
                                  :product => product,

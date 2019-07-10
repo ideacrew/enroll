@@ -1,4 +1,5 @@
-class Products::QhpCostShareVariance
+module Products
+class QhpCostShareVariance
   include Mongoid::Document
   include Mongoid::Timestamps
 
@@ -9,6 +10,7 @@ class Products::QhpCostShareVariance
   field :plan_marketing_name, type: String
   field :metal_level, type: String
   field :csr_variation_type, type: String
+  field :product_id, type: String
 
   field :issuer_actuarial_value, type: String
   field :av_calculator_output_number, type: String
@@ -58,16 +60,39 @@ class Products::QhpCostShareVariance
 
   def self.find_qhp_cost_share_variances(ids, year, coverage_kind)
     csvs = find_qhp(ids, year).map(&:qhp_cost_share_variances).flatten
-    ids = ids.map{|a| a+"-01" } if coverage_kind == "dental"
+    ids = ids.map{|a| a+"-01"} if coverage_kind == "dental"
     csvs.select{ |a| ids.include?(a.hios_plan_and_variant_id) }
   end
 
   def plan
     # return @qhp_plan if defined? @qhp_plan
     Rails.cache.fetch("qcsv-plan-#{qhp.active_year}-hios-id-#{hios_plan_and_variant_id}", expires_in: 5.hour) do
-      # Plan.find_by(active_year: qhp.active_year, hios_id: hios_plan_and_variant_id)
-      BenefitMarkets::Products::Product.where(hios_id: hios_plan_and_variant_id).select{|a| a.active_year == qhp.active_year}.first
+      plan = Plan.where(active_year: qhp.active_year, hios_id: hios_plan_and_variant_id).first
+      if plan.blank?
+        plan = Plan.where(active_year: qhp.active_year, hios_id: hios_plan_and_variant_id.split('-')[0]).first if dental?
+      end
+      plan
     end
   end
 
+  def product
+    if product_id.present?
+      ::BenefitMarkets::Products::Product.find(product_id)
+    else
+      Rails.cache.fetch("qcsv-product-#{qhp.active_year}-hios-id-#{hios_plan_and_variant_id}", expires_in: 5.hours) do
+        product = BenefitMarkets::Products::Product.where(hios_id: /#{hios_plan_and_variant_id}/).select{|a| a.active_year == qhp.active_year}.first
+        if product.blank?
+          product = BenefitMarkets::Products::Product.where(hios_id: /#{hios_plan_and_variant_id.split('-')[0]}/).select{|a| a.active_year == qhp.active_year}.first if dental?
+        end
+        product
+      end
+    end
+  end
+
+  private
+
+  def dental?
+    qhp.metal_level == "dental"
+  end
+end
 end

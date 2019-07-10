@@ -71,17 +71,6 @@ describe HbxEnrollmentMember, dbclean: :around_each do
         end
       end
     end
-
-    context "update_current" do
-      before :all do
-        @member = enrollment.hbx_enrollment_members.last
-        @member.update_current(applied_aptc_amount: 11.1)
-      end
-
-      it "member should update applied_aptc_amount" do
-        expect(@member.applied_aptc_amount.to_f).to eq 11.1.to_f
-      end
-    end
   end
 
   context "given a family member", dbclean: :around_each do

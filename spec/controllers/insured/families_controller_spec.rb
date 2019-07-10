@@ -81,7 +81,6 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       allow(FamilyPolicy).to receive(:new).with(user, family).and_return(family_access_policy)
       allow(family).to receive(:enrollments).and_return(hbx_enrollments)
       allow(family).to receive(:enrollments_for_display).and_return(hbx_enrollments)
-      allow(family).to receive(:waivers_for_display).and_return(hbx_enrollments)
       allow(family).to receive(:coverage_waived?).and_return(false)
       allow(family).to receive(:latest_active_sep).and_return sep
       allow(hbx_enrollments).to receive(:active).and_return(hbx_enrollments)
@@ -306,7 +305,6 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         let(:employee_role) { FactoryBot.create(:employee_role, employer_profile: abc_profile) }
         let(:census_employee) { FactoryBot.create(:census_employee, employee_role_id: employee_role.id, employer_profile: abc_profile) }
         before :each do
-          allow(family).to receive(:waivers_for_display).and_return([{"hbx_enrollment"=>{"_id"=>waived_hbx.id}}])
           allow(family).to receive(:active_family_members).and_return(family_members)
           allow(employee_role).to receive(:census_employee_id).and_return census_employee.id
           get :home
@@ -332,7 +330,6 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         let(:employee_role) { FactoryBot.create(:employee_role, employer_profile: abc_profile) }
         let(:census_employee) { FactoryBot.create(:census_employee, employee_role_id: employee_role.id, employer_profile: abc_profile) }
         before :each do
-          allow(family).to receive(:waivers_for_display).and_return([{"hbx_enrollment"=>{"_id"=>waived_hbx.id}}])
           allow(family).to receive(:active_family_members).and_return(family_members)
           allow(employee_role).to receive(:census_employee_id).and_return census_employee.id
           get :home
