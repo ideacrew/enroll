@@ -119,7 +119,6 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         expect(assigns.keys).to_not include("all_hbx_enrollments_for_admin")
       end
     end
-  end   end
 
     context "#check_for_address_info" do
       before :each do
