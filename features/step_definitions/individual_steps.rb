@@ -438,7 +438,9 @@ Then(/CSR clicks on New Consumer Paper Application/) do
 end
 
 Then(/CSR starts a new enrollment/) do
-  expect(page).to have_content('Personal Information', :wait => 10)
+  wait_for_ajax
+  sleep(4)
+  expect(page).to have_content('Personal Information')
 end
 
 Then(/^click continue again$/) do
