@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'pry'
 require File.join(Rails.root, 'spec/shared_contexts/ivl_eligibility')
 
 RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each do
@@ -203,8 +204,8 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
               end
             end
 
-            it { expect(@available_eligibility[:aptc][family_member.id.to_s].round(2)).to eq 200.35 }
-            it { expect(@available_eligibility[:total_available_aptc].round(2)).to eq 200.35 }
+            it { expect(@available_eligibility[:aptc][family_member.id.to_s].round(2)).to eq 443.32 }
+            it { expect(@available_eligibility[:total_available_aptc].round(2)).to eq 443.32 }
             it { expect(@available_eligibility[:csr]).to eq 'csr_94' }
           end
 

@@ -92,9 +92,9 @@ module Factories
     def tax_members_aptc_breakdown(tax_household)
       total_thh_available_aptc = tax_household.total_aptc_available_amount_for_enrollment(@enrollment)
       aptc_thhms = tax_household.aptc_members
-      member_aptc_benchmark_hash = enrollment_eligible_benchmark_hash(aptc_thhms)
-      total_eligible_member_benchmark = member_aptc_benchmark_hash.values.sum
       enrolling_aptc_members = aptc_enrollment_members(aptc_thhms)
+      member_aptc_benchmark_hash = enrollment_eligible_benchmark_hash(enrolling_aptc_members)
+      total_eligible_member_benchmark = member_aptc_benchmark_hash.values.sum
 
       enrolling_aptc_members.inject({}) do |thh_hash, thh_member|
         fm_id = thh_member.applicant_id.to_s
