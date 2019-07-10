@@ -52,11 +52,12 @@ module AccessPolicies
     def is_general_agency_staff_for_employer?(employer_id)
       person = user.person
       if person.general_agency_staff_roles.present?
-        @ga_id = person.general_agency_staff_roles.last.general_agency_profile.id
+        ga_id = person.general_agency_staff_roles.last.general_agency_profile.id
+        return false if ga_id.nil? || employer_id.nil?
         plan_design_organizations = SponsoredBenefits::Organizations::PlanDesignOrganization.find_by_sponsor(employer_id)
         plan_design_organizations.each do |a|
           if !a.general_agency_profile.nil?
-            return true if a.general_agency_profile.id == @ga_id
+            return true if a.general_agency_profile.id == ga_id
           end
         end
       else
