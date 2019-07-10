@@ -1,1 +1,17 @@
-Question: <input type='text' formControlName="question" id='qle_kind_question_form' class='form-control-custom-qle' required>
+<div [formGroup]="questionFormGroup">
+  <button
+    (click)="removeQuestion()"
+    class='btn btn-primary'>
+      DELETE
+  </button>
+  <div class="form-group">
+    <label for="qle_kind_question_{{questionIndex}}_title" class="control-label col-sm-2">Prompt</label>
+    <div class="col-sm-8">
+      <input 
+        id="qle_kind_question_{{questionIndex}}_title"
+        type="text"
+        formControlName="question_title"
+        class="form-control">
+    </div>
+  </div>
+</div>

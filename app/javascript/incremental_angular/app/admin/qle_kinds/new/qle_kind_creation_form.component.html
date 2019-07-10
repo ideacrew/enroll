@@ -1,100 +1,40 @@
-<div class='container '>
+<div class='container'>
+    <div class="row">
     <h1 class="heading-text">
-      Create an Existing Qualifying Life Event Kind
+      Create a Qualifying Life Event Kind
     </h1>
-    <form [formGroup]="creationFormGroup" class='form'>
+    <form [formGroup]="creationFormGroup" class='form form-horizontal'>
       <field-errors [errorControl]="creationFormGroup" errorHeader="Your QLE Kind could not be Created for the following reasons:"></field-errors>
-      <input type="hidden">
-      <dl class="">
-        <dt>
-          Title 
-          <input type='text' formControlName="title" id='qle_kind_creation_form_title' class='form-control-custom-qle' required>
-        </dt>
-        <dt>
-          Tool Tip 
-          <input type='text' formControlName="tool_tip" id='qle_kind_creation_form_tool_tip' class='form-control-custom-qle' required>
-        </dt>
-        <dt>
-          <div *ngIf="questionCreated"><h3>Your Question has been created!</h3></div>
-          <button (click)="addElement(creationFormGroup,'questions')" (click)="showQuestions()" class='btn btn-primary'>
-            Create a new question for this QLE
-          </button>
-            <div *ngIf='showQuestionContainer' class="row container-fluid">
-              <div formArrayName="questions">
-                <div *ngFor="let question of creationFormGroup.controls.questions.controls; let questionIndex=index">
-                  <div [formGroupName]="questionIndex">
-                    <div *ngIf="showQuestionInput(questionIndex) ">
-                      <div *ngIf="showQuestionInputs" >
-                        Enter a question for this QLE
-                        <input type="text" formControlName="id" name="questionIndex" value='questionIndex'  class='form-control-custom-qle' style="display: none;"/>
-                        <input type="text" formControlName="questionTitle"  class='form-control-custom-qle'(focusout)="showQuestionTypes()" >
-                      </div>
-                      <h3 *ngIf="showQuestionTitle" class="container-fluid">
-                        Question: {{displayQuestionTitle(questionIndex)}}
-                      </h3>
-                      <div *ngIf="showQuestionType" class="container-fluid">
-                        <h5>What type of question will this be?</h5>
-                        <div>
-                          <span>A Date Question</span>
-                          <p><input type='radio' formControlName="questionType" id='qle_kind_question_tpye' value="Date" (change)="questionTypeSelected('date')" required></p>
-                          <span>A True/False Question</span>
-                            <p><input type='radio' formControlName="questionType" id='qle_kind_question_tpye' value="True/False" (change)="questionTypeSelected('boolean')" required></p>
-                          <span>A Multiple Choice Question</span>
-                          <p> <input type='radio' formControlName="questionType" id='qle_kind_question_tpye' value="MultipleChoice" (change)="questionTypeSelected('multipleChoice')" required></p>  
-                        </div>
-                      </div>
-                      <div *ngIf="showQuestionDateForm">
-                        <div formArrayName="responses">
-                          <div>
-                            <div *ngFor="let response of question.controls.responses.controls; let responseIndex=index"  >
-                              <div [formGroupName]="responseIndex">
-                                <div>
-                                  <p>Please choose acceptable dates as answers to this question</p>
-                                  <select  class='form-control-custom-qle' (change)="checkOperator(questionIndex,responseIndex)" formControlName="responseDateOperator" placeholder="Please Choose a Date Operator" >
-                                    <option value="" disabled selected hidden>Choose a date operator</option>
-                                    <option value="before">Before</option>
-                                    <option value="between">Between</option>
-                                    <option value="after">After</option>
-                                  </select>
-                                </div>
-                                <div *ngIf="showBetweenOperator">
-                                    <input placeholder="MM/DD/YYYY" type="text" formControlName="responseDateFirst" class="form-control-custom-qle" mask="M0/d0/0000" required>
-                                    <span>And</span>
-                                    <input placeholder="MM/DD/YYYY" type="text" formControlName="responseDateLast" class="form-control-custom-qle" mask="M0/d0/0000" required>
-                                </div>
-                                <div *ngIf="showBeforeOperator">
-                                    <input placeholder="MM/DD/YYYY" type="text" formControlName="responseDateFirst" class="form-control-custom-qle" mask="M0/d0/0000" required>
-                                </div>
-                                <div *ngIf="showAfterOperator">
-                                    <input placeholder="MM/DD/YYYY" type="text" formControlName="responseDateLast" class="form-control-custom-qle" mask="M0/d0/0000" required>
-                                </div>
-                                <button type="button" (click)="submitQuestion()" class='btn btn-primary'>Create Question</button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div *ngIf="showQuestionMultipleChoiceForm">
-                        <div formArrayName="responses">
-                          <div>
-                            <div *ngFor="let response of question.controls.responses.controls; let responseIndex=index"  >
-                              <div [formGroupName]="responseIndex">
-                                <div>
-                                  <p>Plase add a response to this question</p>
-                                    <input type="text" formControlName="responseMultipleChoice"  class='form-control-custom-qle'(focusout)="addElement(question,'responses')" >
-                                    <button type="button" class='btn btn-primary'>Add Response</button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+        <div class="form-group">
+          <label for="qle_kind_creation_form_title" class="col-sm-3 control-label">Title</label>
+          <div class="col-sm-7">
+            <input type='text' formControlName="title" id='qle_kind_creation_form_title' class='form-control' required>
+          </div>
+        </div>
+        <div class="form-group">
+            <label for="qle_kind_creation_form_tool_tip" class="col-sm-3 control-label">Tool Tip </label>
+            <div class="col-sm-7">
+                <input
+                 type='text'
+                 formControlName="tool_tip"
+                 id='qle_kind_creation_form_tool_tip'
+                 class='form-control' required>
             </div>
-          </dt>
+        </div>
+        <fieldset>
+          <legend>Questions <button (click)="addQuestion()" class='btn btn-primary'>
+              Create a new question for this QLE
+          </button></legend>
+          <div *ngIf="showQuestions()">
+            <qle-question-form
+              *ngFor="let question of questionControls(); let i = index"
+              [questionFormGroup]="question"
+              [questionIndex]="i"
+              [questionComponentParent]="this">
+            </qle-question-form>
+          </div>
+          <div *ngIf="!showQuestions()">No questions specified.</div>
+        </fieldset>
         <dt>
           Action Kind
           <select formControlName="action_kind" id='form-control-custom-qle'>
@@ -125,10 +65,10 @@
             </label>     
           </div>
         </dt>
-      </dl>
       <div class="form-group col-md-4 mb-2{{errorClassFor(creationFormGroup.get('title'))}}">
         <button class="btn btn-primary " (click)="submitCreation()">Create QLE Kind</button>
       </div>
     </form>
+    </div>
   </div>
   

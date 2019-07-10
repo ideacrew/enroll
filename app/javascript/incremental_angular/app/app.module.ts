@@ -71,8 +71,5 @@ export class AppModule {
     customElements.define("admin-qle-kind-deactivation-form",qle_kind_deactivation_form_custom);
     const qle_kind_creation_form_custom = createCustomElement(QleKindCreationFormComponent, { injector: this.injector });
     customElements.define("admin-qle-kind-creation-form",qle_kind_creation_form_custom);
-    const qle_kind_question_form_custom = createCustomElement(QleKindQuestionFormComponent, { injector: this.injector });
-    customElements.define('qle-question-form', qle_kind_question_form_custom);
-  
   }
 }

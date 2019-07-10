@@ -14,34 +14,45 @@ import { __core_private_testing_placeholder__ } from '@angular/core/testing';
 })
 export class QleKindCreationFormComponent {
   public qleKindToCreate : QleKindCreationResource | null = null;
-  public creationFormGroup : FormGroup = new FormGroup({});
+  public creationFormGroup : FormGroup;
+  public questionArray : FormArray;
   public creationUri : string | "";
-  public showQuestionInputs : boolean | false;
-  public showQuestionType : boolean | false;
-  public showQuestionTitle : boolean | false;
-  public showQuestionContainer : boolean | false;
-  public showQuestionDateForm : boolean | false;
-  public showBetweenOperator : boolean | false;
-  public showBeforeOperator : boolean | false;
-  public showAfterOperator : boolean | false;
-  public questionCreated : boolean | false;
-  public lastQuestion : boolean | false;
-  public showQuestionMultipleChoiceForm : boolean | false;
-
-
-
-  @ViewChild('headerRef') headerRef: ElementRef;
+  public questionCreated : boolean = false;
+  public lastQuestion : boolean = false;
+  public showQuestionMultipleChoiceForm : boolean = false;
 
   constructor(
      injector: Injector,
      private _elementRef : ElementRef,
      private _creationForm: FormBuilder,
-
-
      @Inject("QleKindCreationService") private CreationService : QleKindCreationService,
      ) {
-
+     this.buildInitialForm(_creationForm);
   }
+
+  private buildInitialForm(formBuilder : FormBuilder) {
+    var qControls = formBuilder.array([]);
+    var formGroup = formBuilder.group({
+      title: ['', [Validators.required, Validators.minLength(1)]],
+      tool_tip: ['', [Validators.required, Validators.minLength(1)]],
+      action_kind: ['',[]],
+      reason: ['', [Validators.required, Validators.minLength(1)]],
+      market_kind: ['', [Validators.required, Validators.minLength(1)]],
+      is_self_attested: [''],
+      questions: qControls
+    });
+    this.creationFormGroup = formGroup;
+    this.questionArray = qControls;
+  }
+
+  public questionControls() : FormGroup[] {
+    return this.questionArray.controls.map(
+      function(item) {
+        return <FormGroup>item;
+      }
+    );
+  }
+
   public hasErrors(control : AbstractControl) : Boolean {
     return ((control.touched || control.dirty) && !control.valid);
   }
@@ -50,22 +61,10 @@ export class QleKindCreationFormComponent {
   }
 
   ngOnInit() {
-    var qleKindToCreateJson = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-qle-kind-create-url");
-        this.creationFormGroup = this._creationForm.group({
-          title: ['', [Validators.required, Validators.minLength(1)]],
-          tool_tip: ['', [Validators.required, Validators.minLength(1)]],
-          action_kind: ['',[]],
-          reason: ['', [Validators.required, Validators.minLength(1)]],
-          market_kind: ['', [Validators.required, Validators.minLength(1)]],
-          is_self_attested: [''],
-          questions: this._creationForm.array([
-          ]),
-        })
-      
     var submissionUriAttribute = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-qle-kind-creation-url");
-      if (submissionUriAttribute != null) {
-        this.creationUri = submissionUriAttribute;
-      }
+    if (submissionUriAttribute != null) {
+      this.creationUri = submissionUriAttribute;
+    }
   }
 
   getresponseDateFirst(){
@@ -74,17 +73,16 @@ export class QleKindCreationFormComponent {
   responseOperatorChosen(o:number){
   }
 
-  initQuestion(){
-   return  this._creationForm.group({
-      id: "",
-      questionTitle: ['', Validators.required],
-      questionType:[''],
-      responses: this._creationForm.array([
-        this.initElement('responses')
-      ]),
-    });
+  addQuestion() {
+    this.questionArray.push(
+      QleKindQuestionFormComponent.newQuestionFormGroup()
+    );
   }
 
+  removeQuestion(questionIndex: number) {
+    this.questionArray.removeAt(questionIndex);
+  }
+/*
   checkOperator(questionIndex:number,responseIndex:number){
     const operator = this.creationFormGroup.value.questions[questionIndex].responses[responseIndex].responseDateOperator
     if (operator === "between"){
@@ -160,7 +158,7 @@ export class QleKindCreationFormComponent {
     }
   }
 
-  showQuestionTypes(){
+  showQuestionTypes() {
       this.showQuestionInputs = false
       this.showQuestionType = true
       this.showQuestionTitle = true
@@ -176,12 +174,6 @@ export class QleKindCreationFormComponent {
     }
   }
 
-  showQuestions(){
-    this.showQuestionContainer = true
-    this.showQuestionInputs = true
-
-  }
-
   submitQuestion(){
     this.showQuestionDateForm = false
     this.questionCreated = true 
@@ -193,6 +185,11 @@ export class QleKindCreationFormComponent {
 
     console.log(this.creationFormGroup.value)
   }
+*/
+
+showQuestions(){
+  return this.questionArray.length > 0;
+}
 
   submitCreation() {
     var form = this;
