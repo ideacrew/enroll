@@ -754,14 +754,11 @@ def employer_poc
   end
 
 private
-   def register_employer(employer_profile)
+  def register_employer(employer_profile)
     from_state = employer_profile.aasm_state
     employer_profile.update_attributes(aasm_state: :registered)
-    employer_profile.workflow_state_transitions << WorkflowStateTransition.new(
-            from_state: from_state,
-            to_state: "registered"
-        )
-   end
+    employer_profile.workflow_state_transitions << WorkflowStateTransition.new(from_state: from_state,to_state: "registered")
+  end
 
    def modify_admin_tabs?
      authorize HbxProfile, :modify_admin_tabs?
