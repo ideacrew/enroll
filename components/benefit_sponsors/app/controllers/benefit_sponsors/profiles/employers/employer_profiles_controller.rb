@@ -96,9 +96,13 @@ module BenefitSponsors
 
         def export_census_employees
           authorize @employer_profile
-          employee_export = BenefitSponsors::Exporters::CensusEmployeeExport.new(@employer_profile, {action: "download"})
-          respond_to do |format|
-            format.csv { send_data employee_export.to_csv, filename: "#{@employer_profile.legal_name.parameterize.underscore}_census_employees_#{TimeKeeper.date_of_record}.csv" }
+          begin
+            employee_export = BenefitSponsors::Exporters::CensusEmployeeExport.new(@employer_profile, {action: "download"})
+            respond_to do |format|
+              format.csv { send_data employee_export.to_csv, type: csv_content_type, filename: "#{@employer_profile.legal_name.parameterize.underscore}_census_employees_#{TimeKeeper.date_of_record}.csv" }
+            end
+          rescue StandardError
+            format.html { redirect_to :back, :flash => {:error => "OOps! Error on Downloading Roster, please contact #{aca_site_short_name} customer service"}}
           end
         end
 

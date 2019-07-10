@@ -33,9 +33,14 @@ module BenefitSponsors
             employee_details = employeement_headers(census_employee)
             benefit_group_details = benefit_group_assignment_details(census_employee)
             address_details = primary_location_details(census_employee)
-            contribution_details = total_premium(census_employee)
-            dependet_dob_details = append_dependent_dob(census_employee)
-            csv << ["", "employee"] + personal_details + employee_details + benefit_group_details + address_details + contribution_details + dependet_dob_details
+            append_config_data = ["", "employee"] + personal_details + employee_details + benefit_group_details + address_details
+
+            if site_key == :dc
+              append_config_data += total_premium(census_employee)
+              append_config_data += append_dependent_dob(census_employee)
+            end
+
+            csv << append_config_data
           end
         end
       end
@@ -178,7 +183,7 @@ module BenefitSponsors
       end
 
       def census_employee_roster
-        @census_employee_roster ||= employer_profile.census_employees.sorted
+        @census_employee_roster ||= employer_profile.census_employees.order_name_asc
       end
     end
   end

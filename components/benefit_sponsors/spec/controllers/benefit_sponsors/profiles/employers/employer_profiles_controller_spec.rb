@@ -9,7 +9,7 @@ module BenefitSponsors
     let(:person) { FactoryBot.create(:person) }
     let(:user) { FactoryBot.create(:user, :person => person)}
 
-    let!(:site)                  { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    let!(:site)                  { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, site_key: Settings.site.key) }
     let!(:benefit_sponsor)       { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let(:employer_profile)      { benefit_sponsor.employer_profile }
     let!(:rating_area)           { FactoryBot.create_default :benefit_markets_locations_rating_area }
