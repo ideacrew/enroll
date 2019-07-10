@@ -1,5 +1,6 @@
 class Exchanges::QlesController < ApplicationController
   before_action :set_qle_and_attributes, only: [:deactivation_form, :edit]
+  before_action :can_add_custom_qle?, only: [:manage_qle]
   # TODO: We need to discuss the design/naming conventions used here
   # the new/create manage is essentially just a redirect wizard.
 
@@ -75,6 +76,12 @@ class Exchanges::QlesController < ApplicationController
   end
 
   private
+
+  def can_add_custom_qle?
+    unless authorize HbxProfile, :can_add_custom_qle?
+      redirect_to root_path, :flash => { :error => "Access not allowed" }
+    end
+  end
 
   def set_qle_and_attributes
     @qle = QualifyingLifeEventKind.find(params[:id])
