@@ -408,6 +408,35 @@ describe Person, :dbclean => :after_each do
         it_behaves_like "validate consumer_fields_validations private", nil, nil, nil, nil, nil, nil, false, [errors[:citizenship], errors[:native], errors[:incarceration]]
       end
 
+      if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
+        context 'consumer fields validation - applying for coverage false' do
+          let(:params) {valid_params}
+          let(:person) {Person.new(**params)}
+          let!(:consumer_role) {FactoryBot.create(:consumer_role, citizen_status: nil, is_applying_coverage: false)}
+
+          shared_examples_for 'validate consumer_fields_validations private' do |citizenship, naturalized, incarceration, is_valid, error_list|
+            before do
+              allow(person).to receive(:consumer_role).and_return consumer_role
+              person.instance_variable_set(:@is_consumer_role, true)
+              person.instance_variable_set(:@us_citizen, citizenship)
+              person.instance_variable_set(:@naturalized_citizen, naturalized)
+              person.is_incarcerated = incarceration
+              person.valid?
+            end
+
+            it "#{is_valid ? 'pass' : 'fails'} validation" do
+              expect(person.valid?).to eq is_valid
+            end
+
+            it "#{is_valid ? 'does not raise' : 'raise'} the errors" do
+              expect(person.errors[:base].count).to eq error_list.count
+              expect(person.errors[:base]).to eq error_list
+            end
+          end
+          it_behaves_like 'validate consumer_fields_validations private', nil, nil, nil, true, []
+        end
+      end
+
       context "is_consumer_role_active?" do
         let(:person) {FactoryBot.build(:person)}
         let(:consumer_role) {double(is_active?: true)}
