@@ -1237,7 +1237,7 @@ class HbxEnrollment
 
   def is_an_existing_plan?(new_plan)
     if is_shop?
-      self.family.currently_enrolled_plans_ids(self).include?(new_plan.id)
+      family.currently_enrolled_product_ids(self).include?(new_plan.id)
     else
       family.currently_enrolled_products(self).select{ |plan| plan.is_same_plan_by_hios_id_and_active_year?(new_plan) }.present?
     end

@@ -1,4 +1,4 @@
-- if @hbx_enrollment.kind == 'employer_sponsored'
+- if @hbx_enrollment.is_shop?
   - member_enrollment = @member_group.group_enrollment
   - @plan = member_enrollment.product
 - else
@@ -18,7 +18,7 @@
       .col-xs-6
         span.pull-right
           span style=("font-size: 24px;")
-          - if @hbx_enrollment.kind == 'employer_sponsored'
+          - if @hbx_enrollment.is_shop?
             = number_to_currency(member_enrollment.product_cost_total - member_enrollment.sponsor_contribution_total)
           - else
             - if (@hbx_enrollment.present? && @hbx_enrollment.coverage_kind == 'health') || @plan.kind == :health
