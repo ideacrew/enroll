@@ -169,14 +169,10 @@ class Insured::GroupSelectionController < ApplicationController
     hbx_enrollment = HbxEnrollment.find(params.require(:hbx_enrollment_id))
     term_date = Date.strptime(params.require(:term_date), '%m/%d/%Y')
     hbx_enrollment.term_or_cancel_enrollment(hbx_enrollment, term_date)
-    redirect_to family_account_path
-  end
-
-  def cancel
-    hbx = HbxEnrollment.find(params.require(:hbx_enrollment_id))
-    hbx.cancel_coverage! if hbx.may_cancel_coverage?
-    # TODO: Decide how transmit will be handled
-    # BulkActionsForAdmin.handle_edi_transmissions(@hbx_enrollment.id, transmit_flag)
+    if params.require(:term_or_cancel) == 'cancel'
+      transmit_flag = true
+      BulkActionsForAdmin.handle_edi_transmissions(params.require(:hbx_enrollment_id), transmit_flag)
+    end
     redirect_to family_account_path
   end
 
