@@ -1,8 +1,8 @@
-set_tab_content("<%= escape_javascript render "issuer_index"%>")
+set_tab_content("<%= escape_javascript render "index"%>")
 
 var table = $('#issuers-ajax-dt').DataTable( {
   "ajax": {
-    "url": "/exchanges/hbx_profiles/issuer_index",
+    "url": "/exchanges/issuers",
     "dataSrc": "data"
   },
   "type": "get",

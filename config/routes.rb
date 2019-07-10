@@ -86,6 +86,8 @@ Rails.application.routes.draw do
       end
     end
 
+    resources :issuers, only: [:index]
+
     resources :hbx_profiles do
       root 'hbx_profiles#show'
 
@@ -107,7 +109,6 @@ Rails.application.routes.draw do
         post :force_publish
         get :broker_agency_index
         get :general_agency_index
-        get :issuer_index
         get :product_index
         get :configuration
         post :set_date
