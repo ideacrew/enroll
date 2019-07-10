@@ -13,7 +13,11 @@ RSpec.describe CarrierProfile, :type => :model, dbclean: :after_each do
   let(:abbrev) {"uhc"}
 
   describe "class methods" do
-    context "carrier_profile_service_area_pairs_for" do
+    context "carrier_profile_service_area_pairs_for when the calculation model is not simple" do
+      before do
+        allow(employer).to receive(:use_simple_employer_calculation_model?).and_return(false)
+      end
+
       let!(:carrier_profile) { create(:carrier_profile, with_service_areas: 0, issuer_hios_ids: ['99999']) }
       let!(:carrier_service_area_2017) { create(:carrier_service_area, issuer_hios_id: carrier_profile.issuer_hios_ids.first, active_year: '2017') }
       let!(:carrier_service_area_2018) { create(:carrier_service_area, issuer_hios_id: carrier_profile.issuer_hios_ids.first, active_year: '2018') }
