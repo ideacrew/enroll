@@ -17,7 +17,7 @@ Background: General Agency registration
     Then the broker should see the home of broker
     When the broker visits their Employers page
     And selects the general agency from dropdown for the employer
-    # Then the broker should see assign successful message
+    Then the broker should see assign successful message
     When the broker visits their Employers page
     Then the employer is assigned to general agency
     Then the broker logs out

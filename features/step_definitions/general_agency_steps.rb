@@ -184,7 +184,7 @@ When(/^.+ assign employer to general agency$/) do
 end
 
 Then(/^.+ should see assign successful message$/) do
-  expect(page).to have_content('Successfully Assigned General Agency')
+  expect(page).to have_content('Succesfully Assigned General Agency')
 end
 
 Then(/^.+ should see the assigned general agency$/) do
