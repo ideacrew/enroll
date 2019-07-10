@@ -106,7 +106,8 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     end
 
     context "HBX admin variables to show all enrollments" do
-      let(:user_with_hbx_staff_role) { FactoryBot.create(:user, :with_family, :with_hbx_staff_role) }
+      let(:user_with_hbx_staff_role) { FactoryGirl.create(:user, :with_family, :with_hbx_staff_role) }
+
       it "should assign all_hbx_enrollments_for_admin variable if hbx admin user" do
         sign_in(user_with_hbx_staff_role)
         get :home, {:family => family.id.to_s}
