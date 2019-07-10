@@ -64,7 +64,6 @@ module BenefitSponsors
           self.profile_type = attrs[:profile_type]
           self.profile_id = attrs[:profile_id]
           self.handler = attrs[:handler]
-          handler.site_key = site_key if attrs[:handler]
           initialize_attributes(attrs)
         end
 
@@ -273,7 +272,7 @@ module BenefitSponsors
           self.profile = BenefitSponsors::Organizations::Profile.find(profile_id)
         end
 
-        BenefitSponsor = Struct.new(:factory, :organization, :profile, :person, :profile_id, :current_user, :is_saved, :site_key) do
+        BenefitSponsor = Struct.new(:factory, :organization, :profile, :person, :profile_id, :current_user, :is_saved) do
 
           def persist_representative!
             profile = organization.employer_profile
@@ -310,6 +309,8 @@ module BenefitSponsors
           end
 
           def build_sponsor_profile_class
+            # TODO - Use Configuration settings
+            site_key = BenefitSponsors::ApplicationController::current_site.site_key
             return Organizations::AcaShopDcEmployerProfile if site_key == :dc
             return Organizations::AcaShopCcaEmployerProfile if site_key == :cca
           end
@@ -343,13 +344,8 @@ module BenefitSponsors
             return "sponsor_show_pending_registration_url" if factory.pending
             organization = factory.organization
             resource_id = factory.profile_id || (organization.employer_profile.id if organization.present?)
-            return "#{config_widgts_url}@#{resource_id}" if is_saved
-
+            return "sponsor_home_registration_url@#{resource_id}" if is_saved
             :sponsor_new_registration_url
-          end
-
-          def config_widgts_url
-            site_key == :dc ? "sponsor_profiles_privacy_url" : "sponsor_home_registration_url"
           end
 
           def redirection_url_on_update
@@ -357,7 +353,7 @@ module BenefitSponsors
           end
         end
 
-        GeneralAgency = Struct.new(:factory, :organization, :profile, :person, :profile_id, :current_user, :is_saved, :site_key) do
+        GeneralAgency = Struct.new(:factory, :organization, :profile, :person, :profile_id, :current_user, :is_saved) do
 
           def persist_representative!
             profile = organization.general_agency_profile
@@ -370,7 +366,7 @@ module BenefitSponsors
             end
             person.save!
           end
-
+          
           def fetch_organization(attributes)
             if organization.present? && !organization.general_agency_profile.present?
               organization.profiles << build_profile(attributes)
@@ -408,7 +404,7 @@ module BenefitSponsors
           end
         end
 
-        BrokerAgency = Struct.new(:factory, :organization, :profile, :person, :profile_id, :current_user, :is_saved, :site_key) do
+        BrokerAgency = Struct.new(:factory, :organization, :profile, :person, :profile_id, :current_user, :is_saved) do
 
           def persist_representative!
             profile = organization.broker_agency_profile

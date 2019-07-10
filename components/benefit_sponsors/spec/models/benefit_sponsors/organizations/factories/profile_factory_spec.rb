@@ -172,8 +172,7 @@ module BenefitSponsors
         end
 
         it 'should return redirection url' do
-          result_url = (site.site_key == :dc ? "sponsor_profiles_privacy_url" : "sponsor_home_registration_url")
-          expect(profile_factory.redirection_url(profile_factory.pending, true)).to eq "#{result_url}@#{profile_factory.profile.id}"
+          expect(profile_factory.redirection_url(profile_factory.pending, true)).to eq "sponsor_home_registration_url@#{profile_factory.profile.id}"
         end
       end
 

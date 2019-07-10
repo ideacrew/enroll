@@ -76,7 +76,6 @@ BenefitSponsors::Engine.routes.draw do
         member do
           get :inbox
           get :download_invoice
-          get :privacy
         end
 
         resources :broker_agency, only: [:index, :show, :create] do
