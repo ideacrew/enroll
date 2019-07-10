@@ -36,32 +36,15 @@ describe ChangeEnrollmentDetails do
       benefit_application.update_attributes(effective_period: (start_date..end_date))
       allow(ENV).to receive(:[]).with("ce_id").and_return(census_employee.id.to_s)
       allow(ENV).to receive(:[]).with("bga_id").and_return(benefit_group_assignment.id)
-      allow(ENV).to receive(:[]).with("new_state").and_return(benefit_group_assignment.aasm_state)
+      allow(ENV).to receive(:[]).with("new_state").and_return "coverage_void"
       allow(ENV).to receive(:[]).with("action").and_return "change_aasm_state"
     end
 
     it "should change the aasm state" do
+
       subject.migrate
       benefit_group_assignment.reload
-      expect(benefit_group_assignment.aasm_state).to eq "coverage_expired"
-    end
-
-    context "change enrollment aasm state" do
-      before(:each) do
-        benefit_application.update_attributes(effective_period: (start_date..end_date))
-        benefit_group_assignment.update_attributes(aasm_state: "coverage_expired", is_active: false)
-        allow(ENV).to receive(:[]).with("ce_id").and_return(census_employee.id.to_s)
-        allow(ENV).to receive(:[]).with("bga_id").and_return(benefit_group_assignment.id)
-        allow(ENV).to receive(:[]).with("new_state").and_return(benefit_group_assignment.aasm_state)
-        allow(ENV).to receive(:[]).with("action").and_return "unset_hbx_id"
-      end
-
-      it "should unset hbx enrollment id" do
-        subject.migrate
-        hbx_enrollment.reload
-        benefit_group_assignment.reload
-        expect(benefit_group_assignment.hbx_enrollment_id).to eq nil
-      end
+      expect(benefit_group_assignment.aasm_state).to eq "coverage_void"
     end
   end
 end
