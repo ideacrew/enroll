@@ -271,6 +271,11 @@ Then(/(.*) should see the enrollment with make changes button/) do |role|
   expect(page).to have_link "Make Changes"
 end
 
+Then(/(.*) should see the enrollment with (.*) button/) do |_role, button_text|
+  expect(page).to have_content "#{(current_effective_date || TimeKeeper.date_of_record).year} HEALTH COVERAGE"
+  expect(page).to have_link(button_text.titleize)
+end
+
 Then(/(.*) should see the dental enrollment with make changes button/) do |role|
   if role == "employee"
     expect(page).to have_content "#{(current_effective_date || TimeKeeper.date_of_record).year} DENTAL COVERAGE"
@@ -442,4 +447,72 @@ end
 
 And(/Resident clicked on "Married" qle/) do
   click_link "Married"
+end
+
+When(/(.*) clicks on the edit plan button/) do |_role|
+  click_link 'Edit Plan'
+end
+
+Then(/(.*) should see the edit plan page/) do |_role|
+  expect(page).to have_content('Cancel Plan')
+end
+
+When(/(.*) clicks on the Cancel Plan button/) do |_role|
+  find('.interaction-click-control-cancel-plan').click
+end
+
+Then(/(.*) should see the calender/) do |_role|
+  expect(page).to have_selector :css, '.date-picker'
+end
+
+Then(/the submit button should be disabled/) do
+  expect(page).to have_button('Are you sure?', disabled: true)
+end
+
+When(/(.*) selects a date/) do |_role|
+  fill_in 'term-date', :with => (TimeKeeper.date_of_record + 10).to_s
+end
+
+Then(/the submit button should be enabled/) do
+  expect(page).to have_button('Are you sure?', disabled: false)
+end
+
+When(/(.*) clicks the submit button/) do |_role|
+  click_button('Are you sure?')
+end
+
+Then(/the enrollment should be terminated/) do
+  @family.all_enrollments.first.aasm_state == 'coverage_terminated'
+end
+
+Given(/(.*) has an employee role/) do |_role|
+  FactoryBot.create(:employee_role, person: @family.primary_person)
+end
+
+Given(/(.*) has a resident role/) do |_role|
+  FactoryBot.create(:resident_role_object, person: @family.primary_person)
+end
+
+When(/consumer's health enrollment has an effective date in the future/) do
+  @family.all_enrollments.first.update_attributes(effective_on: TimeKeeper.date_of_record + 20)
+end
+
+Then(/(.*) should not see the calender/) do |_role|
+  expect(page).not_to have_selector :css, '.date-picker'
+end
+
+When(/(.*) selects (.*) to are you sure/) do |_role, option|
+  if option.eql?('yes')
+    choose('agreement_action-confirm-yes')
+  else
+    choose('agreement_action-confirm-no')
+  end
+end
+
+Then(/the enrollment should be canceled/) do
+  @family.all_enrollments.first.aasm_state == 'coverage_cancelled'
+end
+
+When(/(.*) clicks on the Shop for Plans button/) do |_role|
+  find('.interaction-click-control-shop-for-plans').click
 end
