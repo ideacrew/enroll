@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Exchanges
-  class IssuersController < ApplicationController
+  class IssuersController < HbxProfilesController
     before_action :check_hbx_staff_role, only: [:index]
     layout 'single_column'
 
@@ -13,12 +13,6 @@ module Exchanges
         format.js
         format.json { render json: @data }
       end
-    end
-
-    private
-
-    def check_hbx_staff_role
-      redirect_to root_path, :flash => { :error => "You must be an HBX staff member" } unless current_user.has_hbx_staff_role?
     end
   end
 end
