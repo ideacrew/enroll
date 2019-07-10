@@ -654,9 +654,9 @@ class HbxEnrollment
   end
 
   def should_term_or_cancel_ivl
-    if self.effective_on <= TimeKeeper.date_of_record
+    if self.effective_on > TimeKeeper.date_of_record
       'cancel'
-    elsif (self.effective_on > TimeKeeper.date_of_record || self.may_terminate_coverage?)
+    elsif (self.effective_on <= TimeKeeper.date_of_record || self.may_terminate_coverage?)
       'terminate'
     end
   end
