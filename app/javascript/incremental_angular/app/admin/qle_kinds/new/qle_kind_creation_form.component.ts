@@ -16,7 +16,7 @@ export class QleKindCreationFormComponent {
   public qleKindToCreate : QleKindCreationResource | null = null;
   public creationFormGroup : FormGroup = new FormGroup({});
   public creationUri : string | "";
-  public showQuestionInput : boolean | true;
+  public showQuestionInputs : boolean | false;
   public showQuestionType : boolean | false;
   public showQuestionTitle : boolean | false;
   public showQuestionContainer : boolean | false;
@@ -25,6 +25,9 @@ export class QleKindCreationFormComponent {
   public showBeforeOperator : boolean | false;
   public showAfterOperator : boolean | false;
   public questionCreated : boolean | false;
+  public lastQuestion : boolean | false;
+  public showQuestionMultipleChoiceForm : boolean | false;
+
 
 
   @ViewChild('headerRef') headerRef: ElementRef;
@@ -152,25 +155,43 @@ export class QleKindCreationFormComponent {
     else if(type == "boolean"){
     }  
     else if(type == "multipleChoice"){
+      this.showQuestionMultipleChoiceForm = true;
+
     }
   }
 
   showQuestionTypes(){
-      this.showQuestionInput = false
+      this.showQuestionInputs = false
       this.showQuestionType = true
       this.showQuestionTitle = true
   }
 
+  showQuestionInput(questionIndex:number){
+    const questions = this.creationFormGroup.value.questions
+    if (questions.length == 1 || questionIndex == (questions.length-1)){
+      return true
+    }
+    else{
+      return false
+    }
+  }
+
   showQuestions(){
     this.showQuestionContainer = true
-    this.showQuestionInput = true
+    this.showQuestionInputs = true
+
   }
 
   submitQuestion(){
     this.showQuestionDateForm = false
     this.questionCreated = true 
     this.showQuestionTitle = false
-    this.creationFormGroup.value.questions.d
+    this.showQuestionInputs = false
+    this.showBeforeOperator = false
+    this.showAfterOperator = false
+    this.showBetweenOperator = false
+
+    console.log(this.creationFormGroup.value)
   }
 
   submitCreation() {

@@ -15,7 +15,7 @@
           <input type='text' formControlName="tool_tip" id='qle_kind_creation_form_tool_tip' class='form-control-custom-qle' required>
         </dt>
         <dt>
-          <div *ngIf="questionCreated"><h5>Your Question has been created!</h5></div>
+          <div *ngIf="questionCreated"><h3>Your Question has been created!</h3></div>
           <button (click)="addElement(creationFormGroup,'questions')" (click)="showQuestions()" class='btn btn-primary'>
             Create a new question for this QLE
           </button>
@@ -23,51 +23,68 @@
               <div formArrayName="questions">
                 <div *ngFor="let question of creationFormGroup.controls.questions.controls; let questionIndex=index">
                   <div [formGroupName]="questionIndex">
-                    <div *ngIf="showQuestionInput">
-                       Enter a question for this QLE
-                      <input type="text" formControlName="id" name="questionIndex" value='questionIndex'  class='form-control-custom-qle' style="display: none;"/>
-                      <input type="text" formControlName="questionTitle"  class='form-control-custom-qle'(focusout)="showQuestionTypes()" >
-                    </div>
-                    <div *ngIf="showQuestionTitle" class="container-fluid">
-                      Question: {{displayQuestionTitle(questionIndex)}}
-                    </div>
-                    <div *ngIf="showQuestionType" class="container-fluid">
-                      <h5>What type of question will this be?</h5>
-                      <div>
-                        <span>A Date Question</span>
-                        <p><input type='radio' formControlName="questionType" id='qle_kind_question_tpye' value="Date" (change)="questionTypeSelected('date')" required></p>
-                        <span>A True/False Question</span>
-                          <p><input type='radio' formControlName="questionType" id='qle_kind_question_tpye' value="True/False" (change)="questionTypeSelected('boolean')" required></p>
-                        <span>A Multiple Choice Question</span>
-                         <p> <input type='radio' formControlName="questionType" id='qle_kind_question_tpye' value="MultipleChoice" (change)="questionTypeSelected('multipleChoice')" required></p>  
+                    <div *ngIf="showQuestionInput(questionIndex) ">
+                      <div *ngIf="showQuestionInputs" >
+                        Enter a question for this QLE
+                        <input type="text" formControlName="id" name="questionIndex" value='questionIndex'  class='form-control-custom-qle' style="display: none;"/>
+                        <input type="text" formControlName="questionTitle"  class='form-control-custom-qle'(focusout)="showQuestionTypes()" >
                       </div>
-                    </div>
-                    <div *ngIf="showQuestionDateForm">
-                      <div formArrayName="responses">
+                      <h3 *ngIf="showQuestionTitle" class="container-fluid">
+                        Question: {{displayQuestionTitle(questionIndex)}}
+                      </h3>
+                      <div *ngIf="showQuestionType" class="container-fluid">
+                        <h5>What type of question will this be?</h5>
                         <div>
-                          <div *ngFor="let response of question.controls.responses.controls; let responseIndex=index"  >
-                            <div [formGroupName]="responseIndex">
-                              <div>
-                                <p>Please choose acceptable dates as answers to this question</p>
-                                <select  class='form-control-custom-qle' (change)="checkOperator(questionIndex,responseIndex)" formControlName="responseDateOperator" placeholder="Please Choose a Date Operator" >
-                                  <option value="" disabled selected hidden>Choose a date operator</option>
-                                  <option value="before">Before</option>
-                                  <option value="between">Between</option>
-                                  <option value="after">After</option>
-                                </select>
+                          <span>A Date Question</span>
+                          <p><input type='radio' formControlName="questionType" id='qle_kind_question_tpye' value="Date" (change)="questionTypeSelected('date')" required></p>
+                          <span>A True/False Question</span>
+                            <p><input type='radio' formControlName="questionType" id='qle_kind_question_tpye' value="True/False" (change)="questionTypeSelected('boolean')" required></p>
+                          <span>A Multiple Choice Question</span>
+                          <p> <input type='radio' formControlName="questionType" id='qle_kind_question_tpye' value="MultipleChoice" (change)="questionTypeSelected('multipleChoice')" required></p>  
+                        </div>
+                      </div>
+                      <div *ngIf="showQuestionDateForm">
+                        <div formArrayName="responses">
+                          <div>
+                            <div *ngFor="let response of question.controls.responses.controls; let responseIndex=index"  >
+                              <div [formGroupName]="responseIndex">
+                                <div>
+                                  <p>Please choose acceptable dates as answers to this question</p>
+                                  <select  class='form-control-custom-qle' (change)="checkOperator(questionIndex,responseIndex)" formControlName="responseDateOperator" placeholder="Please Choose a Date Operator" >
+                                    <option value="" disabled selected hidden>Choose a date operator</option>
+                                    <option value="before">Before</option>
+                                    <option value="between">Between</option>
+                                    <option value="after">After</option>
+                                  </select>
+                                </div>
+                                <div *ngIf="showBetweenOperator">
+                                    <input placeholder="MM/DD/YYYY" type="text" formControlName="responseDateFirst" class="form-control-custom-qle" mask="M0/d0/0000" required>
+                                    <span>And</span>
+                                    <input placeholder="MM/DD/YYYY" type="text" formControlName="responseDateLast" class="form-control-custom-qle" mask="M0/d0/0000" required>
+                                </div>
+                                <div *ngIf="showBeforeOperator">
+                                    <input placeholder="MM/DD/YYYY" type="text" formControlName="responseDateFirst" class="form-control-custom-qle" mask="M0/d0/0000" required>
+                                </div>
+                                <div *ngIf="showAfterOperator">
+                                    <input placeholder="MM/DD/YYYY" type="text" formControlName="responseDateLast" class="form-control-custom-qle" mask="M0/d0/0000" required>
+                                </div>
+                                <button type="button" (click)="submitQuestion()" class='btn btn-primary'>Create Question</button>
                               </div>
-                              <div *ngIf="showBetweenOperator">
-                                  <input placeholder="MM/DD/YYYY" type="text" formControlName="responseDateFirst" class="form-control-custom-qle" mask="M0/d0/0000" required>
-                                  <span>And</span>
-                                  <input placeholder="MM/DD/YYYY" type="text" formControlName="responseDateLast" class="form-control-custom-qle" mask="M0/d0/0000" required>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div *ngIf="showQuestionMultipleChoiceForm">
+                        <div formArrayName="responses">
+                          <div>
+                            <div *ngFor="let response of question.controls.responses.controls; let responseIndex=index"  >
+                              <div [formGroupName]="responseIndex">
+                                <div>
+                                  <p>Plase add a response to this question</p>
+                                    <input type="text" formControlName="responseMultipleChoice"  class='form-control-custom-qle'(focusout)="addElement(question,'responses')" >
+                                    <button type="button" class='btn btn-primary'>Add Response</button>
+                                </div>
                               </div>
-                              <div *ngIf="showBeforeOperator">
-                                  <input placeholder="MM/DD/YYYY" type="text" formControlName="responseDateFirst" class="form-control-custom-qle" mask="M0/d0/0000" required>
-                              </div>
-                              <div *ngIf="showAfterOperator">
-                                  <input placeholder="MM/DD/YYYY" type="text" formControlName="responseDateLast" class="form-control-custom-qle" mask="M0/d0/0000" required>
-                              </div>
-                              <button type="button" (click)="submitQuestion()" class='btn btn-primary'>Create Question</button>
                             </div>
                           </div>
                         </div>
@@ -80,7 +97,7 @@
           </dt>
         <dt>
           Action Kind
-          <select  formControlName="action_kind" id='form-control-custom-qle'>
+          <select formControlName="action_kind" id='form-control-custom-qle'>
             <option value="drop-member">Drop Member</option>
             <option value="adminstrative">Adminstrative</option>
             <option value="add-member">Add Member</option>
