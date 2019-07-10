@@ -221,7 +221,8 @@ class Admin::Aptc < ApplicationController
         aptc_members = family.active_household.latest_active_tax_household.aptc_members
       end
       cost = aptc_members.map do |member|
-        slcsp.premium_for(TimeKeeper.datetime_of_record, member.age_on_effective_date)
+        product = ::BenefitMarkets::Products::ProductFactory.new({product_id: slcsp.id})
+        product.cost_for(TimeKeeper.datetime_of_record, member.age_on_effective_date)
       end.inject(:+) || 0
       return '%.2f' % cost
     end
@@ -273,7 +274,7 @@ class Admin::Aptc < ApplicationController
       max_aptc = latest_eligibility_determination.max_aptc
       csr_percent_as_integer = latest_eligibility_determination.csr_percent_as_integer
       csr_percentage_param = params[:csr_percentage] == "limited" ? -1 : params[:csr_percentage].to_i # storing "limited" CSR as -1
-      if !(params[:max_aptc].to_f == max_aptc.to_f && csr_percentage_param == csr_percent_as_integer) # If any changes made to MAX APTC or CSR
+      unless (params[:max_aptc].to_f == max_aptc.to_f) && (csr_percentage_param == csr_percent_as_integer) # If any changes made to MAX APTC or CSR
         effective_starting_on = family.active_household.latest_active_tax_household_with_year(year).effective_starting_on
         if effective_starting_on > TimeKeeper.date_of_record
           eligibility_date = effective_starting_on

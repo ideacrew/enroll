@@ -89,8 +89,9 @@ class FamilyMember
   def aptc_benchmark_amount
     benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
     benefit_coverage_period = benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}
+    # slcsp is a product
     slcsp = benefit_coverage_period.second_lowest_cost_silver_plan
-    ehb = benefit_coverage_period.second_lowest_cost_silver_plan.ehb
+    ehb = slcsp.ehb
     product = product_factory.new({product_id: slcsp.id})
     cost = product.cost_for(TimeKeeper.datetime_of_record, person.age_on(TimeKeeper.datetime_of_record))
     cost * ehb
