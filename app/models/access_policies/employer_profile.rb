@@ -54,7 +54,11 @@ module AccessPolicies
       if person.general_agency_staff_roles.present?
         ga_id = person.general_agency_staff_roles.last.general_agency_profile.id
         plan_design_organizations = SponsoredBenefits::Organizations::PlanDesignOrganization.find_by_sponsor(employer_id)
-        plan_design_organizations.map{|a| a.general_agency_profile.id}.include? ga_id
+        plan_design_organizations.each do |a|
+          if !a.general_agency_profile.nil?
+            return true if a.general_agency_profile.id == ga.id
+          end
+        end
       else
         false
       end
