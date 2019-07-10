@@ -1017,8 +1017,8 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     let(:permission) { double(can_extend_open_enrollment: true) }
     let(:hbx_staff_role) { double("hbx_staff_role", permission: permission)}
     let(:hbx_profile) { double("HbxProfile")}
-    let(:employer_profile) { double(plan_years: plan_years) }
-    let(:plan_years) { [ double ]}
+    let(:employer_profile){FactoryGirl.create(:employer_with_planyear)}
+    let(:plan_years) { employer_profile.plan_years}
 
      before :each do
       allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
