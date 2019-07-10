@@ -1,7 +1,7 @@
 <%= javascript_pack_tag 'qle_form', 'data-turbolinks-track': 'reload' %>
 <div class="container"  >
   <div id='custom-sep-container' data-controller="qle">
-    <%= form_for @qle, url:  qles_path , method: "post", class: "form" do |f| %>
+    <%= form_for @qle, url:  exchanges_qles_path , method: "post", class: "form" do |f| %>
       <div class='row'>
         <h4 class='col-md-6' >Modify an Existing Qualifying Life Event</h4>
       </div>
