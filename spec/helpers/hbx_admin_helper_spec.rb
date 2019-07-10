@@ -18,6 +18,7 @@ RSpec.describe HbxAdminHelper, :type => :helper do
 
   let(:hbx) do
     FactoryBot.create(:hbx_enrollment,
+                      family: family,
                       household: household,
                       product: product,
                       is_active: true,
@@ -29,6 +30,7 @@ RSpec.describe HbxAdminHelper, :type => :helper do
 
   let(:hbx_inactive) do
     FactoryBot.create(:hbx_enrollment,
+                      family: family,
                       household: household,
                       product: product,
                       is_active: false,
@@ -40,6 +42,7 @@ RSpec.describe HbxAdminHelper, :type => :helper do
 
   let(:hbx_without_aptc) do
     FactoryBot.create(:hbx_enrollment,
+                      family: family,
                       household: household,
                       product: product,
                       is_active: true,
