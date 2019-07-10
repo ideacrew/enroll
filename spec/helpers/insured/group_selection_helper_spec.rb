@@ -214,11 +214,9 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
         sep.save
         sep
       }
-
       let!(:active_enrollment) do
         FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
                           household: family.active_household,
-                          family: family,
                           aasm_state: "coverage_selected",
                           kind: "employer_sponsored",
                           effective_on: predecessor_application.start_on,
@@ -232,7 +230,6 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
       let!(:renewal_enrollment) do
         FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
                           household: family.active_household,
-                          family: family,
                           aasm_state: "renewing_coverage_selected",
                           kind: "employer_sponsored",
                           effective_on: renewal_application.start_on,

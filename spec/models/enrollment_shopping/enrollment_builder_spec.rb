@@ -204,9 +204,7 @@ RSpec.describe EnrollmentShopping::EnrollmentBuilder, dbclean: :around_each do
         let(:build_product_package) { coverage_kind == "health" ? product_package : dental_product_package }
 
         let!(:previous_enrollment) {
-          FactoryBot.create(
-            :hbx_enrollment,
-            family: family,
+          FactoryBot.create(:hbx_enrollment,
             household: family.active_household,
             coverage_kind: coverage_kind,
             effective_on: enrollment_effective_date,

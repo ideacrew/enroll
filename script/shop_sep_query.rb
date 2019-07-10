@@ -18,9 +18,22 @@ end
 
 enrollment_kinds = ["employer_sponsored", "employer_sponsored_cobra"]
 
-purchase_ids = HbxEnrollment.collection.aggregate([
+purchase_ids = Family.collection.aggregate([
   {"$match" => {
-    "workflow_state_transitions" => {
+    "households.hbx_enrollments.workflow_state_transitions" => {
+      "$elemMatch" => {
+        "to_state" => {"$in" => ["coverage_selected", "auto_renewing"]},
+        "transition_at" => {
+           "$gte" => start_time,
+           "$lt" => end_time
+        }
+      }
+    }
+  }},
+  {"$unwind" => "$households"},
+  {"$unwind" => "$households.hbx_enrollments"},
+  {"$match" => {
+    "households.hbx_enrollments.workflow_state_transitions" => {
       "$elemMatch" => {
         "to_state" => {"$in" => ["coverage_selected", "auto_renewing"]},
         "transition_at" => {
@@ -29,16 +42,29 @@ purchase_ids = HbxEnrollment.collection.aggregate([
         }
       }
     },
-    "kind" => {"$in" => enrollment_kinds},
-    "sponsored_benefit_id" => {"$ne" => nil},
-    "sponsored_benefit_package_id" => {"$ne" => nil}
+    "households.hbx_enrollments.kind" => {"$in" => enrollment_kinds},
+    "households.hbx_enrollments.sponsored_benefit_id" => {"$ne" => nil},
+    "households.hbx_enrollments.sponsored_benefit_package_id" => {"$ne" => nil}
   }},
-  {"$group" => {"_id" => "$hbx_id"}}
+  {"$group" => {"_id" => "$households.hbx_enrollments.hbx_id"}}
 ]).map { |rec| rec["_id"] }
 
-term_ids = HbxEnrollment.collection.aggregate([
+term_ids = Family.collection.aggregate([
   {"$match" => {
-    "workflow_state_transitions" => {
+    "households.hbx_enrollments.workflow_state_transitions" => {
+      "$elemMatch" => {
+        "to_state" => {"$in" => ["coverage_terminated","coverage_canceled", "coverage_termination_pending"]},
+        "transition_at" => {
+           "$gte" => start_time,
+           "$lt" => end_time
+        }
+      }
+    }
+  }},
+  {"$unwind" => "$households"},
+  {"$unwind" => "$households.hbx_enrollments"},
+  {"$match" => {
+    "households.hbx_enrollments.workflow_state_transitions" => {
       "$elemMatch" => {
         "to_state" => {"$in" => ["coverage_terminated","coverage_canceled", "coverage_termination_pending"]},
         "transition_at" => {
@@ -47,11 +73,11 @@ term_ids = HbxEnrollment.collection.aggregate([
         }
       }
     },
-    "kind" => {"$in" => enrollment_kinds},
-    "sponsored_benefit_id" => {"$ne" => nil},
-    "sponsored_benefit_package_id" => {"$ne" => nil}
+    "households.hbx_enrollments.kind" => {"$in" => enrollment_kinds},
+    "households.hbx_enrollments.sponsored_benefit_id" => {"$ne" => nil},
+    "households.hbx_enrollments.sponsored_benefit_package_id" => {"$ne" => nil}
   }},
-  {"$group" => {"_id" => "$hbx_id"}}
+  {"$group" => {"_id" => "$households.hbx_enrollments.hbx_id"}}
 ]).map { |rec| rec["_id"] }
 
 def is_valid_benefit_application?(benefit_application)
@@ -79,39 +105,46 @@ end
 puts purchase_ids.length unless Rails.env.test?
 puts term_ids.length unless Rails.env.test?
 
+purchase_families = Family.where("households.hbx_enrollments.hbx_id" => {"$in" => purchase_ids})
+
 Rails.logger.info "-----purchased families #{purchase_ids}"
-purchase_ids.each do |hbx_id|
-  purchase =  HbxEnrollment.where(hbx_id: hbx_id ).first
-  purchased_at = purchase.workflow_state_transitions.where({
-    "to_state" => {"$in" => ["coverage_selected", "auto_renewing"]},
-    "transition_at" => {
-      "$gte" => start_time,
-      "$lt" => end_time
-    }
-  }).first.transition_at
+purchase_families.each do |fam|
+  purchases = fam.households.flat_map(&:hbx_enrollments).select { |en| purchase_ids.include?(en.hbx_id) }
+  purchases.each do |purchase|
+    purchased_at = purchase.workflow_state_transitions.where({
+      "to_state" => {"$in" => ["coverage_selected", "auto_renewing"]},
+      "transition_at" => {
+        "$gte" => start_time,
+        "$lt" => end_time
+      }
+    }).first.transition_at
 
     Rails.logger.info "---processing #{purchase.hbx_id}---#{purchased_at}---#{Time.now}"
-  if can_publish_enrollment?(purchase, purchased_at)
-    Rails.logger.info "-----publishing #{purchase.hbx_id}"
-    ShopEnrollmentsPublisher.publish_action( "acapi.info.events.hbx_enrollment.coverage_selected",
-                   purchase.hbx_id,
-                   "urn:openhbx:terms:v1:enrollment#initial")
+    if can_publish_enrollment?(purchase, purchased_at)
+      Rails.logger.info "-----publishing #{purchase.hbx_id}"
+      ShopEnrollmentsPublisher.publish_action( "acapi.info.events.hbx_enrollment.coverage_selected",
+                     purchase.hbx_id,
+                     "urn:openhbx:terms:v1:enrollment#initial")
+    end
   end
 end
 
-term_ids.each do |hbx_id|
-  term =  HbxEnrollment.where(hbx_id: hbx_id ).first
-  terminated_at = term.workflow_state_transitions.where({
-    "to_state" => {"$in" => term_states},
-    "transition_at" => {
-      "$gte" => start_time,
-      "$lt" => end_time
-    }
-  }).first.transition_at
+term_families = Family.where("households.hbx_enrollments.hbx_id" => {"$in" => term_ids})
+term_families.each do |fam|
+  terms = fam.households.flat_map(&:hbx_enrollments).select { |en| term_ids.include?(en.hbx_id) }
+  terms.each do |term|
+    terminated_at = term.workflow_state_transitions.where({
+      "to_state" => {"$in" => term_states},
+      "transition_at" => {
+        "$gte" => start_time,
+        "$lt" => end_time
+      }
+    }).first.transition_at
 
-  if can_publish_enrollment?(term, terminated_at)
-    ShopEnrollmentsPublisher.publish_action( "acapi.info.events.hbx_enrollment.terminated",
-                   term.hbx_id,
-                   "urn:openhbx:terms:v1:enrollment#terminate_enrollment")
+    if can_publish_enrollment?(term, terminated_at)
+      ShopEnrollmentsPublisher.publish_action( "acapi.info.events.hbx_enrollment.terminated",
+                     term.hbx_id,
+                     "urn:openhbx:terms:v1:enrollment#terminate_enrollment")
+    end
   end
 end

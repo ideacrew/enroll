@@ -11,22 +11,28 @@ class FixIsSubscriberForResponsiblePartyEnrollments < MongoidMigrationTask
   private
 
   def invalid_is_subscriber_enrollment_ids
-    HbxEnrollment.collection.aggregate(
+    Family.collection.aggregate(
       [
+        {'$unwind' => '$households'},
+        {'$unwind' => '$households.hbx_enrollments'},
+        {'$unwind' => '$households.hbx_enrollments.hbx_enrollment_members'},
         {'$match' => {
-          'hbx_enrollment_members' => {'$ne' => nil},
-          'external_enrollment' => {'$ne' => true}
+          'households.hbx_enrollments' => {'$ne' => nil}
         }},
         {'$match' => {
-          'aasm_state' => {'$ne' => 'shopping'}
+          'households.hbx_enrollments.hbx_enrollment_members' => {'$ne' => nil},
+          'households.hbx_enrollments.external_enrollment' => {'$ne' => true}
         }},
         {'$match' => {
-          'plan_id' => {'$ne' => nil},
-          'aasm_state' => {'$nin' => ['shopping', 'inactive', 'coverage_canceled', 'coverage_terminated']}
+          'households.hbx_enrollments.aasm_state' => {'$ne' => 'shopping'}
+        }},
+        {'$match' => {
+          'households.hbx_enrollments.plan_id' => {'$ne' => nil},
+          'households.hbx_enrollments.aasm_state' => {'$nin' => ['shopping', 'inactive', 'coverage_canceled', 'coverage_terminated']}
         }},
         {'$group' => {
-          '_id' => '$_id',
-          'max_hbx_enrollment_member' => {'$max' => '$hbx_enrollment_members.is_subscriber'}
+          '_id' => '$households.hbx_enrollments._id',
+          'max_hbx_enrollment_member' => {'$max' => '$households.hbx_enrollments.hbx_enrollment_members.is_subscriber'}
         }},
         {'$match' => {
           'max_hbx_enrollment_member' => false

@@ -13,7 +13,6 @@ module CensusEmployeeWorld
       :hbx_enrollment, 
       :with_enrollment_members,
       *traits,
-      family: attributes[:family],
       household: attributes[:household],
       benefit_group_assignment: attributes[:benefit_group_assignment],
       employee_role: attributes[:employee_role],
@@ -229,7 +228,6 @@ And(/(.*) has active coverage and passive renewal/) do |named_person|
   person_rec = Person.where(first_name: /#{person[:first_name]}/i, last_name: /#{person[:last_name]}/i).first
   benefit_package = ce.active_benefit_group_assignment.benefit_package
   active_enrollment = FactoryBot.create(:hbx_enrollment,
-                                         family: person_rec.primary_family,
                                          household: person_rec.primary_family.active_household,
                                          coverage_kind: "health",
                                          effective_on: benefit_package.start_on,
@@ -281,9 +279,9 @@ And(/^employees for (.*?) have a selected coverage$/) do |legal_name|
   coverage_household = person.primary_family.households.first
   rating_area_id =  benefit_package.benefit_application.recorded_rating_area_id
   sponsored_benefit_id = benefit_package.sponsored_benefits.first.id
+
   build_enrollment({household: coverage_household,
                     benefit_group_assignment: bga,
-                    family:person.primary_family,
                     employee_role: @census_employees.first.employee_role,
                     sponsored_benefit_package_id: benefit_package.id,
                     rating_area_id: rating_area_id,
@@ -304,7 +302,6 @@ And(/^employer (.*?) with employee (.*?) is under open enrollment$/) do |legal_n
 
   build_enrollment({household: coverage_household,
                     benefit_group_assignment: bga,
-                    family: @person_family_record,
                     employee_role: @census_employees.first.employee_role,
                     sponsored_benefit_package_id: benefit_package.id,
                     rating_area_id: rating_area_id,
@@ -322,7 +319,6 @@ And(/^employer (.*?) with employee (.*?) has hbx_enrollment with health product$
   sponsored_benefit_id = benefit_package.sponsored_benefits.first.id
   build_enrollment({household: coverage_household,
                     benefit_group_assignment: bga,
-                    family: person_record.families.first,
                     employee_role: @census_employees.first.employee_role,
                     sponsored_benefit_package_id: benefit_package.id,
                     rating_area_id: rating_area_id,
@@ -342,7 +338,6 @@ And(/^employer (.*?) with employee (.*?) has (.*?) hbx_enrollment with health pr
   census_employee = CensusEmployee.where(first_name: person[:first_name], last_name: person[:last_name]).first
   attributes = {}
   attributes[:household] = person_record.families.first.households.first
-  attributes[:family]  = person_record.families.first
   attributes[:benefit_group_assignment] = census_employee.active_benefit_group_assignment
   attributes[:employee_role] = @employer_staff_role #census_employee.employee_role
   # Will return the proper package if optional enrollment type arugmenet is set

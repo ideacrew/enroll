@@ -19,9 +19,22 @@ end
 enrollment_kinds = %w(employer_sponsored employer_sponsored_cobra)
 active_statuses = %w[coverage_selected auto_renewing unverified]
 
-purchases = HbxEnrollment.collection.aggregate([
+purchases = Family.collection.aggregate([
   {"$match" => {
-    "workflow_state_transitions" => {
+    "households.hbx_enrollments.workflow_state_transitions" => {
+      "$elemMatch" => {
+        "to_state" => {"$in" => active_statuses},
+        "transition_at" => {
+           "$gte" => start_time,
+           "$lt" => end_time
+        }
+      }
+    }
+  }},
+  {"$unwind" => "$households"},
+  {"$unwind" => "$households.hbx_enrollments"},
+  {"$match" => {
+    "households.hbx_enrollments.workflow_state_transitions" => {
       "$elemMatch" => {
         "to_state" => {"$in" => active_statuses},
         "transition_at" => {
@@ -30,11 +43,11 @@ purchases = HbxEnrollment.collection.aggregate([
         }
       }
     },
-    "kind" => {"$nin" => enrollment_kinds}
+    "households.hbx_enrollments.kind" => {"$nin" => enrollment_kinds}
   }},
   {"$group" => {
-    "_id" => "$hbx_id",
-    "enrollment_state" => {"$last" => "$aasm_state"}
+    "_id" => "$households.hbx_enrollments.hbx_id",
+    "enrollment_state" => {"$last" => "$households.hbx_enrollments.aasm_state"}
   }},
   {"$project" => {
     "_id" => 1,
@@ -42,9 +55,22 @@ purchases = HbxEnrollment.collection.aggregate([
   }}
 ])
 
-terms = HbxEnrollment.collection.aggregate([
+terms = Family.collection.aggregate([
   {"$match" => {
-    "workflow_state_transitions" => {
+    "households.hbx_enrollments.workflow_state_transitions" => {
+      "$elemMatch" => {
+        "to_state" => {"$in" => ["coverage_terminated","coverage_canceled"]},
+        "transition_at" => {
+           "$gte" => start_time,
+           "$lt" => end_time
+        }
+      }
+    }
+  }},
+  {"$unwind" => "$households"},
+  {"$unwind" => "$households.hbx_enrollments"},
+  {"$match" => {
+    "households.hbx_enrollments.workflow_state_transitions" => {
       "$elemMatch" => {
         "to_state" => {"$in" => ["coverage_terminated","coverage_canceled"]},
         "transition_at" => {
@@ -53,9 +79,9 @@ terms = HbxEnrollment.collection.aggregate([
         }
       }
     },
-    "kind" => {"$nin" => enrollment_kinds}
+    "households.hbx_enrollments.kind" => {"$nin" => enrollment_kinds}
   }},
-  {"$group" => {"_id" => "$hbx_id"}}
+  {"$group" => {"_id" => "$households.hbx_enrollments.hbx_id"}}
 ])
 
 puts purchases.count

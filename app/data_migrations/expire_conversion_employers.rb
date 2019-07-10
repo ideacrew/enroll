@@ -62,6 +62,10 @@ class ExpireConversionEmployers < MongoidMigrationTask
 
   def plan_year_enrollments(plan_year)
     id_list = plan_year.benefit_groups.collect(&:_id).uniq
-    HbxEnrollment.where(:benefit_group_id.in => id_list).enrolled_and_renewal.to_a
+
+    families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list)
+    families.inject([]) do |enrollments, family|
+      enrollments += family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).enrolled_and_renewal.to_a
+    end
   end
 end

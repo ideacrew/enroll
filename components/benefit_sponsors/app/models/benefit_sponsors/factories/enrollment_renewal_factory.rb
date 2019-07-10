@@ -27,7 +27,6 @@ module BenefitSponsors
         @renewal_enrollment = BenefitSponsors::Enrollments::EnrollmentBuilder.build do |builder|
 
           builder.init_enrollment(@base_enrollment.household)
-          builder.set_family(@base_enrollment.household)
           builder.set_effective_on(new_benefit_group_assignment.start_on)
           builder.set_kind(base_enrollment.kind)
           builder.set_coverage_kind(base_enrollment.coverage_kind)
@@ -47,6 +46,7 @@ module BenefitSponsors
             builder.set_as_renew_enrollment
           end
         end
+
         @renewal_enrollment.hbx_enrollment_members = cloned_enrollment_members
         finalize_hbx_enrollment_members
       end

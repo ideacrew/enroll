@@ -83,10 +83,12 @@ class TerminatedHbxEnrollments < MongoidMigrationTask
   end
 
   def get_families
-    Family.where(:'id'.in => HbxEnrollment.where({'$or'=>
-                [{:"aasm_state" => "coverage_terminated"},
-                {:"aasm_state" => "coverage_termination_pending"}],
-                "workflow_state_transitions.transition_at" => date_of_termination}).map(&:family_id))
+    Family.where(:"households.hbx_enrollments" =>
+                     {:$elemMatch =>
+                          {'$or'=>
+                               [{:"aasm_state" => "coverage_terminated"},
+                                {:"aasm_state" => "coverage_termination_pending"}],
+                           "workflow_state_transitions.transition_at" => date_of_termination}})
   end
 
   def date_of_termination

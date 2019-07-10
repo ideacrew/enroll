@@ -16,8 +16,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeWaiverConfirmation', dbcle
   
   let!(:model_instance) { 
     hbx_enrollment = FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product, 
-                        household: family.active_household,
-                        family: family,
+                        household: family.active_household, 
                         aasm_state: "coverage_selected",
                         effective_on: initial_application.start_on,
                         kind: "employer_sponsored",
