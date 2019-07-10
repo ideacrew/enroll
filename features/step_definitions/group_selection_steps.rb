@@ -273,6 +273,11 @@ Then(/(.*) should see the enrollment with (.*) button/) do |_role, button_text|
   expect(page).to have_link(button_text.titleize)
 end
 
+Then(/(.*) should see the enrollment with (.*) button/) do |_role, button_text|
+  expect(page).to have_content "#{(current_effective_date || TimeKeeper.date_of_record).year} HEALTH COVERAGE"
+  expect(page).to have_link(button_text.titleize)
+end
+
 Then(/(.*) should see the dental enrollment with make changes button/) do |role|
   if role == "employee"
     expect(page).to have_content "#{(current_effective_date || TimeKeeper.date_of_record).year} DENTAL COVERAGE"
@@ -508,6 +513,19 @@ end
 
 When(/consumer's health enrollment has an effective date in the future/) do
   Family.all.first.all_enrollments.first.update_attributes(effective_on: TimeKeeper.date_of_record + 20)
+  @family.all_enrollments.first.aasm_state == 'coverage_terminated'
+end
+
+Given(/(.*) has an employee role/) do |_role|
+  FactoryBot.create(:employee_role, person: @family.primary_person)
+end
+
+Given(/(.*) has a resident role/) do |_role|
+  FactoryBot.create(:resident_role_object, person: @family.primary_person)
+end
+
+When(/consumer's health enrollment has an effective date in the future/) do
+  @family.all_enrollments.first.update_attributes(effective_on: TimeKeeper.date_of_record + 20)
 end
 
 Then(/(.*) should not see the calender/) do |_role|
