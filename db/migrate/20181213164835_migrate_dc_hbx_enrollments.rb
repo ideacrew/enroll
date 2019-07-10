@@ -207,6 +207,7 @@ class MigrateDcHbxEnrollments < Mongoid::Migration
     end
 
     say_with_time("Update enrollment with benefit application reference's ") do
+      HbxEnrollment.create_indexes
       @benefit_app_hash.each do |benefit_hash|
         HbxEnrollment.where(benefit_group_id: benefit_hash[0], coverage_kind: 'health').
             update_all(benefit_sponsorship_id: benefit_hash[1]['benefit_sponsorship_id'],
