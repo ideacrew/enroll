@@ -430,6 +430,7 @@ Then(/^(?:.+) should be logged on as an unlinked employee$/) do
 end
 
 When (/^(.*) logs? out$/) do |someone|
+  find_link('Logout', wait: 1)
   click_link "Logout"
   visit "/"
   find('.container.welcome', wait: 5) do |element|

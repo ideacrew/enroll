@@ -50,10 +50,10 @@ module BenefitApplicationWorld
 
   def application_dates_for(effective_date, aasm_state)
     oe_period = if effective_date >= TimeKeeper.date_of_record
-      TimeKeeper.date_of_record.beginning_of_month..(effective_date.prev_month + 20.days)
-    else
-      effective_date.prev_month..(effective_date.prev_month + 20.days)
-    end
+                  TimeKeeper.date_of_record.beginning_of_month..(effective_date.prev_month + Settings.aca.shop_market.open_enrollment.monthly_end_on - 1.day)
+                else
+                  effective_date.prev_month..(effective_date.prev_month + Settings.aca.shop_market.open_enrollment.monthly_end_on - 1.day)
+                end
 
     {
       effective_period: effective_date..effective_date.next_year.prev_day,
