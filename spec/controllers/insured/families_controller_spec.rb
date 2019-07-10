@@ -43,7 +43,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
   let(:hbx_enrollments) { double("HbxEnrollment") }
   let(:user) { FactoryBot.create(:user) }
-  let(:person) { double("Person", id: "test", addresses: [], no_dc_address: false, no_dc_address_reason: "" , is_consumer_role_active?: false, has_active_employee_role?: true) }
+  let(:person) { double("Person", id: "test", addresses: [], no_dc_address: false, no_dc_address_reason: "" , is_consumer_role_active?: false, has_active_employee_role?: true, has_multiple_roles?: false) }
   let(:family) { instance_double(Family, active_household: household, :model_name => "Family") }
   let(:household) { double("HouseHold", hbx_enrollments: hbx_enrollments) }
   let(:addresses) { [double] }
@@ -55,6 +55,37 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   # let(:coverage_wavied) { double("CoverageWavied") }
   let(:qle) { FactoryBot.create(:qualifying_life_event_kind, pre_event_sep_in_days: 30, post_event_sep_in_days: 0) }
   let(:sep) { double("SpecialEnrollmentPeriod") }
+
+  describe "GET home variables" do
+   context "HBX admin variables to show all enrollments" do
+      let(:user_with_hbx_staff_role) { FactoryBot.create(:user, :with_family, :with_hbx_staff_role) }
+      let(:consumer_person) { FactoryBot.create(:person, :with_consumer_role) }
+      let(:testing_family) { FactoryBot.create(:family, :with_primary_family_member, person: consumer_person) }
+      let(:testing_enrollments) do
+        5.times do
+          instance_double("HbxEnrollment", family_id: testing_family.id)
+        end
+      end
+      let(:consumer_role) { double("ConsumerRole", bookmark_url: "/families/home") }
+
+      it "should assign all_hbx_enrollments_for_admin variable if hbx admin user" do
+        testing_family.stub_chain('primary_applicant.person_id').and_return(user_with_hbx_staff_role.person.id)
+        sign_in(user_with_hbx_staff_role)
+        get :home, params: {:family => testing_family.id.to_s}
+        expect(assigns.keys).to include("all_hbx_enrollments_for_admin")
+      end
+
+       it "should not assign all_hbx_enrollments_for_admin for non hbx admin user" do
+        testing_family.stub_chain('primary_applicant.person_id').and_return(user.person.id)
+        allow_any_instance_of(Person).to receive(:has_multiple_roles?).and_return(false)
+
+        allow(testing_family).to receive(:person).and_return(user.person)
+        sign_in(user)
+        get :home, params: {:family => testing_family.id.to_s}
+        expect(assigns.keys).to_not include("all_hbx_enrollments_for_admin")
+      end
+    end
+  end
 
 
   before :each do
@@ -103,22 +134,6 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       allow(hbx_enrollments).to receive(:compact).and_return(hbx_enrollments)
 
       session[:portal] = "insured/families"
-    end
-
-    context "HBX admin variables to show all enrollments" do
-      let(:user_with_hbx_staff_role) { FactoryGirl.create(:user, :with_family, :with_hbx_staff_role) }
-
-      it "should assign all_hbx_enrollments_for_admin variable if hbx admin user" do
-        sign_in(user_with_hbx_staff_role)
-        get :home, {:family => family.id.to_s}
-        expect(assigns.keys).to include("all_hbx_enrollments_for_admin")
-      end
-
-       it "should not assign all_hbx_enrollments_for_admin for non hbx admin user" do
-        sign_in(user)
-        get :home, {:family => family.id.to_s}
-        expect(assigns.keys).to_not include("all_hbx_enrollments_for_admin")
-      end
     end
 
     context "#check_for_address_info" do
