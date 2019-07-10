@@ -20,13 +20,6 @@ module BenefitSponsors
       attribute :working_hours do
         'N/A'
       end
-
-      attribute :actions_menu_items do |issuer_profile|
-        {
-          "issuer_id": issuer_profile.id
-        }
-      end
-
     end
   end
 end

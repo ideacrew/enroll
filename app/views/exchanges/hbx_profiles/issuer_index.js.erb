@@ -19,22 +19,5 @@ var table = $('#issuers-ajax-dt').DataTable( {
     { "data": "attributes.email" },
     { "data": "attributes.working_hours" },
     // Builds Actions Menu
-    { "data": null,
-      "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-        $(nTd).html(buildDropDownMenu(sData));
-      }
-    }
   ]
 });
-
-function buildDropDownMenu(sData) {
-  var benefit_sponsor_id = sData['id'];
-  return `<div class="btn-group">
-            <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Actions
-            </button>
-            <ul class="dropdown-menu">
-              <li><a>Plans</a></li>
-            </ul>
-          </div>`
-}
