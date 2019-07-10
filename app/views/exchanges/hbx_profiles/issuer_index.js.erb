@@ -1,1 +1,40 @@
 set_tab_content("<%= escape_javascript render "issuer_index"%>")
+
+var table = $('#issuers-ajax-dt').DataTable( {
+  "ajax": {
+    "url": "/exchanges/hbx_profiles/issuer_index",
+    "dataSrc": "data"
+  },
+  "type": "get",
+  "ordering": false,
+  "deferRender": true,
+  // Call back event when table renders
+  "drawCallback": function() {
+  },
+  // Creates a custom toolbar
+  "dom": '<"toolbar">frtip',
+  "columns": [
+    { "data": "attributes.legal_name" },
+    { "data": "attributes.phone" },
+    { "data": "attributes.email" },
+    { "data": "attributes.working_hours" },
+    // Builds Actions Menu
+    { "data": null,
+      "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+        $(nTd).html(buildDropDownMenu(sData));
+      }
+    }
+  ]
+});
+
+function buildDropDownMenu(sData) {
+  var benefit_sponsor_id = sData['id'];
+  return `<div class="btn-group">
+            <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Actions
+            </button>
+            <ul class="dropdown-menu">
+              <li><a>Plans</a></li>
+            </ul>
+          </div>`
+}

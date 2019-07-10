@@ -497,10 +497,12 @@ def employer_poc
   end
 
   def issuer_index
-    @issuers = CarrierProfile.all
-
+    issuers = ::BenefitSponsors::Services::IssuerDataTableService.new
+    table_data = issuers.retrieve_table_data
+    @data = ::BenefitSponsors::Serializers::IssuerDatatableSerializer.new(table_data).serialized_json
     respond_to do |format|
-      format.html { render "exchanges/hbx_profiles/issuer_index.html.slim" }
+      format.js
+      format.json { render json: @data }
     end
   end
 

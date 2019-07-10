@@ -419,6 +419,8 @@ GEM
       railties (>= 3.0.0)
     fakeredis (0.7.0)
       redis (>= 3.2, < 5.0)
+    fast_jsonapi (1.5)
+      activesupport (>= 4.2)
     ffi (1.9.25)
     forgery (0.7.0)
     gherkin (5.1.0)
@@ -873,6 +875,7 @@ DEPENDENCIES
   eye (= 0.8)
   factory_bot_rails (~> 4.11)
   fakeredis (~> 0.7.0)
+  fast_jsonapi
   forgery (~> 0.7.0)
   haml (~> 5.0)
   httparty (~> 0.16)
