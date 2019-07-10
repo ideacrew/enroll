@@ -180,15 +180,19 @@ class Insured::GroupSelectionController < ApplicationController
 
   def term_or_cancel
     hbx_enrollment = HbxEnrollment.find(params.require(:hbx_enrollment_id))
-    if params.require(:term_date)
-      term_date = Date.strptime(params.require(:term_date), '%m/%d/%Y')
-    else
-      term_date = TimeKeeper.date_of_record
-    end
+    term_date = params[:term_date].present? ? Date.strptime(params[:term_date], '%m/%d/%Y') : TimeKeeper.date_of_record
     hbx_enrollment.term_or_cancel_enrollment(hbx_enrollment, term_date)
     if params.require(:term_or_cancel) == 'cancel'
       transmit_flag = true
-      BulkActionsForAdmin.handle_edi_transmissions(params.require(:hbx_enrollment_id), transmit_flag)
+      notify(
+        "acapi.info.events.hbx_enrollment.terminated",
+        {
+          :reply_to => "#{Rails.application.config.acapi.hbx_id}.#{Rails.application.config.acapi.environment_name}.q.glue.enrollment_event_batch_handler",
+          "hbx_enrollment_id" => hbx_enrollment.hbx_id,
+          "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment",
+          "is_trading_partner_publishable" => transmit_flag
+        }
+      )
     end
     redirect_to family_account_path
   end
