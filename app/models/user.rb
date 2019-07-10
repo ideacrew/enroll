@@ -7,6 +7,7 @@ class User
   include Mongoid::Timestamps
   include Acapi::Notifiers
   include AuthorizationConcern
+  include Mongoid::History::Trackable
   include PermissionsConcern
   attr_accessor :login
 
@@ -15,7 +16,7 @@ class User
   validate :oim_id_rules
   validates :email,
    uniqueness: { :case_sensitive => false },
-   format: { with: Devise::email_regexp, allow_blank: true, message: "(optional) is invalid" }
+   format: { with: /\A[^@\s]+@([^@\s]+\.)+[^@\s]+\z/, allow_blank: true, message: "is invalid" }
 
   scope :datatable_search, ->(query) {
     search_regex = ::Regexp.compile(/.*#{query}.*/i)
@@ -88,10 +89,21 @@ class User
   index({oim_id: 1}, {sparse: true, unique: true})
   index({created_at: 1 })
 
+  track_history :on => [:oim_id, :email],
+                :modifier_field => :modifier,
+                :modifier_field_optional => true,
+                :version_field => :tracking_version,
+                :track_create  => true,
+                :track_update  => true,
+                :track_destroy => true
+
   before_save :strip_empty_fields
 
   # Enable polymorphic associations
   belongs_to :profile, polymorphic: true, optional: true
+
+  has_one :person, inverse_of: :user
+  accepts_nested_attributes_for :person, :allow_destroy => true
 
   attr_accessor :invitation_id
   #  validate :ensure_valid_invitation, :on => :create

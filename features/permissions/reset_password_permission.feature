@@ -1,3 +1,4 @@
+@ma_only
 Feature: Only HBX Staff will be able to see & access the Reset Password Feature.
 
   Background: Setup site, employer, benefit application and active employee

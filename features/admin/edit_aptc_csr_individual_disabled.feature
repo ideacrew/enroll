@@ -1,4 +1,4 @@
-@wip
+@ma_only
 Feature: Update APTC and CSR
     In order to update APTC and CSR
     User should have the role of an admin

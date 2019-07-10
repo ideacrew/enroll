@@ -6,6 +6,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   include ::SepAll
   include ::Config::AcaHelper
 
+  before_action :permit_params, only: [:family_index_dt]
   before_action :modify_admin_tabs?, only: [:binder_paid, :transmit_group_xml]
   before_action :check_hbx_staff_role, except: [:request_help, :configuration, :show, :assister_index, :family_index, :update_cancel_enrollment, :update_terminate_enrollment, :identity_verification]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
@@ -297,20 +298,12 @@ def employer_poc
 
   def family_index_dt
     @selector = params[:scopes][:selector] if params[:scopes].present?
-    @datatable = Effective::Datatables::FamilyDataTable.new(params[:scopes])
+    @datatable = Effective::Datatables::FamilyDataTable.new(params[:scopes].to_h)
     #render '/exchanges/hbx_profiles/family_index_datatable'
   end
 
   def identity_verification
     @datatable = Effective::Datatables::IdentityVerificationDataTable.new(params[:scopes])
-  end
-
-  def identity_verification
-    @datatable = Effective::Datatables::IdentityVerificationDataTable.new(params[:scopes])
-  end
-
-  def user_account_index
-    @datatable = Effective::Datatables::UserAccountDatatable.new
   end
 
   def user_account_index
@@ -701,6 +694,10 @@ def employer_poc
   end
 
 private
+
+  def permit_params
+    params.permit!
+  end
 
   def benefit_application_error_messages(obj)
     obj.errors.full_messages.collect { |error| "<li>#{error}</li>".html_safe }

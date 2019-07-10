@@ -19,28 +19,29 @@ class Person
   # verification history tracking
   include Mongoid::History::Trackable
 
-  # track_history :on => [:first_name,
-  #                       :middle_name,
-  #                       :last_name,
-  #                       :full_name,
-  #                       :alternate_name,
-  #                       :encrypted_ssn,
-  #                       :dob,
-  #                       :gender,
-  #                       :is_incarcerated,
-  #                       :is_disabled,
-  #                       :ethnicity,
-  #                       :race,
-  #                       :tribal_id,
-  #                       :no_dc_address,
-  #                       :no_dc_address_reason,
-  #                       :is_active,
-  #                       :no_ssn],
-  #               :modifier_field => :modifier,
-  #               :version_field => :tracking_version,
-  #               :track_create  => true,    # track document creation, default is false
-  #               :track_update  => true,    # track document updates, default is true
-  #               :track_destroy => true     # track document destruction, default is false
+  track_history :on => [:first_name,
+                        :middle_name,
+                        :last_name,
+                        :full_name,
+                        :alternate_name,
+                        :encrypted_ssn,
+                        :dob,
+                        :gender,
+                        :is_incarcerated,
+                        :is_disabled,
+                        :ethnicity,
+                        :race,
+                        :tribal_id,
+                        :no_dc_address,
+                        :no_dc_address_reason,
+                        :is_active,
+                        :no_ssn],
+                :modifier_field => :modifier,
+                :modifier_field_optional => true,
+                :version_field => :tracking_version,
+                :track_create  => true,    # track document creation, default is false
+                :track_update  => true,    # track document updates, default is true
+                :track_destroy => true     # track document destruction, default is false
 
 
   extend Mongorder
@@ -97,7 +98,7 @@ class Person
   delegate :is_applying_coverage, to: :consumer_role, allow_nil: true
 
   # Login account
-  belongs_to :user, optional: true
+  belongs_to :user, inverse_of: :person, optional: true
 
   belongs_to :employer_contact,
                 class_name: "EmployerProfile",
@@ -1071,11 +1072,11 @@ class Person
   end
 
   def consumer_fields_validations
-    if @is_consumer_role.to_s == "true" #&& consumer_role.is_applying_coverage.to_s == "true" #only check this for consumer flow.
-      citizenship_validation
-      native_american_validation
-      incarceration_validation
-    end
+    return unless @is_consumer_role.to_s == 'true' && consumer_role.is_applying_coverage.to_s == 'true' #only check this for consumer flow.
+
+    citizenship_validation
+    native_american_validation
+    incarceration_validation
   end
 
   def native_american_validation
