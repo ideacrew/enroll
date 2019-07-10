@@ -755,7 +755,11 @@ describe BenefitGroup, type: :model, dbclean: :after_each do
     let!(:employer_group_size_rating_factor_set) { create(:employer_group_size_rating_factor_set, carrier_profile: carrier_profile_one, rating_factor_entries: [carrier_one_size_3, carrier_one_size_6, carrier_one_size_10], max_integer_factor_key: 10)}
     let!(:census_employees) { (1..number_of_employees).map { |em| build(:census_employee, expected_selection: 'enroll') } }
 
-    context "group_size_factor_for" do
+    context "group_size_factor_for, for complex models" do
+      before :each do
+        allow(benefit_group).to receive(:use_simple_employer_calculation_model?).and_return(false)
+      end
+
       context "with small groups" do
         let(:number_of_employees) { 3 }
 
