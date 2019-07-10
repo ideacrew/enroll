@@ -67,7 +67,7 @@ class IvlNotices::IvlBacklogVerificationNoticeUqhp < IvlNotice
   def append_unverified_individuals(people)
     people.each do |person|
       person.consumer_role.outstanding_verification_types.each do |verification_type|
-        case verification_type
+        case verification_type.type_name
           when "Social Security Number"
             notice.ssa_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
           when "Immigration status"

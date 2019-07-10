@@ -77,7 +77,7 @@
     </div>
   </div>
 <% else %>
-  <% metal_levels = ::Plan::REFERENCE_PLAN_METAL_LEVELS %>
+  <% metal_levels = ::Plan::REFERENCE_PLAN_METAL_LEVELS_NO_DENTAL %>
   <% if check_plan_options_title %>
       <% metal_levels = enabled_metal_levels_for_single_carrier - ['dental'] %>
   <% end %>

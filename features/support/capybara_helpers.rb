@@ -19,6 +19,10 @@ module CapybaraHelpers
   def finished_all_ajax_requests?
     page.evaluate_script('jQuery.active').zero?
   end
+
+  def click_outside_datepicker(text_outside_datepicker)
+    page.find(:xpath, "//*[text()='#{text_outside_datepicker}']").click
+  end
 end
 
 World(CapybaraHelpers)
