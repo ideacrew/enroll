@@ -27,13 +27,13 @@ class CensusEmployeePolicy < ApplicationPolicy
       return true if @user.person.employer_staff_roles.map(&:employer_profile_id).map(&:to_s).include? @record.employer_profile_id.to_s     
     end  
     if @user.has_role?(:general_agency_staff) || @user.has_general_agency_staff_role?
-      @ga_id = @user.person.general_agency_staff_roles.last.general_agency_profile.id
+      ga_id = @user.person.general_agency_staff_roles.last.general_agency_profile.id
       employer_id = @record.employer_profile.id
       return false if ga_id.nil? || employer_id.nil?
       plan_design_organizations = SponsoredBenefits::Organizations::PlanDesignOrganization.find_by_sponsor(employer_id)
       plan_design_organizations.each do |a|
           if !a.general_agency_profile.nil?
-            return true if a.general_agency_profile.id == @ga_id
+            return true if a.general_agency_profile.id == ga_id
           end
       end
       return false
