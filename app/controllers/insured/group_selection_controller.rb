@@ -167,7 +167,11 @@ class Insured::GroupSelectionController < ApplicationController
 
   def term_or_cancel
     hbx_enrollment = HbxEnrollment.find(params.require(:hbx_enrollment_id))
-    term_date = Date.strptime(params.require(:term_date), '%m/%d/%Y')
+    if params.require(:term_date)
+      term_date = Date.strptime(params.require(:term_date), '%m/%d/%Y')
+    else
+      term_date = TimeKeeper.date_of_record
+    end
     hbx_enrollment.term_or_cancel_enrollment(hbx_enrollment, term_date)
     if params.require(:term_or_cancel) == 'cancel'
       transmit_flag = true
