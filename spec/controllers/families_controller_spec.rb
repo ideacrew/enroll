@@ -36,7 +36,6 @@ RSpec.describe FamiliesController do
       subject.instance_eval{set_family}
       expect(person2.families.first).to eq(Family.find(params[:family]))
     end
-
   end
 
 end
