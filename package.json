@@ -66,7 +66,9 @@
   },
   "scripts": {
     "test": "jest",
-    "test-watch": "jest --watch"
+    "test-watch": "jest --watch",
+    "ng-test": "ng test",
+    "ng-test-watch": "ng test --watch"
   },
   "jest": {
     "testURL": "http://localhost",
