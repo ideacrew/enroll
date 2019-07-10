@@ -85,8 +85,8 @@
                   </div>
 
                   <div class="col-sm-4">
-                    <% if @sep || is_under_open_enrollment? %>
-                      <%= link_to 'Shop for Plans', insured_family_members_path(sep_id: @sep.id, qle_id: @sep.qualifying_life_event_kind_id), class: "btn btn-default btn-block"%>
+                    <% if @sep.qualifying_life_event_kind.market_kind == "individual" || @family.is_under_ivl_open_enrollment? %>
+                      <%= link_to 'Shop for Plans', insured_family_members_path(sep_id: @sep.id, qle_id: @sep.qualifying_life_event_kind_id, market_kind: "individual"), class: "btn btn-default btn-block"%>
                     <% end %>
                   </div>
                 </div>
