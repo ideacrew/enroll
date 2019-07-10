@@ -16,7 +16,7 @@ class User
   validate :oim_id_rules
   validates :email,
    uniqueness: { :case_sensitive => false },
-   format: { with: Devise::email_regexp, allow_blank: true, message: "(optional) is invalid" }
+   format: { with: /\A[^@\s]+@([^@\s]+\.)+[^@\s]+\z/, allow_blank: true, message: "is invalid" }
 
   scope :datatable_search, ->(query) {
     search_regex = ::Regexp.compile(/.*#{query}.*/i)
