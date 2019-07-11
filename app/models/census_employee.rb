@@ -38,6 +38,7 @@ class CensusEmployee < CensusMember
   include ::Eligibility::CensusEmployee
   include ::Eligibility::EmployeeBenefitPackages
   include BenefitSponsors::Concerns::Observable
+  include Insured::FamiliesHelper
   include BenefitSponsors::ModelEvents::CensusEmployee
   include Ssn
 
@@ -1179,11 +1180,8 @@ def self.to_csv
   # Pull expired enrollments as well
   def past_enrollments
     if employee_role.present?
-      employee_role.person.primary_family.active_household.hbx_enrollments.shop_market.enrolled_and_terminated.where(
-        {
-          :benefit_group_assignment_id.in => past_benefit_group_assignments.map(&:id)
-        }
-      )
+      enrollments = employee_role.person.primary_family.active_household.hbx_enrollments.shop_market.terminated
+      enrollments.select{|e| e.benefit_group_assignment.present? && e.benefit_group_assignment.census_employee == self && !enrollments_for_display.include?(e) && !e.void?}.sort_by { |enr| enrollment_coverage_end(enr)}.reverse
     end
   end
 
