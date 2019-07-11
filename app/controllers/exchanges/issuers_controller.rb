@@ -3,7 +3,6 @@
 module Exchanges
   class IssuersController < HbxProfilesController
     before_action :check_hbx_staff_role, only: [:index]
-    layout 'single_column'
 
     def index
       issuers = ::BenefitSponsors::Services::IssuerDataTableService.new
