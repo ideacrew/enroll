@@ -353,8 +353,8 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
     end
   end
 
-  describe ".add_employee_role" do
-    context "when employee has existing consumer_role" do
+  describe "dual role contact methods" do
+    context "add employee role to existing consumer_role" do
       let(:census_employee) {FactoryBot.create(:census_employee, employer_profile_id: employer_profile.id)}
       let(:existing_person) {FactoryBot.create(:person, :with_consumer_role, valid_person_params)}
       let(:employee) {FactoryBot.create(:employee_role, valid_employee_params.merge(person: existing_person, employer_profile: employer_profile))}
@@ -375,6 +375,38 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
       it "updates employee role contact method to match consumer role" do
         @employee_role, @family = Factories::EnrollmentFactory.add_employee_role(**params)
         expect(@employee_role.contact_method).to eq(existing_person.consumer_role.contact_method)
+      end
+    end
+
+    context "add consumer role to existing employee role" do
+      let(:existing_person) {FactoryBot.create(:person, :with_employee_role, valid_person_params)}
+      let(:is_incarcerated) {true}
+      let(:is_applicant) {true}
+      let(:is_state_resident) {true}
+      let(:citizen_status) {"us_citizen"}
+
+      let(:valid_consumer_params) do
+        { person: existing_person,
+          new_is_incarcerated: is_incarcerated,
+          new_is_applicant: is_applicant,
+          new_is_state_resident: is_state_resident,
+          new_ssn: ssn,
+          new_dob: dob,
+          new_gender: gender,
+          new_citizen_status: citizen_status }
+      end
+
+      let(:params) {valid_consumer_params}
+
+      before do
+        allow(existing_person).to receive(:active_employee_roles).and_return(existing_person.employee_roles)
+        allow(existing_person).to receive(:has_active_employee_role?).and_return(true)
+        existing_person.employee_roles.first.update_attributes(:contact_method => 'Paper Only')
+      end
+
+      it "should not raise" do
+        consumer_role = Factories::EnrollmentFactory.build_consumer_role(existing_person, params)
+        expect(consumer_role.contact_method).to eq(existing_person.employee_roles.first.contact_method)
       end
     end
   end
