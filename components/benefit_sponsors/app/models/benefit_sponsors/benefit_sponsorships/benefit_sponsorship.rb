@@ -239,6 +239,10 @@ module BenefitSponsors
       where(:profile_id => profile._id)
     }
 
+    scope :benefit_application_start_on_or_after, ->(start_on) {
+      where(:"benefit_applications.effective_period.min".gte => start_on)
+    }
+
     index({ hbx_id: 1 })
     index({ aasm_state: 1 })
     index({ profile_id: 1 })
