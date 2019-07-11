@@ -140,6 +140,7 @@ RSpec.describe GroupSelectionPrevaricationAdapter, dbclean: :after_each do
   end
 
   context 'set_mc_variables for coverall' do
+    let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product)}
     let!(:hbx_enrollment) do
       FactoryBot.create(:hbx_enrollment,
                         household: family.active_household,
@@ -148,7 +149,7 @@ RSpec.describe GroupSelectionPrevaricationAdapter, dbclean: :after_each do
                         effective_on: enrollment_effective_date,
                         enrollment_kind: 'special_enrollment',
                         kind: 'coverall',
-                        product: dental_product_package.products[0])
+                        product: product)
     end
 
     let(:group_selection_params) do
