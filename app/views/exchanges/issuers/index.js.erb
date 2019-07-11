@@ -23,5 +23,24 @@ var table = $('#issuers-ajax-dt').DataTable( {
     { "data": "attributes.email" },
     { "data": "attributes.working_hours" },
     // Builds Actions Menu
+    { "data": null,
+      "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+        $(nTd).html(buildDropDownMenu(sData));
+      }
+    }
   ]
 });
+
+// Actions Menu List Items
+function buildDropDownMenu(sData) {
+  var product_id = sData['id'];
+  return `<div class="btn-group">
+            <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Actions
+            </button>
+            <ul class="dropdown-menu">
+              <li><a href="javascript:void(0)" onclick="toAction(this)" data-product-id-id='${product_id}'>Edit Contacts</a></li>
+              <li><a href="javascript:void(0)" onclick="toAction(this)" data-product-id-id='${product_id}'>Edit SBC</a></li>
+            </ul>
+          </div>`
+}
