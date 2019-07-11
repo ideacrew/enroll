@@ -28,7 +28,7 @@ module BenefitSponsors
         delegate :url_helpers, to: :'Rails.application.routes'
 
         def products_url(object)
-          url_helpers.exchanges_issuer_products_path(object)
+          url_helpers.exchanges_issuer_products_path(object.issuer_profile.id)
         end
 
         # This needs to be updated once we start saving carrier contact info data in db.

@@ -1,8 +1,7 @@
 set_tab_content("<%= escape_javascript render "index"%>")
-
 var table = $('#products-ajax-dt').DataTable( {
   "ajax": {
-    "url": "/exchanges/issuers",
+    "url": "/exchanges/issuers/<%=params['issuer_id']%>/products" ,
     "dataSrc": "data"
   },
   "type": "get",
@@ -14,7 +13,12 @@ var table = $('#products-ajax-dt').DataTable( {
   // Creates a custom toolbar
   "dom": '<"toolbar">frtip',
   "columns": [
-    { "data": "attributes.email" },
+    { "data": "attributes.name" },
+    { "data": "attributes.size" },
+    { "data": "attributes.size" },
+    { "data": "attributes.size" },
+    { "data": "attributes.size" },
+    { "data": "attributes.size" },
     // Builds Actions Menu
   ]
 });
