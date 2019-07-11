@@ -138,4 +138,40 @@ RSpec.describe GroupSelectionPrevaricationAdapter, dbclean: :after_each do
       end 
     end
   end
+
+  context 'set_mc_variables for coverall' do
+    let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product)}
+    let!(:hbx_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        household: family.active_household,
+                        family: family,
+                        coverage_kind: 'health',
+                        effective_on: enrollment_effective_date,
+                        enrollment_kind: 'special_enrollment',
+                        kind: 'coverall',
+                        product: product)
+    end
+
+    let(:group_selection_params) do
+      {
+        :person_id => person.id,
+        :market_kind => 'coverall',
+        :coverage_kind => 'health',
+        :change_plan => 'change_plan',
+        :hbx_enrollment_id => hbx_enrollment.id
+      }
+    end
+
+    let(:params2) { ActionController::Parameters.new(group_selection_params) }
+    subject(:adapter2) { GroupSelectionPrevaricationAdapter.initialize_for_common_vars(params2) }
+
+    it 'should set market' do
+      adapter2.set_mc_variables do |market_kind, coverage_kind|
+        m_kind = market_kind
+        c_kind = coverage_kind
+        expect(m_kind).to eq 'coverall'
+        expect(c_kind).to eq 'health'
+      end
+    end
+  end
 end

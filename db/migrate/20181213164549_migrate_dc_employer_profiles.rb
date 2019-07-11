@@ -275,6 +275,6 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
 
   def self.fehb_benefit_market
     return @fehb_benefit_market if defined? @fehb_benefit_market
-    @benefit_market  = find_site('dc').first.benefit_market_for(:fehb)
+    @fehb_benefit_market  = find_site('dc').first.benefit_market_for(:fehb)
   end
 end

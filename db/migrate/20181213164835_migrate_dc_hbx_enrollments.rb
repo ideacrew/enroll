@@ -6,7 +6,6 @@ class MigrateDcHbxEnrollments < Mongoid::Migration
 
       update_hbx_enrollments
 
-      puts "Check enrollment_migration_data logs & enrollment_migration_status csv for additional information." unless Rails.env.test?
       @logger.info "End of the script" unless Rails.env.test?
     else
       say "Skipping for non-CCA site"
