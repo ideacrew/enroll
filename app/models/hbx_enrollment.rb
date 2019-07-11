@@ -876,7 +876,7 @@ class HbxEnrollment
   end
 
   def renewal_enrollments(successor_application)
-    family.active_household.hbx_enrollments.where({
+    HbxEnrollment.where({
       :sponsored_benefit_package_id.in => successor_application.benefit_packages.pluck(:_id), 
       :coverage_kind => coverage_kind,
       :kind => kind,
