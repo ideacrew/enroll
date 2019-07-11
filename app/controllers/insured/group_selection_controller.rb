@@ -172,8 +172,8 @@ class Insured::GroupSelectionController < ApplicationController
 
   def edit_plan
     @hbx_enrollment = HbxEnrollment.find(params.require(:hbx_enrollment_id))
-    family = Family.find(params.require(:family_id))
-    @sep = family.try(:latest_active_sep)
+    @family = Family.find(params.require(:family_id))
+    @sep = @family.try(:latest_active_sep)
     @should_term_or_cancel = @hbx_enrollment.should_term_or_cancel_ivl
     @calendar_enabled = @should_term_or_cancel == 'cancel' ? false : true
   end
