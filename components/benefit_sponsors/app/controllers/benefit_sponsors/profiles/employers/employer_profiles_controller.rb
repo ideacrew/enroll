@@ -90,7 +90,7 @@ module BenefitSponsors
             if @roster_upload_form.save
               redirect_to @roster_upload_form.redirection_url
             else
-              render @roster_upload_form.redirection_url
+              render @roster_upload_form.redirection_url || default_url
             end
           rescue Exception => e
             @roster_upload_form.errors.add(:base, e.message)

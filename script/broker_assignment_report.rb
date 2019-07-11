@@ -3,7 +3,7 @@
   batch_size = 500
   offset = 0
 
-  org_count = Organization.where("employer_profile" => {"$exists" => true}).count
+  org_count = BenefitSponsors::Organizations::Organization.employer_profiles.count
   field_names  = %w(
              Group_name
              Employer_FEIN
@@ -21,7 +21,7 @@
     csv << field_names
 
     while offset <= org_count
-      Organization.where("employer_profile" => {"$exists" => true}).offset(offset).limit(batch_size).map(&:employer_profile).each do |employer|
+      BenefitSponsors::Organizations::Organization.employer_profiles.offset(offset).limit(batch_size).map(&:employer_profile).each do |employer|
         employer.broker_agency_accounts.unscoped.all.each do |ba_account|
           next if ba_account.nil? || ba_account.broker_agency_profile.nil? || ba_account.broker_agency_profile.primary_broker_role.nil?
           csv << [
