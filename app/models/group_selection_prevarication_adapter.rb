@@ -108,7 +108,11 @@ class GroupSelectionPrevaricationAdapter
 
   def set_mc_variables
     if @previous_hbx_enrollment.present? && @change_plan == "change_plan"
-      m_kind = @previous_hbx_enrollment.kind == "employer_sponsored" ? "shop" : "individual"
+      m_kind = if @previous_hbx_enrollment.kind == 'employer_sponsored'
+                 'shop'
+               elsif %w[coverall individual].include? @previous_hbx_enrollment.kind
+                 @previous_hbx_enrollment.kind
+               end
       yield m_kind, @previous_hbx_enrollment.coverage_kind
     end
   end
