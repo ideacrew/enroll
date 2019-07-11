@@ -487,7 +487,7 @@ module BenefitSponsors
     end
 
     def members_eligible_to_enroll_count
-      members_eligible_to_enroll.count
+      @members_eligible_to_enroll_count ||= members_eligible_to_enroll.count
     end
 
     def waived_members
@@ -496,7 +496,7 @@ module BenefitSponsors
     end
 
     def waived_member_count
-      waived_members.count
+      @waived_members_count ||= waived_members.count
     end
 
     def enrolled_members
@@ -505,7 +505,7 @@ module BenefitSponsors
     end
 
     def enrolled_member_count
-      enrolled_members.count
+      @enrolled_member_count ||= enrolled_members.count
     end
 
     def enrolled_families
@@ -548,14 +548,16 @@ module BenefitSponsors
     end
 
     def enrolled_non_business_owner_count
-      enrolled_non_business_owner_members.size
+      @enrolled_non_business_owner_count ||= enrolled_non_business_owner_members.size
     end
 
     def all_enrolled_and_waived_member_count
-      if active_census_employees.count <= Settings.aca.shop_market.small_market_active_employee_limit
-        enrolled_families.size
-      else
-        0
+      @all_enrolled_and_waived_member_count ||= begin
+        if active_census_employees.count <= Settings.aca.shop_market.small_market_active_employee_limit
+          enrolled_families.size
+        else
+          0
+        end
       end
     end
 
@@ -1011,10 +1013,12 @@ module BenefitSponsors
     end
 
     def enrollment_ratio
-      if members_eligible_to_enroll_count == 0
-        0
-      else
-        ((all_enrolled_and_waived_member_count * 1.0)/ members_eligible_to_enroll_count)
+      @enrollment_ration ||= begin
+        if members_eligible_to_enroll_count == 0
+          0
+        else
+          ((all_enrolled_and_waived_member_count * 1.0)/ members_eligible_to_enroll_count)
+        end
       end
     end
 

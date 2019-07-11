@@ -247,14 +247,9 @@ module BenefitSponsors
         active_benefit_sponsorship.registered_on
       end
 
-      def renewing_plan_year
-        warn "[Deprecated] Instead use renewal_benefit_application" unless Rails.env.test?
-        renewal_benefit_application
-      end
-
       def show_plan_year
         warn "[Deprecated] Instead use published_benefit_application" unless Rails.env.test?
-        published_benefit_application
+        @show_plan_year ||= published_benefit_application
       end
 
       def renewing_plan_year
