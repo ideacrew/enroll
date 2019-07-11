@@ -404,7 +404,7 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
         existing_person.employee_roles.first.update_attributes(:contact_method => 'Paper Only')
       end
 
-      it "should not raise" do
+      it "adds contact method for new consumer role to match employee role contact method" do
         consumer_role = Factories::EnrollmentFactory.build_consumer_role(existing_person, params)
         expect(consumer_role.contact_method).to eq(existing_person.employee_roles.first.contact_method)
       end
