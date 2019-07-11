@@ -51,7 +51,6 @@ module Effective
         }, :filter => false, :sortable => false
       end
 
-
       def collection
         return @collection if defined? @collection
         @employer_profile = BenefitSponsors::Organizations::Profile.find(attributes[:id])

@@ -76,47 +76,6 @@ class HbxEnrollmentListSponsorCostCalculator
           "people" => {"_id" => 1, "dob" => 1, "person_relationships" => 1, "is_disabled" => 1}
         }}
       ])
-=begin
-      Family.collection.aggregate([
-        {"$match" => {
-          "households.hbx_enrollments._id" => {"$in" => enrollment_ids}
-        }},
-          {"$project" => {"households" => {"hbx_enrollments": 1}, "family_members" => {"_id": 1, "person_id": 1}}},
-          {"$unwind" => "$households"},
-          {"$unwind" => "$households.hbx_enrollments"},
-          {"$match" => {
-            "households.hbx_enrollments._id" => {"$in" => enrollment_ids}
-          }},
-          {"$project" => {
-            "hbx_enrollment" => {
-              "effective_on" => "$households.hbx_enrollments.effective_on",
-              "hbx_enrollment_members" => "$households.hbx_enrollments.hbx_enrollment_members",
-              "_id" => "$households.hbx_enrollments._id",
-              "product_id" => "$households.hbx_enrollments.product_id",
-              "kind" => "$households.hbx_enrollments.kind"
-            },
-            "family_members" => 1,
-            "people_ids" => {
-              "$map" => {
-                "input" => "$family_members",
-                "as" => "fm",
-                "in" => "$$fm.person_id"
-              }
-            }
-          }},
-          {"$lookup" => {
-            "from" => "people",
-            "localField" => "people_ids",
-            "foreignField" => "_id",
-            "as" => "people"
-          }},
-          {"$project" => {
-            "hbx_enrollment" => 1,
-            "family_members" => 1,
-            "people" => {"_id" => 1, "dob" => 1, "person_relationships" => 1, "is_disabled" => 1}
-          }}
-      ])
-=end
     end
 
     def rosterize_hbx_enrollment(enrollment_record)

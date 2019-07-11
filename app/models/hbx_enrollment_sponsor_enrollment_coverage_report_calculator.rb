@@ -41,7 +41,7 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
     end
 
     def search_criteria(enrollment_ids)
-      Family.collection.aggregate([
+      HbxEnrollment.collection.aggregate([
         {"$match" => {
           "_id" => {"$in" => enrollment_ids}
         }},
@@ -51,6 +51,9 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
           "foreignField" => "_id",
           "as" => "family"
         }},
+        {
+          "$unwind" => "$family"
+        },
         {"$project" => {
           "family_members" => "$family.family_members",
           "hbx_enrollment" => {

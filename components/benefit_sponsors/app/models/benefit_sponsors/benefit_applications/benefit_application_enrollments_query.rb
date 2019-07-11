@@ -12,6 +12,14 @@ module BenefitSponsors
       def call(klass_name, date)
         end_date = (benefit_application.effective_period.min > date.end_of_month) ? benefit_application.effective_period.min : date.end_of_month
         klass_name.collection.aggregate([
+          {"$project" =>  {
+            "sponsored_benefit_id" => 1,
+            "aasm_state" => 1,
+            "effective_on" => 1,
+            "terminated_on" => 1,
+            "employee_role_id" => 1,
+            "submitted_at" => 1
+          }},
           {"$match" => {
             "sponsored_benefit_id" => @sponsored_benefit.id,
             "aasm_state" => { "$in" => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES)},

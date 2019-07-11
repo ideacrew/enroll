@@ -40,17 +40,8 @@ module BenefitSponsors
           {first_name: /#{str}/i}, {last_name: /#{str}/i}
         ]
       ).map(&:employee_roles).flatten.map(&:id)
-
-      add({"$project" => {"hbx_enrollments": 1}})
       add({"$match" => {
         "hbx_enrollments.employee_role_id" => {"$in" => employee_role_ids}
-      }})
-      add({"$group" => {
-        "_id" => {
-          "bga_id" => "$hbx_enrollments.sponsored_benefit_id",
-          "employee_role_id" => "$hbx_enrollments.employee_role_id"
-        },
-        "hbx_enrollment_id" => {"$last" => "$hbx_enrollments._id"}
       }})
     end
 
