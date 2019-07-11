@@ -467,18 +467,6 @@ class HbxEnrollment
         :allow_disk_use => true
       ).to_a
     end
-    
-    def families_with_contingent_enrollments
-      Family.by_enrollment_individual_market.where(:'households.hbx_enrollments' => {
-        :$elemMatch => {
-            :aasm_state => "enrolled_contingent",
-            :$or => [
-                {:"terminated_on" => nil},
-                {:"terminated_on".gt => TimeKeeper.date_of_record}
-            ]
-        }
-      })
-    end
 
     def by_hbx_id(policy_hbx_id)
       self.where(hbx_id: policy_hbx_id)
