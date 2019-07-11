@@ -100,7 +100,6 @@ module Factories
       end
       role = build_consumer_role(person, person_new)
       role.update_attribute(:is_applying_coverage, (person_params["is_applying_coverage"].nil? ?  true : person_params["is_applying_coverage"]))
-      role.update_attributes(contact_method: person.active_employee_roles.first.contact_method) if person.has_active_employee_role?
       role
     end
 
@@ -114,6 +113,7 @@ module Factories
       elsif person_new
         person.delete
       end
+      role.update_attributes(contact_method: person.active_employee_roles.first.contact_method) if person.has_active_employee_role?
       return role
     end
 
