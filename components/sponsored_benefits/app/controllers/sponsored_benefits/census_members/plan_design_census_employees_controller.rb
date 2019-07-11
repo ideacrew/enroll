@@ -85,6 +85,7 @@ module SponsoredBenefits
     end
 
     def export_plan_design_employees
+      begin
         employee_export = ::BenefitSponsors::Exporters::CensusEmployeeExport.new(@plan_design_proposal.profile, {action: "download"})
         respond_to do |format|
           format.csv { send_data employee_export.to_csv, filename: "#{@plan_design_proposal.plan_design_organization.legal_name.parameterize.underscore}_census_employees_#{TimeKeeper.date_of_record}.csv" }

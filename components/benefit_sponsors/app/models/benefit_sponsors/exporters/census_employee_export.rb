@@ -26,7 +26,7 @@ module BenefitSponsors
 
       def to_csv
         CSV.generate(headers: true) do |csv|
-          csv << (["#{Settings.site.long_name} Employee Census Template"] + 6.times.collect{ "" } + [TimeKeeper.date_of_record] + 5.times.collect{ "" } + ["1.1"])
+          csv << (["#{Settings.site.long_name} Employee Census Template"] + Array.new(6) + [TimeKeeper.date_of_record] + Array.new(5) + ["1.1"])
           csv << headers
           census_employee_roster.each do |census_employee|
             personal_details = personal_headers(census_employee)
@@ -57,7 +57,7 @@ module BenefitSponsors
         if record.address.present?
           record.address.to_a
         else
-          6.times.collect{ "" }
+          Array.new(6)
         end
       end
 
@@ -79,12 +79,12 @@ module BenefitSponsors
           health_enrollment = pull_enrollment_state_by_kind(active_assignment, "health")
           dental_enrollment = pull_enrollment_state_by_kind(active_assignment, "dental")
           bga.push(
-            active_assignment.benefit_group.title,
+            active_assignment.benefit_package.title,
             "dental: #{dental_enrollment}  health: #{health_enrollment}",
             active_assignment.try(:benefit_application).try(:start_on)
           )
         else
-          bga += 3.times.collect{ "" }
+          bga += Array.new(3)
         end
         bga
       end
@@ -96,7 +96,7 @@ module BenefitSponsors
             dependent.dob.present? ? dependent.dob.strftime("%m/%d/%Y") : ""
           )
         end
-        dependent_count_diff = (dependent_count - dob_rows.length).times.collect{ "" }
+        dependent_count_diff = Array.new(dependent_count - dob_rows.length)
         dob_rows + dependent_count_diff
       end
 
@@ -105,19 +105,17 @@ module BenefitSponsors
       end
 
       def total_premium(record)
+        premiums = []
         bga = record.active_benefit_group_assignment
         if bga
-          enrollments = bga.try(:hbx_enrollments)
-          return ["", ""] if enrollments.nil?
-
-          health_selected_enrollment = pull_selected_enrollment(enrollments, "health")
-          dental_selected_enrollment = pull_selected_enrollment(enrollments, "dental")
-          health_cost = number_with_precision(health_selected_enrollment.total_employee_cost, precision: 2)
-          dental_cost = number_with_precision(dental_selected_enrollment.total_employee_cost, precision: 2)
-        else
-          health_cost, dental_cost = 2.times.collect{ "" }
+          estimator = ::BenefitSponsors::Services::SponsoredBenefitCostEstimationService.new
+          bga.benefit_package.sponsored_benefits.each do |sponsored_benefit|
+            cost_hash = estimator.calculate_estimates_for_benefit_display(sponsored_benefit)
+            premiums.push(number_to_currency(cost_hash ? cost_hash[:estimated_sponsor_exposure] : 0))
+          end
         end
-        [health_cost, dental_cost]
+        # handles Only health/dental present or none
+        premiums += Array.new(2 - premiums.count)
       end
 
       def pull_selected_enrollment(enrollments, coverage_kind)
