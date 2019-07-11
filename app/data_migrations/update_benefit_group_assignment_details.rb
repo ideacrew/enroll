@@ -19,7 +19,7 @@ class UpdateBenefitGroupAssignmentDetails < MongoidMigrationTask
 
   def change_aasm_sate(bga)
     new_state = ENV['new_state'].to_s
-    bga.update_attributes(aasm_state: new_state)
+    bga.update_attributes!(aasm_state: new_state)
     puts "Changed bga aasm state on date to #{new_state}" unless Rails.env.test?
   end
 end
