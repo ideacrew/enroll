@@ -8,7 +8,7 @@ Given(/^oustanding verfications users exists$/) do
   enrollment = FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
                                  :family => family,
                                  :household => family.active_household,
-                                 :aasm_state => 'enrolled_contingent',
+                                 :aasm_state => 'coverage_selected',
                                  :is_any_enrollment_member_outstanding => true,
                                  :kind => 'individual',
                                  :product => product,

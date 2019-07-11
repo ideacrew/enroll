@@ -3,17 +3,17 @@ require 'rails_helper'
 describe Queries::FamilyDatatableQuery, "Filter Scopes for families Index", dbclean: :after_each do
   it "filters: by_enrollment_individual_market" do
     fdq = Queries::FamilyDatatableQuery.new({"families" => "by_enrollment_individual_market"})
-    expect(fdq.build_scope.selector).to eq ({"is_active"=>true, "_id"=>{"$in" => HbxEnrollment.where(:"aasm_state"=>{"$in" => ["coverage_selected", "transmitted_to_carrier", "coverage_enrolled", "coverage_termination_pending", "enrolled_contingent", "unverified"]}).pluck(:family_id)}})
+    expect(fdq.build_scope.selector).to eq ({"is_active"=>true, "_id"=>{"$in" => HbxEnrollment.where(:"aasm_state"=>{"$in" => ["coverage_selected", "transmitted_to_carrier", "coverage_enrolled", "coverage_termination_pending", "unverified"]}).pluck(:family_id)}})
   end
 
   it "filters: by_enrollment_shop_market" do
     fdq = Queries::FamilyDatatableQuery.new({"families" => "by_enrollment_shop_market"})
-    expect(fdq.build_scope.selector).to eq ({"is_active"=>true,"_id"=>{"$in" => HbxEnrollment.where(:"aasm_state"=>{"$in" => ["coverage_selected", "transmitted_to_carrier", "coverage_enrolled", "coverage_termination_pending", "enrolled_contingent", "unverified"]}).pluck(:family_id)}})
+    expect(fdq.build_scope.selector).to eq ({"is_active"=>true,"_id"=>{"$in" => HbxEnrollment.where(:"aasm_state"=>{"$in" => ["coverage_selected", "transmitted_to_carrier", "coverage_enrolled", "coverage_termination_pending", "unverified"]}).pluck(:family_id)}})
   end
 
   it "filters: non_enrolled" do
     fdq = Queries::FamilyDatatableQuery.new({"families" => "non_enrolled"})
-    expect(fdq.build_scope.selector).to eq ({"is_active"=>true,"_id"=>{"$in" => HbxEnrollment.where(:"aasm_state"=>{"$nin" => ["coverage_selected", "transmitted_to_carrier", "coverage_enrolled", "coverage_termination_pending", "enrolled_contingent", "unverified"]}).pluck(:family_id)}})
+    expect(fdq.build_scope.selector).to eq ({"is_active"=>true,"_id"=>{"$in" => HbxEnrollment.where(:"aasm_state"=>{"$nin" => ["coverage_selected", "transmitted_to_carrier", "coverage_enrolled", "coverage_termination_pending", "unverified"]}).pluck(:family_id)}})
   end
 
   it "filters: by_enrollment_renewing" do

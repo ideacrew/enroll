@@ -376,7 +376,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       let(:benefit_sponsorship)       { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
       let(:benefit_coverage_period)   { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
       let(:benefit_package)           { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
-      let!(:hbx_enrollment)           { FactoryBot.create(:hbx_enrollment, aasm_state: "enrolled_contingent",
+      let!(:hbx_enrollment)           { FactoryBot.create(:hbx_enrollment, is_any_enrollment_member_outstanding: true, aasm_state: "coverage_selected",
                                           household: family.active_household, kind: "individual", family: family) }
       let!(:hbx_enrollment_member)     { FactoryBot.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, hbx_enrollment: hbx_enrollment) }
       let(:active_year)               {TimeKeeper.date_of_record.year}

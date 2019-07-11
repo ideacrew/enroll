@@ -43,7 +43,7 @@ class HbxEnrollment
   ENROLLMENT_KINDS    = %w(open_enrollment special_enrollment)
   COVERAGE_KINDS      = %w(health dental)
 
-  ENROLLED_STATUSES   = %w[coverage_selected transmitted_to_carrier enrolled_contingent coverage_enrolled coverage_termination_pending unverified].freeze
+  ENROLLED_STATUSES   = %w[coverage_selected transmitted_to_carrier coverage_enrolled coverage_termination_pending unverified].freeze
   SELECTED_AND_WAIVED = %w(coverage_selected inactive)
   TERMINATED_STATUSES = %w[coverage_terminated unverified coverage_expired].freeze
   CANCELED_STATUSES   = %w[coverage_canceled void].freeze # Void state enrollments are invalid enrollments. will be treated same as canceled.
@@ -343,14 +343,14 @@ class HbxEnrollment
   scope :by_writing_agent_id, ->(broker_id) { where(writing_agent_id: broker_id)}
   scope :by_benefit_group_ids, ->(benefit_group_ids) { where(:"benefit_group_id".in => benefit_group_ids) }
   scope :by_benefit_sponsorship_id, ->(benefit_sponsorship_id) { where(benefit_sponsorship_id: benefit_sponsorship_id) }
-  scope :verified, ->{ where(aasm_state: "enrolled_contingent", :"review_status" => "ready") }
-  scope :by_unverified, -> { where(aasm_state: "enrolled_contingent")}
-  scope :partially_verified, -> { where(aasm_state: "enrolled_contingent", :"review_status" => "ready") }
-  scope :not_verified, -> { where(aasm_state: "enrolled_contingent", :"review_status" => "in review") }
-  scope :reset_verifications, -> { where(aasm_state: "enrolled_contingent", :"review_status" => "incomplete") }
+  scope :verified, ->{ where(is_any_enrollment_member_outstanding: true, :"review_status" => "ready") }
+  scope :by_unverified, -> { where(is_any_enrollment_member_outstanding: true)}
+  scope :partially_verified, -> { where(is_any_enrollment_member_outstanding: true, :"review_status" => "ready") }
+  scope :not_verified, -> { where(is_any_enrollment_member_outstanding: true, :"review_status" => "in review") }
+  scope :reset_verifications, -> { where(is_any_enrollment_member_outstanding: true, :"review_status" => "incomplete") }
   scope :verification_outstanding, -> do
     where(
-      aasm_state: "enrolled_contingent",
+      is_any_enrollment_member_outstanding: true,
       effective_on: { :"$gte" => TimeKeeper.date_of_record.beginning_of_year, :"$lte" =>  TimeKeeper.date_of_record.end_of_year }
     )
   end
@@ -633,21 +633,6 @@ class HbxEnrollment
 
   def is_active?
     self.is_active
-  end
-
-  def status_step
-    case
-      when coverage_selected?  #submitted
-        1
-      when transmitted_to_carrier? #transmitted
-        2
-      when enrolled_contingent? #acknowledged
-        3
-      when coverage_enrolled? #enrolled
-        4
-      when coverage_canceled? || coverage_terminated? #canceled/terminated
-        5
-    end
   end
 
   def currently_active?

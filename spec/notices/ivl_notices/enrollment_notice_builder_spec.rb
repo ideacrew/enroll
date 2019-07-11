@@ -11,7 +11,8 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
       family: family,
       household: family.households.first,
       kind: "individual",
-      aasm_state: "enrolled_contingent"
+      is_any_enrollment_member_outstanding: true,
+      aasm_state: 'coverage_selected'
     )
   end
   let!(:hbx_enrollment_member) {FactoryBot.create(:hbx_enrollment_member,hbx_enrollment: hbx_enrollment, applicant_id: family.family_members.first.id,is_subscriber: true, eligibility_date: TimeKeeper.date_of_record.prev_month )}
