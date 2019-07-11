@@ -86,7 +86,9 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :issuers, only: [:index]
+    resources :issuers, only: [:index] do
+      resources :products, only: [:index]
+    end
 
     resources :hbx_profiles do
       root 'hbx_profiles#show'

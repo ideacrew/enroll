@@ -1,6 +1,6 @@
 set_tab_content("<%= escape_javascript render "index"%>")
 
-var table = $('#issuers-ajax-dt').DataTable( {
+var table = $('#products-ajax-dt').DataTable( {
   "ajax": {
     "url": "/exchanges/issuers",
     "dataSrc": "data"
@@ -14,14 +14,7 @@ var table = $('#issuers-ajax-dt').DataTable( {
   // Creates a custom toolbar
   "dom": '<"toolbar">frtip',
   "columns": [
-    { "data": "attributes.product_url",
-      "render": function ( data, type, row, meta ) {
-        return '<a href="' + row['attributes']['products_url'] + '" data-remote="true">' + row['attributes']['legal_name'] + '</a>';
-      }
-    },
-    { "data": "attributes.phone" },
     { "data": "attributes.email" },
-    { "data": "attributes.working_hours" },
     // Builds Actions Menu
   ]
 });
