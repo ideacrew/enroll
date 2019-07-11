@@ -85,6 +85,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
 
     before :each do
+      allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
       allow(view).to receive(:disable_make_changes_button?).with(hbx_enrollment).and_return(true)
     end
 
@@ -188,6 +189,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
 
     before :each do
+      allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
       allow(hbx_enrollment).to receive(:kind).and_return('employer_sponsored')
       allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
@@ -243,6 +245,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       let(:future_enrollment_termination_date) { Date.today }
 
       before :each do
+        allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
         allow(hbx_enrollment).to receive(:kind).and_return('employer_sponsored')
         allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
         allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)

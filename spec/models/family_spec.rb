@@ -1414,3 +1414,36 @@ describe Family, "scopes", dbclean: :after_each do
     end
   end
 end
+
+describe "terminated_enrollments", dbclean: :after_each do
+  let!(:person) { FactoryBot.create(:person)}
+  let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+  let!(:household) { FactoryBot.create(:household, family: family) }
+  let!(:termination_pending_enrollment) {
+    FactoryBot.create(:hbx_enrollment,
+                       family: family,
+                       household: family.active_household,
+                       coverage_kind: "health",
+                       aasm_state: 'coverage_termination_pending'
+    )}
+  let!(:terminated_enrollment) {
+    FactoryBot.create(:hbx_enrollment,
+                       family: family,
+                       household: family.active_household,
+                       coverage_kind: "health",
+                       aasm_state: 'coverage_terminated'
+    )}
+  let!(:expired_enrollment) {
+    FactoryBot.create(:hbx_enrollment,
+                       family: family,
+                       household: family.active_household,
+                       coverage_kind: "health",
+                       aasm_state: 'coverage_expired'
+    )}
+
+
+  it "should include termination and termination pending enrollments only" do
+    expect(family.terminated_enrollments.count).to eq 2
+    expect(family.terminated_enrollments.map(&:aasm_state)).to eq ["coverage_termination_pending", "coverage_terminated"]
+  end
+end
