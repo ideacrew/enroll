@@ -106,12 +106,27 @@ module BenefitSponsors
 
       def total_premium(record)
         premiums = []
-        bga = record.active_benefit_group_assignment
-        if bga
-          estimator = ::BenefitSponsors::Services::SponsoredBenefitCostEstimationService.new
-          bga.benefit_package.sponsored_benefits.each do |sponsored_benefit|
-            cost_hash = estimator.calculate_estimates_for_benefit_display(sponsored_benefit)
-            premiums.push(number_to_currency(cost_hash ? cost_hash[:estimated_sponsor_exposure] : 0))
+        if record.is_a?(SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee)
+          sponsor_ship = employer_profile.benefit_sponsorships.first
+          return Array.new(2) if sponsor_ship.nil?
+
+          benefit_group = sponsor_ship.benefit_applications.first.benefit_groups.first
+          return  Array.new(2) if benefit_group.nil?
+
+          sponsored_service = SponsoredBenefits::Services::PlanCostService.new({benefit_group: benefit_group})
+          health_plan = sponsored_service.reference_plan
+          dental_plan = sponsored_service.dental_reference_plan
+          @employer_health_contribution_amount = sponsored_service.monthly_employer_contribution_amount(health_plan)
+          @employer_dental_contribution_amount = sponsored_service.monthly_employer_contribution_amount(dental_plan) if dental_plan.present?
+          premiums.push(@employer_health_contribution_amount, @employer_dental_contribution_amount)
+        else
+          bga = record.active_benefit_group_assignment
+          if bga
+            estimator = ::BenefitSponsors::Services::SponsoredBenefitCostEstimationService.new
+            bga.benefit_package.sponsored_benefits.each do |sponsored_benefit|
+              cost_hash = estimator.calculate_estimates_for_benefit_display(sponsored_benefit)
+              premiums.push(number_to_currency(cost_hash ? cost_hash[:estimated_sponsor_exposure] : 0))
+            end
           end
         end
         # handles Only health/dental present or none
