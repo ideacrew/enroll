@@ -88,3 +88,4 @@ Feature: Edit Plan Button
       | coverage_terminated          | should not |
       | coverage_canceled            | should not |
       | coverage_expired             | should not |
+
