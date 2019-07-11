@@ -3,7 +3,7 @@ module BenefitSponsors
     class SponsoredBenefitCostEstimationService
 
       def calculate_estimates_for_home_display(sponsored_benefit)
-        query = ::BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentsQuery.new(sponsored_benefit.benefit_package.benefit_application, sponsored_benefit).call(::Family, TimeKeeper.date_of_record).lazy.map { |rec| rec["hbx_enrollment_id"] }
+        query = ::BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentsQuery.new(sponsored_benefit.benefit_package.benefit_application, sponsored_benefit).call(::HbxEnrollment, TimeKeeper.date_of_record).lazy.map { |rec| rec["hbx_enrollment_id"] }
         reference_product = sponsored_benefit.reference_product
         benefit_application = sponsored_benefit.benefit_package.benefit_application
         package = sponsored_benefit.product_package

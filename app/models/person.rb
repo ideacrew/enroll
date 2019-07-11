@@ -650,12 +650,14 @@ class Person
 
     def search_hash(s_str)
       clean_str = s_str.strip
-      s_rex = Regexp.new(Regexp.escape(clean_str), true)
+      s_rex = Regexp.new("^" + Regexp.escape(clean_str), true)
       if clean_str =~ /[a-z]/i
-          { "$or" => ([
-            {"first_name" => s_rex},
-            {"last_name" => s_rex}
-          ] + additional_exprs(clean_str)) }
+          {
+            "$or" => [
+              {"first_name" => s_rex},
+              {"last_name" => s_rex}
+            ]
+          }
       else
         {
           "$or" => [
@@ -664,17 +666,6 @@ class Person
           ]
         }
       end
-    end
-
-    def additional_exprs(clean_str)
-      additional_exprs = []
-      if clean_str.include?(" ")
-        parts = clean_str.split(" ").compact
-        first_re = ::Regexp.new(::Regexp.escape(parts.first), true)
-        last_re = ::Regexp.new(::Regexp.escape(parts.last), true)
-        additional_exprs << {:first_name => first_re, :last_name => last_re}
-      end
-      additional_exprs
     end
 
     def search_first_name_last_name_npn(s_str, query=self)

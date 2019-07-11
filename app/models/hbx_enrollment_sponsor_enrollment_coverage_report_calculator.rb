@@ -43,44 +43,44 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
     def search_criteria(enrollment_ids)
       Family.collection.aggregate([
         {"$match" => {
-          "households.hbx_enrollments" => { "$elemMatch" => {
-            "_id" => {"$in" => enrollment_ids}
-          }}}},
-          {"$project" => {"households" => {"hbx_enrollments": 1}, "family_members" => {"_id": 1, "person_id": 1}}},
-          {"$unwind" => "$households"},
-          {"$unwind" => "$households.hbx_enrollments"},
-          {"$match" => {
-            "households.hbx_enrollments._id" => {"$in" => enrollment_ids}
-          }},
-          {"$project" => {
-            "hbx_enrollment" => {
-              "effective_on" => "$households.hbx_enrollments.effective_on",
-              "hbx_enrollment_members" => "$households.hbx_enrollments.hbx_enrollment_members",
-              "_id" => "$households.hbx_enrollments._id",
-              "product_id" => "$households.hbx_enrollments.product_id",
-              "employee_role_id" => "$households.hbx_enrollments.employee_role_id",
-              "kind" => "$households.hbx_enrollments.kind"
-            },
-            "family_members" => 1,
-            "people_ids" => {
-              "$map" => {
-                "input" => "$family_members",
-                "as" => "fm",
-                "in" => "$$fm.person_id"
-              }
+          "_id" => {"$in" => enrollment_ids}
+        }},
+        {"$lookup" => {
+          "from" => "families",
+          "localField" => "family_id",
+          "foreignField" => "_id",
+          "as" => "family"
+        }},
+        {"$project" => {
+          "family_members" => "$family.family_members",
+          "hbx_enrollment" => {
+            "effective_on" => "$effective_on",
+            "hbx_enrollment_members" => "$hbx_enrollment_members",
+            "_id" => "$_id",
+            "product_id" => "$product_id",
+            "kind" => "$kind",
+            "employee_role_id" => "$employee_role_id"
+          },
+          "people_ids" => {
+            "$map" => {
+              "input" => "$family.family_members",
+              "as" => "fm",
+              "in" => "$$fm.person_id"
             }
-          }},
-          {"$lookup" => {
-            "from" => "people",
-            "localField" => "people_ids",
-            "foreignField" => "_id",
-            "as" => "people"
-          }},
-          {"$project" => {
-            "hbx_enrollment" => 1,
-            "family_members" => 1,
-            "people" => ({"_id" => 1, "dob" => 1, "person_relationships" => 1, "is_disabled" => 1, "employee_roles" => 1}.merge(person_info_fields))
-          }}
+          }
+          }
+        },
+        {"$lookup" => {
+          "from" => "people",
+          "localField" => "people_ids",
+          "foreignField" => "_id",
+          "as" => "people"
+        }},
+        {"$project" => {
+          "hbx_enrollment" => 1,
+          "family_members" => 1,
+          "people" => ({"_id" => 1, "dob" => 1, "person_relationships" => 1, "is_disabled" => 1, "employee_roles" => 1}.merge(person_info_fields))
+        }}
       ])
     end
 

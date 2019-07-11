@@ -224,6 +224,15 @@ class HbxEnrollment
     "kind" => 1
   }, {name: "hbx_enrollment_sb_package_lookup"})
 
+  index({
+    "sponsored_benefit_id" => 1,
+    "aasm_state" => 1,
+    "effective_on" => 1,
+    "submitted_at" => 1,
+    "terminated_on" => 1,
+    "employee_role_id" => 1
+  }, {name: "hbx_enrollment_bp_enrolment_query_lookup"})
+
   index(
     {
       "is_active" => 1,

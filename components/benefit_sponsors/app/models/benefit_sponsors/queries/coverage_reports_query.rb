@@ -17,7 +17,7 @@ module BenefitSponsors
       end
 
       def query(s_benefit)
-        query = ::BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentsQuery.new(application, s_benefit).call(::Family, billing_report_date)
+        query = ::BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentsQuery.new(application, s_benefit).call(::HbxEnrollment, billing_report_date)
         return nil if query.count > 100
         query
       end

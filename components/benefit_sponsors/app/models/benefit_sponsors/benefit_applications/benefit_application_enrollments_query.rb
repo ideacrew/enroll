@@ -12,33 +12,25 @@ module BenefitSponsors
       def call(klass_name, date)
         end_date = (benefit_application.effective_period.min > date.end_of_month) ? benefit_application.effective_period.min : date.end_of_month
         klass_name.collection.aggregate([
-          {"$match" => { "households.hbx_enrollments" => {
-            "$elemMatch" => {
+          {"$match" => {
             "sponsored_benefit_id" => @sponsored_benefit.id,
             "aasm_state" => { "$in" => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES)},
-            "effective_on" =>  {"$lte" => end_date, "$gte" => benefit_application.effective_period.min}
-          }}}},
-          {"$unwind" => "$households"},
-          {"$unwind" => "$households.hbx_enrollments"},
-          {"$match" => {
-            "households.hbx_enrollments.sponsored_benefit_id" => @sponsored_benefit.id,
-            "households.hbx_enrollments.aasm_state" => { "$in" => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES)},
-            "households.hbx_enrollments.effective_on" =>  {"$lte" => end_date, "$gte" => benefit_application.effective_period.min},
+            "effective_on" =>  {"$lte" => end_date, "$gte" => benefit_application.effective_period.min},
             "$or" => [
-             {"households.hbx_enrollments.terminated_on" => {"$eq" => nil} },
-             {"households.hbx_enrollments.terminated_on" => {"$gte" => date.end_of_month}}
+             {"terminated_on" => {"$eq" => nil} },
+             {"terminated_on" => {"$gte" => date.end_of_month}}
             ]
           }},
           {"$sort" => {
-            "households.hbx_enrollments.submitted_at" => 1
+            "submitted_at" => 1
           }},
           {"$group" => {
             "_id" => {
-              "bga_id" => "$households.hbx_enrollments.sponsored_benefit_id",
-              "employee_role_id" => "$households.hbx_enrollments.employee_role_id"
+              "bga_id" => "$sponsored_benefit_id",
+              "employee_role_id" => "$employee_role_id"
             },
-            "hbx_enrollment_id" => {"$last" => "$households.hbx_enrollments._id"},
-            "hbx_enrollments" => {"$last" => "$households.hbx_enrollments"}
+            "hbx_enrollment_id" => {"$last" => "$_id"},
+            "hbx_enrollments" => {"$last" => "$$ROOT"}
           }}
         ])
       end
