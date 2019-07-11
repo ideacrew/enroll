@@ -18,21 +18,24 @@ namespace :reports do
         csv << field_names
         benefit_sponsorships.each do |benefit_sponsorship|
           benefit_sponsorship.benefit_applications.each do |benefit_application|
-            benefit_application.benefit_packages.each do |benefit_package|
-              fein                = benefit_application.employer_profile.organization.fein
-              legal_name          = benefit_application.employer_profile.organization.legal_name.gsub(',','')
-              dba                 = benefit_application.employer_profile.organization.dba.gsub(',','')
-              employer_status     = benefit_application.employer_profile.aasm_state
+            employer_profile = benefit_application.sponsor_profile
+            organization = employer_profile.organization
+
+            benefit_application.benefit_packages.each do |bp|
+              fein                = organization.fein
+              legal_name          = organization.legal_name.gsub(',','')
+              dba                 = organization.dba.gsub(',','')
+              employer_status     = employer_profile.latest_benefit_sponsorship.aasm_state
               plan_year_start_on  = benefit_application.start_on
               plan_year_status    = benefit_application.aasm_state
-              benefit_package     = benefit_package.title.gsub(',','')
-              plan_option         = benefit_package.plan_option_kind
-              ref_plan_name       = benefit_package.reference_plan.name.gsub(',','')
-              ref_plan_hios_id    = benefit_package.reference_plan.hios_id
-              ref_plan_year       = benefit_package.reference_plan.active_year
+              benefit_package     = bp.title.gsub(',','')
+              plan_option         = bp.plan_option_kind
+              ref_plan_name       = bp.reference_plan.name.gsub(',','')
+              ref_plan_hios_id    = bp.reference_plan.hios_id
+              ref_plan_year       = bp.reference_plan.active_year
 
-              if benefit_application.employer_profile.staff_roles.size > 0
-                staff_role = benefit_application.employer_profile.staff_roles.first
+              if employer_profile.staff_roles.size > 0
+                staff_role = employer_profile.staff_roles.first
                 staff_name = staff_role.full_name
 
                 if staff_role.phones.present? && staff_role.phones.where(kind: "work").size > 0
@@ -43,8 +46,8 @@ namespace :reports do
                 end
               end
 
-              if benefit_application.employer_profile.active_broker.present?
-                broker = benefit_application.employer_profile.active_broker
+              if employer_profile.active_broker.present?
+                broker = employer_profile.active_broker
                 broker_name = broker.full_name
 
                 if broker.phones.present? && broker.phones.where(kind: "work").size > 0

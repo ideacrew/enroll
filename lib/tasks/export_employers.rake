@@ -157,10 +157,10 @@ namespace :employers do
 
     end
 
-    # if Rails.env.production?
-    #   pubber = Publishers::Legacy::EmployerExportPublisher.new
-    #   pubber.publish URI.join("file://", file_name)
-    # end
+    if Rails.env.production? && Settings.site.key == :cca
+      pubber = Publishers::Legacy::EmployerExportPublisher.new
+      pubber.publish URI.join("file://", file_name)
+    end
 
     puts "Output written to #{file_name}"
     puts "************ Report Finished *********"
