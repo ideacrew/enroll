@@ -28,6 +28,11 @@ var table = $('#products-ajax-dt').DataTable( {
     { "data": "attributes.size" },
     { "data": "attributes.size" },
     // Builds Actions Menu
+    { "data": null,
+      "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+        $(nTd).html(buildDropDownMenu(sData));
+      }
+    }
   ]
 });
 
@@ -58,4 +63,18 @@ function selectAllCheckboxes(element) {
 function buildCheckboxes(sData) {
   var product_id = sData['id'];
   return `<input type="checkbox" class="ee-main-checkbox" data-product-id='${product_id}'>`
+}
+
+// Actions Menu List Items
+function buildDropDownMenu(sData) {
+  var product_id = sData['id'];
+  return `<div class="btn-group">
+            <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Actions
+            </button>
+            <ul class="dropdown-menu">
+              <li><a href="javascript:void(0)" onclick="toAction(this)" data-product-id-id='${product_id}'>Delete</a></li>
+              <li><a href="javascript:void(0)" onclick="toAction(this)" data-product-id-id='${product_id}'>Download</a></li>
+            </ul>
+          </div>`
 }
