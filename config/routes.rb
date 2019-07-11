@@ -111,7 +111,6 @@ Rails.application.routes.draw do
         post :force_publish
         get :broker_agency_index
         get :general_agency_index
-        get :product_index
         get :configuration
         post :set_date
         post :update_setting
