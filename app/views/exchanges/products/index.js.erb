@@ -1,4 +1,5 @@
 set_tab_content("<%= escape_javascript render "index"%>")
+
 var table = $('#products-ajax-dt').DataTable( {
   "ajax": {
     "url": "/exchanges/issuers/<%=params['issuer_id']%>/products" ,
@@ -9,10 +10,16 @@ var table = $('#products-ajax-dt').DataTable( {
   "deferRender": true,
   // Call back event when table renders
   "drawCallback": function() {
+    resetMainCheckbox()
   },
   // Creates a custom toolbar
   "dom": '<"toolbar">frtip',
   "columns": [
+    { "data": null,
+        "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+          $(nTd).html(buildCheckboxes(sData));
+        }
+    },
     { "data": "attributes.name" },
     { "data": "attributes.active_year" },
     { "data": "attributes.size" },
@@ -23,3 +30,32 @@ var table = $('#products-ajax-dt').DataTable( {
     // Builds Actions Menu
   ]
 });
+
+function resetMainCheckbox() {
+  var element = $('.all-product-chkbx');
+  selectAllCheckboxes(element);
+  $('.all-product-chkbx')[0].checked = false;
+}
+
+function selectAllCheckboxes(element) {
+  // Selects All Checkboxes
+  if (element.checked) {
+    $('.ee-main-checkbox').each(function() {
+      $(this)[0].disabled ? $(this)[0].checked = false : $(this)[0].checked = true
+    })
+    // Enables Bulk Action Button
+    $('.er-bulk-action-btn').prop('disabled', false);
+  // Deselects All Checkboxes
+  } else {
+    $('.ee-main-checkbox').each(function() {
+      $(this)[0].checked = false;
+    })
+    // Disables Bulk Action Button
+    $('.er-bulk-action-btn').prop('disabled', true);
+  }
+}
+
+function buildCheckboxes(sData) {
+  var product_id = sData['id'];
+  return `<input type="checkbox" class="ee-main-checkbox" data-product-id='${product_id}'>`
+}
