@@ -191,6 +191,8 @@ class Person
 
   index({last_name: 1, dob: 1}, {sparse: true})
 
+  index({last_name: "text", first_name: "text", full_name: "text"}, {name: "person_search_text_index"})
+
   # Broker child model indexes
   index({"broker_role._id" => 1})
   index({"broker_role.provider_kind" => 1})
