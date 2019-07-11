@@ -9,7 +9,7 @@ RSpec.describe Factories::EmployerEnrollFactory, type: :model, dbclean: :after_e
     TimeKeeper.set_date_of_record_unprotected!(Date.today)
   end
 
-  context 'New Employer' do
+  xcontext 'New Employer' do
     let(:organization) {
       org = FactoryBot.create :organization, legal_name: "Corp 1"
       employer_profile = FactoryBot.create :employer_profile, organization: org
@@ -88,7 +88,7 @@ RSpec.describe Factories::EmployerEnrollFactory, type: :model, dbclean: :after_e
     end
   end
 
-  context "Renewing employer" do
+  xcontext "Renewing employer" do
     let(:organization) {
       org = FactoryBot.create :organization, legal_name: "Corp 1"
       employer_profile = FactoryBot.create :employer_profile, organization: org
@@ -202,7 +202,7 @@ RSpec.describe Factories::EmployerEnrollFactory, type: :model, dbclean: :after_e
     end
   end
 
-  context '.end' do
+  xcontext '.end' do
     context 'When employer active plan year ended' do
 
       let(:organization) {
