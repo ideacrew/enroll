@@ -1,9 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: :after_each do
-  before do
-    DatabaseCleaner.clean
-  end
 
   describe ".sort_by_standard_plans", dbclean: :after_each do
     context "width standard plan present" do

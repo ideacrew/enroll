@@ -93,12 +93,11 @@ RSpec.describe Employers::CensusEmployeesController do
   end
 
   describe "GET edit" do
-    let(:user) { FactoryGirl.create(:user, :hbx_staff) }
+    let(:user) { FactoryGirl.create(:user, :employer_staff) }
     it "should be render edit template" do
       sign_in user
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(CensusEmployee).to receive(:find).and_return(census_employee)
-      allow(controller).to receive(:authorize).and_return(true)
       post :edit, :id => census_employee.id, :employer_profile_id => employer_profile_id, census_employee: {}
       expect(response).to render_template("edit")
     end
@@ -194,13 +193,15 @@ RSpec.describe Employers::CensusEmployeesController do
   end
 
   describe "GET show" do
-    let(:user) { FactoryGirl.create(:user, :hbx_staff) }
+    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+
      it "should be render show template" do
-      sign_in @user
-      allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(census_employee.employer_profile_id)
+      sign_in
+
+      allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(CensusEmployee).to receive(:find).and_return(census_employee)
-      allow(controller).to receive(:authorize).and_return(true)
-      get :show, :id => census_employee.id, :employer_profile_id => census_employee.employer_profile_id
+
+      get :show, :id => census_employee.id, :employer_profile_id => employer_profile_id
       expect(response).to render_template("show")
     end
 
