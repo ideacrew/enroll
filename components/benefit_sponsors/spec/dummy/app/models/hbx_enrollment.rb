@@ -42,7 +42,7 @@ class HbxEnrollment
   ENROLLMENT_KINDS    = %w(open_enrollment special_enrollment)
   COVERAGE_KINDS      = %w(health dental)
 
-  ENROLLED_STATUSES   = %w[coverage_selected transmitted_to_carrier enrolled_contingent coverage_enrolled coverage_termination_pending unverified].freeze
+  ENROLLED_STATUSES   = %w[coverage_selected transmitted_to_carrier coverage_enrolled coverage_termination_pending unverified].freeze
   SELECTED_AND_WAIVED = %w(coverage_selected inactive)
   TERMINATED_STATUSES = %w[coverage_terminated unverified coverage_expired].freeze
   CANCELED_STATUSES   = %w[coverage_canceled void].freeze # Void state enrollments are invalid enrollments. will be treated same as canceled.
@@ -416,18 +416,6 @@ class HbxEnrollment
       ).to_a
     end
 
-    def families_with_contingent_enrollments
-      Family.by_enrollment_individual_market.where(:'households.hbx_enrollments' => {
-        :$elemMatch => {
-            :aasm_state => "enrolled_contingent",
-            :$or => [
-                {:"terminated_on" => nil},
-                {:"terminated_on".gt => TimeKeeper.date_of_record}
-            ]
-        }
-      })
-    end
-
     def by_hbx_id(policy_hbx_id)
       self.where(hbx_id: policy_hbx_id)
       # families = Family.with_enrollment_hbx_id(policy_hbx_id)
@@ -581,21 +569,6 @@ class HbxEnrollment
 
   def is_active?
     self.is_active
-  end
-
-  def status_step
-    case
-      when coverage_selected?  #submitted
-        1
-      when transmitted_to_carrier? #transmitted
-        2
-      when enrolled_contingent? #acknowledged
-        3
-      when coverage_enrolled? #enrolled
-        4
-      when coverage_canceled? || coverage_terminated? #canceled/terminated
-        5
-    end
   end
 
   def currently_active?

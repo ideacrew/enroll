@@ -162,20 +162,17 @@ class Family
   scope :by_enrollment_effective_date_range,    ->(start_on, end_on){ where(:"_id".in => HbxEnrollment.where(effective_on: { "$gte" => start_on, "$lte" => end_on }).pluck(:family_id))}
   scope :non_enrolled,                          ->{ where(:"_id".in => HbxEnrollment.where(:"aasm_state".nin => HbxEnrollment::ENROLLED_STATUSES).pluck(:family_id))}
   scope :sep_eligible,                          ->{ where(:"active_seps.count".gt => 0) }
-  scope :coverage_waived,                       ->{ where(:"_id".in => HbxEnrollment.where(:"aasm_state".in => HbxEnrollment::WAIVED_STATUSES).pluck(:family_id))}
-  scope :having_unverified_enrollment,          ->{ where(:"_id".in => HbxEnrollment.where(aasm_state: "enrolled_contingent").pluck(:family_id))}
-  scope :with_all_verifications,                ->{ where(:"_id".in => HbxEnrollment.where(aasm_state: "enrolled_contingent", :"review_status" => "ready").pluck(:family_id))}
-  scope :with_partial_verifications,            ->{ where(:"_id".in => HbxEnrollment.where(aasm_state: "enrolled_contingent", :"review_status" => "in review").pluck(:family_id))}
-  scope :with_no_verifications,                 ->{ where(:"_id".in => HbxEnrollment.where(aasm_state: "enrolled_contingent", :"review_status" => "incomplete").pluck(:family_id))}
-  scope :with_reset_verifications,              ->{ where(:"_id".in => HbxEnrollment.where(aasm_state: "enrolled_contingent").pluck(:family_id))}
+  scope :coverage_waived,                       ->{ where(:"_id".in => HbxEnrollment.waived.distinct(:family_id))}
+  scope :having_unverified_enrollment,          ->{ where(:"_id".in => HbxEnrollment.by_unverified.distinct(:family_id)) }
+  scope :with_all_verifications,                ->{ where(:"_id".in => HbxEnrollment.verified.distinct(:family_id))}
+  scope :with_partial_verifications,            ->{ where(:"_id".in => HbxEnrollment.partially_verified.distinct(:family_id))}
+  scope :with_no_verifications,                 ->{ where(:"_id".in => HbxEnrollment.not_verified.distinct(:family_id))}
+  scope :with_reset_verifications,              ->{ where(:"_id".in => HbxEnrollment.reset_verifications.distinct(:family_id))}
   scope :vlp_fully_uploaded,                    ->{ where(vlp_documents_status: "Fully Uploaded")}
   scope :vlp_partially_uploaded,                ->{ where(vlp_documents_status: "Partially Uploaded")}
   scope :vlp_none_uploaded,                     ->{ where(:vlp_documents_status.in => ["None",nil])}
   scope :outstanding_verification,   ->{ by_enrollment_individual_market.where(
-    :"_id".in => HbxEnrollment.where(
-      aasm_state: "enrolled_contingent",
-      effective_on: { :"$gte" => TimeKeeper.date_of_record.beginning_of_year, :"$lte" =>  TimeKeeper.date_of_record.end_of_year }
-      ).pluck(:family_id))
+    :"_id".in => HbxEnrollment.verification_outstanding.distinct(:family_id))
   }
   
   # Replaced scopes for moving HbxEnrollment to top level
@@ -772,7 +769,7 @@ class Family
       individual_market_enrollments = HbxEnrollment.where(
         :effective_on.lt => current_benefit_period.start_on,
         kind: 'individual',
-        :"aasm_state".in => HbxEnrollment::ENROLLED_STATUSES - ['coverage_termination_pending', 'enrolled_contingent', 'unverified']
+        :"aasm_state".in => HbxEnrollment::ENROLLED_STATUSES - ['coverage_termination_pending', 'unverified']
       )
       begin
         individual_market_enrollments.each do |enrollment|
