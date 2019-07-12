@@ -301,7 +301,7 @@ class Family
   end
 
   def terminated_enrollments
-    HbxEnrollment.where(:family_id => id, :aasm_state.in=> ["coverage_terminated", "coverage_termination_pending"])
+    hbx_enrollments.where(:aasm_state.in=> ["coverage_terminated", "coverage_termination_pending"])
   end
 
   # @deprecated Use {primary_applicant}
