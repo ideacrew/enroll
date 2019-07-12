@@ -13,7 +13,7 @@
       <div class='hide' id='collection_scope'><%= @profile._id %> </div>
       <div class="row container">
         <div class="pull-right">
-          <%= link_to "Add Prospect Employer", new_organizations_plan_design_organization_path(broker_agency_id: @profile.id), class:"btn btn-primary prospective-employer" if @profile.class.to_s != "GeneralAgencyProfile" %>
+          <%= link_to "Add Prospect Employer", new_organizations_plan_design_organization_path(broker_agency_id: @profile.id), class:"btn btn-primary prospective-employer" if @profile.class.to_s != "BenefitSponsors::Organizations::GeneralAgencyProfile" %>
         </div>
       </div>
       <br>
