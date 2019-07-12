@@ -2,7 +2,7 @@ require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
-describe Factories::EnrollmentFactory, "starting with unlinked employee_family and employee_role", :dbclean => :after_each do
+describe Factories::EnrollmentFactory, :dbclean => :after_each do
   def p(model)
     model.class.find(model.id)
   end
@@ -12,50 +12,68 @@ describe Factories::EnrollmentFactory, "starting with unlinked employee_family a
   include_context "setup benefit market with market catalogs and product packages"
   include_context "setup initial benefit application"
 
-  let(:hired_on) { TimeKeeper.date_of_record - 30.days }
-  let(:terminated_on) { TimeKeeper.date_of_record - 1.days }
-  let(:dob) { employee_role.dob }
-  let(:ssn) { employee_role.ssn }
+  context "starting with unlinked employee_family and employee_role" do
+    let(:hired_on) { TimeKeeper.date_of_record - 30.days }
+    let(:terminated_on) { TimeKeeper.date_of_record - 1.days }
+    let(:dob) { employee_role.dob }
+    let(:ssn) { employee_role.ssn }
 
-  let!(:census_employee) do
-    create(:census_employee,
-      hired_on: hired_on,
-      employment_terminated_on: terminated_on,
-      dob: dob, ssn: ssn,
-      benefit_sponsorship: benefit_sponsorship,
-      employer_profile: benefit_sponsorship.profile,
-      benefit_group: current_benefit_package
-    )
+    let!(:census_employee) do
+      create(:census_employee,
+             hired_on: hired_on,
+             employment_terminated_on: terminated_on,
+             dob: dob, ssn: ssn,
+             benefit_sponsorship: benefit_sponsorship,
+             employer_profile: benefit_sponsorship.profile,
+             benefit_group: current_benefit_package)
+    end
+    let(:employee_role) {FactoryBot.build(:employee_role, employer_profile: abc_profile)}
+
+    describe "After performing the link", :dbclean => :after_each do
+
+      before(:each) do
+        Factories::EnrollmentFactory.link_census_employee(census_employee, employee_role, abc_profile)
+      end
+
+      it "should set employee role id on the census employee" do
+        expect(census_employee.employee_role_id).to eq employee_role.id
+      end
+
+      it "should set employer profile id on the employee_role" do
+        expect(employee_role.benefit_sponsors_employer_profile_id).to eq abc_profile.id
+      end
+
+      it "should set census employee id on the employee_role" do
+        expect(employee_role.census_employee_id).to eq census_employee.id
+      end
+
+      it "should set hired on on the employee_role" do
+        expect(employee_role.hired_on).to eq hired_on
+      end
+
+      it "should set terminated on on the employee_role" do
+        expect(employee_role.terminated_on).to eq terminated_on
+      end
+    end
   end
 
-  let(:employee_role) {
-    FactoryBot.build(:employee_role, employer_profile: abc_profile)
-  }
+  context "dual role contact methods" do
+    let(:existing_person) {FactoryBot.create(:person, :with_consumer_role)}
 
-  describe "After performing the link", :dbclean => :after_each do
+    let(:employer_profile) { abc_profile }
+    let(:organization) { abc_organization }
+    let(:hired_on) {TimeKeeper.date_of_record.beginning_of_month}
+    let(:census_employee) {FactoryBot.create(:benefit_sponsors_census_employee, employer_profile: employer_profile, ssn: existing_person.ssn, dob: existing_person.dob, hired_on: hired_on, benefit_sponsorship: organization.active_benefit_sponsorship)}
 
-    before(:each) do
-      Factories::EnrollmentFactory.link_census_employee(census_employee, employee_role, abc_profile)
-    end
+    describe "existing consumer role adds employee role" do
+      before do
+        existing_person.consumer_role.update_attributes(contact_method: "Paper Only")
+        Factories::EnrollmentFactory.build_employee_role(existing_person, nil, employer_profile,census_employee, hired_on)
+      end
 
-    it "should set employee role id on the census employee" do
-      expect(census_employee.employee_role_id).to eq employee_role.id
-    end
-
-    it "should set employer profile id on the employee_role" do
-      expect(employee_role.benefit_sponsors_employer_profile_id).to eq abc_profile.id
-    end
-
-    it "should set census employee id on the employee_role" do
-      expect(employee_role.census_employee_id).to eq census_employee.id
-    end
-
-    it "should set hired on on the employee_role" do
-      expect(employee_role.hired_on).to eq hired_on
-    end
-
-    it "should set terminated on on the employee_role" do
-      expect(employee_role.terminated_on).to eq terminated_on
+      it 'should give employee_role the same contact method as consumer_role' do
+        expect(existing_person.employee_roles.first.contact_method).to eq(existing_person.consumer_role.contact_method)
+      end
     end
   end
 end
@@ -373,6 +391,7 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
       end
 
       it "updates employee role contact method to match consumer role" do
+        #is it hitting this method???
         @employee_role, @family = Factories::EnrollmentFactory.add_employee_role(**params)
         expect(@employee_role.contact_method).to eq(existing_person.consumer_role.contact_method)
       end
