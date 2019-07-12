@@ -49,14 +49,14 @@ function selectAllCheckboxes(element) {
       $(this)[0].disabled ? $(this)[0].checked = false : $(this)[0].checked = true
     })
     // Enables Bulk Action Button
-    $('.er-bulk-action-btn').prop('disabled', false);
+    // $('.er-bulk-action-btn').prop('disabled', false);
   // Deselects All Checkboxes
   } else {
     $('.ee-main-checkbox').each(function() {
       $(this)[0].checked = false;
     })
     // Disables Bulk Action Button
-    $('.er-bulk-action-btn').prop('disabled', true);
+    // $('.er-bulk-action-btn').prop('disabled', true);
   }
 }
 
