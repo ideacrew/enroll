@@ -1890,6 +1890,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       FactoryBot.create(
         :hbx_enrollment,
         household: census_employee.employee_role.person.primary_family.active_household,
+        family: census_employee.employee_role.person.primary_family,
         coverage_kind: "health",
         kind: "employer_sponsored",
         benefit_sponsorship_id: benefit_sponsorship.id,
