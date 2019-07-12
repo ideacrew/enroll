@@ -36,6 +36,10 @@ When(/^click on the New Quote button$/) do
   click_link 'New Quote'
 end
 
+When(/^.+ clicks on the Add Prospect Employer button$/) do
+  find(:xpath, "//*[@id='myTabContent']/div/div[4]/div/a").click
+end
+
 When(/^click on the Upload Employee Roster button$/) do
   click_link "Upload Roster"
 end

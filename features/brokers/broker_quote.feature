@@ -3,11 +3,12 @@ Feature: Broker creates a quote for a prospect employer
   The Broker should be able to add Employer and Employees
   And Generate a quote
 
+  Background: Broker Quoting Tool
+   Given a CCA site exists with a benefit market
+   And there is a Broker Agency exists for District Brokers Inc
+   And the broker Max Planck is primary broker for District Brokers Inc 
+
   Scenario: Broker should be able to create an Employer
-    Given that a broker exists
-    And the broker is signed in
-    When broker visits the Employers tab
-    And create a Prospect Employer
-    And click on the Create Quote button
-    Then the broker should be on the Roster page of a new quote
-    And broker should see the quote roster is empty
+    Given Max Planck logs on to the Broker Agency Portal
+    And Primary Broker clicks on the Employers tab
+    When Primary Broker clicks on the Add Prospect Employer button
