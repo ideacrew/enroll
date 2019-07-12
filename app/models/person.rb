@@ -670,6 +670,17 @@ class Person
       end
     end
 
+    def additional_exprs(clean_str)
+      additional_exprs = []
+      if clean_str.include?(" ")
+        parts = clean_str.split(" ").compact
+        first_re = ::Regexp.new(::Regexp.escape(parts.first), true)
+        last_re = ::Regexp.new(::Regexp.escape(parts.last), true)
+        additional_exprs << {:first_name => first_re, :last_name => last_re}
+      end
+      additional_exprs
+    end
+
     def search_first_name_last_name_npn(s_str, query=self)
       clean_str = s_str.strip
       s_rex = ::Regexp.new(::Regexp.escape(s_str.strip), true)
