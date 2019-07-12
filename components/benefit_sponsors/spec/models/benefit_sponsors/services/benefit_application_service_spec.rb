@@ -231,7 +231,7 @@ module BenefitSponsors
         end
 
         [:pending, :enrollment_open, :enrollment_closed, :enrollment_ineligible].each do |active_state|
-          let!(:ba) { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, aasm_state: :draft) }
+          let!(:ba) { FactoryBot.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, aasm_state: :draft) }
 
           context 'with dt in pending and enrollment states' do
             it 'should return true and instance as ba succesfully created' do
@@ -255,8 +255,7 @@ module BenefitSponsors
         end
 
         context 'with dt active state' do
-          # let!(:ba2) { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, aasm_state: :active) }
-
+          
           it 'should return true and instance as ba succesfully created' do
             ba2.update_attribute(:aasm_state, :active)
             set_bs_for_service(@form)
@@ -272,7 +271,7 @@ module BenefitSponsors
             @model_attrs = subject.form_params_to_attributes(@form)
             result = subject.create_or_cancel_draft_ba(@form, @model_attrs)
             benefit_sponsorship.reload
-            expect(benefit_sponsorship.benefit_applications.first).to have_attributes(:aasm_state => :termination_pending)
+            expect(benefit_sponsorship.benefit_applications.map(&:aasm_state)).to include(:termination_pending)
           end
         end
       end

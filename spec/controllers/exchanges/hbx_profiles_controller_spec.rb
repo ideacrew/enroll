@@ -1295,7 +1295,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
     context '.new_benefit_application' do
       before :each do
-        xhr :get, :new_benefit_application, benefit_sponsorship_id: benefit_sponsorship.id.to_s
+        get :new_benefit_application, params: {benefit_sponsorship_id: benefit_sponsorship.id.to_s}, xhr: true
       end
 
       it 'should respond with success status' do
@@ -1309,7 +1309,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
     context '.create_benefit_application when existing draft application' do
       before :each do
-        xhr :post, :create_benefit_application, valid_params, has_active_ba: false
+        post :create_benefit_application, params: valid_params, has_active_ba: false, xhr: true
       end
 
       it 'should respond with success status' do
@@ -1323,7 +1323,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
     context '.create_benefit_application when existing application is in active states' do
       before :each do
-        xhr :post, :create_benefit_application, valid_params, has_active_ba: true
+        post :create_benefit_application, params: valid_params, has_active_ba: true, xhr: true
       end
 
       it 'should respond with success status' do

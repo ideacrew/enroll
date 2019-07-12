@@ -56,8 +56,8 @@ module BenefitSponsors
             terminatation_pending_active_applications(persisted_object)
             cancel_draft_enrolling_and_ineligible_applications(persisted_object)
           else
-          benefit_sponsorship.revert_to_applicant! if benefit_sponsorship.may_revert_to_applicant? && !benefit_sponsorship.applicant?
-          cancel_draft_and_ineligible_applications(persisted_object)
+            benefit_sponsorship.revert_to_applicant! if benefit_sponsorship.may_revert_to_applicant? && !benefit_sponsorship.applicant?
+            cancel_draft_and_ineligible_applications(persisted_object)
           end
         end
         [save_result, persisted_object]
@@ -79,6 +79,7 @@ module BenefitSponsors
         applications_for_cancel  = benefit_sponsorship.benefit_applications.draft_and_exception.select{|existing_application| existing_application != benefit_application}
         applications_for_cancel += benefit_sponsorship.benefit_applications.enrollment_ineligible.to_a
         applications_for_cancel += benefit_sponsorship.benefit_applications.enrolling.to_a
+        applications_for_cancel += benefit_sponsorship.benefit_applications.where(aasm_state: :enrollment_eligible)
 
         applications_for_cancel.each do |application|
           application.cancel! if application.may_cancel?
