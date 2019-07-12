@@ -36,6 +36,15 @@ var table = $('#products-ajax-dt').DataTable( {
   ]
 });
 
+$("div.toolbar").html(
+  `<div class="btn-group main-group" role="group" aria-label="...">
+    <button type="button" class="btn btn-default" onclick="filterProductDataTable(this.innerText)">All</button>
+    <button type="button" class="btn btn-default" onclick="filterProductDataTable(this.innerText)">2019</button>
+    <button type="button" class="btn btn-default" onclick="filterProductDataTable(this.innerText)">2018</button>
+   </div> <br />
+  </div>`
+);
+
 function resetMainCheckbox() {
   var element = $('.all-product-chkbx');
   selectAllCheckboxes(element);
@@ -78,4 +87,20 @@ function buildDropDownMenu(sData) {
               <li><a href="javascript:void(0)" onclick="toAction(this)" data-product-id-id='${product_id}'>Download</a></li>
             </ul>
           </div>`
+}
+
+function filterProductDataTable(type) {
+  var url = '';
+  switch (type) {
+    case 'All':
+      url = "/exchanges/issuers/<%=params['issuer_id']%>/products?query=all";
+      break;
+    case '2019':
+      url = "/exchanges/issuers/<%=params['issuer_id']%>/products?query=2019";
+      break;
+    case '2018':
+      url = "/exchanges/issuers/<%=params['issuer_id']%>/products?query=2018";
+      break;
+  }
+  table.ajax.url(url).load();
 }
