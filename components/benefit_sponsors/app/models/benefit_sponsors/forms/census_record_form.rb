@@ -30,9 +30,9 @@ module BenefitSponsors
       validate :date_format
 
       def date_format
-        errors.add(:base, "DOB: #{dob} Invalid DATE format") if dob.include?('Invalid Format')
-        errors.add(:base, "Hired On: #{hired_on} Invalid DATE format") if hired_on.include?('Invalid Format')
-        errors.add(:base, "Employment Terminated On: #{employment_terminated_on} Invalid DATE format") if employment_terminated_on.include?('Invalid Format')
+        errors.add(:base, "DOB: #{dob}") if dob &.include?('Invalid Format')
+        errors.add(:base, "Hired On: #{hired_on}") if hired_on &.include?('Invalid Format')
+        errors.add(:base, "Employment Terminated On: #{employment_terminated_on}") if employment_terminated_on &.include?('Invalid Format')
       end
     end
   end

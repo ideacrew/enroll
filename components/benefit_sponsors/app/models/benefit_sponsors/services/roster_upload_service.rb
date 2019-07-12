@@ -331,7 +331,7 @@ module BenefitSponsors
             begin
               Date.strptime(sanitize_value(cell), "%m-%d-%Y")
             rescue
-              "Invalid Format: #{cell}"
+              "#{cell} Invalid Format"
             end
           end
         else
