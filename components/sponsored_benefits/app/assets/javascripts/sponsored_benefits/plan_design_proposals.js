@@ -287,6 +287,19 @@ function setSliderDisplayVal(slideEvt) {
   calcPlanDesignContributions();
 }
 
+function updateSlider(element) {
+  var value = element.value;
+  var inputBox = $(element).closest('.row').find('input.contribution_handler').val(element.value);
+  var slideLabel = $(element).closest('.row').find('.slide-label').text(element.value + "%");
+  var slideLabel = $(element).closest('.row').find('.slide-label').text(element.value + "%");
+}
+
+function updateSliderValue(element) {
+  var value = element.value;
+  var slider = $(element).closest('.row').find('.contribution_slide_handler').val(element.value);
+  var slideLabel = $(element).closest('.row').find('.slide-label').text(element.value + "%");
+}
+
 function toggleSliders(plan_kind) {
   if (plan_kind == 'sole_source') {
     $('.composite-offerings').removeClass('hidden');
