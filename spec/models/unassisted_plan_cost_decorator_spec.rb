@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
@@ -9,17 +11,15 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
     let!(:member_provider) {double("member_provider", effective_on: 10.days.ago, hbx_enrollment_members: [father, mother, one, two, three, four, five])}
     let!(:father)          {double("father", dob: 55.years.ago, age_on_effective_date: 55, employee_relationship: "self")}
     let!(:mother)          {double("mother", dob: 45.years.ago, age_on_effective_date: 45, employee_relationship: "spouse")}
-    let!(:one)             {double("one"   , dob: 20.years.ago, age_on_effective_date: 20, employee_relationship: "child")}
-    let!(:two)             {double("two"   , dob: 18.years.ago, age_on_effective_date: 18, employee_relationship: "child")}
-    let!(:three)           {double("three" , dob: 13.years.ago, age_on_effective_date: 13, employee_relationship: "child")}
-    let!(:four)            {double("four"  , dob: 11.years.ago, age_on_effective_date: 11, employee_relationship: "child")}
-    let!(:five)            {double("five"  , dob: 4.years.ago , age_on_effective_date: 4, employee_relationship: "child")}
+    let!(:one)             {double("one", dob: 20.years.ago, age_on_effective_date: 20, employee_relationship: "child")}
+    let!(:two)             {double("two", dob: 18.years.ago, age_on_effective_date: 18, employee_relationship: "child")}
+    let!(:three)           {double("three", dob: 13.years.ago, age_on_effective_date: 13, employee_relationship: "child")}
+    let!(:four)            {double("four", dob: 11.years.ago, age_on_effective_date: 11, employee_relationship: "child")}
+    let!(:five)            {double("five", dob: 4.years.ago, age_on_effective_date: 4, employee_relationship: "child")}
     let!(:relationship_benefit_for) do
-      {
-        "self"   => double("self", :offered? => true),
+      { "self" => double("self", :offered? => true),
         "spouse" => double("spouse", :offered? => true),
-        "child"  => double("child", :offered? => true)
-      }
+        "child" => double("child", :offered? => true)}
     end
 
     before do
@@ -79,34 +79,51 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
   end
 
   describe 'UnassistedPlanCostDecorator' do
-    let!(:family10) { FactoryBot.create(:family, :with_primary_family_member_and_dependent) }
+    let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, dob: 95.years.ago) }
+    let!(:family10) { FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person) }
     let!(:member2_age_update) {family10.dependents.first.person.update_attributes(dob: 14.years.ago)}
-    let!(:hbx_enrollment10) { FactoryBot.create(:hbx_enrollment, family: family10, household: family10.active_household, aasm_state: 'shopping', product: product) }
+    let!(:hbx_enrollment10) { FactoryBot.create(:hbx_enrollment, family: family10, household: family10.active_household, aasm_state: 'shopping', product: product, consumer_role_id: person.consumer_role.id) }
     let!(:hbx_enrollment_member1) { FactoryBot.create(:hbx_enrollment_member, applicant_id: family10.primary_applicant.id, is_subscriber: true, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: hbx_enrollment10) }
     let!(:hbx_enrollment_member2) { FactoryBot.create(:hbx_enrollment_member, applicant_id: family10.family_members[1].id, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: hbx_enrollment10) }
     let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
-    let!(:tax_household10) { FactoryBot.create(:tax_household, household: family10.active_household) }
+    let!(:tax_household10) { FactoryBot.create(:tax_household, household: family10.active_household, effective_ending_on: nil) }
     let!(:eligibility_determination) { FactoryBot.create(:eligibility_determination, tax_household: tax_household10) }
     let!(:tax_household_member1) { tax_household10.tax_household_members.create(applicant_id: family10.primary_applicant.id, is_subscriber: true, is_ia_eligible: true)}
     let!(:tax_household_member2) {tax_household10.tax_household_members.create(applicant_id: family10.family_members[1].id, is_ia_eligible: true)}
     let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
-    #let(:plan) { FactoryBot.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', csr_variant_id: '01', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01") }
+    let(:person2) { family10.family_members[1].person }
 
     before do
-      hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}.update_attributes!(slcsp_id: product.id)
+      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) {|_id, _start, age| age * 1.0}
+      hbx_profile.benefit_sponsorship.benefit_coverage_periods.each{|bcp| bcp.update_attributes!(slcsp_id: product.id)}
     end
 
-    context 'for aptc_amount' do
-      let(:unassisted_plan_cost_decorator1) { UnassistedPlanCostDecorator.new(product, hbx_enrollment10, 100.00, tax_household10) }
+    context 'for valid arguments' do
+      it 'should return amounts based on elected_aptc' do
+        person2.update_attributes!(dob: 80.years.ago)
+        upcd_1 = UnassistedPlanCostDecorator.new(product, hbx_enrollment10, 100.00, tax_household10)
+        expect(upcd_1.aptc_amount(hbx_enrollment_member1)).to eq 50.00
+        expect(upcd_1.aptc_amount(hbx_enrollment_member2)).to eq 50.00
+      end
+
+      it 'should return amounts based on premium' do
+        person.update_attributes!(dob: 45.years.ago)
+        person2.update_attributes!(dob: 45.years.ago)
+        upcd_1 = UnassistedPlanCostDecorator.new(product, hbx_enrollment10, 100.00, tax_household10)
+        expect(upcd_1.aptc_amount(hbx_enrollment_member1).round(2)).to eq 43.75
+        expect(upcd_1.aptc_amount(hbx_enrollment_member2).round(2)).to eq 43.75
+      end
+
+      it 'should return amounts based on max_aptc' do
+        eligibility_determination.update_attributes!(max_aptc: 50.00)
+        upcd_1 = UnassistedPlanCostDecorator.new(product, hbx_enrollment10, 100.00, tax_household10)
+        expect(upcd_1.aptc_amount(hbx_enrollment_member1)).to eq 25.00
+        expect(upcd_1.aptc_amount(hbx_enrollment_member2)).to eq 25.00
+      end
+    end
+
+    context 'for invalid arguments' do
       let(:unassisted_plan_cost_decorator2) { UnassistedPlanCostDecorator.new(product, hbx_enrollment10) }
-
-      before :each do
-        allow(unassisted_plan_cost_decorator1).to receive(:premium_for).and_return(200.00)
-      end
-
-      it 'should return some valid amount when valid information is given' do
-        expect(unassisted_plan_cost_decorator1.aptc_amount(hbx_enrollment_member1)).to eq 50.00
-      end
 
       it 'should return 0.00 when invalid information is given' do
         expect(unassisted_plan_cost_decorator2.aptc_amount(hbx_enrollment_member1)).to eq 0.00
