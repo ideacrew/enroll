@@ -22,7 +22,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
     describe 'cases for multi tax household scenarios' do
       include_context 'setup two tax households with one ia member each'
 
-      let!(:enrollment1) { FactoryBot.create(:hbx_enrollment, :individual_shopping, household: family.active_household, family: family) }
+      let!(:enrollment1) { FactoryBot.create(:hbx_enrollment, :individual_shopping, family: family, household: family.active_household) }
       let!(:enrollment_member1) { FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: enrollment1, applicant_id: family_member.id) }
 
       before :each do
@@ -178,7 +178,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
     describe 'cases for single tax household scenarios' do
       include_context 'setup one tax household with two ia members'
 
-      let!(:enrollment1) { FactoryBot.create(:hbx_enrollment, :individual_shopping, household: family.active_household, family: family) }
+      let!(:enrollment1) { FactoryBot.create(:hbx_enrollment, :individual_shopping, family: family, household: family.active_household) }
       let!(:enrollment_member1) { FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: enrollment1, applicant_id: family_member.id) }
 
       before :each do
@@ -306,7 +306,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
 
         context 'with an existing enrollment' do
           let!(:enrollment_member2) { FactoryBot.create(:hbx_enrollment_member, is_subscriber: false, hbx_enrollment: enrollment1, applicant_id: family_member2.id) }
-          let!(:enrollment2) { FactoryBot.create(:hbx_enrollment, :individual_assisted, applied_aptc_amount: 50.00, household: family.active_household, family: family) }
+          let!(:enrollment2) { FactoryBot.create(:hbx_enrollment, :individual_assisted, applied_aptc_amount: 50.00, family: family, household: family.active_household) }
           let!(:enrollment_member21) { FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: enrollment2, applicant_id: family_member.id, applied_aptc_amount: 50.00) }
 
           context 'with valid tax household for all the shopping members' do
