@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# This factory can be used for all eligibilities related projects.
+# This factory can be used for all ivl pdc eligibility related projects.
 # Currently Applied: Passive Renewals.
 # Future Applicable locations: Plan Shopping Controller, APTC tool, Self Service.
 module Factories
@@ -37,7 +37,44 @@ module Factories
       end
     end
 
+    def fetch_aptc_per_member
+      raise "Cannot process without #{@selected_aptc} and #{@product_ids}" if @selected_aptc.nil? || @product_ids.empty?
+
+      return @fetch_aptc_per_member if @fetch_aptc_per_member
+
+      @product_ids.inject({}) do |member_hash, product_id|
+        member_hash[product_id] = all_members_aptc(product_id)
+        member_hash
+      end
+    end
+
     private
+
+    def fetch_member_ratio
+      return @fetch_member_ratio if @fetch_member_ratio.present?
+
+      aptc_enr_members = aptc_enrolling_members(all_aptc_thhms)
+      @fetch_member_ratio ||= aptc_benchmark_ratio_hash_test(aptc_enr_members)
+    end
+
+    def applicable_aptc(product_id)
+      return @applicable_aptc if @applicable_aptc
+
+      @applicable_aptc ||= fetch_applicable_aptcs[product_id.to_s]
+    end
+
+    def all_members_aptc(product_id)
+      @enrollment.hbx_enrollment_members.inject({}) do |aptc_hash, member|
+        fm_id = member.applicant_id.to_s
+        aptc_hash[fm_id] = if fetch_member_ratio[fm_id]
+                             (applicable_aptc(product_id) * fetch_member_ratio[fm_id])
+                           else
+                             0.00
+                           end
+
+        aptc_hash
+      end
+    end
 
     def applicable_aptc_hash(product_id)
       # We still consider AvailableAptc in this calculation because the
@@ -81,13 +118,36 @@ module Factories
       shopping_tax_members.map(&:is_ia_eligible?).include?(false)
     end
 
-    def aptc_enrollment_members(aptc_thhms)
+    def enrollment_aptc_members(aptc_thhms)
       aptc_thhms.select { |thhm| shopping_member_ids.include?(thhm.applicant_id.to_s) && thhm.is_ia_eligible? }
     end
 
     def enrollment_eligible_benchmark_hash(thhms, enrollment)
       thhms.inject({}) do |benchmark_hash, thhm|
         benchmark_hash.merge!({ thhm.applicant_id.to_s => thhm.family_member.aptc_benchmark_amount(enrollment) })
+      end
+    end
+
+    def all_aptc_thhms
+      thhms = tax_households.flat_map(&:tax_household_members)
+      enrollment_aptc_members(thhms)
+    end
+
+    def aptc_enrolling_members(aptc_thhms)
+      aptc_fm_ids = aptc_thhms.map(&:applicant_id).map(&:to_s)
+      @enrollment.hbx_enrollment_members.select{ |member| aptc_fm_ids.include?(member.applicant_id.to_s) }
+    end
+
+    def aptc_benchmark_ratio_hash_test(aptc_enr_members)
+      member_benchmark_hash = aptc_enr_members.map(&:family_member).inject({}) do |b_hash, member|
+        b_hash[member.id.to_s] = member.aptc_benchmark_amount
+        b_hash
+      end
+      total_benchmark = member_benchmark_hash.values.sum
+      aptc_enr_members.inject({}) do |members_ratio_hash, member|
+        family_member_id = member.applicant_id.to_s
+        members_ratio_hash[family_member_id] = (member_benchmark_hash[family_member_id] / total_benchmark)
+        members_ratio_hash
       end
     end
 
