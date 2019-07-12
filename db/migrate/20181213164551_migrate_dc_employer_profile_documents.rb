@@ -82,7 +82,7 @@ class MigrateDcEmployerProfileDocuments < Mongoid::Migration
           print 'F' unless Rails.env.test?
           @logger.error "Migration Failed for Organization HBX_ID: #{old_org.hbx_id},
            validation_errors:
-           profile - #{new_profile.errors.messages},
+           profile - #{new_profile.errors.messages if new_profile},
            #{e.inspect}" unless Rails.env.test?
         end
       end
