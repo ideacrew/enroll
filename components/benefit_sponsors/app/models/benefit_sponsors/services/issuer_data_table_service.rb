@@ -11,7 +11,7 @@ module BenefitSponsors
       end
 
       def retrieve_table_data
-        ::BenefitSponsors::Organizations::Organization.issuer_profiles.sort_by(&:legal_name)
+        ::BenefitSponsors::Organizations::ExemptOrganization.issuer_profiles.sort_by(&:legal_name)
       end
 
     end

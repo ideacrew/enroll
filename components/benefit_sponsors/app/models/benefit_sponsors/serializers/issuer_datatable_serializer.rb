@@ -43,7 +43,7 @@ module BenefitSponsors
             "Kaiser" => ['1-800-777-7902', '', ''],
             "MetLife" => ['1-855-638-2221', '', ''],
             "UnitedHealthcare" => ['1-888-842-4571', '', '']
-          }[legal_name]
+          }[legal_name] || []
         end
       end
     end
