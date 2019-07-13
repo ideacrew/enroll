@@ -69,7 +69,10 @@ module Queries
 
       if clean_str =~ /[a-z]/i
         Person.collection.aggregate([
-          {"$match" => {"$text" => {"$search" => clean_str}}},
+          {"$match" => {
+              "$text" => {"$search" => clean_str}
+          }.merge(Person.search_hash(clean_str))
+          },
           {"$project" => {"first_name" => 1, "last_name" => 1, "full_name" => 1}},
           {"$sort" => {"last_name" => 1, "first_name" => 1}},
           {"$project" => {"_id" => 1}}
@@ -77,7 +80,7 @@ module Queries
           rec["_id"]
         end
       else
-        People.search(s_string, nil, nil).pluck(:_id)
+        Person.search(s_string, nil, nil).pluck(:_id)
       end
     end
 

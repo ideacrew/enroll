@@ -189,6 +189,7 @@ class Person
   index({dob: 1}, {sparse: true})
   index({dob: 1, encrypted_ssn: 1})
 
+  index({hbx_id: 1, encrypted_ssn: 1}, {name: "person_search_hash_ssn_hbx_id"})
   index({last_name: 1, dob: 1}, {sparse: true})
 
   index({last_name: "text", first_name: "text", full_name: "text"}, {name: "person_search_text_index"})
@@ -655,10 +656,10 @@ class Person
       s_rex = Regexp.new("^" + Regexp.escape(clean_str), true)
       if clean_str =~ /[a-z]/i
           {
-            "$or" => [
+            "$or" => ([
               {"first_name" => s_rex},
               {"last_name" => s_rex}
-            ]
+            ] + additional_exprs(clean_str))
           }
       else
         {
