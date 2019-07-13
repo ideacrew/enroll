@@ -102,7 +102,7 @@
                         <%unless broker_carrier_appointments_enabled?%>
                           <%= check_box_tag "person[broker_role_attributes][carrier_appointments][#{name}]", "true", value == "true" ? true : false %>
                         <%else%>
-                          <%= check_box_tag "person[broker_role_attributes][carrier_appointments][#{name}]", "true", true, disabled: true %>
+                          <%= check_box_tag "person[broker_role_attributes][carrier_appointments][#{name}]", "true", false, disabled: false %>
                         <%end%>
                           <%= label_tag "person[broker_role_attributes][carrier_appointments][#{name}]" do %>
                             <i class="far fa-check-square fa-2x"></i>
