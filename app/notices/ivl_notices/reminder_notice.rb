@@ -68,7 +68,7 @@ class IvlNotices::ReminderNotice < IvlNotice
 
   def append_unverified_family_members
     family = recipient.primary_family
-    enrollments = family.active_household.hbx_enrollments.select do |hbx_en|
+    enrollments = HbxEnrollment.where(family_id: family.id).select do |hbx_en|
       (!hbx_en.is_shop?) && (!["coverage_canceled", "shopping", "inactive"].include?(hbx_en.aasm_state)) &&
         (
           hbx_en.terminated_on.blank? ||
@@ -122,13 +122,13 @@ class IvlNotices::ReminderNotice < IvlNotice
 
    def build_enrollment(hbx_enrollment)
     PdfTemplates::Enrollment.new({
-      plan_name: hbx_enrollment.plan.name ,
+      plan_name: hbx_enrollment.product.title ,
       premium: hbx_enrollment.total_premium,
       phone: hbx_enrollment.phone_number,
       coverage_kind: hbx_enrollment.coverage_kind,
       effective_on: hbx_enrollment.effective_on,
       selected_on: hbx_enrollment.created_at,
-      is_receiving_assistance: (hbx_enrollment.applied_aptc_amount > 0 || hbx_enrollment.plan.is_csr?) ? true : false
+      is_receiving_assistance: (hbx_enrollment.applied_aptc_amount > 0 || hbx_enrollment.product.is_csr?) ? true : false
     })
   end
 
