@@ -34,8 +34,8 @@
                   | &nbsp;
                   | &nbsp;
                   span
-                    = l10n(".my_id")
-                    | : #{truncate(current_user.try(:person).try(:hbx_id).upcase, length: 8, omission: '')}
+                    | My ID
+                    | : #{truncate(current_user.try(:person).try(:hbx_id).upcase, length: 9, omission: '')}
   - if user_signed_in?
   javascript:
     // check time until logout
