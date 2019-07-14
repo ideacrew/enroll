@@ -75,6 +75,7 @@ BenefitSponsors::Engine.routes.draw do
         end
         member do
           get :inbox
+          get :show_invoice
           get :download_invoice
         end
 
