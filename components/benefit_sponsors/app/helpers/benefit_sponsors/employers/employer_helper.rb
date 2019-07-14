@@ -45,6 +45,14 @@ module BenefitSponsors
         false
       end
 
+      def get_invoices_for_year(invoices, year)
+        results = []
+        invoices.each do |invoice|
+          results << invoice if invoice.date.year == year.to_i
+        end
+        results
+      end
+
       def deactivate_benefit_sponsors_employer_staff(person_id, employer_profile_id)
         begin
           person = Person.find(person_id)
