@@ -638,9 +638,20 @@ function saveProposalAndPublish(event) {
 function AddDentalToPlanDesignProposal(event) {
   event.preventDefault();
   event.stopImmediatePropagation();
-  saveProposal(event);
-  var url = $("#add_dental_url").val()
-  window.location.href = url + "&profile_id=" + $("#profile_id").val()
+
+  var data = buildBenefitGroupParams();
+  if (proposalIsInvalid(data)) {
+  } else {
+    url = $("#benefit_groups_url").val();
+    $.ajax({
+      type: "POST",
+      data: data,
+      url: url
+    }).done(function(){
+      var url = $("#add_dental_url").val()
+      window.location.href = url + "&profile_id=" + $("#profile_id").val()
+    });
+  }
 }
 
 function saveProposalAndNavigateToReview(event) {

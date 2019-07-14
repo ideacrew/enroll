@@ -16,11 +16,11 @@
         <tr>
           <th>Employee</th>
           <th>Dependent Count</th>
-          <% if (!benefit_group.single_plan_type? && kind == "health") %>
+          <% if (!benefit_group.single_plan_type?) %>
             <th>Lowest Cost Available Plan</th>
           <% end %>
           <th>Reference Plan</th>
-          <% if (!benefit_group.single_plan_type? && kind == "health") %>
+          <% if (!benefit_group.single_plan_type?) %>
             <th>Highest Cost Available Plan</th>
           <% end %>
         </tr>

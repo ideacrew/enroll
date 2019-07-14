@@ -14,11 +14,9 @@ module SponsoredBenefits
           @benefit_group_costs = @benefit_group.employee_costs_for_reference_plan(@service)
           @dental_plan = @benefit_group.dental_reference_plan
           if @dental_plan.present?
-            @benefit_group_dental_costs = @benefit_group.employee_costs_for_dental_reference_plan(@service)
+            @benefit_group_dental_costs = @benefit_group.employee_costs_for_reference_plan(@service, @dental_plan)
             @employer_dental_contribution_amount = @service.monthly_employer_contribution_amount(@dental_plan)
           end
-          @min_employee_cost = @service.monthly_min_employee_cost
-          @max_employee_cost = @service.monthly_max_employee_cost
           @qhps = ::Products::QhpCostShareVariance.find_qhp_cost_share_variances(plan_array(@plan), plan_design_proposal.effective_date.year, "Health")
         end
       end
@@ -33,11 +31,9 @@ module SponsoredBenefits
           @plan = @benefit_group.reference_plan
           @employer_contribution_amount = @benefit_group.monthly_employer_contribution_amount
           @benefit_group_costs = @benefit_group.employee_costs_for_reference_plan(@service)
-          @min_employee_cost = @service.monthly_min_employee_cost
-          @max_employee_cost = @service.monthly_max_employee_cost
           @dental_plan = @benefit_group.dental_reference_plan
           if @dental_plan.present?
-            @benefit_group_dental_costs = @benefit_group.employee_costs_for_dental_reference_plan(@service)
+            @benefit_group_dental_costs = @benefit_group.employee_costs_for_reference_plan(@service, @dental_plan)
             @employer_dental_contribution_amount = @service.monthly_employer_contribution_amount(@dental_plan)
           end
           @qhps = ::Products::QhpCostShareVariance.find_qhp_cost_share_variances(plan_array(@plan), plan_design_proposal.effective_date.year, "Health")

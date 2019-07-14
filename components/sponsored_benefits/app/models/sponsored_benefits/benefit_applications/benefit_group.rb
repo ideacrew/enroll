@@ -27,6 +27,7 @@ module SponsoredBenefits
       end
 
       def employee_costs_for_reference_plan(service, plan = reference_plan)
+          plan.dental? ? set_bounding_cost_dental_plans : set_bounding_cost_plans
           service.employee_cost_for_plan(plan) # To initialize census_employee_costs
           if !single_plan_type?
             service.employee_cost_for_plan(lowest_cost_plan)
@@ -171,11 +172,12 @@ module SponsoredBenefits
 
       def set_bounding_cost_dental_plans
         return if reference_plan_id.nil?
-        option_kind = self.persisted? ? dental_plan_option_kind : plan_option_kind
+        option_kind = (self.persisted? || dental_plan_option_kind.present?) ? dental_plan_option_kind : plan_option_kind
         if option_kind == "single_plan"
           plans = elected_dental_plans
         elsif option_kind == "single_carrier"
-          plans = Plan.shop_dental_by_active_year(reference_plan.active_year).by_carrier_profile(reference_plan.carrier_profile)
+          ref_plan = (self.persisted? || dental_reference_plan.present?) ? dental_reference_plan : reference_plan
+          plans = Plan.shop_dental_by_active_year(ref_plan.active_year).by_carrier_profile(ref_plan.carrier_profile)
         end
 
         set_lowest_and_highest(plans)

@@ -86,8 +86,8 @@
                 </tr>
                 <tr>
                   <td colspan="2"><b>Total Estimated Monthly Cost for Plan Participants</b></td>
-                  <td><%= number_to_currency(@service.monthly_min_employee_cost) %></td>
-                  <td><%= number_to_currency(@service.monthly_max_employee_cost) %></td>
+                  <td><%= number_to_currency(@benefit_group_costs[:lowest_plan_employer_cost]) %></td>
+                  <td><%= number_to_currency(@benefit_group_costs[:highest_plan_employer_cost]) %></td>
                 </tr>
               </table>
             </div>
@@ -146,8 +146,8 @@
                 </tr>
                 <tr>
                   <td colspan="2"><b>Total Estimated Monthly Cost for Plan Participants</b></td>
-                  <td><%= number_to_currency(@service.monthly_min_employee_cost(@dental_plan)) %></td>
-                  <td><%= number_to_currency(@service.monthly_max_employee_cost(@dental_plan)) %></td>
+                  <td><%= number_to_currency(@benefit_group_dental_costs[:lowest_plan_employer_cost]) %></td>
+                  <td><%= number_to_currency(@benefit_group_dental_costs[:highest_plan_employer_cost]) %></td>
                 </tr>
               </table>
             </div>
