@@ -86,7 +86,7 @@ class IvlNotices::IvlToCoverallTransitionNoticeBuilder < IvlNotice
   def check_for_unverified_individuals
     family = recipient.primary_family
     date = TimeKeeper.date_of_record
-    enrollments = family.households.flat_map(&:hbx_enrollments).select do |hbx_en|
+    enrollments = HbxEnrollment.where(family_id: family.id).select do |hbx_en|
       (!hbx_en.is_shop?) && (!["coverage_canceled", "shopping", "inactive"].include?(hbx_en.aasm_state)) &&
           (hbx_en.terminated_on.blank? || hbx_en.terminated_on >= TimeKeeper.date_of_record)
     end
@@ -128,20 +128,20 @@ class IvlNotices::IvlToCoverallTransitionNoticeBuilder < IvlNotice
 
   def append_enrollment_information(enrollment)
     plan = PdfTemplates::Plan.new({
-        plan_name: enrollment.plan.name,
-        is_csr: enrollment.plan.is_csr?,
-        coverage_kind: enrollment.plan.coverage_kind,
-        plan_carrier: enrollment.plan.carrier_profile.organization.legal_name,
-        family_deductible: enrollment.plan.family_deductible.split("|").last.squish,
-        deductible: enrollment.plan.deductible
+        plan_name: enrollment.product.title,
+        is_csr: enrollment.product.is_csr?,
+        coverage_kind: enrollment.product.kind,
+        plan_carrier: enrollment.product.issuer_profile.organization.legal_name,
+        family_deductible: enrollment.product.family_deductible.split("|").last.squish,
+        deductible: enrollment.product.deductible
     })
     PdfTemplates::Enrollment.new({
      created_at: enrollment.created_at,
      premium: enrollment.total_premium.round(2),
      aptc_amount: enrollment.applied_aptc_amount.round(2),
      responsible_amount: (enrollment.total_premium - enrollment.applied_aptc_amount.to_f).round(2),
-     phone: phone_number(enrollment.plan.carrier_profile.legal_name),
-     is_receiving_assistance: (enrollment.applied_aptc_amount > 0 || enrollment.plan.is_csr?) ? true : false,
+     phone: phone_number(enrollment.product.issuer_profile.legal_name),
+     is_receiving_assistance: (enrollment.applied_aptc_amount > 0 || enrollment.product.is_csr?) ? true : false,
      coverage_kind: enrollment.coverage_kind,
      kind: enrollment.kind,
      effective_on: enrollment.effective_on,
