@@ -15,7 +15,17 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     let!(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, family: family, household: family.households.first, kind: "individual", product: product, aasm_state: "auto_renewing", effective_on: Date.new(year,1,1))}
     let!(:hbx_enrollment_member) {FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: hbx_enrollment, applicant_id: family.family_members.first.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record.prev_month )}
     let!(:hbx_enrollment_member_1) {FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: hbx_enrollment_1, applicant_id: family.family_members.first.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record.prev_month )}
-    let!(:hbx_enrollment_1) {FactoryBot.create(:hbx_enrollment,family: family, household: family.households.first, kind: "individual", product: product, is_any_enrollment_member_outstanding: true, aasm_state: "coverage_selected", special_verification_period: TimeKeeper.date_of_record+95.days, effective_on: Date.new(2017,1,1))}
+    let!(:hbx_enrollment_1) do
+      FactoryBot.create(:hbx_enrollment,
+                        family: family,
+                        household: family.households.first,
+                        kind: "individual",
+                        product: product,
+                        is_any_enrollment_member_outstanding: true,
+                        aasm_state: "coverage_selected",
+                        special_verification_period: TimeKeeper.date_of_record + 95.days,
+                        effective_on: Date.new(2017,1,1))
+    end
     let(:application_event){ double("ApplicationEventKind",{
                               :name =>'Final Eligibility Notice for UQHP individuals',
                               :notice_template => 'notices/ivl/final_eligibility_notice_uqhp',

@@ -11,7 +11,9 @@ csv << %w(ic_number policy.id policy.subscriber.coverage_start_on policy.aasm_st
 
 
 def add_to_csv(csv, policy, person, is_dependent, outstanding_verification_types, document_due_date)
-  csv << [policy.family.id, policy.hbx_id, policy.effective_on, policy.aasm_state, policy.product.kind, policy.product.metal_level_kind, policy.product.title, policy.total_premium, policy.product.deductible, policy.product.family_deductible.split("|").last.squish, person.hbx_id, person.hbx_id, person.first_name, person.last_name,
+  csv << [policy.family.id, policy.hbx_id, policy.effective_on, policy.aasm_state, policy.product.kind, policy.product.metal_level_kind, policy.product.title, policy.total_premium,
+          policy.product.deductible, policy.product.family_deductible.split("|").last.squish,
+          person.hbx_id, person.hbx_id, person.first_name, person.last_name,
           person.is_incarcerated, person.citizen_status, outstanding_verification_types, document_due_date, 
           is_dc_resident(person)] + [is_dependent]
 end
@@ -33,7 +35,7 @@ def is_dc_resident(person)
 end
 
 def enrollments_for_family(family)
-  @enrollments ||=  HbxEnrollment.where(family_id: family.id)
+  @enrollments_for_family ||= HbxEnrollment.where(family_id: family.id)
 end
 
 def document_due_date(family)
