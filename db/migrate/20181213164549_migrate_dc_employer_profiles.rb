@@ -90,7 +90,7 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
           if existing_new_organizations.count == 0
             @old_profile = old_org.employer_profile
 
-            json_data = @old_profile.to_json(:except => [:_id, :sic_code, :xml_transmitted_timestamp, :entity_kind, :profile_source, :aasm_state, :registered_on, :contact_method, :employer_attestation, :broker_agency_accounts, :general_agency_accounts, :employer_profile_account, :plan_years, :updated_by_id, :workflow_state_transitions, :inbox, :documents])
+            json_data = @old_profile.to_json(:except => [:_id, :no_ssn, :enable_ssn_date, :disable_ssn_date, :sic_code, :xml_transmitted_timestamp, :entity_kind, :profile_source, :aasm_state, :registered_on, :contact_method, :employer_attestation, :broker_agency_accounts, :general_agency_accounts, :employer_profile_account, :plan_years, :updated_by_id, :workflow_state_transitions, :inbox, :documents])
             old_profile_params = JSON.parse(json_data)
 
             @new_profile = initialize_new_profile(old_org, old_profile_params)
