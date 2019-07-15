@@ -16,6 +16,7 @@ module SponsoredBenefits
           @employer_contribution_amount = @service.monthly_employer_contribution_amount(@plan)
           @employer_dental_contribution_amount = @service.monthly_employer_contribution_amount(dental_plan) if dental_plan.present?
           @benefit_group_costs = @benefit_group.employee_costs_for_reference_plan(@service)
+          @benefit_group_dental_costs = @benefit_group.employee_costs_for_reference_plan(@service, dental_plan) if dental_plan.present?
           @qhps = ::Products::QhpCostShareVariance.find_qhp_cost_share_variances(plan_array(@plan), plan_design_proposal.effective_date.year, "Health")
         end
 
@@ -44,7 +45,14 @@ module SponsoredBenefits
           persisted_benefit_group = sponsorship.benefit_applications.first.benefit_groups.first
 
           if persisted_benefit_group.present? && kind == 'dental'
-            @benefit_group = sponsorship.benefit_applications.first.benefit_groups.build(dental_benefit_params.as_json)
+            if dental_benefit_params[:dental_relationship_benefits].blank?
+              benefit_params = {
+                dental_reference_plan_id: persisted_benefit_group.dental_reference_plan_id,
+                dental_relationship_benefits: persisted_benefit_group.dental_relationship_benefits,
+                dental_plan_option_kind:  persisted_benefit_group.dental_plan_option_kind
+              }
+            end
+            @benefit_group = sponsorship.benefit_applications.first.benefit_groups.build((benefit_params || dental_benefit_params).as_json)
             @benefit_group.assign_attributes({
               relationship_benefits: persisted_benefit_group.relationship_benefits,
               reference_plan_id: persisted_benefit_group.reference_plan_id,

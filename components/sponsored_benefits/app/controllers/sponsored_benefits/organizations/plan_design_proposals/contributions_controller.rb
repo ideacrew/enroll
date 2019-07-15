@@ -8,10 +8,7 @@ module SponsoredBenefits
         end
         benefit_group.set_bounding_cost_plans
         @service = SponsoredBenefits::Services::PlanCostService.new({benefit_group: benefit_group})
-
         @employer_contribution_amount = @service.monthly_employer_contribution_amount
-        @min_employee_cost = @service.monthly_min_employee_cost
-        @max_employee_cost = @service.monthly_max_employee_cost
 
         @benefit_group_costs = benefit_group.employee_costs_for_reference_plan(@service)
       end
