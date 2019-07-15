@@ -28,8 +28,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
                             enrollment_kind: "open_enrollment",
                             kind: "individual",
                             submitted_at: start_on.prev_month,
-                            product_id: product.id,
-                      
+                            product_id: product.id
                             )
                           }
 

@@ -34,23 +34,6 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
     @logger.info "Process ended at #{Time.now.in_time_zone("Eastern Time (US & Canada)").strftime("%m-%d-%Y %H:%M")}"
   end
 
-  def log_message
-    @logger.info yield unless Rails.env.test?
-  end
-
-  def query_criteria
-    {
-      :kind => 'individual',
-      :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES - ["coverage_renewed", "coverage_termination_pending"]),
-      :coverage_kind.in => HbxEnrollment::COVERAGE_KINDS
-      # :effective_on.gte => HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.start_on
-    }
-  end
-
-  def families
-    Family.where(:"households.hbx_enrollments" => {:$elemMatch => query_criteria})
-  end
-
   def is_individual_assisted?(enrollment)
     # reader.all_assisted_individuals.keys
     # enrollment.applied_aptc_amount > 0 || enrollment.elected_premium_credit > 0 || enrollment.applied_premium_credit > 0 || is_csr?(enrollment)
@@ -141,9 +124,9 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
       :effective_on => { "$gte" => current_benefit_coverage_period.start_on, "$lt" => current_benefit_coverage_period.end_on}
     }
 
-    families = Family.where(:"households.hbx_enrollments" => {:$elemMatch => query})
+    family_ids = HbxEnrollment.where(query).pluck(:family_id).uniq
 
-    @logger.info "Families count #{families.count}"
+    @logger.info "Families count #{family_ids.count}"
 
     enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
     enrollment_renewal.renewal_coverage_start = renewal_benefit_coverage_period.start_on
@@ -151,8 +134,9 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
     enrollment_renewal.aptc_values = {}
 
     count = 0
-    families.no_timeout.each do |family|
-      primary_hbx_id = family.primary_applicant.person.hbx_id
+    family_ids.each do |family_id|
+      family = Family.find(family_id.to_s)
+      primary_hbx_id = enrollment.family.primary_applicant.person.hbx_id
 
       begin
         enrollments = family.active_household.hbx_enrollments.where(query).order(:"effective_on".desc)
