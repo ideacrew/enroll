@@ -101,7 +101,7 @@ class MigrateDcBenefitApplication < Mongoid::Migration
       old_organizations.batch_size(limit).no_timeout.each do |old_org|
 
         new_organization = new_org(old_org)
-        raise "Organization not found" unless new_organization.present?
+        next puts "Organization not found #{old_org.hbx_id}" unless new_organization.present?
         @benefit_sponsorship = new_organization.active_benefit_sponsorship
 
         old_org.employer_profile.plan_years.asc(:start_on).each do |plan_year|

@@ -25,15 +25,21 @@ class MigrateDcHbxEnrollments < Mongoid::Migration
       @benefit_app_hash ={}
       BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:'benefit_applications'.exists=>true).each do |bs|
         bs.benefit_applications.each do |ba|
-          ba.benefit_groups.unscoped.each do |bg|
-            plan_year = PlanYear.find(ba.id)
-            raise "Plan year not found" unless plan_year.present?
-            old_bg =  plan_year.benefit_groups.unscoped.select{|b| b.title == bg.title}
-            raise "Issue with benefit group" unless old_bg.present? || old_bg.count > 1
-            bg_hash = {}
-            bg_hash[old_bg.first.id] = {'benefit_package_id' => bg.id, 'benefit_sponsorship_id' => bs.id,'health_sponsored_benefit_id' => bg.health_sponsored_benefit.id, "rating_area_id" => ba.recorded_rating_area_id}
-            bg_hash[old_bg.first.id].merge!({'dental_sponsored_benefit_id' => bg.dental_sponsored_benefit.id }) if bg.dental_sponsored_benefit.present?
-            @benefit_app_hash.merge!(bg_hash)
+          begin
+            ba.benefit_groups.unscoped.each do |bg|
+              plan_year = PlanYear.find(ba.id)
+              raise "Plan year not found" unless plan_year.present?
+              old_bg =  plan_year.benefit_groups.unscoped.select{|b| b.title == bg.title}
+              raise "Issue with benefit group" unless old_bg.present? || old_bg.count > 1
+              bg_hash = {}
+              bg_hash[old_bg.first.id] = {'benefit_package_id' => bg.id, 'benefit_sponsorship_id' => bs.id,'health_sponsored_benefit_id' => bg.health_sponsored_benefit.id, "rating_area_id" => ba.recorded_rating_area_id}
+              bg_hash[old_bg.first.id].merge!({'dental_sponsored_benefit_id' => bg.dental_sponsored_benefit.id }) if bg.dental_sponsored_benefit.present?
+              @benefit_app_hash.merge!(bg_hash)
+            end
+          rescue => e
+            print 'F' unless Rails.env.test?
+            @logger.error "Plan Year not found #{ba.id},
+            #{e.message}" unless Rails.env.test?
           end
         end
       end
