@@ -136,7 +136,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
     count = 0
     family_ids.each do |family_id|
       family = Family.find(family_id.to_s)
-      primary_hbx_id = enrollment.family.primary_applicant.person.hbx_id
+      primary_hbx_id = family.primary_applicant.person.hbx_id
 
       begin
         enrollments = family.active_household.hbx_enrollments.where(query).order(:"effective_on".desc)
