@@ -36,14 +36,16 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
                               :person =>  person,
                               :title => "Your Final Eligibility Results, Plan, And Option TO Change Plans"})
                             }
-    let(:valid_parmas) {{
+    let(:valid_params) do
+      {
         :subject => application_event.title,
         :mpi_indicator => application_event.mpi_indicator,
         :event_name => application_event.event_name,
         :template => application_event.notice_template,
         :data => data,
         :person => person
-    }}
+      }
+    end
 
     describe "New" do
       before do
@@ -51,7 +53,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       end
       context "valid params" do
         it "should initialze" do
-          expect{IvlNotices::FinalEligibilityNoticeUqhp.new(person.consumer_role, valid_parmas)}.not_to raise_error
+          expect{IvlNotices::FinalEligibilityNoticeUqhp.new(person.consumer_role, valid_params)}.not_to raise_error
         end
       end
 
@@ -59,7 +61,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         [:mpi_indicator,:subject,:template].each do  |key|
           it "should NOT initialze with out #{key}" do
             valid_parmas.delete(key)
-            expect{IvlNotices::FinalEligibilityNoticeUqhp.new(person.consumer_role, valid_parmas)}.to raise_error(RuntimeError,"Required params #{key} not present")
+            expect{IvlNotices::FinalEligibilityNoticeUqhp.new(person.consumer_role, valid_params)}.to raise_error(RuntimeError,"Required params #{key} not present")
           end
         end
       end
@@ -67,7 +69,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
     describe "#pick_enrollments" do
       before do
-        @final_eligibility_notice = IvlNotices::FinalEligibilityNoticeUqhp.new(person.consumer_role, valid_parmas)
+        @final_eligibility_notice = IvlNotices::FinalEligibilityNoticeUqhp.new(person.consumer_role, valid_params)
         person.consumer_role.update_attributes!(:aasm_state => "verification_outstanding")
         @final_eligibility_notice.append_data
       end
@@ -86,7 +88,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
     describe "#append_data" do
       before do
-        @final_eligibility_notice = IvlNotices::FinalEligibilityNoticeUqhp.new(person.consumer_role, valid_parmas)
+        @final_eligibility_notice = IvlNotices::FinalEligibilityNoticeUqhp.new(person.consumer_role, valid_params)
         @final_eligibility_notice.append_data
       end
 
@@ -109,7 +111,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
     describe "#generate_pdf_notice" do
       before do
-        @final_eligibility_notice = IvlNotices::FinalEligibilityNoticeUqhp.new(person.consumer_role, valid_parmas)
+        @final_eligibility_notice = IvlNotices::FinalEligibilityNoticeUqhp.new(person.consumer_role, valid_params)
       end
 
       it "should render the final eligibility notice template" do
@@ -122,6 +124,33 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         file = @final_eligibility_notice.generate_pdf_notice
         expect(File.exist?(file.path)).to be true
       end
+    end
+  end
+
+  describe "for recipient, recipient_document_store", dbclean: :after_each do
+    let!(:person100)          { FactoryBot.create(:person, :with_consumer_role, :with_work_email) }
+    let!(:dep_family1)        { FactoryBot.create(:family, :with_primary_family_member, person: FactoryBot.create(:person, :with_consumer_role, :with_work_email)) }
+    let!(:dep_family_member)  { FactoryBot.create(:family_member, family: dep_family1, person: person100) }
+    let!(:family100)          { FactoryBot.create(:family, :with_primary_family_member, person: person100) }
+    let(:dep_fam_primary)     { dep_family1.primary_applicant.person }
+
+    before :each do
+      valid_params.merge!({:person => person100})
+      @notice = IvlNotices::FinalEligibilityNoticeUqhp.new(person100.consumer_role, valid_params)
+    end
+
+    it "should have person100 as the recipient for the enrollment notice as this person is the primary" do
+      expect(@notice.recipient).to eq person100
+      expect(@notice.person).to eq person100
+      expect(@notice.recipient_document_store).to eq person100
+      expect(@notice.to).to eq person100.work_email_or_best
+    end
+
+    it "should not pick the dep_family1's primary person" do
+      expect(@notice.recipient).not_to eq dep_fam_primary
+      expect(@notice.person).not_to eq dep_fam_primary
+      expect(@notice.recipient_document_store).not_to eq dep_fam_primary
+      expect(@notice.to).not_to eq dep_fam_primary.work_email_or_best
     end
   end
 end
