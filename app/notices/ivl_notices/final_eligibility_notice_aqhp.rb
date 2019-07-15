@@ -104,19 +104,19 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
   def append_enrollment_information
     enrollments.each do |enrollment|
       plan = PdfTemplates::Plan.new({
-        plan_name: enrollment.product.title,
-        is_csr: enrollment.product.is_csr?,
-        coverage_kind: enrollment.product.kind,
-        plan_carrier: enrollment.product.issuer_profile.organization.legal_name,
-        family_deductible: enrollment.product.family_deductible.split("|").last.squish,
-        deductible: enrollment.product.deductible
-        })
+                                      plan_name: enrollment.product.title,
+                                      is_csr: enrollment.product.is_csr?,
+                                      coverage_kind: enrollment.product.kind,
+                                      plan_carrier: enrollment.product.issuer_profile.organization.legal_name,
+                                      family_deductible: enrollment.product.family_deductible.split("|").last.squish,
+                                      deductible: enrollment.product.deductible
+                                    })
       notice.enrollments << PdfTemplates::Enrollment.new({
         premium: enrollment.total_premium.round(2),
         aptc_amount: enrollment.applied_aptc_amount.round(2),
         responsible_amount: (enrollment.total_premium - enrollment.applied_aptc_amount.to_f).round(2),
         phone: phone_number(enrollment.product.issuer_profile.legal_name),
-        is_receiving_assistance: (enrollment.applied_aptc_amount > 0 || enrollment.product.is_csr?) ? true : false,
+        is_receiving_assistance: enrollment.applied_aptc_amount > 0 || enrollment.product.is_csr? ? true : false,
         coverage_kind: enrollment.coverage_kind,
         kind: enrollment.kind,
         effective_on: enrollment.effective_on,

@@ -122,15 +122,15 @@ class IvlNotices::ReminderNotice < IvlNotice
 
    def build_enrollment(hbx_enrollment)
     PdfTemplates::Enrollment.new({
-      plan_name: hbx_enrollment.product.title ,
-      premium: hbx_enrollment.total_premium,
-      phone: hbx_enrollment.phone_number,
-      coverage_kind: hbx_enrollment.coverage_kind,
-      effective_on: hbx_enrollment.effective_on,
-      selected_on: hbx_enrollment.created_at,
-      is_receiving_assistance: (hbx_enrollment.applied_aptc_amount > 0 || hbx_enrollment.product.is_csr?) ? true : false
-    })
-  end
+                                   plan_name: hbx_enrollment.product.title,
+                                   premium: hbx_enrollment.total_premium,
+                                   phone: hbx_enrollment.phone_number,
+                                   coverage_kind: hbx_enrollment.coverage_kind,
+                                   effective_on: hbx_enrollment.effective_on,
+                                   selected_on: hbx_enrollment.created_at,
+                                   is_receiving_assistance: hbx_enrollment.applied_aptc_amount > 0 || hbx_enrollment.product.is_csr? ? true : false
+                                 })
+   end
 
   def ssn_outstanding?(person)
     person.consumer_role.types_include_to_notices.map(&:type_name).include?("Social Security Number")
