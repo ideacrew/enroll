@@ -764,7 +764,8 @@ module BenefitSponsors
         :enrolled => :active,
         :suspended => :suspended,
         :registered => :applicant,
-        :eligible => :applicant
+        :eligible => :applicant,
+        :ineligible => :applicant
       }
     end
   end
