@@ -411,12 +411,14 @@ Then(/the enrollment should be terminated/) do
   @family.all_enrollments.first.aasm_state == 'coverage_terminated'
 end
 
-Given(/(.*) has an employee role/) do |_role|
-  FactoryBot.create(:employee_role, person: @family.primary_person)
-end
 
-Given(/(.*) has a resident role/) do |_role|
-  FactoryBot.create(:resident_role_object, person: @family.primary_person)
+Given(/(.*) has a (.*) role/) do |_primary_role, secondary_role|
+  # Assumes primary role is consumer.
+  if secondary_role.eql?('resident')
+    FactoryBot.create(:resident_role_object, person: @family.primary_person)
+  elsif secondary_role.eql?('employee')
+    FactoryBot.create(:employee_role, person: @family.primary_person)
+  end
 end
 
 When(/consumer's health enrollment has an effective date in the future/) do
