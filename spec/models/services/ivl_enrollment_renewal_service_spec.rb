@@ -17,6 +17,7 @@ RSpec.describe Services::IvlEnrollmentRenewalService, type: :model, :dbclean => 
                         consumer_role_id: family_assisted.primary_family_member.person.consumer_role.id,
                         effective_on: renewal_calender_date,
                         household: family_assisted.active_household,
+                        family: family_assisted,
                         enrollment_members: [family_assisted.family_members.first],
                         product: renewal_csr_87_product)
     end

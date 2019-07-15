@@ -52,13 +52,13 @@ module Factories
     end
 
     def ehb_premium(product_id)
-      premium_amount = fetch_total_premium(product_id)
       product = ::BenefitMarkets::Products::Product.find(product_id)
+      premium_amount = fetch_total_premium(product)
       premium_amount * product.ehb
     end
 
-    def fetch_total_premium(product_id)
-      cost_decorator = @enrollment.ivl_decorated_hbx_enrollment(product_id)
+    def fetch_total_premium(product)
+      cost_decorator = @enrollment.ivl_decorated_hbx_enrollment(product)
       cost_decorator.total_premium
     end
 
