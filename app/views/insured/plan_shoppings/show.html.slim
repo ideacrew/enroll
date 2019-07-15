@@ -21,14 +21,14 @@
             - if @market_kind == "individual"
               a.btn.btn-default.ivl-compare-selected-plans-link href="javascript:void(0);" style="display: none;" data-uri="#{comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind)}"
                 = l10n("compare_plans").to_s.upcase
-            - if @market_kind == "shop"
+            - if @market_kind == "shop" || @market_kind = 'fehb'
               a.btn.btn-default.compare-selected-plans-link href="javascript:void(0);" style="display: none;" data-uri="#{comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind)}"
                 = l10n("compare_plans").to_s.upcase
             #plan-summary
             #all-plans.all-filters-row
               = render partial: './ui-components/v1/filters/plan_filters'
               .col-lg-9.col-md-9.co-sm-9.col-xs-12#planContainer style="padding-right:0"
-                - if @market_kind == "shop"
+                - if @market_kind == 'shop' || @market_kind = 'fehb'
                   button.btn.btn-default.pull-right.hidden#compareBtn onclick="compareResults()" data-uri="#{comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind)}" = l10n("compare_plans").to_s.upcase
                 br
                 .sort-area.mt-1.mb-1
@@ -44,7 +44,7 @@
                     h3
                       = l10n("loading")
                       | ...
-                - if @market_kind == "shop"
+                - if @market_kind == 'shop' || @market_kind = 'fehb'
                   #plans
                     = render partial: "ui-components/v1/cards/plan_details", collection: @member_groups, as: :plan
                   #filteredPlans data-enrollments="#{json_for_plan_shopping_member_groups(@member_groups)}"

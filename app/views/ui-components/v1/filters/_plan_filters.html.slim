@@ -128,7 +128,7 @@
         a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="#{l10n("insured.plan_shoppings.network_title_info")}"
           i.fas.fa-question-circle.fa-lg.pl-1 aria-hidden="true"
       ul.list-unstyled
-        - if @market_kind == "shop"
+        - if @market_kind == 'shop' || @market_kind == 'fehb'
           - @networks.each_with_index do |network, i|
             li
               .filter-input-block style="text-align:left"
@@ -156,7 +156,7 @@
     ul.list-unstyled
       li
         .filter-input-block
-          - issuer_names = @market_kind == 'shop' ? @carrier_names : @carriers
+          - issuer_names =  (@market_kind == 'shop' ||  @market_kind == 'fehb') ? @carrier_names : @carriers
           = select_tag :carrier, options_for_select(issuer_names), class: "plan-carrier-selection-filter", include_blank: "All", onchange:"filterPlanCarriers(this)"
   .checkbox-filter-wrapper-uc
     h5
@@ -207,7 +207,7 @@
           output name="pct" 85
           | %
   .checkbox-filter-wrapper
-    - if @market_kind == "shop"
+    - if @market_kind == 'shop' || @market_kind == 'fehb'
       .form-inline.search-apply-wrapper.mt-1
         a.btn.btn-primary.mz href="javascript:void(0)" onclick="filterResults()"
           = l10n("apply")

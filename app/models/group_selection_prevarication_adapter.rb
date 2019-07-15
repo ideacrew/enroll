@@ -108,7 +108,9 @@ class GroupSelectionPrevaricationAdapter
 
   def set_mc_variables
     if @previous_hbx_enrollment.present? && @change_plan == "change_plan"
-      m_kind = if @previous_hbx_enrollment.kind == 'employer_sponsored'
+      m_kind = if @previous_hbx_enrollment.employer_profile.is_a?(BenefitSponsors::Organizations::FehbEmployerProfile)
+                 "fehb"
+               elsif @previous_hbx_enrollment.kind == 'employer_sponsored'
                  'shop'
                elsif %w[coverall individual].include? @previous_hbx_enrollment.kind
                  @previous_hbx_enrollment.kind
@@ -119,7 +121,7 @@ class GroupSelectionPrevaricationAdapter
 
   def disable_market_kinds(params)
     if (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep')
-      d_market_kind = (select_market(params) == "shop") ? "individual" : "shop"
+      d_market_kind = (select_market(params) == "shop" || select_market(params) == "fehb") ? "individual" : "shop"
       yield d_market_kind
     end
   end
@@ -161,7 +163,7 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def if_should_generate_coverage_family_members_for_cobra(params)
-    if (select_market(params) == 'shop') && !(@change_plan == 'change_by_qle' || @enrollment_kind == 'sep') && possible_employee_role.present? && possible_employee_role.is_cobra_status?
+    if (select_market(params) == "shop" || select_market(params) == "fehb") && !(@change_plan == 'change_by_qle' || @enrollment_kind == 'sep') && possible_employee_role.present? && possible_employee_role.is_cobra_status?
       hbx_enrollment = @family.active_household.hbx_enrollments.shop_market.enrolled_and_renewing.effective_desc.detect { |hbx| hbx.may_terminate_coverage? }
       if hbx_enrollment.present?
         yield(hbx_enrollment.hbx_enrollment_members.map(&:family_member))
@@ -170,7 +172,7 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def if_hbx_enrollment_unset_and_sep_or_qle_change_and_can_derive_previous_shop_enrollment(params, enrollment, new_effective_date)
-    if (select_market(params) == 'shop') && (@change_plan == 'change_by_qle') && enrollment.blank?
+    if (select_market(params) == 'shop' || select_market(params) == 'fehb') && (@change_plan == 'change_by_qle') && enrollment.blank?
       
       prev_enrollment = find_previous_enrollment_for(params, new_effective_date)
       if prev_enrollment
@@ -185,7 +187,7 @@ class GroupSelectionPrevaricationAdapter
     if hbx_enrollment.present?
       hbx_enrollment.is_shop?
     else
-      (select_market(params) == "shop")
+      select_market(params) == 'shop' || select_market(params) == 'fehb'
     end
   end
 
@@ -202,14 +204,12 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def select_benefit_group(params)
-    return unless select_market(params) == "shop"
+    return unless select_market(params) == 'shop' || select_market(params) == 'fehb'
 
     if @change_plan.present? && @previous_hbx_enrollment.present? && @previous_hbx_enrollment.is_shop?
       @previous_hbx_enrollment.sponsored_benefit_package 
-    else
-      if (select_market(params) == "shop") && possible_employee_role.present?
-        possible_employee_role.benefit_package(qle: is_qle?)
-      end
+    elsif (select_market(params) == 'shop' || select_market(params) == 'fehb') && possible_employee_role.present?
+      possible_employee_role.benefit_package(qle: is_qle?)
     end
   end
 
@@ -233,7 +233,9 @@ class GroupSelectionPrevaricationAdapter
       qle = QualifyingLifeEventKind.find(params[:qle_id])
       return qle.market_kind
     end
-    if person.has_active_employee_role?
+    if is_fehb?(person)
+      'fehb'
+    elsif person.has_active_employee_role?
       'shop'
     elsif person.is_consumer_role_active?
       'individual'
@@ -267,7 +269,7 @@ class GroupSelectionPrevaricationAdapter
       family_member_ids)
   end
 
-  def build_new_shop_waiver_enrollent(controller_employee_role, params)
+  def build_new_shop_waiver_enrollment(controller_employee_role, params)
     e_builder = ::EnrollmentShopping::EnrollmentBuilder.new(coverage_household, controller_employee_role, coverage_kind)
     e_builder.build_new_waiver_enrollment(is_qle: is_qle?, optional_effective_on: optional_effective_on, waiver_reason: get_waiver_reason(params))
   end
@@ -291,6 +293,10 @@ class GroupSelectionPrevaricationAdapter
 
   def can_shop_shop?(person)
     person.present? && person.has_employer_benefits? # FIX ME
+  end
+
+  def is_fehb?(person)
+    person.present? && person.active_employee_roles.present? && person.active_employee_roles.any?{|r| r.employer_profile.is_a?(BenefitSponsors::Organizations::FehbEmployerProfile)}
   end
 
   def can_shop_individual?(person)

@@ -212,7 +212,7 @@ class Insured::PlanShoppingsController < ApplicationController
     hbx_enrollment_id = params.require(:id)
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
-    if params[:market_kind] == 'shop'
+    if params[:market_kind] == 'shop' || params[:market_kind] == 'fehb'
       show_shop(hbx_enrollment_id)
     elsif params[:market_kind] == 'individual' || params[:market_kind] == 'coverall'
       show_ivl(hbx_enrollment_id)
@@ -237,7 +237,7 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def show_shop(hbx_enrollment_id)
-    set_employee_bookmark_url(family_account_path) if params[:market_kind] == 'shop'
+    set_employee_bookmark_url(family_account_path) if params[:market_kind] == 'shop' || params[:market_kind] == 'fehb'
 
     sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(@hbx_enrollment)
     products = @hbx_enrollment.sponsored_benefit.products(@hbx_enrollment.sponsored_benefit.rate_schedule_date)

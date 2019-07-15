@@ -55,9 +55,9 @@ module Insured
 
     def view_market_places(person)
       if can_shop_both_markets?(person)
-        Plan::MARKET_KINDS
+        BenefitMarkets::Products::Product::MARKET_KINDS
       elsif can_shop_individual_or_resident?(person)
-        Plan::INDIVIDUAL_MARKET_KINDS
+        BenefitMarkets::Products::Product::INDIVIDUAL_MARKET_KINDS
       elsif can_shop_individual?(person)
         ['individual']
       elsif can_shop_resident?(person)
@@ -91,7 +91,7 @@ module Insured
     end
 
     def select_benefit_group(qle, employee_role)
-      if @market_kind == "shop" && employee_role.present?
+      if (@market_kind == "shop" || @market_kind == "fehb") && employee_role.present?
         employee_role.benefit_group(qle: qle)
       else
         nil
@@ -99,9 +99,7 @@ module Insured
     end
 
     def insure_hbx_enrollment_for_shop_qle_flow
-      if @market_kind == 'shop' && (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep') && @hbx_enrollment.blank?
-        @hbx_enrollment = selected_enrollment(@family, @employee_role)
-      end
+      @hbx_enrollment = selected_enrollment(@family, @employee_role) if (@market_kind == 'shop' || @market_kind == 'fehb') && (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep') && @hbx_enrollment.blank?
     end
 
     def selected_enrollment(family, employee_role)

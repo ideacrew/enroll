@@ -59,7 +59,7 @@ class Insured::GroupSelectionController < ApplicationController
     @market_kind = @adapter.create_action_market_kind(params)
     return redirect_to purchase_insured_families_path(change_plan: @change_plan, terminate: 'terminate') if params[:commit] == "Terminate Plan"
 
-    if @market_kind == 'shop' && @employee_role.census_employee.present?
+    if (@market_kind == 'shop' || @market_kind == 'fehb') && @employee_role.census_employee.present?
       new_hire_enrollment_period = @employee_role.census_employee.new_hire_enrollment_period
       if new_hire_enrollment_period.begin > TimeKeeper.date_of_record
         raise "You're not yet eligible under your employer-sponsored benefits. Please return on #{new_hire_enrollment_period.begin.strftime("%m/%d/%Y")} to enroll for coverage."
@@ -75,7 +75,7 @@ class Insured::GroupSelectionController < ApplicationController
 
     hbx_enrollment = build_hbx_enrollment(family_member_ids)
 
-    if @market_kind == 'shop'
+    if @market_kind == 'shop' || @market_kind == 'fehb'
 
       raise "Unable to find employer-sponsored benefits for enrollment year #{hbx_enrollment.effective_on.year}" unless hbx_enrollment.sponsored_benefit_package.shoppable?
 
@@ -118,19 +118,19 @@ class Insured::GroupSelectionController < ApplicationController
     hbx_enrollment.coverage_kind = @coverage_kind
     hbx_enrollment.validate_for_cobra_eligiblity(@employee_role)
 
-    hbx_enrollment.kind = @market_kind if (hbx_enrollment.kind != @market_kind) && (@market_kind != 'shop')
+    hbx_enrollment.kind = @market_kind if (hbx_enrollment.kind != @market_kind) && @market_kind != 'shop' && @market_kind != 'fehb'
 
     if hbx_enrollment.save
       if @market_kind == 'individual' || @market_kind == 'coverall'
         hbx_enrollment.inactive_related_hbxs # FIXME: bad name, but might go away
-      elsif @market_kind == 'shop'
+      elsif @market_kind == 'shop' || @market_kind == 'fehb'
         @adapter.assign_enrollment_to_benefit_package_assignment(@employee_role, hbx_enrollment)
       end
 
       if (@market_kind == 'individual' || @market_kind == 'coverall') && keep_existing_plan
         hbx_enrollment.update_coverage_kind_by_plan
         redirect_to purchase_insured_families_path(change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, hbx_enrollment_id: hbx_enrollment.id)
-      elsif @market_kind == 'shop' && keep_existing_plan && @adapter.previous_hbx_enrollment.present?
+      elsif (@market_kind == 'shop' || @market_kind == 'fehb') && keep_existing_plan && @adapter.previous_hbx_enrollment.present?
         redirect_to thankyou_insured_plan_shopping_path(change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @adapter.coverage_kind, id: hbx_enrollment.id, plan_id: @adapter.previous_hbx_enrollment.product_id)
       elsif @change_plan.present?
         redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @adapter.coverage_kind, enrollment_kind: @adapter.enrollment_kind)
@@ -184,7 +184,7 @@ class Insured::GroupSelectionController < ApplicationController
 
   def build_hbx_enrollment(family_member_ids)
     case @market_kind
-    when 'shop'
+    when 'shop', 'fehb'
       @adapter.if_employee_role_unset_but_can_be_derived(@employee_role) do |e_role|
         @employee_role = e_role
       end
@@ -244,14 +244,17 @@ class Insured::GroupSelectionController < ApplicationController
       @resident_role = res_role
       @role = res_role
     end
-    if @hbx_enrollment.present? && @change_plan == "change_plan"
-      if @hbx_enrollment.kind == "employer_sponsored"
-        @mc_market_kind = "shop"
-      elsif @hbx_enrollment.kind == "coverall"
-        @mc_market_kind = "coverall"
-      else
-        @mc_market_kind = "individual"
-      end
+    if @hbx_enrollment.present? && @change_plan == 'change_plan'
+      @mc_market_kind = if @hbx_enrollment.employer_profile.is_a?(BenefitSponsors::Organizations::FehbEmployerProfile)
+                          'fehb'
+                        elsif @hbx_enrollment.kind == 'employer_sponsored'
+                          'shop'
+                        elsif @hbx_enrollment.kind == 'coverall'
+                          'coverall'
+                        else
+                          'individual'
+                        end
+
       @mc_coverage_kind = @hbx_enrollment.coverage_kind
     end
 

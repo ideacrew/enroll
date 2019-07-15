@@ -85,6 +85,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     context "when benefit group plan option kind is not solesource", dbclean: :after_each do
       before :each do
         allow(adapter).to receive(:can_shop_shop?).with(person).and_return(true)
+        allow(adapter).to receive(:is_fehb?).with(person).and_return(false)
         allow(adapter).to receive(:can_shop_individual?).with(person).and_return(false)
         allow(adapter).to receive(:can_shop_resident?).with(person).and_return(false)
         allow(adapter).to receive(:can_shop_both_markets?).with(person).and_return(false)
@@ -424,6 +425,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(employee_role).to receive(:employer_profile).and_return(employer_profile)
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       allow(adapter).to receive(:can_shop_shop?).with(person).and_return(true)
+      allow(adapter).to receive(:is_fehb?).with(person).and_return(false)
       allow(adapter).to receive(:can_shop_both_markets?).with(person).and_return(false)
       allow(adapter).to receive(:can_shop_resident?).with(person).and_return(false)
       allow(adapter).to receive(:can_shop_individual?).with(person).and_return(false)
@@ -523,6 +525,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(view).to receive(:can_employee_shop?).and_return(false)
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       allow(adapter).to receive(:can_shop_shop?).with(person).and_return(true)
+      allow(adapter).to receive(:is_fehb?).with(person).and_return(false)
       allow(adapter).to receive(:can_shop_both_markets?).and_return(false)
       allow(adapter).to receive(:can_shop_resident?).with(person).and_return(false)
       allow(adapter).to receive(:can_shop_individual?).with(person).and_return(false)
@@ -557,6 +560,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       allow(view).to receive(:can_employee_shop?).and_return(false)
       allow(adapter).to receive(:can_shop_shop?).with(person).and_return(true)
+      allow(adapter).to receive(:is_fehb?).with(person).and_return(false)
       allow(adapter).to receive(:can_shop_both_markets?).and_return(false)
       allow(adapter).to receive(:can_shop_resident?).with(person).and_return(false)
       allow(adapter).to receive(:can_shop_individual?).with(person).and_return(false)
@@ -657,6 +661,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       allow(adapter).to receive(:can_shop_shop?).with(person).and_return(true)
+      allow(adapter).to receive(:is_fehb?).with(person).and_return(false)
       allow(adapter).to receive(:can_shop_both_markets?).and_return(false)
       allow(adapter).to receive(:can_shop_resident?).with(person).and_return(false)
       allow(adapter).to receive(:can_shop_individual?).with(person).and_return(false)
@@ -690,6 +695,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(person).to receive(:active_employee_roles).and_return [employee_role]
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       allow(adapter).to receive(:can_shop_shop?).with(person).and_return(true)
+      allow(adapter).to receive(:is_fehb?).with(person).and_return(false)
       allow(adapter).to receive(:can_shop_both_markets?).with(person).and_return(false)
       allow(adapter).to receive(:can_shop_resident?).with(person).and_return(false)
       allow(adapter).to receive(:can_shop_individual?).with(person).and_return(false)

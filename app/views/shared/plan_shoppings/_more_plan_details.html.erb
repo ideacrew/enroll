@@ -5,14 +5,14 @@
     &nbsp;
     <strong><%= plan_shopping_dependent_text(@hbx_enrollment) %></strong>
     &nbsp;&nbsp;
-    <% if @market_kind == 'shop' && @coverage_kind == 'health' %>
+    <% if (@market_kind == 'shop' || @market_kind == 'fehb') && @coverage_kind == 'health' %>
     Employer: &nbsp;
     <strong><%= @hbx_enrollment.try(:benefit_sponsorship).try(:organization).try(:legal_name) %></strong>
     &nbsp;&nbsp;
     <% end %>
     <span class="ttu lg twelve">Plans:</span>
     &nbsp;
-    <% products = @market_kind == 'shop' ? @member_groups : @plans %>
+    <% products = (@market_kind == 'shop' || @market_kind == 'fehb') ? @member_groups : @plans %>
     <strong id='plans-count'><%= products_count(products)%></strong>
     &nbsp;&nbsp;
     <span class="ttu lg twelve">Effective Date:</span>

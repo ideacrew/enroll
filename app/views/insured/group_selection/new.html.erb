@@ -42,7 +42,7 @@
                     <%= radio_button_tag 'market_kind', kind, index == 0, id: "market_kind_#{kind}", required: true, class: "n-radio", checked: is_market_kind_checked?(kind, @person), disabled: is_market_kind_disabled?(kind, @person) %>
                     <span class="n-radio">
                 </span>
-                  <% if kind=="shop" %>
+                  <% if kind == 'shop' || kind == 'fehb' %>
                     <%= l10n("insured.group_selection.new.employee_sponsored_benefits") %>
                   <% elsif kind=="individual"  %>
                     <%= l10n("insured.group_selection.new.individual_benefits") %>
@@ -79,6 +79,8 @@
               <% end %>
             </div>
           </div>
+        <% elsif @adapter.is_fehb?(@person) %>
+          <%= hidden_field_tag 'market_kind', 'fehb' %>
         <% elsif @adapter.can_shop_shop?(@person) %>
           <%= hidden_field_tag 'market_kind', 'shop' %>
         <% elsif @adapter.can_shop_individual?(@person) && !@adapter.can_shop_resident?(@person) %>
@@ -144,7 +146,7 @@
             <% if @hbx_enrollment.present? && @hbx_enrollment.may_terminate_coverage? %>
               <%= submit_tag l10n('keep_existing_plan'), class: 'btn btn-primary  btn-lg' + pundit_class(Family, :updateable?) if show_keep_existing_plan(@shop_for_plans, @hbx_enrollment, @new_effective_on) %>
               <% if @hbx_enrollment.effective_on <= TimeKeeper.date_of_record %>
-                <% if @market_kind == 'shop' && @hbx_enrollment.kind != 'individual' %>
+                <% if (@market_kind == 'shop' || @market_kind == 'fehb') && @hbx_enrollment.kind != 'individual' %>
                   <%= link_to l10n('select_plan_to_terminate'), '#', data: {toggle: "modal", target: "#waive_confirm"}, class: ('btn btn-primary btn-lg' + pundit_class(Family, :updateable?)) %>
                 <% else %>
                   <%= link_to 'Select Plan to Terminate', terminate_selection_insured_group_selections_path(person_id: @person.id, change_plan: @change_plan),
