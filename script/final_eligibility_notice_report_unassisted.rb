@@ -1,8 +1,8 @@
 batch_size = 500
 offset = 0
-family_count = Family.count
+enrollment_count = HbxEnrollment.count
 
-plan_ids = Plan.where(:active_year => 2018, :market => "individual").map(&:_id)
+product_ids = BenefitMarkets::Products::Product.where(:active_year => 2019, benefit_market_kind: :aca_individual).map(&:_id)
 
 csv = CSV.open("final_eligibility_notice_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv", "w")
 csv << %w(ic_number policy.id policy.subscriber.coverage_start_on policy.aasm_state policy.plan.coverage_kind policy.plan.metal_level policy.plan.plan_name policy.total_premium deductible family_deductible  subscriber_id member_id person.first_name person.last_name
@@ -11,7 +11,7 @@ csv << %w(ic_number policy.id policy.subscriber.coverage_start_on policy.aasm_st
 
 
 def add_to_csv(csv, policy, person, is_dependent, outstanding_verification_types, document_due_date)
-  csv << [policy.family.id, policy.hbx_id, policy.effective_on, policy.aasm_state, policy.plan.coverage_kind, policy.plan.metal_level, policy.plan.name, policy.total_premium, policy.plan.deductible, policy.plan.family_deductible.split("|").last.squish, person.hbx_id, person.hbx_id, person.first_name, person.last_name,
+  csv << [policy.family.id, policy.hbx_id, policy.effective_on, policy.aasm_state, policy.product.kind, policy.product.metal_level_kind, policy.product.title, policy.total_premium, policy.product.deductible, policy.product.family_deductible.split("|").last.squish, person.hbx_id, person.hbx_id, person.first_name, person.last_name,
           person.is_incarcerated, person.citizen_status, outstanding_verification_types, document_due_date, 
           is_dc_resident(person)] + [is_dependent]
 end
@@ -32,8 +32,12 @@ def is_dc_resident(person)
   end
 end
 
+def enrollments_for_family(family)
+  @enrollments ||=  HbxEnrollment.where(family_id: family.id)
+end
+
 def document_due_date(family)
-  enrolled_contingent_enrollment = family.enrollments.outstanding_enrollments.first
+  enrolled_contingent_enrollment = enrollments_for_family(family).outstanding_enrollments.first
   if enrolled_contingent_enrollment.present?
     if enrolled_contingent_enrollment.special_verification_period.present?
       enrolled_contingent_enrollment.special_verification_period.strftime("%m/%d/%Y")
@@ -46,7 +50,7 @@ def document_due_date(family)
 end
 
 def is_family_renewing(family)
-  family.active_household.hbx_enrollments.where(:aasm_state => "coverage_selected", kind: "individual", effective_on: Date.new(2017,1,1)).present?
+  enrollments_for_family(family).where(:aasm_state => "coverage_selected", kind: "individual", effective_on: Date.new(2019,1,1)).present?
 end
 
 def check_for_outstanding_verification_types(person)
@@ -62,20 +66,20 @@ def check_for_outstanding_verification_types(person)
 end
 
 def has_current_aptc_hbx_enrollment(family)
-  enrollments = family.latest_household.hbx_enrollments rescue []
+  enrollments = enrollments_for_family(family) rescue []
   enrollments.any? {|enrollment| (enrollment.effective_on.year == TimeKeeper.date_of_record.next_year.year) && enrollment.applied_aptc_amount > 0}
 end
 
-while offset <= family_count
-  Family.offset(offset).limit(batch_size).flat_map(&:households).flat_map(&:hbx_enrollments).each do |policy|
+while offset <= enrollment_count
+  HbxEnrollment.offset(offset).limit(batch_size).each do |policy|
     begin
       next unless is_family_renewing(policy.family)
-      next if policy.plan.nil?
-      next unless plan_ids.include?(policy.plan_id)
+      next if policy.product.nil?
+      next unless product_ids.include?(policy.product_id)
       next if policy.effective_on < Date.new(2018, 01, 01)
       next unless ["auto_renewing", "coverage_selected"].include?(policy.aasm_state)
-      next unless ['01', '03', ''].include?(policy.plan.csr_variant_id) #includes dental plans - csr_variant_id - ''
-      next if policy.plan.market != 'individual'
+      next unless ['01', '03', ''].include?(policy.product.csr_variant_id) #includes dental plans - csr_variant_id - ''
+      next if policy.product.benefit_market_kind != :aca_individual
       next if (!(['unassisted_qhp', 'individual'].include? policy.kind)) || has_current_aptc_hbx_enrollment(policy.family)
 
       person = policy.subscriber.person

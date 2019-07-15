@@ -9,8 +9,9 @@ RSpec.describe IvlNotices::FinalEligibilityNoticeRenewalUqhp, :dbclean => :after
   year = TimeKeeper.date_of_record.year + 1
   let(:person) { FactoryBot.create(:person, :with_consumer_role, :hbx_id => "48574857")}
   let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
-  let(:plan) { FactoryBot.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', csr_variant_id: '01', active_year: 2018, hios_id: "11111111122302-01") }
-  let!(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, family: family, household: family.households.first, kind: "individual", plan: plan, aasm_state: "auto_renewing", effective_on: Date.new(year,1,1))}
+  let(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
+  let!(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', issuer_profile: issuer_profile)}
+  let!(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, family: family, household: family.households.first, kind: "individual", product: product, aasm_state: "auto_renewing", effective_on: Date.new(year,1,1))}
   let!(:hbx_enrollment_member) {FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: hbx_enrollment, applicant_id: family.family_members.first.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record.prev_month )}
   let!(:hbx_enrollment_member_1) {FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: hbx_enrollment_1, applicant_id: family.family_members.first.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record.prev_month )}
   let!(:hbx_enrollment_1) do
@@ -19,7 +20,8 @@ RSpec.describe IvlNotices::FinalEligibilityNoticeRenewalUqhp, :dbclean => :after
                       :created_at => (TimeKeeper.date_of_record.in_time_zone("Eastern Time (US & Canada)") - 2.days),
                       :household => family.households.first,
                       :kind => "individual",
-                      :is_any_enrollment_member_outstanding => true)
+                      :is_any_enrollment_member_outstanding => true,
+                      product: product)
   end
   let(:application_event){ double("ApplicationEventKind",{
       :name =>'Final Eligibility Notice for UQHP/AQHP individuals',
