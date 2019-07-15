@@ -14,7 +14,10 @@ module Effective
     end
 
     def order_by_column
-      @order_by_column ||= table_columns[@datatable.order_name]
+      sort_column = table_columns[@datatable.order_name]
+      if sort_column[:sortable]
+        @order_by_column ||= table_columns[@datatable.order_name]
+      end
     end
 
     def order(collection)

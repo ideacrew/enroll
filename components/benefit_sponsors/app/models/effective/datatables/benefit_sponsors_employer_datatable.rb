@@ -17,7 +17,6 @@ module Effective
         table_column :legal_name, :proc => Proc.new { |row|
           @employer_profile = row.organization.employer_profile
           (link_to row.organization.legal_name.titleize, benefit_sponsors.profiles_employers_employer_profile_path(@employer_profile.id, :tab => 'home'), data: {turbolinks: false})
-
         }, :sortable => false, :filter => false
         table_column :fein, :label => 'FEIN', :proc => Proc.new { |row| row.organization.fein }, :sortable => false, :filter => false
         table_column :hbx_id, :label => 'HBX ID', :proc => Proc.new { |row| row.organization.hbx_id }, :sortable => false, :filter => false
@@ -132,7 +131,7 @@ module Effective
       def collection
         return @employer_collection if defined? @employer_collection
 
-        benefit_sponsorships ||= BenefitSponsors::BenefitSponsorships::BenefitSponsorship.all
+        benefit_sponsorships ||= BenefitSponsors::BenefitSponsorships::BenefitSponsorship.unscoped
 
         if attributes[:employers].present? && !['all'].include?(attributes[:employers])
           benefit_sponsorships = benefit_sponsorships.send(attributes[:employers]) if employer_kinds.include?(attributes[:employers])
