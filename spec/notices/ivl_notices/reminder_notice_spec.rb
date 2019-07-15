@@ -10,8 +10,19 @@ RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
   let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person, :min_verification_due_date => TimeKeeper.date_of_record+95.days) }
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 2.month - 1.year}
   let(:hbx_enrollment_member){ FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }
-  let!(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, hbx_enrollment_members: [hbx_enrollment_member], household: family.active_household,family:   family, kind: "individual", is_any_enrollment_member_outstanding: true, aasm_state: "coverage_selected", effective_on: TimeKeeper.date_of_record)}
-  let(:plan){ FactoryBot.create(:plan) }
+  let!(:hbx_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      hbx_enrollment_members: [hbx_enrollment_member],
+                      household: family.active_household,
+                      family: family,
+                      kind: "individual",
+                      is_any_enrollment_member_outstanding: true,
+                      aasm_state: "coverage_selected",
+                      effective_on: TimeKeeper.date_of_record,
+                      product: product)
+  end
+  let(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
+  let!(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', issuer_profile: issuer_profile)}
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'First Outstanding Verification Notification',
                             :notice_template => 'notices/ivl/documents_verification_reminder',
@@ -34,7 +45,6 @@ RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
   describe "New" do
     before do
       allow(person).to receive("primary_family").and_return(family)
-      allow(hbx_enrollment).to receive("plan").and_return(plan)
       person.consumer_role.update_attributes!(:aasm_state => "verification_outstanding")
       @consumer_role = IvlNotices::ReminderNotice.new(person.consumer_role, valid_parmas)
     end
@@ -58,7 +68,6 @@ RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
   describe "Build" do
     before do
       person.consumer_role.update_attributes!(:aasm_state => "verification_outstanding")
-      allow(hbx_enrollment).to receive("plan").and_return(plan)
       allow(person).to receive("primary_family").and_return(family)
       @reminder_notice = IvlNotices::ReminderNotice.new(person.consumer_role, valid_parmas)
       @reminder_notice.build
@@ -100,7 +109,6 @@ RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
   describe "#append_notice_subject" do
     before do
       person.consumer_role.update_attributes!(:aasm_state => "verification_outstanding")
-      allow(hbx_enrollment).to receive("plan").and_return(plan)
       allow(person).to receive("primary_family").and_return(family)
       @reminder_notice = IvlNotices::ReminderNotice.new(person.consumer_role, valid_parmas)
       @reminder_notice.build
@@ -113,7 +121,6 @@ RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
   describe "#generate_pdf_notice" do
     before do
       person.consumer_role.update_attributes!(:aasm_state => "verification_outstanding")
-      allow(hbx_enrollment).to receive("plan").and_return(plan)
       allow(person).to receive("primary_family").and_return(family)
       @reminder_notice = IvlNotices::ReminderNotice.new(person.consumer_role, valid_parmas)
     end
@@ -133,7 +140,6 @@ RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
 
     before :each do
       person.consumer_role.update_attributes!(:aasm_state => "verification_outstanding")
-      allow(hbx_enrollment).to receive("plan").and_return(plan)
       allow(person).to receive("primary_family").and_return(family)
       @reminder_notice = IvlNotices::ReminderNotice.new(person.consumer_role, valid_parmas)
     end

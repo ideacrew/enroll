@@ -4,6 +4,8 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
   let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
   let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person, e_case_id: "family_test#1000")}
+  let(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
+  let!(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', issuer_profile: issuer_profile)}
   let!(:hbx_enrollment) do
     FactoryBot.create(
       :hbx_enrollment,
@@ -12,7 +14,8 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
       household: family.households.first,
       kind: "individual",
       is_any_enrollment_member_outstanding: true,
-      aasm_state: 'coverage_selected'
+      aasm_state: 'coverage_selected',
+      product: product
     )
   end
   let!(:hbx_enrollment_member) {FactoryBot.create(:hbx_enrollment_member,hbx_enrollment: hbx_enrollment, applicant_id: family.family_members.first.id,is_subscriber: true, eligibility_date: TimeKeeper.date_of_record.prev_month )}
@@ -70,13 +73,13 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
       expect(@eligibility_notice.notice.enrollments.first.coverage_kind).to eq hbx_enrollment.coverage_kind
     end
     it "should return plan name" do
-      expect(@eligibility_notice.notice.enrollments.first.plan.plan_name).to eq hbx_enrollment.plan.name
+      expect(@eligibility_notice.notice.enrollments.first.plan.plan_name).to eq hbx_enrollment.product.title
     end
     it "should retun carrier name" do
-      expect(@eligibility_notice.notice.enrollments.first.plan.plan_carrier).to eq hbx_enrollment.plan.carrier_profile.organization.legal_name
+      expect(@eligibility_notice.notice.enrollments.first.plan.plan_carrier).to eq hbx_enrollment.product.issuer_profile.organization.legal_name
     end
     it "should return plan deductible" do
-      expect(@eligibility_notice.notice.enrollments.first.plan.deductible).to eq hbx_enrollment.plan.deductible
+      expect(@eligibility_notice.notice.enrollments.first.plan.deductible).to eq hbx_enrollment.product.deductible
     end
     it "should return person full name" do
       expect(@eligibility_notice.notice.primary_fullname).to eq person.full_name.titleize

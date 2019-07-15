@@ -38,10 +38,10 @@ notice_trigger = event_kind.notice_triggers.first
 def valid_enrollments(person)
   hbx_enrollments = []
   family = person.primary_family
-  enrollments = family.enrollments.where(:aasm_state.in => ["auto_renewing", "coverage_selected"], :kind => "individual")
+  enrollments = HbxEnrollment.where(family_id: family.id, :aasm_state.in => ["auto_renewing", "coverage_selected"], :kind => "individual")
   return [] if enrollments.blank?
-  health_enrollments = enrollments.select{ |e| e.coverage_kind == "health" && e.effective_on.year == 2018}
-  dental_enrollments = enrollments.select{ |e| e.coverage_kind == "dental" && e.effective_on.year == 2018}
+  health_enrollments = enrollments.select{ |e| e.coverage_kind == "health" && e.effective_on.year == 2019}
+  dental_enrollments = enrollments.select{ |e| e.coverage_kind == "dental" && e.effective_on.year == 2019}
 
   hbx_enrollments << health_enrollments
   hbx_enrollments << dental_enrollments

@@ -9,8 +9,11 @@ RSpec.describe IvlNotices::IvlToCoverallTransitionNoticeBuilder, dbclean: :after
                       :created_at => (TimeKeeper.date_of_record.in_time_zone("Eastern Time (US & Canada)") - 2.days),
                       :household => family.households.first,
                       :kind => "individual",
-                      :is_any_enrollment_member_outstanding => true)
+                      :is_any_enrollment_member_outstanding => true,
+                      product: product)
   end
+  let(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
+  let!(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', issuer_profile: issuer_profile)}
   let!(:hbx_enrollment_member) {FactoryBot.create(:hbx_enrollment_member,hbx_enrollment: hbx_enrollment, applicant_id: family.family_members.first.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record.prev_month )}
   let(:application_event){ double("ApplicationEventKind",{
       :name =>'Ivl to Coverall Transition Notice',
