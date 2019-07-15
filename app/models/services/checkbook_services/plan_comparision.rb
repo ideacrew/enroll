@@ -140,6 +140,8 @@ module Services
         when "single_plan"
           # @hbx_enrollment.benefit_group.reference_plan_id.to_s
           reference_plan.hios_id.to_s
+        when "single_product"
+          reference_plan.hios_id.to_s
         when "metal_level"
           reference_plan.metal_level
         else
@@ -151,6 +153,8 @@ module Services
         case @hbx_enrollment.sponsored_benefit_package.plan_option_kind.to_s
         when "single_plan"
           "Plan"
+        when "single_product"
+          "Plan"
         when "single_carrier"
           "Carrier"
         when "single_issuer"
@@ -159,7 +163,6 @@ module Services
           "Metal"
         end
       end
-
 
       def employer_contributions
         premium_benefit_contributions = {}
