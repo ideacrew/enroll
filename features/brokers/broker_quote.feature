@@ -10,5 +10,6 @@ Feature: Broker creates a quote for a prospect employer
 
   Scenario: Broker should be able to create an Employer
     Given Max Planck logs on to the Broker Agency Portal
-    And Primary Broker clicks on the Employers tab
-    When Primary Broker clicks on the Add Prospect Employer button
+    When Primary Broker clicks on the Employers tab
+    And Primary Broker clicks on the Add Prospect Employer button
+    And Primary Broker creates new Prospect Employer with default_office_location

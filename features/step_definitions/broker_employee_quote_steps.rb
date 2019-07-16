@@ -37,7 +37,26 @@ When(/^click on the New Quote button$/) do
 end
 
 When(/^.+ clicks on the Add Prospect Employer button$/) do
-  find(:xpath, "//*[@id='myTabContent']/div/div[4]/div/a").click
+  find('#myTabContent a', text: 'Add Prospect Employer').click
+end
+
+And(/^Primary Broker creates new Prospect Employer with default_office_location$/) do
+  find('#organization_legal_name').click
+  fill_in 'organization[legal_name]', :with => "emp1"
+  fill_in 'organization[dba]', :with => 101010
+
+  find('.interaction-choice-control-organization-entity-kind').click
+  find(".interaction-choice-control-organization-entity-kind-2").click
+
+  find(:xpath, "//select[@name='organization[entity_kind]']/option[@value='c_corporation']")
+  fill_in 'organization[office_locations_attributes][0][address_attributes][address_1]', :with => "1818"
+  fill_in 'organization[office_locations_attributes][0][address_attributes][address_2]', :with => "exp st"
+  fill_in 'organization[office_locations_attributes][0][address_attributes][city]', :with => "Washington"
+  fill_in 'organization[office_locations_attributes][0][address_attributes][zip]', :with => "20002"
+  fill_in 'organization[office_locations_attributes][0][phone_attributes][area_code]', :with => "202"
+  fill_in 'organization[office_locations_attributes][0][phone_attributes][number]', :with => "5551212"
+  fill_in 'organization[office_locations_attributes][0][phone_attributes][extension]', :with => "22332"
+  find('.interaction-click-control-confirm').click
 end
 
 When(/^click on the Upload Employee Roster button$/) do
