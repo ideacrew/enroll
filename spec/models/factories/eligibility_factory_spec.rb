@@ -14,7 +14,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
     describe 'cases for multi tax household scenarios' do
       include_context 'setup two tax households with one ia member each'
 
-      let!(:enrollment1) { FactoryBot.create(:hbx_enrollment, :individual_shopping, household: family.active_household) }
+      let!(:enrollment1) { FactoryBot.create(:hbx_enrollment, :individual_shopping, household: family.active_household, family: family) }
       let!(:enrollment_member1) { FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: enrollment1, applicant_id: family_member.id) }
 
       before :each do
