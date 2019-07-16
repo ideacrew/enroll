@@ -530,7 +530,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       it "should redirect" do
         special_enrollment_period = @family.special_enrollment_periods.last
         expect(response).to have_http_status(:redirect)
-        expect(response).to redirect_to(new_insured_group_selection_path({person_id: person.id, consumer_role_id: person.consumer_role.try(:id), enrollment_kind: 'sep', effective_on_date: special_enrollment_period.effective_on, qle_id: @qle.id}))
+        expect(response).to redirect_to(new_insured_group_selection_path({person_id: person.id, consumer_role_id: person.consumer_role.try(:id), enrollment_kind: 'sep', effective_on_date: special_enrollment_period.effective_on, qle_id: @qle.id, market_kind: @qle.market_kind}))
       end
     end
 
@@ -543,7 +543,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
       it "should redirect with change_plan parameter" do
         expect(response).to have_http_status(:redirect)
-        expect(controller).to redirect_to(new_insured_group_selection_path({person_id: person.id, consumer_role_id: person.consumer_role.try(:id), change_plan: 'change_plan', enrollment_kind: 'sep', qle_id: @qle.id}))
+        expect(controller).to redirect_to(new_insured_group_selection_path({person_id: person.id, consumer_role_id: person.consumer_role.try(:id), change_plan: 'change_plan', enrollment_kind: 'sep', qle_id: @qle.id, market_kind: @qle.market_kind}))
       end
     end
   end

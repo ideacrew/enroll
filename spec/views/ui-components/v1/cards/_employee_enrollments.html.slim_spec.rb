@@ -17,7 +17,7 @@ RSpec.describe "employee_enrollments.html.slim.rb", :type => :view, dbclean: :af
     end
 
     it "should return proper message in tooltip when there is benefit application" do
-      expect(rendered).to match /At least 75 percent of your eligible employees must enroll or waive coverage during the open enrollment period in order to establish your Health Benefits Program. One of your enrollees must also be a non-owner/
+      expect(rendered).to match /At least #{(Settings.aca.shop_market.employee_participation_ratio_minimum * 100).to_i} percent of your eligible employees must enroll or waive coverage during the open enrollment period in order to establish your Health Benefits Program. One of your enrollees must also be a non-owner/
       expect(rendered).to match /Employee Enrollments and Waivers/
     end
   end
