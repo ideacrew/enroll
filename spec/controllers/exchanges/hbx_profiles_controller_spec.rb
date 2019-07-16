@@ -357,7 +357,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
     context "of an hbx super admin clicks Force Publish" do
       let(:site) do
-        FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
+        FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key)
       end
       let(:employer_organization) do
         FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site).tap do |org|
@@ -395,7 +395,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
     context "of an hbx super admin clicks Submit in Force Publish window" do
       let(:site) do
-        FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
+        FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key)
       end
       let(:employer_organization) do
         FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site).tap do |org|
@@ -980,7 +980,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     let!(:hbx_staff_role)      { FactoryBot.create(:hbx_staff_role, person: person, permission_id: permission.id, subrole:permission.name) }
     let!(:rating_area)         { FactoryBot.create_default :benefit_markets_locations_rating_area }
     let!(:service_area)        { FactoryBot.create_default :benefit_markets_locations_service_area }
-    let!(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    let!(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
     let!(:benefit_market)      { site.benefit_markets.first }
     let!(:organization)        { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let!(:employer_profile)    { organization.employer_profile }
@@ -1053,7 +1053,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
     context "of an hbx super admin clicks Change FEIN" do
       let(:site) do
-        FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
+        FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key)
       end
       let(:employer_organization) do
         FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site).tap do |org|
@@ -1091,7 +1091,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
     context "of an hbx super admin clicks Submit in Change FEIN window" do
       let(:site) do
-        FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
+        FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key)
       end
       let(:employer_organization) do
         FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site).tap do |org|
