@@ -192,6 +192,13 @@ RSpec.describe "insured/group_selection/new.html.erb" do
         allow(consumer_role).to receive(:latest_active_tax_household_with_year).and_return nil
         allow(consumer_role2).to receive(:latest_active_tax_household_with_year).and_return nil
         allow(consumer_role3).to receive(:latest_active_tax_household_with_year).and_return nil
+        allow(person2).to receive(:current_individual_market_transition).and_return(individual_market_transition)
+        allow(person3).to receive(:current_individual_market_transition).and_return(individual_market_transition)
+        allow(individual_market_transition).to receive(:role_type).and_return('consumer')
+        allow(person2).to receive(:is_consumer_role_active?).and_return(true)
+        allow(person2).to receive(:is_resident_role_active?).and_return(false)
+        allow(person3).to receive(:is_consumer_role_active?).and_return(true)
+        allow(person3).to receive(:is_resident_role_active?).and_return(false)
         sign_in current_user
       end
 
