@@ -169,7 +169,7 @@ module Factories
         user, person_details.name_pfx, person_details.first_name,
         person_details.middle_name, person_details.last_name,
         person_details.name_sfx, census_employee.ssn,
-        census_employee.dob, person_details.gender, "employee"
+        census_employee.dob, person_details.gender, "employee", person_details.no_ssn
         )
       return nil, nil if person.blank? && person_new.blank?
       self.build_employee_role(

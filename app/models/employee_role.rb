@@ -30,7 +30,8 @@ class EmployeeRole
   delegate :benefit_package_for_date, to: :census_employee, allow_nil: true
   delegate :benefit_package_for_open_enrollment, to: :census_employee, allow_nil: true
 
-  validates_presence_of :ssn, :dob, :gender, :hired_on
+  validates_presence_of :dob, :gender, :hired_on
+  validates_presence_of :ssn, :if => Proc.new { |m| !m.census_employee.no_ssn_allowed }
   # validates_presence_of :employer_profile_id
   # validates_presence_of :benefit_sponsors_employer_profile_id
   validates_presence_of :employer_profile_id, :if => Proc.new { |m| m.benefit_sponsors_employer_profile_id.blank? }

@@ -77,6 +77,10 @@ module BenefitSponsors
     field :source_kind,         type: Symbol, default: :self_serve
     field :registered_on,       type: Date,   default: ->{ TimeKeeper.date_of_record }
 
+    field :is_no_ssn_enabled,   type: Boolean, default: false
+    field :ssn_enabled_on,      type: DateTime
+    field :ssn_disabled_on,     type: DateTime
+
     # This sponsorship's workflow status
     field :aasm_state,          type: Symbol, default: :applicant do
       error_on_all_events { |e| raise WMS::MovementError.new(e.message, original_exception: e, model: self) }
