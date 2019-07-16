@@ -1,4 +1,3 @@
-@wip
 Feature: Insured Plan Shopping on Individual market
 
   Background:
@@ -58,7 +57,7 @@ Feature: Insured Plan Shopping on Individual market
     Then Individual should see a form to enter personal information
     Then Individual selects eligible immigration status
     And Individual selects not applying for coverage
-    When Individual clicks on continue button
+    When Individual clicks on continue
     Then Individual should not see error message Document type cannot be blank
     Then Individual agrees to the privacy agreeement
     Then Individual should see identity verification page and clicks on submit
@@ -72,7 +71,7 @@ Feature: Insured Plan Shopping on Individual market
     Then Individual should see a form to enter personal information
     Then Individual selects eligible immigration status
     And Individual selects applying for coverage
-    When Individual clicks on continue button
+    When Individual clicks on continue
     Then Individual should see error message Document type cannot be blank
     Then Individual logs out
 
@@ -82,7 +81,7 @@ Feature: Insured Plan Shopping on Individual market
     And I signed in
     Then Individual should see heading labeled personal information
     Then Individual should see a form to enter personal information
-    When Individual clicks on continue button
+    When Individual clicks on continue
     Then Individual agrees to the privacy agreeement
     Then Individual should see identity verification page and clicks on submit
     Then Individual should see the dependents form
@@ -99,7 +98,7 @@ Feature: Insured Plan Shopping on Individual market
     And I signed in
     Then Individual should see heading labeled personal information
     Then Individual should see a form to enter personal information
-    When Individual clicks on continue button
+    When Individual clicks on continue
     Then Individual agrees to the privacy agreeement
     Then Individual should see identity verification page and clicks on submit
     Then Individual should see the dependents form

@@ -71,6 +71,10 @@ When(/^\w+ clicks? on continue button$/) do
   find('.interaction-click-control-continue', text: 'Continue', :wait => 10).click
 end
 
+When(/^\w+ clicks? on continue$/) do
+  find('.btn', text: 'CONTINUE').click
+end
+
 Then(/^.+ should see heading labeled personal information/) do
   expect(page).to have_content("Personal Information")
 end
@@ -123,7 +127,7 @@ And(/(.*) selects eligible immigration status$/) do |text|
 end
 
 And(/Individual edits dependent/) do
-  find('.fa-pencil').click
+  find('.fa-edit').click
   wait_for_ajax
 end
 
