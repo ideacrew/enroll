@@ -5,7 +5,7 @@ module BenefitSponsors
     class ProductDatatableSerializer
       include FastJsonapi::ObjectSerializer
 
-      attributes :name, :active_year
+      attributes :name, :active_year, :benefit_market_kind, :kind
       attribute :size do
         ''
       end

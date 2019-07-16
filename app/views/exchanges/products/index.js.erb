@@ -22,6 +22,8 @@ var table = $('#products-ajax-dt').DataTable( {
     },
     { "data": "attributes.name" },
     { "data": "attributes.active_year" },
+    { "data": "attributes.benefit_market_kind" },
+    { "data": "attributes.kind" },
     { "data": "attributes.size" },
     { "data": "attributes.size" },
     { "data": "attributes.size" },
@@ -41,6 +43,16 @@ $("div.toolbar").html(
     <button type="button" class="btn btn-default" onclick="filterProductDataTable(this.innerText)">All</button>
     <button type="button" class="btn btn-default" onclick="filterProductDataTable(this.innerText)">2019</button>
     <button type="button" class="btn btn-default" onclick="filterProductDataTable(this.innerText)">2018</button>
+   </div> <br />
+
+   <div class="btn-group main-group" role="group" aria-label="...">
+    <button type="button" class="btn btn-default" onclick="filterProductDataTable(this.innerText)">Shop</button>
+    <button type="button" class="btn btn-default" onclick="filterProductDataTable(this.innerText)">IVL</button>
+   </div> <br />
+
+   <div class="btn-group main-group" role="group" aria-label="...">
+    <button type="button" class="btn btn-default" onclick="filterProductDataTable(this.innerText)">Health</button>
+    <button type="button" class="btn btn-default" onclick="filterProductDataTable(this.innerText)">Dental</button>
    </div> <br />
   </div>`
 );
@@ -93,13 +105,25 @@ function filterProductDataTable(type) {
   var url = '';
   switch (type) {
     case 'All':
-      url = "/exchanges/issuers/<%=params['issuer_id']%>/products?query=all";
+      url = "/exchanges/issuers/<%=params['issuer_id']%>/products?query[by_year]=nil";
       break;
     case '2019':
-      url = "/exchanges/issuers/<%=params['issuer_id']%>/products?query=2019";
+      url = "/exchanges/issuers/<%=params['issuer_id']%>/products?query[by_year]=2019";
       break;
     case '2018':
-      url = "/exchanges/issuers/<%=params['issuer_id']%>/products?query=2018";
+      url = "/exchanges/issuers/<%=params['issuer_id']%>/products?query[by_year]=2018";
+      break;
+    case 'Shop':
+      url = "/exchanges/issuers/<%=params['issuer_id']%>/products?query[by_benefit_market_kind]=aca_shop";
+      break;
+    case 'IVL':
+      url = "/exchanges/issuers/<%=params['issuer_id']%>/products?query[by_benefit_market_kind]=aca_individual";
+      break;
+    case 'Health':
+      url = "/exchanges/issuers/<%=params['issuer_id']%>/products?query[by_kind]=health";
+      break;
+    case 'Dental':
+      url = "/exchanges/issuers/<%=params['issuer_id']%>/products?query[by_kind]=dental";
       break;
   }
   table.ajax.url(url).load();

@@ -3,11 +3,12 @@
 module BenefitSponsors
   module Services
     class ProductDataTableService
-      attr_accessor :issuer_profile_id, :filter
+      attr_accessor :issuer_profile_id, :filter, :key, :value
 
       def initialize(params = {})
         @issuer_profile_id = params[:issuer_profile_id]
-        @filter = params[:filter].to_i
+        @filter = params[:filter].to_h
+        @key, @value = @filter&.first
       end
 
       def legal_name
@@ -16,13 +17,14 @@ module BenefitSponsors
         end
       end
 
-      def not_all?
-        filter.present? && filter != 0
+      def all?
+        filter.empty? || value == "nil"
       end
 
       def retrieve_table_data
         records = ::BenefitMarkets::Products::Product.by_issuer_profile_id(issuer_profile_id)
-        not_all? ? records.by_year(filter) : records
+        records = all? ? records : records.send(key, value)
+        records.sort_by(&:active_year).reverse!
       end
     end
   end

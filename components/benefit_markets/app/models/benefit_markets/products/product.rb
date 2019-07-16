@@ -93,9 +93,10 @@ module BenefitMarkets
               )
             }
 
-    scope :aca_shop_market,             ->{ where(benefit_market_kind: :aca_shop) }
+    scope :aca_shop_market,             ->{where(benefit_market_kind: :aca_shop) }
     scope :aca_individual_market,       ->{ where(benefit_market_kind: :aca_individual) }
     scope :congressional_market,        ->{ where(benefit_market_kind: :fehb) }
+    scope :by_benefit_market_kind,      ->(benefit_market_kind) { where(benefit_market_kind: benefit_market_kind) }
     scope :by_issuer_profile,           ->(issuer_profile){ where(issuer_profile_id: issuer_profile.id) }
     scope :by_issuer_profile_id,        ->(issuer_profile_id){ where(issuer_profile_id: issuer_profile_id) }
     scope :by_kind,                     ->(kind){ where(kind: kind) }
@@ -136,8 +137,8 @@ module BenefitMarkets
     }
 
     scope :by_year, lambda {|year|
-      where('$and' => [{'application_period.min' => {'$lte' => Date.new(year)}},
-                       {'application_period.max' => {'$gte' => Date.new(year).end_of_year}}
+      where('$and' => [{'application_period.min' => {'$lte' => Date.new(year.to_i)}},
+                       {'application_period.max' => {'$gte' => Date.new(year.to_i).end_of_year}}
       ])
     }
 
