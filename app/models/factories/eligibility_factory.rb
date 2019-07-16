@@ -7,8 +7,8 @@ module Factories
   class EligibilityFactory
 
     def initialize(enrollment_id, selected_aptc = nil, product_ids = [])
-      @enrollment = HbxEnrollment.where(id: enrollment_id.to_s)
-      raise "Cannot find a valid enrollment with given enrollment id" if @enrollment.blank?
+      @enrollment = HbxEnrollment.where(id: enrollment_id.to_s).first
+      raise "Cannot find a valid enrollment with given enrollment id" unless @enrollment
 
       @family = @enrollment.family
       set_applicable_aptc_attrs(selected_aptc, product_ids) if product_ids.present? && selected_aptc

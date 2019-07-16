@@ -21,13 +21,13 @@ RSpec.describe Services::ApplicableAptcService, type: :model, :dbclean => :after
     end
 
     it 'should raise error for bad selected aptc' do
-      allow(HbxEnrollment).to receive(:where).and_return(double(family: 'family'))
+      allow(HbxEnrollment).to receive(:where).and_return([double(family: 'family')])
       service_instance = described_class.new('enrollment_id', nil, ['product_ids'])
       expect{service_instance.applicable_aptcs}.to raise_error(RuntimeError, /Cannot process without selected_aptc:/)
     end
 
     it 'should raise error for bad product ids' do
-      allow(HbxEnrollment).to receive(:where).and_return(double(family: 'family'))
+      allow(HbxEnrollment).to receive(:where).and_return([double(family: 'family')])
       service_instance = described_class.new('enrollment_id', 10.00, [])
       expect{service_instance.applicable_aptcs}.to raise_error(RuntimeError, /Cannot process without selected_aptc:/)
     end
