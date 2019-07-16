@@ -59,6 +59,29 @@ And(/^Primary Broker creates new Prospect Employer with default_office_location$
   find('.interaction-click-control-confirm').click
 end
 
+And(/^.+ should see successful message$/) do
+  expect(page).to have_content("Prospect Employer (#{SponsoredBenefits::Organizations::PlanDesignOrganization.all.first.legal_name}) Added Successfully.")
+end
+
+And(/^the broker clicks Actions dropdown and clicks Create Quote from dropdown menu$/) do
+  #action_id = "dropdown_for_plan_design_"+SponsoredBenefits::Organizations::PlanDesignOrganization.all.first.id.to_s
+  find("#dropdown_for_plan_design_"+SponsoredBenefits::Organizations::PlanDesignOrganization.all.first.id.to_s, :text => "Actions").click
+  find("#plan_design_#{SponsoredBenefits::Organizations::PlanDesignOrganization.all.first.id.to_s}> ul > li:nth-child(2) > a", :text => "Create Quote").click
+  #wait_for_ajax(10, 2)
+  #sleep(10)
+  #census_id = SponsoredBenefits::Organizations::PlanDesignOrganization.all.first.id.to_s
+  #find(:xpath, "//*[@id='dropdown_for_plan_design_#{census_id}']").click
+  wait_for_ajax(10, 2)
+end
+
+Then (/^Primary Broker should be on the Roster page of a Create quote$/) do
+  expect(page).to have_content("Quote for #{SponsoredBenefits::Organizations::PlanDesignOrganization.all.first.legal_name}")
+end
+
+And (/^Primary Broker should see the quote roster is empty$/) do
+  expect(page).not_to have_button('Actions')
+end
+
 When(/^click on the Upload Employee Roster button$/) do
   click_link "Upload Roster"
 end
