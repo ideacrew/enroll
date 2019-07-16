@@ -83,8 +83,8 @@ module Factories
       aptc_thhms.select { |thhm| shopping_member_ids.include?(thhm.applicant_id.to_s) && thhm.is_ia_eligible? }
     end
 
-    def enrollment_eligible_benchmark_hash(aptc_thhms)
-      aptc_thhms.inject({}) do |benchmark_hash, thhm|
+    def enrollment_eligible_benchmark_hash(thhms)
+      thhms.inject({}) do |benchmark_hash, thhm|
         benchmark_hash.merge!({ thhm.applicant_id.to_s => thhm.family_member.aptc_benchmark_amount })
       end
     end
@@ -93,12 +93,12 @@ module Factories
       total_thh_available_aptc = tax_household.total_aptc_available_amount_for_enrollment(@enrollment)
       aptc_thhms = tax_household.aptc_members
       enrolling_aptc_members = aptc_enrollment_members(aptc_thhms)
-      member_aptc_benchmark_hash = enrollment_eligible_benchmark_hash(enrolling_aptc_members)
-      total_eligible_member_benchmark = member_aptc_benchmark_hash.values.sum
+      member_benchmark_hash = enrollment_eligible_benchmark_hash(enrolling_aptc_members)
+      total_eligible_benchmark = member_benchmark_hash.values.sum
 
       enrolling_aptc_members.inject({}) do |thh_hash, thh_member|
         fm_id = thh_member.applicant_id.to_s
-        member_ratio = (member_aptc_benchmark_hash[fm_id] / total_eligible_member_benchmark)
+        member_ratio = (member_benchmark_hash[fm_id] / total_eligible_benchmark)
         thh_hash.merge!({ fm_id => (total_thh_available_aptc * member_ratio) })
       end
     end
