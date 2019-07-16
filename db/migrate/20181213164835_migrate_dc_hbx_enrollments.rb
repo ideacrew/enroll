@@ -211,6 +211,7 @@ class MigrateDcHbxEnrollments < Mongoid::Migration
     ]).each
     end
 
+    HbxEnrollment.skip_callback(:save, :after, :notify_on_save,  raise: false)
     say_with_time("Update enrollment with benefit application reference's ") do
       HbxEnrollment.create_indexes
       @benefit_app_hash.each do |benefit_hash|
@@ -246,6 +247,7 @@ class MigrateDcHbxEnrollments < Mongoid::Migration
         HbxEnrollment.where(:benefit_sponsorship_id.in=> benefit_sponsorship_ids, plan_id: product_data[0]).update_all(product_id: product_data[1]['product_id'], issuer_profile_id: product_data[1]['carrier_profile_id'])
       end
     end
+    HbxEnrollment.set_callback(:save, :after, :notify_on_save,  raise: false)
 
     reset_hash
   end
