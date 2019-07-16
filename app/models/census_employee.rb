@@ -1339,7 +1339,7 @@ def self.to_csv
   end
 
   def active_census_employee_is_unique
-    potential_dups = CensusEmployee.by_ssn(ssn).by_employer_profile_id(employer_profile_id).active if is_case_old?
+    potential_dups = CensusEmployee.by_ssn(ssn).by_old_employer_profile_id(employer_profile_id).active if is_case_old?
     potential_dups ||= CensusEmployee.by_ssn(ssn).by_benefit_sponsor_employer_profile_id(benefit_sponsors_employer_profile_id).active
     if potential_dups.detect { |dup| dup.id != self.id  }
       message = "Employee with this identifying information is already active. "\
