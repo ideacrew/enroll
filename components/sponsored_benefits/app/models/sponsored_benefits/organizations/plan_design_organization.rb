@@ -6,6 +6,7 @@ module SponsoredBenefits
       include Mongoid::Timestamps
       include SponsoredBenefits::Concerns::OrganizationConcern
       include SponsoredBenefits::Concerns::AcaRatingAreaConfigConcern
+      include Config::AcaModelConcern
 
       belongs_to :broker_agency_profile, class_name: "SponsoredBenefits::Organizations::BrokerAgencyProfile", inverse_of: 'plan_design_organization', optional: true
 
@@ -42,7 +43,7 @@ module SponsoredBenefits
 
 
       validates_presence_of   :legal_name, :has_active_broker_relationship
-      validates_presence_of :sic_code, if: :sic_code_exists_for_employer?
+      validates_presence_of :sic_code, if: :sic_field_exists_for_employer?
       validates_uniqueness_of :owner_profile_id, :scope => :sponsor_profile_id, unless: Proc.new { |pdo| pdo.sponsor_profile_id.nil? }
       validates_uniqueness_of :sponsor_profile_id, :scope => :owner_profile_id, unless: Proc.new { |pdo| pdo.sponsor_profile_id.nil? }
 

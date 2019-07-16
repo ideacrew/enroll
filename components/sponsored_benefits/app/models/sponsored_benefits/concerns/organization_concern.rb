@@ -33,7 +33,7 @@ module SponsoredBenefits
 
       embeds_many :office_locations, class_name: "SponsoredBenefits::Organizations::OfficeLocation", cascade_callbacks: true, validate: true
 
-      accepts_nested_attributes_for :office_locations, class_name: "SponsoredBenefits::Organizations::OfficeLocation"
+      accepts_nested_attributes_for :office_locations, class_name: "SponsoredBenefits::Organizations::OfficeLocation", if: :sic_field_exists_for_employer?
 
       validates_presence_of :legal_name, :office_locations
 
@@ -43,7 +43,7 @@ module SponsoredBenefits
       #   numericality: true,
       #   uniqueness: true
 
-      validate :office_location_kinds
+      validate :office_location_kinds, if: :sic_field_exists_for_employer?
 
       index({ hbx_id: 1 }, { unique: true })
       index({ legal_name: 1 })
