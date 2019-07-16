@@ -81,7 +81,7 @@ FactoryBot.define do
 
     trait :with_complex_premium_tables do
       transient do
-        premium_tables_count 1
+        premium_tables_count { 1 }
       end
 
       after(:create) do |plan, evaluator|

@@ -6,7 +6,7 @@ module Services
     def initialize(enrollment_id, selected_aptc, product_ids)
       @enrollment_id = enrollment_id
       @selected_aptc = selected_aptc
-      @product_ids = fetch_product_ids(product_ids)
+      @product_ids = ids_to_strings(product_ids)
     end
 
     def applicable_aptcs
@@ -16,7 +16,7 @@ module Services
 
     private
 
-    def fetch_product_ids(product_ids)
+    def ids_to_strings(product_ids)
       product_ids.map(&:to_s)
     end
 

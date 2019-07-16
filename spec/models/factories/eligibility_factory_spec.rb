@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require 'pry'
 require File.join(Rails.root, 'spec/shared_contexts/ivl_eligibility')
 
 RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each do
@@ -171,7 +170,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
     describe 'cases for single tax household scenarios' do
       include_context 'setup one tax household with two ia members'
 
-      let!(:enrollment1) { FactoryBot.create(:hbx_enrollment, :individual_shopping, household: family.active_household) }
+      let!(:enrollment1) { FactoryBot.create(:hbx_enrollment, :individual_shopping, household: family.active_household, family: family) }
       let!(:enrollment_member1) { FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: enrollment1, applicant_id: family_member.id) }
 
       before :each do
