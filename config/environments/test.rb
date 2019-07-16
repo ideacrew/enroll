@@ -58,6 +58,14 @@ Rails.application.configure do
   config.checkbook_services_congress_url = "https://checkbook_url/congress/"
   config.checkbook_services_remote_access_key = "9876543210"
   config.checkbook_services_reference_id = "0123456789"
+  # for Employer Auto Pay
+  config.wells_fargo_api_url = 'https://demo.e-billexpress.com:443/PayIQ/Api/SSO'
+  config.wells_fargo_api_key = 'e2dab122-114a-43a3-aaf5-78caafbbec02'
+  config.wells_fargo_biller_key = '3741'
+  config.wells_fargo_api_secret = 'dchbx 2017'
+  config.wells_fargo_api_version = '3000'
+  config.wells_fargo_private_key_location = '/wfpk.pem'
+  config.wells_fargo_api_date_format = '%Y-%m-%dT%H:%M:%S.0000000%z'
 
   #Queue adapter
   config.active_job.queue_adapter = :test

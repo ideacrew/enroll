@@ -1,4 +1,5 @@
 module EmployerWorld
+  include ActionView::Helpers::NumberHelper
   # This method is designed to be used in two kinds of scenarios,
   # 1. where there are multiple employers for a scenario and it's called with
   # legal_name to find the right one
@@ -63,6 +64,12 @@ end
 
 Given(/^at least one attestation document status is (.*?)$/) do |status|
   @employer_attestation_status = status
+end
+
+And(/^an employer (.*?) exists with statements and premium payments$/) do |legal_name|
+  employer legal_name, legal_name: legal_name, dba: legal_name
+  benefit_sponsorship = benefit_sponsorship(employer(legal_name))
+  @benefit_sponsorship_account = FactoryBot.create(:benefit_sponsors_benefit_sponsorships_benefit_sponsorship_account, :with_financial_transactions, :with_current_statement_activities, benefit_sponsorship: benefit_sponsorship)
 end
 
 Given(/^employer (.*?) has hired this broker$/) do |legal_name|

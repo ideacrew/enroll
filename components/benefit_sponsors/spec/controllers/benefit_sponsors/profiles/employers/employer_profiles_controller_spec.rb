@@ -40,21 +40,40 @@ module BenefitSponsors
       let!(:employees) {
         FactoryBot.create_list(:census_employee, 2, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship)
       }
+      context 'employee tab' do
+        before do
+          benefit_sponsorship.save!
+          allow(controller).to receive(:authorize).and_return(true)
+          sign_in user
+          get :show, params: {id: benefit_sponsor.profiles.first.id.to_s, tab: 'employees'}
+          allow(employer_profile).to receive(:active_benefit_sponsorship).and_return benefit_sponsorship
+        end
 
-      before do
-        benefit_sponsorship.save!
-        allow(controller).to receive(:authorize).and_return(true)
-        sign_in user
-        get :show, params: {id: benefit_sponsor.profiles.first.id.to_s, tab: 'employees'}
-        allow(employer_profile).to receive(:active_benefit_sponsorship).and_return benefit_sponsorship
+        it "should render show template" do
+          expect(response).to render_template("show")
+        end
+
+        it "should return http success" do
+          expect(response).to have_http_status(:success)
+        end
       end
 
-      it "should render show template" do
-        expect(response).to render_template("show")
-      end
+      context 'accounts tab' do
+        before do
+          benefit_sponsorship.save!
+          allow(controller).to receive(:authorize).and_return(true)
+          sign_in user
+          get :show, params: {id: benefit_sponsor.profiles.first.id.to_s, tab: 'accounts'}
+          allow(employer_profile).to receive(:active_benefit_sponsorship).and_return benefit_sponsorship
+        end
 
-      it "should return http success" do
-        expect(response).to have_http_status(:success)
+        it "should render show template" do
+          expect(response).to render_template("show")
+        end
+
+        it "should return http success" do
+          expect(response).to have_http_status(:success)
+        end
       end
     end
 
