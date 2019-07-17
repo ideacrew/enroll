@@ -293,9 +293,9 @@ validateEmailFormat() {
   let email = this.optionalEmailTarget.value;
   if (!this.isEmail(email)) {
     Swal.fire({
-      title: 'Inproper email format detected',
+      title: 'Invalid Email Entered',
       type: 'error',
-      text: 'Please enter a valid email address.'
+      text: 'The email entered is not in a valid format, please check your entry and submit the information again.'
     });
     this.optionalEmailTarget.value = '';
   }
