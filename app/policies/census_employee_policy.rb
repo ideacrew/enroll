@@ -11,8 +11,10 @@ class CensusEmployeePolicy < ApplicationPolicy
       elsif @user.has_role? :broker
         @record.employer_profile.try(:active_broker) == @user.person
       elsif @user.has_role?(:general_agency_staff)
-        emp_ids = EmployerProfile.find_by_general_agency_profile(@user.person.general_agency_staff_roles.first.general_agency_profile).map(&:id)
-        emp_ids.include? ( @record.employer_profile.id)
+        ga_account = @record.employer_profile.general_agency_accounts.select do |general_agency_account|
+          @user.person.general_agency_staff_roles.where(benefit_sponsors_general_agency_profile_id: general_agency_account.benefit_sponsrship_general_agency_profile_id)
+        end.first
+        ga_account.present? && ga_account.active?
       else
         false
       end
