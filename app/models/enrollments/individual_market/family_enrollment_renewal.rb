@@ -70,7 +70,6 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   def assisted_enrollment(renewal_enrollment)
     renewal_service = Services::IvlEnrollmentRenewalService.new(renewal_enrollment)
     renewal_service.assign(@aptc_values)
-    renewal_service.hbx_enrollment
   end
 
   def is_dependent_dropped?
