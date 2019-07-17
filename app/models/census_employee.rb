@@ -1202,11 +1202,12 @@ def self.to_csv
     benefit_group_assignments - [active_benefit_group_assignment, renewal_benefit_group_assignment].compact
   end
 
-  # Pull expired enrollments as well
   def past_enrollments
     if employee_role.present?
-      enrollments = employee_role.person.primary_family.active_household.hbx_enrollments.shop_market.terminated
-      enrollments.select{|e| e.benefit_group_assignment.present? && e.benefit_group_assignment.census_employee == self && !enrollments_for_display.include?(e) && !e.void?}.sort_by { |enr| enrollment_coverage_end(enr)}.reverse
+      employee_role.person.primary_family.active_household.hbx_enrollments.non_external.shop_market.where({
+        :"aasm_state".in => ["coverage_terminated", "coverage_termination_pending"],
+        :"benefit_group_assignment_id".in => benefit_group_assignments.map(&:id)
+      })
     end
   end
 

@@ -1702,6 +1702,47 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     end
   end
 
+  context 'past_enrollment' do
+    let!(:census_employee) do
+      ce = FactoryBot.create(:benefit_sponsors_census_employee,
+                              employer_profile: employer_profile,
+                              benefit_sponsorship: benefit_sponsorship,
+                              dob: TimeKeeper.date_of_record - 30.years)
+
+       person = FactoryBot.create(:person, last_name: ce.last_name, first_name: ce.first_name)
+      employee_role = FactoryBot.build(:benefit_sponsors_employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
+      ce.update_attributes({employee_role: employee_role})
+      Family.find_or_build_from_employee_role(employee_role)
+      ce
+    end
+
+     let!(:enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                         household: census_employee.employee_role.person.primary_family.active_household,
+                         family: census_employee.employee_role.person.primary_family,
+                         coverage_kind: "health",
+                         kind: "employer_sponsored",
+                         benefit_sponsorship_id: benefit_sponsorship.id,
+                         sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
+                         employee_role_id: census_employee.employee_role.id,
+                         benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
+                         aasm_state: "coverage_terminated")
+    end
+    let!(:family) {census_employee.employee_role.person.primary_family}
+
+     it "should return enrollments" do
+      expect(census_employee.past_enrollments.count).to eq 1
+    end
+
+     context 'should not return enrollment' do
+      before do
+        enrollment.update_attributes(external_enrollment: true)
+      end
+      it{expect(census_employee.past_enrollments.count).to eq 0}
+    end
+
+   end
+
   context '.enrollments_for_display' do
     include_context "setup renewal application"
 
