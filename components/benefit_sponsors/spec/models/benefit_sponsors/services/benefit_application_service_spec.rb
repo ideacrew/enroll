@@ -181,7 +181,7 @@ module BenefitSponsors
 
             it 'should return false as dt active state exists for one of the bas' do
               set_bs_for_service(init_form_for_create)
-              expect(subject.can_create_draft_ba?).to be_falsey
+              expect(subject.can_create_draft_ba?).to be_truthy
             end
           end
         end
@@ -194,7 +194,7 @@ module BenefitSponsors
         context 'with dt active state' do
           it 'should return false as dt active state exists for one of the bas' do
             set_bs_for_service(init_form_for_create)
-            expect(subject.can_create_draft_ba?).to be_falsey
+            expect(subject.can_create_draft_ba?).to be_truthy
           end
         end
       end
@@ -255,7 +255,7 @@ module BenefitSponsors
         end
 
         context 'with dt active state' do
-          
+
           it 'should return true and instance as ba succesfully created' do
             ba2.update_attribute(:aasm_state, :active)
             set_bs_for_service(@form)

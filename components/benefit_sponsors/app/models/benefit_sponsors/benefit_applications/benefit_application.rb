@@ -108,7 +108,7 @@ module BenefitSponsors
 
     field :predecessor_id,          type: BSON::ObjectId
 
-    field :recorded_rating_area_id,     type: BSON::ObjectId 
+    field :recorded_rating_area_id,     type: BSON::ObjectId
     field :recorded_service_area_ids,   type: Array, default: []
 
     field :benefit_sponsor_catalog_id,  type: BSON::ObjectId
@@ -160,7 +160,7 @@ module BenefitSponsors
     scope :approved_and_terminated,         ->{ any_in(aasm_state: APPPROVED_AND_TERMINATED_STATES) }
 
     # Used for specific DataTable Action only
-    scope :active_states_per_dt_action,     ->{ any_in(aasm_state: [:active, :pending, :enrollment_open, :enrollment_eligible, :enrollment_closed, :enrollment_ineligible, :termination_pending]) }
+    scope :active_states_per_dt_action,     ->{ any_in(aasm_state: [:active, :pending, :enrollment_open, :enrollment_eligible, :enrollment_closed, :enrollment_ineligible]) }
 
     # scope :is_renewing,                     ->{ where(:predecessor => {:$exists => true},
     #                                                   :aasm_state.in => APPLICATION_DRAFT_STATES + ENROLLING_STATES).order_by(:'created_at'.desc)
@@ -419,7 +419,7 @@ module BenefitSponsors
 
     # This is being used by Open enrollment extension feature
     # Admin can't choose date before regular monthly open enrollment end date i.e, 20th
-    # Admin can't choose a date beyond the effective month of the application. 
+    # Admin can't choose a date beyond the effective month of the application.
     #   ex: For 1/1 application we limit calender from 12/20 to 1/31.
     def open_enrollment_date_bounds
       {

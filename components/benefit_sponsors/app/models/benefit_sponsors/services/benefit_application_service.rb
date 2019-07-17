@@ -44,34 +44,37 @@ module BenefitSponsors
 
       def can_create_draft_ba?
         bas = benefit_sponsorship.benefit_applications
-        bas.active_states_per_dt_action.present? ? false : true
+        bas.active_states_per_dt_action.present? || bas.draft.present?
       end
 
       def create_or_cancel_draft_ba(form, model_attributes)
         #build cca/dc application
-        benefit_application = benefit_application_factory.call(benefit_sponsorship, model_attributes)
-        save_result, persisted_object = store(form, benefit_application)
-        if save_result
-          if form.admin_datatable_action
-            terminatation_pending_active_applications(persisted_object)
-            cancel_draft_enrolling_and_ineligible_applications(persisted_object)
-          else
-            benefit_sponsorship.revert_to_applicant! if benefit_sponsorship.may_revert_to_applicant? && !benefit_sponsorship.applicant?
-            cancel_draft_and_ineligible_applications(persisted_object)
+        if form.admin_datatable_action && !can_create_draft_ba?
+          form.errors.add(:base, 'Existing plan year with overlapping coverage exists')
+          [false, nil]
+        else
+          benefit_application = benefit_application_factory.call(benefit_sponsorship, model_attributes)
+          save_result, persisted_object = store(form, benefit_application)
+          if save_result
+            if form.admin_datatable_action
+              terminatation_pending_active_applications(persisted_object)
+              cancel_draft_enrolling_and_ineligible_applications(persisted_object)
+            else
+              benefit_sponsorship.revert_to_applicant! if benefit_sponsorship.may_revert_to_applicant? && !benefit_sponsorship.applicant?
+              cancel_draft_and_ineligible_applications(persisted_object)
+            end
           end
+          [save_result, persisted_object]
         end
-        [save_result, persisted_object]
       end
 
       def terminatation_pending_active_applications(new_ba)
-        new_effective_date = new_ba.start_on
-        termination_date = new_effective_date.prev_day
+        termination_date = new_ba.start_on.prev_day
         applications_for_termination = benefit_sponsorship.benefit_applications.where(aasm_state: :active)
 
         applications_for_termination.each do |application|
-          effective_period = application.effective_period.min..termination_date
-          application.update_attributes!(:effective_period => effective_period, :terminated_on => termination_date)
-          application.schedule_enrollment_termination!
+          enrollment_service = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(application)
+          enrollment_service.schedule_termination(termination_date, TimeKeeper.date_of_record, "voluntary", "Other", false)
         end
       end
 
