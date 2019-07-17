@@ -10,3 +10,7 @@
 <% else %>
   <%= hidden_field_tag 'effective_on_kind', @qle.effective_on_kinds.first %>
 <% end %>
+
+<script type="text/javascript">
+  ('select').selectric();
+</script>
