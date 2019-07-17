@@ -139,7 +139,7 @@ function bulkUpload(type) {
   var url = '';
   switch (type) {
     case 'Bulk Upload':
-      url = "/exchanges/issuers/<%=params['issuer_id']%>/products/bulkupload";
+      url = "/exchanges/issuers/<%=params['issuer_id']%>/bulk_upload";
       break;
   }
   table.ajax.url(url).load();

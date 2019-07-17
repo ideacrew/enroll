@@ -87,6 +87,7 @@ Rails.application.routes.draw do
     end
 
     resources :issuers, only: [:index] do
+      post :bulk_upload
       resources :products, only: [:index]
     end
 
