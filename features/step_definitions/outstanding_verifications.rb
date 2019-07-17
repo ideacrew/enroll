@@ -35,9 +35,7 @@ Then(/^the Admin is navigated to the Families screen$/) do
 end
 
 And 'I click on the name of a person of family list' do
-  within('table.effective-datatable tbody tr:last-child') do
-    find('td.col-name a').click
-  end
+  find('a', :text => /First*/i).click
 end
 
 Then(/^the Admin is navigated to the Outstanding Verifications screen$/) do
