@@ -5,10 +5,7 @@ export default class extends Controller {
   static targets = ['countySelect']
 
   initialize() {
-    let kind_select = document.getElementById('kindSelect')
-    if (kind_select) {
-      kind_select.value = "primary";
-    }
+
   }
 
   zipChange(event) {
