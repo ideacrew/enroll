@@ -106,6 +106,7 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
             @benefit_sponsorship.unset(:hbx_id)
             @benefit_sponsorship.send(:generate_hbx_id)
 
+            migrate_employer_profile_account
             set_benefit_sponsorship_state
             set_benefit_sponsorship_effective_on
             construct_workflow_state_for_benefit_sponsorship
@@ -150,6 +151,10 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
 
     say_with_time("Time taken to update all census employee record to default value.") do
       mark_all_census_as_enroll
+    end
+
+    say_with_time("Time taken create bill file") do
+      create_bill_file
     end
 
     logger.info " Total #{total_organizations} old organizations for type: employer profile" unless Rails.env.test?
@@ -244,6 +249,25 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
 
   def self.set_benefit_sponsorship_state
     @benefit_sponsorship.aasm_state = @benefit_sponsorship.send(:employer_profile_to_benefit_sponsor_states_map)[@old_profile.aasm_state.to_sym]
+  end
+
+  def self.migrate_employer_profile_account
+    return unless @old_profile.employer_profile_account.present?
+    benefit_account = @benefit_sponsorship.build_benefit_sponsorship_account(@old_profile.employer_profile_account.attributes.except("_id","updated_by_id","current_statement_activity","workflow_state_transitions","premium_payments"))
+
+    @old_profile.employer_profile_account.current_statement_activity.each do |activity|
+      benefit_account.current_statement_activities.new(activity.attributes.except("_id"))
+    end
+
+    @old_profile.employer_profile_account.premium_payments.each do |payment|
+      benefit_account.financial_transactions.new(payment.attributes.except("_id"))
+    end
+  end
+
+  def self.create_bill_file
+    BillFile.all.each do |bill_file|
+      BenefitSponsors::BenefitSponsorships::BillFile.create(bill_file.attributes.except("_id"))
+    end
   end
 
   def self.set_benefit_sponsorship_effective_on
