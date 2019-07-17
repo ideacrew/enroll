@@ -1,4 +1,3 @@
-@wip
 Feature: Update DOB and SSN
 
   Scenario: Admin purchases the an insured user through sep

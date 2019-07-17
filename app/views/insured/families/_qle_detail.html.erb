@@ -51,7 +51,7 @@
               <div class="spec_reasons">
               </div>
               <div class="text-center <%= pundit_class Family,:updateable? %>">
-                <%= submit_tag l10n('.continue'), class: 'btn btn-primary' %>
+                <%= submit_tag l10n('.continue'), class: 'btn btn-primary', data: { disable_with: false } %>
                 <br/>
                 <br/>
               </div>
@@ -73,7 +73,7 @@
   </div>
 </div>
 <script>
-$(document).on('ready page:load', function () {
+$(document).on('turbolinks:load', function () {
   QLE.initialize();
 });
 </script>
