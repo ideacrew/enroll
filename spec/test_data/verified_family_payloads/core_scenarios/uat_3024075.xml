@@ -468,7 +468,7 @@
                            </ns0:person_name>
                         </ns0:person>
                         <ns0:is_without_assistance>false</ns0:is_without_assistance>
-                        <ns0:is_insurance_assistance_eligible>false</ns0:is_insurance_assistance_eligible>
+                        <ns0:is_insurance_assistance_eligible>true</ns0:is_insurance_assistance_eligible>
                         <ns0:is_medicaid_chip_eligible>false</ns0:is_medicaid_chip_eligible>
                      </ns0:tax_household_member>
                      <ns0:tax_household_member>
@@ -482,7 +482,7 @@
                            </ns0:person_name>
                         </ns0:person>
                         <ns0:is_without_assistance>false</ns0:is_without_assistance>
-                        <ns0:is_insurance_assistance_eligible>false</ns0:is_insurance_assistance_eligible>
+                        <ns0:is_insurance_assistance_eligible>true</ns0:is_insurance_assistance_eligible>
                         <ns0:is_medicaid_chip_eligible>false</ns0:is_medicaid_chip_eligible>
                      </ns0:tax_household_member>
                   </ns0:tax_household_members>
@@ -532,7 +532,7 @@
                            </ns0:person_name>
                         </ns0:person>
                         <ns0:is_without_assistance>false</ns0:is_without_assistance>
-                        <ns0:is_insurance_assistance_eligible>false</ns0:is_insurance_assistance_eligible>
+                        <ns0:is_insurance_assistance_eligible>true</ns0:is_insurance_assistance_eligible>
                         <ns0:is_medicaid_chip_eligible>false</ns0:is_medicaid_chip_eligible>
                      </ns0:tax_household_member>
                      <ns0:tax_household_member>
@@ -546,7 +546,7 @@
                            </ns0:person_name>
                         </ns0:person>
                         <ns0:is_without_assistance>false</ns0:is_without_assistance>
-                        <ns0:is_insurance_assistance_eligible>false</ns0:is_insurance_assistance_eligible>
+                        <ns0:is_insurance_assistance_eligible>true</ns0:is_insurance_assistance_eligible>
                         <ns0:is_medicaid_chip_eligible>false</ns0:is_medicaid_chip_eligible>
                      </ns0:tax_household_member>
                   </ns0:tax_household_members>

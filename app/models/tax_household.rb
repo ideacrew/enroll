@@ -253,6 +253,11 @@ class TaxHousehold
     end
   end
 
+  # TODO: Refactor this to return Applicants vs TaxHouseholdMembers after FAA merge.
+  def tax_members
+    tax_household_members
+  end
+
   private
 
   def product_factory

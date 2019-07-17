@@ -34,7 +34,6 @@ module BenefitMarkets
       field :hsa_eligibility,             type: Boolean,  default: false
       field :network_information,         type: String
 
-
       belongs_to  :renewal_product,
                   inverse_of: nil,
                   class_name: "BenefitMarkets::Products::HealthProducts::HealthProduct",
@@ -43,7 +42,7 @@ module BenefitMarkets
       belongs_to  :catastrophic_age_off_product,
                   inverse_of: nil,
                   class_name: "BenefitMarkets::Products::HealthProducts::HealthProduct",
-                  optional: true 
+                  optional: true
 
       validates_presence_of :hios_id, :health_plan_kind, :ehb
 

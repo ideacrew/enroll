@@ -41,6 +41,11 @@ FactoryBot.define do
       aasm_state { "coverage_selected" }
     end
 
+    trait :individual_shopping do
+      kind { 'individual' }
+      aasm_state { 'shopping' }
+    end
+
     trait :individual_assisted do
       kind { "individual" }
       elected_premium_credit { 150 }
