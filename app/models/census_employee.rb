@@ -457,6 +457,17 @@ class CensusEmployee < CensusMember
     is_business_owner
   end
 
+  def can_be_reinstated?
+    self.employment_terminated? || self.cobra_terminated?
+  end
+
+  def reinstate_employment
+    if self.may_reinstate_eligibility?
+      self.update_attributes({:employment_terminated_on => nil, :coverage_terminated_on => nil})
+      reinstate_eligibility!
+    end
+  end
+
   def is_covered_or_waived?
     ["coverage_selected", "coverage_waived"].include?(active_benefit_group_assignment.aasm_state)
   end

@@ -300,6 +300,10 @@ class Family
     primary_family_member
   end
 
+  def terminated_enrollments
+    hbx_enrollments.where(:aasm_state.in=> ["coverage_terminated", "coverage_termination_pending"])
+  end
+
   # @deprecated Use {primary_applicant}
   alias_method :primary_family_member, :primary_applicant
 
