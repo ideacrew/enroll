@@ -14,6 +14,6 @@ Feature: Broker creates a quote for a prospect employer
     And Primary Broker clicks on the Add Prospect Employer button
     And Primary Broker creates new Prospect Employer with default_office_location
     And Primary Broker should see successful message
-    And the broker clicks Actions dropdown and clicks Create Quote from dropdown menu 
-    Then Primary Broker should be on the Roster page of a Create quote
+    And the broker clicks Actions dropdown and clicks View Quotes from dropdown menu
+    Then Primary Broker should be on the Roster page of a View quote
     And Primary Broker should see the quote roster is empty
