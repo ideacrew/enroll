@@ -120,6 +120,8 @@ module BenefitSponsors
           expect { create_form.save }.to change { BenefitSponsors::Organizations::Organization.broker_agency_profiles.count }.by(1)
           expect(BenefitSponsors::Organizations::Organization.broker_agency_profiles.first.legal_name).to eq params["organization"]["legal_name"]
         end
+        expect(create_form.organization.profile_type).to eq profile_type
+        expect(create_form.organization.profile.profile_type).to eq profile_type
       end
     end
 
