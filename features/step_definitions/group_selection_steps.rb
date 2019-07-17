@@ -492,6 +492,11 @@ Then(/the enrollment should be terminated/) do
 end
 
 Given(/(.*) has a (.*) secondary role/) do |_primary_role, secondary_role|
+  Family.all.first.all_enrollments.first.aasm_state == 'coverage_terminated'
+end
+
+
+Given(/(.*) has a (.*) role/) do |_primary_role, secondary_role|
   family = Family.all.first
   # Assumes primary role is consumer.
   if secondary_role.eql?('resident')
