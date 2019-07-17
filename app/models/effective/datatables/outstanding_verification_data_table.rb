@@ -30,6 +30,10 @@ module Effective
         true
       end
 
+      def global_search?
+        true
+      end
+
       def date_filter_name_definition
         "Verification Due Date Range"
       end
