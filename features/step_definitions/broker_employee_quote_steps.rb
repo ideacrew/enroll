@@ -64,9 +64,10 @@ And(/^.+ should see successful message$/) do
 end
 
 And(/^the broker clicks Actions dropdown and clicks Create Quote from dropdown menu$/) do
-  find("#dropdown_for_plan_design_" + SponsoredBenefits::Organizations::PlanDesignOrganization.all.first.id.to_s, :text => "Actions").click
-  find("#plan_design_#{SponsoredBenefits::Organizations::PlanDesignOrganization.all.first.id.to_s}> ul > li:nth-child(2) > a", :text => "Create Quote").click
-  wait_for_ajax(10, 2)
+  path = SponsoredBenefits::Organizations::PlanDesignOrganization.all.first.id.to_s
+  find("#dropdown_for_plan_design_" + path, :text => "Actions").click
+  find("#plan_design_#{path}> ul > li:nth-child(2) > a", :text => "Create Quote").click
+  wait_for_ajax(3, 2)
 end
 
 Then(/^Primary Broker should be on the Roster page of a Create quote$/) do
