@@ -77,12 +77,8 @@ end
 
 And(/(.*) also has a health enrollment with primary person covered/) do |role|
   family = Family.all.first
-  if ["consumer","Resident","user"].include? role
-    qle = FactoryBot.create :qualifying_life_event_kind, market_kind: "individual"
-    sep = FactoryBot.create :special_enrollment_period, qualifying_life_event_kind_id: qle.id, family: family
-  else
-    sep = FactoryBot.create :special_enrollment_period, family: family
-  end
+  qle = FactoryBot.create(:qualifying_life_event_kind,market_kind: @employee_role.present? ? "employer_sponsored" : "individual")
+  sep = FactoryBot.create(:special_enrollment_period, family: family, qualifying_life_event_kind_id: qle.id)
   product = FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile)
   enrollment = FactoryBot.create(:hbx_enrollment, product: product,
                                   household: family.active_household,
@@ -482,21 +478,22 @@ When(/(.*) clicks the submit button/) do |_role|
 end
 
 Then(/the enrollment should be terminated/) do
-  @family.all_enrollments.first.aasm_state == 'coverage_terminated'
+  Family.all.first.all_enrollments.first.aasm_state == 'coverage_terminated'
 end
 
 
 Given(/(.*) has a (.*) role/) do |_primary_role, secondary_role|
+  family = Family.all.first
   # Assumes primary role is consumer.
   if secondary_role.eql?('resident')
-    FactoryBot.create(:resident_role_object, person: @family.primary_person)
+    FactoryBot.create(:resident_role_object, person: family.primary_person)
   elsif secondary_role.eql?('employee')
-    FactoryBot.create(:employee_role, person: @family.primary_person)
+    FactoryBot.create(:employee_role, person: family.primary_person)
   end
 end
 
 When(/consumer's health enrollment has an effective date in the future/) do
-  @family.all_enrollments.first.update_attributes(effective_on: TimeKeeper.date_of_record + 20)
+  Family.all.first.all_enrollments.first.update_attributes(effective_on: TimeKeeper.date_of_record + 20)
 end
 
 Then(/(.*) should not see the calender/) do |_role|
@@ -512,7 +509,7 @@ When(/(.*) selects (.*) to are you sure/) do |_role, option|
 end
 
 Then(/the enrollment should be canceled/) do
-  @family.all_enrollments.first.aasm_state == 'coverage_cancelled'
+  Family.all.first.all_enrollments.first.aasm_state == 'coverage_cancelled'
 end
 
 When(/(.*) clicks on the Shop for Plans button/) do |_role|
