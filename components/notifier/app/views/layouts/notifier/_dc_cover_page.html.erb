@@ -36,6 +36,12 @@
     </tbody>
   </table>
 
+  <% if recipient.shop? %>
+    <table class="total_table" border="0" style="margin-top: 260px;">
+  <% else %>
+    <table class="total_table" border="0" style="margin-top: 200px;">
+  <% end %>
+
   <table class="total_table" border="0" style="margin-top: 220px;">
     <tbody>
       <tr>
