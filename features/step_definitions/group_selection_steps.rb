@@ -616,4 +616,3 @@ end
 Given(/the coverall enrollment flag is TRUE/) do
   @family.enrollments.first.update_attributes(kind: "coverall")
 end
-
