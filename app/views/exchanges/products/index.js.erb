@@ -53,6 +53,10 @@ $("div.toolbar").html(
    <div class="btn-group main-group" role="group" aria-label="...">
     <button type="button" class="btn btn-default" onclick="filterProductDataTable(this.innerText)">Health</button>
     <button type="button" class="btn btn-default" onclick="filterProductDataTable(this.innerText)">Dental</button>
+   </div> <br /> <br />
+
+   <div class="btn-group main-group" role="group" aria-label="...">
+    <button type="button" class="btn btn-default" onclick="bulkUpload(this.innerText)">Bulk Upload</button>
    </div> <br />
   </div>`
 );
@@ -125,6 +129,17 @@ function filterProductDataTable(type) {
       break;
     case 'Dental':
       url = "/exchanges/issuers/<%=params['issuer_id']%>/products?query[by_kind]=dental";
+      break;
+  }
+  table.ajax.url(url).load();
+}
+
+// needs to be updated accordingly
+function bulkUpload(type) {
+  var url = '';
+  switch (type) {
+    case 'Bulk Upload':
+      url = "/exchanges/issuers/<%=params['issuer_id']%>/products/bulkupload";
       break;
   }
   table.ajax.url(url).load();
