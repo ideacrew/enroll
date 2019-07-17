@@ -69,6 +69,7 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
                                       "created_at"=> "$employer_profile.plan_years.created_at",
                                       "updated_at"=>"$employer_profile.plan_years.updated_at",
                                       "terminated_on"=>"$employer_profile.plan_years.terminated_on",
+                                      "termination_kind"=>"$employer_profile.plan_years.termination_kind",
                                       "aasm_state" => '$employer_profile.plan_years.aasm_state',
                                       "effective_period" => { "min": "$employer_profile.plan_years.start_on","max": "$employer_profile.plan_years.end_on" },
                                       "open_enrollment_period" => { "min": "$employer_profile.plan_years.open_enrollment_start_on","max": "$employer_profile.plan_years.open_enrollment_end_on" }}}},
