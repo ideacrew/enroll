@@ -1,12 +1,16 @@
 require 'rails_helper'
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 RSpec.describe CensusEmployeeImport, dbclean: :after_each, :type => :model do
+  include_context "setup benefit market with market catalogs and product packages"
+  include_context "setup initial benefit application"
 
   let(:tempfile) { double("", path: 'spec/test_data/census_employee_import/DCHL Employee Census.xlsx') }
   let(:file) {
     double("", :tempfile => tempfile)
   }
-  let(:employer_profile) { FactoryBot.create(:employer_profile) }
+  let(:employer_profile) { abc_profile }
   let(:sheet) {
     Roo::Spreadsheet.open(file.tempfile.path).sheet(0)
   }
@@ -37,7 +41,7 @@ RSpec.describe CensusEmployeeImport, dbclean: :after_each, :type => :model do
       expect(subject.save).to be_truthy
       expect(subject.load_imported_census_employees.count).to eq(2) # 1 employee + 1 dependent
       expect(subject.load_imported_census_employees.first).to be_a CensusEmployee
-      expect(subject.load_imported_census_employees.first.census_dependents.count).to eq(1)
+      expect(subject.load_imported_census_employees.first.census_dependents.size).to eq(1)
       expect(subject.load_imported_census_employees.last).to be_a CensusDependent
     end
 
@@ -67,7 +71,7 @@ RSpec.describe CensusEmployeeImport, dbclean: :after_each, :type => :model do
     let(:file) {
       double("", :tempfile => tempfile)
     }
-    let(:employer_profile) { FactoryBot.create(:employer_profile) }
+    let(:employer_profile) { abc_profile }
     let(:sheet) {
       Roo::Spreadsheet.open(file.tempfile.path).sheet(0)
     }
@@ -91,7 +95,7 @@ RSpec.describe CensusEmployeeImport, dbclean: :after_each, :type => :model do
   context "terminate employee" do
     let(:tempfile) { double("", path: 'spec/test_data/census_employee_import/DCHL Employee Census 3.xlsx') }
     let(:file) { double("", :tempfile => tempfile) }
-    let(:employer_profile) { FactoryBot.create(:employer_profile) }
+    let(:employer_profile) { abc_profile }
     let(:census_employee) { FactoryBot.create(:census_employee, {ssn: "111111111", dob: Date.new(1987, 12, 12), employer_profile: employer_profile}) }
 
     context "employee does not exist" do
