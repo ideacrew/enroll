@@ -1,6 +1,8 @@
 require "rails_helper"
 
 describe Forms::EmployeeCandidate do
+  let(:subject) { Forms::EmployeeCandidate.new({:ssn => "1236789"})}
+
   before :each do
     subject.valid?
   end
