@@ -132,6 +132,28 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
+  def disable_ssn_requirement
+    @benfit_sponsorships = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:"_id".in => params[:ids])
+
+    @benfit_sponsorships.each do |benfit_sponsorship|
+      # logic for both Bulk Action drop down and action column drop down under data table
+      if params[:can_update].present?
+        if params[:can_update] == "disable"
+          benfit_sponsorship.update_attributes(is_no_ssn_enabled: true, ssn_disabled_on: TimeKeeper.datetime_of_record)
+        else
+          benfit_sponsorship.update_attributes(is_no_ssn_enabled: false, ssn_enabled_on: TimeKeeper.datetime_of_record)
+        end
+      else
+        if !benfit_sponsorship.is_no_ssn_enabled
+          benfit_sponsorship.update_attributes(is_no_ssn_enabled: true, ssn_disabled_on: TimeKeeper.datetime_of_record)
+        else
+          benfit_sponsorship.update_attributes(is_no_ssn_enabled: false, ssn_enabled_on: TimeKeeper.datetime_of_record)
+        end
+      end
+    end
+    redirect_to exchanges_hbx_profiles_root_path, :flash => { :success => "SSN/TIN requirement has been successfully updated for the roster of selected employer" }
+  end
+
   def generate_invoice
     @benfit_sponsorships = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:"_id".in => params[:ids])
     @organizations = @benfit_sponsorships.map(&:organization)
@@ -577,6 +599,11 @@ def employer_poc
     @person = Person.find(params[:person][:pid]) if !params[:person].blank? && !params[:person][:pid].blank?
     @ssn_match = Person.find_by_ssn(params[:person][:ssn]) unless params[:person][:ssn].blank?
     @info_changed, @dc_status = sensitive_info_changed?(@person.consumer_role) if @person.consumer_role
+    # If there is an SSN requiremrnt on ER, then you cannot unset SSN
+    if params[:person][:ssn].blank? && @person.employee_roles.present? && @person.employee_roles.any? {|er| !er.census_employee.no_ssn_allowed }
+      @dont_allow_change = true
+    end
+
     if !@ssn_match.blank? && (@ssn_match.id != @person.id) # If there is a SSN match with another person.
       @dont_allow_change = true
     else

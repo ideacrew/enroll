@@ -5,6 +5,8 @@ class Employers::CensusEmployeesController < ApplicationController
   layout "two_column"
   def new
     @census_employee = build_census_employee
+    @no_ssn = @benefit_sponsorship.is_no_ssn_enabled
+    flash[:notice] = "SSN requirement is currently disabled. This means you are not required to input an SSN when adding new employees to your roster at this time." if @no_ssn
   end
 
   def create
@@ -12,7 +14,8 @@ class Employers::CensusEmployeesController < ApplicationController
       benefit_sponsorship_id: @benefit_sponsorship.id,
       benefit_sponsors_employer_profile_id: @employer_profile.id,
       active_benefit_group_assignment: benefit_group_id,
-      renewal_benefit_group_assignment: renewal_benefit_group_id
+      renewal_benefit_group_assignment: renewal_benefit_group_id,
+      no_ssn_allowed: @benefit_sponsorship.is_no_ssn_enabled
     }))
     # @census_employee.assign_benefit_packages(benefit_group_id: benefit_group_id, renewal_benefit_group_id: renewal_benefit_group_id)
 
@@ -32,6 +35,7 @@ class Employers::CensusEmployeesController < ApplicationController
     @census_employee.build_address unless @census_employee.address.present?
     @census_employee.build_email unless @census_employee.email.present?
     @census_employee.benefit_group_assignments.build unless @census_employee.benefit_group_assignments.present?
+    @no_ssn = @census_employee.no_ssn_allowed
   end
 
   def update
@@ -41,7 +45,8 @@ class Employers::CensusEmployeesController < ApplicationController
     # @census_employee.assign_benefit_packages(benefit_group_id: benefit_group_id, renewal_benefit_group_id: renewal_benefit_group_id)
     @census_employee.attributes = census_employee_params.merge!({
       active_benefit_group_assignment: benefit_group_id,
-      renewal_benefit_group_assignment: renewal_benefit_group_id
+      renewal_benefit_group_assignment: renewal_benefit_group_id,
+      no_ssn_allowed: @benefit_sponsorship.is_no_ssn_enabled
     })
 
     destroyed_dependent_ids = census_employee_params[:census_dependents_attributes].delete_if{|k,v| v.has_key?("_destroy") }.values.map{|x| x[:id]} if census_employee_params[:census_dependents_attributes]
@@ -180,6 +185,9 @@ class Employers::CensusEmployeesController < ApplicationController
   def show
     @family = @census_employee.employee_role.person.primary_family if @census_employee.employee_role.present?
     @status = params[:status] || ''
+    if @census_employee.no_ssn_allowed && !@employer_profile.is_no_ssn_enabled && @census_employee.encrypted_ssn.nil?
+      flash[:notice] = "This employee does not have an SSN because he/she was created at a time when an SSN was not required."
+    end
   end
 
   def delink
@@ -284,6 +292,7 @@ class Employers::CensusEmployeesController < ApplicationController
     @census_employee.build_address
     @census_employee.build_email
     @census_employee.benefit_group_assignments.build
+    @census_employee.benefit_sponsors_employer_profile_id = @employer_profile.id
     @census_employee
   end
 
