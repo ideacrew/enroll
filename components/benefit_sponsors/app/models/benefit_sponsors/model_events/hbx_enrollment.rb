@@ -26,7 +26,15 @@ module BenefitSponsors
           if is_transition_matching?(to: [:coverage_terminated, :coverage_termination_pending], from: [:coverage_selected, :coverage_enrolled, :auto_renewing,
                            :renewing_coverage_selected,:auto_renewing_contingent, :renewing_contingent_selected, :renewing_contingent_transmitted_to_carrier,
                            :renewing_contingent_enrolled, :unverified], event: [:terminate_coverage, :schedule_coverage_termination])
-            is_employee_coverage_termination = true
+            # TODO:
+            # the original commit here https://github.com/health-connector/enroll/commit/4e861518fd
+            # had exactly this
+            # NameError:
+            # undefined local variable or method `is_employee_coverage_termination' for #<HbxEnrollment:0x00007fef1ae392a0>
+            # Did you mean?  is_employee_waiver_confirmation
+            unless is_shop? && (sponsored_benefit_package.benefit_application.terminated? || sponsored_benefit_package.benefit_application.termination_pending?)
+              @is_employee_coverage_termination = true
+            end
           end
 
           # TODO -- encapsulated notify_observers to recover from errors raised by any of the observers

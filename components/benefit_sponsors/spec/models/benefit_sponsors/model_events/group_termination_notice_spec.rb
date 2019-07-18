@@ -18,6 +18,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::GroupTerminationNotice', :dbclean 
       :with_enrollment_members,
       :with_product,
       household: family.active_household,
+      family: family,
       aasm_state: "coverage_selected",
       effective_on: initial_application.start_on,
       rating_area_id: initial_application.recorded_rating_area_id,
@@ -45,6 +46,10 @@ RSpec.describe 'BenefitSponsors::ModelEvents::GroupTerminationNotice', :dbclean 
             expect(model_event).to be_an_instance_of(::BenefitSponsors::ModelEvents::ModelEvent)
             expect(model_event).to have_attributes(:event_key => :group_termination_confirmation_notice, :klass_instance => model_instance, :options => {})
           end
+        end
+        # added spec for 42046.
+        hbx_enrollment.class.observer_peers.keys.each do |observer|
+          expect(observer).not_to receive(:notifications_send)
         end
         service.terminate(end_date, termination_date, "voluntary", false)
       end
