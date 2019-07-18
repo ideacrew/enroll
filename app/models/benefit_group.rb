@@ -469,9 +469,7 @@ class BenefitGroup
   end
 
   def elected_plans_by_option_kind
-    if constrain_service_areas?
-      @profile_and_service_area_pairs = CarrierProfile.carrier_profile_service_area_pairs_for(employer_profile, self.start_on.year)
-    end
+    @profile_and_service_area_pairs = CarrierProfile.carrier_profile_service_area_pairs_for(employer_profile, start_on.year) if constrain_service_areas?
     case plan_option_kind
     when "sole_source"
       Plan.where(id: reference_plan_id).first
