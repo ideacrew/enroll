@@ -542,16 +542,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     end
   end
 
-  context "GET edit_plan" do
-    it "return http success and render" do
-      sign_in
-      allow(HbxEnrollment).to receive(:find).and_return(hbx_enrollment)
-      get :edit_plan, params: { person_id: person.id, family_id: person.primary_family.id, hbx_enrollment_id: hbx_enrollment.id }
-      expect(response).to have_http_status(:success)
-      expect(response).to render_template(:edit_plan)
-    end
-  end
-
   context "POST terminate" do
 
     before do
