@@ -1736,7 +1736,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         aasm_state: "coverage_terminated"
       )
     end
-    let!(:family) {census_employee.employee_role.person.primary_family}
+    let!(:family) { census_employee.employee_role.person.primary_family }
 
     it "should return enrollments" do
       expect(census_employee.past_enrollments.count).to eq 1
