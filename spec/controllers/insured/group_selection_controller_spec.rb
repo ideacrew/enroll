@@ -285,6 +285,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         allow(person).to receive(:has_active_employee_role?).and_return false
         allow(person).to receive(:consumer_role).and_return(consumer_role)
         allow(HbxEnrollment).to receive(:calculate_effective_on_from).and_return TimeKeeper.date_of_record
+        allow(hbx_enrollment).to receive(:kind).and_return "individual"
       end
 
       it "should set session" do
@@ -315,6 +316,41 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         expect(response).to have_http_status(:redirect)
         expect(response).to redirect_to(insured_plan_shopping_path(id: new_household.hbx_enrollments(true).first.id, change_plan: 'change', coverage_kind: 'health', market_kind: 'individual', enrollment_kind: 'sep'))
       end
+
+      context "IVL edit plan paths" do
+        #These paths should only be reached with an IVL enrollment, hence their location here.
+        before do
+          sign_in
+          allow(HbxEnrollment).to receive(:find).and_return(hbx_enrollment)
+        end
+
+        context "GET edit_plan" do
+          it "return http success and render" do
+            sign_in
+            allow(HbxEnrollment).to receive(:find).and_return(hbx_enrollment)
+            get :edit_plan, params: { person_id: person.id, family_id: person.primary_family.id, hbx_enrollment_id: hbx_enrollment.id }
+            expect(response).to have_http_status(:success)
+            expect(response).to render_template(:edit_plan)
+          end
+        end
+
+        context "POST term_or_cancel" do
+          it "should cancel enrollment with no term date given" do
+            allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record + 10)
+            post :term_or_cancel, params: { hbx_enrollment_id: hbx_enrollment.id, term_or_cancel: 'cancel' }
+            expect(hbx_enrollment.aasm_state).to eq "coverage_canceled"
+            expect(response).to redirect_to(family_account_path)
+          end
+
+          it "should schedule terminate enrollment with term date given" do
+            allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record - 10)
+            post :term_or_cancel, params: { hbx_enrollment_id: hbx_enrollment.id, term_date: TimeKeeper.date_of_record + 1, term_or_cancel: 'terminate' }
+            expect(hbx_enrollment.aasm_state).to eq "coverage_termination_pending"
+            expect(response).to redirect_to(family_account_path)
+          end
+        end
+
+      end
     end
   end
 
@@ -324,16 +360,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       get :terminate_selection, params: { person_id: person.id }
       expect(response).to have_http_status(:success)
       expect(response).to render_template(:terminate_selection)
-    end
-  end
-
-  context "GET edit_plan" do
-    it "return http success and render" do
-      sign_in
-      allow(HbxEnrollment).to receive(:find).and_return(hbx_enrollment)
-      get :edit_plan, params: { person_id: person.id, family_id: person.primary_family.id, hbx_enrollment_id: hbx_enrollment.id }
-      expect(response).to have_http_status(:success)
-      expect(response).to render_template(:edit_plan)
     end
   end
 
