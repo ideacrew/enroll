@@ -1982,9 +1982,25 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         aasm_state: "coverage_canceled"
       )
     end
+    let!(:canceled_enrollment) do
+      FactoryBot.create(
+        :hbx_enrollment,
+        household: census_employee.employee_role.person.primary_family.active_household,
+        coverage_kind: "health",
+        family: census_employee.employee_role.person.primary_family,
+        kind: "employer_sponsored",
+        benefit_sponsorship_id: benefit_sponsorship.id,
+        sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
+        employee_role_id: census_employee.employee_role.id,
+        benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
+        aasm_state: "coverage_canceled"
+      )
+    end
     let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
 
-    it 'should return past expired enrollment' do
+    # https://github.com/health-connector/enroll/pull/1666/files
+    # original commit removes this from scope
+    xit 'should return past expired enrollment' do
       expect(census_employee.past_enrollments.to_a.include?(past_expired_enrollment)).to eq true
     end
 
