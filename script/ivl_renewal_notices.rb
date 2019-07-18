@@ -128,7 +128,7 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
       next if renewing_enrollments.empty?
       consumer_role = primary_person.consumer_role
       if consumer_role.present?
-        if InitialEvents.include? event
+        if ((InitialEvents.include? event) || event == 'ivl_backlog_verification_notice_uqhp')
           family = primary_person.primary_family
           family.set_due_date_on_verification_types
           family.update_attributes(min_verification_due_date: (family.min_verification_due_date_on_family || (TimeKeeper.date_of_record + 95.days)))
@@ -141,6 +141,7 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
             person: primary_person,
             renewing_enrollments: renewing_enrollments,
             active_enrollments: active_enrollments,
+            family: primary_person.primary_family,
             data: members
             }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)
             )
