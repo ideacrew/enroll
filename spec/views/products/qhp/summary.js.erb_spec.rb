@@ -10,6 +10,8 @@ RSpec.describe "products/qhp/summary.js.erb" do
     assign(:member_group, member_group)
     assign(:hbx_enrollment, hbx_enrollment)
     allow(benefit_group).to receive(:sole_source?).and_return(true)
+    allow(benefit_group).to receive(:sole_source?).and_return(true)
+    allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
     stub_template "shared/_summary.html.erb" => ''
     render file: "products/qhp/summary.js.erb"
   end
