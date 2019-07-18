@@ -83,9 +83,12 @@
       <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
         <%= phone.text_field :number, class: "floatlabel form-control phone_number7 interaction-field-control-office-location-phone-number", required: true, placeholder: 'NUMBER', oninvalid:"checkPhone(this);", oninput:"checkPhone(this);" %>
       </div>
+
+    <% unless Settings.site.key.to_s == "cca" %>
       <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd border_bottom_zero">
-        <%= phone.text_field :extension, class: "floatlabel form-control interaction-field-control-office-location-phone-extension", placeholder: 'EXTENSION' %>
+        <%= phone.text_field :extension, class: "floatlabel form-control interaction-field-control-office-location-phone-extension", placeholder: 'EXTENSION'%>
       </div>
+    <% end %>  
     </div><br>
   <% end %>
 </fieldset>

@@ -3,7 +3,7 @@ require 'rails_helper'
 module BenefitMarkets
   RSpec.describe Products::ProductFactory, type: :model do
 
-    describe "#has_rates?" do
+    describe "#has_rates?", dbclean: :after_each do
       let!(:product) { FactoryGirl.create(:benefit_markets_products_health_products_health_product) }
 
       it "should return true if rates are available with atleast one carrier" do
