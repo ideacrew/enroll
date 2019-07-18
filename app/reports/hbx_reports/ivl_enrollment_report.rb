@@ -33,8 +33,9 @@ class IvlEnrollmentReport < MongoidMigrationTask
   end
 
   def writing_on_csv(enrollment_ids_final, glue_list)
-    ivl_headers = ['Enrollment GroupID', 'Purchase Date', 'Coverage Start', 'Coverage Kind', 'Enrollment State', 'Subscriber HBXID',
-                   'Subscriber First Name', 'Subscriber Last Name', 'HIOS ID', 'Family Size', 'Enrollment Reason', 'In Glue']
+    ivl_headers = ['Enrollment GroupID', 'Purchase Date', 'Coverage Start', 'Coverage End', 'Coverage Kind', 'Enrollment State', 
+                    'Subscriber HBXID', 'Subscriber First Name','Subscriber Last Name', 'HIOS ID', 'Premium Subtotal', 
+                    'ER Contribution', 'Applied APTC Amount', 'Total Responsible Amount', 'Family Size', 'Enrollment Reason', 'In Glue']
     
     file_name = "#{Rails.root}/hbx_report/ivl_enrollment_report.csv"
     CSV.open(file_name, "w", force_quotes: true) do |csv|
@@ -51,8 +52,10 @@ class IvlEnrollmentReport < MongoidMigrationTask
             last_name = subscriber.person.last_name
           end
           in_glue = glue_list.include?(id) if glue_list.present?
-          csv << [id,hbx_enrollment.created_at,hbx_enrollment.effective_on,hbx_enrollment.coverage_kind,hbx_enrollment.aasm_state,
-                  subscriber_hbx_id,first_name,last_name,hbx_enrollment.product.hios_id,hbx_enrollment.hbx_enrollment_members.size,
+          csv << [hbx_enrollment.hbx_id,hbx_enrollment.created_at,hbx_enrollment.effective_on,hbx_enrollment.terminated_on,
+                  hbx_enrollment.coverage_kind,hbx_enrollment.aasm_state,subscriber_hbx_id,first_name,last_name,
+                  hbx_enrollment.product.hios_id,hbx_enrollment.total_premium,hbx_enrollment.total_employer_contribution,
+                  hbx_enrollment.applied_aptc_amount,hbx_enrollment.total_employee_cost,hbx_enrollment.hbx_enrollment_members.size,
                   enrollment_reason,in_glue]
         rescue StandardError => e
           @logger = Logger.new("#{Rails.root}/log/ivl_enrollment_report_error.log")
