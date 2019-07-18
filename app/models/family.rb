@@ -175,6 +175,9 @@ class Family
     :"_id".in => HbxEnrollment.verification_outstanding.distinct(:family_id))
   }
 
+  scope :outstanding_verification_datatable,   ->{ by_enrollment_individual_market.where(
+    :"_id".in => HbxEnrollment.enrolled_and_renewing.by_unverified.distinct(:family_id))
+  }
   scope :monthly_reports_scope, -> do
     where(
       :"_id".in => HbxEnrollment.where(

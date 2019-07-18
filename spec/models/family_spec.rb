@@ -1021,6 +1021,57 @@ describe Family, 'coverage_waived?' do
   end
 end
 
+describe "#outstanding_verification_datatable scope", dbclean: :after_each do
+  let!(:ivl_person)       { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+  let!(:ivl_person_2)       { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+  let!(:ivl_family)       { FactoryBot.create(:family, :with_primary_family_member, person: ivl_person) }
+  let!(:ivl_family_2)       { FactoryBot.create(:family, :with_primary_family_member, person: ivl_person_2) }
+  let!(:ivl_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      household: ivl_family.active_household,
+                      family: ivl_family,
+                      kind: "individual",
+                      is_any_enrollment_member_outstanding: true,
+                      aasm_state: "coverage_selected")
+  end
+  let!(:ivl_enrollment_2) do
+    FactoryBot.create(:hbx_enrollment,
+                      household: ivl_family_2.active_household,
+                      family: ivl_family_2,
+                      kind: "individual",
+                      is_any_enrollment_member_outstanding: true,
+                      aasm_state: "coverage_terminated")
+  end
+
+  let!(:ivl_enrollment_member) do
+    FactoryBot.create(:hbx_enrollment_member,
+                      is_subscriber: true,
+                      applicant_id: ivl_family.primary_applicant.id,
+                      hbx_enrollment: ivl_enrollment,
+                      eligibility_date: TimeKeeper.date_of_record,
+                      coverage_start_on: TimeKeeper.date_of_record)
+  end
+  let!(:ivl_enrollment_member_2) do
+    FactoryBot.create(:hbx_enrollment_member,
+                      is_subscriber: true,
+                      pplicant_id: ivl_family_2.primary_applicant.id,
+                      hbx_enrollment: ivl_enrollment_2,
+                      eligibility_date: TimeKeeper.date_of_record,
+                      coverage_start_on: TimeKeeper.date_of_record)
+  end
+
+
+  it "should include families with only enrolled and enrolling outstanding enrollments" do
+    ivl_person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
+    ivl_person_2.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
+    ivl_enrollment.save!
+    ivl_enrollment_2.save!
+    expect(Family.outstanding_verification_datatable.size).to be(1)
+    expect(Family.outstanding_verification_datatable.map(&:id)).to include(ivl_family.id)
+    expect(Family.outstanding_verification_datatable.map(&:id)).not_to include(ivl_family_2.id)
+  end
+end
+
 describe Family, "with 2 households a person and 2 extended family members", :dbclean => :after_each do
   let(:family) { FactoryBot.build(:family) }
   let(:primary) { FactoryBot.create(:person) }
