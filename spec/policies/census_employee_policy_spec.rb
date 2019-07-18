@@ -222,10 +222,29 @@ describe CensusEmployeePolicy, dbclean: :after_each do
     context "when is general agency user", dbclean: :after_each do
       let(:user) { FactoryBot.create(:user, :general_agency_staff, person: person) }
       context "current user is broker of employer_profile" do
-        let(:person) { FactoryBot.create(:person, :with_general_agency_staff_role) }
-        before do
-          allow(EmployerProfile).to receive(:find_by_general_agency_profile).and_return [employee.employer_profile]
+
+        let!(:employee) { FactoryBot.create(:census_employee, benefit_sponsors_employer_profile_id: bs_employer_profile.id, aasm_state: "eligible", employer_profile_id: '', benefit_sponsorship: benefit_sponsorship) }
+        let(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
+        let(:start_on) { TimeKeeper.date_of_record }
+        let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
+        let!(:bs_employer_profile)    { organization.employer_profile }
+        let!(:benefit_sponsorship) do
+          bs = bs_employer_profile.add_benefit_sponsorship
+          bs.save
+          bs
         end
+
+        let(:broker_agency) {FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site)}
+        let(:broker_agency_profile)  { broker_agency.broker_agency_profile }
+
+        let(:general_agency) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, :with_site) }
+        let(:general_agency_profile) { general_agency.profiles.first }
+
+        let!(:plan_design_organization) { FactoryBot.create(:sponsored_benefits_plan_design_organization, sponsor_profile_id: bs_employer_profile.id) }
+        let!(:general_agency_account) { plan_design_organization.general_agency_accounts.create(general_agency_profile: general_agency_profile, start_on: start_on, broker_role_id: broker_agency_profile.primary_broker_role.id) }
+
+        let(:person) { FactoryBot.create(:person) }
+        let!(:general_agency_staff_role) { FactoryBot.create(:general_agency_staff_role, benefit_sponsors_general_agency_profile_id: general_agency_profile.id, person: person)}
 
         it "grants access when change dob" do
           employee.dob = TimeKeeper.date_of_record
