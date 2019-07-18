@@ -17,7 +17,7 @@ class EmployerAttestationDocument < Document
   embedded_in :employer_attestation
   embeds_many :workflow_state_transitions, as: :transitional
 
-  after_create :mark_as_submitted
+  after_create :mark_as_submitted, :submit_attestation
 
   aasm do
     state :submitted, initial: true
@@ -55,6 +55,10 @@ class EmployerAttestationDocument < Document
 
   def employer_attestation
     employer_profile.employer_attestation
+  end
+
+  def submit_attestation
+    employer_attestation.resubmit! if employer_attestation.denied? && employer_attestation.may_resubmit?
   end
 
   def submit_review(params)

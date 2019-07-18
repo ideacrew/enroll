@@ -51,7 +51,7 @@ describe EmployerAttestation, dbclean: :after_each do
       context 'employer with active plan year' do
 
         it 'should reject document and terminate plan year' do
-          #TODO refactor according to benefit application
+          # TODO: refactor according to benefit application
           # employer_attestation.deny!
           # expect(plan_year.aasm_state).to eq 'termination_pending'
           # expect(plan_year.end_on).to eq TimeKeeper.date_of_record.end_of_month
@@ -62,7 +62,7 @@ describe EmployerAttestation, dbclean: :after_each do
       context 'employer with published plan year' do
         
         it 'should reject document and cancel plan year' do
-          #TODO refactor according to benefit application
+          # TODO: refactor according to benefit application
           # plan_year.update_attributes(start_on:TimeKeeper.date_of_record.beginning_of_month + 1.month, aasm_state:'enrolling')
           # employer_attestation.deny!
           # expect(plan_year.aasm_state).to eq 'canceled'
@@ -90,6 +90,16 @@ describe EmployerAttestation, dbclean: :after_each do
       employer_attestation.update_attributes(aasm_state:'submitted')
       employer_attestation.revert!
       expect(employer_attestation.aasm_state).to eq 'unsubmitted'
+    end
+  end
+
+  context ".resubmit" do
+    let(:employer_profile) { FactoryBot.create(:employer_profile) }
+    let!(:employer_attestation) { FactoryBot.create(:employer_attestation, aasm_state: 'denied', employer_profile: employer_profile) }
+
+    it 'should be updated employer_attestation from denied to submitted state' do
+      employer_attestation.resubmit!
+      expect(employer_attestation.aasm_state).to eq('submitted')
     end
   end
 end
