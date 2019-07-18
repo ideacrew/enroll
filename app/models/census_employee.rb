@@ -28,39 +28,6 @@ require 'services/checkbook_services/plan_comparision'
 #  `----------------------'     `--------------'
 
 class CensusEmployee < CensusMember
-  # An instance of the CensusEmployee is an employee that belongs to a Benefit Sponsor. 
-  # It is the primary way for us to refer to the employee of an employer. 
-  # This is different from a person, though it references the person through the employee_role model
-  # Dependents of the census employee (CensusDependents) are embedded in the CensusEmployee 
-  # Embeded document BenefitGroupAssignment is the model responsible for connecting the CensusEmployee with the approriate coverage
-
-#                          ,------------------.                        ,------.   
-#                          |BenefitSponsorship|                        |person|   
-#                          |------------------|                        |------|   
-#                          |------------------|                        |------|   
-#                          `------------------'                        `------'   
-#                            |                |                             |      
-#                            |                |                             |      
-#,------------------------------------.       |                             |      
-#|CensusEmployee                      |  ,---------------------.   ,------------.
-#|------------------------------------|  |BenefitCoveragePeriod|   |EmployeeRole|
-#|benefit_sponsors_employer_profile_id|  |---------------------|   |------------|
-#|employee_role_id                    |  |---------------------|   |------------|
-#|------------------------------------|  `---------------------'   `------------'
-#`------------------------------------'       |                            |       
-#               |                   |_________|____________________________|          
-#               |                             |           
-#,----------------------.     ,--------------.                       
-#|BenefitGroupAssignment|     |BenefitPackage|                       
-#|----------------------|     |--------------|                       
-#|----------------------|-----|--------------|                       
-#`----------------------'     `--------------'                       
-                                        
-                   
-
-
-
-
   include AASM
   include Sortable
   include Searchable
@@ -77,8 +44,7 @@ class CensusEmployee < CensusMember
 
   require 'roo'
 
-  # Groupings for the potential AASM states for Census Employees
-
+  # @!group AASM state groupings
   EMPLOYMENT_ACTIVE_STATES = %w(eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked cobra_eligible cobra_linked cobra_termination_pending)
   EMPLOYMENT_TERMINATED_STATES = %w(employment_terminated cobra_terminated rehired)
   EMPLOYMENT_ACTIVE_ONLY = %w(eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked)
@@ -117,7 +83,6 @@ class CensusEmployee < CensusMember
     cascade_callbacks: true,
     validate: true
 
-  
   embeds_many :benefit_group_assignments,
     cascade_callbacks: true,
     validate: true

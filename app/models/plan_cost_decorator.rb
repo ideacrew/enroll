@@ -112,7 +112,7 @@ class PlanCostDecorator < SimpleDelegator
     else
       1.0
     end
-    (rate_value * large_family_factor(member) * value).round(2)
+    (rate_value * large_family_factor(member) * value)
   end
 
   def premium_for(member)
