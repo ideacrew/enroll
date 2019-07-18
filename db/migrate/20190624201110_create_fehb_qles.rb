@@ -50,7 +50,7 @@ class CreateFehbQles < Mongoid::Migration
             end
           elsif person.employee_roles.unscoped.map(&:benefit_sponsors_employer_profile_id).any?{|id| profile_ids.include?(id)}
             person.primary_family.special_enrollment_periods.shop_market.each do |sep|
-              if person.primary_family.hbx_enrollments.where(:special_enrollment_period_id => sep.id, :employee_role_id.in => employee_roles).any?
+              if person.primary_family.hbx_enrollments.where(:special_enrollment_period_id => sep.id, :benefit_sponsorship_id.in => fehb_sponsorship).any?
                 fehb_qle = @qle_map[sep.qualifying_life_event_kind_id]
                 sep.update_attributes(qualifying_life_event_kind_id: fehb_qle)
                 print '.' unless Rails.env.test?
