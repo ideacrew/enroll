@@ -171,12 +171,12 @@ class Family
   scope :vlp_fully_uploaded,                    ->{ where(vlp_documents_status: "Fully Uploaded")}
   scope :vlp_partially_uploaded,                ->{ where(vlp_documents_status: "Partially Uploaded")}
   scope :vlp_none_uploaded,                     ->{ where(:vlp_documents_status.in => ["None",nil])}
-  scope :outstanding_verification,   ->{ by_enrollment_individual_market.where(
-    :"_id".in => HbxEnrollment.verification_outstanding.distinct(:family_id))
+  scope :outstanding_verification,   ->{ where(
+    :"_id".in => HbxEnrollment.individual_market.verification_outstanding.distinct(:family_id))
   }
 
-  scope :outstanding_verification_datatable,   ->{ by_enrollment_individual_market.where(
-    :"_id".in => HbxEnrollment.enrolled_and_renewing.by_unverified.distinct(:family_id))
+  scope :outstanding_verification_datatable,   ->{ where(
+    :"_id".in => HbxEnrollment.individual_market.enrolled_and_renewing.by_unverified.distinct(:family_id))
   }
   scope :monthly_reports_scope, -> do
     where(
