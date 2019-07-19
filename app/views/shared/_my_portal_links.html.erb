@@ -11,7 +11,7 @@
       <%= link_to l10n(".my_insured_portal"), main_app.family_account_path(tab: 'home'), class: 'header-text' if insured %>
       <%= link_to l10n('.my_employer_portal'), benefit_sponsors.new_profiles_registration_path(:profile_type => :benefit_sponsor), class: 'header-text' if employer_staff.present? %>
       <%= link_to l10n('.my_broker_agency_portal'), benefit_sponsors.new_profiles_registration_path(:profile_type => :broker_agency), class: 'header-text' if broker_staff_roles.any? %>
-      <%= link_to l10n('.my_general_agency_portal'), benefit_sponsors.new_profiles_registration_path(:profile_type => :general_agency), class: 'header-text' if ga_staff_roles.any? %>
+      <%= link_to l10n('.my_general_agency_portal'), benefit_sponsors.profiles_general_agencies_general_agency_profile_path(ga_staff_roles.first.general_agency_profile, tab:'home'), class: 'header-text' if ga_staff_roles.any? %>
       <span> | </span>
     </span>
     <%elsif portal_count > 1 %>
