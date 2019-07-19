@@ -1,4 +1,7 @@
 class EmployerProfilePolicy < ApplicationPolicy
+  def modify_admin_tabs?
+    return true if user.person.hbx_staff_role
+  end
 
   def list_enrollments?
     return false unless person=user.person

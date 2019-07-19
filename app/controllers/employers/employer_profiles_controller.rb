@@ -10,6 +10,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   before_action :check_show_permissions, only: [:show, :show_profile, :destroy, :inbox, :bulk_employee_upload, :bulk_employee_upload_form]
   before_action :check_index_permissions, only: [:index]
   before_action :check_employer_staff_role, only: [:new]
+  before_action :modify_admin_tabs?, only: %i[terminate_employee_roster_enrollments]
   before_action :check_access_to_organization, only: [:edit]
   before_action :check_and_download_invoice, only: [:download_invoice]
   around_action :wrap_in_benefit_group_cache, only: [:show]
@@ -275,7 +276,27 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   #   end
   # end
 
+  def terminate_employee_roster_enrollments
+    employer_profile = EmployerProfile.find(params["employer_profile_id"])
+    if employer_profile.active_plan_year.present?
+      employer_profile.terminate_roster_enrollments(terminate_employee_roster_enrollments_params)
+      flash[:notice] = "Successfully terminated employee enrollments."
+    else
+      flash[:error] = "No Active Plan Year present, unable to terminate employee enrollments."
+    end
+
+     redirect_to employers_employer_profile_path(employer_profile) + "?tab=employees"
+  end
+
   private
+
+  def modify_admin_tabs?
+    authorize EmployerProfile, :modify_admin_tabs?
+  end
+
+   def terminate_employee_roster_enrollments_params
+    params.permit(:employer_profile_id, :termination_date, :termination_reason, :transmit_xml)
+  end
 
   def file_path(file)
     file.tempfile.path
@@ -316,8 +337,8 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     status_params = params.permit(:id, :status, :search)
     @status = status_params[:status] || 'active'
     @search = status_params[:search] || false
-    #@avaliable_employee_names ||= @employer_profile.census_employees.sorted.map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
-    #@avaliable_employee_names ||= @employer_profile.census_employees.where(last_name: => /^#{page_no}/i).limit(20).map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
+    # @avaliable_employee_names ||= @employer_profile.census_employees.sorted.map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
+    # @avaliable_employee_names ||= @employer_profile.census_employees.where(last_name: => /^#{page_no}/i).limit(20).map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
 
     census_employees = case @status
                        when 'terminated'
@@ -338,16 +359,16 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     if params[:page].present?
       page_no = cur_page_no(@page_alphabets.first)
       @census_employees = census_employees.where("last_name" => /^#{page_no}/i).page(params[:pagina])
-      #@avaliable_employee_names ||= @census_employees.limit(20).map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
+      # @avaliable_employee_names ||= @census_employees.limit(20).map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
     else
       @total_census_employees_quantity = census_employees.count
       @census_employees = census_employees.limit(20).to_a
-      #@avaliable_employee_names ||= @census_employees.map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
+      # @avaliable_employee_names ||= @census_employees.map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
     end
   end
 
   def paginate_families
-    #FIXME add paginate
+    # TODO: FIXME add paginate
     @employees = @employer_profile.employee_roles.select { |ee| CensusEmployee::EMPLOYMENT_ACTIVE_STATES.include?(ee.census_employee.aasm_state)}
   end
 
