@@ -54,13 +54,15 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
       Organization.collection.aggregate([
         {"$match" => {"employer_profile" => { "$exists" => true }}},
         {"$project" => {"hbx_id"=> 1, "employer_profile.profile_source"=> 1,
-                        "employer_profile.broker_agency_accounts" => 1,
+                        "employer_profile.no_ssn" => 1, "employer_profile.enable_ssn_date" => 1,
+                        "employer_profile.disable_ssn_date" => 1, "employer_profile.broker_agency_accounts" => 1,
                         "employer_profile.registered_on"=> 1,"employer_profile.plan_years" => 1}},
 
         {"$unwind" => {"path": "$employer_profile.plan_years", "preserveNullAndEmptyArrays": true}},
 
         {"$project" => {
             "hbx_id" => 1, 'employer_profile.profile_source'=> 1, "employer_profile.registered_on" => 1,
+            "employer_profile.no_ssn" => 1, "employer_profile.enable_ssn_date" => 1, "employer_profile.disable_ssn_date" => 1,
             "employer_profile.broker_agency_accounts" => { "$ifNull" => [ "$employer_profile.broker_agency_accounts", []]},
             "benefit_application" => {"fte_count" => "$employer_profile.plan_years.fte_count",
                                       "_id" => "$employer_profile.plan_years._id",
@@ -76,6 +78,9 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
         {"$group"=>{"_id" =>  "$_id","hbx_id" => {"$last" => "$hbx_id"},
                     "source_kind" => {"$last"=> "$employer_profile.profile_source"},
                     "registered_on" => {"$last" => "$employer_profile.registered_on"},
+                    "is_no_ssn_enabled" => {"$last" => "$employer_profile.no_ssn"},
+                    "ssn_enabled_on" => {"$last" => "$employer_profile.enable_ssn_date"},
+                    "ssn_disabled_on" => {"$last" => "$employer_profile.disable_ssn_date"},
                     "broker_agency_accounts" => {"$last" => "$employer_profile.broker_agency_accounts"},
                     "benefit_applications" => {"$push" => {"$cond" => { if: { "$ne": [ "$benefit_application.effective_period", {}]},
                                                                         then: "$benefit_application", else: [],}}}}},
