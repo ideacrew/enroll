@@ -91,6 +91,7 @@ class Organization
   index({"employer_profile.plan_years.open_enrollment_end_on" => 1})
   index({"employer_profile.plan_years.benefit_groups._id" => 1})
   index({"employer_profile.plan_years.benefit_groups.reference_plan_id" => 1})
+  index({"employer_profile.plan_years.benefit_groups.title" => 1})
 
   index({"employer_profile.workflow_state_transitions.transition_at" => 1,
          "employer_profile.workflow_state_transitions.to_state" => 1},

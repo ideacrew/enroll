@@ -259,13 +259,19 @@ module BenefitSponsors
     index({ profile_id: 1 })
     index({ organization_id: 1 })
 
-    index({"benefit_application._id" => 1})
-    index({"benefit_application.predecessor_id" => 1})
-    index({ "benefit_application.aasm_state" => 1, "effective_period.min" => 1, "effective_period.max" => 1},
+    index({"benefit_applications._id" => 1})
+    index({"benefit_applications.predecessor_id" => 1})
+    index({"benefit_applications.recorded_rating_area_id" => 1})
+    index({ "benefit_applications.aasm_state" => 1, "benefit_applications.effective_period.min" => 1, "benefit_applications.effective_period.max" => 1},
             { name: "effective_period" })
 
-    index({ "benefit_application.aasm_state" => 1, "open_enrollment_period.min" => 1, "open_enrollment_period.max" => 1},
+    index({ "benefit_applications.aasm_state" => 1, "benefit_applications.open_enrollment_period.min" => 1, "benefit_applications.open_enrollment_period.max" => 1},
             { name: "open_enrollment_period" })
+
+    index({"benefit_applications.benefit_packages._id" => 1})
+    index({"benefit_applications.benefit_packages.title" => 1})
+
+    index({"benefit_applications.benefit_packages.sponsored_benefits._id" => 1})
 
     add_observer ::BenefitSponsors::Observers::NoticeObserver.new, [:process_benefit_sponsorship_events]
 

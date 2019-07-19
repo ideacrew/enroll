@@ -26,10 +26,10 @@ class MigrateDcHbxEnrollments < Mongoid::Migration
       BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:'benefit_applications'.exists=>true).each do |bs|
         bs.benefit_applications.each do |ba|
           begin
-            ba.benefit_groups.unscoped.each do |bg|
+              ba.benefit_packages.unscoped.each do |bg|
               plan_year = PlanYear.find(ba.id)
               raise "Plan year not found" unless plan_year.present?
-              old_bg =  plan_year.benefit_groups.unscoped.select{|b| b.title == bg.title}
+              old_bg =  plan_year.benefit_groups.unscoped.where(title: bg.title)
               raise "Issue with benefit group" unless old_bg.present? || old_bg.count > 1
               bg_hash = {}
               bg_hash[old_bg.first.id] = {'benefit_package_id' => bg.id, 'benefit_sponsorship_id' => bs.id,'health_sponsored_benefit_id' => bg.health_sponsored_benefit.id, "rating_area_id" => ba.recorded_rating_area_id}
