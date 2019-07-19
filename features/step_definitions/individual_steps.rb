@@ -126,6 +126,35 @@ And(/(.*) selects eligible immigration status$/) do |text|
   end
 end
 
+Then(/select I-551 doc and fill details/) do
+  find('.label', :text => 'Select document type', wait: 10).click
+  find('li', :text => 'I-551 (Permanent Resident Card)', wait: 10).click
+  fill_in 'Alien Number', with: '987654323'
+  fill_in 'Card Number', with: 'aaa1231231231'
+  fill_in 'Expiration Date', with: TimeKeeper.date_of_record.to_s
+  click_link((TimeKeeper.date_of_record + 10.days).day)
+end
+
+Then(/click citizen yes/) do
+  find(:xpath, '//label[@for="person_us_citizen_true"]').click
+end
+
+Then(/click citizen no/) do
+  find(:xpath, '//label[@for="person_us_citizen_false"]').click
+end
+
+When(/click eligible immigration status yes/) do
+  find(:xpath, '//label[@for="person_eligible_immigration_status_true"]').click
+end
+
+Then(/should find I-551 doc type/) do
+  find('.label', :text => 'I-551 (Permanent Resident Card)')
+end
+
+And(/should find alien number/) do
+  find('#person_consumer_role_vlp_documents_attributes_0_alien_number')
+end
+
 And(/Individual edits dependent/) do
   find('.fa-edit').click
   wait_for_ajax
