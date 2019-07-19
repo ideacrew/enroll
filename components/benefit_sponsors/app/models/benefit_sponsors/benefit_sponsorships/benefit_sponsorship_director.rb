@@ -1,5 +1,6 @@
 module BenefitSponsors
   class BenefitSponsorships::BenefitSponsorshipDirector
+    include ::Acapi::Notifiers
 
     attr_reader :new_date
 
@@ -9,8 +10,16 @@ module BenefitSponsors
     end
 
     def process(benefit_sponsorships, event)
-      business_policy_name = policy_name(event)
+      if event == :renew_sponsor_benefit
+        benefit_sponsorships.no_timeout.each do |sponsorship|
+          notify("acapi.info.events.benefit_sponsorship.execute_benefit_renewal", {
+            :benefit_sponsorship_id => benefit_sponsorship.id.to_s, :new_date => new_date.strftime("%Y-%m-%d")
+          })
+        end
+        return
+      end
 
+      business_policy_name = policy_name(event)
       benefit_sponsorships.no_timeout.each do |benefit_sponsorship|
         begin
           business_policy = business_policy_for(benefit_sponsorship, business_policy_name)
