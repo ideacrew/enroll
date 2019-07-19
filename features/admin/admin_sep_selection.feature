@@ -41,3 +41,4 @@ Feature: Update DOB and SSN
     And I select a effective date from list
     And I click on continue button on select effective date
     When I click on continue button on household info form
+    Then Hbx Admin logs out
