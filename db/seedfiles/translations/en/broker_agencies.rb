@@ -46,6 +46,7 @@ BROKER_AGENCIES_TRANSLATIONS = {
 	"en.broker_agencies.profiles.ee_count" => "EE Count",
 	"en.broker_agencies.profiles.er_state" => "ER State",
 	"en.general_agency" => "General Agency",
+	"en.no_general_agencies_found" => "No General Agencies Found",
 	"en.families" => "Families",
 	"en.hbx_id" => "HBX ID",
 	"en.review" => "Review",
