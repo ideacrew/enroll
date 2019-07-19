@@ -230,7 +230,7 @@ module BenefitSponsors
           @form = init_form_for_create
         end
 
-        [:pending, :enrollment_open, :enrollment_closed, :enrollment_ineligible].each do |active_state|
+        [:pending, :enrollment_open, :enrollment_closed, :enrollment_ineligible, :binder_paid].each do |active_state|
           let!(:ba) { FactoryBot.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, aasm_state: :draft) }
 
           context 'with dt in pending and enrollment states' do
