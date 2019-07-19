@@ -71,8 +71,8 @@ function applyListenersFor(target) {
   });
 
   $("input[name='" + target + "[naturalized_citizen]']").change(function() {
+    var selected_doc_type = $('#naturalization_doc_type').val();
     if ($(this).val() == 'true') {
-      var selected_doc_type = $('#naturalization_doc_type').val();
       $('#vlp_documents_container').show();
       $('#naturalization_doc_type_select').show();
       $('#immigration_doc_type_select').hide();
