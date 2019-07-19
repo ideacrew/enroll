@@ -27,8 +27,12 @@ module PortalHeaderHelper
       end
     elsif current_user.try(:has_broker_agency_staff_role?) && controller_path.exclude?('general_agencies') && controller_path.exclude?('employers')
       link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe, get_broker_profile_path, class: "portal"
-    elsif current_user.try(:has_general_agency_staff_role?) && controller_path.exclude?('employers')
-      link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a General Agency".html_safe, benefit_sponsors.profiles_general_agencies_general_agency_profile_path(id: current_user.person.active_general_agency_staff_roles.first.benefit_sponsors_general_agency_profile_id), class: "portal"
+    elsif current_user.try(:has_general_agency_staff_role?)
+      if current_user.try(:has_employer_staff_role?) && controller_path.include?('employers')
+        link_to "#{image_tag 'icons/icon-business-owner.png'} &nbsp; I'm an Employer".html_safe, benefit_sponsors.profiles_employers_employer_profile_path(id: current_user.person.active_employer_staff_roles.first.benefit_sponsor_employer_profile_id, :tab=>'home'), class: "portal"
+      else
+        link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a General Agency".html_safe, benefit_sponsors.profiles_general_agencies_general_agency_profile_path(id: current_user.person.active_general_agency_staff_roles.first.benefit_sponsors_general_agency_profile_id), class: "portal"
+      end
     elsif current_user.try(:has_employer_staff_role?)
       link_to "#{image_tag 'icons/icon-business-owner.png'} &nbsp; I'm an Employer".html_safe, benefit_sponsors.profiles_employers_employer_profile_path(id: current_user.person.active_employer_staff_roles.first.benefit_sponsor_employer_profile_id, :tab=>'home'), class: "portal"
     else
