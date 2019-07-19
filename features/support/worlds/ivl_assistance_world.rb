@@ -8,19 +8,26 @@ module IvlAssistanceWorld
   end
 
   def create_tax_household_and_eligibility_determination(family)
-    tax_household = TaxHousehold.new(
-        effective_starting_on: (TimeKeeper.date_of_record - 30.days),
-        is_eligibility_determined: true,
-        submitted_at: TimeKeeper.date_of_record
+    benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
+    product = BenefitMarkets::Products::Product.all.where(metal_level_kind: :silver).first
+    benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}.update_attributes!(slcsp_id: product.id)
+    slcsp_id = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp_id
+
+    tax_household = family.active_household.tax_households.create(
+      effective_starting_on: (TimeKeeper.date_of_record - 30.days),
+      is_eligibility_determined: true,
+      submitted_at: TimeKeeper.date_of_record
     )
-    family.active_household.tax_households << tax_household
+
+    tax_household.eligibility_determinations.create(
+      benchmark_plan_id: slcsp_id,
+      max_aptc: 100.00,
+      csr_percent_as_integer: 87,
+      determined_on: (TimeKeeper.date_of_record - 30.days),
+      csr_eligibility_kind: 'csr_87'
+    )
+
     family.active_household.save!
-    tax_household.eligibility_determinations << EligibilityDetermination.new(
-        max_aptc: 100.00,
-        csr_percent_as_integer: 87,
-        determined_on: (TimeKeeper.date_of_record - 30.days)
-    )
-    tax_household.save!
     family.save!
     tax_household
   end

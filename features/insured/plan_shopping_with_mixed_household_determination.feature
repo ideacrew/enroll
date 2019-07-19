@@ -1,4 +1,3 @@
-@wip
 Feature: plan shopping with mixed household determination
 
   Background: Consumer work flow while plan shopping for mixed household determinations

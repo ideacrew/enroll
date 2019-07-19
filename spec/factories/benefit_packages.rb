@@ -23,6 +23,30 @@ FactoryBot.define do
                                      metal_level_kind: "silver",
                                      csr_variant_id: "01",
                                      issuer_profile: issuer_profile)
+      ivl_silver_csr_4 = FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                                           title: 'IVL Test Plan Silver csr 4',
+                                           benefit_market_kind: :aca_individual,
+                                           kind: 'health',
+                                           deductible: 2000,
+                                           metal_level_kind: 'silver',
+                                           csr_variant_id: '04',
+                                           issuer_profile: issuer_profile)
+      ivl_silver_csr_5 = FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                                           title: 'IVL Test Plan Silver csr 5',
+                                           benefit_market_kind: :aca_individual,
+                                           kind: 'health',
+                                           deductible: 2000,
+                                           metal_level_kind: 'silver',
+                                           csr_variant_id: '05',
+                                           issuer_profile: issuer_profile)
+      ivl_silver_csr_6 = FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                                           title: 'IVL Test Plan Silver csr 6',
+                                           benefit_market_kind: :aca_individual,
+                                           kind: 'health',
+                                           deductible: 2000,
+                                           metal_level_kind: 'silver',
+                                           csr_variant_id: '06',
+                                           issuer_profile: issuer_profile)
       ivl_gold = FactoryBot.create(:benefit_markets_products_health_products_health_product,
                                    title: 'IVL Test Plan Gold',
                                    benefit_market_kind: :aca_individual,
@@ -69,7 +93,7 @@ FactoryBot.define do
                                           metal_level_kind: "platinum",
                                           csr_variant_id: "01",
                                           issuer_profile: issuer_profile)
-      bp.benefit_ids = [ivl_bronze.id, ivl_silver.id, ivl_gold.id, ivl_plat.id, future_ivl_bronze.id, future_ivl_silver.id, future_ivl_gold.id, future_ivl_plat.id ]
+      bp.benefit_ids = [ivl_bronze.id, ivl_silver.id, ivl_silver_csr_4.id, ivl_silver_csr_5.id, ivl_silver_csr_6.id, ivl_gold.id, ivl_plat.id, future_ivl_bronze.id, future_ivl_silver.id, future_ivl_gold.id, future_ivl_plat.id]
     end
 
     trait :next_coverage_year_title do
