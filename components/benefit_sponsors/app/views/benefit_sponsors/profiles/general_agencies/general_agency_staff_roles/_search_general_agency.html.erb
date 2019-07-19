@@ -10,6 +10,7 @@
       </thead>
       <% @general_agency_profiles.each do |agency| %>
       <tbody class="select-ga">
+        <tr style='border: 1px solid #d5d5d5; height: 50px;'>
           <td><%= agency.legal_name %></td>
           <td><%= agency.general_agency_primary_staff.npn %></td>
           <td><%= agency.general_agency_primary_staff.person.full_name %></td>
