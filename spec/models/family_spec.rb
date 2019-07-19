@@ -1054,7 +1054,7 @@ describe "#outstanding_verification_datatable scope", dbclean: :after_each do
   let!(:ivl_enrollment_member_2) do
     FactoryBot.create(:hbx_enrollment_member,
                       is_subscriber: true,
-                      pplicant_id: ivl_family_2.primary_applicant.id,
+                      applicant_id: ivl_family_2.primary_applicant.id,
                       hbx_enrollment: ivl_enrollment_2,
                       eligibility_date: TimeKeeper.date_of_record,
                       coverage_start_on: TimeKeeper.date_of_record)
