@@ -1,7 +1,10 @@
-renewal_begin_date = Date.new(2018, 1, 1)
-feins = ARGV[0].split(" ")
+# frozen_string_literal: true
 
-Organization.where(:fein.in => feins).each do |organization|
+#RAILS_ENV=production bundle exec rails runner -e production script/congressional_report.rb "fein1" "fein2" "fein 3"
+renewal_begin_date = Date.new(2018, 1, 1)
+feins = ARGV
+
+BenefitSponsors::Organizations::Organization.where(:fein.in => feins).each do |organization|
 
   CSV.open("#{Rails.root}/congressional_enrollments_#{organization.fein}.csv", "w") do |csv|
 
@@ -29,16 +32,16 @@ Organization.where(:fein.in => feins).each do |organization|
     ]
 
     employer_profile = organization.employer_profile
-    renewal_bg_ids = employer_profile.renewing_plan_year.benefit_groups.pluck(:id) if employer_profile.renewing_plan_year.present?
-    active_bg_ids = employer_profile.active_plan_year.benefit_groups.pluck(:id)
+    renewal_bg_ids = employer_profile.renewal_benefit_application.benefit_packages.pluck(:id) if employer_profile.renewal_benefit_application.present?
+    active_bg_ids = employer_profile.active_benefit_application.benefit_packages.pluck(:id)
     count = 0
 
-    organization.employer_profile.census_employees.each do |ce|
+    employer_profile.census_employees.each do |ce|
       if CensusEmployee::EMPLOYMENT_ACTIVE_STATES.include?(ce.aasm_state) || (CensusEmployee::EMPLOYMENT_TERMINATED_STATES.include?(ce.aasm_state) && ce.coverage_terminated_on.present? && ce.coverage_terminated_on > Date.new(2017,1,1))
 
         if ce.employee_role.present?
           person = ce.employee_role.person
-          family = ce.employee_role.person.primary_family      
+          family = person.primary_family      
         else
           assignment_ids = ce.benefit_group_assignments.pluck(:id)
           family = Family.where(:"household.hbx_enrollments.benefit_group_assignment_id".in => assignment_ids).first
@@ -52,14 +55,14 @@ Organization.where(:fein.in => feins).each do |organization|
         end
 
         active_enrollment = family.active_household.hbx_enrollments.where({
-          :benefit_group_id.in => active_bg_ids,
+          :sponsored_benefit_package_id.in => active_bg_ids,
           :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES + ['coverage_terminated', 'inactive', 'auto_renewing', 'renewing_waived']
-          }).sort_by(&:submitted_at).last if family.present?
+          }).max_by(&:submitted_at) if family.present?
 
         renewal_enrollment = family.active_household.hbx_enrollments.where({
-          :benefit_group_id.in => renewal_bg_ids,
+          :sponsored_benefit_package_id.in => renewal_bg_ids,
           :aasm_state.in => ['auto_renewing', 'renewing_waived']
-          }).sort_by(&:submitted_at).last if family.present? && employer_profile.renewing_plan_year.present?
+          }).max_by(&:submitted_at) if family.present? && employer_profile.renewal_benefit_application.present?
 
         data = [ce.first_name, ce.last_name, ce.aasm_state.humanize]
         if CensusEmployee::EMPLOYMENT_TERMINATED_STATES.include?(ce.aasm_state)
@@ -72,7 +75,7 @@ Organization.where(:fein.in => feins).each do |organization|
         if active_enrollment.present?
           data += [
             active_enrollment.hbx_id,
-            active_enrollment.plan.try(:hios_id),
+            active_enrollment.product.try(:hios_id),
             active_enrollment.effective_on.strftime("%m/%d/%Y"),
             active_enrollment.coverage_kind,
             active_enrollment.aasm_state.humanize
@@ -84,7 +87,7 @@ Organization.where(:fein.in => feins).each do |organization|
         if renewal_enrollment.present?
           data += [
             renewal_enrollment.hbx_id,
-            renewal_enrollment.plan.try(:hios_id),
+            renewal_enrollment.product.try(:hios_id),
             renewal_enrollment.effective_on.strftime("%m/%d/%Y"),
             renewal_enrollment.coverage_kind,
             renewal_enrollment.aasm_state.humanize,
