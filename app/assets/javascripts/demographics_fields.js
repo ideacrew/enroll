@@ -84,10 +84,12 @@ function applyListenersFor(target) {
   });
 
   $("input[name='" + target + "[eligible_immigration_status]']").change(function() {
+    var selected_doc_type = $('#immigration_doc_type').val();
     if ($(this).val() == 'true') {
       $('#vlp_documents_container').show();
       $('#naturalization_doc_type_select').hide();
       $('#immigration_doc_type_select').show();
+      showOnly(selected_doc_type);
     } else {
       $('#vlp_documents_container').hide();
       $('#naturalization_doc_type_select').hide();
