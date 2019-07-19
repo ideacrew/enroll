@@ -128,6 +128,7 @@ module BenefitSponsors
 
 
       index({ legal_name: 1 })
+      index({ hbx_id: 1 })
       index({ dba: 1 },   { sparse: true })
       index({ fein: 1 },  { unique: true, sparse: true })
       index({ :"profiles._id" => 1 })

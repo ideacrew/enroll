@@ -72,6 +72,7 @@ class Organization
 
   # CarrierProfile child model indexes
   index({"carrier_profile._id" => 1}, { unique: true, sparse: true })
+  index({"hbx_profile._id" => 1}, { unique: true, sparse: true })
 
   # BrokerAgencyProfile child model indexes
   index({"broker_agency_profile._id" => 1}, { unique: true, sparse: true })
@@ -105,6 +106,7 @@ class Organization
          "employer_profile.broker_agency_accounts.writing_agent_id" => 1 },
          { name: "active_broker_accounts_writing_agent" })
 
+  index({"general_agency_profile._id" => 1}, { unique: true, sparse: true })
 
   index({"employer_profile.general_agency_accounts._id" => 1})
   index({"employer_profile.broker_agency_accounts.is_active" => 1,

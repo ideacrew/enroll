@@ -77,9 +77,8 @@ class MigrateDcBrokerQuotingTool < Mongoid::Migration
             puts "mapping not found for account #{account.id}, old general agency: #{account.general_agency_profile_id}" if new_general_agency.blank?
             puts "mapping not found for account #{account.id}, old broker agency: #{account.broker_agency_profile_id}," if new_broker_agency.blank?
 
-            account.benefit_sponsrship_general_agency_profile_id = new_general_agency
-            account.benefit_sponsrship_broker_agency_profile_id = new_broker_agency
-            account.save!
+            account.update_attributes!(benefit_sponsrship_general_agency_profile_id:new_general_agency,
+                                       benefit_sponsrship_broker_agency_profile_id: new_broker_agency)
           end
 
           unless pdo.valid?
