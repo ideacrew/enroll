@@ -387,7 +387,7 @@ module BenefitSponsors
 
         def filter_general_agencies_by_primary_roles(agencies, general_agencies)
           agency_ids = agencies.map{|org| org.general_agency_profile.id}
-          general_agencies.select{ |ga| agency_ids.include?(ga.general_agency_primary_staff.benefit_sponsors_general_agency_profile_id) }
+          general_agencies.select{ |ga| agency_ids.include?(ga.general_agency_primary_staff.benefit_sponsors_general_agency_profile_id) if ga.general_agency_primary_staff.present? }
         end
 
         def build_query_params(search_params)
