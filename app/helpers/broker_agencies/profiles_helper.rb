@@ -30,4 +30,10 @@ module BrokerAgencies::ProfilesHelper
     person = user.person
     person.broker_role.present? ? false : true
   end
+
+  def disable_edit_general_agency?(user)
+    return false if user.has_hbx_staff_role?
+    person = user.person
+    person.general_agency_primary_staff.present? ? false : true
+  end
 end
