@@ -4,14 +4,14 @@ require 'csv'
 class OutstandingTypesReport < MongoidMigrationTask
   def ivl_enrollment(person)
     if person.primary_family
-      if person.primary_family.hbx_enrollments.individual_market.present?
-        person.primary_family.hbx_enrollments.individual_market.select{|enrollment| HbxEnrollment::ENROLLED_STATUSES.include?(enrollment.aasm_state) && enrollment.effective_on.between?(TimeKeeper.date_of_record.beginning_of_year,TimeKeeper.date_of_record.end_of_year) }.any? ? "YES" : "NO"
+      if person.primary_family.active_household.hbx_enrollments.individual_market.present?
+        person.primary_family.active_household.hbx_enrollments.individual_market.select{|enrollment| HbxEnrollment::ENROLLED_STATUSES.include?(enrollment.aasm_state) && enrollment.effective_on.between?(TimeKeeper.date_of_record.beginning_of_year,TimeKeeper.date_of_record.end_of_year) }.any? ? "YES" : "NO"
       else
         "nil"
       end
     else
-      families = person.families.select{|family| family.hbx_enrollments.individual_market.present?}
-      enrollments = families.flat_map(&:hbx_enrollments).select{|enrollment| !enrollment.is_shop? } if families
+      families = person.families.select{|family| family.active_household.hbx_enrollments.individual_market.present?}
+      enrollments = families.flat_map(&:active_household).flat_map(&:hbx_enrollments).select{|enrollment| !(["employer_sponsored", "employer_sponsored_cobra"].include? enrollment.kind)} if families
       all_enrollments = enrollments.select{|enrollment| enrollment.hbx_enrollment_members.map(&:person).map(&:id).include?(person.id) }
       active_enrollments = enrollments.select{|enrollment| HbxEnrollment::ENROLLED_STATUSES.include?(enrollment.aasm_state) && enrollment.effective_on.between?(TimeKeeper.date_of_record.beginning_of_year,TimeKeeper.date_of_record.end_of_year)}
       return "nil" unless all_enrollments.any?
@@ -20,7 +20,9 @@ class OutstandingTypesReport < MongoidMigrationTask
   end
 
   def outstanding_types(person)
-    person.verification_types.active.find_all(&:is_type_outstanding?)
+    person.verification_types.active.find_all do |type|
+      type.is_type_outstanding?
+    end
   end
 
   def created_at(person)
@@ -34,14 +36,14 @@ class OutstandingTypesReport < MongoidMigrationTask
 
   def shop_enrollment(person)
     if person.primary_family
-      if person.primary_family.hbx_enrollments.shop_market.present?
-        person.primary_family.hbx_enrollments.shop_market.select{|enrollment| HbxEnrollment::ENROLLED_STATUSES.include?(enrollment.aasm_state) && enrollment.effective_on.between?(TimeKeeper.date_of_record.beginning_of_year,TimeKeeper.date_of_record.end_of_year) }.any? ? "YES" : "NO"
+      if person.primary_family.active_household.hbx_enrollments.shop_market.present?
+        person.primary_family.active_household.hbx_enrollments.shop_market.select{|enrollment| HbxEnrollment::ENROLLED_STATUSES.include?(enrollment.aasm_state) && enrollment.effective_on.between?(TimeKeeper.date_of_record.beginning_of_year,TimeKeeper.date_of_record.end_of_year) }.any? ? "YES" : "NO"
       else
         "nil"
       end
     else
-      families = person.families.select{|family| family.hbx_enrollments.shop_market.present?}
-      enrollments = families.flat_map(&:hbx_enrollments).select{|enrollment| !enrollment.is_shop? } if families
+      families = person.families.select{|family| family.active_household.hbx_enrollments.shop_market.present?}
+      enrollments = families.flat_map(&:active_household).flat_map(&:hbx_enrollments).select{|enrollment| (["employer_sponsored", "employer_sponsored_cobra"].include? enrollment.kind)} if families
       all_enrollments = enrollments.select{|enrollment| enrollment.hbx_enrollment_members.map(&:person).map(&:id).include?(person.id) }
       active_enrollments = enrollments.select{|enrollment| HbxEnrollment::ENROLLED_STATUSES.include?(enrollment.aasm_state) && enrollment.effective_on.between?(TimeKeeper.date_of_record.beginning_of_year,TimeKeeper.date_of_record.end_of_year)}
       return "nil" unless all_enrollments.any?
