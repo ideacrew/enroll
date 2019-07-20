@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
@@ -32,22 +34,22 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
   let(:address) {Address.new(kind: "home", address_1: "221 R St, NW", city: "Washington", state: "DC", zip: "20001")}
   let(:autocomplete) {" lynyrd skynyrd"}
 
-  let(:valid_params) {
+  let(:valid_params) do
     {
-        employer_profile: employer_profile,
-        first_name: first_name,
-        middle_name: middle_name,
-        last_name: last_name,
-        name_sfx: name_sfx,
-        ssn: ssn,
-        dob: dob,
-        gender: gender,
-        hired_on: hired_on,
-        is_business_owner: is_business_owner,
-        address: address,
-        benefit_sponsorship: organization.active_benefit_sponsorship
+      employer_profile: employer_profile,
+      first_name: first_name,
+      middle_name: middle_name,
+      last_name: last_name,
+      name_sfx: name_sfx,
+      ssn: ssn,
+      dob: dob,
+      gender: gender,
+      hired_on: hired_on,
+      is_business_owner: is_business_owner,
+      address: address,
+      benefit_sponsorship: organization.active_benefit_sponsorship
     }
-  }
+  end
 
   describe "Model instance" do
     context "model Attributes" do
@@ -173,7 +175,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     let(:params) {valid_params}
     let(:initial_census_employee) {CensusEmployee.new(**params)}
     let(:dependent) {CensusDependent.new(first_name: 'David', last_name: 'Henry', ssn: "", employee_relationship: "spouse", dob: TimeKeeper.date_of_record - 30.years, gender: "male")}
-    let(:dependent2) {FactoryBot.build(:census_dependent, employee_relationship: "child_under_26", ssn: 333333333, dob: TimeKeeper.date_of_record - 30.years, gender: "male")}
+    let(:dependent2) {FactoryBot.build(:census_dependent, employee_relationship: "child_under_26", ssn: 333_333_333, dob: TimeKeeper.date_of_record - 30.years, gender: "male")}
 
     it "allow dependent ssn's to be updated to nil" do
       initial_census_employee.census_dependents = [dependent]
@@ -188,8 +190,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     end
 
     context "with duplicate ssn's on dependents" do
-      let(:child1) {FactoryBot.build(:census_dependent, employee_relationship: "child_under_26", ssn: 333333333)}
-      let(:child2) {FactoryBot.build(:census_dependent, employee_relationship: "child_under_26", ssn: 333333333)}
+      let(:child1) {FactoryBot.build(:census_dependent, employee_relationship: "child_under_26", ssn: 333_333_333)}
+      let(:child2) {FactoryBot.build(:census_dependent, employee_relationship: "child_under_26", ssn: 333_333_333)}
 
       it "should have errors" do
         initial_census_employee.census_dependents = [child1, child2]
@@ -263,7 +265,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     context "and employee is terminated and reported by employer on timely basis" do
 
       let(:termination_maximum) { Settings.aca.shop_market.retroactive_coverage_termination_maximum.to_hash }
-      let(:earliest_retro_coverage_termination_date) {(TimeKeeper.date_of_record.advance(termination_maximum)).end_of_month }
+      let(:earliest_retro_coverage_termination_date) {TimeKeeper.date_of_record.advance(termination_maximum).end_of_month }
       let(:earliest_valid_employment_termination_date) {earliest_retro_coverage_termination_date.beginning_of_month}
       let(:invalid_employment_termination_date) {earliest_valid_employment_termination_date - 1.day}
       let(:invalid_coverage_termination_date) {invalid_employment_termination_date.end_of_month}
@@ -310,7 +312,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
         it "should not terminate the census employee if today's date < termination date" do
           initial_census_employee.update_attributes(employment_terminated_on: TimeKeeper.date_of_record + 2.days, aasm_state: "employee_termination_pending")
-          CensusEmployee.terminate_future_scheduled_census_employees(TimeKeeper.date_of_record + 1.days)
+          CensusEmployee.terminate_future_scheduled_census_employees(TimeKeeper.date_of_record + 1.day)
           expect(CensusEmployee.find(initial_census_employee.id).aasm_state).to eq "employee_termination_pending"
         end
 
@@ -442,9 +444,9 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
           end
 
           context "and the provided employee role identifying information does match a census employee" do
-            before {
+            before do
               initial_census_employee.employee_role = valid_employee_role
-            }
+            end
 
             it "should link the roster instance and employer role" do
               expect(initial_census_employee.employee_role_linked?).to be_truthy
@@ -494,10 +496,10 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
     let(:employee_count) do
       er1_active_employee_count +
-      er1_terminated_employee_count +
-      er1_rehired_employee_count +
-      er2_active_employee_count +
-      er2_terminated_employee_count
+        er1_terminated_employee_count +
+        er1_rehired_employee_count +
+        er2_active_employee_count +
+        er2_terminated_employee_count
     end
 
     let(:terminated_today_employee_count) {2}
@@ -902,7 +904,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       allow(@enrollment).to receive(:benefit_group).and_return(benefit_group)
       allow(benefit_group).to receive(:effective_on_for).and_return(TimeKeeper.date_of_record + 20.days)
       census_employee.update(hired_on: TimeKeeper.date_of_record + 10.days)
-      @enrollment.reload 
+      @enrollment.reload
       expect(@enrollment.read_attribute(:effective_on)).to eq TimeKeeper.date_of_record + 20.days
     end
   end
@@ -929,7 +931,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
   describe 'construct_employee_role', dbclean: :after_each do
     let(:user)  { FactoryBot.create(:user) }
     context 'when employee_role present' do
-      let(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, employer_profile: employer_profile ) }
+      let(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, employer_profile: employer_profile) }
       let(:census_employee) do
         FactoryBot.create(
           :benefit_sponsors_census_employee,
@@ -1207,9 +1209,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
           end
 
           it "should move the waived enrollment to inactive state" do
-            if terminated_on >= TimeKeeper.date_of_record
-              expect(hbx_enrollment_three.reload.aasm_state).to eq 'inactive'
-            end
+            expect(hbx_enrollment_three.reload.aasm_state).to eq 'inactive' if terminated_on >= TimeKeeper.date_of_record
           end
 
           it "should set the coverage termination on date on the dental enrollment" do
@@ -1235,7 +1235,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       it 'should return census employee created date as new hire enrollment period start date' do
         # created_at will have default utc time zone
         time_zone = TimeKeeper.date_according_to_exchange_at(census_employee.created_at).beginning_of_day
-        expect(census_employee.new_hire_enrollment_period.min).to eq (time_zone)
+        expect(census_employee.new_hire_enrollment_period.min).to eq time_zone
       end
     end
 
@@ -1251,7 +1251,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       let(:hired_on) {TimeKeeper.date_of_record}
 
       it 'should return earliest_eligible_date as new hire enrollment period end date' do
-        # TODO - Fix Effective On For & Eligible On on benefit package
+        # TODO: - Fix Effective On For & Eligible On on benefit package
         expected_end_date = (hired_on + 60.days)
         expected_end_date = (hired_on + 60.days).end_of_month + 1.day if expected_end_date.day != 1
         # expect(census_employee.new_hire_enrollment_period.max).to eq (expected_end_date).end_of_day
@@ -1279,7 +1279,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     end
 
     it 'should return earliest effective date' do
-      # TODO - Fix Effective On For & Eligible On on benefit package
+      # TODO: - Fix Effective On For & Eligible On on benefit package
       eligible_date = (hired_on + 60.days)
       eligible_date = (hired_on + 60.days).end_of_month + 1.day if eligible_date.day != 1
       # expect(census_employee.earliest_eligible_date).to eq eligible_date
@@ -1627,7 +1627,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         terminated_on: TimeKeeper.date_of_record,
         coverage_kind: 'health'
         # family: census_employee.employee_role.person.primary_family
-              )
+      )
     end
 
     it "should return true when employement is terminated and " do
@@ -1671,7 +1671,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
     it "should return false when employment terminated not more that 6 months " do
       allow(census_employee).to receive(:coverage_terminated_on).and_return(nil)
-      allow(census_employee).to receive(:employment_terminated_on).and_return(TimeKeeper.date_of_record - 1.months)
+      allow(census_employee).to receive(:employment_terminated_on).and_return(TimeKeeper.date_of_record - 1.month)
       expect(census_employee.cobra_eligibility_expired?).to be_falsey
     end
   end
@@ -1702,6 +1702,57 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     end
   end
 
+  context 'past_enrollment' do
+    let!(:census_employee) do
+      ce = FactoryBot.create(
+        :benefit_sponsors_census_employee,
+        employer_profile: employer_profile,
+        benefit_sponsorship: benefit_sponsorship,
+        dob: TimeKeeper.date_of_record - 30.years
+      )
+      person = FactoryBot.create(:person, last_name: ce.last_name, first_name: ce.first_name)
+      employee_role = FactoryBot.build(
+        :benefit_sponsors_employee_role,
+        person: person,
+        census_employee: ce,
+        employer_profile: employer_profile
+      )
+      ce.update_attributes({employee_role: employee_role})
+      Family.find_or_build_from_employee_role(employee_role)
+      ce
+    end
+
+    let!(:enrollment) do
+      FactoryBot.create(
+        :hbx_enrollment,
+        household: census_employee.employee_role.person.primary_family.active_household,
+        family: census_employee.employee_role.person.primary_family,
+        coverage_kind: "health",
+        kind: "employer_sponsored",
+        benefit_sponsorship_id: benefit_sponsorship.id,
+        sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
+        employee_role_id: census_employee.employee_role.id,
+        benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
+        aasm_state: "coverage_terminated"
+      )
+    end
+    let!(:family) { census_employee.employee_role.person.primary_family }
+
+    it "should return enrollments" do
+      expect(census_employee.past_enrollments.count).to eq 1
+    end
+
+    context 'should not return enrollment' do
+      before do
+        enrollment.update_attributes(external_enrollment: true)
+      end
+
+      it 'returns 0 enrollments' do
+        expect(census_employee.past_enrollments.count).to eq(0)
+      end
+    end
+  end
+
   context '.enrollments_for_display' do
     include_context "setup renewal application"
 
@@ -1725,7 +1776,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         :hbx_enrollment,
         household: census_employee.employee_role.person.primary_family.active_household,
         coverage_kind: "health",
-        family:census_employee.employee_role.person.primary_family,
+        family: census_employee.employee_role.person.primary_family,
         kind: "employer_sponsored",
         benefit_sponsorship_id: benefit_sponsorship.id,
         sponsored_benefit_package_id: renewal_application.benefit_packages.first.id,
@@ -1836,7 +1887,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       expect(census_employee.enrollments_for_display).to eq [enrollment, auto_renewing_health_enrollment, auto_renewing_dental_enrollment]
     end
 
-    it 'has renewal_benefit_group_enrollments' do 
+    it 'has renewal_benefit_group_enrollments' do
       renewal_application.approve_application! if renewal_application.may_approve_application?
       benefit_sponsorship.benefit_applications << renewal_application
       benefit_sponsorship.save
@@ -1931,9 +1982,25 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         aasm_state: "coverage_canceled"
       )
     end
+    let!(:canceled_enrollment) do
+      FactoryBot.create(
+        :hbx_enrollment,
+        household: census_employee.employee_role.person.primary_family.active_household,
+        coverage_kind: "health",
+        family: census_employee.employee_role.person.primary_family,
+        kind: "employer_sponsored",
+        benefit_sponsorship_id: benefit_sponsorship.id,
+        sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
+        employee_role_id: census_employee.employee_role.id,
+        benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
+        aasm_state: "coverage_canceled"
+      )
+    end
     let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
 
-    it 'should return past expired enrollment' do
+    # https://github.com/health-connector/enroll/pull/1666/files
+    # original commit removes this from scope
+    xit 'should return past expired enrollment' do
       expect(census_employee.past_enrollments.to_a.include?(past_expired_enrollment)).to eq true
     end
 
@@ -1952,10 +2019,11 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
   context 'editing a CensusEmployee SSN/DOB that is in a linked status' do
 
-    let(:census_employee) {FactoryBot.create :benefit_sponsors_census_employee,
-                                              employer_profile: employer_profile,
-                                              benefit_sponsorship: organization.active_benefit_sponsorship
-    }
+    let(:census_employee) do
+      FactoryBot.create :benefit_sponsors_census_employee,
+                        employer_profile: employer_profile,
+                        benefit_sponsorship: organization.active_benefit_sponsorship
+    end
 
     let(:person) {FactoryBot.create(:person)}
 
@@ -1986,10 +2054,11 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
   context "check_hired_on_before_dob" do
 
-    let(:census_employee) {FactoryBot.build :benefit_sponsors_census_employee,
-                                             employer_profile: employer_profile,
-                                             benefit_sponsorship: organization.active_benefit_sponsorship
-    }
+    let(:census_employee) do
+      FactoryBot.build :benefit_sponsors_census_employee,
+                       employer_profile: employer_profile,
+                       benefit_sponsorship: organization.active_benefit_sponsorship
+    end
 
     it "should fail" do
       census_employee.dob = TimeKeeper.date_of_record - 30.years
@@ -2002,23 +2071,26 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
   context "expected to enroll" do
 
-    let!(:valid_waived_employee) {FactoryBot.create :benefit_sponsors_census_employee,
-                                                     employer_profile: employer_profile,
-                                                     benefit_sponsorship: organization.active_benefit_sponsorship,
-                                                     expected_selection: 'waive'
-    }
+    let!(:valid_waived_employee) do
+      FactoryBot.create :benefit_sponsors_census_employee,
+                        employer_profile: employer_profile,
+                        benefit_sponsorship: organization.active_benefit_sponsorship,
+                        expected_selection: 'waive'
+    end
 
-    let!(:enrolling_employee) {FactoryBot.create :benefit_sponsors_census_employee,
-                                                  employer_profile: employer_profile,
-                                                  benefit_sponsorship: organization.active_benefit_sponsorship,
-                                                  expected_selection: 'enroll'
-    }
+    let!(:enrolling_employee) do
+      FactoryBot.create :benefit_sponsors_census_employee,
+                        employer_profile: employer_profile,
+                        benefit_sponsorship: organization.active_benefit_sponsorship,
+                        expected_selection: 'enroll'
+    end
 
-    let!(:invalid_waive) {FactoryBot.create :benefit_sponsors_census_employee,
-                                             employer_profile: employer_profile,
-                                             benefit_sponsorship: organization.active_benefit_sponsorship,
-                                             expected_selection: 'will_not_participate'
-    }
+    let!(:invalid_waive) do
+      FactoryBot.create :benefit_sponsors_census_employee,
+                        employer_profile: employer_profile,
+                        benefit_sponsorship: organization.active_benefit_sponsorship,
+                        expected_selection: 'will_not_participate'
+    end
 
     it "returns true for enrolling employees" do
       expect(enrolling_employee.expected_to_enroll?).to be_truthy
@@ -2038,11 +2110,12 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
   context "when active employeees opt to waive" do
 
-    let(:census_employee) {FactoryBot.build :benefit_sponsors_census_employee,
-                                             employer_profile: employer_profile,
-                                             benefit_sponsorship: organization.active_benefit_sponsorship,
-                                             benefit_group_assignments: [benefit_group_assignment]
-    }
+    let(:census_employee) do
+      FactoryBot.build :benefit_sponsors_census_employee,
+                       employer_profile: employer_profile,
+                       benefit_sponsorship: organization.active_benefit_sponsorship,
+                       benefit_group_assignments: [benefit_group_assignment]
+    end
     let(:benefit_group_assignment) {FactoryBot.build(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_group, aasm_state: "coverage_waived")}
 
     it "returns true when employees waive the coverage" do
@@ -2207,10 +2280,11 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
   end
 
   describe "#has_no_hbx_enrollments?" do
-    let(:census_employee) {FactoryBot.create :census_employee_with_active_assignment,
-                                              employer_profile: employer_profile,
-                                              benefit_sponsorship: organization.active_benefit_sponsorship
-    }
+    let(:census_employee) do
+      FactoryBot.create :census_employee_with_active_assignment,
+                        employer_profile: employer_profile,
+                        benefit_sponsorship: organization.active_benefit_sponsorship
+    end
 
     it "should return true if no employee role linked" do
       expect(census_employee.send(:has_no_hbx_enrollments?)).to eq true
@@ -2236,10 +2310,11 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
   describe "#benefit_package_for_date", dbclean: :around_each do
     let(:employer_profile) {abc_profile}
-    let(:census_employee) {FactoryBot.create :benefit_sponsors_census_employee,
-                                              employer_profile: employer_profile,
-                                              benefit_sponsorship: benefit_sponsorship
-    }
+    let(:census_employee) do
+      FactoryBot.create :benefit_sponsors_census_employee,
+                        employer_profile: employer_profile,
+                        benefit_sponsorship: benefit_sponsorship
+    end
 
     before do
       census_employee.save
@@ -2282,18 +2357,20 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
     context "when ER has imported, mid year conversion and renewal benefit applications" do
 
-      let(:organization) {FactoryBot.build(:benefit_sponsors_organizations_general_organization,
-                                            :with_aca_shop_cca_employer_profile_imported_and_renewal_application,
-                                            site: site
-      )}
+      let(:organization) do
+        FactoryBot.build(:benefit_sponsors_organizations_general_organization,
+                         :with_aca_shop_cca_employer_profile_imported_and_renewal_application,
+                         site: site)
+      end
 
-      let(:myc_application) {FactoryBot.build(:benefit_sponsors_benefit_application,
-                                               :with_benefit_package,
-                                               benefit_sponsorship: benefit_sponsorship,
-                                               aasm_state: :active,
-                                               default_effective_period: ((benefit_application.end_on - 2.months).next_day..benefit_application.end_on),
-                                               default_open_enrollment_period: ((benefit_application.end_on - 1.year).next_day - 1.month..(benefit_application.end_on - 1.year).next_day - 15.days)
-      )}
+      let(:myc_application) do
+        FactoryBot.build(:benefit_sponsors_benefit_application,
+                         :with_benefit_package,
+                         benefit_sponsorship: benefit_sponsorship,
+                         aasm_state: :active,
+                         default_effective_period: ((benefit_application.end_on - 2.months).next_day..benefit_application.end_on),
+                         default_open_enrollment_period: ((benefit_application.end_on - 1.year).next_day - 1.month..(benefit_application.end_on - 1.year).next_day - 15.days))
+      end
 
       let(:mid_year_benefit_group_assignment) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: myc_application.benefit_packages.first, census_employee: census_employee)}
 
@@ -2305,7 +2382,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       it "should return mid year benefit_package if given effective_on date is in both imported & mid year benefit application" do
         coverage_date = myc_application.start_on
         mid_year_benefit_group_assignment
-        census_employee.benefit_group_assignments.where(:"benefit_package_id".in => benefit_application.benefit_packages.map(&:id)).each do |bga|
+        census_employee.benefit_group_assignments.where(:benefit_package_id.in => benefit_application.benefit_packages.map(&:id)).each do |bga|
           # when there is both MYC & Imported Plan years, is_active for imported plan year's bga's should be false
           # to allow plan shop through myc plan years
           bga.update_attributes!(is_active: false)
