@@ -12,7 +12,7 @@ module BenefitMarkets
     include Mongoid::Timestamps
 
     CSR_KIND_TO_PRODUCT_VARIANT_MAP = ::EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP
-    MARKET_KINDS = %w[shop individual].freeze
+    MARKET_KINDS = %w[shop individual fehb].freeze
     INDIVIDUAL_MARKET_KINDS = %w[individual coverall].freeze
 
     field :benefit_market_kind,   type: Symbol
