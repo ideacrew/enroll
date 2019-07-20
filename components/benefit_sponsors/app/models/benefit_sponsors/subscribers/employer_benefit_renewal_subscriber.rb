@@ -7,7 +7,7 @@ module BenefitSponsors
         Acapi::Amqp::WorkerSpecification.new(
           :queue_name => "employer_benefit_renewal_subscriber",
           :kind => :direct,
-          :routing_key => "acapi.info.events.benefit_sponsorship.execute_benefit_renewal"
+          :routing_key => "info.events.benefit_sponsorship.execute_benefit_renewal"
         )
       end
 
