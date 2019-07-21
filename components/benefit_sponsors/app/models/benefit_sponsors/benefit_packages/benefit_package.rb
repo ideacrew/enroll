@@ -239,7 +239,7 @@ module BenefitSponsors
             renew_member_benefit(member)
           else
             notify(
-              "info.events.benefit_package.renew_employee",
+              "acapi.info.events.benefit_package.renew_employee",
               {
                 :census_employee_id => member.id,
                 :benefit_package_id => self.id
