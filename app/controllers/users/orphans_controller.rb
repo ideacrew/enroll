@@ -1,10 +1,14 @@
 class Users::OrphansController < ApplicationController
   layout "two_column"
+  layout "single_column", only: [:index]
   before_action :check_agent_role
   before_action :set_orphan, only: [:show, :destroy]
 
   def index
     @orphans = User.orphans
+    respond_to do |format|
+      format.html { render '/users/orphans/index.html.erb' }
+    end
   end
 
   def show
@@ -20,7 +24,7 @@ class Users::OrphansController < ApplicationController
 
 private
   def check_agent_role
-    unless current_user.has_hbx_staff_role? 
+    unless current_user.has_hbx_staff_role?
       redirect_to root_path, :flash => { :error => "You must be an HBX Administrator" }
     end
   end
