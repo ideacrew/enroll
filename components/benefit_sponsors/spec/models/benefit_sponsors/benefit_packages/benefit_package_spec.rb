@@ -458,6 +458,7 @@ module BenefitSponsors
       let(:hbx_enrollment) do
         FactoryBot.create(:hbx_enrollment, :shop,
                            household: family.active_household,
+                           family: family,
                            product: cbp.sponsored_benefits.first.reference_product,
                            coverage_kind: :health,
                            effective_on: predecessor_application.start_on,
@@ -554,7 +555,7 @@ module BenefitSponsors
       end
 
       context "when renewal product not offered by employer" do
-        let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product)}
+        let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
         let(:hbx_enrollment) do
           double(
             product: current_benefit_package.sponsored_benefits.first.reference_product,
