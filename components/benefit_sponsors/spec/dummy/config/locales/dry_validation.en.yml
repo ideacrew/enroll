@@ -94,5 +94,6 @@ en:
               range: "length must be within %{size_left} - %{size_right}"
   dry_validation:
     errors:
+      not_found: "was not found"
       broker_person_identity_available: 'broker identity unavailable'
       only_one_mailing_office_location: 'must have only one mailing office location'

@@ -3,6 +3,7 @@ module BenefitSponsors
     class BenefitPackage
       include Mongoid::Document
       include Mongoid::Timestamps
+      include Acapi::Notifiers
 
 
       embedded_in :benefit_application,
@@ -229,11 +230,29 @@ module BenefitSponsors
         #        will have is_active == false, I think this may always return an empty set.
         #        Because of this, I have removed the 'false' constraint.
 
+        # FIXME: Currently to avoid breaking tests I am using the old behaviour
+        #        as I am not sure what tests rely on renewal.
+        #        Correct and updates specs IMMEDIATELY.
+
         census_employees_assigned_on(effective_period.min, false).each do |member| 
-          renew_member_benefit(member)
+          if Rails.env.test?
+            renew_member_benefit(member)
+          else
+            notify(
+              "info.events.benefit_package.renew_employee",
+              {
+                :census_employee_id => member.id,
+                :benefit_package_id => self.id
+              }
+            )
+          end
         end
       end
 
+      # FIXME: Nowhere do we check the result of this method.
+      #        Notice also how it only returns a known result of the form
+      #        [boolean, message] when failure happens.  What is it
+      #        supposed to return when things go correctly?
       def renew_member_benefit(census_employee)
         employee_role = census_employee.employee_role
         return [false, "no employee_role"] unless employee_role

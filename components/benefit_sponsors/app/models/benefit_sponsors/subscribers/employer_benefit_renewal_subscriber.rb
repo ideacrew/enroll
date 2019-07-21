@@ -2,6 +2,7 @@ module BenefitSponsors
   module Subscribers
     class EmployerBenefitRenewalSubscriber
       include Acapi::Notifiers
+      include Base
 
       def self.worker_specification
         Acapi::Amqp::WorkerSpecification.new(
@@ -27,7 +28,7 @@ module BenefitSponsors
               :benefit_sponsorship_id => benefit_sponsorship_id_string,
               :new_date => new_date_string,
               :body => JSON.dump(validation.errors.to_h)
-            }
+            }.merge(extract_response_params(properties))
           )
           return :ack
         end
@@ -46,7 +47,7 @@ module BenefitSponsors
               :body => JSON.dump({
                 "benefit sponsorship" => ["can't be found"]
               })
-            }
+            }.merge(extract_response_params(properties))
           )
           return :ack
         end
@@ -60,13 +61,13 @@ module BenefitSponsors
             "acapi.error.events.benefit_sponsorship.execute_benefit_renewal.benefit_renewal_failed", {
               :return_status => "500",
               :benefit_sponsorship_id => benefit_sponsorship_id_string,
-              :new_date => new_datae_string,
+              :new_date => new_date_string,
               :body => JSON.dump({
                 :error => e.inspect,
                 :message => e.message,
                 :backtrace => e.backtrace
               })
-            }
+            }.merge(extract_response_params(properties))
           )
           return :reject
         end

@@ -16,12 +16,14 @@ module BenefitSponsors
     let(:benefit_renewal_event) { "acapi.info.events.benefit_sponsorship.execute_benefit_renewal" }
     let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_month + 2.months }
     let(:aasm_state) { :active }
+    let(:correlation_id) { "a correlation id" }
 
     let(:payload) {
       double(:headers => {
         benefit_sponsorship_id: benefit_sponsorship.id.to_s,
         new_date: renewal_effective_date.strftime("%Y-%m-%d")
-        })
+        },
+        :correlation_id => correlation_id)
     }
 
     context "when benefit sponsorship exists" do
@@ -44,7 +46,8 @@ module BenefitSponsors
         double(:headers => {
           benefit_sponsorship_id: benefit_sponsorship_id.to_s,
           new_date: renewal_effective_date.strftime("%Y-%m-%d")
-          })
+          },
+          :correlation_id => correlation_id)
       }
       it "should notify the error" do
         expect(subject).to receive(:notify).with(
@@ -55,7 +58,8 @@ module BenefitSponsors
             :new_date => renewal_effective_date.strftime("%Y-%m-%d"),
             :body => JSON.dump({
               "benefit sponsorship" => ["can't be found"]
-            })
+            }),
+            :correlation_id => correlation_id
           }
         )
         subject.work_with_params("", nil, payload)
