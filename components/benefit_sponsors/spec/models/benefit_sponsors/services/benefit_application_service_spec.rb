@@ -165,7 +165,7 @@ module BenefitSponsors
                                               "open_enrollment_start_on"=>"01/15/2019", "open_enrollment_end_on"=>"01/20/2019",
                                               "benefit_sponsorship_id"=> benefit_sponsorship.id.to_s} }
 
-      [:active, :pending, :enrollment_open, :enrollment_eligible, :enrollment_closed, :enrollment_ineligible, :termination_pending].each do |active_state|
+      [:active, :pending, :enrollment_open, :binder_paid, :enrollment_closed, :enrollment_ineligible, :termination_pending].each do |active_state|
         context 'for imported' do
           let!(:ba) { FactoryBot.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, aasm_state: :draft) }
 
@@ -183,6 +183,16 @@ module BenefitSponsors
               set_bs_for_service(init_form_for_create)
               expect(subject.can_create_draft_ba?).to be_truthy
             end
+          end
+        end
+      end
+
+      [:terminated, :canceled, :suspended].each do |non_active_state|
+        context 'for benefit applications in non active states' do
+          let!(:ba) { FactoryBot.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, aasm_state: non_active_state) }
+          it 'should return true as no bas has dt active state' do
+            set_bs_for_service(init_form_for_create)
+            expect(subject.can_create_draft_ba?).to be_falsy
           end
         end
       end
@@ -274,6 +284,28 @@ module BenefitSponsors
             expect(benefit_sponsorship.benefit_applications.map(&:aasm_state)).to include(:termination_pending)
           end
         end
+
+        [:terminated, :canceled, :suspended].each do |non_active_state|
+          context 'with dt not in active states' do
+
+            before do
+              ba.destroy!
+              ba2.update_attribute(:aasm_state, non_active_state)
+              set_bs_for_service(@form)
+              @model_attrs = subject.form_params_to_attributes(@form)
+              @result = subject.create_or_cancel_draft_ba(@form, @model_attrs)
+              benefit_sponsorship.reload
+            end
+
+            it 'should add errors to form' do
+              expect(@form.errors.full_messages).to eq ['Existing plan year with overlapping coverage exists']
+            end
+
+            it 'should return a combination of false and nil' do
+              expect(@result).to eq [false, nil]
+            end
+          end
+        end
       end
 
       context 'not for admin_datatable_action' do
@@ -287,6 +319,41 @@ module BenefitSponsors
           result = subject.create_or_cancel_draft_ba(@form, @model_attrs)
           benefit_sponsorship.reload
           expect(result).to eq [true, benefit_sponsorship.benefit_applications.first]
+        end
+      end
+    end
+
+    describe '.has_an_active_ba?' do
+      let!(:rating_area)                  { FactoryBot.create_default :benefit_markets_locations_rating_area }
+      let!(:service_area)                 { FactoryBot.create_default :benefit_markets_locations_service_area }
+      let(:site)                          { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+      let(:organization)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+      let(:employer_profile)              { organization.employer_profile }
+      let(:benefit_sponsorship)           { bs = employer_profile.add_benefit_sponsorship
+                                            bs.save!
+                                            bs }
+      let(:create_ba_params)              { { "start_on"=>"02/01/2019", "end_on"=>"01/31/2020", "fte_count"=>"11",
+                                              "open_enrollment_start_on"=>"01/15/2019", "open_enrollment_end_on"=>"01/20/2019",
+                                              "benefit_sponsorship_id"=> benefit_sponsorship.id.to_s} }
+
+      [:active, :pending, :enrollment_open, :binder_paid, :enrollment_closed, :enrollment_ineligible].each do |active_state|
+        context 'for benefit applications in active states' do
+          let!(:ba) { FactoryBot.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, aasm_state: active_state) }
+
+          it 'should return true as no bas has dt active state' do
+            set_bs_for_service(init_form_for_create)
+            expect(subject.has_an_active_ba?).to be_truthy
+          end
+        end
+      end
+
+      [:terminated, :canceled, :suspended].each do |non_active_state|
+        context 'for benefit applications in non active states' do
+          let!(:ba) { FactoryBot.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, aasm_state: non_active_state) }
+          it 'should return true as no bas has dt active state' do
+            set_bs_for_service(init_form_for_create)
+            expect(subject.has_an_active_ba?).to be_falsy
+          end
         end
       end
     end
