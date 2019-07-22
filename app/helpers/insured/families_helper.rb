@@ -294,6 +294,6 @@ module Insured::FamiliesHelper
   end
 
   def enable_edit_plan_button?(hbx_enrollment)
-    return hbx_enrollment.is_ivl_by_kind? && ['coverage_selected', 'auto_renewing', 'unverified', 'renewing_coverage_selected', 'transmitted_to_carrier'].include?(hbx_enrollment.aasm_state)
+    hbx_enrollment.is_ivl_by_kind? && ['coverage_selected', 'auto_renewing', 'unverified', 'renewing_coverage_selected', 'transmitted_to_carrier'].include?(hbx_enrollment.aasm_state)
   end
 end
