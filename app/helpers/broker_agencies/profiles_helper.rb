@@ -11,7 +11,7 @@ module BrokerAgencies::ProfilesHelper
 
   def can_show_destroy?(staff, broker_agency_profile)
     primary_broker = broker_agency_profile.primary_broker_role
-    return true  if primary_broker.present? && (staff.person == primary_broker.person)
+    return true  if primary_broker.present? && (staff == primary_broker.person)
     false
   end
 
