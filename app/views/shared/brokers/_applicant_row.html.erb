@@ -5,12 +5,12 @@
   <% broker_role = applicant.broker_agency_staff_roles[0] if broker_role.nil? %>
   <% edit_path = edit_broker_agencies_profile_applicant_path(@broker_agency_profile, applicant) %>
 <% end %>
-    
+
 <% if broker_role.broker_agency_profile %>
 <tr>
   <td>
-    <%= link_to applicant.full_name, edit_path, class: "interaction-click-control-broker-show", method: :get, 
-    remote: true %>
+    <%= link_to applicant.full_name, edit_path, class: "interaction-click-control-broker-show", method: :get,
+    remote: false %>
   </td>
 
   <% if controller_name == 'applicants' %>
@@ -36,4 +36,3 @@
   <% end %>
 </tr>
 <% end %>
-    

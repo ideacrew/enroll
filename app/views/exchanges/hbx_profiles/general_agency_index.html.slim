@@ -1,0 +1,10 @@
+= render "ui-components/v1/navs/primary_nav.html.slim"
+br
+br
+.container
+  = render "general_agencies/profiles/index"
+
+javascript:
+  (function() {
+    enableGeneralAgenciesFilters();
+  })();
