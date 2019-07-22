@@ -58,7 +58,6 @@ class HbxProfilePolicy < ApplicationPolicy
 
   def can_modify_plan_year?
     return true unless (role = user.person.hbx_staff_role)
-
     role.permission.can_modify_plan_year
   end
 
@@ -171,14 +170,12 @@ class HbxProfilePolicy < ApplicationPolicy
 
   def can_access_user_account_tab?
     return @user.person.hbx_staff_role.permission.can_access_user_account_tab if @user&.person && @user.person.hbx_staff_role
-
     false
   end
 
   def can_add_pdc?
     role = user_hbx_staff_role
     return false unless role
-
     role.permission.can_add_pdc
   end
 
