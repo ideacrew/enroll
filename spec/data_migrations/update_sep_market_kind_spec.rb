@@ -13,14 +13,14 @@ describe UpdateSepMarketKind, dbclean: :after_each do
   end
   
   describe "update sep invalid records", dbClean: :after_each do
-    let!(:person100)  { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
+    let!(:person100)  { FactoryBot.create(:person, :with_consumer_role, :with_employee_role) }
     let!(:primary_applicant) { double }
-    let!(:family100)  { FactoryGirl.create(:family, :with_primary_family_member, person: person100 ) }
-    let(:special_enrollment_period) {FactoryGirl.build(:special_enrollment_period,family:family100,qualifying_life_event_kind_id: qualifying_life_event_kind101.id, market_kind: "ivl")}
+    let!(:family100)  { FactoryBot.create(:family, :with_primary_family_member, person: person100 ) }
+    let(:special_enrollment_period) {FactoryBot.build(:special_enrollment_period,family:family100,qualifying_life_event_kind_id: qualifying_life_event_kind101.id, market_kind: "ivl")}
     let!(:add_special_enrollment_period) {family100.special_enrollment_periods = [special_enrollment_period]
                                           family100.save
     }
-    let!(:qualifying_life_event_kind101)  { FactoryGirl.create(:qualifying_life_event_kind, market_kind: "shop") }
+    let!(:qualifying_life_event_kind101)  { FactoryBot.create(:qualifying_life_event_kind, market_kind: "shop") }
 
     context 'update sep market kind to shop', dbclean: :after_each  do
       

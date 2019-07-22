@@ -1344,8 +1344,8 @@ describe "set_due_date_on_verification_types" do
 end
 
 context "verifying employee_role is active?" do
-  let!(:person100) { FactoryGirl.create(:person, :with_employee_role) }
-  let!(:family100) { FactoryGirl.create(:family, :with_primary_family_member, person: person100) }
+  let!(:person100) { FactoryBot.create(:person, :with_employee_role) }
+  let!(:family100) { FactoryBot.create(:family, :with_primary_family_member, person: person100) }
 
   before :each do
     allow(person100).to receive(:has_active_employee_role?).and_return(true)

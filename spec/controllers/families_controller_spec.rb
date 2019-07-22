@@ -12,7 +12,7 @@ RSpec.describe FamiliesController do
     let!(:family_member2) {FactoryBot.create(:family_member, family: person.primary_family, person: person2) }
 
     let(:params) { {family:  person.primary_family.id.to_s } }
-    let(:qle) { FactoryGirl.create(:qualifying_life_event_kind) }
+    let(:qle) { FactoryBot.create(:qualifying_life_event_kind) }
 
     it "return when @person is nil" do
       sign_in(user_with_out_person)
