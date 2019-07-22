@@ -1,8 +1,7 @@
 require 'rails_helper'
 
 module Notifier
-  RSpec.describe NoticeKind, type: :model do
-    
+  RSpec.describe NoticeKind, type: :model, dbclean: :around_each do
 
     describe '.set_data_elements' do
 
@@ -43,6 +42,47 @@ module Notifier
             "employer_profile.offered_products",
             "offered_product.enrollments"
           ])
+      end
+    end
+
+    describe '.execute_notice' do
+      let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
+      let!(:model_instance)     { FactoryBot.build(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
+      let(:employer_profile)    { model_instance.employer_profile }
+      let(:event_name) {"acapi.info.events.employer.welcome_notice_to_employer"}
+      let(:payload) do
+        {
+          "employer_id" => employer_profile.id.to_s,
+          "event_object_kind" => "BenefitSponsors::Organizations::AcaShop#{Settings.site.key.capitalize}EmployerProfile",
+          "event_object_id" => employer_profile.id
+        }
+      end
+      let(:resource) {double "resource"}
+
+      let(:finder_mapping) do
+        double "finder_mapping",
+               mapped_class: double("mapped_class", search: resource),
+               search_method: "search",
+               identifier_key: "employer_id"
+      end
+      let(:subject) { Notifier::NoticeKind.new(event_name: event_name) }
+
+      before do
+        allow(Notifier::ApplicationEventMapper).to receive(:lookup_resource_mapping).and_return(finder_mapping)
+        allow(subject).to receive(:generate_pdf_notice).and_return(true)
+        allow(subject).to receive(:upload_and_send_secure_message).and_return(true)
+        allow(subject).to receive(:send_generic_notice_alert).and_return(true)
+        allow(subject).to receive(:send_generic_notice_alert_to_broker_and_ga).and_return(true)
+        allow(subject).to receive(:store_paper_notice).and_return(true)
+        subject.execute_notice(event_name, payload)
+      end
+
+      it "should receive send_generic_notice_alert" do
+        expect(subject).to have_received(:send_generic_notice_alert)
+      end
+
+      it "should receive store_paper_notice" do
+        expect(subject).to have_received(:store_paper_notice)
       end
     end
   end
