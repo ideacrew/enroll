@@ -116,6 +116,12 @@ class PlanYear
 
   after_save :notify_on_save
 
+  def enrollments_for_plan_year
+    id_list = self.benefit_groups.map(&:id)
+    enrollment_selector = [HbxEnrollment::enrolled.selector, HbxEnrollment::renewing.selector, HbxEnrollment::waived.selector, HbxEnrollment::terminated.selector]
+    HbxEnrollment.where(:benefit_group_id.in => id_list).any_of(enrollment_selector).to_a
+  end
+
   def update_employee_benefit_packages
     if self.start_on_changed?
       bg_ids = self.benefit_groups.pluck(:_id)

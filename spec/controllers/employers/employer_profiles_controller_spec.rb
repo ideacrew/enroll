@@ -208,9 +208,11 @@ RSpec.describe Employers::EmployerProfilesController, dbclean: :after_each do
       expect(profile_no_plan_year.active_plan_year.present?).to eq(false)
       post(
         :terminate_employee_roster_enrollments,
-        employer_profile_id: profile_no_plan_year.id,
-        termination_date: "1/1/2020",
-        transmit_xml: true
+        params: {
+          employer_profile_id: profile_no_plan_year.id,
+          termination_date: "1/1/2020",
+          transmit_xml: true
+        }
       )
       error_message = "No Active Plan Year present, unable to terminate employee enrollments."
       expect(flash[:error]).to eq(error_message)
@@ -223,9 +225,11 @@ RSpec.describe Employers::EmployerProfilesController, dbclean: :after_each do
       expect(first_enrollment.terminated_on).to eq(nil)
       post(
         :terminate_employee_roster_enrollments,
-        employer_profile_id: terminate_employee_profile.id,
-        termination_date: "1/1/2020",
-        transmit_xml: true
+        params: {
+          employer_profile_id: terminate_employee_profile.id,
+          termination_date: "1/1/2020",
+          transmit_xml: true
+        }
       )
       first_enrollment.reload
       expect(first_enrollment.terminated_on.present?).to eq(true)
@@ -241,9 +245,11 @@ RSpec.describe Employers::EmployerProfilesController, dbclean: :after_each do
       expect(first_enrollment.terminated_on).to eq(nil)
       post(
         :terminate_employee_roster_enrollments,
-        employer_profile_id: terminate_employee_profile.id,
-        termination_date: "1/1/2020",
-        transmit_xml: true
+        params: {
+          employer_profile_id: terminate_employee_profile.id,
+          termination_date: "1/1/2020",
+          transmit_xml: true
+        }
       )
       first_enrollment.reload
       expect(first_enrollment.terminated_on.present?).to eq(true)
