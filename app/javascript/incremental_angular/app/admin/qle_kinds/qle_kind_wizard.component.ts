@@ -21,6 +21,7 @@ export class QleKindWizardComponent {
   }
 
   ngOnInit() {
+    console.log("hit")
     var editableListJson = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-editable-list");
     if (editableListJson != null) {
       this.editableList = JSON.parse(editableListJson);
