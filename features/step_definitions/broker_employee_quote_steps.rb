@@ -75,6 +75,7 @@ Then(/^Primary Broker should be on the Roster page of a View quote$/) do
 end
 
 And(/^the broker clicks Actions dropdown and clicks Create Quote from dropdown menu$/) do
+  plan = FactoryBot.create(:plan, :with_premium_tables, active_year: TimeKeeper.date_of_record.year)
   path = SponsoredBenefits::Organizations::PlanDesignOrganization.all.first.id.to_s
   find("#dropdown_for_plan_design_" + path, :text => "Actions").click
   find("#plan_design_#{path}> ul > li:nth-child(2) > a", :text => "Create Quote").click
@@ -93,11 +94,27 @@ And(/^Primary Broker enters quote name$/) do
   expect(page).to have_content((TimeKeeper.date_of_record + 2.months).strftime("%B %Y"))
   find('li', :text => "#{(TimeKeeper.date_of_record + 2.months).strftime('%B %Y')}").click
   wait_for_ajax(3, 2)
-  #expect(page).to have_button('Select Health Benefits')
 end
 
 And(/^the broker clicks on Select Health Benefits button$/) do
-#pending
+  find('.interaction-click-control-select-health-benefits').click
+end
+
+And(/^the broker selected by metal level plan offerings$/) do
+  wait_for_ajax(3, 2)
+  find(:xpath, "//*[@id='pdp-bms']/div/ul/li[2]/label/div").click
+  expect(page).to have_content("Gold")
+  find(:xpath, "//*[@id='metalLevelCarrierList']/div[3]/div[2]/label/h3").click
+  wait_for_ajax(3, 2)
+  fill_in "forms_plan_design_proposal[profile][benefit_sponsorship][benefit_application][benefit_group][relationship_benefits_attributes][0][premium_pct]", with: 100
+  fill_in "forms_plan_design_proposal[profile][benefit_sponsorship][benefit_application][benefit_group][relationship_benefits_attributes][1][premium_pct]", with: 100
+  fill_in "forms_plan_design_proposal[profile][benefit_sponsorship][benefit_application][benefit_group][relationship_benefits_attributes][2][premium_pct]", with: 100
+  fill_in "forms_plan_design_proposal[profile][benefit_sponsorship][benefit_application][benefit_group][relationship_benefits_attributes][3][premium_pct]", with: 100
+  wait_for_ajax(3, 2)
+  find(:xpath, "//*[@id='new_forms_plan_design_proposal']/div[9]", :visible => false).click
+  find(:xpath,"//*[@id='new_forms_plan_design_proposal']/div[3]/div/div/div[2]/div[1]/div/div[1]/label/div/div[2]/div/div[1]/h3").click
+  wait_for_ajax(3, 2)
+  find('.interaction-click-control-publish-quote').click
 end
 
 And(/^Primary Broker should see the quote roster is empty$/) do
@@ -205,6 +222,7 @@ Given(/^the Plans exist$/) do
   end_on = start_on + 1.year - 1.day
   plan1 = FactoryBot.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', metal_level: 'silver', active_year: start_on.year, deductible: 5000, csr_variant_id: "01", coverage_kind: 'health')
   plan2 = FactoryBot.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', metal_level: 'bronze', active_year: start_on.year, deductible: 3000, csr_variant_id: "01", coverage_kind: 'health')
+  plan1 = FactoryBot.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: start_on.year, deductible: 2000, csr_variant_id: "01", coverage_kind: 'health')
   plan3 = FactoryBot.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', dental_level: 'high', active_year: start_on.year, deductible: 4000, coverage_kind: 'dental')
   plan4 = FactoryBot.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', dental_level: 'low', active_year: start_on.year, deductible: 4000, coverage_kind: 'dental')
   Caches::PlanDetails.load_record_cache!
