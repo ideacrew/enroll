@@ -198,6 +198,21 @@ class CensusEmployee < CensusMember
     })
   }
 
+  scope :eligible_for_renewal_under_package, ->(benefit_package, package_start, new_effective_date) {
+    where(:"benefit_group_assignments" => {
+        :$elemMatch => {
+          :benefit_package_id => benefit_package.id,
+          :start_on => { "$gte" => package_start }
+        },
+      },
+      "$or" => [
+        {"employment_terminated_on" => nil},
+        {"employment_terminated_on" => {"$exists" => false}},
+        {"employment_terminated_on" => {"$gte" => new_effective_date}}
+      ]
+    )
+  }
+
   scope :benefit_application_assigned,     ->(benefit_application) { where(:"benefit_group_assignments.benefit_package_id".in => benefit_application.benefit_packages.pluck(:_id)) }
   scope :benefit_application_unassigned,   ->(benefit_application) { where(:"benefit_group_assignments.benefit_package_id".nin => benefit_application.benefit_packages.pluck(:_id)) }
 

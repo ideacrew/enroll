@@ -223,7 +223,7 @@ module BenefitSponsors
 
       def renew_employee_assignments(async_workflow_id = nil)
         if predecessor
-          assigned_census_employees = predecessor.census_employees_assigned_on(predecessor.start_on)
+          assigned_census_employees = predecessor.census_employees_eligible_for_renewal(self.start_on)
 
           assigned_census_employees.each do |census_employee|
             if async_workflow_id.blank?
@@ -504,6 +504,10 @@ module BenefitSponsors
 
       def census_employees_assigned_on(effective_date, is_active = true)
         CensusEmployee.by_benefit_package_and_assignment_on(self, effective_date, is_active).non_terminated
+      end
+
+      def census_employees_eligible_for_renewal(effective_date)
+        CensusEmployee.eligible_for_renewal_under_package(self, start_on, effective_date)
       end
 
       def self.find(id)
