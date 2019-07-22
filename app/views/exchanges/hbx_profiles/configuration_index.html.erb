@@ -14,7 +14,7 @@
           <td width="50%" style="padding: 18px;font-weight: bold;">Current Date: <%= @time_keeper.date_of_record %>
           </td>
           <td>
-            <%= datepicker_control f, :date_of_record, {:class => "floatlabel form-control", :placeholder => "DATE OF RECORD",
+            <%= datepicker_control f, :date_of_record, {:class => "form-control", :placeholder => "DATE OF RECORD",
                                              :'data-date-min' => "0d", required: true } %>
             <button type="submit" class="btn btn-primary pull-right display-on-mobile" <%=  policy_helper(HbxProfile).can_submit_time_travel_request? ? "" : "disabled" %>>Set Current Date</button>
           </td>
