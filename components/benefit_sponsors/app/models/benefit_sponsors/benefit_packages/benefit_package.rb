@@ -213,26 +213,32 @@ module BenefitSponsors
         new_benefit_package
       end
 
+      def renew_employee_assignment(census_employee, package_effective_date)
+        new_benefit_package_assignment = census_employee.benefit_package_assignment_on(package_effective_date)
+
+        if new_benefit_package_assignment.blank?
+          census_employee.assign_to_benefit_package(self, package_effective_date)
+        end
+      end
+
       def renew_employee_assignments(async_workflow_id = nil)
-        assigned_census_employees = predecessor.census_employees_assigned_on(predecessor.start_on)
+        if predecessor
+          assigned_census_employees = predecessor.census_employees_assigned_on(predecessor.start_on)
 
-        assigned_census_employees.each do |census_employee|
-          if async_workflow_id.blank?
-            new_benefit_package_assignment = census_employee.benefit_package_assignment_on(start_on)
-
-            if new_benefit_package_assignment.blank?
-              census_employee.assign_to_benefit_package(self, effective_period.min)
+          assigned_census_employees.each do |census_employee|
+            if async_workflow_id.blank?
+              renew_employee_assignment(census_employee, start_on)
+            else
+              notify(
+                "acapi.info.events.benefit_package.renew_employee_assignment",
+                {
+                  :workflow_id => async_workflow_id,
+                  :benefit_package_id => self.id,
+                  :census_employee_id => census_employee.id,
+                  :effective_on_date => start_on.strftime("%Y-%m-%d")
+                }
+              )
             end
-          else
-            notify(
-              "info.events.benefit_package.renew_employee_assignment",
-              {
-                :workflow_id => async_workflow_id,
-                :benefit_package_id => self.id,
-                :census_employee_id => census_employee.id,
-                :effective_on_date => effective_period.min.strftime("%Y-%m-%d")
-              }
-            )
           end
         end
       end

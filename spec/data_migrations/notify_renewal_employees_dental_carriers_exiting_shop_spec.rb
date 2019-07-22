@@ -1,5 +1,7 @@
 require 'rails_helper'
 require File.join(Rails.root, 'app', 'data_migrations', 'notify_renewal_employees_dental_carriers_exiting_shop')
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 describe NotifyRenewalEmployeesDentalCarriersExitingShop, dbclean: :after_each do
 
@@ -13,8 +15,13 @@ describe NotifyRenewalEmployeesDentalCarriersExitingShop, dbclean: :after_each d
   end
 
   describe '#trigger notify_renewal_employees_dental_carriers_exiting_shop', type: :model, dbclean: :after_each do
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup renewal application"
+
+    let(:renewal_effective_date) { TimeKeeper.date_of_record.next_month.beginning_of_month }
+    let(:current_effective_date) { renewal_effective_date.prev_year }
+
     let!(:person) { FactoryBot.create(:person, hbx_id: '19877154') }
-    let!(:employer_profile) { create(:employer_with_planyear)}
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
     let!(:hbx_enrollment) do
       FactoryBot.create(
@@ -30,8 +37,8 @@ describe NotifyRenewalEmployeesDentalCarriersExitingShop, dbclean: :after_each d
     let!(:organization) {FactoryBot.create(:organization, legal_name: 'Delta Dental')}
     let!(:carrier_profile) {FactoryBot.create(:carrier_profile, organization: organization)}
     let!(:plan) {FactoryBot.create(:plan, :with_dental_coverage, carrier_profile: carrier_profile)}
-    let!(:employee_role) { FactoryBot.create(:employee_role, employer_profile: employer_profile, person: person, census_employee_id: census_employee.id) }
-    let!(:census_employee) { FactoryBot.create(:benefit_sponsors_census_employee, employer_profile: employer_profile) }
+    let!(:employee_role) { FactoryBot.create(:employee_role, employer_profile: abc_profile, person: person, census_employee_id: census_employee.id) }
+    let!(:census_employee) { FactoryBot.create(:benefit_sponsors_census_employee, employer_profile: abc_profile) }
 
     before(:each) do
       census_employee.update_attributes(employee_role_id: employee_role.id)
