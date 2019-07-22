@@ -300,8 +300,8 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
 
-    it "should display terminate plan option tile" do
-      expect(rendered).to have_text(/Terminate Plan/)
+    it "should display edit plan button" do
+      expect(rendered).to have_text("Edit Plan")
     end
   end
 
