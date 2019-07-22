@@ -421,7 +421,7 @@ Then(/the enrollment should be pending termination/) do
   expect(page).to have_content('Coverage End: ' + (TimeKeeper.date_of_record + 10).to_s)
 end
 
-Given(/(.*) has a (.*) role/) do |_primary_role, secondary_role|
+Given(/(.*) has a (.*) secondary role/) do |_primary_role, secondary_role|
   family = Family.all.first
   # Assumes primary role is consumer.
   if secondary_role.eql?('resident')
