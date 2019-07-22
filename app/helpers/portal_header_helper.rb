@@ -47,8 +47,6 @@ module PortalHeaderHelper
       main_app.broker_agencies_profile_path(id: @broker_agency_profile.id)
     elsif klass_name == BrokerAgencyProfile
       benefit_sponsors.profiles_broker_agencies_broker_agency_profile_path(id: @broker_agency_profile.id)
-    else
-      benefit_sponsors.profiles_broker_agencies_broker_agency_profile_path(id: current_user.person.active_broker_staff_roles.first.benefit_sponsors_broker_agency_profile_id)
     end
   end
 
