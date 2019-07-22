@@ -36,7 +36,7 @@ Feature: Edit Plan Button
       | yes    |
 
   Scenario Outline: Consumer, EE with IVL coverage, or resident terminates plan
-    Given consumer has a <secondary_role> role
+    Given consumer has a <secondary_role> secondary role
     When consumer clicks on the edit plan button
     Then consumer should see the edit plan page
     When consumer clicks on the Cancel Plan button
@@ -55,7 +55,7 @@ Feature: Edit Plan Button
       | employee |
 
   Scenario Outline: Consumer, EE with IVL coverage, or resident cancels plan
-    Given consumer has a <secondary_role> role 
+    Given consumer has a <secondary_role> secondary role 
     When consumer's health enrollment has an effective date in the future
     When consumer clicks on the edit plan button
     And consumer clicks on the Cancel Plan button
