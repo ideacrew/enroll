@@ -133,6 +133,11 @@ class CensusEmployee < CensusMember
   index({"benefit_group_assignments._id" => 1})
   index({"benefit_group_assignments.benefit_group_id" => 1})
   index({"benefit_group_assignments.aasm_state" => 1})
+  index({"benefit_group_assignments.benefit_package_id" => 1})
+  index({"benefit_group_assignments.benefit_package_id" => 1,
+         "benefit_group_assignments.start_on" => 1,
+         "benefit_group_assignments.is_active" => 1 },
+        {name: "benefit_group_assignments_renewal_search_index"})
 
   scope :active,            ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_STATES) }
   scope :terminated,        ->{ any_in(aasm_state: EMPLOYMENT_TERMINATED_STATES) }
@@ -183,10 +188,14 @@ class CensusEmployee < CensusMember
   scope :by_ssn,                          ->(ssn) { where(encrypted_ssn: CensusMember.encrypt_ssn(ssn)).and(:encrypted_ssn.nin => ["", nil]) }
 
   scope :by_benefit_package_and_assignment_on,->(benefit_package, effective_on, is_active) {
-    where(:"benefit_group_assignments" => { :$elemMatch => {
-      :start_on => effective_on,
-      :benefit_package_id => benefit_package.id, :is_active => is_active
-    }})
+    where(:"benefit_group_assignments" => {
+      :$elemMatch =>
+      {
+        :benefit_package_id => benefit_package.id,
+        :start_on => effective_on,
+        :is_active => is_active
+      }
+    })
   }
 
   scope :benefit_application_assigned,     ->(benefit_application) { where(:"benefit_group_assignments.benefit_package_id".in => benefit_application.benefit_packages.pluck(:_id)) }
