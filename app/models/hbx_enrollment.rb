@@ -1990,6 +1990,11 @@ end
     active_consumer_role_people.present? ? active_consumer_role_people.map(&:consumer_role).any?(&:verification_outstanding?) : false
   end
 
+  def is_aptc_eligible?
+    allowed_metal_levels = ["platinum", "silver", "gold", "bronze"]
+    return true if allowed_metal_levels.include?(self.product.metal_level) && self.coverage_kind == "health" && self.kind != "coverall"
+  end
+
   EnrollmentMemberAdapter = Struct.new(:member_id, :dob, :relationship, :is_primary_member, :is_disabled) do
     def is_disabled?
       is_disabled
