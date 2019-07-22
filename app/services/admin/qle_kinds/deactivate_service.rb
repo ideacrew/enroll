@@ -2,48 +2,45 @@ module Admin
   module QleKinds
     class DeactivateService
 
-      # Process the qle deactivation request from  controller params.
-      # @return [#success?, #errors, #output]
+      include Admin::QleKinds::Injection[
+        "deactivate_params_validator",
+        "deactivate_domain_validator",
+        "deactivate_virtual_model"
+      ]
+
       def self.call(current_user, qle_kind_data)
-        params_result = resolve_param_validator.call(qle_kind_data)
-        return params_result unless params_result.success?
-        request = Admin::QleKinds::DeactivateREquest.new(params_result.output)
-        self.call_with_request(current_user, request)
+        self.new.call(current_user, qle_kind_data)
       end
 
-      # Process the qle creation request from a developer
-      # @param current_user [User]
-      # @param request [Admin::QleKinds::DeactivateRequest]
-      # @return [#success?, #errors, #output]
-      def self.call_with_request(current_user, request)
-        result = resolve_domain_validator.call(
+      def call(current_user, qle_kind_data)
+        params_result = deactivate_params_validator.call(qle_kind_data)
+        return params_result unless params_result.success?
+        request = deactivate_virtual_model.new(params_result.output)
+        call_with_request(current_user, request, qle_kind_data)
+      end
+
+      def call_with_request(current_user, request, qle_kind_data)
+        result = deactivate_domain_validator.call(
           user: current_user,
           request: request,
           service: self
         )
         return result unless result.success?
-        deactivate_record(current_user, request)
+        deactivate_record(current_user, request, qle_kind_data)
       end
 
-      def self.date_is_valid?(date)
-        # TO DO
+      def end_on_present?(end_on)
+        end_on.present?
       end
 
       protected
 
-      def self.resolve_param_validator
-        QleKinds::DeactivateParamsValidator.new
-      end
-
-      def self.resolve_domain_validator
-        QleKinds::DeactivateDomainValidator.new
-      end
-
-      def self.deactivate_record(current_user, request)
-        deactivated_record = QualifyingLifeEventKind.find(request._id)
+      def deactivate_record(current_user, request, qle_kind_data)
+        deactivated_record = QualifyingLifeEventKind.find(qle_kind_data["_id"])
         end_on_date = Date.strptime(request.end_on, '%m/%d/%Y')
-        qle.update_attributes!(end_on: end_on_date)
-        BenefitSponsors::Service::ServiceResponse.new(deactivated_record)
+        deactivated_record.update_attributes!(end_on: end_on_date)
+        # TODO: Wasn't sure if needed to create a new response
+        Admin::QleKinds::ServiceResponse.new(deactivated_record)
       end
     end
   end

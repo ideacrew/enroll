@@ -62,7 +62,7 @@ import { ErrorLocalizer } from './error_localizer';
     BrokerAgencyProfileResourceService.provides('BrokerAgencyProfileCreationService'),
     QleKindResourceService.provides("QleKindDeactivationService"),
     QleKindResourceService.provides("QleKindCreationService"),
-    QleKindResourceService.provides("QleKindUpdateService"),
+    QleKindResourceService.provides("QleKindEditService"),
     ErrorLocalizer
   ]
 })
@@ -74,12 +74,14 @@ export class AppModule {
     customElements.define("broker-agency-profile-create",bapc_custom);
     const qlewk_custom = createCustomElement(QleKindWizardComponent, {injector: this.injector });
     customElements.define("admin-qle-management-wizard",qlewk_custom);
+    // Deactivation
     const qle_kind_deactivation_form_custom = createCustomElement(QleKindDeactivationFormComponent, { injector: this.injector });
     customElements.define("admin-qle-kind-deactivation-form",qle_kind_deactivation_form_custom);
+    // Creation
     const qle_kind_creation_form_custom = createCustomElement(QleKindCreationFormComponent, { injector: this.injector });
     customElements.define("admin-qle-kind-creation-form",qle_kind_creation_form_custom);
-
-    // const qle_kind_edit_form_custom = createCustomElement(QleKindEditFormComponent, { injector: this.injector });
-    // customElements.define("admin-qle-kind-edit-form ",qle_kind_edit_form_custom);
+    // Edit
+    const qle_kind_edit_form_custom = createCustomElement(QleKindEditFormComponent, { injector: this.injector });
+    customElements.define("admin-qle-kind-edit-form", qle_kind_edit_form_custom);
   }
 }

@@ -1,11 +1,11 @@
 module Admin
   module QleKinds
-    class CreateService
+    class UpdateService
 
       include Admin::QleKinds::Injection[
-        "create_params_validator",
-        "create_domain_validator",
-        "create_virtual_model"
+        "update_params_validator",
+        "update_domain_validator",
+        "update_virtual_model"
       ]
 
       def self.call(current_user, qle_kind_data)
@@ -15,24 +15,24 @@ module Admin
       # Process the qle creation request from  controller params.
       # @return [#success?, #errors, #output]
       def call(current_user, qle_kind_data)
-        params_result = create_params_validator.call(qle_kind_data)
+        params_result = update_params_validator.call(qle_kind_data)
         return params_result unless params_result.success?
-        request = create_virtual_model.new(params_result.output)
+        request = update_virtual_model.new(params_result.output)
         call_with_request(current_user, request)
       end
 
       # Process the qle creation request from a developer
       # @param current_user [User]
-      # @param request [Admin::QleKinds::CreateRequest]
+      # @param request [Admin::QleKinds::UpdateRequest]
       # @return [#success?, #errors, #output]
       def call_with_request(current_user, request)
-        result = create_domain_validator.call(
+        result = update_domain_validator.call(
           user: current_user,
           request: request,
           service: self
         )
         return result unless result.success?
-        create_record(current_user, request)
+        update_record(current_user, request)
       end
 
       def title_is_unique?(title)
@@ -45,7 +45,7 @@ module Admin
       # automatically be included in here
       # currently its an input
       def reason_is_valid?(reason)
-        # binding.pry
+
         # reason.in?(QualifyingLifeEventKind::REASON_KINDS)
         return true
       end
@@ -58,10 +58,17 @@ module Admin
         # TO DO
       end
 
+
+      def valid_market_kind?(kind)
+        kind.in?(QualifyingLifeEventKind::MARKET_KINDS)
+      end
+
       protected
 
-      def create_record(current_user, request)
-        new_record = QualifyingLifeEventKind.create!(
+      def update_record(current_user, request)
+        record = QualifyingLifeEventKind.find(request.id)
+        record.update_attributes!(
+          id: request.id,
           title: request.title,
           market_kind: request.market_kind,
           effective_on_kinds: request.effective_on_kinds,
@@ -70,8 +77,7 @@ module Admin
           post_event_sep_in_days: request.post_event_sep_in_days
 
         )
-        # TODO: Make suer this is being called
-        BenefitSponsors::Services::ServiceResponse.new(new_record)
+        BenefitSponsors::Services::ServiceResponse.new(record)
       end
     end
   end

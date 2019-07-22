@@ -1,5 +1,5 @@
 module QleKinds
-  class CreateParamsValidator < ::BenefitSponsors::BaseParamValidator
+  class UpdateParamsValidator < ::BenefitSponsors::BaseParamValidator
     define do
       required(:title).filled(:str?)
       required(:pre_event_sep_in_days).filled

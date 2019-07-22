@@ -1,7 +1,7 @@
 module Forms
   class ManageQleForm
   	include Virtus.model
-    
+    attribute :id, String
     attribute :action, String
     attribute :market_kind, String
     attribute :new_qle, Boolean

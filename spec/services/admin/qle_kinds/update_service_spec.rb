@@ -1,54 +1,55 @@
 require "rails_helper"
 
-describe Admin::QleKinds::CreateService, "given:
-- a create_params_validator
-- a create_domain_validator
-- a create_virtual_model
+describe Admin::QleKinds::UpdateService, "given:
+- a update_params_validator
+- a update_domain_validator
+- a update_virtual_model
 " do
 
-  let(:create_params_validator) do
-    instance_double(::QleKinds::CreateParamsValidator)
+  let(:update_params_validator) do
+    instance_double(::QleKinds::UpdateParamsValidator)
   end
-  let(:create_domain_validator) do 
-    instance_double(::QleKinds::CreateDomainValidator)
+  let(:update_domain_validator) do 
+    instance_double(::QleKinds::UpdateDomainValidator)
   end
-  let(:create_virtual_model) { double }
+  let(:update_virtual_model) { double }
   
   let(:subject) do
-     Admin::QleKinds::CreateService.new(
-       create_params_validator: create_params_validator,
-       create_domain_validator: create_domain_validator,
-       create_virtual_model: create_virtual_model
+     Admin::QleKinds::UpdateService.new(
+       update_params_validator: update_params_validator,
+       update_domain_validator: update_domain_validator,
+       update_virtual_model: update_virtual_model
      )
   end
 
   it "assigns the params validator" do
-    expect(subject.create_params_validator).to eq create_params_validator
+
+    expect(subject.update_params_validator).to eq update_params_validator
   end
 
   it "assigns the domain validator" do
-    expect(subject.create_domain_validator).to eq create_domain_validator
+    expect(subject.update_domain_validator).to eq update_domain_validator
   end
 
   it "assigns the virtual_model" do
-    expect(subject.create_virtual_model).to eq create_virtual_model
+    expect(subject.update_virtual_model).to eq update_virtual_model
   end
 end
 
-describe Admin::QleKinds::CreateService, "#call" do
-  let(:create_params_validator) do
-    instance_double(::QleKinds::CreateParamsValidator)
+describe Admin::QleKinds::UpdateService, "#call" do
+  let(:update_params_validator) do
+    instance_double(::QleKinds::UpdateParamsValidator)
   end
-  let(:create_domain_validator) do 
-    instance_double(::QleKinds::CreateDomainValidator)
+  let(:update_domain_validator) do 
+    instance_double(::QleKinds::UpdateDomainValidator)
   end
-  let(:create_virtual_model) { double }
+  let(:update_virtual_model) { double }
   
   let(:subject) do
-     Admin::QleKinds::CreateService.new(
-       create_params_validator: create_params_validator,
-       create_domain_validator: create_domain_validator,
-       create_virtual_model: create_virtual_model
+     Admin::QleKinds::UpdateService.new(
+       update_params_validator: update_params_validator,
+       update_domain_validator: update_domain_validator,
+       update_virtual_model: update_virtual_model
      )
   end
 
@@ -57,7 +58,9 @@ describe Admin::QleKinds::CreateService, "#call" do
   let(:params_output) { double }
 
   before do
-    allow(create_params_validator).to receive(
+
+    allow(update_params_validator).to receive(
+
         :call
       ).with(
         params
@@ -100,14 +103,16 @@ describe Admin::QleKinds::CreateService, "#call" do
     let(:reason) {"bad reason"}
 
     before do
-      allow(create_virtual_model).to receive(
+      allow(update_virtual_model).to receive(
+
           :new
         ).with(
           params_output
         ).and_return(
           virtual_model
         )
-      allow(create_domain_validator).to receive(
+      allow(update_domain_validator).to receive(
+
           :call
         ).with(
           user: user,
@@ -149,37 +154,38 @@ describe Admin::QleKinds::CreateService, "#call" do
        success?: true
       )
     end
-    let(:virtual_model) do
-      instance_double(
-        Admin::QleKinds::CreateRequest,
-        create_record_params
-      )
-    end
-    let(:new_qle_kind_record) { double }
-    let(:create_record_params) do
+    
+    let(:virtual_model) {Admin::QleKinds::UpdateRequest.new(updated_record_params)}
+    let(:updated_qle_kind_record) { double }
+    let(:updated_record_params) do
       {
-        title: title,
-        market_kind: market_kind,
-        is_self_attested: is_self_attested,
+        id: existing_qle_kind.id,
+        title: updated_title,
+        market_kind: updated_market_kind,
+        is_self_attested: updated_is_self_attested,
         effective_on_kinds:['date_of_event'],
-        pre_event_sep_in_days: 10,
-        post_event_sep_in_days:10
+        pre_event_sep_in_days: 12,
+        post_event_sep_in_days:12,
       }
     end
 
-    let(:title) { "QLE Kind Title" }
-    let(:market_kind) { "QLE Kind Market Kind" }
-    let(:is_self_attested) { "QLE Kind Market Kind" }
-
+    let(:updated_title) { "Updated QLE Kind Title" }
+    let(:updated_market_kind) { "shop" }
+    let(:updated_is_self_attested) { false}
+    let(:existing_qle_kind) {FactoryBot.create(:qualifying_life_event_kind)}
+    let!(:attrs) {existing_qle_kind.attributes}
     before do
-      allow(create_virtual_model).to receive(
+
+      allow(update_virtual_model).to receive(
+
         :new
       ).with(
         params_output
       ).and_return(
         virtual_model
       )
-      allow(create_domain_validator).to receive(
+      allow(update_domain_validator).to receive(
+
         :call
       ).with(
         user: user,
@@ -189,12 +195,13 @@ describe Admin::QleKinds::CreateService, "#call" do
         domain_validation_result
       )
       allow(QualifyingLifeEventKind).to receive(
-        :create!
+        :update
       ).with(
-        create_record_params
+        updated_record_params
       ).and_return(
-        new_qle_kind_record
+        updated_qle_kind_record
       )
+
     end
 
     it "is a success" do
@@ -202,22 +209,15 @@ describe Admin::QleKinds::CreateService, "#call" do
       expect(result.success?).to be_truthy
     end
 
-    it "creates the record" do
-      expect(QualifyingLifeEventKind).to receive(
-        :create!
-      ).with(
-        create_record_params
-      ).and_return(
-        new_qle_kind_record
-      )
+    it "updates the record" do
       result = subject.call(user, params)
+      existing_qle_kind.reload
+      expect(existing_qle_kind.attributes).to_not eq(attrs) 
     end
 
-    it "returns the new record" do
+    it "returns the updated record" do
       result = subject.call(user, params)
-      expect(result.output).to eq new_qle_kind_record
+      expect(result.output).to eq existing_qle_kind
     end
-
-
   end
 end

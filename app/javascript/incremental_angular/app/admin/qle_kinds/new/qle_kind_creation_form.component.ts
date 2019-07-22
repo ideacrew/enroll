@@ -54,10 +54,10 @@ export class QleKindCreationFormComponent {
       reason: ['', [Validators.required, Validators.minLength(1)]],
       market_kind: ['', [Validators.required, Validators.minLength(1)]],
       is_self_attested: [''],
-      effective_on_options:  new FormArray([]),
+      effective_on_kinds:  new FormArray([]),
       questions: qControls,
-      pre_event_sep_eligibility:[0, Validators.required],
-      post_event_sep_eligibility:[0, Validators.required],
+      pre_event_sep_in_days:[0, Validators.required],
+      post_event_sep_in_days:[0, Validators.required],
       available_in_system_from: [''],   
       available_in_system_until: ['']
     });
@@ -69,7 +69,7 @@ export class QleKindCreationFormComponent {
   private addCheckboxes() {
     this.effectiveOnOptionsArray.map((o, i) => {
       const control = new FormControl( i === 0); // if first item set to true, else false
-      (this.creationFormGroup.controls.effective_on_options as FormArray).push(control);
+      (this.creationFormGroup.controls.effective_on_kinds as FormArray).push(control);
     });
   }
 
@@ -127,7 +127,7 @@ export class QleKindCreationFormComponent {
         var invocation = this.CreationService.submitCreate(this.creationUri, this.creationFormGroup.value);
         invocation.subscribe(
           function(data: HttpResponse<any>) {
-            var location_header = data.headers.get("Location");
+            var location_header = data.body.next_url;
             if (location_header != null) {
               window.location.href = location_header;
             }
