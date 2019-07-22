@@ -455,7 +455,7 @@ module BenefitSponsors
         census_employee.benefit_group_assignments = [active_bga, renewal_bga]
         census_employee.save!
       end
-      
+
       let(:hbx_enrollment) do
         FactoryBot.create(
           :hbx_enrollment,
