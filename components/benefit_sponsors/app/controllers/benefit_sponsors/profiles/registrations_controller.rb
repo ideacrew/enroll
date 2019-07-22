@@ -8,7 +8,7 @@ module BenefitSponsors
 
       rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
-      layout 'single_column', :only => :edit
+      layout 'two_column'
 
       def new
         @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_new(profile_type: profile_type, portal: params[:portal])
