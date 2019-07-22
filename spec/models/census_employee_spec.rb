@@ -921,7 +921,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
         [census_employees[1].id, census_employees[2].id].each do |ce_id|
           expect(@census_employees.pluck(:id)).not_to include(ce_id)
         end
-      endg
+      end
     end
   end
 
