@@ -24,7 +24,7 @@ export class QleKindResourceService {
   public submitCreate(post_uri: string, obj_data : object) : Observable<HttpResponse<any>> {
     var json = JSON.stringify({ data: obj_data });
     return this.http.post(
-      post_uri,
+      `${post_uri}.json`,
       json,
       {
         headers : {
@@ -36,10 +36,10 @@ export class QleKindResourceService {
     );
   };
 
-  public submitupdate(post_uri: string, obj_data : object) : Observable<HttpResponse<any>> {
+  public submitEdit(post_uri: string, obj_data : object) : Observable<HttpResponse<any>> {
     var json = JSON.stringify({ data: obj_data });
-    return this.http.post(
-      post_uri + ".json",
+    return this.http.put(
+      post_uri,
       json,
       {
         headers : {
