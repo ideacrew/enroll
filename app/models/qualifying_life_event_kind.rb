@@ -61,6 +61,24 @@ class QualifyingLifeEventKind
     "eligibility_documents_provided"
   ]
 
+    DEFAULT_QUALIFYING_LIFE_EVENTS = 
+    ["Started a new job",
+    "Married",
+    "Entered into a legal domestic partnership",
+    "Had a baby",
+    "Adopted a child",
+    "Losing other health insurance",
+    "Divorced",
+    "A family member has died",
+    "Child losing or lost coverage due to age",
+    "Drop coverage due to new eligibility",
+    "Drop family member due to new eligibility",
+    "Moved or moving",
+    "Exceptional circumstances",
+    "Health plan contract violation",
+    "Court order to provide coverage for someone"]
+  
+
   embeds_many :custom_qle_questions, as: :questionable
 
 
@@ -113,7 +131,7 @@ class QualifyingLifeEventKind
   scope :active, ->{ where(is_active: true).where(:created_at.ne => nil).order(ordinal_position: :asc) }
   
   # TODO: This scope should be updated depending on what the business rule for editable QLE Kind is
-  scope :editable, ->{ all.sort_by_title_alphabetical }
+  scope :editable, ->{where(is_active: false)}
   # TODO: This scope should be update depdning on what the business definition of deactivation is
   # At the moment, setting 'end on' is how they are deactivated.
   scope :not_set_for_deactivation, ->{ where(end_on: nil).sort_by_title_alphabetical }

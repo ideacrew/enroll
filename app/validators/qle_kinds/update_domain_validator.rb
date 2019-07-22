@@ -1,5 +1,5 @@
 module QleKinds
-  class CreateDomainValidator < BenefitSponsors::BaseDomainValidator
+  class UpdateDomainValidator < BenefitSponsors::BaseDomainValidator
     params do
       required(:user).value(:filled?)
       required(:request).value(:filled?)
