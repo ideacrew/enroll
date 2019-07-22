@@ -333,8 +333,7 @@ class CensusEmployee < CensusMember
   end
 
   def is_case_old?(employer_profile=nil)
-    employer_profile = employer_profile || self.employer_profile
-    employer_profile.present? && employer_profile.is_a?(EmployerProfile)
+    benefit_sponsors_employer_profile_id.blank?
   end
 
   def employer_profile=(new_employer_profile)
