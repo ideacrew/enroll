@@ -49,7 +49,7 @@ Feature: IVL plan purchase
     And consumer clicked on shop for new plan
     Then consumer should see primary person
 
-  Scenario: IVL plan shopping by clicking on 'make changes' button on enrollment
+  Scenario: IVL plan shopping by clicking on 'edit plan' button on enrollment
     Given a consumer exists
     And the consumer is logged in
     And consumer has a dependent in child relationship with age greater than 26
