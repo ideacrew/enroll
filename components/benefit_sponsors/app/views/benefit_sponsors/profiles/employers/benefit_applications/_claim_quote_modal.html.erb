@@ -15,9 +15,11 @@
           url: sponsored_benefits.organizations_plan_design_proposal_claim_path(@employer_profile),
           method: "get",
           class: "form-inline" do |f| %>
-            <label><%= text_field_tag :claim_code, nil, placeholder: 'X X X X - X X X X', maxlength: 9 %></label>
+            <label>
+              <%= text_field_tag :claim_code, nil, placeholder: 'X X X X - X X X X', maxlength: 9 %>    
+            </label>
             </br></br>
-            <!--   <p><label><%= check_box_tag "import_roster", "yes", false %> Import roster</label></p>
+            <!--   <p><label><%=# check_box_tag "import_roster", "yes", false %> Import roster</label></p>
             </br> -->
             <%= submit_tag "Claim Code", 'data-disable-with' => "Please wait...", class: 'btn btn-primary' %>
         <%end%>
@@ -31,6 +33,4 @@
     </div>
   </div>
 </div>
-<script>
 
-</script>
