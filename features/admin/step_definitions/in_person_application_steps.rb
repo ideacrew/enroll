@@ -18,5 +18,5 @@ When(/^the Admin clicks CONTINUE after uploading and verifying an Identity$/) do
   find('li', :text => 'Document in EnrollApp').click
   find('.v-type-confirm-button').click
   expect(page).to have_content('Identity successfully verified.')
-  find('.button', text: 'Continue').click
+  find('.button', text: 'CONTINUE').click
 end

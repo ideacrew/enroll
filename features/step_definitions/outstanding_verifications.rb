@@ -31,7 +31,7 @@ When(/^Admin clicks Families tab$/) do
 end
 
 Then(/^the Admin is navigated to the Families screen$/) do
-  expect(page).to have_xpath("//*[@id='inbox']/div/div[1]/h1", text: 'Families')
+  expect(page).to have_selector 'h1', text: 'Families'
 end
 
 And 'I click on the name of a person of family list' do
