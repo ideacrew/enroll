@@ -445,6 +445,14 @@ And(/Resident clicked on "Married" qle/) do
   click_link "Married"
 end
 
+Then(/consumer (.*) see the edit plan button/) do |visibility|
+  if visibility.eql?("should")
+    expect(page).to have_selector("a", text: "Edit Plan",  count: 1)
+  else
+    expect(page).to_not have_selector("a", text: "Edit Plan",  count: 1)
+  end
+end
+
 When(/(.*) clicks on the edit plan button/) do |_role|
   click_link 'Edit Plan'
 end
@@ -477,10 +485,10 @@ When(/(.*) clicks the submit button/) do |_role|
   click_button('Are you sure?')
 end
 
-Then(/the enrollment should be terminated/) do
-  Family.all.first.all_enrollments.first.aasm_state == 'coverage_terminated'
+Then(/the enrollment should be pending termination/) do
+  expect(Family.all.first.all_enrollments.first.aasm_state).to eq('coverage_termination_pending')
+  expect(page).to have_content('Coverage End: ' + (TimeKeeper.date_of_record + 10).to_s)
 end
-
 
 Given(/(.*) has a (.*) role/) do |_primary_role, secondary_role|
   family = Family.all.first
@@ -509,9 +517,25 @@ When(/(.*) selects (.*) to are you sure/) do |_role, option|
 end
 
 Then(/the enrollment should be canceled/) do
-  Family.all.first.all_enrollments.first.aasm_state == 'coverage_cancelled'
+  expect(Family.all.first.all_enrollments.first.aasm_state).to eq('coverage_canceled')
+  #Enrollment tile should not show
+  expect(page).not_to have_content("View Details")
 end
 
 When(/(.*) clicks on the Shop for Plans button/) do |_role|
   find('.interaction-click-control-shop-for-plans').click
+end
+
+And(/the enrollment is in (.*) state/) do |state|
+  Family.all.first.all_enrollments.first.update_attributes(aasm_state: state)
+  # Refresh page to ensure UI change
+  visit current_path
+end
+
+And(/the consumer (.*) see the make changes button/) do |visibility|
+  if visibility.eql?("should")
+    expect(page).to have_button("Make Changes")
+  else
+    expect(page).to_not have_button("Make Changes")
+  end
 end
