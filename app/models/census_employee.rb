@@ -332,8 +332,12 @@ class CensusEmployee < CensusMember
     self.employment_terminated_on.next_month.beginning_of_month
   end
 
-  def is_case_old?(employer_profile=nil)
-    benefit_sponsors_employer_profile_id.blank?
+  def is_case_old?(profile=nil)
+    if profile.present?
+      profile.is_a?(EmployerProfile)
+    else
+      benefit_sponsors_employer_profile_id.blank?
+    end
   end
 
   def employer_profile=(new_employer_profile)

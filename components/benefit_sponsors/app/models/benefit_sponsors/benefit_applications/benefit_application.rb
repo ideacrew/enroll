@@ -261,6 +261,8 @@ module BenefitSponsors
       )
     }
 
+    attr_accessor :async_renewal_workflow_id
+
     # Migration map for plan_year to benefit_application
     def matching_state_for(plan_year)
       plan_year_to_benefit_application_states_map[plan_year.aasm_state.to_sym]
@@ -633,14 +635,27 @@ module BenefitSponsors
 
     def renew_benefit_package_assignments
       if is_renewing?
-        benefit_packages.each do |benefit_package|
-          benefit_package.renew_employee_assignments
-        end
+        if async_renewal_workflow_id.blank?
+          benefit_packages.each do |benefit_package|
+            benefit_package.renew_employee_assignments
+          end
 
-        default_benefit_package = benefit_packages.detect{|benefit_package| benefit_package.is_default }
-        if benefit_sponsorship.census_employees.present?
-          benefit_sponsorship.census_employees.non_terminated.benefit_application_unassigned(self).each do |census_employee|
-            census_employee.assign_to_benefit_package(default_benefit_package, effective_period.min)
+          default_benefit_package = benefit_packages.detect{|benefit_package| benefit_package.is_default }
+          if benefit_sponsorship.census_employees.present?
+            benefit_sponsorship.census_employees.non_terminated.benefit_application_unassigned(self).each do |census_employee|
+              census_employee.assign_to_benefit_package(default_benefit_package, effective_period.min)
+            end
+          end
+        else
+          benefit_packages.each do |benefit_package|
+            benefit_package.renew_employee_assignments(async_renewal_workflow_id)
+          end
+
+          default_benefit_package = benefit_packages.detect{|benefit_package| benefit_package.is_default }
+          if benefit_sponsorship.census_employees.present?
+            benefit_sponsorship.census_employees.non_terminated.benefit_application_unassigned(self).each do |census_employee|
+              census_employee.assign_to_benefit_package(default_benefit_package, effective_period.min)
+            end
           end
         end
       end
