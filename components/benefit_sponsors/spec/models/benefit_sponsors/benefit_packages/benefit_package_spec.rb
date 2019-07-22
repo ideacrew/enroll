@@ -430,7 +430,7 @@ module BenefitSponsors
           :hbx_enrollment,
           :shop,
           household: family.active_household,
-          family:family,
+          family: family,
           product: cbp.sponsored_benefits.first.reference_product,
           coverage_kind: :health,
           employee_role_id: census_employee.employee_role.id,
@@ -455,16 +455,21 @@ module BenefitSponsors
         census_employee.benefit_group_assignments = [active_bga, renewal_bga]
         census_employee.save!
       end
+      
       let(:hbx_enrollment) do
-        FactoryBot.create(:hbx_enrollment, :shop,
-                           household: family.active_household,
-                           product: cbp.sponsored_benefits.first.reference_product,
-                           coverage_kind: :health,
-                           effective_on: predecessor_application.start_on,
-                           employee_role_id: census_employee.employee_role.id,
-                           sponsored_benefit_package_id: cbp.id,
-                           benefit_sponsorship: bs,
-                           benefit_group_assignment: active_bga)
+        FactoryBot.create(
+          :hbx_enrollment,
+          :shop,
+          family: family,
+          household: family.active_household,
+          product: cbp.sponsored_benefits.first.reference_product,
+          coverage_kind: :health,
+          effective_on: predecessor_application.start_on,
+          employee_role_id: census_employee.employee_role.id,
+          sponsored_benefit_package_id: cbp.id,
+          benefit_sponsorship: bs,
+          benefit_group_assignment: active_bga
+        )
       end
 
       before do
@@ -558,6 +563,7 @@ module BenefitSponsors
         let(:hbx_enrollment) do
           double(
             product: current_benefit_package.sponsored_benefits.first.reference_product,
+            family: double('Family'),
             coverage_kind: :health,
             is_coverage_waived?: false,
             coverage_termination_pending?: false
@@ -662,7 +668,7 @@ module BenefitSponsors
             :hbx_enrollment,
             :with_enrollment_members,
             :with_product,
-            family:family,
+            family: family,
             household: family.active_household,
             aasm_state: "coverage_selected",
             effective_on: initial_application.start_on,
@@ -695,7 +701,7 @@ module BenefitSponsors
             :hbx_enrollment,
             :with_enrollment_members,
             :with_product,
-            family:family_1,
+            family: family_1,
             household: family_1.active_household,
             aasm_state: "coverage_selected",
             effective_on: TimeKeeper.date_of_record.next_month,
