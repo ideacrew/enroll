@@ -14,6 +14,7 @@ module BenefitSponsors
     def initialize(benefit_sponsorship: nil, new_date: TimeKeeper.date_of_record)
       @benefit_sponsorship = benefit_sponsorship
       @new_date = new_date
+      initialize_logger
     end
 
     def execute(benefit_sponsorship, event_name, business_policy = nil)
@@ -170,7 +171,13 @@ module BenefitSponsors
       begin
         block.call
       rescue Exception => e
+        @logger.error e.message
+        @logger.error e.backtrace.join("\n")
       end
+    end
+
+    def initialize_logger
+      @logger = Logger.new("#{Rails.root}/log/aca_shop_benefit_sponsorship_service.log") unless defined? @logger
     end
   end
 end
