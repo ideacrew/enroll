@@ -54,7 +54,7 @@ Feature: Edit Plan Button
       | resident |
       | employee |
 
-  Scenario Outline: Consumer, EE with IVL coverage, or resident cancels plan
+  Scenario Outline: Consumer, EE with IVL coverage, or resident cancels pla
     Given consumer has a <secondary_role> secondary role
     When consumer's health enrollment has an effective date in the future
     When consumer clicks on the edit plan button
