@@ -46,7 +46,7 @@ Feature: Edit Plan Button
     And  consumer selects yes to are you sure
     Then the submit button should be enabled
     When consumer clicks the submit button
-    Then the enrollment should be terminated
+    Then the enrollment should be pending termination
 
     Examples:
       | secondary_role |
@@ -70,3 +70,21 @@ Feature: Edit Plan Button
       | consumer |
       | resident |
       | employee |
+
+  Scenario Outline: Edit plan button visibility on IVL enrollment tiles 
+    Given consumer should see my account page
+    And the enrollment is in <state> state
+    Then the consumer <visibility> see the edit plan button
+    And the consumer should not see the make changes button
+
+    Examples:
+      | state                        | visibility |
+      | coverage_selected            | should     |
+      | auto_renewing                | should     |
+      | unverified                   | should     |
+      | renewing_coverage_selected   | should     |
+      | transmitted_to_carrier       | should     |
+      | coverage_termination_pending | should not |
+      | coverage_terminated          | should not |
+      | coverage_canceled            | should not |
+      | coverage_expired             | should not |
