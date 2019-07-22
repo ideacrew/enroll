@@ -108,8 +108,6 @@ class CensusEmployee < CensusMember
     inclusion: {in: ENROLL_STATUS_STATES, message: "%{value} is not a valid  expected selection" }
   validate :validate_unique_identifier
   after_update :update_hbx_enrollment_effective_on_by_hired_on
-  after_save :assign_default_benefit_package
-  after_save :assign_benefit_packages
   after_save :notify_on_save
 
   before_save :allow_nil_ssn_updates_dependents
@@ -333,8 +331,7 @@ class CensusEmployee < CensusMember
   end
 
   def is_case_old?(employer_profile=nil)
-    employer_profile = employer_profile || self.employer_profile
-    employer_profile.present? && employer_profile.is_a?(EmployerProfile)
+    benefit_sponsors_employer_profile_id.blank?
   end
 
   def employer_profile=(new_employer_profile)
@@ -632,13 +629,6 @@ class CensusEmployee < CensusMember
 
   def employee_relationship
     "employee"
-  end
-
-  def assign_benefit_packages
-    return true if is_case_old?
-    # These will assign deafult benefit packages if not present
-    self.active_benefit_group_assignment = nil
-    self.renewal_benefit_group_assignment = nil
   end
 
   def active_benefit_group_assignment=(benefit_package_id)
@@ -1364,8 +1354,7 @@ def self.to_csv
   end
 
   def active_census_employee_is_unique
-    potential_dups = CensusEmployee.by_ssn(ssn).by_old_employer_profile_id(employer_profile_id).active if is_case_old?
-    potential_dups ||= CensusEmployee.by_ssn(ssn).by_benefit_sponsor_employer_profile_id(benefit_sponsors_employer_profile_id).active
+    potential_dups = CensusEmployee.by_ssn(ssn).by_benefit_sponsor_employer_profile_id(benefit_sponsors_employer_profile_id).active
     if potential_dups.detect { |dup| dup.id != self.id  }
       message = "Employee with this identifying information is already active. "\
                 "Update or terminate the active record before adding another."

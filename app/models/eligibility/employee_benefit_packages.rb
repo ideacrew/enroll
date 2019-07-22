@@ -1,24 +1,6 @@
 module Eligibility
   module EmployeeBenefitPackages
     # Deprecated
-    def assign_default_benefit_package
-      return true unless is_case_old?
-
-      py = employer_profile.plan_years.published.first || employer_profile.plan_years.where(aasm_state: 'draft').first
-      if py.present?
-        if active_benefit_group_assignment.blank? || active_benefit_group_assignment.benefit_group.plan_year != py
-          find_or_create_benefit_group_assignment(py.benefit_groups)
-        end
-      end
-
-      if py = employer_profile.plan_years.renewing.first
-        if benefit_group_assignments.where(:benefit_group_id.in => py.benefit_groups.map(&:id)).blank?
-          add_renew_benefit_group_assignment(py.benefit_groups)
-        end
-      end
-    end
-
-    # Deprecated
     def find_or_create_benefit_group_assignment_deprecated(benefit_groups)
       bg_assignments = benefit_group_assignments.where(:benefit_group_id.in => benefit_groups.map(&:_id)).order_by(:'created_at'.desc)
 
