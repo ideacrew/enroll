@@ -37,7 +37,7 @@ When(/^click on the New Quote button$/) do
 end
 
 When(/^.+ clicks on the Add Prospect Employer button$/) do
-  find('#myTabContent a', text: 'Add Prospect Employer').click
+  find(:xpath, "//*[@id='myTabContent']/div/div[4]/div/a").click
 end
 
 And(/^Primary Broker creates new Prospect Employer with default_office_location$/) do
