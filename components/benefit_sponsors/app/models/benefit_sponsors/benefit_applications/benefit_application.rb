@@ -1104,6 +1104,10 @@ module BenefitSponsors
       refresh_recorded_sic_code      unless recorded_sic_code.present?
     end
 
+    def has_unassigned_census_employees?
+      CensusEmployee.employees_for_benefit_application_sponsorship(self).count > CensusEmployee.benefit_application_assigned(self).count
+    end
+
     private
 
     def set_expiration_date

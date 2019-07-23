@@ -89,7 +89,7 @@ module BenefitSponsors
 
     rule :all_employees_are_assigned_benefit_package,
             validate: -> (benefit_application){
-              benefit_application.benefit_sponsorship.census_employees.active.all?{|e| benefit_application.benefit_packages.map(&:id).include?(e.try(:renewal_benefit_group_assignment).try(:benefit_package_id) || e.try(:active_benefit_group_assignment).try(:benefit_package_id))}
+              !benefit_application.has_unassigned_census_employees?
             },
             success:  -> (benfit_application)  { "validated successfully" },
             fail:     -> (benefit_application) { "All employees must have an assigned benefit package" }

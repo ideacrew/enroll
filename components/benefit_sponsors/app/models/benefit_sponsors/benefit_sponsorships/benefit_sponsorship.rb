@@ -88,7 +88,7 @@ module BenefitSponsors
 
     delegate :sic_code,     :sic_code=,     to: :profile, allow_nil: true
     delegate :primary_office_location,      to: :profile, allow_nil: true
-    delegate :enforce_employer_attestation, to: :benefit_market
+    delegate :enforce_employer_attestation,  to: :benefit_market
     delegate :legal_name,   :fein,          to: :organization
 
     belongs_to  :organization,
@@ -718,6 +718,11 @@ module BenefitSponsors
     def self.find_by_feins(feins)
       organizations = BenefitSponsors::Organizations::Organization.where(fein: {:$in => feins})
       where(:organization_id => {:$in => organizations.pluck(:_id)})
+    end
+
+    def market_kind
+      return nil if benefit_market_id.blank?
+      @market_kind ||= benefit_market.kind
     end
 
     private

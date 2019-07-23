@@ -253,6 +253,20 @@ class CensusEmployee < CensusMember
     matched.by_benefit_group_assignment_ids(benefit_group_assignment_ids)
   }
 
+  scope :employees_for_benefit_application_sponsorship, ->(benefit_application) {
+    new_effective_date = benefit_application.start_on
+    benefit_sponsorship_id = benefit_application.benefit_sponsorship.id
+    where(
+      "hired_on" => {"$lte" => new_effective_date},
+      "benefit_sponsorship_id" => benefit_sponsorship_id,
+      "$or" => [
+        {"employment_terminated_on" => nil},
+        {"employment_terminated_on" => {"$exists" => false}},
+        {"employment_terminated_on" => {"$gte" => new_effective_date}}
+      ]
+    )
+  }
+
   # This initializes a new CensusEmploye with the given +args+, the method
   # has been overriden to write the attribute +:employee_relationship+ to +"self"+
   # @param args [Hash]

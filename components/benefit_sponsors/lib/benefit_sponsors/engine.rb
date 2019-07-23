@@ -6,6 +6,8 @@ require 'devise'
 require 'pundit'
 require 'language_list'
 require 'interactor'
+require 'dry-container'
+require 'dry-auto_inject'
 
 module BenefitSponsors
   class Engine < ::Rails::Engine

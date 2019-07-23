@@ -176,12 +176,12 @@ module BenefitSponsors
 
       def eligibility_policy
         return @eligibility_policy if defined? @eligibility_policy
-        @eligibility_policy = BenefitSponsors::BenefitApplications::AcaShopApplicationEligibilityPolicy.new
+        @eligibility_policy = BenefitSponsors::BusinessPolicies::PolicyResolver.benefit_application_eligibility_policy
       end
 
       def enrollment_policy
         return @enrollment_policy if defined? @enrollment_policy
-        @enrollment_policy = BenefitSponsors::BenefitApplications::AcaShopEnrollmentEligibilityPolicy.new
+        @enrollment_policy = BenefitSponsors::BusinessPolicies::PolicyResolver.benefit_application_enrollment_eligibility_policy
       end
 
     end
