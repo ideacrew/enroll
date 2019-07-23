@@ -117,6 +117,10 @@ And(/^the broker selected by metal level plan offerings and publish quote$/) do
   find('.interaction-click-control-publish-quote').click
 end
 
+And(/^.+ should see successful message of published quote$/) do
+  expect(page).to have_content("Quote Published")
+end
+
 And(/^Primary Broker should see the quote roster is empty$/) do
   expect(page).not_to have_button('Actions')
 end

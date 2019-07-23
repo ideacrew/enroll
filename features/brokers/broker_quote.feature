@@ -31,3 +31,6 @@ Feature: Broker creates a quote for a prospect employer
     And Primary Broker enters quote name
     And the broker clicks on Select Health Benefits button
     And the broker selected by metal level plan offerings and publish quote
+    And Primary Broker should see successful message of published quote
+    And Primary Broker should see the quote roster is empty
+    And Primary Broker logs out
