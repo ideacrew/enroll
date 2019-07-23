@@ -5,14 +5,14 @@ describe "exchanges/scheduled_events/index.html.erb" do
   let(:scheduled_event) { FactoryBot.create(:scheduled_event) }
   before :each do
     assign(:scheduled_event, scheduled_event)
-    allow(view).to receive(:policy_helper).and_return(double("Policy", view_admin_tabs?: true))
+    allow(view).to receive(:policy_helper).and_return(double("Policy", view_admin_tabs?: true, access_outstanding_verification_sub_tab?: true, access_identity_verification_sub_tab?: true, view_the_configuration_tab?: true, can_access_user_account_tab?: true, begin_resident_enrollment?: true, access_new_consumer_application_sub_tab?: true))
     sign_in user
     @calendar_events = [FactoryBot.create(:scheduled_event)]
     @scheduled_events = [FactoryBot.create(:scheduled_event)]
   end
 
   it "should display index page info" do
-    render template: "exchanges/scheduled_events/_index"
+    render template: "exchanges/scheduled_events/index"
     expect(rendered).to have_text(/Calendar/)
     expect(rendered).to have_text(/Previous/)
     expect(rendered).to have_text(/Next/)

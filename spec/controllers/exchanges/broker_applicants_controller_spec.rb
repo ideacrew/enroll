@@ -32,13 +32,13 @@ RSpec.describe Exchanges::BrokerApplicantsController do
 
     before :each do
       sign_in(user)
-      get :edit, params:{id: broker_role.person.id}, format: :js, xhr:true
+      get :edit, params:{id: broker_role.person.id}, format: :html, xhr:true
     end
 
     it "should render edit" do
       expect(assigns(:broker_applicant))
       expect(response).to have_http_status(:success)
-      expect(response).to render_template("exchanges/broker_applicants/edit")
+      expect(response).to render_template("shared/brokers/applicant.html.erb", "layouts/single_column")
     end
   end
 

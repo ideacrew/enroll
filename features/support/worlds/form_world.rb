@@ -67,17 +67,25 @@ module FormWorld
     fill_in 'agency[organization][legal_name]', with: 'Benken Inc'
     fill_in 'agency[organization][dba]', with: 'benken inc'
     # fill_in 'agency[organization][fein]', with: '238964984'
-    select "Small Business Marketplace ONLY", :from => "agency_organization_profile_attributes_market_kind"
+    # select "Small Business Marketplace ONLY", :from => "agency_organization_profile_attributes_market_kind"
+    find(:xpath, '//*[@id="broker_registration_form"]/fieldset[2]/div[2]/div[1]/div[1]/div[2]/span').click
+    find('li', :text => 'Small Business Marketplace ONLY').click
+
     find("option[value='tr']").click
     find("#agency_organization_profile_attributes_accept_new_clients").click
   end
 
   def fill_in_office_locations_for_broker_agecny
     fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][address_1]', with: '123 main st'
-    select "Primary", :from => "kindSelect"
+    # select "Primary", :from => "kindSelect"
+    find(:xpath, '//*[@id="addressDetails"]/div[2]/div[2]/div[1]/div[2]/span').click
+    find('li', :text => 'Primary').click
+
     fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][address_2]', with: '456 suite'
     fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][city]', with: 'Dunn village'
-    select "MA", from: "inputState"
+    # select "MA", from: "inputState"
+    find(:xpath, '//*[@id="addressDetails"]/div[4]/div[2]/div[1]/div[2]/span').click
+    find('li', :text => 'DC').click
     fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][zip]', with: '01011'
     fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][area_code]', with: '781'
     fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][number]', with: '2783461'

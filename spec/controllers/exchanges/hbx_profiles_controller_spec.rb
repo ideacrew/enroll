@@ -28,19 +28,19 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     it "renders broker_agency_index" do
       get :broker_agency_index, xhr: true
       expect(response).to have_http_status(:success)
-      expect(response).to render_template("exchanges/hbx_profiles/broker_agency_index")
+      expect(response).to render_template("exchanges/hbx_profiles/broker_agency_index_datatable.html.slim", "layouts/single_column")
     end
 
     it "renders issuer_index" do
       get :issuer_index, xhr: true
       expect(response).to have_http_status(:success)
-      expect(response).to render_template("exchanges/hbx_profiles/issuer_index")
+      expect(response).to render_template("exchanges/hbx_profiles/issuer_index.html.slim", "layouts/single_column")
     end
 
     it "renders issuer_index" do
       get :product_index, xhr: true
       expect(response).to have_http_status(:success)
-      expect(response).to render_template("exchanges/hbx_profiles/product_index")
+      expect(response).to render_template("exchanges/hbx_profiles/product_index.html.slim", "layouts/single_column")
     end
   end
 
@@ -782,12 +782,12 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
         Enroll::Application.reload_routes!
       end
       it "should returns http success" do
-        get :general_agency_index, format: :js, xhr: true
+        get :general_agency_index, format: :html, xhr: true
         expect(response).to have_http_status(:success)
       end
 
       it "should get general_agencies" do
-        get :general_agency_index, format: :js, xhr: true
+        get :general_agency_index, format: :html, xhr: true
         expect(assigns(:general_agency_profiles)).to eq Kaminari.paginate_array(GeneralAgencyProfile.filter_by())
       end
     end
