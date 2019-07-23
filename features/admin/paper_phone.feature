@@ -5,7 +5,7 @@ Feature: Phone and Paper Enrollment options exist
   Background:
     Given a Hbx admin with read and write permissions exists
     When Hbx Admin logs on to the Hbx Portal
-    When Hbx Admin click Families link
+    When Hbx Admin click Families dropdown
 
   Scenario: Phone and Phone Enrollment
     Then I see the DC Resident Application link

@@ -1,14 +1,16 @@
 require 'rails_helper'
 
 module BenefitSponsors
-  RSpec.describe Subscribers::BenefitPackageEmployeeRenewerSubscriber do
+  RSpec.describe Subscribers::BenefitPackageRenewalGroupAssignmentSubscriber do
 
     let(:subscriber) do
-      Subscribers::BenefitPackageEmployeeRenewerSubscriber.new
+      Subscribers::BenefitPackageRenewalGroupAssignmentSubscriber.new
     end
     let(:correlation_id) { "a correlation id" }
     let(:benefit_package_id) { "a benefit package id" }
     let(:census_employee_id) { "a census employee id" }
+    let(:effective_on_date) { Date.today }
+    let(:effective_on_date_string) { effective_on_date.strftime("%Y-%m-%d") }
     let(:syntax_validator) { double }
     let(:domain_validator) { double }
 
@@ -22,7 +24,8 @@ module BenefitSponsors
     let(:headers) do
       {
         benefit_package_id: benefit_package_id,
-        census_employee_id: census_employee_id
+        census_employee_id: census_employee_id,
+        effective_on_date: effective_on_date_string
       }
     end
 
@@ -47,7 +50,7 @@ module BenefitSponsors
 
     before :each do
       allow(
-        BenefitSponsors::BenefitPackages::EmployeeRenewals::ParameterValidator
+        BenefitSponsors::BenefitPackages::RenewalGroupAssignments::ParameterValidator
       ).to receive(
         :new  
       ).and_return(syntax_validator)
@@ -70,11 +73,12 @@ module BenefitSponsors
         allow(subscriber).to receive(
           :notify
         ).with(
-          "acapi.error.events.benefit_package.renew_employee.invalid_request",
+          "acapi.error.events.benefit_package.renew_employee_assignment.invalid_request",
           {
             :return_status => "422",
             :benefit_package_id => benefit_package_id.to_s,
             :census_employee_id => census_employee_id.to_s,
+            :effective_on_date => effective_on_date_string,
             :body => JSON.dump(validation_errors_hash),
             :correlation_id => correlation_id
           }
@@ -85,11 +89,12 @@ module BenefitSponsors
         expect(subscriber).to receive(
           :notify
         ).with(
-          "acapi.error.events.benefit_package.renew_employee.invalid_request",
+          "acapi.error.events.benefit_package.renew_employee_assignment.invalid_request",
           {
             :return_status => "422",
             :benefit_package_id => benefit_package_id.to_s,
             :census_employee_id => census_employee_id.to_s,
+            :effective_on_date => effective_on_date_string,
             :body => JSON.dump(validation_errors_hash),
             :correlation_id => correlation_id
           }
@@ -120,7 +125,7 @@ module BenefitSponsors
 
       before :each do
         allow(
-          BenefitSponsors::BenefitPackages::EmployeeRenewals::DomainValidator
+          BenefitSponsors::BenefitPackages::RenewalGroupAssignments::DomainValidator
         ).to receive(
           :new
         ).and_return(domain_validator)
@@ -132,11 +137,12 @@ module BenefitSponsors
         allow(subscriber).to receive(
           :notify
         ).with(
-          "acapi.error.events.benefit_package.renew_employee.invalid_request",
+          "acapi.error.events.benefit_package.renew_employee_assignment.invalid_request",
           {
             :return_status => "422",
             :benefit_package_id => benefit_package_id.to_s,
             :census_employee_id => census_employee_id.to_s,
+            :effective_on_date => effective_on_date_string,
             :body => JSON.dump(validation_errors_hash),
             :correlation_id => correlation_id
           }
@@ -147,11 +153,12 @@ module BenefitSponsors
         expect(subscriber).to receive(
           :notify
         ).with(
-          "acapi.error.events.benefit_package.renew_employee.invalid_request",
+          "acapi.error.events.benefit_package.renew_employee_assignment.invalid_request",
           {
             :return_status => "422",
             :benefit_package_id => benefit_package_id.to_s,
             :census_employee_id => census_employee_id.to_s,
+            :effective_on_date => effective_on_date_string,
             :body => JSON.dump(validation_errors_hash),
             :correlation_id => correlation_id
           }
@@ -169,7 +176,8 @@ module BenefitSponsors
       let(:syntax_validation_output) do
         {
           :benefit_package_id => benefit_package_id,
-          :census_employee_id => census_employee_id
+          :census_employee_id => census_employee_id,
+          :effective_on_date => effective_on_date
         }
       end
       let(:syntax_validation_result) do
@@ -186,7 +194,7 @@ module BenefitSponsors
 
       before :each do
         allow(
-          BenefitSponsors::BenefitPackages::EmployeeRenewals::DomainValidator
+          BenefitSponsors::BenefitPackages::RenewalGroupAssignments::DomainValidator
         ).to receive(
           :new  
         ).and_return(domain_validator)
@@ -198,17 +206,18 @@ module BenefitSponsors
         allow(subscriber).to receive(
           :notify
         ).with(
-          "acapi.info.events.benefit_package.renew_employee.renewal_executed",
+          "acapi.info.events.benefit_package.renew_employee_assignment.renewal_executed",
           {
             :return_status => "200",
             :benefit_package_id => benefit_package_id.to_s,
             :census_employee_id => census_employee_id.to_s,
+            :effective_on_date => effective_on_date_string,
             :correlation_id => correlation_id
           }
         )
         allow(benefit_package).to receive(
-          :renew_member_benefit
-        ).with(census_employee)
+          :renew_employee_assignment
+        ).with(census_employee, effective_on_date)
         allow(
           BenefitSponsors::BenefitPackages::BenefitPackage
         ).to receive(
@@ -225,11 +234,12 @@ module BenefitSponsors
         expect(subscriber).to receive(
           :notify
         ).with(
-          "acapi.info.events.benefit_package.renew_employee.renewal_executed",
+          "acapi.info.events.benefit_package.renew_employee_assignment.renewal_executed",
           {
             :return_status => "200",
             :benefit_package_id => benefit_package_id.to_s,
             :census_employee_id => census_employee_id.to_s,
+            :effective_on_date => effective_on_date_string,
             :correlation_id => correlation_id
           }
         )
@@ -237,9 +247,9 @@ module BenefitSponsors
       end
 
       it "executed the renewal" do
-        expect(benefit_package).to receive(
-          :renew_member_benefit
-        ).with(census_employee)
+        allow(benefit_package).to receive(
+          :renew_employee_assignment
+        ).with(census_employee, effective_on_date)
         subscriber.work_with_params("", nil, payload)
       end
 
@@ -253,7 +263,8 @@ module BenefitSponsors
       let(:syntax_validation_output) do
         {
           :benefit_package_id => benefit_package_id,
-          :census_employee_id => census_employee_id
+          :census_employee_id => census_employee_id,
+          :effective_on_date => effective_on_date
         }
       end
       let(:syntax_validation_result) do
@@ -276,7 +287,7 @@ module BenefitSponsors
       before :each do
         allow(error).to receive(:backtrace).and_return([])
         allow(
-          BenefitSponsors::BenefitPackages::EmployeeRenewals::DomainValidator
+          BenefitSponsors::BenefitPackages::RenewalGroupAssignments::DomainValidator
         ).to receive(
           :new  
         ).and_return(domain_validator)
@@ -288,11 +299,12 @@ module BenefitSponsors
         allow(subscriber).to receive(
           :notify
         ).with(
-          "acapi.error.events.benefit_package.renew_employee.exception",
+          "acapi.error.events.benefit_package.renew_employee_assignment.exception",
           {
             :return_status => "500",
             :benefit_package_id => benefit_package_id.to_s,
             :census_employee_id => census_employee_id.to_s,
+            :effective_on_date => effective_on_date_string,
             :body => JSON.dump({
               error: error.inspect,
               message: error.message,
@@ -312,19 +324,20 @@ module BenefitSponsors
           :find
         ).with(census_employee_id).and_return(census_employee)
         allow(benefit_package).to receive(
-          :renew_member_benefit
-        ).and_raise(error)
+          :renew_employee_assignment
+        ).with(census_employee, effective_on_date).and_raise(error)
       end
 
       it "notifies of an exception" do
         expect(subscriber).to receive(
           :notify
         ).with(
-          "acapi.error.events.benefit_package.renew_employee.exception",
+          "acapi.error.events.benefit_package.renew_employee_assignment.exception",
           {
             :return_status => "500",
             :benefit_package_id => benefit_package_id.to_s,
             :census_employee_id => census_employee_id.to_s,
+            :effective_on_date => effective_on_date_string,
             :body => JSON.dump({
               error: error.inspect,
               message: error.message,

@@ -55,7 +55,7 @@ module BenefitSponsors
         begin
           sponsorship_service = BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipService.new(new_date: new_date)
           business_policy = business_policy_for(benefit_sponsorship, :renew_sponsor_benefit)
-          sponsorship_service.execute(benefit_sponsorship, :renew_sponsor_benefit, business_policy)
+          sponsorship_service.execute(benefit_sponsorship, :renew_sponsor_benefit, business_policy, extract_workflow_id(properties))
         rescue Exception => e
           notify(
             "acapi.error.events.benefit_sponsorship.execute_benefit_renewal.benefit_renewal_failed", {

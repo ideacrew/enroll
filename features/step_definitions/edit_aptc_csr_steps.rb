@@ -10,6 +10,12 @@ When(/^Hbx Admin click Families link$/) do
   wait_for_ajax
 end
 
+When(/^Hbx Admin click Families dropdown/) do
+  visit exchanges_hbx_profiles_path
+  find('.interaction-click-control-families').click
+  wait_for_ajax
+end
+
 Then(/^Hbx Admin should see an Edit APTC \/ CSR link$/) do
   find_link('Edit APTC / CSR').visible?
 end

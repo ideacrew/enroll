@@ -8,7 +8,7 @@ Feature: Consumer requests enrollment in CoverAll
   Scenario: When we login as Hbx admin with read and write permissions then on family tab we should see link DC Resident Application
     Given a Hbx admin with super admin access exists
     When Hbx Admin logs on to the Hbx Portal
-    When Hbx Admin click Families link
+    When Hbx Admin click Families dropdown
     Then Hbx Admin should see an DC Resident Application link
     When Hbx Admin clicks on DC Resident Application link
     Then Hbx Admin should see DC Resident Personal Information page
@@ -34,19 +34,19 @@ Feature: Consumer requests enrollment in CoverAll
   Scenario: When we login as Hbx admin with only read permissions then on family tab we should not see link New DC Resident Application
     Given a Hbx admin with read only permissions exists
     When Hbx Admin logs on to the Hbx Portal
-    When Hbx Admin click Families link
+    When Hbx Admin click Families dropdown
     Then Hbx Admin should see a DC Resident Application link disabled
     And Hbx Admin logs out
 
   Scenario: When we login as Hbx admin with read and write permissions then on family tab we should not see link New DC Resident Application
      Given a Hbx admin with super admin access exists
      When Hbx Admin logs on to the Hbx Portal
-     When Hbx Admin click Families link
+     When Hbx Admin click Families dropdown
      Then Hbx Admin should not see an New DC Resident Application link
      And Hbx Admin logs out
 
   Scenario: When we login as Hbx admin then on family tab admin should not see link New Consumer Phone Application and New Consumer Paper Application
     Given a Hbx admin with read and write permissions exists
     When Hbx Admin logs on to the Hbx Portal
-    When Hbx Admin click Families link
+    When Hbx Admin click Families dropdown
     Then Hbx Admin should not see an New Consumer Phone Application link and New Consumer Paper Application link

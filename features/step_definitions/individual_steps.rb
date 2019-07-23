@@ -68,7 +68,7 @@ When(/user goes to register as an individual$/) do
 end
 
 When(/^\w+ clicks? on continue button$/) do
-  find('.interaction-click-control-continue', text: 'Continue', :wait => 10).click
+  find('.interaction-click-control-continue', text: 'CONTINUE', :wait => 10).click
 end
 
 When(/^\w+ clicks? on continue$/) do

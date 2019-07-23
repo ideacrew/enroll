@@ -2474,5 +2474,21 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         expect(census_employee.is_terminate_possible?).to eq false
       end
     end
+
+    context "if censue employee is cobra linked" do
+      let(:aasm_state) {"cobra_eligible"}
+
+      it "should return false" do
+        expect(census_employee.is_terminate_possible?).to eq false
+      end
+    end
+
+    context "if censue employee is cobra linked" do
+      let(:aasm_state) {"cobra_linked"}
+
+      it "should return false" do
+        expect(census_employee.is_terminate_possible?).to eq false
+      end
+    end
   end
 end

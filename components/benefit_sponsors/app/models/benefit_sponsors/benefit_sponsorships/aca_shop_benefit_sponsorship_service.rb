@@ -14,12 +14,17 @@ module BenefitSponsors
     def initialize(benefit_sponsorship: nil, new_date: TimeKeeper.date_of_record)
       @benefit_sponsorship = benefit_sponsorship
       @new_date = new_date
+      initialize_logger
     end
 
-    def execute(benefit_sponsorship, event_name, business_policy = nil)
+    def execute(benefit_sponsorship, event_name, business_policy = nil, async_workflow_id = nil)
       self.benefit_sponsorship = benefit_sponsorship
       if business_policy.blank? || business_policy.is_satisfied?(benefit_sponsorship)
-        process_event { eval(event_name.to_s) }
+        if :renew_sponsor_benefit == event_name
+          process_event { renew_sponsor_benefit(async_workflow_id) }
+        else
+          process_event { eval(event_name.to_s) }
+        end
       else
         # log()
       end
@@ -71,14 +76,14 @@ module BenefitSponsors
       application_service_for(benefit_application).terminate(benefit_application.end_on, TimeKeeper.date_of_record, benefit_application.termination_kind, benefit_application.termination_reason) if benefit_application.present?
     end
 
-    def renew_sponsor_benefit
+    def renew_sponsor_benefit(async_workflow_id = nil)
       months_prior_to_effective = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months.abs
       renewal_application_begin = (new_date + months_prior_to_effective.months)
 
       benefit_application = benefit_sponsorship.application_may_renew_effective_on(renewal_application_begin)
 
       if benefit_application.present?
-        application_service_for(benefit_application).renew_application
+        application_service_for(benefit_application).renew_application(async_workflow_id)
       end
     end
 
@@ -170,7 +175,13 @@ module BenefitSponsors
       begin
         block.call
       rescue Exception => e
+        @logger.error e.message
+        @logger.error e.backtrace.join("\n")
       end
+    end
+
+    def initialize_logger
+      @logger = Logger.new("#{Rails.root}/log/aca_shop_benefit_sponsorship_service.log") unless defined? @logger
     end
   end
 end

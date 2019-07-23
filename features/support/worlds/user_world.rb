@@ -140,7 +140,7 @@ When(/^the user clicks Extend Open Enrollment$/) do
 end
 
 When(/^the user clicks Edit Open Enrollment$/) do
-  find('a.btn.btn-primary.btn-sm', text: 'Edit Open Enrollment').click
+  find('a.btn.btn-primary.btn-sm', text: 'EDIT OPEN ENROLLMENT').click
 end
 
 Then(/^the user clicks Extend Open Enrollment button$/) do

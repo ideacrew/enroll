@@ -198,6 +198,36 @@ class CensusEmployee < CensusMember
     })
   }
 
+
+  index(
+    {
+      "benefit_group_assignments.benefit_package_id" => 1,
+      "benefit_group_assignments.start_on" => 1,
+      "benefit_group_assignments.end_on" => 1,
+      "employment_terminated_on" => 1
+    },
+   {name: "benefit_group_assignments_predecessor_renewal_index"})
+
+  scope :eligible_for_renewal_under_package, ->(benefit_package, package_start, package_end, new_effective_date) {
+    where(:"benefit_group_assignments" => {
+        :$elemMatch => {
+          :benefit_package_id => benefit_package.id,
+          :start_on => { "$gte" => package_start },
+          "$or" => [
+            {"end_on" => nil},
+            {"end_on" => {"$exists" => false}},
+            {"end_on" => package_end}
+          ]
+        },
+      },
+      "$or" => [
+        {"employment_terminated_on" => nil},
+        {"employment_terminated_on" => {"$exists" => false}},
+        {"employment_terminated_on" => {"$gte" => new_effective_date}}
+      ]
+    )
+  }
+
   scope :benefit_application_assigned,     ->(benefit_application) { where(:"benefit_group_assignments.benefit_package_id".in => benefit_application.benefit_packages.pluck(:_id)) }
   scope :benefit_application_unassigned,   ->(benefit_application) { where(:"benefit_group_assignments.benefit_package_id".nin => benefit_application.benefit_packages.pluck(:_id)) }
 
@@ -332,9 +362,12 @@ class CensusEmployee < CensusMember
     self.employment_terminated_on.next_month.beginning_of_month
   end
 
-  def is_case_old?(employer_profile=nil)
-    employer_profile = employer_profile || self.employer_profile
-    employer_profile.present? && employer_profile.is_a?(EmployerProfile)
+  def is_case_old?(profile=nil)
+    if profile.present?
+      profile.is_a?(EmployerProfile)
+    else
+      benefit_sponsors_employer_profile_id.blank?
+    end
   end
 
   def employer_profile=(new_employer_profile)
@@ -626,6 +659,7 @@ class CensusEmployee < CensusMember
 
   def is_terminate_possible?
     return true if employment_terminated? || cobra_terminated?
+    return false if cobra_linked?
 
     !(is_eligible? || employee_role_linked?)
   end

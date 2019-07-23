@@ -81,7 +81,7 @@ When(/^the Admin clicks CONTINUE after uploading and verifying an application$/)
   find('li', :text => 'Document in EnrollApp', wait: 10).click
   find('.v-type-confirm-button', wait: 10).click
   expect(page).to have_content('Application successfully verified.')
-  find('.button', text: 'Continue', wait: 10).click
+  find('.button', text: 'CONTINUE', wait: 10).click
 end
 
 Then(/^the Admin can navigate to the next page and finish the application$/) do

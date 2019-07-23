@@ -107,7 +107,7 @@ function calculateEmployerContributionsImmediate(productOptionKind,referencePlan
     url: "calculate_employer_contributions",
     success: function (d) {
       var eeMin = parseFloat(d["estimated_enrollee_minimum"]).toFixed(2);
-      var eeCost = parseFloat(d["estimated_total_cost"]).toFixed(2);
+      var eeCost = parseFloat(d["estimated_sponsor_exposure"]).toFixed(2);
       var eeMax = parseFloat(d["estimated_enrollee_maximum"]).toFixed(2);
       showCostDetails(eeCost,eeMin,eeMax)
     }
