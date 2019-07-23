@@ -58,7 +58,7 @@ RSpec.describe "exchanges/employer_applications/index.html.erb", dbclean: :after
     end
 
     it 'should display termination reasons' do
-      expect(rendered).to have_content('Please select terminate reason')
+      expect(rendered).to have_content('Please select terminate reason') if show_termination_reasons?
     end
   end
 
