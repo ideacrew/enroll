@@ -30,4 +30,4 @@ Feature: Broker creates a quote for a prospect employer
     Then Primary Broker should be on the Roster page of a Create quote
     And Primary Broker enters quote name
     And the broker clicks on Select Health Benefits button
-    And the broker selected by metal level plan offerings
+    And the broker selected by metal level plan offerings and publish quote
