@@ -36,6 +36,95 @@ When(/^click on the New Quote button$/) do
   click_link 'New Quote'
 end
 
+When(/^.+ clicks on the Add Prospect Employer button$/) do
+  find(:xpath, "//*[@id='myTabContent']/div/div[4]/div/a").click
+end
+
+And(/^Primary Broker creates new Prospect Employer with default_office_location$/) do
+  find('#organization_legal_name').click
+  fill_in 'organization[legal_name]', :with => "emp1"
+  fill_in 'organization[dba]', :with => 101010
+
+  find('.interaction-choice-control-organization-entity-kind').click
+  find(".interaction-choice-control-organization-entity-kind-2").click
+
+  find(:xpath, "//select[@name='organization[entity_kind]']/option[@value='c_corporation']")
+  fill_in 'organization[office_locations_attributes][0][address_attributes][address_1]', :with => "1818"
+  fill_in 'organization[office_locations_attributes][0][address_attributes][address_2]', :with => "exp st"
+  fill_in 'organization[office_locations_attributes][0][address_attributes][city]', :with => "Washington"
+  fill_in 'organization[office_locations_attributes][0][address_attributes][zip]', :with => "20002"
+  fill_in 'organization[office_locations_attributes][0][phone_attributes][area_code]', :with => "202"
+  fill_in 'organization[office_locations_attributes][0][phone_attributes][number]', :with => "5551212"
+  fill_in 'organization[office_locations_attributes][0][phone_attributes][extension]', :with => "22332"
+  find('.interaction-click-control-confirm').click
+end
+
+And(/^.+ should see successful message$/) do
+  expect(page).to have_content("Prospect Employer (#{SponsoredBenefits::Organizations::PlanDesignOrganization.all.first.legal_name}) Added Successfully.")
+end
+
+And(/^the broker clicks Actions dropdown and clicks View Quotes from dropdown menu$/) do
+  path = SponsoredBenefits::Organizations::PlanDesignOrganization.all.first.id.to_s
+  find("#dropdown_for_plan_design_" + path, :text => "Actions").click
+  find("#plan_design_#{path}> ul > li:nth-child(1) > a", :text => "View Quotes").click
+  wait_for_ajax(3, 2)
+end
+
+Then(/^Primary Broker should be on the Roster page of a View quote$/) do
+  expect(page).to have_content("Manage Quotes for #{SponsoredBenefits::Organizations::PlanDesignOrganization.all.first.legal_name}")
+end
+
+And(/^the broker clicks Actions dropdown and clicks Create Quote from dropdown menu$/) do
+  #plan = FactoryBot.create(:plan, :with_premium_tables, active_year: TimeKeeper.date_of_record.year)
+  path = SponsoredBenefits::Organizations::PlanDesignOrganization.all.first.id.to_s
+  find("#dropdown_for_plan_design_" + path, :text => "Actions").click
+  find("#plan_design_#{path}> ul > li:nth-child(2) > a", :text => "Create Quote").click
+  wait_for_ajax(3, 2)
+end
+
+Then(/^Primary Broker should be on the Roster page of a Create quote$/) do
+  expect(page).to have_content("Quote for #{SponsoredBenefits::Organizations::PlanDesignOrganization.all.first.legal_name}")
+end
+
+And(/^Primary Broker enters quote name$/) do
+  find('#forms_plan_design_proposal_title').click
+  fill_in 'forms_plan_design_proposal[title]', :with => "Test Quote"
+
+  find(:xpath, "//*[@id='new_forms_plan_design_proposal']/div[1]/div/div[1]/div[2]/div/div[2]/div").click
+  expect(page).to have_content((TimeKeeper.date_of_record + 2.months).strftime("%B %Y"))
+  find('li', :text => "#{(TimeKeeper.date_of_record + 2.months).strftime('%B %Y')}").click
+  wait_for_ajax(3, 2)
+end
+
+And(/^the broker clicks on Select Health Benefits button$/) do
+  find('.interaction-click-control-select-health-benefits').click
+end
+
+And(/^the broker selected by metal level plan offerings and publish quote$/) do
+  wait_for_ajax(3, 2)
+  find(:xpath, "//*[@id='pdp-bms']/div/ul/li[2]/label/div").click
+  expect(page).to have_content("Gold")
+  find(:xpath, "//*[@id='metalLevelCarrierList']/div[3]/div[2]/label/h3").click
+  wait_for_ajax(3, 2)
+  fill_in "forms_plan_design_proposal[profile][benefit_sponsorship][benefit_application][benefit_group][relationship_benefits_attributes][0][premium_pct]", with: 100
+  fill_in "forms_plan_design_proposal[profile][benefit_sponsorship][benefit_application][benefit_group][relationship_benefits_attributes][1][premium_pct]", with: 100
+  fill_in "forms_plan_design_proposal[profile][benefit_sponsorship][benefit_application][benefit_group][relationship_benefits_attributes][2][premium_pct]", with: 100
+  fill_in "forms_plan_design_proposal[profile][benefit_sponsorship][benefit_application][benefit_group][relationship_benefits_attributes][3][premium_pct]", with: 100
+  wait_for_ajax(3, 2)
+  find(:xpath, "//*[@id='new_forms_plan_design_proposal']/div[9]", :visible => false).click
+  find(:xpath,"//*[@id='new_forms_plan_design_proposal']/div[3]/div/div/div[2]/div[1]/div/div[1]/label/div/div[2]/div/div[1]/h3").click
+  wait_for_ajax(3, 2)
+  find('.interaction-click-control-publish-quote').click
+end
+
+And(/^.+ should see successful message of published quote$/) do
+  expect(page).to have_content("Quote Published")
+end
+
+And(/^Primary Broker should see the quote roster is empty$/) do
+  expect(page).not_to have_button('Actions')
+end
+
 When(/^click on the Upload Employee Roster button$/) do
   click_link "Upload Roster"
 end
@@ -135,6 +224,7 @@ Given(/^the Plans exist$/) do
   open_enrollment_end_on = open_enrollment_start_on + 12.days
   start_on = open_enrollment_start_on + 2.months
   end_on = start_on + 1.year - 1.day
+  plan0 = FactoryBot.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: start_on.year, deductible: 2000, csr_variant_id: "01", coverage_kind: 'health')
   plan1 = FactoryBot.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', metal_level: 'silver', active_year: start_on.year, deductible: 5000, csr_variant_id: "01", coverage_kind: 'health')
   plan2 = FactoryBot.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', metal_level: 'bronze', active_year: start_on.year, deductible: 3000, csr_variant_id: "01", coverage_kind: 'health')
   plan3 = FactoryBot.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', dental_level: 'high', active_year: start_on.year, deductible: 4000, coverage_kind: 'dental')
