@@ -11,14 +11,14 @@ module BenefitSponsors
       @messages = {}
     end
 
-    def renew_application
+    def renew_application(async_workflow_id = nil)
       if business_policy_satisfied_for?(:renew_benefit_application)
         renewal_effective_date = benefit_application.effective_period.end.to_date.next_day
         service_areas = benefit_application.benefit_sponsorship.service_areas_on(renewal_effective_date)
         benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(service_areas, renewal_effective_date)
 
         if benefit_sponsor_catalog
-          new_benefit_application = benefit_application.renew(benefit_sponsor_catalog)
+          new_benefit_application = benefit_application.renew(benefit_sponsor_catalog, async_workflow_id)
           if new_benefit_application.save
             benefit_sponsor_catalog.save
           end

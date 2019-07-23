@@ -56,7 +56,7 @@ Then(/^Hbx Admin should see text Household Info$/) do
   expect(page).to have_content('Household Info')
   expect(page).to have_content('get insurance coverage for other members of your household')
   find_link('Add Member').visible?
-  find('.btn', text: 'Continue').click
+  find('.btn', text: 'CONTINUE').click
 end
 
 Then(/^Hbx Admin should see text Special Enrollment Period$/) do
@@ -98,7 +98,7 @@ When(/HBX Admin clicks on Confirm button on the summary page of plan selection/)
   find(:xpath, '//*[@id="terms_check_thank_you"]').click
   fill_in 'first_name_thank_you', :with => "Carlos"
   fill_in 'last_name_thank_you', :with => "Devina"
-  find('.btn', text: 'Confirm').click
+  find('.btn', text: 'CONFIRM').click
 end
 
 Then(/HBX Admin should see the enrollment receipt page/) do

@@ -213,14 +213,32 @@ module BenefitSponsors
         new_benefit_package
       end
 
-      def renew_employee_assignments
-        assigned_census_employees = predecessor.census_employees_assigned_on(predecessor.start_on)
+      def renew_employee_assignment(census_employee, package_effective_date)
+        new_benefit_package_assignment = census_employee.benefit_package_assignment_on(package_effective_date)
 
-        assigned_census_employees.each do |census_employee|
-          new_benefit_package_assignment = census_employee.benefit_package_assignment_on(start_on)
+        if new_benefit_package_assignment.blank?
+          census_employee.assign_to_benefit_package(self, package_effective_date)
+        end
+      end
 
-          if new_benefit_package_assignment.blank?
-            census_employee.assign_to_benefit_package(self, effective_period.min)
+      def renew_employee_assignments(async_workflow_id = nil)
+        if predecessor
+          assigned_census_employees = predecessor.census_employees_eligible_for_renewal(self.start_on)
+
+          assigned_census_employees.each do |census_employee|
+            if async_workflow_id.blank?
+              renew_employee_assignment(census_employee, start_on)
+            else
+              notify(
+                "acapi.info.events.benefit_package.renew_employee_assignment",
+                {
+                  :workflow_id => async_workflow_id,
+                  :benefit_package_id => self.id,
+                  :census_employee_id => census_employee.id,
+                  :effective_on_date => start_on.strftime("%Y-%m-%d")
+                }
+              )
+            end
           end
         end
       end
@@ -486,6 +504,10 @@ module BenefitSponsors
 
       def census_employees_assigned_on(effective_date, is_active = true)
         CensusEmployee.by_benefit_package_and_assignment_on(self, effective_date, is_active).non_terminated
+      end
+
+      def census_employees_eligible_for_renewal(effective_date)
+        CensusEmployee.eligible_for_renewal_under_package(self, start_on, effective_date)
       end
 
       def self.find(id)

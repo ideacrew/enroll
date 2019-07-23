@@ -261,6 +261,8 @@ module BenefitSponsors
       )
     }
 
+    attr_accessor :async_renewal_workflow_id
+
     # Migration map for plan_year to benefit_application
     def matching_state_for(plan_year)
       plan_year_to_benefit_application_states_map[plan_year.aasm_state.to_sym]
@@ -603,7 +605,7 @@ module BenefitSponsors
     # @param [ BenefitSponsorCatalog ] The catalog valid for the effective_period immediately following this
     # BenefitApplication instance's effective_period
     # @return [ BenefitApplication ] The built renewal application instance and submodels
-    def renew(new_benefit_sponsor_catalog)
+    def renew(new_benefit_sponsor_catalog, async_workflow_id = nil)
       if new_benefit_sponsor_catalog.effective_date != end_on + 1.day
         raise StandardError, "effective period must begin on #{end_on + 1.day}"
       end
@@ -617,6 +619,10 @@ module BenefitSponsors
         effective_period:         new_benefit_sponsor_catalog.effective_period,
         open_enrollment_period:   new_benefit_sponsor_catalog.open_enrollment_period
       )
+
+      if async_workflow_id
+        renewal_application.async_renewal_workflow_id = async_workflow_id
+      end
 
       renewal_application.pull_benefit_sponsorship_attributes
 
@@ -634,12 +640,14 @@ module BenefitSponsors
     def renew_benefit_package_assignments
       if is_renewing?
         benefit_packages.each do |benefit_package|
-          benefit_package.renew_employee_assignments
+          benefit_package.renew_employee_assignments(async_renewal_workflow_id)
         end
 
-        default_benefit_package = benefit_packages.detect{|benefit_package| benefit_package.is_default }
+        default_benefit_package = benefit_packages.detect{ |benefit_package| benefit_package.is_default }
+
+        default_renewal_check_application = async_renewal_workflow_id.blank? ? self : predecessor
         if benefit_sponsorship.census_employees.present?
-          benefit_sponsorship.census_employees.non_terminated.benefit_application_unassigned(self).each do |census_employee|
+          benefit_sponsorship.census_employees.non_terminated.benefit_application_unassigned(default_renewal_check_application).each do |census_employee|
             census_employee.assign_to_benefit_package(default_benefit_package, effective_period.min)
           end
         end

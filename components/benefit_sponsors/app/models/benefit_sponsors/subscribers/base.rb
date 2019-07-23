@@ -17,6 +17,12 @@ module BenefitSponsors
 
         response_params
       end
+
+      def extract_workflow_id(properties)
+        headers = properties.headers || {}
+        stringed_headers = headers.stringify_keys
+        stringed_headers["workflow_id"] || SecureRandom.uuid.gsub("-","")
+      end
     end
   end
 end
