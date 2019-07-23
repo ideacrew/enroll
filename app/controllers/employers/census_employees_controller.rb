@@ -32,6 +32,7 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def edit
+    authorize @census_employee, :show?
     @census_employee.build_address unless @census_employee.address.present?
     @census_employee.build_email unless @census_employee.email.present?
     @census_employee.benefit_group_assignments.build unless @census_employee.benefit_group_assignments.present?
@@ -185,6 +186,7 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def show
+    authorize @census_employee, :show?
     @family = @census_employee.employee_role.person.primary_family if @census_employee.employee_role.present?
     @status = params[:status] || ''
     @no_ssn = @census_employee.no_ssn_allowed || false
