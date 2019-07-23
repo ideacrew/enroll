@@ -30,10 +30,6 @@ FactoryBot.define do
       addresses { [FactoryBot.build(:address, :mailing_kind, :without_address_1, :without_city, :without_state, :without_zip)] }
     end
 
-    trait :with_mailing_address do
-      addresses { [FactoryGirl.build(:address, :mailing_kind)]}
-    end
-
     trait :with_ssn do
       sequence(:ssn) { |n| 222222220 + n }
     end

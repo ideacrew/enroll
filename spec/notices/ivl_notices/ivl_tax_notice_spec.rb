@@ -1,8 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe IvlNotices::IvlTaxNotice, dbclean: :after_each do
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_mailing_address)}
-  let(:family) {FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+  let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_mailing_address)}
+  let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'1095A Tax Cover Letter Notice',
                             :notice_template => 'notices/ivl/ivl_tax_notice',
