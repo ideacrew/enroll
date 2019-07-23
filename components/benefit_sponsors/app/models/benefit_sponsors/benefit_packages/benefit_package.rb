@@ -507,7 +507,7 @@ module BenefitSponsors
       end
 
       def census_employees_eligible_for_renewal(effective_date)
-        CensusEmployee.eligible_for_renewal_under_package(self, start_on, effective_date)
+        CensusEmployee.eligible_for_renewal_under_package(self, start_on, end_on, effective_date)
       end
 
       def self.find(id)
