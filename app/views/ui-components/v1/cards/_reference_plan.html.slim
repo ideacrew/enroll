@@ -4,6 +4,10 @@
   .panel-body
     .row
       .col-xs-8
+        - if f.object.kind == 'dental'
+          = f.hidden_field :reference_product, value: f.object.reference_product
+          = f.hidden_field :reference_plan_id, value: f.object.reference_plan_id
+
         h3.heading-text.mt-0 #{f.object.reference_product.title}
       .col-xs-4
         a onclick="showPlanSelection()" Change reference Plan?

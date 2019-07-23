@@ -4,7 +4,7 @@
 - if !is_new_benefit && !is_new_benefit.nil?
     #scEdit
         = f.fields_for :sponsor_contribution, f.object.sponsor_contribution, errors: {}, fieldset: false do |sc|
-            = render "./ui-components/v1/cards/sponsor_contributions", f: sc
+            = render "./ui-components/v1/cards/dental_sponsor_contributions", sc: sc
     br
     br
 
