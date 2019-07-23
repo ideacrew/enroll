@@ -340,21 +340,12 @@ class BenefitGroupAssignment
   end
 
   def date_guards
-    return unless benefit_group.present? && start_on.present?
+    return if benefit_package.blank? || start_on.blank?
 
-    unless (self.benefit_group.start_on..self.benefit_group.end_on).cover?(start_on)
-      errors.add(:start_on, "can't occur outside plan year dates")
-    end
-
+    errors.add(:start_on, "can't occur outside plan year dates") unless benefit_package.effective_period.cover?(start_on)
     if end_on.present?
-      unless (self.benefit_group.start_on..self.benefit_group.end_on).cover?(end_on)
-        errors.add(:end_on, "can't occur outside plan year dates")
-      end
-
-      if end_on < start_on
-        errors.add(:end_on, "can't occur before start date")
-      end
+      errors.add(:end_on, "can't occur outside plan year dates") unless benefit_package.effective_period.cover?(end_on)
+      errors.add(:end_on, "can't occur before start date") if end_on < start_on
     end
   end
-
 end
