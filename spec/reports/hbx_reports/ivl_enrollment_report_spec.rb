@@ -21,8 +21,10 @@ describe IvlEnrollmentReport, dbclean: :after_each do
     ClimateControl.modify purchase_date_start:"#{06/01/2018}", purchase_date_end:"#{06/10/2018}" do 
 
       CSV.foreach(@file, :headers => true) do |csv|
-        expect(csv).to eq ['Enrollment GroupID', 'Purchase Date', 'Coverage Start', 'Coverage Kind', 'Enrollment State', 'Subscriber HBXID',
-                           'Subscriber First Name', 'Subscriber Last Name', 'HIOS ID', 'Family Size', 'Enrollment Reason', 'In Glue']
+        expect(csv).to eq ['Enrollment GroupID', 'Purchase Date', 'Coverage Start', 'Coverage End', 'Coverage Kind', 'Enrollment State', 
+                           'Subscriber HBXID', 'Subscriber First Name','Subscriber Last Name', 'HIOS ID', 'Premium Subtotal', 
+                           'ER Contribution', 'Applied APTC Amount', 'Total Responsible Amount', 'Family Size', 'Enrollment Reason', 
+                           'In Glue']
       end
     end
   end

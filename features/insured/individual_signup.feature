@@ -108,3 +108,22 @@ Feature: Insured Plan Shopping on Individual market
     And Dependent selects not applying for coverage
     And Individual clicks on confirm member
     Then Dependent should not see error message Document type cannot be blank
+
+  Scenario: Individual should see immigration details even after changing radio options
+    Given Individual resumes enrollment
+    And Individual click on sign in existing account
+    And I signed in
+    Then user should see heading labeled personal information
+    Then Individual should click on Individual market for plan shopping #TODO re-write this step
+    Then Individual should see a form to enter personal information
+    And Individual selects eligible immigration status
+    Then select I-551 doc and fill details
+    When Individual clicks on Save and Exit
+    Then Individual resumes enrollment
+    And Individual click on sign in existing account
+    And I signed in
+    Then click citizen yes
+    Then click citizen no
+    When click eligible immigration status yes
+    Then should find I-551 doc type
+    And should find alien number

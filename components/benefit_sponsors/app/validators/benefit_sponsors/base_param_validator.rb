@@ -4,9 +4,24 @@ require 'date'
 require 'mail'
 
 module BenefitSponsors
+  module ValidationTypes
+    include Dry::Types()
+  end
+
+  BsonObjectIdString = ValidationTypes.Constructor(BSON::ObjectId) do |value|
+    begin
+      BSON::ObjectId.from_string(value)
+    rescue BSON::ObjectId::Invalid
+      nil
+    end
+  end
+
   class BaseParamValidator < Dry::Schema::Params
     define do
       config.messages.backend = :i18n
+      config.messages.load_paths += Dir[
+        Rails.root.join('config', 'locales', 'dry_validation.*.yml')
+      ]
     end
   end
 

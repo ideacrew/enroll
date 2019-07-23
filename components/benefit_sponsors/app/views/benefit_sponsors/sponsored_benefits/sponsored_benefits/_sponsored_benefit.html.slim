@@ -520,7 +520,7 @@ javascript:
     })
 
     // if (document.getElementById('sponsored_benefits_is_new_benefit').value == "true") {
-      if($(".benefit-package-dental").length) {
+      if($(".benefit-package-dental").length || $("#edit_dental_form").length) {
         var sbErCL = erDentalCL
       } else {
         var sbErCL = erCL

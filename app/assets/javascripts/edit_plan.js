@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
 $(document).on("ready ajax:success", function() {
 
   $("#agreement_action-confirm-yes").click(function(){
@@ -9,8 +7,7 @@ $(document).on("ready ajax:success", function() {
   $("#agreement_action-confirm-no").click(function(){
     $(".interaction-click-control-action-confirm").attr("disabled", true);
     $("#action-confirm-date").attr("hidden", true);
-=======
-$(document).ready(function() {
+  });
 
   $('#terminate-button').click(function(e){
     e.preventDefault();
@@ -22,18 +19,6 @@ $(document).ready(function() {
     $('#enter-text').removeClass('hidden').html('Enter the date of termination');
     $('#term_date').val('');
     $('#applied-aptc-text').addClass('hidden');
->>>>>>> e3e87103fc... Move branch modify-plan-mockup to self_service_cancel
-=======
-$(document).on("ready ajax:success", function() {
-
-  $("#agreement_action-confirm-yes").click(function(){
-    $(".interaction-click-control-action-confirm").attr("disabled", false);
-    $("#action-confirm-date").attr("hidden", false);
-  });
-  $("#agreement_action-confirm-no").click(function(){
-    $(".interaction-click-control-action-confirm").attr("disabled", true);
-    $("#action-confirm-date").attr("hidden", true);
->>>>>>> fcd434ba83... Add open enrollment option to shop for plans button
   });
 
   $('#cancel-button').click(function(e){
@@ -42,37 +27,11 @@ $(document).on("ready ajax:success", function() {
     $('#action-confirm').removeClass('hidden');
     $('.action-msg').addClass('hidden');
     $('#cancel-msg').removeClass('hidden');
-<<<<<<< HEAD
-<<<<<<< HEAD
-    $('#cancel-form').removeClass('hidden');
-    $('#calendar-div').addClass('hidden');
-    $('#applied-aptc-text').addClass('hidden');
-  });
-
-  // Mockup temporarily disabled
-  // $('#aptc-button').click(function(e){
-  //   e.preventDefault();
-  //   $('.confirmation').addClass('hidden');
-  //   $('#action-confirm').removeClass('hidden');
-  //   $('.action-msg').addClass('hidden');
-  //   $('#aptc-msg').removeClass('hidden');
-  //   $('#calendar-div').removeClass('hidden');
-  //   $('#enter-text').addClass('hidden');
-  //   $('#aptc_date').val('07/01/2019');
-  //   $('#applied-aptc-text').removeClass('hidden');
-  //   $('#cancel-form').addClass('hidden');
-  // });
-
-
-  // APTC JS
-=======
     $('#calendar-div').removeClass('hidden');
     $('#enter-text').removeClass('hidden').html('Enter the date of cancellation');
     $('#term_date').val('');
-=======
     $('#cancel-form').removeClass('hidden');
     $('#calendar-div').addClass('hidden');
->>>>>>> fcd434ba83... Add open enrollment option to shop for plans button
     $('#applied-aptc-text').addClass('hidden');
   });
 
@@ -90,12 +49,7 @@ $(document).on("ready ajax:success", function() {
   //   $('#cancel-form').addClass('hidden');
   // });
 
-
-<<<<<<< HEAD
->>>>>>> e3e87103fc... Move branch modify-plan-mockup to self_service_cancel
-=======
   // APTC JS
->>>>>>> fcd434ba83... Add open enrollment option to shop for plans button
   $('#applied_pct_1').change(function(){
     calculatePercent('#applied_pct_1', 100);
   });

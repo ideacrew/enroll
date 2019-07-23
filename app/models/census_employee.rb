@@ -133,6 +133,11 @@ class CensusEmployee < CensusMember
   index({"benefit_group_assignments._id" => 1})
   index({"benefit_group_assignments.benefit_group_id" => 1})
   index({"benefit_group_assignments.aasm_state" => 1})
+  index({"benefit_group_assignments.benefit_package_id" => 1})
+  index({"benefit_group_assignments.benefit_package_id" => 1,
+         "benefit_group_assignments.start_on" => 1,
+         "benefit_group_assignments.is_active" => 1 },
+        {name: "benefit_group_assignments_renewal_search_index"})
 
   scope :active,            ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_STATES) }
   scope :terminated,        ->{ any_in(aasm_state: EMPLOYMENT_TERMINATED_STATES) }
@@ -183,10 +188,14 @@ class CensusEmployee < CensusMember
   scope :by_ssn,                          ->(ssn) { where(encrypted_ssn: CensusMember.encrypt_ssn(ssn)).and(:encrypted_ssn.nin => ["", nil]) }
 
   scope :by_benefit_package_and_assignment_on,->(benefit_package, effective_on, is_active) {
-    where(:"benefit_group_assignments" => { :$elemMatch => {
-      :start_on => effective_on,
-      :benefit_package_id => benefit_package.id, :is_active => is_active
-    }})
+    where(:"benefit_group_assignments" => {
+      :$elemMatch =>
+      {
+        :benefit_package_id => benefit_package.id,
+        :start_on => effective_on,
+        :is_active => is_active
+      }
+    })
   }
 
   scope :benefit_application_assigned,     ->(benefit_application) { where(:"benefit_group_assignments.benefit_package_id".in => benefit_application.benefit_packages.pluck(:_id)) }
@@ -600,11 +609,25 @@ class CensusEmployee < CensusMember
     EMPLOYMENT_TERMINATED_STATES.include?(aasm_state)
   end
 
-  def active_or_pending_termination?
+  def is_cobra_possible?
+    return false if cobra_linked? || cobra_eligible? || rehired? || cobra_terminated?
     return true if self.employment_terminated_on.present?
     return true if PENDING_STATES.include?(self.aasm_state)
-    return false if self.rehired?
-    !(self.is_eligible? || self.employee_role_linked?)
+
+    !(is_eligible? || employee_role_linked?)
+  end
+
+  def is_rehired_possible?
+    return false if cobra_linked? || cobra_eligible? || rehired?
+    return true if employment_terminated? || cobra_terminated?
+
+    !(is_eligible? || employee_role_linked?)
+  end
+
+  def is_terminate_possible?
+    return true if employment_terminated? || cobra_terminated?
+
+    !(is_eligible? || employee_role_linked?)
   end
 
   def employee_relationship
@@ -1202,11 +1225,13 @@ def self.to_csv
     benefit_group_assignments - [active_benefit_group_assignment, renewal_benefit_group_assignment].compact
   end
 
-  # Pull expired enrollments as well
   def past_enrollments
     if employee_role.present?
-      enrollments = employee_role.person.primary_family.active_household.hbx_enrollments.shop_market.terminated
-      enrollments.select{|e| e.benefit_group_assignment.present? && e.benefit_group_assignment.census_employee == self && !enrollments_for_display.include?(e) && !e.void?}.sort_by { |enr| enrollment_coverage_end(enr)}.reverse
+      query = {
+        :aasm_state.in => ["coverage_terminated", "coverage_termination_pending"],
+        :benefit_group_assignment_id.in => benefit_group_assignments.map(&:id)
+      }
+      employee_role.person.primary_family.active_household.hbx_enrollments.non_external.shop_market.where(query)
     end
   end
 

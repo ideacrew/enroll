@@ -128,7 +128,6 @@ class Exchanges::HbxProfilesController < ApplicationController
 
     respond_to do |format|
       format.html { render "employers/employer_profiles/index" }
-      format.js {}
     end
   end
 
@@ -211,7 +210,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   def employer_datatable
   @datatable = Effective::Datatables::BenefitSponsorsEmployerDatatable.new
     respond_to do |format|
-      format.js
+      format.html { render '/exchanges/hbx_profiles/invoice.html.slim' }
     end
   end
 
@@ -240,6 +239,9 @@ def employer_poc
       @staff = @staff.where(last_name: /^#{page_no}/i)
     else
       @staff = @staff.where(last_name: @q)
+    end
+    respond_to do |format|
+      format.html { render '/exchanges/hbx_profiles/staff.html.erb' }
     end
   end
 
@@ -322,20 +324,31 @@ def employer_poc
   def family_index_dt
     @selector = params[:scopes][:selector] if params[:scopes].present?
     @datatable = Effective::Datatables::FamilyDataTable.new(params[:scopes].to_h)
-    #render '/exchanges/hbx_profiles/family_index_datatable'
+    respond_to do |format|
+      format.html { render "/exchanges/hbx_profiles/family_index_datatable" }
+    end
   end
 
   def identity_verification
     @datatable = Effective::Datatables::IdentityVerificationDataTable.new(params[:scopes])
+    respond_to do |format|
+      format.html { render "/exchanges/hbx_profiles/identity_verification_datatable.html.erb" }
+    end
   end
 
   def user_account_index
     @datatable = Effective::Datatables::UserAccountDatatable.new
+    respond_to do |format|
+      format.html { render '/exchanges/hbx_profiles/user_account_index_datatable.html.slim' }
+    end
   end
 
   def outstanding_verification_dt
     @selector = params[:scopes][:selector] if params[:scopes].present?
     @datatable = Effective::Datatables::OutstandingVerificationDataTable.new(params[:scopes])
+    respond_to do |format|
+      format.html { render "/exchanges/hbx_profiles/outstanding_verification_datatable.html.erb" }
+    end
   end
 
   def hide_form
@@ -461,7 +474,7 @@ def employer_poc
 
 
     respond_to do |format|
-      format.js {}
+      format.html { render 'exchanges/hbx_profiles/broker_agency_index_datatable.html.slim' }
     end
   end
 
@@ -475,8 +488,7 @@ def employer_poc
     @general_agency_profiles = Kaminari.paginate_array(@general_agency_profiles).page(page_no)
 
     respond_to do |format|
-      # format.html { render 'general_agency' }
-      format.js
+      format.html { render "exchanges/hbx_profiles/general_agency_index.html.slim" }
     end
   end
 
@@ -484,8 +496,7 @@ def employer_poc
     @issuers = CarrierProfile.all
 
     respond_to do |format|
-      format.html { render "issuer_index" }
-      format.js {}
+      format.html { render "exchanges/hbx_profiles/issuer_index.html.slim" }
     end
   end
 
@@ -534,16 +545,14 @@ def employer_poc
 
   def product_index
     respond_to do |format|
-      format.html { render "product_index" }
-      format.js {}
+      format.html { render "exchanges/hbx_profiles/product_index.html.slim" }
     end
   end
 
   def configuration
     @time_keeper = Forms::TimeKeeper.new
     respond_to do |format|
-      format.html { render partial: "configuration_index" }
-      format.js {}
+      format.html { render '/exchanges/hbx_profiles/configuration_index.html.erb' }
     end
   end
 
@@ -670,6 +679,12 @@ def employer_poc
 
   # GET /exchanges/hbx_profiles/1/edit
   def edit
+  end
+
+  def inbox
+    respond_to do |format|
+      format.html { render "exchanges/hbx_profiles/inbox_messages.html.slim" }
+    end
   end
 
 # FIXME: I have removed all writes to the HBX Profile models as we
