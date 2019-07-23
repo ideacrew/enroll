@@ -98,9 +98,7 @@ module BenefitSponsors
       end
 
       context 'when a wrong format is uploaded' do
-        let(:file) do
-          test_file = Rack::Test::UploadedFile.new(Rails.root.join("spec", "test_data", "individual_person_payloads", "individual.xml"))
-        end
+        let(:file) { Rack::Test::UploadedFile.new(Rails.root.join("spec", "test_data", "individual_person_payloads", "individual.xml")) }
 
         before do
           benefit_sponsorship.save!
@@ -109,7 +107,7 @@ module BenefitSponsors
           post :bulk_employee_upload, :params => {:employer_profile_id => benefit_sponsor.profiles.first.id, :file => file}
         end
 
-        it 'should upload sucessfully' do
+        it 'should throw error' do
           expect(response).to render_template("benefit_sponsors/profiles/employers/employer_profiles/_employee_csv_upload_errors", "layouts/two_column")
         end
       end

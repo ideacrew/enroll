@@ -68,6 +68,7 @@ class CensusEmployee < CensusMember
 
   scope :eligible_without_term_pending, ->{ any_in(aasm_state: (ELIGIBLE_STATES - PENDING_STATES)) }
   scope :active_alone,      ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_ONLY) }
+  scope :by_ssn,            ->(ssn) { where(encrypted_ssn: CensusMember.encrypt_ssn(ssn)).and(:encrypted_ssn.nin => ["", nil]) }
 
   scope :eligible_for_renewal_under_package, ->(benefit_package, package_start, package_end, new_effective_date) {
     where(:"benefit_group_assignments" => {
