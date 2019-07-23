@@ -68,6 +68,13 @@ $(function() {
       });
     }
   })
+  // Places employee roster in correct container
+  setTimeout(function() {
+    var dataTableWrapper = document.querySelectorAll('[id^="plan_design_employee_datatable-table"]')[0];
+    if (dataTableWrapper) {
+      dataTableWrapper.closest('.row');
+      dataTableWrapper.style ="max-width: 94% !important"
+    }
+  }, 100);
 });
 </script>
-

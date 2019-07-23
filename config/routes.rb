@@ -102,6 +102,7 @@ Rails.application.routes.draw do
         get :employer_datatable
         post :employer_invoice_datatable
         post :generate_invoice
+        post :disable_ssn_requirement
         get :edit_force_publish
         post :force_publish
         get :broker_agency_index

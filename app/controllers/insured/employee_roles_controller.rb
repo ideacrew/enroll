@@ -222,6 +222,6 @@ class Insured::EmployeeRolesController < ApplicationController
 
   def employment_relationship_params
     params.require(:employment_relationship).permit(:first_name, :last_name, :middle_name,
-      :name_pfx, :name_sfx, :gender, :hired_on, :eligible_for_coverage_on, :census_employee_id, :employer_name)
+      :name_pfx, :name_sfx, :gender, :hired_on, :eligible_for_coverage_on, :census_employee_id, :employer_name, :no_ssn)
   end
 end

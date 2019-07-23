@@ -26,7 +26,7 @@
               active_tab: active_tab,
               remote: true,
               pundit_object: HbxProfile,
-              pundit_method: :can_access_outstanding_verification_sub_tab?
+              pundit_method: :access_outstanding_verification_sub_tab?
             } %>
             <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
               tab_name: 'new-consumer-application',
@@ -105,14 +105,20 @@
                                                                             link_path: main_app.family_index_dt_exchanges_hbx_profiles_path,
                                                                             display_name: 'Families',
                                                                             active_tab: active_tab,
-                                                                            glyphicon_class: 'glyphicon-briefcase'
+                                                                            glyphicon_class: 'glyphicon-briefcase',
+                                                                            remote: false,
+                                                                            pundit_object: nil,
+                                                                            pundit_method: nil
                                                                           } %>
               <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
                                                                               tab_name: 'outstanding-verifications',
                                                                               link_path: main_app.outstanding_verification_dt_exchanges_hbx_profiles_path,
                                                                               display_name: 'Outstanding Verifications',
                                                                               active_tab: active_tab,
-                                                                              glyphicon_class: 'glyphicon-briefcase'
+                                                                              glyphicon_class: 'glyphicon-briefcase',
+                                                                              remote: false,
+                                                                              pundit_object: nil,
+                                                                              pundit_method: nil
                                                                             } %>
           </ul>
         </li>
@@ -128,7 +134,7 @@
       %>
       <% end %>
 
-      
+
 
       <%= render partial: 'exchanges/hbx_profiles/shared/nav_link',
                   locals: {
@@ -136,7 +142,10 @@
                     link_path: main_app.employer_datatable_exchanges_hbx_profiles_path,
                     display_name: 'Employers',
                     active_tab: active_tab,
-                    glyphicon_class: 'glyphicon-briefcase'
+                    glyphicon_class: 'glyphicon-briefcase',
+                    remote: false,
+                    pundit_object: nil,
+                    pundit_method: nil
                   }
                   %>
 
@@ -147,7 +156,10 @@
                     link_path: main_app.user_account_index_exchanges_hbx_profiles_path,
                     display_name: 'User Accounts',
                     active_tab: active_tab,
-                    glyphicon_class: 'glyphicon-user'
+                    glyphicon_class: 'glyphicon-user',
+                    remote: false,
+                    pundit_object: nil,
+                    pundit_method: nil
                   }
                   %>
 
@@ -159,7 +171,10 @@
                     link_path: main_app.issuer_index_exchanges_hbx_profiles_path,
                     display_name: 'Issuers',
                     active_tab: active_tab,
-                    glyphicon_class: 'glyphicon-italic'
+                    glyphicon_class: 'glyphicon-italic',
+                    remote: false,
+                    pundit_object: nil,
+                    pundit_method: nil
                   }
                   %>
 
@@ -169,7 +184,10 @@
                           link_path: main_app.product_index_exchanges_hbx_profiles_path,
                           display_name: 'Products',
                           active_tab: active_tab,
-                          glyphicon_class: 'glyphicon-usd'
+                          glyphicon_class: 'glyphicon-usd',
+                          remote: false,
+                          pundit_object: nil,
+                          pundit_method: nil
                         }
       %>
 
@@ -181,14 +199,20 @@
                                                                             link_path: main_app.exchanges_broker_applicants_path,
                                                                             display_name: 'Broker Applications',
                                                                             active_tab: active_tab,
-                                                                            glyphicon_class: 'glyphicon-pencil'
+                                                                            glyphicon_class: 'glyphicon-pencil',
+                                                                            remote: false,
+                                                                            pundit_object: nil,
+                                                                            pundit_method: nil
                                                                           } %>
               <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
                                                                               tab_name: 'broker-agencies',
                                                                               link_path: main_app.broker_agency_index_exchanges_hbx_profiles_path,
                                                                               display_name: 'Broker Agencies',
                                                                               active_tab: active_tab,
-                                                                              glyphicon_class: 'glyphicon-phone'
+                                                                              glyphicon_class: 'glyphicon-phone',
+                                                                              remote: false,
+                                                                              pundit_object: nil,
+                                                                              pundit_method: nil
                                                                             } %>
               <% if general_agency_enabled? %>
                 <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
@@ -196,7 +220,10 @@
                                                                               link_path: main_app.general_agency_index_exchanges_hbx_profiles_path,
                                                                               display_name: 'General Agencies',
                                                                               active_tab: active_tab,
-                                                                              glyphicon_class: 'glyphicon-phone'
+                                                                              glyphicon_class: 'glyphicon-phone',
+                                                                              remote: false,
+                                                                              pundit_object: nil,
+                                                                              pundit_method: nil
                                                                             } %>
               <% end %>
             </ul>
@@ -210,7 +237,10 @@
                                                                             link_path: main_app.exchanges_scheduled_events_path,
                                                                             display_name: 'Calendar',
                                                                             active_tab: active_tab,
-                                                                            glyphicon_class:'glyphicon-calendar'
+                                                                            glyphicon_class:'glyphicon-calendar',
+                                                                            remote: false,
+                                                                            pundit_object: nil,
+                                                                            pundit_method: nil
                                                                           } %>
           <% end %>
           <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
@@ -218,7 +248,10 @@
                                                                           link_path: main_app.configuration_exchanges_hbx_profiles_path,
                                                                           display_name: 'Config',
                                                                           active_tab: active_tab,
-                                                                          glyphicon_class: 'glyphicon-cog'
+                                                                          glyphicon_class: 'glyphicon-cog',
+                                                                          remote: false,
+                                                                          pundit_object: nil,
+                                                                          pundit_method: nil
                                                                         }
                                                                         %>
         <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
@@ -226,7 +259,10 @@
                                                                         link_path: main_app.staff_index_exchanges_hbx_profiles_path,
                                                                         display_name: 'Staff',
                                                                         active_tab: active_tab,
-                                                                        glyphicon_class: 'glyphicon-sunglasses'
+                                                                        glyphicon_class: 'glyphicon-sunglasses',
+                                                                        remote: false,
+                                                                        pundit_object: nil,
+                                                                        pundit_method: nil
                                                                       }
                                                                       %>
 
@@ -235,7 +271,10 @@
                                                                         link_path: main_app.users_orphans_path,
                                                                         display_name: 'Orphan Accounts',
                                                                         active_tab: active_tab,
-                                                                        glyphicon_class: 'glyphicon-search'
+                                                                        glyphicon_class: 'glyphicon-search',
+                                                                        remote: false,
+                                                                        pundit_object: nil,
+                                                                        pundit_method: nil
                                                                       } %>
         </ul>
     </li>

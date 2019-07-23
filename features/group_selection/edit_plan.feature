@@ -47,7 +47,7 @@ Feature: Edit Plan Button
     Then the submit button should be enabled
     When consumer clicks the submit button
     Then the enrollment should be pending termination
-
+    
     Examples:
       | secondary_role |
       | consumer |

@@ -5,16 +5,16 @@ namespace :reports do
   task :verified_verification_report => :environment do
     field_names = %w( SUBSCRIBER_ID MEMBER_ID FIRST_NAME LAST_NAME CURRENT_STATUS VERIFICATION_TYPE VERIFIED_DATE VERIFICATION_REASON IVL_ENROLLMENT SHOP_ENROLLMENT)
 
-    CITIZEN_VALID_EVENTS = ["ssn_valid_citizenship_valid!", "ssn_valid_citizenship_valid","pass_dhs!", "pass_dhs"]
+    CITIZEN_VALID_EVENTS = %w(ssn_valid_citizenship_valid! ssn_valid_citizenship_valid pass_dhs!  pass_dhs)
 
-    SSN_VALID_EVENTS = ["ssn_valid_citizenship_valid!", "ssn_valid_citizenship_valid", "ssn_valid_citizenship_invalid", "ssn_valid_citizenship_invalid!",
-                                "ssn_valid!", "ssn_valid"]
-    RESIDENCY_VALID_EVENTS = ["pass_residency!", "pass_residency"]
+    SSN_VALID_EVENTS = %w(ssn_valid_citizenship_valid! ssn_valid_citizenship_valid  ssn_valid_citizenship_invalid! ssn_valid_citizenship_invalid
+                                ssn_valid! ssn_valid)
+    RESIDENCY_VALID_EVENTS = %w(pass_residency!  pass_residency)
 
-    IMMIGRATION_VALID_EVENTS = ["pass_dhs!", "pass_dhs"]
+    IMMIGRATION_VALID_EVENTS = %w(pass_dhs! pass_dhs)
 
-    ALL_EVENTS = ["ssn_valid_citizenship_valid!", "ssn_valid_citizenship_valid", "ssn_valid_citizenship_invalid", "ssn_valid_citizenship_invalid!",
-                  "pass_dhs!", "pass_dhs"]
+    ALL_EVENTS = %w(ssn_valid_citizenship_valid! ssn_valid_citizenship_valid ssn_valid_citizenship_invalid  ssn_valid_citizenship_invalid!
+                  pass_dhs! pass_dhs)
     def date
       begin
         ENV["date"].strip         
@@ -33,14 +33,14 @@ namespace :reports do
 
     def ivl_enrollment(person)
       if person.primary_family
-        if person.primary_family.active_household.hbx_enrollments.individual_market.present?
-          person.primary_family.active_household.hbx_enrollments.individual_market.select{|enrollment| enrollment.currently_active? }.any? ? "YES" : "NO"
+        if person.primary_family.hbx_enrollments.individual_market.present?
+          person.primary_family.hbx_enrollments.individual_market.select(&:currently_active?).any? ? "YES" : "NO"
         else
           "nil"
         end
       else
-        families = person.families.select{|family| family.active_household.hbx_enrollments.individual_market.present?}
-        enrollments = families.flat_map(&:active_household).flat_map(&:hbx_enrollments).select{|enrollment| !(["employer_sponsored", "employer_sponsored_cobra"].include? enrollment.kind)} if families
+        families = person.families.select{|family| family.hbx_enrollments.individual_market.present?}
+        enrollments = families.flat_map(&:hbx_enrollments).select{|enrollment| !enrollment.is_shop?} if families
         all_enrollments = enrollments.select{|enrollment| enrollment.hbx_enrollment_members.map(&:person).map(&:id).include?(person.id) }
         active_enrollments = enrollments.select{|enrollment| HbxEnrollment::ENROLLED_STATUSES.include?(enrollment.aasm_state)}
         return "nil" unless all_enrollments.any?
@@ -50,16 +50,16 @@ namespace :reports do
 
     def shop_enrollment(person)
       if person.primary_family
-        if person.primary_family.active_household.hbx_enrollments.shop_market.present?
-          person.primary_family.active_household.hbx_enrollments.shop_market.select{|enrollment| enrollment.currently_active? }.any? ? "YES" : "NO"
+        if person.primary_family.hbx_enrollments.shop_market.present?
+          person.primary_family.hbx_enrollments.shop_market.select(&:currently_active?).any? ? "YES" : "NO"
         else
           "nil"
         end
       else
-        families = person.families.select{|family| family.active_household.hbx_enrollments.shop_market.present?}
-        enrollments = families.flat_map(&:active_household).flat_map(&:hbx_enrollments).select{|enrollment| (["employer_sponsored", "employer_sponsored_cobra"].include? enrollment.kind)} if families
+        families = person.families.select{|family| family.hbx_enrollments.shop_market.present?}
+        enrollments = families.flat_map(&:hbx_enrollments).select{|enrollment| !enrollment.is_shop?} if families
         all_enrollments = enrollments.select{|enrollment| enrollment.hbx_enrollment_members.map(&:person).map(&:id).include?(person.id) }
-        active_enrollments = enrollments.select{|enrollment| enrollment.currently_active?}
+        active_enrollments = enrollments.select(&:currently_active?)
         return "nil" unless all_enrollments.any?
         active_enrollments.any? ? "YES" : "NO"
       end

@@ -43,7 +43,7 @@ class HbxEnrollment
   ENROLLMENT_KINDS    = %w(open_enrollment special_enrollment)
   COVERAGE_KINDS      = %w(health dental)
 
-  ENROLLED_STATUSES   = %w[coverage_selected transmitted_to_carrier enrolled_contingent coverage_enrolled coverage_termination_pending unverified coverage_reinstated].freeze
+  ENROLLED_STATUSES   = %w[coverage_selected transmitted_to_carrier coverage_enrolled coverage_termination_pending unverified coverage_reinstated].freeze
   SELECTED_AND_WAIVED = %w(coverage_selected inactive)
   TERMINATED_STATUSES = %w[coverage_terminated unverified coverage_expired].freeze
   CANCELED_STATUSES   = %w[coverage_canceled void].freeze # Void state enrollments are invalid enrollments. will be treated same as canceled.
@@ -870,17 +870,14 @@ class HbxEnrollment
   end
 
   def update_renewal_coverage
-    if is_shop?
-      if successor_benefit_package = sponsored_benefit_package.successor
-        successor_application = successor_benefit_package.benefit_application
-        passive_renewals_under(successor_application).each{|en| en.cancel_coverage! if en.may_cancel_coverage? }
-        if active_renewals_under(successor_application).blank?
-          if successor_application.coverage_renewable?
-            renew_benefit(successor_benefit_package)
-          end
-        end
-      end
-    end
+    return unless is_shop? && (successor_benefit_package = sponsored_benefit_package.successor)
+    successor_application = successor_benefit_package.benefit_application
+    passive_renewals_under(successor_application).each{|en| en.cancel_coverage! if en.may_cancel_coverage? }
+    renew_benefit(successor_benefit_package) if active_renewals_under(successor_application).blank? && successor_application.coverage_renewable? && non_inactive_transition?
+  end
+
+  def non_inactive_transition?
+    !(aasm.from_state == :inactive && aasm.to_state == :inactive)
   end
 
   def renewal_enrollments(successor_application)
@@ -1229,7 +1226,7 @@ class HbxEnrollment
 
   def is_an_existing_plan?(new_plan)
     if is_shop?
-      self.family.currently_enrolled_plans_ids(self).include?(new_plan.id)
+      family.currently_enrolled_product_ids(self).include?(new_plan.id)
     else
       family.currently_enrolled_products(self).select{ |plan| plan.is_same_plan_by_hios_id_and_active_year?(new_plan) }.present?
     end

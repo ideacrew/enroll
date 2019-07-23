@@ -3,6 +3,9 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 describe EmployeeRole do
+  let(:person) {Person.new}
+  subject {EmployeeRole.new(:person => person)}
+
   before :each do
     subject.valid?
   end
@@ -26,7 +29,12 @@ describe EmployeeRole, "given a person" do
       :dob => dob,
       :gender => gender
   )}
+
   subject {EmployeeRole.new(:person => person)}
+
+  before do
+    subject.valid?
+  end
 
   it "should have access to dob" do
     expect(subject.dob).to eq dob
@@ -39,6 +47,7 @@ describe EmployeeRole, "given a person" do
   it "should have access to ssn" do
     expect(subject.ssn).to eq ssn
   end
+
   it "should have access to hbx_id" do
     expect(subject.hbx_id).to eq hbx_id
   end

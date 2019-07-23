@@ -12,6 +12,8 @@ module Effective
         bulk_actions_column(partial: 'datatables/employers/bulk_actions_column') do
           bulk_action 'Generate Invoice', generate_invoice_exchanges_hbx_profiles_path, data: { confirm: 'Generate Invoices?', no_turbolink: true }
           bulk_action 'Mark Binder Paid', binder_paid_exchanges_hbx_profiles_path, data: {  confirm: 'Mark Binder Paid?', no_turbolink: true }
+          bulk_action 'Disable SSN Requirement', disable_ssn_requirement_exchanges_hbx_profiles_path(:can_update => 'disable'), data: { confirm: 'disable ssn requirement?', no_turbolink: true }
+          bulk_action 'Enable SSN Requirement', disable_ssn_requirement_exchanges_hbx_profiles_path(:can_update => 'enable'), data: { confirm: 'enable ssn requirement?', no_turbolink: true }
         end
 
         table_column :legal_name, :proc => Proc.new { |row|
@@ -72,6 +74,7 @@ module Effective
               ['Transmit XML', "#", "disabled"],
               ['Generate Invoice', generate_invoice_exchanges_hbx_profiles_path(ids: [row.id]), generate_invoice_link_type(@employer_profile)],
               ['Create Plan Year', main_app.new_benefit_application_exchanges_hbx_profiles_path(benefit_sponsorship_id: row.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), pundit_allow(HbxProfile, :can_create_benefit_application?) ? 'ajax' : 'hide'],
+              [text_to_display(row), disable_ssn_requirement_exchanges_hbx_profiles_path(ids: [row], no_ssn_field: row.is_no_ssn_enabled), 'post_ajax'],
               ['Change FEIN', edit_fein_exchanges_hbx_profiles_path(id: row.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), pundit_allow(HbxProfile, :can_change_fein?) ? "ajax" : "hide"],
               ['Force Publish', edit_force_publish_exchanges_hbx_profiles_path(id: @employer_profile.latest_benefit_sponsorship.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), force_publish_link_type(row, pundit_allow(HbxProfile, :can_force_publish?))]
           ]
@@ -103,6 +106,10 @@ module Effective
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "employer_actions_#{@employer_profile.id}"}, formats: :html
         }, :filter => false, :sortable => false
 
+      end
+
+      def text_to_display(sponsorship)
+        sponsorship.is_no_ssn_enabled ? "Enable SSN/TIN" : "Disable SSN/TIN"
       end
 
       def generate_invoice_link_type(row)

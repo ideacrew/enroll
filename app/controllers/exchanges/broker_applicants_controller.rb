@@ -1,5 +1,6 @@
 class Exchanges::BrokerApplicantsController < ApplicationController
   include Exchanges::BrokerApplicantsHelper
+  layout 'single_column'
 
   before_action :check_hbx_staff_role
   before_action :find_broker_applicant, only: [:edit, :update]
@@ -22,13 +23,14 @@ class Exchanges::BrokerApplicantsController < ApplicationController
     end
 
     respond_to do |format|
+      format.html { render "shared/brokers/applicants.html.slim" }
       format.js
     end
   end
 
   def edit
     respond_to do |format|
-      format.js
+      format.html { render "shared/brokers/applicant.html.erb" }
     end
   end
 
@@ -68,7 +70,7 @@ class Exchanges::BrokerApplicantsController < ApplicationController
         staff_role = broker_role.person.broker_agency_staff_roles[0]
         staff_role.broker_agency_accept! if staff_role
       end
-      
+
       if broker_role.agency_pending?
         send_secure_message_to_broker_agency(broker_role) if broker_role.broker_agency_profile
       end

@@ -1,5 +1,5 @@
 class Exchanges::ScheduledEventsController < ApplicationController
-  layout "two_column"
+  layout "single_column"
 
   def new
     @scheduled_event = ScheduledEvent.new
@@ -58,6 +58,9 @@ class Exchanges::ScheduledEventsController < ApplicationController
 
   def index
     @calendar_events = load_calendar_events
+    respond_to do |format|
+      format.html { render "exchanges/scheduled_events/index.html.erb" }
+    end
   end
 
   def destroy

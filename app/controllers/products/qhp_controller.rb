@@ -51,7 +51,8 @@ class Products::QhpController < ApplicationController
     @qhp = find_qhp_cost_share_variances.first
     @source = params[:source]
     @qhp.hios_plan_and_variant_id = @qhp.hios_plan_and_variant_id[0..13] if @coverage_kind == "dental"
-    if params[:market_kind] == 'shop'
+
+    if @hbx_enrollment.is_shop?
       sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(@hbx_enrollment)
       @member_group = sponsored_cost_calculator.groups_for_products([@qhp.product]).first
     else

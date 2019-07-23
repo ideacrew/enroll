@@ -18,6 +18,7 @@ module Factories
         :gender => employee_candidate.gender,
         :census_employee_id => census_employee.id,
         :hired_on => hired_on,
+        :no_ssn => employee_candidate.no_ssn,
         :eligible_for_coverage_on => census_employee.coverage_effective_on
       })
     end

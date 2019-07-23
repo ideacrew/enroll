@@ -1,6 +1,6 @@
 <div class="container">
   <%if @matches != true %>
-    <h4 class="title">User Account Updated Successfully</h4>
+    <h4 class="title text-center">User Account Updated Successfully</h4>
     <table class="table table-border">
       <thead></thead>
       <tbody>
@@ -24,7 +24,7 @@
     </table>
     </div>
   <%else%>
-    <h3>User Account Update Failed</h3>
+    <h3 class="title text-center">User Account Update Failed</h3>
     <% if @username_taken.present? %>
       <h4>The username matches with the following user:</h4>
       First Name :<b><%= @username_taken.person.first_name %></b> <br />

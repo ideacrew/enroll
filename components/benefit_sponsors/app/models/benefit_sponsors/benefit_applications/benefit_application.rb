@@ -411,7 +411,7 @@ module BenefitSponsors
     end
 
     def open_enrollment_length
-      (open_enrollment_period.end - open_enrollment_period.begin).to_i
+      ((open_enrollment_period.end.to_date - open_enrollment_period.begin.to_date) + 1).to_i
     end
 
     # This is being used by Open enrollment extension feature
