@@ -232,9 +232,9 @@ module BenefitSponsors
               notify(
                 "acapi.info.events.benefit_package.renew_employee_assignment",
                 {
-                  :workflow_id => async_workflow_id,
-                  :benefit_package_id => self.id,
-                  :census_employee_id => census_employee.id,
+                  :workflow_id => async_workflow_id.to_s,
+                  :benefit_package_id => self.id.to_s,
+                  :census_employee_id => census_employee.id.to_s,
                   :effective_on_date => start_on.strftime("%Y-%m-%d")
                 }
               )
@@ -259,8 +259,8 @@ module BenefitSponsors
             notify(
               "acapi.info.events.benefit_package.renew_employee",
               {
-                :census_employee_id => member.id,
-                :benefit_package_id => self.id
+                :census_employee_id => member.id.to_s,
+                :benefit_package_id => self.id.to_s
               }
             )
           end
