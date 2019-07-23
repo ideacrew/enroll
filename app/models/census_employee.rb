@@ -198,6 +198,16 @@ class CensusEmployee < CensusMember
     })
   }
 
+
+  index(
+    {
+      "benefit_group_assignments.benefit_package_id" => 1,
+      "benefit_group_assignments.start_on" => 1,
+      "benefit_group_assignments.end_on" => 1,
+      "employment_terminated_on" => 1
+    },
+   {name: "benefit_group_assignments_predecessor_renewal_index"})
+
   scope :eligible_for_renewal_under_package, ->(benefit_package, package_start, package_end, new_effective_date) {
     where(:"benefit_group_assignments" => {
         :$elemMatch => {

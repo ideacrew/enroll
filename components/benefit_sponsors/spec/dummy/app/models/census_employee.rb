@@ -69,11 +69,16 @@ class CensusEmployee < CensusMember
   scope :eligible_without_term_pending, ->{ any_in(aasm_state: (ELIGIBLE_STATES - PENDING_STATES)) }
   scope :active_alone,      ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_ONLY) }
 
-  scope :eligible_for_renewal_under_package, ->(benefit_package, package_start, new_effective_date) {
+  scope :eligible_for_renewal_under_package, ->(benefit_package, package_start, package_end, new_effective_date) {
     where(:"benefit_group_assignments" => {
         :$elemMatch => {
           :benefit_package_id => benefit_package.id,
-          :start_on => { "$gte" => package_start }
+          :start_on => { "$gte" => package_start },
+          "$or" => [
+            {"end_on" => nil},
+            {"end_on" => {"$exists" => false}},
+            {"end_on" => package_end}
+          ]
         },
       },
       "$or" => [
