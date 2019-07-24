@@ -57,8 +57,8 @@ module BenefitSponsors
           if save_result
             if form.admin_datatable_action
               terminatation_pending_active_applications(persisted_object)
-            else
-              benefit_sponsorship.revert_to_applicant! if benefit_sponsorship.may_revert_to_applicant? && !benefit_sponsorship.applicant?
+            elsif benefit_sponsorship.may_revert_to_applicant? && !benefit_sponsorship.applicant?
+              benefit_sponsorship.revert_to_applicant!
             end
             cancel_unwanted_applications(persisted_object, form.admin_datatable_action)
           end
