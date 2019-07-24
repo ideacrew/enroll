@@ -28,6 +28,11 @@ class CensusMember
     end
   end
 
+  def unset_sparse(field)
+    normalized = database_field_name(field)
+    attributes.delete(normalized)
+  end
+
   def ssn
     ssn_val = read_attribute(:encrypted_ssn)
     if !ssn_val.blank?
