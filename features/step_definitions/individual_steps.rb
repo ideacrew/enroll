@@ -354,6 +354,7 @@ Then(/^Individual fills in the form$/) do
   fill_in 'dependent[last_name]', :with => (@u.last_name :last_name)
   fill_in 'jq_datepicker_ignore_dependent[dob]', :with => (@u.adult_dob :dob)
   click_link(@u.adult_dob.to_date.day)
+  click_outside_datepicker('Household Info: Family Members')
   fill_in 'dependent[ssn]', :with => (@u.ssn :ssn)
   find('.label', :text => 'This Person Is', :wait => 10).click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Sibling')]").click
