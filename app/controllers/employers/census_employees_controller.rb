@@ -185,9 +185,7 @@ class Employers::CensusEmployeesController < ApplicationController
   def show
     @family = @census_employee.employee_role.person.primary_family if @census_employee.employee_role.present?
     @status = params[:status] || ''
-    if @census_employee.no_ssn_allowed && !@employer_profile.is_no_ssn_enabled && @census_employee.encrypted_ssn.nil?
-      flash[:notice] = "This employee does not have an SSN because he/she was created at a time when an SSN was not required."
-    end
+    flash[:notice] = "This employee does not have an SSN because he/she was created at a time when an SSN was not required." if @census_employee.no_ssn_allowed && !@benefit_sponsorship.is_no_ssn_enabled && @census_employee.encrypted_ssn.nil?
   end
 
   def delink
