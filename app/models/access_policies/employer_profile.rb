@@ -49,7 +49,6 @@ module AccessPolicies
     end
 
     def is_general_agency_staff_for_employer?(employer_id)
-      binding.pry
       return false if user.person.general_agency_staff_roles.blank?
       ga_id = user.person.general_agency_staff_roles.last.general_agency_profile.id
       return false if ga_id.nil? || employer_id.nil?
