@@ -161,7 +161,7 @@ module Notifier
     end
 
     def builder_param
-      params['builder'] || 'Notifier::MergeDataModels::EmployerProfile'
+      params['builder'].present? ? params['builder'] : 'Notifier::MergeDataModels::EmployerProfile'
     end
   end
 end
