@@ -42,7 +42,11 @@ CKEDITOR.editorConfig = function( config )
   update_tokens(config);
 
   config.removeButtons = "Form,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,HiddenField,About,Print,Save,NewPage,Preview,Save,Language,Flash,Smiley,Image,Iframe";
-  config.extraPlugins = 'button,lineutils,widgetselection,notification,toolbar,widget,dialogui,dialog,clipboard,token,placeholder,placeholder_select';
+  config.extraPlugins = 'fontawesome,button,lineutils,widgetselection,notification,toolbar,widget,dialogui,dialog,clipboard,token,placeholder,placeholder_select';
+  CKEDITOR.dtd.$removeEmpty.span = 0;
+  CKEDITOR.dtd.$removeEmpty.i = 0;
+  config.allowedContent = true;
+
   
   config.language = 'en';
 
