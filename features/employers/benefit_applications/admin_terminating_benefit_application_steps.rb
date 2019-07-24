@@ -28,9 +28,9 @@ When(/^the user enters (mid_month|any_day) and other details for (voluntary|non-
 end
 
 When(/^user clicks submit button$/) do
-  find('.plan-year-submit', text: 'Submit', wait: 5).click
+  find('.plan-year-submit', text: 'SUBMIT', wait: 5).click
 end
 
-Then(/^user should see successful message$/) do
+Then(/^user should see termination successful message$/) do
   expect(page).to have_content('Application terminated successfully')
 end

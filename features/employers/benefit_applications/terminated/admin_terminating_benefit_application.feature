@@ -16,7 +16,7 @@ Feature: As an admin user I should have the ability to terminate a given Employe
   Scenario Outline: As an HBX Staff with Super Admin subroles I should be able to terminate an benefit application
     When the user enters <termination_date> and other details for <termination_type> termination
     When user clicks submit button
-    Then user should see successful message
+    Then user should see termination successful message
     And user logs out
 
     Examples:
