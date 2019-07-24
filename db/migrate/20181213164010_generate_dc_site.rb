@@ -26,7 +26,7 @@ class GenerateDcSite < Mongoid::Migration
         renweal_app_config = BenefitMarkets::Configurations::AcaShopRenewalApplicationConfiguration.new
         configuration = BenefitMarkets::Configurations::AcaShopConfiguration.new initial_application_configuration: inital_app_config,
                                                                                  renewal_application_configuration: renweal_app_config,
-                                                                                 binder_due_dom: 15
+                                                                                 binder_due_dom: 12
         @benefit_market = BenefitMarkets::BenefitMarket.new kind: :aca_shop,
                                                             site_urn: 'dc',
                                                             title: 'ACA SHOP',

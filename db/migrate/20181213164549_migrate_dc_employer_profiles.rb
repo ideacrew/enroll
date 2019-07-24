@@ -54,13 +54,15 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
       Organization.collection.aggregate([
         {"$match" => {"employer_profile" => { "$exists" => true }}},
         {"$project" => {"hbx_id"=> 1, "employer_profile.profile_source"=> 1,
-                        "employer_profile.broker_agency_accounts" => 1,
+                        "employer_profile.no_ssn" => 1, "employer_profile.enable_ssn_date" => 1,
+                        "employer_profile.disable_ssn_date" => 1, "employer_profile.broker_agency_accounts" => 1,
                         "employer_profile.registered_on"=> 1,"employer_profile.plan_years" => 1}},
 
         {"$unwind" => {"path": "$employer_profile.plan_years", "preserveNullAndEmptyArrays": true}},
 
         {"$project" => {
             "hbx_id" => 1, 'employer_profile.profile_source'=> 1, "employer_profile.registered_on" => 1,
+            "employer_profile.no_ssn" => 1, "employer_profile.enable_ssn_date" => 1, "employer_profile.disable_ssn_date" => 1,
             "employer_profile.broker_agency_accounts" => { "$ifNull" => [ "$employer_profile.broker_agency_accounts", []]},
             "benefit_application" => {"fte_count" => "$employer_profile.plan_years.fte_count",
                                       "_id" => "$employer_profile.plan_years._id",
@@ -69,12 +71,16 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
                                       "created_at"=> "$employer_profile.plan_years.created_at",
                                       "updated_at"=>"$employer_profile.plan_years.updated_at",
                                       "terminated_on"=>"$employer_profile.plan_years.terminated_on",
+                                      "termination_kind"=>"$employer_profile.plan_years.termination_kind",
                                       "aasm_state" => '$employer_profile.plan_years.aasm_state',
                                       "effective_period" => { "min": "$employer_profile.plan_years.start_on","max": "$employer_profile.plan_years.end_on" },
                                       "open_enrollment_period" => { "min": "$employer_profile.plan_years.open_enrollment_start_on","max": "$employer_profile.plan_years.open_enrollment_end_on" }}}},
         {"$group"=>{"_id" =>  "$_id","hbx_id" => {"$last" => "$hbx_id"},
                     "source_kind" => {"$last"=> "$employer_profile.profile_source"},
                     "registered_on" => {"$last" => "$employer_profile.registered_on"},
+                    "is_no_ssn_enabled" => {"$last" => "$employer_profile.no_ssn"},
+                    "ssn_enabled_on" => {"$last" => "$employer_profile.enable_ssn_date"},
+                    "ssn_disabled_on" => {"$last" => "$employer_profile.disable_ssn_date"},
                     "broker_agency_accounts" => {"$last" => "$employer_profile.broker_agency_accounts"},
                     "benefit_applications" => {"$push" => {"$cond" => { if: { "$ne": [ "$benefit_application.effective_period", {}]},
                                                                         then: "$benefit_application", else: [],}}}}},
@@ -90,7 +96,7 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
           if existing_new_organizations.count == 0
             @old_profile = old_org.employer_profile
 
-            json_data = @old_profile.to_json(:except => [:_id, :sic_code, :xml_transmitted_timestamp, :entity_kind, :profile_source, :aasm_state, :registered_on, :contact_method, :employer_attestation, :broker_agency_accounts, :general_agency_accounts, :employer_profile_account, :plan_years, :updated_by_id, :workflow_state_transitions, :inbox, :documents])
+            json_data = @old_profile.to_json(:except => [:_id, :no_ssn, :enable_ssn_date, :disable_ssn_date, :sic_code, :xml_transmitted_timestamp, :entity_kind, :profile_source, :aasm_state, :registered_on, :contact_method, :employer_attestation, :broker_agency_accounts, :general_agency_accounts, :employer_profile_account, :plan_years, :updated_by_id, :workflow_state_transitions, :inbox, :documents])
             old_profile_params = JSON.parse(json_data)
 
             @new_profile = initialize_new_profile(old_org, old_profile_params)
@@ -105,6 +111,7 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
             @benefit_sponsorship.unset(:hbx_id)
             @benefit_sponsorship.send(:generate_hbx_id)
 
+            migrate_employer_profile_account
             set_benefit_sponsorship_state
             set_benefit_sponsorship_effective_on
             construct_workflow_state_for_benefit_sponsorship
@@ -149,6 +156,10 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
 
     say_with_time("Time taken to update all census employee record to default value.") do
       mark_all_census_as_enroll
+    end
+
+    say_with_time("Time taken create bill file") do
+      create_bill_file
     end
 
     logger.info " Total #{total_organizations} old organizations for type: employer profile" unless Rails.env.test?
@@ -243,6 +254,25 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
 
   def self.set_benefit_sponsorship_state
     @benefit_sponsorship.aasm_state = @benefit_sponsorship.send(:employer_profile_to_benefit_sponsor_states_map)[@old_profile.aasm_state.to_sym]
+  end
+
+  def self.migrate_employer_profile_account
+    return unless @old_profile.employer_profile_account.present?
+    benefit_account = @benefit_sponsorship.build_benefit_sponsorship_account(@old_profile.employer_profile_account.attributes.except("_id","updated_by_id","current_statement_activity","workflow_state_transitions","premium_payments"))
+
+    @old_profile.employer_profile_account.current_statement_activity.each do |activity|
+      benefit_account.current_statement_activities.new(activity.attributes.except("_id"))
+    end
+
+    @old_profile.employer_profile_account.premium_payments.each do |payment|
+      benefit_account.financial_transactions.new(payment.attributes.except("_id"))
+    end
+  end
+
+  def self.create_bill_file
+    BillFile.all.each do |bill_file|
+      BenefitSponsors::BenefitSponsorships::BillFile.create(bill_file.attributes.except("_id"))
+    end
   end
 
   def self.set_benefit_sponsorship_effective_on

@@ -28,6 +28,7 @@ class MigrateDcBrokerQuotingTool < Mongoid::Migration
       Organization.all.each do |org|
         next if org.carrier_profile.present? || org.hbx_profile.present?
         new_org = find_org(org)
+        next puts "Organization not found #{org.hbx_id}" unless new_org.present?
         @plan_design_hash[:employer].merge!({org.employer_profile.id => new_org.employer_profile.id}) if org.employer_profile.present?
         @plan_design_hash[:broker_agency].merge!({org.broker_agency_profile.id => new_org.broker_agency_profile.id}) if org.broker_agency_profile.present?
         @plan_design_hash[:general_agency].merge!({org.general_agency_profile.id => new_org.general_agency_profile.id}) if  org.general_agency_profile.present?
@@ -76,9 +77,8 @@ class MigrateDcBrokerQuotingTool < Mongoid::Migration
             puts "mapping not found for account #{account.id}, old general agency: #{account.general_agency_profile_id}" if new_general_agency.blank?
             puts "mapping not found for account #{account.id}, old broker agency: #{account.broker_agency_profile_id}," if new_broker_agency.blank?
 
-            account.benefit_sponsrship_general_agency_profile_id = new_general_agency
-            account.benefit_sponsrship_broker_agency_profile_id = new_broker_agency
-            account.save!
+            account.update_attributes!(benefit_sponsrship_general_agency_profile_id:new_general_agency,
+                                       benefit_sponsrship_broker_agency_profile_id: new_broker_agency)
           end
 
           unless pdo.valid?

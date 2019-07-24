@@ -51,6 +51,9 @@ module SponsoredBenefits
       index({"sponsor_profile_id" => 1})
       index({"has_active_broker_relationship" => 1})
       index({"plan_design_proposals._id" => 1})
+      index({"general_agency_accounts._id" => 1})
+      index({"general_agency_accounts.general_agency_profile_id" => 1})
+      index({"general_agency_accounts.broker_agency_profile_id" => 1})
       index({"plan_design_proposals.aasm_state" => 1, "plan_design_proposals.claim_code" => 1})
 
 

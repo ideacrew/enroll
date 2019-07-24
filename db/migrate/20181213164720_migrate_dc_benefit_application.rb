@@ -101,6 +101,7 @@ class MigrateDcBenefitApplication < Mongoid::Migration
       old_organizations.batch_size(limit).no_timeout.each do |old_org|
 
         new_organization = new_org(old_org)
+        next puts "Organization not found #{old_org.hbx_id}" unless new_organization.present?
         @benefit_sponsorship = new_organization.active_benefit_sponsorship
 
         old_org.employer_profile.plan_years.asc(:start_on).each do |plan_year|
@@ -126,7 +127,7 @@ class MigrateDcBenefitApplication < Mongoid::Migration
             print 'F' unless Rails.env.test?
             @logger.error "Migration Failed for Organization HBX_ID: #{old_org.hbx_id},
             validation_errors:
-            benefit_application - #{@benefit_application.try(:errors).try(:messages)},
+            benefit_application - #{@benefit_application.errors.messages if @benefit_application},
             #{e.inspect}" unless Rails.env.test?
           end
         end
