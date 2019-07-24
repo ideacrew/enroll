@@ -2,9 +2,6 @@
 br
 br
 .container
-  = render "general_agencies/profiles/index"
-
-javascript:
-  (function() {
-    enableGeneralAgenciesFilters();
-  })();
+  #main
+    = render "general_agencies/profiles/index"
+  #filter
