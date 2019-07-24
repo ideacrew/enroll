@@ -110,18 +110,38 @@ module BenefitSponsors
 
         def bulk_employee_upload
           authorize @employer_profile, :show?
-          file = params.require(:file)
-          @roster_upload_form = BenefitSponsors::Forms::RosterUploadForm.call(file, @employer_profile)
-          begin
-            if @roster_upload_form.save
-              redirect_to @roster_upload_form.redirection_url
-            else
+          if roster_upload_file_type.include?(file_content_type)
+            file = params.require(:file)
+            @roster_upload_form = BenefitSponsors::Forms::RosterUploadForm.call(file, @employer_profile)
+            begin
+              if @roster_upload_form.save
+                redirect_to @roster_upload_form.redirection_url
+              else
+                render @roster_upload_form.redirection_url || default_url
+              end
+            rescue StandardError => e
+              @roster_upload_form.errors.add(:base, e.message)
               render @roster_upload_form.redirection_url || default_url
             end
-          rescue Exception => e
-            @roster_upload_form.errors.add(:base, e.message)
-            render (@roster_upload_form.redirection_url || default_url)
+          else
+            @roster_upload_form = BenefitSponsors::Forms::RosterUploadForm.new
+            @roster_upload_form.errors.add(:base, "Can't detect file type #{params[:file].original_filename}, please upload Excel/CSV format files only.")
+            render default_url
           end
+        end
+
+        def file_content_type
+          params[:file].content_type
+        end
+
+        def roster_upload_file_type
+          [
+            'text/csv',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'application/vnd.ms-excel',
+            'application/xls',
+            'application/xlsx'
+          ].freeze
         end
 
         def inbox

@@ -29,6 +29,10 @@ module BenefitSponsors
       validates_presence_of :employee_relationship, :email
       validate :date_format
 
+      def dob=(val)
+        super(val.strftime("%m/%d/%Y")) if val
+      end
+
       def date_format
         errors.add(:base, "DOB: #{dob}") if dob &.include?('Invalid Format')
         errors.add(:base, "Hired On: #{hired_on}") if hired_on &.include?('Invalid Format')
