@@ -181,7 +181,7 @@ module BenefitSponsors
       #for existing active states in as per active_states_per_dt_action
       [:draft, :active, :pending, :enrollment_open, :binder_paid, :enrollment_closed, :enrollment_ineligible, :termination_pending].each do |active_state|
         context 'with dt active state' do
-          let!(:ba) { FactoryBot.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, aasm_state: :draft) }
+          let!(:ba) { FactoryBot.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, aasm_state: active_state) }
 
           it 'should return true as dt active state exists for one of the bas' do
             set_bs_for_service(@form)
