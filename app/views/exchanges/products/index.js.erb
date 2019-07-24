@@ -8,6 +8,27 @@ var table = $('#products-ajax-dt').DataTable( {
   "type": "get",
   "ordering": false,
   "deferRender": true,
+  // Build filters for table
+  initComplete: function () {
+            this.api().columns([2,3,4]).every( function () {
+                var column = this;
+                var select = $('<select class="col-md-2" style="margin-left:5px"><option value=""></option></select>')
+                    .appendTo( '#subFilters' )
+                    .on( 'change', function () {
+                        var val = $.fn.dataTable.util.escapeRegex(
+                            $(this).val()
+                        );
+
+                        column
+                            .search( val ? '^'+val+'$' : '', true, false )
+                            .draw();
+                    } );
+
+                column.data().unique().sort().each( function ( d, j ) {
+                    select.append( '<option value="'+d+'">'+d+'</option>' )
+                } );
+            } );
+        },
   // Call back event when table renders
   "drawCallback": function() {
     resetMainCheckbox()
@@ -37,7 +58,7 @@ var table = $('#products-ajax-dt').DataTable( {
     }
   ]
 });
-
+/*
 $("div.toolbar").html(
   `<div class="btn-group main-group" role="group" aria-label="...">
     <button type="button" class="btn btn-default" onclick="filterProductDataTable(this.innerText)">All</button>
@@ -59,7 +80,7 @@ $("div.toolbar").html(
     <button type="button" class="btn btn-default" onclick="bulkUpload(this.innerText)">Bulk Upload</button>
    </div> <br />
   </div>`
-);
+);*/
 
 function resetMainCheckbox() {
   var element = $('.all-product-chkbx');
