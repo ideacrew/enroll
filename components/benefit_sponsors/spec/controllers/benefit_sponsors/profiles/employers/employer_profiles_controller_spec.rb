@@ -182,17 +182,11 @@ module BenefitSponsors
         let(:renewal_benefit_package) { employer_profile.renewal_benefit_application.benefit_packages.first }
         let(:renewal_sponsored_benefit) {  employer_profile.renewal_benefit_application.benefit_packages.first.sponsored_benefits.first}
 
+        let!(:person) {FactoryBot.create(:person)}
+        let(:census_employee) { create(:census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile) }
+        let!(:employee_role) { FactoryBot.create(:employee_role, person: person, census_employee: census_employee, employer_profile: benefit_sponsorship.profile) }
+        let!(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
 
-        let(:person) {FactoryBot.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789')}
-        let(:census_employee) { create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, benefit_sponsors_employer_profile_id: benefit_sponsorship.profile.id, benefit_group: active_benefit_package) }
-        let!(:family) {
-          person = FactoryBot.create(:person, last_name: census_employee.last_name, first_name: census_employee.first_name)
-          employee_role = FactoryBot.create(:employee_role, person: person, census_employee: census_employee, benefit_sponsors_employer_profile_id: employer_profile.id)
-          census_employee.update_attributes({employee_role: employee_role})
-          Family.find_or_build_from_employee_role(employee_role)
-        }
-
-        let!(:employee_role){census_employee.employee_role}
         let!(:active_enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
                                                      household: family.latest_household,
                                                      coverage_kind: "health",
@@ -204,8 +198,7 @@ module BenefitSponsors
                                                      benefit_sponsorship_id: benefit_sponsorship.id,
                                                      sponsored_benefit_package_id: active_benefit_package.id,
                                                      sponsored_benefit_id: active_sponsored_benefit.id,
-                                                     employee_role_id: employee_role.id,
-                                                     benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id) }
+                                                     employee_role_id: employee_role.id) }
         let!(:renewal_enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
                                                       household: family.latest_household,
                                                       coverage_kind: "health",
@@ -219,9 +212,10 @@ module BenefitSponsors
                                                       employee_role_id: employee_role.id,
                                                       sponsored_benefit_id: renewal_sponsored_benefit.id) }
         before do
+          census_employee.update_attributes({employee_role_id: employee_role.id})
           allow(controller).to receive(:authorize).and_return(true)
           sign_in(user)
-          post :terminate_employee_roster_enrollments, params: {employer_profile_id: employer_profile.id.to_s, termination_reason: "nonpayment ", termination_date: employer_profile.active_benefit_application.end_on, transmit_xml: true}, format: :js, xhr: true
+          post :terminate_employee_roster_enrollments, params: {employer_profile_id: employer_profile.id.to_s, termination_reason: "nonpayment ", termination_date: employer_profile.active_benefit_application.end_on.strftime("%m/%d/%Y"), transmit_xml: true}, format: :js, xhr: true
         end
 
 
