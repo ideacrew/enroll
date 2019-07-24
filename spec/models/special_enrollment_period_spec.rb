@@ -204,6 +204,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
 
      it "should return nil with SHOP SEP and next_poss_effective_date present" do
       # since module method invokes in class
+      allow_any_instance_of(Family).to receive(:has_primary_active_employee?).and_return(true)
       allow_any_instance_of(SpecialEnrollmentPeriod).to receive(:sep_optional_date).with(ivl_qle_sep.family, "min", "shop").and_return(min_date)
       allow_any_instance_of(SpecialEnrollmentPeriod).to receive(:sep_optional_date).with(ivl_qle_sep.family, "max", "shop").and_return(max_date)
       shop_qle_sep.update_attributes(next_poss_effective_date: TimeKeeper.date_of_record)
@@ -212,6 +213,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
 
      it "should not throw out of range error message" do
       # since module method invokes in class
+      allow_any_instance_of(Family).to receive(:has_primary_active_employee?).and_return(true)
       allow_any_instance_of(SpecialEnrollmentPeriod).to receive(:sep_optional_date).with(ivl_qle_sep.family, "min", "shop").and_return(min_date)
       allow_any_instance_of(SpecialEnrollmentPeriod).to receive(:sep_optional_date).with(ivl_qle_sep.family, "max", "shop").and_return(max_date)
       expect(shop_qle_sep_past_effective_on.valid?).to eq false

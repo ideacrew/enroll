@@ -1,5 +1,8 @@
 require 'rails_helper'
 
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
+
 RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
 
   let(:family)        { FactoryBot.create(:family, :with_primary_family_member) }
@@ -381,18 +384,25 @@ RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
     end
   end
   
-  context "for validating next_poss_effective_date_within_range" do
-    let!(:person100) { FactoryBot.create(:person, :with_employee_role) }
-    let!(:family100) { FactoryBot.create(:family, :with_primary_family_member, person: person100) }
-    let!(:shop_sep) { FactoryBot.create :special_enrollment_period, family: family100, qualifying_life_event_kind_id: shop_qle.id, next_poss_effective_date: (TimeKeeper.date_of_record - 1.year), market_kind: "shop"}
+  context "for validating next_poss_effective_date_within_range", :dbclean => :around_each do
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup initial benefit application"
+
+    let!(:census_employee) { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile, benefit_group: current_benefit_package ) }
+    let!(:employee_role) { FactoryBot.create(:employee_role, person: person, employer_profile: abc_profile) }
+    let(:person) {FactoryBot.create(:person)}
+    let(:family){ FactoryBot.create(:family, :with_primary_family_member, person: person) }
+    let(:household){ family.active_household }
+    let!(:shop_sep) { FactoryBot.create :special_enrollment_period, family: family, qualifying_life_event_kind_id: shop_qle.id, next_poss_effective_date: (TimeKeeper.date_of_record - 1.year), market_kind: "shop"}
 
     it "should return true" do
-      allow(person100).to receive(:has_active_employee_role?).and_return false
+      allow(person).to receive(:has_active_employee_role?).and_return false
       expect(shop_sep.valid?).to be_truthy
     end
 
     it "should not return true" do
-      allow(person100).to receive(:active_employee_roles).and_return person100.employee_roles
+      initial_application.update_attributes!(aasm_state: 'draft')
+      allow(person).to receive(:active_employee_roles).and_return person.employee_roles
       expect(shop_sep.send(:next_poss_effective_date_within_range)).to eq ["No active plan years present"]
     end
   end
