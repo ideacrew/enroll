@@ -357,12 +357,12 @@ module BenefitSponsors
       errors = {}
       result = true
       if termination_kind == 'voluntary'
-        if !allow_mid_month_voluntary_terms? && end_on != end_on.end_of_month
+        if !allow_mid_month_voluntary_terms? && end_on.to_date != end_on.end_of_month.to_date
           result = false
           errors[:mid_month_voluntary_term] = "Exchange doesn't allow mid month voluntary terminations"
         end
       elsif termination_kind == 'nonpayment'
-        if !allow_mid_month_non_payment_terms? && end_on != end_on.end_of_month
+        if !allow_mid_month_non_payment_terms? && end_on.to_date != end_on.end_of_month.to_date
           result = false
           errors[:mid_month_non_payment_term] = "Exchange doesn't allow mid month non payment terminations"
         end

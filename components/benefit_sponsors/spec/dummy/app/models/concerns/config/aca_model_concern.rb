@@ -22,6 +22,7 @@ module Config::AcaModelConcern
     delegate :aca_shop_market_transmit_scheduled_employers, to: :class
     delegate :aca_shop_market_employer_transmission_day_of_month, to: :class
     delegate :allow_mid_month_voluntary_terms?, to: :class
+    delegate :show_termination_reasons?, to: :class
     delegate :allow_mid_month_non_payment_terms?, to: :class
   end
 
@@ -68,6 +69,10 @@ module Config::AcaModelConcern
 
     def allow_mid_month_voluntary_terms?
       @allow_mid_month_voluntary_terms ||= Settings.aca.shop_market.mid_month_benefit_application_terminations.voluntary
+    end
+
+    def show_termination_reasons?
+      @show_termination_reasons ||= Settings.aca.shop_market.mid_month_benefit_application_terminations.show_termination_reasons
     end
 
     def allow_mid_month_non_payment_terms?

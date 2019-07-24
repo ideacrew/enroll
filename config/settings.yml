@@ -296,7 +296,8 @@ aca:
 
     mid_month_benefit_application_terminations:
       voluntary: false
-      non_payment: false
+      non_payment: true
+      show_termination_reasons: false
 
   transmit_employers_immediately: false
   employer_has_sic_field: false
