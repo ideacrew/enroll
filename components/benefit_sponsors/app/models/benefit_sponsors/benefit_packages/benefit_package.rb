@@ -202,7 +202,7 @@ module BenefitSponsors
       end
 
       def renew_employee_assignments
-        assigned_census_employees = predecessor.census_employees_assigned_on(predecessor.start_on)
+        assigned_census_employees = predecessor.eligible_assigned_census_employees(predecessor.start_on)
 
         assigned_census_employees.each do |census_employee|
           new_benefit_package_assignment = census_employee.benefit_package_assignment_on(start_on)
@@ -452,6 +452,10 @@ module BenefitSponsors
 
       def is_offering_dental?
         sponsored_benefit_for(:dental).present?
+      end
+
+      def eligible_assigned_census_employees(effective_date, is_active = true)
+        CensusEmployee.by_benefit_package_and_assignment_on_or_later(self, effective_date, is_active).non_term_and_pending
       end
 
       def census_employees_assigned_on(effective_date, is_active = true)
