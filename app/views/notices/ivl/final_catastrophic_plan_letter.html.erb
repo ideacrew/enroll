@@ -15,40 +15,37 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td>Dear <%= notice.primary_fullname %>:</td>
+      <td>Dear <%= notice.primary_firstname %>:</td>
     </tr>
   </tbody>
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "You are receiving this letter because you were enrolled in a catastrophic health plan through #{Settings.site.short_name} in #{previous_year}."} %>
+content: "You are receiving this letter because you were enrolled in a catastrophic health plan through #{Settings.site.short_name} in #{previous_year}. This plan meets the individual responsibility requirement to have health coverage."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "Federal law requires most Americans to have a minimum level of health coverage through 2018. This requirement is known as the individual mandate. Your enrollment in a catastrophic plan meets this requirement. We report your enrollment status each month to the Internal Revenue Service (IRS).  These reports allow the IRS to verify the months that you were enrolled in coverage through #{Settings.site.short_name}."} %>
+content: "Federal law required most Americans to have a minimum level of health coverage or pay a tax penalty through #{previous_year}. The #{Settings.aca.state_name} now has an individual responsibility requirement. This means that DC residents must have qualifying health coverage all year. If you don't have coverage, and don't qualify for an exemption, you'll have to pay a penalty when you file your DC taxes. For more information: <a href= #{Settings.site.ivl_responsibility_url}>https://dchealthlink.com/individual-responsibility-requirement</a>."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "You will not receive any tax forms from #{Settings.site.short_name} for your enrollment in a catastrophic health plan, because these plans do not qualify for an advance premium tax credit.  Only those enrolled in plans that qualify for an advance premium tax credit receive a tax form from #{Settings.site.short_name}."} %>
+content: "You will not receive any tax forms from #{Settings.site.short_name} for your enrollment in a catastrophic health plan because these plans do not qualify for an advance premium tax credit.  Only those enrolled in plans that qualify for an advance premium tax credit receive a tax form from #{Settings.site.short_name}."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "You may receive a tax form from your health insurance company.  Health insurance companies are encouraged (but not required) to provide a tax form for those enrolled in catastrophic coverage.  Contact your insurance company directly for more information on this tax form."} %>
-
-<%= render partial: 'notices/shared/paragraph', :locals => {
-content: "#{Settings.site.short_name} does not control the individual mandate and cannot provide tax advice. If you have questions about this letter or your catastrophic health plan, go to <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>, or call us at #{notice.hbe.phone}."} %>
-
-<%= render partial: 'notices/shared/paragraph', :locals => {
-content: "For more information on these topics, consult a tax adviser or visit the IRS website at <a href=#{Settings.site.irs_url}>IRS.gov</a>."} %>
-
-<br>
 
 <div style="page-break-inside: avoid;">
   <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "If you have questions or concerns, we’re here to help."} %>
 
+<br>
+
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
   content: "The #{Settings.site.short_name} Team <br></br> _____________________________________________________________________________________________________________"} %>
 </div>
 
+<br>
+
 <%= render partial: 'notices/shared/reference_paragraph', :locals => {
 contents: ["<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:",
-"Individual mandate: 26 U.S.C. §5000A",
+"DC individual mandate: DC Official Code §47-5102(a)",
+"Federal Individual mandate: 26 U.S.C. §5000A",
 "Catastrophic plan ineligibility for advance premium tax credit: 26 U.S.C. §36B(c)(3)(A)"]} %>
