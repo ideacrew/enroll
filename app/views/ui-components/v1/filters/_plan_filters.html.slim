@@ -1,6 +1,6 @@
 #filter-sidebar.col-lg-3.col-md-3.co-sm-3.col-xs-12.pl-0
   .checkbox-filter-wrapper-uc
-    
+
     h4 = find_my_doctor
     - if aca_state_abbreviation == "DC"
       - if @market_kind == "individual" && @coverage_kind == "health"
@@ -157,7 +157,7 @@
       li
         .filter-input-block
           - issuer_names =  (@market_kind == 'shop' ||  @market_kind == 'fehb') ? @carrier_names : @carriers
-          = select_tag :carrier, options_for_select(issuer_names), class: "plan-carrier-selection-filter", include_blank: "All", onchange:"filterPlanCarriers(this)"
+          = select_tag :carrier, options_for_select(issuer_names), class: "plan-carrier-selection-filter form-control", include_blank: "All", onchange:"filterPlanCarriers(this)"
   .checkbox-filter-wrapper-uc
     h5
       strong = l10n('hsa_eligible')
@@ -166,7 +166,7 @@
     ul.list-unstyled
       li
         .filter-input-block
-          = select_tag :hsa_eligibility, options_for_select(["Yes", "No"]), class: "plan-hsa-eligibility-selection-filter", include_blank: "All", onchange:"filterHSAEligibility(this)"
+          = select_tag :hsa_eligibility, options_for_select(["Yes", "No"]), class: "plan-hsa-eligibility-selection-filter form-control", include_blank: "All", onchange:"filterHSAEligibility(this)"
   .checkbox-filter-wrapper-uc
     h5
       strong = l10n("premium_amount")
@@ -211,9 +211,34 @@
       .form-inline.search-apply-wrapper.mt-1
         a.btn.btn-primary.mz href="javascript:void(0)" onclick="filterResults()"
           = l10n("apply")
-        a.btn.btn-default onclick="resetAllFilters()"
+        a.btn.btn-default#reset-btn onclick="resetAllFilters()"
           = l10n("reset")
     - else
       .form-inline.search-apply-wrapper
         a.btn.btn-primary.apply-btn.mz href="javascript:void(0);" = l10n("apply")
-        a.btn.btn-default.reset-btn href="javascript:void(0);" = l10n("reset")
+        a.btn.btn-default.reset-btn#reset-btn href="javascript:void(0);" = l10n("reset")
+
+
+// Needed to fix for shop if user hits back button in browser
+- if @market_kind == 'shop' || @market_kind == 'fehb'
+  javascript:
+    var promise1 = new Promise(function(resolve, reject) {
+      setTimeout(function() {
+        resolve('completed');
+        $('select.plan-carrier-selection-filter').selectric('destroy');
+        $('select.plan-hsa-eligibility-selection-filter').selectric('destroy');
+      }, 700);
+    });
+
+    var promise2 = new Promise(function(resolve, reject) {
+      setTimeout(function() {
+        resolve('promise 2 completed');
+        resetAllFilters();
+      }, 200);
+    });
+
+    (function() {
+      promise1.then(function(value) {
+        promise2;
+      });
+    })();
