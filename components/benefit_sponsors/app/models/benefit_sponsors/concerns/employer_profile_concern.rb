@@ -325,7 +325,7 @@ module BenefitSponsors
         transmit_xml = args["transmit_xml"]
 
         active_benefit_application.benefit_packages.each do |package|
-          if termination_date > today
+          if termination_date >= today
             package.termination_pending_member_benefits(term_date: termination_date, enroll_term_reason: termination_reason, enroll_notify: transmit_xml)
           else
             package.terminate_member_benefits(term_date: termination_date, enroll_term_reason: termination_reason, enroll_notify: transmit_xml)
