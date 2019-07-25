@@ -42,7 +42,7 @@ module PdfTemplates
     attribute :current_year, String
     attribute :same_plan_health_enrollment, Boolean
     attribute :same_plan_dental_enrollment, Boolean
-    attribute :is_an_aqhp_hbx_enrollment, Boolean
+    attribute :is_an_aqhp_cover_letter, Boolean
 
 
     def other_enrollments
