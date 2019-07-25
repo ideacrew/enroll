@@ -492,6 +492,7 @@ def employer_poc
 
     respond_to do |format|
       format.html { render "exchanges/hbx_profiles/general_agency_index.html.slim" }
+      format.js
     end
   end
 
