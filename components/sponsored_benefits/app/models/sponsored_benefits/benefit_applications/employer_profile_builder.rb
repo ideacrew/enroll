@@ -67,28 +67,30 @@ module SponsoredBenefits
       end
 
       def add_benefit_sponsors_benefit_application
-        if aca_state_abbreviation == "DC"
-          quote_benefit_application = @benefit_application.to_plan_year(@organization)
-          if @organization.employer_profile.active_plan_year.present? || @organization.employer_profile.is_converting?
-            quote_benefit_application.renew_plan_year if quote_benefit_application.may_renew_plan_year?
-          end
+        # if aca_state_abbreviation == "DC"
+        #   quote_benefit_application = @benefit_application.to_plan_year(@organization)
+        #   if @organization.employer_profile.active_plan_year.present? || @organization.employer_profile.is_converting?
+        #     quote_benefit_application.renew_plan_year if quote_benefit_application.may_renew_plan_year?
+        #   end
 
-          if quote_benefit_application.valid? && @organization.valid?
-            @organization.employer_profile.plan_years.each do |plan_year|
-              next unless plan_year.start_on == quote_benefit_application.start_on
-              if plan_year.is_renewing?
-                plan_year.cancel_renewal! if plan_year.may_cancel_renewal?
-              else
-                plan_year.cancel! if plan_year.may_cancel?
-              end
-            end
-          end
-          @organization.employer_profile.plan_years << quote_benefit_application
-          @organization.save!
-          @organization.employer_profile.census_employees.each do |census_employee|
-            census_employee.save
-          end
-        else
+        #   if quote_benefit_application.valid? && @organization.valid?
+        #     @organization.employer_profile.plan_years.each do |plan_year|
+        #       next unless plan_year.start_on == quote_benefit_application.start_on
+        #       if plan_year.is_renewing?
+        #         plan_year.cancel_renewal! if plan_year.may_cancel_renewal?
+        #       else
+        #         plan_year.cancel! if plan_year.may_cancel?
+        #       end
+        #     end
+        #   end
+        #   @organization.employer_profile.plan_years << quote_benefit_application
+        #   @organization.save!
+        #   @organization.employer_profile.census_employees.each do |census_employee|
+        #     census_employee.save
+        #   end
+        # else
+
+        # Migrated to new model in DC
           quote_benefit_application = @benefit_application.to_benefit_sponsors_benefit_application(@organization)
 
           if quote_benefit_application.valid? && quote_benefit_application.save!
@@ -98,7 +100,7 @@ module SponsoredBenefits
           @organization.active_benefit_sponsorship.census_employees.each do |census_employee|
             census_employee.save
           end
-        end
+        # end
       end
 
       # Output the employer_profile
