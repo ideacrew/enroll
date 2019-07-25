@@ -68,6 +68,7 @@ BenefitSponsors::Engine.routes.draw do
       resources :employer_profiles, only: [:show] do
         get :export_census_employees
         post :bulk_employee_upload
+        get :bulk_employee_upload
         get :coverage_reports
         collection do
           get :generate_sic_tree

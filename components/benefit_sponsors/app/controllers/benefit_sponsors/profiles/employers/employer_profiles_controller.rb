@@ -125,7 +125,7 @@ module BenefitSponsors
             end
           else
             @roster_upload_form = BenefitSponsors::Forms::RosterUploadForm.new
-            @roster_upload_form.errors.add(:base, "Can't detect file type #{params[:file].original_filename}, please upload Excel/CSV format files only.")
+            @roster_upload_form.errors.add(:base, "Can't detect file type #{params[:file] &.original_filename}, please upload Excel/CSV format files only.")
             respond_to do |format|
               format.html {  render default_url}
             end
@@ -133,7 +133,7 @@ module BenefitSponsors
         end
 
         def file_content_type
-          params[:file].content_type
+          params[:file].content_type if params[:file]
         end
 
         def roster_upload_file_type
