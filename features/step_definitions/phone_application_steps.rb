@@ -74,10 +74,11 @@ When(/^the Admin clicks CONTINUE after uploading and verifying an application$/)
   wait_for_ajax(10, 2)
   within('#Application') do
     find('.label', :text => "Action", wait: 10).click
+    find('li', :text => 'Verify', wait: 10).click
   end
-  find('.interaction-choice-control-verification-reason-1', wait: 10).click
+
   wait_for_ajax(10, 2)
-  find('.selectric-interaction-choice-control-verification-reason', wait: 10).click
+  find('.verification-update-reason').click
   find('li', :text => 'Document in EnrollApp', wait: 10).click
   find('.v-type-confirm-button', wait: 10).click
   expect(page).to have_content('Application successfully verified.')

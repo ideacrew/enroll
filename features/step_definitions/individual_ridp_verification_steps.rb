@@ -88,9 +88,9 @@ And(/^an uploaded application in VERIFIED status is present$/) do
   expect(page).to have_content('Application')
   within('#Application') do
     find('.label', :text => 'Action').click
+    find('li', :text => 'Verify').click
   end
-  find('.interaction-choice-control-verification-reason-1').click
-  find('.selectric-interaction-choice-control-verification-reason').click
+  find('.verification-update-reason').click
   find('li', :text => 'Document in EnrollApp').click
   find('.v-type-confirm-button').click
   expect(page).to have_content('Application successfully verified.')
@@ -105,9 +105,9 @@ And(/^an uploaded Identity verification in VERIFIED status is present$/) do
   expect(page).to have_content('Identity')
   within('#Identity') do
     find('.label', :text => 'Action').click
+    find('li', :text => 'Verify').click
   end
-  find('.interaction-choice-control-verification-reason-1').click
-  find('.selectric-interaction-choice-control-verification-reason').click
+  find('.verification-update-reason').click
   find('li', :text => 'Document in EnrollApp').click
   find('.v-type-confirm-button').click
   expect(page).to have_content('Identity successfully verified.')
@@ -172,9 +172,9 @@ When(/^an uploaded Identity verification in VERIFIED status is present on failed
   expect(page).to have_content('Identity')
   within('#Identity') do
     find('.label', :text => 'Action').click
+    find('li', :text => 'Verify').click
   end
-  find('.interaction-choice-control-verification-reason-1').click
-  find('.selectric-interaction-choice-control-verification-reason').click
+  find('.verification-update-reason').click
   find('li', :text => 'Document in EnrollApp').click
   find('.v-type-confirm-button').click
   expect(page).to have_content('Identity successfully verified.')
@@ -189,9 +189,9 @@ When(/^an uploaded application in VERIFIED status is present on failed experian 
   expect(page).to have_content('Application')
   within('#Application') do
     find('.label', :text => 'Action').click
+    find('li', :text => 'Verify').click
   end
-  find('.interaction-choice-control-verification-reason-1').click
-  find('.selectric-interaction-choice-control-verification-reason').click
+  find('.verification-update-reason').click
   find('li', :text => 'Document in EnrollApp').click
   find('.v-type-confirm-button').click
   expect(page).to have_content('Application successfully verified.')
