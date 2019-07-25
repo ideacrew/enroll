@@ -300,12 +300,10 @@ When(/(^.+) enters? office location for (.+)$/) do |role, location|
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][city]', :with => location[:city]
 
   # find(:xpath, "//div[contains(@class, 'selectric')][p[contains(text(), 'SELECT STATE')]]").click
-  find(:xpath, '//*[@id="addressDetails"]/div[4]/div[2]/div[1]/div[2]/span').click
-  find('li', :text => 'DC').click
+  select "DC", from: "inputState"
   # agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][state]
   # find(:xpath, "//div[contains(@class, 'selectric-scroll')]/ul/li[contains(text(), '#{location[:state]}')]").click
-  find(:xpath, '//*[@id="addressDetails"]/div[2]/div[2]/div[1]/div[2]/span').click
-  find('li', :text => 'Primary').click
+  select "Primary", from: "kindSelect"
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][zip]', :with => location[:zip]
   if role.include? 'Employer'
     wait_for_ajax
