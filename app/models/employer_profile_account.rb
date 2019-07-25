@@ -26,7 +26,7 @@ class EmployerProfileAccount
 
   accepts_nested_attributes_for :premium_payments
 
-  #validates_presence_of :next_premium_due_on, :next_premium_amount
+  validates_presence_of :next_premium_due_on, :next_premium_amount
 
   scope :active,      ->{ not_in(aasm_state: %w(canceled terminated)) }
 
