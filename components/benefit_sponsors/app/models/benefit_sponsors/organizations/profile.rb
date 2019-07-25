@@ -131,6 +131,10 @@ module BenefitSponsors
         organization.first.employer_profile
       end
 
+      def is_fehb?
+        is_a?(FehbEmployerProfile)
+      end
+
       private
 
       # Subclasses may extend this method
