@@ -643,13 +643,20 @@ module BenefitSponsors
           benefit_package.renew_employee_assignments(async_renewal_workflow_id)
         end
 
-        default_benefit_package = benefit_packages.detect{ |benefit_package| benefit_package.is_default }
+        renew_gapped_benefit_package_assignments(async_renewal_workflow_id)
+      end
+    end
 
-        default_renewal_check_application = async_renewal_workflow_id.blank? ? self : predecessor
-        if benefit_sponsorship.census_employees.present?
-          benefit_sponsorship.census_employees.non_terminated.benefit_application_unassigned(default_renewal_check_application).each do |census_employee|
-            census_employee.assign_to_benefit_package(default_benefit_package, effective_period.min)
-          end
+    # Renew individuals who are qualified to be assigned to the renewal
+    # assignments but were not, these come in one main flavour:
+    #   * they should have been in the predecessor application but were not,
+    #     i.e. they are are in the hire range for the predecessor but are
+    #     not assigned
+    def renew_gapped_benefit_package_assignments(async_renewal_workflow_id)
+      if predecessor
+        default_benefit_package = benefit_packages.detect { |benefit_package| benefit_package.is_default }
+        CensusEmployee.lacking_predecessor_assignment_for_application_as_of(predecessor, self.start_on).each do |census_employee|
+          census_employee.assign_to_benefit_package(default_benefit_package, effective_period.min)
         end
       end
     end

@@ -1363,6 +1363,35 @@ def self.to_csv
     end
   end
 
+  def self.lacking_predecessor_assignment_for_application_as_of(predecessor_application, new_effective_date)
+    package_ids = predecessor_application.benefit_packages.map(&:id)
+    package_start = predecessor_application.start_on
+    package_end = predecessor_application.end_on
+    benefit_sponsorship_id = predecessor_application.benefit_sponsorship.id
+    CensusEmployee.where(
+      "hired_on" => {"$lte" => new_effective_date},
+      "benefit_sponsorship_id" => benefit_sponsorship_id,
+      "$or" => [
+        {"employment_terminated_on" => nil},
+        {"employment_terminated_on" => {"$exists" => false}},
+        {"employment_terminated_on" => {"$gte" => new_effective_date}}
+      ],
+      "benefit_group_assignments" => {
+        "$not" => {
+          "$elemMatch" => {
+            "benefit_package_id" => {"$in" => package_ids},
+            "start_on" => { "$gte" => package_start },
+            "$or" => [
+              {"end_on" => nil},
+              {"end_on" => {"$exists" => false}},
+              {"end_on" => package_end}
+            ]
+          }
+        }
+      }
+    )
+  end
+
   private
 
   def record_transition
