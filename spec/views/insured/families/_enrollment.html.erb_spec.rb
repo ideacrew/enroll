@@ -414,12 +414,12 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
   end
 
   context "when the enrollment is coverage_selected" do
-    let(:plan) {FactoryGirl.create(:plan)}
-    let!(:person) { FactoryGirl.create(:person, last_name: 'John', first_name: 'Doe') }
-    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
+    let(:plan) {FactoryBot.create(:plan)}
+    let!(:person) { FactoryBot.create(:person, last_name: 'John', first_name: 'Doe') }
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, :person => person) }
 
     let!(:enrollment) {
-      FactoryGirl.create(:hbx_enrollment,
+      FactoryBot.create(:hbx_enrollment,
                        household: family.active_household,
                        coverage_kind: "health",
                        effective_on: TimeKeeper.date_of_record.beginning_of_month,
