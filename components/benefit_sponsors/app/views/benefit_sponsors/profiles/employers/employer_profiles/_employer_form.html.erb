@@ -155,7 +155,10 @@
   </div>
 </div>
 
-
 <script>
 var disableSelectric = true;
+
+$('.edit_agency').submit(function(){
+  $(this).find(':input[type=submit]').prop('disabled', true);
+});
 </script>
