@@ -2,11 +2,12 @@ module Enrollments
   module Replicator
     class Reinstatement
 
-      attr_accessor :base_enrollment, :new_effective_date
+      attr_accessor :base_enrollment, :new_effective_date, :new_aptc
 
-      def initialize(enrollment, effective_date)
+      def initialize(enrollment, effective_date, new_aptc = nil)
         @base_enrollment = enrollment
         @new_effective_date = effective_date
+        @new_aptc = new_aptc
       end
 
       def benefit_application
@@ -103,6 +104,7 @@ module Enrollments
         reinstated_enrollment.enrollment_kind = base_enrollment.enrollment_kind
         reinstated_enrollment.kind = base_enrollment.kind
         reinstated_enrollment.predecessor_enrollment_id = base_enrollment.id
+        reinstated_enrollment.hbx_enrollment_members = clone_hbx_enrollment_members
 
         if base_enrollment.is_shop?
           if can_be_reinstated?
@@ -115,14 +117,32 @@ module Enrollments
             reinstated_enrollment.rating_area_id = reinstate_rating_area
             reinstated_enrollment.issuer_profile_id = reinstatement_plan.issuer_profile_id
           end
-        else
+        elsif base_enrollment.is_ivl_by_kind? && new_aptc
+          # Change in APTC path for IVL
+          # Gather information needed
+          aptc_ratio_by_member = family.active_household.latest_active_tax_household.aptc_ratio_by_member
+          percent_sum_for_all_enrolles = duplicate_hbx.hbx_enrollment_members.inject(0.0) { |sum, member| sum + aptc_ratio_by_member[member.applicant_id.to_s] || 0.0 }
+          max_aptc = family.active_household.latest_active_tax_household_with_year(year).latest_eligibility_determination.max_aptc.to_f
+
+          # Update enrollment basics
           reinstated_enrollment.product_id = base_enrollment.product_id
           reinstated_enrollment.consumer_role_id = base_enrollment.consumer_role_id
-          reinstated_enrollment.elected_aptc_pct = base_enrollment.elected_aptc_pct
-          reinstated_enrollment.applied_aptc_amount = base_enrollment.applied_aptc_amount
+
+          # Update applied APTC on enrollment
+          reinstated_enrollment.applied_aptc_amount = new_aptc
+
+          # Update elected APTC percent on enrollment - To do: DOUBLE CHECK THIS CALCULATION -
+          reinstated_enrollment.elected_aptc_pct = new_aptc / max_aptc
+
+          # Update applied APTC for each enrollment member
+          duplicate_hbx.hbx_enrollment_members.each do |mem|
+            aptc_pct_for_member = aptc_ratio_by_member[mem.applicant_id.to_s] || 0.0
+            mem.applied_aptc_amount = new_aptc * aptc_pct_for_member / percent_sum_for_all_enrolles
+          end
+
+          # To do: Handle effective date
         end
 
-        reinstated_enrollment.hbx_enrollment_members = clone_hbx_enrollment_members
         reinstated_enrollment
       end
 
