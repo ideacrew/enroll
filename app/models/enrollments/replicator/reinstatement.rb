@@ -140,7 +140,7 @@ module Enrollments
             mem.applied_aptc_amount = new_aptc * aptc_pct_for_member / percent_sum_for_all_enrolles
           end
 
-          # To do: Handle effective date
+          # To do for this path: Handle enrollment state & handle 15th of month rule for effective date (outside of service, probably)
         end
 
         reinstated_enrollment
@@ -149,6 +149,9 @@ module Enrollments
       def member_coverage_start_date(hbx_enrollment_member)
         if base_enrollment.is_shop? && reinstate_under_renewal_py?
           new_effective_date
+        elsif base_enrollment.is_ivl_by_kind? && new_aptc
+          # If "copying" an enrollment to edit APTC, then we keep the coverage_start_on from the old member object since we aren't changing the plan
+          hbx_enrollment_member.coverage_start_on
         else
           hbx_enrollment_member.coverage_start_on || base_enrollment.effective_on || new_effective_date
         end
