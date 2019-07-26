@@ -142,6 +142,7 @@ class CensusEmployee < CensusMember
   scope :active,            ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_STATES) }
   scope :terminated,        ->{ any_in(aasm_state: EMPLOYMENT_TERMINATED_STATES) }
   scope :non_terminated,    ->{ where(:aasm_state.nin => EMPLOYMENT_TERMINATED_STATES) }
+  scope :non_term_and_pending,->{ where(:aasm_state.nin => (EMPLOYMENT_TERMINATED_STATES + PENDING_STATES)) }
   scope :newly_designated,  ->{ any_in(aasm_state: NEWLY_DESIGNATED_STATES) }
   scope :linked,            ->{ any_in(aasm_state: LINKED_STATES) }
   scope :eligible,          ->{ any_in(aasm_state: ELIGIBLE_STATES) }
@@ -153,6 +154,18 @@ class CensusEmployee < CensusMember
   # scope :emplyee_profiles_active_cobra,        ->{ where(aasm_state: "eligible") }
   scope :employee_profiles_terminated,         ->{ where(aasm_state: "employment_terminated")}
   scope :eligible_without_term_pending, ->{ any_in(aasm_state: (ELIGIBLE_STATES - PENDING_STATES)) }
+
+  scope :by_benefit_package_and_assignment_on_or_later, ->(benefit_package, effective_on, is_active) do
+    where(
+      :benefit_group_assignments => {
+        :$elemMatch => {
+          :start_on.gte => effective_on,
+          :benefit_package_id => benefit_package.id,
+          :is_active => is_active 
+        }
+      }
+    )
+  end
 
   #TODO - need to add fix for multiple plan years
   # scope :enrolled,    ->{ where("benefit_group_assignments.aasm_state" => ["coverage_selected", "coverage_waived"]) }
