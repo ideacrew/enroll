@@ -16,9 +16,10 @@ When(/^hbx admin uploads application document and verifies application$/) do
   expect(page).to have_content('In Review')
   within('#Application') do
     find('.label', :text => 'Action').click
+    find('li', :text => 'Verify').click
   end
-  find('.interaction-choice-control-verification-reason-1').click
-  find('.selectric-interaction-choice-control-verification-reason').click
+
+  find('.verification-update-reason').click
   find('li', :text => 'Document in EnrollApp').click
   find('.v-type-confirm-button').click
 

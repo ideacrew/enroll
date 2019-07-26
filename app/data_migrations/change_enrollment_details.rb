@@ -16,7 +16,7 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
         # When Enrollment with given policy ID is active in Glue & canceled in Enroll(Mostly you will see this with passive enrollments)
         revert_cancel(enrollments)
       when "cancel", "cancel_enrollment"
-        cancel_enr(enrollments)
+        cancel_enrollment(enrollments)
       when "generate_hbx_signature"
         generate_hbx_signature(enrollments)
       when "expire_enrollment"
@@ -115,14 +115,10 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
     end
   end
 
-  def cancel_enr(enrollments)
+  def cancel_enrollment(enrollments)
     enrollments.each do |enrollment|
-      if enrollment.may_cancel_coverage?
-        enrollment.cancel_coverage!
-        puts "enrollment with hbx_id: #{enrollment.hbx_id} cancelled" unless Rails.env.test?
-      else
-        puts " Issue with enrollment with hbx_id: #{enrollment.hbx_id}" unless Rails.env.test?
-      end
+      enrollment.update_attributes(aasm_state: "coverage_canceled")
+      puts "enrollment with hbx_id: #{enrollment.hbx_id} cancelled" unless Rails.env.test?
     end
   end
 
@@ -136,12 +132,8 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
 
   def expire_enrollment(enrollments)
     enrollments.each do |enrollment|
-      if enrollment.may_expire_coverage?
-        enrollment.expire_coverage!
-        puts "expire enrollment with hbx_id: #{enrollment.hbx_id}" unless Rails.env.test?
-      else
-        puts "HbxEnrollment with hbx_id: #{enrollment.hbx_id} can not be expired" unless Rails.env.test?
-      end
+      enrollment.update_attributes(aasm_state: "coverage_expired")
+      puts "expire enrollment with hbx_id: #{enrollment.hbx_id}" unless Rails.env.test?
     end
   end
 

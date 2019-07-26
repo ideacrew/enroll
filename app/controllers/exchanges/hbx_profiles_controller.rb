@@ -492,14 +492,7 @@ def employer_poc
 
     respond_to do |format|
       format.html { render "exchanges/hbx_profiles/general_agency_index.html.slim" }
-    end
-  end
-
-  def issuer_index
-    @issuers = CarrierProfile.all
-
-    respond_to do |format|
-      format.html { render "exchanges/hbx_profiles/issuer_index.html.slim" }
+      format.js
     end
   end
 
@@ -544,12 +537,6 @@ def employer_poc
     @organizations = organizations.skip(dt_query.skip).limit(dt_query.take)
     render
 
-  end
-
-  def product_index
-    respond_to do |format|
-      format.html { render "exchanges/hbx_profiles/product_index.html.slim" }
-    end
   end
 
   def configuration

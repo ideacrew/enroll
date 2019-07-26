@@ -31,6 +31,7 @@ class PlanYear
   field :open_enrollment_end_on, type: Date
 
   field :terminated_on, type: Date
+  field :termination_kind, type: String
 
   field :imported_plan_year, type: Boolean, default: false
 

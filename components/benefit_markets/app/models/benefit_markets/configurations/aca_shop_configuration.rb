@@ -10,10 +10,10 @@ module BenefitMarkets
         autobuild: true
 
       field :ee_ct_max,           as: :employee_count_max, type: Integer, default: 50
-      field :ee_ratio_min,        as: :employee_participation_ratio_min, type: Float, default: 0.75
+      field :ee_ratio_min,        as: :employee_participation_ratio_min, type: Float, default: 0.66
       field :ee_non_owner_ct_min, as: :employee_non_owner_count_min, type: Integer, default: 1
-      field :er_contrib_pct_min,  as: :employer_contribution_pct_min, type: Integer, default: 75
-      field :binder_due_dom, as: :binder_payment_due_day_of_month, type: Integer
+      field :er_contrib_pct_min,  as: :employer_contribution_pct_min, type: Integer, default: 50
+      field :binder_due_dom, as: :binder_payment_due_day_of_month, type: Integer, default: 12
       field :erlst_e_prior_eod, as: :earliest_enroll_prior_effective_on_days, type: Integer, default: -30
       field :ltst_e_aft_eod, as: :latest_enroll_after_effective_on_days, type: Integer, default: 30
       field :ltst_e_aft_ee_roster_cod, as: :latest_enroll_after_ee_roster_correction_on_days, type: Integer, default: 30
@@ -21,10 +21,10 @@ module BenefitMarkets
       field :ben_per_min_year, as: :benefit_period_min_year, type: Integer, default: 1
       field :ben_per_max_year, as: :benefit_period_max_year, type: Integer, default: 1
       field :oe_start_month, as: :open_enrollment_start_on_montly, type: Integer, default: 1
-      field :oe_end_month, as: :open_enrollment_end_on_montly, type: Integer, default: 20
+      field :oe_end_month, as: :open_enrollment_end_on_montly, type: Integer, default: 13
       field :oe_min_dys, as: :open_enrollment_days_min, type: Integer, default: 5
       field :oe_grce_min_dys, as: :open_enrollment_grace_period_length_days_min, type: Integer, default: 5
-      field :oe_min_adv_dys, as: :open_enrollment_adv_days_min, type: Integer, default: 5
+      field :oe_min_adv_dys, as: :open_enrollment_adv_days_min, type: Integer, default: 10
       field :oe_max_months, as: :open_enrollment_months_max, type: Integer, default: 2
       field :cobra_epm, as: :cobra_enrollment_period_month, type: Integer, default: 6
       field :gf_new_enrollment_trans, as: :group_file_new_enrollment_transmit_on, type: Integer, default: 16

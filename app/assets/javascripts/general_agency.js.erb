@@ -56,3 +56,17 @@ function enableGeneralAgenciesFilters() {
     });
   });
 }
+
+function filterTable(element) {
+  var url = '/exchanges/hbx_profiles/general_agency_index.js';
+  filter = element.value;
+  $.ajax({
+    url: url,
+    type: "GET",
+    data : { 'status': filter },
+    success: function(data) {
+      $('#main').hide();
+      $('#filter').show();
+    }
+  });
+}

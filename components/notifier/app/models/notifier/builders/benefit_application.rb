@@ -193,7 +193,7 @@ module Notifier
       benefit_application = (renewal_benefit_application || current_benefit_application)
       return if benefit_application.blank?
 
-      policy = enrollment_policy.business_policies_for(benefit_application, :end_open_enrollment)
+      policy = enrollment_policy_for(benefit_application, :end_open_enrollment)
       unless policy.is_satisfied?(benefit_application)
         policy.fail_results.each do |k, _|
           case k.to_s
@@ -211,21 +211,19 @@ module Notifier
       merge_model.benefit_application.enrollment_errors = enrollment_errors.join(' AND/OR ')
     end
 
-    def enrollment_policy
-      return @enrollment_policy if defined? @enrollment_policy
-      @enrollment_policy = BenefitSponsors::BenefitApplications::AcaShopEnrollmentEligibilityPolicy.new
+    def enrollment_policy_for(benefit_application, event_name)
+      BenefitSponsors::BusinessPolicies::PolicyResolver.benefit_application_enrollment_eligibility_policy_for(benefit_application, event_name)
     end
 
-    def eligibility_policy
-      return @eligibility_policy if defined? @eligibility_policy
-      @eligibility_policy = BenefitSponsors::BenefitApplications::AcaShopApplicationEligibilityPolicy.new
+    def eligibility_policy_for(benefit_application, event_name)
+      BenefitSponsors::BusinessPolicies::PolicyResolver.benefit_application_eligibility_policy_for(benefit_application, event_name)
     end
 
     def benefit_application_warnings
       benefit_application_warnings = []
       benefit_application = current_benefit_application || renewal_benefit_application
       if benefit_application.present?
-        policy = eligibility_policy.business_policies_for(current_benefit_application, :submit_benefit_application)
+        policy = eligibility_policy_for(current_benefit_application, :submit_benefit_application)
         unless policy.is_satisfied?(current_benefit_application)
           policy.fail_results.each do |k, _|
             case k.to_s

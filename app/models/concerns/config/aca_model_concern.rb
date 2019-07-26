@@ -32,6 +32,7 @@ module Config::AcaModelConcern
     delegate :plan_match_tool_is_enabled?, to: :class
     delegate :dental_market_enabled?, to: :class
     delegate :allow_mid_month_voluntary_terms?, to: :class
+    delegate :show_termination_reasons?, to: :class
     delegate :allow_mid_month_non_payment_terms?, to: :class
     delegate :enabled_metal_levels, to: :class
     delegate :offerings_constrained_to_service_areas?, to: :class
@@ -152,6 +153,10 @@ module Config::AcaModelConcern
 
     def allow_mid_month_voluntary_terms?
       @allow_mid_month_voluntary_terms ||= Settings.aca.shop_market.mid_month_benefit_application_terminations.voluntary
+    end
+
+    def show_termination_reasons?
+      @show_termination_reasons ||= Settings.aca.shop_market.mid_month_benefit_application_terminations.show_termination_reasons
     end
 
     def allow_mid_month_non_payment_terms?

@@ -39,6 +39,7 @@ class CreateFehbQles < Mongoid::Migration
 
     say_with_time("Time taken to migrate fehb SEP's") do
       profile_ids = BenefitSponsors::Organizations::Organization.where(:"profiles._type" => /.*FehbEmployerProfile/).map(&:employer_profile).map(&:_id)
+      fehb_sponsorship =  BenefitSponsors::Organizations::Organization.where(:"profiles._type" => /.*FehbEmployerProfile/).map(&:active_benefit_sponsorship).map(&:_id)
       Person.where(:'employee_roles'.exists=>true, :'employee_roles.benefit_sponsors_employer_profile_id'.in=> profile_ids).each do |person|
         begin
           if person.employee_roles.unscoped.map(&:benefit_sponsors_employer_profile_id).all?{|id| profile_ids.include?(id)}
@@ -48,9 +49,8 @@ class CreateFehbQles < Mongoid::Migration
               print '.' unless Rails.env.test?
             end
           elsif person.employee_roles.unscoped.map(&:benefit_sponsors_employer_profile_id).any?{|id| profile_ids.include?(id)}
-            employee_roles = person.employee_roles.unscoped.select{|role| profile_ids.include?(role.benefit_sponsors_employer_profile_id)}.map(&:_id)
             person.primary_family.special_enrollment_periods.shop_market.each do |sep|
-              if HbxEnrollment.where(:special_enrollment_period_id => sep.id, :employee_role_id.in => employee_roles).any?
+              if person.primary_family.hbx_enrollments.where(:special_enrollment_period_id => sep.id, :benefit_sponsorship_id.in => fehb_sponsorship).any?
                 fehb_qle = @qle_map[sep.qualifying_life_event_kind_id]
                 sep.update_attributes(qualifying_life_event_kind_id: fehb_qle)
                 print '.' unless Rails.env.test?

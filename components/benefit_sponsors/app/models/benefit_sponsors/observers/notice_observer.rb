@@ -225,7 +225,7 @@ module BenefitSponsors
 
       def trigger_employer_open_enrollment_completed_notice(model_event)
         benefit_application = model_event.klass_instance
-        policy = enrollment_policy.business_policies_for(benefit_application, :end_open_enrollment)
+        policy = enrollment_policy_for(benefit_application, :end_open_enrollment)
         return unless policy.is_satisfied?(benefit_application)
 
         notice_event = benefit_application.is_renewing? ? "renewal_employer_open_enrollment_completed" : "initial_employer_open_enrollment_completed"
@@ -242,7 +242,7 @@ module BenefitSponsors
 
       def trigger_ineligible_application_submitted_notice(model_event)
         benefit_application = model_event.klass_instance
-        policy = eligibility_policy.business_policies_for(benefit_application, :submit_benefit_application)
+        policy = eligibility_policy_for(benefit_application, :submit_benefit_application)
         return if policy.is_satisfied?(benefit_application)
 
         if benefit_application.is_renewing?
@@ -259,7 +259,7 @@ module BenefitSponsors
 
       def trigger_application_denied_notice(model_event)
         benefit_application = model_event.klass_instance
-        policy = enrollment_policy.business_policies_for(benefit_application, :end_open_enrollment)
+        policy = enrollment_policy_for(benefit_application, :end_open_enrollment)
         return if policy.is_satisfied?(benefit_application)
 
         return unless policy.fail_results.include?(:minimum_participation_rule) || policy.fail_results.include?(:non_business_owner_enrollment_count)
@@ -484,16 +484,12 @@ module BenefitSponsors
 
       private
 
-      def eligibility_policy
-        return @eligibility_policy if defined? @eligibility_policy
-
-        @eligibility_policy = BenefitSponsors::BenefitApplications::AcaShopApplicationEligibilityPolicy.new
+      def eligibility_policy_for(benefit_application, event_name)
+        BenefitSponsors::BusinessPolicies::PolicyResolver.benefit_application_eligibility_policy_for(benefit_application, event_name)
       end
 
-      def enrollment_policy
-        return @enrollment_policy if defined? @enrollment_policy
-
-        @enrollment_policy = BenefitSponsors::BenefitApplications::AcaShopEnrollmentEligibilityPolicy.new
+      def enrollment_policy_for(benefit_application, event_name)
+        BenefitSponsors::BusinessPolicies::PolicyResolver.benefit_application_enrollment_eligibility_policy_for(benefit_application, event_name)
       end
     end
   end

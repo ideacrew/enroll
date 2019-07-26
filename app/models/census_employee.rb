@@ -253,6 +253,20 @@ class CensusEmployee < CensusMember
     matched.by_benefit_group_assignment_ids(benefit_group_assignment_ids)
   }
 
+  scope :employees_for_benefit_application_sponsorship, ->(benefit_application) {
+    new_effective_date = benefit_application.start_on
+    benefit_sponsorship_id = benefit_application.benefit_sponsorship.id
+    where(
+      "hired_on" => {"$lte" => new_effective_date},
+      "benefit_sponsorship_id" => benefit_sponsorship_id,
+      "$or" => [
+        {"employment_terminated_on" => nil},
+        {"employment_terminated_on" => {"$exists" => false}},
+        {"employment_terminated_on" => {"$gte" => new_effective_date}}
+      ]
+    )
+  }
+
   # This initializes a new CensusEmploye with the given +args+, the method
   # has been overriden to write the attribute +:employee_relationship+ to +"self"+
   # @param args [Hash]
@@ -1347,6 +1361,35 @@ def self.to_csv
     else
       unset_sparse("encrypted_ssn")
     end
+  end
+
+  def self.lacking_predecessor_assignment_for_application_as_of(predecessor_application, new_effective_date)
+    package_ids = predecessor_application.benefit_packages.map(&:id)
+    package_start = predecessor_application.start_on
+    package_end = predecessor_application.end_on
+    benefit_sponsorship_id = predecessor_application.benefit_sponsorship.id
+    CensusEmployee.where(
+      "hired_on" => {"$lte" => new_effective_date},
+      "benefit_sponsorship_id" => benefit_sponsorship_id,
+      "$or" => [
+        {"employment_terminated_on" => nil},
+        {"employment_terminated_on" => {"$exists" => false}},
+        {"employment_terminated_on" => {"$gte" => new_effective_date}}
+      ],
+      "benefit_group_assignments" => {
+        "$not" => {
+          "$elemMatch" => {
+            "benefit_package_id" => {"$in" => package_ids},
+            "start_on" => { "$gte" => package_start },
+            "$or" => [
+              {"end_on" => nil},
+              {"end_on" => {"$exists" => false}},
+              {"end_on" => package_end}
+            ]
+          }
+        }
+      }
+    )
   end
 
   private

@@ -91,7 +91,7 @@ FactoryBot.define do
         unless Settings.aca.rating_areas.empty?
           plan.service_area_id = CarrierServiceArea.for_issuer(plan.carrier_profile.issuer_hios_ids).first.service_area_id
           plan.save!
-          rating_area = RatingArea.first.try(:rating_area) || FactoryGirl.create(:rating_area, rating_area: Settings.aca.rating_areas.first).rating_area
+          rating_area = RatingArea.first.try(:rating_area) || FactoryBot.create(:rating_area, rating_area: Settings.aca.rating_areas.first).rating_area
           (14..65).each do |age|
             create_list(:premium_table, evaluator.premium_tables_count, plan: plan, age: age, start_on: start_on, end_on: end_on, rating_area: rating_area)
           end

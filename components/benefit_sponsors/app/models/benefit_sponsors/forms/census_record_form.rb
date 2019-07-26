@@ -17,6 +17,7 @@ module BenefitSponsors
       attribute :hired_on, String
       attribute :employment_terminated_on, Date
       attribute :is_business_owner, String
+      attribute :no_ssn_allowed, Boolean
       
       # template attributes
       attribute :benefit_group, String
@@ -28,6 +29,10 @@ module BenefitSponsors
 
       validates_presence_of :employee_relationship, :email
       validate :date_format
+
+      def dob=(val)
+        super(val.strftime("%m/%d/%Y")) if val
+      end
 
       def date_format
         errors.add(:base, "DOB: #{dob}") if dob &.include?('Invalid Format')

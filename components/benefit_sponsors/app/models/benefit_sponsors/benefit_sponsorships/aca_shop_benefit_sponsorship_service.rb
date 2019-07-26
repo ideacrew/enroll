@@ -158,15 +158,6 @@ module BenefitSponsors
       end
     end
 
-    def enrollment_policy
-      return @enrollment_policy if defined?(@enrollment_policy)
-      @enrollment_policy = BenefitSponsors::BenefitApplications::AcaShopEnrollmentEligibilityPolicy.new
-    end
-
-    def business_policy_for(benefit_application, event_name)
-      enrollment_policy.business_policies_for(benefit_application, event_name)
-    end
-
     def application_service_for(benefit_application)
       BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(benefit_application)
     end

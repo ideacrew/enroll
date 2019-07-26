@@ -88,7 +88,7 @@ module BenefitSponsors
 
     delegate :sic_code,     :sic_code=,     to: :profile, allow_nil: true
     delegate :primary_office_location,      to: :profile, allow_nil: true
-    delegate :enforce_employer_attestation, to: :benefit_market
+    delegate :enforce_employer_attestation,  to: :benefit_market
     delegate :legal_name,   :fein,          to: :organization
 
     belongs_to  :organization,
@@ -259,13 +259,19 @@ module BenefitSponsors
     index({ profile_id: 1 })
     index({ organization_id: 1 })
 
-    index({"benefit_application._id" => 1})
-    index({"benefit_application.predecessor_id" => 1})
-    index({ "benefit_application.aasm_state" => 1, "effective_period.min" => 1, "effective_period.max" => 1},
+    index({"benefit_applications._id" => 1})
+    index({"benefit_applications.predecessor_id" => 1}, {name: "predecessor"})
+    index({"benefit_applications.recorded_rating_area_id" => 1}, {name: "rating_area"})
+    index({ "benefit_applications.aasm_state" => 1, "benefit_applications.effective_period.min" => 1, "benefit_applications.effective_period.max" => 1},
             { name: "effective_period" })
 
-    index({ "benefit_application.aasm_state" => 1, "open_enrollment_period.min" => 1, "open_enrollment_period.max" => 1},
+    index({ "benefit_applications.aasm_state" => 1, "benefit_applications.open_enrollment_period.min" => 1, "benefit_applications.open_enrollment_period.max" => 1},
             { name: "open_enrollment_period" })
+
+    index({"benefit_applications.benefit_packages._id" => 1}, {name: "package_id"})
+    index({"benefit_applications.benefit_packages.title" => 1}, {name: "package_title"})
+    index({"benefit_applications.benefit_packages.sponsored_benefits._id" => 1}, {name: "sponsored_benefit_index"})
+
 
     add_observer ::BenefitSponsors::Observers::NoticeObserver.new, [:process_benefit_sponsorship_events]
 
@@ -720,6 +726,11 @@ module BenefitSponsors
       where(:organization_id => {:$in => organizations.pluck(:_id)})
     end
 
+    def market_kind
+      return nil if benefit_market_id.blank?
+      @market_kind ||= benefit_market.kind
+    end
+
     private
 
     def validate_profile_organization
@@ -759,7 +770,8 @@ module BenefitSponsors
         :enrolled => :active,
         :suspended => :suspended,
         :registered => :applicant,
-        :eligible => :applicant
+        :eligible => :applicant,
+        :ineligible => :applicant
       }
     end
   end

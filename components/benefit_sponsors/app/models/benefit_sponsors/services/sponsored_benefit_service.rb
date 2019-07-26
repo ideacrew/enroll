@@ -20,6 +20,11 @@ module BenefitSponsors
         form
       end
 
+      def load_benefit_catalog_to_form(form)
+        form.catalog = sponsor_catalog_decorator_class.new(package.benefit_sponsor_catalog)
+        form
+      end
+
       def find(sponsored_benefit_id)
         sponsored_benefit = find_sponsored_benefit(sponsored_benefit_id)
         attributes_to_form_params(sponsored_benefit)

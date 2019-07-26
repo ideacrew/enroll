@@ -13,6 +13,8 @@ var employerId = "";
 var pyEndDate = "";
 var termKind = "";
 var termReason = "";
+var pyEndOn = "";
+var pyStartOn = ""
 
 if ( $parent_row.next().hasClass('child-row') ) {
 //
@@ -84,14 +86,14 @@ function initDatePicker() {
 }
 
 function validateFormat(id, pyStartOn, pyEndOn) {
-  ele2 = $('#' + 'term_reason_'+ applicationId).val()
   element = $('#' + 'date_picker_'+ applicationId).val()
   applicationId = id
+  pyStartOn = pyStartOn;
+  pyEndOn = pyEndOn;
   pyEndDate = element;
-
   setTimeout(function() {
-    if (element.length != 10 || element.indexOf("/") != 2 || checkTermReason(ele2)) {
-      if (element.length > 0 && (checkTermReason(ele2) == false)) {
+    if (element.length != 10 || element.indexOf("/") != 2 || checkTermReason()) {
+      if (element.length > 0 && (checkTermReason() == false)) {
         element = "";
         alert("Please use mm/dd/yyyy format");
       }
@@ -236,6 +238,7 @@ function getLastDayOfYearAndMonth(year, month){
 }
 
 function updateDatePickerBasedOnTermReason(reason, id) {
+  $("#date_picker_" + id ).datepicker("destroy");
   var terminationReason = reason
   if (terminationReason == 'nonpayment' && '<%= @allow_mid_month_non_payment_terms.to_s %>' == 'true') {
     showAllDates(id);
@@ -248,36 +251,46 @@ function updateDatePickerBasedOnTermReason(reason, id) {
 
 function addTermReasons(reason, id) {
   applicationId = id
-  document.getElementById('term_reason_'+ applicationId).value = "";
-  document.getElementById('date_picker_'+ applicationId).value = "";
-  validateFormat(applicationId)
+  validateFormat(applicationId, pyStartOn, pyEndOn)
   updateDatePickerBasedOnTermReason(reason.value, id)
-  $.ajax({
-    type: 'get',
-    datatype: 'js',
-    url: '/exchanges/employer_applications/term_reasons',
-    data: { reason_type_id: reason.id },
-    success: function (response) {
-      var select = document.getElementById('term_reason_'+ applicationId);
-      select.options.length = 1;
-      for (i = 0; i < response.length; i++) {
-        var newOption = document.createElement('option')
-        newOption.value = response[i]
-        newOption.innerHTML = response[i];
-        select.options.add(newOption)
-      }
-    }
-  });
-
-  return true
-}
-
-function checkTermReason(element) {
-  if (element == undefined || element == "") {
+  if ('<%= @show_termination_reasons.to_s %>' == 'false') {
     return true
   }
   else {
+    document.getElementById('term_reason_'+ applicationId).value = "";
+    document.getElementById('date_picker_'+ applicationId).value = "";
+    $.ajax({
+      type: 'get',
+      datatype: 'js',
+      url: '/exchanges/employer_applications/term_reasons',
+      data: { reason_type_id: reason.id },
+      success: function (response) {
+        var select = document.getElementById('term_reason_'+ applicationId);
+        select.options.length = 1;
+        for (i = 0; i < response.length; i++) {
+          var newOption = document.createElement('option')
+          newOption.value = response[i]
+          newOption.innerHTML = response[i];
+          select.options.add(newOption)
+        }
+      }
+    });
+
+    return true
+  }
+}
+
+function checkTermReason() {
+  if ('<%= @show_termination_reasons.to_s %>' == 'false') {
     return false
+  } else {
+    element = $('#' + 'term_reason_'+ applicationId).val()
+    if (element == undefined || element == "") {
+      return true
+    }
+    else {
+      return false
+    }
   }
 }
 

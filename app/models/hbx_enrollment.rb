@@ -253,6 +253,15 @@ class HbxEnrollment
     {name: "hbx_enrollment_enrollments_for_display"}
   )
 
+  index(
+      {
+          "benefit_group_id" => 1,
+          "coverage_kind" => 1
+      },
+      {name: "enrollments_query_lookup_for_migration"}
+  )
+  index({ "benefit_sponsorship_id" => 1 })
+
   index({"plan_id" => 1}, { sparse: true })
   index({"product_id" => 1}, { sparse: true })
   index({"family_id" => 1})

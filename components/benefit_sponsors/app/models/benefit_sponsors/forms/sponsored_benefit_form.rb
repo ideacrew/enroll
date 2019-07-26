@@ -83,7 +83,8 @@ module BenefitSponsors
       def self.for_update(params)
         form = self.new(params)
         form.service = resolve_service(params)
-        form
+        form.is_new_benefit = false
+        form.service.load_benefit_catalog_to_form(form)
       end
 
       def self.fetch(params)

@@ -4,7 +4,6 @@ module BenefitSponsors
 
     attr_reader   :benefit_application, :business_policy, :errors, :messages
 
-
     def initialize(benefit_application)
       @benefit_application = benefit_application
       @errors = []
@@ -357,12 +356,12 @@ module BenefitSponsors
       errors = {}
       result = true
       if termination_kind == 'voluntary'
-        if !allow_mid_month_voluntary_terms? && end_on != end_on.end_of_month
+        if !allow_mid_month_voluntary_terms? && end_on.to_date != end_on.end_of_month.to_date
           result = false
           errors[:mid_month_voluntary_term] = "Exchange doesn't allow mid month voluntary terminations"
         end
       elsif termination_kind == 'nonpayment'
-        if !allow_mid_month_non_payment_terms? && end_on != end_on.end_of_month
+        if !allow_mid_month_non_payment_terms? && end_on.to_date != end_on.end_of_month.to_date
           result = false
           errors[:mid_month_non_payment_term] = "Exchange doesn't allow mid month non payment terminations"
         end
@@ -378,9 +377,9 @@ module BenefitSponsors
 
     def business_policy_for(business_policy_name)
       if business_policy_name == :end_open_enrollment
-        enrollment_eligibility_policy.business_policies_for(benefit_application, business_policy_name)
+        enrollment_eligibility_policy_for(benefit_application, business_policy_name)
       else
-        application_eligibility_policy.business_policies_for(benefit_application, business_policy_name)
+        application_eligibility_policy_for(benefit_application, business_policy_name)
       end
     end
 
@@ -397,14 +396,12 @@ module BenefitSponsors
       (errors[msg[0]] ||= []) << msg[1]
     end
 
-    def application_eligibility_policy
-      return @application_eligibility_policy if defined?(@application_eligibility_policy)
-      @application_eligibility_policy = BenefitSponsors::BenefitApplications::AcaShopApplicationEligibilityPolicy.new
+    def application_eligibility_policy_for(benefit_application, business_policy_name)
+      BenefitSponsors::BusinessPolicies::PolicyResolver.benefit_application_eligibility_policy_for(benefit_application, business_policy_name)
     end
 
-    def enrollment_eligibility_policy
-      return @enrollment_eligibility_policy if defined?(@enrollment_eligibility_policy)
-      @enrollment_eligibility_policy = BenefitSponsors::BenefitApplications::AcaShopEnrollmentEligibilityPolicy.new
+    def enrollment_eligibility_policy_for(benefit_application, event_name)
+      BenefitSponsors::BusinessPolicies::PolicyResolver.benefit_application_enrollment_eligibility_policy_for(benefit_application, event_name)
     end
 
     def due_date_for_publish

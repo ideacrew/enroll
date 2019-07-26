@@ -7,7 +7,7 @@ module AccessPolicies
     end
 
     def authorize_show(employer, controller)
-      return(true) if user.has_hbx_staff_role? || is_broker_for_employer?(employer.id) || is_general_agency_staff_for_employer?(employer.id)
+      return true if user.has_hbx_staff_role? || is_broker_for_employer?(employer.id) || is_general_agency_staff_for_employer?(employer.id)
       person = user.person
 
       if person.employer_staff_roles.active.length > 0
@@ -21,7 +21,7 @@ module AccessPolicies
     end
 
     def authorize_index(broker_agency_id, controller)
-      return(true) if user.has_hbx_staff_role?
+      return true if user.has_hbx_staff_role?
       if user.has_broker_role? || user.has_broker_agency_staff_role?
         if !broker_agency_id.blank?
           return
@@ -49,11 +49,14 @@ module AccessPolicies
     end
 
     def is_general_agency_staff_for_employer?(employer_id)
-      person = user.person
-      if person.general_agency_staff_roles.present?
-        person.general_agency_staff_roles.last.general_agency_profile.employer_clients.map(&:_id).include?(employer_id) rescue false
-      else
-        false
+      return false if user.person.general_agency_staff_roles.blank?
+      ga_id = user.person.general_agency_staff_roles.last.general_agency_profile.id
+      return false if ga_id.nil? || employer_id.nil?
+      plan_design_organizations = SponsoredBenefits::Organizations::PlanDesignOrganization.find_by_sponsor(employer_id)
+      plan_design_organizations.each do |a|
+        if a.general_agency_profile.present?
+          return true if a.general_agency_profile.id == ga_id
+        end
       end
     end
   end

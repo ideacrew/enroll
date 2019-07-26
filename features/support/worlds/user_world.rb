@@ -56,7 +56,9 @@ module UserWorld
         raise "No subrole was provided"
       end
       if Permission.where(name:subrole).present?
-        permission_id = Permission.where(name:subrole).first.id
+        permission = Permission.where(name: subrole).first
+        permission.update_attributes(can_modify_plan_year: true)
+        permission_id = permission.id
       else
         raise "No permission was found for subrole #{subrole}"
       end
@@ -129,6 +131,10 @@ end
 
 Then(/^the user will see the Extend Open Enrollment button$/) do
   expect(page).to have_css('.btn.btn-xs', text: 'Extend Open Enrollment')
+end
+
+Then(/^the user will see the Plan Years button$/) do
+  find('.btn.btn-xs', text: 'Plan Years').click
 end
 
 Then(/^the user will not see the Extend Open Enrollment button$/) do

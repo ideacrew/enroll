@@ -113,11 +113,13 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
   end
 
   describe "GET edit", dbclean: :around_each do
-    let(:user) { FactoryBot.create(:user, :employer_staff) }
+    let(:user) { FactoryBot.create(:user, :hbx_staff) }
+
     it "should be render edit template" do
       sign_in user
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(CensusEmployee).to receive(:find).and_return(census_employee)
+      allow(controller).to receive(:authorize).and_return(true)
       post :edit, params: {id: census_employee.id, employer_profile_id: employer_profile_id, census_employee: {}}
       expect(response).to render_template("edit")
     end
@@ -158,6 +160,19 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
       }
     }
 
+    let(:census_employee_delete_ssn) do
+      {
+        "first_name" => "aqzz",
+        "middle_name" => "",
+        "last_name" => "White",
+        "gender" => "male",
+        "is_business_owner" => true,
+        "hired_on" => "05/02/2015",
+        "employer_profile" => employer_profile,
+        "ssn" => ""
+      }
+    end
+
     let!(:user) { create(:user, person: person)}
     let(:child1) { FactoryBot.build(:census_dependent, employee_relationship: "child_under_26", ssn: 123123714) }
     let(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person)}
@@ -183,6 +198,16 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
         allow(controller).to receive(:census_employee_params).and_return(census_employee_delete_params)
         post :update, params: {id: census_employee.id, employer_profile_id: employer_profile_id, census_employee: census_employee_delete_params}
         expect(response).to be_redirect
+      end
+    end
+
+    context 'employer can remove census employee ssn when census employee is added at the time of ssn/tin disabled' do
+      it "should able to update census employee without ssn" do
+        expect(census_employee.ssn.present?).to eq true
+        census_employee.update_attributes!(:no_ssn_allowed => 'true')
+        post :update, params: {id: census_employee.id, employer_profile_id: employer_profile_id, census_employee: census_employee_delete_ssn}
+        census_employee.reload
+        expect(census_employee.ssn.present?).to eq false
       end
     end
 
@@ -276,14 +301,14 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
                          aasm_state: 'coverage_expired'
       )
     end
-    it "should be render show template" do
-      # allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return(hbx_enrollments)
-      # allow(benefit_group_assignment).to receive(:benefit_group).and_return(benefit_group)
-      # allow(census_employee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)
-      sign_in
-      # allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
-      # allow(CensusEmployee).to receive(:find).and_return(census_employee)
-      get :show, params:{:id => census_employee.id, :employer_profile_id => employer_profile_id}
+    let(:hbx_staff_user) { FactoryBot.create(:user, :hbx_staff) }
+
+    it "should render show template" do
+      sign_in hbx_staff_user
+      allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(census_employee.employer_profile_id)
+      allow(CensusEmployee).to receive(:find).and_return(census_employee)
+      allow(controller).to receive(:authorize).and_return(true)
+      get :show, params: { id: census_employee.id, employer_profile_id: employer_profile_id, census_employee: {} }
       expect(response).to render_template("show")
     end
 
@@ -587,3 +612,4 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
     end
   end
 end
+

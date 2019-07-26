@@ -30,9 +30,10 @@
     <p class='memo'>Find the event name on the associated ticket</p>
   </div>
 
+  <% recipients = Notifier::Services::NoticeKindService.new(notice_kind.market_kind).recipients %>
   <div class="form-group col-xs-8">
     <label for="noticeDescription">Recipient *</label>
-    <%= f.select(:recipient, options_for_select(Notifier::NoticeKind::RECIPIENTS.inject([]) {|options, (k, v)| options << [k, v]}, selected: notice_kind.recipient), { :class => 'form-control'}, required: true ) %>
+    <%= f.select(:recipient, options_for_select(recipients.inject([]) {|options, (k, v)| options << [k, v]}, selected: notice_kind.recipient), { :class => 'form-control'}, required: true ) %>
   </div>
  
   <div class="form-group col-xs-12">

@@ -26,6 +26,8 @@ module BenefitSponsors
       end
 
       def load_employer_estimates(form)
+        return if @employer_profile.present? && @employer_profile.is_fehb?
+        
         form.sponsored_benefits.each do |sponsored_benefit_form|
           if sponsored_benefit_form.id
             benefit_package = form.service.benefit_application.benefit_packages.where(:"sponsored_benefits._id" => BSON::ObjectId.from_string(sponsored_benefit_form.id.to_s)).first
@@ -43,6 +45,8 @@ module BenefitSponsors
       end
 
       def load_employees_cost_estimates(form)
+        return if @employer_profile.present? && @employer_profile.is_fehb?
+        
         form.sponsored_benefits.each do |sponsored_benefit_form|
           if sponsored_benefit_form.id
             benefit_package = form.service.benefit_application.benefit_packages.where(:"sponsored_benefits._id" => BSON::ObjectId.from_string(sponsored_benefit_form.id.to_s)).first

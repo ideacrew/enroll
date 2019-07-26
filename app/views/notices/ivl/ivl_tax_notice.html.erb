@@ -1,0 +1,224 @@
+<div class="page-break">
+
+  <%= render partial: 'notices/shared/logo_and_address_shop', :locals => {notice: notice} %>
+
+  <table class="total_table address" border="0">
+    <tbody>
+      <tr>
+        <td><br></br></td>
+      </tr>
+      <tr>
+        <td><br></br></td>
+      </tr>
+      <tr>
+        <td>                   </td>
+      </tr>
+      <tr class="fssize1">
+        <td>                   </td>
+      </tr>
+      <tr>
+      <td>                   </td>
+      <tr>
+        <td>
+          <br>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <br>
+  <table class="total_table" border="0">
+    <tbody>
+      <tr>
+        <br></br>
+      </tr>
+      <tr>
+        <td style="text-align: center"><h1><b>THIS IS A COVER PAGE</b></h1>
+        <hr style="height: 0px;  border-color: black; border-bottom: 0px; border-width: 1px 0 0 0;">
+        </td>
+      </tr>
+      <tr>
+        <td style="font-size: 18px; text-align: center;">
+          The enclosed letter has important information about your health or dental insurance, which may include steps you need to take to get or keep your insurance.
+        </td>
+      </tr>
+      <tr>
+        <br></br>
+      </tr>
+    </tbody>
+  </table>
+
+  <table class="total_table" border="0" style="margin-top: 260px;">
+    <tbody>
+      <tr>
+        <td><%= notice.mpi_indicator %></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="page-break">
+  <table class="total_table" border="0">
+    <tbody>
+      <tr>
+        <td style="color: #b3b3b3; font-size: 18px; text-align: center; padding-top: 300px;">
+          This page intentionally left blank.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<%= render partial: 'notices/shared/logo_and_address_shop', :locals => {notice: notice} %>
+<br>
+
+<table class="total_table address" border="0">
+  <tbody>
+    <tr>
+      <td><br></br></td>
+    </tr>
+    <tr>
+      <td><br></br></td>
+    </tr>
+    <tr>
+      <td>                   </td>
+    </tr>
+    <tr class="fssize1">
+      <td>                   </td>
+    </tr>
+    <tr class="fssize1">
+      <td>                   </td>
+    </tr>
+    <tr>
+    <td>                   </td>
+    <% display_mpi_indicator =  show_mpi_indicator if defined? show_mpi_indicator%>
+    <% if (display_mpi_indicator.nil? && !notice.shop?) %>
+      <td style="text-align: right;"><%= notice.mpi_indicator %></td>
+    <% end %>
+    </tr>
+    <tr>
+      <td>
+        <br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+  <tr>
+  <td></br></br></td>
+  </tr>
+    <tr class="wid50">
+      <td align="left"></td>
+    </tr>
+  <tr>
+  <td>                   </td>
+  </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td><h3>YOUR 1095-A HEALTH COVERAGE TAX FORM</h3></td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>Dear                  </td>
+    </tr>
+  </tbody>
+</table>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "This letter includes your tax Form 1095-A. You’re receiving this tax form because you or someone in your household enrolled in a private health insurance plan through #{Settings.site.short_name} in #{previous_year}."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "Federal law required most Americans to have a minimum level of health coverage or pay a tax penalty through #{previous_year}. The #{Settings.aca.state_name} now has an individual responsibility requirement. This means that DC residents must have qualifying health coverage all year. If you don't have coverage, and don't qualify for an exemption, you’ll have to pay a penalty when you file your DC taxes. For more information: <a href= #{Settings.site.ivl_responsibility_url}>https://dchealthlink.com/individual-responsibility-requirement</a>."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "We are required by federal law to send a copy of your Form 1095-A to you and the Internal Revenue Service (IRS). You may need this form to complete your federal tax return for #{previous_year}. Please keep it for your records.  You can also download a copy of your tax form at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>."} %>
+
+<% if notice.is_an_aqhp_cover_letter %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "Form 1095-A is also called the Health Insurance Marketplace Statement. It shows how long you or someone in your household had health insurance through #{Settings.site.short_name} last year. Since you received an advance premium tax credit, your Form 1095-A also shows how much of your tax credit was applied to your premium each month."} %>
+<% else %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "Form 1095-A is also called the Health Insurance Marketplace Statement. It shows how long you or someone in your household had health insurance through #{Settings.site.short_name} last year."} %>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+ contents: [""], heading: 'Here’s What You Need to Do Now', sub_heading: '', top_margin: '12px'} %>
+
+<% if notice.is_an_aqhp_cover_letter %>
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+  content: "Because you received a tax credit in #{previous_year}, you must complete IRS Premium Tax Credit Form 8962 when you file your federal taxes.  You’ll need the information on Form 1095-A to fill out Form 8962."} %>
+
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "The IRS requires you to use Form 8962 to report the amount of advance premium tax credit you received in #{previous_year}. You can download Form 8962 directly from the IRS website at <a href=#{Settings.site.irs_url}>IRS.gov</a>."} %>
+
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+  content: "If your income is higher than what you told us when you applied for the tax credit, you may have to repay some or all of the tax credit to the IRS. If your income is lower than what you told us, you may get an additional credit on your tax return.", bottom_margin: '8px', top_margin: '10px'} %>
+
+  <%= render partial: 'notices/shared/unordered_list', locals: {
+      previous: "If you do not include Form 8962 when you file your federal taxes:",
+      listings: ["The IRS may reject your federal tax return or delay payment of any refund you are owed.", "You will not be able to receive assistance paying for a private health plan in the future."]} %>
+<% end %>
+
+<% if !notice.is_an_aqhp_cover_letter %>
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+  content: "You’ll use the information on your Form 1095-A to show that you or someone in your household had health insurance in #{previous_year}. If you want to see if you qualify for a premium tax credit, you’ll need the information on your Form 1095-A to complete the IRS Premium Tax Credit Form 8962.  You can download Form 8962 directly from the IRS website at <a href=#{Settings.site.irs_url}>IRS.gov</a>.", bottom_margin: '8px'} %>
+<% end %>
+
+<%= render partial: 'notices/shared/unordered_list', locals: {
+    previous: "You may receive more than one Form 1095-A if you:",
+    listings: ["Also had a plan from another health insurance marketplace during the year.", "Changed from one plan offered by #{Settings.site.short_name} to another during the year.", "Had family members enrolled in different plans through #{Settings.site.short_name}."]} %>
+
+<div style="page-break-inside: avoid;">
+  <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+   contents: [""], heading: 'Understanding Form 1095-A', sub_heading: '', bottom_margin: ''} %>
+
+  <% if !notice.is_an_aqhp_cover_letter %>
+    <%= render partial: 'notices/shared/unordered_list', locals: {
+    previous: "IRS Form 1095-A has three sections:",
+    listings: ["<strong>Part I</strong> includes information about the primary recipient. Your spouse’s information is not listed because you didn’t receive an advance premium tax credit, and the IRS tells us not to include their information here. Part I also lists when your health insurance started and ended.<br>", "<strong>Part II</strong> shows everyone in your household who was enrolled in the plan. It lists the date(s) that each person’s coverage started and ended.",["<strong>Part III</strong> lists information about each month that you or members of your household had health insurance:", ["Column A shows the amount of your monthly premium. The premium amount you see here may be a few dollars lower than what you paid each month because the IRS asks us not to include the part of your premium that went to pay for benefits not required by the Affordable Care Act.", "Column B shows the cost of the Second Lowest Cost Silver Plan for any months you received tax credit savings. If this column is blank, and you would like to claim the premium tax credit on your taxes, you can use the Second Lowest Cost Silver Plan calculator at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> to find out what to enter for this column.", "Column C shows the amount of any tax credit paid directly to your health insurance company each month."]]]} %>
+  <% else %>
+    <%= render partial: 'notices/shared/unordered_list', locals: {
+    previous: "IRS Form 1095-A has three sections:",
+    listings: ["<strong>Part I</strong> includes information about the primary recipient. Part I also lists when your health insurance started and ended.<br>", "<strong>Part II</strong> shows everyone in your household who was enrolled in the plan. It lists the date(s) that each person’s coverage started and ended.",["<strong>Part III</strong> lists information about each month that you or members of your household had health insurance:", ["Column A shows the amount of your monthly premium. The premium amount you see here may be a few dollars lower than what you paid each month because the IRS asks us not to include the part of your premium that went to pay for benefits not required by the Affordable Care Act.", "Column B shows the cost of the Second Lowest Cost Silver Plan for any months you received tax credit savings. If this column is blank, and you would like to claim the premium tax credit on your taxes, you can use the Second Lowest Cost Silver Plan calculator at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> to find out what to enter for this column.", "Column C shows the amount of any tax credit paid directly to your health insurance company each month."]]]} %>
+  <% end %>
+</div>
+
+<% if notice.is_an_aqhp_cover_letter %>
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+  content: "The back of your Form 1095-A has instructions on how to fill out Form 8962. You must fill out Form 8962 because you received an advance premium tax credit for #{previous_year}.", top_margin: '-10px'} %>
+<% else %>
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+  content: "The back of your Form 1095-A has instructions on how to fill out Form 8962. You only need to fill out Form 8962 if you want to see if you qualified for a premium tax credit in #{previous_year}.", top_margin: '-10px'} %>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
+ contents: ["The information on your Form 1095-A is based on records provided by your health insurance company and #{Settings.site.short_name}. If you believe the information on your Form 1095-A is not accurate, please go to the tax information section at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> for information on how to request a corrected Form 1095-A, or call us at #{notice.hbe.phone}."],
+   heading: 'If You Think This Form is Wrong', sub_heading: '', top_margin: '12px'} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+ contents: ["Go to <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>, or call us at #{notice.hbe.phone}. #{Settings.site.short_name} cannot provide tax advice. For more information on these topics, consult a tax adviser."],
+   heading: 'Still Have Questions?', sub_heading: '', top_margin: '8px', bottom_margin: '8px'} %>
+
+<div style="page-break-inside: avoid;">
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "If you have questions or concerns, we’re here to help."} %>
+
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+  content: "The #{Settings.site.short_name} Team <br></br> _____________________________________________________________________________________________________________"} %>
+</div>
+
+<%= render partial: 'notices/shared/reference_paragraph', :locals => {
+contents: ["<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:",
+"DC individual mandate: DC Official Code §47-5102(a)",
+"Federal individual mandate: 26 U.S.C. §5000A",
+"Exchange requirement to send 1095-A: 26 U.S.C. §36B(f); 26 C.F.R. §1-36B-5",
+"Requirement to reconcile advance premium tax credit: 26 C.F.R. §1-36B-4"]} %>

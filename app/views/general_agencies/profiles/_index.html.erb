@@ -6,19 +6,19 @@
         <div class="btn-group" role="group" aria-label="">
           <div class="btn-group" data-toggle="buttons" name="general_agencies_tab">
             <label class="btn btn-default <%= 'active' if @status == 'is_applicant' %>">
-              <input type="radio" name="options" autocomplete="off" value="is_applicant" <%= 'checked' if @status == 'is_applicant' %>> Applicant
+              <input type="radio" name="options" autocomplete="off" onchange="filterTable(this)" value="is_applicant" <%= 'checked' if @status == 'is_applicant' %>> Applicant
             </label>
             <label class="btn btn-default <%= 'active' if @status == 'is_approved' %>">
-              <input type="radio" name="options" autocomplete="off" value="is_approved" <%= 'checked' if @status == 'is_approved' %>> Certified
+              <input type="radio" name="options" autocomplete="off" onchange="filterTable(this)" value="is_approved" <%= 'checked' if @status == 'is_approved' %>> Certified
             </label>
             <label class="btn btn-default <%= 'active' if @status == 'is_rejected' %>">
-              <input type="radio" name="options" autocomplete="off" value="is_rejected" <%= 'checked' if @status == 'is_rejected' %>> Decertified
+              <input type="radio" name="options" autocomplete="off" onchange="filterTable(this)" value="is_rejected" <%= 'checked' if @status == 'is_rejected' %>> Decertified
             </label>
             <label class="btn btn-default <%= 'active' if @status == 'is_suspended' %>">
-              <input type="radio" name="options" autocomplete="off" value="is_suspended" <%= 'checked' if @status == 'is_suspended' %>> Pending
+              <input type="radio" name="options" autocomplete="off" onchange="filterTable(this)" value="is_suspended" <%= 'checked' if @status == 'is_suspended' %>> Pending
             </label>
             <label class="btn btn-default <%= 'active' if @status == 'all' %>">
-              <input type="radio" name="options" autocomplete="off" value="all" <%= 'checked' if @status == 'all' %>> All
+              <input type="radio" name="options" autocomplete="off" onchange="filterTable(this)" value="all" <%= 'checked' if @status == 'all' %>> All
             </label>
           </div>
         </div>

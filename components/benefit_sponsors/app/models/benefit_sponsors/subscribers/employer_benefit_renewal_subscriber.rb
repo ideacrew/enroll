@@ -77,8 +77,7 @@ module BenefitSponsors
       private
 
       def business_policy_for(benefit_sponsorship, business_policy_name)
-        sponsor_policy = BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipPolicy.new
-        sponsor_policy.business_policies_for(benefit_sponsorship, business_policy_name)
+        BenefitSponsors::BusinessPolicies::PolicyResolver.benefit_sponsorship_policy_for(benefit_sponsorship, business_policy_name)
       end
     end
   end

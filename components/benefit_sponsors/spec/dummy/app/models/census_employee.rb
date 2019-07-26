@@ -68,6 +68,7 @@ class CensusEmployee < CensusMember
 
   scope :eligible_without_term_pending, ->{ any_in(aasm_state: (ELIGIBLE_STATES - PENDING_STATES)) }
   scope :active_alone,      ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_ONLY) }
+  scope :by_ssn,            ->(ssn) { where(encrypted_ssn: CensusMember.encrypt_ssn(ssn)).and(:encrypted_ssn.nin => ["", nil]) }
 
   scope :eligible_for_renewal_under_package, ->(benefit_package, package_start, package_end, new_effective_date) {
     where(:"benefit_group_assignments" => {
@@ -88,6 +89,49 @@ class CensusEmployee < CensusMember
       ]
     )
   }
+
+  scope :employees_for_benefit_application_sponsorship, ->(benefit_application) {
+    new_effective_date = benefit_application.start_on
+    benefit_sponsorship_id = benefit_application.benefit_sponsorship.id
+    where(
+      "hired_on" => {"$lte" => new_effective_date},
+      "benefit_sponsorship_id" => benefit_sponsorship_id,
+      "$or" => [
+        {"employment_terminated_on" => nil},
+        {"employment_terminated_on" => {"$exists" => false}},
+        {"employment_terminated_on" => {"$gte" => new_effective_date}}
+      ]
+    )
+  }
+
+  def self.lacking_predecessor_assignment_for_application_as_of(predecessor_application, new_effective_date)
+    package_ids = predecessor_application.benefit_packages.map(&:id)
+    package_start = predecessor_application.start_on
+    package_end = predecessor_application.end_on
+    benefit_sponsorship_id = predecessor_application.benefit_sponsorship.id
+    CensusEmployee.where(
+      "hired_on" => {"$lte" => new_effective_date},
+      "benefit_sponsorship_id" => benefit_sponsorship_id,
+      "$or" => [
+        {"employment_terminated_on" => nil},
+        {"employment_terminated_on" => {"$exists" => false}},
+        {"employment_terminated_on" => {"$gte" => new_effective_date}}
+      ],
+      "benefit_group_assignments" => {
+        "$not" => {
+          "$elemMatch" => {
+            "benefit_package_id" => {"$in" => package_ids},
+            "start_on" => { "$gte" => package_start },
+            "$or" => [
+              {"end_on" => nil},
+              {"end_on" => {"$exists" => false}},
+              {"end_on" => package_end}
+            ]
+          }
+        }
+      }
+    )
+  end
 
   def initialize(*args)
     super(*args)

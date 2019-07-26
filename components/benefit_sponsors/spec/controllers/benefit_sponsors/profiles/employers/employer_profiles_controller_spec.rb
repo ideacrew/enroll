@@ -77,6 +77,42 @@ module BenefitSponsors
       end
     end
 
+    describe "bulk employee upload" do
+      context 'when a correct format is uploaded' do
+        let(:file) do
+          test_file = Rack::Test::UploadedFile.new(Rails.root.join("spec", "test_data", "census_employee_import", "DCHL Employee Census.xlsx"))
+          test_file.content_type = 'application/xlsx'
+          test_file
+        end
+
+        before do
+          benefit_sponsorship.save!
+          allow(controller).to receive(:authorize).and_return(true)
+          sign_in user
+          post :bulk_employee_upload, :params => {:employer_profile_id => benefit_sponsor.profiles.first.id, :file => file}
+        end
+
+        it 'should upload sucessfully' do
+          expect(response).to redirect_to(profiles_employers_employer_profile_path(benefit_sponsor.profiles.first, tab: 'employees'))
+        end
+      end
+
+      context 'when a wrong format is uploaded' do
+        let(:file) { Rack::Test::UploadedFile.new(Rails.root.join("spec", "test_data", "individual_person_payloads", "individual.xml")) }
+
+        before do
+          benefit_sponsorship.save!
+          allow(controller).to receive(:authorize).and_return(true)
+          sign_in user
+          post :bulk_employee_upload, :params => {:employer_profile_id => benefit_sponsor.profiles.first.id, :file => file}
+        end
+
+        it 'should throw error' do
+          expect(response).to render_template("benefit_sponsors/profiles/employers/employer_profiles/_employee_csv_upload_errors", "layouts/two_column")
+        end
+      end
+    end
+
 
     describe "GET coverage_reports" do
       let!(:employees) {
