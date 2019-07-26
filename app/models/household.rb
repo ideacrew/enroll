@@ -261,16 +261,6 @@ class Household
     end
   end
 
-  def end_multiple_thh(options = {})
-    all_active_thh = tax_households.active_tax_household
-    all_active_thh.group_by(&:group_by_year).select {|k, v| v.size > 1}.each_pair do |k, v|
-      sorted_ath = active_thh_with_year(k).order_by(:'created_at'.asc)
-      c = sorted_ath.count
-      #for update eligibility manually
-      sorted_ath.limit(c-1).update_all(effective_ending_on: Date.new(k, 12, 31)) if sorted_ath
-    end
-  end
-
   def latest_active_thh
     return tax_households.first if tax_households.length == 1
     tax_households.active_tax_household.order_by(:'created_at'.desc).first

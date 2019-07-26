@@ -3,13 +3,17 @@ require 'csv'
 @slcsp = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.last.slcsp_id
 @wrong_ssn_counter = 0
 
+def start_date_of_next_year
+  @start_date_of_next_year ||= TimeKeeper.date_of_record.next_year.beginning_of_year
+end
+
 def check_duplicated
   valid_people = {}
   dupes = {}
   not_found = []
   stranges = []
 
-  CSV.foreach("pids/2019_THHEligibility.csv") do |row_with_ssn|
+  CSV.foreach("pids/#{start_date_of_next_year.year}_THHEligibility.csv") do |row_with_ssn|
     ssn, hbx_id, aptc, csr, date = row_with_ssn
     if ssn && ssn =~ /^\d+$/ && ssn.to_s != '0'
       ssn = '0'*(9-ssn.length) + ssn if ssn.length < 9
@@ -56,9 +60,9 @@ def check_and_run
   not_run = []
   created_eligibility = []
 
-  CSV.foreach("pids/2019_THHEligibility.csv") do |row_with_ssn|
+  CSV.foreach("pids/#{start_date_of_next_year.year}_THHEligibility.csv") do |row_with_ssn|
     ssn, hbx_id, aptc, csr, date = row_with_ssn
-    date = "1/1/2019" unless date
+    date ||= start_date_of_next_year.to_s
     effective_date = date.to_date
 
     if aptc.blank? || csr.blank?
