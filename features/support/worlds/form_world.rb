@@ -81,7 +81,6 @@ module FormWorld
     fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][zip]', with: '01011'
     fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][area_code]', with: '781'
     fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][number]', with: '2783461'
-    fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][extension]', with: '1'
   end
 end
 
