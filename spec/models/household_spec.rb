@@ -314,10 +314,10 @@ describe Household, "for creating a new taxhousehold using create eligibility", 
 end
 
 describe "financial assistance eligibiltiy for a family", type: :model, dbclean: :after_each do
-  let!(:person) { FactoryGirl.create(:person, :with_family) }
+  let!(:person) { FactoryBot.create(:person, :with_family) }
   let!(:active_household) { person.primary_family.active_household }
   let!(:date) { Date.new(TimeKeeper.date_of_record.year, 1, 1) }
-  let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
+  let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
   let!(:slcsp) { HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp_id }
 
   it "should create one active tax household for the specified year" do
