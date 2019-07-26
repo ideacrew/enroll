@@ -95,14 +95,6 @@ class HbxProfilePolicy < ApplicationPolicy
     index?
   end
 
-  def issuer_index?
-    index?
-  end
-
-  def product_index?
-    index?
-  end
-
   def configuration?
     index?
   end

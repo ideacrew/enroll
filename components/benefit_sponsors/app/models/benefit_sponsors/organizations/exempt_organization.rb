@@ -3,8 +3,7 @@
 module BenefitSponsors
   module Organizations
     class ExemptOrganization < BenefitSponsors::Organizations::Organization
-
-
+      scope :by_profile_id, ->(profile_id){ where("profiles._id" => BSON::ObjectId.from_string(profile_id)) }
     end
   end
 end

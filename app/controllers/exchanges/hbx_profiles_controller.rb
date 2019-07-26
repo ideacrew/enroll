@@ -496,14 +496,6 @@ def employer_poc
     end
   end
 
-  def issuer_index
-    @issuers = CarrierProfile.all
-
-    respond_to do |format|
-      format.html { render "exchanges/hbx_profiles/issuer_index.html.slim" }
-    end
-  end
-
   def verification_index
     #@families = Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent").page(params[:page]).per(15)
     # @datatable = Effective::Datatables::DocumentDatatable.new
@@ -545,12 +537,6 @@ def employer_poc
     @organizations = organizations.skip(dt_query.skip).limit(dt_query.take)
     render
 
-  end
-
-  def product_index
-    respond_to do |format|
-      format.html { render "exchanges/hbx_profiles/product_index.html.slim" }
-    end
   end
 
   def configuration
