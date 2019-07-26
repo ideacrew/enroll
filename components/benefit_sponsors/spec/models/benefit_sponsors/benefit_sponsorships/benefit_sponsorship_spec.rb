@@ -500,6 +500,69 @@ module BenefitSponsors
       end
     end
 
+    describe "dt_display_benefit_application", :dbclean => :after_each do
+      let(:benefit_sponsorship)             { employer_profile.add_benefit_sponsorship }
+
+      context "when an employer has renewing draft benefit application" do
+        let!(:draft_benefit_application) do
+          FactoryBot.create(
+            :benefit_sponsors_benefit_application,
+            benefit_sponsorship: benefit_sponsorship,
+            recorded_service_areas: benefit_sponsorship.service_areas,
+            aasm_state: :draft
+          )
+        end
+
+        it "should return draft benefit application" do
+          benefit_sponsorship.update_attributes!(source_kind: :conversion)
+          expect(benefit_sponsorship.dt_display_benefit_application).to eq draft_benefit_application
+        end
+      end
+
+      context "when employer with renewing draft & active benefit application" do
+        let(:active_app_start_on)  { TimeKeeper.date_of_record.beginning_of_month.prev_month }
+        let(:draft_app_start_on)  { TimeKeeper.date_of_record.beginning_of_month + 2.months }
+
+        let!(:active_benefit_application) do
+          FactoryBot.create(
+            :benefit_sponsors_benefit_application,
+            benefit_sponsorship: benefit_sponsorship,
+            effective_period: active_app_start_on..active_app_start_on.next_year.prev_day,
+            recorded_service_areas: benefit_sponsorship.service_areas, aasm_state: :active
+          )
+        end
+
+        let!(:renewing_benefit_application) do
+          FactoryBot.create(
+            :benefit_sponsors_benefit_application,
+            benefit_sponsorship: benefit_sponsorship,
+            effective_period: draft_app_start_on..draft_app_start_on.next_year.prev_day,
+            recorded_service_areas: benefit_sponsorship.service_areas,
+            aasm_state: :draft
+          )
+        end
+        it "should return renewing draft benefit application" do
+          benefit_sponsorship.update_attributes!(source_kind: :conversion)
+          expect(benefit_sponsorship.dt_display_benefit_application).to eq renewing_benefit_application
+        end
+      end
+
+      context "when employer with active benefit application" do
+        let!(:active_benefit_application) do
+          FactoryBot.create(
+            :benefit_sponsors_benefit_application,
+            benefit_sponsorship: benefit_sponsorship,
+            recorded_service_areas: benefit_sponsorship.service_areas, aasm_state: :active
+          )
+        end
+
+        it "should return active benefit application" do
+          benefit_sponsorship.update_attributes!(source_kind: :conversion)
+          expect(benefit_sponsorship.dt_display_benefit_application).to eq active_benefit_application
+        end
+      end
+    end
+
     describe "Scopes", :dbclean => :after_each do
       let!(:rating_area)                    { FactoryBot.create(:benefit_markets_locations_rating_area)  }
       let!(:service_area)                    { FactoryBot.create(:benefit_markets_locations_service_area)  }
