@@ -516,6 +516,7 @@ module BenefitSponsors
         private
 
         def get_existing_organization
+          return unless fein.present?
           Organization.where(:fein => fein).first
         end
 
