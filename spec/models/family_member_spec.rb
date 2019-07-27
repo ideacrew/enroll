@@ -181,7 +181,10 @@ describe FamilyMember, dbclean: :after_each do
 end
 
 describe FamilyMember, "which is inactive" do
-  it "can be reactivated with a specified relationship"
+  # TODO: Note 7/17/2019 this wasn't even a finished block, xit'd out
+  xit "can be reactivated with a specified relationship" do
+
+  end
 end
 
 describe FamilyMember, "given a relationship to update" do
@@ -202,7 +205,7 @@ describe FamilyMember, "given a relationship to update" do
 end
 
 describe FamilyMember, "aptc_benchmark_amount" do
-  let(:person) { FactoryBot.create(:person, :with_consumer_role)}
+  let(:person) { FactoryBot.create(:person, :with_consumer_role, dob: TimeKeeper.date_of_record - 46.years)}
   let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person, e_case_id: "family_test#1000")}
   let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
   let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
