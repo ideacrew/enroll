@@ -8,10 +8,6 @@ class Insured::ConsumerRolesController < ApplicationController
   before_action :individual_market_is_enabled?
   #before_action :authorize_for, except: [:edit, :update]
 
-  # generate initial individual_market_transition as a placeholder for initial enrollment in IVL
-  after_action :create_initial_market_transition, only: [:create]
-
-
   def ssn_taken
   end
 
@@ -337,16 +333,6 @@ class Insured::ConsumerRolesController < ApplicationController
       current_user.save!
       # render 'privacy'
     end
-  end
-
-  def create_initial_market_transition
-    transition = IndividualMarketTransition.new
-    transition.role_type = "consumer"
-    transition.submitted_at = TimeKeeper.datetime_of_record
-    transition.reason_code = "generating_consumer_role"
-    transition.effective_starting_on = TimeKeeper.datetime_of_record
-    transition.user_id = current_user.id
-    Person.find(session[:person_id]).individual_market_transitions << transition
   end
 
   def set_error_message(message)
