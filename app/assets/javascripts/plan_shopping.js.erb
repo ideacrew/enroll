@@ -179,7 +179,7 @@ $(function() {
 		}
   });
 
-  
+
   $(document).on('change', '.ivl-select-plan-for-comparison', function(){
 	  maybeAddComparisonPlan(this);
   });
@@ -255,3 +255,9 @@ $(function() {
 $(document).on("click", ".reference_plan_info h4 span", function() {
   $(this).parents(".reference_plan_info").find('.content').toggle();
 });
+
+function disableSelectricInModal() {
+  $('#waive_confirm').on('shown.bs.modal', function (e) {
+    $('select#waiver_reason_selection_dropdown').selectric('destroy');
+  })
+}

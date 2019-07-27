@@ -31,13 +31,13 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       expect(response).to render_template("exchanges/hbx_profiles/broker_agency_index_datatable.html.slim", "layouts/single_column")
     end
 
-    it "renders issuer_index" do
+    xit "renders issuer_index" do
       get :issuer_index, xhr: true
       expect(response).to have_http_status(:success)
       expect(response).to render_template("exchanges/hbx_profiles/issuer_index.html.slim", "layouts/single_column")
     end
 
-    it "renders issuer_index" do
+    xit "renders issuer_index" do
       get :product_index, xhr: true
       expect(response).to have_http_status(:success)
       expect(response).to render_template("exchanges/hbx_profiles/product_index.html.slim", "layouts/single_column")
