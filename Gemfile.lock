@@ -36,6 +36,27 @@ GIT
       ttfunk (~> 1.0.3)
 
 PATH
+  remote: ../resource_registry
+  specs:
+    resource_registry (0.1.0)
+      bootsnap (~> 1.0)
+      dry-auto_inject (~> 0.6)
+      dry-configurable (~> 0.8)
+      dry-container (~> 0.7)
+      dry-core (~> 0.4)
+      dry-equalizer (~> 0.2)
+      dry-inflector (~> 0.1)
+      dry-matcher (~> 0.7)
+      dry-monads (~> 1.2)
+      dry-struct (~> 1.0)
+      dry-system (~> 0.12)
+      dry-types (~> 1.0)
+      dry-validation (~> 1.0)
+      i18n (~> 1.6)
+      mime-types
+      ox (~> 2.0)
+
+PATH
   remote: components/benefit_markets
   specs:
     benefit_markets (0.0.1)
@@ -375,6 +396,11 @@ GEM
       concurrent-ruby (~> 1.0)
       dry-core (~> 0.2)
       dry-equalizer (~> 0.2)
+    dry-matcher (0.7.0)
+    dry-monads (1.2.0)
+      concurrent-ruby (~> 1.0)
+      dry-core (~> 0.4, >= 0.4.4)
+      dry-equalizer
     dry-schema (1.2.0)
       concurrent-ruby (~> 1.0)
       dry-configurable (~> 0.8, >= 0.8.3)
@@ -383,6 +409,20 @@ GEM
       dry-initializer (~> 3.0)
       dry-logic (~> 1.0)
       dry-types (~> 1.0)
+    dry-struct (1.0.0)
+      dry-core (~> 0.4, >= 0.4.3)
+      dry-equalizer (~> 0.2)
+      dry-types (~> 1.0)
+      ice_nine (~> 0.11)
+    dry-system (0.12.0)
+      concurrent-ruby (~> 1.0)
+      dry-auto_inject (>= 0.4.0)
+      dry-configurable (~> 0.7, >= 0.7.0)
+      dry-container (~> 0.7)
+      dry-core (>= 0.3.1)
+      dry-equalizer (~> 0.2)
+      dry-inflector (~> 0.1, >= 0.1.2)
+      dry-struct (~> 1.0)
     dry-types (1.1.0)
       concurrent-ruby (~> 1.0)
       dry-container (~> 0.3)
@@ -556,6 +596,7 @@ GEM
     overcommit (0.48.1)
       childprocess (~> 0.6, >= 0.6.3)
       iniparse (~> 1.4)
+    ox (2.11.0)
     parallel (1.17.0)
     parallel_tests (2.26.2)
       parallel
@@ -919,6 +960,7 @@ DEPENDENCIES
   redcarpet (~> 3.4)
   redis (~> 4.0)
   redis-rails (~> 5.0.2)
+  resource_registry!
   resque (~> 2.0)
   roo (~> 2.1)
   rspec-benchmark
