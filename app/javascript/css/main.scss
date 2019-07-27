@@ -8,13 +8,18 @@ body {
   font-family: 'Open Sans', sans-serif;
 }
 
+.nm-content {
+  height: calc(100vh - 175px);
+  overflow-y: auto;
+}
+
 footer {
   font-size: 14px;
   color: $white;
   background-color: $dc-dark-blue;
   position: absolute;
-  bottom: 0;
   left: 0;
+  bottom:0;
   width: 100%;
   a, a:hover {
     color: $white;
