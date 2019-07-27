@@ -1,2 +1,3 @@
 //set_tab_content("update successful.");
-set_tab_content("<%= escape_javascript render "update_aptc_csr"%>")
+$('#aptcData').hide();
+$('#aptcUpdate').html('<%= j render partial: 'update_aptc_csr'%>');
