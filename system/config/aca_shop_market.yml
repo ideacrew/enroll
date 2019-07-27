@@ -1,0 +1,90 @@
+namespace:
+  key: :tenants
+  namespaces:
+    - key: :dchbx
+      namespaces:
+      - key: :applications
+        namespaces:
+        - key: :enroll
+          namespaces:  
+          - key: :features
+            namespaces:
+            - key: :aca_shop_market
+              namespaces:
+              - key: :benefit_market_catalogs
+                namespaces:
+                - key: :catalog_2019
+                  settings:
+                  - key: application_period
+                    type: :range
+                    default: "{{ Date.new(2019,1,1)..Date.new(2019,12,31) }}"
+                  - key: :enrollment_transmit_period
+                    type: :range
+                    default: "{{ Date.new(2019, 1, 26)..Date.new(2019, 1, 31) }}"
+                  - key: :application_interval_kind
+                    type: :enumerated_hash
+                    default: { monthly: "Monthly" }
+                  - key: :probation_period_kinds
+                    type: :enumerated_hash_array
+                    default: [
+                               { first_of_month_before_15th: "First of month before 15th" },
+                               { date_of_hire: "Date of hire" },
+                               { first_of_month: "First of month following date of hire" },
+                               { first_of_month_after_30_days: "First of month after 30 days following date of hire" },
+                               { first_of_month_after_60_days: "First of month after 60 days following date of hire" }
+                             ]
+                  - key: :employer_attestation_required
+                    type: :boolean
+                    default: false
+                  - key: employer_sic_required
+                    type: :boolean
+                    default: false
+                  - key: :employer_contribution_pct_min
+                    type: :integer
+                    default: 75
+                  - key: :employee_non_owner_count_min
+                    type: :integer
+                    default: 1
+                  - key: :employee_count_max
+                    type: :integer
+                    default: 50
+                  - key: :employee_participation_ratio_min
+                    type: :float
+                    default: 0.75
+                  namespaces:
+                  - key: :product_packages
+                    namespaces:                
+                    - key: month_1
+                      settings:
+                      - key: :open_enrollment_begin_dom
+                        type: :integer
+                        default: 1
+                      - key: :open_enrollment_end_dom
+                        type: :integer
+                        default: 20
+                      - key: :binder_payment_due_dom
+                        type: :integer
+                        default: 24
+                      - key: :open_enrollment_length_days_min
+                        type: :integer
+                        default: 5
+                      - key: :open_enrollment_length_months_max
+                        type: :integer
+                        default: 2
+                    - key: :month_2
+                      settings:
+                      - key: :open_enrollment_begin_dom
+                        type: :integer
+                        default: 1
+                      - key: :open_enrollment_end_dom
+                        type: :integer
+                        default: 20
+                      - key: :binder_payment_due_dom
+                        type: :integer
+                        default: 24
+                      - key: :open_enrollment_length_days_min
+                        type: :integer
+                        default: 5
+                      - key: :open_enrollment_length_months_max
+                        type: :integer
+                        default: 2
