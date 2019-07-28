@@ -320,4 +320,11 @@ passwordsMatch() {
   }
 }
 
+preventEnterSubmission(event) {
+  if (event.keyCode === 13 || event.code === "Enter") {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+}
+
 }
