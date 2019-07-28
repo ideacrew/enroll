@@ -31,10 +31,18 @@ module BenefitSponsors
               person = current_person
               create_sso_account(current_user, current_person, 15, "employer") do
               end
-            else
+              redirect_to result_url
+            elsif is_general_agency_profile?
               flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
+              redirect_to result_url
+            else
+              if is_site_cca?
+                redirect_to result_url
+              else
+                flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
+                render 'confirmation', :layout => 'single_column'
+              end
             end
-            redirect_to result_url
             return
           end
         rescue Exception => e
@@ -110,6 +118,10 @@ module BenefitSponsors
       def current_person
         current_user.reload # devise current user not loading changes
         current_user.person
+      end
+
+      def is_site_cca?
+        Settings.site.key == :cca
       end
 
       def user_not_authorized(exception)

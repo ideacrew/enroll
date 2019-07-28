@@ -253,16 +253,19 @@ module BenefitSponsors
             post :create, params:{:agency => self.send("#{profile_type}_params")}
           end
 
-          it "should redirect" do
-            expect(response).to have_http_status(:redirect)
+          it "should redirect for benefit_sponsor and general agency" do
+            expect(response).to have_http_status(:redirect) if profile_type != 'broker_agency'
+          end
+
+          it "should render confirmation template for broker agency" do
+            expect(response).to render_template('confirmation') if profile_type == 'broker_agency'
           end
 
           it "should redirect to home page of benefit_sponsor" do
             expect(response.location.include?("tab=home")).to eq true if profile_type == "benefit_sponsor"
           end
 
-          it "should redirect to new for broker agency or general agency" do
-            expect(response.location.include?("new?profile_type=broker_agency")).to eq true if profile_type == "broker_agency"
+          it "should redirect to new for general agency" do
             expect(response.location.include?("new?profile_type=general_agency")).to eq true if profile_type == "general_agency"
           end
         end
