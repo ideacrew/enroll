@@ -483,6 +483,10 @@ module BenefitSponsors
       renewal_benefit_application.present? ? renewal_benefit_application.predecessor : most_recent_benefit_application
     end
 
+    def dt_display_benefit_application
+      benefit_applications.where(:aasm_state.ne => :canceled).order_by(:"effective_period.min".desc).first || latest_benefit_application
+    end
+
     def renewal_benefit_application
       benefit_applications.order_by(:"created_at".desc).detect {|application| application.is_renewing? }
     end
