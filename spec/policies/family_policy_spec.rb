@@ -116,8 +116,8 @@ describe FamilyPolicy, "given a family where the primary has an active employer 
   let(:broker_agency_staff_role) { instance_double(BrokerAgencyStaffRole, :benefit_sponsors_broker_agency_profile_id => '1234') }
   let(:user) { instance_double(User, :person => ga_person) }
   let(:ga_person) { instance_double(Person, :id => ga_person_id, :broker_role => nil, :active_general_agency_staff_roles => [general_agency_staff_role], :active_broker_staff_roles => [broker_agency_staff_role], :hbx_staff_role => nil) }
-  let(:general_agency_staff_role) { instance_double(GeneralAgencyStaffRole, :general_agency_profile_id => general_agency_profile_id) }
-  let(:general_agency_account) { instance_double(GeneralAgencyAccount, :general_agency_profile_id => general_agency_account_profile_id ) }
+  let(:general_agency_staff_role) { instance_double(GeneralAgencyStaffRole, :benefit_sponsors_general_agency_profile_id => general_agency_profile_id) }
+  let(:general_agency_account) { instance_double(SponsoredBenefits::Accounts::GeneralAgencyAccount, :benefit_sponsrship_general_agency_profile_id => general_agency_account_profile_id) }
   let(:primary_member) { instance_double(FamilyMember, :person_id => primary_person_id, :person => person) }
 
   subject { FamilyPolicy.new(user, family) }
