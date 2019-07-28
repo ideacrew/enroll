@@ -1,19 +1,23 @@
 <%= render "ui-components/v1/navs/primary_nav.html.slim" %>
-<p id="notice"><%= notice %></p>
+<div id="familiesDTMain">
+  <p id="notice"><%= notice %></p>
 
-<div class='container'>
-  <h1> Families </h1>
-  <%#= link_to 'Switch to APTC / CSR Families', aptc_csr_family_index_exchanges_hbx_profiles_path, remote: true%>
-  <%= raw render_datatable(@datatable) %>
-</div>
+  <div class='container'>
+    <h1> Families </h1>
+    <%#= link_to 'Switch to APTC / CSR Families', aptc_csr_family_index_exchanges_hbx_profiles_path, remote: true%>
+    <%= raw render_datatable(@datatable) %>
+  </div>
 
-<div class="container">
-  <div class="col-sm-12 col-md-12">
-    <div class="row">
-      <p> After working on an enrollment return to this page via the person icon in the header </p>
+  <div class="container">
+    <div class="col-sm-12 col-md-12">
+      <div class="row">
+        <p> After working on an enrollment return to this page via the person icon in the header </p>
+      </div>
     </div>
   </div>
 </div>
+<div id="aptcData"></div>
+<div id="aptcUpdate"></div>
 
 <script>
  initializeDataTables();
