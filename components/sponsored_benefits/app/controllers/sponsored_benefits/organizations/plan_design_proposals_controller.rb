@@ -45,7 +45,7 @@ module SponsoredBenefits
         end
       end
 
-      redirect_to benefit_sponsors.profiles_employers_employer_profile_path(employer_profile, :tab => 'benefits')
+      redirect_to benefit_sponsors.profiles_employers_employer_profile_path(employer_profile_id, :tab => 'benefits')
     end
 
     def publish
