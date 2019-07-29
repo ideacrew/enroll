@@ -65,6 +65,7 @@ class CensusEmployee < CensusMember
   scope :non_business_owner, ->{ where(is_business_owner: false) }
   scope :benefit_application_assigned,     ->(benefit_application) { where(:"benefit_group_assignments.benefit_package_id".in => benefit_application.benefit_packages.pluck(:_id)) }
   scope :benefit_application_unassigned,   ->(benefit_application) { where(:"benefit_group_assignments.benefit_package_id".nin => benefit_application.benefit_packages.pluck(:_id)) }
+  scope :non_term_and_pending,->{ where(:aasm_state.nin => (EMPLOYMENT_TERMINATED_STATES + PENDING_STATES)) }
 
   scope :eligible_without_term_pending, ->{ any_in(aasm_state: (ELIGIBLE_STATES - PENDING_STATES)) }
   scope :active_alone,      ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_ONLY) }
