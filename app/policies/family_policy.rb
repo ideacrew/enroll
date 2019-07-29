@@ -20,14 +20,12 @@ class FamilyPolicy < ApplicationPolicy
         end
       end
       ga_roles = user_person.active_general_agency_staff_roles
-      if ga_roles.any?
-        if employee_roles.any?
-          general_agency_profile_account_ids = employee_roles.map do |er|
-            er.employer_profile.active_general_agency_account
-          end.compact.map(&:general_agency_profile_id)
-          ga_roles.each do |ga_role|
-            return true if general_agency_profile_account_ids.include?(ga_role.general_agency_profile_id)
-          end
+      if ga_roles.any? && employee_roles.any?
+        general_agency_profile_account_ids = employee_roles.map do |er|
+          er.employer_profile.active_general_agency_account
+        end.compact.map(&:benefit_sponsrship_general_agency_profile_id)
+        ga_roles.each do |ga_role|
+          return true if general_agency_profile_account_ids.include?(ga_role.benefit_sponsors_general_agency_profile_id)
         end
       end
     end

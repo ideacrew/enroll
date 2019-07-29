@@ -6,7 +6,7 @@
     - if sponsored_benefit.present? && sponsored_benefit.latest_pricing_determination.present?
       %group_size= sponsored_benefit.latest_pricing_determination.group_size
       %participation_rate= sponsored_benefit.latest_pricing_determination.participation_rate
-  - if benefit_group.rating_area.present?
+  - if benefit_group.rating_area.present? && Settings.site.key.to_s == "cca"
     %rating_area= benefit_group.rating_area.exchange_provided_code
   %elected_plans
     = render :partial => "events/v2/employers/elected_plan", :collection => elected_plans
