@@ -390,7 +390,7 @@ describe CensusEmployeePolicy, dbclean: :after_each do
         # return true if a.general_agency_profile.id == ga_id
         # in #show? of census_employee_policy
         before do
-          allow(user).to receive(:has_general_agency_staff_role?).and_return (true)
+          allow(user).to receive(:has_general_agency_staff_role?).and_return true
           allow(EmployerProfile).to receive(:find_by_general_agency_profile).and_return [employee.employer_profile]
           allow(user.person.general_agency_staff_roles.last).to receive(:general_agency_profile).and_return(general_agency_profile_double)
           allow(SponsoredBenefits::Organizations::PlanDesignOrganization).to receive(:find_by_sponsor).with(CensusEmployee.first.employer_profile.id).and_return(organizations_scope_double)
