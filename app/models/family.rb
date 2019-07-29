@@ -178,7 +178,7 @@ class Family
   scope :outstanding_verification_datatable,   ->{ where(
     :"_id".in => HbxEnrollment.individual_market.enrolled_and_renewing.by_unverified.distinct(:family_id))
   }
-  scope :monthly_reports_scope, -> do
+  scope :monthly_reports_scope, lambda { |start_date, end_date|
     where(
       :"_id".in => HbxEnrollment.where(
       {
@@ -188,7 +188,7 @@ class Family
         :kind => 'individual'
       }
     ).distinct(:family_id))
-  end
+  }
   
   # Replaced scopes for moving HbxEnrollment to top level
   # The following methods are rewrites of scopes that were being called before HbxEnrollment was a top level document.
