@@ -62,8 +62,15 @@ javascript:
             type: "GET",
             data: {profile_type: "broker_agency_staff"},
             success: function (data) {
-              $("#broker_agency_staff").html(data)
-                initDatepicker('inputStaffDOB', new Date("#{Date.today.beginning_of_month-90.years}"), new Date("#{Date.today.end_of_month-18.years}"));
+              $("#broker_agency_staff").html(data);
+              setTimeout(function() {
+              initDatepicker('inputStaffDOB', new Date("#{Date.today.beginning_of_month-90.years}"), new Date("#{Date.today.end_of_month-18.years}"));
+
+              var cleave = new Cleave('#inputStaffDOB', {
+            	    date: true,
+            	    datePattern: ['m', 'd', 'Y']
+            	});
+              })
             }
           })
         }
