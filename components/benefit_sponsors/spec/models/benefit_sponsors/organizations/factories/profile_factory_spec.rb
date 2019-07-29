@@ -251,7 +251,7 @@ module BenefitSponsors
         end
 
         it 'should create general agency staff role with is_primary true' do
-          expect( profile_factory.person.general_agency_staff_roles.first.is_primary).to be_truthy
+          expect(profile_factory.person.general_agency_staff_roles.first.is_primary).to be_truthy
         end
 
         it 'should return redirection url' do
