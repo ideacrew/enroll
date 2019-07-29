@@ -1,6 +1,5 @@
-namespace:
-  key: :tenants
-  namespaces:
+key: :tenants
+namespaces:
     - key: :dchbx
       namespaces:
       - key: :applications

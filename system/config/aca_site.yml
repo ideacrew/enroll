@@ -1,37 +1,36 @@
-namespace:
-  key: :tenants
-  namespaces:
-    - key: :dchbx
-      settings:
-      - key: :owner
-        title: DC Health Link
-        description: 'DCHBX'
-        default: :owner
-      - key: :subscriptions
-        type: :array
-        default:
-        - :enroll
-        - :edi
+key: :tenants
+namespaces:
+  - key: :dchbx
+    settings:
+    - key: :owner
+      title: DC Health Link
+      description: 'DCHBX'
+      default: :owner
+    - key: :subscriptions
+      type: :array
+      default:
+      - :enroll
+      - :edi
+    namespaces:
+    - key: :applications
       namespaces:
-      - key: :applications
+      - key: :enroll
+        settings:
+        - key: :features
+          default: 
+          - :aca_shop_market
+          - :aca_individual_market
         namespaces:
-        - key: :enroll
-          settings:
-          - key: :features
-            default: 
-            - :aca_shop_market
-            - :aca_individual_market
+        - key: :features
           namespaces:
-          - key: :features
-            namespaces:
-            - key: :enroll_main
-              settings:
-              - key: :test_setting
-                value: Test Value
-                default: Test Value
-        - key: :edi
-          settings:
-          - key: :features
-            default:
-            - :aca_shop_market
-            - :aca_individual_market
+          - key: :enroll_main
+            settings:
+            - key: :test_setting
+              value: Test Value
+              default: Test Value
+      - key: :edi
+        settings:
+        - key: :features
+          default:
+          - :aca_shop_market
+          - :aca_individual_market
