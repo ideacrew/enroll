@@ -10,7 +10,7 @@ describe CensusEmployeePolicy, dbclean: :after_each do
   let(:employer_staff_person) { FactoryBot.create(:person,:with_employer_staff_role) }
   let(:general_agency_person) { FactoryBot.create(:person,:with_general_agency_staff_role) }
 
-  before do 
+  before do
     allow_any_instance_of(CensusEmployee).to receive(:generate_and_deliver_checkbook_url).and_return(true)
   end
 
@@ -390,6 +390,7 @@ describe CensusEmployeePolicy, dbclean: :after_each do
         # return true if a.general_agency_profile.id == ga_id
         # in #show? of census_employee_policy
         before do
+          allow(user).to receive(:has_general_agency_staff_role?).and_return (true)
           allow(EmployerProfile).to receive(:find_by_general_agency_profile).and_return [employee.employer_profile]
           allow(user.person.general_agency_staff_roles.last).to receive(:general_agency_profile).and_return(general_agency_profile_double)
           allow(SponsoredBenefits::Organizations::PlanDesignOrganization).to receive(:find_by_sponsor).with(CensusEmployee.first.employer_profile.id).and_return(organizations_scope_double)
