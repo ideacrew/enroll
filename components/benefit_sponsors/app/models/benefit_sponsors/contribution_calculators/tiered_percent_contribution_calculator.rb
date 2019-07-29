@@ -48,7 +48,7 @@ module BenefitSponsors
             end
             cu = @level_map[contribution_unit.id]
             c_factor = cu.contribution_factor
-            max_contribution = BigDecimal.new((@total_price * c_factor).to_s).round(2)
+            max_contribution = BigDecimal.new((@total_price * c_factor).to_s).round(2, BigDecimal::ROUND_HALF_DOWN)
             @total_contribution = [max_contribution, @total_price].min
             distribution_remaining = @total_contribution
             members_total_price = 0.00

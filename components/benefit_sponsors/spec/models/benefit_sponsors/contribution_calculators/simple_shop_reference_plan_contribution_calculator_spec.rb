@@ -224,6 +224,122 @@ module BenefitSponsors
           expect(member_total).to eq(total_contribution)
         end
       end
+
+      describe "with a pricing determination and one family that has:
+      - an employee
+      - a spouse
+      - a child
+      " do
+
+        let(:employee_dob) { Date.new(1990, 6, 1) }
+        let(:employee_member_id) { "some_employee_id" }
+
+        let(:employee) do
+          instance_double(
+            "::BenefitMarkets::SponsoredBenefits::RosterMember",
+            member_id: employee_member_id,
+            relationship: "self",
+            is_disabled?: false,
+            is_primary_member?: true,
+            dob: employee_dob
+          )
+        end
+        let(:employee_enrollment) do
+          BenefitSponsors::Enrollments::MemberEnrollment.new(
+            member_id: employee_member_id,
+            product_price: primary_price 
+          )
+        end
+        let(:employee_age) { 27 }
+
+        let(:spouse_member_id) { "some_spouse_id" }
+        let(:spouse_dob) { Date.new(1995, 9, 27) }
+        let(:spouse) do
+          instance_double(
+            "::BenefitMarkets::SponsoredBenefits::RosterMember",
+            member_id: spouse_member_id,
+            relationship: "spouse",
+            is_disabled?: false,
+            dob: spouse_dob,
+            is_primary_member?: false
+          )
+        end
+
+        let(:coverage_start_date) { Date.new(2018, 1, 1) }
+        let(:rate_schedule_date) { Date.new(2018, 1, 1) }
+
+        let(:family_group_enrollment) do
+          BenefitSponsors::Enrollments::GroupEnrollment.new(
+            member_enrollments: [employee_enrollment],
+            rate_schedule_date: rate_schedule_date,
+            coverage_start_on: coverage_start_date,
+            previous_product: nil,
+            product: product,
+            rating_area: rating_area,
+            product_cost_total: family_price
+          )
+        end
+
+        let(:rating_area) { "DC01" }
+
+        let(:family_roster_entry) do
+          ::BenefitSponsors::Members::MemberGroup.new(
+            [employee],
+            group_enrollment: family_group_enrollment
+          )
+        end
+
+        let(:family_price) { 541.17 }
+        let(:primary_price) { 541.17 }
+
+        let(:total_contribution) { 270.58 }
+
+        let(:employee_contribution_level) do
+          instance_double(
+            ::BenefitSponsors::SponsoredBenefits::ContributionLevel,
+            contribution_unit_id: "employee_cu_id",
+            contribution_factor: 0.50
+          )
+        end
+
+        let(:sponsor_contribution) do
+          instance_double(
+            ::BenefitSponsors::SponsoredBenefits::ReferenceProductFixedPercentSponsorContribution,
+            contribution_levels: [employee_contribution_level],
+            reference_product: reference_product,
+            id: "some cacheable id"
+          )
+        end
+        
+        let(:reference_product) { double(id: "reference product id") }
+
+        before(:each) do
+          allow(contribution_model).to receive(:map_relationship_for).with("self", employee_age, false).and_return("employee")
+          allow(employee_contribution_unit).to receive(:match?).with({"employee"=>1}).and_return(true)
+          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(reference_product, rate_schedule_date, employee_age, rating_area).and_return(541.17)
+        end
+
+        it "calculates the total contribution" do
+          calculation_result = contribution_calculator.calculate_contribution_for(
+            contribution_model,
+            family_roster_entry,
+            sponsor_contribution
+          )
+          expect(calculation_result.group_enrollment.sponsor_contribution_total).to eq(total_contribution)
+        end
+
+        it "calculates the member contributions" do
+          calculation_result = contribution_calculator.calculate_contribution_for(
+            contribution_model,
+            family_roster_entry,
+            sponsor_contribution
+          )
+          member_total = calculation_result.group_enrollment.member_enrollments.inject(BigDecimal.new("0.00")) do |acc, m_en|
+            BigDecimal.new((acc + m_en.sponsor_contribution).to_s).round(2)
+          end
+          expect(member_total).to eq(total_contribution)
+        end
+      end
     end
   end
 end
