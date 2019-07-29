@@ -33,7 +33,7 @@
             Benefit: <%= @enrollment.coverage_kind.titleize %><br>
             Market: <%= show_market_name_by_enrollment @enrollment %><br>
             <!-- #TODO: FIX me  -->
-            Metal level : <%#= display_dental_metal_level @plan %>
+            Metal level: <%= @plan.metal_level_kind.capitalize %>
           </p>
 
           <% if @enrollment.employee_role.present? %>

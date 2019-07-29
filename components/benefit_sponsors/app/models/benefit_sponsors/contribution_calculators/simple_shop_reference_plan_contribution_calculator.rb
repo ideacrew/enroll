@@ -39,8 +39,8 @@ module BenefitSponsors
           if (member_price == 0.00) || (c_factor == 0)
             0.00
           end
-          ref_rate = reference_rate_for(member)
-          ref_contribution = BigDecimal.new((ref_rate * c_factor).to_s).round(2)
+          ref_rate = BigDecimal.new(reference_rate_for(member).to_s).round(2)
+          ref_contribution = BigDecimal.new((ref_rate * c_factor).to_s).round(2, BigDecimal::ROUND_HALF_DOWN)
           if member_price <= ref_contribution
             member_price
           else

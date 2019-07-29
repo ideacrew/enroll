@@ -65,10 +65,23 @@ class CensusEmployee < CensusMember
   scope :non_business_owner, ->{ where(is_business_owner: false) }
   scope :benefit_application_assigned,     ->(benefit_application) { where(:"benefit_group_assignments.benefit_package_id".in => benefit_application.benefit_packages.pluck(:_id)) }
   scope :benefit_application_unassigned,   ->(benefit_application) { where(:"benefit_group_assignments.benefit_package_id".nin => benefit_application.benefit_packages.pluck(:_id)) }
+  scope :non_term_and_pending,->{ where(:aasm_state.nin => (EMPLOYMENT_TERMINATED_STATES + PENDING_STATES)) }
 
   scope :eligible_without_term_pending, ->{ any_in(aasm_state: (ELIGIBLE_STATES - PENDING_STATES)) }
   scope :active_alone,      ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_ONLY) }
   scope :by_ssn,            ->(ssn) { where(encrypted_ssn: CensusMember.encrypt_ssn(ssn)).and(:encrypted_ssn.nin => ["", nil]) }
+
+  scope :by_benefit_package_and_assignment_on_or_later,->(benefit_package, effective_on, is_active) do
+    where(
+      :benefit_group_assignments => {
+        :$elemMatch => {
+          :start_on.gte => effective_on,
+          :benefit_package_id => benefit_package.id,
+          :is_active => is_active
+        }
+      }
+    )
+  end
 
   scope :eligible_for_renewal_under_package, ->(benefit_package, package_start, package_end, new_effective_date) {
     where(:"benefit_group_assignments" => {

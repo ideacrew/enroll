@@ -381,6 +381,16 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       expect(flash[:notice]).to eq "Waive Coverage Successful"
       expect(response).to be_redirect
     end
+    
+    it "#post enrollment termination" do 
+      allow(hbx_enrollment).to receive(:coverage_termination_pending?).and_return(true)
+      allow(hbx_enrollment).to receive(:waiver_reason=).with("Because").and_return(true)
+      allow(hbx_enrollment).to receive(:valid?).and_return(true)
+      allow(hbx_enrollment).to receive(:inactive?).and_return(true)
+      post :waive, params: {id: "hbx_id", waiver_reason: "Because"}
+      expect(flash[:notice]).to eq "Waive Coverage Successful"
+      expect(response).to be_redirect
+    end
 
     it "should get failure flash message" do
       allow(hbx_enrollment).to receive(:waiver_reason=).with("Because").and_return(false)

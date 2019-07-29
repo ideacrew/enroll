@@ -349,5 +349,4 @@ class Invitation
       invitation.send_agent_invitation!(hbx_staff_role.parent.full_name)
       invitation
   end
-
 end

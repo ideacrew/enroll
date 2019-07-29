@@ -46,7 +46,7 @@
 
     <%= render partial: './ui-components/bs4/v1/navs/header' %>
 
-    <div class="content <%= controller_name %> content-bottom">
+    <div class="content <%= controller_name %> content-bottom nm-content">
       <% if aca_security_questions %>
         <%= render 'users/security_question_responses/modal' %>
       <% end %>
@@ -54,13 +54,9 @@
       <%= render_flash %>
       <div class="container">
         <%= yield :horizontal_status %>
-
       </div>
         <%= yield %>
-
     </div>
-
     <%= render partial: './ui-components/bs4/v1/footers/footer' %>
-
   </body>
  </html>
