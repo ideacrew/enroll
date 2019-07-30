@@ -116,7 +116,7 @@ class Insured::GroupSelectionController < ApplicationController
     hbx_enrollment.broker_agency_profile_id = broker_role.broker_agency_profile_id if broker_role
 
     hbx_enrollment.coverage_kind = @coverage_kind
-    hbx_enrollment.validate_for_cobra_eligiblity(@employee_role)
+    hbx_enrollment.validate_for_cobra_eligiblity(@employee_role, current_user)
 
     hbx_enrollment.kind = @market_kind if (hbx_enrollment.kind != @market_kind) && @market_kind != 'shop' && @market_kind != 'fehb'
 
@@ -247,7 +247,7 @@ class Insured::GroupSelectionController < ApplicationController
     if @hbx_enrollment.present? && @change_plan == 'change_plan'
       @mc_market_kind = if @hbx_enrollment.employer_profile.is_a?(BenefitSponsors::Organizations::FehbEmployerProfile)
                           'fehb'
-                        elsif @hbx_enrollment.kind == 'employer_sponsored'
+                        elsif @hbx_enrollment.is_shop?
                           'shop'
                         elsif @hbx_enrollment.kind == 'coverall'
                           'coverall'
