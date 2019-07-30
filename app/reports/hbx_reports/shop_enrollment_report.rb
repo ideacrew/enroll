@@ -38,14 +38,16 @@ class ShopEnrollmentReport < MongoidMigrationTask
     file_name = "#{Rails.root}/hbx_report/shop_enrollment_report.csv"
 
     rating_area_cache = get_rating_areas
+    product_cache = get_product_cache
+    qle_kind_map = get_qle_kind_cache
     CSV.open(file_name, "w", force_quotes: true) do |csv|
       csv << shop_headers
-      enrollment_ids_final.each_slice(400) do |en_slice|
+      enrollment_ids_final.each_slice(1000) do |en_slice|
         en_org_map = get_employer_profiles_for(en_slice)
         en_pers_map = get_people_for(en_slice)
+        family_map = get_family_map(en_slice, qle_kind_map)
         f_member_person_map = get_family_member_map(en_slice)
         enrollment_map = Hash.new
-        product_map = get_products_for(en_slice)
         HbxEnrollment.where("hbx_id" => {"$in" => en_slice.to_a}).each do |en|
           enrollment_map[en.hbx_id] = en
         end
@@ -55,7 +57,13 @@ class ShopEnrollmentReport < MongoidMigrationTask
           begin
             hbx_enrollment = enrollment_map[id]
             next unless hbx_enrollment.is_shop?
+            hbx_enrollment.family = family_map[hbx_enrollment.family_id]
             sponsored_benefit = sb_map[hbx_enrollment.sponsored_benefit_id]
+            if !sponsored_benefit.reference_product_id.blank?
+              sponsored_benefit.reference_product = product_cache[sponsored_benefit.reference_product_id]
+            end
+            product = product_cache[hbx_enrollment.product_id]
+            hbx_enrollment.product = product
             hbx_enrollment.sponsored_benefit = sponsored_benefit
             hbx_enrollment.sponsored_benefit_package = sponsored_benefit.benefit_package
             hbx_enrollment.benefit_sponsorship = sponsored_benefit.benefit_package.benefit_application.benefit_sponsorship
@@ -65,7 +73,6 @@ class ShopEnrollmentReport < MongoidMigrationTask
                                   hbx_enrollment.employer_profile
                                 end
             enrollment_reason = enrollment_kind(hbx_enrollment)
-            product = product_map[id]
             calculator = Enrollments::RandomAccessSponsoredEnrollmentCalculator.new(
               hbx_enrollment,
               f_member_person_map,
@@ -110,29 +117,20 @@ class ShopEnrollmentReport < MongoidMigrationTask
     ra_map
   end
 
-  def get_products_for(enrollment_hbx_ids)
-    en_p_id_map = Hash.new
-    product_map = Hash.new
-    product_ids = Array.new
-    HbxEnrollment.collection.aggregate([
-      {"$match" => {"hbx_id" => {"$in" => enrollment_hbx_ids.to_a}}},
-      {"$project" => {"product_id" => 1, "hbx_id" => 1}}
-    ]).each do |rec|
-      en_p_id_map[rec["hbx_id"]] = rec["product_id"]
-      product_ids << rec["product_id"]
+  def get_product_cache
+    product_cache = Hash.new
+    BenefitMarkets::Products::Product.without("premium_tables.premium_tuples").each do |prod|
+      product_cache[prod.id] = prod
     end
-    product_id_map = Hash.new
-    BenefitMarkets::Products::Product.where(
-      "_id" => {"$in" => product_ids}
-    ).each do |product|
-      product_id_map[product.id] = product
+    product_cache
+  end
+
+  def get_qle_kind_cache
+    qle_kind_cache = Hash.new
+    QualifyingLifeEventKind.all.each do |qlek|
+      qle_kind_cache[qlek.id] = qlek
     end
-    en_p_id_map.each_pair do |k, v|
-      if product_id_map.has_key?(v)
-        product_map[k] = product_id_map[v]
-      end
-    end
-    product_map
+    qle_kind_cache
   end
 
   def get_people_for(enrollment_hbx_ids)
@@ -159,7 +157,11 @@ class ShopEnrollmentReport < MongoidMigrationTask
     end
     pers_id_map = Hash.new
     Person.where(
-      "_id" => {"$in" => person_ids}  
+      "_id" => {"$in" => person_ids.compact.uniq}  
+    ).without(
+      "versions", "addresses", "documents", "inbox", 
+      "broker_agency_staff_roles", "employer_staff_roles", "general_agency_staff_roles",
+      "broker_role", "hbx_staff_role"
     ).each do |person|
       pers_id_map[person.id] = person
     end
@@ -169,6 +171,28 @@ class ShopEnrollmentReport < MongoidMigrationTask
       end
     end
     en_pers_map
+  end
+
+  def get_family_map(enrollment_hbx_ids, qle_kind_map)
+    family_map = Hash.new
+    family_ids = Array.new
+    HbxEnrollment.collection.aggregate([
+      {"$match" => {"hbx_id" => {"$in" => enrollment_hbx_ids.to_a}}},
+      {"$project" => {"family_id" => 1}}
+    ]).each do |rec|
+      family_ids << rec["family_id"]
+    end
+    Family.where(
+      {"_id" => {"$in" => family_ids.compact.uniq}}
+    ).each do |fam|
+      fam.special_enrollment_periods.each do |sep|
+        if !sep.qualifying_life_event_kind_id.blank?
+          sep.cached_qle_kind = qle_kind_map[sep.qualifying_life_event_kind_id]
+        end
+      end
+      family_map[fam.id] = fam
+    end
+    family_map
   end
 
   def get_sponsored_benefit_map(enrollment_hbx_ids)

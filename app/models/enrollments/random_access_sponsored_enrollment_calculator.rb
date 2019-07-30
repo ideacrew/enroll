@@ -4,6 +4,8 @@ module Enrollments
   # It allows passing in a number of cache hashes that allow you to look up
   # what would normally be queried from the database as needed.
   class RandomAccessSponsoredEnrollmentCalculator
+    PreviousProductSlug = Struct.new(:id)
+
     EnrollmentMemberAdapter = Struct.new(:member_id, :dob, :relationship, :is_primary_member, :is_disabled) do
       def is_disabled?
         is_disabled
@@ -58,7 +60,7 @@ module Enrollments
       previous_enrollment = @original_enrollment.parent_enrollment
       previous_product = nil
       if previous_enrollment
-        previous_product = previous_enrollment.product
+        previous_product = PreviousProductSlug.new(previous_enrollment.product_id)
       end
 
       subscriber = @original_enrollment.hbx_enrollment_members.detect(&:is_subscriber?)

@@ -102,6 +102,10 @@ class SpecialEnrollmentPeriod
     (start_on <= compare_date) && (compare_date <= end_on)
   end
 
+  def cached_qle_kind=(qle_kind)
+    @qualifying_life_event_kind = qle_kind
+  end
+
   def qualifying_life_event_kind=(new_qualifying_life_event_kind)
     raise ArgumentError.new("expected QualifyingLifeEventKind") unless new_qualifying_life_event_kind.is_a?(QualifyingLifeEventKind)
     self.qualifying_life_event_kind_id = new_qualifying_life_event_kind._id
