@@ -240,9 +240,9 @@ end
 
 Then /^the employer will not be assigned that general agency$/ do
   expect(page).to have_content('Employers')
-  expect(page).to have_content('EmployerA Inc')
+  expect(page).to have_content('ABC Widgets')
   expect(page).to have_content('General Agencies')
-  expect(page).not_to have_content('Rooxo')
+  expect(page).not_to have_content('District Agency Inc')
 end
 
 When /^the broker visits their general agencies page$/ do
@@ -258,11 +258,11 @@ When /^the broker set default ga$/ do
 end
 
 Then /^the broker should see default ga msg$/ do
-  expect(page).to have_content("this is your default GA, to change your default GA click 'Select Default GA' under your desired agency.")
+  expect(page).to have_content("Setting default general agencies may take a few minutes to update all employers.")
 end
 
 Then /^the broker should see no default ga msg$/ do
-  expect(page).to have_content("You do not have default GA, to select your default GA click 'Select Default GA' under your desired agency.")
+  expect(page).to have_content("Clearing default general agencies may take a few minutes to update all employers.")
 end
 
 Given /^call change default ga subscriber for ga1$/ do
@@ -272,9 +272,9 @@ Given /^call change default ga subscriber for ga1$/ do
 end
 
 Given /^call change default ga subscriber for ga1 with pre default ga id$/ do
-  broker = User.find_by(email: "broker1@dc.gov")
-  hbx_id = broker.person.hbx_id
-  pre_ga_id = Organization.find_by(legal_name: 'Rooxo').try(:general_agency_profile).try(:id).try(:to_s)
+  broker = @brokers["Jane Goodall"].person.user
+  hbx_id =  @brokers["Jane Goodall"].person.hbx_id
+  pre_ga_id = general_agency_profile.id.to_s
   Subscribers::DefaultGaChanged.new.call(nil, nil, nil, nil, {broker_id: hbx_id, pre_default_ga_id: pre_ga_id})
 end
 
@@ -381,7 +381,7 @@ Then /^the ga2 should not see the employer$/ do
 end
 
 When /^the broker click the link of clear default ga$/ do
-  click_link "Clear Default GA"
+  click_link "CLEAR DEFAULT GA"
 end
 
 Then(/^he should be able to see the Assign link under his profile$/) do
