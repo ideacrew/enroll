@@ -56,12 +56,16 @@ module Config::SiteHelper
     link_to site_home_url, site_home_url
   end
 
+  def site_copyright_period_start
+    Registry['tenants.dchbx.enroll.site.copyright_period_start']
+  end
+
   def site_help_url
-    Settings.site.help_url
+    Registry['tenants.dchbx.enroll.site.help_url']
   end
 
   def site_business_resource_center_url
-    Settings.site.business_resource_center_url
+    Registry['tenants.dchbx.enroll.site.business_resource_center_url']
   end
 
   def link_to_site_business_resource_center
@@ -69,15 +73,15 @@ module Config::SiteHelper
   end
 
   def site_nondiscrimination_notice_url
-    Settings.site.nondiscrimination_notice_url
+    Registry['tenants.dchbx.enroll.site.nondiscrimination_notice_url']
   end
 
   def site_policies_url
-    Settings.site.policies_url
+    Registry['tenants.dchbx.enroll.site.policies_url']
   end
 
   def site_faqs_url
-    Settings.site.faqs_url
+    Registry['tenants.dchbx.enroll.site.faqs_url']
   end
 
   def site_short_name
@@ -160,6 +164,13 @@ module Config::SiteHelper
     Settings.site.employer_application_deadline_link
   end
 
+  def site_initial_earliest_start_prior_to_effective_on
+    Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.abs
+  end
+
+  def publish_due_day_of_month
+    Settings.aca.shop_market.initial_application.publish_due_day_of_month
+  end
 
   def site_guidance_for_business_owners_url
     Settings.site.guidance_for_business_owners_url
@@ -177,7 +188,31 @@ module Config::SiteHelper
     Settings.site.invoice_bill_url
   end
 
+  def site_user_sign_in_url
+    Settings.site.user_sign_in_url
+  end
+
   def mail_address
     Settings.site.mail_address
+  end
+
+  def certification_url
+    Settings.site.certification_url
+  end
+
+  def site_title
+    Settings.site.site_title
+  end
+
+  def fte_max_count
+    Settings.aca.shop_market.small_market_employee_count_maximum
+  end
+
+  def site_tufts_url
+     Settings.site.tufts_premier_url
+  end
+
+  def site_tufts_premier_link
+    link_to site_tufts_url, site_tufts_url
   end
 end
