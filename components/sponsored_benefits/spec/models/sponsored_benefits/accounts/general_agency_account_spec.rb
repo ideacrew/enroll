@@ -1,5 +1,4 @@
 require 'rails_helper'
-require 'pry'
 
 module SponsoredBenefits
   RSpec.describe Accounts::GeneralAgencyAccount, type: :model, dbclean: :after_each do
