@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'rails_helper'
 
 module SponsoredBenefits
@@ -5,7 +6,7 @@ module SponsoredBenefits
 
     let(:general_agency) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, :with_site, legal_name: "NEW AGENCY PROFILE") }
     let(:general_agency_profile) { general_agency.profiles.first }
-    let(:general_agency_account) { FactoryBot.build(:sponsored_benefits_accounts_general_agency_account, general_agency_profile: general_agency_profile, general_agency_profile_id: 'general_agency_profile_id' )}
+    let(:general_agency_account) { FactoryBot.build(:sponsored_benefits_accounts_general_agency_account, general_agency_profile: general_agency_profile, general_agency_profile_id: 'general_agency_profile_id')}
 
     context "#ga_name" do
 
