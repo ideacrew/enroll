@@ -610,7 +610,7 @@ class HbxEnrollment
   end
 
   def benefit_sponsored?
-    benefit_group.present?
+    sponsored_benefit_package_id.present? && sponsored_benefit_package.present?
   end
 
   def affected_by_verifications_made_today?
