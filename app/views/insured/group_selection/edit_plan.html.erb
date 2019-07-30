@@ -80,7 +80,7 @@
                     <a id="cancel-button" class="btn btn-default btn-block interaction-click-control-cancel-plan" >Cancel Plan</a>
                   </div>
                   
-                  <% if @hbx_enrollment.is_aptc_eligible? && !@tax_household.find_aptc_family_members(@hbx_enrollment_members).empty? %>
+                  <% if @hbx_enrollment.is_aptc_eligible? && @tax_household.aptc_members.present?%>
                     <div class="col-sm-4">
                       <a id="aptc-button" class="btn btn-default btn-block interaction-click-control-edit-aptc" >Edit APTC</a>
                     </div>

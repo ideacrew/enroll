@@ -1998,7 +1998,7 @@ end
 
   def is_aptc_eligible?
     allowed_metal_levels = ["platinum", "silver", "gold", "bronze"]
-    return true if allowed_metal_levels.include?(self.product.metal_level) && self.coverage_kind == "health" && self.kind != "coverall"
+    return true if allowed_metal_levels.include?(product.metal_level) && coverage_kind == "health" && kind != "coverall" && household.tax_households.present?
   end
 
   EnrollmentMemberAdapter = Struct.new(:member_id, :dob, :relationship, :is_primary_member, :is_disabled) do
