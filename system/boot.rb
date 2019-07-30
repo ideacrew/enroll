@@ -2,10 +2,14 @@ module System
   # require_relative "local/inject"
 
   # require ResourceRegistry.services_path.join('load_registry').to_s
-
   # path = Rails.root.join(Registry.config.system_dir, Registry["persistence.container"])
+
   path = Rails.root.join(Registry.config.system_dir, "config")
-  ResourceRegistry::Services::LoadRegistry.call(path: path)
+
+  Dir.glob(File.join(path, "*")).each do |file_path|
+    ResourceRegistry::Services::LoadRegistry.new.call(file_path)
+  end
+
   Registry.finalize!(freeze: true) # if defined? Rails && Rail.env == 'production'
 
   # Repository.namespace(:options) do |container|

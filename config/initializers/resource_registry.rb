@@ -1,6 +1,6 @@
 ResourceRegistry.configure do 
   {
-    registry: {
+    application: {
       config: {
         name: "public",
         default_namespace: "core",
@@ -9,6 +9,16 @@ ResourceRegistry.configure do
         auto_register: []
       },
       load_paths: ['system']
+    },
+    resource_registry: {
+      config: {
+        name: "public",
+        default_namespace: "core",
+        root: '.',
+        system_dir: "system",
+        auto_register: []
+      },
+      load_paths: []
     },
     options: {
       key: :tenants,
@@ -40,6 +50,6 @@ ResourceRegistry.configure do
   }
 end
 
-Kernel.const_set("Registry", ResourceRegistry::PublicRegistry)
-ResourceRegistry.const_set(:PublicInject, Registry.injector)
+Kernel.const_set("Registry", ResourceRegistry::Registry)
+ResourceRegistry.const_set(:Inject, Registry.injector)
 require_relative Rails.root.join('system', 'boot')
