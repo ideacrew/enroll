@@ -9,10 +9,9 @@ class CensusEmployeePolicy < ApplicationPolicy
       elsif @user.has_role?(:broker)
         @record.employer_profile.try(:active_broker) == @user.person
       elsif @user.has_role?(:general_agency_staff)
-        ga_account = @record.employer_profile.general_agency_accounts.select do |general_agency_account|
+        @record.employer_profile.general_agency_accounts.active.select do |general_agency_account|
           @user.person.general_agency_staff_roles.where(benefit_sponsors_general_agency_profile_id: general_agency_account.benefit_sponsrship_general_agency_profile_id)
-        end.first
-        ga_account.present? && ga_account.active?
+        end.first&.present?
       else
         false
       end
