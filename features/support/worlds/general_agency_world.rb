@@ -6,7 +6,7 @@ module GeneralAgencyWorld
 
   def general_agency_staff_role
     @general_agency_staff_role = FactoryBot.create(:general_agency_staff_role,
-      benefit_sponsors_general_agency_profile_id: general_agency_profile.id)
+                                                   benefit_sponsors_general_agency_profile_id: general_agency_profile.id)
   end
 
   def general_agency_organization(legal_name = nil, *traits)
@@ -17,15 +17,15 @@ module GeneralAgencyWorld
     if legal_name.blank?
       if @general_agency_organization.empty?
         @general_agency_organization[:default] ||= FactoryBot.create(:benefit_sponsors_organizations_general_organization,
-                                                                *traits,
-                                                                attributes.merge(site: site))
+                                                                     *traits,
+                                                                     attributes.merge(site: site))
       else
         @general_agency_organization.values.first
       end
     else
       @general_agency_organization[legal_name] ||= FactoryBot.create(:benefit_sponsors_organizations_general_organization,
-                                                                *traits,
-                                                                attributes.merge(site: site))
+                                                                     *traits,
+                                                                     attributes.merge(site: site))
     end
   end
 

@@ -272,7 +272,6 @@ Given /^call change default ga subscriber for ga1$/ do
 end
 
 Given /^call change default ga subscriber for ga1 with pre default ga id$/ do
-  broker = @brokers["Jane Goodall"].person.user
   hbx_id =  @brokers["Jane Goodall"].person.hbx_id
   pre_ga_id = general_agency_profile.id.to_s
   Subscribers::DefaultGaChanged.new.call(nil, nil, nil, nil, {broker_id: hbx_id, pre_default_ga_id: pre_ga_id})
