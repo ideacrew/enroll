@@ -13,11 +13,13 @@ deactivatable_list = @deactivatable_qles.map do |qle|
      value: deactivation_form_exchanges_qle_path(qle)
    }
 end
+
  %>
 
  <admin-qle-management-wizard
    data-new-location="<%= new_exchanges_qle_path %>"
    data-editable-list="<%= editable_list.to_json %>"
    data-deactivatable-list="<%= deactivatable_list.to_json %>"
+   data-sorting-order-list="<%= sorting_order_exchanges_qles_path %>"
  >
  </admin-qle-management-wizard>

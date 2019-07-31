@@ -22,6 +22,7 @@ import { QleKindCreationFormComponent } from  './admin/qle_kinds/new/qle_kind_cr
 import { QleKindQuestionFormComponent } from './admin/qle_kinds/new/qle_kind_question_form.component';
 import { QleKindWizardSelectionComponent } from './admin/qle_kinds/wizard/qle_kind_wizard_selection.component';
 import { QleKindResponseFormComponent } from './admin/qle_kinds/new/qle_kind_question_response_form.component';
+import { QleKindSortingOrderFormComponent } from './admin/qle_kinds/sorting_order/qle_kind_sorting_order_form.component';
 
 import { ErrorLocalizer } from './error_localizer';
 
@@ -31,6 +32,7 @@ import { ErrorLocalizer } from './error_localizer';
     BrokerAgencyProfileCreateComponent,
     FieldErrorsComponent,
     QleKindCreationFormComponent,
+    QleKindSortingOrderFormComponent,
     QleKindResponseFormComponent,
     PhoneComponent,
     OfficeLocationComponent,
@@ -45,6 +47,7 @@ import { ErrorLocalizer } from './error_localizer';
     BrokerAgencyProfileCreateComponent,
     QleKindCreationFormComponent,
     QleKindEditFormComponent,
+    QleKindSortingOrderFormComponent,
     QleKindResponseFormComponent,
     QleKindWizardComponent,
     QleKindQuestionFormComponent,
@@ -63,6 +66,7 @@ import { ErrorLocalizer } from './error_localizer';
     QleKindResourceService.provides("QleKindDeactivationService"),
     QleKindResourceService.provides("QleKindCreationService"),
     QleKindResourceService.provides("QleKindEditService"),
+    QleKindResourceService.provides("QleKindSortingOrderService"),
     ErrorLocalizer
   ]
 })
@@ -83,5 +87,8 @@ export class AppModule {
     // Edit
     const qle_kind_edit_form_custom = createCustomElement(QleKindEditFormComponent, { injector: this.injector });
     customElements.define("admin-qle-kind-edit-form", qle_kind_edit_form_custom);
+    // Sorting Order
+    const qle_kind_sorting_order_form_custom = createCustomElement(QleKindSortingOrderFormComponent, { injector: this.injector });
+    customElements.define("admin-qle-kind-sorting-order-form", qle_kind_sorting_order_form_custom);
   }
 }
