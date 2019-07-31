@@ -36,16 +36,13 @@ module BenefitSponsors
 
         def calc_contribution_amount_for(member, c_factor)
           member_price = @member_prices[member.member_id]
-          if (member_price == 0.00) || (c_factor == 0)
-            0.00
+          if (member_price < 0.01) || (c_factor == 0)
+            return BigDecimal.new("0.00")
           end
-          ref_rate = BigDecimal.new(reference_rate_for(member).to_s).round(2)
-          ref_contribution = BigDecimal.new((ref_rate * c_factor).to_s).round(2, BigDecimal::ROUND_HALF_DOWN)
-          if member_price <= ref_contribution
-            member_price
-          else
-            ref_contribution
-          end
+          ref_rate = reference_rate_for(member)
+          c_percent = integerize_percent(c_factor)
+          ref_contribution = (ref_rate * c_percent)/100.00
+          BigDecimal.new([member_price,ref_contribution].min.to_s).round(2)
         end
 
         def reference_rate_for(member)
@@ -70,6 +67,10 @@ module BenefitSponsors
           @contribution_model.contribution_units.detect do |cu|
             cu.match?({rel_name.to_s => 1})
           end
+        end
+
+        def integerize_percent(cont_percent)
+          BigDecimal.new((cont_percent * 100.00).to_s).round(0).to_i
         end
       end
 
