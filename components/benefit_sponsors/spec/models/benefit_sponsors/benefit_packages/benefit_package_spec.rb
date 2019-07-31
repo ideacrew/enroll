@@ -479,7 +479,6 @@ module BenefitSponsors
         predecessor_application.update_attributes({:aasm_state => "active"})
         ra.update_attributes({:aasm_state => "enrollment_eligible"})
         hbx_enrollment.benefit_group_assignment_id = census_employee.benefit_group_assignments[0].id
-        rbp.renew_member_benefit(census_employee)
         allow(rbp).to receive(:is_renewal_benefit_available?).and_return(true)
         allow(rbp).to receive(:trigger_renewal_model_event).and_return nil
         allow(hbx_enrollment).to receive(:renew_benefit).with(rbp).and_return(renewed_enrollment)
@@ -545,7 +544,7 @@ module BenefitSponsors
       end
 
       context "when renewal product offered by employer" do
-        let(:hbx_enrollment) { double(product: current_benefit_package.sponsored_benefits.first.reference_product, coverage_kind: :health, is_coverage_waived?: false) }
+        let(:hbx_enrollment) { double(product: current_benefit_package.sponsored_benefits.first.reference_product, coverage_kind: :health, is_coverage_waived?: false, coverage_termination_pending?: false) }
         let(:sponsored_benefit) { renewal_benefit_package.sponsored_benefits.build(product_package_kind: :single_issuer) }
 
         before do
