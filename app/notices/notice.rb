@@ -139,7 +139,7 @@ class Notice
 
   def store_paper_notice
     bucket_name= Settings.paper_notice
-    notice_filename_for_paper_notice = "#{recipient.hbx_id}_#{subject.titleize.gsub(/\s*/, '')}"
+    notice_filename_for_paper_notice = "#{recipient.hbx_id}_#{subject.titleize.gsub(/\s*/, '')}_#{mpi_indicator.delete('_')}_IVL"
     notice_path_for_paper_notice = Rails.root.join("tmp", "#{notice_filename_for_paper_notice}.pdf")
     begin
       FileUtils.cp(notice_path, notice_path_for_paper_notice)
