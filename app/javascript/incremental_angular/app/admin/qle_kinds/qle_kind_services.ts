@@ -12,3 +12,7 @@ export interface QleKindEditService {
 export interface QleKindCreationService {
   submitCreate(post_uri: string, obj_data : object) : Observable<HttpResponse<any>>;
 }
+
+export interface QleKindSortingOrderService {
+  submitSortingOrder(post_uri: string, obj_data : object) : Observable<HttpResponse<any>>;
+}

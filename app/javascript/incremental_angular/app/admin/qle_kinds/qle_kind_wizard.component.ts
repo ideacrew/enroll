@@ -11,10 +11,12 @@ export class QleKindWizardComponent {
   public deactivatableList : Array<CategorizedDropdownOption> = [];
 
   public newLocation : string | null = null;
+  public sortingOrderLocation : string | null = null;
   private selectedAction : string | null = null;
   @ViewChild('editSelection') editSelection : QleKindWizardSelectionComponent;
   @ViewChild('deactivateSelection') deactivateSelection : QleKindWizardSelectionComponent;
   @ViewChild('createSelection') createSelection : ElementRef;
+  //@ViewChild('sortingOrderSelection') sortingOrderSelection : ElementRef;
 
   constructor(injector: Injector, private _elementRef : ElementRef) {
 
@@ -34,6 +36,10 @@ export class QleKindWizardComponent {
     if (newLocationAttribute != null) {
       this.newLocation = newLocationAttribute;
     }
+    var sortingOrderLocationAttribute = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-sorting-order-list");
+    if (sortingOrderLocationAttribute != null) {
+      this.sortingOrderLocation = sortingOrderLocationAttribute;
+    }
   }
 
   selectAction(action : string) {
@@ -41,14 +47,15 @@ export class QleKindWizardComponent {
   }
 
   submit() {
-    console.log(this.selectedAction)
     if (this.selectedAction == "new") {
       if (this.newLocation != null) {
         window.location.href = this.newLocation;
       }
+    } else if (this.selectedAction == "sorting-order") {
+        if (this.sortingOrderLocation != null) {
+          window.location.href = this.sortingOrderLocation;
+        }
     } else if (this.selectedAction == "edit") {
-      console.log(this.editSelection)
-
       var editLocation = this.editSelection.getSelection();
       if (editLocation != null) {
         window.location.href = editLocation;
@@ -71,4 +78,8 @@ export class QleKindWizardComponent {
   showCreate() {
     return(this.selectedAction == "create");
   }
+  showSortingOrder() {
+    return(this.selectedAction == "sorting-order");
+  }
+
 }

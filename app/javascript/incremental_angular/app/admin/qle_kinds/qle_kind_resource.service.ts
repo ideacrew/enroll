@@ -36,6 +36,21 @@ export class QleKindResourceService {
     );
   };
 
+  public submitSortingOrder(post_uri: string, obj_data : object) : Observable<HttpResponse<any>> {
+    var json = JSON.stringify({ data: obj_data });
+    return this.http.post(
+      post_uri,
+      json,
+      {
+        headers : {
+          'Content-Type': 'application/json',
+        },
+        observe: "response",
+        withCredentials: true
+      }
+    );
+  };
+
   public submitEdit(post_uri: string, obj_data : object) : Observable<HttpResponse<any>> {
     var json = JSON.stringify({ data: obj_data });
     return this.http.put(

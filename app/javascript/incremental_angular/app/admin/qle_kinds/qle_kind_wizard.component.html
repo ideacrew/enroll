@@ -17,6 +17,12 @@
                     </label>
                 </div>
                 <div class="checkbox">
+                  <label for="qle_wizard_sorting_order_qle_selected_radio">
+                      <input id="qle_wizard_sorting_order_qle_selected_radio" name="qle_kind_wizard_action" type="radio" (change)="selectAction('sorting-order')">
+                      Sorting a QLE's
+                  </label>
+              </div>
+                <div class="checkbox">
                     <label for="qle_wizard_modify_qle_selected_radio">
                         <input id="qle_wizard_modify_qle_selected_radio" name="qle_kind_wizard_action" type="radio" (change)="selectAction('edit')">
                         Modify Existing QLE
