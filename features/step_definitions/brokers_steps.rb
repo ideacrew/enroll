@@ -110,6 +110,9 @@ And(/^.+ clicks? on Create Broker Agency$/) do
 end
 
 Then(/^.+ should see broker registration successful message$/) do
+  if Settings.site.key == :dc
+    expect(page).to have_content('Complete the following requirements to become a DC Health Link Registered Broker')
+  end
   expect(page).to have_content('Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed.')
 end
 

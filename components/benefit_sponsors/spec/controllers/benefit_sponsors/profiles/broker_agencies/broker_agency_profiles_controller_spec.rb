@@ -240,6 +240,16 @@ module BenefitSponsors
           expect(@query.total_count).to eq 0
         end
       end
+
+      context "broker request registration guide" do
+        before do
+          post :email_guide, params: {email:'Broker@test.com', first_name:'Broker'}
+        end
+
+        it "should send Registration Guide to Broker@test.com" do
+          expect(flash[:notice]).to eq "A copy of the Broker Registration Guide has been emailed to Broker@test.com"
+        end
+      end
     end
   end
 end

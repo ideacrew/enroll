@@ -14,6 +14,7 @@ BenefitSponsors::Engine.routes.draw do
           get :agency_messages
           get :commission_statements
           get :general_agency_index
+          post :email_guide
         end
         member do
           post :clear_assign_for_employer
