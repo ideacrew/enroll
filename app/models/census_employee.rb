@@ -979,7 +979,11 @@ class CensusEmployee < CensusMember
       person.employee_roles.each do |employee_role|
         ce = employee_role.census_employee
         if current_user.has_hbx_staff_role? && ce.present?
-          ce.ssn = person.ssn
+          if person.ssn.nil?
+            ce.unset(:encrypted_ssn)
+          else
+            ce.ssn = person.ssn
+          end
           ce.dob = person.dob
           ce.save!(validate: false)
         end
