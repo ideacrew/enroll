@@ -64,9 +64,9 @@ export class QleKindEditFormComponent {
           reason: ['', [Validators.required, Validators.minLength(1)]],
           market_kind: [''],
           is_self_attested: [''],
-          effective_on_options:  new FormArray([]),
-          pre_event_sep_eligibility:[0, Validators.required],
-          post_event_sep_eligibility:[0, Validators.required],
+          effective_on_kinds:  new FormArray([]),
+          pre_event_sep_in_days:[0, Validators.required],
+          post_event_sep_in_days:[0, Validators.required],
           available_in_system_from: [''],   
           available_in_system_until: ['']
         })
@@ -78,7 +78,7 @@ export class QleKindEditFormComponent {
   private addCheckboxes() {
     this.effectiveOnOptionsArray.map((o, i) => {
       const control = new FormControl( i === 0); // if first item set to true, else false
-      (this.editFormGroup.controls.effective_on_options as FormArray).push(control);
+      (this.editFormGroup.controls.effective_on_kinds as FormArray).push(control);
     });
   }
 
@@ -127,6 +127,7 @@ export class QleKindEditFormComponent {
         var invocation = this.editService.submitEdit(this.editUri, this.editFormGroup.value);
         invocation.subscribe(
           function(data: HttpResponse<any>) {
+            console.log(data)
             var location_header = data.headers.get("Location");
             if (location_header != null) {
               // TODO: Can we add a div append here to show the success or decline message

@@ -67,8 +67,8 @@ module Admin
           effective_on_kinds: request.effective_on_kinds,
           is_self_attested: request.is_self_attested,
           pre_event_sep_in_days: request.pre_event_sep_in_days,
+          is_active: false,
           post_event_sep_in_days: request.post_event_sep_in_days
-
         )
         # TODO: Make suer this is being called
         BenefitSponsors::Services::ServiceResponse.new(new_record)
