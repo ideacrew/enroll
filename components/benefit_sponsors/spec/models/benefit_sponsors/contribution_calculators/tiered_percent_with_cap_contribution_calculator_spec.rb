@@ -163,7 +163,7 @@ module BenefitSponsors
         let(:primary_price) { 106.68 }
         let(:dependent_price) { 106.66 }
 
-        let(:total_contribution) { 80.00 }
+        let(:total_contribution) { BigDecimal.new(80.01.to_s) }
 
         let(:family_contribution_level) do
           instance_double(

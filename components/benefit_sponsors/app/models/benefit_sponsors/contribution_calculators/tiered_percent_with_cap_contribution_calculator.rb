@@ -48,14 +48,16 @@ module BenefitSponsors
             end
             cu = @level_map[contribution_unit.id]
             c_factor = cu.contribution_factor
-            max_contribution = BigDecimal.new((@total_price * c_factor).to_s).round(2, BigDecimal::ROUND_HALF_DOWN)
-            @total_contribution = [max_contribution, @total_price, cu.contribution_cap].min
-            distribution_remaining = @total_contribution
-            @member_ids.reverse.each do |m_id|
-              member_price = member_prices[m_id]
-              member_discount = [distribution_remaining, member_price].min
-              distribution_remaining = BigDecimal.new((distribution_remaining - member_discount).to_s).round(2)
-              @member_contributions[m_id] = member_discount
+            t_contribution = BigDecimal.new("0.00")
+            @member_ids.each do |m_id|
+              cont_amount = BigDecimal.new((member_prices[m_id] * c_factor).to_s).round(2)
+              @member_contributions[m_id] = cont_amount
+              t_contribution = BigDecimal.new((t_contribution + cont_amount).to_s).round(2)
+            end
+            cap = cu.contribution_cap
+            @total_contribution = t_contribution
+            if t_contribution > cap
+              rebalance_contributions(cap, @total_contribution)
             end
           else
             @member_ids.each do |m_id|
@@ -64,6 +66,18 @@ module BenefitSponsors
             end
           end
           self
+        end
+
+        def rebalance_contributions(cap, t_contribution)
+          new_total_contribution = cap
+          difference_to_remove = BigDecimal.new((t_contribution - cap).to_s).round(2)
+          @member_ids.reverse.each do |m_id|
+            break if (difference_to_remove < BigDecimal.new("0.01"))
+            removed_amount = [@member_contributions[m_id], difference_to_remove].min
+            @member_contributions[m_id] = BigDecimal.new((@member_contributions[m_id] - removed_amount).to_s).round(2)
+            difference_to_remove = BigDecimal.new((difference_to_remove - removed_amount).to_s).round(2)
+          end
+          @total_contribution = new_total_contribution
         end
       end
 
