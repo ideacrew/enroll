@@ -227,7 +227,10 @@ module SponsoredBenefits
 
         attributes[:is_default] = benefit_group.default
         attributes[:reference_plan_hios_id] = benefit_group.reference_plan.hios_id
-        attributes[:dental_reference_plan_hios_id] = benefit_group.dental_reference_plan.hios_id if benefit_group.is_offering_dental?
+        if benefit_group.is_offering_dental?
+          attributes[:dental_reference_plan_hios_id] = benefit_group.dental_reference_plan.hios_id
+          attributes[:elected_dental_plan_hios_ids] = benefit_group.elected_dental_plans.map(&:hios_id)
+        end
         attributes[:composite_tier_contributions] = benefit_group.composite_tier_contributions.inject([]) do |contributions, tier|
           contributions << {
             relationship: tier.composite_rating_tier,
