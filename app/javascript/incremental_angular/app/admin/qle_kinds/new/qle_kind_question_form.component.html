@@ -1,0 +1,36 @@
+<div [formGroup]="questionFormGroup">
+  <div class="from-group-question">
+    <span  class="col-sm-2 control-label">Prompt</span>
+      <div class="col-sm-4">
+        <input 
+        id="qle_kind_question_{{questionIndex}}_title"
+        type="text"
+        formControlName="question_title"
+        class="form-control col-md-2"
+        (focusout)="submitQuestion()">
+      </div>
+        <button
+        (click)="removeQuestion()"
+        class='btn btn-primary'>
+        DELETE
+      </button>
+  </div>
+    <div *ngIf="showResponseForm">
+      <div class='from-group'>
+        <span class="control-label col-sm-3">Accepted Response For this Question </span>
+        <div class='col-md-2'>
+          <select formControlName="accepted_response" id="qle_kind_question_{{questionIndex}}_accepted_response">
+            <option selected="selected">Choose...</option>
+            <option value="true">True</option>
+            <option value="false">False</option>
+          </select>
+        </div>
+      </div>
+        <!-- <qle-question-response-form
+        *ngFor="let response of responseControls(); let i = index"
+        [responseFormGroup]="response"
+        [responseIndex]="i"
+        [responseComponentParent]="this"
+        ></qle-question-response-form> -->
+    </div>
+</div>
