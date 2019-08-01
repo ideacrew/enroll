@@ -327,8 +327,8 @@ module BenefitSponsors
       def effectuate_member_benefits
         activate_benefit_group_assignments if predecessor.present?
 
-        enrolled_families.each do |family| 
-          enrollments = HbxEnrollment.by_benefit_package(self).where(family_id: family.id).enrolled_and_waived
+        enrolled_families.each do |family|
+          enrollments = HbxEnrollment.by_benefit_package(self).where(family_id: family.id).show_enrollments_sans_canceled
 
           sponsored_benefits.each do |sponsored_benefit|
             hbx_enrollment = enrollments.by_coverage_kind(sponsored_benefit.product_kind).first
