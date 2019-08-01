@@ -26,7 +26,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/resource_registry.git
-  revision: b9121732e229517a9a028b3a4541cfb02688216b
+  revision: 5810e16e5cd4a122d65cd204b9fc95dbdd788117
   branch: master
   specs:
     resource_registry (0.2.0)
