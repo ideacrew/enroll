@@ -61,6 +61,20 @@ Rails.application.routes.draw do
   get 'payment_transactions/generate_saml_response', to: 'payment_transactions#generate_saml_response'
 
   namespace :exchanges do
+    resources :qles, only: [:new, :create, :edit, :update] do
+      member do
+        get :deactivation_form
+        get :question_flow
+        post :question_flow
+        put :deactivate
+      end
+      collection do      
+        get :manage
+        post :manage_qle
+        get :sorting_order
+        post :sorting_order
+      end
+    end
 
     resources :inboxes, only: [:show, :destroy]
     resources :announcements, only: [:index, :create, :destroy] do
@@ -151,6 +165,12 @@ Rails.application.routes.draw do
         get :identity_verification
         post :identity_verification_datatable
         get :new_eligibility
+        get :custom_qle_answer
+        post :custom_qle_answer
+        get :build_attestation_flow
+        post :build_attestation_flow
+        get :create_qle_answer
+        post :create_qle_answer
       end
 
       member do
