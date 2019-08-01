@@ -28,15 +28,11 @@
         </div>
         <div class="form-group"> 
           <span for="qle_kind_creation_form_action_kind" class="col-sm-2 control-label">Action Kind </span>
-          <div class="col-md-2 " >        
-            <select formControlName="action_kind" type="select">
-              <option value="not-applicable">Not Applicable</option>
-              <option value="drop-member">Drop Member</option>
-              <option value="adminstrative">Adminstrative</option>
-              <option value="add-member">Add Member</option>
-              <option value="add-benefit">Add Benefit</option>
-              <option value="change-benefit">Change Benefit</option>
-              <option value="transition-member">Transition Member</option>
+          <div class="col-md-2" >        
+            <select formControlName="action_kind">
+              <option  *ngFor="let actionKind of actionKindList" [value]="actionKind">
+              {{actionKind}}
+              </option>
             </select>
           </div>
         </div>

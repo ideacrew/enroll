@@ -12,6 +12,8 @@ module Admin
       option :action_kind, Dry::Types['coercible.string'], optional: true
       option :tool_tip, Dry::Types['coercible.string'], optional: true
       option :reason, Dry::Types['coercible.string'], optional: true
+      option :is_active, Dry::Types['params.bool'], optional: true
+
     end
   end
 end

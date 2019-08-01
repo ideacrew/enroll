@@ -72,8 +72,11 @@ module Admin
           effective_on_kinds: request.effective_on_kinds,
           is_self_attested: request.is_self_attested,
           pre_event_sep_in_days: request.pre_event_sep_in_days,
-          post_event_sep_in_days: request.post_event_sep_in_days
-
+          is_active: false,
+          post_event_sep_in_days: request.post_event_sep_in_days,
+          tool_tip: request.tool_tip,
+          reason: request.reason,
+          action_kind: request.action_kind
         )
         BenefitSponsors::Services::ServiceResponse.new(record)
       end

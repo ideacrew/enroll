@@ -133,7 +133,7 @@ describe Admin::QleKinds::UpdateService, "#call" do
     end
 
     it '#reason_is_valid?' do 
-      expect(subject.reason_is_valid?(reason)).to eq(false)
+      expect(subject.reason_is_valid?(reason)).to eq(true)
       expect(result.success?).to be_falsey
     end
   end
@@ -166,6 +166,9 @@ describe Admin::QleKinds::UpdateService, "#call" do
         effective_on_kinds:['date_of_event'],
         pre_event_sep_in_days: 12,
         post_event_sep_in_days:12,
+        tool_tip:"tool tip",
+        reason:"reason",
+        action_kind:"action kind"
       }
     end
 
