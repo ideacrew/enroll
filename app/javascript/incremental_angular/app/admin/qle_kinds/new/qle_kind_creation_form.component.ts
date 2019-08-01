@@ -32,6 +32,15 @@ export class QleKindCreationFormComponent {
       { name: 'Exact Date',  selected: false, id: 6 },
       { name: 'Date options available',  selected: false, id: 7 }
     ]
+  public actionKindList = [
+    "Not Applicable", 
+    "Drop Member", 
+    "Adminstrative", 
+    "Add Member",
+    "Add Benefit", 
+    "Change Benefit", 
+    "Transition Member"
+  ]
     @ViewChild('headerRef') headerRef: ElementRef;
 
 
@@ -50,7 +59,7 @@ export class QleKindCreationFormComponent {
     var formGroup = formBuilder.group({
       title: ['', Validators.required],
       tool_tip: ['', [Validators.required, Validators.minLength(1)]],
-      action_kind: ['',[]],
+      action_kind: ['',Validators.required],
       reason: ['', [Validators.required, Validators.minLength(1)]],
       market_kind: ['', [Validators.required, Validators.minLength(1)]],
       is_self_attested: [''],
@@ -121,7 +130,7 @@ export class QleKindCreationFormComponent {
   submitCreation() {
     var form = this;
     var errorMapper = new ErrorMapper();
-
+console.log(this.creationFormGroup.value)
     if (this.creationFormGroup != null) {
       if (this.creationUri != null) {
         var invocation = this.CreationService.submitCreate(this.creationUri, this.creationFormGroup.value);

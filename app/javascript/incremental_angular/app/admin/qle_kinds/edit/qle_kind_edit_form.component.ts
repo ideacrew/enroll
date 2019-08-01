@@ -127,8 +127,7 @@ export class QleKindEditFormComponent {
         var invocation = this.editService.submitEdit(this.editUri, this.editFormGroup.value);
         invocation.subscribe(
           function(data: HttpResponse<any>) {
-            console.log(data)
-            var location_header = data.headers.get("Location");
+            var location_header = data.body.next_url;
             if (location_header != null) {
               // TODO: Can we add a div append here to show the success or decline message
               // or should we add a new function?
