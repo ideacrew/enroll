@@ -62,6 +62,7 @@ class CensusEmployee < CensusMember
   scope :non_terminated,     ->{ where(:aasm_state.nin => EMPLOYMENT_TERMINATED_STATES) }
   scope :active,             ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_STATES) }
   scope :pending,           ->{ any_in(aasm_state: PENDING_STATES) }
+  scope :non_term_and_pending,->{ where(:aasm_state.nin => (EMPLOYMENT_TERMINATED_STATES + PENDING_STATES)) }
   scope :non_business_owner, ->{ where(is_business_owner: false) }
   scope :benefit_application_assigned,     ->(benefit_application) { where(:"benefit_group_assignments.benefit_package_id".in => benefit_application.benefit_packages.pluck(:_id)) }
   scope :benefit_application_unassigned,   ->(benefit_application) { where(:"benefit_group_assignments.benefit_package_id".nin => benefit_application.benefit_packages.pluck(:_id)) }
@@ -259,6 +260,12 @@ class CensusEmployee < CensusMember
 
   def qle_30_day_eligible?
     is_inactive? && (TimeKeeper.date_of_record - employment_terminated_on).to_i < 30
+  end
+
+  def benefit_package_assignment_for(benefit_package)
+    benefit_group_assignments.effective_on(benefit_package.effective_period.min).detect do |assignment|
+      assignment.benefit_package_id == benefit_package.id
+    end
   end
 
   def active_benefit_group_assignment

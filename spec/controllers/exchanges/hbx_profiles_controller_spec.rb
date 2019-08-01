@@ -702,9 +702,11 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
   end
 
 
-  describe "POST update_dob_ssn" do
+  describe "POST update_dob_ssn", :dbclean => :after_each do
+    include_context 'setup benefit market with market catalogs and product packages'
+    include_context 'setup initial benefit application'
 
-    let!(:person) { FactoryBot.create(:person, :with_consumer_role, :with_employee_role) }
+    let!(:person) { FactoryBot.create(:person, :with_consumer_role) }
     let!(:person1) { FactoryBot.create(:person, :with_consumer_role) }
     let!(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person) }
     let!(:family1) {FactoryBot.create(:family, :with_primary_family_member, person: person1) }
@@ -717,6 +719,13 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     let(:valid_ssn) { "234-45-8390" }
     let(:valid_dob) { "03/17/1987" }
     let(:valid_dob2) {'1987-03-17'}
+    let(:employee_role) { FactoryBot.build(:benefit_sponsors_employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: abc_profile.id)}
+    let(:census_employee)  { FactoryBot.create(:benefit_sponsors_census_employee, employer_profile: abc_profile) }
+
+    before do
+      allow(employee_role.census_employee).to receive(:employer_profile).and_return(abc_profile)
+      allow(person).to receive(:employee_roles).and_return([employee_role])
+    end
 
     it "should render back to edit_enrollment if there is a validation error on save" do
       allow(hbx_staff_role).to receive(:permission).and_return permission_yes

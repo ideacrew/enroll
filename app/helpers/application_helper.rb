@@ -46,10 +46,10 @@ module ApplicationHelper
   end
 
   def copyright_notice
-    if TimeKeeper.date_of_record.year.to_s == Settings.site.copyright_period_start.to_s
-      copyright_attribution = "#{Settings.site.copyright_period_start} #{Settings.site.long_name}"
+    if TimeKeeper.date_of_record.year.to_s == site_copyright_period_start.to_s
+      copyright_attribution = "#{site_copyright_period_start} #{Settings.site.long_name}"
     else
-      copyright_attribution = "#{Settings.site.copyright_period_start}-#{TimeKeeper.date_of_record.year} #{Settings.site.long_name}"
+      copyright_attribution = "#{site_copyright_period_start}-#{TimeKeeper.date_of_record.year} #{Settings.site.long_name}"
     end
     raw("<span class='copyright'><i class='far fa-copyright fa-lg' aria-hidden='true'></i> #{copyright_attribution}. All Rights Reserved. </span>")
   end

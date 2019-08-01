@@ -47,10 +47,10 @@ module BenefitSponsors
               cu.match?(@relationship_totals)
             end
             cu = @level_map[contribution_unit.id]
-            c_factor = cu.contribution_factor
+            c_factor = integerize_percent(cu.contribution_factor)
             t_contribution = BigDecimal.new("0.00")
             @member_ids.each do |m_id|
-              cont_amount = BigDecimal.new((member_prices[m_id] * c_factor).to_s).round(2)
+              cont_amount = BigDecimal.new(((member_prices[m_id] * c_factor)/100.00).to_s).round(2)
               @member_contributions[m_id] = cont_amount
               t_contribution = BigDecimal.new((t_contribution + cont_amount).to_s).round(2)
             end
@@ -78,6 +78,11 @@ module BenefitSponsors
             difference_to_remove = BigDecimal.new((difference_to_remove - removed_amount).to_s).round(2)
           end
           @total_contribution = new_total_contribution
+        end
+
+        # Integerize the contribution percent to match the old rounding model
+        def integerize_percent(cont_percent)
+          BigDecimal.new((cont_percent * 100.00).to_s).round(0).to_i
         end
       end
 

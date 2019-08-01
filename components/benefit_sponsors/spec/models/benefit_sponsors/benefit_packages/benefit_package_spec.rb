@@ -411,6 +411,13 @@ module BenefitSponsors
       let(:bs) { ra.predecessor.benefit_sponsorship}
       let(:cbp){ra.predecessor.benefit_packages.first}
       let(:rbp){ra.benefit_packages.first}
+      let!(:rhsb) do
+        sb = rbp.health_sponsored_benefit
+        sb.product_package_kind = :single_product
+        sb.save
+        sb
+      end
+      let(:ibp){ia.benefit_packages.first}
       let(:roster_size) { 5 }
       let(:enrollment_kinds) { ['health'] }
       let!(:census_employees) { create_list(:census_employee, roster_size, :with_active_assignment, benefit_sponsorship: bs, employer_profile: bs.profile, benefit_group: cbp) }
@@ -423,7 +430,7 @@ module BenefitSponsors
           :hbx_enrollment,
           :shop,
           household: family.active_household,
-          family:family,
+          family: family,
           product: cbp.sponsored_benefits.first.reference_product,
           coverage_kind: :health,
           employee_role_id: census_employee.employee_role.id,
@@ -441,6 +448,30 @@ module BenefitSponsors
         reference_product.save!
       end
 
+      let(:active_bga) {FactoryBot.build(:benefit_sponsors_benefit_group_assignment, benefit_group: ibp, census_employee: census_employee, is_active: true)}
+      let(:renewal_bga) {FactoryBot.build(:benefit_sponsors_benefit_group_assignment, benefit_group: rbp, census_employee: census_employee, is_active: false)}
+
+      let!(:census_update) do
+        census_employee.benefit_group_assignments = [active_bga, renewal_bga]
+        census_employee.save!
+      end
+
+      let(:hbx_enrollment) do
+        FactoryBot.create(
+          :hbx_enrollment,
+          :shop,
+          family: family,
+          household: family.active_household,
+          product: cbp.sponsored_benefits.first.reference_product,
+          coverage_kind: :health,
+          effective_on: predecessor_application.start_on,
+          employee_role_id: census_employee.employee_role.id,
+          sponsored_benefit_package_id: cbp.id,
+          benefit_sponsorship: bs,
+          benefit_group_assignment: active_bga
+        )
+      end
+
       before do
         census_employee.update_attributes(employee_role_id: employee_role.id)
         census_employee.employee_role.primary_family.active_household.hbx_enrollments << hbx_enrollment
@@ -448,27 +479,26 @@ module BenefitSponsors
         predecessor_application.update_attributes({:aasm_state => "active"})
         ra.update_attributes({:aasm_state => "enrollment_eligible"})
         hbx_enrollment.benefit_group_assignment_id = census_employee.benefit_group_assignments[0].id
-        rbp.renew_member_benefit(census_employee)
         allow(rbp).to receive(:is_renewal_benefit_available?).and_return(true)
         allow(rbp).to receive(:trigger_renewal_model_event).and_return nil
         allow(hbx_enrollment).to receive(:renew_benefit).with(rbp).and_return(renewed_enrollment)
       end
 
       it "should have renewing enrollment" do
-        hbx_enrollment.update_attributes(benefit_sponsorship: bs, aasm_state: 'coverage_enrolled')
-        hbx_enrollment.save
-        expect(benefit_sponsorship).not_to eq nil
-        expect(family.active_household.hbx_enrollments.enrolled_and_waived.by_benefit_sponsorship(benefit_sponsorship)
-        .by_effective_period(predecessor_application.effective_period).count).to eq 1
-        expect(census_employee.benefit_group_assignments[0].hbx_enrollments.first.aasm_state).to eq "coverage_enrolled"
+        expect(family.active_household.hbx_enrollments.map(&:aasm_state)).to eq ["coverage_selected"]
+        rbp.renew_member_benefit(census_employee)
+        family.reload
+        expect(family.active_household.hbx_enrollments.map(&:aasm_state).include?("auto_renewing")).to eq true
       end
 
-      it "when active enrollment terminated for initial application" do
+      it "when enrollment in terminated for initial application, should not generate renewal" do
         hbx_enrollment.update_attributes(benefit_sponsorship: bs, aasm_state: 'coverage_terminated')
         hbx_enrollment.save
-        expect(family.active_household.hbx_enrollments.enrolled_and_waived.by_benefit_sponsorship(benefit_sponsorship)
-          .by_effective_period(predecessor_application.effective_period).count).to eq 0
-        expect(census_employee.benefit_group_assignments[0].hbx_enrollments.first.aasm_state).to eq "coverage_terminated"
+
+        expect(family.active_household.hbx_enrollments.map(&:aasm_state)).to eq ["coverage_terminated"]
+        rbp.renew_member_benefit(census_employee)
+        family.reload
+        expect(family.active_household.hbx_enrollments.map(&:aasm_state).include?("auto_renewing")).to eq false
       end
     end
 
@@ -489,7 +519,12 @@ module BenefitSponsors
       let(:renewal_benefit_package)         { renewal_application.benefit_packages.build }
 
       context "when renewal product missing" do
-        let(:hbx_enrollment) { double(product: current_enrolled_product, is_coverage_waived?: false, coverage_kind: :health) }
+        let(:hbx_enrollment) { double(product: current_enrolled_product, is_coverage_waived?: false, coverage_termination_pending?: false, coverage_kind: :health) }
+        let(:renewal_sponsored_benefit) do
+          renewal_benefit_package.sponsored_benefits.build(
+            product_package_kind: :single_issuer
+          )
+        end
         let(:renewal_sponsored_benefit) do
           renewal_benefit_package.sponsored_benefits.build(
             product_package_kind: :single_issuer
@@ -509,7 +544,7 @@ module BenefitSponsors
       end
 
       context "when renewal product offered by employer" do
-        let(:hbx_enrollment) { double(product: current_benefit_package.sponsored_benefits.first.reference_product, coverage_kind: :health, is_coverage_waived?: false) }
+        let(:hbx_enrollment) { double(product: current_benefit_package.sponsored_benefits.first.reference_product, coverage_kind: :health, is_coverage_waived?: false, coverage_termination_pending?: false) }
         let(:sponsored_benefit) { renewal_benefit_package.sponsored_benefits.build(product_package_kind: :single_issuer) }
 
         before do
@@ -523,8 +558,16 @@ module BenefitSponsors
       end
 
       context "when renewal product not offered by employer" do
-        let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product)}
-        let(:hbx_enrollment) { double(product: current_benefit_package.sponsored_benefits.first.reference_product, coverage_kind: :health, is_coverage_waived?: false) }
+        let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
+        let(:hbx_enrollment) do
+          double(
+            product: current_benefit_package.sponsored_benefits.first.reference_product,
+            family: double('Family'),
+            coverage_kind: :health,
+            is_coverage_waived?: false,
+            coverage_termination_pending?: false
+          )
+        end
         let(:sponsored_benefit) { renewal_benefit_package.sponsored_benefits.build(product_package_kind: :single_issuer) }
 
         before do
@@ -624,7 +667,7 @@ module BenefitSponsors
             :hbx_enrollment,
             :with_enrollment_members,
             :with_product,
-            family:family,
+            family: family,
             household: family.active_household,
             aasm_state: "coverage_selected",
             effective_on: initial_application.start_on,
@@ -657,7 +700,7 @@ module BenefitSponsors
             :hbx_enrollment,
             :with_enrollment_members,
             :with_product,
-            family:family_1,
+            family: family_1,
             household: family_1.active_household,
             aasm_state: "coverage_selected",
             effective_on: TimeKeeper.date_of_record.next_month,

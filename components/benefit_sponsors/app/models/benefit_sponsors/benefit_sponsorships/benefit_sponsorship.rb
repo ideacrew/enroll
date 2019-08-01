@@ -476,6 +476,10 @@ module BenefitSponsors
       employer_attestation.present? && employer_attestation.is_eligible?
     end
 
+    def latest_application
+      renewal_benefit_application || most_recent_benefit_application
+    end
+
     # If there is a gap, it will fall under a new benefit sponsorship
     # Renewal_benefit_application's predecessor is always current benefit application
     # most_recent_benefit_application will always be their current benefit_application if no renewal
