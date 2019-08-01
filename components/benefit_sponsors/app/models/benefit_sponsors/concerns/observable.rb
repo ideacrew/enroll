@@ -7,7 +7,7 @@ module BenefitSponsors
         if self.class.observer_peers.any?
           self.class.observer_peers.each do |k, events|
             events.each do |event|
-              if k.is_a?(args.options[:observer_klass] || BenefitSponsors::Observers::NoticeObserver)
+              if args.present? && k.is_a?(args.options[:observer_klass] || BenefitSponsors::Observers::NoticeObserver)
                 k.send event, self, args
               end
             end
