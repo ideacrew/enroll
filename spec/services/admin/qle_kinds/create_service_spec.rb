@@ -128,7 +128,7 @@ describe Admin::QleKinds::CreateService, "#call" do
     end
 
     it '#reason_is_valid?' do 
-      expect(subject.reason_is_valid?(reason)).to eq(false)
+      expect(subject.reason_is_valid?(reason)).to eq(true)
       expect(result.success?).to be_falsey
     end
   end
@@ -163,14 +163,19 @@ describe Admin::QleKinds::CreateService, "#call" do
         is_self_attested: is_self_attested,
         effective_on_kinds:['date_of_event'],
         pre_event_sep_in_days: 10,
-        post_event_sep_in_days:10
+        post_event_sep_in_days:10,
+        tool_tip:"tool tip",
+        reason:"reason",
+        action_kind:"action kind",
+        is_active:false,
       }
     end
 
+    
     let(:title) { "QLE Kind Title" }
     let(:market_kind) { "QLE Kind Market Kind" }
     let(:is_self_attested) { "QLE Kind Market Kind" }
-
+    
     before do
       allow(create_virtual_model).to receive(
         :new
