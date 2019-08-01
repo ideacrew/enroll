@@ -107,8 +107,6 @@ attributes: !ruby/hash:BSON::Document
     relationship_name: :dependent
     relationship_kinds:
     - spouse
-    - life_partner
-    - domestic_partner
   - !ruby/hash:BSON::Document
     _id: !ruby/object:BSON::ObjectId
       raw_data: !binary |-
@@ -131,8 +129,4 @@ attributes: !ruby/hash:BSON::Document
     age_comparison: :>=
     disability_qualifier: true
     relationship_kinds:
-    - child
-    - adopted_child
-    - foster_child
-    - stepchild
     - ward
