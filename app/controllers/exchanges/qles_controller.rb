@@ -46,19 +46,18 @@ class Exchanges::QlesController < ApplicationController
     end
   end
 
-  def edit; end
+  def edit
+  end
 
   def update
+    binding.pry
     result = Admin::QleKinds::UpdateService.call(current_user, params.require("data").permit!.to_hash)
     if result.success?
       flash[:notice] = "Successfully updated Qualifying Life Event Kind."
     else
       flash[:error] = "Unable to update Qualifying Life Event Kind."
     end
-    respond_to do |format|
-      format.html
-      format.json { head :manage_exchanges_qles_path, :location => manage_exchanges_qles_path }
-    end
+    render json: {next_url: manage_exchanges_qles_path}
   end
 
   def sorting_order; end
