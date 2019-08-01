@@ -1,0 +1,37 @@
+# frozen_string_literal: true
+
+module RuleSet
+  class AcaIvlEnrollmentEligibilityPolicy
+    include ::BenefitMarkets::BusinessRulesEngine
+
+    VALID_PRODUCT_CLASS = ::BenefitMarkets::Products::HealthProducts::HealthProduct
+    VALID_MARKET_KIND = 'individual'
+    VALID_METAL_LEVEL_SET = VALID_PRODUCT_CLASS::METAL_LEVEL_KINDS - [:catastrophic]
+
+    rule :any_member_eligible,
+         validate: lambda { |enrollment|
+           fac_obj = ::Factories::IvlEligibilityFactory.new(enrollment.id)
+           fac_obj.any_member_aptc_eligible?
+         },
+         success: ->(_enrollment){ 'validated successfully' },
+         fail: ->(_enrollment){ 'None of the shopping members are eligible for APTC' }
+
+    rule :market_kind_eligiblity,
+         validate: ->(enrollment){ enrollment.kind == VALID_MARKET_KIND },
+         success: ->(_enrollment) { 'validated successfully' },
+         fail: ->(enrollment) {"Market Kind of given enrollment is #{enrollment.kind} and not #{VALID_MARKET_KIND}"}
+
+    business_policy :apply_aptc,
+                    rules: [:market_kind_eligiblity,
+                            :any_member_eligible]
+
+    def business_policies_for(enrollment, event_name)
+      return unless enrollment.is_a?(::HbxEnrollment)
+
+      case event_name
+      when :apply_aptc
+        business_policies[:apply_aptc]
+      end
+    end
+  end
+end
