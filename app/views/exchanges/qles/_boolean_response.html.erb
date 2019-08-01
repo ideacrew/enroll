@@ -1,4 +1,0 @@
-<%= f.fields_for :responses, f.object.new_response do |response_fields| %>
-  <%= response_fields.hidden_field :name, value: value %>
-  <%= value.capitalize %>: <%= response_fields.select :result, {"Contact Call Center" => :contact_call_center, "Proceed" => :proceed, "Follow Up Question" => :follow_up_question } %>
-<% end %>

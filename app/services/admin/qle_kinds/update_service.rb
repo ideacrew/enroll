@@ -9,7 +9,7 @@ module Admin
       ]
 
       def self.call(current_user, qle_kind_data)
-        self.new.call(current_user, qle_kind_data)
+        new.call(current_user, qle_kind_data)
       end
 
       # Process the qle creation request from  controller params.
@@ -32,7 +32,7 @@ module Admin
           service: self
         )
         return result unless result.success?
-        update_record(current_user, request)
+        update_record(request)
       end
 
       def title_is_unique?(title)
@@ -40,22 +40,20 @@ module Admin
         qle_titles.exclude?(title)
       end
       
-      # TODO:
-      # The reason kinds should be a select so it'll
+      # TODO: The reason kinds should be a select so it'll
       # automatically be included in here
       # currently its an input
       def reason_is_valid?(reason)
-
         # reason.in?(QualifyingLifeEventKind::REASON_KINDS)
         return true
       end
 
       def post_sep_eligiblity_date_is_valid?(date)
-        # TO DO
+        # TODO: Add validation
       end
 
       def self.post_sep_eligiblity_date_is_valid?(date)
-        # TO DO
+        # TODO: validation
       end
 
 
@@ -65,7 +63,7 @@ module Admin
 
       protected
 
-      def update_record(current_user, request)
+      def update_record(request)
         record = QualifyingLifeEventKind.find(request.id)
         record.update_attributes!(
           id: request.id,
