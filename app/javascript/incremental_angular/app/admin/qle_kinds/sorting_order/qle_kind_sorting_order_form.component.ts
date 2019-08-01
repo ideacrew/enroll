@@ -3,7 +3,7 @@ import { QleKindSortingOrderResource } from './qle_kind_sorting_order_data';
 import { FormGroup, FormControl, AbstractControl, FormArray, FormBuilder, Validators } from '@angular/forms';
 // import { ErrorLocalizer } from '../../../error_localizer';
 // import { ErrorMapper, ErrorResponse } from '../../../error_mapper';
-import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
+// import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 // import { __core_private_testing_placeholder__ } from '@angular/core/testing';
 import { QleKindSortingOrderService } from '../qle_kind_services';
 import { HttpResponse } from "@angular/common/http";
@@ -50,9 +50,9 @@ export class QleKindSortingOrderFormComponent {
     'Episode VIII - The Last Jedi'
   ];
 
-  drop(event: CdkDragDrop<string[]>) {
-    moveItemInArray(this.movies, event.previousIndex, event.currentIndex);
-  }
+  // drop(event: CdkDragDrop<string[]>) {
+  //  moveItemInArray(this.movies, event.previousIndex, event.currentIndex);
+  // }
   ngOnInit() {
     var submissionUriAttribute = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-qle-kind-sorting-order-url");
     if (submissionUriAttribute != null) {

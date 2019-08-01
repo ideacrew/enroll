@@ -5,8 +5,8 @@ import { QleKindEditService } from '../qle_kind_services';
 import { ErrorLocalizer } from '../../../error_localizer';
 import { ErrorMapper, ErrorResponse } from '../../../error_mapper';
 import { HttpResponse } from "@angular/common/http";
-import { DragDropModule } from '@angular/cdk/drag-drop';
-import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
+// import { DragDropModule } from '@angular/cdk/drag-drop';
+// import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 
 
 
