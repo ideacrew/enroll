@@ -147,7 +147,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         context 'for success case' do
           before :each do
             enrollment_assisted.update_attributes(aasm_state: state)
-            @business_policy = subject.business_policies_for(enrollment_assisted, :edit_aptc)
+            @business_policy = subject.business_policies_for(enrollment_assisted, :edit_aptc_on_enrollment)
           end
 
           it 'should return true when validated' do
@@ -169,7 +169,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         context 'for failure cases' do
           before :each do
             enrollment_assisted.update_attributes(aasm_state: state)
-            @business_policy = subject.business_policies_for(enrollment_assisted, :edit_aptc)
+            @business_policy = subject.business_policies_for(enrollment_assisted, :edit_aptc_on_enrollment)
           end
 
           it 'should return true when validated' do
@@ -189,7 +189,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
       context 'for invalid inputs' do
         it 'should return not return any business_policy when invalid data is sent' do
-          @business_policy = subject.business_policies_for('bad object', :edit_aptc)
+          @business_policy = subject.business_policies_for('bad object', :edit_aptc_on_enrollment)
           expect(@business_policy).to be_nil
         end
 
