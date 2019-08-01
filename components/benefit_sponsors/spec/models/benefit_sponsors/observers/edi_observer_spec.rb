@@ -11,11 +11,11 @@ RSpec.describe BenefitSponsors::Observers::EdiObserver, dbclean: :after_each do
   let!(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
   let!(:model_instance) do
     FactoryBot.create(
-        :benefit_sponsors_benefit_application,
-        :with_benefit_package,
-        :benefit_sponsorship => benefit_sponsorship,
-        :aasm_state => 'active',
-        :effective_period => start_on..(start_on + 1.year) - 1.day
+      :benefit_sponsors_benefit_application,
+      :with_benefit_package,
+      :benefit_sponsorship => benefit_sponsorship,
+      :aasm_state => 'active',
+      :effective_period => start_on..(start_on + 1.year) - 1.day
     )
   end
 
@@ -25,7 +25,6 @@ RSpec.describe BenefitSponsors::Observers::EdiObserver, dbclean: :after_each do
     let!(:event_type) {event.to_sym}
 
     let(:model_event) { BenefitSponsors::ModelEvents::ModelEvent.new(event_type, model_instance, {}) }
-
 
     it "deliver event should have" do
       expect(subject).to receive(:deliver) do |recipient:, event_object:,event_name:, edi_params: {}|

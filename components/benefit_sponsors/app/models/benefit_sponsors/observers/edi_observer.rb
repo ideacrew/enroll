@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Observers
     class EdiObserver
@@ -14,7 +16,6 @@ module BenefitSponsors
       end
 
       def process_application_edi_events(_model_instance, model_event)
-
         raise ArgumentError, "expected BenefitSponsors::ModelEvents::ModelEvent" unless model_event.present? && model_event.is_a?(BenefitSponsors::ModelEvents::ModelEvent)
 
         method_name = "trigger_#{model_event.event_key}_event"
@@ -35,7 +36,7 @@ module BenefitSponsors
 
       def trigger_benefit_coverage_renewal_carrier_dropped_event(model_event)
         employer_profile = model_event.klass_instance.employer_profile
-        deliver(recipient: employer_profile, event_object: model_event.klass_instance, event_name: BenefitApplications::BenefitApplication::INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT_TAG, edi_params:{plan_year_id: model_event.klass_instance.id.to_s,})
+        deliver(recipient: employer_profile, event_object: model_event.klass_instance, event_name: BenefitApplications::BenefitApplication::INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT_TAG, edi_params: { plan_year_id: model_event.klass_instance.id.to_s })
       end
     end
   end

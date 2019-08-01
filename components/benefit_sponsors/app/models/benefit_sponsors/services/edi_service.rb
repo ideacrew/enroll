@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Services
     class EdiService
@@ -14,11 +16,15 @@ module BenefitSponsors
       end
 
       def trigger_edi_event(recipient, event_object, event_name, edi_params)
-        notify("acapi.info.events.employer.#{event_name}", {
-                             :employer_id => recipient.hbx_id,
-                             :is_trading_partner_publishable => event_object.is_application_trading_partner_publishable?,
-                             :plan_year_id   => edi_params[:plan_year_id],
-                             :event_name => event_name})
+        notify(
+          "acapi.info.events.employer.#{event_name}",
+          {
+            :employer_id => recipient.hbx_id,
+            :is_trading_partner_publishable => event_object.is_application_trading_partner_publishable?,
+            :plan_year_id => edi_params[:plan_year_id],
+            :event_name => event_name
+          }
+        )
       end
     end
   end

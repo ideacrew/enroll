@@ -65,18 +65,11 @@ module BenefitSponsors
 
           if is_transition_matching?(to: [:terminated, :termination_pending], from: [:active, :suspended, :expired], event: [:terminate_enrollment, :schedule_enrollment_termination])
             is_group_termination_confirmation_notice = true
-            if self.termination_kind.to_s == "voluntary"
-              is_benefit_coverage_period_terminated_voluntary = true
-            end
-
-            if self.termination_kind.to_s == "nonpayment"
-              is_benefit_coverage_period_terminated_nonpayment = true
-            end
+            is_benefit_coverage_period_terminated_voluntary = true if termination_kind.to_s == "voluntary"
+            is_benefit_coverage_period_terminated_nonpayment = true if termination_kind.to_s == "nonpayment"
           end
 
-          if is_transition_matching?(to: :canceled, from: [:enrollment_eligible, :active, :binder_paid], event: :cancel)
-            is_benefit_coverage_renewal_carrier_dropped = true
-          end
+          is_benefit_coverage_renewal_carrier_dropped = true if is_transition_matching?(to: :canceled, from: [:enrollment_eligible, :active, :binder_paid], event: :cancel)
 
           if is_transition_matching?(to: :approved, from: [:draft, :imported] + BenefitSponsors::BenefitApplications::BenefitApplication::APPLICATION_EXCEPTION_STATES, event: :auto_approve_application)
             is_renewal_application_autosubmitted = true
