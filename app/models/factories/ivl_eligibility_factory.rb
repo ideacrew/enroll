@@ -4,7 +4,7 @@
 # Currently Applied: Passive Renewals.
 # Future Applicable locations: Plan Shopping Controller, APTC tool, Self Service.
 module Factories
-  class EligibilityFactory
+  class IvlEligibilityFactory
 
     def initialize(enrollment_id, selected_aptc = nil, product_ids = [])
       @enrollment = HbxEnrollment.where(id: enrollment_id.to_s).first
@@ -33,6 +33,10 @@ module Factories
         products_aptcs_hash.merge!(product_aptc) unless product_aptc.empty?
         products_aptcs_hash
       end
+    end
+
+    def any_member_aptc_eligible?
+      shopping_tax_members.map(&:is_ia_eligible?).include?(true)
     end
 
     private
