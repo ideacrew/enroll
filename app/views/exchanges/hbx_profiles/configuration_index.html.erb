@@ -36,6 +36,11 @@
           </tbody>
         </table>
       <% end %>
+      <br/>
+      <br/>
+      <%=pundit_span HbxProfile, :can_add_custom_qle? %>
+        <%= link_to "Manage QLEs", manage_exchanges_qles_path, data: { turbolinks: false }, class: "btn btn-default" %>
+      </span>
     </div>
 
   </div>
