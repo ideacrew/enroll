@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Exchanges::QlesController < ApplicationController
   before_action :set_qle_and_attributes, only: [:deactivation_form, :edit, :question_flow]
   before_action :set_new_qle_and_questions, only: [:new]
@@ -7,28 +9,27 @@ class Exchanges::QlesController < ApplicationController
   before_action :can_add_custom_qle?, only: [:manage_qle]
   skip_before_action :verify_authenticity_token, only: [:deactivate, :create, :update]
 
-  def manage
-  end
+  def manage; end
   
   def manage_qle
-    attrs = { market_kind: params[:market_kind] }
+    attrs = { market_kind: params.dig(:market_kind) }
     if params[:manage_qle_action] == 'new_qle'
-      redirect_to new_exchanges_qle_path(attrs) and return
+      redirect_to new_exchanges_qle_path(attrs)
     elsif params[:manage_qle_action] == 'modify_qle'
       @qle = QualifyingLifeEventKind.find(params[:id])
-      redirect_to edit_exchanges_qle_path(@qle, attrs) and return
+      redirect_to edit_exchanges_qle_path(@qle, attrs)
     elsif params[:manage_qle_action] == 'deactivate_qle'
       @qle = QualifyingLifeEventKind.find(params[:id])
-      redirect_to deactivation_form_exchanges_qle_path(@qle, attrs) and return
+      redirect_to deactivation_form_exchanges_qle_path(@qle, attrs)
     end
   end
 
-  def question_flow 
-    redirect_to question_flow_exchanges_qle(@qle, attrs) and return
+  def question_flow
+    attrs = { market_kind: params.dig(:market_kind) }
+    redirect_to question_flow_exchanges_qle_path(@qle, attrs)
   end
 
-  def deactivation_form
-  end
+  def deactivation_form; end
 
   def deactivate
     result = Admin::QleKinds::DeactivateService.call(
@@ -45,8 +46,7 @@ class Exchanges::QlesController < ApplicationController
     end
   end
 
-  def edit
-  end
+  def edit; end
 
   def update
     result = Admin::QleKinds::UpdateService.call(current_user, params.require("data").permit!.to_hash)
@@ -61,11 +61,9 @@ class Exchanges::QlesController < ApplicationController
     end
   end
 
-  def sorting_order
-  end
+  def sorting_order; end
 
-  def new
-  end
+  def new; end
 
   def create
     result = Admin::QleKinds::CreateService.call(current_user, params.require("data").permit!.to_hash)
@@ -85,9 +83,7 @@ class Exchanges::QlesController < ApplicationController
   private
 
   def can_add_custom_qle?
-    unless authorize HbxProfile, :can_add_custom_qle?
-      redirect_to root_path, :flash => { :error => "Access not allowed" }
-    end
+    redirect_to(root_path, :flash => { :error => "Access not allowed" }) unless authorize(HbxProfile, :can_add_custom_qle?)
   end
 
   def set_sortable_qles

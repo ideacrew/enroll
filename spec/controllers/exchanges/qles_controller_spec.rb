@@ -1,49 +1,51 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Exchanges::QlesController, :type => :controller do
   render_views
   let(:qle_creation_params) do
-    { 
+    {
       'data' =>
       {
-        "title"=>"Got a New Dog",
-        "event_kind_label"=>"Date of birth",
+        "title" => "Got a New Dog",
+        "event_kind_label" => "Date of birth",
         "market_kind" => "shop",
         "effective_on_kinds" => ["date_of_event"],
-        "tool_tip"=>"Household adds a new dog for emotional support",
+        "tool_tip" => "Household adds a new dog for emotional support",
         "is_self_attested" => true,
-        "reason"=>"birth",
+        "reason" => "birth",
         "pre_event_sep_in_days" => "1",
         "post_event_sep_in_days" => "1",
-        "questions_attributes"=> {
-          "0"=> {
-            "content"=>"When was Your Dog Born?",
-            "answer_attributes"=> {
-              "responses_attributes"=> {
-                "0"=>{
-                  "name"=>"true",
-                  "result"=>"contact_call_center"
-                  },
-                "1"=>{
-                  "name"=>"false",
-                  "result"=>"contact_call_center"
-                  },
-                "2"=>{
-                  "operator"=>"before",
-                  "value"=>"",
-                  "value_2"=>""
+        "questions_attributes" => {
+          "0" => {
+            "content" => "When was Your Dog Born?",
+            "answer_attributes" => {
+              "responses_attributes" => {
+                "0" => {
+                  "name" => "true",
+                  "result" => "contact_call_center"
                 },
-                "3"=>{
-                  "name"=>"",
-                  "result"=>"proceed"
+                "1" => {
+                  "name" => "false",
+                  "result" => "contact_call_center"
+                },
+                "2" => {
+                  "operator" => "before",
+                  "value" => "",
+                  "value_2" => ""
+                },
+                "3" => {
+                  "name" => "",
+                  "result" => "proceed"
                 }
               }
             },
-            "type"=>"date"
+            "type" => "date"
           }
         },
-        "start_on"=>"06/01/1990",
-        "end_on"=>"06/01/2005"
+        "start_on" => "06/01/1990",
+        "end_on" => "06/01/2005"
       }
     }
   end
@@ -56,7 +58,7 @@ RSpec.describe Exchanges::QlesController, :type => :controller do
       "data" =>
       {
         "_id" => existing_qle.id,
-        "end_on"=>"06/01/2030"
+        "end_on" => "06/01/2030"
       }
     }
   end
@@ -69,38 +71,6 @@ RSpec.describe Exchanges::QlesController, :type => :controller do
       }
     }
   end
-  let(:new_qle_params) do
-    {
-      "action"=>"manage_qle",
-      "controller"=>"exchanges/qles",
-      "manage_qle"=>{
-        "action"=>"new_qle"
-      }
-    }
-  end
-  let(:modify_qle_params) do
-    {
-      "action"=>"manage_qle",
-      "controller"=>"exchanges/qles",
-      "id" => existing_qle.id,
-      "manage_qle"=>{
-        "action"=>"modify_qle"
-      }
-    }
-  end
-  let(:deactivate_qle_params) do
-    {
-      "action"=>"manage_qle",
-      "controller"=>"exchanges/qles",
-      "id" => existing_qle.id,
-      "manage_qle"=>{
-        "action"=>"deactivate_qle"
-      }
-    }
-  end
-  let(:manage_qle_new_instance) { ::Forms::ManageQleForm.for_create(new_qle_params) }
-  let(:manage_qle_modify_instance) { ::Forms::ManageQleForm.for_create(modify_qle_params) }
-  let(:manage_qle_deactivate_instance) { ::Forms::ManageQleForm.for_create(deactivate_qle_params) }
   let(:existing_qle) do
     FactoryBot.create(
       :qualifying_life_event_kind,
@@ -141,14 +111,14 @@ RSpec.describe Exchanges::QlesController, :type => :controller do
         expect(QualifyingLifeEventKind.count).to eq(0)
         post(:create, as: 'json', params: qle_creation_params)
         expect(QualifyingLifeEventKind.count).to eq(1)
-        expect(flash['notice']).to eq('Successfully created QualifyingLifeEventKind.')
+        expect(flash['notice']).to eq('Successfully created Qualifying Life Event Kind.')
       end
     end
     context "invalid input" do
       it "fails to create record and throws error" do
         expect(QualifyingLifeEventKind.count).to eq(0)
         post(:create, as: 'json', params: invalid_qle_creation_params)
-        expect(flash['error']).to eq('Unable to create QualifyingLifeEventKind.')
+        expect(flash['error']).to eq('Unable to create Qualifying Life Event Kind.')
       end
     end
   end
@@ -180,41 +150,69 @@ RSpec.describe Exchanges::QlesController, :type => :controller do
             data: invalid_deactivate_existing_qle_params
           }
         )
-        expect(flash['error']).to eq('Unable to deactivate QualifyingLifeEventKind.')
+        expect(flash['error']).to eq('Unable to deactivate Qualifying Life Event Kind.')
         expect(response.status).to eq(204)
         expect(response.location).to eq(manage_exchanges_qles_path)
       end
     end
   end
 
-  describe "POST #manage_qle" do
-    before :each do
-      # TODO: Assure that it should be "shop" for market kind
-      allow_any_instance_of(::Forms::ManageQleForm).to receive(:market_kind).and_return("shop")
+  describe "GET #manage" do
+    it "successfully renders manage action" do
+      get :manage
+      expect(response.status).to eq(200)
     end
+  end
 
+  describe "POST #question_flow" do
+    it "succesfully redirects to question flow get" do
+      post(:question_flow, params: { id: existing_qle, market_kind: 'shop' })
+      expect(response.status).to eq(302)
+      attrs = { market_kind: 'shop' }
+      expect(response).to redirect_to(question_flow_exchanges_qle_path(existing_qle, attrs))
+    end
+  end
+
+  describe "GET #question_flow" do
+
+  end
+
+  describe "POST #manage_qle" do
+    # NOTE: The market_kind param should be passed
+    # via angular when the user selects market kind on the manage page
     context "successfully redirects to" do
       it "new" do
-        allow(::Forms::ManageQleForm).to receive(:for_create).with(new_qle_params).and_return(manage_qle_new_instance)
-        post :manage_qle, params: { manage_qle: { action: "new_qle" } }
+        post(:manage_qle, params: { manage_qle_action: "new_qle", market_kind: 'shop' })
         expect(response.status).to eq(302)
-        attrs = {market_kind: 'shop'}
+        attrs = { market_kind: 'shop' }
         expect(response).to redirect_to(new_exchanges_qle_path(attrs))
       end
 
       it "edit" do
-        allow(::Forms::ManageQleForm).to receive(:for_create).with(modify_qle_params).and_return(manage_qle_modify_instance)
-        post :manage_qle, params: { manage_qle: { action: "modify_qle" }, id: existing_qle.id.to_s }
+        post(
+          :manage_qle,
+          params: {
+            manage_qle_action: "modify_qle",
+            market_kind: 'shop',
+            id: existing_qle.id.to_s
+          }
+        )
         expect(response.status).to eq(302)
-        attrs = {market_kind: 'shop'}
+        attrs = { market_kind: 'shop' }
         expect(response).to redirect_to(edit_exchanges_qle_path(existing_qle, attrs))
       end
 
       it "deactivation_form" do
-        allow(::Forms::ManageQleForm).to receive(:for_create).with(deactivate_qle_params).and_return(manage_qle_deactivate_instance)
-        post :manage_qle, params: { manage_qle: { action: "deactivate_qle" }, id: existing_qle.id.to_s }
+        post(
+          :manage_qle,
+          params: {
+            manage_qle_action: "deactivate_qle",
+            id: existing_qle.id.to_s,
+            market_kind: 'shop'
+          }
+        )
         expect(response.status).to eq(302)
-        attrs = {market_kind: 'shop'}
+        attrs = { market_kind: 'shop' }
         expect(response).to redirect_to(deactivation_form_exchanges_qle_path(existing_qle, attrs))
       end
     end

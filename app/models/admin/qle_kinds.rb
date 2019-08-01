@@ -5,7 +5,7 @@ module Admin
       
       # Create
       register "create_params_validator" do
-        ::QleKinds::UpdateParamsValidator.new
+        ::QleKinds::CreateParamsValidator.new
       end
 
       register "create_domain_validator" do

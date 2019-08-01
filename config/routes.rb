@@ -61,19 +61,14 @@ Rails.application.routes.draw do
   get 'payment_transactions/generate_saml_response', to: 'payment_transactions#generate_saml_response'
 
   namespace :exchanges do
-
     resources :qles, only: [:new, :create, :edit, :update] do
       member do
         get :deactivation_form
         get :question_flow
         post :question_flow
-        get :creation_form
         put :deactivate
       end
-      # TODO: We need to discuss renaming these
-      # essentially they're a redirect wizard and not
-      # creating anything
-      collection do      
+      collection do
         get :manage
         post :manage_qle
         get :sorting_order

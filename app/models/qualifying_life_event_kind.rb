@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class QualifyingLifeEventKind
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -61,8 +63,8 @@ class QualifyingLifeEventKind
     "eligibility_documents_provided"
   ]
 
-    DEFAULT_QUALIFYING_LIFE_EVENTS = 
-    ["Started a new job",
+  DEFAULT_QUALIFYING_LIFE_EVENTS = [
+    "Started a new job",
     "Married",
     "Entered into a legal domestic partnership",
     "Had a baby",
@@ -76,7 +78,8 @@ class QualifyingLifeEventKind
     "Moved or moving",
     "Exceptional circumstances",
     "Health plan contract violation",
-    "Court order to provide coverage for someone"]
+    "Court order to provide coverage for someone"
+  ]
   
 
   embeds_many :custom_qle_questions, as: :questionable
@@ -129,7 +132,7 @@ class QualifyingLifeEventKind
                         :post_event_sep_in_days
 
   scope :active, ->{ where(is_active: true).where(:created_at.ne => nil).order(ordinal_position: :asc) }
-  
+
   # TODO: This scope should be updated depending on what the business rule for editable QLE Kind is
   scope :editable, ->{where(is_active: false)}
   # TODO: This scope should be update depdning on what the business definition of deactivation is

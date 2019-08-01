@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module QleKinds
   class UpdateDomainValidator < BenefitSponsors::BaseDomainValidator
     params do

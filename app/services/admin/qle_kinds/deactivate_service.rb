@@ -1,3 +1,5 @@
+# frozen_string_literal: true.
+
 module Admin
   module QleKinds
     class DeactivateService
@@ -9,14 +11,14 @@ module Admin
       ]
 
       def self.call(current_user, qle_kind_data)
-        self.new.call(current_user, qle_kind_data)
+        new.call(current_user, qle_kind_data)
       end
 
       def call(current_user, qle_kind_data)
         params_result = deactivate_params_validator.call(qle_kind_data)
         return params_result unless params_result.success?
         request = deactivate_virtual_model.new(params_result.output)
-        call_with_request(current_user, request, qle_kind_data)
+        call_with_request(request, qle_kind_data)
       end
 
       def call_with_request(current_user, request, qle_kind_data)
@@ -35,7 +37,7 @@ module Admin
 
       protected
 
-      def deactivate_record(current_user, request, qle_kind_data)
+      def deactivate_record(request, qle_kind_data)
         deactivated_record = QualifyingLifeEventKind.find(qle_kind_data["_id"])
         end_on_date = Date.strptime(request.end_on, '%m/%d/%Y')
         deactivated_record.update_attributes!(end_on: end_on_date)
