@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Admin
   module QleKinds
     class CreateService
@@ -9,7 +11,7 @@ module Admin
       ]
 
       def self.call(current_user, qle_kind_data)
-        self.new.call(current_user, qle_kind_data)
+        new.call(current_user, qle_kind_data)
       end
 
       # Process the qle creation request from  controller params.
@@ -32,35 +34,33 @@ module Admin
           service: self
         )
         return result unless result.success?
-        create_record(current_user, request)
+        create_record(request)
       end
 
       def title_is_unique?(title)
         qle_titles = QualifyingLifeEventKind.all.map(&:title)
         qle_titles.exclude?(title)
       end
-      
-      # TODO:
-      # The reason kinds should be a select so it'll
+
+      # TODO: The reason kinds should be a select so it'll
       # automatically be included in here
       # currently its an input
       def reason_is_valid?(reason)
-        # binding.pry
         # reason.in?(QualifyingLifeEventKind::REASON_KINDS)
         return true
       end
 
       def post_sep_eligiblity_date_is_valid?(date)
-        # TO DO
+        # TODO: Add validation here
       end
 
-      def self.post_sep_eligiblity_date_is_valid?(date)
-        # TO DO
+      def post_sep_eligiblity_date_is_valid?(date)
+        # TODO: Add validation here
       end
 
       protected
 
-      def create_record(current_user, request)
+      def create_record(request)
         new_record = QualifyingLifeEventKind.create!(
           title: request.title,
           market_kind: request.market_kind,
@@ -70,7 +70,7 @@ module Admin
           is_active: false,
           post_event_sep_in_days: request.post_event_sep_in_days
         )
-        # TODO: Make suer this is being called
+        # TODO: Make sure this is being called
         BenefitSponsors::Services::ServiceResponse.new(new_record)
       end
     end
