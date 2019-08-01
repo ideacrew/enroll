@@ -74,7 +74,7 @@ module BenefitSponsors
             end
           end
 
-          if is_transition_matching?(to: :canceled, from: [:enrollment_eligible, :active], event: :cancel)
+          if is_transition_matching?(to: :canceled, from: [:enrollment_eligible, :active, :binder_paid], event: :cancel)
             is_benefit_coverage_renewal_carrier_dropped = true
           end
 
