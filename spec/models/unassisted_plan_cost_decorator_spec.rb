@@ -99,26 +99,56 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
     end
 
     context 'for valid arguments' do
-      it 'should return amounts based on elected_aptc' do
-        person2.update_attributes!(dob: 80.years.ago)
-        upcd_1 = UnassistedPlanCostDecorator.new(product, hbx_enrollment10, 100.00, tax_household10)
-        expect(upcd_1.aptc_amount(hbx_enrollment_member1)).to eq 50.00
-        expect(upcd_1.aptc_amount(hbx_enrollment_member2)).to eq 50.00
+      context 'for persisted enrollment object' do
+        it 'should return amounts based on elected_aptc' do
+          person2.update_attributes!(dob: 80.years.ago)
+          upcd_1 = UnassistedPlanCostDecorator.new(product, hbx_enrollment10, 100.00, tax_household10)
+          expect(upcd_1.aptc_amount(hbx_enrollment_member1)).to eq 50.00
+          expect(upcd_1.aptc_amount(hbx_enrollment_member2)).to eq 50.00
+        end
+
+        it 'should return amounts based on premium' do
+          person.update_attributes!(dob: 45.years.ago)
+          person2.update_attributes!(dob: 45.years.ago)
+          upcd_1 = UnassistedPlanCostDecorator.new(product, hbx_enrollment10, 100.00, tax_household10)
+          expect(upcd_1.aptc_amount(hbx_enrollment_member1).round(2)).to eq 43.75
+          expect(upcd_1.aptc_amount(hbx_enrollment_member2).round(2)).to eq 43.75
+        end
+
+        it 'should return amounts based on max_aptc' do
+          eligibility_determination.update_attributes!(max_aptc: 50.00)
+          upcd_1 = UnassistedPlanCostDecorator.new(product, hbx_enrollment10, 100.00, tax_household10)
+          expect(upcd_1.aptc_amount(hbx_enrollment_member1)).to eq 25.00
+          expect(upcd_1.aptc_amount(hbx_enrollment_member2)).to eq 25.00
+        end
       end
 
-      it 'should return amounts based on premium' do
-        person.update_attributes!(dob: 45.years.ago)
-        person2.update_attributes!(dob: 45.years.ago)
-        upcd_1 = UnassistedPlanCostDecorator.new(product, hbx_enrollment10, 100.00, tax_household10)
-        expect(upcd_1.aptc_amount(hbx_enrollment_member1).round(2)).to eq 43.75
-        expect(upcd_1.aptc_amount(hbx_enrollment_member2).round(2)).to eq 43.75
-      end
+      context 'for non-persisted enrollment object' do
+        let!(:enrollment1) { FactoryBot.build(:hbx_enrollment, family: family10, household: family10.active_household, aasm_state: 'shopping', product: product, consumer_role_id: person.consumer_role.id) }
+        let!(:enr_member1) { FactoryBot.build(:hbx_enrollment_member, applicant_id: family10.primary_applicant.id, is_subscriber: true, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: enrollment1) }
+        let!(:enr_member2) { FactoryBot.build(:hbx_enrollment_member, applicant_id: family10.family_members[1].id, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: enrollment1) }
 
-      it 'should return amounts based on max_aptc' do
-        eligibility_determination.update_attributes!(max_aptc: 50.00)
-        upcd_1 = UnassistedPlanCostDecorator.new(product, hbx_enrollment10, 100.00, tax_household10)
-        expect(upcd_1.aptc_amount(hbx_enrollment_member1)).to eq 25.00
-        expect(upcd_1.aptc_amount(hbx_enrollment_member2)).to eq 25.00
+        it 'should return amounts based on elected_aptc' do
+          person2.update_attributes!(dob: 80.years.ago)
+          upcd_1 = UnassistedPlanCostDecorator.new(product, enrollment1, 100.00, tax_household10)
+          expect(upcd_1.aptc_amount(enr_member1)).to eq 50.00
+          expect(upcd_1.aptc_amount(enr_member2)).to eq 50.00
+        end
+
+        it 'should return amounts based on premium' do
+          person.update_attributes!(dob: 45.years.ago)
+          person2.update_attributes!(dob: 45.years.ago)
+          upcd_1 = UnassistedPlanCostDecorator.new(product, enrollment1, 100.00, tax_household10)
+          expect(upcd_1.aptc_amount(enr_member1).round(2)).to eq 43.75
+          expect(upcd_1.aptc_amount(enr_member2).round(2)).to eq 43.75
+        end
+
+        it 'should return amounts based on max_aptc' do
+          eligibility_determination.update_attributes!(max_aptc: 50.00)
+          upcd_1 = UnassistedPlanCostDecorator.new(product, enrollment1, 100.00, tax_household10)
+          expect(upcd_1.aptc_amount(enr_member1)).to eq 25.00
+          expect(upcd_1.aptc_amount(enr_member2)).to eq 25.00
+        end
       end
     end
 
