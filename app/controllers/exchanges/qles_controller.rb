@@ -8,6 +8,8 @@ class Exchanges::QlesController < ApplicationController
   # TODO: Determine which need the Pundit before_action
   before_action :can_add_custom_qle?, only: [:manage_qle]
   skip_before_action :verify_authenticity_token, only: [:deactivate, :create, :update]
+  # This is in hbx_profiles controller, which is part of the admin pages
+  layout 'single_column'
 
   def manage; end
   
