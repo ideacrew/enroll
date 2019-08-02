@@ -71,7 +71,10 @@ module Admin
           post_event_sep_in_days: request.post_event_sep_in_days,
           tool_tip: request.tool_tip,
           reason: request.reason,
-          action_kind: request.action_kind
+          action_kind: request.action_kind,
+          end_on:request.end_on,
+          start_on: request.start_on,
+
         )
         # TODO: Make sure this is being called
         BenefitSponsors::Services::ServiceResponse.new(new_record)

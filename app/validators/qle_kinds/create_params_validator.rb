@@ -10,6 +10,9 @@ module QleKinds
       optional(:action_kind).maybe(:str?)
       optional(:tool_tip).maybe(:str?)
       optional(:reason).maybe(:str?)
+      optional(:start_on).maybe(:str?)
+      optional(:end_on).maybe(:str?)
+
     end
   end
 end

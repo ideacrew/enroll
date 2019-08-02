@@ -167,7 +167,9 @@ describe Admin::QleKinds::CreateService, "#call" do
         tool_tip:"tool tip",
         reason:"reason",
         action_kind:"action kind",
-        is_active:false,
+        is_active: false,
+    end_on: "11/11/1111",
+    start_on: '11/11/1111'
       }
     end
 

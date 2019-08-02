@@ -33,14 +33,23 @@ export class QleKindCreationFormComponent {
       { name: 'Date options available',  selected: false, id: 7 }
     ]
   public actionKindList = [
-    "Not Applicable", 
-    "Drop Member", 
-    "Adminstrative", 
-    "Add Member",
-    "Add Benefit", 
-    "Change Benefit", 
-    "Transition Member"
+      {name:"Not Applicable"},
+      {name:"Drop Member"}, 
+      {name:"Adminstrative"}, 
+      {name:"Add Member"},
+      {name:"Add Benefit"}, 
+      {name:"Change Benefit"}, 
+      {name:"Transition Member"}
   ]
+  
+  public reasonList = [
+    "exceptional_circumstances_natural_disaster",
+    "exceptional_circumstances_medical_emergency",
+    "exceptional_circumstances_system_outage",
+    "exceptional_circumstances_domestic_abuse",
+    "exceptional_circumstances_civic_service",
+    "exceptional_circumstances",
+]
     @ViewChild('headerRef') headerRef: ElementRef;
 
 
@@ -67,10 +76,11 @@ export class QleKindCreationFormComponent {
       questions: qControls,
       pre_event_sep_in_days:[0, Validators.required],
       post_event_sep_in_days:[0, Validators.required],
-      available_in_system_from: [''],   
-      available_in_system_until: ['']
+      start_on: [''],   
+      end_on: ['']
     });
     this.creationFormGroup = formGroup;
+
     this.questionArray = qControls;
     this.addCheckboxes();
   }
@@ -102,6 +112,11 @@ export class QleKindCreationFormComponent {
   }
 
   ngOnInit() {
+
+  // $( document ).ready(function() {
+  //    $('select#qle_kind_creation_form_action_kind').selectric('destroy')
+  // });
+
     var submissionUriAttribute = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-qle-kind-create-url");
     if (submissionUriAttribute != null) {
       this.creationUri = submissionUriAttribute;
@@ -130,8 +145,8 @@ export class QleKindCreationFormComponent {
   submitCreation() {
     var form = this;
     var errorMapper = new ErrorMapper();
-console.log(this.creationFormGroup.value)
     if (this.creationFormGroup != null) {
+      this.creationFormGroup.value.action_kind =  this._elementRef.nativeElement.querySelector('select option:checked').value
       if (this.creationUri != null) {
         var invocation = this.CreationService.submitCreate(this.creationUri, this.creationFormGroup.value);
         invocation.subscribe(
