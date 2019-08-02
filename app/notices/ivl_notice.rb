@@ -34,12 +34,6 @@ class IvlNotice < Notice
     clear_tmp
   end
 
-  def generate_custom_notice(custom_template)
-    File.open(custom_notice_path, 'wb') do |file|
-      file << self.pdf_custom(custom_template)
-    end
-  end
-
   def pdf_custom(custom_template)
     WickedPdf.new.pdf_from_string(self.html({kind: 'pdf', custom_template: custom_template}), pdf_options_custom)
   end
