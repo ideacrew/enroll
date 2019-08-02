@@ -25,7 +25,7 @@ module BenefitSponsors
         today = TimeKeeper.date_of_record
         current_year = today.year
         years = [current_year, current_year - 1]
-        (10..12).include?(today.month) ? (years << current_year + 1) : years
+        (10..12).cover?(today.month) ? (years << current_year + 1) : years
       end
 
       def retrieve_table_data
