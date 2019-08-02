@@ -49,7 +49,6 @@ class Exchanges::QlesController < ApplicationController
   def edit; end
 
   def update
-    binding.pry
     result = Admin::QleKinds::UpdateService.call(current_user, params.require("data").permit!.to_hash)
     if result.success?
       flash[:notice] = "Successfully updated Qualifying Life Event Kind."
