@@ -18,7 +18,7 @@ module Admin
         params_result = deactivate_params_validator.call(qle_kind_data)
         return params_result unless params_result.success?
         request = deactivate_virtual_model.new(params_result.output)
-        call_with_request(request, qle_kind_data)
+        call_with_request(current_user, request)
       end
 
       def call_with_request(current_user, request, qle_kind_data)
@@ -28,7 +28,7 @@ module Admin
           service: self
         )
         return result unless result.success?
-        deactivate_record(current_user, request, qle_kind_data)
+        deactivate_record(request)
       end
 
       def end_on_present?(end_on)
@@ -37,7 +37,7 @@ module Admin
 
       protected
 
-      def deactivate_record(request, qle_kind_data)
+      def deactivate_record(request)
         deactivated_record = QualifyingLifeEventKind.find(qle_kind_data["_id"])
         end_on_date = Date.strptime(request.end_on, '%m/%d/%Y')
         deactivated_record.update_attributes!(end_on: end_on_date)
