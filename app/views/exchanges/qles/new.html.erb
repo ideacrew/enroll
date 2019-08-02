@@ -1,5 +1,7 @@
- <admin-qle-kind-creation-form
+<%= render "ui-components/v1/navs/primary_nav.html.slim" %>
+
+<admin-qle-kind-creation-form
   data-qle-kind-create-url="<%= exchanges_qles_path %>"
   data-qle-kind-market-kinds="<%= QualifyingLifeEventKind::MARKET_KINDS.to_json %>">
- </admin-qle-kind-creation-form>
+</admin-qle-kind-creation-form>
 

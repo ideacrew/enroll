@@ -1,4 +1,6 @@
- <%
+<%= render "ui-components/v1/navs/primary_nav.html.slim" %>
+
+<%
 editable_list = @editable_qles.map do |qle|
    {
      label: qle.qle_dropdown_label,
