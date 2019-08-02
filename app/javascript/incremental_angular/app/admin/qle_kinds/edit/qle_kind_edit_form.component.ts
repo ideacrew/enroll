@@ -29,6 +29,16 @@ export class QleKindEditFormComponent {
     { name: 'Exact Date',  selected: false, id: 6 },
     { name: 'Date options available',  selected: false, id: 7 }
   ]
+    public actionKindList = [
+      {name:"Not Applicable"},
+      {name:"Drop Member"}, 
+      {name:"Adminstrative"}, 
+      {name:"Add Member"},
+      {name:"Add Benefit"}, 
+      {name:"Change Benefit"}, 
+      {name:"Transition Member"}
+  ]
+  
   constructor(
     injector: Injector,
     @Inject("QleKindEditService") private editService : QleKindEditService,
@@ -67,8 +77,8 @@ export class QleKindEditFormComponent {
           effective_on_kinds:  new FormArray([]),
           pre_event_sep_in_days:[0, Validators.required],
           post_event_sep_in_days:[0, Validators.required],
-          available_in_system_from: [''],   
-          available_in_system_until: ['']
+          start_on: [''],   
+          end_on: ['']
         })
         this.editFormGroup = formGroup;
         this.addCheckboxes();
@@ -123,6 +133,7 @@ export class QleKindEditFormComponent {
     var errorMapper = new ErrorMapper();
         console.log(this.editFormGroup.value)
     if (this.editFormGroup.valid) {
+        this.editFormGroup.value.action_kind =  this._elementRef.nativeElement.querySelector('select option:checked').value
       if (this.editUri != null) {
         var invocation = this.editService.submitEdit(this.editUri, this.editFormGroup.value);
         invocation.subscribe(
