@@ -48,12 +48,18 @@ class UnassistedPlanCostDecorator < SimpleDelegator
     0.00
   end
 
-  def init_applicable_eligibility_service
-    @init_applicable_eligibility_service ||= ::Services::ApplicableAptcService.new(@hbx_enrollment.id, @elected_aptc, [__getobj__.id.to_s])
+  def all_members_aptc_for_saved_enrs
+    serv_obj = ::Services::ApplicableAptcService.new(@hbx_enrollment.id, @elected_aptc, [__getobj__.id.to_s])
+    serv_obj.aptc_per_member[__getobj__.id.to_s]
+  end
+
+  def all_members_aptc_for_unsaved_enrs
+    fac_obj = ::Factories::IvlPlanShoppingEligibilityFactory.new(@hbx_enrollment, @elected_aptc, [__getobj__.id.to_s])
+    fac_obj.fetch_aptc_per_member[__getobj__.id.to_s]
   end
 
   def all_members_aptc
-    @all_members_aptc ||= init_applicable_eligibility_service.aptc_per_member[__getobj__.id.to_s]
+    @all_members_aptc ||= @hbx_enrollment.persisted? ? all_members_aptc_for_saved_enrs : all_members_aptc_for_unsaved_enrs
   end
 
   def aptc_amount(member)
