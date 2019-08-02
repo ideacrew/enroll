@@ -168,7 +168,9 @@ describe Admin::QleKinds::UpdateService, "#call" do
         post_event_sep_in_days:12,
         tool_tip:"tool tip",
         reason:"reason",
-        action_kind:"action kind"
+        action_kind:"action kind",
+        start_on: "11/11/1111",
+        end_on: "11/11/1111",
       }
     end
 
