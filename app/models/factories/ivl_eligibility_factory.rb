@@ -36,7 +36,15 @@ module Factories
     end
 
     def any_member_aptc_eligible?
+      return false if tax_households.blank?
+
       shopping_tax_members.map(&:is_ia_eligible?).include?(true)
+    end
+
+    def any_member_csr_ineligible?
+      return true if tax_households.blank?
+
+      any_aptc_ineligible?
     end
 
     private

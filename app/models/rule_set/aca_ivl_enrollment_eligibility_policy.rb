@@ -8,7 +8,7 @@ module RuleSet
     VALID_MARKET_KIND = 'individual'
     VALID_METAL_LEVEL_SET = VALID_PRODUCT_CLASS::METAL_LEVEL_KINDS - [:catastrophic]
 
-    rule :any_member_eligible,
+    rule :any_member_aptc_eligible,
          validate: lambda { |enrollment|
            fac_obj = ::Factories::IvlEligibilityFactory.new(enrollment.id)
            fac_obj.any_member_aptc_eligible?
@@ -21,9 +21,20 @@ module RuleSet
          success: ->(_enrollment) { 'validated successfully' },
          fail: ->(enrollment) {"Market Kind of given enrollment is #{enrollment.kind} and not #{VALID_MARKET_KIND}"}
 
+    rule :any_member_csr_ineligible,
+         validate: lambda { |enrollment|
+           fac_obj = ::Factories::IvlEligibilityFactory.new(enrollment.id)
+           !fac_obj.any_member_csr_ineligible?
+         },
+         success: ->(_enrollment){ 'validated successfully' },
+         fail: ->(_enrollment){ 'One of the shopping members are ineligible for CSR' }
+
     business_policy :apply_aptc,
                     rules: [:market_kind_eligiblity,
-                            :any_member_eligible]
+                            :any_member_aptc_eligible]
+
+    business_policy :apply_csr,
+                    rules: [:any_member_csr_ineligible]
 
     def business_policies_for(enrollment, event_name)
       return unless enrollment.is_a?(::HbxEnrollment)
@@ -31,6 +42,8 @@ module RuleSet
       case event_name
       when :apply_aptc
         business_policies[:apply_aptc]
+      when :apply_csr
+        business_policies[:apply_csr]
       end
     end
   end
