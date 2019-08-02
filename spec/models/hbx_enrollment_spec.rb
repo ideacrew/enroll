@@ -1971,6 +1971,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       let(:hbx_enrollment) {HbxEnrollment.new(kind: 'employer_sponsored', effective_on: effective_on)}
       let(:employee_role) {double(is_cobra_status?: true, census_employee: census_employee)}
       let(:census_employee) {double(cobra_begin_date: cobra_begin_date, have_valid_date_for_cobra?: true, coverage_terminated_on: cobra_begin_date - 1.day)}
+      let(:current_user) { FactoryBot.create :user }
 
       before do
         allow(hbx_enrollment).to receive(:employee_role).and_return(employee_role)
@@ -1978,7 +1979,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
 
       context 'When Enrollment Effectve date is prior to cobra begin date' do
         it 'should reset enrollment effective date to cobra begin date' do
-          hbx_enrollment.validate_for_cobra_eligiblity(employee_role)
+          hbx_enrollment.validate_for_cobra_eligiblity(employee_role, current_user)
           expect(hbx_enrollment.kind).to eq 'employer_sponsored_cobra'
           expect(hbx_enrollment.effective_on).to eq cobra_begin_date
         end
@@ -1988,7 +1989,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
         let(:cobra_begin_date) {TimeKeeper.date_of_record.prev_month.beginning_of_month}
 
         it 'should not update enrollment effective date' do
-          hbx_enrollment.validate_for_cobra_eligiblity(employee_role)
+          hbx_enrollment.validate_for_cobra_eligiblity(employee_role, current_user)
           expect(hbx_enrollment.kind).to eq 'employer_sponsored_cobra'
           expect(hbx_enrollment.effective_on).to eq effective_on
         end
@@ -1996,9 +1997,10 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
 
       context 'When employee not elgibile for cobra' do
         let(:census_employee) {double(cobra_begin_date: cobra_begin_date, have_valid_date_for_cobra?: false, coverage_terminated_on: cobra_begin_date - 1.day)}
+        let(:current_user) { FactoryBot.create :user }
 
         it 'should raise error' do
-          expect {hbx_enrollment.validate_for_cobra_eligiblity(employee_role)}.to raise_error("You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated.")
+          expect {hbx_enrollment.validate_for_cobra_eligiblity(employee_role, current_user)}.to raise_error("You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated.")
         end
       end
     end

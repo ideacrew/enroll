@@ -110,7 +110,7 @@ class GroupSelectionPrevaricationAdapter
     if @previous_hbx_enrollment.present? && @change_plan == "change_plan"
       m_kind = if @previous_hbx_enrollment.employer_profile.is_a?(BenefitSponsors::Organizations::FehbEmployerProfile)
                  "fehb"
-               elsif @previous_hbx_enrollment.kind == 'employer_sponsored'
+               elsif @previous_hbx_enrollment.is_shop?
                  'shop'
                elsif %w[coverall individual].include? @previous_hbx_enrollment.kind
                  @previous_hbx_enrollment.kind
