@@ -10,7 +10,7 @@ Feature: Employer creates a profile
 
   Scenario:
    Given employer ABC Widgets visits benefits page
-   And Employer doesn't have any intial benefit applications
+   And Employer doesn't have benefit applications
    When Employer clicks on Add PlanYear button
    Then Employer should see shell plan year page
    And Employer clicks on all valid information
