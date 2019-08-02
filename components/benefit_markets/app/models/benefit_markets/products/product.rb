@@ -142,7 +142,7 @@ module BenefitMarkets
       ])
     }
 
-    scope :across_years, lambda(years) {
+    scope :across_years, lambda { |years|
       where('$and' => [{'application_period.min' => {'$lte' => Date.new(years.max.to_i)}},
                        {'application_period.max' => {'$gte' => Date.new(years.min.to_i)}}])
     }
