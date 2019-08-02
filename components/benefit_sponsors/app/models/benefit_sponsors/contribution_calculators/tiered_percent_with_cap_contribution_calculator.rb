@@ -57,7 +57,7 @@ module BenefitSponsors
             cap = cu.contribution_cap
             @total_contribution = t_contribution
             if t_contribution > cap
-              rebalance_contributions(cap, @total_contribution)
+              rebalance_contributions(cap, @total_contribution, member_prices)
             end
           else
             @member_ids.each do |m_id|
@@ -68,16 +68,21 @@ module BenefitSponsors
           self
         end
 
-        def rebalance_contributions(cap, t_contribution)
+        def rebalance_contributions(cap, t_contribution, member_prices)
           new_total_contribution = cap
-          difference_to_remove = BigDecimal.new((t_contribution - cap).to_s).round(2)
-          @member_ids.reverse.each do |m_id|
-            break if (difference_to_remove < BigDecimal.new("0.01"))
-            removed_amount = [@member_contributions[m_id], difference_to_remove].min
-            @member_contributions[m_id] = BigDecimal.new((@member_contributions[m_id] - removed_amount).to_s).round(2)
-            difference_to_remove = BigDecimal.new((difference_to_remove - removed_amount).to_s).round(2)
-          end
           @total_contribution = new_total_contribution
+          adjusted_contribution_factor = (new_total_contribution * 1.00)/@total_price
+          total_assigned = BigDecimal.new("0.00")
+          @member_ids.each do |m_id|
+            assigned_value = BigDecimal.new((adjusted_contribution_factor * member_prices[m_id]).to_s).round(2, BigDecimal::ROUND_DOWN)
+            @member_contributions[m_id] = assigned_value
+            total_assigned = total_assigned + assigned_value
+          end
+          difference = @total_contribution - total_assigned
+          if (difference > 0.005) && @member_ids.first.present?
+            first_member_id = @member_ids.first
+            @member_contributions[first_member_id] = BigDecimal.new((difference + @member_contributions[first_member_id]).to_s).round(2)
+          end
         end
 
         # Integerize the contribution percent to match the old rounding model
