@@ -1,8 +1,7 @@
+<%= render "ui-components/v1/navs/primary_nav.html.slim" %>
+
 <admin-qle-kind-edit-form 
   data-qle-kind-to-edit="<%= @qle.to_json %>"
   data-qle-kind-edit-url="<%=   exchanges_qle_path(@qle) %>"
   data-qle-kind-market-kinds="<%= QualifyingLifeEventKind::MARKET_KINDS.to_json %>">
-
- </admin-qle-kind-edit-form >
-
-<%= @qle.to_json %>
+</admin-qle-kind-edit-form >
