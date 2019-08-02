@@ -2,7 +2,14 @@ module Admin
   module QleKinds
     class UpdateRequest
       extend Dry::Initializer
-      option :id, Dry::Types['coercible.string'], optional: true
+
+      class UsDateCoercer
+        def self.coerce(string)
+          Date.strptime(string, "%m/%d/%Y") rescue nil
+        end
+      end
+      
+      option :id, Dry::Types['coercible.string']  
       option :title, Dry::Types['coercible.string']
       option :market_kind, Dry::Types['coercible.string']
       option :is_self_attested, Dry::Types['params.bool']
@@ -13,6 +20,8 @@ module Admin
       option :tool_tip, Dry::Types['coercible.string'], optional: true
       option :reason, Dry::Types['coercible.string'], optional: true
       option :is_active, Dry::Types['params.bool'], optional: true
+      option :start_on, type: ->(val) { UsDateCoercer.coerce(val) }, optional: true
+      option :end_on, type: ->(val) { UsDateCoercer.coerce(val) }, optional: true
 
     end
   end

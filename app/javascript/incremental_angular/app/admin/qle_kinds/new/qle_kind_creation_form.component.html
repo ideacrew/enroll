@@ -29,9 +29,9 @@
         <div class="form-group"> 
           <span for="qle_kind_creation_form_action_kind" class="col-sm-2 control-label">Action Kind </span>
           <div class="col-md-2" >        
-            <select formControlName="action_kind">
-              <option  *ngFor="let actionKind of actionKindList" [value]="actionKind">
-              {{actionKind}}
+            <select formControlName="action_kind" id="qle_kind_creation_form_action_kind">
+              <option [ngValue]="actionKind.name" *ngFor="let actionKind of actionKindList" >
+              {{actionKind.name}}
               </option>
             </select>
           </div>
@@ -109,13 +109,13 @@
         <div class="form-group">
           <span for="qle_kind_creation_form_post_event_sep_eligibility" class="col-sm-2 control-label">Sep/Qle Available in system from</span>
           <div class='col-md-5'>
-              <input type='text' formControlName="available_in_system_from" id='qle_kind_creation_available_in_system_from' placeholder="MM/DD/YYYY" mask="M0/d0/0000" [dropSpecialCharacters]="false" [validation]="true" required> <br>
+              <input type='text' formControlName="start_on" id='qle_kind_creation_start_on' placeholder="MM/DD/YYYY" mask="M0/d0/0000" [dropSpecialCharacters]="false" [validation]="true" required> <br>
           </div>
         </div>
         <div class="form-group">
           <span for="qle_kind_creation_form_post_event_sep_eligibility" class="col-sm-2 control-label">Sep/Qle Available in system until</span>
           <div class='col-md-5'>
-            <input type='text' formControlName="available_in_system_until" id='qle_kind_creation_available_in_system_until' placeholder="MM/DD/YYYY" mask="M0/d0/0000" [dropSpecialCharacters]="false" [validation]="true" required> <br>
+            <input type='text' formControlName="end_on" id='qle_kind_creation_end_on' placeholder="MM/DD/YYYY" mask="M0/d0/0000" [dropSpecialCharacters]="false" [validation]="true" required> <br>
           </div>
         </div>
         <div class="form-group col-md-4 mb-2{{errorClassFor(creationFormGroup.get('title'))}}">
@@ -125,4 +125,3 @@
     </div>
   </form>
 </div>
-  
