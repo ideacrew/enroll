@@ -52,7 +52,7 @@ module Admin
         # TODO: Add validation
       end
 
-      def self.post_sep_eligiblity_date_is_valid?(date)
+      def post_sep_eligiblity_date_is_valid?(date)
         # TODO: validation
       end
 
