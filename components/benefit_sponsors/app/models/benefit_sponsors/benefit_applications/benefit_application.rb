@@ -127,6 +127,7 @@ module BenefitSponsors
     validates_presence_of :recorded_sic_code, if: :display_sic_field_for_employer?
 
     add_observer ::BenefitSponsors::Observers::NoticeObserver.new, [:process_application_events]
+    add_observer BenefitSponsors::Observers::EdiObserver.new, [:process_application_edi_events]
 
     before_validation :pull_benefit_sponsorship_attributes
     after_create      :renew_benefit_package_assignments

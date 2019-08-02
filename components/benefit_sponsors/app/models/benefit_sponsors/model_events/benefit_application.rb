@@ -21,6 +21,12 @@ module BenefitSponsors
         :renewal_application_created
       ].freeze
 
+      EMPLOYER_EDI_EVENTS_ON_SAVE = [
+        :benefit_coverage_period_terminated_nonpayment,
+        :benefit_coverage_period_terminated_voluntary,
+        :benefit_coverage_renewal_carrier_dropped
+      ].freeze
+
       DATE_CHANGE_EVENTS = [
         :renewal_employer_first_reminder_to_publish_plan_year,
         :renewal_employer_second_reminder_to_publish_plan_year,
@@ -57,17 +63,23 @@ module BenefitSponsors
 
           is_initial_employee_plan_selection_confirmation = true if is_transition_matching?(to: :binder_paid, from: :enrollment_closed, event: :credit_binder)
 
-          is_group_termination_confirmation_notice = true if is_transition_matching?(to: [:terminated, :termination_pending], from: [:active, :suspended, :expired], event: [:terminate_enrollment, :schedule_enrollment_termination])
+          if is_transition_matching?(to: [:terminated, :termination_pending], from: [:active, :suspended, :expired], event: [:terminate_enrollment, :schedule_enrollment_termination])
+            is_group_termination_confirmation_notice = true
+            is_benefit_coverage_period_terminated_voluntary = true if termination_kind.to_s == "voluntary"
+            is_benefit_coverage_period_terminated_nonpayment = true if termination_kind.to_s == "nonpayment"
+          end
+
+          is_benefit_coverage_renewal_carrier_dropped = true if is_transition_matching?(to: :canceled, from: [:enrollment_eligible, :active, :binder_paid], event: :cancel)
 
           if is_transition_matching?(to: :approved, from: [:draft, :imported] + BenefitSponsors::BenefitApplications::BenefitApplication::APPLICATION_EXCEPTION_STATES, event: :auto_approve_application)
             is_renewal_application_autosubmitted = true
           end
 
           # TODO -- encapsulated notify_observers to recover from errors raised by any of the observers
-          REGISTERED_EVENTS_ON_SAVE.each do |event|
+          (REGISTERED_EVENTS_ON_SAVE + EMPLOYER_EDI_EVENTS_ON_SAVE).each do |event|
             next unless (event_fired = instance_eval("is_" + event.to_s))
 
-            event_options = {}
+            event_options = EMPLOYER_EDI_EVENTS_ON_SAVE.include?(event) ? {observer_klass: BenefitSponsors::Observers::EdiObserver} : {}
             notify_observers(ModelEvent.new(event, self, event_options))
           rescue StandardError => e
             Rails.logger.info { "Benefit Application REGISTERED_EVENTS_ON_SAVE: #{event} unable to notify observers" }

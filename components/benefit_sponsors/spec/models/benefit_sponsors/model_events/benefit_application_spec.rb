@@ -25,10 +25,10 @@ RSpec.describe BenefitSponsors::ModelEvents::BenefitApplication, dbclean: :after
 
   shared_examples_for "for employer plan year action" do |action, event|
     it "should create model event and should have attributes" do
-      model_instance.class.observer_peers.keys.each do |observer|
-        expect(observer).to receive(:notifications_send) do |model_instance, model_event|
+      model_instance.class.observer_peers.keys.select{ |ob| ob.is_a? BenefitSponsors::Observers::EdiObserver }.each do |observer|
+        expect(observer).to receive(:process_application_edi_events) do |model_instance, model_event|
           expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
-          expect(model_event).to have_attributes(:event_key => event.to_sym, :klass_instance => model_instance, :options => {})
+          expect(model_event).to have_attributes(:event_key => event.to_sym, :klass_instance => model_instance, :options => {observer_klass: BenefitSponsors::Observers::EdiObserver})
         end
         if action == "cancel"
           model_instance.cancel!
@@ -40,8 +40,7 @@ RSpec.describe BenefitSponsors::ModelEvents::BenefitApplication, dbclean: :after
     end
   end
 
-  # TODO: EDI related specs should be moved a different observer.
-  xdescribe "Employer ModelEvent" do
+  describe "Employer ModelEvent" do
     it_behaves_like "for employer plan year action", "nonpayment", "benefit_coverage_period_terminated_nonpayment"
     it_behaves_like "for employer plan year action", "voluntary", "benefit_coverage_period_terminated_voluntary"
     it_behaves_like "for employer plan year action", "cancel", "benefit_coverage_renewal_carrier_dropped"
