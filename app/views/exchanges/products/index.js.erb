@@ -13,7 +13,7 @@ var table = $('#products-ajax-dt').DataTable( {
     $('#subFilters').show();
     this.api().columns([2,3,4]).every( function () {
       var column = this;
-      var select = $('<select class="col-md-2" style="margin-left:5px"><option value=""></option></select>')
+      var select = $('<select class="col-md-2" style="margin-left:5px"><option value="">All</option></select>')
         .appendTo( '#subFilters' )
         .on( 'change', function () {
           var val = $.fn.dataTable.util.escapeRegex(
