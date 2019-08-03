@@ -1,0 +1,2 @@
+class BrokerAgencyProfile
+end
