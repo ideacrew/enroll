@@ -233,7 +233,6 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilderWithDateRange, dbclean: :after
 
     it "should generate pdf" do
       @eligibility_notice.append_hbe
-      bc_period = hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(TimeKeeper.date_of_record.next_year) }
       @eligibility_notice.build
       file = @eligibility_notice.generate_pdf_notice
       expect(File.exist?(file.path)).to be true
@@ -241,7 +240,6 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilderWithDateRange, dbclean: :after
 
     it "should delete generated pdf" do
       @eligibility_notice.append_hbe
-      bc_period = hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(TimeKeeper.date_of_record.next_year) }
       @eligibility_notice.build
       file = @eligibility_notice.generate_pdf_notice
       @eligibility_notice.clear_tmp(file.path)
