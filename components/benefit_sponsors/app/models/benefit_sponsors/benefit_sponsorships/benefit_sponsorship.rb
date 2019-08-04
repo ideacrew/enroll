@@ -234,7 +234,7 @@ module BenefitSponsors
 
     scope :may_cancel_ineligible_application?, -> (compare_date = TimeKeeper.date_of_record) {
       where(:benefit_applications => {
-        :$elemMatch => {:"effective_period.min" => compare_date, :aasm_state => :enrollment_ineligible }}
+        :$elemMatch => {:"effective_period.min" => compare_date, :aasm_state.in => [:enrollment_closed, :enrollment_ineligible] }}
       )
     }
 
