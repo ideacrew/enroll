@@ -134,6 +134,13 @@ RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
       file = @reminder_notice.generate_pdf_notice
       expect(File.exist?(file.path)).to be true
     end
+
+    it "should delete generated pdf" do
+      @reminder_notice.build
+      file = @reminder_notice.generate_pdf_notice
+      @reminder_notice.clear_tmp(file.path)
+      expect(File.exist?(file.path)).to be false
+    end
   end
 
   describe "append_unverified_individuals" do

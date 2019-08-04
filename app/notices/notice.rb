@@ -159,12 +159,12 @@ class Notice
 
   def create_recipient_document(doc_uri)
     notice = recipient_document_store.documents.build({
-      title: title,
-      creator: "hbx_staff",
-      subject: "notice",
-      identifier: doc_uri,
-      format: "application/pdf"
-    })
+                                                        title: title,
+                                                        creator: "hbx_staff",
+                                                        subject: "notice",
+                                                        identifier: doc_uri,
+                                                        format: "application/pdf"
+                                                      })
     if notice.save
       notice
     else
