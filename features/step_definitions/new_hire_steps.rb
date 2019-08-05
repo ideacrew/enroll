@@ -250,10 +250,10 @@ When(/(.*) enters reason for termination in modal$/) do |named_person|
 end
 
 When(/^.+ submits termination reason in modal$/) do
-  waiver_modal = find('#waive_confirm')
+  waiver_modal = find('.terminate_confirm')
   find('.selectric').click
-  waiver_modal.find(:xpath, "//*[@id='waiver_reasons_selection_modal_form']/div[2]/div/div[3]/div/ul/li[6]").click
-  waiver_modal.find('#waiver_reason_submit').click
+  find('li', :text => 'I have coverage through Medicare').click
+  waiver_modal.find('.terminate_reason_submit').click
 end
 
 Then(/(.*) should see a confirmation message of (.*)$/) do |named_person, message|

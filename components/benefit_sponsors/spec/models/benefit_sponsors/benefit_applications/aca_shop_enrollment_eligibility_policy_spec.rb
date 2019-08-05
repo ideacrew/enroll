@@ -34,7 +34,9 @@ module BenefitSponsors
         before do
           benefit_sponsorship.census_employees.each do |ce|
             family = FactoryBot.create(:family, :with_primary_family_member)
-            FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_sponsorship: benefit_sponsorship, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
+            allow(ce).to receive(:family).and_return(family)
+            allow(benefit_application).to receive(:active_census_employees).and_return([ce])
+            FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
             ce.save
           end
         end
@@ -48,7 +50,7 @@ module BenefitSponsors
         before do
           benefit_sponsorship.census_employees.limit(3).each do |ce|
             family = FactoryBot.create(:family, :with_primary_family_member)
-            FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_sponsorship: benefit_sponsorship, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
+            FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
             ce.save
           end
         end
@@ -66,12 +68,15 @@ module BenefitSponsors
 
       context "When all the census employees are emrolled" do
 
-        let!(:load_enrollments) {benefit_sponsorship.census_employees.each do |ce|
-          family = FactoryBot.create(:family, :with_primary_family_member)
-          FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_sponsorship: benefit_sponsorship, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
-          ce.save
+        before do
+          benefit_sponsorship.census_employees.each do |ce|
+            family = FactoryBot.create(:family, :with_primary_family_member)
+            allow(ce).to receive(:family).and_return(family)
+            allow(benefit_application).to receive(:active_census_employees).and_return([ce])
+            FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
+            ce.save
+          end
         end
-        }
 
         it "should satisfy rules" do
           expect(policy.is_satisfied?(benefit_application)).to eq true
@@ -81,12 +86,15 @@ module BenefitSponsors
 
       context "When less then minimum participation of the census employees are emrolled" do
 
-        let!(:load_enrollments) {benefit_sponsorship.census_employees.limit(3).each do |ce|
-          family = FactoryBot.create(:family, :with_primary_family_member)
-          FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_sponsorship: benefit_sponsorship, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
-          ce.save
+        before do
+          benefit_sponsorship.census_employees.each do |ce|
+            family = FactoryBot.create(:family, :with_primary_family_member)
+            allow(ce).to receive(:family).and_return(family)
+            allow(benefit_application).to receive(:active_census_employees).and_return([ce])
+            FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
+            ce.save
+          end
         end
-        }
 
         it "should satisfy rules" do
           expect(policy.is_satisfied?(benefit_application)).to eq true
@@ -103,12 +111,15 @@ module BenefitSponsors
 
       context "When all the census employees are emrolled" do
 
-        let!(:load_enrollments1) {benefit_sponsorship.census_employees.each do |ce|
-          family = FactoryBot.create(:family, :with_primary_family_member)
-          FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_sponsorship: benefit_sponsorship, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
-          ce.save
+        before do
+          benefit_sponsorship.census_employees.each do |ce|
+            family = FactoryBot.create(:family, :with_primary_family_member)
+            allow(ce).to receive(:family).and_return(family)
+            allow(benefit_application).to receive(:active_census_employees).and_return([ce])
+            FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
+            ce.save
+          end
         end
-        }
 
         it "should satisfy rules" do
           policy = subject.business_policies_for(benefit_application, :end_open_enrollment)
@@ -119,12 +130,15 @@ module BenefitSponsors
       context "When minimum participation of the census employees are emrolled" do
         context "At-least 1.0 non-owner employee enrolled" do
 
-          let!(:load_enrollments2) {benefit_sponsorship.census_employees.limit(3).each do |ce|
-            family = FactoryBot.create(:family, :with_primary_family_member)
-            FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_sponsorship: benefit_sponsorship, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
-            ce.save
+          before do
+            benefit_sponsorship.census_employees.each do |ce|
+              family = FactoryBot.create(:family, :with_primary_family_member)
+              allow(ce).to receive(:family).and_return(family)
+              allow(benefit_application).to receive(:active_census_employees).and_return([ce])
+              FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
+              ce.save
+            end
           end
-          }
 
           it "should pass the policy" do
             policy = subject.business_policies_for(benefit_application, :end_open_enrollment)
@@ -150,19 +164,20 @@ module BenefitSponsors
 
     describe "For business_policies_for non 1/1 effective date" do
       context "When all the census employees are emrolled" do
-
-        let!(:load_enrollments) {benefit_sponsorship.census_employees.each do |ce|
-          family = FactoryBot.create(:family, :with_primary_family_member)
-          FactoryBot.create(:hbx_enrollment,family: family, household: family.active_household, benefit_sponsorship: benefit_sponsorship, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
-          ce.save
+        before do
+          benefit_sponsorship.census_employees.each do |ce|
+            family = FactoryBot.create(:family, :with_primary_family_member)
+            allow(ce).to receive(:family).and_return(family)
+            allow(benefit_application).to receive(:active_census_employees).and_return([ce])
+            FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
+            ce.save
+          end
         end
-        }
 
         it "should satisfy rules" do
           policy = subject.business_policies_for(benefit_application, :end_open_enrollment)
           expect(policy.is_satisfied?(benefit_application)).to eq true
         end
-
       end
 
       context "When less then minimum participation of the census employees are emrolled" do

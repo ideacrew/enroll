@@ -212,10 +212,13 @@ class Family
     ).distinct(:family_id)
   ) }
 
-  scope :enrolled_under_benefit_application, ->(benefit_application) { where(:"_id".in => HbxEnrollment.where(
+  scope :enrolled_under_benefit_application, ->(benefit_application) {
+    active_family_ids = benefit_application.active_census_employees.collect{|ce| ce.family.nil? ? nil : ce.family.id }.compact
+    where(:"_id".in => HbxEnrollment.where(
     :"sponsored_benefit_package_id".in => benefit_application.benefit_packages.pluck(:_id),
     :"aasm_state".nin => %w(coverage_canceled shopping coverage_terminated),
-    coverage_kind: "health"
+    coverage_kind: "health",
+    :"family_id".in => active_family_ids
     ).distinct(:family_id)
   ) }
 

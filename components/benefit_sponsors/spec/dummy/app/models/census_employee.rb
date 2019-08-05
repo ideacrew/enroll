@@ -251,6 +251,13 @@ class CensusEmployee < CensusMember
     @employee_role = EmployeeRole.find(self.employee_role_id)
   end
 
+  def family
+    return nil if employee_role.blank?
+
+    person_rec = employee_role.person
+    person_rec.primary_family
+  end
+
   def benefit_sponsorship=(benefit_sponsorship)
     return "expected Benefit Sponsorship" unless defined?(BenefitSponsors::BenefitSponsorships::BenefitSponsorship)
     self.benefit_sponsorship_id = benefit_sponsorship.id
