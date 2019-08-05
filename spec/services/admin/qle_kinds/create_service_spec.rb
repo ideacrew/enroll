@@ -168,8 +168,8 @@ describe Admin::QleKinds::CreateService, "#call" do
         reason:"reason",
         action_kind:"action kind",
         is_active: false,
-    end_on: "11/11/1111",
-    start_on: '11/11/1111'
+        end_on: "11/11/1111",
+        start_on: '11/11/1111'
       }
     end
 
@@ -224,7 +224,5 @@ describe Admin::QleKinds::CreateService, "#call" do
       result = subject.call(user, params)
       expect(result.output).to eq new_qle_kind_record
     end
-
-
   end
 end
