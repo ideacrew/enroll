@@ -141,9 +141,27 @@ javascript:
     }
   }
 
-	function showDatepicker(id) {
-		initDatepicker(id,new Date(dateOptions.oeStartOn),new Date(dateOptions.oeEndOn))
-	}
+  function showDatepicker(id) {
+    selectedDate(document.getElementById("baStartDate"))
+    initDatepicker(id,new Date(dateOptions.oeStartOn),new Date(dateOptions.oeEndOn))
+  }
+
+  function initDatepicker(id,minDate,maxDate) {
+    $("#"+id).datepicker("destroy")
+    $("#"+id).datepicker({
+      dateFormat:'mm/dd/yy',
+      changeYear: true,
+      changeMonth:true,
+      yearRange: minDate.getFullYear()+':'+maxDate.getFullYear(),
+      minDate:minDate,
+      maxDate:maxDate
+    })
+
+    .on("change", function (e) {
+      validateDate(e, minDate, maxDate)
+    });
+  }
+
   // Temporary fix to Select your open enrollment dates row width and alignment
   (function() {
     var element = document.querySelectorAll('.col-md-12')[1].querySelector('#uic-wrapper');
