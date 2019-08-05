@@ -26,13 +26,12 @@
               id='qle_kind_edit_form_tool_tip'
               class='form-control' required>
               <field-errors [errorControl]="editFormGroup.get('tool_tip')"></field-errors>
-
           </div>
         </div>
         <div class="form-group"> 
           <span for="qle_kind_edit_form_action_kind" class="col-sm-2 control-label">Action Kind </span>
           <div class="col-md-2 " >        
-            <select formControlName="action_kind">
+            <select formControlName="action_kind" id="qle_kind_edit_form_action_kind">
               <option  *ngFor="let actionKind of actionKindList" value="actionKind.name">
               {{actionKind.name}}
               </option>
@@ -41,21 +40,20 @@
         </div>
         <div class="form-group">
           <span for="qle_kind_edit_form_reason" class="col-sm-2 control-label">Reason </span>
-          <div class="col-sm-4">
-            <input
-                type='text'
-                placeholder ="{{qleKindToEdit.reason}}"
-                formControlName="reason"
-                id='qle_kind_edit_form_reason'
-                class='form-control' required>
+          <div class="col-md-3" >        
+            <select formControlName="reason" id="qle_kind_edit_form_reason">
+              <option  *ngFor="let reason of reasonList" [ngValue]="reason.code">
+              {{reason.name}}
+              </option>
+            </select>
           </div>
         </div>
         <div class="form-group">
-          <span for="qle_kind_creation_form_market_kind" class="col-sm-2 control-label">Market Kind</span>
+          <span for="qle_kind_edit_form_market_kind" class="col-sm-2 control-label">Market Kind</span>
           <div class="col-sm-4">
-            <div id="qle_kind_creation_form_market_kind"  *ngFor="let marketKind of marketKindsList">
+            <div id="qle_kind_edit_form_market_kind"  *ngFor="let marketKind of marketKindsList">
               <label class="control-label">{{marketKind}}
-                <input type='radio' class='' formControlName="market_kind" id='qle_kind_creation_form_market_kind' value = {{marketKind}} required>
+                <input type='radio' class='' formControlName="market_kind" id='qle_kind_edit_form_market_kind' value = {{marketKind}} required>
               </label>
             </div>
           </div>

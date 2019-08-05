@@ -29,8 +29,8 @@
         <div class="form-group"> 
           <span for="qle_kind_creation_form_action_kind" class="col-sm-2 control-label">Action Kind </span>
           <div class="col-md-2" >        
-            <select formControlName="action_kind" id="qle_kind_creation_form_action_kind">
-              <option [ngValue]="actionKind.name" *ngFor="let actionKind of actionKindList" >
+            <select formControlName="action_kind" id= "qle_kind_creation_form_action_kind">
+              <option [ngValue]="actionKind.code" *ngFor="let actionKind of actionKindList" >
               {{actionKind.name}}
               </option>
             </select>
@@ -38,12 +38,12 @@
         </div>
         <div class="form-group">
           <span for="qle_kind_creation_form_reason" class="col-sm-2 control-label">Reason </span>
-          <div class="col-sm-4">
-            <input
-                type='text'
-                formControlName="reason"
-                id='qle_kind_creation_form_reason'
-                class='form-control' required>
+          <div class="col-md-2" >        
+            <select formControlName="reason" id="qle_kind_creation_form_reason">
+              <option  *ngFor="let reason of reasonList" [ngValue]="reason.code">
+              {{reason.name}}
+              </option>
+            </select>
           </div>
         </div>
         <div class="form-group">
@@ -91,7 +91,7 @@
           </div>
         </div>
         <div class="form-group">
-          <span for="qle_kind_creation_form_pre_event_sep_in_days" class="col-sm-2 control-label">Pre-event Sep/Qle Eligibility</span>
+          <span for="qle_kind_creation_form_pre_event_sep_in_days" class="col-sm-3 control-label">Pre-event Sep/Qle Eligibility</span>
           <div class='col-md-5'>
             up to
             <input type='number'formControlName="pre_event_sep_in_days" id='qle_kind_creation_form_pre_event_sep_eligibility'/>
@@ -99,7 +99,7 @@
           </div>
         </div>
         <div class="form-group">
-          <span for="qle_kind_creation_form_post_event_sep_in_days" class="col-sm-2 control-label">Post-event Sep/Qle Eligibility</span>
+          <span for="qle_kind_creation_form_post_event_sep_in_days" class="col-sm-3 control-label">Post-event Sep/Qle Eligibility</span>
           <div class='col-md-5'>
             up to
             <input type='number'formControlName="post_event_sep_in_days" id='qle_kind_creation_form_post_event_sep_eligibility'/>
@@ -107,15 +107,15 @@
           </div>
         </div>
         <div class="form-group">
-          <span for="qle_kind_creation_form_post_event_sep_eligibility" class="col-sm-2 control-label">Sep/Qle Available in system from</span>
+          <span for="qle_kind_creation_form_post_event_sep_eligibility" class="col-sm-3 control-label"> Sep/Qle Available in system from</span>
           <div class='col-md-5'>
               <input type='text' formControlName="start_on" id='qle_kind_creation_start_on' placeholder="MM/DD/YYYY" mask="M0/d0/0000" [dropSpecialCharacters]="false" [validation]="true" required> <br>
           </div>
         </div>
         <div class="form-group">
-          <span for="qle_kind_creation_form_post_event_sep_eligibility" class="col-sm-2 control-label">Sep/Qle Available in system until</span>
+          <span for="qle_kind_creation_form_post_event_sep_eligibility" class="col-sm-3 control-label">Sep/Qle Available in system until      </span>
           <div class='col-md-5'>
-            <input type='text' formControlName="end_on" id='qle_kind_creation_end_on' placeholder="MM/DD/YYYY" mask="M0/d0/0000" [dropSpecialCharacters]="false" [validation]="true" required> <br>
+                 <input type='text' formControlName="end_on" id='qle_kind_creation_end_on' placeholder="MM/DD/YYYY" mask="M0/d0/0000" [dropSpecialCharacters]="false" [validation]="true" required> <br>
           </div>
         </div>
         <div class="form-group col-md-4 mb-2{{errorClassFor(creationFormGroup.get('title'))}}">

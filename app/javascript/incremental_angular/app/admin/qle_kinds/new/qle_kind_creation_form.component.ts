@@ -23,35 +23,39 @@ export class QleKindCreationFormComponent {
   public questionCreated : boolean = false;
   public lastQuestion : boolean = false;
   public showQuestionMultipleChoiceForm : boolean = false;
+
   public effectiveOnOptionsArray =  [
-      { name: 'Date of Event',  selected: false, id: 1 },
-      { name: 'First of Next Month',  selected: false, id: 2 },
-      { name: 'First of Month',  selected: false, id: 3 },
-      { name: 'First Fixed of Next Month',  selected: false, id: 4 },
-      { name: 'Next 15 of the month',  selected: false, id: 5 },
-      { name: 'Exact Date',  selected: false, id: 6 },
-      { name: 'Date options available',  selected: false, id: 7 }
-    ]
+    { name: 'Date of Event',  selected: false, id: 1 },
+    { name: 'First of Next Month',  selected: false, id: 2 },
+    { name: 'First of Month',  selected: false, id: 3 },
+    { name: 'First Fixed of Next Month',  selected: false, id: 4 },
+    { name: 'Next 15 of the month',  selected: false, id: 5 },
+    { name: 'Exact Date',  selected: false, id: 6 },
+    { name: 'Date options available',  selected: false, id: 7 }
+  ]
+
   public actionKindList = [
-      {name:"Not Applicable"},
-      {name:"Drop Member"}, 
-      {name:"Adminstrative"}, 
-      {name:"Add Member"},
-      {name:"Add Benefit"}, 
-      {name:"Change Benefit"}, 
-      {name:"Transition Member"}
+    {name:"Not Applicable", code:"not_applicable"},
+    {name:"Drop Member", code:"drop_member" }, 
+    {name:"Adminstrative", code:"administrative" }, 
+    {name:"Add Member", code: "add_member"},
+    {name:"Add Benefit", code: "add_benefit" }, 
+    {name:"Change Benefit", code:"change_benefit" }, 
+    {name:"Transition Member", code:"transition_member" },
+    {name:"Terminate Benefit", code:"terminate_benefit" }
   ]
   
   public reasonList = [
-    "exceptional_circumstances_natural_disaster",
-    "exceptional_circumstances_medical_emergency",
-    "exceptional_circumstances_system_outage",
-    "exceptional_circumstances_domestic_abuse",
-    "exceptional_circumstances_civic_service",
-    "exceptional_circumstances",
-]
-    @ViewChild('headerRef') headerRef: ElementRef;
-
+    {name:"Not Applicable", code: "not_applicable"},
+    {name:"Natural Disaster", code: "exceptional_circumstances_natural_disaster"},
+    {name:"Medical Emergency", code: "exceptional_circumstances_medical_emergency"},
+    {name:"System Outage", code: "exceptional_circumstances_system_outage"},
+    {name:"Domestic Abuse", code: "exceptional_circumstances_domestic_abuse"},
+    {name:"Civic Service",code:"exceptional_circumstances_civic_service"},
+    {name:"Exceptional Circumstances",code: "exceptional_circumstances"}  
+  ]
+  
+  @ViewChild('headerRef') headerRef: ElementRef;
 
   constructor(
      injector: Injector,
@@ -64,7 +68,6 @@ export class QleKindCreationFormComponent {
 
   private buildInitialForm(formBuilder : FormBuilder) {
     var qControls = formBuilder.array([]);
-
     var formGroup = formBuilder.group({
       title: ['', Validators.required],
       tool_tip: ['', [Validators.required, Validators.minLength(1)]],
@@ -80,7 +83,6 @@ export class QleKindCreationFormComponent {
       end_on: ['']
     });
     this.creationFormGroup = formGroup;
-
     this.questionArray = qControls;
     this.addCheckboxes();
   }
@@ -113,10 +115,6 @@ export class QleKindCreationFormComponent {
 
   ngOnInit() {
 
-  // $( document ).ready(function() {
-  //    $('select#qle_kind_creation_form_action_kind').selectric('destroy')
-  // });
-
     var submissionUriAttribute = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-qle-kind-create-url");
     if (submissionUriAttribute != null) {
       this.creationUri = submissionUriAttribute;
@@ -146,7 +144,8 @@ export class QleKindCreationFormComponent {
     var form = this;
     var errorMapper = new ErrorMapper();
     if (this.creationFormGroup != null) {
-      this.creationFormGroup.value.action_kind =  this._elementRef.nativeElement.querySelector('select option:checked').value
+      this.creationFormGroup.value.action_kind = this._elementRef.nativeElement.querySelector('select#qle_kind_creation_form_action_kind option:checked').value
+      this.creationFormGroup.value.reason = this._elementRef.nativeElement.querySelector('select#qle_kind_creation_form_reason option:checked').value
       if (this.creationUri != null) {
         var invocation = this.CreationService.submitCreate(this.creationUri, this.creationFormGroup.value);
         invocation.subscribe(

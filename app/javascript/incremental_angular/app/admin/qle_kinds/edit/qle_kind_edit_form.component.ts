@@ -20,6 +20,7 @@ export class QleKindEditFormComponent {
   public editFormGroup : FormGroup = new FormGroup({});
   @ViewChild('headerRef') headerRef: ElementRef;
   public marketKindsList = new FormArray([])
+
   public effectiveOnOptionsArray =  [
     { name: 'Date of Event',  selected: false, id: 1 },
     { name: 'First of Next Month',  selected: false, id: 2 },
@@ -29,16 +30,27 @@ export class QleKindEditFormComponent {
     { name: 'Exact Date',  selected: false, id: 6 },
     { name: 'Date options available',  selected: false, id: 7 }
   ]
-    public actionKindList = [
-      {name:"Not Applicable"},
-      {name:"Drop Member"}, 
-      {name:"Adminstrative"}, 
-      {name:"Add Member"},
-      {name:"Add Benefit"}, 
-      {name:"Change Benefit"}, 
-      {name:"Transition Member"}
+
+  public actionKindList = [
+    {name:"Not Applicable", code:"not_applicable"},
+    {name:"Drop Member", code:"drop_member" }, 
+    {name:"Adminstrative", code:"administrative" }, 
+    {name:"Add Member", code: "add_member"},
+    {name:"Add Benefit", code: "add_benefit" }, 
+    {name:"Change Benefit", code:"change_benefit" }, 
+    {name:"Transition Member", code:"transition_member" },
+    {name:"Terminate Benefit", code:"terminate_benefit" }
   ]
   
+  public reasonList = [
+    {name:"Not Applicable", code: "not_applicable"},
+    {name:"Natural Disaster", code: "exceptional_circumstances_natural_disaster"},
+    {name:"Medical Emergency", code: "exceptional_circumstances_medical_emergency"},
+    {name:"System Outage", code: "exceptional_circumstances_system_outage"},
+    {name:"Domestic Abuse", code: "exceptional_circumstances_domestic_abuse"},
+    {name:"Civic Service",code:"exceptional_circumstances_civic_service"},
+    {name:"Exceptional Circumstances",code: "exceptional_circumstances"}  
+  ]
   constructor(
     injector: Injector,
     @Inject("QleKindEditService") private editService : QleKindEditService,
@@ -131,9 +143,10 @@ export class QleKindEditFormComponent {
   submitEdit() {
     var form = this;
     var errorMapper = new ErrorMapper();
-        console.log(this.editFormGroup.value)
-    if (this.editFormGroup.valid) {
-        this.editFormGroup.value.action_kind =  this._elementRef.nativeElement.querySelector('select option:checked').value
+    if (this.editFormGroup != null) {
+       console.log(this._elementRef.nativeElement.querySelector('select#qle_kind_edit_form_action_kind option:checked'))
+      this.editFormGroup.value.action_kind = this._elementRef.nativeElement.querySelector('select#qle_kind_edit_form_action_kind option:checked').value
+      this.editFormGroup.value.reason = this._elementRef.nativeElement.querySelector('select#qle_kind_edit_form_reason option:checked').value   
       if (this.editUri != null) {
         var invocation = this.editService.submitEdit(this.editUri, this.editFormGroup.value);
         invocation.subscribe(
