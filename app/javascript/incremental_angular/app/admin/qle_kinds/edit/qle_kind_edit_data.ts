@@ -12,6 +12,7 @@ export interface QleKindEditResource {
   post_event_sep_in_days: number;
   is_self_attested: boolean;
   date_options_available: boolean;
+  visible_to_customer: boolean;
   ordinal_position: number;
   event_kind_label: string;
   start_on: string;
@@ -38,6 +39,7 @@ export interface QleKindUpdateRequest {
   post_event_sep_in_days: number;
   is_self_attested: boolean;
   date_options_available: boolean;
+  visible_to_customer: boolean;
   ordinal_position: number;
   event_kind_label: string;
   is_active:  boolean;
