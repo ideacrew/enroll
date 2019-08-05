@@ -9,6 +9,7 @@ module Services
       expire_individual_market_enrollments
       begin_coverage_for_ivl_enrollments
       send_enrollment_notice_for_ivl(new_date)
+      send_reminder_notices_for_ivl(new_date)
     end
 
     def expire_individual_market_enrollments
@@ -73,6 +74,35 @@ module Services
           IvlNoticesNotifierJob.perform_later(person.id.to_s, "enrollment_notice") if person.consumer_role.present?
         rescue Exception => e
           Rails.logger.error { "Unable to deliver enrollment notice #{person.hbx_id} due to #{e.inspect}" }
+        end
+      end
+    end
+
+    def send_reminder_notices_for_ivl(date)
+      families = Family.outstanding_verification
+      families.each do |family|
+        begin
+          next if family.has_valid_e_case_id? #skip assisted families
+          consumer_role = family.primary_applicant.person.consumer_role
+          person = family.primary_applicant.person
+          if consumer_role.present? && (family.best_verification_due_date > date)
+            case (family.best_verification_due_date.to_date.mjd - date.mjd)
+            when 85
+              IvlNoticesNotifierJob.perform_later(person.id.to_s, "first_verifications_reminder")
+              puts "Sent first_verifications_reminder to #{person.hbx_id}" unless Rails.env.test?
+            when 70
+              IvlNoticesNotifierJob.perform_later(person.id.to_s, "second_verifications_reminder")
+              puts "Sent second_verifications_reminder to #{person.hbx_id}" unless Rails.env.test?
+            when 45
+              IvlNoticesNotifierJob.perform_later(person.id.to_s, "third_verifications_reminder")
+              puts "Sent third_verifications_reminder to #{person.hbx_id}" unless Rails.env.test?
+            when 30
+              IvlNoticesNotifierJob.perform_later(person.id.to_s, "fourth_verifications_reminder")
+              puts "Sent fourth_verifications_reminder to #{person.hbx_id}" unless Rails.env.test?
+            end
+          end
+        rescue Exception => e
+          Rails.logger.error {"Unable to send verification reminder notices to #{person.hbx_id} due to #{e}"}
         end
       end
     end
