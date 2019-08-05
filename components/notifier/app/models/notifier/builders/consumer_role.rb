@@ -326,7 +326,7 @@ module Notifier
         csr
       end
 
-      def aqhp_event_and_irs_consent_not_needed?
+      def aqhp_event_and_irs_consent_no?
         return false if uqhp_notice?
 
         aqhp_event? && !irs_consent?
@@ -384,7 +384,7 @@ module Notifier
       def csr_is_nil?
         csr_percent.nil?
       end
-
+      
       def citizen_status(status)
         if uqhp_notice?
           uqhp_citizen_status(status)
