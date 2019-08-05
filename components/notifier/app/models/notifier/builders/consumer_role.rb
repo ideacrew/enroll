@@ -384,7 +384,7 @@ module Notifier
       def csr_is_nil?
         csr_percent.nil?
       end
-      
+
       def citizen_status(status)
         if uqhp_notice?
           uqhp_citizen_status(status)
