@@ -11,6 +11,7 @@ RSpec.describe Exchanges::QlesController, :type => :controller do
         "title" => "Got a New Dog",
         "event_kind_label" => "Date of birth",
         "market_kind" => "shop",
+        "action_kind" => "add_benefit",
         "effective_on_kinds" => ["date_of_event"],
         "tool_tip" => "Household adds a new dog for emotional support",
         "is_self_attested" => true,
@@ -80,11 +81,30 @@ RSpec.describe Exchanges::QlesController, :type => :controller do
     )
   end
 
-  let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
+  let(:user) do
+    double(
+      "user",
+      :has_hbx_staff_role? => true,
+      :has_employer_staff_role? => false,
+      :needs_to_provide_security_questions? => true
+    )
+  end
   let(:person) { double("person")}
   let(:hbx_staff_role) { double("hbx_staff_role", permission: permission) }
   let(:hbx_profile) { double("HbxProfile")}
-  let(:permission) { double(can_add_custom_qle: true) }
+  let(:permission) do
+    double(
+      can_add_custom_qle: true,
+      can_access_outstanding_verification_sub_tab: true,
+      access_new_consumer_application_sub_tab: true,
+      can_access_new_consumer_application_sub_tab: true,
+      can_access_identity_verification_sub_tab: true,
+      can_complete_resident_application: true,
+      can_access_user_account_tab: true,
+      view_admin_tabs: true,
+      view_the_configuration_tab: true
+    )
+  end
 
   before :each do
     allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
@@ -175,46 +195,5 @@ RSpec.describe Exchanges::QlesController, :type => :controller do
 
   describe "GET #question_flow" do
 
-  end
-
-  describe "POST #manage_qle" do
-    # NOTE: The market_kind param should be passed
-    # via angular when the user selects market kind on the manage page
-    context "successfully redirects to" do
-      it "new" do
-        post(:manage_qle, params: { manage_qle_action: "new_qle", market_kind: 'shop' })
-        expect(response.status).to eq(302)
-        attrs = { market_kind: 'shop' }
-        expect(response).to redirect_to(new_exchanges_qle_path(attrs))
-      end
-
-      it "edit" do
-        post(
-          :manage_qle,
-          params: {
-            manage_qle_action: "modify_qle",
-            market_kind: 'shop',
-            id: existing_qle.id.to_s
-          }
-        )
-        expect(response.status).to eq(302)
-        attrs = { market_kind: 'shop' }
-        expect(response).to redirect_to(edit_exchanges_qle_path(existing_qle, attrs))
-      end
-
-      it "deactivation_form" do
-        post(
-          :manage_qle,
-          params: {
-            manage_qle_action: "deactivate_qle",
-            id: existing_qle.id.to_s,
-            market_kind: 'shop'
-          }
-        )
-        expect(response.status).to eq(302)
-        attrs = { market_kind: 'shop' }
-        expect(response).to redirect_to(deactivation_form_exchanges_qle_path(existing_qle, attrs))
-      end
-    end
   end
 end
