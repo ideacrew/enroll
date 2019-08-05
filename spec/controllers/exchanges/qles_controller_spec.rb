@@ -9,12 +9,13 @@ RSpec.describe Exchanges::QlesController, :type => :controller do
       'data' =>
       {
         "title" => "Got a New Dog",
+        "visible_to_customer" => 'Yes',
         "event_kind_label" => "Date of birth",
         "market_kind" => "shop",
         "action_kind" => "add_benefit",
         "effective_on_kinds" => ["date_of_event"],
         "tool_tip" => "Household adds a new dog for emotional support",
-        "is_self_attested" => true,
+        "is_self_attested" => 'Yes',
         "reason" => "birth",
         "pre_event_sep_in_days" => "1",
         "post_event_sep_in_days" => "1",

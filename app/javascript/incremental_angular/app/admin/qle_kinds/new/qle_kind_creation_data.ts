@@ -11,6 +11,7 @@ export interface QleKindCreationResource {
     pre_event_sep_in_days: number;
     post_event_sep_in_days: number;
     is_self_attested: boolean;
+    visible_to_customer: boolean;
     date_options_available: boolean;
     ordinal_position: number;
     event_kind_label: string;
@@ -42,6 +43,7 @@ export interface QleKindCreationResource {
     pre_event_sep_in_days: number;
     post_event_sep_in_days: number;
     is_self_attested: boolean;
+    visible_to_customer: boolean;
     date_options_available: boolean;
     ordinal_position: number;
     event_kind_label: string;

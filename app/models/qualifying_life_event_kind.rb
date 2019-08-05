@@ -107,6 +107,7 @@ class QualifyingLifeEventKind
   field :start_on, type: Date
   field :end_on, type: Date
   field :visibility, type: Symbol
+  field :visible_to_customer, type: Mongoid::Boolean, default: false
 
   index({action_kind: 1})
   index({market: 1, ordinal_position: 1 })
@@ -139,6 +140,7 @@ class QualifyingLifeEventKind
   # At the moment, setting 'end on' is how they are deactivated.
   scope :not_set_for_deactivation, ->{ where(end_on: nil).sort_by_title_alphabetical }
   scope :sort_by_title_alphabetical, ->{ order('title ASC') }
+  scope :is_visible_to_customer, -> { where(visible_to_customer: true) }
 
   # Business rules for EmployeeGainingMedicare
   # If coverage ends on last day of month and plan selected before loss of coverage:
@@ -225,7 +227,7 @@ class QualifyingLifeEventKind
 
   class << self
     def shop_market_events
-      by_market_kind('shop').and(:is_self_attested.ne => false).active.to_a
+      by_market_kind('shop').and(:is_self_attested.ne => false).active.is_visible_to_customer.to_a
     end
 
     def shop_market_events_admin
@@ -233,35 +235,35 @@ class QualifyingLifeEventKind
     end
 
     def shop_market_non_self_attested_events
-      by_market_kind('shop').and(:is_self_attested.ne => true).active.to_a
+      by_market_kind('shop').and(:is_self_attested.ne => true).active.is_visible_to_customer.to_a
     end
 
     def fehb_market_events
-      by_market_kind('fehb').and(:is_self_attested.ne => false).active.to_a
+      by_market_kind('fehb').and(:is_self_attested.ne => false).active.is_visible_to_customer.to_a
     end
 
     def fehb_market_events_admin
-      by_market_kind('fehb').active.to_a
+      by_market_kind('fehb').active.is_visible_to_customer.to_a
     end
 
     def fehb_market_non_self_attested_events
-      by_market_kind('fehb').and(:is_self_attested.ne => true).active.to_a
+      by_market_kind('fehb').and(:is_self_attested.ne => true).active.is_visible_to_customer.to_a
     end
 
     def individual_market_events
-      by_market_kind('individual').and(:is_self_attested.ne => false).active.to_a
+      by_market_kind('individual').and(:is_self_attested.ne => false).active.is_visible_to_customer.to_a
     end
 
     def individual_market_events_admin
-      by_market_kind('individual').active.to_a
+      by_market_kind('individual').active.is_visible_to_customer.to_a
     end
 
     def individual_market_non_self_attested_events
-      by_market_kind('individual').and(:is_self_attested.ne => true).active.to_a
+      by_market_kind('individual').and(:is_self_attested.ne => true).active.is_visible_to_customer.to_a
     end
 
     def individual_market_events_without_transition_member_action
-      by_market_kind('individual').active.to_a.reject {|qle| qle.action_kind == "transition_member"}
+      by_market_kind('individual').active.is_visible_to_customer.to_a.reject {|qle| qle.action_kind == "transition_member"}
     end
 
     def qualifying_life_events_for(role, hbx_staff = false)

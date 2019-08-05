@@ -75,6 +75,7 @@ export class QleKindCreationFormComponent {
       reason: ['', [Validators.required, Validators.minLength(1)]],
       market_kind: ['', [Validators.required, Validators.minLength(1)]],
       is_self_attested: [''],
+      visible_to_customer: [''],
       effective_on_kinds:  new FormArray([]),
       questions: qControls,
       pre_event_sep_in_days:[0, Validators.required],
@@ -145,6 +146,7 @@ export class QleKindCreationFormComponent {
     var errorMapper = new ErrorMapper();
     if (this.creationFormGroup != null) {
       this.creationFormGroup.value.action_kind = this._elementRef.nativeElement.querySelector('select#qle_kind_creation_form_action_kind option:checked').value
+       this.creationFormGroup.value.visible_to_customer = this._elementRef.nativeElement.querySelector('input#qle_kind_creation_form_visible_to_customer').value
       this.creationFormGroup.value.reason = this._elementRef.nativeElement.querySelector('select#qle_kind_creation_form_reason option:checked').value
       if (this.creationUri != null) {
         var invocation = this.CreationService.submitCreate(this.creationUri, this.creationFormGroup.value);

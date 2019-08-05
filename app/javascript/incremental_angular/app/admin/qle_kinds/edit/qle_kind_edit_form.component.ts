@@ -85,6 +85,7 @@ export class QleKindEditFormComponent {
           action_kind: ['',[]],
           reason: ['', [Validators.required, Validators.minLength(1)]],
           market_kind: [''],
+          visible_to_customer: [''],
           is_self_attested: [''],
           effective_on_kinds:  new FormArray([]),
           pre_event_sep_in_days:[0, Validators.required],
@@ -144,7 +145,8 @@ export class QleKindEditFormComponent {
     var form = this;
     var errorMapper = new ErrorMapper();
     if (this.editFormGroup != null) {
-       console.log(this._elementRef.nativeElement.querySelector('select#qle_kind_edit_form_action_kind option:checked'))
+      console.log(this._elementRef.nativeElement.querySelector('select#qle_kind_edit_form_action_kind option:checked'))
+      this.editFormGroup.value.visible_to_customer = this._elementRef.nativeElement.querySelector('input#qle_kind_edit_form_visible_to_customer').value
       this.editFormGroup.value.action_kind = this._elementRef.nativeElement.querySelector('select#qle_kind_edit_form_action_kind option:checked').value
       this.editFormGroup.value.reason = this._elementRef.nativeElement.querySelector('select#qle_kind_edit_form_reason option:checked').value   
       if (this.editUri != null) {

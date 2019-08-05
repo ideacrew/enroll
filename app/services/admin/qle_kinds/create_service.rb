@@ -66,6 +66,7 @@ module Admin
           market_kind: request.market_kind,
           effective_on_kinds: request.effective_on_kinds,
           is_self_attested: request.is_self_attested,
+          visible_to_customer: request.visible_to_customer,
           pre_event_sep_in_days: request.pre_event_sep_in_days,
           is_active: false,
           post_event_sep_in_days: request.post_event_sep_in_days,

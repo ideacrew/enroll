@@ -67,6 +67,7 @@ module Admin
         record = QualifyingLifeEventKind.find(request.id)
         record.update_attributes!(
           id: request.id,
+          visible_to_customer: visible_to_customer,
           title: request.title,
           market_kind: request.market_kind,
           effective_on_kinds: request.effective_on_kinds,
@@ -77,7 +78,7 @@ module Admin
           tool_tip: request.tool_tip,
           reason: request.reason,
           action_kind: request.action_kind,
-          end_on:request.end_on,
+          end_on: request.end_on,
           start_on: request.start_on
 
         )
