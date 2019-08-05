@@ -50,6 +50,7 @@ module Notifier
             first_name: 'Primary',
             last_name: 'Test',
             age: 28,
+            primary_fullname: 'Primary Test',
             dc_resident: 'Yes',
             citizenship: 'US Citizen',
             incarcerated: 'No',
