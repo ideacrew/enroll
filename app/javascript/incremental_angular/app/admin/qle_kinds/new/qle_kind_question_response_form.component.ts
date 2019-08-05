@@ -47,7 +47,7 @@ export class QleKindResponseFormComponent {
     return (this.hasErrors(control) ? " has-error" : "");
   }
 
-  static newResponseFormGroup(){
+  public newResponseFormGroup(){
     return new FormGroup({
       id: new FormControl(""),
       response_title: new FormControl('', Validators.required),

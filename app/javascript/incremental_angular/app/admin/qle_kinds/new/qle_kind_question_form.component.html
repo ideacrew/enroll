@@ -17,20 +17,13 @@
   </div>
     <div *ngIf="showResponseForm">
       <div class='from-group'>
-        <span class="control-label col-sm-3">Accepted Response For this Question </span>
-        <div class='col-md-2'>
-          <select formControlName="accepted_response" id="qle_kind_question_{{questionIndex}}_accepted_response">
-            <option selected="selected">Choose...</option>
-            <option value="true">True</option>
-            <option value="false">False</option>
-          </select>
+        <span class="control-label col-sm-3">Please add a response to this question</span>
         </div>
-      </div>
-        <!-- <qle-question-response-form
+        <qle-question-response-form
         *ngFor="let response of responseControls(); let i = index"
         [responseFormGroup]="response"
         [responseIndex]="i"
         [responseComponentParent]="this"
-        ></qle-question-response-form> -->
+        ></qle-question-response-form>
     </div>
 </div>
