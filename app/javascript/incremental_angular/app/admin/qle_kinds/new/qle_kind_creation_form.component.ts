@@ -128,9 +128,10 @@ export class QleKindCreationFormComponent {
   }
 
   addQuestion() {
-    this.questionArray.push(
-      QleKindQuestionFormComponent.newQuestionFormGroup(this._creationForm)
-    );
+     var questionForm  = new QleKindQuestionFormComponent(this._creationForm)
+      this.questionArray.push(
+      questionForm.newQuestionFormGroup(this._creationForm)
+      );
   }
 
   removeQuestion(questionIndex: number) {

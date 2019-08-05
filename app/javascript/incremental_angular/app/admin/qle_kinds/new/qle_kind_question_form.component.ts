@@ -25,9 +25,15 @@ export class QleKindQuestionFormComponent {
   public responseArray : FormArray;
   
   constructor(private _questionForm: FormBuilder) {
-      const rControls = _questionForm.array([]);
-      this.responseArray = rControls;
     }
+
+  ngOnInit() {
+    // this.getResponseArray()
+  }
+
+//  public getResponseArray(){
+//    return this.responseArray
+//  }
 
   public responseControls() : FormGroup[] {
     return this.responseArray.controls.map(
@@ -46,15 +52,17 @@ export class QleKindQuestionFormComponent {
   }
 
   public submitQuestion(){
-    if(this.questionFormGroup != null){
+    if (this.questionFormGroup != null){
         this.showResponseForm = true
-        // this.addResponse()
+        this.addResponse()
     }
   }
 
+
   public addResponse(){
+    var responseForm = new QleKindResponseFormComponent()
     this.responseArray.push(
-      QleKindResponseFormComponent.newResponseFormGroup()
+      responseForm.newResponseFormGroup()
     ); 
   }
 
@@ -66,14 +74,17 @@ export class QleKindQuestionFormComponent {
     return (this.hasErrors(control) ? " has-error" : "");
   }
 
- static newQuestionFormGroup(formBuilder: FormBuilder) {
+ public newQuestionFormGroup(formBuilder: FormBuilder) {
     var rControls = formBuilder.array([]);
-    return  new FormGroup({
+    var questionForm = new FormGroup({
       id: new FormControl(""),
       question_title: new FormControl('', Validators.required),
       question_type: new FormControl(''),
-      accepted_response: new FormControl(true)
+      responses: rControls,
+      correctAnswer: new FormControl('', Validators.required),
     });
+    this.responseArray = rControls;
+    return questionForm
   }
 
 }
