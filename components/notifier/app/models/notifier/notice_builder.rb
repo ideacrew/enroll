@@ -84,6 +84,7 @@ module Notifier
       else
         ivl_blank_page
         ivl_non_discrimination
+        ivl_taglines
         ivl_attach_envelope
         voter_application
       end
@@ -152,7 +153,7 @@ module Notifier
     end
 
     def ivl_attach_envelope
-      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ivl_envelope.pdf')] if ['projected_eligibility_notice'].include?(event_name)
+      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ivl_envelope.pdf')] unless ['projected_eligibility_notice'].include?(event_name)
     end
 
     def voter_application
@@ -164,11 +165,15 @@ module Notifier
     end
 
     def attach_envelope
-      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', shop_envelope_without_address)]
+      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', shop_envelope_without_address.pdf)]
     end
 
     def employee_appeal_rights
-      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'employee_appeal_rights.pdf')]
+      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', employee_appeal_rights)]
+    end
+
+    def ivl_taglines
+      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'taglines.pdf')] if ['projected_eligibility_notice'].include?(event_name)
     end
 
     def join_pdfs(pdfs)
