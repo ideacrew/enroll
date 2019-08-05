@@ -113,9 +113,21 @@ attributes: !ruby/hash:BSON::Document
       raw_data: !binary |-
         WwROSZ+IC11vNseZ
     relationship_name: :dependent
+    age_threshold: 26
+    age_comparison: :<
     relationship_kinds:
     - child
     - adopted_child
     - foster_child
     - stepchild
+    - ward
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        XUNVWK/wbqMZxmou
+    relationship_name: :dependent
+    age_threshold: 26
+    age_comparison: :>=
+    disability_qualifier: true
+    relationship_kinds:
     - ward

@@ -13,6 +13,12 @@ RSpec.describe Insured::PlanFilterHelper, :type => :helper do
       @coverage_kind = "health"
       expect(find_my_doctor).to eq "<a data-toggle=\"modal\" data-target=\"#plan_match_doctor_shop\" href=\"\">Find Your Doctor</a>"
     end
+
+    it "should return link for individual" do
+      @market_kind = "fehb"
+      @coverage_kind = "health"
+      expect(find_my_doctor).to eq "<a data-toggle=\"modal\" data-target=\"#plan_match_doctor_shop\" href=\"\">Find Your Doctor</a>"
+    end
   end
 
   context ".estimate_your_costs" do
