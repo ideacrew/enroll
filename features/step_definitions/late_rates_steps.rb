@@ -1,4 +1,5 @@
-Given(/^employer ABC Widgets visits benefits page$/) dovisit "/"
+Given(/^employer ABC Widgets visits benefits page$/) do
+  visit "/"
   find(:xpath, '//*[@id="welcome-nav-options"]/div/a[5]').click
   find(:xpath, '//*[@id="uic-employers-right-menu"]/li[3]/a').click
 end
