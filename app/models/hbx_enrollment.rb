@@ -1392,15 +1392,15 @@ class HbxEnrollment
     
     case
       when employee_role.present?
+        enrollment.kind = "employer_sponsored"
+        enrollment.employee_role = employee_role
+
         if benefit_group.blank? || benefit_group_assignment.blank?
           benefit_group, benefit_group_assignment = employee_current_benefit_group(employee_role, enrollment, qle)
         end
         if qle && employee_role.coverage_effective_on(qle: qle) > employee_role.person.primary_family.current_sep.effective_on
           raise "You are attempting to purchase coverage through Qualifying Life Event prior to your eligibility date. Please contact your Employer for assistance. You are eligible for employer benefits from #{employee_role.coverage_effective_on(qle: qle)} "
         end
-
-        enrollment.kind = "employer_sponsored"
-        enrollment.employee_role = employee_role
 
         if qle && enrollment.family.is_under_special_enrollment_period?
           if opt_effective_on.present?
