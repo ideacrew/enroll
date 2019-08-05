@@ -70,7 +70,6 @@ Rails.application.routes.draw do
       end
       collection do
         get :manage
-        post :manage_qle
         get :sorting_order
         post :sorting_order
       end
