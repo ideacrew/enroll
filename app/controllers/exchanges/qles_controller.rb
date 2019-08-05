@@ -6,25 +6,20 @@ class Exchanges::QlesController < ApplicationController
   before_action :set_qles_to_manage, only: [:manage]
   before_action :set_sortable_qles, only: [:sorting_order]
   # TODO: Determine which need the Pundit before_action
-  before_action :can_add_custom_qle?, only: [:manage_qle]
+  before_action :can_add_custom_qle?, only: [
+    :manage,
+    :new,
+    :create,
+    :edit,
+    :update,
+    :deactivation_form,
+    :deactivate
+  ]
   skip_before_action :verify_authenticity_token, only: [:deactivate, :create, :update]
   # This is in hbx_profiles controller, which is part of the admin pages
   layout 'single_column'
 
   def manage; end
-  
-  def manage_qle
-    attrs = { market_kind: params.dig(:market_kind) }
-    if params[:manage_qle_action] == 'new_qle'
-      redirect_to new_exchanges_qle_path(attrs)
-    elsif params[:manage_qle_action] == 'modify_qle'
-      @qle = QualifyingLifeEventKind.find(params[:id])
-      redirect_to edit_exchanges_qle_path(@qle, attrs)
-    elsif params[:manage_qle_action] == 'deactivate_qle'
-      @qle = QualifyingLifeEventKind.find(params[:id])
-      redirect_to deactivation_form_exchanges_qle_path(@qle, attrs)
-    end
-  end
 
   def question_flow
     attrs = { market_kind: params.dig(:market_kind) }
