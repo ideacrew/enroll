@@ -165,7 +165,7 @@ module Notifier
     end
 
     def attach_envelope
-      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', shop_envelope_without_address.pdf)]
+      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', shop_envelope_without_address)]
     end
 
     def employee_appeal_rights
