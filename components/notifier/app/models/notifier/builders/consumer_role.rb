@@ -41,10 +41,6 @@ module Notifier
         consumer_role.present?
       end
 
-      def full_name
-        merge_model.full_name = consumer_role.person.full_name if consumer_role.present?
-      end
-
       def primary_fullname
         merge_model.primary_fullname = consumer_role.person.full_name.titleize if consumer_role.present?
       end
