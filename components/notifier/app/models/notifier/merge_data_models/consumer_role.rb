@@ -7,6 +7,8 @@ module Notifier
       attribute :notice_date, String
       attribute :first_name, String
       attribute :last_name, String
+      attribute :middle_name, String
+      attribute :name_sfx, String
       attribute :full_name, String
       attribute :primary_fullname, String
       attribute :mailing_address, MergeDataModels::Address
@@ -51,7 +53,9 @@ module Notifier
             first_name: 'Primary',
             full_name: 'Primary M Test',
             last_name: 'Test',
-            primary_fullname: 'Primary Test',
+            primary_fullname: 'Primary M Test Sr.',
+            middle_name: 'M',
+            name_sfx: 'Sr.',
             age: 28,
             dc_resident: 'Yes',
             citizenship: 'US Citizen',
