@@ -25,19 +25,14 @@ class IvlNotice < Notice
     if recipient.consumer_role.can_receive_paper_communication?
       store_paper_notice
     end
+    clear_tmp(notice_path)
   end
 
   def attach_required_documents
     generate_custom_notice('notices/ivl/documents_section')
     attach_blank_page(custom_notice_path)
     join_pdfs [notice_path, custom_notice_path]
-    clear_tmp
-  end
-
-  def generate_custom_notice(custom_template)
-    File.open(custom_notice_path, 'wb') do |file|
-      file << self.pdf_custom(custom_template)
-    end
+    clear_tmp(custom_notice_path)
   end
 
   def pdf_custom(custom_template)
@@ -75,8 +70,8 @@ class IvlNotice < Notice
     options
   end
 
-  def clear_tmp
-    File.delete(custom_notice_path)
+  def clear_tmp(file)
+    File.delete(file)
   end
 
   def custom_notice_path
