@@ -910,8 +910,7 @@ class Family
   end
 
   def has_aptc_hbx_enrollment?
-    enrollments = hbx_enrollments.active rescue []
-    enrollments.any? {|enrollment| enrollment.applied_aptc_amount > 0}
+    hbx_enrollments.current_year.individual_market.with_aptc.present?
   end
 
   def self.by_special_enrollment_period_id(special_enrollment_period_id)
