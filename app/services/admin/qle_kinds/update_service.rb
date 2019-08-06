@@ -76,11 +76,10 @@ module Admin
           is_active: false,
           post_event_sep_in_days: request.post_event_sep_in_days,
           tool_tip: request.tool_tip,
-          reason: request.reason,
-          action_kind: request.action_kind,
+          reason: request.reason.split('').drop(3).join(''),
+          action_kind: request.action_kind.split('').drop(3).join(''),
           end_on: request.end_on,
           start_on: request.start_on
-
         )
         BenefitSponsors::Services::ServiceResponse.new(record)
       end

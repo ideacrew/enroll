@@ -71,8 +71,8 @@ export class QleKindCreationFormComponent {
     var formGroup = formBuilder.group({
       title: ['', Validators.required],
       tool_tip: ['', [Validators.required, Validators.minLength(1)]],
-      action_kind: ['',Validators.required],
-      reason: ['', [Validators.required, Validators.minLength(1)]],
+      action_kind: ['not_applicable',Validators.required],
+      reason: ['not_applicable', [Validators.required, Validators.minLength(1)]],
       market_kind: ['', [Validators.required, Validators.minLength(1)]],
       is_self_attested: [''],
       visible_to_customer: [''],
@@ -146,8 +146,8 @@ export class QleKindCreationFormComponent {
     var form = this;
     var errorMapper = new ErrorMapper();
     if (this.creationFormGroup != null) {
+      console.log(this.creationFormGroup.value)
       this.creationFormGroup.value.action_kind = this._elementRef.nativeElement.querySelector('select#qle_kind_creation_form_action_kind option:checked').value
-       this.creationFormGroup.value.visible_to_customer = this._elementRef.nativeElement.querySelector('input#qle_kind_creation_form_visible_to_customer').value
       this.creationFormGroup.value.reason = this._elementRef.nativeElement.querySelector('select#qle_kind_creation_form_reason option:checked').value
       if (this.creationUri != null) {
         var invocation = this.CreationService.submitCreate(this.creationUri, this.creationFormGroup.value);
