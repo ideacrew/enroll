@@ -31,7 +31,6 @@ module BenefitSponsors
       default_scope -> {where(:is_active => true)}
 
       before_create :notify_observers
-      after_update  :notify_observers
       after_save    :notify_on_save
 
       add_observer ::BenefitSponsors::Observers::BrokerAgencyAccountObserver.new, [:broker_fired?, :broker_hired?]
