@@ -40,11 +40,15 @@ module BenefitSponsors
       end
 
       def is_broker_profile?
-        profile_type == "broker_agency"
+        profile.profile_type == "broker_agency"
+      end
+
+      def is_general_agency_profile?
+        profile.profile_type == "general_agency"
       end
 
       def is_employer_profile?
-        profile_type == "benefit_sponsor"
+        profile.profile_type == "benefit_sponsor"
       end
 
       def profile_attributes=(profile_params)
