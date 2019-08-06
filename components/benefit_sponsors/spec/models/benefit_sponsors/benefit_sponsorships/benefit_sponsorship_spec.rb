@@ -824,6 +824,16 @@ module BenefitSponsors
           expect(subject.may_cancel_ineligible_application?(april_effective_date).to_a.sort).to eq ((april_ineligible_sponsors + april_renewal_sponsors).sort)
         end
       end
+
+      context 'non-binder paid applications count' do
+        let(:initial_application_state) { :enrollment_closed }
+
+        it "should find sponsorships with application in enrollment_closed state and matching effective period begin date" do
+          expect(subject.may_cancel_ineligible_application?(march_effective_date).size).to eq march_sponsors.size
+          march_sponsors[0].benefit_applications.first.credit_binder!
+          expect(subject.may_cancel_ineligible_application?(march_effective_date).size).to eq march_sponsors.size - 1
+        end
+      end
     end
 
     describe "Finding BenefitApplications" do

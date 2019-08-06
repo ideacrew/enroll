@@ -17,7 +17,7 @@ class IvlNotices::CoverallToIvlTransitionNoticeBuilder < IvlNotice
     generate_custom_notice('notices/ivl/documents_section')
     attach_blank_page(custom_notice_path)
     join_pdfs [notice_path, custom_notice_path]
-    clear_tmp
+    clear_tmp(custom_notice_path)
   end
 
   def deliver
@@ -37,6 +37,7 @@ class IvlNotices::CoverallToIvlTransitionNoticeBuilder < IvlNotice
     if recipient.consumer_role.can_receive_paper_communication?
       store_paper_notice
     end
+    clear_tmp(notice_path)
   end
 
   def build

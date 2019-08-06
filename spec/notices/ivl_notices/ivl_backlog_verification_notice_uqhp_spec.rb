@@ -87,6 +87,14 @@ RSpec.describe IvlNotices::IvlBacklogVerificationNoticeUqhp, :dbclean => :after_
       file = @backlog_notice.generate_pdf_notice
       expect(File.exist?(file.path)).to be true
     end
+
+    it "should delete generated pdf" do
+      @backlog_notice.append_hbe
+      @backlog_notice.build
+      file = @backlog_notice.generate_pdf_notice
+      @reminder_notice.clear_tmp(file.path)
+      expect(File.exist?(file.path)).to be false
+    end
   end
 
 end

@@ -234,7 +234,7 @@ module BenefitSponsors
 
     scope :may_cancel_ineligible_application?, -> (compare_date = TimeKeeper.date_of_record) {
       where(:benefit_applications => {
-        :$elemMatch => {:"effective_period.min" => compare_date, :aasm_state => :enrollment_ineligible }}
+        :$elemMatch => {:"effective_period.min" => compare_date, :aasm_state.in => [:enrollment_closed, :enrollment_ineligible] }}
       )
     }
 
@@ -474,6 +474,10 @@ module BenefitSponsors
     def is_attestation_eligible?
       return true unless enforce_employer_attestation
       employer_attestation.present? && employer_attestation.is_eligible?
+    end
+
+    def latest_application
+      renewal_benefit_application || most_recent_benefit_application
     end
 
     # If there is a gap, it will fall under a new benefit sponsorship

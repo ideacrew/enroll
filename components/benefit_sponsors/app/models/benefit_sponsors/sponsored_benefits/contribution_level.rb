@@ -35,6 +35,15 @@ module BenefitSponsors
         return @contribution_unit if defined? @contribution_unit
         @contribution_unit = contribution_model.find_contribution_unit(contribution_unit_id)
       end
+
+      def renew_from(current_contribution_level)
+        if current_contribution_level.present?
+          self.is_offered = current_contribution_level.is_offered
+          self.contribution_factor = current_contribution_level.contribution_factor
+          self.contribution_cap = current_contribution_level.contribution_cap
+          self.flat_contribution_amount = current_contribution_level.flat_contribution_amount
+        end
+      end
     end
   end
 end

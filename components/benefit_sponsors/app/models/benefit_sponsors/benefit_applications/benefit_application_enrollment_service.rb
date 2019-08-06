@@ -160,6 +160,12 @@ module BenefitSponsors
       end
     end
 
+    def mark_initial_ineligible
+      raise StandardError, "Benefit ineligible state transition failed" unless benefit_application.may_deny_enrollment_eligiblity?
+
+      benefit_application.deny_enrollment_eligiblity!
+    end
+
     def cancel(notify_trading_partner = false)
       if business_policy_satisfied_for?(:cancel_benefit)
         if benefit_application.may_cancel?

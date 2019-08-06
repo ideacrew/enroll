@@ -101,7 +101,15 @@ module BenefitSponsors
     end
 
     def auto_cancel_ineligible
-      benefit_sponsorship.benefit_applications.each { |benefit_application| benefit_application.cancel! if benefit_application.may_cancel? }
+      benefit_applications = benefit_sponsorship.benefit_applications.where(:"effective_period.min" => new_date, :aasm_state.in => [:enrollment_closed, :enrollment_ineligible])
+
+      benefit_applications.each do |benefit_application|
+        application_service = application_service_for(benefit_application)
+
+        application_service.mark_initial_ineligible if !benefit_application.is_renewing? && benefit_application.enrollment_closed?
+
+        application_service.cancel
+      end
     end
 
     def transmit_initial_eligible_event

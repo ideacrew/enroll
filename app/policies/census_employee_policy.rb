@@ -3,16 +3,19 @@ class CensusEmployeePolicy < ApplicationPolicy
   # Last updated July 23 from https://github.com/dchbx/enroll/pull/2782/
   def update?
     return true if @user.has_role?(:hbx_staff)
-    if @user.has_role?(:employer_staff) && !@user.has_role?(:broker)
-      can_change = @user.person.employer_staff_roles.map(&:employer_profile_id).map(&:to_s).include? @record.employer_profile_id.to_s
-    elsif @user.has_role?(:broker)
-      can_change = @record.employer_profile.try(:active_broker) == @user.person
-    elsif @user.has_role?(:general_agency_staff)
-      emp_ids = EmployerProfile.find_by_general_agency_profile(@user.person.general_agency_staff_roles.first.general_agency_profile).map(&:id)
-      can_change = emp_ids.include?(@record.employer_profile.id)
-    else
-      can_change = false
-    end
+    can_change =
+      if @user.has_role?(:employer_staff) && !@user.has_role?(:broker)
+        @user.person.employer_staff_roles.map(&:employer_profile_id).map(&:to_s).include? @record.employer_profile_id.to_s
+      elsif @user.has_role?(:broker)
+        @record.employer_profile.try(:active_broker) == @user.person
+      elsif @user.has_role?(:general_agency_staff)
+        ga_account = @record.employer_profile.general_agency_accounts.select do |general_agency_account|
+          @user.person.general_agency_staff_roles.where(benefit_sponsors_general_agency_profile_id: general_agency_account.benefit_sponsrship_general_agency_profile_id)
+        end.first
+        ga_account.present? && ga_account.active?
+      else
+        false
+      end
     can_change || (!@record.dob_changed? && !@record.ssn_changed?)
   end
 

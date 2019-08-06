@@ -4,12 +4,10 @@ RSpec.describe PeopleController, dbclean: :after_each do
   let(:census_employee_id) { "abcdefg" }
   let(:user) { FactoryBot.build(:user) }
   let(:email) {FactoryBot.build(:email)}
-
-  let(:consumer_role){FactoryBot.build(:consumer_role)}
-
+  let(:consumer_role){FactoryBot.build(:consumer_role, :contact_method => "Paper Only")}
   let(:census_employee){FactoryBot.build(:census_employee)}
   let(:employee_role){FactoryBot.build(:employee_role, :census_employee => census_employee)}
-  let(:person) { FactoryBot.create(:person, :with_employee_role) }
+  let(:person) { FactoryBot.create(:person) }
 
 
   let(:vlp_document){FactoryBot.build(:vlp_document)}
@@ -38,9 +36,6 @@ RSpec.describe PeopleController, dbclean: :after_each do
     let(:vlp_documents_attributes) { {"1" => vlp_document.attributes.to_hash}}
     let(:consumer_role_attributes) { consumer_role.attributes.to_hash}
     let(:person_attributes) { person.attributes.to_hash}
-    let(:employee_roles) { person.employee_roles }
-    let(:census_employee_id) {employee_roles[0].census_employee_id}
-
     let(:email_attributes) { {"0"=>{"kind"=>"home", "address"=>"test@example.com"}}}
     let(:addresses_attributes) { {"0"=>{"kind"=>"home", "address_1"=>"address1_a", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"22211", "id"=> person.addresses[0].id.to_s},
         "1"=>{"kind"=>"mailing", "address_1"=>"address1_b", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"22211", "id"=> person.addresses[1].id.to_s} } }
@@ -51,10 +46,13 @@ RSpec.describe PeopleController, dbclean: :after_each do
       allow(Person).to receive(:first).and_return(person)
       allow(controller).to receive(:sanitize_person_params).and_return(true)
       allow(person).to receive(:consumer_role).and_return(consumer_role)
+      allow(person).to receive(:employee_roles).and_return [employee_role]
       allow_any_instance_of(VlpDoc).to receive(:sensitive_info_changed?).and_return([false, false])
       allow(person).to receive(:update_attributes).and_return(true)
       allow(person).to receive(:is_consumer_role_active?).and_return(false)
       person_attributes[:addresses_attributes] = addresses_attributes
+      person_attributes[:consumer_role_attributes] = consumer_role_attributes
+
       sign_in user
       post :update, params: {id: person.id, person: person_attributes}
     end
@@ -68,6 +66,12 @@ RSpec.describe PeopleController, dbclean: :after_each do
 
       it "should not empty the person's addresses on update" do
         expect(person.addresses).not_to eq []
+      end
+    end
+
+    context "employee roles are updated" do
+      it "should update active employee role's contact method to match consumer role contact method" do
+        expect(person.consumer_role.contact_method).to eq(person.employee_roles.first.contact_method)
       end
     end
 

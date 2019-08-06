@@ -344,11 +344,11 @@ class HbxEnrollment
       :"effective_on".gte => benefit_application.effective_period.min
     )
   end
-  scope :enrollments_for_monthly_report_sep_scope, ->(start_date, end_date, family) do
-    where(family_id: family.id).special_enrollments.individual_market.show_enrollments_sans_canceled.where(
+  scope :enrollments_for_monthly_report_sep_scope, lambda { |start_date, end_date, family_id|
+    where(family_id: family_id).special_enrollments.individual_market.show_enrollments_sans_canceled.where(
       :"created_at" => {:"$gte" => start_date, :"$lt" => end_date}
     )
-  end
+  }
   # Rewritten from family scopes
   scope :enrolled_statuses, -> { where(:"aasm_state".in => ENROLLED_STATUSES) }
   scope :by_writing_agent_id, ->(broker_id) { where(writing_agent_id: broker_id)}
@@ -449,16 +449,7 @@ class HbxEnrollment
 
     # terminate all Enrollments scheduled for termination
     def terminate_scheduled_enrollments(as_of_date = TimeKeeper.date_of_record)
-      families = Family.where("households.hbx_enrollments" => {
-        :$elemMatch => { :aasm_state => "coverage_termination_pending", :terminated_on.lt => as_of_date }
-      })
-
-      enrollments_for_termination = families.inject([]) do |enrollments, family|
-        enrollments += family.active_household.hbx_enrollments.where(:aasm_state => "coverage_termination_pending",
-                                                                     :terminated_on.lt => as_of_date).to_a
-      end
-
-      enrollments_for_termination.each do |hbx_enrollment|
+      HbxEnrollment.where(:aasm_state => 'coverage_termination_pending', :terminated_on.lt => as_of_date).find_each do |hbx_enrollment|
         hbx_enrollment.terminate_coverage!(hbx_enrollment.terminated_on)
       rescue StandardError => e
         Rails.logger.error { "Error terminating scheduled enrollment hbx_id - #{hbx_enrollment.hbx_id} due to #{e.backtrace}" }
@@ -610,7 +601,7 @@ class HbxEnrollment
   end
 
   def benefit_sponsored?
-    benefit_group.present?
+    sponsored_benefit_package_id.present? && sponsored_benefit_package.present?
   end
 
   def affected_by_verifications_made_today?
@@ -652,13 +643,13 @@ class HbxEnrollment
     is_cobra_status? && future_active?
   end
 
-  def validate_for_cobra_eligiblity(role)
+  def validate_for_cobra_eligiblity(role, current_user)
     if self.is_shop?
       if role.present? && role.is_cobra_status?
         census_employee = role.census_employee
         self.kind = 'employer_sponsored_cobra'
         self.effective_on = census_employee.cobra_begin_date if census_employee.cobra_begin_date > self.effective_on
-        if census_employee.coverage_terminated_on.present? && !census_employee.have_valid_date_for_cobra?
+        if census_employee.coverage_terminated_on.present? && !census_employee.have_valid_date_for_cobra?(current_user)
           raise "You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated."
         end
       end
@@ -1401,15 +1392,15 @@ class HbxEnrollment
     
     case
       when employee_role.present?
+        enrollment.kind = "employer_sponsored"
+        enrollment.employee_role = employee_role
+
         if benefit_group.blank? || benefit_group_assignment.blank?
           benefit_group, benefit_group_assignment = employee_current_benefit_group(employee_role, enrollment, qle)
         end
         if qle && employee_role.coverage_effective_on(qle: qle) > employee_role.person.primary_family.current_sep.effective_on
           raise "You are attempting to purchase coverage through Qualifying Life Event prior to your eligibility date. Please contact your Employer for assistance. You are eligible for employer benefits from #{employee_role.coverage_effective_on(qle: qle)} "
         end
-
-        enrollment.kind = "employer_sponsored"
-        enrollment.employee_role = employee_role
 
         if qle && enrollment.family.is_under_special_enrollment_period?
           if opt_effective_on.present?

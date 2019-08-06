@@ -1,9 +1,12 @@
 require "rails_helper"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
-if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
-describe RuleSet::HbxEnrollment::IndividualMarketVerification do
+describe RuleSet::HbxEnrollment::IndividualMarketVerification, :if => ExchangeTestingConfigurationHelper.individual_market_is_enabled?, dbclean: :around_each do
+  include_context 'setup benefit market with market catalogs and product packages'
+  include_context 'setup initial benefit application'
+
   subject { RuleSet::HbxEnrollment::IndividualMarketVerification.new(enrollment) }
-
   let(:effective_on) { TimeKeeper.date_of_record.beginning_of_year }
   let(:enrollment_status) { 'coverage_selected' }
   let(:product) {FactoryBot.build(:benefit_markets_products_product, benefit_market_kind: 'aca_individual') }
@@ -18,10 +21,44 @@ describe RuleSet::HbxEnrollment::IndividualMarketVerification do
                                           aasm_state: enrollment_status,
                                           product: product )}
 
+
+  let(:shop_enrollment_verification) { RuleSet::HbxEnrollment::IndividualMarketVerification.new(shop_enrollment) }
+  let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_month }
+  let(:hired_on) { TimeKeeper.date_of_record - 3.months }
+  let(:employee_created_at) { hired_on }
+  let(:employee_updated_at) { employee_created_at }
+  let(:shop_family) {FactoryBot.create(:family, :with_primary_family_member)}
+  let(:census_employee) do
+    create(:census_employee,
+           :with_active_assignment,
+           benefit_sponsorship: benefit_sponsorship,
+           employer_profile: benefit_sponsorship.profile,
+           benefit_group: current_benefit_package,
+           hired_on: hired_on,
+           created_at: employee_created_at,
+           updated_at: employee_updated_at)
+  end
+  let(:employee_role) { FactoryBot.create(:employee_role, benefit_sponsors_employer_profile_id: abc_profile.id, hired_on: census_employee.hired_on, census_employee_id: census_employee.id) }
+  let(:shop_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      household: shop_family.latest_household,
+                      aasm_state: 'coverage_selected',
+                      coverage_kind: 'health',
+                      family: shop_family,
+                      effective_on: current_effective_date,
+                      enrollment_kind: 'open_enrollment',
+                      kind: 'employer_sponsored',
+                      submitted_at: effective_on - 10.days,
+                      benefit_sponsorship_id: benefit_sponsorship.id,
+                      sponsored_benefit_package_id: current_benefit_package.id,
+                      sponsored_benefit_id: current_benefit_package.sponsored_benefits[0].id,
+                      employee_role_id: employee_role.id,
+                      benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id)
+  end
+
   describe "for a shop policy" do
     it "should not be applicable" do
-      allow(enrollment).to receive(:benefit_sponsored?).and_return(true)
-      expect(subject.applicable?).to eq false
+      expect(shop_enrollment_verification.applicable?).to eq false
     end
   end
 
@@ -126,5 +163,4 @@ describe RuleSet::HbxEnrollment::IndividualMarketVerification do
       end
     end
   end
-end
 end

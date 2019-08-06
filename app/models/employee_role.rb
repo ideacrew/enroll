@@ -226,6 +226,14 @@ class EmployeeRole
     benefit_group_assignment.present? && benefit_group_assignment.benefit_group.is_offering_dental? ? true : false
   end
 
+  def can_receive_paper_communication?
+    ["Only Paper communication", "Paper and Electronic communications"].include?(contact_method)
+  end
+
+  def can_receive_electronic_communication?
+    ["Only Electronic communications", "Paper and Electronic communications"].include?(contact_method)
+  end
+
   class << self
     def klass
       self.to_s.underscore

@@ -163,6 +163,13 @@ module BenefitSponsors
           end
         end
 
+        def email_guide
+          notice = "A copy of the Broker Registration Guide has been emailed to #{params[:email]}"
+          flash[:notice] = notice
+          UserMailer.broker_registration_guide(params).deliver_now
+          render 'benefit_sponsors/profiles/registrations/confirmation', :layout => 'single_column'
+        end
+
         private
 
         def check_and_download_commission_statement

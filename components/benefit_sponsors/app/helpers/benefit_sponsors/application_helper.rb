@@ -84,11 +84,11 @@ module BenefitSponsors
     end
 
     def employer_contribution_tool_tip_helper
-      employer_contribution = "Employers are required to contribute at least #{aca_shop_market_employer_contribution_percent_minimum} of the premium costs for employees based on the reference plan selected, except during the special annual enrollment period at the end of each year."
+      employer_contribution = "Employers are required to contribute at least #{aca_shop_market_employer_contribution_percent_minimum}% of the premium costs for employees based on the reference plan selected, except during the special annual enrollment period at the end of each year."
           if individual_market_is_enabled?
             add_on_text = "Contributions towards family coverage are optional. You can still offer family coverage even if you don’t contribute."
           else
-            add_on_text = "Offering family coverage is optional, but if offered, employers are required to contribute at least #{aca_shop_market_employer_family_contribution_percent_minimum} towards family premiums, except during the special annual enrollment period at the end of each year."
+            add_on_text = "Offering family coverage is optional, but if offered, employers are required to contribute at least #{aca_shop_market_employer_family_contribution_percent_minimum}% towards family premiums, except during the special annual enrollment period at the end of each year."
           end
       return employer_contribution + add_on_text
     end

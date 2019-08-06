@@ -27,6 +27,7 @@ class IvlNotices::FinalCatastrophicPlanNotice < IvlNotice
     if recipient.consumer_role.can_receive_paper_communication?
       store_paper_notice
     end
+    clear_tmp(notice_path)
   end
 
   def build

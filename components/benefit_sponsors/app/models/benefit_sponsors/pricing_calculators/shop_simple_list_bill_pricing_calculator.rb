@@ -31,7 +31,7 @@ module BenefitSponsors
           if (rel.to_s == "dependent") && (coverage_age < 21)
             @discount_kid_count = @discount_kid_count + 1
           end
-          member_price = if (rel.to_s == "dependent") && (coverage_age < 21) && (@discount_kid_count > 3)
+          member_price = if (rel.to_s == "dependent") && (coverage_age < 21) && (@discount_kid_count > 3) && (@product.kind.to_s != :dental.to_s)
                            0.00
                          else
                            # Do calc
@@ -42,7 +42,7 @@ module BenefitSponsors
                              @rating_area
                            )
                          end
-          @member_totals[member.member_id] = member_price
+          @member_totals[member.member_id] = BigDecimal.new(member_price.to_s).round(2)
           @total = BigDecimal.new((@total + member_price).to_s).round(2)
           self
         end

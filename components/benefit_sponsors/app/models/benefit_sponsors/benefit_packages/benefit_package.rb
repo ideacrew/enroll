@@ -310,6 +310,7 @@ module BenefitSponsors
 
       def is_renewal_benefit_available?(enrollment)
         return true if (enrollment.present? && enrollment.is_coverage_waived?)
+        return false if enrollment.present? && enrollment.coverage_termination_pending?
         return false if enrollment.blank? || enrollment.product.blank? || enrollment.product.renewal_product.blank?
         sponsored_benefit = sponsored_benefit_for(enrollment.coverage_kind)
         sponsored_benefit.products(start_on).include?(enrollment.product.renewal_product)
@@ -326,8 +327,8 @@ module BenefitSponsors
       def effectuate_member_benefits
         activate_benefit_group_assignments if predecessor.present?
 
-        enrolled_families.each do |family| 
-          enrollments = HbxEnrollment.by_benefit_package(self).where(family_id: family.id).enrolled_and_waived
+        enrolled_families.each do |family|
+          enrollments = HbxEnrollment.by_benefit_package(self).where(family_id: family.id).show_enrollments_sans_canceled
 
           sponsored_benefits.each do |sponsored_benefit|
             hbx_enrollment = enrollments.by_coverage_kind(sponsored_benefit.product_kind).first
@@ -507,7 +508,7 @@ module BenefitSponsors
       end
 
       def census_employees_assigned_on(effective_date, is_active = true)
-        CensusEmployee.by_benefit_package_and_assignment_on(self, effective_date, is_active).non_terminated
+        CensusEmployee.by_benefit_package_and_assignment_on(self, effective_date, is_active).non_term_and_pending
       end
 
       def census_employees_eligible_for_renewal(effective_date)

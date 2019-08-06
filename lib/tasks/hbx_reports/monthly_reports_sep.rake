@@ -23,7 +23,7 @@ namespace :reports do
     file_name = "#{Rails.root}/monthly_sep_enrollments_report_#{date.gsub(" ", "").split(",").join("_")}.csv"
     puts "Created file and trying to import the data #{file_name}" 
 
-    families = Family.monthly_reports_scope
+    families = Family.monthly_reports_scope(start_date, end_date)
 
     CSV.open(file_name,"w") do |csv|
       csv <<  ["Subscriber ID",

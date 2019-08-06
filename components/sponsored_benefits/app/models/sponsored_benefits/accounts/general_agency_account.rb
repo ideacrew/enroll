@@ -75,11 +75,10 @@ module SponsoredBenefits
         end
 
         def ga_name
-          Rails.cache.fetch("general-agency-name-#{self.general_agency_profile_id}", expires_in: 12.hour) do
+          Rails.cache.fetch("general-agency-name-#{benefit_sponsrship_general_agency_profile_id}", expires_in: 12.hour) do
             legal_name
           end
         end
-
 
         def legal_name
           general_agency_profile.present? ? general_agency_profile.legal_name : ""

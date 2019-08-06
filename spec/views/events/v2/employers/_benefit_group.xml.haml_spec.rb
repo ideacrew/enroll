@@ -20,6 +20,10 @@ describe "app/views/events/v2/employers/_benefit_group.xml.haml", dbclean: :arou
       it "does not include reference plan" do
         expect(@doc.xpath("//reference_plan").count).to eq(0)
       end
+
+      it "should not include rating area for DC" do
+        expect(@doc.xpath("//rating_area").count).to eq(0)
+      end
     end
   end
 end
