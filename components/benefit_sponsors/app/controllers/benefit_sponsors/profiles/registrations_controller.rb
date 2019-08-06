@@ -48,6 +48,8 @@ module BenefitSponsors
       def edit
         @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_edit(profile_id: params[:id])
         authorize @agency
+
+        render layout: 'single_column'
       end
 
       def update
