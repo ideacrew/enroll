@@ -170,6 +170,19 @@ class Insured::GroupSelectionController < ApplicationController
     end
   end
 
+  def edit_aptc
+    #rule 1 if cuurent policy terminated, canceled, expired create a new enrollment
+    @hbx_enrollment = HbxEnrollment.find(params.require(:hbx_enrollment_id)) #hbx_enrollment_id=5d480b5df56cd20e82872eeb
+    enrollment_policies = IvlMarket::BusinessPolicies::EnrollmentPolicyService.new(policies: ["aptc_policy_rules"], enrollment: @hbx_enrollment)
+    policies_applied = enrollment_policies.apply_policies
+
+    if policies_applied
+      #proceed
+    else
+
+    end
+  end
+
   private
 
   def permit_params
