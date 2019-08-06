@@ -83,7 +83,7 @@ module Services
       return if families.blank?
 
       @logger.info '*' * 50
-      @logger.info "Started send_reminder_notices_for_ivl process at #{TimeKeeper.datetime_of_record.to_s}"
+      @logger.info "Started send_reminder_notices_for_ivl process at #{TimeKeeper.datetime_of_record}"
 
       families.each do |family|
         begin
@@ -106,10 +106,10 @@ module Services
               @logger.info "Sent fourth_verifications_reminder to #{person.hbx_id}" unless Rails.env.test?
             end
           end
-        rescue Exception => e
+        rescue StandardError => e
           @logger.info "Unable to send verification reminder notices to #{person.hbx_id} due to #{e}"
         end
-        @logger.info "End of generating reminder notices at #{TimeKeeper.datetime_of_record.to_s}"
+        @logger.info "End of generating reminder notices at #{TimeKeeper.datetime_of_record}"
       end
     end
   end
