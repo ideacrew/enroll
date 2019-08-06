@@ -42,8 +42,8 @@ class IvlNotice < Notice
   def pdf_options_custom
     options = {
       margin:  {
-        top: 15,
-        bottom: 20,
+        top: 3,
+        bottom: 22,
         left: 22,
         right: 22
       },
