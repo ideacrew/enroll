@@ -67,8 +67,8 @@ class Notice
   def pdf_options
     options = {
       margin:  {
-        top: 3,
-        bottom: 22,
+        top: 10,
+        bottom: 20,
         left: 22,
         right: 22
       },
