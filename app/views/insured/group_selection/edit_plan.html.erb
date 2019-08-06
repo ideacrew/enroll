@@ -80,6 +80,7 @@
                     <a id="cancel-button" class="btn btn-default btn-block interaction-click-control-cancel-plan" >Cancel Plan</a>
                   </div>
 
+                  <!-- Need conditional logic -->
                   <div class="col-sm-4">
                     <a id="aptc-button" class="btn btn-default btn-block interaction-click-control-edit-aptc" >Edit APTC</a>
                   </div>
@@ -114,14 +115,17 @@
             </div>
 
             <div id="cancel-form" class="hidden">
-              <%= form_tag term_or_cancel_insured_group_selections_path(hbx_enrollment_id: @hbx_enrollment.id, term_or_cancel: @should_term_or_cancel), :method => :post do %>
+              <%= form_for @self_term_or_cancel_form, as: :self_term_or_cancel_form, url: {action: 'term_or_cancel'} do |f| %>
+
+                <%= hidden_field_tag :hbx_enrollment_id, @hbx_enrollment.id %>
+                <%= hidden_field_tag :term_or_cancel,    @should_term_or_cancel %>
                 <div class="col-xs-3" style="float:right;">
                   <% if @calendar_enabled %>
                     <h5 id="enter-text">Enter the date of cancellation</h5>
                     <%= text_field_tag 'term_date', '',:'data-date-min'=> "+0d", placeholder: " ", class: "required date-picker term-date-picker floatlabel form-control", required: true, id: "term-date" %>
                     <br>
                   <% end %>
-                  <%= submit_tag l10n("confirm"), class: 'button btn btn-lg btn-primary btn-block interaction-click-control-action-confirm', id: 'btn-cancel', :disabled => true %>
+                  <%= f.submit l10n("confirm"), class: 'button btn btn-lg btn-primary btn-block interaction-click-control-action-confirm', id: 'btn-cancel', :disabled => true %>
                </div>
              <% end %>
             </div>
