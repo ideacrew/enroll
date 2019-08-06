@@ -1516,16 +1516,19 @@ end
 
 shared_examples_for 'has aptc enrollment' do |created_at, applied_aptc, market_kind, result|
   let(:family) { FactoryBot.build(:family, :with_primary_family_member) }
-  let(:enrollment) {
-    FactoryBot.create(:hbx_enrollment,
-                      family: family,
-                      household: household,
-                      coverage_kind: "health",
-                      kind: market_kind,
-                      created_at: created_at,
-                      enrollment_kind: "open_enrollment",
-                      applied_aptc_amount: applied_aptc
-    )}
+  let(:enrollment) do
+    FactoryBot.create(
+      :hbx_enrollment,
+      family: family,
+      household: household,
+      coverage_kind: "health",
+      kind: market_kind,
+      created_at: created_at,
+      enrollment_kind: "open_enrollment",
+      applied_aptc_amount: applied_aptc
+    )
+  end
+
 
   it "should return #{result}" do
     expect(family.has_aptc_hbx_enrollment?).to eq result
