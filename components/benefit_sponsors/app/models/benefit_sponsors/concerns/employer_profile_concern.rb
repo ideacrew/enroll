@@ -134,7 +134,7 @@ module BenefitSponsors
       end
 
       def plan_design_organization
-        ::SponsoredBenefits::Organizations::PlanDesignOrganization.where(sponsor_profile_id: self.id, has_active_broker_relationship: true).first
+        ::SponsoredBenefits::Organizations::PlanDesignOrganization.where(sponsor_profile_id: id, has_active_broker_relationship: true).first
       end
 
       def staff_roles

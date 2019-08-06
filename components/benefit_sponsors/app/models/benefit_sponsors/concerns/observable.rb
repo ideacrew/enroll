@@ -10,7 +10,7 @@ module BenefitSponsors
               if args.present? && k.is_a?(args.options[:observer_klass] || BenefitSponsors::Observers::NoticeObserver)
                 k.send event, self, args
               elsif k.respond_to?(event) && ['EdiObserver','NoticeObserver'].exclude?(k.class.name.split('::').last)
-                # TODO REMOVE this else condition after observer pattern isolated to notice, edi observerd
+                # TODO: REMOVE this else condition after observer pattern isolated to notice, edi observerd
                 k.send event, self, args
               end
             end
