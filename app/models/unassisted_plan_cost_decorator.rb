@@ -63,6 +63,8 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def aptc_amount(member)
+    return 0.00 if @elected_aptc <= 0
+
     member_premium = premium_for(member)
     [all_members_aptc[member.applicant_id.to_s], member_premium * __getobj__.ehb].min
   end
