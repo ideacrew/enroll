@@ -61,7 +61,6 @@ module Admin
       protected
 
       def create_record(request)
-        binding.pry
         new_record = QualifyingLifeEventKind.create!(
           title: request.title,
           market_kind: request.market_kind,
