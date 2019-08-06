@@ -40,7 +40,7 @@
           <span for="qle_kind_creation_form_reason" class="col-sm-2 control-label">Reason </span>
           <div class="col-md-2" >        
             <select formControlName="reason" id="qle_kind_creation_form_reason">
-              <option  *ngFor="let reason of reasonList" [ngValue]="reason.code">
+              <option  *ngFor="let reason of reasonList" value="{{reason}}" [ngValue]="reason.code">
               {{reason.name}}
               </option>
             </select>
