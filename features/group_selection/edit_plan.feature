@@ -1,6 +1,6 @@
 Feature: Edit Plan Button
 
-  Background: 
+  Background:
     Given a consumer exists
     And the consumer is logged in
     And consumer has a dependent in child relationship with age greater than 26
@@ -22,7 +22,7 @@ Feature: Edit Plan Button
     When consumer clicks on the Cancel Plan button
     And consumer selects a date
     Then the submit button should be disabled
-  
+
   Scenario Outline: Submit button disabled with no date
     When consumer clicks on the edit plan button
     Then consumer should see the edit plan page
@@ -55,7 +55,7 @@ Feature: Edit Plan Button
       | employee |
 
   Scenario Outline: Consumer, EE with IVL coverage, or resident cancels plan
-    Given consumer has a <secondary_role> secondary role 
+    Given consumer has a <secondary_role> secondary role
     When consumer's health enrollment has an effective date in the future
     When consumer clicks on the edit plan button
     And consumer clicks on the Cancel Plan button
@@ -71,7 +71,7 @@ Feature: Edit Plan Button
       | resident |
       | employee |
 
-  Scenario Outline: Edit plan button visibility on IVL enrollment tiles 
+  Scenario Outline: Edit plan button visibility on IVL enrollment tiles
     Given consumer should see my account page
     And the enrollment is in <state> state
     Then the consumer <visibility> see the edit plan button
