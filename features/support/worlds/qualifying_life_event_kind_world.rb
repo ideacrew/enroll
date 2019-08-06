@@ -1,7 +1,10 @@
 module QualifyingLifeEventKindWorld
 
-def qualifying_life_event_kind(qle_kind_title = nil)
-    @site ||= FactoryBot.create(
+  def qualifying_life_event_kind(qle_kind_title = nil)
+    if QualifyingLifeEventKind.where(title: qle_kind_title).present?
+      return QualifyingLifeEventKind.where(title: qle_kind_title).first
+    end
+    @qle_kind ||= FactoryBot.create(
       :qualifying_life_event_kind,
       title: qle_kind_title.present? ? qle_kind_title : 'Married'
     )
@@ -32,6 +35,7 @@ def qualifying_life_event_kind(qle_kind_title = nil)
     when 'new'
       click_button('Create QLE Kind')
     when 'edit'
+    when 'deactivate'
     end
   end
 end
@@ -55,7 +59,13 @@ And(/^.+user visits the new Qualifying Life Event Kind page$/) do
   visit(manage_exchanges_qles_path)
 end
 
-And(/^.+ selects Create a Custom QLE and clicks submit$/) do
+And(/^.+user visits the deactivate Qualifying Life Event Kind page for (.*?) qualifying life event kind$/) do |qle_kind_title|
+  qle_kind = qualifying_life_event_kind(qle_kind_title)
+  visit(deactivate_exchanges_qle_path(qle_kind))
+end
+
+# TODO: Need to implement reusable step for edit and deactivate
+And(/^.+ selects Create a Custom QLE and clicks submit$/) do |which_action|
   choose('qle_wizard_new_qle_selected_radio')
   click_button('Submit')
 end
