@@ -61,7 +61,8 @@ module BenefitSponsors
 
         before do
           account.assign_attributes({
-            is_active: false
+            is_active: false,
+            end_on: TimeKeeper.date_of_record
           })
 
           subject.broker_hired?(account)

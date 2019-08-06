@@ -66,6 +66,7 @@ module BenefitSponsors
       include_context 'set up broker agency profile for BQT, by using configuration settings'
 
       let(:employer_profile) {plan_design_organization_with_assigned_ga.employer_profile}
+      let!(:update_plan_design) {plan_design_organization_with_assigned_ga.update_attributes!(has_active_broker_relationship: true)}
       let(:ga_legal_name) {plan_design_organization_with_assigned_ga.general_agency_profile.legal_name.to_s}
       let(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
       let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
