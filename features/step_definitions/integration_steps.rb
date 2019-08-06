@@ -617,9 +617,17 @@ And(/^.+ clicks the Manage QLE link$/) do
   click_link 'Manage QLEs'
 end
 
-Then(/^.+ should see the QLE Wizard$/) do
+Then(/^.+ should see the QLE Kind Wizard$/) do
   expect(page.current_path).to eq(manage_exchanges_qles_path)
   expect(page).to have_content("Manage Qualifying Life Events")
+end
+
+And(/^.+user visits the new Qualifying Life Event Kind page$/) do
+  visit(manage_exchanges_qles_path)
+end
+
+When(/^.+ fills out the new QLE Kind form for (.*?) event$/) do |new_event_name|
+
 end
 
 And(/^.+ clicks Confirm$/) do
