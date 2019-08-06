@@ -38,9 +38,7 @@ module Factories
     end
 
     def fetch_aptc_per_member
-      raise "Cannot process without #{@selected_aptc} and #{@product_ids}" if @selected_aptc.nil? || @product_ids.empty?
-
-      return @fetch_aptc_per_member if @fetch_aptc_per_member
+      raise "Cannot process without selected_aptc: #{@selected_aptc} and product_ids: #{@product_ids}" if @selected_aptc.nil? || @product_ids.empty?
 
       @product_ids.inject({}) do |member_hash, product_id|
         member_hash[product_id] = all_members_aptc(product_id)
