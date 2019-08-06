@@ -7,7 +7,7 @@ RSpec.describe Services::IvlEnrollmentService, type: :model, :dbclean => :after_
   let(:person) { FactoryBot.create(:person, :with_consumer_role)}
   let!(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person, e_case_id: nil)}
   let!(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, family: family, household: family.households.first, kind: "individual", is_any_enrollment_member_outstanding: true, aasm_state: "coverage_selected", applied_aptc_amount: 0.0)}
-  let!(:hbx_enrollment_member) {FactoryBot.create(:hbx_enrollment_member,hbx_enrollment: hbx_enrollment, applicant_id: family.family_members.first.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record.prev_month )}
+  let!(:hbx_enrollment_member) {FactoryBot.create(:hbx_enrollment_member,hbx_enrollment: hbx_enrollment, applicant_id: family.family_members.first.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record.prev_month)}
 
   subject do
     Services::IvlEnrollmentService.new
