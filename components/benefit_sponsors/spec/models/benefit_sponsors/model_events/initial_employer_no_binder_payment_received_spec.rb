@@ -13,12 +13,12 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerNoBinderPaymentRece
 
   let(:start_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }
   let(:current_effective_date) { start_on }
-  let(:aasm_state) { :enrollment_ineligible }
+  let(:aasm_state) { :enrollment_closed }
   let(:benefit_sponsorship_state) { :initial_enrollment_ineligible }
   let(:employer_profile) { abc_profile }
   let(:benefit_application) { initial_application }
-
-  let!(:date_mock_object) { BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new.calculate_open_enrollment_date(TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date].next_day }
+  let(:dc_date_mock_object) { double("Date", day: Settings.aca.shop_market.initial_application.non_binder_paid_notice_day_of_month)}
+  let(:cca_date_mock_object) { BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new.calculate_open_enrollment_date(TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date].next_day }
   let!(:person) { FactoryBot.create(:person, :with_family) }
   let!(:census_employee)  { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile ) }
   let!(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: employer_profile, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: employer_profile.id)}
@@ -39,7 +39,11 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerNoBinderPaymentRece
           expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
         end
       end
-      BenefitSponsors::BenefitApplications::BenefitApplication.date_change_event(date_mock_object)
+      if Settings.site.key == :dc
+        BenefitSponsors::BenefitApplications::BenefitApplication.date_change_event(dc_date_mock_object)
+      elsif Settings.site.key == :cca
+        BenefitSponsors::BenefitApplications::BenefitApplication.date_change_event(cca_date_mock_object)
+      end
     end
   end
 
@@ -93,7 +97,11 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerNoBinderPaymentRece
     before do
       allow(subject).to receive(:resource).and_return(employee_role)
       allow(subject).to receive(:payload).and_return(payload)
-      BenefitSponsors::BenefitApplications::BenefitApplication.date_change_event(date_mock_object)
+      if Settings.site.key == :dc
+        BenefitSponsors::BenefitApplications::BenefitApplication.date_change_event(dc_date_mock_object)
+      elsif Settings.site.key == :cca
+        BenefitSponsors::BenefitApplications::BenefitApplication.date_change_event(cca_date_mock_object)
+      end
     end
 
     it "should return merge model" do
@@ -147,7 +155,11 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerNoBinderPaymentRece
     before do
       allow(subject).to receive(:resource).and_return(employer_profile)
       allow(subject).to receive(:payload).and_return(payload)
-      BenefitSponsors::BenefitApplications::BenefitApplication.date_change_event(date_mock_object)
+      if Settings.site.key == :dc
+        BenefitSponsors::BenefitApplications::BenefitApplication.date_change_event(dc_date_mock_object)
+      elsif Settings.site.key == :cca
+        BenefitSponsors::BenefitApplications::BenefitApplication.date_change_event(cca_date_mock_object)
+      end
     end
 
     it "should return merge model" do
@@ -175,7 +187,8 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerNoBinderPaymentRece
     end
 
     it "should return binder payment due date" do
-      expect(merge_model.benefit_application.binder_payment_due_date).to eq date_mock_object.prev_day.strftime('%m/%d/%Y')
+      date_mock_object = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new.calculate_open_enrollment_date(TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date]
+      expect(merge_model.benefit_application.binder_payment_due_date).to eq date_mock_object.strftime('%m/%d/%Y')
     end
 
     it "should return broker" do
