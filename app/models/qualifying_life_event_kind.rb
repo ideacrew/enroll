@@ -140,6 +140,7 @@ class QualifyingLifeEventKind
   # At the moment, setting 'end on' is how they are deactivated.
   scope :not_set_for_deactivation, ->{ where(end_on: nil).sort_by_title_alphabetical }
   scope :sort_by_title_alphabetical, ->{ order('title ASC') }
+  scope :by_market_kind, ->(market_kind){ where(market_kind: market_kind) }
   scope :is_visible_to_customer, -> { where(visible_to_customer: true) }
 
   # Business rules for EmployeeGainingMedicare
