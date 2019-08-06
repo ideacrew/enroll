@@ -15,6 +15,8 @@ Feature: As an HBX Admin User I can access the QLE Wizard management wizard
     Given all permissions are present
     And that a user with a HBX staff role with HBX staff subrole exists and is logged in
     And the user visits the new Qualifying Life Event Kind page
+    And the user selects Create a Custom QLE and clicks submit
     When the user fills out the new QLE Kind form for Got a New Dog event
-    And the user clicks submit
+    And user clicks Create QLE Kind button
     Then user should see a message that a new QLE Kind has been created Got a New Dog event
+
