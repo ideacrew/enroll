@@ -613,6 +613,15 @@ And(/^.+ sees the (.*) page and clicks Continue$/) do |which_page|
   continue.click
 end
 
+And(/^.+ clicks the Manage QLE link$/) do
+  click_link 'Manage QLEs'
+end
+
+Then(/^.+ should see the QLE Wizard$/) do
+  expect(page.current_path).to eq(manage_exchanges_qles_path)
+  expect(page).to have_content("Manage Qualifying Life Events")
+end
+
 And(/^.+ clicks Confirm$/) do
   find_link('Confirm', wait: 10)
   click_link 'Confirm'
