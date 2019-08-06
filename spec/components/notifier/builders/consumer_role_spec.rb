@@ -17,7 +17,7 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
                            "primary_member" => data.detect{ |m| m["dependent"].casecmp('NO').zero? }.to_hash}}
     end
 
-    let!(:person) { FactoryBot.create(:person, :with_consumer_role, hbx_id: "a16f4029916445fcab3dbc44bb7aadd0", first_name: "Test", last_name: "Data") }
+    let!(:person) { FactoryBot.create(:person, :with_consumer_role, hbx_id: "a16f4029916445fcab3dbc44bb7aadd0", first_name: "Test", last_name: "Data", middle_name: "M", name_sfx: "Jr") }
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
 
     subject do
@@ -34,6 +34,10 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
 
       it "should have last name from payload" do
         expect(subject.last_name).to eq(payload["notice_params"]["primary_member"]["last_name"])
+      end
+
+      it "should have full name from payload" do
+        expect(subject.primary_fullname).to eq(person.full_name)
       end
 
       it "should have aptc from payload" do
