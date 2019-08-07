@@ -402,11 +402,9 @@ module BenefitSponsors
         deactivate_benefit_group_assignments
 
         enrolled_families.each do |family|
-          enrollments = HbxEnrollment.by_benefit_package(self).enrolled_and_waived
-
-          sponsored_benefits.each do |sponsored_benefit|
-            hbx_enrollment = enrollments.by_coverage_kind(sponsored_benefit.product_kind).first
-            if hbx_enrollment&.may_cancel_coverage?
+          enrollments = HbxEnrollment.by_benefit_package(self).where(family_id: family.id).show_enrollments_sans_canceled
+          enrollments.each do |hbx_enrollment|
+            if hbx_enrollment.may_cancel_coverage?
               if hbx_enrollment.inactive?
                 hbx_enrollment.cancel_coverage!
               else
