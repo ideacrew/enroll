@@ -27,4 +27,12 @@ module Config::AcaHelper
   def show_termination_reasons?
     Settings.aca.shop_market.mid_month_benefit_application_terminations.show_termination_reasons
   end
+
+  def plan_match_tool_is_enabled?
+    Settings.aca.plan_match_tool
+  end
+
+  def aca_shop_market_census_employees_template_file
+    @aca_shop_market_census_employees_template_file ||= Settings.aca.shop_market.census_employees_template_file
+  end
 end

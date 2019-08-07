@@ -5,7 +5,7 @@ module BenefitSponsors
 
         include Config::AcaHelper
 
-        before_action :find_employer, only: [:show, :inbox, :bulk_employee_upload, :export_census_employees, :show_invoice, :coverage_reports, :download_invoice]
+        before_action :find_employer, only: [:show, :inbox, :bulk_employee_upload, :export_census_employees, :show_invoice, :coverage_reports, :download_invoice, :terminate_employee_roster_enrollments]
         before_action :load_group_enrollments, only: [:coverage_reports], if: :is_format_csv?
         before_action :check_and_download_invoice, only: [:download_invoice, :show_invoice]
         before_action :wells_fargo_sso, only: [:show]
@@ -163,6 +163,23 @@ module BenefitSponsors
         def generate_sic_tree
           sic_tree = SicCode.generate_sic_array
           render :json => sic_tree
+        end
+
+        def term_roster_enrollments_params
+          params.permit(:employer_profile_id, :termination_date, :termination_reason, :transmit_xml)
+        end
+
+        def terminate_employee_roster_enrollments
+          authorize @employer_profile, :can_modify_employer?
+
+          if @employer_profile.active_benefit_application.present?
+            @employer_profile.terminate_roster_enrollments(term_roster_enrollments_params)
+            flash[:notice] = "Successfully terminated employee enrollments."
+          else
+            flash[:error] = "No Active Plan Year present, unable to terminate employee enrollments."
+          end
+
+          redirect_to profiles_employers_employer_profile_path(@employer_profile) + "?tab=employees"
         end
 
         private
