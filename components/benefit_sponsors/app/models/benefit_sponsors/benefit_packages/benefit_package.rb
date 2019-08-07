@@ -394,7 +394,7 @@ module BenefitSponsors
         deactivate_benefit_group_assignments
 
         enrolled_families.each do |family|
-          enrollments = family.hbx_enrollments.show_enrollments_sans_canceled.by_benefit_package(self)
+          enrollments = HbxEnrollment.by_benefit_package(self).where(family_id: family.id).show_enrollments_sans_canceled
           enrollments.each do |hbx_enrollment|
             if hbx_enrollment.may_cancel_coverage?
               if hbx_enrollment.inactive?

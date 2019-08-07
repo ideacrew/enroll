@@ -695,6 +695,57 @@ module BenefitSponsors
       end
     end
 
+    describe '.cancel_member_benefits', :dbclean => :after_each do
+
+      include_context "setup renewal application"
+
+      let(:benefit_group_assignment) {FactoryBot.build(:benefit_group_assignment, benefit_group: benefit_package)}
+      let(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: benefit_sponsorship.profile, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: abc_profile.id) }
+      let(:census_employee) { FactoryBot.create(:census_employee, employer_profile: benefit_sponsorship.profile, benefit_sponsorship: benefit_sponsorship, benefit_group_assignments: [benefit_group_assignment]) }
+      let(:person)       { FactoryBot.create(:person, :with_family) }
+      let!(:family)       { person.primary_family }
+      let!(:hbx_enrollment) do
+        hbx_enrollment =
+          FactoryBot.create(
+            :hbx_enrollment,
+            :with_enrollment_members,
+            :with_product,
+            family: family,
+            household: family.active_household,
+            aasm_state: enr_state,
+            effective_on: renewal_application.start_on,
+            rating_area_id: renewal_application.recorded_rating_area_id,
+            sponsored_benefit_id: renewal_application.benefit_packages.first.health_sponsored_benefit.id,
+            sponsored_benefit_package_id: benefit_package.id,
+            benefit_sponsorship_id: renewal_application.benefit_sponsorship.id,
+            employee_role_id: employee_role.id
+          )
+        hbx_enrollment.benefit_sponsorship = benefit_sponsorship
+        hbx_enrollment.save!
+        hbx_enrollment
+      end
+
+      context "when enrollment is in auto renewing state" do
+        let(:enr_state) {"auto_renewing"}
+
+        it "should move auto renewing enrollment to coverage enrolled state" do
+          expect(hbx_enrollment.aasm_state).to eq "auto_renewing"
+          benefit_package.cancel_member_benefits
+          expect(hbx_enrollment.reload.aasm_state).to eq "coverage_canceled"
+        end
+      end
+
+      context "when enrollment is in coverage selected state state" do
+        let(:enr_state) {"coverage_selected"}
+
+        it "should move auto renewing enrollment to coverage enrolled state" do
+          expect(hbx_enrollment.aasm_state).to eq "coverage_selected"
+          benefit_package.cancel_member_benefits
+          expect(hbx_enrollment.reload.aasm_state).to eq "coverage_canceled"
+        end
+      end
+    end
+
     describe '.terminate_member_benefits', :dbclean => :after_each do
 
       include_context "setup initial benefit application" do
