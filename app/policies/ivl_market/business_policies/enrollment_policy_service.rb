@@ -14,7 +14,6 @@ module IvlMarket
       def apply_policies
         @policies.each do |policy|
           policy = PoliciesContainer[policy]
-          binding.pry
           @policies_applied << policy.execute(enrollment)
         end
         @policies_applied
