@@ -30,8 +30,8 @@ module RuleSet
 
     def business_policies_for(product, event_name)
       return unless product.is_a?(::BenefitMarkets::Products::Product)
-
       business_policies[event_name]
     end
   end
 end
+
