@@ -9,16 +9,18 @@ RSpec.describe TaxHouseholdMember, type: :model do
   let!(:eligibility_kinds2) {{"is_ia_eligible" => "true", "is_medicaid_chip_eligible" => "false"}}
   let!(:eligibility_kinds3) {{"is_ia_eligible" => "false", "is_medicaid_chip_eligible" => "false"}}
 
-  context 'validations' do
-    context 'strictly_one_pdc_only' do
-      it { expect(tax_household_member1.save).to eq false }
-
-      it 'should return error messages' do
-        tax_household_member1.valid?
-        expect(tax_household_member1.errors.full_messages).to include('only one of the all pdcs types should be applicable')
-      end
-    end
-  end
+  # Validation introduced in new model intergration
+  # Disabled as per the reference ticket: 43583
+  # context 'validations' do
+  #   context 'strictly_one_pdc_only' do
+  #     it { expect(tax_household_member1.save).to eq false }
+  #
+  #     it 'should return error messages' do
+  #       tax_household_member1.valid?
+  #       expect(tax_household_member1.errors.full_messages).to include('only one of the all pdcs types should be applicable')
+  #     end
+  #   end
+  # end
 
   context "update_eligibility_kinds" do
     it "should not update and return false when trying to update both the eligibility_kinds as true" do

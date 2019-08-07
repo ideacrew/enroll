@@ -17,7 +17,9 @@ class TaxHouseholdMember
   field :is_subscriber, type: Boolean, default: false
   field :reason, type: String
 
-  validate :strictly_boolean, :strictly_one_pdc_only
+  # Validation :strictly_one_pdc_only introduced in new model intergration
+  # Disabled as per the reference ticket: 43583
+  validate :strictly_boolean #, :strictly_one_pdc_only
 
   alias_method :family_member_id, :applicant_id
 
@@ -71,10 +73,12 @@ class TaxHouseholdMember
     end
   end
 
-  def strictly_one_pdc_only
-    pdc_values = [is_ia_eligible, is_medicaid_chip_eligible, is_totally_ineligible, is_uqhp_eligible]
-    errors.add(:base, "only one of the all pdcs types should be applicable") unless pdc_values.count(true) == 1
-  end
+  # Validation introduced in new model intergration
+  # Disabled as per the reference ticket: 43583
+  # def strictly_one_pdc_only
+  #   pdc_values = [is_ia_eligible, is_medicaid_chip_eligible, is_totally_ineligible, is_uqhp_eligible]
+  #   errors.add(:base, "only one of the all pdcs types should be applicable") unless pdc_values.count(true) == 1
+  # end
 
   def person
     return @person unless @person.blank?
