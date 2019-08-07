@@ -66,7 +66,6 @@ module BenefitSponsors
           coverage_age = age_calculator.calc_coverage_age_for(rm, roster_coverage.product, roster_coverage.coverage_start_on, coverage_eligibility_dates, roster_coverage.previous_product)
           if coverage_age >= 26 && rm.relationship == "child"
             rm.relationship = "ward"
-            rm.is_disabled = true
           end
         end
         sorted_members = roster_entry.members.sort_by do |rm|
