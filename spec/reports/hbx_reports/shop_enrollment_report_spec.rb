@@ -6,8 +6,6 @@ describe ShopEnrollmentReport do
   subject { ShopEnrollmentReport.new("shop_enrollment_report", double(:current_scope => nil)) }
 
   before(:each) do
-    # allow(ENV).to receive(:[]).with("purchase_date_start").and_return('06/01/2018')
-    # allow(ENV).to receive(:[]).with("purchase_date_end").and_return('06/10/2018')
     subject.migrate
     @file = "#{Rails.root}/hbx_report/shop_enrollment_report.csv"
   end
