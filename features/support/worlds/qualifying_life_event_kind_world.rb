@@ -1,8 +1,9 @@
 module QualifyingLifeEventKindWorld
 
   def qualifying_life_event_kind(qle_kind_title = nil)
-    if QualifyingLifeEventKind.where(title: qle_kind_title).present?
-      return QualifyingLifeEventKind.where(title: qle_kind_title).first
+    qle_kind = QualifyingLifeEventKind.where(title: qle_kind_title)
+    if qle_kind.present?
+      return qle_kind.first
     end
     @qle_kind ||= FactoryBot.create(
       :qualifying_life_event_kind,
@@ -59,15 +60,35 @@ And(/^.+user visits the new Qualifying Life Event Kind page$/) do
   visit(manage_exchanges_qles_path)
 end
 
-And(/^.+user visits the deactivate Qualifying Life Event Kind page for (.*?) qualifying life event kind$/) do |qle_kind_title|
+And(/^.+ visits the (.*?) Qualifying Life Event Kind page for (.*?) QLE Kind$/) do |which_action, qle_kind_title|
   qle_kind = qualifying_life_event_kind(qle_kind_title)
-  visit(deactivate_exchanges_qle_path(qle_kind))
+  case which_action
+  when 'deactivate'
+    visit(deactivate_form_exchanges_qle_path(qle_kind))
+  when 'edit'
+    visit(edit_exchanges_qle_path(qle_kind))
+  end
 end
 
 # TODO: Need to implement reusable step for edit and deactivate
-And(/^.+ selects Create a Custom QLE and clicks submit$/) do |which_action|
-  choose('qle_wizard_new_qle_selected_radio')
-  click_button('Submit')
+And(/^.+ selects (.*?) and clicks submit$/) do |which_action|
+  case which_action
+  when 'Create a Custom QLE'
+    choose('qle_wizard_new_qle_selected_radio')
+    click_button('Submit')
+  when 'Modify Existing QLE, Market Kind, and first QLE Kind'
+    choose('qle_wizard_modify_qle_selected_radio')
+    choose('qle_wizard_kind_selected_radio_category_shop')
+    first_qle_kind = QualifyingLifeEventKind.first
+    first_qle_kind_option_value = deactivation_form_exchanges_qle_path(first_qle_kind._id)
+    options = page.all('option')
+    first_qle_kind_option = options.detect { |option| option[:value] == first_qle_kind_option_value }
+    first_qle_kind_option.click
+    click_button('Submit')
+  when 'Deactivate Active QLE, Market Kind, and first QLE Kind'
+    choose('qle_wizard_deactivate_qle_selected_radio')
+    click_button('Submit')
+  end
 end
 
 When(/^.+ fills out the (.*?) QLE Kind form for (.*?) event and clicks submit$/) do |action_name, qle_kind_title|
