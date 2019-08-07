@@ -167,4 +167,7 @@ class User
       raise e
     end
   end
+  def get_announcements_by_roles_and_portal(portal_path="")
+    []
+  end
 end

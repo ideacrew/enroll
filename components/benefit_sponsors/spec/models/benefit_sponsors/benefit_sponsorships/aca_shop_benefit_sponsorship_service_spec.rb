@@ -85,10 +85,19 @@ module BenefitSponsors
     #   end
     # end
 
-    describe '.auto_cancel_enrollment_closed' do
+    describe '.auto_cancel_enrollment_closed', dbclean: :after_each do
       let(:sponsorship_state)               { :applicant }
       let(:initial_application_state)       { :enrollment_closed }
       let(:renewal_application_state)       { :enrollment_closed }
+      let(:application_effective_date)      { april_sponsors.first.benefit_applications.first.effective_period.min }
+
+      before do
+        TimeKeeper.set_date_of_record_unprotected!(application_effective_date)
+      end
+
+      after do
+        TimeKeeper.set_date_of_record_unprotected!(Time.zone.today)
+      end
 
       context  'when initial employer missed binder payment' do 
 
