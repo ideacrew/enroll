@@ -238,7 +238,7 @@ module BenefitSponsors
         end
 
         it "should get an error" do
-          expect(flash[:error]).to match /Role was not deactivated because Please add another staff role before deleting this role/
+          expect(flash[:error]).to match(/Please add another staff role before deleting this role/)
         end
       end
     end
