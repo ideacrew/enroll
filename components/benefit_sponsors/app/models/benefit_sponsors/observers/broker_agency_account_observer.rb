@@ -20,15 +20,14 @@ module BenefitSponsors
 
       def broker_fired?(account, options={})
         return unless account.persisted? && account.changed? && account.changed_attributes.include?("end_on") && account.benefit_sponsorship.present?
-          profile = account.benefit_sponsorship.profile
-          notify(
-            "acapi.info.events.employer.broker_terminated",
-            {
-              employer_id: profile.hbx_id,
-              event_name: "broker_terminated"
-            }
-          )
-        end
+        profile = account.benefit_sponsorship.profile
+        notify(
+          "acapi.info.events.employer.broker_terminated",
+          {
+            employer_id: profile.hbx_id,
+            event_name: "broker_terminated"
+          }
+        )
       end
 
       private
