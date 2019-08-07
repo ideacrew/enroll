@@ -683,14 +683,15 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
     let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
     let!(:person1) { FactoryGirl.create(:person, :with_consumer_role) }
-    let(:family) {FactoryGirl.create(:family, :with_primary_family_member, person: person1) }
+    let!(:family1) {FactoryGirl.create(:family, :with_primary_family_member, person: person1) }
+    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
     let(:user) { double("user", :person => person, :has_hbx_staff_role? => true) }
     let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person)}
     let(:hbx_profile) { FactoryGirl.create(:hbx_profile)}
     let(:permission_yes) { FactoryGirl.create(:permission, :can_update_ssn => true)}
     let(:permission_no) { FactoryGirl.create(:permission, :can_update_ssn => false)}
-    let(:invalid_ssn) { "234-45-839" }
-    let(:valid_ssn) { "234-45-8390" }
+    let(:invalid_ssn) { "23445839" }
+    let(:valid_ssn) { "234458390" }
     let(:valid_dob) { "03/17/1987" }
 
     it "should render back to edit_enrollment if there is a validation error on save" do
