@@ -49,10 +49,6 @@ attributes: !ruby/hash:BSON::Document
     age_comparison: :>=
     disability_qualifier: true
     relationship_kinds:
-    - child
-    - adopted_child
-    - foster_child
-    - stepchild
     - ward
   pricing_units:
   - !ruby/hash:BSON::Document
