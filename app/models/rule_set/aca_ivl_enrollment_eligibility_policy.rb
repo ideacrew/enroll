@@ -5,6 +5,7 @@ module RuleSet
     include ::BenefitMarkets::BusinessRulesEngine
 
     VALID_MARKET_KIND = 'individual'
+    APTC_INELIGIBLE_ENROLLMENT_STATES = ::HbxEnrollment::CANCELED_STATUSES + ::HbxEnrollment::TERMINATED_STATUSES
 
     rule :any_member_aptc_eligible,
          validate: lambda { |enrollment|
@@ -27,6 +28,10 @@ module RuleSet
          success: ->(_enrollment){ 'validated successfully' },
          fail: ->(_enrollment){ 'One of the shopping members are ineligible for CSR' }
 
+    rule :valid_state,
+         validate: ->(enrollment){ APTC_INELIGIBLE_ENROLLMENT_STATES.exclude?(enrollment.aasm_state) },
+         success: ->(_enrollment) { 'validated successfully' },
+         fail: ->(enrollment) { "Aasm state of given enrollment is #{enrollment.aasm_state} which is an invalid state" }
 
     business_policy :apply_aptc,
                     rules: [:market_kind_eligiblity,
@@ -34,6 +39,9 @@ module RuleSet
 
     business_policy :apply_csr,
                     rules: [:any_member_csr_ineligible]
+
+    business_policy :edit_aptc,
+                    rules: [:valid_state]
 
     def business_policies_for(enrollment, event_name)
       return unless enrollment.is_a?(::HbxEnrollment)
@@ -43,6 +51,8 @@ module RuleSet
         business_policies[:apply_aptc]
       when :apply_csr
         business_policies[:apply_csr]
+      when :edit_aptc_on_enrollment
+        business_policies[:edit_aptc]
       end
     end
   end

@@ -139,5 +139,61 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
       end
     end
+
+    context 'edit_aptc' do
+      include_context 'setup families enrollments'
+
+      context 'for success case' do
+        before :each do
+          enrollment_assisted.update_attributes(aasm_state: 'coverage_selected')
+          @business_policy = subject.business_policies_for(enrollment_assisted, :edit_aptc_on_enrollment)
+        end
+
+        it 'should return true when validated' do
+          expect(@business_policy.is_satisfied?(enrollment_assisted)).to be_truthy
+        end
+
+        it 'should not return any fail results' do
+          expect(@business_policy.fail_results).to be_empty
+        end
+
+        it 'should return all rules in success_results' do
+          expect(@business_policy.success_results.keys).to eq @business_policy.rules.map(&:name)
+          expect(@business_policy.success_results.values.uniq).to eq ['validated successfully']
+        end
+      end
+
+      context 'for failure cases' do
+        before :each do
+          enrollment_assisted.update_attributes(aasm_state: 'coverage_canceled')
+          @business_policy = subject.business_policies_for(enrollment_assisted, :edit_aptc_on_enrollment)
+        end
+
+        it 'should return true when validated' do
+          expect(@business_policy.is_satisfied?(enrollment_assisted)).to be_falsy
+        end
+
+        it 'should return fail results' do
+          expect(@business_policy.fail_results.keys).to eq [:valid_state]
+          expect(@business_policy.fail_results.values).to eq ["Aasm state of given enrollment is #{enrollment_assisted.aasm_state} which is an invalid state"]
+        end
+
+        it 'should not return all keys in the success results' do
+          expect(@business_policy.success_results.keys).not_to eq @business_policy.rules.map(&:name)
+        end
+      end
+
+      context 'for invalid inputs' do
+        it 'should return not return any business_policy when invalid data is sent' do
+          @business_policy = subject.business_policies_for('bad object', :edit_aptc_on_enrollment)
+          expect(@business_policy).to be_nil
+        end
+
+        it 'should return not return any business_policy when invalid data is sent' do
+          @business_policy = subject.business_policies_for(enrollment_unassisted, 'invalid_case')
+          expect(@business_policy).to be_nil
+        end
+      end
+    end
   end
 end
