@@ -36,4 +36,4 @@ Feature: As an HBX Admin User I can access the QLE Wizard management wizard
     # TODO: Should test the wizard redirecting here.
     # See above comment about selecting market kind
     When the user fills out the deactivate QLE Kind form for Got a New Dog event and clicks submit
-    Then user should see a message that a new QLE Kind has been created Got a New Dog event
+    # Then user should see a message that a new QLE Kind has been created Got a New Dog event

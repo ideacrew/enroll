@@ -21,7 +21,7 @@ module QualifyingLifeEventKindWorld
       button_text = 'Update QLE Kind'
     when 'deactivate'
       # TODO: Fill out buttons and text
-      form_name = nil
+      form_name = "deactivation_form"
       button_text = nil
     end
     if %w[creation_form edit_form].include?(form_name)
@@ -43,12 +43,14 @@ module QualifyingLifeEventKindWorld
       is_self_attested_radio.click
       fill_in("qle_kind_#{form_name}_pre_event_sep_eligibility", with: '10')
       fill_in("qle_kind_#{form_name}_post_event_sep_eligibility", with: '10')
-      fill_in("qle_kind_#{form_name}_start_on", with: '10/10/2020')
-      fill_in("qle_kind_#{form_name}_end_on", with: '10/20/2030')
+      fill_in("qle_kind_#{form_name}_start_on", with: '10/10/2030')
+      fill_in("qle_kind_#{form_name}_end_on", with: '10/20/2040')
       click_button(button_text)
     elsif form_name == 'deactivate'
       # TODO: Fill out deactivate form
       # TODO: Click deactivation button
+      fill_in("qle_kind_#{form_name}_end_on", with: '10/10/2030')
+      binding.pry
     end
   end
 
