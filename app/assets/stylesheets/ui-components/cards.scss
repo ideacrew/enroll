@@ -681,3 +681,17 @@
   text-align: center;
 }
 
+#submitBenefitPackage {
+  position: relative;
+  box-sizing: border-box;
+}
+
+.benefit-properties {
+  .tool-tip {
+    display: inline-block;
+  }
+
+  .tool-tip [disabled] {
+    pointer-events: none;
+  }
+}

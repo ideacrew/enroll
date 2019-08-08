@@ -14,6 +14,7 @@ module BenefitSponsors
       attribute :parent, BenefitSponsors::Forms::BenefitApplicationForm
       attribute :probation_period_display_name, String
       attribute :has_dental_sponsored_benefits, Boolean
+      attribute :previous_bp_titles, Array
 
       attribute :is_new_package, Boolean
 

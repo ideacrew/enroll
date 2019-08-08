@@ -12,7 +12,7 @@ h1.heading-text Benefit Package - Set Up
   .plan-title#uic-wrapper
     .row.row-form-wrapper
       - title_value = f.object.title.present? ? f.object.title : "#{TimeKeeper.date_of_record.year} Employer Benefits"
-      = f.text_field :title, class: "form-control", placeholder:'My Benefit Package', required: true
+      = f.text_field :title, class: "form-control", placeholder:'My Benefit Package', onchange: 'validateTitle()', id: 'benefitPackageTitle', required: true
     .row.row-form-wrapper
       = f.text_field :description, class: "form-control", placeholder:'My Description'
     .row.row-form-wrapper
@@ -24,13 +24,30 @@ h1.heading-text Benefit Package - Set Up
   - if f.object.is_dental_products_available?
     button.btn.btn-default.ml-1#dentalBenefits type="submit" name="#{action}_dental_benefits" value="true" #{action.humanize} Dental Benefits
   / button.btn.btn-default#editDentalBenefits type="submit" name="edit_dental_benefits" value="true" Edit Dental Benefits
-  button.btn.btn-primary#submitBenefitPackage type="submit" name="add_new_benefit_package" value="false" class="pull-right" Create Plan Year
+  span.tool-tip.pull-right data-toggle="tooltip" data-placement="top"
+    button.btn.btn-primary.submit-benefit-package#submitBenefitPackage type="submit" name="add_new_benefit_package" value="false" Create Plan Year
 
 
   = link_to 'Cancel', profiles_employers_employer_profile_path(@benefit_package_form.service.employer_profile, :tab=>'benefits'), :class => 'btn btn-default pull-right mr-1', id:'cancelBenefitPackage'
 
 javascript:
   var disableSelectric = false;
+
+  function validateTitle() {
+    var new_title = document.getElementById("benefitPackageTitle").value
+    previousBPTitles = "#{@benefit_package_form.previous_bp_titles}"
+
+    $('[data-toggle="tooltip"]').tooltip()
+
+    if (previousBPTitles.includes(new_title)) {
+      document.getElementById("submitBenefitPackage").classList.add('disabled')
+      $('.benefit-properties span.tool-tip').attr('data-original-title', 'Before you can save, each benefit group must have a unique title.');
+    }
+    else {
+      $('.benefit-properties span.tool-tip').attr('data-original-title', '')
+      document.getElementById("submitBenefitPackage").classList.remove('disabled')
+    }
+  }
 
 - if is_new_package || is_new_package.nil?
   javascript:
