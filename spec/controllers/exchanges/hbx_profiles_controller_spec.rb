@@ -373,7 +373,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     end
   end
 
-   describe "GET edit_force_publish" do
+  describe "GET edit_force_publish", :dbclean => :around_each do
 
     context "of an hbx super admin clicks Force Publish" do
       let(:site) do
@@ -729,6 +729,195 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     end
   end
 
+  describe "POST reinstate_enrollment", :dbclean => :around_each do
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup initial benefit application"
+    include_context "setup employees with benefits"
+
+    let(:user) { FactoryGirl.create(:user, roles: ["hbx_staff"]) }
+    let!(:person) { FactoryGirl.create(:person)}
+    let(:current_effective_date)  { TimeKeeper.date_of_record }
+    let(:benefit_market)      { site.benefit_markets.first }
+
+    let(:issuer_profile)  { FactoryGirl.create :benefit_sponsors_organizations_issuer_profile, assigned_site: site}
+    let(:product_package_kind) { :single_product}
+    let!(:product_package) { current_benefit_market_catalog.product_packages.where(package_kind: product_package_kind).first }
+    let(:product) { product_package.products.first }
+
+    # let!(:employer_profile) {benefit_sponsorship.profile}
+    # let!(:initial_application) { create(:benefit_sponsors_benefit_application, benefit_sponsor_catalog: benefit_sponsor_catalog, effective_period: effective_period,benefit_sponsorship:benefit_sponsorship, aasm_state: :active) }
+    let(:product_package)           { initial_application.benefit_sponsor_catalog.product_packages.detect { |package| package.package_kind == package_kind } }
+    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+    # let!(:household) { FactoryGirl.create(:household, family: family) }
+    # let!(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    # let!(:benefit_market)      { site.benefit_markets.first }
+    # let!(:organization)        { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+    # let!(:employer_profile)    { organization.employer_profile }
+    # let(:benefit_sponsor)        { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile_initial_application, site: site) }
+    # let(:benefit_sponsorship)    { benefit_sponsor.active_benefit_sponsorship }
+    # let(:benefit_application)    { benefit_sponsorship.benefit_applications.first }
+    let(:benefit_package)    { initial_application.benefit_packages.first }
+    # let(:benefit_group_assignment) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_package)}
+
+    let!(:enrollment) { family.active_household.hbx_enrollments.create!(
+                        household: family.active_household,
+                        coverage_kind: "health",
+                        product:product,
+                        effective_on: TimeKeeper.date_of_record.last_month.beginning_of_month,
+                        aasm_state: 'coverage_termination_pending',
+                        kind:"employer_sponsored",
+                        benefit_sponsorship: benefit_sponsorship,
+                        sponsored_benefit_package: benefit_package,
+                        terminated_on: TimeKeeper.date_of_record.end_of_month,
+      )}
+
+    before :each do
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      sign_in user
+    end
+
+    it "should redirect to root path" do
+      xhr :post, :reinstate_enrollment, enrollment_id: enrollment.id
+      expect(response).to have_http_status(:redirect)
+      expect(response).to redirect_to(exchanges_hbx_profiles_root_path)
+    end
+  end
+
+  describe "POST view_enrollment_to_update_end_date", :dbclean => :around_each do
+    let(:user) { FactoryGirl.create(:user, roles: ["hbx_staff"]) }
+    let!(:person) { FactoryGirl.create(:person)}
+    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+    let!(:household) { FactoryGirl.create(:household, family: family) }
+    let!(:enrollment) {
+      FactoryGirl.create(:hbx_enrollment,
+                         household: family.active_household,
+                         coverage_kind: "health",
+                         effective_on: TimeKeeper.date_of_record.last_month.beginning_of_month,
+                         aasm_state: 'coverage_termination_pending'
+      )}
+
+    before :each do
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      sign_in user
+    end
+
+    it "should render template" do
+      xhr :post, :view_enrollment_to_update_end_date, person_id: person.id.to_s, family_actions_id: family.id, format: :js
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template("view_enrollment_to_update_end_date")
+    end
+  end
+
+  describe "POST update_enrollment_termianted_on_date", :dbclean => :around_each do
+    let(:user) { FactoryGirl.create(:user, roles: ["hbx_staff"]) }
+    let!(:person) { FactoryGirl.create(:person)}
+    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+    let!(:household) { FactoryGirl.create(:household, family: family) }
+    let!(:enrollment) {
+      FactoryGirl.create(:hbx_enrollment,
+                         household: family.active_household,
+                         coverage_kind: "health",
+                         kind: 'employer_sponsored',
+                         effective_on: TimeKeeper.date_of_record.last_month.beginning_of_month,
+                         terminated_on: TimeKeeper.date_of_record.end_of_month,
+                         aasm_state: 'coverage_termination_pending'
+      )}
+    let!(:glue_event_queue_name) { "#{Rails.application.config.acapi.hbx_id}.#{Rails.application.config.acapi.environment_name}.q.glue.enrollment_event_batch_handler" }
+
+
+    before :each do
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      sign_in user
+    end
+
+    context "shop enrollment" do
+      context "with valid params" do
+
+        it "should render template " do
+          xhr :post, :update_enrollment_termianted_on_date, enrollment_id: enrollment.id.to_s, family_actions_id: family.id, new_termination_date: TimeKeeper.date_of_record.to_s, format: :js
+          expect(response).to have_http_status(:redirect)
+          expect(response).to redirect_to(exchanges_hbx_profiles_root_path)
+        end
+
+        context "enrollment that already terminated with past date" do
+          context "with new past or current termination date" do
+            it "should update enrollment with new end date and notify enrollment" do
+              expect_any_instance_of(HbxEnrollment).to receive(:notify).with("acapi.info.events.hbx_enrollment.terminated", {:reply_to=>glue_event_queue_name, "hbx_enrollment_id" => enrollment.hbx_id, "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment", "is_trading_partner_publishable" => false})
+              xhr :post, :update_enrollment_termianted_on_date, enrollment_id: enrollment.id.to_s, family_actions_id: family.id, new_termination_date: TimeKeeper.date_of_record.to_s, format: :js
+              enrollment.reload
+              expect(enrollment.aasm_state).to eq "coverage_terminated"
+              expect(enrollment.terminated_on).to eq TimeKeeper.date_of_record
+            end
+          end
+
+        end
+
+        context "enrollment that already terminated with future date" do
+          context "with new future termination date" do
+            it "should update enrollment with new end date and notify enrollment" do
+              expect_any_instance_of(HbxEnrollment).to receive(:notify).with("acapi.info.events.hbx_enrollment.terminated", {:reply_to=>glue_event_queue_name, "hbx_enrollment_id" => enrollment.hbx_id, "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment", "is_trading_partner_publishable" => false})
+              xhr :post, :update_enrollment_termianted_on_date, enrollment_id: enrollment.id.to_s, family_actions_id: family.id, new_termination_date: (TimeKeeper.date_of_record + 1.day).to_s, format: :js
+              enrollment.reload
+              expect(enrollment.aasm_state).to eq "coverage_termination_pending"
+              expect(enrollment.terminated_on).to eq TimeKeeper.date_of_record + 1.day
+            end
+          end
+        end
+      end
+    end
+
+    context "IVL enrollment", :dbclean => :around_each do
+
+      before do
+        enrollment.kind = "individual"
+        enrollment.save
+      end
+
+      context "with valid params" do
+
+        it "should render template " do
+          xhr :post, :update_enrollment_termianted_on_date, enrollment_id: enrollment.id.to_s, family_actions_id: family.id, new_termination_date: TimeKeeper.date_of_record.to_s, format: :js
+          expect(response).to have_http_status(:redirect)
+          expect(response).to redirect_to(exchanges_hbx_profiles_root_path)
+        end
+
+        context "enrollment that already terminated with past date" do
+          context "with new past or current termination date" do
+            it "should update enrollment with new end date and notify enrollment" do
+              expect_any_instance_of(HbxEnrollment).to receive(:notify).with("acapi.info.events.hbx_enrollment.terminated", {:reply_to=>glue_event_queue_name, "hbx_enrollment_id" => enrollment.hbx_id, "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment", "is_trading_partner_publishable" => false})
+              xhr :post, :update_enrollment_termianted_on_date, enrollment_id: enrollment.id.to_s, family_actions_id: family.id, new_termination_date: TimeKeeper.date_of_record.to_s, format: :js
+              enrollment.reload
+              expect(enrollment.aasm_state).to eq "coverage_terminated"
+              expect(enrollment.terminated_on).to eq TimeKeeper.date_of_record
+            end
+          end
+
+        end
+
+        context "enrollment that already terminated with future date" do
+          context "with new future termination date" do
+            it "should update enrollment with new end date and notify enrollment" do
+              expect_any_instance_of(HbxEnrollment).to receive(:notify).with("acapi.info.events.hbx_enrollment.terminated", {:reply_to=>glue_event_queue_name, "hbx_enrollment_id" => enrollment.hbx_id, "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment", "is_trading_partner_publishable" => false})
+              xhr :post, :update_enrollment_termianted_on_date, enrollment_id: enrollment.id.to_s, family_actions_id: family.id, new_termination_date: (TimeKeeper.date_of_record + 1.day).to_s, format: :js
+              enrollment.reload
+              expect(enrollment.aasm_state).to eq "coverage_terminated"
+              expect(enrollment.terminated_on).to eq TimeKeeper.date_of_record + 1.day
+            end
+          end
+        end
+      end
+    end
+
+    context "with invalid params" do
+      it "should redirect to root path" do
+        xhr :post, :update_enrollment_termianted_on_date, enrollment_id: '', family_actions_id: '', new_termination_date: '', format: :js
+        expect(response).to have_http_status(:redirect)
+        expect(response).to redirect_to(exchanges_hbx_profiles_root_path)
+      end
+    end
+
+  end
+
   describe "GET get_user_info" do
     let(:user) { double("User", :has_hbx_staff_role? => true)}
     let(:person) { double("Person", id: double)}
@@ -863,7 +1052,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     end
   end
 
-  describe "close open enrollment" do
+  describe "close open enrollment", :dbclean => :around_each do
 
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
     let(:person) { double("person")}

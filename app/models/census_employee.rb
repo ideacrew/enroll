@@ -219,7 +219,6 @@ class CensusEmployee < CensusMember
 
   def assign_to_benefit_package(benefit_package, assignment_on)
     return if benefit_package.blank?
-
     benefit_group_assignments.create(
       start_on: assignment_on,
       end_on:   benefit_package.effective_period.max,
@@ -418,6 +417,17 @@ class CensusEmployee < CensusMember
 
   def is_business_owner?
     is_business_owner
+  end
+  
+  def can_be_reinstated?
+    self.employment_terminated? || self.cobra_terminated?
+  end
+
+   def reinstate_employment
+    if self.may_reinstate_eligibility?
+      self.update_attributes({:employment_terminated_on => nil, :coverage_terminated_on => nil})
+      reinstate_eligibility!
+    end
   end
 
   def is_covered_or_waived?

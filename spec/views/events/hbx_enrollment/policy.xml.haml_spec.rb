@@ -67,4 +67,19 @@ RSpec.describe "events/hbx_enrollment/policy.haml.erb", dbclean: :after_each do
       expect(@doc.xpath("//cobra_eligibility_date").text).to eq cobra_begin_date.strftime("%Y%m%d")
     end
   end
+
+  context "ivl enrollment with unknown_sep" do
+
+    before do
+      allow(hbx_enrollment).to receive(:enrollment_kind).and_return("special_enrollment")
+      render :template=>"events/hbx_enrollment/policy", :locals=>{hbx_enrollment: hbx_enrollment}
+      @doc = Nokogiri::XML(rendered)
+    end
+
+    it "should include exceptional_circumstances event type for unknowsep value" do
+      expect(hbx_enrollment.eligibility_event_kind).to eq("unknown_sep")
+      expect(@doc.xpath("//x:event_kind", "x"=>"http://openhbx.org/api/terms/1.0").text).to eq "urn:dc0:terms:v1:qualifying_life_event#exceptional_circumstances"
+    end
+  end
+  
 end

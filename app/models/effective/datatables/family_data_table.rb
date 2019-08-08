@@ -25,6 +25,8 @@ module Effective
            #cancel_enrollment_type(row, pundit_allow(Family, :can_update_ssn?))],
            ['Terminate Enrollment', terminate_enrollment_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"), terminate_enrollment_type(row, pundit_allow(Family, :can_update_ssn?))],
            #terminate_enrollment_type(row, pundit_allow(Family, :can_update_ssn?))],
+           ['Change Enrollment End Date', view_enrollment_to_update_end_date_exchanges_hbx_profiles_path(family: row.id, person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id.to_s}"), update_terminated_enrollment_type(row, pundit_allow(Family, :can_update_ssn?))],
+           ['Reinstate', view_terminated_hbx_enrollments_exchanges_hbx_profiles_path(family: row.id, person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id.to_s}"), reinstate_enrollment_type(row, pundit_allow(Family, :can_update_ssn?))],
            [("<div class='" + pundit_class(Family, :can_update_ssn?) + "'> Edit DOB / SSN </div>").html_safe, edit_dob_ssn_path(id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id.to_s}"), 'ajax'],
            ['Send Secure Message', new_insured_inbox_path(id: row.primary_applicant.person.id, profile_id: current_user.person.hbx_staff_role.hbx_profile.id, to: row.primary_applicant.person.last_name + ', ' + row.primary_applicant.person.first_name, family_actions_id: "family_actions_#{row.id.to_s}"), secure_message_link_type(row, current_user)],
            ['View Username and Email', get_user_info_exchanges_hbx_profiles_path(person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id.to_s}"), (individual_market_is_enabled? && pundit_allow(Family, :can_view_username_and_email?)) ? 'ajax' : 'disabled'],
@@ -67,6 +69,22 @@ module Effective
 
       def add_sep_link_type(allow)
         allow ? 'ajax' : 'disabled'
+      end
+      
+      def reinstate_enrollment_type(family, allow)
+        return 'disabled' unless allow
+        reinstate_eligibles = family.admin_dt_enrollments.any? do |en|
+           en.is_admin_reinstate_or_end_date_update_eligible?
+         end
+        reinstate_eligibles ? 'ajax' : 'disabled'
+       end
+ 
+      def update_terminated_enrollment_type(family, allow)
+        return 'disabled' unless allow
+        end_date_update_eligibles = family.admin_dt_enrollments.any? do |en|
+          en.is_admin_reinstate_or_end_date_update_eligible?
+        end
+        end_date_update_eligibles ? 'ajax' : 'disabled'
       end
 
       def cancel_enrollment_type(family, allow)
