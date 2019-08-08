@@ -6,6 +6,7 @@ module RuleSet
 
     VALID_MARKET_KIND = 'individual'
     APTC_INELIGIBLE_ENROLLMENT_STATES = ::HbxEnrollment::CANCELED_STATUSES + ::HbxEnrollment::TERMINATED_STATUSES
+    APTC_ELIGIBLE_ENROLLMENT_STATES = ::HbxEnrollment.aasm.states.map(&:name).map(&:to_s) - APTC_INELIGIBLE_ENROLLMENT_STATES
 
     rule :any_member_aptc_eligible,
          validate: lambda { |enrollment|
