@@ -58,6 +58,30 @@ module Admin
         # TODO: Add validation here
       end
 
+      def create_record_response(request)
+        # TODO: Make this method work
+      end
+
+      def create_record_question(question_hash)
+        custom_qle_question = qle_kind.custom_qle_questions.build(
+          title: question_hash.question_title,
+          type: question_hash.question_type
+        )
+        custom_qle_question.save!
+      end
+
+      def create_record_questions_and_responses(qle_kind, request)
+        request.questions.each do |question_hash|
+          question = create_record_question(question_hash)
+          # question_hash.responses.each do |response_hash|
+            # TODO: attributes in hash are
+            # response_title
+            # response_accepted
+            # response_type
+          # end
+        end
+      end
+
       protected
 
       def create_record(request)
@@ -76,6 +100,7 @@ module Admin
           end_on:request.end_on,
           start_on: request.start_on,
         )
+        create_record_questions_and_responses(new_record, request)
         BenefitSponsors::Services::ServiceResponse.new(new_record)
       end
     end
