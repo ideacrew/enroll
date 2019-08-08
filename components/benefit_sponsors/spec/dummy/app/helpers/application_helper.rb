@@ -28,4 +28,16 @@ module ApplicationHelper
     date ||= BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new.calculate_start_on_dates[0]
     benefit_sponsorship.applicant? && BenefitMarkets::Forms::ProductForm.for_new(date).fetch_results.is_late_rate
   end
+
+  def show_oop_pdf_link(aasm_state)
+    return false if aasm_state.blank?
+
+    BenefitSponsors::BenefitApplications::BenefitApplication::SUBMITTED_STATES.include?(aasm_state.to_sym)
+  end
+
+  def env_bucket_name(bucket_name)
+    aws_env = ENV['AWS_ENV'] || "qa"
+    "dchbx-enroll-#{bucket_name}-#{aws_env}"
+  end
+
 end

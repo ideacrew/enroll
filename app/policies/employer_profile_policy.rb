@@ -11,6 +11,11 @@ class EmployerProfilePolicy < ApplicationPolicy
     role.permission.modify_employer
   end
 
+  def can_modify_employer?
+    return false if (user.blank? || user.person.blank? )
+    return true if (user.has_hbx_staff_role? && user.person.hbx_staff_role.permission.modify_employer)
+  end
+
   def revert_application?
     return true unless role = user.person.hbx_staff_role
     role.permission.revert_application

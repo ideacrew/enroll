@@ -9,6 +9,7 @@ module Services
       expire_individual_market_enrollments
       begin_coverage_for_ivl_enrollments
       send_enrollment_notice_for_ivl(new_date)
+      send_reminder_notices_for_ivl(new_date)
     end
 
     def expire_individual_market_enrollments
@@ -74,6 +75,41 @@ module Services
         rescue Exception => e
           Rails.logger.error { "Unable to deliver enrollment notice #{person.hbx_id} due to #{e.inspect}" }
         end
+      end
+    end
+
+    def send_reminder_notices_for_ivl(date)
+      families = Family.outstanding_verification_datatable
+      return if families.blank?
+
+      @logger.info '*' * 50
+      @logger.info "Started send_reminder_notices_for_ivl process at #{TimeKeeper.datetime_of_record}"
+
+      families.each do |family|
+        begin
+          next if family.has_valid_e_case_id? #skip assisted families
+          consumer_role = family.primary_applicant.person.consumer_role
+          person = family.primary_applicant.person
+          if consumer_role.present? && family.best_verification_due_date.present? && (family.best_verification_due_date > date)
+            case (family.best_verification_due_date.to_date.mjd - date.mjd)
+            when 85
+              IvlNoticesNotifierJob.perform_later(person.id.to_s, "first_verifications_reminder")
+              @logger.info "Sent first_verifications_reminder to #{person.hbx_id}" unless Rails.env.test?
+            when 70
+              IvlNoticesNotifierJob.perform_later(person.id.to_s, "second_verifications_reminder")
+              @logger.info "Sent second_verifications_reminder to #{person.hbx_id}" unless Rails.env.test?
+            when 45
+              IvlNoticesNotifierJob.perform_later(person.id.to_s, "third_verifications_reminder")
+              @logger.info "Sent third_verifications_reminder to #{person.hbx_id}" unless Rails.env.test?
+            when 30
+              IvlNoticesNotifierJob.perform_later(person.id.to_s, "fourth_verifications_reminder")
+              @logger.info "Sent fourth_verifications_reminder to #{person.hbx_id}" unless Rails.env.test?
+            end
+          end
+        rescue StandardError => e
+          @logger.info "Unable to send verification reminder notices to #{person.hbx_id} due to #{e}"
+        end
+        @logger.info "End of generating reminder notices at #{TimeKeeper.datetime_of_record}"
       end
     end
   end

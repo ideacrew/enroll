@@ -319,6 +319,26 @@ module BenefitSponsors
         hbx_enrollments
       end
 
+      def terminate_roster_enrollments(args)
+        termination_date = Date.strptime(args["termination_date"], "%m/%d/%Y")
+        termination_reason = args["termination_reason"]
+        transmit_xml = args["transmit_xml"]
+
+        active_benefit_application.benefit_packages.each do |package|
+          if termination_date >= today
+            package.termination_pending_member_benefits(term_date: termination_date, enroll_term_reason: termination_reason, enroll_notify: transmit_xml)
+          else
+            package.terminate_member_benefits(term_date: termination_date, enroll_term_reason: termination_reason, enroll_notify: transmit_xml)
+          end
+        end
+
+        if renewal_benefit_application.present?
+          renewal_benefit_application.benefit_packages.each do |package|
+            package.cancel_member_benefits(enroll_notify: transmit_xml)
+          end
+        end
+      end
+
       class << self
         def upload_invoice_to_print_vendor(file_path,file_name)
           org = by_invoice_filename(file_path) rescue nil
