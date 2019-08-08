@@ -79,19 +79,23 @@
           </div>
         </div>
         <div class='form-group'>
-          <span for="qle_kind_creation_form_action_kind" class="col-sm-2 control-label">Questions </span>
-          <button (click)="addQuestion()" class='btn btn-primary'>
-            Create a new question for this QLE
-          </button>
-          <div *ngIf="showQuestions()">
-            <qle-question-form
-              *ngFor="let question of questionControls(); let i = index"
-              [questionFormGroup]="question"
-              [questionIndex]="i"
-              [questionComponentParent]="this">
-            </qle-question-form>
+          <div class='row'>
+            <div class='col-md-12'>
+              <span for="qle_kind_creation_form_action_kind" class="col-sm-2 control-label">Questions</span>
+              <button (click)="addQuestion()" class='btn btn-primary'>
+                Create a New Question
+              </button>
+              <div *ngIf="showQuestions()">
+                <qle-question-form
+                  *ngFor="let question of questionControls(); let i = index"
+                  [questionFormGroup]="question"
+                  [questionIndex]="i"
+                  [questionComponentParent]="this">
+                </qle-question-form>
+              </div>
+            </div>
           </div>
-        </div >
+        </div>
         <div class='form-group'>
           <span for="qle_kind_creation_form_effective_on_kinds" class="col-sm-2 control-label">Effective on Options</span>
           <div formArrayName="effective_on_kinds" *ngFor="let option of getOptions(); let i = index">
