@@ -54,6 +54,10 @@ def build_employee_row(employee, employer_data)
     data << format_date(employee.employment_terminated_on)
     transition = employee.workflow_state_transitions.where(:to_state => 'employment_terminated').first
     data << (transition.present? ? format_date(transition.transition_at) : format_date(employee.updated_at))
+  elsif employment_status(employee.aasm_state) == 'termination pending'
+    data << format_date(employee.employment_terminated_on)
+    transition = employee.workflow_state_transitions.where(:to_state => 'employee_termination_pending').first
+    data << (transition.present? ? format_date(transition.transition_at) : format_date(employee.updated_at))
   else
     data += ['', '']
   end
@@ -90,6 +94,8 @@ def employment_status(aasm_state)
   case aasm_state.to_s
   when 'employment_terminated'
     'terminated'
+  when 'employee_termination_pending'
+    'termination pending'
   when 'rehired'
     'rehired'
   else
