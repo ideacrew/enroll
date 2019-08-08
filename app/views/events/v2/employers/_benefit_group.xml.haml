@@ -21,4 +21,14 @@
           %contribution_percent= deter_tier.sponsor_contribution_factor * 100
   - else
     %relationship_benefits
-      = render :partial => "events/v2/employers/relationship_benefit", :collection => relationship_benefits
+      - if benefit_group &. benefit_sponsorship &. organization &. is_a_fehb_profile?
+        - ["employee", "spouse", "domestic_partner", "child_under_26"].each do |relationship|
+          %relationship_benefit
+            %relationship= "urn:openhbx:terms:v1:employee_census_relationship##{relationship}"
+            %offered= relationship == "domestic_partner" ? false : true
+            %contribution_percent= relationship == "domestic_partner" ? 0.0 : 75.00
+      - else
+        = render :partial => "events/v2/employers/relationship_benefit", :collection => relationship_benefits
+      -# TODO: Need to fix relationship_benefits for fehb employer.
+      -# HACK: Hard coding FEHB relationship_benefits temporary with old modal relationships,
+      -# remove hard coded relationships after XSD schema updated for fehb market.
