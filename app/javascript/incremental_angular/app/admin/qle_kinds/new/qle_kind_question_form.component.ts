@@ -35,12 +35,14 @@ export class QleKindQuestionFormComponent {
 //    return this.responseArray
 //  }
 
-  public responseControls() : FormGroup[] {
-    return this.responseArray.controls.map(
-      function(item) {
-        return <FormGroup>item;
-      }
-    );
+  public responseControls(){
+    if (this.questionFormGroup != null && this.questionFormGroup.value != null) {
+      return this.questionFormGroup.value.responses.map(
+        function(item:FormGroup) {
+          return <FormGroup>item;
+        }
+      );
+    }
   }
 
   public removeQuestion() {
@@ -51,19 +53,39 @@ export class QleKindQuestionFormComponent {
     }
   }
 
-  public submitQuestion(){
+  public startQuestion(){
     if (this.questionFormGroup != null){
         this.showResponseForm = true
         this.addResponse()
     }
   }
 
+    public submitQuestion(){
+    if (this.questionFormGroup != null){
+        this.showResponseForm = true
+        console.log(this.questionFormGroup.value)
+    }
+  }
+
+
+  removeResponse(responseIndex: number) {
+    if(this.questionFormGroup != null && this.questionFormGroup.value.responses != null) {
+      this.questionFormGroup.value.responses.splice(responseIndex,1);
+        console.log(this.questionFormGroup.value.responses)
+
+    }
+  }
 
   public addResponse(){
-    var responseForm = new QleKindResponseFormComponent()
-    this.responseArray.push(
-      responseForm.newResponseFormGroup()
-    ); 
+    if (this.questionFormGroup != null) {
+    const control:FormArray = this.questionFormGroup.get('responses') as FormArray;  
+      if (control){
+        var responseForm = new QleKindResponseFormComponent()
+        control.push(
+          responseForm.newResponseFormGroup()
+        ); 
+      }
+    }
   }
 
   public hasErrors(control : AbstractControl) : Boolean {
@@ -74,6 +96,7 @@ export class QleKindQuestionFormComponent {
     return (this.hasErrors(control) ? " has-error" : "");
   }
 
+  // public responseArray : FormArray;
  public newQuestionFormGroup(formBuilder: FormBuilder) {
     var rControls = formBuilder.array([]);
     var questionForm = new FormGroup({
@@ -84,6 +107,7 @@ export class QleKindQuestionFormComponent {
       correctAnswer: new FormControl('', Validators.required),
     });
     this.responseArray = rControls;
+    this.questionFormGroup = questionForm;
     return questionForm
   }
 

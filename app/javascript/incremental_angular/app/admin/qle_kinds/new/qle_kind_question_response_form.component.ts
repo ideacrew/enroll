@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { FormGroup, FormControl, FormArray, AbstractControl, Validators } from '@angular/forms';
 import { ResponseComponentRemover } from './response_component_remover';
+import { QleKindQuestionFormComponent } from './qle_kind_question_form.component';
 
 @Component({
   selector: 'qle-question-response-form',
@@ -8,7 +9,7 @@ import { ResponseComponentRemover } from './response_component_remover';
 })
 
 export class QleKindResponseFormComponent {
-  // public responseArray : FormArray;
+  public showAddAnotherResponse : boolean = false;
 
   @Input("responseFormGroup")
   public responseFormGroup : FormGroup | null;
@@ -19,18 +20,35 @@ export class QleKindResponseFormComponent {
   @Input("responseComponentParent")
   public responseComponentParent : ResponseComponentRemover | null;
 
-  constructor() {}
+  constructor() {
+  }
 
+ngOnInit(){
+  this.responseFormGroup = this.newResponseFormGroup()
+
+  }
   public showIndex() {
-    console.log(this.responseFormGroup);
     return this.responseIndex;
   }
 
-  public removeResponse() {
+  public removeResponse(responseIndex: number) {
     if (this.responseComponentParent != null) {
-      if (this.responseIndex != null) {
-        this.responseComponentParent.removeResponse(this.responseIndex);
+      if (responseIndex != null) {
+        this.responseComponentParent.removeResponse(responseIndex);
       }
+    }
+  }
+
+  public addNewResponse(questionComponent: QleKindQuestionFormComponent, responseIndex: number){
+    if (questionComponent != null){
+    if (questionComponent.questionFormGroup != null){
+    if (this.responseFormGroup != null){
+     questionComponent.questionFormGroup.value.responses[responseIndex] = this.responseFormGroup.value
+   
+    }     
+    }     
+      questionComponent.addResponse()
+
     }
   }
 
@@ -40,6 +58,11 @@ export class QleKindResponseFormComponent {
     }
   }
 
+  public createResponse(){
+    if(this.responseFormGroup != null){
+      this.showAddAnotherResponse = true
+    }
+  }
   public hasErrors(control : AbstractControl) : Boolean {
     return ((control.touched || control.dirty) && !control.valid);
   }
@@ -48,11 +71,13 @@ export class QleKindResponseFormComponent {
   }
 
   public newResponseFormGroup(){
-    return new FormGroup({
-      id: new FormControl(""),
+    var responseForm = new FormGroup({
       response_title: new FormControl('', Validators.required),
-      response_accepted: new FormControl('true'),
+      response_accepted: new FormControl('false'),
+      response_type: new FormControl('select'),
     });
+    this.responseFormGroup = responseForm
+    return responseForm
   }
 
 
