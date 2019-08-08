@@ -1,21 +1,18 @@
-<div [formGroup]="responseFormGroup">
-    <div class="col-sm-4">
-    <input 
-        id="qle_kind_question_response{{questionIndex}}_title"
-        type="text"
-        formControlName="response_title"
-        class="form-control col-md-2"
-        >
-    <input 
-        id="qle_kind_question_response{{questionIndex}}_title"
-        type="checkbox"
-        formControlName="question_title"
-        class="form-control col-md-2"
-        >
-        <button
-        (click)="addResponse()"
-        class='btn btn-primary'>
-        Add This Response
-        </button>
+<div class='form-group'>
+  <div>
+    <span class="control-label col-sm-2">Response to this question</span>
+  </div>
+  <div [formGroup]="responseFormGroup">
+    <div class="from-group-question-response">
+      <div class="col-sm-4" >
+        <input id="qle_kind_response_response{{responseIndex}}_title" type="text" formControlName="response_title" id="response-title col-md-2" class= 'form-control'>
+      </div>
+      <p class="col-sm-2 control-label">Acceptable Response?
+        <input id="qle_kind_response_response{{responseIndex}}_accepted" type="checkbox" formControlName="response_accepted" ></p>
+        <button (click)="removeResponse(responseIndex)" class='btn btn-primary'> Remove Response</button>&nbsp; 
+        <button (click)="addNewResponse(responseComponentParent, responseIndex)"  class='btn btn-primary'> Add Another Response</button>
     </div>
+  </div>
 </div>
+
+

@@ -1,13 +1,13 @@
 <div [formGroup]="questionFormGroup">
   <div class="from-group-question">
-    <span  class="col-sm-2 control-label">Prompt</span>
+    <span  class="col-sm-2 control-label">Question</span>
       <div class="col-sm-4">
         <input 
         id="qle_kind_question_{{questionIndex}}_title"
         type="text"
         formControlName="question_title"
         class="form-control col-md-2"
-        (focusout)="submitQuestion()">
+        (focusout)="startQuestion()">
       </div>
         <button
         (click)="removeQuestion()"
@@ -15,15 +15,16 @@
         DELETE
       </button>
   </div>
-    <div *ngIf="showResponseForm">
-      <div class='from-group'>
-        <span class="control-label col-sm-3">Please add a response to this question</span>
-        </div>
-        <qle-question-response-form
-        *ngFor="let response of responseControls(); let i = index"
-        [responseFormGroup]="response"
-        [responseIndex]="i"
-        [responseComponentParent]="this"
-        ></qle-question-response-form>
+    <div class='form-group'>
+      <div *ngIf="showResponseForm" class='form-group'>
+          <qle-question-response-form
+          *ngFor="let response of responseControls(); let i = index"
+          [responseFormGroup]="response"
+          [responseIndex]="i"
+          [responseComponentParent]="this"
+          ></qle-question-response-form>
+    </div>
+    <div class='form-group'>
+        <button (click)="submitQuestion()" class='btn btn-primary'> Submit Question</button>
     </div>
 </div>
