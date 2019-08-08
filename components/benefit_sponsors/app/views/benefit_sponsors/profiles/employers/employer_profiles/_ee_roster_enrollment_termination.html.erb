@@ -1,4 +1,5 @@
-<% any_enrollments = false #employer_profile.active_benefit_application.blank? ? false : employer_profile.active_benefit_application.hbx_enrollments.select{|hbx| ["coverage_selected", "coverage_enrolled", "auto_renewing"].include?(hbx.aasm_state)}.any?%>
+<% any_enrollments = employer_profile.active_benefit_application.blank? ? false :
+        employer_profile.active_benefit_application.benefit_packages.any?{|benefit_package| HbxEnrollment.enrolled_and_renewal.by_benefit_package(benefit_package).any?}%>
 <button type="button" class="btn btn-default <%= 'disabled' unless any_enrollments %>"
         data-toggle="modal" data-target="#terminate_employee_enrollments_modal">Terminate Employee Roster Enrollments</button>
 <% if employer_profile.active_benefit_application %>
