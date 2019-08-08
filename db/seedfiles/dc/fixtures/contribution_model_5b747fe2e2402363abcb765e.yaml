@@ -130,3 +130,7 @@ attributes: !ruby/hash:BSON::Document
     age_comparison: :>=
     relationship_kinds:
     - ward
+    - child
+    - adopted_child
+    - foster_child
+    - stepchild

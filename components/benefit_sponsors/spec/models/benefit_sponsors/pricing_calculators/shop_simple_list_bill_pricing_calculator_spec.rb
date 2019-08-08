@@ -179,7 +179,6 @@ module BenefitSponsors
       - a child (19)
       - a child (17)
       - a child (5)
-      - a child (26)
       " do
       let(:pricing_units) { [employee_pricing_unit, spouse_pricing_unit, dependent_pricing_unit] }
 
@@ -297,26 +296,7 @@ module BenefitSponsors
         )
       end
 
-      let(:child6_member_id) { "some_child6_id" }
-      let(:child6_dob) { Date.new(1992, 1, 1) }
-      let(:child6) do
-        instance_double(
-          "::BenefitMarkets::SponsoredBenefits::RosterMember",
-          member_id: child6_member_id,
-          relationship: "ward",
-          is_disabled?: false,
-          dob: child6_dob,
-          is_primary_member?: false
-        )
-      end
-      let(:child6_age) { 26 }
-      let(:child6_enrollment) do
-        ::BenefitSponsors::Enrollments::MemberEnrollment.new(
-          member_id: child6_member_id
-        )
-      end
-
-      let(:roster_members) { [employee, spouse, child1, child2, child3, child4, child5, child6] }
+      let(:roster_members) { [employee, spouse, child1, child2, child3, child4, child5] }
       let(:member_enrollments) { [
         employee_enrollment,
         spouse_member_enrollment,
@@ -324,8 +304,7 @@ module BenefitSponsors
         child2_enrollment,
         child3_enrollment,
         child4_enrollment,
-        child5_enrollment,
-        child6_enrollment
+        child5_enrollment
         ] }
 
       before(:each) do
@@ -336,7 +315,6 @@ module BenefitSponsors
         allow(pricing_model).to receive(:map_relationship_for).with("child", child3_age, false).and_return("dependent")
         allow(pricing_model).to receive(:map_relationship_for).with("child", child4_age, false).and_return("dependent")
         allow(pricing_model).to receive(:map_relationship_for).with("child", child5_age, false).and_return("dependent")
-        allow(pricing_model).to receive(:map_relationship_for).with("ward", child6_age, false).and_return("dependent")
         allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(
           product,
           rate_schedule_date,
@@ -379,18 +357,11 @@ module BenefitSponsors
             child5_age,
             "MA1"
           ).and_return(10.00)
-        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(
-          product,
-          rate_schedule_date,
-          child6_age,
-          "MA1"
-        ).and_return(120.00)
-
       end
 
       it "calculates the total" do
         result_entry = pricing_calculator.calculate_price_for(pricing_model, roster_entry, sponsor_contribution)
-        expect(result_entry.group_enrollment.product_cost_total).to eq(595.00)
+        expect(result_entry.group_enrollment.product_cost_total).to eq(475.00)
       end
 
       it "calculates the correct employee cost" do
@@ -433,12 +404,6 @@ module BenefitSponsors
         result_entry = pricing_calculator.calculate_price_for(pricing_model, roster_entry, sponsor_contribution)
         member_entry = result_entry.group_enrollment.member_enrollments.detect { |me| me.member_id == child5_member_id }
         expect(member_entry.product_price).to eq(0.00)
-      end
-
-      it "calculates the correct child6 cost" do
-        result_entry = pricing_calculator.calculate_price_for(pricing_model, roster_entry, sponsor_contribution)
-        member_entry = result_entry.group_enrollment.member_enrollments.detect { |me| me.member_id == child6_member_id }
-        expect(member_entry.product_price).to eq(120.00)
       end
     end
 

@@ -62,12 +62,6 @@ module BenefitSponsors
         roster_coverage.member_enrollments.each do |m_en|
           coverage_eligibility_dates[m_en.member_id] = m_en.coverage_eligibility_on
         end
-        roster_entry.members.each do |rm|
-          coverage_age = age_calculator.calc_coverage_age_for(rm, roster_coverage.product, roster_coverage.coverage_start_on, coverage_eligibility_dates, roster_coverage.previous_product)
-          if coverage_age >= 26 && rm.relationship == "child"
-            rm.relationship = "ward"
-          end
-        end
         sorted_members = roster_entry.members.sort_by do |rm|
           coverage_age = age_calculator.calc_coverage_age_for(rm, roster_coverage.product, roster_coverage.coverage_start_on, coverage_eligibility_dates, roster_coverage.previous_product)
           [pricing_model.map_relationship_for(rm.relationship, coverage_age, rm.is_disabled?), rm.dob]

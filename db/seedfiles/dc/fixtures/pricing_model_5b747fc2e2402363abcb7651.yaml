@@ -48,6 +48,10 @@ attributes: !ruby/hash:BSON::Document
     age_threshold: 26
     age_comparison: :>=
     relationship_kinds:
+    - child
+    - adopted_child
+    - foster_child
+    - stepchild
     - ward
   pricing_units:
   - !ruby/hash:BSON::Document
