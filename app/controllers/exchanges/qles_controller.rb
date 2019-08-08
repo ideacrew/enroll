@@ -60,7 +60,11 @@ class Exchanges::QlesController < ApplicationController
   def new; end
 
   def create
-    result = Admin::QleKinds::CreateService.call(current_user, params.require("data").permit!.to_hash)
+    result = Admin::QleKinds::CreateService.call(
+      current_user,
+      params.require("data").permit!.to_hash
+    )
+    
     if result.success?
       flash[:notice] = "Successfully created Qualifying Life Event Kind."
       respond_to do |format|
