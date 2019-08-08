@@ -50,15 +50,13 @@ module BenefitSponsors
             c_factor = integerize_percent(cu.contribution_factor)
             t_contribution = BigDecimal.new("0.00")
             @member_ids.each do |m_id|
-              cont_amount = BigDecimal.new(((member_prices[m_id] * c_factor)/100.00).to_s).round(2)
-              @member_contributions[m_id] = cont_amount
-              t_contribution = BigDecimal.new((t_contribution + cont_amount).to_s).round(2)
+              cont_amount = (member_prices[m_id] * c_factor)/100.00
+              t_contribution = t_contribution + cont_amount
             end
             cap = cu.contribution_cap
-            @total_contribution = t_contribution
-            if t_contribution > cap
-              rebalance_contributions(cap, @total_contribution, member_prices)
-            end
+            @total_contribution = BigDecimal.new(t_contribution.to_s).round(2)
+            rebalance_value = (@total_contribution > cap) ? cap : @total_contribution
+            rebalance_contributions(rebalance_value, member_prices)
           else
             @member_ids.each do |m_id|
               @member_contributions[m_id] = 0.00
@@ -68,7 +66,7 @@ module BenefitSponsors
           self
         end
 
-        def rebalance_contributions(cap, t_contribution, member_prices)
+        def rebalance_contributions(cap, member_prices)
           new_total_contribution = cap
           @total_contribution = new_total_contribution
           adjusted_contribution_factor = (new_total_contribution * 1.00)/@total_price
@@ -87,7 +85,8 @@ module BenefitSponsors
 
         # Integerize the contribution percent to match the old rounding model
         def integerize_percent(cont_percent)
-          BigDecimal.new((cont_percent * 100.00).to_s).round(0).to_i
+          per = BigDecimal.new((cont_percent * 100.00).to_s).round(0).to_i
+          per
         end
       end
 
