@@ -24,6 +24,8 @@ class GroupSelectionEligibilityChecker
     # If the relationship doesn't even map, they aren't allowed
     mapped_relationship = @contribution_model.map_relationship_for(rel, coverage_age, disability)
     return false if mapped_relationship.blank?
+    return false if mapped_relationship.to_s == 'dependent' && mapped_relationship.age_comparison == :>=
+
     matching_contribution_units = @contribution_model.contribution_units.select do |cu|
       cu.at_least_one_matches?({mapped_relationship.to_s => 1})
     end
