@@ -4,9 +4,7 @@ module RuleSet
   class AcaIvlEnrollmentEligibilityPolicy
     include ::BenefitMarkets::BusinessRulesEngine
 
-    VALID_PRODUCT_CLASS = ::BenefitMarkets::Products::HealthProducts::HealthProduct
     VALID_MARKET_KIND = 'individual'
-    VALID_METAL_LEVEL_SET = VALID_PRODUCT_CLASS::METAL_LEVEL_KINDS - [:catastrophic]
 
     rule :any_member_aptc_eligible,
          validate: lambda { |enrollment|
@@ -28,6 +26,7 @@ module RuleSet
          },
          success: ->(_enrollment){ 'validated successfully' },
          fail: ->(_enrollment){ 'One of the shopping members are ineligible for CSR' }
+
 
     business_policy :apply_aptc,
                     rules: [:market_kind_eligiblity,
