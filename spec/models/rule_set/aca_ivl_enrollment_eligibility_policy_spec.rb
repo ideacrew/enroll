@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require 'pry'
 require File.join(Rails.root, 'spec/shared_contexts/enrollment')
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
