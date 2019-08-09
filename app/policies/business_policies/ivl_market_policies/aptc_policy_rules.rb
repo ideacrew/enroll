@@ -5,7 +5,7 @@ module BusinessPolicies
     class AptcPolicyRules
       include BenefitMarkets::BusinessRulesEngine
 
-      attr_reader :errors, :satisfied
+      attr_reader :policy_errors, :satisfied
 
       APTC_INELIGIBLE_ENROLLMENT_STATES = HbxEnrollment::CANCELED_STATUSES + HbxEnrollment::TERMINATED_STATUSES
 
@@ -22,15 +22,15 @@ module BusinessPolicies
       business_policy :update_aptc_for_current_enrollment, rules: [:edit_aptc, :edit_aptc_2]
 
       def initialize
-        @errors = []
+        @policy_errors = []
         @satisfied = false
       end
 
       def execute(enrollment)
         applied_policy = business_policies[:update_aptc_for_current_enrollment]
         @satisfied = applied_policy.is_satisfied?(enrollment)
-        @errors << applied_policy.fail_results
-        {errors: errors, satisfied: satisfied}
+        @policy_errors << applied_policy.fail_results
+        {errors: failed, satisfied: satisfied}
       end
     end
   end
