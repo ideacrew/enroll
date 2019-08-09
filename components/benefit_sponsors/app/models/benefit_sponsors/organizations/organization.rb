@@ -363,7 +363,7 @@ module BenefitSponsors
         def general_agencies_with_matching_ga(search_params, value = nil)
           if search_params[:q].present?
             general_agencies = Person.general_agencies_matching_search_criteria(search_params[:q])
-            orgs2 = self.approved_general_agencies.where({
+            orgs2 = approved_general_agencies.where({
               :"profiles._id" => {
                 "$in" => general_agencies.map(&:general_agency_staff_roles).flatten.map(&:benefit_sponsors_general_agency_profile_id)
               }
@@ -378,7 +378,7 @@ module BenefitSponsors
                 return filter_general_agencies_by_primary_roles(agencies_matching_advanced_criteria, general_agencies)
               end
             elsif value
-              return self.approved_general_agencies.where({ "$and" => build_query_params(search_params) })
+              return approved_general_agencies.where({ "$and" => build_query_params(search_params) })
             end
           elsif !search_params[:q].present? && value
             return []
