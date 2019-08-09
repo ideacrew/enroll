@@ -61,7 +61,7 @@ module BenefitSponsors
         end
 
         def search_general_agency
-          @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_broker_agency_search(general_agency_staff_params)
+          @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_general_agency_search(general_agency_staff_params)
           @general_agency_profiles = @staff.general_agency_search
         end
 

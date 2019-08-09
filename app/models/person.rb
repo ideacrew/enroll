@@ -194,6 +194,8 @@ class Person
   index({last_name: 1, dob: 1}, {sparse: true})
 
   index({last_name: "text", first_name: "text", full_name: "text"}, {name: "person_search_text_index"})
+  index({"first_name" => 1, "last_name" => 1, "broker_role.npn": 1}, {name: "first_name_last_name_broker_npn_search"})
+  index({"first_name" => 1, "last_name" => 1, "general_agency_staff_roles.npn": 1}, {name: "first_name_last_name_ga_npn_search"})
 
   # Broker child model indexes
   index({"broker_role._id" => 1})
@@ -201,6 +203,7 @@ class Person
   index({"broker_role.broker_agency_id" => 1})
   index({"broker_role.benefit_sponsors_broker_agency_profile_id" => 1})
   index({"broker_role.npn" => 1}, {sparse: true, unique: true})
+  index({"general_agency_staff_roles.npn" => 1}, {sparse: true})
 
   # Employer role index
   index({"employer_staff_roles._id" => 1})
@@ -713,6 +716,10 @@ class Person
           {"general_agency_staff_roles.npn" => s_rex}
           ] + additional_exprs(clean_str))
         })
+    end
+
+    def general_agencies_matching_search_criteria(search_str)
+      general_agency_staff_certified.search_first_name_last_name_npn(search_str)
     end
 
     # Find all employee_roles.  Since person has_many employee_roles, person may show up
