@@ -51,8 +51,7 @@ module BenefitMarkets
       end
 
       def member_relationship_for(relationship, age, disability)
-        found_rel = member_relationships.detect { |mr| mr.match?(relationship, age, disability) }
-        found_rel ? found_rel : nil
+        member_relationships.detect { |mr| mr.match?(relationship, age, disability) }
       end
 
       def many_simultaneous_contribution_units?
