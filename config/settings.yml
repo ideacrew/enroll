@@ -239,6 +239,7 @@ aca:
     initial_application:
       publish_due_day_of_month: 5
       advertised_deadline_of_month: 1
+      non_binder_paid_notice_day_of_month: 16
       earliest_start_prior_to_effective_on:
         months: -3
         day_of_month: 0

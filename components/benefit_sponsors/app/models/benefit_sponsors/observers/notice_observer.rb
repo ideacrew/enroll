@@ -233,8 +233,9 @@ module BenefitSponsors
 
         return unless benefit_application.is_renewing?
 
-        benefit_application.benefit_sponsorship.census_employees.non_terminated.each do |ce|
-          enrollments = HbxEnrollment.by_benefit_sponsorship(benefit_application.benefit_sponsorship)
+        benefit_sponsorship = benefit_application.benefit_sponsorship
+        benefit_sponsorship.census_employees.non_terminated.each do |ce|
+          enrollments = ce.renewal_benefit_group_assignment.hbx_enrollments
           enrollment = enrollments.select{ |enr| (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES).include?(enr.aasm_state) }.max_by(&:updated_at)
           deliver(recipient: enrollment.employee_role, event_object: enrollment, notice_event: "renewal_employee_enrollment_confirmation") if enrollment.employee_role.present?
         end
@@ -347,9 +348,9 @@ module BenefitSponsors
       end
 
       def trigger_initial_employer_no_binder_payment_received_notice(_model_event)
-        BenefitSponsors::Queries::NoticeQueries.initial_employers_in_ineligible_state.each do |benefit_sponsorship|
+        BenefitSponsors::Queries::NoticeQueries.initial_employers_in_enrolled_state.each do |benefit_sponsorship|
 
-          benefit_application = benefit_sponsorship.benefit_applications.where(:aasm_state => :enrollment_ineligible).first
+          benefit_application = benefit_sponsorship.benefit_applications.where(:aasm_state => :enrollment_closed).first
           next unless benefit_application.present? && !benefit_application.is_renewing?
 
           #Notice to employer for missing binder payment
@@ -436,7 +437,7 @@ module BenefitSponsors
 
         employer_profile.census_employees.non_terminated.each do |ce|
           enrollment = ce.active_benefit_group_assignment.hbx_enrollment
-          effective_on = employer_profile.active_benefit_sponsorship.benefit_applications.where(:aasm_state.in => [:enrollment_eligible, :enrollment_closed]).first.start_on
+          effective_on = employer_profile.active_benefit_sponsorship.benefit_applications.where(:aasm_state.in => [:enrollment_eligible, :enrollment_closed, :binder_paid]).first.start_on
           next unless enrollment.present? && enrollment.effective_on == effective_on
 
           deliver(recipient: ce.employee_role, event_object: ce, notice_event: "initial_employee_plan_selection_confirmation")
