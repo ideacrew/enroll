@@ -4,6 +4,9 @@ require 'rails_helper'
 
 RSpec.describe Exchanges::QlesController, :type => :controller do
   render_views
+  # TODO: Make the actual angular view pass the
+  # questions attributes properly, and place them in the
+  # Dry RB models and make sure they validate correctly.
   let(:qle_creation_params) do
     {
       'data' =>
@@ -19,33 +22,26 @@ RSpec.describe Exchanges::QlesController, :type => :controller do
         "reason" => "birth",
         "pre_event_sep_in_days" => "1",
         "post_event_sep_in_days" => "1",
-        "questions_attributes" => {
-          "0" => {
-            "content" => "When was Your Dog Born?",
-            "answer_attributes" => {
-              "responses_attributes" => {
-                "0" => {
-                  "name" => "true",
-                  "result" => "contact_call_center"
-                },
-                "1" => {
-                  "name" => "false",
-                  "result" => "contact_call_center"
-                },
-                "2" => {
-                  "operator" => "before",
-                  "value" => "",
-                  "value_2" => ""
-                },
-                "3" => {
-                  "name" => "",
-                  "result" => "proceed"
-                }
+        "questions"=>[
+          {
+            "id" => "",
+            "question_title" => "What is your favorite food?",
+            "question_type" => "",
+            "responses" => [
+              {
+                "response_title" => "",
+                "response_accepted" => "false",
+                "response_type" => "select"
+              },
+              {
+                "response_title" => "",
+                "response_accepted" => "false",
+                "response_type" => "select"
               }
-            },
-            "type" => "date"
+            ],
+            "correctAnswer" => ""
           }
-        },
+        ]
         "start_on" => "06/01/1990",
         "end_on" => "06/01/2005"
       }
