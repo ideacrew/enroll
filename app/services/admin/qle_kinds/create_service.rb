@@ -46,8 +46,8 @@ module Admin
       # automatically be included in here
       # currently its an input
       def reason_is_valid?(reason)
-        # reason.in?(QualifyingLifeEventKind::REASON_KINDS)
-        return true
+        reason.in?(QualifyingLifeEventKind::REASON_KINDS)
+        #return true
       end
 
       def post_sep_eligiblity_date_is_valid?(date)
@@ -58,27 +58,30 @@ module Admin
         # TODO: Add validation here
       end
 
-      def create_record_response(request)
-        # TODO: Make this method work
+      def create_question_response(custom_qle_question, response_hash)
+        response = custom_qle_question.custom_qle_responses.build(
+          content: response_hash["response_title"],
+          accepted: response_hash["response_accepted"],
+        )
+        response.save!
       end
-
-      def create_record_question(question_hash)
+ 
+      def create_record_question(qle_kind, question_hash)
         custom_qle_question = qle_kind.custom_qle_questions.build(
-          title: question_hash.question_title,
-          type: question_hash.question_type
+          content: question_hash["question_title"],
+          type: question_hash["question_type"]
         )
         custom_qle_question.save!
       end
 
       def create_record_questions_and_responses(qle_kind, request)
         request.questions.each do |question_hash|
-          question = create_record_question(question_hash)
-          # question_hash.responses.each do |response_hash|
-            # TODO: attributes in hash are
-            # response_title
-            # response_accepted
-            # response_type
-          # end
+          if create_record_question(qle_kind, question_hash)
+            custom_qle_question = qle_kind.custom_qle_questions.last
+            question_hash["responses"].each do |response_hash|
+              create_question_response(custom_qle_question, response_hash)
+            end
+          end
         end
       end
 
