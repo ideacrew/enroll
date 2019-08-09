@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-module IvlMarket
-  module BusinessPolicies
+module BusinessPolicies
+  module IvlMarketPolicies
     class EnrollmentPolicyService
       attr_reader :enrollment, :policies_applied
 

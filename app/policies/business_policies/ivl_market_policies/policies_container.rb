@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-module IvlMarket
-  module BusinessPolicies
+module BusinessPolicies
+  module IvlMarketPolicies
     class PoliciesContainer
       extend Dry::Container::Mixin
 
       register "aptc_policy_rules" do
-        IvlMarket::BusinessPolicies::AptcPolicyRules.new
+        BusinessPolicies::IvlMarketPolicies::AptcPolicyRules.new
       end
     end
     IvlInjector = Dry::AutoInject(PoliciesContainer)
