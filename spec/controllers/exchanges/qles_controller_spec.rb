@@ -22,26 +22,26 @@ RSpec.describe Exchanges::QlesController, :type => :controller do
         "reason" => "birth",
         "pre_event_sep_in_days" => "1",
         "post_event_sep_in_days" => "1",
-        "questions"=>[
+        "questions" => [
           {
             "id" => "",
             "question_title" => "What is your favorite food?",
             "question_type" => "",
             "responses" => [
               {
-                "response_title" => "",
-                "response_accepted" => "false",
+                "response_title" => "Pizza",
+                "response_accepted" => "true",
                 "response_type" => "select"
               },
               {
-                "response_title" => "",
+                "response_title" => "Potato Chips",
                 "response_accepted" => "false",
                 "response_type" => "select"
               }
             ],
             "correctAnswer" => ""
           }
-        ]
+        ],
         "start_on" => "06/01/1990",
         "end_on" => "06/01/2005"
       }
@@ -129,8 +129,13 @@ RSpec.describe Exchanges::QlesController, :type => :controller do
         post(:create, as: 'json', params: qle_creation_params)
         expect(QualifyingLifeEventKind.count).to eq(1)
         expect(flash['notice']).to eq('Successfully created Qualifying Life Event Kind.')
+        # Creates questions and responses
+        qle_kind = QualifyingLifeEventKind.where(title: 'Got a New Dog').first
+        expect(qle_kind.custom_qle_questions.count).to eq(1)
+        expect(qle_kind.custom_qle_questions.first.custom_qle_responses.count).to eq(2)
       end
     end
+
     context "invalid input" do
       it "fails to create record and throws error" do
         expect(QualifyingLifeEventKind.count).to eq(0)
