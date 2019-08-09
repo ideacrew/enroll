@@ -6,7 +6,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
   describe RuleSet::AcaIvlProductEligibilityPolicy, dbclean: :after_each do
     subject { RuleSet::AcaIvlProductEligibilityPolicy.new }
 
-    let!(:shop_health_product) {FactoryBot.create(:benefit_markets_products_health_products_health_product)}
+    let!(:shop_health_product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, metal_level_kind: :platinum)}
 
     let!(:ivl_health_product) do
       FactoryBot.create(:benefit_markets_products_health_products_health_product,
