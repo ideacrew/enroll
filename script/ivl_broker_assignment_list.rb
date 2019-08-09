@@ -28,7 +28,7 @@
           next if broker_agency_account.nil?
           next if broker_agency_account.broker_agency_profile.nil?
           next if broker_agency_account.broker_agency_profile.primary_broker_role.nil?
-          broker_role = broker_agency_account.primary_broker_role
+          broker_role = broker_agency_account.broker_agency_profile.primary_broker_role
           csv << [
             primary_person.first_name,
             primary_person.last_name,
