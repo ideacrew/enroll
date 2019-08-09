@@ -135,10 +135,6 @@ class GeneralAgencyStaffRole
         pr.general_agency_staff_roles.present? && pr.general_agency_staff_roles.where(npn: npn_value).first
       end.general_agency_staff_roles.where(npn: npn_value).first
     end
-
-    def general_agencies_matching_search_criteria(search_str)
-      Person.exists(general_agency_staff_roles: true).search_first_name_last_name_npn(search_str).where("general_agency_staff_roles.aasm_state" => "active")
-    end
   end
 
   private
