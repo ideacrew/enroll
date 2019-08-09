@@ -549,15 +549,18 @@ def employer_poc
     @ssn_match = Person.find_by_ssn(params[:person][:ssn]) unless params[:person][:ssn].blank?
     @ssn_fields = @person.employee_roles.map{|e| e.employer_profile.no_ssn} if @person.employee_roles.present?
     @info_changed, @dc_status = sensitive_info_changed?(@person.consumer_role) if @person.consumer_role
+    @ssn_require = @ssn_fields.present? && @ssn_fields.include?(false)
     if !@ssn_match.blank? && (@ssn_match.id != @person.id) # If there is a SSN match with another person.
       @dont_allow_change = true
-    elsif @ssn_fields.present? && @ssn_fields.include?(false)
-      @dont_update_ssn = true
     else
       begin
         @person.dob = Date.strptime(params[:jq_datepicker_ignore_person][:dob], '%m/%d/%Y').to_date
         if params[:person][:ssn].blank?
-          @person.encrypted_ssn = ""
+          if @ssn_require
+            @dont_update_ssn = true
+          else
+            @person.encrypted_ssn = ""
+          end
         else
           @person.ssn = params[:person][:ssn]
         end
