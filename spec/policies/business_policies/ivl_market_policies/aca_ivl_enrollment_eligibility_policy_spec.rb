@@ -4,8 +4,8 @@ require 'rails_helper'
 require File.join(Rails.root, 'spec/shared_contexts/enrollment')
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
-  describe RuleSet::AcaIvlEnrollmentEligibilityPolicy, dbclean: :after_each do
-    subject { RuleSet::AcaIvlEnrollmentEligibilityPolicy.new }
+  describe BusinessPolicies::IvlMarketPolicies::AcaIvlEnrollmentEligibilityPolicy, dbclean: :after_each do
+    subject { BusinessPolicies::IvlMarketPolicies::AcaIvlEnrollmentEligibilityPolicy.new }
 
     context 'apply_aptc' do
       include_context 'setup families enrollments'
@@ -143,7 +143,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     context 'edit_aptc' do
       include_context 'setup families enrollments'
 
-      RuleSet::AcaIvlEnrollmentEligibilityPolicy::APTC_ELIGIBLE_ENROLLMENT_STATES.each do |state|
+      BusinessPolicies::IvlMarketPolicies::AcaIvlEnrollmentEligibilityPolicy::APTC_ELIGIBLE_ENROLLMENT_STATES.each do |state|
         context 'for success case' do
           before :each do
             enrollment_assisted.update_attributes(aasm_state: state)
@@ -165,7 +165,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
       end
 
-      RuleSet::AcaIvlEnrollmentEligibilityPolicy::APTC_INELIGIBLE_ENROLLMENT_STATES.each do |state|
+      BusinessPolicies::IvlMarketPolicies::AcaIvlEnrollmentEligibilityPolicy::APTC_INELIGIBLE_ENROLLMENT_STATES.each do |state|
         context 'for failure cases' do
           before :each do
             enrollment_assisted.update_attributes(aasm_state: state)

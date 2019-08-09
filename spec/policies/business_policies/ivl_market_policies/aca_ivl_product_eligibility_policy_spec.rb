@@ -3,8 +3,8 @@
 require 'rails_helper'
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
-  describe RuleSet::AcaIvlProductEligibilityPolicy, dbclean: :after_each do
-    subject { RuleSet::AcaIvlProductEligibilityPolicy.new }
+  describe BusinessPolicies::IvlMarketPolicies::AcaIvlProductEligibilityPolicy, dbclean: :after_each do
+    subject { BusinessPolicies::IvlMarketPolicies::AcaIvlProductEligibilityPolicy.new }
 
     let!(:shop_health_product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, metal_level_kind: :platinum)}
 
