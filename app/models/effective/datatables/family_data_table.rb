@@ -73,7 +73,7 @@ module Effective
       
       def reinstate_enrollment_type(family, allow)
         return 'disabled' unless allow
-        reinstate_eligibles = family.admin_dt_enrollments.any? do |en|
+        reinstate_eligibles = family.active_household.hbx_enrollments.any? do |en|
            en.is_admin_reinstate_or_end_date_update_eligible?
          end
         reinstate_eligibles ? 'ajax' : 'disabled'
@@ -81,7 +81,7 @@ module Effective
  
       def update_terminated_enrollment_type(family, allow)
         return 'disabled' unless allow
-        end_date_update_eligibles = family.admin_dt_enrollments.any? do |en|
+        end_date_update_eligibles = family.active_household.hbx_enrollments.any? do |en|
           en.is_admin_reinstate_or_end_date_update_eligible?
         end
         end_date_update_eligibles ? 'ajax' : 'disabled'
