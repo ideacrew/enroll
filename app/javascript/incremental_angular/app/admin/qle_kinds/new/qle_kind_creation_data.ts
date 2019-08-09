@@ -16,19 +16,15 @@ export interface QleKindCreationResource {
     ordinal_position: number;
     event_kind_label: string;
     start_on: string;
-    is_active:  boolean;
+    is_active: boolean;
     event_on: string;
     coverage_effective_on: string;
     end_on: string;
-    visibility: string;
-    questions: Array<string>;
-    pre_event_sep_eligibility:number,
-    post_event_sep_eligibility:number,
-    available_in_system_from: string,  
-    available_in_system_until: string
-
+    pre_event_sep_eligibility: number;
+    post_event_sep_eligibility: number;
+    available_in_system_from: string;  
+    available_in_system_until: string;
   }
-  
 
   // The maximum data being sent to the server
   
@@ -52,6 +48,6 @@ export interface QleKindCreationResource {
     coverage_effective_on: string;
     start_on: string;
     end_on: string;
-    visibility: string;
+    questions: Array<string>;
   }
   
