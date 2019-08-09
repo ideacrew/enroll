@@ -362,32 +362,35 @@ module BenefitSponsors
 
         def general_agencies_with_matching_ga(search_params, value = nil)
           if search_params[:q].present?
-            general_agencies = Person.general_agencies_matching_search_criteria(search_params[:q])
-            orgs2 = approved_general_agencies.where({
-              :"profiles._id" => {
-                "$in" => general_agencies.map(&:general_agency_staff_roles).flatten.map(&:benefit_sponsors_general_agency_profile_id)
-              }
-            })
+            staff = Person.general_agencies_matching_search_criteria(search_params[:q])
+            organizations = approved_general_agencies
 
-            if general_agencies.any?
+            if staff.any?
               search_params.delete(:q)
+
               if search_params.empty?
-                return filter_general_agencies_by_primary_roles(orgs2, general_agencies)
+                return filter_general_agencies_by_primary_roles(organizations, staff)
               else
-                agencies_matching_advanced_criteria = orgs2.where({ "$and" => build_query_params(search_params) })
-                return filter_general_agencies_by_primary_roles(agencies_matching_advanced_criteria, general_agencies)
+                agencies_matching_advanced_criteria = organizations.where({ "$and" => build_query_params(search_params) })
+                return filter_general_agencies_by_primary_roles(agencies_matching_advanced_criteria, staff)
               end
             elsif value
-              return approved_general_agencies.where({ "$and" => build_query_params(search_params) })
+              return approved_general_agencies.where({"$and" => build_query_params(search_params) })
             end
           elsif !search_params[:q].present? && value
             return []
           end
         end
 
-        def filter_general_agencies_by_primary_roles(agencies, general_agencies)
-          agency_ids = agencies.map{|org| org.general_agency_profile.id}
-          general_agencies.select{ |ga| agency_ids.include?(ga.general_agency_primary_staff.benefit_sponsors_general_agency_profile_id) if ga.general_agency_primary_staff.present? }
+        def filter_general_agencies_by_primary_roles(organizations, staff)
+          agency_ids = organizations.map{|org| org.general_agency_profile.id}
+
+          staff.where(:"general_agency_staff_roles" => {
+            :$elemMatch => {
+              :benefit_sponsors_general_agency_profile_id => {:$in => agency_ids},
+              :is_primary => true
+            }
+          })
         end
 
         def build_query_params(search_params)

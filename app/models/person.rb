@@ -194,8 +194,6 @@ class Person
   index({last_name: 1, dob: 1}, {sparse: true})
 
   index({last_name: "text", first_name: "text", full_name: "text"}, {name: "person_search_text_index"})
-  index({"first_name" => 1, "last_name" => 1, "broker_role.npn": 1}, {name: "first_name_last_name_broker_npn_search"})
-  index({"first_name" => 1, "last_name" => 1, "general_agency_staff_roles.npn": 1}, {name: "first_name_last_name_ga_npn_search"})
 
   # Broker child model indexes
   index({"broker_role._id" => 1})
@@ -204,6 +202,16 @@ class Person
   index({"broker_role.benefit_sponsors_broker_agency_profile_id" => 1})
   index({"broker_role.npn" => 1}, {sparse: true, unique: true})
   index({"general_agency_staff_roles.npn" => 1}, {sparse: true})
+  index({"general_agency_staff_roles.is_primary" => 1}, {sparse: true})
+  index({"general_agency_staff_roles.benefit_sponsors_general_agency_profile_id" => 1}, {sparse: true})
+
+  index({"first_name" => 1, "last_name" => 1, "broker_role.npn" => 1}, {name: "first_name_last_name_broker_npn_search"})
+  index({"first_name" => 1, "last_name" => 1, "general_agency_staff_roles.npn" => 1}, {name: "first_name_last_name_ga_npn_search"})
+
+  index({
+      "general_agency_staff_roles.benefit_sponsors_general_agency_profile_id" => 1,
+      "general_agency_staff_roles.is_primary" => 1
+    }, {name: "agency_search_by_id_and_is_primary"})
 
   # Employer role index
   index({"employer_staff_roles._id" => 1})
