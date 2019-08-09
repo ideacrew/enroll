@@ -39,6 +39,7 @@ module BenefitSponsors
           :"benefit_applications" => { 
             :$elemMatch => {
               :"aasm_state" => :enrollment_closed,
+              :predecessor_id => { :$exists => false }
             }
           }
         })
