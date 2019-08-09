@@ -28,7 +28,7 @@
         </td>
 
         <td>
-          <%=  link_to(broker_agencies_broker_agency_staff_role_path(id:@broker_agency_profile.id, staff_id: staff.id), hidden: can_show_destroy?(current_user, staff) , method: 'delete', data: {confirm: 'Delete this role?'}) do %>
+          <%=  link_to(broker_agencies_broker_agency_staff_role_path(id:@broker_agency_profile.id, staff_id: staff.id), hidden: can_show_destroy?(staff, @broker_agency_profile) , method: 'delete', data: {confirm: 'Delete this role?'}) do %>
             <i class="fa fa-trash-o fa-2x role-trashcan"></i>
           <% end %>
         </td>

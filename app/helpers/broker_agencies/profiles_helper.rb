@@ -9,8 +9,10 @@ module BrokerAgencies::ProfilesHelper
     person.broker_role.present? ? false : true
   end
 
-  def can_show_destroy?(current_user, staff)
-    return true if current_user.person == staff || staff.broker_role.present?
+  def can_show_destroy?(staff, broker_agency_profile)
+    primary_broker = broker_agency_profile.primary_broker_role
+    return true  if primary_broker.present? && (staff == primary_broker.person)
+    false
   end
 
 end
