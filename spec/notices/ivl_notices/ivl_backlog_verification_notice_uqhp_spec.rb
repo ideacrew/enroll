@@ -92,7 +92,7 @@ RSpec.describe IvlNotices::IvlBacklogVerificationNoticeUqhp, :dbclean => :after_
       @backlog_notice.append_hbe
       @backlog_notice.build
       file = @backlog_notice.generate_pdf_notice
-      @reminder_notice.clear_tmp(file.path)
+      @backlog_notice.clear_tmp(file.path)
       expect(File.exist?(file.path)).to be false
     end
   end
