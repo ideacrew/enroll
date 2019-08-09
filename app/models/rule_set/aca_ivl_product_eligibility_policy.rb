@@ -31,10 +31,7 @@ module RuleSet
     def business_policies_for(product, event_name)
       return unless product.is_a?(::BenefitMarkets::Products::Product)
 
-      case event_name
-      when :apply_aptc
-        business_policies[:apply_aptc]
-      end
+      business_policies[event_name]
     end
   end
 end

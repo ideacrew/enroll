@@ -47,14 +47,7 @@ module RuleSet
     def business_policies_for(enrollment, event_name)
       return unless enrollment.is_a?(::HbxEnrollment)
 
-      case event_name
-      when :apply_aptc
-        business_policies[:apply_aptc]
-      when :apply_csr
-        business_policies[:apply_csr]
-      when :edit_aptc_on_enrollment
-        business_policies[:edit_aptc]
-      end
+      business_policies[event_name]
     end
   end
 end
