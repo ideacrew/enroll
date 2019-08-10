@@ -91,6 +91,7 @@ module BenefitSponsors
         benefit_application.predecessor
       end
 
+      # deprecated. Do not use. Use successor_benefit_package on benefit application instead.
       def successor
         self.benefit_application.benefit_sponsorship.benefit_applications.flat_map(&:benefit_packages).detect do |bp|
           bp.predecessor_id.to_s == self.id.to_s && (bp.benefit_application.is_submitted?)
@@ -173,6 +174,7 @@ module BenefitSponsors
         sponsored_benefits.delete(sponsored_benefit)
       end
 
+      # deprecated. Do not use. Use predecessor_benefit_package on benefit application instead.
       def predecessor
         return nil if predecessor_id.blank?
         return @predecessor if @predecessor
