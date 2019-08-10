@@ -221,24 +221,24 @@ module BenefitSponsors
         end
       end
 
-      def renew_employee_assignments(async_workflow_id = nil)
-        if predecessor
-          assigned_census_employees = predecessor.eligible_assigned_census_employees(predecessor.start_on)
+      def renew_employee_assignments(predecessor_benefit_package, async_workflow_id = nil)
+        return unless predecessor_benefit_package
 
-          assigned_census_employees.each do |census_employee|
-            if async_workflow_id.blank?
-              renew_employee_assignment(census_employee, start_on)
-            else
-              notify(
-                "acapi.info.events.benefit_package.renew_employee_assignment",
-                {
-                  :workflow_id => async_workflow_id.to_s,
-                  :benefit_package_id => self.id.to_s,
-                  :census_employee_id => census_employee.id.to_s,
-                  :effective_on_date => start_on.strftime("%Y-%m-%d")
-                }
-              )
-            end
+        assigned_census_employees = predecessor_benefit_package.eligible_assigned_census_employees(predecessor_benefit_package.start_on)
+
+        assigned_census_employees.each do |census_employee|
+          if async_workflow_id.blank?
+            renew_employee_assignment(census_employee, start_on)
+          else
+            notify(
+              "acapi.info.events.benefit_package.renew_employee_assignment",
+              {
+                :workflow_id => async_workflow_id.to_s,
+                :benefit_package_id => id.to_s,
+                :census_employee_id => census_employee.id.to_s,
+                :effective_on_date => start_on.strftime("%Y-%m-%d")
+              }
+            )
           end
         end
       end
@@ -275,7 +275,6 @@ module BenefitSponsors
         employee_role = census_employee.employee_role
         return [false, "no employee_role"] unless employee_role
         family = employee_role.primary_family
-
         return [false, "family missing for #{census_employee.full_name}"] if family.blank?
 
         # family.validate_member_eligibility_policy
@@ -325,7 +324,7 @@ module BenefitSponsors
       end
 
       def effectuate_member_benefits
-        activate_benefit_group_assignments if predecessor.present?
+        activate_benefit_group_assignments if predecessor_application.present?
 
         enrolled_families.each do |family|
           enrollments = HbxEnrollment.by_benefit_package(self).where(family_id: family.id).show_enrollments_sans_canceled

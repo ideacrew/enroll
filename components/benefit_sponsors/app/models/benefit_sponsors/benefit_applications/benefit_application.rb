@@ -639,7 +639,12 @@ module BenefitSponsors
     end
 
     def predecessor_benefit_package(current_benefit_package)
-      predecessor.benefit_packages.where(:title => current_benefit_package.title + "(#{current_benefit_package.start_on.year.prev_year})").first
+      *previous_title, _b = current_benefit_package.title.split('(')
+      predecessor.benefit_packages.where(:title => previous_title.join('(')).first
+    end
+
+    def successor_benefit_package(current_benefit_package)
+      successors.first.benefit_packages.where(:title => current_benefit_package.title + "(#{current_benefit_package.start_on.next_year.year})").first if successors.any?
     end
 
     def renew_benefit_package_assignments
