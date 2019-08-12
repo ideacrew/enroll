@@ -5,6 +5,8 @@ module BusinessPolicies
     class AcaIvlEnrollmentEligibilityPolicy
       include ::BenefitMarkets::BusinessRulesEngine
 
+      attr_reader :policy_errors, :satisfied
+
       VALID_MARKET_KIND = 'individual'
       APTC_INELIGIBLE_ENROLLMENT_STATES = ::HbxEnrollment::CANCELED_STATUSES + ::HbxEnrollment::TERMINATED_STATUSES
       APTC_ELIGIBLE_ENROLLMENT_STATES = ::HbxEnrollment.aasm.states.map(&:name).map(&:to_s) - APTC_INELIGIBLE_ENROLLMENT_STATES
@@ -45,10 +47,34 @@ module BusinessPolicies
       business_policy :edit_aptc,
                       rules: [:valid_state]
 
-      def business_policies_for(enrollment, event_name)
-        return unless enrollment.is_a?(::HbxEnrollment)
+      def initialize
+        @policy_errors = []
+        @satisfied = false
+      end
 
-        business_policies[event_name]
+      def execute(enrollment, event)
+        error = ["Class of the given object is #{enrollment.class} and not ::HbxEnrollment"]
+        unless valid_object?(enrollment)
+          @policy_errors += error
+          return {errors: @policy_errors, satisfied: satisfied}
+        end
+
+        applied_policy = business_policies[event]
+        error = ["Invalid event: #{event}"]
+        if applied_policy.blank?
+          @policy_errors += error
+          return {errors: @policy_errors, satisfied: satisfied}
+        end
+
+        @satisfied = applied_policy.is_satisfied?(enrollment)
+        @policy_errors += applied_policy.fail_results.values.uniq
+        {errors: @policy_errors, satisfied: satisfied}
+      end
+
+      private
+
+      def valid_object?(enrollment)
+        @valid_object ||= enrollment.is_a?(::HbxEnrollment)
       end
     end
   end

@@ -5,7 +5,7 @@ require File.join(Rails.root, 'spec/shared_contexts/enrollment')
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
   describe BusinessPolicies::IvlMarketPolicies::AcaIvlEnrollmentEligibilityPolicy, dbclean: :after_each do
-    subject { BusinessPolicies::IvlMarketPolicies::AcaIvlEnrollmentEligibilityPolicy.new }
+    subject { described_class.new }
 
     context 'apply_aptc' do
       include_context 'setup families enrollments'
@@ -13,51 +13,29 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       context 'for success case' do
         before :each do
           tax_household.update_attributes!(effective_starting_on: enrollment_assisted.effective_on)
-          @business_policy = subject.business_policies_for(enrollment_assisted, :apply_aptc)
+          @business_policy = subject.execute(enrollment_assisted, :apply_aptc)
         end
 
         it 'should return true when validated' do
-          expect(@business_policy.is_satisfied?(enrollment_assisted)).to be_truthy
+          expect(@business_policy[:satisfied]).to eq true
         end
 
         it 'should not return any fail results' do
-          expect(@business_policy.fail_results).to be_empty
-        end
-
-        it 'should return all rules in success_results' do
-          expect(@business_policy.success_results.keys).to eq @business_policy.rules.map(&:name)
-          expect(@business_policy.success_results.values.uniq).to eq ['validated successfully']
+          expect(@business_policy[:errors]).to be_empty
         end
       end
 
       context 'for failure cases' do
         before :each do
-          @business_policy = subject.business_policies_for(enrollment_unassisted, :apply_aptc)
+          @business_policy = subject.execute(enrollment_unassisted, :apply_aptc)
         end
 
         it 'should return true when validated' do
-          expect(@business_policy.is_satisfied?(enrollment_unassisted)).to be_falsy
+          expect(@business_policy[:satisfied]).to eq false
         end
 
         it 'should return fail results' do
-          expect(@business_policy.fail_results.keys).to eq [:any_member_aptc_eligible]
-          expect(@business_policy.fail_results.values).to eq ['None of the shopping members are eligible for APTC']
-        end
-
-        it 'should not return all keys in the success results' do
-          expect(@business_policy.success_results.keys).not_to eq @business_policy.rules.map(&:name)
-        end
-      end
-
-      context 'for invalid inputs' do
-        it 'should return not return any business_policy when invalid data is sent' do
-          @business_policy = subject.business_policies_for('bad object', :apply_aptc)
-          expect(@business_policy).to be_nil
-        end
-
-        it 'should return not return any business_policy when invalid data is sent' do
-          @business_policy = subject.business_policies_for(enrollment_unassisted, 'invalid_case')
-          expect(@business_policy).to be_nil
+          expect(@business_policy[:errors]).to eq ['None of the shopping members are eligible for APTC']
         end
       end
     end
@@ -68,20 +46,15 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       context 'for success case' do
         before :each do
           tax_household.update_attributes!(effective_starting_on: enrollment_assisted.effective_on)
-          @business_policy = subject.business_policies_for(enrollment_assisted, :apply_csr)
+          @business_policy = subject.execute(enrollment_assisted, :apply_aptc)
         end
 
         it 'should return true when validated' do
-          expect(@business_policy.is_satisfied?(enrollment_assisted)).to be_truthy
+          expect(@business_policy[:satisfied]).to eq true
         end
 
         it 'should not return any fail results' do
-          expect(@business_policy.fail_results).to be_empty
-        end
-
-        it 'should return all rules in success_results' do
-          expect(@business_policy.success_results.keys).to eq @business_policy.rules.map(&:name)
-          expect(@business_policy.success_results.values.uniq).to eq ['validated successfully']
+          expect(@business_policy[:errors]).to be_empty
         end
       end
 
@@ -90,52 +63,30 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           before :each do
             tax_household.update_attributes!(effective_starting_on: enrollment_assisted.effective_on)
             tax_household_member1.update_attributes!(is_ia_eligible: false, is_medicaid_chip_eligible: true)
-            @business_policy = subject.business_policies_for(enrollment_assisted, :apply_csr)
+            @business_policy = subject.execute(enrollment_assisted, :apply_csr)
           end
 
           it 'should return true when validated' do
-            expect(@business_policy.is_satisfied?(enrollment_assisted)).to be_falsy
+            expect(@business_policy[:satisfied]).to eq false
           end
 
           it 'should return fail results' do
-            expect(@business_policy.fail_results.keys).to eq [:any_member_csr_ineligible]
-            expect(@business_policy.fail_results.values).to eq ['One of the shopping members are ineligible for CSR']
-          end
-
-          it 'should not return all keys in the success results' do
-            expect(@business_policy.success_results.keys).not_to eq @business_policy.rules.map(&:name)
+            expect(@business_policy[:errors]).to eq ['One of the shopping members are ineligible for CSR']
           end
         end
 
         context 'tax households does not exists' do
           before :each do
-            @business_policy = subject.business_policies_for(enrollment_unassisted, :apply_csr)
+            @business_policy = subject.execute(enrollment_unassisted, :apply_csr)
           end
 
           it 'should return true when validated' do
-            expect(@business_policy.is_satisfied?(enrollment_unassisted)).to be_falsy
+            expect(@business_policy[:satisfied]).to eq false
           end
 
           it 'should return fail results' do
-            expect(@business_policy.fail_results.keys).to eq [:any_member_csr_ineligible]
-            expect(@business_policy.fail_results.values).to eq ['One of the shopping members are ineligible for CSR']
+            expect(@business_policy[:errors]).to eq ['One of the shopping members are ineligible for CSR']
           end
-
-          it 'should not return all keys in the success results' do
-            expect(@business_policy.success_results.keys).not_to eq @business_policy.rules.map(&:name)
-          end
-        end
-      end
-
-      context 'for invalid inputs' do
-        it 'should return not return any business_policy when invalid data is sent' do
-          @business_policy = subject.business_policies_for('bad object', :apply_csr)
-          expect(@business_policy).to be_nil
-        end
-
-        it 'should return not return any business_policy when invalid data is sent' do
-          @business_policy = subject.business_policies_for(enrollment_unassisted, 'invalid_case')
-          expect(@business_policy).to be_nil
         end
       end
     end
@@ -147,20 +98,15 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         context 'for success case' do
           before :each do
             enrollment_assisted.update_attributes(aasm_state: state)
-            @business_policy = subject.business_policies_for(enrollment_assisted, :edit_aptc)
+            @business_policy = subject.execute(enrollment_assisted, :edit_aptc)
           end
 
           it 'should return true when validated' do
-            expect(@business_policy.is_satisfied?(enrollment_assisted)).to be_truthy
+            expect(@business_policy[:satisfied]).to eq true
           end
 
           it 'should not return any fail results' do
-            expect(@business_policy.fail_results).to be_empty
-          end
-
-          it 'should return all rules in success_results' do
-            expect(@business_policy.success_results.keys).to eq @business_policy.rules.map(&:name)
-            expect(@business_policy.success_results.values.uniq).to eq ['validated successfully']
+            expect(@business_policy[:errors]).to be_empty
           end
         end
       end
@@ -169,33 +115,50 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         context 'for failure cases' do
           before :each do
             enrollment_assisted.update_attributes(aasm_state: state)
-            @business_policy = subject.business_policies_for(enrollment_assisted, :edit_aptc)
+            @business_policy = subject.execute(enrollment_assisted, :edit_aptc)
           end
 
           it 'should return true when validated' do
-            expect(@business_policy.is_satisfied?(enrollment_assisted)).to be_falsy
+            expect(@business_policy[:satisfied]).to eq false
           end
 
           it 'should return fail results' do
-            expect(@business_policy.fail_results.keys).to eq [:valid_state]
-            expect(@business_policy.fail_results.values).to eq ["Aasm state of given enrollment is #{enrollment_assisted.aasm_state} which is an invalid state"]
-          end
-
-          it 'should not return all keys in the success results' do
-            expect(@business_policy.success_results.keys).not_to eq @business_policy.rules.map(&:name)
+            expect(@business_policy[:errors]).to eq ["Aasm state of given enrollment is #{enrollment_assisted.aasm_state} which is an invalid state"]
           end
         end
       end
+    end
 
-      context 'for invalid inputs' do
-        it 'should return not return any business_policy when invalid data is sent' do
-          @business_policy = subject.business_policies_for('bad object', :edit_aptc)
-          expect(@business_policy).to be_nil
+    context 'for invalid inputs' do
+      context 'for invalid object' do
+        before do
+          @object = 'invalid object'
+          @business_policy = subject.execute(@object, :apply_aptc)
         end
 
-        it 'should return not return any business_policy when invalid data is sent' do
-          @business_policy = subject.business_policies_for(enrollment_unassisted, 'invalid_case')
-          expect(@business_policy).to be_nil
+        it 'should return false' do
+          expect(@business_policy[:satisfied]).to eq false
+        end
+
+        it 'should return fail results based on market kind' do
+          fail_messages = ["Class of the given object is #{@object.class} and not ::HbxEnrollment"]
+          expect(@business_policy[:errors]).to eq fail_messages
+        end
+      end
+
+      context 'for invalid event' do
+        before do
+          @event = 'invalid event'
+          @business_policy = subject.execute(enrollment_assisted, @event)
+        end
+
+        it 'should return false' do
+          expect(@business_policy[:satisfied]).to eq false
+        end
+
+        it 'should return fail results based on market kind' do
+          fail_messages = ["Invalid event: #{@event}"]
+          expect(@business_policy[:errors]).to eq fail_messages
         end
       end
     end
