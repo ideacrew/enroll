@@ -84,8 +84,13 @@ Given(/^qualifying life event kind (.*?) present for (.*?) market$/) do |qle_kin
   qualifying_life_event_kind(qle_kind_title, market_kind)
 end
 
-And(/^all qualifying life event kinds are visible to customer$/) do
-  QualifyingLifeEventKind.update_all(visible_to_customer: true)
+And(/^all qualifying life event kinds (.*?) to customer$/) do |visible_to_customer|
+  case visible_to_customer
+  when 'are visible'
+    QualifyingLifeEventKind.update_all(visible_to_customer: true)
+  when 'are not visible'
+    QualifyingLifeEventKind.update_all(visible_to_customer: false)
+  end
 end
 
 And(/^.+ clicks the Manage QLE link$/) do
