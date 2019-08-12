@@ -917,6 +917,13 @@ Then(/^I should see "(.*?)" in qle carousel$/) do |qle_event|
   expect(page).to have_content(qle_event)
 end
 
+Then(/^I should not see "(.*?)" in qle carousel$/) do |qle_kind_title|
+  qle_kind = qualifying_life_event_kind(qle_kind_title, market_kind = 'individual')
+  expect(qle_kind.market_kind).to eq('individual')
+  expect(qle_kind.visible_to_customer).to eq(false)
+  expect(page).to_not have_content(qle_kind_title)
+end
+
 When(/^I click the "(.*?)" in qle carousel$/) do |qle_event|
   click_link "#{qle_event}"
 end
