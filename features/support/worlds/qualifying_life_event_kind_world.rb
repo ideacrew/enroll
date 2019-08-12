@@ -1,13 +1,14 @@
 module QualifyingLifeEventKindWorld
 
-  def qualifying_life_event_kind(qle_kind_title = nil)
+  def qualifying_life_event_kind(qle_kind_title = nil, market_kind = 'shop')
     qle_kind = QualifyingLifeEventKind.where(title: qle_kind_title)
     if qle_kind.present?
       return qle_kind.first
     end
     @qle_kind ||= FactoryBot.create(
       :qualifying_life_event_kind,
-      title: qle_kind_title.present? ? qle_kind_title : 'Married'
+      title: qle_kind_title.present? ? qle_kind_title : 'Married',
+      market_kind: market_kind
     )
   end
 
@@ -29,12 +30,15 @@ module QualifyingLifeEventKindWorld
       fill_in("qle_kind_#{form_name}_tool_tip", with: "Tool Tip")
       # select('', from: "qle_kind_#{form_name}_action_kind")
       # select('', from: "qle_kind_#{form_name}__reason")
+      # TODO: Consider modifying this step to allow visibility as false
       # Visible to Customer
       choose("qle_kind_#{form_name}_visible_to_customer", option: 'Yes')
       # Note: not using capybara 'choose' here because the 'option' param
       # is for value, but we're using ng-reflect-value
       inputs = page.all('input')
-      shop_radio = inputs.detect { |input| input["ng-reflect-value"] == 'shop' }
+      # TODO: Consider modifying this step to allow different market kinds
+      market_kind = 'individual'
+      shop_radio = inputs.detect { |input| input["ng-reflect-value"] == market_kind }
       shop_radio.click
       # Self attested
       is_self_attested_radio = inputs.detect do |input|
@@ -50,7 +54,6 @@ module QualifyingLifeEventKindWorld
       # TODO: Fill out deactivate form
       # TODO: Click deactivation button
       fill_in("qle_kind_#{form_name}_end_on", with: '10/10/2030')
-      binding.pry
     end
   end
 
@@ -77,8 +80,12 @@ end
 
 World(QualifyingLifeEventKindWorld)
 
-Given(/^qualifying life event kind (.*?) present$/) do |qle_kind_title|
-  qualifying_life_event_kind(qle_kind_title)
+Given(/^qualifying life event kind (.*?) present for (.*?) market$/) do |qle_kind_title, market_kind|
+  qualifying_life_event_kind(qle_kind_title, market_kind)
+end
+
+And(/^all qualifying life event kinds are visible to customer$/) do
+  QualifyingLifeEventKind.update_all(visible_to_customer: true)
 end
 
 And(/^.+ clicks the Manage QLE link$/) do
