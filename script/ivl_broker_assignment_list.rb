@@ -23,32 +23,23 @@
       Family.exists("broker_agency_accounts" =>true).all.offset(offset).limit(batch_size).each do |family|
         next if family.primary_person.nil? || family.broker_agency_accounts.empty?
         primary_person = family.primary_person
-        history = family.broker_agency_accounts.map{|a| [a.broker_agency_profile.primary_broker_role.person.full_name,a.broker_agency_profile.primary_broker_role.npn,a.start_on,a.end_on]}
 
-        csv << [
+        family.broker_agency_accounts.each do |broker_agency_account|
+          next if broker_agency_account.nil?
+          next if broker_agency_account.broker_agency_profile.nil?
+          next if broker_agency_account.broker_agency_profile.primary_broker_role.nil?
+          broker_role = broker_agency_account.broker_agency_profile.primary_broker_role
+          csv << [
             primary_person.first_name,
             primary_person.last_name,
             primary_person.hbx_id,
-            history
+            broker_role.person.full_name,
+            broker_role.npn,
+            broker_agency_account.start_on,
+            broker_agency_account.end_on
           ]
-          puts @processed_count if @processed_count % 100 ==0
-
-
-        # family.broker_agency_accounts.each do |ba_account|
-        #   next if ba_account.nil? || ba_account.broker_agency_profile.nil? || ba_account.broker_agency_profile.primary_broker_role.nil?
-        #   
-        #   broker_role =  ba_account.broker_agency_profile.primary_broker_role
-        #   csv << [
-        #     primary_person.first_name,
-        #     primary_person.last_name,
-        #     primary_person.hbx_id,
-        #     broker_role.person.full_name,
-        #     broker_role.npn,
-        #     ba_account.start_on,
-        #     ba_account.end_on
-        #   ]
-        #   puts @processed_count if @processed_count % 100 ==0
-        # end
+        end
+        puts @processed_count if @processed_count % 100 == 0
         @processed_count += 1
       end
       offset = offset + batch_size
