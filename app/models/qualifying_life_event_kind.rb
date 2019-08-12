@@ -273,11 +273,10 @@ class QualifyingLifeEventKind
       market_kind = 'shop'
       market_kind = 'individual' if role.is_a?(ConsumerRole) || role.is_a?(ResidentRole)
       market_kind = 'fehb' if role.is_a?(EmployeeRole) && role.employer_profile.is_a?(BenefitSponsors::Organizations::FehbEmployerProfile)
-
       if hbx_staff
-        __send__(market_kind + '_market_events_admin')
+        send(market_kind + '_market_events_admin')
       else
-        __send__(market_kind + '_market_events')
+        send(market_kind + '_market_events')
       end
     end
   end

@@ -913,6 +913,10 @@ When(/^.+ clicks? on the tab for (.+)$/) do |tab_name|
   scroll_then_click(@browser.element(class: /interaction-click-control-#{tab_name}/))
 end
 
+Then(/^I should see "(.*?)" in qle carousel$/) do |qle_event|
+  expect(page).to have_content(qle_event)
+end
+
 When(/^I click the "(.*?)" in qle carousel$/) do |qle_event|
   click_link "#{qle_event}"
 end
@@ -942,7 +946,7 @@ Then(/^I should see not qualify message$/) do
 end
 
 When(/^I select a past qle date$/) do
-  expect(page).to have_content "Married"
+  # expect(page).to have_content "Married"
   screenshot("past_qle_date")
   fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
   click_link((TimeKeeper.date_of_record - 5.days).day)
