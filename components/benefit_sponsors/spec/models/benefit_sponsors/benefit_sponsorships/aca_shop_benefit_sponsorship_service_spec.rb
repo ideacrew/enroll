@@ -254,9 +254,9 @@ module BenefitSponsors
         end
       end
 
-      context "no change in renewal application" do
+      context "NO change in renewal application products" do
 
-        it "should notify carrier drop event" do
+        it "should not notify carrier drop event" do
           expect(service_instance).to receive(:notify).exactly(0).times
           service_instance.transmit_renewal_carrier_drop_event
         end
