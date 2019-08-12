@@ -209,9 +209,9 @@ class Person
   index({"first_name" => 1, "last_name" => 1, "general_agency_staff_roles.npn" => 1}, {name: "first_name_last_name_ga_npn_search"})
 
   index({
-      "general_agency_staff_roles.benefit_sponsors_general_agency_profile_id" => 1,
-      "general_agency_staff_roles.is_primary" => 1
-    }, {name: "agency_search_by_id_and_is_primary"})
+          "general_agency_staff_roles.benefit_sponsors_general_agency_profile_id" => 1,
+          "general_agency_staff_roles.is_primary" => 1
+        }, {name: "agency_search_by_id_and_is_primary"})
 
   # Employer role index
   index({"employer_staff_roles._id" => 1})
