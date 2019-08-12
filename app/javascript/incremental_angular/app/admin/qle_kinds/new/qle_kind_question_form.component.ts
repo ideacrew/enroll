@@ -104,7 +104,6 @@ export class QleKindQuestionFormComponent {
       question_title: new FormControl('', Validators.required),
       question_type: new FormControl(''),
       responses: rControls,
-      correctAnswer: new FormControl('', Validators.required),
     });
     this.responseArray = rControls;
     this.questionFormGroup = questionForm;

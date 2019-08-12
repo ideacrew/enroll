@@ -4,9 +4,6 @@ require 'rails_helper'
 
 RSpec.describe Exchanges::QlesController, :type => :controller do
   render_views
-  # TODO: Make the actual angular view pass the
-  # questions attributes properly, and place them in the
-  # Dry RB models and make sure they validate correctly.
   let(:qle_creation_params) do
     {
       'data' =>
@@ -39,7 +36,6 @@ RSpec.describe Exchanges::QlesController, :type => :controller do
                 "response_type" => "select"
               }
             ],
-            "correctAnswer" => ""
           }
         ],
         "start_on" => "06/01/1990",
