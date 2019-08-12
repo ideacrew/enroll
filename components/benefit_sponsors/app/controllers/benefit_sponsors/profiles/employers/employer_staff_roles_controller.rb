@@ -49,7 +49,7 @@ module BenefitSponsors
           authorize @staff
           @status , @result = @staff.destroy!
           unless @status
-            flash[:error] = ('Role was not deactivated because '  + @result)
+            flash[:error] = @result
           else
             flash[:notice] = 'Staff role was deleted'
           end

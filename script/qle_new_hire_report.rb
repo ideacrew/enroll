@@ -6,8 +6,8 @@ require 'csv'
 @start_date = Date.strptime(ARGV[0], "%m/%d/%Y").beginning_of_day
 @end_date  = Date.strptime(ARGV[1], "%m/%d/%Y").end_of_day
 
-@issuer_profile = BenefitSponsors::Organizations::Organization.issuer_profiles.all.inject({}) do |data, c|
-  data[c.id.to_s] = c.legal_name
+@issuer_profile = BenefitSponsors::Organizations::Organization.issuer_profiles.all.inject({}) do |data, c| 
+  data[c.issuer_profile.id.to_s] = c.issuer_profile.legal_name
   data
 end
 
@@ -47,8 +47,8 @@ def get_plan_details(enrollment, employer)
     enrollment.aasm_state.titleize,
     enrollment.total_premium,
     enrollment.total_employer_contribution,
-    product.name,
     product.hios_id,
+    product.name,
     @issuer_profile[product.issuer_profile_id.to_s],
     product_kind,
     product.metal_level,
@@ -98,7 +98,6 @@ def header_rows
     "Subscriber SSN",
     "Subscriber DOB",
     "Subscriber Gender",
-    "Subscriber Premium",
     "Subscriber First Name",
     "Subscriber Middle Name",
     "Subscriber Last Name",
@@ -113,7 +112,6 @@ def header_rows
       "Dep#{i+1} SSN",
       "Dep#{i+1} DOB",
       "Dep#{i+1} Gender ",
-      "Dep#{i+1} Premium",
       "Dep#{i+1} First Name ",
       "Dep#{i+1} Middle Name",
       "Dep#{i+1} Last Name",

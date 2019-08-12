@@ -60,9 +60,7 @@ module BenefitSponsors
         let(:account) { create :benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: broker_agency_profile, benefit_sponsorship: benefit_sponsorship }
 
         before do
-          account.assign_attributes({
-            is_active: false
-          })
+          account.assign_attributes({is_active: false, end_on: TimeKeeper.date_of_record})
 
           subject.broker_hired?(account)
           subject.broker_fired?(account)

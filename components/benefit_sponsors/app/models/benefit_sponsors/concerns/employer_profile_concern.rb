@@ -134,7 +134,7 @@ module BenefitSponsors
       end
 
       def plan_design_organization
-        ::SponsoredBenefits::Organizations::PlanDesignOrganization.where(sponsor_profile_id: self.id).first
+        ::SponsoredBenefits::Organizations::PlanDesignOrganization.where(sponsor_profile_id: id, has_active_broker_relationship: true).first
       end
 
       def staff_roles
@@ -152,7 +152,6 @@ module BenefitSponsors
       end
 
       def hire_broker_agency(new_broker_agency, start_on = today)
-        ::SponsoredBenefits::Organizations::BrokerAgencyProfile.assign_employer(broker_agency: new_broker_agency, employer: self) if parent
         start_on = start_on.to_date.beginning_of_day
         if active_broker_agency_account.present?
           terminate_on = (start_on - 1.day).end_of_day
@@ -162,12 +161,14 @@ module BenefitSponsors
 
         organization.employer_profile.active_benefit_sponsorship.broker_agency_accounts.create(broker_agency_profile: new_broker_agency, writing_agent_id: broker_role_id, start_on: start_on).save!
         @broker_agency_profile = new_broker_agency
+        ::SponsoredBenefits::Organizations::BrokerAgencyProfile.assign_employer(broker_agency: new_broker_agency, employer: self) if parent
       end
 
       def fire_broker_agency(terminate_on = today)
         return unless active_broker_agency_account
-        ::SponsoredBenefits::Organizations::BrokerAgencyProfile.unassign_broker(broker_agency: broker_agency_profile, employer: self) if parent
+        broker_profile = broker_agency_profile
         active_broker_agency_account.update_attributes!(end_on: terminate_on, is_active: false)
+        ::SponsoredBenefits::Organizations::BrokerAgencyProfile.unassign_broker(broker_agency: broker_profile, employer: self) if parent
         # TODO fix these during notices implementation
         # employer_broker_fired
         # notify_broker_terminated
@@ -317,6 +318,26 @@ module BenefitSponsors
         end
 
         hbx_enrollments
+      end
+
+      def terminate_roster_enrollments(args)
+        termination_date = Date.strptime(args["termination_date"], "%m/%d/%Y")
+        termination_reason = args["termination_reason"]
+        transmit_xml = args["transmit_xml"]
+
+        active_benefit_application.benefit_packages.each do |package|
+          if termination_date >= today
+            package.termination_pending_member_benefits(term_date: termination_date, enroll_term_reason: termination_reason, enroll_notify: transmit_xml)
+          else
+            package.terminate_member_benefits(term_date: termination_date, enroll_term_reason: termination_reason, enroll_notify: transmit_xml)
+          end
+        end
+
+        if renewal_benefit_application.present?
+          renewal_benefit_application.benefit_packages.each do |package|
+            package.cancel_member_benefits(enroll_notify: transmit_xml)
+          end
+        end
       end
 
       class << self

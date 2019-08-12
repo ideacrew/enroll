@@ -449,7 +449,7 @@ class HbxEnrollment
 
     # terminate all Enrollments scheduled for termination
     def terminate_scheduled_enrollments(as_of_date = TimeKeeper.date_of_record)
-      HbxEnrollment.where(:aasm_state => 'coverage_termination_pending', :terminated_on.lt => as_of_date).find_each do |hbx_enrollment|
+      HbxEnrollment.where(:aasm_state => 'coverage_termination_pending', :terminated_on.lt => as_of_date).each do |hbx_enrollment|
         hbx_enrollment.terminate_coverage!(hbx_enrollment.terminated_on)
       rescue StandardError => e
         Rails.logger.error { "Error terminating scheduled enrollment hbx_id - #{hbx_enrollment.hbx_id} due to #{e.backtrace}" }
