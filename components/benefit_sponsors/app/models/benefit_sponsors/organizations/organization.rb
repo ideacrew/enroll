@@ -375,9 +375,9 @@ module BenefitSponsors
                 return filter_general_agencies_by_primary_roles(agencies_matching_advanced_criteria, staff)
               end
             elsif value
-              return approved_general_agencies.where({"$and" => build_query_params(search_params) })
+              return organizations.where({"$and" => build_query_params(search_params) })
             end
-          elsif !search_params[:q].present? && value
+          elsif search_params[:q].blank? && value
             return []
           end
         end
@@ -385,12 +385,12 @@ module BenefitSponsors
         def filter_general_agencies_by_primary_roles(organizations, staff)
           agency_ids = organizations.map{|org| org.general_agency_profile.id}
 
-          staff.where(:"general_agency_staff_roles" => {
-            :$elemMatch => {
-              :benefit_sponsors_general_agency_profile_id => {:$in => agency_ids},
-              :is_primary => true
-            }
-          })
+          staff.where(:general_agency_staff_roles => {
+                        :$elemMatch => {
+                          :benefit_sponsors_general_agency_profile_id => {:$in => agency_ids},
+                          :is_primary => true
+                        }
+                      })
         end
 
         def build_query_params(search_params)
