@@ -341,8 +341,8 @@ class GroupSelectionPrevaricationAdapter
   #   current_benefit_package.present? && current_benefit_package.is_offering_dental?
   # end
 
-  def shop_health_and_dental_attributes(family_member, employee_role, coverage_start)
-    benefit_group = get_benefit_group(@benefit_group, employee_role, @qle)
+  def shop_health_and_dental_attributes(family_member, employee_role, coverage_start, qle)
+    benefit_group = get_benefit_group(@benefit_group, employee_role, qle)
 
     # Here we need to use the complex method to determine if this member is eligible to enroll
     [ 
@@ -355,9 +355,9 @@ class GroupSelectionPrevaricationAdapter
     shop_benefit_eligibilty_checker_for(benefit_group, coverage_kind)
   end
 
-  def class_for_ineligible_row(family_member, is_ivl_coverage, coverage_start)
+  def class_for_ineligible_row(family_member, is_ivl_coverage, coverage_start, qle)
     class_names = @person.active_employee_roles.inject([]) do |class_names, employee_role|
-      is_health_coverage, is_dental_coverage = shop_health_and_dental_attributes(family_member, employee_role, coverage_start)
+      is_health_coverage, is_dental_coverage = shop_health_and_dental_attributes(family_member, employee_role, coverage_start, qle)
 
       if !is_health_coverage && !is_health_coverage.nil?
         class_names << "ineligible_health_row_#{employee_role.id}"

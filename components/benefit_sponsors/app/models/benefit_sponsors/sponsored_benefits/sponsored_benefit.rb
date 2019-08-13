@@ -111,8 +111,9 @@ module BenefitSponsors
       end
 
       def issuers_offered
-        return [] if product_package.blank?
-        product_package.products.pluck(:issuer_profile_id).uniq
+        return [] if products(benefit_package.start_on).blank?
+
+        products(benefit_package.start_on).pluck(:issuer_profile_id).uniq
       end
 
       def latest_pricing_determination
