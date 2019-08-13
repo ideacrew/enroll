@@ -137,8 +137,11 @@ class GeneralAgencyProfile
     end
 
     def find(id)
-      organizations = Organization.where("general_agency_profile._id" => BSON::ObjectId.from_string(id)).to_a
-      organizations.size > 0 ? organizations.first.general_agency_profile : nil
+      organization = BenefitSponsors::Organizations::Organization.where(
+        "profiles._id" => BSON::ObjectId.from_string(id)
+      ).first
+
+      organization.profiles.where(id: BSON::ObjectId.from_string(id)).first if organization.present?
     end
 
     def filter_by(status="is_applicant")

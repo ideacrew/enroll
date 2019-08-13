@@ -292,7 +292,7 @@ module BenefitSponsors
         let(:family_price) { 541.17 }
         let(:primary_price) { 541.17 }
 
-        let(:total_contribution) { 270.58 }
+        let(:total_contribution) { 270.59 }
 
         let(:employee_contribution_level) do
           instance_double(

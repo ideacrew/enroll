@@ -103,6 +103,14 @@ RSpec.describe IvlNotices::FinalEligibilityNoticeRenewalAqhp, :dbclean => :after
       file = @final_eligibility_notice.generate_pdf_notice
       expect(File.exist?(file.path)).to be true
     end
+
+    it "should delete generated pdf" do
+      @final_eligibility_notice.append_hbe
+      @final_eligibility_notice.build
+      file = @final_eligibility_notice.generate_pdf_notice
+      @final_eligibility_notice.clear_tmp(file.path)
+      expect(File.exist?(file.path)).to be false
+    end
   end
 
   describe "for recipient, recipient_document_store", dbclean: :after_each do

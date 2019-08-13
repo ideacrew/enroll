@@ -728,6 +728,20 @@ module BenefitSponsors
       end
     end
 
+    describe '.mark_initial_ineligible' do
+      include_context "setup initial benefit application" do
+        let(:aasm_state) { 'enrollment_closed'}
+      end
+
+      subject { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application) }
+
+      it "should move benefit application to canceled" do
+        expect(initial_application.aasm_state).to eq :enrollment_closed
+        subject.mark_initial_ineligible
+        expect(initial_application.reload.aasm_state).to eq :enrollment_ineligible
+      end
+    end
+
     describe '.cancel' do
 
       include_context "setup initial benefit application"

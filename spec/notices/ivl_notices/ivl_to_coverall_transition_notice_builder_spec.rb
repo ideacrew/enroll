@@ -125,6 +125,14 @@ RSpec.describe IvlNotices::IvlToCoverallTransitionNoticeBuilder, dbclean: :after
       file = @ivl_cdc_notice.generate_pdf_notice
       expect(File.exist?(file.path)).to be true
     end
+
+    it "should delete generated pdf" do
+      @ivl_cdc_notice.append_hbe
+      @ivl_cdc_notice.build
+      file = @ivl_cdc_notice.generate_pdf_notice
+      @ivl_cdc_notice.clear_tmp(file.path)
+      expect(File.exist?(file.path)).to be false
+    end
   end
 
 end

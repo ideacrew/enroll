@@ -1971,6 +1971,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       let(:hbx_enrollment) {HbxEnrollment.new(kind: 'employer_sponsored', effective_on: effective_on)}
       let(:employee_role) {double(is_cobra_status?: true, census_employee: census_employee)}
       let(:census_employee) {double(cobra_begin_date: cobra_begin_date, have_valid_date_for_cobra?: true, coverage_terminated_on: cobra_begin_date - 1.day)}
+      let(:current_user) { FactoryBot.create :user }
 
       before do
         allow(hbx_enrollment).to receive(:employee_role).and_return(employee_role)
@@ -1978,7 +1979,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
 
       context 'When Enrollment Effectve date is prior to cobra begin date' do
         it 'should reset enrollment effective date to cobra begin date' do
-          hbx_enrollment.validate_for_cobra_eligiblity(employee_role)
+          hbx_enrollment.validate_for_cobra_eligiblity(employee_role, current_user)
           expect(hbx_enrollment.kind).to eq 'employer_sponsored_cobra'
           expect(hbx_enrollment.effective_on).to eq cobra_begin_date
         end
@@ -1988,7 +1989,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
         let(:cobra_begin_date) {TimeKeeper.date_of_record.prev_month.beginning_of_month}
 
         it 'should not update enrollment effective date' do
-          hbx_enrollment.validate_for_cobra_eligiblity(employee_role)
+          hbx_enrollment.validate_for_cobra_eligiblity(employee_role, current_user)
           expect(hbx_enrollment.kind).to eq 'employer_sponsored_cobra'
           expect(hbx_enrollment.effective_on).to eq effective_on
         end
@@ -1996,9 +1997,10 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
 
       context 'When employee not elgibile for cobra' do
         let(:census_employee) {double(cobra_begin_date: cobra_begin_date, have_valid_date_for_cobra?: false, coverage_terminated_on: cobra_begin_date - 1.day)}
+        let(:current_user) { FactoryBot.create :user }
 
         it 'should raise error' do
-          expect {hbx_enrollment.validate_for_cobra_eligiblity(employee_role)}.to raise_error("You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated.")
+          expect {hbx_enrollment.validate_for_cobra_eligiblity(employee_role, current_user)}.to raise_error("You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated.")
         end
       end
     end
@@ -2959,27 +2961,31 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
     let!(:person) { FactoryBot.create(:person)}
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
     let!(:household) { FactoryBot.create(:household, family: family) }
+    let(:original_termination_date) { TimeKeeper.date_of_record.next_month.end_of_month }
     let!(:enrollment) {
       FactoryBot.create(:hbx_enrollment,
                         family: family,
-                         household: family.active_household,
-                         coverage_kind: "health",
-                         kind: 'employer_sponsored',
-                         effective_on: TimeKeeper.date_of_record.last_month.beginning_of_month,
-                         terminated_on: TimeKeeper.date_of_record.end_of_month,
-                         aasm_state: 'coverage_termination_pending'
+                        household: family.active_household,
+                        coverage_kind: "health",
+                        kind: 'employer_sponsored',
+                        effective_on: TimeKeeper.date_of_record.last_month.beginning_of_month,
+                        terminated_on: original_termination_date,
+                        aasm_state: 'coverage_termination_pending'
       )}
     let!(:glue_event_queue_name) { "#{Rails.application.config.acapi.hbx_id}.#{Rails.application.config.acapi.environment_name}.q.glue.enrollment_event_batch_handler" }
 
     context "shop enrollment" do
       context "enrollment that already terminated with past date" do
         context "with new past or current termination date" do
+          let(:terminated_date) { original_termination_date - 1.day }
+          let(:original_termination_date) { TimeKeeper.date_of_record.beginning_of_month }
+
           it "should update enrollment with new end date and notify enrollment" do
             expect(enrollment).to receive(:notify).with("acapi.info.events.hbx_enrollment.terminated", {:reply_to=>glue_event_queue_name, "hbx_enrollment_id" => enrollment.hbx_id, "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment", "is_trading_partner_publishable" => false})
-            enrollment.reterm_enrollment_with_earlier_date(TimeKeeper.date_of_record, false)
+            enrollment.reterm_enrollment_with_earlier_date(terminated_date, false)
             enrollment.reload
             expect(enrollment.aasm_state).to eq "coverage_terminated"
-            expect(enrollment.terminated_on).to eq TimeKeeper.date_of_record
+            expect(enrollment.terminated_on).to eq terminated_date
           end
         end
 

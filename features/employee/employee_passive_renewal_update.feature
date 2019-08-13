@@ -50,5 +50,7 @@ Feature: Passive renewal should be updated when EE updates his current coverage
     When Patrick Doe selects make changes on active enrollment
     Then Patrick Doe should see page with SelectPlanToTerminate button
     When Patrick Doe clicks SelectPlanToTerminate button
+    Then Patrick Doe selects active enrollment for termination
     When Patrick Doe submits termination reason in modal
+    Then Patrick Doe should see termination confirmation
     Then Patrick Doe should see a confirmation message of Waive Coverage Successful

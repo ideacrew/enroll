@@ -49,6 +49,10 @@ class Notice
   end
 
   def notice_filename
+    "#{recipient.hbx_id}_#{subject.titleize.gsub(/[^0-9a-z]/i,'')}"
+  end
+
+  def title
     "#{subject.titleize.gsub(/[^0-9a-z]/i,'')}"
   end
 
@@ -139,7 +143,7 @@ class Notice
 
   def store_paper_notice
     bucket_name= Settings.paper_notice
-    notice_filename_for_paper_notice = "#{recipient.hbx_id}_#{subject.titleize.gsub(/\s*/, '')}"
+    notice_filename_for_paper_notice = "#{recipient.hbx_id}_#{subject.titleize.gsub(/\s*/, '')}_#{mpi_indicator.delete('_')}_IVL"
     notice_path_for_paper_notice = Rails.root.join("tmp", "#{notice_filename_for_paper_notice}.pdf")
     begin
       FileUtils.cp(notice_path, notice_path_for_paper_notice)
@@ -155,12 +159,12 @@ class Notice
 
   def create_recipient_document(doc_uri)
     notice = recipient_document_store.documents.build({
-      title: notice_filename,
-      creator: "hbx_staff",
-      subject: "notice",
-      identifier: doc_uri,
-      format: "application/pdf"
-    })
+                                                        title: title,
+                                                        creator: "hbx_staff",
+                                                        subject: "notice",
+                                                        identifier: doc_uri,
+                                                        format: "application/pdf"
+                                                      })
     if notice.save
       notice
     else

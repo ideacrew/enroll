@@ -47,16 +47,16 @@ module BenefitSponsors
               cu.match?(@relationship_totals)
             end
             cu = @level_map[contribution_unit.id]
-            c_factor = cu.contribution_factor
-            max_contribution = BigDecimal.new((@total_price * c_factor).to_s).round(2, BigDecimal::ROUND_HALF_DOWN)
-            @total_contribution = [max_contribution, @total_price, cu.contribution_cap].min
-            distribution_remaining = @total_contribution
-            @member_ids.reverse.each do |m_id|
-              member_price = member_prices[m_id]
-              member_discount = [distribution_remaining, member_price].min
-              distribution_remaining = BigDecimal.new((distribution_remaining - member_discount).to_s).round(2)
-              @member_contributions[m_id] = member_discount
+            c_factor = integerize_percent(cu.contribution_factor)
+            t_contribution = BigDecimal.new("0.00")
+            @member_ids.each do |m_id|
+              cont_amount = (member_prices[m_id] * c_factor)/100.00
+              t_contribution = t_contribution + cont_amount
             end
+            cap = cu.contribution_cap
+            @total_contribution = BigDecimal.new(t_contribution.to_s).round(2)
+            rebalance_value = (@total_contribution > cap) ? cap : @total_contribution
+            rebalance_contributions(rebalance_value, member_prices)
           else
             @member_ids.each do |m_id|
               @member_contributions[m_id] = 0.00
@@ -64,6 +64,29 @@ module BenefitSponsors
             end
           end
           self
+        end
+
+        def rebalance_contributions(cap, member_prices)
+          new_total_contribution = cap
+          @total_contribution = new_total_contribution
+          adjusted_contribution_factor = (new_total_contribution * 1.00)/@total_price
+          total_assigned = BigDecimal.new("0.00")
+          @member_ids.each do |m_id|
+            assigned_value = BigDecimal.new((adjusted_contribution_factor * member_prices[m_id]).to_s).round(2, BigDecimal::ROUND_DOWN)
+            @member_contributions[m_id] = assigned_value
+            total_assigned = total_assigned + assigned_value
+          end
+          difference = @total_contribution - total_assigned
+          if (difference > 0.005) && @member_ids.first.present?
+            first_member_id = @member_ids.first
+            @member_contributions[first_member_id] = BigDecimal.new((difference + @member_contributions[first_member_id]).to_s).round(2)
+          end
+        end
+
+        # Integerize the contribution percent to match the old rounding model
+        def integerize_percent(cont_percent)
+          per = BigDecimal.new((cont_percent * 100.00).to_s).round(0).to_i
+          per
         end
       end
 

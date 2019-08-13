@@ -992,12 +992,24 @@ end
 
 RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   describe "GET purchase" do
-    let(:hbx_enrollment) { HbxEnrollment.new }
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup initial benefit application"
+
     let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
     let(:person) { FactoryBot.create(:person) }
     let(:user) { FactoryBot.create(:user, person: person) }
+    let(:hbx_enrollment) {  FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+                        household: family.active_household,
+                        family: family,
+                        aasm_state: "coverage_enrolled",
+                        effective_on: initial_application.start_on,
+                        rating_area_id: initial_application.recorded_rating_area_id,
+                        sponsored_benefit_id: initial_application.benefit_packages.first.health_sponsored_benefit.id,
+                        sponsored_benefit_package_id:initial_application.benefit_packages.first.id,
+                        benefit_sponsorship_id:initial_application.benefit_sponsorship.id)
+    }
+
     before :each do
-      allow(HbxEnrollment).to receive(:find).and_return hbx_enrollment
       allow(person).to receive(:primary_family).and_return(family)
       allow(hbx_enrollment).to receive(:reset_dates_on_previously_covered_members).and_return(true)
       sign_in(user)

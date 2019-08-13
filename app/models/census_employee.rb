@@ -142,7 +142,7 @@ class CensusEmployee < CensusMember
   scope :active,            ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_STATES) }
   scope :terminated,        ->{ any_in(aasm_state: EMPLOYMENT_TERMINATED_STATES) }
   scope :non_terminated,    ->{ where(:aasm_state.nin => EMPLOYMENT_TERMINATED_STATES) }
-  scope :non_term_and_pending,->{ where(:aasm_state.nin => (EMPLOYMENT_TERMINATED_STATES + PENDING_STATES)) }
+  scope :non_term_and_pending, ->{ where(:aasm_state.nin => (EMPLOYMENT_TERMINATED_STATES + PENDING_STATES)) }
   scope :newly_designated,  ->{ any_in(aasm_state: NEWLY_DESIGNATED_STATES) }
   scope :linked,            ->{ any_in(aasm_state: LINKED_STATES) }
   scope :eligible,          ->{ any_in(aasm_state: ELIGIBLE_STATES) }
@@ -979,7 +979,11 @@ class CensusEmployee < CensusMember
       person.employee_roles.each do |employee_role|
         ce = employee_role.census_employee
         if current_user.has_hbx_staff_role? && ce.present?
-          ce.ssn = person.ssn
+          if person.ssn.nil?
+            ce.unset(:encrypted_ssn)
+          else
+            ce.ssn = person.ssn
+          end
           ce.dob = person.dob
           ce.save!(validate: false)
         end

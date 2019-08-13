@@ -17,7 +17,7 @@ class TaxHouseholdMember
   field :is_subscriber, type: Boolean, default: false
   field :reason, type: String
 
-  validate :strictly_boolean, :strictly_one_pdc_only
+  validate :strictly_boolean
 
   alias_method :family_member_id, :applicant_id
 
@@ -69,11 +69,6 @@ class TaxHouseholdMember
     unless is_subscriber.is_a? Boolean
       self.errors.add(:base, "is_subscriber should be a boolean")
     end
-  end
-
-  def strictly_one_pdc_only
-    pdc_values = [is_ia_eligible, is_medicaid_chip_eligible, is_totally_ineligible, is_uqhp_eligible]
-    errors.add(:base, "only one of the all pdcs types should be applicable") unless pdc_values.count(true) == 1
   end
 
   def person

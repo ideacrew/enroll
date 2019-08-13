@@ -7,13 +7,12 @@ module BenefitSponsors
         if self.class.observer_peers.any?
           self.class.observer_peers.each do |k, events|
             events.each do |event|
-              model_instance = self
-              if args.is_a?(BenefitSponsors::ModelEvents::ModelEvent)
-                model_instance = args.klass_instance
+              if args.present? && k.is_a?(args.options[:observer_klass] || BenefitSponsors::Observers::NoticeObserver)
+                k.send event, self, args
+              elsif k.respond_to?(event) && ['EdiObserver','NoticeObserver'].exclude?(k.class.name.split('::').last)
+                # TODO: REMOVE this else condition after observer pattern isolated to notice, edi observerd
+                k.send event, self, args
               end
-              next if k.is_a?(BenefitSponsors::Observers::NoticeObserver) & args.blank?
-
-              k.send event, model_instance, args
             end
           end
         end

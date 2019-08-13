@@ -208,7 +208,12 @@ class BenefitGroupAssignment
 
   def hbx_enrollment
     return @hbx_enrollment if defined? @hbx_enrollment
-    @hbx_enrollment = HbxEnrollment.where(id: self.hbx_enrollment_id).first if hbx_enrollment_id.present?
+    @hbx_enrollment =
+      if hbx_enrollment_id.present?
+        HbxEnrollment.where(id: hbx_enrollment_id).first
+      else
+        hbx_enrollments.max_by(&:created_at)
+      end
   end
 
   def end_benefit(end_on)
