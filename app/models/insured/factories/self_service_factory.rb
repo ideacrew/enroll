@@ -4,7 +4,7 @@ module Insured
   module Factories
     class SelfServiceFactory
 
-      attr_accessor :enrollment_id, :enrollment
+      attr_accessor :enrollment_id, :enrollment, :product
 
       def initialize(enrollment_id)
         self.enrollment_id = enrollment_id
