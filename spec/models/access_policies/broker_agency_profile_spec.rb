@@ -31,6 +31,16 @@ describe AccessPolicies::BrokerAgencyProfile, :dbclean => :after_each do
       end
     end
 
+    context 'for an broker role person' do
+      let(:broker_role) { FactoryGirl.create(:broker_role, broker_agency_profile: broker_agency_profile) }
+      let(:person) { broker_role.person }
+
+      it 'should authorize' do
+        broker_agency_profile = BrokerAgencyProfile.find(broker_role.broker_agency_profile.id.to_s)
+        expect(subject.authorize_edit(broker_agency_profile, controller)).to be_truthy
+      end
+    end
+
     context 'has broker staff role of broker agency profile' do
       let(:user) { FactoryGirl.create(:user, person: person) }
       let(:person) { FactoryGirl.create(:person) }

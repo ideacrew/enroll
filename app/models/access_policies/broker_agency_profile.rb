@@ -8,6 +8,7 @@ module AccessPolicies
 
     def is_broker_staff_for_agency?(broker_profile)
       person = user.person
+      return true if person.broker_role.present?
       return false unless person.broker_agency_staff_roles.present?
       broker_agency_profiles = person.broker_agency_staff_roles.map {|role| ::BrokerAgencyProfile.find(role.broker_agency_profile_id) }
       broker_agency_profiles.map(&:id).map(&:to_s).include?(broker_profile.to_s)
