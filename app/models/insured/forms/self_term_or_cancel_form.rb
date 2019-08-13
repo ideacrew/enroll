@@ -3,19 +3,37 @@
 module Insured
   module Forms
     class SelfTermOrCancelForm
+      include ActiveModel::Validations
       include Virtus.model
 
-      attribute :enrollment, HbxEnrollment
-      attribute :term_date, Date
+      attribute :carrier_logo,          String
+      attribute :covered_members,       Array
+      attribute :current_premium,       String
+      attribute :enrollment,            ::Insured::Forms::EnrollmentForm
+      attribute :is_under_ivl_oe,       Boolean
+      attribute :market_kind,           String
+      attribute :product,               ::Insured::Forms::ProductForm
+      attribute :qle_kind_id,           String
+      attribute :sep_id,                String
+      attribute :should_term_or_cancel, String
+      attribute :term_date,             Date
+
+      validates :current_premium,       presence: true
+      validates :market_kind,           presence: true
 
       def self.for_view(attrs)
-        service = self_term_or_cancel_service(attrs[:enrollment_id])
+        service     = self_term_or_cancel_service(attrs)
         form_params = service.find
         new(form_params)
       end
 
-      def self.self_term_or_cancel_service(enrollment_id)
-        ::Insured::Services::SelfTermOrCancelService.new(enrollment_id)
+      def self.for_post(attrs)
+        service     = self_term_or_cancel_service(attrs)
+        form_params = service.term_or_cancel(:should_term_or_cancel)
+      end
+
+      def self.self_term_or_cancel_service(attrs)
+        ::Insured::Services::SelfTermOrCancelService.new(attrs)
       end
     end
   end

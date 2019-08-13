@@ -2,8 +2,8 @@
 
 module Insured
   module Serializers
-    class EnrollmentSerializer < ::ActiveModel::Serializer
-      attributes :id, :hbx_id, :effective_on
+    class ProductSerializer < ::ActiveModel::Serializer
+      attributes :id, :application_period, :name, :hios_id, :issuer_profile_id, :metal_level, :kind
 
       # provide defaults(if any needed) that were not set on Model
       def attributes(*args)

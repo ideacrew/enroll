@@ -2,8 +2,8 @@
 
 module Insured
   module Serializers
-    class EnrollmentSerializer < ::ActiveModel::Serializer
-      attributes :id, :hbx_id, :effective_on
+    class SbcDocumentSerializer < ::ActiveModel::Serializer
+      attributes :id, :identifier
 
       # provide defaults(if any needed) that were not set on Model
       def attributes(*args)
