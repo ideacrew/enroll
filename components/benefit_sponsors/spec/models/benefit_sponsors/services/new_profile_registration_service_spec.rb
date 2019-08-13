@@ -219,22 +219,24 @@ module BenefitSponsors
         plan_design_organization
       }
 
+      let(:params) {{ profile_id: employer_profile.id, profile_type: "benefit_sponsor" }}
+      let(:service) {subject.new params}
+
       before do
         allow(person).to receive(:active_general_agency_staff_roles).and_return([primary_general_agency_staff_role])
         allow(employer_profile).to receive(:general_agency_accounts).and_return(plan_design_organization_with_assigned_ga.general_agency_accounts)
+        allow(service).to receive(:load_profile) do
+          service.instance_variable_set(:@profile, employer_profile)
+        end
       end
 
       it "should return true if general agency staff is assigned to a general agency profile" do
-        params = { profile_id: employer_profile.id, profile_type: "benefit_sponsor" }
-        service = subject.new params
-        expect(service.is_general_agency_staff_for_employer?(user, nil)). to eq true
+        expect(service.is_general_agency_staff_for_employer?(user, nil)).to eq true
       end
 
       it "should return false if general agency staff is not assigned to a general agency profile" do
         person.general_agency_staff_roles.each{|staff| staff.update_attributes(benefit_sponsors_general_agency_profile_id: nil)}
-        params = { profile_id: employer_profile.id, profile_type: "benefit_sponsor" }
-        service = subject.new params
-        expect(service.is_general_agency_staff_for_employer?(user, nil)). to eq false
+        expect(service.is_general_agency_staff_for_employer?(user, nil)).to eq false
       end
     end
   end
