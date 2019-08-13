@@ -2,7 +2,7 @@
 
 module Insured
   module Serializers
-    class EnrollmentSerializer < ::ActiveModel::Serializer
+    class FamilySerializer < ::ActiveModel::Serializer
       attributes :id, :hbx_id, :effective_on
 
       # provide defaults(if any needed) that were not set on Model
