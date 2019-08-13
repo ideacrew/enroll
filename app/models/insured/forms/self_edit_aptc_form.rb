@@ -2,11 +2,10 @@
 
 module Insured
   module Forms
-    class SelfTermOrCancelForm
+    class SelfEditAPTCForm
       include Virtus.model
 
       attribute :enrollment, HbxEnrollment
-      # attribute :new_aptc, TYPE
 
       def self.for_view(attrs)
         service = self_edit_aptc_service(attrs[:enrollment_id])
