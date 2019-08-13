@@ -116,6 +116,7 @@ describe ChangeEnrollmentDetails do
 
     context "change enrollment aasm state" do
 
+      let(:benefit_application) { ::BenefitSponsors::BenefitApplications::BenefitApplication.new }
       let(:benefit_package) { ::BenefitSponsors::BenefitPackages::BenefitPackage.new }
 
       
@@ -124,7 +125,7 @@ describe ChangeEnrollmentDetails do
           hbx_enrollment.update_attribute('aasm_state', 'unverified')
           hbx_enrollment.reload
           allow(::BenefitSponsors::BenefitPackages::BenefitPackage).to receive(:find).and_return(benefit_package)
-          allow(benefit_package).to receive(:successor).and_return(nil)
+          allow(benefit_package).to receive(:benefit_application).and_return(benefit_application)
           expect(hbx_enrollment.may_move_to_enrolled?).to eq true
           subject.migrate
           hbx_enrollment.reload

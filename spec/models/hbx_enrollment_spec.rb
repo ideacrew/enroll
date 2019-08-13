@@ -1650,6 +1650,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       let(:current_benefit_package) { renewal_application.predecessor.benefit_packages[0] }
 
       let(:generate_passive_renewal) {
+        renewal_application.benefit_packages[0].update_attributes(title: current_benefit_package.title + "(#{renewal_application.start_on.year})")
         census_employee.update!(created_at: 2.months.ago)
         census_employee.assign_to_benefit_package(benefit_package, renewal_effective_date)
         benefit_package.renew_member_benefit(census_employee)
@@ -2255,12 +2256,15 @@ describe HbxEnrollment, type: :model, :dbclean => :around_each do
           r_application
         }
 
+        let(:initial_benefit_package) { initial_application.benefit_packages[0] }
+
         let(:renewal_benefit_package) {
           renewal_application.benefit_packages[0]
         }
 
         before do
           allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(100.0)
+          renewal_benefit_package.update_attributes(title: initial_benefit_package.title + "(#{renewal_application.effective_period.min.year})")
           renewal_benefit_package.sponsored_benefits.each do |sponsored_benefit|
             allow(sponsored_benefit).to receive(:products).and_return(sponsored_benefit.product_package.products)
           end
@@ -2325,6 +2329,7 @@ describe HbxEnrollment, type: :model, :dbclean => :around_each do
         context 'renewing employee D' do
 
           before do
+            renewal_benefit_package.update_attributes(title: initial_benefit_package.title + "(#{renewal_application.effective_period.min.year})")
             renewal_benefit_package.renew_member_benefit(census_employees[3])
             family.reload
           end

@@ -15,7 +15,7 @@
 - @benefit_application_form.benefit_packages.each do |benefit_package_form|
 
   .col-xs-12
-    = link_to 'Edit Benefit Package', edit_benefit_sponsorship_benefit_application_benefit_package_path(@benefit_application_form.service.benefit_sponsorship, benefit_package_form.service.benefit_application, benefit_package_form.service.benefit_package, :show_benefit_application_tile => true), method: :get, class: 'btn btn-default pull-right mb-1'
+    = link_to 'Edit Benefit Package', edit_benefit_sponsorship_benefit_application_benefit_package_path(@benefit_application_form.service.benefit_sponsorship, benefit_package_form.service.benefit_application, benefit_package_form.service.benefit_package, :show_benefit_application_tile => true), method: :get, class: 'btn btn-default pull-right mb-1', data: { turbolinks: false }
 
     .panel.benefitgroup.col-xs-12.referenceplan#uicReferencePlan
       .col-xs-1
