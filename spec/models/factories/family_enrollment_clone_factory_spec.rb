@@ -89,7 +89,7 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model, dbclean
       expect(family.enrollments.size).to eq 1
       expect(family.enrollments.map(&:kind)).not_to include('employer_sponsored_cobra')
       generate_cobra_enrollment
-      expect(family.enrollments.by_coverage_kind('health').size).to eq 2
+      expect(family.enrollments.by_coverage_kind('health').size).to eq 3
       expect(family.enrollments.map(&:kind)).to include('employer_sponsored_cobra')
     end
 
