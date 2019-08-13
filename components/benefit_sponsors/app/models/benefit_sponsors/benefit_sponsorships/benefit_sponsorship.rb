@@ -429,7 +429,11 @@ module BenefitSponsors
 
     def submitted_benefit_application
       # renewing_published_plan_year || active_plan_year ||
-      published_benefit_application || imported_benefit_application
+      published_benefit_application || active_imported_benefit_application
+    end
+
+    def active_imported_benefit_application
+      benefit_applications.where(:"effective_period.max".gte => TimeKeeper.date_of_record).order_by(:"updated_at".desc).imported.first  if is_conversion?
     end
 
     def imported_benefit_application

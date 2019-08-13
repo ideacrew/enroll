@@ -500,6 +500,44 @@ module BenefitSponsors
       end
     end
 
+    describe "active_imported_benefit_application", :dbclean => :after_each do
+      let(:benefit_sponsorship) { employer_profile.add_benefit_sponsorship }
+
+      context "when employer with active imported benefit application" do
+        let!(:active_imported_benefit_application) do
+          FactoryBot.create(
+            :benefit_sponsors_benefit_application,
+            benefit_sponsorship: benefit_sponsorship,
+            recorded_service_areas: benefit_sponsorship.service_areas, aasm_state: :imported
+          )
+        end
+
+        it "should return active imported benefit application" do
+          benefit_sponsorship.update_attributes!(source_kind: :conversion)
+          expect(benefit_sponsorship.active_imported_benefit_application).to eq active_imported_benefit_application
+        end
+      end
+
+      context "when employer with expired imported benefit application" do
+        let(:effective_on) { TimeKeeper.date_of_record - 2.years}
+        let(:effective_period) { effective_on..(effective_on.next_year.prev_day) }
+        let(:expired_imported_benefit_application) do
+          FactoryBot.create(
+            :benefit_sponsors_benefit_application,
+            benefit_sponsorship: benefit_sponsorship,
+            recorded_service_areas: benefit_sponsorship.service_areas,
+            aasm_state: :imported,
+            effective_period: effective_period
+          )
+        end
+
+        it "should return nil" do
+          benefit_sponsorship.update_attributes!(source_kind: :conversion)
+          expect(benefit_sponsorship.active_imported_benefit_application).to eq nil
+        end
+      end
+    end
+
     describe "dt_display_benefit_application", :dbclean => :after_each do
       let(:benefit_sponsorship)             { employer_profile.add_benefit_sponsorship }
 
