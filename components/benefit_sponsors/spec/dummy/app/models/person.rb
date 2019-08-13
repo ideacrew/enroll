@@ -96,6 +96,7 @@ class Person
   after_create :create_inbox
 
   scope :by_hbx_id, ->(person_hbx_id) { where(hbx_id: person_hbx_id) }
+  scope :general_agency_staff_certified,     -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :active })}
 
   def move_encrypted_ssn_errors
     deleted_messages = errors.delete(:encrypted_ssn)
@@ -284,6 +285,10 @@ class Person
           {"broker_role.npn" => s_rex}
           ] + additional_exprs(clean_str))
         })
+    end
+
+    def general_agencies_matching_search_criteria(search_str)
+      general_agency_staff_certified.search_first_name_last_name_npn(search_str)
     end
 
     def match_existing_person(personish)
