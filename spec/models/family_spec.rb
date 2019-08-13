@@ -1385,7 +1385,7 @@ describe Family, "scopes", dbclean: :after_each do
   let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_year }
   let!(:plan) { FactoryBot.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01", csr_variant_id: "01")}
   let!(:benefit_group) { current_benefit_package }
-  let!(:census_employee) { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile, benefit_group: current_benefit_package ) }
+  let!(:census_employee) { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile, benefit_group: current_benefit_package) }
   let!(:employee_role) { FactoryBot.create(:employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id) }
   let!(:benefit_group_assignment) { FactoryBot.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee)}
   let(:family_member) {family.family_members.first}
@@ -1464,6 +1464,8 @@ describe Family, "scopes", dbclean: :after_each do
     end
 
     it '.enrolled_under_benefit_application' do
+      allow(census_employee).to receive(:family).and_return(family)
+      allow(initial_application).to receive(:active_census_employees).and_return([census_employee])
       expect(Family.enrolled_under_benefit_application(initial_application)).to include family
     end
 

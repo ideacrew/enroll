@@ -243,7 +243,7 @@ describe CensusEmployeePolicy, dbclean: :after_each do
         let(:general_agency) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, :with_site) }
         let(:general_agency_profile) { general_agency.profiles.first }
 
-        let!(:plan_design_organization) { FactoryBot.create(:sponsored_benefits_plan_design_organization, sponsor_profile_id: bs_employer_profile.id) }
+        let!(:plan_design_organization) { FactoryBot.create(:sponsored_benefits_plan_design_organization, has_active_broker_relationship: true, sponsor_profile_id: bs_employer_profile.id) }
         let!(:general_agency_account) { plan_design_organization.general_agency_accounts.create(general_agency_profile: general_agency_profile, start_on: start_on, broker_role_id: broker_agency_profile.primary_broker_role.id) }
 
         let(:person) { FactoryBot.create(:person) }

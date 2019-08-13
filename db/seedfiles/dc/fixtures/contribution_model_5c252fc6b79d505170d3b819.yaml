@@ -127,6 +127,9 @@ attributes: !ruby/hash:BSON::Document
     relationship_name: :dependent
     age_threshold: 26
     age_comparison: :>=
-    disability_qualifier: true
     relationship_kinds:
     - ward
+    - child
+    - adopted_child
+    - foster_child
+    - stepchild

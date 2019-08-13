@@ -124,6 +124,15 @@ RSpec.describe IvlNotices::FinalEligibilityNoticeRenewalUqhp, :dbclean => :after
       file = @final_eligibility_notice.generate_pdf_notice
       expect(File.exist?(file.path)).to be true
     end
+
+    it "should delete generated pdf" do
+      person.consumer_role.update_attributes!(:aasm_state => "verification_outstanding")
+      person.primary_family.update_attributes(min_verification_due_date: TimeKeeper.date_of_record + 95.days)
+      @final_eligibility_notice.build
+      file = @final_eligibility_notice.generate_pdf_notice
+      @final_eligibility_notice.clear_tmp(file.path)
+      expect(File.exist?(file.path)).to be false
+    end
   end
 
   describe "for recipient, recipient_document_store", dbclean: :after_each do

@@ -62,6 +62,7 @@ module SponsoredBenefits
                 broker_agency_profile: broker_agency_profile(broker_agency_profile_id),
                 status: 'Hire'
               })
+              notify("acapi.info.events.employer.general_agent_added", {employer_id: employer_profile.hbx_id, event_name: "general_agent_added"})
             end
           else
             map_failed_assignment_on_form(id) if form.present?

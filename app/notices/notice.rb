@@ -49,6 +49,10 @@ class Notice
   end
 
   def notice_filename
+    "#{recipient.hbx_id}_#{subject.titleize.gsub(/[^0-9a-z]/i,'')}"
+  end
+
+  def title
     "#{subject.titleize.gsub(/[^0-9a-z]/i,'')}"
   end
 
@@ -155,12 +159,12 @@ class Notice
 
   def create_recipient_document(doc_uri)
     notice = recipient_document_store.documents.build({
-      title: notice_filename,
-      creator: "hbx_staff",
-      subject: "notice",
-      identifier: doc_uri,
-      format: "application/pdf"
-    })
+                                                        title: title,
+                                                        creator: "hbx_staff",
+                                                        subject: "notice",
+                                                        identifier: doc_uri,
+                                                        format: "application/pdf"
+                                                      })
     if notice.save
       notice
     else

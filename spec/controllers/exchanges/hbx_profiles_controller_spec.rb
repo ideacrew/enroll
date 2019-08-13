@@ -868,6 +868,48 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     end
   end
 
+  describe "POST update_terminate_enrollment", :dbclean => :around_each do
+    let(:user) { FactoryBot.create(:user, roles: ["hbx_staff"]) }
+    let!(:person) { FactoryBot.create(:person)}
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+    let!(:household) { FactoryBot.create(:household, family: family) }
+    let!(:enrollment) do
+      FactoryBot.create(
+        :hbx_enrollment,
+        family: family,
+        household: family.active_household,
+        coverage_kind: "health",
+        kind: 'employer_sponsored',
+        effective_on: ::TimeKeeper.date_of_record.last_month.beginning_of_month,
+        aasm_state: 'coverage_selected'
+      )
+    end
+
+    before :each do
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      sign_in user
+    end
+
+    shared_examples_for "POST update_terminate_enrollment" do |aasm_state, terminated_date|
+      context 'shop enrollment' do
+        it 'should render template' do
+          post :update_terminate_enrollment, params: { "termination_date_#{enrollment.id}".to_sym => terminated_date, "terminate_hbx_#{enrollment.id}".to_sym => enrollment.id.to_s }, format: :js, xhr: true
+          expect(response).to have_http_status(:success)
+        end
+      end
+
+      it "enrollment should be moved to #{aasm_state}" do
+        post :update_terminate_enrollment, params: { "termination_date_#{enrollment.id}".to_sym => terminated_date, "terminate_hbx_#{enrollment.id}".to_sym => enrollment.id.to_s }, format: :js, xhr: true
+        enrollment.reload
+        expect(enrollment.aasm_state).to eq aasm_state
+        expect(enrollment.terminated_on).to eq Date.strptime(terminated_date, "%m/%d/%Y")
+      end
+    end
+
+    it_behaves_like 'POST update_terminate_enrollment', 'coverage_termination_pending', ::TimeKeeper.date_of_record.next_month.beginning_of_month.to_s
+    it_behaves_like 'POST update_terminate_enrollment', 'coverage_terminated', ::TimeKeeper.date_of_record.prev_day.to_s
+  end
+
   describe "POST update_enrollment_termianted_on_date", :dbclean => :around_each do
     let(:user) { FactoryBot.create(:user, roles: ["hbx_staff"]) }
     let!(:person) { FactoryBot.create(:person)}

@@ -1,45 +1,45 @@
 require 'rails_helper'
 
+class DummyNoticeKind
+  attr_accessor :title, :event_name, :resource, :market_kind, :notice_number, :notice_path, :notice_type
+  include Notifier::NoticeBuilder
+
+  def initialize(params)
+    self.event_name = params[:event_name]
+    self.title = params[:title]
+    self.market_kind = params[:market_kind]
+    self.notice_number = params[:notice_number]
+  end
+end
+
 module Notifier
   module NoticeBuilder
-    class DummyNoticeKind
-      attr_accessor :title, :event_name, :resource, :market_kind, :notice_number
-      include Notifier::NoticeBuilder
-
-      def initialize(params)
-        self.event_name = params[:event_name]
-        self.title = params[:title]
-        self.market_kind = params[:market_kind]
-        self.notice_number = params[:notice_number]
-      end
-    end
-
     RSpec.describe NoticeBuilder, dbclean: :around_each do
-      let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
-      let!(:model_instance)     { FactoryBot.build(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site, hbx_id: "38739472") }
-      let(:employer_profile)    { model_instance.employer_profile }
+      let(:hbx_id) { "1234" }
+      let(:resource) { EmployeeRole.new }
       let(:event_name) {"acapi.info.events.employer.welcome_notice_to_employer"}
-      let(:resource) {model_instance.employer_profile }
       let(:payload) do
         {
-          "employer_id" => employer_profile.hbx_id.to_s,
-          "event_object_kind" => "BenefitSponsors::Organizations::AcaShop#{Settings.site.key.capitalize}EmployerProfile",
-          "event_object_id" => employer_profile.id
+          "employer_id" => hbx_id,
+          "event_object_kind" => "BenefitSponsors::Organizations::AcaShopDcEmployerProfile",
+          "event_object_id" => "12345"
         }
       end
       let(:subject) do
-        Notifier::NoticeBuilder::DummyNoticeKind.new(event_name: event_name, title: 'Test', notice_number: "ABC_123")
+        DummyNoticeKind.new(event_name: event_name, title: 'Test', notice_number: "ABC_123")
       end
 
       describe ".store_paper_notice" do
         let(:bucket_name) { 'paper-notices' }
-        let(:notice_filename_for_paper_notice) { "#{employer_profile.organization.hbx_id}_#{subject.title}_#{subject.notice_number.delete('_')}_#{subject.notice_type}.pdf" }
+        let(:notice_filename_for_paper_notice) { "#{hbx_id}_#{subject.title}_#{subject.notice_number.delete('_')}_#{subject.notice_type}.pdf" }
         let(:doc_uri) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}#sample-key" }
         let(:notice_path_for_paper_notice) { Rails.root.join("tmp", notice_filename_for_paper_notice) }
 
         before do
           allow(FileUtils).to receive(:cp)
           allow(File).to receive(:delete)
+          allow(resource).to receive(:person).and_return(double(hbx_id: '1234'))
+          allow(subject).to receive(:is_employer?).and_return(false)
           allow(subject).to receive(:resource).and_return(resource)
           allow(subject).to receive(:notice_path).and_return("notice_path")
           allow(subject).to receive(:notice_type).and_return("ER")
@@ -56,6 +56,7 @@ module Notifier
         let(:usermailer) {double "UserMailer"}
 
         before do
+          allow(subject).to receive(:is_employer?).and_return(false)
           allow(UserMailer).to receive(:generic_notice_alert).and_return(usermailer)
           allow(usermailer).to receive(:deliver_now).and_return(true)
           subject.send_generic_notice_alert

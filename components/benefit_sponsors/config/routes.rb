@@ -71,6 +71,7 @@ BenefitSponsors::Engine.routes.draw do
         post :bulk_employee_upload
         get :bulk_employee_upload
         get :coverage_reports
+        post :terminate_employee_roster_enrollments
         collection do
           get :generate_sic_tree
           get :show_pending

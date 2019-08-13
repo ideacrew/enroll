@@ -449,16 +449,7 @@ class HbxEnrollment
 
     # terminate all Enrollments scheduled for termination
     def terminate_scheduled_enrollments(as_of_date = TimeKeeper.date_of_record)
-      families = Family.where("households.hbx_enrollments" => {
-        :$elemMatch => { :aasm_state => "coverage_termination_pending", :terminated_on.lt => as_of_date }
-      })
-
-      enrollments_for_termination = families.inject([]) do |enrollments, family|
-        enrollments += family.active_household.hbx_enrollments.where(:aasm_state => "coverage_termination_pending",
-                                                                     :terminated_on.lt => as_of_date).to_a
-      end
-
-      enrollments_for_termination.each do |hbx_enrollment|
+      HbxEnrollment.where(:aasm_state => 'coverage_termination_pending', :terminated_on.lt => as_of_date).each do |hbx_enrollment|
         hbx_enrollment.terminate_coverage!(hbx_enrollment.terminated_on)
       rescue StandardError => e
         Rails.logger.error { "Error terminating scheduled enrollment hbx_id - #{hbx_enrollment.hbx_id} due to #{e.backtrace}" }
@@ -1401,15 +1392,15 @@ class HbxEnrollment
     
     case
       when employee_role.present?
+        enrollment.kind = "employer_sponsored"
+        enrollment.employee_role = employee_role
+
         if benefit_group.blank? || benefit_group_assignment.blank?
           benefit_group, benefit_group_assignment = employee_current_benefit_group(employee_role, enrollment, qle)
         end
         if qle && employee_role.coverage_effective_on(qle: qle) > employee_role.person.primary_family.current_sep.effective_on
           raise "You are attempting to purchase coverage through Qualifying Life Event prior to your eligibility date. Please contact your Employer for assistance. You are eligible for employer benefits from #{employee_role.coverage_effective_on(qle: qle)} "
         end
-
-        enrollment.kind = "employer_sponsored"
-        enrollment.employee_role = employee_role
 
         if qle && enrollment.family.is_under_special_enrollment_period?
           if opt_effective_on.present?

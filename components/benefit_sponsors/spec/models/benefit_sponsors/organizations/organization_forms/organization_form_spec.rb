@@ -10,9 +10,9 @@ module BenefitSponsors
 
       let!(:params) {
         {
-            entity_kind: 'tax_exempt_organization',
-            fein: "111222333",
-            legal_name: "legal_name",
+          entity_kind: 'tax_exempt_organization',
+          fein: "111222333",
+          legal_name: "legal_name"
         }
       }
 
@@ -49,8 +49,7 @@ module BenefitSponsors
       context "for fein" do
         it "new form should not be valid when fein is nil for benefit_sponsor" do
           params[:fein]=nil
-          new_form = subject.new params
-          new_form.profile_type = "benefit_sponsor"
+          new_form = subject.new params.merge({profile: {profile_type: 'benefit_sponsor'} })
           new_form.validate
           expect(new_form).to_not be_valid
           expect(new_form.errors.messages.has_key?(:fein)).to eq true
@@ -58,8 +57,7 @@ module BenefitSponsors
 
         it "new form should be valid when fein is nil for broker_agency" do
           params[:fein]=nil
-          new_form = subject.new params
-          new_form.profile_type = "broker_agency"
+          new_form = subject.new params.merge({profile: {profile_type: 'broker_agency'} })
           new_form.validate
           expect(new_form).to be_valid
           expect(new_form.errors.messages.has_key?(:fein)).to eq false

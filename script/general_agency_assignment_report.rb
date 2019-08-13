@@ -3,7 +3,8 @@ require 'csv'
 batch_size = 500
 offset = 0
 
-org_count = Organization.count
+orgs = BenefitSponsors::Organizations::Organization.employer_profiles
+org_count = orgs.count
 field_names  = %w(
            Group_name
            Employer_FEIN
@@ -20,17 +21,19 @@ file_name = "#{Rails.root}/ga_assignment_report_#{TimeKeeper.date_of_record.strf
 CSV.open(file_name, "w", force_quotes: true) do |csv|
   csv << field_names
 
-  while offset < org_count
-    Organization.offset(offset).limit(batch_size).where("employer_profile" => {"$exists" => true}).all.each do |org|
+  while offset <= org_count
+    orgs.offset(offset).limit(batch_size).no_timeout.each do |org|
       employer = org.employer_profile
-      employer.general_agency_accounts.unscoped.all.each do |ga_account|
-        next if  (ga_account.nil? || ga_account.general_agency_profile.nil?) ||  ga_account.general_agency_profile.market_kind == "individual"
+      employer.general_agency_accounts&.each do |ga_account|
+        next if ga_account.nil? || ga_account.general_agency_profile.nil? || ga_account.general_agency_profile.market_kind.to_s == "individual"
+
+        ga_staff_role = ga_account.general_agency_profile.general_agency_staff_roles.first
         csv << [
           employer.legal_name,
           employer.fein,
           ga_account.general_agency_profile.legal_name,
-          ga_account.general_agency_profile.general_agency_staff_roles.first.person.full_name,
-          ga_account.general_agency_profile.general_agency_staff_roles.first.npn,
+          ga_staff_role.person.full_name,
+          ga_staff_role.npn,
           ga_account.start_on,
           ga_account.end_on
         ]

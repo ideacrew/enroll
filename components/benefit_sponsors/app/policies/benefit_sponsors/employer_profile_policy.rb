@@ -70,7 +70,7 @@ module BenefitSponsors
     end
 
     def can_modify_employer?
-      user.person.hbx_staff_role.permission.modify_employer
+      user.has_hbx_staff_role? && user.person.hbx_staff_role.permission.modify_employer
     end
   end
 end

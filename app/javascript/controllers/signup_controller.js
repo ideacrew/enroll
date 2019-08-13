@@ -295,7 +295,10 @@ validateEmailFormat() {
     Swal.fire({
       title: 'Invalid Email Entered',
       type: 'error',
-      text: 'The email entered is not in a valid format, please check your entry and submit the information again.'
+      text: 'The email entered is not in a valid format, please check your entry and submit the information again.',
+      onClose: () => {
+        this.usernameFieldTarget.value = '';
+      }
     });
     this.optionalEmailTarget.value = '';
   }
