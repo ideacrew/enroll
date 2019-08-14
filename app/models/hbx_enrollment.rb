@@ -862,11 +862,11 @@ class HbxEnrollment
   end
 
   def update_renewal_coverage
-    return unless is_shop?
+    return unless is_shop? && census_employee&.renewal_benefit_group_assignment
 
     current_benefit_application = sponsored_benefit_package.benefit_application
-    successor_application = current_benefit_application.successors.first
-    successor_benefit_package = current_benefit_application&.successor_benefit_package(sponsored_benefit_package)
+    successor_benefit_package = census_employee.renewal_benefit_group_assignment.benefit_package
+    successor_application = successor_benefit_package.benefit_application
     return unless successor_application && successor_benefit_package
 
     passive_renewals_under(successor_application).each{|en| en.cancel_coverage! if en.may_cancel_coverage? }
