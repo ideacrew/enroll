@@ -1,6 +1,7 @@
 class Phone
   include Mongoid::Document
   include Mongoid::Timestamps
+  include Mongoid::History::Trackable
 
   embedded_in :person
   embedded_in :office_location
@@ -16,6 +17,15 @@ class Phone
   field :extension, type: String, default: ""
   field :primary, type: Boolean
   field :full_phone_number, type: String, default: ""
+
+  track_history :on => [:fields],
+                :scope => :person,
+                :modifier_field => :modifier,
+                :modifier_field_optional => true,
+                :version_field => :tracking_version,
+                :track_create  => true,    # track document creation, default is false
+                :track_update  => true,    # track document updates, default is true
+                :track_destroy => true
 
   before_validation :save_phone_components
 

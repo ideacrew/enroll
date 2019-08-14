@@ -5,6 +5,7 @@ class ResidentRole
   include Acapi::Notifiers
   include SetCurrentUser
   include Mongoid::Attributes::Dynamic
+  include Mongoid::History::Trackable
 
   RESIDENCY_VERIFICATION_REQUEST_EVENT_NAME = "local.enroll.residency.verification_request"
 
@@ -35,7 +36,6 @@ class ResidentRole
   validates_presence_of :dob, :gender
 
   accepts_nested_attributes_for :person, :paper_applications
-  
 
   embeds_many :local_residency_responses, class_name:"EventResponse"
 
@@ -43,6 +43,15 @@ class ResidentRole
   after_create :create_initial_market_transition
 
   alias_method :is_incarcerated?,   :is_incarcerated
+
+  track_history :on => [:fields],
+                :scope => :person,
+                :modifier_field => :modifier,
+                :modifier_field_optional => true,
+                :version_field => :tracking_version,
+                :track_create  => true,    # track document creation, default is false
+                :track_update  => true,    # track document updates, default is true
+                :track_destroy => true
 
   def parent
     raise "undefined parent: Person" unless person?

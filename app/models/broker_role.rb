@@ -4,6 +4,7 @@ class BrokerRole
   include Mongoid::Timestamps
   include AASM
   include Acapi::Notifiers
+  include Mongoid::History::Trackable
 
   PROVIDER_KINDS = %W[broker assister]
   BROKER_UPDATED_EVENT_NAME = "acapi.info.events.broker.updated"
@@ -58,6 +59,15 @@ class BrokerRole
   field :license, type: Boolean
   field :training, type: Boolean
   field :carrier_appointments, type: Hash, default: "BrokerRole::#{Settings.site.key.upcase}_BROKER_CARRIER_APPOINTMENTS".constantize
+
+  track_history :on => [:fields],
+                :scope => :person,
+                :modifier_field => :modifier,
+                :modifier_field_optional => true,
+                :version_field => :tracking_version,
+                :track_create  => true,    # track document creation, default is false
+                :track_update  => true,    # track document updates, default is true
+                :track_destroy => true
 
   embeds_many :workflow_state_transitions, as: :transitional
   embeds_many :favorite_general_agencies, cascade_callbacks: true
