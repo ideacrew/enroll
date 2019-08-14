@@ -862,8 +862,13 @@ class HbxEnrollment
   end
 
   def update_renewal_coverage
-    return unless is_shop? && (successor_benefit_package = sponsored_benefit_package.successor)
-    successor_application = successor_benefit_package.benefit_application
+    return unless is_shop?
+
+    current_benefit_application = sponsored_benefit_package.benefit_application
+    successor_application = current_benefit_application.successors.first
+    successor_benefit_package = current_benefit_application&.successor_benefit_package(sponsored_benefit_package)
+    return unless successor_application && successor_benefit_package
+
     passive_renewals_under(successor_application).each{|en| en.cancel_coverage! if en.may_cancel_coverage? }
     renew_benefit(successor_benefit_package) if active_renewals_under(successor_application).blank? && successor_application.coverage_renewable? && non_inactive_transition?
   end
@@ -1537,7 +1542,6 @@ end
       reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage? && self.effective_on <= TimeKeeper.date_of_record
       reinstate_enrollment.notify_of_coverage_start(edi)
     end
-
     reinstate_enrollment
   end
 

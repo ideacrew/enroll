@@ -96,6 +96,10 @@ RSpec.shared_context "setup renewal application", :shared_context => :metadata d
 
   let(:predecessor_application)   { renewal_application.predecessor }
   let(:product_package)           { renewal_application.benefit_sponsor_catalog.product_packages.detect { |package| package.package_kind == package_kind } }
-  let(:benefit_package)           { renewal_application.benefit_packages[0] }
+  let!(:benefit_package) do
+    bp = renewal_application.benefit_packages[0]
+    bp.title = bp.title + "(#{renewal_application.start_on.year})"
+    bp
+  end
   let(:current_benefit_package)   { predecessor_application.benefit_packages[0] }
 end

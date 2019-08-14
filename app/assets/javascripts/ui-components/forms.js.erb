@@ -60,7 +60,7 @@ function addOfficeLocation() {
   var selectKindOption = doc.querySelector("#kindSelect")
   selectKindOption.value = " ";
   // Removes primary from select as its set by default for first office location
-  selectKindOption.remove(1)
+  // selectKindOption.remove(1)
   // clears inputs from new location
   newOfficeField.querySelectorAll('input').forEach(function(input) {
     if (input.value != 'phone main') {

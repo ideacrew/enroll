@@ -183,6 +183,8 @@ RSpec.describe Enrollments::Replicator::Reinstatement, :type => :model, dbclean:
         end
 
         it "should generate passive renewal" do
+          initial_benefit_package = renewal_application.predecessor.benefit_packages.first
+          renewal_application.benefit_packages.first.update_attributes(title: initial_benefit_package.title + "(#{renewal_application.effective_period.min.year})")
           reinstated_enrollment
           enrollment = HbxEnrollment.where({ family_id:family.id,
                                              :effective_on => renewal_effective_date,

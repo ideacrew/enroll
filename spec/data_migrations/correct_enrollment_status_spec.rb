@@ -48,7 +48,13 @@ describe CorrectEnrollmentStatus, dbclean: :after_each do
   end
 
   describe "verification successful" do
+    let(:benefit_application) { ::BenefitSponsors::BenefitApplications::BenefitApplication.new }
+    let(:benefit_package) { ::BenefitSponsors::BenefitPackages::BenefitPackage.new }
+
     before :each do
+      allow(::BenefitSponsors::BenefitPackages::BenefitPackage).to receive(:find).and_return(benefit_package)
+      allow(benefit_package).to receive(:benefit_application).and_return(benefit_application)
+
       enrollment.aasm_state = "unverified"
       enrollment.save!
       allow(subject).to receive(:get_families).and_return([family])

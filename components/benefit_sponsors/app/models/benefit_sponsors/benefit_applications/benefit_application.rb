@@ -638,10 +638,20 @@ module BenefitSponsors
       renewal_application
     end
 
+    def predecessor_benefit_package(current_benefit_package)
+      *previous_title, _b = current_benefit_package.title.split('(')
+      predecessor.benefit_packages.where(:title => previous_title.join('(')).first
+    end
+
+    def successor_benefit_package(current_benefit_package)
+      successors.first.benefit_packages.where(:title => current_benefit_package.title + "(#{current_benefit_package.start_on.next_year.year})").first if successors.any?
+    end
+
     def renew_benefit_package_assignments
       if is_renewing?
         benefit_packages.each do |benefit_package|
-          benefit_package.renew_employee_assignments(async_renewal_workflow_id)
+          predecessor_package = predecessor_benefit_package(benefit_package)
+          benefit_package.renew_employee_assignments(predecessor_package, async_renewal_workflow_id)
         end
 
         renew_gapped_benefit_package_assignments(async_renewal_workflow_id)

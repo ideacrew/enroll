@@ -18,6 +18,7 @@ module BenefitSponsors
       def load_form_metadata(form)
         application  = find_benefit_application(form)
         @employer_profile = benefit_application.benefit_sponsorship.profile
+        form.previous_bp_titles = benefit_application.benefit_packages.where(:id.ne => form.id).map(&:title).map(&:strip)
         form.catalog = BenefitSponsors::BenefitApplications::BenefitSponsorHealthCatalogDecorator.new(application.benefit_sponsor_catalog)
         if form.sponsored_benefits.present?
           load_employer_estimates(form)

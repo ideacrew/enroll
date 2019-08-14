@@ -903,5 +903,23 @@ module BenefitSponsors
         expect(initial_application.enrolled_families.count).to eq benefit_sponsorship.census_employees.count
       end
     end
+
+    describe '.predecessor_benefit_package', dbclean: :after_each do
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup renewal application"
+
+      it 'should return predecessor benefit package' do
+        expect(renewal_application.predecessor_benefit_package(benefit_package)).to eq current_benefit_package
+      end
+    end
+
+    describe '.successor_benefit_package', dbclean: :after_each do
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup renewal application"
+
+      it 'should return successor benefit package' do
+        expect(predecessor_application.successor_benefit_package(current_benefit_package)).to eq benefit_package
+      end
+    end
   end
 end

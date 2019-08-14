@@ -14,15 +14,17 @@ describe 'Cancel employer plan year & enrollments', :dbclean => :around_each do
   let(:employee_role)   { FactoryBot.build(:employee_role, employer_profile: employer_profile )}
   let(:enrollment) { FactoryBot.build(:hbx_enrollment, family: family, household: family.active_household, employee_role: census_employee.employee_role)}
   let(:enrollment2) { FactoryBot.build(:hbx_enrollment,family: family, household: family.active_household, employee_role: census_employee.employee_role,aasm_state:'auto_renewing')}
-  let(:active_benefit_group_assignment) {census_employee.benefit_group_assignments.where(:benefit_group_id.in =>[benefit_group.id]).first}
-  let(:renewal_benefit_group_assignment) {census_employee.benefit_group_assignments.where(:benefit_group_id.in =>[benefit_group1.id]).first}
+  let!(:active_benefit_group_assignment) do
+    bga = FactoryBot.build(:benefit_group_assignment, benefit_group_id: benefit_group.id, is_active: true, census_employee: census_employee, hbx_enrollment_id: enrollment.id, aasm_state: 'coverage_selected')
+    bga.save(:validate => false)
+    bga
+  end
+  let!(:renewal_benefit_group_assignment) { FactoryBot.create(:benefit_group_assignment, benefit_group_id: benefit_group1.id, is_active: false, census_employee: census_employee, hbx_enrollment_id: enrollment2.id) }
 
   describe 'migrations:cancel_employer_incorrect_renewal' do
 
     before do
       enrollment.update_attributes(benefit_group_id: benefit_group.id, aasm_state:'coverage_selected')
-      active_benefit_group_assignment.update_attributes!(hbx_enrollment_id: enrollment.id)
-      active_benefit_group_assignment.select_coverage!
       load File.expand_path("#{Rails.root}/lib/tasks/migrations/cancel_employer_renewal.rake", __FILE__)
       Rake::Task.define_task(:environment)
       Rake::Task["migrations:cancel_employer_incorrect_renewal"].reenable
