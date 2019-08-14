@@ -12,7 +12,10 @@ import { Observable } from "rxjs";
 
 
 class MockQleKindCreationService {
-  submitCreate(post_uri: string, obj_data : object) : Observable<HttpResponse<any>>;
+  public submitCreate(post_uri: string, obj_data : object) : Observable<HttpResponse<any>> {
+    return null;
+  }
+
 }
 
 describe('QleKindCreationFormComponent', () => {

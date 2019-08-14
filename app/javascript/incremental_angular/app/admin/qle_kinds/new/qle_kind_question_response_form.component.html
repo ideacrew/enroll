@@ -3,10 +3,10 @@
     <span class="col-sm-2 control-label">Response</span>
     <div class="col-sm-10">
       <input
-        id="qle_kind_response_response_{{responseIndex}}_title"
+        id="qle_kind_response_response_{{responseIndex}}_content"
         type="text"
-        formControlName="response_title"
-        id="response-title col-md-2"
+        formControlName="response_content"
+        id="response-content col-md-2"
         class='form-control'>
       <div class="btn-group" role="group" aria-label="Response Actions">
         <button
@@ -19,10 +19,15 @@
           class='btn btn-secondary btn-primary margin-right-10px'>
           Remove Response
         </button>
-        <label for="qle_kind_response_response_{{responseIndex}}_accepted" class='margin-right-10px'>
-          Valid?
-        </label> <br>
-        <input id="qle_kind_response_response_{{responseIndex}}_accepted" type="checkbox" formControlName="response_accepted">
+        <label for="qle_kind_response_response_{{responseIndex}}_action_to_take">
+          Action to Take
+          <select class='form-control' id="qle_kind_response_response_{{responseIndex}}_action_to_take" formControlName="response_action_to_take">
+            <option value='accepted'>Accepted</option>
+            <option value='declined'>Declined</option>
+            <option value='to_question_two'>To Question 2</option>
+            <option value='call_center'>Call Center</option>
+          </select>
+        </label>
       </div>
     </div>
   </div>
