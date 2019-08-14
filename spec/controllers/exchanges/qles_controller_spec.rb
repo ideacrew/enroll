@@ -4,6 +4,7 @@ require 'rails_helper'
 
 RSpec.describe Exchanges::QlesController, :type => :controller do
   render_views
+  # TODO: Update this with the updated param and model attribute names
   let(:qle_creation_params) do
     {
       'data' =>

@@ -40,15 +40,14 @@ export class QleKindResponseFormComponent {
   }
 
   public addNewResponse(questionComponent: QleKindQuestionFormComponent, responseIndex: number){
-    if (questionComponent != null){
-    if (questionComponent.questionFormGroup != null){
-    if (this.responseFormGroup != null){
-     questionComponent.questionFormGroup.value.responses[responseIndex] = this.responseFormGroup.value
+    if (questionComponent != null) {
+      if (questionComponent.questionFormGroup != null) {
+        if (this.responseFormGroup != null) {
+          questionComponent.questionFormGroup.value.responses[responseIndex] = this.responseFormGroup.value
    
-    }     
-    }     
+        }     
+      }     
       questionComponent.addResponse()
-
     }
   }
 
