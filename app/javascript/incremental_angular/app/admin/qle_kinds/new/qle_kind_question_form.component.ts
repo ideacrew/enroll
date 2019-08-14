@@ -10,8 +10,6 @@ import { QleKindResponseFormComponent } from './qle_kind_question_response_form.
 })
 
 export class QleKindQuestionFormComponent {
-  public showResponseForm : boolean = false;
-
   @Input("questionFormGroup")
   public questionFormGroup : FormGroup | null;
   
@@ -20,29 +18,23 @@ export class QleKindQuestionFormComponent {
   
   @Input("questionComponentParent")
   public questionComponentParent : QuestionComponentRemover | null;
-
-  @Input("responseArray")
-  public responseArray : FormArray;
   
   constructor(private _questionForm: FormBuilder) {
-    }
-
-  ngOnInit() {
-    // this.getResponseArray()
   }
 
-//  public getResponseArray(){
-//    return this.responseArray
-//  }
+  ngOnInit() {
+  }
 
-  public responseControls(){
-    if (this.questionFormGroup != null && this.questionFormGroup.value != null) {
-      return this.questionFormGroup.value.responses.map(
-        function(item:FormGroup) {
-          return <FormGroup>item;
-        }
-      );
+  public getResponseArray() : FormGroup[] {
+    if (this.questionFormGroup != null) {
+      var responses = <FormArray>this.questionFormGroup.get('responses');
+      if (responses != null) {
+        return responses.controls.map(function(r_control) {
+          return <FormGroup>r_control;
+        });
+      }
     }
+    return [];
   }
 
   public removeQuestion() {
@@ -53,37 +45,30 @@ export class QleKindQuestionFormComponent {
     }
   }
 
-  public startQuestion(){
-    if (this.questionFormGroup != null){
-        this.showResponseForm = true
-        this.addResponse()
+  public showResponseForm() : boolean {
+    var responses = <FormGroup[]>this.getResponseArray();
+    if (responses != null) {
+      return responses.length > 0;
     }
-  }
-
-    public submitQuestion(){
-    if (this.questionFormGroup != null){
-        this.showResponseForm = true
-        console.log(this.questionFormGroup.value)
-    }
+    return false;
   }
 
 
   removeResponse(responseIndex: number) {
-    if(this.questionFormGroup != null && this.questionFormGroup.value.responses != null) {
-      this.questionFormGroup.value.responses.splice(responseIndex,1);
-        console.log(this.questionFormGroup.value.responses)
-
+    if(this.questionFormGroup != null) {
+      var responses : FormArray | null = <FormArray>this.questionFormGroup.get('responses');
+      if (responses != null) {
+        responses.removeAt(responseIndex);
+      }
     }
   }
 
   public addResponse(){
     if (this.questionFormGroup != null) {
-    const control:FormArray = this.questionFormGroup.get('responses') as FormArray;  
+      var control : FormArray | null = <FormArray>this.questionFormGroup.get('responses');
       if (control){
-        var responseForm = new QleKindResponseFormComponent()
-        control.push(
-          responseForm.newResponseFormGroup()
-        ); 
+        var responseFormGroup = QleKindResponseFormComponent.newResponseFormGroup();
+        control.push(responseFormGroup); 
       }
     }
   }
@@ -97,16 +82,11 @@ export class QleKindQuestionFormComponent {
   }
 
   // public responseArray : FormArray;
- public newQuestionFormGroup(formBuilder: FormBuilder) {
-    var rControls = formBuilder.array([]);
+ public static newQuestionFormGroup(formBuilder: FormBuilder) : FormGroup {
     var questionForm = new FormGroup({
-      id: new FormControl(""),
-      question_title: new FormControl('', Validators.required),
-      question_type: new FormControl(''),
-      responses: rControls,
+      content: new FormControl('', Validators.required),
+      responses: new FormArray([])
     });
-    this.responseArray = rControls;
-    this.questionFormGroup = questionForm;
     return questionForm
   }
 
