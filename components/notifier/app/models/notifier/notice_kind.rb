@@ -99,6 +99,7 @@ module Notifier
       send_generic_notice_alert
       send_generic_notice_alert_to_broker_and_ga
       store_paper_notice
+      clear_tmp
     end
 
     def recipient_klass_name
