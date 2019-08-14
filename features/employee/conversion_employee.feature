@@ -149,7 +149,7 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
 
   Scenario: Existing Employee can buy coverage during open enrollment of renewing plan year using QLE
     Given a CCA site exists with a benefit market
-    Given benefit market catalog exists for enrollment_open renewal employer with health benefits
+    Given benefit market catalog exists for enrollment_closed renewal employer with health benefits
     Given Qualifying life events are present
     And there is an employer ABC Widgets
     And renewal employer ABC Widgets has imported and renewal enrollment_open benefit applications
