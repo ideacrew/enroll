@@ -559,7 +559,7 @@ def employer_poc
           if @ssn_require
             @dont_update_ssn = true
           else
-            @person.encrypted_ssn = ""
+            @person.unset(:encrypted_ssn)
           end
         else
           @person.ssn = params[:person][:ssn]
