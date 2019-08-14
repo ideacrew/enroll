@@ -23,10 +23,10 @@ export class QleKindResponseFormComponent {
   constructor() {
   }
 
-ngOnInit(){
-  this.responseFormGroup = this.newResponseFormGroup()
+  ngOnInit(){
 
   }
+
   public showIndex() {
     return this.responseIndex;
   }
@@ -70,14 +70,13 @@ ngOnInit(){
     return (this.hasErrors(control) ? " has-error" : "");
   }
 
-  public newResponseFormGroup(){
+  public static newResponseFormGroup() : FormGroup {
     var responseForm = new FormGroup({
       response_title: new FormControl('', Validators.required),
       response_accepted: new FormControl('false'),
       response_type: new FormControl('select'),
     });
-    this.responseFormGroup = responseForm
-    return responseForm
+    return responseForm;
   }
 
 

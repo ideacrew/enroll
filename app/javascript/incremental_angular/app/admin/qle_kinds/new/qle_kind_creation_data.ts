@@ -1,15 +1,12 @@
 // Minimum of what the Creation form needs to draw itself
 
-export interface QleKindCreationResource {
-
+  export interface QleKindCreationResource {
     effective_on_kinds: Array<string>;
     title: string;
     tool_tip: string | null;
     action_kind: string | null;
     reason: string | null;
     market_kind: string;
-    pre_event_sep_in_days: number;
-    post_event_sep_in_days: number;
     is_self_attested: boolean;
     visible_to_customer: boolean;
     date_options_available: boolean;
@@ -27,9 +24,18 @@ export interface QleKindCreationResource {
   }
 
   // The maximum data being sent to the server
+  interface ResponseCreationRequest {
+    content: string;
+    action_to_take: string;
+  }
+
+
+  interface QuestionCreationRequest {
+    content: string;
+    responses: Array<ResponseCreationRequest>;
+  }
   
   export interface QleKindCreationRequest {
-    _id: string;
     effective_on_kinds: Array<string>;
     title: string;
     tool_tip: string | null;

@@ -1,5 +1,5 @@
 import { Component, Injector, ElementRef, Inject, ViewChild  } from '@angular/core';
-import { QleKindCreationResource } from './qle_kind_creation_data';
+import { QleKindCreationResource, QleKindCreationRequest } from './qle_kind_creation_data';
 import { FormGroup, FormControl, AbstractControl, FormArray, FormBuilder, Validators } from '@angular/forms';
 import { QleKindCreationService } from '../qle_kind_services';
 import { ErrorLocalizer } from '../../../error_localizer';
@@ -115,7 +115,6 @@ export class QleKindCreationFormComponent {
   }
 
   ngOnInit() {
-
     var submissionUriAttribute = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-qle-kind-create-url");
     if (submissionUriAttribute != null) {
       this.creationUri = submissionUriAttribute;
@@ -128,9 +127,8 @@ export class QleKindCreationFormComponent {
   }
 
   addQuestion() {
-     var questionForm  = new QleKindQuestionFormComponent(this._creationForm)
       this.questionArray.push(
-      questionForm.newQuestionFormGroup(this._creationForm)
+        QleKindQuestionFormComponent.newQuestionFormGroup(this._creationForm)
       );
   }
 
@@ -146,11 +144,9 @@ export class QleKindCreationFormComponent {
     var form = this;
     var errorMapper = new ErrorMapper();
     if (this.creationFormGroup != null) {
-      console.log(this.creationFormGroup.value)
-      this.creationFormGroup.value.action_kind = this._elementRef.nativeElement.querySelector('select#qle_kind_creation_form_action_kind option:checked').value
-      this.creationFormGroup.value.reason = this._elementRef.nativeElement.querySelector('select#qle_kind_creation_form_reason option:checked').value
       if (this.creationUri != null) {
-        var invocation = this.CreationService.submitCreate(this.creationUri, this.creationFormGroup.value);
+        console.log(this.creationFormGroup.value);
+        var invocation = this.CreationService.submitCreate(this.creationUri, <QleKindCreationRequest>this.creationFormGroup.value);
         invocation.subscribe(
           function(data: HttpResponse<any>) {
             var location_header = data.body.next_url;
