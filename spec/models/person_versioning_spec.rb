@@ -150,3 +150,15 @@ describe Person, :dbclean => :after_each do
     include_examples 'tracked history', 'update_reason', 'Testing'
   end
 end
+
+describe "Person LegacyVersioningRecords" do
+  subject { Person.new }
+
+  it 'creates a version field with a default value of 1' do
+    expect(subject.version).to eql(1)
+  end
+
+  it 'has an array of versions' do
+    expect(subject.versions).to be_kind_of(Array)
+  end
+end
