@@ -6,13 +6,12 @@
         id="qle_kind_question_{{questionIndex}}_title"
         type="text"
         formControlName="question_title"
-        class="form-control col-md-2"
-        (focusout)="startQuestion()">
+        class="form-control col-md-2">
       <div class="btn-group" role="group" aria-label="Question Actions">
         <button
-          (click)="submitQuestion()"
+          (click)="addResponse()"
           class='btn btn-secondary btn-success margin-right-10px'>
-          Submit
+          Add Response
         </button>
         <button
           (click)="removeQuestion()"
@@ -20,9 +19,9 @@
           Delete
         </button>
       </div>
-      <div *ngIf="showResponseForm">
+      <div *ngIf="showResponseForm()">
         <qle-question-response-form
-          *ngFor="let response of responseControls(); let i = index"
+          *ngFor="let response of getResponseArray(); let i = index"
           [responseFormGroup]="response"
           [responseIndex]="i"
           [responseComponentParent]="this">    

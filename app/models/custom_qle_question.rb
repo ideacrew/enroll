@@ -5,7 +5,6 @@ class CustomQleQuestion
   embeds_many :custom_qle_responses
 
   field :content, type: String
-  field :type, type: String
 
   accepts_nested_attributes_for :custom_qle_responses
 end
