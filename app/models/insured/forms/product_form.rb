@@ -8,12 +8,12 @@ module Insured
       attribute :id,                    String
       attribute :application_period,    Date
       attribute :kind,                  Symbol
-      attribute :name,                  String
+      attribute :title,                 String
       attribute :hios_id,               String
       attribute :issuer_profile_id,     String
       attribute :issuer_legal_name,     String
       attribute :issuer_hios_id,        String
-      attribute :metal_level,           String
+      attribute :metal_level_kind,      String
       attribute :sbc_document,          ::Insured::Forms::SbcDocumentForm
 
 
@@ -36,8 +36,8 @@ module Insured
       def render_product_type_details
         product_details = []
 
-        if product_level = self.metal_level.try(:humanize)
-          product_details << "<span class=\"#{product_level.try(:downcase)}-icon\">#{self.metal_level.titleize}</span>"
+        if product_level = self.metal_level_kind.try(:humanize)
+          product_details << "<span class=\"#{product_level.try(:downcase)}-icon\">#{self.metal_level_kind.titleize}</span>"
         end
 
         if self.try(:nationwide)
