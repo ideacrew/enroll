@@ -29,7 +29,6 @@
     action_to_take: string;
   }
 
-
   interface QuestionCreationRequest {
     content: string;
     responses: Array<ResponseCreationRequest>;
@@ -54,6 +53,6 @@
     coverage_effective_on: string;
     start_on: string;
     end_on: string;
-    questions: Array<string>;
+    questions: Array<QuestionCreationRequest>;
   }
   

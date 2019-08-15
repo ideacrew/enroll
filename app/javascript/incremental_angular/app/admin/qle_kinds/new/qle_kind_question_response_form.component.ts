@@ -71,9 +71,8 @@ export class QleKindResponseFormComponent {
 
   public static newResponseFormGroup() : FormGroup {
     var responseForm = new FormGroup({
-      response_title: new FormControl('', Validators.required),
-      response_accepted: new FormControl('false'),
-      response_type: new FormControl('select'),
+      content: new FormControl('', Validators.required),
+      action_to_take: new FormControl('select'),
     });
     return responseForm;
   }
