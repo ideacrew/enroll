@@ -4,43 +4,36 @@ require 'rails_helper'
 
 RSpec.describe Exchanges::QlesController, :type => :controller do
   render_views
-  # TODO: Update this with the updated param and model attribute names
   let(:qle_creation_params) do
     {
-      'data' =>
-      {
+      "data" => {
         "title" => "Got a New Dog",
-        "visible_to_customer" => 'Yes',
-        "event_kind_label" => "Date of birth",
+        "tool_tip" => "New Pet",
+        "action_kind" => "not_applicable",
+        "reason" => "qualified_native_american",
         "market_kind" => "shop",
-        "action_kind" => "add_benefit",
+        "is_self_attested" => "Yes",
+        "visible_to_customer" => "Yes",
         "effective_on_kinds" => ["date_of_event"],
-        "tool_tip" => "Household adds a new dog for emotional support",
-        "is_self_attested" => 'Yes',
-        "reason" => "birth",
-        "pre_event_sep_in_days" => "1",
-        "post_event_sep_in_days" => "1",
         "questions" => [
           {
-            "id" => "",
-            "question_title" => "What is your favorite food?",
-            "question_type" => "",
+            "content" => "Did you move to DC recently?",
             "responses" => [
               {
-                "response_title" => "Pizza",
-                "response_accepted" => "true",
-                "response_type" => "select"
+                "content" => "I'm not sure",
+                "action_to_take" => "declined"
               },
               {
-                "response_title" => "Potato Chips",
-                "response_accepted" => "false",
-                "response_type" => "select"
+                "content" => "Yes",
+                "action_to_take" => "accepted"
               }
-            ],
+            ]
           }
         ],
-        "start_on" => "06/01/1990",
-        "end_on" => "06/01/2005"
+        "pre_event_sep_in_days" => 10,
+        "post_event_sep_in_days" => 10,
+        "start_on" => "10/20/2030",
+        "end_on" => "10/20/2040"
       }
     }
   end

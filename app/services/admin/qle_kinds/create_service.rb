@@ -60,16 +60,15 @@ module Admin
 
       def create_question_response(custom_qle_question, response_hash)
         response = custom_qle_question.custom_qle_responses.build(
-          content: response_hash["response_title"],
-          accepted: response_hash["response_accepted"],
+          content: response_hash["content"],
+          action_to_take: response_hash["action_to_take"],
         )
         response.save!
       end
  
       def create_record_question(qle_kind, question_hash)
         custom_qle_question = qle_kind.custom_qle_questions.build(
-          content: question_hash["question_title"],
-          type: question_hash["question_type"]
+          content: question_hash["content"],
         )
         custom_qle_question.save!
       end
@@ -98,8 +97,8 @@ module Admin
           is_active: false,
           post_event_sep_in_days: request.post_event_sep_in_days,
           tool_tip: request.tool_tip,
-          reason: request.reason.split('').drop(3).join(''),
-          action_kind: request.action_kind.split('').drop(3).join(''),
+          reason: request.reason,
+          action_kind: request.action_kind,
           end_on:request.end_on,
           start_on: request.start_on,
         )
