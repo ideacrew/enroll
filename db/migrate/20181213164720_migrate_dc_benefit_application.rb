@@ -57,12 +57,6 @@ class MigrateDcBenefitApplication < Mongoid::Migration
         {"$out"=> "benefit_markets_benefit_sponsor_catalogs"}
       ],:allow_disk_use => true).each
 
-      # update product package ids.
-      # BenefitMarkets::BenefitSponsorCatalog.each do |bsc|
-      #   bsc.product_packages.map {|pp| pp._id = BSON::ObjectId.new}
-      #   bsc.save(validate: false)
-      # end
-
       # congress
       Organization.where(:'hbx_id'.in=>["100101", "118510", "100102"]).each do |org|
         org.employer_profile.plan_years.each do |plan_year|
@@ -83,6 +77,29 @@ class MigrateDcBenefitApplication < Mongoid::Migration
       BenefitMarkets::BenefitSponsorCatalog.create_indexes
       BenefitSponsors::BenefitSponsorships::BenefitSponsorship.create_indexes
       BenefitSponsors::BenefitApplications::BenefitApplication.create_indexes
+
+      update_catalog_package
+    end
+  end
+
+  def self.update_catalog_package
+    (1..5).each do |package_count|
+      max_package_index = package_count - 1
+      vals = BenefitMarkets::BenefitSponsorCatalog.where({"product_packages.#{max_package_index}._id" => {"$exists" => true},
+                                                          "product_packages.#{package_count}._id" => {"$exists" => false}}).pluck(:id)
+      vals.each do |v|
+        update_set = {}
+        (0..max_package_index).to_a.each do |i|
+          b_id = BSON::ObjectId.new
+          update_set["product_packages.#{i}._id"] = b_id
+        end
+        BenefitMarkets::BenefitSponsorCatalog.collection.update_one(
+          {"_id" => v},
+          {
+            "$set" => update_set
+          }
+        )
+      end
     end
   end
 
@@ -136,6 +153,15 @@ class MigrateDcBenefitApplication < Mongoid::Migration
       @logger.info " Total #{total_plan_years} plan years" unless Rails.env.test?
       @logger.info " #{failed} plan years failed to migrate into new DB at this point." unless Rails.env.test?
       @logger.info " #{success} plan years successfully migrated into new DB at this point." unless Rails.env.test?
+
+      BenefitSponsors::BenefitApplications::BenefitApplication.set_callback(:save, :after, :notify_on_save,  raise: false)
+      BenefitSponsors::BenefitApplications::BenefitApplication.set_callback(:create, :after, :renew_benefit_package_assignments,  raise: false)
+      BenefitSponsors::BenefitApplications::BenefitApplication.set_callback(:create, :after, :notify_on_create,  raise: false)
+      BenefitSponsors::BenefitApplications::BenefitApplication.set_callback(:create, :after, :set_expiration_date,  raise: false)
+      CensusEmployee.set_callback(:save, :after, :assign_default_benefit_package,  raise: false)
+      CensusEmployee.set_callback(:save, :after, :assign_benefit_packages,  raise: false)
+      CensusEmployee.set_callback(:save, :after, :construct_employee_role,  raise: false)
+      CensusEmployee.set_callback(:update, :after, :update_hbx_enrollment_effective_on_by_hired_on,  raise: false)
     end
   end
 
@@ -152,9 +178,6 @@ class MigrateDcBenefitApplication < Mongoid::Migration
     @benefit_application.recorded_service_area_ids = @rating_service_area_hash[plan_year.start_on.year]['service_area']
 
     benefit_sponsor_catalog = BenefitMarkets::BenefitSponsorCatalog.where(benefit_application_id: plan_year.id).first rescue nil
-    # TODO update ids
-    # benefit_sponsor_catalog.product_packages.map {|pp| pp._id = BSON::ObjectId.new}
-    # benefit_sponsor_catalog.save(validate: false)
 
     raise "@benefit_sponsor_catalog not found #{plan_year.employer_profile.organization.hbx_id}" if benefit_sponsor_catalog.blank?
 
@@ -263,26 +286,5 @@ class MigrateDcBenefitApplication < Mongoid::Migration
 
   def self.new_org(old_org)
     BenefitSponsors::Organizations::Organization.where(hbx_id: old_org.hbx_id).first
-  end
-
-  def self.skip_validation_for_invalid_py(id)
-    # TODO py has invalid inactive benefit group, latest py # 1057125 # high
-    # TODO 2017 dental plan pointing to 2018 PY # 1055030  # high
-    # TODO 2016 dental plan pointing to 2015 PY # 1055006
-    # TODO 2016 health plan pointing to 2017 py #1050755
-    # TODO 2015 health plan pointing to 2016 py #1050202
-    # TODO 2015 health plan poinitng to 2016 py #1050123
-    # TODO 2016 dental plan poinitng to 2019 py #1050953  #high
-    # 244561
-    # 1050123
-    # 1056081
-    [BSON::ObjectId('5a1429b350526c7cd90000a1'),
-     BSON::ObjectId('582f06ea082e76425e000016'),
-     BSON::ObjectId('582b5efdfaca1450e0000006'),
-     BSON::ObjectId('56aa5836faca1465b1000036'),
-     BSON::ObjectId('562ff9d269702d359b390000'),
-     BSON::ObjectId('561fe0cd69702d0ad8b90000'),
-     BSON::ObjectId('56e095c0082e76472d000116')
-    ].include?(id)
   end
 end
