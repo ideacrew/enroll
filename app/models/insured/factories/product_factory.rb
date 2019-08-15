@@ -15,7 +15,7 @@ module Insured
       end
 
       def product
-        self.product = ::BenefitMarkets::Products::Product.find(BSON::ObjectId.from_string(product_id))
+        self.product = ::BenefitMarkets::Products::HealthProducts::HealthProduct.find(BSON::ObjectId.from_string(product_id))
       end
     end
   end
