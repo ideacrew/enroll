@@ -11,6 +11,12 @@ h1.heading-text Add Benefit Package
 
   h4.i.fas.fa-question-circle data-toggle='tooltip' title=plan_shop_coverage_tip_helper
 .row#benefitApplicationform
+  .row.pl-3
+      - if aca_state_abbreviation == "DC" && f.object.id
+        p.pl-1
+          i.pl-2.fas.fa-info-circle style="color: #e72b2d"
+          b.pl-1 You can't edit this date.
+          |  To select a new effective date, go to '#{link_to('Benefits', benefit_sponsors.profiles_employers_employer_profile_path(f.object.sponsor_profile_id, :tab=>'benefits'), 'aria-expanded' => 'true')}' and create a new plan year
   .col-md-12.p0
     - benefit_application_start_dates = f.object.start_on_options.keys
     - formatted_start_on = f.object.start_on.present? ? Date.strptime(f.object.start_on, "%m/%d/%Y") : nil

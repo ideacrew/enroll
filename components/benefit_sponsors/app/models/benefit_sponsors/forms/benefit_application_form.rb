@@ -18,6 +18,7 @@ module BenefitSponsors
 
       attribute :id, String
       attribute :benefit_sponsorship_id, String
+      attribute :sponsor_profile_id, String
       attribute :start_on_options, Hash
       attribute :admin_datatable_action, Boolean, default: false
 

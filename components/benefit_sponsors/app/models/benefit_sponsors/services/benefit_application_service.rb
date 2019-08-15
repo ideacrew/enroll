@@ -125,6 +125,7 @@ module BenefitSponsors
           open_enrollment_start_on: format_date_to_string(benefit_application.open_enrollment_period.min),
           open_enrollment_end_on: format_date_to_string(benefit_application.open_enrollment_period.max),
           fte_count: benefit_application.fte_count,
+          sponsor_profile_id: benefit_application.sponsor_profile.id,
           pte_count: benefit_application.pte_count,
           msp_count: benefit_application.msp_count
         }
