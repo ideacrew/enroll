@@ -6,6 +6,7 @@ class GeneralAgencies::ProfilesController < ApplicationController
   before_action :find_general_agency_staff, only: [:edit_staff, :update_staff]
   before_action :check_general_agency_profile_permissions_index, only: [:index]
   before_action :check_general_agency_profile_permissions_new, only: [:new]
+  before_action :redirect_new_model, only: [:new_agency, :new, :create]
 
   layout 'single_column'
 
@@ -56,10 +57,17 @@ class GeneralAgencies::ProfilesController < ApplicationController
     end
   end
 
+  # Redirect General Agency to "New Model"
+  def redirect_new_model
+    redirect_to "/benefit_sponsors/profiles/registrations/new?profile_type=general_agency"
+  end
+
+  # Should no longer be accessible because of the redirect
   def new_agency
     @organization = ::Forms::GeneralAgencyProfile.new
   end
 
+  # Should no longer be accessible because of the redirect
   def new_agency_staff
     @organization = ::Forms::GeneralAgencyProfile.new
   end
