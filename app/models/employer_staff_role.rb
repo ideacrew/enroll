@@ -3,6 +3,7 @@ class EmployerStaffRole
   include Mongoid::Timestamps
   include AASM
   include ::BenefitSponsors::Concerns::Observable
+  include Mongoid::History::Trackable
 
   add_observer ::BenefitSponsors::Observers::EmployerStaffRoleObserver.new, :contact_changed?
   after_create :notify_observers
@@ -15,6 +16,15 @@ class EmployerStaffRole
   field :bookmark_url, type: String
   field :is_active, type: Boolean, default: true
   field :benefit_sponsor_employer_profile_id, type: BSON::ObjectId
+
+  track_history :on => [:fields],
+                :scope => :person,
+                :modifier_field => :modifier,
+                :modifier_field_optional => true,
+                :version_field => :tracking_version,
+                :track_create  => true,    # track document creation, default is false
+                :track_update  => true,    # track document updates, default is true
+                :track_destroy => true
 
   validates_presence_of :employer_profile_id, :if => Proc.new { |m| m.benefit_sponsor_employer_profile_id.blank? }
   validates_presence_of :benefit_sponsor_employer_profile_id, :if => Proc.new { |m| m.employer_profile_id.blank? }

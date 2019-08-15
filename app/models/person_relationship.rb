@@ -1,6 +1,7 @@
 class PersonRelationship
   include Mongoid::Document
   include Mongoid::Timestamps
+  include Mongoid::History::Trackable
 
   embedded_in :person
 
@@ -96,6 +97,15 @@ class PersonRelationship
 
   field :relative_id, type: BSON::ObjectId
   field :kind, type: String
+
+  track_history :on => [:fields],
+                :scope => :person,
+                :modifier_field => :modifier,
+                :modifier_field_optional => true,
+                :version_field => :tracking_version,
+                :track_create  => true,    # track document creation, default is false
+                :track_update  => true,    # track document updates, default is true
+                :track_destroy => true
 
   validates_presence_of :relative_id, message: "Choose a relative"
   validates :kind,

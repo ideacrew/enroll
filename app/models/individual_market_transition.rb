@@ -2,6 +2,7 @@ class IndividualMarketTransition
   include Mongoid::Document
   include Mongoid::Timestamps
   include SetCurrentUser
+  include Mongoid::History::Trackable
 
   embedded_in :person
 
@@ -17,6 +18,14 @@ class IndividualMarketTransition
   field :submitted_at, type: DateTime, default: nil
   field :user_id, type: BSON::ObjectId
 
+  track_history :on => [:fields],
+                :scope => :person,
+                :modifier_field => :modifier,
+                :modifier_field_optional => true,
+                :version_field => :tracking_version,
+                :track_create  => true,    # track document creation, default is false
+                :track_update  => true,    # track document updates, default is true
+                :track_destroy => true
 
 	validates_presence_of :submitted_at
 

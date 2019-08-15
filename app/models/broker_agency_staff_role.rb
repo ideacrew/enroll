@@ -3,6 +3,7 @@ class BrokerAgencyStaffRole
   include SetCurrentUser
   include MongoidSupport::AssociationProxies
   include AASM
+  include Mongoid::History::Trackable
 
   embedded_in :person
   field :aasm_state, type: String, default: "broker_agency_pending"
@@ -11,6 +12,15 @@ class BrokerAgencyStaffRole
   field :benefit_sponsors_broker_agency_profile_id, type: BSON::ObjectId
   embeds_many :workflow_state_transitions, as: :transitional
   # associated_with_one :broker_agency_profile, :broker_agency_profile_id, "BrokerAgencyProfile"  depricated
+
+  track_history :on => [:fields],
+                :scope => :person,
+                :modifier_field => :modifier,
+                :modifier_field_optional => true,
+                :version_field => :tracking_version,
+                :track_create  => true,    # track document creation, default is false
+                :track_update  => true,    # track document updates, default is true
+                :track_destroy => true
 
   associated_with_one :broker_agency_profile, :benefit_sponsors_broker_agency_profile_id, "BenefitSponsors::Organizations::BrokerAgencyProfile"
 

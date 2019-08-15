@@ -1,6 +1,7 @@
 class Email
   include Mongoid::Document
   include Mongoid::Timestamps
+  include Mongoid::History::Trackable
 
   include Validations::Email
 
@@ -12,6 +13,15 @@ class Email
 
   field :kind, type: String
   field :address, type: String
+
+  track_history :on => [:fields],
+                :scope => :person,
+                :modifier_field => :modifier,
+                :modifier_field_optional => true,
+                :version_field => :tracking_version,
+                :track_create  => true,    # track document creation, default is false
+                :track_update  => true,    # track document updates, default is true
+                :track_destroy => true
 
   validates :address, :email => true, :allow_blank => false
   validates_presence_of  :kind, message: "Choose a type"
