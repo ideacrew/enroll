@@ -39,7 +39,7 @@ class Notifier::Services::DependentService
     if is_uqhp_notice
       person.age_on(TimeKeeper.date_of_record).presence || nil
     else
-      Date.current.year - Date.parse(payload_member['dob']).year
+      Date.current.year - Date.strptime(payload_member['dob'], '%m/%d/%Y').year
     end
   end
 
