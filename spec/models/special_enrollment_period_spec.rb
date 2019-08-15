@@ -93,6 +93,23 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
     }
   }
 
+  let(:fehb_qle) do
+    QualifyingLifeEventKind.create(
+      title: "Married",
+      tool_tip: "Enroll or add a family member because of marriage",
+      action_kind: "add_benefit",
+      event_kind_label: "Date of married",
+      market_kind: "fehb",
+      ordinal_position: 15,
+      reason: "marriage",
+      edi_code: "32-MARRIAGE",
+      effective_on_kinds: ["first_of_next_month"],
+      pre_event_sep_in_days: 0,
+      post_event_sep_in_days: 30,
+      is_self_attested: true
+    )
+  end
+
   context "a new instance" do
     context "with no family" do
       let(:params) {valid_params.except(:family)}
@@ -504,6 +521,42 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
 
     it "should return false when ivl qle" do
       expect(ivl_qle_sep.is_shop?).to be_falsey
+    end
+  end
+
+  context "#is_fehb?" do
+    let(:ivl_qle_sep) { family.special_enrollment_periods.build(qualifying_life_event_kind: ivl_qle) }
+    let(:shop_qle_sep) { family.special_enrollment_periods.build(qualifying_life_event_kind: shop_qle) }
+    let(:fehb_qle_sep) { family.special_enrollment_periods.build(qualifying_life_event_kind: fehb_qle) }
+
+    it "should return true when shop qle" do
+      expect(shop_qle_sep.is_fehb?).to be_falsey
+    end
+
+    it "should return false when ivl qle" do
+      expect(ivl_qle_sep.is_fehb?).to be_falsey
+    end
+
+    it "should return true when fehb qle" do
+      expect(fehb_qle_sep.is_fehb?).to be_truthy
+    end
+  end
+
+  context "#is_shop_or_fehb?" do
+    let(:ivl_qle_sep) { family.special_enrollment_periods.build(qualifying_life_event_kind: ivl_qle) }
+    let(:shop_qle_sep) { family.special_enrollment_periods.build(qualifying_life_event_kind: shop_qle) }
+    let(:fehb_qle_sep) { family.special_enrollment_periods.build(qualifying_life_event_kind: fehb_qle) }
+
+    it "should return true when shop qle" do
+      expect(shop_qle_sep.is_shop_or_fehb?).to be_truthy
+    end
+
+    it "should return false when ivl qle" do
+      expect(ivl_qle_sep.is_shop_or_fehb?).to be_falsey
+    end
+
+    it "should return true when fehb qle" do
+      expect(fehb_qle_sep.is_shop_or_fehb?).to be_truthy
     end
   end
 

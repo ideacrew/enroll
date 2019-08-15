@@ -195,7 +195,7 @@ end
 When /(\w+) removes EmployerStaffRole from Sarah/ do |staff2|
   staff = Person.where(first_name: staff2).first
   accept_alert do
-    find(:xpath, '//*[@id="edit_agency"]/div[2]/div/div[1]/table/tbody/tr[2]/td[6]/a').click
+    find(:xpath, '//*[@id="edit_agency"]/div/div/div[1]/table/tbody/tr[2]/td[6]/a/i').click
   end
 end
 

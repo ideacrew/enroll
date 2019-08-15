@@ -67,6 +67,7 @@ And(/^.+ enters broker agency information for SHOP markets$/) do
 
   # find(:xpath, "//p[@class='label'][contains(., 'Select Practice Area')]").click
   # find(:xpath, "//li[contains(., 'Small Business Marketplace ONLY')]").click
+  select 'Small Business Marketplace ONLY', from: "agency_organization_profile_attributes_market_kind"
   # Languages
   find("option[value='tr']").click
   find("#agency_organization_profile_attributes_accept_new_clients").click
