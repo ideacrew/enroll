@@ -153,7 +153,7 @@ module Notifier
     end
 
     def ivl_attach_envelope
-      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ivl_envelope.pdf')] if ['projected_eligibility_notice'].include?(event_name)
+      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ivl_envelope.pdf')] unless ['projected_eligibility_notice'].include?(event_name)
     end
 
     def voter_application
