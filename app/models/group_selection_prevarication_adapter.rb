@@ -32,7 +32,8 @@ class GroupSelectionPrevaricationAdapter
       optional_effective_on: optional_effective_on
     )
     if params[:hbx_enrollment_id].present?
-      record.previous_hbx_enrollment = ::HbxEnrollment.find(params[:hbx_enrollment_id])
+      enrollment = ::HbxEnrollment.find(params[:hbx_enrollment_id])
+      record.previous_hbx_enrollment = enrollment if enrollment.coverage_kind == coverage_kind
     end
     record.check_shopping_roles(params)
     record
