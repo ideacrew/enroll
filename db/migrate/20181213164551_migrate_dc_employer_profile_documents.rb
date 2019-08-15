@@ -90,6 +90,10 @@ class MigrateDcEmployerProfileDocuments < Mongoid::Migration
       @logger.info " Total #{total_organizations} old organizations for type: employer profile" unless Rails.env.test?
       @logger.info " #{failed} organizations failed to migrated to new DB at this point." unless Rails.env.test?
       @logger.info " #{success} organizations migrated to new DB at this point." unless Rails.env.test?
+
+      BenefitSponsors::Organizations::Organization.set_callback(:create, :after, :notify_on_create, raise: false)
+      BenefitSponsors::Organizations::Profile.set_callback(:save, :after, :publish_profile_event, raise: false)
+
       return true
     end
 
