@@ -153,6 +153,7 @@ When(/^.+ fills out the (.*?) QLE Kind form for (.*?) event and clicks submit$/)
   fill_qle_kind_form_and_submit(action_name, qle_kind_title)
 end
 
-Given(/^.+ should see a message that QLE Kind (.*?) has been successfully (.*?) for (.*?)$/) do |qle_kind_title, action_verb|
-  binding.pry
+Then(/^user should see message QLE Kind (.*?) has been sucessfully (.*?)$/) do |qle_kind_title, action_name|
+  expect(page).to have_content("Successfully #{action_name} Qualifying Life Event Kind.")
+  expect(QualifyingLifeEventKind.where(title: qle_kind_title).present?).to eq(true)
 end
