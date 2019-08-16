@@ -251,13 +251,13 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
 
       it "should return active enrollment if the coverage effective on covers active plan year" do
         allow(employee_role.census_employee).to receive(:active_benefit_package).and_return(current_benefit_package)
-        expect(subject.selected_enrollment(family, employee_role)).to eq active_enrollment
+        expect(subject.selected_enrollment(family, employee_role, active_enrollment.coverage_kind)).to eq active_enrollment
       end
 
       it "should return renewal enrollment if the coverage effective on covers renewal plan year" do
         allow(employee_role.census_employee).to receive(:renewal_published_benefit_package).and_return(benefit_package)
         sep.update_attribute(:effective_on, renewal_application.start_on + 2.days)
-        expect(subject.selected_enrollment(family, employee_role)).to eq renewal_enrollment
+        expect(subject.selected_enrollment(family, employee_role, active_enrollment.coverage_kind)).to eq renewal_enrollment
       end
 
       context 'it should not return any enrollment' do
@@ -268,12 +268,12 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
         end
 
         it "should not return active enrollment although if the coverage effective on covers active plan year & if not belongs to the assigned benefit group" do
-          expect(subject.selected_enrollment(family, employee_role)).to eq nil
+          expect(subject.selected_enrollment(family, employee_role, 'health')).to eq nil
         end
 
         it "should not return renewal enrollment although if the coverage effective on covers renewal plan year & if not belongs to the assigned benefit group" do
           sep.update_attribute(:effective_on, renewal_application.start_on + 2.days)
-          expect(subject.selected_enrollment(family, employee_role)).to eq nil
+          expect(subject.selected_enrollment(family, employee_role, 'health')).to eq nil
         end
       end
     end
