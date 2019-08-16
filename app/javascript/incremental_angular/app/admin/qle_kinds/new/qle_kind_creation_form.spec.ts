@@ -28,15 +28,31 @@ describe('QleKindCreationFormComponent', () => {
     )
   });
 
-  it("successfully passes through the question and responses params", () => {
+  it("successfully submits creation", () => {
     var component = new QleKindCreationFormComponent(
      new Injector(),
      new ElementRef(null),
      new FormBuilder(),
      new MockQleKindCreationService(),
     )
-    expect(component.submitCreation())
+    expect(component.submitCreation()).toBeTruthy
+  })
 
+  it("shows questions", () => {
+      var component = new QleKindCreationFormComponent(
+      new Injector(),
+      new ElementRef(null),
+      new FormBuilder(),
+      new MockQleKindCreationService(),
+    )
+    component.questionArray = ["Test", "Test"]
+    expect(component.questionArray).toEqual(["Test", "Test"])
+    var result = component.showQuestions()
+    expect(result).toEqual(true)
+    component.questionArray = []
+    expect(component.questionArray).toEqual([])
+    var result = component.showQuestions()
+    expect(result).toEqual(false)
   })
 });
 
