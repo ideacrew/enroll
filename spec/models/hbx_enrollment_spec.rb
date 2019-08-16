@@ -1385,6 +1385,57 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     end
   end
 
+  describe HbxEnrollment, 'all_enrollments_under_benefit_application', type: :model, dbclean: :around_each do
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup initial benefit application"
+
+    let!(:census_employee) { create(:census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, employee_role_id: employee_role.id) }
+    let!(:employee_role) { FactoryBot.create(:employee_role, person: person, employer_profile: benefit_sponsorship.profile) }
+
+    let(:person) {FactoryBot.create(:person)}
+    let!(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
+
+    let(:subject) { HbxEnrollment.all_enrollments_under_benefit_application(initial_application) }
+
+    context 'should return coverage_selected enrollment' do
+      let(:enrollment) do
+        FactoryBot.create(
+          :hbx_enrollment,
+          household: family.active_household,
+          aasm_state: "coverage_selected",
+          sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
+          family: family,
+          coverage_kind: "health",
+          kind: "employer_sponsored"
+        )
+      end
+
+      it "should return the enrollment with the benefit group assignment" do
+        enrollment
+        expect(subject).to include enrollment
+      end
+    end
+
+    context 'should return waived enrollment' do
+      let(:enrollment) do
+        FactoryBot.create(
+          :hbx_enrollment,
+          household: family.active_household,
+          aasm_state: "inactive",
+          sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
+          family: family,
+          coverage_kind: "health",
+          kind: "employer_sponsored"
+        )
+      end
+
+      it "should return the enrollment with the benefit group assignment" do
+        enrollment
+        expect(subject).to include enrollment
+      end
+    end
+  end
+
   describe HbxEnrollment, 'dental shop calculation related', type: :model, dbclean: :around_each do
     context ".find_enrollments_by_benefit_group_assignment" do
 
