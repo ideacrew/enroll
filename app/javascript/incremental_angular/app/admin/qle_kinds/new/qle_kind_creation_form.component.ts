@@ -35,24 +35,24 @@ export class QleKindCreationFormComponent {
   ]
 
   public actionKindList = [
-    {name:"Not Applicable", code:"not_applicable"},
-    {name:"Drop Member", code:"drop_member" }, 
-    {name:"Adminstrative", code:"administrative" }, 
+    {name:"Not Applicable", code: ""},
+    {name:"Drop Member", code: "drop_member" }, 
+    {name:"Adminstrative", code: "administrative" }, 
     {name:"Add Member", code: "add_member"},
     {name:"Add Benefit", code: "add_benefit" }, 
     {name:"Change Benefit", code:"change_benefit" }, 
-    {name:"Transition Member", code:"transition_member" },
-    {name:"Terminate Benefit", code:"terminate_benefit" }
+    {name:"Transition Member", code: "transition_member" },
+    {name:"Terminate Benefit", code: "terminate_benefit" }
   ]
   
   public reasonList = [
-    {name:"Not Applicable", code: "not_applicable"},
+    {name:"Not Applicable", code: ""},
     {name:"Natural Disaster", code: "exceptional_circumstances_natural_disaster"},
     {name:"Medical Emergency", code: "exceptional_circumstances_medical_emergency"},
     {name:"System Outage", code: "exceptional_circumstances_system_outage"},
     {name:"Domestic Abuse", code: "exceptional_circumstances_domestic_abuse"},
-    {name:"Civic Service",code:"exceptional_circumstances_civic_service"},
-    {name:"Exceptional Circumstances",code: "exceptional_circumstances"}  
+    {name:"Civic Service",code: "exceptional_circumstances_civic_service"},
+    {name:"Exceptional Circumstances", code: "exceptional_circumstances"}  
   ]
   
   @ViewChild('headerRef') headerRef: ElementRef;

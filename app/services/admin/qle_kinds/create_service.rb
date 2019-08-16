@@ -46,8 +46,10 @@ module Admin
       # automatically be included in here
       # currently its an input
       def reason_is_valid?(reason)
+        # TODO: Determine if reason can be blank
+        # not applicable is blank
+        return true if reason.blank?
         reason.in?(QualifyingLifeEventKind::REASON_KINDS)
-        #return true
       end
 
       def post_sep_eligiblity_date_is_valid?(date)
@@ -99,7 +101,7 @@ module Admin
           tool_tip: request.tool_tip,
           reason: request.reason,
           action_kind: request.action_kind,
-          end_on:request.end_on,
+          end_on: request.end_on,
           start_on: request.start_on,
         )
         create_record_questions_and_responses(new_record, request)

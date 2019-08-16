@@ -4,13 +4,16 @@ require 'rails_helper'
 
 RSpec.describe Exchanges::QlesController, :type => :controller do
   render_views
+  # Note: Value is '' when choosing 'not_applicable' reason and action kind
+  # Always make sure this is up to date by submitting the form once and grabbing the
+  # params with binding.pry and params["data"]
   let(:qle_creation_params) do
     {
       "data" => {
         "title" => "Got a New Dog",
         "tool_tip" => "New Pet",
-        "action_kind" => "not_applicable",
-        "reason" => "qualified_native_american",
+        "action_kind" => "",
+        "reason" => "",
         "market_kind" => "shop",
         "is_self_attested" => "Yes",
         "visible_to_customer" => "Yes",
