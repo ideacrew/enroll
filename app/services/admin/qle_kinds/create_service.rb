@@ -47,7 +47,8 @@ module Admin
       # currently its an input
       def reason_is_valid?(reason)
         # TODO: Determine if reason can be blank
-        # not applicable is blank
+        # not applicable is blank. Currently no method validates
+        # the reason in the QualifyingLifeEventKind model.
         return true if reason.blank?
         reason.in?(QualifyingLifeEventKind::REASON_KINDS)
       end
