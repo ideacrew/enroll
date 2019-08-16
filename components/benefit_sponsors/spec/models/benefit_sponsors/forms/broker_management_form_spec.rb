@@ -75,7 +75,7 @@ module BenefitSponsors
         organization.save
       end
 
-      it "should assign the termiante params to broker management forms" do
+      it "should assign the terminate params to broker management forms" do
         expect(terminate_form.employer_profile_id).to eq terminate_form[:employer_profile_id]
         expect(terminate_form.broker_agency_profile_id).to eq terminate_form[:broker_agency_profile_id]
         expect(terminate_form.broker_role_id).to eq terminate_form[:broker_role_id]

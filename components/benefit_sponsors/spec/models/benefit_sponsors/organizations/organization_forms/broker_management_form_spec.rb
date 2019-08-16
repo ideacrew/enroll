@@ -110,7 +110,7 @@ module BenefitSponsors
         expect(broker_management_form_terminate.terminate).to eq true
       end
 
-      it 'should termiante active broker agency of the employer_profile' do
+      it 'should terminate active broker agency of the employer_profile' do
         broker_management_form_terminate.terminate
         employer_profile.active_benefit_sponsorship.reload
         expect(employer_profile.active_benefit_sponsorship.broker_agency_accounts).to eq []

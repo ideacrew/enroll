@@ -453,7 +453,7 @@ def employer_poc
     @dup_enr_ids = fetch_duplicate_enrollment_ids(@enrollments).map(&:to_s)
   end
 
-  def update_enrollment_termianted_on_date
+  def update_enrollment_terminated_on_date
     begin
       enrollment = HbxEnrollment.find(params[:enrollment_id].strip)
       @row = params[:family_actions_id]
