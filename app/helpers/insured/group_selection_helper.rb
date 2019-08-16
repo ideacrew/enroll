@@ -99,28 +99,38 @@ module Insured
     end
 
     def insure_hbx_enrollment_for_shop_qle_flow
-      @hbx_enrollment = selected_enrollment(@family, @employee_role) if (@market_kind == 'shop' || @market_kind == 'fehb') && (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep') && @hbx_enrollment.blank?
+      @hbx_enrollment = selected_enrollment(@family, @employee_role, @coverage_kind) if (@market_kind == 'shop' || @market_kind == 'fehb') && (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep') && @hbx_enrollment.blank?
     end
 
-    def selected_enrollment(family, employee_role)
+    def selected_enrollment(family, employee_role, coverage_kind)
       employer_profile = employee_role.employer_profile
       benefit_application = employer_profile.benefit_applications.detect { |ba| is_covered_plan_year?(ba, family.current_sep.effective_on)} || employer_profile.published_benefit_application
       enrollments = family.active_household.hbx_enrollments
       if benefit_application.present? && benefit_application.is_renewing?
-        renewal_enrollment(enrollments, employee_role)
+        renewal_enrollment(enrollments, employee_role, coverage_kind)
       else
-        active_enrollment(enrollments, employee_role)
+        active_enrollment(enrollments, employee_role, coverage_kind)
       end
     end
 
-    def renewal_enrollment(enrollments, employee_role)
-      enrollments.where({:sponsored_benefit_package_id => employee_role.census_employee.renewal_published_benefit_package.try(:id),
-                         :aasm_state.in => HbxEnrollment::RENEWAL_STATUSES}).first
+    def renewal_enrollment(enrollments, employee_role, coverage_kind)
+      enrollments.where(
+        {
+          :sponsored_benefit_package_id => employee_role.census_employee.renewal_published_benefit_package.try(:id),
+          :aasm_state.in => HbxEnrollment::RENEWAL_STATUSES,
+          :coverage_kind => coverage_kind
+        }
+      ).first
     end
 
-    def active_enrollment(enrollments, employee_role)
-      enrollments.where({:sponsored_benefit_package_id => employee_role.census_employee.active_benefit_package.try(:id),
-                         :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES}).first
+    def active_enrollment(enrollments, employee_role, coverage_kind)
+      enrollments.where(
+        {
+          :sponsored_benefit_package_id => employee_role.census_employee.active_benefit_package.try(:id),
+          :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES,
+          :coverage_kind => coverage_kind
+        }
+      ).first
     end
 
     def benefit_group_assignment_by_plan_year(employee_role, benefit_group, change_plan, enrollment_kind)

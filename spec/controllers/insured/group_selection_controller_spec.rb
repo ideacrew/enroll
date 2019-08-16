@@ -250,6 +250,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         allow(HbxEnrollment).to receive(:find).with("123").and_return(hbx_enrollment)
         allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return true
         allow(hbx_enrollment).to receive(:kind).and_return "individual"
+        allow(hbx_enrollment).to receive(:coverage_kind).and_return "health"
         sign_in user
         get :new, params: { person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_plan', hbx_enrollment_id: "123" }
       end
@@ -276,30 +277,41 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       let(:benefit_coverage_period) {FactoryBot.build(:benefit_coverage_period)}
 
       before :each do
+        allow(HbxEnrollment).to receive(:find).with("123").and_return(hbx_enrollment)
+        allow(hbx_enrollment).to receive(:coverage_kind).and_return "health"
         allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
         allow(benefit_coverage_period).to receive(:benefit_packages).and_return [benefit_package]
         allow(person).to receive(:is_consumer_role_active?).and_return true
         allow(person).to receive(:has_active_employee_role?).and_return false
         allow(person).to receive(:consumer_role).and_return(consumer_role)
-        allow(HbxEnrollment).to receive(:find).and_return nil
         allow(HbxEnrollment).to receive(:calculate_effective_on_from).and_return TimeKeeper.date_of_record
       end
 
       it "should set session" do
         sign_in user
-        get :new, params: { person_id: person.id, consumer_role_id: consumer_role.id, change_plan: "change", hbx_enrollment_id: "123" }
+        get :new, params: { person_id: person.id, consumer_role_id: consumer_role.id, change_plan: "change", hbx_enrollment_id: "123", coverage_kind: hbx_enrollment.coverage_kind }
         expect(session[:pre_hbx_enrollment_id]).to eq "123"
       end
 
       it "should get new_effective_on" do
         sign_in user
-        get :new, params: { person_id: person.id, consumer_role_id: consumer_role.id, change_plan: "change", hbx_enrollment_id: "123" }
+        get :new, params: { person_id: person.id, consumer_role_id: consumer_role.id, change_plan: "change", hbx_enrollment_id: "123", coverage_kind: hbx_enrollment.coverage_kind }
         expect(assigns(:new_effective_on)).to eq TimeKeeper.date_of_record
       end
 
       it "should create an hbx enrollment" do
+        params = {
+          person_id: person.id,
+          consumer_role_id: consumer_role.id,
+          market_kind: "individual",
+          change_plan: "change",
+          hbx_enrollment_id: "123",
+          family_member_ids: family_member_ids,
+          enrollment_kind: 'sep',
+          coverage_kind: hbx_enrollment.coverage_kind
+        }
         sign_in user
-        post :create, params: { person_id: person.id, consumer_role_id: consumer_role.id , market_kind:"individual", change_plan: "change", hbx_enrollment_id: "123",family_member_ids: family_member_ids, enrollment_kind:'sep' }
+        post :create, params: params
         expect(response).to have_http_status(:redirect)
         expect(response).to redirect_to(insured_plan_shopping_path(id: new_household.hbx_enrollments(true).first.id, change_plan: 'change', coverage_kind: 'health', market_kind: 'individual', enrollment_kind: 'sep'))
       end
