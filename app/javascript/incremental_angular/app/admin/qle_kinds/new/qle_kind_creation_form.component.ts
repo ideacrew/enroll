@@ -71,8 +71,8 @@ export class QleKindCreationFormComponent {
     var formGroup = formBuilder.group({
       title: ['', Validators.required],
       tool_tip: ['', [Validators.required, Validators.minLength(1)]],
-      action_kind: ['not_applicable',Validators.required],
-      reason: ['not_applicable', [Validators.required, Validators.minLength(1)]],
+      action_kind: ['', Validators.required],
+      reason: ['', [Validators.required, Validators.minLength(1)]],
       market_kind: ['', [Validators.required, Validators.minLength(1)]],
       is_self_attested: [''],
       visible_to_customer: [''],
