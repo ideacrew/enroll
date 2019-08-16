@@ -28,8 +28,36 @@ module QualifyingLifeEventKindWorld
     if %w[creation_form edit_form].include?(form_name)
       fill_in("qle_kind_#{form_name}_title", with: qle_kind_title)
       fill_in("qle_kind_#{form_name}_tool_tip", with: "Tool Tip")
-      # select('', from: "qle_kind_#{form_name}_action_kind")
-      # select('', from: "qle_kind_#{form_name}__reason")
+      # TODO: Selectric selects are considered not visible
+      # However, they are set to `not_applicable` by default, which is valid.
+      # remove selectric or find a work around to select them.
+      # options = page.all('option')
+      # Action kind
+      # administrative_action_kind = options.detect { |option| option['ng-reflect-ng-value'] == 'administrative' }
+      # administrative_action_kind.click
+      # Reason
+      # natural_disaster_option = options.detect { |option| option['ng-reflect-ng-value'] == 'exceptional_circumstances_natural_disaster' }
+      # natural_disaster_option.click
+
+      # TODO: Add these to the edit form too
+      if form_name == 'creation_form'
+        click_button('Create a New Question')
+        # Question 1
+        fill_in('qle_kind_question_0_title', with: "Did you just move to DC?")
+        click_button('Add Response')
+        fill_in('qle_kind_response_response_0_content', with: 'No')
+        select('Declined', from: 'qle_kind_response_response_0_action_to_take')
+        click_button('Create a New Question')
+        sleep(2)
+        buttons = page.all('button')
+        add_response_buttons = []
+        second_add_response = buttons.each { |button| add_response_buttons << button if button.text == 'Add Response' }
+        add_response_buttons.second.click
+        # TODO: These need to have the index properly added to them so they have different
+        # IDS
+        # fill_in('qle_kind_response_response_1_content', with: 'Yes')
+        # select('Accepted', from: 'qle_kind_response_response_1_action_to_take')
+      end
       # TODO: Consider modifying this step to allow visibility as false
       # Visible to Customer
       choose("qle_kind_#{form_name}_visible_to_customer", option: 'Yes')
@@ -123,4 +151,8 @@ end
 
 When(/^.+ fills out the (.*?) QLE Kind form for (.*?) event and clicks submit$/) do |action_name, qle_kind_title|
   fill_qle_kind_form_and_submit(action_name, qle_kind_title)
+end
+
+Given(/^.+ should see a message that QLE Kind (.*?) has been successfully (.*?) for (.*?)$/) do |qle_kind_title, action_verb|
+  binding.pry
 end
