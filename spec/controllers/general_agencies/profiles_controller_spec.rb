@@ -13,7 +13,7 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
   end
 
   describe "GET new" do
-    it "should redirect without login" do
+    it "should redirect to new model" do
       get :new
       expect(response).to have_http_status(:redirect)
     end
@@ -22,9 +22,7 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
       allow(controller).to receive(:check_general_agency_profile_permissions_new).and_return true
       sign_in(user)
       get :new
-      expect(response).to have_http_status(:success)
-      expect(flash[:notice]).to eq "You don't have a General Agency Profile associated with your Account!! Please register your General Agency first."
-      expect(response).to render_template("new")
+      expect(response).to have_http_status(:redirect)
     end
   end
 
@@ -75,28 +73,16 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
   end
 
   describe "GET new_agency" do
-    it "should render the new_agency template" do
-      get :new_agency
-      expect(response).to have_http_status(:success)
-      expect(response).to render_template("new_agency")
-    end
-
-    it "should get organization" do
-      get :new_agency
-      expect(assigns(:organization).class).to eq Forms::GeneralAgencyProfile
+    it "should redirect to new model" do
+      get :new_agency_staff
+      expect(response).to have_http_status(:redirect)
     end
   end
 
   describe "GET new_agency_staff" do
-    it "should render the new_agency_staff template" do
+    it "should redirect to new model" do
       get :new_agency_staff
-      expect(response).to have_http_status(:success)
-      expect(response).to render_template("new_agency_staff")
-    end
-
-    it "should get organization" do
-      get :new_agency_staff
-      expect(assigns(:organization).class).to eq Forms::GeneralAgencyProfile
+      expect(response).to have_http_status(:redirect)
     end
   end
 
@@ -335,31 +321,13 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
   end
 
   describe "POST create" do
-    let(:form) { double("organization") }
     before do
-      allow(::Forms::GeneralAgencyProfile).to receive(:new).and_return(form)
       sign_in(user)
     end
 
     it "should redirect" do
-      allow(form).to receive(:save).and_return true
       post :create, params:{organization: {first_name: 'test'}}
       expect(response).to have_http_status(:redirect)
-      expect(flash[:notice]).to eq "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
-    end
-
-    it "should render new_agency template" do
-      allow(form).to receive(:save).and_return false
-      allow(form).to receive(:only_staff_role?).and_return false
-      post :create, params:{organization: {first_name: 'test'}}
-      expect(response).to render_template("new_agency")
-    end
-
-    it "should render new_agency_staff template" do
-      allow(form).to receive(:save).and_return false
-      allow(form).to receive(:only_staff_role?).and_return true
-      post :create, params:{organization: {first_name: 'test'}}
-      expect(response).to render_template("new_agency_staff")
     end
   end
 end
