@@ -6,7 +6,7 @@ class GeneralAgencies::ProfilesController < ApplicationController
   before_action :find_general_agency_staff, only: [:edit_staff, :update_staff]
   before_action :check_general_agency_profile_permissions_index, only: [:index]
   before_action :check_general_agency_profile_permissions_new, only: [:new]
-  before_action :redirect_new_model, only: [:new_agency, :new, :create]
+  before_action :redirect_new_model, only: [:new_agency, :new_agency_staff, :new, :create]
 
   layout 'single_column'
 
