@@ -1,5 +1,7 @@
 module Aws
   class S3Storage
+    include ::Acapi::Notifiers
+
     ENV_LIST = ['local', 'prod', 'preprod', 'test', 'uat', 'qa']
 
     def initialize
@@ -20,6 +22,8 @@ module Aws
           nil
         end
       rescue Exception => e
+        log("ERROR: Unable to upload Notice to S3 bucket due to #{e.backtrace}", {:severity => "critical"})
+        nil
       end
     end
 
