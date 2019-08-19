@@ -72,8 +72,14 @@ module Insured::FamiliesHelper
     end.join("&nbsp<label class='separator'></label>").html_safe
   end
 
-  def qle_link_generater(qle, index)
+  def qle_link_generator(qle, index)
     options = {class: 'qle-menu-item'}
+    if qle.custom_qle_questions.present?
+      # TODO: Should go to insured/families/custom_qle_questions
+      link_url = "javascript:void(0)"
+    else
+      link_url = "javascript:void(0)"
+    end
     data = {
       title: qle.title, id: qle.id.to_s, label: qle.event_kind_label,
       is_self_attested: qle.is_self_attested,
@@ -86,7 +92,9 @@ module Insured::FamiliesHelper
     else
       options.merge!(data: data)
     end
-    link_to qle.title, "javascript:void(0)", options
+    # TODO: When the custom QLE questions are present
+    # it will go to the new page with questions
+    link_to qle.title, link_url, options
   end
 
   def qle_link_generator_for_an_existing_qle(qle, link_title=nil)

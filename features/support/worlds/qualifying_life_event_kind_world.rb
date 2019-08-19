@@ -1,3 +1,4 @@
+
 module QualifyingLifeEventKindWorld
 
   def qualifying_life_event_kind(qle_kind_title = nil, market_kind = 'shop')
@@ -10,6 +11,25 @@ module QualifyingLifeEventKindWorld
       title: qle_kind_title.present? ? qle_kind_title : 'Married',
       market_kind: market_kind
     )
+  end
+
+  def create_custom_qle_kind_questions_and_responses(qle_kind_title = nil)
+    qle_kind = QualifyingLifeEventKind.where(title: qle_kind_title).first
+    custom_qle_question = qle_kind.custom_qle_questions.build(
+      content: "What is the name of your dog?"
+    )
+    custom_qle_question.save!
+    custom_qle_question = qle_kind.custom_qle_questions.last
+    custom_qle_question_response_1 = custom_qle_question.custom_qle_responses.build(
+      content: "Fido",
+      action_to_take: 'accepted'
+    )
+    custom_qle_question_response_1.save!
+    custom_qle_question_response_2 = custom_qle_question.custom_qle_responses.build(
+      content: "Jimmy",
+      action_to_take: 'declined'
+    )
+    custom_qle_question_response_2.save!
   end
 
   def fill_qle_kind_form_and_submit(action_name, qle_kind_title)
@@ -112,6 +132,11 @@ Given(/^qualifying life event kind (.*?) present for (.*?) market$/) do |qle_kin
   qualifying_life_event_kind(qle_kind_title, market_kind)
 end
 
+
+And(/^qualifying life event kind (.*?) has custom qle questions and responses present$/) do |qle_kind_title|
+  create_custom_qle_kind_questions_and_responses(qle_kind_title)
+end
+
 And(/^all qualifying life event kinds (.*?) to customer$/) do |visible_to_customer|
   case visible_to_customer
   when 'are visible'
@@ -167,4 +192,10 @@ Then(/^user should see message QLE Kind (.*?) has been sucessfully (.*?)$/) do |
   if action_name == 'deactivated'
     expect(qle_kind.first.end_on.present?).to eq(true)
   end
+end
+
+
+And(/I see the custom qle questions for (.*?) qualifying life event kind$/) do |qle_kind_title|
+  #fail
+  binding.pry
 end
