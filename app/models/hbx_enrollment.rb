@@ -843,6 +843,7 @@ class HbxEnrollment
 
   def update_existing_shop_coverage
     return if parent_enrollment.blank?
+    return unless benefit_sponsorship_id == parent_enrollment.benefit_sponsorship_id # Allows EE to shop under a different employer.
 
     if parent_enrollment.effective_on >= effective_on
       parent_enrollment.cancel_coverage! if parent_enrollment.may_cancel_coverage?

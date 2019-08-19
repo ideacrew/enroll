@@ -2201,6 +2201,20 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       end
     end
 
+    context "should not cancel/terminate if Enrollments are from different employers" do
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup initial benefit application"
+
+      let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
+      let(:existing_shop_enrollment) {FactoryBot.create(:hbx_enrollment, :shop, household: family.active_household, aasm_state: 'coverage_enrolled', effective_on: TimeKeeper.date_of_record, family: family, benefit_sponsorship_id: mikes_benefit_sponsorship.id)}
+      let(:new_enrollment) {FactoryBot.create(:hbx_enrollment, :shop, household: family.active_household, family: family, predecessor_enrollment_id: existing_shop_enrollment.id, effective_on: TimeKeeper.date_of_record, benefit_sponsorship_id: benefit_sponsorship.id)}
+
+      it 'should cancel the previous enrollment if the effective_on date of the previous and the current are the same.' do
+        new_enrollment.update_existing_shop_coverage
+        expect(existing_shop_enrollment.reload.aasm_state).to eq 'coverage_enrolled'
+      end
+    end
+
     context "Cancel / Terminate Previous Enrollments for IVL" do
       attr_reader :enrollment, :household, :coverage_household
 
