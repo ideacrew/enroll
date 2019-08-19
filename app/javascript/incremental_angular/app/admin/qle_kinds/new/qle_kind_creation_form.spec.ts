@@ -15,7 +15,6 @@ class MockQleKindCreationService {
   public submitCreate(post_uri: string, obj_data : object) : Observable<HttpResponse<any>> {
     return null;
   }
-
 }
 
 describe('QleKindCreationFormComponent', () => {
@@ -36,10 +35,21 @@ describe('QleKindCreationFormComponent', () => {
      new MockQleKindCreationService(),
     )
     expect(component.submitCreation()).toBeTruthy
-  })
+  });
+
+  it("gets options", () => {
+    var component = new QleKindCreationFormComponent(
+      new Injector(),
+      new ElementRef(null),
+      new FormBuilder(),
+      new MockQleKindCreationService(),
+    )
+    var result = component.getOptions();
+    expect(result[0]).toEqual({ name: 'Date of Event',  selected: false, id: 1 })
+  });
 
   it("shows questions", () => {
-      var component = new QleKindCreationFormComponent(
+    var component = new QleKindCreationFormComponent(
       new Injector(),
       new ElementRef(null),
       new FormBuilder(),
@@ -49,10 +59,6 @@ describe('QleKindCreationFormComponent', () => {
     expect(component.questionArray).toEqual(["Test", "Test"])
     var result = component.showQuestions()
     expect(result).toEqual(true)
-    component.questionArray = []
-    expect(component.questionArray).toEqual([])
-    var result = component.showQuestions()
-    expect(result).toEqual(false)
-  })
+  });
 });
 
