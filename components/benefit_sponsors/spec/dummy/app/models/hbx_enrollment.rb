@@ -258,6 +258,7 @@ class HbxEnrollment
   scope :enrolled_and_terminated,->{ where(:aasm_state.in => ENROLLED_STATUSES + TERMINATED_STATUSES) }
   scope :renewing,            ->{ where(:aasm_state.in => RENEWAL_STATUSES )}
   scope :enrolled_and_renewal, ->{where(:aasm_state.in => ENROLLED_AND_RENEWAL_STATUSES )}
+  scope :enrolled_waived_and_renewing, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES + WAIVED_STATUSES)) }
   scope :enrolled_and_renewing, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES)) }
   scope :enrolled_and_renewing_and_shopping, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES + ['shopping'])) }
   scope :enrolled_and_renewing_and_expired, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES + ['coverage_expired'])) }
@@ -809,17 +810,15 @@ class HbxEnrollment
   end
 
   def update_renewal_coverage
-    if is_shop?
-      if successor_benefit_package = sponsored_benefit_package.successor
-        successor_application = successor_benefit_package.benefit_application
-        passive_renewals_under(successor_application).each{|en| en.cancel_coverage! if en.may_cancel_coverage? }
-        if active_renewals_under(successor_application).blank?
-          if successor_application.coverage_renewable?
-            renew_benefit(successor_benefit_package)
-          end
-        end
-      end
-    end
+    return unless is_shop?
+
+    current_benefit_application = sponsored_benefit_package.benefit_application
+    successor_application = current_benefit_application.successors.first
+    successor_benefit_package = current_benefit_application&.successor_benefit_package(sponsored_benefit_package)
+    return unless successor_application && successor_benefit_package
+
+    passive_renewals_under(successor_application).each{|en| en.cancel_coverage! if en.may_cancel_coverage? }
+    renew_benefit(successor_benefit_package) if active_renewals_under(successor_application).blank? && successor_application.coverage_renewable? && non_inactive_transition?
   end
 
   def renewal_enrollments(successor_application)
@@ -1474,7 +1473,7 @@ class HbxEnrollment
   def self.all_enrollments_under_benefit_application(benefit_application)
     id_list = benefit_application.benefit_packages.collect(&:_id).uniq
     benefit_application.enrolled_families.inject([]) do |enrollments, family|
-      enrollments += family.active_household.hbx_enrollments.where(:sponsored_benefit_package_id.in => id_list).enrolled_and_renewing.to_a
+      enrollments += family.active_household.hbx_enrollments.where(:sponsored_benefit_package_id.in => id_list).enrolled_waived_and_renewing.to_a
     end
   end
 

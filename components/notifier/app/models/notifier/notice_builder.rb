@@ -136,11 +136,11 @@ module Notifier
     end
 
     def notice_filename
-      if shop_market?
-        "#{subject.titleize.gsub(/\s+/, '_')}"
-      else
-        "#{subject.titleize.gsub(/\s+/, '_')}_#{notice_recipient.hbx_id}"
-      end
+      "#{notice_recipient.hbx_id}_#{subject.titleize.gsub(/\s+/, '_')}"
+    end
+
+    def display_file_name
+      "#{subject.titleize.gsub(/\s+/, '_')}"
     end
 
     def non_discrimination_attachment
@@ -291,7 +291,7 @@ module Notifier
       receiver = resource
       receiver = resource.person if sub_resource?
 
-      title = (self.event_name == 'generate_initial_employer_invoice') ? file_name : notice_filename
+      title = (event_name == 'generate_initial_employer_invoice') ? file_name : display_file_name
 
       doc_params = {
         title: title,

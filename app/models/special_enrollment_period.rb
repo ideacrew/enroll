@@ -136,12 +136,24 @@ class SpecialEnrollmentPeriod
 
   def is_active?
     return false if start_on.blank? || end_on.blank?
+
     (start_on..end_on).include?(TimeKeeper.date_of_record)
   end
 
   def is_shop?
     return false if qualifying_life_event_kind.blank?
+
     qualifying_life_event_kind.market_kind == "shop"
+  end
+
+  def is_fehb?
+    return false if qualifying_life_event_kind.blank?
+
+    qualifying_life_event_kind.market_kind == "fehb"
+  end
+
+  def is_shop_or_fehb?
+    is_shop? || is_fehb?
   end
 
   def duration_in_days
@@ -157,7 +169,8 @@ class SpecialEnrollmentPeriod
 private
   def next_poss_effective_date_within_range
     return if next_poss_effective_date.blank?
-    return true unless (is_shop? && family.has_primary_active_employee?)
+    return true unless is_shop_or_fehb? && family.has_primary_active_employee?
+
     min_date = sep_optional_date family, 'min', qualifying_life_event_kind.market_kind
     max_date = sep_optional_date family, 'max', qualifying_life_event_kind.market_kind
     if !(min_date || max_date)
@@ -168,7 +181,8 @@ private
   end
 
   def optional_effective_on_dates_within_range
-    return true unless (is_shop? && family.has_primary_active_employee?)
+    return true unless is_shop_or_fehb? && family.has_primary_active_employee?
+
     optional_effective_on.each_with_index do |date_option, index|
       date_option = Date.strptime(date_option, "%m/%d/%Y")
       min_date = sep_optional_date family, 'min', qualifying_life_event_kind.market_kind
@@ -198,7 +212,7 @@ private
 
     # Use end_on date as boundary guard for lapsed SEPs
     @reference_date = [submitted_at.to_date, end_on].min
-    @earliest_effective_date = self.is_shop? ? qle_on : [@reference_date, qle_on].max
+    @earliest_effective_date = is_shop_or_fehb? ? qle_on : [@reference_date, qle_on].max
     start_on..end_on
   end
 
@@ -235,12 +249,12 @@ private
     elsif is_eligible_to_get_effective_on_based_plan_shopping?
       TimeKeeper.date_of_record.next_month.beginning_of_month
     else
-      is_shop? ? first_of_next_month_effective_date_for_shop : first_of_next_month_effective_date_for_individual
+      is_shop_or_fehb? ? first_of_next_month_effective_date_for_shop : first_of_next_month_effective_date_for_individual
     end
   end
 
   def is_eligible_to_get_effective_on_based_plan_shopping?
-    qualifying_life_event_kind.is_loss_of_other_coverage? && !is_shop? && qle_on < TimeKeeper.date_of_record
+    qualifying_life_event_kind.is_loss_of_other_coverage? && !is_shop_or_fehb? && qle_on < TimeKeeper.date_of_record
   end
 
   def first_of_next_month_effective_date_for_individual
@@ -278,7 +292,7 @@ private
 
   def is_eligible?
     return true unless is_active?
-    return true unless is_shop?
+    return true unless is_shop_or_fehb?
 
     person = family.primary_applicant.person
     person.active_employee_roles.any? do |employee_role|

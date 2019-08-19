@@ -2,6 +2,7 @@ class HbxStaffRole
   include Mongoid::Document
   include SetCurrentUser
   include Mongoid::Timestamps
+  include Mongoid::History::Trackable
 
   embedded_in :person
 
@@ -10,6 +11,15 @@ class HbxStaffRole
   field :job_title, type: String, default: ""
   field :department, type: String, default: ""
   field :is_active, type: Boolean, default: true
+
+  track_history :on => [:fields],
+                :scope => :person,
+                :modifier_field => :modifier,
+                :modifier_field_optional => true,
+                :version_field => :tracking_version,
+                :track_create  => true,    # track document creation, default is false
+                :track_update  => true,    # track document updates, default is true
+                :track_destroy => true
 
   delegate :hbx_id, to: :person, allow_nil: true
   delegate :dob, :dob=, to: :person, allow_nil: true

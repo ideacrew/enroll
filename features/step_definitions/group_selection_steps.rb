@@ -296,6 +296,13 @@ And(/first ER not offers dental benefits to spouse/) do
   benefit_group.save
 end
 
+And(/ER not offers benefits for child/) do
+  benefit_group = @person.active_employee_roles[0].employer_profile.plan_years[0].benefit_groups[0]
+  benefit_group.health_sponsored_benefit.sponsor_contribution.contribution_levels.where(display_name: "Child Under 26").first.update_attributes!(is_offered: false)
+  benefit_group.dental_sponsored_benefit.sponsor_contribution.contribution_levels.where(display_name: "Child Under 26").first.update_attributes!(is_offered: false)
+  benefit_group.save
+end
+
 And(/employee should not see the reason for ineligibility/) do
   expect(page).not_to have_content "This dependent is ineligible for employer-sponsored"
 end

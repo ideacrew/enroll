@@ -450,6 +450,7 @@ def employer_poc
     @person = Person.find(params[:person_id])
     @row = params[:family_actions_id]
     @enrollments = @person.primary_family.terminated_enrollments
+    @dup_enr_ids = fetch_duplicate_enrollment_ids(@enrollments).map(&:to_s)
   end
 
   def update_enrollment_termianted_on_date
@@ -772,14 +773,73 @@ def employer_poc
 
     begin
       setting_record.update(value: setting_params[:value]) if setting_record.present?
-    rescue Exception=>e
+    rescue Exception => e
       flash[:error] = "Failed to update setting, " + e.message
     end
     redirect_to exchanges_hbx_profiles_root_path
 
   end
 
-private
+  private
+
+  def group_enrollments_by_year_and_market(all_enrollments)
+    current_year = TimeKeeper.date_of_record.year
+    years = ((current_year - 4)..(current_year + 1))
+
+    years.inject({}) do |hash_map, year|
+      ivl_enrs = all_enrollments.select{ |enrollment| !enrollment.is_shop? && enrollment.effective_on.year == year }
+      shop_enrs = all_enrollments.select do |enrollment|
+        next unless enrollment.present? || enrollment.sponsored_benefit_package.present?
+
+        enrollment.is_shop? && enrollment.sponsored_benefit_package.start_on.year == year
+      end
+      hash_map["ivl_#{year}"] = ivl_enrs if ivl_enrs.present?
+      hash_map["shop_#{year}"] = shop_enrs if shop_enrs.present?
+      hash_map
+    end
+  end
+
+  def get_duplicate_enrs(dup_enrollments)
+    product_ids = dup_enrollments.flatten.pluck(:product_id)
+    return [] if product_ids.uniq.count == product_ids.count
+
+    product_ids.uniq.inject([]) do |array_of_arrays, product_id|
+      current_enr = dup_enrollments.detect{ |en| en.product_id == product_id}
+      dup_enrs =  if current_enr.is_shop?
+                    dup_enrollments.select do |enr|
+                      (enr.subscriber.applicant_id == current_enr.subscriber.applicant_id) &&
+                        (enr.market_name == current_enr.market_name) &&
+                        (enr.product.id == current_enr.product.id) &&
+                        (enr.employer_profile.id == current_enr.employer_profile.id) &&
+                        (enr.sponsored_benefit_package.start_on == current_enr.sponsored_benefit_package.start_on)
+                    end
+                  else
+                    dup_enrollments.select do |enr|
+                      (enr.subscriber.applicant_id == current_enr.subscriber.applicant_id) &&
+                        (enr.market_name == current_enr.market_name) &&
+                        (enr.product.id == current_enr.product.id)
+                    end
+                  end
+      array_of_arrays = dup_enrs.to_a if dup_enrs.count > 1
+      array_of_arrays
+    end
+  end
+
+  def fetch_duplicate_enrollment_ids(enrollments)
+    enrs_mapping_by_year_and_market = group_enrollments_by_year_and_market(enrollments)
+    return [] if enrs_mapping_by_year_and_market.blank?
+
+    enrs_mapping_by_year_and_market.values.inject([]) do |duplicate_ids, enrs|
+      dups = get_duplicate_enrs(enrs.flatten) if enrs.flatten.count > 1
+      next enrs if dups.blank?
+
+      effective_date = dups.map(&:effective_on).max
+      dups.each do |enr|
+        duplicate_ids << enr.id if enr.effective_on < effective_date
+      end
+      duplicate_ids
+    end
+  end
 
   def permit_params
     params.permit!

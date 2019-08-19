@@ -48,13 +48,13 @@ module BenefitSponsors
     def amount_color_style(amount)
       return "" if amount.blank?
 
-      amount > 0 ? "class=red" : ""
+      amount > 0 ? 'style=color:red' : ""
     end
 
     def payment_amount_color_style(amount)
       return "" if amount.blank?
 
-      amount < 0 ? "class=red" : ""
+      amount < 0 ? 'style=color:red' : ""
     end
 
     def render_flash

@@ -62,6 +62,7 @@ module Notifier
         allow(subject).to receive(:send_generic_notice_alert).and_return(true)
         allow(subject).to receive(:send_generic_notice_alert_to_broker_and_ga).and_return(true)
         allow(subject).to receive(:store_paper_notice).and_return(true)
+        allow(subject).to receive(:clear_tmp).and_return(true)
         subject.execute_notice(event_name, payload)
       end
 

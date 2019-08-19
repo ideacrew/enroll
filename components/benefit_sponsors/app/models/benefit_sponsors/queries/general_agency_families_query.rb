@@ -67,7 +67,7 @@ module BenefitSponsors
       end
 
       def employer_ids
-        @employer_ids ||= plan_design_organizations.map { |org| org.employer_profile.id }
+        @employer_ids ||= plan_design_organizations.pluck(:sponsor_profile_id).compact
       end
 
     end

@@ -217,6 +217,14 @@ class HbxEnrollment
 
   index({
     "sponsored_benefit_package_id" => 1,
+    "coverage_kind" => 1,
+    "kind" => 1,
+    "family_id" => 1,
+    "effective_on" => 1
+  }, {name: "family_hbx_enrollments_by_package_lookup"})
+
+  index({
+    "sponsored_benefit_package_id" => 1,
     "sponsored_benefit_id" => 1,
     "effective_on" => 1,
     "submitted_at" => 1,
@@ -299,6 +307,7 @@ class HbxEnrollment
   scope :enrolled_and_terminated,->{ where(:aasm_state.in => ENROLLED_STATUSES + TERMINATED_STATUSES) }
   scope :renewing,            ->{ where(:aasm_state.in => RENEWAL_STATUSES )}
   scope :enrolled_and_renewal, ->{where(:aasm_state.in => ENROLLED_AND_RENEWAL_STATUSES )}
+  scope :enrolled_waived_and_renewing, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES + WAIVED_STATUSES)) }
   scope :enrolled_and_renewing, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES)) }
   scope :enrolled_and_renewing_and_shopping, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES + ['shopping'])) }
   scope :enrolled_and_renewing_and_expired, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES + ['coverage_expired'])) }
@@ -862,8 +871,19 @@ class HbxEnrollment
   end
 
   def update_renewal_coverage
-    return unless is_shop? && (successor_benefit_package = sponsored_benefit_package.successor)
-    successor_application = successor_benefit_package.benefit_application
+    return unless is_shop?
+
+    enrollment_benefit_application = sponsored_benefit_package.benefit_application
+    
+    return unless enrollment_benefit_application.active?
+    return unless census_employee&.renewal_benefit_group_assignment
+
+    successor_benefit_package = census_employee.renewal_benefit_group_assignment.benefit_package
+    successor_application = successor_benefit_package.benefit_application if successor_benefit_package
+
+    return unless successor_application&.is_submitted?
+    return unless enrollment_benefit_application.successors.include?(successor_application)
+
     passive_renewals_under(successor_application).each{|en| en.cancel_coverage! if en.may_cancel_coverage? }
     renew_benefit(successor_benefit_package) if active_renewals_under(successor_application).blank? && successor_application.coverage_renewable? && non_inactive_transition?
   end
@@ -877,6 +897,7 @@ class HbxEnrollment
       :sponsored_benefit_package_id.in => successor_application.benefit_packages.pluck(:_id), 
       :coverage_kind => coverage_kind,
       :kind => kind,
+      :family_id => family_id,
       :effective_on => successor_application.start_on
     })
   end
@@ -1537,7 +1558,6 @@ end
       reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage? && self.effective_on <= TimeKeeper.date_of_record
       reinstate_enrollment.notify_of_coverage_start(edi)
     end
-
     reinstate_enrollment
   end
 
@@ -1549,7 +1569,7 @@ end
   def self.all_enrollments_under_benefit_application(benefit_application)
     id_list = benefit_application.benefit_packages.collect(&:_id).uniq
     benefit_application.enrolled_families.inject([]) do |enrollments, family|
-      enrollments += family.active_household.hbx_enrollments.where(:sponsored_benefit_package_id.in => id_list).enrolled_and_renewing.to_a
+      enrollments += family.active_household.hbx_enrollments.where(:sponsored_benefit_package_id.in => id_list).enrolled_waived_and_renewing.to_a
     end
   end
 

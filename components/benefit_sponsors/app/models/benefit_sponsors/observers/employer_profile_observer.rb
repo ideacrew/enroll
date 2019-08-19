@@ -7,7 +7,9 @@ module BenefitSponsors
 
       def update(employer_profile, options={})
         employer_profile.office_locations.each do |office_location|
-          notify("acapi.info.events.employer.address_changed", {employer_id: employer_profile.hbx_id, event_name: "address_changed"}) unless office_location.address.changes.empty?
+          if office_location.address.changes.present? && office_location.address.changes.keys.any?{|key| ["address_1", "address_2", "city", "state", "zip"].include?(key)}
+            notify("acapi.info.events.employer.address_changed", {employer_id: employer_profile.hbx_id, event_name: "address_changed"})
+          end
         end
       end
 

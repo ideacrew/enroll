@@ -166,6 +166,12 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
     logger.info " #{failed} organizations failed to migrated to new DB at this point." unless Rails.env.test?
     logger.info " #{success} organizations migrated to new DB at this point." unless Rails.env.test?
     logger.info " #{existing_organization} old organizations are already present in new DB." unless Rails.env.test?
+
+    BenefitSponsors::BenefitSponsorships::BenefitSponsorship.set_callback(:save, :after, :notify_on_save, raise: false)
+    BenefitSponsors::BenefitSponsorships::BenefitSponsorship.set_callback(:create, :before, :generate_hbx_id, raise: false)
+    BenefitSponsors::Organizations::Organization.set_callback(:create, :after, :notify_on_create, raise: false)
+    BenefitSponsors::Organizations::Profile.set_callback(:save, :after, :publish_profile_event, raise: false)
+
     return true
   end
 

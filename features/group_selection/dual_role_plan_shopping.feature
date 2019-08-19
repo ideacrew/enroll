@@ -45,8 +45,8 @@ Feature: EE with consumer role plan purchase
     Then user should see the ivl error message
 
   Scenario: user plan shopping by clicking on 'make changes' button of SHOP dental enrollment
-            -- ER not offers shop dental benefits for child under 26
     Given a matched Employee exists with consumer role
+    And ER not offers benefits for child
     And user has a dependent in child relationship with age less than 26
     And user has a dependent in spouse relationship with age greater than 26
     And user did not apply coverage for child as ivl

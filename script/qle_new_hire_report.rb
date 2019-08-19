@@ -65,7 +65,7 @@ def get_member_details(enrollment_member, enrollment)
     person.hbx_id,
     person.ssn,
     person.dob.strftime('%m/%d/%Y'),
-    person.gender, nil,
+    person.gender,
     person.first_name,
     person.middle_name,
     person.last_name,

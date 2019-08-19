@@ -1385,6 +1385,57 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     end
   end
 
+  describe HbxEnrollment, 'all_enrollments_under_benefit_application', type: :model, dbclean: :around_each do
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup initial benefit application"
+
+    let!(:census_employee) { create(:census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, employee_role_id: employee_role.id) }
+    let!(:employee_role) { FactoryBot.create(:employee_role, person: person, employer_profile: benefit_sponsorship.profile) }
+
+    let(:person) {FactoryBot.create(:person)}
+    let!(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
+
+    let(:subject) { HbxEnrollment.all_enrollments_under_benefit_application(initial_application) }
+
+    context 'should return coverage_selected enrollment' do
+      let(:enrollment) do
+        FactoryBot.create(
+          :hbx_enrollment,
+          household: family.active_household,
+          aasm_state: "coverage_selected",
+          sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
+          family: family,
+          coverage_kind: "health",
+          kind: "employer_sponsored"
+        )
+      end
+
+      it "should return the enrollment with the benefit group assignment" do
+        enrollment
+        expect(subject).to include enrollment
+      end
+    end
+
+    context 'should return waived enrollment' do
+      let(:enrollment) do
+        FactoryBot.create(
+          :hbx_enrollment,
+          household: family.active_household,
+          aasm_state: "inactive",
+          sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
+          family: family,
+          coverage_kind: "health",
+          kind: "employer_sponsored"
+        )
+      end
+
+      it "should return the enrollment with the benefit group assignment" do
+        enrollment
+        expect(subject).to include enrollment
+      end
+    end
+  end
+
   describe HbxEnrollment, 'dental shop calculation related', type: :model, dbclean: :around_each do
     context ".find_enrollments_by_benefit_group_assignment" do
 
@@ -1650,6 +1701,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       let(:current_benefit_package) { renewal_application.predecessor.benefit_packages[0] }
 
       let(:generate_passive_renewal) {
+        renewal_application.benefit_packages[0].update_attributes(title: current_benefit_package.title + "(#{renewal_application.start_on.year})")
         census_employee.update!(created_at: 2.months.ago)
         census_employee.assign_to_benefit_package(benefit_package, renewal_effective_date)
         benefit_package.renew_member_benefit(census_employee)
@@ -1835,6 +1887,41 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
             expect(passive_waiver.present?).to be_falsey
           end
         end
+      end
+
+      context '.renewal_enrollments', dbclean: :around_each do 
+        let(:new_enrollment_product_id) { passive_renewal.product_id }
+        let(:new_enrollment) { 
+          FactoryBot.create(:hbx_enrollment,
+            household: shop_family.latest_household,
+            coverage_kind: "health",
+            family: shop_family,
+            effective_on: enrollment_effective_on,
+            enrollment_kind: enrollment_kind,
+            kind: "employer_sponsored",
+            submitted_at: TimeKeeper.date_of_record,
+            benefit_sponsorship_id: benefit_sponsorship.id,
+            sponsored_benefit_package_id: benefit_package.id,
+            sponsored_benefit_id: benefit_package.sponsored_benefits[0].id,
+            employee_role_id: employee_role.id,
+            benefit_group_assignment_id: census_employee.renewal_benefit_group_assignment.id,
+            predecessor_enrollment_id: passive_renewal.id,
+            product_id: new_enrollment_product_id,
+            special_enrollment_period_id: special_enrollment_period_id,
+            aasm_state: 'shopping'
+          )
+        }
+
+        before do
+          allow(benefit_package).to receive(:is_renewal_benefit_available?).and_return(true)
+          generate_passive_renewal
+        end
+
+        it 'should return enrollments by family' do
+          enrollments = new_enrollment.renewal_enrollments(renewal_application)
+
+          expect(enrollments).to include(passive_renewal)
+        end 
       end
     end
 
@@ -2255,12 +2342,15 @@ describe HbxEnrollment, type: :model, :dbclean => :around_each do
           r_application
         }
 
+        let(:initial_benefit_package) { initial_application.benefit_packages[0] }
+
         let(:renewal_benefit_package) {
           renewal_application.benefit_packages[0]
         }
 
         before do
           allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(100.0)
+          renewal_benefit_package.update_attributes(title: initial_benefit_package.title + "(#{renewal_application.effective_period.min.year})")
           renewal_benefit_package.sponsored_benefits.each do |sponsored_benefit|
             allow(sponsored_benefit).to receive(:products).and_return(sponsored_benefit.product_package.products)
           end
@@ -2325,6 +2415,7 @@ describe HbxEnrollment, type: :model, :dbclean => :around_each do
         context 'renewing employee D' do
 
           before do
+            renewal_benefit_package.update_attributes(title: initial_benefit_package.title + "(#{renewal_application.effective_period.min.year})")
             renewal_benefit_package.renew_member_benefit(census_employees[3])
             family.reload
           end
