@@ -11,8 +11,8 @@ h1.heading-text Add Benefit Package
 
   h4.i.fas.fa-question-circle data-toggle='tooltip' title=plan_shop_coverage_tip_helper
 .row#benefitApplicationform
-  .row.pl-3
-      - if aca_state_abbreviation == "DC" && f.object.id
+    .row.pl-3
+      - if aca_state_abbreviation == "DC" && f.object.id && !f.object.is_renewing?
         p.pl-1
           i.pl-2.fas.fa-info-circle style="color: #e72b2d"
           b.pl-1 You can't edit this date.
