@@ -52,10 +52,6 @@ end
 Then('the user will see a pop up modal with "Confirm" or "Cancel" action') do
   expect(page).to have_content('Confirm Create Plan Year')
 end
-#
-# Then('the existing application will remain in Publish Pending') do
-#   expect(page).to have_content('Plan Year (Publish Pending)')
-# end
 
 Then('the draft application will NOT be created') do
   expect(page).to_not have_content('Plan Year (Draft)')
