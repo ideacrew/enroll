@@ -179,7 +179,7 @@ module BenefitSponsors
       end
 
       #for existing active states in as per active_states_per_dt_action
-      [:draft, :active, :pending, :enrollment_open, :binder_paid, :enrollment_closed, :enrollment_ineligible, :termination_pending].each do |active_state|
+      [:draft, :active, :pending, :enrollment_open, :binder_paid, :enrollment_closed, :enrollment_ineligible].each do |active_state|
         context 'with dt active state' do
           let!(:ba) { FactoryBot.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, aasm_state: active_state) }
 
@@ -206,7 +206,7 @@ module BenefitSponsors
 
         context 'with overlapping coverage exists' do
           it 'should return false as there is an overlapping coverage exists' do
-            ba.update_attributes!(:effective_period => @form.start_on.to_date.prev_month..@form.start_on.to_date)
+            ba.update_attributes!(:effective_period => @form.start_on.to_date.prev_month..start_on)
             set_bs_for_service(@form)
             expect(subject.can_create_draft_ba?(@form)).to be_falsy
           end
