@@ -42,6 +42,16 @@ class Insured::FamiliesController < FamiliesController
     end
   end
 
+  # Display questions
+  def custom_qle_questions
+  end
+
+  # Send data to verify
+  def verify_custom_qle_questions
+    # Verify that they submitted the proper answer
+    
+  end
+
   def manage_family
     set_bookmark_url
     set_admin_bookmark_url
