@@ -180,10 +180,10 @@ end
 
 Then(/^user should see message QLE Kind (.*?) has been sucessfully (.*?)$/) do |qle_kind_title, action_name|
   expect(page).to have_content("Successfully #{action_name} Qualifying Life Event Kind.")
-  qle_kind = QualifyingLifeEventKind.where(title: qle_kind_title)
+  qle_kind = qualifying_life_event_kind(qle_kind_title)
   expect(qle_kind.first.present?).to eq(true)
   if %w[created updated].include?(action_name)
-    first_custom_qle_question = qle_kind.first.custom_qle_questions.first
+    first_custom_qle_question = qle_kind.custom_qle_questions.first
     expect(first_custom_qle_question.present?).to eq(true)
     first_response = first_custom_qle_question.custom_qle_responses.first
     expect(first_response.present?).to eq(true)
@@ -196,6 +196,11 @@ end
 
 
 And(/I see the custom qle questions for (.*?) qualifying life event kind$/) do |qle_kind_title|
-  #fail
-  binding.pry
+  qle_kind = qualifying_life_event_kind(qle_kind_title)
+  expect(page.current_path). to eq(custom_qle_questions_insured_family_path(qle_kind.id))
+end
+
+And(/And I fill out the correct response for (.*?) qualifying life event kind$/) do |qle_kind_title|
+
+
 end
