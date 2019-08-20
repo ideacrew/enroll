@@ -9,6 +9,8 @@ class Insured::FamiliesController < FamiliesController
   before_action :check_employee_role
   before_action :find_or_build_consumer_role, only: [:home]
   before_action :calculate_dates, only: [:check_move_reason, :check_marriage_reason, :check_insurance_reason]
+  before_action :display_all_hbx_enrollments, only: %i[home]
+  before_action :can_view_entire_family_enrollment_history?, only: %i[display_all_hbx_enrollments]
 
   def home
     Caches::CurrentHbx.with_cache do
@@ -310,6 +312,23 @@ class Insured::FamiliesController < FamiliesController
   end
 
   private
+
+  def display_all_hbx_enrollments
+    #  @hbx_enrollments in the "home" method is calling @family.enrollments
+    # which appears to be in the census_employee model. This is getting absolutely all the
+    # hbx enrollments, directly from the HbxEnrollment model
+    @all_hbx_enrollments_for_admin = HbxEnrollment.where(
+      family_id: @family.id,
+      :product_id.nin => [nil]
+    ).order(
+      effective_on: :desc,
+      submitted_at: :desc, coverage_kind: :desc
+    )
+  end
+
+  def can_view_entire_family_enrollment_history?
+    authorize Family, :can_view_entire_family_enrollment_history?
+  end
 
   def trigger_ivl_to_cdc_transition_notice
     person =  @family.primary_applicant.person
