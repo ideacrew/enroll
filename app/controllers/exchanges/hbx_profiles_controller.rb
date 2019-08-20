@@ -450,7 +450,8 @@ def employer_poc
     @person = Person.find(params[:person_id])
     @row = params[:family_actions_id]
     @enrollments = @person.primary_family.terminated_enrollments
-    @dup_enr_ids = fetch_duplicate_enrollment_ids(@enrollments).map(&:to_s)
+    @coverage_ended_enrollments = @person.primary_family.hbx_enrollments.where(:aasm_state.in=> ["coverage_terminated", "coverage_termination_pending", "coverage_expired"])
+    @dup_enr_ids = fetch_duplicate_enrollment_ids(@coverage_ended_enrollments).map(&:to_s)
   end
 
   def update_enrollment_termianted_on_date
