@@ -48,6 +48,12 @@ class Insured::FamiliesController < FamiliesController
 
   # Display questions
   def custom_qle_questions
+    @qle_kind = QualifyingLifeEventKind.find(params[:id])
+    @qle_questions_and_responses = Hash[
+      @qle_kind.custom_qle_questions.to_a.collect do |question|
+        [question.content, question.custom_qle_responses.to_a.map(&:content)]
+      end
+    ]
   end
 
   # Send data to verify
