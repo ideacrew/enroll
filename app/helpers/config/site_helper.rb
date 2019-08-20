@@ -57,15 +57,15 @@ module Config::SiteHelper
   end
 
   def site_copyright_period_start
-    Registry['tenants.dchbx.enroll.site.copyright_period_start']
+    Registry['enterprise.dchbx.primary.production.copyright_period_start']
   end
 
   def site_help_url
-    Registry['tenants.dchbx.enroll.site.help_url']
+    Registry['enterprise.dchbx.primary.production.help_url']
   end
 
   def site_business_resource_center_url
-    Registry['tenants.dchbx.enroll.site.business_resource_center_url']
+    Registry['enterprise.dchbx.primary.production.business_resource_center_url']
   end
 
   def link_to_site_business_resource_center
@@ -73,15 +73,15 @@ module Config::SiteHelper
   end
 
   def site_nondiscrimination_notice_url
-    Registry['tenants.dchbx.enroll.site.nondiscrimination_notice_url']
+    Registry['enterprise.dchbx.primary.production.nondiscrimination_notice_url']
   end
 
   def site_policies_url
-    Registry['tenants.dchbx.enroll.site.policies_url']
+    Registry['enterprise.dchbx.primary.production.policies_url']
   end
 
   def site_faqs_url
-    Registry['tenants.dchbx.enroll.site.faqs_url']
+    Registry['enterprise.dchbx.primary.production.faqs_url']
   end
 
   def site_short_name
