@@ -24,7 +24,7 @@
         next if family.primary_person.nil? || family.broker_agency_accounts.empty?
         primary_person = family.primary_person
 
-        family.broker_agency_accounts.each do |broker_agency_account|
+        family.broker_agency_accounts.unscoped.all.each do |broker_agency_account|
           next if broker_agency_account.nil?
           next if broker_agency_account.broker_agency_profile.nil?
           next if broker_agency_account.broker_agency_profile.primary_broker_role.nil?
