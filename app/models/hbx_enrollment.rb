@@ -746,7 +746,7 @@ class HbxEnrollment
 
     # waive only renewal enrollments if waives coverage after clicking "make changes" on renewing coverage
     aasm_state = parent_enrollment.aasm_state if parent_enrollment
-    enrollments = if RENEWAL_STATUSES.include?(aasm_state)
+    enrollments = if (RENEWAL_STATUSES + WAIVED_STATUSES).include?(aasm_state)
                     parent_enrollment.to_a
                   elsif is_open_enrollment? && renewing_enrollments.present?
                     update(predecessor_enrollment_id: renewing_enrollments.first.id)

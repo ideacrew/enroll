@@ -1925,6 +1925,56 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       end
     end
 
+    context '.term_existing_shop_enrollments' do
+      include_context "setup renewal application"
+
+      let(:predecessor_application_catalog) { true }
+      let(:current_effective_date) { (TimeKeeper.date_of_record + 2.months).beginning_of_month - 1.year }
+      let(:renewal_state) { :enrollment_open }
+      let(:open_enrollment_period)  { TimeKeeper.date_of_record..(effective_period.min - 10.days) }
+      let(:current_benefit_package) { renewal_application.predecessor.benefit_packages[0] }
+      let(:renewal_benefit_package) { renewal_application.benefit_packages[0] }
+
+      let(:generate_passive_renewal) do
+        enrollment.update_attributes(aasm_state: 'inactive')
+        renewal_application.benefit_packages[0].update_attributes(title: current_benefit_package.title + "(#{renewal_application.start_on.year})")
+        census_employee.update!(created_at: 2.months.ago)
+        census_employee.assign_to_benefit_package(benefit_package, renewal_effective_date)
+        benefit_package.renew_member_benefit(census_employee)
+      end
+
+      let(:enrollment_effective_on) { renewal_effective_date }
+      let(:special_enrollment_period_id) { nil }
+      let(:passive_renewal) { shop_family.reload.enrollments.renewing_waived.first }
+      let(:new_waiver_under_renewal_app) do
+        FactoryBot.build(
+          :hbx_enrollment,
+          kind: 'employer_sponsored',
+          coverage_kind: passive_renewal.coverage_kind,
+          household: shop_family.active_household,
+          benefit_sponsorship_id: benefit_sponsorship.id,
+          aasm_state: "shopping",
+          predecessor_enrollment_id: passive_renewal.id,
+          sponsored_benefit_package_id: renewal_benefit_package.id,
+          sponsored_benefit_id: renewal_benefit_package.sponsored_benefits[0].id,
+          employee_role_id: employee_role.id,
+          benefit_group_assignment_id: census_employee.renewal_benefit_group_assignment.id,
+          family: shop_family
+        )
+      end
+
+      before do
+        allow(benefit_package).to receive(:is_renewal_benefit_available?).and_return(true)
+        generate_passive_renewal
+      end
+
+      it 'should cancel future effective waivers upon creating a new waiver' do
+        new_waiver_under_renewal_app.waive_enrollment
+        passive_renewal.reload
+        expect(passive_renewal.coverage_canceled?).to be_truthy
+      end
+    end
+
     context "market_name" do
       include_context "setup initial benefit application"
 
