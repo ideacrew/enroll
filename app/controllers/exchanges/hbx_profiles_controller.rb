@@ -830,10 +830,10 @@ def employer_poc
     enrs_mapping_by_year_and_market = group_enrollments_by_year_and_market(enrollments)
     return [] if enrs_mapping_by_year_and_market.blank?
 
-    enrs_mapping_by_year_and_market.values.inject([]) do |duplicate_ids, enrs|
-      dups = get_duplicate_enrs(enrs.flatten) if enrs.flatten.count > 1
-      next enrs if dups.blank?
-
+    enrs_mapping_by_year_and_market.inject([]) do |duplicate_ids, (market_year, enrollments)|
+      next duplicate_ids unless enrollments.count > 1
+      dups = get_duplicate_enrs(enrollments)
+      next duplicate_ids if dups.empty?
       effective_date = dups.map(&:effective_on).max
       dups.each do |enr|
         duplicate_ids << enr.id if enr.effective_on < effective_date
