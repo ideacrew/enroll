@@ -1,0 +1,8 @@
+<%= render "ui-components/v1/navs/primary_nav.html.slim" %>
+
+<qle-questions-responses-form
+  qle-kind="<%= @qle.to_json %>"
+  qle-kind-questions-and-responses="<%=  @qle_questions_and_responses.to_json %>"
+>
+</qle-questions-responses-form>
+<%=  @qle_questions_and_responses.to_json %>

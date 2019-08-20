@@ -202,5 +202,4 @@ end
 
 And(/And I fill out the correct response for (.*?) qualifying life event kind$/) do |qle_kind_title|
 
-
 end
