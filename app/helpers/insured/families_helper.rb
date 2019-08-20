@@ -75,13 +75,15 @@ module Insured::FamiliesHelper
   def qle_link_generator(qle, index)
     options = {class: 'qle-menu-item'}
     if qle.custom_qle_questions.present?
-      # TODO: Should go to insured/families/custom_qle_questions
-      link_url = "javascript:void(0)"
+      # link_url = custom_qle_questions_insured_family_path(qle.id).to_s
+      link_url = "/insured/families/#{qle.id}/custom_qle_questions"
     else
       link_url = "javascript:void(0)"
     end
     data = {
-      title: qle.title, id: qle.id.to_s, label: qle.event_kind_label,
+      title: qle.title,
+      id: qle.id.to_s,
+      label: qle.event_kind_label,
       is_self_attested: qle.is_self_attested,
       current_date: TimeKeeper.date_of_record.strftime("%m/%d/%Y")
     }

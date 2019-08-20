@@ -108,8 +108,6 @@ Feature: Purchasing through SEP
     And I click on the name of a person of family list
     And I should see the individual home page
     When I click the "Had a baby" in qle carousel
-    And I select a past qle date
-    And I should see confirmation and continue
     And I see the custom qle questions for Had a baby qualifying life event kind
     And I fill out the correct response for Had a baby qualifying life event kind
     Then I should be able to enroll
