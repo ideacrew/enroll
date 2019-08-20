@@ -164,6 +164,28 @@ module SponsoredBenefits
         end
       end
 
+      describe "address update" do
+        let!(:organization) do
+          create(:sponsored_benefits_plan_design_organization,
+                 sponsor_profile_id: "1234",
+                 owner_profile_id: "5678",
+                 legal_name: "ABC Company",
+                 sic_code: "0345")
+        end
+
+        context "when new address passed" do
+          before do
+            organization.office_locations.first.address.city = 'Boston'
+            organization.save!
+            organization.reload
+          end
+
+          it "should update the address" do
+            expect(organization.office_locations.first.address.city).to eq 'Boston'
+          end
+        end
+      end
+
     end
   end
 end
