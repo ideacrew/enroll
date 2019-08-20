@@ -294,11 +294,19 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def set_elected_aptc
+    @logger = Logger.new("#{Rails.root}/log/applied_aptc_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
     session[:elected_aptc] = params[:elected_aptc].to_f
+    @logger.info "testing elected_aptc: #{session[:elected_aptc]}"
+    puts "testing elected_aptc: #{session[:elected_aptc]}"
     @hbx_enrollment = HbxEnrollment.find(params.require(:id))
     plan_comparision_obj = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment)
     plan_comparision_obj.elected_aptc = session[:elected_aptc]
     checkbook_url = plan_comparision_obj.generate_url
+    @logger.info "testing plan_comparision_obj: #{plan_comparision_obj}"
+    @logger.info "testing checkbook_url: #{checkbook_url}"
+    puts "testing plan_comparision_obj: #{session[:plan_comparision_obj]}"
+
+    puts "testing checkbook_url: #{session[:checkbook_url]}"
     render json: {message: 'ok',checkbook_url: checkbook_url }
   end
 
