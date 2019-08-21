@@ -41,6 +41,14 @@ When(/^the primary staff clicks on the approve button$/) do
   page.execute_script("document.querySelector('.approve').click()")
 end
 
+Then(/^the primary staff should see an approval popup$/) do
+  expect(find('.modal-body')).to have_content("By authorizing this employee to access your book of business on DC Health Link")
+end
+
+Then(/^the primary staff clicks on continue and approve button$/) do
+  find(".modal-dialog .interaction-click-control-continue---approve", wait: 5).click
+end
+
 Then(/^the primary staff should see the staff successfully approved message$/) do
   expect(page).to have_content('Role approved successfully')
 end
