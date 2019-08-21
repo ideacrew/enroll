@@ -168,7 +168,7 @@ module BenefitSponsors
 
       let(:create_ba_params) do
         {
-          "start_on" => start_on, "end_on" => end_on, "fte_count" => "11",
+          "start_on" => start_on.strftime('%m/%d/%Y'), "end_on" => end_on, "fte_count" => "11",
           "open_enrollment_start_on" => "01/15/2019", "open_enrollment_end_on" => "01/20/2019",
           "benefit_sponsorship_id" => benefit_sponsorship.id.to_s
         }
