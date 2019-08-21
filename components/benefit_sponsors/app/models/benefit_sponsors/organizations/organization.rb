@@ -274,6 +274,10 @@ module BenefitSponsors
         profiles.where(_type: /.*FehbEmployerProfile$/).present?
       end
 
+      def is_embassy_or_gov_profile?
+        [:foreign_embassy_or_consulate, :governmental_employer].include? entity_kind
+      end
+
       def active_benefit_sponsorship
         #TODO pull the correct benefit sponsorship
         benefit_sponsorships.first
