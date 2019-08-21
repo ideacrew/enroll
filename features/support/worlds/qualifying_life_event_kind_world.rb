@@ -181,7 +181,6 @@ end
 Then(/^user should see message QLE Kind (.*?) has been sucessfully (.*?)$/) do |qle_kind_title, action_name|
   expect(page).to have_content("Successfully #{action_name} Qualifying Life Event Kind.")
   qle_kind = qualifying_life_event_kind(qle_kind_title)
-  expect(qle_kind.first.present?).to eq(true)
   if %w[created updated].include?(action_name)
     first_custom_qle_question = qle_kind.custom_qle_questions.first
     expect(first_custom_qle_question.present?).to eq(true)
@@ -190,7 +189,7 @@ Then(/^user should see message QLE Kind (.*?) has been sucessfully (.*?)$/) do |
   end
   # TODO: Use this for the deactivate cucumber
   if action_name == 'deactivated'
-    expect(qle_kind.first.end_on.present?).to eq(true)
+    expect(qle_kind.end_on.present?).to eq(true)
   end
 end
 
