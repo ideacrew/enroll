@@ -4,19 +4,32 @@ module Insured
   module Factories
     class SelfServiceFactory
 
-      attr_accessor :enrollment_id, :enrollment, :product
+      attr_accessor :enrollment, :product, :family, :qle, :document, :sep
 
-      def initialize(enrollment_id)
-        self.enrollment_id = enrollment_id
+      def self.enrollment(enrollment_id)
+        HbxEnrollment.find(BSON::ObjectId.from_string(enrollment_id))
       end
 
-      def self.find(enrollment_id)
-        new(enrollment_id).enrollment
+      def self.product(product_id)
+        ::BenefitMarkets::Products::HealthProducts::HealthProduct.find(BSON::ObjectId.from_string(product_id))
       end
 
-      def enrollment
-        self.enrollment = HbxEnrollment.find(BSON::ObjectId.from_string(enrollment_id))
+      def self.family(family_id)
+        Family.find(BSON::ObjectId.from_string(family_id))
       end
+
+      def self.qle_kind(qle_id)
+        QualifyingLifeEventKind.find(BSON::ObjectId.from_string(qle_id))
+      end
+
+      def self.sbc_document(sbc_id)
+        BenefitMarkets::Products::Product.where("sbc_document._id" => BSON::ObjectId.from_string(sbc_id.to_s)).first.sbc_document
+      end
+
+      def self.sep(sep_id)
+        SpecialEnrollmentPeriod.find(BSON::ObjectId.from_string(sep_id))
+      end
+
     end
   end
 end
