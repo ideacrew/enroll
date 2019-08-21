@@ -9,24 +9,18 @@ module Insured
         @enrollment_id = attrs[:enrollment_id]
         @family_id     = attrs[:family_id]
         @term_date     = attrs[:term_date].present? ? Date.strptime(attrs[:term_date], '%m/%d/%Y') : TimeKeeper.date_of_record
-        @factory_class = ::Insured::Factories::SelfServiceFactory
-        @family_class  = ::Insured::Factories::FamilyFactory
-        @sep_class     = ::Insured::Factories::SepFactory
-        @qle_class     = ::Insured::Factories::QualifyingLifeEventKindFactory
-        @product_class = ::Insured::Factories::ProductFactory
+        @enrollment    = ::Insured::Factories::SelfServiceFactory.enrollment(@enrollment_id)
       end
 
       def find
-        enrollment = @factory_class.find(@enrollment_id)
-        family     = @family_class.find(@family_id)
-        sep        = @sep_class.find(family.latest_active_sep.id)
-        qle        = @qle_class.find(sep.qualifying_life_event_kind_id)
-        attributes_to_form_params({enrollment: enrollment, family: family, qle: qle})
+        family         = ::Insured::Factories::SelfServiceFactory.family(@family_id)
+        sep            = ::Insured::Factories::SelfServiceFactory.sep(family.latest_active_sep.id)
+        qle            = ::Insured::Factories::SelfServiceFactory.qle_kind(sep.qualifying_life_event_kind_id)
+        attributes_to_form_params({enrollment: @enrollment, family: family, qle: qle})
       end
 
       def term_or_cancel(should_term_or_cancel)
-        enrollment = @factory_class.find(@enrollment_id)
-        enrollment.term_or_cancel_enrollment(enrollment, @term_date)
+        @enrollment.term_or_cancel_enrollment(@enrollment, @term_date)
         if should_term_or_cancel == 'cancel'
           transmit_flag = true
           notify(
@@ -42,14 +36,19 @@ module Insured
       end
 
       def current_premium
-        enrollment = @factory_class.find(@enrollment_id)
-        if enrollment.is_shop?
-          enrollment.total_employee_cost
-        elsif enrollment.kind == 'coverall'
-          enrollment.total_premium
+        if @enrollment.is_shop?
+          @enrollment.total_employee_cost
+        elsif @enrollment.kind == 'coverall'
+          @enrollment.total_premium
         else
-          enrollment.total_premium > enrollment.applied_aptc_amount.to_f ? enrollment.total_premium - enrollment.applied_aptc_amount.to_f : 0
+          @enrollment.total_premium > @enrollment.applied_aptc_amount.to_f ? @enrollment.total_premium - @enrollment.applied_aptc_amount.to_f : 0
         end
+      end
+
+      def is_aptc_eligible?
+        allowed_metal_levels = ["platinum", "silver", "gold", "bronze"]
+        product = @enrollment.product
+        return true if allowed_metal_levels.include?(product.metal_level_kind.to_s) && @enrollment.household.tax_households.present?
       end
 
       def attributes_to_form_params(attrs)
@@ -62,7 +61,8 @@ module Insured
           :product => ::Insured::Services::ProductService.new(attrs[:enrollment].product).find,
           :qle_kind_id => attrs[:family].latest_active_sep.qualifying_life_event_kind_id,
           :sep_id => attrs[:family].latest_active_sep.id,
-          :current_premium => number_to_currency(current_premium, precision: 2)
+          :current_premium => number_to_currency(current_premium, precision: 2),
+          :is_aptc_eligible => is_aptc_eligible?
         }
       end
     end

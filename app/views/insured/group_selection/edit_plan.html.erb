@@ -80,10 +80,11 @@
                     <a id="cancel-button" class="btn btn-default btn-block interaction-click-control-cancel-plan" >Cancel Plan</a>
                   </div>
 
-                  <!-- Need conditional logic -->
-                  <div class="col-sm-4">
-                    <a id="aptc-button" class="btn btn-default btn-block interaction-click-control-edit-aptc" >Edit APTC</a>
-                  </div>
+                  <% if @self_term_or_cancel_form.is_aptc_eligible %>
+                    <div class="col-sm-4">
+                      <a id="aptc-button" class="btn btn-default btn-block interaction-click-control-edit-aptc" >Edit APTC</a>
+                    </div>
+                  <% end %>
 
                   <div class="col-sm-4">
                     <% if @self_term_or_cancel_form[:market_kind] == "individual" || @self_term_or_cancel_form.is_under_ivl_oe %>
