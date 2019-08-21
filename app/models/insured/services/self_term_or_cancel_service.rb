@@ -13,10 +13,10 @@ module Insured
       end
 
       def find
-        family         = ::Insured::Factories::SelfServiceFactory.family(@family_id)
-        sep            = ::Insured::Factories::SelfServiceFactory.sep(family.latest_active_sep.id)
-        qle            = ::Insured::Factories::SelfServiceFactory.qle_kind(sep.qualifying_life_event_kind_id)
-        attributes_to_form_params({enrollment: @enrollment, family: family, qle: qle})
+        @family         = ::Insured::Factories::SelfServiceFactory.family(@family_id)
+        sep             = ::Insured::Factories::SelfServiceFactory.sep(@family.latest_active_sep.id)
+        qle             = ::Insured::Factories::SelfServiceFactory.qle_kind(sep.qualifying_life_event_kind_id)
+        attributes_to_form_params({enrollment: @enrollment, family: @family, qle: qle})
       end
 
       def term_or_cancel(should_term_or_cancel)
@@ -48,7 +48,9 @@ module Insured
       def is_aptc_eligible?
         allowed_metal_levels = ["platinum", "silver", "gold", "bronze"]
         product = @enrollment.product
-        return true if allowed_metal_levels.include?(product.metal_level_kind.to_s) && @enrollment.household.tax_households.present?
+        tax_household = @family.active_household.latest_active_tax_household if @family.active_household.latest_active_tax_household.present?
+        aptc_members = tax_household.aptc_members if tax_household.present?
+        return true if allowed_metal_levels.include?(product.metal_level_kind.to_s) && @enrollment.household.tax_households.present? && aptc_members.present?
       end
 
       def attributes_to_form_params(attrs)
