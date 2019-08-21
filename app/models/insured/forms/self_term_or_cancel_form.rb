@@ -17,6 +17,7 @@ module Insured
       attribute :sep_id,                String
       attribute :should_term_or_cancel, String
       attribute :term_date,             Date
+      attribute :is_aptc_eligible,      Boolean
 
       validates :current_premium,       presence: true
       validates :market_kind,           presence: true
