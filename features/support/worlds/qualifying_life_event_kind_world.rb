@@ -114,13 +114,19 @@ module QualifyingLifeEventKindWorld
       choose('qle_wizard_modify_qle_selected_radio')
       choose('qle_wizard_kind_selected_radio_category_shop')
       first_qle_kind = QualifyingLifeEventKind.first
-      first_qle_kind_option_value = deactivation_form_exchanges_qle_path(first_qle_kind._id)
+      first_qle_kind_option_value = edit_exchanges_qle_path(first_qle_kind._id)
       options = page.all('option')
       first_qle_kind_option = options.detect { |option| option[:value] == first_qle_kind_option_value }
       first_qle_kind_option.click
       click_button('Submit')
     when 'Deactivate Active QLE, Market Kind, and first QLE Kind'
       choose('qle_wizard_deactivate_qle_selected_radio')
+      first_qle_kind = QualifyingLifeEventKind.first
+      first_qle_kind_option_value = deactivation_form_exchanges_qle_path(first_qle_kind._id)
+      first_qle_kind_option_value = edit_exchanges_qle_path(first_qle_kind._id)
+      options = page.all('option')
+      first_qle_kind_option = options.detect { |option| option[:value] == first_qle_kind_option_value }
+      first_qle_kind_option.click
       click_button('Submit')
     end
   end
@@ -130,6 +136,12 @@ World(QualifyingLifeEventKindWorld)
 
 Given(/^qualifying life event kind (.*?) present for (.*?) market$/) do |qle_kind_title, market_kind|
   qualifying_life_event_kind(qle_kind_title, market_kind)
+end
+
+And(/^qualifying life event kind (.*?) is not active$/) do |qle_kind_title|
+  qle_kind = qualifying_life_event_kind(qle_kind_title)
+  qle_kind.is_active = false
+  qle_kind.save!
 end
 
 

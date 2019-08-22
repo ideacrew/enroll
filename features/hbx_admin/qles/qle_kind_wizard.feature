@@ -21,15 +21,14 @@ Feature: As an HBX Admin User I can access the QLE Wizard management wizard
 
   Scenario: HBX Staff with Super Admin subroles can edit a custom QLE Kind
     Given qualifying life event kind Got a New Dog present for shop market
-    And the user visits the edit Qualifying Life Event Kind page for Got a New Dog QLE Kind
-    # And the user is on the Main Page
-    # And the user goes to the Config Page
-    # When the user clicks the Manage QLE link
-    # And the user selects Modify Existing QLE, Market Kind, and first QLE Kind and clicks submit
-    # TODO: Need to figure out why the market_kind isn't showing. Produces the followign error:
-    # Unable to find radio button "qle_wizard_kind_selected_radio_category_shop" that is not disabled 
+    And qualifying life event kind Got a New Dog is not active
+    # And the user visits the edit Qualifying Life Event Kind page for Got a New Dog QLE Kind
+    And the user is on the Main Page
+    And the user goes to the Config Page
+    When the user clicks the Manage QLE link
+    And the user selects Modify Existing QLE, Market Kind, and first QLE Kind and clicks submit
     When the user fills out the edit QLE Kind form for Got a New Dog event and clicks submit
-    # Then user should see message QLE Kind Got a New Dog has been sucessfully updated
+    Then user should see message QLE Kind Got a New Dog has been sucessfully updated
 
   Scenario: HBX Staff with Super Admin subroles can deactivate a custom QLE Kind
     Given qualifying life event kind Had a New Dog present for individual market
