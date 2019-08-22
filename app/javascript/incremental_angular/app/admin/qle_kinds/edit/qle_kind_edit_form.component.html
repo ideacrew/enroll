@@ -12,7 +12,7 @@
           </field-errors>
           <span for="qle_kind_edit_form_title" class="col-sm-2 control-label">Title</span>
           <div class="col-sm-4">
-            <input type='text' formControlName="title" id='qle_kind_edit_form_title' placeholder ="{{qleKindToEdit.title}}" class='form-control' required>
+            <input type='text' formControlName="title" id='qle_kind_edit_form_title' value="{{qleKindToEdit.title}}" class='form-control' required>
             <field-errors [errorControl]="editFormGroup.get('title')"></field-errors>
             </div>
         </div>
@@ -21,7 +21,7 @@
           <div class="col-sm-4">
             <input
               type='text'
-              placeholder ="{{qleKindToEdit.tool_tip}}" 
+              value ="{{qleKindToEdit.tool_tip}}" 
               formControlName="tool_tip"
               id='qle_kind_edit_form_tool_tip'
               class='form-control' required>
@@ -32,7 +32,8 @@
           <span for="qle_kind_edit_form_action_kind" class="col-sm-2 control-label">Action Kind </span>
           <div class="col-md-2 " >        
             <select formControlName="action_kind" id="qle_kind_edit_form_action_kind">
-              <option  *ngFor="let actionKind of actionKindList" value="actionKind.name">
+              <option *ngFor="let actionKind of actionKindList" [ngValue]="actionKind.code"
+              [attr.selected]="(qleKindToEdit.action_kind == actionKind.code) ? true : null">
               {{actionKind.name}}
               </option>
             </select>
@@ -42,8 +43,10 @@
           <span for="qle_kind_edit_form_reason" class="col-sm-2 control-label">Reason </span>
           <div class="col-md-3" >        
             <select formControlName="reason" id="qle_kind_edit_form_reason">
-              <option  *ngFor="let reason of reasonList" [ngValue]="reason.code">
-              {{reason.name}}
+              <option *ngFor="let reasonOption of reasonList" [ngValue]="reasonOption.code"
+              [attr.selected]="(qleKindToEdit.reason == reasonOption.code) ? true : null"
+              >
+              {{reasonOption.name}}
               </option>
             </select>
           </div>
@@ -52,10 +55,10 @@
           <span for="qle_kind_edit_form_visible_to_customer" class="col-sm-2 control-label">Visible to Customer</span>
           <div class="col-md-2">
             <label class="control-label">Yes
-              <input type='radio' class='' formControlName="visible_to_customer" id='qle_kind_edit_form_visible_to_customer' value = "Yes" required>
+              <input type='radio' class='' formControlName="visible_to_customer" id='qle_kind_edit_form_visible_to_customer' value = "Yes" [checked]="qleKindToEdit.visible_to_customer == true" required>
             </label> <br>
             <label class=" control-label">No
-              <input type='radio' class='' formControlName="visible_to_customer" id='qle_kind_edit_form_visible_to_customer' value = "No" checked required>   
+              <input type='radio' class='' formControlName="visible_to_customer" id='qle_kind_edit_form_visible_to_customer' value = "No" [checked]="qleKindToEdit.visible_to_customer == false" required>   
             </label>
           </div>
         </div>
@@ -64,7 +67,7 @@
           <div class="col-sm-4">
             <div id="qle_kind_edit_form_market_kind"  *ngFor="let marketKind of marketKindsList">
               <label class="control-label">{{marketKind}}
-                <input type='radio' class='' formControlName="market_kind" id='qle_kind_edit_form_market_kind' value = {{marketKind}} required>
+                <input type='radio' class='' formControlName="market_kind" id='qle_kind_edit_form_market_kind' value ="{{marketKind}}" [checked]="qleKindToEdit.market_kind == marketKind" required disabled>
               </label>
             </div>
           </div>
@@ -73,10 +76,11 @@
           <span for="qle_kind_edit_form_is_self_attested" class="col-sm-2 control-label">Self-Attestion Option </span>
           <div class="col-md-2">
             <label class="control-label">User Self Service
-              <input type='radio' class='' formControlName="is_self_attested" id='qle_kind_edit_form_is_self_attested' value = "Yes" required>
+              <input type='radio' class='' formControlName="is_self_attested" id='qle_kind_edit_form_is_self_attested' value = "Yes" [checked]="qleKindToEdit.is_self_attested == true" required>
             </label>
             <label class=" control-label">Admin Only 
-              <input type='radio' class='' formControlName="is_self_attested" id='qle_kind_edit_form_is_self_attested' value = "No" required>   
+              <input type='radio' class='' formControlName="is_self_attested" id='qle_kind_edit_form_is_self_attested' value = "No"
+              [checked]="qleKindToEdit.is_self_attested == false" required>   
             </label>
           </div>
         </div>
@@ -99,7 +103,8 @@
           <div formArrayName="effective_on_kinds" *ngFor="let option of getOptions(); let i = index">
             <span *ngIf='i != 0' class="col-sm-2 control-label"></span>           
             <label class='control-label'>{{option.name}}
-              <input type="checkbox" [formControlName]='i'>
+              <input type="checkbox" [formControlName]='i' value="{{option.code}}"
+              [checked]="(qleKindToEdit.effective_on_kinds == option.code)">
             </label>
           </div>
         </div>
@@ -107,7 +112,8 @@
           <span for="qle_kind_edit_form_pre_event_sep_in_days" class="col-sm-2 control-label">Pre-event Sep/Qle Eligibility</span>
           <div class='col-md-5'>
             up to
-            <input type='number'formControlName="pre_event_sep_in_days" id='qle_kind_edit_form_pre_event_sep_eligibility'/>
+            <input type='number'formControlName="pre_event_sep_in_days" id='qle_kind_edit_form_pre_event_sep_eligibility'
+            value="{{qleKindToEdit.pre_event_sep_in_days}}"/>
             days post event
           </div>
         </div>
@@ -115,14 +121,15 @@
           <span for="qle_kind_edit_form_post_event_sep_in_days" class="col-sm-2 control-label">Post-event Sep/Qle Eligibility</span>
           <div class='col-md-5'>
             up to
-            <input type='number'formControlName="post_event_sep_in_days" id='qle_kind_edit_form_post_event_sep_eligibility'/>
+            <input type='number'formControlName="post_event_sep_in_days" id='qle_kind_edit_form_post_event_sep_eligibility' 
+            value="{{qleKindToEdit.post_event_sep_in_days}}"/>
             days prior to event
           </div>
         </div>
         <div class="form-group">
           <span for="qle_kind_edit_form_post_event_sep_eligibility" class="col-sm-2 control-label">Sep/Qle Available in system from</span>
           <div class='col-md-5'>
-              <input type='text' formControlName="start_on" id='qle_kind_edit_form_start_on' placeholder="MM/DD/YYYY" mask="M0/d0/0000" [dropSpecialCharacters]="false" [validation]="true" required> <br>
+              <input type='text' formControlName="start_on" id='qle_kind_edit_form_start_on' placeholder="MM/DD/YYYY" mask="M0/d0/0000" [dropSpecialCharacters]="false" [validation]="true" value="{{stringifiedEndOn}}" required> <br>
           </div>
         </div>
         <div class="form-group">
