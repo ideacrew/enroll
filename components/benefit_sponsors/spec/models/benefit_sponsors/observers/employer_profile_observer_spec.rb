@@ -30,6 +30,22 @@ module BenefitSponsors
           expect(subject).to have_received(:notify).with('acapi.info.events.employer.address_changed', {:employer_id=> employer_profile.hbx_id, :event_name=>"address_changed"})
         end
       end
+
+      context "when non reported address attributes changed" do
+        before do
+          employer_profile.class.add_observer subject
+          employer_profile.assign_attributes office_locations_attributes: {'0' => { id: employer_profile.office_locations.first.id,
+                                                                                    address_attributes: {
+                                                                                      updated_at: '',
+                                                                                      county: ''
+                                                                                    }}}
+          subject.update(employer_profile)
+        end
+
+        it 'should not send notification' do
+          expect(subject).not_to have_received(:notify).with('acapi.info.events.employer.address_changed', {:employer_id => employer_profile.hbx_id, :event_name => "address_changed"})
+        end
+      end
     end
   end
 end

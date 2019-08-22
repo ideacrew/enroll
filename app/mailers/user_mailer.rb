@@ -38,7 +38,7 @@ class UserMailer < ApplicationMailer
     benefit_applications = census_employee.benefit_sponsorship.benefit_applications.published.select{|ba| ba.effective_period.cover?(census_employee.earliest_effective_date)}
     if email.present? && benefit_applications.any?{|ba| ba.is_submitted?}
       if (census_employee.hired_on > TimeKeeper.date_of_record)
-        mail({to: email, subject: "You Have Been Invited to Sign Up for Employer-Sponsored Coverage through the #{Settings.site.long_name}"}) do |format|
+        mail({to: email, subject: "You Have Been Invited to Sign Up for Employer-Sponsored Coverage through the #{site_short_name}"}) do |format|
           format.html { render "invite_future_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
         end
       else

@@ -3,6 +3,7 @@ class GeneralAgencyStaffRole
   include SetCurrentUser
   include MongoidSupport::AssociationProxies
   include AASM
+  include Mongoid::History::Trackable
 
   embedded_in :person
   field :npn, type: String
@@ -10,6 +11,16 @@ class GeneralAgencyStaffRole
   field :benefit_sponsors_general_agency_profile_id, type: BSON::ObjectId
   field :aasm_state, type: String, default: "applicant"
   field :is_primary, type: Boolean, default: false
+
+  track_history :on => [:fields],
+                :scope => :person,
+                :modifier_field => :modifier,
+                :modifier_field_optional => true,
+                :version_field => :tracking_version,
+                :track_create  => true,    # track document creation, default is false
+                :track_update  => true,    # track document updates, default is true
+                :track_destroy => true
+
   embeds_many :workflow_state_transitions, as: :transitional
 
   associated_with_one :general_agency_profile, :benefit_sponsors_general_agency_profile_id, "::BenefitSponsors::Organizations::GeneralAgencyProfile"

@@ -2,6 +2,7 @@
 class Address
   include Mongoid::Document
   include Mongoid::Timestamps
+  include Mongoid::History::Trackable
 
   embedded_in :person
   embedded_in :office_location
@@ -37,6 +38,15 @@ class Address
 
   # The name of the country where this address is located
   field :country_name, type: String, default: ""
+
+  track_history :on => [:fields],
+                :scope => :person,
+                :modifier_field => :modifier,
+                :modifier_field_optional => true,
+                :version_field => :tracking_version,
+                :track_create  => true,    # track document creation, default is false
+                :track_update  => true,    # track document updates, default is true
+                :track_destroy => true
 
   validates_presence_of :address_1, :city, :state, :zip
   

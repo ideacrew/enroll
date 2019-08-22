@@ -54,6 +54,22 @@ module EventsHelper
     end
   end
 
+  def fehb_relationship_map(relationship, contribution_levels)
+    relationship_map = case relationship
+                       when "employee"
+                         "employee_only"
+                       when "spouse"
+                         "employee_plus_one"
+                       when "child_under_26"
+                         "family"
+                       when "domestic_partner"
+                         ""
+                       end
+    contribution_levels.select do |contribution_level|
+      contribution_level.contribution_unit.name == relationship_map
+    end.first
+  end
+
   def is_office_location_address_valid?(office_location)
     office_location.present? && office_location.address.present? && (['mailing', 'work', 'primary'].include? office_location.address.kind)
   end

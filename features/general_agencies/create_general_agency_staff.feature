@@ -17,6 +17,8 @@ Feature: Assign General Agency Staff to General Agency
     And Max Planck logs on to the General Agency Portal
     And there is a Staff with a “pending” general agency staff role in the table
     When the primary staff clicks on the approve button
+    Then the primary staff should see an approval popup
+    Then the primary staff clicks on continue and approve button
     Then the primary staff should see the staff successfully approved message
     And new ga staff should receive an email
     And the primary staff logs out

@@ -40,6 +40,7 @@ module BenefitSponsors
         if current_contribution_level.present?
           self.is_offered = current_contribution_level.is_offered
           self.contribution_factor = current_contribution_level.contribution_factor
+          self.min_contribution_factor = current_contribution_level.min_contribution_factor
           self.contribution_cap = current_contribution_level.contribution_cap
           self.flat_contribution_amount = current_contribution_level.flat_contribution_amount
         end

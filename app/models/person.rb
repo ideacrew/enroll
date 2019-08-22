@@ -15,6 +15,7 @@ class Person
   include FullStrippedNames
   include ::BenefitSponsors::Concerns::Observable
   include SponsoredBenefits::Concerns::Dob
+  include LegacyVersioningRecords
 
   # verification history tracking
   include Mongoid::History::Trackable

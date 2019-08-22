@@ -5,6 +5,7 @@ class EmployeeRole
   include Acapi::Notifiers
   include BenefitSponsors::ModelEvents::EmployeeRole
   include BenefitSponsors::Concerns::Observable
+  include Mongoid::History::Trackable
 
   EMPLOYMENT_STATUS_KINDS   = ["active", "full-time", "part-time", "retired", "terminated"]
 
@@ -21,6 +22,16 @@ class EmployeeRole
   field :bookmark_url, type: String, default: nil
   field :contact_method, type: String, default: "Paper and Electronic communications"
   field :language_preference, type: String, default: "English"
+
+  track_history :on => [:fields],
+                :scope => :person,
+                :modifier_field => :modifier,
+                :modifier_field_optional => true,
+                :version_field => :tracking_version,
+                :track_create  => true,    # track document creation, default is false
+                :track_update  => true,    # track document updates, default is true
+                :track_destroy => true
+
   delegate :hbx_id, to: :person, allow_nil: true
   delegate :ssn, :ssn=, to: :person, allow_nil: true
   delegate :dob, :dob=, to: :person, allow_nil: true
