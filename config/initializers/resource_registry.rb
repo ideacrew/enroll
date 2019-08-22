@@ -2,13 +2,22 @@ ResourceRegistry.configure do
   {
     application: {
       config: {
-        name: "EnrollApp", # reference Rails.app.name
+        name: "EnrollApp",
         default_namespace: "options",
-        root: '.',
+        root: Rails.root,
         system_dir: "system",
         auto_register: []
       },
       load_paths: ['system']
+    },
+    resource_registry: {
+      resolver: {
+        root: :enterprise,
+        tenant: :dchbx,
+        site: :primary,
+        env: :production,
+        application: :enroll
+      }
     }
     # ,
     # options: {
@@ -30,4 +39,4 @@ ResourceRegistry.configure do
   }
 end
 
-require_relative Rails.root.join('system', 'boot')
+ResourceRegistry.create
