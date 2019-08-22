@@ -20,26 +20,29 @@ export class QleKindEditFormComponent {
   public editFormGroup : FormGroup = new FormGroup({});
   @ViewChild('headerRef') headerRef: ElementRef;
   public marketKindsList = new FormArray([])
+  
+  public stringifiedStartOn = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-qle-kind-to-edit-end-on-stringified");
+  public stringifiedEndOn = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-qle-kind-to-edit-end-on-stringified");
 
   public effectiveOnOptionsArray =  [
-    { name: 'Date of Event',  selected: false, id: 1 },
-    { name: 'First of Next Month',  selected: false, id: 2 },
-    { name: 'First of Month',  selected: false, id: 3 },
-    { name: 'First Fixed of Next Month',  selected: false, id: 4 },
-    { name: 'Next 15 of the month',  selected: false, id: 5 },
-    { name: 'Exact Date',  selected: false, id: 6 },
-    { name: 'Date options available',  selected: false, id: 7 }
+    {name: 'Date of Event', code: 'date_of_event'},
+    {name: 'First of Next Month', code: 'first_of_next_month'},
+    {name: 'First of Month', code: 'first_of_month'},
+    {name: 'First Fixed of Next Month', code: 'fixed_first_of_next_month'},
+    {name: 'Next 15 of the month', selected: false, id: 5},
+    {name: 'Exact Date', code: 'exact_date', selected: false, id: 6},
+    {name: 'Date options available', selected: false, id: 7}
   ]
 
   public actionKindList = [
-    {name:"Not Applicable", code:"not_applicable"},
-    {name:"Drop Member", code:"drop_member" }, 
-    {name:"Adminstrative", code:"administrative" }, 
+    {name:"Not Applicable", code: "not_applicable"},
+    {name:"Drop Member", code: "drop_member" }, 
+    {name:"Adminstrative", code: "administrative" }, 
     {name:"Add Member", code: "add_member"},
     {name:"Add Benefit", code: "add_benefit" }, 
-    {name:"Change Benefit", code:"change_benefit" }, 
-    {name:"Transition Member", code:"transition_member" },
-    {name:"Terminate Benefit", code:"terminate_benefit" }
+    {name:"Change Benefit", code: "change_benefit" }, 
+    {name:"Transition Member", code: "transition_member"},
+    {name:"Terminate Benefit", code: "terminate_benefit"}
   ]
   
   public reasonList = [
@@ -48,8 +51,8 @@ export class QleKindEditFormComponent {
     {name:"Medical Emergency", code: "exceptional_circumstances_medical_emergency"},
     {name:"System Outage", code: "exceptional_circumstances_system_outage"},
     {name:"Domestic Abuse", code: "exceptional_circumstances_domestic_abuse"},
-    {name:"Civic Service",code:"exceptional_circumstances_civic_service"},
-    {name:"Exceptional Circumstances",code: "exceptional_circumstances"}  
+    {name:"Civic Service", code: "exceptional_circumstances_civic_service"},
+    {name:"Exceptional Circumstances", code: "exceptional_circumstances"}  
   ]
   constructor(
     injector: Injector,
@@ -69,7 +72,7 @@ export class QleKindEditFormComponent {
     if (submissionUriAttribute != null) {
       this.editUri = submissionUriAttribute;
     }
-      var marketKindsAttribute = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-qle-kind-market-kinds");
+    var marketKindsAttribute = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-qle-kind-market-kinds");
     if (marketKindsAttribute != null) {
       var marketKindsArrayJson = JSON.parse(marketKindsAttribute)
       this.marketKindsList = marketKindsArrayJson;
@@ -113,29 +116,6 @@ export class QleKindEditFormComponent {
   public errorClassFor(control : AbstractControl) : String {
     return (this.hasErrors(control) ? " has-error" : "");
   }
-
-  ngOnInit() {
-    // var qleKindToEditJson = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-qle-kind-to-edit");
-    // if (qleKindToEditJson != null) {
-    //   this.qleKindToEdit = JSON.parse(qleKindToEditJson)
-    // console.log(this.qleKindToEdit)
-    //   var formGroup = this._editForm.group({
-    //     title: ['', Validators.required],
-    //     tool_tip: ['', [Validators.required, Validators.minLength(1)]],
-    //     action_kind: ['',[]],
-    //     reason: ['', [Validators.required, Validators.minLength(1)]],
-    //     market_kind: ['', [Validators.required, Validators.minLength(1)]],
-    //     is_self_attested: [''],
-    //     effective_on_options:  new FormArray([]),
-    //     pre_event_sep_eligibility:[0, Validators.required],
-    //     post_event_sep_eligibility:[0, Validators.required],
-    //     available_in_system_from: [''],   
-    //     available_in_system_until: ['']
-    //   });
-    //   }
-    }
-
-  // }
 
   hasResource() {
     // return this.qleKindToEdit != null;
