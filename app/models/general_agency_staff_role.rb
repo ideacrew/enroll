@@ -11,7 +11,7 @@ class GeneralAgencyStaffRole
   field :benefit_sponsors_general_agency_profile_id, type: BSON::ObjectId
   field :aasm_state, type: String, default: "applicant"
   field :is_primary, type: Boolean, default: false
-  
+
   track_history :on => [:fields],
                 :scope => :person,
                 :modifier_field => :modifier,
