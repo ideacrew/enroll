@@ -1,6 +1,7 @@
 import { Component, Injector, ElementRef, Inject, ViewChild } from '@angular/core';
 import { QleKindEditResource } from './qle_kind_edit_data';
 import { FormGroup, FormControl, FormBuilder, FormArray, AbstractControl, Validators } from '@angular/forms';
+import { QleKindQuestionFormComponent } from '../new/qle_kind_question_form.component';
 import { QleKindEditService } from '../qle_kind_services';
 import { ErrorLocalizer } from '../../../error_localizer';
 import { ErrorMapper, ErrorResponse } from '../../../error_mapper';
@@ -8,14 +9,13 @@ import { HttpResponse } from "@angular/common/http";
 // import { DragDropModule } from '@angular/cdk/drag-drop';
 // import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 
-
-
 @Component({
   selector: 'admin-qle-kind-edit-form',
   templateUrl: './qle_kind_edit_form.component.html'
 })
 export class QleKindEditFormComponent {
   public qleKindToEdit : QleKindEditResource | null = null;
+  public questionArray : FormArray;
   public editUri : string | null = null;
   public editFormGroup : FormGroup = new FormGroup({});
   @ViewChild('headerRef') headerRef: ElementRef;
@@ -120,6 +120,21 @@ export class QleKindEditFormComponent {
   hasResource() {
     // return this.qleKindToEdit != null;
   }
+
+  // addQuestion() {
+  //    this.questionArray.push(
+  //      QleKindQuestionFormComponent.newQuestionFormGroup(this._editForm)
+  //    );
+  // }
+
+  // removeQuestion(questionIndex: number) {
+  //   this.questionArray.removeAt(questionIndex);
+  // }
+
+  // showQuestions(){
+  //  return this.questionArray.length > 0;
+  // }
+
 
   submitEdit() {
     var form = this;
