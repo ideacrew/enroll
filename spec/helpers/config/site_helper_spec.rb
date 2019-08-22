@@ -4,15 +4,15 @@ RSpec.describe Config::SiteHelper, :type => :helper, dbclean: :after_each do
 
   describe "Site settings" do
 
-    context '.site_copyright_period_start' do 
-
+    context '.site_copyright_period_start' do
+      
       it 'should return copyright period start year' do
         expect(helper.site_copyright_period_start).to be_kind_of(String)
       end
     end
-
+    
     context '.site_help_url' do
-
+      
       it 'should return help url' do
         expect(helper.site_copyright_period_start).to be_kind_of(String)
       end
