@@ -8,8 +8,6 @@ import { QleKindQuestionFormComponent } from './qle_kind_question_form.component
 import { __core_private_testing_placeholder__ } from '@angular/core/testing';
 import { HttpResponse } from "@angular/common/http";
 
-
-
 @Component({
   selector: 'admin-qle-kind-creation-form',
   templateUrl: './qle_kind_creation_form.component.html'
