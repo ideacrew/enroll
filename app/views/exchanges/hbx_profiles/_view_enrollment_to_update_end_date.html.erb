@@ -13,18 +13,34 @@
             }
         });
     });
+
     var TerminateWithEarlierDate = function () {
         $('#termiante_with_earlier_date').modal('show');
         jQuery('[id^="terminate_hbx_"]').each(function($) {
             if (this.checked) {
+
+                var dup_enr_ids = <%= raw @dup_enr_ids %>;
+                var input_id = this.value;
+                var output = dup_enr_ids.includes(input_id);
                 var new_term_date = jQuery(this).closest('tr').find("input[name=new_termination_date]")[0].value
                 var enrollment_effective = jQuery(this).closest('tr').find("td#enrollment_effective_on").html();
-                if(new_term_date == enrollment_effective){
+                if(new_term_date == enrollment_effective && !output){
                     jQuery('#cancel_message').show();
                     jQuery('#termination_message').hide();
-                }else{
+                    jQuery('#no_termination_message').show();
+                    jQuery("a.modal_confirm").show();
+                }
+                else if(new_term_date !== enrollment_effective && output ){
+                  jQuery('#cancel_message').hide();
+                  jQuery('#termination_message').hide();
+                  jQuery('#no_termination_message').show();
+                  jQuery("a.modal_confirm").hide();
+                }
+                else{
                     jQuery('#cancel_message').hide();
                     jQuery('#termination_message').show();
+                    jQuery('#no_termination_message').hide();
+                    jQuery("a.modal_confirm").show();
                 }
             }
         });
@@ -96,6 +112,13 @@
                 </p>
               </div>
             </div>
+            <div id="no_termination_message">
+              <div>
+                <h4 class="modal-title" style="display:inline;">&nbsp;&nbsp;
+                  You cannot update the enrollment end date
+                </h4>
+              </div>
+            </div>
             <div id="cancel_message">
               <div>
                 <h4 class="modal-title" style="display:inline;">&nbsp;&nbsp;
@@ -116,7 +139,6 @@
       </div>
     </div>
   </div>
-
 </td>
 
 <style>.date-picker { width:90px !important;font-size: 12px;} </style>

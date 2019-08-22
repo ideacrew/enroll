@@ -784,17 +784,33 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
   end
 
   describe "POST view_enrollment_to_update_end_date", :dbclean => :around_each do
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup initial benefit application"
+    include_context "setup employees with benefits"
+
     let(:user) { FactoryGirl.create(:user, roles: ["hbx_staff"]) }
     let!(:person) { FactoryGirl.create(:person)}
-    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+    let(:current_effective_date)  { TimeKeeper.date_of_record.beginning_of_year - 1.year }
+    let(:primary) { family.primary_family_member }
+    let(:dependents) { family.dependents }
     let!(:household) { FactoryGirl.create(:household, family: family) }
-    let!(:enrollment) {
-      FactoryGirl.create(:hbx_enrollment,
-                         household: family.active_household,
-                         coverage_kind: "health",
-                         effective_on: TimeKeeper.date_of_record.last_month.beginning_of_month,
-                         aasm_state: 'coverage_termination_pending'
-      )}
+    let!(:hbx_en_member1) { FactoryGirl.build(:hbx_enrollment_member, eligibility_date: current_effective_date, coverage_start_on: current_effective_date, applicant_id: dependents.first.id) }
+    let!(:hbx_en_member2) { FactoryGirl.build(:hbx_enrollment_member, eligibility_date: current_effective_date + 2.months, coverage_start_on: current_effective_date + 2.months, applicant_id: hbx_en_member1.applicant_id) }
+    let!(:hbx_en_member3) { FactoryGirl.build(:hbx_enrollment_member, eligibility_date: current_effective_date + 6.months, coverage_start_on: current_effective_date + 6.months, applicant_id: dependents.last.id) }
+    let(:benefit_market)      { site.benefit_markets.first }
+
+    let(:issuer_profile)  { FactoryGirl.create :benefit_sponsors_organizations_issuer_profile, assigned_site: site}
+    let(:product_package_kind) { :single_product}
+    let!(:product_package) { current_benefit_market_catalog.product_packages.where(package_kind: product_package_kind).first }
+    let(:product) { product_package.products.first }
+    let(:product_package)           { initial_application.benefit_sponsor_catalog.product_packages.detect { |package| package.package_kind == package_kind } }
+    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member_and_dependent, person: person)}
+    let(:benefit_package)    { initial_application.benefit_packages.first }
+    let!(:enrollment1)  { FactoryGirl.create(:hbx_enrollment, household: family.active_household, coverage_kind: "health", product: product, effective_on: current_effective_date, aasm_state: 'coverage_terminated', kind: "employer_sponsored", hbx_enrollment_members: [hbx_en_member1], benefit_sponsorship: benefit_sponsorship, sponsored_benefit_package: benefit_package, terminated_on: current_effective_date.next_month.end_of_month)}
+
+    let!(:enrollment2)  { FactoryGirl.create(:hbx_enrollment, household: family.active_household, coverage_kind: "health", product: product, effective_on: current_effective_date + 2.months, aasm_state: 'coverage_terminated', kind: "employer_sponsored", hbx_enrollment_members: [hbx_en_member2], benefit_sponsorship: benefit_sponsorship, sponsored_benefit_package: benefit_package, terminated_on: (current_effective_date + 5.months).end_of_month)}
+
+    let!(:enrollment3)  { FactoryGirl.create(:hbx_enrollment, household: family.active_household, coverage_kind: "health", product: product, effective_on: current_effective_date + 6.months, aasm_state: 'coverage_terminated', kind: "employer_sponsored", hbx_enrollment_members: [hbx_en_member3], benefit_sponsorship: benefit_sponsorship, sponsored_benefit_package: benefit_package, terminated_on: current_effective_date.end_of_year)}
 
     before :each do
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
@@ -805,6 +821,12 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       xhr :post, :view_enrollment_to_update_end_date, person_id: person.id.to_s, family_actions_id: family.id, format: :js
       expect(response).to have_http_status(:success)
       expect(response).to render_template("view_enrollment_to_update_end_date")
+    end
+
+    it "should get duplicate enrollment id's" do
+      xhr :post, :view_enrollment_to_update_end_date, person_id: person.id.to_s, family_actions_id: family.id, format: :js
+      expect(assigns(:dup_enr_ids).include?(enrollment1.id.to_s)).to eq true
+      expect(assigns(:dup_enr_ids).include?(enrollment3.id.to_s)).to eq false
     end
   end
 
