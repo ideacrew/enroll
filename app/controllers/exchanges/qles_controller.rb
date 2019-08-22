@@ -1,21 +1,21 @@
 # frozen_string_literal: true
 
 class Exchanges::QlesController < ApplicationController
-  before_action :set_qle_and_attributes, only: [:deactivation_form, :edit, :question_flow]
-  before_action :set_new_qle_and_questions, only: [:new]
-  before_action :set_qles_to_manage, only: [:manage]
-  before_action :set_sortable_qles, only: [:sorting_order]
+  before_action :set_qle_and_attributes, only: %i[deactivation_form edit update question_flow]
+  before_action :set_new_qle_and_questions, only: %i[new]
+  before_action :set_qles_to_manage, only: %i[manage]
+  before_action :set_sortable_qles, only: %i[sorting_order]
   # TODO: Determine which need the Pundit before_action
-  before_action :can_add_custom_qle?, only: [
-    :manage,
-    :new,
-    :create,
-    :edit,
-    :update,
-    :deactivation_form,
-    :deactivate
+  before_action :can_add_custom_qle?, only: %i[
+    manage
+    new
+    create
+    edit
+    update
+    deactivation_form
+    deactivate
   ]
-  skip_before_action :verify_authenticity_token, only: [:deactivate, :create, :update]
+  skip_before_action :verify_authenticity_token, only: %i[deactivate create update]
   layout 'single_column'
 
   def manage; end
@@ -42,10 +42,12 @@ class Exchanges::QlesController < ApplicationController
     end
   end
 
-  def edit; end
+  def edit
+    verify_qle_kind_inactive
+  end
 
   def update
-    binding.pry
+    verify_qle_kind_inactive
     result = Admin::QleKinds::UpdateService.call(current_user, params.require("data").permit!.to_hash)
     if result.success?
       flash[:notice] = "Successfully updated Qualifying Life Event Kind."
@@ -79,6 +81,13 @@ class Exchanges::QlesController < ApplicationController
   end
 
   private
+
+  # The QualifyingLifeEventKind.editable scope displaying editable QLE Kinds on the manage page verifies that
+  # is_active is set to false. Add this as an extra precaution to not allow access to the edit/update actions by accidnet.
+  def verify_qle_kind_inactive
+    msg = "Unable to modify active Qualifying life Event Kind."
+    redirect_to(manage_exchanges_qles_path, flash: { error: msg }) if @qle.is_active == true
+  end
 
   def can_add_custom_qle?
     redirect_to(root_path, :flash => { :error => "Access not allowed" }) unless authorize(HbxProfile, :can_add_custom_qle?)

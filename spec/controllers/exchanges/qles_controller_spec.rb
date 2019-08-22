@@ -104,6 +104,7 @@ RSpec.describe Exchanges::QlesController, :type => :controller do
     sign_in(user)
   end
 
+  # TODO: Test edit and update methods
   describe "GET #new" do
     it "successfully renders the new page" do
       get :new
