@@ -10,8 +10,8 @@ begin
 
   CSV.foreach(csv_path, :headers => true).each do |d|
     if @data_hash[d["family.id"]].present?
-      hbx_ids = @data_hash[d["family.id"]].collect{|r| r['person.hbx_id']}
-      next if hbx_ids.include?(d["person.hbx_id"])
+      hbx_ids = @data_hash[d["family.id"]].collect{|r| r['person_hbx_id']}
+      next if hbx_ids.include?(d["person_hbx_id"])
       @data_hash[d["family.id"]] << d
     else
       @data_hash[d["family.id"]] = [d]
