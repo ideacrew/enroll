@@ -90,6 +90,10 @@ module BenefitSponsors
           if is_broker_profile?
             return service.is_broker_agency_registered?(user, record)
           end
+
+          if is_general_agency_profile?
+            return service.is_general_agency_registered?(user, record)
+          end
           true
         end
       end

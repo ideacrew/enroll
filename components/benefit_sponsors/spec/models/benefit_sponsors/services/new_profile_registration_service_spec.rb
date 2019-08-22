@@ -18,7 +18,7 @@ module BenefitSponsors
     let!(:broker_agency_profile) {broker_agency.broker_agency_profile}
     let!(:general_agency) {FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, site: site)}
     let!(:general_agency_profile) {general_agency.profiles.first }
-    let(:general_role) {FactoryBot.create(:general_agency_staff_role, aasm_state: "active", benefit_sponsors_general_agency_profile_id: general_agency_profile.id)}
+    let!(:general_role) {FactoryBot.create(:general_agency_staff_role, aasm_state: "active", benefit_sponsors_general_agency_profile_id: general_agency_profile.id, person: person)}
 
     def agency(type)
       case type
@@ -141,7 +141,6 @@ module BenefitSponsors
     end
 
     describe ".is_broker_agency_registered?" do
-
       let(:profile_form) {BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.new(profile_id: broker_agency_profile.id)}
       let(:user1) { FactoryBot.create(:user)}
       let(:person1) { FactoryBot.create(:person, emails: [FactoryBot.build(:email, kind: 'work')], user: user1) }
@@ -159,7 +158,27 @@ module BenefitSponsors
         service = subject.new params
         expect(service.is_broker_agency_registered?(user1, profile_form)). to eq true
       end
+    end
 
+    describe ".is_general_agency_registered?" do
+      let(:profile_form) {BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.new(profile_id: general_agency_profile.id)}
+      let(:user1) { FactoryBot.create(:user)}
+      let(:general_agency_staff_role) { FactoryBot.build(:general_agency_staff_role, benefit_sponsors_general_agency_profile_id: general_agency_profile.id, aasm_state: "coverage_terminated")}
+      let!(:person1) do
+        FactoryBot.create(:person, emails: [FactoryBot.build(:email, kind: 'work')], user: user1, general_agency_staff_roles: [ general_agency_staff_role ])
+      end
+
+      it 'should return false if general staff role or general role exists for the user' do
+        params = { profile_id: general_agency_profile.id, profile_type: "general_agency_staff"}
+        service = subject.new params
+        expect(service.is_general_agency_registered?(user, profile_form)). to eq false
+      end
+
+      it 'should return true if general staff role or general role does not exists for the user' do
+        params = { profile_id: general_agency_profile.id, profile_type: "general_agency_staff"}
+        service = subject.new params
+        expect(service.is_general_agency_registered?(user1, profile_form)). to eq true
+      end
     end
 
     describe ".is_staff_for_agency?" do

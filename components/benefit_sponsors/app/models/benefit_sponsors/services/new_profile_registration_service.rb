@@ -230,6 +230,16 @@ module BenefitSponsors
         true
       end
 
+      def is_general_agency_registered?(user, form)
+        if user.present? && user.person.present?
+          if general_agency_staff_role = user.person.general_agency_staff_roles.where(aasm_state: 'active').first
+            form.profile_id = general_agency_staff_role.benefit_sponsors_general_agency_profile_id.to_s
+            return false
+          end
+        end
+        true
+      end
+
       def is_broker_for_employer?(user, form)
         person = user.person
         staff_roles = person.broker_agency_staff_roles
