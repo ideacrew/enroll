@@ -16,7 +16,6 @@ class Exchanges::QlesController < ApplicationController
     :deactivate
   ]
   skip_before_action :verify_authenticity_token, only: [:deactivate, :create, :update]
-  # This is in hbx_profiles controller, which is part of the admin pages
   layout 'single_column'
 
   def manage; end
@@ -46,6 +45,7 @@ class Exchanges::QlesController < ApplicationController
   def edit; end
 
   def update
+    binding.pry
     result = Admin::QleKinds::UpdateService.call(current_user, params.require("data").permit!.to_hash)
     if result.success?
       flash[:notice] = "Successfully updated Qualifying Life Event Kind."
