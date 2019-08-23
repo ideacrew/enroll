@@ -1,8 +1,38 @@
 <%= render "ui-components/v1/navs/primary_nav.html.slim" %>
-
+<!-- Todo: Make this an angular component 
 <qle-questions-responses-form
   qle-kind="<%= @qle.to_json %>"
   qle-kind-questions-and-responses="<%=  @qle_questions_and_responses.to_json %>"
 >
 </qle-questions-responses-form>
-<%=  @qle_questions_and_responses.to_json %>
+-->
+
+<div class='container top-padding-20px'>
+  <%# Form %>
+  <div class='panel panel-primary'>
+    <div class='panel-heading'>
+      <strong>
+        Verification Question(s)
+      </strong>
+    </div>
+    <div class='panel-body'>
+      <div class="form-group">
+        <%= form_with url: verify_custom_qle_questions_insured_family_path, scope: 'post' do |f| %>
+          <% @qle_questions_and_responses.each do |question_and_responses_hash| %>
+            <p>Question: <%= question_and_responses_hash[0] %>
+              <%= f.select(
+                :response_content,
+                question_and_responses_hash[1],
+                {},
+                {include_blank: true}
+              )
+              %>
+          <% end %>
+          <div class="actions">
+            <%= f.submit %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
