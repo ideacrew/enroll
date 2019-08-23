@@ -54,7 +54,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
                         family: family,
                         household: family.latest_household,
                         coverage_kind: 'health',
-                        effective_on: effective_on.prev_week,
+                        effective_on: effective_on.beginning_of_year,
                         enrollment_kind: 'open_enrollment',
                         kind: 'individual',
                         consumer_role: person.consumer_role,
