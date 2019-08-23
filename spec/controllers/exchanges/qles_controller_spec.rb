@@ -40,6 +40,9 @@ RSpec.describe Exchanges::QlesController, :type => :controller do
       }
     }
   end
+  let(:qle_edit_params) do
+
+  end
   let(:invalid_qle_creation_params) do
     qle_creation_params["data"].delete('title')
     qle_creation_params
