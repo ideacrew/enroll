@@ -3,21 +3,53 @@ require 'rake'
 namespace :load_rating_factors do
 
   task :run_all_rating_factors => :environment do
-    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{Settings.aca.state_abbreviation.downcase}/xls_templates/rating_factors", "**", "*.xlsx"))
-    puts "*"*80 unless Rails.env.test?
-    files.each do |file|
-      puts "processing file #{file}" unless Rails.env.test?
-      #  old model
-      Rake::Task['load_rating_factors:update_factor_sets'].invoke(file)
-      Rake::Task['load_rating_factors:update_factor_sets'].reenable
-      #  end of old model
+    if Settings.site.key.to_s == "dc"
+      Rake::Task['load_rating_factors:dc_rating_factors'].invoke
+    else
+      files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{Settings.aca.state_abbreviation.downcase}/xls_templates/rating_factors", "**", "*.xlsx"))
+      puts "*"*80 unless Rails.env.test?
+      files.each do |file|
+        puts "processing file #{file}" unless Rails.env.test?
+        #  old model
+        Rake::Task['load_rating_factors:update_factor_sets'].invoke(file)
+        Rake::Task['load_rating_factors:update_factor_sets'].reenable
+        #  end of old model
 
-      # new model
-      Rake::Task['load_rating_factors:update_factor_sets_new_model'].invoke(file)
-      Rake::Task['load_rating_factors:update_factor_sets_new_model'].reenable
-      # end of new model
+        # new model
+        Rake::Task['load_rating_factors:update_factor_sets_new_model'].invoke(file)
+        Rake::Task['load_rating_factors:update_factor_sets_new_model'].reenable
+        # end of new model
+      end
     end
     puts "*"*80 unless Rails.env.test?
+  end
+
+  desc "DC rating factors"
+  task :dc_rating_factors => :environment do
+    if Settings.site.key.to_s == "dc"
+      (2014..TimeKeeper.date_of_record.year).each do |year|
+        puts "creating dc rating factors for #{year}" unless Rails.env.test?
+        ::BenefitSponsors::Organizations::Organization.issuer_profiles.each do |issuer_organization|
+          issuer_profile = issuer_organization.issuer_profile
+          # participation rate factor
+          ::BenefitMarkets::Products::ActuarialFactors::ParticipationRateActuarialFactor.create!(
+              active_year: year,
+              default_factor_value: 1.0,
+              max_integer_factor_key: 100,
+              issuer_profile_id: issuer_profile.id,
+              actuarial_factor_entries: []
+          )
+          # group size factor
+          ::BenefitMarkets::Products::ActuarialFactors::GroupSizeActuarialFactor.create!(
+              active_year: year,
+              default_factor_value: 1.0,
+              max_integer_factor_key: 1,
+              issuer_profile_id: issuer_profile.id,
+              actuarial_factor_entries: []
+          )
+        end
+      end
+    end
   end
 
   task :update_factor_sets_new_model, [:file_name] => :environment do |t,args|

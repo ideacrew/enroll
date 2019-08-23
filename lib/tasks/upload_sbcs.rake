@@ -75,9 +75,20 @@ namespace :sbc do
       plan.save!
     end
 
+    ::BenefitMarkets::Products::Product.each do |product|
+      plan = Plan.where(hios_id: product.hios_id, active_year: product.active_year).first
+      next if plan.nil?
+      product.sbc_document = plan.sbc_document
+      product.save
+    end
+
     puts "#{Plan.all.select do |p|
       p.sbc_document.present?
     end.count} plans updated with sbc document"
+
+    puts "#{::BenefitMarkets::Products::Product.all.select do |p|
+      p.sbc_document.present?
+    end.count} products updated with sbc document"
   end
 
   namespace :'2015' do

@@ -61,13 +61,13 @@ generate_approved_broker(bk1, wk_addr, wk_phone, wk_email, 'jane.curtin@example.
 puts "::: Creating ConsumerRole Roles:::"
 c0 = ConsumerRole.new(person: p0, is_incarcerated: false, is_applicant: true, is_state_resident: true, citizen_status: "us_citizen")
 c0.gender = "male"
-c0.dob = "09/21/1950"
+c0.dob = Date.new(1950,9,21)
 c0.ssn = "444556666"
 c0.save!
 
 c1 = ConsumerRole.new(person: p1, is_incarcerated: false, is_applicant: true, is_state_resident: true, citizen_status: "us_citizen")
 c1.gender = "male"
-c1.dob = "07/01/1952"
+c1.dob = Date.new(1952,7,01)
 c1.ssn = "444556665"
 c1.save!
 
