@@ -49,7 +49,7 @@ namespace :load do
                                                                       })
 
         product_package.products = products_for(product_package, calender_year)
-        product_package.save! if product_package.valid?
+        product_package.save! if product_package.valid? && product_package.products.present?
 
         if product_kind.to_s == "health"
           product_package = benefit_market_catalog.product_packages.new({
@@ -61,7 +61,7 @@ namespace :load do
                                                                         })
 
           product_package.products = products_for(product_package, calender_year)
-          product_package.save! if product_package.valid?
+          product_package.save! if product_package.valid? && product_package.products.present?
 
           product_package = benefit_market_catalog.product_packages.new({
                                                                             benefit_kind: kind, product_kind: product_kind, title: 'Single Product',
@@ -72,7 +72,7 @@ namespace :load do
                                                                         })
 
           product_package.products = products_for(product_package, calender_year)
-          product_package.save! if product_package.valid?
+          product_package.save! if product_package.valid? && product_package.products.present?
         end
 
         if product_kind.to_s == "dental"
@@ -85,7 +85,7 @@ namespace :load do
                                                                         })
 
           product_package.products = products_for(product_package, calender_year)
-          product_package.save! if product_package.valid?
+          product_package.save! if product_package.valid? && product_package.products.present?
         end
       end
 

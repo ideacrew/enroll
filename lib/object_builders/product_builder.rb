@@ -161,13 +161,21 @@ class ProductBuilder
   end
 
   def mapped_service_area_id
-    @service_area_map[[@qhp.issuer_id,get_issuer_profile_id.to_s,@qhp.service_area_id,@qhp.active_year]]
+    if Settings.site.key == :cca
+      @service_area_map[[@qhp.issuer_id,get_issuer_profile_id.to_s,@qhp.service_area_id,@qhp.active_year]]
+    else
+      @service_area_map[[get_issuer_profile_id.to_s,@qhp.service_area_id,@qhp.active_year]]
+    end
   end
 
   def set_service_areas
     @service_area_map = {}
     ::BenefitMarkets::Locations::ServiceArea.all.map do |sa|
-      @service_area_map[[sa.issuer_hios_id, sa.issuer_profile_id.to_s,sa.issuer_provided_code,sa.active_year]] = sa.id
+      if Settings.site.key == :cca
+        @service_area_map[[sa.issuer_hios_id, sa.issuer_profile_id.to_s,sa.issuer_provided_code,sa.active_year]] = sa.id
+      else
+        @service_area_map[[sa.issuer_profile_id.to_s,sa.issuer_provided_code,sa.active_year]] = sa.id
+      end
     end
   end
 

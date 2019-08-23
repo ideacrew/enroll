@@ -1,23 +1,48 @@
 namespace :load_service_reference do
 
   task :run_all_service_areas => :environment do
-    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{Settings.aca.state_abbreviation.downcase}/xls_templates/service_areas", "**", "*.xlsx"))
-    puts "*"*80 unless Rails.env.test?
-    # CarrierServiceArea.delete_all # delete and recreate all carrier service areas.
-    files.sort.each do |file|
-      puts "processing file #{file}" unless Rails.env.test?
-      # old model
-      Rake::Task['load_service_reference:update_service_areas'].invoke(file)
-      Rake::Task['load_service_reference:update_service_areas'].reenable
-      # end old model
+    if Settings.site.key.to_s == "dc"
+      Rake::Task['load_service_reference:dc_service_areas'].invoke
+    else
+      files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{Settings.aca.state_abbreviation.downcase}/xls_templates/service_areas", "**", "*.xlsx"))
+      puts "*"*80 unless Rails.env.test?
+      # CarrierServiceArea.delete_all # delete and recreate all carrier service areas.
+      files.sort.each do |file|
+        puts "processing file #{file}" unless Rails.env.test?
+        # old model
+        Rake::Task['load_service_reference:update_service_areas'].invoke(file)
+        Rake::Task['load_service_reference:update_service_areas'].reenable
+        # end old model
 
-      # new model
-      Rake::Task['load_service_reference:update_service_areas_new_model'].invoke(file)
-      Rake::Task['load_service_reference:update_service_areas_new_model'].reenable
-      # end new model
+        # new model
+        Rake::Task['load_service_reference:update_service_areas_new_model'].invoke(file)
+        Rake::Task['load_service_reference:update_service_areas_new_model'].reenable
+        # end new model
+      end
+      puts "created #{CarrierServiceArea.all.size} service areas in old model" unless Rails.env.test?
+      puts "*"*80 unless Rails.env.test?
     end
-    puts "created #{CarrierServiceArea.all.size} service areas in old model" unless Rails.env.test?
-    puts "*"*80 unless Rails.env.test?
+  end
+
+  desc "dc service areas"
+  task :dc_service_areas => :environment do
+    if Settings.site.key.to_s == "dc"
+      (2014..TimeKeeper.date_of_record.year).each do |year|
+        puts "Creating Service areas for new model #{year}" unless Rails.env.test?
+        ::BenefitSponsors::Organizations::Organization.issuer_profiles.each do |issuer_organization|
+          issuer_profile = issuer_organization.issuer_profile
+          ::BenefitMarkets::Locations::ServiceArea.create!({
+             active_year: year,
+             issuer_provided_code: "DCS001",
+             covered_states: ["DC"],
+             county_zip_ids: [],
+             issuer_profile_id: issuer_profile.id,
+             issuer_hios_id: nil,
+             issuer_provided_title: issuer_profile.legal_name}
+          )
+        end
+      end
+    end
   end
 
   task :update_service_areas_new_model, [:file] => :environment do |t,args|
