@@ -38,7 +38,7 @@
                         <label>APTC Amount:</label><strong>$100.00/month</strong>
                       </div>
                       <!-- ^^^ -->
-                        <% names = @self_term_or_cancel_form[:covered_members] %>
+                        <% names = @self_term_or_cancel_form.enrollment.covered_members_first_names %>
                         <div class="family-members">
                           <p>
                             <label><%= l10n("covered") %>:</label>
@@ -87,8 +87,8 @@
                   <% end %>
 
                   <div class="col-sm-4">
-                    <% if @self_term_or_cancel_form[:market_kind] == "individual" || @self_term_or_cancel_form.is_under_ivl_oe %>
-                      <%= link_to 'Shop for Plans', insured_family_members_path(sep_id: @self_term_or_cancel_form[:sep_id], qle_id: @self_term_or_cancel_form[:qle_kind_id], market_kind: "individual"), class: "btn btn-default btn-block"%>
+                    <% if @self_term_or_cancel_form[:market_kind] == "individual" || @self_term_or_cancel_form.family.is_under_ivl_oe %>
+                      <%= link_to 'Shop for Plans', insured_family_members_path(sep_id: @self_term_or_cancel_form.family.sep_id, qle_id: @self_term_or_cancel_form.family.qle_kind_id, market_kind: "individual"), class: "btn btn-default btn-block"%>
                     <% end %>
                   </div>
                 </div>
@@ -134,7 +134,7 @@
             <!-- Placeholder APTC Form - work functionality in later -->
             <!-- TODO: add terminate-calendar id -->
             <!-- Calendar form functionality only necessary for terminate -->
-            <div id="calendar-div" class="hidden">
+            <div id="aptc-div" class="hidden">
               <%= form_tag edit_aptc_insured_group_selections_path(hbx_enrollment_id: hbx_enrollment[:id]), :method => :post do %>
               <div id="date-confirm" class="col-xs-3">
                 <%= text_field_tag 'confirm_date', '',:'data-date-min'=> "+0d", placeholder: " ", class: "required date-picker aptc-date-picker floatlabel form-control", required: true, id: "aptc_date" %>
