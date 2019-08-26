@@ -47,19 +47,38 @@ class Insured::FamiliesController < FamiliesController
   end
 
   # Display questions
+  # TODO: This also needs to contain the date of the qualifying life event,
+  # as it does for normal QLE kinds 
   def custom_qle_questions
     @qle_kind = QualifyingLifeEventKind.find(params[:id])
-    @qle_questions_and_responses = Hash[
-      @qle_kind.custom_qle_questions.to_a.collect do |question|
-        [question.content, question.custom_qle_responses.to_a.map(&:content)]
-      end
-    ]
+    @qle_questions_and_responses = @qle_kind.custom_qle_questions.to_a.map do |question|
+      {
+        question_content: question.content,
+        responses_array: question.custom_qle_responses.to_a.map(&:content)
+      }
+    end
   end
 
   # Send data to verify
   def verify_custom_qle_questions
     # Verify that they submitted the proper answer
-    
+    qle_kind = QualifyingLifeEventKind.find(params[:questions_and_responses][:qle_kind_id])
+    end_user_selected_response_content = params[:questions_and_responses][:end_user_selected_response_content]
+    custom_qle_questions = qle_kind.custom_qle_questions
+    action_to_take = qle_kind.custom_qle_questions.where(
+      'custom_qle_responses.content' => end_user_selected_response_content
+    ).first.custom_qle_responses.where(content: end_user_selected_response_content).first.action_to_take
+    # Found in CustomQleResponse::ACTIONS_TO_TAKE = %w[accepted declined to_question_2 call_center]
+    case action_to_take
+    when 'accepted'
+      # TODO: Forward on to the family/plans selection flow
+    when 'declined'
+      # TODO: Figure out where this should go to
+    when 'to_question_2'
+      # TODO: Forward them back to the preivous page but only with question 2? Or something similar.
+    when 'call_center'
+      # TODO: Maybe send them to a page saying the call center will get them enrolled?
+    end
   end
 
   def manage_family

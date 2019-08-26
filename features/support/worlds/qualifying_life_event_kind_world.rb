@@ -32,6 +32,22 @@ module QualifyingLifeEventKindWorld
     custom_qle_question_response_2.save!
   end
 
+  def fill_responses_to_qle_kind_responses_form(which_action_to_take = 'accepted', qle_kind_title)
+    qle_kind = qualifying_life_event_kind(qle_kind_title)
+    custom_qle_questions = qle_kind.custom_qle_questions
+    which_response_to_choose = qle_kind.custom_qle_questions.where(
+      'custom_qle_responses.action_to_take' => which_action_to_take
+    ).first.custom_qle_responses.where(action_to_take: which_action_to_take).first
+    response_value_content = which_response_to_choose.content
+    # Note: Selectric is weird, so we click by xpath first
+    response_options = find(:xpath, "//div[contains(@class, 'selectric-response-content-options')]")
+    response_options.click
+    all_lis = page.all('li')
+    which_response_to_choose_option = all_lis.detect { |li| li.text == response_value_content }
+    which_response_to_choose_option.click
+    click_button 'Submit'
+  end
+
   def fill_qle_kind_form_and_submit(action_name, qle_kind_title)
     case action_name
     when 'new'
@@ -211,6 +227,7 @@ And(/I see the custom qle questions for (.*?) qualifying life event kind$/) do |
   expect(page.current_path). to eq(custom_qle_questions_insured_family_path(qle_kind.id))
 end
 
-And(/And I fill out the correct response for (.*?) qualifying life event kind$/) do |qle_kind_title|
-
+And(/I fill out the (.*?) response for (.*?) qualifying life event kind$/) do |which_action_to_take, qle_kind_title|
+  fill_responses_to_qle_kind_responses_form(which_action_to_take, qle_kind_title)
 end
+
