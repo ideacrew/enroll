@@ -128,6 +128,13 @@ module SponsoredBenefits
         end
       end
 
+      def valid_plan_design_organization
+        pdp_obj = build_proposal_from_existing_employer_profile
+        result = pdp_obj.plan_design_organization.save
+        pdp_obj = result ? pdp_obj : nil
+        [result, pdp_obj]
+      end
+
       def build_proposal_from_existing_employer_profile
 
         # TODO Use Subclass that belongs to this set, e.g. SponsoredBenefits::BenefitApplications::AcaShopCcaPlanDesignProposalBuilder

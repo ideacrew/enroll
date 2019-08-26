@@ -59,9 +59,15 @@ module SponsoredBenefits
     def new
       if @plan_design_organization.employer_profile.present?
         begin
-          plan_design_proposal = @plan_design_organization.build_proposal_from_existing_employer_profile
-          flash[:success] = "Imported quote and employee information from your client #{@plan_design_organization.employer_profile.legal_name}."
-          redirect_to action: :edit, id: plan_design_proposal.id
+          saved, plan_design_proposal = @plan_design_organization.valid_plan_design_organization
+          if saved
+            flash[:success] = "Imported quote and employee information from your client #{@plan_design_organization.employer_profile.legal_name}."
+            redirect_to action: :edit, id: plan_design_proposal.id
+          else
+            flash[:error] = "Could not create new plan design proposal."
+            @plan_design_proposal = SponsoredBenefits::Forms::PlanDesignProposal.new(organization: @plan_design_organization)
+            init_employee_datatable
+          end
         rescue Exception => e
           flash[:error] = e.to_s
           @plan_design_proposal = SponsoredBenefits::Forms::PlanDesignProposal.new(organization: @plan_design_organization)

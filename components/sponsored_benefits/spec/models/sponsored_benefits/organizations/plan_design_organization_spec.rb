@@ -107,6 +107,21 @@ module SponsoredBenefits
         end
       end
 
+      describe ".valid_plan_design_organization" do
+        before do
+          allow_any_instance_of(SponsoredBenefits::BenefitApplications::PlanDesignProposalBuilder).to receive(:has_access?).and_return(true)
+          pdp = SponsoredBenefits::Organizations::PlanDesignProposal.new(claim_code: "123-123")
+          plan_design_organization.plan_design_proposals << pdp
+          allow(plan_design_organization).to receive(:valid?).and_return(false)
+        end
+
+        context "active plan year present" do
+          it "should return plan design proposal with renewal effective date and status" do
+            expect(plan_design_organization.valid_plan_design_organization).to eq [false, nil]
+          end
+        end
+      end
+
       describe ".build_proposal_from_existing_employer_profile" do
 
         before do
