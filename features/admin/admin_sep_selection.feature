@@ -109,6 +109,6 @@ Feature: Purchasing through SEP
     And I should see the individual home page
     When I click the "Had a baby" in qle carousel
     And I see the custom qle questions for Had a baby qualifying life event kind
-    And I fill out the correct response for Had a baby qualifying life event kind
+    And I fill out the accepted response for Had a baby qualifying life event kind
     Then I should be able to enroll
     # Show the page here
