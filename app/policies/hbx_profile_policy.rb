@@ -175,6 +175,13 @@ class HbxProfilePolicy < ApplicationPolicy
     role.permission.can_add_pdc
   end
 
+  def can_upload_sbc?
+    true
+    # role = user_hbx_staff_role
+    # return false unless role
+    # role.permission.can_upload_sbc?
+  end
+
 
   private
 

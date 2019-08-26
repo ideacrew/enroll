@@ -131,6 +131,8 @@ class Person
   embeds_one :assister_role, cascade_callbacks: true, validate: true
   embeds_one :inbox, as: :recipient
 
+  embeds_one :sbc_role, cascade_callbacks: true, validate: true
+
   embeds_many :employer_staff_roles, cascade_callbacks: true, validate: true
   embeds_many :broker_agency_staff_roles, cascade_callbacks: true, validate: true
   embeds_many :employee_roles, cascade_callbacks: true, validate: true
@@ -1107,4 +1109,10 @@ class Person
   def incarceration_validation
     self.errors.add(:base, "Incarceration status is required.") if is_incarcerated.to_s.blank?
   end
+end
+
+
+
+def has_sbc_access?
+  sbc_role?
 end
