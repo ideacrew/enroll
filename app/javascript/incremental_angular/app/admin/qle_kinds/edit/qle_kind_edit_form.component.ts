@@ -89,6 +89,7 @@ export class QleKindEditFormComponent {
           reason: ['', [Validators.required, Validators.minLength(1)]],
           market_kind: [''],
           visible_to_customer: [''],
+          custom_qle_questions: formBuilder.array([]),  
           is_self_attested: [''],
           effective_on_kinds:  new FormArray([]),
           pre_event_sep_in_days:[0, Validators.required],
@@ -135,6 +136,24 @@ export class QleKindEditFormComponent {
   //  return this.questionArray.length > 0;
   // }
 
+  showQuestions(){
+    // return this.qleKindToEdit.custom_qle_questionlength > 0;
+    if(this.qleKindToEdit != null){
+      return this.qleKindToEdit.custom_qle_questions.length > 0 
+    }
+  }
+
+  public questionControls(): any {
+    if(this.qleKindToEdit != null){
+      if(this.qleKindToEdit.custom_qle_questions.length > 0 ){
+       return this.qleKindToEdit.custom_qle_questions.map(
+          function(item) {  
+           return QleKindQuestionFormComponent.editQuestionFormGroup(item)
+          }
+        );
+      }
+    } 
+  }
 
   submitEdit() {
     var form = this;
@@ -163,4 +182,11 @@ export class QleKindEditFormComponent {
         errorMapper.invalidParentForm(this.editFormGroup);
     }
   }
+
+  addQuestion() {
+    this.questionArray.push(
+      QleKindQuestionFormComponent.newQuestionFormGroup(this._editForm)
+    );
+  }
+  
 }
