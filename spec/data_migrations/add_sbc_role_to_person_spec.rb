@@ -16,6 +16,7 @@ describe AddSbcRoleToPerson, dbclean: :after_each do
 
   describe '#sbc_role' do
     let(:person) { FactoryBot.create(:person) }
+    let!(:super_admin) { create(:permission, :super_admin) }
 
     it 'should create an sbc role for a person' do
       ClimateControl.modify hbx_id: person.hbx_id do
