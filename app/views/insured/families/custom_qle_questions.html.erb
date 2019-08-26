@@ -17,19 +17,21 @@
     </div>
     <div class='panel-body'>
       <div class="form-group">
-        <%= form_with url: verify_custom_qle_questions_insured_family_path, scope: 'post' do |f| %>
+        <!-- TODO: This also needs to contain the date of the qualifying life event, as it does for normal QLE kinds -->
+        <%= form_with url: verify_custom_qle_questions_insured_family_path, scope: 'questions_and_responses' do |f| %>
+          <%= f.hidden_field(:qle_kind_id, value: @qle_kind._id.to_s) %>
           <% @qle_questions_and_responses.each do |question_and_responses_hash| %>
-            <p>Question: <%= question_and_responses_hash[0] %>
+            <p>Question: <%= question_and_responses_hash[:question_content] %>
               <%= f.select(
-                :response_content,
-                question_and_responses_hash[1],
+                :end_user_selected_response_content,
+                question_and_responses_hash[:responses_array],
                 {},
-                {include_blank: true}
+                {class: 'response-content-options'}
               )
               %>
           <% end %>
           <div class="actions">
-            <%= f.submit %>
+            <%= f.submit('Submit', class: 'btn btn-primary') %>
           </div>
         <% end %>
       </div>
