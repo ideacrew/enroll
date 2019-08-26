@@ -5,7 +5,7 @@ module BenefitSponsors
     class ProductSummarySerializer
       include FastJsonapi::ObjectSerializer
 
-      attributes :visit_type, :copay_in_network_tier_1
+      attributes :visit_type, :copay_in_network_tier_1, :copay_out_of_network
 
       attribute :service_header do |object|
         retrieve_info(object.visit_type)
