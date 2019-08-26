@@ -1110,9 +1110,3 @@ class Person
     self.errors.add(:base, "Incarceration status is required.") if is_incarcerated.to_s.blank?
   end
 end
-
-
-
-def has_sbc_access?
-  sbc_role?
-end

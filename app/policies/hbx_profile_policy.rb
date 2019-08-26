@@ -176,7 +176,7 @@ class HbxProfilePolicy < ApplicationPolicy
   end
 
   def can_upload_sbc?
-    user&.person&.sbc_role
+    user&.person&.sbc_role&.present?
   end
 
 
