@@ -77,5 +77,16 @@ export class QleKindResponseFormComponent {
     return responseForm;
   }
 
+  public static editResponseFormGroup(response:any) : FormGroup {
+    var responseForm = new FormGroup({
+      content: new FormControl(response.content, Validators.required),
+      action_to_take: new FormControl(response.action_to_take),
+    });
+    return responseForm;
+  }
+  // public static editResponseFormGroups(responses:Array<string>) : FormArray[] {
+  //   //  return new FormArray([])
+
+  // }
 
 }
