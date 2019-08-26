@@ -4,7 +4,7 @@ module Services
   class CensusEmployeeUpdateService
 
     def update_census_records(person)
-      return unless person.valid?
+      return unless (person.valid? && person.changed?)
 
       if person.active_employee_roles.present?
         update_census_employee_records(person)
@@ -20,20 +20,20 @@ module Services
     end
 
     def update_census_dependent_records(person)
-      return if person.families.blank?
+      families = person.families
+      return if families.blank?
 
-      person.families.each do |family|
-        hbx_enrollments = HbxEnrollment.shop_enrollments_in_enrolled_and_renewal_states(family)
-        hbx_enrollments.each do |enrollment|
-          census_employee = enrollment.census_employee
-          enrollment.hbx_enrollment_members.where(is_subscriber: false).each do |enrollment_member|
-            next unless enrollment_member.person.id == person.id
+      family_member_ids = families.map(&:family_members).flatten.select {|fm| fm.person_id == person.id }.map(&:id)
 
-            census_employee.census_dependents.where(matching_criteria(person)).each do |census_dependent|
-              update_record(person, census_dependent)
-            end
-          end
-        end
+      employee_roles = HbxEnrollment.where(
+        :"hbx_enrollment_members.applicant_id".in => family_member_ids,
+        :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES + ['coverage_termination_pending'],
+        :kind.in => ["employer_sponsored", "employer_sponsored_cobra"]
+      ).map(&:employee_role).uniq
+
+      employee_roles.each do |role|
+        census_dependent = role.census_employee.census_dependents.where(matching_criteria(person)).first
+        update_record(person, census_dependent) if census_dependent.present?
       end
     end
 

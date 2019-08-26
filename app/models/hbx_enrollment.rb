@@ -359,14 +359,6 @@ class HbxEnrollment
     )
   }
 
-  scope :shop_enrollments_in_enrolled_and_renewal_states, lambda { |family|
-    where(
-      :family_id => family.id,
-      :aasm_state.in => ENROLLED_AND_RENEWAL_STATUSES,
-      :kind.in => ["employer_sponsored", "employer_sponsored_cobra"]
-    )
-  }
-
   # Rewritten from family scopes
   scope :enrolled_statuses, -> { where(:"aasm_state".in => ENROLLED_STATUSES) }
   scope :by_writing_agent_id, ->(broker_id) { where(writing_agent_id: broker_id)}
