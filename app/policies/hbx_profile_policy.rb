@@ -179,7 +179,6 @@ class HbxProfilePolicy < ApplicationPolicy
     user&.person&.sbc_role&.present?
   end
 
-
   private
 
   def user_hbx_staff_role
