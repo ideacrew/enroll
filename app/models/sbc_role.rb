@@ -6,19 +6,15 @@ class SbcRole
   include Mongoid::Timestamps
 
   embedded_in :person
+  accepts_nested_attributes_for :person
 
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
-  delegate :first, to: :all
-  delegate :last, to: :all
-
-  accepts_nested_attributes_for :person
 
   def parent
     person
   end
 
   class << self
-
     def find(id)
       return nil if id.blank?
 
