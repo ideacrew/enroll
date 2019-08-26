@@ -67,7 +67,7 @@
           <div class="col-sm-4">
             <div id="qle_kind_edit_form_market_kind"  *ngFor="let marketKind of marketKindsList">
               <label class="control-label">{{marketKind}}
-                <input type='radio' class='' formControlName="market_kind" id='qle_kind_edit_form_market_kind' value ="{{marketKind}}" [checked]="qleKindToEdit.market_kind == marketKind" required disabled>
+                <input type='radio' class='' formControlName="market_kind" id='qle_kind_edit_form_market_kind' value ="{{marketKind}}" [checked]="qleKindToEdit.market_kind == marketKind" required>
               </label>
             </div>
           </div>
@@ -84,7 +84,7 @@
             </label>
           </div>
         </div>
-        <!-- TODO: Need to figure out why uncommenting this blows out all the data from the form
+        <!-- TODO: Need to figure out why uncommenting this blows out all the data from the form -->
 
         <div class='form-group'>
           <span for="qle_kind_edit_form_action_kind" class="col-sm-2 control-label">Questions </span>
@@ -100,7 +100,7 @@
             </qle-question-form>
           </div>
         </div >
-      -->
+     
         <div class='form-group'>
           <span for="qle_kind_edit_form_effective_on_kinds" class="col-sm-2 control-label">Effective on Options</span>
           <div formArrayName="effective_on_kinds" *ngFor="let option of getOptions(); let i = index">
