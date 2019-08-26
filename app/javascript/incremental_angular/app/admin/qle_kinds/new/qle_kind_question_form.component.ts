@@ -34,6 +34,9 @@ export class QleKindQuestionFormComponent {
         });
       }
     }
+    else if (this.questionComponentParent != null){
+      
+    }
     return [];
   }
 
@@ -81,13 +84,28 @@ export class QleKindQuestionFormComponent {
     return (this.hasErrors(control) ? " has-error" : "");
   }
 
-  // public responseArray : FormArray;
- public static newQuestionFormGroup(formBuilder: FormBuilder) : FormGroup {
+  public static newQuestionFormGroup(formBuilder: FormBuilder) : FormGroup {
     var questionForm = new FormGroup({
       content: new FormControl('', Validators.required),
       responses: new FormArray([])
     });
     return questionForm
   }
+
+  public static getResponses(item:any): Array<FormControl>{
+    return item.custom_qle_responses.map(
+      function(response:any){
+        return QleKindResponseFormComponent.editResponseFormGroup(response);
+      }
+    )
+  }
+
+  public static editQuestionFormGroup(item:any) : FormGroup {
+    return new FormGroup({
+      content: new FormControl(item.content, Validators.required),
+      responses: new FormArray(this.getResponses(item))
+    });
+  }
+
 
 }
