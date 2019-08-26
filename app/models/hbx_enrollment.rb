@@ -358,6 +358,15 @@ class HbxEnrollment
       :"created_at" => {:"$gte" => start_date, :"$lt" => end_date}
     )
   }
+
+  scope :shop_enrollments_in_enrolled_and_renewal_states, lambda { |family|
+    where(
+      :family_id => family.id,
+      :aasm_state.in => ENROLLED_AND_RENEWAL_STATUSES,
+      :kind.in => ["employer_sponsored", "employer_sponsored_cobra"]
+    )
+  }
+
   # Rewritten from family scopes
   scope :enrolled_statuses, -> { where(:"aasm_state".in => ENROLLED_STATUSES) }
   scope :by_writing_agent_id, ->(broker_id) { where(writing_agent_id: broker_id)}
@@ -869,6 +878,11 @@ class HbxEnrollment
   def handle_coverage_selection
     callback_context = { :hbx_enrollment => self }
     HandleCoverageSelected.call(callback_context)
+  end
+
+  def create_missing_census_dependents
+    service = Services::CensusEmployeeUpdateService.new
+    service.create_missing_census_dependents(self)
   end
 
   def update_renewal_coverage
@@ -1600,7 +1614,7 @@ end
 
   aasm do
     state :shopping, initial: true
-    state :coverage_selected, :after_enter => [:update_renewal_coverage, :handle_coverage_selection]
+    state :coverage_selected, :after_enter => [:update_renewal_coverage, :handle_coverage_selection, :create_missing_census_dependents]
     state :transmitted_to_carrier
     state :coverage_enrolled, :after_enter => :update_renewal_coverage
 

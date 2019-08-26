@@ -171,6 +171,7 @@ class Person
   before_save :generate_hbx_id
   before_save :update_full_name
   before_save :strip_empty_fields
+  before_save :update_census_records
 
   #after_save :generate_family_search
   after_create :create_inbox
@@ -277,6 +278,10 @@ class Person
   after_create :notify_created
   after_update :notify_updated
 
+  def update_census_records
+    service = Services::CensusEmployeeUpdateService.new
+    service.update_census_records(self)
+  end
 
   def active_general_agency_staff_roles
     general_agency_staff_roles.select(&:active?)
@@ -488,6 +493,10 @@ class Person
 
   def work_email
     emails.detect { |adr| adr.kind == "work" }
+  end
+
+  def work_or_home_email
+    work_email || home_email
   end
 
   def work_email_or_best
