@@ -1,7 +1,7 @@
 module BenefitSponsors
   module SponsoredBenefits
     class HbxEnrollmentPricingDeterminationCalculator
-      EnrollmentProductAdapter = Struct.new(:id, :issuer_profile_id, :active_year)
+      EnrollmentProductAdapter = Struct.new(:id, :issuer_profile_id, :active_year, :kind)
 
       EnrollmentMemberAdapter = Struct.new(:member_id, :dob, :relationship, :is_primary_member, :is_disabled) do
         def is_disabled?
@@ -52,7 +52,8 @@ module BenefitSponsors
                   "effective_on" => "$households.hbx_enrollments.effective_on",
                   "hbx_enrollment_members" => "$households.hbx_enrollments.hbx_enrollment_members",
                   "_id" => "$households.hbx_enrollments.hbx_id",
-                  "product_id" => "$households.hbx_enrollments.product_id"
+                  "product_id" => "$households.hbx_enrollments.product_id",
+                  "coverage_kind" => "$coverage_kind"
                 },
                 "family_members" => 1,
                 "people_ids" => {
@@ -135,7 +136,8 @@ module BenefitSponsors
           product = EnrollmentProductAdapter.new(
             enrollment_record["hbx_enrollment"]["product_id"],
             @issuer_profile_id_map[enrollment_record["hbx_enrollment"]["product_id"]],
-            @active_year_map[enrollment_record["hbx_enrollment"]["product_id"]]
+            @active_year_map[enrollment_record["hbx_enrollment"]["product_id"]],
+            enrollment_record["hbx_enrollment"]["coverage_kind"]
           )
           group_enrollment = ::BenefitSponsors::Enrollments::GroupEnrollment.new(
             {
