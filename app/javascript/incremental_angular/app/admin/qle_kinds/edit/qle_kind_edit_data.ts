@@ -15,6 +15,7 @@ export interface QleKindEditResource {
   visible_to_customer: boolean;
   ordinal_position: number;
   event_kind_label: string;
+  custom_qle_questions: Array<string>;
   start_on: string;
   is_active:  boolean;
   event_on: string;
