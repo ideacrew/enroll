@@ -12,6 +12,7 @@ import { QleKindResponseFormComponent } from './qle_kind_question_response_form.
 export class QleKindQuestionFormComponent {
   @Input("questionFormGroup")
   public questionFormGroup : FormGroup | null;
+
   
   @Input("questionIndex")
   public questionIndex : number | null;
@@ -19,9 +20,10 @@ export class QleKindQuestionFormComponent {
   @Input("questionComponentParent")
   public questionComponentParent : QuestionComponentRemover | null;
   
-  constructor(private _questionForm: FormBuilder) {
+  constructor(private _questionForm: FormBuilder,
+  ) {
   }
-
+  
   ngOnInit() {
   }
 
@@ -92,19 +94,20 @@ export class QleKindQuestionFormComponent {
     return questionForm
   }
 
-  public static getResponses(item:any): Array<FormControl>{
-    return item.custom_qle_responses.map(
+  public static getResponses(question:any): Array<FormControl>{
+    return question.custom_qle_responses.map(
       function(response:any){
         return QleKindResponseFormComponent.editResponseFormGroup(response);
       }
     )
   }
 
-  public static editQuestionFormGroup(item:any) : FormGroup {
-    return new FormGroup({
-      content: new FormControl(item.content, Validators.required),
-      responses: new FormArray(this.getResponses(item))
+  public static editQuestionFormGroup(question:any) : FormGroup {
+    var editQuestionFormGroup =  new FormGroup({
+      content: new FormControl(question.content),
+      responses: new FormArray(this.getResponses(question))
     });
+    return editQuestionFormGroup
   }
 
 
