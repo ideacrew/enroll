@@ -1,10 +1,8 @@
 require File.join(Rails.root, "lib/mongoid_migration_task")
-require 'pry-byebug'
 
 class ServiceVisitImport < MongoidMigrationTask
   def migrate
     files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", Settings.aca.state_abbreviation.downcase, "service_visits", "**", "*.csv"))
-    binding.pry
     files.each do |file|
       result = Roo::Spreadsheet.open(file)
       sheet_data = result.sheet("default")
