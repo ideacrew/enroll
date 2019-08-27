@@ -204,7 +204,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
 
       it "generates link for custom qle with custom_qle_questions" do
         qle_kind_double.stub_chain(:custom_qle_questions, :present?).and_return(true)
-        questions_page_href = "href=\"/insured/families/1/custom_qle_questions\""
+        questions_page_href = "href=\"/insured/families/1/custom_qle_question\""
         expect(qle_link_generator(qle_kind_double, qle_kind_index)).to include(questions_page_href)
       end
 
