@@ -202,10 +202,13 @@ module BenefitSponsors
 
     describe ".is_general_agency_staff_for_employer?" do
 
-      let(:plan_design_organization) { FactoryBot.create(:sponsored_benefits_plan_design_organization,
-        owner_profile_id: broker_agency_profile.id,
-        sponsor_profile_id: employer_profile.id
-      )}
+      let(:plan_design_organization) do
+        FactoryBot.create(
+          :sponsored_benefits_plan_design_organization,
+          owner_profile_id: broker_agency_profile.id,
+          sponsor_profile_id: employer_profile.id
+        )
+      end
 
       let(:plan_design_organization_with_assigned_ga) {
         plan_design_organization.general_agency_accounts.create(
