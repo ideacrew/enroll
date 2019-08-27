@@ -7,7 +7,7 @@ module Insured
 
     describe "model attributes" do
       it {
-        [:carrier_logo, :covered_members, :current_premium, :enrollment, :is_under_ivl_oe, :market_kind, :product, :qle_kind_id, :sep_id, :should_term_or_cancel, :term_date].each do |key|
+        [:carrier_logo, :enrollment, :family, :is_aptc_eligible, :market_kind, :product, :term_date].each do |key|
           expect(subject.attributes.has_key?(key)).to be_truthy
         end
       }
@@ -17,14 +17,12 @@ module Insured
 
       let(:valid_params) {
         {
-          :current_premium => "100",
           :market_kind => "kind"
         }
       }
 
       let(:invalid_params) {
         {
-          :current_premium => nil,
           :market_kind => nil
         }
       }
@@ -52,7 +50,7 @@ module Insured
       let (:family) { FactoryBot.create(:family, :with_primary_family_member) }
       let (:sep) { FactoryBot.create(:special_enrollment_period, family: family) }
       let (:sbc_document) { FactoryBot.build(:document, subject: "SBC", identifier: "urn:openhbx#123") }
-      let (:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, title: "AAA", issuer_profile_id: "ab1233", sbc_document: sbc_document) }
+      let (:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile, title: "AAA", sbc_document: sbc_document) }
       let (:enrollment) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product) }
 
       it "should create a valid form for the view" do
@@ -61,9 +59,8 @@ module Insured
         form = Insured::Forms::SelfTermOrCancelForm.for_view(attrs)
         expect(Insured::Forms::SelfTermOrCancelForm.self_term_or_cancel_service(attrs)).to be_instance_of(Insured::Services::SelfTermOrCancelService)
         expect(form.enrollment).not_to be nil
+        expect(form.family).not_to be nil
         expect(form.product).not_to be nil
-        expect(form.should_term_or_cancel).not_to be nil
-        expect(form.current_premium).not_to be nil
       end
     end
 
