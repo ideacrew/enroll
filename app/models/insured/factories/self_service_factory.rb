@@ -4,6 +4,7 @@ module Insured
   module Factories
     class SelfServiceFactory
       attr_accessor :document_id, :enrollment_id, :family_id, :product_id, :qle_id, :sep_id
+      extend Acapi::Notifiers
 
       def initialize(args)
         self.document_id   = args[:document_id] || nil
@@ -18,25 +19,37 @@ module Insured
         new({enrollment_id: enrollment_id, family_id: family_id}).build_form_params
       end
 
+      def self.term_or_cancel(enrollment_id, term_date, term_or_cancel)
+        enrollment = HbxEnrollment.find(BSON::ObjectId.from_string(enrollment_id))
+        enrollment.term_or_cancel_enrollment(enrollment, term_date)
+        if term_or_cancel == 'cancel'
+          transmit_flag = true
+          notify(
+            "acapi.info.events.hbx_enrollment.terminated",
+            {
+              :reply_to => "#{Rails.application.config.acapi.hbx_id}.#{Rails.application.config.acapi.environment_name}.q.glue.enrollment_event_batch_handler",
+              "hbx_enrollment_id" => @enrollment_id,
+              "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment",
+              "is_trading_partner_publishable" => transmit_flag
+            }
+          )
+        end
+      end
+
+      def is_aptc_eligible(enrollment, family)
+        allowed_metal_levels = ["platinum", "silver", "gold", "bronze"]
+        product = enrollment.product
+        tax_household = family.active_household.latest_active_tax_household if family.active_household.latest_active_tax_household.present?
+        aptc_members = tax_household.aptc_members if tax_household.present?
+        return true if allowed_metal_levels.include?(product.metal_level_kind.to_s) && enrollment.household.tax_households.present? && aptc_members.present?
+      end
+
       def build_form_params
-        enrollment = self.class.enrollment(enrollment_id)
+        enrollment = HbxEnrollment.find(BSON::ObjectId.from_string(enrollment_id))
         family     = Family.find(BSON::ObjectId.from_string(family_id))
         sep        = SpecialEnrollmentPeriod.find(BSON::ObjectId.from_string(family.latest_active_sep.id))
         qle        = QualifyingLifeEventKind.find(BSON::ObjectId.from_string(sep.qualifying_life_event_kind_id))
-        return { enrollment: enrollment, family: family, qle: qle }
-      end
-
-
-      def self.enrollment(enrollment_id)
-        HbxEnrollment.find(BSON::ObjectId.from_string(enrollment_id))
-      end
-
-      def self.family(family_id)
-        Family.find(BSON::ObjectId.from_string(family_id))
-      end
-
-      def self.sbc_document(sbc_id)
-        BenefitMarkets::Products::Product.where("sbc_document._id" => BSON::ObjectId.from_string(sbc_id.to_s)).first.sbc_document
+        return { enrollment: enrollment, family: family, qle: qle, is_aptc_eligible: is_aptc_eligible(enrollment, family) }
       end
 
     end
