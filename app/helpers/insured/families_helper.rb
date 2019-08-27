@@ -72,6 +72,21 @@ module Insured::FamiliesHelper
     end.join("&nbsp<label class='separator'></label>").html_safe
   end
 
+  def render_product_type_details(metal_level_kind, nationwide)
+    product_details = []
+
+    if metal_level_kind
+      product_level = metal_level_kind.to_s.try(:humanize)
+      product_details << "<span class=\"#{product_level.try(:downcase)}-icon\">#{product_level.titleize}</span>"
+    end
+
+    product_details << 'NATIONWIDE NETWORK' if nationwide
+
+    product_details.inject([]) do |data, element|
+      data << element.to_s
+    end.join("&nbsp#{content_tag(:label, '', class: 'separator')}")
+  end
+
   def qle_link_generater(qle, index)
     options = {class: 'qle-menu-item'}
     data = {

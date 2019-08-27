@@ -26,7 +26,7 @@
                     <div><%=raw product.display_carrier_logo %></div>
                     <h4><strong><%= link_to product[:title], summary_products_plans_path({:standard_component_id => product.hios_id, hbx_enrollment_id:hbx_enrollment[:id], active_year: product.active_year}), remote: true %></strong>
                     </h4>
-                      <div><p><%= product.render_product_type_details %></p></div>
+                      <div><p><%= render_product_type_details(product[:metal_level_kind],product[:nationwide]) %></p></div>
                       <div>
                         <p>
                           <label><%= l10n("premium") %>:</label> <strong><%= number_to_currency(@self_term_or_cancel_form.enrollment.current_premium, precision:2) %></strong>/<%= l10n("month").to_s.downcase %>
