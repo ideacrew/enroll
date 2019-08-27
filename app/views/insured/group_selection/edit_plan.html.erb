@@ -29,7 +29,8 @@
                       <div><p><%= product.render_product_type_details %></p></div>
                       <div>
                         <p>
-                          <label><%= l10n("premium") %>:</label> <strong><%= @self_term_or_cancel_form[:current_premium] %></strong>/<%= l10n("month").to_s.downcase %>
+                          <label><%= l10n("premium") %>:</label> <strong><%= number_to_currency(@self_term_or_cancel_form.enrollment.current_premium, precision:2) %></strong>/<%= l10n("month").to_s.downcase %>
+                          
                           <label class="bullet-separator">&nbsp;<%= l10n("DCHL_ID") %>:</label> <strong><%= hbx_enrollment[:hbx_id] %></strong>
                         </p>
                       </div>
@@ -80,7 +81,8 @@
                     <a id="cancel-button" class="btn btn-default btn-block interaction-click-control-cancel-plan" >Cancel Plan</a>
                   </div>
 
-                  <% if @self_term_or_cancel_form.is_aptc_eligible %>
+                  <!--% if @self_term_or_cancel_form.enrollment.is_aptc_eligible? %-->
+                  <% if @self_term_or_cancel_form[:is_aptc_eligible] %>
                     <div class="col-sm-4">
                       <a id="aptc-button" class="btn btn-default btn-block interaction-click-control-edit-aptc" >Edit APTC</a>
                     </div>
