@@ -60,9 +60,12 @@ export class QleKindEditFormComponent {
     private errorLocalizer: ErrorLocalizer,
     private _editForm: FormBuilder,
     private _elementRef : ElementRef) {
-     this.buildInitialForm(_editForm);
-
+      this.buildInitialForm(this._editForm);
   }
+
+  public ngOnInit() {
+  }
+
   public getOptions(){
     return this.effectiveOnOptionsArray
   }
@@ -89,7 +92,11 @@ export class QleKindEditFormComponent {
           reason: ['', [Validators.required, Validators.minLength(1)]],
           market_kind: [''],
           visible_to_customer: [''],
-          custom_qle_questions: formBuilder.array([]),  
+          custom_qle_questions: formBuilder.array(
+            this.qleKindToEdit.custom_qle_questions.map(function(cqq) {
+              return QleKindQuestionFormComponent.editQuestionFormGroup(cqq);
+            })
+          ), 
           is_self_attested: [''],
           effective_on_kinds:  new FormArray([]),
           pre_event_sep_in_days:[0, Validators.required],
@@ -118,42 +125,32 @@ export class QleKindEditFormComponent {
     return (this.hasErrors(control) ? " has-error" : "");
   }
 
-  hasResource() {
-    // return this.qleKindToEdit != null;
-  }
-
-  // addQuestion() {
-  //    this.questionArray.push(
-  //      QleKindQuestionFormComponent.newQuestionFormGroup(this._editForm)
-  //    );
-  // }
-
-  // removeQuestion(questionIndex: number) {
-  //   this.questionArray.removeAt(questionIndex);
-  // }
-
-  // showQuestions(){
-  //  return this.questionArray.length > 0;
-  // }
-
   showQuestions(){
-    // return this.qleKindToEdit.custom_qle_questionlength > 0;
     if(this.qleKindToEdit != null){
       return this.qleKindToEdit.custom_qle_questions.length > 0 
     }
   }
 
-  public questionControls(): any {
-    if(this.qleKindToEdit != null){
-      if(this.qleKindToEdit.custom_qle_questions.length > 0 ){
-       return this.qleKindToEdit.custom_qle_questions.map(
-          function(item) {  
-           return QleKindQuestionFormComponent.editQuestionFormGroup(item)
-          }
-        );
+   questions(){
+    if (this.editFormGroup != null) {
+      var editGroup : FormGroup = this.editFormGroup;
+      var questionArray = <FormArray>editGroup.get("custom_qle_questions");
+      if (questionArray != null) {
+        return questionArray.controls.map(function(ctl) {
+          return <FormGroup>ctl;
+        });
       }
-    } 
+    }
+    return []; 
   }
+
+  removeQuestion(questionIndex: number) {
+      var editGroup : FormGroup = this.editFormGroup;
+      var questionArray = <FormArray>editGroup.get("custom_qle_questions");
+      if (questionArray != null) {    
+        questionArray.controls.splice(questionIndex,1)
+      }
+    }
 
   submitEdit() {
     var form = this;
@@ -165,8 +162,6 @@ export class QleKindEditFormComponent {
           function(data: HttpResponse<any>) {
             var location_header = data.body.next_url;
             if (location_header != null) {
-              // TODO: Can we add a div append here to show the success or decline message
-              // or should we add a new function?
               window.location.href = location_header;
             }
           },
@@ -184,9 +179,14 @@ export class QleKindEditFormComponent {
   }
 
   addQuestion() {
-    this.questionArray.push(
-      QleKindQuestionFormComponent.newQuestionFormGroup(this._editForm)
-    );
+    var editGroup : FormGroup = this.editFormGroup;
+    var questionArray = <FormArray>editGroup.get("custom_qle_questions");
+    if (questionArray != null) {    
+      questionArray.controls.push(
+        QleKindQuestionFormComponent.newQuestionFormGroup(this._editForm)
+
+      )
+    }
   }
   
 }
