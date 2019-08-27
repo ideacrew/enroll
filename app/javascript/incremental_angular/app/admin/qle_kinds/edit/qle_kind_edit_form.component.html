@@ -89,18 +89,19 @@
         <div class='form-group'>
           <span for="qle_kind_edit_form_action_kind" class="col-sm-2 control-label">Questions </span>
           <button (click)="addQuestion()" class='btn btn-primary'>
-            Create a new question for this QLE
+            Add a new question for this QLE
           </button>
           <div *ngIf="showQuestions()">
             <qle-question-form
-              *ngFor="let question of questionControls(); let i = index"
+              *ngFor="let question of questions(); let i = index"
               [questionFormGroup]="question"
               [questionIndex]="i"
-              [questionComponentParent]="this">
+              [questionComponentParent]="this"
+              >
             </qle-question-form>
           </div>
         </div >
-     
+
         <div class='form-group'>
           <span for="qle_kind_edit_form_effective_on_kinds" class="col-sm-2 control-label">Effective on Options</span>
           <div formArrayName="effective_on_kinds" *ngFor="let option of getOptions(); let i = index">
