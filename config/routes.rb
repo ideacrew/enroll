@@ -259,8 +259,8 @@ Rails.application.routes.draw do
       member do
         delete 'delete_consumer_broker'
         get 'generate_out_of_pocket_url'
-        get 'custom_qle_questions'
-        post 'verify_custom_qle_questions'
+        get 'custom_qle_question'
+        post 'verify_custom_qle_question'
       end
 
       collection do

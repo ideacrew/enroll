@@ -5,6 +5,8 @@ class Insured::FamiliesController < FamiliesController
 
   before_action :updateable?, only: [:delete_consumer_broker, :record_sep, :purchase, :upload_notice]
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
+  before_action :init_custom_qle_question_verification, only: %i[verify_custom_qle_question]
+  before_action :init_custom_qle_question, only: %i[custom_qle_question]
   before_action :check_for_address_info, only: [:find_sep, :home]
   before_action :check_employee_role
   before_action :find_or_build_consumer_role, only: [:home]
@@ -46,36 +48,23 @@ class Insured::FamiliesController < FamiliesController
     end
   end
 
-  # Display questions
-  # TODO: This also needs to contain the date of the qualifying life event,
-  # as it does for normal QLE kinds 
-  def custom_qle_questions
-    @qle_kind = QualifyingLifeEventKind.find(params[:id])
-    @qle_questions_and_responses = @qle_kind.custom_qle_questions.to_a.map do |question|
-      {
-        question_content: question.content,
-        responses_array: question.custom_qle_responses.to_a.map(&:content)
-      }
-    end
-  end
+  def custom_qle_question; end
 
-  # Send data to verify
-  def verify_custom_qle_questions
-    # Verify that they submitted the proper answer
-    qle_kind = QualifyingLifeEventKind.find(params[:questions_and_responses][:qle_kind_id])
-    end_user_selected_response_content = params[:questions_and_responses][:end_user_selected_response_content]
-    custom_qle_questions = qle_kind.custom_qle_questions
-    action_to_take = qle_kind.custom_qle_questions.where(
-      'custom_qle_responses.content' => end_user_selected_response_content
-    ).first.custom_qle_responses.where(content: end_user_selected_response_content).first.action_to_take
-    # Found in CustomQleResponse::ACTIONS_TO_TAKE = %w[accepted declined to_question_2 call_center]
-    case action_to_take
+  def verify_custom_qle_question
+    case @action_to_take
     when 'accepted'
       # TODO: Forward on to the family/plans selection flow
+      message = "You are eligible to enroll. Please fill out the questions below."
+      redirect_to(insured_family_members_path, flash: { notice: message })
     when 'declined'
       # TODO: Figure out where this should go to
+      message = "Sorry, but you are ineligible to enroll."
+      flash[:error] = message
+      redirect_to(action: "home" , flash: { notice: message })
     when 'to_question_2'
       # TODO: Forward them back to the preivous page but only with question 2? Or something similar.
+
+      redirect_to(verify_custom_qle_question_insured_family_path(only_display_question_two: true))
     when 'call_center'
       # TODO: Maybe send them to a page saying the call center will get them enrolled?
     end
@@ -208,14 +197,11 @@ class Insured::FamiliesController < FamiliesController
     end
   end
 
-  def check_move_reason
-  end
+  def check_move_reason; end
 
-  def check_insurance_reason
-  end
+  def check_insurance_reason; end
 
-  def check_marriage_reason
-  end
+  def check_marriage_reason; end
 
   def purchase
     if params[:hbx_enrollment_id].present?
@@ -402,6 +388,28 @@ class Insured::FamiliesController < FamiliesController
     @family.check_for_consumer_role
   end
 
+  def init_custom_qle_question_verification
+    @family = Family.find(params[:question_and_responses][:family_id])
+    @qle_kind = QualifyingLifeEventKind.find(params[:question_and_responses][:qle_kind_id])
+    end_user_selected_response_content = params[:question_and_responses][:end_user_selected_response_content]
+    custom_qle_questions = @qle_kind.custom_qle_questions
+    @action_to_take = @qle_kind.custom_qle_questions.where(
+      'custom_qle_responses.content' => end_user_selected_response_content
+    ).first.custom_qle_responses.where(content: end_user_selected_response_content).first.action_to_take
+    @person = current_user.person
+  end
+
+  def init_custom_qle_question
+    @qle_kind = QualifyingLifeEventKind.find(params[:id])
+    if params[:only_display_question_two].present? && @qle_kind.custom_qle_questions.count == 2
+      # Only initialize the first question, whose answer doesn't include a response that equals to_question_2
+      @qle_question = @qle_kind.custom_qle_questions.where(:'custom_qle_responses.action_to_take'.in => %w[to_question_2]).first
+    else
+      # Only initialize the one with a response that isn't to_question_2, because maximum of two questions
+      @qle_question = @qle_kind.custom_qle_questions.where(:'custom_qle_responses.action_to_take'.nin => %w[to_question_2]).first
+    end
+  end
+
   def init_qualifying_life_events
     begin
       raise if @person.nil?
@@ -507,7 +515,5 @@ class Insured::FamiliesController < FamiliesController
     if @person.resident_role?
       @resident_role_id = @person.resident_role.id
     end
-
   end
-
 end

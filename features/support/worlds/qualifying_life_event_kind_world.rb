@@ -224,10 +224,18 @@ end
 
 And(/I see the custom qle questions for (.*?) qualifying life event kind$/) do |qle_kind_title|
   qle_kind = qualifying_life_event_kind(qle_kind_title)
-  expect(page.current_path). to eq(custom_qle_questions_insured_family_path(qle_kind.id))
+  expect(page.current_path). to eq(custom_qle_question_insured_family_path(qle_kind.id))
 end
 
 And(/I fill out the (.*?) response for (.*?) qualifying life event kind$/) do |which_action_to_take, qle_kind_title|
   fill_responses_to_qle_kind_responses_form(which_action_to_take, qle_kind_title)
+end
+
+And(/I see the new insured group selection page and a message confirming that I can enroll$/) do
+  expect(page.current_path).to eq(insured_family_members_path)
+end
+
+And(/I see the home page and a message informing me that I'm unable to enroll$/) do
+  expect(page.current_path).to eq(home_insured_families_path)
 end
 

@@ -75,8 +75,7 @@ module Insured::FamiliesHelper
   def qle_link_generator(qle, index)
     options = {class: 'qle-menu-item'}
     if qle.custom_qle_questions.present?
-      # link_url = custom_qle_questions_insured_family_path(qle.id).to_s
-      link_url = "/insured/families/#{qle.id}/custom_qle_questions"
+      link_url = "/insured/families/#{qle.id}/custom_qle_question"
     else
       link_url = "javascript:void(0)"
     end
@@ -94,8 +93,6 @@ module Insured::FamiliesHelper
     else
       options.merge!(data: data)
     end
-    # TODO: When the custom QLE questions are present
-    # it will go to the new page with questions
     link_to qle.title, link_url, options
   end
 
