@@ -492,4 +492,14 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
       end
     end
   end
+
+  describe '#render_product_type_details', dbclean: :after_each do
+    it 'should return gold icon with nationwide' do
+      expect(helper.render_product_type_details(:gold, true)).to eq "<span class=\"gold-icon\">Gold</span>&nbsp<label class='separator'></label>NATIONWIDE NETWORK"
+    end
+
+    it 'should return gold icon without nationwide' do
+      expect(helper.render_product_type_details(:gold, false)).to eq "<span class=\"gold-icon\">Gold</span>"
+    end
+  end
 end
