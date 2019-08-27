@@ -6,6 +6,7 @@ module Insured
       include Virtus.model
 
       attribute :covered_members_first_names, Array
+      attribute :current_premium,             String
       attribute :effective_on,                Date
       attribute :hbx_id,                      String
       attribute :id,                          String
