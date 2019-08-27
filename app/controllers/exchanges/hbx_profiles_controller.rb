@@ -404,7 +404,6 @@ def employer_poc
   end
 
   def view_enrollment_to_update_end_date
-    # binding.pry
     @person = Person.find(params[:person_id])
     @row = params[:family_actions_id]
     @enrollments = @person.primary_family.terminated_enrollments
@@ -736,58 +735,48 @@ private
     end
   end
 
-  def duplicate_enrs_by_year(current_enrs, dup_enrollments)
-    if current_enrs.first.is_shop?
-      current_enrs.inject([]) do |enrss, current_enr|
-        enrss +=  dup_enrollments.select do |enr|
-          (enr.id != current_enr.id) &&
-            (enr.subscriber.applicant_id == current_enr.subscriber.applicant_id) &&
-            (enr.market_name == current_enr.market_name) &&
-            (enr.product.id == current_enr.product.id) &&
-            (enr.benefit_sponsorship_id == current_enr.benefit_sponsorship_id) &&
-            (enr.sponsored_benefit_package_id == current_enr.sponsored_benefit_package_id) &&
-            (enr.sponsored_benefit_package.start_on == current_enr.sponsored_benefit_package.start_on)
-        end
-        enrss.flatten.compact.uniq
+  def duplicate_enrs_by_market_year(market_enrollments)
+    if market_enrollments.first.is_shop?
+      market_enrollments.each_cons(2).select do |enr, next_enr|
+        (enr.subscriber.applicant_id == next_enr.subscriber.applicant_id) &&
+          (enr.market_name == next_enr.market_name) &&
+          (enr.product.id == next_enr.product.id) &&
+          (enr.benefit_sponsorship_id == next_enr.benefit_sponsorship_id) &&
+          (enr.sponsored_benefit_package_id == next_enr.sponsored_benefit_package_id) &&
+          (enr.sponsored_benefit_package.start_on == next_enr.sponsored_benefit_package.start_on)
       end
     else
-      current_enrs.inject([]) do |enrss, current_enr|
-        enrss += dup_enrollments.select do |enr|
-                   (enr.id != current_enr.id) &&
-                    (enr.subscriber.applicant_id == current_enr.subscriber.applicant_id) &&
-                    (enr.market_name == current_enr.market_name) &&
-                    (enr.product.id == current_enr.product.id)
-                 end
-        enrss.flatten.compact.uniq
+      market_enrollments.each_cons(2).select do |enr, next_enr|
+        (enr.subscriber.applicant_id == next_enr.subscriber.applicant_id) &&
+          (enr.market_name == next_enr.market_name) &&
+          (enr.product.id == next_enr.product.id)
       end
     end
   end
 
-  def get_duplicate_enrs(dup_enrollments)
-    product_ids = dup_enrollments.flatten.map(&:product_id)
+  def get_duplicate_enrs(market_enrollments)
+    product_ids = market_enrollments.flatten.map(&:product_id)
     return [] if product_ids.uniq.count == product_ids.count
 
-    product_ids.uniq.inject([]) do |array_of_arrays, product_id|
-      current_enrs = dup_enrollments.select{ |en| en.product_id == product_id}
-      dup_enrs = duplicate_enrs_by_year(current_enrs, dup_enrollments)
-      array_of_arrays = dup_enrs.to_a if dup_enrs.count > 1
-      array_of_arrays
-    end
+    dup_enrs = duplicate_enrs_by_market_year(market_enrollments)
+    dup_enr_arrays = dup_enrs.flatten.compact.count > 1 ? dup_enrs.flatten.compact : []
+    dup_enr_arrays
   end
 
   def fetch_duplicate_enrollment_ids(enrollments)
     enrs_mapping_by_year_and_market = group_enrollments_by_year_and_market(enrollments)
     return [] if enrs_mapping_by_year_and_market.blank?
 
-    enrs_mapping_by_year_and_market.inject([]) do |duplicate_ids, (market_year, market_enrollments)|
+    enrs_mapping_by_year_and_market.inject([]) do |duplicate_ids, (_market_year, market_enrollments)|
       next duplicate_ids unless market_enrollments.count > 1
+
       dups = get_duplicate_enrs(market_enrollments)
       next duplicate_ids if dups.empty?
+
       effective_date = dups.map(&:effective_on).max
       dups.each do |enr|
         duplicate_ids << enr.id if enr.effective_on < effective_date
       end
-
       duplicate_ids
     end
   end
