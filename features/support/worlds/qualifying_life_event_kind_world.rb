@@ -160,13 +160,16 @@ And(/^qualifying life event kind (.*?) is not active$/) do |qle_kind_title|
   qle_kind.save!
 end
 
-
 And(/^qualifying life event kind (.*?) has custom qle questions and responses present$/) do |qle_kind_title|
   create_custom_qle_kind_questions_and_responses(qle_kind_title)
 end
 
 And(/^qualifying life event kind (.*?) has two custom qle questions with a to_question_2 response present$/) do |qle_kind_title|
   create_custom_qle_kind_questions_and_responses(qle_kind_title, 'to_question_2', 'accepted')
+end
+
+And(/^qualifying life event kind (.*?) has custom qle questions with call_center response present$/) do |qle_kind_title|
+  create_custom_qle_kind_questions_and_responses(qle_kind_title, 'call_center', 'accepted')
 end
 
 And(/^all qualifying life event kinds (.*?) to customer$/) do |visible_to_customer|
@@ -225,7 +228,6 @@ Then(/^user should see message QLE Kind (.*?) has been sucessfully (.*?)$/) do |
   end
 end
 
-
 And(/I see the custom qle questions for (.*?) qualifying life event kind$/) do |qle_kind_title|
   qle_kind = qualifying_life_event_kind(qle_kind_title)
   expect(page.current_path). to eq(custom_qle_question_insured_family_path(qle_kind.id))
@@ -240,7 +242,10 @@ And(/I see the new insured group selection page and a message confirming that I 
   expect(page.current_path).to eq(insured_family_members_path)
 end
 
+And(/I see the call center page and a phone number to call so I can be approved for enrollment$/) do
+  expect(page).to have_content("Please contact the call center.")
+end
+
 And(/I see the home page and a message informing me that I'm unable to enroll$/) do
   expect(page.current_path).to eq(home_insured_families_path)
 end
-
