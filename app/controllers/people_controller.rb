@@ -200,7 +200,9 @@ class PeopleController < ApplicationController
     end
     @info_changed, @dc_status = sensitive_info_changed?(@person.consumer_role)
     respond_to do |format|
-      if @person.update_attributes(person_params.except(:is_applying_coverage))
+      @person.assign_attributes(person_params.except(:is_applying_coverage))
+      # TODO: Update CesusMembers accordingly.
+      if @person.save
         if @person.is_consumer_role_active?
           @person.consumer_role.check_for_critical_changes(@family, info_changed: @info_changed, no_dc_address: person_params["no_dc_address"], dc_status: @dc_status)
         end

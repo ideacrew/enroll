@@ -127,6 +127,7 @@ module Forms
           person.home_address.try(:destroy)
           person.addresses << address
           person.save
+          # TODO: Update address accordingly.
         end
       else
         home_address = person.home_address rescue nil
@@ -146,7 +147,9 @@ module Forms
             next
           end
           if current_address.present?
-            current_address.update(address.permit!)
+            current_address.assign_attributes(address.permit!)
+            # TODO: Update address accordingly.
+            current_address.save
           else
             person.addresses.create(address.permit!)
           end
@@ -270,14 +273,27 @@ module Forms
 
     def try_update_person(person)
       person.consumer_role.update_attributes(:is_applying_coverage => is_applying_coverage) if person.consumer_role
-      person.update_attributes(extract_person_params).tap do
+      person.assign_attributes(extract_person_params)
+      # TODO: Update Census Members accordingly
+      person.save.tap do
         bubble_person_errors(person)
       end
+    end
+
+    def relationship_validation_for_shop
+      return true if init_service.is_valid_relationship?(self)
+
+      errors.add(:base, "This action could not be completed. Please check eligibility with your employer")
+    end
+
+    def init_service
+      @init_service ||= ::Services::CensusMemberUpdateService.new
     end
 
     def update_attributes(attr)
       assign_attributes(attr)
       assign_citizen_status
+      relationship_validation_for_shop
       return false unless valid?
       return false unless try_update_person(family_member.person)
       if attr["is_consumer_role"] == "true"

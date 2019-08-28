@@ -1,10 +1,56 @@
 # frozen_string_literal: true
 
-module Services
-  class CensusEmployeeUpdateService
+# This factory is be used to update the CensusMemebers.
+# Currently Applied: Family Member updates from UI.
+
+module Factories
+  class CensusMemberUpdateFactory
+    include ActiveModel::Validations
+
+    def initialize(form)
+      @form = form
+      @family = Family.find(form.family_id.to_s)
+      @family_member = @family.family_members.find(form.id.to_s) if @family
+
+      fetch_people if @family_member
+    end
+
+    def is_a_valid_relationship?
+      return true unless relationship_changed?
+
+      employer_profiles = fetch_employer_profiles
+      return true if employer_profiles.blank?
+
+      !employer_profiles.inject([]) do |results, employer_profile|
+        results << employer_sponsored_relation?(@form.relationship, employer_profile)
+        results
+      end.include?(false)
+    end
+
+    private
+
+    def fetch_employer_profiles
+      employee_roles = @primary_person.active_employee_roles
+      employee_roles.present? ? employee_roles.map(&:employer_profile) : []
+    end
+
+    def employer_sponsored_relation?(relation, employer_profile)
+      # TODO: Refactor code accordingly to find it the employer contributes to the specific relationship.
+      true
+    end
+
+    def relationship_changed?
+      # TODO: Placeholder to verify if the relationship changed.
+      true
+    end
+
+    def fetch_people
+      @primary_person = @family.primary_person
+      @person_in_context = @family_member.person
+    end
 
     def update_census_records(person)
-      return unless (person.valid? && person.changed?)
+      return unless person.valid? && person.changed?
 
       if person.active_employee_roles.present?
         update_census_employee_records(person)
@@ -49,7 +95,7 @@ module Services
     def create_missing_census_dependents(hbx_enrollment)
       return unless hbx_enrollment.employee_role.present? && hbx_enrollment.is_shop?
 
-      hbx_enrollment.hbx_enrollment_members.where(is_subscriber: false).each do |enrollment_member|
+      hbx_enrollment.hbx_enrollment_members.where(is_subscriber: false).all.each do |enrollment_member|
         person = enrollment_member.family_member.person
         census_dependents = hbx_enrollment.employee_role.census_employee.census_dependents
         census_dependents.where(first_name: person.first_name, last_name: person.last_name, dob: person.dob).first_or_create do |census_dependent|
