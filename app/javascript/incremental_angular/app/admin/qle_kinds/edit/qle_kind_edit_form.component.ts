@@ -1,5 +1,5 @@
 import { Component, Injector, ElementRef, Inject, ViewChild } from '@angular/core';
-import { QleKindEditResource } from './qle_kind_edit_data';
+import { QleKindEditResource, QleKindUpdateRequest } from './qle_kind_edit_data';
 import { FormGroup, FormControl, FormBuilder, FormArray, AbstractControl, Validators } from '@angular/forms';
 import { QleKindQuestionFormComponent } from '../new/qle_kind_question_form.component';
 import { QleKindEditService } from '../qle_kind_services';
@@ -60,10 +60,10 @@ export class QleKindEditFormComponent {
     private errorLocalizer: ErrorLocalizer,
     private _editForm: FormBuilder,
     private _elementRef : ElementRef) {
-      this.buildInitialForm(this._editForm);
-  }
-
+    }
+    
   public ngOnInit() {
+    this.buildInitialForm(this._editForm);
   }
 
   public getOptions(){
@@ -84,6 +84,11 @@ export class QleKindEditFormComponent {
     if (qleKindToEditJson != null) {
       this.qleKindToEdit = JSON.parse(qleKindToEditJson)
       if (this.qleKindToEdit != null){
+       var custom_questions =
+          this.qleKindToEdit.custom_qle_questions.map(function(cqq) {
+            return QleKindQuestionFormComponent.editQuestionFormGroup(cqq);
+          })
+        
         var formGroup = formBuilder.group({
           id: this.qleKindToEdit._id,
           title: [this.qleKindToEdit.title, Validators.required],
@@ -92,11 +97,7 @@ export class QleKindEditFormComponent {
           reason: [this.qleKindToEdit.reason, [Validators.required, Validators.minLength(1)]],
           market_kind: [this.qleKindToEdit.market_kind],
           visible_to_customer: [this.qleKindToEdit.visible_to_customer],
-          custom_qle_questions: formBuilder.array(
-            this.qleKindToEdit.custom_qle_questions.map(function(cqq) {
-              return QleKindQuestionFormComponent.editQuestionFormGroup(cqq);
-            })
-          ), 
+          custom_qle_questions:  formBuilder.array([]),
           is_self_attested: [this.qleKindToEdit.is_self_attested],
           effective_on_kinds:  new FormArray([]),
           pre_event_sep_in_days:[this.qleKindToEdit.pre_event_sep_in_days, Validators.required],
@@ -105,6 +106,7 @@ export class QleKindEditFormComponent {
           end_on: [this.qleKindToEdit.end_on]
         })
         this.editFormGroup = formGroup;
+        this.editFormGroup.setControl('custom_qle_questions', formBuilder.array(custom_questions|| []));
         this.addCheckboxes();
       }
     }
@@ -126,12 +128,12 @@ export class QleKindEditFormComponent {
   }
 
   showQuestions(){
-    if(this.qleKindToEdit != null){
-      return this.qleKindToEdit.custom_qle_questions.length > 0 
-    }
+    var editGroup : FormGroup = this.editFormGroup;
+    var questionArray = <FormArray>editGroup.get("custom_qle_questions");
+    return questionArray.controls.length > 0
   }
 
-   questions(){
+  questions(){
     if (this.editFormGroup != null) {
       var editGroup : FormGroup = this.editFormGroup;
       var questionArray = <FormArray>editGroup.get("custom_qle_questions");
@@ -148,16 +150,26 @@ export class QleKindEditFormComponent {
       var editGroup : FormGroup = this.editFormGroup;
       var questionArray = <FormArray>editGroup.get("custom_qle_questions");
       if (questionArray != null) {    
-        questionArray.controls.splice(questionIndex,1)
+        questionArray.controls.splice!(questionIndex,1)
+        questionArray.value.splice!(questionIndex,1)
       }
     }
+    
+  addQuestion() {
+    var editGroup : FormGroup = this.editFormGroup;
+    var questionArray = <FormArray>editGroup.get("custom_qle_questions");
+    var group = QleKindQuestionFormComponent.newQuestionFormGroup(this._editForm)
+      questionArray.controls.push(group)
+      console.log(editGroup)
+  }
 
   submitEdit() {
     var form = this;
     var errorMapper = new ErrorMapper();
     if (this.editFormGroup != null) {
       if (this.editUri != null) {
-        var invocation = this.editService.submitEdit(this.editUri, this.editFormGroup.value);
+        console.log(this.editFormGroup.value)
+        var invocation = this.editService.submitEdit(this.editUri, <QleKindUpdateRequest>this.editFormGroup.value);
         invocation.subscribe(
           function(data: HttpResponse<any>) {
             var location_header = data.body.next_url;
@@ -178,15 +190,5 @@ export class QleKindEditFormComponent {
     }
   }
 
-  addQuestion() {
-    var editGroup : FormGroup = this.editFormGroup;
-    var questionArray = <FormArray>editGroup.get("custom_qle_questions");
-    if (questionArray != null) {    
-      questionArray.controls.push(
-        QleKindQuestionFormComponent.newQuestionFormGroup(this._editForm)
-
-      )
-    }
-  }
   
 }
