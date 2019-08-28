@@ -46,6 +46,12 @@ class Insured::FamiliesController < FamiliesController
     end
   end
 
+  def to_call_center; end
+
+  # TODO: The current (non custom) QLE Flow has a javascript form that validates for when
+  # the qualifying life event took place, and then forwards them to the enrollment page if appropriate.
+  # that page should be replicated on this view and the view associated with this page hidden, and then displayed
+  # if they are indeed eligible to enroll.
   def custom_qle_question
     init_custom_qle_question
   end
@@ -65,6 +71,7 @@ class Insured::FamiliesController < FamiliesController
       redirect_to(custom_qle_question_insured_family_path(only_display_question_two: true))
     when 'call_center'
       # TODO: Maybe send them to a page saying the call center will get them enrolled?
+      redirect_to(to_call_center_insured_family_path)
     end
   end
 
