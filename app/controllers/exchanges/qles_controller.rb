@@ -1,10 +1,6 @@
 # frozen_string_literal: true
 
 class Exchanges::QlesController < ApplicationController
-  before_action :set_qle_and_attributes, only: %i[deactivation_form edit update question_flow]
-  before_action :set_new_qle_and_questions, only: %i[new]
-  before_action :set_qles_to_manage, only: %i[manage]
-  before_action :set_sortable_qles, only: %i[sorting_order]
   # TODO: Determine which need the Pundit before_action
   before_action :can_add_custom_qle?, only: %i[
     manage
@@ -18,14 +14,19 @@ class Exchanges::QlesController < ApplicationController
   skip_before_action :verify_authenticity_token, only: %i[deactivate create update]
   layout 'single_column'
 
-  def manage; end
+  def manage
+    set_qles_to_manage
+  end
 
   def question_flow
+    set_qle_and_attributes
     attrs = { market_kind: params.dig(:market_kind) }
     redirect_to question_flow_exchanges_qle_path(@qle, attrs)
   end
 
-  def deactivation_form; end
+  def deactivation_form
+    set_qle_and_attributes
+  end
 
   def deactivate
     result = Admin::QleKinds::DeactivateService.call(
@@ -43,10 +44,12 @@ class Exchanges::QlesController < ApplicationController
   end
 
   def edit
+    set_qle_and_attributes
     verify_qle_kind_inactive
   end
 
   def update
+    set_qle_and_attributes
     verify_qle_kind_inactive
     result = Admin::QleKinds::UpdateService.call(current_user, params.require("data").permit!.to_hash)
     if result.success?
@@ -57,9 +60,13 @@ class Exchanges::QlesController < ApplicationController
     render json: {next_url: manage_exchanges_qles_path}
   end
 
-  def sorting_order; end
+  def sorting_order
+    set_sortable_qles
+  end
 
-  def new; end
+  def new
+    set_new_qle_and_questions
+  end
 
   def create
     result = Admin::QleKinds::CreateService.call(
