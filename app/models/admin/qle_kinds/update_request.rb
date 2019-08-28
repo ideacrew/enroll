@@ -23,6 +23,7 @@ module Admin
       option :is_active, Dry::Types['params.bool'], optional: true
       option :start_on, type: ->(val) { UsDateCoercer.coerce(val) }, optional: true
       option :end_on, type: ->(val) { UsDateCoercer.coerce(val) }, optional: true
+      option :custom_qle_questions, Dry::Types['coercible.array'], optional: true
 
     end
   end
