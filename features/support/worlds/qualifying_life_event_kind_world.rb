@@ -13,7 +13,7 @@ module QualifyingLifeEventKindWorld
     )
   end
 
-  def create_custom_qle_kind_questions_and_responses(qle_kind_title = nil)
+  def create_custom_qle_kind_questions_and_responses(qle_kind_title = nil, action_to_take_1 = 'accepted', action_to_take_2 = 'declined')
     qle_kind = QualifyingLifeEventKind.where(title: qle_kind_title).first
     custom_qle_question = qle_kind.custom_qle_questions.build(
       content: "What is the name of your dog?"
@@ -22,12 +22,12 @@ module QualifyingLifeEventKindWorld
     custom_qle_question = qle_kind.custom_qle_questions.last
     custom_qle_question_response_1 = custom_qle_question.custom_qle_responses.build(
       content: "Fido",
-      action_to_take: 'accepted'
+      action_to_take: action_to_take_1
     )
     custom_qle_question_response_1.save!
     custom_qle_question_response_2 = custom_qle_question.custom_qle_responses.build(
       content: "Jimmy",
-      action_to_take: 'declined'
+      action_to_take: action_to_take_2
     )
     custom_qle_question_response_2.save!
   end
@@ -165,6 +165,10 @@ And(/^qualifying life event kind (.*?) has custom qle questions and responses pr
   create_custom_qle_kind_questions_and_responses(qle_kind_title)
 end
 
+And(/^qualifying life event kind (.*?) has two custom qle questions with a to_question_2 response present$/) do |qle_kind_title|
+  create_custom_qle_kind_questions_and_responses(qle_kind_title, 'to_question_2', 'accepted')
+end
+
 And(/^all qualifying life event kinds (.*?) to customer$/) do |visible_to_customer|
   case visible_to_customer
   when 'are visible'
@@ -232,6 +236,7 @@ And(/I fill out the (.*?) response for (.*?) qualifying life event kind$/) do |w
 end
 
 And(/I see the new insured group selection page and a message confirming that I can enroll$/) do
+  expect(page).to have_content("You are eligible to enroll. Please continue.")
   expect(page.current_path).to eq(insured_family_members_path)
 end
 
