@@ -86,23 +86,23 @@ export class QleKindEditFormComponent {
       if (this.qleKindToEdit != null){
         var formGroup = formBuilder.group({
           id: this.qleKindToEdit._id,
-          title: ['', Validators.required],
-          tool_tip: ['', [Validators.required, Validators.minLength(1)]],
-          action_kind: ['',[]],
-          reason: ['', [Validators.required, Validators.minLength(1)]],
-          market_kind: [''],
-          visible_to_customer: [''],
+          title: [this.qleKindToEdit.title, Validators.required],
+          tool_tip: [this.qleKindToEdit.tool_tip, [Validators.required, Validators.minLength(1)]],
+          action_kind: [this.qleKindToEdit.action_kind,[]],
+          reason: [this.qleKindToEdit.reason, [Validators.required, Validators.minLength(1)]],
+          market_kind: [this.qleKindToEdit.market_kind],
+          visible_to_customer: [this.qleKindToEdit.visible_to_customer],
           custom_qle_questions: formBuilder.array(
             this.qleKindToEdit.custom_qle_questions.map(function(cqq) {
               return QleKindQuestionFormComponent.editQuestionFormGroup(cqq);
             })
           ), 
-          is_self_attested: [''],
+          is_self_attested: [this.qleKindToEdit.is_self_attested],
           effective_on_kinds:  new FormArray([]),
-          pre_event_sep_in_days:[0, Validators.required],
-          post_event_sep_in_days:[0, Validators.required],
-          start_on: [''],   
-          end_on: ['']
+          pre_event_sep_in_days:[this.qleKindToEdit.pre_event_sep_in_days, Validators.required],
+          post_event_sep_in_days:[this.qleKindToEdit.post_event_sep_in_days, Validators.required],
+          start_on: [this.qleKindToEdit.start_on],   
+          end_on: [this.qleKindToEdit.end_on]
         })
         this.editFormGroup = formGroup;
         this.addCheckboxes();

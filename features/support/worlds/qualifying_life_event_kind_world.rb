@@ -204,6 +204,11 @@ And(/^.+ visits the (.*?) Qualifying Life Event Kind page for (.*?) QLE Kind$/) 
   end
 end
 
+Then("user should see an edit form with the existing QLEKind information loaded") do
+  expect(current_path).to eq(edit_exchanges_qle_path(@qle_kind))
+  # expect(page).to have_content("#{@qle_kind.title}")
+
+end
 # TODO: Need to implement reusable step for edit and deactivate
 And(/^.+ selects (.*?) and clicks submit$/) do |action_name|
   qle_kind_wizard_selection(action_name)

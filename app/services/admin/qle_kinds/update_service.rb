@@ -15,6 +15,7 @@ module Admin
       # Process the qle creation request from  controller params.
       # @return [#success?, #errors, #output]
       def call(current_user, qle_kind_data)
+        binding.pry
         params_result = update_params_validator.call(qle_kind_data)
         return params_result unless params_result.success?
         request = update_virtual_model.new(params_result.output)
@@ -67,7 +68,7 @@ module Admin
         record = QualifyingLifeEventKind.find(request.id)
         record.update_attributes!(
           id: request.id,
-          visible_to_customer: visible_to_customer,
+          visible_to_customer: request.visible_to_customer,
           title: request.title,
           market_kind: request.market_kind,
           effective_on_kinds: request.effective_on_kinds,
