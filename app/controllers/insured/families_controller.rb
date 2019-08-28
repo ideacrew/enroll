@@ -5,8 +5,6 @@ class Insured::FamiliesController < FamiliesController
 
   before_action :updateable?, only: [:delete_consumer_broker, :record_sep, :purchase, :upload_notice]
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
-  before_action :init_custom_qle_question_verification, only: %i[verify_custom_qle_question]
-  before_action :init_custom_qle_question, only: %i[custom_qle_question]
   before_action :check_for_address_info, only: [:find_sep, :home]
   before_action :check_employee_role
   before_action :find_or_build_consumer_role, only: [:home]
@@ -48,13 +46,15 @@ class Insured::FamiliesController < FamiliesController
     end
   end
 
-  def custom_qle_question; end
+  def custom_qle_question
+    init_custom_qle_question
+  end
 
   def verify_custom_qle_question
+    init_custom_qle_question_verification
     case @action_to_take
     when 'accepted'
-      # TODO: Forward on to the family/plans selection flow
-      message = "You are eligible to enroll. Please fill out the questions below."
+      message = "You are eligible to enroll. Please continue."
       redirect_to(insured_family_members_path, flash: { notice: message })
     when 'declined'
       # TODO: Figure out where this should go to
@@ -62,9 +62,7 @@ class Insured::FamiliesController < FamiliesController
       flash[:error] = message
       redirect_to(action: "home" , flash: { notice: message })
     when 'to_question_2'
-      # TODO: Forward them back to the preivous page but only with question 2? Or something similar.
-
-      redirect_to(verify_custom_qle_question_insured_family_path(only_display_question_two: true))
+      redirect_to(custom_qle_question_insured_family_path(only_display_question_two: true))
     when 'call_center'
       # TODO: Maybe send them to a page saying the call center will get them enrolled?
     end
@@ -391,7 +389,9 @@ class Insured::FamiliesController < FamiliesController
   def init_custom_qle_question_verification
     @family = Family.find(params[:question_and_responses][:family_id])
     @qle_kind = QualifyingLifeEventKind.find(params[:question_and_responses][:qle_kind_id])
+    @custom_qle_question =  @qle_kind.custom_qle_questions.where(_id: params[:question_and_responses][:custom_qle_question_id]).first
     end_user_selected_response_content = params[:question_and_responses][:end_user_selected_response_content]
+    record_end_user_custom_qle_response(end_user_selected_response_content)
     custom_qle_questions = @qle_kind.custom_qle_questions
     @action_to_take = @qle_kind.custom_qle_questions.where(
       'custom_qle_responses.content' => end_user_selected_response_content
@@ -399,14 +399,23 @@ class Insured::FamiliesController < FamiliesController
     @person = current_user.person
   end
 
+  def record_end_user_custom_qle_response(end_user_selected_response_content)
+    CustomQleEndUserResponse.create!(
+      response_submitted: end_user_selected_response_content,
+      user_id: current_user.present? ? current_user._id.to_s : '',
+      qualifying_life_event_kind_id: @qle_kind._id.to_s,
+      qualifying_life_event_custom_qle_question_id: @custom_qle_question._id.to_s,
+    )
+  end
+
   def init_custom_qle_question
     @qle_kind = QualifyingLifeEventKind.find(params[:id])
     if params[:only_display_question_two].present? && @qle_kind.custom_qle_questions.count == 2
       # Only initialize the first question, whose answer doesn't include a response that equals to_question_2
-      @qle_question = @qle_kind.custom_qle_questions.where(:'custom_qle_responses.action_to_take'.in => %w[to_question_2]).first
+      @qle_question = @qle_kind.custom_qle_questions.where(:'custom_qle_response.action_to_take'.in => %w[to_question_2]).first
     else
       # Only initialize the one with a response that isn't to_question_2, because maximum of two questions
-      @qle_question = @qle_kind.custom_qle_questions.where(:'custom_qle_responses.action_to_take'.nin => %w[to_question_2]).first
+      @qle_question = @qle_kind.custom_qle_questions.where(:'custom_qle_response.action_to_take'.nin => %w[to_question_2]).first
     end
   end
 
