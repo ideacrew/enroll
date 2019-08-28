@@ -22,7 +22,16 @@ export interface QleKindEditResource {
   coverage_effective_on: string;
   end_on: string;
   visibility: string;
+}
 
+interface ResponseCreationRequest {
+  content: string;
+  action_to_take: string;
+}
+
+interface QuestionCreationRequest {
+  content: string;
+  responses: Array<ResponseCreationRequest>;
 }
 
 // The maximum data being sent to the server
@@ -49,5 +58,7 @@ export interface QleKindUpdateRequest {
   start_on: string;
   end_on: string;
   visibility: string;
+  custom_qle_questions: Array<QuestionCreationRequest>;
+
 }
   

@@ -15,7 +15,6 @@ module Admin
       # Process the qle creation request from  controller params.
       # @return [#success?, #errors, #output]
       def call(current_user, qle_kind_data)
-        binding.pry
         params_result = update_params_validator.call(qle_kind_data)
         return params_result unless params_result.success?
         request = update_virtual_model.new(params_result.output)
@@ -62,6 +61,37 @@ module Admin
         kind.in?(QualifyingLifeEventKind::MARKET_KINDS)
       end
 
+
+      def create_question_response(custom_qle_question, response_hash)
+        response = custom_qle_question.custom_qle_responses.build(
+          content: response_hash["content"],
+          action_to_take: response_hash["action_to_take"],
+        )
+        response.save!
+      end
+ 
+      def create_record_question(qle_kind, question_hash)
+        custom_qle_question = qle_kind.custom_qle_questions.build(
+          content: question_hash["content"],
+        )
+        custom_qle_question.save!
+      end
+
+      def update_record_questions_and_responses(qle_kind, request)
+        qle_kind.custom_qle_questions.delete_all
+        if request.custom_qle_questions.present?
+          request.custom_qle_questions.each do |question_hash|
+            if create_record_question(qle_kind, question_hash)
+              custom_qle_question = qle_kind.custom_qle_questions.last
+              question_hash["responses"].each do |response_hash|
+                create_question_response(custom_qle_question, response_hash)
+              end
+            end
+          end
+        end
+      end
+
+
       protected
 
       def update_record(request)
@@ -82,6 +112,7 @@ module Admin
           end_on: request.end_on,
           start_on: request.start_on
         )
+        update_record_questions_and_responses(record, request)
         BenefitSponsors::Services::ServiceResponse.new(record)
       end
     end
