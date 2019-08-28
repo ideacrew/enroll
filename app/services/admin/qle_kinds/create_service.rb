@@ -77,12 +77,13 @@ module Admin
       end
 
       def create_record_questions_and_responses(qle_kind, request)
-        request.questions.each do |question_hash|
-          next unless question_hash.present?
-          if create_record_question(qle_kind, question_hash)
-            custom_qle_question = qle_kind.custom_qle_questions.last
-            question_hash["responses"].each do |response_hash|
-              create_question_response(custom_qle_question, response_hash)
+        if request.questions.present?
+          request.questions.each do |question_hash|
+            if create_record_question(qle_kind, question_hash)
+              custom_qle_question = qle_kind.custom_qle_questions.last
+              question_hash["responses"].each do |response_hash|
+                create_question_response(custom_qle_question, response_hash)
+              end
             end
           end
         end
