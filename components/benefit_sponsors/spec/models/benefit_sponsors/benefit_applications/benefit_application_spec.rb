@@ -921,5 +921,28 @@ module BenefitSponsors
         expect(predecessor_application.successor_benefit_package(current_benefit_package)).to eq benefit_package
       end
     end
+
+    describe 'quiet period end date for intial and renewal application', dbclean: :after_each do
+
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup renewal application"
+
+      context ".renewal_quiet_period_end", dbclean: :after_each do
+        it 'should return renewal quiet period dates' do
+          renewal_start_on = renewal_application.start_on
+          expect(renewal_application.renewal_quiet_period_end(renewal_application.start_on).mday).to eq 15
+          expect(renewal_application.renewal_quiet_period_end(renewal_application.start_on)).to eq Date.new(renewal_start_on.year, renewal_start_on.prev_month.month, 15)
+        end
+      end
+
+      context ".initial_quiet_period_end", dbclean: :after_each do
+        it 'should return initial quiet period dates' do
+
+          inital_start_on = predecessor_application.start_on
+          expect(predecessor_application.initial_quiet_period_end(predecessor_application.start_on).mday).to eq 28
+          expect(predecessor_application.initial_quiet_period_end(predecessor_application.start_on)).to eq Date.new(inital_start_on.year, inital_start_on.prev_month.month, 28)
+        end
+      end
+    end
   end
 end
