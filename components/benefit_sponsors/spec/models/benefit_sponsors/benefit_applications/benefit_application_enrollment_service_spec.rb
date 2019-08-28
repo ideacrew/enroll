@@ -113,6 +113,19 @@ module BenefitSponsors
             expect(initial_application.aasm_state).to eq :approved
           end
         end
+
+        context "SIC code should be update as per ER profile" do
+          before(:each) do
+            abc_profile.sic_code = "002"
+            abc_profile.save
+          end
+
+          it "benefit_application should have the latest sic_code" do
+            expect(initial_application.recorded_sic_code).not_to eq abc_profile.sic_code
+            subject.submit_application
+            expect(initial_application.recorded_sic_code).to eq abc_profile.sic_code
+          end
+        end
       end
 
       context "when renewing employer present with renewal application" do
@@ -201,6 +214,19 @@ module BenefitSponsors
                 expect(subject.messages['notice']).to eq('Employer(s) Plan Year was successfully published.')
                 expect(subject.errors).to eq([])
                 expect(initial_application.aasm_state).to eq :enrollment_open
+              end
+            end
+
+            context "SIC code should be update as per ER profile" do
+              before(:each) do
+                abc_profile.sic_code = "002"
+                abc_profile.save
+              end
+
+              it "benefit_application should have the latest sic_code" do
+                expect(initial_application.recorded_sic_code).not_to eq abc_profile.sic_code
+                subject.force_submit_application
+                expect(initial_application.recorded_sic_code).to eq abc_profile.sic_code
               end
             end
 
