@@ -293,7 +293,7 @@ end
 And(/I see the call center page and a phone number to call so I can be approved for enrollment$/) do
   expect(page).to have_content(
     "Based on the information you entered, you may be eligible for a special enrollment period." \
-    " Please call us at <%= Settings.contact_center.phone_number %> to give us more information so we can see if you qualify."
+    " Please call us at #{Settings.contact_center.phone_number} to give us more information so we can see if you qualify."
   )
 end
 
