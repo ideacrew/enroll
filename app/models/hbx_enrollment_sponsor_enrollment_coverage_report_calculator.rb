@@ -1,5 +1,5 @@
 class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
-  EnrollmentProductAdapter = Struct.new(:id, :issuer_profile_id, :active_year, :kind)
+  EnrollmentProductAdapter = Struct.new(:id, :issuer_profile_id, :active_year)
   
   MemberInfoAdapter = Struct.new(:prefix, :first_name, :middle_name, :last_name, :suffix, :encrypted_ssn) do
     def ssn
@@ -62,8 +62,7 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
             "_id" => "$_id",
             "product_id" => "$product_id",
             "kind" => "$kind",
-            "employee_role_id" => "$employee_role_id",
-            "coverage_kind" => "$coverage_kind"
+            "employee_role_id" => "$employee_role_id"
           },
           "people_ids" => {
             "$map" => {
@@ -182,8 +181,7 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
       product = EnrollmentProductAdapter.new(
             enrollment_record["hbx_enrollment"]["product_id"],
             @issuer_profile_id_map[enrollment_record["hbx_enrollment"]["product_id"]],
-            @active_year_map[enrollment_record["hbx_enrollment"]["product_id"]],
-            enrollment_record["hbx_enrollment"]["coverage_kind"]
+            @active_year_map[enrollment_record["hbx_enrollment"]["product_id"]]
           )
       contribution_prohibited = (enrollment_record["hbx_enrollment"]["kind"].to_s == "employer_sponsored_cobra")
       group_enrollment = ::BenefitSponsors::Enrollments::GroupEnrollment.new(
