@@ -33,7 +33,7 @@ export class QleKindCreationFormComponent {
   ]
 
   public actionKindList = [
-    {name:"Not Applicable", code: ""},
+    {name:"Not Applicable", code: "not_applicable"},
     {name:"Drop Member", code: "drop_member" }, 
     {name:"Adminstrative", code: "administrative" }, 
     {name:"Add Member", code: "add_member"},
@@ -44,7 +44,7 @@ export class QleKindCreationFormComponent {
   ]
   
   public reasonList = [
-    {name:"Not Applicable", code: ""},
+    {name:"Not Applicable", code: "not_applicable"},
     {name:"Natural Disaster", code: "exceptional_circumstances_natural_disaster"},
     {name:"Medical Emergency", code: "exceptional_circumstances_medical_emergency"},
     {name:"System Outage", code: "exceptional_circumstances_system_outage"},
@@ -69,8 +69,8 @@ export class QleKindCreationFormComponent {
     var formGroup = formBuilder.group({
       title: ['', Validators.required],
       tool_tip: ['', [Validators.required, Validators.minLength(1)]],
-      action_kind: ['', Validators.required],
-      reason: ['', [Validators.required, Validators.minLength(1)]],
+      action_kind: [''],
+      reason: [''],
       market_kind: ['', [Validators.required, Validators.minLength(1)]],
       is_self_attested: [''],
       visible_to_customer: [''],
@@ -84,19 +84,25 @@ export class QleKindCreationFormComponent {
     this.creationFormGroup = formGroup;
     this.questionArray = qControls;
     this.addCheckboxes();
+
   }
 
   private addCheckboxes() {
     this.effectiveOnOptionsArray.map((o, i) => {
-      const control = new FormControl( i === 0); // if first item set to true, else false
+      const control = new FormControl(i === 0); // if first item set to true, else false
       (this.creationFormGroup.controls.effective_on_kinds as FormArray).push(control);
     });
+  }
+
+  public printit() {
+    console.log("hit")
   }
 
   public getOptions(){
     const options = this.effectiveOnOptionsArray
     return options
   }
+
   public questionControls() : FormGroup[] {
     return this.questionArray.controls.map(
       function(item) {
@@ -125,9 +131,9 @@ export class QleKindCreationFormComponent {
   }
 
   addQuestion() {
-      this.questionArray.push(
-        QleKindQuestionFormComponent.newQuestionFormGroup(this._creationForm)
-      );
+    this.questionArray.push(
+      QleKindQuestionFormComponent.newQuestionFormGroup(this._creationForm)
+    );
   }
 
   removeQuestion(questionIndex: number) {
@@ -138,11 +144,21 @@ export class QleKindCreationFormComponent {
     return this.questionArray.length > 0;
   }
 
+  //taking array of booleans and mapping them to the effectiveOnOptionsArray of objects 
+  updateEffectiveOnKinds() : void{
+    this.creationFormGroup.value.effective_on_kinds.forEach((o:boolean, i:number) => {
+      this.effectiveOnOptionsArray[i].selected = o
+    } 
+    )
+    this.creationFormGroup.value.effective_on_kinds = this.effectiveOnOptionsArray
+  }
+
   submitCreation() {
     var form = this;
     var errorMapper = new ErrorMapper();
     if (this.creationFormGroup != null) {
-      if (this.creationUri != null) {
+      if (this.creationUri != null) {  
+        this.updateEffectiveOnKinds()
         console.log(this.creationFormGroup.value);
         var invocation = this.CreationService.submitCreate(this.creationUri, <QleKindCreationRequest>this.creationFormGroup.value);
         invocation.subscribe(
