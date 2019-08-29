@@ -12,15 +12,15 @@ module Products
       end
 
       def process
-        if record.co_insurance_in_network_tier_1.gsub("%","").to_i == 0
-          "No Charge"
-        elsif record.co_insurance_in_network_tier_1.gsub("%","").to_i == 100
-          "Not covered. You are responsible for the full cost"
-        elsif NO_CHARGE.include?(record.co_insurance_in_network_tier_1)
+        if NO_CHARGE.include?(record.co_insurance_in_network_tier_1)
           "No Charge"
         elsif record.co_insurance_in_network_tier_1.include?("Coinsurance after deductible")
           number, _string = record.co_insurance_in_network_tier_1.split(/\ (?=[\w])/)
           "You must meet the deductible first, then #{number} of allowed charges"
+        elsif record.co_insurance_in_network_tier_1.gsub("%","").to_i.zero?
+          "No Charge"
+        elsif record.co_insurance_in_network_tier_1.gsub("%","").to_i == 100
+          "Not covered. You are responsible for the full cost"
         end
       end
     end
