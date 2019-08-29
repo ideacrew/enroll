@@ -260,7 +260,6 @@ Rails.application.routes.draw do
         delete 'delete_consumer_broker'
         get 'generate_out_of_pocket_url'
         get 'custom_qle_question'
-        get 'to_call_center'
         post 'verify_custom_qle_question'
       end
 
