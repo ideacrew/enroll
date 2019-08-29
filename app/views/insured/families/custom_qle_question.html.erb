@@ -23,7 +23,7 @@
           <%= f.hidden_field(:family_id, value: @family._id.to_s) %>
           <%= f.hidden_field(:qle_kind_id, value: @qle_kind._id.to_s) %>
           <%= f.hidden_field(:custom_qle_question_id, value: @qle_question._id.to_s) %>
-          <p>Question: <%= @qle_question.content %>
+          <p>Question: <%= @qle_question.content %></p>
           <%= f.select(
               :end_user_selected_response_content,
               @qle_question.custom_qle_responses.map(&:content),
