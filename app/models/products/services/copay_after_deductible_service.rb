@@ -17,7 +17,7 @@ module Products
         elsif record.co_insurance_in_network_tier_1.include?("No Charge after deductible")
           if record.qhp_cost_share_variance.medical_and_drug_deductible?
             "You must meet the deductible first, then #{number} per prescription"
-          elsif record.qhp_cost_share_variance.separarate_drug_deductible?
+          elsif record.qhp_cost_share_variance.separarate_drug_deductible? && DRUG_DEDUCTIBLE_OPTIONS.include?(record.visit_type)
             "You must meet the separate drug deductible first, then #{number} per prescription"
           elsif record.qhp_cost_share_variance.separarate_medical_deductible?
             "You must meet the deductible first, then #{number} per visit."
