@@ -53,6 +53,7 @@ export class QleKindResourceService {
 
   public submitEdit(post_uri: string, obj_data : object) : Observable<HttpResponse<any>> {
     var json = JSON.stringify({ data: obj_data });
+    console.log(json)
     return this.http.put(
       post_uri,
       json,
