@@ -4,25 +4,16 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 
-
-
 describe CensusEmployeePolicy, dbclean: :after_each do
   subject { described_class }
   include_context "setup benefit market with market catalogs and product packages"
   include_context "setup initial benefit application"
-
-
-# before :all do
-#   binding.pry
-# end
-
   let(:employer_profile){abc_profile}
   let(:person) { FactoryBot.create(:person) }
   let!(:benefit_group) { current_benefit_package }
   let!(:employee) { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile, benefit_group: benefit_group) }
   let!(:employee_role) { FactoryBot.create(:employee_role, person: person, employer_profile: abc_profile, census_employee_id: employee.id) }
   let!(:benefit_group_assignment) { FactoryBot.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: employee)}
-
   let(:admin_person) { FactoryBot.create(:person, :with_hbx_staff_role) }
   let(:broker_person) { FactoryBot.create(:person, :with_broker_role) }
   let(:employer_staff_person) { FactoryBot.create(:person,:with_employer_staff_role) }
@@ -156,7 +147,7 @@ describe CensusEmployeePolicy, dbclean: :after_each do
         end
 
         context "when employee is staff of current user" do
-          let(:employer_staff_role) {double(benefit_sponsors_employer_profile_id: employee.benefit_sponsors_employer_profile_id)}
+          let(:employer_staff_role) {double(benefit_sponsor_employer_profile_id: employee.benefit_sponsors_employer_profile_id)}
           let(:employer_staff_roles) { [employer_staff_role] }
           before :each do
             allow(person).to receive(:employer_staff_roles).and_return employer_staff_roles
@@ -176,7 +167,7 @@ describe CensusEmployeePolicy, dbclean: :after_each do
         end
 
         context "when employee is not staff of current user" do
-          let(:employer_staff_role) {double(benefit_sponsors_employer_profile_id: EmployerProfile.new.id)}
+          let(:employer_staff_role) {double(benefit_sponsor_employer_profile_id: EmployerProfile.new.id)}
           let(:employer_staff_roles) { [employer_staff_role] }
           before :each do
             allow(person).to receive(:employer_staff_roles).and_return employer_staff_roles
@@ -202,7 +193,7 @@ describe CensusEmployeePolicy, dbclean: :after_each do
         end
 
         context "when employee is staff of current user" do
-          let(:employer_staff_role) {double(benefit_sponsors_employer_profile_id: employee.benefit_sponsors_employer_profile_id)}
+          let(:employer_staff_role) {double(benefit_sponsor_employer_profile_id: employee.benefit_sponsors_employer_profile_id)}
           let(:employer_staff_roles) { [employer_staff_role] }
           before :each do
             allow(person).to receive(:employer_staff_roles).and_return employer_staff_roles
@@ -222,7 +213,7 @@ describe CensusEmployeePolicy, dbclean: :after_each do
         end
 
         context "when employee is not staff of current user" do
-          let(:employer_staff_role) {double(benefit_sponsors_employer_profile_id: EmployerProfile.new.id)}
+          let(:employer_staff_role) {double(benefit_sponsor_employer_profile_id: EmployerProfile.new.id)}
           let(:employer_staff_roles) { [employer_staff_role] }
           before :each do
             allow(person).to receive(:employer_staff_roles).and_return employer_staff_roles
@@ -339,7 +330,7 @@ describe CensusEmployeePolicy, dbclean: :after_each do
         end
 
         context "employee is staff of current user" do
-          let(:employer_staff_role) {double(benefit_sponsors_employer_profile_id: employee.benefit_sponsors_employer_profile_id)}
+          let(:employer_staff_role) {double(benefit_sponsor_employer_profile_id: employee.benefit_sponsors_employer_profile_id)}
           let(:employer_staff_roles) { [employer_staff_role] }
           before :each do
             allow(person).to receive(:employer_staff_roles).and_return employer_staff_roles
@@ -353,7 +344,7 @@ describe CensusEmployeePolicy, dbclean: :after_each do
         end
 
         context "employee is not staff of current user" do
-          let(:employer_staff_role) {double(benefit_sponsors_employer_profile_id: EmployerProfile.new.id)}
+          let(:employer_staff_role) {double(benefit_sponsor_employer_profile_id: EmployerProfile.new.id)}
           let(:employer_staff_roles) { [employer_staff_role] }
           before :each do
             allow(person).to receive(:employer_staff_roles).and_return employer_staff_roles
@@ -372,7 +363,7 @@ describe CensusEmployeePolicy, dbclean: :after_each do
         end
 
         context "employee is staff of current user" do
-          let(:employer_staff_role) {double(benefit_sponsors_employer_profile_id: employee.benefit_sponsors_employer_profile_id)}
+          let(:employer_staff_role) {double(benefit_sponsor_employer_profile_id: employee.benefit_sponsors_employer_profile_id)}
           let(:employer_staff_roles) { [employer_staff_role] }
           before :each do
             allow(person).to receive(:employer_staff_roles).and_return employer_staff_roles
@@ -387,7 +378,7 @@ describe CensusEmployeePolicy, dbclean: :after_each do
 
         context "employee is not staff of current user" do
 
-          let(:employer_staff_role) {double(benefit_sponsors_employer_profile_id: EmployerProfile.new.id)}
+          let(:employer_staff_role) {double(benefit_sponsor_employer_profile_id: EmployerProfile.new.id)}
           let(:employer_staff_roles) { [employer_staff_role] }
           before :each do
             allow(person).to receive(:employer_staff_roles).and_return employer_staff_roles
