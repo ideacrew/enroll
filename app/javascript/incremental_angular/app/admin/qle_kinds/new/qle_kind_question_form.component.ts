@@ -88,18 +88,21 @@ export class QleKindQuestionFormComponent {
 
   public static newQuestionFormGroup(formBuilder: FormBuilder) : FormGroup {
     var questionForm = new FormGroup({
-      content: new FormControl('', Validators.required),
+      content: new FormControl(''),
       responses: new FormArray([])
     });
     return questionForm
   }
 
   public static getResponses(question:any): Array<FormControl>{
-    return question.custom_qle_responses.map(
-      function(response:any){
-        return QleKindResponseFormComponent.editResponseFormGroup(response);
-      }
-    )
+    if(question.custom_qle_responses != null) {
+      return question.custom_qle_responses.map(
+        function(response:any){
+          return QleKindResponseFormComponent.editResponseFormGroup(response);
+        }
+      )
+    }
+    return [];
   }
 
   public static editQuestionFormGroup(question:any) : FormGroup {
