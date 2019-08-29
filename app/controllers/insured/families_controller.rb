@@ -46,8 +46,6 @@ class Insured::FamiliesController < FamiliesController
     end
   end
 
-  def to_call_center; end
-
   # TODO: The current (non custom) QLE Flow has a javascript form that validates for when
   # the qualifying life event took place, and then forwards them to the enrollment page if appropriate.
   # that page should be replicated on this view and the view associated with this page hidden, and then displayed
@@ -56,22 +54,29 @@ class Insured::FamiliesController < FamiliesController
     init_custom_qle_question
   end
 
+  # Error messages taken from qle.js.erb
   def verify_custom_qle_question
     init_custom_qle_question_verification
+    # Need to add qle_date param
+    validator = CustomQleDateValidator.new(@qle_kind._id.to_s, @qle_date, @qle_reason_val_string, @person.id)
+    validator.qualifying_qle_date?
+    ineligible_message = "Based on the information you have provided, you are not eligible for this special enrollment period. " \
+    "If you have questions or would like to provide additional information, please contact DC Health Link customer service at (855) 532-5465."
+    redirect_to(action: "home", flash: { error: message }) unless validator.qualifying_qle_date?
     case @action_to_take
     when 'accepted'
       message = "You are eligible to enroll. Please continue."
       redirect_to(insured_family_members_path, flash: { notice: message })
     when 'declined'
-      # TODO: Figure out where this should go to
-      message = "Sorry, but you are ineligible to enroll."
-      flash[:error] = message
-      redirect_to(action: "home" , flash: { notice: message })
+      redirect_to(action: "home" , flash: { notice: ineligible_message })
     when 'to_question_2'
-      redirect_to(custom_qle_question_insured_family_path(only_display_question_two: true))
+      redirect_to(custom_qle_question_insured_family_path(only_display_question_two: true, qle_date: @qle_date))
     when 'call_center'
       # TODO: Maybe send them to a page saying the call center will get them enrolled?
-      redirect_to(to_call_center_insured_family_path)
+      call_center_message = "Based on the information you entered, you may be eligible for a special enrollment period. " \
+      "Please call us at <%= Settings.contact_center.phone_number %> to give us more information so we can see if you qualify."
+      flash[:notice] = call_center_message
+      redirect_to(action: "home")
     end
   end
 
@@ -395,6 +400,7 @@ class Insured::FamiliesController < FamiliesController
 
   def init_custom_qle_question_verification
     @family = Family.find(params[:question_and_responses][:family_id])
+    @qle_date = params[:question_and_responses][:qle_date]
     @qle_kind = QualifyingLifeEventKind.find(params[:question_and_responses][:qle_kind_id])
     @custom_qle_question =  @qle_kind.custom_qle_questions.where(_id: params[:question_and_responses][:custom_qle_question_id]).first
     end_user_selected_response_content = params[:question_and_responses][:end_user_selected_response_content]
@@ -403,6 +409,7 @@ class Insured::FamiliesController < FamiliesController
     @action_to_take = @qle_kind.custom_qle_questions.where(
       'custom_qle_responses.content' => end_user_selected_response_content
     ).first.custom_qle_responses.where(content: end_user_selected_response_content).first.action_to_take
+    @qle_reason_val_string = '' # TODO: Need to determine what this is about.
     @person = current_user.person
   end
 
@@ -418,11 +425,13 @@ class Insured::FamiliesController < FamiliesController
   def init_custom_qle_question
     @qle_kind = QualifyingLifeEventKind.find(params[:id])
     if params[:only_display_question_two].present? && @qle_kind.custom_qle_questions.count == 2
-      # Only initialize the first question, whose answer doesn't include a response that equals to_question_2
-      @qle_question = @qle_kind.custom_qle_questions.where(:'custom_qle_response.action_to_take'.in => %w[to_question_2]).first
+      # TODO: Add a query to only initialize the first question, whose answer doesn't include a
+      # response that equals to_question_2
+      @qle_question = @qle_kind.custom_qle_questions.last
     else
-      # Only initialize the one with a response that isn't to_question_2, because maximum of two questions
-      @qle_question = @qle_kind.custom_qle_questions.where(:'custom_qle_response.action_to_take'.nin => %w[to_question_2]).first
+      # TODO: Add a query here to only initialize the one with a response that
+      # isn't to_question_2, because maximum of two questions
+      @qle_question = @qle_kind.custom_qle_questions.first
     end
   end
 

@@ -1,5 +1,4 @@
 Feature: Purchasing through SEP
-
   Scenario: Admin purchases the an insured user through sep
     Given Individual has not signed up as an HBX user
     And qualifying life event kind Had a baby present for individual market
@@ -74,10 +73,10 @@ Feature: Purchasing through SEP
     And I should see the individual home page
     Then I should not see "Had a Baby" in qle carousel
 
-  Scenario: Admin can enroll with the accepted response for QLE Kind with custom qle_questions
+  Scenario: User can enroll with the accepted response for QLE Kind with custom qle_questions
     Given Individual has not signed up as an HBX user
     And qualifying life event kind Had a baby present for individual market
-    And qualifying life event kind Had a baby has custom qle questions and responses present
+    And qualifying life event kind Had a baby has custom qle question and accepted response present
     And all qualifying life event kinds are visible to customer
     When Individual visits the Insured portal during open enrollment
     Then Individual creates HBX account
@@ -112,10 +111,10 @@ Feature: Purchasing through SEP
     And I fill out the accepted response for Had a baby qualifying life event kind
     And I see the new insured group selection page and a message confirming that I can enroll
 
-  Scenario: Admin cannot enroll with the declined response for QLE Kind with custom qle_questions
+  Scenario: User cannot enroll with the declined response for QLE Kind with custom qle_questions
     Given Individual has not signed up as an HBX user
     And qualifying life event kind Had a baby present for individual market
-    And qualifying life event kind Had a baby has custom qle questions and responses present
+    And qualifying life event kind Had a baby has custom qle question and declined response present
     And all qualifying life event kinds are visible to customer
     When Individual visits the Insured portal during open enrollment
     Then Individual creates HBX account
@@ -150,7 +149,7 @@ Feature: Purchasing through SEP
     And I fill out the declined response for Had a baby qualifying life event kind
     And I see the home page and a message informing me that I'm unable to enroll
 
-  Scenario: Admin must fill out second question with accepted response if redirected from two_question_2 in order to enroll
+  Scenario: User must fill out second question with accepted response if redirected from two_question_2 in order to enroll
     Given Individual has not signed up as an HBX user
     And qualifying life event kind Had a baby present for individual market
     And qualifying life event kind Had a baby has two custom qle questions with a to_question_2 response present
@@ -184,9 +183,9 @@ Feature: Purchasing through SEP
     And I click on the name of a person of family list
     And I should see the individual home page
     When I click the "Had a baby" in qle carousel
-    And I see the custom qle questions for Had a baby qualifying life event kind
+    And I see the first custom qle question for Had a baby qualifying life event kind
     And I fill out the to_question_2 response for Had a baby qualifying life event kind
-    And I see the custom qle questions for Had a baby qualifying life event kind
+    And I see the second custom custom qle question for Had a baby qualifying life event kind
     And I fill out the accepted response for Had a baby qualifying life event kind
     And I see the new insured group selection page and a message confirming that I can enroll
 

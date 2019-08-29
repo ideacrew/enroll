@@ -19,6 +19,7 @@
       <div class="form-group">
         <!-- TODO: This also needs to contain the date of the qualifying life event, as it does for normal QLE kinds -->
         <%= form_with url: verify_custom_qle_question_insured_family_path, scope: 'question_and_responses' do |f| %>
+          <%= f.text_field(:qle_date, value: @qle_date, class: @qle_date.present? ? 'hidden' : '') %>
           <%= f.hidden_field(:family_id, value: @family._id.to_s) %>
           <%= f.hidden_field(:qle_kind_id, value: @qle_kind._id.to_s) %>
           <%= f.hidden_field(:custom_qle_question_id, value: @qle_question._id.to_s) %>
