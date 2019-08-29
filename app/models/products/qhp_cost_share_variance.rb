@@ -52,6 +52,20 @@ class Products::QhpCostShareVariance
 
   accepts_nested_attributes_for :qhp_maximum_out_of_pockets, :qhp_service_visits
 
+  delegate :deductible_type, to: :qhp_deductable, allow_nil: true
+
+  def medical_and_drug_deductible?
+    deductible_type == "Combined Medical and Drug EHB Deductible"
+  end
+
+  def medical_deductible?
+    deductible_type == "Medical EHB Deductible"
+  end
+
+  def drug_deductible?
+    deductible_type == "Drug EHB Deductible"
+  end
+
 
   def self.find_qhp(ids, year)
     Products::Qhp.by_hios_ids_and_active_year(ids.map { |str| str[0..13] }, year)

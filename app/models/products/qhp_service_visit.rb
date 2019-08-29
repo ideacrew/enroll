@@ -12,6 +12,16 @@ class Products::QhpServiceVisit
   field :co_insurance_in_network_tier_2, type: String
   field :co_insurance_out_of_network, type: String
 
+  def result
+    if copay_in_network_tier_1.include?("Copay after deductible") && co_insurance_in_network_tier_1.include?("Not Applicable")
+      number, _string = copay_in_network_tier_1.split(/\ (?=[\w])/)
+      "You must meet the deductible first, then #{number} per prescription."
+    elsif copay_in_network_tier_1.split(/\ (?=[\w])/).size == 1 && co_insurance_in_network_tier_1.include?("Not Applicable")
+      number, _string = copay_in_network_tier_1.split(/\ (?=[\w])/)
+      "#{number} per visit."
+    end
+  end
+
 ## Service visit types
 # visit_type: "Maximum Out of Pocket for Medical EHB Benefits"
 # visit_type: "Maximum Out of Pocket for Drug EHB Benefits"
