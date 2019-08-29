@@ -2,7 +2,7 @@
 
 module Products
   module Services
-    class ZeroCopayService
+    class ZeroCopayService < BaseService
 
       attr_accessor :record
       NO_CHARGE = ["No Charge", "Not Applicable"].freeze
