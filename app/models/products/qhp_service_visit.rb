@@ -13,12 +13,18 @@ class Products::QhpServiceVisit
   field :co_insurance_out_of_network, type: String
 
   def result
-    if copay_in_network_tier_1.include?("Copay after deductible") && co_insurance_in_network_tier_1.include?("Not Applicable")
+    if copay_in_network_tier_1.gsub("$","").to_i == 0
+      Products::Services::ZeroCopayService.new(self).process
+    elsif copay_in_network_tier_1 == "No Charge" && co_insurance_in_network_tier_1 == "No Charge"
+      "No Charge"
+    elsif copay_in_network_tier_1.gsub("$","").to_i == 0 && co_insurance_in_network_tier_1 == "No Charge"
+      "No Charge"
+    elsif copay_in_network_tier_1.include?("Copay after deductible") && co_insurance_in_network_tier_1.include?("Not Applicable")
       number, _string = copay_in_network_tier_1.split(/\ (?=[\w])/)
-      "You must meet the deductible first, then #{number} per prescription."
+      "You must meet the deductible first, then #{number} per prescription"
     elsif copay_in_network_tier_1.split(/\ (?=[\w])/).size == 1 && co_insurance_in_network_tier_1.include?("Not Applicable")
       number, _string = copay_in_network_tier_1.split(/\ (?=[\w])/)
-      "#{number} per visit."
+      "#{number} per visit"
     end
   end
 
