@@ -14,6 +14,7 @@ class CustomQleDateValidator
     @qualified_date
   end
 
+  # This is based of a route in the families controller which is called in the families controller
   def check_qle_date
     if @qle.present?
       @start_date = @today - @qle.post_event_sep_in_days.try(:days)
