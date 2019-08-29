@@ -72,7 +72,6 @@ Cucumber::Rails::Database.javascript_strategy = :truncation
 
 Capybara::Screenshot.webkit_options = { width: 2280, height: 1800 }
 Capybara::Screenshot.prune_strategy = :keep_last_run
-Webdrivers::Chromedriver.required_version = '2.46'
 Webdrivers.cache_time = 86_400
 
 # Selenium::WebDriver::Chrome.path = '/opt/homebrew-cask/Caskroom/google-chrome/latest/Google Chrome.app/Contents/MacOS/Google Chrome'
