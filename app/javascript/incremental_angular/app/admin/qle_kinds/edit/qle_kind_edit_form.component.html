@@ -107,8 +107,8 @@
           <div formArrayName="effective_on_kinds" *ngFor="let option of getOptions(); let i = index">
             <span *ngIf='i != 0' class="col-sm-2 control-label"></span>           
             <label class='control-label'>{{option.name}}
-              <input type="checkbox" [formControlName]='i' value="{{option.code}}"
-              [checked]="(qleKindToEdit.effective_on_kinds == option.code)">
+              <input type="checkbox" [formControlName]='i' 
+              [checked]="(qleKindToEdit.effective_on_kinds[i] == true)">
             </label>
           </div>
         </div>
@@ -139,7 +139,7 @@
         <div class="form-group">
           <span for="qle_kind_edit_form_post_event_sep_eligibility" class="col-sm-2 control-label">Sep/Qle Available in system until</span>
           <div class='col-md-5'>
-            <input type='text' formControlName="end_on" id='qle_kind_edit_form_end_on' value="{{qleKindToEdit.end_on}}" mask="M0/d0/0000" [dropSpecialCharacters]="false" [validation]="true" required> <br>
+            <input type='text' formControlName="end_on" id='qle_kind_edit_form_end_on' value="{{qleKindToEdit.end_on}}" mask="M0/d0/0000" [dropSpecialCharacters]="false" [validation]="true" value="{{stringifiedEndOn}}" required> <br>
           </div>
         </div>
         <div class="form-group col-md-4 mb-2{{errorClassFor(editFormGroup.get('title'))}}">

@@ -78,16 +78,13 @@ export class QleKindEditFormComponent {
     var marketKindsAttribute = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-qle-kind-market-kinds");
     if (marketKindsAttribute != null) {
       var marketKindsArrayJson = JSON.parse(marketKindsAttribute)
-      this.marketKindsList = marketKindsArrayJson;
+    this.marketKindsList = marketKindsArrayJson;
     }
     var qleKindToEditJson = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-qle-kind-to-edit");
     if (qleKindToEditJson != null) {
       this.qleKindToEdit = JSON.parse(qleKindToEditJson)
       if (this.qleKindToEdit != null){
-       var custom_questions =
-          this.qleKindToEdit.custom_qle_questions.map(function(cqq) {
-            return QleKindQuestionFormComponent.editQuestionFormGroup(cqq);
-          })
+       var custom_questions = this.getQuestionsfromJson()
         
         var formGroup = formBuilder.group({
           id: this.qleKindToEdit._id,
@@ -106,7 +103,7 @@ export class QleKindEditFormComponent {
           end_on: [this.qleKindToEdit.end_on]
         })
         this.editFormGroup = formGroup;
-        this.editFormGroup.setControl('custom_qle_questions', formBuilder.array(custom_questions|| []));
+        this.editFormGroup.setControl('custom_qle_questions', formBuilder.array(custom_questions));
         this.addCheckboxes();
       }
     }
@@ -118,6 +115,16 @@ export class QleKindEditFormComponent {
     });
   }
 
+  public getQuestionsfromJson(){
+    if (this.qleKindToEdit != null){
+      if (this.qleKindToEdit.custom_qle_questions != null){
+        return this.qleKindToEdit.custom_qle_questions.map(function(cqq) {
+          return QleKindQuestionFormComponent.editQuestionFormGroup(cqq);
+        })
+      }
+    }
+    return [];
+  }
 
   public hasErrors(control : AbstractControl) : Boolean {
     return ((control.touched || control.dirty) && !control.valid);
@@ -147,20 +154,19 @@ export class QleKindEditFormComponent {
   }
 
   removeQuestion(questionIndex: number) {
-      var editGroup : FormGroup = this.editFormGroup;
-      var questionArray = <FormArray>editGroup.get("custom_qle_questions");
-      if (questionArray != null) {    
-        questionArray.controls.splice!(questionIndex,1)
-        questionArray.value.splice!(questionIndex,1)
-      }
+    var editGroup : FormGroup = this.editFormGroup;
+    var questionArray = <FormArray>editGroup.get("custom_qle_questions"); // 
+    if (questionArray != null) {    
+      questionArray.controls.splice!(questionIndex,1)
+      questionArray.value.splice!(questionIndex,1)
     }
+  }
     
   addQuestion() {
     var editGroup : FormGroup = this.editFormGroup;
-    var questionArray = <FormArray>editGroup.get("custom_qle_questions");
-    var group = QleKindQuestionFormComponent.newQuestionFormGroup(this._editForm)
-      questionArray.controls.push(group)
-      console.log(editGroup)
+    var questionArray = (this.editFormGroup.controls.custom_qle_questions as FormArray) // this used to have line 150 but didn't work for some reason
+    var group = QleKindQuestionFormComponent.newQuestionFormGroup(new FormBuilder)
+      questionArray.push(group)
   }
 
   submitEdit() {
