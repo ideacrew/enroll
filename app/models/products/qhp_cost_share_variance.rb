@@ -52,22 +52,22 @@ class Products::QhpCostShareVariance
 
   accepts_nested_attributes_for :qhp_maximum_out_of_pockets, :qhp_service_visits, :qhp_deductables
 
-  delegate :deductible_type, to: :qhp_deductable, allow_nil: true
+  # delegate :deductible_type, to: :qhp_deductable, allow_nil: true
+
+  def deductible_types
+    qhp_deductables.pluck(:deductible_type)
+  end
 
   def medical_and_drug_deductible?
-    deductible_type == "Combined Medical and Drug EHB Deductible"
+    deductible_types.include?("Combined Medical and Drug EHB Deductible")
   end
 
-  def medical_deductible?
-    deductible_type == "Medical EHB Deductible"
+  def separarate_drug_deductible?
+    deductible_types.include?("Drug EHB Deductible")
   end
 
-  def drug_deductible?
-    deductible_type == "Drug EHB Deductible"
-  end
-
-  def dental_deductible?
-    deductible_type == "Dental EHB Deductible"
+  def separarate_medical_deductible?
+    deductible_types.include?("Medical EHB Deductible")
   end
 
   def self.find_qhp(ids, year)
