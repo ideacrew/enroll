@@ -5,6 +5,7 @@ module Products
     class ZeroCopayService
 
       attr_accessor :record
+      NO_CHARGE = ["No Charge", "Not Applicable"].freeze
 
       def initialize(record)
         @record = record
@@ -15,9 +16,7 @@ module Products
           "No Charge"
         elsif record.co_insurance_in_network_tier_1.gsub("%","").to_i == 100
           "Not covered. You are responsible for the full cost"
-        elsif record.co_insurance_in_network_tier_1 == "No Charge"
-          "No Charge"
-        elsif record.co_insurance_in_network_tier_1 == "Not Applicable"
+        elsif NO_CHARGE.include?(record.co_insurance_in_network_tier_1)
           "No Charge"
         elsif record.co_insurance_in_network_tier_1.include?("Coinsurance after deductible")
           number, _string = record.co_insurance_in_network_tier_1.split(/\ (?=[\w])/)
