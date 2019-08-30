@@ -9,7 +9,7 @@ end
 
 module BenefitSponsors
   RSpec.describe BenefitApplications::BenefitApplication, type: :model, :dbclean => :after_each do
-    let(:site) { ::BenefitSponsors::SiteSpecHelpers.create_cca_site_with_hbx_profile_and_benefit_market }
+    let(:site) { ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_benefit_market }
     let(:benefit_market)          { site.benefit_markets.first }
     let(:employer_organization)   { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let(:benefit_sponsorship)    { BenefitSponsors::BenefitSponsorships::BenefitSponsorship.new(profile: employer_organization.employer_profile) }
