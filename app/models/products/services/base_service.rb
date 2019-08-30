@@ -4,6 +4,9 @@ module Products
   module Services
     class BaseService
 
+      NO_CHARGE = "No Charge"
+      NO_CHARGE_RESULTS = [NO_CHARGE, "Not Applicable"].freeze
+
       DRUG_DEDUCTIBLE_OPTIONS = [
         "Separate Drug Deductible",
         "Generic Drugs",
