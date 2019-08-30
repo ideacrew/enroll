@@ -69,7 +69,6 @@ class Exchanges::QlesController < ApplicationController
   end
 
   def create
-    binding.pry
     result = Admin::QleKinds::CreateService.call(
       current_user,
       params.require("data").permit!.to_hash
