@@ -92,12 +92,7 @@ module Notifier
 
     def pdf_options
       options = {
-        margin:  {
-          top: 15,
-          bottom: 22,
-          left: 22,
-          right: 22
-        },
+        margin: set_margin_for_market,
         disable_smart_shrinking: true,
         dpi: 96,
         page_size: 'Letter',
@@ -122,6 +117,24 @@ module Notifier
         }})
       end
       options
+    end
+
+    def set_margin_for_market
+      if is_consumer?
+        {
+          top: 10,
+          bottom: 20,
+          left: 22,
+          right: 22
+        }
+      else
+        {
+          top: 15,
+          bottom: 22,
+          left: 22,
+          right: 22
+        }
+      end
     end
 
     def notice_path
