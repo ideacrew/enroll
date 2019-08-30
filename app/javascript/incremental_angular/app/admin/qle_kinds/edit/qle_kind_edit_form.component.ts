@@ -80,6 +80,7 @@ export class QleKindEditFormComponent {
       var marketKindsArrayJson = JSON.parse(marketKindsAttribute)
     this.marketKindsList = marketKindsArrayJson;
     }
+
     var qleKindToEditJson = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-qle-kind-to-edit");
     if (qleKindToEditJson != null) {
       this.qleKindToEdit = JSON.parse(qleKindToEditJson)
@@ -169,11 +170,60 @@ export class QleKindEditFormComponent {
       questionArray.push(group)
   }
 
+  //taking array of booleans and mapping them to the effectiveOnOptionsArray of objects 
+  updateEffectiveOnKinds() : void{
+    var updatedArray = this.editFormGroup.value.effective_on_kinds.map((o:boolean, i:number) => {
+        if (o==true){
+          return this.effectiveOnOptionsArray[i].name
+        }
+      })
+      this.editFormGroup.value.effective_on_kinds = updatedArray
+    }
+   
+  //traverse dom for selected actionKind
+  updateActionKind(): void {
+    var actionKinds = document.getElementById("qle_kind_edit_form_action_kind");
+    if(actionKinds != null){
+      Array.from(actionKinds.querySelectorAll('option')).forEach((kind) => {
+        if(kind.selected == true){
+          var actionKind = kind.value
+          this.editFormGroup.value.action_kind = actionKind
+        }    
+      });
+    } 
+  }
+
+  //traverse dom for selected reason
+  updateReason() : void {
+    var reasons = document.getElementById("qle_kind_edit_form_reason");
+    if(reasons != null){
+      Array.from(reasons.querySelectorAll('option')).forEach((reason) => {
+        if(reason.selected == true){
+          var Selectedreason = reason.value
+          this.editFormGroup.value.reason = Selectedreason
+        }    
+      });
+    }
+  }
+
+  updateReasonAndActionKind() : void {
+    this.updateActionKind()
+    this.updateReason()
+  }
+
+  formatOuput() : void {
+    //this formats the outgoing EffectiveOnKinds to return the effective on kind name if the boolean is true
+    this.updateEffectiveOnKinds()
+    //this is a hack to read the DOM for the selected option because currently the selectric library is overriding our select tags
+    this.updateReasonAndActionKind()
+  }
+
   submitEdit() {
     var form = this;
     var errorMapper = new ErrorMapper();
     if (this.editFormGroup != null) {
       if (this.editUri != null) {
+        this.formatOuput()
         console.log(this.editFormGroup.value)
         var invocation = this.editService.submitEdit(this.editUri, <QleKindUpdateRequest>this.editFormGroup.value);
         invocation.subscribe(

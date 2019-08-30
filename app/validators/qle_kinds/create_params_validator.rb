@@ -14,7 +14,7 @@ module QleKinds
       optional(:start_on).maybe(:str?)
       optional(:end_on).maybe(:str?)
       # Not required
-      optional(:questions).maybe(:array?)
+      optional(:custom_qle_questions).maybe(:array?)
     end
   end
 end

@@ -33,7 +33,7 @@
           <div class="col-md-2 " >        
             <select formControlName="action_kind" id="qle_kind_edit_form_action_kind">
               <option *ngFor="let actionKind of actionKindList" [ngValue]="actionKind.code"
-              [attr.selected]="(qleKindToEdit.action_kind == actionKind.code) ? true : null">
+              [attr.selected]="(qleKindToEdit.action_kind == actionKind.code)">
               {{actionKind.name}}
               </option>
             </select>
@@ -43,10 +43,10 @@
           <span for="qle_kind_edit_form_reason" class="col-sm-2 control-label">Reason </span>
           <div class="col-md-3" >        
             <select formControlName="reason" id="qle_kind_edit_form_reason">
-              <option *ngFor="let reasonOption of reasonList" [ngValue]="reasonOption.code"
-              [attr.selected]="(qleKindToEdit.reason == reasonOption.code) ? true : null"
+              <option *ngFor="let reason of reasonList" [ngValue]="reason.code"
+              [attr.selected]="(qleKindToEdit.reason == reason.code)"
               >
-              {{reasonOption.name}}
+              {{reason.name}}
               </option>
             </select>
           </div>
@@ -108,7 +108,8 @@
             <span *ngIf='i != 0' class="col-sm-2 control-label"></span>           
             <label class='control-label'>{{option.name}}
               <input type="checkbox" [formControlName]='i' 
-              [checked]="(qleKindToEdit.effective_on_kinds[i] == true)">
+              [checked]="(qleKindToEdit.effective_on_kinds.includes(option.name))"
+              value= option>
             </label>
           </div>
         </div>
