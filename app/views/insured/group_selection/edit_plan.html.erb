@@ -118,8 +118,7 @@
             </div>
 
             <div id="cancel-form" class="hidden">
-              <%= form_for @self_term_or_cancel_form, as: :self_term_or_cancel_form, url: {action: 'term_or_cancel'} do |f| %>
-
+              <%= form_for @self_term_or_cancel_form, as: :self_term_or_cancel_form, url: term_or_cancel_insured_group_selections_path do |f| %>
                 <%= hidden_field_tag :hbx_enrollment_id, hbx_enrollment[:id] %>
                 <%= hidden_field_tag :term_or_cancel,    @should_term_or_cancel %>
                 <div class="col-xs-3" style="float:right;">
