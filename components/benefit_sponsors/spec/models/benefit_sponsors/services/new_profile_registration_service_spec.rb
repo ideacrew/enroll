@@ -6,7 +6,7 @@ module BenefitSponsors
 
     subject { BenefitSponsors::Services::NewProfileRegistrationService }
     let!(:security_question)  { FactoryBot.create_default :security_question }
-    let!(:site) { ::BenefitSponsors::SiteSpecHelpers.create_cca_site_with_hbx_profile_and_benefit_market }
+    let!(:site) { ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_benefit_market }
     let!(:general_org) {FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)}
     let!(:employer_profile) {general_org.employer_profile}
     let!(:user) { FactoryBot.create(:user)}
