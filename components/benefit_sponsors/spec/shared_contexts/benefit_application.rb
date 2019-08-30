@@ -19,10 +19,12 @@ RSpec.shared_context "setup initial benefit application", :shared_context => :me
   }
   
   let(:dental_sponsored_benefit) { false }
-  let!(:rating_area)   { create_default(:benefit_markets_locations_rating_area) }
-  let!(:service_areas) { benefit_sponsorship.service_areas_on(effective_period.min) }
+  #let!(:rating_area)   { create_default(:benefit_markets_locations_rating_area) }
+  #let!(:service_areas) { benefit_sponsorship.service_areas_on(effective_period.min) }
 
-  let(:benefit_sponsor_catalog) { benefit_sponsorship.benefit_sponsor_catalog_for(service_areas, effective_period.min) }
+  let(:benefit_sponsor_catalog) {
+    benefit_sponsorship.benefit_sponsor_catalog_for(service_areas, effective_period.min)
+  }
   let!(:initial_application)    { create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog,
                                         :with_benefit_package,
                                         passed_benefit_sponsor_catalog: benefit_sponsor_catalog,
@@ -41,7 +43,7 @@ RSpec.shared_context "setup initial benefit application", :shared_context => :me
                                 )}
 
   let(:product_package)           { benefit_sponsor_catalog.product_packages.detect { |package| package.package_kind == package_kind } }
-  let(:dental_product_package)    { benefit_sponsor_catalog.product_packages.detect { |package| package.product_kind == :dental } }
+  let(:dental_product_package)    { benefit_sponsor_catalog.product_packages.detect { |package| package.product_kind == :dental && package.package_kind == dental_package_kind } }
   let(:current_benefit_package)   { initial_application.benefit_packages[0] }
 end
 
@@ -72,11 +74,14 @@ RSpec.shared_context "setup renewal application", :shared_context => :metadata d
   let(:abc_profile)              { abc_organization.employer_profile }
   let!(:benefit_sponsorship)     { abc_profile.add_benefit_sponsorship }
 
-  let(:recorded_service_areas)   { benefit_sponsorship.service_areas_on(effective_period.min) }
+  let(:recorded_service_areas)   { 
+    current_benefit_market_catalog
+    benefit_sponsorship.service_areas_on(effective_period.min)
+  }
 
   let(:dental_sponsored_benefit)           { false }
-  let(:current_dental_product_package)     { renewal_benefit_market_catalog.product_packages.detect { |package| package.product_kind == :dental } }
-  let(:predeccesor_dental_product_package) { current_benefit_market_catalog.product_packages.detect { |package| package.product_kind == :dental } }
+  let(:current_dental_product_package)     { renewal_benefit_market_catalog.product_packages.detect { |package| package.product_kind == :dental && package.package_kind == dental_package_kind } }
+  let(:predeccesor_dental_product_package) { current_benefit_market_catalog.product_packages.detect { |package| package.product_kind == :dental && package.package_kind == dental_package_kind } }
   let(:predecessor_application_catalog)    { false }
 
   let!(:renewal_application)  { create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog,

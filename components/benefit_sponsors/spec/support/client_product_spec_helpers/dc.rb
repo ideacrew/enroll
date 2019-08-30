@@ -19,7 +19,7 @@ module BenefitSponsors
       product_ptable_id = BSON::ObjectId.new
       product_ptuple_id = BSON::ObjectId.new
       product_props = {
-        "_id": product_id,
+        "_id" => product_id,
         "_type": "BenefitMarkets::Products::DentalProducts::DentalProduct",
         ehb: 0.9942,
         dental_plan_kind: "hmo",
@@ -75,7 +75,7 @@ module BenefitSponsors
       product_ptable_id = BSON::ObjectId.new
       product_ptuple_id = BSON::ObjectId.new
       product_props = {
-        "_id": product_id,
+        "_id" => product_id,
         "_type": "BenefitMarkets::Products::HealthProducts::HealthProduct",
         ehb: 0.9942,
         health_plan_kind: "hmo",
@@ -592,11 +592,12 @@ module BenefitSponsors
         "_id": benefit_market_catalog_id,
         application_interval_kind: :monthly,
         probation_period_kinds: [ 
-          "first_of_month_before_15th", 
-          "date_of_hire",
-          "first_of_month", 
-          "first_of_month_after_30_days", 
-          "first_of_month_after_60_days"
+          :first_of_month_before_15th,
+          :date_of_hire,
+          :first_of_month,
+          :first_of_month_following,
+          :first_of_month_after_30_days,
+          :first_of_month_after_60_days
         ],
         application_period: {
           min: effective_period.min,
@@ -649,11 +650,12 @@ module BenefitSponsors
         "_id": renewal_benefit_market_catalog_id,
         application_interval_kind: :monthly,
         probation_period_kinds: [ 
-          "first_of_month_before_15th", 
-          "date_of_hire",
-          "first_of_month", 
-          "first_of_month_after_30_days", 
-          "first_of_month_after_60_days"
+          :first_of_month_before_15th,
+          :date_of_hire,
+          :first_of_month,
+          :first_of_month_following,
+          :first_of_month_after_30_days,
+          :first_of_month_after_60_days
         ],
         application_period: {
           min: renewal_effective_period.min,
@@ -698,11 +700,12 @@ module BenefitSponsors
         "_id": benefit_market_catalog_id,
         application_interval_kind: :monthly,
         probation_period_kinds: [ 
-          "first_of_month_before_15th", 
-          "date_of_hire",
-          "first_of_month", 
-          "first_of_month_after_30_days", 
-          "first_of_month_after_60_days"
+          :first_of_month_before_15th,
+          :date_of_hire,
+          :first_of_month,
+          :first_of_month_following,
+          :first_of_month_after_30_days,
+          :first_of_month_after_60_days
         ],
         application_period: {
           min: effective_period.min,
@@ -756,11 +759,12 @@ module BenefitSponsors
         "_id": renewal_benefit_market_catalog_id,
         application_interval_kind: :monthly,
         probation_period_kinds: [ 
-          "first_of_month_before_15th", 
-          "date_of_hire",
-          "first_of_month", 
-          "first_of_month_after_30_days", 
-          "first_of_month_after_60_days"
+          :first_of_month_before_15th,
+          :date_of_hire,
+          :first_of_month,
+          :first_of_month_following,
+          :first_of_month_after_30_days,
+          :first_of_month_after_60_days
         ],
         application_period: {
           min: renewal_effective_period.min,
@@ -806,11 +810,12 @@ module BenefitSponsors
         "_id": benefit_market_catalog_id,
         application_interval_kind: :monthly,
         probation_period_kinds: [ 
-          "first_of_month_before_15th", 
-          "date_of_hire",
-          "first_of_month", 
-          "first_of_month_after_30_days", 
-          "first_of_month_after_60_days"
+          :first_of_month_before_15th,
+          :date_of_hire,
+          :first_of_month,
+          :first_of_month_following,
+          :first_of_month_after_30_days,
+          :first_of_month_after_60_days
         ],
         application_period: {
           min: effective_period.min,
@@ -860,11 +865,12 @@ module BenefitSponsors
         "_id": previous_benefit_market_catalog_id,
         application_interval_kind: :monthly,
         probation_period_kinds: [ 
-          "first_of_month_before_15th", 
-          "date_of_hire",
-          "first_of_month", 
-          "first_of_month_after_30_days", 
-          "first_of_month_after_60_days"
+          :first_of_month_before_15th,
+          :date_of_hire,
+          :first_of_month,
+          :first_of_month_following,
+          :first_of_month_after_30_days,
+          :first_of_month_after_60_days
         ],
         application_period: {
           min: previous_effective_period.min,
