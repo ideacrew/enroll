@@ -6,7 +6,7 @@ module Insured
     subject { Insured::Factories::SelfServiceFactory }
 
     describe "view methods" do
-      let (:family) { FactoryBot.create(:family, :with_primary_family_member) }
+      let (:family) { FactoryBot.create(:individual_market_family) }
       let (:sep) { FactoryBot.create(:special_enrollment_period, family: family) }
       let (:sbc_document) { FactoryBot.build(:document, subject: "SBC", identifier: "urn:openhbx#123") }
       let (:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, title: "AAA", issuer_profile_id: "ab1233", sbc_document: sbc_document) }
@@ -15,6 +15,7 @@ module Insured
       context "#find" do
         before :each do
           family.special_enrollment_periods << sep
+          # binding.pry
           @enrollment_id = enrollment.id
           @family_id     = family.id
           @qle           = QualifyingLifeEventKind.find(BSON::ObjectId.from_string(sep.qualifying_life_event_kind_id))
@@ -58,7 +59,7 @@ module Insured
         it "should terminate an enrollment if it is already effective" do
           subject.term_or_cancel(enrollment_to_term.id, TimeKeeper.date_of_record, 'terminate')
           enrollment_to_term.reload
-          expect(enrollment_to_term.aasm_state).to eq 'coverage_termination_pending'
+          expect(enrollment_to_term.aasm_state).to eq 'coverage_terminated'
         end
       end
     end
