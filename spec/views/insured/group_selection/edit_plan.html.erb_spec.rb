@@ -21,6 +21,8 @@ RSpec.describe "app/views/insured/group_selection/edit_plan.html.erb" do
       enrollment.rebuild_members_by_coverage_household(coverage_household: coverage_household)
       @self_term_or_cancel_form = ::Insured::Forms::SelfTermOrCancelForm.for_view({enrollment_id: enrollment.id, family_id: family.id})
       assign :self_term_or_cancel_form, @self_term_or_cancel_form
+      assign :should_term_or_cancel, @self_term_or_cancel_form.enrollment.should_term_or_cancel_ivl
+      assign :calendar_enabled, @should_term_or_cancel == 'cancel' ? false : true
 
       render :template =>"insured/group_selection/edit_plan.html.erb"
     end

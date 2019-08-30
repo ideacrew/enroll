@@ -21,6 +21,7 @@ module Insured
       context "#find" do
         before :each do
           family.special_enrollment_periods << sep
+          # binding.pry
           @enrollment_id = enrollment.id
           @family_id     = family.id
           @qle           = QualifyingLifeEventKind.find(BSON::ObjectId.from_string(sep.qualifying_life_event_kind_id))
