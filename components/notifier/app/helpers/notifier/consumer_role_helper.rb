@@ -9,7 +9,7 @@ module Notifier
                                       federal_tax_filing_status: filer_type(member['filer_type']),
                                       expected_income_for_coverage_year: member['actual_income'].present? ? ActionController::Base.helpers.number_to_currency(member['actual_income'], :precision => 0) : "",
                                       citizenship: citizen_status(member["citizen_status"]),
-                                      dc_resident: member['resident'],
+                                      dc_resident: member['resident'].capitalize,
                                       tax_household_size: member['tax_hh_count'],
                                       incarcerated: member['incarcerated'] == 'N' ? 'No' : 'Yes',
                                       other_coverage: member["mec"].presence || 'No',

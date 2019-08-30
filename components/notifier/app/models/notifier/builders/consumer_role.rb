@@ -68,7 +68,7 @@ module Notifier
           if uqhp_notice?
             consumer_role.person.age_on(TimeKeeper.date_of_record)
           else
-            (Date.current.year - Date.strptime(payload['notice_params']['primary_member']['dob'],"%m-%d-%Y").year)
+            (Date.current.year - Date.strptime(payload['notice_params']['primary_member']['dob'],"%m/%d/%Y").year)
           end
       end
 
@@ -197,7 +197,7 @@ module Notifier
       end
 
       def incarcerated
-        merge_model.incarcerated = payload['notice_params']['primary_member']['incarcerated'] == 'N' ? 'No' : 'Yes'
+        merge_model.incarcerated = (payload['notice_params']['primary_member']['incarcerated'] == 'N' || payload['notice_params']['primary_member']['incarcerated'] == '') ? 'No' : 'Yes'
       end
 
       def irs_consent
@@ -326,7 +326,7 @@ module Notifier
         csr
       end
 
-      def aqhp_event_and_irs_consent_not_needed?
+      def aqhp_event_and_irs_consent_no?
         return false if uqhp_notice?
 
         aqhp_event? && !irs_consent?
