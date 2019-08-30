@@ -84,7 +84,7 @@ module Insured::FamiliesHelper
 
     product_details.inject([]) do |data, element|
       data << element.to_s
-    end.join("&nbsp#{content_tag(:label, '', class: 'separator')}")
+    end.join("&nbsp<label class='separator'></label>").html_safe
   end
 
   def qle_link_generater(qle, index)
