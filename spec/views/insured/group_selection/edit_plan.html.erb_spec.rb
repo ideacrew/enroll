@@ -9,30 +9,31 @@ end
 
 RSpec.describe "app/views/insured/group_selection/edit_plan.html.erb" do
   context "Enrollment information and buttons" do
-
-    let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
-    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :individual_assisted, { household: family.households.first, family: family, enrollment_members: family.family_members })}
-    let(:benefit_sponsorship) { FactoryBot.create :benefit_sponsors_benefit_sponsorship, :with_benefit_market, :with_organization_cca_profile, :with_initial_benefit_application}
-    let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile) }
-    let(:qle) { FactoryBot.create(:qualifying_life_event_kind, market_kind:  "individual") }
-    let(:sep) {FactoryBot.create(:special_enrollment_period, family: family, qualifying_life_event_kind: qle) }
-    let(:current_user) { FactoryBot.create(:user) }
+    let (:family) { FactoryBot.create(:individual_market_family) }
+    let (:sep) { FactoryBot.create(:special_enrollment_period, family: family) }
+    let (:sbc_document) { FactoryBot.build(:document, subject: "SBC", identifier: "urn:openhbx#123") }
+    let (:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile, title: "AAA", sbc_document: sbc_document) }
+    let (:enrollment) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, :with_enrollment_members, family: family, product: product) }
 
     before(:each) do
-      allow(hbx_enrollment).to receive(:product).and_return(product)
-      @hbx_enrollment = hbx_enrollment
-      @sep = sep
-      @family = family
+      family.special_enrollment_periods << sep
+      coverage_household = family.active_household.coverage_households.first
+      enrollment.rebuild_members_by_coverage_household(coverage_household: coverage_household)
+      @self_term_or_cancel_form = ::Insured::Forms::SelfTermOrCancelForm.for_view({enrollment_id: enrollment.id, family_id: family.id})
+      assign :self_term_or_cancel_form, @self_term_or_cancel_form
+      assign :should_term_or_cancel, @self_term_or_cancel_form.enrollment.should_term_or_cancel_ivl
+      assign :calendar_enabled, @should_term_or_cancel == 'cancel' ? false : true
+
       render :template =>"insured/group_selection/edit_plan.html.erb"
     end
 
     it "should show the DCHL ID as hbx_enrollment.hbx_id" do
       expect(rendered).to match /DCHL ID/
-      expect(rendered).to match /#{hbx_enrollment.hbx_id}/
+      expect(rendered).to match /#{enrollment.hbx_id}/
     end
 
     it "should show the correct Premium" do
-      dollar_amount = number_to_currency(SpecHelperClassesForViews::InsuredFamiliesHelperSlugForGroupSelectionTermination.current_premium(hbx_enrollment), precision: 2)
+      dollar_amount = number_to_currency(SpecHelperClassesForViews::InsuredFamiliesHelperSlugForGroupSelectionTermination.current_premium(enrollment), precision: 2)
       expect(rendered).to match /Premium/
       expect(rendered).to include dollar_amount
     end
@@ -40,7 +41,6 @@ RSpec.describe "app/views/insured/group_selection/edit_plan.html.erb" do
     it "should show Cancel Plan button" do
       expect(rendered).to have_selector("a", text: "Cancel Plan",  count: 1)
     end
-    #TODO: appearance of shop for plans button & edit edit button
 
   end
 end
