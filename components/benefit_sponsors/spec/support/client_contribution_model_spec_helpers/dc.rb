@@ -7,8 +7,8 @@ module BenefitSponsors
         "sponsor_contribution_kind"=>
          "::BenefitSponsors::SponsoredBenefits::FixedPercentSponsorContribution",
         "contribution_calculator_kind"=>
-         "::BenefitSponsors::ContributionCalculators::CcaShopReferencePlanContributionCalculator",
-        "title"=>"MA List Bill Shop Contribution Model",
+         "::BenefitSponsors::ContributionCalculators::SimpleShopReferencePlanContributionCalculator",
+        "title"=>"DC List Bill Shop Contribution Model",
         "many_simultaneous_contribution_units"=>true,
         "contribution_units"=>
          [{"_id"=>BSON::ObjectId.new,

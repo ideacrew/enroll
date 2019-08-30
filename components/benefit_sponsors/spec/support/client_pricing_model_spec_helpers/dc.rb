@@ -5,8 +5,8 @@ module BenefitSponsors
       {"_id"=>BSON::ObjectId.new,
         "product_multiplicities"=>["multiple", "single"],
         "price_calculator_kind"=>
-         "::BenefitSponsors::PricingCalculators::CcaShopListBillPricingCalculator",
-        "name"=>"MA List Bill Shop Pricing Model",
+         "::BenefitSponsors::PricingCalculators::ShopSimpleListBillPricingCalculator",
+        "name"=>"DC List Bill Shop Pricing Model",
         "member_relationships"=>
          [{"_id"=>BSON::ObjectId.new,
            "relationship_name"=>:employee,

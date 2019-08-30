@@ -24,7 +24,7 @@ module BenefitSponsors
         title: "ACA SHOP",
         description: "DCHBX Shop Market",
         kind: :aca_shop,
-        site_urn: "dchbx",
+        site_urn: "dc",
         site_id: site_id,
         configuration: {
           _id: config_id,
@@ -90,7 +90,7 @@ module BenefitSponsors
       office_location_id = BSON::ObjectId.from_string('5bd8931fec969ce8e31386de')
       site_props = {
         _id: site_id,
-        site_key: :dchbx,
+        site_key: :dc,
         byline: "The Right Place for the Right Plan",
         short_name: "Health Connector",
         domain_name: "hbxshop.org",

@@ -135,6 +135,8 @@ module BenefitSponsors
       }
       BenefitMarkets::Locations::ServiceArea.collection.insert_one(state_service_area_props)
       renewal_id_1 = renewal_product_props.blank? ? nil : renewal_product_props[0]["_id"]
+      renewal_id_2 = renewal_product_props.blank? ? nil : renewal_product_props[1]["_id"]
+      renewal_id_3 = renewal_product_props.blank? ? nil : renewal_product_props[2]["_id"]
       product_1_props = dental_shop_product_props_for(
         issuer_profile_id,
         "Carrier 3 Dental Only - Dental - State",
@@ -146,8 +148,32 @@ module BenefitSponsors
         [:single_product],
         renewal_id_1
       )
+      product_2_props = dental_shop_product_props_for(
+        issuer_profile_id,
+        "Carrier 3 Dental Only - Dental - State",
+        "32345MA0260005",
+        effective_period,
+        "bronze",
+        state_service_area_id,
+        rating_area_id,
+        [:single_issuer],
+        renewal_id_2
+      )
+      product_3_props = dental_shop_product_props_for(
+        issuer_profile_id,
+        "Carrier 3 Dental Only - Dental - State",
+        "32345MA0260009",
+        effective_period,
+        "bronze",
+        state_service_area_id,
+        rating_area_id,
+        [:multi_product],
+        renewal_id_3
+      )
       product_props = [
-        product_1_props
+        product_1_props,
+        product_2_props,
+        product_3_props
       ]
       #BenefitMarkets::Products::Product.collection.insert_many(product_props)
       product_props
@@ -379,7 +405,7 @@ module BenefitSponsors
           abbrev: "C3DO",
           offers_sole_source: true,
           shop_dental: true,
-          shop_health: true
+          shop_health: false
         }]
       }
       ::BenefitSponsors::Organizations::Organization.collection.insert_many([
@@ -433,11 +459,31 @@ module BenefitSponsors
       }
     end
 
+    def metal_level_health_product_package_from_product_props(product_props_list, effective_period)
+      selected_products = product_props_list.select do |p_props|
+        p_props[:product_package_kinds].include?(:metal_level) && (p_props[:kind] == :health)
+      end
+      product_package_id = BSON::ObjectId.new
+      {
+        "_id": product_package_id,
+        title: "Metal Level",
+        application_period: {
+          min: effective_period.min,
+          max: effective_period.max
+        },
+        benefit_kind: :aca_shop,
+        product_kind: :health,
+        package_kind: :metal_level,
+        products: selected_products,
+        pricing_model: ::BenefitSponsors::PricingModelSpecHelpers.list_bill_pricing_model,
+        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.list_bill_contribution_model
+      }
+    end
+
     def single_issuer_health_product_package_from_product_props(product_props_list, effective_period)
       selected_products = product_props_list.select do |p_props|
         p_props[:product_package_kinds].include?(:single_issuer) && (p_props[:kind] == :health)
       end
-      raise "WAT" if selected_products.blank?
       product_package_id = BSON::ObjectId.new
       {
         "_id": product_package_id,
@@ -476,6 +522,48 @@ module BenefitSponsors
       }
     end
 
+    def dental_multi_product_package_from_product_props(product_props_list, effective_period)
+      selected_products = product_props_list.select do |p_props|
+        p_props[:product_package_kinds].include?(:multi_product) && (p_props[:kind] == :dental)
+      end
+      product_package_id = BSON::ObjectId.new
+      {
+        "_id": product_package_id,
+        title: "Dental - Multi-Product",
+        application_period: {
+          min: effective_period.min,
+          max: effective_period.max
+        },
+        benefit_kind: :aca_shop,
+        product_kind: :dental,
+        package_kind: :multi_product,
+        products: selected_products,
+        pricing_model: ::BenefitSponsors::PricingModelSpecHelpers.list_bill_pricing_model,
+        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.list_bill_contribution_model
+      }
+    end
+
+    def dental_single_issuer_product_package_from_product_props(product_props_list, effective_period)
+      selected_products = product_props_list.select do |p_props|
+        p_props[:product_package_kinds].include?(:single_issuer) && (p_props[:kind] == :dental)
+      end
+      product_package_id = BSON::ObjectId.new
+      {
+        "_id": product_package_id,
+        title: "Dental - Single Issuer",
+        application_period: {
+          min: effective_period.min,
+          max: effective_period.max
+        },
+        benefit_kind: :aca_shop,
+        product_kind: :dental,
+        package_kind: :single_issuer,
+        products: selected_products,
+        pricing_model: ::BenefitSponsors::PricingModelSpecHelpers.list_bill_pricing_model,
+        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.list_bill_contribution_model
+      }
+    end
+
     def dental_single_product_product_package_from_product_props(product_props_list, effective_period)
       selected_products = product_props_list.select do |p_props|
         p_props[:product_package_kinds].include?(:single_product) && (p_props[:kind] == :dental)
@@ -483,7 +571,7 @@ module BenefitSponsors
       product_package_id = BSON::ObjectId.new
       {
         "_id": product_package_id,
-        title: "Dental",
+        title: "Dental - Single Product",
         application_period: {
           min: effective_period.min,
           max: effective_period.max
@@ -517,9 +605,11 @@ module BenefitSponsors
         title: "MA Health Connector SHOP Benefit Catalog",
         benefit_market_id: benefit_market._id,
         product_packages: [
+         metal_level_health_product_package_from_product_props(product_list, effective_period),
          sole_source_health_product_package_from_product_props(product_list, effective_period),
          single_issuer_health_product_package_from_product_props(product_list, effective_period),
-         dental_single_product_product_package_from_product_props(product_list, effective_period)
+         dental_single_product_product_package_from_product_props(product_list, effective_period),
+         dental_single_issuer_product_package_from_product_props(product_list, effective_period)
         ]
       }
       BenefitMarkets::BenefitMarketCatalog.collection.insert_one(benefit_market_catalog_props)
@@ -572,9 +662,12 @@ module BenefitSponsors
         title: "MA Health Connector SHOP Benefit Catalog",
         benefit_market_id: benefit_market._id,
         product_packages: [
+         metal_level_health_product_package_from_product_props(renewal_product_list, renewal_effective_period),
          sole_source_health_product_package_from_product_props(renewal_product_list, renewal_effective_period),
          single_issuer_health_product_package_from_product_props(renewal_product_list, renewal_effective_period),
-         dental_single_product_product_package_from_product_props(renewal_product_list, renewal_effective_period)
+         dental_single_product_product_package_from_product_props(renewal_product_list, renewal_effective_period),
+         dental_single_issuer_product_package_from_product_props(renewal_product_list, renewal_effective_period),
+         dental_multi_product_package_from_product_props(renewal_product_list, renewal_effective_period)
         ]
       }
 
@@ -618,9 +711,12 @@ module BenefitSponsors
         title: "MA Health Connector SHOP Benefit Catalog",
         benefit_market_id: benefit_market._id,
         product_packages: [
+         metal_level_health_product_package_from_product_props(product_list, effective_period),
          sole_source_health_product_package_from_product_props(product_list, effective_period),
          single_issuer_health_product_package_from_product_props(product_list, effective_period),
-         dental_single_product_product_package_from_product_props(product_list, effective_period)
+         dental_single_product_product_package_from_product_props(product_list, effective_period),
+         dental_single_issuer_product_package_from_product_props(product_list, effective_period),
+         dental_multi_product_package_from_product_props(product_list, effective_period)
         ]
       }
       #BenefitMarkets::BenefitMarketCatalog.collection.insert_one(benefit_market_catalog_props)
@@ -673,9 +769,12 @@ module BenefitSponsors
         title: "MA Health Connector SHOP Benefit Catalog",
         benefit_market_id: benefit_market._id,
         product_packages: [
-         sole_source_health_product_package_from_product_props(renewal_product_list, renewal_effective_period),
-         single_issuer_health_product_package_from_product_props(renewal_product_list, renewal_effective_period),
-         dental_single_product_product_package_from_product_props(renewal_product_list, renewal_effective_period)
+          metal_level_health_product_package_from_product_props(renewal_product_list, renewal_effective_period),
+          sole_source_health_product_package_from_product_props(renewal_product_list, renewal_effective_period),
+          single_issuer_health_product_package_from_product_props(renewal_product_list, renewal_effective_period),
+          dental_single_product_product_package_from_product_props(renewal_product_list, renewal_effective_period),
+          dental_single_issuer_product_package_from_product_props(renewal_product_list, renewal_effective_period),
+          dental_multi_product_package_from_product_props(renewal_product_list, renewal_effective_period)
         ]
       }
       #BenefitMarkets::BenefitMarketCatalog.collection.insert_one(renewal_benefit_market_catalog_props)
@@ -720,9 +819,12 @@ module BenefitSponsors
         title: "MA Health Connector SHOP Benefit Catalog",
         benefit_market_id: benefit_market._id,
         product_packages: [
+         metal_level_health_product_package_from_product_props(product_list, effective_period),
          sole_source_health_product_package_from_product_props(product_list, effective_period),
          single_issuer_health_product_package_from_product_props(product_list, effective_period),
-         dental_single_product_product_package_from_product_props(product_list, effective_period)
+         dental_single_product_product_package_from_product_props(product_list, effective_period),
+         dental_single_issuer_product_package_from_product_props(product_list, effective_period),
+         dental_multi_product_package_from_product_props(product_list, effective_period)
         ]
       }
       #BenefitMarkets::BenefitMarketCatalog.collection.insert_one(benefit_market_catalog_props)
@@ -771,9 +873,12 @@ module BenefitSponsors
         title: "MA Health Connector SHOP Benefit Catalog",
         benefit_market_id: benefit_market._id,
         product_packages: [
+         metal_level_health_product_package_from_product_props(previous_product_list, previous_effective_period),
          sole_source_health_product_package_from_product_props(previous_product_list, previous_effective_period),
          single_issuer_health_product_package_from_product_props(previous_product_list, previous_effective_period),
-         dental_single_product_product_package_from_product_props(previous_product_list, previous_effective_period)
+         dental_single_product_product_package_from_product_props(previous_product_list, previous_effective_period),
+         dental_single_issuer_product_package_from_product_props(previous_product_list, previous_effective_period),
+         dental_multi_product_package_from_product_props(previous_product_list, previous_effective_period)
         ]
       }
       #BenefitMarkets::BenefitMarketCatalog.collection.insert_one(previous_benefit_market_catalog_props)
