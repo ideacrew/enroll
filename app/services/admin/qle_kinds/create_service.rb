@@ -77,8 +77,8 @@ module Admin
       end
 
       def create_record_questions_and_responses(qle_kind, request)
-        if request.questions.present?
-          request.questions.each do |question_hash|
+        if request.custom_qle_question.present?
+          request.custom_qle_question.each do |question_hash|
             if create_record_question(qle_kind, question_hash)
               custom_qle_question = qle_kind.custom_qle_questions.last
               question_hash["responses"].each do |response_hash|
@@ -102,8 +102,8 @@ module Admin
           is_active: false,
           post_event_sep_in_days: request.post_event_sep_in_days,
           tool_tip: request.tool_tip,
-          reason: request.reason,
-          action_kind: request.action_kind,
+          reason: request.reason.split('').drop(3).join(''),
+          action_kind: request.action_kind.split('').drop(3).join(''),
           end_on: request.end_on,
           start_on: request.start_on,
         )

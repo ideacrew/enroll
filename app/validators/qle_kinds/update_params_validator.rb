@@ -7,7 +7,8 @@ module QleKinds
       required(:post_event_sep_in_days).filled
       required(:effective_on_kinds).value(:array?, min_size?: 1)
       required(:market_kind).value(:filled?, included_in?: QualifyingLifeEventKind::MARKET_KINDS)
-      required(:is_self_attested).filled(::Dry::Types["params.bool"])
+      optional(:is_self_attested).filled(::Dry::Types["params.bool"])
+      optional(:visible_to_customer).filled(::Dry::Types["params.bool"])
       optional(:action_kind).maybe(:str?)
       optional(:custom_qle_questions).maybe(:array?)
       optional(:tool_tip).maybe(:str?)
