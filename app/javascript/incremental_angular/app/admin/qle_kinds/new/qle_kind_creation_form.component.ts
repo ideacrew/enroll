@@ -69,13 +69,13 @@ export class QleKindCreationFormComponent {
     var formGroup = formBuilder.group({
       title: ['', Validators.required],
       tool_tip: ['', [Validators.required, Validators.minLength(1)]],
-      action_kind: [''],
-      reason: [''],
+      action_kind: ['not_applicable'],
+      reason: ['not_applicable'],
       market_kind: ['', [Validators.required, Validators.minLength(1)]],
       is_self_attested: [''],
       visible_to_customer: [''],
       effective_on_kinds:  new FormArray([]),
-      questions: qControls,
+      custom_qle_questions: qControls,
       pre_event_sep_in_days:[0, Validators.required],
       post_event_sep_in_days:[0, Validators.required],
       start_on: [''],   
@@ -146,11 +146,50 @@ export class QleKindCreationFormComponent {
 
   //taking array of booleans and mapping them to the effectiveOnOptionsArray of objects 
   updateEffectiveOnKinds() : void{
-    this.creationFormGroup.value.effective_on_kinds.forEach((o:boolean, i:number) => {
-      this.effectiveOnOptionsArray[i].selected = o
+   var updatedArray = this.creationFormGroup.value.effective_on_kinds.map((o:boolean, i:number) => {
+      if (o==true){
+        return this.effectiveOnOptionsArray[i].name
+      }
+    })
+    this.creationFormGroup.value.effective_on_kinds = updatedArray
+  }
+
+  //traverse dom for selected actionKind
+  updateActionKind(): void {
+    var actionKinds = document.getElementById("qle_kind_creation_form_action_kind");
+    if(actionKinds != null){
+      Array.from(actionKinds.querySelectorAll('option')).forEach((kind) => {
+        if(kind.selected == true){
+          var actionKind = kind.value
+          this.creationFormGroup.value.action_kind = actionKind
+        }    
+      });
     } 
-    )
-    this.creationFormGroup.value.effective_on_kinds = this.effectiveOnOptionsArray
+  }
+
+  //traverse dom for selected reason
+  updateReason() : void {
+    var reasons = document.getElementById("qle_kind_creation_form_reason");
+    if(reasons != null){
+      Array.from(reasons.querySelectorAll('option')).forEach((reason) => {
+        if(reason.selected == true){
+          var Selectedreason = reason.value
+          this.creationFormGroup.value.reason = Selectedreason
+        }    
+      });
+    }
+  }
+
+  updateReasonAndActionKind() : void {
+    this.updateActionKind()
+    this.updateReason()
+  }
+
+  formatOuput() : void {
+    //this formats the outgoing EffectiveOnKinds to return the effective on kind name if the boolean is true
+    this.updateEffectiveOnKinds()
+    //this is a hack to read the DOM for the selected option because currently the selectric library is overriding our select tags
+    this.updateReasonAndActionKind()
   }
 
   submitCreation() {
@@ -158,7 +197,7 @@ export class QleKindCreationFormComponent {
     var errorMapper = new ErrorMapper();
     if (this.creationFormGroup != null) {
       if (this.creationUri != null) {  
-        this.updateEffectiveOnKinds()
+        this.formatOuput()
         console.log(this.creationFormGroup.value);
         var invocation = this.CreationService.submitCreate(this.creationUri, <QleKindCreationRequest>this.creationFormGroup.value);
         invocation.subscribe(
