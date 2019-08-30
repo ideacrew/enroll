@@ -131,7 +131,7 @@ When(/^the Admin clicks “Continue” on the doc upload page$/) do
 end
 
 Then(/^the Admin is unable to complete the application for the consumer until ID is verified$/) do
-  find('.interaction-click-control-continue')['disabled'].should == "disabled"
+  expect(['disabled', 'true']).to include(find('.interaction-click-control-continue')['disabled'])
 end
 
 
