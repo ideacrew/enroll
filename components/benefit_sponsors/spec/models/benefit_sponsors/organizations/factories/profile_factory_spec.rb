@@ -156,7 +156,10 @@ module BenefitSponsors
 
     context '.persist' do
       context 'when type is benefit sponsor' do
-        let(:profile_factory) { profile_factory_class.call(valid_employer_params) }
+        let(:profile_factory) do
+          site
+          profile_factory_class.call(valid_employer_params)
+        end
 
         it 'should create general organization with given fein' do
           expect(profile_factory.organization.class).to eq BenefitSponsors::Organizations::GeneralOrganization
