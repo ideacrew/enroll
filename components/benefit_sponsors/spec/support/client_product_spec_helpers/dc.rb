@@ -24,7 +24,7 @@ module BenefitSponsors
         ehb: 0.9942,
         dental_plan_kind: "hmo",
         metal_level_kind: :dental,
-        benefit_market_kind: "aca_shop",
+        benefit_market_kind: :aca_shop,
         title: title,
         issuer_profile_id: issuer_profile_id,
         hios_id: "#{hios_base}-01",
@@ -56,7 +56,10 @@ module BenefitSponsors
             }]
           }
         ],
-        renewal_product_id: renewal_product_id
+        is_reference_plan_eligible: true,
+        renewal_product_id: renewal_product_id,
+        is_standard_plan: true,
+        hsa_eligibility: true
       }
     end
 
@@ -112,6 +115,9 @@ module BenefitSponsors
             }]
           }
         ],
+        is_reference_plan_eligible: true,
+        is_standard_plan: true,
+        hsa_eligibility: true,
         renewal_product_id: renewal_product_id
       }
     end
@@ -142,7 +148,7 @@ module BenefitSponsors
         "Carrier 3 Dental Only - Dental - State",
         "32345MA0260001",
         effective_period,
-        "bronze",
+        :dental,
         state_service_area_id,
         rating_area_id,
         [:single_product],
@@ -153,7 +159,7 @@ module BenefitSponsors
         "Carrier 3 Dental Only - Dental - State",
         "32345MA0260005",
         effective_period,
-        "bronze",
+        :dental,
         state_service_area_id,
         rating_area_id,
         [:single_issuer],
@@ -162,9 +168,9 @@ module BenefitSponsors
       product_3_props = dental_shop_product_props_for(
         issuer_profile_id,
         "Carrier 3 Dental Only - Dental - State",
-        "32345MA0260009",
+        "32345MA0260029",
         effective_period,
-        "bronze",
+        :dental,
         state_service_area_id,
         rating_area_id,
         [:multi_product],
@@ -239,7 +245,7 @@ module BenefitSponsors
         "Carrier 2 Health and Dental - Dental",
         "22345MA0260005",
         effective_period,
-        "bronze",
+        :dental,
         state_service_area_id,
         rating_area_id,
         [:single_product],
@@ -610,7 +616,8 @@ module BenefitSponsors
          sole_source_health_product_package_from_product_props(product_list, effective_period),
          single_issuer_health_product_package_from_product_props(product_list, effective_period),
          dental_single_product_product_package_from_product_props(product_list, effective_period),
-         dental_single_issuer_product_package_from_product_props(product_list, effective_period)
+         dental_single_issuer_product_package_from_product_props(product_list, effective_period),
+         dental_multi_product_package_from_product_props(product_list, effective_period)
         ]
       }
       BenefitMarkets::BenefitMarketCatalog.collection.insert_one(benefit_market_catalog_props)
@@ -830,7 +837,45 @@ module BenefitSponsors
          dental_single_product_product_package_from_product_props(product_list, effective_period),
          dental_single_issuer_product_package_from_product_props(product_list, effective_period),
          dental_multi_product_package_from_product_props(product_list, effective_period)
-        ]
+        ],
+=begin
+        sponsor_market_policy: {
+          _type: "::BenefitMarkets::MarketPolicies::SponsorMarketPolicy",
+          _id: BSON::ObjectId.new,
+          roster_size_rule: {
+            min: 0,
+            max: 0
+          },
+          full_time_employee_size_rule: {
+            min: 0,
+            max: 0
+          },
+          part_time_employee_size_rule: {
+            min: 0,
+            max: 0
+          },
+          rostered_non_owner_size_rule: 0,
+          benefit_categories: [ :any ]
+        },
+        member_market_policy: {
+          _type: "::BenefitMarkets::MarketPolicies::MemberMarketPolicy",
+          _id: BSON::ObjectId.new,
+          age_range_policy: {
+            min: 0,
+            max: 0
+          },
+          child_age_off_policy: 26,
+          incarceration_status_policy: [:any],
+          citizenship_status_policy: [:any],
+          residency_status_policy: [:any],
+          ethnicity_policy: [:any],
+          product_dependencies_policy: [:any],
+          cost_sharing_policy: "",
+          lawful_presence_status_policy: ""
+        },
+=end
+        created_at: Time.now,
+        updated_at: Time.now
       }
       #BenefitMarkets::BenefitMarketCatalog.collection.insert_one(benefit_market_catalog_props)
 
