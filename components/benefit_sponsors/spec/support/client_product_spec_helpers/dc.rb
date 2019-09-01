@@ -591,6 +591,48 @@ module BenefitSponsors
       }
     end
 
+    def shared_benefit_market_catalog_properties
+=begin
+      {
+        sponsor_market_policy: {
+          _type: "BenefitMarkets::MarketPolicies::SponsorMarketPolicy",
+          _id: BSON::ObjectId.new,
+          roster_size_rule: {
+            min: 0,
+            max: 0
+          },
+          full_time_employee_size_rule: {
+            min: 0,
+            max: 0
+          },
+          part_time_employee_size_rule: {
+            min: 0,
+            max: 0
+          },
+          rostered_non_owner_size_rule: 0,
+          benefit_categories: [ :any ]
+        },
+        member_market_policy: {
+          _type: "BenefitMarkets::MarketPolicies::MemberMarketPolicy",
+          _id: BSON::ObjectId.new,
+          age_range_policy: {
+            min: 0,
+            max: 0
+          },
+          child_age_off_policy: 26,
+          incarceration_status_policy: [:any],
+          citizenship_status_policy: [:any],
+          residency_status_policy: [:any],
+          ethnicity_policy: [:any],
+          product_dependencies_policy: [:any],
+          cost_sharing_policy: "",
+          lawful_presence_status_policy: ""
+        }
+      }
+=end
+      {}
+    end
+
     def construct_simple_benefit_market_catalog(site, benefit_market, effective_period)
       product_list = build_carriers_and_plans_for_effective_period_at(site, effective_period)
       benefit_market_catalog_id = BSON::ObjectId.new
@@ -787,7 +829,7 @@ module BenefitSponsors
           dental_single_issuer_product_package_from_product_props(renewal_product_list, renewal_effective_period),
           dental_multi_product_package_from_product_props(renewal_product_list, renewal_effective_period)
         ]
-      }
+      }.merge(shared_benefit_market_catalog_properties)
       #BenefitMarkets::BenefitMarketCatalog.collection.insert_one(renewal_benefit_market_catalog_props)
 
       rating_area_id = BenefitSponsors::ProductSpecHelpers.create_rating_areas(effective_period)
@@ -838,45 +880,9 @@ module BenefitSponsors
          dental_single_issuer_product_package_from_product_props(product_list, effective_period),
          dental_multi_product_package_from_product_props(product_list, effective_period)
         ],
-=begin
-        sponsor_market_policy: {
-          _type: "::BenefitMarkets::MarketPolicies::SponsorMarketPolicy",
-          _id: BSON::ObjectId.new,
-          roster_size_rule: {
-            min: 0,
-            max: 0
-          },
-          full_time_employee_size_rule: {
-            min: 0,
-            max: 0
-          },
-          part_time_employee_size_rule: {
-            min: 0,
-            max: 0
-          },
-          rostered_non_owner_size_rule: 0,
-          benefit_categories: [ :any ]
-        },
-        member_market_policy: {
-          _type: "::BenefitMarkets::MarketPolicies::MemberMarketPolicy",
-          _id: BSON::ObjectId.new,
-          age_range_policy: {
-            min: 0,
-            max: 0
-          },
-          child_age_off_policy: 26,
-          incarceration_status_policy: [:any],
-          citizenship_status_policy: [:any],
-          residency_status_policy: [:any],
-          ethnicity_policy: [:any],
-          product_dependencies_policy: [:any],
-          cost_sharing_policy: "",
-          lawful_presence_status_policy: ""
-        },
-=end
         created_at: Time.now,
         updated_at: Time.now
-      }
+      }.merge(shared_benefit_market_catalog_properties)
       #BenefitMarkets::BenefitMarketCatalog.collection.insert_one(benefit_market_catalog_props)
 
       previous_ep_min = effective_period.min - 1.year
@@ -931,7 +937,7 @@ module BenefitSponsors
          dental_single_issuer_product_package_from_product_props(previous_product_list, previous_effective_period),
          dental_multi_product_package_from_product_props(previous_product_list, previous_effective_period)
         ]
-      }
+      }.merge(shared_benefit_market_catalog_properties)
       #BenefitMarkets::BenefitMarketCatalog.collection.insert_one(previous_benefit_market_catalog_props)
 
       BenefitMarkets::BenefitMarketCatalog.collection.insert_many([renewal_benefit_market_catalog_props, benefit_market_catalog_props, previous_benefit_market_catalog_props])
