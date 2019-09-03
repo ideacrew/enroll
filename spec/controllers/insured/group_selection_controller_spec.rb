@@ -327,11 +327,11 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     end
 
     context "GET edit_plan" do
-      let (:edit_family) { FactoryBot.create(:family, :with_primary_family_member) }
-      let (:sep) { FactoryBot.create(:special_enrollment_period, family: edit_family) }
-      let (:sbc_document) { FactoryBot.build(:document, subject: "SBC", identifier: "urn:openhbx#123") }
-      let (:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile, title: "AAA", sbc_document: sbc_document) }
-      let (:edit_enrollment) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: edit_family, product: product) }
+      let(:edit_family) { FactoryBot.create(:family, :with_primary_family_member) }
+      let(:sep) { FactoryBot.create(:special_enrollment_period, family: edit_family) }
+      let(:sbc_document) { FactoryBot.build(:document, subject: "SBC", identifier: "urn:openhbx#123") }
+      let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile, title: "AAA", sbc_document: sbc_document) }
+      let(:edit_enrollment) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: edit_family, product: product) }
 
       it "return http success and render" do
         sign_in
