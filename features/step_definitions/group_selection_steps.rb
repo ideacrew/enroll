@@ -79,7 +79,8 @@ And(/(.*) also has a health enrollment with primary person covered/) do |role|
   family = Family.all.first
   qle = FactoryBot.create(:qualifying_life_event_kind,market_kind: @employee_role.present? ? "employer_sponsored" : "individual")
   sep = FactoryBot.create(:special_enrollment_period, family: family, qualifying_life_event_kind_id: qle.id)
-  product = FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile)
+  document = FactoryBot.build(:document, identifier: '525252')
+  product = FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile, sbc_document: document)
   enrollment = FactoryBot.create(:hbx_enrollment, product: product,
                                   household: family.active_household,
                                   family: family,
@@ -416,8 +417,8 @@ When(/(.*) clicks the submit button/) do |_role|
   click_button('Are you sure?')
 end
 
-Then(/the enrollment should be pending termination/) do
-  expect(Family.all.first.all_enrollments.first.aasm_state).to eq('coverage_termination_pending')
+Then(/the enrollment should be terminated/) do
+  expect(Family.all.first.all_enrollments.first.aasm_state).to eq('coverage_terminated')
   expect(page).to have_content('Coverage End: ' + (TimeKeeper.date_of_record + 10).to_s)
 end
 
