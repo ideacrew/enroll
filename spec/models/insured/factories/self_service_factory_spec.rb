@@ -8,11 +8,11 @@ module Insured
     subject { Insured::Factories::SelfServiceFactory }
 
     describe "view methods" do
-      let (:family) { FactoryBot.create(:individual_market_family) }
-      let (:sep) { FactoryBot.create(:special_enrollment_period, family: family) }
-      let (:sbc_document) { FactoryBot.build(:document, subject: "SBC", identifier: "urn:openhbx#123") }
-      let (:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, title: "AAA", issuer_profile_id: "ab1233", sbc_document: sbc_document) }
-      let (:enrollment) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product) }
+      let(:family) { FactoryBot.create(:individual_market_family) }
+      let(:sep) { FactoryBot.create(:special_enrollment_period, family: family) }
+      let(:sbc_document) { FactoryBot.build(:document, subject: "SBC", identifier: "urn:openhbx#123") }
+      let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, title: "AAA", issuer_profile_id: "ab1233", sbc_document: sbc_document) }
+      let(:enrollment) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product) }
 
       context "#find" do
         before :each do
