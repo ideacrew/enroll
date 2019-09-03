@@ -5,6 +5,10 @@ require 'rails_helper'
 module Insured
   RSpec.describe Factories::SelfServiceFactory, type: :model, dbclean: :after_each do
 
+    before :all do
+      DatabaseCleaner.clean
+    end
+
     subject { Insured::Factories::SelfServiceFactory }
 
     describe "view methods" do
@@ -17,7 +21,6 @@ module Insured
       context "#find" do
         before :each do
           family.special_enrollment_periods << sep
-          # binding.pry
           @enrollment_id = enrollment.id
           @family_id     = family.id
           @qle           = QualifyingLifeEventKind.find(BSON::ObjectId.from_string(sep.qualifying_life_event_kind_id))
