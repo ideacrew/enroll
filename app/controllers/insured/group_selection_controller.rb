@@ -172,9 +172,6 @@ class Insured::GroupSelectionController < ApplicationController
 
   def edit_plan
     @self_term_or_cancel_form = ::Insured::Forms::SelfTermOrCancelForm.for_view({enrollment_id: params.require(:hbx_enrollment_id), family_id: params.require(:family_id)})
-
-    @should_term_or_cancel = @self_term_or_cancel_form.enrollment.should_term_or_cancel_ivl
-    @calendar_enabled      = @should_term_or_cancel == 'cancel' ? false : true
   end
 
   def term_or_cancel
