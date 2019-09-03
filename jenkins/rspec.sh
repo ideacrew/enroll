@@ -26,5 +26,6 @@ done
 cd $root
 
 rm -Rf ./coverage
+rm -Rf ./tmp/rspec_junit_*.xml
 bundle install
 COVERAGE=true bundle exec rake parallel:spec[4]
