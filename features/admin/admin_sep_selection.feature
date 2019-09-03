@@ -34,10 +34,6 @@ Feature: Purchasing through SEP
     When I click the "Had a baby" in qle carousel
     And I select a past qle date
     Then I should see confirmation and continue
-    Then I can see the error message Please Select Effective Date
-    And I select a effective date from list
-    And I click on continue button on select effective date
-    When I click on continue button on household info form
 
   Scenario: Admin attempts to purchase the an insured user through sep, but sep not visible
     Given Individual has not signed up as an HBX user

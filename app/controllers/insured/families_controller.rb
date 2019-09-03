@@ -373,6 +373,15 @@ class Insured::FamiliesController < FamiliesController
     authorize Family, :can_view_entire_family_enrollment_history?
   end
 
+  def record_end_user_custom_qle_response(end_user_selected_response_content)
+    CustomQleEndUserResponse.create!(
+      response_submitted: end_user_selected_response_content,
+      user_id: current_user.present? ? current_user._id.to_s : '',
+      qualifying_life_event_kind_id: @qle_kind._id.to_s,
+      qualifying_life_event_custom_qle_question_id: @custom_qle_question._id.to_s
+    )
+  end
+
   def trigger_ivl_to_cdc_transition_notice
     person =  @family.primary_applicant.person
     begin
