@@ -49,14 +49,39 @@ class Insured::FamiliesController < FamiliesController
   # TODO: Move this entire view into some kind of angular component or javascript parital that takes place on the
   # families home page to keep it all there. Use the verify_custom_qle_question post method to process the responses.
   def custom_qle_question
-    init_custom_qle_question
+    @qle_kind = QualifyingLifeEventKind.find(params[:id])
+    # TODO: Consider adding an attribute to the question model to easily denote the first or second question.
+    # that will simplify query logic.
+    if params[:only_display_question_two].present? && @qle_kind.custom_qle_questions.count == 2
+      # TODO: Add a query to only initialize the first question, whose answer doesn't include a
+      # response that equals to_question_2
+      @qle_question = @qle_kind.custom_qle_questions.last
+      # @qle_question = @qle_kind.custom_qle_questions.where(:'custom_qle_responses.action_to_take'.nin => %w[to_question_2]).first
+    else
+      # TODO: Add a query here to only initialize the one with a response that
+      # isn't to_question_2, because maximum of two questions
+      @qle_question = @qle_kind.custom_qle_questions.first
+      # @qle_question = @qle_kind.custom_qle_questions.where(:'custom_qle_responses.action_to_take'.in => %w[to_question_2]).first
+    end
   end
 
   # Error messages taken from qle.js.erb
   def verify_custom_qle_question
-    init_custom_qle_question_verification
+    @family = Family.find(params[:question_and_responses][:family_id])
+    @qle_date = params[:question_and_responses][:qle_date]
+    @qle_kind = QualifyingLifeEventKind.find(params[:question_and_responses][:qle_kind_id])
+    @custom_qle_question =  @qle_kind.custom_qle_questions.where(_id: params[:question_and_responses][:custom_qle_question_id]).first
+    end_user_selected_response_content = params[:question_and_responses][:end_user_selected_response_content]
+    record_end_user_custom_qle_response(end_user_selected_response_content)
+    custom_qle_questions = @qle_kind.custom_qle_questions
+    @action_to_take = @qle_kind.custom_qle_questions.where(
+      'custom_qle_responses.content' => end_user_selected_response_content
+    ).first.custom_qle_responses.where(content: end_user_selected_response_content).first.action_to_take
+    @qle_reason_val_string = '' # TODO: Need to determine what this is about.
+    @person = current_user.person
     ineligible_message = "Based on the information you have provided, you are not eligible for this special enrollment period. " \
     "If you have questions or would like to provide additional information, please contact DC Health Link customer service at (855) 532-5465."
+    @validator = CustomQleDateValidator.new(@qle_kind._id.to_s, @qle_date, @qle_reason_val_string, @person._id.to_s)
     redirect_to(action: "home", flash: { error: message }) unless @validator.qualifying_qle_date?
     case @action_to_take
     when 'accepted'
@@ -390,47 +415,6 @@ class Insured::FamiliesController < FamiliesController
 
   def find_or_build_consumer_role
     @family.check_for_consumer_role
-  end
-
-  def init_custom_qle_question_verification
-    @family = Family.find(params[:question_and_responses][:family_id])
-    @qle_date = params[:question_and_responses][:qle_date]
-    @qle_kind = QualifyingLifeEventKind.find(params[:question_and_responses][:qle_kind_id])
-    @custom_qle_question =  @qle_kind.custom_qle_questions.where(_id: params[:question_and_responses][:custom_qle_question_id]).first
-    end_user_selected_response_content = params[:question_and_responses][:end_user_selected_response_content]
-    record_end_user_custom_qle_response(end_user_selected_response_content)
-    custom_qle_questions = @qle_kind.custom_qle_questions
-    @action_to_take = @qle_kind.custom_qle_questions.where(
-      'custom_qle_responses.content' => end_user_selected_response_content
-    ).first.custom_qle_responses.where(content: end_user_selected_response_content).first.action_to_take
-    @qle_reason_val_string = '' # TODO: Need to determine what this is about.
-    @person = current_user.person
-  end
-
-  def record_end_user_custom_qle_response(end_user_selected_response_content)
-    CustomQleEndUserResponse.create!(
-      response_submitted: end_user_selected_response_content,
-      user_id: current_user.present? ? current_user._id.to_s : '',
-      qualifying_life_event_kind_id: @qle_kind._id.to_s,
-      qualifying_life_event_custom_qle_question_id: @custom_qle_question._id.to_s,
-    )
-  end
-
-  def init_custom_qle_question
-    @qle_kind = QualifyingLifeEventKind.find(params[:id])
-    # TODO: Consider adding an attribute to the question model to easily denote the first or second question.
-    # that will simplify query logic.
-    if params[:only_display_question_two].present? && @qle_kind.custom_qle_questions.count == 2
-      # TODO: Add a query to only initialize the first question, whose answer doesn't include a
-      # response that equals to_question_2
-      @qle_question = @qle_kind.custom_qle_questions.last
-      # @qle_question = @qle_kind.custom_qle_questions.where(:'custom_qle_responses.action_to_take'.nin => %w[to_question_2]).first
-    else
-      # TODO: Add a query here to only initialize the one with a response that
-      # isn't to_question_2, because maximum of two questions
-      @qle_question = @qle_kind.custom_qle_questions.first
-      # @qle_question = @qle_kind.custom_qle_questions.where(:'custom_qle_responses.action_to_take'.in => %w[to_question_2]).first
-    end
   end
 
   def init_qualifying_life_events
