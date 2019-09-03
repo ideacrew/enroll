@@ -9,7 +9,8 @@ module QualifyingLifeEventKindWorld
     @qle_kind ||= FactoryBot.create(
       :qualifying_life_event_kind,
       title: qle_kind_title.present? ? qle_kind_title : 'Married',
-      market_kind: market_kind
+      market_kind: market_kind,
+      event_kind_label: qle_kind_title.present? ? qle_kind_title + " took place on" : "Qualifying Life Event took place on"
     )
   end
 
