@@ -122,7 +122,9 @@
                 <%= hidden_field_tag :hbx_enrollment_id, hbx_enrollment[:id] %>
                 <%= hidden_field_tag :term_or_cancel,    @should_term_or_cancel %>
                 <div class="col-xs-3" style="float:right;">
-                  <% if @calendar_enabled %>
+                  <% term_or_cancel = @self_term_or_cancel_form.enrollment.should_term_or_cancel_ivl %>
+                  <%calendar_enabled = !(term_or_cancel == 'cancel') %>
+                  <% if calendar_enabled %>
                     <h5 id="enter-text">Enter the date of cancellation</h5>
                     <%= text_field_tag 'term_date', '',:'data-date-min'=> "+0d", placeholder: " ", class: "required date-picker term-date-picker floatlabel form-control", required: true, id: "term-date" %>
                     <br>

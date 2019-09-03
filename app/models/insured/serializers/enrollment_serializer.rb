@@ -27,7 +27,7 @@ module Insured
       def should_term_or_cancel_ivl
         if object.effective_on > TimeKeeper.date_of_record
           'cancel'
-        elsif (object.effective_on <= TimeKeeper.date_of_record || object.may_terminate_coverage?)
+        elsif object.effective_on <= TimeKeeper.date_of_record || object.may_terminate_coverage?
           'terminate'
         end
       end

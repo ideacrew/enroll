@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module Insured
@@ -42,12 +44,12 @@ module Insured
     end
 
     describe "post methods" do
-      let (:family) { FactoryBot.create(:family, :with_primary_family_member) }
-      let (:sep) { FactoryBot.create(:special_enrollment_period, family: family) }
-      let (:sbc_document) { FactoryBot.build(:document, subject: "SBC", identifier: "urn:openhbx#123") }
-      let (:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, title: "AAA", issuer_profile_id: "ab1233", sbc_document: sbc_document) }
-      let (:enrollment_to_cancel) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product, effective_on: DateTime.now + 1.month) }
-      let (:enrollment_to_term) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product, effective_on: DateTime.now - 1.month) }
+      let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
+      let(:sep) { FactoryBot.create(:special_enrollment_period, family: family) }
+      let(:sbc_document) { FactoryBot.build(:document, subject: "SBC", identifier: "urn:openhbx#123") }
+      let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, title: "AAA", issuer_profile_id: "ab1233", sbc_document: sbc_document) }
+      let(:enrollment_to_cancel) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product, effective_on: Date.today + 1.month) }
+      let(:enrollment_to_term) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product, effective_on: Date.today - 1.month) }
 
       context "#term_or_cancel" do
         it "should cancel an enrollment if it is not yet effective" do
