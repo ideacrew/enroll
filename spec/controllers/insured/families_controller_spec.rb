@@ -41,7 +41,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   include_context "setup benefit market with market catalogs and product packages"
   include_context "setup initial benefit application"
 
-  let(:hbx_enrollments) { double("HbxEnrollment") }
+  let(:hbx_enrollments) { double("HbxEnrollment", order: nil, waived: nil, any?: nil, non_external: nil) }
   let(:user) { FactoryBot.create(:user) }
   let(:person) do
     double(
@@ -69,6 +69,9 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
 
   before :each do
+    allow(hbx_enrollments).to receive(:+).with(HbxEnrollment.family_home_page_hidden_enrollments(family)).and_return(
+      HbxEnrollment.family_home_page_hidden_enrollments(family) + [hbx_enrollments]
+    )
     allow(hbx_enrollments).to receive(:order).and_return(hbx_enrollments)
     allow(hbx_enrollments).to receive(:waived).and_return([])
     allow(hbx_enrollments).to receive(:any?).and_return(false)
