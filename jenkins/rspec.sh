@@ -1,14 +1,21 @@
 #!/bin/bash
- 
+
 result=0
 
 base="$( dirname "${BASH_SOURCE[0]}" )/.."
-
 cd $base
 root=`pwd -P`
 
-nvm use
+rm -rf ./log/test.log
+rm -rf ./spec/vocabularies
+rm -rf ./coverage
+rm -rf ./tmp/rspec_junit_*.xml
+rm -rf ./public/packs*
+
+nvm use 10
+npm install --global yarn
 yarn install
+
 NODE_ENV=test RAILS_ENV=test ./bin/webpack
 
 for test_dir in `ls -1 $root/components/ | grep -v old_sponsored_benefits`; do
@@ -25,7 +32,8 @@ done
 
 cd $root
 
-rm -Rf ./coverage
-rm -Rf ./tmp/rspec_junit_*.xml
 bundle install
+
+bundle exec rails r -e test "DatabaseCleaner.clean"
+
 COVERAGE=true bundle exec rake parallel:spec[4]
