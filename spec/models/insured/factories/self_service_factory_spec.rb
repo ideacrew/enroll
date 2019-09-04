@@ -5,7 +5,7 @@ require 'rails_helper'
 module Insured
   RSpec.describe Factories::SelfServiceFactory, type: :model, dbclean: :after_each do
 
-    before :all do
+    before :each do
       DatabaseCleaner.clean
     end
 
