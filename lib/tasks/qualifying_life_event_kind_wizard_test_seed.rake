@@ -74,11 +74,11 @@ namespace :qle_kind_wizard_test_seed do
       date_options_available: false,
     )
     # First question
-    first_custom_qle_question = qle_kind_with_questions.custom_qle_questions.build(
+    first_custom_qle_question = qle_kind_with_two_questions.custom_qle_questions.build(
       content: "Please, we need clarification, who is the person you're getting coverage for?"
     )
     first_custom_qle_question.save!
-    first_custom_qle_question = qle_kind.custom_qle_questions.last
+    first_custom_qle_question = qle_kind_with_two_questions.custom_qle_questions.last
     # First question first response
     first_qle_question_response_1 = first_custom_qle_question.custom_qle_responses.build(
       content: "I don't know",
@@ -92,11 +92,11 @@ namespace :qle_kind_wizard_test_seed do
     )
     first_qle_question_response_2.save!
     # Second Question
-    second_custom_qle_question = qle_kind_with_questions.custom_qle_questions.build(
+    second_custom_qle_question = qle_kind_with_two_questions.custom_qle_questions.build(
       content: "Ok, let's try this again, who is the person you're getting coverage for?"
     )
     second_custom_qle_question.save!
-    second_custom_qle_question = qle_kind.custom_qle_questions.last
+    second_custom_qle_question = qle_kind_with_two_questions.custom_qle_questions.last
     # Second Question Response 1
     second_custom_qle_question_response_1 = first_custom_qle_question.custom_qle_responses.build(
       content: "It's a family member",
@@ -126,11 +126,11 @@ namespace :qle_kind_wizard_test_seed do
       date_options_available: false,
     )
     # First question
-    first_custom_qle_question = qle_kind_with_questions.custom_qle_questions.build(
+    first_custom_qle_question = qle_kind_with_one_question.custom_qle_questions.build(
       content: "Please, we need clarification, who is the person you're getting coverage for?"
     )
     first_custom_qle_question.save!
-    first_custom_qle_question = qle_kind.custom_qle_questions.last
+    first_custom_qle_question = qle_kind_with_one_question.custom_qle_questions.last
     # First question first response
     first_qle_question_response_1 = first_custom_qle_question.custom_qle_responses.build(
       content: "I don't know",
