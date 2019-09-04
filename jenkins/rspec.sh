@@ -38,4 +38,6 @@ bundle install
 
 bundle exec rails r -e test "DatabaseCleaner.clean"
 
-COVERAGE=true bundle exec rake parallel:spec[4]
+# Remove coverage for now, it adds about 20 minutes or so
+#  COVERAGE=true bundle exec rake parallel:spec[4]
+bundle exec rake parallel:spec[4]
