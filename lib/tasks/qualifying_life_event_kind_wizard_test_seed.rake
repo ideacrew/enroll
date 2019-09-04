@@ -43,7 +43,7 @@ namespace :qle_kind_wizard_test_seed do
       title: "Federal Government order to provide coverage for someone",
       tool_tip: "",
       action_kind: "add_member",
-      market_kind: "shop",
+      market_kind: "individual",
       event_kind_label: "Date that court orders that coverage starts",
       ordinal_position: 100,
       reason: "court_order",
@@ -54,6 +54,40 @@ namespace :qle_kind_wizard_test_seed do
       is_self_attested: true,
       visible_to_customer: true,
       date_options_available: false,
+    )
+    # First question
+    first_custom_qle_question = individual_self_attested_qle_kind.custom_qle_questions.build(
+      content: "Please, we need clarification, who is the person you're getting coverage for?"
+    )
+    first_custom_qle_question.save!
+    first_custom_qle_question = individual_self_attested_qle_kind.custom_qle_questions.last
+    # First question first response
+    first_qle_question_response_1 = first_custom_qle_question.custom_qle_responses.build(
+      content: "I don't know",
+      action_to_take: 'to_question_2'
+    )
+    first_qle_question_response_1.save!
+    # first question second response
+    first_qle_question_response_2 = first_custom_qle_question.custom_qle_responses.build(
+      content: "It's a family member",
+      action_to_take: 'accepted'
+    )
+    first_qle_question_response_2.save!
+    # Second Question
+    second_custom_qle_question = individual_self_attested_qle_kind.custom_qle_questions.build(
+      content: "Ok, let's try this again, who is the person you're getting coverage for?"
+    )
+    second_custom_qle_question.save!
+    second_custom_qle_question = individual_self_attested_qle_kind.custom_qle_questions.last
+    # Second Question Response 1
+    second_custom_qle_question_response_1 = first_custom_qle_question.custom_qle_responses.build(
+      content: "It's a family member",
+      action_to_take: 'accepted'
+    )
+    # Second Question Response 2
+    second_custom_qle_question_response_2 = first_custom_qle_question.custom_qle_responses.build(
+      content: "I don't know",
+      action_to_take: 'declined'
     )
     puts("Individual self attested QLE Kind present.") if individual_self_attested_qle_kind.present?
     # For QLE Kind with two custom QLE questions
@@ -114,7 +148,7 @@ namespace :qle_kind_wizard_test_seed do
       end_on: nil,
       tool_tip: "",
       action_kind: "add_member",
-      market_kind: "shop",
+      market_kind: "individual",
       event_kind_label: "Date that UN gov orders that coverage starts",
       ordinal_position: 100,
       reason: "court_order",
