@@ -6,7 +6,6 @@ spec/controllers/insured/families_controller_spec.rb:144.0566790001467
 spec/test_data/verified_family_payloads/core_scenarios/core_scenarios_spec.rb:140.77071400079876
 spec/models/census_employee_spec.rb:134.49369699973613
 spec/data_migrations/permissions_spec.rb:126.37919000070542
-spec/views/general_agencies/edit.html.erb_spec.rb:103.7100470000878
 spec/controllers/insured/group_selection_controller_spec.rb:90.76013400033116
 spec/models/hbx_enrollment_spec.rb:88.80704499781132
 spec/models/factories/eligibility_factory_spec.rb:85.75055299978703
@@ -163,6 +162,7 @@ spec/notices/ivl_notices/final_catastrophic_plan_notice_spec.rb:4.93150899931788
 spec/notices/shop_employer_notices/renewal_employer_eligibility_notice_spec.rb:4.871189000084996
 spec/models/person_versioning_spec.rb:4.75766000058502
 spec/models/importers/conversion_employee_policy_update_spec.rb:4.7355210008099675
+spec/views/general_agencies/edit.html.erb_spec.rb:4.7100470000878
 spec/notices/shop_employer_notices/employer_account_creation_notice_spec.rb:4.618197999894619
 spec/controllers/broker_agencies/inboxes_controller_spec.rb:4.590931000187993
 spec/controllers/hbx_admin_controller_spec.rb:4.498276999220252

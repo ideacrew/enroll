@@ -31,8 +31,8 @@ if [ -f 'tmp/cucumber3.summary' ]; then
 
   if [ $cucumber_results -ne 0 ]; then
     failure_count=$(($cucumber_results + 0))
-    if  [[ $failure_count -gt 255 ]]; then
-      exit_code=255
+    if  [[ $failure_count -gt 126 ]]; then
+      exit_code=126
     else
       exit_code=$failure_count
     fi

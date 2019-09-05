@@ -15,6 +15,7 @@ module BenefitSponsors
         ep_props = employer_profile_properties
         org_props = {
           _id: org_id,
+          hbx_id: "ALKJVFKLEIJDSLF",
           fein: fein,
           dba: dba,
           entity_kind: entity_kind,
