@@ -56,7 +56,7 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
 
         it 'should get age from payload for projected aqhp notice' do
           allow(subject).to receive(:uqhp_notice?).and_return(false)
-          expect(subject.age).to eq(Date.current.year - Date.strptime(payload['notice_params']['primary_member']['dob'],"%m/%d/%Y").year)
+          expect(subject.age).to eq(subject.age_of_aqhp_person(TimeKeeper.date_of_record, Date.strptime(payload['notice_params']['primary_member']['dob'],"%m/%d/%Y")))
         end
       end
 
@@ -136,6 +136,15 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
 
       it "should have csr_is_100?" do
         expect(subject.csr_is_100?).to eq(false)
+      end
+
+      it "should return false if APTC amount is greater than 0" do
+        expect(subject.aptc_is_zero?).to eq(false)
+      end
+
+      it "should return true if APTC amount is $0" do
+        allow(subject).to receive(:aptc).and_return "$0"
+        expect(subject.aptc_is_zero?).to eq(true)
       end
 
       context 'aqhp_event_and_irs_consent_no?' do

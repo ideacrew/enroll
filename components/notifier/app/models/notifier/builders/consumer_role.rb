@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-
 module Notifier
   module Builders
     class ConsumerRole
@@ -68,8 +67,17 @@ module Notifier
           if uqhp_notice?
             consumer_role.person.age_on(TimeKeeper.date_of_record)
           else
-            (Date.current.year - Date.strptime(payload['notice_params']['primary_member']['dob'],"%m/%d/%Y").year)
+            age_of_aqhp_person(TimeKeeper.date_of_record, Date.strptime(payload['notice_params']['primary_member']['dob'],"%m/%d/%Y"))
           end
+      end
+
+      def age_of_aqhp_person(date, dob)
+        age = date.year - dob.year
+        if date.month < dob.month || (date.month == dob.month && date.day < dob.day)
+          age - 1
+        else
+          age
+        end
       end
 
       def append_contact_details
@@ -301,7 +309,7 @@ module Notifier
       end
 
       def aptc_is_zero?
-        aptc.present? && aptc.to_i.zero?
+        aptc.present? && aptc.gsub(/\D/, ' ').to_f.zero?
       end
 
       def aqhp_or_non_magi_medicaid?

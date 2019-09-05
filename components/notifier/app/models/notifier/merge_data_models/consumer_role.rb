@@ -150,7 +150,7 @@ module Notifier
       end
 
       def aptc_is_zero?
-        aptc.present? && aptc.to_i.zero?
+        aptc.present? && aptc.gsub(/\D/, ' ').to_f.zero?
       end
 
       def csr?
