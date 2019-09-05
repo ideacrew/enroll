@@ -37,6 +37,7 @@
     "sweetalert2": "^8.13.0",
     "turbolinks": "^5.2.0",
     "typescript": "3.2.4",
+    "webpack-merge": "^4.2.2",
     "zone.js": "^0.9.1"
   },
   "devDependencies": {
