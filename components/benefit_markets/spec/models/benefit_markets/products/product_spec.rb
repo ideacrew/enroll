@@ -283,12 +283,11 @@ module BenefitMarkets
     end
 
     context '#display_carrier_logo' do
-      let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
-      subject {described_class.new(params.merge({issuer_profile: issuer_profile}))}
+      let!(:legal_name) {'Blue Cross Blue Shield'}
 
       it 'should display carrier logo' do
-        carrier_name = subject.issuer_profile.legal_name
-        expect(subject.display_carrier_logo).to eq "<img src=\"\/assets\/logo\/carrier\/#{carrier_name.parameterize.underscore}.jpg\" width=\"50\"/>"
+        allow(subject).to receive(:find_carrier_info).and_return(legal_name)
+        expect(subject.display_carrier_logo).to eq "<img src=\"\/assets\/logo\/carrier\/#{legal_name.parameterize.underscore}.jpg\" width=\"50\"/>"
       end
     end
   end

@@ -5,6 +5,10 @@ require 'rails_helper'
 module Insured
   RSpec.describe Forms::SelfTermOrCancelForm, type: :model, dbclean: :after_each do
 
+    before do
+      DatabaseCleaner.clean
+    end
+
     subject { Insured::Forms::SelfTermOrCancelForm.new }
 
     describe "model attributes" do
