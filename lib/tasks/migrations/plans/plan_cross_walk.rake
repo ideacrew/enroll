@@ -16,54 +16,50 @@ namespace :xml do
       cross_walks.each do |row|
         old_hios_id = row["plan_id_#{@previous_year}_hios".to_sym].squish
         new_hios_id = row["plan_id_#{@current_year}_hios".to_sym].squish
-
-        # old model
+        is_this_plan_catastrophic_or_child_only_plan = row[:is_this_plan_catastrophic_or_child_only_plan].squish.downcase
+        cat_hios_id = row["plan_id_#{@current_year}_for_enrollees_aging_off_catastrophic_or_child_only_plan".to_sym].squish
         new_plans =  Plan.where(hios_id: /#{new_hios_id}/, active_year: @current_year)
-        # cat_age_off_renewal_plan =  Plan.where(hios_id: /#{hios_id_cat_age_off_2018}/, active_year: @current_year)
-        new_plans.each do |new_plan|
-          if new_plan.present? && new_plan.csr_variant_id != "00"
-            old_plan = Plan.where(hios_id: /#{old_hios_id}/, active_year: @previous_year, csr_variant_id: /#{new_plan.csr_variant_id}/).first
-            if old_plan.present?
-              old_plan.update(renewal_plan_id: new_plan.id)
-              puts "Old #{@previous_year} plan hios_id #{old_plan.hios_id} renewed with New #{@current_year} plan hios_id: #{new_plan.hios_id}" unless Rails.env.test?
-            else
-              puts "Old #{@previous_year} plan hios_id #{old_hios_id}-#{new_plan.csr_variant_id} not present." unless Rails.env.test?
+
+        # to handle cases when business provides us with a renewal mapping
+        # and then updates the template to say that the old plan got retired with no new mapping.
+        if new_hios_id.blank?
+          old_plans = Plan.where(hios_id: /#{old_hios_id}/, active_year: @previous_year)
+          old_plans.each do |old_plan|
+            old_plan.update(renewal_plan_id: nil)
+            puts "Old #{@previous_year} #{old_plan.carrier_profile.legal_name} plan hios_id #{old_plan.hios_id} retired" unless Rails.env.test?
+          end
+        else
+          new_plans.each do |new_plan|
+            if new_plan.present? && new_plan.csr_variant_id != "00"
+              old_plan = Plan.where(hios_id: /#{old_hios_id}/, active_year: @previous_year, csr_variant_id: /#{new_plan.csr_variant_id}/).first
+              if old_plan.present?
+                old_plan.update(renewal_plan_id: new_plan.id)
+                if is_this_plan_catastrophic_or_child_only_plan == "yes" && new_plan.csr_variant_id == "01" && new_plan.coverage_kind == "health"
+                  cat_age_off_renewal_plan = Plan.where(hios_id: /#{cat_hios_id}/,active_year: @current_year,csr_variant_id: "01").first
+                  old_plan.update(cat_age_off_renewal_plan_id: cat_age_off_renewal_plan.id)
+                  puts "Successfully mapped #{@previous_year} #{old_plan.carrier_profile.legal_name} cat age off plan with hios_id #{old_plan.hios_id} to #{@current_year} #{cat_age_off_renewal_plan.carrier_profile.legal_name} plan_hios_id: #{cat_age_off_renewal_plan.hios_id}" unless Rails.env.test?
+                end
+                puts "Old #{@previous_year} #{old_plan.carrier_profile.legal_name} plan hios_id #{old_plan.hios_id} renewed with New #{@current_year} #{new_plan.carrier_profile.legal_name} plan hios_id: #{new_plan.hios_id}" unless Rails.env.test?
+              else
+                puts "Old #{@previous_year}  plan hios_id #{old_hios_id}-#{new_plan.csr_variant_id} not present." unless Rails.env.test?
+              end
             end
           end
         end
-        # end of old model
-
-        # new model
-        new_products = ::BenefitMarkets::Products::Product.where(hios_id: /#{new_hios_id}/).select{|a| a.active_year == @current_year}
-        new_products.each do |new_product|
-          if new_product.present? && new_product.csr_variant_id != "00"
-            old_product = ::BenefitMarkets::Products::Product.where(hios_id: /#{old_hios_id}/, csr_variant_id: /#{new_product.csr_variant_id}/).select{|a| a.active_year == @previous_year}.first
-
-            if old_product.present?
-              old_product.update(renewal_product_id: new_product.id)
-              puts "Old #{@previous_year} product hios_id #{old_product.hios_id} renewed with New #{@current_year} product hios_id: #{new_product.hios_id}" unless Rails.env.test?
-            else
-              puts "Old #{@previous_year} product hios_id #{old_hios_id}-#{new_product.csr_variant_id} not present." unless Rails.env.test?
-            end
+      end
+      # for scenarios where plan cross walk templates were not provided because
+      # there were no plans retired or no new plans present for the renewing year.
+      plan_mapping_hash = { "2017" => "2018", "2018" => "2019", "2019" => "2020" }
+      plan_mapping_hash.each do |previous_year, current_year|
+        old_plans = Plan.where(active_year: previous_year, renewal_plan_id: nil)
+        old_plans.each do |old_plan|
+          new_plan = Plan.where(active_year: current_year, hios_base_id: old_plan.hios_base_id, csr_variant_id: old_plan.csr_variant_id).first
+          if new_plan.present? && old_plan.renewal_plan_id.nil?
+            old_plan.renewal_plan_id = new_plan.id
+            old_plan.save
+            puts "Old #{old_plan.active_year} #{old_plan.carrier_profile.legal_name} plan hios_id #{old_plan.hios_id} renewed with New #{new_plan.active_year} #{new_plan.carrier_profile.legal_name} plan hios_id: #{new_plan.hios_id}" unless Rails.env.test?
           end
         end
-        # end of new model
-
-        # new model
-        # new_products = ::BenefitMarkets::Products::Product.where(hios_id: /#{hios_id_2018}/).select{|a| a.active_year == @current_year}
-        # new_products.each do |new_product|
-        #   if new_product.present? && new_product.csr_variant_id != "00"
-        #     old_product = ::BenefitMarkets::Products::Product.where(hios_id: /#{hios_id_2017}/, csr_variant_id: /#{new_product.csr_variant_id}/).select{|a| a.active_year == @previous_year}.first
-
-        #     if old_product.present?
-        #       old_product.update(renewal_product_id: new_product.id)
-        #       puts "Old #{@previous_year} product hios_id #{old_product.hios_id} renewed with New #{@current_year} product hios_id: #{new_product.hios_id}"
-        #     else
-        #       puts "Old #{@previous_year} product hios_id #{hios_id_2017}-#{new_product.csr_variant_id} not present."
-        #     end
-        #   end
-        # end
-        # end of new model
       end
     end
   end
