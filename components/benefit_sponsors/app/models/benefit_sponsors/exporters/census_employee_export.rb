@@ -16,14 +16,6 @@ module BenefitSponsors
         @headers = config_based_headers
       end
 
-      def config_based_headers
-        site_key == :dc ? dc_csv_headers : census_employee_details_headers
-      end
-
-      def dc_csv_headers
-        census_employee_details_headers + contribution_headers + dependent_dob_headers(type_of_action)
-      end
-
       def to_csv
         CSV.generate(headers: true) do |csv|
           csv << (["#{Settings.site.long_name} Employee Census Template"] + Array.new(6) + [TimeKeeper.date_of_record] + Array.new(5) + ["1.1"])
@@ -37,39 +29,14 @@ module BenefitSponsors
 
             if site_key == :dc
               append_config_data += total_premium(census_employee)
-              append_config_data += append_dependent_dob(census_employee)
+              census_employee.census_dependents.each do |dependent|
+                append_config_data += append_dependent(dependent)
+              end
             end
 
             csv << append_config_data
           end
         end
-      end
-
-      def personal_headers(record)
-        personal_info_headers = []
-        %w[last_name first_name middle_name name_sfx email_address ssn dob gender].each do |attribute|
-          personal_info_headers.push record.send(attribute)
-        end
-        personal_info_headers
-      end
-
-      def primary_location_details(record)
-        if record.address.present?
-          record.address.to_a
-        else
-          Array.new(6)
-        end
-      end
-
-      def employeement_headers(census_employee)
-        employeement = []
-        employeement.push(
-          census_employee.hired_on.present? ? census_employee.hired_on.strftime("%m/%d/%Y") : "",
-          census_employee.aasm_state.humanize.downcase,
-          census_employee.employment_terminated_on.present? ? census_employee.employment_terminated_on.strftime("%m/%d/%Y") : "",
-          census_employee.is_business_owner ? "yes" : "no"
-        )
-        employeement
       end
 
       def benefit_group_assignment_details(census_employee)
@@ -89,33 +56,24 @@ module BenefitSponsors
         bga
       end
 
-      def append_dependent_dob(census_employee)
-        dob_rows = []
-        census_employee.census_dependents.each do |dependent|
-          dob_rows.push(
-            dependent.dob.present? ? dependent.dob.strftime("%m/%d/%Y") : ""
-          )
-        end
-        dependent_count_diff = Array.new(dependent_count - dob_rows.length)
-        dob_rows + dependent_count_diff
-      end
-
       def pull_enrollment_state_by_kind(active_bga, coverage_kind)
-        active_bga.try(:hbx_enrollments).detect{|enrollment| enrollment.coverage_kind == coverage_kind}.try(:aasm_state).try(:humanize).try(:downcase)
+        active_bga.try(:hbx_enrollments).detect {|enrollment| enrollment.coverage_kind == coverage_kind}.try(:aasm_state).try(:humanize).try(:downcase)
       end
 
       def total_premium(record)
         premiums = []
-        if record.is_a?(SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee)
+        if record.is_a?(::SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee)
           sponsor_ship = employer_profile.benefit_sponsorships.first
           return Array.new(2) if sponsor_ship.nil?
 
           benefit_group = sponsor_ship.benefit_applications.first.benefit_groups.first
-          return  Array.new(2) if benefit_group.nil?
+          return Array.new(2) if benefit_group.nil?
 
-          sponsored_service = SponsoredBenefits::Services::PlanCostService.new({benefit_group: benefit_group})
-          health_plan = sponsored_service.reference_plan
-          dental_plan = sponsored_service.dental_reference_plan
+          sponsored_service = ::SponsoredBenefits::Services::PlanCostService.new({benefit_group: benefit_group})
+          health_plan = benefit_group.reference_plan
+          dental_plan = benefit_group.dental_reference_plan
+
+          #As per the current requirement, total premium for the employer is calculated and recorded in the excel.
           @employer_health_contribution_amount = sponsored_service.monthly_employer_contribution_amount(health_plan)
           @employer_dental_contribution_amount = sponsored_service.monthly_employer_contribution_amount(dental_plan) if dental_plan.present?
           premiums.push(@employer_health_contribution_amount, @employer_dental_contribution_amount)
@@ -133,8 +91,71 @@ module BenefitSponsors
         premiums += Array.new(2 - premiums.count)
       end
 
-      def pull_selected_enrollment(enrollments, coverage_kind)
-        enrollments.detect{|enrollment| enrollment.coverage_kind == coverage_kind && enrollment.aasm_state == "coverage_selected"}
+      private
+
+      def primary_location_details(record)
+        if record.address.present?
+          record.address.to_a
+        else
+          Array.new(6)
+        end
+      end
+
+      def employeement_headers(census_employee)
+        employeement = []
+        employeement.push(
+            census_employee.hired_on.present? ? census_employee.hired_on.strftime("%m/%d/%Y") : '',
+            census_employee.aasm_state.humanize.downcase,
+            census_employee.employment_terminated_on.present? ? census_employee.employment_terminated_on.strftime("%m/%d/%Y") : '',
+            census_employee.is_business_owner ? "yes" : "no"
+        )
+        employeement
+      end
+
+      def personal_headers(record)
+        personal_info_headers = []
+        primary_attributes.each do |attribute|
+          personal_info_headers.push record.send(attribute)
+        end
+        personal_info_headers
+      end
+
+      def dependent_headers(type_of_action)
+        return [] if type_of_action == 'upload'
+
+        dep_headers = []
+        dep_count.times do |i|
+          dependent_attributes.each do |attribute|
+            dep_headers << "Dep#{i + 1} #{attribute.titleize}"
+          end
+        end
+        dep_headers
+      end
+
+      def append_dependent(dependent)
+        columns = []
+        dependent_attributes.each do |attribute|
+          columns.push(dependent.public_send(attribute).presence ? dependent.public_send(attribute) : '')
+        end
+        columns
+      end
+
+      def dependent_count
+        dependent = []
+        census_employee_roster.each do |census_employee|
+          next if census_employee.census_dependents.blank?
+
+          dependent.push census_employee.census_dependents.count
+        end
+        dependent.max.nil? ? 0 : dependent.max
+      end
+
+      def config_based_headers
+        site_key == :dc ? dc_csv_headers : census_employee_details_headers
+      end
+
+      def dc_csv_headers
+        census_employee_details_headers + contribution_headers + dependent_headers(type_of_action)
       end
 
       def census_employee_details_headers
@@ -169,27 +190,13 @@ module BenefitSponsors
         %w[Total\ Monthly\ Premium\ Health Total\ Monthly\ Premium\ Dental]
       end
 
-      def dependent_dob_headers(type_of_action)
-        return [] if type_of_action == "upload"
-
-        dep_headers = []
-        dep_count.times do |i|
-          dep_headers << "Dep#{i + 1} DOB"
-        end
-        dep_headers
+      def dependent_attributes
+        %w[first_name last_name dob]
       end
 
-      def dependent_count
-        dependent = []
-        census_employee_roster.each do |census_employee|
-          next if census_employee.census_dependents.blank?
-
-          dependent.push census_employee.census_dependents.count
-        end
-        dependent.max.nil? ? 0 : dependent.max
+      def primary_attributes
+        %w[last_name first_name middle_name name_sfx email_address ssn dob gender]
       end
-
-      private
 
       def fetch_site_key
         BenefitSponsors::ApplicationController.current_site.site_key
