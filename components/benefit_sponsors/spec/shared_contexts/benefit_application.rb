@@ -1,3 +1,5 @@
+require File.join(File.dirname(__FILE__), "..", "support/benefit_sponsors_organization_spec_helpers")
+
 RSpec.shared_context "setup initial benefit application", :shared_context => :metadata do
   
   let(:aasm_state)                { :active }
@@ -7,7 +9,10 @@ RSpec.shared_context "setup initial benefit application", :shared_context => :me
   let(:effective_period)          { current_effective_date..(current_effective_date.next_year.prev_day) }
   let(:open_enrollment_start_on)  { current_effective_date.prev_month }
   let(:open_enrollment_period)    { open_enrollment_start_on..(open_enrollment_start_on+5.days) }
-  let!(:abc_organization)         { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
+  let!(:abc_organization)         do
+    org_id = BenefitSponsors::OrganizationSpecHelpers.with_aca_shop_employer_profile(site)
+    BenefitSponsors::Organizations::GeneralOrganization.find(org_id)
+  end
   let(:abc_profile)               { abc_organization.employer_profile }
   
   let!(:benefit_sponsorship) { 
@@ -70,7 +75,11 @@ RSpec.shared_context "setup renewal application", :shared_context => :metadata d
   let(:effective_period)         { renewal_effective_date..renewal_effective_date.next_year.prev_day }
   let(:open_enrollment_period)   { effective_period.min.prev_month..(effective_period.min - 10.days) }
 
-  let(:abc_organization)         { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
+  #let(:abc_organization)         { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
+  let(:abc_organization)         do
+    org_id = BenefitSponsors::OrganizationSpecHelpers.with_aca_shop_employer_profile(site)
+    BenefitSponsors::Organizations::GeneralOrganization.find(org_id)
+  end
   let(:abc_profile)              { abc_organization.employer_profile }
   let!(:benefit_sponsorship)     { abc_profile.add_benefit_sponsorship }
 
