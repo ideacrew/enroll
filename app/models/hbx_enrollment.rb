@@ -289,7 +289,7 @@ class HbxEnrollment
   scope :by_created_datetime_range,  ->(start_at, end_at) { where(:created_at => { "$gte" => start_at, "$lte" => end_at }) }
   scope :by_submitted_datetime_range,  ->(start_at, end_at) { where(:submitted_at => { "$gte" => start_at, "$lte" => end_at }) }
   scope :by_submitted_after_datetime,  ->(start_at) { where(:submitted_at => { "$gte" => start_at} )}
-  scope :by_updated_datetime_range, ->(start_at, end_at) { where(updated_at: { "$gte" => start_at, "$lte" => end_at }) } 
+  scope :by_updated_datetime_range, ->(start_at, end_at) { where(updated_at: { "$gte" => start_at, "$lte" => end_at }) }
   scope :by_effective_date_range, ->(start_on, end_on) { where(effective_on: { "$gte" => start_on, "$lte" => end_on }) }
   scope :current_year,        ->{ where(:effective_on.gte => TimeKeeper.date_of_record.beginning_of_year, :effective_on.lte => TimeKeeper.date_of_record.end_of_year) }
   scope :by_year,             ->(year) { where(effective_on: (Date.new(year)..Date.new(year).end_of_year)) }
@@ -345,7 +345,7 @@ class HbxEnrollment
                                                           :"effective_on".gte => effective_period.min,
                                                           :"effective_on".lte => effective_period.max
                                                         )}
-  scope :by_benefit_application_and_sponsored_benefit,  ->(benefit_application, sponsored_benefit, end_date) do 
+  scope :by_benefit_application_and_sponsored_benefit,  ->(benefit_application, sponsored_benefit, end_date) do
     where(
       :"sponsored_benefit_id" => sponsored_benefit._id,
       :"aasm_state".in => (ENROLLED_STATUSES + RENEWAL_STATUSES + TERMINATED_STATUSES),
@@ -799,12 +799,20 @@ class HbxEnrollment
   def term_or_cancel_enrollment(enrollment, coverage_end_date, term_reason = nil)
     if enrollment.effective_on >= coverage_end_date
       enrollment.cancel_coverage! if enrollment.may_cancel_coverage? # cancel coverage if enrollment is future effective
-    elsif coverage_end_date >= TimeKeeper.date_of_record
+    elsif coverage_end_date >= TimeKeeper.date_of_record && enrollment.is_shop?
       enrollment.schedule_coverage_termination!(coverage_end_date) if enrollment.may_schedule_coverage_termination?
     elsif enrollment.may_terminate_coverage?
       enrollment.terminate_coverage!(coverage_end_date)
     end
     enrollment.update(terminate_reason: term_reason, termination_submitted_on: TimeKeeper.datetime_of_record) if term_reason.present?
+  end
+
+  def should_term_or_cancel_ivl
+    if self.effective_on > TimeKeeper.date_of_record
+      'cancel'
+    elsif (self.effective_on <= TimeKeeper.date_of_record || self.may_terminate_coverage?)
+      'terminate'
+    end
   end
 
   def waiver_enrollment_present?
@@ -875,7 +883,7 @@ class HbxEnrollment
     return unless is_shop?
 
     enrollment_benefit_application = sponsored_benefit_package.benefit_application
-    
+
     return unless enrollment_benefit_application.active?
     return unless census_employee&.renewal_benefit_group_assignment
 
@@ -895,7 +903,7 @@ class HbxEnrollment
 
   def renewal_enrollments(successor_application)
     HbxEnrollment.where({
-      :sponsored_benefit_package_id.in => successor_application.benefit_packages.pluck(:_id), 
+      :sponsored_benefit_package_id.in => successor_application.benefit_packages.pluck(:_id),
       :coverage_kind => coverage_kind,
       :kind => kind,
       :family_id => family_id,
@@ -1072,13 +1080,13 @@ class HbxEnrollment
 
   def sponsored_benefit
     return @sponsored_benefit if defined? @sponsored_benefit
-    @sponsored_benefit = sponsored_benefit_package.sponsored_benefits.detect{ |sb| sb.id == sponsored_benefit_id }    
+    @sponsored_benefit = sponsored_benefit_package.sponsored_benefits.detect{ |sb| sb.id == sponsored_benefit_id }
   end
 
   def sponsored_benefit=(sponsored_benefit)
     raise ArgumentError.new("expected BenefitSponsors::SponsoredBenefits::SponsoredBenefit") unless sponsored_benefit.is_a? ::BenefitSponsors::SponsoredBenefits::SponsoredBenefit
     self.sponsored_benefit_id = sponsored_benefit._id
-    @sponsored_benefit = sponsored_benefit    
+    @sponsored_benefit = sponsored_benefit
   end
 
   def rating_area
@@ -1411,7 +1419,7 @@ class HbxEnrollment
     enrollment.household = coverage_household.household
     enrollment.family = coverage_household.household.family
     enrollment.submitted_at = submitted_at
-    
+
     case
       when employee_role.present?
         enrollment.kind = "employer_sponsored"
@@ -2018,7 +2026,7 @@ end
     if previous_enrollment
       previous_product = previous_enrollment.product
     end
-    
+
     hbx_enrollment_members.each do |hem|
       person = hem.person
       roster_member = EnrollmentMemberAdapter.new(

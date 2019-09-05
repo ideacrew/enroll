@@ -285,6 +285,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         allow(person).to receive(:has_active_employee_role?).and_return false
         allow(person).to receive(:consumer_role).and_return(consumer_role)
         allow(HbxEnrollment).to receive(:calculate_effective_on_from).and_return TimeKeeper.date_of_record
+        allow(hbx_enrollment).to receive(:kind).and_return "individual"
       end
 
       it "should set session" do
@@ -315,7 +316,58 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         expect(response).to have_http_status(:redirect)
         expect(response).to redirect_to(insured_plan_shopping_path(id: new_household.hbx_enrollments(true).first.id, change_plan: 'change', coverage_kind: 'health', market_kind: 'individual', enrollment_kind: 'sep'))
       end
+
     end
+  end
+
+  context "IVL edit plan paths" do
+    #These paths should only be reached with an IVL enrollment, hence their location here.
+    before do
+      sign_in
+    end
+
+    context "GET edit_plan" do
+      let(:edit_family) { FactoryBot.create(:family, :with_primary_family_member) }
+      let(:sep) { FactoryBot.create(:special_enrollment_period, family: edit_family) }
+      let(:sbc_document) { FactoryBot.build(:document, subject: "SBC", identifier: "urn:openhbx#123") }
+      let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile, title: "AAA", sbc_document: sbc_document) }
+      let(:edit_enrollment) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: edit_family, product: product) }
+
+      it "return http success and render" do
+        sign_in
+        edit_family.special_enrollment_periods << sep
+        attrs = {hbx_enrollment_id: edit_enrollment.id.to_s, family_id: edit_family.id}
+        get :edit_plan, params:  attrs
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template(:edit_plan)
+      end
+    end
+
+    context "POST term_or_cancel" do
+      let(:family) { FactoryBot.create(:individual_market_family) }
+      let(:sep) { FactoryBot.create(:special_enrollment_period, family: family) }
+      let(:sbc_document) { FactoryBot.build(:document, subject: "SBC", identifier: "urn:openhbx#123") }
+      let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile, title: "AAA", sbc_document: sbc_document) }
+      let(:enrollment_to_cancel) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product, effective_on: Date.today + 1.month) }
+      let(:enrollment_to_term) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product, effective_on: Date.today - 1.month) }
+
+      it "should cancel enrollment with no term date given" do
+        family.family_members.first.person.consumer_role.update_attributes(:aasm_state => :fully_verified)
+        post :term_or_cancel, params: { hbx_enrollment_id: enrollment_to_cancel.id, term_or_cancel: 'cancel' }
+        enrollment_to_cancel.reload
+        expect(enrollment_to_cancel.aasm_state).to eq "coverage_canceled"
+        expect(response).to redirect_to(family_account_path)
+      end
+
+      it "should schedule terminate enrollment with term date given" do
+        family.family_members.first.person.consumer_role.update_attributes(:aasm_state => :fully_verified)
+        post :term_or_cancel, params: { hbx_enrollment_id: enrollment_to_term.id, term_date: TimeKeeper.date_of_record + 1, term_or_cancel: 'terminate' }
+        enrollment_to_term.reload
+        expect(enrollment_to_term.aasm_state).to eq "coverage_terminated"
+        expect(response).to redirect_to(family_account_path)
+      end
+    end
+
   end
 
   context "GET terminate_selection" do
@@ -327,21 +379,11 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     end
   end
 
-  context "GET terminate_confirm" do
-    it "return http success and render" do
-      sign_in
-      allow(HbxEnrollment).to receive(:find).and_return(hbx_enrollment)
-      get :terminate_confirm, params: { person_id: person.id, hbx_enrollment_id: hbx_enrollment.id }
-      expect(response).to have_http_status(:success)
-      expect(response).to render_template(:terminate_confirm)
-    end
-  end
-
   context "POST terminate" do
 
     before do
       sign_in
-      request.env["HTTP_REFERER"] = terminate_confirm_insured_group_selections_path(person_id: person.id, hbx_enrollment_id: hbx_enrollment.id)
+      request.env["HTTP_REFERER"] = edit_plan_insured_group_selections_path(person_id: person.id, hbx_enrollment_id: hbx_enrollment.id)
       allow(HbxEnrollment).to receive(:find).and_return(hbx_enrollment)
     end
 
@@ -359,7 +401,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       hbx_enrollment.assign_attributes(aasm_state: "shopping")
       post :terminate, params: { term_date: TimeKeeper.date_of_record, hbx_enrollment_id: hbx_enrollment.id }
       expect(hbx_enrollment.may_terminate_coverage?).to be_falsey
-      expect(response).to redirect_to(terminate_confirm_insured_group_selections_path(person_id: person.id, hbx_enrollment_id: hbx_enrollment.id))
+      expect(response).to redirect_to(edit_plan_insured_group_selections_path(person_id: person.id, hbx_enrollment_id: hbx_enrollment.id))
     end
 
 
@@ -367,7 +409,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       allow(hbx_enrollment).to receive(:terminate_benefit)
       post :terminate, params: { term_date: TimeKeeper.date_of_record - 10.days, hbx_enrollment_id: hbx_enrollment.id }
       expect(hbx_enrollment.may_terminate_coverage?).to be_truthy
-      expect(response).to redirect_to(terminate_confirm_insured_group_selections_path(person_id: person.id, hbx_enrollment_id: hbx_enrollment.id))
+      expect(response).to redirect_to(edit_plan_insured_group_selections_path(person_id: person.id, hbx_enrollment_id: hbx_enrollment.id))
     end
 
   end

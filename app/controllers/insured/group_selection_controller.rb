@@ -170,6 +170,16 @@ class Insured::GroupSelectionController < ApplicationController
     end
   end
 
+  def edit_plan
+    @self_term_or_cancel_form = ::Insured::Forms::SelfTermOrCancelForm.for_view({enrollment_id: params.require(:hbx_enrollment_id), family_id: params.require(:family_id)})
+  end
+
+  def term_or_cancel
+    @self_term_or_cancel_form = ::Insured::Forms::SelfTermOrCancelForm.for_post({enrollment_id: params.require(:hbx_enrollment_id), term_date: params[:term_date], term_or_cancel: params[:term_or_cancel]})
+
+    redirect_to family_account_path
+  end
+
   private
 
   def permit_params

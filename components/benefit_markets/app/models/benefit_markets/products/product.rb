@@ -295,6 +295,17 @@ module BenefitMarkets
       application_period.min.year
     end
 
+    def find_carrier_info
+      return '' if issuer_profile.legal_name.nil?
+
+      issuer_profile.legal_name
+    end
+
+    def display_carrier_logo(options = {:width => 50})
+      carrier_name = find_carrier_info
+      "<img src=\"\/assets\/logo\/carrier\/#{carrier_name.parameterize.underscore}.jpg\" width=\"#{options[:width]}\"/>"
+    end
+
     def premium_table_effective_on(effective_date)
       premium_tables.detect { |premium_table| premium_table.effective_period.cover?(effective_date) }
     end

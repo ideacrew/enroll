@@ -72,6 +72,21 @@ module Insured::FamiliesHelper
     end.join("&nbsp<label class='separator'></label>").html_safe
   end
 
+  def render_product_type_details(metal_level_kind, nationwide)
+    product_details = []
+
+    if metal_level_kind
+      product_level = metal_level_kind.to_s.try(:humanize)
+      product_details << "<span class=\"#{product_level.try(:downcase)}-icon\">#{product_level.titleize}</span>"
+    end
+
+    product_details << 'NATIONWIDE NETWORK' if nationwide
+
+    product_details.inject([]) do |data, element|
+      data << element.to_s
+    end.join("&nbsp<label class='separator'></label>").html_safe
+  end
+
   def qle_link_generater(qle, index)
     options = {class: 'qle-menu-item'}
     data = {
@@ -291,5 +306,9 @@ module Insured::FamiliesHelper
      @qle = QualifyingLifeEventKind.where(reason: 'eligibility_documents_provided').first
      { @qle.title => @qle.reason }
     end
+  end
+
+  def enable_edit_plan_button?(hbx_enrollment)
+    hbx_enrollment.is_ivl_by_kind? && ['coverage_selected', 'auto_renewing', 'unverified', 'renewing_coverage_selected', 'transmitted_to_carrier'].include?(hbx_enrollment.aasm_state)
   end
 end
