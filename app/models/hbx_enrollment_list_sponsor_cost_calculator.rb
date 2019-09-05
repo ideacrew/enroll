@@ -1,5 +1,4 @@
 class HbxEnrollmentListSponsorCostCalculator
-  include Acapi::Notifiers
 
   EnrollmentProductAdapter = Struct.new(:id, :issuer_profile_id, :active_year, :kind)
 
@@ -204,14 +203,7 @@ class HbxEnrollmentListSponsorCostCalculator
     contribution_total = 0.00
     group_mapper = HbxEnrollmentRosterMapper.new(hbx_enrollment_id_list, sponsored_benefit)
     group_mapper.each do |ce_roster|
-      begin
-        price_group = p_calculator.calculate_price_for(pricing_model, ce_roster, sponsor_contribution)
-      rescue StandardError => e
-        relation_string = ce_roster.members.map(&:relationship).join(', ')
-        primary_member_id = ce_roster.primary_member.member_id
-        log("#47977 Invalid_Relationship person_id: #{primary_member_id}, relations: #{relation_string}, error: #{e.message}", {:severity => "error"})
-        next ce_roster
-      end
+      price_group = p_calculator.calculate_price_for(pricing_model, ce_roster, sponsor_contribution)
       contribution_group = c_calculator.calculate_contribution_for(contribution_model, price_group, sponsor_contribution)
       price_total = price_total + contribution_group.group_enrollment.product_cost_total
       contribution_total = contribution_total + contribution_group.group_enrollment.sponsor_contribution_total
