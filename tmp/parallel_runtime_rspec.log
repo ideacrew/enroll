@@ -1,5 +1,4 @@
 spec/components/benefit_sponsors_spec.rb:700.04980899952352
-spec/views/welcome/index.html.slim_spec.rb:598.9792240001261
 spec/controllers/general_agencies/profiles_controller_spec.rb:248.19047799985856
 spec/views/general_agencies/_index.html.erb_spec.rb:190.4978680005297
 spec/components/sponsored_benefits_spec.rb:186.35946299694479
@@ -180,6 +179,7 @@ spec/controllers/employers/employer_profiles_controller_spec.rb:4.15425699949264
 spec/lib/tasks/cancel_employer_renewal_spec.rb:4.038890999741852
 spec/views/insured/interactive_identity_verifications/failed_validation.html.haml_spec.rb:4.0365829998627305
 spec/data_migrations/change_plan_year_effective_date_spec.rb:4.011571999639273
+spec/views/welcome/index.html.slim_spec.rb:3.9792240001261
 spec/models/general_agency_profile_spec.rb:3.9747850000858307
 spec/controllers/insured/interactive_identity_verifications_controller_spec.rb:3.95382499974221
 spec/notices/shop_employer_notices/group_advance_termination_confirmation_spec.rb:3.942189999856055
