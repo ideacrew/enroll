@@ -39,7 +39,8 @@ module Insured
 
         it "returns a truthy is_aptc_eligible if tax household and valid aptc members exist" do
           tax_household = FactoryBot.create(:tax_household, household: family.active_household)
-          aptc_member   = FactoryBot.create(:tax_household_member, tax_household: tax_household)
+          FactoryBot.create(:tax_household_member, tax_household: tax_household)
+          allow(family.active_household).to receive(:latest_active_tax_household).and_return(tax_household)
           form_params   = subject.find(@enrollment_id, @family_id)
           expect(form_params[:is_aptc_eligible]).to be_truthy
         end
