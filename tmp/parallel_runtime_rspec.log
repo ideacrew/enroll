@@ -1,6 +1,4 @@
 spec/components/benefit_sponsors_spec.rb:700.04980899952352
-spec/controllers/general_agencies/profiles_controller_spec.rb:248.19047799985856
-spec/views/general_agencies/_index.html.erb_spec.rb:190.4978680005297
 spec/components/sponsored_benefits_spec.rb:186.35946299694479
 spec/controllers/insured/families_controller_spec.rb:144.0566790001467
 spec/test_data/verified_family_payloads/core_scenarios/core_scenarios_spec.rb:140.77071400079876
@@ -11,6 +9,7 @@ spec/models/hbx_enrollment_spec.rb:88.80704499781132
 spec/models/factories/eligibility_factory_spec.rb:85.75055299978703
 spec/controllers/broker_agencies/profiles_controller_spec.rb:83.8696170002222
 spec/controllers/exchanges/hbx_profiles_controller_spec.rb:83.68074399977922
+spec/controllers/general_agencies/profiles_controller_spec.rb:80.19047799985856
 spec/controllers/insured/plan_shoppings_controller_spec.rb:76.872244999744
 spec/views/general_agencies/_staffs.html.erb_spec.rb:63.525714000687
 spec/views/general_agencies/_show.html.erb_spec.rb:56.56670199986547
@@ -80,6 +79,7 @@ spec/notices/shop_broker_notices/broker_fired_notice_spec.rb:11.000289000570774
 spec/models/services/ivl_enrollment_renewal_service_spec.rb:10.897336000576615
 spec/script/shop_sep_query_spec.rb:10.883566999807954
 spec/views/insured/consumer_roles/_form.html.erb_spec.rb:10.76236299984157
+spec/views/general_agencies/_index.html.erb_spec.rb:10.4978680005297
 spec/views/broker_agencies/profiles/_assign.html.erb_spec.rb:10.388648999854922
 spec/models/benefit_sponsorship_spec.rb:10.370196999982
 spec/models/benefit_coverage_period_spec.rb:10.210326999425888
