@@ -132,12 +132,12 @@ namespace :qle_kind_wizard_test_seed do
     second_custom_qle_question.save!
     second_custom_qle_question = qle_kind_with_two_questions.custom_qle_questions.last
     # Second Question Response 1
-    second_custom_qle_question_response_1 = first_custom_qle_question.custom_qle_responses.build(
+    second_custom_qle_question_response_1 = second_custom_qle_question.custom_qle_responses.build(
       content: "It's a family member",
       action_to_take: 'accepted'
     )
     # Second Question Response 2
-    second_custom_qle_question_response_2 = first_custom_qle_question.custom_qle_responses.build(
+    second_custom_qle_question_response_2 = second_custom_qle_question.custom_qle_responses.build(
       content: "I don't know",
       action_to_take: 'declined'
     )
