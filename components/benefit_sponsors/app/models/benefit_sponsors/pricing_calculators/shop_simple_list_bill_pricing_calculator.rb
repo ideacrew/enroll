@@ -69,7 +69,7 @@ module BenefitSponsors
             member_relationship = pricing_model.map_relationship_for(rm.relationship, coverage_age, rm.is_disabled?)
             if member_relationship.blank?
               primary = roster_entry.members.detect(&:is_primary_member?) || OpenStruct.new({:member_id => "NO PRIMARY"})
-              raise ::BenefitSponsors::PricingCalculators::UnmatchedRelationshipError.new(primary_id.member_id,rm.member_id,rm.relationship)
+              raise ::BenefitSponsors::PricingCalculators::UnmatchedRelationshipError.new(primary.member_id,rm.member_id,rm.relationship)
             end
             [member_relationship, rm.dob]
           end
@@ -87,7 +87,7 @@ module BenefitSponsors
           benefit_roster_entry.group_enrollment.member_enrollments.each do |m_en|
             m_en.product_price = 0.00
           end
-          benefit_roster_entry.group_enrollment.product_cost_total = calc_results.total
+          benefit_roster_entry.group_enrollment.product_cost_total = 0.00
           benefit_roster_entry
         end
       end
