@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module PricingCalculators
     class UnmatchedRelationshipError < RangeError
-      include Acapi::Notifier
+      include Acapi::Notifiers
 
       attr_reader :primary_id
       attr_reader :member_id
@@ -15,11 +17,11 @@ module BenefitSponsors
       end
 
       def message
-        "Invalid Relationship for pricing calculations: person_id: #{primary_id}, relationship: #{relation_string}, member: #{member_id}"
+        "Invalid Relationship for pricing calculations: person_id: #{primary_id}, relationship: #{relationship}, member: #{member_id}"
       end
 
       def broadcast
-        log("#47977 Invalid Relationship for pricing calculations: person_id: #{primary_id}, relationship: #{relation_string}, member: #{member_id}", {:severity => "error"})
+        log("#47977 Invalid Relationship for pricing calculations: person_id: #{primary_id}, relationship: #{relationship}, member: #{member_id}", {:severity => "error"})
       end
     end
   end

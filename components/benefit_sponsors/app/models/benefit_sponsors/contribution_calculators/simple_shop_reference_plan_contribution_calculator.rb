@@ -69,7 +69,7 @@ module BenefitSponsors
           rel_name = @contribution_model.map_relationship_for(relationship, coverage_age, roster_entry_member.is_disabled?)
           if rel_name.blank?
             primary = @primary_member || OpenStruct.new({:member_id => "NO PRIMARY ASSIGNED IN CALCULATION"})
-            raise ::BenefitSponsors::ContributionCalculators::UnmatchedRelationshipError.new(primary.id,roster_entry_member.member_id,relationship)
+            raise ::BenefitSponsors::ContributionCalculators::UnmatchedRelationshipError.new(primary.member_id,roster_entry_member.member_id,relationship)
           end
           @contribution_model.contribution_units.detect do |cu|
             cu.match?({rel_name.to_s => 1})
