@@ -5,8 +5,8 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 describe HbxEnrollmentListSponsorCostCalculator, :dbclean => :after_each do
-  include_context "setup benefit market with market catalogs and product packages"
-  include_context "setup initial benefit application"
+  include_context 'setup benefit market with market catalogs and product packages'
+  include_context 'setup initial benefit application'
   let(:person) { FactoryBot.create(:person) }
   let(:person2) do
     pr = FactoryBot.create(:person)
@@ -33,7 +33,7 @@ describe HbxEnrollmentListSponsorCostCalculator, :dbclean => :after_each do
                       enrollment_members: family.family_members.to_a,
                       household: family.active_household,
                       family: family,
-                      aasm_state: "coverage_selected",
+                      aasm_state: 'coverage_selected',
                       effective_on: initial_application.start_on,
                       rating_area_id: initial_application.recorded_rating_area_id,
                       sponsored_benefit_id: benefit_package.health_sponsored_benefit.id,
@@ -44,13 +44,17 @@ describe HbxEnrollmentListSponsorCostCalculator, :dbclean => :after_each do
 
   context 'for invalid relationships' do
     before do
-      person.person_relationships.first.update_attributes!(kind: "parent")
+      person.person_relationships.first.update_attributes!(kind: 'parent')
       @enr_cal_obj = HbxEnrollmentListSponsorCostCalculator.new(benefit_sponsorship)
+      @hbx_ids = HbxEnrollment.all.pluck(:_id)
     end
 
     it 'should not raise any error' do
-      hbx_ids = HbxEnrollment.all.pluck(:_id)
-      expect { @enr_cal_obj.calculate(sponsored_benefit, hbx_ids) }.not_to raise_error
+      expect{ @enr_cal_obj.calculate(sponsored_benefit, @hbx_ids) }.not_to raise_error
+    end
+
+    it 'should return 0 for price' do
+      expect(@enr_cal_obj.calculate(sponsored_benefit, @hbx_ids)[1]).to eq(0.00)
     end
   end
 end
