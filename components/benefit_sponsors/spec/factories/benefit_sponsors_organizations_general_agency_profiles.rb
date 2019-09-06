@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :benefit_sponsors_organizations_general_agency_profile, class: '::BenefitSponsors::Organizations::GeneralAgencyProfile' do
-    market_kind "shop"
+    market_kind { "shop" }
     organization
 
     transient do

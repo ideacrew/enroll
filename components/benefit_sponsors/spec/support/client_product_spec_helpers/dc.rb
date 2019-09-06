@@ -19,12 +19,12 @@ module BenefitSponsors
       product_ptable_id = BSON::ObjectId.new
       product_ptuple_id = BSON::ObjectId.new
       product_props = {
-        "_id": product_id,
+        "_id" => product_id,
         "_type": "BenefitMarkets::Products::DentalProducts::DentalProduct",
         ehb: 0.9942,
         dental_plan_kind: "hmo",
         metal_level_kind: :dental,
-        benefit_market_kind: "aca_shop",
+        benefit_market_kind: :aca_shop,
         title: title,
         issuer_profile_id: issuer_profile_id,
         hios_id: "#{hios_base}-01",
@@ -56,7 +56,10 @@ module BenefitSponsors
             }]
           }
         ],
-        renewal_product_id: renewal_product_id
+        is_reference_plan_eligible: true,
+        renewal_product_id: renewal_product_id,
+        is_standard_plan: true,
+        hsa_eligibility: true
       }
     end
 
@@ -75,7 +78,7 @@ module BenefitSponsors
       product_ptable_id = BSON::ObjectId.new
       product_ptuple_id = BSON::ObjectId.new
       product_props = {
-        "_id": product_id,
+        "_id" => product_id,
         "_type": "BenefitMarkets::Products::HealthProducts::HealthProduct",
         ehb: 0.9942,
         health_plan_kind: "hmo",
@@ -112,6 +115,9 @@ module BenefitSponsors
             }]
           }
         ],
+        is_reference_plan_eligible: true,
+        is_standard_plan: true,
+        hsa_eligibility: true,
         renewal_product_id: renewal_product_id
       }
     end
@@ -142,7 +148,7 @@ module BenefitSponsors
         "Carrier 3 Dental Only - Dental - State",
         "32345MA0260001",
         effective_period,
-        "bronze",
+        :dental,
         state_service_area_id,
         rating_area_id,
         [:single_product],
@@ -153,7 +159,7 @@ module BenefitSponsors
         "Carrier 3 Dental Only - Dental - State",
         "32345MA0260005",
         effective_period,
-        "bronze",
+        :dental,
         state_service_area_id,
         rating_area_id,
         [:single_issuer],
@@ -162,9 +168,9 @@ module BenefitSponsors
       product_3_props = dental_shop_product_props_for(
         issuer_profile_id,
         "Carrier 3 Dental Only - Dental - State",
-        "32345MA0260009",
+        "32345MA0260029",
         effective_period,
-        "bronze",
+        :dental,
         state_service_area_id,
         rating_area_id,
         [:multi_product],
@@ -239,7 +245,7 @@ module BenefitSponsors
         "Carrier 2 Health and Dental - Dental",
         "22345MA0260005",
         effective_period,
-        "bronze",
+        :dental,
         state_service_area_id,
         rating_area_id,
         [:single_product],
@@ -585,6 +591,48 @@ module BenefitSponsors
       }
     end
 
+    def shared_benefit_market_catalog_properties
+=begin
+      {
+        sponsor_market_policy: {
+          _type: "BenefitMarkets::MarketPolicies::SponsorMarketPolicy",
+          _id: BSON::ObjectId.new,
+          roster_size_rule: {
+            min: 0,
+            max: 0
+          },
+          full_time_employee_size_rule: {
+            min: 0,
+            max: 0
+          },
+          part_time_employee_size_rule: {
+            min: 0,
+            max: 0
+          },
+          rostered_non_owner_size_rule: 0,
+          benefit_categories: [ :any ]
+        },
+        member_market_policy: {
+          _type: "BenefitMarkets::MarketPolicies::MemberMarketPolicy",
+          _id: BSON::ObjectId.new,
+          age_range_policy: {
+            min: 0,
+            max: 0
+          },
+          child_age_off_policy: 26,
+          incarceration_status_policy: [:any],
+          citizenship_status_policy: [:any],
+          residency_status_policy: [:any],
+          ethnicity_policy: [:any],
+          product_dependencies_policy: [:any],
+          cost_sharing_policy: "",
+          lawful_presence_status_policy: ""
+        }
+      }
+=end
+      {}
+    end
+
     def construct_simple_benefit_market_catalog(site, benefit_market, effective_period)
       product_list = build_carriers_and_plans_for_effective_period_at(site, effective_period)
       benefit_market_catalog_id = BSON::ObjectId.new
@@ -592,11 +640,12 @@ module BenefitSponsors
         "_id": benefit_market_catalog_id,
         application_interval_kind: :monthly,
         probation_period_kinds: [ 
-          "first_of_month_before_15th", 
-          "date_of_hire",
-          "first_of_month", 
-          "first_of_month_after_30_days", 
-          "first_of_month_after_60_days"
+          :first_of_month_before_15th,
+          :date_of_hire,
+          :first_of_month,
+          :first_of_month_following,
+          :first_of_month_after_30_days,
+          :first_of_month_after_60_days
         ],
         application_period: {
           min: effective_period.min,
@@ -609,7 +658,8 @@ module BenefitSponsors
          sole_source_health_product_package_from_product_props(product_list, effective_period),
          single_issuer_health_product_package_from_product_props(product_list, effective_period),
          dental_single_product_product_package_from_product_props(product_list, effective_period),
-         dental_single_issuer_product_package_from_product_props(product_list, effective_period)
+         dental_single_issuer_product_package_from_product_props(product_list, effective_period),
+         dental_multi_product_package_from_product_props(product_list, effective_period)
         ]
       }
       BenefitMarkets::BenefitMarketCatalog.collection.insert_one(benefit_market_catalog_props)
@@ -649,11 +699,12 @@ module BenefitSponsors
         "_id": renewal_benefit_market_catalog_id,
         application_interval_kind: :monthly,
         probation_period_kinds: [ 
-          "first_of_month_before_15th", 
-          "date_of_hire",
-          "first_of_month", 
-          "first_of_month_after_30_days", 
-          "first_of_month_after_60_days"
+          :first_of_month_before_15th,
+          :date_of_hire,
+          :first_of_month,
+          :first_of_month_following,
+          :first_of_month_after_30_days,
+          :first_of_month_after_60_days
         ],
         application_period: {
           min: renewal_effective_period.min,
@@ -698,11 +749,12 @@ module BenefitSponsors
         "_id": benefit_market_catalog_id,
         application_interval_kind: :monthly,
         probation_period_kinds: [ 
-          "first_of_month_before_15th", 
-          "date_of_hire",
-          "first_of_month", 
-          "first_of_month_after_30_days", 
-          "first_of_month_after_60_days"
+          :first_of_month_before_15th,
+          :date_of_hire,
+          :first_of_month,
+          :first_of_month_following,
+          :first_of_month_after_30_days,
+          :first_of_month_after_60_days
         ],
         application_period: {
           min: effective_period.min,
@@ -756,11 +808,12 @@ module BenefitSponsors
         "_id": renewal_benefit_market_catalog_id,
         application_interval_kind: :monthly,
         probation_period_kinds: [ 
-          "first_of_month_before_15th", 
-          "date_of_hire",
-          "first_of_month", 
-          "first_of_month_after_30_days", 
-          "first_of_month_after_60_days"
+          :first_of_month_before_15th,
+          :date_of_hire,
+          :first_of_month,
+          :first_of_month_following,
+          :first_of_month_after_30_days,
+          :first_of_month_after_60_days
         ],
         application_period: {
           min: renewal_effective_period.min,
@@ -776,7 +829,7 @@ module BenefitSponsors
           dental_single_issuer_product_package_from_product_props(renewal_product_list, renewal_effective_period),
           dental_multi_product_package_from_product_props(renewal_product_list, renewal_effective_period)
         ]
-      }
+      }.merge(shared_benefit_market_catalog_properties)
       #BenefitMarkets::BenefitMarketCatalog.collection.insert_one(renewal_benefit_market_catalog_props)
 
       rating_area_id = BenefitSponsors::ProductSpecHelpers.create_rating_areas(effective_period)
@@ -806,11 +859,12 @@ module BenefitSponsors
         "_id": benefit_market_catalog_id,
         application_interval_kind: :monthly,
         probation_period_kinds: [ 
-          "first_of_month_before_15th", 
-          "date_of_hire",
-          "first_of_month", 
-          "first_of_month_after_30_days", 
-          "first_of_month_after_60_days"
+          :first_of_month_before_15th,
+          :date_of_hire,
+          :first_of_month,
+          :first_of_month_following,
+          :first_of_month_after_30_days,
+          :first_of_month_after_60_days
         ],
         application_period: {
           min: effective_period.min,
@@ -825,8 +879,10 @@ module BenefitSponsors
          dental_single_product_product_package_from_product_props(product_list, effective_period),
          dental_single_issuer_product_package_from_product_props(product_list, effective_period),
          dental_multi_product_package_from_product_props(product_list, effective_period)
-        ]
-      }
+        ],
+        created_at: Time.now,
+        updated_at: Time.now
+      }.merge(shared_benefit_market_catalog_properties)
       #BenefitMarkets::BenefitMarketCatalog.collection.insert_one(benefit_market_catalog_props)
 
       previous_ep_min = effective_period.min - 1.year
@@ -860,11 +916,12 @@ module BenefitSponsors
         "_id": previous_benefit_market_catalog_id,
         application_interval_kind: :monthly,
         probation_period_kinds: [ 
-          "first_of_month_before_15th", 
-          "date_of_hire",
-          "first_of_month", 
-          "first_of_month_after_30_days", 
-          "first_of_month_after_60_days"
+          :first_of_month_before_15th,
+          :date_of_hire,
+          :first_of_month,
+          :first_of_month_following,
+          :first_of_month_after_30_days,
+          :first_of_month_after_60_days
         ],
         application_period: {
           min: previous_effective_period.min,
@@ -880,7 +937,7 @@ module BenefitSponsors
          dental_single_issuer_product_package_from_product_props(previous_product_list, previous_effective_period),
          dental_multi_product_package_from_product_props(previous_product_list, previous_effective_period)
         ]
-      }
+      }.merge(shared_benefit_market_catalog_properties)
       #BenefitMarkets::BenefitMarketCatalog.collection.insert_one(previous_benefit_market_catalog_props)
 
       BenefitMarkets::BenefitMarketCatalog.collection.insert_many([renewal_benefit_market_catalog_props, benefit_market_catalog_props, previous_benefit_market_catalog_props])
