@@ -203,7 +203,7 @@ module BenefitSponsors
           allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(reference_product, rate_schedule_date, child_age, rating_area).and_return(300.00)
         end
 
-        it "calculates the total contribution" do
+        it 'calculates the total contribution' do
           calculation_result = contribution_calculator.calculate_contribution_for(
             contribution_model,
             family_roster_entry,
@@ -212,7 +212,7 @@ module BenefitSponsors
           expect(calculation_result.group_enrollment.sponsor_contribution_total).to eq(total_contribution)
         end
 
-        it "calculates the member contributions" do
+        it 'calculates the member contributions' do
           calculation_result = contribution_calculator.calculate_contribution_for(
             contribution_model,
             family_roster_entry,
@@ -222,6 +222,99 @@ module BenefitSponsors
             BigDecimal.new((acc + m_en.sponsor_contribution).to_s).round(2)
           end
           expect(member_total).to eq(total_contribution)
+        end
+
+        context 'for invalid relationships' do
+          let(:parent_member_id) { "some_parent1_member_id" }
+          let(:parent_dob) { Date.new(2015, 1, 1) }
+          let(:parent) do
+            instance_double(
+              "::BenefitMarkets::SponsoredBenefits::RosterMember",
+              member_id: parent_member_id,
+              relationship: "parent",
+              is_disabled?: false,
+              dob: parent_dob,
+              is_primary_member?: false
+            )
+          end
+          let(:parent_enrollment) do
+            ::BenefitSponsors::Enrollments::MemberEnrollment.new(
+              member_id: parent_member_id,
+              product_price: dependent_price
+            )
+          end
+          let(:parent_age) { 3 }
+
+          let(:invalid_family_group_enrollment) do
+            BenefitSponsors::Enrollments::GroupEnrollment.new(
+              member_enrollments: [employee_enrollment, spouse_enrollment, parent_enrollment],
+              rate_schedule_date: rate_schedule_date,
+              coverage_start_on: coverage_start_date,
+              previous_product: nil,
+              product: product,
+              rating_area: rating_area,
+              product_cost_total: family_price
+            )
+          end
+
+          let(:invalid_family_roster_entry) do
+            ::BenefitSponsors::Members::MemberGroup.new(
+              [employee, spouse, parent],
+              group_enrollment: invalid_family_group_enrollment
+            )
+          end
+
+          let(:calculator_state) do
+            roster_coverage = invalid_family_roster_entry.group_enrollment
+            member_pricing = {}
+            roster_coverage.member_enrollments.each do |m_en|
+              member_pricing[m_en.member_id] = m_en.product_price
+            end
+            reference_product = sponsor_contribution.reference_product
+            level_map = contribution_calculator.send(:level_map_for, sponsor_contribution)
+            coverage_eligibility_dates = {}
+            roster_coverage.member_enrollments.each do |m_en|
+              coverage_eligibility_dates[m_en.member_id] = m_en.coverage_eligibility_on
+            end
+            cal_klass = BenefitSponsors::ContributionCalculators::SimpleShopReferencePlanContributionCalculator::CalculatorState
+            cal_klass.new(contribution_model,
+                          member_pricing,
+                          roster_coverage,
+                          reference_product,
+                          level_map,
+                          coverage_eligibility_dates,
+                          roster_coverage.sponsor_contribution_prohibited)
+          end
+
+          before :each do
+            allow(contribution_model).to receive(:map_relationship_for).with("parent", parent_age, false).and_return(nil)
+          end
+
+          it 'should raise UnmatchedRelationshipError' do
+            error_klass = ::BenefitSponsors::ContributionCalculators::UnmatchedRelationshipError
+            expect{calculator_state.get_contribution_unit(parent)}.to raise_error(error_klass)
+          end
+
+          it 'calculates the total contribution' do
+            calculation_result = contribution_calculator.calculate_contribution_for(
+              contribution_model,
+              invalid_family_roster_entry,
+              sponsor_contribution
+            )
+            expect(calculation_result.group_enrollment.sponsor_contribution_total).to eq(0.00)
+          end
+
+          it 'calculates the member contributions' do
+            calculation_result = contribution_calculator.calculate_contribution_for(
+              contribution_model,
+              invalid_family_roster_entry,
+              sponsor_contribution
+            )
+            member_total = calculation_result.group_enrollment.member_enrollments.inject(BigDecimal("0.00")) do |acc, m_en|
+              BigDecimal((acc + m_en.sponsor_contribution).to_s).round(2)
+            end
+            expect(member_total).to eq(0.00)
+          end
         end
       end
 
@@ -319,7 +412,7 @@ module BenefitSponsors
           allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(reference_product, rate_schedule_date, employee_age, rating_area).and_return(541.17)
         end
 
-        it "calculates the total contribution" do
+        it 'calculates the total contribution' do
           calculation_result = contribution_calculator.calculate_contribution_for(
             contribution_model,
             family_roster_entry,
@@ -328,7 +421,7 @@ module BenefitSponsors
           expect(calculation_result.group_enrollment.sponsor_contribution_total).to eq(total_contribution)
         end
 
-        it "calculates the member contributions" do
+        it 'calculates the member contributions' do
           calculation_result = contribution_calculator.calculate_contribution_for(
             contribution_model,
             family_roster_entry,
