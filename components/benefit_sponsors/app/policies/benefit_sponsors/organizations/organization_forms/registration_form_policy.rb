@@ -47,8 +47,13 @@ module BenefitSponsors
         def can_edit?
           if is_employer_profile?
             return true if (service.is_broker_for_employer?(user, record) || service.is_general_agency_staff_for_employer?(user, record))
+            service.is_staff_for_agency?(user, record)
+          elsif is_general_agency_profile?
+            return false if user.person.general_agency_primary_staff.blank?
+            return true if service.is_staff_for_agency?(user, record)
+          else
+            service.is_staff_for_agency?(user, record)
           end
-          service.is_staff_for_agency?(user, record)
         end
 
         def can_update?
@@ -61,6 +66,10 @@ module BenefitSponsors
 
         def is_employer_profile?
           profile_type == "benefit_sponsor"
+        end
+
+        def is_general_profile?
+          profile_type == "general_agency"
         end
 
         def is_general_agency_profile?
@@ -89,6 +98,10 @@ module BenefitSponsors
 
           if is_broker_profile?
             return service.is_broker_agency_registered?(user, record)
+          end
+
+          if is_general_agency_profile?
+            return service.is_general_agency_registered?(user, record)
           end
           true
         end

@@ -3,17 +3,36 @@
 namespace :load_rate_reference do
 
   task :run_all_rating_areas => :environment do
-    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{Settings.aca.state_abbreviation.downcase}/xls_templates/rating_areas", "**", "*.xlsx"))
+    if Settings.site.key.to_s == "dc"
+      Rake::Task['load_rate_reference:dc_rating_areas'].invoke
+    else
+      files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{Settings.aca.state_abbreviation.downcase}/xls_templates/rating_areas", "**", "*.xlsx"))
 
-    puts "*"*80 unless Rails.env.test?
-    files.each do |file|
-      puts "processing file #{file}" unless Rails.env.test?
-      Rake::Task['load_rate_reference:update_rating_areas'].invoke(file)
-      Rake::Task['load_rate_reference:update_rating_areas'].reenable
-      puts "created #{RatingArea.all.size} rating areas in old model for all years" unless Rails.env.test?
-      puts "created #{BenefitMarkets::Locations::RatingArea.all.size} rating areas in new model for all years" unless Rails.env.test?
+      puts "*"*80 unless Rails.env.test?
+      files.each do |file|
+        puts "processing file #{file}" unless Rails.env.test?
+        Rake::Task['load_rate_reference:update_rating_areas'].invoke(file)
+        Rake::Task['load_rate_reference:update_rating_areas'].reenable
+        puts "created #{RatingArea.all.size} rating areas in old model for all years" unless Rails.env.test?
+        puts "created #{BenefitMarkets::Locations::RatingArea.all.size} rating areas in new model for all years" unless Rails.env.test?
+      end
     end
     puts "*"*80 unless Rails.env.test?
+  end
+
+  desc "rating areas"
+  task :dc_rating_areas => :environment do
+    if Settings.site.key.to_s == "dc"
+      (2014..TimeKeeper.date_of_record.year).each do |year|
+        puts "Creating DC Rating areas for #{year}" unless Rails.env.test?
+        ::BenefitMarkets::Locations::RatingArea.create!({
+                                                            active_year: year,
+                                                            exchange_provided_code: 'R-DC001',
+                                                            county_zip_ids: [],
+                                                            covered_states: ['DC']
+                                                        })
+      end
+    end
   end
 
   desc "load rating regions from xlsx file"

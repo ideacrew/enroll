@@ -55,7 +55,9 @@ end
 if (ENV["type"] != "fixtures") && missing_plan_dumps
   puts "Running full seed"
 
-  system "bundle exec rake import:county_zips"
+  if Settings.site.key == :cca
+    system "bundle exec rake import:county_zips"
+  end
 
   if Settings.aca.employer_has_sic_field
     system "bundle exec rake load_sic_code:update_sic_codes"
@@ -64,34 +66,36 @@ if (ENV["type"] != "fixtures") && missing_plan_dumps
 
   puts "*"*80
   puts "Loading Site seed"
-  glob_pattern = File.join(Rails.root, "db/seedfiles/cca/site_seed.rb")
+  glob_pattern = File.join(Rails.root, "db/seedfiles/#{Settings.aca.state_abbreviation.downcase}/site_seed.rb")
   load glob_pattern
-  load_cca_site_seed
+  __send__("load_#{Settings.aca.state_abbreviation.downcase}_site_seed")
   puts "Loading benefit market seed"
-  bm_glob_pattern = File.join(Rails.root, "db/seedfiles/cca/benefit_markets_seed.rb")
+  bm_glob_pattern = File.join(Rails.root, "db/seedfiles/#{Settings.aca.state_abbreviation.downcase}/benefit_markets_seed.rb")
   load bm_glob_pattern
-  load_cca_benefit_markets_seed
+  __send__("load_#{Settings.aca.state_abbreviation.downcase}_benefit_markets_seed")
   puts "complete"
 
-  unless Settings.aca.use_simple_employer_calculation_model
-    puts "*"*80
-    puts "Loading Rating Areas."
-    system "bundle exec rake load_rate_reference:run_all_rating_areas"
-    puts "::: complete :::"
-  end
+  puts "*"*80
+  puts "Loading Rating Areas."
+  system "bundle exec rake load_rate_reference:run_all_rating_areas"
+  puts "::: complete :::"
 
   puts "*"*80
   puts "Loading carriers"
   require File.join(File.dirname(__FILE__),'seedfiles', "carriers_seed_#{Settings.aca.state_abbreviation.downcase}")
-  system "bundle exec rake migrations:load_issuer_profiles"
+  if Settings.site.key == :dc
+    ra_glob_pattern = File.join(Rails.root, "db/seedfiles/#{Settings.aca.state_abbreviation.downcase}/issuer_profiles_seed.rb")
+    load ra_glob_pattern
+    __send__("load_#{Settings.aca.state_abbreviation.downcase}_issuer_profile_seed")
+  else
+    system "bundle exec rake migrations:load_issuer_profiles"
+  end
   puts "::: complete :::"
 
-  if Settings.aca.offerings_constrained_to_service_areas
-    puts "*"*80
-    puts "Loading Carrier Service Areas."
-    system "bundle exec rake load_service_reference:run_all_service_areas"
-    puts "::: complete :::"
-  end
+  puts "*"*80
+  puts "Loading Carrier Service Areas."
+  system "bundle exec rake load_service_reference:run_all_service_areas"
+  puts "::: complete :::"
 
   puts "*"*80
   puts "Loading SERFF Plan data"
@@ -99,12 +103,10 @@ if (ENV["type"] != "fixtures") && missing_plan_dumps
   system "bundle exec rake xml:plans"
   puts "::: complete :::"
 
-  unless Settings.aca.use_simple_employer_calculation_model
-    puts "*" * 80
-    puts "Importing Rating Factors."
-    system "bundle exec rake load_rating_factors:run_all_rating_factors"
-    puts "::: complete :::"
-  end
+  puts "*" * 80
+  puts "Importing Rating Factors."
+  system "bundle exec rake load_rating_factors:run_all_rating_factors"
+  puts "::: complete :::"
 
   puts "Loading super group ids ..."
   system "bundle exec rake supergroup:update_plan_id"
@@ -136,7 +138,7 @@ if (ENV["type"] != "fixtures") && missing_plan_dumps
 
   puts "*"*80
   # system "bundle exec rake load:benefit_market_catalog[2018]"
-  system "bundle exec rake load:dc_benefit_market_catalog"
+  system "bundle exec rake load:dc_benefit_market_catalog[#{TimeKeeper.date_of_record.year}]"
   puts "::: complete :::"
   puts "*"*80
 
@@ -202,12 +204,24 @@ puts "::: complete :::"
 # puts "::: benefit packages seed complete :::"
 
 puts "*"*80
-system "bundle exec rake permissions:initial_hbx"
+puts "Loading IVL benefit packages."
+# Need to fix this rake to handle based on year for IVL
+system "bundle exec rake import:create_2019_ivl_packages"
+puts "::: complete :::"
 puts "*"*80
 
-require File.join(File.dirname(__FILE__),'seedfiles', 'security_questions_seed')
-puts "importing security questions complete"
 puts "*"*80
+system "bundle exec rake permissions:initial_hbx"
+# TODO FIX This
+permission = Permission.hbx_staff
+Person.where(hbx_staff_role: {:$exists => true}).all.each{|p|p.hbx_staff_role.update_attributes(permission_id: permission.id, subrole:'hbx_staff')}
+puts "*"*80
+
+if Settings.aca.security_questions
+  require File.join(File.dirname(__FILE__),'seedfiles', 'security_questions_seed')
+  puts "importing security questions complete"
+  puts "*"*80
+end
 
 if Settings.site.key.to_s == "cca" && (ENV["type"] == "fixtures")
   require File.join(File.dirname(__FILE__), 'seedfiles', 'sic_codes_seed')
@@ -216,6 +230,12 @@ if Settings.site.key.to_s == "cca" && (ENV["type"] == "fixtures")
   puts "loading plan fixtures"
   require File.join(File.dirname(__FILE__), 'seedfiles', 'cca', 'cca_seed')
 end
+
+puts "*"*80
+puts "Loading translations"
+system "bundle exec rake seed:translations[db/seedfiles/english_translations_seed.rb]"
+puts "::: complete :::"
+puts "*"*80
 
 puts "*"*80
 puts "Creating Indexes"
