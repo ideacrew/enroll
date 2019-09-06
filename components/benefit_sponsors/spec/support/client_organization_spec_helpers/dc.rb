@@ -58,6 +58,7 @@ module BenefitSponsors
         {
           _id: ep_id,
           is_benefit_sponsorship_eligible: false,
+          market_kind: :shop,
           _type: "BenefitSponsors::Organizations::GeneralAgencyProfile",
           contact_method: :paper_and_electronic,
           languages_spoken: [:en],
