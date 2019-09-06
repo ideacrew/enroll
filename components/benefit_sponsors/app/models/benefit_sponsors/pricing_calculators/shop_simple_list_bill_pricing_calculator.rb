@@ -22,9 +22,14 @@ module BenefitSponsors
         end
 
         def add(member)
+          @primary_member = member if member.is_primary_member?
           coverage_age = @pricing_calculator.calc_coverage_age_for(member, @product, @coverage_start_date, @eligibility_dates, @previous_product)
           relationship = member.is_primary_member? ? "self" : member.relationship
           rel = @pricing_model.map_relationship_for(relationship, coverage_age, member.is_disabled?)
+          if rel.blank?
+            primary = @primary_member || OpenStruct.new({:member_id => "NO PRIMARY"})
+            raise ::BenefitSponsors::PricingCalculators::UnmatchedRelationshipError.new(primary.member_id, member.member_id, relationship)
+          end
           pu = @pricing_unit_map[rel.to_s]
           @relationship_totals[rel.to_s] = @relationship_totals[rel.to_s] + 1
           rel_count = @relationship_totals[rel.to_s]
@@ -82,8 +87,8 @@ module BenefitSponsors
           end
           benefit_roster_entry.group_enrollment.product_cost_total = calc_results.total
           benefit_roster_entry
-        rescue ::BenefitSponsors::PricingCalculators::UnmatchedRelationshipError => err
-          err.broadcast
+        rescue ::BenefitSponsors::PricingCalculators::UnmatchedRelationshipError => e
+          e.broadcast
           benefit_roster_entry.group_enrollment.member_enrollments.each do |m_en|
             m_en.product_price = 0.00
           end
