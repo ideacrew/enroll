@@ -18,17 +18,18 @@ module BenefitSponsors
 
       def to_csv
         CSV.generate(headers: true) do |csv|
-          csv << (["#{Settings.site.long_name} Employee Census Template"] + Array.new(6) + [TimeKeeper.date_of_record] + Array.new(5) + ["1.1"])
+          csv << (["#{Settings.site.long_name} Employee Census Template"] + Array.new(6) + [TimeKeeper.date_of_record] + Array.new(5) + ['1.1'])
           csv << headers
           census_employee_roster.each do |census_employee|
             personal_details = personal_headers(census_employee)
             employee_details = employeement_headers(census_employee)
             benefit_group_details = benefit_group_assignment_details(census_employee)
             address_details = primary_location_details(census_employee)
-            append_config_data = ["", "employee"] + personal_details + employee_details + benefit_group_details + address_details
+            append_config_data = ['', 'employee'] + personal_details + employee_details + benefit_group_details + address_details
 
             if site_key == :dc
-              append_config_data += total_premium(census_employee)
+              @total_employer_contribution ||= total_premium(census_employee) #Using pipe, as the contribution is same in every loop, this does not work for employee premium.
+              append_config_data += @total_employer_contribution
               census_employee.census_dependents.each do |dependent|
                 append_config_data += append_dependent(dependent)
               end
@@ -43,8 +44,8 @@ module BenefitSponsors
         bga = []
         active_assignment = census_employee.active_benefit_group_assignment
         if active_assignment
-          health_enrollment = pull_enrollment_state_by_kind(active_assignment, "health")
-          dental_enrollment = pull_enrollment_state_by_kind(active_assignment, "dental")
+          health_enrollment = pull_enrollment_state_by_kind(active_assignment, 'health')
+          dental_enrollment = pull_enrollment_state_by_kind(active_assignment, 'dental')
           bga.push(
             active_assignment.benefit_package.title,
             "dental: #{dental_enrollment}  health: #{health_enrollment}",
@@ -74,14 +75,15 @@ module BenefitSponsors
           dental_plan = benefit_group.dental_reference_plan
 
           #As per the current requirement, total premium for the employer is calculated and recorded in the excel.
-          @employer_health_contribution_amount = sponsored_service.monthly_employer_contribution_amount(health_plan)
-          @employer_dental_contribution_amount = sponsored_service.monthly_employer_contribution_amount(dental_plan) if dental_plan.present?
-          premiums.push(@employer_health_contribution_amount, @employer_dental_contribution_amount)
+          er_health_contribution_amount = sponsored_service.monthly_employer_contribution_amount(health_plan)
+          er_dental_contribution_amount = sponsored_service.monthly_employer_contribution_amount(dental_plan) if dental_plan.present?
+          premiums.push(er_health_contribution_amount, er_dental_contribution_amount)
         else
           bga = record.active_benefit_group_assignment
           if bga
             estimator = ::BenefitSponsors::Services::SponsoredBenefitCostEstimationService.new
             bga.benefit_package.sponsored_benefits.each do |sponsored_benefit|
+              #As per the current requirement, total premium for the employer is calculated and recorded in the excel.
               cost_hash = estimator.calculate_estimates_for_benefit_display(sponsored_benefit)
               premiums.push(number_to_currency(cost_hash ? cost_hash[:estimated_sponsor_exposure] : 0))
             end
@@ -104,10 +106,10 @@ module BenefitSponsors
       def employeement_headers(census_employee)
         employeement = []
         employeement.push(
-            census_employee.hired_on.present? ? census_employee.hired_on.strftime("%m/%d/%Y") : '',
-            census_employee.aasm_state.humanize.downcase,
-            census_employee.employment_terminated_on.present? ? census_employee.employment_terminated_on.strftime("%m/%d/%Y") : '',
-            census_employee.is_business_owner ? "yes" : "no"
+          census_employee.hired_on.present? ? census_employee.hired_on.strftime('%m/%d/%Y') : '',
+          census_employee.aasm_state.humanize.downcase,
+          census_employee.employment_terminated_on.present? ? census_employee.employment_terminated_on.strftime('%m/%d/%Y') : '',
+          census_employee.is_business_owner ? 'yes' : 'no'
         )
         employeement
       end
@@ -160,29 +162,29 @@ module BenefitSponsors
 
       def census_employee_details_headers
         [
-          "Family ID # (to match family members to the EE & each household gets a unique number)(Optional)",
-          "Relationship (EE, Spouse, Domestic Partner, or Child)",
-          "Last Name",
-          "First Name",
-          "Middle Name or Initial (Optional)",
-          "Suffix (Optional)",
-          "Email Address",
-          "SSN / TIN (Required for EE & enter without dashes)",
-          "Date of Birth (MM/DD/YYYY)",
-          "Gender",
-          "Date of Hire",
-          "Status(Optional)",
-          "Date of Termination (Optional)",
-          "Is Business Owner?",
-          "Benefit Group(Optional)",
-          "Enrollment Type(Optional)",
-          "Plan Year (Optional)",
-          "Address Kind(Optional)",
-          "Address Line 1(Optional)",
-          "Address Line 2(Optional)",
-          "City(Optional)",
-          "State(Optional)",
-          "Zip(Optional)"
+          'Family ID # (to match family members to the EE & each household gets a unique number)(Optional)',
+          'Relationship (EE, Spouse, Domestic Partner, or Child)',
+          'Last Name',
+          'First Name',
+          'Middle Name or Initial (Optional)',
+          'Suffix (Optional)',
+          'Email Address',
+          'SSN / TIN (Required for EE & enter without dashes)',
+          'Date of Birth (MM/DD/YYYY)',
+          'Gender',
+          'Date of Hire',
+          'Status(Optional)',
+          'Date of Termination (Optional)',
+          'Is Business Owner?',
+          'Benefit Group(Optional)',
+          'Enrollment Type(Optional)',
+          'Plan Year (Optional)',
+          'Address Kind(Optional)',
+          'Address Line 1(Optional)',
+          'Address Line 2(Optional)',
+          'City(Optional)',
+          'State(Optional)',
+          'Zip(Optional)'
         ]
       end
 
