@@ -1,14 +1,12 @@
-require "rails_helper"
+# frozen_string_literal: true
 
+require "rails_helper"
 module BenefitSponsors
   RSpec.describe PricingCalculators::ShopSimpleListBillPricingCalculator, :dbclean => :after_each do
     let(:employee_dob) { Date.new(1990, 6, 1) }
     let(:employee_member_id) { "some_employee_id" }
     let(:roster_entry) do
-      ::BenefitSponsors::Members::MemberGroup.new(
-        roster_members,
-        group_enrollment: group_enrollment,
-      )
+      ::BenefitSponsors::Members::MemberGroup.new(roster_members, group_enrollment: group_enrollment)
     end
 
     let(:employee) do
@@ -69,14 +67,14 @@ module BenefitSponsors
       ::BenefitSponsors::PricingCalculators::ShopSimpleListBillPricingCalculator.new
     end
 
-    let(:pricing_model) { 
+    let(:pricing_model) do
       instance_double(
         ::BenefitMarkets::PricingModels::PricingModel,
         pricing_calculator: pricing_calculator,
         id: "a pricing model id",
         pricing_units: pricing_units
       )
-    }
+    end
 
     let(:spouse_pricing_unit) do
       instance_double(
@@ -87,9 +85,7 @@ module BenefitSponsors
     end
 
     let(:sponsor_contribution) do
-      instance_double(
-        ::BenefitSponsors::SponsoredBenefits::SponsorContribution,
-      )
+      instance_double(::BenefitSponsors::SponsoredBenefits::SponsorContribution)
     end
 
     let(:dependent_pricing_unit) do
@@ -101,7 +97,7 @@ module BenefitSponsors
     end
 
     describe "given:
-      - a sponsor which offers choice rating 
+      - a sponsor which offers choice rating
       - with 'employee' and 'spouse' groups" do
 
       describe "given:
@@ -134,18 +130,14 @@ module BenefitSponsors
         before(:each) do
           allow(pricing_model).to receive(:map_relationship_for).with("self", employee_age, false).and_return("employee")
           allow(pricing_model).to receive(:map_relationship_for).with("spouse", spouse_age, false).and_return("spouse")
-          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(
-            product,
-            rate_schedule_date,
-            employee_age,
-            "MA1"
-            ).and_return(200.00)
-          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(
-            product,
-            rate_schedule_date,
-            spouse_age,
-            "MA1"
-            ).and_return(100.00)
+          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(product,
+                                                                                            rate_schedule_date,
+                                                                                            employee_age,
+                                                                                            'MA1').and_return(200.00)
+          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(product,
+                                                                                            rate_schedule_date,
+                                                                                            spouse_age,
+                                                                                            'MA1').and_return(100.00)
         end
 
         it "calculates the total" do
@@ -254,8 +246,8 @@ module BenefitSponsors
     end
 
     describe "given:
-    - a sponsor which offers choice rating 
-    - with 'employee' and 'spouse' and 'dependent' groups" do
+      - a sponsor which offers choice rating
+      - with 'employee' and 'spouse' and 'dependent' groups" do
 
       describe "given:
         - an employee
@@ -383,15 +375,15 @@ module BenefitSponsors
         end
 
         let(:roster_members) { [employee, spouse, child1, child2, child3, child4, child5] }
-        let(:member_enrollments) { [
-          employee_enrollment,
-          spouse_member_enrollment,
-          child1_enrollment,
-          child2_enrollment,
-          child3_enrollment,
-          child4_enrollment,
-          child5_enrollment
-          ] }
+        let(:member_enrollments) do
+          [employee_enrollment,
+           spouse_member_enrollment,
+           child1_enrollment,
+           child2_enrollment,
+           child3_enrollment,
+           child4_enrollment,
+           child5_enrollment]
+        end
 
         before(:each) do
           allow(pricing_model).to receive(:map_relationship_for).with("self", employee_age, false).and_return("employee")
@@ -401,48 +393,34 @@ module BenefitSponsors
           allow(pricing_model).to receive(:map_relationship_for).with("child", child3_age, false).and_return("dependent")
           allow(pricing_model).to receive(:map_relationship_for).with("child", child4_age, false).and_return("dependent")
           allow(pricing_model).to receive(:map_relationship_for).with("child", child5_age, false).and_return("dependent")
-          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(
-            product,
-            rate_schedule_date,
-            employee_age,
-            "MA1"
-            ).and_return(200.00)
-          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(
-            product,
-            rate_schedule_date,
-            spouse_age,
-            "MA1"
-            ).and_return(100.00)
-          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(
-              product,
-              rate_schedule_date,
-              child1_age,
-              "MA1"
-            ).and_return(75.00)
-          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(
-              product,
-              rate_schedule_date,
-              child2_age,
-              "MA1"
-            ).and_return(50.00)
-          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(
-              product,
-              rate_schedule_date,
-              child3_age,
-              "MA1"
-            ).and_return(30.00)
-          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(
-              product,
-              rate_schedule_date,
-              child4_age,
-              "MA1"
-            ).and_return(20.00)
-          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(
-              product,
-              rate_schedule_date,
-              child5_age,
-              "MA1"
-            ).and_return(10.00)
+          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(product,
+                                                                                            rate_schedule_date,
+                                                                                            employee_age,
+                                                                                            'MA1').and_return(200.00)
+          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(product,
+                                                                                            rate_schedule_date,
+                                                                                            spouse_age,
+                                                                                            'MA1').and_return(100.00)
+          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(product,
+                                                                                            rate_schedule_date,
+                                                                                            child1_age,
+                                                                                            'MA1').and_return(75.00)
+          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(product,
+                                                                                            rate_schedule_date,
+                                                                                            child2_age,
+                                                                                            'MA1').and_return(50.00)
+          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(product,
+                                                                                            rate_schedule_date,
+                                                                                            child3_age,
+                                                                                            'MA1').and_return(30.00)
+          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(product,
+                                                                                            rate_schedule_date,
+                                                                                            child4_age,
+                                                                                            'MA1').and_return(20.00)
+          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(product,
+                                                                                            rate_schedule_date,
+                                                                                            child5_age,
+                                                                                            'MA1').and_return(10.00)
         end
 
         it "calculates the total" do
@@ -622,15 +600,15 @@ module BenefitSponsors
         end
 
         let(:roster_members) { [employee, spouse, child1, child2, child3, child4, child5] }
-        let(:member_enrollments) { [
-          employee_enrollment,
-          spouse_member_enrollment,
-          child1_enrollment,
-          child2_enrollment,
-          child3_enrollment,
-          child4_enrollment,
-          child5_enrollment
-          ] }
+        let(:member_enrollments) do
+          [employee_enrollment,
+           spouse_member_enrollment,
+           child1_enrollment,
+           child2_enrollment,
+           child3_enrollment,
+           child4_enrollment,
+           child5_enrollment]
+        end
 
         before(:each) do
           allow(pricing_model).to receive(:map_relationship_for).with("self", employee_age, false).and_return("employee")
@@ -640,48 +618,34 @@ module BenefitSponsors
           allow(pricing_model).to receive(:map_relationship_for).with("child", child3_age, false).and_return("dependent")
           allow(pricing_model).to receive(:map_relationship_for).with("child", child4_age, false).and_return("dependent")
           allow(pricing_model).to receive(:map_relationship_for).with("child", child5_age, false).and_return("dependent")
-          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(
-            product,
-            rate_schedule_date,
-            employee_age,
-            "MA1"
-            ).and_return(200.00)
-          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(
-            product,
-            rate_schedule_date,
-            spouse_age,
-            "MA1"
-            ).and_return(100.00)
-          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(
-              product,
-              rate_schedule_date,
-              child1_age,
-              "MA1"
-            ).and_return(75.00)
-          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(
-              product,
-              rate_schedule_date,
-              child2_age,
-              "MA1"
-            ).and_return(50.00)
-          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(
-              product,
-              rate_schedule_date,
-              child3_age,
-              "MA1"
-            ).and_return(30.00)
-          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(
-              product,
-              rate_schedule_date,
-              child4_age,
-              "MA1"
-            ).and_return(20.00)
-          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(
-              product,
-              rate_schedule_date,
-              child5_age,
-              "MA1"
-            ).and_return(10.00)
+          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(product,
+                                                                                            rate_schedule_date,
+                                                                                            employee_age,
+                                                                                            'MA1').and_return(200.00)
+          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(product,
+                                                                                            rate_schedule_date,
+                                                                                            spouse_age,
+                                                                                            'MA1').and_return(100.00)
+          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(product,
+                                                                                            rate_schedule_date,
+                                                                                            child1_age,
+                                                                                            'MA1').and_return(75.00)
+          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(product,
+                                                                                            rate_schedule_date,
+                                                                                            child2_age,
+                                                                                            'MA1').and_return(50.00)
+          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(product,
+                                                                                            rate_schedule_date,
+                                                                                            child3_age,
+                                                                                            'MA1').and_return(30.00)
+          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(product,
+                                                                                            rate_schedule_date,
+                                                                                            child4_age,
+                                                                                            'MA1').and_return(20.00)
+          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(product,
+                                                                                            rate_schedule_date,
+                                                                                            child5_age,
+                                                                                            'MA1').and_return(10.00)
         end
 
         it "calculates the total" do
@@ -731,6 +695,6 @@ module BenefitSponsors
           expect(member_entry.product_price).to eq(20.00)
         end
       end
-  end
+    end
   end
 end
