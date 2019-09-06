@@ -327,11 +327,12 @@ class HbxEnrollment
   scope :family_home_page_hidden_enrollments, ->(family) do
     where(
       family_id: family.id,
-      :product_id.nin => [nil]
+      :product_id.nin => [nil],
+      aasm_state: "coverage_canceled"
     ).order(
       effective_on: :desc,
       submitted_at: :desc, coverage_kind: :desc
-    ).canceled
+    )
   end
   #scope :terminated, -> { where(:aasm_state.in => TERMINATED_STATUSES, :terminated_on.gte => TimeKeeper.date_of_record.beginning_of_day) }
   scope :terminated, -> { where(:aasm_state.in => TERMINATED_STATUSES) }
