@@ -71,15 +71,6 @@ module Notifier
           end
       end
 
-      def age_of_aqhp_person(date, dob)
-        age = date.year - dob.year
-        if date.month < dob.month || (date.month == dob.month && date.day < dob.day)
-          age - 1
-        else
-          age
-        end
-      end
-
       def append_contact_details
         mailing_address = consumer_role.person.mailing_address
         return if mailing_address.blank?
