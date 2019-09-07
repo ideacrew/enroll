@@ -68,6 +68,15 @@ module Notifier
       end
     end
 
+    def age_of_aqhp_person(date, dob)
+      age = date.year - dob.year
+      if date.month < dob.month || (date.month == dob.month && date.day < dob.day)
+        age - 1
+      else
+        age
+      end
+    end
+
     def format_date(date)
       return '' if date.blank?
 
