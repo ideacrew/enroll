@@ -28,12 +28,29 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
     end
 
     context "Model attributes" do
-      it "should have first name from person object" do
-        expect(subject.first_name).to eq(person.first_name)
+
+      context 'first name' do
+        it 'should get first name from person object for projected uqhp notice' do
+          allow(subject).to receive(:uqhp_notice?).and_return(true)
+          expect(subject.first_name).to eq(person.first_name)
+        end
+
+        it 'should get first name from payload for projected aqhp notice' do
+          allow(subject).to receive(:uqhp_notice?).and_return(false)
+          expect(subject.first_name).to eq(payload["notice_params"]["primary_member"]["first_name"])
+        end
       end
 
-      it "should have last name from person object" do
-        expect(subject.last_name).to eq(person.last_name)
+      context 'last name' do
+        it 'should get last name from person object for projected uqhp notice' do
+          allow(subject).to receive(:uqhp_notice?).and_return(true)
+          expect(subject.last_name).to eq(person.last_name)
+        end
+
+        it 'should get last name from payload for projected aqhp notice' do
+          allow(subject).to receive(:uqhp_notice?).and_return(false)
+          expect(subject.last_name).to eq(payload["notice_params"]["primary_member"]["last_name"])
+        end
       end
 
       it "should have full name from person object" do
