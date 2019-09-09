@@ -97,7 +97,7 @@ module BenefitSponsors
         def export_census_employees
           authorize @employer_profile
           begin
-            employee_export = BenefitSponsors::Exporters::CensusEmployeeExport.new(@employer_profile, {action: "download"})
+            employee_export = ::Services::CensusEmployeeRoster.new(@employer_profile, {action: "download"})
             respond_to do |format|
               format.csv { send_data employee_export.to_csv, type: csv_content_type, filename: "#{@employer_profile.legal_name.parameterize.underscore}_census_employees_#{TimeKeeper.date_of_record}.csv" }
             end

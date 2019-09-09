@@ -6,7 +6,7 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 require "#{SponsoredBenefits::Engine.root}/spec/shared_contexts/sponsored_benefits.rb"
 include ActionView::Helpers::NumberHelper
 
-RSpec.describe BenefitSponsors::Exporters::CensusEmployeeExport, :dbclean => :after_each do
+RSpec.describe Services::CensusEmployeeRoster, :dbclean => :after_each do
   describe 'Employer Flow' do
     include_context 'setup benefit market with market catalogs and product packages'
     include_context 'setup initial benefit application'
@@ -42,7 +42,7 @@ RSpec.describe BenefitSponsors::Exporters::CensusEmployeeExport, :dbclean => :af
       abc_profile.reload
     end
 
-    subject {BenefitSponsors::Exporters::CensusEmployeeExport.new(abc_profile, {action: 'download'})}
+    subject {Services::CensusEmployeeRoster.new(abc_profile, {action: 'download'})}
 
     context 'total_premium' do
       it 'should return total health and dental premium' do
@@ -78,7 +78,7 @@ RSpec.describe BenefitSponsors::Exporters::CensusEmployeeExport, :dbclean => :af
     let!(:census_employee) {plan_design_census_employee}
     let!(:plan_year) {benefit_application}
 
-    subject {BenefitSponsors::Exporters::CensusEmployeeExport.new(profile, {action: 'download'})}
+    subject {Services::CensusEmployeeRoster.new(profile, {action: 'download'})}
 
     context 'total_premium' do
       it 'should return total employer contribution for health and dental' do
