@@ -67,14 +67,18 @@ class UserMailer < ApplicationMailer
 
   def initial_employee_invitation_email(email, census_employee, invitation)
     mail({to: email, subject: "Enroll Now: Your Plan Open Enrollment Period has Begun"}) do |format|
-      format.html { render "initial_employee_invitation_email", :locals => { :census_employee => census_employee, :invitation => invitation }}
+      if Settings.site.key == :dc
+        format.html { render "dc_initial_employee_invitation_email", :locals => { :census_employee => census_employee, :invitation => invitation }}
+      else
+        format.html { render "initial_employee_invitation_email", :locals => { :census_employee => census_employee, :invitation => invitation }}
+      end
     end
   end
 
-  def agent_invitation_email(email, person_name, invitation)
+  def agent_invitation_email(email, person_name, invitation, person_id=nil)
     if email.present?
       mail({to: email, subject: "#{site_short_name} Support Invitation"}) do |format|
-        format.html { render "agent_invitation_email", :locals => { :person_name => person_name, :invitation => invitation }}
+        format.html { render "agent_invitation_email", :locals => { :person_name => person_name, :invitation => invitation, :person_id => person_id }}
       end
     end
   end
@@ -159,14 +163,14 @@ class UserMailer < ApplicationMailer
       format.html {render "employer_invoice_generation", locals: {first_name: employer.person.first_name}}
     end
   end
-  
+
   def broker_registration_guide(user)
     attachments['Broker Registration Guide.pdf'] = File.read('public/new_broker_registration.pdf')
     mail({to: user[:email], subject: "Broker Registration Guide"}) do |format|
       format.html { render "broker_registration_guide", :locals => { :first_name => user[:first_name]}}
     end
   end
-  
+
   def broker_denied_notification(broker_role)
     if broker_role.email_address.present?
       mail({to: broker_role.email_address, subject: "Broker application denied"}) do |format|
@@ -182,7 +186,7 @@ class UserMailer < ApplicationMailer
       end
     end
   end
-  
+
   def broker_pending_notification(broker_role,unchecked_carriers)
     subject_sufix = unchecked_carriers.present? ? ", missing carrier appointments" : ", has all carrier appointments"
     subject_prefix = broker_role.training || broker_role.training == true ? "Action Needed - Broker License for #{site_short_name} for Business" : "Action Needed - Complete Broker Training for #{site_short_name} for Business"
