@@ -12,6 +12,7 @@ module Forms
     include ::Forms::ConsumerFields
     include ::Forms::SsnField
     RELATIONSHIPS = ::PersonRelationship::Relationships + ::BenefitEligibilityElementGroup::INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS
+    EMPLOYEE_RELATIONSHIP_KINDS = ["spouse", "domestic_partner", "child"].freeze
     #include ::Forms::DateOfBirthField
     #include Validations::USDate.on(:date_of_birth)
 
@@ -109,6 +110,7 @@ module Forms
       family.save_relevant_coverage_households
       family.save!
       self.id = family_member.id
+      create_census_dependent(family_member) if ce_updated_enabled?
       true
     end
 
@@ -126,6 +128,7 @@ module Forms
         if address.present?
           person.home_address.try(:destroy)
           person.addresses << address
+          update_census_dependent(person)
           person.save
         end
       else
@@ -146,7 +149,9 @@ module Forms
             next
           end
           if current_address.present?
-            current_address.update(address.permit!)
+            current_address.assign_attributes(address.permit!)
+            update_census_dependent(person)
+            current_address.save
           else
             person.addresses.create(address.permit!)
           end
@@ -268,9 +273,29 @@ module Forms
       end
     end
 
+    def update_census_dependent(person)
+      return unless person.valid? && ce_updated_enabled?
+
+      factory = Factories::CensusMemberUpdateFactory.new
+      factory.update_census_dependent_records(person, family_member)
+    end
+
+    def create_census_dependent(family_member)
+      return unless ce_updated_enabled?
+
+      factory = Factories::CensusMemberUpdateFactory.new
+      factory.create_census_dependent(family_member)
+    end
+
+    def ce_updated_enabled?
+      Settings.site.employee_roster_updates_enabled?
+    end
+
     def try_update_person(person)
       person.consumer_role.update_attributes(:is_applying_coverage => is_applying_coverage) if person.consumer_role
-      person.update_attributes(extract_person_params).tap do
+      person.assign_attributes(extract_person_params)
+      update_census_dependent(person)
+      person.save.tap do
         bubble_person_errors(person)
       end
     end
