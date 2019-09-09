@@ -27,6 +27,8 @@ endpoints = [
     { title: "Email outbound", key: :email_outbound, site_key: :cca,    market_kind: :any, uri: "smtp://blah.com/folder", credentials: [] },
     { title: "Email outbound", key: :email_outbound, site_key: :dchbx,  market_kind: :any, uri: "smtp://blah.com/folder", credentials: [] },
     
+    { title: "report_eligibility_updated_h41s", key: :report_eligibility_updated_h41s , site_key: :dchbx, market_kind: :any, uri: "s3://bucket@whatever", credentials: [] },
+
     { title: "Legacy Data Extract Archive", key: :aca_legacy_data_extracts_archive , site_key: :cca, market_kind: :any, uri: "s3://bucket@whatever", credentials: [] },
     { title: "Legacy Data Extracts", key: :aca_legacy_data_extracts, site_key: :cca, market_kind: :any, uri: "s3://bucket@whatever", credentials: [] },
     
