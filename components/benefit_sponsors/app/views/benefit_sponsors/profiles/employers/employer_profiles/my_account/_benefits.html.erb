@@ -80,7 +80,7 @@
           <% end %>
           <span></span>
         </div>
-
+        <br> <!-- this is needed because the flow is kind of messy, and otherwise the buttons will be overlapped by the benefit divs //-->
         <% if benefit_application.draft? && benefit_application.benefit_packages.empty? %>
           <div class="benefit-group">
             <div class="panel benefitgroup col-xs-12">
