@@ -32,12 +32,21 @@ module Notifier
       end
 
       def first_name
-        merge_model.first_name = consumer_role.person.first_name if consumer_role.present?
+        merge_model.first_name =
+          if uqhp_notice? && consumer_role.present?
+            consumer_role.person.first_name
+          else
+            payload['notice_params']['primary_member']['first_name'].titleize
+         end
       end
 
       def last_name
-        merge_model.last_name = consumer_role.person.last_name if
-        consumer_role.present?
+        merge_model.last_name =
+          if uqhp_notice? && consumer_role.present?
+            consumer_role.person.last_name
+          else
+            payload['notice_params']['primary_member']['last_name'].titleize
+          end
       end
 
       def primary_fullname
