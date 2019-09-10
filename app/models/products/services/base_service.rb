@@ -6,6 +6,7 @@ module Products
 
       NO_CHARGE = "No Charge"
       NO_CHARGE_RESULTS = [NO_CHARGE, "Not Applicable"].freeze
+      DEVICES = ["Durable Medical Equipment", "Prosthetic Devices"].freeze
 
       DRUG_DEDUCTIBLE_OPTIONS = [
         "Separate Drug Deductible",
