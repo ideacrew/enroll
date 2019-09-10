@@ -84,6 +84,7 @@ module Notifier
       else
         ivl_blank_page
         ivl_non_discrimination
+        ivl_taglines
         ivl_attach_envelope
         voter_application
       end
@@ -91,12 +92,7 @@ module Notifier
 
     def pdf_options
       options = {
-        margin:  {
-          top: 15,
-          bottom: 22,
-          left: 22,
-          right: 22
-        },
+        margin: set_margin_for_market,
         disable_smart_shrinking: true,
         dpi: 96,
         page_size: 'Letter',
@@ -121,6 +117,24 @@ module Notifier
         }})
       end
       options
+    end
+
+    def set_margin_for_market
+      if is_consumer?
+        {
+          top: 10,
+          bottom: 20,
+          left: 22,
+          right: 22
+        }
+      else
+        {
+          top: 15,
+          bottom: 22,
+          left: 22,
+          right: 22
+        }
+      end
     end
 
     def notice_path
@@ -152,7 +166,7 @@ module Notifier
     end
 
     def ivl_attach_envelope
-      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ivl_envelope.pdf')] if ['projected_eligibility_notice'].include?(event_name)
+      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ivl_envelope.pdf')] unless ['projected_eligibility_notice'].include?(event_name)
     end
 
     def voter_application
@@ -169,6 +183,10 @@ module Notifier
 
     def employee_appeal_rights
       join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'employee_appeal_rights.pdf')]
+    end
+
+    def ivl_taglines
+      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'taglines.pdf')] if ['projected_eligibility_notice'].include?(event_name)
     end
 
     def join_pdfs(pdfs)
@@ -350,7 +368,7 @@ module Notifier
     end
 
     def sub_resource?
-      (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole))
+      (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole) || resource.is_a?(ConsumerRole))
     end
 
     def envelope
