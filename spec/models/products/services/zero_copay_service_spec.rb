@@ -54,7 +54,7 @@ describe Products::Services::ZeroCopayService do
     context "zero copay and [PARAM]% Coinsurance after deductible" do
       let(:percentage) {"20%"}
       let(:service_visit) do
-        build(:products_qhp_service_visit, copay_out_of_network: zero_dollar, co_insurance_out_of_network: "#{percentage} Coinsurance after deductible", visit_type: "Durable Medical Equipment" )
+        build(:products_qhp_service_visit, copay_out_of_network: zero_dollar, co_insurance_out_of_network: "#{percentage} Coinsurance after deductible", visit_type: "Durable Medical Equipment")
       end
 
       it "should return translated result" do
