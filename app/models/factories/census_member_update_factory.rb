@@ -5,7 +5,6 @@
 
 module Factories
   class CensusMemberUpdateFactory
-    include ActiveModel::Validations
 
     EMPLOYEE_RELATIONSHIP_KINDS = ["spouse", "domestic_partner", "child", "child_under_26", "child_26_and_over", "disabled_child_26_and_over"].freeze
 
@@ -40,7 +39,7 @@ module Factories
     def update_record(person, record)
       record.update_attributes(build_updated_value_hash(person.changes, required_person_attributes)) if person.changed_attributes
 
-      record.address.update_attributes(build_updated_value_hash(person.mailing_address.changes)) if person.mailing_address.changes && record.address
+      record.address.update_attributes(build_updated_value_hash(person.mailing_address.changes)) if person.mailing_address&.changes && record.address
 
       email_changes = person.work_or_home_email.changes if person.work_or_home_email
       record.email.update_attributes(build_updated_value_hash(email_changes)) if email_changes.present?
