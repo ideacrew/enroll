@@ -1,12 +1,12 @@
 module GeneralAgencyWorld
   def assign_roles_to_general_agency
-    general_agency_profile.general_agency_staff_roles << general_agency_staff_role
+    general_agency_profile.general_agency_staff_roles << primary_general_agency_staff_role
     general_agency_profile.save!
   end
 
-  def general_agency_staff_role
+  def primary_general_agency_staff_role
     @general_agency_staff_role = FactoryBot.create(:general_agency_staff_role,
-                                                   benefit_sponsors_general_agency_profile_id: general_agency_profile.id)
+      benefit_sponsors_general_agency_profile_id: general_agency_profile.id, is_primary: true)
   end
 
   def general_agency_organization(legal_name = nil, *traits)
@@ -24,8 +24,8 @@ module GeneralAgencyWorld
       end
     else
       @general_agency_organization[legal_name] ||= FactoryBot.create(:benefit_sponsors_organizations_general_organization,
-                                                                     *traits,
-                                                                     attributes.merge(site: site))
+                                                                *traits,
+                                                                attributes.merge(site: site))
     end
   end
 
@@ -36,8 +36,8 @@ module GeneralAgencyWorld
   def assign_staff_to_general_agency(staff_name, legal_name)
     general_agency_profile = general_agency_profile(legal_name)
     person = FactoryBot.create(:person, :with_work_email, first_name: staff_name.split(/\s/)[0], last_name: staff_name.split(/\s/)[1])
-    general_agency_staff_role = create(:general_agency_staff_role, aasm_state: :active, benefit_sponsors_general_agency_profile_id: general_agency_profile.id)
-    person.general_agency_staff_roles << general_agency_staff_role
+    primary_general_agency_staff_role = create(:general_agency_staff_role, aasm_state: :active, benefit_sponsors_general_agency_profile_id: general_agency_profile.id, is_primary: true)
+    person.general_agency_staff_roles << primary_general_agency_staff_role
     @ga_staff = create(:user, person: person, email: people[staff_name][:email], password: people[staff_name][:password], password_confirmation: people[staff_name][:password])
     @ga_staff.roles = ['general_agency_staff']
     @ga_staff.update_attributes(last_portal_visited: "/benefit_sponsors/profiles/general_agencies/general_agency_profiles/#{general_agency_profile.id}")
