@@ -8,6 +8,7 @@ export default class extends Controller {
 connect() {
   // Equivalent to document ready
   this.getForms();
+  this.checkRegistrationRules();
 }
 
 getForms() {
@@ -330,4 +331,13 @@ preventEnterSubmission(event) {
   }
 }
 
+checkRegistrationRules() {
+  let registrationError = document.getElementsByClassName('registration-rules');
+
+  if (registrationError.length) {
+    setTimeout(function() {
+      document.getElementById('user_password').focus();
+    },300);
+  }
+}
 }
