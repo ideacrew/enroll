@@ -21,8 +21,6 @@ class Products::QhpServiceVisit
       Products::Services::NonZeroCopayService.new(self).in_network_process
     elsif copay_in_network_tier_1 == "No Charge" && co_insurance_in_network_tier_1 == "No Charge"
       "No Charge"
-    elsif copay_in_network_tier_1.gsub("$","").to_i == 0 && co_insurance_in_network_tier_1 == "No Charge"
-      "No Charge"
     end
   end
 

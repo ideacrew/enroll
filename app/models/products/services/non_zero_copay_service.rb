@@ -10,13 +10,14 @@ module Products
         @record = record
       end
 
-      def process
-        if record.co_insurance_in_network_tier_1.include?("Not Applicable")
-          number, _string = record.copay_in_network_tier_1.split(/\ (?=[\w])/)
+      def in_network_process
+        if record.co_insurance_in_network_tier_1.include?("Not Applicable") #ticket_42679
+          number = record.copay_in_network_tier_1.delete('^0-9')
+          # number, _string = record.copay_in_network_tier_1.split(/\ (?=[\w])/)
           if DRUG_DEDUCTIBLE_OPTIONS.include?(record.visit_type)
-            "#{number} per prescription"
+            "$#{number} per prescription"
           else
-            "#{number} per visit"
+            "$#{number} per visit"
           end
         else
           ""

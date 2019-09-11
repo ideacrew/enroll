@@ -10,7 +10,7 @@ module Products
         @record = record
       end
 
-      def process
+      def in_network_process
         number, _string = record.copay_in_network_tier_1.split(/\ (?=[\w])/)
         if record.co_insurance_in_network_tier_1.include?("Not Applicable")
           "You must meet the deductible first, then #{number} per prescription"
