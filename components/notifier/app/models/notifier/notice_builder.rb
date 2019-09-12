@@ -284,7 +284,7 @@ module Notifier
     end
 
     def store_paper_notice
-      return unless has_valid_resource? && resource.can_receive_paper_communication?
+      return unless send_paper_notices? && has_valid_resource? && resource.can_receive_paper_communication?
 
       bucket_name = Settings.paper_notice
       notice_filename_for_paper_notice = if is_employer?
@@ -373,6 +373,10 @@ module Notifier
 
     def envelope
       shop_market? ? Settings.notices.shop.partials.template : Settings.notices.individual.partials.template
+    end
+
+    def send_paper_notices?
+      shop_market? ? Settings.notices.shop.store_paper_notice : Settings.notices.individual.store_paper_notice
     end
 
     def header
