@@ -11,8 +11,7 @@ class DummyNoticeKind
     self.notice_number = params[:notice_number]
   end
 
-  def shop_market?
-  end
+  def shop_market?; end
 end
 
 module Notifier
