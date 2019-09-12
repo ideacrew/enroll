@@ -24,6 +24,8 @@ class Insured::FamiliesController < FamiliesController
 
       @hbx_enrollments = @family.enrollments.non_external.order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) || []
       @all_hbx_enrollments_for_admin = @hbx_enrollments + HbxEnrollment.family_home_page_hidden_enrollments(@family)
+      # Sort by effective_on again. The latest enrollment will display at the top.
+      @all_hbx_enrollments_for_admin = @all_hbx_enrollments_for_admin.sort_by(&:effective_on).reverse
       @enrollment_filter = @family.enrollments_for_display
 
       valid_display_enrollments = Array.new
