@@ -18,7 +18,7 @@ RSpec.describe Exchanges::QlesController, :type => :controller do
         "is_self_attested" => "Yes",
         "visible_to_customer" => "Yes",
         "effective_on_kinds" => ["date_of_event"],
-        "questions" => [
+        "custom_qle_questions" => [
           {
             "content" => "Did you move to DC recently?",
             "responses" => [
@@ -40,8 +40,25 @@ RSpec.describe Exchanges::QlesController, :type => :controller do
       }
     }
   end
-  let(:qle_edit_params) do
-
+  let(:update_existing_qle_params) do
+    {
+      "data" => {
+        "id" => "5d711cbeec969c0d6f25eab8",
+        "title" => "New Birth In Family",
+        "tool_tip" => "Household adds a new family member due to marriage, birth, adoption, placement for adoption, or placement in foster care",
+        "action_kind" => "7: terminate_benefit",
+        "reason" => "6: exceptional_circumstances",
+        "market_kind" => "shop",
+        "visible_to_customer" => false,
+        "is_self_attested" => true,
+        "effective_on_kinds" => ["Date of Event"],
+        "pre_event_sep_in_days" => 0,
+        "post_event_sep_in_days" => 30,
+        "start_on" => "2030-10-20",
+        "end_on" => "2040-10-20",
+        "custom_qle_questions"=> []
+      }
+    }
   end
   let(:invalid_qle_creation_params) do
     qle_creation_params["data"].delete('title')
@@ -108,6 +125,50 @@ RSpec.describe Exchanges::QlesController, :type => :controller do
   end
 
   # TODO: Test edit and update methods
+  describe "GET #edit" do
+    before :each do
+      allow(QualifyingLifeEventKind).to receive(:find).with(existing_qle.id).and_return(existing_qle)
+    end
+
+    it "successfully renders the edit action" do
+      allow(existing_qle).to receive(:is_active).and_return(false)
+      get(:edit, params: { id: existing_qle.id} )
+      expect(response.status).to eq(200)
+    end
+
+    it "redirects if active" do
+      allow(existing_qle).to receive(:is_active).and_return(true)
+      get(:edit, params: { id: existing_qle.id} )
+      expect(response.status).to eq(302)
+      expect(flash['error']).to eq("Unable to modify active Qualifying life Event Kind.")
+    end
+  end
+
+  describe "POST #update" do
+    before :each do
+      allow(QualifyingLifeEventKind).to receive(:find).with(existing_qle.id).and_return(existing_qle)
+    end
+
+    it "successfully updates record" do
+      allow(existing_qle).to receive(:is_active).and_return(false)
+      post(
+        :update,
+        xhr: true,
+        params: {
+          id: existing_qle.id,
+          data: update_existing_qle_params
+        }
+      )
+    end
+
+    it "redirects if active" do
+      allow(existing_qle).to receive(:is_active).and_return(true)
+      get(:edit, params: { id: existing_qle.id} )
+      expect(response.status).to eq(302)
+      expect(flash['error']).to eq("Unable to modify active Qualifying life Event Kind.")
+    end
+  end
+
   describe "GET #new" do
     it "successfully renders the new page" do
       get :new
