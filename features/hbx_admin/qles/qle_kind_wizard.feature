@@ -26,8 +26,8 @@ Feature: As an HBX Admin User I can access the QLE Wizard management wizard
     And the user goes to the Config Page
     And the user clicks the Manage QLE link
     And the user selects Modify Existing QLE, Market Kind, and first QLE Kind and clicks submit
+    When the user fills out the edit QLE Kind form for Got a New Dog event and clicks submit
     Then user should see message QLE Kind Got a New Dog has been sucessfully updated
-    # When the user fills out the edit QLE Kind form for Got a New Dog event and clicks submit
 
   Scenario: HBX Staff with Super Admin subroles can deactivate a custom QLE Kind
     Given qualifying life event kind Had a New Dog present for individual market
@@ -43,8 +43,8 @@ Feature: As an HBX Admin User I can access the QLE Wizard management wizard
     And the user clicks the Manage QLE link
     And the user selects Create a Custom QLE and clicks submit
     When the user fills out the new QLE Kind form for Got a New Dog event and clicks submit
+    Then user should see message QLE Kind Got a New Dog has been sucessfully created
     Then user logs out
-    # Then user should see a message that a new QLE Kind has been created Got a New Dog Qle Kind
     # Taken from admin_sep_selection.feature
     # Assure that the last QLE kind created is present
     And qualifying life event kind Got a New Dog present for individual market
