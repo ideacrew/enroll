@@ -75,13 +75,10 @@ class Exchanges::QlesController < ApplicationController
     )
     if result.success?
       flash[:notice] = "Successfully created Qualifying Life Event Kind."
-      render json: {next_url: manage_exchanges_qles_path}
-
     else
       flash[:error] = "Unable to create Qualifying Life Event Kind."
-      render json: {next_url: manage_exchanges_qles_path}
-
     end
+    render json: {next_url: manage_exchanges_qles_path}
   end
 
   private
