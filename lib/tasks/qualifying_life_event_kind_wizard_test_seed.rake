@@ -144,7 +144,7 @@ namespace :qle_kind_wizard_test_seed do
     puts("Qle Kind with multiple questions present.") if qle_kind_with_two_questions.custom_qle_questions.present?
     # Custom QLE Kind with One Question
     qle_kind_with_one_question = QualifyingLifeEventKind.find_or_create_by!(
-      title: "UN Mandate to provide cocerage for someone",
+      title: "UN Mandate to provide coverage for someone",
       end_on: nil,
       tool_tip: "",
       action_kind: "add_member",
