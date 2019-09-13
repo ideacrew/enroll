@@ -10,8 +10,12 @@ module QualifyingLifeEventKindWorld
       :qualifying_life_event_kind,
       title: qle_kind_title.present? ? qle_kind_title : 'Married',
       market_kind: market_kind,
+      visible_to_customer: true,
       event_kind_label: qle_kind_title.present? ? qle_kind_title + " took place on" : "Qualifying Life Event took place on"
     )
+    question = @qle_kind.custom_qle_questions.create!(content: "test")
+    question.custom_qle_responses.create!(content:"response", action_to_take: "accepted")
+    @qle_kind
   end
 
   def create_custom_qle_kind_questions_and_responses(qle_kind_title = nil, action_to_take_1 = 'accepted')

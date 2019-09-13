@@ -77,8 +77,8 @@ module Admin
       end
 
       def create_record_questions_and_responses(qle_kind, request)
-        if request.custom_qle_question.present?
-          request.custom_qle_question.each do |question_hash|
+        if request.custom_qle_questions.present?
+          request.custom_qle_questions.each do |question_hash|
             if create_record_question(qle_kind, question_hash)
               custom_qle_question = qle_kind.custom_qle_questions.last
               question_hash["responses"].each do |response_hash|
