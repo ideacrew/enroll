@@ -12,7 +12,6 @@ module Forms
     include ::Forms::ConsumerFields
     include ::Forms::SsnField
     RELATIONSHIPS = ::PersonRelationship::Relationships + ::BenefitEligibilityElementGroup::INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS
-    EMPLOYEE_RELATIONSHIP_KINDS = ["spouse", "domestic_partner", "child"].freeze
     #include ::Forms::DateOfBirthField
     #include Validations::USDate.on(:date_of_birth)
 

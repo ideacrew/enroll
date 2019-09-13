@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-# This factory is be used to update the CensusMemebers.
+# This factory is used to update the CensusMemebers.
 # Currently Applied: Family Member updates from UI.
 
 module Factories
   class CensusMemberUpdateFactory
 
-    EMPLOYEE_RELATIONSHIP_KINDS = ["spouse", "domestic_partner", "child", "child_under_26", "child_26_and_over", "disabled_child_26_and_over"].freeze
+    EMPLOYEE_RELATIONSHIP_KINDS = ['spouse', 'domestic_partner', 'child', 'child_under_26', 'child_26_and_over', 'disabled_child_26_and_over'].freeze
 
     def update_census_employee_records(person)
       person.active_employee_roles.each do |role|
@@ -36,15 +36,6 @@ module Factories
       end
     end
 
-    def update_record(person, record)
-      record.update_attributes(build_updated_value_hash(person.changes, required_person_attributes)) if person.changed_attributes
-
-      record.address.update_attributes(build_updated_value_hash(person.mailing_address.changes)) if person.mailing_address&.changes && record.address
-
-      email_changes = person.work_or_home_email.changes if person.work_or_home_email
-      record.email.update_attributes(build_updated_value_hash(email_changes)) if email_changes.present?
-    end
-
     def create_census_dependent(family_member)
       employee_roles = family_member.family.primary_person.active_employee_roles
       return unless employee_roles.present? && EMPLOYEE_RELATIONSHIP_KINDS.include?(family_member.relationship)
@@ -63,10 +54,21 @@ module Factories
       end
     end
 
+    private
+
+    def update_record(person, record)
+      record.update_attributes(build_updated_value_hash(person.changes, required_person_attributes)) if person.changed_attributes
+
+      record.address.update_attributes(build_updated_value_hash(person.mailing_address.changes)) if person.mailing_address&.changes && record.address
+
+      email_changes = person.work_or_home_email.changes if person.work_or_home_email
+      record.email.update_attributes(build_updated_value_hash(email_changes)) if email_changes.present?
+    end
+
     def build_relationship(family_member)
-      if family_member.relationship == "child" && family_member.person.age_on(TimeKeeper.date_of_record) < 26
+      if family_member.relationship == 'child' && family_member.person.age_on(TimeKeeper.date_of_record) < 26
         'child_under_26'
-      elsif family_member.relationship == "child"
+      elsif family_member.relationship == 'child'
         'child_26_and_over'
       else
         family_member.relationship
@@ -74,7 +76,7 @@ module Factories
     end
 
     def required_person_attributes
-      ["first_name", "middle_name", "last_name", "name_sfx", "dob", "encrypted_ssn", "gender"]
+      ['first_name', 'middle_name', 'last_name', 'name_sfx', 'dob', 'encrypted_ssn', 'gender']
     end
 
     def matching_criteria(person)
