@@ -9,7 +9,6 @@ module Admin
         end
       end
   
-      option :id, Dry::Types['coercible.string'], optional: true
       option :title, Dry::Types['coercible.string']
       option :market_kind, Dry::Types['coercible.string']
       option :is_self_attested, Dry::Types['params.bool']
