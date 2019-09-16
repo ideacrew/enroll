@@ -61,7 +61,6 @@ class ConsumerRolePolicy < ApplicationPolicy
 
   def access_new_consumer_application_sub_tab?
     return @user.person.hbx_staff_role.permission.can_access_new_consumer_application_sub_tab if (@user.person && @user.person.hbx_staff_role)
-    binding.pry
     return false
   end
 

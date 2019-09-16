@@ -283,6 +283,10 @@ Then(/^user should see failure message (.*?)$/) do |message_text|
   expect(page).to have_content('Unable to deactivate Qualifying Life Event Kind')
 end
 
+Then(/^user should see message Unable to deactivate Qualifying Life Event Kind$/) do
+  expect(page).to have_content('Unable to deactivate Qualifying Life Event Kind')
+end 
+
 And(/I see the first custom qle question for (.*?) qualifying life event kind$/) do |qle_kind_title|
   qle_kind = qualifying_life_event_kind(qle_kind_title)
   first_custom_qle_question = qle_kind.custom_qle_questions.first

@@ -19,7 +19,6 @@ Feature: As an HBX Admin User I can access the QLE Wizard management wizard
     When the user fills out the new QLE Kind form for Got a New Dog event and clicks submit
     Then user should see message QLE Kind Got a New Dog has been sucessfully created
 
-  # TODO: Add a scenario to test errors being thrown for form not being fullly completed
   Scenario: HBX Staff with Super Admin subroles can edit a custom QLE Kind
     Given qualifying life event kind Got a New Dog present for shop market
     And qualifying life event kind Got a New Dog has custom qle question and accepted response present
@@ -41,6 +40,16 @@ Feature: As an HBX Admin User I can access the QLE Wizard management wizard
     When the user fills out only partially the edit QLE Kind form for Got a New Dog event and clicks submit
     Then user should see message Unable to deactivate Qualifying Life Event Kind
 
+  Scenario: HBX Staff with Super Admin subroles does not see active custom QLE Kind available to edit
+    Given qualifying life event kind Got a New Dog present for shop market
+    And qualifying life event kind Got a New Dog has custom qle question and accepted response present
+    And qualifying life event kind Got a New Dog is currently in use (active)
+    Given the user is on the Main Page
+    And the user goes to the Config Page
+    And the user clicks the Manage QLE link
+    And the user selects Modify Existing QLE and Shop Market Kind
+    Then the user should not see the Had a New Dog QLE Kind in the select options to edit
+
   # TODO: Update this test to reflect selecting deactivate rather than just visiting a hard coded URL
   # TODO: Create another scenario to show that form can't submit if no date for deactivation is set
   Scenario: HBX Staff with Super Admin subroles can deactivate a custom QLE Kind
@@ -50,6 +59,16 @@ Feature: As an HBX Admin User I can access the QLE Wizard management wizard
     # See above comment about selecting market kind
     When the user fills out the deactivate QLE Kind form for Got a New Dog event and clicks submit
     # Then user should see a message that a new QLE Kind has been created Got a New Dog event
+
+  Scenario: HBX Staff with Super Admin subroles does not see option to deactivate a QLE Kind set for deactivation
+    Given qualifying life event kind Had a New Dog present for individual market
+    And qualifying life event kind Had a New Dog has end_on date set to 11/01/2020
+    And the user is on the Main page
+    And the user goes to the Config Page
+    And the user clicks the Manage QLE link
+    When the user selects Deactivate a Custom Qle
+    And the user selects individual market
+    Then the user should not see the Had a New Dog QLE Kind in the select options to deactivate
 
   # TODO: Add a scenario to test errors being thrown for form not being fully completed
   Scenario: HBX Staff with Super Admin subroles can create a custom QLE Kind visible to customer and then use it to enroll family
