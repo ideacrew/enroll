@@ -44,7 +44,6 @@ module Notifier
           allow(Aws::S3Storage).to receive(:save).and_return(doc_uri)
         end
 
-
         context "ivl_market" do
           let(:resource) { ConsumerRole.new }
 
