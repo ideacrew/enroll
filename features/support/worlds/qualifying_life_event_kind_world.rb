@@ -3,9 +3,7 @@ module QualifyingLifeEventKindWorld
 
   def qualifying_life_event_kind(qle_kind_title = nil, market_kind = 'shop')
     qle_kind = QualifyingLifeEventKind.where(title: qle_kind_title)
-    if qle_kind.present?
-      return qle_kind.first
-    end
+    return qle_kind.first if qle_kind.first.present?
     @qle_kind ||= FactoryBot.create(
       :qualifying_life_event_kind,
       title: qle_kind_title.present? ? qle_kind_title : 'Married',
@@ -13,13 +11,10 @@ module QualifyingLifeEventKindWorld
       visible_to_customer: true,
       event_kind_label: qle_kind_title.present? ? qle_kind_title + " took place on" : "Qualifying Life Event took place on"
     )
-    question = @qle_kind.custom_qle_questions.create!(content: "test")
-    question.custom_qle_responses.create!(content:"response", action_to_take: "accepted")
-    @qle_kind
   end
 
-  def create_custom_qle_kind_questions_and_responses(qle_kind_title = nil, action_to_take_1 = 'accepted')
-    qle_kind = QualifyingLifeEventKind.where(title: qle_kind_title).first
+  def create_custom_qle_kind_questions_and_responses(qle_kind_title = nil, action_to_take = 'accepted')
+    qle_kind = qualifying_life_event_kind(qle_kind_title)
     custom_qle_question = qle_kind.custom_qle_questions.build(
       content: "What is the name of your dog?"
     )
@@ -27,19 +22,13 @@ module QualifyingLifeEventKindWorld
     custom_qle_question = qle_kind.custom_qle_questions.last
     custom_qle_question_response_1 = custom_qle_question.custom_qle_responses.build(
       content: "Fido",
-      action_to_take: action_to_take_1
+      action_to_take: action_to_take
     )
-    # TODO: Add action_to_take_2 arguement as 'declined'
     custom_qle_question_response_1.save!
-    # custom_qle_question_response_2 = custom_qle_question.custom_qle_responses.build(
-    #   content: "Jimmy",
-    #   action_to_take: action_to_take_2
-    # )
-    # custom_qle_question_response_2.save!
   end
 
-  def create_second_custom_qle_kind_question_and_responses(qle_kind_title = nil, which_action_to_take = 'accepted')
-    qle_kind = QualifyingLifeEventKind.where(title: qle_kind_title).first
+  def create_second_custom_qle_kind_question_and_responses(qle_kind_title = nil, action_to_take = 'accepted')
+    qle_kind = qualifying_life_event_kind(qle_kind_title)
     expect(qle_kind.custom_qle_questions.count).to eq(1)
     second_custom_qle_question = qle_kind.custom_qle_questions.build(
       content: "Please, we need clarification, what is the name of your dog?"
@@ -48,30 +37,30 @@ module QualifyingLifeEventKindWorld
     second_custom_qle_question = qle_kind.custom_qle_questions.last
     second_qle_question_response_1 = second_custom_qle_question.custom_qle_responses.build(
       content: "Johnny",
-      action_to_take: which_action_to_take
+      action_to_take: action_to_take
     )
     second_qle_question_response_1.save!
   end
 
-  def fill_responses_to_qle_kind_responses_form(which_action_to_take = 'accepted', qle_kind_title)
+  def fill_responses_to_qle_kind_responses_form(action_to_take = 'accepted', qle_kind_title)
     qle_kind = qualifying_life_event_kind(qle_kind_title)
     custom_qle_questions = qle_kind.custom_qle_questions
     # TODO: Make this an arguement'
     # TODO: Currently only creating a single response
     fill_in('question_and_responses[qle_date]', with: Date.today.to_s)
-    # which_response_to_choose = qle_kind.custom_qle_questions.where(
-    #  'custom_qle_responses.action_to_take' => which_action_to_take
-    # ).first.custom_qle_responses.where(action_to_take: which_action_to_take).first ||
-    # which_response_to_choose = qle_kind.custom_qle_questions.where(
-    #   'custom_qle_response.action_to_take' => which_action_to_take
-    # ).first.custom_qle_responses.where(action_to_take: which_action_to_take).first 
-    # response_value_content = which_response_to_choose.content
-    # all_lis = page.all('li')
-    # which_response_to_choose_option = all_lis.detect { |li| li.text == response_value_content }
-    # which_response_to_choose_option.click if which_response_to_choose_option.present?
+    which_response_to_choose = qle_kind.custom_qle_questions.where(
+      'custom_qle_responses.action_to_take' => action_to_take
+    ).first.custom_qle_responses.where(action_to_take: action_to_take).first ||
+    which_response_to_choose = qle_kind.custom_qle_questions.where(
+       'custom_qle_response.action_to_take' => action_to_take
+    ).first.custom_qle_responses.where(action_to_take: action_to_take).first 
+    response_value_content = which_response_to_choose.content
+    all_lis = page.all('li')
+    which_response_to_choose_option = all_lis.detect { |li| li.text == response_value_content }
+    which_response_to_choose_option.click if which_response_to_choose_option.present?
     # Note: Selectric is weird, so we click by xpath first
-    # esponse_options = find(:xpath, "//div[contains(@class, 'selectric-response-content-options')]")
-    # response_options.click if which_response_to_choose_option.present?
+    response_options = find(:xpath, "//div[contains(@class, 'selectric-response-content-options')]")
+    response_options.click if which_response_to_choose_option.present?
     click_button 'Submit'
   end
 
@@ -187,22 +176,13 @@ And(/^qualifying life event kind (.*?) is not active$/) do |qle_kind_title|
   qle_kind.save!
 end
 
-And(/^qualifying life event kind (.*?) has custom qle question and accepted response present$/) do |qle_kind_title|
-  create_custom_qle_kind_questions_and_responses(qle_kind_title)
-end
-
-
-And(/^qualifying life event kind (.*?) has custom qle question and declined response present$/) do |qle_kind_title|
-  create_custom_qle_kind_questions_and_responses(qle_kind_title, 'declined')
+And(/^qualifying life event kind (.*?) has custom qle question and (.*?) response present$/) do |qle_kind_title, action_to_take|
+  create_custom_qle_kind_questions_and_responses(qle_kind_title, action_to_take)
 end
 
 And(/^qualifying life event kind (.*?) has two custom qle questions with a to_question_2 response present$/) do |qle_kind_title|
   create_custom_qle_kind_questions_and_responses(qle_kind_title, 'to_question_2')
   create_second_custom_qle_kind_question_and_responses(qle_kind_title, 'accepted')
-end
-
-And(/^qualifying life event kind (.*?) has custom qle questions with call_center response present$/) do |qle_kind_title|
-  create_custom_qle_kind_questions_and_responses(qle_kind_title, 'call_center')
 end
 
 And(/^all qualifying life event kinds (.*?) to customer$/) do |visible_to_customer|
@@ -278,7 +258,6 @@ And(/I see the second custom custom qle question for (.*?) qualifying life event
   second_qle_kind_custom_qle_question_content = second_custom_qle_question.content
   expect(page).to have_content(second_qle_kind_custom_qle_question_content)
 end
-
 
 # TODO: Make sure the proper question appears here
 And(/I see the custom qle questions for (.*?) qualifying life event kind$/) do |qle_kind_title|

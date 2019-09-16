@@ -67,7 +67,7 @@ Feature: Purchasing through SEP
     Then the Admin is navigated to the Families screen
     And I click on the name of a person of family list
     And I should see the individual home page
-    Then I should not see "Had a Baby" in qle carousel
+    Then I should not see "Had a baby" in qle carousel
 
   Scenario: User can enroll with the accepted response for QLE Kind with custom qle_questions
     Given Individual has not signed up as an HBX user
@@ -188,7 +188,7 @@ Feature: Purchasing through SEP
   Scenario: User is redirected to call center if they choose response for call_center
     Given Individual has not signed up as an HBX user
     And qualifying life event kind Had a baby present for individual market
-    And qualifying life event kind Had a baby has custom qle questions with call_center response present
+    And qualifying life event kind Had a baby has custom qle question and call_center response present
     And all qualifying life event kinds are visible to customer
     When Individual visits the Insured portal during open enrollment
     Then Individual creates HBX account
