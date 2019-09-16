@@ -5,7 +5,17 @@ base="$( dirname "${BASH_SOURCE[0]}" )/.."
 cd $base
 root=`pwd -P`
 
-rm -Rf ./public/packs*
+rm -rf ./log/test.log
+rm -rf ./spec/vocabularies
+rm -rf ./coverage
+rm -rf ./tmp/rspec_junit_*.xml
+rm -rf ./public/packs*
+
+bundle install
+
+[[ -s $HOME/.nvm/nvm.sh ]] && . $HOME/.nvm/nvm.sh
+nvm use 10 || exit -1
+
 bundle exec rails r -e test "DatabaseCleaner.clean"
 
 ### Run cucumber
