@@ -124,7 +124,6 @@ RSpec.describe Exchanges::QlesController, :type => :controller do
     sign_in(user)
   end
 
-  # TODO: Test edit and update methods
   describe "GET #edit" do
     before :each do
       allow(QualifyingLifeEventKind).to receive(:find).with(existing_qle.id).and_return(existing_qle)
@@ -251,9 +250,5 @@ RSpec.describe Exchanges::QlesController, :type => :controller do
       attrs = { market_kind: 'shop' }
       expect(response).to redirect_to(question_flow_exchanges_qle_path(existing_qle, attrs))
     end
-  end
-
-  describe "GET #question_flow" do
-
   end
 end
