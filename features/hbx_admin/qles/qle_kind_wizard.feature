@@ -22,6 +22,7 @@ Feature: As an HBX Admin User I can access the QLE Wizard management wizard
   # TODO: Add a scenario to test errors being thrown for form not being fullly completed
   Scenario: HBX Staff with Super Admin subroles can edit a custom QLE Kind
     Given qualifying life event kind Got a New Dog present for shop market
+    And qualifying life event kind Got a New Dog has custom qle question and accepted response present
     And qualifying life event kind Got a New Dog is not active
     Given the user is on the Main Page
     And the user goes to the Config Page
@@ -29,6 +30,16 @@ Feature: As an HBX Admin User I can access the QLE Wizard management wizard
     And the user selects Modify Existing QLE, Market Kind, and first QLE Kind and clicks submit
     When the user fills out the edit QLE Kind form for Got a New Dog event and clicks submit
     Then user should see message QLE Kind Got a New Dog has been sucessfully updated
+
+  Scenario: HBX Staff with Super Admin sees error message if edit form not fully completed
+    Given qualifying life event kind Got a New Dog present for shop market
+    And qualifying life event kind Got a New Dog is not active
+    Given the user is on the Main Page
+    And the user goes to the Config Page
+    And the user clicks the Manage QLE link
+    And the user selects Modify Existing QLE, Market Kind, and first QLE Kind and clicks submit
+    When the user fills out only partially the edit QLE Kind form for Got a New Dog event and clicks submit
+    Then user should see message Unable to deactivate Qualifying Life Event Kind
 
   # TODO: Update this test to reflect selecting deactivate rather than just visiting a hard coded URL
   # TODO: Create another scenario to show that form can't submit if no date for deactivation is set
@@ -52,7 +63,9 @@ Feature: As an HBX Admin User I can access the QLE Wizard management wizard
     # Taken from admin_sep_selection.feature
     # Assure that the last QLE kind created is present
     And qualifying life event kind Got a New Dog present for individual market
+    And qualifying life event kind Got a New Dog for individual market created by user in QLE Wizard present
     And all qualifying life event kinds are visible to customer
+    And all qualifying life event kinds are active
     # Individual sign up
     Given Individual has not signed up as an HBX user
     When Individual visits the Insured portal during open enrollment

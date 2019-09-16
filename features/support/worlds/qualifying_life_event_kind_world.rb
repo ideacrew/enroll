@@ -137,6 +137,27 @@ module QualifyingLifeEventKindWorld
     end
   end
 
+  def fill_incomplete_qle_kind_form_and_submit(action_name, qle_kind_title)
+  case action_name
+    when 'new'
+      form_name = "creation_form"
+      button_text = 'Create QLE Kind'
+    when 'edit'
+      form_name = 'edit_form'
+      button_text = 'Update QLE Kind'
+    when 'deactivate'
+      # TODO: Fill out buttons and text
+      form_name = "deactivation_form"
+      button_text = nil
+    end
+    if %w[creation_form edit_form].include?(form_name)
+      # Critical required field
+      fill_in("qle_kind_#{form_name}_title", with: '')
+      fill_in("qle_kind_#{form_name}_tool_tip", with: "Tool Tip")
+    end
+    click_button(button_text)
+  end
+
   def qle_kind_wizard_selection(action_name)
     case action_name
     when 'Create a Custom QLE'
@@ -166,6 +187,11 @@ end
 
 World(QualifyingLifeEventKindWorld)
 
+And(/^qualifying life event kind (.*?) for (.*?) market created by user in QLE Wizard present$/) do |qle_kind_title, market_kind|
+  qle_kind = QualifyingLifeEventKind.where(title: qle_kind_title, market_kind: market_kind).first
+  expect(qle_kind.present?).to eq(true)
+end
+
 Given(/^qualifying life event kind (.*?) present for (.*?) market$/) do |qle_kind_title, market_kind|
   qualifying_life_event_kind(qle_kind_title, market_kind)
 end
@@ -192,6 +218,10 @@ And(/^all qualifying life event kinds (.*?) to customer$/) do |visible_to_custom
   when 'are not visible'
     QualifyingLifeEventKind.update_all(visible_to_customer: false)
   end
+end
+
+And(/^all qualifying life event kinds are active$/) do
+  QualifyingLifeEventKind.update_all(is_active: true)
 end
 
 And(/^.+ clicks the Manage QLE link$/) do
@@ -230,6 +260,10 @@ When(/^.+ fills out the (.*?) QLE Kind form for (.*?) event and clicks submit$/)
   fill_qle_kind_form_and_submit(action_name, qle_kind_title)
 end
 
+When(/^.+ fills out only partially the (.*?) QLE Kind form for (.*?) event and clicks submit$/) do |action_name, qle_kind_title|
+  fill_incomplete_qle_kind_form_and_submit(action_name, qle_kind_title)
+end
+
 Then(/^user should see message QLE Kind (.*?) has been sucessfully (.*?)$/) do |qle_kind_title, action_name|
   expect(page).to have_content("Successfully #{action_name} Qualifying Life Event Kind.")
   qle_kind = qualifying_life_event_kind(qle_kind_title)
@@ -243,6 +277,10 @@ Then(/^user should see message QLE Kind (.*?) has been sucessfully (.*?)$/) do |
   if action_name == 'deactivated'
     expect(qle_kind.end_on.present?).to eq(true)
   end
+end
+
+Then(/^user should see failure message (.*?)$/) do |message_text|
+  expect(page).to have_content('Unable to deactivate Qualifying Life Event Kind')
 end
 
 And(/I see the first custom qle question for (.*?) qualifying life event kind$/) do |qle_kind_title|
