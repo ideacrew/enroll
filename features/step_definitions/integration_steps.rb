@@ -939,7 +939,6 @@ When(/^I click on continue on qle confirmation page$/) do
   click_link "GO TO MY ACCOUNT"
 end
 
-
 When(/^I select a future qle date$/) do
   expect(page).to have_content "Married"
   screenshot("future_qle_date")
