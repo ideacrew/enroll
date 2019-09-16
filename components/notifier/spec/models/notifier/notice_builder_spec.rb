@@ -16,7 +16,6 @@ module Notifier
   module NoticeBuilder
     RSpec.describe NoticeBuilder, dbclean: :around_each do
       let(:hbx_id) { "1234" }
-      # let(:resource) { EmployeeRole.new }
       let(:event_name) {"acapi.info.events.employer.welcome_notice_to_employer"}
       let(:payload) do
         {
@@ -38,18 +37,10 @@ module Notifier
         before do
           allow(FileUtils).to receive(:cp)
           allow(File).to receive(:delete)
-          # allow(resource).to receive(:person).and_return(double(hbx_id: '1234'))
-          # allow(subject).to receive(:is_employer?).and_return(false)
           allow(subject).to receive(:resource).and_return(resource)
           allow(subject).to receive(:notice_path).and_return("notice_path")
-          #allow(subject).to receive(:notice_type).and_return("ER")
           allow(Aws::S3Storage).to receive(:save).and_return(doc_uri)
-          # subject.store_paper_notice
         end
-
-        # it 'AWS Storage to save doc_uri' do
-        #   expect(Aws::S3Storage).to have_received(:save).with(notice_path_for_paper_notice, bucket_name, notice_filename_for_paper_notice)
-        # end
 
         context "ivl_market" do
           context 'Notices for Consumer' do
