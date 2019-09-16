@@ -358,9 +358,13 @@ module Notifier
     end
 
     def notice_type
-      "IVL" if is_consumer?
-      "EE" if is_employee?
-      "ER" if is_employer?
+      if is_consumer?
+        "IVL"
+      elsif is_employee?
+        "EE"
+      elsif is_employer?
+        "ER"
+      end
     end
 
     def has_valid_resource?
