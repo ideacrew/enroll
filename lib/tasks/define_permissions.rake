@@ -81,6 +81,12 @@ namespace :permissions do
   DefinePermissions.define_task :grant_hbx_tier3_access => :environment
 end
 
+# RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_update_enrollment_end_date_or_reinstate
+namespace :permissions do
+  desc 'hbx admin can create benefit application'
+  DefinePermissions.define_task :hbx_admin_can_update_enrollment_end_date_or_reinstate => :environment
+end
+
 #rake permissions:initial_hbx
 #rake permissions:migrate_hbx
 #rake permissions:hbx_admin_can_update_ssn

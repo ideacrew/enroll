@@ -167,4 +167,9 @@ class DefinePermissions < MigrationTask
       HbxStaffRole.create!( person: user.person, permission_id: Permission.hbx_tier3.id, subrole: 'hbx_tier3', hbx_profile_id: HbxProfile.current_hbx.id, benefit_sponsor_hbx_profile_id: hbx_organization.hbx_profile.id)
     end
   end
+
+  def hbx_admin_can_update_enrollment_end_date_or_reinstate
+    Permission.super_admin.update_attributes(can_update_enrollment_end_date: true, can_reinstate_enrollment: true)
+    Permission.hbx_tier3.update_attributes(can_update_enrollment_end_date: true, can_reinstate_enrollment: true)
+  end
 end
