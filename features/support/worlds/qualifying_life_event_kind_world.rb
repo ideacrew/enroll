@@ -151,11 +151,15 @@ module QualifyingLifeEventKindWorld
       button_text = nil
     end
     if %w[creation_form edit_form].include?(form_name)
-      # Critical required field
+      # Make fields blank
       fill_in("qle_kind_#{form_name}_title", with: '')
-      fill_in("qle_kind_#{form_name}_tool_tip", with: "Tool Tip")
+      fill_in("qle_kind_#{form_name}_tool_tip", with: "")
+      fill_in("qle_kind_#{form_name}_pre_event_sep_eligibility", with: '')
+      fill_in("qle_kind_#{form_name}_post_event_sep_eligibility", with: '')
+      fill_in("qle_kind_#{form_name}_start_on", with: '')
+      fill_in("qle_kind_#{form_name}_end_on", with: '')
+      click_button(button_text)
     end
-    click_button(button_text)
   end
 
   def qle_kind_wizard_selection(action_name)
@@ -199,6 +203,12 @@ end
 And(/^qualifying life event kind (.*?) is not active$/) do |qle_kind_title|
   qle_kind = qualifying_life_event_kind(qle_kind_title)
   qle_kind.is_active = false
+  qle_kind.save!
+end
+
+And(/^qualifying life event kind (.*?) is currently in use (active)$/) do |qle_kind_title|
+  qle_kind = qualifying_life_event_kind(qle_kind_title)
+  qle_kind.is_active = true
   qle_kind.save!
 end
 
@@ -260,7 +270,7 @@ When(/^.+ fills out the (.*?) QLE Kind form for (.*?) event and clicks submit$/)
   fill_qle_kind_form_and_submit(action_name, qle_kind_title)
 end
 
-When(/^.+ fills out only partially the (.*?) QLE Kind form for (.*?) event and clicks submit$/) do |action_name, qle_kind_title|
+When(/^.+ fills out only partially the (.*?) QLE Kind form for (.*?) event$/) do |action_name, qle_kind_title|
   fill_incomplete_qle_kind_form_and_submit(action_name, qle_kind_title)
 end
 
@@ -281,6 +291,14 @@ end
 
 Then(/^user should see failure message (.*?)$/) do |message_text|
   expect(page).to have_content('Unable to deactivate Qualifying Life Event Kind')
+end
+
+And(/^the user sees a message that the fields are required$/) do
+  expect(page).to have_content('must be provided')
+end
+
+When(/^the user clicks the Update QLE Kind button$/) do
+  click_button('Update QLE Kind')
 end
 
 Then(/^user should see message Unable to deactivate Qualifying Life Event Kind$/) do
