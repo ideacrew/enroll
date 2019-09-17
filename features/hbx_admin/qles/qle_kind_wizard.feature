@@ -44,12 +44,12 @@ Feature: As an HBX Admin User I can access the QLE Wizard management wizard
 
   Scenario: HBX Staff with Super Admin subroles does not see active custom QLE Kind available to edit
     Given qualifying life event kind Got a New Dog present for shop market
-    And qualifying life event kind Got a New Dog is currently in use (active)
+    And qualifying life event kind Got a New Dog is active
     Given the user is on the Main Page
     And the user goes to the Config Page
     And the user clicks the Manage QLE link
-    And the user selects Modify Existing QLE and Shop Market Kind
-    Then the user should not see the Had a New Dog QLE Kind in the select options to edit
+    When the user selects Modify Existing QLE
+    Then the user should not see an option to select Shop Market Kind QLE Kinds
 
   # TODO: Update this test to reflect selecting deactivate rather than just visiting a hard coded URL
   # TODO: Create another scenario to show that form can't submit if no date for deactivation is set
@@ -67,9 +67,8 @@ Feature: As an HBX Admin User I can access the QLE Wizard management wizard
     And the user is on the Main page
     And the user goes to the Config Page
     And the user clicks the Manage QLE link
-    When the user selects Deactivate a Custom Qle
-    And the user selects individual market
-    Then the user should not see the Had a New Dog QLE Kind in the select options to deactivate
+    When the user selects Deactivate Existing QLE
+    Then the user should not see an option to select Shop Market Kind QLE Kinds
 
   # TODO: Add a scenario to test errors being thrown for form not being fully completed
   # Scenario: HBX Staff with Super Admin subroles can create a custom QLE Kind visible to customer and then use it to enroll family
