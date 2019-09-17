@@ -207,6 +207,7 @@ puts "*"*80
 puts "Loading IVL benefit packages."
 # Need to fix this rake to handle based on year for IVL
 system "bundle exec rake import:create_2019_ivl_packages"
+system "bundle exec rake import:create_2020_ivl_packages"
 puts "::: complete :::"
 puts "*"*80
 
