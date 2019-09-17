@@ -303,6 +303,10 @@ end
 
 Then(/^user should see message Unable to deactivate Qualifying Life Event Kind$/) do
   expect(page).to have_content('Unable to deactivate Qualifying Life Event Kind')
+end
+
+Then(/^user should see message Unable to update Qualifying Life Event Kind$/) do
+  expect(page).to have_content('Unable to update Qualifying Life Event Kind')
 end 
 
 And(/I see the first custom qle question for (.*?) qualifying life event kind$/) do |qle_kind_title|
