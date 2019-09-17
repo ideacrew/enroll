@@ -9,8 +9,8 @@ module BenefitSponsors
     def each
       iteration_index = 0
       yielded_so_far = 0
-      skip_amount = @skip
-      record_limit = @limit
+      skip_amount = @skip || 0
+      record_limit = @limit || 100000000
       @criterias.each do |criteria|
         s_benefit, query = criteria
         query_ids = query.lazy.map { |q| q["hbx_enrollment_id"] }

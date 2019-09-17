@@ -61,7 +61,7 @@
               Plan Year (<%= benefit_application_summarized_state(benefit_application) %>)
           </h3>
         </div>
-        <div class="col-md-5 pull-right" style="margin-right:1px">
+        <div class="row" style="margin-right:1px">
           <%#= pundit_span EmployerProfile, :updateable? %>
           <% if benefit_application.draft? %>
               <%# if benefit_application.overlapping_published_benefit_applications.empty? %>
