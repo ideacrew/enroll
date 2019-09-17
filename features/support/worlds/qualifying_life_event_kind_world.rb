@@ -1,6 +1,4 @@
-
 module QualifyingLifeEventKindWorld
-
   def qualifying_life_event_kind(qle_kind_title = nil, market_kind = 'shop')
     qle_kind = QualifyingLifeEventKind.where(title: qle_kind_title)
     return qle_kind.first if qle_kind.first.present?
@@ -206,7 +204,7 @@ And(/^qualifying life event kind (.*?) is not active$/) do |qle_kind_title|
   qle_kind.save!
 end
 
-And(/^qualifying life event kind (.*?) is currently in use (active)$/) do |qle_kind_title|
+And(/^qualifying life event kind (.*?) is active$/) do |qle_kind_title|
   qle_kind = qualifying_life_event_kind(qle_kind_title)
   qle_kind.is_active = true
   qle_kind.save!
@@ -268,6 +266,27 @@ end
 
 When(/^.+ fills out the (.*?) QLE Kind form for (.*?) event and clicks submit$/) do |action_name, qle_kind_title|
   fill_qle_kind_form_and_submit(action_name, qle_kind_title)
+end
+
+When(/^the user selects Modify Existing QLE$/) do
+  choose('qle_wizard_modify_qle_selected_radio')
+end
+
+When(/^the user selects Deactivate Existing QLE$/) do
+  choose('qle_wizard_deactivate_qle_selected_radio')
+end
+
+Then(/^the user should not see an option to select (.*) Market Kind QLE Kinds$/) do |market_kind|
+  case market_kind
+  when 'Shop'
+    market_kind_radio_id = 'qle_wizard_kind_selected_radio_category_shop'
+  when 'Individual'
+    market_kind_radio_id = 'qle_wizard_kind_selected_radio_category_individual'
+  end
+  all_inputs = page.all('input')
+  # Radio button shouldn't appear on the page
+  market_kind_radio = all_inputs.detect { |input| input[:id] == market_kind_radio_id }
+  expect(market_kind_radio).to eq(nil)
 end
 
 When(/^.+ fills out only partially the (.*?) QLE Kind form for (.*?) event$/) do |action_name, qle_kind_title|
