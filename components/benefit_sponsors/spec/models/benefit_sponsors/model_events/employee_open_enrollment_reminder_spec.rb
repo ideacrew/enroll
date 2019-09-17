@@ -89,7 +89,7 @@ RSpec.describe 'ModelEvents::EmployeeOpenEnrollmentReminder', :dbclean => :after
     let(:recipient) { "Notifier::MergeDataModels::EmployeeProfile" }
     let(:template)  { Notifier::Template.new(data_elements: data_elements) }
     let(:payload)   { {"event_object_kind" => "BenefitSponsors::BenefitApplications::BenefitApplication", "event_object_id" => model_instance.id }}
-    let(:subject) { Notifier::NoticeKind.new(template: template, recipient: recipient) }
+    let(:subject) { Notifier::NoticeKind.new(template: template, recipient: recipient, event_name: notice_event) }
     let(:merge_model) { subject.construct_notice_object }
 
     before do
@@ -127,7 +127,7 @@ RSpec.describe 'ModelEvents::EmployeeOpenEnrollmentReminder', :dbclean => :after
 
     context 'for renewing plan year' do
       include_context "setup renewal application"
-      let(:payload) { { "event_object_kind" => "BenefitSponsors::BenefitApplications::BenefitApplication", "event_object_id" => model_instance.id } }
+      let(:payload) { { "event_object_kind" => "BenefitSponsors::BenefitApplications::BenefitApplication", "event_object_id" => renewal_application.id } }
 
       it 'should return renewing plan year open enrollment end on' do
         expect(merge_model.benefit_application.current_py_oe_end_date).to eq renewal_application.open_enrollment_end_on.strftime('%m/%d/%Y')
