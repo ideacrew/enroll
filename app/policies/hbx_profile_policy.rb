@@ -144,6 +144,18 @@ class HbxProfilePolicy < ApplicationPolicy
     role.permission.can_add_sep
   end
 
+  def can_update_enrollment_end_date?
+    role = user_hbx_staff_role
+    return false unless role
+    role.permission.can_update_enrollment_end_date
+  end
+
+  def can_reinstate_enrollment?
+    role = user_hbx_staff_role
+    return false unless role
+    role.permission.can_reinstate_enrollment
+  end
+
   private
 
   def user_hbx_staff_role
