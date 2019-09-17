@@ -252,3 +252,38 @@ describe HbxProfilePolicy do
   end
 
 end
+
+describe HbxProfilePolicy do
+  context '.can_update_enrollment_end_date? .can_reinstate_enrollment?' do
+    let!(:user)                  { FactoryGirl.create(:user) }
+    let!(:person)                  { FactoryGirl.create(:person, :with_hbx_staff_role, user: user) }
+
+    subject                        { HbxProfilePolicy.new(user, nil) }
+
+
+    (Permission::PERMISSION_KINDS - ['super_admin', 'hbx_tier3']).each do |kind|
+      context "for permissions which doesn't allow the user" do
+        let(:bad_permission) { FactoryGirl.create(:permission, kind.to_sym) }
+
+        it 'should return false' do
+          person.hbx_staff_role.update_attributes!(permission_id: bad_permission.id)
+          expect(subject.can_update_enrollment_end_date?).to eq false
+          expect(subject.can_reinstate_enrollment?).to eq false
+        end
+      end
+    end
+
+    ['super_admin', 'hbx_tier3'].each do |kind|
+      context "for permissions which allow the user" do
+        let(:good_permission) { FactoryGirl.create(:permission, kind.to_sym) }
+
+        it 'should return true' do
+          person.hbx_staff_role.update_attributes!(permission_id: good_permission.id)
+          expect(subject.can_update_enrollment_end_date?).to eq true
+          expect(subject.can_reinstate_enrollment?).to eq true
+        end
+      end
+    end
+  end
+end
+
