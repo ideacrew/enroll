@@ -41,10 +41,21 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   include_context "setup benefit market with market catalogs and product packages"
   include_context "setup initial benefit application"
 
-  let(:hbx_enrollments) { double("HbxEnrollment") }
+  let(:hbx_enrollments) { double("HbxEnrollment", order: nil, waived: nil, any?: nil, non_external: nil, effective_on: Date.today) }
   let(:user) { FactoryBot.create(:user) }
-  let(:person) { double("Person", id: "test", addresses: [], no_dc_address: false, no_dc_address_reason: "" , is_consumer_role_active?: false, has_active_employee_role?: true) }
-  let(:family) { instance_double(Family, active_household: household, :model_name => "Family") }
+  let(:person) do
+    double(
+      "Person",
+      id: "test",
+      addresses: [],
+      no_dc_address: false,
+      no_dc_address_reason: "",
+      is_consumer_role_active?: false,
+      has_active_employee_role?: true,
+      has_multiple_roles?: false
+    )
+  end
+  let(:family) { instance_double(Family, active_household: household, :model_name => "Family", id: 1) }
   let(:household) { double("HouseHold", hbx_enrollments: hbx_enrollments) }
   let(:addresses) { [double] }
   let(:family_members) { [double("FamilyMember")] }
@@ -58,6 +69,9 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
 
   before :each do
+    allow(hbx_enrollments).to receive(:+).with(HbxEnrollment.family_home_page_hidden_enrollments(family)).and_return(
+      HbxEnrollment.family_home_page_hidden_enrollments(family) + [hbx_enrollments]
+    )
     allow(hbx_enrollments).to receive(:order).and_return(hbx_enrollments)
     allow(hbx_enrollments).to receive(:waived).and_return([])
     allow(hbx_enrollments).to receive(:any?).and_return(false)
@@ -72,6 +86,36 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     allow(person).to receive(:resident_role).and_return(resident_role)
     allow(consumer_role).to receive(:bookmark_url=).and_return(true)
     sign_in(user)
+  end
+
+  describe "GET home variables" do
+    context "HBX admin variables to show all enrollments" do
+      let(:user_with_hbx_staff_role) { FactoryBot.create(:user, :with_family, :with_hbx_staff_role) }
+      let(:consumer_person) { FactoryBot.create(:person, :with_consumer_role) }
+      let(:testing_family) { FactoryBot.create(:family, :with_primary_family_member, person: consumer_person) }
+      let(:testing_enrollments) do
+        5.times do
+          instance_double("HbxEnrollment", family_id: testing_family.id)
+        end
+      end
+      let(:consumer_role) { double("ConsumerRole", bookmark_url: "/families/home") }
+
+      it "should assign all_hbx_enrollments_for_admin variable if hbx admin user" do
+        testing_family.stub_chain('primary_applicant.person_id').and_return(user_with_hbx_staff_role.person.id)
+        sign_in(user_with_hbx_staff_role)
+        get :home, params: {:family => testing_family.id.to_s}
+        expect(assigns.keys).to include("all_hbx_enrollments_for_admin")
+      end
+
+      it "should not assign all_hbx_enrollments_for_admin for non hbx admin user" do
+        testing_family.stub_chain('primary_applicant.person_id').and_return(user.person.id)
+        allow_any_instance_of(Person).to receive(:has_multiple_roles?).and_return(false)
+        allow(testing_family).to receive(:person).and_return(user.person)
+        sign_in(user)
+        get :home, params: {:family => testing_family.id.to_s}
+        expect(assigns.keys).to_not include("all_hbx_enrollments_for_admin")
+      end
+    end
   end
 
   describe "GET home" do
