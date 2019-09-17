@@ -25,4 +25,18 @@ describe UpdateCarrierName, dbclean: :after_each do
       expect(organization.legal_name).to match(new_legal_name)
     end
   end
+
+  describe "update carrier legal name in exempt_organization" do
+    let(:exempt_organization) { FactoryBot.create(:benefit_sponsors_organizations_exempt_organization, :with_hbx_profile) }
+    let(:new_legal_name) { "New Legal Name" }
+
+    it "allow dependent ssn's to be updated to nil" do
+      exempt_organization
+      ClimateControl.modify fein: exempt_organization.fein, name: new_legal_name do
+        subject.migrate
+      end
+      exempt_organization.reload
+      expect(exempt_organization.legal_name).to match(new_legal_name)
+    end
+  end
 end
