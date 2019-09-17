@@ -20,10 +20,16 @@ yarn install
 
 NODE_ENV=test RAILS_ENV=test ./bin/webpack
 
-cd $root
+for test_dir in `ls -1 $root/components/ | grep -v old_sponsored_benefits`; do
+  echo $root/components/$test_dir
+  cd $root/components/$test_dir
+  bundle install
+  bundle exec rspec --fail-fast
+  ((result+=$?))
+  if [ $result -ne 0 ]; then
+    echo "ENGINE FAILED"
+	  exit $result
+  fi
+done
 
-bundle install
-
-bundle exec rails r -e test "DatabaseCleaner.clean"
-
-COVERAGE=true bundle exec rake parallel:spec[4]
+exit $result
