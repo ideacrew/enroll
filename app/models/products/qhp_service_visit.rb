@@ -25,8 +25,12 @@ class Products::QhpServiceVisit
   end
 
   def out_network_result
-    if copay_out_of_network.gsub("$","").to_i.zero?
+    if copay_out_of_network.include?("Copay after deductible")
+      Products::Services::CopayAfterDeductibleService.new(self).out_network_process
+    elsif copay_out_of_network.gsub("$","").to_i.zero?
       Products::Services::ZeroCopayService.new(self).out_network_process
+    elsif copay_out_of_network.gsub("$","").to_i != 0
+      Products::Services::NonZeroCopayService.new(self).out_network_process
 
     #WIP
     # elsif copay_out_of_network.gsub("$","").to_i != 0

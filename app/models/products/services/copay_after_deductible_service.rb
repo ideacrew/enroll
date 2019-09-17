@@ -22,8 +22,22 @@ module Products
           elsif record.qhp_cost_share_variance.separarate_medical_deductible?
             "You must meet the deductible first, then #{number} per visit."
           end
-        elsif record.co_insurance_in_network_tier_1.gsub("%","").to_i == 100 # scenario not present in the templates
+        elsif record.co_insurance_in_network_tier_1.gsub("%","").to_i == 100 #ticket_42680
           "You must meet the deductible first, then #{number} per visit"
+        end
+      end
+
+      def out_network_process
+        number, _string = record.copay_out_of_network.split(/\ (?=[\w])/)
+        if record.co_insurance_out_of_network.gsub("%","").to_i == 100 #ticket_42680
+          "You must meet the out-of-network deductible first, then #{number} per visit"
+        #WIP
+        # elsif NO_CHARGE.include?(record.co_insurance_out_of_network)
+        #     NO_CHARGE
+        # elsif record.co_insurance_out_of_network.gsub("%","").to_i.zero?
+        #   NO_CHARGE
+        # elsif record.co_insurance_out_of_network.gsub("%","").to_i == 100
+        #   "Not covered. You are responsible for the full cost"
         end
       end
     end
