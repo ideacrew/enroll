@@ -14,7 +14,10 @@ rm -rf ./public/packs*
 bundle install
 
 [[ -s $HOME/.nvm/nvm.sh ]] && . $HOME/.nvm/nvm.sh
+nvm install 10
 nvm use 10 || exit -1
+npm install --global yarn
+yarn install
 
 bundle exec rails r -e test "DatabaseCleaner.clean"
 
