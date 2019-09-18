@@ -10,7 +10,7 @@ module CensusEmployeeWorld
 
   def build_enrollment(attributes, *traits)
     @hbx_enrollment ||= FactoryBot.create(
-      :hbx_enrollment, 
+      :hbx_enrollment,
       :with_enrollment_members,
       *traits,
       family: attributes[:family],
@@ -26,7 +26,6 @@ module CensusEmployeeWorld
   def person_record_from_census_employee(person, legal_name = nil, organizations = nil)
     organizations.reject! { |organization| @organization.values.include?(organization) == false }
     census_employee = CensusEmployee.where(first_name: person[:first_name], last_name: person[:last_name]).first
-    
     employer_prof = employer_profile(legal_name)
     emp_staff_role = FactoryBot.create(
       :benefit_sponsor_employer_staff_role,
@@ -114,6 +113,25 @@ module CensusEmployeeWorld
     )
   end
 
+  def create_second_census_employee_from_person(named_person, legal_name = nil)
+    person = people[named_person]
+    organization = employer(legal_name)
+    sponsorship = benefit_sponsorship(organization)
+    benefit_group = fetch_benefit_group(organization.legal_name)
+    @census_employee2 ||= {}
+    @census_employee2[named_person] ||= FactoryBot.create(
+      :census_employee,
+      :with_active_assignment,
+      first_name: person[:first_name],
+      last_name: person[:last_name],
+      dob: person[:dob_date],
+      ssn: person[:ssn],
+      benefit_sponsorship: sponsorship,
+      employer_profile: organization.profiles.first,
+      benefit_group: benefit_group
+    )
+  end
+
   def census_employee_from_person(person)
     CensusEmployee.where(first_name: person[:first_name], last_name: person[:last_name]).first
   end
@@ -134,6 +152,10 @@ end
 
 And(/^there is a census employee record for (.*?) for employer (.*?)$/) do |named_person, legal_name|
   create_census_employee_from_person(named_person, legal_name)
+end
+
+And(/^there is a second census employee record for (.*?) for employer (.*?)$/) do |named_person, legal_name|
+  create_second_census_employee_from_person(named_person, legal_name)
 end
 
 And(/^census employee (.*?) is a (.*) employee$/) do |named_person, state|

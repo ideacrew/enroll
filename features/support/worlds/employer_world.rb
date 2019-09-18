@@ -87,6 +87,13 @@ And(/^(.*?) employer has a staff role$/) do |legal_name|
   @staff_role ||= FactoryBot.create(:user, :person => person)
 end
 
+And(/^second employer (.*?) has a staff role$/) do |legal_name|
+  employer_profile = employer_profile(legal_name)
+  employer_staff_role = FactoryBot.build(:benefit_sponsor_employer_staff_role, aasm_state: 'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)
+  person = FactoryBot.create(:person, employer_staff_roles: [employer_staff_role])
+  @staff_role2 ||= FactoryBot.create(:user, :person => person)
+end
+
 And(/^(.*?) employer terminates employees$/) do |legal_name|
   termination_date = TimeKeeper.date_of_record - 1.day
   @census_employees.each do |employee|

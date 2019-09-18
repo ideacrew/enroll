@@ -2,6 +2,10 @@ Given(/^Employer exists and logs in$/) do
   login_as @staff_role
 end
 
+Given(/^second Employer exists and logs in$/) do
+  login_as @staff_role2
+end
+
 Then(/^Employee should click on Manage Family button$/) do
   find('a.interaction-click-control-manage-family').click
 end

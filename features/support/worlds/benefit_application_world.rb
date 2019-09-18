@@ -75,6 +75,20 @@ module BenefitApplicationWorld
                        package_kind: package_kind)
   end
 
+  def create_second_application(new_application_status: new_application_status)
+    application_dates = application_dates_for(current_effective_date, new_application_status)
+
+    @new_application = FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog,
+                       :with_benefit_package,
+                       benefit_sponsorship: @employer_profile2.active_benefit_sponsorship,
+                       effective_period: application_dates[:effective_period],
+                       aasm_state: new_application_status,
+                       open_enrollment_period: application_dates[:open_enrollment_period],
+                       recorded_rating_area: rating_area,
+                       recorded_service_areas: [service_area],
+                       package_kind: package_kind)
+  end
+
   def create_applications(predecessor_status: , new_application_status: )
     if predecessor_status
       aasm_state(predecessor_status)
@@ -187,6 +201,11 @@ And(/^initial employer (.*) has (.*) benefit application with (.*) plan options$
   @package_kind = plan_option.downcase.gsub(/\s/, '_')
   @employer_profile = employer_profile(legal_name)
   create_application(new_application_status: new_application_status.to_sym)
+end
+
+And(/^second employer (.*) has (.*) benefit application$/) do |legal_name, new_application_status|
+  @employer_profile2 = employer_profile(legal_name)
+  create_second_application(new_application_status: new_application_status.to_sym)
 end
 
 And(/^employer (.*?) has a (.*?) benefit application with offering health and dental$/) do |legal_name, state|
