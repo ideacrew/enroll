@@ -217,6 +217,12 @@ And(/^the QLE Kind (.*?) has no end_on$/) do |qle_kind_title|
   qle_kind.save!
 end
 
+And(/^qualifying life event kind (.*?) has end_on date set to (.*?)$/) do |qle_kind_title, end_on_date|
+  qle_kind = qualifying_life_event_kind(qle_kind_title)
+  qle_kind.end_on = end_on_date
+  qle_kind.save!
+end
+
 And(/^the QLE Kind (.*?) record should be updated with an end_on date$/) do |qle_kind_title|
   qle_kind = qualifying_life_event_kind(qle_kind_title)
   expect(qle_kind.end_on.present?).to eq(true)
