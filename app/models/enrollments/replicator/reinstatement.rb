@@ -96,20 +96,19 @@ module Enrollments
         assign_attributes_to_reinstate_enrollment(reinstated_enrollment, common_params)
 
         if base_enrollment.is_shop?
-            assign_attributes_to_reinstate_enrollment(reinstated_enrollment, form_shop_params) if can_be_reinstated?
-
+          assign_attributes_to_reinstate_enrollment(reinstated_enrollment, form_shop_params) if can_be_reinstated?
         elsif base_enrollment.is_ivl_by_kind? && new_aptc
-          # TODO why this much calculations
+          #TODO: why this much calculations
           aptc_ratio_by_member = base_enrollment.family.active_household.latest_active_tax_household.aptc_ratio_by_member
           percent_sum_for_all_enrolles = duplicate_hbx.hbx_enrollment_members.inject(0.0) { |sum, member| sum + aptc_ratio_by_member[member.applicant_id.to_s] || 0.0 }
 
           assign_attributes_to_reinstate_enrollment(reinstated_enrollment, form_ivl_params)
 
-          apply_aptc_to_members(duplicate_hbx, {
+          apply_aptc_to_members(duplicate_hbx,{
             aptc_ratio_by_member: aptc_ratio_by_member,
             new_aptc: new_aptc,
             percent_sum_for_all_enrolles: percent_sum_for_all_enrolles
-            })
+          })
 
           # To do for this path: Handle enrollment state & handle 15th of month rule for effective date (outside of service, probably)
         end
@@ -118,7 +117,7 @@ module Enrollments
         reinstated_enrollment
       end
 
-      def assign_attributes_to_reinstate_enrollment(enrollment, options={})
+      def assign_attributes_to_reinstate_enrollment(enrollment, options = {})
         enrollment.assign_attributes(options)
       end
 
@@ -136,7 +135,7 @@ module Enrollments
       end
 
       def form_ivl_params
-        #TODO Query is too long
+        #TODO: Query is too long
         max_aptc = base_enrollment.family.active_household.latest_active_tax_household_with_year(year).latest_eligibility_determination.max_aptc.to_f
         {
           product_id: base_enrollment.product_id,
@@ -159,7 +158,7 @@ module Enrollments
         }
       end
 
-      def apply_aptc_to_members(duplicate_hbx, options={})
+      def apply_aptc_to_members(duplicate_hbx, options = {})
         duplicate_hbx.hbx_enrollment_members.each do |mem|
           aptc_pct_for_member = options[:aptc_ratio_by_member][mem.applicant_id.to_s] || 0.0
           mem.applied_aptc_amount = otpions[:new_aptc] * aptc_pct_for_member / options[:percent_sum_for_all_enrolles]
