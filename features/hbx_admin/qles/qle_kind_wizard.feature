@@ -51,16 +51,14 @@ Feature: As an HBX Admin User I can access the QLE Wizard management wizard
     When the user selects Modify Existing QLE
     Then the user should not see an option to select Shop Market Kind QLE Kinds
 
-  # TODO: Update this test to reflect selecting deactivate rather than just visiting a hard coded URL
-  # TODO: Create another scenario to show that form can't submit if no date for deactivation is set
   Scenario: HBX Staff with Super Admin subroles can deactivate a custom QLE Kind
-    Given qualifying life event kind Had a New Dog present for individual market
+    Given qualifying life event kind Got a New Dog present for individual market
+    And the QLE Kind Got a New Dog has no end_on
     And the user visits the deactivate Qualifying Life Event Kind page for Got a New Dog QLE Kind
-    # TODO: Should test the wizard redirecting here.
-    # See above comment about selecting market kind
     When the user fills out the deactivate QLE Kind form for Got a New Dog event and clicks submit
-    # Then user should see a message that a new QLE Kind has been created Got a New Dog event
-
+    Then user should see message QLE Kind Got a New Dog has been sucessfully deactivated
+    And the QLE Kind Got a New Dog record should be updated with an end_on date
+  
   Scenario: HBX Staff with Super Admin subroles does not see option to deactivate a QLE Kind set for deactivation
     Given qualifying life event kind Had a New Dog present for individual market
     And qualifying life event kind Had a New Dog has end_on date set to 11/01/2020

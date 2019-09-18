@@ -71,9 +71,8 @@ module QualifyingLifeEventKindWorld
       form_name = 'edit_form'
       button_text = 'Update QLE Kind'
     when 'deactivate'
-      # TODO: Fill out buttons and text
       form_name = "deactivation_form"
-      button_text = nil
+      button_text = 'Deactivate QLE Kind'
     end
     if %w[creation_form edit_form].include?(form_name)
       fill_in("qle_kind_#{form_name}_title", with: qle_kind_title)
@@ -127,12 +126,11 @@ module QualifyingLifeEventKindWorld
       fill_in("qle_kind_#{form_name}_post_event_sep_eligibility", with: '10')
       fill_in("qle_kind_#{form_name}_start_on", with: '10/10/2030')
       fill_in("qle_kind_#{form_name}_end_on", with: '10/20/2040')
-      click_button(button_text)
-    elsif form_name == 'deactivate'
-      # TODO: Fill out deactivate form
-      # TODO: Click deactivation button
+    end
+    if form_name == 'deactivation_form'
       fill_in("qle_kind_#{form_name}_end_on", with: '10/10/2030')
     end
+    click_button(button_text)
   end
 
   def fill_incomplete_qle_kind_form_and_submit(action_name, qle_kind_title)
@@ -144,9 +142,8 @@ module QualifyingLifeEventKindWorld
       form_name = 'edit_form'
       button_text = 'Update QLE Kind'
     when 'deactivate'
-      # TODO: Fill out buttons and text
       form_name = "deactivation_form"
-      button_text = nil
+      button_text = 'Deactivate QLE Kind'
     end
     if %w[creation_form edit_form].include?(form_name)
       # Make fields blank
@@ -156,8 +153,12 @@ module QualifyingLifeEventKindWorld
       fill_in("qle_kind_#{form_name}_post_event_sep_eligibility", with: '')
       fill_in("qle_kind_#{form_name}_start_on", with: '')
       fill_in("qle_kind_#{form_name}_end_on", with: '')
-      click_button(button_text)
     end
+    if form_name == 'deactivation_form'
+      fill_in("qle_kind_#{form_name}_end_on", with: '')
+    end
+    click_button(button_text)
+
   end
 
   def qle_kind_wizard_selection(action_name)
@@ -208,6 +209,18 @@ And(/^qualifying life event kind (.*?) is active$/) do |qle_kind_title|
   qle_kind = qualifying_life_event_kind(qle_kind_title)
   qle_kind.is_active = true
   qle_kind.save!
+end
+
+And(/^the QLE Kind (.*?) has no end_on$/) do |qle_kind_title|
+  qle_kind = qualifying_life_event_kind(qle_kind_title)
+  qle_kind.end_on = nil
+  qle_kind.save!
+end
+
+And(/^the QLE Kind (.*?) record should be updated with an end_on date$/) do |qle_kind_title|
+  qle_kind = qualifying_life_event_kind(qle_kind_title)
+  expect(qle_kind.end_on.present?).to eq(true)
+  expect(qle_kind.end_on.class).to eq(Date)
 end
 
 And(/^qualifying life event kind (.*?) has custom qle question and (.*?) response present$/) do |qle_kind_title, action_to_take|
