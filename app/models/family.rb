@@ -390,7 +390,7 @@ class Family
 
   # Get list of Individual and SHOP market {EnrollmentEligibilityReason EnrollmentEligibilityReasons} currently available to this family
   #
-  # @example Get the list of {EnrollmentEligibilityReason EnrollmentEligibilityReasons}
+  # @example Get the list of EnrollmentEligibilityReasonEnrollmentEligibilityReasons:
   #   model.current_ivl_eligible_open_enrollments
   #
   # @see current_ivl_eligible_open_enrollments
