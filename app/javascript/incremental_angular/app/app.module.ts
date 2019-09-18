@@ -6,6 +6,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { NgxMaskModule } from 'ngx-mask'
 export const options = {};
 
+
+import { DragDropModule } from '@angular/cdk/drag-drop'
 import { BrokerAgencyProfileCreateComponent } from './broker_agency_profile/broker_agency_profile_create.component';
 import { TrustedHtmlPipe } from './trusted_html_pipe';
 import { PhoneComponent } from './contact_information/phone.component';
@@ -57,6 +59,7 @@ import { ErrorLocalizer } from './error_localizer';
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
+    DragDropModule,
     NgxMaskModule.forRoot(options)
   ],
   providers: 
