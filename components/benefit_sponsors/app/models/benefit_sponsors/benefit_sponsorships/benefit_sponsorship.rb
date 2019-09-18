@@ -215,7 +215,8 @@ module BenefitSponsors
 
     scope :may_transmit_renewal_enrollment?, -> (compare_date = TimeKeeper.date_of_record) {
       where(:benefit_applications => {
-        :$elemMatch => {:predecessor_id => { :$exists => true }, :"effective_period.min" => compare_date, :aasm_state => :enrollment_eligible }},
+        :$elemMatch => {:predecessor_id => { :$exists => true }, :"effective_period.min" => compare_date,
+                        :aasm_state.in => BenefitSponsors::BenefitApplications::BenefitApplication::RENEWAL_TRANSMISSION_STATES }},
         :aasm_state => :active
       )
     }
