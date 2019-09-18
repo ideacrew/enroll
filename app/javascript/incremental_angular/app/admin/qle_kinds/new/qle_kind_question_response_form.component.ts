@@ -3,6 +3,7 @@ import { FormGroup, FormControl, FormArray, AbstractControl, Validators } from '
 import { ResponseComponentRemover } from './response_component_remover';
 import { QleKindQuestionFormComponent } from './qle_kind_question_form.component';
 
+
 @Component({
   selector: 'qle-question-response-form',
   templateUrl: './qle_kind_question_response_form.component.html'
@@ -39,15 +40,14 @@ export class QleKindResponseFormComponent {
     }
   }
 
-  public addNewResponse(questionComponent: QleKindQuestionFormComponent, responseIndex: number){
+  public addNewResponse(questionComponent: ResponseComponentRemover, responseIndex: number){
     if (questionComponent != null) {
       if (questionComponent.questionFormGroup != null) {
         if (this.responseFormGroup != null) {
           questionComponent.questionFormGroup.value.responses[responseIndex] = this.responseFormGroup.value
    
         }     
-      }     
-      questionComponent.addResponse()
+      }
     }
   }
 

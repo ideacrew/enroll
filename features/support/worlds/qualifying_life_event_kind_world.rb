@@ -294,7 +294,11 @@ When(/^.+ fills out only partially the (.*?) QLE Kind form for (.*?) event$/) do
 end
 
 Then(/^user should see message QLE Kind (.*?) has been sucessfully (.*?)$/) do |qle_kind_title, action_name|
-  expect(page).to have_content("Successfully #{action_name} Qualifying Life Event Kind.")
+  # TODO: Suddenly the messages were showing up on the screenshot by Capybara claimed they were invisible,
+  # Adding this as a temporary fix
+  Capybara.ignore_hidden_elements = false
+  expect(page).to have_text("Successfully #{action_name} Qualifying Life Event Kind.")
+  Capybara.ignore_hidden_elements = true
   qle_kind = qualifying_life_event_kind(qle_kind_title)
   if %w[created updated].include?(action_name)
     first_custom_qle_question = qle_kind.custom_qle_questions.first

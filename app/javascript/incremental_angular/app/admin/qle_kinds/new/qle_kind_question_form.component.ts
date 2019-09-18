@@ -42,7 +42,7 @@ export class QleKindQuestionFormComponent {
     return [];
   }
 
-  public removeQuestion() {
+  public removeQuestion(questionIndex: number) {
     if (this.questionComponentParent != null) {
       if (this.questionIndex != null) {
         this.questionComponentParent.removeQuestion(this.questionIndex);
