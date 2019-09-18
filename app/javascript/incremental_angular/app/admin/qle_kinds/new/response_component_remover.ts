@@ -1,3 +1,8 @@
+import { FormGroup, FormControl, AbstractControl, FormArray, FormBuilder, Validators } from '@angular/forms';
+
 export interface ResponseComponentRemover {
-    removeResponse(responseIndex: number) : void;
-  }
+
+  questionFormGroup : FormGroup
+
+  removeResponse(responseIndex: number) : void;
+}
