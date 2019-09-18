@@ -292,7 +292,7 @@ module BenefitSponsors
         enrolled_families.each do |family|
           enrollments = family.enrollments.by_benefit_package(self).enrolled_and_waived
 
-          sponsored_benefits.each do |sponsored_benefit|
+          sponsored_benefits.unscoped.each do |sponsored_benefit|
             hbx_enrollment = enrollments.by_coverage_kind(sponsored_benefit.product_kind).first
             hbx_enrollment.expire_coverage! if hbx_enrollment && hbx_enrollment.may_expire_coverage?
           end
