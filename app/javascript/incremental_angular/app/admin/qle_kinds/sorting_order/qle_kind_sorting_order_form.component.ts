@@ -18,6 +18,7 @@ export class QleKindSortingOrderFormComponent {
   public sortingOrderUri : string | null = null;
   public sortingOrderFormGroup : FormGroup;
   public marketKindsList : Array<string> | null = null;
+  public drop : null;
   @ViewChild('headerRef') headerRef: ElementRef;
   constructor(
     injector: Injector,
