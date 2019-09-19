@@ -19,4 +19,10 @@ describe Config::AcaModelConcern do
       expect(subject.aca_shop_market_employer_transmission_day_of_month).to be_kind_of(Numeric)
     end
   end
+
+  context ".aca_shop_market_transmit_carrier_drop_events" do
+    it "should return setting" do
+      expect(subject.aca_shop_market_transmit_employer_carrier_drop_events).to be_truthy
+    end
+  end
 end
