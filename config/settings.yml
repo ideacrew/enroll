@@ -198,6 +198,7 @@ aca:
     new_employee_paper_application: true
     census_employees_template_file: 'DCHL Employee Census'
     coverage_start_period: "2 months"
+    auto_cancel_ineligible: false
 
     binder_payment_dates: [
       {"2019-01-01": '2018,12,12'},
