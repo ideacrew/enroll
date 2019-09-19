@@ -16,6 +16,12 @@ module Products
         "Specialty Drugs"
       ].freeze
 
+      EXPECTED_SERVICES = [
+        "Emergency Room Services",
+        "Emergency Transportation/Ambulance",
+        "Emergency Services only",
+        "Urgent Care Centers or Facilities"
+      ].freeze
     end
   end
 end
