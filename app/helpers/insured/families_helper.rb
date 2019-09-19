@@ -34,6 +34,10 @@ module Insured::FamiliesHelper
     policy.created_at.in_time_zone('Eastern Time (US & Canada)')
   end
 
+  def second_qle_question_message
+    "Based on your response to the first question, we need to ask you another question to clarify your eligibility."
+  end
+
   def shift_waived_time(policy)
     (policy.submitted_at || policy.created_at).in_time_zone('Eastern Time (US & Canada)')
   end
