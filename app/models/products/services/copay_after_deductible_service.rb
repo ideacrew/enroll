@@ -44,7 +44,7 @@ module Products
           else #ticket_42681
             "You must meet the out-of-network deductible first, then #{number} per visit."
           end
-        elsif record.co_insurance_out_of_network.gsub("%","").to_i == 100 #ticket_42681
+        elsif record.co_insurance_out_of_network.delete("%").to_i == 100 #ticket_42681
           "You must meet the out-of-network deductible first, then #{number} per visit."
         end
       end
