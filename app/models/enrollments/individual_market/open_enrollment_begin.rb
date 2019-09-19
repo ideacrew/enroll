@@ -67,7 +67,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
     puts "Assisted Renewing Started..." unless Rails.env.test?
     current_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
     query = {
-      :kind => 'individual',
+      :kind.in => ['individual', 'coverall'],
       :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES - ["coverage_renewed", "coverage_termination_pending"]),
       :coverage_kind => 'health',
       :effective_on => { "$gte" => current_benefit_coverage_period.start_on, "$lt" => current_benefit_coverage_period.end_on}
@@ -118,7 +118,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
     puts "Un-Assisted Renewing Started..." unless Rails.env.test?
     current_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
     query = {
-      :kind => 'individual',
+      :kind.in => ['individual', 'coverall'],
       :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES - ["coverage_renewed", "coverage_termination_pending"]),
       :coverage_kind.in => HbxEnrollment::COVERAGE_KINDS,
       :effective_on => { "$gte" => current_benefit_coverage_period.start_on, "$lt" => current_benefit_coverage_period.end_on}
@@ -172,7 +172,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
 
   def active_enrollment_from_family(enrollment)
     enrollment.family.active_household.hbx_enrollments.where(
-      {:kind => 'individual',
+      {:kind.in => ['individual', 'coverall'],
        :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + ['auto_renewing'] - ["coverage_renewed", "coverage_termination_pending"]),
        :coverage_kind => enrollment.coverage_kind}
     )
