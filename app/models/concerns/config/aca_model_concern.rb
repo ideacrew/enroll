@@ -73,7 +73,7 @@ module Config::AcaModelConcern
     end
 
     def aca_shop_market_transmit_employer_carrier_drop_events
-      @@aca_shop_market_transmit_scheduled_employers ||= (Settings.aca.shop_market.transmit_carrier_drop_events.to_s.downcase == "true")
+      @@aca_shop_market_transmit_scheduled_employers ||= Settings.aca.shop_market.transmit_carrier_drop_events
     end
 
     def aca_shop_market_employer_transmission_day_of_month
