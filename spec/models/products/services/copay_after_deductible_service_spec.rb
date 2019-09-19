@@ -7,7 +7,7 @@ describe Products::Services::CopayAfterDeductibleService do
   let(:percentage) {"100%"}
 
   context "In Network Costs" do
-    context "zero copay and zero coinsurance" do
+    context "$[PARAM] Copay after deductible/100% Coinsurance" do
       let(:service_visit) do
         build(:products_qhp_service_visit, copay_in_network_tier_1: "#{amount} copay after deductible", co_insurance_in_network_tier_1: percentage)
       end
@@ -20,7 +20,7 @@ describe Products::Services::CopayAfterDeductibleService do
 
 
   context "Out of Network Costs" do
-    context "zero copay and [PARAM]% Coinsurance after deductible" do
+    context "$[PARAM] Copay after deductible/100% Coinsurance" do
       let(:service_visit) do
         build(:products_qhp_service_visit, copay_out_of_network: "#{amount} copay after deductible", co_insurance_out_of_network: percentage)
       end
