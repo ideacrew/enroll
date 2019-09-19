@@ -13,7 +13,7 @@ describe Products::Services::CopayAfterDeductibleService do
       end
 
       it "should return translated result" do
-        expect(Products::Services::CopayAfterDeductibleService.new(service_visit).in_network_process).to eq "You must meet the deductible first, then #{amount} per visit"
+        expect(Products::Services::CopayAfterDeductibleService.new(service_visit).in_network_process).to eq "You must meet the deductible first, then #{amount} per visit."
       end
     end
 
@@ -63,10 +63,19 @@ describe Products::Services::CopayAfterDeductibleService do
         end
 
         it "should return translated result" do
-          expect(Products::Services::CopayAfterDeductibleService.new(service_visit).in_network_process).to eq "You must meet the deductible first, then #{amount} per visit"
+          expect(Products::Services::CopayAfterDeductibleService.new(service_visit).in_network_process).to eq "You must meet the deductible first, then #{amount} per visit."
         end
       end
+    end
 
+    context "$[PARAM] Copay after deductible/[PARAM]% Coinsurance after deductible" do
+      let(:service_visit) do
+        build(:products_qhp_service_visit, copay_in_network_tier_1: "#{amount} copay after deductible", co_insurance_in_network_tier_1: "20.00% Coinsurance after deductible")
+      end
+
+      it "should return translated result" do
+        expect(Products::Services::CopayAfterDeductibleService.new(service_visit).in_network_process).to eq "You must meet the deductible first, then #{amount} per visit."
+      end
     end
   end
 
@@ -78,7 +87,17 @@ describe Products::Services::CopayAfterDeductibleService do
       end
 
       it "should return translated result" do
-        expect(Products::Services::CopayAfterDeductibleService.new(service_visit).out_network_process).to eq "You must meet the out-of-network deductible first, then #{amount} per visit"
+        expect(Products::Services::CopayAfterDeductibleService.new(service_visit).out_network_process).to eq "You must meet the out-of-network deductible first, then #{amount} per visit."
+      end
+    end
+
+    context "$[PARAM] Copay after deductible/[PARAM]% Coinsurance after deductible" do
+      let(:service_visit) do
+        build(:products_qhp_service_visit, copay_out_of_network: "#{amount} copay after deductible", co_insurance_out_of_network: "20.00% Coinsurance after deductible")
+      end
+
+      it "should return translated result" do
+        expect(Products::Services::CopayAfterDeductibleService.new(service_visit).out_network_process).to eq "You must meet the out-of-network deductible first, then #{amount} per visit."
       end
     end
   end
