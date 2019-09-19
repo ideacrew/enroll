@@ -22,9 +22,10 @@ namespace :load_rate_reference do
 
   # will only create if the rating areas are not present.
   desc "rating areas"
-  task :dc_rating_areas => :environment do
+  task :dc_rating_areas, [:active_year] => :environment do |t, args|
     if Settings.site.key.to_s == "dc"
-      (2014..2020).each do |year|
+      years = args[:active_year].present? ? [args[:active_year].to_i] : (2014..2020)
+      years.each do |year|
         puts "Creating DC Rating areas for #{year}" unless Rails.env.test?
         ::BenefitMarkets::Locations::RatingArea.find_or_create_by!({
             active_year: year,
