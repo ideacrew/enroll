@@ -195,6 +195,11 @@ class QualifyingLifeEventKind
     %w(employee_gaining_medicare employer_sponsored_coverage_termination).include? reason
   end
 
+  # Example of this is "Date that feds order that coverage starts". If not present, just show "Date of Event."
+  def show_event_kind_label_if_present
+    event_kind_label.to_s.length > 0 ? event_kind_label.to_s + ":" : "Date of Event:" 
+  end
+
   def is_moved_to_dc?
     #title == "I'm moving to the District of Columbia"
     reason == 'relocate'
