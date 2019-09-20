@@ -93,25 +93,6 @@ And(/employee (.*) with a dependent has (.*) relationship with age (.*) than 26/
   person.save
 end
 
-When(/^.+ clicks initiate cobra$/) do
-  click_link "Initiate cobra"
-end
-
-When(/^clicks cobra confirm$/) do
-  terminated_date = TimeKeeper.date_of_record + 31.days
-  find('.date-picker').set(terminated_date)
-  find('.cobra_confirm').click
-end
-
-When(/^clicks terminated employees tab$/) do
-  find('div', :text => 'Terminated', :class => 'btn-default').click
-end
-
-When(/^should see terminated employee$/) do
-  wait_for_ajax
-  expect(find_all('.col-employee_name').size).to eq(2)
-end
-
 When(/^.+ clicks sign in existing account$/) do
   click_link "Sign In Existing Account"
 end
@@ -126,41 +107,6 @@ When(/^Patrick Doe logs in$/) do
   login_as user
   visit "/"
   click_link 'Employee Portal'
-end
-
-When /^clicks on the employee profile for Patrick$/ do
-  click_link "Patrick Doe"
-  wait_for_ajax
-end
-
-Then /^.+ should see dependents including Patrick's wife$/ do
-  wait_for_ajax
-  expect(find_all('#dependent_info > div').count).to eq(1)
-end
-
-Then /^.+ should not see dependents$/ do
-  wait_for_ajax
-  expect(find_all('#dependent_info > div').count).to eq(0)
-end
-
-When /^Employer clicks on Actions button$/ do
-  click_button "Actions"
-end
-
-When /^Employer clicks on terminate button for an employee$/ do
-  click_link "Terminate"
-  find('input.date-picker').set((TimeKeeper.date_of_record - 1.days).to_s)
-  click_link "Terminate Employee"
-end
-
-When /^Employer clicks on future termination button for an employee$/ do
-  click_link "Terminate"
-  find('input.date-picker').set((TimeKeeper.date_of_record + 10.days).to_s)
-  click_link "Terminate Employee"
-end
-
-When /^Employer clicks cobra tab$/ do
-  find("div", class:"btn-default",text: "COBRA Only").click
 end
 
 When /^.+ enters? the spouse info of Patrick wife$/ do
@@ -225,6 +171,7 @@ end
 
 When /^visits My Insured Portal$/ do
   visit "/families/home?tab=home"
+  sleep 2
 end
 
 When /^(.*) visits Returning User Portal$/ do |named_person|

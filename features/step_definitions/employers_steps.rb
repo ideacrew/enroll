@@ -1023,3 +1023,57 @@ end
 And(/^employer should see census employee status as (.*?)$/) do |status|
   expect(page).to have_content status
 end
+
+When(/^clicks terminated employees tab$/) do
+  find('div', :text => 'Terminated', :class => 'btn-default').click
+end
+
+When(/^should see terminated employee$/) do
+  wait_for_ajax
+  expect(find_all('.col-employee_name').size).to eq(2)
+end
+
+When /^Employer clicks cobra tab$/ do
+  find("div", class:"btn-default",text: "COBRA Only").click
+end
+
+When /^Employer clicks on Actions button$/ do
+  click_button "Actions"
+end
+
+When(/^.+ clicks initiate cobra$/) do
+  click_link "Initiate cobra"
+end
+
+When(/^clicks cobra confirm$/) do
+  terminated_date = TimeKeeper.date_of_record + 31.days
+  find('.date-picker').set(terminated_date)
+  find('.cobra_confirm').click
+end
+
+When /^clicks on the employee profile for Patrick$/ do
+  click_link "Patrick Doe"
+  wait_for_ajax
+end
+
+Then /^.+ should see dependents including Patrick's wife$/ do
+  wait_for_ajax
+  expect(find_all('#dependent_info > div').count).to eq(1)
+end
+
+Then /^.+ should not see dependents$/ do
+  wait_for_ajax
+  expect(find_all('#dependent_info > div').count).to eq(0)
+end
+
+When /^Employer clicks on terminate button for an employee$/ do
+  click_link "Terminate"
+  find('input.date-picker').set((TimeKeeper.date_of_record - 1.days).to_s)
+  click_link "Terminate Employee"
+end
+
+When /^Employer clicks on future termination button for an employee$/ do
+  click_link "Terminate"
+  find('input.date-picker').set((TimeKeeper.date_of_record + 10.days).to_s)
+  click_link "Terminate Employee"
+end
