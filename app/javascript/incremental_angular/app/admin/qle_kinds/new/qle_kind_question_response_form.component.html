@@ -1,0 +1,34 @@
+<div [formGroup]="responseFormGroup">
+  <div class="from-group-response">
+    <span class="col-sm-2 control-label">Response</span>
+    <div class="col-sm-10">
+      <input
+        id="qle_kind_response_response_{{responseIndex}}_content"
+        type="text"
+        formControlName="content"
+        id="response-content col-md-2"
+        class='form-control'>
+      <div class="btn-group" role="group" aria-label="Response Actions">
+        <button
+          (click)="addNewResponse(responseComponentParent, responseIndex)"
+          class='btn btn-secondary btn-success margin-right-10px'>
+          Add Another Response
+        </button>
+        <button
+          (click)="removeResponse(responseIndex)"
+          class='btn btn-secondary btn-primary margin-right-10px'>
+          Remove Response
+        </button>
+        <label for="qle_kind_response_response_{{responseIndex}}_action_to_take">
+          Action to Take
+          <select class='form-control' id="qle_kind_response_response_{{responseIndex}}_action_to_take" formControlName="action_to_take">
+            <option value='accepted'>Accepted</option>
+            <option value='declined'>Declined</option>
+            <option value='to_question_two'>To Question 2</option>
+            <option value='call_center'>Call Center</option>
+          </select>
+        </label>
+      </div>
+    </div>
+  </div>
+</div>
