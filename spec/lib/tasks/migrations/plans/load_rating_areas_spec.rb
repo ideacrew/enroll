@@ -30,23 +30,18 @@ describe 'load_rate_reference:update_rating_areas' do
       expect(BenefitMarkets::Locations::RatingArea.all.count).to eq 7
     end
 
-    it "should not create multiple records when ran multiple times" do
-      run_rake_task
-      expect(RatingArea.all.count).to eq 40
-      expect(BenefitMarkets::Locations::RatingArea.all.count).to eq 7
-    end
-
     context "match attributes for old model" do
-      subject { RatingArea.all.where(zip_code: "01001", county_name: "Hampden", rating_area: "R-MA001").first }
-      it { is_expected.to have_attributes(zip_code: "01001") }
-      it { is_expected.to have_attributes(county_name: "Hampden") }
-      it { is_expected.to have_attributes(zip_code_in_multiple_counties: false) }
-      it { is_expected.to have_attributes(rating_area: "R-MA001") }
+      subject { RatingArea.where(zip_code: "01001", county_name: "Hampden", rating_area: "R-MA001").first }
+      it { is_expected.to have_attributes(zip_code: subject.zip_code) }
+      it { is_expected.to have_attributes(county_name: subject.county_name) }
+      it { is_expected.to have_attributes(zip_code_in_multiple_counties: subject.zip_code_in_multiple_counties) }
+      it { is_expected.to have_attributes(rating_area: subject.rating_area) }
+      it { is_expected.to have_attributes(active_years: subject.active_years) }
     end
 
     context "match attributes for new model" do
-      subject { BenefitMarkets::Locations::RatingArea.all.where(exchange_provided_code: "R-MA001").first }
-      it { is_expected.to have_attributes(exchange_provided_code: "R-MA001") }
+      subject { BenefitMarkets::Locations::RatingArea.where(exchange_provided_code: "R-MA001").first }
+      it { is_expected.to have_attributes(exchange_provided_code: subject.exchange_provided_code) }
     end
   end
 
