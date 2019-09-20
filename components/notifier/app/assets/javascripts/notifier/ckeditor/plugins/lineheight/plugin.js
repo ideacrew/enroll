@@ -71,7 +71,7 @@
 		}
 	} );
 } )();
-CKEDITOR.config.line_height = "0.5em;0.75em;1em;1.1em;1.2em;1.3em;1.4em;Default(1.5em);1.6em;1.7em;1.8em;1.9em;2em;2.5em;3em;3.5em;4em;4.5em;5em;";
+CKEDITOR.config.line_height = "1em;1.1em;1.2em;1.3em;1.4em;Default(1.5em);1.6em;1.7em;1.8em;1.9em;2em;2.5em;3em;3.5em;4em;4.5em;5em;";
 CKEDITOR.config.lineHeight_style = {
 	element: 'span',
 	styles: { 'line-height': '#(size)' },
