@@ -44,15 +44,27 @@ describe EmployerAttestationDocument, dbclean: :after_each do
       end
     end
     
-    context 'when employer attestation is already denied' do
-      context 'admin approves second attestation document ' do 
+    context 'admin approves second attestation document' do
+      context 'where attestation is in denied state' do
+        before :each do
+          attestation.update_attributes!(aasm_state: 'denied')
+          FactoryGirl.create(:employer_attestation_document, employer_attestation: attestation)
+          attestation.reload
+        end
 
-        it 'should not change doc status and attestation status' do
-          attestation.update(aasm_state: 'denied')
-          document.submit_review({status: 'accepted'})
-          employer_profile.reload
-          expect(document.submitted?).to be_truthy
-          expect(document.employer_attestation.denied?).to be_truthy
+        it 'should change attestation status to submitted' do
+          expect(attestation.submitted?).to be_truthy
+        end
+      end
+
+      context 'where attestation is in approved state' do
+        before :each do
+          attestation.update_attributes!(aasm_state: 'approved')
+          FactoryGirl.create(:employer_attestation_document, employer_attestation: attestation)
+        end
+
+        it 'should not change attestation status' do
+          expect(attestation.submitted?).to be_falsey
         end
       end
     end

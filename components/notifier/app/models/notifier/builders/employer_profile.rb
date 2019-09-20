@@ -10,7 +10,7 @@ module Notifier
     include Config::ContactCenterHelper
     include Config::SiteHelper
 
-    attr_accessor :employer_profile, :merge_model, :payload
+    attr_accessor :employer_profile, :merge_model, :payload, :event_name
 
     def initialize
       data_object = Notifier::MergeDataModels::EmployerProfile.new

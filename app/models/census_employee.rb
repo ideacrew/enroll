@@ -98,6 +98,7 @@ class CensusEmployee < CensusMember
   scope :active,            ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_STATES) }
   scope :terminated,        ->{ any_in(aasm_state: EMPLOYMENT_TERMINATED_STATES) }
   scope :non_terminated,    ->{ where(:aasm_state.nin => EMPLOYMENT_TERMINATED_STATES) }
+  scope :non_term_and_pending,->{ where(:aasm_state.nin => (EMPLOYMENT_TERMINATED_STATES + PENDING_STATES)) }
   scope :newly_designated,  ->{ any_in(aasm_state: NEWLY_DESIGNATED_STATES) }
   scope :linked,            ->{ any_in(aasm_state: LINKED_STATES) }
   scope :eligible,          ->{ any_in(aasm_state: ELIGIBLE_STATES) }
@@ -149,6 +150,13 @@ class CensusEmployee < CensusMember
       :start_on => effective_on,
       :benefit_package_id => benefit_package.id, :is_active => is_active
     }})
+  }
+
+  scope :by_benefit_package_and_assignment_on_or_later,->(benefit_package, effective_on, is_active) {
+    where(:benefit_group_assignments =>
+              { :$elemMatch => { :start_on.gte => effective_on,
+                                 :benefit_package_id => benefit_package.id,
+                                 :is_active => is_active }})
   }
 
   scope :benefit_application_assigned,     ->(benefit_application) { where(:"benefit_group_assignments.benefit_package_id".in => benefit_application.benefit_packages.pluck(:_id)) }
@@ -1163,7 +1171,7 @@ def self.to_csv
   # Pull expired enrollments as well
   def past_enrollments
     if employee_role.present?
-      employee_role.person.primary_family.active_household.hbx_enrollments.shop_market.enrolled_and_terminated.where({
+      employee_role.person.primary_family.active_household.hbx_enrollments.non_external.shop_market.enrolled_and_terminated.where({
         :"benefit_group_assignment_id".in => past_benefit_group_assignments.map(&:id)
       })
     end

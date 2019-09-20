@@ -21,6 +21,8 @@ module Config::AcaModelConcern
     delegate :aca_shop_market_small_market_employee_count_maximum, to: :class
     delegate :aca_shop_market_transmit_scheduled_employers, to: :class
     delegate :aca_shop_market_employer_transmission_day_of_month, to: :class
+    delegate :allow_mid_month_voluntary_terms?, to: :class
+    delegate :allow_mid_month_non_payment_terms?, to: :class
   end
 
   class_methods do
@@ -62,6 +64,14 @@ module Config::AcaModelConcern
 
     def aca_shop_market_employer_transmission_day_of_month
       @@aca_shop_market_employer_transmission_day_of_month ||= Settings.aca.shop_market.employer_transmission_day_of_month
+    end
+
+    def allow_mid_month_voluntary_terms?
+      @allow_mid_month_voluntary_terms ||= Settings.aca.shop_market.mid_month_benefit_application_terminations.voluntary
+    end
+
+    def allow_mid_month_non_payment_terms?
+      @allow_mid_month_non_payment_terms ||= Settings.aca.shop_market.mid_month_benefit_application_terminations.non_payment
     end
 
     def market_rating_areas

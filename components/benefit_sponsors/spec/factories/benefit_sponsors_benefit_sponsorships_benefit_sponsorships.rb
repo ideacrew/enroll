@@ -38,6 +38,26 @@ FactoryGirl.define do
       end
     end
 
+    trait :with_previous_year_rating_area do
+      after :build do |benefit_sponsorship, evaluator|
+        if evaluator.supplied_rating_area
+          benefit_sponsorship.rating_area = evaluator.supplied_rating_area
+        else
+          benefit_sponsorship.rating_area = create(:benefit_markets_locations_rating_area, active_year: TimeKeeper.date_of_record.prev_year.year)
+        end
+      end
+    end
+
+    trait :with_previous_year_service_areas do
+      after :build do |benefit_sponsorship, evaluator|
+        if evaluator.service_area_list.any?
+          benefit_sponsorship.service_areas = evaluator.service_area_list
+        else
+          benefit_sponsorship.service_areas = [create(:benefit_markets_locations_service_area, active_year: TimeKeeper.date_of_record.prev_year.year)]
+        end
+      end
+    end
+
     trait :with_organization_dc_profile do
       after :build do |benefit_sponsorship, evaluator|
         profile = build(:benefit_sponsors_organizations_aca_shop_dc_employer_profile, organization: benefit_sponsorship.organization)

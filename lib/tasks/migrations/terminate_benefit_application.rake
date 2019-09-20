@@ -28,7 +28,7 @@ namespace :migrations do
     # Terminate current active benefit applications
     organization.active_benefit_sponsorship.benefit_applications.published_benefit_applications_by_date(TimeKeeper.date_of_record).each do |benefit_application|
       enrollment_service = initialize_service(benefit_application)
-      enrollment_service.terminate(end_on, termination_date)
+      enrollment_service.terminate(end_on, termination_date, "voluntary", false)
 
       if benefit_application.terminated?
         if generate_termination_notice

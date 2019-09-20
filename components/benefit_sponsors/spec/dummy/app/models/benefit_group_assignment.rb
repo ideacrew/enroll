@@ -40,6 +40,23 @@ class BenefitGroupAssignment
     benefit_package
   end
 
+  def covered_families
+    Family.where({
+      "households.hbx_enrollments.benefit_group_assignment_id" => BSON::ObjectId.from_string(self.id)
+    })
+  end
+
+  def hbx_enrollments
+    covered_families.inject([]) do |enrollments, family|
+      family.households.each do |household|
+        enrollments += household.hbx_enrollments.show_enrollments_sans_canceled.select do |enrollment|
+          enrollment.benefit_group_assignment_id == self.id
+        end.to_a
+      end
+      enrollments
+    end
+  end
+
   def benefit_package=(new_benefit_package)
     raise ArgumentError.new("expected BenefitPackage") unless new_benefit_package.is_a? BenefitSponsors::BenefitPackages::BenefitPackage
     self.benefit_package_id = new_benefit_package._id
@@ -102,6 +119,23 @@ class BenefitGroupAssignment
     update_attributes(is_active: true, activated_at: TimeKeeper.datetime_of_record) unless is_active?
   end
 
+  def covered_families
+    Family.where({
+      "households.hbx_enrollments.benefit_group_assignment_id" => BSON::ObjectId.from_string(self.id)
+    })
+  end
+
+  def hbx_enrollments
+    covered_families.inject([]) do |enrollments, family|
+      family.households.each do |household|
+        enrollments += household.hbx_enrollments.show_enrollments_sans_canceled.select do |enrollment|
+          enrollment.benefit_group_assignment_id == self.id
+        end.to_a
+      end
+      enrollments
+    end
+  end
+
   aasm do
     state :initialized, initial: true
     state :coverage_selected
@@ -110,6 +144,10 @@ class BenefitGroupAssignment
     state :coverage_void
     state :coverage_renewing
     state :coverage_expired
+
+    event :renew_coverage do
+      transitions from: :initialized, to: :coverage_renewing
+    end
 
   end
 end

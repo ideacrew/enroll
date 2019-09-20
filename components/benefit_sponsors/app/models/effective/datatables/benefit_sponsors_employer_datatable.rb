@@ -38,12 +38,12 @@ module Effective
           :filter => {include_blank: false, :as => :select, :collection => SOURCE_KINDS, :selected => "all"}
 
         table_column :plan_year_state, :proc => Proc.new { |row|
-          if row.latest_benefit_application.present?
-            benefit_application_summarized_state(row.latest_benefit_application)
+          if row.latest_application.present?
+            benefit_application_summarized_state(row.latest_application)
           end }, :filter => false
         table_column :effective_date, :proc => Proc.new { |row|
-          if row.latest_benefit_application.present?
-            row.latest_benefit_application.effective_period.min.strftime("%m/%d/%Y")
+          if row.latest_application.present?
+            row.latest_application.effective_period.min.strftime("%m/%d/%Y")
           end }, :filter => false, :sortable => true
 
         table_column :invoiced?, :proc => Proc.new { |row|
@@ -72,6 +72,10 @@ module Effective
            ['Change FEIN', edit_fein_exchanges_hbx_profiles_path(id: row.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), pundit_allow(HbxProfile, :can_change_fein?) ? "ajax" : "hide"],
            ['Force Publish', edit_force_publish_exchanges_hbx_profiles_path(id: @employer_profile.latest_benefit_sponsorship.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), force_publish_link_type(row, pundit_allow(HbxProfile, :can_force_publish?))]
           ]
+
+          if pundit_allow(HbxProfile, :can_modify_plan_year?)
+            dropdown.insert(2,['Plan Years', exchanges_employer_applications_path(employer_id: row, employers_action_id: "employer_actions_#{@employer_profile.id}"), 'ajax'])
+          end
 
           if individual_market_is_enabled?
             people_id = Person.where({"employer_staff_roles.employer_profile_id" => @employer_profile._id}).map(&:id)

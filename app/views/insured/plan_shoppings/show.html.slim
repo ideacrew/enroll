@@ -200,80 +200,130 @@ javascript:
     showFilteredResults()
   }
 
-  function filterResultsSelections(selections) {
-    var resultsArray = [];
-    // Filters based on Metal Level
-    metalLevels = selections.selectedMetalLevels;
-    if (metalLevels) {
-       metalLevels.forEach(function(metalLevel) {
-         availableEnrollments.forEach(function(enrollment) {
-           if (enrollment.product.metal_level_kind.toLowerCase() == metalLevel.toLowerCase()) {
-             resultsArray.push(enrollment);
-           }
-         })
-       })
-    }
-    // Filters based on Plan Type
-    planTypes = selections.selectedPlanTypes;
-    if (planTypes) {
-      planTypes.forEach(function(plan) {
-        availableEnrollments.forEach(function(enrollment) {
-          if (enrollment.product.product_type.toLowerCase() == plan.toLowerCase()) {
-            resultsArray.push(enrollment);
-          }
-        })
+  function filterByMetalLevels(metalLevels, dataArray) {
+      var resultsData = [];
+      metalLevels.forEach(function (metalLevel) {
+          dataArray.forEach(function (enrollment) {
+              if (enrollment.product.metal_level_kind.toLowerCase() == metalLevel.toLowerCase()) {
+                  resultsData.push(enrollment);
+              }
+          })
       })
-    }
-    // Filters based on Premium Amount
-    premiumFrom = parseFloat(selections.premiumFromAmountValue || 0).toFixed(2);
-    premiumTo = parseFloat(selections.premiumToAmountValue || 0).toFixed(2);
+      return resultsData;
+  }
 
-    availableEnrollments.filter(function(enrollment) {
-      premiumTotal = parseFloat(enrollment.product_cost_total - enrollment.sponsor_contribution_total).toFixed(2);
-      if (Number(premiumTotal) >= Number(premiumFrom) && Number(premiumTotal) <= Number(premiumTo)) {
-        resultsArray.push(enrollment);
-      }
-    })
-    // Filters based on Deductible Amount
-    deductibleFrom = parseFloat(selections.deductibleFromAmountValue || 0).toFixed(0);
-    deductibleTo = parseFloat(selections.deductibleToAmountValue || 0).toFixed(0);
-
-    if (selections.deductibleFromAmountValue != ""){
-      availableEnrollments.filter(function(enrollment) {
-        deductible = parseFloat(enrollment.product.deductible.replace(',','').replace('$','')).toFixed(0);
-        if (Number(deductible) >= Number(deductibleFrom) && Number(deductible) <= Number(deductibleTo)) {
-          resultsArray.push(enrollment);
+  function filterByPlanTypes(planTypes, dataArray) {
+      var resultsData = [];
+      planTypes.forEach(function (plan) {
+          dataArray.forEach(function (enrollment) {
+              if (enrollment.product.health_plan_kind.toLowerCase() == plan.toLowerCase()) {
+                  resultsData.push(enrollment);
+              }
+          })
+      })
+      return resultsData;
+  }
+  
+  function filterByCarrier(carrier, dataArray) {
+      var resultsData = [];
+      dataArray.forEach(function (enrollment) {
+        if (enrollment.product.issuer_name.toLowerCase() == carrier.toLowerCase()) {
+          resultsData.push(enrollment);
         }
       })
-    }
-	  // Filters based on Carrier
-	  carrier = selections.selectedCarrier;
-	  if (carrier) {
-	    availableEnrollments.forEach(function(enrollment) {
-	      if (enrollment.product.issuer_name.toLowerCase() == carrier.toLowerCase()) {
-	        resultsArray.push(enrollment);
-	      }
-	    })
-	  }
-
-    if (selections.selectedHSA) {
+      return resultsData;
+  }
+  
+  function filterByHSA(selectedHSA, dataArray) {
+      var resultsData = [];
       var hsa = Boolean;
-      if (selections.selectedHSA == "Yes") {
-        hsa = true;
+      if (selectedHSA == "Yes") {
+          hsa = true;
       } else {
-        hsa = false;
+          hsa = false;
       }
 
-      availableEnrollments.filter(function(enrollment) {
-        if (enrollment.product.hsa_eligibility == hsa) {
-          resultsArray.push(enrollment);
-        }
+      dataArray.filter(function (enrollment) {
+          if (enrollment.product.hsa_eligibility == hsa) {
+              resultsData.push(enrollment);
+          }
       })
+      return resultsData;
+  }
 
+  function filterByPremiumAmountRange(selections, dataArray) {
+      var resultsData = [];
+      premiumFrom = parseFloat(selections.premiumFromAmountValue || 0).toFixed(2);
+      premiumTo = parseFloat(selections.premiumToAmountValue || 0).toFixed(2);
+
+      dataArray.forEach(function (enrollment) {
+          premiumTotal = parseFloat(enrollment.product_cost_total - enrollment.sponsor_contribution_total).toFixed(2);
+          if ((Number(premiumFrom) > 0 && Number(premiumTo) > 0) && (Number(premiumTotal) >= Number(premiumFrom) && Number(premiumTotal) <= Number(premiumTo))) {
+              resultsData.push(enrollment);
+          }
+          else if ((Number(premiumFrom) > 0 && Number(premiumTo) == 0) && (Number(premiumTotal) >= Number(premiumFrom))) {
+              resultsData.push(enrollment);
+          }
+          else if ((Number(premiumFrom) == 0 && Number(premiumTo) > 0) && (Number(premiumTotal) <= Number(premiumTo))) {
+              resultsData.push(enrollment);
+          }
+      })
+      return resultsData;
+  }
+
+  function filterByDeductibleAmountRange(selections, dataArray) {
+      var resultsData = [];
+      deductibleFrom = parseFloat(selections.deductibleFromAmountValue || 0).toFixed(0);
+      deductibleTo = parseFloat(selections.deductibleToAmountValue || 0).toFixed(0);
+
+      dataArray.forEach(function (enrollment) {
+          deductible = parseFloat(enrollment.product.deductible.replace(',', '').replace('$', '')).toFixed(0);
+          if ((Number(deductibleFrom) > 0 && Number(deductibleTo) > 0) && (Number(deductible) >= Number(deductibleFrom) && Number(deductible) <= Number(deductibleTo))) {
+              resultsData.push(enrollment);
+          }
+          else if ((Number(deductibleFrom) > 0 && Number(deductibleTo) == 0) && (Number(deductible) >= Number(deductibleFrom))) {
+              resultsData.push(enrollment);
+          }
+          else if ((Number(deductibleTo) > 0 && Number(deductibleFrom) == 0) && (Number(deductible) <= Number(deductibleTo))) {
+              resultsData.push(enrollment);
+          }
+      })
+      return resultsData;
+  }
+
+  function filterResultsSelections(selections) {
+    var resultsArray;
+    metalLevels = selections.selectedMetalLevels;
+    planTypes = selections.selectedPlanTypes;
+    carrier = selections.selectedCarrier;
+    selectedHSA = selections.selectedHSA;
+
+    resultsArray = availableEnrollments;
+
+    if (metalLevels.length != 0) {
+      resultsArray = filterByMetalLevels(metalLevels, resultsArray)
     }
 
+    if (planTypes.length != 0) {
+      resultsArray = filterByPlanTypes(planTypes, resultsArray)
+    }
 
+    if (carrier) {
+      resultsArray = filterByCarrier(carrier, resultsArray)
+    }
 
+    if (selectedHSA) {
+      resultsArray = filterByHSA(selectedHSA, resultsArray)
+    }
+
+    if (selections.premiumFromAmountValue != "" || selections.premiumToAmountValue != "") {
+      resultsArray = filterByPremiumAmountRange(selections, resultsArray)
+    }
+
+    if (selections.deductibleFromAmountValue != "" || selections.deductibleToAmountValue != "") {
+        resultsArray = filterByDeductibleAmountRange(selections, resultsArray)
+    }
+    
     // Removes duplicates from results array
     filteredArray = removeDuplicates(resultsArray)
     // Shows results in the view

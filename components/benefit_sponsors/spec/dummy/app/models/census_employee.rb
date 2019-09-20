@@ -60,6 +60,7 @@ class CensusEmployee < CensusMember
 
 
   scope :non_terminated,     ->{ where(:aasm_state.nin => EMPLOYMENT_TERMINATED_STATES) }
+  scope :non_term_and_pending,->{ where(:aasm_state.nin => (EMPLOYMENT_TERMINATED_STATES + PENDING_STATES)) }
   scope :active,             ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_STATES) }
   scope :pending,           ->{ any_in(aasm_state: PENDING_STATES) }
   scope :non_business_owner, ->{ where(is_business_owner: false) }
@@ -68,6 +69,13 @@ class CensusEmployee < CensusMember
 
   scope :eligible_without_term_pending, ->{ any_in(aasm_state: (ELIGIBLE_STATES - PENDING_STATES)) }
   scope :active_alone,      ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_ONLY) }
+
+  scope :by_benefit_package_and_assignment_on_or_later,->(benefit_package, effective_on, is_active) {
+    where(:benefit_group_assignments =>
+              { :$elemMatch => { :start_on.gte => effective_on,
+                                 :benefit_package_id => benefit_package.id,
+                                 :is_active => is_active }})
+  }
 
 
   def initialize(*args)
@@ -417,6 +425,12 @@ end
       :"employee_role_id" => self.employee_role_id,
       :"aasm_state".ne => "shopping"
     )
+  end
+
+  def benefit_package_assignment_for(benefit_package)
+    benefit_group_assignments.effective_on(benefit_package.effective_period.min).detect do |assignment|
+      assignment.benefit_package_id == benefit_package.id
+    end
   end
 
   def benefit_package_assignment_on(effective_date)

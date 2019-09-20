@@ -66,6 +66,14 @@ module BenefitSponsors
       end
     end
 
+    def terminate_pending_sponsor_benefit
+      benefit_application = benefit_sponsorship.pending_application_may_terminate_on(new_date)
+
+      if benefit_application.present?
+        application_service_for(benefit_application).terminate(benefit_application.end_on, TimeKeeper.date_of_record, benefit_application.termination_kind, benefit_application.termination_reason)
+      end
+    end
+
     def renew_sponsor_benefit
       months_prior_to_effective = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months.abs
       renewal_application_begin = (new_date + months_prior_to_effective.months)
@@ -91,7 +99,7 @@ module BenefitSponsors
     end
 
     def auto_cancel_ineligible
-      benefit_sponsorship.cancel! if benefit_sponsorship.may_cancel?      
+      benefit_sponsorship.benefit_applications.each { |benefit_application| benefit_application.cancel! if benefit_application.may_cancel? }
     end
 
     def transmit_initial_eligible_event
@@ -110,9 +118,12 @@ module BenefitSponsors
       end
     end
 
+    # TODO: Need to verify is_renewing? logic for off-cycle renewals
     def self.set_binder_paid(benefit_sponsorship_ids)
       benefit_sponsorships = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:"_id".in => benefit_sponsorship_ids)
-      benefit_sponsorships.each {|benefit_sponsorship| benefit_sponsorship.credit_binder! if benefit_sponsorship.may_credit_binder?}
+      benefit_sponsorships.each do |benefit_sponsorship|
+        benefit_sponsorship.benefit_applications.each { |benefit_application| benefit_application.credit_binder! if (!benefit_application.is_renewing? && benefit_application.may_credit_binder?) }
+      end
     end
 
     def update_fein(new_fein)

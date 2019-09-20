@@ -130,6 +130,16 @@ describe HbxProfilePolicy do
       expect(policy.view_the_configuration_tab?).to be false
       expect(policy.can_submit_time_travel_request?).to be false
     end
+
+    it 'super_admin' do
+      allow(hbx_staff_role).to receive(:permission).and_return(FactoryGirl.create(:permission, :super_admin))
+      expect(policy.modify_admin_tabs?).to be true
+      expect(policy.view_admin_tabs?).to be true
+      expect(policy.send_broker_agency_message?).to be true
+      expect(policy.approve_broker?).to be true
+      expect(policy.approve_ga?).to be true
+      expect(policy.can_modify_plan_year?).to be true
+    end
   end
 
   describe "given no staff role" do
