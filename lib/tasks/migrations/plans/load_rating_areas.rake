@@ -26,11 +26,12 @@ namespace :load_rate_reference do
 
       # old model
       (2..sheet.last_row).each do |i|
-        RatingArea.find_or_create_by!(
+        RatingArea.create!(
             zip_code: sheet.cell(i, 1),
             county_name: sheet.cell(i, 2),
             zip_code_in_multiple_counties: to_boolean(sheet.cell(i, 3)),
-            rating_area: sheet.cell(i, 4)
+            rating_area: sheet.cell(i, 4),
+            active_years: [file_year]
         )
       end
       # end of old model
