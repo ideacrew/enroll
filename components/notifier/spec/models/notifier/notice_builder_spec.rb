@@ -10,17 +10,19 @@ class DummyNoticeKind
     self.market_kind = params[:market_kind]
     self.notice_number = params[:notice_number]
   end
+
+  def shop_market?; end
 end
 
 module Notifier
   module NoticeBuilder
     RSpec.describe NoticeBuilder, dbclean: :around_each do
       let(:hbx_id) { "1234" }
-      let(:event_name) {"acapi.info.events.employer.welcome_notice_to_employer"}
+      let(:event_name) {"acapi.info.events.notices.notice"}
       let(:payload) do
         {
           "employer_id" => hbx_id,
-          "event_object_kind" => "BenefitSponsors::Organizations::AcaShopDcEmployerProfile",
+          "event_object_kind" => "EventObjectKind",
           "event_object_id" => "12345"
         }
       end
