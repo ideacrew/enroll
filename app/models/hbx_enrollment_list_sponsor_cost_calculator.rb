@@ -1,5 +1,4 @@
 class HbxEnrollmentListSponsorCostCalculator
-
   EnrollmentProductAdapter = Struct.new(:id, :issuer_profile_id, :active_year, :kind)
 
   EnrollmentMemberAdapter = Struct.new(:member_id, :dob, :relationship, :is_primary_member, :is_disabled) do

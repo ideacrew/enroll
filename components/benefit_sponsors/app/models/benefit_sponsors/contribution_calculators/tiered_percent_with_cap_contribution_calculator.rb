@@ -26,16 +26,11 @@ module BenefitSponsors
 
         def add(member)
           if member.is_primary_member?
-            @primary_member = member
             @primary_member_id = member.member_id
           end
           coverage_age = @contribution_calculator.calc_coverage_age_for(member, @product, @coverage_start, @eligibility_dates, @previous_product)
           relationship = member.is_primary_member? ? "self" : member.relationship
           rel_name = @contribution_model.map_relationship_for(relationship, coverage_age, member.is_disabled?)
-          if rel_name.blank?
-            primary = @primary_member || OpenStruct.new({:member_id => "NO PRIMARY ASSIGNED IN CALCULATION"})
-            raise ::BenefitSponsors::ContributionCalculators::UnmatchedRelationshipError.new(primary.member_id, member.member_id, relationship)
-          end
           @relationship_totals[rel_name.to_s] = @relationship_totals[rel_name.to_s] + 1
           @member_total = @member_total + 1
           @member_ids = @member_ids + [member.member_id]
@@ -116,24 +111,15 @@ module BenefitSponsors
         end
         level_map = level_map_for(sponsor_contribution)
         state = CalculatorState.new(contribution_model, level_map, roster_coverage.product_cost_total, coverage_eligibility_dates, roster_coverage.coverage_start_on, roster_coverage,roster_coverage.sponsor_contribution_prohibited)
-        begin
-          priced_roster_entry.members.each do |member|
-            state.add(member)
-          end
-          state.finalize_results
-          roster_coverage.sponsor_contribution_total = state.total_contribution
-          roster_coverage.member_enrollments.each do |m_en|
-            m_en.sponsor_contribution = state.member_contributions[m_en.member_id]
-          end
-          priced_roster_entry
-        rescue ::BenefitSponsors::ContributionCalculators::UnmatchedRelationshipError => e
-          e.broadcast
-          roster_coverage.member_enrollments.each do |m_en|
-            m_en.sponsor_contribution = 0.00
-          end
-          roster_coverage.sponsor_contribution_total = 0.00
-          priced_roster_entry
+        priced_roster_entry.members.each do |member|
+          state.add(member)
         end
+        state.finalize_results
+        roster_coverage.sponsor_contribution_total = state.total_contribution
+        roster_coverage.member_enrollments.each do |m_en|
+          m_en.sponsor_contribution = state.member_contributions[m_en.member_id]
+        end
+        priced_roster_entry
       end
 
       protected

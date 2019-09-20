@@ -22,14 +22,9 @@ module BenefitSponsors
         end
 
         def add(member)
-          @primary_member = member if member.is_primary_member?
           coverage_age = @pricing_calculator.calc_coverage_age_for(member, @product, @coverage_start_date, @eligibility_dates, @previous_product)
           relationship = member.is_primary_member? ? "self" : member.relationship
           rel = @pricing_model.map_relationship_for(relationship, coverage_age, member.is_disabled?)
-          if rel.blank?
-            primary = @primary_member || OpenStruct.new({:member_id => "NO PRIMARY"})
-            raise ::BenefitSponsors::PricingCalculators::UnmatchedRelationshipError.new(primary.member_id, member.member_id, relationship)
-          end
           pu = @pricing_unit_map[rel.to_s]
           @relationship_totals[rel.to_s] = @relationship_totals[rel.to_s] + 1
           rel_count = @relationship_totals[rel.to_s]
@@ -67,34 +62,19 @@ module BenefitSponsors
         roster_coverage.member_enrollments.each do |m_en|
           coverage_eligibility_dates[m_en.member_id] = m_en.coverage_eligibility_on
         end
-        begin
-          sorted_members = roster_entry.members.sort_by do |rm|
-            coverage_age = age_calculator.calc_coverage_age_for(rm, roster_coverage.product, roster_coverage.coverage_start_on, coverage_eligibility_dates, roster_coverage.previous_product)
-            # First area we can encounter the error
-            member_relationship = pricing_model.map_relationship_for(rm.relationship, coverage_age, rm.is_disabled?)
-            if member_relationship.blank?
-              primary = roster_entry.members.detect(&:is_primary_member?) || OpenStruct.new({:member_id => "NO PRIMARY"})
-              raise ::BenefitSponsors::PricingCalculators::UnmatchedRelationshipError.new(primary.member_id,rm.member_id,rm.relationship)
-            end
-            [member_relationship, rm.dob]
-          end
-          calc_state = CalculatorState.new(age_calculator, roster_coverage.product, pricing_model, pricing_unit_map, roster_coverage, coverage_eligibility_dates)
-          calc_results = sorted_members.inject(calc_state) do |calc, mem|
-            calc.add(mem)
-          end
-          benefit_roster_entry.group_enrollment.member_enrollments.each do |m_en|
-            m_en.product_price = calc_results.member_totals[m_en.member_id]
-          end
-          benefit_roster_entry.group_enrollment.product_cost_total = calc_results.total
-          benefit_roster_entry
-        rescue ::BenefitSponsors::PricingCalculators::UnmatchedRelationshipError => e
-          e.broadcast
-          benefit_roster_entry.group_enrollment.member_enrollments.each do |m_en|
-            m_en.product_price = 0.00
-          end
-          benefit_roster_entry.group_enrollment.product_cost_total = 0.00
-          benefit_roster_entry
+        sorted_members = roster_entry.members.sort_by do |rm|
+          coverage_age = age_calculator.calc_coverage_age_for(rm, roster_coverage.product, roster_coverage.coverage_start_on, coverage_eligibility_dates, roster_coverage.previous_product)
+          [pricing_model.map_relationship_for(rm.relationship, coverage_age, rm.is_disabled?), rm.dob]
         end
+        calc_state = CalculatorState.new(age_calculator, roster_coverage.product, pricing_model, pricing_unit_map, roster_coverage, coverage_eligibility_dates)
+        calc_results = sorted_members.inject(calc_state) do |calc, mem|
+          calc.add(mem)
+        end
+        benefit_roster_entry.group_enrollment.member_enrollments.each do |m_en|
+          m_en.product_price = calc_results.member_totals[m_en.member_id]
+        end
+        benefit_roster_entry.group_enrollment.product_cost_total = calc_results.total
+        benefit_roster_entry
       end
 
       def pricing_unit_map_for(pricing_model)
