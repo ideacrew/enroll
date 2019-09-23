@@ -23,7 +23,17 @@ describe Products::Services::CopayPerStayService do
       end
 
       it "should return translated result" do
-        expect(Products::Services::CopayPerStayService.new(service_visit).in_network_process).to eq "You must first meet the deductible, then #{amount} per stay."
+        expect(Products::Services::CopayPerStayService.new(service_visit).in_network_process).to eq "You must meet the deductible first, then #{amount} per stay."
+      end
+    end
+
+    context "$[PARAM] Copay per Stay after deductible/Not Applicable Coinsurance" do
+      let(:service_visit) do
+        build(:products_qhp_service_visit, copay_in_network_tier_1: "#{amount} Copay per Stay after deductible", co_insurance_in_network_tier_1: not_applicable)
+      end
+
+      it "should return translated result" do
+        expect(Products::Services::CopayPerStayService.new(service_visit).in_network_process).to eq "You must meet the deductible first, then #{amount} per stay."
       end
     end
   end
@@ -32,6 +42,16 @@ describe Products::Services::CopayPerStayService do
     context "$[PARAM] Copay per Stay after deductible/100% Coinsurance" do
       let(:service_visit) do
         build(:products_qhp_service_visit, copay_out_of_network: "#{amount} Copay per Stay after deductible", co_insurance_out_of_network: "100%")
+      end
+
+      it "should return translated result" do
+        expect(Products::Services::CopayPerStayService.new(service_visit).out_network_process).to eq "You must first meet the out-of-network deductible, then #{amount} per stay."
+      end
+    end
+
+    context "$[PARAM] Copay per Stay after deductible/Not Applicable Coinsurance" do
+      let(:service_visit) do
+        build(:products_qhp_service_visit, copay_out_of_network: "#{amount} Copay per Stay after deductible", co_insurance_out_of_network: not_applicable)
       end
 
       it "should return translated result" do
