@@ -29,18 +29,12 @@ class Products::QhpServiceVisit
   def out_network_result
     if copay_out_of_network.include?("Copay after deductible")
       Products::Services::CopayAfterDeductibleService.new(self).out_network_process
+    elsif copay_out_of_network.include?("Copay per Day")
+      Products::Services::CopayPerDayService.new(self).out_network_process
     elsif copay_out_of_network.gsub("$","").to_i.zero?
       Products::Services::ZeroCopayService.new(self).out_network_process
     elsif copay_out_of_network.gsub("$","").to_i != 0
       Products::Services::NonZeroCopayService.new(self).out_network_process
-
-    #WIP
-    # elsif copay_out_of_network.gsub("$","").to_i != 0
-    #   Products::Services::NonZeroCopayService.new(self).process
-    # elsif copay_out_of_network == "No Charge" && co_insurance_in_network_tier_1 == "No Charge"
-    #   "No Charge"
-    # elsif copay_out_of_network.gsub("$","").to_i == 0 && co_insurance_in_network_tier_1 == "No Charge"
-    #   "No Charge"
     end
   end
 
