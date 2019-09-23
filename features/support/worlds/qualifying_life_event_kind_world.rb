@@ -365,6 +365,10 @@ And(/I see the second custom custom qle question for (.*?) qualifying life event
   expect(page).to have_content(second_qle_kind_custom_qle_question_content)
 end
 
+And(/the user clicks the Manage QLE Kinds dropdown$/) do
+  click_link 'Manage QLE Kinds'
+end
+
 # TODO: Make sure the proper question appears here
 And(/I see the custom qle questions for (.*?) qualifying life event kind$/) do |qle_kind_title|
   qle_kind = qualifying_life_event_kind(qle_kind_title)
