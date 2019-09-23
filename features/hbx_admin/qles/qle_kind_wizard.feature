@@ -7,14 +7,14 @@ Feature: As an HBX Admin User I can access the QLE Wizard management wizard
   # TODO: These files need to be updated to include questions and responses creation/edit steps
   Scenario: HBX Staff with Super Admin subroles can access and manage the QLE Wizard page
     Given the user is on the Main Page
-    And the user goes to the Config Page
-    When the user clicks the Manage QLE link
+    When user clicks on Families dropdown link
+    And the user clicks the Manage QLE Kinds dropdown
     Then the user should see the QLE Kind Wizard
 
   Scenario: HBX Staff with Super Admin subroles can create a custom QLE Kind
     Given the user is on the Main Page
-    And the user goes to the Config Page
-    And the user clicks the Manage QLE link
+    When user clicks on Families dropdown link
+    And the user clicks the Manage QLE Kinds dropdown
     And the user selects Create a Custom QLE and clicks submit
     When the user fills out the new QLE Kind form for Got a New Dog event and clicks submit
     Then user should see message QLE Kind Got a New Dog has been sucessfully created
@@ -24,8 +24,8 @@ Feature: As an HBX Admin User I can access the QLE Wizard management wizard
     And qualifying life event kind Got a New Dog has custom qle question and accepted response present
     And qualifying life event kind Got a New Dog is not active
     Given the user is on the Main Page
-    And the user goes to the Config Page
-    And the user clicks the Manage QLE link
+    When user clicks on Families dropdown link
+    And the user clicks the Manage QLE Kinds dropdown
     And the user selects Modify Existing QLE, Market Kind, and first QLE Kind and clicks submit
     When the user fills out the edit QLE Kind form for Got a New Dog event and clicks submit
     Then user should see message QLE Kind Got a New Dog has been sucessfully updated
@@ -34,8 +34,8 @@ Feature: As an HBX Admin User I can access the QLE Wizard management wizard
     Given qualifying life event kind Got a New Dog present for shop market
     And qualifying life event kind Got a New Dog is not active
     Given the user is on the Main Page
-    And the user goes to the Config Page
-    And the user clicks the Manage QLE link
+    When user clicks on Families dropdown link
+    And the user clicks the Manage QLE Kinds dropdown
     And the user selects Modify Existing QLE, Market Kind, and first QLE Kind and clicks submit
     When the user fills out only partially the edit QLE Kind form for Got a New Dog event
     And the user sees a message that the fields are required
@@ -46,8 +46,8 @@ Feature: As an HBX Admin User I can access the QLE Wizard management wizard
     Given qualifying life event kind Got a New Dog present for shop market
     And qualifying life event kind Got a New Dog is active
     Given the user is on the Main Page
-    And the user goes to the Config Page
-    And the user clicks the Manage QLE link
+    When user clicks on Families dropdown link
+    And the user clicks the Manage QLE Kinds dropdown
     When the user selects Modify Existing QLE
     Then the user should not see an option to select Shop Market Kind QLE Kinds
 
@@ -63,8 +63,8 @@ Feature: As an HBX Admin User I can access the QLE Wizard management wizard
     Given qualifying life event kind Had a New Dog present for individual market
     And qualifying life event kind Had a New Dog has end_on date set to 11/01/2020
     Given the user is on the Main Page
-    And the user goes to the Config Page
-    And the user clicks the Manage QLE link
+    When user clicks on Families dropdown link
+    And the user clicks the Manage QLE Kinds dropdown
     When the user selects Deactivate Existing QLE
     Then the user should not see an option to select Shop Market Kind QLE Kinds
 
