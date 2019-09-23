@@ -17,6 +17,8 @@ class Products::QhpServiceVisit
       Products::Services::CopayAfterDeductibleService.new(self).in_network_process
     elsif copay_in_network_tier_1.include?("Copay per Day")
       Products::Services::CopayPerDayService.new(self).in_network_process
+    elsif copay_in_network_tier_1.include?("Copay per Stay")
+      Products::Services::CopayPerStayService.new(self).in_network_process
     elsif copay_in_network_tier_1.delete("$").to_i.zero?
       Products::Services::ZeroCopayService.new(self).in_network_process
     elsif copay_in_network_tier_1.delete("$").to_i != 0
