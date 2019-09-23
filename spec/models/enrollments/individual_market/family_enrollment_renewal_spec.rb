@@ -237,6 +237,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         it "should append APTC values" do
           enr = subject.clone_enrollment
           enr.save!
+          expect(enr.kind).to eq subject.enrollment.kind
           renewel_enrollment = subject.assisted_enrollment(enr)
           expect(renewel_enrollment.applied_aptc_amount.to_f).to eq((renewel_enrollment.total_premium * renewel_enrollment.product.ehb).round(2))
         end
