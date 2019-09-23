@@ -17,7 +17,7 @@ module SponsoredBenefits
         if use_simple_employer_calculation_model?
           return nil
         end
-        proposal_for = self.benefit_application.effective_period.min.year if self.benefit_application
+        proposal_for = benefit_application.effective_period.min.year if benefit_application
         RatingArea.rating_area_for(primary_office_location.address, proposal_for)
       end
 
