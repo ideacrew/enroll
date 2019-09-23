@@ -17,9 +17,9 @@ class Products::QhpServiceVisit
       Products::Services::CopayAfterDeductibleService.new(self).in_network_process
     elsif copay_in_network_tier_1.include?("Copay per Day")
       Products::Services::CopayPerDayService.new(self).in_network_process
-    elsif copay_in_network_tier_1.gsub("$","").to_i.zero?
+    elsif copay_in_network_tier_1.delete("$").to_i.zero?
       Products::Services::ZeroCopayService.new(self).in_network_process
-    elsif copay_in_network_tier_1.gsub("$","").to_i != 0
+    elsif copay_in_network_tier_1.delete("$").to_i != 0
       Products::Services::NonZeroCopayService.new(self).in_network_process
     elsif copay_in_network_tier_1 == "No Charge" && co_insurance_in_network_tier_1 == "No Charge"
       "No Charge"
@@ -31,9 +31,9 @@ class Products::QhpServiceVisit
       Products::Services::CopayAfterDeductibleService.new(self).out_network_process
     elsif copay_out_of_network.include?("Copay per Day")
       Products::Services::CopayPerDayService.new(self).out_network_process
-    elsif copay_out_of_network.gsub("$","").to_i.zero?
+    elsif copay_out_of_network.delete("$").to_i.zero?
       Products::Services::ZeroCopayService.new(self).out_network_process
-    elsif copay_out_of_network.gsub("$","").to_i != 0
+    elsif copay_out_of_network.delete("$").to_i != 0
       Products::Services::NonZeroCopayService.new(self).out_network_process
     end
   end
