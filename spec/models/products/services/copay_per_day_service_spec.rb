@@ -26,6 +26,17 @@ describe Products::Services::CopayPerDayService do
         expect(Products::Services::CopayPerDayService.new(service_visit).in_network_process).to eq "Not covered. You are responsible for the full cost."
       end
     end
+
+    context "$[PARAM] Copay per Day after deductible/Not Applicable Coinsurance" do
+      let(:service_visit) do
+        build(:products_qhp_service_visit, copay_in_network_tier_1: "#{amount} Copay per Day after deductible", co_insurance_in_network_tier_1: not_applicable)
+      end
+
+      it "should return translated result" do
+        expect(Products::Services::CopayPerDayService.new(service_visit).in_network_process).to eq "You must meet the deductible first, then pay #{amount} copay per day."
+      end
+    end
+
   end
 
   context "Out of Network Costs" do
@@ -36,6 +47,16 @@ describe Products::Services::CopayPerDayService do
 
       it "should return translated result" do
         expect(Products::Services::CopayPerDayService.new(service_visit).out_network_process).to eq "Not covered. You are responsible for the full cost."
+      end
+    end
+
+    context "$[PARAM] Copay per Day after deductible/Not Applicable Coinsurance" do
+      let(:service_visit) do
+        build(:products_qhp_service_visit, copay_out_of_network: "#{amount} Copay per Day after deductible", co_insurance_out_of_network: not_applicable)
+      end
+
+      it "should return translated result" do
+        expect(Products::Services::CopayPerDayService.new(service_visit).out_network_process).to eq "You must meet the out-of-network deductible first, then pay #{amount} copay per day."
       end
     end
   end
