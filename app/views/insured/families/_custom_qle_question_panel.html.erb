@@ -1,3 +1,10 @@
+    <% if params.present? %>
+<%@qle_kind = QualifyingLifeEventKind.find("#{params[:id]}")%>
+    <% elsif locals.present? %>
+<%@qle_kind = locals[:qle_kind]%>
+    <%end%>
+<%@qle_question = @qle_kind.custom_qle_questions.first%>
+
 <div class='container top-padding-20px'>
   <%# Form %>
   <div class='panel panel-primary'>

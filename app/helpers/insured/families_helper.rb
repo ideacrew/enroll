@@ -80,8 +80,8 @@ module Insured::FamiliesHelper
     options = {class: 'qle-menu-item'}
     if qle.custom_qle_questions.present?
       # TODO: Redo this as a single angular component or partial on the families home page
-      link_url = "/insured/families/#{qle.id}/custom_qle_question"
-    else
+      link_url = "avascript:void(0)"
+    # else
       link_url = "javascript:void(0)"
     end
     data = {

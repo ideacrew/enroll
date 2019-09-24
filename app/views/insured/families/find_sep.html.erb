@@ -31,6 +31,11 @@
       <%# end %>
 
       <%= render 'qle_detail' %>
+      <% @qualifying_life_events.each do |qle| %>
+      <%= render 'custom_qle_question_panel', :locals => {qle_kind: qle} %>
+    <%end%>
+
+
     </div>
 
     <div class="col-lg-3 col-md-3 col-sm-4 col-xs-12 right-section">
