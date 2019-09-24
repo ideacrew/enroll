@@ -587,25 +587,18 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
   end
 
   describe "Get edit consumer role", dbclean: :after_each do
-    let(:consumer_role2){ FactoryBot.build(:consumer_role, :bookmark_url => "http://localhost:3000/insured/consumer_role/591f44497af8800bb5000016/edit") }
-    before(:each) do
-      current_user = user
-      allow(ConsumerRole).to receive(:find).and_return(consumer_role)
-      allow(consumer_role).to receive(:person).and_return(person)
-      allow(consumer_role).to receive(:build_nested_models_for_person).and_return(true)
-      allow(user).to receive(:person).and_return(person)
-      allow(person).to receive(:consumer_role).and_return(consumer_role2)
-      allow(consumer_role).to receive(:save!).and_return(true)
-      allow(consumer_role).to receive(:bookmark_url=).and_return(true)
-      allow(user).to receive(:has_consumer_role?).and_return(true)
+    let(:user) { FactoryBot.create(:user, :consumer, person: consumer_role.person) }
+    let(:consumer_role) { FactoryBot.create(:consumer_role) }
+    let(:other_consumer_role) { FactoryBot.create(:consumer_role, :bookmark_url => "http://localhost:3000/insured/consumer_role/591f44497af8800bb5000016/edit") }
 
+    before(:each) do
+      sign_in(user)
     end
 
     context "with bookmark_url pointing to another person's consumer role", dbclean: :after_each do
 
       it "should redirect to the edit page of the consumer role of the current user" do
-        sign_in user
-        get :edit, params: { id: "test" }
+        get :edit, params: { id: other_consumer_role.id.to_s }
         expect(response).to have_http_status(:redirect)
         expect(response).to redirect_to(edit_insured_consumer_role_path(user.person.consumer_role.id))
       end
