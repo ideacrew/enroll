@@ -21,7 +21,7 @@ export class QleKindEditFormComponent {
   @ViewChild('headerRef') headerRef: ElementRef;
   public marketKindsList = new FormArray([])
   
-  public stringifiedStartOn = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-qle-kind-to-edit-end-on-stringified");
+  public stringifiedStartOn = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-qle-kind-to-edit-start-on-stringified");
   public stringifiedEndOn = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-qle-kind-to-edit-end-on-stringified");
 
   public effectiveOnOptionsArray =  [
