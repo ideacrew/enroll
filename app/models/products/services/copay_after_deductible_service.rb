@@ -34,10 +34,12 @@ module Products
         if record.co_insurance_out_of_network.include?("Coinsurance after deductible") #ticket_42683
           "You must meet the out-of-network deductible first, then #{number} per visit."
         elsif record.co_insurance_out_of_network.include?("No Charge after deductible")
-          if record.qhp_cost_share_variance.no_out_of_network_deductible? && EXPECTED_SERVICES.include?(record.visit_type) #ticket_42681
-            "You must meet the deductible first, then #{number} per visit."
-          elsif record.qhp_cost_share_variance.no_out_of_network_deductible? && DEVICES.include?(record.visit_type) #ticket_42681
-            "You must meet the deductible first, then #{number} per device."
+          if record.qhp_cost_share_variance.no_out_of_network_deductible?
+            if EXPECTED_SERVICES.include?(record.visit_type) #ticket_42681
+              "You must meet the deductible first, then #{number} per visit."
+            elsif DEVICES.include?(record.visit_type) #ticket_42681
+              "You must meet the deductible first, then #{number} per device."
+            end
           elsif DEVICES.include?(record.visit_type) #ticket_42681
             "You must meet the out-of-network deductible first, then #{number} per device."
           else #ticket_42681
