@@ -202,7 +202,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
 
 
   context "POST create with failed construct_employee_role", dbclean: :after_each do
-    let(:person_params){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"000000111","user_id"=>"xyz"}}
+    let(:person_params){{"dob"=>SymmetricEncryption.encrypt("1985-10-01"), "first_name"=>SymmetricEncryption.encrypt("martin"),"gender"=>"male",SymmetricEncryption.encrypt("last_name")=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>SymmetricEncryption.encrypt("000000111"),"user_id"=>"xyz"}}
     let(:person_user){ double("User") }
     before(:each) do
       allow(Factories::EnrollmentFactory).to receive(:construct_consumer_role).and_return(nil)

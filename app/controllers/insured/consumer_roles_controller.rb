@@ -97,6 +97,7 @@ class Insured::ConsumerRolesController < ApplicationController
                   session[:person_id] = @person.id
                 else
                 # not logging error because error was logged in construct_consumer_role
+                  @person_params = encrypt_pii(@person_params)
                   render file: 'public/500.html', status: 500
                   return
                 end
@@ -113,6 +114,7 @@ class Insured::ConsumerRolesController < ApplicationController
                 end
               end
             end
+            @person_params = encrypt_pii(@person_params)
             return
           end
 
@@ -145,6 +147,11 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def create
     begin
+      params[:person][:ssn] = SymmetricEncryption.decrypt(params[:person][:ssn])
+      params[:person][:dob] = SymmetricEncryption.decrypt(params[:person][:dob])
+      params[:person][:first_name] = SymmetricEncryption.decrypt(params[:person][:first_name])
+      params[:person][:last_name] = SymmetricEncryption.decrypt(params[:person][:last_name])
+      
       @consumer_role = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, actual_user)
       if @consumer_role.present?
         @person = @consumer_role.person
@@ -266,6 +273,14 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   private
+
+  def encrypt_pii(person)
+    person[:ssn] = SymmetricEncryption.encrypt(person[:ssn])
+    person[:dob] = SymmetricEncryption.encrypt(person[:dob])
+    person[:first_name] = SymmetricEncryption.encrypt(person[:first_name])
+    person[:last_name] = SymmetricEncryption.encrypt(person[:last_name])
+    person
+  end
 
   def user_not_authorized(exception)
     policy_name = exception.policy.class.to_s.underscore
