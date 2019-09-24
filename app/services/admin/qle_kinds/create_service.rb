@@ -91,6 +91,13 @@ module Admin
 
       protected
 
+      # Active vs visible_to_customer:
+      # In the current UI scopes in the QLEKind model,
+      # the scopes appearing to the end user have
+      # is_active set to true. To non intrusively bring in
+      # the Custom Qle kinds, the new attribute visible_to_customer
+      # was added. That way, Custom QLE Kinds will only appear on the UI
+      # when they're confirmed as ready by business and visible_to_customer = true
       def create_record(request)
         new_record = QualifyingLifeEventKind.create!(
           title: request.title,
