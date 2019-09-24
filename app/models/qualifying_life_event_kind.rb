@@ -133,15 +133,26 @@ class QualifyingLifeEventKind
                         :post_event_sep_in_days
 
   scope :active, ->{ where(is_active: true).where(:created_at.ne => nil).order(ordinal_position: :asc) }
-
-  # TODO: This scope should be updated depending on what the business rule for editable QLE Kind is
-  scope :editable, ->{where(is_active: false)}
   # TODO: This scope should be update depdning on what the business definition of deactivation is
   # At the moment, setting 'end on' is how they are deactivated.
   scope :not_set_for_deactivation, ->{ where(end_on: nil).sort_by_title_alphabetical }
   scope :sort_by_title_alphabetical, ->{ order('title ASC') }
   scope :by_market_kind, ->(market_kind){ where(market_kind: market_kind) }
+  # Active vs visible_to_customer:
+  # In the current UI scopes in the QLEKind model,
+  # the scopes appearing to the end user have
+  # is_active set to true and are creatd with is_active = true by default.
+  # To non intrusively bring in
+  # the Custom Qle kinds, the new attribute visible_to_customer
+  # was added. That way, Custom QLE Kinds will only appear on the UI
+  # when they're confirmed as ready by business and visible_to_customer = true
   scope :is_visible_to_customer, -> { where(visible_to_customer: true) }
+  # TODO: Need to determine what this scope should be. Perhaps all QLE Kinds should be
+  # editable. Or perhaps there needs to be a new action to determine their visibility
+  # to the customer, and only those where is_visible_to_customer set to false should be
+  # editable.
+  scope :editable, ->{where(is_active: false)}
+
 
   # Business rules for EmployeeGainingMedicare
   # If coverage ends on last day of month and plan selected before loss of coverage:
