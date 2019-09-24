@@ -97,6 +97,8 @@ class Insured::ConsumerRolesController < ApplicationController
                   session[:person_id] = @person.id
                 else
                 # not logging error because error was logged in construct_consumer_role
+                  @person_params[:ssn] = SymmetricEncryption.encrypt(@person_params[:ssn])
+                  @person_params[:dob] = SymmetricEncryption.encrypt(@person_params[:dob])
                   render file: 'public/500.html', status: 500
                   return
                 end
@@ -113,6 +115,8 @@ class Insured::ConsumerRolesController < ApplicationController
                 end
               end
             end
+            @person_params[:ssn] = SymmetricEncryption.encrypt(@person_params[:ssn])
+            @person_params[:dob] = SymmetricEncryption.encrypt(@person_params[:dob])
             return
           end
 
@@ -145,6 +149,8 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def create
     begin
+      params[:person][:ssn] = SymmetricEncryption.decrypt(params[:person][:ssn])
+      params[:person][:dob] = SymmetricEncryption.decrypt(params[:person][:dob])
       @consumer_role = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, actual_user)
       if @consumer_role.present?
         @person = @consumer_role.person
