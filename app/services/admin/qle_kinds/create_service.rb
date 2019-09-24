@@ -99,7 +99,7 @@ module Admin
           is_self_attested: request.is_self_attested,
           visible_to_customer: request.visible_to_customer,
           pre_event_sep_in_days: request.pre_event_sep_in_days,
-          is_active: false,
+          is_active: true, # TODO: Confirm this is correct
           post_event_sep_in_days: request.post_event_sep_in_days,
           tool_tip: request.tool_tip,
           reason: request.reason.split('').drop(3).join(''),
