@@ -87,5 +87,45 @@ describe Products::Services::CopayAfterDeductibleService do
         expect(subject.out_network_process).to eq "You must meet the out-of-network deductible first, then #{amount} per visit."
       end
     end
+
+    context "$[PARAM] Copay after deductible/No Charge after deductible Coinsurance" do
+      context "with no out-of-network deductible" do
+
+        before do
+          allow(qhp_cost_share_variance).to receive(:no_out_of_network_deductible?).and_return true
+        end
+
+        it "should return translated result for excepted services" do
+          service_visit.copay_out_of_network = "#{amount} copay after deductible"
+          service_visit.co_insurance_out_of_network = "No Charge after deductible"
+          service_visit.visit_type = "Emergency Room Services"
+          expect(subject.out_network_process).to eq "You must meet the deductible first, then #{amount} per visit."
+        end
+
+        it "should return translated result for devices" do
+          service_visit.copay_out_of_network = "#{amount} copay after deductible"
+          service_visit.co_insurance_out_of_network = "No Charge after deductible"
+          service_visit.visit_type = "Prosthetic Devices"
+          expect(subject.out_network_process).to eq "You must meet the deductible first, then #{amount} per device."
+        end
+      end
+
+      context "with devices" do
+        it "should return translated result" do
+          service_visit.copay_out_of_network = "#{amount} copay after deductible"
+          service_visit.co_insurance_out_of_network = "No Charge after deductible"
+          service_visit.visit_type = "Prosthetic Devices"
+          expect(subject.out_network_process).to eq "You must meet the out-of-network deductible first, then #{amount} per device."
+        end
+      end
+
+      context "for remaining services" do
+        it "should return translated result" do
+          service_visit.copay_out_of_network = "#{amount} copay after deductible"
+          service_visit.co_insurance_out_of_network = "No Charge after deductible"
+          expect(subject.out_network_process).to eq "You must meet the out-of-network deductible first, then #{amount} per visit."
+        end
+      end
+    end
   end
 end
