@@ -18,12 +18,15 @@ namespace :qle_kind_wizard_test_seed do
       is_self_attested: true, 
       date_options_available: false,
       ordinal_position: 25,
+      visible_to_customer: true,
+
     )
     puts("Editable QLE Kind present.") if editable_qle_kind.present?
     # For Deactivation
     deactivatable_qle_kind = QualifyingLifeEventKind.find_or_create_by!(
       title: "Federal Government order to provide coverage for someone",
       end_on: nil,
+      is_active: true,
       tool_tip: "",
       action_kind: "add_member",
       market_kind: "shop",
@@ -35,6 +38,7 @@ namespace :qle_kind_wizard_test_seed do
       pre_event_sep_in_days: 0,
       post_event_sep_in_days: 60,
       is_self_attested: false,
+      visible_to_customer: true,
       date_options_available: false,
     )
     puts("Deactivatable QLE Kind present.") if deactivatable_qle_kind.present?
@@ -42,6 +46,7 @@ namespace :qle_kind_wizard_test_seed do
     individual_self_attested_qle_kind = QualifyingLifeEventKind.find_or_create_by!(
       title: "Federal Government order to provide coverage for someone",
       tool_tip: "",
+      is_active: false,
       action_kind: "add_member",
       market_kind: "individual",
       event_kind_label: "Date that court orders that coverage starts",
@@ -158,6 +163,7 @@ namespace :qle_kind_wizard_test_seed do
       post_event_sep_in_days: 60,
       is_self_attested: false,
       date_options_available: false,
+      visible_to_customer: true
     )
     # First question
     first_custom_qle_question = qle_kind_with_one_question.custom_qle_questions.build(

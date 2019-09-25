@@ -34,6 +34,20 @@ module Insured::FamiliesHelper
     policy.created_at.in_time_zone('Eastern Time (US & Canada)')
   end
 
+  def qle_kind_eligible_success_message
+    "You are eligible to enroll. Please continue."
+  end
+
+  def qle_kind_ineligible_message
+    "Based on the information you have provided, you are not eligible for this special enrollment period. " \
+    "If you have questions or would like to provide additional information, please contact DC Health Link customer service at (855) 532-5465."
+  end
+
+  def qle_kind_call_center_message
+    "Based on the information you entered, you may be eligible for a special enrollment period. " \
+    "Please call us at #{Settings.contact_center.phone_number} to give us more information so we can see if you qualify."
+  end
+
   def second_qle_question_message
     "Based on your response to the first question, we need to ask you another question to clarify your eligibility."
   end

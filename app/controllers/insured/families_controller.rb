@@ -2,6 +2,7 @@ class Insured::FamiliesController < FamiliesController
   include VlpDoc
   include Acapi::Notifiers
   include ::ApplicationHelper
+  include Insured::FamiliesHelper
 
   before_action :updateable?, only: [:delete_consumer_broker, :record_sep, :purchase, :upload_notice]
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
@@ -68,6 +69,7 @@ class Insured::FamiliesController < FamiliesController
   # Error messages taken from qle.js.erb
   def verify_custom_qle_question
     @family = Family.find(params[:question_and_responses][:family_id])
+    # User supplied date event took place
     @qle_date = params[:question_and_responses][:qle_date]
     @qle_kind = QualifyingLifeEventKind.find(params[:question_and_responses][:qle_kind_id])
     @custom_qle_question =  @qle_kind.custom_qle_questions.where(_id: params[:question_and_responses][:custom_qle_question_id]).first
@@ -77,25 +79,32 @@ class Insured::FamiliesController < FamiliesController
     @action_to_take = @qle_kind.custom_qle_questions.where(
       'custom_qle_responses.content' => end_user_selected_response_content
     ).first.custom_qle_responses.where(content: end_user_selected_response_content).first.action_to_take
-    @qle_reason_val_string = '' # TODO: Need to determine what this is about.
+    @qle_reason_val_string = end_user_selected_response_content
     @person = current_user.person
-    ineligible_message = "Based on the information you have provided, you are not eligible for this special enrollment period. " \
-    "If you have questions or would like to provide additional information, please contact DC Health Link customer service at (855) 532-5465."
     @validator = CustomQleDateValidator.new(@qle_kind._id.to_s, @qle_date, @qle_reason_val_string, @person._id.to_s)
-    redirect_to(action: "home", flash: { error: message }) unless @validator.qualifying_qle_date?
+    unless @validator.qualifying_qle_date?
+      redirect_to(action: "home", flash: { notice: qle_kind_ineligible_message }) and return
+    end
     case @action_to_take
     when 'accepted'
-      message = "You are eligible to enroll. Please continue."
-      redirect_to(insured_family_members_path, flash: { notice: message })
+      set_qle_to_active_if_accepted_response(@qle_kind, end_user_selected_response_content)
+      flash[:notice] = qle_kind_eligible_success_message
+      redirect_to(insured_family_members_path(
+        qle_id: @qle_kind.id,
+        qle_date: @qle_date,
+        qle_reason_choice: end_user_selected_response_content,
+        effective_on_kind: @qle_kind.effective_on_kinds[0],
+        effective_on_date: @qle_date,
+        custom_qle_kind_enrollment: true
+      )) and return
     when 'declined'
-      redirect_to(action: "home" , flash: { notice: ineligible_message })
+      flash[:notice] = qle_kind_ineligible_message
+      redirect_to(action: "home") and return
     when 'to_question_2'
-      redirect_to(custom_qle_question_insured_family_path(only_display_question_two: true, qle_date: @qle_date))
+      redirect_to(custom_qle_question_insured_family_path(only_display_question_two: true, qle_date: @qle_date)) and return
     when 'call_center'
-      call_center_message = "Based on the information you entered, you may be eligible for a special enrollment period. " \
-      "Please call us at #{Settings.contact_center.phone_number} to give us more information so we can see if you qualify."
-      flash[:notice] = call_center_message
-      redirect_to(action: "home")
+      flash[:notice] = qle_kind_call_center_message
+      redirect_to(action: "home", flash: { notice: qle_kind_call_center_message }) and return
     end
   end
 
@@ -380,6 +389,12 @@ class Insured::FamiliesController < FamiliesController
       qualifying_life_event_kind_id: @qle_kind._id.to_s,
       qualifying_life_event_custom_qle_question_id: @custom_qle_question._id.to_s
     )
+  end
+
+  def set_qle_to_active_if_accepted_response(qle_kind, end_user_selected_response_content)
+    if !qle_kind.is_active? && end_user_selected_response_content == 'accepted'
+      qle_kind.update_attributes!(is_active: true)
+    end
   end
 
   def trigger_ivl_to_cdc_transition_notice

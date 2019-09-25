@@ -159,7 +159,8 @@ class GroupSelectionPrevaricationAdapter
       family: @family,
       employee_role: employee_role,
       benefit_group: benefit_group,
-      benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship))
+      benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship)
+    )
   end
 
   def if_qle_with_date_option_selected(params)
