@@ -665,7 +665,9 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       let(:user)  { FactoryBot.create(:user, person: person) }
       let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
       let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual) }
+      let(:future_product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, application_period: Date.new(Date.today.next_year.year, 1, 1)..Date.new(Date.today.next_year.year, 12, 31)) }
       let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, kind: 'individual', effective_on: TimeKeeper.date_of_record.beginning_of_month.to_date, product_id: product.id) }
+      let(:future_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, kind: 'individual', effective_on: Date.new(TimeKeeper.date_of_record.next_year.year, 1, 1), product_id: product.id) }
 
       context "When a callback is received" do
         before do
@@ -676,6 +678,19 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
         it "should assign market kind and coverage_kind" do
           expect(assigns(:market_kind)).to be_truthy
           expect(assigns(:coverage_kind)).to be_truthy
+        end
+      end
+
+      context "when user plan shop for the following year" do
+        before do
+          sign_in user
+          get :plan_selection_callback, params: { id: future_enrollment.id, hios_id: future_product.hios_id, market_kind: market_kind, coverage_kind: coverage_kind }
+        end
+
+        it "should assign market kind and coverage_kind" do
+          expect(assigns(:market_kind)).to be_truthy
+          expect(assigns(:coverage_kind)).to be_truthy
+          expect(assigns(:selected_plan)).to eq future_product
         end
       end
     end
