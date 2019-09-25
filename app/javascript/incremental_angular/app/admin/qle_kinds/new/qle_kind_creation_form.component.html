@@ -49,11 +49,11 @@
         <div class='form-group'>
           <span for="qle_kind_creation_form_visible_to_customer" class="col-sm-2 control-label">Visible to Customer</span>
           <div class="col-md-2">
-            <label class="control-label">Yes
-              <input type='radio' class='' formControlName="visible_to_customer" id='qle_kind_creation_form_visible_to_customer' value = "Yes" required>
+            <label class="control-label">
+              <input type='radio' class='' formControlName="visible_to_customer" id='qle_kind_creation_form_visible_to_customer' value = "Yes" required> Yes
             </label> <br>
-            <label class=" control-label">No
-              <input type='radio' class='' formControlName="visible_to_customer" id='qle_kind_creation_form_visible_to_customer' value = "No" required>   
+            <label class=" control-label">
+              <input type='radio' class='' formControlName="visible_to_customer" id='qle_kind_creation_form_visible_to_customer' value = "No" required> No
             </label>
           </div>
         </div>
@@ -61,8 +61,8 @@
           <span for="qle_kind_creation_form_market_kind" class="col-sm-2 control-label">Market Kind</span>
           <div class="col-sm-4">
             <div id="qle_kind_creation_form_market_kind"  *ngFor="let marketKind of marketKindsList">
-              <label class="control-label">{{marketKind}}
-                <input type='radio' class='' formControlName="market_kind" id='qle_kind_creation_form_market_kind' value = {{marketKind}} required>
+              <label class="control-label">
+                <input type='radio' class='' formControlName="market_kind" id='qle_kind_creation_form_market_kind' value = {{marketKind}} required> {{marketKind}}
               </label>
             </div>
           </div>
@@ -70,11 +70,11 @@
         <div class= 'form-group'>
           <span for="qle_kind_creation_form_is_self_attested" class="col-sm-2 control-label">Self-Attestion Option </span>
           <div class="col-md-2">
-            <label class="control-label">User Self Service
-              <input type='radio' class='' formControlName="is_self_attested" id='qle_kind_creation_form_is_self_attested' value = "Yes" required>
+            <label class="control-label">
+              <input type='radio' class='' formControlName="is_self_attested" id='qle_kind_creation_form_is_self_attested' value = "Yes" required> User Self Service
             </label>
-            <label class=" control-label">Admin Only 
-              <input type='radio' class='' formControlName="is_self_attested" id='qle_kind_creation_form_is_self_attested' value = "No" required>   
+            <label class=" control-label">
+              <input type='radio' class='' formControlName="is_self_attested" id='qle_kind_creation_form_is_self_attested' value = "No" required> Admin Only
             </label>
           </div>
         </div>
@@ -101,8 +101,8 @@
           <span for="qle_kind_creation_form_effective_on_kinds" class="col-sm-2 control-label">Effective on Options</span>
           <div formArrayName="effective_on_kinds" *ngFor="let option of getOptions(); let i = index">
             <span *ngIf='i != 0' class="col-sm-2 control-label"></span>
-            <label class='control-label'>{{option.name}}
-              <input type="checkbox" [formControlName]='i' value= option>
+            <label class='control-label'>
+              <input type="checkbox" [formControlName]='i' value= option> {{option.name}}
             </label>
           </div>
         </div>
@@ -123,13 +123,13 @@
           </div>
         </div>
         <div class="form-group">
-          <span for="qle_kind_creation_form_post_event_sep_eligibility" class="col-sm-3 control-label"> Sep/Qle Available in system from</span>
+          <span for="qle_kind_creation_form_start_on" class="col-sm-3 control-label"> Sep/Qle Available in system from</span>
           <div class='col-md-5'>
               <input type='text' formControlName="start_on" id='qle_kind_creation_form_start_on' placeholder="MM/DD/YYYY" mask="M0/d0/0000" [dropSpecialCharacters]="false" [validation]="true" required> <br>
           </div>
         </div>
         <div class="form-group">
-          <span for="qle_kind_creation_form_post_event_sep_eligibility" class="col-sm-3 control-label">Sep/Qle Available in system until      </span>
+          <span for="qle_kind_creation_form_end_on" class="col-sm-3 control-label">Sep/Qle Available in system until      </span>
           <div class='col-md-5'>
                  <input type='text' formControlName="end_on" id='qle_kind_creation_form_end_on' placeholder="MM/DD/YYYY" mask="M0/d0/0000" [dropSpecialCharacters]="false" [validation]="true" required> <br>
           </div>
