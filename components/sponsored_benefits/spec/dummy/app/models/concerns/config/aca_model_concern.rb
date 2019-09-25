@@ -13,6 +13,7 @@ module Config::AcaModelConcern
     delegate :aca_shop_market_census_employees_template_file, to: :class
     delegate :individual_market_is_enabled?, to: :class
     delegate :general_agency_enabled?, to: :class
+    delegate :enrollments_reinstate_enabled?, to: :class
     delegate :use_simple_employer_calculation_model?, to: :class
     delegate :market_rating_areas, to: :class
     delegate :multiple_market_rating_areas?, to: :class
@@ -81,6 +82,10 @@ module Config::AcaModelConcern
 
     def general_agency_enabled?
       @@genearl_agency_enabled ||= Settings.aca.general_agency_enabled
+    end
+
+    def enrollments_reinstate_enabled?
+      @@enrollments_reinstate_enabled ||= Settings.aca.enrollments_reinstate_enabled
     end
 
     def broker_carrier_appointments_enabled?
