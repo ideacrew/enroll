@@ -5,7 +5,11 @@ module Admin
 
       class UsDateCoercer
         def self.coerce(string)
-          Date.strptime(string, "%m/%d/%Y") rescue nil
+          formated_string = Date.parse(string).strftime("%m/%d/%Y") rescue nil
+          if formated_string == nil
+            return Date.strptime(string, "%m/%d/%Y") rescue nil
+          end
+          Date.strptime(formated_string, "%m/%d/%Y") rescue nil
         end
       end
   
