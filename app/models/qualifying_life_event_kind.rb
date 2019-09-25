@@ -244,43 +244,43 @@ class QualifyingLifeEventKind
 
   class << self
     def shop_market_events
-      by_market_kind('shop').and(:is_self_attested.ne => false).active.is_visible_to_customer.to_a
+      by_market_kind('shop').and(:is_self_attested.ne => false).is_visible_to_customer.to_a
     end
 
     def shop_market_events_admin
-      by_market_kind('shop').active.to_a
+      by_market_kind('shop').to_a
     end
 
     def shop_market_non_self_attested_events
-      by_market_kind('shop').and(:is_self_attested.ne => true).active.is_visible_to_customer.to_a
+      by_market_kind('shop').and(:is_self_attested.ne => true).is_visible_to_customer.to_a
     end
 
     def fehb_market_events
-      by_market_kind('fehb').and(:is_self_attested.ne => false).active.is_visible_to_customer.to_a
+      by_market_kind('fehb').and(:is_self_attested.ne => false).is_visible_to_customer.to_a
     end
 
     def fehb_market_events_admin
-      by_market_kind('fehb').active.is_visible_to_customer.to_a
+      by_market_kind('fehb').is_visible_to_customer.to_a
     end
 
     def fehb_market_non_self_attested_events
-      by_market_kind('fehb').and(:is_self_attested.ne => true).active.is_visible_to_customer.to_a
+      by_market_kind('fehb').and(:is_self_attested.ne => true).is_visible_to_customer.to_a
     end
 
     def individual_market_events
-      by_market_kind('individual').and(:is_self_attested.ne => false).active.is_visible_to_customer.to_a
+      by_market_kind('individual').and(:is_self_attested.ne => false).is_visible_to_customer.to_a
     end
 
     def individual_market_events_admin
-      by_market_kind('individual').active.is_visible_to_customer.to_a
+      by_market_kind('individual').is_visible_to_customer.to_a
     end
 
     def individual_market_non_self_attested_events
-      by_market_kind('individual').and(:is_self_attested.ne => true).active.is_visible_to_customer.to_a
+      by_market_kind('individual').and(:is_self_attested.ne => true).is_visible_to_customer.to_a
     end
 
     def individual_market_events_without_transition_member_action
-      by_market_kind('individual').active.is_visible_to_customer.to_a.reject {|qle| qle.action_kind == "transition_member"}
+      by_market_kind('individual').is_visible_to_customer.to_a.reject {|qle| qle.action_kind == "transition_member"}
     end
 
     def qualifying_life_events_for(role, hbx_staff = false)
