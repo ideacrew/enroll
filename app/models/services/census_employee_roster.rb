@@ -4,7 +4,7 @@ module Services
   class CensusEmployeeRoster
     include ActionView::Helpers::NumberHelper
 
-    attr_reader :employer_profile, :site_key
+    attr_reader :employer_profile, :site_key, :feature
     attr_accessor :headers, :type_of_action, :dep_count
 
     def initialize(employer_profile, options = {})
@@ -12,6 +12,7 @@ module Services
       @site_key = fetch_site_key
       @dep_count = dependent_count
       @type_of_action = options[:action]
+      @feature = options[:feature]
       @headers = config_based_headers
     end
 
@@ -22,12 +23,13 @@ module Services
         census_employee_roster.each do |census_employee|
           personal_details = personal_headers(census_employee)
           employee_details = employeement_headers(census_employee)
-          benefit_group_details = benefit_group_assignment_details(census_employee)
+          benefit_group_details = benefit_group_assignment_details(census_employee) unless is_bqt?
           address_details = primary_location_details(census_employee)
           append_config_data = ['', 'employee'] + personal_details + employee_details + benefit_group_details + address_details
 
           if site_key == :dc
-            @total_employer_contribution = total_premium(census_employee) #Using pipe, as the contribution is same in every loop, this does not work for employee premium.
+            #change this not to loop everytime
+            @total_employer_contribution = total_premium(census_employee)
             append_config_data += @total_employer_contribution
             census_employee.census_dependents.each do |dependent|
               append_config_data += append_dependent(dependent)
@@ -63,7 +65,7 @@ module Services
     def total_premium(record)
       return @total_employer_contribution if @total_employer_contribution&.any?
 
-      if record.is_a?(::SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee)
+      if is_bqt?
         bqt_estimated_premium
       elsif (bga = record.active_benefit_group_assignment)
         employer_estimated_premium(bga)
@@ -108,6 +110,10 @@ module Services
     end
 
     private
+
+    def is_bqt?
+      feature == 'bqt'
+    end
 
     def primary_location_details(record)
       if record.address.present?

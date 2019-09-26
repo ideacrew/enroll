@@ -86,7 +86,7 @@ module SponsoredBenefits
 
     def export_plan_design_employees
       begin
-        employee_export = ::Services::CensusEmployeeRoster.new(@plan_design_proposal.profile, {action: "download"})
+        employee_export = ::Services::CensusEmployeeRoster.new(@plan_design_proposal.profile, {action: 'download', feature: 'bqt'})
         respond_to do |format|
           format.csv { send_data employee_export.to_csv, filename: "#{@plan_design_proposal.plan_design_organization.legal_name.parameterize.underscore}_census_employees_#{TimeKeeper.date_of_record}.csv" }
         end
