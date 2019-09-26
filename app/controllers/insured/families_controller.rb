@@ -81,6 +81,12 @@ class Insured::FamiliesController < FamiliesController
     ).first.custom_qle_responses.where(content: end_user_selected_response_content).first.action_to_take
     @qle_reason_val_string = end_user_selected_response_content
     @person = current_user.person
+    if @family.primary_applicant.person != current_user.person
+      @person = @family.primary_applicant.person
+    else
+      @person = current_user.person
+    end
+    @employee_role = @person.active_employee_roles.first
     @validator = CustomQleDateValidator.new(@qle_kind._id.to_s, @qle_date, @qle_reason_val_string, @person._id.to_s)
     unless @validator.qualifying_qle_date?
       redirect_to(action: "home", flash: { notice: qle_kind_ineligible_message }) and return
@@ -95,7 +101,7 @@ class Insured::FamiliesController < FamiliesController
         qle_reason_choice: end_user_selected_response_content,
         effective_on_kind: @qle_kind.effective_on_kinds[0],
         effective_on_date: @qle_date,
-        custom_qle_kind_enrollment: true
+        employee_role_id: @employee_role.present? ? @employee_role._id.to_s : ''
       )) and return
     when 'declined'
       flash[:notice] = qle_kind_ineligible_message
