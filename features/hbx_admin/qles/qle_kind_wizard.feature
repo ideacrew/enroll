@@ -18,6 +18,7 @@ Feature: As an HBX Admin User I can access the QLE Wizard management wizard
     And the user selects Create a Custom QLE and clicks submit
     When the user fills out the new QLE Kind form for Got a New Dog event and clicks submit
     Then user should see message QLE Kind Got a New Dog has been sucessfully created
+    And the QLE Kind Got a New Dog should have the proper attributes the user selected in the create form
 
   Scenario: HBX Staff with Super Admin subroles can edit a custom QLE Kind
     Given qualifying life event kind Got a New Dog present for shop market
