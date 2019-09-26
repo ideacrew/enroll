@@ -23,7 +23,11 @@ module Services
         census_employee_roster.each do |census_employee|
           personal_details = personal_headers(census_employee)
           employee_details = employeement_headers(census_employee)
-          benefit_group_details = benefit_group_assignment_details(census_employee) unless is_bqt?
+          benefit_group_details = if is_bqt?
+                                    Array.new(3)
+                                  else
+                                    benefit_group_assignment_details(census_employee)
+                                  end
           address_details = primary_location_details(census_employee)
           append_config_data = ['', 'employee'] + personal_details + employee_details + benefit_group_details + address_details
 
@@ -47,10 +51,12 @@ module Services
       if active_assignment
         health_enrollment = pull_enrollment_state_by_kind(active_assignment, 'health')
         dental_enrollment = pull_enrollment_state_by_kind(active_assignment, 'dental')
+        title = active_assignment.benefit_package.title if active_assignment.benefit_package
+        py_start_on = active_assignment.benefit_application.start_on if active_assignment.benefit_application
         bga.push(
-            active_assignment.benefit_package.title,
+            title,
             "dental: #{dental_enrollment}  health: #{health_enrollment}",
-            active_assignment.try(:benefit_application).try(:start_on)
+            py_start_on
         )
       else
         bga += Array.new(3)
@@ -59,7 +65,8 @@ module Services
     end
 
     def pull_enrollment_state_by_kind(active_bga, coverage_kind)
-      active_bga.try(:hbx_enrollments).detect {|enrollment| enrollment.coverage_kind == coverage_kind}.try(:aasm_state).try(:humanize).try(:downcase)
+      enrollment = active_bga.hbx_enrollments.detect {|enrollment| enrollment.coverage_kind == coverage_kind}
+      enrollment.aasm_state.humanize.downcase if enrollment
     end
 
     def total_premium(record)
