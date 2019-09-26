@@ -211,19 +211,11 @@ export class QleKindEditFormComponent {
     this.updateReason()
   }
 
-  formatOuput() : void {
-    //this formats the outgoing EffectiveOnKinds to return the effective on kind name if the boolean is true
-    this.updateEffectiveOnKinds()
-    //this is a hack to read the DOM for the selected option because currently the selectric library is overriding our select tags
-    this.updateReasonAndActionKind()
-  }
-
   submitEdit() {
     var form = this;
     var errorMapper = new ErrorMapper();
     if (this.editFormGroup != null) {
       if (this.editUri != null) {
-        this.formatOuput()
         console.log(this.editFormGroup.value)
         var invocation = this.editService.submitEdit(this.editUri, <QleKindUpdateRequest>this.editFormGroup.value);
         invocation.subscribe(

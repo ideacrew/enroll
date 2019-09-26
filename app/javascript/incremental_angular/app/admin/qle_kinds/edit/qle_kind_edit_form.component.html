@@ -33,7 +33,7 @@
           <div class="col-md-2 " >        
             <select formControlName="action_kind" id="qle_kind_edit_form_action_kind">
               <option *ngFor="let actionKind of actionKindList" [ngValue]="actionKind.code"
-              [attr.selected]="(qleKindToEdit.action_kind == actionKind.code)">
+              >
               {{actionKind.name}}
               </option>
             </select>
@@ -44,7 +44,6 @@
           <div class="col-md-3" >        
             <select formControlName="reason" id="qle_kind_edit_form_reason">
               <option *ngFor="let reason of reasonList" [ngValue]="reason.code"
-              [attr.selected]="(qleKindToEdit.reason == reason.code)"
               >
               {{reason.name}}
               </option>
