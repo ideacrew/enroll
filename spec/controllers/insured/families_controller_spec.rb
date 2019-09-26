@@ -1124,11 +1124,11 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     )
   end
 
-  describe "GET custom_qle_question" do
-    before do
-      sign_in(user)
-    end
+  before :each do
+    sign_in(user)
+  end
 
+  describe "GET custom_qle_question" do
     it "should only render question 1 by default" do
       custom_qle_action_params = {id: qle_kind.id, family: family}
       get :custom_qle_question, params: custom_qle_action_params
@@ -1137,8 +1137,23 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   end
 
   describe "POST verify_custom_qle_question" do
-    it "redirects to home if QLE date does not qualify" do
-
+    # Condition that date needs to meet to qualify (these are in the file custom_qle_validator.rb,
+    # which in itself is addapted code from the families_controller.rb#check_qle_date)
+    # @qualified_date = (@start_date <= @qle_date && @qle_date <= @end_date) ? true : false
+    # @start_date = @today - 30.days
+    # @end_date = @today + 30.days
+    # TODO: Not working currently
+    xit "redirects to home if QLE date does not qualify" do
+      verify_custom_qle_question_params = {
+        questions_and_responses: {
+          family_id: family.id,
+          qle_kind_id: qle_kind.id,
+          qle_date: TimeKeeper.date_of_record - 1.year, # Doesn't qualify
+          custom_qle_question_id: qle_kind.custom_qle_questions.first.id,
+          end_user_selected_response_content: 'accepted'
+        }
+      binding.pry
+      post :verify_custom_qle_question, params: verify_custom_qle_question_params
     end
 
     it "redirects to insured_family_members_path if accepted question response submitted" do
