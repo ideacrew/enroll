@@ -1112,3 +1112,42 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     end
   end
 end
+
+RSpec.describe Insured::FamiliesController, dbclean: :after_each do
+  let(:user) { FactoryBot.create(:user, person: person) }
+  let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
+  let(:qle_kind) do
+    FactoryBot.create(
+      :qualifying_life_event_kind,
+      :with_one_question_and_accepted_and_declined_responses
+    )
+  end
+
+  describe "GET custom_qle_question" do
+    before do
+      sign_in(user)
+    end
+
+    it "should only render question 1 by default" do
+      custom_qle_action_params = {id: qle_kind.id, family: family}
+      get :custom_qle_question, params: custom_qle_action_params
+      expect(response).to have_http_status(:success)
+    end
+  end
+
+  describe "POST verify_custom_qle_question" do
+    it "redirects to home if QLE date does not qualify" do
+
+    end
+
+    it "redirects to insured_family_members_path if accepted question response submitted" do
+
+    end
+
+    it "redirects to custom_qle_question_insured_family_path with question 2 as instance variable if to_question_2 question response submitted" do
+
+    end
+
+  end
+end
