@@ -149,6 +149,9 @@ class Insured::ConsumerRolesController < ApplicationController
     begin
       params[:person][:ssn] = SymmetricEncryption.decrypt(params[:person][:ssn])
       params[:person][:dob] = SymmetricEncryption.decrypt(params[:person][:dob])
+      params[:person][:first_name] = SymmetricEncryption.decrypt(params[:person][:first_name])
+      params[:person][:last_name] = SymmetricEncryption.decrypt(params[:person][:last_name])
+      
       @consumer_role = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, actual_user)
       if @consumer_role.present?
         @person = @consumer_role.person
@@ -274,6 +277,8 @@ class Insured::ConsumerRolesController < ApplicationController
   def encrypt_pii(person)
     person[:ssn] = SymmetricEncryption.encrypt(person[:ssn])
     person[:dob] = SymmetricEncryption.encrypt(person[:dob])
+    person[:first_name] = SymmetricEncryption.encrypt(person[:first_name])
+    person[:last_name] = SymmetricEncryption.encrypt(person[:last_name])
     person
   end
 
