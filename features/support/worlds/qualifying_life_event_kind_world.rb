@@ -77,6 +77,8 @@ module QualifyingLifeEventKindWorld
     if %w[creation_form edit_form].include?(form_name)
       fill_in("qle_kind_#{form_name}_title", with: qle_kind_title)
       fill_in("qle_kind_#{form_name}_tool_tip", with: "Tool Tip")
+      # TODO: Several of the select options aren't working properly
+      # and passing through the values
       # TODO: Selectric selects are considered not visible
       # However, they are set to `not_applicable` by default, which is valid.
       # remove selectric or find a work around to select them.
@@ -193,6 +195,10 @@ World(QualifyingLifeEventKindWorld)
 And(/^qualifying life event kind (.*?) for (.*?) market created by user in QLE Wizard present$/) do |qle_kind_title, market_kind|
   qle_kind = QualifyingLifeEventKind.where(title: qle_kind_title, market_kind: market_kind).first
   expect(qle_kind.present?).to eq(true)
+end
+
+And(/^the QLE Kind (.*?) should have the proper attributes the user selected in the create form/) do |qle_kind_title|
+  
 end
 
 Given(/^qualifying life event kind (.*?) present for (.*?) market$/) do |qle_kind_title, market_kind|
