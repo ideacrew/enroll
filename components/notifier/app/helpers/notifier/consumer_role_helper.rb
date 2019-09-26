@@ -63,6 +63,8 @@ module Notifier
         "Tax Dependent"
       when "Married Filing Jointly"
         "Married Filing Jointly"
+      when "Married Filing Separately"
+        "Married Filing Separately"
       else
         ""
       end
