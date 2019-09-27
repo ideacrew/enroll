@@ -20,6 +20,10 @@ module Services
       CSV.generate(headers: true) do |csv|
         csv << (["#{Settings.site.long_name} Employee Census Template"] + Array.new(6) + [TimeKeeper.date_of_record] + Array.new(5) + ['1.1'])
         csv << headers
+
+        benefit_group_assignments = census_employee_roster.map(&:active_benefit_group_assignment).select{|bga| bga.present? }
+        benefit_package = benefit_group_assignments.map(&:benefit_package).uniq.first
+
         census_employee_roster.each do |census_employee|
           personal_details = personal_headers(census_employee)
           employee_details = employeement_headers(census_employee)
@@ -32,8 +36,7 @@ module Services
           append_config_data = ['', 'employee'] + personal_details + employee_details + benefit_group_details + address_details
 
           if site_key == :dc
-            #change this not to loop everytime
-            @total_employer_contribution = total_premium(census_employee)
+            @total_employer_contribution = total_premium(benefit_package)
             append_config_data += @total_employer_contribution
             census_employee.census_dependents.each do |dependent|
               append_config_data += append_dependent(dependent)
@@ -69,22 +72,22 @@ module Services
       enrollment.aasm_state.humanize.downcase if enrollment
     end
 
-    def total_premium(record)
+    def total_premium(benefit_package)
       return @total_employer_contribution if @total_employer_contribution&.any?
 
       if is_bqt?
         bqt_estimated_premium
-      elsif (bga = record.active_benefit_group_assignment)
-        employer_estimated_premium(bga)
+      elsif benefit_package && is_employer?
+        employer_estimated_premium(benefit_package)
       else
         Array.new(2)
       end
     end
 
-    def employer_estimated_premium(bga)
+    def employer_estimated_premium(benefit_package)
       premiums = []
       estimator = ::BenefitSponsors::Services::SponsoredBenefitCostEstimationService.new
-      bga.benefit_package.sponsored_benefits.each do |sponsored_benefit|
+      benefit_package.sponsored_benefits.each do |sponsored_benefit|
         #As per the current requirement, total premium for the employer is calculated and recorded in the excel.
         cost_hash = estimator.calculate_estimates_for_benefit_display(sponsored_benefit)
         premiums.push(number_to_currency(cost_hash ? cost_hash[:estimated_sponsor_exposure] : 0))
@@ -120,6 +123,10 @@ module Services
 
     def is_bqt?
       feature == 'bqt'
+    end
+
+    def is_employer?
+      feature == 'employer'
     end
 
     def primary_location_details(record)
