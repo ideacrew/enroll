@@ -47,8 +47,8 @@ module Insured
       def build_form_params
         enrollment = HbxEnrollment.find(BSON::ObjectId.from_string(enrollment_id))
         family     = Family.find(BSON::ObjectId.from_string(family_id))
-        sep        = SpecialEnrollmentPeriod.find(BSON::ObjectId.from_string(family.latest_active_sep.id))
-        qle        = QualifyingLifeEventKind.find(BSON::ObjectId.from_string(sep.qualifying_life_event_kind_id))
+        sep        = SpecialEnrollmentPeriod.find(BSON::ObjectId.from_string(family.latest_active_sep.id)) if family.latest_active_sep.present?
+        qle        = QualifyingLifeEventKind.find(BSON::ObjectId.from_string(sep.qualifying_life_event_kind_id))  if sep.present?
         { enrollment: enrollment, family: family, qle: qle, is_aptc_eligible: is_aptc_eligible(enrollment, family) }
       end
 
