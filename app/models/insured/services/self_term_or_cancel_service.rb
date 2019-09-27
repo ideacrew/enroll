@@ -25,7 +25,7 @@ module Insured
       def attributes_to_form_params(attrs)
         {
           :enrollment => ::Insured::Serializers::EnrollmentSerializer.new(attrs[:enrollment]).to_hash,
-          :market_kind => attrs[:qle].market_kind,
+          :market_kind => attrs[:qle].present? ? attrs[:qle].market_kind : nil,
           :product => ::Insured::Services::ProductService.new(attrs[:enrollment].product).find,
           :family => ::Insured::Serializers::FamilySerializer.new(attrs[:family]).to_hash,
           :is_aptc_eligible => attrs[:is_aptc_eligible]
