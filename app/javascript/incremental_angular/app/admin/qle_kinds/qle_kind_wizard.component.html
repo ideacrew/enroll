@@ -1,38 +1,38 @@
 <div class="container" style="padding-top: 1px">
   <div class='row'>
-    <div class='col-md-9'>
+    <div class='col-md-12'>
       <div class="panel panel-primary">
-        <div class="panel-heading">
+        <div class="panel-heading text-center">
           <strong>Manage Qualifying Life Events</strong>
         </div>
         <div class="panel-body">
           <form class="form">
             <fieldset>
-              <legend>Select Action</legend>
               <div class="form-group">
-                <div class="checkbox">
+                <div class='row'>
+                  <div class='col-md-12'>
+                    <legend>Select Action</legend>
+                  </div>
+                </div>
+                <div class='row'>
+                  <div class='col-md-4'>
                     <label for="qle_wizard_new_qle_selected_radio">
-                        <input id="qle_wizard_new_qle_selected_radio" name="qle_kind_wizard_action" type="radio" (change)="selectAction('new')">
-                        Create a Custom QLE
+                      <input id="qle_wizard_new_qle_selected_radio" name="qle_kind_wizard_action" type="radio" (change)="selectAction('new')">
+                      Create a Custom QLE
                     </label>
-                </div>
-<!--                 <div class="checkbox">
-                  <label for="qle_wizard_sorting_order_qle_selected_radio">
-                      <input id="qle_wizard_sorting_order_qle_selected_radio" name="qle_kind_wizard_action" type="radio" (change)="selectAction('sorting-order')">
-                      Sorting a QLE's
-                  </label>
-                </div> -->
-                <div class="checkbox">
+                  </div>
+                  <div class='col-md-4'>
                     <label for="qle_wizard_modify_qle_selected_radio">
-                        <input id="qle_wizard_modify_qle_selected_radio" name="qle_kind_wizard_action" type="radio" (change)="selectAction('edit')">
-                        Modify Existing QLE
+                      <input id="qle_wizard_modify_qle_selected_radio" name="qle_kind_wizard_action" type="radio" (change)="selectAction('edit')">
+                      Modify Existing QLE
                     </label>
-                </div>
-                <div class="checkbox">
+                  </div>
+                  <div class='col-md-4'>
                     <label for="qle_wizard_deactivate_qle_selected_radio">
-                        <input id="qle_wizard_deactivate_qle_selected_radio" name="qle_kind_wizard_action" type="radio" (change)="selectAction('deactivate')">
-                        Deactivate Active QLE
+                      <input id="qle_wizard_deactivate_qle_selected_radio" name="qle_kind_wizard_action" type="radio" (change)="selectAction('deactivate')">
+                      Deactivate Active QLE
                     </label>
+                  </div>
                 </div>
               </div>
             </fieldset>
@@ -46,9 +46,9 @@
               [isVisible]="showDeactivate()"
               #deactivateSelection>
             </qle-kind-wizard-selection>
-            <div class="form-group">
-              <button class="btn btn-primary" (click)="submit()">Submit</button>
-            </div>
+              <div class="form-group">
+                <button class="btn btn-primary" (click)="submit()">Submit</button>
+              </div>
           </form>
         </div>
       </div>
