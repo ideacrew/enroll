@@ -54,6 +54,14 @@ describe Products::Services::CopayAfterDeductibleService do
         end
       end
     end
+
+    context "$[PARAM] Copay with deductible/Not Applicable Coinsurance" do
+      it "should return translated result" do
+        service_visit.copay_in_network_tier_1 = "#{amount} copay with deductible"
+        service_visit.co_insurance_in_network_tier_1 = "Not Applicable"
+        expect(subject.in_network_process).to eq "You must first pay #{amount} per visit. Then, pay all of the remaining allowed charges, until you meet the deductible. Then, no charge."
+      end
+    end
   end
 
   context "Out of Network Costs" do
@@ -96,6 +104,14 @@ describe Products::Services::CopayAfterDeductibleService do
           service_visit.co_insurance_out_of_network = "No Charge after deductible"
           expect(subject.out_network_process).to eq "You must first pay #{amount} per visit. Then, pay all of the remaining allowed charges, until you meet the out-of-network deductible. After you meet the deductible, no charge."
         end
+      end
+    end
+
+    context "$[PARAM] Copay with deductible/Not Applicable Coinsurance" do
+      it "should return translated result" do
+        service_visit.copay_out_of_network = "#{amount} copay with deductible"
+        service_visit.co_insurance_out_of_network = "Not Applicable"
+        expect(subject.out_network_process).to eq "You must first pay #{amount} per visit. Then, pay all of the remaining allowed charges, until you meet the deductible. Then, no charge."
       end
     end
   end
