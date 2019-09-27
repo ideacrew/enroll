@@ -15,25 +15,19 @@ describe Products::Services::CopayAfterDeductibleService do
 
   context "In Network Costs" do
     context "$[PARAM] Copay after deductible/No Charge after deductible Coinsurance" do
-      context "with Medical Costs And NOT have an In Network Deductible and ‘excepted service’" do
+      context "with no out-of-network deductible" do
         before do
           allow(qhp_cost_share_variance).to receive(:no_in_network_deductible?).and_return true
         end
 
-        it "should return translated result" do
+        it "should return translated result with excepted services" do
           service_visit.copay_in_network_tier_1 = "#{amount} copay after deductible"
           service_visit.co_insurance_in_network_tier_1 = "No Charge after deductible"
           service_visit.visit_type = "Emergency Room Services"
           expect(subject.in_network_process).to eq "You must pay #{amount} per visit."
         end
-      end
 
-      context "with Medical Costs And NOT have an In Network Deductible and have devices" do
-        before do
-          allow(qhp_cost_share_variance).to receive(:no_in_network_deductible?).and_return true
-        end
-
-        it "should return translated result" do
+        it "should return translated result with devices" do
           service_visit.copay_in_network_tier_1 = "#{amount} copay after deductible"
           service_visit.co_insurance_in_network_tier_1 = "No Charge after deductible"
           service_visit.visit_type = "Prosthetic Devices"
@@ -41,28 +35,66 @@ describe Products::Services::CopayAfterDeductibleService do
         end
       end
 
-      context "with Medical Costs And NOT have an In Network Deductible and have devices" do
+      context "with no out-of-network deductible" do
         before do
           allow(qhp_cost_share_variance).to receive(:no_in_network_deductible?).and_return false
         end
 
-        it "should return translated result" do
+        it "should return translated result with devices" do
           service_visit.copay_in_network_tier_1 = "#{amount} copay after deductible"
           service_visit.co_insurance_in_network_tier_1 = "No Charge after deductible"
           service_visit.visit_type = "Prosthetic Devices"
           expect(subject.in_network_process).to eq "You must first pay #{amount} per device. Then, pay all of the remaining allowed charges, until you meet the deductible. After you meet the deductible, no charge."
         end
-      end
 
-      context "for remaining services" do
-        before do
-          allow(qhp_cost_share_variance).to receive(:no_in_network_deductible?).and_return false
-        end
-
-        it "should return translated result" do
+        it "should return translated result with remaining services" do
           service_visit.copay_in_network_tier_1 = "#{amount} copay after deductible"
           service_visit.co_insurance_in_network_tier_1 = "No Charge after deductible"
           expect(subject.in_network_process).to eq "You must first pay #{amount} per visit. Then, pay all of the remaining allowed charges, until you meet the deductible. After you meet the deductible, no charge"
+        end
+      end
+    end
+  end
+
+  context "Out of Network Costs" do
+    context "$[PARAM] Copay after deductible/No Charge after deductible Coinsurance" do
+      context "with no out-of-network deductible" do
+
+        before do
+          allow(qhp_cost_share_variance).to receive(:no_out_of_network_deductible?).and_return true
+        end
+
+        it "should return translated result for excepted services" do
+          service_visit.copay_out_of_network = "#{amount} copay after deductible"
+          service_visit.co_insurance_out_of_network = "No Charge after deductible"
+          service_visit.visit_type = "Emergency Room Services"
+          expect(subject.out_network_process).to eq "You must first pay #{amount} per visit. Then, pay all of the remaining allowed charges, until you meet the deductible. After you meet the deductible, no charge."
+        end
+
+        it "should return translated result for devices" do
+          service_visit.copay_out_of_network = "#{amount} copay after deductible"
+          service_visit.co_insurance_out_of_network = "No Charge after deductible"
+          service_visit.visit_type = "Prosthetic Devices"
+          expect(subject.out_network_process).to eq "You must first pay #{amount} per device. Then, pay all of the remaining allowed charges, until you meet the deductible. After you meet the deductible, no charge."
+        end
+      end
+
+      context "with no out-of-network deductible" do
+        before do
+          allow(qhp_cost_share_variance).to receive(:no_out_of_network_deductible?).and_return false
+        end
+
+        it "should return translated result with devices" do
+          service_visit.copay_out_of_network = "#{amount} copay after deductible"
+          service_visit.co_insurance_out_of_network = "No Charge after deductible"
+          service_visit.visit_type = "Prosthetic Devices"
+          expect(subject.out_network_process).to eq "You must first pay #{amount} per device. Then, pay all of the remaining allowed charges, until you meet the out-of-network deductible. After you meet the deductible, no charge."
+        end
+
+        it "should return translated result with remaining services" do
+          service_visit.copay_out_of_network = "#{amount} copay after deductible"
+          service_visit.co_insurance_out_of_network = "No Charge after deductible"
+          expect(subject.out_network_process).to eq "You must first pay #{amount} per visit. Then, pay all of the remaining allowed charges, until you meet the out-of-network deductible. After you meet the deductible, no charge."
         end
       end
     end
