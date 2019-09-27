@@ -66,12 +66,24 @@ class Products::QhpCostShareVariance
     qhp_maximum_out_of_pockets.pluck(:out_of_network_individual_amount)
   end
 
+  def in_network_individual_amounts
+    qhp_maximum_out_of_pockets.pluck(:in_network_tier_1_individual_amount)
+  end
+
   def medical_and_drug_deductible?
     deductible_types.include?("Combined Medical and Drug EHB Deductible")
   end
 
   def no_out_of_network_deductible?
-    medical_and_drug_deductible? && out_of_network_family_amounts.include?("per person not applicable | per group not applicable") && out_of_network_individual_amounts.include?("Not Applicable")
+    medical_and_drug_deductible? && out_of_network_individual_amounts.include?("Not Applicable")
+    # Might need to use the following
+    # && out_of_network_family_amounts.include?("per person not applicable | per group not applicable")
+  end
+
+  def no_in_network_deductible?
+    in_network_individual_amounts.include?("Not Applicable")
+    # Might need to use the following
+    # medical_and_drug_deductible? && in_network_tier_1_family_amount.include?("per person not applicable | per group not applicable")
   end
 
   def separarate_drug_deductible?
