@@ -7,134 +7,117 @@
         </strong>
       </div>
       <div class='panel-body'>
-        <div class="form-group">
-          <field-errors [errorControl]="creationFormGroup" errorHeader="Your QLE Kind could not be Created for the following reasons:">   
-          </field-errors>
-          <span for="qle_kind_creation_form_title" class="col-sm-2 control-label">Title</span>
-          <div class="col-sm-4">
+        <field-errors [errorControl]="creationFormGroup" errorHeader="Your QLE Kind could not be Created for the following reasons:">   
+        </field-errors>
+        <div class='row'>
+          <div class='col-md-6 capitalize-text'>
+            <strong>Market Kind:</strong>&nbsp;&nbsp;
+            <span id="qle_kind_creation_form_market_kind" *ngFor="let marketKind of marketKindsList">
+              <input type='radio' class=''formControlName="market_kind" id='qle_kind_creation_form_market_kind' value='{{marketKind}}' required> {{marketKind}}
+              &nbsp;&nbsp;
+            </span>
+          </div>
+          <div class='col-md-4'>
+            <strong>Visible to Customer:</strong>&nbsp;&nbsp;
+            <input type='radio' class='' formControlName="visible_to_customer" id='qle_kind_creation_form_visible_to_customer' value="Yes" required> Yes
+            &nbsp;&nbsp;
+            <input type='radio' class='' formControlName="visible_to_customer" id='qle_kind_creation_form_visible_to_customer' value="No" required> No
+          </div>
+        </div>
+        <br>
+        <hr>
+        <div class='row'>
+          <div class='col-md-4'>
+            <strong>Title:</strong>
             <input type='text' formControlName="title" id='qle_kind_creation_form_title' class='form-control' required>
             <field-errors [errorControl]="creationFormGroup.get('title')"></field-errors>
-            </div>
+          </div>
+          <div class='col-md-4'>
+            <strong>Visible to Customer from:</strong>
+            <input type='text' formControlName="start_on" id='qle_kind_creation_form_start_on' class='form-control' placeholder="MM/DD/YYYY" mask="M0/d0/0000" [dropSpecialCharacters]="false" [validation]="true" required>
+          </div>
+          <div class='col-md-4'>
+            <strong>Visible to Customer until:</strong>
+            <input type='text' formControlName="end_on" id='qle_kind_creation_form_end_on' class='form-control' placeholder="MM/DD/YYYY" mask="M0/d0/0000" [dropSpecialCharacters]="false" [validation]="true" required> <br>
+          </div>
         </div>
-        <div class="form-group">
-          <span for="qle_kind_creation_form_tool_tip" class="col-sm-2 control-label">Tool Tip </span>
-          <div class="col-sm-4">
+        <hr>
+        <div class='row'>
+          <div class='col-md-4'>
+            <strong>Tool Tip:</strong>
             <input
               type='text'
               formControlName="tool_tip"
               id='qle_kind_creation_form_tool_tip'
               class='form-control' required>
           </div>
-        </div>
-        <div class="form-group"> 
-          <span for="qle_kind_creation_form_action_kind" class="col-sm-2 control-label">Action Kind </span>
-          <div class="col-md-2" >        
-            <select formControlName="action_kind" id = "qle_kind_creation_form_action_kind">
-              <option *ngFor="let actionKind of actionKindList" [ngValue]= "actionKind.code">
-                {{actionKind.name}}
-              </option>
-            </select>
-          </div>
-        </div>
-        <div class="form-group">
-          <span for="qle_kind_creation_form_reason" class="col-sm-2 control-label">Reason </span>
-          <div class="col-md-2" >        
-            <select formControlName="reason"  id = "qle_kind_creation_form_reason">
+          <div class="col-md-3">
+            <strong>Reason:</strong>
+            <br>
+            <select formControlName="reason" id="qle_kind_creation_form_reason">
               <option *ngFor="let reason of reasonList" [ngValue]="reason.code">
-              {{reason.name}}
+                {{reason.name}}
               </option>
             </select>
           </div>
-        </div>
-        <div class='form-group'>
-          <span for="qle_kind_creation_form_visible_to_customer" class="col-sm-2 control-label">Visible to Customer</span>
-          <div class="col-md-2">
-            <label class="control-label">
-              <input type='radio' class='' formControlName="visible_to_customer" id='qle_kind_creation_form_visible_to_customer' value = "Yes" required> Yes
-            </label> <br>
-            <label class=" control-label">
-              <input type='radio' class='' formControlName="visible_to_customer" id='qle_kind_creation_form_visible_to_customer' value = "No" required> No
-            </label>
-          </div>
-        </div>
-        <div class="form-group">
-          <span for="qle_kind_creation_form_market_kind" class="col-sm-2 control-label">Market Kind</span>
-          <div class="col-sm-4">
-            <div id="qle_kind_creation_form_market_kind"  *ngFor="let marketKind of marketKindsList">
-              <label class="control-label">
-                <input type='radio' class='' formControlName="market_kind" id='qle_kind_creation_form_market_kind' value = {{marketKind}} required> {{marketKind}}
-              </label>
-            </div>
-          </div>
-        </div>
-        <div class= 'form-group'>
-          <span for="qle_kind_creation_form_is_self_attested" class="col-sm-2 control-label">Self-Attestion Option </span>
-          <div class="col-md-2">
+          <div class='col-md-5'>
+            <strong>Self-Attestion Option:</strong>
+            <br>
             <label class="control-label">
               <input type='radio' class='' formControlName="is_self_attested" id='qle_kind_creation_form_is_self_attested' value = "Yes" required> User Self Service
             </label>
+            &nbsp;&nbsp;
             <label class=" control-label">
               <input type='radio' class='' formControlName="is_self_attested" id='qle_kind_creation_form_is_self_attested' value = "No" required> Admin Only
             </label>
           </div>
         </div>
+        <hr>
         <!-- TODO: Only allow a maximum of two questions to created, and specify on the UI that this will be the first question the user will see, and the second -->
-        <div class='form-group'>
-          <div class='row'>
-            <div class='col-md-12'>
-              <span for="qle_kind_creation_form_action_kind" class="col-sm-2 control-label">Questions</span>
-              <button (click)="addQuestion()" class='btn btn-primary'>
-                Create a New Question
-              </button>
-              <div *ngIf="showQuestions()">
-                <qle-question-form
-                  *ngFor="let question of questionControls(); let i = index"
-                  [questionFormGroup]="question"
-                  [questionIndex]="i"
-                  [questionComponentParent]="this">
-                </qle-question-form>
-              </div>
+        <div class='row'>
+          <div class='col-md-9'>
+            <strong>Questions:</strong>
+            <br>
+            <button (click)="addQuestion()" class='btn btn-primary'>
+              Create a New Question
+            </button>
+            <div *ngIf="showQuestions()">
+              <qle-question-form
+                *ngFor="let question of questionControls(); let i = index"
+                [questionFormGroup]="question"
+                [questionIndex]="i"
+                [questionComponentParent]="this">
+              </qle-question-form>
             </div>
           </div>
         </div>
-        <div class='form-group'>
-          <span for="qle_kind_creation_form_effective_on_kinds" class="col-sm-2 control-label">Effective on Options</span>
-          <div formArrayName="effective_on_kinds" *ngFor="let option of getOptions(); let i = index">
-            <span *ngIf='i != 0' class="col-sm-2 control-label"></span>
-            <label class='control-label'>
-              <input type="checkbox" [formControlName]='i' value= option> {{option.name}}
-            </label>
+        <hr>
+        <div class='row'>
+          <div class='col-md-4'>
+            <strong>Effective on Options:</strong>
+            <div formArrayName="effective_on_kinds" *ngFor="let option of getOptions(); let i = index">
+              <label class='control-label'>
+                <input type="checkbox" [formControlName]='i' value= option> {{option.name}}
+              </label>
+            </div>
           </div>
-        </div>
-        <div class="form-group">
-          <span for="qle_kind_creation_form_pre_event_sep_in_days" class="col-sm-3 control-label">Pre-event Sep/Qle Eligibility</span>
-          <div class='col-md-5'>
-            up to
+          <div class='col-md-4'>
+            <strong>Pre-event Sep/Qle Eligibility up to:</strong>
+            <br>
             <input type='number'formControlName="pre_event_sep_in_days" id='qle_kind_creation_form_pre_event_sep_eligibility'/>
-            days post event
+            <br>
+            <strong>days post event</strong>
           </div>
-        </div>
-        <div class="form-group">
-          <span for="qle_kind_creation_form_post_event_sep_in_days" class="col-sm-3 control-label">Post-event Sep/Qle Eligibility</span>
-          <div class='col-md-5'>
-            up to
+          <div class="col-md-4">
+            <strong>Post-event Sep/Qle Eligibility up to:</strong>
+            <br>
             <input type='number'formControlName="post_event_sep_in_days" id='qle_kind_creation_form_post_event_sep_eligibility'/>
-            days prior to event
+            <br>
+            <strong>days prior to event</strong>
           </div>
         </div>
-        <div class="form-group">
-          <span for="qle_kind_creation_form_start_on" class="col-sm-3 control-label"> Sep/Qle Available in system from</span>
-          <div class='col-md-5'>
-              <input type='text' formControlName="start_on" id='qle_kind_creation_form_start_on' placeholder="MM/DD/YYYY" mask="M0/d0/0000" [dropSpecialCharacters]="false" [validation]="true" required> <br>
-          </div>
-        </div>
-        <div class="form-group">
-          <span for="qle_kind_creation_form_end_on" class="col-sm-3 control-label">Sep/Qle Available in system until      </span>
-          <div class='col-md-5'>
-                 <input type='text' formControlName="end_on" id='qle_kind_creation_form_end_on' placeholder="MM/DD/YYYY" mask="M0/d0/0000" [dropSpecialCharacters]="false" [validation]="true" required> <br>
-          </div>
-        </div>
-        <div class="form-group col-md-4 mb-2{{errorClassFor(creationFormGroup.get('title'))}}">
+        <hr>
+        <div class="form-group col-md-12 mb-2{{errorClassFor(creationFormGroup.get('title'))}}">
           <button class="btn btn-primary" (click)="submitCreation()">Create QLE Kind</button>
         </div>
       </div>

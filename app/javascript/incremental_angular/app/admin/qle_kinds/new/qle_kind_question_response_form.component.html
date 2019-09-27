@@ -1,6 +1,6 @@
 <div [formGroup]="responseFormGroup">
   <div class="from-group-response">
-    <span class="col-sm-2 control-label">Response</span>
+    <span class="col-sm-2 control-label"><strong>Response</strong></span>
     <div class="col-sm-10">
       <input
         id="qle_kind_response_response_{{responseIndex}}_content"
@@ -9,11 +9,6 @@
         id="response-content col-md-2"
         class='form-control'>
       <div class="btn-group" role="group" aria-label="Response Actions">
-        <button
-          (click)="addNewResponse(responseComponentParent, responseIndex)"
-          class='btn btn-secondary btn-success margin-right-10px'>
-          Add Another Response
-        </button>
         <button
           (click)="removeResponse(responseIndex)"
           class='btn btn-secondary btn-primary margin-right-10px'>
