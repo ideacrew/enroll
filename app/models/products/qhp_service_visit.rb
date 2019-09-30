@@ -33,6 +33,8 @@ class Products::QhpServiceVisit
   def out_network_result
     if copay_out_of_network.include?("Copay after deductible")
       Products::Services::CopayAfterDeductibleService.new(self).out_network_process
+    elsif copay_out_of_network.include?("Copay with deductible")
+      Products::Services::CopayWithDeductibleService.new(self).out_network_process
     elsif copay_out_of_network.include?("Copay per Day")
       Products::Services::CopayPerDayService.new(self).out_network_process
     elsif copay_out_of_network.include?("Copay per Stay")
