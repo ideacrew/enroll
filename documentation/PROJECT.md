@@ -6,5 +6,6 @@ Enroll App is the web-facing, transactional component of the first built-to-purp
 
 Below are the various status reports and artifacts for this project.
 
+* [Angular Documentation](../angular_documentation/index.html)
 * [Code Coverage](../coverage/index.html)
 * [Rubocop Results](../rubocop/index.html)

@@ -5,8 +5,13 @@ base="$( dirname "${BASH_SOURCE[0]}" )/.."
 cd $base
 root=`pwd -P`
 
-rm -Rf ./doc ./rubocop rdocs.zip
+rm -Rf ./doc ./rubocop ./angular_documentation rdocs.zip
 
 bundle exec yardoc
 bundle exec rubocop -f h -o rubocop/index.html
-zip -r rdocs.zip doc rubocop
+
+nvm use 10
+yarn install
+yarn run angular-docs
+
+zip -r rdocs.zip doc rubocop angular_documentation
