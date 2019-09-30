@@ -13,12 +13,12 @@ describe UpdateCarrierName, dbclean: :after_each do
   end
 
   describe "update carrier legal name" do
-    let(:carrier_profile)  { FactoryBot.create(:carrier_profile, hbx_carrier_id: "111222")}
+    let(:carrier_profile)  { FactoryBot.create(:carrier_profile, abbrev: "abcxyz")}
     let(:new_legal_name) { "New Legal Name" }
 
-    it "allow dependent ssn's to be updated to nil" do
+    it "should update carrier name in old model" do
       organization = carrier_profile.organization
-      ClimateControl.modify hbx_id: carrier_profile.hbx_carrier_id.to_s, name: new_legal_name do
+      ClimateControl.modify abbrev: carrier_profile.abbrev.to_s, name: new_legal_name do
         subject.migrate
       end
       organization.reload
@@ -28,14 +28,12 @@ describe UpdateCarrierName, dbclean: :after_each do
 
   describe "update carrier legal name in exempt_organization" do
     let(:site) { build(:benefit_sponsors_site, :with_owner_exempt_organization, Settings.site.key) }
-    let(:issuer_profile) { create(:benefit_sponsors_organizations_issuer_profile, organization: site.owner_organization, hbx_carrier_id: "111222") }
+    let(:issuer_profile) { create(:benefit_sponsors_organizations_issuer_profile, organization: site.owner_organization, abbrev: "abcxyz") }
 
-    # let(:exempt_organization) { FactoryBot.create(:benefit_sponsors_organizations_exempt_organization, :with_issuer_profile)}
     let(:new_legal_name) { "New Legal Name" }
 
-    it "allow dependent ssn's to be updated to nil" do
-      # exempt_organization = issuer_profile.exempt_organization
-      ClimateControl.modify hbx_id: issuer_profile.hbx_carrier_id.to_s, name: new_legal_name do
+    it "should update carrier name in old model" do
+      ClimateControl.modify abbrev: issuer_profile.abbrev, name: new_legal_name do
         subject.migrate
       end
       issuer_profile.organization.reload
