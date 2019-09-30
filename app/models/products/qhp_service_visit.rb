@@ -15,6 +15,8 @@ class Products::QhpServiceVisit
   def in_network_result
     if copay_in_network_tier_1.include?("Copay after deductible")
       Products::Services::CopayAfterDeductibleService.new(self).in_network_process
+    elsif copay_in_network_tier_1.include?("Copay with deductible")
+      Products::Services::CopayWithDeductibleService.new(self).in_network_process
     elsif copay_in_network_tier_1.include?("Copay per Day")
       Products::Services::CopayPerDayService.new(self).in_network_process
     elsif copay_in_network_tier_1.include?("Copay per Stay")
@@ -37,8 +39,6 @@ class Products::QhpServiceVisit
       Products::Services::CopayPerStayService.new(self).out_network_process
     elsif copay_out_of_network.delete("$").to_i.zero?
       Products::Services::ZeroCopayService.new(self).out_network_process
-    elsif copay_out_of_network.delete("$").to_i != 0
-      Products::Services::NonZeroCopayService.new(self).out_network_process
     end
   end
 
