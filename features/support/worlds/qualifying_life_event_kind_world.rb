@@ -74,7 +74,7 @@ module QualifyingLifeEventKindWorld
       form_name = "deactivation_form"
       button_text = 'Deactivate QLE Kind'
     end
-    if %w[creation_form edit_form].include?(form_name)
+    if %w[creation_form].include?(form_name)
       fill_in("qle_kind_#{form_name}_title", with: qle_kind_title)
       fill_in("qle_kind_#{form_name}_tool_tip", with: "Tool Tip")
       # TODO: Several of the select options aren't working properly
@@ -149,7 +149,7 @@ module QualifyingLifeEventKindWorld
     end
     if %w[creation_form edit_form].include?(form_name)
       # Make fields blank
-      fill_in("qle_kind_#{form_name}_title", with: '')
+      fill_in("qle_kind_#{form_name}_title", with: '') if form_name == 'creation_form'
       fill_in("qle_kind_#{form_name}_tool_tip", with: "")
       fill_in("qle_kind_#{form_name}_pre_event_sep_eligibility", with: '')
       fill_in("qle_kind_#{form_name}_post_event_sep_eligibility", with: '')
@@ -195,6 +195,14 @@ World(QualifyingLifeEventKindWorld)
 And(/^qualifying life event kind (.*?) for (.*?) market created by user in QLE Wizard present$/) do |qle_kind_title, market_kind|
   qle_kind = QualifyingLifeEventKind.where(title: qle_kind_title, market_kind: market_kind).first
   expect(qle_kind.present?).to eq(true)
+end
+
+And(/^the user cannot edit the market kind or title of the QLE Kind (.*?)$/) do |qle_kind_title|
+  qle_kind = qualifying_life_event_kind(qle_kind_title)
+  non_qle_market_kinds = QualifyingLifeEventKind::MARKET_KINDS.dup.reject { |kind| kind == qle_kind.market_kind }
+  # Appears on page as Shop, Individual, etc.
+  expect(page).to have_text(qle_kind.market_kind.capitalize)
+  non_qle_market_kinds.each { |kind| expect(page).to_not have_text(kind.capitalize) }
 end
 
 And(/^the QLE Kind (.*?) should have the proper attributes the user selected in the create form/) do |qle_kind_title|
