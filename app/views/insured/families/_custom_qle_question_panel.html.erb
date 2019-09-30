@@ -10,7 +10,7 @@
       <div class="form-group">
         <%= form_with url: verify_custom_qle_question_insured_family_path(@qle_kind.id), scope: 'question_and_responses' do |f| %>
           <p>
-            <%= @qle_kind.show_event_kind_label_if_present %>    
+            <strong><%= @qle_kind.show_event_kind_label_if_present %></strong> 
           </p>
           <%# This is the date that the event took place (I.E. Birth of Child) %>
           <%# Hide if the date is present- I.E. on the second question after the user has put in the date %>

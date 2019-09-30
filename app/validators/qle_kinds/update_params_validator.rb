@@ -9,7 +9,6 @@ module QleKinds
       required(:market_kind).value(:filled?, included_in?: QualifyingLifeEventKind::MARKET_KINDS)
       optional(:is_self_attested).filled(::Dry::Types["params.bool"])
       optional(:visible_to_customer).filled(::Dry::Types["params.bool"])
-      optional(:action_kind).maybe(:str?)
       optional(:custom_qle_questions).maybe(:array?)
       optional(:tool_tip).maybe(:str?)
       optional(:reason).maybe(:str?)
