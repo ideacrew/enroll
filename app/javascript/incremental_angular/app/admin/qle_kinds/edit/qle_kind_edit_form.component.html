@@ -7,141 +7,118 @@
         </strong>
       </div>
       <div class='panel-body'>
-        <div class="form-group">
-          <field-errors [errorControl]="editFormGroup" errorHeader="Your QLE Kind could not be Created for the following reasons:">   
-          </field-errors>
-          <span for="qle_kind_edit_form_title" class="col-sm-2 control-label">Title</span>
-          <div class="col-sm-4">
-            <input type='text' formControlName="title" id='qle_kind_edit_form_title' value="{{qleKindToEdit.title}}" class='form-control' required>
-            <field-errors [errorControl]="editFormGroup.get('title')"></field-errors>
-            </div>
+        <field-errors [errorControl]="editFormGroup" errorHeader="Your QLE Kind could not be modified for the following reasons:">   
+        </field-errors>
+
+        <div class='row'>
+          <div class='col-md-6 capitalize-text'>
+            <strong>Market Kind:</strong>&nbsp;&nbsp;
+            {{qleKindToEdit.market_kind}}
+            &nbsp;&nbsp;
+          </div>
+          <div class='col-md-4'>
+            <strong>Visible to Customer:</strong>&nbsp;&nbsp;
+            <input type='radio' formControlName="visible_to_customer" id='qle_kind_edit_form_visible_to_customer' value="Yes" [checked]="qleKindToEdit.visible_to_customer == true" required> Yes
+            &nbsp;&nbsp;
+            <input type='radio' class='' formControlName="visible_to_customer" id='qle_kind_edit_form_visible_to_customer' value="No" [checked]="qleKindToEdit.visible_to_customer == false" required> No
+          </div>
         </div>
-        <div class="form-group">
-          <span for="qle_kind_edit_form_tool_tip"class="col-sm-2 control-label">Tool Tip </span>
-          <div class="col-sm-4">
+        <br>
+        <hr>
+
+        <div class='row'>
+          <div class='col-md-4'>
+            <strong>Title:</strong>
+            <input type='text' formControlName="title" id='qle_kind_edit_form_title' class='form-control' disabled>
+          </div>
+          <div class='col-md-4'>
+            <strong>Visible to Customer from:</strong>
+            <input type='text' formControlName="start_on" id='qle_kind_edit_form_start_on' class='form-control' value="{{stringifiedStartOn}}" placeholder="MM/DD/YYYY" mask="M0/d0/0000" [dropSpecialCharacters]="false" [validation]="true" required>
+          </div>
+          <div class='col-md-4'>
+            <strong>Visible to Customer until:</strong>
+            <input type='text' formControlName="end_on" id='qle_kind_edit_form_end_on' class='form-control' value="{{stringifiedEndOn}}"placeholder="MM/DD/YYYY" mask="M0/d0/0000" [dropSpecialCharacters]="false" [validation]="true" required> <br>
+          </div>
+        </div>
+        <hr>
+
+        <div class='row'>
+          <div class='col-md-4'>
+            <strong>Tool Tip:</strong>
             <input
               type='text'
-              value ="{{qleKindToEdit.tool_tip}}" 
               formControlName="tool_tip"
               id='qle_kind_edit_form_tool_tip'
+              value ="{{qleKindToEdit.tool_tip}}" 
               class='form-control' required>
-              <field-errors [errorControl]="editFormGroup.get('tool_tip')"></field-errors>
           </div>
-        </div>
-        <div class="form-group"> 
-          <span for="qle_kind_edit_form_action_kind" class="col-sm-2 control-label">Action Kind </span>
-          <div class="col-md-2 " >        
-            <select formControlName="action_kind" id="qle_kind_edit_form_action_kind">
-              <option *ngFor="let actionKind of actionKindList" [ngValue]="actionKind.code"
-              >
-              {{actionKind.name}}
-              </option>
-            </select>
-          </div>
-        </div>
-        <div class="form-group">
-          <span for="qle_kind_edit_form_reason" class="col-sm-2 control-label">Reason </span>
-          <div class="col-md-3" >        
+          <div class="col-md-3">
+            <strong>Reason:</strong>
+            <br>
             <select formControlName="reason" id="qle_kind_edit_form_reason">
-              <option *ngFor="let reason of reasonList" [ngValue]="reason.code"
-              >
-              {{reason.name}}
+              <option *ngFor="let reason of reasonList" [ngValue]="reason.code" [selected]="qleKindToEdit.reason">
+                {{reason.name}}
               </option>
             </select>
           </div>
-        </div>
-        <div class='form-group'>
-          <span for="qle_kind_edit_form_visible_to_customer" class="col-sm-2 control-label">Visible to Customer</span>
-          <div class="col-md-2">
-            <label class="control-label">
-              <input type='radio' class='' formControlName="visible_to_customer" id='qle_kind_edit_form_visible_to_customer' value = "Yes" [checked]="qleKindToEdit.visible_to_customer == true" required> Yes
-            </label> <br>
-            <label class=" control-label">
-              <input type='radio' class='' formControlName="visible_to_customer" id='qle_kind_edit_form_visible_to_customer' value = "No" [checked]="qleKindToEdit.visible_to_customer == false" required> No
-            </label>
-          </div>
-        </div>
-        <div class="form-group">
-          <span for="qle_kind_edit_form_market_kind" class="col-sm-2 control-label">Market Kind</span>
-          <div class="col-sm-4">
-            <div id="qle_kind_edit_form_market_kind"  *ngFor="let marketKind of marketKindsList">
-              <label class="control-label">
-                <input type='radio' class='' formControlName="market_kind" id='qle_kind_edit_form_market_kind' value ="{{marketKind}}" [checked]="qleKindToEdit.market_kind == marketKind" required> {{marketKind}}
-              </label>
-            </div>
-          </div>
-        </div>
-        <div class= 'form-group'>
-          <span for="qle_kind_edit_form_is_self_attested" class="col-sm-2 control-label">Self-Attestion Option </span>
-          <div class="col-md-2">
+          <div class='col-md-5'>
+            <strong>Self-Attestion Option:</strong>
+            <br>
             <label class="control-label">
               <input type='radio' class='' formControlName="is_self_attested" id='qle_kind_edit_form_is_self_attested' value = "Yes" [checked]="qleKindToEdit.is_self_attested == true" required> User Self Service
             </label>
-            <label class=" control-label"> 
-              <input type='radio' class='' formControlName="is_self_attested" id='qle_kind_edit_form_is_self_attested' value = "No"
-              [checked]="qleKindToEdit.is_self_attested == false" required> Admin Only 
+            &nbsp;&nbsp;
+            <label class=" control-label">
+              <input type='radio' class='' formControlName="is_self_attested" id='qle_kind_edit_form_is_self_attested' value = "No" [checked]="qleKindToEdit.is_self_attested == false" required> Admin Only
             </label>
           </div>
         </div>
-        <!-- TODO: Need to figure out why uncommenting this blows out all the data from the form -->
+        <hr>
 
-        <div class='form-group'>
-          <span for="qle_kind_edit_form_action_kind" class="col-sm-2 control-label">Questions </span>
-          <button (click)="addQuestion()" class='btn btn-primary'>
-            Add a new question for this QLE
-          </button>
-          <div *ngIf="showQuestions()">
-            <qle-question-form
-              *ngFor="let question of questions(); let i = index"
-              [questionFormGroup]="question"
-              [questionIndex]="i"
-              [questionComponentParent]="this"
-              >
-            </qle-question-form>
+        <div class='row'>
+          <div class='col-md-9'>
+            <strong>Questions:</strong>
+            <br>
+            <button (click)="addQuestion()" class='btn btn-primary'>
+              Create a New Question
+            </button>
+            <div *ngIf="showQuestions()">
+              <qle-question-form
+                *ngFor="let question of questions(); let i = index"
+                [questionFormGroup]="question"
+                [questionIndex]="i"
+                [questionComponentParent]="this">
+              </qle-question-form>
+            </div>
           </div>
-        </div >
+        </div>
 
-        <div class='form-group'>
-          <span for="qle_kind_edit_form_effective_on_kinds" class="col-sm-2 control-label">Effective on Options</span>
-          <div formArrayName="effective_on_kinds" *ngFor="let option of getOptions(); let i = index">
-            <span *ngIf='i != 0' class="col-sm-2 control-label"></span>           
-            <label class='control-label'>
-              <input type="checkbox" [formControlName]='i' 
-              [checked]="(qleKindToEdit.effective_on_kinds.includes(option.name))"
-              value= option> {{option.name}}
-            </label>
+        <div class='row'>
+          <div class='col-md-4'>
+            <strong>Effective on Options:</strong>
+            <div formArrayName="effective_on_kinds" *ngFor="let option of getOptions(); let i = index">
+              <label class='control-label'>
+                <input type="checkbox" [formControlName]='i' [checked]="(qleKindToEdit.effective_on_kinds.includes(option.name))" value={{option}} > {{option.name}}
+              </label>
+            </div>
+          </div>
+          <div class='col-md-4'>
+            <strong>Pre-event Sep/Qle Eligibility up to:</strong>
+            <br>
+            <input type='number'formControlName="pre_event_sep_in_days" id='qle_kind_edit_form_pre_event_sep_eligibility' value="{{qleKindToEdit.pre_event_sep_in_days}}"/>
+            <br>
+            <strong>days post event</strong>
+          </div>
+          <div class="col-md-4">
+            <strong>Post-event Sep/Qle Eligibility up to:</strong>
+            <br>
+            <input type='number'formControlName="post_event_sep_in_days" id='qle_kind_edit_form_post_event_sep_eligibility' value="{{qleKindToEdit.post_event_sep_in_days}}"/>
+            <br>
+            <strong>days prior to event</strong>
           </div>
         </div>
-        <div class="form-group">
-          <span for="qle_kind_edit_form_pre_event_sep_in_days" class="col-sm-2 control-label">Pre-event Sep/Qle Eligibility</span>
-          <div class='col-md-5'>
-            up to
-            <input type='number'formControlName="pre_event_sep_in_days" id='qle_kind_edit_form_pre_event_sep_eligibility'
-            value="{{qleKindToEdit.pre_event_sep_in_days}}" required/>
-            days post event
-          </div>
-        </div>
-        <div class="form-group">
-          <span for="qle_kind_edit_form_post_event_sep_in_days" class="col-sm-2 control-label">Post-event Sep/Qle Eligibility</span>
-          <div class='col-md-5'>
-            up to
-            <input type='number'formControlName="post_event_sep_in_days" id='qle_kind_edit_form_post_event_sep_eligibility' 
-            value="{{qleKindToEdit.post_event_sep_in_days}}" required/>
-            days prior to event
-          </div>
-        </div>
-        <div class="form-group">
-          <span for="qle_kind_edit_form_start_on" class="col-sm-2 control-label">Sep/Qle Available in system from</span>
-          <div class='col-md-5'>
-              <input type='text' formControlName="start_on" id='qle_kind_edit_form_start_on'  value="{{qleKindToEdit.start_on}}"mask="M0/d0/0000" [dropSpecialCharacters]="false" [validation]="true" value="{{stringifiedStartOn}}" required> <br>
-          </div>
-        </div>
-        <div class="form-group">
-          <span for="qle_kind_edit_form_end_on" class="col-sm-2 control-label">Sep/Qle Available in system until</span>
-          <div class='col-md-5'>
-            <input type='text' formControlName="end_on" id='qle_kind_edit_form_end_on' value="{{qleKindToEdit.end_on}}" mask="M0/d0/0000" [dropSpecialCharacters]="false" [validation]="true" value="{{stringifiedEndOn}}" required> <br>
-          </div>
-        </div>
+        <hr>
+
         <div class="form-group col-md-4 mb-2{{errorClassFor(editFormGroup.get('title'))}}">
           <button class="btn btn-primary" (click)="submitEdit()">Update QLE Kind</button>
         </div>
