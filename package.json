@@ -70,7 +70,7 @@
     "webpack-dev-server": "^3.4.1"
   },
   "scripts": {
-    "angular-docs": "compodoc -p app/javascript/incremental_angular/tsconfig.app.json -d angular_documentation",
+    "angular-docs": "compodoc -p app/javascript/incremental_angular/tsconfig.app.json -d angular_documentation --unitTestCoverage angular_coverage/coverage-summary.json",
     "test": "jest",
     "test-watch": "jest --watch"
   },

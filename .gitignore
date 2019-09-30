@@ -94,5 +94,6 @@ yarn-debug.log*
 # Ignore YARD generated doc
 doc
 angular_documentation
+angular_coverage
 rubocop
 coverage
