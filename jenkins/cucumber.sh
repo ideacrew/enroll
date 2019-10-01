@@ -39,7 +39,7 @@ else
   fi
 fi
 
-if [ -f 'tmp/cucumber3.summary' ]; then
+if [ -f 'cucumber3.summary' ]; then
   cucumber_results=$(tail -3 cucumber3.summary | head -1 | sed -e 's/.* (\(.*\) failed.*/\1/')
 
   if [ $cucumber_results -ne 0 ]; then
