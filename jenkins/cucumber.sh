@@ -40,9 +40,11 @@ else
 fi
 
 if [ -f 'cucumber3.summary' ]; then
+  echo "We ran at least 3 times, checking for error output"
   cucumber_results=$(tail -3 cucumber3.summary | head -1 | sed -e 's/.* (\(.*\) failed.*/\1/')
+  echo $cucumber_results
 
-  if [ $cucumber_results -ne 0 ]; then
+  if [ $cucumber_results -ne "0" ]; then
     failure_count=$(($cucumber_results + 0))
     if  [[ $failure_count -gt 126 ]]; then
       exit_code=126
