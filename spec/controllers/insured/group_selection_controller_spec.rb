@@ -86,9 +86,15 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
                         person.employee_roles.first.hired_on =  census_employee.hired_on
                         person.employee_roles.first.save
                         person.save}
+    let(:sbc_document) { FactoryBot.build(:document,subject: "SBC",identifier: "urn:openhbx#123") }
+    let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile, title: "AAA", sbc_document: sbc_document) }
+    let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment,
+                                              family: family,
+                                              household: family.active_household,
+                                              sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
+                                              product: product)
+                                            }
 
-    let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household,
-                            sponsored_benefit_package_id: initial_application.benefit_packages.first.id) }
     let(:hbx_enrollments) {double(:enrolled => [hbx_enrollment], :where => collectiondouble)}
     let!(:collectiondouble) { double(where: double(order_by: [hbx_enrollment]))}
     let!(:hbx_profile) {FactoryBot.create(:hbx_profile)}
