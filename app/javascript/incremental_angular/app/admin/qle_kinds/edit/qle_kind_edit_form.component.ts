@@ -29,20 +29,9 @@ export class QleKindEditFormComponent {
     {name: 'First of Next Month', code: 'first_of_next_month'},
     {name: 'First of Month', code: 'first_of_month'},
     {name: 'First Fixed of Next Month', code: 'fixed_first_of_next_month'},
-    {name: 'Next 15 of the month', selected: false, id: 5},
-    {name: 'Exact Date', code: 'exact_date', selected: false, id: 6},
-    {name: 'Date options available', selected: false, id: 7}
-  ]
-
-  public actionKindList = [
-    {name:"Not Applicable", code: "not_applicable"},
-    {name:"Drop Member", code: "drop_member" }, 
-    {name:"Adminstrative", code: "administrative" }, 
-    {name:"Add Member", code: "add_member"},
-    {name:"Add Benefit", code: "add_benefit" }, 
-    {name:"Change Benefit", code: "change_benefit" }, 
-    {name:"Transition Member", code: "transition_member"},
-    {name:"Terminate Benefit", code: "terminate_benefit"}
+    {name: 'Next 15 of the month', code: ''}, // TBD
+    {name: 'Exact Date', code: 'exact_date'},
+    {name: 'Date options available', code: ''} // TBD
   ]
   
   public reasonList = [

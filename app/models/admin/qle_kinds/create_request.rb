@@ -20,7 +20,6 @@ module Admin
       option :effective_on_kinds, Dry::Types['coercible.array']
       option :post_event_sep_in_days, Dry::Types['coercible.string']
       option :pre_event_sep_in_days, Dry::Types['coercible.string']
-      option :action_kind, Dry::Types['coercible.string'], optional: true
       option :tool_tip, Dry::Types['coercible.string'], optional: true
       option :reason, Dry::Types['coercible.string'], optional: true
       option :is_active, Dry::Types['params.bool'], optional: true

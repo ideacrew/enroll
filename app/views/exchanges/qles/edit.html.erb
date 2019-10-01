@@ -4,6 +4,7 @@
   data-qle-kind-to-edit="<%= @qle.to_json %>"
   data-qle-kind-to-edit-start-on-stringified="<%= @qle.start_on.to_s || '' %>"
   data-qle-kind-to-edit-end-on-stringified="<%= @qle.end_on.to_s || '' %>"
+  data-qle-kind-to-edit-effective-on-kinds-to-modify="<% @qle.effective_on_kinds.to_json || [].to_json %>"
   data-qle-kind-edit-url="<%= exchanges_qle_path(@qle) %>"
   data-qle-kind-market-kinds="<%= QualifyingLifeEventKind::MARKET_KINDS.to_json %>">
 </admin-qle-kind-edit-form >
@@ -11,4 +12,5 @@
 <script type="text/javascript">
   var disableSelectric = true;
 </script>
+
 

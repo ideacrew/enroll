@@ -23,24 +23,13 @@ export class QleKindCreationFormComponent {
   public showQuestionMultipleChoiceForm : boolean = false;
 
   public effectiveOnOptionsArray =  [
-    { name: 'Date of Event',  selected: false, id: 1 },
-    { name: 'First of Next Month',  selected: false, id: 2 },
-    { name: 'First of Month',  selected: false, id: 3 },
-    { name: 'First Fixed of Next Month',  selected: false, id: 4 },
-    { name: 'Next 15 of the month',  selected: false, id: 5 },
-    { name: 'Exact Date',  selected: false, id: 6 },
-    { name: 'Date options available',  selected: false, id: 7 }
-  ]
-
-  public actionKindList = [
-    {name:"Not Applicable", code: "not_applicable"},
-    {name:"Drop Member", code: "drop_member" }, 
-    {name:"Adminstrative", code: "administrative" }, 
-    {name:"Add Member", code: "add_member"},
-    {name:"Add Benefit", code: "add_benefit" }, 
-    {name:"Change Benefit", code:"change_benefit" }, 
-    {name:"Transition Member", code: "transition_member" },
-    {name:"Terminate Benefit", code: "terminate_benefit" }
+    {name: 'Date of Event', code: 'date_of_event'},
+    {name: 'First of Next Month', code: 'first_of_next_month'},
+    {name: 'First of Month', code: 'first_of_month'},
+    {name: 'First Fixed of Next Month', code: 'fixed_first_of_next_month'},
+    {name: 'Next 15 of the month', code: ''}, // TBD
+    {name: 'Exact Date', code: 'exact_date'},
+    {name: 'Date options available', code: ''} // TBD
   ]
   
   public reasonList = [
@@ -94,13 +83,8 @@ export class QleKindCreationFormComponent {
     });
   }
 
-  public printit() {
-    console.log("hit")
-  }
-
   public getOptions(){
-    const options = this.effectiveOnOptionsArray
-    return options
+    return this.effectiveOnOptionsArray
   }
 
   public questionControls() : FormGroup[] {
@@ -144,60 +128,11 @@ export class QleKindCreationFormComponent {
     return this.questionArray.length > 0;
   }
 
-  //taking array of booleans and mapping them to the effectiveOnOptionsArray of objects 
-  updateEffectiveOnKinds() : void{
-   var updatedArray = this.creationFormGroup.value.effective_on_kinds.map((o:boolean, i:number) => {
-      if (o==true){
-        return this.effectiveOnOptionsArray[i].name
-      }
-    })
-    this.creationFormGroup.value.effective_on_kinds = updatedArray
-  }
-
-  //traverse dom for selected actionKind
-  updateActionKind(): void {
-    var actionKinds = document.getElementById("qle_kind_creation_form_action_kind");
-    if(actionKinds != null){
-      Array.from(actionKinds.querySelectorAll('option')).forEach((kind) => {
-        if(kind.selected == true){
-          var actionKind = kind.value
-          this.creationFormGroup.value.action_kind = actionKind
-        }    
-      });
-    } 
-  }
-
-  //traverse dom for selected reason
-  updateReason() : void {
-    var reasons = document.getElementById("qle_kind_creation_form_reason");
-    if(reasons != null){
-      Array.from(reasons.querySelectorAll('option')).forEach((reason) => {
-        if(reason.selected == true){
-          var Selectedreason = reason.value
-          this.creationFormGroup.value.reason = Selectedreason
-        }    
-      });
-    }
-  }
-
-  updateReasonAndActionKind() : void {
-    this.updateActionKind()
-    this.updateReason()
-  }
-
-  formatOuput() : void {
-    //this formats the outgoing EffectiveOnKinds to return the effective on kind name if the boolean is true
-    this.updateEffectiveOnKinds()
-    //this is a hack to read the DOM for the selected option because currently the selectric library is overriding our select tags
-    this.updateReasonAndActionKind()
-  }
-
   submitCreation() {
     var form = this;
     var errorMapper = new ErrorMapper();
     if (this.creationFormGroup != null) {
       if (this.creationUri != null) {  
-        this.formatOuput()
         console.log(this.creationFormGroup.value);
         var invocation = this.CreationService.submitCreate(this.creationUri, <QleKindCreationRequest>this.creationFormGroup.value);
         invocation.subscribe(
