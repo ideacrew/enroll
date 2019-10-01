@@ -1,12 +1,12 @@
 <form [formGroup]="creationFormGroup" class='form form-horizontal container-fluid'>
   <h1>
-    Create a Qualifying Life Event Kind
+    Create a QLE
   </h1>
   <field-errors [errorControl]="creationFormGroup" errorHeader="Your QLE Kind could not be Created for the following reasons:">   
   </field-errors>
   <div class='row'>
     <div class='col-md-6 capitalize-text'>
-      <strong>Market Kind:</strong>&nbsp;&nbsp;
+      <strong>Market:</strong>&nbsp;&nbsp;
       <span id="qle_kind_creation_form_market_kind" *ngFor="let marketKind of marketKindsList">
       <input type='radio' class=''formControlName="market_kind" id='qle_kind_creation_form_market_kind' value='{{marketKind}}' required> {{marketKind}}
       &nbsp;&nbsp;
