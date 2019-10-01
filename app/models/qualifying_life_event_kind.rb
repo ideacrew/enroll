@@ -25,6 +25,8 @@ class QualifyingLifeEventKind
   # first_of_next_month: not subject to 15th of month effective date rule
   EffectiveOnKinds = %w(date_of_event first_of_month first_of_next_month fixed_first_of_next_month exact_date)
 
+  EffectiveOnKindsWithCode = QualifyingLifeEventKind::EffectiveOnKinds.dup.map { |effective_on_kind| { name: effective_on_kind.humanize.titleize, code: effective_on_kind } }
+
   REASON_KINDS = [
     "lost_access_to_mec",
     "adoption",

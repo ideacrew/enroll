@@ -1,7 +1,7 @@
 <div [formGroup]="responseFormGroup">
   <div class="from-group-response">
     <span class="col-sm-2 control-label"><strong>Response</strong></span>
-    <div class="col-sm-10">
+    <div class="col-md-12">
       <input
         id="qle_kind_response_response_{{responseIndex}}_content"
         type="text"
@@ -11,11 +11,12 @@
       <div class="btn-group" role="group" aria-label="Response Actions">
         <button
           (click)="removeResponse(responseIndex)"
-          class='btn btn-secondary btn-primary margin-right-10px'>
+          class='btn btn-default margin-right-10px'>
           Remove Response
         </button>
+        <strong>Action to Take:</strong>
+        &nbsp;
         <label for="qle_kind_response_response_{{responseIndex}}_action_to_take">
-          Action to Take
           <select class='form-control' id="qle_kind_response_response_{{responseIndex}}_action_to_take" formControlName="action_to_take">
             <option value='accepted'>Accepted</option>
             <option value='declined'>Declined</option>
