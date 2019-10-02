@@ -94,7 +94,8 @@ class Insured::FamiliesController < FamiliesController
     end
     case @action_to_take
     when 'accepted'
-      # TODO: Review if this active feature is needed
+      # TODO: Review if this activating feature is needed since we were considering getting rid
+      # of the "active" concept
       set_qle_to_active_if_accepted_response(@qle_kind, end_user_selected_response_content)
       flash[:notice] = qle_kind_eligible_success_message
       return redirect_to(insured_family_members_path(

@@ -20,10 +20,10 @@ class CustomQleDateValidator
 
   def check_qle_date
     if @qle.present?
-      if @qle.post_event_sep_in_days.present?
+      if @qle.post_event_sep_in_days > 0
         @start_date = @today - @qle.post_event_sep_in_days.try(:days)
       end
-      if @qle.pre_event_sep_in_days.present?
+      if @qle.pre_event_sep_in_days > 0
         @end_date = @today + @qle.pre_event_sep_in_days.try(:days)
       end
       @effective_on_options = @qle.employee_gaining_medicare(@qle_date) if @qle.is_dependent_loss_of_coverage?
