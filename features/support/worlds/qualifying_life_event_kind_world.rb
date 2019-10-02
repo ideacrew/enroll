@@ -271,7 +271,7 @@ end
 
 Then(/^.+ should see the QLE Kind Wizard$/) do
   expect(page.current_path).to eq(manage_exchanges_qles_path)
-  expect(page).to have_content("Manage Qualifying Life Events")
+  expect(page).to have_content("Manage QLEs")
 end
 
 And(/^.+user visits the new Qualifying Life Event Kind page$/) do
