@@ -1,3 +1,6 @@
+# This code was exctracted from insured/families_controller.rb#check_qle_date,
+# a method which is in itself called from 
+# from qle.js.erb
 class CustomQleDateValidator
   def initialize(qle_id, qle_date, qle_reason_val_string, person_id)
     @qle = QualifyingLifeEventKind.where(id: qle_id).first
@@ -7,33 +10,33 @@ class CustomQleDateValidator
     @today = TimeKeeper.date_of_record
     @start_date = @today - 30.days
     @end_date = @today + 30.days
+    check_qle_date
+    trigger_notice_observers
   end
 
-  def qualifying_qle_date?
-    check_qle_date
+  def qle_date_qualifies?
     @qualified_date
   end
 
-  # This is based of the check_qle_date method in the families controller which is called in the families controller
-  # from a javascript file called qle.js.erb
   def check_qle_date
     if @qle.present?
-      @start_date = @today - @qle.post_event_sep_in_days.try(:days)
-      @end_date = @today + @qle.pre_event_sep_in_days.try(:days)
+      if @qle.post_event_sep_in_days.present?
+        @start_date = @today - @qle.post_event_sep_in_days.try(:days)
+      end
+      if @qle.pre_event_sep_in_days.present?
+        @end_date = @today + @qle.pre_event_sep_in_days.try(:days)
+      end
       @effective_on_options = @qle.employee_gaining_medicare(@qle_date) if @qle.is_dependent_loss_of_coverage?
       @qle_reason_val = @qle_reason_val if @qle_reason_val.present?
       @qle_end_on = @qle_date + @qle.post_event_sep_in_days.try(:days)
     end
-
+    # The return of this boolean is the primary determinent for enrollment eligibility
+    # By default, the eligibility will be determined by whether or not the user's QLE date
+    # was 30 days before or on today's date, or 30 days 
     @qualified_date = (@start_date <= @qle_date && @qle_date <= @end_date) ? true : false
-    if @person.has_active_employee_role? && !(@qle.present? && @qle.individual?)
-      @future_qualified_date = (@qle_date > @today) ? true : false
-    end
+  end
 
-    if @person.resident_role?
-      @resident_role_id = @person.resident_role.id
-    end
-
+  def trigger_notice_observers
     if ((@qle.present? && @qle.shop?) && !@qualified_date && @qle.present?)
       benefit_application = @person.active_employee_roles.first.employer_profile.active_benefit_application
       reporting_deadline = @qle_date > @today ? @today : @qle_date + 30.days

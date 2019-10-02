@@ -2,6 +2,7 @@ Feature: Purchasing through SEP
   Scenario: Admin purchases the an insured user through sep
     Given Individual has not signed up as an HBX user
     And qualifying life event kind Had a baby present for individual market
+    And individual qualifying life event kind Had a baby has start_on and end_on date within current date range
     And all qualifying life event kinds are visible to customer
     When Individual visits the Insured portal during open enrollment
     Then Individual creates HBX account
@@ -73,6 +74,7 @@ Feature: Purchasing through SEP
     Given Individual has not signed up as an HBX user
     And qualifying life event kind Had a baby present for individual market
     And qualifying life event kind Had a baby has custom qle question and accepted response present
+    And individual qualifying life event kind Had a baby has start_on and end_on date within current date range
     And all qualifying life event kinds are visible to customer
     When Individual visits the Insured portal during open enrollment
     Then Individual creates HBX account
@@ -112,6 +114,7 @@ Feature: Purchasing through SEP
     And qualifying life event kind Had a baby present for individual market
     And qualifying life event kind Had a baby has custom qle question and declined response present
     And all qualifying life event kinds are visible to customer
+    And individual qualifying life event kind Had a baby has start_on and end_on date within current date range
     When Individual visits the Insured portal during open enrollment
     Then Individual creates HBX account
     Then I should see a successful sign up message
@@ -149,6 +152,7 @@ Feature: Purchasing through SEP
     Given Individual has not signed up as an HBX user
     And qualifying life event kind Had a baby present for individual market
     And qualifying life event kind Had a baby has two custom qle questions with a to_question_2 response present
+    And individual qualifying life event kind Had a baby has start_on and end_on date within current date range
     And all qualifying life event kinds are visible to customer
     When Individual visits the Insured portal during open enrollment
     Then Individual creates HBX account
@@ -189,6 +193,7 @@ Feature: Purchasing through SEP
     Given Individual has not signed up as an HBX user
     And qualifying life event kind Had a baby present for individual market
     And qualifying life event kind Had a baby has custom qle question and call_center response present
+    And individual qualifying life event kind Had a baby has start_on and end_on date within current date range
     And all qualifying life event kinds are visible to customer
     When Individual visits the Insured portal during open enrollment
     Then Individual creates HBX account
