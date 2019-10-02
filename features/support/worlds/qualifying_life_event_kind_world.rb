@@ -2,7 +2,7 @@ module QualifyingLifeEventKindWorld
   def qualifying_life_event_kind(qle_kind_title = nil, market_kind = 'shop')
     qle_kind = QualifyingLifeEventKind.where(title: qle_kind_title)
     return qle_kind.first if qle_kind.first.present?
-    @qle_kind ||= FactoryBot.create(
+    FactoryBot.create(
       :qualifying_life_event_kind,
       title: qle_kind_title.present? ? qle_kind_title : 'Married',
       market_kind: market_kind,
@@ -209,6 +209,16 @@ And(/^the QLE Kind (.*?) should have the proper attributes the user selected in 
   
 end
 
+And(/^(.*?) qualifying life event kind (.*?) has start_on and end_on date not within current date range$/) do |market_kind, qle_kind_title|
+  qle_kind = qualifying_life_event_kind(qle_kind_title, market_kind)
+  qle_kind.update_attributes!(start_on: TimeKeeper.date_of_record + 1.year, end_on: TimeKeeper.date_of_record + 2.years)
+end
+
+And(/^(.*?) qualifying life event kind (.*?) has start_on and end_on date within current date range$/) do |market_kind, qle_kind_title|
+  qle_kind = qualifying_life_event_kind(qle_kind_title, market_kind)
+  qle_kind.update_attributes!(start_on: TimeKeeper.date_of_record, end_on: TimeKeeper.date_of_record + 2.years)
+end
+
 Given(/^qualifying life event kind (.*?) present for (.*?) market$/) do |qle_kind_title, market_kind|
   qualifying_life_event_kind(qle_kind_title, market_kind)
 end
@@ -407,4 +417,12 @@ end
 
 And(/I see the home page and a message informing me that I'm unable to enroll$/) do
   expect(page.current_path).to eq(home_insured_families_path)
+end
+
+Then(/I should not see a link to enroll with the (.*?) qualifying life event kind$/) do |qle_kind_title|
+  expect(page).to_not have_content(qle_kind_title)
+end
+
+Then(/I should see a link to enroll with the (.*?) qualifying life event kind$/) do |qle_kind_title|
+  expect(page).to have_content(qle_kind_title)
 end

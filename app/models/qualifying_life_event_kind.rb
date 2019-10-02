@@ -140,6 +140,9 @@ class QualifyingLifeEventKind
   scope :not_set_for_deactivation, ->{ where(end_on: nil).sort_by_title_alphabetical }
   scope :sort_by_title_alphabetical, ->{ order('title ASC') }
   scope :by_market_kind, ->(market_kind){ where(market_kind: market_kind) }
+  scope :within_current_start_on_end_on_dates, -> {
+    where(start_on: {"$lte" => TimeKeeper.date_of_record}, end_on: { "$gte" => TimeKeeper.date_of_record})
+  }
   # Active vs visible_to_customer:
   # In the current UI scopes in the QLEKind model,
   # the scopes appearing to the end user have
@@ -246,43 +249,43 @@ class QualifyingLifeEventKind
 
   class << self
     def shop_market_events
-      by_market_kind('shop').and(:is_self_attested.ne => false).is_visible_to_customer.to_a
+      by_market_kind('shop').and(:is_self_attested.ne => false).is_visible_to_customer.within_current_start_on_end_on_dates.to_a
     end
 
     def shop_market_events_admin
-      by_market_kind('shop').to_a
+      by_market_kind('shop').is_visible_to_customer.within_current_start_on_end_on_dates.to_a
     end
 
     def shop_market_non_self_attested_events
-      by_market_kind('shop').and(:is_self_attested.ne => true).is_visible_to_customer.to_a
+      by_market_kind('shop').and(:is_self_attested.ne => true).is_visible_to_customer.within_current_start_on_end_on_dates.to_a
     end
 
     def fehb_market_events
-      by_market_kind('fehb').and(:is_self_attested.ne => false).is_visible_to_customer.to_a
+      by_market_kind('fehb').and(:is_self_attested.ne => false).is_visible_to_customer.within_current_start_on_end_on_dates.to_a
     end
 
     def fehb_market_events_admin
-      by_market_kind('fehb').is_visible_to_customer.to_a
+      by_market_kind('fehb').is_visible_to_customer.within_current_start_on_end_on_dates.to_a
     end
 
     def fehb_market_non_self_attested_events
-      by_market_kind('fehb').and(:is_self_attested.ne => true).is_visible_to_customer.to_a
+      by_market_kind('fehb').and(:is_self_attested.ne => true).is_visible_to_customer.within_current_start_on_end_on_dates.to_a
     end
 
     def individual_market_events
-      by_market_kind('individual').and(:is_self_attested.ne => false).is_visible_to_customer.to_a
+      by_market_kind('individual').and(:is_self_attested.ne => false).is_visible_to_customer.within_current_start_on_end_on_dates.to_a
     end
 
     def individual_market_events_admin
-      by_market_kind('individual').is_visible_to_customer.to_a
+      by_market_kind('individual').is_visible_to_customer.within_current_start_on_end_on_dates.to_a
     end
 
     def individual_market_non_self_attested_events
-      by_market_kind('individual').and(:is_self_attested.ne => true).is_visible_to_customer.to_a
+      by_market_kind('individual').and(:is_self_attested.ne => true).is_visible_to_customer.within_current_start_on_end_on_dates.to_a
     end
 
     def individual_market_events_without_transition_member_action
-      by_market_kind('individual').is_visible_to_customer.to_a.reject {|qle| qle.action_kind == "transition_member"}
+      by_market_kind('individual').is_visible_to_customer.within_current_start_on_end_on_dates.to_a.reject {|qle| qle.action_kind == "transition_member"}
     end
 
     def qualifying_life_events_for(role, hbx_staff = false)
