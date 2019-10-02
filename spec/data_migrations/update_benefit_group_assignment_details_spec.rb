@@ -14,8 +14,11 @@ describe ChangeEnrollmentDetails do
 
   describe "changing enrollment attributes" do
 
-    let(:start_date) { TimeKeeper.date_of_record - 1.month}
-    let(:end_date) { TimeKeeper.date_of_record - 3.days}
+    let(:start_date) { TimeKeeper.date_of_record}
+    let(:end_date) { TimeKeeper.date_of_record - 5.days}
+    let(:current_effective_date)  { TimeKeeper.date_of_record }
+    let(:start_on)  { current_effective_date.prev_month }
+    let(:effective_period)  { start_on..start_on.next_year.prev_day }
     let!(:site) { create(:benefit_sponsors_site,:with_benefit_market, :with_benefit_market_catalog_and_product_packages, :as_hbx_profile, :cca) }
     let!(:org) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let(:employer_profile) { org.employer_profile }
@@ -33,7 +36,7 @@ describe ChangeEnrollmentDetails do
     let(:census_employee) { FactoryGirl.create(:benefit_sponsors_census_employee, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship) }
 
     before(:each) do
-      benefit_application.update_attributes(effective_period: (start_date..end_date))
+      benefit_application.update_attributes(effective_period: effective_period)
       allow(ENV).to receive(:[]).with("ce_id").and_return(census_employee.id.to_s)
       allow(ENV).to receive(:[]).with("bga_id").and_return(benefit_group_assignment.id)
       allow(ENV).to receive(:[]).with("new_state").and_return "coverage_void"
