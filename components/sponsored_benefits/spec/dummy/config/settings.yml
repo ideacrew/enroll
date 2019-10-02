@@ -1,5 +1,5 @@
 site:
-  short_name: "DC Health Link"
+  short_name: "PID"
   byline: "DC's Online Health Insurance Marketplace"
   long_name: ""
   copyright_period_start: "2013"
@@ -35,8 +35,8 @@ plan_option_descriptions:
     single_plan: "For Dental coverage, you will choose one dental plan from one carrier as the option that all of your employees can enroll in."
 
 contact_center:
-  name: "DC Health Link's Customer Care Center"
-  alt_name: "DC Health Link Customer Service"
+  name: "PID's Customer Care Center"
+  alt_name: "PID Customer Service"
   phone_number: "1-855-532-5465"
   tty_number: "1-855-532-5465"
   tty: "771"

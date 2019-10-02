@@ -1,9 +1,0 @@
-<h3><%= l10n("employers") %></h3>
-<div class="n-radio-group">
-  <% @person.active_employee_roles.each do |employee_role| %>
-    <div class="n-radio-row">
-      <span class="n-radio"><%= employee_role.census_employee.employer_profile.legal_name.capitalize %></span>
-    </div>
-  <% end %>
-</div>
-<hr />

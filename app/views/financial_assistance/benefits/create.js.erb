@@ -1,3 +1,0 @@
-<% selector_id = @benefit_kind == "is_eligible" ? "eligible-benefit-kinds" : "enrolled-benefit-kinds" %>
-
-<%= render partial: 'replace', locals: { id: "##{selector_id} .benefits-list .#{@benefit_insurance_kind}" } %>

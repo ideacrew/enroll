@@ -1,7 +1,0 @@
-$('#plan_shoppings_show_form').hide();
-$('#message_form').show();
-$('#message_form').html("<%= escape_javascript(render "new_message_form") %>");
-$(".interaction-control-click-broker-message-cancel").click(function(){
-	$('#plan_shoppings_show_form').show();
-	$('#message_form').hide();
-});

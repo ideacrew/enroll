@@ -16,7 +16,7 @@ RSpec.describe UserMailer do
     end
 
     it "should have subject of #{Settings.site.short_name}" do
-      expect(email.subject).to match(/DC Health Link/)
+      expect(email.subject).to match(/PID/)
     end
 
     it "should have one attachment" do 
@@ -36,7 +36,7 @@ RSpec.describe UserMailer do
     end
 
     it "should have subject of #{Settings.site.short_name}" do
-      expect(email.subject).to match(/Invitation to create your Broker Staff account on DC Health Link/)
+      expect(email.subject).to match(/Invitation to create your Broker Staff account on PID/)
     end
   end
 
@@ -55,7 +55,7 @@ RSpec.describe UserMailer do
       end
 
       it 'should have subject' do
-        expect(email.subject).to match(/Invitation from your Employer to Sign up for Health Insurance at DC Health Link/)
+        expect(email.subject).to match(/Invitation from your Employer to Sign up for Health Insurance at PID/)
       end
 
       it 'should have proper content' do
@@ -71,7 +71,7 @@ RSpec.describe UserMailer do
       end
 
       it 'should have subject' do
-        expect(email.subject).to match(/Invitation from your Employer to Sign up for Health Insurance at DC Health Link/)
+        expect(email.subject).to match(/Invitation from your Employer to Sign up for Health Insurance at PID/)
       end
 
       it 'should have proper content' do

@@ -1,7 +1,7 @@
 site:
-  short_name: "DC Health Link"
-  byline: "DC's Online Health Insurance Marketplace"
-  long_name: ""
+  short_name: "PA Insurance"
+  byline: "PA's Online Health Insurance Marketplace"
+  long_name: "Pannnsylvania's Insurance Department"
   copyright_period_start: "2013"
   header_message: "Welcome to the District's Health Insurance Marketplace"
   logo_file_name: "logo.png"
@@ -38,14 +38,14 @@ plan_option_descriptions:
     single_plan: "For Dental coverage, you will choose one dental plan from one carrier as the option that all of your employees can enroll in."
 
 contact_center:
-  name: "DC Health Link's Customer Care Center"
-  alt_name: "DC Health Link Customer Service"
+  name: "PID's Customer Care Center"
+  alt_name: "PID Customer Service"
   phone_number: "1-855-532-5465"
   short_number: "(855) 532-5465"
   tty_number: "1-855-532-5465"
   tty: "771"
   alt_phone_number: "1-855-532-LINK"
-  email_address: "info@dchealthlink.com"
+  email_address: "info@pa.gov"
   mailing_address: "PO Box 97022"
   city_state_zip: "Washington, DC 20090"
   po_box: "PO Box 97022"
