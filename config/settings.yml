@@ -295,6 +295,7 @@ aca:
 
     transmit_scheduled_employers: true
     employer_transmission_day_of_month: 16
+    transmit_carrier_drop_events: true
 
     mid_month_benefit_application_terminations:
       voluntary: false

@@ -9,6 +9,7 @@ module Config::AcaModelConcern
     delegate :aca_shop_market_employer_contribution_percent_minimum, to: :class
     delegate :aca_shop_market_new_employee_paper_application_is_enabled?, to: :class
     delegate :aca_shop_market_transmit_scheduled_employers, to: :class
+    delegate :aca_shop_market_transmit_employer_carrier_drop_events, to: :class
     delegate :aca_shop_market_employer_transmission_day_of_month, to: :class
     delegate :aca_shop_market_census_employees_template_file, to: :class
     delegate :individual_market_is_enabled?, to: :class
@@ -69,6 +70,10 @@ module Config::AcaModelConcern
 
     def aca_shop_market_transmit_scheduled_employers
       @@aca_shop_market_transmit_scheduled_employers ||= Settings.aca.shop_market.transmit_scheduled_employers
+    end
+
+    def aca_shop_market_transmit_employer_carrier_drop_events
+      @@aca_shop_market_transmit_scheduled_employers ||= Settings.aca.shop_market.transmit_carrier_drop_events
     end
 
     def aca_shop_market_employer_transmission_day_of_month
