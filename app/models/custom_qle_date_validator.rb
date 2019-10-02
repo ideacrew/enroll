@@ -32,7 +32,9 @@ class CustomQleDateValidator
     end
     # The return of this boolean is the primary determinent for enrollment eligibility
     # By default, the eligibility will be determined by whether or not the user's QLE date
-    # was 30 days before or on today's date, or 30 days 
+    # was 30 days before or on today's date, or 30 days. Otherwise, the eligibility will take into consideration the
+    # pre and post event sep in days, setting the start date for the QLE as being Today - the QLE's post event sep in days and
+    # end date being Today + the QLE's pre event sep in days
     @qualified_date = (@start_date <= @qle_date && @qle_date <= @end_date) ? true : false
   end
 
