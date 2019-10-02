@@ -223,3 +223,40 @@ Feature: Purchasing through SEP
     And I fill out the call_center response for Had a baby qualifying life event kind
     And I see the call center page and a phone number to call so I can be approved for enrollment
 
+  Scenario: User cannot see QLE Kind if current date not between or equal to start on and end on of event
+    Given Individual has not signed up as an HBX user
+    And qualifying life event kind Had a baby present for individual market
+    And individual qualifying life event kind Had a baby has start_on and end_on date not within current date range
+    And qualifying life event kind Natural Disaster present for individual market
+    And individual qualifying life event kind Natural Disaster has start_on and end_on date within current date range
+    And all qualifying life event kinds are visible to customer
+    When Individual visits the Insured portal during open enrollment
+    Then Individual creates HBX account
+    Then I should see a successful sign up message
+    And user should see your information page
+    When user goes to register as an individual
+    When user clicks on continue button
+    Then user should see heading labeled personal information
+    Then Individual should click on Individual market for plan shopping #TODO re-write this step
+    Then Individual should see a form to enter personal information
+    Then Individual sees previously saved address
+    Then Individual agrees to the privacy agreeement
+    Then Individual should see identity verification page and clicks on submit
+    Then Individual should see the dependents form
+    And Individual clicks on add member button
+    And Individual again clicks on add member button #TODO re-write this step
+    And I click on continue button on household info form
+    And I click on continue button on group selection page
+    And I select three plans to compare
+    And I should not see any plan which premium is 0
+    And I select a plan on plan shopping page
+    And I click on purchase button on confirmation page
+    Then Individual logs out
+    Given Hbx Admin exists
+    When Hbx Admin logs on to the Hbx Portal
+    And Admin clicks Families tab
+    Then the Admin is navigated to the Families screen
+    And I click on the name of a person of family list
+    And I should see the individual home page
+    Then I should not see a link to enroll with the Had a baby qualifying life event kind
+    And I should see a link to enroll with the Natural Disaster qualifying life event kind
