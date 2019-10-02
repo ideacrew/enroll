@@ -88,29 +88,31 @@ class Insured::FamiliesController < FamiliesController
     end
     @employee_role = @person.active_employee_roles.first
     @validator = CustomQleDateValidator.new(@qle_kind._id.to_s, @qle_date, @qle_reason_val_string, @person._id.to_s)
-    unless @validator.qualifying_qle_date?
-      redirect_to(action: "home", flash: { notice: qle_kind_ineligible_message }) and return
+    unless @validator.qle_date_qualifies?
+      flash[:notice] = qle_kind_ineligible_message
+      return redirect_to(action: "home")
     end
     case @action_to_take
     when 'accepted'
+      # TODO: Review if this active feature is needed
       set_qle_to_active_if_accepted_response(@qle_kind, end_user_selected_response_content)
       flash[:notice] = qle_kind_eligible_success_message
-      redirect_to(insured_family_members_path(
+      return redirect_to(insured_family_members_path(
         qle_id: @qle_kind.id,
         qle_date: @qle_date,
         qle_reason_choice: end_user_selected_response_content,
         effective_on_kind: @qle_kind.effective_on_kinds[0],
         effective_on_date: @qle_date,
         employee_role_id: @employee_role.present? ? @employee_role._id.to_s : ''
-      )) and return
+      ))
     when 'declined'
       flash[:notice] = qle_kind_ineligible_message
-      redirect_to(action: "home") and return
+      return redirect_to(action: "home")
     when 'to_question_2'
-      redirect_to(custom_qle_question_insured_family_path(only_display_question_two: true, qle_date: @qle_date)) and return
+      return redirect_to(custom_qle_question_insured_family_path(only_display_question_two: true, qle_date: @qle_date))
     when 'call_center'
       flash[:notice] = qle_kind_call_center_message
-      redirect_to(action: "home", flash: { notice: qle_kind_call_center_message }) and return
+      return redirect_to(action: "home")
     end
   end
 

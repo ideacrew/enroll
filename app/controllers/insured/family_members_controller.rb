@@ -39,9 +39,11 @@ class Insured::FamilyMembersController < ApplicationController
 
       @qle = QualifyingLifeEventKind.find(params[:qle_id])      
       @sep = @family.special_enrollment_periods.new(effective_on_kind: params[:effective_on_kind])
-      effective_on_date = Date.strptime(params[:effective_on_date], "%m/%d/%Y")
-      # For employee gaining medicare qle
-      @sep.selected_effective_on = effective_on_date if params[:effective_on_date].present?
+      if params[:effective_on_date].present?
+        effective_on_date = Date.strptime(params[:effective_on_date], "%m/%d/%Y")
+        # For employee gaining medicare qle
+        @sep.selected_effective_on = effective_on_date
+      end
       @sep.qualifying_life_event_kind = @qle
       @sep.qle_on = Date.strptime(params[:qle_date], "%m/%d/%Y")
       @sep.effective_on = effective_on_date if params[:effective_on_date].present?
