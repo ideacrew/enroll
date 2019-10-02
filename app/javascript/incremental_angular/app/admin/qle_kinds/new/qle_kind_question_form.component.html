@@ -1,4 +1,5 @@
-<div [formGroup]="questionFormGroup">
+<!-- questionIndex enforces number of questions to 2 -->
+<div [formGroup]="questionFormGroup" *ngIf="questionIndex < 2">
   <div class="from-group-question">
       <div class="col-sm-12">
       <span class="col-sm-2 control-label"> <strong>Question</strong></span>
