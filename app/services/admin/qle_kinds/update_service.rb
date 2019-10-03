@@ -101,7 +101,8 @@ module Admin
         if request_effective_on_kinds[4] == true || QualifyingLifeEventKind::EffectiveOnKinds.include?(request_effective_on_kinds[4])
           updated_effective_on_kinds << 'exact_date'
         end
-        return record_effective_on_kinds if record_effective_on_kinds.uniq.length == updated_effective_on_kinds.uniq.length
+        binding.pry
+        return record_effective_on_kinds if record_effective_on_kinds.uniq.sort == updated_effective_on_kinds.uniq.sort
         return updated_effective_on_kinds
       end
  

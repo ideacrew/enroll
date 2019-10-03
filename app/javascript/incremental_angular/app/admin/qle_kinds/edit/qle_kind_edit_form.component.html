@@ -95,7 +95,7 @@
             The previously selected checkboxes which load appear to lose their value when submitted. It doesn't go through properly.
             [checked]="existingEfectiveOnKinds.includes(option.code)"
             -->
-            <input type="checkbox" [formControlName]='i' class='effective_on_kind_radio' [checked]="existingEffectiveOnKinds.includes(option.code)" [value]="option.code" (click)="choose($event['target']['value'])"> {{option.name}}
+            <input type="checkbox" [formControlName]='i' class='effective_on_kind_radio' [checked]="existingEffectiveOnKinds.includes(option.code)" [value]="option.code"> {{option.name}}
           </label>
 
         </div>
