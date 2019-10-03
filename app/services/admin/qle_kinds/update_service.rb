@@ -69,6 +69,41 @@ module Admin
         )
         response.save!
       end
+
+      # Checkboxes can only pass a boolean value, so the array values
+      # from angular have to be mapped to the values for the
+      # effective_on_kinds array
+      # Checkboxes Angular Array is ordered as follows:
+      # public effectiveOnOptionsArray =  [
+      # {name: 'Date of Event', code: 'date_of_event'},
+      # {name: 'First of Next Month', code: 'first_of_next_month'},
+      # {name: 'First of Month', code: 'first_of_month'},
+      # {name: 'First Fixed of Next Month', code: 'fixed_first_of_next_month'},
+      # {name: 'Exact Date', code: 'exact_date'},
+      # ]
+      # TODO: Figure out how pass through string values with checkmarks
+      def transform_effective_on_kinds(record, request)
+        request_effective_on_kinds = request.effective_on_kinds
+        record_effective_on_kinds = record.effective_on_kinds
+        updated_effective_on_kinds = []
+        if request_effective_on_kinds[0] == true || QualifyingLifeEventKind::EffectiveOnKinds.include?(request_effective_on_kinds[0])
+          updated_effective_on_kinds << 'date_of_event'
+        end
+        if request_effective_on_kinds[1] == true || QualifyingLifeEventKind::EffectiveOnKinds.include?(request_effective_on_kinds[1])
+          updated_effective_on_kinds << 'first_of_next_month'
+        end
+        if request_effective_on_kinds[2] == true || QualifyingLifeEventKind::EffectiveOnKinds.include?(request_effective_on_kinds[2])
+          updated_effective_on_kinds << 'first_of_month'
+        end
+        if request_effective_on_kinds[3] == true || QualifyingLifeEventKind::EffectiveOnKinds.include?(request_effective_on_kinds[3])
+          updated_effective_on_kinds << 'fixed_first_of_next_month'
+        end
+        if request_effective_on_kinds[4] == true || QualifyingLifeEventKind::EffectiveOnKinds.include?(request_effective_on_kinds[3])
+          updated_effective_on_kinds << 'exact_date'
+        end
+        return record_effective_on_kinds if record_effective_on_kinds.uniq.length == updated_effective_on_kinds.uniq.length
+        return updated_effective_on_kinds
+      end
  
       def create_record_question(qle_kind, question_hash)
         custom_qle_question = qle_kind.custom_qle_questions.build(
@@ -91,7 +126,6 @@ module Admin
         end
       end
 
-
       protected
 
       def update_record(request)
@@ -101,7 +135,7 @@ module Admin
           visible_to_customer: request.visible_to_customer,
           title: request.title,
           market_kind: request.market_kind,
-          effective_on_kinds: request.effective_on_kinds,
+          effective_on_kinds: transform_effective_on_kinds(record, request),
           is_self_attested: request.is_self_attested,
           pre_event_sep_in_days: request.pre_event_sep_in_days,
           is_active: false,

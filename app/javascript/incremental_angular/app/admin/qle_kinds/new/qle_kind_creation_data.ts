@@ -4,7 +4,6 @@
     effective_on_kinds: Array<string>;
     title: string;
     tool_tip: string | null;
-    action_kind: string | null;
     reason: string | null;
     market_kind: string;
     is_self_attested: boolean;
@@ -38,7 +37,6 @@
     effective_on_kinds: Array<string>;
     title: string;
     tool_tip: string | null;
-    action_kind: string | null;
     reason: string | null;
     market_kind: string;
     pre_event_sep_in_days: number;
