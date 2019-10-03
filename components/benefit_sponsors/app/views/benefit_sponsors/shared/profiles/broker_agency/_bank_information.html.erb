@@ -3,14 +3,14 @@
     <div id="routing_info" class="">
       <div class="row">
         <div class="col-md-4">
-          <label for="inputAccountNumber">Account Number</label>
+          <label for="inputAccountNumber">Account Number *</label>
           <%= f.text_field :ach_account_number, value: f.object.ach_account_number, class: "form-control", required: true, placeholder: 'Account #' %>
           <div class="invalid-feedback">
             Please provide an account number.
           </div>
         </div>
         <div class="col-md-4">
-          <label for="inputRoutingNumber">Routing Number</label>
+          <label for="inputRoutingNumber">Routing Number *</label>
           <%= f.text_field :ach_routing_number, value: f.object.ach_routing_number, class: "form-control", required: true, placeholder: '9 digit ACH Routing #', maxlength: 9, onblur:'checkRoutingNumber(this.value)' %>
           <div class="invalid-feedback">
             Please provide a routing number.
@@ -20,7 +20,7 @@
           </div>
         </div>
         <div class="col-md-4">
-          <label for="inputRoutingNumberConfirmation">Routing Number Confirmation</label>
+          <label for="inputRoutingNumberConfirmation">Routing Number Confirmation *</label>
           <%= f.text_field :ach_routing_number_confirmation, value: f.object.ach_routing_number, class: "form-control", required: true, placeholder: 'Confirm Routing #', maxlength: 9, onblur:'checkRoutingNumberConfirmation(this.value)' %>
           <div class="invalid-feedback">
             Please provide routing number confirmation.
