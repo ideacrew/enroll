@@ -90,7 +90,7 @@
       <strong>Effective on Options:</strong>
       <div formArrayName="effective_on_kinds" *ngFor="let option of getOptions(); let i = index">
         <label class='control-label'>
-        <input type="checkbox" [formControlName]='i' value="{{option.code}}">&nbsp;{{option.name}}
+        <input type="checkbox" [formControlName]='i' [value]="option.code">&nbsp;{{option.name}}
         </label>
       </div>
     </div>
