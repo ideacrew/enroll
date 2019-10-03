@@ -89,8 +89,15 @@
         <strong>Effective on Options:</strong>
         <div formArrayName="effective_on_kinds" *ngFor="let option of getOptions(); let i = index">
           <label class='control-label'>
-          <input type="checkbox" [formControlName]='i' [checked]="(qleKindToEdit.effective_on_kinds.includes(option.code))" value={{option.code}} > {{option.name}}
+            <!-- 
+            Note 1:Creating this as a checkbox will automatically pass only booleans to the controller. Use radios here and make them appear as checkboxes. The current effective on kinds need to be set with a conditional [value] rather than just simply being  checked, because if they are just checked, a boolean rather than a string will pass through.
+            Note 2:
+            The previously selected checkboxes which load appear to lose their value when submitted. It doesn't go through properly.
+            [checked]="existingEfectiveOnKinds.includes(option.code)"
+            -->
+            <input type="checkbox" [formControlName]='i' class='effective_on_kind_radio' [checked]="existingEffectiveOnKinds.includes(option.code)" [value]="option.code" (click)="choose($event['target']['value'])"> {{option.name}}
           </label>
+
         </div>
       </div>
       <div class='col-md-4'>

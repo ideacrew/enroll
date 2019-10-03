@@ -20,18 +20,17 @@ export class QleKindEditFormComponent {
   public editFormGroup : FormGroup = new FormGroup({});
   @ViewChild('headerRef') headerRef: ElementRef;
   public marketKindsList = new FormArray([])
+  public existingEffectiveOnKinds : Array<string> | null = null;
   
   public stringifiedStartOn = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-qle-kind-to-edit-start-on-stringified");
   public stringifiedEndOn = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-qle-kind-to-edit-end-on-stringified");
 
   public effectiveOnOptionsArray =  [
-    {name: 'Date of Event', code: 'date_of_event'},
+    {name: 'Date of Event', code: 'date_of_event',},
     {name: 'First of Next Month', code: 'first_of_next_month'},
     {name: 'First of Month', code: 'first_of_month'},
     {name: 'First Fixed of Next Month', code: 'fixed_first_of_next_month'},
-    {name: 'Next 15 of the month', code: ''}, // TBD
     {name: 'Exact Date', code: 'exact_date'},
-    {name: 'Date options available', code: ''} // TBD
   ]
   
   public reasonList = [
@@ -66,8 +65,15 @@ export class QleKindEditFormComponent {
     }
     var marketKindsAttribute = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-qle-kind-market-kinds");
     if (marketKindsAttribute != null) {
-      var marketKindsArrayJson = JSON.parse(marketKindsAttribute)
-    this.marketKindsList = marketKindsArrayJson;
+      var marketKindsArrayJson = JSON.parse(marketKindsAttribute);
+      this.marketKindsList = marketKindsArrayJson;
+    }
+
+    // Current effective_on_options, semi hacked in due to the intricacies of setting string values to checkmark inputs
+    var existingEffectiveOnKinds = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-qle-kind-to-edit-existing-effective-on-kinds");
+    if (existingEffectiveOnKinds != null) {
+      var existingEffectiveOnKindsJson = JSON.parse(existingEffectiveOnKinds);
+      this.existingEffectiveOnKinds = existingEffectiveOnKindsJson;
     }
 
     var qleKindToEditJson = (<HTMLElement>this._elementRef.nativeElement).getAttribute("data-qle-kind-to-edit");
@@ -80,7 +86,6 @@ export class QleKindEditFormComponent {
           id: this.qleKindToEdit._id,
           title: [this.qleKindToEdit.title, Validators.required],
           tool_tip: [this.qleKindToEdit.tool_tip, [Validators.required, Validators.minLength(1)]],
-          action_kind: [this.qleKindToEdit.action_kind,[]],
           reason: [this.qleKindToEdit.reason, [Validators.required, Validators.minLength(1)]],
           market_kind: [this.qleKindToEdit.market_kind],
           visible_to_customer: [this.qleKindToEdit.visible_to_customer],
@@ -157,47 +162,6 @@ export class QleKindEditFormComponent {
     var questionArray = (this.editFormGroup.controls.custom_qle_questions as FormArray) // this used to have line 150 but didn't work for some reason
     var group = QleKindQuestionFormComponent.newQuestionFormGroup(new FormBuilder)
       questionArray.push(group)
-  }
-
-  //taking array of booleans and mapping them to the effectiveOnOptionsArray of objects 
-  updateEffectiveOnKinds() : void{
-    var updatedArray = this.editFormGroup.value.effective_on_kinds.map((o:boolean, i:number) => {
-        if (o==true){
-          return this.effectiveOnOptionsArray[i].name
-        }
-      })
-      this.editFormGroup.value.effective_on_kinds = updatedArray
-    }
-   
-  //traverse dom for selected actionKind
-  updateActionKind(): void {
-    var actionKinds = document.getElementById("qle_kind_edit_form_action_kind");
-    if(actionKinds != null){
-      Array.from(actionKinds.querySelectorAll('option')).forEach((kind) => {
-        if(kind.selected == true){
-          var actionKind = kind.value
-          this.editFormGroup.value.action_kind = actionKind
-        }    
-      });
-    } 
-  }
-
-  //traverse dom for selected reason
-  updateReason() : void {
-    var reasons = document.getElementById("qle_kind_edit_form_reason");
-    if(reasons != null){
-      Array.from(reasons.querySelectorAll('option')).forEach((reason) => {
-        if(reason.selected == true){
-          var Selectedreason = reason.value
-          this.editFormGroup.value.reason = Selectedreason
-        }    
-      });
-    }
-  }
-
-  updateReasonAndActionKind() : void {
-    this.updateActionKind()
-    this.updateReason()
   }
 
   submitEdit() {
