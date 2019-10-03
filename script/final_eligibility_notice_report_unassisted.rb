@@ -1,9 +1,14 @@
+# Passing an year argument is reauired for this script
+# for example
+# RAILS_ENV=production bundle exec rails r script/final_eligibility_notice_report_unassisted.rb 2019
+
 puts "-------------------------------------- Start of rake: #{TimeKeeper.datetime_of_record} --------------------------------------" unless Rails.env.test?
 batch_size = 500
 offset = 0
 enrollment_count = HbxEnrollment.count
+current_year = ARGV[0].to_i
 
-product_ids = BenefitMarkets::Products::Product.where(:active_year => 2020, benefit_market_kind: :aca_individual).map(&:_id)
+product_ids = BenefitMarkets::Products::Product.where(:active_year => current_year + 1, benefit_market_kind: :aca_individual).map(&:_id)
 
 csv = CSV.open("final_eligibility_notice_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv", "w")
 csv << %w(ic_number policy.id policy.subscriber.coverage_start_on policy.aasm_state policy.plan.coverage_kind policy.plan.metal_level policy.plan.plan_name policy.total_premium deductible family_deductible  subscriber_id member_id person.first_name person.last_name
@@ -15,7 +20,7 @@ def add_to_csv(csv, policy, person, is_dependent, outstanding_verification_types
   csv << [policy.family.id, policy.hbx_id, policy.effective_on, policy.aasm_state, policy.product.kind, policy.product.metal_level_kind, policy.product.title, policy.total_premium,
           policy.product.deductible, policy.product.family_deductible.split("|").last.squish,
           person.hbx_id, person.hbx_id, person.first_name, person.last_name,
-          person.is_incarcerated, person.citizen_status, outstanding_verification_types, document_due_date, 
+          person.is_incarcerated, person.citizen_status, outstanding_verification_types, document_due_date,
           is_dc_resident(person)] + [is_dependent]
 end
 
@@ -52,11 +57,11 @@ def document_due_date(family)
   end
 end
 
-def is_family_renewing(family)
+def is_family_renewing(family, current_year)
   enrollments_for_family(family).where(
     :aasm_state.in => ["coverage_selected", "unverified", "coverage_terminated"],
     kind: "individual",
-    :effective_on => {:"$gte" => Date.new(2019,1,1), :"$lte" => Date.new(2019,12,31)}
+    :effective_on => {:"$gte" => Date.new(current_year,1,1), :"$lte" => Date.new(current_year,12,31)}
   ).present?
 end
 
@@ -80,10 +85,10 @@ end
 while offset <= enrollment_count
   HbxEnrollment.offset(offset).limit(batch_size).each do |policy|
     begin
-      next unless is_family_renewing(policy.family)
+      next unless is_family_renewing(policy.family, current_year)
       next if policy.product.nil?
       next unless product_ids.include?(policy.product_id)
-      next if policy.effective_on < Date.new(2018, 01, 01)
+      next if policy.effective_on < Date.new(current_year + 1, 01, 01)
       next unless ["auto_renewing", "coverage_selected", "unverified", "renewing_coverage_selected"].include?(policy.aasm_state)
       next unless ['01', '03', ''].include?(policy.product.csr_variant_id) #includes dental plans - csr_variant_id - ''
       next if policy.product.benefit_market_kind != :aca_individual
