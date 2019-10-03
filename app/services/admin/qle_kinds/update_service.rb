@@ -98,7 +98,7 @@ module Admin
         if request_effective_on_kinds[3] == true || QualifyingLifeEventKind::EffectiveOnKinds.include?(request_effective_on_kinds[3])
           updated_effective_on_kinds << 'fixed_first_of_next_month'
         end
-        if request_effective_on_kinds[4] == true || QualifyingLifeEventKind::EffectiveOnKinds.include?(request_effective_on_kinds[3])
+        if request_effective_on_kinds[4] == true || QualifyingLifeEventKind::EffectiveOnKinds.include?(request_effective_on_kinds[4])
           updated_effective_on_kinds << 'exact_date'
         end
         return record_effective_on_kinds if record_effective_on_kinds.uniq.length == updated_effective_on_kinds.uniq.length
