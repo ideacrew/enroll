@@ -1,3 +1,6 @@
+# To run this script in PROD
+# RAILS_ENV=production bundle exec rails runner script/generate_employer_renewals.rb "2019/10/1"
+
 def benefit_renewal(date)
   months_prior_to_effective = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months.abs
   renewal_offset_days = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.day_of_month.days
