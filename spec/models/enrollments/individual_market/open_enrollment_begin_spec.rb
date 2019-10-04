@@ -68,8 +68,16 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       let(:renewal_shop_health_product)             { FactoryBot.create(:renewal_shop_health_product) }
       let(:renewal_individual_dental_product)       { FactoryBot.create(:renewal_individual_dental_product) }
       let(:renewal_individual_catastophic_product)  { FactoryBot.create(:renewal_individual_catastophic_product) }
-      let(:renewal_csr_87_product)                  { FactoryBot.create(:renewal_csr_87_product) }
-      let(:renewal_csr_00_product)                  { FactoryBot.create(:renewal_csr_00_product) }
+      let(:renewal_csr_87_product) do
+        FactoryBot.create(:renewal_csr_87_product).tap do |product|
+          product.hios_base_id = product.hios_id.split("-").first
+        end
+      end
+      let(:renewal_csr_00_product) do
+        FactoryBot.create(:renewal_csr_00_product).tap do |product|
+          product.hios_base_id = product.hios_id.split("-").first
+        end
+      end
       let!(:product) { FactoryBot.create(:active_ivl_gold_health_product, hios_id: "11111111122302-01", csr_variant_id: "01")}
       let!(:subject) {Enrollments::IndividualMarket::OpenEnrollmentBegin.new}
 
@@ -289,7 +297,7 @@ def invoke_oe_script
   CSV.open(file_name, "w") do |csv|
     csv << field_names
     person = family_assisted.primary_family_member.person
-    csv << ["", person.ssn, person.hbx_id, person.hbx_id, person.first_name, person.last_name, person.dob, 100, 200, "", 0, 400, 150, 73]
+    csv << ["", person.ssn, person.hbx_id, person.hbx_id, person.first_name, person.last_name, person.dob, 100, 200, "", 0, 400, 150, 100]
   end
 
   oe_begin = Enrollments::IndividualMarket::OpenEnrollmentBegin.new
