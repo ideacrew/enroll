@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # To run this script in PROD
 # RAILS_ENV=production bundle exec rails runner script/generate_employer_renewals.rb "2019/10/1"
 
