@@ -8,7 +8,7 @@ offset = 0
 enrollment_count = HbxEnrollment.count
 current_year = ARGV[0].to_i
 
-product_ids = BenefitMarkets::Products::Product.where(:active_year => current_year + 1, benefit_market_kind: :aca_individual).map(&:_id)
+product_ids = BenefitMarkets::Products::Product.by_year(current_year + 1).aca_individual_market.map(&:_id)
 
 csv = CSV.open("final_eligibility_notice_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv", "w")
 csv << %w(ic_number policy.id policy.subscriber.coverage_start_on policy.aasm_state policy.plan.coverage_kind policy.plan.metal_level policy.plan.plan_name policy.total_premium deductible family_deductible  subscriber_id member_id person.first_name person.last_name
