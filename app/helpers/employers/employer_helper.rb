@@ -157,8 +157,11 @@ module Employers::EmployerHelper
   end
 
   def get_benefit_packages_for_census_employee
-    initial_benefit_packages = @benefit_sponsorship.current_benefit_application.benefit_packages if @benefit_sponsorship.current_benefit_application.present? && @benefit_sponsorship.benefit_applications.none?(:draft_state)
-    initial_benefit_packages = @benefit_sponsorship.current_available_benefit_application.benefit_packages if @benefit_sponsorship.current_available_benefit_application.present?
+    initial_benefit_packages = if @benefit_sponsorship.current_benefit_application.present? && @benefit_sponsorship.benefit_applications.none?(:draft_state)
+                                 @benefit_sponsorship.current_benefit_application.benefit_packages
+                               elsif @benefit_sponsorship.current_available_benefit_application.present?
+                                 @benefit_sponsorship.current_available_benefit_application.benefit_packages
+                               end
     renewing_benefit_packages = @benefit_sponsorship.renewal_benefit_application.benefit_packages if @benefit_sponsorship.renewal_benefit_application.present?
     return (initial_benefit_packages || []), (renewing_benefit_packages || [])
   end
