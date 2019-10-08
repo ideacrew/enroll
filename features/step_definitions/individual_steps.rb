@@ -603,7 +603,7 @@ Then(/^Prepare taxhousehold info for aptc user$/) do
   person = User.find_by(email: 'aptc@dclink.com').person
   household = person.primary_family.latest_household
 
-  start_on = TimeKeeper.date_of_record + 3.months
+  start_on = TimeKeeper.date_of_record
 
   if household.tax_households.blank?
     household.tax_households.create(is_eligibility_determined: TimeKeeper.date_of_record, allocated_aptc: 100, effective_starting_on: start_on, submitted_at: TimeKeeper.date_of_record)
