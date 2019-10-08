@@ -68,6 +68,10 @@ contact_center:
   ivl_number: "1-877-623-6765"
   ivl_phone_number: "1-877-623-6765"
   email_address: "smallbusiness@mahealthconnector.org"
+  po_box: "PO Box 960189"
+  city: "Boston"
+  state: "MA"
+  zip_code: "02196"
   small_business_email: "smallbusiness@MAhealthconnector.org"
   non_discrimination_email: "Nondiscrimination@state.ma.us"
 
@@ -130,6 +134,7 @@ notices:
 
 invoices:
   addendum: 'ma_non_discrimination_and_language_tags.pdf'
+  minimum_invoice_display_year: 2015
 
 aca:
   state_name: "Massachusetts"

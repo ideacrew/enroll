@@ -46,6 +46,18 @@ module BenefitSponsors
       raw("<span class='copyright'><i class='fa fa-copyright fa-lg' aria-hidden='true'></i> #{Settings.site.copyright_period_start}-#{TimeKeeper.date_of_record.year} #{Settings.site.short_name}. All Rights Reserved.</span>")
     end
 
+    def amount_color_style(amount)
+      return "" if amount.blank?
+
+      amount > 0 ? "class=red" : ""
+    end
+
+    def payment_amount_color_style(amount)
+      return "" if amount.blank?
+
+      amount < 0 ? "class=red" : ""
+    end
+
     def render_flash
       rendered = []
       flash.each do |type, messages|

@@ -54,6 +54,11 @@ module BenefitSponsors
     TERMINATION_KINDS         = [:voluntary, :involuntary].freeze
     TERMINATION_REASON_KINDS  = [:nonpayment, :ineligible, :fraud].freeze
 
+    NFP_ENROLLMENT_DATA_REQUEST = "acapi.info.events.employer.nfp_enrollment_data_request".freeze
+    NFP_PAYMENT_HISTORY_REQUEST = "acapi.info.events.employer.nfp_payment_history_request".freeze
+    NFP_PDF_REQUEST = "acapi.info.events.employer.nfp_pdf_request".freeze
+    NFP_STATEMENT_SUMMARY_REQUEST = "acapi.info.events.employer.nfp_statement_summary_request".freeze
+
     field :hbx_id,              type: String
     field :profile_id,          type: BSON::ObjectId
 
@@ -118,6 +123,8 @@ module BenefitSponsors
     has_many    :documents,
       inverse_of: :benefit_sponsorship_docs,
       class_name: "BenefitSponsors::Documents::Document"
+
+    accepts_nested_attributes_for :benefit_sponsorship_account
 
     validates_presence_of :organization, :profile_id, :benefit_market, :source_kind
 
@@ -502,6 +509,29 @@ module BenefitSponsors
       end
     end
 
+    def notify_enrollment_data_request
+      notify(NFP_ENROLLMENT_DATA_REQUEST, {employer_id: hbx_id, event_name: "nfp_enrollment_data_request"})
+    end
+
+    def notify_payment_history_request
+      notify(NFP_PAYMENT_HISTORY_REQUEST, {employer_id: hbx_id, event_name: "nfp_payment_history_request"})
+    end
+
+    def notify_pdf_request
+      notify(NFP_PDF_REQUEST, {employer_id: hbx_id, event_name: "nfp_pdf_request"})
+    end
+
+    def notify_statement_summary_request
+      notify(NFP_STATEMENT_SUMMARY_REQUEST, {employer_id: hbx_id, event_name: "nfp_statement_summary_request"})
+    end
+
+    def has_financial_transactions?
+      financial_transactions.present?
+    end
+
+    def financial_transactions
+      benefit_sponsorship_account.present? && benefit_sponsorship_account.financial_transactions
+    end
 
     #### TODO FIX Move these methods to domain logic layer
     def is_renewal_transmission_eligible?

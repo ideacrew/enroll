@@ -807,6 +807,32 @@ And(/^the employer clicks document name/) do
   find(:xpath,"//*[@id='effective_datatable_wrapper']//a[contains(.,'JavaScript.pdf')]").trigger('click')
 end
 
+Given(/^the employer clicks on billing tab$/) do
+  find('.interaction-click-control-billing', wait: 30).click
+end
+
+Then(/^the employer should payment histroy$/) do
+  expect(page).to have_content(number_to_currency(@benefit_sponsorship_account.financial_transactions[0].amount))
+  expect(page).to have_content('Payment History')
+end
+
+When(/^the employer clicks on statements$/) do
+  find('#statements').click
+end
+
+Then(/^the employer should see statements histroy$/) do
+  expect(page).to have_content('Coverage Period')
+  expect(page).to have_content('Download')
+end
+
+When(/^the employer clicks on pay my bill$/) do
+  find('#payMyBill').click
+end
+
+Then(/^the employer should see billing information$/) do
+  expect(page).to have_content('The invoice includes next month')
+end
+
 Then(/^the employer should see Download,Print Option/) do
   wait_for_ajax
 

@@ -15,8 +15,8 @@
     <li <%= menu_tab_class(active_tab, "documents") %>>
       <%= link_to 'Documents', profiles_employers_employer_profile_path(profile.id, :tab=>'documents'), "aria-expanded" => "true" %>
     </li>
-    <li <%= menu_tab_class(active_tab, "billing") %>>
-      <%= link_to 'Billing', profiles_employers_employer_profile_path(profile.id,:tab=>'billing'), "aria-expanded" => "true" %>
+    <li <%= menu_tab_class(active_tab, "accounts") %>>
+      <%= link_to 'Accounts', profiles_employers_employer_profile_path(profile.id,:tab=>'accounts'), "aria-expanded" => "true" %>
     </li>
     <%# unless current_user.try(:has_broker_agency_staff_role?)%>
     <li <%= menu_tab_class(active_tab, "inbox") %>>
