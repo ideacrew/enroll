@@ -6,7 +6,8 @@ class Insured::ConsumerRolesController < ApplicationController
   before_action :check_consumer_role, only: [:search, :match]
   before_action :find_consumer_role, only: [:edit, :update]
   before_action :individual_market_is_enabled?
-  #before_action :authorize_for, except: [:edit, :update]
+
+  FIELDS_TO_ENCRYPT = [:ssn,:dob,:first_name,:middle_name,:last_name,:gender,:user_id]
 
   def ssn_taken
   end
@@ -147,11 +148,12 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def create
     begin
-      params[:person][:ssn] = SymmetricEncryption.decrypt(params[:person][:ssn])
-      params[:person][:dob] = SymmetricEncryption.decrypt(params[:person][:dob])
-      params[:person][:first_name] = SymmetricEncryption.decrypt(params[:person][:first_name])
-      params[:person][:last_name] = SymmetricEncryption.decrypt(params[:person][:last_name])
-      
+
+      # Decrypt encrypted fields
+      FIELDS_TO_ENCRYPT.each do |field|
+        params[:person][field] = SymmetricEncryption.decrypt(params[:person][field])
+      end
+
       @consumer_role = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, actual_user)
       if @consumer_role.present?
         @person = @consumer_role.person
@@ -275,10 +277,9 @@ class Insured::ConsumerRolesController < ApplicationController
   private
 
   def encrypt_pii(person)
-    person[:ssn] = SymmetricEncryption.encrypt(person[:ssn])
-    person[:dob] = SymmetricEncryption.encrypt(person[:dob])
-    person[:first_name] = SymmetricEncryption.encrypt(person[:first_name])
-    person[:last_name] = SymmetricEncryption.encrypt(person[:last_name])
+    FIELDS_TO_ENCRYPT.each do |field|
+      person[field] = SymmetricEncryption.encrypt(person[field])
+    end
     person
   end
 
