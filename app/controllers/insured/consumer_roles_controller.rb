@@ -6,7 +6,8 @@ class Insured::ConsumerRolesController < ApplicationController
   before_action :check_consumer_role, only: [:search, :match]
   before_action :find_consumer_role, only: [:edit, :update]
   before_action :individual_market_is_enabled?
-  #before_action :authorize_for, except: [:edit, :update]
+
+  FIELDS_TO_ENCRYPT = [:ssn,:dob,:first_name,:middle_name,:last_name,:gender,:user_id]
 
   def ssn_taken
   end
@@ -97,6 +98,7 @@ class Insured::ConsumerRolesController < ApplicationController
                   session[:person_id] = @person.id
                 else
                 # not logging error because error was logged in construct_consumer_role
+                  @person_params = encrypt_pii(@person_params)
                   render file: 'public/500.html', status: 500
                   return
                 end
@@ -113,6 +115,7 @@ class Insured::ConsumerRolesController < ApplicationController
                 end
               end
             end
+            @person_params = encrypt_pii(@person_params)
             return
           end
 
@@ -145,6 +148,12 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def create
     begin
+
+      # Decrypt encrypted fields
+      FIELDS_TO_ENCRYPT.each do |field|
+        params[:person][field] = SymmetricEncryption.decrypt(params[:person][field])
+      end
+
       @consumer_role = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, actual_user)
       if @consumer_role.present?
         @person = @consumer_role.person
@@ -266,6 +275,13 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   private
+
+  def encrypt_pii(person)
+    FIELDS_TO_ENCRYPT.each do |field|
+      person[field] = SymmetricEncryption.encrypt(person[field])
+    end
+    person
+  end
 
   def user_not_authorized(exception)
     policy_name = exception.policy.class.to_s.underscore
