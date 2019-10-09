@@ -25,8 +25,8 @@ namespace :reports do
         EA_Policy_ID
         Policy_Effective_Date
         Carrier
-        Coverage_Type_(health or dental)
-        Marketplace_(IVL or SHOP)
+        Coverage_Type_(health_or_dental)
+        Marketplace_(IVL_or_SHOP)
         Date_Relationship_Change_Submitted
         )
 
@@ -38,13 +38,14 @@ namespace :reports do
         people.no_timeout.each do |person|
           begin
             person.person_relationships.where(updated_at: date_range).each do |person_relationship|
+              relationship_history = person_relationship.history_tracks.where(action: 'update').sort_by(&:created_at).last
+              next unless relationship_history.present?
               next unless person.primary_family.present?
               next unless person.primary_family.hbx_enrollments.enrolled_and_renewal.present?
               active_enrollments = person.primary_family.hbx_enrollments.enrolled_and_renewal
               active_enrollments.each do |enrollment|
                 relationship_changed_member = enrollment.hbx_enrollment_members.select{ |member| member.person.id == person_relationship.relative_id}.first
                 next unless relationship_changed_member.present?
-                relationship_history = person_relationship.history_tracks.sort_by(&:created_at).last
                 csv << [
                   enrollment.subscriber.hbx_id,
                   enrollment.subscriber.person.first_name,
