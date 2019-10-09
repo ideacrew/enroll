@@ -81,7 +81,7 @@ RSpec.describe BenefitSponsors::ApplicationHelper, type: :helper, dbclean: :afte
     context 'should return true when with an inactive initial and termination pending renewal PY' do
       before do
         predecessor_application.update_attributes(:aasm_state => :expired)
-        renewal_application.update_attributes(:aasm_state => :enrollment_ineligible)
+        renewal_application.update_attributes(:aasm_state => :enrollment_ineligible, effective_period: (TimeKeeper.date_of_record.beginning_of_month)..(TimeKeeper.date_of_record.beginning_of_month.next_year.prev_day))
       end
       it {expect(add_plan_year_button_business_rule(employer_profile.benefit_applications)).to eq true}
     end
