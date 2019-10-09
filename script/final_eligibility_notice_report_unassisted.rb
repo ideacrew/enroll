@@ -41,7 +41,7 @@ def is_dc_resident(person)
 end
 
 def enrollments_for_family(family)
-  @enrollments_for_family ||= HbxEnrollment.where(family_id: family.id)
+  HbxEnrollment.where(family_id: family.id)
 end
 
 def document_due_date(family)
@@ -101,6 +101,7 @@ while offset <= enrollment_count
       policy.hbx_enrollment_members.each do |hbx_enrollment_member|
         add_to_csv(csv, policy, hbx_enrollment_member.person, "Yes", check_for_outstanding_verification_types(hbx_enrollment_member.person), document_due_date(policy.family)) if hbx_enrollment_member.person != person
       end
+      puts "************** Inserting into CSV #{person.hbx_id} ***************" 
     rescue => e
       puts "Error policy id #{policy.id} family id #{policy.family.id}" + e.message + "   " + e.backtrace.first
     end
