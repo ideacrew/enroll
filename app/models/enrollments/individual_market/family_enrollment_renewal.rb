@@ -113,7 +113,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
 
   def assisted_renewal_product
     # TODO: Make sure tax households create script treats 0 as 100
-    if @aptc_values[:csr_amt].present?
+    if @aptc_values[:csr_amt].present? && @enrollment.product.metal_level == "silver"
       csr_variant = fetch_csr_variant
 
       ::BenefitMarkets::Products::HealthProducts::HealthProduct.by_year(renewal_coverage_start.year).where(
