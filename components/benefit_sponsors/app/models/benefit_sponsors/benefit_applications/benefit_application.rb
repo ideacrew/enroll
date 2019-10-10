@@ -171,6 +171,12 @@ module BenefitSponsors
                                                                                            :"effective_period.min".lte => compare_date )
                                                                                            }
 
+    scope :effective_date_before_begin_on,  ->(compare_date = TimeKeeper.date_of_record) {
+      where(
+        :"effective_period.min".lt => compare_date
+      )
+    }
+
     scope :effective_date_end_on,           ->(compare_date = TimeKeeper.date_of_record) { where(
                                                                                            :"effective_period.max".lt => compare_date )
                                                                                            }
