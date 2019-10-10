@@ -918,28 +918,28 @@ module BenefitSponsors
       include_context "setup renewal application"
       include_context "setup employees"
 
-      it 'should return predecessor benefit package' do
+      it 'should not return the terminated EEs' do
         expect(renewal_application.active_census_employees_under_py.count).to eq 5
         term_date = renewal_application.effective_period.min - 1.day
         renewal_application.active_census_employees_under_py.first.update_attributes(aasm_state: "employment_terminated", employment_terminated_on: term_date)
         expect(renewal_application.active_census_employees_under_py.count).to eq 4
       end
 
-      it 'should return predecessor benefit package' do
+      it 'should not return term pending with prior effective date as term date' do
         expect(renewal_application.active_census_employees_under_py.count).to eq 5
         term_date = renewal_application.effective_period.min - 1.day
         renewal_application.active_census_employees_under_py.first.update_attributes(aasm_state: "employee_termination_pending", employment_terminated_on: term_date)
         expect(renewal_application.active_census_employees_under_py.count).to eq 4
       end
 
-      it 'should return predecessor benefit package' do
+      it 'should return term pending with effective date as term date' do
         expect(renewal_application.active_census_employees_under_py.count).to eq 5
         term_date = renewal_application.effective_period.min
         renewal_application.active_census_employees_under_py.first.update_attributes(aasm_state: "employee_termination_pending", employment_terminated_on: term_date)
         expect(renewal_application.active_census_employees_under_py.count).to eq 5
       end
 
-      it 'should return predecessor benefit package' do
+      it 'should return term pending with future effective date as term date' do
         expect(renewal_application.active_census_employees_under_py.count).to eq 5
         term_date = renewal_application.effective_period.min + 1.day
         renewal_application.active_census_employees_under_py.first.update_attributes(aasm_state: "employee_termination_pending", employment_terminated_on: term_date)
