@@ -116,12 +116,20 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     if @aptc_values[:csr_amt].present? && @enrollment.product.metal_level == "silver"
       csr_variant = fetch_csr_variant
 
-      ::BenefitMarkets::Products::HealthProducts::HealthProduct.by_year(renewal_coverage_start.year).where(
-        {:hios_id => "#{@enrollment.product.renewal_product.hios_base_id}-#{csr_variant}"}
-      ).first.id
+      product_id = get_product_id(csr_variant)
+
+      return product_id if product_id
+
+      get_product_id("01")
     else
       @enrollment.product.renewal_product_id
     end
+  end
+
+  def get_product_id(csr_variant)
+    ::BenefitMarkets::Products::HealthProducts::HealthProduct.by_year(renewal_coverage_start.year).where(
+      {:hios_id => "#{@enrollment.product.renewal_product.hios_base_id}-#{csr_variant}"}
+    ).first.id
   end
 
   def has_catastrophic_product?
