@@ -785,6 +785,7 @@ module BenefitSponsors
         benefit_sponsorship: benefit_sponsorship,
         benefit_group_assignments: [benefit_group_assignment]
       )}
+      let!(:benefit_group_assignment_1) {FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_package, census_employee: census_employee_1)}
       let(:person_1)       { FactoryGirl.create(:person, :with_family) }
       let!(:family_1)       { person_1.primary_family }
       let!(:hbx_enrollment_1) {
@@ -838,6 +839,24 @@ module BenefitSponsors
 
         it "should update hbx_enrollment terminated_on if terminated_on > benefit_application end on" do
           expect(hbx_enrollment_1.terminated_on).to eq end_on
+        end
+      end
+
+      context "when benefit_application terminated the end_on should match with benefit_group_assignment end_on", :dbclean => :after_each do
+        let(:benefit_application_terminated_on) { end_on.prev_month }
+
+        before do
+          initial_application.update_attributes!(aasm_state: :termination_pending, effective_period: initial_application.start_on..end_on, terminated_on: TimeKeeper.date_of_record)
+          hbx_enrollment.update_attributes!(effective_on: initial_application.start_on, aasm_state: "coverage_termination_pending", terminated_on: benefit_application_terminated_on)
+          benefit_group_assignment.update_attributes!(hbx_enrollment: hbx_enrollment, start_on: initial_application.start_on, aasm_state: "coverage_selected", end_on: benefit_application_terminated_on)
+          benefit_group_assignment_1.update_attributes!(hbx_enrollment: hbx_enrollment, start_on: initial_application.start_on, aasm_state: "coverage_selected", end_on: end_on)
+        end
+
+        it "should update benefit_group_assignment end_on if end_on > benefit_application end on" do
+          benefit_package.terminate_benefit_group_assignments
+          hbx_enrollment.reload
+          benefit_group_assignment.reload
+          expect(benefit_group_assignment_1.end_on).to eq benefit_package.end_on
         end
       end
 
