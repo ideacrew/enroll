@@ -913,6 +913,40 @@ module BenefitSponsors
       end
     end
 
+    describe '.active_census_employees_under_py', dbclean: :after_each do
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup renewal application"
+      include_context "setup employees"
+
+      it 'should return predecessor benefit package' do
+        expect(renewal_application.active_census_employees_under_py.count).to eq 5
+        term_date = renewal_application.effective_period.min - 1.day
+        renewal_application.active_census_employees_under_py.first.update_attributes(aasm_state: "employment_terminated", employment_terminated_on: term_date)
+        expect(renewal_application.active_census_employees_under_py.count).to eq 4
+      end
+
+      it 'should return predecessor benefit package' do
+        expect(renewal_application.active_census_employees_under_py.count).to eq 5
+        term_date = renewal_application.effective_period.min - 1.day
+        renewal_application.active_census_employees_under_py.first.update_attributes(aasm_state: "employee_termination_pending", employment_terminated_on: term_date)
+        expect(renewal_application.active_census_employees_under_py.count).to eq 4
+      end
+
+      it 'should return predecessor benefit package' do
+        expect(renewal_application.active_census_employees_under_py.count).to eq 5
+        term_date = renewal_application.effective_period.min
+        renewal_application.active_census_employees_under_py.first.update_attributes(aasm_state: "employee_termination_pending", employment_terminated_on: term_date)
+        expect(renewal_application.active_census_employees_under_py.count).to eq 5
+      end
+
+      it 'should return predecessor benefit package' do
+        expect(renewal_application.active_census_employees_under_py.count).to eq 5
+        term_date = renewal_application.effective_period.min + 1.day
+        renewal_application.active_census_employees_under_py.first.update_attributes(aasm_state: "employee_termination_pending", employment_terminated_on: term_date)
+        expect(renewal_application.active_census_employees_under_py.count).to eq 5
+      end
+    end
+
     describe '.successor_benefit_package', dbclean: :after_each do
       include_context "setup benefit market with market catalogs and product packages"
       include_context "setup renewal application"
