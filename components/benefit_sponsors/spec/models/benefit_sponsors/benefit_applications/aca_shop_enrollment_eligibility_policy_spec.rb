@@ -35,7 +35,7 @@ module BenefitSponsors
           benefit_sponsorship.census_employees.each do |ce|
             family = FactoryBot.create(:family, :with_primary_family_member)
             allow(ce).to receive(:family).and_return(family)
-            allow(benefit_application).to receive(:active_census_employees).and_return([ce])
+            allow(benefit_application).to receive(:active_census_employees_under_py).and_return([ce])
             FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
             ce.save
           end
@@ -72,7 +72,7 @@ module BenefitSponsors
           benefit_sponsorship.census_employees.each do |ce|
             family = FactoryBot.create(:family, :with_primary_family_member)
             allow(ce).to receive(:family).and_return(family)
-            allow(benefit_application).to receive(:active_census_employees).and_return([ce])
+            allow(benefit_application).to receive(:active_census_employees_under_py).and_return([ce])
             FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
             ce.save
           end
@@ -90,7 +90,7 @@ module BenefitSponsors
           benefit_sponsorship.census_employees.each do |ce|
             family = FactoryBot.create(:family, :with_primary_family_member)
             allow(ce).to receive(:family).and_return(family)
-            allow(benefit_application).to receive(:active_census_employees).and_return([ce])
+            allow(benefit_application).to receive(:active_census_employees_under_py).and_return([ce])
             FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
             ce.save
           end
@@ -115,7 +115,7 @@ module BenefitSponsors
           benefit_sponsorship.census_employees.each do |ce|
             family = FactoryBot.create(:family, :with_primary_family_member)
             allow(ce).to receive(:family).and_return(family)
-            allow(benefit_application).to receive(:active_census_employees).and_return([ce])
+            allow(benefit_application).to receive(:active_census_employees_under_py).and_return([ce])
             FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
             ce.save
           end
@@ -134,7 +134,7 @@ module BenefitSponsors
             benefit_sponsorship.census_employees.each do |ce|
               family = FactoryBot.create(:family, :with_primary_family_member)
               allow(ce).to receive(:family).and_return(family)
-              allow(benefit_application).to receive(:active_census_employees).and_return([ce])
+              allow(benefit_application).to receive(:active_census_employees_under_py).and_return([ce])
               FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
               ce.save
             end
@@ -168,7 +168,7 @@ module BenefitSponsors
           benefit_sponsorship.census_employees.each do |ce|
             family = FactoryBot.create(:family, :with_primary_family_member)
             allow(ce).to receive(:family).and_return(family)
-            allow(benefit_application).to receive(:active_census_employees).and_return([ce])
+            allow(benefit_application).to receive(:active_census_employees_under_py).and_return([ce])
             FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
             ce.save
           end

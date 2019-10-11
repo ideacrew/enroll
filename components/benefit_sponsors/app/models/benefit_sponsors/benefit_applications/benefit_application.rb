@@ -561,7 +561,7 @@ module BenefitSponsors
 
     def all_enrolled_and_waived_member_count
       @all_enrolled_and_waived_member_count ||= begin
-        if active_census_employees.count <= Settings.aca.shop_market.small_market_active_employee_limit
+        if active_census_employees_under_py.count <= Settings.aca.shop_market.small_market_active_employee_limit
           enrolled_families.size
         else
           0
