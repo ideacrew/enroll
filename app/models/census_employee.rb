@@ -307,6 +307,85 @@ class CensusEmployee < CensusMember
   # @param benefit_package [BenefitPackage]
   # @param effective_on [Date]
   # @return [BenefitGroupAssignment]
+  def benefit_package_assignment_on(date = TimeKeeper.date_of_record)
+    BenefitGroupAssignment.on_date(self, date)
+  end
+
+  def assign_benefit_package(new_benefit_package, start_on = TimeKeeper.date_of_record)
+    unless new_benefit_package.cover?(start_on)
+      Rails.logger.error { "start_on date (#{start_on}) is not within the benefit package (#{new_benefit_package.id}) effective period" }
+      return
+    end
+
+    if benefit_group_assignments.empty?
+      create_benefit_package_assignment(new_benefit_package, start_on)
+    else
+      update_benefit_package_assignment(new_benefit_package, start_on)
+    end
+  end
+
+  def create_benefit_package_assignment(new_benefit_package, start_on)
+    new_assignment = benefit_group_assignments.build(start_on: start_on, end_on: nil, benefit_package: new_benefit_package)
+
+    if new_assignment.save
+      new_assignment
+    else
+      Rails.logger.error { "Failed to create new_assignment for census employee (#{self.id}) with benefit package (#{new_benefit_package.id}) with start_on: #{start_on} due to #{assignment.errors.inspect}" }
+      return
+    end
+  end
+
+  def update_benefit_package_assignment(new_benefit_package, start_on)
+    current_assignment = benefit_package_assignment_on(start_on)
+
+    if current_assignment.blank?
+      create_benefit_package_assignment(new_benefit_package, start_on)
+    elsif current_assignment.is_belong_to?(new_benefit_package)
+      current_assignment
+    else
+      replace_package_assignment(current_assignment, new_benefit_package, start_on)
+    end
+  end
+
+  def replace_package_assignment(assignment, new_benefit_package, start_on)
+    assignment.set_end_date(start_on.prev_day)
+
+    if assignment.save
+      create_benefit_package_assignment(new_benefit_package, start_on)
+    else
+      Rails.logger.error { "Failed to save package assignment (#{assignment.id}) for census employee (#{self.id}) due to #{assignment.errors.inspect}" }
+      return
+    end
+  end
+
+  def terminate_benefit_package_assignment(benefit_package, terminated_on)
+    package_assignments = benefit_group_assignments.by_benefit_package(benefit_package).by_date(terminated_on).reject(&:canceled?)
+    package_assignments.each do |assignment|
+      assignment.end_on = terminated_on
+      Rails.logger.error { "Failed to terminate package assignment (#{assignment.id}) with termination date #{terminated_on} for census employee (#{self.id}) due to #{assignment.errors.inspect}" } unless assignment.save
+    end
+  end
+
+  def cancel_benefit_package_assignment(benefit_package)
+    package_assignments = benefit_group_assignments.by_benefit_package(benefit_package).reject(&:canceled?)
+    package_assignments.each do |assignment|
+      assignment.end_on = assignment.start_on
+      Rails.logger.error { "Failed to cancel package assignment (#{assignment.id}) for census employee (#{self.id}) due to #{assignment.errors.inspect}" } unless assignment.save
+    end
+  end
+
+  # CensusEmployee.with_session do |session|
+  #   session.start_transaction
+  #   existing_assignment.save! if existing_assignment.present?
+  #   new_assignment.save!
+  #   begin
+  #     session.commit_transaction
+  #   rescue Mongo::Error => e
+  #     Rails.logger.error { "Failed to assign benefit package (#{benefit_package.id}) with start_on: #{start_on} due to #{e.inspect}" }
+  #     raise
+  #   end
+  # end
+
   def benefit_group_assignment_for(benefit_package, effective_on = TimeKeeper.date_of_record)
     benefit_group_assignments.by_benefit_package_and_assignment_on(benefit_package, effective_on).first
   end
@@ -376,9 +455,9 @@ class CensusEmployee < CensusMember
     }
   end
 
-  def benefit_package_assignment_on(effective_date)
-    benefit_group_assignments.effective_on(effective_date).active.first
-  end
+  # def benefit_package_assignment_on(effective_date)
+  #   benefit_group_assignments.effective_on(effective_date).active.first
+  # end
 
   def update_hbx_enrollment_effective_on_by_hired_on
     if employee_role.present? && hired_on != employee_role.hired_on
