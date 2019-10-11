@@ -8,6 +8,16 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
   describe HbxEnrollment, dbclean: :around_each do
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup initial benefit application"
+
+    describe "state transitions" do
+      subject { HbxEnrollment.new }
+      it "should check for state :actively_renewing" do
+        allow(subject).to receive(:propagate_selection).and_return(true)
+        expect(subject.aasm.states.map(&:name)).to include :actively_renewing
+        expect(subject).to transition_from(:actively_renewing).to(:renewing_coverage_selected).on_event(:select_coverage)
+      end
+    end
+
     context "an employer defines a plan year with multiple benefit groups, adds employees to roster and assigns benefit groups" do
 
       before do
@@ -616,7 +626,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
             allow(mikes_family).to receive(:is_under_special_enrollment_period?).and_return sep
             allow(mikes_family).to receive(:is_under_ivl_open_enrollment?).and_return enrollment_period == "open_enrollment"
           end
-          
+
           unless error
             it "assigns #{enrollment_period} as enrollment_kind when qle is #{qle}" do
               expect(enrollment.enrollment_kind).to eq enrollment_period
@@ -1873,7 +1883,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
             passive_waiver = shop_family.reload.enrollments.where(:aasm_state => 'renewing_waived').first
             expect(passive_waiver.present?).to be_truthy
           end
-          
+
           it 'should cancel passive renewal and should not generate a duplicate waiver' do
             expect(passive_renewal).not_to be_nil
             new_enrollment.waive_coverage!
@@ -1889,9 +1899,9 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
         end
       end
 
-      context '.renewal_enrollments', dbclean: :around_each do 
+      context '.renewal_enrollments', dbclean: :around_each do
         let(:new_enrollment_product_id) { passive_renewal.product_id }
-        let(:new_enrollment) { 
+        let(:new_enrollment) do
           FactoryBot.create(:hbx_enrollment,
             household: shop_family.latest_household,
             coverage_kind: "health",
@@ -1910,7 +1920,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
             special_enrollment_period_id: special_enrollment_period_id,
             aasm_state: 'shopping'
           )
-        }
+        end
 
         before do
           allow(benefit_package).to receive(:is_renewal_benefit_available?).and_return(true)
@@ -1921,7 +1931,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
           enrollments = new_enrollment.renewal_enrollments(renewal_application)
 
           expect(enrollments).to include(passive_renewal)
-        end 
+        end
       end
     end
 
@@ -2602,8 +2612,17 @@ end
 describe HbxEnrollment, dbclean: :after_all do
   let!(:ivl_person)       { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
   let!(:ivl_family)       { FactoryBot.create(:family, :with_primary_family_member, person: ivl_person) }
-  let!(:ivl_enrollment)   { FactoryBot.create(:hbx_enrollment, household: ivl_family.active_household, family: ivl_family,  
-                            kind: "individual", is_any_enrollment_member_outstanding: true, aasm_state: "coverage_selected") }
+  let!(:ivl_enrollment) do
+    FactoryBot.create(
+      :hbx_enrollment,
+      household: ivl_family.active_household,
+      family: ivl_family,
+      kind: "individual",
+      is_any_enrollment_member_outstanding: true,
+      aasm_state: "coverage_selected"
+    )
+  end
+
   let!(:ivl_enrollment_member)  { FactoryBot.create(:hbx_enrollment_member, is_subscriber: true,
                                   applicant_id: ivl_family.primary_applicant.id, hbx_enrollment: ivl_enrollment,
                                   eligibility_date: TimeKeeper.date_of_record, coverage_start_on: TimeKeeper.date_of_record) }
@@ -2619,7 +2638,7 @@ describe HbxEnrollment, dbclean: :after_all do
       expect(ivl_enrollment.is_ivl_actively_outstanding?).to be_falsey
     end
   end
-  
+
   context ".enrollments_for_display" do
     it "should return enrollments for display matching the family id" do
       expect(HbxEnrollment.enrollments_for_display(ivl_family.id).map{|a|a['_id']}).to include (ivl_enrollment.id)
