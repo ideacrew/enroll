@@ -842,21 +842,21 @@ module BenefitSponsors
         end
       end
 
-      context "when benefit_application terminated the end_on should match with benefit_group_assignment end_on", :dbclean => :after_each do
-        let(:benefit_application_terminated_on) { end_on.prev_month }
-
-        before do
-          initial_application.update_attributes!(aasm_state: :termination_pending, effective_period: initial_application.start_on..end_on, terminated_on: TimeKeeper.date_of_record)
-          hbx_enrollment.update_attributes!(effective_on: initial_application.start_on, aasm_state: "coverage_termination_pending", terminated_on: benefit_application_terminated_on)
-          benefit_group_assignment.update_attributes!(hbx_enrollment: hbx_enrollment, start_on: initial_application.start_on, aasm_state: "coverage_selected", end_on: benefit_application_terminated_on)
-          benefit_group_assignment_1.update_attributes!(hbx_enrollment: hbx_enrollment, start_on: initial_application.start_on, aasm_state: "coverage_selected", end_on: end_on)
+      context "terminate_benefit_group_assignments", :dbclean => :after_each do
+        before :each do
+          @bga = initial_application.benefit_sponsorship.census_employees.first.benefit_group_assignments.first
+          @bga.update_attributes!(end_on: nil)
         end
 
         it "should update benefit_group_assignment end_on if end_on > benefit_application end on" do
           benefit_package.terminate_benefit_group_assignments
-          hbx_enrollment.reload
-          benefit_group_assignment.reload
-          expect(benefit_group_assignment_1.end_on).to eq benefit_package.end_on
+          expect(@bga.end_on).to eq benefit_package.end_on
+        end
+
+        it "should not update benefit_group_assignment end_on if ba is renewing" do
+          allow(benefit_package).to receive(:is_renewing?).and_return(true)
+          benefit_package.terminate_benefit_group_assignments
+          expect(@bga.end_on).to eq nil
         end
       end
 
