@@ -247,7 +247,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           it "should generate renewal enrollment for unassisted family" do
             invoke_oe_script
             family_unassisted.active_household.reload
-            expect(family_unassisted.active_household.hbx_enrollments.count).to eq 2
+            expect(family_unassisted.active_household.hbx_enrollments.count).to eq 3
           end
         end
       end

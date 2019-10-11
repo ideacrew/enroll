@@ -904,11 +904,13 @@ class HbxEnrollment
   end
 
   def renewal_enrollments(successor_application)
-    HbxEnrollment.where({:sponsored_benefit_package_id.in => successor_application.benefit_packages.pluck(:_id),
-                         :coverage_kind => coverage_kind,
-                         :kind => kind,
-                         :family_id => family_id,
-                         :effective_on => successor_application.start_on})
+    HbxEnrollment.where({
+      :sponsored_benefit_package_id.in => successor_application.benefit_packages.pluck(:_id),
+      :coverage_kind => coverage_kind,
+      :kind => kind,
+      :family_id => family_id,
+      :effective_on => successor_application.start_on
+    })
   end
 
   def active_renewals_under(successor_application)
@@ -1665,7 +1667,7 @@ class HbxEnrollment
                          :coverage_renewed, :unverified],
                   to: :coverage_enrolled, :guard => :is_shop?
 
-      transitions from: [:auto_renewing, :coverage_reinstated], to: :coverage_selected
+      transitions from: [:auto_renewing, :renewing_coverage_selected, :coverage_reinstated], to: :coverage_selected
       transitions from: :renewing_waived, to: :inactive
     end
 
