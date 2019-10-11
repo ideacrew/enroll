@@ -42,11 +42,11 @@ def valid_enrollments(person)
   family = person.primary_family
   enrollments = HbxEnrollment.where(family_id: family.id, :aasm_state.in => ["auto_renewing", "coverage_selected", "unverified", "renewing_coverage_selected"], :kind => "individual")
   return [] if enrollments.blank?
-  renewing_health_enrollments = enrollments.select{ |e| e.coverage_kind == "health" && e.effective_on.year == 2019}
-  renewing_dental_enrollments = enrollments.select{ |e| e.coverage_kind == "dental" && e.effective_on.year == 2019}
+  renewing_health_enrollments = enrollments.select{ |e| e.coverage_kind == "health" && e.effective_on.year == TimeKeeper.date_of_record.next_year.year}
+  renewing_dental_enrollments = enrollments.select{ |e| e.coverage_kind == "dental" && e.effective_on.year == TimeKeeper.date_of_record.next_year.year}
 
-  active_health_enrollments = enrollments.select{ |e| e.coverage_kind == "health" && e.effective_on.year == 2018}
-  active_dental_enrollments = enrollments.select{ |e| e.coverage_kind == "dental" && e.effective_on.year == 2018}
+  active_health_enrollments = enrollments.select{ |e| e.coverage_kind == "health" && e.effective_on.year == TimeKeeper.date_of_record.year}
+  active_dental_enrollments = enrollments.select{ |e| e.coverage_kind == "dental" && e.effective_on.year == TimeKeeper.date_of_record.year}
 
   active_hbx_enrollments << active_health_enrollments
   active_hbx_enrollments << active_dental_enrollments
