@@ -115,21 +115,19 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     # TODO: Make sure tax households create script treats 0 as 100
     if @aptc_values[:csr_amt].present? && @enrollment.product.metal_level == "silver"
       csr_variant = fetch_csr_variant
+      product = fetch_product(csr_variant)
+      return product.id if product
 
-      product_id = get_product_id(csr_variant)
-
-      return product_id if product_id
-
-      get_product_id("01")
+      fetch_product("01").id
     else
       @enrollment.product.renewal_product_id
     end
   end
 
-  def get_product_id(csr_variant)
+  def fetch_product(csr_variant)
     ::BenefitMarkets::Products::HealthProducts::HealthProduct.by_year(renewal_coverage_start.year).where(
       {:hios_id => "#{@enrollment.product.renewal_product.hios_base_id}-#{csr_variant}"}
-    ).first.id
+    ).first
   end
 
   def has_catastrophic_product?
