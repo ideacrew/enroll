@@ -680,6 +680,19 @@ module BenefitSponsors
           expect(hbx_enrollment.terminated_on).to eq hbx_enrollment_terminated_on
         end
       end
+
+      context "terminate_benefit_group_assignments", :dbclean => :after_each do
+
+        before :each do
+          @bga = initial_application.benefit_sponsorship.census_employees.first.benefit_group_assignments.first
+          @bga.update_attributes!(end_on: benefit_package.end_on)
+        end
+
+        it "should update benefit_group_assignment end_on if end_on < benefit_application end on" do
+          benefit_package.terminate_benefit_group_assignments
+          expect(benefit_package.end_on).to eq @bga.end_on
+        end
+      end
     end
 
     describe '.expire_member_benefits', :dbclean => :after_each do
@@ -842,21 +855,16 @@ module BenefitSponsors
         end
       end
 
-      context "terminate_benefit_group_assignments", :dbclean => :after_each do
+      context "pending terminate_benefit_group_assignments", :dbclean => :after_each do
         before :each do
           @bga = initial_application.benefit_sponsorship.census_employees.first.benefit_group_assignments.first
           @bga.update_attributes!(end_on: nil)
         end
 
         it "should update benefit_group_assignment end_on if end_on > benefit_application end on" do
+          expect(@bga.end_on).to eq nil
           benefit_package.terminate_benefit_group_assignments
           expect(@bga.end_on).to eq benefit_package.end_on
-        end
-
-        it "should not update benefit_group_assignment end_on if ba is renewing" do
-          allow(benefit_package).to receive(:is_renewing?).and_return(true)
-          benefit_package.terminate_benefit_group_assignments
-          expect(@bga.end_on).to eq nil
         end
       end
 
