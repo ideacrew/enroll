@@ -33,6 +33,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     renewal_enrollment.family_id = @enrollment.family_id
     renewal_enrollment.household_id = @enrollment.household_id
     renewal_enrollment.consumer_role_id = @enrollment.consumer_role_id
+    renewal_enrollment.resident_role_id = @enrollment.resident_role_id
     renewal_enrollment.effective_on = renewal_coverage_start
     renewal_enrollment.coverage_kind = @enrollment.coverage_kind
     renewal_enrollment.enrollment_kind = "open_enrollment"
