@@ -33,10 +33,11 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     renewal_enrollment.family_id = @enrollment.family_id
     renewal_enrollment.household_id = @enrollment.household_id
     renewal_enrollment.consumer_role_id = @enrollment.consumer_role_id
+    renewal_enrollment.resident_role_id = @enrollment.resident_role_id
     renewal_enrollment.effective_on = renewal_coverage_start
     renewal_enrollment.coverage_kind = @enrollment.coverage_kind
     renewal_enrollment.enrollment_kind = "open_enrollment"
-    renewal_enrollment.kind = "individual"
+    renewal_enrollment.kind = @enrollment.kind
     renewal_enrollment.elected_aptc_pct = @enrollment.elected_aptc_pct
     renewal_enrollment.hbx_enrollment_members = clone_enrollment_members
     renewal_enrollment.product_id = fetch_product_id(renewal_enrollment)
