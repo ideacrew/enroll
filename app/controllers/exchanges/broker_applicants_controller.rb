@@ -43,11 +43,12 @@ class Exchanges::BrokerApplicantsController < ApplicationController
       broker_role.deny!
       flash[:notice] = "Broker applicant denied."
     elsif params['update']
-      all_carrier_appointment = "BrokerRole::#{Settings.site.key.upcase}_BROKER_CARRIER_APPOINTMENTS".constantize.stringify_keys
-      permitted_params = params[:person][:broker_role_attributes][:carrier_appointments].permit!
-      all_carrier_appointment.merge!(permitted_params) if permitted_params
-      params[:person][:broker_role_attributes][:carrier_appointments]= all_carrier_appointment
-      broker_role.update(params.require(:person).require(:broker_role_attributes).permit!.except(:id))
+      update_params = params[:person][:broker_role_attributes].permit!
+      if broker_role.update!(update_params)
+        flash[:notice] = "Broker applicant updated."
+      else
+        flash[:error] = "Unable to update broker applicant."
+      end
     elsif params['decertify']
       broker_role.decertify!
       flash[:notice] = "Broker applicant decertified."
