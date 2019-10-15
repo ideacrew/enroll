@@ -121,7 +121,7 @@ module BenefitSponsors
       end
 
       def validate_oe_dates
-        if admin_datatable_action && open_enrollment_end_on <= open_enrollment_start_on
+        if admin_datatable_action && Date.strptime(open_enrollment_end_on, '%m/%d/%Y') <= Date.strptime(open_enrollment_start_on, '%m/%d/%Y')
           errors.add(:base, "Open Enrollment Start Date can't be later than the Open Enrollment End Date")
         end
       end
