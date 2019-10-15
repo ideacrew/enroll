@@ -33,7 +33,7 @@ module BrokerAgencyWorld
 
   def assign_broker_to_broker_agency(broker_name, legal_name)
     @brokers ||= {}
-    return @brokers[broker_name] if @brokers[:broker_name]
+    return @brokers[broker_name] if @brokers[broker_name]
 
     broker_agency_profile = broker_agency_profile(legal_name)
     person = FactoryBot.create(:person, :with_work_email, first_name: broker_name.split(/\s/)[0], last_name: broker_name.split(/\s/)[1])

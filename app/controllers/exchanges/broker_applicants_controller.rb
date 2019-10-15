@@ -45,7 +45,7 @@ class Exchanges::BrokerApplicantsController < ApplicationController
     elsif params['update']
       update_params = params[:person][:broker_role_attributes].permit!
       if broker_role.update!(update_params)
-        flash[:notice] = "Broker applicant updated."
+        flash[:notice] = "Broker applicant successfully updated."
       else
         flash[:error] = "Unable to update broker applicant."
       end
