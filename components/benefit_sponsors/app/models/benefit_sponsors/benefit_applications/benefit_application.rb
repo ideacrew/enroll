@@ -395,7 +395,7 @@ module BenefitSponsors
     end
 
     def active_census_employees_under_py
-      find_census_employees.active.select{|ce| ce.employment_terminated_on.nil? || ce.employment_terminated_on >= self.effective_period.min }
+      find_census_employees.active.census_employees_active_on(self.effective_period.min)
     end
 
     def assigned_census_employees_without_owner
