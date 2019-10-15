@@ -171,6 +171,12 @@ module BenefitSponsors
                                                                                            :"effective_period.min".lte => compare_date )
                                                                                            }
 
+    scope :effective_date_before_begin_on,  ->(compare_date = TimeKeeper.date_of_record) {
+      where(
+        :"effective_period.min".lt => compare_date
+      )
+    }
+
     scope :effective_date_end_on,           ->(compare_date = TimeKeeper.date_of_record) { where(
                                                                                            :"effective_period.max".lt => compare_date )
                                                                                            }
@@ -469,6 +475,10 @@ module BenefitSponsors
 
     def is_renewing?
       predecessor.present? && (APPLICATION_APPROVED_STATES + APPLICATION_DRAFT_STATES + ENROLLING_STATES + ENROLLMENT_ELIGIBLE_STATES + ENROLLMENT_INELIGIBLE_STATES).include?(aasm_state)
+    end
+
+    def is_renewing_and_non_ineligible?
+      predecessor.present? && (APPLICATION_APPROVED_STATES + APPLICATION_DRAFT_STATES + ENROLLING_STATES + ENROLLMENT_ELIGIBLE_STATES).include?(aasm_state)
     end
 
     def is_renewal_enrolling?

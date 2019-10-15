@@ -40,6 +40,7 @@ module BenefitSponsors
       delegate :benefit_market, to: :benefit_application
       delegate :is_conversion?, to: :benefit_application
       delegate :is_renewing?,   to: :benefit_application
+      delegate :is_renewing_and_non_ineligible?,   to: :benefit_application
       delegate :shoppable?,   to: :benefit_application
 
       validates_presence_of :title, :probation_period_kind, :is_default, :is_active #, :sponsored_benefits
@@ -494,7 +495,7 @@ module BenefitSponsors
         self.benefit_application.benefit_sponsorship.census_employees.each do |ce|
           benefit_group_assignments = ce.benefit_group_assignments.where(benefit_package_id: self.id)
           benefit_group_assignments.each do |benefit_group_assignment|
-            benefit_group_assignment.update(is_active: false) unless is_renewing?
+            benefit_group_assignment.update(is_active: false) unless is_renewing_and_non_ineligible?
           end
         end
       end
