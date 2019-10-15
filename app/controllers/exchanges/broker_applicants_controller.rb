@@ -43,8 +43,7 @@ class Exchanges::BrokerApplicantsController < ApplicationController
       broker_role.deny!
       flash[:notice] = "Broker applicant denied."
     elsif params['update']
-      update_params = params[:person][:broker_role_attributes].permit!
-      if broker_role.update!(update_params)
+      if broker_role.update!(broker_role_update_params)
         flash[:notice] = "Broker applicant successfully updated."
       else
         flash[:error] = "Unable to update broker applicant."
@@ -82,6 +81,12 @@ class Exchanges::BrokerApplicantsController < ApplicationController
   end
 
   private
+
+  def broker_role_update_params
+    # Only assign if nil
+    params[:person][:broker_role_attributes][:carrier_appointments] ||= {}
+    params[:person][:broker_role_attributes].permit(:license, :training, :carrier_appointments => {})
+  end
 
   def broker_carrier_appointments
     all_carrier_appointment = "BrokerRole::#{Settings.site.key.upcase}_BROKER_CARRIER_APPOINTMENTS".constantize.stringify_keys
