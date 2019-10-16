@@ -913,6 +913,56 @@ module BenefitSponsors
       end
     end
 
+    describe '.active_census_employees_under_py', dbclean: :after_each do
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup renewal application"
+      include_context "setup employees with benefits"
+
+      before :each do
+        renewal_application.benefit_packages.first.update_attributes!(_id: CensusEmployee.all.first.benefit_group_assignments.first.benefit_package_id)
+      end
+
+      it 'should not return the terminated EEs' do
+        expect(renewal_application.active_census_employees_under_py.count).to eq 5
+        term_date = renewal_application.effective_period.min - 10.days
+        ce = renewal_application.active_census_employees_under_py.first
+        ce.benefit_group_assignments.first.update_attributes!(start_on: renewal_application.effective_period.min + 1.day)
+        ce.aasm_state = 'employment_terminated'
+        ce.employment_terminated_on = term_date
+        ce.save(validate: false)
+        expect(renewal_application.active_census_employees_under_py.count).to eq 4
+      end
+
+      it 'should not return term pending with prior effective date as term date' do
+        expect(renewal_application.active_census_employees_under_py.count).to eq 5
+        term_date = renewal_application.effective_period.min - 10.days
+        ce = renewal_application.active_census_employees_under_py.first
+        ce.benefit_group_assignments.first.update_attributes!(start_on: renewal_application.effective_period.min + 1.day)
+        ce.aasm_state = 'employee_termination_pending'
+        ce.employment_terminated_on = term_date
+        ce.save(validate: false)
+        expect(renewal_application.active_census_employees_under_py.count).to eq 4
+      end
+
+      it 'should return term pending with effective date as term date' do
+        expect(renewal_application.active_census_employees_under_py.count).to eq 5
+        term_date = renewal_application.effective_period.min
+        ce = renewal_application.active_census_employees_under_py.first
+        ce.aasm_state = 'employee_termination_pending'
+        ce.employment_terminated_on = term_date
+        expect(renewal_application.active_census_employees_under_py.count).to eq 5
+      end
+
+      it 'should return term pending with future effective date as term date' do
+        expect(renewal_application.active_census_employees_under_py.count).to eq 5
+        term_date = renewal_application.effective_period.min + 1.day
+        ce = renewal_application.active_census_employees_under_py.first
+        ce.aasm_state = 'employee_termination_pending'
+        ce.employment_terminated_on = term_date
+        expect(renewal_application.active_census_employees_under_py.count).to eq 5
+      end
+    end
+
     describe '.successor_benefit_package', dbclean: :after_each do
       include_context "setup benefit market with market catalogs and product packages"
       include_context "setup renewal application"

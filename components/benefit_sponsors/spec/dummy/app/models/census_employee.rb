@@ -84,6 +84,15 @@ class CensusEmployee < CensusMember
     )
   end
 
+  scope :census_employees_active_on, -> (date) {
+    where(
+        "$or" => [
+            {"employment_terminated_on" => nil},
+            {"employment_terminated_on" => {"$gte" => date}}
+        ]
+    )
+  }
+
   scope :eligible_for_renewal_under_package, ->(benefit_package, package_start, package_end, new_effective_date) {
     where(:"benefit_group_assignments" => {
         :$elemMatch => {
