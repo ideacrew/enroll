@@ -1,6 +1,7 @@
 --title Enroll
 --exclude README.md
--r STATUS.md
+--exclude app/data_migrations/.*
+-r documentation/PROJECT.md
 app/**/*.rb
 lib/**/*.rb
 components/benefit_markets/lib/**/*.rb
@@ -16,4 +17,4 @@ components/transport_gateway/app/**/*.rb
 components/transport_profiles/lib/**/*.rb
 components/transport_profiles/app/**/*.rb
 - 
-STATUS.md
+documentation/PROJECT.md
