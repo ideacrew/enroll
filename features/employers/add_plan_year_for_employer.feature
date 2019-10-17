@@ -16,6 +16,8 @@ Feature: Add Plan Year For Employer
     And employer filled all the fields on benefit application form
     And employer clicked on continue button
     Then employer should see form for benefit package
+    # Disable button on load to prevent submission
+    Then employer should see create plan year button disabled
     And employer filled all the fields on benefit package form
     And employer selected by metal level plan offerings
     Then employer should see gold metal level type
