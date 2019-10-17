@@ -56,11 +56,11 @@
     <% if thh.max_aptc > 0 %>
       <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
         contents: ["This tax credit is used to help pay the monthly premium – the amount you pay each month to the insurance company to have a health plan."],
-          heading: '', sub_heading: "<strong>Advance Premium Tax Credit Savings:</strong> $#{thh.max_aptc}/month"} %>
+          heading: '', sub_heading: "<strong>Advance Premium Tax Credit Savings:</strong> $#{number_with_precision(thh.max_aptc, precision: 2)}/month"} %>
     <% else %>
       <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
         contents: ["This tax credit is used to help pay the monthly premium – the amount you pay each month to the insurance company to have a health plan. The value of your tax credit is $0, because a silver plan will cost you less than what the federal government expects you to spend each month on health insurance."],
-          heading: '', sub_heading: "<strong>Advance Premium Tax Credit Savings:</strong> $#{thh.max_aptc}/month"} %>
+          heading: '', sub_heading: "<strong>Advance Premium Tax Credit Savings:</strong> $#{number_with_precision(thh.max_aptc, precision: 2)}/month"} %>
     <% end %>
   <% end %>
 <% end %>
