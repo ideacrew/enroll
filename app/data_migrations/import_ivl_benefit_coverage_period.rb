@@ -7,7 +7,7 @@ class ImportIvlBenefitCoveragePeriod < MongoidMigrationTask
   def migrate
     return puts "Please pass year as an argument to the script" if ENV["year"].blank?
     given_year = ENV["year"].to_i
-    puts "::: Creating IVL #{given_year} benefit packages :::" unless Rails.env.test?
+    puts "::: Creating IVL #{given_year} benefit coverage period :::" unless Rails.env.test?
     hbx = HbxProfile.current_hbx
     if hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp.start_on.year == given_year }.present?
       puts "Benefit coverage period already exists for #{given_year}"
