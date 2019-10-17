@@ -2,11 +2,11 @@
 
 require "rails_helper"
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
-  require File.join(Rails.root, "app", "data_migrations", "import_ivl_benefit_package")
+  require File.join(Rails.root, "app", "data_migrations", "import_ivl_benefit_coverage_period")
 
-  describe ImportIvlBenefitPackage, :dbclean => :after_each do
-    let(:given_task_name) { "import_ivl_benefit_package" }
-    subject { ImportIvlBenefitPackage.new(given_task_name, double(:current_scope => nil)) }
+  describe ImportIvlBenefitCoveragePeriod, :dbclean => :after_each do
+    let(:given_task_name) { "import_ivl_benefit_coverage_period" }
+    subject { ImportIvlBenefitCoveragePeriod.new(given_task_name, double(:current_scope => nil)) }
 
     describe "given a task name" do
       it "has the given task name" do
@@ -14,7 +14,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       end
     end
 
-    describe "create 2021 benefit package for IVL market" do
+    describe "create 2021 benefit coverage period for IVL market" do
       let!(:hbx_profile) { FactoryBot.create(:hbx_profile) }
       let!(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, hbx_profile: hbx_profile) }
       let!(:bcp) do
