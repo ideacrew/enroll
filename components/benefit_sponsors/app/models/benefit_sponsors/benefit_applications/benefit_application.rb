@@ -423,8 +423,15 @@ module BenefitSponsors
     # Admin can't choose a date beyond the effective month of the application.
     #   ex: For 1/1 application we limit calender from 12/20 to 1/31.
     def open_enrollment_date_bounds
+      prior_month = effective_date - 1.month
+      day = if is_renewing?
+              Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on
+            else
+              Settings.aca.shop_market.open_enrollment.monthly_end_on
+            end
+      default_oe_date = Date.new(prior_month.year, prior_month.month, day)
       {
-        min: [TimeKeeper.date_of_record, benefit_sponsorship.open_enrollment_period_for(effective_date).max].max,
+        min: [TimeKeeper.date_of_record, default_oe_date].max,
         max: effective_date.end_of_month
       }
     end
