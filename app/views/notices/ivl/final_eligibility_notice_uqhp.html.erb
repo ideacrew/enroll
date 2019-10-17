@@ -60,7 +60,7 @@
  contents: ["If you want to change plans for #{notice.coverage_year}, or add someone to a plan, shop for a new plan during open enrollment. After #{notice.ivl_open_enrollment_end_on.strftime("%B %d, %Y")}, you won’t be able to sign up for a new plan or change to a different plan until the next open enrollment period unless you experience a major life change like getting married or having a baby. If you want to pick a new plan, make sure to keep in mind these deadlines:"],
    heading: 'Open Enrollment', sub_heading: '', bottom_margin: '5px'} %>
 
-<%= render partial: 'notices/shared/oe_dates' %>
+<%= render partial: 'notices/shared/oe_dates', :locals => {notice: notice} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: ["#{Settings.site.short_name} registered Brokers are available (at no cost to you) to help you find the right plan that meets your needs and budget. To search for a Broker near you, go to: <a href='https://www.dchealthlink.com/find-expert'>dchealthlink.com/find-expert</a>.", "You can also use our Plan Match tool to compare plans on your own. With Plan Match, you can see plan features, benefits, and costs side-by-side. You’ll see total estimated costs for services (not just premiums or deductibles). You can also see which plans include your doctors, prescription drugs, and more. To use Plan Match, go to the Individual & Family section at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>."],
