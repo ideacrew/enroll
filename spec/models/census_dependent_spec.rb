@@ -25,34 +25,50 @@ RSpec.describe CensusDependent, :type => :model do
       )
   }
 
-  it 'properly instantiates the class' do
-    expect(dependent.first_name).to eq first_name
-    expect(dependent.middle_name).to eq middle_name
-    expect(dependent.last_name).to eq last_name
-    expect(dependent.name_sfx).to eq name_sfx
-    expect(dependent.ssn).to eq ssn
-    expect(dependent.dob).to eq dob
-    expect(dependent.gender).to eq gender
-    expect(dependent.employee_relationship).to eq employee_relationship
+  context 'spouse' do
+    it 'properly instantiates the class' do
+      expect(dependent.first_name).to eq first_name
+      expect(dependent.middle_name).to eq middle_name
+      expect(dependent.last_name).to eq last_name
+      expect(dependent.name_sfx).to eq name_sfx
+      expect(dependent.ssn).to eq ssn
+      expect(dependent.dob).to eq dob
+      expect(dependent.gender).to eq gender
+      expect(dependent.employee_relationship).to eq employee_relationship
 
-    expect(dependent.errors.messages.size).to eq 0
+      expect(dependent.errors.messages.size).to eq 0
+    end
+
+    it 'fails unless provided with a gender' do
+      dependent.gender = nil
+      expect(dependent.valid?).to eq false
+      expect(dependent).to have_errors_on(:gender)
+    end
+
+    it 'fails when provided a bogus gender' do
+      dependent.gender = "OMG SO NOT A GENDER DUDE"
+      expect(dependent.valid?).to eq false
+      expect(dependent).to have_errors_on(:gender)
+    end
+
+    it 'fails unless provided with a proper employee_relationship' do
+      dependent.employee_relationship = nil
+      expect(dependent.valid?).to eq false
+      expect(dependent).to have_errors_on(:employee_relationship)
+    end
   end
 
-  it 'fails unless provided with a gender' do
-    dependent.gender = nil
-    expect(dependent.valid?).to eq false
-    expect(dependent).to have_errors_on(:gender)
-  end
+  context 'dependent' do
+    let(:dob) { Date.today - 15.years }
+    let!(:census_employee) { FactoryBot.create(:census_employee) }
 
-  it 'fails when provided a bogus gender' do
-    dependent.gender = "OMG SO NOT A GENDER DUDE"
-    expect(dependent.valid?).to eq false
-    expect(dependent).to have_errors_on(:gender)
-  end
+    before do
+      census_employee.census_dependents.destroy_all
+      census_employee.census_dependents.create!(first_name: 'Mary', last_name: 'Doe', dob: dob, employee_relationship: 'child_under_26', gender: 'female')
+    end
 
-  it 'fails unless provided with a proper employee_relationship' do
-    dependent.employee_relationship = nil
-    expect(dependent.valid?).to eq false
-    expect(dependent).to have_errors_on(:employee_relationship)
+    it 'does not allow the census employee to have multiple child dependents with the same first and last name' do
+      expect(census_employee.census_dependents.build(first_name: 'Mary', last_name: 'Doe', dob: dob, employee_relationship: 'child_under_26', gender: 'female')).to_not be_valid
+    end
   end
 end
