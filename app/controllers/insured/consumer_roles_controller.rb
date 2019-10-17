@@ -6,6 +6,7 @@ class Insured::ConsumerRolesController < ApplicationController
   before_action :check_consumer_role, only: [:search, :match]
   before_action :find_consumer_role, only: [:edit, :update]
   before_action :individual_market_is_enabled?
+  before_action :decrypt_params, only: [:create]
 
   FIELDS_TO_ENCRYPT = [:ssn,:dob,:first_name,:middle_name,:last_name,:gender,:user_id]
 
@@ -149,11 +150,6 @@ class Insured::ConsumerRolesController < ApplicationController
   def create
     begin
 
-      # Decrypt encrypted fields
-      FIELDS_TO_ENCRYPT.each do |field|
-        params[:person][field] = SymmetricEncryption.decrypt(params[:person][field])
-      end
-
       @consumer_role = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, actual_user)
       if @consumer_role.present?
         @person = @consumer_role.person
@@ -275,6 +271,14 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   private
+
+  def decrypt_params
+    return unless SymmetricEncryption.encrypted?(params[:person][:first_name]) #temporary fix, need better handling of encryption.
+      # Decrypt encrypted fields
+    FIELDS_TO_ENCRYPT.each do |field|
+      params[:person][field] = SymmetricEncryption.decrypt(params[:person][field])
+    end
+  end
 
   def encrypt_pii(person)
     FIELDS_TO_ENCRYPT.each do |field|
