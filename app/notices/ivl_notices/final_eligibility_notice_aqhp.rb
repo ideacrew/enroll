@@ -58,11 +58,11 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
     hbx_enrollments = []
     primary_member = data.detect{|m| m["subscriber"].upcase == "YES"}
     append_member_information_for_aqhp(primary_member)
-    health_enrollments = renewing_enrollments.detect{ |e| e.coverage_kind == "health" && e.effective_on.year.to_s == "2019"}
-    dental_enrollments = renewing_enrollments.detect{ |e| e.coverage_kind == "dental" && e.effective_on.year.to_s == "2019"}
+    health_enrollments = renewing_enrollments.detect{ |e| e.coverage_kind == "health" && e.effective_on.year.to_s == notice.coverage_year}
+    dental_enrollments = renewing_enrollments.detect{ |e| e.coverage_kind == "dental" && e.effective_on.year.to_s == notice.coverage_year}
 
-    previous_health_enrollments = active_enrollments.detect{ |e| e.coverage_kind == "health" && e.effective_on.year.to_s == "2018"}
-    previous_dental_enrollments = active_enrollments.detect{ |e| e.coverage_kind == "dental" && e.effective_on.year.to_s == "2018"}
+    previous_health_enrollments = active_enrollments.detect{ |e| e.coverage_kind == "health" && e.effective_on.year.to_s == notice.current_year}
+    previous_dental_enrollments = active_enrollments.detect{ |e| e.coverage_kind == "dental" && e.effective_on.year.to_s == notice.current_year}
     renewal_health_plan_id = (previous_health_enrollments.product.renewal_product_id) rescue nil
     renewal_health_plan_hios_base_id = (previous_health_enrollments.product.hios_base_id) rescue nil
     future_health_plan_id = (health_enrollments.product.id) rescue nil
@@ -148,7 +148,7 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
       notice.enrollments << PdfTemplates::Enrollment.new({
         premium: enrollment.total_premium.round(2),
         aptc_amount: enrollment.applied_aptc_amount.round(2),
-        responsible_amount: (enrollment.total_premium - enrollment.applied_aptc_amount.to_f).round(2),
+        responsible_amount: number_to_currency((enrollment.total_premium - enrollment.applied_aptc_amount.to_f), precision: 2),
         phone: phone_number(enrollment.product.issuer_profile.legal_name),
         is_receiving_assistance: enrollment.applied_aptc_amount > 0 || enrollment.product.is_csr? ? true : false,
         coverage_kind: enrollment.coverage_kind,
