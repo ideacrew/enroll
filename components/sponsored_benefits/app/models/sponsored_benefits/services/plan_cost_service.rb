@@ -13,7 +13,11 @@ class SponsoredBenefits::Services::PlanCostService
   end
 
   def reference_plan
-    @reference_plan ||= Plan.find(@reference_plan_id)
+    if plan && plan.dental? && @benefit_group && @benefit_group.dental_reference_plan_id.present?
+      @dental_reference_plan ||= Plan.find(@benefit_group.dental_reference_plan_id)
+    else
+      @reference_plan ||= Plan.find(@reference_plan_id)
+    end
   end
 
   def active_census_employees
@@ -21,7 +25,7 @@ class SponsoredBenefits::Services::PlanCostService
   end
 
   def composite?
-    @composite ||=  (benefit_group.plan_option_kind == 'sole_source' && plan.coverage_kind == "health")
+    @composite =  (benefit_group.plan_option_kind == 'sole_source' && plan.coverage_kind == "health")
   end
 
   def monthly_employer_contribution_amount(plan = reference_plan)
@@ -102,7 +106,7 @@ class SponsoredBenefits::Services::PlanCostService
   end
 
   def max_employer_contribution(member, census_employee)
-    Rails.cache.fetch("employer_contribution_#{reference_plan.id}_#{member.id}_#{employer_contribution_percent(member)}", expires_in: 15.minutes) do
+    Rails.cache.fetch("employer_contribution_#{reference_plan.id}_#{member.id}", expires_in: 15.minutes) do
       ((large_family_factor(member, census_employee) * reference_premium_for(member, census_employee) * employer_contribution_percent(member)) / 100.00).round(2)
     end
   end
@@ -125,7 +129,7 @@ class SponsoredBenefits::Services::PlanCostService
 
   def contribution_hash
     return @contribution_hash if defined? @contribution_hash
-    benefits = (reference_plan.coverage_kind == 'dental' && benefit_group.dental_reference_plan.present?) ? benfit_group.dental_relationship_benefits : benefit_group.relationship_benefits
+    benefits = (reference_plan.coverage_kind == 'dental' && benefit_group.dental_reference_plan.present?) ? benefit_group.dental_relationship_benefits : benefit_group.relationship_benefits
     @contribution_pct_hash = benefits.inject({}) do |result, relationship_benefit|
       result[relationship_benefit.relationship] = (relationship_benefit.offered? ? relationship_benefit.premium_pct : 0.0)
       result
@@ -139,8 +143,8 @@ class SponsoredBenefits::Services::PlanCostService
 
   def relationship_for(member)
     Rails.cache.fetch("relationship_for_#{member.id}", expires_in: 15.minutes) do
-      case member.class
-      when SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee
+      case member.class.to_s
+      when "SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee"
         'employee'
       else
         member.employee_relationship
