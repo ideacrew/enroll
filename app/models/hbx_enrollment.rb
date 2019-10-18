@@ -904,13 +904,11 @@ class HbxEnrollment
   end
 
   def renewal_enrollments(successor_application)
-    HbxEnrollment.where({
-      :sponsored_benefit_package_id.in => successor_application.benefit_packages.pluck(:_id),
-      :coverage_kind => coverage_kind,
-      :kind => kind,
-      :family_id => family_id,
-      :effective_on => successor_application.start_on
-    })
+    HbxEnrollment.where({:sponsored_benefit_package_id.in => successor_application.benefit_packages.pluck(:_id),
+                         :coverage_kind => coverage_kind,
+                         :kind => kind,
+                         :family_id => family_id,
+                         :effective_on => successor_application.start_on})
   end
 
   def active_renewals_under(successor_application)
@@ -1621,6 +1619,7 @@ class HbxEnrollment
     state :renewing_contingent_selected     # VLP-pending customer actively selected product during Open Enrollment
     state :renewing_contingent_transmitted_to_carrier
     state :renewing_contingent_enrolled
+    state :actively_renewing                #It is a temporary lasting initial state for auto generated renewal enrollment
 
     # after_all_transitions :perform_employer_plan_year_count
 
@@ -1635,7 +1634,7 @@ class HbxEnrollment
     event :select_coverage, :after => :record_transition do
       transitions from: :shopping,
                   to: :coverage_selected, after: [:propagate_selection], :guard => :can_select_coverage?
-      transitions from: :auto_renewing,
+      transitions from: [:auto_renewing, :actively_renewing],
                   to: :renewing_coverage_selected, after: [:propagate_selection], :guard => :can_select_coverage?
       transitions from: :auto_renewing_contingent,
                   to: :renewing_contingent_selected, :guard => :can_select_coverage?
