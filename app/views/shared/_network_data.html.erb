@@ -1,5 +1,5 @@
 <% if offers_nationwide_plans? %>
-  <th colspan="2"><%= plan.nationwide ? "Nationwide" : "DC-Metro" %></th>
+  <%= plan.nationwide ? "Nationwide" : "DC-Metro" %>
 <% else %>
   <% if plan.network_information.present? %>
     <span>
