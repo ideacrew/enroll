@@ -11,26 +11,26 @@
       </tr>
       <tr valign="top">
         <td class="small" style="width: 50%;">
-          November 1, 2018 - December 15, 2018
+          <p>November 1, <%= notice.current_year %> - December 15, <%= notice.current_year %></p>
         </td>
         <td class="small">
-          January 1, 2019
-        </td>
-      </tr>
-      <tr valign="top">
-        <td class="small">
-          December 16, 2018 - January 15, 2019
-        </td>
-        <td class="small">
-          February 1, 2019
+          <p>January 1, <%= notice.coverage_year %></p>
         </td>
       </tr>
       <tr valign="top">
         <td class="small">
-          January 16, 2019 - January 31, 2019
+          <p>December 16, <%= notice.current_year %> - January 15, <%= notice.coverage_year %></p>
         </td>
         <td class="small">
-          March 1, 2019
+          <p>February 1, <%= notice.coverage_year %></p>
+        </td>
+      </tr>
+      <tr valign="top">
+        <td class="small">
+          <p>January 16, <%= notice.coverage_year %> - January 31, <%= notice.coverage_year %></p>
+        </td>
+        <td class="small">
+          <p>March 1, <%= notice.coverage_year %></p>
         </td>
       </tr>
     </tbody>
