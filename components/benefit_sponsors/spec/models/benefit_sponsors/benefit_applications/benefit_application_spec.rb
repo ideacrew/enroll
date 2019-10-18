@@ -869,5 +869,35 @@ module BenefitSponsors
       end
 
     end
+
+    describe ".rate_schedule_date" do
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup initial benefit application"
+
+      it 'should return start on for general PY' do
+        expect(initial_application.rate_schedule_date).to eq initial_application.start_on
+      end
+
+      it 'should return start on for mid plan year general PY' do
+        expect(initial_application.rate_schedule_date).to eq initial_application.start_on
+        benefit_sponsorship.update_attributes(:source_kind => :mid_plan_year_conversion)
+        expect(initial_application.rate_schedule_date).to eq initial_application.start_on
+      end
+
+      it 'should not return start on when non terminated mid plan year converted PY' do
+        expect(initial_application.rate_schedule_date).to eq initial_application.start_on
+        benefit_sponsorship.update_attributes(:source_kind => :mid_plan_year_conversion)
+        initial_application.update_attributes(effective_period: TimeKeeper.date_of_record..(TimeKeeper.date_of_record + 4.months))
+        expect(initial_application.rate_schedule_date).not_to eq initial_application.start_on
+      end
+
+      it 'should return start on for terminated and mid plan year PY' do
+        # this is a temporary fix for the bug, need to have more clarity on not to calculated for terminated PY.
+        expect(initial_application.rate_schedule_date).to eq initial_application.start_on
+        benefit_sponsorship.update_attributes(:source_kind => :mid_plan_year_conversion)
+        initial_application.update_attributes(effective_period: initial_application.start_on..(initial_application.start_on + 4.months), :aasm_state => :terminated)
+        expect(initial_application.rate_schedule_date).to eq initial_application.start_on
+      end
+    end
   end
 end
