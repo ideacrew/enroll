@@ -443,4 +443,53 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     end
 
   end
+
+  describe "#Enrollment coverage", dbclean: :after_each do
+    let!(:person) { FactoryBot.build_stubbed(:person)}
+    let!(:family) { FactoryBot.build_stubbed(:family, :with_primary_family_member, person: person) }
+    let!(:household) { FactoryBot.build_stubbed(:household, family: family) }
+
+    context "IVL enrollment", dbclean: :after_each do
+
+      let!(:hbx_enrollment) { FactoryBot.build_stubbed(:hbx_enrollment, household: household, aasm_state: "coverage_expired", effective_on: TimeKeeper.date_of_record) }
+      let!(:hbx_profile) { FactoryBot.create(:hbx_profile)}
+      let!(:benefit_coverage_periods) { HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.by_date(hbx_enrollment.effective_on).first}
+
+      it "should return benefit coverage period" do
+        expect(benefit_coverage_periods.present?).to eq true
+      end
+
+      it "should return benefit coverage period end date" do
+        expect(enrollment_coverage_end(hbx_enrollment)).to eq hbx_enrollment.effective_on.end_of_year
+      end
+    end
+
+    context "shop enrollment", dbclean: :after_each do
+      let(:site)                  { build(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+      let(:benefit_sponsor)        { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile_initial_application, site: site) }
+      let(:benefit_sponsorship)    { benefit_sponsor.active_benefit_sponsorship }
+      let(:employer_profile)      {  benefit_sponsorship.profile }
+      let!(:benefit_package) { benefit_sponsorship.benefit_applications.first.benefit_packages.first}
+      let(:census_employee)   { FactoryBot.create(:census_employee, employer_profile: employer_profile) }
+      let(:benefit_group_assignment) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_package, census_employee: census_employee)}
+      let(:start_on)          { benefit_package.start_on }
+      let(:terminated_on)          { benefit_package.start_on + 1.month }
+      let!(:shop_hbx_enrollment) do
+        FactoryBot.build_stubbed(:hbx_enrollment, kind: "employer_sponsored", household: household, benefit_group_assignment: benefit_group_assignment, aasm_state: "coverage_expired", effective_on: TimeKeeper.date_of_record)
+      end
+      let!(:termed_shop_hbx_enrollment) do
+        FactoryBot.build_stubbed(:hbx_enrollment, terminated_on: terminated_on, kind: "employer_sponsored", household: household, benefit_group_assignment: benefit_group_assignment,
+                                                  aasm_state: "coverage_terminated", effective_on: TimeKeeper.date_of_record)
+      end
+
+
+      it "should return benefit applictaion end date for expired enrollment" do
+        expect(enrollment_coverage_end(shop_hbx_enrollment)).to eq benefit_package.end_on
+      end
+
+      it "should return terminated date for term enrollment" do
+        expect(enrollment_coverage_end(termed_shop_hbx_enrollment)).to eq terminated_on
+      end
+    end
+  end
 end
