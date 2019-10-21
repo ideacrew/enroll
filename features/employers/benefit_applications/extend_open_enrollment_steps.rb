@@ -15,7 +15,7 @@ end
 When(/^the user fills out the Extend Open Enrollment form with a new date$/) do
   # After effective date
   fill_in('open_enrollment_end_date', with: (Date.today + 1.year).to_s)
-end 
+end
 
 When(/^the user clicks the Extend Open Enrollment to submit the form$/) do
   inputs = page.all('input')
