@@ -289,11 +289,11 @@ module Insured::FamiliesHelper
 
   def transition_reason(person)
     if person.is_consumer_role_active?
-    @qle = QualifyingLifeEventKind.where(reason: 'eligibility_failed_or_documents_not_received_by_due_date').first
+      @qle = QualifyingLifeEventKind.where(reason: 'eligibility_failed_or_documents_not_received_by_due_date').first
       { @qle.title => @qle.reason }
     elsif person.is_resident_role_active?
-     @qle = QualifyingLifeEventKind.where(reason: 'eligibility_documents_provided').first
-     { @qle.title => @qle.reason }
+      @qle = QualifyingLifeEventKind.where(reason: 'eligibility_documents_provided').first
+      { @qle.title => @qle.reason }
     end
   end
 end
