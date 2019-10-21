@@ -26,7 +26,7 @@ RSpec.describe Services::CensusEmployeeRoster, :dbclean => :after_each do
     let(:current_effective_date) {effective_period_start_on}
     let(:effective_period_end_on) {effective_period_start_on + 1.year - 1.day}
     let(:effective_period) {effective_period_start_on..effective_period_end_on}
-    let(:benefit_pkg) {initial_application.benefit_packages.first}
+    let(:benefit_pkgs) {initial_application.benefit_packages}
 
     let(:census_dependents_attributes) do
       {:first_name => 'David', :middle_name => '', :last_name => 'Chan', :dob => TimeKeeper.date_of_record - 17.years, gender: 'female', :employee_relationship => 'child_under_26', :ssn => 678453261}
@@ -47,7 +47,7 @@ RSpec.describe Services::CensusEmployeeRoster, :dbclean => :after_each do
 
     context 'total_premium' do
       it 'should return total health and dental premium' do
-        expect(subject.total_premium(benefit_pkg)).to eq ['$500.00', nil]
+        expect(subject.total_premium(benefit_pkgs)).to eq ['$500.00', '$0.00']
       end
     end
 

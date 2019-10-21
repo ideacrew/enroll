@@ -21,19 +21,17 @@ module Services
         csv << (["#{Settings.site.long_name} Employee Census Template"] + Array.new(6) + [TimeKeeper.date_of_record] + Array.new(5) + ['1.1'])
         csv << headers
 
+        @bqt_array = Array.new(3) if is_bqt?
+        @total_employer_contribution ||= total_premium(benefit_pkgs) if site_key == :dc
+
         census_employee_roster.each do |census_employee|
           personal_details = personal_headers(census_employee)
           employee_details = employeement_headers(census_employee)
-          benefit_group_details = if is_bqt?
-                                    Array.new(3)
-                                  else
-                                    benefit_group_assignment_details(census_employee)
-                                  end
+          benefit_group_details = benefit_group_assignment_details(census_employee)
           address_details = primary_location_details(census_employee)
           append_config_data = ['', 'employee'] + personal_details + employee_details + benefit_group_details + address_details
 
           if site_key == :dc
-            @total_employer_contribution = total_premium(benefit_pkg)
             append_config_data += @total_employer_contribution
             census_employee.census_dependents.each do |dependent|
               append_config_data += append_dependent(dependent)
@@ -46,6 +44,8 @@ module Services
     end
 
     def benefit_group_assignment_details(census_employee)
+      return @bqt_array if @bqt_array.present?
+
       bga = []
       active_assignment = census_employee.active_benefit_group_assignment
       if active_assignment
@@ -69,26 +69,33 @@ module Services
       enrollment.aasm_state.humanize.downcase if enrollment
     end
 
-    def total_premium(benefit_package)
-      return @total_employer_contribution if @total_employer_contribution&.any?
-
+    def total_premium(benefit_packages)
       if is_bqt?
         bqt_estimated_premium
-      elsif benefit_package && is_employer?
-        employer_estimated_premium(benefit_package)
+      elsif benefit_packages && is_employer?
+        employer_estimated_premium(benefit_packages)
       else
         Array.new(2)
       end
     end
 
-    def employer_estimated_premium(benefit_package)
+    def employer_estimated_premium(benefit_packages)
       premiums = []
       estimator = ::BenefitSponsors::Services::SponsoredBenefitCostEstimationService.new
-      benefit_package.sponsored_benefits.each do |sponsored_benefit|
-        #As per the current requirement, total premium for the employer is calculated and recorded in the excel.
-        cost_hash = estimator.calculate_estimates_for_benefit_display(sponsored_benefit)
-        premiums.push(number_to_currency(cost_hash ? cost_hash[:estimated_sponsor_exposure] : 0))
+
+      @health_premium = 0
+      @dental_premium = 0
+
+      benefit_packages.each do |pkg|
+        pkg.sponsored_benefits.each do |sponsored_benefit|
+          #As per the current requirement, total premium for the employer is calculated and recorded in the excel.
+          cost_hash = estimator.calculate_estimates_for_benefit_display(sponsored_benefit)
+          @health_premium += (cost_hash ? cost_hash[:estimated_sponsor_exposure] : 0) if sponsored_benefit.health?
+          @dental_premium += (cost_hash ? cost_hash[:estimated_sponsor_exposure] : 0) unless sponsored_benefit.health?
+        end
       end
+
+      premiums.push(number_to_currency(@health_premium), number_to_currency(@dental_premium))
 
       # handles Only health/dental present or none
       premiums += Array.new(2 - premiums.count)
@@ -240,12 +247,12 @@ module Services
     end
 
     def current_application
-      @benefit_application ||= employer_profile.current_benefit_application
+      employer_profile.current_benefit_application
     end
 
-    def benefit_pkg
+    def benefit_pkgs
       return nil if is_bqt?
-      current_application.benefit_packages.first
+      current_application.benefit_packages
     end
   end
 end
