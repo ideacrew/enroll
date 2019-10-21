@@ -10,14 +10,14 @@ RSpec.describe "shared/_network_data.html.erb" do
     it "should have nationwide as true" do
       allow(view).to receive(:offers_nationwide_plans?).and_return(true)
       render partial: "shared/network_data", locals: {plan: mock_dc_plan}
-      expect(rendered).to have_selector("th", text: "Nationwide")
+      expect(rendered).to have_text("Nationwide")
     end
 
     it "should have dc metro as true" do
       allow(view).to receive(:offers_nationwide_plans?).and_return(true)
       allow(mock_dc_plan).to receive(:nationwide).and_return(false)
       render partial: "shared/network_data", locals: {plan: mock_dc_plan}
-      expect(rendered).to have_selector("th", text: "DC-Metro")
+      expect(rendered).to have_text("DC-Metro")
     end
   end
 
