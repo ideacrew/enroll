@@ -2,6 +2,7 @@ module Effective
   module Datatables
     class EmployeeDatatable < Effective::MongoidDatatable
       include Config::AcaModelConcern
+      include Employers::EmployerHelper
 
       datatable do
 
@@ -54,7 +55,8 @@ module Effective
             enrollment_state(row)
         }, :sortable => false, :filter => false
 
-        if attributes["renewal"]
+        # Only render this field if one fo the collection has a renewal enrollment state not blank
+        if attributes["renewal"] && any_employees_in_renewal_enrollment_state?
           table_column :renewal_enrollment_status, :proc => Proc.new { |row|
             renewal_enrollment_state(row)
           }, :filter => false, :sortable => false
@@ -85,6 +87,13 @@ module Effective
           @employees = Queries::EmployeeDatatableQuery.new(attributes)
         end
         @employees
+      end
+
+      def any_employees_in_renewal_enrollment_state?
+        employer_profile = attributes[:employer_profile]
+        @datatable_census_employees = employer_profile&.census_employees
+        return false if @datatable_census_employees.nil?
+        @datatable_census_employees.any? { |employee| renewal_enrollment_state(employee).present? }
       end
 
       def cobra_possible? census_employee
