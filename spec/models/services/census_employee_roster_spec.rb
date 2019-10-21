@@ -26,6 +26,7 @@ RSpec.describe Services::CensusEmployeeRoster, :dbclean => :after_each do
     let(:current_effective_date) {effective_period_start_on}
     let(:effective_period_end_on) {effective_period_start_on + 1.year - 1.day}
     let(:effective_period) {effective_period_start_on..effective_period_end_on}
+    let(:benefit_pkg) {initial_application.benefit_packages.first}
 
     let(:census_dependents_attributes) do
       {:first_name => 'David', :middle_name => '', :last_name => 'Chan', :dob => TimeKeeper.date_of_record - 17.years, gender: 'female', :employee_relationship => 'child_under_26', :ssn => 678453261}
@@ -42,11 +43,11 @@ RSpec.describe Services::CensusEmployeeRoster, :dbclean => :after_each do
       abc_profile.reload
     end
 
-    subject {Services::CensusEmployeeRoster.new(abc_profile, {action: 'download'})}
+    subject {Services::CensusEmployeeRoster.new(abc_profile, {action: 'download', feature: 'employer'})}
 
     context 'total_premium' do
       it 'should return total health and dental premium' do
-        expect(subject.total_premium(census_employees.first)).to eq ['$500.00', nil]
+        expect(subject.total_premium(benefit_pkg)).to eq ['$500.00', nil]
       end
     end
 
@@ -78,12 +79,12 @@ RSpec.describe Services::CensusEmployeeRoster, :dbclean => :after_each do
     let!(:census_employee) {plan_design_census_employee}
     let!(:plan_year) {benefit_application}
 
-    subject {Services::CensusEmployeeRoster.new(profile, {action: 'download'})}
+    subject {Services::CensusEmployeeRoster.new(profile, {action: 'download', feature: 'bqt'})}
 
     context 'total_premium' do
       it 'should return total employer contribution for health and dental' do
-        health_premium = number_to_currency(subject.total_premium(census_employee)[0])
-        dental_premium = number_to_currency(subject.total_premium(census_employee)[1])
+        health_premium = subject.total_premium(nil)[0]
+        dental_premium = subject.total_premium(nil)[1]
         expect([health_premium, dental_premium]).to eq ['$62.40', nil]
       end
     end

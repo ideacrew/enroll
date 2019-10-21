@@ -21,9 +21,6 @@ module Services
         csv << (["#{Settings.site.long_name} Employee Census Template"] + Array.new(6) + [TimeKeeper.date_of_record] + Array.new(5) + ['1.1'])
         csv << headers
 
-        benefit_group_assignments = census_employee_roster.map(&:active_benefit_group_assignment).select{|bga| bga.present? }
-        benefit_package = benefit_group_assignments.map(&:benefit_package).uniq.first
-
         census_employee_roster.each do |census_employee|
           personal_details = personal_headers(census_employee)
           employee_details = employeement_headers(census_employee)
@@ -36,7 +33,7 @@ module Services
           append_config_data = ['', 'employee'] + personal_details + employee_details + benefit_group_details + address_details
 
           if site_key == :dc
-            @total_employer_contribution = total_premium(benefit_package)
+            @total_employer_contribution = total_premium(benefit_pkg)
             append_config_data += @total_employer_contribution
             census_employee.census_dependents.each do |dependent|
               append_config_data += append_dependent(dependent)
@@ -113,7 +110,7 @@ module Services
       #As per the current requirement, total premium for the employer is calculated and recorded in the excel.
       er_health_contribution_amount = sponsored_service.monthly_employer_contribution_amount(health_plan)
       er_dental_contribution_amount = sponsored_service.monthly_employer_contribution_amount(dental_plan) if dental_plan.present?
-      premiums.push(er_health_contribution_amount, er_dental_contribution_amount)
+      premiums.push(number_to_currency(er_health_contribution_amount), number_to_currency(er_dental_contribution_amount))
 
       # handles Only health/dental present or none
       premiums += Array.new(2 - premiums.count)
@@ -240,6 +237,15 @@ module Services
 
     def census_employee_roster
       @census_employee_roster ||= employer_profile.census_employees.order_name_asc
+    end
+
+    def current_application
+      @benefit_application ||= employer_profile.current_benefit_application
+    end
+
+    def benefit_pkg
+      return nil if is_bqt?
+      current_application.benefit_packages.first
     end
   end
 end
