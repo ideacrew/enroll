@@ -10,7 +10,7 @@ Feature: Employer should be able to view payment details
   Scenario: An Employer should be able to view payment history
     When ABC Widgets is logged in and on the home page
     And staff role person clicked on billing tab
-    Then the employer should payment histroy
+    Then the employer should see payment histroy
     When the employer clicks on statements
     Then the employer should see statements histroy
     When the employer clicks on pay my bill

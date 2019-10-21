@@ -811,7 +811,7 @@ Given(/^the employer clicks on billing tab$/) do
   find('.interaction-click-control-billing', wait: 30).click
 end
 
-Then(/^the employer should payment histroy$/) do
+Then(/^the employer should see payment histroy$/) do
   expect(page).to have_content(number_to_currency(@benefit_sponsorship_account.financial_transactions[0].amount))
   expect(page).to have_content('Payment History')
 end

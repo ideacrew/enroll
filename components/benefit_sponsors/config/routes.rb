@@ -38,7 +38,7 @@ BenefitSponsors::Engine.routes.draw do
         end
         member do
           get :inbox
-          get :show_invoice if Settings.aca.auto_enabled
+          get :show_invoice if Settings.aca.autopay_enabled
           get :download_invoice
         end
 
