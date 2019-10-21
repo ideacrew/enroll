@@ -143,8 +143,8 @@ class SponsoredBenefits::Services::PlanCostService
 
   def relationship_for(member)
     Rails.cache.fetch("relationship_for_#{member.id}", expires_in: 15.minutes) do
-      case member.class.to_s
-      when "SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee"
+      case member.class
+      when SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee
         'employee'
       else
         member.employee_relationship
