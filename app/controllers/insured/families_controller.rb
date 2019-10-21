@@ -188,7 +188,7 @@ class Insured::FamiliesController < FamiliesController
     else
       @enrollment = @family.active_household.hbx_enrollments.active.last if @family.present?
     end
-    binding.pry
+
     if @enrollment.present?
       @enrollment.reset_dates_on_previously_covered_members
       if @enrollment.is_shop?

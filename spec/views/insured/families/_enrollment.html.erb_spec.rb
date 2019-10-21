@@ -69,6 +69,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         coverage_year: 2018,
         employer_profile: employer_profile,
         coverage_terminated?: false,
+        coverage_canceled?: false,
         coverage_termination_pending?: true,
         coverage_expired?: false,
         total_premium: 200.00,
@@ -93,6 +94,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx_enrollment).to receive(:kind).and_return('employer_sponsored')
       allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
+      allow(hbx_enrollment).to receive(:display_make_changes_for_ivl?).and_return(true)
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
       expect(rendered).to have_content(employer_legal_name)
       expect(rendered).to have_selector('strong', text: "#{HbxProfile::ShortName}")
@@ -103,6 +105,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx_enrollment).to receive(:kind).and_return('employer_sponsored_cobra')
       allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(true)
+      allow(hbx_enrollment).to receive(:display_make_changes_for_ivl?).and_return(true)
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
       expect(rendered).to have_content(employer_profile.legal_name)
     end
@@ -111,6 +114,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     it "when kind is individual" do
       allow(hbx_enrollment).to receive(:kind).and_return('individual')
       allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
+      allow(hbx_enrollment).to receive(:display_make_changes_for_ivl?).and_return(true)
       allow(hbx_enrollment).to receive(:applied_aptc_amount).and_return(100.0)
       allow(hbx_enrollment).to receive(:is_any_enrollment_member_outstanding).and_return false
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
@@ -142,6 +146,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         coverage_year: 2018,
         employer_profile: employer_profile,
         coverage_terminated?: false,
+        coverage_canceled?: false,
         coverage_termination_pending?: false,
         coverage_expired?: false,
         total_premium: 200.00,
@@ -151,7 +156,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         terminated_on: terminated_on,
         consumer_role_id: nil,
         consumer_role: nil,
-        future_enrollment_termination_date: future_enrollment_termination_date, 
+        future_enrollment_termination_date: future_enrollment_termination_date,
         covered_members_first_names: []
       )
     end
@@ -191,6 +196,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     before :each do
       allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
       allow(hbx_enrollment).to receive(:kind).and_return('employer_sponsored')
+      allow(hbx_enrollment).to receive(:display_make_changes_for_ivl?).and_return(true)
       allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
       allow(view).to receive(:disable_make_changes_button?).with(hbx_enrollment).and_return(false)
@@ -247,6 +253,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       before :each do
         allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
         allow(hbx_enrollment).to receive(:kind).and_return('employer_sponsored')
+        allow(hbx_enrollment).to receive(:display_make_changes_for_ivl?).and_return(true)
         allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
         allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
         allow(view).to receive(:disable_make_changes_button?).with(hbx_enrollment).and_return(false)
@@ -285,6 +292,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
 
     before :each do
+      allow(hbx_enrollment).to receive(:display_make_changes_for_ivl?).and_return(true)
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
 
