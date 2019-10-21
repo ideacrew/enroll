@@ -63,3 +63,14 @@ Feature: IVL plan purchase
     And consumer should also see the reason for ineligibility
     When consumer clicked on shop for new plan
     Then consumer should see primary and valid dependent
+
+  Scenario: IVL plan shopping by clicking on 'shop for plan' button should land on Plan shopping page
+    Given a consumer exists
+    And the consumer is logged in
+    And consumer has a dependent in child relationship with age less than 26
+    And consumer also has a health enrollment with primary person covered
+    When consumer visits home page after successful ridp
+    Then consumer should see the enrollment with make changes button
+    When consumer clicked on make changes button
+    And consumer clicked on shop for new plan
+    Then consumer should see both dependent and primary

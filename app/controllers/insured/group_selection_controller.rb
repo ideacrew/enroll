@@ -183,13 +183,16 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   def build_hbx_enrollment(family_member_ids)
+
+
+    @adapter.if_previous_enrollment_was_special_enrollment do
+      @change_plan = 'change_by_qle'
+    end
+
     case @market_kind
     when 'shop', 'fehb'
       @adapter.if_employee_role_unset_but_can_be_derived(@employee_role) do |e_role|
         @employee_role = e_role
-      end
-      @adapter.if_previous_enrollment_was_special_enrollment do
-        @change_plan = 'change_by_qle'
       end
       benefit_group = nil
       benefit_group_assignment = nil
