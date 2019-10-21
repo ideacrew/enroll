@@ -184,7 +184,6 @@ class Insured::GroupSelectionController < ApplicationController
 
   def build_hbx_enrollment(family_member_ids)
 
-
     @adapter.if_previous_enrollment_was_special_enrollment do
       @change_plan = 'change_by_qle'
     end

@@ -319,12 +319,14 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
     context "IVL Market" do
       context "consumer role family" do
-        let(:family_member_ids) {{"0"=>family.family_members.first.id}}
+        let(:family_member_ids) {{"0" => family.family_members.first.id}}
         let!(:person1) {FactoryBot.create(:person, :with_consumer_role)}
         let!(:consumer_role) {person.consumer_role}
-        let!(:new_household) {family.households.where(:id => {"$ne"=>"#{family.households.first.id}"}).first}
+        let!(:new_household) {family.households.where(:id => {"$ne" => "#{family.households.first.id}"}).first}
         let(:benefit_coverage_period) {FactoryBot.build(:benefit_coverage_period)}
-        let!(:ivl_hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household,
+        let!(:ivl_hbx_enrollment) { FactoryBot.create(:hbx_enrollment,
+                                                      family: family,
+                                                      household: family.active_household,
                                                       enrollment_kind: "special_enrollment") }
 
         before :each do
@@ -351,13 +353,15 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       end
 
       context "resident role family" do
-        let(:family_member_ids) {{"0"=>family.family_members.first.id}}
+        let(:family_member_ids) {{"0" => family.family_members.first.id}}
         let!(:person1) {FactoryBot.create(:person, :with_resident_role)}
         let!(:resident_role) {person.resident_role}
-        let!(:new_household) {family.households.where(:id => {"$ne"=>"#{family.households.first.id}"}).first}
+        let!(:new_household) {family.households.where(:id => {"$ne "=> "#{family.households.first.id}"}).first}
         let(:benefit_coverage_period) {FactoryBot.build(:benefit_coverage_period)}
-        let!(:coverall_hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household,
-                                                      enrollment_kind: "special_enrollment") }
+        let!(:coverall_hbx_enrollment) { FactoryBot.create(:hbx_enrollment,
+                                                           family: family,
+                                                           household: family.active_household,
+                                                           enrollment_kind: "special_enrollment") }
 
         before :each do
           allow(HbxEnrollment).to receive(:find).with("123").and_return(coverall_hbx_enrollment)
