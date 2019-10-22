@@ -25,9 +25,7 @@ module Queries
 
     def self.shop_quiet_period_enrollments(effective_on, enrollment_statuses)
 
-      feins =  BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:benefit_applications => {
-                :$elemMatch => {:predecessor_id => { :$exists => false }, :"effective_period.min" => effective_on, :aasm_state => :active }},
-            :aasm_state => :active
+      feins = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:benefit_applications => {:$elemMatch => {:predecessor_id => { :$exists => false}, :"effective_period.min" => effective_on, :aasm_state => :binder_paid}}
       ).map(&:profile).map(&:fein)
 
       qs = ::Queries::ShopMonthlyEnrollments.new(feins, effective_on)
