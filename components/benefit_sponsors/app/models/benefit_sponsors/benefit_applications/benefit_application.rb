@@ -429,6 +429,7 @@ module BenefitSponsors
       }
     end
 
+    # Note: Above note mentions PUBLISHED_STATES deprecated, use SUBMITTED_STATES
     def is_submitted?
       PUBLISHED_STATES.include?(aasm_state)
     end
