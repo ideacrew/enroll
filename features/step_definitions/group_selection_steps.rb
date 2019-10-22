@@ -77,7 +77,12 @@ end
 
 And(/(.*) also has a health enrollment with primary person covered/) do |role|
   family = Family.all.first
-  sep = FactoryBot.create :special_enrollment_period, family: family
+  if role == "consumer" || role == "Resident" || role == "user"
+    qle = FactoryBot.create :qualifying_life_event_kind, market_kind: "individual"
+    sep = FactoryBot.create :special_enrollment_period, qualifying_life_event_kind_id: qle.id, family: family
+  else
+    sep = FactoryBot.create :special_enrollment_period, family: family
+  end
   product = FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile)
   enrollment = FactoryBot.create(:hbx_enrollment, product: product,
                                   household: family.active_household,
@@ -374,4 +379,3 @@ end
 And(/Resident clicked on "Married" qle/) do
   click_link "Married"
 end
-
