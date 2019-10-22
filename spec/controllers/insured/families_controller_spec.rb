@@ -1041,7 +1041,11 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
     let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
     let(:person) { FactoryBot.create(:person) }
+    let(:ivl_person)       { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+    let(:ivl_family)       { FactoryBot.create(:family, :with_primary_family_member, person: ivl_person) }
     let(:user) { FactoryBot.create(:user, person: person) }
+    let(:ivl_user) { FactoryBot.create(:user, person: ivl_person) }
+    let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
     let(:hbx_enrollment) {  FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
                         household: family.active_household,
                         family: family,
@@ -1049,23 +1053,61 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
                         effective_on: initial_application.start_on,
                         rating_area_id: initial_application.recorded_rating_area_id,
                         sponsored_benefit_id: initial_application.benefit_packages.first.health_sponsored_benefit.id,
-                        sponsored_benefit_package_id:initial_application.benefit_packages.first.id,
-                        benefit_sponsorship_id:initial_application.benefit_sponsorship.id)
+                        sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
+                        benefit_sponsorship_id: initial_application.benefit_sponsorship.id)
     }
 
-    before :each do
-      allow(person).to receive(:primary_family).and_return(family)
-      allow(hbx_enrollment).to receive(:reset_dates_on_previously_covered_members).and_return(true)
-      sign_in(user)
-      get :purchase, params:{id: family.id, hbx_enrollment_id: hbx_enrollment.id, terminate: 'terminate'}
+    let(:ivl_enrollment)    {
+      FactoryBot.create(:hbx_enrollment,
+                         family: ivl_family,
+                         household: ivl_family.latest_household,
+                         coverage_kind: "health",
+                         enrollment_kind: "open_enrollment",
+                         kind: "individual",
+                         product: product,
+                         aasm_state: "coverage_selected")
+    }
+
+    context "for shop" do
+      before :each do
+        allow(person).to receive(:primary_family).and_return(family)
+        allow(hbx_enrollment).to receive(:reset_dates_on_previously_covered_members).and_return(true)
+        sign_in(user)
+        get :purchase, params: {id: family.id, hbx_enrollment_id: hbx_enrollment.id, terminate: 'terminate'}
+      end
+
+      it "should get hbx_enrollment" do
+        expect(assigns(:enrollment)).to eq hbx_enrollment
+      end
+
+      it "should get terminate" do
+        expect(assigns(:terminate)).to eq 'terminate'
+      end
+
+      it "should get plan" do
+        expect(assigns(:plan)).to be_kind_of(BenefitMarkets::Products::Product)
+      end
     end
 
-    it "should get hbx_enrollment" do
-      expect(assigns(:enrollment)).to eq hbx_enrollment
-    end
+    context "for individual" do
+      before :each do
+        allow(ivl_person).to receive(:primary_family).and_return(ivl_family)
+        allow(ivl_enrollment).to receive(:reset_dates_on_previously_covered_members).and_return(true)
+        sign_in(ivl_user)
+        get :purchase, params: {id: ivl_family.id, hbx_enrollment_id: ivl_enrollment.id, terminate: 'terminate'}
+      end
 
-    it "should get terminate" do
-      expect(assigns(:terminate)).to eq 'terminate'
+      it "should get hbx_enrollment" do
+        expect(assigns(:enrollment)).to eq ivl_enrollment
+      end
+
+      it "should get terminate" do
+        expect(assigns(:terminate)).to eq 'terminate'
+      end
+
+      it "should get plan" do
+        expect(assigns(:plan)).to be_kind_of(UnassistedPlanCostDecorator)
+      end
     end
   end
 end
