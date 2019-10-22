@@ -169,8 +169,8 @@ end
 And(/(.*) should see the (.*) family member (.*) and (.*)/) do |employee, type, disabled, checked|
   wait_for_ajax
   if type == "ineligible"
-    expect(find("input[type='checkbox']:disabled", wait: 5)).to be_disabled
-    expect(find("input[type='checkbox']:disabled")).not_to be_checked
+    expect(first("input[type='checkbox']:disabled", wait: 5)).to be_disabled
+    expect(first("input[type='checkbox']:disabled")).not_to be_checked
   else
     expect(find("#family_member_ids_0", wait: 5)).not_to be_disabled
     expect(find("#family_member_ids_0")).to be_checked
