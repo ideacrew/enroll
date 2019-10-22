@@ -1046,7 +1046,8 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     let(:user) { FactoryBot.create(:user, person: person) }
     let(:ivl_user) { FactoryBot.create(:user, person: ivl_person) }
     let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
-    let(:hbx_enrollment) {  FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+    let(:hbx_enrollment) do
+      FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
                         household: family.active_household,
                         family: family,
                         aasm_state: "coverage_enrolled",
@@ -1055,18 +1056,18 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
                         sponsored_benefit_id: initial_application.benefit_packages.first.health_sponsored_benefit.id,
                         sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
                         benefit_sponsorship_id: initial_application.benefit_sponsorship.id)
-    }
+    end
 
-    let(:ivl_enrollment)    {
+    let(:ivl_enrollment) do
       FactoryBot.create(:hbx_enrollment,
-                         family: ivl_family,
-                         household: ivl_family.latest_household,
-                         coverage_kind: "health",
-                         enrollment_kind: "open_enrollment",
-                         kind: "individual",
-                         product: product,
-                         aasm_state: "coverage_selected")
-    }
+                        family: ivl_family,
+                        household: ivl_family.latest_household,
+                        coverage_kind: "health",
+                        enrollment_kind: "open_enrollment",
+                        kind: "individual",
+                        product: product,
+                        aasm_state: "coverage_selected")
+    end
 
     context "for shop" do
       before :each do
