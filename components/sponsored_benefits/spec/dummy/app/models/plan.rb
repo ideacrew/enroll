@@ -32,6 +32,7 @@ class Plan
 
   field :deductible, type: String # Deductible
   field :family_deductible, type: String
+  field :dental_level, type: String
 
   scope :by_active_year,        ->(active_year = TimeKeeper.date_of_record.year) { where(active_year: active_year) }
   scope :shop_market,           ->{ where(market: "shop") }
