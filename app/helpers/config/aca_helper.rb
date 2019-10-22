@@ -7,10 +7,6 @@ module Config::AcaHelper
     Settings.aca.state_name
   end
 
-  def aca_site_short_name
-    Settings.site.short_name
-  end
-
   def aca_primary_market
     Settings.aca.market_kinds.first
   end
