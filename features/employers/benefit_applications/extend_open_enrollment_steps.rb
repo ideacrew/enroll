@@ -11,3 +11,18 @@ end
 Then(/^a Successfully extended employer\(s\) open enrollment success message will display\.$/) do
   expect(page).to have_css('.alert.alert-success', text: 'Successfully extended employer(s) open enrollment.')
 end
+
+When(/^the user fills out the Extend Open Enrollment form with a new date$/) do
+  # After effective date
+  fill_in('open_enrollment_end_date', with: (Date.today + 1.year).to_s)
+end
+
+When(/^the user clicks the Extend Open Enrollment to submit the form$/) do
+  inputs = page.all('input')
+  extension_button = inputs.detect { |input| input[:value] == 'Extend Open Enrollment' }
+  extension_button.click
+end
+
+Then("the user should see a success message that Open Enrollment was successfully extended") do
+  expect(page).to have_content('Successfully extended employer(s) open enrollment.')
+end

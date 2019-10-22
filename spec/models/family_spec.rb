@@ -1440,6 +1440,33 @@ describe Family, "scopes", dbclean: :after_each do
   end
 
   context 'scopes' do 
+    context '.all_enrollments_by_benefit_package' do
+      let(:benefit_package_to_test) do
+        double(:benefit_package, :_id => 1)
+      end
+
+      it "works on the family class" do
+        expect(Family.all_enrollments_by_benefit_package(benefit_package_to_test)).to eq([])
+      end
+    end
+
+    context '.all_enrollments_by_benefit_sponsorship_id' do
+      let(:benefit_sponsorship_id) { 1 }
+      it 'works on the family class' do
+        expect(Family.all_enrollments_by_benefit_sponsorship_id(benefit_sponsorship_id)).to eq([])
+      end
+    end
+
+    context '.enrolled_and_terminated_through_benefit_package' do
+      let(:benefit_package_to_test) do
+        double(:benefit_package, :_id => 1)
+      end
+
+      it "works on the family class" do
+        expect(Family.enrolled_and_terminated_through_benefit_package(benefit_package_to_test)).to eq([])
+      end
+    end
+
     context '.all_with_hbx_enrollments' do
       it "works on family class" do
         expect(Family.all_with_hbx_enrollments).to include(ivl_enrollment.family)
