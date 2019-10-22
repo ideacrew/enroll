@@ -290,7 +290,6 @@ module SponsoredBenefits
       let(:prospect_plan_design_proposal) { plan_design_proposal}
 
       it "should generate a CSV with success as response" do
-        benefit_application
         sign_in user_with_broker_role
         get :export_plan_design_employees, params: {plan_design_proposal_id: prospect_plan_design_proposal.id.to_s}, format: :csv
         assert_response :success
