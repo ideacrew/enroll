@@ -55,6 +55,53 @@ RSpec.describe Exchanges::BrokerApplicantsController do
       sign_in(user)
     end
 
+    context 'carrier appointments, license, and reason' do
+      it "should update for blank values" do
+        put(
+          :update,
+          params: {
+            "update" => "Update",
+            id: broker_role.person.id,
+            "person" => {
+              "broker_role_attributes" => {
+                "license" => "0",
+                "training" => "0",
+                "carrier_appointments" => {}
+              }
+            }
+          }
+        )
+        broker_role.reload
+        expect(broker_role.carrier_appointments).to eq({})
+        expect(response).to have_http_status(:redirect)
+        expect(response).to redirect_to('/exchanges/hbx_profiles')
+      end
+
+      it 'should update for set values' do
+        broker_role.update_attributes!(carrier_appointments: {})
+        broker_role.reload
+        expect(broker_role.carrier_appointments).to eq({})
+        put(
+          :update,
+          params: {
+            "update" => "Update",
+            id: broker_role.person.id,
+            "person" => {
+              "broker_role_attributes" => {
+                "license" => "1",
+                "training" => "1",
+                "carrier_appointments" => {"Aetna Health Inc" => "true", "United Health Care Insurance" => "true"}
+              }
+            }
+          }
+        )
+        broker_role.reload
+        expect(broker_role.carrier_appointments).to eq({"Aetna Health Inc" => "true", "United Health Care Insurance" => "true"})
+        expect(response).to have_http_status(:redirect)
+        expect(response).to redirect_to('/exchanges/hbx_profiles')
+      end
+    end
+
     context 'when application denied' do
       before :each do
         put :update, params:{id: broker_role.person.id, deny: true}, format: :js
@@ -124,7 +171,7 @@ RSpec.describe Exchanges::BrokerApplicantsController do
           expect(response).to redirect_to('/exchanges/hbx_profiles')
           #only really testing that the params go through.
           if aca_state_abbreviation == "DC"
-            expect(broker_role.carrier_appointments).to eq({"Aetna Health Inc"=>"true", "Aetna Life Insurance Company"=>nil, "Carefirst Bluechoice Inc"=>nil, "Group Hospitalization and Medical Services Inc"=>nil, "Kaiser Foundation"=>nil, "Optimum Choice"=>nil, "United Health Care Insurance"=>"true", "United Health Care Mid Atlantic"=>nil})
+            expect(broker_role.carrier_appointments).to eq({"Aetna Health Inc" => "true", "United Health Care Insurance" => "true"})
           else
             expect(broker_role.carrier_appointments).to eq({"Aetna Health Inc"=>"true", "Altus" => nil, "Blue Cross Blue Shield MA" => nil, "Boston Medical Center Health Plan" => nil, "Delta" => nil, "FCHP" => nil, "Guardian" => nil, "Harvard Pilgrim Health Care" => nil, "Health New England" => nil, "Minuteman Health" => nil, "Neighborhood Health Plan" => nil, "Tufts Health Plan Direct" => nil, "Tufts Health Plan Premier" => nil, "United Health Care Insurance" => "true"})
           end
