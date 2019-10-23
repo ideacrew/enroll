@@ -221,12 +221,10 @@ module Queries
     end
 
     def collect_benefit_group_ids(effective_on = nil)
-      start_date = (effective_on || @effective_on)
-      application_state = start_date.present? && start_date >= TimeKeeper.date_of_record ? :binder_paid : :active
       @feins.collect{|e| prepend_zeros(e.to_s, 9) }.inject([]) do |id_list, fein|
         benefit_sponsorship = BenefitSponsors::Organizations::Organization.where(fein: fein).try(:first).try(:active_benefit_sponsorship)
         if benefit_sponsorship.present?
-          benefit_application = benefit_sponsorship.benefit_applications.where(:predecessor_id => nil, :"effective_period.min" => effective_on || @effective_on, :aasm_state => application_state).first
+          benefit_application = benefit_sponsorship.benefit_applications.where(:predecessor_id => nil, :"effective_period.min" => effective_on || @effective_on, :aasm_state.in => [:binder_paid, :active]).first
         end
 
         if benefit_application.blank?
