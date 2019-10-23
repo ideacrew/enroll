@@ -6,6 +6,8 @@
 module Factories
   class EligibilityFactory
 
+    include ApplicationHelper
+
     def initialize(enrollment_id, selected_aptc = nil, product_ids = [])
       @enrollment = HbxEnrollment.where(id: enrollment_id.to_s).first
       raise "Cannot find a valid enrollment with given enrollment id" unless @enrollment
@@ -54,7 +56,7 @@ module Factories
     def ehb_premium(product_id)
       product = ::BenefitMarkets::Products::Product.find(product_id)
       premium_amount = fetch_total_premium(product)
-      premium_amount * product.ehb
+      round_down_float_two_decimals(premium_amount * product.ehb)
     end
 
     def fetch_total_premium(product)

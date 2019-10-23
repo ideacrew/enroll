@@ -594,4 +594,17 @@ end
       expect(user3.person.hbx_staff_role).to eq nil
     end
   end
+
+  describe "round_down_float_two_decimals" do
+
+    shared_examples_for "rounding float number" do |input, output|
+      it "should round down for given input #{input}" do
+        expect(helper.round_down_float_two_decimals(input)).to eq(output)
+      end
+    end
+
+    it_behaves_like "rounding float number", 102.1693244, 102.16
+    it_behaves_like "rounding float number", 102.177777777, 102.17
+    it_behaves_like "rounding float number", 866.07512, 866.07
+  end
 end

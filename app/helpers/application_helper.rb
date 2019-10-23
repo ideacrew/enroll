@@ -828,4 +828,8 @@ module ApplicationHelper
 
     hbx_staff_role.permission.can_access_pay_now
   end
+
+  def round_down_float_two_decimals(float_number)
+    BigDecimal.new((float_number).to_s).round(15).round(2, BigDecimal::ROUND_DOWN).to_f
+  end
 end
