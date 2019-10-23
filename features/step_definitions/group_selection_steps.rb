@@ -271,8 +271,25 @@ end
 
 Then(/(.*) should see keep existing plan and select plan to terminate button/) do |role|
   expect(page).to have_button('Keep existing plan')
-  # expect(page).to have_link "Keep existing plan"
   expect(page).to have_link "Select Plan to Terminate"
+end
+
+When(/(.*) clicked on keep existing plan button/) do |role|
+  click_button "Keep existing plan"
+end
+
+Then(/consumer should land on confirm page/) do
+  expect(page).to have_content "Confirm Your Plan Selection"
+  expect(page).to have_content "Premium"
+end
+
+Then(/consumer should enrollment submitted confirmation page/) do
+  expect(page).to have_content "Enrollment Submitted"
+  expect(page).to have_content "Premium"
+end
+
+Then(/cosumer should see the home page/) do
+  expect(page).to have_content "My #{Settings.site.short_name}"
 end
 
 When(/(.*) clicked continue on household info page/) do |role|
