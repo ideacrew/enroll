@@ -55,8 +55,8 @@ module Effective
             enrollment_state(row)
         }, :sortable => false, :filter => false
 
-        # Only render this field if one fo the collection has a renewal enrollment state not blank
-        if attributes["renewal"] && any_employees_in_renewal_enrollment_state?
+        # Do not show column unless renewal_benefit_application aasm state is in PUBLISHED_STATES
+        if attributes["renewal"] && attributes[:employer_profile].renewal_benefit_application.is_submitted?
           table_column :renewal_enrollment_status, :proc => Proc.new { |row|
             renewal_enrollment_state(row)
           }, :filter => false, :sortable => false
