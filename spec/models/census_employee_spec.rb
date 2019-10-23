@@ -201,8 +201,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     end
 
     context "with duplicate blank ssn's on dependents" do
-      let(:child1) {FactoryBot.build(:census_dependent, employee_relationship: "child_under_26", ssn: "")}
-      let(:child2) {FactoryBot.build(:census_dependent, employee_relationship: "child_under_26", ssn: "")}
+      let(:child1) {FactoryBot.build(:census_dependent, first_name: 'Jimmy', last_name: 'Stephens', employee_relationship: "child_under_26", ssn: "")}
+      let(:child2) {FactoryBot.build(:census_dependent, first_name: 'Ally', last_name: 'Stephens', employee_relationship: "child_under_26", ssn: "")}
 
       it "should not have errors" do
         initial_census_employee.census_dependents = [child1, child2]
