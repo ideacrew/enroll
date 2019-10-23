@@ -1252,6 +1252,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         end
       end
     end
+
+
   end
 
   context '.new_hire_enrollment_period' do
@@ -2519,6 +2521,14 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
     context "if censue employee is cobra linked" do
       let(:aasm_state) {"cobra_linked"}
+
+      it "should return false" do
+        expect(census_employee.is_terminate_possible?).to eq false
+      end
+    end
+
+    context "if censue employee is newly designatede linked" do
+      let(:aasm_state) {"newly_designated_linked"}
 
       it "should return false" do
         expect(census_employee.is_terminate_possible?).to eq false
