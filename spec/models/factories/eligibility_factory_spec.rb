@@ -370,6 +370,8 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
             before do
               @eligibility_factory = described_class.new(enrollment1.id, 150.00, [@product_id])
               @applicable_aptc = @eligibility_factory.fetch_applicable_aptcs
+              @aptc_per_member = @eligibility_factory.fetch_aptc_per_member
+              @ehb_premium =  @eligibility_factory.send(:ehb_premium, enrollment1.product.id)
             end
 
             it 'should return a Hash' do
