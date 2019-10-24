@@ -86,6 +86,16 @@ module BenefitSponsors
               expect(initial_application.aasm_state).to eq :enrollment_open
               expect(initial_application.open_enrollment_period.begin.to_date).to eq TimeKeeper.date_of_record
             end
+
+            it "should submit application with immediate open enrollment without min contributions for 1/1 ERs" do
+              min_date = TimeKeeper.date_of_record.next_year.beginning_of_year
+              initial_application.update_attributes(:effective_period => min_date..(min_date.next_year - 1.day), :open_enrollment_period => TimeKeeper.date_of_record..(min_date.prev_month + 9.days))
+              initial_application.benefit_packages.first.sorted_composite_tier_contributions.first.update_attributes(contribution_factor: 0.0)
+              subject.submit_application
+              initial_application.reload
+              expect(initial_application.aasm_state).to eq :enrollment_open
+              expect(initial_application.open_enrollment_period.begin.to_date).to eq TimeKeeper.date_of_record
+            end
           end
 
           context "and the benefit_application fails business policy validation" do

@@ -576,6 +576,10 @@ class Family
     special_enrollment_periods.fehb_market.order_by(:submitted_at.desc).to_a.detect{ |sep| sep.is_active? }
   end
 
+  def latest_ivl_sep
+    special_enrollment_periods.individual_market.order_by(:submitted_at.desc).to_a.detect{ |sep| sep.is_active? }
+  end
+
   def terminate_date_for_shop_by_enrollment(enrollment=nil)
     latest_sep = latest_shop_sep || latest_fehb_sep
     if latest_sep.present?

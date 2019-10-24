@@ -191,8 +191,12 @@ class Insured::FamiliesController < FamiliesController
 
     if @enrollment.present?
       @enrollment.reset_dates_on_previously_covered_members
-      @plan = @enrollment.product
-      @member_group = HbxEnrollmentSponsoredCostCalculator.new(@enrollment).groups_for_products([@plan]).first
+      if @enrollment.is_shop?
+        @plan = @enrollment.product
+        @member_group = HbxEnrollmentSponsoredCostCalculator.new(@enrollment).groups_for_products([@plan]).first
+      else
+        @plan = @enrollment.build_plan_premium
+      end
 
       begin
         @plan.name

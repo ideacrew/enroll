@@ -129,7 +129,11 @@ class GroupSelectionPrevaricationAdapter
 
   def ivl_benefit
     correct_effective_on = calculate_ivl_effective_on
-    HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.select{|bcp| bcp.contains?(correct_effective_on)}.first.benefit_packages.select{|bp|  bp[:title] == "individual_health_benefits_#{correct_effective_on.year}"}.first
+    if @change_plan.present? && @previous_hbx_enrollment.present? && @previous_hbx_enrollment.is_ivl_by_kind?
+      HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.select{|bcp| bcp.contains?(correct_effective_on)}.first.benefit_packages.select{|bp|  bp.effective_year == correct_effective_on.year && bp.benefit_categories.include?(@previous_hbx_enrollment.coverage_kind)}.first
+    else
+      HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.select{|bcp| bcp.contains?(correct_effective_on)}.first.benefit_packages.select{|bp|  bp[:title] == "individual_health_benefits_#{correct_effective_on.year}"}.first
+    end
   end
 
   def calculate_ivl_effective_on
