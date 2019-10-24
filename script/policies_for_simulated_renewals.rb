@@ -1,4 +1,6 @@
-date = Date.today
+# frozen_string_literal: true
+
+date = Time.zone.today
 
 if date.day > 15
   window_start = Date.new(date.year,date.month,16)
@@ -19,45 +21,36 @@ BenefitMarkets::Products::Product.all.each do |product|
 end
 
 def find_renewed_sponsorships(start_date)
-  BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where({
-                                                                     "benefit_applications" => {
-                                                                         "$elemMatch" => {
-                                                                             "effective_period.min" => start_date,
-                                                                              "predecessor_id" => {"$ne" => nil},
-                                                                             "aasm_state" => {"$in" => [
-                                                                                 :enrollment_open,
-                                                                                 :enrollment_closed,
-                                                                                 :enrollment_eligible,
-                                                                                 :enrollment_extended,
-                                                                                 :active
-                                                                             ]}
-                                                                         }
-                                                                     }
-                                                                 })
+  BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(
+    {:benefit_applications =>
+      { :$elemMatch => {
+        :"effective_period.min" => start_date,
+        :predecessor_id => {"$ne" => nil},
+        :aasm_state.in => [:enrollment_open, :enrollment_closed, :enrollment_eligible, :enrollment_extended, :active]
+      }}}
+  )
 end
 
 def matching_plan_details(enrollment, other_hbx_enrollment, product_cache)
   return false if other_hbx_enrollment.product_id.blank?
   new_plan = product_cache[enrollment.product_id]
   old_plan = product_cache[other_hbx_enrollment.product_id]
-  return false  if old_plan.kind == "dental" && old_plan.active_year == (Date.today.year - 1).to_s
-  (old_plan.issuer_profile_id == new_plan.issuer_profile_id) &&
-      (old_plan.active_year == new_plan.active_year - 1) &&
-      (old_plan.kind == new_plan.kind)
+  return false  if old_plan.kind == "dental" && old_plan.active_year == (Time.zone.today.year - 1).to_s
+  (old_plan.issuer_profile_id == new_plan.issuer_profile_id) && (old_plan.active_year == new_plan.active_year - 1) && (old_plan.kind == new_plan.kind)
 end
 
 def initial_or_renewal(enrollment,product_cache,ben_app)
   return "initial" if ben_app.predecessor_id.blank?
   renewal_enrollments = enrollment.family.hbx_enrollments.select do |hbx_enrollment|
-    if hbx_enrollment.sponsored_benefit_package_id.present?
-      hbx_enrollment.sponsored_benefit_package.benefit_application.id == ben_app.predecessor_id
-    end
+    next if hbx_enrollment.sponsored_benefit_package_id.blank?
+    hbx_enrollment.sponsored_benefit_package.benefit_application.id == ben_app.predecessor_id
   end
 
-  reject_statuses = HbxEnrollment::CANCELED_STATUSES + HbxEnrollment::WAIVED_STATUSES + %w(unverified void)
+  reject_statuses = HbxEnrollment::CANCELED_STATUSES + HbxEnrollment::WAIVED_STATUSES + ['unverified void']
   renewal_enrollments_no_cancels_waives = renewal_enrollments.reject{|ren| reject_statuses.include?(ren.aasm_state.to_s)}
-  renewal_enrollments_no_terms = renewal_enrollments_no_cancels_waives.reject{|ren| %w(coverage_terminated coverage_termination_pending).include?(ren.aasm_state.to_s) && ren.terminated_on.present? &&
-      ren.terminated_on < (enrollment.effective_on - 1.day)}
+  renewal_enrollments_no_terms = renewal_enrollments_no_cancels_waives.reject do |ren|
+    ['coverage_terminated', 'coverage_termination_pending'].include?(ren.aasm_state.to_s) && ren.terminated_on.present? && ren.terminated_on < (enrollment.effective_on - 1.day)
+  end
   if renewal_enrollments_no_terms.any?{|ren| matching_plan_details(enrollment,ren,product_cache)}
     puts 'renewal'
     return "renewal"
@@ -73,8 +66,7 @@ renewed_sponsorships = find_renewed_sponsorships(start_on_date)
 initial_file = File.open("policies_to_pull_ies.txt","w")
 renewal_file = File.open("policies_to_pull_renewals.txt","w")
 
-renewed_sponsorships.each do |bs|
-  fein = bs.fein
+renewed_sponsorships.no_timeout.each do |bs|
   selected_application = bs.renewal_benefit_application
 
   next if selected_application.blank?
