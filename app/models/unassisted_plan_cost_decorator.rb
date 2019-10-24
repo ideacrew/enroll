@@ -88,9 +88,10 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def total_aptc_amount
-    members.reduce(0.00) do |sum, member|
-      (sum + aptc_amount(member)).round(2)
-    end.round(2)
+    result = members.reduce(0.00) do |sum, member|
+      (sum + aptc_amount(member))
+    end
+    round_down_float_two_decimals(result)
   end
 
   def total_employee_cost
