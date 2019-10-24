@@ -379,8 +379,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
               @eligibility_factory = described_class.new(enrollment1.id, 150.00, [@product_id])
               @applicable_aptc = @eligibility_factory.fetch_applicable_aptcs
               @aptc_per_member = @eligibility_factory.fetch_aptc_per_member
-              premium = enrollment1.ivl_decorated_hbx_enrollment.premium_for(enrollment_member1)
-              @ehb_premium = premium * enrollment1.product.ehb
+              @ehb_premium = @eligibility_factory.send(:ehb_premium, enrollment1.product.id)
             end
 
             context '.fetch_applicable_aptcs' do
