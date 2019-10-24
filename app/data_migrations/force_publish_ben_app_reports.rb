@@ -293,28 +293,49 @@ class ForcePublishBenAppReports < MongoidMigrationTask
     end
   end
 
+  # Validators
+
+  def successfully_generated(current_year_state)
+    "Successfully Generated" if ['coverage_enrolled', 'auto_renewing'].include?(current_year_state)
+  end
+
+  def manually_published(ben_app)
+    "The plan year was manually published by stakeholders" if ["active", "enrollment_eligible"].include?(ben_app.aasm_state)
+  end
+
+  def manually_selected(current_year_state, rp_id, cp_id)
+    "Plan was manually selected for the current year" if current_year_state == "coverage_selected" && rp_id != cp_id
+  end
+
+  def enrollment_is_waived(current_year_state)
+    "enrollment is waived" if ["inactive", "renewing_waived"].include?(current_year_state)
+  end
+
+  def er_zip_code_not_in_dc(current_year_state, ben_app)
+    "ER zip code is not in DC" if current_year_state.nil? && ben_app.aasm_state == 'pending'
+  end
+
+  def previous_plan_waived(current_year_state, prev_year_state)
+    "Previous plan has waived or terminated and did not generate renewal" if current_year_state.nil? && prev_year_state.in?(HbxEnrollment::WAIVED_STATUSES + HbxEnrollment::TERMINATED_STATUSES)
+  end
+
+  def enrollment_plan_changed(rp_id, cp_id, current_year_state)
+    "Enrollment plan was changed either for current year or previous year" if rp_id != cp_id && current_year_state.nil? && ["coverage_selected", "coverage_enrolled"].include?(prev_year_state)
+  end
+
   def find_failure_reason(enrollment_prev_year, enrollment_current_year, ben_app)
     current_year_state = enrollment_current_year.try(:aasm_state)
     prev_year_state = enrollment_prev_year.try(:aasm_state)
     rp_id = enrollment_prev_year.try(:product).try(:renewal_product_id)
     cp_id = enrollment_current_year.try(:product).try(:id)
-
-    if current_year_state == 'auto_renewing'
-      "Successfully Generated"
-    elsif current_year_state == 'coverage_enrolled'
-      "The plan year was manually published by stakeholders" if ["active","enrollment_eligible"].include?(ben_app.aasm_state)
-    elsif current_year_state == "coverage_selected"
-      "Plan was manually selected for the current year" unless rp_id == cp_id
-    elsif ["inactive","renewing_waived"].include?(current_year_state)
-      "enrollment is waived"
-    elsif current_year_state.nil? && ben_app.aasm_state == 'pending'
-      "ER zip code is not in DC"
-    elsif current_year_state.nil? && prev_year_state.in?(HbxEnrollment::WAIVED_STATUSES + HbxEnrollment::TERMINATED_STATUSES)
-      "Previous plan has waived or terminated and did not generate renewal"
-    elsif current_year_state.nil? && ["coverage_selected", "coverage_enrolled"].include?(prev_year_state)
-      "Enrollment plan was changed either for current year or previous year" unless rp_id == cp_id
-    else
-      return ''
-    end
+    failure_reasons = []
+    failure_reasons << successfully_generated(current_year_state)
+    failure_reasons << manually_published(ben_app)
+    failure_reasons << manually_selected(current_year_state, rp_id, cp_id)
+    failure_reasons << enrollment_is_waived(current_year_state)
+    failure_reasons << er_zip_code_not_in_dc(current_year_state, ben_app)
+    failure_reasons << revious_plan_waived(current_year_state, prev_year_state)
+    failure_reasons << enrollment_plan_changed(rp_id, cp_id, current_year_state)
+    failure_reasons.join(" ")
   end
 end
