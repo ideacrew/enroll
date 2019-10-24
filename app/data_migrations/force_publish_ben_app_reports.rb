@@ -146,6 +146,29 @@ class ForcePublishBenAppReports < MongoidMigrationTask
     end
   end
 
+  def non_detail_active_bg_ids(active_bg_ids)
+    active_enrollment_count = 0
+    enrollments = HbxEnrollment.where({
+                                        :sponsored_benefit_package_id.in => active_bg_ids,
+                                        :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES
+                                      })
+    %w[health dental].each do |coverage_kind|
+      active_enrollment_count += enrollments.where(:coverage_kind => coverage_kind).count if enrollments.where(:coverage_kind => coverage_kind).present?
+    end
+  end
+
+  def non_detail_renewal_bg_ids(renewal_bg_ids)
+    renewal_enrollment_count = 0
+    renewal_enrollments = HbxEnrollment.where({
+                                                :sponsored_benefit_package_id.in => renewal_bg_ids,
+                                                :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES + ['auto_renewing']
+                                              })
+
+    %w[health dental].each do |coverage_kind|
+      renewal_enrollment_count += renewal_enrollments.where(:coverage_kind => coverage_kind).count if renewal_enrollments.where(:coverage_kind => coverage_kind).present?
+    end
+  end
+
   def non_detailed_report(start_on_date, _current_date)
     file_name = "#{Rails.root}/dry_run_dc_nfp_non_detailed_report_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.csv"
     field_names = [
@@ -169,27 +192,9 @@ class ForcePublishBenAppReports < MongoidMigrationTask
           active_bg_ids = ben_spon.current_benefit_application.benefit_packages.pluck(:id)
 
           renewal_bg_ids = ben_spon.renewal_benefit_application.benefit_packages.pluck(:id) if ben_spon.renewal_benefit_application.present?
+          non_detail_active_bg_ids(active_bg_ids) if active_bg_ids.present?
+          non_detail_renewal_bg_ids(renewal_bg_ids) if renewal_bg_ids.present?
 
-          active_enrollment_count = 0
-          renewal_enrollment_count = 0
-          enrollments = HbxEnrollment.where({
-                                              :sponsored_benefit_package_id.in => active_bg_ids,
-                                              :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES
-                                            })
-          %w[health dental].each do |coverage_kind|
-            active_enrollment_count += enrollments.where(:coverage_kind => coverage_kind).count if enrollments.where(:coverage_kind => coverage_kind).present?
-          end
-
-          if renewal_bg_ids.present?
-            renewal_enrollments = HbxEnrollment.where({
-                                                        :sponsored_benefit_package_id.in => renewal_bg_ids,
-                                                        :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES + ['auto_renewing']
-                                                      })
-
-            %w[health dental].each do |coverage_kind|
-              renewal_enrollment_count += renewal_enrollments.where(:coverage_kind => coverage_kind).count if renewal_enrollments.where(:coverage_kind => coverage_kind).present?
-            end
-          end
           data += [active_enrollment_count, renewal_enrollment_count]
           csv << data
         end
@@ -197,35 +202,40 @@ class ForcePublishBenAppReports < MongoidMigrationTask
     end
   end
 
+  def detailed_report_field_names(start_on_date)
+    [
+      "Employer Legal Name",
+      "Employer FEIN",
+      "Employer HBX ID",
+      "#{start_on_date.prev_year.year} effective_date",
+      "#{start_on_date.prev_year.year} State",
+      "#{start_on_date.year} effective_date",
+      "#{start_on_date.year} State",
+      "First name",
+      "Last Name",
+      "Roster status",
+      "Hbx ID",
+      "#{start_on_date.prev_year.year} enrollment",
+      "#{start_on_date.prev_year.year} enrollment kind",
+      "#{start_on_date.prev_year.year} plan",
+      "#{start_on_date.prev_year.year} effective_date",
+      "#{start_on_date.prev_year.year} status",
+      "#{start_on_date.year} enrollment",
+      "#{start_on_date.year} enrollment kind",
+      "#{start_on_date.year} plan",
+      "#{start_on_date.year} effective_date",
+      "#{start_on_date.year} status",
+      "Reasons"
+    ]
+  end
+
   def detailed_report(start_on_date, _current_date)
     file_name = "#{Rails.root}/dry_run_dc_nfp_detailed_report_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.csv"
-    field_names = ["Employer Legal Name",
-                   "Employer FEIN",
-                   "Employer HBX ID",
-                   "#{start_on_date.prev_year.year} effective_date",
-                   "#{start_on_date.prev_year.year} State",
-                   "#{start_on_date.year} effective_date",
-                   "#{start_on_date.year} State",
-                   "First name",
-                   "Last Name",
-                   "Roster status",
-                   "Hbx ID",
-                   "#{start_on_date.prev_year.year} enrollment",
-                   "#{start_on_date.prev_year.year} enrollment kind",
-                   "#{start_on_date.prev_year.year} plan",
-                   "#{start_on_date.prev_year.year} effective_date",
-                   "#{start_on_date.prev_year.year} status",
-                   "#{start_on_date.year} enrollment",
-                   "#{start_on_date.year} enrollment kind",
-                   "#{start_on_date.year} plan",
-                   "#{start_on_date.year} effective_date",
-                   "#{start_on_date.year} status",
-                   "Reasons"]
 
     system("rm -rf #{file_name}")
 
     CSV.open(file_name, "w", force_quotes: true) do |csv|
-      csv << field_names
+      csv << detailed_report_field_names(start_on_date)
       BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:'benefit_applications.effective_period.min' => start_on_date).find_each do |ben_spon|
         ben_spon.benefit_applications.each do |ben_app|
 
@@ -243,7 +253,7 @@ class ForcePublishBenAppReports < MongoidMigrationTask
               ben_app_prev_year = ben_spon.benefit_applications.where(:"effective_period.min".lt => start_on_date, aasm_state: :active).first
               packages_prev_year = ben_app_prev_year.present? ? ben_app_prev_year.benefit_packages.map(&:id) : []
               package_ids = packages_prev_year + ben_app.benefit_packages.map(&:id)
-              enrollments = family.active_household.hbx_enrollments.where(:sponsored_benefit_package_id.in => package_ids, :aasm_state.nin => ["shopping","coverage_canceled","coverage_expired"])
+              enrollments = family.active_household.hbx_enrollments.where(:sponsored_benefit_package_id.in => package_ids, :aasm_state.nin => ["shopping", "coverage_canceled", "coverage_expired"])
             end
 
             next unless enrollments
