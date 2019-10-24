@@ -120,6 +120,13 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
           expect(upcd_1.aptc_amount(hbx_enrollment_member1)).to eq 25.00
           expect(upcd_1.aptc_amount(hbx_enrollment_member2)).to eq 25.00
         end
+
+        it 'should return total_aptc_amount' do
+          person.update_attributes!(dob: 43.years.ago)
+          person2.update_attributes!(dob: 21.years.ago)
+          upcd_1 = UnassistedPlanCostDecorator.new(product, hbx_enrollment10,71.2352, tax_household10)
+          expect(upcd_1.total_aptc_amount).to eq 50.7
+        end
       end
 
       context 'for non-persisted enrollment object' do
