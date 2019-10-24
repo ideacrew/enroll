@@ -2,6 +2,7 @@
 
 class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   attr_accessor :enrollment, :renewal_coverage_start, :assisted, :aptc_values
+  CAT_AGE_OFF_HIOS_IDS = ["94506DC0390008", "86052DC0400004"]
 
   def initialize
     @logger = Logger.new("#{Rails.root}/log/ivl_open_enrollment_begin_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log") unless defined? @logger
@@ -91,7 +92,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     if @enrollment.coverage_kind == 'dental'
       renewal_product = @enrollment.product.renewal_product_id
     elsif has_catastrophic_product? && is_cat_product_ineligible?
-      renewal_product = @enrollment.product.catastrophic_age_off_product_id
+      renewal_product = fetch_cat_age_off_product(@enrollment.product)
       raise "#{renewal_coverage_start.year} Catastrophic age off product missing on HIOS id #{@enrollment.product.hios_id}" if renewal_product.blank?
     else
       renewal_product = if @enrollment.product.csr_variant_id == '01' || has_catastrophic_product?
@@ -111,6 +112,22 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   def is_csr?
     csr_product_variants = EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.except('csr_100').values
     (@enrollment.product.metal_level == "silver") && csr_product_variants.include?(@enrollment.product.csr_variant_id)
+  end
+
+  def fetch_cat_age_off_product(product)
+    # As per ticket: 61716
+    if renewal_coverage_start.year.to_s == "2019" && CAT_AGE_OFF_HIOS_IDS.include?(product.hios_base_id)
+      base_id = if product.hios_base_id == "94506DC0390008"
+                  "94506DC0390010"
+                elsif product.hios_base_id == "86052DC0400004"
+                  "86052DC0400010"
+                end
+      ::BenefitMarkets::Products::HealthProducts::HealthProduct.by_year(renewal_coverage_start.year).where(
+        {:hios_id => "#{base_id}-01"}
+      ).first.id
+    else
+      product.catastrophic_age_off_product_id
+    end
   end
 
   def assisted_renewal_product
