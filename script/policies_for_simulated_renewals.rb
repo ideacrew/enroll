@@ -35,7 +35,7 @@ def matching_plan_details(enrollment, other_hbx_enrollment, product_cache)
   return false if other_hbx_enrollment.product_id.blank?
   new_plan = product_cache[enrollment.product_id]
   old_plan = product_cache[other_hbx_enrollment.product_id]
-  return false  if old_plan.kind == "dental" && old_plan.active_year == (Time.zone.today.year - 1).to_s
+  return false  if old_plan.kind == "dental" && old_plan.active_year == (Time.zone.today.year - 1).to_s && Settings.site.key.to_s == "cca"
   (old_plan.issuer_profile_id == new_plan.issuer_profile_id) && (old_plan.active_year == new_plan.active_year - 1) && (old_plan.kind == new_plan.kind)
 end
 
@@ -52,7 +52,6 @@ def initial_or_renewal(enrollment,product_cache,ben_app)
     ['coverage_terminated', 'coverage_termination_pending'].include?(ren.aasm_state.to_s) && ren.terminated_on.present? && ren.terminated_on < (enrollment.effective_on - 1.day)
   end
   if renewal_enrollments_no_terms.any?{|ren| matching_plan_details(enrollment,ren,product_cache)}
-    puts 'renewal'
     return "renewal"
   elsif renewal_enrollments_no_terms.empty?
     return "initial"
