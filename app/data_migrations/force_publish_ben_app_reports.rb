@@ -229,6 +229,45 @@ class ForcePublishBenAppReports < MongoidMigrationTask
     ]
   end
 
+  def detailed_report_census(start_on_date, census, ben_spon, ben_app)
+    family = census.employee_role.person.primary_family if census.employee_role.present?
+    if Person.by_ssn(census.ssn).present? && Person.by_ssn(census.ssn).employee_roles.select{|e| e.census_employee_id == census.id && e.is_active == true}.present?
+      person = Person.by_ssn(census.ssn).first
+      family = person.primary_family
+    end
+    ben_app_prev_year = ben_spon.benefit_applications.where(:"effective_period.min".lt => start_on_date, aasm_state: :active).first
+    packages_prev_year = ben_app_prev_year.present? ? ben_app_prev_year.benefit_packages.map(&:id) : []
+    package_ids = packages_prev_year + ben_app.benefit_packages.map(&:id)
+    enrollments = family.active_household.hbx_enrollments.where(:sponsored_benefit_package_id.in => package_ids, :aasm_state.nin => ["shopping", "coverage_canceled", "coverage_expired"]) if family.present?
+    [ben_app_prev_year, packages_prev_year, package_ids, enrollments]
+  end
+
+  def detailed_report_data(ben_app_prev_year,ben_app,census,enrollment_prev_year,enrollment_current_year)
+    ben_spon = ben_app.benefit_sponsorship
+    data = [ben_spon.profile.legal_name,
+            ben_spon.profile.fein,
+            ben_spon.profile.hbx_id,
+            ben_app_prev_year.try(:effective_period).try(:min),
+            ben_app_prev_year.try(:aasm_state),
+            ben_app.effective_period.min,
+            "renewing_#{ben_app.aasm_state}",
+            census.first_name,
+            census.last_name,
+            census.aasm_state,
+            census.try(:employee_role).try(:person).try(:hbx_id) || Person.by_ssn(census.ssn).first.hbx_id,
+            enrollment_prev_year.try(:hbx_id),
+            enrollment_prev_year.try(:coverage_kind),
+            enrollment_prev_year.try(:product).try(:hios_id),
+            enrollment_prev_year.try(:effective_on),
+            enrollment_prev_year.try(:aasm_state),
+            enrollment_current_year.try(:hbx_id),
+            enrollment_prev_year.try(:coverage_kind),
+            enrollment_current_year.try(:product).try(:hios_id),
+            enrollment_current_year.try(:effective_on),
+            enrollment_current_year.try(:aasm_state)]
+    data
+  end
+
   def detailed_report(start_on_date, _current_date)
     file_name = "#{Rails.root}/dry_run_dc_nfp_detailed_report_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.csv"
 
@@ -241,49 +280,15 @@ class ForcePublishBenAppReports < MongoidMigrationTask
 
           next unless ben_app.effective_period.min == start_on_date && ben_app.is_renewing?
 
-          ben_app_prev_year = ben_spon.benefit_applications.where(:"effective_period.min".lt => start_on_date, aasm_state: :active).first
           ben_spon.census_employees.active.each do |census|
-            if census.employee_role.present?
-              family = census.employee_role.person.primary_family
-            elsif Person.by_ssn(census.ssn).present? && Person.by_ssn(census.ssn).employee_roles.select{|e| e.census_employee_id == census.id && e.is_active == true}.present?
-              person = Person.by_ssn(census.ssn).first
-              family = person.primary_family
-            end
-            if family.present?
-              ben_app_prev_year = ben_spon.benefit_applications.where(:"effective_period.min".lt => start_on_date, aasm_state: :active).first
-              packages_prev_year = ben_app_prev_year.present? ? ben_app_prev_year.benefit_packages.map(&:id) : []
-              package_ids = packages_prev_year + ben_app.benefit_packages.map(&:id)
-              enrollments = family.active_household.hbx_enrollments.where(:sponsored_benefit_package_id.in => package_ids, :aasm_state.nin => ["shopping", "coverage_canceled", "coverage_expired"])
-            end
-
+            detailed_report_census(start_on_date, census, ben_spon, ben_app)
             next unless enrollments
 
             ["health", "dental"].each do |kind|
               enrollment_prev_year = enrollments.where(coverage_kind: kind, :effective_on.lt => start_on_date).first
               enrollment_current_year = enrollments.where(coverage_kind: kind, :effective_on => start_on_date).first
               next unless enrollment_prev_year || enrollment_current_year
-
-              data = [ben_spon.profile.legal_name,
-                      ben_spon.profile.fein,
-                      ben_spon.profile.hbx_id,
-                      ben_app_prev_year.try(:effective_period).try(:min),
-                      ben_app_prev_year.try(:aasm_state),
-                      ben_app.effective_period.min,
-                      "renewing_#{ben_app.aasm_state}",
-                      census.first_name,
-                      census.last_name,
-                      census.aasm_state,
-                      census.try(:employee_role).try(:person).try(:hbx_id) || Person.by_ssn(census.ssn).first.hbx_id,
-                      enrollment_prev_year.try(:hbx_id),
-                      enrollment_prev_year.try(:coverage_kind),
-                      enrollment_prev_year.try(:product).try(:hios_id),
-                      enrollment_prev_year.try(:effective_on),
-                      enrollment_prev_year.try(:aasm_state),
-                      enrollment_current_year.try(:hbx_id),
-                      enrollment_prev_year.try(:coverage_kind),
-                      enrollment_current_year.try(:product).try(:hios_id),
-                      enrollment_current_year.try(:effective_on),
-                      enrollment_current_year.try(:aasm_state)]
+              detailed_report_data(ben_app_prev_year,ben_app,census,enrollment_prev_year,enrollment_current_year)
               data += [find_failure_reason(enrollment_prev_year, enrollment_current_year, ben_app)]
               csv << data
             end
@@ -329,13 +334,12 @@ class ForcePublishBenAppReports < MongoidMigrationTask
     rp_id = enrollment_prev_year.try(:product).try(:renewal_product_id)
     cp_id = enrollment_current_year.try(:product).try(:id)
     failure_reasons = []
-    failure_reasons << successfully_generated(current_year_state)
-    failure_reasons << manually_published(ben_app)
-    failure_reasons << manually_selected(current_year_state, rp_id, cp_id)
-    failure_reasons << enrollment_is_waived(current_year_state)
-    failure_reasons << er_zip_code_not_in_dc(current_year_state, ben_app)
-    failure_reasons << revious_plan_waived(current_year_state, prev_year_state)
-    failure_reasons << enrollment_plan_changed(rp_id, cp_id, current_year_state)
-    failure_reasons.join(" ")
+    return failure_reasons.join(" ") unless failure_reasons.nil? failure_reasons << successfully_generated(current_year_state)
+    return failure_reasons.join(" ") unless failure_reasons.nil? failure_reasons << manually_published(ben_app)
+    return failure_reasons.join(" ") unless failure_reasons.nil? failure_reasons << manually_selected(current_year_state, rp_id, cp_id)
+    return failure_reasons.join(" ") unless failure_reasons.nil? failure_reasons << enrollment_is_waived(current_year_state)
+    return failure_reasons.join(" ") unless failure_reasons.nil? failure_reasons << er_zip_code_not_in_dc(current_year_state, ben_app)
+    return failure_reasons.join(" ") unless failure_reasons.nil? failure_reasons << revious_plan_waived(current_year_state, prev_year_state)
+    return failure_reasons.join(" ") unless failure_reasons.nil? failure_reasons << enrollment_plan_changed(rp_id, cp_id, current_year_state)
   end
 end
