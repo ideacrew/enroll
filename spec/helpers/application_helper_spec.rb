@@ -343,6 +343,11 @@ RSpec.describe ApplicationHelper, :type => :helper do
         expect(helper.current_cost(100, 1.2)).to eq 0
       end
 
+      it "should return rounded plan cost value" do
+        session['elected_aptc'] = 600
+        expect(helper.current_cost(520.48, 0.99586)).to eq 2.16
+      end
+
       it "when can_use_aptc is false" do
         expect(helper.current_cost(100, 1.2, nil, 'shopping', false)).to eq 100
       end
