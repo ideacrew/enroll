@@ -4,8 +4,6 @@ module BenefitSponsors
       coverage_elig_date = eligibility_dates[member.member_id]
       coverage_as_of_date = if (previous_product.present?) && (product.id == previous_product.id) && (coverage_elig_date.present?)
                               coverage_elig_date
-                            elsif (coverage_elig_date.present?) && (coverage_elig_date != coverage_start_date)
-                              coverage_elig_date
                             else
                               coverage_start_date
                             end

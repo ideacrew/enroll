@@ -587,9 +587,28 @@ class HbxEnrollment
     end
   end
 
+  PREDECESSOR_ID_INTRODUCTION_DATE = Date.new(2017,8,1)
+
   def parent_enrollment
-    return nil if predecessor_enrollment_id.blank?
-    HbxEnrollment.find(predecessor_enrollment_id)
+    return HbxEnrollment.find(predecessor_enrollment_id) if predecessor_enrollment_id.present?
+    return nil if effective_on >= PREDECESSOR_ID_INTRODUCTION_DATE
+    return nil if created_at.present? && created_at >= PREDECESSOR_ID_INTRODUCTION_DATE
+    return nil if is_shop? && (effective_on == sponsored_benefit_package.start_on)
+    search_for_predecessor
+  end
+
+  def search_for_predecessor
+    possible_enrollments = family.hbx_enrollments.where({effective_on: {"$lt" => effective_on},
+                                                         sponsored_benefit_package_id: sponsored_benefit_package_id,
+                                                         coverage_kind: coverage_kind,
+                                                         kind: kind,
+                                                         external_enrollment: {'$ne' => true},
+                                                         product_id: {"$ne" => nil},
+                                                         employee_role_id: employee_role_id,
+                                                         aasm_state: {"$nin": ["shopping", "coverage_canceled", "void", "inactive", "renewing_waived"]}})
+    possible_enrollments.select do |pe|
+      pe.terminated_on && (pe.terminated_on == (effective_on - 1.day))
+    end.first
   end
 
   def census_employee
