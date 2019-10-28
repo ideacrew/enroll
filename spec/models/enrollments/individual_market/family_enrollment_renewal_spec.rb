@@ -302,6 +302,12 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           enr.save!
           expect(subject.can_renew_assisted_product?(enr)).to eq true
         end
+
+        it 'should create and assign new enrollment member objects to new enrollment' do
+          new_enr = subject.clone_enrollment
+          new_enr.save!
+          expect(new_enr.subscriber.id).not_to eq(enrollment_assisted.subscriber.id)
+        end
       end
     end
   end
