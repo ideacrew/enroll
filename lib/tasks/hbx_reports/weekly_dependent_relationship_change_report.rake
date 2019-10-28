@@ -41,9 +41,9 @@ namespace :reports do
               relationship_history = person_relationship.history_tracks.where(action: 'update').sort_by(&:created_at).last
               next unless relationship_history.present?
               next unless person.primary_family.present?
-              next unless person.primary_family.hbx_enrollments.enrolled_and_renewal.present?
-              active_enrollments = person.primary_family.hbx_enrollments.enrolled_and_renewal
-              active_enrollments.each do |enrollment|
+              enrollments = person.primary_family.hbx_enrollments.where(:aasm_state.in => HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES)
+              next unless enrollments.present?
+              enrollments.each do |enrollment|
                 relationship_changed_member = enrollment.hbx_enrollment_members.select{ |member| member.person.id == person_relationship.relative_id}.first
                 next unless relationship_changed_member.present?
                 csv << [
