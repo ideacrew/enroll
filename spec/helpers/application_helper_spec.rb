@@ -597,6 +597,19 @@ end
 
   describe "round_down_float_two_decimals" do
 
+    shared_examples_for "float_fix" do |input, output|
+      it "should round the floating value #{input}" do
+        expect(helper.float_fix(input)).to eq(output)
+      end
+    end
+
+    it_behaves_like "float_fix", 102.1699999999, 102.17
+    it_behaves_like "float_fix", 866.0799999996, 866.08
+    it_behaves_like "float_fix", (2.76 + 2.43), 5.19
+  end
+
+  describe "round_down_float_two_decimals" do
+
     shared_examples_for "rounding float number" do |input, output|
       it "should round down for given input #{input}" do
         expect(helper.round_down_float_two_decimals(input)).to eq(output)

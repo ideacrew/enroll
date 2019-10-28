@@ -215,6 +215,6 @@ describe FamilyMember, "aptc_benchmark_amount" do
 
   it 'should return valid benchmark value' do
     family_member = FamilyMember.new(:person => person)
-    expect(family_member.aptc_benchmark_amount).to eq 198.86
+    expect(family_member.aptc_benchmark_amount).to eq 198.85
   end
 end
