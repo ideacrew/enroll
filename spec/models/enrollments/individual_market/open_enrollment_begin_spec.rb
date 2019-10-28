@@ -4,7 +4,7 @@ require 'rails_helper'
 require "#{Rails.root}/spec/shared_contexts/enrollment.rb"
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
-  RSpec.describe Enrollments::IndividualMarket::OpenEnrollmentBegin, type: :model do
+  RSpec.describe "Enrollments::IndividualMarket::OpenEnrollmentBegin", type: :model do
     before do
       DatabaseCleaner.clean
     end
@@ -31,7 +31,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
                             product_id: product.id
                             )
                           }
-
       let(:hbx_enrollment_member) { FactoryBot.build(:hbx_enrollment_member, applicant_id: family.primary_family_member.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record.beginning_of_year)}
       let!(:update_family) {family.active_household.hbx_enrollments << [enrollment]}
       let(:hbx_profile)               { FactoryBot.create(:hbx_profile) }
@@ -81,8 +80,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       end
       let!(:product) { FactoryBot.create(:active_ivl_gold_health_product, hios_id: "11111111122302-01", csr_variant_id: "01")}
       let!(:subject) {Enrollments::IndividualMarket::OpenEnrollmentBegin.new}
-
-      # let(:family_health_and_dental)
 
       it "the collection should include ten or more Families" do
         # expect(Family.all.size).to be >= 10
@@ -255,8 +252,27 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           it "should generate renewal enrollment for unassisted family" do
             invoke_oe_script
             family_unassisted.active_household.reload
-            expect(family_unassisted.active_household.hbx_enrollments.count).to eq 2
+            expect(family_unassisted.active_household.hbx_enrollments.count).to eq 3
           end
+        end
+      end
+
+      describe ".kollection" do
+        subject { Enrollments::IndividualMarket::OpenEnrollmentBegin.new }
+        let!(:coverall_enrollment) do
+          FactoryBot.create(:hbx_enrollment, :individual_unassisted, :with_enrollment_members,
+                            family: family_unassisted,
+                            kind: "coverall",
+                            household: family_unassisted.active_household,
+                            enrollment_members: [family_unassisted.family_members.first],
+                            product: active_individual_health_product, effective_on: current_calender_date)
+        end
+        # BenefitCoveragePeriod will span for a year.
+        let(:coverage_period) { double("BenefitCoveragePeriod", start_on: (Time.now.utc - 1.year), end_on: Time.now.utc)}
+
+        it "pull enrollments for both IVL and coverall" do
+          query = subject.kollection(["health"], coverage_period)
+          expect(family_unassisted.active_household.hbx_enrollments.where(query).count).to eq 2
         end
       end
     end

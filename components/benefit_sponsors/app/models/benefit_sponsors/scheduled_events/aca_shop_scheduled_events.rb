@@ -114,7 +114,7 @@ module BenefitSponsors
 
         renewal_benefit_sponsorships = benefit_sponsors.may_transmit_renewal_enrollment?(start_on)
         execute_sponsor_event(renewal_benefit_sponsorships, :transmit_renewal_eligible_event)
-        execute_sponsor_event(renewal_benefit_sponsorships, :transmit_renewal_carrier_drop_event)
+        execute_sponsor_event(renewal_benefit_sponsorships, :transmit_renewal_carrier_drop_event) if aca_shop_market_transmit_employer_carrier_drop_events
 
         initial_benefit_sponsorships = benefit_sponsors.may_transmit_initial_enrollment?(start_on)
         execute_sponsor_event(initial_benefit_sponsorships, :transmit_initial_eligible_event)

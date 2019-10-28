@@ -19,6 +19,11 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       FactoryBot.create(:family, :with_primary_family_member, :person => primary)
     end
 
+    let!(:coverall_family) do
+      primary = FactoryBot.create(:person, :with_resident_role, dob: primary_dob)
+      FactoryBot.create(:family, :with_primary_family_member, :person => primary)
+    end
+
     let!(:spouse_rec) do
       FactoryBot.create(:person, dob: spouse_dob)
     end
@@ -54,7 +59,23 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
                         product_id: current_product.id,
                         aasm_state: 'coverage_selected')
     end
+
+    let!(:coverall_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        :with_enrollment_members,
+                        family: coverall_family,
+                        enrollment_members: coverall_enrollment_members,
+                        household: coverall_family.active_household,
+                        coverage_kind: coverage_kind,
+                        resident_role_id: coverall_family.primary_person.resident_role.id,
+                        effective_on: current_benefit_coverage_period.start_on,
+                        kind: "coverall",
+                        product_id: current_product.id,
+                        aasm_state: 'coverage_selected')
+    end
+
     let(:enrollment_members) { family.family_members }
+    let(:coverall_enrollment_members) { coverall_family.family_members }
     let(:calender_year) { TimeKeeper.date_of_record.year }
     let(:coverage_kind) { 'health' }
     let(:current_product) { FactoryBot.create(:active_ivl_gold_health_product, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_product_id: renewal_product.id) }
@@ -125,6 +146,28 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         it "should generate passive renewal in auto_renewing state" do
           renewal = subject.renew
           expect(renewal.auto_renewing?).to be_truthy
+        end
+      end
+
+      context "renew coverall product" do
+        subject do
+          enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
+          enrollment_renewal.enrollment = coverall_enrollment
+          enrollment_renewal.assisted = assisted
+          enrollment_renewal.aptc_values = aptc_values
+          enrollment_renewal.renewal_coverage_start = renewal_benefit_coverage_period.start_on
+          enrollment_renewal
+        end
+
+        it "should generate passive renewal for coverall enrollment in auto renewing state" do
+          renewal = subject.renew
+          expect(renewal.auto_renewing?).to be_truthy
+        end
+
+        it "should generate passive renewal for coverall enrollment and assign resident role" do
+          renewal = subject.renew
+          expect(renewal.kind).to eq('coverall')
+          expect(renewal.resident_role_id.present?).to eq true
         end
       end
     end
@@ -247,6 +290,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         it "should append APTC values" do
           enr = subject.clone_enrollment
           enr.save!
+          expect(enr.kind).to eq subject.enrollment.kind
           renewel_enrollment = subject.assisted_enrollment(enr)
           expect(renewel_enrollment.applied_aptc_amount.to_f).to eq((renewel_enrollment.total_premium * renewel_enrollment.product.ehb).round(2))
         end

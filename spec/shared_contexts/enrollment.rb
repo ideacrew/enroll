@@ -16,6 +16,14 @@ RSpec.shared_context "setup families enrollments", :shared_context => :metadata 
                       enrollment_members: [family_unassisted.family_members.first],
                       product: active_individual_health_product, effective_on: current_calender_date)
   end
+  let!(:renewal_enrollment_unassisted) do
+    FactoryBot.create(:hbx_enrollment, :individual_unassisted, :with_enrollment_members,
+                      family: family_unassisted,
+                      aasm_state: "renewing_coverage_selected",
+                      household: family_unassisted.active_household,
+                      enrollment_members: [family_unassisted.family_members.first],
+                      product: active_individual_health_product, effective_on: current_calender_date)
+  end
 
   let!(:family_assisted) {FactoryBot.create(:individual_market_family)}
   let!(:tax_household) do

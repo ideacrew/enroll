@@ -688,7 +688,7 @@ class CensusEmployee < CensusMember
     return true if employment_terminated? || cobra_terminated?
     return false if cobra_linked?
 
-    !(is_eligible? || employee_role_linked?)
+    !(is_eligible? || is_linked?)
   end
 
   def employee_relationship
@@ -1293,7 +1293,7 @@ def self.to_csv
   def past_enrollments
     if employee_role.present?
       query = {
-        :aasm_state.in => ["coverage_terminated", "coverage_termination_pending"],
+        :aasm_state.in => ["coverage_terminated", "coverage_termination_pending","coverage_expired"],
         :benefit_group_assignment_id.in => benefit_group_assignments.map(&:id)
       }
       employee_role.person.primary_family.active_household.hbx_enrollments.non_external.shop_market.where(query)
