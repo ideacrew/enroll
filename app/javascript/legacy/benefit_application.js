@@ -4,8 +4,6 @@ function getCostDetails(min,max,cost) {
 }
 
 function showCostDetails(cost,min,max) {
-  document.getElementById('rpEstimatedMonthlyCost').innerHTML = ('$ '+cost);
-
   if (min == 'NaN') {
     min = "0.00"
   }
@@ -88,7 +86,7 @@ function calculateEmployeeCostsImmediate(productOptionKind,referencePlanID, spon
   });
 }
 
-const calculateEmployeeCosts = debounceRequest(calculateEmployeeCostsImmediate, 1000);
+export const calculateEmployeeCosts = debounceRequest(calculateEmployeeCostsImmediate, 1000);
 
 function calculateEmployerContributionsImmediate(productOptionKind,referencePlanID, sponsoredBenefitId, referenceModel = "benefit_package")  {
   var thing = $("input[name^='"+referenceModel+"['").serializeArray();
@@ -114,9 +112,4 @@ function calculateEmployerContributionsImmediate(productOptionKind,referencePlan
   });
 }
 
-const calculateEmployerContributions = debounceRequest(calculateEmployerContributionsImmediate, 1000);
-
-module.exports = {
-  calculateEmployerContributions : calculateEmployerContributions,
-  calculateEmployeeCosts : calculateEmployeeCosts
-};
+export const calculateEmployerContributions = debounceRequest(calculateEmployerContributionsImmediate, 1000);
