@@ -161,7 +161,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
 
   def clone_enrollment_members
     old_enrollment_members = eligible_enrollment_members
-    raise  "unable to generate enrollment for person with hbx_id #{@enrollment.subscriber.person.hbx_id} due to no enrollment members not present" if old_enrollment_members.blank?
+    raise  "unable to generate enrollment with hbx_id #{@enrollment.hbx_id} due to no enrollment members not present" if old_enrollment_members.blank?
 
     old_enrollment_members.inject([]) do |members, hbx_enrollment_member|
       members << HbxEnrollmentMember.new({ applicant_id: hbx_enrollment_member.applicant_id,
