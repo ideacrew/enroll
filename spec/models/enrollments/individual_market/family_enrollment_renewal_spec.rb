@@ -139,7 +139,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
 
         it "should raise an error" do
-          expect { subject.clone_enrollment_members }.to raise_error(RuntimeError, /unable to generate enrollment for person with hbx_/)
+          expect { subject.clone_enrollment_members }.to raise_error(RuntimeError, /unable to generate enrollment with hbx_id /)
         end
       end
     end
