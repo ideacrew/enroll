@@ -23,6 +23,7 @@
     "browserslist": "^4.6.0",
     "classlist.js": "^1.1.20150312",
     "core-js": "2",
+    "custom-event-polyfill": "^1.0.7",
     "html-loader": "^0.5.5",
     "jest": "^24.8.0",
     "jquery": "^3.4.0",
