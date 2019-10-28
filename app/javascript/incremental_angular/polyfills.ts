@@ -36,7 +36,9 @@ import 'core-js/es7/array';
 import 'core-js/es7/object';
 import 'core-js/es7/string';
 
+import 'core-js/es6/reflect';
 import 'core-js/es7/reflect';
+(window as any).__Zone_enable_cross_context_check = true;
 
 /** IE10 and IE11 requires the following for NgClass support on SVG elements */
 import 'classlist.js';  // Run `npm install --save classlist.js`.

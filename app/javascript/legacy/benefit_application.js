@@ -4,6 +4,8 @@ function getCostDetails(min,max,cost) {
 }
 
 function showCostDetails(cost,min,max) {
+  document.getElementById('rpEstimatedMonthlyCost').innerHTML = ('$ '+cost);
+
   if (min == 'NaN') {
     min = "0.00"
   }
@@ -28,7 +30,7 @@ function showCostDetails(cost,min,max) {
 
 function showEmployeeCostDetails(employees_cost) {
   var table = document.getElementById('eeTableBody');
-  table.querySelectorAll('tr').forEach(function(element) {
+  Array.from(table.querySelectorAll('tr')).forEach(function(element) {
     element.remove()
   });
   //modal = document.getElementById('modalInformation')
@@ -68,7 +70,7 @@ function debounceRequest(func, wait, immediate) {
 function calculateEmployeeCostsImmediate(productOptionKind,referencePlanID, sponsoredBenefitId, referenceModel = "benefit_package")  {
   var thing = $("input[name^='"+referenceModel+"['").serializeArray();
   var submitData = {};
-  for (item in thing) {
+  for (var item in thing) {
     submitData[thing[item].name] = thing[item].value;
   }
   // We have to append this afterwards because somehow, somewhere, there is an empty field corresponding
@@ -91,7 +93,7 @@ export const calculateEmployeeCosts = debounceRequest(calculateEmployeeCostsImme
 function calculateEmployerContributionsImmediate(productOptionKind,referencePlanID, sponsoredBenefitId, referenceModel = "benefit_package")  {
   var thing = $("input[name^='"+referenceModel+"['").serializeArray();
   var submitData = { };
-  for (item in thing) {
+  for (var item in thing) {
     submitData[thing[item].name] = thing[item].value;
   }
   // We have to append this afterwards because somehow, somewhere, there is an empty field corresponding
