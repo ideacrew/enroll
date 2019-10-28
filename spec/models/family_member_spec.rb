@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe FamilyMember do
+describe FamilyMember, dbclean: :after_each do
   subject { FamilyMember.new(:is_primary_applicant => nil, :is_coverage_applicant => nil) }
 
   before(:each) do
@@ -19,7 +19,7 @@ describe FamilyMember do
 
 end
 
-describe FamilyMember, "given a person" do
+describe FamilyMember, "given a person", dbclean: :after_each do
   let(:person) { Person.new }
   subject { FamilyMember.new(:person => person) }
 
@@ -180,14 +180,14 @@ describe FamilyMember, dbclean: :after_each do
   end
 end
 
-describe FamilyMember, "which is inactive" do
+describe FamilyMember, "which is inactive", dbclean: :after_each do
   # TODO: Note 7/17/2019 this wasn't even a finished block, xit'd out
   xit "can be reactivated with a specified relationship" do
 
   end
 end
 
-describe FamilyMember, "given a relationship to update" do
+describe FamilyMember, "given a relationship to update", dbclean: :after_each do
   let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
   let(:relationship) { "spouse" }
   let(:person) { FactoryBot.build(:person) }
@@ -204,7 +204,7 @@ describe FamilyMember, "given a relationship to update" do
   end
 end
 
-describe FamilyMember, "aptc_benchmark_amount" do
+describe FamilyMember, "aptc_benchmark_amount", dbclean: :after_each do
   let(:person) { FactoryBot.create(:person, :with_consumer_role, dob: TimeKeeper.date_of_record - 46.years)}
   let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person, e_case_id: "family_test#1000")}
   let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
@@ -215,6 +215,6 @@ describe FamilyMember, "aptc_benchmark_amount" do
 
   it 'should return valid benchmark value' do
     family_member = FamilyMember.new(:person => person)
-    expect(family_member.aptc_benchmark_amount).to eq 198.85
+    expect(family_member.aptc_benchmark_amount).to eq 198.86
   end
 end
