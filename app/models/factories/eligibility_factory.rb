@@ -19,7 +19,7 @@ module Factories
     # returns hash of total_aptc, aptc_breakdown_by_member and csr_value
     def fetch_available_eligibility
       available_eligibility_hash = fetch_enrolling_available_aptcs.merge(fetch_csr)
-      total_aptc = available_eligibility_hash[:aptc].values.inject(0, :+)
+      total_aptc = float_fix(available_eligibility_hash[:aptc].values.inject(0, :+))
       available_eligibility_hash.merge({:total_available_aptc => total_aptc})
     end
 

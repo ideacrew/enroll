@@ -595,30 +595,30 @@ end
     end
   end
 
-  describe "round_down_float_two_decimals" do
+  describe 'float_fix' do
 
-    shared_examples_for "float_fix" do |input, output|
+    shared_examples_for 'float_fix' do |input, output|
       it "should round the floating value #{input}" do
         expect(helper.float_fix(input)).to eq(output)
       end
     end
 
-    it_behaves_like "float_fix", 102.1699999999, 102.17
-    it_behaves_like "float_fix", 866.0799999996, 866.08
-    it_behaves_like "float_fix", (2.76 + 2.43), 5.19
+    it_behaves_like 'float_fix', 102.1699999999, 102.17
+    it_behaves_like 'float_fix', 866.0799999996, 866.08
+    it_behaves_like 'float_fix', (2.76 + 2.43), 5.19
   end
 
-  describe "round_down_float_two_decimals" do
+  describe 'round_down_float_two_decimals' do
 
-    shared_examples_for "rounding float number" do |input, output|
+    shared_examples_for 'rounding float number' do |input, output|
       it "should round down for given input #{input}" do
         expect(helper.round_down_float_two_decimals(input)).to eq(output)
       end
     end
 
-    it_behaves_like "rounding float number", 102.1693244, 102.16
-    it_behaves_like "rounding float number", 102.177777777, 102.17
-    it_behaves_like "rounding float number", 866.07512, 866.07
-    it_behaves_like "rounding float number", (2.76 + 2.43), 5.19
+    it_behaves_like 'rounding float number', 102.1693244, 102.16
+    it_behaves_like 'rounding float number', 102.177777777, 102.17
+    it_behaves_like 'rounding float number', 866.07512, 866.07
+    it_behaves_like 'rounding float number', (2.76 + 2.43), 5.19
   end
 end
