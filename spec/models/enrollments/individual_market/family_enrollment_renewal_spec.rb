@@ -130,6 +130,18 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           expect(applicant_ids).not_to include(spouse.id)
         end
       end
+
+      context "all ineligible members" do
+        before do
+          enrollment.hbx_enrollment_members.each do |member|
+            member.person.update_attributes(is_disabled: true)
+          end
+        end
+
+        it "should raise an error" do
+          expect { subject.clone_enrollment_members }.to raise_error(RuntimeError, /unable to generate enrollment for person with hbx_/)
+        end
+      end
     end
 
     describe ".renew" do

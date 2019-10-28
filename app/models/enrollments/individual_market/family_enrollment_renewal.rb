@@ -168,6 +168,10 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
           is_subscriber: hbx_enrollment_member.is_subscriber }
       )
     end
+
+    raise  "unable to generate enrollment for person with hbx_id #{@enrollment.subscriber.person.hbx_id} due to no enrollment members not present" if eligible_enrollment_members.blank?
+
+    eligible_enrollment_members
   end
 
   def save_renewal_enrollment(renewal_enrollment)
