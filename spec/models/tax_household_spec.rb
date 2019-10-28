@@ -392,9 +392,13 @@ RSpec.describe TaxHousehold, type: :model do
           let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
           let(:shopping_hbx_enrollment) {FactoryBot.build(:hbx_enrollment, family: family, aasm_state: 'shopping', hbx_enrollment_members: [shopping_hbx_enrollment_member], household: family.active_household, product: product)}
 
+          before do
+            allow(tax_household).to receive(:total_aptc_available_amount_for_enrollment).with(shopping_hbx_enrollment).and_return(222.67)
+          end
+
           it 'should return available APTC amount' do
             result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment)
-            expect(result.round(2)).to eq(301.14)
+            expect(result).to eq(222.67)
           end
         end
 
@@ -407,7 +411,7 @@ RSpec.describe TaxHousehold, type: :model do
 
           it 'should return available APTC amount' do
             result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment)
-            expect(result.round(2)).to eq(500.00)
+            expect(result).to eq(500.00)
           end
         end
 
@@ -423,7 +427,7 @@ RSpec.describe TaxHousehold, type: :model do
 
           it 'should return available APTC amount' do
             result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment)
-            expect(result.round(2)).to eq(500.00)
+            expect(result).to eq(500.00)
           end
         end
 

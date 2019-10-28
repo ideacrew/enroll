@@ -159,7 +159,7 @@ class TaxHousehold
     unchecked_aptc_fms = find_aptc_family_members(family_members)
     deduction_amount = total_benchmark_amount(unchecked_aptc_fms) if unchecked_aptc_fms
     total = total - deduction_amount
-    (total < 0.00) ? 0.00 : total
+    (total < 0.00) ? 0.00 : total.round(2)
   end
 
   def total_benchmark_amount(family_members)

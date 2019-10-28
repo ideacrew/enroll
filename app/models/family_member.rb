@@ -3,6 +3,7 @@ class FamilyMember
   include SetCurrentUser
   include Mongoid::Timestamps
   include MongoidSupport::AssociationProxies
+  include ApplicationHelper
 
   embedded_in :family
 
@@ -94,7 +95,7 @@ class FamilyMember
     ehb = slcsp.ehb
     product = product_factory.new({product_id: slcsp.id})
     cost = product.cost_for(TimeKeeper.datetime_of_record, person.age_on(TimeKeeper.datetime_of_record))
-    cost * ehb
+    round_down_float_two_decimals(cost * ehb)
   end
 
   def broker=(new_broker)
