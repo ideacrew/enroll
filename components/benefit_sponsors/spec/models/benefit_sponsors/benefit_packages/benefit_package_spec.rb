@@ -680,19 +680,6 @@ module BenefitSponsors
           expect(hbx_enrollment.terminated_on).to eq hbx_enrollment_terminated_on
         end
       end
-
-      context "terminate_benefit_group_assignments", :dbclean => :after_each do
-
-        before :each do
-          @bga = initial_application.benefit_sponsorship.census_employees.first.benefit_group_assignments.first
-          @bga.update_attributes!(end_on: benefit_package.end_on)
-        end
-
-        it "should update benefit_group_assignment end_on if end_on < benefit_application end on" do
-          benefit_package.terminate_benefit_group_assignments
-          expect(benefit_package.end_on).to eq @bga.end_on
-        end
-      end
     end
 
     describe '.expire_member_benefits', :dbclean => :after_each do
@@ -798,7 +785,6 @@ module BenefitSponsors
         benefit_sponsorship: benefit_sponsorship,
         benefit_group_assignments: [benefit_group_assignment]
       )}
-      let!(:benefit_group_assignment_1) {FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_package, census_employee: census_employee_1)}
       let(:person_1)       { FactoryGirl.create(:person, :with_family) }
       let!(:family_1)       { person_1.primary_family }
       let!(:hbx_enrollment_1) {
@@ -852,19 +838,6 @@ module BenefitSponsors
 
         it "should update hbx_enrollment terminated_on if terminated_on > benefit_application end on" do
           expect(hbx_enrollment_1.terminated_on).to eq end_on
-        end
-      end
-
-      context "pending terminate_benefit_group_assignments", :dbclean => :after_each do
-        before :each do
-          @bga = initial_application.benefit_sponsorship.census_employees.first.benefit_group_assignments.first
-          @bga.update_attributes!(end_on: nil)
-        end
-
-        it "should update benefit_group_assignment end_on if end_on > benefit_application end on" do
-          expect(@bga.end_on).to eq nil
-          benefit_package.terminate_benefit_group_assignments
-          expect(@bga.end_on).to eq benefit_package.end_on
         end
       end
 
