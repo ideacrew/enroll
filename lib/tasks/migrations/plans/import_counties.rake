@@ -1,10 +1,10 @@
 namespace :import do
   task :county_zips, [:file] => :environment do |task, args|
 
-    files = Rails.env.test? ? [args[:file]] : Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{Settings.aca.state_abbreviation.downcase}/xls_templates", "SHOP_ZipCode_CY2017_FINAL.xlsx"))
-    count = 0
+    files = Rails.env.test? ? [args[:file]] : Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{Settings.aca.state_abbreviation.downcase}/xls_templates/counties", "**", "*.xlsx"))
     if Settings.aca.state_abbreviation.downcase == "ma"
       files.each do |file|
+        count = 0
         year = file.split("/")[-2].to_i
         puts "*"*80 unless Rails.env.test?
         puts "Importing county, zips from #{file}..." unless Rails.env.test?
@@ -28,10 +28,10 @@ namespace :import do
           end
         end
 
+        puts "*"*80 unless Rails.env.test?
+        puts "successfully created/updated #{year} -> #{count} county, zip records" unless Rails.env.test?
+        puts "*"*80 unless Rails.env.test?
       end
-      puts "*"*80 unless Rails.env.test?
-      puts "successfully created #{count} county, zip records" unless Rails.env.test?
-      puts "*"*80 unless Rails.env.test?
     end
   end
 
