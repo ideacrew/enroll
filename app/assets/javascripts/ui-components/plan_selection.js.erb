@@ -1,0 +1,59 @@
+$( document ).ready(function() {
+
+  var items = document.querySelectorAll("#radioSelect");
+
+  for (i = 0; i < items.length; i++) {
+    $(items[i]).click(function() {
+      setCircle($(this));
+      disableNewPlanYearButton();
+      // Store radio title to localStorage
+      selectedTitle = $(this)[0].innerText;
+      localStorage.setItem("title", selectedTitle);
+    });
+  }
+
+  var choices = document.querySelectorAll("#product_choice");
+
+  for (var i = 0; i < choices.length; i ++) {
+    $(choices[i]).click(function() {
+      getPlanInfo($(this));
+    });
+  }
+
+  function setCircle(element) {
+		var levels = document.querySelectorAll('#metal-level-select ul li');
+
+    for (var i = 0; i < levels.length; i++) {
+      levels[i].querySelector('i').classList.remove('fa-dot-circle');
+    }
+
+		// Sets radio icon to selected
+		setTimeout(function() {
+			if (element[0].closest('li').classList.contains('active')) {
+				element[0].querySelector('i').classList.add('fa-dot-circle');
+		  }
+		},200);
+
+    // Gets product option info
+    productOptionKind = element[0].querySelector('a').dataset.name;
+    // Sets kind to hidden input field for form submission
+    document.getElementById('ppKind').setAttribute('value', productOptionKind);
+    document.getElementById('referencePlans').classList.add('hidden');
+  }
+
+  function getPlanInfo(element) {
+    var selectedRadio = element[0].value;
+    var selectedName = element[0].dataset.name;
+
+    filteredProducts = planOptions[productOptionKind][selectedName];
+    // Sort by plan title
+    filteredProducts.sort(function(a,b) {
+      if (a.title < b.title) return -1;
+      if (a.title > b.title) return 1;
+      return 0;
+    })
+    populateReferencePlans(filteredProducts);
+    setTempCL();
+    selectDefaultReferencePlan();
+  }
+});
