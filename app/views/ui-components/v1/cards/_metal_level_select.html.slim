@@ -44,10 +44,10 @@
             - @benefit_package_form.catalog.single_issuer_options.each do |issuer_name, issuer_id|
               .col-xs-3.carriers
                 .col-xs-12 style="min-height:130px"
-                  label.container onclick='MetalLevelSelect.getPlanInfo(this)'
+                  label.container for="product_option_choice_carrier_carrier_name_#{issuer_id}"
                     = issuer_name
                     = f.hidden_field :kind, value: "health"
-                    = f.radio_button :product_option_choice, "#{issuer_id}", class: 'product_option_choice', onclick:"MetalLevelSelect.getPlanInfo(this)", data: {name: issuer_name}
+                    = f.radio_button :product_option_choice, "#{issuer_id}", id: "product_option_choice_carrier_carrier_name_#{issuer_id}", class: 'product_option_choice', onclick:"MetalLevelSelect.getPlanInfo(this)", data: {name: issuer_name}
                     span.checkmark
 
           .tab-pane.fade#level role="tabpanel"
@@ -57,10 +57,10 @@
             - metal_levels_sorted(@benefit_package_form.catalog.metal_levels).each do |kind|
               .col-xs-3.metals
                 .col-xs-12
-                  label.container onclick='MetalLevelSelect.getPlanInfo(this)'
+                  label.container for="product_option_choice_metal_level_metal_level_name_#{kind}"
                     = kind.capitalize
                     = f.hidden_field :kind, value: "health"
-                    = f.radio_button :product_option_choice, kind, class: 'product_option_choice', onclick:"MetalLevelSelect.getPlanInfo(this)", data: {name: kind}
+                    = f.radio_button :product_option_choice, kind, id: "product_option_choice_metal_level_metal_level_name_#{kind}", class: 'product_option_choice', onclick:"MetalLevelSelect.getPlanInfo(this)", data: {name: kind}
                     span.checkmark
 
           .tab-pane.fade#plan role="tabpanel"
@@ -70,10 +70,10 @@
             - @benefit_package_form.catalog.single_product_options.each do |carrier_name, carrier_id|
               .col-xs-3.plans
                 .col-xs-12
-                  label.container onclick='MetalLevelSelect.getPlanInfo(this)'
+                  label.container for="product_option_choice_single_plan_carrier_name_#{carrier_id}"
                     = carrier_name
                     = f.hidden_field :kind, value: "health"
-                    = f.radio_button :product_option_choice, carrier_id, class: 'product_option_choice', onclick:"MetalLevelSelect.getPlanInfo(this)", data: {name: carrier_name}
+                    = f.radio_button :product_option_choice, carrier_id, id: "product_option_choice_single_plan_carrier_name_#{carrier_id}", class: 'product_option_choice', onclick:"MetalLevelSelect.getPlanInfo(this)", data: {name: carrier_name}
                     span.checkmark
 
 

@@ -1,3 +1,4 @@
+import "core-js/"
 import { calculateEmployerContributions, calculateEmployeeCosts } from "./benefit_application";
 
 function enableNewAddBenefitPackageButton() {
@@ -93,8 +94,9 @@ function viewSummary(element) {
   window.selectedSummaryTitle = element.dataset.planTitle;
   window.selectedReferencePlanID = element.dataset.planId;
   document.getElementById('viewSummaryTitle').innerHTML = window.selectedSummaryTitle;
-  fetch('/benefit_sponsors/benefit_sponsorships/'+window.selectedBenefitSponsorsID+'/benefit_applications/'+window.selectedBenefitApplicationID+'/benefit_packages/reference_product_summary?reference_plan_id='+window.selectedReferencePlanID)
-    .then(function(res) { res.json() })
+  var query_address = '/benefit_sponsors/benefit_sponsorships/'+window.selectedBenefitSponsorsID+'/benefit_applications/'+window.selectedBenefitApplicationID+'/benefit_packages/reference_product_summary?reference_plan_id='+window.selectedReferencePlanID;
+  fetch(query_address)
+    .then(function(res) { return res.json() })
     .then(function(data) {
       data[1].map(function(s) {
       document.getElementById('sbcLink').setAttribute('href', data[2])
@@ -104,7 +106,7 @@ function viewSummary(element) {
       tbody.insertBefore(tr, tbody.children[-1] || null)
       });
     })
-    .then($('#viewSummaryModal').modal('show'))
+    .then(window.$('#viewSummaryModal').modal('show'))
     window.showLess = false
 }
 
@@ -112,7 +114,7 @@ function showMoreDetails() {
   if (window.showLess) {
     document.getElementById('modalSummaryData').innerHTML = '';
     fetch('/benefit_sponsors/benefit_sponsorships/'+window.selectedBenefitSponsorsID+'/benefit_applications/'+window.selectedBenefitApplicationID+'/benefit_packages/reference_product_summary?reference_plan_id='+window.selectedReferencePlanID)
-      .then(function(res) { res.json() })
+      .then(function(res) { return res.json() })
       .then(function(data) {
         data[1].map(function(s) {
         document.getElementById('sbcLink').setAttribute('href', data[2])
@@ -126,7 +128,7 @@ function showMoreDetails() {
       window.showLess = false;
   } else {
     fetch('/benefit_sponsors/benefit_sponsorships/' + window.selectedBenefitSponsorsID + '/benefit_applications/' + window.selectedBenefitApplicationID + '/benefit_packages/reference_product_summary?reference_plan_id=' + window.selectedReferencePlanID + '&details=details')
-      .then(function(res) { res.json() })
+      .then(function(res) { return res.json() })
       .then(function(data) {
         data[1].map(function(s) {
         var tr = document.createElement('tr');
@@ -430,7 +432,7 @@ function populateReferencePlans(plans) {
             '<span class="plan-label">Carrier:</span> <span class="rp-plan-info">' + plan.carrier_name + '</span><br>' +
             '<span class="plan-label">Level:</span> <span class="rp-plan-info">' + plan.metal_level_kind + '</span><br>' +
             '<span class="plan-label">Network:</span> <span class="rp-plan-info">' + plan.network + '</span><br>' +
-            '<span class="plan-label mt-1 rp-view-summary" onclick="MetalLevelSelect.viewSummary(this)" data-plan-title="' + plan.title + '" data-plan-id="' + plan.id + '">View Summary</span><br>' +
+            '<span class="plan-label mt-1" onclick="MetalLevelSelect.viewSummary(this)" data-plan-title="' + plan.title + '" data-plan-id="' + plan.id + '">View Summary</span><br>' +
             '<input type="radio" name="benefit_package[sponsored_benefits_attributes][0][reference_plan_id]" id="' + plan.id + '" onclick="MetalLevelSelect.newContributionAmounts()" value="' + plan.id + '" data-plan-title="' + plan.title + '" data-plan-carrier="' + plan.carrier_name + '" data-plan-id="' + plan.id + '" data-plan-metal-level="' + plan.metal_level_kind + '" data-plan-type="' + plan.product_type + '" data-network="' + plan.network + '">' +
             '<span class="checkmark"></span>' +
           '</label>' +
@@ -451,7 +453,7 @@ function populateReferencePlans(plans) {
 
 function getPlanInfo(element) {
   if (element.tagName != 'INPUT') {
-    element = element.querySelector('input[type=radio]')
+    element = element.querySelector('input[type=radio][data-name]')
   }
   var selectedRadio = element.value;
   var selectedName = element.dataset.name;
