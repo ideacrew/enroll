@@ -1084,6 +1084,10 @@ class Family
     primary_applicant.person.has_active_employee_role?
   end
 
+  def has_active_sep?(pre_enrollment)
+    pre_enrollment.is_ivl_by_kind? && self.latest_ivl_sep&.start_on&.year == pre_enrollment.effective_on.year
+  end
+
 private
   def build_household
     if households.size == 0

@@ -75,6 +75,13 @@ class GroupSelectionPrevaricationAdapter
     end
   end
 
+  def if_family_has_active_sep
+    return nil if @previous_hbx_enrollment.blank?
+    return unless @family.has_active_sep?(@previous_hbx_enrollment)
+    @change_plan = 'change_by_qle'
+    yield
+  end
+
   def possible_employee_role
     if @employee_role.nil? && @person.has_active_employee_role?
       @person.active_employee_roles.first
