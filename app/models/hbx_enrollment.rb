@@ -289,7 +289,7 @@ class HbxEnrollment
   scope :by_created_datetime_range,  ->(start_at, end_at) { where(:created_at => { "$gte" => start_at, "$lte" => end_at }) }
   scope :by_submitted_datetime_range,  ->(start_at, end_at) { where(:submitted_at => { "$gte" => start_at, "$lte" => end_at }) }
   scope :by_submitted_after_datetime,  ->(start_at) { where(:submitted_at => { "$gte" => start_at} )}
-  scope :by_updated_datetime_range, ->(start_at, end_at) { where(updated_at: { "$gte" => start_at, "$lte" => end_at }) } 
+  scope :by_updated_datetime_range, ->(start_at, end_at) { where(updated_at: { "$gte" => start_at, "$lte" => end_at }) }
   scope :by_effective_date_range, ->(start_on, end_on) { where(effective_on: { "$gte" => start_on, "$lte" => end_on }) }
   scope :current_year,        ->{ where(:effective_on.gte => TimeKeeper.date_of_record.beginning_of_year, :effective_on.lte => TimeKeeper.date_of_record.end_of_year) }
   scope :by_year,             ->(year) { where(effective_on: (Date.new(year)..Date.new(year).end_of_year)) }
@@ -355,7 +355,7 @@ class HbxEnrollment
                                                           :"effective_on".gte => effective_period.min,
                                                           :"effective_on".lte => effective_period.max
                                                         )}
-  scope :by_benefit_application_and_sponsored_benefit,  ->(benefit_application, sponsored_benefit, end_date) do 
+  scope :by_benefit_application_and_sponsored_benefit,  ->(benefit_application, sponsored_benefit, end_date) do
     where(
       :"sponsored_benefit_id" => sponsored_benefit._id,
       :"aasm_state".in => (ENROLLED_STATUSES + RENEWAL_STATUSES + TERMINATED_STATUSES),
@@ -885,7 +885,7 @@ class HbxEnrollment
     return unless is_shop?
 
     enrollment_benefit_application = sponsored_benefit_package.benefit_application
-    
+
     return unless enrollment_benefit_application.active?
     return unless census_employee&.renewal_benefit_group_assignment
 
@@ -904,13 +904,11 @@ class HbxEnrollment
   end
 
   def renewal_enrollments(successor_application)
-    HbxEnrollment.where({
-      :sponsored_benefit_package_id.in => successor_application.benefit_packages.pluck(:_id), 
-      :coverage_kind => coverage_kind,
-      :kind => kind,
-      :family_id => family_id,
-      :effective_on => successor_application.start_on
-    })
+    HbxEnrollment.where({:sponsored_benefit_package_id.in => successor_application.benefit_packages.pluck(:_id),
+                         :coverage_kind => coverage_kind,
+                         :kind => kind,
+                         :family_id => family_id,
+                         :effective_on => successor_application.start_on})
   end
 
   def active_renewals_under(successor_application)
@@ -1082,13 +1080,13 @@ class HbxEnrollment
 
   def sponsored_benefit
     return @sponsored_benefit if defined? @sponsored_benefit
-    @sponsored_benefit = sponsored_benefit_package.sponsored_benefits.detect{ |sb| sb.id == sponsored_benefit_id }    
+    @sponsored_benefit = sponsored_benefit_package.sponsored_benefits.detect{ |sb| sb.id == sponsored_benefit_id }
   end
 
   def sponsored_benefit=(sponsored_benefit)
     raise ArgumentError.new("expected BenefitSponsors::SponsoredBenefits::SponsoredBenefit") unless sponsored_benefit.is_a? ::BenefitSponsors::SponsoredBenefits::SponsoredBenefit
     self.sponsored_benefit_id = sponsored_benefit._id
-    @sponsored_benefit = sponsored_benefit    
+    @sponsored_benefit = sponsored_benefit
   end
 
   def rating_area
@@ -1409,7 +1407,7 @@ class HbxEnrollment
     enrollment.household = coverage_household.household
     enrollment.family = coverage_household.household.family
     enrollment.submitted_at = submitted_at
-    
+
     case
       when employee_role.present?
         enrollment.kind = "employer_sponsored"
@@ -1621,6 +1619,7 @@ class HbxEnrollment
     state :renewing_contingent_selected     # VLP-pending customer actively selected product during Open Enrollment
     state :renewing_contingent_transmitted_to_carrier
     state :renewing_contingent_enrolled
+    state :actively_renewing                #It is a temporary lasting initial state for auto generated renewal enrollment
 
     # after_all_transitions :perform_employer_plan_year_count
 
@@ -1635,7 +1634,7 @@ class HbxEnrollment
     event :select_coverage, :after => :record_transition do
       transitions from: :shopping,
                   to: :coverage_selected, after: [:propagate_selection], :guard => :can_select_coverage?
-      transitions from: :auto_renewing,
+      transitions from: [:auto_renewing, :actively_renewing],
                   to: :renewing_coverage_selected, after: [:propagate_selection], :guard => :can_select_coverage?
       transitions from: :auto_renewing_contingent,
                   to: :renewing_contingent_selected, :guard => :can_select_coverage?
@@ -1666,7 +1665,7 @@ class HbxEnrollment
                          :coverage_renewed, :unverified],
                   to: :coverage_enrolled, :guard => :is_shop?
 
-      transitions from: [:auto_renewing, :coverage_reinstated], to: :coverage_selected
+      transitions from: [:auto_renewing, :renewing_coverage_selected, :coverage_reinstated], to: :coverage_selected
       transitions from: :renewing_waived, to: :inactive
     end
 
@@ -1988,7 +1987,7 @@ class HbxEnrollment
     if previous_enrollment
       previous_product = previous_enrollment.product
     end
-    
+
     hbx_enrollment_members.each do |hem|
       person = hem.person
       roster_member = EnrollmentMemberAdapter.new(
