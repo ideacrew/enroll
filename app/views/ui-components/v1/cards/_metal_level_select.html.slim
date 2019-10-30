@@ -57,7 +57,7 @@
             - metal_levels_sorted(@benefit_package_form.catalog.metal_levels).each do |kind|
               .col-xs-3.metals
                 .col-xs-12
-                  label.container
+                  label.container onclick='MetalLevelSelect.getPlanInfo(this)'
                     = kind.capitalize
                     = f.hidden_field :kind, value: "health"
                     = f.radio_button :product_option_choice, kind, class: 'product_option_choice', onclick:"MetalLevelSelect.getPlanInfo(this)", data: {name: kind}
@@ -70,7 +70,7 @@
             - @benefit_package_form.catalog.single_product_options.each do |carrier_name, carrier_id|
               .col-xs-3.plans
                 .col-xs-12
-                  label.container
+                  label.container onclick='MetalLevelSelect.getPlanInfo(this)'
                     = carrier_name
                     = f.hidden_field :kind, value: "health"
                     = f.radio_button :product_option_choice, carrier_id, class: 'product_option_choice', onclick:"MetalLevelSelect.getPlanInfo(this)", data: {name: carrier_name}
@@ -148,7 +148,7 @@ javascript:
     childUnder26: window.childUnder26 || 0,
     employeeOnly: window.employeeOnly || 0,
     familyOnly: window.familyOnly || 0
-  }
+  };
 
   window.selectedReferencePlanId = "";
 	window.selectedBenefitSponsorsID = "#{params[:benefit_sponsorship_id]}";
@@ -161,7 +161,7 @@ javascript:
   	// Clears modal data on close
 		document.getElementById('modalSummaryData').innerHTML = '';
 		document.getElementById('btnMoreDetails').innerHTML = "More Details"
-	})
+	});
 
   (function() {
     // Clears localStorage on page load

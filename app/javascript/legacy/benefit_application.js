@@ -40,7 +40,7 @@ function showEmployeeCostDetails(employees_cost) {
 
   for (var employee in employees_cost) {
     var tr = document.createElement('tr')
-    estimate = employees_cost[employee];
+    var estimate = employees_cost[employee];
     tr.innerHTML =
     `
       <td class="text-center">${estimate.name}</td>
