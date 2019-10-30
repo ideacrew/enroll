@@ -4,6 +4,10 @@ require 'rails_helper'
 require File.join(Rails.root, 'spec/shared_contexts/ivl_eligibility')
 
 RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each do
+  
+  before :all do
+    DatabaseCleaner.clean
+  end
 
   def reset_premium_tuples
     p_table = @product.premium_tables.first
