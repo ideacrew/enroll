@@ -145,6 +145,18 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           expect(applicant_ids).not_to include(spouse.id)
         end
       end
+
+      context "all ineligible members" do
+        before do
+          enrollment.hbx_enrollment_members.each do |member|
+            member.person.update_attributes(is_disabled: true)
+          end
+        end
+
+        it "should raise an error" do
+          expect { subject.clone_enrollment_members }.to raise_error(RuntimeError, /unable to generate enrollment with hbx_id /)
+        end
+      end
     end
 
     describe ".renew" do
@@ -330,6 +342,12 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           enr = subject.clone_enrollment
           enr.save!
           expect(subject.can_renew_assisted_product?(enr)).to eq true
+        end
+
+        it 'should create and assign new enrollment member objects to new enrollment' do
+          new_enr = subject.clone_enrollment
+          new_enr.save!
+          expect(new_enr.subscriber.id).not_to eq(enrollment_assisted.subscriber.id)
         end
       end
     end
