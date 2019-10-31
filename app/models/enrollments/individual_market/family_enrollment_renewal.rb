@@ -108,26 +108,27 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     renewal_product
   end
 
-  def is_csr?
-    csr_product_variants = EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.except('csr_100').values
-    (@enrollment.product.metal_level == "silver") && csr_product_variants.include?(@enrollment.product.csr_variant_id)
+  def fetch_csr_variant
+    @aptc_values[:csr_amt] == '0' ? '01' : EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP["csr_#{@aptc_values[:csr_amt]}"]
   end
 
   def assisted_renewal_product
     # TODO: Make sure tax households create script treats 0 as 100
-    if is_csr?
-      csr_variant = if @aptc_values[:csr_amt] == '0'
-                      '01'
-                    else
-                      EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP["csr_#{@aptc_values[:csr_amt]}"]
-                    end
+    if @aptc_values[:csr_amt].present? && @enrollment.product.metal_level == "silver"
+      csr_variant = fetch_csr_variant
+      product = fetch_product(csr_variant)
+      return product.id if product
 
-      ::BenefitMarkets::Products::HealthProducts::HealthProduct.by_year(renewal_coverage_start.year).where(
-        {:hios_id => "#{@enrollment.product.renewal_product.hios_base_id}-#{csr_variant}"}
-      ).first.id
+      fetch_product("01").id
     else
       @enrollment.product.renewal_product_id
     end
+  end
+
+  def fetch_product(csr_variant)
+    ::BenefitMarkets::Products::HealthProducts::HealthProduct.by_year(renewal_coverage_start.year).where(
+      {:hios_id => "#{@enrollment.product.renewal_product.hios_base_id}-#{csr_variant}"}
+    ).first
   end
 
   def has_catastrophic_product?

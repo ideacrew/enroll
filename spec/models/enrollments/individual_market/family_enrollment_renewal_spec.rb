@@ -214,6 +214,16 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           end
         end
 
+        context "and aptc value didn't gave in renewal input CSV" do
+          let(:family_enrollment_instance) { Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new}
+
+          it "should return renewal product id" do
+            family_enrollment_instance.enrollment = enrollment
+            family_enrollment_instance.aptc_values = {}
+            expect(family_enrollment_instance.assisted_renewal_product).to eq renewal_product.id
+          end
+        end
+
         context "and have CSR amount as 0 for renewal product year" do
           let(:aptc_values) {{ csr_amt: "0" }}
 
@@ -256,7 +266,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           enrollment_renewal.assisted = true
           enrollment_renewal.aptc_values = {applied_percentage: 87,
                                             applied_aptc: 150,
-                                            csr_amt: 87,
+                                            csr_amt: 100,
                                             max_aptc: 200}
           enrollment_renewal.renewal_coverage_start = renewal_benefit_coverage_period.start_on
           enrollment_renewal
