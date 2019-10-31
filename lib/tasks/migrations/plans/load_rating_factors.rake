@@ -210,14 +210,7 @@ namespace :load_rating_factors do
   end
 
   def number_of_carriers
-    case(@year)
-    when 2017
-      return 12
-    when 2018
-      return 12
-    when 2019
-      return 12
-    end
+    12
   end
 
   def is_group_size_rating_tier?(rating_factor_class)

@@ -13,7 +13,11 @@ class SponsoredBenefits::Services::PlanCostService
   end
 
   def reference_plan
-    @reference_plan ||= Plan.find(@reference_plan_id)
+    if plan && plan.dental? && @benefit_group && @benefit_group.dental_reference_plan_id.present?
+      @dental_reference_plan ||= Plan.find(@benefit_group.dental_reference_plan_id)
+    else
+      @reference_plan ||= Plan.find(@reference_plan_id)
+    end
   end
 
   def active_census_employees
@@ -21,7 +25,7 @@ class SponsoredBenefits::Services::PlanCostService
   end
 
   def composite?
-    @composite ||=  (benefit_group.plan_option_kind == 'sole_source' && plan.coverage_kind == "health")
+    @composite =  (benefit_group.plan_option_kind == 'sole_source' && plan.coverage_kind == "health")
   end
 
   def monthly_employer_contribution_amount(plan = reference_plan)
@@ -125,7 +129,7 @@ class SponsoredBenefits::Services::PlanCostService
 
   def contribution_hash
     return @contribution_hash if defined? @contribution_hash
-    benefits = (reference_plan.coverage_kind == 'dental' && benefit_group.dental_reference_plan.present?) ? benfit_group.dental_relationship_benefits : benefit_group.relationship_benefits
+    benefits = (reference_plan.coverage_kind == 'dental' && benefit_group.dental_reference_plan.present?) ? benefit_group.dental_relationship_benefits : benefit_group.relationship_benefits
     @contribution_pct_hash = benefits.inject({}) do |result, relationship_benefit|
       result[relationship_benefit.relationship] = (relationship_benefit.offered? ? relationship_benefit.premium_pct : 0.0)
       result

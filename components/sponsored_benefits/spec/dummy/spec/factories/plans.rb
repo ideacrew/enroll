@@ -40,6 +40,12 @@ FactoryGirl.define do
 
     trait :with_complex_premium_tables do
     end
+
+    trait :with_dental_coverage do
+      coverage_kind "dental"
+      metal_level "dental"
+      dental_level "high"
+    end
   end
 
   factory :premium_table do

@@ -38,11 +38,11 @@ RSpec.describe RatingArea, type: :model, dbclean: :after_each do
     end
 
     describe "::rating_area_for" do
+      let(:first_address) { build(:address, county: "County One", zip: "10001") }
       context "with a valid search param" do
-        let(:first_address) { build(:address, county: "County One", zip: "10001") }
         let(:second_address) { build(:address, county: "County One", zip: "10002") }
-        let!(:first_county_region) { create(:rating_area, county_name: first_address.county, zip_code: first_address.zip, rating_area: "R-MA001") }
-        let!(:same_county_second_region) { create(:rating_area, county_name: second_address.county, zip_code: second_address.zip, rating_area: "R-MA002") }
+        let!(:first_county_region) { create(:rating_area, county_name: first_address.county, zip_code: first_address.zip, rating_area: "R-MA001", active_years: [TimeKeeper.date_of_record.year]) }
+        let!(:same_county_second_region) { create(:rating_area, county_name: second_address.county, zip_code: second_address.zip, rating_area: "R-MA002", active_years: [TimeKeeper.date_of_record.year]) }
 
         it "returns the rating area" do
           expect(subject.rating_area_for(first_address)).to eq("R-MA001")
@@ -55,6 +55,10 @@ RSpec.describe RatingArea, type: :model, dbclean: :after_each do
 
         it "returns nil" do
           expect(subject.rating_area_for(invalid_address)).to be_nil
+        end
+
+        it "returns nil if year does't match" do
+          expect(subject.rating_area_for(first_address, (TimeKeeper.date_of_record.year + 1))).to be_nil
         end
       end
     end
