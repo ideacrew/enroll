@@ -6,6 +6,8 @@
 module Factories
   class EligibilityFactory
 
+    include ApplicationHelper
+
     def initialize(enrollment_id, selected_aptc = nil, product_ids = [])
       @enrollment = HbxEnrollment.where(id: enrollment_id.to_s).first
       raise "Cannot find a valid enrollment with given enrollment id" unless @enrollment
@@ -17,7 +19,7 @@ module Factories
     # returns hash of total_aptc, aptc_breakdown_by_member and csr_value
     def fetch_available_eligibility
       available_eligibility_hash = fetch_enrolling_available_aptcs.merge(fetch_csr)
-      total_aptc = available_eligibility_hash[:aptc].values.inject(0, :+)
+      total_aptc = float_fix(available_eligibility_hash[:aptc].values.inject(0, :+))
       available_eligibility_hash.merge({:total_available_aptc => total_aptc})
     end
 
@@ -54,7 +56,7 @@ module Factories
     def ehb_premium(product_id)
       product = ::BenefitMarkets::Products::Product.find(product_id)
       premium_amount = fetch_total_premium(product)
-      premium_amount * product.ehb
+      round_down_float_two_decimals(premium_amount * product.ehb)
     end
 
     def fetch_total_premium(product)
