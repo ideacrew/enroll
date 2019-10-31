@@ -27,7 +27,7 @@ RSpec.describe Services::IvlEnrollmentRenewalService, type: :model, :dbclean => 
     end
 
     let(:aptc_values) do
-      { applied_percentage: 87,
+      { applied_percentage: '',
         applied_aptc: 150,
         csr_amt: 87,
         max_aptc: 200 }
@@ -62,7 +62,7 @@ RSpec.describe Services::IvlEnrollmentRenewalService, type: :model, :dbclean => 
       end
 
       it 'should raise error if any of the arguments are not valid' do
-        expect{subject.assign(bad_aptc_values)}.to raise_error(RuntimeError, 'Provide aptc values {applied_aptc: , applied_percentage: , max_aptc:}')
+        expect{subject.assign(bad_aptc_values)}.to raise_error(RuntimeError, 'Provide aptc values {applied_aptc:, max_aptc:}')
       end
     end
 
