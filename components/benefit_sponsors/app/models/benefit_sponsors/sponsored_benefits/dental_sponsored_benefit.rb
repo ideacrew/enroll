@@ -19,7 +19,8 @@ module BenefitSponsors
       end
 
       def renewal_elected_products_for(coverage_date)
-        renewal_products = elected_products.collect(&:renewal_product)
+        # adding compact as some of the products may not be available during renewal, compact will remove nil in such cases
+        renewal_products = elected_products.collect(&:renewal_product).compact
         BenefitMarkets::Products::Product.by_coverage_date(renewal_products, coverage_date)
       end
 
