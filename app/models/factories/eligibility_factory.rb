@@ -85,9 +85,9 @@ module Factories
       aptc_thhms.select { |thhm| shopping_member_ids.include?(thhm.applicant_id.to_s) && thhm.is_ia_eligible? }
     end
 
-    def enrollment_eligible_benchmark_hash(thhms)
+    def enrollment_eligible_benchmark_hash(thhms, enrollment)
       thhms.inject({}) do |benchmark_hash, thhm|
-        benchmark_hash.merge!({ thhm.applicant_id.to_s => thhm.family_member.aptc_benchmark_amount })
+        benchmark_hash.merge!({ thhm.applicant_id.to_s => thhm.family_member.aptc_benchmark_amount(enrollment) })
       end
     end
 
@@ -95,7 +95,7 @@ module Factories
       total_thh_available_aptc = tax_household.total_aptc_available_amount_for_enrollment(@enrollment)
       aptc_thhms = tax_household.aptc_members
       enrolling_aptc_members = aptc_enrollment_members(aptc_thhms)
-      member_benchmark_hash = enrollment_eligible_benchmark_hash(enrolling_aptc_members)
+      member_benchmark_hash = enrollment_eligible_benchmark_hash(enrolling_aptc_members, @enrollment)
       total_eligible_benchmark = member_benchmark_hash.values.sum
 
       enrolling_aptc_members.inject({}) do |thh_hash, thh_member|
