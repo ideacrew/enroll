@@ -87,14 +87,15 @@ class FamilyMember
     # TODO parent.households.coverage_households.where()
   end
 
-  def aptc_benchmark_amount
+  def aptc_benchmark_amount(enrollment)
+    date = enrollment.effective_on
     benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
-    benefit_coverage_period = benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}
+    benefit_coverage_period = benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(date)}
     # slcsp is a product
     slcsp = benefit_coverage_period.second_lowest_cost_silver_plan
     ehb = slcsp.ehb
     product = product_factory.new({product_id: slcsp.id})
-    cost = product.cost_for(TimeKeeper.datetime_of_record, person.age_on(TimeKeeper.datetime_of_record))
+    cost = product.cost_for(date, person.age_on(date))
     round_down_float_two_decimals(cost * ehb)
   end
 
