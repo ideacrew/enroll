@@ -394,7 +394,7 @@ RSpec.describe TaxHousehold, type: :model do
 
           it 'should return available APTC amount' do
             result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment)
-            expect(result.round(2)).to eq(301.14)
+            expect(result).to eq(301.14)
           end
         end
 
@@ -407,7 +407,7 @@ RSpec.describe TaxHousehold, type: :model do
 
           it 'should return available APTC amount' do
             result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment)
-            expect(result.round(2)).to eq(500.00)
+            expect(result).to eq(500.00)
           end
         end
 
@@ -423,7 +423,7 @@ RSpec.describe TaxHousehold, type: :model do
 
           it 'should return available APTC amount' do
             result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment)
-            expect(result.round(2)).to eq(500.00)
+            expect(result).to eq(500.00)
           end
         end
 
