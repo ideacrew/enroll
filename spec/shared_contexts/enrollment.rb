@@ -16,6 +16,14 @@ RSpec.shared_context "setup families enrollments", :shared_context => :metadata 
                       enrollment_members: [family_unassisted.family_members.first],
                       product: active_individual_health_product, effective_on: current_calender_date)
   end
+  let!(:renewal_enrollment_unassisted) do
+    FactoryBot.create(:hbx_enrollment, :individual_unassisted, :with_enrollment_members,
+                      family: family_unassisted,
+                      aasm_state: "renewing_coverage_selected",
+                      household: family_unassisted.active_household,
+                      enrollment_members: [family_unassisted.family_members.first],
+                      product: active_individual_health_product, effective_on: current_calender_date)
+  end
 
   let!(:family_assisted) {FactoryBot.create(:individual_market_family)}
   let!(:tax_household) do
@@ -46,7 +54,11 @@ RSpec.shared_context "setup families enrollments", :shared_context => :metadata 
                       renewal_product: renewal_individual_health_product)
   end
 
-  let!(:active_csr_87_product) {FactoryBot.create(:active_csr_87_product, renewal_product: renewal_csr_87_product)}
+  let!(:active_csr_87_product) do
+    FactoryBot.create(:active_csr_87_product, renewal_product: renewal_csr_87_product).tap do |product|
+      product.hios_base_id = product.hios_id.split("-").first
+    end
+  end
 
   let!(:renewal_individual_health_product) do
     FactoryBot.create(:benefit_markets_products_health_products_health_product,
@@ -55,7 +67,11 @@ RSpec.shared_context "setup families enrollments", :shared_context => :metadata 
                       csr_variant_id: '01')
   end
 
-  let!(:renewal_csr_87_product) {FactoryBot.create(:renewal_csr_87_product)}
+  let!(:renewal_csr_87_product) do
+    FactoryBot.create(:renewal_csr_87_product).tap do |product|
+      product.hios_base_id = product.hios_id.split("-").first
+    end
+  end
 
   before do
     renewal_individual_health_product.update_attributes!(hios_id: active_individual_health_product.hios_id,

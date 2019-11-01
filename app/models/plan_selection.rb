@@ -35,7 +35,7 @@ class PlanSelection
       hbx_enrollment.special_enrollment_period_id = hbx_enrollment.earlier_effective_sep_by_market_kind.try(:id)
     end
 
-    hbx_enrollment.aasm_state = 'auto_renewing' if hbx_enrollment.is_active_renewal_purchase?
+    hbx_enrollment.aasm_state = 'actively_renewing' if hbx_enrollment.is_active_renewal_purchase?
 
     hbx_enrollment.update_attributes!(is_any_enrollment_member_outstanding: true) if enrollment_members_verification_status(market_kind)
 
