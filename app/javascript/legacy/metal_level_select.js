@@ -1,27 +1,27 @@
-import "core-js/"
+import "core-js/";
 import { calculateEmployerContributions, calculateEmployeeCosts } from "./benefit_application";
 
 function enableNewAddBenefitPackageButton() {
   var addBenefitPackageButton = document.getElementById('addBenefitPackage');
-  addBenefitPackageButton.classList.remove('disabled')
+  addBenefitPackageButton.classList.remove('disabled');
 }
 
 function disableNewAddBenefitPackageButton() {
   var addBenefitPackageButton = document.getElementById('addBenefitPackage');
-  addBenefitPackageButton.classList.add('disabled')
+  addBenefitPackageButton.classList.add('disabled');
 }
 
 function disableDentalBenefitPackage() {
   var addBenefitPackageButton = document.getElementById('dentalBenefits');
   if(addBenefitPackageButton) {
-    addBenefitPackageButton.classList.add('disabled')
+    addBenefitPackageButton.classList.add('disabled');
   }
 }
 
 function enableDentalBenefitPackage() {
   var addBenefitPackageButton = document.getElementById('dentalBenefits');
   if(addBenefitPackageButton) {
-    addBenefitPackageButton.classList.remove('disabled')
+    addBenefitPackageButton.classList.remove('disabled');
   }
 }
 
@@ -37,16 +37,16 @@ function preventSubmissionOnEnter() {
 function disableNewPlanYearButton() {
   var savePlanYearButton = document.getElementById('submitBenefitPackage');
   savePlanYearButton.classList.add('disabled');
-  disableNewAddBenefitPackageButton()
-  disableDentalBenefitPackage()
-  preventSubmissionOnEnter()
+  disableNewAddBenefitPackageButton();
+  disableDentalBenefitPackage();
+  preventSubmissionOnEnter();
 }
 
 function enableNewPlanYearButton() {
   var savePlanYearButton = document.getElementById('submitBenefitPackage');
   savePlanYearButton.classList.remove('disabled');
-  enableNewAddBenefitPackageButton()
-  enableDentalBenefitPackage()
+  enableNewAddBenefitPackageButton();
+  enableDentalBenefitPackage();
 }
 
 function disableEmployeeContributionLevel(){
@@ -54,7 +54,7 @@ function disableEmployeeContributionLevel(){
   for (var i = 0; i < elements.length; i++) {
     var element = elements[i];
     if(element.dataset.displayname == 'Employee' || element.dataset.displayname == "Employee Only" ) {
-      element.parentElement.getElementsByTagName('span')[0].classList.add("blocking")
+      element.parentElement.getElementsByTagName('span')[0].classList.add("blocking");
     }
   }
 }
@@ -69,25 +69,25 @@ function setCircle(element) {
   // Sets radio icon to selected
   window.setTimeout(function() {
     if (element.classList.contains('active')) {
-      element.querySelector('i').classList.add('fa-dot-circle')
+      element.querySelector('i').classList.add('fa-dot-circle');
     }
   },200)
 
   // Gets product option info
   window.productOptionKind = element.querySelector('a').dataset.name;
   // Sets kind to hidden input field for form submission
-  document.getElementById('ppKind').setAttribute('value', window.productOptionKind)
+  document.getElementById('ppKind').setAttribute('value', window.productOptionKind);
   document.getElementById('referencePlans').classList.add('hidden');
 }
 
 function showFormButtons() {
-  document.getElementById('addBenefitPackage').classList.remove('hidden')
-  var dentalBenefits = document.getElementById('dentalBenefits')
+  document.getElementById('addBenefitPackage').classList.remove('hidden');
+  var dentalBenefits = document.getElementById('dentalBenefits');
   if(dentalBenefits) {
-    dentalBenefits.classList.remove('hidden')
+    dentalBenefits.classList.remove('hidden');
   }
-  document.getElementById('submitBenefitPackage').classList.remove('hidden')
-  document.getElementById('cancelBenefitPackage').classList.remove('hidden')
+  document.getElementById('submitBenefitPackage').classList.remove('hidden');
+  document.getElementById('cancelBenefitPackage').classList.remove('hidden');
 }
 
 function viewSummary(element) {
@@ -99,15 +99,15 @@ function viewSummary(element) {
     .then(function(res) { return res.json() })
     .then(function(data) {
       data[1].map(function(s) {
-      document.getElementById('sbcLink').setAttribute('href', data[2])
-      var tr = document.createElement('tr');
-      var tbody = document.getElementById('modalSummaryData');
-      tr.innerHTML = '<td style="background-color:#f5f5f5">' + s.visit_type + '</td><td>' + s.copay_in_network_tier_1 + '</td><td>' + s.co_insurance_in_network_tier_1 + '</td>';
-      tbody.insertBefore(tr, tbody.children[-1] || null)
+        document.getElementById('sbcLink').setAttribute('href', data[2]);
+        var tr = document.createElement('tr');
+        var tbody = document.getElementById('modalSummaryData');
+        tr.innerHTML = '<td style="background-color:#f5f5f5">' + s.visit_type + '</td><td>' + s.copay_in_network_tier_1 + '</td><td>' + s.co_insurance_in_network_tier_1 + '</td>';
+        tbody.insertBefore(tr, tbody.children[-1] || null);
       });
     })
-    .then(window.$('#viewSummaryModal').modal('show'))
-    window.showLess = false
+    .then(window.$('#viewSummaryModal').modal('show'));
+    window.showLess = false;
 }
 
 function showMoreDetails() {
@@ -117,34 +117,34 @@ function showMoreDetails() {
       .then(function(res) { return res.json() })
       .then(function(data) {
         data[1].map(function(s) {
-        document.getElementById('sbcLink').setAttribute('href', data[2])
-        var tr = document.createElement('tr');
-        var tbody = document.getElementById('modalSummaryData');
-        tr.innerHTML = '<td style="background-color:#f5f5f5">' + s.visit_type + '</td><td>' + s.copay_in_network_tier_1 + '</td><td>' + s.co_insurance_in_network_tier_1 + '</td>';
-        tbody.insertBefore(tr, tbody.children[-1] || null)
+          document.getElementById('sbcLink').setAttribute('href', data[2]);
+          var tr = document.createElement('tr');
+          var tbody = document.getElementById('modalSummaryData');
+          tr.innerHTML = '<td style="background-color:#f5f5f5">' + s.visit_type + '</td><td>' + s.copay_in_network_tier_1 + '</td><td>' + s.co_insurance_in_network_tier_1 + '</td>';
+          tbody.insertBefore(tr, tbody.children[-1] || null);
         })
       })
-      .then(document.getElementById('btnMoreDetails').innerHTML = "More Details")
+      .then(document.getElementById('btnMoreDetails').innerHTML = "More Details");
       window.showLess = false;
   } else {
     fetch('/benefit_sponsors/benefit_sponsorships/' + window.selectedBenefitSponsorsID + '/benefit_applications/' + window.selectedBenefitApplicationID + '/benefit_packages/reference_product_summary?reference_plan_id=' + window.selectedReferencePlanID + '&details=details')
       .then(function(res) { return res.json() })
       .then(function(data) {
         data[1].map(function(s) {
-        var tr = document.createElement('tr');
-        var tbody = document.getElementById('modalSummaryData');
-        tr.innerHTML = '<td style="background-color:#f5f5f5">' + s.visit_type + '</td><td>' + s.copay_in_network_tier_1 + '</td><td>' + s.co_insurance_in_network_tier_1 + '</td>';
-        tbody.insertBefore(tr, tbody.children[-1] || null)
+          var tr = document.createElement('tr');
+          var tbody = document.getElementById('modalSummaryData');
+          tr.innerHTML = '<td style="background-color:#f5f5f5">' + s.visit_type + '</td><td>' + s.copay_in_network_tier_1 + '</td><td>' + s.co_insurance_in_network_tier_1 + '</td>';
+          tbody.insertBefore(tr, tbody.children[-1] || null);
         })
       })
-      .then(document.getElementById('btnMoreDetails').innerHTML = "Fewer Details")
+      .then(document.getElementById('btnMoreDetails').innerHTML = "Fewer Details");
       window.showLess = true;
   }
 }
 
 function displayReferencePlanDetails(element, options) {
   if(!(element || options)) {
-    return
+    return;
   }
 
   options = options || {};
@@ -171,8 +171,8 @@ function displayReferencePlanDetails(element, options) {
 }
 
 function radioSelected(element) {
-  setCircle(element)
-  disableNewPlanYearButton()
+  setCircle(element);
+  disableNewPlanYearButton();
   // Store radio title to localStorage
   window.selectedTitle = element.querySelector('a').innerText;
   localStorage.setItem("title",window.selectedTitle);
@@ -184,13 +184,13 @@ function selectDefaultReferencePlan() {
   input.click();
   var myplans = document.querySelector('#yourPlans');
   myplans.onmouseover = function() {
-    myplans.click()
-    document.getElementById('new_benefit_package').click()
+    myplans.click();
+    document.getElementById('new_benefit_package').click();
   }
   var contributions = document.querySelector('#yourSponsorContributions');
   contributions.onmouseover = function() {
-    contributions.click()
-    document.getElementById('new_benefit_package').click()
+    contributions.click();
+    document.getElementById('new_benefit_package').click();
   };
 }
 
@@ -199,7 +199,7 @@ function setTempCL() {
   window.selectedTitle = localStorage.getItem("title");
 
   if (myLevels) {
-    var contributions = JSON.parse(myLevels)
+    var contributions = JSON.parse(myLevels);
     window.setTimeout(function() {
       var employee = document.querySelectorAll("[data-displayname='Employee']");
       var spouse = document.querySelectorAll("[data-displayname='Spouse']");
@@ -237,13 +237,13 @@ function setTempCL() {
         family[2].value = contributions.familyOnly;
       }
 
-    },500)
+    },500);
   }
 }
 
 function newContributionAmounts() {
-  var contributionInputs = document.querySelectorAll("[data-contribution-input='true']")
-  var contributionHandlers = document.querySelectorAll(".contribution_handler")
+  var contributionInputs = document.querySelectorAll("[data-contribution-input='true']");
+  var contributionHandlers = document.querySelectorAll(".contribution_handler");
 
   for (var i = 0; i < contributionInputs.length; i++) {
     var element = contributionInputs[i];
@@ -275,13 +275,13 @@ function newContributionAmounts() {
       case 'Employee Only':
         window.employeeOnly = element.value;
         if (window.employeeOnly) {
-          window.tempContributionValues.employeeOnly = parseInt (window.employeeOnly)
+          window.tempContributionValues.employeeOnly = parseInt (window.employeeOnly);
         }
       break;
       case 'Family':
         window.familyOnly = element.value;
         if (familyOnly > 0) {
-          window.tempContributionValues.familyOnly = parseInt (window.familyOnly)
+          window.tempContributionValues.familyOnly = parseInt (window.familyOnly);
         }
       break;
     }
@@ -326,18 +326,18 @@ function newContributionAmounts() {
     }
   }
   if (!(document.querySelectorAll(".reference-plans input[type='radio']:checked").length)) {
-    disableNewPlanYearButton()
+    disableNewPlanYearButton();
   }
   else {
     if (applicationStartOn === "01-01") {
-      enableNewPlanYearButton()
+      enableNewPlanYearButton();
     } else {
       if (window.eeContribution < window.erCL || window.employeeOnly < window.erCL) {
-        disableNewPlanYearButton()
+        disableNewPlanYearButton();
       } else if (window.familyOnly < window.familyCL || window.spouse < window.familyCL || window.domesticPartner < window.familyCL || window.childUnder26 < window.familyCL) {
-        disableNewPlanYearButton()
+        disableNewPlanYearButton();
       }  else {
-        enableNewPlanYearButton()
+        enableNewPlanYearButton();
       }
     }
   }
@@ -346,16 +346,16 @@ function newContributionAmounts() {
 
 function setNumberInputValue(element) {
   document.getElementById(element.dataset.id).value = element.value;
-  newContributionAmounts()
+  newContributionAmounts();
 }
 
 function setInputSliderValue(element) {
-  document.querySelector("[data-id='"+element.id+"']").value = element.value
-  newContributionAmounts()
+  document.querySelector("[data-id='"+element.id+"']").value = element.value;
+  newContributionAmounts();
 }
 
 function buildSponsorContributions(contributions) {
-  var element = document.getElementById('benefitFields');
+  var element = document.getElementById('benefitFields');;
   Array.from(element.children).forEach(function(child) { child.remove() });
 
   var index = 0;
@@ -363,8 +363,8 @@ function buildSponsorContributions(contributions) {
     var contribution = contributions[i];
     index += 1;
     var attrPrefix = 'benefit_package[sponsored_benefits_attributes][0][sponsor_contribution_attributes][contribution_levels_attributes][' + index + ']';
-    var div = document.createElement('div')
-    div.setAttribute('id', 'yourAvailableContributions')
+    var div = document.createElement('div');
+    div.setAttribute('id', 'yourAvailableContributions');
     div.innerHTML =
     '<div class="row">\
       <input id="' + attrPrefix + '[id]" name="' + attrPrefix + '[id]" type="hidden" value="' + contribution['id'] + '" />\
@@ -388,8 +388,8 @@ function buildSponsorContributions(contributions) {
             <input type="range" min="0" max="100" value="' + (contribution["contribution_factor"] * 100) + '" step="5" class="slider" id="'+contribution.id+'" onchange="MetalLevelSelect.setNumberInputValue(this)" data-id="'+contribution.id+'" data-displayname="'+contribution.display_name+'">\
           </div>\
         </div>\
-    </div>'
-    element.insertBefore(div, element.children[-1] || null)
+    </div>';
+    element.insertBefore(div, element.children[-1] || null);
   }
 }
 
@@ -409,7 +409,7 @@ function populateReferencePlans(plans) {
   if (populatedReferencePlans) {
     for (var i = 0; i < populatedReferencePlans.length; i++) {
       var rplans = populatedReferencePlans[i];
-      rplans.remove()
+      rplans.remove();
     }
   }
 
@@ -417,12 +417,12 @@ function populateReferencePlans(plans) {
   for (var i = 0; i < window.filteredProducts.length; i++) {
     var plan = window.filteredProducts[i];
     window.productsTotal = window.filteredProducts.length;
-    var div = document.createElement('div')
-    document.getElementById('yourPlanTotals').innerHTML = '<span class="pull-right mr-3">Displaying: <b>' + window.filteredProducts.length + ' plans</b></span>'
-    div.setAttribute('id', 'yourAvailablePlans')
+    var div = document.createElement('div');
+    document.getElementById('yourPlanTotals').innerHTML = '<span class="pull-right mr-3">Displaying: <b>' + window.filteredProducts.length + ' plans</b></span>';
+    div.setAttribute('id', 'yourAvailablePlans');
       var network = "";
       if (plan.network_information)
-        network = 'NETWORK NOTES <a data-toggle="tooltip" data-placement="top" data-container="body" title="' + plan.network_information + '"><i class="fas fa-question-circle"></i></a>'
+        network = 'NETWORK NOTES <a data-toggle="tooltip" data-placement="top" data-container="body" title="' + plan.network_information + '"><i class="fas fa-question-circle"></i></a>';
       div.innerHTML =
       '<div class="col-xs-4 reference-plans">' +
         '<div class="col-xs-12 p0 mb-1">' +
@@ -437,7 +437,7 @@ function populateReferencePlans(plans) {
             '<span class="checkmark"></span>' +
           '</label>' +
         '</div>' +
-      '</div>'
+      '</div>';
 
       var yourPlans = document.getElementById('yourPlans');
       yourPlans.insertBefore(div, yourPlans.children[-1] || null);
@@ -445,7 +445,7 @@ function populateReferencePlans(plans) {
 
   window.setTimeout(function() {
     selectDefaultReferencePlan();
-    buildSponsorContributions(window.sponsorContribution)
+    buildSponsorContributions(window.sponsorContribution);
     disableEmployeeContributionLevel();
     newContributionAmounts();
   },400);
@@ -453,7 +453,7 @@ function populateReferencePlans(plans) {
 
 function getPlanInfo(element) {
   if (element.tagName != 'INPUT') {
-    element = element.querySelector('input[type=radio][data-name]')
+    element = element.querySelector('input[type=radio][data-name]');
   }
   var selectedRadio = element.value;
   var selectedName = element.dataset.name;
