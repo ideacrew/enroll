@@ -280,7 +280,7 @@ Then(/(.*) should see keep existing plan and select plan to terminate button/) d
   expect(page).to have_link "Select Plan to Terminate"
 end
 
-When(/(.*) clicked on keep existing plan button/) do |role|
+When(/(.*) clicked on keep existing plan button/) do |_role|
   click_button "Keep existing plan"
 end
 
