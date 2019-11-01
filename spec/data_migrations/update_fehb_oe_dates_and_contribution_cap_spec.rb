@@ -32,7 +32,7 @@ describe UpdateFehbOeDatesAndContributionCap, dbclean: :after_each do
     let(:new_oe_end_on)         { new_oe_start_on + 10.days }
 
     it "should change open enrollment period" do
-      ClimateControl.modify feins: organization.fein, oe_start_on: new_oe_start_on.to_s, oe_end_on: new_oe_end_on.to_s, action: "update_open_enrollment_dates" do
+      ClimateControl.modify feins: organization.fein, effective_on: start_on.to_s, oe_start_on: new_oe_start_on.to_s, oe_end_on: new_oe_end_on.to_s, action: "update_open_enrollment_dates" do
         subject.migrate
         expect(benefit_application.reload.open_enrollment_period.min).to eq new_oe_start_on
         expect(benefit_application.reload.open_enrollment_period.max).to eq new_oe_end_on
@@ -42,7 +42,7 @@ describe UpdateFehbOeDatesAndContributionCap, dbclean: :after_each do
 
   describe "begin_open_enrollment" do
     it "should change effective on date" do
-      ClimateControl.modify feins: organization.fein, action: "begin_open_enrollment" do
+      ClimateControl.modify feins: organization.fein, effective_on: start_on.to_s, action: "begin_open_enrollment" do
         expect(benefit_application.aasm_state).to eq :draft
         subject.migrate
         expect(benefit_application.reload.aasm_state).to eq :enrollment_open
@@ -59,7 +59,7 @@ describe UpdateFehbOeDatesAndContributionCap, dbclean: :after_each do
     end
 
     it "should change contribution cap" do
-      ClimateControl.modify feins: organization.fein, employee_only_cap: '510.84', employee_plus_one_cap: '1092.26', family_cap: '1184.02', action: "update_contribution_cap" do
+      ClimateControl.modify feins: organization.fein, effective_on: start_on.to_s, employee_only_cap: '510.84', employee_plus_one_cap: '1092.26', family_cap: '1184.02', action: "update_contribution_cap" do
         level = benefit_application.benefit_packages.first.sponsored_benefits.first.sponsor_contribution.contribution_levels.first
         expect(level.contribution_cap).to eq 0.0
         subject.migrate
