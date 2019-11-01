@@ -9,7 +9,8 @@ class UpdateFehbOeDatesAndContributionCap < MongoidMigrationTask
     feins = ENV['feins'].split(' ').uniq
     feins.each do |fein|
       organization = BenefitSponsors::Organizations::Organization.where(fein: fein).first
-      benefit_application = organization.employer_profile.benefit_applications.draft.first
+      effective_on = DateTime.strptime(ENV['effective_on'], "%m/%d/%Y")
+      benefit_application = organization.employer_profile.benefit_applications.where(:"effective_period.min" => effective_on).first
 
       case action
       when 'update_open_enrollment_dates'
@@ -43,13 +44,8 @@ class UpdateFehbOeDatesAndContributionCap < MongoidMigrationTask
   end
 
   def begin_open_enrollment(benefit_application)
-    benefit_application.approve_application! if benefit_application.may_approve_application?
-    oe_period = benefit_application.open_enrollment_period
-
-    if TimeKeeper.date_of_record >= oe_period.begin
-      benefit_application.begin_open_enrollment! if benefit_application.may_begin_open_enrollment?
-      benefit_application.update(open_enrollment_period: (today..oe_period.end))
-    end
+    service = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(benefit_application)
+    service.submit_application
   rescue StandardError => e
     puts e.message
   end
