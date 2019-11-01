@@ -2,6 +2,7 @@
 
 class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   attr_accessor :enrollment, :renewal_coverage_start, :assisted, :aptc_values
+  CAT_AGE_OFF_HIOS_IDS = ["94506DC0390008", "86052DC0400004"]
 
   def initialize
     @logger = Logger.new("#{Rails.root}/log/ivl_open_enrollment_begin_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log") unless defined? @logger
@@ -33,10 +34,11 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     renewal_enrollment.family_id = @enrollment.family_id
     renewal_enrollment.household_id = @enrollment.household_id
     renewal_enrollment.consumer_role_id = @enrollment.consumer_role_id
+    renewal_enrollment.resident_role_id = @enrollment.resident_role_id
     renewal_enrollment.effective_on = renewal_coverage_start
     renewal_enrollment.coverage_kind = @enrollment.coverage_kind
     renewal_enrollment.enrollment_kind = "open_enrollment"
-    renewal_enrollment.kind = "individual"
+    renewal_enrollment.kind = @enrollment.kind
     renewal_enrollment.elected_aptc_pct = @enrollment.elected_aptc_pct
     renewal_enrollment.hbx_enrollment_members = clone_enrollment_members
     renewal_enrollment.product_id = fetch_product_id(renewal_enrollment)
@@ -90,7 +92,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     if @enrollment.coverage_kind == 'dental'
       renewal_product = @enrollment.product.renewal_product_id
     elsif has_catastrophic_product? && is_cat_product_ineligible?
-      renewal_product = @enrollment.product.catastrophic_age_off_product_id
+      renewal_product = fetch_cat_age_off_product(@enrollment.product)
       raise "#{renewal_coverage_start.year} Catastrophic age off product missing on HIOS id #{@enrollment.product.hios_id}" if renewal_product.blank?
     else
       renewal_product = if @enrollment.product.csr_variant_id == '01' || has_catastrophic_product?
@@ -107,26 +109,43 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     renewal_product
   end
 
-  def is_csr?
-    csr_product_variants = EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.except('csr_100').values
-    (@enrollment.product.metal_level == "silver") && csr_product_variants.include?(@enrollment.product.csr_variant_id)
+  def fetch_csr_variant
+    @aptc_values[:csr_amt] == '0' ? '01' : EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP["csr_#{@aptc_values[:csr_amt]}"]
+  end
+
+  def fetch_cat_age_off_product(product)
+    # As per ticket: 61716
+    if renewal_coverage_start.year.to_s == "2020" && CAT_AGE_OFF_HIOS_IDS.include?(product.hios_base_id)
+      base_id = if product.hios_base_id == "94506DC0390008"
+                  "94506DC0390010"
+                elsif product.hios_base_id == "86052DC0400004"
+                  "86052DC0400010"
+                end
+      ::BenefitMarkets::Products::HealthProducts::HealthProduct.by_year(renewal_coverage_start.year).where(
+        {:hios_id => "#{base_id}-01"}
+      ).first.id
+    else
+      product.catastrophic_age_off_product_id
+    end
   end
 
   def assisted_renewal_product
     # TODO: Make sure tax households create script treats 0 as 100
-    if is_csr?
-      csr_variant = if @aptc_values[:csr_amt] == '0'
-                      '01'
-                    else
-                      EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP["csr_#{@aptc_values[:csr_amt]}"]
-                    end
+    if @aptc_values[:csr_amt].present? && @enrollment.product.metal_level == "silver"
+      csr_variant = fetch_csr_variant
+      product = fetch_product(csr_variant)
+      return product.id if product
 
-      ::BenefitMarkets::Products::HealthProducts::HealthProduct.by_year(renewal_coverage_start.year).where(
-        {:hios_id => "#{@enrollment.product.renewal_product.hios_base_id}-#{csr_variant}"}
-      ).first.id
+      fetch_product("01").id
     else
       @enrollment.product.renewal_product_id
     end
+  end
+
+  def fetch_product(csr_variant)
+    ::BenefitMarkets::Products::HealthProducts::HealthProduct.by_year(renewal_coverage_start.year).where(
+      {:hios_id => "#{@enrollment.product.renewal_product.hios_base_id}-#{csr_variant}"}
+    ).first
   end
 
   def has_catastrophic_product?
@@ -159,13 +178,14 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   end
 
   def clone_enrollment_members
-    eligible_enrollment_members.inject([]) do |members, hbx_enrollment_member|
-      members << HbxEnrollmentMember.new(
-        { applicant_id: hbx_enrollment_member.applicant_id,
-          eligibility_date: renewal_coverage_start,
-          coverage_start_on: renewal_coverage_start,
-          is_subscriber: hbx_enrollment_member.is_subscriber }
-      )
+    old_enrollment_members = eligible_enrollment_members
+    raise  "unable to generate enrollment with hbx_id #{@enrollment.hbx_id} due to no enrollment members not present" if old_enrollment_members.blank?
+
+    old_enrollment_members.inject([]) do |members, hbx_enrollment_member|
+      members << HbxEnrollmentMember.new({ applicant_id: hbx_enrollment_member.applicant_id,
+                                           eligibility_date: renewal_coverage_start,
+                                           coverage_start_on: renewal_coverage_start,
+                                           is_subscriber: hbx_enrollment_member.is_subscriber })
     end
   end
 
