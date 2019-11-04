@@ -1,10 +1,9 @@
 puts "-------------------------------------- Start of rake: #{TimeKeeper.datetime_of_record} --------------------------------------" unless Rails.env.test?
 batch_size = 500
 offset = 0
-current_year = 2019
-enrollment_count = HbxEnrollment.by_year(current_year + 1).individual_market.count
+enrollment_count = HbxEnrollment.count
 
-product_ids = BenefitMarkets::Products::Product.by_year(current_year + 1).aca_individual_market.map(&:_id)
+product_ids = BenefitMarkets::Products::Product.where(:active_year => 2020, benefit_market_kind: :aca_individual).map(&:_id)
 
 csv = CSV.open("final_eligibility_notice_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv", "w")
 csv << %w(ic_number policy.id policy.subscriber.coverage_start_on policy.aasm_state policy.plan.coverage_kind policy.plan.metal_level policy.plan.plan_name policy.total_premium deductible family_deductible  subscriber_id member_id person.first_name person.last_name
@@ -37,7 +36,7 @@ def is_dc_resident(person)
 end
 
 def enrollments_for_family(family)
-  HbxEnrollment.where(family_id: family.id)
+  @enrollments_for_family ||= HbxEnrollment.where(family_id: family.id)
 end
 
 def document_due_date(family)
@@ -53,11 +52,11 @@ def document_due_date(family)
   end
 end
 
-def is_family_renewing(family, current_year)
+def is_family_renewing(family)
   enrollments_for_family(family).where(
     :aasm_state.in => ["coverage_selected", "unverified", "coverage_terminated"],
     kind: "individual",
-    :effective_on => {:"$gte" => Date.new(current_year,1,1), :"$lte" => Date.new(current_year,12,31)}
+    :effective_on => {:"$gte" => Date.new(2019,1,1), :"$lte" => Date.new(2019,12,31)}
   ).present?
 end
 
@@ -79,14 +78,14 @@ def has_current_aptc_hbx_enrollment(family)
 end
 
 while offset <= enrollment_count
-  HbxEnrollment.by_year(current_year + 1).individual_market.offset(offset).limit(batch_size).each do |policy|
+  HbxEnrollment.offset(offset).limit(batch_size).each do |policy|
     begin
-      next unless is_family_renewing(policy.family, current_year)
+      next unless is_family_renewing(policy.family)
       next if policy.product.nil?
       next unless product_ids.include?(policy.product_id)
-      next if policy.effective_on < Date.new(current_year + 1, 01, 01)
+      next if policy.effective_on < Date.new(2018, 01, 01)
       next unless ["auto_renewing", "coverage_selected", "unverified", "renewing_coverage_selected"].include?(policy.aasm_state)
-      next unless ['01', '03', ''].include?(policy.product.csr_variant_id)
+      next unless ['01', '03', ''].include?(policy.product.csr_variant_id) #includes dental plans - csr_variant_id - ''
       next if policy.product.benefit_market_kind != :aca_individual
       next if (!(['unassisted_qhp', 'individual'].include? policy.kind)) || has_current_aptc_hbx_enrollment(policy.family)
 
@@ -97,7 +96,6 @@ while offset <= enrollment_count
       policy.hbx_enrollment_members.each do |hbx_enrollment_member|
         add_to_csv(csv, policy, hbx_enrollment_member.person, "Yes", check_for_outstanding_verification_types(hbx_enrollment_member.person), document_due_date(policy.family)) if hbx_enrollment_member.person != person
       end
-      puts "************** Inserting into CSV #{person.hbx_id} ***************"
     rescue => e
       puts "Error policy id #{policy.id} family id #{policy.family.id}" + e.message + "   " + e.backtrace.first
     end
@@ -105,3 +103,4 @@ while offset <= enrollment_count
 
   offset = offset + batch_size
 end
+puts "-------------------------------------- End of rake: #{TimeKeeper.datetime_of_record} --------------------------------------" unless Rails.env.test?
