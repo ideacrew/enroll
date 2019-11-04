@@ -47,8 +47,8 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory, dbclean: :after_eac
               end
             end
 
-            it { expect(@available_eligibility[:aptc][family_member.id.to_s].round(2)).to eq 443.32 }
-            it { expect(@available_eligibility[:total_available_aptc].round(2)).to eq 443.32 }
+            it { expect(@available_eligibility[:aptc][family_member.id.to_s]).to eq 443.33 }
+            it { expect(@available_eligibility[:total_available_aptc]).to eq 443.33 }
             it { expect(@available_eligibility[:csr]).to eq 'csr_94' }
           end
 
@@ -105,8 +105,8 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory, dbclean: :after_eac
               end
             end
 
-            it { expect(@available_eligibility[:aptc][family_member.id.to_s].round(2)).to eq 225.96 }
-            it { expect(@available_eligibility[:aptc][family_member2.id.to_s].round(2)).to eq 274.04 }
+            it { expect(@available_eligibility[:aptc][family_member.id.to_s]).to eq 225.96711798839456 }
+            it { expect(@available_eligibility[:aptc][family_member2.id.to_s]).to eq 274.0328820116054 }
             it { expect(@available_eligibility[:total_available_aptc]).to eq 500.00 }
             it { expect(@available_eligibility[:csr]).to eq 'csr_94' }
           end
@@ -133,8 +133,8 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory, dbclean: :after_eac
               end
             end
 
-            it { expect(@available_eligibility[:aptc][family_member.id.to_s].round(2)).to eq 500.00 }
-            it { expect(@available_eligibility[:aptc][family_member2.id.to_s].round(2)).to eq 0.00 }
+            it { expect(@available_eligibility[:aptc][family_member.id.to_s]).to eq 500.00 }
+            it { expect(@available_eligibility[:aptc][family_member2.id.to_s]).to eq 0.00 }
             it { expect(@available_eligibility[:total_available_aptc]).to eq 500.00 }
             it { expect(@available_eligibility[:csr]).to eq 'csr_100' }
           end
@@ -166,8 +166,8 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory, dbclean: :after_eac
               end
             end
 
-            it { expect(@available_eligibility[:aptc][family_member.id.to_s].round(2)).to eq 203.37 }
-            it { expect(@available_eligibility[:aptc][family_member2.id.to_s].round(2)).to eq 246.63 }
+            it { expect(@available_eligibility[:aptc][family_member.id.to_s]).to eq 203.3704061895551 }
+            it { expect(@available_eligibility[:aptc][family_member2.id.to_s]).to eq 246.62959381044487 }
             it { expect(@available_eligibility[:total_available_aptc]).to eq 450.00 }
             it { expect(@available_eligibility[:csr]).to eq 'csr_94' }
           end
@@ -194,8 +194,8 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory, dbclean: :after_eac
               end
             end
 
-            it { expect(@available_eligibility[:aptc][family_member.id.to_s].round(2)).to eq 450.00 }
-            it { expect(@available_eligibility[:aptc][family_member2.id.to_s].round(2)).to eq 0 }
+            it { expect(@available_eligibility[:aptc][family_member.id.to_s]).to eq 450.00 }
+            it { expect(@available_eligibility[:aptc][family_member2.id.to_s]).to eq 0 }
             it { expect(@available_eligibility[:total_available_aptc]).to eq 450.00 }
             it { expect(@available_eligibility[:csr]).to eq 'csr_100' }
           end
