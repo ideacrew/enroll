@@ -4,7 +4,7 @@ require 'rails_helper'
 require "#{Rails.root}/spec/shared_contexts/enrollment.rb"
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
-  RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :model do
+  RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :model, :dbclean => :after_each do
 
     let(:current_date) { Date.new(calender_year, 11, 1) }
 
@@ -74,12 +74,27 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
                         aasm_state: 'coverage_selected')
     end
 
+    let!(:catastrophic_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        :with_enrollment_members,
+                        family: family,
+                        enrollment_members: enrollment_members,
+                        household: family.active_household,
+                        coverage_kind: coverage_kind,
+                        resident_role_id: family.primary_person.consumer_role.id,
+                        effective_on: Date.new(2019,1,1),
+                        kind: "coverall",
+                        product_id: current_cat_product.id,
+                        aasm_state: 'coverage_selected')
+    end
+
     let(:enrollment_members) { family.family_members }
     let(:coverall_enrollment_members) { coverall_family.family_members }
     let(:calender_year) { TimeKeeper.date_of_record.year }
     let(:coverage_kind) { 'health' }
     let(:current_product) { FactoryBot.create(:active_ivl_gold_health_product, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_product_id: renewal_product.id) }
     let(:renewal_product) { FactoryBot.create(:renewal_ivl_gold_health_product, hios_id: "11111111122302-01", csr_variant_id: "01") }
+    let(:current_cat_product) { FactoryBot.create(:active_ivl_silver_health_product, hios_base_id: "94506DC0390008", csr_variant_id: "01", metal_level_kind: :catastrophic) }
 
     subject do
       enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
@@ -130,6 +145,18 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           expect(applicant_ids).not_to include(spouse.id)
         end
       end
+
+      context "all ineligible members" do
+        before do
+          enrollment.hbx_enrollment_members.each do |member|
+            member.person.update_attributes(is_disabled: true)
+          end
+        end
+
+        it "should raise an error" do
+          expect { subject.clone_enrollment_members }.to raise_error(RuntimeError, /unable to generate enrollment with hbx_id /)
+        end
+      end
     end
 
     describe ".renew" do
@@ -175,7 +202,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
     describe ".renewal_product" do
       context "When consumer covered under catastrophic product" do
-        let!(:renewal_cat_age_off_product) { FactoryBot.create(:renewal_ivl_silver_health_product, hios_id: "11111111122300-01", csr_variant_id: "01") }
+        let!(:renewal_cat_age_off_product) { FactoryBot.create(:renewal_ivl_silver_health_product,  hios_base_id: "94506DC0390010", hios_id: "94506DC0390010-01", csr_variant_id: "01") }
         let!(:renewal_product) { FactoryBot.create(:renewal_individual_catastophic_product, hios_id: "11111111122302-01", csr_variant_id: "01") }
         let!(:current_product) { FactoryBot.create(:active_individual_catastophic_product, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_product_id: renewal_product.id, catastrophic_age_off_product_id: renewal_cat_age_off_product.id) }
 
@@ -196,6 +223,22 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             expect(subject.renewal_product).to eq renewal_product.id
           end
         end
+
+        context "renew a current product to specific product" do
+          subject do
+            enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
+            enrollment_renewal.enrollment = catastrophic_enrollment
+            enrollment_renewal.assisted = assisted
+            enrollment_renewal.aptc_values = aptc_values
+            enrollment_renewal.renewal_coverage_start = Date.new(2020,1,1)
+            enrollment_renewal
+          end
+          let(:child1_dob) { current_date.next_month - 30.years }
+
+          it "should return new renewal product" do
+            expect(subject.renewal_product).to eq renewal_cat_age_off_product.id
+          end
+        end
       end
     end
 
@@ -211,6 +254,16 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
           it "should be renewed into new CSR variant product" do
             expect(subject.assisted_renewal_product).to eq csr_product.id
+          end
+        end
+
+        context "and aptc value didn't gave in renewal input CSV" do
+          let(:family_enrollment_instance) { Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new}
+
+          it "should return renewal product id" do
+            family_enrollment_instance.enrollment = enrollment
+            family_enrollment_instance.aptc_values = {}
+            expect(family_enrollment_instance.assisted_renewal_product).to eq renewal_product.id
           end
         end
 
@@ -256,7 +309,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           enrollment_renewal.assisted = true
           enrollment_renewal.aptc_values = {applied_percentage: 87,
                                             applied_aptc: 150,
-                                            csr_amt: 87,
+                                            csr_amt: 100,
                                             max_aptc: 200}
           enrollment_renewal.renewal_coverage_start = renewal_benefit_coverage_period.start_on
           enrollment_renewal
@@ -289,6 +342,12 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           enr = subject.clone_enrollment
           enr.save!
           expect(subject.can_renew_assisted_product?(enr)).to eq true
+        end
+
+        it 'should create and assign new enrollment member objects to new enrollment' do
+          new_enr = subject.clone_enrollment
+          new_enr.save!
+          expect(new_enr.subscriber.id).not_to eq(enrollment_assisted.subscriber.id)
         end
       end
     end

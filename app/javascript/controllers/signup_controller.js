@@ -335,7 +335,7 @@ checkRegistrationRules() {
   let registrationError = document.getElementsByClassName('registration-rules');
 
   if (registrationError.length) {
-    document.getElementsByClassName('registration-rules')[0].innerText = "Password didn't match with requirements.";
+    //document.getElementsByClassName('registration-rules')[0].innerText = "Password didn't match with requirements.";
     setTimeout(function() {
       document.getElementById('user_password').focus();
     },300);
