@@ -6,6 +6,8 @@
 module Factories
   class EligibilityFactory
 
+    include ApplicationHelper
+
     def initialize(enrollment_id, selected_aptc = nil, product_ids = [])
       @enrollment = HbxEnrollment.where(id: enrollment_id.to_s).first
       raise "Cannot find a valid enrollment with given enrollment id" unless @enrollment
@@ -17,7 +19,7 @@ module Factories
     # returns hash of total_aptc, aptc_breakdown_by_member and csr_value
     def fetch_available_eligibility
       available_eligibility_hash = fetch_enrolling_available_aptcs.merge(fetch_csr)
-      total_aptc = available_eligibility_hash[:aptc].values.inject(0, :+)
+      total_aptc = float_fix(available_eligibility_hash[:aptc].values.inject(0, :+))
       available_eligibility_hash.merge({:total_available_aptc => total_aptc})
     end
 
@@ -54,7 +56,7 @@ module Factories
     def ehb_premium(product_id)
       product = ::BenefitMarkets::Products::Product.find(product_id)
       premium_amount = fetch_total_premium(product)
-      premium_amount * product.ehb
+      round_down_float_two_decimals(premium_amount * product.ehb)
     end
 
     def fetch_total_premium(product)
@@ -83,9 +85,9 @@ module Factories
       aptc_thhms.select { |thhm| shopping_member_ids.include?(thhm.applicant_id.to_s) && thhm.is_ia_eligible? }
     end
 
-    def enrollment_eligible_benchmark_hash(thhms)
+    def enrollment_eligible_benchmark_hash(thhms, enrollment)
       thhms.inject({}) do |benchmark_hash, thhm|
-        benchmark_hash.merge!({ thhm.applicant_id.to_s => thhm.family_member.aptc_benchmark_amount })
+        benchmark_hash.merge!({ thhm.applicant_id.to_s => thhm.family_member.aptc_benchmark_amount(enrollment) })
       end
     end
 
@@ -93,7 +95,7 @@ module Factories
       total_thh_available_aptc = tax_household.total_aptc_available_amount_for_enrollment(@enrollment)
       aptc_thhms = tax_household.aptc_members
       enrolling_aptc_members = aptc_enrollment_members(aptc_thhms)
-      member_benchmark_hash = enrollment_eligible_benchmark_hash(enrolling_aptc_members)
+      member_benchmark_hash = enrollment_eligible_benchmark_hash(enrolling_aptc_members, @enrollment)
       total_eligible_benchmark = member_benchmark_hash.values.sum
 
       enrolling_aptc_members.inject({}) do |thh_hash, thh_member|

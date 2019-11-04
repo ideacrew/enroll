@@ -316,6 +316,76 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         expect(response).to redirect_to(insured_plan_shopping_path(id: new_household.hbx_enrollments(true).first.id, change_plan: 'change', coverage_kind: 'health', market_kind: 'individual', enrollment_kind: 'sep'))
       end
     end
+
+    context "IVL Market" do
+      context "consumer role family" do
+        let(:family_member_ids) {{"0" => family.family_members.first.id}}
+        let!(:person1) {FactoryBot.create(:person, :with_consumer_role)}
+        let!(:consumer_role) {person.consumer_role}
+        let!(:new_household) {family.households.where(:id => {"$ne" => "#{family.households.first.id}"}).first}
+        let(:benefit_coverage_period) {FactoryBot.build(:benefit_coverage_period)}
+        let!(:ivl_hbx_enrollment) { FactoryBot.create(:hbx_enrollment,
+                                                      family: family,
+                                                      household: family.active_household,
+                                                      enrollment_kind: "special_enrollment") }
+
+        before :each do
+          allow(HbxEnrollment).to receive(:find).with("123").and_return(ivl_hbx_enrollment)
+          allow(ivl_hbx_enrollment).to receive(:coverage_kind).and_return "health"
+          allow(person).to receive(:is_consumer_role_active?).and_return true
+          allow(person).to receive(:consumer_role).and_return(consumer_role)
+        end
+        it "should create an hbx enrollment" do
+          params = {
+            person_id: person.id,
+            consumer_role_id: consumer_role.id,
+            market_kind: "individual",
+            change_plan: "change",
+            hbx_enrollment_id: "123",
+            family_member_ids: family_member_ids,
+            enrollment_kind: 'special_enrollment',
+            coverage_kind: ivl_hbx_enrollment.coverage_kind
+          }
+          sign_in user
+          post :create, params: params
+          expect(assigns(:change_plan)).to eq "change_by_qle"
+        end
+      end
+
+      context "resident role family" do
+        let(:family_member_ids) {{"0" => family.family_members.first.id}}
+        let!(:person1) {FactoryBot.create(:person, :with_resident_role)}
+        let!(:resident_role) {person.resident_role}
+        let!(:new_household) {family.households.where(:id => {"$ne "=> "#{family.households.first.id}"}).first}
+        let(:benefit_coverage_period) {FactoryBot.build(:benefit_coverage_period)}
+        let!(:coverall_hbx_enrollment) { FactoryBot.create(:hbx_enrollment,
+                                                           family: family,
+                                                           household: family.active_household,
+                                                           enrollment_kind: "special_enrollment") }
+
+        before :each do
+          allow(HbxEnrollment).to receive(:find).with("123").and_return(coverall_hbx_enrollment)
+          allow(coverall_hbx_enrollment).to receive(:coverage_kind).and_return "health"
+          allow(person).to receive(:is_resident_role_active?).and_return true
+          allow(person).to receive(:resident_role).and_return(resident_role)
+        end
+        it "should create an hbx enrollment" do
+          params = {
+            person_id: person.id,
+            consumer_role_id: consumer_role.id,
+            market_kind: "coverall",
+            change_plan: "change",
+            hbx_enrollment_id: "123",
+            family_member_ids: family_member_ids,
+            enrollment_kind: 'special_enrollment',
+            coverage_kind: coverall_hbx_enrollment.coverage_kind
+          }
+          sign_in user
+          post :create, params: params
+          expect(assigns(:change_plan)).to eq "change_by_qle"
+        end
+      end
+    end
   end
 
   context "GET terminate_selection" do
