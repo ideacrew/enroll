@@ -14,13 +14,13 @@ non_curam_ivl = Person.collection.aggregate([
     "consumer_role" => {"$ne" => nil},
     "created_at" => {"$lt" => AUDIT_END_DATE} 
   }},
-  {"$match" => {
-    "$or" => [
-      {"created_at" => {"$gte" => AUDIT_START_DATE}},
-      {"created_at" => {"$lt" => AUDIT_START_DATE}, "updated_at" => {"$gte" => AUDIT_START_DATE}}
-    ]
-  }},
-  {"$project" => {_id: 1}}
+  #{"$match" => {
+  #  "$or" => [
+  #    {"created_at" => {"$gte" => AUDIT_START_DATE}},
+  #    {"created_at" => {"$lt" => AUDIT_START_DATE}, "updated_at" => {"$gte" => AUDIT_START_DATE}}
+  #  ]
+  #}},
+  #{"$project" => {_id: 1}}
 ])
 
 ivl_person_ids = non_curam_ivl.map do |rec|
@@ -55,6 +55,17 @@ def relationship_for(person, family)
   family.primary_applicant.person.find_relationship_with(person)
 end
 
+# TODO:
+# Not sure if this condition is possible:
+# non_curam_ivl_person.updated_at = nil
+# non_curam_ivl_person.save!
+# Mongoid::Errors::Validations: 
+# message:
+#   Validation of Person failed.
+# summary:
+#  The following errors were found: Consumer role is invalid
+#resolution:
+#  Try persisting the document with valid data or remove the validations.
 def version_in_window?(pers)
   return true if pers.updated_at.blank?
   (pers.updated_at >= AUDIT_START_DATE) && (pers.updated_at < AUDIT_END_DATE)
