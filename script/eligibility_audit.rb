@@ -14,13 +14,13 @@ non_curam_ivl = Person.collection.aggregate([
     "consumer_role" => {"$ne" => nil},
     "created_at" => {"$lt" => AUDIT_END_DATE} 
   }},
-  #{"$match" => {
-  #  "$or" => [
-  #    {"created_at" => {"$gte" => AUDIT_START_DATE}},
-  #    {"created_at" => {"$lt" => AUDIT_START_DATE}, "updated_at" => {"$gte" => AUDIT_START_DATE}}
-  #  ]
-  #}},
-  #{"$project" => {_id: 1}}
+  {"$match" => {
+    "$or" => [
+      {"created_at" => {"$gte" => AUDIT_START_DATE}},
+      {"created_at" => {"$lt" => AUDIT_START_DATE}, "updated_at" => {"$gte" => AUDIT_START_DATE}}
+    ]
+  }},
+  {"$project" => {_id: 1}}
 ])
 
 ivl_person_ids = non_curam_ivl.map do |rec|
@@ -143,11 +143,11 @@ def each_person_version(person)
     families = person_family_map[pers_record.id]
     familes.each do |family|
       yield
-#      if consumer_role = person.consumer_role && lpd = consumer_role.lawful_presence_determination
-#        consumer_role.person ||= person
-#        if auditable?(person)
-#        end
-#      end
+      if consumer_role = person.consumer_role && lpd = consumer_role.lawful_presence_determination
+        consumer_role.person ||= person
+        if auditable?(person)
+        end
+      end
     end
   end
   person.history_tracks.each do |track|
