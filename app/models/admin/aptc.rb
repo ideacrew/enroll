@@ -306,18 +306,19 @@ class Admin::Aptc < ApplicationController
       #family = Family.find(params[:person][:family_id])
       max_aptc = family.active_household.latest_active_tax_household_with_year(year).latest_eligibility_determination.max_aptc.to_f
       active_aptc_hbxs = family.active_household.hbx_enrollments_with_aptc_by_year(params[:year].to_i)
-
       params.each do |key, aptc_value|
         if key.include?('aptc_applied_')
           # TODO enrollment duplication has to be refactored once Ram promotes reusable module to create HbxEnrollment copy
           hbx_id = key.sub("aptc_applied_", "")
-          updated_aptc_value = aptc_value.to_f
-          actual_aptc_value = HbxEnrollment.find(hbx_id).applied_aptc_amount.to_f
+          original_hbx = HbxEnrollment.find(hbx_id)
+          ehb_value = original_hbx.product.ehb
+          ehb_premium = "#{helpers.round_down_float_two_decimals(aptc_value.to_f * ehb_value)}".to_f
+          updated_aptc_value = ehb_premium
+          actual_aptc_value = original_hbx.applied_aptc_amount.to_f
           # Only create enrollments if the APTC values were updated.
           if actual_aptc_value != updated_aptc_value # TODO: check if the effective_on doesnt go to next year?????
             percent_sum_for_all_enrolles = 0.0
             enrollment_update_result = true
-            original_hbx = HbxEnrollment.find(hbx_id)
             aptc_ratio_by_member = family.active_household.latest_active_tax_household.aptc_ratio_by_member
 
             # Duplicate Enrollment
@@ -445,7 +446,7 @@ class Admin::Aptc < ApplicationController
     def years_with_tax_household(family)
       year_set = family.active_household.tax_households.map(&:effective_starting_on).map(&:year)
       current_hbx = HbxProfile.current_hbx
-      oe_start_year = Settings.aca.individual_market.open_enrollment.start_on.year
+      oe_start_year = TimeKeeper.date_of_record.year
       current_year = TimeKeeper.date_of_record.year
 
       if current_hbx && current_hbx.under_open_enrollment? && oe_start_year == current_year
