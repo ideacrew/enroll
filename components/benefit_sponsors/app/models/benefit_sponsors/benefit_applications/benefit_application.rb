@@ -394,6 +394,10 @@ module BenefitSponsors
       find_census_employees.active
     end
 
+    def active_census_employees_under_py
+      find_census_employees.active.census_employees_active_on(self.effective_period.min)
+    end
+
     def assigned_census_employees_without_owner
       benefit_sponsorship.census_employees.active.non_business_owner
     end
@@ -487,7 +491,7 @@ module BenefitSponsors
 
     def members_eligible_to_enroll
       return @members_eligible_to_enroll if defined? @members_eligible_to_enroll
-      @members_eligible_to_enroll ||= active_census_employees
+      @members_eligible_to_enroll ||= active_census_employees_under_py
     end
 
     def members_eligible_to_enroll_count
@@ -557,7 +561,7 @@ module BenefitSponsors
 
     def all_enrolled_and_waived_member_count
       @all_enrolled_and_waived_member_count ||= begin
-        if active_census_employees.count <= Settings.aca.shop_market.small_market_active_employee_limit
+        if active_census_employees_under_py.count <= Settings.aca.shop_market.small_market_active_employee_limit
           enrolled_families.size
         else
           0

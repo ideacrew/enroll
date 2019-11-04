@@ -266,6 +266,15 @@ class CensusEmployee < CensusMember
     matched.by_benefit_group_assignment_ids(benefit_group_assignment_ids)
   }
 
+  scope :census_employees_active_on, -> (date) {
+    where(
+      "$or" => [
+        {"employment_terminated_on" => nil},
+        {"employment_terminated_on" => {"$gte" => date}}
+      ]
+    )
+  }
+
   scope :employees_for_benefit_application_sponsorship, ->(benefit_application) {
     new_effective_date = benefit_application.start_on
     benefit_sponsorship_id = benefit_application.benefit_sponsorship.id
@@ -688,7 +697,7 @@ class CensusEmployee < CensusMember
     return true if employment_terminated? || cobra_terminated?
     return false if cobra_linked?
 
-    !(is_eligible? || employee_role_linked?)
+    !(is_eligible? || is_linked?)
   end
 
   def employee_relationship
