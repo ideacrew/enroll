@@ -12,7 +12,7 @@ h1.heading-text Benefit Package - Set Up
   .plan-title#uic-wrapper
     .row.row-form-wrapper
       - title_value = f.object.title.present? ? f.object.title : "#{TimeKeeper.date_of_record.year} Employer Benefits"
-      = f.text_field :title, class: "form-control", placeholder:'My Benefit Package', onchange: 'validateTitle()', id: 'benefitPackageTitle', required: true
+      = f.text_field :title, class: "form-control", placeholder: 'My Benefit Package', id: 'benefitPackageTitle', required: true
     .row.row-form-wrapper
       = f.text_field :description, class: "form-control", placeholder:'My Description'
     .row.row-form-wrapper
@@ -30,29 +30,17 @@ h1.heading-text Benefit Package - Set Up
 
   = link_to 'Cancel', profiles_employers_employer_profile_path(@benefit_package_form.service.employer_profile, :tab=>'benefits'), :class => 'btn btn-default pull-right mr-1', id:'cancelBenefitPackage'
 
-javascript:
-  var disableSelectric = false;
+  = hidden_field_tag 'previous_benefit_package_titles', "#{@benefit_package_form.previous_bp_titles.map { |title| title.to_s }}"
 
-  function validateTitle() {
-    var new_title = document.getElementById("benefitPackageTitle").value
-    previousBPTitles = "#{@benefit_package_form.previous_bp_titles}"
 
-    $('[data-toggle="tooltip"]').tooltip()
-
-    if (previousBPTitles.includes(new_title)) {
-      document.getElementById("submitBenefitPackage").classList.add('disabled')
-      $('.benefit-properties span.tool-tip').attr('data-original-title', 'Before you can save, each benefit group must have a unique title.');
-    }
-    else {
-      $('.benefit-properties span.tool-tip').attr('data-original-title', '')
-      document.getElementById("submitBenefitPackage").classList.remove('disabled')
-    }
-    disableNewPlanYearButton()
-  }
+= javascript_pack_tag 'plan_year'
 
 - if is_new_package || is_new_package.nil?
+  = hidden_field_tag 'disable_benefit_package_buttons_boolean', 'true'
+
   javascript:
     window.onload = new function(){
       MetalLevelSelect.disableNewAddBenefitPackageButton()
       MetalLevelSelect.disableDentalBenefitPackage()
     }
+  = hidden_field_tag 'disable_benefit_package_buttons_boolean', 'true'
