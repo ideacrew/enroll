@@ -60,7 +60,7 @@ module PdfTemplates
     def broker?
       return false
     end
-     
+
     def employee_notice?
       false
     end
@@ -122,11 +122,11 @@ module PdfTemplates
     end
 
     def renewal_health_enrollments
-      enrollments.select{|enrollment| enrollment.plan.coverage_kind == "health" && enrollment.effective_on.year == TimeKeeper.date_of_record.next_year.year}
+      health_enrollments.select{|enrollment| enrollment.plan.coverage_kind == "health" && enrollment.effective_on.year == TimeKeeper.date_of_record.next_year.year}
     end
 
     def renewal_dental_enrollments
-      enrollments.select{|enrollment| enrollment.plan.coverage_kind == "dental" && enrollment.effective_on.year == TimeKeeper.date_of_record.next_year.year}
+      dental_enrollments.select{|enrollment| enrollment.plan.coverage_kind == "dental" && enrollment.effective_on.year == TimeKeeper.date_of_record.next_year.year}
     end
 
     def magi_medicaid_eligible
