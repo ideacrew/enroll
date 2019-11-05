@@ -1,28 +1,29 @@
-require File.join(Rails.root, "lib/mongoid_migration_task")
+# frozen_string_literal: true
 
+require File.join(Rails.root, "lib/mongoid_migration_task")
 class RemoveDependent < MongoidMigrationTask
   def migrate
     begin
       id = ENV["family_member_id"].to_s
-      family_member = FamilyMember.find(id)
-      if family_member.nil?
+      family = Family.where("family_members._id" => BSON::ObjectId.from_string(id)).first
+      if family.nil?
         puts "No family member found" unless Rails.env.test?
-      else
-        active_household = family_member.family.active_household
-        coverage_household = active_household.coverage_households.where(:is_immediate_family => true).first
-        enrollments = active_household.hbx_enrollments.my_enrolled_plans.where(:"aasm_state".ne => "coverage_canceled")
-        if (coverage_household.coverage_household_members.map(&:family_member_id).map(&:to_s) & [id]).present?|| (enrollments.map(&:hbx_enrollment_members).flatten.uniq.map(&:applicant_id).map(&:to_s) & [id]).present?
-          puts "you cannot remove this family member. This member may have Coverage Household Member records or Enrollments" unless Rails.env.test?
-          return
-        else
-          family_member.destroy!
-          puts "remove duplicate dependent with family member id: #{family_member.id}" unless Rails.env.test?
-        end
+        return
       end
-    rescue Exception => e
+      family_member = family.family_members.find(id)
+      duplicate_fms_count = family.family_members.where(person_id: family_member.person.id).count
+      chm_fm_ids = family.active_household.coverage_households.flat_map(&:coverage_household_members).map(&:family_member_id)
+      hbx_member_fm_ids = family.active_household.hbx_enrollments.flat_map(&:hbx_enrollment_members).map(&:applicant_id)
+      th_member_ids = family.active_household.tax_households.flat_map(&:tax_household_members).map(&:applicant_id)
+
+      if duplicate_fms_count > 1 && !chm_fm_ids.include?(id) && !hbx_member_fm_ids.include?(id) && !th_member_ids.include?(id)
+        family_member.delete
+        puts "Removed duplicate family member id: #{id}" unless Rails.env.test?
+      else
+        puts "Cannot destroy/delete the FamilyMember, reason: This FamilyMember has a CoverageHouseholdMember/HbxEnrollmentMember/TaxHouseholdMember" unless Rails.env.test?
+      end
+    rescue StandardError => e
       puts e.message
     end
   end
 end
-
-
