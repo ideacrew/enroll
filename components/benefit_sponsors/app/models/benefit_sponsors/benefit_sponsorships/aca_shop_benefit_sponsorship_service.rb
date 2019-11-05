@@ -101,8 +101,12 @@ module BenefitSponsors
     end
 
     def auto_cancel_ineligible
-      benefit_applications = benefit_sponsorship.benefit_applications.where(:"effective_period.min" => new_date, :aasm_state.in => [:enrollment_closed, :enrollment_ineligible])
-
+      benefit_applications =
+        if Settings.aca.shop_market.auto_cancel_ineligible
+          benefit_sponsorship.benefit_applications.where(:"effective_period.min" => new_date, :aasm_state.in => [:enrollment_closed, :enrollment_ineligible])
+        else
+          benefit_sponsorship.benefit_applications.where(:"effective_period.min" => new_date, :aasm_state.in => [:enrollment_closed])
+        end
       benefit_applications.each do |benefit_application|
         application_service = application_service_for(benefit_application)
 

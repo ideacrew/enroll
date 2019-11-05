@@ -88,7 +88,7 @@ module BenefitSponsors
     describe '.auto_cancel_enrollment_closed', dbclean: :after_each do
       let(:sponsorship_state)               { :applicant }
       let(:initial_application_state)       { :enrollment_closed }
-      let(:renewal_application_state)       { :enrollment_closed }
+      let(:renewal_application_state)       { :enrollment_ineligible }
       let(:application_effective_date)      { april_sponsors.first.benefit_applications.first.effective_period.min }
 
       before do
@@ -99,25 +99,38 @@ module BenefitSponsors
         TimeKeeper.set_date_of_record_unprotected!(Time.zone.today)
       end
 
-      context  'when initial employer missed binder payment' do 
+      context 'cancel the application when under enrollment close state' do
 
-        it "should move applications into ineligible state" do
-          (april_sponsors + april_renewal_sponsors).each do |sponsor|
-            benefit_application = sponsor.benefit_applications.detect{|application| application.is_renewing?}
-            benefit_application = sponsor.benefit_applications.first if benefit_application.blank?
+        it "should move closed applications into canceled state" do
+          benefit_application = april_sponsors.first.benefit_applications.first if benefit_application.blank?
 
-            expect(sponsor.applicant?).to be_truthy unless benefit_application.is_renewing?
-            expect(benefit_application.enrollment_closed?).to be_truthy
-            sponsorship_service = subject.new(benefit_sponsorship: sponsor)
-            sponsorship_service.auto_cancel_ineligible
+          expect(april_sponsors.first.applicant?).to be_truthy
+          expect(benefit_application.enrollment_closed?).to be_truthy
+          sponsorship_service = subject.new(benefit_sponsorship: april_sponsors.first)
+          sponsorship_service.auto_cancel_ineligible
 
-            sponsor.reload
-            benefit_application.reload
+          april_sponsors.first.reload
+          benefit_application.reload
 
-            expect(sponsor.applicant?).to be_truthy
-            expect(benefit_application.canceled?).to be_truthy
-          end
+          expect(april_sponsors.first.applicant?).to be_truthy
+          expect(benefit_application.canceled?).to be_truthy
         end
+
+        it "should not move ineligible applications into canceled state" do
+          benefit_application = april_renewal_sponsors.first.benefit_applications.detect(&:is_renewing?)
+
+          expect(april_renewal_sponsors.first.applicant?).to be_falsey
+          expect(benefit_application.enrollment_closed?).to be_falsey
+          sponsorship_service = subject.new(benefit_sponsorship: april_renewal_sponsors.first)
+          sponsorship_service.auto_cancel_ineligible
+
+          april_renewal_sponsors.first.reload
+          benefit_application.reload
+
+          expect(april_renewal_sponsors.first.applicant?).to be_falsey
+          expect(benefit_application.canceled?).to be_falsey
+        end
+
       end
     end
 

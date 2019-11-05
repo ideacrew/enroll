@@ -11,7 +11,7 @@ module Services
     end
 
     def assign(aptc_values)
-      raise 'Provide aptc values {applied_aptc: , applied_percentage: , max_aptc:}' if aptc_values_missing?(aptc_values)
+      raise 'Provide aptc values {applied_aptc:, max_aptc:}' if aptc_values_missing?(aptc_values)
 
       applied_aptc_amt = calculate_applicable_aptc(aptc_values)
       @hbx_enrollment.applied_aptc_amount = applied_aptc_amt.round(2)
@@ -27,7 +27,7 @@ module Services
     private
 
     def aptc_values_missing?(aptc_values)
-      aptc_keys = [:applied_aptc, :applied_percentage, :max_aptc]
+      aptc_keys = [:applied_aptc, :max_aptc]
       return true if aptc_keys.any?{ |aptc_key| aptc_values.keys.exclude?(aptc_key) } || aptc_keys.any?{ |aptc_key| aptc_values[aptc_key].blank? }
 
       false
