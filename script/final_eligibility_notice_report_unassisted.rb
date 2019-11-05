@@ -5,7 +5,7 @@
 puts "-------------------------------------- Start of rake: #{TimeKeeper.datetime_of_record} --------------------------------------" unless Rails.env.test?
 batch_size = 500
 offset = 0
-enrollment_count = HbxEnrollment.count
+enrollment_count = HbxEnrollment.by_year(current_year + 1).individual_market.count
 current_year = ARGV[0].to_i
 
 product_ids = BenefitMarkets::Products::Product.by_year(current_year + 1).aca_individual_market.map(&:_id)
@@ -83,7 +83,7 @@ def has_current_aptc_hbx_enrollment(family)
 end
 
 while offset <= enrollment_count
-  HbxEnrollment.offset(offset).limit(batch_size).each do |policy|
+  HbxEnrollment.by_year(current_year + 1).individual_market.offset(offset).limit(batch_size).each do |policy|
     begin
       next unless is_family_renewing(policy.family, current_year)
       next if policy.product.nil?
