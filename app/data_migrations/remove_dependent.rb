@@ -23,7 +23,7 @@ class RemoveDependent < MongoidMigrationTask
         puts "Cannot destroy/delete the FamilyMember, reason: This FamilyMember has a CoverageHouseholdMember/HbxEnrollmentMember/TaxHouseholdMember" unless Rails.env.test?
       end
     rescue StandardError => e
-      puts e.message
+      puts e.message unless Rails.env.test?
     end
   end
 end

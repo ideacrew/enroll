@@ -66,7 +66,7 @@ describe RemoveDependent, dbclean: :after_each do
 
     context 'Family Member does not exist' do
       around do |example|
-        ClimateControl.modify family_member_id: 'fm_id' do
+        ClimateControl.modify family_member_id: family.id.to_s do
           example.run
         end
       end
