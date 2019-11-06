@@ -55,7 +55,7 @@ module Effective
         }, :sortable => false, :filter => false
 
         # Do not show column unless renewal_benefit_application aasm state is in PUBLISHED_STATES
-        if attributes["renewal"] && attributes[:employer_profile].renewal_benefit_application.is_submitted?
+        if attributes["renewal"] && attributes["is_submitted"]
           table_column :renewal_enrollment_status, :proc => Proc.new { |row|
             renewal_enrollment_state(row)
           }, :filter => false, :sortable => false
