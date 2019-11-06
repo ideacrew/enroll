@@ -4,13 +4,13 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 class RemoveDependent < MongoidMigrationTask
   def migrate
     begin
-      id = ENV["family_member_id"].to_s
-      family = Family.where("family_members._id" => BSON::ObjectId.from_string(id)).first
+      id = BSON::ObjectId.from_string(ENV["family_member_id"].to_s)
+      family = Family.where("family_members._id" => id).first
       if family.nil?
         puts "No family member found" unless Rails.env.test?
         return
       end
-      family_member = family.family_members.find(id)
+      family_member = family.family_members.find(id.to_s)
       duplicate_fms_count = family.family_members.where(person_id: family_member.person.id).count
       chm_fm_ids = family.active_household.coverage_households.flat_map(&:coverage_household_members).map(&:family_member_id)
       hbx_member_fm_ids = family.active_household.hbx_enrollments.flat_map(&:hbx_enrollment_members).map(&:applicant_id)
