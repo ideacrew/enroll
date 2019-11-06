@@ -3307,3 +3307,97 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
     end
   end
 end
+
+describe ".parent enrollments", dbclean: :around_each do
+
+  include_context "setup benefit market with market catalogs and product packages"
+  include_context "setup initial benefit application"
+
+  let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_month - 1.month }
+  let(:effective_on) { current_effective_date }
+  let(:hired_on) { TimeKeeper.date_of_record - 3.months }
+  let(:employee_created_at) { hired_on }
+  let(:employee_updated_at) { employee_created_at }
+  let(:shop_family) {FactoryBot.create(:family, :with_primary_family_member)}
+  let!(:sponsored_benefit) {benefit_sponsorship.benefit_applications.first.benefit_packages.first.health_sponsored_benefit}
+  let!(:update_sponsored_benefit) {sponsored_benefit.update_attributes(product_package_kind: :single_product)}
+
+  let(:aasm_state) { :active }
+  let(:census_employee) do
+    FactoryBot.create(:census_employee, :with_active_assignment,
+                      benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile,
+                      benefit_group: current_benefit_package, hired_on: hired_on, created_at: employee_created_at,
+                      updated_at: employee_updated_at)
+  end
+
+  let(:employee_role) { FactoryBot.create(:employee_role, benefit_sponsors_employer_profile_id: abc_profile.id, hired_on: census_employee.hired_on, census_employee_id: census_employee.id) }
+  let(:enrollment_kind) { "open_enrollment" }
+  let(:special_enrollment_period_id) { nil }
+
+  let!(:active_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      household: shop_family.latest_household,
+                      coverage_kind: "health",
+                      family: shop_family,
+                      effective_on: effective_on + 1.month,
+                      enrollment_kind: enrollment_kind,
+                      kind: "employer_sponsored",
+                      benefit_sponsorship_id: benefit_sponsorship.id,
+                      sponsored_benefit_package_id: current_benefit_package.id,
+                      sponsored_benefit_id: current_benefit_package.sponsored_benefits[0].id,
+                      employee_role_id: employee_role.id,
+                      product: sponsored_benefit.reference_product,
+                      aasm_state: "coverage_selected",
+                      predecessor_enrollment_id: terminated_enrollment.id,
+                      benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id)
+  end
+
+
+  let!(:terminated_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      household: shop_family.latest_household,
+                      coverage_kind: "health",
+                      family: shop_family,
+                      effective_on: effective_on,
+                      enrollment_kind: enrollment_kind,
+                      kind: "employer_sponsored",
+                      benefit_sponsorship_id: benefit_sponsorship.id,
+                      sponsored_benefit_package_id: current_benefit_package.id,
+                      sponsored_benefit_id: current_benefit_package.sponsored_benefits[0].id,
+                      employee_role_id: employee_role.id,
+                      product: sponsored_benefit.reference_product,
+                      aasm_state: "coverage_terminated",
+                      benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
+                      terminated_on: effective_on.end_of_month)
+  end
+
+
+  context "enrollment with predecessor_enrollment_id field exists", dbclean: :around_each do
+    it "should return previous contionus enrollemnt " do
+      expect(active_enrollment.parent_enrollment).to eq terminated_enrollment
+      expect(active_enrollment.effective_on).to eq terminated_enrollment.terminated_on + 1.day
+      expect(terminated_enrollment.terminated_on).to eq active_enrollment.effective_on - 1.day
+    end
+  end
+
+  context "contionus enrollments before predecessor_enrollment_id field introduced", dbclean: :around_each do
+
+    before do
+      active_enrollment.effective_on = HbxEnrollment::PREDECESSOR_ID_INTRODUCTION_DATE
+      active_enrollment.created_at = HbxEnrollment::PREDECESSOR_ID_INTRODUCTION_DATE
+      active_enrollment.save
+
+      terminated_enrollment.effective_on = HbxEnrollment::PREDECESSOR_ID_INTRODUCTION_DATE - 1.month
+      terminated_enrollment.created_at = HbxEnrollment::PREDECESSOR_ID_INTRODUCTION_DATE - 1.month
+      terminated_enrollment.terminated_on = HbxEnrollment::PREDECESSOR_ID_INTRODUCTION_DATE - 1.day
+      terminated_enrollment.save
+    end
+
+    it "should match & return previous contionus enrollment" do
+      expect(active_enrollment.parent_enrollment).to eq terminated_enrollment
+      expect(active_enrollment.effective_on).to eq HbxEnrollment::PREDECESSOR_ID_INTRODUCTION_DATE
+      expect(terminated_enrollment.terminated_on).to eq HbxEnrollment::PREDECESSOR_ID_INTRODUCTION_DATE - 1.day
+    end
+  end
+
+end

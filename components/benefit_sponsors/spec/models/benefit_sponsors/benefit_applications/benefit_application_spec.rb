@@ -994,5 +994,87 @@ module BenefitSponsors
         end
       end
     end
+
+    describe '.open_enrollment_date_bounds', dbclean: :after_each do
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup renewal application"
+
+      context "when DATE is After default OE" do
+
+        before do
+          prior_month = renewal_application.start_on - 1.month
+          TimeKeeper.set_date_of_record_unprotected!(Date.new(prior_month.year, prior_month.month, 14))
+        end
+        after { TimeKeeper.set_date_of_record_unprotected!(Time.zone.today) }
+
+        context ".renewal open_enrollment_date_bound", dbclean: :after_each do
+
+          it 'should return renewal open_enrollment dates' do
+            renewal_start_on = renewal_application.start_on
+            renewal_open_enrollment_date_bound = renewal_application.open_enrollment_date_bounds
+
+            expect(renewal_open_enrollment_date_bound[:min]).to eq TimeKeeper.date_of_record
+            expect(renewal_open_enrollment_date_bound[:max]).to eq renewal_start_on.end_of_month
+          end
+        end
+
+        context ".initial open_enrollment_date_bound", dbclean: :after_each do
+
+          before do
+            prior_month = predecessor_application.start_on - 1.month
+            TimeKeeper.set_date_of_record_unprotected!(Date.new(prior_month.year, prior_month.month, 14))
+          end
+          after { TimeKeeper.set_date_of_record_unprotected!(Time.zone.today) }
+
+          it 'should return initial open_enrollment dates' do
+            inital_start_on = predecessor_application.start_on
+            inital_open_enrollment_date_bound = predecessor_application.open_enrollment_date_bounds
+
+            expect(inital_open_enrollment_date_bound[:min]).to eq TimeKeeper.date_of_record
+            expect(inital_open_enrollment_date_bound[:max]).to eq inital_start_on.end_of_month
+          end
+        end
+      end
+
+      context "when DATE is Before default OE date" do
+
+        before do
+          prior_month = renewal_application.start_on - 1.month
+          TimeKeeper.set_date_of_record_unprotected!(Date.new(prior_month.year, prior_month.month, 9))
+        end
+        after { TimeKeeper.set_date_of_record_unprotected!(Time.zone.today) }
+
+        context ".renewal open_enrollment_date_bound", dbclean: :after_each do
+
+          it 'should return renewal open_enrollment dates' do
+            renewal_start_on = renewal_application.start_on
+            prior_month = renewal_application.start_on - 1.month
+            renewal_open_enrollment_date_bound = renewal_application.open_enrollment_date_bounds
+
+            expect(renewal_open_enrollment_date_bound[:min]).to eq Date.new(prior_month.year, prior_month.month, 13)
+            expect(renewal_open_enrollment_date_bound[:max]).to eq renewal_start_on.end_of_month
+          end
+        end
+
+        context ".initial open_enrollment_date_bound", dbclean: :after_each do
+
+          before do
+            prior_month = predecessor_application.start_on - 1.month
+            TimeKeeper.set_date_of_record_unprotected!(Date.new(prior_month.year, prior_month.month, 9))
+          end
+          after { TimeKeeper.set_date_of_record_unprotected!(Time.zone.today) }
+
+          it 'should return initial open_enrollment dates' do
+            inital_start_on = predecessor_application.start_on
+            prior_month = predecessor_application.start_on - 1.month
+            inital_open_enrollment_date_bound = predecessor_application.open_enrollment_date_bounds
+
+            expect(inital_open_enrollment_date_bound[:min]).to eq Date.new(prior_month.year, prior_month.month, 10)
+            expect(inital_open_enrollment_date_bound[:max]).to eq inital_start_on.end_of_month
+          end
+        end
+      end
+
+    end
   end
 end
