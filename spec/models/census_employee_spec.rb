@@ -201,8 +201,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     end
 
     context "with duplicate blank ssn's on dependents" do
-      let(:child1) {FactoryBot.build(:census_dependent, employee_relationship: "child_under_26", ssn: "")}
-      let(:child2) {FactoryBot.build(:census_dependent, employee_relationship: "child_under_26", ssn: "")}
+      let(:child1) {FactoryBot.build(:census_dependent, first_name: 'Jimmy', last_name: 'Stephens', employee_relationship: "child_under_26", ssn: "")}
+      let(:child2) {FactoryBot.build(:census_dependent, first_name: 'Ally', last_name: 'Stephens', employee_relationship: "child_under_26", ssn: "")}
 
       it "should not have errors" do
         initial_census_employee.census_dependents = [child1, child2]
@@ -1252,6 +1252,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         end
       end
     end
+
+
   end
 
   context '.new_hire_enrollment_period' do
@@ -2519,6 +2521,14 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
     context "if censue employee is cobra linked" do
       let(:aasm_state) {"cobra_linked"}
+
+      it "should return false" do
+        expect(census_employee.is_terminate_possible?).to eq false
+      end
+    end
+
+    context "if censue employee is newly designatede linked" do
+      let(:aasm_state) {"newly_designated_linked"}
 
       it "should return false" do
         expect(census_employee.is_terminate_possible?).to eq false

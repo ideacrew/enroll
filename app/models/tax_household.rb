@@ -7,6 +7,7 @@ class TaxHousehold
   include HasFamilyMembers
   include Acapi::Notifiers
   include Mongoid::Autoinc
+  include ApplicationHelper
 
   # A set of applicants, grouped according to IRS and ACA rules, who are considered a single unit
   # when determining eligibility for Insurance Assistance and Medicaid
@@ -157,15 +158,15 @@ class TaxHousehold
     end
     family_members = unwanted_family_members(hbx_enrollment)
     unchecked_aptc_fms = find_aptc_family_members(family_members)
-    deduction_amount = total_benchmark_amount(unchecked_aptc_fms) if unchecked_aptc_fms
+    deduction_amount = total_benchmark_amount(unchecked_aptc_fms, hbx_enrollment) if unchecked_aptc_fms
     total = total - deduction_amount
-    (total < 0.00) ? 0.00 : total
+    (total < 0.00) ? 0.00 : float_fix(total)
   end
 
-  def total_benchmark_amount(family_members)
+  def total_benchmark_amount(family_members, hbx_enrollment)
     total_sum = 0
     family_members.each do |family_member|
-      total_sum += family_member.aptc_benchmark_amount
+      total_sum += family_member.aptc_benchmark_amount(hbx_enrollment)
     end
     total_sum
   end

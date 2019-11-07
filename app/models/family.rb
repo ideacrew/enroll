@@ -193,7 +193,7 @@ class Family
   # Replaced scopes for moving HbxEnrollment to top level
   # The following methods are rewrites of scopes that were being called before HbxEnrollment was a top level document.
 
-  scope :all_enrollments_by_benefit_package, ->(benefit_package) { where(:"_id".in => HbxEnrollment.where(sponsored_benefit_package_id => benefit_package._id, :aasm_state.ne => :shopping).distinct(:family_id))}
+  scope :all_enrollments_by_benefit_package, ->(benefit_package) { where(:"_id".in => HbxEnrollment.where(:sponsored_benefit_package_id => benefit_package._id, :aasm_state.nin => [:shopping]).distinct(:family_id))}
 
   scope :all_enrollments_by_benefit_sponsorship_id,  ->(benefit_sponsorship_id) {
     where(:"_id".in => HbxEnrollment.where(benefit_sponsorship_id: benefit_sponsorship_id).distinct(:family_id))
@@ -213,7 +213,7 @@ class Family
   ) }
 
   scope :enrolled_under_benefit_application, ->(benefit_application) {
-    active_family_ids = benefit_application.active_census_employees.collect{|ce| ce.family.nil? ? nil : ce.family.id }.compact
+    active_family_ids = benefit_application.active_census_employees_under_py.collect{|ce| ce.family.nil? ? nil : ce.family.id }.compact
     where(:"_id".in => HbxEnrollment.where(
     :"sponsored_benefit_package_id".in => benefit_application.benefit_packages.pluck(:_id),
     :"aasm_state".nin => %w(coverage_canceled shopping coverage_terminated),

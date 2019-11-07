@@ -78,7 +78,7 @@ module BenefitSponsors
 
       def cancel_unwanted_applications(benefit_application, admin_datatable_action = false)
         applications_for_cancel  = benefit_sponsorship.benefit_applications.draft_and_exception.select{|existing_application| existing_application != benefit_application}
-        applications_for_cancel += benefit_sponsorship.benefit_applications.enrollment_ineligible.to_a
+        applications_for_cancel += benefit_sponsorship.benefit_applications.enrollment_ineligible.to_a if Settings.aca.shop_market.auto_cancel_ineligible
         if admin_datatable_action
           applications_for_cancel += benefit_sponsorship.benefit_applications.enrolling.to_a
           applications_for_cancel += benefit_sponsorship.benefit_applications.where(aasm_state: :binder_paid)
