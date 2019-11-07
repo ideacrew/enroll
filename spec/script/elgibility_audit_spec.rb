@@ -17,20 +17,18 @@ describe "Eligilibity Audit" do
       is_applicant: true
     )
   end
-  let(:lawful_presence_determination) { consumer_role.lawful_presence_determination }
-  let(:audit_start_date) { Date.new(2017,10,1) }
-  let(:audit_end_date) { Date.new(2018,10,1) }
+  # let(:lawful_presence_determination) { consumer_role.lawful_presence_determination }
+  let(:audit_start_date) { Date.new(2018,10,1) }
+  let(:audit_end_date) { Date.new(2019,10,1) }
 
   before :each do
     non_curam_ivl_person
     consumer_role
     allow(non_curam_ivl_person).to receive(:consumer_role).and_return(consumer_role)
-    # to match condition in non_curam_ivl variable
-    lawful_presence_determination.update_attributes!(vlp_authority: "non_curam")
-    # To match condition in families_of_interest variable
-    non_curam_ivl_person.families.first.update_attributes!(e_case_id: nil)
-    # To match condition in 
     allow_any_instance_of(Person).to receive(:updated_at).and_return(audit_end_date - 1.week)
+    # Assure there is a history track
+    non_curam_ivl_person.update_attributes addresses_attributes: { "0" => { id: non_curam_ivl_person.addresses.first.id, address_1: '111 1 St NE' } }
+    expect(non_curam_ivl_person.history_tracks.length).to be > 0
     # non_curam_ivl_person.update_attributes!(updated_at: nil)
     eligibility_audit = File.join(Rails.root, "script/eligibility_audit.rb")
     load eligibility_audit
@@ -53,14 +51,17 @@ describe "Eligilibity Audit" do
     end
   end
 
-  # describe "#each_person_version" do
-  #  let(:person) { FactoryBot.create :person }
+  describe "#each_person_version" do
+    let(:person) { FactoryBot.create :person }
 
-  #  before do
-  #    person.update_attributes addresses_attributes: { "0" => { id: person.addresses.first.id, address_1: '111 1 St NE' } }
-  #  end
+    before do
+      person.update_attributes addresses_attributes: { "0" => { id: person.addresses.first.id, address_1: '111 1 St NE' } }
+    end
 
-  #  specify { expect { |b| each_person_version(person, &b) }.to yield_control.at_least(2).times }
-  #    yield_successive_args(1, 2)
-  # end
+    xit 'has a history_track' do
+      expect(person.history_tracks.count).to be > 1
+    end
+
+    # specify { expect { |b| each_person_version(person, &b) }.to yield_control.at_least(2).times }
+  end
 end
