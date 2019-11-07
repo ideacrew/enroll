@@ -15,7 +15,7 @@ module BenefitSponsors
       end
 
       def elected_products
-        products = d.product_package.products.by_service_areas(d.recorded_service_area_ids).where(:id.in => d.elected_product_choices)
+        products = product_package.products.by_service_areas(recorded_service_area_ids).where(:id.in => elected_product_choices)
         ::BenefitMarkets::Products::DentalProducts::DentalProduct.where(:id.in => products.pluck(:_id))
       end
 
