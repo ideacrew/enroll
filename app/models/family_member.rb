@@ -67,6 +67,26 @@ class FamilyMember
 
   associated_with_one :person, :person_id, "Person"
 
+  # This needs to work for history_tracks as well as versions
+  def person_version_for(v_date)
+    return nil if (v_date < created_at)
+    versions_to_search = [person] + person.versions
+    if person.updated_at <= v_date
+      return person
+    end
+
+    person.history_tracks.each do |track|
+      if track.created_at <= v_date
+        # Returns a person in memory
+        return person.history_track_to_person(track)
+      end
+    end
+
+    person.history_track_to_person(person.history_tracks.last) || versions_to_search.reject do |v|
+      v.created_at > v_date
+    end.sort_by(&:updated_at).last
+  end
+
   def former_family=(new_former_family)
     raise ArgumentError.new("expected Family") unless new_former_family.is_a?(Family)
     self.former_family_id = new_former_family._id
