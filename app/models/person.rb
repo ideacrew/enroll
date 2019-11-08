@@ -289,6 +289,13 @@ class Person
   after_create :notify_created
   after_update :notify_updated
 
+  # Should be in person model, take a specific history track to stop at
+  def history_track_to_person(date)
+    versions_to_reverse = self.history_tracks.select { |ht| (ht.created_at >= date) }
+    tracked_versions  = versions_to_reverse.sort_by(&:created_at).reverse
+    tracked_versions.each { |tv| tv.undo_attr({}) }
+    self
+  end
 
   def active_general_agency_staff_roles
     general_agency_staff_roles.where(:aasm_state => :active)

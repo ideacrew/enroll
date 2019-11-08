@@ -120,27 +120,16 @@ def not_authorized_by_curam?(person)
 end
 
 def auditable?(person_record, person_version, family)
-  [
-    version_in_window?(person_record),
-    primary_has_address?(person_record, person_version, family),
-    primary_answered_data?(person_record, person_version, family),
-    not_authorized_by_curam?(person_record)
-  ].all? { |evaluator| evaluator == true }
+  version_in_window?(person_record) &&
+  primary_has_address?(person_record, person_version, family) &&
+  primary_answered_data?(person_record, person_version, family) &&
+  not_authorized_by_curam?(person_record)
 end
 
 def each_person_version(person)
   person.versions.each do |person|
     yield person
   end
-end
-
-def person_version_for(person, date)
-  versions_to_reverse = person.history_tracks.select { |ht| (ht.created_at >= date) }
-  tracked_versions  = versions_to_reverse.sort_by(&:created_at).reverse
-  tracked_versions.each do |tv|
-    tv.undo_attr
-  end
-  person
 end
 
 pb = ProgressBar.create(
@@ -185,7 +174,7 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
         if (p_version.created_at >= AUDIT_END_DATE) || (p_version.created_at < AUDIT_START_DATE)
           next
         end
-        person_version_for(pers_record, p_version.created_at)
+        pers_record.history_track_to_person(p_version.created_at)
       else
         p_version
       end
