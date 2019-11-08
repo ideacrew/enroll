@@ -123,30 +123,30 @@
  <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
     contents: [],
     heading: 'Your Plan', sub_heading: '', bottom_margin: '3px'} %>
-    
+
 <% if notice.health_enrollments.present? && notice.dental_enrollments.present? %>
   <% if (notice.same_plan_health_enrollment && notice.same_plan_dental_enrollment) %>
     <%= render partial: 'notices/ivl/fel_same_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.enrollments} %>
   <% elsif (notice.same_plan_health_enrollment && !notice.same_plan_dental_enrollment) %>
-    <%= render partial: 'notices/ivl/fel_same_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.renewal_health_enrollments} %>
-    <%= render partial: 'notices/ivl/fel_different_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.renewal_dental_enrollments} %>
+    <%= render partial: 'notices/ivl/fel_same_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.health_enrollments} %>
+    <%= render partial: 'notices/ivl/fel_different_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.dental_enrollments} %>
   <% elsif (!notice.same_plan_health_enrollment && notice.same_plan_dental_enrollment) %>
-    <%= render partial: 'notices/ivl/fel_different_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.renewal_health_enrollments} %>
-    <%= render partial: 'notices/ivl/fel_same_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.renewal_dental_enrollments} %>
+    <%= render partial: 'notices/ivl/fel_different_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.health_enrollments} %>
+    <%= render partial: 'notices/ivl/fel_same_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.dental_enrollments} %>
   <% else %>
     <%= render partial: 'notices/ivl/fel_different_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.enrollments} %>
   <% end %>
 <% elsif notice.health_enrollments.present? && notice.dental_enrollments.blank? %>
   <% if notice.same_plan_health_enrollment %>
-    <%= render partial: 'notices/ivl/fel_same_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.renewal_health_enrollments  } %>
+    <%= render partial: 'notices/ivl/fel_same_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.health_enrollments  } %>
   <% else %>
-    <%= render partial: 'notices/ivl/fel_different_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.renewal_health_enrollments  } %>
+    <%= render partial: 'notices/ivl/fel_different_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.health_enrollments  } %>
   <% end %>
 <% elsif notice.health_enrollments.blank? && notice.dental_enrollments.present? %>
   <% if notice.same_plan_dental_enrollment %>
-    <%= render partial: 'notices/ivl/fel_same_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.renewal_dental_enrollments  } %>
+    <%= render partial: 'notices/ivl/fel_same_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.dental_enrollments  } %>
   <% else %>
-    <%= render partial: 'notices/ivl/fel_different_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.renewal_dental_enrollments  } %>
+    <%= render partial: 'notices/ivl/fel_different_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.dental_enrollments  } %>
   <% end %>
 <% end %>
 
