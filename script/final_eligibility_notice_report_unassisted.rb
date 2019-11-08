@@ -5,8 +5,8 @@
 puts "-------------------------------------- Start of rake: #{TimeKeeper.datetime_of_record} --------------------------------------" unless Rails.env.test?
 batch_size = 500
 offset = 0
-enrollment_count = HbxEnrollment.by_year(current_year + 1).individual_market.count
 current_year = ARGV[0].to_i
+enrollment_count = HbxEnrollment.by_year(current_year + 1).individual_market.count
 
 product_ids = BenefitMarkets::Products::Product.by_year(current_year + 1).aca_individual_market.map(&:_id)
 
