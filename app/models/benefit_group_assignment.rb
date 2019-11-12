@@ -33,9 +33,6 @@ class BenefitGroupAssignment
   scope :active,         -> { where(:is_active => true) }
   scope :effective_on,   ->(effective_date) { where(:start_on => effective_date) }
 
-  # when multiple draft applications present, its possible to have more than one benefit group assignment
-  # canceled draft benefit applications put end date on all benefit group assignments
-
   scope :cover_date, lambda { |compare_date|
     result = where(
       {
@@ -44,7 +41,7 @@ class BenefitGroupAssignment
           {:start_on => compare_date, :end_on => nil}
         ]
       }
-    )
+    ).order(start_on: :desc)
     if result.empty?
       result = where(
         {
@@ -53,12 +50,13 @@ class BenefitGroupAssignment
             {:start_on.gte => (compare_date == compare_date.end_of_month ? (compare_date - 1.year + 1.day) : (compare_date - 1.year))}
           ]
         }
-      )
+      ).order(start_on: :desc)
     end
+
     # we need to deal with multiples returned
     #   1) canceled benefit group assignments
     #   2) multiple draft applications
-    if result.size > 1
+    if result.size > 1 && result.and(is_active: true).any?
       result.and(is_active: true)
     else
       result
@@ -66,7 +64,6 @@ class BenefitGroupAssignment
   }
 
   scope :by_benefit_package,     ->(benefit_package) { where(:benefit_package_id => benefit_package.id) }
-
   scope :by_benefit_package_and_assignment_on,->(benefit_package, effective_on) {
     where(:start_on.lte => effective_on, :end_on.gte => effective_on, :benefit_package_id => benefit_package.id)
   }
@@ -79,10 +76,10 @@ class BenefitGroupAssignment
     end
 
     def on_date(census_employee, date)
-      assignments = census_employee.benefitgroup_assignments.cover_date(date)
+      assignments = census_employee.benefit_group_assignments.cover_date(date)
 
       if assignments.size > 1
-        assignments.detect{|assignment| assignment.end_on.blank? }
+        assignments.detect{|assignment| assignment.end_on.blank? } || assignments.first
       else
         assignments.first
       end

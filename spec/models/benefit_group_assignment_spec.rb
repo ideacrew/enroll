@@ -428,8 +428,27 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
 
       it 'should pull benefit group assignment' do
         expect(census_employee.benefit_group_assignments.cover_date(Date.new(2019, 10, 30))).to eq [assignment_three]
-        expect(census_employee.benefit_group_assignments.cover_date(Date.new(2018, 5, 20))).to eq [assignment_one]
-        expect(census_employee.benefit_group_assignments.cover_date(Date.new(2018, 10, 10))).to eq [assignment_one, assignment_two]
+        expect(census_employee.benefit_group_assignments.cover_date(Date.new(2018, 5, 20))).to eq  [assignment_one]
+        expect(census_employee.benefit_group_assignments.cover_date(Date.new(2018, 10, 10))).to eq [assignment_two, assignment_one]
+      end
+    end
+  end
+
+  describe '.on_date' do
+
+    before do
+      census_employee.benefit_group_assignments = []
+    end
+
+    context 'for multiple assignments' do
+      let!(:assignment_one)   { census_employee.benefit_group_assignments.build(start_on: Date.new(2018,5,1), end_on: nil, is_active: false) }
+      let!(:assignment_two)   { census_employee.benefit_group_assignments.build(start_on: Date.new(2018,8,1), end_on: nil, is_active: false) }
+      let!(:assignment_three) { census_employee.benefit_group_assignments.build(start_on: Date.new(2019,5,1), end_on: nil, is_active: true) }
+
+      it 'should pull benefit group assignment with later begin date' do
+        expect(BenefitGroupAssignment.on_date(census_employee, Date.new(2019, 10, 30))).to eq assignment_three
+        expect(BenefitGroupAssignment.on_date(census_employee, Date.new(2018, 5, 20))).to  eq assignment_one
+        expect(BenefitGroupAssignment.on_date(census_employee, Date.new(2018, 10, 10))).to eq assignment_two
       end
     end
   end
