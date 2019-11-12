@@ -502,10 +502,6 @@ module BenefitSponsors
       renewal_benefit_application.present? ? renewal_benefit_application.predecessor : most_recent_benefit_application
     end
 
-    def current_available_benefit_application
-      non_ineligile_renewal_benefit_application.present? ? renewal_benefit_application.predecessor : most_recent_benefit_application
-    end
-
     def dt_display_benefit_application
       benefit_applications.where(:aasm_state.ne => :canceled).order_by(:"effective_period.min".desc).first || latest_benefit_application
     end
@@ -519,10 +515,6 @@ module BenefitSponsors
 
     def renewal_benefit_application
       benefit_applications.order_by(:"created_at".desc).detect {|application| application.is_renewing? }
-    end
-
-    def non_ineligile_renewal_benefit_application
-      benefit_applications.order_by(:"created_at".desc).detect(&:is_renewing_and_non_ineligible?)
     end
 
     def active_benefit_application

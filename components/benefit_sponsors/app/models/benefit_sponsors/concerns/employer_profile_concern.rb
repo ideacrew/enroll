@@ -58,10 +58,6 @@ module BenefitSponsors
         active_benefit_sponsorship.current_benefit_application
       end
 
-      def current_available_benefit_application
-        active_benefit_sponsorship.current_available_benefit_application
-      end
-
       def draft_benefit_applications
         benefit_applications.draft_state
       end

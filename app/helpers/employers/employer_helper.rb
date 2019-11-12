@@ -157,30 +157,15 @@ module Employers::EmployerHelper
   end
 
   def get_benefit_packages_for_census_employee
-    initial_benefit_packages = if @benefit_sponsorship.current_benefit_application.present? && @benefit_sponsorship.benefit_applications.none?(:draft_state)
-                                 @benefit_sponsorship.current_benefit_application.benefit_packages
-                               elsif @benefit_sponsorship.current_available_benefit_application.present?
-                                 @benefit_sponsorship.current_available_benefit_application.benefit_packages
-                               end
+    initial_benefit_packages = @benefit_sponsorship.current_benefit_application.benefit_packages if @benefit_sponsorship.current_benefit_application.present?
     renewing_benefit_packages = @benefit_sponsorship.renewal_benefit_application.benefit_packages if @benefit_sponsorship.renewal_benefit_application.present?
     return (initial_benefit_packages || []), (renewing_benefit_packages || [])
   end
 
   def current_option_for_initial_benefit_package
     bga = @census_employee.active_benefit_group_assignment
-    return bga.benefit_package_id if bga&.benefit_package_id
-
-    application = @employer_profile.current_benefit_application
-    return nil if application.blank?
-    return nil if application.benefit_packages.empty?
-
-    application.benefit_packages[0].id
-  end
-
-  def current_available_option_for_initial_benefit_package
-    bga = @census_employee.active_benefit_group_assignment
     return bga.benefit_package_id if bga && bga.benefit_package_id
-    application = @employer_profile.current_available_benefit_application
+    application = @employer_profile.current_benefit_application
     return nil if application.blank?
     return nil if application.benefit_packages.empty?
     application.benefit_packages[0].id

@@ -62,16 +62,6 @@ module BenefitSponsors
       end
     end
 
-    describe 'current_available_benefit_application' do
-      include_context "setup benefit market with market catalogs and product packages"
-      include_context "setup renewal application"
-
-      let(:employer_profile) {benefit_sponsorship.organization.employer_profile}
-      it 'should return current available options' do
-        expect(employer_profile.current_available_benefit_application).not_to eq nil
-      end
-    end
-
     describe 'active_ga_legal_name' do
       include_context 'set up broker agency profile for BQT, by using configuration settings'
 
