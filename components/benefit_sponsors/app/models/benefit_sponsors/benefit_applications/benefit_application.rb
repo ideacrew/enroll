@@ -489,10 +489,6 @@ module BenefitSponsors
       predecessor.present? && (APPLICATION_APPROVED_STATES + APPLICATION_DRAFT_STATES + ENROLLING_STATES + ENROLLMENT_ELIGIBLE_STATES + ENROLLMENT_INELIGIBLE_STATES).include?(aasm_state)
     end
 
-    def is_renewing_and_non_ineligible?
-      predecessor.present? && (APPLICATION_APPROVED_STATES + APPLICATION_DRAFT_STATES + ENROLLING_STATES + ENROLLMENT_ELIGIBLE_STATES).include?(aasm_state)
-    end
-
     def is_renewal_enrolling?
       predecessor.present? && (ENROLLING_STATES).include?(aasm_state)
     end
