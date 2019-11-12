@@ -1113,10 +1113,6 @@ class Family
     e_case_id.split('#').last.scan(/\D/).empty?
   end
 
-  def has_active_shop_sep?(pre_enrollment)
-    pre_enrollment.is_shop? && pre_enrollment.sponsored_benefit_package.effective_period.cover?(latest_shop_sep.effective_on)
-  end
-
 private
   def build_household
     if households.size == 0
