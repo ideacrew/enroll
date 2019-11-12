@@ -105,6 +105,7 @@ gem 'wicked_pdf',               '~> 1.1.0'
 gem 'wkhtmltopdf-binary-edge',  '~> 0.12.3.0'
 gem 'webpacker',                '~> 4.0.2'
 gem 'fast_jsonapi'
+gem 'ruby-progressbar',             '~> 1'
 
 group :doc do
   gem 'sdoc',                   '~> 1.0'
@@ -156,7 +157,6 @@ group :test do
   gem 'poltergeist',                  '~> 1.18.0'
   gem 'rspec-instafail',              '~> 1'
   gem 'rspec-benchmark'
-  gem 'ruby-progressbar',             '~> 1'
   gem 'shoulda-matchers',             '~> 3'
   gem 'simplecov',                    '~> 0.14',  :require => false
   gem 'test-prof',                    '~> 0.5.0'
