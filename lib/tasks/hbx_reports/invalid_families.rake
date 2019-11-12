@@ -8,7 +8,7 @@ namespace :reports do
   task generate_report_for_invalid_families: :environment do
 
     file_name = "#{Rails.root}/report_for_invalid_families_#{TimeKeeper.date_of_record.strftime('%Y-%m-%d')}.csv"
-    field_names = %w[family_id primary_hbx_id person_full_name error_reason]
+    field_names = %w[FamilyID ECaseID PrimaryHbxID PersonFullName ErrorReason]
     CSV.open(file_name, 'w', force_quotes: true) do |csv|
       csv << field_names
       @total_invalid_families = 0
@@ -30,7 +30,8 @@ namespace :reports do
               @duplicate_family_member_families += 1
               person = family.primary_person
               error_reason.slice!('The following errors were found: ')
-              csv << [family.id, person.hbx_id, person.full_name, error_reason]
+              e_case_id = family.has_valid_e_case_id? ? family.e_case_id : 'N/A'
+              csv << [family.id, e_case_id, person.hbx_id, person.full_name, error_reason]
             rescue => error
               puts "Error: #{error.message}, Family: #{family.id}"
             end
