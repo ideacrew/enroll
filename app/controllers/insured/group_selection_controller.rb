@@ -147,7 +147,7 @@ class Insured::GroupSelectionController < ApplicationController
       @adapter.if_employee_role_unset_but_can_be_derived(@employee_role) do |e_role|
         @employee_role = e_role
       end
-      @adapter.if_previous_enrollment_was_special_enrollment do
+      @adapter.if_family_has_active_shop_sep do
         @change_plan = 'change_by_qle'
       end
       benefit_group = nil

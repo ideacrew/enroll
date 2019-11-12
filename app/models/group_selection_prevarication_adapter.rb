@@ -73,6 +73,12 @@ class GroupSelectionPrevaricationAdapter
     end
   end
 
+  def if_family_has_active_shop_sep
+    return nil if @previous_hbx_enrollment.blank?
+    return unless @family.has_active_shop_sep?(@previous_hbx_enrollment)
+    yield
+  end
+
   def possible_employee_role
     if @employee_role.nil? && @person.has_active_employee_role?
       @person.active_employee_roles.first
@@ -260,7 +266,7 @@ class GroupSelectionPrevaricationAdapter
       family_member_ids)
   end
 
-  def build_new_shop_waiver_enrollent(controller_employee_role, params)
+  def build_new_shop_waiver_enrollment(controller_employee_role, params)
     e_builder = ::EnrollmentShopping::EnrollmentBuilder.new(coverage_household, controller_employee_role, coverage_kind)
     e_builder.build_new_waiver_enrollment(is_qle: is_qle?, optional_effective_on: optional_effective_on, waiver_reason: get_waiver_reason(params))
   end
