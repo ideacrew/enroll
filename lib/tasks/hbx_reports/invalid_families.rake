@@ -30,7 +30,7 @@ namespace :reports do
               @duplicate_family_member_families += 1
               person = family.primary_person
               error_reason.slice!('The following errors were found: ')
-              e_case_id = family.has_valid_e_case_id? ? family.e_case_id : 'N/A'
+              e_case_id = family.has_valid_e_case_id? ? family.e_case_id.split('#').last : 'N/A'
               csv << [family.id, e_case_id, person.hbx_id, person.full_name, error_reason]
             rescue => error
               puts "Error: #{error.message}, Family: #{family.id}"
