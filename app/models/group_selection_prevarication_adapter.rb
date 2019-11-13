@@ -74,9 +74,12 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def if_family_has_active_shop_sep
-    return nil if @previous_hbx_enrollment.blank?
-    return unless @previous_hbx_enrollment.is_shop? && @previous_hbx_enrollment.sponsored_benefit_package.effective_period.cover?(@family.latest_shop_sep.effective_on)
-    yield
+    if @previous_hbx_enrollment.present? && @previous_hbx_enrollment.is_shop? && @family.latest_shop_sep.present?
+      benefit_package = @previous_hbx_enrollment.sponsored_benefit_package
+      if benefit_package.effective_period.cover?(@family.latest_shop_sep.effective_on)
+        yield
+      end
+    end
   end
 
   def possible_employee_role
