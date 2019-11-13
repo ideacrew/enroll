@@ -16,6 +16,7 @@ class Person
   include ::BenefitSponsors::Concerns::Observable
   include SponsoredBenefits::Concerns::Dob
   include LegacyVersioningRecords
+  include HistoryTrackerToRecord
 
   # verification history tracking
   include Mongoid::History::Trackable
@@ -288,13 +289,6 @@ class Person
 
   after_create :notify_created
   after_update :notify_updated
-
-  def history_track_to_person(history_track)
-    versions_to_reverse = self.history_tracks.select { |ht| (ht.created_at >= history_track.created_at) }
-    tracked_versions  = versions_to_reverse.sort_by(&:created_at).reverse
-    tracked_versions.each { |tv| tv.undo_attr({}) }
-    self
-  end
 
   def active_general_agency_staff_roles
     general_agency_staff_roles.where(:aasm_state => :active)
