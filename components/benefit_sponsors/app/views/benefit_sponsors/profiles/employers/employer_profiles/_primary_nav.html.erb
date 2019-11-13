@@ -21,7 +21,8 @@
       </li>
     <% else %>
       <li <%= menu_tab_class(active_tab, "billing") %>>
-      <%= link_to 'Billing', profiles_employers_employer_profile_path(profile.id,:tab=>'billing'), "aria-expanded" => "true" %>
+        <%= link_to 'Billing', profiles_employers_employer_profile_path(profile.id,:tab=>'billing'), "aria-expanded" => "true" %>
+      </li>
     <% end %>
     <%# unless current_user.try(:has_broker_agency_staff_role?)%>
     <li <%= menu_tab_class(active_tab, "inbox") %>>

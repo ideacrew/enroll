@@ -45,7 +45,7 @@ module BenefitSponsors
 
     def self.find(id)
       org = BenefitSponsorships::Organizations::Organization.where(:"benefit_sponsorship.benefit_sponsorship_account._id" => id)
-      org.first.benefit_sponsorship.benefit_sponsorship_account
+      org.benefit_sponsorships.first.benefit_sponsorship_account
     end
 
   end

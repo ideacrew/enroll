@@ -14,10 +14,10 @@ namespace :billfile do
 
       BenefitSponsors::Organizations::Organization.employer_profiles.each do |org|
         begin
-          benefit_sponsorship = org.benefit_sponsorship
+          benefit_sponsorship = org.active_benefit_sponsorship
           benefit_sponsorship_account = benefit_sponsorship.benefit_sponsorship_account
           if benefit_sponsorship && benefit_sponsorship_account
-            due_date = format_due_date(benefit_sponsorship_account.current_statement_date.end_of_month)
+            due_date = format_due_date(benefit_sponsorship_account.current_statement_date.end_of_month) if benefit_sponsorship_account.current_statement_date.present?
             # due_date = pull_due_date(benefit_sponsorship_account)
             total_due = format_total_due(benefit_sponsorship_account.total_due)
             row = []
