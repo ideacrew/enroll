@@ -5,7 +5,7 @@ namespace :billfile do
   # Usage rake billfile:from_file_path
   task :export => [:environment] do
 
-    TITLE = "DCHEALTHPAY.#{DateTime.now.strftime('%Y%m%d.%H%M%S')}.csv"
+    TITLE = "HEALTHCONNECTORPAY.#{DateTime.now.strftime('%Y%m%d.%H%M%S')}.csv"
     FILE_PATH = Rails.root.join TITLE
 
     CSV.open(FILE_PATH, "w") do |csv|
