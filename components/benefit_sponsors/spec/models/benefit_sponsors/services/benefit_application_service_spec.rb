@@ -183,9 +183,9 @@ module BenefitSponsors
         context 'with dt active state' do
           let!(:ba) { FactoryBot.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, aasm_state: active_state) }
 
-          it 'should return true as dt active state exists for one of the bas' do
+          it 'should return false as dt active state exists for one of the bas' do
             set_bs_for_service(@form)
-            expect(subject.can_create_draft_ba?(@form)).to be_truthy
+            expect(subject.can_create_draft_ba?(@form)).to be_falsy
           end
         end
       end
@@ -194,9 +194,9 @@ module BenefitSponsors
       [:terminated, :canceled, :suspended].each do |non_active_state|
         context 'for benefit applications in non active states' do
           let!(:ba) { FactoryBot.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, aasm_state: non_active_state) }
-          it 'should return false as no bas has dt active state' do
+          it 'should return true as no bas has dt active state' do
             set_bs_for_service(@form)
-            expect(subject.can_create_draft_ba?(@form)).to be_falsy
+            expect(subject.can_create_draft_ba?(@form)).to be_truthy
           end
         end
       end
