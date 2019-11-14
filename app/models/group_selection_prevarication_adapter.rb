@@ -130,8 +130,17 @@ class GroupSelectionPrevaricationAdapter
   def disable_market_kinds(params)
     if (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep')
       d_market_kind = (select_market(params) == "shop" || select_market(params) == "fehb") ? "individual" : "shop"
-      yield d_market_kind
+    else
+      d_market_kind = 'individual' if (@person.consumer_role.present? || @person.resident_role.present?) && !is_under_ivl_open_enrollment?
+
+      d_market_kind = 'shop' if !@employee_role&.is_eligible_to_enroll_without_qle?
     end
+
+    yield d_market_kind
+  end
+
+  def is_under_ivl_open_enrollment?
+    HbxProfile.current_hbx.present? ? HbxProfile.current_hbx.under_open_enrollment? : nil
   end
 
   def ivl_benefit
