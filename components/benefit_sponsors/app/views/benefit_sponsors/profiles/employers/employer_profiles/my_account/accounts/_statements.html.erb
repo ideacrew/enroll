@@ -13,7 +13,7 @@
   <tbody>
     <% @invoice_years.each do |invoice_year| %>
     <tr data-toggle="collapse" data-target="#collapse2" id="<%= invoice_year %>" class="invoice_years">
-      <td><i class='glyphicon glyphicon-plus' data-toggle='tooltip'></i> <%= invoice_year %></td>
+      <td><i class='glyphicon glyphicon-plus' data-toggle='tooltip'><%= invoice_year %> </i></td>
       <td></td>
       <td></td>
       <td></td>
@@ -45,7 +45,7 @@
 
 <script>
   $('td i').click(function() {
-    $(this).toggleClass("glyphicon glyphicon-plus glyphicon glyphicon-minus");
+    $(this).toggleClass("glyphicon-plus glyphicon-minus");
   });
   $(document).ready(function() {
     $('tr.invoices').hide();
