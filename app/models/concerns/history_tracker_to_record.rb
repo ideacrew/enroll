@@ -18,7 +18,7 @@ module HistoryTrackerToRecord
       elsif trackable_record.send(last_association["name"]).is_a?(Enumerable)
         # embeds_many or has_many, needs id, hence checking if enumerable type object like array
         last_association_id = last_association["id"].to_s
-        trackable_record.send(last_association["name"]).find(last_association_id)[key] = value
+        trackable_record.send(last_association["name"]).where(id: last_association_id).first[key] = value
       else
         # embeds_one type relationship
         trackable_record.send(last_association["name"])[key] = value
