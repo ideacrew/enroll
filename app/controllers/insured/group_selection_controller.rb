@@ -69,6 +69,11 @@ class Insured::GroupSelectionController < ApplicationController
     end
 
     hbx_enrollment = build_hbx_enrollment(family_member_ids)
+
+    if @market_kind == 'shop' || @market_kind == 'fehb'
+      raise "Unable to find employer-sponsored benefits for enrollment year #{hbx_enrollment.effective_on.year}" unless hbx_enrollment.sponsored_benefit_package.shoppable?
+    end
+
     if @adapter.is_waiving?(params)
       if hbx_enrollment.save
         @adapter.assign_enrollment_to_benefit_package_assignment(@employee_role, hbx_enrollment)
