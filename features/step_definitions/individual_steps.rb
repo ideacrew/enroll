@@ -603,17 +603,19 @@ Then(/^Prepare taxhousehold info for aptc user$/) do
   person = User.find_by(email: 'aptc@dclink.com').person
   household = person.primary_family.latest_household
 
-  start_on = TimeKeeper.date_of_record
+  start_on = Date.new(TimeKeeper.date_of_record.year, 1,1)
+  future_start_on = Date.new(TimeKeeper.date_of_record.year+1, 1,1)
+  current_product = BenefitMarkets::Products::Product.all.by_year(start_on.year).where(metal_level_kind: :silver).first
+  future_product = BenefitMarkets::Products::Product.all.by_year(future_start_on.year).where(metal_level_kind: :silver).first
 
   if household.tax_households.blank?
-    household.tax_households.create(is_eligibility_determined: TimeKeeper.date_of_record, allocated_aptc: 100, effective_starting_on: start_on, submitted_at: TimeKeeper.date_of_record)
-    fm_id = person.primary_family.family_members.last.id
-    household.tax_households.last.tax_household_members.create(applicant_id: fm_id, is_ia_eligible: true, is_subscriber: true)
-    household.tax_households.last.eligibility_determinations.create(max_aptc: 80, determined_on: Time.now, csr_percent_as_integer: 40)
+    household.build_thh_and_eligibility(80, 0, start_on, current_product.id)
+    household.build_thh_and_eligibility(80, 0, future_start_on, future_product.id)
+    household.save!
   end
   benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
-  product = BenefitMarkets::Products::Product.all.where(metal_level_kind: :silver).first
-  benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}.update_attributes!(slcsp_id: product.id)
+  benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(start_on)}.update_attributes!(slcsp_id: current_product.id)
+  benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(future_start_on)}.update_attributes!(slcsp_id: future_product.id)
   screenshot("aptc_householdinfo")
 end
 
