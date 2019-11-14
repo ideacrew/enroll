@@ -362,6 +362,19 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       expect(response).to redirect_to(insured_plan_shopping_path(id: family.active_household.hbx_enrollments[1].id, change_plan: 'change', coverage_kind: 'health', market_kind: 'shop', enrollment_kind: ''))
     end
 
+    it "should raise error if not shoppable" do
+      user = FactoryGirl.create(:user, id: 98, person: FactoryGirl.create(:person))
+      plan_year.update_attributes(aasm_state: :approved)
+      plan_year.save!
+      plan_year.reload
+      sign_in user
+      allow(hbx_enrollment).to receive(:save).and_return(true)
+      post :create, person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids, change_plan: 'change'
+      family.reload
+      family.active_household.reload
+      expect(flash[:error]).to match /Unable to find employer-sponsored benefits for enrollment year/
+    end
+
     context "when keep_existing_plan" do
       let(:old_hbx) {hbx_enrollment}
 
