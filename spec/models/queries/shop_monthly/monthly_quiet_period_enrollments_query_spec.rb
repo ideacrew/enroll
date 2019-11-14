@@ -42,7 +42,7 @@ describe "a monthly inital employer quiet period enrollments query" do
 
       let(:current_effective_date) { TimeKeeper.date_of_record.next_month.beginning_of_month }
       let(:effective_on) { current_effective_date }
-      let(:aasm_state) { :active }
+      let(:aasm_state) { :binder_paid }
 
       let(:initial_employer) {
         abc_profile
@@ -276,7 +276,7 @@ describe "a monthly inital employer quiet period enrollments query" do
 
       let(:current_effective_date) { TimeKeeper.date_of_record.next_month.beginning_of_month }
       let(:effective_on) { current_effective_date }
-      let(:aasm_state) { :active }
+      let(:aasm_state) { :binder_paid }
 
       let(:initial_employer) {
         abc_profile

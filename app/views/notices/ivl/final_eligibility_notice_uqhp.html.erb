@@ -27,11 +27,11 @@
       listings: ["What’s new this year", "Your final eligibility results for #{notice.coverage_year}", "What you need to do next", "How we made our decision", "What to do if you don’t agree with our decision, or think we made a mistake"]} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-  contents: ["#{Settings.site.short_name} is proud to build on our award-winning reputation as one of the best health exchange websites in the nation. This year, in a global competition among government agencies, we received our second AWS Best Practices Award for innovative use of technology in how we deliver services to District residents.", "There are 25 plans available from CareFirst BlueCross BlueShield and Kaiser Permanente for #{notice.coverage_year}. To find the best prices and plans that meet your medical needs and budget, we encourage you to use our Plan Match tool to shop, compare and enroll in coverage for #{notice.coverage_year}. Plan Match will also tell you if you may be eligible for cost savings to lower your premiums. Free expert enrollment assistance, and online support tools including the new DCHealthSmarts<sup>(SM)</sup> Glossary are available to help you and your family make informed decisions."],
+  contents: ["There are 25 plans available from CareFirst BlueCross BlueShield and Kaiser Permanente for #{notice.coverage_year}. Find a plan to meet your needs and budget by using our Plan Match tool.  Use Plan Match when shopping in your #{Settings.site.short_name} account by selecting “Estimate your Costs”", "Be sure to check out your standard plan options. We know that deductibles can be a struggle.  We’ve designed standard plans to make it easier for #{Settings.site.short_name} customers to access needed medical care. Standard plans cover many in-network medical services without you having to meet the deductible first. This includes primary care visits, specialist visits, mental health services, generic prescription drugs, and urgent care."],
     heading: 'What’s New This Year', sub_heading: '', bottom_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-  content: "Having quality affordable health insurance is important for you and your family. It can give you peace of mind if something unexpected happens like you get sick or have an accident. The #{Settings.aca.state_name} has recently established an individual responsibility requirement. This means that if you don't have health coverage and don’t qualify for an exemption, you may have to pay a penalty on your DC taxes. The penalty is up to $695 or 2.5 percent of income above the tax filing threshold, whichever is greater. So, be sure to get covered and stay covered!"} %>
+  content: "Having health insurance all year is important. Remember that the #{Settings.aca.state_name} has an individual responsibility requirement. This means that if you don’t have health coverage and don’t qualify for an exemption, you may have to pay a penalty on your DC taxes.  The penalty is up to $695 or 2.5 percent of income above the tax filing threshold, whichever is greater. So, be sure to get covered and stay covered!  Visit dchealthlink.com/individual-responsibility-requirement to learn more"} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: ["Each year, the federal government requires us to confirm that you still qualify to get coverage through #{Settings.site.short_name}. Based on our records, and any updates you gave us, your results are as follows:"],
@@ -60,11 +60,15 @@
  contents: ["If you want to change plans for #{notice.coverage_year}, or add someone to a plan, shop for a new plan during open enrollment. After #{notice.ivl_open_enrollment_end_on.strftime("%B %d, %Y")}, you won’t be able to sign up for a new plan or change to a different plan until the next open enrollment period unless you experience a major life change like getting married or having a baby. If you want to pick a new plan, make sure to keep in mind these deadlines:"],
    heading: 'Open Enrollment', sub_heading: '', bottom_margin: '5px'} %>
 
-<%= render partial: 'notices/shared/oe_dates' %>
+<%= render partial: 'notices/shared/oe_dates', :locals => {notice: notice} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: ["#{Settings.site.short_name} registered Brokers are available (at no cost to you) to help you find the right plan that meets your needs and budget. To search for a Broker near you, go to: <a href='https://www.dchealthlink.com/find-expert'>dchealthlink.com/find-expert</a>.", "You can also use our Plan Match tool to compare plans on your own. With Plan Match, you can see plan features, benefits, and costs side-by-side. You’ll see total estimated costs for services (not just premiums or deductibles). You can also see which plans include your doctors, prescription drugs, and more. To use Plan Match, go to the Individual & Family section at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>."],
    heading: 'Get Help Choosing a Plan', sub_heading: '', top_margin: '8px', bottom_margin: '8px'} %>
+
+ <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+  contents: [],
+    heading: 'Your Plan', sub_heading: '', top_margin: '8px', bottom_margin: '8px'} %>
 
 <% if notice.health_enrollments.present? && notice.dental_enrollments.present? %>
   <% if (notice.same_plan_health_enrollment && notice.same_plan_dental_enrollment) %>

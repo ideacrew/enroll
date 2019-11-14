@@ -587,9 +587,28 @@ class HbxEnrollment
     end
   end
 
+  PREDECESSOR_ID_INTRODUCTION_DATE = Date.new(2017,8,1)
+
   def parent_enrollment
-    return nil if predecessor_enrollment_id.blank?
-    HbxEnrollment.find(predecessor_enrollment_id)
+    return HbxEnrollment.find(predecessor_enrollment_id) if predecessor_enrollment_id.present?
+    return nil if effective_on >= PREDECESSOR_ID_INTRODUCTION_DATE
+    return nil if created_at.present? && created_at >= PREDECESSOR_ID_INTRODUCTION_DATE
+    return nil if is_shop? && (effective_on == sponsored_benefit_package.start_on)
+    search_for_predecessor
+  end
+
+  def search_for_predecessor
+    possible_enrollments = family.hbx_enrollments.where({effective_on: {"$lt" => effective_on},
+                                                         sponsored_benefit_package_id: sponsored_benefit_package_id,
+                                                         coverage_kind: coverage_kind,
+                                                         kind: kind,
+                                                         external_enrollment: {'$ne' => true},
+                                                         product_id: {"$ne" => nil},
+                                                         employee_role_id: employee_role_id,
+                                                         aasm_state: {"$nin": ["shopping", "coverage_canceled", "void", "inactive", "renewing_waived"]}})
+    possible_enrollments.select do |pe|
+      pe.terminated_on && (pe.terminated_on == (effective_on - 1.day))
+    end.first
   end
 
   def census_employee
@@ -1249,6 +1268,15 @@ class HbxEnrollment
       plan_selection = PlanSelection.new(self, product)
       self.hbx_enrollment_members = plan_selection.same_plan_enrollment.hbx_enrollment_members
     end
+  end
+
+  def display_make_changes_for_ivl?
+    return true if is_shop?
+
+    benefit_sponsorship = HbxProfile.current_hbx.try(:benefit_sponsorship)
+    benefit_coverage_period = benefit_sponsorship.current_benefit_period
+    is_ivl_by_kind? && (family.latest_ivl_sep&.start_on&.year == effective_on.year ||
+      (family.is_under_ivl_open_enrollment? && effective_on >= benefit_coverage_period.start_on))
   end
 
   def build_plan_premium(qhp_plan: nil, elected_aptc: false, tax_household: nil, apply_aptc: nil)
