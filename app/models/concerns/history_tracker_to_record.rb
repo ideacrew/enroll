@@ -15,11 +15,11 @@ module HistoryTrackerToRecord
       if last_association["name"] == trackable_class
         # Changes bottom level document
         trackable_record[key] = value
-      elsif trackable_record.send(last_association["name"]).is_a?(Enumerable)
+      elsif trackable_record.send(last_association["name"]).is_a?(Enumerable) && trackable_record.send(last_association["name"]).length > 0
         # embeds_many or has_many, needs id, hence checking if enumerable type object like array
         last_association_id = last_association["id"].to_s
         trackable_record.send(last_association["name"]).where(id: last_association_id).first[key] = value
-      else
+      elsif trackable_record.send(last_association["name"]).present?
         # embeds_one type relationship
         trackable_record.send(last_association["name"])[key] = value
       end
