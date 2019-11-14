@@ -348,7 +348,7 @@ class CensusEmployee < CensusMember
   end
 
   def replace_package_assignment(assignment, new_benefit_package, start_on)
-    assignment.set_end_date(start_on.prev_day)
+    assignment.end_date = start_on.prev_day
 
     if assignment.save
       create_benefit_package_assignment(new_benefit_package, start_on)
