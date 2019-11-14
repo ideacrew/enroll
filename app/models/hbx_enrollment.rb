@@ -1270,6 +1270,15 @@ class HbxEnrollment
     end
   end
 
+  def display_make_changes_for_ivl?
+    return true if is_shop?
+
+    benefit_sponsorship = HbxProfile.current_hbx.try(:benefit_sponsorship)
+    benefit_coverage_period = benefit_sponsorship.current_benefit_period
+    is_ivl_by_kind? && (family.latest_ivl_sep&.start_on&.year == effective_on.year ||
+      (family.is_under_ivl_open_enrollment? && effective_on >= benefit_coverage_period.start_on))
+  end
+
   def build_plan_premium(qhp_plan: nil, elected_aptc: false, tax_household: nil, apply_aptc: nil)
     qhp_plan ||= product
 
