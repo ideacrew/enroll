@@ -372,7 +372,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       post :create, person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids, change_plan: 'change'
       family.reload
       family.active_household.reload
-      expect(flash[:error]).to match /Unable to find employer-sponsored benefits for enrollment year/
+      expect(flash[:error]).to match(/Unable to find employer-sponsored benefits for enrollment year/)
     end
 
     context "when keep_existing_plan" do
