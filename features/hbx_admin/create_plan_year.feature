@@ -69,10 +69,10 @@ Feature: Create Benefit Application by admin UI
     And the existing applications for ABC Widgets will be <after_submit_title>
 
     Examples:
-      | title                 | aasm_state            | after_submit_title  | message |
-      | Publish Pending       | pending               | Canceled            | Successfully created a draft plan year |
-      | Enrolling             | enrollment_open       | Canceled            | Successfully created a draft plan year |
-      | Enrollment Closed     | enrollment_closed     | Canceled            | Successfully created a draft plan year |
-      | Enrolled              | binder_paid           | Canceled            | Successfully created a draft plan year |
-      | Enrollment Ineligible | enrollment_ineligible | Canceled            | Successfully created a draft plan year |
-      | Active                | active                | Termination Pending | Successfully created a draft plan year |
+      | title                 | aasm_state            | after_submit_title                | message |
+      | Publish Pending       | pending               | Canceled                          | Successfully created a draft plan year |
+      | Enrolling             | enrollment_open       | Canceled                          | Successfully created a draft plan year |
+      | Enrollment Closed     | enrollment_closed     | Canceled                          | Successfully created a draft plan year |
+      | Enrolled              | binder_paid           | Canceled                          | Successfully created a draft plan year |
+      | Enrollment Ineligible | enrollment_ineligible | Enrollment Ineligible             | Successfully created a draft plan year |
+      | Active                | active                | Termination Pending               | Successfully created a draft plan year |

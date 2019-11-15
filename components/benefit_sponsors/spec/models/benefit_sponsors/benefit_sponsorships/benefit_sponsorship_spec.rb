@@ -815,7 +815,7 @@ module BenefitSponsors
           applications = subject.may_transmit_renewal_enrollment?(april_effective_date)
 
           expect(applications & april_renewal_sponsors).to eq april_renewal_sponsors
-          expect(applications & april_ineligible_renewal_sponsors).to be_empty
+          expect(applications & april_ineligible_renewal_sponsors).to eq april_ineligible_renewal_sponsors
           expect(applications & april_wrong_sponsorship_renewal_sponsors).to be_empty
         end
       end

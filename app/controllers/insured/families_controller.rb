@@ -9,6 +9,7 @@ class Insured::FamiliesController < FamiliesController
   before_action :check_employee_role
   before_action :find_or_build_consumer_role, only: [:home]
   before_action :calculate_dates, only: [:check_move_reason, :check_marriage_reason, :check_insurance_reason]
+  before_action :can_view_entire_family_enrollment_history?, only: %i[display_all_hbx_enrollments]
 
   def home
     Caches::CurrentHbx.with_cache do
@@ -22,6 +23,9 @@ class Insured::FamiliesController < FamiliesController
       log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
 
       @hbx_enrollments = @family.enrollments.non_external.order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) || []
+      @all_hbx_enrollments_for_admin = @hbx_enrollments + HbxEnrollment.family_home_page_hidden_enrollments(@family)
+      # Sort by effective_on again. The latest enrollment will display at the top.
+      @all_hbx_enrollments_for_admin = @all_hbx_enrollments_for_admin.sort_by(&:effective_on).reverse
       @enrollment_filter = @family.enrollments_for_display
 
       valid_display_enrollments = Array.new
@@ -187,8 +191,12 @@ class Insured::FamiliesController < FamiliesController
 
     if @enrollment.present?
       @enrollment.reset_dates_on_previously_covered_members
-      @plan = @enrollment.product
-      @member_group = HbxEnrollmentSponsoredCostCalculator.new(@enrollment).groups_for_products([@plan]).first
+      if @enrollment.is_shop?
+        @plan = @enrollment.product
+        @member_group = HbxEnrollmentSponsoredCostCalculator.new(@enrollment).groups_for_products([@plan]).first
+      else
+        @plan = @enrollment.build_plan_premium
+      end
 
       begin
         @plan.name
@@ -310,6 +318,10 @@ class Insured::FamiliesController < FamiliesController
   end
 
   private
+
+  def can_view_entire_family_enrollment_history?
+    authorize Family, :can_view_entire_family_enrollment_history?
+  end
 
   def trigger_ivl_to_cdc_transition_notice
     person =  @family.primary_applicant.person

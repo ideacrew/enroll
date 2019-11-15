@@ -231,6 +231,10 @@ module BenefitSponsors
             renewal: true
           }) if @employer_profile.renewal_benefit_application.present?
 
+          data_table_params.merge!({
+            is_submitted: true
+          }) if @employer_profile&.renewal_benefit_application&.is_submitted?
+
           data_table_params
         end
 

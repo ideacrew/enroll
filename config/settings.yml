@@ -175,8 +175,8 @@ aca:
       days: 95
 
     open_enrollment:
-      start_on: <%= Date.new(2018,11,1) %>
-      end_on: <%= Date.new(2019,01,31) %>
+      start_on: <%= Date.new(2019,11,1) %>
+      end_on: <%= Date.new(2020,01,31) %>
     dc_resident_application: true
     transition_family_members_link: true
       # dc_resident_application: true
@@ -198,6 +198,7 @@ aca:
     new_employee_paper_application: true
     census_employees_template_file: 'DCHL Employee Census'
     coverage_start_period: "2 months"
+    auto_cancel_ineligible: false
 
     binder_payment_dates: [
       {"2019-01-01": '2018,12,12'},
@@ -249,7 +250,7 @@ aca:
       ineligible_period_after_application_denial:
         days: 90
       quiet_period:
-        month_offset: 0
+        month_offset: -1
         mday: 28
 
     renewal_application:
@@ -295,6 +296,7 @@ aca:
 
     transmit_scheduled_employers: true
     employer_transmission_day_of_month: 16
+    transmit_carrier_drop_events: true
 
     mid_month_benefit_application_terminations:
       voluntary: false
@@ -330,6 +332,7 @@ notices:
       zip_code: "20005"
 
   shop:
+    store_paper_notice: false
     attachments:
       envelope_without_address: "taglines.pdf"
       non_discrimination_attachment: "shop_non_discrimination_attachment.pdf"
@@ -341,6 +344,7 @@ notices:
       layout: "notifier/pdf_layout.html.erb"
 
   individual:
+    store_paper_notice: true
     attachments:
       blank_page_attachment: "blank.pdf"
       envelope_without_address: "taglines.pdf"

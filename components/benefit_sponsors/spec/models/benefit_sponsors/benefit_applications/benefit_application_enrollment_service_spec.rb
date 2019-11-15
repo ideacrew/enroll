@@ -86,6 +86,16 @@ module BenefitSponsors
               expect(initial_application.aasm_state).to eq :enrollment_open
               expect(initial_application.open_enrollment_period.begin.to_date).to eq TimeKeeper.date_of_record
             end
+
+            it "should submit application with immediate open enrollment without min contributions for 1/1 ERs" do
+              min_date = TimeKeeper.date_of_record.next_year.beginning_of_year
+              initial_application.update_attributes(:effective_period => min_date..(min_date.next_year - 1.day), :open_enrollment_period => TimeKeeper.date_of_record..(min_date.prev_month + 9.days))
+              initial_application.benefit_packages.first.sorted_composite_tier_contributions.first.update_attributes(contribution_factor: 0.0)
+              subject.submit_application
+              initial_application.reload
+              expect(initial_application.aasm_state).to eq :enrollment_open
+              expect(initial_application.open_enrollment_period.begin.to_date).to eq TimeKeeper.date_of_record
+            end
           end
 
           context "and the benefit_application fails business policy validation" do
@@ -529,6 +539,17 @@ module BenefitSponsors
         let(:current_effective_date) { Date.new(TimeKeeper.date_of_record.year, 8, 1) }
         let(:aasm_state) { :enrollment_open }
         let(:open_enrollment_period) { effective_period.min.prev_month..open_enrollment_close }
+        let(:person){ FactoryBot.create(:person, :with_family)}
+        let(:family) {person.primary_family}
+        let(:benefit_package) { initial_application.benefit_packages.first }
+        let(:benefit_group_assignment) {FactoryBot.build(:benefit_group_assignment, benefit_group: benefit_package)}
+        let(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: benefit_sponsorship.profile, census_employee_id: census_employee.id) }
+        let(:census_employee) do
+          FactoryBot.create(:census_employee,
+                            employer_profile: benefit_sponsorship.profile,
+                            benefit_sponsorship: benefit_sponsorship,
+                            benefit_group_assignments: [benefit_group_assignment])
+        end
 
         include_context "setup initial benefit application" do
           let(:aasm_state) { :enrollment_open }
@@ -566,13 +587,28 @@ module BenefitSponsors
 
           context "and the benefit_application enrollment fails eligibility policy validation" do
             let(:business_policy) { instance_double("some_policy", fail_results: { business_rule: "failed validation" })}
+            let!(:hbx_enrollment) do
+              FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+                                family: family,
+                                household: family.active_household,
+                                aasm_state: "coverage_selected",
+                                effective_on: initial_application.start_on,
+                                rating_area_id: initial_application.recorded_rating_area_id,
+                                coverage_kind: "health",
+                                sponsored_benefit_id: initial_application.benefit_packages.first.health_sponsored_benefit.id,
+                                sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
+                                benefit_sponsorship_id: initial_application.benefit_sponsorship.id,
+                                employee_role_id: employee_role.id)
+            end
 
             it "should close open enrollment and transition into :enrollment_ineligible state" do
+              census_employee.update_attributes(employee_role_id: employee_role.id)
               allow(subject).to receive(:business_policy).and_return(business_policy)
               allow(subject).to receive(:business_policy_satisfied_for?).with(:end_open_enrollment).and_return(false)
-
               subject.end_open_enrollment
               initial_application.reload
+              hbx_enrollment.reload
+              expect(hbx_enrollment.aasm_state).to eq "coverage_canceled"
               expect(initial_application.aasm_state).to eq :enrollment_ineligible
               expect(initial_application.benefit_sponsorship.aasm_state).to eq :applicant
             end
