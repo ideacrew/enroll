@@ -44,14 +44,12 @@
 </table>
 
 <script>
-  $('td i').click(function() {
-    $(this).toggleClass("glyphicon-plus glyphicon-minus");
-  });
   $(document).ready(function() {
     $('tr.invoices').hide();
     $('.invoice_years').each(function() {
       $(this).click(function() {
-        $('tr.' + $(this).attr('id')).toggle();
+        $('tr.'+$(this).attr('id')).toggle();
+        $('tr#'+$(this).attr('id')+' td i.glyphicon').toggleClass("glyphicon-plus glyphicon-minus");
       })
     });
   });
