@@ -24,7 +24,7 @@ describe Person, :dbclean => :after_each do
 
     describe ".history_track_to_person" do
       let(:non_curam_ivl_person) do
-        FactoryBot.create(:person, :with_family, first_name: "Tom", last_name: "Cruise")
+        FactoryBot.create(:person, :with_family, gender: 'male', first_name: "Tom", last_name: "Cruise")
       end
       let!(:consumer_role) do
         ConsumerRole.create!(
@@ -44,10 +44,10 @@ describe Person, :dbclean => :after_each do
 
         it "undoes changes to a person when a HistoryTrack instance passed as arguement" do
           target_history_track =  non_curam_ivl_person.history_tracks.where(modified: {"is_state_resident" => false}).last
-          past_person = non_curam_ivl_person.history_tracker_to_record(target_history_track, "Person")
+          past_person = non_curam_ivl_person.history_tracker_to_record(target_history_track)
           expect(past_person.consumer_role.is_state_resident).to eq(false)
           target_history_track =  non_curam_ivl_person.history_tracks.where(modified: {"is_state_resident" => true}).last
-          past_person = non_curam_ivl_person.history_tracker_to_record(target_history_track, "Person")
+          past_person = non_curam_ivl_person.history_tracker_to_record(target_history_track)
           expect(past_person.consumer_role.is_state_resident).to eq(true)
         end
       end
@@ -55,17 +55,19 @@ describe Person, :dbclean => :after_each do
       context "just person record itself" do
         before do
           non_curam_ivl_person.update_attributes!(gender: 'female')
+          sleep 1
           non_curam_ivl_person.update_attributes!(gender: 'male')
+          sleep 1
+          non_curam_ivl_person.update_attributes!(dob: Date.today - 22.years)
+          sleep 1
           non_curam_ivl_person.update_attributes!(gender: 'female')
         end
 
         it "undoes changes to a person when a HistoryTrack instance passed as arguement" do
-          target_history_track =  non_curam_ivl_person.history_tracks.where(modified: {"gender" => 'male'}).last
-          past_person = non_curam_ivl_person.history_tracker_to_record(target_history_track, "Person")
-          expect(past_person.gender).to eq('male')
-          target_history_track =  non_curam_ivl_person.history_tracks.where(modified: {"gender" => 'female'}).last
-          past_person = non_curam_ivl_person.history_tracker_to_record(target_history_track, "Person")
-          expect(past_person.gender).to eq('female')
+          history_tracks = non_curam_ivl_person.history_tracks.reverse
+          expect(non_curam_ivl_person.history_tracker_to_record(history_tracks.third).gender).to eq('male')
+          expect(non_curam_ivl_person.history_tracker_to_record(history_tracks.third).dob).to_not eq(Date.today - 22.years)
+          expect(non_curam_ivl_person.history_tracker_to_record(history_tracks.first).gender).to eq('female')
         end
       end
     end
