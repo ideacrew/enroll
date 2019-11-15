@@ -7,7 +7,7 @@ module HistoryTrackerToRecord
     # history_track.trackable will return consumer_role
     # if the consumer_role was modified. trackable_root
     # will return person for both
-    trackable_record = history_tracker.trackable_root
+    trackable_record = self.clone
     # Example structure of modified: {"is_state_resident"=>false}
     trackable_record.history_tracks.where(:version.gte => history_tracker.version).each do |track|
       modified_attributes = track.original
