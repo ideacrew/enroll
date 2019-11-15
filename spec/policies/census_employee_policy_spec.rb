@@ -88,6 +88,10 @@ describe CensusEmployeePolicy, dbclean: :after_each do
 
     context "when is normal user" do
       let(:user) { FactoryBot.create(:user) }
+      before do
+          allow(user).to receive(:person).and_return person
+          allow(user.person).to receive(:has_active_broker_staff_role?).and_return false
+      end
 
       it "denies access when change dob" do
         employee.dob = TimeKeeper.date_of_record
@@ -291,7 +295,11 @@ describe CensusEmployeePolicy, dbclean: :after_each do
     end
 
     context "wnormal user" do
-      let(:user) { FactoryBot.create(:user) }
+      let(:user) { FactoryBot.create(:user, person: person) }
+      before do
+          allow(user).to receive(:person).and_return person
+          allow(user.person).to receive(:has_active_broker_staff_role?).and_return false
+        end
       it "denies access" do
         expect(subject).not_to permit(user, employee)
       end
@@ -417,7 +425,11 @@ describe CensusEmployeePolicy, dbclean: :after_each do
       end
 
       context "current user is not broker of general agency role" do
-        let(:user) { FactoryBot.create(:user, person: person) }
+        let!(:user) { FactoryBot.create(:user, :broker, person: person) }
+        before do
+          allow(user).to receive(:person).and_return person
+          allow(user.person).to receive(:has_active_broker_staff_role?).and_return false
+        end
         it "denies access" do
           expect(subject).not_to permit(user, employee)
         end
