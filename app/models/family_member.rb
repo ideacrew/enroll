@@ -69,21 +69,13 @@ class FamilyMember
   # This needs to work for history_tracks as well as versions
   def person_version_for(v_date)
     return nil if (v_date < created_at)
-    versions_to_search = [person] + person.versions
-    if person.updated_at <= v_date
-      return person
+    if closest_track = person.history_tracks.unscoped.where(:created_at.lte => v_date).desc("created_at").limit(1).first
+      person.history_tracker_to_record(closest_track)
+    elsif closest_person = person.versions.where(:updated_at.lte => v_date).desc("updated_at").limit(1).first
+      closest_person
+    else
+      person
     end
-
-    person.history_tracks.each do |track|
-      if track.created_at <= v_date
-        # Returns a person in memory
-        return person.history_tracker_to_record(track, 'Person')
-      end
-    end
-
-    person.history_tracker_to_record(person.history_tracks.last, 'Person') || versions_to_search.reject do |v|
-      v.created_at > v_date
-    end.sort_by(&:updated_at).last
   end
 
   def former_family=(new_former_family)

@@ -48,7 +48,7 @@ describe Person, :dbclean => :after_each do
           expect(past_person.consumer_role.is_state_resident).to eq(false)
           target_history_track =  non_curam_ivl_person.history_tracks.where(modified: {"is_state_resident" => true}).last
           past_person = non_curam_ivl_person.history_tracker_to_record(target_history_track)
-          expect(past_person.consumer_role.is_state_resident).to eq(true)
+          expect(past_person.consumer_role.is_state_resident).to eq(false)
         end
       end
 
@@ -67,7 +67,7 @@ describe Person, :dbclean => :after_each do
           history_tracks = non_curam_ivl_person.history_tracks.reverse
           expect(non_curam_ivl_person.history_tracker_to_record(history_tracks.third).gender).to eq('male')
           expect(non_curam_ivl_person.history_tracker_to_record(history_tracks.third).dob).to_not eq(Date.today - 22.years)
-          expect(non_curam_ivl_person.history_tracker_to_record(history_tracks.first).gender).to eq('female')
+          expect(non_curam_ivl_person.history_tracker_to_record(history_tracks.first).gender).to eq('male')
         end
       end
     end

@@ -9,7 +9,7 @@ module HistoryTrackerToRecord
     # will return person for both
     trackable_record = history_tracker.trackable_root
     # Example structure of modified: {"is_state_resident"=>false}
-    trackable_record.history_tracks.where(:version.gt => history_tracker.version).each do |track|
+    trackable_record.history_tracks.where(:version.gte => history_tracker.version).each do |track|
       modified_attributes = track.original
       last_association = track.association_chain.last
       modified_attributes.each do |key, value|

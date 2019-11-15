@@ -175,7 +175,7 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
           next
         end
         # This will be a HistoryTracker
-        pers_record.history_tracker_to_record(p_version, "Person")
+        pers_record.history_tracker_to_record(p_version)
       else
         p_version
       end
