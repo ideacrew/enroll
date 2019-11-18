@@ -38,6 +38,10 @@ module BenefitSponsors
 
       validate :check_product_option_choice
 
+      def benefit_application
+        @benefit_application ||= BenefitSponsors::BenefitApplications::BenefitApplication.find(benefit_application_id)
+      end
+
       def sponsor_contribution_attributes=(attributes)
         attributes.permit! if attributes.is_a?(ActionController::Parameters)
         @sponsor_contribution = SponsorContributionForm.new(attributes)
