@@ -167,6 +167,9 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
   ]
   ivl_people.no_timeout.each do |pers_record|
     person_versions = [pers_record] + pers_record.versions + pers_record.history_tracks
+    if pers_record.versions.empty? && pers_record.history_tracks.any?
+      person_versions = person_versions + [pers_record.created_at]
+    end
     person_versions.each do |p_version|
       pers_record.reload
       p_version, person_updated_at = if p_version.kind_of?(HistoryTracker)
@@ -174,7 +177,9 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
           next
         end
         # This will be a HistoryTracker
-        [pers_record.history_tracker_to_record(p_version), p_version.created_at]
+        [pers_record.history_tracker_to_record(p_version.created_at), p_version.created_at]
+      elsif person_version.kind_of?(Date)
+        [pers_record.history_tracker_to_record(p_version), p_version]
       else
         [p_version, p_version.updated_at]
       end

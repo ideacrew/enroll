@@ -70,8 +70,13 @@ class FamilyMember
   def person_version_for(v_date)
     person.reload
     return nil if (v_date < created_at)
-    if closest_track = person.history_tracks.unscoped.where(:created_at.lte => v_date).order_by({created_at: -1}).limit(1).first
-      person.history_tracker_to_record(closest_track)
+    return person if (person.updated_at < v_date)
+    oldest_history_track = person.history_tracks.unscoped.to_a.map(&:created_at).sort.first
+    if oldest_history_track && person.versions.empty? && (oldest_history_track.created_at > v_date)
+      return person.history_tracker_to_record(v_date)
+    end
+    if closest_track = person.history_tracks.unscoped.to_a.where(:created_at.lte => v_date).order_by({created_at: -1}).limit(1).first
+      person.history_tracker_to_record(closest_track.created_at)
     elsif closest_person = person.versions.where(:updated_at.lte => v_date).order_by({updated_at: -1}).limit(1).first
       closest_person
     else

@@ -44,10 +44,11 @@ describe Person, :dbclean => :after_each do
 
         it "undoes changes to a person when a HistoryTrack instance passed as arguement" do
           target_history_track =  non_curam_ivl_person.history_tracks.where(modified: {"is_state_resident" => false}).last
-          past_person = non_curam_ivl_person.history_tracker_to_record(target_history_track)
+          puts target_history_track.inspect
+          past_person = non_curam_ivl_person.history_tracker_to_record(target_history_track.created_at)
           expect(past_person.consumer_role.is_state_resident).to eq(false)
           target_history_track =  non_curam_ivl_person.history_tracks.where(modified: {"is_state_resident" => true}).last
-          past_person = non_curam_ivl_person.history_tracker_to_record(target_history_track)
+          past_person = non_curam_ivl_person.history_tracker_to_record(target_history_track.created_at)
           expect(past_person.consumer_role.is_state_resident).to eq(false)
         end
       end
@@ -64,10 +65,11 @@ describe Person, :dbclean => :after_each do
         end
 
         it "undoes changes to a person when a HistoryTrack instance passed as arguement" do
-          history_tracks = non_curam_ivl_person.history_tracks.reverse
-          expect(non_curam_ivl_person.history_tracker_to_record(history_tracks.third).gender).to eq('male')
-          expect(non_curam_ivl_person.history_tracker_to_record(history_tracks.third).dob).to_not eq(Date.today - 22.years)
-          expect(non_curam_ivl_person.history_tracker_to_record(history_tracks.first).gender).to eq('male')
+          history_tracks = non_curam_ivl_person.history_tracks.to_a.sort_by(&:created_at).reverse
+          puts history_tracks.map { |t| "#{t.created_at} - #{t.version} - #{t['original']}"}.join("\n")
+          expect(non_curam_ivl_person.history_tracker_to_record(history_tracks[1].created_at).gender).to eq('male')
+          expect(non_curam_ivl_person.history_tracker_to_record(history_tracks.third.created_at).dob).to_not eq(Date.today - 22.years)
+          expect(non_curam_ivl_person.history_tracker_to_record(history_tracks.second.created_at).gender).to eq('male')
         end
       end
     end
