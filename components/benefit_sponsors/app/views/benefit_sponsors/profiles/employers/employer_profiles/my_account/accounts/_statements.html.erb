@@ -42,15 +42,3 @@
     <% end %>
   </tbody>
 </table>
-
-<script>
-  $(document).ready(function() {
-    $('tr.invoices').hide();
-    $('.invoice_years').each(function() {
-      $(this).click(function() {
-        $('tr.'+$(this).attr('id')).toggle();
-        $('tr#'+$(this).attr('id')+' td i.glyphicon').toggleClass("glyphicon-plus glyphicon-minus");
-      })
-    });
-  });
-</script>

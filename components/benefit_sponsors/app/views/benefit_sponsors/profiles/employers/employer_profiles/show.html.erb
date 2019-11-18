@@ -38,3 +38,13 @@
     </aside>
   <% end %>
 <% end %>
+
+<script>
+  $(document).ready(function() {
+    $('tr.invoices').hide();
+    $('.invoice_years td i.glyphicon').click(function(){
+      $(this).toggleClass("glyphicon-plus glyphicon-minus");
+      $('tr.'+$(this).closest('.invoice_years').attr('id')).toggle();
+    });
+  });
+</script>
