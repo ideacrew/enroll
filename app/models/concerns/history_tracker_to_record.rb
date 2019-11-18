@@ -10,7 +10,9 @@ module HistoryTrackerToRecord
     self.reload
     # Example structure of modified: {"is_state_resident"=>false}
     tracks_to_reverse = self.history_tracks.sort_by(&:created_at).reject do |ht|
-      self.updated_at <= ht.created_at
+      # Reject everything that comes before history tracker including history tracker record itself
+      # And then apply them in reverse
+      ht.created_at <= history_tracker.created_at
     end.reverse
     tracks_to_reverse.each do |track|
       track.undo_attr({})
