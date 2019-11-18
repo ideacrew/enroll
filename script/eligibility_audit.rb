@@ -54,9 +54,8 @@ def relationship_for(person, family)
   family.primary_applicant.person.find_relationship_with(person)
 end
 
-def version_in_window?(person)
-  return true if person.updated_at.blank?
-  (person.updated_at >= AUDIT_START_DATE) && (person.updated_at < AUDIT_END_DATE)
+def version_in_window?(updated_at)
+  (updated_at >= AUDIT_START_DATE) && (updated_at < AUDIT_END_DATE)
 end
 
 def calc_eligibility_for(cr, family, benefit_packages, ed)
@@ -119,8 +118,8 @@ def not_authorized_by_curam?(person)
   !(lpd.vlp_authority == "curam")
 end
 
-def auditable?(person_record, person_version, family)
-  version_in_window?(person_record) &&
+def auditable?(person_record, person_version, person_updated_at, family)
+  version_in_window?(person_updated_at) &&
   primary_has_address?(person_record, person_version, family) &&
   primary_answered_data?(person_record, person_version, family) &&
   not_authorized_by_curam?(person_record)
@@ -170,16 +169,17 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
     person_versions = [pers_record] + pers_record.versions + pers_record.history_tracks
     person_versions.each do |p_version|
       pers_record.reload
-      p_version = if p_version.kind_of?(HistoryTracker)
+      p_version, person_updated_at = if p_version.kind_of?(HistoryTracker)
         if (p_version.created_at >= AUDIT_END_DATE) || (p_version.created_at < AUDIT_START_DATE)
           next
         end
         # This will be a HistoryTracker
-        pers_record.history_tracker_to_record(p_version)
+        [pers_record.history_tracker_to_record(p_version), p_version.created_at]
       else
-        p_version
+        [p_version, p_version.updated_at]
       end
       families = person_family_map[pers_record.id]
+      # This "pers" variable will be the version that is appended to the CSV
       pers = p_version
       families.each do |fam|
         cr = pers.consumer_role
@@ -188,8 +188,8 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
             cr.person = p_version
           end
           begin
-            if auditable?(pers_record, p_version, fam)
-              eligible = calc_eligibility_for(cr, fam, health_benefit_packages, pers.updated_at)
+            if auditable?(pers_record, p_version, person_updated_at, fam)
+              eligible = calc_eligibility_for(cr, fam, health_benefit_packages, person_updated_at)
               lpd = cr.lawful_presence_determination
               if lpd
                 address_fields = home_address_for(pers)
@@ -202,7 +202,7 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
                   pers.full_name,
                   pers.dob,
                   pers.gender,
-                  pers.updated_at.strftime("%Y-%m-%d %H:%M:%S.%L"),
+                  person_updated_at.strftime("%Y-%m-%d %H:%M:%S.%L"),
                   (pers_record.id == fam.primary_applicant.person_id),
                   relationship_for(pers_record, fam),
                   lpd.citizen_status,
