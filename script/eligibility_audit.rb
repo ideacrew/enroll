@@ -180,12 +180,12 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
         p_version
       end
       families = person_family_map[pers_record.id]
-      pers = pers_record
+      pers = p_version
       families.each do |fam|
         cr = pers.consumer_role
         if cr
           if cr.person.blank?
-            cr.person = pers
+            cr.person = p_version
           end
           begin
             if auditable?(pers_record, p_version, fam)
