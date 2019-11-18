@@ -44,12 +44,11 @@ describe Person, :dbclean => :after_each do
 
         it "undoes changes to a person when a HistoryTrack instance passed as arguement" do
           target_history_track =  non_curam_ivl_person.history_tracks.where(modified: {"is_state_resident" => false}).last
-          puts target_history_track.inspect
           past_person = non_curam_ivl_person.history_tracker_to_record(target_history_track.created_at)
           expect(past_person.consumer_role.is_state_resident).to eq(false)
           target_history_track =  non_curam_ivl_person.history_tracks.where(modified: {"is_state_resident" => true}).last
           past_person = non_curam_ivl_person.history_tracker_to_record(target_history_track.created_at)
-          expect(past_person.consumer_role.is_state_resident).to eq(false)
+          expect(past_person.consumer_role.is_state_resident).to eq(true)
         end
       end
 
