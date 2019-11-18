@@ -329,6 +329,41 @@ describe CensusEmployeePolicy, dbclean: :after_each do
       end
     end
 
+    context "broker agency staff user" do
+
+      let!(:staff_person) {FactoryBot.create(:person)}
+      let!(:broker_person) {FactoryBot.create(:person, :with_broker_role)}
+      let(:broker_agency_staff_role) {staff_person.broker_agency_staff_roles.first}
+      let!(:user) { FactoryBot.create(:user, person: staff_person )}
+      let(:site) {create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+      let!(:broker_organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+      let!(:broker_agency_profile) { broker_organization.broker_agency_profile }
+      let!(:broker_agency_staff_role) {FactoryBot.create(:broker_agency_staff_role, person: staff_person, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id)}
+
+      context 'current user is a broker staff role of employer_profile' do
+        
+        before :each do
+           broker_person.broker_role.update_attributes(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id)
+          employer_profile.organization.benefit_sponsorships.first.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, writing_agent_id: broker_person.id, start_on: TimeKeeper.date_of_record)
+          allow(employer_profile).to receive(:active_broker).and_return broker_person
+          allow(employee).to receive(:employer_profile).and_return employer_profile
+        end
+
+        it 'should grant access' do
+          expect(subject).to permit(user, employee)
+        end
+      end
+
+      context "current user is not a broker agency staff role of employer_profile" do
+        before :each do
+          allow(user.person).to receive(:has_active_broker_staff_role?).and_return false
+        end
+        it "denies access" do
+          expect(subject).not_to permit(user, employee)
+        end
+      end
+    end
+
     context "employer_staff user" do
       let(:user) { FactoryBot.create(:user, :employer_staff) }
 
