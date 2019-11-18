@@ -38,7 +38,8 @@ class BenefitGroupAssignment
       {
         :$or => [
           {:start_on.lte => compare_date, :end_on.gte => compare_date},
-          {:start_on => compare_date, :end_on => nil}
+          {:start_on => compare_date, :end_on => nil},
+          {:start_on.lte => compare_date, :end_on => nil, :is_active => true}
         ]
       }
     ).order(start_on: :desc)
