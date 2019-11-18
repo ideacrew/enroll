@@ -3,30 +3,31 @@ import { calculateEmployerContributions, calculateEmployeeCosts } from "./benefi
 
 function enableNewAddBenefitPackageButton() {
   var addBenefitPackageButton = document.getElementById('addBenefitPackage');
-  addBenefitPackageButton.classList.remove('disabled');
+  if (addBenefitPackageButton)
+    addBenefitPackageButton.classList.remove('disabled');
 }
 
 function disableNewAddBenefitPackageButton() {
   var addBenefitPackageButton = document.getElementById('addBenefitPackage');
-  addBenefitPackageButton.classList.add('disabled');
+  if (addBenefitPackageButton)
+    addBenefitPackageButton.classList.add('disabled');
 }
 
 function disableDentalBenefitPackage() {
   var addBenefitPackageButton = document.getElementById('dentalBenefits');
-  if(addBenefitPackageButton) {
+  if (addBenefitPackageButton)
     addBenefitPackageButton.classList.add('disabled');
-  }
 }
 
 function enableDentalBenefitPackage() {
   var addBenefitPackageButton = document.getElementById('dentalBenefits');
-  if(addBenefitPackageButton) {
+  if (addBenefitPackageButton)
     addBenefitPackageButton.classList.remove('disabled');
-  }
 }
 
 function preventSubmissionOnEnter() {
-  document.getElementById('new_benefit_package').onkeypress = function(e) {
+  var newBenefitPackageSubmit = document.getElementById('new_benefit_package') || document.getElementById('new_sponsored_benefits');
+  newBenefitPackageSubmit.onkeypress = function(e) {
     var key = e.charCode || e.keyCode || 0;
     if (key == 13) {
         e.preventDefault();
@@ -35,15 +36,16 @@ function preventSubmissionOnEnter() {
 }
 
 function disableNewPlanYearButton() {
-  var savePlanYearButton = document.getElementById('submitBenefitPackage');
+  var savePlanYearButton = document.getElementById('submitBenefitPackage') || document.getElementById('submitDentalBenefits');
   savePlanYearButton.classList.add('disabled');
+
   disableNewAddBenefitPackageButton();
   disableDentalBenefitPackage();
   preventSubmissionOnEnter();
 }
 
 function enableNewPlanYearButton() {
-  var savePlanYearButton = document.getElementById('submitBenefitPackage');
+  var savePlanYearButton = document.getElementById('submitBenefitPackage') || document.getElementById('submitDentalBenefits');
   savePlanYearButton.classList.remove('disabled');
   enableNewAddBenefitPackageButton();
   enableDentalBenefitPackage();
@@ -76,18 +78,25 @@ function setCircle(element) {
   // Gets product option info
   window.productOptionKind = element.querySelector('a').dataset.name;
   // Sets kind to hidden input field for form submission
-  document.getElementById('ppKind').setAttribute('value', window.productOptionKind);
+  var ppKind;
+  if (ppKind = document.getElementById('ppKind'))
+    ppKind.setAttribute('value', window.productOptionKind);
+
   document.getElementById('referencePlans').classList.add('hidden');
 }
 
 function showFormButtons() {
-  document.getElementById('addBenefitPackage').classList.remove('hidden');
+  var addBenefitPackage = document.getElementById('addBenefitPackage')
+  if (addBenefitPackage)
+    addBenefitPackage.classList.remove('hidden');
   var dentalBenefits = document.getElementById('dentalBenefits');
   if(dentalBenefits) {
     dentalBenefits.classList.remove('hidden');
   }
-  document.getElementById('submitBenefitPackage').classList.remove('hidden');
-  document.getElementById('cancelBenefitPackage').classList.remove('hidden');
+  var submitButton = document.getElementById('submitBenefitPackage') || document.getElementById('submitDentalBenefits');
+  submitButton.classList.remove('hidden');
+  var cancelButton = document.getElementById('cancelBenefitPackage') || document.querySelector('form .interaction-click-control-cancel');
+  cancelButton.classList.remove('hidden');
 }
 
 function viewSummary(element) {
@@ -185,12 +194,14 @@ function selectDefaultReferencePlan() {
   var myplans = document.querySelector('#yourPlans');
   myplans.onmouseover = function() {
     myplans.click();
-    document.getElementById('new_benefit_package').click();
+    var form = document.getElementById('new_benefit_package') || document.getElementById('new_sponsored_benefits');
+    form.click();
   }
   var contributions = document.querySelector('#yourSponsorContributions');
   contributions.onmouseover = function() {
     contributions.click();
-    document.getElementById('new_benefit_package').click();
+    var form = document.getElementById('new_benefit_package') || document.getElementById('new_sponsored_benefits');
+    form.click();
   };
 }
 
@@ -468,16 +479,70 @@ function getPlanInfo(element) {
   setTempCL();
 }
 
+function showPlanSelection() {
+  // document.getElementById('planSelection').classList.remove('hidden');
+  document.getElementById('referencePlanEdit').classList.add('hidden');
+  document.getElementById('scEdit').remove();
+  document.getElementById('metal-level-select').classList.remove('hidden');
+  document.getElementById('saveBenefitPackage').classList.add('hidden');
+  document.getElementById('submitDentalBenefits').classList.remove('hidden');
+}
+
+function loadEmployeeCosts() {
+  var table = document.getElementById('eeTableBody');
+
+  table.querySelectorAll('tr').forEach(function(element) {
+    element.remove()
+    });
+
+  var tr = document.createElement('tr')
+  var productOptionKind = 'multi_product';
+  var productsTotal;
+  var estimate = window.employeeCostEstimate;
+  var planOptions = window.planOptions;
+  var element = document.querySelector("input[name='sponsored_benefits[reference_plan_id]']:checked");
+
+  // var selectedName = element.dataset.carrierName;
+  // var planTitle = element.dataset.planTitle;
+  // filteredProducts = planOptions[productOptionKind][selectedName];
+
+  document.getElementById('planOfferingsTitle').innerHTML = '';
+  // document.getElementById('planOfferingsTitle').append(`Plan Offerings - ${planTitle} (${filteredProducts.length})`)
+
+  tr.innerHTML =
+    `
+    <td class="text-center">${estimate[0].name}</td>
+    <td class="text-center">${estimate[0].dependent_count}</td>
+    <td class="text-center">$ ${estimate[0].lowest_cost_estimate}</td>
+    <td class="text-center">$ ${estimate[0].reference_estimate}</td>
+    <td class="text-center">$ ${estimate[0].highest_cost_estimate}</td>
+    `
+  table.appendChild(tr)
+}
+
+function setPlanOptionKind(element) {
+  var productPackageKind = element.querySelector('a').dataset.name;
+  document.getElementById('sponsored_benefits_product_package_kind').value = productPackageKind;
+  if (productPackageKind == 'multi_product') {
+    document.querySelector('.select_choice_reference_plan').classList.remove("hidden");
+  }
+  else {
+    document.querySelector('.select_choice_reference_plan').classList.add("hidden");
+  }
+}
+
 export const MetalLevelSelect = {
   disableDentalBenefitPackage: disableDentalBenefitPackage,
   disableNewAddBenefitPackageButton: disableNewAddBenefitPackageButton,
   disableNewPlanYearButton: disableNewPlanYearButton,
   displayReferencePlanDetails: displayReferencePlanDetails,
   getPlanInfo: getPlanInfo,
-  showMoreDetails: showMoreDetails,
-  setInputSliderValue: setInputSliderValue,
-  setNumberInputValue: setNumberInputValue,
-  viewSummary: viewSummary,
+  loadEmployeeCosts: loadEmployeeCosts,
   newContributionAmounts: newContributionAmounts,
-  radioSelected: radioSelected
+  radioSelected: radioSelected,
+  setInputSliderValue: setInputSliderValue,
+  setPlanOptionKind: setPlanOptionKind,
+  setNumberInputValue: setNumberInputValue,
+  showMoreDetails: showMoreDetails,
+  viewSummary: viewSummary
 };
