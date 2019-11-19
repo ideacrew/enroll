@@ -178,7 +178,7 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
         end
         # This will be a HistoryTracker
         [pers_record.history_tracker_to_record(p_version.created_at), p_version.created_at]
-      elsif person_version.kind_of?(Date)
+      elsif p_version.kind_of?(Date) || p_version.kind_of?(ActiveSupport::TimeWithZone)
         [pers_record.history_tracker_to_record(p_version), p_version]
       else
         [p_version, p_version.updated_at]

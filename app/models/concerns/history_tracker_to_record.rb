@@ -1,7 +1,6 @@
 module HistoryTrackerToRecord
   extend ActiveSupport::Concern
 
-  # trackable_class should be capitalized as string like "Person"
   def history_tracker_to_record(ht_date)
     # Example: If is a HistoryTracker in person model
     # history_track.trackable will return consumer_role
@@ -21,23 +20,13 @@ module HistoryTrackerToRecord
         self.attributes = rt.undo_attr({})
       else
         chain_target = rt.association_chain.inject(self) do |acc, chain_location|
+          # Modifies top level document itself
           if self.id == chain_location["id"]
-            self
-          else
-            if false #Enumerable
-              # https://github.com/dchbx/enroll/blob/fdc849710eece394dba0ad6cb3fe380f6eac782b/app/models/concerns/history_tracker_to_record.rb
-              # Look there for inspiration
-              # Also mongo has a method for this
-              # code here
-            else
-              acc.send(chain_location["name"].to_sym)
-            end
+            self.attributes = rt.original
+          else # Modifies embedded document. Compensates for embeds_one and embeds_many
+            self.send(chain_location["name"].to_sym).attributes = rt.original
           end
         end
-        puts rt.undo_attr(nil).inspect
-        puts chain_target.inspect
-        chain_target.attributes = rt.undo_attr(nil)
-        puts chain_target.inspect
       end
     end
     self
