@@ -46,7 +46,7 @@ class Insured::GroupSelectionController < ApplicationController
     @adapter.if_change_plan_selected(params) do |new_effective_date|
       @new_effective_on = new_effective_date
     end
-    
+
     @waivable = @adapter.can_waive?(@hbx_enrollment, params)
   end
 
@@ -71,7 +71,7 @@ class Insured::GroupSelectionController < ApplicationController
     hbx_enrollment = build_hbx_enrollment(family_member_ids)
 
     if @market_kind == 'shop'
-      raise "Unable to find employer-sponsored benefits for enrollment year #{hbx_enrollment.effective_on.year}" unless hbx_enrollment.sponsored_benefit_package.shoppable?
+      raise "Open enrollment for your employer-sponsored benefits not yet started. Please return on #{hbx_enrollment.effective_on.strftime("%m/%d/%Y")} to enroll for coverage." unless hbx_enrollment.sponsored_benefit_package.shoppable?
     end
 
     if @adapter.is_waiving?(params)
