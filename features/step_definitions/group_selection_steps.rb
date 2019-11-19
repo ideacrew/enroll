@@ -116,6 +116,7 @@ And(/(.*) also has a dental enrollment with primary person covered/) do |role|
              "coverall"
            else
              "individual"
+           end
          end
   product = FactoryBot.create(:benefit_markets_products_dental_products_dental_product, :with_issuer_profile, dental_level: 'low', dental_plan_kind: 'ppo')
   enrollment = FactoryBot.create(:hbx_enrollment, product: product,
