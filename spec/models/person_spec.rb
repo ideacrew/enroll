@@ -36,7 +36,7 @@ describe Person, :dbclean => :after_each do
           is_applicant: true
         )
       end
-      context "embedded consumer role" do
+      context "embeds_one consumer role" do
         before do
           non_curam_ivl_person.consumer_role.update_attributes!(is_state_resident: false, citizen_status: 'undocumented_immigrant')
           non_curam_ivl_person.consumer_role.update_attributes!(is_state_resident: true, citizen_status: 'us_citizen')
@@ -49,6 +49,21 @@ describe Person, :dbclean => :after_each do
           target_history_track =  non_curam_ivl_person.history_tracks.where(modified: {"is_state_resident" => true}).last
           past_person = non_curam_ivl_person.history_tracker_to_record(target_history_track.created_at)
           expect(past_person.consumer_role.is_state_resident).to eq(true)
+        end
+      end
+
+      context "embeds_many address updated" do
+        before do
+          non_curam_ivl_person.update_attributes!(addresses_attributes: { "0" => { id: non_curam_ivl_person.addresses.first.id, address_1: '1600 PA Ave' } })
+          non_curam_ivl_person.update_attributes!(addresses_attributes: { "0" => { id: non_curam_ivl_person.addresses.first.id, address_1: '111 1 St NE' } })
+          non_curam_ivl_person.update_attributes!(addresses_attributes: { "0" => { id: non_curam_ivl_person.addresses.first.id, address_1: '1150 Connecticut Ave' } })
+        end
+
+        it "successfully returns the addresses" do
+          expect(non_curam_ivl_person.addresses.first.address_1).to eq('1150 Connecticut Ave')
+          target_history_track =  non_curam_ivl_person.history_tracks.where(modified: {"address_1"=>'1600 PA Ave'}).last
+          past_person = non_curam_ivl_person.history_tracker_to_record(target_history_track.created_at)
+          expect(past_person.addresses.first.address_1).to eq('1600 PA Ave')
         end
       end
 

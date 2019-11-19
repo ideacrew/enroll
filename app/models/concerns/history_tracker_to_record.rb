@@ -23,7 +23,9 @@ module HistoryTrackerToRecord
           # Modifies top level document itself
           if self.id == chain_location["id"]
             self.attributes = rt.original
-          else # Modifies embedded document. Compensates for embeds_one and embeds_many
+          elsif self.send(chain_location["name"]).is_a?(Enumerable) # embeds_many
+            self.send(chain_location["name"]).where(id: chain_location["id"].to_s).first.attributes = rt.original
+          else # embeds_one
             self.send(chain_location["name"].to_sym).attributes = rt.original
           end
         end
