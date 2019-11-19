@@ -71,7 +71,7 @@ class Insured::GroupSelectionController < ApplicationController
     hbx_enrollment = build_hbx_enrollment(family_member_ids)
 
     if @market_kind == 'shop'
-      raise "Open enrollment for your employer-sponsored benefits not yet started. Please return on #{hbx_enrollment.effective_on.strftime('%m/%d/%Y')} to enroll for coverage." unless hbx_enrollment.sponsored_benefit_package.shoppable?
+      raise "Open enrollment for your employer-sponsored benefits not yet started. Please return on #{hbx_enrollment.sponsored_benefit_package.open_enrollment_start_on.strftime('%m/%d/%Y')} to enroll for coverage." unless hbx_enrollment.sponsored_benefit_package.shoppable?
     end
 
     if @adapter.is_waiving?(params)
