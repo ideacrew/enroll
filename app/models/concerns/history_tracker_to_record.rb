@@ -20,15 +20,15 @@ module HistoryTrackerToRecord
         self.attributes = rt.undo_attr({})
       else
         chain_target = rt.association_chain.inject(self) do |acc, chain_location|
-          # Modifies top level document itself
           if self.id == chain_location["id"]
-            self.attributes = rt.original
-          elsif self.send(chain_location["name"]).is_a?(Enumerable) # embeds_many
-            self.send(chain_location["name"]).where(id: chain_location["id"].to_s).first.attributes = rt.original
+            self
+          elsif acc.send(chain_location["name"]).is_a?(Enumerable) # embeds_many
+            acc.send(chain_location["name"]).where(id: chain_location["id"].to_s).first
           else # embeds_one
-            self.send(chain_location["name"].to_sym).attributes = rt.original
+            acc.send(chain_location["name"].to_sym)
           end
         end
+        chain_target.attributes = rt.original
       end
     end
     self
