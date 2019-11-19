@@ -2,6 +2,7 @@
 
 module Services
   class IvlEnrollmentRenewalService
+    attr_accessor :hbx_enrollment
 
     def initialize(enrollment)
       raise "Hbx Enrollment Missing!!!" if enrollment.nil?

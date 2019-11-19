@@ -59,17 +59,20 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   end
 
   def can_renew_assisted_product?(renewal_enrollment)
-    return false unless @assisted
-
-    tax_household = enrollment.family.active_household.latest_active_thh_with_year(renewal_coverage_start.year)
-    members = tax_household.tax_household_members
-    enrollment_members_in_thh = members.where(:applicant_id.in => renewal_enrollment.hbx_enrollment_members.map(&:applicant_id))
-    enrollment_members_in_thh.all? {|m| m.is_ia_eligible == true}
+    if @assisted
+      tax_household = enrollment.family.active_household.latest_active_thh_with_year(renewal_coverage_start.year)
+      members = tax_household.tax_household_members
+      enrollment_members_in_thh = members.where(:applicant_id.in => renewal_enrollment.hbx_enrollment_members.map(&:applicant_id))
+      enrollment_members_in_thh.all? {|m| m.is_ia_eligible == true}
+    else
+      false
+    end
   end
 
   def assisted_enrollment(renewal_enrollment)
     renewal_service = Services::IvlEnrollmentRenewalService.new(renewal_enrollment)
     renewal_service.assign(@aptc_values)
+    renewal_service.hbx_enrollment
   end
 
   def is_dependent_dropped?

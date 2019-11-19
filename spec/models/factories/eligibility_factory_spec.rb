@@ -22,7 +22,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
     describe 'cases for multi tax household scenarios' do
       include_context 'setup two tax households with one ia member each'
 
-      let!(:enrollment1) { FactoryBot.create(:hbx_enrollment, :individual_shopping, family: family, household: family.active_household) }
+      let!(:enrollment1) { FactoryBot.create(:hbx_enrollment, :individual_shopping, household: family.active_household, family: family) }
       let!(:enrollment_member1) { FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: enrollment1, applicant_id: family_member.id) }
 
       before :each do
@@ -111,7 +111,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
 
         context 'with an existing enrollment' do
           let!(:enrollment_member2) { FactoryBot.create(:hbx_enrollment_member, is_subscriber: false, hbx_enrollment: enrollment1, applicant_id: family_member2.id) }
-          let!(:enrollment2) { FactoryBot.create(:hbx_enrollment, :individual_assisted, applied_aptc_amount: 50.00, family: family, household: family.active_household) }
+          let!(:enrollment2) { FactoryBot.create(:hbx_enrollment, :individual_assisted, applied_aptc_amount: 50.00, household: family.active_household) }
           let!(:enrollment_member21) { FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: enrollment2, applicant_id: family_member.id, applied_aptc_amount: 50.00) }
 
           before :each do
@@ -178,7 +178,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
     describe 'cases for single tax household scenarios' do
       include_context 'setup one tax household with two ia members'
 
-      let!(:enrollment1) { FactoryBot.create(:hbx_enrollment, :individual_shopping, family: family, household: family.active_household) }
+      let!(:enrollment1) { FactoryBot.create(:hbx_enrollment, :individual_shopping, household: family.active_household, family: family) }
       let!(:enrollment_member1) { FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: enrollment1, applicant_id: family_member.id) }
 
       before :each do
@@ -306,7 +306,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
 
         context 'with an existing enrollment' do
           let!(:enrollment_member2) { FactoryBot.create(:hbx_enrollment_member, is_subscriber: false, hbx_enrollment: enrollment1, applicant_id: family_member2.id) }
-          let!(:enrollment2) { FactoryBot.create(:hbx_enrollment, :individual_assisted, applied_aptc_amount: 50.00, family: family, household: family.active_household) }
+          let!(:enrollment2) { FactoryBot.create(:hbx_enrollment, :individual_assisted, applied_aptc_amount: 50.00, household: family.active_household, family: family) }
           let!(:enrollment_member21) { FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: enrollment2, applicant_id: family_member.id, applied_aptc_amount: 50.00) }
 
           context 'with valid tax household for all the shopping members' do
@@ -378,30 +378,16 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
             before do
               @eligibility_factory = described_class.new(enrollment1.id, 150.00, [@product_id])
               @applicable_aptc = @eligibility_factory.fetch_applicable_aptcs
-              @aptc_per_member = @eligibility_factory.fetch_aptc_per_member
-              @ehb_premium = @eligibility_factory.send(:ehb_premium, enrollment1.product.id)
             end
 
-            context '.fetch_applicable_aptcs' do
-              it 'should return a Hash' do
-                expect(@applicable_aptc.class).to eq Hash
-              end
-
-              it 'should return ehb_premium' do
-                expect(@applicable_aptc.keys.first).to eq @product_id
-                expect(@applicable_aptc.values.first).to eq @ehb_premium
-              end
+            it 'should return a Hash' do
+              expect(@applicable_aptc.class).to eq Hash
             end
 
-            context '.fetch_aptc_per_member' do
-              it 'should return a Hash' do
-                expect(@aptc_per_member.class).to eq Hash
-              end
-
-              it 'should should return ehb premium' do
-                fm1_id = enrollment1.hbx_enrollment_members.first.applicant_id.to_s
-                expect(@aptc_per_member[enrollment1.product_id.to_s][fm1_id]).to eq @ehb_premium
-              end
+            it 'should return ehb_premium' do
+              premium = enrollment1.ivl_decorated_hbx_enrollment.premium_for(enrollment_member1).round
+              expect(@applicable_aptc.keys.first).to eq @product_id
+              expect(@applicable_aptc.values.first.round).to eq premium
             end
           end
 
@@ -409,28 +395,15 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
             before do
               @eligibility_factory = described_class.new(enrollment1.id, 35.00, [@product_id])
               @applicable_aptc = @eligibility_factory.fetch_applicable_aptcs
-              @aptc_per_member = @eligibility_factory.fetch_aptc_per_member
             end
 
-            context '.fetch_applicable_aptcs' do
-              it 'should return a Hash' do
-                expect(@applicable_aptc.class).to eq Hash
-              end
-
-              it 'should return selected_aptc' do
-                expect(@applicable_aptc[@product_id]).to eq 35.00
-              end
+            it 'should return a Hash' do
+              expect(@applicable_aptc.class).to eq Hash
             end
 
-            context '.fetch_aptc_per_member' do
-              it 'should return a Hash' do
-                expect(@aptc_per_member.class).to eq Hash
-              end
-
-              it 'should return selected_aptc' do
-                fm1_id = enrollment1.hbx_enrollment_members.first.applicant_id.to_s
-                expect(@aptc_per_member[enrollment1.product_id.to_s][fm1_id]).to eq 35.00
-              end
+            it 'should return selected_aptc' do
+              product_aptc = {@product_id => 35.00}
+              expect(@applicable_aptc).to eq product_aptc
             end
           end
 
@@ -439,28 +412,15 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
               family.active_household.tax_households.first.destroy
               @eligibility_factory = described_class.new(enrollment1.id, 100.00, [@product_id])
               @applicable_aptc = @eligibility_factory.fetch_applicable_aptcs
-              @aptc_per_member = @eligibility_factory.fetch_aptc_per_member
             end
 
-            context '.fetch_applicable_aptcs' do
-              it 'should return a Hash' do
-                expect(@applicable_aptc.class).to eq Hash
-              end
-
-              it 'should return available_aptc' do
-                expect(@applicable_aptc[@product_id]).to eq 0.00
-              end
+            it 'should return a Hash' do
+              expect(@applicable_aptc.class).to eq Hash
             end
 
-            context '.fetch_aptc_per_member' do
-              it 'should return a Hash' do
-                expect(@applicable_aptc.class).to eq Hash
-              end
-
-              it 'should return available_aptc' do
-                fm1_id = enrollment1.hbx_enrollment_members.first.applicant_id.to_s
-                expect(@aptc_per_member[enrollment1.product_id.to_s][fm1_id]).to eq 0.00
-              end
+            it 'should return selected_aptc' do
+              product_aptc = {@product_id => 0.00}
+              expect(@applicable_aptc).to eq product_aptc
             end
           end
         end
