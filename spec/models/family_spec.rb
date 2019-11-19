@@ -445,9 +445,29 @@ describe Family, dbclean: :around_each do
     end
   end
 
-  context "best_verification_due_date" do 
+  context "latest_ivl_sep" do
     let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
-    
+    before do
+      @qlek = FactoryBot.create(:qualifying_life_event_kind, market_kind: 'individual', is_active: true)
+      date1 = TimeKeeper.date_of_record - 20.days
+      @current_sep = FactoryBot.build(:special_enrollment_period, family: family, qle_on: date1, effective_on: date1, qualifying_life_event_kind: @qlek, effective_on_kind: 'first_of_month', submitted_at: date1)
+      date2 = TimeKeeper.date_of_record - 10.days
+      @another_current_sep = FactoryBot.build(:special_enrollment_period, family: family, qle_on: date2, effective_on: date2, qualifying_life_event_kind: @qlek, effective_on_kind: 'first_of_month', submitted_at: date2)
+    end
+
+    it "should return latest active sep" do
+      date3 = TimeKeeper.date_of_record - 200.days
+      sep = FactoryBot.build(:special_enrollment_period, family: family, qle_on: date3, effective_on: date3, qualifying_life_event_kind: @qlek, effective_on_kind: 'first_of_month')
+      expect(@current_sep.is_active?).to eq true
+      expect(@another_current_sep.is_active?).to eq true
+      expect(sep.is_active?).to eq false
+      expect(family.latest_ivl_sep).to eq @another_current_sep
+    end
+  end
+
+  context "best_verification_due_date" do
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
+
     it "should earliest duedate when family had two or more due dates" do
       family_due_dates = [TimeKeeper.date_of_record+40 , TimeKeeper.date_of_record+ 80]
       allow(family).to receive(:contingent_enrolled_family_members_due_dates).and_return(family_due_dates)

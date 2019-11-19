@@ -73,8 +73,7 @@ Feature: Insured Plan Shopping on Individual market
     And I select a plan on plan shopping page
     And I click on purchase button on confirmation page
     And I click on continue button to go to the individual home page
-    And I should see the individual home page
-    Then consumer should see the enrollment with make changes button
+    Then I should see the individual home page
     When consumer clicked on make changes button
     And consumer clicked on shop for new plan
     Then I should not see any plan which premium is 0

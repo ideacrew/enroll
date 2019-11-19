@@ -188,6 +188,10 @@ class Insured::GroupSelectionController < ApplicationController
       @change_plan = 'change_by_qle'
     end
 
+    @adapter.if_family_has_active_sep do
+      @change_plan = 'change_by_qle'
+    end
+
     case @market_kind
     when 'shop', 'fehb'
       @adapter.if_employee_role_unset_but_can_be_derived(@employee_role) do |e_role|

@@ -145,7 +145,7 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
                                       family_deductible: enrollment.product.family_deductible.split("|").last.squish,
                                       deductible: enrollment.product.deductible
                                     })
-      notice.enrollments << PdfTemplates::Enrollment.new({
+      PdfTemplates::Enrollment.new({
         premium: enrollment.total_premium.round(2),
         aptc_amount: enrollment.applied_aptc_amount.round(2),
         responsible_amount: number_to_currency((enrollment.total_premium - enrollment.applied_aptc_amount.to_f), precision: 2),
