@@ -32,8 +32,13 @@ h1.heading-text Benefit Package - Set Up
 
   = hidden_field_tag 'previous_benefit_package_titles', "#{@benefit_package_form.previous_bp_titles.map { |title| title.to_s }}"
 
-
 = javascript_pack_tag 'plan_year'
 
-- if is_new_package || is_new_package.nil?
+- if is_new_package || is_new_package.nil?  
+  javascript:
+    window.onload = new function(){
+      MetalLevelSelect.disableNewAddBenefitPackageButton()
+      MetalLevelSelect.disableDentalBenefitPackage()
+    }
+
   = hidden_field_tag 'disable_benefit_package_buttons_boolean', 'true'
