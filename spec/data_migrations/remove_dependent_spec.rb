@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "remove_dependent")
 
@@ -9,7 +11,7 @@ describe RemoveDependent, dbclean: :after_each do
   subject { RemoveDependent.new(given_task_name, double(:current_scope => nil)) }
 
   around do |example|
-    ClimateControl.modify family_member_id: dependent.id.to_s do
+    ClimateControl.modify family_member_ids: dependent.id.to_s do
       example.run
     end
   end
@@ -41,7 +43,7 @@ describe RemoveDependent, dbclean: :after_each do
       end
 
       around do |example|
-        ClimateControl.modify family_member_id: duplicate_family_member.id.to_s do
+        ClimateControl.modify family_member_ids: duplicate_family_member.id.to_s do
           example.run
         end
       end
@@ -50,6 +52,37 @@ describe RemoveDependent, dbclean: :after_each do
         subject.migrate
         family.reload
         expect { family.family_members.find(duplicate_family_member.id.to_s) }.to raise_error(Mongoid::Errors::DocumentNotFound)
+      end
+    end
+
+    context '2 family members exists with coverage_household_members for same person' do
+      let!(:duplicate_family_member) do
+        family.family_members << FamilyMember.new(person_id: dependent.person.id)
+        dup_fm = family.family_members.last
+        dup_fm.save(validate: false)
+        family.active_household.add_household_coverage_member(dup_fm)
+        dup_fm
+      end
+
+      around do |example|
+        ClimateControl.modify family_member_ids: duplicate_family_member.id.to_s do
+          example.run
+        end
+      end
+
+      before :each do
+        subject.migrate
+        family.reload
+      end
+
+      it 'should delete FM record' do
+        expect { family.family_members.find(duplicate_family_member.id.to_s) }.to raise_error(Mongoid::Errors::DocumentNotFound)
+      end
+
+      it 'should delete CHM record' do
+        chmms = family.active_household.coverage_households.flat_map(&:coverage_household_members)
+        expect(family.family_members.count).to eq(chmms.count)
+        expect(chmms.map(&:family_member_id).map(&:to_s)).not_to include(duplicate_family_member.id.to_s)
       end
     end
   end
@@ -61,12 +94,12 @@ describe RemoveDependent, dbclean: :after_each do
       expect(size).to eq 3
       subject.migrate
       family.reload
-      expect(family.households.first.coverage_households.where(:is_immediate_family => true).first.coverage_household_members.size).to eq (size)
+      expect(family.households.first.coverage_households.where(:is_immediate_family => true).first.coverage_household_members.size).to eq(size)
     end
 
     context 'Family Member does not exist' do
       around do |example|
-        ClimateControl.modify family_member_id: family.id.to_s do
+        ClimateControl.modify family_member_ids: family.id.to_s do
           example.run
         end
       end
@@ -110,13 +143,13 @@ describe RemoveDependent, dbclean: :after_each do
     end
 
     context 'Mapping Hbx Enrollment Member exist' do
-      let!(:enrollment)  {
+      let!(:enrollment) do
         enr = FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household)
-        enr.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: dependent.id.to_s, eligibility_date: Date.today, coverage_start_on: Date.today)
+        enr.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: dependent.id.to_s, eligibility_date: Time.zone.today, coverage_start_on: Time.zone.today)
         enr.hbx_enrollment_members.first.save!
         enr.save!
         enr
-      }
+      end
 
       before do
         subject.migrate
