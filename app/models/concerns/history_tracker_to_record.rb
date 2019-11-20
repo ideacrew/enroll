@@ -7,11 +7,8 @@ module HistoryTrackerToRecord
     # if the consumer_role was modified. trackable_root
     # will return person for both
     self.reload
-    # Example structure of modified: {"is_state_resident"=>false}
     all_tracks = self.history_tracks.unscoped.to_a.sort_by(&:created_at)
     tracks_to_reverse = all_tracks.reject do |ht|
-      # Reject everything that comes before history tracker including history tracker record itself
-      # And then apply them in reverse
       (ht.created_at <= ht_date) || ((ht.created_at.to_f - self.created_at.to_f).abs < 1.1)
     end.reverse
     tracks_to_reverse.each do |rt|
@@ -20,7 +17,6 @@ module HistoryTrackerToRecord
       else
         case rt.action
         when "create"
-          #binding.pry
           association_chain_without_last = rt.association_chain[0..-2]
           last_in_chain = rt.association_chain.last
           chain_target = association_chain_without_last.inject(self) do |acc, chain_location|
@@ -58,7 +54,6 @@ module HistoryTrackerToRecord
             chain_target.send(("build_" + last_in_chain["name"]).to_sym, rt.original)
           end
         else
-          #binding.pry
           chain_target = rt.association_chain.inject(self) do |acc, chain_location|
             if self.id == chain_location["id"]
               self

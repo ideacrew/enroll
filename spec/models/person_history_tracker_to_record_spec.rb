@@ -51,7 +51,6 @@ describe "Person with history tracks and a list of addresses", :dbclean => :afte
     end
 
     it "reverts to the original state" do
-      puts person.history_tracks.map(&:created_at).map(&:to_f).inspect
       reverted_person = person.history_tracker_to_record(person.created_at)
       expect(reverted_person.addresses.map(&:kind)).not_to include("mailing")
       expect(reverted_person.addresses.map(&:kind)).to include("work")
@@ -150,7 +149,6 @@ describe "Person with history tracks and a consumer role", :dbclean => :after_ea
 
         it "undoes changes to a person when a HistoryTrack instance passed as arguement" do
           history_tracks = non_curam_ivl_person.history_tracks.to_a.sort_by(&:created_at).reverse
-          puts history_tracks.map { |t| "#{t.created_at} - #{t.version} - #{t['original']}"}.join("\n")
           expect(non_curam_ivl_person.history_tracker_to_record(history_tracks[1].created_at).gender).to eq('male')
           expect(non_curam_ivl_person.history_tracker_to_record(history_tracks.third.created_at).dob).to_not eq(Date.today - 22.years)
           expect(non_curam_ivl_person.history_tracker_to_record(history_tracks.second.created_at).gender).to eq('male')
