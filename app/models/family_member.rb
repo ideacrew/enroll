@@ -71,7 +71,9 @@ class FamilyMember
     person.reload
     return nil if (v_date < created_at)
     return person if (person.updated_at < v_date)
-    oldest_history_track = person.history_tracks.unscoped.to_a.map(&:created_at).sort.first
+    oldest_history_track = person.history_tracks.unscoped.to_a.reject do |ht|
+      ((ht.created_at.to_f - person.created_at.to_f).abs < 1.1)
+    end.map(&:created_at).sort.first
     if oldest_history_track && person.versions.empty? && (oldest_history_track.created_at > v_date)
       return person.history_tracker_to_record(v_date)
     end

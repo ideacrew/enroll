@@ -166,7 +166,10 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
     "Eligible"
   ]
   ivl_people.no_timeout.each do |pers_record|
-    person_versions = [pers_record] + pers_record.versions + pers_record.history_tracks
+    clean_history_tracks = pers_record.history_tracks.reject do |ht|
+      ((ht.created_at.to_s.to_f - pers_record.created_at.to_s.to_f).abs < 1.1)
+    end
+    person_versions = [pers_record] + pers_record.versions + clean_history_tracks
     if pers_record.versions.empty? && pers_record.history_tracks.any?
       person_versions = person_versions + [pers_record.created_at]
     end
