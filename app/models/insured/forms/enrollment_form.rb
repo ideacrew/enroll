@@ -11,6 +11,11 @@ module Insured
       attribute :hbx_id,                      String
       attribute :id,                          String
       attribute :should_term_or_cancel_ivl,   String
+
+
+      def special_enrollment_period
+        HbxEnrollment.where(id: id).first&.special_enrollment_period
+      end
     end
   end
 end
