@@ -27,10 +27,10 @@ describe "Eligilibity Audit" do
       non_curam_ivl_person
       consumer_role
       allow(non_curam_ivl_person).to receive(:consumer_role).and_return(consumer_role)
-      allow_any_instance_of(Person).to receive(:updated_at).and_return(audit_end_date - 1.week)
+      allow_any_instance_of(Person).to receive(:updated_at).and_return((audit_end_date - 1.week).to_datetime)
       # Assure existence of history tracks
       non_curam_ivl_person.update_attributes!(addresses_attributes: { "0" => { id: non_curam_ivl_person.addresses.first.id, address_1: '111 1 St NE' } })
-      allow_any_instance_of(HistoryTracker).to receive(:created_at).and_return(audit_start_date + 1.week)
+      allow_any_instance_of(HistoryTracker).to receive(:created_at).and_return((audit_start_date + 1.week).to_datetime)
       expect(non_curam_ivl_person.history_tracks.length).to be > 1
       eligibility_audit = File.join(Rails.root, "script/eligibility_audit.rb")
       load eligibility_audit
