@@ -100,7 +100,10 @@ describe "Person with history tracks and a consumer role", :dbclean => :after_ea
     describe "editing records" do
       context "embeds_one consumer role" do
         before do
+          non_curam_ivl_person
+          sleep(1.5)
           non_curam_ivl_person.consumer_role.update_attributes!(is_state_resident: false, citizen_status: 'undocumented_immigrant')
+          sleep(1.5)
           non_curam_ivl_person.consumer_role.update_attributes!(is_state_resident: true, citizen_status: 'us_citizen')
         end
 
@@ -116,8 +119,12 @@ describe "Person with history tracks and a consumer role", :dbclean => :after_ea
 
       context "embeds_many address updated" do
         before do
+          non_curam_ivl_person
+          sleep(1.5)
           non_curam_ivl_person.update_attributes!(addresses_attributes: { "0" => { id: non_curam_ivl_person.addresses.first.id, address_1: '1600 PA Ave' } })
+          sleep(1.5)
           non_curam_ivl_person.update_attributes!(addresses_attributes: { "0" => { id: non_curam_ivl_person.addresses.first.id, address_1: '111 1 St NE' } })
+          sleep(1.5)
           non_curam_ivl_person.update_attributes!(addresses_attributes: { "0" => { id: non_curam_ivl_person.addresses.first.id, address_1: '1150 Connecticut Ave' } })
         end
 
@@ -131,12 +138,13 @@ describe "Person with history tracks and a consumer role", :dbclean => :after_ea
 
       context "just person record itself" do
         before do
+          non_curam_ivl_person
           non_curam_ivl_person.update_attributes!(gender: 'female')
-          sleep 1
+          sleep 1.5
           non_curam_ivl_person.update_attributes!(gender: 'male')
-          sleep 1
+          sleep 1.5
           non_curam_ivl_person.update_attributes!(dob: Date.today - 22.years)
-          sleep 1
+          sleep 1.5
           non_curam_ivl_person.update_attributes!(gender: 'female')
         end
 
