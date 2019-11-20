@@ -1,4 +1,3 @@
-@edit_aptc
 Feature: Edit APTC button
 
 Background:
