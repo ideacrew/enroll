@@ -29,9 +29,8 @@ function preventSubmissionOnEnter() {
   var newBenefitPackageSubmit = document.getElementById('new_benefit_package') || document.getElementById('new_sponsored_benefits');
   newBenefitPackageSubmit.onkeypress = function(e) {
     var key = e.charCode || e.keyCode || 0;
-    if (key == 13) {
-        e.preventDefault();
-      }
+    if (key == 13)
+      e.preventDefault();
   }
 }
 
@@ -73,7 +72,7 @@ function setCircle(element) {
     if (element.classList.contains('active')) {
       element.querySelector('i').classList.add('fa-dot-circle');
     }
-  },200)
+  },200);
 
   // Gets product option info
   window.productOptionKind = element.querySelector('a').dataset.name;
@@ -131,7 +130,7 @@ function showMoreDetails() {
           var tbody = document.getElementById('modalSummaryData');
           tr.innerHTML = '<td style="background-color:#f5f5f5">' + s.visit_type + '</td><td>' + s.copay_in_network_tier_1 + '</td><td>' + s.co_insurance_in_network_tier_1 + '</td>';
           tbody.insertBefore(tr, tbody.children[-1] || null);
-        })
+        });
       })
       .then(document.getElementById('btnMoreDetails').innerHTML = "More Details");
       window.showLess = false;
@@ -144,7 +143,7 @@ function showMoreDetails() {
           var tbody = document.getElementById('modalSummaryData');
           tr.innerHTML = '<td style="background-color:#f5f5f5">' + s.visit_type + '</td><td>' + s.copay_in_network_tier_1 + '</td><td>' + s.co_insurance_in_network_tier_1 + '</td>';
           tbody.insertBefore(tr, tbody.children[-1] || null);
-        })
+        });
       })
       .then(document.getElementById('btnMoreDetails').innerHTML = "Fewer Details");
       window.showLess = true;
@@ -201,7 +200,7 @@ function selectDefaultReferencePlan() {
     myplans.click();
     var form = document.getElementById('new_benefit_package') || document.getElementById('new_sponsored_benefits');
     form.click();
-  }
+  };
   var contributions = document.querySelector('#yourSponsorContributions');
   contributions.onmouseover = function() {
     contributions.click();
@@ -311,37 +310,37 @@ function newContributionAmounts() {
     localStorage.setItem("contributionLevels",tempLevels);
   }
 
-  for (var i = 0; i < contributionHandlers.length; i++) {
-    var element = contributionHandlers[i];
+  for (i = 0; i < contributionHandlers.length; i++) {
+    element = contributionHandlers[i];
     switch (element.dataset.displayname) {
       case 'Employee':
         if(!(element.checked)) {
-          window.eeContribution = 100
+          window.eeContribution = 100;
         }
       break;
       case 'Spouse':
         if(!(element.checked)) {
-          window.spouse = 100
+          window.spouse = 100;
         }
       break;
       case 'Domestic Partner':
         if(!(element.checked)) {
-          window.domesticPartner = 100
+          window.domesticPartner = 100;
         }
       break;
       case 'Child Under 26':
         if(!(element.checked)) {
-          window.childUnder26 = 100
+          window.childUnder26 = 100;
         }
       break;
       case 'Employee Only':
         if(!(element.checked)) {
-          window.employeeOnly = 100
+          window.employeeOnly = 100;
         }
       break;
       case 'Family':
         if(!(element.checked)) {
-          window.familyOnly = 100
+          window.familyOnly = 100;
         }
       break;
     }
@@ -395,8 +394,8 @@ function setInputSliderValue(element) {
 }
 
 function buildSponsorContributions(contributions) {
-  var element = document.getElementById('benefitFields');;
-  Array.from(element.children).forEach(function(child) { child.remove() });
+  var element = document.getElementById('benefitFields');
+  Array.from(element.children).forEach(function(child) { child.remove(); });
 
   var index = 0;
   for (var i = 0; i < contributions.length; i++) {
