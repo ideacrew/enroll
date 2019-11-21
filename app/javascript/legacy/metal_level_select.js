@@ -29,9 +29,8 @@ function preventSubmissionOnEnter() {
   var newBenefitPackageSubmit = document.getElementById('new_benefit_package') || document.getElementById('new_sponsored_benefits');
   newBenefitPackageSubmit.onkeypress = function(e) {
     var key = e.charCode || e.keyCode || 0;
-    if (key == 13) {
-        e.preventDefault();
-      }
+    if (key == 13)
+      e.preventDefault();
   }
 }
 
@@ -73,7 +72,7 @@ function setCircle(element) {
     if (element.classList.contains('active')) {
       element.querySelector('i').classList.add('fa-dot-circle');
     }
-  },200)
+  },200);
 
   // Gets product option info
   window.productOptionKind = element.querySelector('a').dataset.name;
@@ -131,7 +130,7 @@ function showMoreDetails() {
           var tbody = document.getElementById('modalSummaryData');
           tr.innerHTML = '<td style="background-color:#f5f5f5">' + s.visit_type + '</td><td>' + s.copay_in_network_tier_1 + '</td><td>' + s.co_insurance_in_network_tier_1 + '</td>';
           tbody.insertBefore(tr, tbody.children[-1] || null);
-        })
+        });
       })
       .then(document.getElementById('btnMoreDetails').innerHTML = "More Details");
       window.showLess = false;
@@ -144,7 +143,7 @@ function showMoreDetails() {
           var tbody = document.getElementById('modalSummaryData');
           tr.innerHTML = '<td style="background-color:#f5f5f5">' + s.visit_type + '</td><td>' + s.copay_in_network_tier_1 + '</td><td>' + s.co_insurance_in_network_tier_1 + '</td>';
           tbody.insertBefore(tr, tbody.children[-1] || null);
-        })
+        });
       })
       .then(document.getElementById('btnMoreDetails').innerHTML = "Fewer Details");
       window.showLess = true;
@@ -175,8 +174,13 @@ function displayReferencePlanDetails(element, options) {
   document.getElementById('rpNetwork').innerHTML = network;
   document.getElementById('planOfferingsTitle').innerHTML = '';
   document.getElementById('planOfferingsTitle').innerHTML = 'Plan Offerings - ' + planTitle + '(' + window.productsTotal + ')';
-  calculateEmployerContributions(window.productOptionKind, referencePlanID, sponsoredBenefitId)
-  calculateEmployeeCosts(window.productOptionKind, referencePlanID, sponsoredBenefitId)
+  if (document.querySelector('input#sponsored_benefits_kind')) {
+    calculateEmployerContributions(window.productOptionKind, referencePlanID, sponsoredBenefitId, "sponsored_benefits")
+    calculateEmployeeCosts(window.productOptionKind, referencePlanID, sponsoredBenefitId, "sponsored_benefits")
+  } else {
+    calculateEmployerContributions(window.productOptionKind, referencePlanID, sponsoredBenefitId);
+    calculateEmployeeCosts(window.productOptionKind, referencePlanID, sponsoredBenefitId);
+  }
 }
 
 function radioSelected(element) {
@@ -196,7 +200,7 @@ function selectDefaultReferencePlan() {
     myplans.click();
     var form = document.getElementById('new_benefit_package') || document.getElementById('new_sponsored_benefits');
     form.click();
-  }
+  };
   var contributions = document.querySelector('#yourSponsorContributions');
   contributions.onmouseover = function() {
     contributions.click();
@@ -210,7 +214,12 @@ function setTempCL() {
   window.selectedTitle = localStorage.getItem("title");
 
   if (myLevels) {
-    var contributions = JSON.parse(myLevels);
+    var contributions = {};
+    if (myLevels)
+      contributions = JSON.parse(myLevels);
+    else
+      contributions = window.tempContributionValues;
+
     window.setTimeout(function() {
       var employee = document.querySelectorAll("[data-displayname='Employee']");
       var spouse = document.querySelectorAll("[data-displayname='Spouse']");
@@ -301,58 +310,77 @@ function newContributionAmounts() {
     localStorage.setItem("contributionLevels",tempLevels);
   }
 
-  for (var i = 0; i < contributionHandlers.length; i++) {
-    var element = contributionHandlers[i];
+  for (i = 0; i < contributionHandlers.length; i++) {
+    element = contributionHandlers[i];
     switch (element.dataset.displayname) {
       case 'Employee':
         if(!(element.checked)) {
-          window.eeContribution = 100
+          window.eeContribution = 100;
         }
       break;
       case 'Spouse':
         if(!(element.checked)) {
-          window.spouse = 100
+          window.spouse = 100;
         }
       break;
       case 'Domestic Partner':
         if(!(element.checked)) {
-          window.domesticPartner = 100
+          window.domesticPartner = 100;
         }
       break;
       case 'Child Under 26':
         if(!(element.checked)) {
-          window.childUnder26 = 100
+          window.childUnder26 = 100;
         }
       break;
       case 'Employee Only':
         if(!(element.checked)) {
-          window.employeeOnly = 100
+          window.employeeOnly = 100;
         }
       break;
       case 'Family':
         if(!(element.checked)) {
-          window.familyOnly = 100
+          window.familyOnly = 100;
         }
       break;
     }
   }
-  if (!(document.querySelectorAll(".reference-plans input[type='radio']:checked").length)) {
-    disableNewPlanYearButton();
-  }
-  else {
-    if (applicationStartOn === "01-01") {
-      enableNewPlanYearButton();
+  if (document.querySelector('input#sponsored_benefits_kind')) {
+    if($(".benefit-package-dental").length || $("#edit_dental_form").length) {
+      var sbErCL = erDentalCL
     } else {
-      if (window.eeContribution < window.erCL || window.employeeOnly < window.erCL) {
-        disableNewPlanYearButton();
-      } else if (window.familyOnly < window.familyCL || window.spouse < window.familyCL || window.domesticPartner < window.familyCL || window.childUnder26 < window.familyCL) {
-        disableNewPlanYearButton();
-      }  else {
+      var sbErCL = erCL
+    }
+    if (window.eeContribution < sbErCL) {
+      disableNewPlanYearButton()
+    } else if (window.spouse < familyCL || window.domesticPartner < familyCL || window.childUnder26 < familyCL) {
+      disableNewPlanYearButton()
+    } else if (!(document.querySelectorAll(".reference-plans input[type='radio']:checked").length)) {
+      disableNewPlanYearButton()
+    } else {
+      enableNewPlanYearButton()
+    }
+    // }
+    displayReferencePlanDetails(document.querySelector("input[name='sponsored_benefits[reference_plan_id]']:checked"));
+  } else {
+    if (!(document.querySelectorAll(".reference-plans input[type='radio']:checked").length)) {
+      disableNewPlanYearButton();
+    }
+    else {
+      if (applicationStartOn === "01-01") {
         enableNewPlanYearButton();
+      } else {
+        if (window.eeContribution < window.erCL || window.employeeOnly < window.erCL) {
+          disableNewPlanYearButton();
+        } else if (window.familyOnly < window.familyCL || window.spouse < window.familyCL || window.domesticPartner < window.familyCL || window.childUnder26 < window.familyCL) {
+          disableNewPlanYearButton();
+        }  else {
+          enableNewPlanYearButton();
+        }
       }
     }
+    displayReferencePlanDetails(document.querySelector("input[name='benefit_package[sponsored_benefits_attributes][0][reference_plan_id]']:checked"));
   }
-  displayReferencePlanDetails(document.querySelector("input[name='benefit_package[sponsored_benefits_attributes][0][reference_plan_id]']:checked"));
 }
 
 function setNumberInputValue(element) {
@@ -366,14 +394,18 @@ function setInputSliderValue(element) {
 }
 
 function buildSponsorContributions(contributions) {
-  var element = document.getElementById('benefitFields');;
-  Array.from(element.children).forEach(function(child) { child.remove() });
+  var element = document.getElementById('benefitFields');
+  Array.from(element.children).forEach(function(child) { child.remove(); });
 
   var index = 0;
   for (var i = 0; i < contributions.length; i++) {
     var contribution = contributions[i];
     index += 1;
-    var attrPrefix = 'benefit_package[sponsored_benefits_attributes][0][sponsor_contribution_attributes][contribution_levels_attributes][' + index + ']';
+    var attrPrefix ;
+    if (document.querySelector('input#sponsored_benefits_kind'))
+      attrPrefix = 'sponsored_benefits[sponsor_contribution_attributes][contribution_levels_attributes][' + index + ']';
+    else
+      attrPrefix = 'benefit_package[sponsored_benefits_attributes][0][sponsor_contribution_attributes][contribution_levels_attributes][' + index + ']';
     var div = document.createElement('div');
     div.setAttribute('id', 'yourAvailableContributions');
     div.innerHTML =
@@ -424,6 +456,12 @@ function populateReferencePlans(plans) {
     }
   }
 
+  var referencePlanName;
+  if (document.querySelector('input#sponsored_benefits_kind'))
+    referencePlanName = "sponsored_benefits[reference_plan_id]";
+  else
+    referencePlanName = "benefit_package[sponsored_benefits_attributes][0][reference_plan_id]"
+
   // Build reference plans to be displayed in UI
   for (var i = 0; i < window.filteredProducts.length; i++) {
     var plan = window.filteredProducts[i];
@@ -444,7 +482,7 @@ function populateReferencePlans(plans) {
             '<span class="plan-label">Level:</span> <span class="rp-plan-info">' + plan.metal_level_kind + '</span><br>' +
             '<span class="plan-label">Network:</span> <span class="rp-plan-info">' + plan.network + '</span><br>' +
             '<span class="plan-label mt-1" onclick="MetalLevelSelect.viewSummary(this)" data-plan-title="' + plan.title + '" data-plan-id="' + plan.id + '">View Summary</span><br>' +
-            '<input type="radio" name="benefit_package[sponsored_benefits_attributes][0][reference_plan_id]" id="' + plan.id + '" onclick="MetalLevelSelect.newContributionAmounts()" value="' + plan.id + '" data-plan-title="' + plan.title + '" data-plan-carrier="' + plan.carrier_name + '" data-plan-id="' + plan.id + '" data-plan-metal-level="' + plan.metal_level_kind + '" data-plan-type="' + plan.product_type + '" data-network="' + plan.network + '">' +
+            '<input type="radio" name="' + referencePlanName + '" id="' + plan.id + '" onclick="MetalLevelSelect.newContributionAmounts()" value="' + plan.id + '" data-plan-title="' + plan.title + '" data-plan-carrier="' + plan.carrier_name + '" data-plan-id="' + plan.id + '" data-plan-metal-level="' + plan.metal_level_kind + '" data-plan-type="' + plan.product_type + '" data-network="' + plan.network + '">' +
             '<span class="checkmark"></span>' +
           '</label>' +
         '</div>' +
@@ -463,20 +501,50 @@ function populateReferencePlans(plans) {
 }
 
 function getPlanInfo(element) {
-  if (element.tagName != 'INPUT') {
-    element = element.querySelector('input[type=radio][data-name]');
+  if (document.querySelector('input#sponsored_benefits_kind')) {
+    if (productOptionKind == 'multi_product') {
+      document.querySelector('.select_choice_reference_plan').classList.add("hidden");
+      var choices = new Array;
+      document.querySelectorAll('.multiProductOptions input[type=checkbox]:checked').forEach(function(ele, index){
+        choices.push(ele.value);
+      });
+      var products = new Array;
+      window.planOptions[productOptionKind].forEach(function(product, index) {
+        if(choices.includes(product.id)) {
+          products.push(product);
+        }
+      });
+      filteredProducts = products;
+    } else {
+      var selectedRadio = element.value;
+      var selectedName = element.dataset.name;
+      window.filteredProducts = window.planOptions[window.productOptionKind][selectedName];
+    }
+    // Sort by plan title
+    filteredProducts.sort(function(a,b) {
+      if (a.title < b.title) return -1;
+      if (a.title > b.title) return 1;
+      return 0;
+    })
+    populateReferencePlans(window.filteredProducts)
+    setTempCL()
+    selectDefaultReferencePlan()
+  } else {
+    if (element.tagName != 'INPUT') {
+      element = element.querySelector('input[type=radio][data-name]');
+    }
+    var selectedRadio = element.value;
+    var selectedName = element.dataset.name;
+    window.filteredProducts = window.planOptions[window.productOptionKind][selectedName];
+    // Sort by plan title
+    window.filteredProducts.sort(function(a,b) {
+      if (a.title < b.title) return -1;
+      if (a.title > b.title) return 1;
+      return 0;
+    })
+    populateReferencePlans(window.filteredProducts);
+    setTempCL();
   }
-  var selectedRadio = element.value;
-  var selectedName = element.dataset.name;
-  window.filteredProducts = window.planOptions[window.productOptionKind][selectedName];
-  // Sort by plan title
-  window.filteredProducts.sort(function(a,b) {
-    if (a.title < b.title) return -1;
-    if (a.title > b.title) return 1;
-    return 0;
-  })
-  populateReferencePlans(window.filteredProducts);
-  setTempCL();
 }
 
 function showPlanSelection() {
