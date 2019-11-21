@@ -101,26 +101,17 @@ javascript:
   window.filteredProducts = [];
   window.employeeCostEstimate = #{@sponsored_benefit_form.employees_cost.to_json.html_safe};
   window.planOptions = #{@sponsored_benefit_form.catalog.plan_options.to_json.html_safe};
-  var applicationStartOn = #{@sponsored_benefit_form.benefit_application.effective_period.min.strftime("%m-%d").to_json.html_safe};
-  var referencePlanID = String;
-  var erCL = #{aca_shop_market_employer_contribution_percent_minimum};
-  var erDentalCL = #{aca_shop_market_employer_dental_contribution_percent_minimum};
-  var familyCL = #{aca_shop_market_employer_family_contribution_percent_minimum};
-  var productsTotal;
-  var eeContribution;
-  var spouse;
-  var domesticPartner;
-  var childUnder26;
-  var contributionInputs;
-  var planOptions = #{@sponsored_benefit_form.catalog.plan_options.to_json.html_safe};
-  var sponsorContributions = #{@sponsored_benefit_form.catalog.sponsor_contributions(@sponsored_benefit_form.benefit_package_id).to_json.html_safe};
-  var sponsoredBenefitId;
-
-  var tempContributionValues = {
-    eeContribution:eeContribution || 0,
-    spouse:spouse || 0,
-    domesticPartner:domesticPartner || 0,
-    childUnder26:childUnder26 || 0
+  window.applicationStartOn = #{@sponsored_benefit_form.benefit_application.effective_period.min.strftime("%m-%d").to_json.html_safe};
+  window.referencePlanID = String;
+  window.erCL = #{aca_shop_market_employer_contribution_percent_minimum};
+  window.erDentalCL = #{aca_shop_market_employer_dental_contribution_percent_minimum};
+  window.familyCL = #{aca_shop_market_employer_family_contribution_percent_minimum};
+  window.sponsorContributions = #{@sponsored_benefit_form.catalog.sponsor_contributions(@sponsored_benefit_form.benefit_package_id).to_json.html_safe};
+  window.tempContributionValues = {
+    eeContribution: 0,
+    spouse: 0,
+    domesticPartner: 0,
+    childUnder26: 0
   }
 
   window.onload = function() {

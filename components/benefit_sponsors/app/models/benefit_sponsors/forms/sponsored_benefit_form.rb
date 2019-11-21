@@ -10,7 +10,7 @@ module BenefitSponsors
       attribute :product_option_choice, String
       attribute :product_package_kind, String, default: Settings.aca.default_dental_option_kind
       attribute :elected_product_choices, Array # used for dental choice model
-      
+
       # for employee cost details
       attribute :employees_cost, Array[EmployeeCostForm]
 
