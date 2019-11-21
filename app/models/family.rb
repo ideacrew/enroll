@@ -189,11 +189,11 @@ class Family
       }
     ).distinct(:family_id))
   }
-  
+
   # Replaced scopes for moving HbxEnrollment to top level
   # The following methods are rewrites of scopes that were being called before HbxEnrollment was a top level document.
 
-  scope :all_enrollments_by_benefit_package, ->(benefit_package) { where(:"_id".in => HbxEnrollment.where(sponsored_benefit_package_id => benefit_package._id, :aasm_state.ne => :shopping).distinct(:family_id))}
+  scope :all_enrollments_by_benefit_package, ->(benefit_package) { where(:"_id".in => HbxEnrollment.where(:sponsored_benefit_package_id => benefit_package._id, :aasm_state.nin => [:shopping]).distinct(:family_id))}
 
   scope :all_enrollments_by_benefit_sponsorship_id,  ->(benefit_sponsorship_id) {
     where(:"_id".in => HbxEnrollment.where(benefit_sponsorship_id: benefit_sponsorship_id).distinct(:family_id))
@@ -574,6 +574,10 @@ class Family
 
   def latest_fehb_sep
     special_enrollment_periods.fehb_market.order_by(:submitted_at.desc).to_a.detect{ |sep| sep.is_active? }
+  end
+
+  def latest_ivl_sep
+    special_enrollment_periods.individual_market.order_by(:submitted_at.desc).to_a.detect(&:is_active?)
   end
 
   def terminate_date_for_shop_by_enrollment(enrollment=nil)
@@ -1078,6 +1082,10 @@ class Family
 
   def has_primary_active_employee?
     primary_applicant.person.has_active_employee_role?
+  end
+
+  def has_active_sep?(pre_enrollment)
+    pre_enrollment.is_ivl_by_kind? && latest_ivl_sep&.start_on&.year == pre_enrollment.effective_on.year
   end
 
 private

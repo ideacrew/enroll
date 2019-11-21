@@ -28,7 +28,13 @@ class HbxEnrollmentListSponsorCostCalculator
     def each
       @hbx_enrollment_id_list.each_slice(200) do |heidl|
         search_criteria(heidl).each do |agg_result|
-          yield rosterize_hbx_enrollment(agg_result)
+
+          people_details = Person.where(:id.in => agg_result['people_ids']).pluck(:id, :dob, :person_relationships, :is_disabled)
+          people_merge = people_details.map do |id, dob, person_relationships, is_disabled|
+            {'_id' => id, 'dob' => dob, 'person_relationships' => person_relationships, 'is_disabled' => is_disabled}.compact
+          end
+
+          yield rosterize_hbx_enrollment(agg_result.merge({"people" => people_merge}))
         end
       end
     end
@@ -64,18 +70,7 @@ class HbxEnrollmentListSponsorCostCalculator
             }
           }
           }
-        },
-        {"$lookup" => {
-          "from" => "people",
-          "localField" => "people_ids",
-          "foreignField" => "_id",
-          "as" => "people"
-        }},
-        {"$project" => {
-          "hbx_enrollment" => 1,
-          "family_members" => 1,
-          "people" => {"_id" => 1, "dob" => 1, "person_relationships" => 1, "is_disabled" => 1}
-        }}
+        }
       ])
     end
 

@@ -21,13 +21,12 @@
           %contribution_percent= deter_tier.sponsor_contribution_factor * 100
   - else
     %relationship_benefits
-      - if relationship_benefits.present? && benefit_group &. benefit_sponsorship &. organization &. is_a_fehb_profile?
-        - ["employee", "spouse", "domestic_partner", "child_under_26"].each do |old_relationship|
-          - relationship_benefit = fehb_relationship_map(old_relationship, relationship_benefits)
+      - if benefit_group &. benefit_sponsorship &. organization &. is_a_fehb_profile?
+        - ["employee", "spouse", "domestic_partner", "child_under_26"].each do |relationship|
           %relationship_benefit
-            %relationship= "urn:openhbx:terms:v1:employee_census_relationship##{old_relationship}"
-            %offered= old_relationship == "domestic_partner" ? false : relationship_benefit.offered?
-            %contribution_percent= old_relationship == "domestic_partner" ? 0.0 : relationship_benefit.contribution_pct
+            %relationship= "urn:openhbx:terms:v1:employee_census_relationship##{relationship}"
+            %offered= relationship == "domestic_partner" ? false : true
+            %contribution_percent= relationship == "domestic_partner" ? 0.0 : 75.00
       - else
         = render :partial => "events/v2/employers/relationship_benefit", :collection => relationship_benefits
       -# TODO: Need to fix relationship_benefits for fehb employer.

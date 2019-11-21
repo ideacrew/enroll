@@ -182,18 +182,30 @@ module BenefitSponsors
 
       context "When less then minimum participation of the census employees are emrolled" do
 
-        let!(:load_enrollments) {benefit_sponsorship.census_employees.limit(3).each do |ce|
-          family = FactoryBot.create(:family, :with_primary_family_member)
-          FactoryBot.create(
-            :hbx_enrollment,
-            family: family,
-            household: family.active_household,
-            benefit_sponsorship: benefit_sponsorship,
-            benefit_group_assignment: ce.benefit_group_assignments.first,
-            sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
-          ce.save
+        let!(:load_enrollments) do
+          benefit_sponsorship.census_employees.limit(3).each do |ce|
+            person = FactoryBot.create(:person)
+            family = FactoryBot.create(:family, :with_primary_family_member, person: person)
+            enrollment = FactoryBot.create(:hbx_enrollment,
+                                           family: family,
+                                           household: family.active_household,
+                                           benefit_sponsorship: benefit_sponsorship,
+                                           benefit_group_assignment: ce.benefit_group_assignments.first,
+                                           sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id
+                                           )
+            employee_role = FactoryBot.create(:employee_role, benefit_sponsors_employer_profile_id: abc_profile.id, hired_on: TimeKeeper.date_of_record - 2.days, person: person, census_employee: ce)
+            ce.update_attributes(employee_role_id: employee_role.id)
+            ce.save!
+            ce.benefit_group_assignments.first.update_attributes(hbx_enrollment_id: enrollment.id)
+          end
         end
-        }
+
+        let!(:update_census_emnployee) do
+          benefit_sponsorship.census_employees.limit(1).each do |ce|
+            ce.update_attributes(is_business_owner: true)
+            ce.save!
+          end
+        end
 
         # For 1/1 effective date minimum participation rule does not apply
         # 1+ non-owner rule does apply

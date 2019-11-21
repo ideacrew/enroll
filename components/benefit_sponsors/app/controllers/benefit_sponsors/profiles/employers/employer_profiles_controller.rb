@@ -225,11 +225,15 @@ module BenefitSponsors
         end
 
         def employee_datatable_params
-          data_table_params = { id: params[:id], scopes: params[:scopes], employer_profile: @employer_profile}
+          data_table_params = { id: params[:id], scopes: params[:scopes] }
 
           data_table_params.merge!({
             renewal: true
           }) if @employer_profile.renewal_benefit_application.present?
+
+          data_table_params.merge!({
+            is_submitted: true
+          }) if @employer_profile&.renewal_benefit_application&.is_submitted?
 
           data_table_params
         end
