@@ -19,7 +19,7 @@ module Notifier
     def enrollment_waiver_plan_name
       return if parent_enrollment.blank?
 
-      merge_model.enrollment.waiver_plan_name = parent_enrollment.plan.name
+      merge_model.enrollment.waiver_plan_name = parent_enrollment.product.name
     end
 
     def enrollment_waiver_enrolled_count

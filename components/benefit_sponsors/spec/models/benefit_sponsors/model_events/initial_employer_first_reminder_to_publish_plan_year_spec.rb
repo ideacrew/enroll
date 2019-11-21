@@ -15,7 +15,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerFirstRemainderToPub
     :aasm_state => 'draft',
     :effective_period =>  start_on..(start_on + 1.year) - 1.day
   )}
-  let!(:date_mock_object) { double("Date", day: Settings.aca.shop_market.initial_application.advertised_deadline_of_month - 2 )}
+  let!(:date_mock_object) { (TimeKeeper.date_of_record.next_month.beginning_of_month - 2.days)}
 
 
   describe "ModelEvent" do
