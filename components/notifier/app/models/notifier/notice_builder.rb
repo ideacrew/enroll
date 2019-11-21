@@ -235,7 +235,7 @@ module Notifier
     end
 
     def is_employer?
-      resource.is_a?("BenefitSponsors::Organizations::AcaShop#{site_key.capitalize}EmployerProfile".constantize)
+      resource.is_a?("BenefitSponsors::Organizations::AcaShop#{site_key.capitalize}EmployerProfile".constantize) || resource.is_a?(BenefitSponsors::Organizations::FehbEmployerProfile)
     end
 
     def is_employee?
