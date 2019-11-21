@@ -17,7 +17,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerNoBinderPaymentRece
   let(:benefit_sponsorship_state) { :initial_enrollment_ineligible }
   let(:employer_profile) { abc_profile }
   let(:benefit_application) { initial_application }
-  let(:dc_date_mock_object) { double("Date", day: Settings.aca.shop_market.initial_application.non_binder_paid_notice_day_of_month)}
+  let!(:dc_date_mock_object) { Date.new(start_on.year, start_on.prev_month.month, Settings.aca.shop_market.initial_application.non_binder_paid_notice_day_of_month) }
   let(:cca_date_mock_object) { BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new.calculate_open_enrollment_date(TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date].next_day }
   let!(:person) { FactoryBot.create(:person, :with_family) }
   let!(:census_employee)  { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile ) }
