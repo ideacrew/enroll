@@ -160,7 +160,7 @@ class Insured::FamiliesController < FamiliesController
       @resident_role_id = @person.resident_role.id
     end
 
-    if ((@qle.present? && @qle.shop?) && !@qualified_date && params[:qle_id].present?)
+    if @qle.present? && (@qle.shop? || @qle.fehb?) && !@qualified_date && params[:qle_id].present?
       benefit_application = @person.active_employee_roles.first.employer_profile.active_benefit_application
       reporting_deadline = @qle_date > today ? today : @qle_date + 30.days
       employee_role = @person.active_employee_roles.first

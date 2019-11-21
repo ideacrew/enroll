@@ -71,6 +71,8 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeWaiverConfirmation', dbcle
       [
         "employee_profile.notice_date",
         "employee_profile.employer_name",
+        "employee_profile.enrollment.waiver_plan_name",
+        "employee_profile.enrollment.waiver_effective_on",
         "employee_profile.broker.primary_fullname",
         "employee_profile.broker.organization",
         "employee_profile.broker.phone",
@@ -79,11 +81,19 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeWaiverConfirmation', dbcle
       ]
     }
 
+    let(:enrollment) { model_instance }
+    let(:waived_enrollment) do
+      enrollment.waive_coverage!
+      enrollment.predecessor_enrollment_id = model_instance.id
+      enrollment.save!
+      enrollment
+    end
+
     let(:recipient) { "Notifier::MergeDataModels::EmployeeProfile" }
     let!(:template)  { Notifier::Template.new(data_elements: data_elements) }
     let!(:payload)   { {
       "event_object_kind" => "HbxEnrollment",
-      "event_object_id" => model_instance.id
+      "event_object_id" => waived_enrollment.id
     } }
     let(:merge_model) { subject.construct_notice_object }
     let(:benefit_group_assignment) { double(hbx_enrollment: model_instance, active_hbx_enrollments: [model_instance]) }
@@ -106,6 +116,10 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeWaiverConfirmation', dbcle
 
       it "should return false when there is no broker linked to employer" do
         expect(merge_model.broker_present?).to be_falsey
+      end
+
+      it "should return waiver plan name" do
+        expect(merge_model.enrollment.waiver_plan_name).to eq model_instance.product.name
       end
 
       it "should return waived effective on date" do
