@@ -66,7 +66,6 @@ class FamilyMember
 
   associated_with_one :person, :person_id, "Person"
 
-  # This needs to work for history_tracks as well as versions
   def person_version_for(v_date)
     person.reload
     return nil if (v_date < created_at)
@@ -77,9 +76,9 @@ class FamilyMember
     if oldest_history_track && person.versions.empty? && (oldest_history_track.created_at > v_date)
       return person.history_tracker_to_record(v_date)
     end
-    if closest_track = person.history_tracks.unscoped.to_a.detect { |ht| ht.created_at <= v_date }.order_by({created_at: -1}).limit(1).first
+    if closest_track = person.history_tracks.unscoped.to_a.detect { |ht| ht.created_at <= v_date }.sort_by(&:created_at).reverse.first
       person.history_tracker_to_record(closest_track.created_at)
-    elsif closest_person = person.versions.to_a.detect { |ver| ver.updated_at <= v_date }.order_by({updated_at: -1}).limit(1).first
+    elsif closest_person = person.versions.to_a.detect { |ver| ver.updated_at <= v_date }.order_by({updated_at: -1}).reverse.first
       closest_person
     else
       person
