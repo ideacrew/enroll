@@ -21,7 +21,9 @@ module HistoryTrackerToRecord
           last_in_chain = rt.association_chain.last
           chain_target = association_chain_without_last.inject(self) do |acc, chain_location|
             if acc.send(chain_location["name"]).is_a?(Enumerable) # embeds_many
-              acc.send(chain_location["name"]).where(id: chain_location["id"].to_s).first
+              acc.send(chain_location["name"]).detect do |ao|
+                ao.id.to_s == chain_location["id"].to_s
+              end
             else # embeds_one
               acc.send(chain_location["name"].to_sym)
             end
@@ -39,7 +41,9 @@ module HistoryTrackerToRecord
           last_in_chain = rt.association_chain.last
           chain_target = association_chain_without_last.inject(self) do |acc, chain_location|
             if acc.send(chain_location["name"]).is_a?(Enumerable) # embeds_many
-              acc.send(chain_location["name"]).where(id: chain_location["id"].to_s).first
+              acc.send(chain_location["name"]).detect do |ao|
+                ao.id.to_s == chain_location["id"].to_s
+              end
             else # embeds_one
               acc.send(chain_location["name"].to_sym)
             end
@@ -53,7 +57,9 @@ module HistoryTrackerToRecord
           association_chain_without_first = rt.association_chain[1..-1]
           chain_target = association_chain_without_first.inject(self) do |acc, chain_location|
             if acc.send(chain_location["name"]).is_a?(Enumerable) # embeds_many
-              acc.send(chain_location["name"]).where(id: chain_location["id"].to_s).first
+              acc.send(chain_location["name"]).detect do |ao|
+                ao.id.to_s == chain_location["id"].to_s
+              end
             else # embeds_one
               acc.send(chain_location["name"].to_sym)
             end
