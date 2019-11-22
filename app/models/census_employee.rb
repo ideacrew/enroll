@@ -560,29 +560,19 @@ class CensusEmployee < CensusMember
   end
 
   def active_benefit_group_assignment
-    benefit_group_assignments.detect { |assignment| assignment.is_active? }
+    benefit_package_assignment_on(TimeKeeper.date_of_record) || benefit_group_assignments.benefit_group_assignments.order_by(:start_on.asc).last
   end
 
   def renewal_benefit_group_assignment
-    return benefit_group_assignments.order_by(:created_at.desc).detect{ |assignment| assignment.plan_year &. is_renewing? } if is_case_old?
-    benefit_group_assignments.order_by(:created_at.desc).detect{ |assignment| assignment.benefit_application &. is_renewing? }
+    renewal_begin_date = active_benefit_group_assignment.benefit_package.end_on + 1.day
+    benefit_package_assignment_on(renewal_begin_date)
   end
 
-  def inactive_benefit_group_assignments
-    benefit_group_assignments.reject(&:is_active?)
-  end
-
+  # DEPRECATE IF POSSIBLE
   def published_benefit_group_assignment
     benefit_group_assignments.select do |benefit_group_assignment|
       benefit_group_assignment.benefit_group.is_active && benefit_group_assignment.benefit_group.plan_year.employees_are_matchable?
     end.first
-  end
-
-  def active_and_renewing_benefit_group_assignments
-    result = []
-    result << active_benefit_group_assignment if !active_benefit_group_assignment.nil?
-    result << renewal_benefit_group_assignment if !renewal_benefit_group_assignment.nil?
-    result
   end
 
   def active_benefit_package
@@ -1382,7 +1372,6 @@ class CensusEmployee < CensusMember
     enrollments.compact.uniq
   end
 
-
   def expected_to_enroll?
     expected_selection == 'enroll'
   end
@@ -1477,10 +1466,6 @@ class CensusEmployee < CensusMember
     benefit_group_assignments.where(benefit_package_id: package_id).order_by(:'updated_at'.desc).first
   end
 
-  def benefit_package_for_open_enrollment(shopping_date)
-    active_benefit_group_assignment.benefit_package.package_for_open_enrollment(shopping_date)
-  end
-
   def benefit_package_for_date(coverage_date)
     benefit_assignment = benefit_group_assignment_for_date(coverage_date)
     benefit_package = benefit_assignment.benefit_package if benefit_assignment.present?
@@ -1496,11 +1481,6 @@ class CensusEmployee < CensusMember
       (assignment.start_on..assignment.benefit_end_date).cover?(coverage_date) && assignment.benefit_package.is_active
     end
     assignments.detect(&:is_active) || assignments.sort_by(&:created_at).reverse.first
-  end
-
-
-  def earliest_benefit_package_after(coverage_date)
-    active_benefit_group_assignment.benefit_package.earliest_benefit_package_after(coverage_date)
   end
 
   def ssn=(new_ssn)
