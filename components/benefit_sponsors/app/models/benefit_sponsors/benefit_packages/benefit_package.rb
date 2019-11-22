@@ -301,6 +301,7 @@ module BenefitSponsors
       end
  
       def terminate_member_benefits
+        terminate_benefit_group_assignments
         enrolled_and_terminated_families.each do |family|
           enrollments = family.enrollments.by_benefit_package(self).enrolled_waived_terminated_and_expired
           sponsored_benefits.each do |sponsored_benefit|
@@ -326,6 +327,7 @@ module BenefitSponsors
       end
 
       def termination_pending_member_benefits
+        terminate_benefit_group_assignments
         enrolled_families.each do |family|
           enrollments = family.enrollments.by_benefit_package(self).enrolled_and_waived
 
@@ -433,6 +435,15 @@ module BenefitSponsors
           benefit_group_assignments = ce.benefit_group_assignments.where(benefit_package_id: self.id)
           benefit_group_assignments.each do |benefit_group_assignment|
             benefit_group_assignment.update(is_active: false) unless is_renewing?
+          end
+        end
+      end
+
+      def terminate_benefit_group_assignments
+        self.benefit_application.benefit_sponsorship.census_employees.each do |ce|
+          benefit_group_assignments = ce.benefit_group_assignments.where(benefit_package_id: self.id)
+          benefit_group_assignments.each do |benefit_group_assignment|
+            benefit_group_assignment.update(end_on: self.end_on)
           end
         end
       end
