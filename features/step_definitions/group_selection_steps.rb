@@ -459,12 +459,12 @@ Then(/consumer (.*) see the edit plan button/) do |visibility|
   end
 end
 
-When(/(.*) clicks on the edit plan button/) do |_role|
-  click_link 'Edit Plan'
+When(/(.*) clicks on the make changes button/) do |_role|
+  click_link 'Make Changes'
 end
 
-Then(/(.*) should see the edit plan page/) do |_role|
-  expect(page).to have_content('Cancel Plan')
+Then(/(.*) should see the make changes page/) do |_role|
+  expect(page).to have_text('Cancel Plan')
 end
 
 When(/(.*) clicks on the Cancel Plan button/) do |_role|
@@ -591,12 +591,12 @@ And(/the metal level is (.*)/) do |metal_level|
   @family.enrollments.first.product.update_attributes(metal_level_kind: metal_level.to_sym)
 end
 
-Then(/the Edit APTC button should be available/) do
-  expect(page).to have_content("Edit APTC")
+Then(/the Change Tax Credit button should be available/) do
+  expect(page).to have_content("Change Tax Credit")
 end
 
-Then(/the Edit APTC button should NOT be available/) do
-  expect(page).to_not have_content("Edit APTC")
+Then(/the Change Tax Credit button should NOT be available/) do
+  expect(page).to_not have_content("Tax Credit amount")
 end
 
 Given(/the enrollment has HIOS ID ending in (.*)/) do |id_number|

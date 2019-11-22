@@ -18,7 +18,7 @@
 
               <div class="panel-heading">
                 <h4>
-                  <%= @product[:application_period].min.year %> <%= l10n("health_coverage") %> 
+                  <%= product[:application_period].min.year %> <%= l10n("health_coverage") %> 
                 </h4>
                 <hr>
               </div>
@@ -34,7 +34,7 @@
                         <p>
                           <label><%= l10n("premium") %>:</label> <strong><%= number_to_currency(@self_term_or_cancel_form.enrollment.current_premium, precision:2) %></strong>/<%= l10n("month").to_s.downcase %>
 
-                          <label class="bullet-separator">&nbsp;<%= l10n("DCHL_ID") %>:</label> <strong><%= hbx_enrollment[:hbx_id] %></strong>
+                          <label class="bullet-separator">&nbsp;<%= l10n("ID") %>:</label> <strong><%= hbx_enrollment[:hbx_id] %></strong>
                           <br>
                         </p>
                       </div>
@@ -71,7 +71,7 @@
                 <div class="row">
                   <div class="col-md-6">
                     <i class="fa fa-icon-link fa-2x"></i>
-                    <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: @product } %>
+                    <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: product } %>
                   </div>
                   <div class="col-md-3 margin-top-15px">
                     <a href="#">
