@@ -464,7 +464,7 @@ When(/(.*) clicks on the make changes button/) do |_role|
 end
 
 Then(/(.*) should see the make changes page/) do |_role|
-  expect(page).to have_text('Cancel Plan')
+  expect(page).to have_text('Tax credit amount')
 end
 
 When(/(.*) clicks on the Cancel Plan button/) do |_role|
@@ -597,6 +597,14 @@ end
 
 Then(/the Change Tax Credit button should NOT be available/) do
   expect(page).to_not have_content("Tax Credit amount")
+end
+
+When(/the user clicks on the Change Tax Credit button/) do
+  find("#aptc-button").click
+end
+
+And(/the user sees the Change Tax Credit Form/) do
+
 end
 
 Given(/the enrollment has HIOS ID ending in (.*)/) do |id_number|

@@ -85,5 +85,8 @@ Scenario: Change Tax Credit button is available for families with at least 1 mem
   And the tax household has at least one member that is APTC eligible
   When consumer clicks on the make changes button
   Then consumer should see the make changes page
-  Then the Change Tax Credit button should be available
+  And the Change Tax Credit button should be available
+  When the user clicks on the Change Tax Credit button
+  And the user sees the Change Tax Credit Form
+
 

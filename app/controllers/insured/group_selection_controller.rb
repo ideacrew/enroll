@@ -181,6 +181,7 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   def edit_aptc
+    binding.pry
     #aptc build_eligible_members
     # if build_eligible_members.count == family.count AND enrollment is eligible, show aptc button
   end
