@@ -172,6 +172,9 @@ class Insured::GroupSelectionController < ApplicationController
 
   def edit_plan
     @self_term_or_cancel_form = ::Insured::Forms::SelfTermOrCancelForm.for_view({enrollment_id: params.require(:hbx_enrollment_id), family_id: params.require(:family_id)})
+    @hbx_enrollment = HbxEnrollment.find(params[:hbx_enrollment_id])
+    @product = @hbx_enrollment.product
+    @sep = @hbx_enrollment.special_enrollment_period
   end
 
   def term_or_cancel

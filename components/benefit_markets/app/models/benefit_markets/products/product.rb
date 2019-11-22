@@ -192,7 +192,7 @@ module BenefitMarkets
     end
 
     def can_use_aptc?
-      metal_level != 'catastrophic'
+      metal_level != 'catastrophic' && !dental?
     end
 
     def is_csr?
