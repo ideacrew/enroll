@@ -20,7 +20,7 @@ module HistoryTrackerToRecord
           association_chain_without_last = rt.association_chain[0..-2]
           last_in_chain = rt.association_chain.last
           chain_target = association_chain_without_last.inject(self) do |acc, chain_location|
-            if self.id == chain_location["id"] || self.class.name == chain_location["name"]
+            if self.id.to_s == chain_location["id"] || self.class.name == chain_location["name"]
               self
             elsif acc.send(chain_location["name"]).is_a?(Enumerable) # embeds_many
               acc.send(chain_location["name"]).where(id: chain_location["id"].to_s).first
@@ -40,7 +40,7 @@ module HistoryTrackerToRecord
           association_chain_without_last = rt.association_chain[0..-2]
           last_in_chain = rt.association_chain.last
           chain_target = association_chain_without_last.inject(self) do |acc, chain_location|
-            if self.id == chain_location["id"]
+            if self.id.to_s == chain_location["id"] || self.class.name == chain_location["name"]
               self
             elsif acc.send(chain_location["name"]).is_a?(Enumerable) # embeds_many
               acc.send(chain_location["name"]).where(id: chain_location["id"].to_s).first
@@ -55,7 +55,7 @@ module HistoryTrackerToRecord
           end
         else
           chain_target = rt.association_chain.inject(self) do |acc, chain_location|
-            if self.id == chain_location["id"]
+            if self.id.to_s == chain_location["id"] || self.class.name == chain_location["name"]
               self
             elsif acc.send(chain_location["name"]).is_a?(Enumerable) # embeds_many
               acc.send(chain_location["name"]).where(id: chain_location["id"].to_s).first
