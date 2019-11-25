@@ -11,7 +11,9 @@ module HistoryTrackerToRecord
     tracks_to_reverse = all_tracks.reject do |ht|
       (ht.created_at <= ht_date) || ((ht.created_at.to_f - self.created_at.to_f).abs < 1.1)
     end.reverse
+
     tracks_to_reverse.each do |rt|
+      begin
       if rt.association_chain.length < 2
         self.attributes = rt.undo_attr(nil)
       else
@@ -67,7 +69,13 @@ module HistoryTrackerToRecord
           chain_target.attributes = rt.undo_attr(nil)
         end
       end
+      rescue Exception => e
+        log_string = e.inspect + " - ASSOCIATION CHAIN:" + rt.association_chain.inspect + " - HISTORY TRACK: " + rt.inspect + " - PERSON: " + self.inspect
+        $STDERR.puts log_string
+        Rails.logger.error("[IVL ELIG AUDIT]") { log_string }
+      end
     end
+
     self
   end
 end
