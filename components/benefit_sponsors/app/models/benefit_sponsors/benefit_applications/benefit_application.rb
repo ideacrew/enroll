@@ -161,7 +161,7 @@ module BenefitSponsors
     scope :approved_and_terminated,         ->{ any_in(aasm_state: APPPROVED_AND_TERMINATED_STATES) }
 
     # Used for specific DataTable Action only
-    scope :active_states_per_dt_action,     ->{ any_in(aasm_state: [:draft, :approved, :active, :pending, :enrollment_open, :binder_paid, :enrollment_closed, :enrollment_ineligible, :enrollment_eligible]) }
+    scope :active_states_per_dt_action,     ->{ any_in(aasm_state: [:draft, :approved, :active, :pending, :enrollment_open, :binder_paid, :enrollment_closed, :enrollment_ineligible, :enrollment_eligible, :termination_pending]) }
 
     # scope :is_renewing,                     ->{ where(:predecessor => {:$exists => true},
     #                                                   :aasm_state.in => APPLICATION_DRAFT_STATES + ENROLLING_STATES).order_by(:'created_at'.desc)
@@ -170,6 +170,10 @@ module BenefitSponsors
     scope :effective_date_begin_on,         ->(compare_date = TimeKeeper.date_of_record) { where(
                                                                                            :"effective_period.min".lte => compare_date )
                                                                                            }
+
+    scope :before_effective_date,  ->(compare_date = TimeKeeper.date_of_record) {
+      where(:"effective_period.min".lt => compare_date)
+    }
 
     scope :effective_date_end_on,           ->(compare_date = TimeKeeper.date_of_record) { where(
                                                                                            :"effective_period.max".lt => compare_date )
