@@ -71,8 +71,9 @@ module HistoryTrackerToRecord
       end
       rescue Exception => e
         log_string = e.inspect + " - ASSOCIATION CHAIN:" + rt.association_chain.inspect + " - HISTORY TRACK: " + rt.inspect + " - PERSON: " + self.inspect
-        $STDERR.puts log_string
         Rails.logger.error("[IVL ELIG AUDIT]") { log_string }
+        STDERR.puts log_string
+        raise e
       end
     end
 
