@@ -7,7 +7,7 @@ module HistoryTrackerToRecord
     # if the consumer_role was modified. trackable_root
     # will return person for both
     self.reload
-    all_tracks = self.history_tracks.unscoped.to_a.sort_by(&:created_at)
+    all_tracks = self.history_tracks.to_a.sort_by(&:created_at)
     tracks_to_reverse = all_tracks.reject do |ht|
       (ht.created_at <= ht_date) || ((ht.created_at.to_f - self.created_at.to_f).abs < 1.1)
     end.reverse
@@ -51,9 +51,9 @@ module HistoryTrackerToRecord
             end
           end
           if chain_target.send(last_in_chain["name"]).is_a?(Enumerable)
-            chain_target.send(last_in_chain["name"].to_sym).build(rt.original)
+            chain_target.send(last_in_chain["name"].to_sym).build(rt.original.merge({:id  => last_in_chain["id"]}))
           else
-            chain_target.send(("build_" + last_in_chain["name"]).to_sym, rt.original)
+            chain_target.send(("build_" + last_in_chain["name"]).to_sym, rt.original.merge({:id  => last_in_chain["id"]}))
           end
         else
           association_chain_without_first = rt.association_chain[1..-1]
@@ -66,7 +66,7 @@ module HistoryTrackerToRecord
               acc.send(chain_location["name"].to_sym)
             end
           end
-          chain_target.attributes = rt.undo_attr(nil)
+          chain_target.attributes = rt.original
         end
       end
       rescue Exception => e
