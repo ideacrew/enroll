@@ -96,10 +96,13 @@ Scenario: Eligible IVL Family can Modify APTC
   And the Change Tax Credit button should be available
   When the user clicks on the Change Tax Credit button
   And the user sees the Change Tax Credit Form
-  When the user changes Tax credit applied to 50%
-  And the user clicks Change Tax Credit button
+  And the user confirms "Yes" to change the tax credit
+  And the user changes Tax credit applied to 50%
+  When the user submits the Change Tax Credit form
   Then the user should see a message that their Tax Credits were updated
-  # Also include the database change here
-
+  And current user visits the family home page
+  When consumer clicks on the make changes button
+  When the user clicks on the Change Tax Credit button
+  Then the user should see that applied tax credit has been set to 50%
 
 

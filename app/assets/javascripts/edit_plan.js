@@ -54,19 +54,19 @@ $(document).on("ready ajax:success", function() {
     calculatePercent('#applied_pct_1', 100);
   });
   $('#aptc_applied_5cf6c9ec9ee4f43836000020').change(function(){
-    calculatePercent('#aptc_applied_5cf6c9ec9ee4f43836000020', 1);
+    calculatePercent('#aptc_applied_total', 1);
   });
 
   function calculatePercent(selector, multiplier) {
     var percent = parseFloat($(selector).val()).toFixed(2) * multiplier;
     $('#aptc_applied_pct_1_percent').val(percent + '%');
-    $('#aptc_applied_5cf6c9ec9ee4f43836000020').val(percent);
+    $('#aptc_applied_total').val(percent);
     // TODO: Fix the value being subtracted from new premium
     var current_total_premium_value = document.getElementById("current_total_premium").innerHTML;
     console.log("Currentn value of total premium is " + current_total_premium_value);
     var current_total_premium = parseFloat(current_total_premium_value);
     console.log("Integer value of current toal premium is " + current_total_premium) 
-    var new_premium = (current_total_premium - parseInt($('#aptc_applied_5cf6c9ec9ee4f43836000020').val()).toFixed(2)).toFixed(2);
+    var new_premium = (current_total_premium - parseInt($('#aptc_applied_total').val()).toFixed(2)).toFixed(2);
     $('#new-premium').html(new_premium);
   }
 

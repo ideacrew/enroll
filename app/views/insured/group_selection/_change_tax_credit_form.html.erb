@@ -19,7 +19,7 @@
         </span>
         <input id="applied_pct_1" name='applied_pct_1' type="range" min="0" max="1" step="0.01" style = "padding: 0px;">
         <h5>Tax credit value ($)</h5>
-        <input type="text" name="aptc_applied_5cf6c9ec9ee4f43836000020" id="aptc_applied_5cf6c9ec9ee4f43836000020"
+        <input type="text" name="aptc_applied_total" id="aptc_applied_total"
         value="<%= (locals[:hbx_enrollment].elected_aptc_pct.to_f * 100).to_s %>" placeholder="APTC Applied" class="form-control" size="8px">
         <h5><strong>Your new premium:</strong></h5>
         <div id="current_total_premium" class='hidden'><%= locals[:hbx_enrollment].total_premium %></div>

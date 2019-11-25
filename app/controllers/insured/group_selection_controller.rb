@@ -182,7 +182,11 @@ class Insured::GroupSelectionController < ApplicationController
 
   def edit_aptc
     attrs = {enrollment_id: params.require(:hbx_enrollment_id), elected_aptc_pct: params[:applied_pct_1]}
-    @self_term_or_cancel_form = ::Insured::Forms::SelfTermOrCancelForm.for_aptc_update_post(attrs)
+    if @self_term_or_cancel_form = ::Insured::Forms::SelfTermOrCancelForm.for_aptc_update_post(attrs)
+      flash[:notice] = "Successfully updated tax credits for enrollment."
+    else
+      flash[:error] = "Unable to update tax credits for enrollment."
+    end
     redirect_to family_account_path
   end
 
