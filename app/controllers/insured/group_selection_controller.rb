@@ -182,8 +182,11 @@ class Insured::GroupSelectionController < ApplicationController
 
   def edit_aptc
     binding.pry
-    #aptc build_eligible_members
-    # if build_eligible_members.count == family.count AND enrollment is eligible, show aptc button
+    attrs = {enrollment_id: params.require(:hbx_enrollment_id), elected_aptc_pct: params[:applied_pct_1]}
+    binding.pry
+    @self_term_or_cancel_form = ::Insured::Forms::SelfTermOrCancelForm.for_aptc_update_post(attrs)
+    binding.pry
+    redirect_to family_account_path
   end
 
   private

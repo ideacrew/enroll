@@ -89,4 +89,17 @@ Scenario: Change Tax Credit button is available for families with at least 1 mem
   When the user clicks on the Change Tax Credit button
   And the user sees the Change Tax Credit Form
 
+Scenario: Eligible IVL Family can Modify APTC
+  And the tax household has at least one member that is APTC eligible
+  When consumer clicks on the make changes button
+  Then consumer should see the make changes page
+  And the Change Tax Credit button should be available
+  When the user clicks on the Change Tax Credit button
+  And the user sees the Change Tax Credit Form
+  When the user changes Tax credit applied to 50%
+  And the user clicks Change Tax Credit button
+  Then the user should see a message that their Tax Credits were updated
+  # Also include the database change here
+
+
 

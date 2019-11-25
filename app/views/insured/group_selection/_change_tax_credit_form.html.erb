@@ -2,28 +2,34 @@
   <h3>
     <%= l10n("change_tax_credit") %>    
   </h3>
-  <div id="calendar-div" class="hidden">
+  <div id="calendar-div" class="row hidden">
     <%= form_tag edit_aptc_insured_group_selections_path(hbx_enrollment_id: locals[:hbx_enrollment][:id]), :method => :post do %>
-      <div id="date-confirm" class="col-xs-3">
+    <div class='col-md-12'>
+      <div id="date-confirm">
         <%# Placeholder %>
         <%= Date.today.to_s %>
       </div>
-      <div id="applied-aptc-text" class="col-xs-3 hidden">
+      <div id="applied-aptc-text" class="hidden">
         <h5>Maximum tax credit available: 100.00</h5>
         <h5>Tax credit applied (%)</h5>
         <span align= "center">
-          <output id="aptc_applied_pct_1_percent" name="aptc_applied_pct">88%</output>
+          <output id="aptc_applied_pct_1_percent" name="aptc_applied_pct">
+            <%= locals[:hbx_enrollment][:elected_aptc_pct] %>    
+          </output>
         </span>
         <input id="applied_pct_1" name='applied_pct_1' type="range" min="0" max="1" step="0.01" value=".88" style = "padding: 0px;">
         <h5>Tax credit value ($)</h5>
-        <input type="text" name="aptc_applied_5cf6c9ec9ee4f43836000020" id="aptc_applied_5cf6c9ec9ee4f43836000020" value="87.50" placeholder="APTC Applied" class="form-control" size="8px">
+        <input type="text" name="aptc_applied_5cf6c9ec9ee4f43836000020" id="aptc_applied_5cf6c9ec9ee4f43836000020"
+        value="<%= (locals[:hbx_enrollment][:elected_aptc_pct].to_f * 100).to_s %>" placeholder="APTC Applied" class="form-control" size="8px">
         <h5><strong>Your new premium:</strong></h5>
-        <span>$<span id="new-premium">290</span>/month</span>
+        <span>
+          $<span id="new-premium">
+            <%= (locals[:hbx_enrollment][:elected_aptc_pct].to_f * 100).to_s %>      
+          </span>/month
+        </span>
       </div>
-      <div class="col-xs-3" style="float:right;">
-        <br>
-        <%= submit_tag l10n("change_tax_credit"), class: 'button btn btn-lg btn-primary btn-block interaction-click-control-action-confirm', id: 'btn-aptc', :disabled => true %>
-      </div>
+      <br>
+      <%= submit_tag l10n("change_tax_credit"), class: 'button btn btn-lg btn-primary btn-block interaction-click-control-action-confirm', id: 'btn-aptc', :disabled => true %>
     <% end %>
   </div>
 </div>
