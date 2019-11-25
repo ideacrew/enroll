@@ -24,7 +24,6 @@ module Insured
       end
 
       def update_aptc
-        binding.pry
         @factory_class.update_aptc(@enrollment_id, @elected_aptc_pct.to_f, @elected_aptc_pct.to_f.to_money)
       end
 

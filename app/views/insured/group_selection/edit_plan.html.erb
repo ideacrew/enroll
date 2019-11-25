@@ -76,11 +76,11 @@
             </div>
             <div class="row">
               <div class="col-sm-6 transm">
-                <a id="cancel-button" class="btn btn-default btn-block interaction-click-control-cancel-plan" >Cancel Plan</a>
+                <a id="cancel-button" class="btn btn-default btn-block interaction-click-control-cancel-plan">Cancel Plan</a>
               </div>
               <% if hbx_enrollment.has_at_least_one_aptc_eligible_member? && product.can_use_aptc? && !hbx_enrollment.is_coverall? && hbx_enrollment.coverage_kind != 'dental'%>
                 <div class="col-sm-4">
-                  <a id="aptc-button" class="btn btn-default btn-block interaction-click-control-edit-aptc" >Change Tax Credit</a>
+                  <a id="aptc-button" class="btn btn-default btn-block interaction-click-control-edit-aptc">Change Tax Credit</a>
                 </div>
               <% end %>
             </div>

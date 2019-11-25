@@ -181,11 +181,8 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   def edit_aptc
-    binding.pry
     attrs = {enrollment_id: params.require(:hbx_enrollment_id), elected_aptc_pct: params[:applied_pct_1]}
-    binding.pry
     @self_term_or_cancel_form = ::Insured::Forms::SelfTermOrCancelForm.for_aptc_update_post(attrs)
-    binding.pry
     redirect_to family_account_path
   end
 
