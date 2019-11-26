@@ -184,6 +184,7 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
       person_versions = person_versions + [pers_record.created_at]
     end
     person_versions.each do |p_version|
+      begin
       p_version, person_updated_at = if p_version.kind_of?(HistoryTracker)
         if (p_version.created_at >= AUDIT_END_DATE) || (p_version.created_at < AUDIT_START_DATE)
           next
@@ -239,15 +240,16 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
                     eligible
                 ])
               end
-            end
-          rescue HistoryTrackerReversalError => htre
-            STDERR.puts htre.inspect
-            STDERR.flush
-            next            
+            end          
           rescue Mongoid::Errors::DocumentNotFound => e
             puts e.inspect
           end
         end
+      end
+      rescue HistoryTrackerReversalError => htre
+        STDERR.puts htre.inspect
+        STDERR.flush
+        next  
       end
     end
     pb.increment
