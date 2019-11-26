@@ -1,7 +1,8 @@
 AUDIT_START_DATE = Date.new(2018,10,1)
 AUDIT_END_DATE = Date.new(2019,10,1)
 
-puts "Standard caching complete."
+STDOUT.puts "Standard caching complete."
+STDOUT.flush
 
 hbx = HbxProfile.current_hbx
 bcps = hbx.benefit_sponsorship.benefit_coverage_periods
@@ -11,6 +12,7 @@ health_benefit_packages = bcp.benefit_packages.select do |bp|
 end
 
 puts "Health Benefit Packages located."
+STDOUT.flush
 
 non_curam_ivl = Person.collection.aggregate([
   {"$project" => {
@@ -33,7 +35,8 @@ ivl_person_ids = non_curam_ivl.map do |rec|
   rec["_id"]
 end
 
-puts "Counted #{ivl_person_ids.count} people."
+STDOUT.puts "Counted #{ivl_person_ids.count} people."
+STDOUT.flush
 
 ivl_people = Person.where("_id" => {"$in" => ivl_person_ids})
 
@@ -41,7 +44,8 @@ families_of_interest = Family.where(
   {"family_members.person_id" => {"$in" => ivl_person_ids}}
 )
 
-puts "Counted #{families_of_interest.count} families."
+STDOUT.puts "Counted #{families_of_interest.count} families."
+STDOUT.flush
 
 # Let's cache the family mappings
 person_family_map = Hash.new { |h,k| h[k] = Array.new }
@@ -54,8 +58,9 @@ end
 
 # So what we need here is: family_membership * person_record * version_numbers_for_person
 person_id_count = ivl_person_ids.count
-puts person_id_count.inspect
-puts families_of_interest.count
+STDOUT.puts person_id_count.inspect
+STDOUT.puts families_of_interest.count
+STDOUT.flush
 
 def relationship_for(person, family)
   return "self" if (person.id == family.primary_applicant.person_id)
