@@ -284,6 +284,11 @@ Then(/(.*) should see the enrollment with (.*) button/) do |_role, button_text|
   expect(page).to have_link(button_text.titleize)
 end
 
+Then(/(.*) should see the enrollment with (.*) button/) do |_role, button_text|
+  expect(page).to have_content "#{(current_effective_date || TimeKeeper.date_of_record).year} HEALTH COVERAGE"
+  expect(page).to have_link(button_text.titleize)
+end
+
 Then(/(.*) should see the dental enrollment with make changes button/) do |role|
   if role == "employee"
     expect(page).to have_content "#{(current_effective_date || TimeKeeper.date_of_record).year} DENTAL COVERAGE"
@@ -521,6 +526,31 @@ Then(/the enrollment should be terminated/) do
 end
 
 Given(/(.*) has a (.*) secondary role/) do |_primary_role, secondary_role|
+  Family.all.first.all_enrollments.first.aasm_state == 'coverage_terminated'
+end
+
+Then(/the enrollment should be pending termination/) do
+  expect(Family.all.first.all_enrollments.first.aasm_state).to eq('coverage_termination_pending')
+  expect(page).to have_content('Coverage End: ' + (TimeKeeper.date_of_record + 10).to_s)
+end
+
+Given(/(.*) has a (.*) secondary role/) do |_primary_role, secondary_role|
+  family = Family.all.first
+  # Assumes primary role is consumer.
+  if secondary_role.eql?('resident')
+    FactoryBot.create(:resident_role_object, person: family.primary_person)
+  elsif secondary_role.eql?('employee')
+    FactoryBot.create(:employee_role, person: family.primary_person)
+  end
+end
+
+When(/consumer's health enrollment has an effective date in the future/) do
+  Family.all.first.all_enrollments.first.update_attributes(effective_on: TimeKeeper.date_of_record + 20)
+  @family.all_enrollments.first.aasm_state == 'coverage_terminated'
+end
+
+
+Given(/(.*) has a (.*) role/) do |_primary_role, secondary_role|
   family = Family.all.first
   # Assumes primary role is consumer.
   if secondary_role.eql?('resident')
@@ -591,6 +621,11 @@ And(/the tax household has at least one member that is APTC eligible/) do
   FactoryBot.create(:eligibility_determination, max_aptc: 500, tax_household: tax_household)
 end
 
+And(/the tax household has no members that are APTC eligible/) do
+  tax_household = @family.active_household.latest_active_tax_household
+  tax_household.tax_household_members.update_all(is_ia_eligible: false, applicant_id: @family.enrollments.first.hbx_enrollment_members.first.id)
+end
+
 And(/the metal level is (.*)/) do |metal_level|
   @family.enrollments.first.product.update_attributes(metal_level_kind: metal_level.to_sym)
 end
@@ -610,13 +645,13 @@ Given(/the enrollment has HIOS ID ending in (.*)/) do |id_number|
 end
 
 Given(/the enrollment is a Health plan/) do
-  @family.enrollments.first.update_attributes(coverage_kind: "health")
+  @family.enrollments.first.update_attributes!(coverage_kind: "health")
 end
 
 Given(/the enrollment is a Dental plan/) do
-  @family.enrollments.first.update_attributes(coverage_kind: "dental")
+  @family.enrollments.first.update_attributes!(coverage_kind: "dental")
 end
 
 Given(/the coverall enrollment flag is TRUE/) do
-  @family.enrollments.first.update_attributes(kind: "coverall")
+  @family.enrollments.first.update_attributes!(kind: "coverall")
 end
