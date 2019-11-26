@@ -137,13 +137,7 @@ def auditable?(person_record, person_version, person_updated_at, family)
   version_in_window?(person_updated_at) &&
   primary_has_address?(person_record, person_version, family) &&
   primary_answered_data?(person_record, person_version, family) &&
-  not_authorized_by_curam?(person_record)
-end
-
-def each_person_version(person)
-  person.versions.each do |person|
-    yield person
-  end
+  not_authorized_by_curam?(person_version)
 end
 
 pb = ProgressBar.create(
@@ -181,7 +175,6 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
     "Eligible"
   ]
   ivl_people.no_timeout.each do |pers_record|
-    STDERR.puts pers_record.id
     pers_record.reload
     clean_history_tracks = pers_record.history_tracks.reject do |ht|
       ((ht.created_at.to_f - pers_record.created_at.to_f).abs < 1.1)
@@ -198,6 +191,9 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
         # This will be a HistoryTracker
         [pers_record.history_tracker_to_record(p_version.created_at), p_version.created_at]
       elsif p_version.kind_of?(Date) || p_version.kind_of?(ActiveSupport::TimeWithZone)
+        if (p_version < AUDIT_START_DATE) || (p_version >= AUDIT_END_DATE)
+          next
+        end
         [pers_record.history_tracker_to_record(p_version), p_version]
       else
         [p_version, p_version.updated_at]
