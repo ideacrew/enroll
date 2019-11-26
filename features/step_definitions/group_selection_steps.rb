@@ -492,8 +492,8 @@ When(/(.*) clicks on the dental make changes button/) do |_role|
   page.all('a', text: 'Make Changes').first.click
 end
 
-Then(/(.*) should see the edit plan page/) do |_role|
-  expect(page).to have_content('Cancel Plan')
+Then(/(.*) should see the make changes page/) do |_role|
+  expect(page).to have_text('Tax credit amount')
 end
 
 When(/(.*) clicks on the Cancel Plan button/) do |_role|
@@ -630,12 +630,40 @@ And(/the metal level is (.*)/) do |metal_level|
   @family.enrollments.first.product.update_attributes(metal_level_kind: metal_level.to_sym)
 end
 
-Then(/the Edit APTC button should be available/) do
-  expect(page).to have_content("Edit APTC")
+Then(/the Change Tax Credit button should be available/) do
+  expect(page).to have_content("Change Tax Credit")
 end
 
-Then(/the Edit APTC button should NOT be available/) do
-  expect(page).to_not have_content("Edit APTC")
+Then(/the Change Tax Credit button should NOT be available/) do
+  expect(page).to_not have_content("Tax Credit amount")
+end
+
+When(/the user clicks on the Change Tax Credit button/) do
+  find("#aptc-button").click
+end
+
+When(/the user submits the Change Tax Credit form/) do
+  find("#update-aptc-button").click
+end
+
+And(/the user sees the Change Tax Credit Form/) do
+  expect(page).to have_content("Are you sure you want to update your tax credit?")
+end
+
+When(/the user changes Tax credit applied to 50%/) do
+  fill_in("aptc_applied_total", with: "50.0")
+end
+
+And(/the user confirms "Yes" to change the tax credit/) do
+  find("#agreement_action-confirm-yes-change-tax-credit").click
+end
+
+Then(/the user should see a message that their Tax Credits were updated/) do
+  expect(page).to have_content("Successfully updated tax credits for enrollment.")
+end
+
+Then(/the user should see that applied tax credit has been set to 50%/) do
+  expect(page).to have_content("0.5")
 end
 
 Given(/the enrollment has HIOS ID ending in (.*)/) do |id_number|
