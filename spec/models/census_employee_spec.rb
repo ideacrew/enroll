@@ -16,7 +16,6 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
   let!(:organization) {abc_organization}
 
   let!(:benefit_application) {initial_application}
-
   let!(:benefit_package) {benefit_application.benefit_packages.first}
   let!(:benefit_group) {benefit_package}
   let(:effective_period_start_on) {TimeKeeper.date_of_record.end_of_month + 1.day + 1.month}
