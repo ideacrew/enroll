@@ -73,7 +73,7 @@ class FamilyMember
     oldest_history_track = person.history_tracks.to_a.reject do |ht|
       ((ht.created_at.to_f - person.created_at.to_f).abs < 1.1)
     end.map(&:created_at).sort.first
-    if oldest_history_track && person.versions.empty? && (oldest_history_track.created_at > v_date)
+    if oldest_history_track && person.versions.empty? && (oldest_history_track > v_date)
       return person.history_tracker_to_record(v_date)
     end
     if closest_track = person.history_tracks.to_a.select { |ht| ht.created_at <= v_date }.sort_by(&:created_at).reverse.first

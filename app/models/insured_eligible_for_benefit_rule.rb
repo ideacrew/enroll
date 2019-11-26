@@ -17,6 +17,7 @@ class InsuredEligibleForBenefitRule
     @benefit_package = benefit_package
     @coverage_kind = options[:coverage_kind].present? ? options[:coverage_kind] : 'health'
     @new_effective_on = options[:new_effective_on]
+    @version_date = options[:version_date]
     @market_kind = options[:market_kind]
   end
 
@@ -140,7 +141,7 @@ class InsuredEligibleForBenefitRule
       #TODO person can have more than one families
       @family.family_members.active.each do |family_member|
         next if (family_member.person_id == person.id)
-        fm_person = family_member.person_version_for(person.updated_at)
+        fm_person = family_member.person_version_for(@version_date)
         next unless fm_person
         if age_on_next_effective_date(fm_person.dob) >= 19 && fm_person.is_dc_resident?
           return true
@@ -188,7 +189,7 @@ class InsuredEligibleForBenefitRule
   end
 
   def age_on_next_effective_date(dob)
-    today = TimeKeeper.date_of_record
+    today = @new_effective_on
     today.day <= 15 ? age_on = today.end_of_month + 1.day : age_on = (today + 1.month).end_of_month + 1.day
     age_on.year - dob.year - ((age_on.month > dob.month || (age_on.month == dob.month && age_on.day >= dob.day)) ? 0 : 1)
   end

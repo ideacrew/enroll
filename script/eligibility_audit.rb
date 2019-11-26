@@ -74,8 +74,9 @@ def version_in_window?(updated_at)
 end
 
 def calc_eligibility_for(cr, family, benefit_packages, ed)
+  effective_date = (ed < Date.new(2019,1,1)) ? Date.new(2019,1,1) : ed
   benefit_packages.any? do |hbp|
-    InsuredEligibleForBenefitRule.new(cr, hbp, {eligibility_date: ed, family: family}).satisfied?.first
+    InsuredEligibleForBenefitRule.new(cr, hbp, {new_effective_on: effective_date, family: family, version_date: ed, market_kind: "individual"}).satisfied?.first
   end
 end
 
