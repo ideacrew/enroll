@@ -98,6 +98,17 @@ And(/(.*) also has a health enrollment with primary person covered/) do |role|
   enrollment.save!
 end
 
+And(/(.*) has a health enrollment with dependent covered/) do |role|
+  family = Family.all.first
+  enrollment = family.hbx_enrollments.first
+  chm = family.active_household.immediate_family_coverage_household.coverage_household_members.last
+  enrollment.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: chm,
+    eligibility_date: TimeKeeper.date_of_record - 2.months,
+    coverage_start_on: TimeKeeper.date_of_record - 2.months
+  )
+  enrollment.save!
+end
+
 And(/(.*) also has a dental enrollment with primary person covered/) do |role|
   family = Family.all.first
   if ["consumer","Resident","user"].include? role
@@ -446,16 +457,34 @@ And(/Resident clicked on "Married" qle/) do
   click_link "Married"
 end
 
-Then(/consumer (.*) see the edit plan button/) do |visibility|
+# Replaced with Make Changes, commented out in case it's needed later
+# Then(/consumer (.*) see the edit plan button/) do |visibility|
+#   if visibility.eql?("should")
+#     expect(page).to have_selector("a", text: "Edit Plan",  count: 1)
+#   else
+#     expect(page).to_not have_selector("a", text: "Edit Plan",  count: 1)
+#   end
+# end
+
+Then(/consumer (.*) see the make changes button/) do |visibility|
   if visibility.eql?("should")
-    expect(page).to have_selector("a", text: "Edit Plan",  count: 1)
+    expect(page).to have_selector("a", text: "Make Changes",  count: 1)
   else
-    expect(page).to_not have_selector("a", text: "Edit Plan",  count: 1)
+    expect(page).to_not have_selector("a", text: "Make Changes",  count: 1)
   end
 end
 
-When(/(.*) clicks on the edit plan button/) do |_role|
-  click_link 'Edit Plan'
+# Replaced with Make Changes, commented out in case it's needed later
+# When(/(.*) clicks on the edit plan button/) do |_role|
+#   click_link 'Edit Plan'
+# end
+
+When(/(.*) clicks on the make changes button/) do |_role|
+  click_link 'Make Changes'
+end
+
+When(/(.*) clicks on the dental make changes button/) do |_role|
+  page.all('a', text: 'Make Changes').first.click
 end
 
 Then(/(.*) should see the edit plan page/) do |_role|
@@ -505,6 +534,10 @@ When(/consumer's health enrollment has an effective date in the future/) do
   Family.all.first.all_enrollments.first.update_attributes(effective_on: TimeKeeper.date_of_record + 20)
 end
 
+When(/consumer's dental enrollment has an effective date in the future/) do
+  Family.all.last.all_enrollments.first.update_attributes(effective_on: TimeKeeper.date_of_record + 20)
+end
+
 Then(/(.*) should not see the calender/) do |_role|
   expect(page).not_to have_selector :css, '.date-picker'
 end
@@ -519,6 +552,12 @@ end
 
 Then(/the enrollment should be canceled/) do
   expect(Family.all.first.all_enrollments.first.aasm_state).to eq('coverage_canceled')
+  #Enrollment tile should not show
+  expect(page).not_to have_content("View Details")
+end
+
+Then(/the dental enrollment should be canceled/) do
+  expect(Family.all.first.all_enrollments.last.aasm_state).to eq('coverage_canceled')
   #Enrollment tile should not show
   expect(page).not_to have_content("View Details")
 end

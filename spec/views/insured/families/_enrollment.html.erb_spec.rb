@@ -300,8 +300,8 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
 
-    it "should display edit plan button" do
-      expect(rendered).to have_text("Edit Plan")
+    it "should display make changes button" do
+      expect(rendered).to have_text("Make Changes")
     end
   end
 
