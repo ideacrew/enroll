@@ -2370,7 +2370,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         expect(census_employee.benefit_group_assignment_for_date(coverage_date)).to eq nil
       end
 
-      it "should return nil if given coverage_date is not between the bga start_on and end_on dates" do
+      it "should return latest bga for given coverage_date" do
         bga = census_employee.benefit_group_assignments.first
         coverage_date = bga.start_on
         bga.update_attributes(is_active: false)
