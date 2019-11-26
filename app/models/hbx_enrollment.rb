@@ -421,6 +421,10 @@ class HbxEnrollment
   after_save :check_created_at
   after_save :notify_on_save
 
+  def max_aptc
+    family&.active_household&.latest_active_tax_household_with_year(effective_on.year)&.total_aptc_available_amount_for_enrollment(self)
+  end
+
   # This method checks to see if there is at least one subscriber in the hbx_enrollment_members nested document.
   # If not, it assigns it to the oldest person.
   def check_for_subscriber

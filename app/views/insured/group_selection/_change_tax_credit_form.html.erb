@@ -10,7 +10,7 @@
     <%= form_tag edit_aptc_insured_group_selections_path(hbx_enrollment_id: locals[:hbx_enrollment][:id]), :method => :post do %>
     <div class='col-md-6'>
       <div id="applied-aptc-text" class="hidden">
-        <h5>Maximum tax credit available: 100.00</h5>
+        <h5>Maximum tax credit available: $<%= locals[:hbx_enrollment].max_aptc.to_s %></h5>
         <h5>Tax credit applied (%)</h5>
         <span align= "center">
           <output id="aptc_applied_pct_1_percent" name="aptc_applied_pct">
@@ -34,3 +34,4 @@
     <% end %>
   </div>
 </div>
+
