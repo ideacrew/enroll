@@ -57,7 +57,7 @@ class RemoveDependent < MongoidMigrationTask
             puts 'Cannot destroy/delete the FamilyMember, reason: This FamilyMember does not have any other FamilyMember in the Family with CoverageHouseholdMember' unless Rails.env.test?
           end
         else
-          puts 'Cannot destroy/delete the FamilyMember' unless Rails.env.test?
+          puts 'Cannot destroy/delete the FamilyMember, reason: This family member has other dependencies other than the ones in the rake(Please enhance the rake)' unless Rails.env.test?
         end
       rescue StandardError => e
         puts e.message unless Rails.env.test?

@@ -126,10 +126,8 @@ Feature: IVL plan purchase
     Then consumer should land on confirm page
     And consumer clicks Confirm
     Then consumer should enrollment submitted confirmation page
-    And consumer clicks back to my account button
+    Then consumer clicked on continue for plan shopping
     Then cosumer should see the home page
-
-
 
   Scenario: IVL plan shopping by clicking on 'shop for plan' button should land on Plan shopping page
     Given a consumer exists

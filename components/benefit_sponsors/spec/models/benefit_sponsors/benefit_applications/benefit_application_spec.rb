@@ -979,18 +979,17 @@ module BenefitSponsors
 
       context ".renewal_quiet_period_end", dbclean: :after_each do
         it 'should return renewal quiet period dates' do
-          renewal_start_on = renewal_application.start_on
+          renewal_quiet_period = renewal_application.start_on + (Settings.aca.shop_market.renewal_application.quiet_period.month_offset.months) + (Settings.aca.shop_market.renewal_application.quiet_period.mday - 1).days
           expect(renewal_application.renewal_quiet_period_end(renewal_application.start_on).mday).to eq 15
-          expect(renewal_application.renewal_quiet_period_end(renewal_application.start_on)).to eq Date.new(renewal_start_on.year, renewal_start_on.prev_month.month, 15)
+          expect(renewal_application.renewal_quiet_period_end(renewal_application.start_on)).to eq renewal_quiet_period
         end
       end
 
       context ".initial_quiet_period_end", dbclean: :after_each do
         it 'should return initial quiet period dates' do
-
-          inital_start_on = predecessor_application.start_on
+          inital_quiet_period = predecessor_application.start_on + (Settings.aca.shop_market.initial_application.quiet_period.month_offset.months) + (Settings.aca.shop_market.initial_application.quiet_period.mday - 1).days
           expect(predecessor_application.initial_quiet_period_end(predecessor_application.start_on).mday).to eq 28
-          expect(predecessor_application.initial_quiet_period_end(predecessor_application.start_on)).to eq Date.new(inital_start_on.year, inital_start_on.prev_month.month, 28)
+          expect(predecessor_application.initial_quiet_period_end(predecessor_application.start_on)).to eq inital_quiet_period
         end
       end
     end
