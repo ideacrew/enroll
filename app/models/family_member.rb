@@ -76,7 +76,7 @@ class FamilyMember
     if oldest_history_track && person.versions.empty? && (oldest_history_track.created_at > v_date)
       return person.history_tracker_to_record(v_date)
     end
-    if closest_track = person.history_tracks.unscoped.to_a.select { |ht| ht.created_at <= v_date }.sort_by(&:created_at).reverse.first
+    if closest_track = person.history_tracks.to_a.select { |ht| ht.created_at <= v_date }.sort_by(&:created_at).reverse.first
       person.history_tracker_to_record(closest_track.created_at)
     elsif closest_person = person.versions.to_a.select { |ver| ver.updated_at <= v_date }.order_by({updated_at: -1}).reverse.first
       closest_person

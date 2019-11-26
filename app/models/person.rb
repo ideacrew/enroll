@@ -244,6 +244,8 @@ class Person
 
   index({"hbx_csr_role._id" => 1})
   index({"hbx_assister._id" => 1})
+  index({"created_at" => 1, "updated_at" => 1})
+  index({"created_at" => 1, "updated_at" => 1, "consumer_role._id" => 1})
 
   scope :all_consumer_roles,          -> { exists(consumer_role: true) }
   scope :all_resident_roles,          -> { exists(resident_role: true) }
