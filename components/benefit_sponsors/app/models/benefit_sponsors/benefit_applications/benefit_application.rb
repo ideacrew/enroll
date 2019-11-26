@@ -738,6 +738,20 @@ module BenefitSponsors
       end
     end
 
+    # Employee can plan shop only when application belong to following states.
+    def shoppable?
+      [
+        :enrollment_open,
+        :enrollment_extended,
+        :enrollment_closed,
+        :binder_paid,
+        :enrollment_eligible,
+        :active,
+        :expired,
+        :termination_pending
+      ].include?(aasm_state)
+    end
+
     aasm do
       state :draft, initial: true
       state :imported             # Static state for seed application instances used to transfer Benefit Sponsors and members into the system
