@@ -13,6 +13,12 @@ end
 puts "Health Benefit Packages located."
 
 non_curam_ivl = Person.collection.aggregate([
+  {"$project" => {
+    _id: 1,
+    created_at: 1,
+    updated_at: 1,
+    consumer_role: 1
+  }},
   {"$match" => {
     "consumer_role._id" => {"$ne" => nil},
     "$or" => [
@@ -191,7 +197,7 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
       else
         [p_version, p_version.updated_at]
       end
-      if (person_updated_at < AUDIT_START_DATE) || (person_udpated_at >= AUDIT_END_DATE)
+      if (person_updated_at < AUDIT_START_DATE) || (person_updated_at >= AUDIT_END_DATE)
         next
       end
       families = person_family_map[pers_record.id]
