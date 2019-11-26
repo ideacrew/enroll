@@ -49,23 +49,6 @@ Feature: IVL plan purchase
     And consumer clicked on shop for new plan
     Then consumer should see primary person
 
-  Scenario: IVL plan shopping by clicking on 'edit plan' button on enrollment
-    Given a consumer exists
-    And the consumer is logged in
-    And consumer has a dependent in child relationship with age greater than 26
-    And consumer has a dependent in spouse relationship with age greater than 26
-    And consumer also has a health enrollment with primary person covered
-    When consumer visits home page after successful ridp
-    Then consumer should see the enrollment with edit plan button
-    When consumer clicks on the edit plan button
-    And consumer clicks on the Shop for Plans button
-    And consumer clicks continue
-    Then consumer should see the ineligible family member disabled and unchecked
-    And consumer should see the eligible family member enabled and checked
-    And consumer should also see the reason for ineligibility
-    When consumer clicked on shop for new plan
-    Then consumer should see primary and valid dependent
-
   Scenario: IVL keep existing plan by clicking on 'make changes' button on sep enrollment
     Given a consumer exists
     And the consumer is logged in
@@ -130,30 +113,3 @@ Feature: IVL plan purchase
     Then consumer should enrollment submitted confirmation page
     Then consumer clicked on continue for plan shopping
     Then cosumer should see the home page
-
-  Scenario: IVL plan shopping by clicking on 'shop for plan' button should land on Plan shopping page
-    Given a consumer exists
-    And the consumer is logged in
-    And consumer has a dependent in child relationship with age less than 26
-    And consumer also has a health enrollment with primary person covered
-    When consumer visits home page after successful ridp
-    Then consumer should see the enrollment with make changes button
-    When consumer clicked on make changes button
-    And consumer clicked on shop for new plan
-    Then consumer should see both dependent and primary
-
-  Scenario: IVL plan shopping by clicking on 'make changes' button on dental enrollment
-    Given a consumer exists
-    And the consumer is logged in
-    And consumer has a dependent in child relationship with age greater than 26
-    And consumer has a dependent in spouse relationship with age greater than 26
-    And consumer also has a dental enrollment with primary person covered
-    When consumer visits home page after successful ridp
-    Then consumer should see the dental enrollment with make changes button
-    When consumer clicked on make changes button
-    Then consumer should see the ineligible family member disabled and unchecked
-    And consumer should see the eligible family member enabled and checked
-    And consumer should also see the reason for ineligibility
-    Then consumer should see keep existing plan and select plan to terminate button
-    When consumer clicked on shop for new plan
-    Then consumer should see primary and valid dependent

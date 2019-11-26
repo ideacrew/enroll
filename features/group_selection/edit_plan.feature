@@ -1,4 +1,4 @@
-Feature: Edit Plan Button
+Feature: Make Changes Button
 
   Background:
     Given a consumer exists
@@ -71,7 +71,7 @@ Feature: Edit Plan Button
       | resident |
       | employee |
 
-  Scenario Outline: Edit plan button visibility on IVL enrollment tiles
+  Scenario Outline: Make changes button visibility on IVL enrollment tiles
     Given consumer should see my account page
     And the enrollment is in <state> state
     Then the consumer <visibility> see the make changes button
