@@ -16,6 +16,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
   let!(:organization) {abc_organization}
 
   let!(:benefit_application) {initial_application}
+
   let!(:benefit_package) {benefit_application.benefit_packages.first}
   let!(:benefit_group) {benefit_package}
   let(:effective_period_start_on) {TimeKeeper.date_of_record.end_of_month + 1.day + 1.month}
@@ -2368,6 +2369,16 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         initial_application.update_attributes(aasm_state: :imported)
         coverage_date = census_employee.benefit_group_assignments.first.start_on - 1.month
         expect(census_employee.benefit_group_assignment_for_date(coverage_date)).to eq nil
+      end
+
+      it "should return nil if given coverage_date is not between the bga start_on and end_on dates" do
+        bga = census_employee.benefit_group_assignments.first
+        coverage_date = bga.start_on
+        bga.update_attributes(is_active: false)
+        bga1 = bga.dup
+        bga.update_attributes(created_at: bga.created_at - 1.day)
+        census_employee.benefit_group_assignments << bga1
+        expect(census_employee.benefit_group_assignment_for_date(coverage_date)).to eq bga1
       end
     end
 
