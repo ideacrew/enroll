@@ -72,8 +72,7 @@ module HistoryTrackerToRecord
       rescue Exception => e
         log_string = e.inspect + " - ASSOCIATION CHAIN:" + rt.association_chain.inspect + " - HISTORY TRACK: " + rt.inspect + " - PERSON: " + self.inspect
         Rails.logger.error("[IVL ELIG AUDIT]") { log_string }
-        STDERR.puts log_string
-        raise e
+        raise HistoryTrackerReversalError.new(e.message, rt, self)
       end
     end
 

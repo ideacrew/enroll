@@ -240,6 +240,10 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
                 ])
               end
             end
+          rescue HistoryTrackerReversalError => htre
+            STDERR.puts htre.inspect
+            STDERR.flush
+            next            
           rescue Mongoid::Errors::DocumentNotFound => e
             puts e.inspect
           end
