@@ -40,12 +40,15 @@ module Insured
         # field :elected_aptc_pct, type: Float, default: 0.0
         # field :applied_aptc_amount, type: Money, default: 0.0
         enrollment = HbxEnrollment.find(BSON::ObjectId.from_string(enrollment_id))
-        enrollment.update_attributes!(elected_aptc_pct: elected_aptc_pct, applied_aptc_amount: applied_aptc_amount)
+
+        new_effective_date = find_enrollment_effective_on_date(current_datetime).to_date
+        reinstatement = Enrollments::Replicator::Reinstatement.new(enrollment, new_effective_date, applied_aptc_amount).build
+        reinstatement.update_attributes!(elected_aptc_pct: elected_aptc_pct, applied_aptc_amount: applied_aptc_amount)
       end
 
       def is_aptc_eligible(enrollment, family)
         return false if enrollment.kind == "coverall" || enrollment.coverage_kind == "dental"
-        
+
         allowed_metal_levels = ["platinum", "silver", "gold", "bronze"]
         product = enrollment.product
         tax_household = family.active_household.latest_active_tax_household if family.active_household.latest_active_tax_household.present?
@@ -59,6 +62,21 @@ module Insured
         sep        = SpecialEnrollmentPeriod.find(BSON::ObjectId.from_string(family.latest_active_sep.id)) if family.latest_active_sep.present?
         qle        = QualifyingLifeEventKind.find(BSON::ObjectId.from_string(sep.qualifying_life_event_kind_id))  if sep.present?
         { enrollment: enrollment, family: family, qle: qle, is_aptc_eligible: is_aptc_eligible(enrollment, family) }
+      end
+
+      def def find_enrollment_effective_on_date(hbx_created_datetime)
+        offset_month = hbx_created_datetime.day <= 15 ? 1 : 2
+        year = hbx_created_datetime.year
+        month = hbx_created_datetime.month + offset_month
+        if month > 12
+          year = year + 1
+          month = month - 12
+        end
+        day = 1
+        hour = hbx_created_datetime.hour
+        min = hbx_created_datetime.min
+        sec = hbx_created_datetime.sec
+        return DateTime.new(year, month, day, hour, min, sec)
       end
 
     end

@@ -2,11 +2,12 @@ module Enrollments
   module Replicator
     class Reinstatement
 
-      attr_accessor :base_enrollment, :new_effective_date
+      attr_accessor :base_enrollment, :new_effective_date, :new_aptc
 
-      def initialize(enrollment, effective_date)
+      def initialize(enrollment, effective_date, new_aptc=nil)
         @base_enrollment = enrollment
         @new_effective_date = effective_date
+        @new_aptc = new_aptc
       end
 
       def benefit_application
@@ -114,6 +115,14 @@ module Enrollments
         end
 
         reinstated_enrollment.hbx_enrollment_members = clone_hbx_enrollment_members
+
+        if base_enrollment.may_terminate_coverage? && (reinstate_enrollment.effective_on > base_enrollment.effective_on)
+          base_enrollment.terminate_coverage!
+          base_enrollment.update_attributes!(terminated_on: reinstate_enrollment.effective_on - 1.day)
+        else
+          base_enrollment.cancel_coverage! if base_enrollment.may_cancel_coverage?
+        end
+
         reinstated_enrollment
       end
 
@@ -161,7 +170,7 @@ module Enrollments
       def apply_aptc_to_members(duplicate_hbx, options = {})
         duplicate_hbx.hbx_enrollment_members.each do |mem|
           aptc_pct_for_member = options[:aptc_ratio_by_member][mem.applicant_id.to_s] || 0.0
-          mem.applied_aptc_amount = otpions[:new_aptc] * aptc_pct_for_member / options[:percent_sum_for_all_enrolles]
+          mem.applied_aptc_amount = options[:new_aptc] * aptc_pct_for_member / options[:percent_sum_for_all_enrolles]
         end
       end
 
