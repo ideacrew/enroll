@@ -8,14 +8,14 @@
   </div>
   <div class="row">
     <div class="col-md-6">
-      <% hbx_enrollment = @self_term_or_cancel_form.hbx_enrollment %>  
+      <% hbx_enrollment = @self_term_or_cancel_form.hbx_enrollment %>
       <% product = @self_term_or_cancel_form.product %>
       <% sep = @self_term_or_cancel_form.special_enrollment_period %>
       <div class="hbx-enrollment-panel module">
         <div class="panel panel-default min-h">
           <div class="panel-heading">
             <h4>
-              <%= product[:application_period].min.year %> <%= l10n("health_coverage") %> 
+              <%= product[:application_period].min.year %> <%= l10n("health_coverage") %>
             </h4>
             <hr>
           </div>
@@ -91,7 +91,7 @@
         locals: {
           self_term_or_cancel_form: @self_term_or_cancel_form,
           hbx_enrollment: @self_term_or_cancel_form.hbx_enrollment,
-          term_or_cancel: @self_term_or_cancel_form.enrollment.should_term_or_cancel_ivl, 
+          term_or_cancel: @self_term_or_cancel_form.enrollment.should_term_or_cancel_ivl,
         }
     %>
     <!-- Placeholder APTC Form - work functionality in later -->
