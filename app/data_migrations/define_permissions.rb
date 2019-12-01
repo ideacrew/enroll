@@ -40,7 +40,7 @@ class DefinePermissions < MigrationTask
       .find_or_initialize_by(name: 'hbx_tier3')
       .update_attributes!(modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
                           send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_update_ssn: false, can_complete_resident_application: false,
-                          can_add_sep: false, can_lock_unlock: true, can_view_username_and_email: false, can_reset_password: false, modify_admin_tabs: true,
+                          can_add_sep: false, can_lock_unlock: false, can_view_username_and_email: false, can_reset_password: false, modify_admin_tabs: true,
                           view_admin_tabs: true,  view_the_configuration_tab: true, can_submit_time_travel_request: false)
     Permission
       .find_or_initialize_by(name: 'super_admin')
@@ -96,6 +96,11 @@ class DefinePermissions < MigrationTask
     Permission.hbx_tier3.update_attributes!(can_access_user_account_tab: true)
   end
 
+  def hbx_admin_can_view_login_history
+    Permission.hbx_staff.update_attributes!(view_login_history: true)
+    Permission.super_admin.update_attributes!(view_login_history: true)
+  end
+
   def hbx_admin_csr_view_personal_info_page
     Permission.hbx_staff.update_attributes!(view_personal_info_page: true)
     Permission.super_admin.update_attributes!(view_personal_info_page: true)
@@ -120,7 +125,6 @@ class DefinePermissions < MigrationTask
   def hbx_admin_can_lock_unlock
     Permission.hbx_staff.update_attributes(can_lock_unlock: true)
     Permission.super_admin.update_attributes(can_lock_unlock: true)
-    Permission.hbx_tier3.update_attributes(can_lock_unlock: true)
   end
 
   def hbx_admin_can_add_pdc
@@ -142,7 +146,6 @@ class DefinePermissions < MigrationTask
   def hbx_admin_can_reset_password
     Permission.hbx_staff.update_attributes(can_reset_password: true)
     Permission.super_admin.update_attributes(can_reset_password: true)
-    Permission.hbx_tier3.update_attributes(can_reset_password: true)
   end
 
   def hbx_admin_can_change_fein
