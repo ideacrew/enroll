@@ -147,7 +147,7 @@ class DefinePermissions < MigrationTask
   def hbx_admin_can_reset_password
     Permission.hbx_staff.update_attributes(can_reset_password: true)
     Permission.super_admin.update_attributes(can_reset_password: true)
-    Permission.hbx_tier3.update_attributes(can_lock_unlock: false)
+    Permission.hbx_tier3.update_attributes(can_reset_password: false)
   end
 
   def hbx_admin_can_change_fein
