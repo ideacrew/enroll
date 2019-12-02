@@ -2,12 +2,16 @@ module Enrollments
   module Replicator
     class Reinstatement
 
-      attr_accessor :base_enrollment, :new_effective_date, :new_aptc
+      attr_accessor :base_enrollment, :new_effective_date, :new_aptc, :year, :duplicate_hbx, :reinstate_enrollment, :aptc_ratio_by_member
 
       def initialize(enrollment, effective_date, new_aptc=nil)
         @base_enrollment = enrollment
         @new_effective_date = effective_date
         @new_aptc = new_aptc
+        @year = effective_date.year
+        # TODO: dupliate_hbx was in the inherited code but was undefined. Need to know
+        # what it is supposed to be
+        @duplicate_hbx = enrollment.dup
       end
 
       def benefit_application
@@ -94,22 +98,26 @@ module Enrollments
 
       def build
         reinstated_enrollment = HbxEnrollment.new
+        @reinstate_enrollment = reinstated_enrollment
         assign_attributes_to_reinstate_enrollment(reinstated_enrollment, common_params)
-
         if base_enrollment.is_shop?
           assign_attributes_to_reinstate_enrollment(reinstated_enrollment, form_shop_params) if can_be_reinstated?
         elsif base_enrollment.is_ivl_by_kind? && new_aptc
           #TODO: why this much calculations
           aptc_ratio_by_member = base_enrollment.family.active_household.latest_active_tax_household.aptc_ratio_by_member
-          percent_sum_for_all_enrolles = duplicate_hbx.hbx_enrollment_members.inject(0.0) { |sum, member| sum + aptc_ratio_by_member[member.applicant_id.to_s] || 0.0 }
+          # TODO: duplicate_hbx is undefined
+          percent_sum_for_all_enrollees = duplicate_hbx.hbx_enrollment_members.inject(0.0) { |sum, member| sum + (aptc_ratio_by_member[member.applicant_id.to_s] || 0.0)}
 
           assign_attributes_to_reinstate_enrollment(reinstated_enrollment, form_ivl_params)
 
-          apply_aptc_to_members(duplicate_hbx,{
-            aptc_ratio_by_member: aptc_ratio_by_member,
-            new_aptc: new_aptc,
-            percent_sum_for_all_enrolles: percent_sum_for_all_enrolles
-          })
+          apply_aptc_to_members(
+            duplicate_hbx,
+            {
+              aptc_ratio_by_member: aptc_ratio_by_member,
+              new_aptc: new_aptc,
+              percent_sum_for_all_enrolles: percent_sum_for_all_enrollees
+            }
+          )
 
           # To do for this path: Handle enrollment state & handle 15th of month rule for effective date (outside of service, probably)
         end
@@ -123,6 +131,7 @@ module Enrollments
           base_enrollment.cancel_coverage! if base_enrollment.may_cancel_coverage?
         end
 
+        @reinstate_enrollment = reinstated_enrollment
         reinstated_enrollment
       end
 
@@ -144,8 +153,9 @@ module Enrollments
       end
 
       def form_ivl_params
-        #TODO: Query is too long
-        max_aptc = base_enrollment.family.active_household.latest_active_tax_household_with_year(year).latest_eligibility_determination.max_aptc.to_f
+        # TODO: Query is too long
+        # TODO: undefined local variable or method `year' for #<Enrollments::Replicator::Reinstatement:0x00007fca4bcb2970>
+        max_aptc = base_enrollment.max_aptc
         {
           product_id: base_enrollment.product_id,
           consumer_role_id: base_enrollment.consumer_role_id,

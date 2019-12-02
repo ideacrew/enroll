@@ -41,7 +41,7 @@ module Insured
         # field :applied_aptc_amount, type: Money, default: 0.0
         enrollment = HbxEnrollment.find(BSON::ObjectId.from_string(enrollment_id))
 
-        new_effective_date = find_enrollment_effective_on_date(current_datetime).to_date
+        new_effective_date = find_enrollment_effective_on_date(DateTime.now)
         reinstatement = Enrollments::Replicator::Reinstatement.new(enrollment, new_effective_date, applied_aptc_amount).build
         reinstatement.update_attributes!(elected_aptc_pct: elected_aptc_pct, applied_aptc_amount: applied_aptc_amount)
       end
@@ -64,7 +64,7 @@ module Insured
         { enrollment: enrollment, family: family, qle: qle, is_aptc_eligible: is_aptc_eligible(enrollment, family) }
       end
 
-      def find_enrollment_effective_on_date(hbx_created_datetime)
+      def self.find_enrollment_effective_on_date(hbx_created_datetime)
         offset_month = hbx_created_datetime.day <= 15 ? 1 : 2
         year = hbx_created_datetime.year
         month = hbx_created_datetime.month + offset_month
