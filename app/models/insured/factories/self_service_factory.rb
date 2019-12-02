@@ -64,7 +64,7 @@ module Insured
         { enrollment: enrollment, family: family, qle: qle, is_aptc_eligible: is_aptc_eligible(enrollment, family) }
       end
 
-      def def find_enrollment_effective_on_date(hbx_created_datetime)
+      def find_enrollment_effective_on_date(hbx_created_datetime)
         offset_month = hbx_created_datetime.day <= 15 ? 1 : 2
         year = hbx_created_datetime.year
         month = hbx_created_datetime.month + offset_month
