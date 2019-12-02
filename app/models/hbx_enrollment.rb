@@ -262,6 +262,16 @@ class HbxEnrollment
   )
 
   index(
+    {
+      "family_id"  => 1,
+      "aasm_state" => 1,
+      "product_id" => 1,
+      "sponsored_benefit_id" => 1
+    },
+    {name: "family_home_page_hidden_enrollments_lookup"}
+  )
+
+  index(
       {
           "benefit_group_id" => 1,
           "coverage_kind" => 1
@@ -326,12 +336,12 @@ class HbxEnrollment
   scope :canceled, -> { where(:aasm_state.in => CANCELED_STATUSES) }
   scope :family_home_page_hidden_enrollments, ->(family) do
     where(
-      family_id: family.id,
+      :family_id => family.id,
+      :aasm_state => "coverage_canceled",
       :product_id.nin => [nil],
-      aasm_state: "coverage_canceled"
+      :sponsored_benefit_id.nin => [nil, '']
     ).order(
-      effective_on: :desc,
-      submitted_at: :desc, coverage_kind: :desc
+      effective_on: :desc, submitted_at: :desc, coverage_kind: :desc
     )
   end
   #scope :terminated, -> { where(:aasm_state.in => TERMINATED_STATUSES, :terminated_on.gte => TimeKeeper.date_of_record.beginning_of_day) }
