@@ -15,7 +15,12 @@
         <div class="panel panel-default min-h">
           <div class="panel-heading">
             <h4>
-              <%= product[:application_period].min.year %> <%= hbx_enrollment.product.kind.to_s == "health" ? l10n("health_coverage") : l10n("dental_coverage") %>
+              <%= product[:application_period].min.year %>
+              <% if hbx_enrollment.product.kind.to_s == "health" %>
+                <%= l10n("health_coverage") %>
+              <% else %>
+                <%= l10n("dental_coverage") %>
+              <% end %>
             </h4>
             <hr>
           </div>
