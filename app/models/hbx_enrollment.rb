@@ -265,8 +265,7 @@ class HbxEnrollment
     {
       "family_id"  => 1,
       "aasm_state" => 1,
-      "product_id" => 1,
-      "sponsored_benefit_id" => 1
+      "product_id" => 1
     },
     {name: "family_home_page_hidden_enrollments_lookup"}
   )
@@ -338,8 +337,7 @@ class HbxEnrollment
     where(
       :family_id => family.id,
       :aasm_state => "coverage_canceled",
-      :product_id.nin => [nil],
-      :sponsored_benefit_id.nin => [nil, '']
+      :product_id.nin => [nil]
     ).order(
       effective_on: :desc, submitted_at: :desc, coverage_kind: :desc
     )
@@ -1352,6 +1350,11 @@ class HbxEnrollment
     if self.consumer_role.present? && self.consumer_role_id == pre_hbx.consumer_role_id
       pre_hbx.update_attributes!(is_active: false, changing: false)
     end
+  end
+
+  def self.family_canceled_enrollments(family)
+    canceled_enrollments = HbxEnrollment.family_home_page_hidden_enrollments(family)
+    canceled_enrollments.reject{|enrollment| enrollment.is_shop? && enrollment.sponsored_benefit_id.blank? }
   end
 
   # TODO: Fix this to properly respect mulitiple possible employee roles for the same employer
