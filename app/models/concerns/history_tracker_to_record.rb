@@ -1,13 +1,31 @@
 module HistoryTrackerToRecord
   extend ActiveSupport::Concern
 
+  ACTION_ORDER = {
+    "create" => 1,
+    "update" => 5,
+    "destroy"  => 10
+  }
+
+  def sort_history_tracks(a,b)
+    a_id = a.association_chain.last["id"].to_s
+    b_id = b.association_chain.last["id"].to_s
+    a_action = a.action.to_s
+    b_action = b.action.to_s
+    return (a.created_at <=> b.created_at) if a_id != b_id
+    return (a.created_at <=> b.created_at) if a_action == b_action
+    ACTION_ORDER[a_action] <=> ACTION_ORDER[b_action]
+  end
+
   def history_tracker_to_record(ht_date)
     # Example: If is a HistoryTracker in person model
     # history_track.trackable will return consumer_role
     # if the consumer_role was modified. trackable_root
     # will return person for both
     self.reload
-    all_tracks = self.history_tracks.to_a.sort_by(&:created_at)
+    all_tracks = self.history_tracks.to_a.sort do |a,b|
+      sort_history_tracks(a,b)
+    end
     tracks_to_reverse = all_tracks.reject do |ht|
       (ht.created_at <= ht_date) || ((ht.created_at.to_f - self.created_at.to_f).abs < 1.1)
     end.reverse
