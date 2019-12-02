@@ -145,7 +145,7 @@
         <% if hbx_enrollment.consumer_role.present? && (hbx_enrollment.applied_aptc_amount > 0) %>
         <p>
           <label><%= l10n("APTC_amount") %>:</label>
-          <strong>$<%= (hbx_enrollment.elected_aptc_pct.to_f * 1000).to_s %></strong>/month
+          <strong><%= number_to_currency(hbx_enrollment.applied_aptc_amount, precision: 2) %></strong>/month
         </p>
         <% else %>
         &nbsp;
