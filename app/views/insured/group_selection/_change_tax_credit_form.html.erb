@@ -4,12 +4,15 @@
   </h3>
   <br>
   <p id="aptc-msg" class="action-msg hidden"><%= l10n("are_you_sure_you_want_to_update_aptc") %></p>
-  <%= radio_button_tag :agreement, "action-confirm-yes-change-tax-credit" %>&nbsp;<%= l10n("yes") %><br>
-  <%= radio_button_tag :agreement, "action-confirm-no-change-tax-credit" %>&nbsp;<%= l10n("no") %>  
+  <%= radio_button_tag :agreement, "action-confirm-yes-change-tax-credit" %>&nbsp;&nbsp;<%= l10n("yes") %><br>
+  <%= radio_button_tag :agreement, "action-confirm-no-change-tax-credit" %>&nbsp;&nbsp;<%= l10n("no") %>  
   <div id="calendar-div" class="row hidden">
     <%= form_tag edit_aptc_insured_group_selections_path(hbx_enrollment_id: locals[:hbx_enrollment][:id]), :method => :post do %>
     <div class='col-md-6'>
       <div id="applied-aptc-text" class="hidden">
+        <h5>Effective date</h5>
+        <%# removed the classes date-picker aptc-date-picker from field below because readonly %>
+        <%= text_field_tag 'effective_on_date', '',:'data-date-min'=> "+0d", placeholder: " ", class: "required floatlabel form-control", required: true, id: "aptc_date", value: locals[:hbx_enrollment][:effective_on], readonly: true %>
         <h5>Maximum tax credit available: $<%= locals[:hbx_enrollment].max_aptc.to_s %></h5>
         <h5>Tax credit applied (%)</h5>
         <span align= "center">
@@ -30,7 +33,7 @@
         </span>
       </div>
       <br>
-      <%= submit_tag l10n("change_tax_credit"), class: 'button btn btn-lg btn-primary btn-block interaction-click-control-action-confirm', id: 'update-aptc-button', :disabled => true %>
+      <%= submit_tag l10n("update_tax_credit"), class: 'button btn btn-lg btn-primary btn-block interaction-click-control-action-confirm', id: 'update-aptc-button', :disabled => true %>
     <% end %>
   </div>
 </div>
