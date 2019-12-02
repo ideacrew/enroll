@@ -178,7 +178,9 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
   ivl_people.no_timeout.each do |pers_record|
     pers_record.reload
     clean_history_tracks = pers_record.history_tracks.reject do |ht|
-      ((ht.created_at.to_f - pers_record.created_at.to_f).abs < 1.1)
+      last_chain_name = ht.association_chain.last["name"]
+      ((ht.created_at.to_f - pers_record.created_at.to_f).abs < 1.1) ||
+        (last_chain_name == "verification_types")
     end
     person_versions = [pers_record] + pers_record.versions + clean_history_tracks
     if pers_record.versions.empty? && pers_record.history_tracks.any?

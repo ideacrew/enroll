@@ -7,6 +7,17 @@ module HistoryTrackerToRecord
     "destroy"  => 10
   }
 
+  def reversed_history_tracks(ht_date)
+    all_tracks = self.history_tracks.to_a.sort do |a,b|
+      sort_history_tracks(a,b)
+    end
+    tracks_to_reverse = all_tracks.reject do |ht|
+      last_chain_name = ht.association_chain.last["name"]
+      (ht.created_at <= ht_date) || ((ht.created_at.to_f - self.created_at.to_f).abs < 1.1) ||
+        (last_chain_name == "verification_types")
+    end.reverse
+  end
+
   def sort_history_tracks(a,b)
     a_id = a.association_chain.last["id"].to_s
     b_id = b.association_chain.last["id"].to_s
@@ -26,10 +37,7 @@ module HistoryTrackerToRecord
     all_tracks = self.history_tracks.to_a.sort do |a,b|
       sort_history_tracks(a,b)
     end
-    tracks_to_reverse = all_tracks.reject do |ht|
-      (ht.created_at <= ht_date) || ((ht.created_at.to_f - self.created_at.to_f).abs < 1.1)
-    end.reverse
-
+    tracks_to_reverse = reversed_history_tracks(ht_date)
     tracks_to_reverse.each do |rt|
       begin
       if rt.association_chain.length < 2
