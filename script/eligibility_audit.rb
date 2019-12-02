@@ -253,6 +253,7 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
         next  
       end
     end
+    person_family_map.delete(pers_record.id)
     pb.increment
   end
 end
