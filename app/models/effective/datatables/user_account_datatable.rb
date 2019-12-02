@@ -13,7 +13,7 @@ module Effective
                                dropdown = [
                                    # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
                                    if row.email.present?
-                                     ['Reset Password', reset_password_user_path(row),  'ajax']
+                                     ['Reset Password', reset_password_user_path(row), 'ajax']
                                    else
                                      ['Reset Password', edit_user_path(row.id), 'ajax']
                                    end,
