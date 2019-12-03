@@ -18,13 +18,14 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model, dbclean
   let(:employee_role) { FactoryGirl.create :employee_role, employer_profile: employer_profile }
   let!(:active_benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_package: sponsored_benefit_package, start_on: predecessor_application.start_on, end_on: predecessor_application.end_on, benefit_group_id: nil)}
   let!(:renewal_benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, start_on: renewal_application.start_on, end_on: renewal_application.end_on, benefit_package: benefit_package, benefit_group_id: nil)}
-  let!(:ce) { FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile, employee_role_id: employee_role.id ,benefit_group_assignments:[active_benefit_group_assignment, renewal_benefit_group_assignment]}
+  let!(:ce) { FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile, dob: Date.new((coverage_terminated_on.year - 30), 9,8),  employee_role_id: employee_role.id ,benefit_group_assignments:[active_benefit_group_assignment, renewal_benefit_group_assignment]}
   let!(:ce_update){ce.update_attributes(aasm_state: 'cobra_linked', cobra_begin_date: coverage_terminated_on.next_day, coverage_terminated_on: coverage_terminated_on)}
 
 
   let!(:family) {
-    person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
-    employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
+    employee_role.person.update_attributes(dob: ce.dob, ssn: ce.ssn)
+    employee_role.update_attributes(census_employee: ce)
+    person = employee_role.person
     ce.update_attributes({employee_role: employee_role})
     family_rec = Family.find_or_build_from_employee_role(employee_role)
     hbx_enrollment_mem=FactoryGirl.build(:hbx_enrollment_member, eligibility_date:Time.now,applicant_id:person.primary_family.family_members.first.id,coverage_start_on:ce.active_benefit_group_assignment.benefit_package.start_on)
@@ -50,13 +51,13 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model, dbclean
     family_rec.reload
   }
 
-  let!(:clone_enrollment){family.enrollments.first}
+  let!(:clone_enrollment){family.enrollments.select{|e| e.kind == "employer_sponsored"}.first}
 
   let(:generate_cobra_enrollment) {
     factory = Factories::FamilyEnrollmentCloneFactory.new
     factory.family = family
     factory.census_employee = ce
-    factory.enrollment = family.enrollments.first
+    factory.enrollment = clone_enrollment
     factory.clone_for_cobra
   }
 
@@ -73,6 +74,12 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model, dbclean
       generate_cobra_enrollment
       expect(family.enrollments.by_coverage_kind('health').size).to eq 3
       expect(family.enrollments.map(&:kind)).to include('employer_sponsored_cobra')
+    end
+
+    it 'should have predecessor_enrollment_id on cobra enrollment' do
+      generate_cobra_enrollment
+      predecessor_enrollment_id = family.enrollments.select{|e| e.kind == 'employer_sponsored_cobra' && e.aasm_state == 'coverage_enrolled'}.first.predecessor_enrollment_id
+      expect(predecessor_enrollment_id).to eq clone_enrollment.id
     end
 
     it "the effective_on of cobra enrollment should greater than start_on of plan_year" do
