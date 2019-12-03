@@ -97,7 +97,6 @@ class DefinePermissions < MigrationTask
   end
 
   def hbx_admin_can_view_login_history
-    Permission.hbx_staff.update_attributes!(view_login_history: true)
     Permission.super_admin.update_attributes!(view_login_history: true)
   end
 
@@ -123,7 +122,7 @@ class DefinePermissions < MigrationTask
   end
 
   def hbx_admin_can_lock_unlock
-    Permission.hbx_staff.update_attributes(can_lock_unlock: true)
+    Permission.hbx_staff.update_attributes(can_lock_unlock: false)
     Permission.super_admin.update_attributes(can_lock_unlock: true)
     Permission.hbx_tier3.update_attributes(can_lock_unlock: false)
   end
@@ -145,7 +144,7 @@ class DefinePermissions < MigrationTask
   end
 
   def hbx_admin_can_reset_password
-    Permission.hbx_staff.update_attributes(can_reset_password: true)
+    Permission.hbx_staff.update_attributes(can_reset_password: false)
     Permission.super_admin.update_attributes(can_reset_password: true)
     Permission.hbx_tier3.update_attributes(can_reset_password: false)
   end
