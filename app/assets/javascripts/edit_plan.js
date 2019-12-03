@@ -1,7 +1,9 @@
 $(document).on("ready ajax:success", function() {
 
   // Max Date for Cancellation Datepicker
-  $("#term-date").datepicker({maxDate: new Date(new Date().getFullYear(), 11, 31)});
+  // Minimum date is current date
+  // maximum date is end of current year (I.E. 12/31/2019)
+  $("#term-date").datepicker({minDate: 0, maxDate: new Date(new Date().getFullYear(), 11, 31)});
 
   // Cancel Confirmation
   $("#agreement_action-confirm-yes").click(function(){

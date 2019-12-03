@@ -16,7 +16,7 @@
         <%# Keep blank space in placeholder. Otherwise, "You forgot to add placeholder attribute!" appears %>
         <%= text_field_tag 'term_date', '', :'data-date-min'=> "+0d", placeholder: " ",
             class: "required date-picker term-date-picker floatlabel form-control",
-            required: true, id: "term-date" %>
+            required: true, readonly: true, id: "term-date" %>
         <br>
       <% end %>
       <%= f.submit l10n("cancel_plan"), class: 'button btn btn-lg btn-primary btn-block interaction-click-control-action-confirm', id: 'btn-cancel', :disabled => true %>
