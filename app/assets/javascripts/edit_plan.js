@@ -1,5 +1,8 @@
 $(document).on("ready ajax:success", function() {
 
+  // Max Date for Cancellation Datepicker
+  $("#term-date").datepicker({maxDate: new Date(new Date().getFullYear(), 11, 31)});
+
   // Cancel Confirmation
   $("#agreement_action-confirm-yes").click(function(){
     $(".interaction-click-control-action-confirm").attr("disabled", false);
