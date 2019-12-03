@@ -358,8 +358,8 @@ module Notifier
     end
 
     def notice_type
-      "IVL" if is_consumer?
-      "EE" if is_employee?
+      return "IVL" if is_consumer?
+      return "EE" if is_employee?
       "ER" if is_employer?
     end
 
