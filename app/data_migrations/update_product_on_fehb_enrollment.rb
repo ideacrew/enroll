@@ -6,11 +6,13 @@ class UpdateProductOnFehbEnrollment < MongoidMigrationTask
     begin
 
     feins = "#{ENV['feins']}".split(',').uniq
+    logger = Logger.new("#{Rails.root}/log/update_product_on_fehb_enrollment_log_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
 
-    feins.each do |fein|
+    feins.no_timeout.each do |fein|
       organization = ::BenefitSponsors::Organizations::Organization.where(fein: fein).first
+      logger.info("Processing #{organization.legal_name} -- #{organization.fein}")
       employer_profile = organization.employer_profile
-      employer_profile.census_employees.each do |ce|
+      employer_profile.census_employees.no_timeout.each do |ce|
         if ce.employee_role.present?
           person = ce.employee_role.person
           enrollments = enrollments_effective_on(person, Date.new(2019,1,1))
@@ -27,6 +29,7 @@ class UpdateProductOnFehbEnrollment < MongoidMigrationTask
                             :benefit_market_kind => :fehb
                           ).first
             enrollment.update_attributes(:product_id => fehb_product.id) if fehb_product.present?
+            logger.info("Updated Enrollment #{enrollment.hbx_id} for the person with hbx id #{person.hbx_id} under employer #{organization.legal_name}")
           end
         end
       end
