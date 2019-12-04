@@ -65,7 +65,14 @@ class Person
     "verification_types",
     "employee_roles",
     "employer_staff_roles",
-    "individual_market_transitions"
+    "individual_market_transitions",
+    "broker_role",
+    "phones",
+    "emails",
+    "inbox",
+    "messages",
+    "workflow_state_transitions",
+    "raw_event_responses"
   ]
 
   field :hbx_id, type: String
