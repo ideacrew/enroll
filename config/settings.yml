@@ -201,7 +201,7 @@ aca:
     auto_cancel_ineligible: false
 
     employee:
-      contact_method: 'Only Electronic communications'
+      default_contact_method: 'Only Electronic communications'
 
     binder_payment_dates: [
       {"2019-01-01": '2018,12,12'},
