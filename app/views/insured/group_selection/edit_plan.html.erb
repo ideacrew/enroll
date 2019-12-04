@@ -56,7 +56,7 @@
                   </p>
                 </div>
                 <label class="bullet-separator">&nbsp;Tax credit amount:</label>
-                <strong>$<%= (hbx_enrollment.elected_aptc_pct.to_f * 1000).to_s %></strong>
+                <strong>$<%= (hbx_enrollment&.max_aptc * hbx_enrollment&.elected_aptc_pct).to_s %></strong>
               </div>
               <div class="col-xs-4">
                 <div class="family-plan-selection">
