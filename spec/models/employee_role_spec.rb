@@ -808,7 +808,7 @@ describe EmployeeRole do
     end
 
     context 'default contact_method' do
-      it { expect(FactoryBot.build(:employee_role).contact_method).to eq(Settings.aca.shop_market.employee.contact_method) }
+      it { expect(FactoryBot.build(:employee_role).contact_method).to eq(Settings.aca.shop_market.employee.default_contact_method) }
     end
   end
 end
