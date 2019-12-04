@@ -180,7 +180,7 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
     clean_history_tracks = pers_record.history_tracks.reject do |ht|
       last_chain_name = ht.association_chain.last["name"]
       ((ht.created_at.to_f - pers_record.created_at.to_f).abs < 1.1) ||
-        (last_chain_name == "verification_types")
+      Person::IVL_ELIGIBILITY_EXCLUDED_CHAINS.include?(last_chain_name)
     end
     person_versions = [pers_record] + pers_record.versions + clean_history_tracks
     if pers_record.versions.empty? && pers_record.history_tracks.any?

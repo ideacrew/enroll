@@ -61,6 +61,13 @@ class Person
 
   NON_SHOP_ROLES = ['Individual','Coverall']
 
+  IVL_ELIGIBILITY_EXCLUDED_CHAINS = [
+    "verification_types",
+    "employee_roles",
+    "employer_staff_roles",
+    "individual_market_transitions"
+  ]
+
   field :hbx_id, type: String
   field :name_pfx, type: String
   field :first_name, type: String

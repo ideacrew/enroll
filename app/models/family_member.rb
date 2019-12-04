@@ -73,7 +73,7 @@ class FamilyMember
     oldest_history_track = person.history_tracks.to_a.reject do |ht|
       last_chain_name = ht.association_chain.last["name"]
       ((ht.created_at.to_f - person.created_at.to_f).abs < 1.1) ||
-      (last_chain_name == "verification_types")
+      ::Person::IVL_ELIGIBILITY_EXCLUDED_CHAINS.include?(last_chain_name)
     end.map(&:created_at).sort.first
     if oldest_history_track && person.versions.empty? && (oldest_history_track > v_date)
       return person.history_tracker_to_record(v_date)

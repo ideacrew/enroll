@@ -14,7 +14,7 @@ module HistoryTrackerToRecord
     tracks_to_reverse = all_tracks.reject do |ht|
       last_chain_name = ht.association_chain.last["name"]
       (ht.created_at <= ht_date) || ((ht.created_at.to_f - self.created_at.to_f).abs < 1.1) ||
-        (last_chain_name == "verification_types")
+        ::Person::IVL_ELIGIBILITY_EXCLUDED_CHAINS.include?(last_chain_name)
     end.reverse
   end
 
