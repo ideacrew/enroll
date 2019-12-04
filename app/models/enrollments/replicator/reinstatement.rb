@@ -115,7 +115,7 @@ module Enrollments
             {
               aptc_ratio_by_member: aptc_ratio_by_member,
               new_aptc: new_aptc,
-              percent_sum_for_all_enrolles: percent_sum_for_all_enrollees
+              percent_sum_for_all_enrollees: percent_sum_for_all_enrollees
             }
           )
 
@@ -180,7 +180,7 @@ module Enrollments
       def apply_aptc_to_members(duplicate_hbx, options = {})
         duplicate_hbx.hbx_enrollment_members.each do |mem|
           aptc_pct_for_member = options[:aptc_ratio_by_member][mem.applicant_id.to_s] || 0.0
-          mem.applied_aptc_amount = options[:new_aptc] * aptc_pct_for_member / options[:percent_sum_for_all_enrolles]
+          mem.applied_aptc_amount = options[:new_aptc] * aptc_pct_for_member / options[:percent_sum_for_all_enrollees]
         end
       end
 
