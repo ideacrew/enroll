@@ -41,7 +41,7 @@ module Insured
         # field :applied_aptc_amount, type: Money, default: 0.0
         enrollment = HbxEnrollment.find(BSON::ObjectId.from_string(enrollment_id))
 
-        new_effective_date = find_enrollment_effective_on_date(DateTime.now)
+        new_effective_date = self.find_enrollment_effective_on_date(DateTime.now)
         reinstatement = Enrollments::Replicator::Reinstatement.new(enrollment, new_effective_date, applied_aptc_amount).build
         reinstatement.update_attributes!(elected_aptc_pct: elected_aptc_pct, applied_aptc_amount: applied_aptc_amount)
       end
