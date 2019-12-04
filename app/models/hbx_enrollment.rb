@@ -469,9 +469,8 @@ class HbxEnrollment
   end
 
   def has_at_least_one_aptc_eligible_member?
-    family.active_household.latest_active_tax_household_with_year(effective_on.year).to_a.compact.each do |household|
-      household.tax_household_members.detect { |member| member.is_ia_eligible? }
-    end
+    tax_household = family.active_household.latest_active_tax_household
+    tax_household.tax_household_members.any? { |member| member.is_ia_eligible? }
   end
 
   class << self

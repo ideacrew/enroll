@@ -7,7 +7,8 @@ Background:
   And consumer has a dependent in spouse relationship with age greater than 26
   And consumer also has a health enrollment with primary person covered
   And the family has an active tax household
-  When consumer visits home page after successful ridp
+  And consumer has successful ridp
+  When consumer visits home page
 
 Scenario Outline: Change Tax Credit button is available for non-catastrophic plan
   And the metal level is <metal_level>

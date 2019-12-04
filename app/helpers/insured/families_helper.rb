@@ -1,5 +1,12 @@
 module Insured::FamiliesHelper
 
+  def display_change_tax_credits_button?(hbx_enrollment)
+    hbx_enrollment.has_at_least_one_aptc_eligible_member? &&
+    hbx_enrollment.product.can_use_aptc? &&
+    !hbx_enrollment.is_coverall? &&
+    hbx_enrollment.coverage_kind != 'dental'
+  end
+
   def plan_shopping_dependent_text(hbx_enrollment)
     subscriber, dependents = hbx_enrollment.hbx_enrollment_members.partition {|h| h.is_subscriber == true }
     if subscriber.present? && dependents.count == 0
