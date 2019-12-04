@@ -126,7 +126,9 @@ module BenefitSponsors
           if status == 'all'
             all
           else
-            list_embedded BenefitSponsors::Organizations::Organization.general_agency_profiles.where(:'profiles.aasm_state' => status).order_by([:legal_name]).to_a
+            list_embedded BenefitSponsors::Organizations::Organization.general_agency_profiles.where(:profiles =>
+                                                                                                         {:$elemMatch => {:aasm_state => status,
+                                                                                                                          :_type => "BenefitSponsors::Organizations::GeneralAgencyProfile"}}).order_by([:legal_name]).to_a
           end
         rescue
           []
