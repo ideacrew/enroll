@@ -650,6 +650,14 @@ Then(/Aptc user should see aptc amount on individual home page/) do
   screenshot("my_account")
 end
 
+And(/consumer has successful ridp/) do
+  user.identity_final_decision_code = "acc"
+  user.save
+  FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual")
+  FactoryBot.create(:hbx_profile, :no_open_enrollment_coverage_period)
+  BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
+end
+
 When(/consumer visits home page after successful ridp/) do
   user.identity_final_decision_code = "acc"
   user.save
