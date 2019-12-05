@@ -25,13 +25,15 @@ class UpdateProductOnFehbEnrollment < MongoidMigrationTask
             next if (!current_product || current_product&.benefit_market_kind.to_s == 'fehb')
 
             fehb_product = BenefitMarkets::Products::Product.where(
-                            :hios_base_id => /#{current_product.hios_id}/,
+                            :hios_base_id => /#{current_product.hios_base_id}/,
                             :"application_period.min".gte => Date.new(current_product.active_year, 1, 1), :"application_period.max".lte => Date.new(current_product.active_year, 1, 1).end_of_year,
                             :kind => current_product.kind,
                             :benefit_market_kind => :fehb
                           ).first
-            enrollment.update_attributes(:product_id => fehb_product.id) if fehb_product.present?
-            logger.info("Updated Enrollment #{enrollment.hbx_id} for the person with hbx id #{person.hbx_id} under employer #{organization.legal_name}") unless Rails.env.test?
+            if fehb_product.present?
+              enrollment.update_attributes(:product_id => fehb_product.id)
+              logger.info("Updated Enrollment #{enrollment.hbx_id} for the person with hbx id #{person.hbx_id} under employer #{organization.legal_name}") unless Rails.env.test?
+            end
           end
         end
       end
