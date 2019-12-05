@@ -80,7 +80,7 @@ module Effective
           dropdown.insert(2,['Plan Years', exchanges_employer_applications_path(employer_id: row, employers_action_id: "employer_actions_#{@employer_profile.id}"), 'ajax']) if pundit_allow(HbxProfile, :can_modify_plan_year?)
 
           if individual_market_is_enabled?
-            people_id = Person.where({"employer_staff_roles.employer_profile_id" => @employer_profile._id}).map(&:id)
+            people_id = Person.where({"employer_staff_roles.benefit_sponsor_employer_profile_id" => @employer_profile._id}).map(&:id)
             dropdown.insert(2,['View Username and Email', main_app.get_user_info_exchanges_hbx_profiles_path(
                 people_id: people_id,
                 employers_action_id: "employer_actions_#{@employer_profile.id}"
