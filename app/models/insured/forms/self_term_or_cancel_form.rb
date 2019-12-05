@@ -14,13 +14,19 @@ module Insured
       attribute :product,               ::Insured::Forms::ProductForm
       attribute :term_date,             Date
       attribute :elected_aptc_pct,      String
+      attribute :available_aptc,        Float
 
       validates :market_kind,           presence: true
 
       def self.for_view(attrs)
         service     = self_term_or_cancel_service(attrs)
         form_params = service.find
+        form_params.merge!({available_aptc: fetch_available_aptc(attrs[:enrollment_id])})
         new(form_params)
+      end
+
+      def self.fetch_available_aptc(enr_id)
+        ::Services::AvailableEligibilityService.new(enr_id, enr_id).available_eligibility[:total_available_aptc]
       end
 
       def self.for_post(attrs)

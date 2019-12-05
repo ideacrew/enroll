@@ -181,7 +181,7 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   def edit_aptc
-    attrs = {enrollment_id: params.require(:hbx_enrollment_id), elected_aptc_pct: params[:applied_pct_1]}
+    attrs = {enrollment_id: params.require(:hbx_enrollment_id), elected_aptc_pct: params[:applied_pct_1], aptc_applied_total: params[:aptc_applied_total].delete_prefix('$')}
     if @self_term_or_cancel_form = ::Insured::Forms::SelfTermOrCancelForm.for_aptc_update_post(attrs)
       flash[:notice] = "Successfully updated tax credits for enrollment."
     else

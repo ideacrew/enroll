@@ -43,7 +43,14 @@ module Insured
 
         new_effective_date = self.find_enrollment_effective_on_date(DateTime.now)
         reinstatement = Enrollments::Replicator::Reinstatement.new(enrollment, new_effective_date, applied_aptc_amount).build
+        reinstatement.save!
+        applicable_aptc = fetch_applicable_aptc(reinstatement, applied_aptc_amount, enrollment)
         reinstatement.update_attributes!(elected_aptc_pct: elected_aptc_pct, applied_aptc_amount: applied_aptc_amount)
+      end
+
+      def self.fetch_applicable_aptc(new_enrollment, selected_aptc, old_enrollment)
+        service = ::Services::ApplicableAptcService.new(new_enrollment.id, selected_aptc, [new_enrollment.product_id])
+        service.applicable_aptcs.values.sum
       end
 
       def is_aptc_eligible(enrollment, family)
