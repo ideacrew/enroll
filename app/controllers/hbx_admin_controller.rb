@@ -59,6 +59,8 @@ class HbxAdminController < ApplicationController
     end
   end
 
+  private
+
   def find_values
     attr = params[:person] || params
     @person = Person.find(attr[:person_id])
