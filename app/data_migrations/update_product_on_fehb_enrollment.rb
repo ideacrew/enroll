@@ -22,7 +22,7 @@ class UpdateProductOnFehbEnrollment < MongoidMigrationTask
             next unless enrollment.fehb_profile.present?
 
             current_product = enrollment.product
-            next if current_product && current_product.benefit_market_kind.to_s == 'fehb'
+            next if (!current_product || current_product&.benefit_market_kind.to_s == 'fehb')
 
             fehb_product = BenefitMarkets::Products::Product.where(
                             :hios_base_id => /#{current_product.hios_id}/,
