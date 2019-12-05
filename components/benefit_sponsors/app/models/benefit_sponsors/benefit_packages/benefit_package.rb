@@ -326,8 +326,10 @@ module BenefitSponsors
       end
 
       def effectuate_member_benefits
-        activate_benefit_group_assignments if predecessor_application.present?
-
+        application_transition = benefit_application.workflow_state_transitions.detect do |transition|
+          terminated_benefit_application?(transition)
+        end
+        return if application_transition
         enrolled_families.each do |family|
           enrollments = HbxEnrollment.by_benefit_package(self).where(family_id: family.id).show_enrollments_sans_canceled
 
@@ -371,6 +373,37 @@ module BenefitSponsors
         end
       end
 
+      def terminated_benefit_application?(transition)
+        transition.from_state == "terminated"
+      end
+
+      def terminated_after?(transaction, termination_time)
+        transition.to_state == 'coverage_terminated' && transition.transition_at >= termination_time
+      end
+
+      def reinstate_terminated_member_benefits
+        reinstate_benefit_group_assignments unless benefit_application.is_renewing?
+        application_transition = benefit_application.workflow_state_transitions.detect{|transition| terminated_benefit_application?(transition) }
+        return if application_transition.blank?
+
+        Family.all_enrollments_by_benefit_package(self).each do |family|
+          enrollments = family.active_household.hbx_enrollments.by_benefit_package(self)
+          terminated_coverages = enrollments.terminated.select{|enrollment| enrollment.workflow_state_transitions.any?{|wst| terminated_after?(wst, application_transition.transition_at) } }
+          if terminated_coverages.present?
+            sponsored_benefits.each do |sponsored_benefit|
+              hbx_enrollment = terminated_coverages.detect{|coverage| coverage.coverage_kind == sponsored_benefit.product_kind.to_s}
+              enrollment_transition = hbx_enrollment.workflow_state_transitions[0] if hbx_enrollment.present?
+
+              if enrollment_transition.present? && enrollment_transition.to_state == hbx_enrollment.aasm_state
+                hbx_enrollment.update(aasm_state: enrollment_transition.from_state)
+                hbx_enrollment.workflow_state_transitions.create(from_state: enrollment_transition.to_state, to_state: enrollment_transition.from_state)
+                hbx_enrollment.benefit_group_assignment.update_status_from_enrollment(hbx_enrollment)
+              end
+            end
+          end
+        end
+      end
+
       def termination_pending_member_benefits(term_date: nil, enroll_term_reason: nil, enroll_notify: false)
         enrolled_families.each do |family|
           enrollments = family.hbx_enrollments.enrolled_waived_terminated_and_expired.by_benefit_package(self)
@@ -388,6 +421,19 @@ module BenefitSponsors
               hbx_enrollment.notify_enrollment_cancel_or_termination_event(enrollment_notify_flag(enroll_notify))
             end
           end
+        end
+      end
+
+      def reinstate_benefit_group_assignments
+        self.benefit_application.benefit_sponsorship.census_employees.each do |ce|
+          bga=ce.active_benefit_group_assignment
+          bga_aasm_state=bga.aasm_state
+          if bga.hbx_enrollment_id == nil
+            id = bga.hbx_enrollments.first.id
+            bga.update_attributes!(hbx_enrollment_id: id)
+          end
+          bga.update_attributes!(coverage_end_on: nil)
+          bga.select_coverage!
         end
       end
 

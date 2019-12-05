@@ -613,6 +613,12 @@ module BenefitSponsors
       self
     end
 
+    def reinstate_terminated_benefit_package_members
+      if aasm.from_state == :terminated
+        benefit_packages.each { |benefit_package| benefit_package.reinstate_terminated_member_benefits}
+      end
+    end
+
     # Build a new [BenefitApplication] instance along with all associated child model instances, for the
     # benefit period immediately following this application's, applying the renewal settings
     # specified in the passed [BenefitSponsorCatalog]

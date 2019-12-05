@@ -20,6 +20,8 @@ class ModifyBenefitApplication< MongoidMigrationTask
       extend_open_enrollment
     when "force_submit_application"
       force_submit_application(benefit_application_for_force_submission)
+    when "reinstate"
+      reinstate_benefit_application(benefit_applications_for_aasm_state_update)
     end
   end
 
@@ -67,7 +69,13 @@ class ModifyBenefitApplication< MongoidMigrationTask
   end
 
   def reinstate_benefit_application(benefit_applications)
-
+    effective_date = Date.strptime(ENV['effective_date'], "%m/%d/%Y")
+    benefit_application = benefit_applications.where(
+      :"effective_period.min" => effective_date,
+      :aasm_state => :terminated
+    ).first
+    service = initialize_service(benefit_application)
+    service.reinstate
   end
 
   def update_effective_period_and_approve(benefit_applications)
