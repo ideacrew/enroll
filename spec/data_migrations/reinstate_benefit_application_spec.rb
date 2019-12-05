@@ -2,8 +2,6 @@ require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "reinstate_plan_year")
 
 describe ReinstatePlanYear, dbclean: :after_each do
-  skip do "depricated rake task, update spec when rake task updated to new model"
-
   let(:given_task_name) { "reinstate_plan_year" }
   subject { ReinstatePlanYear.new(given_task_name, double(:current_scope => nil)) }
 
@@ -82,8 +80,6 @@ describe ReinstatePlanYear, dbclean: :after_each do
         expect(plan_year.aasm_state).to eq 'expired'
         expect(plan_year.terminated_on).to eq terminated_on
       end
-
-
     end
 
     context "on reinstate of plan year with end date passed and has renewing plan year cancelled" do
@@ -170,6 +166,5 @@ describe ReinstatePlanYear, dbclean: :after_each do
         end
       end
     end
-  end
   end
 end
