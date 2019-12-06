@@ -370,16 +370,17 @@ def employer_poc
   end
 
   def get_user_info
-    @element_to_replace_id = params[:family_actions_id] || params[:employers_action_id]
+    # from benefit_sponsors_employer_datatable
+    @element_to_replace_id = params[:family_actions_id] || params[:employer_actions_id]
     if params[:person_id].present?
       @person = Person.find(params[:person_id])
     else
       @employer_actions = true
       @people = Person.where(:id => { "$in" => (params[:people_id] || []) })
-      @organization = if params.key?(:employers_action_id)
-        EmployerProfile.find(@element_to_replace_id.split("_").last).organization
+      @organization = if params.key?(:employer_actions_id)
+        BenefitSponsors::Organizations::Profile.find(@element_to_replace_id.split("_").last).organization
       else
-        Organization.find(@element_to_replace_id.split("_").last)
+        BenefitSponsors::Organizations::Organization.find(@element_to_replace_id.split("_").last)
       end
     end
   end

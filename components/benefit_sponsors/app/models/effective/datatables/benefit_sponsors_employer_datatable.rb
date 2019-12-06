@@ -81,10 +81,17 @@ module Effective
 
           if individual_market_is_enabled?
             people_id = Person.where({"employer_staff_roles.benefit_sponsor_employer_profile_id" => @employer_profile._id}).map(&:id)
-            dropdown.insert(2,['View Username and Email', main_app.get_user_info_exchanges_hbx_profiles_path(
-                people_id: people_id,
-                employers_action_id: "employer_actions_#{@employer_profile.id}"
-            ), !people_id.empty? && pundit_allow(Family, :can_view_username_and_email?) ? 'ajax' : 'disabled'])
+            dropdown.insert(
+              2,
+              [
+                'View Username and Email',
+                main_app.get_user_info_exchanges_hbx_profiles_path(
+                  people_id: people_id,
+                  employer_actions_id: "employer_actions_#{@employer_profile.id}"
+                ),
+                !people_id.empty? && pundit_allow(Family, :can_view_username_and_email?) ? 'ajax' : 'disabled'
+              ]
+            )
           end
 
           if employer_attestation_is_enabled?
