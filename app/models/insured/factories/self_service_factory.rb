@@ -68,7 +68,13 @@ module Insured
         family     = Family.find(BSON::ObjectId.from_string(family_id))
         sep        = SpecialEnrollmentPeriod.find(BSON::ObjectId.from_string(family.latest_active_sep.id)) if family.latest_active_sep.present?
         qle        = QualifyingLifeEventKind.find(BSON::ObjectId.from_string(sep.qualifying_life_event_kind_id))  if sep.present?
-        { enrollment: enrollment, family: family, qle: qle, is_aptc_eligible: is_aptc_eligible(enrollment, family) }
+        {
+          enrollment: enrollment,
+          family: family,
+          qle: qle,
+          is_aptc_eligible: is_aptc_eligible(enrollment, family),
+          new_effective_on: self.class.find_enrollment_effective_on_date(DateTime.current)
+        }
       end
 
       def self.find_enrollment_effective_on_date(hbx_created_datetime)

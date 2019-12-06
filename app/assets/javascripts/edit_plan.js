@@ -65,8 +65,8 @@ $(document).on("ready ajax:success", function() {
   function calculatePercent(selector, multiplier) {
     // Starting variables
     var applied_aptc_total = $('#aptc_applied_total').val()
-    var current_total_premium_value = document.getElementById("current_total_premium").innerHTML;
-    var current_total_premium = parseFloat(current_total_premium_value);
+    var total_premium_value = document.getElementById("enrollment_total_premium").innerHTML;
+    var total_premium = parseFloat(total_premium_value);
     // Percentage of max aptc available that user wishes to apply
     var percent = parseFloat($(selector).val()).toFixed(2) * multiplier;
     // Max available tax credit per month for month
@@ -77,10 +77,7 @@ $(document).on("ready ajax:success", function() {
     // Update the view to reflect the total cash to be applied
     $('#aptc_applied_total').val("$" + aptc_total_cash_amount_to_apply);
     // Show dollar amount of Tax Credit value
-    console.log("Current total premium is " + current_total_premium_value);
-    console.log("applied aptc total value is " + applied_aptc_total);
-    console.log("Max APTC available is " + max_aptc_available);
-    var new_premium = (current_total_premium - aptc_total_cash_amount_to_apply).toFixed(2);
+    var new_premium = (total_premium - aptc_total_cash_amount_to_apply).toFixed(2);
     $('#new-premium').html(new_premium);
   }
 

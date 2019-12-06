@@ -15,14 +15,26 @@ module Insured
       attribute :term_date,             Date
       attribute :elected_aptc_pct,      String
       attribute :available_aptc,        Float
+      attribute :enable_tax_credit_btn, Boolean
+      attribute :new_effective_on,      Date
 
       validates :market_kind,           presence: true
 
       def self.for_view(attrs)
         service     = self_term_or_cancel_service(attrs)
         form_params = service.find
-        form_params.merge!({available_aptc: fetch_available_aptc(attrs[:enrollment_id])})
+        form_params.merge!(
+          { available_aptc: fetch_available_aptc(attrs[:enrollment_id]),
+            enable_tax_credit_btn: check_to_enable_tax_credit_btn}
+        )
         new(form_params)
+      end
+
+      def self.check_to_enable_tax_credit_btn
+        system_date = TimeKeeper.date_of_record
+        begin_date = Date.new(system_date.year, 11, ::HbxProfile::IndividualEnrollmentDueDayOfMonth + 1).beginning_of_day
+        end_date = begin_date.end_of_year.end_of_day
+        (begin_date..end_date).cover?(system_date) ? false : true
       end
 
       def self.fetch_available_aptc(enr_id)
@@ -35,8 +47,11 @@ module Insured
       end
 
       def self.for_aptc_update_post(attrs)
+        return 'Action cannot be performed because of the overlapping plan years.' unless check_to_enable_tax_credit_btn
+
         service = self_term_or_cancel_service(attrs)
         service.update_aptc
+        'Successfully updated tax credits for enrollment.'
       end
 
       def self.self_term_or_cancel_service(attrs)

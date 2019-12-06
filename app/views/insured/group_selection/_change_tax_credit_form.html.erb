@@ -12,7 +12,7 @@
       <div id="applied-aptc-text" class="hidden">
         <h5>Effective date</h5>
         <%# removed the classes date-picker aptc-date-picker from field below because readonly %>
-        <%= text_field_tag 'effective_on_date', '',:'data-date-min'=> "+0d", placeholder: " ", class: "required floatlabel form-control", required: true, id: "aptc_date", value: locals[:hbx_enrollment][:effective_on], readonly: true %>
+        <%= text_field_tag 'effective_on_date', '',:'data-date-min'=> "+0d", placeholder: " ", class: "required floatlabel form-control", required: true, id: "aptc_date", value: locals[:new_effective_on_date], readonly: true %>
         <h5>Maximum tax credit available: $<span id="max_aptc_available"><%= locals[:available_aptc] %></span></h5>
         <h5>Tax credit applied (%)</h5>
         <span align= "center">
@@ -28,13 +28,16 @@
         value="$<%= ((locals[:available_aptc] * locals[:hbx_enrollment]&.elected_aptc_pct).to_s) if [locals[:available_aptc], locals[:hbx_enrollment].elected_aptc_pct].all? %>" placeholder="APTC Applied" class="form-control" size="8px">
         <h5><strong>Your new premium:</strong></h5>
         <div id="current_total_premium" class='hidden'>
-          <% if [locals[:hbx_enrollment].total_premium, locals[:hbx_enrollment].max_aptc, locals[:hbx_enrollment].elected_aptc_pct].all? %>
-            <%= locals[:hbx_enrollment].total_premium - (locals[:hbx_enrollment].max_aptc * locals[:hbx_enrollment].elected_aptc_pct) %>
+          <% if [locals[:hbx_enrollment].total_premium, locals[:available_aptc], locals[:hbx_enrollment].elected_aptc_pct].all? %>
+            <%= locals[:hbx_enrollment].total_premium - (locals[:available_aptc] * locals[:hbx_enrollment].elected_aptc_pct) %>
           <% end %>
+        </div>
+        <div id="enrollment_total_premium" class='hidden'>
+          <%= locals[:hbx_enrollment].total_premium %>
         </div>
         <span>
           $<span id="new-premium">
-            <%= (locals[:hbx_enrollment].elected_aptc_pct.to_f * 1000).to_s %>      
+            <%= (locals[:hbx_enrollment].total_premium - locals[:hbx_enrollment].applied_aptc_amount.to_f) %>
           </span>/month
         </span>
       </div>
