@@ -958,7 +958,8 @@ module BenefitSponsors
 
       # Coverage reinstated
       event :reinstate_enrollment do
-        transitions from: [:suspended, :terminated], to: :active #, after: :reset_termination_and_end_date
+        transitions from: [:suspended, :terminated], to: :active,
+        :after => [:reinstate_terminated_benefit_package_members]#, after: :reset_termination_and_end_date
       end
 
       event :extend_open_enrollment do

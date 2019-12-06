@@ -426,8 +426,8 @@ module BenefitSponsors
 
       def reinstate_benefit_group_assignments
         self.benefit_application.benefit_sponsorship.census_employees.each do |ce|
-          bga=ce.active_benefit_group_assignment
-          bga_aasm_state=bga.aasm_state
+          bga = ce.active_benefit_group_assignment
+          bga_aasm_state =  bga.aasm_state
           if bga.hbx_enrollment_id == nil
             id = bga.hbx_enrollments.first.id
             bga.update_attributes!(hbx_enrollment_id: id)

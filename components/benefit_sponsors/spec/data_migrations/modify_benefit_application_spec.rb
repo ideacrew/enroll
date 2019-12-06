@@ -33,20 +33,25 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
     )}
     let(:person) { FactoryBot.create(:person, :with_family) }
     let(:family) { person.primary_family }
-    let!(:enrollment) {  FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
-                        household: family.active_household,
-                        family: family,
-                        aasm_state: "coverage_selected",
-                        effective_on: start_on,
-                        rating_area_id: predecessor_application.recorded_rating_area_id,
-                        sponsored_benefit_id: predecessor_application.benefit_packages.first.health_sponsored_benefit.id,
-
-                        # sponsored_benefit_id:sponsored_benefit.id,
-                        sponsored_benefit_package_id:predecessor_application.benefit_packages.first.id,
-                        benefit_sponsorship_id:predecessor_application.benefit_sponsorship.id,
-                        benefit_group_assignment_id: benefit_group_assignment.id,
-                        employee_role_id: employee_role.id)
-    }
+    let!(:enrollment) do
+      FactoryBot.create(
+        :hbx_enrollment,
+        :with_enrollment_members,
+        :with_product,
+        household: family.active_household,
+        family: family,
+        aasm_state: "coverage_selected",
+        effective_on: start_on,
+        rating_area_id: predecessor_application.recorded_rating_area_id,
+        sponsored_benefit_id: predecessor_application.benefit_packages.first.health_sponsored_benefit.id,
+        # sponsored_benefit_id:  sponsored_benefit.id,
+        sponsored_benefit_package_id: predecessor_application.benefit_packages.first.id,
+        benefit_sponsorship_id: predecessor_application.benefit_sponsorship.id,
+        benefit_group_assignment_id: benefit_group_assignment.id,
+        employee_role_id: employee_role.id,
+        aasm_state: 'coverage_terminated'
+      )
+    end
 
     around do |example|
       ClimateControl.modify fein: abc_organization.fein do
@@ -119,7 +124,31 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
         end
       end
 
-      context "update aasm state to enrollment open but not sponsoship for renewing ER" do
+      context "reinstate benefit_application", dbclean: :after_each do 
+        let(:effective_date) { start_on }
+        let!(:benefit_application) {
+          application = FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, effective_period: effective_period, aasm_state: :terminated)
+          application
+        end
+
+      before do 
+        allow(ENV).to receive(:[]).with("action").and_return("reinstate")
+        allow(ENV).to receive(:[]).with("effective_date").and_return(effective_date.strftime("%m/%d/%Y"))
+        subject.migrate
+      end
+ 
+      it "should reinstate the benefit application" do 
+        benefit_application.reload
+        expect(benefit_application.aasm_state).to eq :active
+      end
+
+      it "should reinstate terminated employee enrollments" do
+        benefit_application.hbx_enrollments.each { |hbx_enrollment| expect(hbx_enrollment.aasm_state).to eq "coverage_enrolled"}
+      end
+    end
+
+
+      context "update aasm state to enrollment open but not sponsorship for renewing ER" do
         let(:effective_date) { predecessor_application.effective_period.min }
 
         before do
