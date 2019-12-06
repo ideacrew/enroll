@@ -19,7 +19,7 @@ RSpec.describe 'ModelEvents::EmployeeOpenEnrollmentReminder', :dbclean => :after
   let(:family) {person.primary_family}
   let(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: abc_profile.id)}
   let(:census_employee)  { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile) }
-  let(:date_mock_object) { Date.new(current_effective_date.year, current_effective_date.prev_month.month, (Settings.aca.shop_market.open_enrollment.monthly_end_on - 2))}
+  let(:date_mock_object) { Date.new(open_enrollment_start_on.year, open_enrollment_start_on.month, (Settings.aca.shop_market.open_enrollment.monthly_end_on - 2))}
 
   before :each do
     census_employee.update_attributes(employee_role_id: employee_role.id)
@@ -59,10 +59,12 @@ RSpec.describe 'ModelEvents::EmployeeOpenEnrollmentReminder', :dbclean => :after
           expect(payload[:event_object_id]).to eq model_instance.id.to_s
         end
 
-        expect(subject.notifier).to receive(:notify) do |event_name, payload|
-          expect(event_name).to eq "acapi.info.events.employer.low_enrollment_notice_for_employer"
-          expect(payload[:event_object_kind]).to eq 'BenefitSponsors::BenefitApplications::BenefitApplication'
-          expect(payload[:event_object_id]).to eq model_instance.id.to_s
+        unless model_instance.effective_period.min.yday == 1
+          expect(subject.notifier).to receive(:notify) do |event_name, payload|
+            expect(event_name).to eq "acapi.info.events.employer.low_enrollment_notice_for_employer"
+            expect(payload[:event_object_kind]).to eq 'BenefitSponsors::BenefitApplications::BenefitApplication'
+            expect(payload[:event_object_id]).to eq model_instance.id.to_s
+          end
         end
         subject.process_application_events(model_instance, model_event)
       end

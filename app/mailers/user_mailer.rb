@@ -39,11 +39,19 @@ class UserMailer < ApplicationMailer
     if email.present? && benefit_applications.any?{|ba| ba.is_submitted?}
       if (census_employee.hired_on > TimeKeeper.date_of_record)
         mail({to: email, subject: "You Have Been Invited to Sign Up for Employer-Sponsored Coverage through the #{site_short_name}"}) do |format|
-          format.html { render "invite_future_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
+          if Settings.site.key == :dc
+            format.html { render "dc_invite_future_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
+          else
+            format.html { render "invite_future_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
+          end
         end
       else
         mail({to: email, subject: "Enroll Now: Your Plan Open Enrollment Period has Begun"}) do |format|
-          format.html { render "invite_initial_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
+          if Settings.site.key == :dc
+            format.html { render "dc_invite_initial_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
+          else
+            format.html { render "invite_initial_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
+          end
         end
       end
     end
@@ -67,7 +75,11 @@ class UserMailer < ApplicationMailer
 
   def initial_employee_invitation_email(email, census_employee, invitation)
     mail({to: email, subject: "Enroll Now: Your Plan Open Enrollment Period has Begun"}) do |format|
-      format.html { render "initial_employee_invitation_email", :locals => { :census_employee => census_employee, :invitation => invitation }}
+      if Settings.site.key == :dc
+        format.html { render "dc_initial_employee_invitation_email", :locals => { :census_employee => census_employee, :invitation => invitation }}
+      else
+        format.html { render "initial_employee_invitation_email", :locals => { :census_employee => census_employee, :invitation => invitation }}
+      end
     end
   end
 

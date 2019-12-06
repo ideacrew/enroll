@@ -189,11 +189,11 @@ class Family
       }
     ).distinct(:family_id))
   }
-  
+
   # Replaced scopes for moving HbxEnrollment to top level
   # The following methods are rewrites of scopes that were being called before HbxEnrollment was a top level document.
 
-  scope :all_enrollments_by_benefit_package, ->(benefit_package) { where(:"_id".in => HbxEnrollment.where(sponsored_benefit_package_id => benefit_package._id, :aasm_state.ne => :shopping).distinct(:family_id))}
+  scope :all_enrollments_by_benefit_package, ->(benefit_package) { where(:"_id".in => HbxEnrollment.where(:sponsored_benefit_package_id => benefit_package._id, :aasm_state.nin => [:shopping]).distinct(:family_id))}
 
   scope :all_enrollments_by_benefit_sponsorship_id,  ->(benefit_sponsorship_id) {
     where(:"_id".in => HbxEnrollment.where(benefit_sponsorship_id: benefit_sponsorship_id).distinct(:family_id))
@@ -213,7 +213,7 @@ class Family
   ) }
 
   scope :enrolled_under_benefit_application, ->(benefit_application) {
-    active_family_ids = benefit_application.active_census_employees.collect{|ce| ce.family.nil? ? nil : ce.family.id }.compact
+    active_family_ids = benefit_application.active_census_employees_under_py.collect{|ce| ce.family.nil? ? nil : ce.family.id }.compact
     where(:"_id".in => HbxEnrollment.where(
     :"sponsored_benefit_package_id".in => benefit_application.benefit_packages.pluck(:_id),
     :"aasm_state".nin => %w(coverage_canceled shopping coverage_terminated),
@@ -390,7 +390,7 @@ class Family
 
   # Get list of Individual and SHOP market {EnrollmentEligibilityReason EnrollmentEligibilityReasons} currently available to this family
   #
-  # @example Get the list of {EnrollmentEligibilityReason EnrollmentEligibilityReasons}
+  # @example Get the list of EnrollmentEligibilityReasonEnrollmentEligibilityReasons:
   #   model.current_ivl_eligible_open_enrollments
   #
   # @see current_ivl_eligible_open_enrollments
@@ -574,6 +574,10 @@ class Family
 
   def latest_fehb_sep
     special_enrollment_periods.fehb_market.order_by(:submitted_at.desc).to_a.detect{ |sep| sep.is_active? }
+  end
+
+  def latest_ivl_sep
+    special_enrollment_periods.individual_market.order_by(:submitted_at.desc).to_a.detect(&:is_active?)
   end
 
   def terminate_date_for_shop_by_enrollment(enrollment=nil)
@@ -910,8 +914,7 @@ class Family
   end
 
   def has_aptc_hbx_enrollment?
-    enrollments = latest_household.hbx_enrollments.active rescue []
-    enrollments.any? {|enrollment| enrollment.applied_aptc_amount > 0}
+    hbx_enrollments.current_year.individual_market.with_aptc.present?
   end
 
   def self.by_special_enrollment_period_id(special_enrollment_period_id)
@@ -1079,6 +1082,10 @@ class Family
 
   def has_primary_active_employee?
     primary_applicant.person.has_active_employee_role?
+  end
+
+  def has_active_sep?(pre_enrollment)
+    pre_enrollment.is_ivl_by_kind? && latest_ivl_sep&.start_on&.year == pre_enrollment.effective_on.year
   end
 
 private

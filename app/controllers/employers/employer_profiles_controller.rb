@@ -2,7 +2,8 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   include ::Config::AcaConcern
   include ApplicationHelper
 
-  before_action :redirect_new_model, only: [:show, :welcome, :index, :new, :show_profile, :edit, :generate_sic_tree, :create]
+  before_action :redirect_new_model, only: [:welcome, :index, :new, :show_profile, :edit, :generate_sic_tree, :create]
+  before_action :redirect_show, only: [:show]
 
   before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
                                        :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees, :link_from_quote, :new_document, :upload_document, :generate_checkbook_urls]
@@ -19,6 +20,18 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def redirect_new_model
     redirect_to "/benefit_sponsors/profiles/registrations/new?profile_type=benefit_sponsor"
+  end
+
+  def redirect_show
+    employer_profile = EmployerProfile.find(params[:id])
+    hbx_id = employer_profile.hbx_id if employer_profile.present?
+    organization = BenefitSponsors::Organizations::Organization.employer_by_hbx_id(hbx_id)
+    if organization.present?
+      employer_profile_id = organization.first.employer_profile.id.to_s
+      redirect_to benefit_sponsors.profiles_employers_employer_profile_path(employer_profile_id, tab: 'home')
+    else
+      redirect_to "/benefit_sponsors/profiles/registrations/new?profile_type=benefit_sponsor"
+    end
   end
 
   def link_from_quote

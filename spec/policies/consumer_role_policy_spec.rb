@@ -1,7 +1,7 @@
 require "rails_helper"
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
-describe ConsumerRolePolicy do
+describe ConsumerRolePolicy, dbclean: :after_each do
   subject { described_class }
   let(:consumer_role) { FactoryBot.create(:consumer_role) }
   let(:consumer_person) { FactoryBot.create(:person, :with_consumer_role) }
@@ -59,21 +59,16 @@ describe ConsumerRolePolicy do
     end
 
     context "consumer" do
-      let(:user) {FactoryBot.create(:user, :consumer)}
-      let(:person) { FactoryBot.build(:person) }
-
-      before :each do
-        allow(user).to receive(:person).and_return person
-      end
+      let(:user) { FactoryBot.create(:user, :consumer, person: consumer_role.person) }
+      let(:consumer_role) { FactoryBot.create(:consumer_role) }
+      let(:other_consumer_role) { FactoryBot.build(:consumer_role) }
 
       it "grants access" do
-        allow(person).to receive(:consumer_role).and_return consumer_role
         expect(subject).to permit(user, consumer_role)
       end
 
       it "denies access" do
-        allow(person).to receive(:consumer_role).and_return ConsumerRole.new
-        expect(subject).not_to permit(user, consumer_role)
+        expect(subject).not_to permit(user, other_consumer_role)
       end
     end
   end
