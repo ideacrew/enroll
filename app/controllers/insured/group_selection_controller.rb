@@ -170,6 +170,26 @@ class Insured::GroupSelectionController < ApplicationController
     end
   end
 
+  def edit_plan
+    @self_term_or_cancel_form = ::Insured::Forms::SelfTermOrCancelForm.for_view({enrollment_id: params.require(:hbx_enrollment_id), family_id: params.require(:family_id)})
+  end
+
+  def term_or_cancel
+    @self_term_or_cancel_form = ::Insured::Forms::SelfTermOrCancelForm.for_post({enrollment_id: params.require(:hbx_enrollment_id), term_date: params[:term_date], term_or_cancel: params[:term_or_cancel]})
+
+    redirect_to family_account_path
+  end
+
+  def edit_aptc
+    attrs = {enrollment_id: params.require(:hbx_enrollment_id), elected_aptc_pct: params[:applied_pct_1]}
+    if @self_term_or_cancel_form = ::Insured::Forms::SelfTermOrCancelForm.for_aptc_update_post(attrs)
+      flash[:notice] = "Successfully updated tax credits for enrollment."
+    else
+      flash[:error] = "Unable to update tax credits for enrollment."
+    end
+    redirect_to family_account_path
+  end
+
   private
 
   def permit_params
@@ -280,5 +300,4 @@ class Insured::GroupSelectionController < ApplicationController
     options[:language_preference] = person.consumer_role.language_preference
     options
   end
-
 end
