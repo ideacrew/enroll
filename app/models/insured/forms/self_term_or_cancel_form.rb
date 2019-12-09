@@ -25,16 +25,18 @@ module Insured
         form_params = service.find
         form_params.merge!(
           { available_aptc: fetch_available_aptc(attrs[:enrollment_id]),
-            enable_tax_credit_btn: check_to_enable_tax_credit_btn}
+            enable_tax_credit_btn: check_to_enable_tax_credit_btn(attrs)}
         )
         new(form_params)
       end
 
-      def self.check_to_enable_tax_credit_btn
+      def self.check_to_enable_tax_credit_btn(attrs)
+        enrollment = HbxEnrollment.find(attrs[:enrollment_id])
         system_date = TimeKeeper.date_of_record
+        # Can't create a corresponing enrollment during the end of the year due to overlapping plan year issue and hence disabling the change tax credit button
         begin_date = Date.new(system_date.year, 11, ::HbxProfile::IndividualEnrollmentDueDayOfMonth + 1).beginning_of_day
         end_date = begin_date.end_of_year.end_of_day
-        (begin_date..end_date).cover?(system_date) ? false : true
+        !((begin_date..end_date).cover?(system_date) && (enrollment.effective_on.year == system_date.year))
       end
 
       def self.fetch_available_aptc(enr_id)
