@@ -469,8 +469,8 @@ class HbxEnrollment
   end
 
   def has_at_least_one_aptc_eligible_member?
-    tax_household = family.active_household.latest_active_tax_household
-    tax_household.tax_household_members.any? { |member| member.is_ia_eligible? }
+    tax_household = family&.active_household&.latest_active_tax_household
+    tax_household&.tax_household_members.any? { |member| member&.is_ia_eligible? }
   end
 
   class << self

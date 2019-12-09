@@ -530,9 +530,9 @@ Then(/the enrollment should be terminated/) do
   expect(page).to have_content('Coverage End: ' + (TimeKeeper.date_of_record + 10).to_s)
 end
 
-Given(/(.*) has a (.*) secondary role/) do |_primary_role, secondary_role|
-  Family.all.first.all_enrollments.first.aasm_state == 'coverage_terminated'
-end
+# Given(/(.*) has a (.*) secondary role/) do |_primary_role, secondary_role|
+#  Family.all.first.all_enrollments.first.aasm_state == 'coverage_terminated'
+# end
 
 Then(/the enrollment should be pending termination/) do
   expect(Family.all.first.all_enrollments.first.aasm_state).to eq('coverage_termination_pending')
