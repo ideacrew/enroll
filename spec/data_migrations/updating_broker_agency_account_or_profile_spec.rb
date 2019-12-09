@@ -3,6 +3,10 @@ require File.join(Rails.root, "app", "data_migrations", "updating_broker_agency_
 
 describe UpdatingBrokerAgencyAccountOrProfile, dbclean: :after_each do
 
+  after(:each) do
+    DatabaseCleaner.clean
+  end
+
   let!(:given_task_name) { "delinking_broker" }
   let!(:person) { FactoryBot.create(:person,:with_broker_role)}
   let!(:organization1) {FactoryBot.create(:organization)}
@@ -95,11 +99,49 @@ describe UpdatingBrokerAgencyAccountOrProfile, dbclean: :after_each do
         market_kind:'both',
         broker_agency_profile_id: broker_agency_profile.id,
         action:'update_broker_role' do
-          puts "id = #{broker_agency_profile.id}"
             subject.migrate
             person.reload
             expect(person.broker_role.market_kind).to eq 'both'
         end
+      end
+    end
+  end
+
+  context 'update_family_broker_agency_account_with_writing_agent', dbclean: :before_each do
+    let!(:given_task_name) { "updating_broker_agency_account_or_profile" }
+    let!(:person) { FactoryBot.create(:person,:with_broker_role)}
+    let!(:dummy_writing_agent_id) { "12345667" }
+    let(:site)  { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    let(:benefit_broker_agency_organization)   { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+    let(:benefit_broker_agency_profile) { benefit_broker_agency_organization.broker_agency_profile }
+    let(:writing_agent_id) { benefit_broker_agency_profile.primary_broker_role.id }
+    let(:family) {FactoryBot.create(:family,:with_primary_family_member, person: person, broker_agency_accounts: [benefit_broker_agency_account])}
+    let(:benefit_broker_agency_account) { BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: benefit_broker_agency_profile.id, writing_agent_id: dummy_writing_agent_id, is_active: true, start_on: TimeKeeper.date_of_record) }
+
+    it 'should update the broker agency account with correct writing agent' do
+      ClimateControl.modify org_fein: benefit_broker_agency_organization.fein,
+        hbx_id: person.hbx_id,
+        action: 'update_family_broker_agency_account_with_writing_agent' do
+        expect(family.broker_agency_accounts.first.writing_agent_id).to eq dummy_writing_agent_id
+        subject.migrate
+        family.reload
+        expect(family.broker_agency_accounts.first.writing_agent_id).to eq writing_agent_id
+      end
+    end
+
+    it 'should return if fein is not passed' do
+      ClimateControl.modify org_fein: "",
+                            hbx_id: person.hbx_id,
+                            action: 'update_family_broker_agency_account_with_writing_agent' do
+        expect( subject.migrate).to eq 'Fein not found'
+      end
+    end
+
+    it 'should return if organization is not found' do
+      ClimateControl.modify org_fein: "12345",
+                            hbx_id: person.hbx_id,
+                            action: 'update_family_broker_agency_account_with_writing_agent' do
+        expect(subject.migrate).to eq 'Unable to find organization with FEIN'
       end
     end
   end
