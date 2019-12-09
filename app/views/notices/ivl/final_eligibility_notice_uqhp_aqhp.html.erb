@@ -4,70 +4,18 @@
 <%= render partial: "notices/shared/address", :locals => {notice: notice} %>
 <%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
 
-<% if notice.uqhp_individuals.present? && notice.renewal_health_enrollments.present? && notice.renewal_dental_enrollments.present?  %>
-    <table class="total_table" border="0">
-      <tbody>
-      <tr>
-        <td><h3>YOUR HEALTH AND DENTAL PLAN ENROLLMENT FOR <%= notice.coverage_year %></h3></td>
-      </tr>
-      </tbody>
-    </table>
-    <table class="total_table" border="0">
-      <tbody>
-      <tr>
-        <td><h3>PAYMENT DEADLINE: JANUARY 1, <%= notice.coverage_year %></h3></td>
-      </tr>
-      </tbody>
-    </table>
-<% elsif  notice.uqhp_individuals.present? && notice.renewal_health_enrollments.present? %>
-    <table class="total_table" border="0">
-      <tbody>
-      <tr>
-        <td><h3>YOUR HEALTH PLAN ENROLLMENT FOR <%= notice.coverage_year %></h3></td>
-      </tr>
-      </tbody>
-    </table>
-    <table class="total_table" border="0">
-      <tbody>
-      <tr>
-        <td><h3>PAYMENT DEADLINE: JANUARY 1, <%= notice.coverage_year %></h3></td>
-      </tr>
-      </tbody>
-    </table>
-<% end %>
-
-<% if notice.renewal_health_enrollments.present? && notice.renewal_dental_enrollments.present?  %>
-    <table class="total_table" border="0">
-      <tbody>
-      <tr>
-        <td><h3>YOUR HEALTH AND DENTAL PLAN ENROLLMENT AND COST SAVINGS FOR <%= notice.coverage_year %></h3></td>
-      </tr>
-      </tbody>
-    </table>
-
-    <table class="total_table" border="0">
-      <tbody>
-      <tr>
-        <td><h3>PAYMENT DEADLINE: JANUARY 1, <%= notice.coverage_year %></h3></td>
-      </tr>
-      </tbody>
-    </table>
-<% elsif notice.renewal_health_enrollments.present?  %>
-    <table class="total_table" border="0">
-      <tbody>
-      <tr>
-        <td><h3>YOUR HEALTH PLAN ENROLLMENT AND COST SAVINGS FOR <%= notice.coverage_year %></h3></td>
-      </tr>
-      </tbody>
-    </table>
-
-    <table class="total_table" border="0">
-      <tbody>
-      <tr>
-        <td><h3>PAYMENT DEADLINE: JANUARY 1, <%= notice.coverage_year %></h3></td>
-      </tr>
-      </tbody>
-    </table>
+<% if notice.uqhp_individuals.present? %>
+  <% if notice.renewal_health_enrollments.present? && notice.renewal_dental_enrollments.present?  %>
+    <h3>YOUR HEALTH AND DENTAL PLAN ENROLLMENT FOR <%= notice.coverage_year %><br/>PAYMENT DEADLINE: JANUARY 1, <%= notice.coverage_year %></h3>
+  <% elsif notice.renewal_health_enrollments.present? %>
+    <h3>YOUR HEALTH PLAN ENROLLMENT FOR <%= notice.coverage_year %><br/>PAYMENT DEADLINE: JANUARY 1, <%= notice.coverage_year %></h3>
+  <% end %>
+<% elsif notice.aqhp_individuals.present? %>
+  <% if notice.renewal_health_enrollments.present? && notice.renewal_dental_enrollments.present?  %>
+    <h3>YOUR HEALTH AND DENTAL PLAN ENROLLMENT AND COST SAVINGS FOR <%= notice.coverage_year %><br/>PAYMENT DEADLINE: JANUARY 1, <%= notice.coverage_year %></h3>
+  <% elsif notice.renewal_health_enrollments.present? %>
+    <h3>YOUR HEALTH PLAN ENROLLMENT AND COST SAVINGS FOR <%= notice.coverage_year %><br/>PAYMENT DEADLINE: JANUARY 1, <%= notice.coverage_year %></h3>
+  <% end %>
 <% end %>
 
 <% if !notice.renewal_health_enrollments.present? && notice.renewal_dental_enrollments.present?  %>
@@ -112,7 +60,7 @@
     listings: ["Make your premium payment directly to the insurance company - not #{Settings.site.short_name}.","We’ve included information in this letter on how to make your payment.","If you don’t make your payments on time, you could lose your insurance."]} %>
 
 <%= render partial: 'notices/shared/custom_listing', locals: {
-    listing: "<strong>If you have auto-pay set up</strong> through your health and/or dental insurance plan(s), you must contact your insurance company to <strong>update your autopay</strong>. The same is true if you set-up auto-pay through another method, such as through your bank. <strong>If you do not make an update, your plan may be terminated</strong>"} %>
+    listing: "<strong>If you have auto-pay set up</strong> through your health and/or dental insurance plan(s), you must contact your insurance company to <strong>update your autopay</strong>. The same is true if you set-up auto-pay through another method, such as through your bank. <strong>If you do not make an update, your plan may be terminated.</strong>"} %>
 
 <% if notice.documents_needed %>
     <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
@@ -242,9 +190,8 @@
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
     content: "If you want to end a plan, you must tell us no later than the day you want your plan to end.", top_margin: '3px'} %>
 
-
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-    content: "If you end your health plan, and don’t replace it, you may have to pay a penalty to the IRS for the months you don’t have health insurance.", top_margin: '5px'} %>
+    content: "If you end your health plan, and don’t replace it, you may have to pay a penalty on your DC taxes for the months you don’t have health insurance.", top_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
     content: "If you end your plan, you also won’t be able to sign up again until the next annual open enrollment period, unless you qualify for a special enrollment period. To end your plan, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>, or call #{Settings.site.short_name}.", top_margin: '5px'} %>
