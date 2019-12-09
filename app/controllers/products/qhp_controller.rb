@@ -13,7 +13,7 @@ class Products::QhpController < ApplicationController
     @standard_component_ids = params[:standard_component_ids]
     @hbx_enrollment_id = params[:hbx_enrollment_id]
     @active_year = params[:active_year]
-    if (@market_kind == 'shop' || @market_kind == 'fehb') && (@coverage_kind == 'health' || @coverage_kind == "dental") # 2016 plans have shop dental plans too.
+    if (@market_kind == 'aca_shop' || @market_kind == 'fehb') && (@coverage_kind == 'health' || @coverage_kind == "dental") # 2016 plans have shop dental plans too.
       sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(@hbx_enrollment)
       products = @hbx_enrollment.sponsored_benefit.products(@hbx_enrollment.effective_on)
       @member_groups = sponsored_cost_calculator.groups_for_products(products)
@@ -87,9 +87,9 @@ class Products::QhpController < ApplicationController
     @market_kind = if params[:market_kind] == "fehb"
                      "fehb"
                    elsif params[:market_kind] == "shop" || @hbx_enrollment.is_shop?
-                     "shop"
+                     "aca_shop"
                    else
-                     "individual"
+                     "aca_individual"
                    end
 
     @coverage_kind = if @hbx_enrollment.product.present?

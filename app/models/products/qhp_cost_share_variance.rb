@@ -88,8 +88,9 @@ class Products::QhpCostShareVariance
     end
   end
 
-  def product_for(market_kind = 'shop')
+  def product_for(market_kind = 'aca_shop')
     qhp_product = product
+
     return qhp_product if qhp_product.benefit_market_kind == market_kind.to_sym || dental?
 
     Rails.cache.fetch("qcsv--#{market_kind}-product-#{qhp.active_year}-hios-id-#{hios_plan_and_variant_id}", expires_in: 5.hours) do
