@@ -37,11 +37,11 @@ module Services
       @logger.info "Started begin_coverage_for_ivl_enrollments process at #{TimeKeeper.datetime_of_record.to_s}"
       current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
       ivl_enrollments = HbxEnrollment.where(
-        effective_on: current_benefit_period.start_on,
-        kind: 'individual',
-        aasm_state: 'auto_renewing'
+        :effective_on => current_benefit_period.start_on,
+        :kind => 'individual',
+        :aasm_state.in => ['auto_renewing', 'renewing_coverage_selected']
       )
-      begin 
+      begin
         ivl_enrollments.each do |enrollment|
           enrollment.begin_coverage! if enrollment.may_begin_coverage?
           @logger.info "Processed enrollment: #{enrollment.hbx_id}"
