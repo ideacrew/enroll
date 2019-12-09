@@ -72,7 +72,25 @@ RSpec.describe IvlNotices::FinalEligibilityNoticeRenewalUqhp, :dbclean => :after
       @final_eligibility_notice.append_data
     end
 
-    it "returns all auto_renewing enrollments" do
+    it 'returns all auto_renewing enrollments' do
+      @final_eligibility_notice.pick_enrollments
+      expect(@final_eligibility_notice.notice.enrollments.size).to eq 1
+    end
+
+    it 'returns all coverage_selected enrollments' do
+      hbx_enrollment.update_attributes!(:aasm_state => 'coverage_selected')
+      @final_eligibility_notice.pick_enrollments
+      expect(@final_eligibility_notice.notice.enrollments.size).to eq 1
+    end
+
+    it 'returns all unverified enrollments' do
+      hbx_enrollment.update_attributes!(:aasm_state => 'unverified')
+      @final_eligibility_notice.pick_enrollments
+      expect(@final_eligibility_notice.notice.enrollments.size).to eq 1
+    end
+
+    it 'returns all renewing_coverage_selected enrollments' do
+      hbx_enrollment.update_attributes!(:aasm_state => 'renewing_coverage_selected')
       @final_eligibility_notice.pick_enrollments
       expect(@final_eligibility_notice.notice.enrollments.size).to eq 1
     end
