@@ -4,7 +4,7 @@ Feature: IVL plan purchase
     Given a Resident exists
     And the Resident is logged in
     And Resident has a dependent in child relationship with age less than 26
-    When Resident visits home page with qle
+    When Resident has QLE and goes to home page
     And Resident clicked on "Married" qle
     And I select a past qle date
     Then I should see confirmation and continue
@@ -17,7 +17,7 @@ Feature: IVL plan purchase
     Given a Resident exists
     And the Resident is logged in
     And Resident has a dependent in child relationship with age less than 26
-    When Resident visits home page with qle
+    When Resident has QLE and goes to home page
     And Resident clicked on "Married" qle
     And I select a past qle date
     Then I should see confirmation and continue
@@ -31,7 +31,7 @@ Feature: IVL plan purchase
     Given a Resident exists
     And the Resident is logged in
     And Resident has a dependent in child relationship with age greater than 26
-    When Resident visits home page with qle
+    When Resident has QLE and goes to home page
     And Resident clicked on "Married" qle
     And I select a past qle date
     Then I should see confirmation and continue
