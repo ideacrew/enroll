@@ -4,7 +4,8 @@ Feature: IVL plan purchase
     Given a consumer exists
     And the consumer is logged in
     And consumer has a dependent in child relationship with age less than 26
-    When consumer visits home page after successful ridp
+    And consumer has successful ridp
+    When consumer visits home page
     And consumer clicked on "Married" qle
     And I select a past qle date
     Then I should see confirmation and continue
@@ -17,7 +18,8 @@ Feature: IVL plan purchase
     Given a consumer exists
     And the consumer is logged in
     And consumer has a dependent in child relationship with age less than 26
-    When consumer visits home page after successful ridp
+    And consumer has successful ridp
+    When consumer visits home page
     And consumer clicked on "Married" qle
     And I select a past qle date
     Then I should see confirmation and continue
@@ -31,7 +33,8 @@ Feature: IVL plan purchase
     Given a consumer exists
     And the consumer is logged in
     And consumer has a dependent in child relationship with age greater than 26
-    When consumer visits home page after successful ridp
+    And consumer has successful ridp
+    When consumer visits home page
     And consumer clicked on "Married" qle
     And I select a past qle date
     Then I should see confirmation and continue
@@ -55,7 +58,8 @@ Feature: IVL plan purchase
     And consumer has a dependent in child relationship with age greater than 26
     And consumer has a dependent in spouse relationship with age greater than 26
     And consumer also has a health enrollment with primary person covered
-    When consumer visits home page after successful ridp
+    And consumer has successful ridp
+    When consumer visits home page
     Then consumer should see the enrollment with make changes button
     When consumer clicked on make changes button
     Then consumer should see the ineligible family member disabled and unchecked

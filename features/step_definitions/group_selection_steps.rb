@@ -555,15 +555,15 @@ When(/consumer's health enrollment has an effective date in the future/) do
 end
 
 
-Given(/(.*) has a (.*) role/) do |_primary_role, secondary_role|
-  family = Family.all.first
-  # Assumes primary role is consumer.
-  if secondary_role.eql?('resident')
-    FactoryBot.create(:resident_role_object, person: family.primary_person)
-  elsif secondary_role.eql?('employee')
-    FactoryBot.create(:employee_role, person: family.primary_person)
-  end
-end
+# Given(/(.*) has a (.*) role/) do |_primary_role, secondary_role|
+#  family = Family.all.first
+#  # Assumes primary role is consumer.
+#  if secondary_role.eql?('resident')
+#    FactoryBot.create(:resident_role_object, person: family.primary_person)
+#  elsif secondary_role.eql?('employee')
+#    FactoryBot.create(:employee_role, person: family.primary_person)
+#  end
+# end
 
 When(/consumer's health enrollment has an effective date in the future/) do
   Family.all.first.all_enrollments.first.update_attributes(effective_on: TimeKeeper.date_of_record + 20)

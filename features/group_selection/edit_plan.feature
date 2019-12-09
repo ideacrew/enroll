@@ -6,7 +6,8 @@ Feature: Make Changes Button
     And consumer has a dependent in child relationship with age greater than 26
     And consumer has a dependent in spouse relationship with age greater than 26
     And consumer also has a health enrollment with primary person covered
-    When consumer visits home page after successful ridp
+    And consumer has successful ridp
+    When consumer visits home page
 
   Scenario: Submit button disabled with date and "no" answered for "Are you sure?"
     When consumer clicks on the make changes button
