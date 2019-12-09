@@ -4,6 +4,7 @@ module Insured
   module Factories
     class SelfServiceFactory
       attr_accessor :document_id, :enrollment_id, :family_id, :product_id, :qle_id, :sep_id
+      extend ::ApplicationHelper
       extend Acapi::Notifiers
 
       def initialize(args)
@@ -44,13 +45,25 @@ module Insured
         new_effective_date = self.find_enrollment_effective_on_date(DateTime.now)
         reinstatement = Enrollments::Replicator::Reinstatement.new(enrollment, new_effective_date, applied_aptc_amount).build
         reinstatement.save!
-        applicable_aptc = fetch_applicable_aptc(reinstatement, applied_aptc_amount, enrollment)
-        reinstatement.update_attributes!(elected_aptc_pct: elected_aptc_pct, applied_aptc_amount: applied_aptc_amount)
+        update_enrollment_for_apcts(elected_aptc_pct, reinstatement, applied_aptc_amount, enrollment)
+        reinstatement.select_coverage!
+      end
+
+      def self.update_enrollment_for_apcts(elected_aptc_pct, reinstatement, applied_aptc_amount, enrollment)
+        applicable_aptc_by_member = fetch_applicable_aptc(reinstatement, applied_aptc_amount, enrollment)
+        reinstatement.hbx_enrollment_members.each do |enrollment_member|
+          aptc_value = applicable_aptc_by_member[enrollment_member.applicant_id.to_s]
+          next enrollment_member unless aptc_value
+          aptc_value = round_down_float_two_decimals(aptc_value)
+          enrollment_member.update_attributes!(applied_aptc_amount: aptc_value)
+        end
+        total_aptc = round_down_float_two_decimals(reinstatement.hbx_enrollment_members.pluck(:applied_aptc_amount).sum)
+        reinstatement.update_attributes!(elected_aptc_pct: elected_aptc_pct, applied_aptc_amount: total_aptc)
       end
 
       def self.fetch_applicable_aptc(new_enrollment, selected_aptc, old_enrollment)
         service = ::Services::ApplicableAptcService.new(new_enrollment.id, selected_aptc, [new_enrollment.product_id])
-        service.applicable_aptcs.values.sum
+        service.applicable_aptcs
       end
 
       def is_aptc_eligible(enrollment, family)
