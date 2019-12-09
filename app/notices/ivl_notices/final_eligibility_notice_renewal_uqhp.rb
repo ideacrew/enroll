@@ -49,7 +49,7 @@ class IvlNotices::FinalEligibilityNoticeRenewalUqhp < IvlNotice
   def pick_enrollments
     hbx_enrollments = []
     family = recipient.primary_family
-    enrollments = HbxEnrollment.where(family_id: family.id, :aasm_state.in => ["auto_renewing", "coverage_selected"], :kind => "individual")
+    enrollments = HbxEnrollment.where(family_id: family.id, :aasm_state.in => ['auto_renewing', 'coverage_selected', 'unverified', 'renewing_coverage_selected'], :kind => "individual")
     return nil if enrollments.blank?
     health_enrollments = enrollments.detect{ |e| e.coverage_kind == "health" && e.effective_on.year.to_s == notice.coverage_year}
     dental_enrollments = enrollments.detect{ |e| e.coverage_kind == "dental" && e.effective_on.year.to_s == notice.coverage_year}
