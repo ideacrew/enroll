@@ -95,7 +95,7 @@ RSpec.describe Products::QhpController, :type => :controller, dbclean: :around_e
       sign_in(user)
       get :summary, params: {standard_component_id: "11111100001111-01", hbx_enrollment_id: shop_health_enrollment.id, active_year: shop_health_enrollment.effective_on.year, market_kind: "shop", coverage_kind: "health"}
       expect(response).to have_http_status(:success)
-      expect(assigns(:market_kind)).to eq "shop"
+      expect(assigns(:market_kind)).to eq "aca_shop"
       expect(assigns(:coverage_kind)).to eq "health"
     end
 
@@ -114,7 +114,7 @@ RSpec.describe Products::QhpController, :type => :controller, dbclean: :around_e
       sign_in(user)
       get :summary, params: {standard_component_id: "11111100001111-01", hbx_enrollment_id: shop_dental_enrollment.id, active_year: shop_dental_enrollment.effective_on.year, market_kind: "shop", coverage_kind: "dental"}
       expect(response).to have_http_status(:success)
-      expect(assigns(:market_kind)).to eq "shop"
+      expect(assigns(:market_kind)).to eq "aca_shop"
       expect(assigns(:coverage_kind)).to eq "dental"
     end
 
