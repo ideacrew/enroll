@@ -8,11 +8,12 @@ module Factories
 
     include ApplicationHelper
 
-    def initialize(enrollment_id, selected_aptc = nil, product_ids = [])
+    def initialize(enrollment_id, selected_aptc = nil, product_ids = [], excluding_enrollment_id = nil)
       @enrollment = HbxEnrollment.where(id: enrollment_id.to_s).first
       raise "Cannot find a valid enrollment with given enrollment id" unless @enrollment
 
       @family = @enrollment.family
+      @excluding_enrollment_id = excluding_enrollment_id
       set_applicable_aptc_attrs(selected_aptc, product_ids) if product_ids.present? && selected_aptc
     end
 
@@ -92,7 +93,7 @@ module Factories
     end
 
     def tax_members_aptc_breakdown(tax_household)
-      total_thh_available_aptc = tax_household.total_aptc_available_amount_for_enrollment(@enrollment)
+      total_thh_available_aptc = tax_household.total_aptc_available_amount_for_enrollment(@enrollment, @excluding_enrollment_id)
       aptc_thhms = tax_household.aptc_members
       enrolling_aptc_members = aptc_enrollment_members(aptc_thhms)
       member_benchmark_hash = enrollment_eligible_benchmark_hash(enrolling_aptc_members, @enrollment)

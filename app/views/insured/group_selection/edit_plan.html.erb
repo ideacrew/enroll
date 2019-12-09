@@ -56,7 +56,7 @@
                   </p>
                 </div>
                 <label class="bullet-separator">&nbsp;Tax credit amount:</label>
-                <strong>$<%= hbx_enrollment.max_aptc && hbx_enrollment.elected_aptc_pct ? (hbx_enrollment&.max_aptc * hbx_enrollment&.elected_aptc_pct).to_s : "0.00" %></strong>
+                <strong>$<%= hbx_enrollment.applied_aptc_amount %></strong>
               </div>
               <div class="col-xs-4">
                 <div class="family-plan-selection">
@@ -85,7 +85,7 @@
               </div>
               <% if display_change_tax_credits_button?(hbx_enrollment) %>
                 <div class="col-sm-4">
-                  <a id="aptc-button" class="btn btn-default btn-block interaction-click-control-edit-aptc">Change Tax Credit</a>
+                  <button type="button" id="aptc-button" class="btn btn-default btn-block interaction-click-control-edit-aptc" <%= @self_term_or_cancel_form.enable_tax_credit_btn ? '' : 'disabled' %>>Change Tax Credit</button>
                 </div>
               <% end %>
             </div>
@@ -107,6 +107,8 @@
     <%= render 'change_tax_credit_form',
         locals: {
           hbx_enrollment: @self_term_or_cancel_form.hbx_enrollment,
+          available_aptc: @self_term_or_cancel_form.available_aptc,
+          new_effective_on_date: @self_term_or_cancel_form.new_effective_on
         }
     %>
   </div>

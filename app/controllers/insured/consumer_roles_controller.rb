@@ -45,9 +45,9 @@ class Insured::ConsumerRolesController < ApplicationController
       @person_params[:ssn] = Person.decrypt_ssn(person.encrypted_ssn)
       @person_params[:dob] = person.dob.strftime("%Y-%m-%d")
 
-      @person = Forms::ConsumerCandidate.new(@person_params)
+      @person = ::Forms::ConsumerCandidate.new(@person_params)
     else
-      @person = Forms::ConsumerCandidate.new
+      @person = ::Forms::ConsumerCandidate.new
     end
 
     respond_to do |format|
@@ -58,7 +58,7 @@ class Insured::ConsumerRolesController < ApplicationController
   def match
     @no_save_button = true
     @person_params = params.require(:person).merge({user_id: current_user.id}).permit!.to_h
-    @consumer_candidate = Forms::ConsumerCandidate.new(@person_params)
+    @consumer_candidate = ::Forms::ConsumerCandidate.new(@person_params)
     @person = @consumer_candidate
     @use_person = true #only used to manupulate form data
     respond_to do |format|
@@ -82,18 +82,18 @@ class Insured::ConsumerRolesController < ApplicationController
 
             if @employee_candidate.valid?
               found_census_employees = @employee_candidate.match_census_employees
-              @employment_relationships = Factories::EmploymentRelationshipFactory.build(@employee_candidate, found_census_employees)
+              @employment_relationships = ::Factories::EmploymentRelationshipFactory.build(@employee_candidate, found_census_employees)
               if @employment_relationships.present?
                 format.html { render 'insured/employee_roles/match' }
               end
             end
           end
-          @resident_candidate = Forms::ResidentCandidate.new(@person_params)
+          @resident_candidate = ::Forms::ResidentCandidate.new(@person_params)
           if @resident_candidate.valid?
             found_person = @resident_candidate.match_person
             if found_person.present? && found_person.resident_role.present?
               begin
-                @resident_role = Factories::EnrollmentFactory.construct_resident_role(params.permit!, actual_user)
+                @resident_role = ::Factories::EnrollmentFactory.construct_resident_role(params.permit!, actual_user)
                 if @resident_role.present?
                   @person = @resident_role.person
                   session[:person_id] = @person.id
@@ -149,8 +149,7 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def create
     begin
-
-      @consumer_role = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, actual_user)
+      @consumer_role = ::Factories::EnrollmentFactory.construct_consumer_role(params.permit!, actual_user)
       if @consumer_role.present?
         @person = @consumer_role.person
       else

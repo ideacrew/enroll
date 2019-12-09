@@ -11,6 +11,7 @@ module Insured
         @term_date      = attrs[:term_date].present? ? Date.strptime(attrs[:term_date], '%m/%d/%Y') : TimeKeeper.date_of_record
         @term_or_cancel = attrs[:term_or_cancel]
         @elected_aptc_pct = attrs[:elected_aptc_pct]
+        @selected_aptc = attrs[:aptc_applied_total]
         @factory_class  = ::Insured::Factories::SelfServiceFactory
       end
 
@@ -24,7 +25,7 @@ module Insured
       end
 
       def update_aptc
-        @factory_class.update_aptc(@enrollment_id, @elected_aptc_pct.to_f, @elected_aptc_pct.to_f.to_money)
+        @factory_class.update_aptc(@enrollment_id, @elected_aptc_pct.to_f, @selected_aptc.to_f)
       end
 
       def attributes_to_form_params(attrs)
@@ -33,7 +34,8 @@ module Insured
           :market_kind => attrs[:qle].present? ? attrs[:qle].market_kind : nil,
           :product => ::Insured::Services::ProductService.new(attrs[:enrollment].product).find,
           :family => ::Insured::Serializers::FamilySerializer.new(attrs[:family]).to_hash,
-          :is_aptc_eligible => attrs[:is_aptc_eligible]
+          :is_aptc_eligible => attrs[:is_aptc_eligible],
+          new_effective_on: attrs[:new_effective_on]
         }
       end
     end
