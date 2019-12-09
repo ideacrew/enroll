@@ -607,14 +607,6 @@ And(/the enrollment is in (.*) state/) do |state|
   visit current_path
 end
 
-And(/the consumer (.*) see the make changes button/) do |visibility|
-  if visibility.eql?("should")
-    expect(page).to have_button("Make Changes")
-  else
-    expect(page).to_not have_button("Make Changes")
-  end
-end
-
 And(/the family has an active tax household/) do
   @family = Family.all.first
   FactoryBot.create(:tax_household, household: @family.active_household)
