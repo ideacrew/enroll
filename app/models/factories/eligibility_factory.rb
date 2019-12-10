@@ -24,6 +24,15 @@ module Factories
       available_eligibility_hash.merge({:total_available_aptc => total_aptc})
     end
 
+    def fetch_member_level_applicable_aptcs(total_aptc)
+      benchmark_hash = enrollment_eligible_benchmark_hash(aptc_enrollment_members, enrollment)
+      total = benchmark_hash.values.sum
+      benchmark_hash.inject({}) do |ratio_hash, member_id, benchmark_value|
+        ratio_hash[member_id] = (benchmark_value / total) * total_aptc
+        ratio_hash
+      end
+    end
+
     # returns hash of product_id to applicable_aptc mappings
     def fetch_applicable_aptcs
       raise "Cannot process without selected_aptc: #{@selected_aptc} and product_ids: #{@product_ids}" if @selected_aptc.nil? || @product_ids.empty?

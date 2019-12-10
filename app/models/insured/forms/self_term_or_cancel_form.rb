@@ -23,10 +23,7 @@ module Insured
       def self.for_view(attrs)
         service     = self_term_or_cancel_service(attrs)
         form_params = service.find
-        form_params.merge!(
-          { available_aptc: fetch_available_aptc(attrs[:enrollment_id]),
-            enable_tax_credit_btn: check_to_enable_tax_credit_btn(attrs)}
-        )
+        form_params.merge!({enable_tax_credit_btn: check_to_enable_tax_credit_btn(attrs)})
         new(form_params)
       end
 
@@ -37,10 +34,6 @@ module Insured
         begin_date = Date.new(system_date.year, 11, ::HbxProfile::IndividualEnrollmentDueDayOfMonth + 1).beginning_of_day
         end_date = begin_date.end_of_year.end_of_day
         !((begin_date..end_date).cover?(system_date) && (enrollment.effective_on.year == system_date.year))
-      end
-
-      def self.fetch_available_aptc(enr_id)
-        ::Services::AvailableEligibilityService.new(enr_id, enr_id).available_eligibility[:total_available_aptc]
       end
 
       def self.for_post(attrs)
