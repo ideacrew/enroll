@@ -455,7 +455,7 @@ Given(/^the Resident is logged in$/) do
   login_as user
 end
 
-When(/Resident visits home page with qle/) do
+When(/Resident has QLE and goes to home page/) do
   # we have only shop & ivl as market kinds for qle
   FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual")
   FactoryBot.create(:hbx_profile, :no_open_enrollment_coverage_period)
@@ -530,9 +530,9 @@ Then(/the enrollment should be terminated/) do
   expect(page).to have_content('Coverage End: ' + (TimeKeeper.date_of_record + 10).to_s)
 end
 
-Given(/(.*) has a (.*) secondary role/) do |_primary_role, secondary_role|
-  Family.all.first.all_enrollments.first.aasm_state == 'coverage_terminated'
-end
+# Given(/(.*) has a (.*) secondary role/) do |_primary_role, secondary_role|
+#  Family.all.first.all_enrollments.first.aasm_state == 'coverage_terminated'
+# end
 
 Then(/the enrollment should be pending termination/) do
   expect(Family.all.first.all_enrollments.first.aasm_state).to eq('coverage_termination_pending')
@@ -555,15 +555,15 @@ When(/consumer's health enrollment has an effective date in the future/) do
 end
 
 
-Given(/(.*) has a (.*) role/) do |_primary_role, secondary_role|
-  family = Family.all.first
-  # Assumes primary role is consumer.
-  if secondary_role.eql?('resident')
-    FactoryBot.create(:resident_role_object, person: family.primary_person)
-  elsif secondary_role.eql?('employee')
-    FactoryBot.create(:employee_role, person: family.primary_person)
-  end
-end
+# Given(/(.*) has a (.*) role/) do |_primary_role, secondary_role|
+#  family = Family.all.first
+#  # Assumes primary role is consumer.
+#  if secondary_role.eql?('resident')
+#    FactoryBot.create(:resident_role_object, person: family.primary_person)
+#  elsif secondary_role.eql?('employee')
+#    FactoryBot.create(:employee_role, person: family.primary_person)
+#  end
+# end
 
 When(/consumer's health enrollment has an effective date in the future/) do
   Family.all.first.all_enrollments.first.update_attributes(effective_on: TimeKeeper.date_of_record + 20)
@@ -605,14 +605,6 @@ And(/the enrollment is in (.*) state/) do |state|
   Family.all.first.all_enrollments.first.update_attributes(aasm_state: state)
   # Refresh page to ensure UI change
   visit current_path
-end
-
-And(/the consumer (.*) see the make changes button/) do |visibility|
-  if visibility.eql?("should")
-    expect(page).to have_button("Make Changes")
-  else
-    expect(page).to_not have_button("Make Changes")
-  end
 end
 
 And(/the family has an active tax household/) do
