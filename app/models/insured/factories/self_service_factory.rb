@@ -50,7 +50,7 @@ module Insured
       end
 
       def self.update_enrollment_for_apcts(elected_aptc_pct, reinstatement, applied_aptc_amount, enrollment)
-        applicable_aptc_by_member = fetch_applicable_aptc(reinstatement, applied_aptc_amount, enrollment)
+        applicable_aptc_by_member = member_level_aptc_breakdown(reinstatement, applied_aptc_amount)
         reinstatement.hbx_enrollment_members.each do |enrollment_member|
           aptc_value = applicable_aptc_by_member[enrollment_member.applicant_id.to_s]
           next enrollment_member unless aptc_value
@@ -61,9 +61,15 @@ module Insured
         reinstatement.update_attributes!(elected_aptc_pct: elected_aptc_pct, applied_aptc_amount: total_aptc)
       end
 
-      def self.fetch_applicable_aptc(new_enrollment, selected_aptc, old_enrollment)
+      def self.member_level_aptc_breakdown(new_enrollment, applied_aptc_amount)
+        applicable_aptc = fetch_applicable_aptc(reinstatement, applied_aptc_amount)
+        eli_fac_obj = ::Factories::EligibilityFactory.new(new_enrollment.id)
+        eli_fac_obj.fetch_member_level_applicable_aptcs(applicable_aptc)
+      end
+
+      def self.fetch_applicable_aptc(new_enrollment, selected_aptc)
         service = ::Services::ApplicableAptcService.new(new_enrollment.id, selected_aptc, [new_enrollment.product_id])
-        service.applicable_aptcs
+        service.applicable_aptcs[new_enrollment.product_id.to_s]
       end
 
       def is_aptc_eligible(enrollment, family)
@@ -86,8 +92,14 @@ module Insured
           family: family,
           qle: qle,
           is_aptc_eligible: is_aptc_eligible(enrollment, family),
-          new_effective_on: self.class.find_enrollment_effective_on_date(DateTime.current)
+          new_effective_on: self.class.find_enrollment_effective_on_date(DateTime.current),
+          available_aptc: calculate_max_applicable_aptc(enrollment)
         }
+      end
+
+      def self.calculate_max_applicable_aptc(enrollment)
+        selected_aptc = ::Services::AvailableEligibilityService.new(enrollment.id, enrollment.id).available_eligibility[:total_available_aptc]
+        fetch_applicable_aptc(new_enrollment, selected_aptc)
       end
 
       def self.find_enrollment_effective_on_date(hbx_created_datetime)
