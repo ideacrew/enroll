@@ -35,7 +35,8 @@ module Insured
           :product => ::Insured::Services::ProductService.new(attrs[:enrollment].product).find,
           :family => ::Insured::Serializers::FamilySerializer.new(attrs[:family]).to_hash,
           :is_aptc_eligible => attrs[:is_aptc_eligible],
-          new_effective_on: attrs[:new_effective_on]
+          new_effective_on: attrs[:new_effective_on],
+          available_aptc: attrs[:available_aptc]
         }
       end
     end

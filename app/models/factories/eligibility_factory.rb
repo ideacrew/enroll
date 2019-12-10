@@ -25,12 +25,14 @@ module Factories
     end
 
     def fetch_member_level_applicable_aptcs(total_aptc)
-      benchmark_hash = enrollment_eligible_benchmark_hash(aptc_enrollment_members, enrollment)
+      thh_members = aptc_enrollment_members(shopping_tax_members)
+      benchmark_hash = enrollment_eligible_benchmark_hash(thh_members, @enrollment)
       total = benchmark_hash.values.sum
-      benchmark_hash.inject({}) do |ratio_hash, member_id, benchmark_value|
+      ratio_hash = {}
+      benchmark_hash.each do |member_id, benchmark_value|
         ratio_hash[member_id] = (benchmark_value / total) * total_aptc
-        ratio_hash
       end
+      ratio_hash
     end
 
     # returns hash of product_id to applicable_aptc mappings

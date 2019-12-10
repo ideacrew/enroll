@@ -62,7 +62,7 @@ module Insured
       end
 
       def self.member_level_aptc_breakdown(new_enrollment, applied_aptc_amount)
-        applicable_aptc = fetch_applicable_aptc(reinstatement, applied_aptc_amount)
+        applicable_aptc = fetch_applicable_aptc(new_enrollment, applied_aptc_amount)
         eli_fac_obj = ::Factories::EligibilityFactory.new(new_enrollment.id)
         eli_fac_obj.fetch_member_level_applicable_aptcs(applicable_aptc)
       end
@@ -97,9 +97,9 @@ module Insured
         }
       end
 
-      def self.calculate_max_applicable_aptc(enrollment)
+      def calculate_max_applicable_aptc(enrollment)
         selected_aptc = ::Services::AvailableEligibilityService.new(enrollment.id, enrollment.id).available_eligibility[:total_available_aptc]
-        fetch_applicable_aptc(new_enrollment, selected_aptc)
+        Insured::Factories::SelfServiceFactory.fetch_applicable_aptc(enrollment, selected_aptc)
       end
 
       def self.find_enrollment_effective_on_date(hbx_created_datetime)
