@@ -93,7 +93,7 @@ module Insured
           qle: qle,
           is_aptc_eligible: is_aptc_eligible(enrollment, family),
           new_effective_on: self.class.find_enrollment_effective_on_date(DateTime.current),
-          available_aptc: calculate_max_applicable_aptc(enrollment)
+          available_aptc: self.class.calculate_max_applicable_aptc(enrollment)
         }
       end
 

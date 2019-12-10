@@ -565,10 +565,6 @@ end
 #  end
 # end
 
-When(/consumer's health enrollment has an effective date in the future/) do
-  Family.all.first.all_enrollments.first.update_attributes(effective_on: TimeKeeper.date_of_record + 20)
-end
-
 When(/consumer's dental enrollment has an effective date in the future/) do
   Family.all.last.all_enrollments.first.update_attributes(effective_on: TimeKeeper.date_of_record + 20)
 end

@@ -6,7 +6,9 @@ module Insured
 
       def initialize(product)
         @product = ::Insured::Serializers::ProductSerializer.new(product).to_hash
-        @product[:sbc_document] = ::Insured::Serializers::SbcDocumentSerializer.new(product.sbc_document).to_hash
+        if @product[:sbc_document]
+          @product[:sbc_document] = ::Insured::Serializers::SbcDocumentSerializer.new(product.sbc_document).to_hash
+        end
       end
 
       def find
