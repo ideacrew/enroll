@@ -23,10 +23,7 @@ module Insured
       def self.for_view(attrs)
         service     = self_term_or_cancel_service(attrs)
         form_params = service.find
-        form_params.merge!(
-          { available_aptc: fetch_available_aptc(attrs[:enrollment_id]),
-            enable_tax_credit_btn: check_to_enable_tax_credit_btn(attrs)}
-        )
+        form_params.merge!({enable_tax_credit_btn: check_to_enable_tax_credit_btn(attrs)})
         new(form_params)
       end
 
@@ -39,17 +36,13 @@ module Insured
         !((begin_date..end_date).cover?(system_date) && (enrollment.effective_on.year == system_date.year))
       end
 
-      def self.fetch_available_aptc(enr_id)
-        ::Services::AvailableEligibilityService.new(enr_id, enr_id).available_eligibility[:total_available_aptc]
-      end
-
       def self.for_post(attrs)
         service = self_term_or_cancel_service(attrs)
         service.term_or_cancel
       end
 
       def self.for_aptc_update_post(attrs)
-        return 'Action cannot be performed because of the overlapping plan years.' unless check_to_enable_tax_credit_btn
+        return 'Action cannot be performed because of the overlapping plan years.' unless check_to_enable_tax_credit_btn(attrs)
 
         service = self_term_or_cancel_service(attrs)
         service.update_aptc

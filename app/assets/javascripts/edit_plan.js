@@ -62,23 +62,28 @@ $(document).on("ready ajax:success", function() {
     calculatePercent('#aptc_applied_total', 1);
   });
 
+  function toFixedTrunc(x) {
+    var with2Decimals = x.toString().match(/^-?\d+(?:\.\d{0,2})?/)[0];
+    return with2Decimals;
+  }
+
   function calculatePercent(selector, multiplier) {
     // Starting variables
     var applied_aptc_total = $('#aptc_applied_total').val()
     var total_premium_value = document.getElementById("enrollment_total_premium").innerHTML;
-    var total_premium = parseFloat(total_premium_value);
+    var total_premium = toFixedTrunc(parseFloat(total_premium_value));
     // Percentage of max aptc available that user wishes to apply
-    var percent = parseFloat($(selector).val()).toFixed(2) * multiplier;
+    var percent = Math.round(parseFloat($(selector).val()).toFixed(2) * multiplier);
     // Max available tax credit per month for month
     var max_aptc_available = document.getElementById("max_aptc_available").innerHTML;
-    var aptc_total_cash_amount_to_apply = max_aptc_available * (percent / 100)
+    var aptc_total_cash_amount_to_apply = toFixedTrunc(max_aptc_available * (percent / 100))
     // Update the percentage
     $('#aptc_applied_pct_1_percent').val(percent + '%');
     // Update the view to reflect the total cash to be applied
     $('#aptc_applied_total').val("$" + aptc_total_cash_amount_to_apply);
     // Show dollar amount of Tax Credit value
-    var new_premium = (total_premium - aptc_total_cash_amount_to_apply).toFixed(2);
-    $('#new-premium').html(new_premium);
+    var new_premium = (total_premium - aptc_total_cash_amount_to_apply);
+    $('#new-premium').html(toFixedTrunc(new_premium));
   }
 
 });

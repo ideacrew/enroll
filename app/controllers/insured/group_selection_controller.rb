@@ -185,8 +185,8 @@ class Insured::GroupSelectionController < ApplicationController
     begin
       message = ::Insured::Forms::SelfTermOrCancelForm.for_aptc_update_post(attrs)
       flash[:notice] = message
-    rescue => e
-      flash[:error] = 'Unable to update tax credits for enrollment.'
+    rescue StandardError => e
+      flash[:error] = "Unable to update tax credits for enrollment"
     end
 
     redirect_to family_account_path
