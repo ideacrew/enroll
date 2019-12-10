@@ -39,7 +39,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       allow(consumer_role).to receive(:bookmark_url).and_return("test")
       get :privacy, params: {:aqhp => 'true'}
       expect(response).to have_http_status(:redirect)
-      expect(response).to redirect_to(person.consumer_role.bookmark_url+"?aqhp=true")
+      expect(response).to redirect_to(person.consumer_role.bookmark_url)
     end
     it "should render privacy" do
       allow(person).to receive(:consumer_role?).and_return(false)
