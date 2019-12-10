@@ -92,8 +92,8 @@ module Insured
           family: family,
           qle: qle,
           is_aptc_eligible: is_aptc_eligible(enrollment, family),
-          new_effective_on: self.class.find_enrollment_effective_on_date(DateTime.current),
-          available_aptc: self.class.calculate_max_applicable_aptc(enrollment)
+          new_effective_on: find_enrollment_effective_on_date(DateTime.current),
+          available_aptc: calculate_max_applicable_aptc(enrollment)
         }
       end
 
@@ -102,7 +102,7 @@ module Insured
         Insured::Factories::SelfServiceFactory.fetch_applicable_aptc(enrollment, selected_aptc)
       end
 
-      def self.find_enrollment_effective_on_date(hbx_created_datetime)
+      def find_enrollment_effective_on_date(hbx_created_datetime)
         offset_month = hbx_created_datetime.day <= 15 ? 1 : 2
         year = hbx_created_datetime.year
         month = hbx_created_datetime.month + offset_month
