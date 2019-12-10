@@ -69,8 +69,8 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
 
   before :each do
-    allow(hbx_enrollments).to receive(:+).with(HbxEnrollment.family_home_page_hidden_enrollments(family)).and_return(
-      HbxEnrollment.family_home_page_hidden_enrollments(family) + [hbx_enrollments]
+    allow(hbx_enrollments).to receive(:+).with(HbxEnrollment.family_canceled_enrollments(family)).and_return(
+      HbxEnrollment.family_canceled_enrollments(family) + [hbx_enrollments]
     )
     allow(hbx_enrollments).to receive(:order).and_return(hbx_enrollments)
     allow(hbx_enrollments).to receive(:waived).and_return([])
