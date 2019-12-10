@@ -200,6 +200,9 @@ aca:
     coverage_start_period: "2 months"
     auto_cancel_ineligible: false
 
+    employee:
+      default_contact_method: 'Only Electronic communications'
+
     binder_payment_dates: [
       {"2019-01-01": '2018,12,12'},
       {"2019-02-01": '2019,1,14'},
