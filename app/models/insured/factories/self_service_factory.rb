@@ -42,7 +42,7 @@ module Insured
         # field :applied_aptc_amount, type: Money, default: 0.0
         enrollment = HbxEnrollment.find(BSON::ObjectId.from_string(enrollment_id))
 
-        new_effective_date = self.find_enrollment_effective_on_date(DateTime.now)
+        new_effective_date = Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(DateTime.now.in_time_zone("Eastern Time (US & Canada)"))
         reinstatement = Enrollments::Replicator::Reinstatement.new(enrollment, new_effective_date, applied_aptc_amount).build
         reinstatement.save!
         update_enrollment_for_apcts(elected_aptc_pct, reinstatement, applied_aptc_amount, enrollment)
@@ -92,8 +92,8 @@ module Insured
           family: family,
           qle: qle,
           is_aptc_eligible: is_aptc_eligible(enrollment, family),
-          new_effective_on: self.class.find_enrollment_effective_on_date(DateTime.current),
-          available_aptc: self.class.calculate_max_applicable_aptc(enrollment)
+          new_effective_on: Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(DateTime.now.in_time_zone("Eastern Time (US & Canada)")),
+          available_aptc: calculate_max_applicable_aptc(enrollment)
         }
       end
 
