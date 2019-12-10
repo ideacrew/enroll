@@ -93,13 +93,13 @@ module Insured
           qle: qle,
           is_aptc_eligible: is_aptc_eligible(enrollment, family),
           new_effective_on: self.class.find_enrollment_effective_on_date(DateTime.current),
-          available_aptc: calculate_max_applicable_aptc(enrollment)
+          available_aptc: self.class.calculate_max_applicable_aptc(enrollment)
         }
       end
 
       def self.calculate_max_applicable_aptc(enrollment)
         selected_aptc = ::Services::AvailableEligibilityService.new(enrollment.id, enrollment.id).available_eligibility[:total_available_aptc]
-        fetch_applicable_aptc(new_enrollment, selected_aptc)
+        fetch_applicable_aptc(enrollment, selected_aptc)
       end
 
       def self.find_enrollment_effective_on_date(hbx_created_datetime)
