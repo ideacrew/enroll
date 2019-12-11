@@ -406,6 +406,26 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
   end
 
   describe "When plan year is published" do
+    describe "with a renewal package and a separate package" do
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup renewal application"
+      include_context "setup employees with benefits"
+
+      let!(:census_employee) { census_employees.first }
+      let!(:benefit_package) { FactoryBot.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: renewal_application, product_package: product_package) }
+      let!(:old_benefit_group_assignment) { FactoryBot.create :benefit_group_assignment, is_active: false, benefit_group: benefit_package, census_employee: census_employee }
+      let!(:benefit_group_assignment) { FactoryBot.create :benefit_group_assignment, is_active: false, benefit_group: benefit_package, census_employee: census_employee }
+
+      before do
+        benefit_group_assignment.update_attributes updated_at: benefit_group_assignment.updated_at + 2.minutes
+      end
+
+      it 'finds the last updated benefit_group_assignment' do
+        binding.pry
+        expect(census_employee.benefit_group_assignment_by_package(benefit_package.id)).to eql(benefit_group_assignment)
+      end
+    end
+
     let(:params) {valid_params}
     let(:initial_census_employee) {CensusEmployee.new(**params)}
     let(:benefit_group_assignment) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_group, census_employee: initial_census_employee)}
@@ -1383,8 +1403,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     end
 
     context 'when benefit group assignment with benefit group already exists' do
-      let!(:blue_collar_benefit_group_assignment) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: blue_collar_benefit_group, census_employee: census_employee, is_active: false)}
-      let!(:white_collar_benefit_group_assignment) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: white_collar_benefit_group, census_employee: census_employee, is_active: true)}
+      let!(:blue_collar_benefit_group_assignment) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: blue_collar_benefit_group, census_employee: census_employee, aasm_state: 'initialized', is_active: false)}
+      let!(:white_collar_benefit_group_assignment) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: white_collar_benefit_group, census_employee: census_employee, aasm_state: 'initialized', is_active: true)}
 
       it 'should activate existing benefit_group_assignment' do
         expect(census_employee.benefit_group_assignments.size).to eq 2
@@ -1392,6 +1412,14 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         census_employee.find_or_create_benefit_group_assignment([blue_collar_benefit_group])
         expect(census_employee.benefit_group_assignments.size).to eq 2
         expect(census_employee.active_benefit_group_assignment).to eq blue_collar_benefit_group_assignment
+      end
+
+      it 'makes the blue collar assignment active' do
+        expect { census_employee.find_or_create_benefit_group_assignment([blue_collar_benefit_group]) }.to change { blue_collar_benefit_group_assignment.is_active }
+      end
+
+      it 'makes the white collar assignment inactive' do
+        expect { census_employee.find_or_create_benefit_group_assignment([blue_collar_benefit_group]) }.to change { white_collar_benefit_group_assignment.is_active }
       end
     end
 

@@ -13,7 +13,7 @@ module BenefitSponsors
         return if benefit_group_assignment.blank?
 
         census_employee = benefit_group_assignment.census_employee
-        new_benefit_group_assignment = census_employee.benefit_package_assignment_for(new_benefit_package)
+        new_benefit_group_assignment = census_employee.benefit_group_assignment_by_package(new_benefit_package.id)
         
         return if new_benefit_group_assignment.blank?
 

@@ -102,5 +102,24 @@ module BenefitSponsors
         expect(subject.product).to eq enrollment.product.renewal_product
       end
     end
+
+    context "Renewal factory invoked with 2 benefit group assignments" do
+      include_context "setup employees with benefits"
+
+      let(:coverage_kind)     { :health }
+      let(:enrollment_status) { :coverage_selected }
+      let!(:census_employee) { census_employees.first }
+      let!(:benefit_package) { FactoryBot.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: renewal_application, product_package: product_package) }
+      let!(:old_benefit_group_assignment) { FactoryBot.create :benefit_group_assignment, is_active: false, benefit_group: benefit_package, census_employee: census_employee }
+      let!(:benefit_group_assignment) { FactoryBot.create :benefit_group_assignment, is_active: false, benefit_group: benefit_package, census_employee: census_employee }
+
+      before do
+        benefit_group_assignment.update_attributes updated_at: benefit_group_assignment.updated_at + 2.minutes
+      end
+
+      it 'finds and assigns the correct benefit group assignment' do
+        expect(subject.benefit_group_assignment).to eql(benefit_group_assignment)
+      end
+    end
   end
 end
