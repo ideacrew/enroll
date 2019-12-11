@@ -43,7 +43,7 @@ class RemoveDependent < MongoidMigrationTask
   def delete_matching_hbx_member(family, bson_id)
     deleted_ids = []
     shopping_enrollments = family.active_household.hbx_enrollments.where(:aasm_state.in => ["shopping"])
-    if shopping_enrollments.present?
+    if shopping_enrollments.present? && chhm_exists_for_other_fms(bson_id)
       enrollments = shopping_enrollments.where(:"hbx_enrollment_members.applicant_id" => bson_id)
       enrollments.each do |enr|
         matched_hem = enr.hbx_enrollment_members.where(:applicant_id => bson_id).first if enr.hbx_enrollment_members.present?
@@ -53,7 +53,7 @@ class RemoveDependent < MongoidMigrationTask
       @family_member.delete if @family_member.present?
       puts "Removed duplicate hbx enrollment members with ids: #{deleted_ids} and family member with id: #{bson_id}" unless Rails.env.test?
     else
-      puts 'Cannot destroy/delete the FamilyMember, reason: This FamilyMember does not have any Hbx Enrollment in shopping with duplicate family member' unless Rails.env.test?
+      puts 'Cannot destroy/delete the FamilyMember, reason: This FamilyMember does not have any Hbx Enrollment in shopping and does not have any other FamilyMember in the Family with CoverageHouseholdMember' unless Rails.env.test?
     end
   end
 
