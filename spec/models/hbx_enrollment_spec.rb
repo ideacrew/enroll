@@ -825,7 +825,9 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
               hbx_enrollment1.effective_on = date + 2.day
               hbx_enrollment2.effective_on = date + 1.day
             end
-
+            eff_date = hbx_enrollment1.effective_on
+            product1.update_attributes(application_period: eff_date.beginning_of_year..eff_date.end_of_year)
+            product2.update_attributes(application_period: eff_date.beginning_of_year..eff_date.end_of_year)
             hbx_enrollment2.select_coverage!
             hbx_enrollment1_from_db = HbxEnrollment.by_hbx_id(hbx_enrollment1.hbx_id).first.reload
             expect(hbx_enrollment1_from_db.coverage_canceled?).to be_truthy
@@ -852,6 +854,9 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
           it "terminates previous enrollments if both effective on in the future" do
             hbx_enrollment1.update_attributes!(effective_on: date + 10.days)
             hbx_enrollment2.update_attributes!(effective_on: date + 20.days)
+            eff_date = hbx_enrollment1.effective_on
+            product1.update_attributes(application_period: eff_date.beginning_of_year..eff_date.end_of_year)
+            product2.update_attributes(application_period: eff_date.beginning_of_year..eff_date.end_of_year)
             hbx_enrollment2.select_coverage!
             expect(hbx_enrollment1.reload.coverage_terminated?).to be_truthy
             expect(hbx_enrollment2.coverage_selected?).to be_truthy

@@ -326,31 +326,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
     end
 
-    context "POST term_or_cancel" do
-      let (:family) { FactoryBot.create(:individual_market_family) }
-      let (:sep) { FactoryBot.create(:special_enrollment_period, family: family) }
-      let (:sbc_document) { FactoryBot.build(:document, subject: "SBC", identifier: "urn:openhbx#123") }
-      let (:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile, title: "AAA", sbc_document: sbc_document) }
-      let (:enrollment_to_cancel) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product, effective_on: DateTime.now + 1.month) }
-      let (:enrollment_to_term) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product, effective_on: DateTime.now - 1.month) }
-
-      it "should cancel enrollment with no term date given" do
-        family.family_members.first.person.consumer_role.update_attributes(:aasm_state => :fully_verified)
-        post :term_or_cancel, params: { hbx_enrollment_id: enrollment_to_cancel.id, term_or_cancel: 'cancel' }
-        enrollment_to_cancel.reload
-        expect(enrollment_to_cancel.aasm_state).to eq "coverage_canceled"
-        expect(response).to redirect_to(family_account_path)
-      end
-
-      it "should schedule terminate enrollment with term date given" do
-        family.family_members.first.person.consumer_role.update_attributes(:aasm_state => :fully_verified)
-        post :term_or_cancel, params: { hbx_enrollment_id: enrollment_to_term.id, term_date: TimeKeeper.date_of_record + 1, term_or_cancel: 'terminate' }
-        enrollment_to_term.reload
-        expect(enrollment_to_term.aasm_state).to eq "coverage_terminated"
-        expect(response).to redirect_to(family_account_path)
-      end
-    end
-
   end
 
   context "IVL edit plan paths" do
@@ -373,31 +348,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         get :edit_plan, params:  attrs
         expect(response).to have_http_status(:success)
         expect(response).to render_template(:edit_plan)
-      end
-    end
-
-    context "POST term_or_cancel" do
-      let (:family) { FactoryBot.create(:individual_market_family) }
-      let (:sep) { FactoryBot.create(:special_enrollment_period, family: family) }
-      let (:sbc_document) { FactoryBot.build(:document, subject: "SBC", identifier: "urn:openhbx#123") }
-      let (:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile, title: "AAA", sbc_document: sbc_document) }
-      let (:enrollment_to_cancel) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product, effective_on: DateTime.now + 1.month) }
-      let (:enrollment_to_term) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product, effective_on: DateTime.now - 1.month) }
-
-      it "should cancel enrollment with no term date given" do
-        family.family_members.first.person.consumer_role.update_attributes(:aasm_state => :fully_verified)
-        post :term_or_cancel, params: { hbx_enrollment_id: enrollment_to_cancel.id, term_or_cancel: 'cancel' }
-        enrollment_to_cancel.reload
-        expect(enrollment_to_cancel.aasm_state).to eq "coverage_canceled"
-        expect(response).to redirect_to(family_account_path)
-      end
-
-      it "should schedule terminate enrollment with term date given" do
-        family.family_members.first.person.consumer_role.update_attributes(:aasm_state => :fully_verified)
-        post :term_or_cancel, params: { hbx_enrollment_id: enrollment_to_term.id, term_date: TimeKeeper.date_of_record + 1, term_or_cancel: 'terminate' }
-        enrollment_to_term.reload
-        expect(enrollment_to_term.aasm_state).to eq "coverage_terminated"
-        expect(response).to redirect_to(family_account_path)
       end
     end
 
@@ -565,7 +515,8 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
       it "should cancel enrollment with no term date given" do
         family.family_members.first.person.consumer_role.update_attributes(:aasm_state => :fully_verified)
-        post :term_or_cancel, params: { hbx_enrollment_id: enrollment_to_cancel.id, term_or_cancel: 'cancel' }
+        sign_in user
+        post :term_or_cancel, params: { hbx_enrollment_id: enrollment_to_cancel.id, term_date: nil, term_or_cancel: 'cancel' }
         enrollment_to_cancel.reload
         expect(enrollment_to_cancel.aasm_state).to eq "coverage_canceled"
         expect(response).to redirect_to(family_account_path)
@@ -573,6 +524,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
       it "should schedule terminate enrollment with term date given" do
         family.family_members.first.person.consumer_role.update_attributes(:aasm_state => :fully_verified)
+        sign_in user
         post :term_or_cancel, params: { hbx_enrollment_id: enrollment_to_term.id, term_date: TimeKeeper.date_of_record + 1, term_or_cancel: 'terminate' }
         enrollment_to_term.reload
         expect(enrollment_to_term.aasm_state).to eq "coverage_terminated"
