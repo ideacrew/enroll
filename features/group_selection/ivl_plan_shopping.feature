@@ -52,25 +52,6 @@ Feature: IVL plan purchase
     And consumer clicked on shop for new plan
     Then consumer should see primary person
 
-  # TODO: need to look at this feature because the functionality has changed with 45672
-  Scenario: IVL keep existing plan by clicking on 'make changes' button on sep enrollment
-    Given a consumer exists
-    And the consumer is logged in
-    And consumer has a dependent in child relationship with age greater than 26
-    And consumer has a dependent in spouse relationship with age greater than 26
-    And consumer also has a health enrollment with primary person covered
-    And consumer has successful ridp
-    When consumer visits home page
-    Then consumer should see the enrollment with make changes button
-    When consumer clicked on make changes button
-    Then consumer should see the ineligible family member disabled and unchecked
-    When consumer clicked on keep existing plan button
-    Then consumer should land on confirm page
-    And consumer clicks Confirm
-    Then consumer should enrollment submitted confirmation page
-    And consumer clicks back to my account button
-    Then cosumer should see the home page
-
   Scenario: IVL keep existing plan by clicking on 'make changes' button on open enrollment
     Given Individual has not signed up as an HBX user
     When Individual visits the Insured portal during open enrollment
