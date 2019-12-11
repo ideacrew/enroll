@@ -52,6 +52,7 @@ Feature: IVL plan purchase
     And consumer clicked on shop for new plan
     Then consumer should see primary person
 
+  # TODO: need to look at this feature because the functionality has changed with 45672
   Scenario: IVL keep existing plan by clicking on 'make changes' button on sep enrollment
     Given a consumer exists
     And the consumer is logged in
