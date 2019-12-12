@@ -58,7 +58,7 @@ module BenefitSponsors
       end
 
       it "should not permit the user with broker role for staff_index?" do
-        expect(policy.staff_index?).to be false
+        expect(policy.staff_index?).to be_falsey
       end
     end
 
@@ -84,6 +84,23 @@ module BenefitSponsors
 
       it "should permit the user with csr role for staff_index?" do
         expect(policy.staff_index?).to be true
+      end
+    end
+
+    context 'for a user with consumer role' do
+      let(:user) { FactoryBot.create(:user, :with_consumer_role) }
+
+      shared_examples_for "should not permit for a user with consumer role" do |policy_type|
+        it "should not permit" do
+          expect(policy.send(policy_type)).to be false
+        end
+      end
+
+      it_behaves_like "should not permit for a user with consumer role", :family_index?
+      it_behaves_like "should not permit for a user with consumer role", :family_datatable?
+
+      it 'should permit the user with consumer role for staff_index?' do
+        expect(policy.staff_index?).to be_truthy
       end
     end
   end

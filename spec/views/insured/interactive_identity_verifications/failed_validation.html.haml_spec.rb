@@ -29,4 +29,17 @@ describe "insured/interactive_identity_verifications/failed_validation" do
     expect(rendered).to include("CONTINUE APPLICATION")
     expect(rendered).to include("href=\"/insured/interactive_identity_verifications/the_transaction_id\"")
   end
+
+  context "when transaction id is not generated" do
+
+    before do
+      assign :verification_transaction_id, nil
+    end
+
+    it "should not show a link to invoke fars if transaction id not present" do
+      render :template => "insured/interactive_identity_verifications/failed_validation.html.haml"
+      expect(rendered).not_to include("CONTINUE APPLICATION")
+      expect(rendered).not_to include("href=\"/insured/interactive_identity_verifications/the_transaction_id\"")
+    end
+  end
 end
