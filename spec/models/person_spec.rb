@@ -1287,7 +1287,7 @@ describe Person, :dbclean => :after_each do
   end
 
   describe "#check_for_paper_application", dbclean: :after_each do
-    let(:person) { FactoryBot.create(:person, user: user) }
+    let(:person) { FactoryBot.create(:person, :with_consumer_role, user: user) }
     let(:user) { FactoryBot.create(:user)}
 
     before do
@@ -1314,6 +1314,17 @@ describe Person, :dbclean => :after_each do
     it "should return nil if no user present & if session var is not paper" do
       person.user.destroy!
       expect(person.set_ridp_for_paper_application('something')).to eq nil
+    end
+
+    it "should return nil if user present and no consumer_role" do
+      allow(person).to receive(:consumer_role).and_return nil
+      expect(person.set_ridp_for_paper_application('paper')).to eq nil
+    end
+
+    it "should return update ID nad Application documents for consumer_role" do
+      person.set_ridp_for_paper_application('paper')
+      expect(person.consumer_role.identity_validation).to eq 'valid'
+      expect(person.consumer_role.application_validation).to eq 'valid'
     end
   end
 

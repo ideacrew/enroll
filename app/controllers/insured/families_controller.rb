@@ -17,7 +17,7 @@ class Insured::FamiliesController < FamiliesController
       build_employee_role_by_census_employee_id
       set_flash_by_announcement
       set_bookmark_url
-      set_admin_bookmark_url
+      set_admin_bookmark_url(home_insured_families_path)
       @active_sep = @family.latest_active_sep
 
       log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
@@ -48,7 +48,7 @@ class Insured::FamiliesController < FamiliesController
 
   def manage_family
     set_bookmark_url
-    set_admin_bookmark_url
+    set_admin_bookmark_url(manage_family_insured_families_path)
     @family_members = @family.active_family_members
     @resident = @person.is_resident_role_active?
     # @employee_role = @person.employee_roles.first
