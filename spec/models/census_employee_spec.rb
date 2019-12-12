@@ -421,7 +421,6 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       end
 
       it 'finds the last updated benefit_group_assignment' do
-        binding.pry
         expect(census_employee.benefit_group_assignment_by_package(benefit_package.id)).to eql(benefit_group_assignment)
       end
     end
