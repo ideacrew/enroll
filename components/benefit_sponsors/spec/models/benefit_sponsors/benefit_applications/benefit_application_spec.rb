@@ -8,29 +8,6 @@ class ApplicationHelperModStubber
 end
 
 module BenefitSponsors
-  RSpec.describe "Transitioning a BA with a renewal package and a separate package", dbclean: :after_each do
-    include_context "setup benefit market with market catalogs and product packages"
-    include_context "setup renewal application"
-    let!(:benefit_package) { FactoryBot.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: renewal_application, product_package: product_package) }
-
-    let!(:renewal_employees) { create_list(:census_employee, 3, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: renewal_application.benefit_packages[0]) }
-    let!(:new_benefit_package_employees) { create_list(:census_employee, 3, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: benefit_package) }
-
-    it 'keeps renewal employees in the renewal package' do
-      expect do
-        renewal_application.approve_application!
-        renewal_application.renew_benefit_package_members
-      end.to_not change { renewal_employees.map { |employee| employee.benefit_group_assignments }}
-    end
-
-    it 'keeps new benefit package employees in the new benefit package' do
-      expect do
-        renewal_application.approve_application!
-        renewal_application.renew_benefit_package_members
-      end.to_not change { new_benefit_package_employees.map { |employee| employee.benefit_group_assignments.map(&:aasm_state) }}
-    end
-  end
-
   RSpec.describe BenefitApplications::BenefitApplication, type: :model, :dbclean => :after_each do
     let(:site) { ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_benefit_market }
     let(:benefit_market)          { site.benefit_markets.first }
