@@ -84,7 +84,7 @@
 <% notice.renewal_health_enrollments.each do |enrollment|%>
     <% if enrollment.aptc_amount > 0 %>
         <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-            contents: ["You’re getting savings on your health insurance called an advance premium tax credit(APTC)."],
+            contents: ["You’re getting savings on your health insurance called an advance premium tax credit (APTC)."],
             heading: 'What You’ll Pay Each Month', sub_heading: '', top_margin: '10px'} %>
 
         <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
@@ -116,9 +116,8 @@
             </td>
           </tr>
         </table>
-
-        <%= render partial: 'notices/shared/custom_listing', locals: {
-            listing: "Remember, tax credit savings are based on your household’s estimated annual income. You must file a federal income tax return for #{notice.coverage_year} to report your actual income. When you file, you must report the tax credits you received. If your income is higher than what you told us on your application, you may have to repay some or all of the tax credit. If your income is lower than what you told us, you may get an additional credit on your tax return."} %>
+      <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+        contents: ["Remember, tax credit savings are based on your household’s estimated annual income. You must file a federal income tax return for #{notice.coverage_year} to report your actual income. When you file, you must report the tax credits you received. If your income is higher than what you told us on your application, you may have to repay some or all of the tax credit. If your income is lower than what you told us, you may get an additional credit on your tax return."], heading:'', sub_heading: '', top_margin: '10px', bottom_margin: '10px'} %>
     <% end %>
 <% end %>
 
