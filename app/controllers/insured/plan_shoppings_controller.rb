@@ -200,13 +200,9 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def generate_checkbook_service
-    if @hbx_enrollment.effective_on.year == Settings.checkbook_services.current_year
-      plan_comparision_obj = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment)
-      plan_comparision_obj.elected_aptc = session[:elected_aptc]
-      @dc_individual_checkbook_url = plan_comparision_obj.generate_url
-    elsif @hbx_enrollment.effective_on.year == Settings.checkbook_services.previous_year
-      @dc_individual_checkbook_previous_year = Rails.application.config.checkbook_services_base_url + '/hie/dc/' + Settings.checkbook_services.previous_year.to_s + "/"
-    end
+    plan_comparision_obj = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment)
+    plan_comparision_obj.elected_aptc = session[:elected_aptc]
+    @dc_individual_checkbook_url = plan_comparision_obj.generate_url
   end
 
   def show
