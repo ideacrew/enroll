@@ -14,6 +14,7 @@ class DeleteInvoiceWithFein < MongoidMigrationTask
     puts 'No organizations are present' if orgs.blank?
 
     delete_initial_employer_invoice_notice(orgs)
+    delete_message_from_inbox(orgs)
     delete_invoice(orgs)
   end
 
@@ -31,6 +32,15 @@ class DeleteInvoiceWithFein < MongoidMigrationTask
       next if documents.blank?
 
       documents.map(&:destroy)
+    end
+  end
+
+  def delete_message_from_inbox(orgs)
+    orgs.each do |org|
+      messages = org.employer_profile.inbox.messages.select{|message| message.subject == "Your Invoice is Now Available in your DC Health Link Account" }
+      next if messages.blank?
+
+      messages.map(&:destroy)
     end
   end
 end
