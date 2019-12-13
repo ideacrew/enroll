@@ -59,24 +59,21 @@ module ApplicationHelper
     (a_tab == current_tab) ? raw(" class=\"active\"") : ""
   end
 
-  def current_cost(plan_cost, ehb=0, hbx_enrollment=nil, source=nil, can_use_aptc=true)
+  #Purchased enrollment family premium (family home page - view details button on the enrollment)
+  def current_cost(hbx_enrollment = nil, source = nil)
     # source is account or shopping
-    if source == 'account' && hbx_enrollment.present? && hbx_enrollment.try(:applied_aptc_amount).to_f > 0
-      if hbx_enrollment.coverage_kind == 'health'
-        return (hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f)
-      else
-        return hbx_enrollment.total_premium
-      end
-    end
+    return unless source == 'account' && hbx_enrollment.present? && hbx_enrollment.coverage_kind == 'health'
 
-    if session['elected_aptc'].present? && session['max_aptc'].present? && can_use_aptc
-      aptc_amount = session['elected_aptc'].to_f
-      ehb_premium = plan_cost * ehb
-      cost = plan_cost - round_down_float_two_decimals([ehb_premium, aptc_amount].min)
-      cost > 0 ? cost.round(2) : 0
-    else
-      plan_cost
-    end
+    (hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f)
+  end
+
+  #Shopping enrollment family premium (plan shopping page)
+  def family_premium(plan_cost, plan_ehb_cost, can_use_aptc=true)
+    return plan_cost unless session['elected_aptc'].present? && session['max_aptc'].present? && can_use_aptc
+
+    aptc_amount = session['elected_aptc'].to_f
+    cost = float_fix(plan_cost - [plan_ehb_cost, aptc_amount].min)
+    cost > 0 ? cost.round(2) : 0
   end
 
   def datepicker_control(f, field_name, options = {}, value = "")
@@ -635,15 +632,15 @@ module ApplicationHelper
   end
 
   def display_dental_metal_level(plan)
-    if plan.class == Plan || (plan.is_a?(Maybe) && plan.extract_value.class.to_s == 'Plan')
-      return plan.metal_level.to_s.titleize if plan.coverage_kind.to_s == 'health'
-
-      (plan.active_year == 2015 ? plan.metal_level : plan.dental_level).try(:to_s).try(:titleize) || ""
-    else
+    # # if plan.class == Plan || (plan.is_a?(Maybe) && plan.extract_value.class.to_s == 'Plan')
+    #   return plan.metal_level.to_s.titleize if plan.coverage_kind.to_s == 'health'
+    #
+    #   (plan.active_year == 2015 ? plan.metal_level : plan.dental_level).try(:to_s).try(:titleize) || ""
+    # else
       return plan.metal_level_kind.to_s.titleize if plan.kind.to_s == 'health'
 
       (plan.active_year == 2015 ? plan.metal_level_kind : plan.dental_level).try(:to_s).try(:titleize) || ""
-    end
+    # end
   end
 
   def ivl_metal_network(plan)
