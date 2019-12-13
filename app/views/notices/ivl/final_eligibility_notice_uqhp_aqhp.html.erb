@@ -67,12 +67,10 @@
     <%= render partial: 'notices/shared/paragraph_with_margins', :locals => { content: "<strong>Send Us Documents</strong>", top_margin: '-5px', bottom_margin: '5px' } %>
 
     <%= render partial: 'notices/shared/unordered_list', locals: { previous: "You need to send documents to #{Settings.site.short_name}. We need them to verify your eligibility. The deadline to return them is #{notice.due_date.strftime("%B %d, %Y")}. You could lose your insurance or cost savings if you don’t submit them by this deadline.", listings: ["The list of documents we need from you is at the end of this letter.","We also tell you how to send them to us.","We need your documents, by the deadline, to make a final decision on your eligibility for insurance and cost savings."]} %>
-  <% end %>
-
-  <% if notice.uqhp_enrollments.present? %>
+  <% elsif notice.enrollments.present? %>
     <%= render partial: 'notices/shared/paragraph_with_margins', :locals => { content: "<strong>Send Us Documents</strong>", top_margin: '-5px', bottom_margin: '5px' } %>
 
-    <%= render partial: 'notices/shared/unordered_list', locals: { previous: "You need to send us documents to #{Settings.site.short_name}. We need them to verify your eligibility. The deadline to return them is #{notice.due_date.strftime("%B %d, %Y")}. You could lose your insurance if you don’t submit them by this deadline.", listings: ["The list of documents we need from you is at the end of this letter.","We need your documents, by the deadline, to make a final decision on your eligibility for insurance."]} %>
+    <%= render partial: 'notices/shared/unordered_list', locals: { previous: "You need to send us documents to #{Settings.site.short_name}. We need them to verify your eligibility. The deadline to return them is #{notice.due_date.strftime("%B %d, %Y")}. You could lose your insurance if you don’t submit them by this deadline.", listings: ["The list of documents we need from you is at the end of this letter.","We also tell you how to send them to us.","We need your documents, by the deadline, to make a final decision on your eligibility for insurance."]} %>
   <% end %>
 <% end %>
 
