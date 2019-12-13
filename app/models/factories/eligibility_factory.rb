@@ -76,7 +76,7 @@ module Factories
       @enrollment.hbx_enrollment_members.inject({}) do |aptc_hash, member|
         fm_id = member.applicant_id.to_s
         aptc_hash[fm_id] = if fetch_member_ratio[fm_id]
-                             (applicable_aptc(product_id) * fetch_member_ratio[fm_id])
+                             round_down_float_two_decimals(applicable_aptc(product_id) * fetch_member_ratio[fm_id])
                            else
                              0.00
                            end
