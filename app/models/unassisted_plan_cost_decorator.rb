@@ -69,7 +69,7 @@ class UnassistedPlanCostDecorator < SimpleDelegator
     return 0.00 if @elected_aptc <= 0
 
     member_premium = premium_for(member)
-    [all_members_aptc[member.applicant_id.to_s], member_premium * __getobj__.ehb].min
+    round_down_float_two_decimals([all_members_aptc[member.applicant_id.to_s], member_premium * __getobj__.ehb].min)
   end
 
   def employee_cost_for(member)
@@ -99,5 +99,11 @@ class UnassistedPlanCostDecorator < SimpleDelegator
     members.reduce(0.00) do |sum, member|
       (sum + employee_cost_for(member)).round(2)
     end.round(2)
+  end
+
+  def total_ehb_premium
+    members.reduce(0.00) do |sum, member|
+      (sum + round_down_float_two_decimals((employee_cost_for(member) * __getobj__.ehb)))
+    end
   end
 end
