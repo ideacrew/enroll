@@ -138,7 +138,7 @@ module Factories
 
     def aptc_benchmark_ratio_hash_test(aptc_enr_members)
       member_benchmark_hash = aptc_enr_members.map(&:family_member).inject({}) do |b_hash, member|
-        b_hash[member.id.to_s] = member.aptc_benchmark_amount
+        b_hash[member.id.to_s] = member.aptc_benchmark_amount(@enrollment)
         b_hash
       end
       total_benchmark = member_benchmark_hash.values.sum
@@ -152,7 +152,7 @@ module Factories
     def tax_members_aptc_breakdown(tax_household)
       total_thh_available_aptc = tax_household.total_aptc_available_amount_for_enrollment(@enrollment)
       aptc_thhms = tax_household.aptc_members
-      enrolling_aptc_members = aptc_enrollment_members(aptc_thhms)
+      enrolling_aptc_members = enrollment_aptc_members(aptc_thhms)
       member_benchmark_hash = enrollment_eligible_benchmark_hash(enrolling_aptc_members, @enrollment)
       total_eligible_benchmark = member_benchmark_hash.values.sum
 
