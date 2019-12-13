@@ -87,9 +87,9 @@ module HistoryTrackerToRecord
             if acc.send(chain_location["name"]).is_a?(Enumerable) # embeds_many
               acc.send(chain_location["name"]).detect do |ao|
                 ao.id.to_s == chain_location["id"].to_s
-              end
+              end || acc.send(chain_location["name"].to_sym).build
             else # embeds_one
-              acc.send(chain_location["name"].to_sym)
+              acc.send(chain_location["name"].to_sym) || acc.send("build_#{chain_location["name"]}".to_sym)
             end
           end
           chain_target.attributes = rt.original

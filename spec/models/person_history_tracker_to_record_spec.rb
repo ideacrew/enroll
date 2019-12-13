@@ -84,11 +84,14 @@ describe "Person with history tracks and a consumer role", :dbclean => :after_ea
 
     describe "destroying records" do
       context "embeds many addresses" do
+        let(:address_1) { FactoryBot.create(:address, person: non_curam_ivl_person) }
+        let(:address_2) { FactoryBot.create(:address, person: non_curam_ivl_person) }
+        let(:address_3) { FactoryBot.create(:address, person: non_curam_ivl_person) }
         before do
-          FactoryBot.create(:address, person: non_curam_ivl_person)
-          FactoryBot.create(:address, person: non_curam_ivl_person)
+          address_1
+          address_2
           non_curam_ivl_person.addresses.first.destroy
-          FactoryBot.create(:address, person: non_curam_ivl_person)
+          address_3
         end
 
         it "undoes the destroyed records" do
@@ -132,6 +135,41 @@ describe "Person with history tracks and a consumer role", :dbclean => :after_ea
           target_history_track =  non_curam_ivl_person.history_tracks.where(modified: {"address_1"=>'1600 PA Ave'}).last
           past_person = non_curam_ivl_person.history_tracker_to_record(target_history_track.created_at)
           expect(past_person.addresses.first.address_1).to eq('1600 PA Ave')
+        end
+      end
+
+      context "embeds_many address missing creation" do
+        let(:address_1) { FactoryBot.create(:address, person: non_curam_ivl_person) }
+        let(:address_2) { FactoryBot.create(:address, person: non_curam_ivl_person) }
+        let(:address_3) { FactoryBot.create(:address, person: non_curam_ivl_person) }
+
+        # update address
+        let(:history_track_1) do
+          HistoryTracker.new version: 1,
+            created_at: 1.days.ago,
+            action: 'update',
+            association_chain: [{ "name" => "Person", "id" => non_curam_ivl_person.id }, { "name" => "addresses", "id" => address_1.id }],
+            modified: address_1.attributes.slice(:address_1, :address_2),
+            original: { "address_1": "Yo St" }
+        end
+        before do
+          address_1
+          address_2
+          non_curam_ivl_person.addresses.first.destroy
+          address_3
+          non_curam_ivl_person.addresses.find(address_1.id).destroy
+          allow(non_curam_ivl_person).to receive(:created_at).and_return(10.days.ago)
+          allow(non_curam_ivl_person).to receive(:history_tracks).and_return([history_track_1])
+        end
+
+        it "can restore to last updated address" do
+          puts address_1.address_1.inspect
+          puts address_2.address_2.inspect
+          puts address_3.address_3.inspect
+          puts non_curam_ivl_person.addresses.map(&:address_1).inspect
+          past_person = non_curam_ivl_person.history_tracker_to_record(2.days.ago)
+          puts past_person.addresses.map(&:address_1).inspect
+          expect(past_person.addresses.first.address_1).to eql(address_1.address_1)
         end
       end
 
