@@ -532,6 +532,133 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       end
     end
 
+    context "POST edit_aptc", dbclean: :after_each do
+      let!(:silver_product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
+      let!(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+      let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+      let!(:person2) do
+        member = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, dob: (TimeKeeper.date_of_record - 40.years))
+        person.ensure_relationship_with(member, 'spouse')
+        member.save!
+        member
+      end
+      let!(:household) { family.active_household }
+      let!(:family_member2) { FactoryBot.create(:family_member, family: family, person: person2) }
+      let!(:tax_household) { FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil, effective_starting_on: effective_on) }
+      let!(:tax_household_member1) { FactoryBot.create(:tax_household_member, applicant_id: family.family_members[0].id, tax_household: tax_household) }
+      let!(:tax_household_member2) { FactoryBot.create(:tax_household_member, applicant_id: family.family_members[1].id, tax_household: tax_household) }
+      let!(:eligibilty_determination) { FactoryBot.create(:eligibility_determination, max_aptc: 500.00, tax_household: tax_household, csr_eligibility_kind: 'csr_73') }
+      let(:effective_on) { TimeKeeper.date_of_record.beginning_of_month.next_month}
+
+      let!(:hbx_enrollment) do
+        FactoryBot.create(:hbx_enrollment,
+                          family: family,
+                          household: family.active_household,
+                          coverage_kind: 'health',
+                          effective_on: effective_on,
+                          enrollment_kind: 'open_enrollment',
+                          kind: 'individual',
+                          consumer_role: person.consumer_role,
+                          product: product34)
+      end
+
+      let!(:hbx_enrollment_member2) do
+        FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: hbx_enrollment, eligibility_date: effective_on, coverage_start_on: effective_on, applicant_id: family.family_members[1].id)
+      end
+
+      let(:application_period) { effective_on.beginning_of_year..effective_on.end_of_year }
+
+      let!(:product34) do
+        FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                          hios_id: '11111111122301-01',
+                          csr_variant_id: '01',
+                          metal_level_kind: :silver,
+                          application_period: application_period,
+                          benefit_market_kind: :aca_individual)
+      end
+
+      let(:new_aptc_amount) { 250.0 }
+      let(:new_aptc_pct)    { "0.5" }
+
+      let(:params) do
+        {
+          "effective_on_date" => fetch_effective_date_of_new_enrollment.to_date,
+          "applied_pct_1" => new_aptc_pct,
+          "aptc_applied_total" => new_aptc_amount,
+          "hbx_enrollment_id" => hbx_enrollment.id.to_s
+        }
+      end
+
+      before :each do
+        BenefitMarkets::Products::Product.all.each do |prod|
+          prod.update_attributes(application_period: application_period)
+          prod.premium_tables.each do |pt|
+            pt.update_attributes(effective_period: application_period)
+          end
+        end
+        BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
+        silver_product.update_attributes(metal_level_kind: 'silver')
+        benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods[0]
+        benefit_coverage_period.update_attributes(
+          start_on: effective_on.beginning_of_year,
+          end_on: effective_on.end_of_year,
+          open_enrollment_start_on: Date.new(effective_on.prev_year.year, 11, 1),
+          open_enrollment_end_on: Date.new(effective_on.year, 1, 31)
+        )
+        benefit_coverage_period.second_lowest_cost_silver_plan = silver_product
+        benefit_coverage_period.save!
+        sign_in user
+        post :edit_aptc, params: params
+      end
+
+      def fetch_effective_date_of_new_enrollment
+        enr_created_datetime = DateTime.now.in_time_zone("Eastern Time (US & Canada)")
+        offset_month = enr_created_datetime.day <= 15 ? 1 : 2
+        year = enr_created_datetime.year
+        month = enr_created_datetime.month + offset_month
+        if month > 12
+          year += 1
+          month -= 12
+        end
+        day = 1
+        hour = enr_created_datetime.hour
+        min = enr_created_datetime.min
+        sec = enr_created_datetime.sec
+        DateTime.new(year, month, day, hour, min, sec).in_time_zone
+      end
+
+      it "should update current enrollment(cancel/terminate)" do
+        hbx_enrollment.reload
+        expect(hbx_enrollment.aasm_state).to eq "coverage_canceled"
+      end
+
+      it "should create new enrollment" do
+        family.reload
+        expect(family.hbx_enrollments.coverage_selected.present?).to be_truthy
+      end
+
+      it "should update APTC amount on the new enrollment" do
+        family.reload
+        new_enrollment = family.hbx_enrollments.coverage_selected.first
+        expect(new_enrollment.applied_aptc_amount.to_f.to_s).to eq new_aptc_amount.to_s
+      end
+
+      it "should update APTC pct on the new enrollment" do
+        family.reload
+        new_enrollment = family.hbx_enrollments.coverage_selected.first
+        expect(new_enrollment.elected_aptc_pct.to_s).to eq new_aptc_pct
+      end
+
+      it "should update APTC amount on the hbx enrollment members" do
+        family.reload
+        new_enrollment = family.hbx_enrollments.coverage_selected.first
+        expect(new_enrollment.hbx_enrollment_members.any?(&:applied_aptc_amount)).to be_truthy
+      end
+
+      it "should redirect successfully" do
+        expect(response).to redirect_to(family_account_path)
+      end
+    end
   end
 
   context "GET terminate_selection" do
