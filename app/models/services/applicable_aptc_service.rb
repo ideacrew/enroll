@@ -17,6 +17,10 @@ module Services
       factory_instance.fetch_aptc_per_member
     end
 
+    def elected_aptc_per_member
+      factory_instance.fetch_elected_aptc_per_member
+    end
+
     private
 
     def factory_instance
