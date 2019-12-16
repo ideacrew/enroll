@@ -4,10 +4,6 @@ require 'rails_helper'
 require File.join(Rails.root, 'spec/shared_contexts/ivl_eligibility')
 
 RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each do
-  
-  before :all do
-    DatabaseCleaner.clean
-  end
 
   before :all do
     DatabaseCleaner.clean
@@ -496,6 +492,35 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
             ratio_hash[family_member.id.to_s] = applicable_aptc / 2
             ratio_hash[family_member2.id.to_s] = applicable_aptc / 2
             expect(@member_level_aptcs).to eq ratio_hash
+          end
+        end
+      end
+
+      context 'for fetch_elected_aptc_per_member' do
+        context 'for two members enrollment' do
+          before :each do
+            @product_id = @product.id.to_s
+            allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) {|_id, _start, age| age * 1.0}
+            enrollment.update_attributes!(product_id: @product.id, aasm_state: 'coverage_selected', consumer_role_id: person.consumer_role.id)
+          end
+
+          let!(:member2) {FactoryBot.create(:hbx_enrollment_member, is_subscriber: false, hbx_enrollment: enrollment, applicant_id: family_member2.id)}
+          let!(:enrollment) {FactoryBot.create(:hbx_enrollment, :individual_assisted, family: family, household: family.active_household)}
+          let!(:member1) {FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: enrollment, applicant_id: family_member.id)}
+
+          context '.fetch_elected_aptc_per_member' do
+            it 'should return a Hash of members aptc' do
+              eligibility_factory = described_class.new(enrollment.id, 150.00, [@product_id])
+              elected_aptc_per_member = eligibility_factory.fetch_elected_aptc_per_member
+              expect(elected_aptc_per_member.class).to eq Hash
+              expect(elected_aptc_per_member.values[0]).to eq 82.20986460348162
+              expect(elected_aptc_per_member.values[1]).to eq 67.79013539651837
+            end
+
+            it 'should raise error for nil value' do
+              eligibility_factory = described_class.new(enrollment.id, nil, [@product_id])
+              expect {eligibility_factory.fetch_elected_aptc_per_member}.to raise_error(RuntimeError, /Cannot process without selected_aptc/)
+            end
           end
         end
       end
