@@ -152,9 +152,12 @@
                "<strong>The annual out-of-pocket limit</strong> – the most you'll have to pay for covered services before your plan pays 100 percent. This applies to the deductible, copayments, and coinsurance."]} %>
 
 <% if notice.renewal_csr_enrollments.present? %>
-    <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-        content: "Your plan has extra savings called cost-sharing reductions. This means you’ll pay even less for these types of expenses.", top_margin: '5px'} %>
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => { content: "Your plan has extra savings called cost-sharing reductions. This means you’ll pay even less for these types of expenses. You can learn about the benefits of your plan, and how much you’ll pay, in a document called the Summary of Benefits and Coverage (SBC). You can find it online at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>.", top_margin: '5px'} %>
+<% else %>
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => { content: "You can learn about the benefits of your plan, and how much you’ll pay, in a document called the Summary of Benefits and Coverage (SBC). You can find it online at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>.", top_margin: '5px'} %>
 <% end %>
+
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => { content: "Call your insurance company if you have questions about services the plan covers, or the doctors, hospitals, and other providers you can use.", top_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
     contents: ["Once your plan begins, you must tell us about life changes.  You must tell us within 30 days if:"],
