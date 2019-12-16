@@ -94,7 +94,7 @@
       </div>
     </div>
     <!-- Cancel Plan Form -->
-    <%= render 'cancel_plan_form',
+    <%= render 'insured/group_selection/cancel_plan_form',
         locals: {
           self_term_or_cancel_form: @self_term_or_cancel_form,
           hbx_enrollment: @self_term_or_cancel_form.hbx_enrollment,
@@ -104,7 +104,7 @@
     <!-- Placeholder APTC Form - work functionality in later -->
     <!-- TODO: add terminate-calendar id -->
     <!-- Calendar form functionality only necessary for terminate -->
-    <%= render 'change_tax_credit_form',
+    <%= render 'insured/group_selection/change_tax_credit_form',
         locals: {
           hbx_enrollment: @self_term_or_cancel_form.hbx_enrollment,
           available_aptc: @self_term_or_cancel_form.available_aptc,

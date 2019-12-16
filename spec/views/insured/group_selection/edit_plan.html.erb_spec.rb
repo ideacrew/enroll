@@ -28,7 +28,7 @@ RSpec.describe "app/views/insured/group_selection/edit_plan.html.erb" do
     end
 
     it "should show the DCHL ID as hbx_enrollment.hbx_id" do
-      expect(rendered).to match /DCHL ID/
+      expect(rendered).to match(/ID/)
       expect(rendered).to match /#{enrollment.hbx_id}/
     end
 

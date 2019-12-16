@@ -54,7 +54,7 @@ module Insured
       end
 
       def product
-        hbx_enrollment.product
+        hbx_enrollment&.product
       end
 
       def hbx_enrollment

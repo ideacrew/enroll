@@ -17,9 +17,9 @@ RSpec.describe 'ModelEvents::EmployeeSepRequestDeniedNotice', :dbclean => :after
   let(:notice_event2) {'sep_denial_notice_for_ee_active_on_multiple_rosters'}
 
   before do
-    today = TimeKeeper.date_of_record
-    @qle_date = TimeKeeper.date_of_record.next_month
-    @reporting_deadline = @qle_date > today ? today : @qle_date + 30.days
+    today = TimeKeeper.date_of_record.strftime("%m/%d/%Y")
+    @qle_date = TimeKeeper.date_of_record.next_month.strftime("%m/%d/%Y")
+    @reporting_deadline = @qle_date > today ? today : @qle_date.to_date + 30.days
     census_employee.update_attributes(employee_role_id: employee_role.id)
   end
 

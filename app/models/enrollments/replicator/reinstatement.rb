@@ -2,7 +2,7 @@ module Enrollments
   module Replicator
     class Reinstatement
 
-      attr_accessor :base_enrollment, :new_effective_date, :new_aptc, :year, :duplicate_hbx, :reinstate_enrollment, :aptc_ratio_by_member
+      attr_accessor :base_enrollment, :new_effective_date, :new_aptc, :year, :duplicate_hbx, :reinstate_enrollment
 
       def initialize(enrollment, effective_date, new_aptc=nil)
         @base_enrollment = enrollment
@@ -103,27 +103,9 @@ module Enrollments
         if base_enrollment.is_shop?
           assign_attributes_to_reinstate_enrollment(reinstated_enrollment, form_shop_params) if can_be_reinstated?
         elsif base_enrollment.is_ivl_by_kind? && new_aptc
-          #TODO: why this much calculations
-          aptc_ratio_by_member = base_enrollment.family.active_household.latest_active_tax_household.aptc_ratio_by_member
-          # TODO: duplicate_hbx is undefined
-          percent_sum_for_all_enrollees = duplicate_hbx.hbx_enrollment_members.inject(0.0) { |sum, member| sum + (aptc_ratio_by_member[member.applicant_id.to_s] || 0.0)}
-
           assign_attributes_to_reinstate_enrollment(reinstated_enrollment, form_ivl_params)
-
-          apply_aptc_to_members(
-            duplicate_hbx,
-            {
-              aptc_ratio_by_member: aptc_ratio_by_member,
-              new_aptc: new_aptc,
-              percent_sum_for_all_enrollees: percent_sum_for_all_enrollees
-            }
-          )
-
-          # To do for this path: Handle enrollment state & handle 15th of month rule for effective date (outside of service, probably)
         end
-
         reinstated_enrollment.hbx_enrollment_members = clone_hbx_enrollment_members
-
         if base_enrollment.may_terminate_coverage? && (reinstate_enrollment.effective_on > base_enrollment.effective_on)
           base_enrollment.terminate_coverage!
           base_enrollment.update_attributes!(terminated_on: reinstate_enrollment.effective_on - 1.day)
@@ -155,12 +137,9 @@ module Enrollments
       def form_ivl_params
         # TODO: Query is too long
         # TODO: undefined local variable or method `year' for #<Enrollments::Replicator::Reinstatement:0x00007fca4bcb2970>
-        max_aptc = base_enrollment.max_aptc
         {
           product_id: base_enrollment.product_id,
-          consumer_role_id: base_enrollment.consumer_role_id,
-          applied_aptc_amount: new_aptc,
-          elected_aptc_pct: new_aptc / max_aptc
+          consumer_role_id: base_enrollment.consumer_role_id
         }
       end
 
@@ -175,13 +154,6 @@ module Enrollments
           predecessor_enrollment_id: base_enrollment.id,
           hbx_enrollment_members: clone_hbx_enrollment_members
         }
-      end
-
-      def apply_aptc_to_members(duplicate_hbx, options = {})
-        duplicate_hbx.hbx_enrollment_members.each do |mem|
-          aptc_pct_for_member = options[:aptc_ratio_by_member][mem.applicant_id.to_s] || 0.0
-          mem.applied_aptc_amount = options[:new_aptc] * aptc_pct_for_member / options[:percent_sum_for_all_enrollees]
-        end
       end
 
       def member_coverage_start_date(hbx_enrollment_member)

@@ -11,7 +11,19 @@ RSpec.describe "app/views/insured/group_selection/edit_plan.html.erb" do
   context "Enrollment information and buttons" do
 
     let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
-    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :individual_assisted, { household: family.households.first, family: family, enrollment_members: family.family_members })}
+    let!(:hbx_enrollment) do
+      FactoryBot.create(
+        :hbx_enrollment,
+        :with_enrollment_members,
+        :individual_assisted,
+        {
+          household: family.households.first,
+          family: family,
+          enrollment_members: family.family_members,
+          product: product
+        }
+      )
+    end
     let(:benefit_sponsorship) { FactoryBot.create :benefit_sponsors_benefit_sponsorship, :with_benefit_market, :with_organization_cca_profile, :with_initial_benefit_application}
     let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile) }
     let(:qle) { FactoryBot.create(:qualifying_life_event_kind, market_kind:  "individual") }
@@ -19,10 +31,14 @@ RSpec.describe "app/views/insured/group_selection/edit_plan.html.erb" do
     let(:current_user) { FactoryBot.create(:user) }
 
     before(:each) do
-      allow(hbx_enrollment).to receive(:product).and_return(product)
       @hbx_enrollment = hbx_enrollment
       @sep = sep
       @family = family
+      @self_term_or_cancel_form = ::Insured::Forms::SelfTermOrCancelForm.for_view(
+        {
+          enrollment_id: hbx_enrollment.id,
+          family_id: family.id
+        })
       render :template =>"insured/group_selection/edit_plan.html.erb"
     end
 
