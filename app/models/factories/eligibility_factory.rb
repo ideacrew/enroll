@@ -46,6 +46,20 @@ module Factories
       end
     end
 
+    def fetch_elected_aptc_per_member
+      raise 'Cannot process without selected_aptc' if @selected_aptc.nil?
+
+      @enrollment.hbx_enrollment_members.inject({}) do |aptc_hash, member|
+        fm_id = member.applicant_id.to_s
+        aptc_hash[member.id.to_s] = if fetch_member_ratio[fm_id]
+                                      @selected_aptc * fetch_member_ratio[fm_id]
+                                    else
+                                      0.00
+                                    end
+        aptc_hash
+      end
+    end
+
     private
 
     def fetch_member_ratio
@@ -65,7 +79,12 @@ module Factories
       @enrollment.hbx_enrollment_members.inject({}) do |aptc_hash, member|
         fm_id = member.applicant_id.to_s
         aptc_hash[fm_id] = if fetch_member_ratio[fm_id]
-                             round_down_float_two_decimals(applicable_aptc(product_id) * fetch_member_ratio[fm_id])
+                             member_cost = applicable_aptc(product_id) * fetch_member_ratio[fm_id]
+                             if @can_round_off_cents
+                               round_down_float_two_decimals(member_cost)
+                             else
+                               member_cost
+                             end
                            else
                              0.00
                            end
@@ -79,8 +98,10 @@ module Factories
       # :applied_aptc(ElectedAptc) is given externally for Passive Renewals
       # and not calculated by the EA.
 
-      applicable_aptc = [@available_aptc, @selected_aptc, ehb_premium(product_id)].min
-      { product_id => applicable_aptc }
+      ehb_premium = ehb_premium(product_id)
+      applicable_aptc = [@available_aptc, @selected_aptc, ehb_premium].min
+      @can_round_off_cents = @selected_aptc > ehb_premium(product_id)
+      {product_id => applicable_aptc}
     end
 
     def set_applicable_aptc_attrs(selected_aptc, product_ids)
