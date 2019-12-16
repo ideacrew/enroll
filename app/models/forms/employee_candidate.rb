@@ -61,8 +61,11 @@ module Forms
                        :last_name => /^#{last_name}$/i,
                        :first_name => /^#{first_name}$/i,
                    }).first
-      potential_person.update_attributes(gender: gender, ssn: ssn) if potential_person.present?
-      return potential_person if potential_person.present? && potential_person.employer_staff_roles?
+      if potential_person.present?
+        potential_person.update(gender: gender) if potential_person.gender.blank?
+        potential_person.update(ssn: ssn) if potential_person.ssn.blank?
+        return potential_person if potential_person.employer_staff_roles?
+      end
       nil
     end
 
