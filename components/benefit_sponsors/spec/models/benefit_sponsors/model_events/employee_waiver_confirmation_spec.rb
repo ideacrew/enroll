@@ -12,7 +12,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeWaiverConfirmation', dbcle
   let!(:person){ FactoryBot.create(:person, :with_family)}
   let!(:family) {person.primary_family}
   let!(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: abc_profile.id)}
-  let!(:census_employee)  { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile) }
+  let!(:census_employee)  { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship,  active_benefit_group_assignment: current_benefit_package.id, employer_profile: abc_profile) }
   
   let!(:model_instance) { 
     hbx_enrollment = FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product, 
@@ -75,7 +75,8 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeWaiverConfirmation', dbcle
         "employee_profile.broker.organization",
         "employee_profile.broker.phone",
         "employee_profile.broker.email",
-        "employee_profile.broker_present?"
+        "employee_profile.broker_present?",
+        "employee_profile.has_parent_enrollment?"
       ]
     }
 
@@ -86,11 +87,16 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeWaiverConfirmation', dbcle
       "event_object_id" => model_instance.id
     } }
     let(:merge_model) { subject.construct_notice_object }
-    let(:benefit_group_assignment) { double(hbx_enrollment: model_instance, active_hbx_enrollments: [model_instance]) }
+    let(:benefit_group_assignment) { census_employee.active_benefit_group_assignment }
 
 
     context "when notice event received" do
       before do
+        model_instance.waive_coverage!
+        model_instance.reload
+        model_instance.update_attributes(predecessor_enrollment_id: model_instance.id)
+        allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([model_instance])
+        allow(employee_role.census_employee).to receive(:active_and_renewing_benefit_group_assignments).and_return([benefit_group_assignment])
         allow(subject).to receive(:resource).and_return(employee_role)
         allow(subject).to receive(:payload).and_return(payload)
       end
@@ -109,8 +115,6 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeWaiverConfirmation', dbcle
       end
 
       it "should return waived effective on date" do
-        allow(census_employee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)
-        allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([model_instance])
         waived_on = census_employee.active_benefit_group_assignment.hbx_enrollments.first.updated_at
         expect(waived_on).to eq model_instance.updated_at
       end
