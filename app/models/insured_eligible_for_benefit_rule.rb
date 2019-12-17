@@ -163,7 +163,7 @@ class InsuredEligibleForBenefitRule
   end
 
   def is_lawful_presence_status_satisfied?
-    is_verification_satisfied? || is_person_vlp_verified?
+    true
   end
 
   def is_active_individual_role_satisfied?
