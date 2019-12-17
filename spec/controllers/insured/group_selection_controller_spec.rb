@@ -629,7 +629,12 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
       it "should update current enrollment(cancel/terminate)" do
         hbx_enrollment.reload
-        expect(hbx_enrollment.aasm_state).to eq "coverage_canceled"
+        if TimeKeeper.date_of_record.day >= 15
+          expect(hbx_enrollment.aasm_state).to eq "coverage_terminated"
+          expect(hbx_enrollment.terminated_on.to_date).to eq hbx_enrollment.effective_on.end_of_month.to_date
+        else
+          expect(hbx_enrollment.aasm_state).to eq "coverage_canceled"
+        end
       end
 
       it "should create new enrollment" do
