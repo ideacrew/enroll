@@ -1073,6 +1073,7 @@ class Person
   def set_ridp_for_paper_application(session_var)
     if user && session_var == 'paper'
       user.ridp_by_paper_application
+      consumer_role&.move_identity_documents_to_verified
     end
   end
 

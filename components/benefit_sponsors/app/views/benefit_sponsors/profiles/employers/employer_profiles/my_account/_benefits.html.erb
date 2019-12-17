@@ -226,7 +226,7 @@
             </div>
 
             <% package.sponsored_benefits.each do |sponsored_benefit| %>
-              <%= render 'sponsored_benefit', sponsored_benefit: sponsored_benefit %>
+              <%= render 'sponsored_benefit', sponsored_benefit: sponsored_benefit, skip_calcs: can_skip_calculations_for(benefit_application) %>
             <% end %>
 
 

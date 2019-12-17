@@ -2,6 +2,13 @@ module Notifier
   module Builders::BenefitApplication
     include ActionView::Helpers::NumberHelper
 
+    EVENTS_TO_PICK_LOAD_BENEFIT_APPLICATION = [
+      'zero_employees_on_roster_notice',
+      'low_enrollment_notice_for_employer',
+      'employee_open_enrollment_reminder',
+      'open_enrollment_end_reminder_notice_to_employee'
+    ].freeze
+
     def benefit_application_current_py_start_date
       if current_benefit_application.present?
         merge_model.benefit_application.current_py_start_date = format_date(current_benefit_application.start_on)
@@ -95,7 +102,7 @@ module Notifier
 
     def benefit_application_current_py_oe_end_date
       benefit_application =
-        if ['zero_employees_on_roster_notice', 'low_enrollment_notice_for_employer', 'open_enrollment_end_reminder_notice_to_employee'].include? event_name
+        if EVENTS_TO_PICK_LOAD_BENEFIT_APPLICATION.include? event_name
           load_benefit_application
         else
           current_benefit_application
