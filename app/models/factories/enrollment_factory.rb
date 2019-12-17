@@ -233,6 +233,7 @@ module Factories
       if saved
         self.link_census_employee(census_employee, role, employer_profile)
         census_employee.save
+        role.save!
         migrate_census_employee_contact_to_person(census_employee, person)
       elsif person_new
         person.delete
