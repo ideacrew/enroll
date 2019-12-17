@@ -35,8 +35,11 @@ RSpec.describe ApplicationHelper, :type => :helper do
     let(:benefit_sponsorship){ double("benefit_sponsorship") }
 
     context "when active_benefit_application is present" do
-      it "should return false" do
+      before do
         allow(benefit_sponsorship).to receive(:active_benefit_application).and_return(true)
+      end
+
+      it "should return false" do
         expect(helper.product_rates_available?(benefit_sponsorship)).to eq false
       end
     end
@@ -46,8 +49,9 @@ RSpec.describe ApplicationHelper, :type => :helper do
         allow(benefit_sponsorship).to receive(:active_benefit_application).and_return(false)
         allow(benefit_sponsorship).to receive(:applicant?).and_return(true)
       end
+
       it "should return false if not in late rates" do
-        expect(helper.product_rates_available?(benefit_sponsorship)).to eq false
+        expect(helper.product_rates_available?(benefit_sponsorship, TimeKeeper.date_of_record)).to eq false
       end
 
       it "should return true if during late rates" do
