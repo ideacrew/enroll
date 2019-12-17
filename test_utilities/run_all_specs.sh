@@ -20,5 +20,5 @@ for test_dir in `ls -1 $root/components/ | grep -v old_sponsored_benefits`; do
   fi
 done
 
-cd $root  cd $root
+cd $root
 bundle exec rake parallel:spec[3]
