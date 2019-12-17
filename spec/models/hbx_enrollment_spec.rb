@@ -809,14 +809,6 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
                               effective_on: date)
           end
 
-          before do
-            TimeKeeper.set_date_of_record_unprotected!(Date.today + 20.days) if TimeKeeper.date_of_record.month == 1 || TimeKeeper.date_of_record.month == 12
-          end
-
-          after do
-            TimeKeeper.set_date_of_record_unprotected!(Date.today) if TimeKeeper.date_of_record.month == 1 || TimeKeeper.date_of_record.month == 12
-          end
-
           it "should cancel hbx enrollemnt plan1 from carrier1 when choosing plan2 from carrier2" do
             hbx_enrollment1.update_attributes!(effective_on: date + 1.day)
             hbx_enrollment2.effective_on = date

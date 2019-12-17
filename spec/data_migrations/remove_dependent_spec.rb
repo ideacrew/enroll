@@ -142,7 +142,53 @@ describe RemoveDependent, dbclean: :after_each do
       end
     end
 
-    context 'Mapping Hbx Enrollment Member exist' do
+    context 'Matching Hbx Enrollment Member exist with shopping state' do
+      let!(:enrollment) do
+        enr = FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, aasm_state: "shopping")
+        enr.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: dependent.id.to_s, eligibility_date: Time.zone.today, coverage_start_on: Time.zone.today)
+        enr.hbx_enrollment_members.first.save!
+        enr.save!
+        enr
+      end
+
+      let!(:matched_hbx_member) do
+        enrollment.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: duplicate_family_member.id.to_s, eligibility_date: Time.zone.today, coverage_start_on: Time.zone.today)
+        enrollment.hbx_enrollment_members.last.save!
+        enrollment.save!
+        enrollment.hbx_enrollment_members.last
+      end
+
+      let!(:duplicate_family_member) do
+        family.family_members << FamilyMember.new(person_id: dependent.person.id)
+        dup_fm = family.family_members.last
+        dup_fm.save(validate: false)
+        dup_fm
+      end
+
+      let!(:size) {enrollment.hbx_enrollment_members.count}
+
+      around do |example|
+        ClimateControl.modify family_member_ids: duplicate_family_member.id.to_s do
+          example.run
+        end
+      end
+
+      before do
+        subject.migrate
+      end
+
+      it 'should delete FM record' do
+        family.reload
+        expect { family.family_members.find(duplicate_family_member.id.to_s) }.to raise_error(Mongoid::Errors::DocumentNotFound)
+      end
+
+      it 'should delete shopping enrollment membre record linked with duplicate family member' do
+        enrollment.reload
+        expect(enrollment.hbx_enrollment_members.count).not_to eq(size)
+      end
+    end
+
+    context 'Mapping Hbx Enrollment Member exist with not in shopping state' do
       let!(:enrollment) do
         enr = FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household)
         enr.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: dependent.id.to_s, eligibility_date: Time.zone.today, coverage_start_on: Time.zone.today)

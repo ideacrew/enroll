@@ -916,6 +916,8 @@ module BenefitSponsors
 
       let(:this_year)                       { TimeKeeper.date_of_record.year }
       let(:april_effective_date)            { Date.new(this_year,4,1) }
+      let(:april_open_enrollment_begin_on)  { april_effective_date - 1.month }
+      let(:april_open_enrollment_end_on)    { april_open_enrollment_begin_on + 9.days }
 
       let!(:april_sponsor) do
         create(
@@ -1015,9 +1017,9 @@ module BenefitSponsors
 
       context '.oe_extended_applications' do
 
-        before { 
-          allow(april_sponsor).to receive(:open_enrollment_period_for).and_return(april_effective_date - 20.days..april_effective_date - 10.days)
-          TimeKeeper.set_date_of_record_unprotected!(current_date)
+        before {
+          allow(april_sponsor).to receive(:open_enrollment_period_for).and_return(april_open_enrollment_begin_on..april_open_enrollment_end_on)
+          TimeKeeper.set_date_of_record_unprotected!(april_open_enrollment_end_on + 1.day)
         }
 
         context "when open enrollment extended application present" do
@@ -1029,7 +1031,7 @@ module BenefitSponsors
 
             it "should not return application for close of open enrollment" do
               expect(april_sponsor.oe_extended_applications).to be_empty
-            end 
+            end
           end
 
           context "and monthly open enrollment end date reached" do
@@ -1038,7 +1040,7 @@ module BenefitSponsors
 
             it "should not return application for close of open enrollment" do
               expect(april_sponsor.oe_extended_applications).to be_empty
-            end 
+            end
           end
 
           context "and monthly open enrollment end date passed" do
@@ -1047,7 +1049,15 @@ module BenefitSponsors
 
             it "should not return application for close of open enrollment" do
               expect(april_sponsor.oe_extended_applications).to be_empty
-            end 
+            end
+          end
+
+          context "and monthly open enrollment end date passed for initial application" do
+            let(:current_date)  { april_sponsor.open_enrollment_period_for(april_effective_date).max + 2.days }
+
+            it "should return initial application for close of open enrollment" do
+              expect(april_sponsor.oe_extended_applications.present?).to eq true
+            end
           end
         end
       end

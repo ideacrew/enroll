@@ -17,9 +17,10 @@ RSpec.describe 'ModelEvents::EmployeeSepRequestDeniedNotice', :dbclean => :after
   let(:notice_event2) {'sep_denial_notice_for_ee_active_on_multiple_rosters'}
 
   before do
-    today = TimeKeeper.date_of_record.strftime("%m/%d/%Y")
-    @qle_date = TimeKeeper.date_of_record.next_month.strftime("%m/%d/%Y")
+    today = TimeKeeper.date_of_record
+    @qle_date = TimeKeeper.date_of_record.next_month
     @reporting_deadline = @qle_date > today ? today : @qle_date.to_date + 30.days
+
     census_employee.update_attributes(employee_role_id: employee_role.id)
   end
 
@@ -118,11 +119,11 @@ RSpec.describe 'ModelEvents::EmployeeSepRequestDeniedNotice', :dbclean => :after
       end
 
       it "should return qle_reporting_deadline" do
-        expect(merge_model.special_enrollment_period.reporting_deadline).to eq @reporting_deadline
+        expect(merge_model.special_enrollment_period.reporting_deadline).to eq @reporting_deadline.strftime("%m/%d/%Y")
       end
 
       it "should return event_on" do
-        expect(merge_model.special_enrollment_period.event_on).to eq @qle_date
+        expect(merge_model.special_enrollment_period.event_on).to eq @qle_date.strftime("%m/%d/%Y")
       end
 
       it "should return qle_reported_on" do
