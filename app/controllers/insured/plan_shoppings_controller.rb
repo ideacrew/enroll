@@ -281,9 +281,8 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def plan_selection_callback
-    hios_id_with_year = params[:hios_id].split('-')
-    year = hios_id_with_year.slice!(0)
-    hios_id = hios_id_with_year.join('-')
+    year = params[:year]
+    hios_id = params[:hios_id]
     selected_plan = BenefitMarkets::Products::Product.where(:hios_id => hios_id, :"application_period.min" => Date.new(year.to_i, 1, 1)).first
     # selected_plan = Plan.where(:hios_id => params[:hios_id], active_year: Settings.checkbook_services.current_year).first
     if selected_plan.present?
