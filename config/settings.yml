@@ -335,7 +335,7 @@ notices:
       zip_code: "20005"
 
   shop:
-    store_paper_notice: false
+    store_paper_notice: true
     attachments:
       envelope_without_address: "taglines.pdf"
       non_discrimination_attachment: "shop_non_discrimination_attachment.pdf"
