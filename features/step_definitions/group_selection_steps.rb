@@ -264,7 +264,7 @@ end
 
 Then(/(.*) should see the enrollment with make changes button/) do |role|
   if role == "employee"
-    expect(page).to have_content "#{(current_effective_date || TimeKeeper.date_of_record).year} HEALTH COVERAGE"
+    expect(page).to have_content "#{(@current_effective_date || TimeKeeper.date_of_record).year} HEALTH COVERAGE"
   else
     expect(page).to have_content "#{TimeKeeper.date_of_record.year} HEALTH COVERAGE"
   end
@@ -273,7 +273,7 @@ end
 
 Then(/(.*) should see the dental enrollment with make changes button/) do |role|
   if role == "employee"
-    expect(page).to have_content "#{(current_effective_date || TimeKeeper.date_of_record).year} DENTAL COVERAGE"
+    expect(page).to have_content "#{(@current_effective_date || TimeKeeper.date_of_record).year} DENTAL COVERAGE"
   else
     expect(page).to have_content "#{TimeKeeper.date_of_record.year} DENTAL COVERAGE"
   end
