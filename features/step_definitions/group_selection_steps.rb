@@ -457,8 +457,9 @@ end
 #   end
 # end
 
-Then(/(.*) should see the make changes button/) do |role|
-  if role.eql?("consumer")
+Then(/^.* (.*) see the make changes button/) do |visibility|
+  # There are two different buttons, each with links. one for IVl and one for SHOP
+  if visibility.eql?("should")
     expect(page).to have_css('.ivl-make-changes')
   else
     expect(page).to have_css('.ee-make-changes')

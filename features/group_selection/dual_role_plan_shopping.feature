@@ -32,11 +32,11 @@ Feature: EE with consumer role plan purchase
     And employee clicked on continue for plan shopping
     Then employee should see primary and valid dependent
 
-  Scenario: User should see ONLY Employee make changes button for SHOP enrollments
+  Scenario: User should not see IVL "Make Changes" button for SHOP enrollments
     Given a matched Employee exists with consumer role
     And user has a dependent in child relationship with age less than 26
     And user has a dependent in spouse relationship with age greater than 26
     And user did not apply coverage for child as ivl
     And employee also has a health enrollment with primary covered under first employer
     Then Employee sign in to portal
-    And employee should see the make changes button
+    And employee should not see the make changes button
