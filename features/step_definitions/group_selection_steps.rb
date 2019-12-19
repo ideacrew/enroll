@@ -457,11 +457,11 @@ end
 #   end
 # end
 
-Then(/consumer (.*) see the make changes button/) do |visibility|
-  if visibility.eql?("should")
-    expect(page).to have_selector("a", text: "Make Changes",  count: 1)
+Then(/(.*) should see the make changes button/) do |role|
+  if role.eql?("consumer")
+    expect(page).to have_css('.ivl-make-changes')
   else
-    expect(page).to_not have_selector("a", text: "Make Changes",  count: 1)
+    expect(page).to have_css('.ee-make-changes')
   end
 end
 
