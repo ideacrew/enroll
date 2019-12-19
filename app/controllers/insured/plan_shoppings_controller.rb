@@ -200,13 +200,9 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def generate_checkbook_service
-    if @hbx_enrollment.effective_on.year == Settings.checkbook_services.current_year
-      plan_comparision_obj = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment)
-      plan_comparision_obj.elected_aptc = session[:elected_aptc]
-      @dc_individual_checkbook_url = plan_comparision_obj.generate_url
-    elsif @hbx_enrollment.effective_on.year == Settings.checkbook_services.previous_year
-      @dc_individual_checkbook_previous_year = Rails.application.config.checkbook_services_base_url + '/hie/dc/' + Settings.checkbook_services.previous_year.to_s + "/"
-    end
+    plan_comparision_obj = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment)
+    plan_comparision_obj.elected_aptc = session[:elected_aptc]
+    @dc_individual_checkbook_url = plan_comparision_obj.generate_url
   end
 
   def show
@@ -285,7 +281,9 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def plan_selection_callback
-    selected_plan = BenefitMarkets::Products::Product.where(:"hios_id" => params[:hios_id], :"application_period.min" => Date.new(Settings.checkbook_services.current_year, 1, 1)).first
+    year = params[:year]
+    hios_id = params[:hios_id]
+    selected_plan = BenefitMarkets::Products::Product.where(:hios_id => hios_id, :"application_period.min" => Date.new(year.to_i, 1, 1)).first
     # selected_plan = Plan.where(:hios_id => params[:hios_id], active_year: Settings.checkbook_services.current_year).first
     if selected_plan.present?
       redirect_to thankyou_insured_plan_shopping_path({plan_id: selected_plan.id.to_s, id: params[:id],coverage_kind: params[:coverage_kind], market_kind: params[:market_kind], change_plan: params[:change_plan]})

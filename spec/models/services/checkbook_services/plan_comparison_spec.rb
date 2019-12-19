@@ -84,7 +84,7 @@ describe Services::CheckbookServices::PlanComparision do
               }
             }
           ).and_raise(Exception)
-        expect(subject.generate_url).to eq false
+        expect(subject.generate_url).to eq "/insured/plan_shoppings/#{hbx_enrollment1.id}?market_kind=#{hbx_enrollment1.kind}&coverage_kind=#{hbx_enrollment1.coverage_kind}"
       end
     end
   end
