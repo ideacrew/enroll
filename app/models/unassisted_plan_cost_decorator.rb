@@ -7,7 +7,6 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   attr_reader :hbx_enrollment
   attr_reader :elected_aptc
   attr_reader :tax_household
-  attr_reader :can_round_cents
 
   def initialize(plan, hbx_enrollment, elected_aptc = 0, tax_household = nil)
     super(plan)
@@ -98,7 +97,7 @@ class UnassistedPlanCostDecorator < SimpleDelegator
       (sum + aptc_amount(member))
     end
 
-    return result unless can_round_cents
+    return result unless @can_round_cents
 
     round_down_float_two_decimals(result)
   end
