@@ -75,7 +75,7 @@ end
 
 def calc_eligibility_for(cr, family, benefit_packages, ed)
   effective_date = (ed < Date.new(2019,1,1)) ? Date.new(2019,1,1) : ed
-  all_eligibilities = benefit_packages.map? do |hbp|
+  all_eligibilities = benefit_packages.map do |hbp|
     [
       hbp,
       InsuredEligibleForBenefitRule.new(cr, hbp, {new_effective_on: effective_date, family: family, version_date: ed, market_kind: "individual"}).satisfied?
