@@ -75,9 +75,25 @@ end
 
 def calc_eligibility_for(cr, family, benefit_packages, ed)
   effective_date = (ed < Date.new(2019,1,1)) ? Date.new(2019,1,1) : ed
-  benefit_packages.any? do |hbp|
-    InsuredEligibleForBenefitRule.new(cr, hbp, {new_effective_on: effective_date, family: family, version_date: ed, market_kind: "individual"}).satisfied?.first
+  all_eligibilities = benefit_packages.map? do |hbp|
+    [
+      hbp,
+      InsuredEligibleForBenefitRule.new(cr, hbp, {new_effective_on: effective_date, family: family, version_date: ed, market_kind: "individual"}).satisfied?
+    ]
   end
+  eligible_value = all_eligibilities.any? do |ae|
+    ae.last.first
+  end
+  eligibility_error_lookups = all_eligibilities.reject do |ae|
+    ae.last.first
+  end
+  eligibility_errors = eligibility_error_lookups.map do |eel|
+    {
+      package: eel.first.title,
+      errors: eel.last.last.to_hash
+    }.to_json
+  end
+  [eligible_value, eligibility_errors.join("\n")]
 end
 
 def home_address_for(person)
@@ -173,7 +189,8 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
     "Mailing Zip",
     "Residency Exemption Reason",
     "Is applying for coverage",
-    "Eligible"
+    "Eligible",
+    "Denial Reasons"
   ]
   ivl_people.no_timeout.each do |pers_record|
     pers_record.reload
@@ -216,7 +233,7 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
           end
           begin
             if auditable?(pers_record, p_version, person_updated_at, fam)
-              eligible = calc_eligibility_for(cr, fam, health_benefit_packages, person_updated_at)
+              eligible, eligibility_errors = calc_eligibility_for(cr, fam, health_benefit_packages, person_updated_at)
               lpd = cr.lawful_presence_determination
               if lpd
                 address_fields = home_address_for(pers)
@@ -240,7 +257,8 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
                   [
                     pers.no_dc_address ? pers.no_dc_address_reason : "",
                     cr.is_applying_coverage,
-                    eligible
+                    eligible,
+                    eligible ? "" : eligibility_errors
                 ])
               end
             end          
