@@ -71,20 +71,38 @@ module Notifier
 
             let(:resource) { EmployeeRole.new }
 
-            it 'should not store paper notices for Employee with paper contact method' do
-              allow(resource).to receive(:person).and_return(double(hbx_id: '1234'))
-              allow(resource).to receive(:can_receive_paper_communication?).and_return(true)
-              allow(subject).to receive(:shop_market?).and_return(true)
-              subject.store_paper_notice
-              expect(Aws::S3Storage).not_to have_received(:save).with(notice_path_for_paper_notice, bucket_name, notice_filename_for_paper_notice)
-            end
+            if ::Settings.notices.shop.store_paper_notice
+              it 'should store paper notices for Employee with paper contact method' do
+                allow(resource).to receive(:person).and_return(double(hbx_id: '1234'))
+                allow(resource).to receive(:can_receive_paper_communication?).and_return(true)
+                allow(subject).to receive(:shop_market?).and_return(true)
+                subject.store_paper_notice
+                expect(Aws::S3Storage).to have_received(:save).with(notice_path_for_paper_notice, bucket_name, notice_filename_for_paper_notice)
+              end
 
-            it 'should not store paper notices for Employee with electronic communication contact method' do
-              allow(resource).to receive(:person).and_return(double(hbx_id: '1234'))
-              allow(resource).to receive(:can_receive_paper_communication?).and_return(false)
-              allow(subject).to receive(:shop_market?).and_return(true)
-              subject.store_paper_notice
-              expect(Aws::S3Storage).not_to have_received(:save).with(notice_path_for_paper_notice, bucket_name, notice_filename_for_paper_notice)
+              it 'should store paper notices for Employee with electronic communication contact method' do
+                allow(resource).to receive(:person).and_return(double(hbx_id: '1234'))
+                allow(resource).to receive(:can_receive_paper_communication?).and_return(true)
+                allow(subject).to receive(:shop_market?).and_return(true)
+                subject.store_paper_notice
+                expect(Aws::S3Storage).to have_received(:save).with(notice_path_for_paper_notice, bucket_name, notice_filename_for_paper_notice)
+              end
+            else
+              it 'should not store paper notices for Employee with paper contact method' do
+                allow(resource).to receive(:person).and_return(double(hbx_id: '1234'))
+                allow(resource).to receive(:can_receive_paper_communication?).and_return(true)
+                allow(subject).to receive(:shop_market?).and_return(true)
+                subject.store_paper_notice
+                expect(Aws::S3Storage).not_to have_received(:save).with(notice_path_for_paper_notice, bucket_name, notice_filename_for_paper_notice)
+              end
+
+              it 'should not store paper notices for Employee with electronic communication contact method' do
+                allow(resource).to receive(:person).and_return(double(hbx_id: '1234'))
+                allow(resource).to receive(:can_receive_paper_communication?).and_return(false)
+                allow(subject).to receive(:shop_market?).and_return(true)
+                subject.store_paper_notice
+                expect(Aws::S3Storage).not_to have_received(:save).with(notice_path_for_paper_notice, bucket_name, notice_filename_for_paper_notice)
+              end
             end
           end
 
@@ -92,20 +110,38 @@ module Notifier
 
             let(:resource) { BenefitSponsors::Organizations::AcaShopDcEmployerProfile.new }
 
-            it 'should not store paper notices for Employer with paper contact method' do
-              allow(resource).to receive(:organization).and_return(double(hbx_id: '1234'))
-              allow(resource).to receive(:can_receive_paper_communication?).and_return(true)
-              allow(subject).to receive(:shop_market?).and_return(true)
-              subject.store_paper_notice
-              expect(Aws::S3Storage).not_to have_received(:save).with(notice_path_for_paper_notice, bucket_name, notice_filename_for_paper_notice)
-            end
+            if ::Settings.notices.shop.store_paper_notice
+              it 'should store paper notices for Employer with paper contact method' do
+                allow(resource).to receive(:organization).and_return(double(hbx_id: '1234'))
+                allow(resource).to receive(:can_receive_paper_communication?).and_return(true)
+                allow(subject).to receive(:shop_market?).and_return(true)
+                subject.store_paper_notice
+                expect(Aws::S3Storage).to have_received(:save).with(notice_path_for_paper_notice, bucket_name, notice_filename_for_paper_notice)
+              end
 
-            it 'should not store paper notices for Employer with electronic communication contact method' do
-              allow(resource).to receive(:organization).and_return(double(hbx_id: '1234'))
-              allow(resource).to receive(:can_receive_paper_communication?).and_return(false)
-              allow(subject).to receive(:shop_market?).and_return(true)
-              subject.store_paper_notice
-              expect(Aws::S3Storage).not_to have_received(:save).with(notice_path_for_paper_notice, bucket_name, notice_filename_for_paper_notice)
+              it 'should store paper notices for Employer with electronic communication contact method' do
+                allow(resource).to receive(:organization).and_return(double(hbx_id: '1234'))
+                allow(resource).to receive(:can_receive_paper_communication?).and_return(true)
+                allow(subject).to receive(:shop_market?).and_return(true)
+                subject.store_paper_notice
+                expect(Aws::S3Storage).to have_received(:save).with(notice_path_for_paper_notice, bucket_name, notice_filename_for_paper_notice)
+              end
+            else
+              it 'should not store paper notices for Employer with paper contact method' do
+                allow(resource).to receive(:organization).and_return(double(hbx_id: '1234'))
+                allow(resource).to receive(:can_receive_paper_communication?).and_return(true)
+                allow(subject).to receive(:shop_market?).and_return(true)
+                subject.store_paper_notice
+                expect(Aws::S3Storage).not_to have_received(:save).with(notice_path_for_paper_notice, bucket_name, notice_filename_for_paper_notice)
+              end
+
+              it 'should not store paper notices for Employer with electronic communication contact method' do
+                allow(resource).to receive(:organization).and_return(double(hbx_id: '1234'))
+                allow(resource).to receive(:can_receive_paper_communication?).and_return(false)
+                allow(subject).to receive(:shop_market?).and_return(true)
+                subject.store_paper_notice
+                expect(Aws::S3Storage).not_to have_received(:save).with(notice_path_for_paper_notice, bucket_name, notice_filename_for_paper_notice)
+              end
             end
           end
         end
