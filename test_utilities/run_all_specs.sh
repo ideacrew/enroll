@@ -16,7 +16,7 @@ for test_dir in `ls -1 $root/components/ | grep -v old_sponsored_benefits`; do
   ((result+=$?))
   if [ $result -ne 0 ]; then
     echo "ENGINE FAILED"
-	  exit $result
+    exit $result
   fi
 done
 
