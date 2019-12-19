@@ -261,11 +261,7 @@ module Forms
     end
 
     def bubble_person_errors(person)
-      if person.errors.has_key?(:ssn)
-        person.errors.get(:ssn).each do |err|
-          self.errors.add(:ssn, err)
-        end
-      end
+      self.errors.add(:ssn, person.errors[:ssn]) if person.errors.has_key?(:ssn)
     end
 
     def try_update_person(person)
