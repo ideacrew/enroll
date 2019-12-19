@@ -773,6 +773,7 @@ class CensusEmployee < CensusMember
     employee_relationship = Forms::EmployeeCandidate.new({first_name: first_name,
                                                           last_name: last_name,
                                                           ssn: ssn,
+                                                          gender: gender,
                                                           dob: dob.strftime("%Y-%m-%d")})
     person = employee_relationship.match_person if employee_relationship.present?
 

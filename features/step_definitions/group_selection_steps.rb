@@ -270,7 +270,6 @@ Then(/(.*) should see primary person/) do |role|
   expect(page).to have_content "Coverage For:   #{primary.first_name}"
 end
 
-
 Then(/(.*) should see the enrollment with (.*) button/) do |_role, button_text|
   expect(page).to have_content "#{Time.now.year} HEALTH COVERAGE"
   expect(page).to have_link(button_text.titleize)
@@ -278,7 +277,7 @@ end
 
 Then(/(.*) should see the dental enrollment with make changes button/) do |role|
   if role == "employee"
-    expect(page).to have_content "#{(current_effective_date || TimeKeeper.date_of_record).year} DENTAL COVERAGE"
+    expect(page).to have_content "#{(@current_effective_date || TimeKeeper.date_of_record).year} DENTAL COVERAGE"
   else
     expect(page).to have_content "#{TimeKeeper.date_of_record.year} DENTAL COVERAGE"
   end
