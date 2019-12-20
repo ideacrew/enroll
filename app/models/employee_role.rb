@@ -186,6 +186,10 @@ class EmployeeRole
     employer_profile.published_benefit_application.present? && employer_profile.published_benefit_application.open_enrollment_contains?(TimeKeeper.date_of_record)
   end
 
+  def benefit_begin_date
+    employer_profile.published_benefit_application.start_on
+  end
+
   def is_eligible_to_enroll_without_qle?
     is_under_open_enrollment? || census_employee.new_hire_enrollment_period.cover?(TimeKeeper.date_of_record) || census_employee.new_hire_enrollment_period.min > TimeKeeper.date_of_record
   end
