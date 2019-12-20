@@ -90,7 +90,7 @@ def calc_eligibility_for(cr, family, benefit_packages, ed)
   eligibility_errors = eligibility_error_lookups.map do |eel|
     {
       package: eel.first.title,
-      errors: eel.last.last.to_hash
+      errors: eel.last.last
     }.to_json
   end
   [eligible_value, eligibility_errors.join("\n")]
