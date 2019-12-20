@@ -457,12 +457,19 @@ end
 #   end
 # end
 
-Then(/^.* (.*) see the make changes button/) do |visibility|
+Then(/^.* (.*) see the (.*) make changes button/) do |visibility, market|
   # There are two different buttons, each with links. one for IVl and one for SHOP
-  if visibility.eql?("should")
-    expect(page).to have_css('.ivl-make-changes')
+  case market
+  when 'individual'
+    css_class = '.ivl-make-changes'
+  when 'shop'
+    css_class = '.ee-make-changes'
+  end
+  case visibility
+  when 'should'
+    expect(page).to have_css(css_class)
   else
-    expect(page).to have_css('.ee-make-changes')
+    expect(page).to_not have_css(css_class)
   end
 end
 
