@@ -139,7 +139,7 @@
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: '', heading: 'What You’ll Pay When You Receive Services', sub_heading: ''} %>
 
-<% if notice.renewal_health_enrollments %>
+<% if notice.renewal_health_enrollments.present? %>
   <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["Every health plan includes some services - like vaccines and certain tests - that are free if you use an in-network provider. These are called preventive services, and help you avoid illness or detect it early."], heading: '', sub_heading: ''} %>
 <% end %>
 
@@ -211,8 +211,7 @@
     listing: "<strong>Remember, you must pay your monthly premium by January 1, #{notice.coverage_year} to start and keep your insurance.</strong>", top_margin: '10px'} %>
 
 <% if notice.documents_needed == true %>
-    <%= render partial: 'notices/shared/custom_listing', :locals => {
-        listing: "<strong>And don’t forget, the deadline to submit the documents we need from you is #{notice.due_date.strftime("%B %d, %Y")}.</strong>If you do not submit them by the deadline, you could lose your insurance. The list of documents you need to submit is on the next page."} %>
+  <%= render partial: 'notices/shared/custom_listing', :locals => { listing: "<strong>And don’t forget, the deadline to submit the documents we need from you is #{notice.due_date.strftime("%B %d, %Y")}. </strong>If you do not submit them by the deadline, you could lose your insurance. The list of documents you need to submit is on the next page."} %>
 <% end %>
 
 <br>
