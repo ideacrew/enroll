@@ -1,0 +1,141 @@
+{
+  "version": 1,
+  "projects": {
+    "user-management": {
+      "projectType": "application",
+      "schematics": {
+        "@nrwl/angular:component": {
+          "style": "scss"
+        }
+      },
+      "root": "apps/user-management",
+      "sourceRoot": "apps/user-management/src",
+      "prefix": "angular-poc",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/apps/user-management",
+            "index": "apps/user-management/src/index.html",
+            "main": "apps/user-management/src/main.ts",
+            "polyfills": "apps/user-management/src/polyfills.ts",
+            "tsConfig": "apps/user-management/tsconfig.app.json",
+            "aot": false,
+            "assets": [
+              "apps/user-management/src/favicon.ico",
+              "apps/user-management/src/assets"
+            ],
+            "styles": ["apps/user-management/src/styles.scss"],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "apps/user-management/src/environments/environment.ts",
+                  "with": "apps/user-management/src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "user-management:build"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "user-management:build:production"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "user-management:build"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "apps/user-management/tsconfig.app.json",
+              "apps/user-management/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!apps/user-management/**"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "apps/user-management/jest.config.js",
+            "tsConfig": "apps/user-management/tsconfig.spec.json",
+            "setupFile": "apps/user-management/src/test-setup.ts"
+          }
+        }
+      }
+    },
+    "user-management-e2e": {
+      "root": "apps/user-management-e2e",
+      "sourceRoot": "apps/user-management-e2e/src",
+      "projectType": "application",
+      "architect": {
+        "e2e": {
+          "builder": "@nrwl/cypress:cypress",
+          "options": {
+            "cypressConfig": "apps/user-management-e2e/cypress.json",
+            "tsConfig": "apps/user-management-e2e/tsconfig.e2e.json",
+            "devServerTarget": "user-management:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "user-management:serve:production"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": ["apps/user-management-e2e/tsconfig.e2e.json"],
+            "exclude": ["**/node_modules/**", "!apps/user-management-e2e/**"]
+          }
+        }
+      }
+    }
+  },
+  "cli": {
+    "defaultCollection": "@nrwl/angular"
+  },
+  "schematics": {
+    "@nrwl/angular:application": {
+      "unitTestRunner": "jest",
+      "e2eTestRunner": "cypress"
+    },
+    "@nrwl/angular:library": {
+      "unitTestRunner": "jest"
+    }
+  },
+  "defaultProject": "user-management"
+}
