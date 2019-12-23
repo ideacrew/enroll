@@ -94,7 +94,7 @@ class UnassistedPlanCostDecorator < SimpleDelegator
 
   def total_ehb_premium
     members.reduce(0.00) do |sum, member|
-      (sum + round_down_float_two_decimals((premium_for(member) * __getobj__.ehb)))
+      (sum + round_down_float_two_decimals(member_ehb_premium(member)))
     end
   end
 
