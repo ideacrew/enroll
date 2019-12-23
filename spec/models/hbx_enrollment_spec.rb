@@ -842,7 +842,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
           end
 
           it "terminates previous enrollments if both effective on in the future" do
-            hbx_enrollment1.update_attributes!(effective_on: date + 10.days)
+            hbx_enrollment1.update_attributes!(effective_on: date + 1.days)
             hbx_enrollment2.update_attributes!(effective_on: date + 20.days)
             hbx_enrollment2.select_coverage!
             expect(hbx_enrollment1.reload.coverage_terminated?).to be_truthy
