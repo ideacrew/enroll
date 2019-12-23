@@ -187,6 +187,7 @@ class EmployeeRole
   end
 
   def benefit_begin_date
+    return employer_profile.show_plan_year.start_on && employer_profile.show_plan_year.open_enrollment_contains?(TimeKeeper.date_of_record) if is_case_old?
     employer_profile.published_benefit_application.start_on
   end
 
