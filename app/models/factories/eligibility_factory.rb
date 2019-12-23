@@ -55,8 +55,7 @@ module Factories
       # We still consider AvailableAptc in this calculation because the
       # :applied_aptc(ElectedAptc) is given externally for Passive Renewals
       # and not calculated by the EA.
-
-      applicable_aptc = [@available_aptc, @selected_aptc, ehb_premium(product_id)].min
+      applicable_aptc = [@available_aptc, @selected_aptc, total_ehb_premium(product_id)].min
       { product_id => applicable_aptc }
     end
 
@@ -74,6 +73,12 @@ module Factories
     def fetch_total_premium(product)
       cost_decorator = @enrollment.ivl_decorated_hbx_enrollment(product)
       cost_decorator.total_premium
+    end
+
+    def total_ehb_premium(product_id)
+      product = ::BenefitMarkets::Products::Product.find(product_id)
+      cost_decorator = @enrollment.ivl_decorated_hbx_enrollment(product)
+      cost_decorator.total_ehb_premium
     end
 
     def shopping_member_ids

@@ -52,10 +52,18 @@ module Insured
       def self.update_enrollment_for_apcts(elected_aptc_pct, reinstatement, applied_aptc_amount, enrollment)
         applicable_aptc_by_member = member_level_aptc_breakdown(reinstatement, applied_aptc_amount)
         reinstatement.hbx_enrollment_members.each do |enrollment_member|
-          aptc_value = applicable_aptc_by_member[enrollment_member.applicant_id.to_s]
-          next enrollment_member unless aptc_value
-          aptc_value = round_down_float_two_decimals(aptc_value)
-          enrollment_member.update_attributes!(applied_aptc_amount: aptc_value)
+          member_aptc_value = applicable_aptc_by_member[enrollment_member.applicant_id.to_s]
+          next enrollment_member unless member_aptc_value
+          cost_decorator = reinstatement.ivl_decorated_hbx_enrollment
+          member_ehb_premium = cost_decorator.member_ehb_premium(enrollment_member)
+
+          if member_aptc_value > member_ehb_premium
+            member_aptc_value = round_down_float_two_decimals(member_aptc_value)
+          else
+            member_aptc_value
+          end
+
+          enrollment_member.update_attributes!(applied_aptc_amount: member_aptc_value)
         end
         total_aptc = round_down_float_two_decimals(reinstatement.hbx_enrollment_members.pluck(:applied_aptc_amount).sum)
         reinstatement.update_attributes!(elected_aptc_pct: elected_aptc_pct, applied_aptc_amount: total_aptc)
