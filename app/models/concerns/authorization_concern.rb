@@ -4,8 +4,9 @@ module AuthorizationConcern
   included do
     # Include default devise modules. Others available are:
     # :confirmable, :lockable, :timeoutable and :omniauthable
-    devise :database_authenticatable, :registerable, :lockable,
-           :recoverable, :rememberable, :trackable, :timeoutable, :authentication_keys => {email: false, login: true}
+    devise :database_authenticatable, :registerable, :lockable, :jwt_authenticatable,
+           :recoverable, :rememberable, :trackable, :timeoutable,
+           :authentication_keys => {email: false, login: true}, jwt_revocation_strategy: self
 
     ## Database authenticatable
     field :email,              type: String, default: ""

@@ -10,6 +10,11 @@ Devise.setup do |config|
     manager.failure_app = CustomFailureApp
   end
 
+  config.jwt do |jwt|
+    # TODO Change this to production doesn't fall back
+    jwt.secret = ENV['DEVISE_JWT_SECRET_KEY'] || '9245dabe18b83a4f779d401e3ccca648c0ef16613ee1955162e0cdfd95f60a8a53f8eea390be54692ce2820baff789a2b8cbb358d5da608d52fd51bb3a4e97e8'
+  end
+
   # The secret key used by Devise. Devise uses this key to generate
   # random tokens. Changing this key will render invalid all existing
   # confirmation, reset password and unlock tokens in the database.
