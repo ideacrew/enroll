@@ -154,6 +154,53 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
           expect(SpecialEnrollmentPeriod.find(saved_sep._id).id).to eq saved_sep.id
         end
       end
+
+      # use .send because its a private method
+      context ".is_eligible? method" do
+        let(:special_enrollment_period) { SpecialEnrollmentPeriod.create!(**params) }
+        let(:census_employee) do
+          double(
+            earliest_eligible_date: Date.today
+          )
+        end
+        let(:active_employee_roles) { [employee_role] }
+        let(:employee_role) do
+          double(
+            census_employee: census_employee
+          )
+        end
+
+        context "is_active? false" do
+          before do
+            allow(special_enrollment_period).to receive(:is_active?).and_return(false)
+          end
+
+          it "should be eligible" do
+            expect(special_enrollment_period.send(:is_eligible?)).to eq(true)
+          end
+        end
+
+        context "is_shop_or_fehb? false" do
+          before do
+            allow(special_enrollment_period).to receive(:is_shop_or_fehb?).and_return(false)
+          end
+
+          it "should be eligible" do
+            expect(special_enrollment_period.send(:is_eligible?)).to eq(true)
+          end
+        end
+
+        context "active employee roles present" do
+          let(:person) { special_enrollment_period.family.person }
+          before do
+            allow(person).to receive(:active_employee_roles).and_return(active_employee_roles)
+          end
+
+          it "should be eligible" do
+            expect(special_enrollment_period.send(:is_eligible?)).to eq(true)
+          end
+        end
+      end
     end
 
     context "with invalid next_poss_effective_date" do
