@@ -24,10 +24,7 @@
         .modal-footer style="padding:10px"
           center
             button.btn.btn-default.btn-default data-dismiss="modal" type="button"  Cancel
-            - if @hbx_enrollment.effective_on.year == TimeKeeper.date_of_record.year
-              = link_to l10n("confirm") , @dc_individual_checkbook_url, class: "btn btn-primary checkbook_url"
-            - elsif @hbx_enrollment.effective_on.year == (TimeKeeper.date_of_record.year - 1)
-              = link_to l10n("confirm") , @dc_individual_checkbook_previous_year , class: "btn btn-primary"
+            = link_to l10n("confirm") , @dc_individual_checkbook_url, class: "btn btn-primary checkbook_url"
 
   #plan_match_dental_redirection.modal.fade role="document" tabindex="-1"
     .modal-dialog
