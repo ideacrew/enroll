@@ -38,7 +38,7 @@ describe UpdateEmployeeRoleId, dbclean: :after_each do
         employer_attestation: employer_attestation)
     end
 
-    let(:start_on)  { current_effective_date.prev_month }
+    let(:start_on)  { current_effective_date }
     let(:effective_period)  { start_on..start_on.next_year.prev_day }
     let!(:benefit_application) {
       application = FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, effective_period: effective_period, aasm_state: :active)
