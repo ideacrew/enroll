@@ -117,6 +117,7 @@ notices:
 
 invoices:
   addendum: 'ma_non_discrimination_and_language_tags.pdf'
+  minimum_invoice_display_year: 2015
 
 aca:
   state_name: "Massachusetts"

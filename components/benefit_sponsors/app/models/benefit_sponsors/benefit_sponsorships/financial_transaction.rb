@@ -1,26 +1,42 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
-  class BenefitSponsorships::FinancialTransaction
-    include Mongoid::Document
-    include Mongoid::Timestamps
+  module BenefitSponsorships
+    class FinancialTransaction
+      include Mongoid::Document
+      include Mongoid::Timestamps
 
-    field :payment_type,                     type: String
-    # field :amount,                         type: Money
-    # field :transaction_date,               type: Date
-    # field :payment_date,                   type: Date
-    # field :submitted_at,                   type: DateTime
-    field :benefit_application_id,           type: BSON::ObjectId
-    field :kind,                             type: String
+      embedded_in :benefit_sponsorship_account,
+                  class_name: "::BenefitSponsors::BenefitSponsorships:BenefitSponsorshipAccount",
+                  inverse_of: :financial_transactions
 
-    index({ benefit_application_id:  1 })
 
-    def benefit_application
+      METHOD_KINDS = ['ach', 'credit_card', 'check'].freeze
+
+      # Payment status
+      field :paid_on, type: Date
+      field :amount, type: Money
+
+      # Payment instrument
+      field :method_kind, type: String
+
+      # For Payment by check
+
+      # Confirmation ID or similar
+      field :reference_id, type: String
+
+      # Network reference to the payment document
+      field :document_uri, type: String
+
+      validates_presence_of :paid_on, :amount, :method_kind, :reference_id
+
+
+      def benefit_application; end
+
+      def credit_binder_payment; end
+
+      def reverse_binder_payment; end
+
     end
-
-    def credit_binder_payment
-    end
-
-    def reverse_binder_payment
-    end
-
   end
 end

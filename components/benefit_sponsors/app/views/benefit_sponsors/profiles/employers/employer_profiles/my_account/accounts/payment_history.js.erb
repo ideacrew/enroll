@@ -1,0 +1,4 @@
+$('#payments-table').empty();
+<% if @benefit_sponsorship.has_financial_transactions? %>
+$('#payments-table').append("<%= escape_javascript(render 'benefit_sponsors/profiles/employers/employer_profiles/my_account/accounts/payment_history') %>");
+<% end %>

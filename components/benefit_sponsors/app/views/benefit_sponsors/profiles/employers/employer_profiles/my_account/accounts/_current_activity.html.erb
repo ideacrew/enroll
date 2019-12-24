@@ -1,0 +1,86 @@
+<br>
+<h4><strong> Recent Activity</strong></h4>
+<br>
+<table class="table recent-activity-table">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Description</th>
+      <th>Amount</th>
+    </tr>
+  </thead>
+  <% if @benefit_sponsorship_account %>
+  <tbody>
+    <!-- Payments -->
+    <tr>
+      <td class="payments-icon"><span class="pull-right glyphicon glyphicon-plus"></span></td>
+      <td>Payments since <%= @benefit_sponsorship_account.try(:current_statement_date) %> invoice</td>
+      <td></td>
+    </tr>
+    <% if @benefit_sponsorship_account.payments_since_last_invoice.size == 0 %>
+    <tr class="payments">
+      <td></td>
+      <td>There have been no payments since the last invoice.</td>
+      <td></td>
+    </tr>
+    <% else %>
+      <% @benefit_sponsorship_account.payments_since_last_invoice.each do |payment| %>
+        <tr class="payments">
+          <td><%= payment.posting_date %></td>
+          <% if payment.payment_method == "SCN" %>
+            <td>Payment Type: CHK</td>
+          <% else %>
+            <td>Payment Type: <%= payment.payment_method %></td>
+          <% end %>
+          <td <%= payment_amount_color_style(payment.amount) %>><%= number_to_currency(payment.amount) %></td>
+        </tr>
+      <% end %>
+    <% end %>
+
+    <!-- Adjustments/Enrollment Changes -->
+    <tr>
+      <td class="adjustments-icon"><span class="pull-right glyphicon glyphicon-plus"></span></td>
+      <td>Enrollment changes since <%= @benefit_sponsorship_account.current_statement_date %> invoice
+        <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" title="Includes new enrollments, changes to existing enrollments, and terminations. Enrollment changes happen when you make a new employee eligible for coverage, when someone qualifies for a special enrollment period, or when someone is no longer eligible for coverage."></i>
+      </td>
+      <td></td>
+    </tr>
+
+    <% if @benefit_sponsorship_account.adjustments_since_last_invoice.size == 0 %>
+    <tr class="adjustments">
+      <td></td>
+      <td>There have been no adjustments since the last invoice.</td>
+      <td></td>
+    </tr>
+    <% else %>
+      <% @benefit_sponsorship_account.adjustments_since_last_invoice.each do |adjustment| %>
+        <tr class="adjustments">
+          <td></td>
+          <td><%= adjustment.name%> <%= adjustment.coverage_month.strftime("%m/%Y") %> coverage</td>
+          <td><%= number_to_currency(adjustment.amount) %></td>
+        </tr>
+      <% end %>
+    <% end %>
+
+  </tbody>
+  <% end %>
+
+</table>
+
+<!-- display payment history -->
+<%= render partial: "benefit_sponsors/profiles/employers/employer_profiles/my_account/accounts/payment_history" %>
+
+<script>
+  $(document).ready(function() {
+    $('.payments').hide();
+    $('.adjustments').hide();
+  });
+  $('td.payments-icon').click(function() {
+    $(this).find('span').toggleClass('glyphicon-plus').toggleClass('glyphicon-minus');
+    $('tr.payments').toggle();
+  });
+  $('td.adjustments-icon').click(function() {
+    $(this).find('span').toggleClass('glyphicon-plus').toggleClass('glyphicon-minus');
+    $('tr.adjustments').toggle();
+  });
+</script>
