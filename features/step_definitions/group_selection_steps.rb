@@ -83,6 +83,7 @@ And(/(.*) also has a health enrollment with primary person covered/) do |role|
   else
     sep = FactoryBot.create :special_enrollment_period, family: family
   end
+  sep.update_attributes!(effective_on: TimeKeeper.date_of_record.end_of_month)
   product = FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile)
   enrollment = FactoryBot.create(:hbx_enrollment, product: product,
                                   household: family.active_household,
