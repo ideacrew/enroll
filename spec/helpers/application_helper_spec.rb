@@ -86,6 +86,29 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
   end
 
+  describe "#carrier_logo" do
+    let!(:carrier_profile){ FactoryBot.build(:carrier_profile, legal_name: "Kaiser")}
+    let!(:plan){ Maybe.new(FactoryBot.build(:plan, hios_id: "94506DC0350001-01", carrier_profile: carrier_profile)) }
+
+    it "should return blank string if plan nil" do
+      expect(helper.carrier_logo(nil)).to eq("")
+    end
+
+    it "should return blank string if legal name nil" do
+      allow(carrier_profile).to receive(:legal_name).and_return(nil)
+      expect(helper.carrier_logo(nil)).to eq("")
+    end
+
+    it "should return blank string if legal name extract_value nil" do
+      allow(carrier_profile).to receive_message_chain("legal_name.extract_value").and_return("")
+      expect(helper.carrier_logo(nil)).to eq("")
+    end
+
+    it "should return the carrier logo text if plan and legal name present" do
+      expect(helper.carrier_logo(plan)).to eq("Kaiser")
+    end
+  end
+
   describe "#display_carrier_logo" do
     let(:carrier_profile){ FactoryBot.build(:carrier_profile, legal_name: "Kaiser")}
     let(:plan){ Maybe.new(FactoryBot.build(:plan, hios_id: "94506DC0350001-01", carrier_profile: carrier_profile)) }

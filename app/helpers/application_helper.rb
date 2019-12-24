@@ -415,12 +415,15 @@ module ApplicationHelper
   end
 
   def carrier_logo(plan)
+    # 62488 reported undefined method `issuer_profile' for nil:NilClass, suggesting
+    # plan might be nil
+    return "" if plan.nil?
     if plan.extract_value.class.to_s == "Plan"
       return "" if !plan.carrier_profile.legal_name.extract_value.present?
       issuer_hios_id = plan.hios_id[0..4].extract_value
       Settings.aca.carrier_hios_logo_variant[issuer_hios_id] || plan.carrier_profile.legal_name.extract_value
     else
-      return '' if plan.extract_value.issuer_profile.legal_name.nil?
+      return "" if plan&.extract_value&.issuer_profile&.legal_name.nil?
 
       issuer_hios_id = plan.hios_id[0..4].extract_value
       Settings.aca.carrier_hios_logo_variant[issuer_hios_id] || plan.issuer_profile.legal_name.extract_value
