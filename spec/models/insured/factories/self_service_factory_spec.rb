@@ -9,14 +9,30 @@ module Insured
       DatabaseCleaner.clean
     end
 
+    let!(:person) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
+    let!(:family) {FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person)}
+    let(:sep) {FactoryBot.create(:special_enrollment_period, family: family)}
+    let(:sbc_document) {FactoryBot.build(:document, subject: 'SBC', identifier: 'urn:openhbx#123')}
+    let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, title: 'AAA', issuer_profile_id: 'ab1233', benefit_market_kind: :aca_individual, sbc_document: sbc_document)}
+    let!(:enrollment) {FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product, consumer_role_id: person.consumer_role.id)}
+    let!(:hbx_enrollment_member1) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, is_subscriber: true, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: enrollment)}
+    let!(:hbx_enrollment_member2) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[1].id, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: enrollment)}
+    let!(:hbx_profile) {FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)}
+
     subject { Insured::Factories::SelfServiceFactory }
 
     describe "view methods" do
-      let(:family) { FactoryBot.create(:individual_market_family) }
-      let(:sep) { FactoryBot.create(:special_enrollment_period, family: family) }
-      let(:sbc_document) { FactoryBot.build(:document, subject: "SBC", identifier: "urn:openhbx#123") }
-      let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, title: "AAA", issuer_profile_id: "ab1233", sbc_document: sbc_document) }
-      let(:enrollment) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product) }
+      before :each do
+        @product = BenefitMarkets::Products::Product.all.where(benefit_market_kind: :aca_individual).first
+        @product.update_attributes(ehb: 0.9844)
+        enrollment.update_attributes(product: @product)
+        hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 59, 'R-DC001').and_return(814.85)
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 60, 'R-DC001').and_return(846.72)
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 61, 'R-DC001').and_return(879.8)
+        person.update_attributes!(dob: (enrollment.effective_on - 61.years))
+        family.family_members[1].person.update_attributes!(dob: (enrollment.effective_on - 59.years))
+      end
 
       context "#find" do
         before :each do
@@ -48,7 +64,10 @@ module Insured
     end
 
     describe "post methods" do
-      let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
+      before :all do
+        DatabaseCleaner.clean
+      end
+
       let(:sep) { FactoryBot.create(:special_enrollment_period, family: family) }
       let(:sbc_document) { FactoryBot.build(:document, subject: "SBC", identifier: "urn:openhbx#123") }
       let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, title: "AAA", issuer_profile_id: "ab1233", sbc_document: sbc_document) }
@@ -70,5 +89,35 @@ module Insured
       end
     end
 
+    describe "update_enrollment_for_apcts" do
+      let!(:tax_household10) {FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil)}
+      let!(:eligibility_determination) {FactoryBot.create(:eligibility_determination, tax_household: tax_household10, max_aptc: 2000)}
+      let!(:tax_household_member1) {tax_household10.tax_household_members.create(applicant_id: family.primary_applicant.id, is_subscriber: true, is_ia_eligible: true)}
+      let!(:tax_household_member2) {tax_household10.tax_household_members.create(applicant_id: family.family_members[1].id, is_ia_eligible: true)}
+
+
+      before :each do
+        @product = BenefitMarkets::Products::Product.all.where(benefit_market_kind: :aca_individual).first
+        @product.update_attributes(ehb: 0.9844)
+        premium_table = @product.premium_tables.first
+        premium_table.premium_tuples.where(age: 59).first.update_attributes(cost: 614.85)
+        premium_table.premium_tuples.where(age: 60).first.update_attributes(cost: 646.72)
+        premium_table.premium_tuples.where(age: 61).first.update_attributes(cost: 679.8)
+        @product.save!
+        enrollment.update_attributes(product: @product)
+        hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 59, 'R-DC001').and_return(614.85)
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 60, 'R-DC001').and_return(646.72)
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 61, 'R-DC001').and_return(679.8)
+        person.update_attributes!(dob: (enrollment.effective_on - 61.years))
+        family.family_members[1].person.update_attributes!(dob: (enrollment.effective_on - 59.years))
+      end
+
+      it 'should return updated enrollment with aptc fields' do
+        subject.update_enrollment_for_apcts(1, enrollment, 2000, nil)
+        enrollment.reload
+        expect(enrollment.applied_aptc_amount.to_f).to eq 1274.44
+      end
+    end
   end
 end
