@@ -13,7 +13,6 @@ Scenario Outline: Change Tax Credit button is available for non-catastrophic pla
   And the metal level is <metal_level>
   And the tax household has at least one member that is APTC eligible
   When consumer clicks on the make changes button
-  Then consumer should see the make changes page
   Then the Change Tax Credit button should be available
 
   Examples:
@@ -27,7 +26,6 @@ Scenario: Change Tax Credit button is not available for catastrophic plans
   And the metal level is catastrophic
   And the tax household has at least one member that is APTC eligible
   When consumer clicks on the make changes button
-  Then consumer should see the make changes page
   Then the Change Tax Credit button should NOT be available
 
 Scenario Outline: Change Tax Credit button is available for all HIOS ID endings
@@ -35,7 +33,6 @@ Scenario Outline: Change Tax Credit button is available for all HIOS ID endings
   And the metal level is gold
   And the tax household has at least one member that is APTC eligible
   When consumer clicks on the make changes button
-  Then consumer should see the make changes page
   Then the Change Tax Credit button should be available
 
   Examples:
@@ -50,20 +47,17 @@ Scenario Outline: Change Tax Credit button is available for all HIOS ID endings
 # Scenario: Change Tax Credit button is available for IVL market
 #  And the tax household has at least one member that is APTC eligible
 #  When consumer clicks on the make changes button
-#  Then consumer should see the make changes page
 #  Then the Change Tax Credit button should be available
 
 Scenario: Change Tax Credit button is not available for families with no members that are APTC eligible
   And the tax household has no members that are APTC eligible
   When consumer clicks on the make changes button
-  Then consumer should see the make changes page
   Then the Change Tax Credit button should NOT be available
 
 Scenario: Change Tax Credit button is not available for Resident
   Given the coverall enrollment flag is TRUE
   And the tax household has at least one member that is APTC eligible
   When consumer clicks on the make changes button
-  Then consumer should see the make changes page
   Then the Change Tax Credit button should NOT be available
 
 Scenario: Change Tax Credit button is available for Health Plans
@@ -71,20 +65,17 @@ Scenario: Change Tax Credit button is available for Health Plans
   And the metal level is gold
   And the tax household has at least one member that is APTC eligible
   When consumer clicks on the make changes button
-  Then consumer should see the make changes page
   Then the Change Tax Credit button should be available
 
 Scenario: Change Tax Credit button is not available for Dental Plans
   Given the enrollment is a Dental plan
   And the tax household has at least one member that is APTC eligible
   When consumer clicks on the make changes button
-  Then consumer should see the make changes page
   Then the Change Tax Credit button should NOT be available
 
 Scenario: Change Tax Credit button is available for families with at least 1 member that is APTC eligible
   And the tax household has at least one member that is APTC eligible
   When consumer clicks on the make changes button
-  Then consumer should see the make changes page
   And the Change Tax Credit button should be available
   When the user clicks on the Change Tax Credit button
   And the user sees the Change Tax Credit Form
@@ -92,7 +83,6 @@ Scenario: Change Tax Credit button is available for families with at least 1 mem
 Scenario: Eligible IVL Family can Modify APTC
   And the tax household has at least one member that is APTC eligible
   When consumer clicks on the make changes button
-  Then consumer should see the make changes page
   And the Change Tax Credit button should be available
   When the user clicks on the Change Tax Credit button
   And the user sees the Change Tax Credit Form
