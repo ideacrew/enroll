@@ -8,11 +8,12 @@ module Factories
 
     include ApplicationHelper
 
-    def initialize(enrollment_id, selected_aptc = nil, product_ids = [])
+    def initialize(enrollment_id, selected_aptc = nil, product_ids = [], excluding_enrollment_id = nil)
       @enrollment = HbxEnrollment.where(id: enrollment_id.to_s).first
       raise "Cannot find a valid enrollment with given enrollment id" unless @enrollment
 
       @family = @enrollment.family
+      @excluding_enrollment_id = excluding_enrollment_id
       set_applicable_aptc_attrs(selected_aptc, product_ids) if product_ids.present? && selected_aptc
     end
 
@@ -21,6 +22,17 @@ module Factories
       available_eligibility_hash = fetch_enrolling_available_aptcs.merge(fetch_csr)
       total_aptc = float_fix(available_eligibility_hash[:aptc].values.inject(0, :+))
       available_eligibility_hash.merge({:total_available_aptc => total_aptc})
+    end
+
+    def fetch_member_level_applicable_aptcs(total_aptc)
+      thh_members = aptc_enrollment_members(shopping_tax_members)
+      benchmark_hash = enrollment_eligible_benchmark_hash(thh_members, @enrollment)
+      total = benchmark_hash.values.sum
+      ratio_hash = {}
+      benchmark_hash.each do |member_id, benchmark_value|
+        ratio_hash[member_id] = (benchmark_value / total) * total_aptc
+      end
+      ratio_hash
     end
 
     # returns hash of product_id to applicable_aptc mappings
@@ -92,7 +104,7 @@ module Factories
     end
 
     def tax_members_aptc_breakdown(tax_household)
-      total_thh_available_aptc = tax_household.total_aptc_available_amount_for_enrollment(@enrollment)
+      total_thh_available_aptc = tax_household.total_aptc_available_amount_for_enrollment(@enrollment, @excluding_enrollment_id)
       aptc_thhms = tax_household.aptc_members
       enrolling_aptc_members = aptc_enrollment_members(aptc_thhms)
       member_benchmark_hash = enrollment_eligible_benchmark_hash(enrolling_aptc_members, @enrollment)
