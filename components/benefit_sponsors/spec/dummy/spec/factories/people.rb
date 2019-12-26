@@ -45,5 +45,17 @@ FactoryBot.define do
         create_list(:benefit_sponsors_employee_role, 1, person: p)
       end
     end
+
+    trait :with_consumer_role do
+      after(:create) do |p, evaluator|
+        create_list(:consumer_role, 1, person: p, dob: p.dob)
+      end
+    end
+
+    trait :with_active_consumer_role do
+      after(:create) do |person|
+        transition = FactoryBot.create :individual_market_transition, person: person
+      end
+    end
   end
 end
