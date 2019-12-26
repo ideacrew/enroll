@@ -209,9 +209,11 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
     end
 
     context "cancel benefit application", dbclean: :after_each do
-      let(:past_start_on) {start_on + 2.months}
+      let(:past_start_on) { Date.new(current_effective_date.year, 10, 1) }
+      let(:start_on)  { past_start_on }
+
       let!(:past_effective_period) {past_start_on..past_start_on.next_year.prev_day }
-      let!(:mid_plan_year_effective_date) {start_on.next_month}
+      let!(:mid_plan_year_effective_date) { Date.new(current_effective_date.year, 9, 1) }
       let!(:range_effective_period) { mid_plan_year_effective_date..mid_plan_year_effective_date.next_year.prev_day }
       let!(:draft_benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, :with_benefit_package, benefit_sponsorship: benefit_sponsorship, aasm_state: :imported, effective_period: past_effective_period)}
       let!(:import_draft_benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, :with_benefit_package, benefit_sponsorship: benefit_sponsorship, aasm_state: :imported, effective_period: range_effective_period)}
@@ -233,9 +235,16 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
     end
 
     context "Should update effective period and approve initial benefit application", dbclean: :after_each do
-      let(:effective_date) { start_on }
-      let(:new_start_date) { start_on.next_month }
-      let(:new_end_date) { new_start_date + 1.year }
+      let(:effective_date)   { Date.new(current_effective_date.year, 10, 1) }
+      let(:new_start_date)   { effective_date.next_month }
+      let(:new_end_date)     { new_start_date + 1.year }
+      let(:effective_period) { effective_date..effective_date.next_year.prev_day }
+      
+      let(:benefit_application) {
+        application = FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, effective_period: effective_period, aasm_state: :active)
+        application.benefit_sponsor_catalog.save!
+        application
+      }
 
       before do
         allow(ENV).to receive(:[]).with("action").and_return("update_effective_period_and_approve")
@@ -246,7 +255,7 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
 
       it "should update the initial benefit application and transition the benefit sponsorship" do
         benefit_application.update_attributes!(aasm_state: "draft")
-        expect(benefit_application.effective_period.min.to_date).to eq start_on
+        expect(benefit_application.effective_period.min.to_date).to eq effective_date
         subject.migrate
         benefit_application.reload
         benefit_sponsorship.reload

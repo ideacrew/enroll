@@ -90,7 +90,11 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
                             sponsored_benefit_package_id: initial_application.benefit_packages.first.id) }
     let(:hbx_enrollments) {double(:enrolled => [hbx_enrollment], :where => collectiondouble)}
     let!(:collectiondouble) { double(where: double(order_by: [hbx_enrollment]))}
-    let!(:hbx_profile) {FactoryGirl.create(:hbx_profile)}
+    let!(:hbx_profile) {
+      profile = FactoryGirl.create(:hbx_profile)
+      profile.benefit_sponsorship.benefit_coverage_periods << FactoryGirl.build(:benefit_coverage_period, :next_years_open_enrollment_coverage_period)
+      profile
+    }
     let(:benefit_group) { FactoryGirl.create(:benefit_group)}
     let(:benefit_package) { FactoryGirl.build(:benefit_package,
         benefit_coverage_period: hbx_profile.benefit_sponsorship.benefit_coverage_periods.first,

@@ -39,7 +39,7 @@ module SponsoredBenefits
 		let(:proposal_profile) { plan_design_proposal.profile }
 
 		let(:benefit_sponsorship_enrollment_period) do
-			begin_on = SponsoredBenefits::BenefitApplications::BenefitApplication.calculate_start_on_dates[0]
+      begin_on = SponsoredBenefits::BenefitApplications::BenefitApplication.calculate_start_on_dates[0]
 			end_on = begin_on + 1.year - 1.day
 			begin_on..end_on
 		end
@@ -54,7 +54,7 @@ module SponsoredBenefits
 
 		let(:benefit_group) do
       benefit_application.benefit_groups.first.tap do |benefit_group|
-        reference_plan_id = FactoryGirl.create(:plan, :with_complex_premium_tables, :with_rating_factors).id
+        reference_plan_id = FactoryGirl.create(:plan, :with_complex_premium_tables, :with_rating_factors, active_year: benefit_group.start_on.year).id
         benefit_group.update_attributes(reference_plan_id: reference_plan_id, plan_option_kind: 'single_carrier')
       end
     end
@@ -72,7 +72,7 @@ module SponsoredBenefits
         benefit_sponsorship_id: benefit_sponsorship.id
     end
 
-    [2016, 2017, 2018, 2019].each do |year|
+    [2016, 2017, 2018, 2019, 2020].each do |year|
       let!("health_plans_for_#{year}".to_sym) do
         FactoryGirl.create_list :plan,
           77,
