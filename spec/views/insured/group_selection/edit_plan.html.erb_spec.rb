@@ -9,16 +9,29 @@ end
 
 RSpec.describe "app/views/insured/group_selection/edit_plan.html.erb" do
   context "Enrollment information and buttons" do
-    let(:family) { FactoryBot.create(:individual_market_family) }
-    let(:sep) { FactoryBot.create(:special_enrollment_period, family: family) }
-    let(:sbc_document) { FactoryBot.build(:document, subject: "SBC", identifier: "urn:openhbx#123") }
-    let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile, title: "AAA", sbc_document: sbc_document) }
-    let(:enrollment) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, :with_enrollment_members, family: family, product: product) }
+    let!(:person) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
+    let!(:family) {FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person)}
+    let(:sep) {FactoryBot.create(:special_enrollment_period, family: family)}
+    let!(:enrollment) {FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: @product, consumer_role_id: person.consumer_role.id)}
+    let!(:hbx_enrollment_member1) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, is_subscriber: true, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: enrollment)}
+    let!(:hbx_enrollment_member2) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[1].id, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: enrollment)}
+    let!(:hbx_profile) {FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)}
 
     before(:each) do
+      @product = BenefitMarkets::Products::Product.all.where(benefit_market_kind: :aca_individual).first
+      @product.update_attributes(ehb: 0.9844)
+      premium_table = @product.premium_tables.first
+      premium_table.premium_tuples.where(age: 59).first.update_attributes(cost: 614.85)
+      premium_table.premium_tuples.where(age: 61).first.update_attributes(cost: 679.8)
+      @product.save!
+      enrollment.update_attributes(product: @product)
+      hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
+      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 59, 'R-DC001').and_return(814.85)
+      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 61, 'R-DC001').and_return(879.8)
+      person.update_attributes!(dob: (enrollment.effective_on - 61.years))
+      family.family_members[1].person.update_attributes!(dob: (enrollment.effective_on - 59.years))
+
       family.special_enrollment_periods << sep
-      coverage_household = family.active_household.coverage_households.first
-      enrollment.rebuild_members_by_coverage_household(coverage_household: coverage_household)
       @self_term_or_cancel_form = ::Insured::Forms::SelfTermOrCancelForm.for_view({enrollment_id: enrollment.id, family_id: family.id})
       assign :self_term_or_cancel_form, @self_term_or_cancel_form
       assign :should_term_or_cancel, @self_term_or_cancel_form.enrollment.should_term_or_cancel_ivl

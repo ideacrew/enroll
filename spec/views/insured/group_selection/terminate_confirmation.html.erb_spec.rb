@@ -10,27 +10,29 @@ end
 RSpec.describe "app/views/insured/group_selection/edit_plan.html.erb" do
   context "Enrollment information and buttons" do
 
-    let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
-    let!(:hbx_enrollment) do
-      FactoryBot.create(
-        :hbx_enrollment,
-        :with_enrollment_members,
-        :individual_assisted,
-        {
-          household: family.households.first,
-          family: family,
-          enrollment_members: family.family_members,
-          product: product
-        }
-      )
-    end
-    let(:benefit_sponsorship) { FactoryBot.create :benefit_sponsors_benefit_sponsorship, :with_benefit_market, :with_organization_cca_profile, :with_initial_benefit_application}
-    let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile) }
-    let(:qle) { FactoryBot.create(:qualifying_life_event_kind, market_kind:  "individual") }
-    let(:sep) {FactoryBot.create(:special_enrollment_period, family: family, qualifying_life_event_kind: qle) }
     let(:current_user) { FactoryBot.create(:user) }
+    let!(:person) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
+    let!(:family) {FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person)}
+    let(:sep) {FactoryBot.create(:special_enrollment_period, family: family)}
+    let!(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, :individual_assisted, family: family, product: @product, consumer_role_id: person.consumer_role.id)}
+    let!(:hbx_enrollment_member1) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, is_subscriber: true, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: hbx_enrollment)}
+    let!(:hbx_enrollment_member2) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[1].id, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: hbx_enrollment)}
+    let!(:hbx_profile) {FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)}
 
     before(:each) do
+      @product = BenefitMarkets::Products::Product.all.where(benefit_market_kind: :aca_individual).first
+      @product.update_attributes(ehb: 0.9844)
+      premium_table = @product.premium_tables.first
+      premium_table.premium_tuples.where(age: 59).first.update_attributes(cost: 614.85)
+      premium_table.premium_tuples.where(age: 61).first.update_attributes(cost: 679.8)
+      @product.save!
+      hbx_enrollment.update_attributes(product: @product)
+      hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
+      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment.effective_on, 59, 'R-DC001').and_return(814.85)
+      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment.effective_on, 61, 'R-DC001').and_return(879.8)
+      person.update_attributes!(dob: (hbx_enrollment.effective_on - 61.years))
+      family.family_members[1].person.update_attributes!(dob: (hbx_enrollment.effective_on - 59.years))
+
       @hbx_enrollment = hbx_enrollment
       @sep = sep
       @family = family
