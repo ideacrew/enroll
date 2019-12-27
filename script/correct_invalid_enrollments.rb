@@ -21,6 +21,8 @@ def process_enrollments(file_name, csv)
       enrollment_product_year = enrollment&.product.application_period.min.year
       profile = enrollment&.employer_profile
 
+      person_hbx_id = enrollment&.subscriber&.person.hbx_id
+
       benefit_market_kind = is_fehb_employer?(profile) ? :fehb : :aca_shop
 
       sponsored_product_ids = enrollment&.sponsored_benefit&.product_package.products.pluck(:id)
@@ -47,8 +49,9 @@ def process_enrollments(file_name, csv)
       end
 
       if is_employer_sponsored_product(sponsored_product_ids, products) && is_different_effective_on(enrollment_effective_year, enrollment_product_year)
+        puts "Hbx id #{person_hbx_id} - updating the enrollment with correct product..... #{enrollment.hbx_id}"
         enrollment.update_attributes!(product_id: products.first.id)
-        puts "assigned enrollment with correct product for enrollment #{enrollment.hbx_id}"
+        puts "Hbx id #{person_hbx_id} - assigned enrollment with correct product for enrollment #{enrollment.hbx_id} "
         next
       end
 
@@ -60,7 +63,7 @@ def process_enrollments(file_name, csv)
                            end
         sponsored_benefit = benefit_package.sponsored_benefit_for(enrollment.coverage_kind.to_sym)
         enrollment.update_attributes!(sponsored_benefit_package_id: benefit_package.id, sponsored_benefit_id: sponsored_benefit.id, rating_area_id: benefit_package.recorded_rating_area.id, benefit_sponsorship_id: benefit_package.benefit_sponsorship.id)
-        puts "assigned enrollment with correct sponsored benefit for enrollment #{enrollment.hbx_id}"
+        puts "Hbx id #{person_hbx_id}  - assigned enrollment with correct sponsored benefit for enrollment #{enrollment.hbx_id}"
       else
         csv << [row_hash[:enrollment_id], row_hash[:hios_id], enrollment.aasm_state, enrollment&.subscriber&.person.hbx_id, enrollment&.subscriber&.person.full_name, enrollment.coverage_kind, "No benefit packages present"]
       end
