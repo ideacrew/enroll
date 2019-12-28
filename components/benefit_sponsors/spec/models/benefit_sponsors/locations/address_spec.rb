@@ -23,8 +23,13 @@ module BenefitSponsors
           allow(subject).to receive(:office_location).and_return double(profile: double(_type: "BenefitSponsors::Organizations::AcaShopCcaEmployerProfile"))
         end
 
-        it 'should return true for MA' do
+        it 'should return false for MA' do
           expect(subject.valid?).to eq false
+        end
+
+        it 'should return true for non primary in MA' do
+          subject.kind = "mailing"
+          expect(subject.valid?).to eq true
         end
       end
     end

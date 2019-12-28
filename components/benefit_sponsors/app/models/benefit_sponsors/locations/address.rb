@@ -57,7 +57,7 @@ module BenefitSponsors
 
 
       def is_cca_employer_profile?
-        office_location.profile._type.match(/.*CcaEmployerProfile$/) if office_location
+        office_location.profile._type.match(/.*CcaEmployerProfile$/) if office_location && office_is_primary_location?
       end
       # def plan_design_model?
       #   _parent.is_a?(SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee) 
