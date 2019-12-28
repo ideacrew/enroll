@@ -37,6 +37,15 @@ Rails.application.configure do
   # Print deprecation notices to the stderr.
   config.active_support.deprecation = :stderr
 
+  # for Employer Auto Pay
+  config.wells_fargo_api_url = 'https://demo.e-billexpress.com:443/PayIQ/Api/SSO'
+  config.wells_fargo_api_key = 'e2dab122-114a-43a3-aaf5-78caafbbec02'
+  config.wells_fargo_biller_key = '3741'
+  config.wells_fargo_api_secret = 'dchbx 2017'
+  config.wells_fargo_api_version = '3000'
+  config.wells_fargo_private_key_location = '/wfpk.pem'
+  config.wells_fargo_api_date_format = '%Y-%m-%dT%H:%M:%S.0000000%z'
+
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
 end

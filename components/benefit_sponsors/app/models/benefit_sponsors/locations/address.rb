@@ -44,6 +44,7 @@ module BenefitSponsors
 
       validates :address_1, presence: {message: "Please enter address_1"}
       validates :city, presence: {message: "Please enter city"}
+      validates :county, presence: {message: "Please enter county"}, if: :is_cca_employer_profile?
 
       validates :zip,
         allow_blank: false,
@@ -55,6 +56,9 @@ module BenefitSponsors
 
 
 
+      def is_cca_employer_profile?
+        office_location.profile._type.match(/.*CcaEmployerProfile$/) if office_location && office_is_primary_location?
+      end
       # def plan_design_model?
       #   _parent.is_a?(SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee) 
       # end

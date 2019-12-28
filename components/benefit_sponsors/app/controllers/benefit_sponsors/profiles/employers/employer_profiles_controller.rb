@@ -3,9 +3,10 @@ module BenefitSponsors
     module Employers
       class EmployerProfilesController < ::BenefitSponsors::ApplicationController
 
-        before_action :find_employer, only: [:show, :inbox, :bulk_employee_upload, :export_census_employees, :coverage_reports, :download_invoice]
+        before_action :find_employer, only: [:show, :inbox, :bulk_employee_upload, :export_census_employees, :coverage_reports, :download_invoice, :show_invoice]
         before_action :load_group_enrollments, only: [:coverage_reports], if: :is_format_csv?
-        before_action :check_and_download_invoice, only: [:download_invoice]
+        before_action :check_and_download_invoice, only: [:download_invoice, :show_invoice]
+        before_action :wells_fargo_sso, only: [:show]
         layout "two_column", except: [:new]
 
         #New profile registration with existing organization and approval request submitted to employer
@@ -29,6 +30,23 @@ module BenefitSponsors
           when 'documents'
             @datatable = ::Effective::Datatables::BenefitSponsorsEmployerDocumentsDataTable.new({employer_profile_id: @employer_profile.id})
             load_documents
+          when 'accounts'
+            collect_and_sort_invoices(params[:sort_order])
+            @benefit_sponsorship = @employer_profile.organization.active_benefit_sponsorship
+            @benefit_sponsorship_account = @benefit_sponsorship.benefit_sponsorship_account
+            @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"
+            #only exists if coming from redirect from sso failing
+            @page_num = params[:page_num] if params[:page_num].present?
+            if @page_num.present?
+              retrieve_payments_for_page(@page_num)
+            else
+              retrieve_payments_for_page(1)
+            end
+            respond_to do |format|
+              format.js {render 'benefit_sponsors/profiles/employers/employer_profiles/my_account/accounts/payment_history'}
+
+              format.html
+            end
           when 'employees'
             @datatable = ::Effective::Datatables::EmployeeDatatable.new(employee_datatable_params)
           when 'brokers'
@@ -78,6 +96,14 @@ module BenefitSponsors
           end
         end
 
+        def show_invoice
+          options = {}
+          options[:filename] = @invoice.title
+          options[:type] = 'application/pdf'
+          options[:disposition] = 'inline'
+          send_data Aws::S3Storage.find(@invoice.identifier), options
+        end
+
         def bulk_employee_upload
           authorize @employer_profile, :show?
           file = params.require(:file)
@@ -114,17 +140,40 @@ module BenefitSponsors
 
         private
 
+        def wells_fargo_sso
+          #grab url for WellsFargoSSO and store in insance variable
+          email = @employer_profile.staff_roles.first.present? ? @employer_profile.staff_roles.first.work_email_or_best : nil
+
+          if email.present?
+            wells_fargo_sso =
+              ::WellsFargo::BillPay::SingleSignOn.new(
+                @employer_profile.hbx_id,
+                @employer_profile.hbx_id,
+                @employer_profile.dba.presence || @employer_profile.legal_name,
+                email
+              )
+          end
+          @wf_url = wells_fargo_sso.url if wells_fargo_sso.present? && wells_fargo_sso.token.present?
+        end
+
+        def retrieve_payments_for_page(page_no)
+          return unless (financial_transactions = @benefit_sponsorship.financial_transactions)
+
+          @payments = financial_transactions.order_by(:paid_on => 'desc').skip((page_no.to_i - 1) * 10).limit(10)
+        end
+
         def check_and_download_invoice
           @invoice = @employer_profile.documents.find(params[:invoice_id])
         end
 
         def collect_and_sort_invoices(sort_order='ASC')
           @invoices = @employer_profile.invoices
+          @invoice_years = (Settings.invoices.minimum_invoice_display_year..TimeKeeper.date_of_record.year).to_a.reverse
           sort_order == 'ASC' ? @invoices.sort_by!(&:date) : @invoices.sort_by!(&:date).reverse! unless @documents
         end
 
         def find_employer
-          id_params = params.permit(:id, :employer_profile_id)
+          id_params = params.permit(:id, :employer_profile_id, :tab)
           id = id_params[:id] || id_params[:employer_profile_id]
           @organization = BenefitSponsors::Organizations::Organization.employer_profiles.where(:"profiles._id" => BSON::ObjectId.from_string(id)).first
           @employer_profile = @organization.employer_profile

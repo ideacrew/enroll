@@ -37,16 +37,34 @@ module BenefitSponsors
     end
 
     describe "GET show" do
-      context "tab: employees" do
-        let!(:employees) {
-          FactoryGirl.create_list(:census_employee, 2, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship)
-        }
+      let!(:employees) do
+        FactoryGirl.create_list(:census_employee, 2, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship)
+      end
 
+      context "tab: employees" do
         before do
           benefit_sponsorship.save!
           allow(controller).to receive(:authorize).and_return(true)
           sign_in user
           get :show, id: benefit_sponsor.profiles.first.id, tab: 'employees'
+          allow(employer_profile).to receive(:active_benefit_sponsorship).and_return benefit_sponsorship
+        end
+
+        it "should render show template" do
+          expect(response).to render_template("show")
+        end
+
+        it "should return http success" do
+          expect(response).to have_http_status(:success)
+        end
+      end
+
+      context "tab: accounts" do
+        before do
+          benefit_sponsorship.save!
+          allow(controller).to receive(:authorize).and_return(true)
+          sign_in user
+          get :show, id: benefit_sponsor.profiles.first.id, tab: 'accounts'
           allow(employer_profile).to receive(:active_benefit_sponsorship).and_return benefit_sponsorship
         end
 

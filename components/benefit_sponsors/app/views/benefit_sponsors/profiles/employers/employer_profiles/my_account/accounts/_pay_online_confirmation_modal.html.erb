@@ -1,0 +1,24 @@
+<div class="modal pay-online-modal" id="payOnlineConfirmation_<%= @employer_profile.id %>" tabindex="-1" role="dialog" role="document">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+      <div class="modal-body">
+        <p>
+          <%= Settings.site.short_name %>’s on-line payment is powered by Wells Fargo E-Bill Express. By clicking this link, you will be subject to the terms of use found on that website.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <%= link_to '<button class="btn btn-default pay_online_confirmation pull-right left-margin">Pay Online</button>'.html_safe, @wf_url, target: :_blank %> <span class="btn btn-default btn-small" data-dismiss="modal">Cancel</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  var conf_id = '#payOnlineConfirmation_' + '<%= @employer_profile.id %>';
+  $('.pay_online_confirmation.btn').click(function() {
+    $(conf_id).modal('hide');
+  });
+</script>

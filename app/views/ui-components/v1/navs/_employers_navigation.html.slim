@@ -11,7 +11,10 @@ nav
     li
       = link_to 'Documents', benefit_sponsors.profiles_employers_employer_profile_path(profile.id, :tab=>'documents'), "aria-expanded" => "true"
     li
-      = link_to 'Billing', benefit_sponsors.profiles_employers_employer_profile_path(profile.id,:tab=>'billing'), "aria-expanded" => "true"
+      - if Settings.aca.autopay_enabled
+        = link_to 'Billing', benefit_sponsors.profiles_employers_employer_profile_path(profile.id,:tab=>'accounts'), "aria-expanded" => "true"
+      - else
+        = link_to 'Billing', benefit_sponsors.profiles_employers_employer_profile_path(profile.id,:tab=>'billing'), "aria-expanded" => "true"
     li
       = link_to(benefit_sponsors.profiles_employers_employer_profile_path(profile.id, :tab=>'inbox'), class: 'hidden-xs', "aria-expanded" => "true" ) do
         | Messages
