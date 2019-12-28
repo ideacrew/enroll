@@ -16,7 +16,7 @@ def process_enrollments(file_name, csv)
   begin
     CSV.foreach(file_name, headers: true, header_converters: :symbol).each do |row|
       row_hash = row.to_hash
-      enrollment = HbxEnrollment.by_hbx_id(row_hash[:enrollment_id]).first
+      enrollment = HbxEnrollment.by_hbx_id(row_hash[:hbx_enrollment_id]).first
       enrollment_effective_year = enrollment.effective_on.year
       enrollment_product_year = enrollment&.product.application_period.min.year
       profile = enrollment&.employer_profile
@@ -34,22 +34,21 @@ def process_enrollments(file_name, csv)
 
 
       unless row_hash[:hios_id].present?
-        csv << [row_hash[:enrollment_id], row_hash[:hios_id], enrollment.aasm_state, enrollment&.subscriber&.person.hbx_id, enrollment&.subscriber&.person.full_name, enrollment.coverage_kind, "enrollment not found in glue"]
+        csv << [row_hash[:hbx_enrollment_id], row_hash[:hios_id], enrollment.aasm_state, enrollment&.subscriber&.person.hbx_id, enrollment&.subscriber&.person.full_name, enrollment.coverage_kind, "enrollment not found in glue"]
         next
       end
 
       unless products.present?
-        csv << [row_hash[:enrollment_id], row_hash[:hios_id], enrollment.aasm_state, enrollment&.subscriber&.person.hbx_id, enrollment&.subscriber&.person.full_name, enrollment.coverage_kind, "No product present for the enrollment effective year"]
+        csv << [row_hash[:hbx_enrollment_id], row_hash[:hios_id], enrollment.aasm_state, enrollment&.subscriber&.person.hbx_id, enrollment&.subscriber&.person.full_name, enrollment.coverage_kind, "No product present for the enrollment effective year"]
         next
       end
 
       if products.count > 1
-        csv << [row_hash[:enrollment_id], row_hash[:hios_id], enrollment.aasm_state, enrollment&.subscriber&.person.hbx_id, enrollment&.subscriber&.person.full_name, enrollment.coverage_kind, "Multiple products present for the enrollment effective year"]
+        csv << [row_hash[:hbx_enrollment_id], row_hash[:hios_id], enrollment.aasm_state, enrollment&.subscriber&.person.hbx_id, enrollment&.subscriber&.person.full_name, enrollment.coverage_kind, "Multiple products present for the enrollment effective year"]
         next
       end
 
       if is_employer_sponsored_product(sponsored_product_ids, products) && is_different_effective_on(enrollment_effective_year, enrollment_product_year)
-        puts "Hbx id #{person_hbx_id} - updating the enrollment with correct product..... #{enrollment.hbx_id}"
         enrollment.update_attributes!(product_id: products.first.id)
         puts "Hbx id #{person_hbx_id} - assigned enrollment with correct product for enrollment #{enrollment.hbx_id} "
         next
@@ -65,7 +64,7 @@ def process_enrollments(file_name, csv)
         enrollment.update_attributes!(sponsored_benefit_package_id: benefit_package.id, sponsored_benefit_id: sponsored_benefit.id, rating_area_id: benefit_package.recorded_rating_area.id, benefit_sponsorship_id: benefit_package.benefit_sponsorship.id)
         puts "Hbx id #{person_hbx_id}  - assigned enrollment with correct sponsored benefit for enrollment #{enrollment.hbx_id}"
       else
-        csv << [row_hash[:enrollment_id], row_hash[:hios_id], enrollment.aasm_state, enrollment&.subscriber&.person.hbx_id, enrollment&.subscriber&.person.full_name, enrollment.coverage_kind, "No benefit packages present"]
+        csv << [row_hash[:hbx_enrollment_id], row_hash[:hios_id], enrollment.aasm_state, enrollment&.subscriber&.person.hbx_id, enrollment&.subscriber&.person.full_name, enrollment.coverage_kind, "No benefit packages present"]
       end
     end
   rescue Exception => e
