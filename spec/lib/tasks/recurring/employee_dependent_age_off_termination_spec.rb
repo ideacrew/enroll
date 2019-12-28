@@ -57,6 +57,7 @@ describe 'recurring:employee_dependent_age_off_termination', :dbclean => :after_
       allow(TimeKeeper).to receive(:date_of_record).and_return TimeKeeper.date_of_record.next_month.beginning_of_month
       expect_any_instance_of(BenefitSponsors::Observers::NoticeObserver).to receive(:deliver)
       person.employee_roles.first.update_attributes(census_employee_id: census_employee.id)
+      Rake::Task["recurring:dependent_age_off_termination_notification_manual"].reenable
       Rake::Task["recurring:dependent_age_off_termination_notification_manual"].invoke(person.hbx_id)
     end
   end
