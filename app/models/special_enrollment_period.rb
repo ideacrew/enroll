@@ -166,7 +166,8 @@ class SpecialEnrollmentPeriod
     family.special_enrollment_periods.detect() { |sep| sep._id == id } unless family.blank?
   end
 
-private
+  private
+
   def next_poss_effective_date_within_range
     return if next_poss_effective_date.blank?
     return true unless is_shop_or_fehb? && family.has_primary_active_employee?
@@ -285,19 +286,20 @@ private
     end
   end
 
-
   ## TODO - Validation for SHOP, EE SEP cannot be granted unless effective_on >= initial coverage effective on, except for
   ## HBX_Admin override
-
-
   def is_eligible?
     return true unless is_active?
     return true unless is_shop_or_fehb?
 
     person = family.primary_applicant.person
-    person.active_employee_roles.any? do |employee_role|
-      eligible_date = employee_role.census_employee.earliest_eligible_date
-      eligible_date <= TimeKeeper.date_of_record
+    if person.active_employee_roles.any?
+      person.active_employee_roles.each do |employee_role|
+        eligible_date = employee_role&.census_employee&.earliest_eligible_date
+        if eligible_date.present?
+          eligible_date <= TimeKeeper.date_of_record
+        end
+      end
     end
   end
 
