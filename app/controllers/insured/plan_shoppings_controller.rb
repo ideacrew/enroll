@@ -213,6 +213,12 @@ class Insured::PlanShoppingsController < ApplicationController
       show_shop(hbx_enrollment_id)
     elsif params[:market_kind] == 'individual' || params[:market_kind] == 'coverall'
       show_ivl(hbx_enrollment_id)
+    else
+      if @hbx_enrollment.is_ivl_by_kind?
+        show_ivl(hbx_enrollment_id)
+      else
+        show_shop(hbx_enrollment_id)
+      end
     end
   end
 
