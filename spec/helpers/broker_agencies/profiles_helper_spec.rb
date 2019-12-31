@@ -25,7 +25,7 @@ RSpec.describe BrokerAgencies::ProfilesHelper, dbclean: :after_each, :type => :h
 
   describe 'can_show_destroy?' do
     context "total broker staff count" do
-      it "should return false if single broker staff member remains" do
+      it "should return false if single staff member remains" do
         expect(helper.can_show_destroy?(user, person, 1)).to be_falsey
       end
     end
