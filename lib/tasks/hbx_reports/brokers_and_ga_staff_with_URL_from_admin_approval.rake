@@ -26,12 +26,17 @@ namespace :reports do
       broker_processed_count = 0
       general_agency_processed_count = 0
 
-      file_name = fetch_file_format(
-        'brokers_and_ga_staff_list_with_URL_from_admin_approval',
+      br_file_name = fetch_file_format(
+        'brokers_list_with_URL_from_admin_approval',
         'BROKERSANDGASTAFFLISTWITHURLFROMADMINAPPROVAL'
       )
 
-      CSV.open(file_name, "w", force_quotes: true) do |csv|
+      ga_file_name = fetch_file_format(
+        'ga_staff_list_with_URL_from_admin_approval',
+        'BROKERSANDGASTAFFLISTWITHURLFROMADMINAPPROVAL'
+      )
+
+      CSV.open(br_file_name, "w", force_quotes: true) do |csv|
         csv << broker_agency_field_names + shared_field_names
         broker_invitations.each do |invitation|
           broker = BrokerRole.find(invitation.source_id.to_s)
@@ -47,17 +52,20 @@ namespace :reports do
             broker_processed_count += 1
           end
         end
+      end
+
+      CSV.open(ga_file_name, "w", force_quotes: true) do |csv|
         csv << general_agency_field_names + shared_field_names
         general_agency_invitations.each do |invitation|
           ga_staff_role = GeneralAgencyStaffRole.find(invitation.source_id.to_s)
           if ga_staff_role.present?
             csv << [
-              ga_staff_role&.general_agency_profile&.legal_name,
-              ga_staff_role.person.first_name,
-              ga_staff_role.person.last_name,
-              ga_staff_role.email_address,
-              invitation.created_at,
-              "http://enroll.dchealthlink.com/invitations/#{invitation.id}/claim"
+                ga_staff_role&.general_agency_profile&.legal_name,
+                ga_staff_role.person.first_name,
+                ga_staff_role.person.last_name,
+                ga_staff_role.email_address,
+                invitation.created_at,
+            "http://enroll.dchealthlink.com/invitations/#{invitation.id}/claim"
             ]
             general_agency_processed_count += 1
           end
@@ -66,11 +74,12 @@ namespace :reports do
 
       if Rails.env.production?
         pubber = Publishers::Legacy::ShopBrokersWithAdminUrlReportPublisher.new
-        pubber.publish URI.join("file://", file_name)
+        pubber.publish URI.join("file://", br_file_name)
+        pubber.publish URI.join("file://", ga_file_name)
       end
 
-      puts "#{broker_processed_count} Brokers to output file: #{file_name}."
-      puts "#{general_agency_processed_count} General Agency Staff to output file: #{file_name}."
+      puts "#{broker_processed_count} Brokers to output file: #{br_file_name}."
+      puts "#{general_agency_processed_count} General Agency Staff to output file: #{ga_file_name}."
     end
   end
 end
