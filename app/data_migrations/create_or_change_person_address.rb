@@ -42,8 +42,8 @@ class CreateOrChangePersonAddress < MongoidMigrationTask
         puts "The address has been set to: #{address_1}, #{city}, #{zip}." unless Rails.env.test?
       else # Create New Address
         puts "No address matching parameters present. Creating new one." unless Rails.env.test?
-        person.addresses.build(kind: kind, address_1: address_1, city: city, zip: zip, state: state_code)
-        person.addresses.last.save!
+        address = person.addresses.build(kind: kind, address_1: address_1, city: city, zip: zip, state: state_code)
+        address.save!
         person.save!
         puts "The address has been set to: #{address_1}, #{city}, #{zip}." unless Rails.env.test?
       end
