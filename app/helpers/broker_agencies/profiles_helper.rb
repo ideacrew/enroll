@@ -29,11 +29,7 @@ module BrokerAgencies::ProfilesHelper
     # Destroy button will always be shown to broker staff member OR
     # broker staff member with broker role OR
     # general agency primary staff
-    [
-      current_user.person == broker_staff_member,
-      broker_staff_member.broker_role.present?,
-      broker_staff_member.general_agency_primary_staff.present?
-    ].any?
+    current_user.person == broker_staff_member || broker_staff_member.broker_role.present? || broker_staff_member.general_agency_primary_staff.present?
   end
 
   def disable_edit_broker_agency?(user)
