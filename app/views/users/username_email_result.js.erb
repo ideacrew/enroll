@@ -1,0 +1,12 @@
+var $containing_row = $("#user_action_<%= @user.id %>").closest('TR');
+if ( $('tr.child-row:visible').length > 0 ) {
+    $('tr.child-row:visible').remove();
+    $("li>a:contains('Collapse Form')").addClass('disabled');
+}
+if ( $containing_row.next().hasClass('child-row') ) {
+} else {
+    $containing_row.after('<tr class="child-row"><td colspan="100"><%= j render partial: "users/username_email_result", locals: {user: @user} %></td></tr>');
+    $("li>a:contains('Collapse Form')").eq($containing_row.index()).removeClass('disabled');
+    $('.dropdown.pull-right').removeClass('open');
+}
+

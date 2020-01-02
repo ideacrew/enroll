@@ -135,6 +135,15 @@ class User
     end
   end
 
+  def has_tier3_subrole?
+    hbx_staff_role = self.try(:person).try(:hbx_staff_role)
+    if hbx_staff_role.present? && hbx_staff_role.subrole == "hbx_tier3"
+      true
+    else
+      false
+    end
+  end
+
   def is_active_broker?(employer_profile)
     person == employer_profile.active_broker if employer_profile.active_broker
   end
