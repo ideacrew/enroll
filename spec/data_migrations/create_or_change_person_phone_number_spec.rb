@@ -3,7 +3,7 @@ require File.join(Rails.root, "app", "data_migrations", "create_or_change_person
 
 describe CreateOrChangePersonPhoneNumber do
 
-  let(:given_task_name) { "change_person_phone_number" }
+  let(:given_task_name) { "create_or_change_person_phone_number" }
   subject { CreateOrChangePersonPhoneNumber.new(given_task_name, double(:current_scope => nil)) }
 
   describe "given a task name" do
