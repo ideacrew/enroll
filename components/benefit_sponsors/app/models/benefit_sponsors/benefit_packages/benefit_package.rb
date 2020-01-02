@@ -329,9 +329,9 @@ module BenefitSponsors
         activate_benefit_group_assignments if predecessor_application.present?
 
         enrolled_families.no_timeout.each do |family|
-          enrollments = HbxEnrollment.by_benefit_package(benefit_package).where(family_id: family.id).show_enrollments_sans_canceled
+          enrollments = HbxEnrollment.by_benefit_package(self).where(family_id: family.id).show_enrollments_sans_canceled
 
-          benefit_package.sponsored_benefits.each do |sponsored_benefit|
+          sponsored_benefits.each do |sponsored_benefit|
             hbx_enrollment = enrollments.by_coverage_kind(sponsored_benefit.product_kind).first
             hbx_enrollment.begin_coverage! if hbx_enrollment && hbx_enrollment.may_begin_coverage?
           end
