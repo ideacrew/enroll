@@ -21,6 +21,8 @@ CSV.foreach(file_1,:headers =>true).each do |d|
   end
 end
 
+@primary_people_hbx_ids = []
+
 field_names = %w(
         primary_hbx_id
         primary_first_name
@@ -64,6 +66,8 @@ CSV.open(file_2, "w", force_quotes: true) do |csv|
         #Reject if aasm_state is CANCELED and also reject if market kind is SHOP
         if (enrollment_aasm_states.count > 1 || ( enrollment_aasm_states.count == 1 && enrollment_aasm_states.first != "canceled")) && !(enrollment_market_kinds.include? false)
           person = @family.primary_person
+          primary_hbx_id = person.hbx_id
+          next if @primary_people_hbx_ids.include?(primary_hbx_id)
           consumer_role = person.consumer_role if person.present?
           if person.present? && consumer_role.present?
             begin
@@ -76,13 +80,14 @@ CSV.open(file_2, "w", force_quotes: true) do |csv|
               builder.deliver
 
               csv << [
-                person.hbx_id,
+                primary_hbx_id,
                 person.first_name,
                 person.last_name
               ]
-              puts "CAT Notice is sent to primary person with hbx_id: #{person.hbx_id}" unless Rails.env.test?
+              @primary_people_hbx_ids << primary_hbx_id
+              puts "CAT Notice is sent to primary person with hbx_id: #{primary_hbx_id}" unless Rails.env.test?
             rescue Exception => e
-              puts "Unable to deliver to #{person.hbx_id} for the following error #{e.backtrace}" unless Rails.env.test?
+              puts "Unable to deliver to #{primary_hbx_id} for the following error #{e.backtrace}" unless Rails.env.test?
             end
           else
             puts "No Person or No consumer role exists for hbx_id: #{person_hbx_id}" unless Rails.env.test?
