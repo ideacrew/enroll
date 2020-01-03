@@ -59,7 +59,7 @@ CSV.open(file_2, "w", force_quotes: true) do |csv|
         #To verify the aasm state
         enrollment_aasm_states = enrollments_by_family.inject([]) do |states, enrollment|
                                    states << enrollment["State"]
-                                 end.uniq!
+                                 end.uniq
 
         #Reject if aasm_state is CANCELED and also reject if market kind is SHOP
         if (enrollment_aasm_states.count > 1 || ( enrollment_aasm_states.count == 1 && enrollment_aasm_states.first != "canceled")) && !(enrollment_market_kinds.include? false)
