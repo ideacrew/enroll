@@ -57,7 +57,7 @@ CSV.open(file_2, "w", force_quotes: true) do |csv|
                                   end
 
         #To verify the aasm state
-        enrollment_aasm_states = enrollments_by_family.inject({}) do |states, enrollment|
+        enrollment_aasm_states = enrollments_by_family.inject([]) do |states, enrollment|
                                    states << enrollment["State"]
                                  end.uniq!
 
@@ -90,7 +90,7 @@ CSV.open(file_2, "w", force_quotes: true) do |csv|
         end
       end
     rescue => error
-      puts error.backtrace unless Rails.env.test?
+      puts "Message: #{error.message}, trace: #{error.backtrace}" unless Rails.env.test?
     end
   end
 end
