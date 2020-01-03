@@ -23,7 +23,7 @@ module BenefitSponsors
 
     context 'for a user with ER role' do
       let(:user) { FactoryBot.create(:user, person: person) }
-      let(:er_staff_role) { FactoryBot.create(:employer_staff_role, benefit_sponsor_employer_profile_id: benefit_sponsorship.organization.employer_profile.id) }
+      let(:er_staff_role) { FactoryBot.create(:benefit_sponsor_employer_staff_role, benefit_sponsor_employer_profile_id: benefit_sponsorship.organization.employer_profile.id) }
 
       shared_examples_for "should not permit for invalid user" do |policy_type|
         it "should permit for active ER staff role" do
