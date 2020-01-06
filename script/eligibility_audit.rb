@@ -74,7 +74,7 @@ def version_in_window?(updated_at)
 end
 
 def calc_eligibility_for(cr, family, benefit_packages, ed)
-  effective_date = (ed < Date.new(2019,1,1)) ? Date.new(2019,1,1) : ed
+  effective_date = (ed < Date.new(2019,1,1)) ? Date.new(2019,1,1) : ed.to_date
   all_eligibilities = benefit_packages.map do |hbp|
     [
       hbp,
