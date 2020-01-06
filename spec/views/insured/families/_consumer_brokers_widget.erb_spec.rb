@@ -4,8 +4,8 @@ RSpec.describe '_consumer_brokers_widget.html.erb' do
 
   context 'insured home broker widget as consumer with primary family and broker agency accounts' do
     let!(:consumer_role) { FactoryBot.create(:consumer_role) }
-    let(:broker_agency_profile){FactoryBot.create(:broker_agency_profile)}
-    let(:broker_agency_account) {FactoryBot.create(:broker_agency_account,broker_agency_profile_id:broker_agency_profile.id)}
+    let(:broker_agency_profile){ FactoryBot.create(:broker_agency_profile) }
+    let(:broker_agency_account) { FactoryBot.create(:broker_agency_account, broker_agency_profile_id: broker_agency_profile.id) }
     let(:person) { consumer_role.person }
     let!(:family) do
       f = FactoryBot.build(:family)
@@ -17,12 +17,14 @@ RSpec.describe '_consumer_brokers_widget.html.erb' do
       f
     end
     let(:family_member) { family.family_members.last }
+    let(:writing_agent) { FactoryBot(:broker_role) }
 
     before :each do
       assign(:person, person)
       assign :family_members, [family_member]
-      allow(person).to receive_message_chain('primary_family.current_broker_agency').and_return(broker_agency_account)
-      allow(person).to receive_message_chain('primary_family.current_broker_agency.broker_agency_profile').and_return(broker_agency_profile)
+      allow(person).to receive(:primary_family).and_return(family)
+      allow(family).to receive(:current_broker_agency).and_return(broker_agency_account)
+      allow(person).to receive_message_chain('primary_family.current_broker_agency.present?').and_return(true)
       render 'insured/families/consumer_brokers_widget'
     end
 
@@ -33,13 +35,12 @@ RSpec.describe '_consumer_brokers_widget.html.erb' do
     it 'should display brokers email' do
       expect(rendered).to match("mailto")
     end
-
   end
 
   context 'insured home broker widget as consumer without broker agency accounts' do
     let!(:consumer_role) { FactoryBot.create(:consumer_role) }
-    let(:broker_agency_profile){FactoryBot.create(:broker_agency_profile)}
-    let(:broker_agency_account) {FactoryBot.create(:broker_agency_account,broker_agency_profile_id:broker_agency_profile.id)}
+    let(:broker_agency_profile){ FactoryBot.create(:broker_agency_profile) }
+    let(:broker_agency_account) { FactoryBot.create(:broker_agency_account, broker_agency_profile_id: broker_agency_profile.id) }
     let(:person) { consumer_role.person }
     let!(:family) do
       f = FactoryBot.build(:family)
@@ -51,11 +52,15 @@ RSpec.describe '_consumer_brokers_widget.html.erb' do
       f
     end
     let(:family_member) { family.family_members.last }
+    let(:writing_agent) { nil }
 
     before :each do
       assign(:person, person)
       assign :family_members, [family_member]
-      allow(person).to receive_message_chain('primary_family.current_broker_agency.present?').and_return(false)
+      allow(person).to receive(:primary_family).and_return(family)
+      allow(family).to receive(:current_broker_agency).and_return(nil)
+      #allow(person).to receive_message_chain('primary_family.current_broker_agency.present?').and_return(false)
+      #allow(person).to receive_message_chain('primary_family.current_broker_agency.writing_agent').and_return(writing_agent)
       render 'insured/families/consumer_brokers_widget'
     end
 

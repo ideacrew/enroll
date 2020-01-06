@@ -90,7 +90,7 @@ describe Forms::EmployeeCandidate, "asked to match a person" do
                                      :ssn => "123-45-6789",
                                      :first_name => "yo",
                                      :last_name => "guy",
-                                     :gender => "m",
+                                     :gender => "male",
                                      :user_id => 20,
                                      :is_applying_coverage => false
                                  })
@@ -156,7 +156,7 @@ describe "match a person in db" do
                                      :ssn => search_params.ssn,
                                      :first_name => search_param_name.first_name,
                                      :last_name => search_param_name.last_name,
-                                     :gender => "m",
+                                     :gender => "male",
                                      :user_id => 20,
                                      :is_applying_coverage => false
                                  })
@@ -193,6 +193,8 @@ describe "match a person in db" do
         db_person.save!
         allow(search_params).to receive(:ssn).and_return("517991234")
         expect(subject.match_person).to eq db_person
+        expect(subject.match_person.gender).not_to eq nil
+        expect(subject.match_person.ssn).not_to eq nil
       end
     end
   end

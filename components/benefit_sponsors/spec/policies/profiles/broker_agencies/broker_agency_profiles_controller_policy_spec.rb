@@ -88,7 +88,9 @@ module BenefitSponsors
     end
 
     context 'for a user with consumer role' do
-      let(:user) { FactoryBot.create(:user, :with_consumer_role) }
+      let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+      let(:user) { FactoryBot.create(:user, person: person) }
+
 
       shared_examples_for "should not permit for a user with consumer role" do |policy_type|
         it "should not permit" do

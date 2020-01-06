@@ -77,8 +77,14 @@ end
 
 And(/(.*) also has a health enrollment with primary person covered/) do |role|
   family = Family.all.first
-  qle = FactoryBot.create(:qualifying_life_event_kind,market_kind: @employee_role.present? ? "employer_sponsored" : "individual")
-  sep = FactoryBot.create(:special_enrollment_period, family: family, qualifying_life_event_kind_id: qle.id)
+  # qle = FactoryBot.create(:qualifying_life_event_kind,market_kind: @employee_role.present? ? "employer_sponsored" : "individual")
+  if ["consumer","Resident","user"].include? role
+    qle = FactoryBot.create :qualifying_life_event_kind, market_kind: "individual"
+    sep = FactoryBot.create :special_enrollment_period, qualifying_life_event_kind_id: qle.id, family: family
+  else
+    sep = FactoryBot.create :special_enrollment_period, family: family
+  end
+  sep.update_attributes!(effective_on: TimeKeeper.date_of_record.end_of_month)
   document = FactoryBot.build(:document, identifier: '525252')
   product = FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile, sbc_document: document)
   enrollment = FactoryBot.create(:hbx_enrollment, product: product,
@@ -270,14 +276,18 @@ Then(/(.*) should see primary person/) do |role|
   expect(page).to have_content "Coverage For:   #{primary.first_name}"
 end
 
-Then(/(.*) should see the enrollment with (.*) button/) do |_role, button_text|
-  expect(page).to have_content "#{(@current_effective_date || TimeKeeper.date_of_record).year} HEALTH COVERAGE"
-  expect(page).to have_link(button_text.titleize)
+Then(/(.*) should see the enrollment with make changes button/) do |role|
+  if role == "employee"
+    expect(page).to have_content "#{(@current_effective_date || TimeKeeper.date_of_record).year} HEALTH COVERAGE"
+  else
+    expect(page).to have_content "#{TimeKeeper.date_of_record.year} HEALTH COVERAGE"
+  end
+  expect(page).to have_link "Make Changes"
 end
 
 Then(/(.*) should see the dental enrollment with make changes button/) do |role|
   if role == "employee"
-    expect(page).to have_content "#{(current_effective_date || TimeKeeper.date_of_record).year} DENTAL COVERAGE"
+    expect(page).to have_content "#{(@current_effective_date || TimeKeeper.date_of_record).year} DENTAL COVERAGE"
   else
     expect(page).to have_content "#{TimeKeeper.date_of_record.year} DENTAL COVERAGE"
   end
