@@ -1,8 +1,8 @@
-# rails runner script/final_catastrophic_notice.rb <file_name>, Example: rails runner script/final_catastrophic_notice.rb cat_plans_glue_data_set.csv -e production
+# rails runner script/final_catastrophic_notice.rb <file_name>, Example: rails runner script/final_catastrophic_notice.rb catastrophic_plans_report_for_2019.csv -e production
 file_1 = ARGV[0]
 
 if !file_1.present?
-  puts "Please enter a valid file_name as an argument. Example: rails runner script/final_catastrophic_notice.rb cat_plans_glue_data_set.csv"
+  puts "Please enter a valid file_name as an argument. Example: rails runner script/final_catastrophic_notice.rb catastrophic_plans_report_for_2019.csv"
   exit
 end
 
