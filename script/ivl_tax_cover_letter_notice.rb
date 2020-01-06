@@ -16,7 +16,8 @@ begin
                                                                                       options: { is_an_aqhp_hbx_enrollment: true_or_false},
                                                                                       mpi_indicator: notice_trigger.mpi_indicator}.merge(notice_trigger.notice_trigger_element_group.notice_peferences))
     builder.deliver
-    puts "IVL_TAX AQHP pdf template(new) generated for person with hbx_id: #{person.hbx_id}, full_name: #{person.full_name}"
+    aqhp_or_uqhp = true_or_false ? 'AQHP' : 'UQHP'
+    puts "IVL_TAX #{aqhp_or_uqhp} pdf template(new) generated for person with hbx_id: #{person.hbx_id}, full_name: #{person.full_name}"
   end
 rescue Standard => e
   puts "Error message: #{e.message}, backtrace: #{e.backtrace}"
