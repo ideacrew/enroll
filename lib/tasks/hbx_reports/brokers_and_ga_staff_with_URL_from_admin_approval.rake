@@ -8,11 +8,11 @@ namespace :reports do
     task :brokers_and_ga_staff_with_URL_from_admin_approval => :environment do
       include Config::AcaHelper
 
-      broker_invitations = Invitation.where(role: "broker_role").all
+      broker_invitations = Invitation.where(:role.in => ["broker_role","broker_agency_staff_role"])
       broker_agency_field_names  = %w(
         Broker_Agency_Legal_Name
       )
-      general_agency_invitations = Invitation.where(role: "general_agency_staff_role").all
+      general_agency_invitations = Invitation.where(role: "general_agency_staff_role")
       general_agency_field_names = %w(
         General_Agency_Legal_Name
       )
@@ -39,9 +39,8 @@ namespace :reports do
       CSV.open(br_file_name, "w", force_quotes: true) do |csv|
         csv << broker_agency_field_names + shared_field_names
         broker_invitations.each do |invitation|
-          broker_role = BrokerRole.find(invitation.source_id.to_s)
-          staff_role = BrokerAgencyStaffRole.find(invitation.source_id.to_s)
-          broker = broker_role || staff_role
+          broker = BrokerRole.find(invitation.source_id.to_s)
+          broker = BrokerAgencyStaffRole.find(invitation.source_id.to_s) if broker.blank?
           if broker.present?
             csv << [
               broker&.broker_agency_profile&.legal_name,
