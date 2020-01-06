@@ -5,8 +5,7 @@
 # Future Applicable locations: Plan Shopping Controller, APTC tool, Self Service.
 module Factories
   class EligibilityFactory
-
-    include ApplicationHelper
+    include FloatHelper
 
     def initialize(enrollment_id, selected_aptc = nil, product_ids = [], excluding_enrollment_id = nil)
       @enrollment = HbxEnrollment.where(id: enrollment_id.to_s).first
@@ -62,17 +61,6 @@ module Factories
     def set_applicable_aptc_attrs(selected_aptc, product_ids)
       @selected_aptc = selected_aptc
       @product_ids = product_ids
-    end
-
-    def ehb_premium(product_id)
-      product = ::BenefitMarkets::Products::Product.find(product_id)
-      premium_amount = fetch_total_premium(product)
-      round_down_float_two_decimals(premium_amount * product.ehb)
-    end
-
-    def fetch_total_premium(product)
-      cost_decorator = @enrollment.ivl_decorated_hbx_enrollment(product)
-      cost_decorator.total_premium
     end
 
     def total_ehb_premium(product_id)

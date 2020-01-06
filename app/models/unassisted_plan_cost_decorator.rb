@@ -1,5 +1,5 @@
 class UnassistedPlanCostDecorator < SimpleDelegator
-  include ApplicationHelper
+  include FloatHelper
 
   attr_reader :hbx_enrollment
   attr_reader :elected_aptc

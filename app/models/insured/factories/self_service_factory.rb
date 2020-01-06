@@ -4,7 +4,7 @@ module Insured
   module Factories
     class SelfServiceFactory
       attr_accessor :document_id, :enrollment_id, :family_id, :product_id, :qle_id, :sep_id
-      extend ::ApplicationHelper
+      extend ::FloatHelper
       extend Acapi::Notifiers
 
       def initialize(args)

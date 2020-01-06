@@ -83,8 +83,7 @@ $(document).on("ready ajax:success", function() {
     $('#aptc_applied_total').val("$" + aptc_total_cash_amount_to_apply);
     // Show dollar amount of Tax Credit value
     var new_premium = (total_premium - aptc_total_cash_amount_to_apply);
-    debugger;
-    $('#new-premium').html(toFixedTrunc(new_premium.toFixed(4)));
+    $('#new-premium').html(toFixedTrunc(new_premium.toFixed(8)));
   }
 
 });
