@@ -39,7 +39,9 @@ namespace :reports do
       CSV.open(br_file_name, "w", force_quotes: true) do |csv|
         csv << broker_agency_field_names + shared_field_names
         broker_invitations.each do |invitation|
-          broker = BrokerRole.find(invitation.source_id.to_s)
+          broker_role = BrokerRole.find(invitation.source_id.to_s)
+          staff_role = BrokerAgencyStaffRole.find(invitation.source_id.to_s)
+          broker = broker_role || staff_role
           if broker.present?
             csv << [
               broker&.broker_agency_profile&.legal_name,
