@@ -844,7 +844,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
           end
 
           it "terminates previous enrollments if both effective on in the future" do
-            hbx_enrollment1.update_attributes!(effective_on: date + 10.days)
+            hbx_enrollment1.update_attributes!(effective_on: date + 1.days)
             hbx_enrollment2.update_attributes!(effective_on: date + 20.days)
             eff_date = hbx_enrollment1.effective_on
             product1.update_attributes(application_period: eff_date.beginning_of_year..eff_date.end_of_year)

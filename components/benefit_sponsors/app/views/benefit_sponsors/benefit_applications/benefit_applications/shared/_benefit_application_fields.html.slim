@@ -18,8 +18,8 @@ h1.heading-text Add Benefit Package
         b.pl-1 You can't edit this date.
         |  To select a new effective date, go to '#{link_to('Benefits', benefit_sponsors.profiles_employers_employer_profile_path(f.object.sponsor_profile_id, :tab=>'benefits'), 'aria-expanded' => 'true')}' and create a new plan year
   .col-md-12.p0
-    - benefit_application_start_dates = f.object.start_on_options.keys
     - formatted_start_on = f.object.start_on.present? ? Date.strptime(f.object.start_on, "%m/%d/%Y") : nil
+    - benefit_application_start_dates = formatted_start_on.nil? ? f.object.start_on_options.keys : (f.object.start_on_options.keys + [formatted_start_on])
     .row.row-form-wrapper#uic-wrapper
       .col-md-6.col-sm-12
         = f.hidden_field :benefit_sponsorship_id

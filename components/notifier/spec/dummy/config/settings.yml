@@ -21,12 +21,12 @@ site:
   health_care_website_url: "https://www.healthcare.gov"
   short_name: "DC Health Link"
   byline: "Welcome to the District's Health Insurance Marketplace"
-  long_name: ""
+  long_name: "District of Columbia Health Link"
   header_message: "Welcome to the District's Health Insurance Marketplace"
   logo_file_name: "logo.png"
   make_their_premium_payments_online: "https://www.e-billexpress.com/ebpp/DCHEALTHPAY/"
   tab_icon: 'favicon.ico'
-  mailer_logo_file_name: "dc_health.png"
+  mailer_logo_file_name: "dchealthlink.jpg"
   employer_application_deadline_link: "https://dchealthlink.com/smallbusiness/employer-coverage-deadlines"
   s3_prefix: "dchbx"
   broker_quoting_enabled: false
@@ -168,15 +168,15 @@ aca:
     with_in_sixty_days: 60
   #
   individual_market:
-    monthly_enrollment_due_on: 15
+    monthly_enrollment_due_on: 18
     verification_outstanding_window:
       days: 0
     verification_due:
       days: 95
 
     open_enrollment:
-      start_on: <%= Date.new(2018,11,1) %>
-      end_on: <%= Date.new(2019,01,31) %>
+      start_on: <%= Date.new(2019,11,1) %>
+      end_on: <%= Date.new(2020,01,31) %>
     dc_resident_application: true
     transition_family_members_link: true
       # dc_resident_application: true
@@ -198,6 +198,10 @@ aca:
     new_employee_paper_application: true
     census_employees_template_file: 'DCHL Employee Census'
     coverage_start_period: "2 months"
+    auto_cancel_ineligible: false
+
+    employee:
+      default_contact_method: 'Only Electronic communications'
 
     binder_payment_dates: [
       {"2019-01-01": '2018,12,12'},
@@ -212,7 +216,7 @@ aca:
       {"2019-10-01": '2019,9,12'},
       {"2019-11-01": '2019,10,15'},
       {"2019-12-01": '2019,11,13'},
-      {"2020-01-01": '2020,12,12'},
+      {"2020-01-01": '2019,12,13'},
       {"2020-02-01": '2020,1,14'},
       {"2020-03-01": '2020,2,12'},
       {"2020-04-01": '2020,3,12'},
@@ -239,6 +243,7 @@ aca:
     initial_application:
       publish_due_day_of_month: 5
       advertised_deadline_of_month: 1
+      non_binder_paid_notice_day_of_month: 16
       earliest_start_prior_to_effective_on:
         months: -3
         day_of_month: 0
@@ -248,7 +253,7 @@ aca:
       ineligible_period_after_application_denial:
         days: 90
       quiet_period:
-        month_offset: 0
+        month_offset: -1
         mday: 28
 
     renewal_application:
@@ -294,6 +299,7 @@ aca:
 
     transmit_scheduled_employers: true
     employer_transmission_day_of_month: 16
+    transmit_carrier_drop_events: true
 
     mid_month_benefit_application_terminations:
       voluntary: false
@@ -382,7 +388,7 @@ style:
   brand_primary: '#007bc4'
   primary_color:  '#007bc4'
   primary_notification: '#333333'
-  primary_panel: '#333333'
+  primary_panel: '#69A30D'
   primary_button: '#e72b2d'
   primary_button_color: '#286090'
   primary_button_disabled: '#337ab7'
