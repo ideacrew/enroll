@@ -5,7 +5,7 @@
         <th> Org Legal Name: </th>
         <td> <%= @organization.legal_name %> </td>
       </tr>
-      <% address = @organization.primary_office_location.address %>
+      <% address = @organization.employer_profile.primary_office_location.address %>
       <tr>
         <th> Address: </th>
         <td> <%= address.address_1 + ',' + address.address_2 %></td>
