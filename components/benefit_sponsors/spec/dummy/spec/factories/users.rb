@@ -25,4 +25,10 @@ FactoryBot.define do
   trait "general" do
     roles { ["general"] }
   end
+
+  trait :with_consumer_role do
+    after :create do |user|
+      FactoryBot.create :person, :with_consumer_role, :with_family, :with_active_consumer_role, :user => user
+    end
+  end
 end
