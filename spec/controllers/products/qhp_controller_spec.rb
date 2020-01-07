@@ -72,7 +72,6 @@ RSpec.describe Products::QhpController, :type => :controller, dbclean: :around_e
   )}
 
   context "GET comparison", :dbclean => :around_each do
-
     it "should return comparison of multiple plans" do
       sign_in(user)      
       get :comparison, params: {standard_component_ids: ["11111111111111-01", "11111111111111-02"], hbx_enrollment_id: shop_health_enrollment.id, active_year: shop_health_enrollment.effective_on.year, market_kind: "shop", coverage_kind: "health"}      
@@ -81,13 +80,14 @@ RSpec.describe Products::QhpController, :type => :controller, dbclean: :around_e
   end
 
   context "GET summary", :dbclean => :around_each do
-
     let(:qhp_cost_share_variance){ double("QhpCostShareVariance", :hios_plan_and_variant_id => "id") }
     let(:product) { double("Product") }
     let(:qhp_cost_share_variances) { [qhp_cost_share_variance] }
 
     before do
       allow(Products::QhpCostShareVariance).to receive(:find_qhp_cost_share_variances).and_return(qhp_cost_share_variances)
+      allow(qhp_cost_share_variance).to receive(:plan).and_return(nil)
+      allow(qhp_cost_share_variance).to receive(:product).and_return(double('Product'))
     end
 
     it "should return summary of a plan for shop and coverage_kind as health" do
@@ -116,6 +116,19 @@ RSpec.describe Products::QhpController, :type => :controller, dbclean: :around_e
       expect(response).to have_http_status(:success)
       expect(assigns(:market_kind)).to eq "aca_shop"
       expect(assigns(:coverage_kind)).to eq "dental"
+    end
+
+    context 'when qhp product is not present' do
+      before do
+        allow(qhp_cost_share_variance).to receive(:plan).and_return(nil)
+        allow(qhp_cost_share_variance).to receive(:product_for).with("aca_shop").and_return(product)
+        sign_in(user)
+        get :summary, params: {standard_component_id: "11111100001111-01", hbx_enrollment_id: shop_health_enrollment.id, active_year: shop_health_enrollment.effective_on.year, market_kind: "shop", coverage_kind: "health"}
+      end
+
+      it 'defers to qhp product when plan is unavailable' do
+        expect(assigns(:plan)).to eql(qhp_cost_share_variance.product)
+      end
     end
 
     # if individual_market_is_enabled?
