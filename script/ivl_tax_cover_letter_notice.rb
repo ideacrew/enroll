@@ -19,6 +19,6 @@ begin
     aqhp_or_uqhp = true_or_false ? 'AQHP' : 'UQHP'
     puts "IVL_TAX #{aqhp_or_uqhp} pdf template(new) generated for person with hbx_id: #{person.hbx_id}, full_name: #{person.full_name}"
   end
-rescue Standard => e
+rescue StandardError => e
   puts "Error message: #{e.message}, backtrace: #{e.backtrace}"
 end
