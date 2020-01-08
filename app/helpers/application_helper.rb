@@ -1,4 +1,5 @@
 module ApplicationHelper
+  include FloatHelper
 
   def can_employee_shop?(date)
     return false if date.blank?

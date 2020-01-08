@@ -4,7 +4,6 @@ class FamilyMember
   include Mongoid::Timestamps
   include MongoidSupport::AssociationProxies
   include ApplicationHelper
-  include FloatHelper
 
   embedded_in :family
 

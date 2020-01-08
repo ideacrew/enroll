@@ -8,7 +8,6 @@ class TaxHousehold
   include Acapi::Notifiers
   include Mongoid::Autoinc
   include ApplicationHelper
-  include FloatHelper
 
   # A set of applicants, grouped according to IRS and ACA rules, who are considered a single unit
   # when determining eligibility for Insurance Assistance and Medicaid
