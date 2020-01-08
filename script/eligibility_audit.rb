@@ -228,9 +228,7 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
       families.each do |fam|
         cr = pers.consumer_role
         if cr
-          if cr.person.blank?
-            cr.person = p_version
-          end
+          cr.person = p_version
           begin
             if auditable?(pers_record, p_version, person_updated_at, fam)
               eligible, eligibility_errors = calc_eligibility_for(cr, fam, health_benefit_packages, person_updated_at)
