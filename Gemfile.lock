@@ -48,6 +48,17 @@ GIT
       mime-types
       ox (~> 2.0)
 
+GIT
+  remote: https://github.com/prawnpdf/prawn.git
+  revision: 8028ca0cd2aae8c72df9fc4bf16388948423bcb2
+  ref: 8028ca0cd2
+  specs:
+    prawn (1.0.0.rc2)
+      afm
+      pdf-reader (~> 1.2)
+      ruby-rc4
+      ttfunk (~> 1.0.3)
+
 PATH
   remote: components/benefit_markets
   specs:
@@ -169,6 +180,7 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
+    Ascii85 (1.0.3)
     aasm (4.8.0)
     action_mailer_cache_delivery (0.3.7)
       actionmailer (>= 3.0)
@@ -220,6 +232,7 @@ GEM
       tzinfo (~> 1.1)
     addressable (2.6.0)
       public_suffix (>= 2.0.2, < 4.0)
+    afm (0.2.2)
     airbrussh (1.3.1)
       sshkit (>= 1.6.1, != 1.7.0)
     amq-protocol (1.9.2)
@@ -476,6 +489,7 @@ GEM
       html2haml (>= 1.0.1)
       railties (>= 5.1)
     hashdiff (0.4.0)
+    hashery (2.1.2)
     html2haml (2.2.0)
       erubis (~> 2.7.0)
       haml (>= 4.0, < 6)
@@ -601,14 +615,16 @@ GEM
       parallel
     parser (2.6.3.0)
       ast (~> 2.4.0)
-    pdf-core (0.7.0)
+    pdf-reader (1.4.1)
+      Ascii85 (~> 1.0.0)
+      afm (~> 0.2.1)
+      hashery (~> 2.0)
+      ruby-rc4
+      ttfunk
     poltergeist (1.18.1)
       capybara (>= 2.1, < 4)
       cliver (~> 0.3.1)
       websocket-driver (>= 0.2.0)
-    prawn (2.2.2)
-      pdf-core (~> 0.7.0)
-      ttfunk (~> 1.5)
     public_suffix (3.1.0)
     puma (3.12.1)
     pundit (2.0.1)
@@ -824,7 +840,7 @@ GEM
     thread_safe (0.3.6)
     tilt (2.0.9)
     timers (4.3.0)
-    ttfunk (1.6.1)
+    ttfunk (1.0.3)
     turbolinks (5.2.0)
       turbolinks-source (~> 5.2)
     turbolinks-source (5.2.0)
@@ -946,7 +962,7 @@ DEPENDENCIES
   overcommit (~> 0.47)
   parallel_tests (~> 2.26.2)
   poltergeist (~> 1.18.0)
-  prawn (~> 2.2.2)
+  prawn!
   puma (~> 3.11)
   pundit (~> 2.0)
   railroady (~> 1.5.3)

@@ -15,7 +15,7 @@ gem 'effective_datatables', path: './project_gems/effective_datatables-2.6.14'
 # gem 'jquery-datatables-rails', '3.4.0'config/initializers/effective_datatables.rb
 
 # Verify this gem git reference is necessary.  Otherwise point it to release level
-gem 'prawn', '~> 2.2.2'
+gem 'prawn', :git => 'https://github.com/prawnpdf/prawn.git', :ref => '8028ca0cd2'
 
 ## Fix this dependency -- bring into project
 # gem 'recurring_select', :git => 'https://github.com/brianweiner/recurring_select'
