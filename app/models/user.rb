@@ -145,8 +145,8 @@ class User
   end
 
   def has_tier3_subrole?
-    hbx_staff_role = self.try(:person).try(:hbx_staff_role)
-    if hbx_staff_role.present? && hbx_staff_role.subrole == "hbx_tier3"
+    hbx_staff_role = person && person.hbx_staff_role
+    if hbx_staff_role && hbx_staff_role.subrole == "hbx_tier3"
       true
     else
       false

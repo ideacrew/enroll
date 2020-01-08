@@ -145,7 +145,8 @@ class HbxProfilePolicy < ApplicationPolicy
   end
 
   def can_access_user_account_tab?
-    return @user.person.hbx_staff_role.permission.can_access_user_account_tab if (@user.person && @user.person.hbx_staff_role)
+    hbx_staff_role = @user.person && @user.person.hbx_staff_role
+    return hbx_staff_role.permission.can_access_user_account_tab if hbx_staff_role
     return false
   end
 
