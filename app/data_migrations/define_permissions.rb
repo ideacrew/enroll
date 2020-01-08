@@ -90,6 +90,12 @@ class DefinePermissions < MigrationTask
     Permission.hbx_tier3.update_attributes!(can_update_ssn: true)
   end
 
+  def hbx_admin_can_access_user_account_tab
+    Permission.hbx_staff.update_attributes!(can_access_user_account_tab: true)
+    Permission.super_admin.update_attributes!(can_access_user_account_tab: true)
+    Permission.hbx_tier3.update_attributes!(can_access_user_account_tab: true)
+  end
+
   def hbx_admin_can_complete_resident_application
     Permission.hbx_staff.update_attributes!(can_complete_resident_application: true)
     Permission.super_admin.update_attributes!(can_complete_resident_application: true)
@@ -112,10 +118,6 @@ class DefinePermissions < MigrationTask
     Permission.hbx_staff.update_attributes!(can_view_username_and_email: true)
     Permission.super_admin.update_attributes!(can_view_username_and_email: true)
     Permission.hbx_tier3.update_attributes!(can_view_username_and_email: true)
-    Permission.hbx_read_only.update_attributes!(can_view_username_and_email: true)
-    Permission.hbx_csr_supervisor.update_attributes!(can_view_username_and_email: true)
-    Permission.hbx_csr_tier2.update_attributes!(can_view_username_and_email: true)
-    Permission.hbx_csr_tier1.update_attributes!(can_view_username_and_email: true)
   end
 
   def hbx_admin_can_reset_password

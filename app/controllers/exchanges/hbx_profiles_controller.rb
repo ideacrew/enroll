@@ -300,6 +300,7 @@ def employer_poc
   end
 
   def user_account_index
+    authorize HbxProfile, :can_access_user_account_tab?
     @datatable = Effective::Datatables::UserAccountDatatable.new
   end
 
