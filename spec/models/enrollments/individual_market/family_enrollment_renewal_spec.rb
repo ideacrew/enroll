@@ -5,6 +5,7 @@ require "#{Rails.root}/spec/shared_contexts/enrollment.rb"
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
   RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :model, :dbclean => :after_each do
+    include FloatHelper
 
     let(:current_date) { Date.new(calender_year, 11, 1) }
 
@@ -335,7 +336,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           enr.save!
           expect(enr.kind).to eq subject.enrollment.kind
           renewel_enrollment = subject.assisted_enrollment(enr)
-          expect(renewel_enrollment.applied_aptc_amount.to_f).to eq((renewel_enrollment.total_premium * renewel_enrollment.product.ehb).round(2))
+          expect(renewel_enrollment.applied_aptc_amount.to_f).to eq(round_down_float_two_decimals(renewel_enrollment.total_premium * renewel_enrollment.product.ehb))
         end
 
         it "should append APTC values" do

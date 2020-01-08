@@ -5,8 +5,7 @@
 # Future Applicable locations: Plan Shopping Controller, APTC tool, Self Service.
 module Factories
   class EligibilityFactory
-
-    include ApplicationHelper
+    include FloatHelper
 
     def initialize(enrollment_id, selected_aptc = nil, product_ids = [], excluding_enrollment_id = nil)
       @enrollment = HbxEnrollment.where(id: enrollment_id.to_s).first
@@ -55,8 +54,7 @@ module Factories
       # We still consider AvailableAptc in this calculation because the
       # :applied_aptc(ElectedAptc) is given externally for Passive Renewals
       # and not calculated by the EA.
-
-      applicable_aptc = [@available_aptc, @selected_aptc, ehb_premium(product_id)].min
+      applicable_aptc = [@available_aptc, @selected_aptc, total_ehb_premium(product_id)].min
       { product_id => applicable_aptc }
     end
 
@@ -65,15 +63,10 @@ module Factories
       @product_ids = product_ids
     end
 
-    def ehb_premium(product_id)
+    def total_ehb_premium(product_id)
       product = ::BenefitMarkets::Products::Product.find(product_id)
-      premium_amount = fetch_total_premium(product)
-      round_down_float_two_decimals(premium_amount * product.ehb)
-    end
-
-    def fetch_total_premium(product)
       cost_decorator = @enrollment.ivl_decorated_hbx_enrollment(product)
-      cost_decorator.total_premium
+      cost_decorator.total_ehb_premium
     end
 
     def shopping_member_ids

@@ -5,6 +5,8 @@ require "#{Rails.root}/spec/shared_contexts/enrollment.rb"
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
   RSpec.describe "Enrollments::IndividualMarket::OpenEnrollmentBegin", type: :model do
+    include FloatHelper
+
     before do
       DatabaseCleaner.clean
     end
@@ -246,7 +248,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             family_assisted.active_household.reload
             enrollments = family_assisted.active_household.hbx_enrollments
             expect(enrollments.size).to eq 2
-            expect(enrollments[1].applied_aptc_amount.to_f).to eq((enrollments[1].total_premium * enrollments[1].product.ehb).round(2))
+            expect(enrollments[1].applied_aptc_amount.to_f).to eq(round_down_float_two_decimals(enrollments[1].total_premium * enrollments[1].product.ehb))
           end
 
           it "should generate renewal enrollment for unassisted family" do
