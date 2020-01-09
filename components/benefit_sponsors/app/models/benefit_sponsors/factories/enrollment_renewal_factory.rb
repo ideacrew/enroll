@@ -24,6 +24,10 @@ module BenefitSponsors
         @sponsored_benefit  = new_benefit_package.sponsored_benefit_for(@base_enrollment.coverage_kind)
         @new_effective_on   = new_benefit_package.start_on
 
+        sponsored_benefit_products = @sponsored_benefit.products(@new_effective_on)
+        renewal_product = @base_enrollment.product.renewal_product
+        raise "Product not offered in renewal application" unless sponsored_benefit_products.include?(renewal_product)
+
         @renewal_enrollment = BenefitSponsors::Enrollments::EnrollmentBuilder.build do |builder|
 
           builder.init_enrollment(@base_enrollment.household)
