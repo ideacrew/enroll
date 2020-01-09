@@ -197,6 +197,7 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
   ivl_people.no_timeout.each do |pers_record|
     person_versions = Versioning::VersionCollection.new(pers_record)
     person_versions.each do |p_v|
+      begin
       p_version = p_v.resolve_to_model
       person_updated_at = p_v.timestamp
       families = person_family_map[pers_record.id]
