@@ -7,6 +7,14 @@ module HistoryTrackerToRecord
     "destroy"  => 10
   }
 
+  def filtered_history_tracks
+    self.history_tracks.reject do |ht|
+      last_chain_name = ht.association_chain.last["name"]
+      ((ht.created_at.to_f - self.created_at.to_f).abs < 1.1) ||
+        ::Person::IVL_ELIGIBILITY_EXCLUDED_CHAINS.include?(last_chain_name)
+    end
+  end
+
   def reversed_history_tracks(ht_date)
     all_tracks = self.history_tracks.to_a.sort do |a,b|
       sort_history_tracks(a,b)
@@ -33,7 +41,6 @@ module HistoryTrackerToRecord
     # history_track.trackable will return consumer_role
     # if the consumer_role was modified. trackable_root
     # will return person for both
-    self.reload
     all_tracks = self.history_tracks.to_a.sort do |a,b|
       sort_history_tracks(a,b)
     end

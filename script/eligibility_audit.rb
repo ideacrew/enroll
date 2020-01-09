@@ -1,3 +1,5 @@
+require 'delegate'
+
 AUDIT_START_DATE = Date.new(2018,10,1)
 AUDIT_END_DATE = Date.new(2019,10,1)
 
@@ -193,35 +195,10 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
     "Denial Reasons"
   ]
   ivl_people.no_timeout.each do |pers_record|
-    pers_record.reload
-    clean_history_tracks = pers_record.history_tracks.reject do |ht|
-      last_chain_name = ht.association_chain.last["name"]
-      ((ht.created_at.to_f - pers_record.created_at.to_f).abs < 1.1) ||
-      Person::IVL_ELIGIBILITY_EXCLUDED_CHAINS.include?(last_chain_name)
-    end
-    person_versions = [pers_record] + pers_record.versions + clean_history_tracks
-    if pers_record.versions.empty? && pers_record.history_tracks.any?
-      person_versions = person_versions + [pers_record.created_at]
-    end
-    person_versions.each do |p_version|
-      begin
-      p_version, person_updated_at = if p_version.kind_of?(HistoryTracker)
-        if (p_version.created_at >= AUDIT_END_DATE) || (p_version.created_at < AUDIT_START_DATE)
-          next
-        end
-        # This will be a HistoryTracker
-        [pers_record.history_tracker_to_record(p_version.created_at), p_version.created_at]
-      elsif p_version.kind_of?(Date) || p_version.kind_of?(ActiveSupport::TimeWithZone)
-        if (p_version < AUDIT_START_DATE) || (p_version >= AUDIT_END_DATE)
-          next
-        end
-        [pers_record.history_tracker_to_record(p_version), p_version]
-      else
-        [p_version, p_version.updated_at]
-      end
-      if (person_updated_at < AUDIT_START_DATE) || (person_updated_at >= AUDIT_END_DATE)
-        next
-      end
+    person_versions = Versioning::VersionCollection.new(pers_record)
+    person_versions.each do |p_v|
+      p_version = p_v.resolve_to_model
+      person_updated_at = p_v.timestamp
       families = person_family_map[pers_record.id]
       # This "pers" variable will be the version that is appended to the CSV
       pers = p_version
@@ -268,7 +245,7 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
       rescue HistoryTrackerReversalError => htre
         STDERR.puts htre.inspect
         STDERR.flush
-        next  
+        next
       end
     end
     person_family_map.delete(pers_record.id)
