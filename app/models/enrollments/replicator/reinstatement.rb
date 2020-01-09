@@ -93,9 +93,8 @@ module Enrollments
 
       def build
         family = base_enrollment.family
-        reinstated_enrollment = family.active_household.hbx_enrollments.new
+        reinstated_enrollment = HbxEnrollment.new
         reinstated_enrollment.household = family.active_household
-
 
         reinstated_enrollment.effective_on = new_effective_date
         reinstated_enrollment.coverage_kind = base_enrollment.coverage_kind
