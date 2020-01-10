@@ -1,17 +1,11 @@
 require 'csv'
 
 #this report generate current IVL and SHOP enrollees from EnrollApp. 
-#This report would include SHOP, Congress and IVL, all subscribers and dependents, and for both medical and dental enrollment. 
-#The format should mirror the glue enrollment report extract where each covered life is shown in its own record, 
-#meaning a subscriber with 2 dependents would result in 3 records.
- 
- # The task to run is RAILS_ENV=production bundle exec rake reports:enrollapp_report
+# The task to run is RAILS_ENV=production bundle exec rake reports:enrollapp_report
 namespace :reports do
- 
   desc "List of ivl and shop enrollees from EnrollApp"
   task :enrollapp_report => :environment do
-
-  field_names  = %w(
+    field_names  = %w(
                     primary_person_hbx_id
                     person_hbx_id 
                     enrollment_hbx_id 
@@ -46,14 +40,9 @@ namespace :reports do
                     Employer_FEIN 
                     Employer_HBX_ID     
                     )
-     count = 0
-     file_name = "#{Rails.root}/public/enrollapp_enrollment_report.csv"
-
-    
-
+    file_name = "#{Rails.root}/public/enrollapp_enrollment_report.csv"
     CSV.open(file_name, "w", force_quotes: true) do |csv|
       csv << field_names
-
       HbxEnrollment.enrolled.each do |hbx|
         begin
           p=hbx.subscriber.person       
@@ -129,15 +118,12 @@ namespace :reports do
                           "NAN"
                         ]
                 end 
-                # count = count + 1
             end
-            puts "Primary_Person_hbx_id: #{primary_person.hbx_id}" unless Rails.env.test?
         rescue => e
           puts "Bad Family Record, error: #{e}" unless Rails.env.test?
         end
       end
       puts "End of the report" unless Rails.env.test?
     end
-    puts "Total number of enrollee listed  is #{count}"
   end
 end
