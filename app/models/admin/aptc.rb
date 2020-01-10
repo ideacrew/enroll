@@ -7,6 +7,7 @@ class Admin::Aptc < ApplicationController
   $months_array = Date::ABBR_MONTHNAMES.compact
 
   class << self
+    include FloatHelper
 
     def build_household_level_aptc_csr_data(year, family, hbxs=nil, max_aptc=nil, csr_percentage=nil, applied_aptc_array=nil,  member_ids=nil)
       max_aptc_vals             = build_max_aptc_values(year, family, max_aptc, hbxs)
@@ -302,18 +303,16 @@ class Admin::Aptc < ApplicationController
     def update_aptc_applied_for_enrollments(family, params, year)
       current_datetime = TimeKeeper.datetime_of_record
       enrollment_update_result = false
+
       # For every HbxEnrollment, if Applied APTC was updated, clone a new enrtollment with the new Applied APTC and make the current one inactive.
-      #family = Family.find(params[:person][:family_id])
-      max_aptc = family.active_household.latest_active_tax_household_with_year(year).latest_eligibility_determination.max_aptc.to_f
-      active_aptc_hbxs = family.active_household.hbx_enrollments_with_aptc_by_year(params[:year].to_i)
       params.each do |key, aptc_value|
         if key.include?('aptc_applied_')
+          max_aptc = family.active_household.latest_active_tax_household_with_year(year).latest_eligibility_determination.max_aptc.to_f
+
           # TODO enrollment duplication has to be refactored once Ram promotes reusable module to create HbxEnrollment copy
           hbx_id = key.sub("aptc_applied_", "")
           original_hbx = HbxEnrollment.find(hbx_id)
-          ehb_value = original_hbx.product.ehb
-          ehb_premium = "#{helpers.round_down_float_two_decimals(aptc_value.to_f * ehb_value)}".to_f
-          updated_aptc_value = ehb_premium
+          updated_aptc_value = aptc_to_apply(original_hbx, aptc_value.to_f)
           actual_aptc_value = original_hbx.applied_aptc_amount.to_f
           # Only create enrollments if the APTC values were updated.
           if actual_aptc_value != updated_aptc_value # TODO: check if the effective_on doesnt go to next year?????
@@ -360,7 +359,6 @@ class Admin::Aptc < ApplicationController
             # Reload and Select Coverage for new Enrollment. This ensures workflow transition is set
             duplicate_hbx.reload
             duplicate_hbx.select_coverage!
-
 
             # Cancel or Terminate Coverage.
             if original_hbx.may_terminate_coverage? && (duplicate_hbx.effective_on > original_hbx.effective_on)
@@ -454,6 +452,18 @@ class Admin::Aptc < ApplicationController
       end
 
       year_set.uniq
+    end
+
+    private
+
+    def aptc_to_apply(original_hbx, aptc_value)
+      ehb_value = original_hbx.product.ehb
+
+      total_ehb_premium = original_hbx.hbx_enrollment_members.reduce(0.00) do |sum, member|
+        (sum + round_down_float_two_decimals(original_hbx.premium_for(member) * ehb_value))
+      end
+
+      aptc_value < total_ehb_premium ? aptc_value : total_ehb_premium
     end
 
   end #  end of class << self
