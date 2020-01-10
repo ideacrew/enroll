@@ -68,7 +68,7 @@ def relationship_for(person, family)
   return "self" if (person.id == family.primary_applicant.person_id)
   from_rel = person.find_relationship_with(family.primary_applicant.person)
   return from_rel if !from_rel.blank?
-  family.primary_applicant.person.find_relationship_with(person)
+  "unrelated"
 end
 
 def version_in_window?(updated_at)
@@ -189,8 +189,10 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
     "Mailing City",
     "Mailing State",
     "Mailing Zip",
+    "No DC Address",
     "Residency Exemption Reason",
     "Is applying for coverage",
+    "Resident Role",
     "Eligible",
     "Denial Reasons"
   ]
@@ -231,8 +233,10 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
                   address_fields +
                   mailing_address_fields +
                   [
+                    pers.no_dc_address,
                     pers.no_dc_address ? pers.no_dc_address_reason : "",
                     cr.is_applying_coverage,
+                    pers.resident_role.present?,
                     eligible,
                     eligible ? "" : eligibility_errors
                 ])
