@@ -1279,6 +1279,7 @@ class HbxEnrollment
                          :effective_on.gte => self.terminated_on.next_day,
                          :coverage_kind => self.coverage_kind,
                          :employee_role_id => self.employee_role_id,
+                         :sponsored_benefit_id => sponsored_benefit_id,
                          :aasm_state.in => (ENROLLED_AND_RENEWAL_STATUSES + CAN_REINSTATE_AND_UPDATE_END_DATE)}).any?
   end
 
