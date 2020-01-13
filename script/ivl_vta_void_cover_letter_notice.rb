@@ -2,7 +2,7 @@
 
 # rails runner script/ivl_vta_void_cover_letter_notice.rb, Example: rails runner script/ivl_vta_void_cover_letter_notice.rb -e production
 begin
-  person = Person.by_hbx_id('eae9597c7e5743e39f87a470ab490f4d').first #Person.all_consumer_roles.first
+  person = Person.all_consumer_roles.first
   consumer_role = person.consumer_role
   event_name = 'ivl_vta_void_cover_letter_notice'
   event_kind = ApplicationEventKind.where(event_name: event_name).first
