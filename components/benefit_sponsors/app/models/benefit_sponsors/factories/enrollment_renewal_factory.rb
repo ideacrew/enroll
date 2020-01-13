@@ -55,7 +55,7 @@ module BenefitSponsors
 
       def has_renewal_product?
         renewal_product = @base_enrollment.product.renewal_product
-        raise "Product not offered in renewal application" unless @sponsored_benefit.products(@new_effective_on).include?(renewal_product)
+        @sponsored_benefit.products(@new_effective_on).include?(renewal_product)
       end
 
       def finalize_hbx_enrollment_members
