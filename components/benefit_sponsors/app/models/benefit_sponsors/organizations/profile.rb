@@ -8,6 +8,8 @@ module BenefitSponsors
       include Mongoid::Timestamps
       include ::BenefitSponsors::ModelEvents::Profile
 
+      require 'pry'
+
       embedded_in :organization,  class_name: "BenefitSponsors::Organizations::Organization"
 
       # Profile subclass may sponsor benefits
@@ -120,6 +122,101 @@ module BenefitSponsors
       def can_receive_electronic_communication?
         [:electronic_only, :paper_and_electronic].include?(contact_method)
       end
+
+      def get_census_data
+        columns = [
+          "Family ID # (to match family members to the EE & each household gets a unique number)(optional)",
+          "Relationship (EE, Spouse, Domestic Partner, or Child)",
+          "Last Name",
+          "First Name",
+          "Middle Name or Initial (optional)",
+          "Suffix (optional)",
+          "Email Address",
+          "SSN / TIN (Required for EE & enter without dashes)",
+          "Date of Birth (MM/DD/YYYY)",
+          "Gender",
+          "Date of Hire",
+          "Date of Termination (optional)",
+          "Is Business Owner?",
+          "Benefit Group (optional)",
+          "Plan Year (Optional)",
+          "Address Kind(Optional)",
+          "Address Line 1(Optional)",
+          "Address Line 2(Optional)",
+          "City(Optional)",
+          "State(Optional)",
+          "Zip(Optional)"
+        ]
+
+        CSV.generate(headers: true) do |csv|
+          csv << (["#{Settings.site.long_name} Employee Census Template"] +  6.times.collect{ "" } + [Date.new(2016,10,26)] + 5.times.collect{ "" } + ["1.1"])
+          csv << %w(employer_assigned_family_id employee_relationship last_name first_name  middle_name name_sfx  email ssn dob gender  hire_date termination_date  is_business_owner benefit_group plan_year kind  address_1 address_2 city  state zip)
+          csv << columns
+          get_census_employees.each do |rec|
+            census_employee = CensusEmployee.find(rec["_id"])
+            csv << push_census_data(census_employee, rec)
+
+            if rec["items"].present?
+              rec["items"].each do |rec|
+                census_dependent = CensusDependent.find(rec["_id"])
+                csv << push_census_data(census_dependent, rec)
+              end
+            end
+          end
+        end
+      end
+
+
+      def push_census_data(object, rec)
+        values = [
+          object.employer_assigned_family_id,
+          object.relationship_string,
+          rec["last_name"],
+          rec["first_name"],
+          rec["middle_name"],
+          rec["name_sfx"],
+          object.email_address,
+          object.ssn,
+          rec["dob"].strftime("%m/%d/%Y"),
+          rec["gender"]
+        ]
+
+        active_assignment = object&.active_benefit_group_assignment || object&.census_employee&.active_benefit_group_assignment
+        if active_assignment
+          if object.is_a?(CensusEmployee)
+            values += [
+              rec["hired_on"].present? ? rec["hired_on"].strftime("%m/%d/%Y") : "",
+              rec["employment_terminated_on"].present? ? rec["employment_terminated_on"].strftime("%m/%d/%Y") : "",
+              rec["is_business_owner"] ? "yes" : "no"
+            ]
+          else
+            values += ["", "", "no"]
+          end
+
+          values += 2.times.collect{ "" }
+          if object.address.present?
+            values += object.address.to_a
+          else
+            values += 6.times.collect{ "" }
+          end
+        end
+        values
+      end
+
+      def get_census_employees
+        CensusEmployee.collection.aggregate(
+          [
+            {'$match' => {
+              'benefit_sponsors_employer_profile_id' => self.id
+            }},
+            { "$project" => { "first_name" => 1, "last_name" => 1, "middle_name" => 1, "name_sfx" => 1,  "email_address" => 1, "ssn" => 1,
+                              "dob" => 1, "gender" => 1, "hired_on" => 1, "aasm_state" => 1, "employment_terminated_on" => 1, "is_business_owner" => 1,  "employer_assigned_family_id" => 1, "items" => { "$concatArrays" => ["$census_dependents"] } } },
+          ],
+          :allow_disk_use => true
+        )
+      end
+
+
 
       class << self
         def find(id)

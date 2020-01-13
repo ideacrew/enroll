@@ -15,4 +15,10 @@ class CensusDependent < CensusMember
               in: EMPLOYEE_RELATIONSHIP_KINDS,
               message: "'%{value}' is not a valid employee relationship"
             }
+
+  def self.find(census_dependent_id)
+    return [] if census_dependent_id.nil?
+    census_employee = CensusEmployee.where("census_dependents._id" => BSON::ObjectId.from_string(census_dependent_id)).first
+    census_employee.census_dependents.detect { |member| member._id.to_s == census_dependent_id.to_s } unless census_employee.blank?
+  end
 end
