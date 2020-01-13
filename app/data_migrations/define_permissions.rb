@@ -9,7 +9,7 @@ class DefinePermissions < MigrationTask
       .find_or_initialize_by(name: 'hbx_staff')
       .update_attributes!(modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
                           send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_update_ssn: false, can_complete_resident_application: false,
-                          can_add_sep: false, can_lock_unlock: true, can_view_username_and_email: false, can_reset_password: false, modify_admin_tabs: true,
+                          can_add_sep: false, can_lock_unlock: true, can_view_username_and_email: true, can_reset_password: false, modify_admin_tabs: true,
                           view_admin_tabs: true,  view_the_configuration_tab: true, can_submit_time_travel_request: false)
     Permission
       .find_or_initialize_by(name: 'hbx_read_only')
@@ -40,13 +40,13 @@ class DefinePermissions < MigrationTask
       .find_or_initialize_by(name: 'hbx_tier3')
       .update_attributes!(modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
                           send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_update_ssn: false, can_complete_resident_application: false,
-                          can_add_sep: false, can_lock_unlock: true, can_view_username_and_email: false, can_reset_password: false, modify_admin_tabs: true,
+                          can_add_sep: false, can_lock_unlock: true, can_view_username_and_email: true, can_reset_password: false, modify_admin_tabs: true,
                           view_admin_tabs: true,  view_the_configuration_tab: true, can_submit_time_travel_request: false)
     Permission
       .find_or_initialize_by(name: 'super_admin')
       .update_attributes!(modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
                           send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_update_ssn: false, can_complete_resident_application: false,
-                          can_add_sep: false, can_lock_unlock: true, can_view_username_and_email: false, can_reset_password: false, modify_admin_tabs: true,
+                          can_add_sep: false, can_lock_unlock: true, can_view_username_and_email: true, can_reset_password: false, modify_admin_tabs: true,
                           view_admin_tabs: true, can_extend_open_enrollment: true, view_the_configuration_tab: true, can_submit_time_travel_request: false)
       #puts 'Permissions Updated!'
   end

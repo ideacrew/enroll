@@ -64,10 +64,10 @@ describe DefinePermissions, dbclean: :after_each do
         expect(@hbx_staff_person.hbx_staff_role.permission.can_view_username_and_email).to be true
         expect(@super_admin.hbx_staff_role.permission.can_view_username_and_email).to be true
         expect(@hbx_tier3.hbx_staff_role.permission.can_view_username_and_email).to be true
-        expect(@hbx_read_only_person.hbx_staff_role.permission.can_view_username_and_email).to be true
-        expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_view_username_and_email).to be true
-        expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_view_username_and_email).to be true
-        expect(@hbx_csr_tier2_person.hbx_staff_role.permission.can_view_username_and_email).to be true
+        expect(@hbx_read_only_person.hbx_staff_role.permission.can_view_username_and_email).to be false
+        expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_view_username_and_email).to be false
+        expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_view_username_and_email).to be false
+        expect(@hbx_csr_tier2_person.hbx_staff_role.permission.can_view_username_and_email).to be false
         #verifying that the rake task updated only the correct subroles
         expect(Permission.developer.can_add_sep).to be false
       end
