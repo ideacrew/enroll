@@ -1,9 +1,7 @@
 class Employers::EmployerProfilesController < Employers::EmployersController
   include ::Config::AcaConcern
   include ApplicationHelper
-
-  require 'pry'
-
+  
   before_action :redirect_new_model, only: [:welcome, :index, :new, :show_profile, :edit, :generate_sic_tree, :create]
   before_action :redirect_show, only: [:show]
 

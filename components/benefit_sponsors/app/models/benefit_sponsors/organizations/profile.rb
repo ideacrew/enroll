@@ -8,8 +8,6 @@ module BenefitSponsors
       include Mongoid::Timestamps
       include ::BenefitSponsors::ModelEvents::Profile
 
-      require 'pry'
-
       embedded_in :organization,  class_name: "BenefitSponsors::Organizations::Organization"
 
       # Profile subclass may sponsor benefits
