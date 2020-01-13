@@ -67,17 +67,16 @@ describe UsersController do
   describe ".confirm_change_username_and_email", dbclean: :after_each do
     let(:person) { FactoryGirl.create(:person) }
     let(:user) { FactoryGirl.create(:user, :person => person) }
-    let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person)}
-    let(:hbx_profile) { FactoryGirl.create(:hbx_profile)}
     let(:invalid_username) { "ggg" }
     let(:valid_username) { "gariksubaric" }
     let(:invalid_email) { "email@" }
     let(:valid_email) { "email@email.com" }
 
     before do
+      allow(UserPolicy).to receive(:new).with(user, User).and_return(user_policy)
       allow(user_policy).to receive(:change_username_and_email?).and_return(true)
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
-      sign_in(admin)
+      sign_in(user)
     end
 
     context "email format wrong" do
