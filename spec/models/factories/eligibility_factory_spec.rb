@@ -375,7 +375,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
               @eligibility_factory = described_class.new(enrollment1.id, 150.00, [@product_id])
               @applicable_aptc = @eligibility_factory.fetch_applicable_aptcs
               @aptc_per_member = @eligibility_factory.fetch_aptc_per_member
-              @ehb_premium = @eligibility_factory.send(:ehb_premium, enrollment1.product.id)
+              @ehb_premium = @eligibility_factory.send(:total_ehb_premium, enrollment1.product.id)
             end
 
             context '.fetch_applicable_aptcs' do
@@ -496,17 +496,19 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
         end
       end
 
-      context 'for fetch_elected_aptc_per_member' do
-        context 'for two members enrollment' do
-          before :each do
-            @product_id = @product.id.to_s
-            allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) {|_id, _start, age| age * 1.0}
-            enrollment.update_attributes!(product_id: @product.id, aasm_state: 'coverage_selected', consumer_role_id: person.consumer_role.id)
-          end
+      context 'for two members enrollment' do
+        before :each do
+          @product_id = @product.id.to_s
+          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) {|_id, _start, age| age * 1.0}
+          enrollment.update_attributes!(product_id: @product.id, aasm_state: 'coverage_selected', consumer_role_id: person.consumer_role.id)
+        end
 
-          let!(:member2) {FactoryBot.create(:hbx_enrollment_member, is_subscriber: false, hbx_enrollment: enrollment, applicant_id: family_member2.id)}
-          let!(:enrollment) {FactoryBot.create(:hbx_enrollment, :individual_assisted, family: family, household: family.active_household)}
-          let!(:member1) {FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: enrollment, applicant_id: family_member.id)}
+        let(:current_date) {TimeKeeper.date_of_record.beginning_of_month}
+        let!(:member2) {FactoryBot.create(:hbx_enrollment_member, is_subscriber: false, hbx_enrollment: enrollment, applicant_id: family_member2.id, eligibility_date: current_date, coverage_start_on: current_date)}
+        let!(:enrollment) {FactoryBot.create(:hbx_enrollment, :individual_assisted, family: family, household: family.active_household, effective_on: current_date)}
+        let!(:member1) {FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: enrollment, applicant_id: family_member.id, eligibility_date: current_date, coverage_start_on: current_date)}
+
+        context 'for fetch_elected_aptc_per_member' do
 
           context '.fetch_elected_aptc_per_member' do
             it 'should return a Hash of members aptc' do
@@ -520,6 +522,16 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
             it 'should raise error for nil value' do
               eligibility_factory = described_class.new(enrollment.id, nil, [@product_id])
               expect {eligibility_factory.fetch_elected_aptc_per_member}.to raise_error(RuntimeError, /Cannot process without selected_aptc/)
+            end
+          end
+        end
+
+        context 'for fetch_max_aptc' do
+          context '.fetch_max_aptc' do
+            it 'should return max aptc' do
+              eligibility_factory = described_class.new(enrollment.id)
+              max_aptc = eligibility_factory.fetch_max_aptc
+              expect(max_aptc).to eq 500.0
             end
           end
         end
