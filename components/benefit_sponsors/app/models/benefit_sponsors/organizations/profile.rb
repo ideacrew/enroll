@@ -8,6 +8,7 @@ module BenefitSponsors
       include Mongoid::Timestamps
       include ::BenefitSponsors::ModelEvents::Profile
 
+
       embedded_in :organization,  class_name: "BenefitSponsors::Organizations::Organization"
 
       # Profile subclass may sponsor benefits
@@ -151,13 +152,11 @@ module BenefitSponsors
           csv << %w(employer_assigned_family_id employee_relationship last_name first_name  middle_name name_sfx  email ssn dob gender  hire_date termination_date  is_business_owner benefit_group plan_year kind  address_1 address_2 city  state zip)
           csv << columns
           get_census_employees.each do |rec|
-            census_employee = CensusEmployee.find(rec["_id"])
-            csv << push_census_data(census_employee, rec)
+            csv << push_census_data(rec)
 
             if rec["items"].present?
               rec["items"].each do |rec|
-                census_dependent = CensusDependent.find(rec["_id"])
-                csv << push_census_data(census_dependent, rec)
+                csv << push_census_data(rec)
               end
             end
           end
@@ -165,23 +164,20 @@ module BenefitSponsors
       end
 
 
-      def push_census_data(object, rec)
+      def push_census_data(rec)
         values = [
-          object.employer_assigned_family_id,
-          object.relationship_string,
+          nil,
+          relationship_mapping[rec["employee_relationship"]],
           rec["last_name"],
           rec["first_name"],
           rec["middle_name"],
           rec["name_sfx"],
-          object.email_address,
-          object.ssn,
+          rec["email"].present? ? rec["email"]["address"] : nil,
+          SymmetricEncryption.decrypt(rec["encrypted_ssn"]),
           rec["dob"].strftime("%m/%d/%Y"),
           rec["gender"]
         ]
-
-        active_assignment = object&.active_benefit_group_assignment || object&.census_employee&.active_benefit_group_assignment
-        if active_assignment
-          if object.is_a?(CensusEmployee)
+          if rec["hired_on"].present?
             values += [
               rec["hired_on"].present? ? rec["hired_on"].strftime("%m/%d/%Y") : "",
               rec["employment_terminated_on"].present? ? rec["employment_terminated_on"].strftime("%m/%d/%Y") : "",
@@ -192,26 +188,43 @@ module BenefitSponsors
           end
 
           values += 2.times.collect{ "" }
-          if object.address.present?
-            values += object.address.to_a
+          if rec["address"].present?
+            array = []
+            array.push(rec["address"]["kind"])
+            array.push(rec["address"]["address_1"])
+            array.push(rec["address"]["address_2"].to_s)
+            array.push(rec["address"]["city"])
+            array.push(rec["address"]["state"])
+            array.push(rec["address"]["zip"])
+            values += array
           else
             values += 6.times.collect{ "" }
           end
-        end
+
         values
+      end
+
+      def relationship_mapping
+        {
+          "self" => "employee",
+          "spouse" => "spouse",
+          "domestic_partner" => "domestic partner",
+          "child_under_26" => "child",
+          "disabled_child_26_and_over" => "disabled child"
+        }
       end
 
       def get_census_employees
         CensusEmployee.collection.aggregate(
           [
             {'$match' => {
-              'benefit_sponsors_employer_profile_id' => self.id
+              'benefit_sponsors_employer_profile_id' => self.id,
             }},
-            { "$project" => { "first_name" => 1, "last_name" => 1, "middle_name" => 1, "name_sfx" => 1,  "email_address" => 1, "ssn" => 1,
-                              "dob" => 1, "gender" => 1, "hired_on" => 1, "aasm_state" => 1, "employment_terminated_on" => 1, "is_business_owner" => 1,  "employer_assigned_family_id" => 1, "items" => { "$concatArrays" => ["$census_dependents"] } } },
+            { "$project" => { "first_name" => 1, "last_name" => 1, "middle_name" => 1, "name_sfx" => 1,
+                              "dob" => 1, "gender" => 1, "hired_on" => 1, "aasm_state" => 1, "encrypted_ssn" =>1, "employment_terminated_on" => 1, "email.address" => 1, "address" => 1, "employee_relationship" => 1,"is_business_owner" => 1,  "employer_assigned_family_id" => 1, "items" => { "$concatArrays" => ["$census_dependents", "$census_dependents.email", "$census_dependents.address"] } } },
           ],
           :allow_disk_use => true
-        )
+        ).to_a
       end
 
 
