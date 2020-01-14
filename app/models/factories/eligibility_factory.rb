@@ -24,7 +24,7 @@ module Factories
     end
 
     def fetch_member_level_applicable_aptcs(total_aptc)
-      thh_members = aptc_enrollment_members(shopping_tax_members)
+      thh_members = enrollment_aptc_members(shopping_tax_members)
       benchmark_hash = enrollment_eligible_benchmark_hash(thh_members, @enrollment)
       total = benchmark_hash.values.sum
       ratio_hash = {}
@@ -71,6 +71,10 @@ module Factories
       end
     end
 
+    def fetch_max_aptc
+      tax_households.first.latest_eligibility_determination.max_aptc.to_f
+    end
+
     private
 
     def fetch_member_ratio
@@ -110,7 +114,7 @@ module Factories
       # and not calculated by the EA.
       ehb_premium = total_ehb_premium(product_id)
       applicable_aptc = [@available_aptc, @selected_aptc, ehb_premium].min
-      @can_round_off_cents = @selected_aptc > ehb_premium(product_id)
+      @can_round_off_cents = @selected_aptc > ehb_premium
       {product_id => applicable_aptc}
     end
 

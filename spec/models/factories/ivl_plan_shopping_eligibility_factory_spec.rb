@@ -14,8 +14,9 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory, dbclean: :after_eac
     describe 'cases for single tax household scenarios' do
       include_context 'setup one tax household with two ia members'
 
-      let!(:enrollment1) { FactoryBot.create(:hbx_enrollment, :individual_shopping, family: family, household: family.active_household) }
-      let!(:enrollment_member1) { FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: enrollment1, applicant_id: family_member.id) }
+      let(:current_date) {TimeKeeper.date_of_record.beginning_of_month}
+      let!(:enrollment1) { FactoryBot.create(:hbx_enrollment, :individual_shopping, family: family, household: family.active_household, effective_on: current_date) }
+      let!(:enrollment_member1) { FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: enrollment1, applicant_id: family_member.id, eligibility_date: current_date, coverage_start_on: current_date) }
 
       before :each do
         @product = FactoryBot.create(:benefit_markets_products_health_products_health_product, metal_level_kind: :silver, benefit_market_kind: :aca_individual)
@@ -141,9 +142,10 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory, dbclean: :after_eac
         end
 
         context 'with an existing enrollment' do
-          let!(:enrollment_member2) { FactoryBot.create(:hbx_enrollment_member, is_subscriber: false, hbx_enrollment: enrollment1, applicant_id: family_member2.id) }
-          let!(:enrollment2) { FactoryBot.create(:hbx_enrollment, :individual_assisted, applied_aptc_amount: 50.00, family: family, household: family.active_household) }
-          let!(:enrollment_member21) { FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: enrollment2, applicant_id: family_member.id, applied_aptc_amount: 50.00) }
+          let(:current_date) {TimeKeeper.date_of_record.beginning_of_month}
+          let!(:enrollment_member2) { FactoryBot.create(:hbx_enrollment_member, is_subscriber: false, hbx_enrollment: enrollment1, applicant_id: family_member2.id, eligibility_date: current_date, coverage_start_on: current_date) }
+          let!(:enrollment2) { FactoryBot.create(:hbx_enrollment, :individual_assisted, applied_aptc_amount: 50.00, family: family, household: family.active_household, effective_on: current_date) }
+          let!(:enrollment_member21) { FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: enrollment2, applicant_id: family_member.id, applied_aptc_amount: 50.00, eligibility_date: current_date, coverage_start_on: current_date) }
 
           context 'with valid tax household for all the shopping members' do
             before :each do
@@ -215,7 +217,7 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory, dbclean: :after_eac
               @eligibility_factory = described_class.new(enrollment1, 150.00, [@product_id])
               @applicable_aptc = @eligibility_factory.fetch_applicable_aptcs
               @aptc_per_member = @eligibility_factory.fetch_aptc_per_member
-              @ehb_premium = @eligibility_factory.send(:ehb_premium, enrollment1.product.id)
+              @ehb_premium = @eligibility_factory.send(:total_ehb_premium, enrollment1.product.id)
             end
 
             context '.fetch_applicable_aptcs' do

@@ -25,7 +25,7 @@ module Insured
       end
 
       def update_aptc
-        @factory_class.update_aptc(@enrollment_id, @elected_aptc_pct.to_f, @selected_aptc.to_f)
+        @factory_class.update_aptc(@enrollment_id, @selected_aptc.to_f)
       end
 
       def attributes_to_form_params(attrs)
