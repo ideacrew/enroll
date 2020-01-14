@@ -39,6 +39,11 @@ namespace :permissions do
   DefinePermissions.define_task :hbx_admin_can_view_username_and_email => :environment
 end
 
+namespace :permissions do
+  desc 'hbx admin can access user account tab'
+  DefinePermissions.define_task :hbx_admin_can_access_user_account_tab => :environment
+end
+
 #RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_change_fein
 namespace :permissions do
   desc 'hbx system admin can change fein'
@@ -85,6 +90,7 @@ end
 #rake permissions:migrate_hbx
 #rake permissions:hbx_admin_can_update_ssn
 #rake permissions:hbx_admin_can_complete_resident_application
+#rake permissions:hbx_admin_can_access_user_account_tab
 #rake permissions:hbx_admin_can_update_ssn
 #rake permissions:hbx_admin_can_reset_password
 #rake permissions:hbx_admin_can_modify_plan_year

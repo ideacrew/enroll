@@ -7,6 +7,7 @@ class User
   include Mongoid::Timestamps
   include Acapi::Notifiers
   include AuthorizationConcern
+  include Mongoid::History::Trackable
   include PermissionsConcern
   attr_accessor :login
 
@@ -86,6 +87,14 @@ class User
   index({oim_id: 1}, {sparse: true, unique: true})
   index({created_at: 1 })
 
+  track_history :on => [:oim_id, :email],
+                :modifier_field => :modifier,
+                :modifier_field_optional => true,
+                :version_field => :tracking_version,
+                :track_create  => true,
+                :track_update  => true,
+                :track_destroy => true
+
   before_save :strip_empty_fields
 
   # Enable polymorphic associations
@@ -132,6 +141,15 @@ class User
       else
         "Customer Service Representative (CSR)"
       end
+    end
+  end
+
+  def has_tier3_subrole?
+    hbx_staff_role = person && person.hbx_staff_role
+    if hbx_staff_role && hbx_staff_role.subrole == "hbx_tier3"
+      true
+    else
+      false
     end
   end
 

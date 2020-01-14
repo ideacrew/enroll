@@ -1,4 +1,4 @@
-<li role="presentation"<%= menu_tab_class(active_tab, "#{tab_name}-tab") %> class="<%=pundit_class HbxProfile, :view_admin_tabs?%>">
+<li role="presentation"<%= menu_tab_class(active_tab, "#{tab_name}-tab") %> class="<%= tab_name == "user-account" ? (pundit_class HbxProfile, :can_access_user_account_tab?) : (pundit_class HbxProfile, :view_admin_tabs?) %>">
  <%= link_to(link_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "#{tab_name}", "role" => "tab" ) do  %>
   <span class="hidden-xs"><%= display_name %></span>
   <span title=<%= display_name %>></span>

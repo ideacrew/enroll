@@ -105,6 +105,9 @@ FactoryGirl.define do
       can_create_benefit_application true
       view_the_configuration_tab false 
       can_submit_time_travel_request false
+      can_view_username_and_email true
+      can_lock_unlock true
+      can_reset_password true
     end
 
     trait :super_admin do
