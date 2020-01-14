@@ -43,7 +43,7 @@ namespace :reports do
     file_name = "#{Rails.root}/public/enrollapp_enrollment_report.csv"
     CSV.open(file_name, "w", force_quotes: true) do |csv|
       csv << field_names
-      batch_size = 500
+      batch_size = 1000
       offset = 0
       enrollments = HbxEnrollment.enrolled
       @total_count = enrollments.count
@@ -66,8 +66,8 @@ namespace :reports do
                             p.mailing_address.try(:full_address),
                             p.work_email.try(:address),
                             p.home_email.try(:address),
-                            p.main_phone,
-                            p.primary_family.active_broker_agency_account,
+                            p.try(:main_phone),
+                            p.primary_family.active_broker_agency_account.try(:legal_name),
                             p.race,
                             p.ethnicity,
                             p.citizen_status,
@@ -101,8 +101,8 @@ namespace :reports do
                             p.mailing_address.try(:full_address),
                             p.work_email.try(:address),
                             p.home_email.try(:address),
-                            p.main_phone,
-                            p.primary_family.active_broker_agency_account,
+                            p.try(:main_phone),
+                            p.primary_family.active_broker_agency_account.try(:legal_name),
                             p.race,
                             p.ethnicity,
                             p.citizen_status,
