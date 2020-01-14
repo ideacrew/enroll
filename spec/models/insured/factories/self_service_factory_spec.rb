@@ -114,7 +114,7 @@ module Insured
       end
 
       it 'should return updated enrollment with aptc fields' do
-        subject.update_enrollment_for_apcts(1, enrollment, 2000, nil)
+        subject.update_enrollment_for_apcts(enrollment, 2000)
         enrollment.reload
         expect(enrollment.applied_aptc_amount.to_f).to eq 1274.44
       end

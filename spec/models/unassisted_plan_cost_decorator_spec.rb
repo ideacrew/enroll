@@ -161,10 +161,10 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
       end
 
       context 'for non-persisted enrollment object' do
-
-        let!(:enrollment1) { FactoryBot.build(:hbx_enrollment, family: family10, household: family10.active_household, aasm_state: 'shopping', product: @product, consumer_role_id: person.consumer_role.id) }
-        let!(:enr_member1) { FactoryBot.build(:hbx_enrollment_member, applicant_id: family10.primary_applicant.id, is_subscriber: true, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: enrollment1) }
-        let!(:enr_member2) { FactoryBot.build(:hbx_enrollment_member, applicant_id: family10.family_members[1].id, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: enrollment1) }
+        let(:current_date) {TimeKeeper.date_of_record}
+        let!(:enrollment1) { FactoryBot.build(:hbx_enrollment, family: family10, household: family10.active_household, aasm_state: 'shopping', product: @product, consumer_role_id: person.consumer_role.id, effective_on: current_date) }
+        let!(:enr_member1) { FactoryBot.build(:hbx_enrollment_member, applicant_id: family10.primary_applicant.id, is_subscriber: true, eligibility_date: (TimeKeeper.date_of_record), hbx_enrollment: enrollment1, coverage_start_on: current_date) }
+        let!(:enr_member2) { FactoryBot.build(:hbx_enrollment_member, applicant_id: family10.family_members[1].id, eligibility_date: (TimeKeeper.date_of_record), hbx_enrollment: enrollment1, coverage_start_on: current_date) }
 
         context 'when elected aptc more than ehb premium, should rounddown on premium' do
           before :each do

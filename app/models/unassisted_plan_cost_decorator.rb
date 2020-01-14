@@ -107,15 +107,6 @@ class UnassistedPlanCostDecorator < SimpleDelegator
     end.round(2)
   end
 
-  #Only use this method when @elected_aptc is <= 0
-  def total_ehb_premium
-    raise "Cannot process when selected_aptc is more than 0: #{@selected_aptc} " if @elected_aptc > 0
-
-    members.reduce(0.00) do |sum, member|
-      (sum + round_down_float_two_decimals((employee_cost_for(member) * __getobj__.ehb)))
-    end
-  end
-
   def total_ehb_premium
     members.reduce(0.00) do |sum, member|
       (sum + round_down_float_two_decimals(member_ehb_premium(member)))
