@@ -145,6 +145,8 @@ aca:
   general_agency_enabled: false
   broker_carrier_appointments_enabled: true
   enrollments_reinstate_enabled: true
+  past_enrollment_eligble_to_retrem:
+    year: 2
   dental_market_enabled: true
   calendar_enabled: true
   dental_plan_years_available: [""]

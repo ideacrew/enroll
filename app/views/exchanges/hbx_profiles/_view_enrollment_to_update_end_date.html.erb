@@ -24,23 +24,27 @@
                 var output = dup_enr_ids.includes(input_id);
                 var new_term_date = jQuery(this).closest('tr').find("input[name=new_termination_date]")[0].value
                 var enrollment_effective = jQuery(this).closest('tr').find("td#enrollment_effective_on").html();
-                if(new_term_date == enrollment_effective && !output){
-                    jQuery('#cancel_message').show();
-                    jQuery('#termination_message').hide();
-                    jQuery('#no_termination_message').show();
-                    jQuery("a.modal_confirm").show();
-                }
-                else if(new_term_date !== enrollment_effective && output ){
+                var enrollment_eligible_for_reterm = jQuery(this).closest('tr').find("td#enrollment_eligible_for_reterm").text();
+
+                if (output || enrollment_eligible_for_reterm == "false") {
+                  jQuery('#no_termination_message').show();
                   jQuery('#cancel_message').hide();
                   jQuery('#termination_message').hide();
-                  jQuery('#no_termination_message').show();
                   jQuery("a.modal_confirm").hide();
+                  return
+                }
+
+                if(new_term_date == enrollment_effective){
+                  jQuery('#cancel_message').show();
+                  jQuery('#termination_message').hide();
+                  jQuery('#no_termination_message').hide();
+                  jQuery("a.modal_confirm").show();
                 }
                 else{
-                    jQuery('#cancel_message').hide();
-                    jQuery('#termination_message').show();
-                    jQuery('#no_termination_message').hide();
-                    jQuery("a.modal_confirm").show();
+                  jQuery('#cancel_message').hide();
+                  jQuery('#termination_message').show();
+                  jQuery('#no_termination_message').hide();
+                  jQuery("a.modal_confirm").show();
                 }
             }
         });
@@ -70,6 +74,7 @@
                   <td> <%= radio_button_tag("enrollment_id", hbx.id, (index.zero? ? true : false), id:"terminate_hbx_#{hbx.id}") %> </td>
                   <td><%= hbx.hbx_id %></td>
                   <td><%= hbx.product.name %></td>
+                  <td id="enrollment_eligible_for_reterm" class="hidden"><%= hbx.enrollment_eligible_for_reterm? %></td>
                   <td id="enrollment_effective_on"><%= hbx.effective_on %></td>
                   <td><%= hbx.terminated_on %></td>
                   <td><%= text_field_tag "new_termination_date", nil, readonly: true, disabled: true, value:  hbx.terminated_on, id: "termination-date-picker_#{hbx.id}", class: "form-control date-field date-picker", "data-date-min" =>  hbx.effective_on, "data-date-max" =>  hbx.terminated_on %></td>

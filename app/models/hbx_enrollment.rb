@@ -1752,7 +1752,7 @@ class HbxEnrollment
 
   def reterm_enrollment_with_earlier_date(termination_date, edi_required)
 
-    return false unless self.coverage_terminated? || self.coverage_termination_pending?
+    return false unless enrollment_eligible_for_reterm?
     return false if termination_date > self.terminated_on
     return true if cancel_terminated_enrollment(termination_date, edi_required)
 
@@ -1768,6 +1768,12 @@ class HbxEnrollment
     else
       false
     end
+  end
+
+  def enrollment_eligible_for_reterm?
+    # Adding condition to allow reterm on current & previous year terminated enrollment.
+    ((effective_on.year > (TimeKeeper.date_of_record.year - Settings.aca.past_enrollment_eligble_to_retrem.year)) &&
+        (coverage_terminated? || coverage_termination_pending?))
   end
 
   def is_admin_reinstate_or_end_date_update_eligible?
