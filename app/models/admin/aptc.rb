@@ -213,7 +213,7 @@ class Admin::Aptc < ApplicationController
       benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
       #eligibility_determinations = family.active_household.latest_active_tax_household.eligibility_determinations
       #date = Date.new(year, 1, 1)
-      benefit_coverage_period = benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}
+      benefit_coverage_period = benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.date_of_record)}
       slcsp = benefit_coverage_period.second_lowest_cost_silver_plan
       if member_ids.present?
         aptc_members = family.active_household.latest_active_tax_household.tax_household_members.select {|m| member_ids.include?(m.person.id.to_s) }
@@ -222,7 +222,7 @@ class Admin::Aptc < ApplicationController
       end
       cost = aptc_members.map do |member|
         product = ::BenefitMarkets::Products::ProductFactory.new({product_id: slcsp.id})
-        product.cost_for(TimeKeeper.datetime_of_record, member.age_on_effective_date)
+        product.cost_for(TimeKeeper.date_of_record, member.age_on_effective_date)
       end.inject(:+) || 0
       return '%.2f' % cost
     end
