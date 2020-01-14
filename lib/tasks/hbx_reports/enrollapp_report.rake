@@ -66,7 +66,7 @@ namespace :reports do
                             p.mailing_address.try(:full_address),
                             p.work_email.try(:address),
                             p.home_email.try(:address),
-                            p.try(:main_phone),
+                            p.try(:work_phone),
                             p.primary_family.active_broker_agency_account.try(:legal_name),
                             p.race,
                             p.ethnicity,
