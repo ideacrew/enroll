@@ -1447,3 +1447,29 @@ describe "active dependents" do
     expect(family.active_dependents.count).to eq 1
   end
 end
+
+describe "terminated_enrollments", dbclean: :before_each do
+
+  let!(:person) { FactoryGirl.create(:person)}
+  let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+  let!(:household) { FactoryGirl.create(:household, family: family) }
+  let!(:termination_pending_enrollment) { family.active_household.hbx_enrollments.create!(
+                                            coverage_kind: "health",
+                                            kind:"employer_sponsored",
+                                            aasm_state: 'coverage_termination_pending'
+                                            )}
+  let!(:terminated_enrollment) { family.active_household.hbx_enrollments.create!(
+                                    coverage_kind: "health",
+                                    kind:"employer_sponsored",
+                                    aasm_state: 'coverage_terminated') }
+
+  let!(:expired_enrollment) { family.active_household.hbx_enrollments.create!(
+                                      coverage_kind: "health",
+                                      kind:"employer_sponsored",
+                                      aasm_state: 'coverage_expired') }
+
+  it "should include termination and termination pending enrollments only" do
+    expect(family.terminated_enrollments.count).to eq 2
+    expect(family.terminated_enrollments.map(&:aasm_state)).to eq ["coverage_termination_pending", "coverage_terminated"]
+  end
+end

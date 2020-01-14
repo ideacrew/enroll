@@ -86,6 +86,7 @@ Rails.application.routes.draw do
       root 'hbx_profiles#show'
 
       collection do
+        post :reinstate_enrollment
         get :family_index
         get :family_index_dt
         get :outstanding_verification_dt
@@ -124,6 +125,9 @@ Rails.application.routes.draw do
         get :add_sep_form
         get :hide_form
         get :show_sep_history
+        get :view_terminated_hbx_enrollments
+        get :view_enrollment_to_update_end_date
+        post :update_enrollment_termianted_on_date
         get :calendar_index
         get :user_account_index
         get :get_user_info
