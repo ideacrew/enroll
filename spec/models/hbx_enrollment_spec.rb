@@ -2743,6 +2743,14 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
           end
         end
       end
+
+      context "enrollment that has effective date older than prior year date" do
+        it "should return false" do
+          enrollment.effective_on = Date.new(2018,1,1)
+          enrollment.save
+          expect(enrollment.reterm_enrollment_with_earlier_date(TimeKeeper.date_of_record, false)).to eq false
+        end
+      end
     end
 
     context "IVL enrollment" do
