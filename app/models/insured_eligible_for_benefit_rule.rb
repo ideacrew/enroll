@@ -210,8 +210,9 @@ class InsuredEligibleForBenefitRule
   end
 
   def relation_ship_with_primary_applicant
-    primary_applicant.person.person_relationships.select {|r|r.relative_id.to_s == @role.person.id.to_s}.first.try(:kind) || nil
-  # @role.person.person_relationships.select {|r| r.person.id.to_s == primary_applicant.person_id.to_s }.first.try(:kind) || nil
+    fm_person = @family.primary_applicant.person_version_for(version_date)
+    return nil unless fm_person
+    fm_person.person_relationships.select { |r| r.relative_id.to_s == @role.person.id.to_s}.first.try(:kind) || nil
   end
 
 end

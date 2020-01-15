@@ -64,11 +64,11 @@ STDOUT.puts person_id_count.inspect
 STDOUT.puts families_of_interest.count
 STDOUT.flush
 
-def relationship_for(person, family)
+def relationship_for(person, family, version_date)
   return "self" if (person.id == family.primary_applicant.person_id)
-  from_rel = person.find_relationship_with(family.primary_applicant.person)
-  return from_rel if !from_rel.blank?
-  "unrelated"
+  fm_person = family.primary_applicant.person_version_for(version_date)
+  return "unrelated" unless fm_person
+  fm_person.person_relationships.select { |r| r.relative_id.to_s == person.id.to_s}.first.try(:kind) || "unrelated"
 end
 
 def version_in_window?(updated_at)
@@ -226,7 +226,7 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
                   pers.gender,
                   person_updated_at.strftime("%Y-%m-%d %H:%M:%S.%L"),
                   (pers_record.id == fam.primary_applicant.person_id),
-                  relationship_for(pers_record, fam),
+                  relationship_for(pers_record, fam, person_updated_at),
                   lpd.citizen_status,
                   (lpd.citizen_status.nil? ? nil : (lpd.citizen_status == "indian_tribe_member")),
                   pers.is_incarcerated] +
