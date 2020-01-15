@@ -26,6 +26,16 @@ module Parsers::Xml::Cv::Importers
           ehb: e_plan.ehb_percent.to_f,
           #plan_type: ,
         )
+        product_class = coverage_type == "health" ? BenefitMarkets::Products::HealthProducts::HealthProduct : BenefitMarkets::Products::DentalProducts::DentalProduct
+        product = product_class.new(
+          id: e_plan.id,
+          hios_id: e_plan.id,
+          title: e_plan.name,
+          application_period: (Date.new(e_plan.active_year.to_i, 1, 1)..Date.new(e_plan.active_year.to_i, 12, 31)),
+          metal_level_kind: metal_level,
+          kind: coverage_type == "health" ? :health : :dental,
+          ehb: e_plan.ehb_percent.to_f
+        )
       end
       hbx_enrollment_members = []
       policy.enrollees.each do |enrollee|
@@ -50,6 +60,7 @@ module Parsers::Xml::Cv::Importers
         elected_aptc_pct: elected_aptc_pct,
         applied_aptc_amount: applied_aptc_amount,
         plan: plan,
+        product: product,
         carrier_profile_id: enrollment.plan.try(:carrier).try(:id),
         #writing_agent_id: broker_link.id,
         #terminated_on: ,
@@ -99,13 +110,13 @@ module Parsers::Xml::Cv::Importers
       return nil if shop_market.blank?
       employer = shop_market.employer_link
       fein = employer.id.strip.split('#').last rescue ''
-      org = Organization.new(
+      org = BenefitSponsors::Organizations::Organization.new(
         fein: fein,
         legal_name: employer.try(:name)
       )
-      
+      profile_class = Settings.site.key == :dc ? BenefitSponsors::Organizations::AcaShopDcEmployerProfile : BenefitSponsors::Organizations::AcaShopCcaEmployerProfile
       EmployeeRole.new(
-        employer_profile: EmployerProfile.new(organization: org)
+        employer_profile: profile_class.new(organization: org)
       )
     end
 
