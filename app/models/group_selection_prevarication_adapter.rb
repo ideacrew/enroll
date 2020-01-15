@@ -228,11 +228,16 @@ class GroupSelectionPrevaricationAdapter
   def select_benefit_group(params)
     return unless select_market(params) == 'shop' || select_market(params) == 'fehb'
 
-    if @change_plan.present? && @previous_hbx_enrollment.present? && @previous_hbx_enrollment.is_shop?
-      @previous_hbx_enrollment.sponsored_benefit_package 
-    elsif (select_market(params) == 'shop' || select_market(params) == 'fehb') && possible_employee_role.present?
-      possible_employee_role.benefit_package(qle: is_qle?)
+    if possible_employee_role.present?
+      assigned_benefit_package = possible_employee_role.benefit_package(qle: is_qle?)
     end
+
+    if @change_plan.present? && @previous_hbx_enrollment.present?
+      possible_benefit_package = @previous_hbx_enrollment.sponsored_benefit_package
+      return possible_benefit_package if assigned_benefit_package && assigned_benefit_package.start_on != possible_benefit_package.start_on
+    end
+    
+    assigned_benefit_package
   end
 
   def renewal_enrollment(enrollments, employee_role)
