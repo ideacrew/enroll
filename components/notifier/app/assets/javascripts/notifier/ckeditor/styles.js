@@ -121,6 +121,7 @@ CKEDITOR.stylesSet.add( 'default', [
 	{name: 'Bottom Border Row', element: 'tr', styles: {'border-bottom': '1px solid #E9E9E9'}},
 	{name: 'Borderless Table Data', element: 'td', styles: {'border-style': 'hidden'}},
 	{ name: 'Square Bulleted List',	element: 'ul',		styles: { 'list-style-type': 'square' } },
+	{ name: 'Align List elements to Default Space',	element: 'li', styles: { 'padding-top': '0px', 'margin-top': '-5px'} },
 
 	/* Widget styles */
 
