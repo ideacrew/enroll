@@ -377,9 +377,9 @@ RSpec.describe ApplicationHelper, :type => :helper do
   end
 
 
-  describe 'family_premium' do
+  describe 'shopping_group_premium' do
     it 'should return cost without session' do
-      expect(helper.family_premium(100, 98.44)).to eq 100
+      expect(helper.shopping_group_premium(100, 98.44)).to eq 100
     end
 
     context 'with session' do
@@ -389,24 +389,24 @@ RSpec.describe ApplicationHelper, :type => :helper do
       end
 
       it 'when ehb_premium > aptc_amount' do
-        expect(helper.family_premium(200, 196.88)).to eq(100)
+        expect(helper.shopping_group_premium(200, 196.88)).to eq(100)
       end
 
       it 'when ehb_premium < aptc_amount' do
-        expect(helper.family_premium(100, 98.44)).to eq(1.56)
+        expect(helper.shopping_group_premium(100, 98.44)).to eq(1.56)
       end
 
       it 'should return rounded plan cost value' do
         session['elected_aptc'] = nil
-        expect(helper.family_premium(520.48, 512.360512)).to eq 520.48
+        expect(helper.shopping_group_premium(520.48, 512.360512)).to eq 520.48
       end
 
       it 'when can_use_aptc is false' do
-        expect(helper.family_premium(100, 98.44, false)).to eq 100
+        expect(helper.shopping_group_premium(100, 98.44, false)).to eq 100
       end
 
       it 'when can_use_aptc is true' do
-        expect(helper.family_premium(100, 98.44, true)).to eq 1.56
+        expect(helper.shopping_group_premium(100, 98.44, true)).to eq 1.56
       end
     end
   end
