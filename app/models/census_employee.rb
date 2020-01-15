@@ -948,6 +948,7 @@ class CensusEmployee < CensusMember
           {'$match' => {
             'benefit_sponsors_employer_profile_id' => employer_profile_id
           }},
+          {"$sort" => {"last_name" => 1, "first_name" => 1}},
           { "$project" => { "first_name" => 1, "last_name" => 1, "middle_name" => 1, "name_sfx" => 1,
                             "dob" => 1, "gender" => 1, "hired_on" => 1, "aasm_state" => 1, "encrypted_ssn" =>1,
                             "employment_terminated_on" => 1, "benefit_group_assignments.is_active" => 1,
