@@ -1,7 +1,7 @@
 class Employers::EmployerProfilesController < Employers::EmployersController
   include ::Config::AcaConcern
   include ApplicationHelper
-
+  
   before_action :redirect_new_model, only: [:welcome, :index, :new, :show_profile, :edit, :generate_sic_tree, :create]
   before_action :redirect_show, only: [:show]
 
@@ -193,7 +193,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def export_census_employees
     respond_to do |format|
-      format.csv { send_data @employer_profile.census_employees.sorted.to_csv, filename: "#{@employer_profile.legal_name.parameterize.underscore}_census_employees_#{TimeKeeper.date_of_record}.csv" }
+      format.csv { send_data CensusEmployee.download_census_employees_roster(@employer_profile.id), filename: "#{@employer_profile.legal_name.parameterize.underscore}_census_employees_#{TimeKeeper.date_of_record}.csv" }
     end
   end
 
