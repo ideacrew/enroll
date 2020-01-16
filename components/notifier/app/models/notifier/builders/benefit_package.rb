@@ -7,7 +7,7 @@ module Notifier
 
       def benefit_application_benefit_packages
         benefit_packages = employer_profile.benefit_applications.published_or_renewing_published.first.benefit_packages
-        merge_model.benefit_packages = build_benefit_packages(benefit_packages)
+        merge_model.benefit_application.benefit_packages = build_benefit_packages(benefit_packages)
       end
 
       def build_benefit_packages(benefit_packages)
