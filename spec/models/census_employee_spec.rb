@@ -201,8 +201,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     end
 
     context "with duplicate blank ssn's on dependents" do
-      let(:child1) {FactoryBot.build(:census_dependent, employee_relationship: "child_under_26", ssn: "")}
-      let(:child2) {FactoryBot.build(:census_dependent, employee_relationship: "child_under_26", ssn: "")}
+      let(:child1) {FactoryBot.build(:census_dependent, first_name: 'Jimmy', last_name: 'Stephens', employee_relationship: "child_under_26", ssn: "")}
+      let(:child2) {FactoryBot.build(:census_dependent, first_name: 'Ally', last_name: 'Stephens', employee_relationship: "child_under_26", ssn: "")}
 
       it "should not have errors" do
         initial_census_employee.census_dependents = [child1, child2]
@@ -1252,6 +1252,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         end
       end
     end
+
+
   end
 
   context '.new_hire_enrollment_period' do
@@ -2367,6 +2369,16 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         coverage_date = census_employee.benefit_group_assignments.first.start_on - 1.month
         expect(census_employee.benefit_group_assignment_for_date(coverage_date)).to eq nil
       end
+
+      it "should return latest bga for given coverage_date" do
+        bga = census_employee.benefit_group_assignments.first
+        coverage_date = bga.start_on
+        bga.update_attributes(is_active: false)
+        bga1 = bga.dup
+        bga.update_attributes(created_at: bga.created_at - 1.day)
+        census_employee.benefit_group_assignments << bga1
+        expect(census_employee.benefit_group_assignment_for_date(coverage_date)).to eq bga1
+      end
     end
 
     context "when ER has active and renewal benefit applications" do
@@ -2519,6 +2531,14 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
     context "if censue employee is cobra linked" do
       let(:aasm_state) {"cobra_linked"}
+
+      it "should return false" do
+        expect(census_employee.is_terminate_possible?).to eq false
+      end
+    end
+
+    context "if censue employee is newly designatede linked" do
+      let(:aasm_state) {"newly_designated_linked"}
 
       it "should return false" do
         expect(census_employee.is_terminate_possible?).to eq false

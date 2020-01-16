@@ -130,13 +130,16 @@ class UpdatingBrokerAgencyAccountOrProfile < MongoidMigrationTask
     return "Fein not found" if ENV['org_fein'].blank?
     return "hbx_id not found" if ENV['hbx_id'].blank?
 
-    broker_agency_profile = Organization.where(:fein => ENV['org_fein']).first.broker_agency_profile
+    organization = BenefitSponsors::Organizations::Organization.where(:fein => ENV['org_fein']).first
+    return 'Unable to find organization with FEIN' unless organization.present?
+
+    broker_agency_profile = organization.broker_agency_profile
     writing_agent = broker_agency_profile.primary_broker_role
     person = Person.where(hbx_id: ENV['hbx_id']).first
 
     if person.primary_family.present? && writing_agent.present? && broker_agency_profile.present?
       person.primary_family.broker_agency_accounts.unscoped.each do |agency_account|
-        if agency_account.broker_agency_profile_id == BSON::ObjectId(broker_agency_profile.id)
+        if agency_account.benefit_sponsors_broker_agency_profile_id == BSON::ObjectId(broker_agency_profile.id)
           agency_account.update_attributes!(writing_agent_id: writing_agent.id)
           puts "updated writing_agent for broker_agency_accounts" unless Rails.env.test?
         end

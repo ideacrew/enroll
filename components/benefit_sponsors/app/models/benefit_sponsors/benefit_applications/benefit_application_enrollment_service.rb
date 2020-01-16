@@ -143,6 +143,7 @@ module BenefitSponsors
           [true, benefit_application, business_policy.success_results]
         else
           benefit_application.deny_enrollment_eligiblity! if benefit_application.may_deny_enrollment_eligiblity?
+          benefit_application.benefit_packages.map(&:cancel_member_benefits) unless Settings.aca.shop_market.auto_cancel_ineligible
           [false, benefit_application, business_policy.fail_results]
         end
       end

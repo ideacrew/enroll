@@ -9,7 +9,7 @@ arch = case RUBY_PLATFORM
     raise "Invalid platform. Must be running linux or intel-based Mac OS."
 end
 
-executable_path = File.expand_path "#{File.dirname(Gem.bin_path('wkhtmltopdf-binary-edge'))}/../libexec/wkhtmltopdf-#{arch}"
+executable_path = File.expand_path "#{File.dirname(Gem.bin_path('wkhtmltopdf-binary-edge', 'wkhtmltopdf'))}/../libexec/wkhtmltopdf-#{arch}"
 
 WickedPdf.config = {
   exe_path: executable_path

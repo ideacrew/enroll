@@ -6,7 +6,9 @@ class Insured::ConsumerRolesController < ApplicationController
   before_action :check_consumer_role, only: [:search, :match]
   before_action :find_consumer_role, only: [:edit, :update]
   before_action :individual_market_is_enabled?
-  #before_action :authorize_for, except: [:edit, :update]
+  before_action :decrypt_params, only: [:create]
+
+  FIELDS_TO_ENCRYPT = [:ssn,:dob,:first_name,:middle_name,:last_name,:gender,:user_id]
 
   def ssn_taken
   end
@@ -21,7 +23,7 @@ class Insured::ConsumerRolesController < ApplicationController
       bookmark_url = @person.resident_role.bookmark_url.to_s.present? ? @person.resident_role.bookmark_url.to_s : nil
       redirect_to bookmark_url || family_account_path
     elsif @person.try(:consumer_role?)
-      bookmark_url = @person.consumer_role.bookmark_url.to_s.present? ? @person.consumer_role.bookmark_url.to_s + "?#{@key.to_s}=#{@val.to_s}" : nil
+      bookmark_url = @person.consumer_role.bookmark_url.to_s.present? ? @person.consumer_role.bookmark_url.to_s : nil
       redirect_to bookmark_url || family_account_path
     end
   end
@@ -97,6 +99,7 @@ class Insured::ConsumerRolesController < ApplicationController
                   session[:person_id] = @person.id
                 else
                 # not logging error because error was logged in construct_consumer_role
+                  @person_params = encrypt_pii(@person_params)
                   render file: 'public/500.html', status: 500
                   return
                 end
@@ -113,6 +116,7 @@ class Insured::ConsumerRolesController < ApplicationController
                 end
               end
             end
+            @person_params = encrypt_pii(@person_params)
             return
           end
 
@@ -145,6 +149,7 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def create
     begin
+
       @consumer_role = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, actual_user)
       if @consumer_role.present?
         @person = @consumer_role.person
@@ -200,11 +205,11 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def update
-    #authorize @consumer_role, :update?
+    authorize @consumer_role, :update?
     save_and_exit =  params['exit_after_method'] == 'true'
 
     if update_vlp_documents(@consumer_role, 'person') && @consumer_role.update_by_person(params.require(:person).permit(*person_parameters_list))
-      @consumer_role.update_attribute(:is_applying_coverage, params[:person][:is_applying_coverage])
+      @consumer_role.update_attribute(:is_applying_coverage, params[:person][:is_applying_coverage]) if (!params[:person][:is_applying_coverage].nil?)
       @person.active_employee_roles.each { |role| role.update_attributes(contact_method: params[:person][:consumer_role_attributes][:contact_method]) } if @person.has_multiple_roles?
       @person.primary_family.update_attributes(application_type: params["person"]["family"]["application_type"]) if current_user.has_hbx_staff_role?
       if save_and_exit
@@ -266,6 +271,21 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   private
+
+  def decrypt_params
+    return unless SymmetricEncryption.encrypted?(params[:person][:first_name]) #temporary fix, need better handling of encryption.
+      # Decrypt encrypted fields
+    FIELDS_TO_ENCRYPT.each do |field|
+      params[:person][field] = SymmetricEncryption.decrypt(params[:person][field])
+    end
+  end
+
+  def encrypt_pii(person)
+    FIELDS_TO_ENCRYPT.each do |field|
+      person[field] = SymmetricEncryption.encrypt(person[field])
+    end
+    person
+  end
 
   def user_not_authorized(exception)
     policy_name = exception.policy.class.to_s.underscore

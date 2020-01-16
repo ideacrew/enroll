@@ -13,18 +13,18 @@ module Importers::Transcripts
     end    
 
     def add_plan(association)
-      @plan ||= Plan.where(hios_id: association['hios_id'], active_year: association['active_year']).first
+      @plan ||= BenefitMarkets::Products::Product.by_year(association['active_year']).where(hios_id: association['hios_id']).first
 
       build_new_hbx_enrollment
-      @enrollment.plan = @plan
+      @enrollment.product = @plan
       @enrollment.save!
     end
 
     def update_plan(association)
-      @plan ||= Plan.where(hios_id: association['hios_id'], active_year: association['active_year']).first
+      @plan ||= BenefitMarkets::Products::Product.by_year(association['active_year']).where(hios_id: association['hios_id']).first
       
       build_new_hbx_enrollment
-      @enrollment.plan = @plan
+      @enrollment.product = @plan
       @enrollment.save!
     end
 
@@ -46,6 +46,7 @@ module Importers::Transcripts
       })
 
       family.save!
+      @enrollment.save!
       @member_changed = true
     end
 
@@ -69,6 +70,10 @@ module Importers::Transcripts
         hbx_enrollment.benefit_group_id = @enrollment.benefit_group_id
         hbx_enrollment.benefit_group_assignment_id = @enrollment.benefit_group_assignment_id
         hbx_enrollment.employee_role_id = @enrollment.employee_role_id
+        hbx_enrollment.benefit_sponsorship_id = @enrollment.benefit_sponsorship_id
+        hbx_enrollment.sponsored_benefit_package_id = @enrollment.sponsored_benefit_package_id
+        hbx_enrollment.sponsored_benefit_id = @enrollment.sponsored_benefit_id
+        hbx_enrollment.rating_area_id = @enrollment.rating_area_id
       else
         hbx_enrollment.consumer_role_id = @enrollment.consumer_role_id
       end
@@ -76,9 +81,9 @@ module Importers::Transcripts
       @enrollment.hbx_enrollment_members.each do |member| 
         hbx_enrollment.hbx_enrollment_members.build(member.attributes.except('_id'))
       end
-
-      hbx_enrollment.plan = @enrollment.plan
+      hbx_enrollment.product = @enrollment.product
       hbx_enrollment.aasm_state = 'coverage_selected'
+      hbx_enrollment.family = family
       hbx_enrollment.save!
       hbx_enrollment.reload
 

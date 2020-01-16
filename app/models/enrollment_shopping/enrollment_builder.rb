@@ -131,6 +131,8 @@ module EnrollmentShopping
         benefit_package = benefit_package_for_date(@employee_role, effective_date)
       end
 
+      raise "Unable to find employer sponsored benefits. Please contact your employer." if benefit_package.blank?
+
       build_enrollment_members(enrollment, family_member_ids)
 
       sponsored_benefit = benefit_package.sponsored_benefit_for(@coverage_kind)
@@ -178,7 +180,7 @@ module EnrollmentShopping
       copy_member_coverage_dates(previous_enrollment, enrollment)
       enrollment
     end
-    
+
     def build_common_enrollment_information(enrollment_kind)
       enrollment = @household.hbx_enrollments.build
       enrollment.coverage_household_id = @coverage_household.id

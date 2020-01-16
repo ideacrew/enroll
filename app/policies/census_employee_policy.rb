@@ -8,6 +8,8 @@ class CensusEmployeePolicy < ApplicationPolicy
         @user.person.employer_staff_roles.map(&:benefit_sponsor_employer_profile_id).map(&:to_s).include? @record.benefit_sponsors_employer_profile_id.to_s
       elsif @user.has_role?(:broker)
         @record.employer_profile.try(:active_broker) == @user.person
+      elsif has_valid_broker_staff_role?(@user, @record)
+         true
       elsif @user.has_role?(:general_agency_staff)
         ga_account = @record.employer_profile.general_agency_accounts.select do |general_agency_account|
           @user.person.general_agency_staff_roles.where(benefit_sponsors_general_agency_profile_id: general_agency_account.benefit_sponsrship_general_agency_profile_id)
@@ -22,6 +24,7 @@ class CensusEmployeePolicy < ApplicationPolicy
   def show?
     return true if @user.has_role?(:hbx_staff) || @user.has_hbx_staff_role?
     return true if (@user.has_role?(:broker) || @user.has_broker_role?) && @record.employer_profile.try(:active_broker) == @user.person
+    return true if has_valid_broker_staff_role?(@user, @record)
     return true if (@user.has_role?(:employer_staff) || @user.has_employer_staff_role?) && @user.person.employer_staff_roles.map(&:benefit_sponsor_employer_profile_id).map(&:to_s).include?(@record.benefit_sponsors_employer_profile_id.to_s)
     return false if !@user.has_role?(:general_agency_staff) || !@user.has_general_agency_staff_role?
     ga_id = @user.person.general_agency_staff_roles.last.general_agency_profile.id
@@ -31,6 +34,21 @@ class CensusEmployeePolicy < ApplicationPolicy
     plan_design_organizations.each do |a|
       if a.general_agency_profile.present?
         return true if a.general_agency_profile.id == ga_id
+      end
+    end
+  end
+
+  def has_valid_broker_staff_role?(user, employee)
+    if user.person.has_active_broker_staff_role?
+      broker_agency_profiles = @user.person.active_broker_staff_roles.map(&:broker_agency_profile)
+      broker_agency_profiles.each do |ba|
+        employer_profiles = BenefitSponsors::Concerns::EmployerProfileConcern.find_by_broker_agency_profile(ba)
+        if employer_profiles
+          emp_ids = employer_profiles.map(&:id)
+          if emp_ids.include?(employee.benefit_sponsors_employer_profile_id)
+            return true
+          end
+        end
       end
     end
   end

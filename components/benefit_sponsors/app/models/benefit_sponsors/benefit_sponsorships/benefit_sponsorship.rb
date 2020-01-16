@@ -215,7 +215,9 @@ module BenefitSponsors
 
     scope :may_transmit_renewal_enrollment?, -> (compare_date = TimeKeeper.date_of_record) {
       where(:benefit_applications => {
-        :$elemMatch => {:predecessor_id => { :$exists => true }, :"effective_period.min" => compare_date, :aasm_state => :enrollment_eligible }},
+        :$elemMatch => {:predecessor_id => { :$exists => true }, :"effective_period.min" => compare_date,
+                        :aasm_state.in => BenefitSponsors::BenefitApplications::BenefitApplication::RENEWAL_TRANSMISSION_STATES}
+            },
         :aasm_state => :active
       )
     }
@@ -460,7 +462,11 @@ module BenefitSponsors
 
     def oe_extended_applications
       benefit_applications.select do |application|
-        application.enrollment_extended? && TimeKeeper.date_of_record > open_enrollment_period_for(application.effective_date).max
+        if application.is_renewing? && application.enrollment_extended?
+          TimeKeeper.date_of_record > open_enrollment_period_for(application.effective_date).max
+        else
+          application.enrollment_extended? && TimeKeeper.date_of_record > (open_enrollment_period_for(application.effective_date).max - 3.days)
+        end
       end
     end
 
