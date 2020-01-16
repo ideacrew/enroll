@@ -13,7 +13,7 @@ module Notifier
       def build_benefit_packages(benefit_packages)
         benefit_packages.collect do |benefit_package|
           b_package = Notifier::MergeDataModels::BenefitPackage.new
-          b_package.start_on = benefit_package.start_on
+          b_package.start_on = benefit_package.start_on.to_date
           b_package.title = benefit_package.title.titleize
           b_package.sponsored_benefits = build_sponsored_benenfits(benefit_package.sponsored_benefits)
           b_package
