@@ -50,6 +50,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::OutOfPocketNotice', dbclean: :afte
     end
 
     let(:benefit_package) { abc_profile.benefit_applications.first.benefit_packages[0] }
+    let(:sponsored_benefit) {benefit_package.sponsored_benefits[0]}
 
     context "when notice event is received" do
 
@@ -74,6 +75,10 @@ RSpec.describe 'BenefitSponsors::ModelEvents::OutOfPocketNotice', dbclean: :afte
 
       it "should return benefit package information" do
         expect(merge_model.benefit_application.benefit_packages[0].title).to eq benefit_package.title.titleize
+      end
+
+      it "should return sponsored benefit information" do
+        expect(merge_model.benefit_application.benefit_packages[0].sponsored_benefits[0].plan_offerings_text).to eq "All plans from #{sponsored_benefit.reference_product.issuer_profile.legal_name.titleize}"
       end
 
       it "should return false when there is no broker linked to employer" do

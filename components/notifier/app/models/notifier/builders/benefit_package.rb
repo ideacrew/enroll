@@ -40,13 +40,15 @@ module Notifier
       end
 
       def plan_offerings_text(sponsored_benefit)
-        case sponsored_benefit.product_package_kind
-        when "single_carrier"
+        case sponsored_benefit.product_package_kind.to_s
+        when "single_issuer"
           "All plans from #{sponsored_benefit.reference_product.issuer_profile.legal_name.titleize}"
         when "metal_level"
           "#{sponsored_benefit.reference_product.metal_level.titleize} metal level"
-        when "single_plan"
+        when "single_product"
           "#{sponsored_benefit.reference_product.issuer_profile.legal_name.titleize} - #{sponsored_benefit.reference_product.title.titleize}"
+        when 'multi_product'
+          'Custom'
         end
       end
 
