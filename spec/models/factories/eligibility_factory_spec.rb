@@ -178,7 +178,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
     describe 'cases for single tax household scenarios' do
       include_context 'setup one tax household with two ia members'
 
-      let!(:enrollment1) { FactoryBot.create(:hbx_enrollment, :individual_shopping, household: family.active_household, family: family) }
+      let!(:enrollment1) { FactoryBot.create(:hbx_enrollment, :individual_shopping, household: family.active_household, family: family, effective_on: TimeKeeper.date_of_record) }
       let!(:enrollment_member1) { FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: enrollment1, applicant_id: family_member.id) }
 
       before :each do
@@ -306,7 +306,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
 
         context 'with an existing enrollment' do
           let!(:enrollment_member2) { FactoryBot.create(:hbx_enrollment_member, is_subscriber: false, hbx_enrollment: enrollment1, applicant_id: family_member2.id) }
-          let!(:enrollment2) { FactoryBot.create(:hbx_enrollment, :individual_assisted, applied_aptc_amount: 50.00, household: family.active_household, family: family) }
+          let!(:enrollment2) { FactoryBot.create(:hbx_enrollment, :individual_assisted, applied_aptc_amount: 50.00, household: family.active_household, family: family, effective_on: enrollment1.effective_on - 1.day) }
           let!(:enrollment_member21) { FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: enrollment2, applicant_id: family_member.id, applied_aptc_amount: 50.00) }
 
           context 'with valid tax household for all the shopping members' do
@@ -422,6 +422,40 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
               product_aptc = {@product_id => 0.00}
               expect(@applicable_aptc).to eq product_aptc
             end
+          end
+        end
+      end
+
+      context '#fetch_member_level_applicable_aptcs' do
+        let(:applicable_aptc) { 300.00 }
+
+        context 'with one enrollment member' do
+          before :each do
+            @eligibility_factory ||= described_class.new(enrollment1.id)
+            @member_level_aptcs ||= @eligibility_factory.fetch_member_level_applicable_aptcs(applicable_aptc)
+          end
+          it 'should return the ratio hash for 1 enrollment member' do
+            ratio_hash = {}
+            ratio_hash[family_member.id.to_s] = applicable_aptc
+            expect(@member_level_aptcs).to eq ratio_hash
+          end
+        end
+
+        context 'with two enrollment members' do
+          let!(:enrollment_member2) { FactoryBot.create(:hbx_enrollment_member, is_subscriber: false, hbx_enrollment: enrollment1, applicant_id: family_member2.id) }
+
+          before :each do
+            person.update_attributes(dob: TimeKeeper.date_of_record - 40.years)
+            person2.update_attributes(dob: TimeKeeper.date_of_record - 40.years)
+            @eligibility_factory ||= described_class.new(enrollment1.id)
+            @member_level_aptcs ||= @eligibility_factory.fetch_member_level_applicable_aptcs(applicable_aptc)
+          end
+
+          it 'should return ratio hash for 2 enrollment members' do
+            ratio_hash = {}
+            ratio_hash[family_member.id.to_s] = applicable_aptc / 2
+            ratio_hash[family_member2.id.to_s] = applicable_aptc / 2
+            expect(@member_level_aptcs).to eq ratio_hash
           end
         end
       end

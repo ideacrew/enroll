@@ -429,6 +429,10 @@ class HbxEnrollment
   after_save :check_created_at
   after_save :notify_on_save
 
+  # def max_aptc
+  #   family&.active_household&.latest_active_tax_household_with_year(effective_on.year)&.total_aptc_available_amount_for_enrollment(self)
+  # end
+
   # This method checks to see if there is at least one subscriber in the hbx_enrollment_members nested document.
   # If not, it assigns it to the oldest person.
   def check_for_subscriber
@@ -470,6 +474,12 @@ class HbxEnrollment
       enrollment
     rescue Exception => e
     end
+  end
+
+  def has_at_least_one_aptc_eligible_member?(year)
+    tax_households = family.active_household.tax_households.tax_household_with_year(year)
+    return false if tax_households.blank?
+    tax_households.first.tax_household_members.any?(&:is_ia_eligible?)
   end
 
   class << self
@@ -836,12 +846,20 @@ class HbxEnrollment
   def term_or_cancel_enrollment(enrollment, coverage_end_date, term_reason = nil)
     if enrollment.effective_on >= coverage_end_date
       enrollment.cancel_coverage! if enrollment.may_cancel_coverage? # cancel coverage if enrollment is future effective
-    elsif coverage_end_date >= TimeKeeper.date_of_record
+    elsif coverage_end_date >= TimeKeeper.date_of_record && enrollment.is_shop?
       enrollment.schedule_coverage_termination!(coverage_end_date) if enrollment.may_schedule_coverage_termination?
     elsif enrollment.may_terminate_coverage?
       enrollment.terminate_coverage!(coverage_end_date)
     end
     enrollment.update(terminate_reason: term_reason, termination_submitted_on: TimeKeeper.datetime_of_record) if term_reason.present?
+  end
+
+  def should_term_or_cancel_ivl
+    if self.effective_on > TimeKeeper.date_of_record
+      'cancel'
+    elsif (self.effective_on <= TimeKeeper.date_of_record || self.may_terminate_coverage?)
+      'terminate'
+    end
   end
 
   def waiver_enrollment_present?
@@ -931,11 +949,13 @@ class HbxEnrollment
   end
 
   def renewal_enrollments(successor_application)
-    HbxEnrollment.where({:sponsored_benefit_package_id.in => successor_application.benefit_packages.pluck(:_id),
-                         :coverage_kind => coverage_kind,
-                         :kind => kind,
-                         :family_id => family_id,
-                         :effective_on => successor_application.start_on})
+    HbxEnrollment.where({
+      :sponsored_benefit_package_id.in => successor_application.benefit_packages.pluck(:_id),
+      :coverage_kind => coverage_kind,
+      :kind => kind,
+      :family_id => family_id,
+      :effective_on => successor_application.start_on
+    })
   end
 
   def active_renewals_under(successor_application)
