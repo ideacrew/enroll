@@ -545,6 +545,10 @@ class CensusEmployee < CensusMember
     new_employee
   end
 
+  def deactivate_employee_role_after_replication
+    employee_role.person.employee_roles.first.update_attributes!(is_active: false) if employee_role
+  end
+
   def is_business_owner?
     is_business_owner
   end
