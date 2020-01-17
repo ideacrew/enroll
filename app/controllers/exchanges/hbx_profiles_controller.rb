@@ -211,9 +211,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   @datatable = Effective::Datatables::BenefitSponsorsEmployerDatatable.new
     respond_to do |format|
       format.html { render '/exchanges/hbx_profiles/invoice.html.slim' }
-      # TODO: Consider adding the following after the format.html.
-      # Look at ticket 40578 and associated PR for reference.
-      # format.js
+      format.js
     end
   end
 
@@ -329,6 +327,7 @@ def employer_poc
     @datatable = Effective::Datatables::FamilyDataTable.new(params[:scopes].to_h)
     respond_to do |format|
       format.html { render "/exchanges/hbx_profiles/family_index_datatable" }
+      format.js
     end
   end
 
