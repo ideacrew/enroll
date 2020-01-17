@@ -12,7 +12,7 @@ CSV.open(people_file_name, 'w', force_quotes: true) do |csv|
               result_set[1],
               result_set[2],
               'Consumer Role',
-              result_set[3]]
+              result_set[3]["contact_method"]]
     rescue => e
       puts "ConsumerRole, Message: #{e.message}"
     end
@@ -25,7 +25,7 @@ CSV.open(people_file_name, 'w', force_quotes: true) do |csv|
               result_set[1],
               result_set[2],
               'Resident Role',
-              result_set[3]]
+              result_set[3]["contact_method"]]
     rescue => e
       puts "ResidentRole, Message: #{e.message}"
     end
