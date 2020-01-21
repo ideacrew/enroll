@@ -174,7 +174,15 @@ class InsuredEligibleForBenefitRule
   def resident_role_active?
     r_role = @role.person.resident_role
     return false unless r_role
-    r_role.created_at <= @version_date
+    # Apparently resident roles can have an empty created_at.
+    # If they do, use the timestamp for comparison.
+    r_role_created_at = resident_role_created_at(r_role)
+    r_role_created_at <= @version_date
+  end
+
+  def resident_role_created_at(r_role)
+    return r_role.created_at if r_role.created_at.present?
+    r_role.id.to_time
   end
 
   def consumer_role_active?
