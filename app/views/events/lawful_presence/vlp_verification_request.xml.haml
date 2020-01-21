@@ -30,7 +30,7 @@
       %has_document_I20=consumer.has_i20?
       %has_document_DS2019=consumer.has_ds2019?
       - if consumer.i551.present?
-        %document_I551_receipt_number= consumer.i551.receipt_number
+        %document_I551_receipt_number= consumer.i551.card_number
       - if consumer.i766.present?
         %document_I766
           %receipt_number=consumer.i766.receipt_number
