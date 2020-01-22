@@ -401,7 +401,7 @@ class ConsumerRole
   end
 
   def has_i571?
-    vlp_documents.any?{|doc| doc.subject == "I-551 (Permanent Resident Card)" }
+    vlp_documents.any?{ |doc| doc.subject == 'I-571 (Refugee Travel Document)' && doc.alien_number.present? }
   end
 
   def has_cert_of_citizenship?
@@ -429,7 +429,7 @@ class ConsumerRole
   end
 
   def i551
-    vlp_documents.select{|doc| doc.subject == "I-551 (Permanent Resident Card)" && doc.receipt_number.present? }.first
+    vlp_documents.select{ |doc| doc.subject == 'I-551 (Permanent Resident Card)' && doc.alien_number.present? && doc.card_number.present? }.first
   end
 
   def i766
