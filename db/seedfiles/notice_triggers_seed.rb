@@ -2843,6 +2843,28 @@ elsif Settings.aca.state_abbreviation == "DC"
           }
         }
       ]
+    },
+
+    {
+      hbx_id: 'IVL_VTA',
+      title: 'NOTICE - VOID FORM 1095-A TAX FORM',
+      description: 'Void 1095-A is given to users who received 1095-As on coverage that was never active/effectuated',
+      resource_name: 'consumer_role',
+      event_name: 'ivl_vta_void_cover_letter_notice',
+      notice_triggers: [
+        {
+          name: '1095A VTA Void Cover Letter Notice',
+          notice_template: 'notices/ivl/ivl_vta_notice',
+          notice_builder: 'IvlNotices::IvlVtaNotice',
+          mpi_indicator: 'IVL_VTA',
+          notice_trigger_element_group: {
+            market_places: ['individual'],
+            primary_recipients: ["consumer"],
+            primary_recipient_delivery_method: ["secure_message", "paper"],
+            secondary_recipients: []
+          }
+        }
+      ]
     }
   ]
 else
