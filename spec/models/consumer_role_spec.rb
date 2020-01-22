@@ -1134,5 +1134,33 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
       end
     end
+
+    context 'i571' do
+      let!(:consumer_role) { FactoryBot.create(:consumer_role, vlp_documents: [vlp_doc]) }
+
+      context 'valid i551 document exists' do
+        let(:vlp_doc) { FactoryBot.build(:vlp_document, subject: 'I-571 (Refugee Travel Document)') }
+
+        it 'should return true' do
+          expect(consumer_role.has_i571?).to eq(true)
+        end
+
+        it 'should return the subject' do
+          expect(::VlpDocument::VLP_DOCUMENT_KINDS).to include(consumer_role.vlp_documents.first.subject)
+        end
+
+        it 'should match the subject' do
+          expect(consumer_role.vlp_documents.first.subject).to eq(vlp_doc.subject)
+        end
+      end
+
+      context 'invalid i571 document' do
+        let(:vlp_doc) { FactoryBot.build(:vlp_document, subject: 'I-551 (Permanent Resident Card)', card_number: 'abc4567890123') }
+
+        it 'should not return any object of type VlpDocument' do
+          expect(consumer_role.has_i571?).to eq(false)
+        end
+      end
+    end
   end
 end
