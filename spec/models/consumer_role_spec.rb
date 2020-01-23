@@ -1162,5 +1162,38 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
       end
     end
+
+    context 'i766' do
+      let!(:consumer_role) { FactoryBot.create(:consumer_role, vlp_documents: [vlp_doc]) }
+
+      context 'valid i766 document exists' do
+        let(:vlp_doc) do
+          FactoryBot.build(:vlp_document,
+                           subject: 'I-766 (Employment Authorization Card)',
+                           card_number: 'card_number00',
+                           receipt_number: 'receipt_numbr')
+        end
+
+        it 'should return an object of type VlpDocument' do
+          expect(consumer_role.i766).to be_a(::VlpDocument)
+        end
+
+        it 'should return the subject' do
+          expect(::VlpDocument::VLP_DOCUMENT_KINDS).to include(consumer_role.i766.subject)
+        end
+
+        it 'should match the card_number' do
+          expect(consumer_role.i766.card_number).to eq('card_number00')
+        end
+      end
+
+      context 'invalid i766 document' do
+        let(:vlp_doc) { FactoryBot.build(:vlp_document, subject: 'I-551 (Permanent Resident Card)') }
+
+        it 'should not return any object of type VlpDocument' do
+          expect(consumer_role.i766).to be_nil
+        end
+      end
+    end
   end
 end
