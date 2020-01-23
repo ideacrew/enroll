@@ -102,8 +102,12 @@ module Enrollments
         assign_attributes_to_reinstate_enrollment(reinstated_enrollment, common_params)
         if base_enrollment.is_shop?
           assign_attributes_to_reinstate_enrollment(reinstated_enrollment, form_shop_params) if can_be_reinstated?
-        elsif base_enrollment.is_ivl_by_kind? && new_aptc
+        elsif base_enrollment.is_ivl_by_kind?
           assign_attributes_to_reinstate_enrollment(reinstated_enrollment, form_ivl_params)
+          if new_aptc.blank?
+            reinstated_enrollment.elected_aptc_pct = base_enrollment.elected_aptc_pct
+            reinstated_enrollment.applied_aptc_amount = base_enrollment.applied_aptc_amount
+          end
         end
         reinstated_enrollment.hbx_enrollment_members = clone_hbx_enrollment_members
         if base_enrollment.may_terminate_coverage? && (reinstate_enrollment.effective_on > base_enrollment.effective_on)
