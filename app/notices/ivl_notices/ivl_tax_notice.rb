@@ -8,7 +8,7 @@ class IvlNotices::IvlTaxNotice < IvlNotice
     args[:market_kind] = 'individual'
     args[:recipient_document_store]= consumer_role.person
     args[:to] = consumer_role.person.work_email_or_best
-    self.header = "notices/shared/header_ivl.html.erb"
+    self.header = 'notices/shared/ivl_tax_header.html.erb'
     super(args)
   end
 

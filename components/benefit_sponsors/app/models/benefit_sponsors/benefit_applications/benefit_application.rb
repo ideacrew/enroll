@@ -171,6 +171,10 @@ module BenefitSponsors
                                                                                            :"effective_period.min".lte => compare_date )
                                                                                            }
 
+    scope :before_effective_date,  ->(compare_date = TimeKeeper.date_of_record) {
+      where(:"effective_period.min".lt => compare_date)
+    }
+
     scope :effective_date_end_on,           ->(compare_date = TimeKeeper.date_of_record) { where(
                                                                                            :"effective_period.max".lt => compare_date )
                                                                                            }
@@ -394,6 +398,10 @@ module BenefitSponsors
       find_census_employees.active
     end
 
+    def active_census_employees_under_py
+      find_census_employees.active.census_employees_active_on(self.effective_period.min)
+    end
+
     def assigned_census_employees_without_owner
       benefit_sponsorship.census_employees.active.non_business_owner
     end
@@ -423,12 +431,20 @@ module BenefitSponsors
     # Admin can't choose a date beyond the effective month of the application.
     #   ex: For 1/1 application we limit calender from 12/20 to 1/31.
     def open_enrollment_date_bounds
+      prior_month = effective_date - 1.month
+      day = if is_renewing?
+              Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on
+            else
+              Settings.aca.shop_market.open_enrollment.monthly_end_on
+            end
+      default_oe_date = Date.new(prior_month.year, prior_month.month, day)
       {
-        min: [TimeKeeper.date_of_record, benefit_sponsorship.open_enrollment_period_for(effective_date).max].max,
+        min: [TimeKeeper.date_of_record, default_oe_date].max,
         max: effective_date.end_of_month
       }
     end
 
+    # Note: Above note mentions PUBLISHED_STATES deprecated, use SUBMITTED_STATES
     def is_submitted?
       PUBLISHED_STATES.include?(aasm_state)
     end
@@ -487,7 +503,7 @@ module BenefitSponsors
 
     def members_eligible_to_enroll
       return @members_eligible_to_enroll if defined? @members_eligible_to_enroll
-      @members_eligible_to_enroll ||= active_census_employees
+      @members_eligible_to_enroll ||= active_census_employees_under_py
     end
 
     def members_eligible_to_enroll_count
@@ -557,7 +573,7 @@ module BenefitSponsors
 
     def all_enrolled_and_waived_member_count
       @all_enrolled_and_waived_member_count ||= begin
-        if active_census_employees.count <= Settings.aca.shop_market.small_market_active_employee_limit
+        if active_census_employees_under_py.count <= Settings.aca.shop_market.small_market_active_employee_limit
           enrolled_families.size
         else
           0

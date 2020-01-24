@@ -446,7 +446,7 @@ module BenefitSponsors
 
       def trigger_employee_sep_request_accepted_notice(model_event)
         special_enrollment_period = model_event.klass_instance
-        return unless special_enrollment_period.is_shop?
+        return unless special_enrollment_period.is_shop? || special_enrollment_period.is_fehb?
 
         person = special_enrollment_period.family.primary_applicant.person
         return unless (employee_role = person.active_employee_roles[0])

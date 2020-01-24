@@ -1,4 +1,7 @@
 require 'rails_helper'
+require File.join(Rails.root, "components/benefit_sponsors/spec/support/benefit_sponsors_product_spec_helpers")
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 RSpec.describe Employers::EmployerProfilesController, dbclean: :after_each do
 
@@ -39,14 +42,30 @@ RSpec.describe Employers::EmployerProfilesController, dbclean: :after_each do
   end
 
   describe "GET show" do
-
+    include_context 'setup benefit market with market catalogs and product packages'
+    include_context 'setup initial benefit application'
     let(:user) { double("user") }
     let(:employer_profile) { FactoryBot.create(:employer_profile) }
 
-    it "should redirect" do
-      sign_in(user)
-      get :show, params: {id: employer_profile}
-      expect(response).to redirect_to("/benefit_sponsors/profiles/registrations/new?profile_type=benefit_sponsor")
+    context "for new model employer profile match", dbclean: :after_each do
+
+      before(:each) do
+        abc_organization.update_attributes!(hbx_id: employer_profile.hbx_id)
+      end
+
+      it "should redirect" do
+        sign_in(user)
+        get :show, params: {id: employer_profile}
+        expect(response).to redirect_to("/benefit_sponsors/profiles/employers/employer_profiles/#{abc_profile.id}?tab=home")
+      end
+    end
+
+    context "for new model employer profile don't match", dbclean: :after_each do
+      it "should redirect" do
+        sign_in(user)
+        get :show, params: {id: employer_profile}
+        expect(response).to redirect_to("/benefit_sponsors/profiles/registrations/new?profile_type=benefit_sponsor")
+      end
     end
   end
 
@@ -80,8 +99,11 @@ RSpec.describe Employers::EmployerProfilesController, dbclean: :after_each do
 
 
   describe "GET export_census_employees", dbclean: :after_each do
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup initial benefit application"
+
     let(:user) { FactoryBot.create(:user) }
-    let(:employer_profile) { FactoryBot.create(:employer_profile) }
+    let(:employer_profile) { abc_profile }
 
     it "should export cvs" do
       sign_in(user)

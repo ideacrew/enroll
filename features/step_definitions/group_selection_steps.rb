@@ -77,7 +77,13 @@ end
 
 And(/(.*) also has a health enrollment with primary person covered/) do |role|
   family = Family.all.first
-  sep = FactoryBot.create :special_enrollment_period, family: family
+  if ["consumer","Resident","user"].include? role
+    qle = FactoryBot.create :qualifying_life_event_kind, market_kind: "individual"
+    sep = FactoryBot.create :special_enrollment_period, qualifying_life_event_kind_id: qle.id, family: family
+  else
+    sep = FactoryBot.create :special_enrollment_period, family: family
+  end
+  sep.update_attributes!(effective_on: TimeKeeper.date_of_record.end_of_month)
   product = FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile)
   enrollment = FactoryBot.create(:hbx_enrollment, product: product,
                                   household: family.active_household,
@@ -93,6 +99,39 @@ And(/(.*) also has a health enrollment with primary person covered/) do |role|
     eligibility_date: TimeKeeper.date_of_record - 2.months,
     coverage_start_on: TimeKeeper.date_of_record - 2.months
   )
+  enrollment.save!
+end
+
+And(/(.*) also has a dental enrollment with primary person covered/) do |role|
+  family = Family.all.first
+  if ["consumer","Resident","user"].include? role
+    qle = FactoryBot.create :qualifying_life_event_kind, market_kind: "individual"
+    sep = FactoryBot.create :special_enrollment_period, qualifying_life_event_kind_id: qle.id, family: family
+  else
+    sep = FactoryBot.create :special_enrollment_period, family: family
+  end
+  kind = if @employee_role.present?
+           "employer_sponsored"
+         else
+           if role == "Resident"
+             "coverall"
+           else
+             "individual"
+           end
+         end
+  product = FactoryBot.create(:benefit_markets_products_dental_products_dental_product, :with_issuer_profile, dental_level: 'low', dental_plan_kind: 'ppo')
+  enrollment = FactoryBot.create(:hbx_enrollment, product: product,
+                                                  household: family.active_household,
+                                                  family: family,
+                                                  kind: kind,
+                                                  effective_on: TimeKeeper.date_of_record,
+                                                  enrollment_kind: "special_enrollment",
+                                                  special_enrollment_period_id: sep.id,
+                                                  employee_role_id: (@employee_role.id if @employee_role.present?),
+                                                  benefit_group_id: (@benefit_group.id if @benefit_group.present?))
+  enrollment.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: family.primary_applicant.id,
+                                                               eligibility_date: TimeKeeper.date_of_record - 2.months,
+                                                               coverage_start_on: TimeKeeper.date_of_record - 2.months)
   enrollment.save!
 end
 
@@ -164,8 +203,8 @@ end
 And(/(.*) should see the (.*) family member (.*) and (.*)/) do |employee, type, disabled, checked|
   wait_for_ajax
   if type == "ineligible"
-    expect(find("input[type='checkbox']:disabled", wait: 5)).to be_disabled
-    expect(find("input[type='checkbox']:disabled")).not_to be_checked
+    expect(first("input[type='checkbox']:disabled", wait: 5)).to be_disabled
+    expect(first("input[type='checkbox']:disabled")).not_to be_checked
   else
     expect(find("#family_member_ids_0", wait: 5)).not_to be_disabled
     expect(find("#family_member_ids_0")).to be_checked
@@ -225,17 +264,48 @@ Then(/(.*) should see primary person/) do |role|
 end
 
 Then(/(.*) should see the enrollment with make changes button/) do |role|
-  expect(page).to have_content "#{(current_effective_date || TimeKeeper.date_of_record).year} HEALTH COVERAGE"
+  if role == "employee"
+    expect(page).to have_content "#{(@current_effective_date || TimeKeeper.date_of_record).year} HEALTH COVERAGE"
+  else
+    expect(page).to have_content "#{TimeKeeper.date_of_record.year} HEALTH COVERAGE"
+  end
   expect(page).to have_link "Make Changes"
 end
 
 Then(/(.*) should see the dental enrollment with make changes button/) do |role|
-  expect(page).to have_content "#{(current_effective_date || TimeKeeper.date_of_record).year} DENTAL COVERAGE"
+  if role == "employee"
+    expect(page).to have_content "#{(@current_effective_date || TimeKeeper.date_of_record).year} DENTAL COVERAGE"
+  else
+    expect(page).to have_content "#{TimeKeeper.date_of_record.year} DENTAL COVERAGE"
+  end
   expect(page).to have_link "Make Changes"
 end
 
 When(/(.*) clicked on make changes button/) do |role|
   click_link "Make Changes"
+end
+
+Then(/(.*) should see keep existing plan and select plan to terminate button/) do |_role|
+  expect(page).to have_button('Keep existing plan')
+  expect(page).to have_link "Select Plan to Terminate"
+end
+
+When(/(.*) clicked on keep existing plan button/) do |_role|
+  click_button "Keep existing plan"
+end
+
+Then(/consumer should land on confirm page/) do
+  expect(page).to have_content "Confirm Your Plan Selection"
+  expect(page).to have_content "Premium"
+end
+
+Then(/consumer should enrollment submitted confirmation page/) do
+  expect(page).to have_content "Enrollment Submitted"
+  expect(page).to have_content "Premium"
+end
+
+Then(/cosumer should see the home page/) do
+  expect(page).to have_content "My #{Settings.site.short_name}"
 end
 
 When(/(.*) clicked continue on household info page/) do |role|
@@ -374,4 +444,3 @@ end
 And(/Resident clicked on "Married" qle/) do
   click_link "Married"
 end
-

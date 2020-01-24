@@ -445,9 +445,29 @@ describe Family, dbclean: :around_each do
     end
   end
 
-  context "best_verification_due_date" do 
+  context "latest_ivl_sep" do
     let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
-    
+    before do
+      @qlek = FactoryBot.create(:qualifying_life_event_kind, market_kind: 'individual', is_active: true)
+      date1 = TimeKeeper.date_of_record - 20.days
+      @current_sep = FactoryBot.build(:special_enrollment_period, family: family, qle_on: date1, effective_on: date1, qualifying_life_event_kind: @qlek, effective_on_kind: 'first_of_month', submitted_at: date1)
+      date2 = TimeKeeper.date_of_record - 10.days
+      @another_current_sep = FactoryBot.build(:special_enrollment_period, family: family, qle_on: date2, effective_on: date2, qualifying_life_event_kind: @qlek, effective_on_kind: 'first_of_month', submitted_at: date2)
+    end
+
+    it "should return latest active sep" do
+      date3 = TimeKeeper.date_of_record - 200.days
+      sep = FactoryBot.build(:special_enrollment_period, family: family, qle_on: date3, effective_on: date3, qualifying_life_event_kind: @qlek, effective_on_kind: 'first_of_month')
+      expect(@current_sep.is_active?).to eq true
+      expect(@another_current_sep.is_active?).to eq true
+      expect(sep.is_active?).to eq false
+      expect(family.latest_ivl_sep).to eq @another_current_sep
+    end
+  end
+
+  context "best_verification_due_date" do
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
+
     it "should earliest duedate when family had two or more due dates" do
       family_due_dates = [TimeKeeper.date_of_record+40 , TimeKeeper.date_of_record+ 80]
       allow(family).to receive(:contingent_enrolled_family_members_due_dates).and_return(family_due_dates)
@@ -1440,6 +1460,33 @@ describe Family, "scopes", dbclean: :after_each do
   end
 
   context 'scopes' do 
+    context '.all_enrollments_by_benefit_package' do
+      let(:benefit_package_to_test) do
+        double(:benefit_package, :_id => 1)
+      end
+
+      it "works on the family class" do
+        expect(Family.all_enrollments_by_benefit_package(benefit_package_to_test)).to eq([])
+      end
+    end
+
+    context '.all_enrollments_by_benefit_sponsorship_id' do
+      let(:benefit_sponsorship_id) { 1 }
+      it 'works on the family class' do
+        expect(Family.all_enrollments_by_benefit_sponsorship_id(benefit_sponsorship_id)).to eq([])
+      end
+    end
+
+    context '.enrolled_and_terminated_through_benefit_package' do
+      let(:benefit_package_to_test) do
+        double(:benefit_package, :_id => 1)
+      end
+
+      it "works on the family class" do
+        expect(Family.enrolled_and_terminated_through_benefit_package(benefit_package_to_test)).to eq([])
+      end
+    end
+
     context '.all_with_hbx_enrollments' do
       it "works on family class" do
         expect(Family.all_with_hbx_enrollments).to include(ivl_enrollment.family)
@@ -1465,7 +1512,7 @@ describe Family, "scopes", dbclean: :after_each do
 
     it '.enrolled_under_benefit_application' do
       allow(census_employee).to receive(:family).and_return(family)
-      allow(initial_application).to receive(:active_census_employees).and_return([census_employee])
+      allow(initial_application).to receive(:active_census_employees_under_py).and_return([census_employee])
       expect(Family.enrolled_under_benefit_application(initial_application)).to include family
     end
 

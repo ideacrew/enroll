@@ -913,6 +913,56 @@ module BenefitSponsors
       end
     end
 
+    describe '.active_census_employees_under_py', dbclean: :after_each do
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup renewal application"
+      include_context "setup employees with benefits"
+
+      before :each do
+        renewal_application.benefit_packages.first.update_attributes!(_id: CensusEmployee.all.first.benefit_group_assignments.first.benefit_package_id)
+      end
+
+      it 'should not return the terminated EEs' do
+        expect(renewal_application.active_census_employees_under_py.count).to eq 5
+        term_date = renewal_application.effective_period.min - 10.days
+        ce = renewal_application.active_census_employees_under_py.first
+        ce.benefit_group_assignments.first.update_attributes!(start_on: renewal_application.effective_period.min + 1.day)
+        ce.aasm_state = 'employment_terminated'
+        ce.employment_terminated_on = term_date
+        ce.save(validate: false)
+        expect(renewal_application.active_census_employees_under_py.count).to eq 4
+      end
+
+      it 'should not return term pending with prior effective date as term date' do
+        expect(renewal_application.active_census_employees_under_py.count).to eq 5
+        term_date = renewal_application.effective_period.min - 10.days
+        ce = renewal_application.active_census_employees_under_py.first
+        ce.benefit_group_assignments.first.update_attributes!(start_on: renewal_application.effective_period.min + 1.day)
+        ce.aasm_state = 'employee_termination_pending'
+        ce.employment_terminated_on = term_date
+        ce.save(validate: false)
+        expect(renewal_application.active_census_employees_under_py.count).to eq 4
+      end
+
+      it 'should return term pending with effective date as term date' do
+        expect(renewal_application.active_census_employees_under_py.count).to eq 5
+        term_date = renewal_application.effective_period.min
+        ce = renewal_application.active_census_employees_under_py.first
+        ce.aasm_state = 'employee_termination_pending'
+        ce.employment_terminated_on = term_date
+        expect(renewal_application.active_census_employees_under_py.count).to eq 5
+      end
+
+      it 'should return term pending with future effective date as term date' do
+        expect(renewal_application.active_census_employees_under_py.count).to eq 5
+        term_date = renewal_application.effective_period.min + 1.day
+        ce = renewal_application.active_census_employees_under_py.first
+        ce.aasm_state = 'employee_termination_pending'
+        ce.employment_terminated_on = term_date
+        expect(renewal_application.active_census_employees_under_py.count).to eq 5
+      end
+    end
+
     describe '.successor_benefit_package', dbclean: :after_each do
       include_context "setup benefit market with market catalogs and product packages"
       include_context "setup renewal application"
@@ -929,20 +979,101 @@ module BenefitSponsors
 
       context ".renewal_quiet_period_end", dbclean: :after_each do
         it 'should return renewal quiet period dates' do
-          renewal_start_on = renewal_application.start_on
+          renewal_quiet_period = renewal_application.start_on + (Settings.aca.shop_market.renewal_application.quiet_period.month_offset.months) + (Settings.aca.shop_market.renewal_application.quiet_period.mday - 1).days
           expect(renewal_application.renewal_quiet_period_end(renewal_application.start_on).mday).to eq 15
-          expect(renewal_application.renewal_quiet_period_end(renewal_application.start_on)).to eq Date.new(renewal_start_on.year, renewal_start_on.prev_month.month, 15)
+          expect(renewal_application.renewal_quiet_period_end(renewal_application.start_on)).to eq renewal_quiet_period
         end
       end
 
       context ".initial_quiet_period_end", dbclean: :after_each do
         it 'should return initial quiet period dates' do
-
-          inital_start_on = predecessor_application.start_on
+          inital_quiet_period = predecessor_application.start_on + (Settings.aca.shop_market.initial_application.quiet_period.month_offset.months) + (Settings.aca.shop_market.initial_application.quiet_period.mday - 1).days
           expect(predecessor_application.initial_quiet_period_end(predecessor_application.start_on).mday).to eq 28
-          expect(predecessor_application.initial_quiet_period_end(predecessor_application.start_on)).to eq Date.new(inital_start_on.year, inital_start_on.prev_month.month, 28)
+          expect(predecessor_application.initial_quiet_period_end(predecessor_application.start_on)).to eq inital_quiet_period
         end
       end
+    end
+
+    describe '.open_enrollment_date_bounds', dbclean: :after_each do
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup renewal application"
+
+      context "when DATE is After default OE" do
+
+        before do
+          prior_month = renewal_application.start_on - 1.month
+          TimeKeeper.set_date_of_record_unprotected!(Date.new(prior_month.year, prior_month.month, 14))
+        end
+        after { TimeKeeper.set_date_of_record_unprotected!(Time.zone.today) }
+
+        context ".renewal open_enrollment_date_bound", dbclean: :after_each do
+
+          it 'should return renewal open_enrollment dates' do
+            renewal_start_on = renewal_application.start_on
+            renewal_open_enrollment_date_bound = renewal_application.open_enrollment_date_bounds
+
+            expect(renewal_open_enrollment_date_bound[:min]).to eq TimeKeeper.date_of_record
+            expect(renewal_open_enrollment_date_bound[:max]).to eq renewal_start_on.end_of_month
+          end
+        end
+
+        context ".initial open_enrollment_date_bound", dbclean: :after_each do
+
+          before do
+            prior_month = predecessor_application.start_on - 1.month
+            TimeKeeper.set_date_of_record_unprotected!(Date.new(prior_month.year, prior_month.month, 14))
+          end
+          after { TimeKeeper.set_date_of_record_unprotected!(Time.zone.today) }
+
+          it 'should return initial open_enrollment dates' do
+            inital_start_on = predecessor_application.start_on
+            inital_open_enrollment_date_bound = predecessor_application.open_enrollment_date_bounds
+
+            expect(inital_open_enrollment_date_bound[:min]).to eq TimeKeeper.date_of_record
+            expect(inital_open_enrollment_date_bound[:max]).to eq inital_start_on.end_of_month
+          end
+        end
+      end
+
+      context "when DATE is Before default OE date" do
+
+        before do
+          prior_month = renewal_application.start_on - 1.month
+          TimeKeeper.set_date_of_record_unprotected!(Date.new(prior_month.year, prior_month.month, 9))
+        end
+        after { TimeKeeper.set_date_of_record_unprotected!(Time.zone.today) }
+
+        context ".renewal open_enrollment_date_bound", dbclean: :after_each do
+
+          it 'should return renewal open_enrollment dates' do
+            renewal_start_on = renewal_application.start_on
+            prior_month = renewal_application.start_on - 1.month
+            renewal_open_enrollment_date_bound = renewal_application.open_enrollment_date_bounds
+
+            expect(renewal_open_enrollment_date_bound[:min]).to eq Date.new(prior_month.year, prior_month.month, 13)
+            expect(renewal_open_enrollment_date_bound[:max]).to eq renewal_start_on.end_of_month
+          end
+        end
+
+        context ".initial open_enrollment_date_bound", dbclean: :after_each do
+
+          before do
+            prior_month = predecessor_application.start_on - 1.month
+            TimeKeeper.set_date_of_record_unprotected!(Date.new(prior_month.year, prior_month.month, 9))
+          end
+          after { TimeKeeper.set_date_of_record_unprotected!(Time.zone.today) }
+
+          it 'should return initial open_enrollment dates' do
+            inital_start_on = predecessor_application.start_on
+            prior_month = predecessor_application.start_on - 1.month
+            inital_open_enrollment_date_bound = predecessor_application.open_enrollment_date_bounds
+
+            expect(inital_open_enrollment_date_bound[:min]).to eq Date.new(prior_month.year, prior_month.month, 10)
+            expect(inital_open_enrollment_date_bound[:max]).to eq inital_start_on.end_of_month
+          end
+        end
+      end
+
     end
   end
 end

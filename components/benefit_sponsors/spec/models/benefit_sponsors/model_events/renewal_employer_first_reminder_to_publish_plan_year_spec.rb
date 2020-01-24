@@ -13,7 +13,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployerReminderToPublishPl
   let(:employer_profile) { abc_profile }
   let(:model_instance) { renewal_application }
 
-  let!(:date_mock_object) { double("Date", day: Settings.aca.shop_market.renewal_application.application_submission_soft_deadline - 2 )}
+  let!(:date_mock_object) { Date.new(renewal_effective_date.year, renewal_effective_date.prev_month.month, (Settings.aca.shop_market.renewal_application.application_submission_soft_deadline - 2)) }
 
   before do
     model_instance.update_attributes(:effective_period =>  renewal_effective_date..(renewal_effective_date + 1.year) - 1.day)

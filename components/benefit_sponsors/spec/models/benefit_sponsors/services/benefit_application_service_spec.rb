@@ -258,7 +258,7 @@ module BenefitSponsors
           @form = init_form_for_create
         end
 
-        [:pending, :enrollment_open, :enrollment_closed, :enrollment_ineligible, :binder_paid].each do |active_state|
+        [:pending, :enrollment_open, :enrollment_closed, :binder_paid].each do |active_state|
           let!(:ba) { FactoryBot.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, aasm_state: :draft) }
 
           context 'with dt in pending and enrollment states' do
@@ -277,7 +277,16 @@ module BenefitSponsors
               @model_attrs = subject.form_params_to_attributes(@form)
               subject.create_or_cancel_draft_ba(@form, @model_attrs)
               benefit_sponsorship.reload
-              expect(benefit_sponsorship.benefit_applications.first).to have_attributes(:aasm_state => :canceled)
+              expect(benefit_sponsorship.benefit_applications.find(ba2.id)).to have_attributes(:aasm_state => :canceled)
+            end
+
+            it 'the existing ineligible benefit application should not be turned into cancelled state ' do
+              ba2.update_attributes(aasm_state: :enrollment_ineligible)
+              set_bs_for_service(@form)
+              @model_attrs = subject.form_params_to_attributes(@form)
+              subject.create_or_cancel_draft_ba(@form, @model_attrs)
+              benefit_sponsorship.reload
+              expect(benefit_sponsorship.benefit_applications.find(ba2.id)).to have_attributes(:aasm_state => :enrollment_ineligible)
             end
           end
         end
