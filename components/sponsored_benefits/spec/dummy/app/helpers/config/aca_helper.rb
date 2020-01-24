@@ -15,6 +15,33 @@ module Config::AcaHelper
     @aca_shop_market_employer_family_contribution_percent_minimum ||= Settings.aca.shop_market.employer_family_contribution_percent_minimum
   end
 
+  def flexible_contribution_model_enabled_for_bqt_for_period
+    app_period = Settings.aca.shop_market.broker_quoting_tool.flexible_contribution_model.initial_application_period.split('..')
+    start_on = retrive_date(app_period[0])
+    end_on = retrive_date(app_period[1])
+    start_on..end_on
+  end
+
+  def retrive_date(val)
+    (val.split('-').first.size == 4) ? Date.strptime(val,"%Y-%m-%d") : Date.strptime(val,"%m/%d/%Y")
+  end
+
+  def flexible_family_contribution_percent_minimum_for_bqt
+    @flexible_family_contribution_percent_minimum_for_bqt ||= Settings.aca.shop_market.broker_quoting_tool.flexible_contribution_model.employer_family_contribution_percent_minimum
+  end
+
+  def flexible_employer_contribution_percent_minimum_for_bqt
+    @flexible_employer_contribution_percent_minimum_for_bqt ||= Settings.aca.shop_market.broker_quoting_tool.flexible_contribution_model.employer_contribution_percent_minimum
+  end
+
+  def family_contribution_percent_minimum_for_application_start_on(start_on)
+    flexible_contribution_model_enabled_for_bqt_for_period.cover?(start_on) ? flexible_family_contribution_percent_minimum_for_bqt : aca_shop_market_employer_family_contribution_percent_minimum
+  end
+
+  def employer_contribution_percent_minimum_for_application_start_on(start_on)
+    flexible_contribution_model_enabled_for_bqt_for_period.cover?(start_on) ? flexible_employer_contribution_percent_minimum_for_bqt : aca_shop_market_employer_contribution_percent_minimum
+  end
+
   def aca_shop_market_employer_contribution_percent_minimum
     @aca_shop_market_employer_contribution_percent_minimum ||= Settings.aca.shop_market.employer_contribution_percent_minimum
   end

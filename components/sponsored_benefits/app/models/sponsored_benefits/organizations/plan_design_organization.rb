@@ -135,11 +135,15 @@ module SponsoredBenefits
       end
 
       def new_proposal_state
-        if employer_profile.present? && employer_profile.active_plan_year.present?
+        if is_renewing?
           'renewing_draft'
         else
           'draft'
         end
+      end
+
+      def is_renewing?
+        employer_profile.present? && employer_profile.active_plan_year.present?
       end
 
       def build_proposal_from_existing_employer_profile
