@@ -833,23 +833,20 @@ class BenefitGroup
     # all employee contribution < 50% for 1/1 employers
     return if start_on.yday == 1
 
-    ee_min_contribution = employer_profile.is_renewing? && !flexbile_contribution_model_enabled_for_bqt_for_renewals ? aca_shop_market_employer_contribution_percent_minimum : employer_contribution_percent_minimum_for_application_start_on(start_on)
-    family_min_contribution = employer_profile.is_renewing? && !flexbile_contribution_model_enabled_for_bqt_for_renewals ? aca_shop_market_employer_family_contribution_percent_minimum : family_contribution_percent_minimum_for_application_start_on(start_on)
-
     if self.sole_source?
       if composite_tier_contributions.present?
         employee_tier = composite_tier_contributions.find_by(composite_rating_tier: 'employee_only')
         family_tier = composite_tier_contributions.find_by(composite_rating_tier: 'family')
-        if ee_min_contribution > (employee_tier.try(:employer_contribution_percent) || 0)
-          self.errors.add(:composite_tier_contributions, "Employer contribution for employee must be ≥ #{ee_min_contribution}%")
-        elsif family_tier.offered? && (family_tier.try(:employer_contribution_percent) || 0) < family_min_contribution
-          self.errors.add(:composite_tier_contributions, "Employer contribution for family plans must be ≥ #{family_min_contribution}")
+        if employer_contribution_percent_minimum_for_application_start_on(start_on, employer_profile.is_renewing?) > (employee_tier.try(:employer_contribution_percent) || 0)
+          self.errors.add(:composite_tier_contributions, "Employer contribution for employee must be ≥ #{employer_contribution_percent_minimum_for_application_start_on(start_on, employer_profile.is_renewing?)}%")
+        elsif family_tier.offered? && (family_tier.try(:employer_contribution_percent) || 0) < family_contribution_percent_minimum_for_application_start_on(start_on, employer_profile.is_renewing?)
+          self.errors.add(:composite_tier_contributions, "Employer contribution for family plans must be ≥ #{family_contribution_percent_minimum_for_application_start_on(start_on, employer_profile.is_renewing?)}")
         end
       else
         self.errors.add(:composite_rating_tier, "Employer must set contribution percentages")
       end
-    elsif relationship_benefits.present? && (relationship_benefits.find_by(relationship: "employee").try(:premium_pct) || 0) < ee_min_contribution
-      self.errors.add(:relationship_benefits, "Employer contribution must be ≥ #{ee_min_contribution}% for employee")
+    elsif relationship_benefits.present? && (relationship_benefits.find_by(relationship: "employee").try(:premium_pct) || 0) < employer_contribution_percent_minimum_for_application_start_on(start_on, employer_profile.is_renewing?)
+      self.errors.add(:relationship_benefits, "Employer contribution must be ≥ #{employer_contribution_percent_minimum_for_application_start_on(start_on, employer_profile.is_renewing?)}% for employee")
     end
   end
 
