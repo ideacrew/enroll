@@ -32,6 +32,11 @@ module SponsoredBenefits
       }
     }
 
+    # To avoid the dependency of adding benefit markets dummy
+    before :each do
+      allow_any_instance_of(SponsoredBenefits::Organizations::PlanDesignOrganization).to receive(:is_renewing?).and_return(false)
+    end
+
     describe "POST #create" do
       before do
         benefit_application.benefit_groups.delete_all
