@@ -34,7 +34,7 @@ module SponsoredBenefits
 
     # To avoid the dependency of adding benefit markets dummy
     before :each do
-      allow_any_instance_of(SponsoredBenefits::Organizations::PlanDesignOrganization).to receive(:is_renewing?).and_return(false)
+      allow_any_instance_of(SponsoredBenefits::Organizations::PlanDesignOrganization).to receive(:is_renewing_employer?).and_return(false)
     end
 
     describe "POST #create" do
