@@ -96,25 +96,61 @@ And(/^Primary Broker enters quote name$/) do
   wait_for_ajax(3, 2)
 end
 
+Then(/^.+ sees that publish button is (.*)$/) do |publish_btn|
+  wait_for_ajax(3, 2)
+  find(:xpath, "//*[@id='new_forms_plan_design_proposal']/div[9]", :visible => false).click
+  wait_for_ajax(3, 2)
+  if publish_btn == 'disabled'
+    expect(page).to have_selector(:button, "Save Quote", disabled: true)
+  else
+    expect(find("#submitPlanDesignProposal")[:class].include?('disabled')).to eql false
+  end
+end
+
+And(/^.+ sees quote for (.*) employer$/) do |employer_name|
+  expect(page).to have_content("Quote for #{employer_name}")
+end
+
 And(/^the broker clicks on Select Health Benefits button$/) do
   find('.interaction-click-control-select-health-benefits').click
 end
 
-And(/^the broker selected by metal level plan offerings and publish quote$/) do
-  wait_for_ajax(3, 2)
-  find(:xpath, "//*[@id='pdp-bms']/div/ul/li[2]/label/div").click
-  expect(page).to have_content("Gold")
-  find(:xpath, "//*[@id='metalLevelCarrierList']/div[3]/div[2]/label/h3").click
-  wait_for_ajax(3, 2)
-  fill_in "forms_plan_design_proposal[profile][benefit_sponsorship][benefit_application][benefit_group][relationship_benefits_attributes][0][premium_pct]", with: 100
-  fill_in "forms_plan_design_proposal[profile][benefit_sponsorship][benefit_application][benefit_group][relationship_benefits_attributes][1][premium_pct]", with: 100
-  fill_in "forms_plan_design_proposal[profile][benefit_sponsorship][benefit_application][benefit_group][relationship_benefits_attributes][2][premium_pct]", with: 100
-  fill_in "forms_plan_design_proposal[profile][benefit_sponsorship][benefit_application][benefit_group][relationship_benefits_attributes][3][premium_pct]", with: 100
+When(/^.+ clicks Actions for that Employer$/) do
+  find('.dropdown.pull-right', text: 'Actions').click
+end
+
+Then(/^.+ sees Create Quote button$/) do
+  expect(page).to have_css('.btn.btn-xs', text: 'Create Quote')
+end
+
+Then(/^.+ clicks on Create Quote button$/) do
+  find('.btn.btn-xs', text: 'Create Quote').click
+end
+
+
+
+Then(/^broker publishes the quote$/) do
   wait_for_ajax(3, 2)
   find(:xpath, "//*[@id='new_forms_plan_design_proposal']/div[9]", :visible => false).click
   find(:xpath,"//*[@id='new_forms_plan_design_proposal']/div[3]/div/div/div[2]/div[1]/div/div[1]/label/div/div[2]/div/div[1]/h3").click
   wait_for_ajax(3, 2)
   find('.interaction-click-control-publish-quote').click
+end
+
+Then(/^the broker selects plan offerings by metal level and enters (.*) for employee and deps$/) do |int|
+  wait_for_ajax(3, 2)
+  find(:xpath, "//*[@id='pdp-bms']/div/ul/li[2]/label/div").click
+  expect(page).to have_content("Gold")
+  find(:xpath, "//*[@id='metalLevelCarrierList']/div[3]/div[2]/label/h3").click
+  wait_for_ajax(3, 2)
+  fill_in "forms_plan_design_proposal[profile][benefit_sponsorship][benefit_application][benefit_group][relationship_benefits_attributes][0][premium_pct]", with: int.to_i
+  fill_in "forms_plan_design_proposal[profile][benefit_sponsorship][benefit_application][benefit_group][relationship_benefits_attributes][1][premium_pct]", with: int.to_i
+  fill_in "forms_plan_design_proposal[profile][benefit_sponsorship][benefit_application][benefit_group][relationship_benefits_attributes][2][premium_pct]", with: int.to_i
+  fill_in "forms_plan_design_proposal[profile][benefit_sponsorship][benefit_application][benefit_group][relationship_benefits_attributes][3][premium_pct]", with: int.to_i
+end
+
+Then(/^the broker should see that the save benefits button is enabled$/) do
+  expect(find("#submitPlanDesignProposal")[:class].include?('disabled')).to eql false
 end
 
 And(/^.+ should see successful message of published quote$/) do
