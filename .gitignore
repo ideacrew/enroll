@@ -15,6 +15,7 @@
 /log/*
 !/log/.keep
 /tmp
+public/assets
 
 # Ignore vim swapfiles
 *.swp
