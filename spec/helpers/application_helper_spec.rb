@@ -301,17 +301,52 @@ RSpec.describe ApplicationHelper, :type => :helper do
   end
 
   describe "#calculate_participation_minimum" do
-    let(:plan_year_1) { double("PlanYear", eligible_to_enroll_count: 5) }
-    before do
-      @current_plan_year = plan_year_1
-    end
-    it "should  return 0 when eligible_to_enroll_count is zero" do
-      expect(@current_plan_year).to receive(:eligible_to_enroll_count).and_return(0)
-      expect(helper.calculate_participation_minimum).to eq 0
+
+    context 'initial employers' do
+
+      let(:plan_year_1) { double("PlanYear", eligible_to_enroll_count: 5, is_renewing?: false) }
+
+      it "should return 0 when eligible_to_enroll_count is zero" do
+        @current_plan_year = plan_year_1
+        expect(@current_plan_year).to receive(:eligible_to_enroll_count).and_return(0)
+        expect(helper.calculate_participation_minimum).to eq 0
+      end
+
+      context "should calculate eligible_to_enroll_count when not zero" do
+        let(:flex_plan_year) { double("PlanYear", start_on: Date.new(2020, 3, 1), eligible_to_enroll_count: 5, is_renewing?: false) }
+        let(:standard_plan_year) { double("PlanYear", start_on: Date.new(2029, 3, 1), eligible_to_enroll_count: 5, is_renewing?: false) }
+
+        let(:min_participation_count_for_flex) do
+          (flex_plan_year.eligible_to_enroll_count * Settings.aca.shop_market.initial_application.flexible_contribution_model.employee_participation_ratio_minimum).ceil
+        end
+
+        let(:min_participation_count_for_standard) do
+          (standard_plan_year.eligible_to_enroll_count * Settings.aca.shop_market.employee_participation_ratio_minimum).ceil
+        end
+
+
+        it 'for employer eligible for flexible contribution model' do
+          @current_plan_year = flex_plan_year
+          expect(helper.calculate_participation_minimum.ceil).to eq min_participation_count_for_flex
+        end
+
+        it 'for employer NOT eligible for flexible contribution model' do
+          @current_plan_year = standard_plan_year
+          expect(helper.calculate_participation_minimum.ceil).to eq min_participation_count_for_standard
+        end
+      end
     end
 
-    it "should calculate eligible_to_enroll_count when not zero" do
-      expect(helper.calculate_participation_minimum.ceil).to eq 4
+    context 'renewing employers' do
+      let(:renewing_plan_year) { double("PlanYear", eligible_to_enroll_count: 5, is_renewing?: true) }
+      let(:min_participation_count) do
+        (renewing_plan_year.eligible_to_enroll_count * Settings.aca.shop_market.employee_participation_ratio_minimum).ceil
+      end
+
+      it 'should calculate eligible_to_enroll_count' do
+        @current_plan_year = renewing_plan_year
+        expect(helper.calculate_participation_minimum.ceil).to eq min_participation_count
+      end
     end
   end
 
