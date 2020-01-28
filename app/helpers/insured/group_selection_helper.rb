@@ -55,8 +55,8 @@ module Insured
 
     def view_market_places(person)
       markets = []
-      # markets += BenefitMarkets::Products::Product::MARKET_KINDS if can_shop_both_markets?(person)
-      # markets += BenefitMarkets::Products::Product::INDIVIDUAL_MARKET_KINDS if can_shop_individual_or_resident?(person)
+      markets += BenefitMarkets::Products::Product::MARKET_KINDS if can_shop_both_markets?(person)
+      markets += BenefitMarkets::Products::Product::INDIVIDUAL_MARKET_KINDS if can_shop_individual_or_resident?(person)
       markets += ['shop'] if can_shop_shop?(person)
       markets += ['individual'] if can_shop_individual?(person)
       markets += ['coverall'] if can_shop_resident?(person)
