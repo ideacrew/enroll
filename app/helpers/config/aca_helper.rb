@@ -27,6 +27,17 @@ module Config::AcaHelper
     @aca_shop_market_employer_family_contribution_percent_minimum ||= Settings.aca.shop_market.employer_family_contribution_percent_minimum
   end
 
+  def flexible_contribution_model_enabled_for_period
+    app_period = Settings.aca.shop_market.initial_application.flexible_contribution_model.application_period.split('..')
+    start_on = retrive_date(app_period[0])
+    end_on = retrive_date(app_period[1])
+    start_on..end_on
+  end
+
+  def flexible_employer_participation_ratio_minimum
+    @flexible_employer_participation_ratio_minimum ||= Settings.aca.shop_market.initial_application.flexible_contribution_model.employee_participation_ratio_minimum
+  end
+
   def flexible_contribution_model_enabled_for_bqt_for_period
     app_period = Settings.aca.shop_market.broker_quoting_tool.flexible_contribution_model.initial_application_period.split('..')
     start_on = retrive_date(app_period[0])

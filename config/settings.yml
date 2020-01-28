@@ -257,6 +257,10 @@ aca:
         month_offset: -1
         mday: 28
 
+      flexible_contribution_model:
+        application_period: <%= Date.new(2020,03,01)..Date.new(2020,12,31) %>
+        employee_participation_ratio_minimum: 0
+
     renewal_application:
       earliest_start_prior_to_effective_on:
         months: -3
