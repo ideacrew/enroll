@@ -4,17 +4,26 @@ $(document).on("ready ajax:success", function() {
   // Minimum date is current date
   // maximum date is end of current year (I.E. 12/31/2019)
   $("#term-date").datepicker({minDate: 0, maxDate: new Date(new Date().getFullYear(), 11, 31)});
+  $("#term-date").change(function(){
+    if( $("#agreement_action-confirm-yes").attr('checked') ){
+      $("#btn-cancel").attr("disabled", false);
+    }
+  });
 
   // Cancel Confirmation
   $("#agreement_action-confirm-yes").click(function(){
     $(".interaction-click-control-action-confirm").attr("disabled", false);
     $("#action-confirm-date").attr("hidden", false);
-    $("#update-aptc-button").attr("disabled", false);
+    $(this).attr('checked','checked');
+    if($('#term-date') && $('#term-date').val() != "") {
+      $("#btn-cancel").attr("disabled", false);
+    }
   });
   $("#agreement_action-confirm-no").click(function(){
     $(".interaction-click-control-action-confirm").attr("disabled", true);
     $("#action-confirm-date").attr("hidden", true);
-    $("#update-aptc-button").attr("disabled", true);
+    $("#agreement_action-confirm-yes").removeAttr('checked');
+    $("#btn-cancel").attr("disabled", true);
   });
 
   // Change Tax Credit Confirmation
