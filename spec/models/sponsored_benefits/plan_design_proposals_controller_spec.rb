@@ -100,13 +100,16 @@ RSpec.describe SponsoredBenefits::Organizations::PlanDesignProposalsController, 
       bg
     end
 
-    let(:sponsor_profile) do
-      FactoryBot.create(
-        :benefit_sponsors_organizations_general_organization,
-        "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym,
-        site: site
-      ).profiles.first
+    let(:sponsor_profile) { organization.employer_profile }
+
+    let(:organization) do
+      org = FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site)
+      bs = org.employer_profile.add_benefit_sponsorship
+      bs.save
+      org
     end
+
+    let(:sponsor_profile_benefit_sponsorship) { organization.active_benefit_sponsorship }
 
     let(:proposal_profile) { plan_design_proposal.profile }
 
@@ -120,12 +123,6 @@ RSpec.describe SponsoredBenefits::Organizations::PlanDesignProposalsController, 
       begin_on = SponsoredBenefits::BenefitApplications::BenefitApplication.calculate_start_on_dates[0]
       end_on = begin_on + 1.year - 1.day
       begin_on..end_on
-    end
-
-    let!(:sponsor_profile_benefit_sponsorship) do
-      bs = sponsor_profile.add_benefit_sponsorship
-      bs.save
-      bs
     end
 
     def product_package(pp_kind, kind)
@@ -142,7 +139,7 @@ RSpec.describe SponsoredBenefits::Organizations::PlanDesignProposalsController, 
 
 
     before :each do
-      get :claim, params: { employer_profile_id: sponsor_profile_benefit_sponsorship.profile.id, claim_code: published_plan_design_proposal.claim_code}
+      get :claim, params: { employer_profile_id: organization.employer_profile.id, claim_code: published_plan_design_proposal.claim_code}
     end
 
     it 'should claim the code successfully' do
