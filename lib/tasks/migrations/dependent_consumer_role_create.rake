@@ -6,8 +6,10 @@ namespace :migrations do
       person = Person.where(hbx_id: args[:hbx_id].to_s).first
      family = person&.primary_family
 
-        # next if primary.employee_roles.any?
-        next if primary.consumer_role.blank?
+      # next if primary.employee_roles.any?
+      next if person.consumer_role.blank?
+      next if family.blank?
+      active_family_members = family.active_family_members
 
       active_family_members.each do |member|
         if member.person.consumer_role.blank?
