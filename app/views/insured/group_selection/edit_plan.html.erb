@@ -1,4 +1,4 @@
-<div class="container-fluid">
+<div class="container">
   <div class="row">
     <div class="col-md-2">
       <br class="clear"/>
@@ -7,7 +7,7 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-8">
       <% hbx_enrollment = @self_term_or_cancel_form.hbx_enrollment %>
       <% product = @self_term_or_cancel_form.product %>
       <% sep = @self_term_or_cancel_form.special_enrollment_period %>
@@ -65,14 +65,13 @@
                 </div>
               </div>
             </div>
-            <div class="row">
-              <div class="col-md-6">
-                <i class="fa fa-icon-link fa-2x"></i>
+            <div class="row vertically-aligned-no-table">
+              <div class="col-md-6 margin-top-15px">
                 <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: product } %>
               </div>
-              <div class="col-md-3 margin-top-15px">
+              <div class="col-md-6 margin-top-15px">
                 <a class="vertically-aligned-row" data-target="#<%= product.kind.to_s %>-<%= product.id %>" data-toggle="modal">
-                  <i class="fa fa-phone fa-2x pull-right"></i>
+                  <i class="fa fa-phone fa-2x margin-right-15px"></i>
                   <span><%= l10n(".plan_contact_info") %></span>
                 </a>
                 <%= render partial: "shared/carrier_contact_information", locals: { plan: product } unless product.issuer_profile.blank? %>
