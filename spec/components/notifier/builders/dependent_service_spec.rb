@@ -48,7 +48,9 @@ RSpec.describe 'Components::Notifier::Builders::DependentService', :dbclean => :
       end
 
       it "should have member age from payload" do
-        expect(aqhp_dependent.age).to eq(Date.current.year - Date.strptime(member['dob'], '%m/%d/%Y').year)
+        # 2019 matches the year in the file name
+        member_dob = Date.strptime(member['dob'], '%m/%d/%Y')
+        expect(aqhp_dependent.age).to eq(((TimeKeeper.date_of_record - member_dob) / 365.25).floor)
       end
     end
   end
