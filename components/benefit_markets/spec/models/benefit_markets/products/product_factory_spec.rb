@@ -22,7 +22,7 @@ module BenefitMarkets
         end
 
         it 'should return cost for coverage effective date and age' do
-          expect(@product.cost_for(Date.new(2019, 2, 1), 20)).to be 200.00
+          expect(@product.cost_for(Date.new(2020, 2, 1), 20)).to be 200.00
         end
 
         it 'should raise error if premium table is not present for given coverage effective date' do
