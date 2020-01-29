@@ -50,10 +50,11 @@ class OutstandingMonthlyEnrollments < MongoidMigrationTask
                     "Carrier",
                     "Plan",
                     "Plan Hios ID",
+                    "Super Group ID",
                     "Enrollment Purchase Date/Time",
                     "Coverage Start Date",
                     "Enrollment State",
-                    "Subscriber HBX ID", 
+                    "Subscriber HBX ID",
                     "Subscriber First Name",
                     "Subscriber Last Name",
                     "Policy in Glue?",
@@ -89,6 +90,7 @@ class OutstandingMonthlyEnrollments < MongoidMigrationTask
           binder_paid = benefit_application.binder_paid?
           eg_id = id
           product = hbx_enrollment.product rescue ""
+          super_group_id = product.try(:issuer_assigned_id)
           carrier = product.issuer_profile.legal_name rescue ""
           purchase_time = hbx_enrollment.created_at
           coverage_start = hbx_enrollment.effective_on
@@ -102,7 +104,7 @@ class OutstandingMonthlyEnrollments < MongoidMigrationTask
           in_glue = glue_list.include?(id)
           qp = quiet_period_range(benefit_application,effective_on)
           quiet_period_boolean = qp.include?(hbx_enrollment.created_at)
-          csv << [employer_id,fein,legal_name,oe_start,oe_end,benefit_application_start,benefit_application_state, covered_lives, enrollment_reason,benefit_sponsorship_aasm,initial_renewal,binder_paid,eg_id,carrier,product.title, product.hios_id,purchase_time,coverage_start,
+          csv << [employer_id,fein,legal_name,oe_start,oe_end,benefit_application_start,benefit_application_state, covered_lives, enrollment_reason,benefit_sponsorship_aasm,initial_renewal,binder_paid,eg_id,carrier,product.title, product.hios_id,super_group_id,purchase_time,coverage_start,
                   enrollment_state,subscriber_hbx_id,first_name,last_name,in_glue, quiet_period_boolean]
         rescue Exception => e
           puts "#{id} - #{e.inspect}" unless Rails.env.test?
@@ -117,7 +119,7 @@ class OutstandingMonthlyEnrollments < MongoidMigrationTask
 
       if File.exists?(file_name)
         puts 'Report has been successfully generated in the hbx_report directory!' unless Rails.env.test?
-      end 
+      end
     end
   end
 end

@@ -42,6 +42,7 @@ describe OutstandingMonthlyEnrollments, dbclean: :after_each do
       "Carrier",
       "Plan",
       "Plan Hios ID",
+      "Super Group ID",
       "Enrollment Purchase Date/Time",
       "Coverage Start Date",
       "Enrollment State",
