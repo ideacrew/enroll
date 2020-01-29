@@ -1942,8 +1942,16 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       let(:current_benefit_package) { renewal_application.predecessor.benefit_packages[0] }
       let(:renewal_benefit_package) { renewal_application.benefit_packages[0] }
 
-      let(:generate_passive_renewal) do
+      let(:generate_passive_waiver) do
         enrollment.update_attributes(aasm_state: 'inactive')
+        renewal_application.benefit_packages[0].update_attributes(title: current_benefit_package.title + "(#{renewal_application.start_on.year})")
+        census_employee.update!(created_at: 2.months.ago)
+        census_employee.assign_to_benefit_package(benefit_package, renewal_effective_date)
+        benefit_package.renew_member_benefit(census_employee)
+      end
+
+      let(:generate_passive_renewal) do
+        enrollment.update_attributes(aasm_state: 'coverage_enrolled')
         renewal_application.benefit_packages[0].update_attributes(title: current_benefit_package.title + "(#{renewal_application.start_on.year})")
         census_employee.update!(created_at: 2.months.ago)
         census_employee.assign_to_benefit_package(benefit_package, renewal_effective_date)
@@ -1952,16 +1960,17 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
 
       let(:enrollment_effective_on) { renewal_effective_date }
       let(:special_enrollment_period_id) { nil }
-      let(:passive_renewal) { shop_family.reload.enrollments.renewing_waived.first }
+      let(:passive_renewal_waived)  { shop_family.reload.enrollments.renewing_waived.first }
+      let(:auto_renewal_enrollment) { shop_family.reload.enrollments.auto_renewing.first }
       let(:new_waiver_under_renewal_app) do
         FactoryBot.build(
           :hbx_enrollment,
           kind: 'employer_sponsored',
-          coverage_kind: passive_renewal.coverage_kind,
+          coverage_kind: passive_renewal_waived.coverage_kind,
           household: shop_family.active_household,
           benefit_sponsorship_id: benefit_sponsorship.id,
           aasm_state: "shopping",
-          predecessor_enrollment_id: passive_renewal.id,
+          predecessor_enrollment_id: passive_renewal_waived.id,
           sponsored_benefit_package_id: renewal_benefit_package.id,
           sponsored_benefit_id: renewal_benefit_package.sponsored_benefits[0].id,
           employee_role_id: employee_role.id,
@@ -1970,15 +1979,49 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
         )
       end
 
+      let(:auto_renewing_under_renewal_app) do
+        FactoryBot.build(
+          :hbx_enrollment,
+          kind: 'employer_sponsored',
+          coverage_kind: auto_renewal_enrollment.coverage_kind,
+          household: shop_family.active_household,
+          benefit_sponsorship_id: benefit_sponsorship.id,
+          aasm_state: "shopping",
+          predecessor_enrollment_id: auto_renewal_enrollment.id,
+          sponsored_benefit_package_id: renewal_benefit_package.id,
+          sponsored_benefit_id: renewal_benefit_package.sponsored_benefits[0].id,
+          effective_on: renewal_benefit_package.start_on,
+          employee_role_id: employee_role.id,
+          benefit_group_assignment_id: census_employee.renewal_benefit_group_assignment.id,
+          family: shop_family
+        )
+      end
+
       before do
         allow(benefit_package).to receive(:is_renewal_benefit_available?).and_return(true)
-        generate_passive_renewal
       end
 
       it 'should cancel future effective waivers upon creating a new waiver' do
+        generate_passive_waiver
         new_waiver_under_renewal_app.waive_enrollment
-        passive_renewal.reload
-        expect(passive_renewal.coverage_canceled?).to be_truthy
+        expect(passive_renewal_waived.reload.coverage_canceled?).to be_truthy
+      end
+
+      it 'should terminate previous active enrollment when waiving passive renewal in open enrollment' do
+        generate_passive_renewal
+        auto_renewal_enrollment.update_attributes(predecessor_enrollment_id: enrollment.id)
+        expect(auto_renewal_enrollment.aasm_state).to eq "auto_renewing"
+        auto_renewing_under_renewal_app.waive_enrollment
+        expect(enrollment.reload.coverage_termination_pending?).to be_truthy
+        expect(enrollment.terminated_on).to eq((enrollment.effective_on + 1.year) - 1.day)
+      end
+
+      it 'should terminate previous active enrollment when waiving renewal coverage selected enrollment in open enrollment' do
+        generate_passive_renewal
+        auto_renewal_enrollment.update_attributes(predecessor_enrollment_id: enrollment.id, aasm_state: 'coverage_selected')
+        auto_renewing_under_renewal_app.waive_enrollment
+        expect(enrollment.reload.coverage_termination_pending?).to be_truthy
+        expect(enrollment.terminated_on).to eq((enrollment.effective_on + 1.year) - 1.day)
       end
     end
 
