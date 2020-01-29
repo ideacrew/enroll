@@ -433,7 +433,7 @@ class ConsumerRole
   end
 
   def i766
-    vlp_documents.select{|doc| doc.subject == "I-766 (Employment Authorization Card)" && doc.receipt_number.present? && doc.expiration_date.present? }.first
+    vlp_documents.select{ |doc| doc.subject == 'I-766 (Employment Authorization Card)' && doc.alien_number.present? && doc.card_number.present? && doc.expiration_date.present? }.first
   end
 
   def mac_read_i551
