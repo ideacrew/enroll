@@ -308,8 +308,7 @@ module BenefitSponsors
           end
 
           def build_sponsor_profile_class
-            # TODO - Use Configuration settings
-            site_key = BenefitSponsors::ApplicationController::current_site.site_key
+            site_key = Settings.site.key
             return Organizations::AcaShopDcEmployerProfile if site_key == :dc
             return Organizations::AcaShopCcaEmployerProfile if site_key == :cca
           end
