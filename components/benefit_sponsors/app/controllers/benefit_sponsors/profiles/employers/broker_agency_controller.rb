@@ -49,7 +49,8 @@ module BenefitSponsors
           redirect_to profiles_employers_employer_profile_path(@employer_profile, tab: 'brokers')
         rescue => e
           error_msgs = @broker_management_form.errors.map(&:full_messages) if @broker_management_form.errors
-          redirect_to(:back, :flash => {error: error_msgs})
+          fallback_url = profiles_employers_employer_profile_path(@employer_profile, tab: 'brokers')
+          redirect_back(fallback_location: fallback_url, :flash => {error: error_msgs})
         end
 
         def terminate
