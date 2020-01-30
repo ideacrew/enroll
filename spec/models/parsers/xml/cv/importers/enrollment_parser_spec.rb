@@ -55,7 +55,7 @@ describe Parsers::Xml::Cv::Importers::EnrollmentParser do
       it "should get fein and legal_name by employee_role" do
         employee_role = subject.get_enrollment_object.employee_role
         org = employee_role.employer_profile.organization
-        expect(org.fein).to eq '555002222'
+        expect(org.hbx_id).to eq '555002222'
         expect(org.legal_name).to eq 'United States Senate'
       end
 
