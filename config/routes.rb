@@ -707,6 +707,16 @@ Rails.application.routes.draw do
         end
       end
 
+      resources :agencies, only: %i[index] do
+        collection do
+          get :agency_staff
+        end
+
+        member do
+          get :staff
+        end
+      end
+
       resources :slcsp, :only => []  do
         collection do
           post :plan
@@ -723,6 +733,6 @@ Rails.application.routes.draw do
       end
     end
   end
-  
+
   root 'welcome#index'
 end
