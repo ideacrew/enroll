@@ -730,8 +730,8 @@ class HbxEnrollment
   end
 
   def <=>(other)
-    other_members = other.hbx_enrollment_members # - other.terminated_members
-    [plan.hios_id, effective_on, hbx_enrollment_members.sort_by{|x| x.hbx_id}] <=> [other.plan.hios_id, other.effective_on, other_members.sort_by{|x| x.hbx_id}]
+    other_members = other.hbx_enrollment_members
+    [product.hios_id, effective_on, hbx_enrollment_members.sort_by(&:hbx_id)] <=> [other.product.hios_id, other.effective_on, other_members.sort_by(&:hbx_id)]
   end
 
   # This performs employee summary count for waived and enrolled in the latest plan year
