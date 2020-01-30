@@ -5,7 +5,7 @@ module SiteWorld
   def site(*traits)
     attributes = traits.extract_options!
     if attributes.empty?
-      @site ||= ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_empty_benefit_market
+      @site ||= ::BenefitSponsors::SiteSpecHelpers.create_cca_site_with_hbx_profile_and_empty_benefit_market
     else
       @site ||= FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key, attributes)
     end
