@@ -793,17 +793,21 @@ class HbxEnrollment
 
     # waive only renewal enrollments if waives coverage after clicking "make changes" on renewing coverage
     aasm_state = parent_enrollment.aasm_state if parent_enrollment
-    enrollments = if (RENEWAL_STATUSES + WAIVED_STATUSES).include?(aasm_state)
+    enrollments = if WAIVED_STATUSES.include?(aasm_state)
                     parent_enrollment.to_a
                   elsif is_open_enrollment? && renewing_enrollments.present?
                     update(predecessor_enrollment_id: renewing_enrollments.first.id)
-                    renewing_enrollments
+                    (renewing_enrollments + terminating_enrollments).uniq
                   else
                     terminating_enrollments
                   end
 
     enrollments.each do |enrollment|
-      coverage_end_date = family.terminate_date_for_shop_by_enrollment(enrollment)
+      coverage_end_date = if benefit_application.is_renewing? && benefit_application.start_on == effective_on && predecessor_benefit_application.effective_period.cover?(enrollment.effective_on)
+                            enrollment.sponsored_benefit_package.end_on
+                          else
+                            family.terminate_date_for_shop_by_enrollment(enrollment)
+                          end
       term_or_cancel_enrollment(enrollment, coverage_end_date)
     end
   end
