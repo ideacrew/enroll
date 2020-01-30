@@ -15,6 +15,8 @@
 //
 // For more information refer to: http://docs.ckeditor.com/#!/guide/dev_styles-section-style-rules
 
+CKEDITOR.config.contentsCss = CKEDITOR.basePath + 'contents.css';
+
 CKEDITOR.stylesSet.add( 'default', [
 	/* Block styles */
 
