@@ -560,6 +560,51 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       end
     end
 
+    context "family has active sep" do
+      let(:person1) { FactoryBot.create(:person, :with_family, :with_employee_role, first_name: "mock")}
+      let(:family1) { person1.primary_family }
+      let(:family_member_ids) {{"0" => family1.family_members.first.id}}
+      let!(:new_household) {family1.households.where(:id => {"$ne" => family.households.first.id.to_s}).first}
+      let(:start_on) { TimeKeeper.date_of_record }
+      let(:benefit_package) {hbx_enrollment.sponsored_benefit_package}
+
+      let(:qle) do
+        QualifyingLifeEventKind.create(
+          title: "Married",
+          tool_tip: "Enroll or add a family member because of marriage",
+          action_kind: "add_benefit",
+          event_kind_label: "Date of married",
+          market_kind: "shop",
+          ordinal_position: 15,
+          reason: "marriage",
+          edi_code: "32-MARRIAGE",
+          effective_on_kinds: ["first_of_next_month"],
+          pre_event_sep_in_days: 0,
+          post_event_sep_in_days: 30,
+          is_self_attested: true
+        )
+      end
+      let(:special_enrollment_period) {[double("SpecialEnrollmentPeriod")]}
+      let!(:sep) { family1.special_enrollment_periods.create(qualifying_life_event_kind: qle, qle_on: qle.created_at, effective_on_kind: qle.event_kind_label, effective_on: benefit_package.effective_period.min, start_on: start_on, end_on: start_on + 30.days) }
+
+      let(:params) do
+        { :person_id => person1.id,
+          :employee_role_id => person1.employee_roles.first.id,
+          :market_kind => "shop",
+          :change_plan => "change_plan",
+          :hbx_enrollment_id => hbx_enrollment.id,
+          :family_member_ids => family_member_ids,
+          :enrollment_kind => 'special_enrollment',
+          :coverage_kind => hbx_enrollment.coverage_kind}
+      end
+      it "should create an hbx enrollment" do
+        sign_in user
+        allow(Person).to receive(:find).and_return(person1)
+        post :create, params: {person_id: person1.id, employee_role_id: person1.employee_roles.first.id, market_kind: "shop", family_member_ids: family_member_ids, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id, enrollment_kind: 'special_enrollment', coverage_kind: hbx_enrollment.coverage_kind }
+        expect(assigns(:change_plan)).to eq "change_by_qle"
+      end
+    end
+
     context "when keep_existing_plan_id_is_nil" do
       let(:existing_product) { ::BenefitMarkets::Products::Product.new(:id => existing_product_id) }
       let(:old_hbx) { HbxEnrollment.new(:sponsored_benefit_package_id => sponsored_benefit_package_id, :sponsored_benefit_id => sponsored_benefit_id, :product => existing_product) }
