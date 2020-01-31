@@ -77,6 +77,7 @@ module Transcripts
       if association[:association] == 'hbx_enrollment_members'
         other_assocs = @transcript[:other].send(association[:association]).reject{|member| member.coverage_end_on.present? && member.coverage_end_on <= member.coverage_start_on}
       else
+        association[:association] = "product" if association[:association] == "plan"
         other_assocs = @transcript[:other].send(association[:association]).to_a.dup
       end
 

@@ -122,7 +122,7 @@ module Transcripts
 
     def add_plan_information
       if @transcript[:compare]['base']  && @transcript[:compare]['base']['update'] && @transcript[:compare]['base']['update']['plan_id'].present?
-        plan = @transcript[:other].plan
+        plan = @transcript[:other].product
 
         @transcript[:compare]['base']['update']['plan_id'] = {
           hios_id: plan.hios_id,
@@ -135,8 +135,8 @@ module Transcripts
       {
         hbx_id: enrollment.hbx_id,
         effective_on: enrollment.effective_on,
-        hios_id: enrollment.plan.hios_id,
-        plan_name: enrollment.plan.name,
+        hios_id: enrollment.product.hios_id,
+        plan_name: enrollment.product.name,
         kind: enrollment.kind,
         aasm_state: enrollment.aasm_state.camelcase,
         coverage_kind: enrollment.coverage_kind
@@ -220,7 +220,7 @@ module Transcripts
 
       if @enrollment.present?
         @transcript[:plan_details] = {
-          plan_name: "#{@enrollment.plan.hios_id}:#{@enrollment.plan.name}",
+          plan_name: "#{@enrollment.product.hios_id}:#{@enrollment.product.name}",
           other_effective_on: enrollment.effective_on.strftime("%m/%d/%Y"),
           effective_on:  @enrollment.effective_on.strftime("%m/%d/%Y"),
           aasm_state: @enrollment.aasm_state.camelcase,
@@ -244,21 +244,21 @@ module Transcripts
     end
 
     # 1) Match by hbx_id
-    #   Match found: 
+    #   Match found:
     #     - Verify active state
     #       - True
-    #          - Compare 
+    #          - Compare
     #            (if multiple active enrollments present with primary_applicant, make them as enrollment:remove )
     #            # (if multiple active responsible party enrollments with same subscriber, mark them as enrollment:remove)
     #       - False
     #          - Look for active enrollments with same coverage_kind & market, coverage year.
-    #             - Found 
+    #             - Found
     #               (if multiple found, pick one with max effective date. make other as enrollment:remove in transcript)
     #               - Compare
     #             - New Enrollment
     #   Match not found:
     #     - Look for active enrollments with same coverage_kind & market, coverage year.
-    #       - Found 
+    #       - Found
     #         (if multiple found, pick one with max effective date. make other as enrollment:remove in transcript)
     #         - Compare
     #       - New Enrollment
