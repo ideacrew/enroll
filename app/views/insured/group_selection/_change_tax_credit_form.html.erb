@@ -5,19 +5,21 @@
   <br>
   <p id="aptc-msg" class="action-msg hidden"><%= l10n("are_you_sure_you_want_to_update_aptc") %></p>
   <%= radio_button_tag :agreement, "action-confirm-yes-change-tax-credit" %>&nbsp;&nbsp;<%= l10n("yes") %><br>
-  <%= radio_button_tag :agreement, "action-confirm-no-change-tax-credit" %>&nbsp;&nbsp;<%= l10n("no") %>  
+  <%= radio_button_tag :agreement, "action-confirm-no-change-tax-credit" %>&nbsp;&nbsp;<%= l10n("no") %>
   <div id="calendar-div" class="row hidden">
     <%= form_tag edit_aptc_insured_group_selections_path(hbx_enrollment_id: locals[:hbx_enrollment][:id]), :method => :post do %>
-    <div class='col-md-6'>
+    <div class='col-md-12'>
       <div id="applied-aptc-text" class="hidden">
-        <h5>Effective date</h5>
+        <h5 class="col-md-4 aptc-no-left-padding">Effective date</h5>
         <%# removed the classes date-picker aptc-date-picker from field below because readonly %>
-        <%= text_field_tag 'effective_on_date', '',:'data-date-min'=> "+0d", placeholder: " ", class: "required floatlabel form-control", required: true, id: "aptc_date", value: locals[:new_effective_on_date], readonly: true %>
-        <h5>Maximum tax credit available: $<span id="max_aptc_available"><%= locals[:available_aptc] %></span></h5>
+        <div class="col-md-8">
+          <%= text_field_tag 'effective_on_date', '',:'data-date-min'=> "+0d", placeholder: " ", class: "required floatlabel form-control", required: true, id: "aptc_date", value: locals[:new_effective_on_date], readonly: true %>
+        </div>
+        <h5 class="col-md-12 aptc-no-left-padding">Maximum tax credit available: $<span id="max_aptc_available"><%= locals[:available_aptc] %></span></h5>
         <h5>Tax credit applied (%)</h5>
         <span align= "center">
           <output id="aptc_applied_pct_1_percent" name="aptc_applied_pct">
-            <%= number_to_percentage(locals[:hbx_enrollment][:elected_aptc_pct].to_f * 100).split(".")[0] + "%" %>    
+            <%= number_to_percentage(locals[:hbx_enrollment][:elected_aptc_pct].to_f * 100).split(".")[0] + "%" %>
           </output>
         </span>
         <%# Specify the value attribute on slider to move to right starting spot %>
@@ -46,4 +48,3 @@
     <% end %>
   </div>
 </div>
-
