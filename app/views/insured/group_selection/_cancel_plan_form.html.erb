@@ -10,16 +10,16 @@
       url: term_or_cancel_insured_group_selections_path do |f| %>
       <%= hidden_field_tag :hbx_enrollment_id, locals[:hbx_enrollment][:id] %>
       <%= hidden_field_tag :term_or_cancel, locals[:term_or_cancel] %>
-      <% calendar_enabled = !(locals[:term_or_cancel] == 'cancel') %> 
+      <% calendar_enabled = !(locals[:term_or_cancel] == 'cancel') %>
       <% if calendar_enabled %>
-        <h5 id="enter-text">Choose the last day you want to be covered. The earliest date you can choose is today</h5>
+        <h5 id="enter-text">Choose the last day you want to be covered. The earliest date you can choose is today.</h5>
         <%# Keep blank space in placeholder. Otherwise, "You forgot to add placeholder attribute!" appears %>
         <%= text_field_tag 'term_date', '', :'data-date-min'=> "+0d", placeholder: " ",
             class: "required date-picker term-date-picker floatlabel form-control",
             required: true, readonly: true, id: "term-date" %>
         <br>
       <% end %>
-      <%= f.submit l10n("cancel_plan"), class: 'button btn btn-lg btn-primary btn-block interaction-click-control-action-confirm', id: 'btn-cancel', :disabled => true %>
+      <%= f.submit l10n("cancel_plan"), class: 'button btn btn-lg btn-primary btn-block', id: 'btn-cancel', :disabled => true %>
     <% end %>
   </div>
 </div>
