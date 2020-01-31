@@ -10,7 +10,7 @@
     .col-md-3.col-sm-6.col-xs-12
       label for="inputKind" Kind
       - kinds = f.object.office_kind_options; kinds = kinds.rotate if params[:child_index]
-      = f.select :kind, options_for_select(kinds.map {|a| [a.to_s.humanize, a.to_s]}, selected: "primary"),{}, class: "form-control", required: true, id:'kindSelect', placeholder: 'KIND', onchange:'checkOLKind(this)'
+      = f.select :kind, options_for_select(kinds.map {|a| [a.to_s.humanize, a.to_s]}, selected: f.object.try(:kind) || "primary"),{}, class: "form-control", required: true, id:'kindSelect', placeholder: 'KIND', onchange:'checkOLKind(this)'
       .invalid-feedback
         | Please select an address kind.
 
