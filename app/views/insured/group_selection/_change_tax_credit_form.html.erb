@@ -10,13 +10,13 @@
     <%= form_tag edit_aptc_insured_group_selections_path(hbx_enrollment_id: locals[:hbx_enrollment][:id]), :method => :post do %>
     <div class='col-md-12'>
       <div id="applied-aptc-text" class="hidden">
-        <h5 class="col-md-4 aptc-no-left-padding">Effective date</h5>
+        <h5 class="col-md-4 aptc-no-left-padding"><b>Effective date</b></h5>
         <%# removed the classes date-picker aptc-date-picker from field below because readonly %>
         <div class="col-md-8">
-          <%= text_field_tag 'effective_on_date', '',:'data-date-min'=> "+0d", placeholder: " ", class: "required floatlabel form-control", required: true, id: "aptc_date", value: locals[:new_effective_on_date], readonly: true %>
+          <%= locals[:new_effective_on_date] %>
         </div>
-        <h5 class="col-md-12 aptc-no-left-padding">Maximum tax credit available: $<span id="max_aptc_available"><%= locals[:available_aptc] %></span></h5>
-        <h5>Tax credit applied (%)</h5>
+        <h5 class="col-md-12 aptc-no-left-padding"><b>Maximum tax credit available: </b>$<span id="max_aptc_available"><%= locals[:available_aptc] %></span></h5>
+        <h5><b>Tax credit applied (%)</b></h5>
         <span align= "center">
           <output id="aptc_applied_pct_1_percent" name="aptc_applied_pct">
             <%= number_to_percentage(locals[:hbx_enrollment][:elected_aptc_pct].to_f * 100).split(".")[0] + "%" %>
@@ -25,7 +25,7 @@
         <%# Specify the value attribute on slider to move to right starting spot %>
         <% slider_starting_value = locals[:hbx_enrollment][:elected_aptc_pct].to_s %>
         <input id="applied_pct_1" name='applied_pct_1' type="range" min="0" value="<%= slider_starting_value %>" max="1" step="0.05" style = "padding: 0px;">
-        <h5>Tax credit value ($)</h5>
+        <h5><b>Tax credit value ($)</b></h5>
         <input type="text" name="aptc_applied_total" id="aptc_applied_total"
         value="$<%= round_down_float_two_decimals((locals[:available_aptc] * locals[:hbx_enrollment]&.elected_aptc_pct).to_s) if [locals[:available_aptc], locals[:hbx_enrollment].elected_aptc_pct].all? %>" placeholder="APTC Applied" class="form-control" size="8px">
         <h5><strong>Your new premium:</strong></h5>

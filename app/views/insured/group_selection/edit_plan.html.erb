@@ -4,6 +4,7 @@
       <br class="clear"/>
       <%= link_to l10n("back_to_my_account"),  family_account_path, class: 'btn btn-default btn-default' %>
       <br class="clear"/>
+      <br class="clear"/>
     </div>
   </div>
   <div class="row">
@@ -84,7 +85,7 @@
                 <a id="cancel-button" class="btn btn-default btn-block interaction-click-control-cancel-plan">Cancel Plan</a>
               </div>
               <% if display_change_tax_credits_button?(hbx_enrollment) %>
-                <div class="col-sm-4">
+                <div class="col-sm-6">
                   <button type="button" id="aptc-button" class="btn btn-default btn-block interaction-click-control-edit-aptc" <%= @self_term_or_cancel_form.enable_tax_credit_btn ? '' : 'disabled' %>>Change Tax Credit</button>
                 </div>
               <% end %>

@@ -67,9 +67,6 @@ $(document).on("ready ajax:success", function() {
   $('#applied_pct_1').change(function(){
     calculatePercent('#applied_pct_1', 100);
   });
-  $('#aptc_applied_5cf6c9ec9ee4f43836000020').change(function(){
-    calculatePercent('#aptc_applied_total', 1);
-  });
 
   function toFixedTrunc(x) {
     var with2Decimals = x.toString().match(/^-?\d+(?:\.\d{0,2})?/)[0];
