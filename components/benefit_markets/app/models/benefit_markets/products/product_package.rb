@@ -9,6 +9,19 @@ module BenefitMarkets
     include Mongoid::Document
     include Mongoid::Timestamps
 
+    # Added this module as a temporary fix for EMPLOYER FLEXIBILITY PROJECT
+    module ContributionModuleAssociation
+      def contribution_model
+        if packagable.is_a?(BenefitMarkets::BenefitSponsorCatalog) && packagable.benefit_application&.is_renewing?
+          BenefitMarkets::ContributionModels::ContributionModel.by_title("DC Shop Simple List Bill Contribution Model")
+        else
+          super
+        end
+      end
+    end
+
+    prepend ContributionModuleAssociation
+
     embedded_in :packagable, polymorphic: true
 
     field :application_period,      type: Range
