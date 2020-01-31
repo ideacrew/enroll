@@ -5,10 +5,11 @@
 }
 
 .btn-primary {
-  @include button-variant($dc-red, $dc-red, darken($dc-red, 10%), $dc-red);
+  background-color: #337ab7;
   text-transform: uppercase;
   font-weight: 600;
-  border-color: $dc-dark-red;
+  border-color: #2e6da4;
+  color: #ffffff;
   border-bottom-width: medium;
 }
 
