@@ -67,17 +67,9 @@ class FamilyMember
   associated_with_one :person, :person_id, "Person"
 
   def person_version_for(v_date)
-    return nil if (v_date < created_at)
-    versions_to_search = [person] + person.versions
-    if person.updated_at <= v_date
-      return person
-    end
-
-    versions_to_search.reject do |v|
-      v.updated_at > v_date
-    end.sort_by(&:updated_at).last
+    version_list = Versioning::VersionCollection.new(person)
+    version_list.version_at(v_date)
   end
-
 
   def former_family=(new_former_family)
     raise ArgumentError.new("expected Family") unless new_former_family.is_a?(Family)
