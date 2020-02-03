@@ -392,8 +392,7 @@ module Importers::Transcripts
       hbx_enrollment.sponsored_benefit_id = hbx_enrollment.coverage_kind == "health" ? benefit_group.health_sponsored_benefit.id : benefit_group.dental_sposnored_benefit.id
       hbx_enrollment.rating_area_id = benefit_group.benefit_application.recorded_rating_area_id
       hbx_enrollment.employee_role_id = employee_role.id
-
-      ea_plan = BenefitMarkets::Products::Product.by_year(product.active_year).where(hios_id: product.hios_id, :benefit_market_kind => :aca_shop).first
+      ea_plan = BenefitMarkets::Products::Product.where(hios_id: product.hios_id, :benefit_market_kind => :aca_shop).select{|p| p.active_year == product.active_year}.first
       raise "Plan with hios_id #{product.hios_id} not found in EA." if ea_plan.blank?
 
       hbx_enrollment.product = ea_plan
@@ -402,6 +401,7 @@ module Importers::Transcripts
       hbx_enrollment = build_hbx_enrollment_members(family, @other_enrollment, hbx_enrollment)
       family.save!
       hbx_enrollment.save!
+      hbx_enrollment
     end
 
     def build_consumer_role(matched_person , member)

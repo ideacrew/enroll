@@ -13,7 +13,7 @@ module Parsers::Xml::Cv::Importers
       individual_market = enrollment.individual_market
       elected_aptc_pct = individual_market.present? ? individual_market.elected_aptc_percent.to_f : 0
       applied_aptc_amount = individual_market.present? ? individual_market.applied_aptc_amount.to_f : 0
-      e_product = enrollment.product
+      e_product = enrollment.plan
       metal_level = e_product.metal_level.strip.split("#").last
       coverage_type = e_product.coverage_type.strip.split("#").last
       product_class = coverage_type == "health" ? BenefitMarkets::Products::HealthProducts::HealthProduct : BenefitMarkets::Products::DentalProducts::DentalProduct
@@ -21,7 +21,7 @@ module Parsers::Xml::Cv::Importers
           id: e_product.id,
           hios_id: e_product.id,
           title: e_product.name,
-          application_period: (Date.new(e_product.active_year.to_i, 1, 1)..Date.e_product(e_plan.active_year.to_i, 12, 31)),
+          application_period: (Date.new(e_product.active_year.to_i, 1, 1)..Date.new(e_product.active_year.to_i, 12, 31)),
           metal_level_kind: metal_level,
           kind: coverage_type == "health" ? :health : :dental,
           ehb: e_product.ehb_percent.to_f
@@ -37,7 +37,7 @@ module Parsers::Xml::Cv::Importers
           #applied_aptc_amount: , # can not find it in xml
         )
       end
-      coverage_type = enrollment.product.coverage_type.strip.split('#').last rescue ''
+      coverage_type = enrollment.plan.coverage_type.strip.split('#').last rescue ''
       enrollee = policy.enrollees.detect {|enrollee| enrollee.is_subscriber == 'true'}
       effective_on = enrollee.benefit.begin_date rescue ''
       terminated_on = enrollee.benefit.end_date rescue ''
@@ -47,7 +47,7 @@ module Parsers::Xml::Cv::Importers
           elected_aptc_pct: elected_aptc_pct,
           applied_aptc_amount: applied_aptc_amount,
           product: product,
-          issuer_profile_id: enrollment.product.try(:issuer_profile).try(:id),
+          issuer_profile_id: enrollment.plan.try(:carrier).try(:id),
           coverage_kind: coverage_type,
           hbx_enrollment_members: hbx_enrollment_members,
           household: get_household_by_policy_xml(policy),
