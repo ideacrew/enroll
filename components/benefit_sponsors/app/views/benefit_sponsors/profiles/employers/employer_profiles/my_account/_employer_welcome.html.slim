@@ -6,7 +6,7 @@
     .left-icon-section.section
       .row
         .col-md-offset-1.col-md-11
-          h3 =l10n("employers.employer_profiles.my_account.important_documents_needed")
+          h3.heading-text =l10n("employers.employer_profiles.my_account.important_documents_needed")
           p.twenty =l10n("employers.employer_profiles.my_account.eligibility_documents_needed")
 
   - unless @employer_profile.broker_agency_profile.present?
@@ -16,7 +16,7 @@
           .row
             = image_tag('ui/expertgreen_50.png')
         .col-md-11
-          h3 Get Help From a Broker
+          h3.heading-text Get Help From a Broker
           p.twenty You may want to select a Broker as your personal advocate and trusted adviser, who at no cost to you, can help you set up and administer your Health Benefits Program. If you'd like to select a Broker, we suggest doing so first.
           a#showMoreBrokers role="button" data-toggle="collapse" href="#collapseBrokers" aria-expanded="false" aria-controls="collapseMore" View More
           br
@@ -34,7 +34,7 @@
         .row
           = image_tag('ui/gearsgreen_50.png')
       .col-xs-11
-        h3.no-buffer Set Up Your Health Benefits Program Yourself
+        h3.no-buffer.heading-text Set Up Your Health Benefits Program Yourself
         p.twenty If you want to set up your Health Benefits Program yourself, we'll walk you through it step-by-step.
         a#showMoreBenefits role="button" data-toggle="collapse" href="#collapseMore" aria-expanded="false" aria-controls="collapseMore" View More
         br
