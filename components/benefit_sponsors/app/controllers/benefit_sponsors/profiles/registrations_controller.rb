@@ -31,11 +31,10 @@ module BenefitSponsors
               person = current_person
               create_sso_account(current_user, current_person, 15, "employer") do
               end
-            elsif is_general_agency_profile? || dc_broker_profile?
+            else
               flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
             end
-            redirect_to result_url unless dc_broker_profile?
-            render 'confirmation', :layout => 'single_column' if dc_broker_profile?
+            redirect_to result_url
             return
           end
         rescue Exception => e
