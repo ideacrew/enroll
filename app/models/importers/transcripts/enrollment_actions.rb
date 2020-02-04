@@ -21,7 +21,7 @@ module Importers::Transcripts
     end
 
     def assign_product_to_enrollment(association)
-      @product ||= BenefitMarkets::Products::Product.by_year(association['active_year']).where(hios_id: association['hios_id']).first
+      @product ||= BenefitMarkets::Products::Product.where(hios_id: association['hios_id']).select{|p| p.active_year == association['active_year']}.first
 
       build_new_hbx_enrollment
       @enrollment.product = @product

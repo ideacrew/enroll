@@ -148,9 +148,9 @@ module Importers::Transcripts
             # end
 
             if section == :plan && action == 'add'
-              @plan = BenefitMarkets::Products::Product.by_year(@other_enrollment.product.active_year).where(hios_id: @other_enrollment.product.hios_id, :benefit_market_kind => :aca_shop).first
+              @plan = BenefitMarkets::Products::Product.where(hios_id: @other_enrollment.product.hios_id, :benefit_market_kind => :aca_shop).select{|p| p.active_year == @other_enrollment.product.active_year}.first
 
-              raise "Plan not found with HIOS ID #{association['hios_id']} for year #{association['active_year']}." if @plan.blank?
+              raise "Plan not found with HIOS ID #{@other_enrollment.product.hios_id} for year #{@other_enrollment.product.active_year}." if @plan.blank?
             end
 
             if section == :hbx_enrollment_members
