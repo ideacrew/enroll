@@ -614,12 +614,8 @@ class ConsumerRole
     if sci_verified?
       pass_residency!
     else
-      # ssn_valid_citizenship_valid cannot transition from dhs_pending
-      if person.ssn || is_native? && aasm.current_state != :dhs_pending
-        self.ssn_valid_citizenship_valid! verification_attr(args.first)
-      else
-        self.pass_dhs! verification_attr(args.first)
-      end
+      ssn_valid_citizenship_valid! verification_attr(args.first) if may_ssn_valid_citizenship_valid?
+      pass_dhs! verification_attr(args.first) if may_pass_dhs?
     end
   end
 
