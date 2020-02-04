@@ -614,8 +614,12 @@ class ConsumerRole
     if sci_verified?
       pass_residency!
     else
-      ssn_valid_citizenship_valid! verification_attr(args.first) if may_ssn_valid_citizenship_valid?
-      pass_dhs! verification_attr(args.first) if may_pass_dhs?
+      # ssn_valid_citizenship_valid cannot transition from dhs_pending
+      if person.ssn || is_native?
+        self.ssn_valid_citizenship_valid! verification_attr(args.first) if self.may_ssn_valid_citizenship_valid?
+      else
+        self.pass_dhs! verification_attr(args.first) if self.may_pass_dhs?
+      end
     end
   end
 
