@@ -23,6 +23,21 @@
         font-style: normal;
       }
 
+      .fasm_check_circle {
+        list-style: none;
+        padding-left: 15px;
+      }
+
+      .fasm_check_circle li {
+        padding-left: 0em;
+      }
+
+      .fasm_check_circle li:before {
+        font-family: 'FontAwesome';
+        content: "\f058";
+        margin:0 5px 0 -15px;
+      }
+
       .fa {
         display: inline-block;
         font: normal normal normal 14px/1 FontAwesome;
@@ -2699,7 +2714,6 @@
         font-weight: 400;
         font-size: 11px;
         color: #000000;
-        line-height: 22px;
       }
       table td {
         /*border-collapse:collapse;*/
@@ -2750,9 +2764,6 @@
         font-family: 'FontAwesome';
         content: '\f058';
         margin:0 3px 0 -15px;
-      }
-      ul li {
-        padding:3px 0;
       }
       .addrs td {
         display:block;
