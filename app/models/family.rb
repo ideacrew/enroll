@@ -658,27 +658,24 @@ class Family
   # Remove {FamilyMember} referenced by this {Person}
   #
   # @param [ Person ] person The {Person} to remove from the family.
-  def remove_family_member(person)
+  def remove_family_member(person, family_member = nil)
+    # Check if duplicate family member that shares person record with another family_member
     family_member = find_family_member_by_person(person)
-    if family_member.present?
-      family_member.is_active = false
-      active_household.remove_family_member(family_member)
+    family_members_with_person_id = family_members.where(person_id: person.id)
+    # This destroys the duplicate family member.
+    if family_members_with_person_id.count > 1
+      family_members.where(id: family_member.id).first.destroy
+      # Households will sometimes only have one coverage_household_member for a family member as
+      # expected, so for duplicates this method will NOT destroy
+      # the coverage household member unless its the undisputed final family_member
+    else
+      # This will also destroy the coverage_household_member
+      if family_member.present?
+        family_member.is_active = false
+        active_household.remove_family_member(family_member)
+      end
+      family_member
     end
-
-    family_member
-  end
-
-  # To compensate for duplicate dependents
-  # Otherwise the family member will map to the same person
-  # and an error will be thrown
-
-  def remove_family_member_by_id(family_member_id)
-    family_member = family_members.where(id: family_member_id).first
-    if family_member.present?
-      family_member.is_active = false
-      active_household.remove_family_member(family_member)
-    end
-    family_member
   end
 
   # Determine if {Person} is a member of this family
