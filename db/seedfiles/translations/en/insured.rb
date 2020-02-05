@@ -12,7 +12,7 @@ INSURED_TRANSLATIONS = {
   "en.insured.consumer_roles.docs_shared.country_of_citizenship" => "Country of Citizenship",
   "en.insured.consumer_roles.docs_shared.expiration_date" => "%{name} Expiration Date",
   "en.insured.consumer_roles.docs_shared.i94_number" => "I 94 Number",
-  "en.insured.consumer_roles.docs_shared.i94_number_req" => "When entering the I-94 Number, only include numbers.  Do not enter any other characters, letters, or spaces. -li- You must enter exactly 11 digits into the I-94 Number field. \
+  "en.insured.consumer_roles.docs_shared.i94_number_req" => "When entering the I-94 Number, only include 9 numbers followed by a letter or a number in the 10th position and a number in the 11th position. Do not enter any other characters or spaces. -li- You must enter exactly 11 digits into the I-94 Number field. \
   -li- How to find the I-94 Number: \
   The I-94 Number is also called an admission number. It is an 11 digit number found printed on Arrival/Departure Records (Form I-94 or Form I-94A). It can also be found on Form I-9.",
   "en.insured.consumer_roles.docs_shared.naturalization_number" => "Naturalization Number",
