@@ -10,12 +10,7 @@
     <%= form_tag edit_aptc_insured_group_selections_path(hbx_enrollment_id: locals[:hbx_enrollment][:id]), :method => :post do %>
     <div class='col-md-12'>
       <div id="applied-aptc-text" class="hidden">
-        <div class="col-md-12 aptc-no-left-padding">
-          <h5 class="col-md-6 aptc-no-left-padding"><b>Effective date</b></h5>
-          <div class="col-md-6 aptc-date-margins">
-            <%= locals[:new_effective_on_date] %>
-          </div>
-        </div>
+        <h5 class="col-md-12 aptc-no-left-padding"><b>Effective date: </b><%= locals[:new_effective_on_date] %></h5>
         <h5 class="col-md-12 aptc-no-left-padding"><b>Maximum tax credit available: </b>$<span id="max_aptc_available"><%= locals[:available_aptc] %></span></h5>
         <h5 class="col-md-12 aptc-no-left-padding"><b>Tax credit applied (%)</b></h5>
         <span class="col-md-12" align= "center">
