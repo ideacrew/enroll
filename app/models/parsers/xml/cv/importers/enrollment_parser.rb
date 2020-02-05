@@ -18,13 +18,13 @@ module Parsers::Xml::Cv::Importers
       coverage_type = e_product.coverage_type.strip.split("#").last
       product_class = coverage_type == "health" ? BenefitMarkets::Products::HealthProducts::HealthProduct : BenefitMarkets::Products::DentalProducts::DentalProduct
       product = product_class.new(
-          id: e_product.id,
-          hios_id: e_product.id,
-          title: e_product.name,
-          application_period: (Date.new(e_product.active_year.to_i, 1, 1)..Date.new(e_product.active_year.to_i, 12, 31)),
-          metal_level_kind: metal_level,
-          kind: coverage_type == "health" ? :health : :dental,
-          ehb: e_product.ehb_percent.to_f
+        id: e_product.id,
+        hios_id: e_product.id,
+        title: e_product.name,
+        application_period: (Date.new(e_product.active_year.to_i, 1, 1)..Date.new(e_product.active_year.to_i, 12, 31)),
+        metal_level_kind: metal_level,
+        kind: coverage_type == "health" ? :health : :dental,
+        ehb: e_product.ehb_percent.to_f
       )
       hbx_enrollment_members = []
       policy.enrollees.each do |enrollee|
@@ -42,19 +42,19 @@ module Parsers::Xml::Cv::Importers
       effective_on = enrollee.benefit.begin_date rescue ''
       terminated_on = enrollee.benefit.end_date rescue ''
       HbxEnrollment.new(
-          hbx_id: policy.id,
-          kind: kind,
-          elected_aptc_pct: elected_aptc_pct,
-          applied_aptc_amount: applied_aptc_amount,
-          product: product,
-          issuer_profile_id: enrollment.plan.try(:carrier).try(:id),
-          coverage_kind: coverage_type,
-          hbx_enrollment_members: hbx_enrollment_members,
-          household: get_household_by_policy_xml(policy),
-          effective_on: effective_on,
-          terminated_on: terminated_on,
-          employee_role: get_employee_role_by_shop_market_xml(enrollment.shop_market),
-          broker: get_broker_role_by_broker_xml(policy.broker_link),
+        hbx_id: policy.id,
+        kind: kind,
+        elected_aptc_pct: elected_aptc_pct,
+        applied_aptc_amount: applied_aptc_amount,
+        product: product,
+        issuer_profile_id: enrollment.plan.try(:carrier).try(:id),
+        coverage_kind: coverage_type,
+        hbx_enrollment_members: hbx_enrollment_members,
+        household: get_household_by_policy_xml(policy),
+        effective_on: effective_on,
+        terminated_on: terminated_on,
+        employee_role: get_employee_role_by_shop_market_xml(enrollment.shop_market),
+        broker: get_broker_role_by_broker_xml(policy.broker_link),
       )
     end
 
@@ -92,12 +92,12 @@ module Parsers::Xml::Cv::Importers
       employer = shop_market.employer_link
       fein = employer.id.strip.split('#').last rescue ''
       org = BenefitSponsors::Organizations::Organization.new(
-          fein: fein,
-          legal_name: employer.try(:name)
+        fein: fein,
+        legal_name: employer.try(:name)
       )
       profile_class = Settings.site.key == :ma ? BenefitSponsors::Organizations::AcaShopDcEmployerProfile : BenefitSponsors::Organizations::AcaShopCcaEmployerProfile
       EmployeeRole.new(
-          employer_profile: profile_class.new(organization: org)
+        employer_profile: profile_class.new(organization: org)
       )
     end
 

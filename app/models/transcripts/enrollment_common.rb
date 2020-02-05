@@ -34,12 +34,12 @@ module Transcripts
       family ||= enrollment.family
 
       family.active_household.hbx_enrollments.where({
-                                                        :coverage_kind => enrollment.coverage_kind,
-                                                        :kind => enrollment.kind,
-                                                        :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES)
+                                                      :coverage_kind => enrollment.coverage_kind,
+                                                      :kind => enrollment.kind,
+                                                      :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES)
                                                     }).order_by(:effective_on.asc)
-          .select {|e| e.product.active_year == enrollment.product.active_year} #.reject{|en| en.void?}
-          .select {|en| en.subscriber.present? && enrollment.subscriber.present? && (en.subscriber.hbx_id == enrollment.subscriber.hbx_id)}
+            .select {|e| e.product.active_year == enrollment.product.active_year} #.reject{|en| en.void?}
+            .select {|en| en.subscriber.present? && enrollment.subscriber.present? && (en.subscriber.hbx_id == enrollment.subscriber.hbx_id)}
     end
 
     def matching_shop_coverages(enrollment, family=nil)
