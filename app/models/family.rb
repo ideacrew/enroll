@@ -668,6 +668,19 @@ class Family
     family_member
   end
 
+  # To compensate for duplicate dependents
+  # Otherwise the family member will map to the same person
+  # and an error will be thrown
+
+  def remove_family_member_by_id(family_member_id)
+    family_member = family_members.where(id: family_member_id).first
+    if family_member.present?
+      family_member.is_active = false
+      active_household.remove_family_member(family_member)
+    end
+    family_member
+  end
+
   # Determine if {Person} is a member of this family
   #
   # @example Is this person a family member?

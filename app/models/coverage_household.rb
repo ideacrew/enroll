@@ -86,13 +86,7 @@ class CoverageHousehold
     coverage_household_members.where(family_member_id: family_member.id).each do |chm|
       chm.destroy
     end
-
-    # if chm = coverage_household_members.first
-    #   chm.reload
-    #   chm.save_parent
-    # end
-
-    # household.save
+    save
   end
 
   def remove_coverage_household_member(coverage_household_member_id, family_member_id)
