@@ -16,19 +16,19 @@ describe Parsers::Xml::Cv::Importers::EnrollmentParser do
       end
 
       it "should get plan" do
-        plan = subject.get_enrollment_object.plan
+        plan = subject.get_enrollment_object.product
         expect(plan.name).to eq "BluePreferred PPO $1,000 100%/80%"
         expect(plan.active_year).to eq 2016
         expect(plan.ehb).to eq 91.2
-        expect(plan.metal_level).to eq 'gold'
-        expect(plan.coverage_kind).to eq "health_and_dental"
+        expect(plan.metal_level_kind).to eq :gold
+        expect(plan.kind).to eq :dental
       end
 
       it "should get base info of enrollment" do
         enrollment = subject.get_enrollment_object
         expect(enrollment.elected_aptc_pct).to eq 0
         expect(enrollment.applied_aptc_amount).to eq 0
-        expect(enrollment.carrier_profile_id).to eq '116036'
+        expect(enrollment.issuer_profile_id).to eq '116036'
         expect(enrollment.coverage_kind).to eq 'health_and_dental'
         expect(enrollment.household.class).to eq Household
         expect(enrollment.employee_role.class).to eq EmployeeRole

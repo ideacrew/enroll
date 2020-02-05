@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Transcripts::EnrollmentTranscript, type: :model, dbclean: :after_each do
 
-  describe "find_or_build_family" do
+  describe 'find_or_build_family' do
 
     let!(:spouse)  { FactoryGirl.create(:person)}
     let!(:child1)  { FactoryGirl.create(:person)}
@@ -17,56 +17,51 @@ RSpec.describe Transcripts::EnrollmentTranscript, type: :model, dbclean: :after_
       p
     end
 
-    context "Family already exists" do
+    context 'Family already exists' do
 
       let(:source_effective_on) { Date.new(TimeKeeper.date_of_record.year, 1, 1) }
       let(:other_effective_on) { Date.new(TimeKeeper.date_of_record.year, 3, 1) }
-      let!(:other_plan) { FactoryGirl.create(:plan) }
-      let!(:source_plan) { FactoryGirl.create(:plan) }
-
+      let(:other_plan) { FactoryGirl.create(:benefit_markets_products_health_products_health_product) }
+      let(:source_plan) { FactoryGirl.create(:benefit_markets_products_health_products_health_product) }
       let(:other_family) {
-        family = Family.new({
-          hbx_assigned_id: '24112',
-          e_case_id: "6754632"
-          })
+        family = Family.new(hbx_assigned_id: '24112',
+                            e_case_id: "6754632")
 
         primary = family.family_members.build(is_primary_applicant: true, person: person)
         dependent1 = family.family_members.build(is_primary_applicant: true, person: spouse)
         family
       }
 
-      let(:dependent2) {
+      let(:dependent2) do
         other_family.family_members.build(is_primary_applicant: false, person: child1)
-      }
+      end
 
-      let(:other_enrollment) {
-        enrollment = other_family.active_household.hbx_enrollments.build({ hbx_id: '1000001', kind: 'individual',plan: other_plan, effective_on: other_effective_on })
-        enrollment.hbx_enrollment_members.build({applicant_id: other_family.primary_applicant.id, is_subscriber: true, coverage_start_on: other_effective_on })
-        enrollment.hbx_enrollment_members.build({applicant_id: dependent2.id, is_subscriber: false, coverage_start_on: other_effective_on })
+      let(:other_enrollment) do
+        enrollment = other_family.active_household.hbx_enrollments.build({hbx_id: '1000001', kind: 'individual', product: other_plan, effective_on: other_effective_on})
+        enrollment.hbx_enrollment_members.build({applicant_id: other_family.primary_applicant.id, is_subscriber: true, coverage_start_on: other_effective_on})
+        enrollment.hbx_enrollment_members.build({applicant_id: dependent2.id, is_subscriber: false, coverage_start_on: other_effective_on})
         enrollment
-      }
+      end
 
       let(:source_enrollment_hbx_id1) { '1000001' }
       let(:source_enrollment_hbx_id2) { '1000002' }
+      let(:source_family) do
+        family = Family.new({hbx_assigned_id: '25112', e_case_id: "6754632"})
+        primary = family.family_members.build(is_primary_applicant: true, person: person)
+        dependent = family.family_members.build(is_primary_applicant: false, person: spouse)
 
-      let(:source_family) { 
-         family = Family.new({ hbx_assigned_id: '25112', e_case_id: "6754632" })
-         primary = family.family_members.build(is_primary_applicant: true, person: person)
-         dependent = family.family_members.build(is_primary_applicant: false, person: spouse)
+        enrollment = family.active_household.hbx_enrollments.build({hbx_id: source_enrollment_hbx_id1, kind: 'individual', product: source_plan, effective_on: (source_effective_on + 2.months), aasm_state: 'coverage_selected'})
+        enrollment.hbx_enrollment_members.build({applicant_id: primary.id, is_subscriber: true, coverage_start_on: source_effective_on, eligibility_date: source_effective_on})
+        enrollment.hbx_enrollment_members.build({applicant_id: dependent.id, is_subscriber: false, coverage_start_on: source_effective_on, eligibility_date: source_effective_on})
+        enrollment.save!
 
-         enrollment = family.active_household.hbx_enrollments.build({ hbx_id: source_enrollment_hbx_id1, kind: 'individual',plan: source_plan, effective_on: (source_effective_on + 2.months), aasm_state: 'coverage_selected' })
-         enrollment.hbx_enrollment_members.build({applicant_id: primary.id, is_subscriber: true, coverage_start_on: source_effective_on, eligibility_date: source_effective_on })
-         enrollment.hbx_enrollment_members.build({applicant_id: dependent.id, is_subscriber: false, coverage_start_on: source_effective_on, eligibility_date: source_effective_on })
-         enrollment.save!
+        enrollment = family.active_household.hbx_enrollments.build(hbx_id: source_enrollment_hbx_id2, kind: 'individual', product: source_plan, effective_on: source_effective_on, aasm_state: 'coverage_selected')
+        enrollment.hbx_enrollment_members.build(applicant_id: primary.id, is_subscriber: true, coverage_start_on: (source_effective_on + 1.month), eligibility_date: (source_effective_on + 1.month))
+        family.save
+        family
+      end
 
-         enrollment = family.active_household.hbx_enrollments.build({ hbx_id: source_enrollment_hbx_id2, kind: 'individual',plan: source_plan, effective_on: (source_effective_on), aasm_state: 'coverage_selected'})
-         enrollment.hbx_enrollment_members.build({applicant_id: primary.id, is_subscriber: true, coverage_start_on: (source_effective_on + 1.month), eligibility_date: (source_effective_on + 1.month) })
-         family.save
-         family
-       }
-
-      context "and enrollment member missing & plan hios is different" do
-
+      context 'and enrollment member missing & plan hios is different' do
         it 'should have differences on hbx enrollment member and plan' do
           source_family
 
@@ -85,10 +80,10 @@ RSpec.describe Transcripts::EnrollmentTranscript, type: :model, dbclean: :after_
         end
       end
 
-      context 'other enrollement not matching with the source enrollment hbx_id' do 
+      context 'other enrollement not matching with the source enrollment hbx_id' do
         let(:source_enrollment_hbx_id1) { '1000003' }
 
-        it 'should match enrollments of same coverage kind, market under primary' do 
+        it 'should match enrollments of same coverage kind, market under primary' do
           source_family
 
           factory = Transcripts::EnrollmentTranscript.new
@@ -101,4 +96,3 @@ RSpec.describe Transcripts::EnrollmentTranscript, type: :model, dbclean: :after_
     end
   end
 end
-
