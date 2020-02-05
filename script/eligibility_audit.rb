@@ -246,7 +246,7 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
                     pers.no_dc_address ? pers.no_dc_address_reason : "",
                     cr.is_applying_coverage,
                     pers.resident_role.present?,
-                    determination_source_for(pers)
+                    determination_source_for(pers),
                     eligible,
                     eligible ? "" : eligibility_errors
                 ])
