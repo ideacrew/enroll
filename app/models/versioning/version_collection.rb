@@ -25,7 +25,7 @@ module Versioning
       end
     end
 
-    private
+    protected
 
     def build_version_list
       @record.reload

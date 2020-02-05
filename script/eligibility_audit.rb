@@ -152,11 +152,18 @@ def not_authorized_by_curam?(person)
   !(lpd.vlp_authority == "curam")
 end
 
+def determination_source_for(person)
+  cr = person.consumer_role
+  return "enroll" if cr.blank?
+  lpd = cr.lawful_presence_determination
+  return "enroll" if lpd.blank?
+  (lpd.vlp_authority == "curam") ? "curam" : "enroll"
+end
+
 def auditable?(person_record, person_version, person_updated_at, family)
   version_in_window?(person_updated_at) &&
   primary_has_address?(person_record, person_version, family) &&
-  primary_answered_data?(person_record, person_version, family) &&
-  not_authorized_by_curam?(person_version)
+  primary_answered_data?(person_record, person_version, family)
 end
 
 pb = ProgressBar.create(
@@ -193,11 +200,13 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
     "Residency Exemption Reason",
     "Is applying for coverage",
     "Resident Role",
+    "Determination Source",
     "Eligible",
     "Denial Reasons"
   ]
   ivl_people.no_timeout.each do |pers_record|
-    person_versions = Versioning::VersionCollection.new(pers_record)
+    person_versions = Versioning::PersonVersionCollection.new(pers_record)
+    next unless person_versions.has_non_curam_determination?
     person_versions.each do |p_v|
       begin
       p_version = p_v.resolve_to_model
@@ -237,6 +246,7 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
                     pers.no_dc_address ? pers.no_dc_address_reason : "",
                     cr.is_applying_coverage,
                     pers.resident_role.present?,
+                    determination_source_for(pers)
                     eligible,
                     eligible ? "" : eligibility_errors
                 ])
