@@ -69,6 +69,7 @@ $(document).on("ready ajax:success", function() {
   });
 
   $('#aptc_applied_total').change(function(){
+    $('#applied_pct_1').attr('step',0.01)
     var total = parseFloat($('#aptc_applied_total').val().replace(/\$/, ""));
     var max_aptc_available = parseFloat(document.getElementById("max_aptc_available").innerHTML);
     if (total >= max_aptc_available) {
@@ -80,6 +81,7 @@ $(document).on("ready ajax:success", function() {
     var new_percent = toFixedTrunc(total/max_aptc_available);
     $('#applied_pct_1').val(new_percent);
     calculatePercent('#applied_pct_1', 100);
+    $('#applied_pct_1').attr('step',0.05)
   });
 
   function toFixedTrunc(x) {
