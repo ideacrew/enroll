@@ -86,8 +86,7 @@ module Forms
       # to a different user, when in fact it is the current user
       if same_ssn.present? &&
         same_ssn.first.try(:user) &&
-        same_ssn.first.try(:user_id)&.to_s != user_id.to_s && 
-        same_ssn.first.consumer_role.blank?
+        same_ssn.first.try(:user_id)&.to_s != user_id.to_s
         errors.add(
           :ssn_taken,
           #{}"This Social Security Number has been taken on another account.  If this is your correct SSN, and you don’t already have an account, please contact #{HbxProfile::CallCenterName} at #{HbxProfile::CallCenterPhoneNumber}.")
