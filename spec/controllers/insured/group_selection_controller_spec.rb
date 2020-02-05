@@ -299,6 +299,15 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         expect(assigns(:new_effective_on)).to eq TimeKeeper.date_of_record
       end
 
+      it "should not redirect to coverage household page if incarceration is unanswered" do
+        person.unset(:is_incarcerated)
+        HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.last.benefit_packages[0].incarceration_status = ["incarceration_status"]
+        sign_in user
+        get :new, params: { person_id: person.id, consumer_role_id: consumer_role.id, change_plan: "change", hbx_enrollment_id: "123", coverage_kind: hbx_enrollment.coverage_kind }
+        expect(response).to have_http_status(:redirect)
+        expect(response).to redirect_to(manage_family_insured_families_path(tab: 'family'))
+      end
+
       it "should create an hbx enrollment" do
         params = {
           person_id: person.id,
