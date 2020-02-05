@@ -127,6 +127,50 @@ And(/(.*) selects eligible immigration status$/) do |text|
   end
 end
 
+Then(/Individual should see the i94 text/) do
+  expect(page).to have_content('When entering the I-94 Number, only include 9 numbers followed by a letter or a number in the 10th position and a number in the 11th position.')
+end
+
+Then(/selects i94 document and fills required details (.*)$/) do |correct_or_incorrect|
+  find('.label', :text => 'Select document type', wait: 10).click
+  find('li', :text => "I-94 (Arrival/Departure Record)", match: :prefer_exact, wait: 10).click
+  fill_in 'I 94 Number', with: (correct_or_incorrect == 'correctly' ? '123456789a1' : '@23#5678901')
+  step 'should fill in valid sevis, expiration_date, tribe_member and incarcerated details'
+end
+
+Then(/selects i94 unexpired foreign passport document and fills required details (.*)$/) do |correct_or_incorrect|
+  find('.label', :text => 'Select document type', wait: 10).click
+  find('li', :text => "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport", match: :prefer_exact, wait: 10).click
+  fill_in 'I 94 Number', with: (correct_or_incorrect == 'correctly' ? '123456789a1' : '@23#5678901')
+  fill_in 'Passport Number', with: 'A123456'
+  fill_in 'Visa number', with: 'V1234567'
+  step 'should fill in valid sevis, expiration_date, tribe_member and incarcerated details'
+end
+
+Then(/selects Other With I-94 Number document and fills required details (.*)$/) do |correct_or_incorrect|
+  find('.label', :text => 'Select document type', wait: 10).click
+  find('li', :text => "Other (With I-94 Number)", match: :prefer_exact, wait: 10).click
+  fill_in 'I 94 Number', with: (correct_or_incorrect == 'correctly' ? '123456789a1' : '@23#5678901')
+  fill_in 'Passport Number', with: 'A123456'
+  step 'should fill in valid sevis, expiration_date, tribe_member and incarcerated details'
+end
+
+And(/should fill in valid sevis, expiration_date, tribe_member and incarcerated details/) do
+  fill_in 'SEVIS ID', with: '1234567891'
+  fill_in 'Expiration Date', with: TimeKeeper.date_of_record.to_s
+  click_link((TimeKeeper.date_of_record + 10.days).day.to_s)
+  find('label[for=indian_tribe_member_no]', wait: 20).click
+  find('label[for=radio_incarcerated_no]', wait: 10).click
+end
+
+Then /^Individual (.*) go to Authorization and Consent page$/ do |argument|
+  if argument == 'does'
+    expect(page).to have_content('Authorization and Consent')
+  else
+    expect(page).not_to have_content('Authorization and Consent')
+  end
+end
+
 Then(/select I-551 doc and fill details/) do
   find('.label', :text => 'Select document type', wait: 10).click
   find('li', :text => 'I-551 (Permanent Resident Card)', wait: 10).click
