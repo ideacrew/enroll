@@ -46,7 +46,7 @@ module Insured
 
         service = self_term_or_cancel_service(attrs)
         service.update_aptc
-        'Successfully updated tax credits for enrollment.'
+        'Tax credit updated successfully.'
       end
 
       def self.self_term_or_cancel_service(attrs)
