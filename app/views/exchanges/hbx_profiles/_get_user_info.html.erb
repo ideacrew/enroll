@@ -19,7 +19,7 @@
         <td> <%= user.present? ? user.oim_id : "Nil" %> </td>
         <td> <%= user.present? ? user.email : "Nil" %> </td>
         <% if user.present? %>
-          <td> <%= user.last_sign_in_at.in_time_zone("Eastern Time (US & Canada)").to_date %> <strong>(<%= user.last_sign_in_at.in_time_zone("Eastern Time (US & Canada)").strftime("%I:%M%p") %>)</strong></td>
+          <td> <%= user.current_sign_in_at.in_time_zone("Eastern Time (US & Canada)").to_date %> <strong>(<%= user.current_sign_in_at.in_time_zone("Eastern Time (US & Canada)").strftime("%I:%M%p") %>)</strong></td>
         <% else %>
           <td> Nil </td>
         <% end %>
@@ -31,3 +31,4 @@
   </table>
   <h6 align="right"> Requested by @<%= @current_user.person.full_name %> </h6>
 </div>
+`
