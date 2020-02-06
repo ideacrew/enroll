@@ -9,6 +9,19 @@ module BenefitMarkets
     include Mongoid::Document
     include Mongoid::Timestamps
 
+    # Added this module as a temporary fix for EMPLOYER FLEXIBILITY PROJECT
+    module ContributionModuleAssociation
+      def contribution_model
+        if packagable.is_a?(BenefitMarkets::BenefitSponsorCatalog) && packagable.benefit_application&.is_renewing?
+          BenefitMarkets::ContributionModels::ContributionModel.by_title("DC Shop Simple List Bill Contribution Model")
+        else
+          super
+        end
+      end
+    end
+
+    prepend ContributionModuleAssociation
+
     embedded_in :packagable, polymorphic: true
 
     field :application_period,      type: Range
@@ -114,7 +127,9 @@ module BenefitMarkets
     end
 
     def issuer_profile_products_for(issuer_profile)
-      return @issuer_profile_products if defined?(@issuer_profile_products)
+      return @issuer_profile_products if defined?(@issuer_profile_products) && @profile_hash&.has_value?(issuer_profile.id)
+      @profile_hash = Hash.new
+      @profile_hash["issuer_profile_id"] = issuer_profile.id
       @issuer_profile_products = products.by_issuer_profile(issuer_profile)
     end
 
