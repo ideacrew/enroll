@@ -4,17 +4,26 @@ $(document).on("ready ajax:success", function() {
   // Minimum date is current date
   // maximum date is end of current year (I.E. 12/31/2019)
   $("#term-date").datepicker({minDate: 0, maxDate: new Date(new Date().getFullYear(), 11, 31)});
+  $("#term-date").change(function(){
+    if( $("#agreement_action-confirm-yes").attr('checked') ){
+      $("#btn-cancel").attr("disabled", false);
+    }
+  });
 
   // Cancel Confirmation
   $("#agreement_action-confirm-yes").click(function(){
     $(".interaction-click-control-action-confirm").attr("disabled", false);
     $("#action-confirm-date").attr("hidden", false);
-    $("#update-aptc-button").attr("disabled", false);
+    $(this).attr('checked','checked');
+    if($('#term-date') && $('#term-date').val() != "") {
+      $("#btn-cancel").attr("disabled", false);
+    }
   });
   $("#agreement_action-confirm-no").click(function(){
     $(".interaction-click-control-action-confirm").attr("disabled", true);
     $("#action-confirm-date").attr("hidden", true);
-    $("#update-aptc-button").attr("disabled", true);
+    $("#agreement_action-confirm-yes").removeAttr('checked');
+    $("#btn-cancel").attr("disabled", true);
   });
 
   // Change Tax Credit Confirmation
@@ -56,20 +65,55 @@ $(document).on("ready ajax:success", function() {
 
   // APTC JS
   $('#applied_pct_1').change(function(){
-    calculatePercent('#applied_pct_1', 100);
+    calculateValue('#applied_pct_1', 100);
   });
-  $('#aptc_applied_5cf6c9ec9ee4f43836000020').change(function(){
-    calculatePercent('#aptc_applied_total', 1);
+
+  $('#aptc_applied_total').change(function(){
+
+    var new_total = $('#aptc_applied_total').val();
+
+    $('#applied_pct_1').attr('step',0.01)
+    var total = parseFloat($('#aptc_applied_total').val().replace(/\$/, ""));
+    var max_aptc_available = parseFloat(document.getElementById("max_aptc_available").innerHTML);
+
+    if (total >= max_aptc_available) {
+      $('#aptc_applied_pct_1_percent').val('100%');
+      $('#aptc_applied_total').val("$" + max_aptc_available);
+      $('#applied_pct_1').val("1");
+    }
+
+    var new_percent = toFixedTrunc(total/max_aptc_available);
+    $('#applied_pct_1').val(new_percent);
+    calculatePercent(total);
+    $('#applied_pct_1').attr('step',0.05)
   });
+
+  function calculatePercent(tax_value) {
+    // Starting variables
+    // var applied_aptc_total = $('#aptc_applied_total').val();
+    var total_premium_value = document.getElementById("enrollment_total_premium").innerHTML;
+    var total_premium = toFixedTrunc(parseFloat(total_premium_value));
+    // Max available tax credit per month for month
+    var max_aptc_available = document.getElementById("max_aptc_available").innerHTML;
+    var new_percent = tax_value/max_aptc_available;
+    console.log(new_percent);
+
+    var aptc_total_cash_amount_to_apply = toFixedTrunc(max_aptc_available * new_percent);
+    // Update the percentage
+    $('#aptc_applied_pct_1_percent').val(toFixedTrunc(new_percent));
+    // Show dollar amount of Tax Credit value
+    var new_premium = (total_premium - aptc_total_cash_amount_to_apply);
+    $('#new-premium').html(toFixedTrunc(new_premium.toFixed(8)));
+  }
 
   function toFixedTrunc(x) {
     var with2Decimals = x.toString().match(/^-?\d+(?:\.\d{0,2})?/)[0];
     return with2Decimals;
   }
 
-  function calculatePercent(selector, multiplier) {
+  function calculateValue(selector, multiplier) {
     // Starting variables
-    var applied_aptc_total = $('#aptc_applied_total').val()
+    var applied_aptc_total = $('#aptc_applied_total').val();
     var total_premium_value = document.getElementById("enrollment_total_premium").innerHTML;
     var total_premium = toFixedTrunc(parseFloat(total_premium_value));
     // Percentage of max aptc available that user wishes to apply
