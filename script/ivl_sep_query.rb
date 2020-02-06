@@ -53,7 +53,8 @@ terms = HbxEnrollment.collection.aggregate([
         }
       }
     },
-    "kind" => {"$nin" => enrollment_kinds}
+    "kind" => {"$nin" => enrollment_kinds},
+    "carrier_initiated_term" => false
   }},
   {"$group" => {"_id" => "$hbx_id"}}
 ])
