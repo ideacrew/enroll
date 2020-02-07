@@ -129,6 +129,8 @@ end
 
 Then(/Individual should see the i94 text/) do
   expect(page).to have_content('When entering the I-94 Number, only include 9 numbers followed by a letter or a number in the 10th position and a number in the 11th position.')
+  expect(page).to have_content('You must enter exactly 11 characters into the I-94 field.')
+  expect(page).to have_content("The I-94 number is also called the admissions number. It is an 11 character sequence found printed on Arrival/Departure records (For I-94 or Form I-94A.) It can also be found on the form I-9.")
 end
 
 Then(/selects i94 document and fills required details (.*)$/) do |correct_or_incorrect|
