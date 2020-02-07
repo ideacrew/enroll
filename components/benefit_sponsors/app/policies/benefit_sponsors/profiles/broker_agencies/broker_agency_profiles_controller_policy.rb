@@ -21,6 +21,7 @@ module BenefitSponsors
 
         def redirect_signup?
           user.present?
+          self.send(:family_index?)
         end
 
         def staff_index?
