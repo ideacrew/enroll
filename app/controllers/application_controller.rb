@@ -25,8 +25,8 @@ class ApplicationController < ActionController::Base
   skip_before_action :verify_authenticity_token, if: :format_js?
 
   ## Devise filters
-  #before_action :require_login, unless: :authentication_not_required?
-  #before_action :authenticate_user_from_token!
+  before_action :require_login, unless: :authentication_not_required?
+  before_action :authenticate_user_from_token!
   before_action :authenticate_me!
 
   # for i18L

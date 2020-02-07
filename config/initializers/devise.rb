@@ -20,7 +20,7 @@ Devise.setup do |config|
             ['DELETE', %r{^/api/logout$}],
             ['DELETE', %r{^/api/logout.json$}]
       ]
-      jwt.expiration_time = 1.minute.to_i
+      jwt.expiration_time = 5.days.to_i
       jwt.request_formats = { api_user: [:json] }
   end
 

@@ -108,6 +108,10 @@ class User
   attr_accessor :invitation_id
   #  validate :ensure_valid_invitation, :on => :create
 
+  def self.primary_key
+    :id
+  end
+
   def ensure_valid_invitation
     if self.invitation_id.blank?
       errors.add(:base, "There is no valid invitation for this account.")

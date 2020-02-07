@@ -1,5 +1,7 @@
 class Api::V1::ApiController < Api::V1::ApiBaseController
 
+  before_action :authenticate_user!
+
   def ping
     response = {
       ping:    'pong',

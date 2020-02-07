@@ -6,7 +6,7 @@ module AuthorizationConcern
     # :confirmable, :lockable, :timeoutable and :omniauthable
     devise :database_authenticatable, :jwt_authenticatable, :registerable, :lockable,
            :recoverable, :rememberable, :trackable, :timeoutable, :authentication_keys => {email: false, login: true},
-           jwt_revocation_strategy: Blacklist
+           jwt_revocation_strategy: Devise::JWT::RevocationStrategies::Null
 
     ## Database authenticatable
     field :email,              type: String, default: ""
@@ -58,7 +58,9 @@ module AuthorizationConcern
     end
 
     def on_jwt_dispatch(token, payload)
+      byebug
     end
+
 
     def ensure_authentication_token
       if authentication_token.blank?
