@@ -12,16 +12,21 @@ class ApplicationController < ActionController::Base
    request.format.js?
   end
 
+  def json_request?
+   request.format.js?
+  end
   # force_ssl
 
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
   # Citation: https://stackoverflow.com/a/39954005/5331859
   protect_from_forgery with: :exception, prepend: true
+  protect_from_forgery with: :null_session, if: :format_js?
+  skip_before_action :verify_authenticity_token, if: :format_js?
 
   ## Devise filters
-  before_action :require_login, unless: :authentication_not_required?
-  before_action :authenticate_user_from_token!
+  #before_action :require_login, unless: :authentication_not_required?
+  #before_action :authenticate_user_from_token!
   before_action :authenticate_me!
 
   # for i18L
@@ -50,6 +55,20 @@ class ApplicationController < ActionController::Base
 
   def access_denied
     render file: 'public/403.html', status: 403
+  end
+
+  # Use api_user Devise scope for JSON access
+  def authenticate_user!(*args)
+    super and return unless args.blank?
+    json_request? ? authenticate_api_user! : super
+  end
+
+  def invalid_auth_token
+    respond_to do |format|
+      format.html { redirect_to sign_in_path,
+                    error: 'Login invalid or expired' }
+      format.json { head 401 }
+    end
   end
 
   def user_not_authorized(exception)
@@ -83,7 +102,7 @@ class ApplicationController < ActionController::Base
 
   private
 
-    def strong_params 
+    def strong_params
       params.permit!
     end
 
@@ -234,12 +253,15 @@ class ApplicationController < ActionController::Base
     end
 
     def set_current_user
-      User.current_user = current_user
-      SAVEUSER[:current_user_id] = current_user.try(:id)
-      session_id = SessionTaggedLogger.extract_session_id_from_request(request)
-      unless SessionIdHistory.where(session_id: session_id).present?
-        SessionIdHistory.create(session_id: session_id, session_user_id: current_user.try(:id), sign_in_outcome: "Successful", ip_address: request.remote_ip)
-      end
+      # byebug
+      # unless json_request?
+      #   User.current_user = current_user
+      #   SAVEUSER[:current_user_id] = current_user.try(:id)
+      #   session_id = SessionTaggedLogger.extract_session_id_from_request(request)
+      #   unless SessionIdHistory.where(session_id: session_id).present?
+      #     SessionIdHistory.create(session_id: session_id, session_user_id: current_user.try(:id), sign_in_outcome: "Successful", ip_address: request.remote_ip)
+      #   end
+      # end
     end
 
     def clear_current_user

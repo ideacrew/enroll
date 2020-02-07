@@ -10,6 +10,20 @@ Devise.setup do |config|
     manager.failure_app = CustomFailureApp
   end
 
+  config.jwt do |jwt|
+      jwt.secret = 'secret'
+      jwt.dispatch_requests = [
+            ['POST', %r{^/api/login$}],
+            ['POST', %r{^/api/login.json$}]
+      ]
+      jwt.revocation_requests = [
+            ['DELETE', %r{^/api/logout$}],
+            ['DELETE', %r{^/api/logout.json$}]
+      ]
+      jwt.expiration_time = 1.minute.to_i
+      jwt.request_formats = { api_user: [:json] }
+  end
+
   # The secret key used by Devise. Devise uses this key to generate
   # random tokens. Changing this key will render invalid all existing
   # confirmation, reset password and unlock tokens in the database.
@@ -295,3 +309,16 @@ Devise.setup do |config|
   #   include Turbolinks::Controller
   # end
 end
+
+
+# Warden::JWTAuth.configure do |config|
+#   config.secret =  'secret'
+#   config.dispatch_requests = [
+#                                ['POST', %r{^/api/login$}],
+#                                ['POST', %r{^/api/login.json$}]
+#                              ]
+#   config.revocation_requests = [
+#                                  ['DELETE', %r{^/api/logout$}],
+#                                  ['DELETE', %r{^/api/logout.json$}]
+#                                ]
+# end

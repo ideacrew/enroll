@@ -4,8 +4,9 @@ module AuthorizationConcern
   included do
     # Include default devise modules. Others available are:
     # :confirmable, :lockable, :timeoutable and :omniauthable
-    devise :database_authenticatable, :registerable, :lockable,
-           :recoverable, :rememberable, :trackable, :timeoutable, :authentication_keys => {email: false, login: true}
+    devise :database_authenticatable, :jwt_authenticatable, :registerable, :lockable,
+           :recoverable, :rememberable, :trackable, :timeoutable, :authentication_keys => {email: false, login: true},
+           jwt_revocation_strategy: Blacklist
 
     ## Database authenticatable
     field :email,              type: String, default: ""
@@ -49,6 +50,15 @@ module AuthorizationConcern
     scope :unlocked, ->{ where(locked_at: nil) }
 
     before_save :ensure_authentication_token
+
+    def generate_jwt
+      JWT.encode({ id: id,
+                  exp: 5.days.from_now.to_i },
+                 Rails.env.devise.jwt.secret_key)
+    end
+
+    def on_jwt_dispatch(token, payload)
+    end
 
     def ensure_authentication_token
       if authentication_token.blank?

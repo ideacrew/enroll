@@ -694,6 +694,21 @@ Rails.application.routes.draw do
   # API check_ach_routing
 
   namespace :api, defaults: {format: 'json'} do
+
+    devise_for :users, defaults: { format: :json },
+                     class_name: 'User',
+                           skip: [:registrations, :invitations,
+                                  :passwords, :confirmations,
+                                  :unlocks],
+                           path: '',
+                     path_names: { sign_in: 'login',
+                                  sign_out: 'logout' }
+    devise_scope :user do
+      get 'login', to: 'devise/sessions#new'
+      delete 'logout', to: 'devise/sessions#destroy'
+    end
+
+
     namespace :v1 do
 
       scope module: :api do
@@ -713,6 +728,6 @@ Rails.application.routes.draw do
       end
     end
   end
-  
+
   root 'welcome#index'
 end
