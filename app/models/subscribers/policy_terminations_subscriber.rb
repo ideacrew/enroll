@@ -30,12 +30,8 @@ module Subscribers
             if is_cancel
               Rails.logger.error("PolicyTerminationsSubscriber") { "Found and attempting to process #{en.hbx_id} as cancel" }
               if en.may_cancel_for_non_payment? && qr_uri=='non_payment'
-                en.terminate_reason = qr_uri
-                en.carrier_initiated_term = true
                 en.cancel_for_non_payment!
               elsif en.may_cancel_coverage?
-                en.terminate_reason = qr_uri
-                en.carrier_initiated_term = true
                 en.cancel_coverage!
               end
             else
@@ -43,15 +39,11 @@ module Subscribers
               if en.may_terminate_for_non_payment? && qr_uri=='non_payment'
                 end_effective_date = Date.strptime(end_effective_date_str, "%Y%m%d") rescue nil
                 if end_effective_date
-                  en.terminate_reason = qr_uri
-                  en.carrier_initiated_term = true
                   en.terminate_for_non_payment!(end_effective_date)
                 end
               elsif en.may_terminate_coverage?
                 end_effective_date = Date.strptime(end_effective_date_str, "%Y%m%d") rescue nil
                 if end_effective_date
-                  en.terminate_reason = qr_uri
-                  en.carrier_initiated_term = true
                   en.terminate_coverage!(end_effective_date)
                 end
               end
