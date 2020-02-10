@@ -6,7 +6,6 @@ module Forms
     include PeopleNames
     include SsnField
     attr_accessor :gender
-    attr_reader :dob
     attr_accessor :user_id
     attr_accessor :dob_check
     attr_accessor :is_applying_coverage
@@ -14,7 +13,7 @@ module Forms
     validates_presence_of :first_name, :allow_blank => nil
     validates_presence_of :last_name, :allow_blank => nil
     validates_presence_of :gender, :allow_blank => nil
-    validates_presence_of :dob, :allow_blank => nil
+    validates_presence_of :dob
     include ::Forms::DateOfBirthField
     # include Validations::USDate.on(:dob)
 
@@ -24,13 +23,18 @@ module Forms
               allow_blank: true,
               numericality: true
     validate :dob_not_in_future
+    attr_reader :dob
 
 
     def dob=(val)
+      # Should check here if mm/dd/yyyy or yyyy-mm-dd
+      binding.pry
       if val.class == Date
-        @dob = val rescue nil
+        @dob = val
+      elsif val.match  /\A(?<mon>\d{2})\/(?<day>\d{2})\/(?<yr>\d{4})\z/
+        @dob = Date.strptime(val, "%m/%d/%Y")
       else
-        Date.strptime(val, "%Y-%m-%d") rescue nil
+        @dob = Date.strptime(val, "%Y-%m-%d")
       end
     end
 

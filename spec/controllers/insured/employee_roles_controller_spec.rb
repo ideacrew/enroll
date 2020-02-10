@@ -344,6 +344,8 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :around_each do
       let(:employee_role) { person_with_employee_role.employee_roles.first }
 
       before do
+        # Todo
+        allow_any_instance_of(CensusEmployee).to receive(:published_benefit_group_assignment).and_return(double)
         allow_any_instance_of(CensusEmployee).to receive(:employer_profile).and_return(organization_with_employer_profile.organization.employer_profile)
         person_census_employee
         build_employee_role
