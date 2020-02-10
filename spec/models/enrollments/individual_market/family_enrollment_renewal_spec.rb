@@ -330,6 +330,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) {|_id, _start, age| age * 1.0}
         end
 
+        # This includes the new APTC 'round down' behaviour.
         it "should append APTC values" do
           enr = subject.clone_enrollment
           enr.save!
