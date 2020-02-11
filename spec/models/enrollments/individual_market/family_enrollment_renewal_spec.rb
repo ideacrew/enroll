@@ -331,6 +331,8 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
 
         # This includes the new APTC 'round down' behaviour.
+        # It probably belongs in it's own calculation spec, but it does impact
+        # APTC calcs.
         it "should append APTC values" do
           enr = subject.clone_enrollment
           enr.save!
