@@ -96,11 +96,11 @@ $(document).on("ready ajax:success", function() {
     // Max available tax credit per month for month
     var max_aptc_available = document.getElementById("max_aptc_available").innerHTML;
     var new_percent = tax_value/max_aptc_available;
-    console.log(new_percent);
 
     var aptc_total_cash_amount_to_apply = toFixedTrunc(max_aptc_available * new_percent);
     // Update the percentage
-    $('#aptc_applied_pct_1_percent').val(toFixedTrunc(new_percent));
+    var percent_string = (new_percent.toFixed(2) * 100) + "%";
+    $('#aptc_applied_pct_1_percent').val(percent_string);
     // Show dollar amount of Tax Credit value
     var new_premium = (total_premium - aptc_total_cash_amount_to_apply);
     $('#new-premium').html(toFixedTrunc(new_premium.toFixed(8)));
