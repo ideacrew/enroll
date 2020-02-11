@@ -83,6 +83,7 @@ And(/(.*) also has a health enrollment with primary person covered/) do |role|
   else
     sep = FactoryBot.create :special_enrollment_period, family: family
   end
+  sep.update_attributes!(effective_on: TimeKeeper.date_of_record.end_of_month)
   product = FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile)
   enrollment = FactoryBot.create(:hbx_enrollment, product: product,
                                   household: family.active_household,
@@ -264,7 +265,7 @@ end
 
 Then(/(.*) should see the enrollment with make changes button/) do |role|
   if role == "employee"
-    expect(page).to have_content "#{(current_effective_date || TimeKeeper.date_of_record).year} HEALTH COVERAGE"
+    expect(page).to have_content "#{(@current_effective_date || TimeKeeper.date_of_record).year} HEALTH COVERAGE"
   else
     expect(page).to have_content "#{TimeKeeper.date_of_record.year} HEALTH COVERAGE"
   end
@@ -273,7 +274,7 @@ end
 
 Then(/(.*) should see the dental enrollment with make changes button/) do |role|
   if role == "employee"
-    expect(page).to have_content "#{(current_effective_date || TimeKeeper.date_of_record).year} DENTAL COVERAGE"
+    expect(page).to have_content "#{(@current_effective_date || TimeKeeper.date_of_record).year} DENTAL COVERAGE"
   else
     expect(page).to have_content "#{TimeKeeper.date_of_record.year} DENTAL COVERAGE"
   end

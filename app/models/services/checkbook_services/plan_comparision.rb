@@ -51,7 +51,8 @@ module Services
           end
         rescue Exception => e
           Rails.logger.error { "Unable to generate url for hbx_enrollment_id #{@hbx_enrollment.id} due to #{e.backtrace}" }
-          return false
+          # redirects to plan shopping show page if url generation is failed.
+          return "/insured/plan_shoppings/#{@hbx_enrollment.id}?market_kind=#{@hbx_enrollment.kind}&coverage_kind=#{@hbx_enrollment.coverage_kind}"
         end
       end
 
@@ -110,7 +111,7 @@ module Services
         {
           "remote_access_key": Rails.application.config.checkbook_services_remote_access_key,
           "reference_id": Rails.application.config.checkbook_services_reference_id,
-          "enrollment_year": 2019,
+          "enrollment_year": enrollment_year,
           "family": consumer_build_family,
           "aptc": elected_aptc.to_s,
           "csr": csr_value,

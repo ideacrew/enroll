@@ -47,17 +47,15 @@ RSpec.shared_context "set up broker agency profile for BQT, by using configurati
   let(:proposal_profile) { plan_design_proposal.profile }
   let(:prospect_proposal_profile) {prospect_proposal_profile.profile}
 
-  let(:benefit_sponsorship_enrollment_period) {
-    begin_on = SponsoredBenefits::BenefitApplications::BenefitApplication.calculate_start_on_dates[0]
-    end_on = begin_on + 1.year - 1.day
-    begin_on..end_on
-  }
+  let(:current_effective_date){ TimeKeeper.date_of_record.next_month.beginning_of_month }
+  let(:benefit_sponsorship_enrollment_period) { current_effective_date..current_effective_date.next_year.prev_day }
 
   let(:benefit_sponsorship) { proposal_profile.benefit_sponsorships.first }
   let(:prospect_benefit_sponsorship) { prospect_proposal_profile.benefit_sponsorships.first}
 
   let(:benefit_application) { FactoryBot.create(:plan_design_benefit_application,
     :with_benefit_group,
+    effective_period: current_effective_date..current_effective_date.next_year.prev_day,
     benefit_sponsorship: benefit_sponsorship
   )}
 
@@ -67,6 +65,7 @@ RSpec.shared_context "set up broker agency profile for BQT, by using configurati
   )}
 
   let(:benefit_group) { benefit_application.benefit_groups.first }
+
   let(:prospect_benefit_group) { prospect_benefit_application.benefit_groups.first }
 
   let(:owner_profile) { broker_agency_profile }
@@ -94,9 +93,9 @@ RSpec.shared_context "set up broker agency profile for BQT, by using configurati
 
   def health_plan
     if Settings.aca.state_abbreviation == "DC"
-      FactoryBot.create(:plan, :with_premium_tables, coverage_kind: "health")
+      FactoryBot.create(:plan, :with_premium_tables, coverage_kind: "health", active_year: current_effective_date.year)
     else
-      FactoryBot.create(:plan, :with_premium_tables, :with_rating_factors, coverage_kind: "health")
+      FactoryBot.create(:plan, :with_premium_tables, :with_rating_factors, coverage_kind: "health", active_year: current_effective_date.year)
     end
   end
 
@@ -113,9 +112,9 @@ RSpec.shared_context "set up broker agency profile for BQT, by using configurati
 
   def dental_plan
     if Settings.aca.state_abbreviation == "DC"
-      FactoryBot.create(:plan, :with_premium_tables, coverage_kind: "dental")
+      FactoryBot.create(:plan, :with_premium_tables, coverage_kind: "dental", active_year: current_effective_date.year)
     else
-      FactoryBot.create(:plan, :with_premium_tables, :with_rating_factors, coverage_kind: "dental")
+      FactoryBot.create(:plan, :with_premium_tables, :with_rating_factors, coverage_kind: "dental", active_year: current_effective_date.year)
     end
   end
 
@@ -147,33 +146,29 @@ RSpec.shared_context "set up broker agency profile for BQT, by using configurati
     )
   end
 
-  def current_effective_date
-    (TimeKeeper.date_of_record + 2.months).beginning_of_month.prev_year
+  def site_key
+    Settings.site.key
   end
 
   def broker_agency_profile
-    FactoryBot.create(:benefit_sponsors_organizations_general_organization,
+    FactoryBot.create(
+      :benefit_sponsors_organizations_general_organization,
       :with_site,
       :with_broker_agency_profile
     ).profiles.first
   end
 
   def sponsor_profile
-    if Settings.aca.state_abbreviation == "DC" # toDo
-      FactoryBot.create(:benefit_sponsors_organizations_general_organization,
-        :with_site,
-        :with_aca_shop_dc_employer_profile
-      ).profiles.first
-    else
-      FactoryBot.create(:benefit_sponsors_organizations_general_organization,
-        :with_site,
-        :with_aca_shop_cca_employer_profile
-      ).profiles.first
-    end
+    FactoryBot.create(
+      :benefit_sponsors_organizations_general_organization,
+      :with_site,
+      "with_aca_shop_#{site_key}_employer_profile".to_sym
+    ).profiles.first
   end
 
   def ga_profile
-    FactoryBot.create(:benefit_sponsors_organizations_general_organization,
+    FactoryBot.create(
+      :benefit_sponsors_organizations_general_organization,
       :with_site,
       :with_general_agency_profile
     ).profiles.first

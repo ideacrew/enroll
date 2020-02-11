@@ -55,8 +55,9 @@ module Insured
 
     def view_market_places(person)
       markets = []
-      markets += BenefitMarkets::Products::Product::MARKET_KINDS if can_shop_both_markets?(person)
-      markets += BenefitMarkets::Products::Product::INDIVIDUAL_MARKET_KINDS if can_shop_individual_or_resident?(person)
+      # markets += BenefitMarkets::Products::Product::MARKET_KINDS if can_shop_both_markets?(person)
+      # markets += BenefitMarkets::Products::Product::INDIVIDUAL_MARKET_KINDS if can_shop_individual_or_resident?(person)
+      markets += ['shop'] if can_shop_shop?(person)
       markets += ['individual'] if can_shop_individual?(person)
       markets += ['coverall'] if can_shop_resident?(person)
       markets.uniq
@@ -161,7 +162,8 @@ module Insured
 
     def is_employer_disabled?(employee_role)
       if @mc_market_kind.present?
-        @mc_market_kind == "individual" || @hbx_enrollment.employee_role.id != employee_role.id
+        return true if @mc_market_kind == "individual" || @mc_market_kind == "coverall"
+        @hbx_enrollment.employee_role.blank? || @hbx_enrollment.employee_role.id != employee_role.id
       else
         false
       end

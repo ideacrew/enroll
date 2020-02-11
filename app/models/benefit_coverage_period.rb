@@ -91,7 +91,7 @@ class BenefitCoveragePeriod
   #
   # @return [ true, false ] true if the date falls within the period, false if the date is outside the period
   def contains?(date)
-    (start_on <= date) && (date <= end_on)
+    (start_on <= date.to_date) && (date.to_date <= end_on)
   end
 
   # Determine if this date is within the open enrollment period start/end dates

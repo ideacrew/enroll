@@ -17,7 +17,7 @@ class Insured::FamiliesController < FamiliesController
       build_employee_role_by_census_employee_id
       set_flash_by_announcement
       set_bookmark_url
-      set_admin_bookmark_url
+      set_admin_bookmark_url(home_insured_families_path)
       @active_sep = @family.latest_active_sep
 
       log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
@@ -48,7 +48,7 @@ class Insured::FamiliesController < FamiliesController
 
   def manage_family
     set_bookmark_url
-    set_admin_bookmark_url
+    set_admin_bookmark_url(manage_family_insured_families_path)
     @family_members = @family.active_family_members
     @resident = @person.is_resident_role_active?
     # @employee_role = @person.employee_roles.first
@@ -160,7 +160,7 @@ class Insured::FamiliesController < FamiliesController
       @resident_role_id = @person.resident_role.id
     end
 
-    if ((@qle.present? && @qle.shop?) && !@qualified_date && params[:qle_id].present?)
+    if @qle.present? && (@qle.shop? || @qle.fehb?) && !@qualified_date && params[:qle_id].present?
       benefit_application = @person.active_employee_roles.first.employer_profile.active_benefit_application
       reporting_deadline = @qle_date > today ? today : @qle_date + 30.days
       employee_role = @person.active_employee_roles.first
