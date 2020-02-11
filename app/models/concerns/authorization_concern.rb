@@ -54,9 +54,12 @@ module AuthorizationConcern
     before_save :ensure_authentication_token
 
     def generate_jwt
-      JWT.encode({ id: id,
-                  exp: 5.days.from_now.to_i },
-                 Rails.env.devise.jwt.secret_key)
+      JWT.encode { id: id, exp: 15.minutes.from_now.to_i },
+                 Rails.env.devise.jwt.secret_key
+    end
+
+    def self.jwt_revoked?(payload, user)
+      user.whitelisted_jwts.where(payload.slice('jti', 'aud')).empty?
     end
 
     def on_jwt_dispatch(token, payload)
