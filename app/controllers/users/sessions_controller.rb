@@ -14,6 +14,11 @@ class Users::SessionsController < Devise::SessionsController
     respond_with resource, location: location
   end
 
+  def destroy
+    WhitelistedJwt.where(user_id: current_user.id).destroy_all
+    super
+  end
+  
   private
 
   def log_failed_login

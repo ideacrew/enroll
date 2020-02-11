@@ -4,9 +4,11 @@ module AuthorizationConcern
   included do
     # Include default devise modules. Others available are:
     # :confirmable, :lockable, :timeoutable and :omniauthable
+    include Devise::JWT::RevocationStrategies::Whitelist
+
     devise :database_authenticatable, :jwt_authenticatable, :registerable, :lockable,
            :recoverable, :rememberable, :trackable, :timeoutable, :authentication_keys => {email: false, login: true},
-           jwt_revocation_strategy: Devise::JWT::RevocationStrategies::Null
+           jwt_revocation_strategy: self
 
     ## Database authenticatable
     field :email,              type: String, default: ""
@@ -58,9 +60,13 @@ module AuthorizationConcern
     end
 
     def on_jwt_dispatch(token, payload)
-      byebug
+      whitelisted_jwts.create!(
+        token: token,
+        jti: payload['jti'],
+        aud: payload['aud'],
+        exp: Time.at(payload['exp'].to_i)
+      )
     end
-
 
     def ensure_authentication_token
       if authentication_token.blank?
