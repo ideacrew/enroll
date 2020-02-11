@@ -1,0 +1,124 @@
+env.ENGINES_RESULT = 0
+env.RSPEC_RESULT = 0
+env.CUCUMBER_RESULT = 0
+
+branch_naming = '${env.BRANCH_NAME}'
+
+properties([
+  [
+    $class: 'ThrottleJobProperty',
+    categories: ['enroll'],
+    limitOneJobWithMatchingParams: false,
+    maxConcurrentPerNode: 1,
+    maxConcurrentTotal: 1,
+    paramsToUseForLimit: '',
+    throttleEnabled: true,
+    throttleOption: 'category'
+  ],
+  [
+    $class: 'JobInclusionJobProperty',
+    useJobGroup: true,
+    jobGroupName: 'High Priority Enroll Jobs'
+  ]
+])
+
+pipeline {
+    agent any
+    triggers {
+      pollSCM("H/5 * * * *")
+    }
+    stages {
+      stage("Tests") {
+        parallel {
+          stage("Engine RSpec") {
+            agent {
+              label "master"
+            }
+            steps {
+              script {
+                echo "BRANCH NAME IS: ${env.BRANCH_NAME}"
+              }
+              checkout scm
+              script {
+                env.GIT_COMMIT = sh returnStdout: true, script: "git rev-parse HEAD | tr -d '\\n' | tr -d '\\r'"  
+                env.GIT_BRANCH_NAME = sh returnStdout: true, script: "git rev-parse --abbrev-ref HEAD | tr -d '\\n' | tr -d '\\r'"  
+                env.ENGINES_RESULT = sh returnStatus: true, script: """
+                source ~/.bashrc || true
+                base_domain=`echo \$BUILD_URL | cut -d'/' -f3 | cut -d':' -f1`
+                export no_proxy=raw.githubusercontent.com,\$base_domain,127.0.0.1
+                export https_proxy=\$http_proxy
+                export PATH=/usr/local/bin:\$PATH
+                ./jenkins/engines.sh
+                """
+                echo env.ENGINES_RESULT
+                if ((env.ENGINES_RESULT != 0) && (env.ENGINES_RESULT != '0')) {
+                  error "Engine RSpecs Failed"
+                }
+              }
+            }
+          }
+          stage("RSpec") {
+            agent {
+              label "slave1"
+            }
+            steps {
+              checkout scm
+              script {
+                env.RSPEC_RESULT = sh returnStatus: true, script: """
+                source ~/.bashrc || true
+                base_domain=`echo \$BUILD_URL | cut -d'/' -f3 | cut -d':' -f1`
+                export no_proxy=raw.githubusercontent.com,\$base_domain,127.0.0.1
+                export https_proxy=\$http_proxy
+                export PATH=/usr/local/bin:\$PATH
+                ./jenkins/rspec.sh
+                """
+                junit allowEmptyResults: true, testResults: 'tmp/rspec_junit_*.xml'
+                if ((env.RSPEC_RESULT != 0) && (env.RSPEC_RESULT != '0')) {
+                    error "RSpecs Failed"
+                } else {
+                    sh "rm -rf coverage.zip"
+                    sh "zip -r coverage.zip coverage"
+                    stash includes: 'coverage.zip', name: 'coverage_zip'
+                }
+              }
+            }
+          }
+          stage("Cucumbers") {
+            agent {
+              label "slave2"
+            }
+            steps {
+              checkout scm
+              script {
+                env.CUCUMBER_RESULT = sh returnStatus: true, script: """
+                source ~/.bashrc || true
+                base_domain=`echo \$BUILD_URL | cut -d'/' -f3 | cut -d':' -f1`
+                export no_proxy=raw.githubusercontent.com,\$base_domain,127.0.0.1
+                export https_proxy=\$http_proxy
+                export PATH=/usr/local/bin:\$PATH
+                ./jenkins/cucumber.sh
+                """
+                if ((env.CUCUMBER_RESULT != 0) && (env.CUCUMBER_RESULT != '0')) {
+                  error "Cucumbers Failed"
+                }
+              }
+            }
+          }
+        }
+        post {
+          success {
+            sh """
+echo "{\\"project\\":\\"enroll_dc\\",\\"branch\\":\\"${env.GIT_BRANCH_NAME}\\",\\"sha\\":\\"${env.GIT_COMMIT}\\",\\"status\\":\\"passing\\"}"
+curl -H "Content-Type: application/json" -H "X-API-Key: DEPLOYMENT_TEST_API_KEY" -X POST http://tx.hra.openhbx.org:9000/api/build_results -d "{\\"project\\":\\"enroll_dc\\",\\"branch\\":\\"${env.GIT_BRANCH_NAME}\\",\\"sha\\":\\"${env.GIT_COMMIT}\\",\\"status\\":\\"passing\\"}"
+            """
+          }
+          failure {
+            sh """
+echo "{\\"project\\":\\"enroll_dc\\",\\"branch\\":\\"${env.GIT_BRANCH_NAME}\\",\\"sha\\":\\"${env.GIT_COMMIT}\\",\\"status\\":\\"failing\\"}"
+curl -H "Content-Type: application/json" -H "X-API-Key: DEPLOYMENT_TEST_API_KEY" -X POST http://tx.hra.openhbx.org:9000/api/build_results -d "{\\"project\\":\\"enroll_dc\\",\\"branch\\":\\"${env.GIT_BRANCH_NAME}\\",\\"sha\\":\\"${env.GIT_COMMIT}\\",\\"status\\":\\"failing\\"}"
+            """
+          }
+        }
+      }
+    }
+}
