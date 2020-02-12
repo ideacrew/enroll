@@ -1,4 +1,6 @@
 class UnassistedPlanCostDecorator < SimpleDelegator
+  include FloatHelper
+
   attr_reader :hbx_enrollment
   attr_reader :elected_aptc
   attr_reader :tax_household
@@ -88,5 +90,15 @@ class UnassistedPlanCostDecorator < SimpleDelegator
     members.reduce(0.00) do |sum, member|
       (sum + employee_cost_for(member)).round(2)
     end.round(2)
+  end
+
+  def total_ehb_premium
+    members.reduce(0.00) do |sum, member|
+      (sum + round_down_float_two_decimals(member_ehb_premium(member)))
+    end
+  end
+
+  def member_ehb_premium(member)
+    premium_for(member) * __getobj__.ehb
   end
 end

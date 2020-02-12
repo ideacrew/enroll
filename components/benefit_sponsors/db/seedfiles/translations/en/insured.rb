@@ -312,6 +312,7 @@ INSURED_TRANSLATIONS = {
   "en.keep_existing_plan" => "Keep existing plan",
   "en.select_plan_to_terminate" => "Select Plan to Terminate",
   "en.health_coverage" => "Health Coverage",
+  "en.ID" => "ID",
   "en.DCHL" => "DCHL",
   "en.DCHL_ID" => "DCHL ID",
   "en.confirmation" => "Confirmation",

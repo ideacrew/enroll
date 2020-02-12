@@ -1,4 +1,5 @@
 module ApplicationHelper
+  include FloatHelper
 
   def can_employee_shop?(date)
     return false if date.blank?
@@ -836,13 +837,5 @@ module ApplicationHelper
     return true if hbx_staff_role.blank?
 
     hbx_staff_role.permission.can_access_pay_now
-  end
-
-  def float_fix(float_number)
-    BigDecimal((float_number).to_s).round(8).to_f
-  end
-
-  def round_down_float_two_decimals(float_number)
-    BigDecimal((float_number).to_s).round(8).round(2, BigDecimal::ROUND_DOWN).to_f
   end
 end
