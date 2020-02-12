@@ -70,7 +70,6 @@ $(document).on("ready ajax:success", function() {
 
   $('#aptc_applied_total').change(function(){
 
-    var new_total = $('#aptc_applied_total').val();
 
     $('#applied_pct_1').attr('step',0.01)
     var total = parseFloat($('#aptc_applied_total').val().replace(/\$/, ""));
@@ -81,10 +80,17 @@ $(document).on("ready ajax:success", function() {
       $('#aptc_applied_total').val("$" + max_aptc_available);
       $('#applied_pct_1').val("1");
     }
+    if (total < 0) {
+      $('#aptc_applied_pct_1_percent').val('0%');
+      $('#aptc_applied_total').val("$0");
+      $('#applied_pct_1').val("0");
+    }
 
-    var new_percent = toFixedTrunc(total/max_aptc_available);
+    var new_total = parseFloat($('#aptc_applied_total').val().replace(/\$/, ""));
+
+    var new_percent = toFixedTrunc(new_total/max_aptc_available);
     $('#applied_pct_1').val(new_percent);
-    calculatePercent(total);
+    calculatePercent(new_total);
     $('#applied_pct_1').attr('step',0.05)
   });
 
