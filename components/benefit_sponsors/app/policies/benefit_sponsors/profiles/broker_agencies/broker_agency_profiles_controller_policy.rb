@@ -20,7 +20,7 @@ module BenefitSponsors
         end
 
         def redirect_signup?
-          user.present?
+          return false if user.blank?
           self.send(:family_index?)
         end
 
