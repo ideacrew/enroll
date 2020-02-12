@@ -16,7 +16,7 @@ RSpec.describe Admin::Aptc, :type => :model, dbclean: :after_each do
   let(:eligibility_determination_1) {EligibilityDetermination.new(determined_at: TimeKeeper.date_of_record.beginning_of_year, max_aptc: sample_max_aptc_1, csr_percent_as_integer: sample_csr_percent_1 )}
   let(:eligibility_determination_2) {EligibilityDetermination.new(determined_at: TimeKeeper.date_of_record.beginning_of_year + 4.months, max_aptc: sample_max_aptc_2, csr_percent_as_integer: sample_csr_percent_2 )}
   let(:product1) { FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01') }
-  let(:product2) { FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01') }
+  let(:product2) { FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', ehb: 0.9939) }
 
   # Enrollments
   let!(:hbx_with_aptc_1) do
@@ -141,6 +141,18 @@ RSpec.describe Admin::Aptc, :type => :model, dbclean: :after_each do
       expect(Admin::Aptc.update_aptc_applied_for_enrollments(family, params, year)).to eq true
       expect(family.active_household.hbx_enrollments.count).to eq enrollment_count + 1
       expect(last_enrollment.hbx_id).to_not eq family.active_household.hbx_enrollments.last.id
+    end
+
+    it  "should create a new enrollment and should apply ehb aptc to enrollment" do
+      allow(family).to receive(:active_household).and_return household
+      allow(household).to receive(:latest_active_tax_household_with_year).and_return tax_household
+      allow(tax_household).to receive(:latest_eligibility_determination).and_return eligibility_determination_1
+      enrollment_count = family.active_household.hbx_enrollments.count
+      last_enrollment = family.active_household.hbx_enrollments.last
+      expect(Admin::Aptc.update_aptc_applied_for_enrollments(family, params, year)).to eq true
+      expect(family.active_household.hbx_enrollments.count).to eq enrollment_count + 1
+      expect(last_enrollment.hbx_id).to_not eq family.active_household.hbx_enrollments.last.id
+      expect(family.active_household.hbx_enrollments.last.applied_aptc_amount.to_f).not_to eq 85
     end
   end
 
