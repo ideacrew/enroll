@@ -187,13 +187,13 @@ class Insured::GroupSelectionController < ApplicationController
       role = family_member.person.resident_role
     end
 
-    @rule = if can_shop_individual_or_resident?(@person)
+    rule = if can_shop_individual_or_resident?(@person)
               InsuredEligibleForBenefitRule.new(role, @benefit, {family: @family, coverage_kind: @coverage_kind, new_effective_on: @new_effective_on, market_kind: "individual"})
             else
               InsuredEligibleForBenefitRule.new(role, @benefit, {family: @family, coverage_kind: @coverage_kind, new_effective_on: @new_effective_on, market_kind: @market_kind})
             end
-    is_ivl_coverage, errors = @rule.satisfied?
-    @fm_hash[family_member.id] = [is_ivl_coverage, errors]
+    is_ivl_coverage, errors = rule.satisfied?
+    @fm_hash[family_member.id] = [is_ivl_coverage, rule, errors]
   end
 
   def permit_params

@@ -12,8 +12,8 @@
       <% end %>
       <% if (@adapter.can_shop_individual?(@person)) || (@adapter.can_shop_resident?(@person)) %>
         <%
-          is_ivl_coverage, errors=@fm_hash[family_member.id]
-          @show_residency_alert = !@rule.is_residency_status_satisfied? if @show_residency_alert == false
+          is_ivl_coverage, rule, errors=@fm_hash[family_member.id]
+          @show_residency_alert = !rule.is_residency_status_satisfied? if @show_residency_alert == false
           errors = [incarceration_cannot_purchase(family_member)] if index==0 && errors && errors.flatten.detect{|err| err.match(/incarceration/)}
         %>
       <% end %>
