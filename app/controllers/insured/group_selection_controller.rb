@@ -181,11 +181,11 @@ class Insured::GroupSelectionController < ApplicationController
   private
 
   def family_member_eligibility_check(family_member)
-    if family_member.person.is_consumer_role_active?
-      role = family_member.person.consumer_role
-    elsif family_member.person.is_resident_role_active?
-      role = family_member.person.resident_role
-    end
+    role = if family_member.person.is_consumer_role_active?
+             family_member.person.consumer_role
+           elsif family_member.person.is_resident_role_active?
+             family_member.person.resident_role
+           end
 
     rule = if can_shop_individual_or_resident?(@person)
               InsuredEligibleForBenefitRule.new(role, @benefit, {family: @family, coverage_kind: @coverage_kind, new_effective_on: @new_effective_on, market_kind: "individual"})
