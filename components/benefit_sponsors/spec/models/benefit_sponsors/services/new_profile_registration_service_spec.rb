@@ -241,6 +241,19 @@ module BenefitSponsors
         person.general_agency_staff_roles.each{|staff| staff.update_attributes(benefit_sponsors_general_agency_profile_id: nil)}
         expect(service.is_general_agency_staff_for_employer?(user, nil)).to eq false
       end
+
+      it "should return true if employer staff is active to a employer profile" do
+        params = { profile_id: general_agency_profile.id, profile_type: "general_agency" }
+        service = subject.new params
+        expect(service.has_general_agency_staff_role_for_profile?(user, general_agency_profile)). to eq true
+      end
+
+      it "should return false if employer staff is not active to a employer profile" do
+        person.general_agency_staff_roles.first.update_attributes(aasm_state: "general_agency_terminated")
+        params = { profile_id: general_agency_profile.id, profile_type: "general_agency" }
+        service = subject.new params
+        expect(service.has_general_agency_staff_role_for_profile?(user, general_agency_profile)). to eq false
+      end
     end
   end
 end
