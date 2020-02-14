@@ -204,6 +204,14 @@ RSpec.describe "insured/group_selection/new.html.erb" do
 
       context "base area" do
         before do
+          fm_hash = {}
+          rule1 = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, {family: family, coverage_kind: "health", new_effective_on: TimeKeeper.date_of_record, market_kind: "individual"})
+          fm_hash[family_member1.id] = [false, rule1, nil]
+          rule2 = InsuredEligibleForBenefitRule.new(consumer_role2, benefit_package, {family: family, coverage_kind: "health", new_effective_on: TimeKeeper.date_of_record, market_kind: "individual"})
+          fm_hash[family_member2.id] = [false, rule2, nil]
+          rule3 = InsuredEligibleForBenefitRule.new(consumer_role3, benefit_package, {family: family, coverage_kind: "health", new_effective_on: TimeKeeper.date_of_record, market_kind: "individual"})
+          fm_hash[family_member1.id] = [false, rule3, nil]
+          assign(:fm_hash, fm_hash)
           render :template => "insured/group_selection/new.html.erb"
         end
 
