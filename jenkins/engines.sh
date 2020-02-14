@@ -6,6 +6,8 @@ base="$( dirname "${BASH_SOURCE[0]}" )/.."
 cd $base
 root=`pwd -P`
 
+bundle install
+
 rm -rf ./log/test.log
 rm -rf ./spec/vocabularies
 rm -rf ./coverage
