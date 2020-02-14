@@ -177,7 +177,12 @@ class Insured::GroupSelectionController < ApplicationController
   def term_or_cancel
     @self_term_or_cancel_form = ::Insured::Forms::SelfTermOrCancelForm.for_post({enrollment_id: params.require(:hbx_enrollment_id), term_date: params[:term_date], term_or_cancel: params[:term_or_cancel]})
 
-    redirect_to family_account_path
+    if @self_term_or_cancel_form.errors.present?
+      flash[:error] = @self_term_or_cancel_form.errors.values.flatten.inject(""){|memo, error| "#{memo}<li>#{error}</li>"}
+      redirect_to edit_plan_insured_group_selections_path(hbx_enrollment_id: params[:hbx_enrollment_id], family_id: params[:family_id])
+    else
+      redirect_to family_account_path
+    end
   end
 
   def edit_aptc
