@@ -54,6 +54,14 @@ class Insured::GroupSelectionController < ApplicationController
     end
 
     @waivable = @adapter.can_waive?(@hbx_enrollment, params)
+    @fm_hash = {}
+    @family.family_members.each do |family_member|
+      family_member_eligibility_check(family_member)
+    end
+    if @fm_hash.present? && @fm_hash.values.flatten.detect{|err| err.to_s.match(/eligibility failed on incarceration_status/)}
+      redirect_to manage_family_insured_families_path(tab: 'family')
+      flash[:error] = "A family member has incarceration status unanswered, please answer the question by clicking on edit icon before shopping."
+    end
   end
 
   def create
@@ -173,6 +181,22 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   private
+
+  def family_member_eligibility_check(family_member)
+    role = if family_member.person.is_consumer_role_active?
+             family_member.person.consumer_role
+           elsif family_member.person.is_resident_role_active?
+             family_member.person.resident_role
+           end
+
+    rule = if can_shop_individual_or_resident?(@person)
+              InsuredEligibleForBenefitRule.new(role, @benefit, {family: @family, coverage_kind: @coverage_kind, new_effective_on: @new_effective_on, market_kind: "individual"})
+            else
+              InsuredEligibleForBenefitRule.new(role, @benefit, {family: @family, coverage_kind: @coverage_kind, new_effective_on: @new_effective_on, market_kind: @market_kind})
+            end
+    is_ivl_coverage, errors = rule.satisfied?
+    @fm_hash[family_member.id] = [is_ivl_coverage, rule, errors]
+  end
 
   def permit_params
     params.permit!
