@@ -37,8 +37,11 @@ module Insured
       end
 
       def self.for_post(attrs)
+        form = self.new
+        form.errors.add(:base, 'Date cannot be in the past') unless is_term_or_cancel_date_in_future?(attrs)
         service = self_term_or_cancel_service(attrs)
         service.term_or_cancel
+        form
       end
 
       def self.for_aptc_update_post(attrs)
@@ -63,6 +66,12 @@ module Insured
 
       def special_enrollment_period
         hbx_enrollment.special_enrollment_period
+      end
+
+      def self.is_term_or_cancel_date_in_future?(attrs)
+        return true unless attrs[:term_or_cancel] == 'terminate'
+
+        Date.strptime(attrs[:term_date], "%m/%d/%Y").future?
       end
     end
   end
