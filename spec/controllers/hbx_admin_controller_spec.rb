@@ -52,7 +52,7 @@ RSpec.describe HbxAdminController, :type => :controller do
       post(
         :update_aptc_csr,
         params: { 
-          person: { person_id: person_with_family.id, family_id: family.id, current_year: 2019 },
+          person: { person_id: person_with_family.id, family_id: family.id, current_year: TimeKeeper.date_of_record.year },
           max_aptc: '100',
           csr_percentage: 50
         },

@@ -544,7 +544,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       let(:census_employee) {FactoryBot.create(:census_employee)}
       let(:benefit_group_assignment) {FactoryBot.create(:benefit_group_assignment, benefit_group: package, census_employee: census_employee)}
       let(:application) {double(:start_on => TimeKeeper.date_of_record.beginning_of_month, :end_on => (TimeKeeper.date_of_record.beginning_of_month + 1.year) - 1.day, :aasm_state => :active)}
-      let(:package) {double("BenefitPackage", :is_a? => BenefitSponsors::BenefitPackages::BenefitPackage, :_id => "id", :plan_year => application, :benefit_application => application, start_on: Date.new(2019,4,1),end_on: Date.new(2020,3,31))}
+      let(:package) {double("BenefitPackage", :is_a? => BenefitSponsors::BenefitPackages::BenefitPackage, :_id => "id", :plan_year => application, :benefit_application => application, start_on: Date.new(Time.current.year,4,1),end_on: Date.new(2020,3,31))}
       let(:ivl_enrollment) {FactoryBot.create(:hbx_enrollment, :individual_unassisted, household: family.active_household, family: family)}
       let(:existing_shop_enrollment) {FactoryBot.create(:hbx_enrollment, :shop, household: family.active_household, family: family)}
       let(:enrollment_for_waiver) {FactoryBot.create(:hbx_enrollment, household: family.active_household, predecessor_enrollment_id: existing_shop_enrollment.id, benefit_group_assignment_id: benefit_group_assignment.id, family: family)}
@@ -790,6 +790,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
                               kind: "individual",
                               product: product1,
                               household: family1.latest_household,
+                              effective_on: TimeKeeper.date_of_record.beginning_of_year,
                               enrollment_kind: "open_enrollment",
                               family: family1,
                               aasm_state: 'coverage_selected',
@@ -802,6 +803,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
                               product: product2,
                               family: family1,
                               household: family1.latest_household,
+                              effective_on: TimeKeeper.date_of_record.beginning_of_year,
                               enrollment_kind: 'open_enrollment',
                               aasm_state: 'shopping',
                               consumer_role: person1.consumer_role,
@@ -2647,6 +2649,7 @@ describe HbxEnrollment, dbclean: :after_all do
     FactoryBot.create(
       :hbx_enrollment,
       household: ivl_family.active_household,
+      effective_on: TimeKeeper.date_of_record.beginning_of_year,
       family: ivl_family,
       kind: "individual",
       is_any_enrollment_member_outstanding: true,
@@ -3175,7 +3178,7 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
                         family: family,
                         household: family.active_household,
                         coverage_kind: "health",
-                        effective_on: TimeKeeper.date_of_record.last_month.beginning_of_month,
+                        effective_on: TimeKeeper.date_of_record.beginning_of_year,
                         aasm_state: 'coverage_selected')
     end
 
