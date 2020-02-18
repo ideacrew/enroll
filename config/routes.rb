@@ -713,7 +713,7 @@ Rails.application.routes.draw do
         end
 
         member do
-          get :staff
+          get :agency_staff
         end
       end
 

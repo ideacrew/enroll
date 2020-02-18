@@ -11,9 +11,10 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
       )
   end
 
-  def staff
-    @general_agency_profile = ::BenefitSponsors::Organizations::GeneralAgencyProfile.find(params[:id])
-    render json: @general_agency_profile.general_agency_staff_roles.to_json
+
+  def agency_staff
+    #@general_agency_profile = ::BenefitSponsors::Organizations::GeneralAgencyProfile.find(params[:id])
+    render json: Person.all_agency_staff_roles.to_json
   end
 
   def approve_general_agency_staff
