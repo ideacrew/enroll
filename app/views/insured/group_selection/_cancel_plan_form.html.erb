@@ -10,6 +10,7 @@
       url: term_or_cancel_insured_group_selections_path do |f| %>
       <%= hidden_field_tag :hbx_enrollment_id, locals[:hbx_enrollment][:id] %>
       <%= hidden_field_tag :term_or_cancel, locals[:term_or_cancel] %>
+      <%= hidden_field_tag :family_id, locals[:family_id] %>
       <% calendar_enabled = !(locals[:term_or_cancel] == 'cancel') %>
       <% if calendar_enabled %>
         <h5 id="enter-text">Choose the last day you want to be covered. The earliest date you can choose is today.</h5>
@@ -17,7 +18,7 @@
         <div class="col-md-8 aptc-no-left-padding">
           <%= text_field_tag 'term_date', '', :'data-date-min'=> "+0d", placeholder: " ",
               class: "required date-picker term-date-picker floatlabel form-control",
-              required: true, readonly: true, id: "term-date" %>
+              required: true, id: "term-date" %>
         </div>
         <br><br><br>
       <% end %>

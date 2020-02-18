@@ -3,9 +3,13 @@
 module Insured
   module Serializers
     class FamilySerializer < ::ActiveModel::Serializer
+
+      attribute :id
       attribute :is_under_ivl_oe
       attribute :qle_kind_id,  if: :latest_active_sep_present?
       attribute :sep_id, if: :latest_active_sep_present?
+
+      delegate :id, to: :object
 
       def is_under_ivl_oe
         object.is_under_ivl_open_enrollment?

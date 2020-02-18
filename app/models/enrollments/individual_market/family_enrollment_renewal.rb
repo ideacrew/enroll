@@ -112,7 +112,10 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
 
   def fetch_cat_age_off_product(product)
     # As per ticket: 61716
-    if renewal_coverage_start.year.to_s == "2020" && CAT_AGE_OFF_HIOS_IDS.include?(product.hios_base_id)
+    # FIXME: DON'T EVER DO THIS!
+    # We are incrementing the year to do for all future years too,
+    # which won't work because the HIOS IDs won't be the same
+    if renewal_coverage_start.year.to_i >= 2020 && CAT_AGE_OFF_HIOS_IDS.include?(product.hios_base_id)
       base_id = if product.hios_base_id == "94506DC0390008"
                   "94506DC0390010"
                 elsif product.hios_base_id == "86052DC0400004"
