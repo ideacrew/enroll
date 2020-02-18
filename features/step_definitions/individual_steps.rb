@@ -260,6 +260,10 @@ And(/I click on continue button on household info form/) do
   click_link 'Continue', :wait => 10
 end
 
+Then(/consumer clicked on Go To My Account/) do
+  click_link 'GO TO MY ACCOUNT'
+end
+
 Then(/Individual creates a new HBX account$/) do
   # find('.interaction-click-control-create-account').click
   fill_in "user[oim_id]", :with => "testflow@test.com"
