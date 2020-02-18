@@ -123,6 +123,7 @@ CKEDITOR.addTemplates( 'default', {
 		description: 'Standard template for the notices received by Consumers.',
 		html:
 			"<p>&nbsp;</p>" +
+			"<p>#{consumer_role.notice_date}</p>" +
 			"<p><strong>SUBJECT: &lt;Change subject&gt;</strong></p>" +
 			"<p>Dear #{consumer_role.first_name}:</p>" +
 			"<p>&lt;Paste Your Notice Body Here&gt;</p>" +
