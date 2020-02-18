@@ -711,10 +711,6 @@ Rails.application.routes.draw do
         collection do
           get :agency_staff
         end
-
-        member do
-          get :agency_staff
-        end
       end
 
       resources :slcsp, :only => []  do
