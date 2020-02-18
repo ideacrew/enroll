@@ -1,7 +1,7 @@
 require 'rails_helper'
-require File.join(Rails.root, 'components', 'benefit_sponsors', 'app', 'data_migrations', 'reinstate_benefit_sponsorship')
+require File.join(File.dirname(__FILE__), "..", '..', 'app', 'data_migrations', 'reinstate_benefit_sponsorship')
 
-describe ReinstateBenefitSponsorship, dbclean: :after_each do
+RSpec.describe ReinstateBenefitSponsorship, dbclean: :after_each do
 
   let(:given_task_name) { 'reinstate_benefit_sponsorship' }
   subject { ReinstateBenefitSponsorship.new(given_task_name, double(:current_scope => nil)) }

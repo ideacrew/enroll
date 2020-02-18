@@ -22,11 +22,11 @@ module BenefitMarkets
         end
 
         it 'should return cost for coverage effective date and age' do
-          expect(@product.cost_for(Date.new(2019, 2, 1), 20)).to be 200.00
+          expect(@product.cost_for(Date.new(Time.now.year, 2, 1), 20)).to be 200.00
         end
 
         it 'should raise error if premium table is not present for given coverage effective date' do
-          expect {@product.cost_for(Date.new(2018, 2, 1), 20)}.to raise_error StandardError
+          expect {@product.cost_for(Date.new(Time.now.year - 1, 2, 1), 20)}.to raise_error StandardError
         end
       end
 
@@ -36,11 +36,11 @@ module BenefitMarkets
         end
 
         it 'should return one for premium table present for given coverage effective date' do
-          expect(@product.premium_table_for(Date.new(2019, 2, 1)).count).to be 1
+          expect(@product.premium_table_for(Date.new(Time.now.year, 2, 1)).count).to be 1
         end
 
         it 'should return true for premium table not present for given coverage effective date' do
-          expect(@product.premium_table_for(Date.new(2018, 2, 1)).empty?).to be true
+          expect(@product.premium_table_for(Date.new(Time.now.year - 1, 2, 1)).empty?).to be true
         end
       end
     end
@@ -57,21 +57,21 @@ module BenefitMarkets
 
       context 'by_coverage_kind_year_and_csr' do
         it 'should return all default csr products' do
-          expect(@products.by_coverage_kind_year_and_csr('health', 2019, csr_kind: nil).count).to eq 3
+          expect(@products.by_coverage_kind_year_and_csr('health', Time.now.year, csr_kind: nil).count).to eq 3
         end
 
         it 'should return all product along with product having csr 87' do
-          expect(@products.by_coverage_kind_year_and_csr('health', 2019, csr_kind: "csr_87").count).to eq 4
+          expect(@products.by_coverage_kind_year_and_csr('health', Time.now.year, csr_kind: "csr_87").count).to eq 4
         end
       end
 
       context 'by_coverage_kind_and_year' do
         it 'should return health products' do
-          expect(@products.by_coverage_kind_and_year('health', 2019).count).to eq 4
+          expect(@products.by_coverage_kind_and_year('health', Time.now.year).count).to eq 4
         end
 
         it 'should return deltal products' do
-          expect(@products.by_coverage_kind_and_year('dental', 2019).count).to eq 0
+          expect(@products.by_coverage_kind_and_year('dental', Time.now.year).count).to eq 0
         end
       end
     end
