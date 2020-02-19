@@ -39,6 +39,6 @@ Feature: EE with consumer role plan purchase
     And user did not apply coverage for child as ivl
     And employee also has a health enrollment with primary covered under first employer
     Then Employee sign in to portal
-    And employee shouldnt see the individual make changes button
-    And employee should see the shop make changes button
+    And employee shouldnt see make changes button in individual market
+    And employee should see make changes button in shop market
 
