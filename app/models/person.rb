@@ -256,8 +256,136 @@ class Person
   scope :all_csr_roles,               -> { exists(csr_role: true) }
   scope :all_assister_roles,          -> { exists(assister_role: true) }
   scope :all_broker_staff_roles,      -> { exists(broker_agency_staff_roles: true) }
-  scope :all_agency_staff_roles,      -> { where({"$or" => [{"broker_agency_staff_roles" => {"$exists" => true}}, {"general_agency_staff_roles" => {"$exists" => true}}]}) }
+  scope :all_agency_staff_roles,      -> do
+    where(
+      {
+      "$or" => [
+          { "broker_agency_staff_roles" => { "$exists" => true } },
+          { "general_agency_staff_roles" => { "$exists" => true }, "general_agency_staff_roles.is_primary" => {"$ne" => false} }
+        ]
+      }
+    )
+  end
 
+#   BenefitSponsors::Organizations::Organization
+#     .all_agency_profiles
+#     .to_json(:include => {
+#         :profiles => {
+#           :methods => [:profile_type]
+#         }
+#       }
+#     )
+#
+# org =  BenefitSponsors::Organizations::Organization.where({
+#     "profiles": {
+#       "$elemMatch": {
+#         "_type": /.*AgencyProfile$/,
+#         "aasm_state": "is_approved"
+#       }
+#     }
+#   }).to_json(:include => {
+#       :profiles => {
+#         :methods => [:profile_type]
+#       }
+#     },
+#     :except => [:inbox]
+#   )
+#
+#
+#   broker_orgs =  BenefitSponsors::Organizations::Organization.where({
+#       "profiles": {
+#         "$elemMatch": {
+#           "_type": /.*BrokerAgencyProfile$/,
+#           "aasm_state": "is_approved"
+#         }
+#       }
+#     }).limit(3).to_json(:include => {
+#         :profiles => {
+#           :methods => [:profile_type, :_type],
+#           :except => [:inbox]
+#         },
+#       },
+#       :only => [:dba, :legal_name]
+#     )
+#
+#
+#   org1 =  BenefitSponsors::Organizations::Organization.where({
+#       "profiles": {
+#         "$elemMatch": {
+#           "_type": /.*AgencyProfile$/,
+#           "aasm_state": "is_approved"
+#         }
+#       }
+#     }).limit(3).to_json(:include => {
+#         :profiles => {
+#           :methods => [:profile_type, :_type],
+#           :except => [:inbox]
+#         },
+#       },
+#       :only => [:dba, :legal_name]
+#     )
+#
+# a = {:name=>"Tony", :inboxes=>{:last_name=> "Schaffert", :cnt => 8, :messages => []}}
+# a.to_json(:include => {:inbox => {
+#                     :only => :cnt}
+#   })
+#
+#   konata.to_json(:include => { :posts => {
+#                                  :include => { :comments => {
+#                                                :only => :body } },
+#                                  :only => :title } })
+#
+# BenefitSponsors::Organizations::Organization.where({
+#   "profiles": {
+#     "$elemMatch": {
+#       "_type": /.*AgencyProfile$/,
+#       "aasm_state": "is_approved"
+#     }
+#   }
+# })
+#
+# broker_orgs.map{|x| x.profiles.first.try(:primary_broker_role_id)}
+#
+#   p = Person.where(
+#     {
+#     "is_active" => true,
+#     "$or" => [
+#         { "broker_agency_staff_roles" => { "$exists" => true }, "broker_role._id" => {"$nin" => a} },
+#         { "general_agency_staff_roles" => { "$exists" => true }, "general_agency_staff_roles.is_primary" =>  false }
+#       ]
+#     }
+#   )
+#
+#   p = Person.where(
+#     {
+#     "is_active" => true,
+#     "$or" => [
+#         { "broker_agency_staff_roles" => { "$exists" => true } },
+#         { "general_agency_staff_roles" => { "$exists" => true }, "general_agency_staff_roles.is_primary" =>  false }
+#       ]
+#     }
+#   )
+#
+#   puts p.to_json(:except => [:emails, :messsages, :inbox, :documents, :ssa_responses, :addresses, :local_residency_requests, :emails])
+#
+# puts p.to_json(:except => [:middle_name, :race, :name_sfx, :tracking_version, :bookmark_url, :workflow_state_transitions, :dob, :gender, :full_name, :encrypted_ssn, :created_at, :no_dc_address_reason, :tribal_id, :emails, :messsages, :lawful_presence_determination, :is_incarcerated, :inbox, :documents, :ssa_responses, :addresses, :local_residency_requests, :emails,:consumer_roles])
+#
+# puts p.to_json(:except => [:is_tobacco_user, :language_code, :modifier_id, :phones, :no_ssn, :no_dc_address, :dob_check,:middle_name, :race, :name_sfx, :tracking_version, :bookmark_url, :workflow_state_transitions, :dob, :gender, :full_name, :encrypted_ssn, :created_at, :no_dc_address_reason, :tribal_id, :emails, :messsages, :lawful_presence_determination, :is_incarcerated, :inbox, :documents, :ssa_responses, :addresses, :local_residency_requests, :emails,:ethnicity, :consumer_role, :consumer_roles])
+#
+#
+# puts p.to_json(
+#   :include => {
+#     :broker_agency_staff_roles => {
+#       :methods => [:profile_type, :_type],
+#       :only => [:aasm_state, :benefit_sponsors_broker_agency_profile_id]
+#     },
+#     :general_agency_staff_roles => {
+#       :methods => [:profile_type, :_type],
+#       :only => [:aasm_state, :benefit_sponsors_general_agency_profile_id]
+#     }
+#   },
+#   :only =>[:_id, :profiles, :first_name, :last_name, :hbx_id, :dob, :broker_agency_staff_roles, :general_agency_staff_roles]
+# )
 
   scope :by_hbx_id, ->(person_hbx_id) { where(hbx_id: person_hbx_id) }
   scope :by_broker_role_npn, ->(br_npn) { where("broker_role.npn" => br_npn) }
@@ -292,6 +420,43 @@ class Person
   after_create :notify_created
   after_update :notify_updated
 
+  def self.api_staff_roles
+    broker_orgs =  BenefitSponsors::Organizations::Organization.where({
+          "profiles": {
+            "$elemMatch": {
+              "_type": /.*BrokerAgencyProfile$/,
+              "aasm_state": "is_approved"
+            }
+          }
+        })
+
+    broker_role_ids_to_exclude = broker_orgs.map{|x| x.profiles.first.try(:primary_broker_role_id)}
+
+    Person.where(
+      {
+      "is_active" => true,
+      "$or" => [
+          { "broker_agency_staff_roles" => { "$exists" => true }, "broker_role._id" => {"$nin" => broker_role_ids_to_exclude} },
+          { "general_agency_staff_roles" => { "$exists" => true }, "general_agency_staff_roles.is_primary" =>  false }
+        ]
+      }
+    )
+  end
+
+  def agency_roles
+    role_data(broker_agency_staff_roles) || role_data(general_agency_staff_roles)
+  end
+
+  def role_data(data)
+    data.collect do |r|
+      {
+        id: r.id.to_s,
+        state: r.aasm_state,
+        agency_id: r.try(:benefit_sponsors_broker_agency_profile_id).to_s || r.try(:benefit_sponsors_general_agency_profile_id).to_s,
+        type: r.class.name
+      }
+    end
+  end
 
   def active_general_agency_staff_roles
     general_agency_staff_roles.where(:aasm_state => :active)
