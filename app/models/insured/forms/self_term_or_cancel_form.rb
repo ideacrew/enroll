@@ -71,7 +71,8 @@ module Insured
       def self.is_term_or_cancel_date_in_future?(attrs)
         return true unless attrs[:term_or_cancel] == 'terminate'
 
-        Date.strptime(attrs[:term_date], "%m/%d/%Y").future?
+        date = Date.strptime(attrs[:term_date], "%m/%d/%Y")
+        return date.today? || date.future?
       end
     end
   end
