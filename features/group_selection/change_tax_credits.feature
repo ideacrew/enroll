@@ -14,14 +14,13 @@ Scenario Outline: Change Tax Credit button is available for non-catastrophic pla
   And the metal level is <metal_level>
   And the tax household has at least one member that is APTC eligible
   When consumer clicks on the make changes button
-  Then consumer should see the make changes page
   Then the Change Tax Credit button should be available
 
   Examples:
     | metal_level |
-    | platinum |
-    | silver |
     | gold |
+    | silver |
+    | platinum |
     | bronze |
 
 Scenario: Change Tax Credit button is not available for catastrophic plans

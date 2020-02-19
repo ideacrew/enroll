@@ -84,19 +84,42 @@ And(/(.*) also has a health enrollment with primary person covered/) do |role|
   else
     sep = FactoryBot.create :special_enrollment_period, family: family
   end
-  sep.update_attributes!(effective_on: TimeKeeper.date_of_record.end_of_month)
   document = FactoryBot.build(:document, identifier: '525252')
-  product = FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile, sbc_document: document)
-  enrollment = FactoryBot.create(:hbx_enrollment, product: product,
-                                  household: family.active_household,
-                                  family: family,
-                                  kind: (@employee_role.present? ? "employer_sponsored" : (role == "Resident" ? "coverall" : "individual")),
-                                  effective_on: TimeKeeper.date_of_record,
-                                  enrollment_kind: "special_enrollment",
-                                  special_enrollment_period_id: sep.id,
-                                  employee_role_id: (@employee_role.id if @employee_role.present?),
-                                  benefit_group_id: (@benefit_group.id if @benefit_group.present?)
-                                )
+  product = FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile, sbc_document: document, :metal_level_kind => :silver)
+
+  if role == 'consumer'
+    FactoryBot.create(:hbx_profile, :no_open_enrollment_coverage_period)
+    benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
+    benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.date_of_record)}.update_attributes!(slcsp_id: product.id)
+    consumer_role = family.primary_applicant.person.consumer_role
+
+    tax_household = family.active_household.tax_households[0] || FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil)
+    FactoryBot.create(:tax_household_member, applicant_id: family.primary_applicant.id, tax_household: tax_household)
+    FactoryBot.create(:eligibility_determination, max_aptc: 500.00, tax_household: tax_household, csr_eligibility_kind: 'csr_73')
+  end
+  sep.update_attributes!(effective_on: TimeKeeper.date_of_record.end_of_month)
+  kind =
+    if @employee_role.present?
+      'employer_sponsored'
+    elsif role == "Resident"
+      'coverall'
+    else
+      'individual'
+    end
+  enrollment =
+    FactoryBot.create(
+      :hbx_enrollment,
+      product: product,
+      household: family.active_household,
+      family: family,
+      kind: kind,
+      effective_on: TimeKeeper.date_of_record,
+      enrollment_kind: "special_enrollment",
+      special_enrollment_period_id: sep.id,
+      consumer_role_id: (consumer_role.id if consumer_role.present?),
+      employee_role_id: (@employee_role.id if @employee_role.present?),
+      benefit_group_id: (@benefit_group.id if @benefit_group.present?)
+    )
   enrollment.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: family.primary_applicant.id,
     eligibility_date: TimeKeeper.date_of_record - 2.months,
     coverage_start_on: TimeKeeper.date_of_record - 2.months
@@ -295,7 +318,7 @@ Then(/(.*) should see the dental enrollment with make changes button/) do |role|
 end
 
 When(/(.*) clicked on make changes button/) do |role|
-  click_link "Make Changes"
+  click_link('Make Changes',  wait: 10)
 end
 
 Then(/(.*) should see keep existing plan and select plan to terminate button/) do |_role|
@@ -467,7 +490,7 @@ end
 #   end
 # end
 
-Then(/^.* (.*) see the (.*) make changes button/) do |visibility, market|
+Then(/^.* (.*) see make changes button in (.*) market/) do |visibility, market|
   # There are two different buttons, each with links. one for IVl and one for SHOP
   case market
   when 'individual'
@@ -489,7 +512,8 @@ end
 # end
 
 When(/(.*) clicks on the make changes button/) do |_role|
-  click_link 'Make Changes'
+  click_link('Make Changes')
+  wait_for_ajax
 end
 
 When(/(.*) clicks on the dental make changes button/) do |_role|
@@ -497,6 +521,7 @@ When(/(.*) clicks on the dental make changes button/) do |_role|
 end
 
 Then(/(.*) should see the make changes page/) do |_role|
+  wait_for_ajax
   expect(page).to have_text('Tax credit amount')
 end
 
@@ -604,18 +629,21 @@ end
 
 And(/the family has an active tax household/) do
   @family = Family.all.first
-  FactoryBot.create(:tax_household, household: @family.active_household)
+  household = @family.active_household
+  household.tax_households[0] || FactoryBot.create(:tax_household, household: @family.active_household)
 end
 
 And(/the tax household has at least one member that is APTC eligible/) do
   tax_household = @family.active_household.latest_active_tax_household
-  tax_household.tax_household_members.create!(is_ia_eligible: true, applicant_id: @family.enrollments.first.hbx_enrollment_members.first.id)
+  tax_household.tax_household_members.create!(is_ia_eligible: true, applicant_id: @family.enrollments.first.hbx_enrollment_members.first.applicant_id)
   FactoryBot.create(:eligibility_determination, max_aptc: 500, tax_household: tax_household)
 end
 
 And(/the tax household has no members that are APTC eligible/) do
   tax_household = @family.active_household.latest_active_tax_household
-  tax_household.tax_household_members.update_all(is_ia_eligible: false, applicant_id: @family.enrollments.first.hbx_enrollment_members.first.id)
+  tax_household.tax_household_members.each do |thhm|
+    thhm.update_attributes(is_ia_eligible: false, applicant_id: @family.enrollments.first.hbx_enrollment_members.first.applicant_id)
+  end
 end
 
 And(/the metal level is (.*)/) do |metal_level|
@@ -644,6 +672,7 @@ end
 
 When(/the user changes Tax credit applied to 50%/) do
   fill_in("aptc_applied_total", with: "50.0")
+  page.execute_script('$(document.elementFromPoint(50, 350)).click();')
 end
 
 And(/the user confirms "Yes" to change the tax credit/) do
@@ -651,11 +680,12 @@ And(/the user confirms "Yes" to change the tax credit/) do
 end
 
 Then(/the user should see a message that their Tax Credits were updated/) do
-  expect(page).to have_content("Successfully updated tax credits for enrollment.")
+  wait_for_ajax
+  expect(page).to have_content("Tax credit updated successfully.")
 end
 
-Then(/the user should see that applied tax credit has been set to 50%/) do
-  expect(page).to have_content("0.5")
+Then(/the user should see that applied tax credit has been set accordingly/) do
+  expect(page).to have_content("25")
 end
 
 Given(/the enrollment has HIOS ID ending in (.*)/) do |id_number|

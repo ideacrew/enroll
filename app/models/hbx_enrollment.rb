@@ -1861,12 +1861,11 @@ class HbxEnrollment
   def ivl_decorated_hbx_enrollment(enrollment_product = nil)
     return @cost_decorator if @cost_decorator
     enrollment_product ||= product
-
     if enrollment_product.present? && (resident_role.present? || consumer_role.present?)
       @cost_decorator = UnassistedPlanCostDecorator.new(enrollment_product, self)
     else
       log("#3835 hbx_enrollment without benefit_group and consumer_role. hbx_enrollment_id: #{id}, plan: #{product}", {:severity => 'error'})
-      @cost_decorator = OpenStruct.new(:total_premium => 0.00, :total_employer_contribution => 0.00, :total_employee_cost => 0.00)
+      @cost_decorator = OpenStruct.new(:total_premium => 0.00, :total_employer_contribution => 0.00, :total_employee_cost => 0.00, :total_ehb_premium => 0.00)
     end
   end
 
