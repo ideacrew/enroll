@@ -38,7 +38,10 @@ module Insured
 
       def self.for_post(attrs)
         form = self.new
-        form.errors.add(:base, 'Date cannot be in the past') unless is_term_or_cancel_date_in_future?(attrs)
+        unless is_term_or_cancel_date_in_future?(attrs)
+          form.errors.add(:base, 'Date cannot be in the past')
+          return form
+        end
         service = self_term_or_cancel_service(attrs)
         service.term_or_cancel
         form
