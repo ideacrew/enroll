@@ -119,14 +119,13 @@ Feature: IVL plan purchase
     And I select a effective date from list
     And I click on continue button on select effective date
     When I click on continue button on household info form
-    And I click on continue button on household info form
     And I click on back to my account
     When consumer clicked on make changes button
     Then consumer clicked on keep existing plan button
     Then consumer should land on confirm page
     And consumer clicks Confirm
     Then consumer should enrollment submitted confirmation page
-    Then consumer clicked on continue for plan shopping
+    Then consumer clicked on Go To My Account
     Then cosumer should see the home page
 
   Scenario: IVL plan shopping by clicking on 'shop for plan' button should land on Plan shopping page

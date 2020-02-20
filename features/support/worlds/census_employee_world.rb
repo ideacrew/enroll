@@ -201,10 +201,10 @@ And(/employee (.*) already matched with employer (.*?)(?: and (.*?))? and logged
                                      benefit_sponsors_employer_profile_id: profile.id,
                                      hired_on: ce.hired_on)
 
-  ce.update_attributes(employee_role_id: person_record.employee_roles.first.id)
   sponsorship.benefit_applications.each do |benefit_application|
     benefit_application.benefit_packages.each{|benefit_package| ce.add_benefit_group_assignment(benefit_package) }
   end
+  ce.update_attributes(employee_role_id: person_record.employee_roles.first.id)
   FactoryBot.create :family, :with_primary_family_member, person: person_record
   user = FactoryBot.create(:user,
                             person: person_record,
