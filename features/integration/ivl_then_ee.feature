@@ -1,3 +1,4 @@
+@wip
 Feature: Insured Enrolls as Employee then as Consumer
   Scenario: New insured user purchases on individual market
     # Given Individual has not signed up as an HBX user

@@ -144,6 +144,7 @@ group :test do
   gem 'test-prof', '0.5.0'
   gem 'warden'
   gem 'watir'
+  gem 'webdrivers', '~> 3.0'
   gem 'webmock'
 end
 

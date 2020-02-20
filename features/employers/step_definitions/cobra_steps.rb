@@ -57,18 +57,6 @@ Then(/^I fill employer signup form for (.*?)$/) do |named_person|
   sleep 1
 end
 
-Then(/^I can see the optional Email field$/) do
-  find('.interaction-field-control-user-email', visible: true)
-end
-
-Then(/^I fill out the email address with (.*?)$/) do |email|
-  fill_in 'user[email]', with: email
-end
-
-Then 'I submit button to create account' do
-  find('.interaction-click-control-create-account').click
-end
-
 Then(/^Employer should see a form to enter information about employee, address and dependents details for Jack Cobra$/) do
   person = people_for_cobra['Jack Cobra']
   # Census Employee
@@ -149,6 +137,7 @@ end
 
 Then(/^fill the form with hired date as future date$/) do
   person = people_for_cobra['Jack Employee']
+
   # Census Employee
   fill_in 'census_employee[first_name]', with: person[:first_name], :wait => 10
   fill_in 'census_employee[last_name]', with: person[:last_name]
@@ -328,7 +317,7 @@ When(/^.+ cobra one employee$/) do
   element.find('a', :text => "Initiate Cobra", :wait => 3).click
   wait_for_ajax
 #   find('input.date-picker').set((TimeKeeper.date_of_record.next_month.beginning_of_month).to_s)
-  find('a.cobra_confirm', :text => /Initiate Cobra/i, :wait => 3).trigger('click')
+  find('a.cobra_confirm', :text => /Initiate Cobra/i, :wait => 3).click
 end
 
 Then(/^.+ should see cobra successful msg/) do
@@ -396,50 +385,45 @@ And(/^.+ should be able to enter sole source plan year, benefits, relationship b
   fill_in "plan_year[benefit_groups_attributes][0][composite_tier_contributions_attributes][3][employer_contribution_percent]", :with => 50
 
   wait_for_ajax
-  find('.interaction-click-control-create-plan-year').trigger('click')
+  find('.interaction-click-control-create-plan-year').click
 end
 
 def enter_plan_year_info
+  wait_for_ajax(2,2)
   find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]", :wait => 3).click
-  find(:xpath, "//li[@data-index='1'][contains(., '#{(Date.today + 2.months).year}')]", :wait => 3).click
-
-  screenshot("employer_add_plan_year")
-  find('.interaction-field-control-plan-year-fte-count').click
-
-  fill_in "plan_year[fte_count]", :with => "35"
-  fill_in "plan_year[pte_count]", :with => "15"
-  fill_in "plan_year[msp_count]", :with => "3"
-
+  find(:xpath, "//li[@data-index='1'][contains(., '#{(effective_period.min).year}')]", :wait => 3).click
+  find('.interaction-field-control-fteemployee').click
+  fill_in 'benefit_application[fte_count]', with: '3'
+  fill_in 'benefit_application[pte_count]', with: '3'
+  fill_in 'benefit_application[msp_count]', with: '3'
   find('.interaction-click-control-continue').click
-
-  # Benefit Group
-  fill_in "plan_year[benefit_groups_attributes][0][title]", :with => "Silver PPO Group"
-
-  find('.interaction-choice-control-plan-year-start-on', :visible => true).click
-  find('li.interaction-choice-control-plan-year-start-on-1').click
+  sleep(3)
+  #Benefit Package
+  wait_for_ajax
+  fill_in 'benefit_package[title]', with: 'Silver PPO Group'
+  fill_in 'benefit_package[description]', with: 'Testing'
 end
 
 And(/^.+ should be able to enter single carrier plan year, benefits, relationship benefits for cobra$/) do
   enter_plan_year_info
-
-  find(:xpath, '//li/label[@for="plan_year_benefit_groups_attributes_0_plan_option_kind_single_carrier"]').click
+  find(:xpath, '//*[@id="metal-level-select"]/div/ul/li[1]/a').click
   wait_for_ajax
-  find('.carriers-tab a').click
+  find(:xpath, '//*[@id="carrier"]/div[1]/div/label').click
+  sleep 2
   wait_for_ajax
-  find('.reference-plans label').click
+  expect(page).to have_content('Select Your Reference Plan')
   wait_for_ajax
-  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]", :with => 50
-  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][1][premium_pct]", :with => 50
-  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][2][premium_pct]", :with => 50
-  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][3][premium_pct]", :with => 50
-
-  wait_for_ajax
+  page.first('.reference-plans label').click
+  fill_in "benefit_package[sponsored_benefits_attributes][0][sponsor_contribution_attributes][contribution_levels_attributes][1][contribution_factor]", :with => 50
+  fill_in "benefit_package[sponsored_benefits_attributes][0][sponsor_contribution_attributes][contribution_levels_attributes][2][contribution_factor]", :with => 50
+  fill_in "benefit_package[sponsored_benefits_attributes][0][sponsor_contribution_attributes][contribution_levels_attributes][3][contribution_factor]", :with => 50
+  fill_in "benefit_package[sponsored_benefits_attributes][0][sponsor_contribution_attributes][contribution_levels_attributes][4][contribution_factor]", :with => 50
+  sleep 2
+  find(:xpath, '//*[@id="referencePlanShell"]/div/div[1]/h1').click
   find('.interaction-click-control-create-plan-year').trigger('click')
 end
 
-And(/clicks on the Add New Employee button/) do
-  execute_script(<<-JSCODE)
-    $('.interaction-click-control-add-new-employee')[0].click()
-  JSCODE
+And(/employer selects Add New Employee button on employee roster/) do
+  find('.interaction-click-control-add-new-employee').click
   wait_for_ajax(3,2)
 end

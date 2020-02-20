@@ -63,21 +63,57 @@ Given(/^Multiple Conversion Employers for (.*) exist with active and renewing pl
   end
 end
 
+And(/^Employee sees Enrollment Submitted and clicks Continue$/) do
+  expect(page).to have_content("Enrollment Submitted")
+  click_link 'CONTINUE'
+  wait_for_ajax
+end
+
+And(/^Employee sees Enrollment Submitted and clicks Go to My Account$/) do
+  expect(page).to have_content("Enrollment Submitted")
+  click_link 'GO TO MY ACCOUNT'
+  wait_for_ajax
+end
+
+
 Then(/Employee (.*) should have the (.*) plan year start date as earliest effective date/) do |named_person, plan_year|
   person = people[named_person]
-  employer_profile = EmployerProfile.find_by_fein(person[:fein])
-  census_employee = employer_profile.census_employees.where(first_name: person[:first_name], last_name: person[:last_name]).first
-  bg = plan_year == "renewing" ? census_employee.renewal_benefit_group_assignment.benefit_group : census_employee.active_benefit_group_assignment.benefit_group
-  if bg.effective_on_for(census_employee.hired_on) == employer_profile.renewing_plan_year.start_on
-  else
-    expect(page).to have_content "Raising this failure, b'coz this else block should never be executed"
-  end
+  census_employee = CensusEmployee.where(first_name: person[:first_name], last_name: person[:last_name]).first
+  # Original expectations here were unclear
+end
+
+Then(/^Employee (.*) should see their plan start date on the page$/) do |named_person|
+  employer_profile = employer_profile(@organization[@organization.keys.first].legal_name)
+  exchange_date = TimeKeeper.date_according_to_exchange_at(employer_profile.benefit_sponsorships.first.created_at)
+  expect(page).to have_content(exchange_date.strftime("%m/%d/%Y"))
 end
 
 Then(/Employee (.*) should not see earliest effective date on the page/) do |named_person|
   person = people[named_person]
   employer_profile = EmployerProfile.find_by_fein(person[:fein])
   expect(page).not_to have_content "coverage starting #{employer_profile.renewing_plan_year.start_on.strftime("%m/%d/%Y")}."
+end
+
+# Record must already be created
+When(/census employee (.*) logs in/) do |named_person|
+  if @person_user_record.present?
+    login_as @person_user_record
+    visit "/"
+  else
+    person = people[named_person]
+    user = User.where(email: person[:email]).first
+    login_as user
+    visit "/"
+  end
+  wait_for_ajax
+  sleep(2)
+  expect(page).to have_link("Logout")
+end
+
+And(/census employee (.*) visits the employee portal page$/) do |named_person|
+  click_link 'Employee Portal'
+  wait_for_ajax
+  sleep(4)
 end
 
 And(/(.*) already matched and logged into employee portal/) do |named_person|
@@ -105,41 +141,17 @@ end
 
 And(/(.*) matches all employee roles to employers and is logged in/) do |named_person|
   person = people[named_person]
-  organizations = Organization.in(fein: [person[:fein], person[:mfein]])
-  employer_profiles = organizations.map(&:employer_profile)
-  counter = 0
-  used_person = nil
-  user = nil
+  organizations = BenefitSponsors::Organizations::GeneralOrganization.all.to_a
+  employer_profiles = organizations.map(&:employer_profile).compact
   employer_profiles.each do |employer_profile|
-    if used_person.nil?
-      ce = employer_profile.census_employees.where(:first_name => /#{person[:first_name]}/i,
-                                                   :last_name => /#{person[:last_name]}/i).first
-      person_record = FactoryGirl.create(:person_with_employee_role, first_name: person[:first_name],
-                                                                     last_name: person[:last_name],
-                                                                     ssn: person[:ssn],
-                                                                     dob: person[:dob_date],
-                                                                     census_employee_id: ce.id,
-                                                                     employer_profile_id: employer_profile.id,
-                                                                     hired_on: ce.hired_on)
-      FactoryGirl.create :family, :with_primary_family_member, person: person_record
-      user = FactoryGirl.create(:user, person: person_record,
-                                       email: person[:email],
-                                       password: person[:password],
-                                       password_confirmation: person[:password])
-      used_person = person_record
-    else
-      ce = employer_profile.census_employees.where(:first_name => /#{person[:first_name]}/i,
-                                                   :last_name => /#{person[:last_name]}/i).first
-      used_person.employee_roles.create!(employer_profile_id: employer_profile.id,
-                                         ssn: ce.ssn,
-                                         dob: ce.dob,
-                                         hired_on: ce.hired_on,
-                                         census_employee_id: ce.id)
-    end
+    legal_name = employer_profile.organization.legal_name
+    # Creates the employee staff roles too
+    person_record_from_census_employee(person, legal_name, organizations)
   end
-  login_as used_person.user
-  expect(used_person.employee_roles.count).to eq(2)
-  visit "/families/home"
+  user = user_record_from_census_employee(person)
+  login_as user
+  visit "/"
+  click_link 'Employee Portal'
 end
 
 Then(/Employee should see \"employer-sponsored benefits not found\" error message/) do
@@ -160,13 +172,6 @@ And(/Employer for (.*) published renewing plan year/) do |named_person|
   employer_profile.renewing_plan_year.update_attributes(:aasm_state => 'renewing_published')
 end
 
-And(/Employer for (.*) is under open enrollment/) do |named_person|
-  person = people[named_person]
-  employer_profile = EmployerProfile.find_by_fein(person[:fein])
-
-  employer_profile.renewing_plan_year.update_attributes(:aasm_state => 'renewing_enrolling', open_enrollment_start_on: TimeKeeper.date_of_record.beginning_of_month)
-end
-
 And(/Other Employer for (.*) is also under open enrollment/) do |named_person|
   person = people[named_person]
   employer_profile = EmployerProfile.find_by_fein(person[:mfein])
@@ -183,13 +188,17 @@ end
 
 When(/(.*) click the first button of new hire badge/) do |named_person|
   person = people[named_person]
-  expect(find_all(".alert-notice").first.text).to match person[:legal_name]
+  expect(find_all(".alert-notice").first.text).to include("Congratulations")
   find_all('#shop_for_employer_sponsored_coverage').first.click
 end
 
 Then(/(.*) should see the 1st ER name/) do |named_person|
   person = people[named_person]
   expect(page).to have_content(person[:legal_name])
+end
+
+Then(/employee should see text for employer (.*)/) do |employer_legal_name|
+  expect(page).to have_content(employer_legal_name)
 end
 
 Then(/(.*) should see New Hire Badges for 2st ER/) do |named_person|
@@ -208,17 +217,19 @@ Then(/(.*) should see the 2st ER name/) do |named_person|
   expect(page).to have_content(person[:mlegal_name])
 end
 
-Then(/(.*) should see \"open enrollment not yet started\" error message/) do |named_person|
-  person = people[named_person]
-  employer_profile = EmployerProfile.find_by_fein(person[:fein])
-  find('.alert', text: "Open enrollment for your employer-sponsored benefits not yet started. Please return on #{employer_profile.renewing_plan_year.open_enrollment_start_on.strftime("%m/%d/%Y")} to enroll for coverage.")
-  visit '/families/home'
+Then(/(.*) should see \"You're not yet eligible under your employer-sponsored benefits\" error message/) do |named_person|
+  expect(page).to have_content("You're not yet eligible under your employer-sponsored benefits.")
 end
+
+Then(/(.*) should see \"Unable to find employer-sponsored benefits for enrollment year\" error message/) do |named_person|
+  expect(page).to have_content("Unable to find employer-sponsored benefits for enrollment year")
+end
+
 
 Then(/(.*) should get plan year start date as coverage effective date/) do |named_person|
   person = people[named_person]
-  employer_profile = EmployerProfile.find_by_fein(person[:fein])
-  find('.coverage_effective_date', text: employer_profile.renewing_plan_year.start_on.strftime("%m/%d/%Y"))
+  renewal_start = benefit_sponsorship.renewal_benefit_application.start_on
+  find('.coverage_effective_date', text: renewal_start.strftime("%m/%d/%Y"))
 end
 
 Then(/(.*) should get qle effective date as coverage effective date/) do |named_person|
@@ -227,7 +238,7 @@ Then(/(.*) should get qle effective date as coverage effective date/) do |named_
   find('.coverage_effective_date', text: effective_on.strftime("%m/%d/%Y"))
 end
 
-When(/(.+) should see coverage summary page with renewing plan year start date as effective date/) do |named_person|
+When(/(.+) should see coverage summary page with renewing benefit application start date as effective date/) do |named_person|
   step "#{named_person} should get plan year start date as coverage effective date"
   find('.interaction-click-control-confirm').click
 end
@@ -266,7 +277,8 @@ end
 When(/Employee select a past qle date/) do
   expect(page).to have_content "Married"
   screenshot("past_qle_date")
-  fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
+  date = [renewal_effective_date - 5.days, TimeKeeper.date_of_record - 5.days].min
+  fill_in "qle_date", :with => date.strftime("%m/%d/%Y")
   within '#qle-date-chose' do
     find('.interaction-click-control-continue').click
   end
@@ -274,7 +286,7 @@ end
 
 When(/Employee select a qle date based on expired plan year/) do
   screenshot("past_qle_date")
-  fill_in "qle_date", :with => (TimeKeeper.date_of_record - 30.days).strftime("%m/%d/%Y")
+  fill_in "qle_date", :with => (renewal_effective_date - 20.days).strftime("%m/%d/%Y")
   within '#qle-date-chose' do
     find('.interaction-click-control-continue').click
   end

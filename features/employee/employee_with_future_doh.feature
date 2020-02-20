@@ -7,36 +7,46 @@ Feature: Employee with future date of hire
   And Employee should be able to purchase Insurance
 
 
-  Scenario: New hire has future enrollment period
-    Given Employer for Soren White exists with a published health plan year
+  Background: Setup site, employer, and benefit application
+    Given a CCA site exists with a benefit market
+    Given benefit market catalog exists for enrollment_open initial employer with health benefits
+    Given Qualifying life events are present
+    And there is an employer Acme Inc.
+    And employer Acme Inc. has enrollment_open benefit application
+    And Acme Inc. employer has a staff role
+    And there is a census employee record for Patrick Doe for employer Acme Inc.
+
+  Scenario: New hire has enrollment period based on hired date
+    Given staff role person logged in
     And Employee has future hired on date
-    And Employee has not signed up as an HBX user
-    And Soren White visits the employee portal
-    When Soren White creates an HBX account
+    And Acme Inc. employer visit the Employee Roster
+    Then Employer logs out
+    Given Employee has not signed up as an HBX user
+    And Patrick Doe visits the employee portal
+    When Patrick Doe creates an HBX account
     And I select the all security question and give the answer
     When I have submitted the security questions
     When Employee goes to register as an employee
     Then Employee should see the employee search page
-    When Employee enters the identifying info of Soren White
+    When Employee enters the identifying info of Patrick Doe
     Then Employee should see the matched employee record form
     When Employee accepts the matched employer
-    When Employee completes the matched employee form for Soren White
-    When Employee clicks continue on the dependents page
-    Then Employee should see the group selection page
-    When Employee clicks continue on the group selection page
+    When Employee completes the matched employee form for Patrick Doe
+    And Employee sees the Household Info: Family Members page and clicks Continue
+    And Employee sees the Choose Coverage for your Household page and clicks Continue
     Then Employee should see "not yet eligible" error message
 
-    Given I set the eligibility rule to first of month following or coinciding with date of hire
+    Given Acme Inc. eligibility rule has been set to first of month following or coinciding with date of hire
     When Employee clicks "Shop for Plans" on my account page
     When Employee clicks continue on the group selection page
     Then Employee should see "not yet eligible" error message
 
-    Given I set the eligibility rule to first of month following 30 days
+    Given Acme Inc. eligibility rule has been set to first of month following 30 days
     When Employee clicks "Shop for Plans" on my account page
     When Employee clicks continue on the group selection page
     Then Employee should see "not yet eligible" error message
 
-    Given I set the eligibility rule to first of month following 60 days
+    Given Acme Inc. eligibility rule has been set to first of month following 60 days
     When Employee clicks "Shop for Plans" on my account page
     When Employee clicks continue on the group selection page
     Then Employee should see "not yet eligible" error message
@@ -48,4 +58,4 @@ Feature: Employee with future date of hire
 
     Given I reset employee to future enrollment window
     Then Employee tries to complete purchase of another plan
-    Then Employee should see "my account" page with enrollment
+    Then Employee should see the "my account" page

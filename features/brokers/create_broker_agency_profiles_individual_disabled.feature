@@ -11,6 +11,8 @@ Feature: Create Primary Broker and Broker Agency
   The Broker should be able to purchase insurance for that family
 
   Scenario: Broker can enter ACH information
+    Given a CCA site exists with a benefit market
+    And there is an employer ABC Widgets
     When Primary Broker visits the HBX Broker Registration form
     Given a valid ach record exists
     Given Primary Broker has not signed up as an HBX user
@@ -18,7 +20,7 @@ Feature: Create Primary Broker and Broker Agency
     When Primary Broker enters personal information
     And Primary Broker enters broker agency information for SHOP markets
     And Primary Broker enters office location for default_office_location
-    Then Primary Broker should see bank information
+    Then Primary Broker should see broker registration successful message
 
   @more_than_sole_source
   Scenario: Primary Broker has not signed up on the HBX

@@ -186,17 +186,23 @@ end
 
 Then /(\w+) cannot remove EmployerStaffRole from John/ do |legal_name|
   staff = Person.where(first_name: legal_name).first
-  find(:xpath, '//*[@id="edit_agency"]/div/div/div[1]/table/tbody/tr/td[6]/a').click
+  accept_alert do
+    find(:xpath, '//*[@id="edit_agency"]/div/div/div[1]/table/tbody/tr/td[6]/a').click
+  end
 end
 
 When /(\w+) removes EmployerStaffRole from Sarah/ do |staff2|
   staff = Person.where(first_name: staff2).first
-  find(:xpath, '//*[@id="edit_agency"]/div[2]/div/div[1]/table/tbody/tr[2]/td[6]/a').click
+  accept_alert do
+    find(:xpath, '//*[@id="edit_agency"]/div[2]/div/div[1]/table/tbody/tr[2]/td[6]/a').click
+  end
 end
 
 Then /(\w+) removes EmployerStaffRole from John/ do |name|
   staff = Person.where(first_name: name).first
-  find_all('.fa-trash-alt')[0].trigger('click')
+  accept_alert do
+    find_all('.fa-trash-alt')[0].click
+  end
 end
 
 When /(\w+) approves EmployerStaffRole for (\w+)/ do |staff1, staff2|
@@ -242,9 +248,20 @@ Given(/the user is on the Admin Tab of the Admin Dashboard/) do
   find(tab_class, wait: 10).click
 end
 
+Given("the user is on the User Accounts tab of the Admin Dashboard") do
+  visit exchanges_hbx_profiles_path
+  tab_class = '.interaction-click-control-user-accounts'
+  find(tab_class, wait: 10).click
+end
+
 Given /Admin selects Hannahs company/ do
   company = find('a', text: 'Turner Agency, Inc', :wait => 3)
   company.click
+end
+
+Then("user will click on action tab") do
+  sleep(3)
+  find_all('.dropdown.pull-right', text: 'Actions')[0].click
 end
 
 Given /(\w+) has HBXAdmin privileges/ do |name|

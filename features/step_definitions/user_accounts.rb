@@ -48,16 +48,16 @@ And(/^a locked user exists with broker role$/) do
 end
 
 When(/^I click Employee button$/)do
-  find(:xpath, '//*[@id="Tab:all_employee_roles"]').click 
+  find(:xpath, '//*[@id="Tab:all_employee_roles"]').click
 end
 
 When(/^I click Employee and Locked button$/)do
   find(:xpath, '//*[@id="Tab:all_employee_roles"]').click
-  find(:xpath, '//*[@id="Tab:all_employee_roles-locked"]').click 
+  find(:xpath, '//*[@id="Tab:all_employee_roles-locked"]').click
 end
 
 When(/^I click Employee and Unlocked button$/)do
-  find(:xpath, '//*[@id="Tab:all_employee_roles-unlocked"]').click 
+  find(:xpath, '//*[@id="Tab:all_employee_roles-unlocked"]').click
 end
 
 Then(/^I should only see user with employee role$/)do
@@ -72,7 +72,7 @@ Then(/^I should only see user with employee role$/)do
 end
 
 When(/^I click All button$/)do
-  find(:xpath, '//*[@id="Tab:all"]').click 
+  find(:xpath, '//*[@id="Tab:all"]').click
 end
 
 Then(/^I should only see locked user with employee role$/)do
@@ -118,7 +118,7 @@ Then(/^I should only see user with all roles$/)do
 end
 
 When(/^I click Employer button$/)do
-  find(:xpath, '//*[@id="Tab:all_employer_staff_roles"]').click 
+  find(:xpath, '//*[@id="Tab:all_employer_staff_roles"]').click
 end
 
 Then(/^I should only see user with employer staff role$/)do
@@ -133,7 +133,7 @@ Then(/^I should only see user with employer staff role$/)do
 end
 
 When(/^I click Broker button$/)do
-  find(:xpath, '//*[@id="Tab:all_broker_roles"]').click 
+  find(:xpath, '//*[@id="Tab:all_broker_roles"]').click
 end
 
 Then(/^I should only see user with broker role$/)do
@@ -163,4 +163,8 @@ end
 Then(/^a user should see a result with hbx id$/) do
   expect(page).to have_content(@user_1.email)
   expect(page).to have_no_content(@user_2.email)
+end
+
+Then(/^Hbx Admin click on User Accounts$/) do
+  find(:xpath, '//*[@id="myTab"]/li[7]/a').click
 end
