@@ -40,24 +40,24 @@ module Insured
           @enrollment_id = enrollment.id
           @family_id     = family.id
           @qle           = QualifyingLifeEventKind.find(BSON::ObjectId.from_string(sep.qualifying_life_event_kind_id))
-          @form_params   = subject.find(@enrollment_id, @family_id)
         end
 
         it "returns a hash of valid params" do
+          @form_params = subject.find(@enrollment_id, @family_id)
           expect(@form_params[:enrollment]).to eq enrollment
           expect(@form_params[:family]).to eq family
           expect(@form_params[:qle]).to eq @qle
         end
 
         it "returns a falsey is_aptc_eligible if latest_active_tax_household does not exist" do
+          @form_params = subject.find(@enrollment_id, @family_id)
           expect(@form_params[:is_aptc_eligible]).to be_falsey
         end
 
         it "returns a truthy is_aptc_eligible if tax household and valid aptc members exist" do
           tax_household = FactoryBot.create(:tax_household, household: family.active_household)
           FactoryBot.create(:tax_household_member, tax_household: tax_household)
-          allow(family.active_household).to receive(:latest_active_tax_household).and_return(tax_household)
-          form_params   = subject.find(@enrollment_id, @family_id)
+          form_params = subject.find(@enrollment_id, @family_id)
           expect(form_params[:is_aptc_eligible]).to be_truthy
         end
       end
