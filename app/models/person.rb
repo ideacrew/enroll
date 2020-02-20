@@ -443,6 +443,18 @@ class Person
     )
   end
 
+  def self.api_primary_staff_roles
+    Person.where(
+      {
+      "is_active" => true,
+      "$or" => [
+          { "broker_agency_staff_roles" => { "$exists" => true }, "broker_role._id" => {"$exists" => true} },
+          { "general_agency_staff_roles.is_primary" =>  true }
+        ]
+      }
+    )
+  end
+
   def agency_roles
     role_data(broker_agency_staff_roles, :benefit_sponsors_broker_agency_profile_id) + role_data(general_agency_staff_roles, :benefit_sponsors_general_agency_profile_id)
   end

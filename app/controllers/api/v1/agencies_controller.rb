@@ -14,6 +14,12 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
       :methods => [:agency_roles, :agent_emails])
   end
 
+  def primary_agency_staff
+      render json: Person.api_primary_staff_roles.to_json(
+      :only => [:_id, :profiles, :first_name, :last_name, :hbx_id, :dob],
+      :methods => [:agency_roles, :agent_emails])
+  end
+
   def approve_general_agency_staff
     #{"person_id"=>"5e4954c7b0b6c5c34cc4110e", "profile_id"=>"5e4953d3b0b6c5c34cc410f5", "id"=>"5e4953d3b0b6c5c34cc410f5"}
     # @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_approve(general_agency_staff_params)

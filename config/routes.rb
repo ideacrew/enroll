@@ -710,6 +710,7 @@ Rails.application.routes.draw do
       resources :agencies, only: %i[index] do
         collection do
           get :agency_staff
+          get :primary_agency_staff
         end
       end
 
