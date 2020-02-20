@@ -127,7 +127,9 @@ module BenefitMarkets
     end
 
     def issuer_profile_products_for(issuer_profile)
-      return @issuer_profile_products if defined?(@issuer_profile_products)
+      return @issuer_profile_products if defined?(@issuer_profile_products) && @profile_hash&.has_value?(issuer_profile.id)
+      @profile_hash = Hash.new
+      @profile_hash["issuer_profile_id"] = issuer_profile.id
       @issuer_profile_products = products.by_issuer_profile(issuer_profile)
     end
 
