@@ -187,6 +187,23 @@ module BenefitSponsors
 
       scope :datatable_search, ->(query) { self.where({"$or" => ([{"legal_name" => ::Regexp.compile(::Regexp.escape(query), true)}, {"fein" => ::Regexp.compile(::Regexp.escape(query), true)}, {"hbx_id" => ::Regexp.compile(::Regexp.escape(query), true)}])}) }
 
+      #
+      # API fields
+      #
+
+      # For API. Going to look at better serialization
+      def agency_profile_id
+          self.profiles.select{ |profile| ['BenefitSponsors::Organizations::GeneralAgencyProfile','BenefitSponsors::Organizations::BrokerAgencyProfile'].include?(profile._type)}.first._id.to_s
+      end
+
+      def organization_id
+          self._id
+      end
+
+      #
+      # End: API fields
+      #
+
       # Strip non-numeric characters
       def fein=(new_fein)
         numeric_fein = new_fein.to_s.gsub(/\D/, '')

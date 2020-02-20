@@ -1,14 +1,11 @@
 class Api::V1::AgenciesController < Api::V1::ApiBaseController
 
   def index
-    render json: BenefitSponsors::Organizations::Organization
-      .all_agency_profiles
-      .to_json(:include => {
-          :profiles => {
-            :methods => [:profile_type]
-          },
-        }
-      )
+    render json: BenefitSponsors::Organizations::Organization.all_agency_profiles
+      .to_json(
+             :only => [:dba, :legal_name],
+             :methods => [:agency_profile_id, :organization_id]
+           )
   end
 
   def agency_staff
