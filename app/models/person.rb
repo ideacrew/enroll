@@ -479,6 +479,10 @@ class Person
     end
   end
 
+  def agent_npm
+    self.general_agency_staff_roles.select{|role| role.is_primary }.try(:first).try(:npn) || self.broker_role.try(:npn)
+  end
+
   def active_general_agency_staff_roles
     general_agency_staff_roles.where(:aasm_state => :active)
   end
