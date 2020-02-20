@@ -487,6 +487,10 @@ class Person
     self.general_agency_staff_roles.select{|role| role.is_primary }.try(:first).try(:id) || self.broker_role.try(:id)
   end
 
+  def connected_profile_id
+    self.general_agency_staff_roles.select{|role| role.is_primary }.try(:first).try(:benefit_sponsors_general_agency_profile_id) || self.broker_role.try(:benefit_sponsors_broker_agency_profile_id)
+  end
+
   def active_general_agency_staff_roles
     general_agency_staff_roles.where(:aasm_state => :active)
   end
