@@ -152,8 +152,7 @@
         <% else %>
           <%= link_to "<span class='glyphicon glyphicon-remove-circle' aria-hidden='true'></span> #{l10n("cancel")}".html_safe, insured_family_member_path(dependent), :remote => true %>
         <% end %>
-
-        <%= f.button(id: 'confirm-member', class: "btn btn-primary btn-br pull-right mz hidden", onclick: "$('#btn-continue').removeClass('disabled');$('#dependents_info_wrapper h4:first').text('If you need to get insurance coverage for other members of your household, select \‘Add Member\’. When you’re finished, select CONTINUE.');") do %>
+        <%= f.button(id: 'confirm-member', 'data-disable-with' => l10n("please_wait"), class: "btn btn-primary btn-br pull-right mz hidden", onclick: "$('#btn-continue').removeClass('disabled');$('#dependents_info_wrapper h4:first').text('If you need to get insurance coverage for other members of your household, select \‘Add Member\’. When you’re finished, select CONTINUE.');") do %>
           <%= l10n("confirm_member") %>
         <% end %>
 

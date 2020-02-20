@@ -462,7 +462,11 @@ module BenefitSponsors
 
     def oe_extended_applications
       benefit_applications.select do |application|
-        application.enrollment_extended? && TimeKeeper.date_of_record > open_enrollment_period_for(application.effective_date).max
+        if application.is_renewing? && application.enrollment_extended?
+          TimeKeeper.date_of_record > open_enrollment_period_for(application.effective_date).max
+        else
+          application.enrollment_extended? && TimeKeeper.date_of_record > (open_enrollment_period_for(application.effective_date).max - 3.days)
+        end
       end
     end
 

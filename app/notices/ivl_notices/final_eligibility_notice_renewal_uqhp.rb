@@ -49,7 +49,7 @@ class IvlNotices::FinalEligibilityNoticeRenewalUqhp < IvlNotice
   def pick_enrollments
     hbx_enrollments = []
     family = recipient.primary_family
-    enrollments = HbxEnrollment.where(family_id: family.id, :aasm_state.in => ["auto_renewing", "coverage_selected"], :kind => "individual")
+    enrollments = HbxEnrollment.where(family_id: family.id, :aasm_state.in => ['auto_renewing', 'coverage_selected', 'unverified', 'renewing_coverage_selected'], :kind => "individual")
     return nil if enrollments.blank?
     health_enrollments = enrollments.detect{ |e| e.coverage_kind == "health" && e.effective_on.year.to_s == notice.coverage_year}
     dental_enrollments = enrollments.detect{ |e| e.coverage_kind == "dental" && e.effective_on.year.to_s == notice.coverage_year}
@@ -122,49 +122,35 @@ class IvlNotices::FinalEligibilityNoticeRenewalUqhp < IvlNotice
         outstanding_people << person
       end
     end
-    #enrollments.each {|e| e.update_attributes(special_verification_period: TimeKeeper.date_of_record + 95.days)}
-    # family.update_attributes(min_verification_due_date: family.min_verification_due_date_on_family)
 
-    # enrollments.select{ |en| HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES.include?(en.aasm_state)}.each do |enrollment|
-    #   notice.enrollments << append_enrollment_information(enrollment)
-    # end
     notice.due_date = family.min_verification_due_date
     outstanding_people.uniq!
     notice.documents_needed = outstanding_people.present? ? true : false
     append_unverified_individuals(outstanding_people)
   end
 
-  # def document_due_date(family)
-  #   enrolled_contingent_enrollment = family.enrollments.where(:aasm_state => "enrolled_contingent", :kind => 'individual').first
-  #   if enrolled_contingent_enrollment.present?
-  #     if enrolled_contingent_enrollment.special_verification_period.present?
-  #       enrolled_contingent_enrollment.special_verification_period
-  #     else
-  #       (TimeKeeper.date_of_record+95.days)
-  #     end
-  #   else
-  #     nil
-  #   end
-  # end
+  def outstanding_verification_types(person)
+    person.consumer_role.outstanding_verification_types.map(&:type_name)
+  end
 
   def ssn_outstanding?(person)
-    person.consumer_role.outstanding_verification_types.include?("Social Security Number")
+    outstanding_verification_types(person).include?("Social Security Number")
   end
 
   def lawful_presence_outstanding?(person)
-    person.consumer_role.outstanding_verification_types.include?('Citizenship')
+    outstanding_verification_types(person).include?('Citizenship')
   end
 
   def immigration_status_outstanding?(person)
-   person.consumer_role.outstanding_verification_types.include?('Immigration status')
+    outstanding_verification_types(person).include?('Immigration status')
   end
 
   def american_indian_status_outstanding?(person)
-    person.consumer_role.outstanding_verification_types.include?('American Indian Status')
+    outstanding_verification_types(person).include?('American Indian Status')
   end
 
   def residency_outstanding?(person)
-    person.consumer_role.outstanding_verification_types.include?('DC Residency')
+    outstanding_verification_types(person).include?('DC Residency')
   end
 
   def append_unverified_individuals(people)
@@ -265,5 +251,4 @@ class IvlNotices::FinalEligibilityNoticeRenewalUqhp < IvlNotice
         ""
     end
   end
-
 end

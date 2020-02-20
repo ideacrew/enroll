@@ -665,12 +665,13 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       let(:user)  { FactoryBot.create(:user, person: person) }
       let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
       let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual) }
+      let(:year) { product.application_period.min.year }
       let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, kind: 'individual', effective_on: TimeKeeper.date_of_record.beginning_of_month.to_date, product_id: product.id) }
 
       context "When a callback is received" do
         before do
           sign_in user
-          get :plan_selection_callback, params: { id: hbx_enrollment.id, hios_id: product.hios_id, market_kind: market_kind, coverage_kind: coverage_kind }
+          get :plan_selection_callback, params: { id: hbx_enrollment.id, hios_id: product.hios_id, year: year, market_kind: market_kind, coverage_kind: coverage_kind }
         end
 
         it "should assign market kind and coverage_kind" do

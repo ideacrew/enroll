@@ -177,6 +177,14 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
   describe "#view_market_places" do
     let(:person) { FactoryBot.create(:person) }
 
+    it 'returns shop, individual and coverall if all 3 are true' do
+      allow(person).to receive(:is_consumer_role_active?).and_return(true)
+      allow(person).to receive(:has_employer_benefits?).and_return(true)
+      allow(person).to receive(:is_resident_role_active?).and_return(true)
+
+      expect(helper.view_market_places(person)).to eq(['shop', 'individual', 'coverall'])
+    end
+
     it "should return shop & individual if can_shop_both_markets? return true" do
       allow(person).to receive(:is_consumer_role_active?).and_return(true)
       allow(person).to receive(:has_employer_benefits?).and_return(true)

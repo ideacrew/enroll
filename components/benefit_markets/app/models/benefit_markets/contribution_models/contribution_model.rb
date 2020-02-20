@@ -68,6 +68,10 @@ module BenefitMarkets
       def find_contribution_unit(contribution_unit_id)
         contribution_units.find(contribution_unit_id)
       end
+
+      def self.by_title(title)
+        self.where(title: title).first
+      end
     end
   end
 end

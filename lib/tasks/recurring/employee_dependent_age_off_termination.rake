@@ -16,20 +16,21 @@ namespace :recurring do
     end
   end
 
-  # RAILS_ENV=production bundle exec rake recurring:dependent_age_off_termination_notification_manual['48574857']
+  # RAILS_ENV=production bundle exec rake recurring:dependent_age_off_termination_notification_manual['48574857', '10/1/2018']
   desc "Manual rake task used to send dependent age off termination notifications to employees"
-  task :dependent_age_off_termination_notification_manual, [:hbx_id] => :environment do |task, args|
+  task :dependent_age_off_termination_notification_manual, [:hbx_id, :dob_month_of_dep] => :environment do |task, args|
     return unless args[:hbx_id].present?
     begin
       primary_person = Person.where(:hbx_id => args[:hbx_id].to_s).first
-      trigger_dep_age_off_notice(primary_person)
+      date = Date.strptime(args[:dob_month_of_dep].to_s, "%m/%d/%Y") if args[:dob_month_of_dep].present?
+      trigger_dep_age_off_notice(primary_person, date)
     rescue Exception => e
       Rails.logger.error {"Unable to deliver employee_dependent_age_off_termination notice to: #{primary_person.hbx_id} due to #{e.backtrace}"}
     end
   end
 
-  def trigger_dep_age_off_notice(person)
-    new_date = TimeKeeper.date_of_record
+  def trigger_dep_age_off_notice(person, new_date = nil)
+    new_date ||= TimeKeeper.date_of_record
     employee_roles = person.active_employee_roles
     employee_roles.each do |employee_role|
       next if (employee_role.benefit_group.nil?)

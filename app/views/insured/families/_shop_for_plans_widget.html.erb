@@ -92,9 +92,14 @@
                 <%#= l10n("insured.you_are_not_under_open_enrollment_period") %>
               <% else %>
                 <p>If you <%= link_to 'enroll today', new_insured_group_selection_path(options) %>, coverage will begin
+                <% if is_under_open_enrollment?  %>
                   <%= format_date ivl_enrollment_effective_date %>.
+                <%elsif @employee_role.try(:is_under_open_enrollment?) %>
+                  <%= format_date @employee_role.benefit_begin_date %>.
+                <% end %>
                 </p>
               <% end %>
+
               <% if @family.latest_active_sep %>
                 <p><%= l10n('insured.qualify_for_special_enrollment') %> "<%= @family.latest_active_sep.qualifying_life_event_kind.title %>"
                   <br/>

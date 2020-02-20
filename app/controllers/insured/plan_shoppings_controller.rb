@@ -82,7 +82,7 @@ class Insured::PlanShoppingsController < ApplicationController
   def thankyou
     set_elected_aptc_by_params(params[:elected_aptc]) if params[:elected_aptc].present?
     set_consumer_bookmark_url(family_account_path)
-    set_admin_bookmark_url
+    set_admin_bookmark_url(family_account_path)
     @plan = BenefitMarkets::Products::Product.find(params[:plan_id])
     @enrollment = HbxEnrollment.find(params.require(:id))
     @enrollment.set_special_enrollment_period
@@ -200,13 +200,9 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def generate_checkbook_service
-    if @hbx_enrollment.effective_on.year == Settings.checkbook_services.current_year
-      plan_comparision_obj = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment)
-      plan_comparision_obj.elected_aptc = session[:elected_aptc]
-      @dc_individual_checkbook_url = plan_comparision_obj.generate_url
-    elsif @hbx_enrollment.effective_on.year == Settings.checkbook_services.previous_year
-      @dc_individual_checkbook_previous_year = Rails.application.config.checkbook_services_base_url + '/hie/dc/' + Settings.checkbook_services.previous_year.to_s + "/"
-    end
+    plan_comparision_obj = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment)
+    plan_comparision_obj.elected_aptc = session[:elected_aptc]
+    @dc_individual_checkbook_url = plan_comparision_obj.generate_url
   end
 
   def show
@@ -222,7 +218,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def show_ivl(hbx_enrollment_id)
     set_consumer_bookmark_url(family_account_path) if params[:market_kind] == 'individual'
-    set_admin_bookmark_url if params[:market_kind] == 'individual'
+    set_admin_bookmark_url(family_account_path) if params[:market_kind] == 'individual'
     set_resident_bookmark_url(family_account_path) if params[:market_kind] == 'coverall'
 
     set_plans_by(hbx_enrollment_id: hbx_enrollment_id)
@@ -285,7 +281,9 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def plan_selection_callback
-    selected_plan = BenefitMarkets::Products::Product.where(:"hios_id" => params[:hios_id], :"application_period.min" => Date.new(Settings.checkbook_services.current_year, 1, 1)).first
+    year = params[:year]
+    hios_id = params[:hios_id]
+    selected_plan = BenefitMarkets::Products::Product.where(:hios_id => hios_id, :"application_period.min" => Date.new(year.to_i, 1, 1)).first
     # selected_plan = Plan.where(:hios_id => params[:hios_id], active_year: Settings.checkbook_services.current_year).first
     if selected_plan.present?
       redirect_to thankyou_insured_plan_shopping_path({plan_id: selected_plan.id.to_s, id: params[:id],coverage_kind: params[:coverage_kind], market_kind: params[:market_kind], change_plan: params[:change_plan]})
@@ -305,7 +303,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def plans
     set_consumer_bookmark_url(family_account_path)
-    set_admin_bookmark_url
+    set_admin_bookmark_url(family_account_path)
     set_plans_by(hbx_enrollment_id: params.require(:id))
     @tax_household = @person.primary_family.latest_household.latest_active_tax_household_with_year(@hbx_enrollment.effective_on.year) rescue nil
     if @tax_household.present?
