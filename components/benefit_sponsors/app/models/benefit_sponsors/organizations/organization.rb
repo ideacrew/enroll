@@ -196,6 +196,10 @@ module BenefitSponsors
           self.profiles.select{ |profile| ['BenefitSponsors::Organizations::GeneralAgencyProfile','BenefitSponsors::Organizations::BrokerAgencyProfile'].include?(profile._type)}.first._id.to_s
       end
 
+      def agency_profile_type
+          self.profiles.select{ |profile| ['BenefitSponsors::Organizations::GeneralAgencyProfile','BenefitSponsors::Organizations::BrokerAgencyProfile'].include?(profile._type)}.first._type
+      end
+
       def organization_id
           self._id
       end

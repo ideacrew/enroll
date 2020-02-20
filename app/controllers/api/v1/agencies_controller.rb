@@ -4,7 +4,7 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
     render json: BenefitSponsors::Organizations::Organization.all_agency_profiles
       .to_json(
              :only => [:dba, :legal_name],
-             :methods => [:agency_profile_id, :organization_id]
+             :methods => [:agency_profile_id, :organization_id, :agency_profile_type]
            )
   end
 
