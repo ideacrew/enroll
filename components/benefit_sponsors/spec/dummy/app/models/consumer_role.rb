@@ -143,8 +143,8 @@ class ConsumerRole
 
   embeds_one :lawful_presence_determination, as: :ivl_role
 
-  embeds_many :local_residency_responses, class_name:"EventResponse"
-  embeds_many :local_residency_requests, class_name:"EventRequest"
+  # embeds_many :local_residency_responses, class_name:"EventResponse"
+  # embeds_many :local_residency_requests, class_name:"EventRequest"
 
   after_initialize :setup_lawful_determination_instance
 
@@ -176,7 +176,7 @@ class ConsumerRole
   # used to track history verification actions can be used on any top node model to build history of changes.
   # in this case consumer role taken as top node model instead of family member bz all verification functionality tied to consumer role model
   # might be encapsulated into new verification model further with verification code refactoring
-  embeds_many :history_action_trackers, as: :history_trackable
+  #embeds_many :history_action_trackers, as: :history_trackable
 
   #list of the collections we want to track under consumer role model
   COLLECTIONS_TO_TRACK = %w- Person consumer_role vlp_documents lawful_presence_determination hbx_enrollments -

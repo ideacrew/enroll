@@ -35,9 +35,18 @@ class ConsumerRolePolicy < ApplicationPolicy
   end
 
   def edit?
-    return @user.person.hbx_staff_role.permission.can_update_ssn || @user.person.hbx_staff_role.permission.view_personal_info_page if (@user.person && @user.person.hbx_staff_role)
-    return (@user.person.consumer_role.id == @record.id) if @user.has_consumer_role?
-    return true  if @user.person && @user.person.has_broker_role?
+    person = @user.person
+    if person
+      if @user.has_hbx_staff_role?
+        hbx_staff_role = person.hbx_staff_role
+        if hbx_staff_role.permission
+          return true if hbx_staff_role.permission.can_update_ssn || hbx_staff_role.permission.view_personal_info_page
+        end
+      end
+      return true if person.id == @record.person.id
+    end
+    # FIXME: Shouldn't we be checking the access rights of the specific broker here?
+    return true if @user.person && @user.person.has_broker_role?
     return false
   end
 

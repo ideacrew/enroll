@@ -41,10 +41,21 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   include_context "setup benefit market with market catalogs and product packages"
   include_context "setup initial benefit application"
 
-  let(:hbx_enrollments) { double("HbxEnrollment") }
+  let(:hbx_enrollments) { double("HbxEnrollment", order: nil, waived: nil, any?: nil, non_external: nil, effective_on: Date.today) }
   let(:user) { FactoryBot.create(:user) }
-  let(:person) { double("Person", id: "test", addresses: [], no_dc_address: false, no_dc_address_reason: "" , is_consumer_role_active?: false, has_active_employee_role?: true) }
-  let(:family) { instance_double(Family, active_household: household, :model_name => "Family") }
+  let(:person) do
+    double(
+      "Person",
+      id: "test",
+      addresses: [],
+      no_dc_address: false,
+      no_dc_address_reason: "",
+      is_consumer_role_active?: false,
+      has_active_employee_role?: true,
+      has_multiple_roles?: false
+    )
+  end
+  let(:family) { instance_double(Family, active_household: household, :model_name => "Family", id: 1) }
   let(:household) { double("HouseHold", hbx_enrollments: hbx_enrollments) }
   let(:addresses) { [double] }
   let(:family_members) { [double("FamilyMember")] }
@@ -58,6 +69,9 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
 
   before :each do
+    allow(hbx_enrollments).to receive(:+).with(HbxEnrollment.family_canceled_enrollments(family)).and_return(
+      HbxEnrollment.family_canceled_enrollments(family) + [hbx_enrollments]
+    )
     allow(hbx_enrollments).to receive(:order).and_return(hbx_enrollments)
     allow(hbx_enrollments).to receive(:waived).and_return([])
     allow(hbx_enrollments).to receive(:any?).and_return(false)
@@ -72,6 +86,36 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     allow(person).to receive(:resident_role).and_return(resident_role)
     allow(consumer_role).to receive(:bookmark_url=).and_return(true)
     sign_in(user)
+  end
+
+  describe "GET home variables" do
+    context "HBX admin variables to show all enrollments" do
+      let(:user_with_hbx_staff_role) { FactoryBot.create(:user, :with_family, :with_hbx_staff_role) }
+      let(:consumer_person) { FactoryBot.create(:person, :with_consumer_role) }
+      let(:testing_family) { FactoryBot.create(:family, :with_primary_family_member, person: consumer_person) }
+      let(:testing_enrollments) do
+        5.times do
+          instance_double("HbxEnrollment", family_id: testing_family.id)
+        end
+      end
+      let(:consumer_role) { double("ConsumerRole", bookmark_url: "/families/home") }
+
+      it "should assign all_hbx_enrollments_for_admin variable if hbx admin user" do
+        testing_family.stub_chain('primary_applicant.person_id').and_return(user_with_hbx_staff_role.person.id)
+        sign_in(user_with_hbx_staff_role)
+        get :home, params: {:family => testing_family.id.to_s}
+        expect(assigns.keys).to include("all_hbx_enrollments_for_admin")
+      end
+
+      it "should not assign all_hbx_enrollments_for_admin for non hbx admin user" do
+        testing_family.stub_chain('primary_applicant.person_id').and_return(user.person.id)
+        allow_any_instance_of(Person).to receive(:has_multiple_roles?).and_return(false)
+        allow(testing_family).to receive(:person).and_return(user.person)
+        sign_in(user)
+        get :home, params: {:family => testing_family.id.to_s}
+        expect(assigns.keys).to_not include("all_hbx_enrollments_for_admin")
+      end
+    end
   end
 
   describe "GET home" do
@@ -997,31 +1041,74 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
     let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
     let(:person) { FactoryBot.create(:person) }
+    let(:ivl_person)       { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+    let(:ivl_family)       { FactoryBot.create(:family, :with_primary_family_member, person: ivl_person) }
     let(:user) { FactoryBot.create(:user, person: person) }
-    let(:hbx_enrollment) {  FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+    let(:ivl_user) { FactoryBot.create(:user, person: ivl_person) }
+    let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
+    let(:hbx_enrollment) do
+      FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
                         household: family.active_household,
                         family: family,
                         aasm_state: "coverage_enrolled",
                         effective_on: initial_application.start_on,
                         rating_area_id: initial_application.recorded_rating_area_id,
                         sponsored_benefit_id: initial_application.benefit_packages.first.health_sponsored_benefit.id,
-                        sponsored_benefit_package_id:initial_application.benefit_packages.first.id,
-                        benefit_sponsorship_id:initial_application.benefit_sponsorship.id)
-    }
-
-    before :each do
-      allow(person).to receive(:primary_family).and_return(family)
-      allow(hbx_enrollment).to receive(:reset_dates_on_previously_covered_members).and_return(true)
-      sign_in(user)
-      get :purchase, params:{id: family.id, hbx_enrollment_id: hbx_enrollment.id, terminate: 'terminate'}
+                        sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
+                        benefit_sponsorship_id: initial_application.benefit_sponsorship.id)
     end
 
-    it "should get hbx_enrollment" do
-      expect(assigns(:enrollment)).to eq hbx_enrollment
+    let(:ivl_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        family: ivl_family,
+                        household: ivl_family.latest_household,
+                        coverage_kind: "health",
+                        enrollment_kind: "open_enrollment",
+                        kind: "individual",
+                        product: product,
+                        aasm_state: "coverage_selected")
     end
 
-    it "should get terminate" do
-      expect(assigns(:terminate)).to eq 'terminate'
+    context "for shop" do
+      before :each do
+        allow(person).to receive(:primary_family).and_return(family)
+        allow(hbx_enrollment).to receive(:reset_dates_on_previously_covered_members).and_return(true)
+        sign_in(user)
+        get :purchase, params: {id: family.id, hbx_enrollment_id: hbx_enrollment.id, terminate: 'terminate'}
+      end
+
+      it "should get hbx_enrollment" do
+        expect(assigns(:enrollment)).to eq hbx_enrollment
+      end
+
+      it "should get terminate" do
+        expect(assigns(:terminate)).to eq 'terminate'
+      end
+
+      it "should get plan" do
+        expect(assigns(:plan)).to be_kind_of(BenefitMarkets::Products::Product)
+      end
+    end
+
+    context "for individual" do
+      before :each do
+        allow(ivl_person).to receive(:primary_family).and_return(ivl_family)
+        allow(ivl_enrollment).to receive(:reset_dates_on_previously_covered_members).and_return(true)
+        sign_in(ivl_user)
+        get :purchase, params: {id: ivl_family.id, hbx_enrollment_id: ivl_enrollment.id, terminate: 'terminate'}
+      end
+
+      it "should get hbx_enrollment" do
+        expect(assigns(:enrollment)).to eq ivl_enrollment
+      end
+
+      it "should get terminate" do
+        expect(assigns(:terminate)).to eq 'terminate'
+      end
+
+      it "should get plan" do
+        expect(assigns(:plan)).to be_kind_of(UnassistedPlanCostDecorator)
+      end
     end
   end
 end

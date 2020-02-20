@@ -4,6 +4,8 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb",dbclean: :arou
   let(:person) { FactoryBot.build(:person) }
   let(:family) { FactoryBot.build(:family, :with_primary_family_member) }
   let(:employee_role) { FactoryBot.build(:employee_role) }
+  let(:employer_profile) {employee_role.employer_profile}
+  let(:plan_year) {FactoryBot.create(:plan_year, employer_profile: employer_profile, aasm_state: "published")}
   let(:census_employee) { FactoryBot.build(:census_employee) }
   let(:hbx_enrollments) {double}
   let(:hbx_profile) { FactoryBot.create(:hbx_profile) }
@@ -18,6 +20,7 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb",dbclean: :arou
         assign :hbx_enrollments, hbx_enrollments
         assign :family, family
         sign_in(current_user)
+        allow(employer_profile).to receive(:published_plan_year).and_return(plan_year)
         allow(employee_role).to receive(:is_eligible_to_enroll_without_qle?).and_return(true)
         allow(employee_role).to receive(:is_under_open_enrollment?).and_return(true)
         allow(current_user).to receive(:has_employee_role?).and_return(true)

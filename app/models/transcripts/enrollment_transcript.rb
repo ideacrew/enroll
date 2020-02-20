@@ -122,7 +122,7 @@ module Transcripts
 
     def add_plan_information
       if @transcript[:compare]['base']  && @transcript[:compare]['base']['update'] && @transcript[:compare]['base']['update']['plan_id'].present?
-        plan = @transcript[:other].plan
+        plan = @transcript[:other].product
 
         @transcript[:compare]['base']['update']['plan_id'] = {
           hios_id: plan.hios_id,
@@ -135,8 +135,8 @@ module Transcripts
       {
         hbx_id: enrollment.hbx_id,
         effective_on: enrollment.effective_on,
-        hios_id: enrollment.plan.hios_id,
-        plan_name: enrollment.plan.name,
+        hios_id: enrollment.product.hios_id,
+        plan_name: enrollment.product.name,
         kind: enrollment.kind,
         aasm_state: enrollment.aasm_state.camelcase,
         coverage_kind: enrollment.coverage_kind
@@ -220,7 +220,7 @@ module Transcripts
 
       if @enrollment.present?
         @transcript[:plan_details] = {
-          plan_name: "#{@enrollment.plan.hios_id}:#{@enrollment.plan.name}",
+          plan_name: "#{@enrollment.product.hios_id}:#{@enrollment.product.name}",
           other_effective_on: enrollment.effective_on.strftime("%m/%d/%Y"),
           effective_on:  @enrollment.effective_on.strftime("%m/%d/%Y"),
           aasm_state: @enrollment.aasm_state.camelcase,
@@ -266,7 +266,7 @@ module Transcripts
     def match_enrollment(enrollment)
       match = HbxEnrollment.by_hbx_id(enrollment.hbx_id.to_s).first
 
-      if match.blank? || !(HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES).include?(match.aasm_state) ||  match.hbx_enrollment_members.blank?      
+      if match.blank? || !(HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES).include?(match.aasm_state) || match.hbx_enrollment_members.blank?
         matched_people = match_person_instance(enrollment.family.primary_applicant.person)
         if matched_people.present?       
           raise 'multiple person records match with enrollment primary applicant' if matched_people.size > 1

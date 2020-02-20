@@ -93,6 +93,7 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
     context "Model dependent attributes" do
       it "should have dependent filer type attributes" do
         expect(subject.dependents.first['filer_type']).to eq('Filers')
+        expect(subject.dependents.last['filer_type']).to eq('Married Filing Separately')
         expect(subject.dependents.count).to eq(2)
       end
 

@@ -82,7 +82,7 @@ module BenefitSponsors
 
     rule  :benefit_packages_contains_reference_plans,
             validate: -> (benefit_application){
-              benefit_application.benefit_packages.any?{|bp| bp.reference_plan.present? }
+              benefit_application.benefit_packages.all?{|bp| bp.reference_plan.present? }
               },
             success:  -> (benfit_application)  { "validated successfully" },
             fail:     -> (benefit_application) { "application benefit packages must have reference plans" }
@@ -104,8 +104,12 @@ module BenefitSponsors
     rule :all_contribution_levels_min_met,
           validate: -> (benefit_application) {
             if benefit_application.benefit_packages.map(&:sponsored_benefits).flatten.present?
-              all_contributions = benefit_application.benefit_packages.collect{|c| c.sorted_composite_tier_contributions }
-              all_contributions.flatten.all?{|c| c.contribution_factor >= c.min_contribution_factor }
+              if benefit_application.effective_period.min.month != 1
+                all_contributions = benefit_application.benefit_packages.collect{|c| c.sorted_composite_tier_contributions }
+                all_contributions.flatten.all?{|c| c.contribution_factor >= c.min_contribution_factor }
+              else
+                true
+              end
             else
               false
             end

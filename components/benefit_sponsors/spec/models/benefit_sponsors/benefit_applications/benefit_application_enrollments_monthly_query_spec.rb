@@ -5,7 +5,7 @@ RSpec.describe BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmen
   let(:benefit_application) do
   	site = FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key)
   	current_effective_date = (TimeKeeper.date_of_record + 2.months).beginning_of_month
-  	dates = TimeKeeper.date_of_record.beginning_of_month..(TimeKeeper.date_of_record.beginning_of_month + 20.days)
+  	dates = current_effective_date..(current_effective_date + 20.days)
     application_dates = {
     	effective_period: dates,
     	open_enrollment_period: dates

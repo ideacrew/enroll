@@ -7,7 +7,7 @@ class Insured::FamilyMembersController < ApplicationController
 
   def index
     set_bookmark_url
-    set_admin_bookmark_url
+    set_admin_bookmark_url(insured_family_members_path)
     @type = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? "employee" : "consumer"
 
     if (params[:resident_role_id].present? && params[:resident_role_id])
@@ -135,8 +135,8 @@ class Insured::FamilyMembersController < ApplicationController
     @info_changed, @dc_status = sensitive_info_changed?(consumer_role)
     if @dependent.update_attributes(params.require(:dependent)) && update_vlp_documents(consumer_role, 'dependent', @dependent)
       consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
-      consumer_role.check_for_critical_changes(@family, info_changed: @info_changed, no_dc_address: params[:dependent]["no_dc_address"], dc_status: @dc_status) if consumer_role
-      consumer_role.update_attribute(:is_applying_coverage,  params[:dependent][:is_applying_coverage]) if consumer_role.present?
+      consumer_role.check_for_critical_changes(@dependent.family_member.family, info_changed: @info_changed, no_dc_address: params[:dependent]["no_dc_address"], dc_status: @dc_status) if consumer_role
+      consumer_role.update_attribute(:is_applying_coverage,  params[:dependent][:is_applying_coverage]) if consumer_role.present? && (!params[:dependent][:is_applying_coverage].nil?)
       respond_to do |format|
         format.html { render 'show' }
         format.js { render 'show' }
@@ -154,7 +154,7 @@ class Insured::FamilyMembersController < ApplicationController
 
   def resident_index
     set_bookmark_url
-    set_admin_bookmark_url
+    set_admin_bookmark_url(resident_index_insured_family_members_path)
     @resident_role = @person.resident_role
     @change_plan = params[:change_plan].present? ? 'change_by_qle' : ''
     @change_plan_date = params[:qle_date].present? ? params[:qle_date] : ''

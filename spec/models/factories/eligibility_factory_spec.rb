@@ -4,6 +4,14 @@ require 'rails_helper'
 require File.join(Rails.root, 'spec/shared_contexts/ivl_eligibility')
 
 RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each do
+  
+  before :all do
+    DatabaseCleaner.clean
+  end
+
+  before :all do
+    DatabaseCleaner.clean
+  end
 
   def reset_premium_tuples
     p_table = @product.premium_tables.first
@@ -170,7 +178,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
     describe 'cases for single tax household scenarios' do
       include_context 'setup one tax household with two ia members'
 
-      let!(:enrollment1) { FactoryBot.create(:hbx_enrollment, :individual_shopping, household: family.active_household, family: family) }
+      let!(:enrollment1) { FactoryBot.create(:hbx_enrollment, :individual_shopping, household: family.active_household, family: family, effective_on: Date.today.beginning_of_year) }
       let!(:enrollment_member1) { FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: enrollment1, applicant_id: family_member.id) }
 
       before :each do
@@ -203,8 +211,8 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
               end
             end
 
-            it { expect(@available_eligibility[:aptc][family_member.id.to_s].round(2)).to eq 443.32 }
-            it { expect(@available_eligibility[:total_available_aptc].round(2)).to eq 443.32 }
+            it { expect(@available_eligibility[:aptc][family_member.id.to_s]).to eq 443.33 }
+            it { expect(@available_eligibility[:total_available_aptc]).to eq 443.33 }
             it { expect(@available_eligibility[:csr]).to eq 'csr_94' }
           end
 
@@ -261,8 +269,8 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
               end
             end
 
-            it { expect(@available_eligibility[:aptc][family_member.id.to_s].round(2)).to eq 225.96 }
-            it { expect(@available_eligibility[:aptc][family_member2.id.to_s].round(2)).to eq 274.04 }
+            it { expect(@available_eligibility[:aptc][family_member.id.to_s]).to eq 225.96711798839456 }
+            it { expect(@available_eligibility[:aptc][family_member2.id.to_s]).to eq 274.0328820116054 }
             it { expect(@available_eligibility[:total_available_aptc]).to eq 500.00 }
             it { expect(@available_eligibility[:csr]).to eq 'csr_94' }
           end
@@ -289,8 +297,8 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
               end
             end
 
-            it { expect(@available_eligibility[:aptc][family_member.id.to_s].round(2)).to eq 500.00 }
-            it { expect(@available_eligibility[:aptc][family_member2.id.to_s].round(2)).to eq 0.00 }
+            it { expect(@available_eligibility[:aptc][family_member.id.to_s]).to eq 500.00 }
+            it { expect(@available_eligibility[:aptc][family_member2.id.to_s]).to eq 0.00 }
             it { expect(@available_eligibility[:total_available_aptc]).to eq 500.00 }
             it { expect(@available_eligibility[:csr]).to eq 'csr_100' }
           end
@@ -298,7 +306,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
 
         context 'with an existing enrollment' do
           let!(:enrollment_member2) { FactoryBot.create(:hbx_enrollment_member, is_subscriber: false, hbx_enrollment: enrollment1, applicant_id: family_member2.id) }
-          let!(:enrollment2) { FactoryBot.create(:hbx_enrollment, :individual_assisted, applied_aptc_amount: 50.00, household: family.active_household, family: family) }
+          let!(:enrollment2) { FactoryBot.create(:hbx_enrollment, :individual_assisted, applied_aptc_amount: 50.00, household: family.active_household, family: family, effective_on: Date.today.beginning_of_year) }
           let!(:enrollment_member21) { FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: enrollment2, applicant_id: family_member.id, applied_aptc_amount: 50.00) }
 
           context 'with valid tax household for all the shopping members' do
@@ -322,8 +330,8 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
               end
             end
 
-            it { expect(@available_eligibility[:aptc][family_member.id.to_s].round(2)).to eq 203.37 }
-            it { expect(@available_eligibility[:aptc][family_member2.id.to_s].round(2)).to eq 246.63 }
+            it { expect(@available_eligibility[:aptc][family_member.id.to_s]).to eq 203.3704061895551 }
+            it { expect(@available_eligibility[:aptc][family_member2.id.to_s]).to eq 246.62959381044487 }
             it { expect(@available_eligibility[:total_available_aptc]).to eq 450.00 }
             it { expect(@available_eligibility[:csr]).to eq 'csr_94' }
           end
@@ -350,8 +358,8 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
               end
             end
 
-            it { expect(@available_eligibility[:aptc][family_member.id.to_s].round(2)).to eq 450.00 }
-            it { expect(@available_eligibility[:aptc][family_member2.id.to_s].round(2)).to eq 0 }
+            it { expect(@available_eligibility[:aptc][family_member.id.to_s]).to eq 450.00 }
+            it { expect(@available_eligibility[:aptc][family_member2.id.to_s]).to eq 0 }
             it { expect(@available_eligibility[:total_available_aptc]).to eq 450.00 }
             it { expect(@available_eligibility[:csr]).to eq 'csr_100' }
           end

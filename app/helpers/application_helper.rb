@@ -547,10 +547,19 @@ module ApplicationHelper
     end
   end
 
+  def is_plan_year_eligible_for_flexible_rules?(plan_year)
+    !plan_year.is_renewing? && flexible_contribution_model_enabled_for_period.cover?(plan_year.start_on)
+  end
+
   def calculate_participation_minimum
     if @current_plan_year.present?
-      return 0 if @current_plan_year.eligible_to_enroll_count == 0
-      return (@current_plan_year.eligible_to_enroll_count * Settings.aca.shop_market.employee_participation_ratio_minimum).ceil
+      if @current_plan_year.eligible_to_enroll_count == 0
+        0
+      elsif is_plan_year_eligible_for_flexible_rules?(@current_plan_year)
+        flexible_employer_participation_ratio_minimum
+      else
+        (@current_plan_year.eligible_to_enroll_count * Settings.aca.shop_market.employee_participation_ratio_minimum).ceil
+      end
     end
   end
 
@@ -827,5 +836,13 @@ module ApplicationHelper
     return true if hbx_staff_role.blank?
 
     hbx_staff_role.permission.can_access_pay_now
+  end
+
+  def float_fix(float_number)
+    BigDecimal((float_number).to_s).round(8).to_f
+  end
+
+  def round_down_float_two_decimals(float_number)
+    BigDecimal((float_number).to_s).round(8).round(2, BigDecimal::ROUND_DOWN).to_f
   end
 end

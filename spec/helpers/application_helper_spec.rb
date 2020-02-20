@@ -35,8 +35,11 @@ RSpec.describe ApplicationHelper, :type => :helper do
     let(:benefit_sponsorship){ double("benefit_sponsorship") }
 
     context "when active_benefit_application is present" do
-      it "should return false" do
+      before do
         allow(benefit_sponsorship).to receive(:active_benefit_application).and_return(true)
+      end
+
+      it "should return false" do
         expect(helper.product_rates_available?(benefit_sponsorship)).to eq false
       end
     end
@@ -46,8 +49,9 @@ RSpec.describe ApplicationHelper, :type => :helper do
         allow(benefit_sponsorship).to receive(:active_benefit_application).and_return(false)
         allow(benefit_sponsorship).to receive(:applicant?).and_return(true)
       end
+
       it "should return false if not in late rates" do
-        expect(helper.product_rates_available?(benefit_sponsorship)).to eq false
+        expect(helper.product_rates_available?(benefit_sponsorship, TimeKeeper.date_of_record)).to eq false
       end
 
       it "should return true if during late rates" do
@@ -297,17 +301,52 @@ RSpec.describe ApplicationHelper, :type => :helper do
   end
 
   describe "#calculate_participation_minimum" do
-    let(:plan_year_1) { double("PlanYear", eligible_to_enroll_count: 5) }
-    before do
-      @current_plan_year = plan_year_1
-    end
-    it "should  return 0 when eligible_to_enroll_count is zero" do
-      expect(@current_plan_year).to receive(:eligible_to_enroll_count).and_return(0)
-      expect(helper.calculate_participation_minimum).to eq 0
+
+    context 'initial employers' do
+
+      let(:plan_year_1) { double("PlanYear", eligible_to_enroll_count: 5, is_renewing?: false) }
+
+      it "should return 0 when eligible_to_enroll_count is zero" do
+        @current_plan_year = plan_year_1
+        expect(@current_plan_year).to receive(:eligible_to_enroll_count).and_return(0)
+        expect(helper.calculate_participation_minimum).to eq 0
+      end
+
+      context "should calculate eligible_to_enroll_count when not zero" do
+        let(:flex_plan_year) { double("PlanYear", start_on: Date.new(2020, 3, 1), eligible_to_enroll_count: 5, is_renewing?: false) }
+        let(:standard_plan_year) { double("PlanYear", start_on: Date.new(2029, 3, 1), eligible_to_enroll_count: 5, is_renewing?: false) }
+
+        let(:min_participation_count_for_flex) do
+          (flex_plan_year.eligible_to_enroll_count * Settings.aca.shop_market.initial_application.flexible_contribution_model.employee_participation_ratio_minimum).ceil
+        end
+
+        let(:min_participation_count_for_standard) do
+          (standard_plan_year.eligible_to_enroll_count * Settings.aca.shop_market.employee_participation_ratio_minimum).ceil
+        end
+
+
+        it 'for employer eligible for flexible contribution model' do
+          @current_plan_year = flex_plan_year
+          expect(helper.calculate_participation_minimum.ceil).to eq min_participation_count_for_flex
+        end
+
+        it 'for employer NOT eligible for flexible contribution model' do
+          @current_plan_year = standard_plan_year
+          expect(helper.calculate_participation_minimum.ceil).to eq min_participation_count_for_standard
+        end
+      end
     end
 
-    it "should calculate eligible_to_enroll_count when not zero" do
-      expect(helper.calculate_participation_minimum.ceil).to eq 4
+    context 'renewing employers' do
+      let(:renewing_plan_year) { double("PlanYear", eligible_to_enroll_count: 5, is_renewing?: true) }
+      let(:min_participation_count) do
+        (renewing_plan_year.eligible_to_enroll_count * Settings.aca.shop_market.employee_participation_ratio_minimum).ceil
+      end
+
+      it 'should calculate eligible_to_enroll_count' do
+        @current_plan_year = renewing_plan_year
+        expect(helper.calculate_participation_minimum.ceil).to eq min_participation_count
+      end
     end
   end
 
@@ -593,5 +632,32 @@ end
     it "should return nil when there is no staff role for person " do
       expect(user3.person.hbx_staff_role).to eq nil
     end
+  end
+
+  describe 'float_fix' do
+
+    shared_examples_for 'float_fix' do |input, output|
+      it "should round the floating value #{input}" do
+        expect(helper.float_fix(input)).to eq(output)
+      end
+    end
+
+    it_behaves_like 'float_fix', 102.1699999999, 102.17
+    it_behaves_like 'float_fix', 866.0799999996, 866.08
+    it_behaves_like 'float_fix', (2.76 + 2.43), 5.19
+  end
+
+  describe 'round_down_float_two_decimals' do
+
+    shared_examples_for 'rounding float number' do |input, output|
+      it "should round down for given input #{input}" do
+        expect(helper.round_down_float_two_decimals(input)).to eq(output)
+      end
+    end
+
+    it_behaves_like 'rounding float number', 102.1693244, 102.16
+    it_behaves_like 'rounding float number', 102.177777777, 102.17
+    it_behaves_like 'rounding float number', 866.07512, 866.07
+    it_behaves_like 'rounding float number', (2.76 + 2.43), 5.19
   end
 end

@@ -39,7 +39,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       allow(consumer_role).to receive(:bookmark_url).and_return("test")
       get :privacy, params: {:aqhp => 'true'}
       expect(response).to have_http_status(:redirect)
-      expect(response).to redirect_to(person.consumer_role.bookmark_url+"?aqhp=true")
+      expect(response).to redirect_to(person.consumer_role.bookmark_url)
     end
     it "should render privacy" do
       allow(person).to receive(:consumer_role?).and_return(false)
@@ -202,7 +202,14 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
 
 
   context "POST create with failed construct_employee_role", dbclean: :after_each do
-    let(:person_params){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"000000111","user_id"=>"xyz"}}
+    let(:person_params){
+      {"dob"=>SymmetricEncryption.encrypt("1985-10-01"),
+        "first_name"=>SymmetricEncryption.encrypt("martin"),
+        "gender"=>SymmetricEncryption.encrypt("male"),
+        "last_name"=>SymmetricEncryption.encrypt("york"),
+        "middle_name"=>SymmetricEncryption.encrypt(""),
+        "ssn"=>SymmetricEncryption.encrypt("000000111"),
+        "user_id"=>SymmetricEncryption.encrypt("xyz")}}
     let(:person_user){ double("User") }
     before(:each) do
       allow(Factories::EnrollmentFactory).to receive(:construct_consumer_role).and_return(nil)
@@ -587,25 +594,18 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
   end
 
   describe "Get edit consumer role", dbclean: :after_each do
-    let(:consumer_role2){ FactoryBot.build(:consumer_role, :bookmark_url => "http://localhost:3000/insured/consumer_role/591f44497af8800bb5000016/edit") }
-    before(:each) do
-      current_user = user
-      allow(ConsumerRole).to receive(:find).and_return(consumer_role)
-      allow(consumer_role).to receive(:person).and_return(person)
-      allow(consumer_role).to receive(:build_nested_models_for_person).and_return(true)
-      allow(user).to receive(:person).and_return(person)
-      allow(person).to receive(:consumer_role).and_return(consumer_role2)
-      allow(consumer_role).to receive(:save!).and_return(true)
-      allow(consumer_role).to receive(:bookmark_url=).and_return(true)
-      allow(user).to receive(:has_consumer_role?).and_return(true)
+    let(:user) { FactoryBot.create(:user, :consumer, person: consumer_role.person) }
+    let(:consumer_role) { FactoryBot.create(:consumer_role) }
+    let(:other_consumer_role) { FactoryBot.create(:consumer_role, :bookmark_url => "http://localhost:3000/insured/consumer_role/591f44497af8800bb5000016/edit") }
 
+    before(:each) do
+      sign_in(user)
     end
 
     context "with bookmark_url pointing to another person's consumer role", dbclean: :after_each do
 
       it "should redirect to the edit page of the consumer role of the current user" do
-        sign_in user
-        get :edit, params: { id: "test" }
+        get :edit, params: { id: other_consumer_role.id.to_s }
         expect(response).to have_http_status(:redirect)
         expect(response).to redirect_to(edit_insured_consumer_role_path(user.person.consumer_role.id))
       end

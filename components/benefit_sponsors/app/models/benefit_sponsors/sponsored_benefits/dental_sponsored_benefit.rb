@@ -15,11 +15,13 @@ module BenefitSponsors
       end
 
       def elected_products
-        product_package.products.by_service_areas(recorded_service_area_ids).where(:id.in => elected_product_choices)
+        products = product_package.products.by_service_areas(recorded_service_area_ids).where(:id.in => elected_product_choices)
+        ::BenefitMarkets::Products::DentalProducts::DentalProduct.where(:id.in => products.pluck(:_id))
       end
 
       def renewal_elected_products_for(coverage_date)
-        renewal_products = elected_products.collect(&:renewal_product)
+        # adding compact as some of the products may not be available during renewal, compact will remove nil in such cases
+        renewal_products = elected_products.collect(&:renewal_product).compact
         BenefitMarkets::Products::Product.by_coverage_date(renewal_products, coverage_date)
       end
 
