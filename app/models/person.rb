@@ -444,15 +444,15 @@ class Person
   end
 
   def agency_roles
-    role_data(broker_agency_staff_roles) || role_data(general_agency_staff_roles)
+    role_data(broker_agency_staff_roles, :benefit_sponsors_broker_agency_profile_id) + role_data(general_agency_staff_roles, :benefit_sponsors_general_agency_profile_id)
   end
 
-  def role_data(data)
+  def role_data(data, agency)
     data.collect do |r|
       {
         id: r.id.to_s,
         state: r.aasm_state,
-        agency_id: r.try(:benefit_sponsors_broker_agency_profile_id).to_s || r.try(:benefit_sponsors_general_agency_profile_id).to_s,
+        agency_id: r.try(agency).to_s,
         type: r.class.name
       }
     end
