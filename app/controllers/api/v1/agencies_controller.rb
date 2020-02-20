@@ -11,13 +11,10 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
       )
   end
 
-
   def agency_staff
-    #@general_agency_profile = ::BenefitSponsors::Organizations::GeneralAgencyProfile.find(params[:id])
-    #render json: Person.all_agency_staff_roles.to_json(
       render json: Person.api_staff_roles.to_json(
-      :only =>[:_id, :profiles, :first_name, :last_name, :hbx_id, :dob],
-      :methods => [:agency_roles])
+      :only => [:_id, :profiles, :first_name, :last_name, :hbx_id, :dob],
+      :methods => [:agency_roles, :agent_emails])
   end
 
   def approve_general_agency_staff

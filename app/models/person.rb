@@ -450,10 +450,19 @@ class Person
   def role_data(data, agency)
     data.collect do |r|
       {
-        id: r.id.to_s,
-        state: r.aasm_state,
-        agency_id: r.try(agency).to_s,
+        aasm_state: r.aasm_state,
+        agency_profile_id: r.try(agency).to_s,
         type: r.class.name
+      }
+    end
+  end
+
+  def agent_emails
+    self.emails.collect do |email|
+      {
+        id: email.id.to_s,
+        kind: email.kind,
+        address: email.address
       }
     end
   end
