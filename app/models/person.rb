@@ -479,8 +479,12 @@ class Person
     end
   end
 
-  def agent_npm
+  def agent_npn
     self.general_agency_staff_roles.select{|role| role.is_primary }.try(:first).try(:npn) || self.broker_role.try(:npn)
+  end
+
+  def agent_role_id
+    self.general_agency_staff_roles.select{|role| role.is_primary }.try(:first).try(:id) || self.broker_role.try(:id)
   end
 
   def active_general_agency_staff_roles
