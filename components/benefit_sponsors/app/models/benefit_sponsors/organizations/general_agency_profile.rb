@@ -5,6 +5,7 @@ module BenefitSponsors
       include AASM
       include ::Config::AcaModelConcern
 
+
       MARKET_KINDS = individual_market_is_enabled? ? [:individual, :shop, :both] : [:shop]
 
       ALL_MARKET_KINDS_OPTIONS = {
@@ -66,8 +67,7 @@ module BenefitSponsors
       end
 
       def primary_staff
-        # TODO: need replace this with general_agency_primary_staff
-        general_agency_staff_roles.present? ? general_agency_staff_roles.last : nil
+        general_agency_staff_roles.present? ? general_agency_staff_roles.detect(&:is_primary) : nil
       end
 
       def general_agency_primary_staff
@@ -126,7 +126,9 @@ module BenefitSponsors
           if status == 'all'
             all
           else
-            list_embedded BenefitSponsors::Organizations::Organization.general_agency_profiles.where(:'profiles.aasm_state' => status).order_by([:legal_name]).to_a
+            list_embedded BenefitSponsors::Organizations::Organization.general_agency_profiles.where(:profiles =>
+                                                                                                         {:$elemMatch => {:aasm_state => status,
+                                                                                                                          :_type => "BenefitSponsors::Organizations::GeneralAgencyProfile"}}).order_by([:legal_name]).to_a
           end
         rescue
           []

@@ -17,13 +17,13 @@ class Insured::FamiliesController < FamiliesController
       build_employee_role_by_census_employee_id
       set_flash_by_announcement
       set_bookmark_url
-      set_admin_bookmark_url
+      set_admin_bookmark_url(home_insured_families_path)
       @active_sep = @family.latest_active_sep
 
       log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
 
       @hbx_enrollments = @family.enrollments.non_external.order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) || []
-      @all_hbx_enrollments_for_admin = @hbx_enrollments + HbxEnrollment.family_home_page_hidden_enrollments(@family)
+      @all_hbx_enrollments_for_admin = @hbx_enrollments + HbxEnrollment.family_canceled_enrollments(@family)
       # Sort by effective_on again. The latest enrollment will display at the top.
       @all_hbx_enrollments_for_admin = @all_hbx_enrollments_for_admin.sort_by(&:effective_on).reverse
       @enrollment_filter = @family.enrollments_for_display
@@ -48,7 +48,7 @@ class Insured::FamiliesController < FamiliesController
 
   def manage_family
     set_bookmark_url
-    set_admin_bookmark_url
+    set_admin_bookmark_url(manage_family_insured_families_path)
     @family_members = @family.active_family_members
     @resident = @person.is_resident_role_active?
     # @employee_role = @person.employee_roles.first
@@ -160,7 +160,7 @@ class Insured::FamiliesController < FamiliesController
       @resident_role_id = @person.resident_role.id
     end
 
-    if ((@qle.present? && @qle.shop?) && !@qualified_date && params[:qle_id].present?)
+    if @qle.present? && (@qle.shop? || @qle.fehb?) && !@qualified_date && params[:qle_id].present?
       benefit_application = @person.active_employee_roles.first.employer_profile.active_benefit_application
       reporting_deadline = @qle_date > today ? today : @qle_date + 30.days
       employee_role = @person.active_employee_roles.first
@@ -191,8 +191,12 @@ class Insured::FamiliesController < FamiliesController
 
     if @enrollment.present?
       @enrollment.reset_dates_on_previously_covered_members
-      @plan = @enrollment.product
-      @member_group = HbxEnrollmentSponsoredCostCalculator.new(@enrollment).groups_for_products([@plan]).first
+      if @enrollment.is_shop?
+        @plan = @enrollment.product
+        @member_group = HbxEnrollmentSponsoredCostCalculator.new(@enrollment).groups_for_products([@plan]).first
+      else
+        @plan = @enrollment.build_plan_premium
+      end
 
       begin
         @plan.name

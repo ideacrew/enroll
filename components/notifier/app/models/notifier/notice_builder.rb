@@ -235,7 +235,7 @@ module Notifier
     end
 
     def is_employer?
-      resource.is_a?("BenefitSponsors::Organizations::AcaShop#{site_key.capitalize}EmployerProfile".constantize)
+      resource.is_a?("BenefitSponsors::Organizations::AcaShop#{site_key.capitalize}EmployerProfile".constantize) || resource.is_a?(BenefitSponsors::Organizations::FehbEmployerProfile)
     end
 
     def is_employee?
@@ -358,8 +358,8 @@ module Notifier
     end
 
     def notice_type
-      "IVL" if is_consumer?
-      "EE" if is_employee?
+      return "IVL" if is_consumer?
+      return "EE" if is_employee?
       "ER" if is_employer?
     end
 

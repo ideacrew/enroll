@@ -41,12 +41,12 @@ def valid_enrollments(person)
   active_hbx_enrollments = []
   family = person.primary_family
   enrollments = HbxEnrollment.where(family_id: family.id, :aasm_state.in => ["auto_renewing", "coverage_selected", "unverified", "renewing_coverage_selected"], :kind => "individual")
-  return [] if enrollments.blank?
-  renewing_health_enrollments = enrollments.select{ |e| e.coverage_kind == "health" && e.effective_on.year == 2019}
-  renewing_dental_enrollments = enrollments.select{ |e| e.coverage_kind == "dental" && e.effective_on.year == 2019}
+  return [renewing_hbx_enrollments, active_hbx_enrollments] if enrollments.blank?
+  renewing_health_enrollments = enrollments.select{ |e| e.coverage_kind == "health" && e.effective_on.year == TimeKeeper.date_of_record.next_year.year}
+  renewing_dental_enrollments = enrollments.select{ |e| e.coverage_kind == "dental" && e.effective_on.year == TimeKeeper.date_of_record.next_year.year}
 
-  active_health_enrollments = enrollments.select{ |e| e.coverage_kind == "health" && e.effective_on.year == 2018}
-  active_dental_enrollments = enrollments.select{ |e| e.coverage_kind == "dental" && e.effective_on.year == 2018}
+  active_health_enrollments = enrollments.select{ |e| e.coverage_kind == "health" && e.effective_on.year == TimeKeeper.date_of_record.year}
+  active_dental_enrollments = enrollments.select{ |e| e.coverage_kind == "dental" && e.effective_on.year == TimeKeeper.date_of_record.year}
 
   active_hbx_enrollments << active_health_enrollments
   active_hbx_enrollments << active_dental_enrollments
@@ -106,25 +106,18 @@ end
 #need to exlude this list from UQHP_FEL data set.
 if InitialEvents.include?(event)
   @excluded_list = []
-  CSV.foreach("final_fre_aqhp_data_set.csv",:headers => true).each do |d|
+  file_name = event == "final_eligibility_notice_uqhp" ? "final_fel_aqhp_data_set.csv" : "final_fre_aqhp_data_set.csv"
+  CSV.foreach(file_name, :headers => true).each do |d|
     @excluded_list << d["subscriber_id"]
   end
 end
-
-
-# if event == "final_eligibility_notice_uqhp"
-#   @excluded_list = []
-#   CSV.foreach("final_fel_aqhp_data_set.csv",:headers =>true).each do |d|
-#     @excluded_list << d["subscriber_id"]
-#   end
-# end
 
 
 CSV.open(report_name, "w", force_quotes: true) do |csv|
   csv << field_names
   @data_hash.each do |ic_number , members|
     begin
-      #(next if members.any?{ |m| @excluded_list.include?(m["member_id"]) }) if InitialEvents.include?(event)
+      (next if members.any?{ |m| @excluded_list.include?(m["member_id"]) }) if InitialEvents.include?(event)
       subscriber = members.detect{ |m| m["dependent"].present? && m["dependent"].upcase == "NO"}
       next if subscriber.nil?
 

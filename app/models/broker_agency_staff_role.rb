@@ -111,7 +111,7 @@ class BrokerAgencyStaffRole
     def find(id)
       return nil if id.blank?
       people = Person.where("broker_agency_staff_roles._id" => BSON::ObjectId.from_string(id))
-      people.any? ? people[0].broker_agency_staff_roles.detect{|x| x.id == id} : nil
+      people.any? ? people[0].broker_agency_staff_roles.detect{|x| x.id.to_s == id.to_s} : nil
     end
   end
   

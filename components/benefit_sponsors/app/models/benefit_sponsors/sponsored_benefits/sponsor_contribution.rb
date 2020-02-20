@@ -40,8 +40,16 @@ module BenefitSponsors
       contribution_service.build_sponsor_contribution(new_product_package)
     end
 
+    def self.build_standard_sponsor_contribution
+      contribution_model_builder = ::BenefitMarkets::ContributionModels::ContributionModelBuilder.new      
+      contribution_model = BenefitMarkets::ContributionModels::ContributionModel.by_title("DC Shop Simple List Bill Contribution Model")
+      sponsor_contribution = contribution_model_builder.build_sponsor_contribution(contribution_model)
+      contribution_model_builder.build_contribution_levels(contribution_model, sponsor_contribution)
+      sponsor_contribution
+    end
+
     def renew(new_product_package)
-      new_sponsor_contribution = BenefitSponsors::SponsoredBenefits::SponsorContribution.sponsor_contribution_for(new_product_package)
+      new_sponsor_contribution = BenefitSponsors::SponsoredBenefits::SponsorContribution.build_standard_sponsor_contribution
       new_sponsor_contribution.contribution_levels.each do |new_contribution_level|
         current_contribution_level = contribution_levels.detect{|cl| cl.display_name == new_contribution_level.display_name}
         # TODO: Fix this so that this copies all relevent attributes.

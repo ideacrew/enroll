@@ -66,13 +66,30 @@ describe Factories::EnrollmentFactory, :dbclean => :after_each do
     let(:census_employee) {FactoryBot.create(:benefit_sponsors_census_employee, employer_profile: employer_profile, ssn: existing_person.ssn, dob: existing_person.dob, hired_on: hired_on, benefit_sponsorship: organization.active_benefit_sponsorship)}
 
     describe "existing consumer role adds employee role" do
-      before do
-        existing_person.consumer_role.update_attributes(contact_method: "Paper Only")
-        Factories::EnrollmentFactory.build_employee_role(existing_person, nil, employer_profile,census_employee, hired_on)
+      context 'build_employee_role' do
+        before do
+          existing_person.consumer_role.update_attributes(contact_method: "Paper Only")
+          Factories::EnrollmentFactory.build_employee_role(existing_person, nil, employer_profile,census_employee, hired_on)
+        end
+
+        it 'should set new_census_employee to employee_role' do
+          expect(census_employee.employee_role.new_census_employee).to eq(census_employee)
+        end
+
+        it 'should give employee_role the same contact method as consumer_role' do
+          expect(existing_person.employee_roles.first.contact_method).to eq(existing_person.consumer_role.contact_method)
+        end
       end
 
-      it 'should give employee_role the same contact method as consumer_role' do
-        expect(existing_person.employee_roles.first.contact_method).to eq(existing_person.consumer_role.contact_method)
+      context 'should not build_employee_role' do
+        before do
+          existing_person.unset(:gender)
+          Factories::EnrollmentFactory.build_employee_role(existing_person, nil, employer_profile,census_employee, hired_on)
+        end
+
+        it 'should not have a employee_role' do
+          expect(census_employee.employee_role).to be_nil
+        end
       end
     end
 

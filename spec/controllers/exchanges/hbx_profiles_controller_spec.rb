@@ -1080,13 +1080,17 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     let(:user) { double("User", :has_hbx_staff_role? => true)}
     let(:person) { double("Person", id: double)}
     let(:family_id) { double("Family_ID")}
-    let(:employer_id) { double("Employer_ID") }
+    let(:employer_id) { "employer_id_1234" }
     let(:organization) { double("Organization")}
+    let(:employer_profile) { double }
 
     before do
       sign_in user
       allow(Person).to receive(:find).with("#{person.id}").and_return person
-      allow(EmployerProfile).to receive(:find).and_return(double(organization: organization))
+      allow( BenefitSponsors::Organizations::Profile).to receive(:find).with(
+        "1234"
+      ).and_return(employer_profile)
+      allow(employer_profile).to receive(:organization).and_return(organization)
     end
 
     context "when action called through families datatable" do
@@ -1107,8 +1111,11 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     context "when action called through employers datatable" do
 
       before do
-        allow(Organization).to receive(:find).and_return organization
-        get :get_user_info, params: {employers_action_id: employer_id, people_id: [person.id]}, xhr: true
+        allow( BenefitSponsors::Organizations::Profile).to receive(:find).with(
+          "1234"
+        ).and_return(employer_profile)
+        allow(employer_profile).to receive(:organization).and_return(organization)
+        get :get_user_info, params: {employer_actions_id: employer_id, people_id: [person.id]}, xhr: true
       end
 
       it "should not populate the person instance variable" do
