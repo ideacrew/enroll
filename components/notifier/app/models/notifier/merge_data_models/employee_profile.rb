@@ -19,8 +19,8 @@ module Notifier
     attribute :coverage_terminated_on, String
     attribute :coverage_terminated_on_plus_30_days, String
     attribute :earliest_coverage_begin_date, String
-    attribute :ivl_oe_start_date, Date
-    attribute :ivl_oe_end_date, Date
+    attribute :ivl_oe_start_date, String
+    attribute :ivl_oe_end_date, String
     attribute :new_hire_oe_start_date, String
     attribute :new_hire_oe_end_date, String
     attribute :addresses, Array[MergeDataModels::Address]

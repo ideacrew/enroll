@@ -5,7 +5,7 @@
         <th> Org Legal Name: </th>
         <td> <%= @organization.legal_name %> </td>
       </tr>
-      <% address = @organization.primary_office_location.address %>
+      <% address = @organization.employer_profile.primary_office_location.address %>
       <tr>
         <th> Address: </th>
         <td> <%= address.address_1 + ',' + address.address_2 %></td>
@@ -39,7 +39,7 @@
             <td> <%= user.present? ? user.oim_id : "Nil" %> </td>
             <td> <%= user.present? ? user.email : "Nil" %> </td>
             <% if user.present? %>
-              <td> <%= user.last_sign_in_at.in_time_zone("Eastern Time (US & Canada)").to_date %> <strong>(<%= user.last_sign_in_at.in_time_zone("Eastern Time (US & Canada)").strftime("%I:%M%p") %>)</strong></td>
+              <td> <%= user.current_sign_in_at.in_time_zone("Eastern Time (US & Canada)").to_date %> <strong>(<%= user.current_sign_in_at.in_time_zone("Eastern Time (US & Canada)").strftime("%I:%M%p") %>)</strong></td>
             <% else %>
               <td> Nil </td>
             <% end %>

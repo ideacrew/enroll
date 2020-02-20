@@ -24,7 +24,7 @@ module BenefitSponsors
         end
 
         def staff_index?
-          self.send(:index?)
+          user.has_hbx_staff_role? || user.has_csr_role? || user.has_consumer_role?
         end
       end
     end

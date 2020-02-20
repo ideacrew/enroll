@@ -114,8 +114,10 @@ module BenefitSponsors
           if roster_upload_file_type.include?(file_content_type)
             file = params.require(:file)
             @roster_upload_form = BenefitSponsors::Forms::RosterUploadForm.call(file, @employer_profile)
+            roaster_upload_count = @roster_upload_form.census_records.length
             begin
               if @roster_upload_form.save
+                flash[:notice] = "#{roaster_upload_count } records uploaded from CSV"
                 redirect_to @roster_upload_form.redirection_url
               else
                 render @roster_upload_form.redirection_url || default_url
