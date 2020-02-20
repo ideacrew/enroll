@@ -181,18 +181,22 @@ describe BrokerRole, dbclean: :around_each do
       end
 
       context "and is denied by the HBX" do
-        before do
-          registered_broker_role.deny
-        end
 
         it "should transition to denied status" do
+          registered_broker_role.deny
           expect(registered_broker_role.aasm_state).to eq "denied"
         end
 
         it "should record the transition" do
+          registered_broker_role.deny
           expect(registered_broker_role.workflow_state_transitions.size).to eq 2
           expect(registered_broker_role.workflow_state_transitions.last.from_state).to eq "applicant"
           expect(registered_broker_role.workflow_state_transitions.last.to_state).to eq "denied"
+        end
+
+        it 'should transition from application_extended to denied' do
+          registered_broker_role.update_attributes(aasm_state: 'application_extended')
+          registered_broker_role.deny
         end
       end
 
@@ -209,6 +213,25 @@ describe BrokerRole, dbclean: :around_each do
           registered_broker_role.pending!
           registered_broker_role.extend_application!
           expect(registered_broker_role.aasm_state).to eq 'application_extended'
+        end
+      end
+
+      context 'broker agency accept' do
+        before :each do
+          allow(registered_broker_role).to receive(:is_primary_broker?).and_return(true)
+        end
+
+        it "should transition from broker_agency_pending to active status" do
+          registered_broker_role.pending!
+          registered_broker_role.broker_agency_accept!
+          expect(registered_broker_role.aasm_state).to eq "active"
+        end
+
+        it "should transition from application_extended to active status" do
+          registered_broker_role.pending!
+          registered_broker_role.extend_application!
+          registered_broker_role.broker_agency_accept!
+          expect(registered_broker_role.aasm_state).to eq "active"
         end
       end
 
