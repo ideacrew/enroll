@@ -506,14 +506,14 @@ class HbxEnrollment
         active_benefit_group_enrollments = HbxEnrollment.where({
           :"sponsored_benefit_package_id".in => [census_employee.active_benefit_group.try(:id)].compact,
           :"employee_role_id" => census_employee.employee_role_id,
-          :"aasm_state".ne => "shopping"
+          :"aasm_state".nin => ["shopping", "coverage_terminated"]
         }).to_a || []
       end
       if census_employee.renewal_published_benefit_group.try(:id)
         renewal_benefit_group_enrollments = HbxEnrollment.where({
           :"sponsored_benefit_package_id".in => [census_employee.renewal_published_benefit_group.try(:id)].compact,
           :"employee_role_id" => census_employee.employee_role_id,
-          :"aasm_state".ne => "shopping"
+          :"aasm_state".nin => ["shopping", "coverage_terminated"]
         }).to_a || []
       end
       enrollments += active_benefit_group_enrollments
