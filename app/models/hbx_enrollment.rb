@@ -498,23 +498,27 @@ class HbxEnrollment
     end
 
     def enrollments_for_display_census_employee_show(census_employee)
-        enrollments = []
-        return enrollments if census_employee.employee_role.blank? || census_employee.blank?
-        family_id = census_employee.employee_role.person.primary_family.id
+      enrollments = []
+      active_benefit_group_enrollments = []
+      renewal_benefit_group_enrollments = []
+      return enrollments if census_employee&.employee_role.blank?
+      if census_employee.active_benefit_group.try(:id)
         active_benefit_group_enrollments = HbxEnrollment.where({
           :"sponsored_benefit_package_id".in => [census_employee.active_benefit_group.try(:id)].compact,
           :"employee_role_id" => census_employee.employee_role_id,
           :"aasm_state".ne => "shopping"
-        }) || []
+        }).to_a || []
+      end
+      if census_employee.renewal_published_benefit_group.try(:id)
         renewal_benefit_group_enrollments = HbxEnrollment.where({
           :"sponsored_benefit_package_id".in => [census_employee.renewal_published_benefit_group.try(:id)].compact,
           :"employee_role_id" => census_employee.employee_role_id,
           :"aasm_state".ne => "shopping"
-        }) || []
-        enrollments += active_benefit_group_enrollments
-        enrollments += renewal_benefit_group_enrollments
-        enrollments.compact.uniq
+        }).to_a || []
       end
+      enrollments += active_benefit_group_enrollments
+      enrollments += renewal_benefit_group_enrollments
+      enrollments.compact.uniq
     end
 
     def by_hbx_id(policy_hbx_id)

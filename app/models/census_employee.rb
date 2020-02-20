@@ -1286,7 +1286,7 @@ class CensusEmployee < CensusMember
     return false if active_benefit_group_assignment.nil?
     coverage_terminated_on >= active_benefit_group_assignment.start_on
   end
-  
+
   def enrollments_for_display
     HbxEnrollment.enrollments_for_display_census_employee_show(self)
   end
