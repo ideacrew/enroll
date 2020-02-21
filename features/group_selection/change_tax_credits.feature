@@ -103,6 +103,6 @@ Scenario: Eligible IVL Family can Modify APTC
   And current user visits the family home page
   When consumer clicks on the make changes button
   When the user clicks on the Change Tax Credit button
-  Then the user should see that applied tax credit has been set to 50%
+  Then the user should see that applied tax credit has been set accordingly
 
 
