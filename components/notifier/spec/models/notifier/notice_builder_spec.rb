@@ -168,6 +168,7 @@ module Notifier
 
           before do
             allow(subject).to receive(:notice_path).and_return('tt_notice_path')
+            allow(subject).to receive(:join_pdfs).and_return(true)
           end
 
           context 'ivl_non_discrimination' do
