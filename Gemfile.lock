@@ -263,6 +263,7 @@ GEM
     builder (3.2.3)
     bunny (1.7.1)
       amq-protocol (~> 1.9.2)
+    byebug (11.1.1)
     capistrano (3.11.0)
       airbrussh (>= 1.0.0)
       i18n
@@ -917,6 +918,7 @@ DEPENDENCIES
   benefit_sponsors!
   bootsnap (>= 1.1)
   bson (~> 4.3)
+  byebug
   capistrano (~> 3.1)
   capistrano-rails (= 1.4)
   capybara (~> 3.12)
@@ -1030,4 +1032,4 @@ RUBY VERSION
    ruby 2.5.1p57
 
 BUNDLED WITH
-   2.0.1
+   2.1.4
