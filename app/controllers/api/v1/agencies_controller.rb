@@ -1,6 +1,7 @@
 class Api::V1::AgenciesController < Api::V1::ApiBaseController
 
   def index
+    authenticate_user!
     render json: BenefitSponsors::Organizations::Organization.all_agency_profiles
       .to_json(
              :only => [:dba, :legal_name],
