@@ -634,13 +634,13 @@ And(/the family has an active tax household/) do
 end
 
 And(/the tax household has at least one member that is APTC eligible/) do
-  tax_household = @family.active_household.latest_active_tax_household
+  tax_household = @family.active_household.latest_active_tax_household || FactoryBot.create(:tax_household, household: @family.active_household)
   tax_household.tax_household_members.create!(is_ia_eligible: true, applicant_id: @family.enrollments.first.hbx_enrollment_members.first.applicant_id)
   FactoryBot.create(:eligibility_determination, max_aptc: 500, tax_household: tax_household)
 end
 
 And(/the tax household has no members that are APTC eligible/) do
-  tax_household = @family.active_household.latest_active_tax_household
+  tax_household = @family.active_household.latest_active_tax_household || FactoryBot.create(:tax_household, household: @family.active_household)
   tax_household.tax_household_members.each do |thhm|
     thhm.update_attributes(is_ia_eligible: false, applicant_id: @family.enrollments.first.hbx_enrollment_members.first.applicant_id)
   end

@@ -88,9 +88,13 @@ module Insured
 
         allowed_metal_levels = ["platinum", "silver", "gold", "bronze"]
         product = enrollment.product
-        tax_household = family.active_household.latest_active_tax_household if family.active_household.latest_active_tax_household.present?
-        aptc_members = tax_household.aptc_members if tax_household.present?
-        true if allowed_metal_levels.include?(product.metal_level_kind.to_s) && enrollment.household.tax_households.present? && aptc_members.present?
+        if family.active_household.latest_active_tax_household.present?
+          tax_household = family.active_household.latest_active_tax_household
+          aptc_members = tax_household.aptc_members if tax_household.present?
+          true if allowed_metal_levels.include?(product.metal_level_kind.to_s) && enrollment.household.tax_households.present? && aptc_members.present?
+        else
+          false
+        end
       end
 
       def build_form_params
