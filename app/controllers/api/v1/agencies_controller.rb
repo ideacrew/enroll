@@ -16,7 +16,7 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
 
   def primary_agency_staff
       render json: Person.api_primary_staff_roles.to_json(
-      :only => [:profiles, :first_name, :last_name],
+      :only => [:profiles, :first_name, :last_name, :hbx_id],
       :methods => [:agent_npn, :agent_role_id, :connected_profile_id])
   end
 

@@ -448,7 +448,7 @@ class Person
       {
       "is_active" => true,
       "$or" => [
-          { "broker_agency_staff_roles" => { "$exists" => true }, "broker_role._id" => {"$exists" => true} },
+          { "broker_role._id" => {"$exists" => true} },
           { "general_agency_staff_roles.is_primary" =>  true }
         ]
       }
