@@ -1,7 +1,8 @@
 class Api::V1::AgenciesController < Api::V1::ApiBaseController
 
+  before_action :authenticate_user!, only: [:index, :agency_staff, :primary_agency_staff]
+
   def index
-    authenticate_user!
     render json: BenefitSponsors::Organizations::Organization.all_agency_profiles
       .to_json(
              :only => [:dba, :legal_name],
@@ -10,12 +11,14 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
   end
 
   def agency_staff
+    authenticate_user!
       render json: Person.api_staff_roles.to_json(
       :only => [:_id, :profiles, :first_name, :last_name, :hbx_id, :dob],
       :methods => [:agency_roles, :agent_emails])
   end
 
   def primary_agency_staff
+    authenticate_user!
       render json: Person.api_primary_staff_roles.to_json(
       :only => [:profiles, :first_name, :last_name, :hbx_id],
       :methods => [:agent_npn, :agent_role_id, :connected_profile_id])
