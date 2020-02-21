@@ -13,7 +13,7 @@ class VlpDocument < Document
       "SEVIS ID",
       "Naturalization Number",
       "Receipt Number",
-      "Citizenship Number",
+      "Certificate Number",
       "Card Number"
     ]
 
@@ -98,7 +98,7 @@ class VlpDocument < Document
   field :sevis_id, type: String
   field :naturalization_number, type: String
   field :receipt_number, type: String
-  field :citizenship_number, type: String
+  field :certificate_number, type: String
   field :card_number, type: String
   field :country_of_citizenship, type: String
 
@@ -127,7 +127,7 @@ class VlpDocument < Document
                         :sevis_id,
                         :naturalization_number,
                         :receipt_number,
-                        :citizenship_number,
+                        :certificate_number,
                         :card_number,
                         :country_of_citizenship,
                         :expiration_date,
@@ -142,7 +142,7 @@ class VlpDocument < Document
   scope :uploaded, ->{ where(identifier: {:$exists => true}) }
 
   validates :alien_number, length: { is: 9 }, :allow_blank => true
-  validates :citizenship_number, length: { in: 6..12 }, :allow_blank => true
+  validates :certificate_number, length: { in: 6..12 }, :allow_blank => true
   validates :i94_number, length: { is: 11 }, :allow_blank => true
   validates :naturalization_number, length: { in: 6..12 }, :allow_blank => true
   validates :passport_number, length: { in: 6..12 }, :allow_blank => true
@@ -158,7 +158,7 @@ class VlpDocument < Document
         "I-551 (Permanent Resident Card)": [:alien_number, :card_number],
         "I-571 (Refugee Travel Document)": [:alien_number],
         "I-766 (Employment Authorization Card)": [:alien_number, :card_number, :expiration_date],
-        "Certificate of Citizenship": [:alien_number, :citizenship_number],
+        "Certificate of Citizenship": [:alien_number, :certificate_number],
         "Naturalization Certificate": [:alien_number, :naturalization_number],
         "Machine Readable Immigrant Visa (with Temporary I-551 Language)": [:alien_number, :passport_number, :country_of_citizenship],
         "Temporary I-551 Stamp (on passport or I-94)": [:alien_number],
