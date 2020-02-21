@@ -46,7 +46,7 @@ gem 'mongoid-history'
 gem 'mongoid-versioning'
 gem 'mongoid_rails_migrations', git: 'https://github.com/adacosta/mongoid_rails_migrations.git', branch: 'master'
 gem 'mongoid_userstamp'
-gem 'nokogiri', '1.6.7.2'
+gem 'nokogiri', '1.9.1'
 gem 'nokogiri-happymapper', :require => 'happymapper'
 gem 'non-stupid-digest-assets', '~> 1.0', '>= 1.0.9'
 gem "notifier",           path: "components/notifier"
@@ -128,14 +128,15 @@ end
 
 group :test do
   gem 'action_mailer_cache_delivery', '~> 0.3.7'
-  gem 'capybara', '2.6.2'
+  gem 'capybara'
   gem 'capybara-screenshot'
-  gem 'cucumber', '2.3.3'
-  gem 'cucumber-rails', '1.4.3', :require => false
+  gem 'cucumber', '3.1.2'
+  gem 'cucumber-rails', '1.6.0', :require => false
   gem 'database_cleaner', '1.5.3'
   gem 'fakeredis', :require => 'fakeredis/rspec'
   gem 'mongoid-rspec', '3.0.0'
-  gem 'poltergeist'
+  gem 'selenium-webdriver'
+  gem 'webdriver'
   gem 'rspec-instafail'
   gem 'rspec-benchmark'
   gem 'ruby-progressbar', '~> 1.7'
