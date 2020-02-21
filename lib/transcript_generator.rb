@@ -119,6 +119,7 @@ class TranscriptGenerator
         end
       end
     end
+    puts '.....Refer latest shop_enrollment_change_sets_***_.csv for results.....' unless Rails.env.test?
   end
 
   def display_family_transcripts
