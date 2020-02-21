@@ -161,6 +161,32 @@ module Notifier
           expect(UserMailer).to have_received(:generic_notice_alert)
         end
       end
+
+      describe 'inserts' do
+
+        context 'for IVL inserts' do
+
+          before do
+            allow(subject).to receive(:notice_path).and_return('tt_notice_path')
+          end
+
+          context 'ivl_non_discrimination' do
+            it {expect(subject.ivl_non_discrimination).to be_truthy}
+          end
+
+          context 'ivl_taglines' do
+            it {expect(subject.ivl_taglines).to be_truthy}
+          end
+
+          context 'ivl_attach_envelope' do
+            it {expect(subject.ivl_attach_envelope).to be_truthy}
+          end
+
+          after do
+            File.delete('tt_notice_path') if File.exist?('tt_notice_path')
+          end
+        end
+      end
     end
   end
 end
