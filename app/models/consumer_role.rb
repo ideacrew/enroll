@@ -373,7 +373,7 @@ class ConsumerRole
   end
 
   def citizenship_number
-    vlp_documents.select{|doc| doc.certificate_number.present? }.first.try(:certificate_number)
+    vlp_documents.select{|doc| doc.citizenship_number.present? }.first.try(:citizenship_number)
   end
 
   def visa_number
