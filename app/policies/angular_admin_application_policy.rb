@@ -1,6 +1,6 @@
 class AngularAdminApplicationPolicy < ApplicationPolicy
   def visit?
-    return true if user.has_hbx_staff_role?
+    return false unless user.has_hbx_staff_role?
     permission = user.person.hbx_staff_role.permission
     return false unless permission
     permission.approve_broker &&
