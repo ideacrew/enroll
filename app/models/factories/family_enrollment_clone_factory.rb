@@ -35,6 +35,7 @@ module Factories
 
       clone_enrollment.employee_role_id = enrollment.employee_role_id
       clone_enrollment.product_id = enrollment.product_id
+      clone_enrollment.predecessor_enrollment_id = enrollment.id
       clone_enrollment.coverage_kind = enrollment.coverage_kind
 
       clone_enrollment.kind = 'employer_sponsored_cobra'
