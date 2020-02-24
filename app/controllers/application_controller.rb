@@ -213,7 +213,7 @@ class ApplicationController < ActionController::Base
 
     def after_sign_in_path_for(resource)
       if request.referrer =~ /sign_in/
-        redirect_path = confirm_last_portal_visited(request, resource)
+        redirect_path = confirm_last_portal(request, resource)
         session[:portal] || redirect_path
       else
         session[:portal] || request.referer || root_path
