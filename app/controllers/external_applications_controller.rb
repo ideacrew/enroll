@@ -10,7 +10,7 @@ class ExternalApplicationsController < ApplicationController
     if external_application
       authorize external_application, :visit?
       @url = external_application.url
-      @jwt = current_user.generate_jwt(warden.config[:default_scope], 'admin')
+      @jwt = current_user.generate_jwt(warden.config[:default_scope], nil)
     else
       render status: 404, nothing: true
     end

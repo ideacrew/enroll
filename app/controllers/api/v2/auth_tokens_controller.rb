@@ -7,7 +7,7 @@ module Api
       end
 
       def refresh
-        token = current_user.generate_jwt(warden.config[:default_scope], 'admin')
+        token = current_user.generate_jwt(warden.config[:default_scope], nil)
         reply_body = {
           jwt: token
         }

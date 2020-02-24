@@ -12,7 +12,6 @@ Devise.setup do |config|
 
   config.jwt do |jwt|
     jwt.secret = "2f79bac651f5ebedd286c976febdf8bb7f74b7f1a8013ba23c0f8e5a42faaaedc53f2c9e1062ecbcb48a277636bc9b45cc24a0a5512df0862520c366c0c01489"
-    jwt.aud_header = "admin"
   end
 
   # The secret key used by Devise. Devise uses this key to generate
