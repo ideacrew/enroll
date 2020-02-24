@@ -72,9 +72,9 @@ Capybara::Screenshot.webkit_options = { width: 2280, height: 1800 }
 Capybara::Screenshot.prune_strategy = :keep_last_run
 Webdrivers.cache_time = 86_400
 
-Capybara.register_driver :selenium_chrome do |app|
+Capybara.register_driver :selenium_chrome_custom do |app|
   options = Selenium::WebDriver::Chrome::Options.new
-  options.add_argument("headless")
+  options.headless!
   options.add_argument("no-sandbox")
   options.add_argument("--window-size=1024,768")
 
@@ -93,4 +93,6 @@ Capybara.register_driver :selenium_chrome do |app|
   )
 end
 
-Capybara.default_driver = :selenium_chrome
+Capybara.default_driver = :selenium_chrome_custom
+Capybara.use_default_driver
+Capybara.current_driver = :selenium_chrome_custom

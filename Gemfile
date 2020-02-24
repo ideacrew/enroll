@@ -135,7 +135,7 @@ group :test do
   gem 'database_cleaner', '1.5.3'
   gem 'fakeredis', :require => 'fakeredis/rspec'
   gem 'mongoid-rspec', '3.0.0'
-  gem 'selenium-webdriver'
+  gem 'selenium-webdriver', '3.14.0'
   gem 'webdriver'
   gem 'rspec-instafail'
   gem 'rspec-benchmark'
