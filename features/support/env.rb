@@ -72,6 +72,10 @@ Capybara::Screenshot.webkit_options = { width: 2280, height: 1800 }
 Capybara::Screenshot.prune_strategy = :keep_last_run
 Webdrivers.cache_time = 86_400
 
+Capybara::Screenshot.register_driver(:selenium_chrome_custom) do |driver, path|
+  driver.browser.save_screenshot(path)
+end
+
 Capybara.register_driver :selenium_chrome_custom do |app|
   options = Selenium::WebDriver::Chrome::Options.new
   options.headless!
