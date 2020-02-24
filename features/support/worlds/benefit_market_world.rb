@@ -150,16 +150,12 @@ module BenefitMarketWorld
   end
 
   def create_benefit_market_catalog_for(effective_date)
-    if benefit_market.benefit_market_catalog_for(effective_date).present?
-      benefit_market.benefit_market_catalog_for(effective_date)
-    else
+    benefit_market.benefit_market_catalogs.detect { |catalog| catalog.application_period_cover?(effective_date) } ||
       FactoryGirl.create(:benefit_markets_benefit_market_catalog, :with_product_packages,
         benefit_market: benefit_market,
         product_kinds: product_kinds,
         title: "SHOP Benefits for #{effective_date.year}",
-        application_period: (effective_date.beginning_of_year..effective_date.end_of_year)
-      )
-    end
+        application_period: (effective_date.beginning_of_year..effective_date.end_of_year))
   end
 end
 
