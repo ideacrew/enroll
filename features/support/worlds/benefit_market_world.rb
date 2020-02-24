@@ -125,7 +125,7 @@ module BenefitMarketWorld
         service_area: service_area,
         renewal_service_area: renewal_service_area,
         issuer_profile_id: issuer_profile.id,
-        renewal_issuer_profile_id: issuer_profile.id,
+        #renewal_issuer_profile_id: issuer_profile.id,
         metal_level_kind: :gold)
   end
 
@@ -138,7 +138,7 @@ module BenefitMarketWorld
         service_area: service_area,
         renewal_service_area: renewal_service_area, 
         issuer_profile_id: dental_issuer_profile.id,
-        renewal_issuer_profile_id: dental_issuer_profile.id,
+        #renewal_issuer_profile_id: dental_issuer_profile.id,
         metal_level_kind: :dental)
   end
 
