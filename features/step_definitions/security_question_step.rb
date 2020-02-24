@@ -102,6 +102,10 @@ end
 # Old one, doesn't seem to be working for choosing the questions
 Then(/^I select the all security question and give the answer$/) do
   (0..2).each do |num|
+    within all('div.selectric-wrapper', visible: false)[num] do
+      find('.selectric').click
+      all('li')[-1].click
+    end
     page.all('.security-question-select', visible: false)[num].set("Security Question #{num + 1}")
     page.all('.interaction-field-control-security-question-response-question-answer', visible: false)[num].set("Answer #{num+1}")
   end

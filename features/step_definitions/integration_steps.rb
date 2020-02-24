@@ -576,10 +576,6 @@ When (/^(.*) logs? out$/) do |someone|
 end
 
 When(/^.+ go(?:es)? to register as an employee$/) do
-  find("option[id='sec-answer-0-0']").click
-  find("option[id='sec-answer-0-1']").click
-  find("option[id='sec-answer-0-2']").click
-  click_button('Save Responses')
   find('.interaction-click-control-continue').click
 end
 
