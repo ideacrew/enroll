@@ -24,7 +24,7 @@ namespace :reports do
               "Premium Amount", "Premium Total", "Policy APTC", "Policy Employer Contribution",
               "Coverage Start", "Coverage End",
               "Employer Name", "Employer DBA", "Employer FEIN", "Employer HBX ID",
-              "Home Address", "Mailing Address","Email","Phone Number","Broker"]
+              "Home Address", "Mailing Address","Work Email", "Home Email", "Phone Number","Broker", "Race", "Ethnicity", "Citizen Status"]
       while offset<= total_count
         enrollments.offset(offset).limit(batch_size).no_timeout.each do |enr|
           count += 1
@@ -57,9 +57,15 @@ namespace :reports do
                   enr.employee_role_id.blank? ? nil : enr.employer_profile.dba,
                   enr.employee_role_id.blank? ? nil : enr.employer_profile.fein,
                   enr.employee_role_id.blank? ? nil : enr.employer_profile.hbx_id,
-                  per.home_address.try(:full_address) || enr.subscriber.person.home_address&.full_address,
-                  per.mailing_address.try(:full_address) || enr.subscriber.person.mailing_address&.full_address,
-                  per.emails.first.try(:email_address), per.phones.first&.phone_number, family&.active_broker_agency_account&.writing_agent&.person&.full_name
+                  per.home_address&.full_address || enr.subscriber.person.home_address&.full_address,
+                  per.mailing_address&.full_address || enr.subscriber.person.mailing_address&.full_address,
+                  per.work_email&.address || enr.subscriber.person.work_email&.address ,
+                  per.home_email&.address || enr.subscriber.person.home_email&.address,
+                  per&.work_phone_or_best || enr.subscriber.person&.work_phone_or_best,
+                  family&.active_broker_agency_account&.writing_agent&.person&.full_name,
+                  per&.race,
+                  per&.ethnicity,
+                  per&.citizen_status
                 ]
               end
             end
