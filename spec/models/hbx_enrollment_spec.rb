@@ -60,7 +60,8 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
             {
               :"sponsored_benefit_package_id".in => [census_employee.active_benefit_group.try(:id)].compact,
               :"employee_role_id" => census_employee.employee_role_id,
-              :"aasm_state".nin => ["shopping", "coverage_terminated", "coverage_expired"]
+              :"aasm_state".nin => ["shopping", "coverage_terminated", "coverage_expired", "inactive"],
+              :"external_enrollment" => false
             }
           ).and_return([active_benefit_enrollment])
         end
