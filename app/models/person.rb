@@ -340,11 +340,12 @@ class Person
   end
 
   def role_data(data, agency)
-    data.collect do |r|
+    data.collect do |role|
       {
-        aasm_state: r.aasm_state,
-        agency_profile_id: r.try(agency).to_s,
-        type: r.class.name
+        aasm_state: role.aasm_state,
+        agency_profile_id: role.try(agency).to_s,
+        type: role.class.name,
+        role_id: role._id.to_s
       }
     end
   end
