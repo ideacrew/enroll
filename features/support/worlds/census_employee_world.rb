@@ -178,7 +178,7 @@ And(/employee (.*) already matched with employer (.*?)(?: and (.*?))? and logged
                                      ssn: person[:ssn],
                                      dob: person[:dob],
                                      census_employee_id: ce.id,
-                                     employer_profile_id: profile.id,
+                                     benefit_sponsors_employer_profile_id: profile.id,
                                      hired_on: ce.hired_on)
 
   ce.update_attributes(employee_role_id: person_record.employee_roles.first.id)
