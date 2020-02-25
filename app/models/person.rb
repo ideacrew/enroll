@@ -344,7 +344,8 @@ class Person
       {
         aasm_state: r.aasm_state,
         agency_profile_id: r.try(agency).to_s,
-        type: r.class.name
+        type: r.class.name,
+        role_id: r._id.to_s
       }
     end
   end
