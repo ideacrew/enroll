@@ -19,7 +19,7 @@ namespace :reports do
     timestamp = Time.now.strftime('%Y%m%d%H%M')
     CSV.open("enrollment_report_#{timestamp}.csv", 'w') do |csv|
       csv << ["Subscriber ID", "Member ID" , "Policy ID", "Enrollment Group ID", "Status",
-              "First Name", "Last Name","SSN", "DOB", "Gender", "Relationship",
+              "First Name", "Last Name","SSN", "DOB", "Gender", "Relationship", "Benefit Type",
               "Plan Name", "HIOS ID", "Plan Metal Level", "Carrier Name",
               "Premium Amount", "Premium Total", "Policy APTC", "Policy Employer Contribution",
               "Coverage Start", "Coverage End",
@@ -49,6 +49,7 @@ namespace :reports do
                   per.dob.strftime("%Y%m%d"),
                   per.gender,
                   en.primary_relationship,
+                  enr.coverage_kind,
                   product.name, product.hios_id, product.metal_level, product.carrier_profile.abbrev,
                   premium_amount, enr.total_premium, en.applied_aptc_amount, enr.total_employer_contribution,
                   enr.effective_on.blank? ? nil : enr.effective_on.strftime("%Y%m%d"),
