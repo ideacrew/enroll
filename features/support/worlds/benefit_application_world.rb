@@ -63,7 +63,6 @@ module BenefitApplicationWorld
 
   def create_application(new_application_status: new_application_status)
     application_dates = application_dates_for(current_effective_date, new_application_status)
-
     @new_application = FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog,
                        :with_benefit_package,
                        benefit_sponsorship: @employer_profile.active_benefit_sponsorship,
@@ -169,8 +168,10 @@ end
 #     employer Acme Inc. has expired  and renewing enrollment_eligible benefit applications
 #     employer Acme Inc. has expired  and renewing active benefit applications
 And(/employer (.*) has (.*) and renewing (.*) benefit applications$/) do |legal_name, earlier_application_status, new_application_status|
-  @employer_profile = @organization[legal_name].employer_profile
-  create_applications(predecessor_status: earlier_application_status.to_sym, new_application_status: new_application_status.to_sym)
+  @employer_profile = employer_profile(legal_name)
+  earlier_application = create_application(new_application_status: earlier_application_status.to_sym)
+  @renewal_application = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(earlier_application).renew_application[1]
+  @renewal_application.update_attributes!(aasm_state: new_application_status.to_sym)
 end
 
 
