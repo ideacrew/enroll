@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe 'load_dental_pricing_and_contribution_models', :type => :task do
+RSpec.describe 'load_dental_pricing_and_contribution_models', :type => :task, :dbclean => :around_each do
   before :all do
     Rake.application.rake_require "tasks/migrations/plans/load_dental_pricing_and_contribution_models"
     Rake::Task.define_task(:environment)
