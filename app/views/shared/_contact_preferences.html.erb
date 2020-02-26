@@ -5,6 +5,7 @@
   <div class="phone no-pd">
     <%= f.fields_for role, errors: {}, fieldset: true do |person_role| %>
       <%= person_role.hidden_field :id if role == :employee_roles %>
+      <% next if role == :employee_roles && !person_role.object&.is_active? %>
       <div class="row row-form-wrapper no-buffer <%= 'hidden' if @identifier %>">
         <div class="col-md-6 col-sm-6 form-group-lg no-pd">
           <label class='personal_landing_page_label'>Contact Method</label>

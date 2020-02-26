@@ -3,7 +3,7 @@ FactoryBot.define do
     
     sponsor_contribution_kind { "::BenefitSponsors::SponsoredBenefits::FixedPercentSponsorContribution" }
     contribution_calculator_kind  { "::BenefitSponsors::ContributionCalculators::SimpleShopReferencePlanContributionCalculator" }
-    title  { "#{Settings.aca.state_abbreviation} Shop Contribution Model" }
+    title  { "#{Settings.site.key.to_s.upcase} Shop Simple List Bill Contribution Model" }
     many_simultaneous_contribution_units { true }
 
     after(:build) do |contribution_model|

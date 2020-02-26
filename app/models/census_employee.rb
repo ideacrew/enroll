@@ -847,6 +847,119 @@ class CensusEmployee < CensusMember
 
   class << self
 
+    def download_census_employees_roster(employer_profile_id)
+      columns = [
+        "Family ID # (to match family members to the EE & each household gets a unique number)(optional)",
+        "Relationship (EE, Spouse, Domestic Partner, or Child)",
+        "Last Name",
+        "First Name",
+        "Middle Name or Initial (optional)",
+        "Suffix (optional)",
+        "Email Address",
+        "SSN / TIN (Required for EE & enter without dashes)",
+        "Date of Birth (MM/DD/YYYY)",
+        "Gender",
+        "Date of Hire",
+        "Date of Termination (optional)",
+        "Is Business Owner?",
+        "Benefit Group (optional)",
+        "Plan Year (Optional)",
+        "Address Kind(Optional)",
+        "Address Line 1(Optional)",
+        "Address Line 2(Optional)",
+        "City(Optional)",
+        "State(Optional)",
+        "Zip(Optional)"
+      ]
+
+      CSV.generate(headers: true) do |csv|
+        csv << (["#{Settings.site.long_name} Employee Census Template"] +  6.times.collect{ "" } + [Date.new(2016,10,26)] + 5.times.collect{ "" } + ["1.1"])
+        csv << %w(employer_assigned_family_id employee_relationship last_name first_name  middle_name name_sfx  email ssn dob gender  hire_date termination_date  is_business_owner benefit_group plan_year kind  address_1 address_2 city  state zip)
+        csv << columns
+        census_employees_query_criteria(employer_profile_id).each do |rec|
+          is_active = rec["benefit_group_assignments"].any?{|bga| bga["is_active"] == true}
+          csv << insert_census_data(rec, is_active)
+
+          if rec["census_dependents"].present?
+            rec["census_dependents"].each do |dependent|
+              csv << insert_census_data(dependent, is_active)
+            end
+          end
+        end
+      end
+    end
+
+    def insert_census_data(rec, is_active)
+      values = [
+        rec["employer_assigned_family_id"],
+        relationship_mapping[rec["employee_relationship"]],
+        rec["last_name"],
+        rec["first_name"],
+        rec["middle_name"],
+        rec["name_sfx"],
+        rec["email"].present? ? rec["email"]["address"] : nil,
+        SymmetricEncryption.decrypt(rec["encrypted_ssn"]),
+        rec["dob"].present? ? rec["dob"].strftime("%m/%d/%Y") : nil,
+        rec["gender"]
+      ]
+
+      if is_active
+        if rec["hired_on"].present?
+          values += [
+            rec["hired_on"].present? ? rec["hired_on"].strftime("%m/%d/%Y") : "",
+            rec["employment_terminated_on"].present? ? rec["employment_terminated_on"].strftime("%m/%d/%Y") : "",
+            rec["is_business_owner"] ? "yes" : "no"
+          ]
+        else
+          values += ["", "", "no"]
+        end
+
+        values += 2.times.collect{ "" }
+        if rec["address"].present?
+          array = []
+          array.push(rec["address"]["kind"])
+          array.push(rec["address"]["address_1"])
+          array.push(rec["address"]["address_2"].to_s)
+          array.push(rec["address"]["city"])
+          array.push(rec["address"]["state"])
+          array.push(rec["address"]["zip"])
+          values += array
+        else
+          values += 6.times.collect{ "" }
+        end
+      end
+
+      values
+    end
+
+    def relationship_mapping
+      {
+        "self" => "employee",
+        "spouse" => "spouse",
+        "domestic_partner" => "domestic partner",
+        "child_under_26" => "child",
+        "disabled_child_26_and_over" => "disabled child"
+      }
+    end
+
+    def census_employees_query_criteria(employer_profile_id)
+      CensusEmployee.collection.aggregate(
+        [
+          {'$match' => {
+            'benefit_sponsors_employer_profile_id' => employer_profile_id
+          }},
+          {"$sort" => {"last_name" => 1, "first_name" => 1}},
+          { "$project" => { "first_name" => 1, "last_name" => 1, "middle_name" => 1, "name_sfx" => 1,
+                            "dob" => 1, "gender" => 1, "hired_on" => 1, "aasm_state" => 1, "encrypted_ssn" =>1,
+                            "employment_terminated_on" => 1, "benefit_group_assignments.is_active" => 1,
+                            "email.address" => 1, "address" => 1, "employee_relationship" => 1,"is_business_owner" => 1,
+                            "employer_assigned_family_id" => 1,
+                            "census_dependents" => { "$concatArrays" => ["$census_dependents", "$census_dependents.email", "$census_dependents.address"] } } },
+        ],
+        :allow_disk_use => true
+      )
+    end
+
     def scoped_profile(employer_profile_id)
       if EmployerProfile.find(employer_profile_id).is_a?(EmployerProfile)
         by_old_employer_profile_id(employer_profile_id)
@@ -1088,89 +1201,6 @@ class CensusEmployee < CensusMember
       last_name: lname_exp,
       dob: dob
     }).any_in("benefit_group_assignments.benefit_group_id" => [bg_id])
-  end
-
-def self.to_csv
-
-    columns = [
-      "Family ID # (to match family members to the EE & each household gets a unique number)(optional)",
-      "Relationship (EE, Spouse, Domestic Partner, or Child)",
-      "Last Name",
-      "First Name",
-      "Middle Name or Initial (optional)",
-      "Suffix (optional)",
-      "Email Address",
-      "SSN / TIN (Required for EE & enter without dashes)",
-      "Date of Birth (MM/DD/YYYY)",
-      "Gender",
-      "Date of Hire",
-      "Date of Termination (optional)",
-      "Is Business Owner?",
-      "Benefit Group (optional)",
-      "Plan Year (Optional)",
-      "Address Kind(Optional)",
-      "Address Line 1(Optional)",
-      "Address Line 2(Optional)",
-      "City(Optional)",
-      "State(Optional)",
-      "Zip(Optional)"
-    ]
-
-    CSV.generate(headers: true) do |csv|
-      csv << (["#{Settings.site.long_name} Employee Census Template"] +  6.times.collect{ "" } + [Date.new(2016,10,26)] + 5.times.collect{ "" } + ["1.1"])
-      csv << %w(employer_assigned_family_id employee_relationship last_name first_name  middle_name name_sfx  email ssn dob gender  hire_date termination_date  is_business_owner benefit_group plan_year kind  address_1 address_2 city  state zip)
-      csv << columns
-      all.each do |census_employee|
-        ([census_employee] + census_employee.census_dependents.to_a).each do |census_member|
-          values = [
-            census_member.employer_assigned_family_id,
-            census_member.relationship_string,
-            census_member.last_name,
-            census_member.first_name,
-            census_member.middle_name,
-            census_member.name_sfx,
-            census_member.email_address,
-            census_member.ssn,
-            census_member.dob.strftime("%m/%d/%Y"),
-            census_member.gender
-          ]
-
-        data = [
-            "#{census_employee.first_name} #{census_employee.middle_name} #{census_employee.last_name} ",
-            census_employee.dob,
-            census_employee.hired_on,
-            census_employee.aasm_state.humanize.downcase,
-            census_employee.renewal_benefit_group_assignment.try(:benefit_group).try(:title)
-        ]
-
-          if active_assignment = census_employee.active_benefit_group_assignment
-            data += [
-                active_assignment.benefit_group.title,
-                "dental: #{ d = active_assignment.try(:hbx_enrollments).detect{|enrollment| enrollment.coverage_kind == 'dental'}.try(:aasm_state).try(:humanize).try(:downcase)} health: #{ active_assignment.try(:hbx_enrollments).detect{|enrollment| enrollment.coverage_kind == 'health'}.try(:aasm_state).try(:humanize).try(:downcase)}"
-            ]
-
-            if census_member.is_a?(CensusEmployee)
-              values += [
-                census_member.hired_on.present? ? census_member.hired_on.strftime("%m/%d/%Y") : "",
-                census_member.employment_terminated_on.present? ? census_member.employment_terminated_on.strftime("%m/%d/%Y") : "",
-                census_member.is_business_owner ? "yes" : "no"
-              ]
-            else
-              values += ["", "", "no"]
-            end
-
-            values += 2.times.collect{ "" }
-            if census_member.address.present?
-              values += census_member.address.to_a
-            else
-              values += 6.times.collect{ "" }
-            end
-          end
-
-          csv << values
-        end
-      end
-    end
   end
 
   def existing_cobra
