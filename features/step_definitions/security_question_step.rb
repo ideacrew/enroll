@@ -119,8 +119,11 @@ When(/^user fills out the security questions modal$/) do
   security_questions = SecurityQuestion.all.to_a.map(&:id)
   (0..2).each do |num|
     within all('div.selectric-wrapper.selectric-security-question-select', visible: false)[num] do
+      sleep 1
       find('.selectric').click
+      sleep 1
       all('li')[-1].click
+      sleep 1
     end
     page.all('.interaction-field-control-security-question-response-question-answer', visible: false)[num].set("Answer #{num+1}")
   end
