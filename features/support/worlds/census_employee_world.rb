@@ -182,6 +182,9 @@ And(/employee (.*) already matched with employer (.*?)(?: and (.*?))? and logged
                                      hired_on: ce.hired_on)
 
   ce.update_attributes(employee_role_id: person_record.employee_roles.first.id)
+  sponsorship.benefit_applications.expired.each do |benefit_application|
+    benefit_application.benefit_packages.each{|benefit_package| ce.add_benefit_group_assignment(benefit_package) }
+  end
 
   FactoryGirl.create :family, :with_primary_family_member, person: person_record
   user = FactoryGirl.create(:user,
