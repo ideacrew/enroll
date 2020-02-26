@@ -24,12 +24,13 @@ h1.heading-text Add Benefit Package
     - oe_end_on = f.object.open_enrollment_end_on.present? ? Date.strptime(f.object.open_enrollment_end_on, "%m/%d/%Y") : nil
     .row.row-form-wrapper#uic-wrapper
       - dates = f.object.start_on_options
-      - minDate = dates[formatted_start_on][:open_enrollment_start_on];
-      - maxDate = dates[formatted_start_on][:open_enrollment_end_on];
+      - if formatted_start_on
+        - oe_min_date = dates[formatted_start_on][:open_enrollment_start_on]
+        - oe_max_date = dates[formatted_start_on][:open_enrollment_end_on]
       .col-md-6.col-sm-12
-        = f.text_field :open_enrollment_start_on, class: "form-control", required: true, placeholder: 'OPEN ENROLLMENT START DATE', onmouseover:"showDatepicker('benefit_application_open_enrollment_start_on')", onchange:"isValidDate(this)", :"data-date-min" => f.object.start_on ? (Date.strptime(f.object.start_on, "%m/%d/%Y") - 2.months) : "", "data-oe-start-date" => oe_start_on
+        = f.text_field :open_enrollment_start_on, class: "form-control", required: true, placeholder: 'OPEN ENROLLMENT START DATE', onmouseover:"showDatepicker('benefit_application_open_enrollment_start_on')", onchange:"isValidDate(this)", :"data-date-min" => f.object.start_on ? (Date.strptime(f.object.start_on, "%m/%d/%Y") - 2.months) : "", "data-oe-start-date" => oe_start_on, "data-oe-min-Date" => oe_min_date
       .col-md-6.col-sm-12
-        = f.text_field :open_enrollment_end_on, class: "form-control interaction-field-control-plan_year-open_enrollment_end_on", required: true, placeholder: 'OPEN ENROLLMENT END DATE', onmouseover:"showDatepicker('benefit_application_open_enrollment_end_on')", onchange:"isValidDate(this)", "data-oe-end-date" => oe_end_on,"data-oe-mindate" => minDate,"data-oe-maxdate" => maxDate
+        = f.text_field :open_enrollment_end_on, class: "form-control interaction-field-control-plan_year-open_enrollment_end_on", required: true, placeholder: 'OPEN ENROLLMENT END DATE', onmouseover:"showDatepicker('benefit_application_open_enrollment_end_on')", onchange:"isValidDate(this)", "data-oe-end-date" => oe_end_on, "data-oe-max-Date" => oe_max_date
 .row.pl-1
   h3 Add the total number of employees in your workforce
 .row
@@ -55,12 +56,12 @@ javascript:
   var defaultOEEndOn = '';
 
   function setDefaultDates() {
-      defaultOEStartOn = document.querySelector("input#benefit_application_open_enrollment_start_on").value;
-      defaultOEEndOn = document.querySelector("input#benefit_application_open_enrollment_end_on").value
+    defaultOEStartOn = document.querySelector("input#benefit_application_open_enrollment_start_on").value;
+    defaultOEEndOn = document.querySelector("input#benefit_application_open_enrollment_end_on").value
   }
 
   function selectedDate(element) {
-    showHideRecommendDates(element);
+    showHideRecommendDates(element.value);
     setDefaultDates();
   }
 
@@ -75,12 +76,13 @@ javascript:
   }
 
   function showHideRecommendDates(date) {
-    var recommendDates = document.querySelector('#recommend_dates')
+    var recommendDates = document.querySelector('#recommend_dates');
+
     if (date) {
-      recommendDates.classList.remove('hidden')
+      recommendDates.classList.remove('hidden');
       assignBenefitApplicationDates(date)
     } else {
-      recommendDates.classList.add('hidden')
+      recommendDates.classList.add('hidden');
       resetInputOptions()
     }
   }
@@ -110,12 +112,12 @@ javascript:
     fte: Number,
     pte: Number,
     msp: Number
-  }
+  };
 
 	var dateOptions = {
 		oeStartOn:String,
 		oeEndOn:String
-	}
+	};
 
   function checkEmployeeCount(element) {
     if (element.id == "fteEmployee") {
@@ -135,15 +137,16 @@ javascript:
   }
 
   function showDatepicker(id) {
-      //selectedDate(document.getElementById("baStartDate"));
-      var minDate = $("#benefit_application_open_enrollment_end_on").attr("data-oe-minDate");
-      var maxDate = $("#benefit_application_open_enrollment_end_on").attr("data-oe-maxDate");
-      if (minDate) {
-          initDatepicker(id, new Date(minDate), new Date(maxDate));
-      } else {
-          initDatepicker(id, new Date(defaultOEStartOn), new Date(defaultOEEndOn));
-      }
+    var open_enrollment_start_on = document.querySelector("input#benefit_application_open_enrollment_start_on");
+    var minDate = $(open_enrollment_start_on).attr("data-oe-min-Date") || $(open_enrollment_end_on).attr("data-oe-start-date");
+    var open_enrollment_end_on = document.querySelector("input#benefit_application_open_enrollment_end_on");
+    var maxDate  = $(open_enrollment_end_on).attr("data-oe-max-Date") || $(open_enrollment_end_on).attr("data-oe-end-date");
 
+    if (minDate) {
+        initDatepicker(id, new Date(minDate), new Date(maxDate));
+    } else {
+        initDatepicker(id, new Date(defaultOEStartOn), new Date(defaultOEEndOn));
+    }
   }
   // Temporary fix to Select your open enrollment dates row width and alignment
   (function() {
