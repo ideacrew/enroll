@@ -607,19 +607,8 @@ def employer_poc
     elsif @ssn_fields.present? && @ssn_fields.include?(false)
       @dont_update_ssn = true
     else
-      begin
-        if params[:person][:ssn].present?
-          @person.update_attributes!(encrypted_ssn: Person.encrypt_ssn(params[:person][:ssn]))
-        else
-          @person.unset(:encrypted_ssn)
-        end
-        @person.update_attributes!(dob: Date.strptime(params[:jq_datepicker_ignore_person][:dob], '%m/%d/%Y').to_date)
-        @person.consumer_role.check_for_critical_changes(@person.primary_family, info_changed: @info_changed, no_dc_address: "false", dc_status: @dc_status) if @person.consumer_role && @person.is_consumer_role_active?
-        CensusEmployee.update_census_employee_records(@person, current_user)
-      rescue Exception => e
-        @error_on_save = @person.errors.messages
-        @error_on_save[:census_employee] = [e.summary] if @person.errors.messages.blank? && e.present?
-      end
+      result = ::Operations::UpdateDobSsn.new.call(person_id: @person.id, params: params, info_changed: @info_changed, dc_status: @dc_status, current_user: current_user)
+      @error_on_save = result.failure? ? result.failure : result.success
     end
     respond_to do |format|
       format.js { render "edit_enrollment", person: @person, :family_actions_id => params[:person][:family_actions_id]  } if @error_on_save
