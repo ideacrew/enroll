@@ -44,7 +44,7 @@ module FormWorld
     fill_in 'inputAddress1', with: registering_employer.employer_profile.office_locations.first.address.address_1
     fill_in 'agency_organization_profile_attributes_office_locations_attributes_0_address_attributes_city', with: registering_employer.employer_profile.office_locations.first.address.city
     select registering_employer.employer_profile.office_locations.first.address.state, from: 'inputState'
-    fill_in 'inputZip', with: registering_employer.employer_profile.office_locations.first.address.zip
+    fill_in 'inputZip', with: BenefitMarkets::Locations::CountyZip.first.zip
     fill_in 'inputAreacode', with: registering_employer.employer_profile.office_locations.first.phone.area_code
     phone_number2.set registering_employer.employer_profile.office_locations.first.phone.number
     select 'Radio', from: 'referred-by-select'
