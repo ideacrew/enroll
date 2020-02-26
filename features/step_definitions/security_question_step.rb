@@ -102,10 +102,14 @@ end
 # Old one, doesn't seem to be working for choosing the questions
 Then(/^I select the all security question and give the answer$/) do
   (0..2).each do |num|
-    within all('div.selectric-wrapper', visible: false)[num] do
+    within all('div.selectric-wrapper.selectric-security-question-select', visible: false)[num] do
+      sleep 1
       find('.selectric').click
+      sleep 1
       all('li')[-1].click
+      sleep 1
     end
+
     page.all('.security-question-select', visible: false)[num].set("Security Question #{num + 1}")
     page.all('.interaction-field-control-security-question-response-question-answer', visible: false)[num].set("Answer #{num+1}")
   end
@@ -114,7 +118,7 @@ end
 When(/^user fills out the security questions modal$/) do
   security_questions = SecurityQuestion.all.to_a.map(&:id)
   (0..2).each do |num|
-    within all('div.selectric-wrapper', visible: false)[num] do
+    within all('div.selectric-wrapper.selectric-security-question-select', visible: false)[num] do
       find('.selectric').click
       all('li')[-1].click
     end
