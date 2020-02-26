@@ -9,6 +9,53 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup initial benefit application"
 
+    describe "scopes" do
+      context "family_canceled_enrollments" do
+        let!(:test_family) { FactoryBot.create(:family, :with_primary_family_member) }
+        let!(:enrollment_to_include) do
+          FactoryBot.create(
+            :hbx_enrollment,
+            :with_product,
+            family: test_family,
+            household: test_family.households.first,
+            kind: "employer_sponsored",
+            external_enrollment: false,
+          )
+        end
+
+        let(:create_enrollments_to_exclude) do
+          HbxEnrollment::FAMILY_HOME_PAGE_HIDDEN_STATUSES.each do |aasm_state|
+            test_family.enrollments.create!(
+              household: test_family.households.first,
+              kind: "employer_sponsored",
+              aasm_state: aasm_state,
+              product_id: nil,
+              external_enrollment: false,
+            )
+          end
+        end
+        # Simulates the scope on the families home page
+        let(:hbx_enrollments) do
+          test_family.enrollments_for_home_page
+        end
+        let(:all_hbx_enrollments_for_admin) do
+          hbx_enrollments + HbxEnrollment.family_canceled_enrollments(test_family)
+        end
+
+        before do
+          create_enrollments_to_exclude
+        end
+
+        it "should not include coverage_canceled void inactive renewing_waived shopping states without product_id in the scope" do
+          expect(all_hbx_enrollments_for_admin).to include(enrollment_to_include)
+          expect(all_hbx_enrollments_for_admin.length).to eq(1)
+          HbxEnrollment.family_canceled_enrollments(test_family).each do |enrollment|
+            expect(HbxEnrollment::FAMILY_HOME_PAGE_HIDDEN_STATUSES.include(enrollment.aasm_state.to_s)).to eq(false)
+          end
+        end
+      end
+    end
+
     describe "state transitions" do
       subject { HbxEnrollment.new }
       it "should check for state :actively_renewing" do
