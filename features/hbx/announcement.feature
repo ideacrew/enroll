@@ -17,7 +17,6 @@ Feature: Hbx staff create announcements for consumer role & employee
     Then Hbx admin should see the future announcement
     When Hbx admin enter announcement info with invalid params for employee
     Then Hbx admin should see the alert msg
-    Then Hbx admin logs out
 
 
     # TODO Fix these scenario when we have IVL market.

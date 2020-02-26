@@ -51,9 +51,11 @@ When(/^Hbx admin enter announcement info with invalid params for (.*?)$/) do |ro
   find('#announcement_audiences_ivl').click if role == "ivl"
   find('#announcement_audiences_employer').click if role == "employee"
   find('.interaction-click-control-create-announcement').click
+  sleep 3
 end
 
 Then(/^Hbx admin should see the alert msg$/) do
+  find('.alert-error', wait: 5)
   expect(page).to have_content('prohibited this announcement from being saved')
   expect(page).to have_content('End Date should be later than Start date')
 end

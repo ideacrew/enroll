@@ -114,8 +114,10 @@ end
 When(/^user fills out the security questions modal$/) do
   security_questions = SecurityQuestion.all.to_a.map(&:id)
   (0..2).each do |num|
-    question_select_id = "sec-#{num}"
-    page.execute_script("document.getElementById('#{question_select_id}').value = '#{security_questions[num].to_s}';")
+    within all('div.selectric-wrapper', visible: false)[num] do
+      find('.selectric').click
+      all('li')[-1].click
+    end
     page.all('.interaction-field-control-security-question-response-question-answer', visible: false)[num].set("Answer #{num+1}")
   end
 end
