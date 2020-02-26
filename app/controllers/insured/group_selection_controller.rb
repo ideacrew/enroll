@@ -56,7 +56,7 @@ class Insured::GroupSelectionController < ApplicationController
     @family.family_members.each do |family_member|
       family_member_eligibility_check(family_member)
     end
-    if @fm_hash.present? && @fm_hash.values.flatten.detect{|err| err.to_s.match(/eligibility failed on incarceration_status/)}
+    if @fm_hash.present? && @fm_hash.values.flatten.detect{|err| err.to_s.match(/incarcerated_not_answered/)}
       redirect_to manage_family_insured_families_path(tab: 'family')
       flash[:error] = "A family member has incarceration status unanswered, please answer the question by clicking on edit icon before shopping."
     end
@@ -193,7 +193,8 @@ class Insured::GroupSelectionController < ApplicationController
               InsuredEligibleForBenefitRule.new(role, @benefit, {family: @family, coverage_kind: @coverage_kind, new_effective_on: @new_effective_on, market_kind: @market_kind})
             end
     is_ivl_coverage, errors = rule.satisfied?
-    @fm_hash[family_member.id] = [is_ivl_coverage, rule, errors]
+    incarcerated = family_member.person.is_incarcerated.nil? ? "incarcerated_not_answered" : family_member.person.is_incarcerated
+    @fm_hash[family_member.id] = [is_ivl_coverage, rule, errors, incarcerated]
   end
 
   def permit_params
