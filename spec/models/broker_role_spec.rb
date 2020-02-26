@@ -214,6 +214,14 @@ describe BrokerRole, dbclean: :around_each do
           registered_broker_role.extend_application!
           expect(registered_broker_role.aasm_state).to eq 'application_extended'
         end
+
+        it 'should transition application_extended broker to application_extended' do
+          allow(registered_broker_role).to receive(:is_primary_broker?).and_return(true)
+          registered_broker_role.pending!
+          registered_broker_role.extend_application!
+          registered_broker_role.extend_application!
+          expect(registered_broker_role.aasm_state).to eq 'application_extended'
+        end
       end
 
       context 'broker agency accept' do

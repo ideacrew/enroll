@@ -320,7 +320,7 @@ class BrokerRole
     end
 
     event :broker_agency_decline, :after => :record_transition do
-      transitions from: :broker_agency_pending, to: :broker_agency_declined
+      transitions from: [:broker_agency_pending, :application_extended], to: :broker_agency_declined
     end
 
     event :broker_agency_terminate, :after => [:record_transition, :remove_broker_assignments] do
@@ -352,6 +352,7 @@ class BrokerRole
 
     # Extends the broker application denial time
     event :extend_application, :after => :record_transition do
+      transitions from: :application_extended, to: :application_extended, :after => :notify_broker_pending
       transitions from: [:broker_agency_pending, :denied], to: :application_extended
     end
   end

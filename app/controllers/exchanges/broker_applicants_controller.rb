@@ -54,6 +54,9 @@ class Exchanges::BrokerApplicantsController < ApplicationController
     elsif params['recertify']
       broker_role.recertify!
       flash[:notice] = "Broker applicant is now approved."
+    elsif params['extend']
+      broker_role.extend_application!
+      flash[:notice] = "Broker applicant is now extended."
     elsif params['pending']
       broker_carrier_appointments
       broker_role.update(params.require(:person).require(:broker_role_attributes).permit!.except(:id))
