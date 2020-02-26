@@ -739,11 +739,11 @@ And /^employer click on pencil symbol next to employee status bar$/ do
 end
 
 Then /^employer should see the (.*) button$/ do |status|
-  find_link(status.capitalize).visible?
+  find_link(status.titleize).visible?
 end
 
 When /^employer clicks on (.*) button$/ do |status|
-  click_link(status.capitalize)
+  click_link(status.titleize)
 end
 
 When /^employer clicks on the (.*) link$/ do |status|

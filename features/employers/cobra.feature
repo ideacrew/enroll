@@ -13,7 +13,7 @@ Feature: Census Employee COBRA functionality
     Then employer clicks on terminated filter
     And employer clicks on Actions drop down for one of active employee
     And employer should see the Initiate cobra button
-    When employer clicks on Initiate cobra button
+    When employer clicks on Initiate Cobra button
     Then employer should see Enter effective date for Initiate cobra Action
     And employer should see default cobra start date
     And employer sets cobra start date to two months after termination date
@@ -31,7 +31,7 @@ Feature: Census Employee COBRA functionality
     Then employer clicks on terminated filter
     And employer clicks on Actions drop down for one of active employee
     And employer should see the Initiate cobra button
-    When employer clicks on Initiate cobra button
+    When employer clicks on Initiate Cobra button
     Then employer should see Enter effective date for Initiate cobra Action
     And employer should see default cobra start date
     And employer sets cobra start date to two months after termination date
@@ -49,7 +49,7 @@ Feature: Census Employee COBRA functionality
     Then employer clicks on terminated filter
     And employer clicks on Actions drop down for one of active employee
     And employer should see the Initiate cobra button
-    When employer clicks on Initiate cobra button
+    When employer clicks on Initiate Cobra button
     Then employer should see Enter effective date for Initiate cobra Action
     And employer should see default cobra start date
     And employer sets cobra start date to two months after termination date
