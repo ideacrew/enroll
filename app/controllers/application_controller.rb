@@ -203,7 +203,13 @@ class ApplicationController < ActionController::Base
       current_host = URI(request.referrer).host
       last_portal_visited = resource.try(:last_portal_visited)
       if last_portal_visited
-        redirect_path = current_host == URI(last_portal_visited).host ? last_portal_visited : root_path
+        # get host of url. If localhost return last portal path, if remote host check that host environments match between last_portals
+        last_portal_host = URI(last_portal_visited).host
+        if last_portal_host
+          redirect_path = current_host == last_portal_host ? last_portal_visited : root_path
+        else
+          redirect_path = last_portal_visited
+        end
       else
         redirect_path = root_path
       end
