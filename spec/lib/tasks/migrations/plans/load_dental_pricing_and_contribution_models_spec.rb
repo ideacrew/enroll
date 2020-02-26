@@ -3,6 +3,15 @@ require 'rails_helper'
 # TODO: These specs are very fragile and need to be re-written.
 #       For now, I have marked them pending and tagged them as 'fragile'.
 #       This will be our practice going forward for fragile specs until we address them.
+
+class DentalPricingContributionModelImportSpecHelper
+
+def self.invoke_models_task
+  Rake::Task["seed:dental_contribution_and_pricing_model"].reenable
+  Rake::Task["seed:dental_contribution_and_pricing_model"].invoke
+end
+end
+
 RSpec.describe 'load_dental_pricing_and_contribution_models', :type => :task, :dbclean => :around_each do
   before :all do
     Rake.application.rake_require "tasks/migrations/plans/load_dental_pricing_and_contribution_models"
@@ -10,7 +19,7 @@ RSpec.describe 'load_dental_pricing_and_contribution_models', :type => :task, :d
   end
 
   before :context do
-    invoke_models_task
+    DentalPricingContributionModelImportSpecHelper.invoke_models_task
   end
 
   context "load pricing model" do
@@ -36,11 +45,4 @@ RSpec.describe 'load_dental_pricing_and_contribution_models', :type => :task, :d
   after(:all) do
     DatabaseCleaner.clean
   end
-end
-
-private
-
-def invoke_models_task
-  Rake::Task["seed:dental_contribution_and_pricing_model"].reenable
-  Rake::Task["seed:dental_contribution_and_pricing_model"].invoke
 end
