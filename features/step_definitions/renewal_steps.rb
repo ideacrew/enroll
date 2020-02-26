@@ -101,7 +101,6 @@ Then(/(.+) should see \"my account\" page with waiver and passive renewal should
   ce = CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first
   effective_date = ce.employer_profile.renewing_plan_year.start_on
 
-
   enrollments = page.all('.hbx-enrollment-panel')
   statuses = enrollments.collect{|e| e.find('.panel-heading').find('.label-success').text()}
 
