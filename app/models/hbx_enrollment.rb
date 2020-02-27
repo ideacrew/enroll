@@ -52,7 +52,6 @@ class HbxEnrollment
                               renewing_contingent_enrolled
                             )
   WAIVED_STATUSES     = %w(inactive renewing_waived)
-  FAMILY_HOME_PAGE_HIDDEN_STATUSES = %w(coverage_selected void inactive renewing_waived shopping).freeze
 
   ENROLLED_AND_RENEWAL_STATUSES = ENROLLED_STATUSES + RENEWAL_STATUSES
 
@@ -337,7 +336,7 @@ class HbxEnrollment
   scope :family_home_page_hidden_enrollments, ->(family) do
     where(
       :family_id => family.id,
-      :aasm_state.nin => FAMILY_HOME_PAGE_HIDDEN_STATUSES,
+      :aasm_state => "coverage_canceled",
       :product_id.nin => [nil] # Exception will be thrown on families home page for any enrollment with nil product_id
     ).order(
       effective_on: :desc, submitted_at: :desc, coverage_kind: :desc

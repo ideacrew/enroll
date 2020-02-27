@@ -23,16 +23,14 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
           )
         end
 
-        let(:create_enrollments_to_exclude) do
-          HbxEnrollment::FAMILY_HOME_PAGE_HIDDEN_STATUSES.each do |aasm_state|
-            test_family.enrollments.create!(
-              household: test_family.households.first,
-              kind: "employer_sponsored",
-              aasm_state: aasm_state,
-              product_id: nil,
-              external_enrollment: false,
-            )
-          end
+        let!(:enrollment_to_exclude) do
+          test_family.enrollments.create!(
+            household: test_family.households.first,
+            kind: "employer_sponsored",
+            aasm_state: 'coverage_selected',
+            product_id: nil,
+            external_enrollment: false,
+          )
         end
         # Simulates the scope on the families home page
         let(:hbx_enrollments) do
@@ -42,16 +40,10 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
           hbx_enrollments + HbxEnrollment.family_canceled_enrollments(test_family)
         end
 
-        before do
-          create_enrollments_to_exclude
-        end
-
-        it "should not include coverage_canceled void inactive renewing_waived shopping states without product_id in the scope" do
+        it "should not include coverage_canceled without product_id in the scope" do
           expect(all_hbx_enrollments_for_admin).to include(enrollment_to_include)
           expect(all_hbx_enrollments_for_admin.length).to eq(1)
-          HbxEnrollment.family_canceled_enrollments(test_family).each do |enrollment|
-            expect(HbxEnrollment::FAMILY_HOME_PAGE_HIDDEN_STATUSES.include(enrollment.aasm_state.to_s)).to eq(false)
-          end
+          expect(all_hbx_enrollments_for_admin).to_not include(enrollment_to_exclude)
         end
       end
     end
