@@ -10,20 +10,24 @@ Then /^Hbx admin should see the page of announcements$/ do
   expect(page).to have_content("Msg Start Date")
 end
 
-When(/Hbx admin enter announcement info$/) do
+When(/Hbx admin enter announcement info for (.*?)$/) do |role|
   fill_in 'announcement[content]', with: 'announcement for current'
   fill_in 'jq_datepicker_ignore_announcement[start_date]', with: (TimeKeeper.date_of_record - 5.days).to_s
   fill_in 'jq_datepicker_ignore_announcement[end_date]', with: (TimeKeeper.date_of_record + 5.days).to_s
-  find('#announcement_audiences_ivl').trigger('click')
+  find('#announcement_content').click
+  find('#announcement_audiences_ivl').click if role == "ivl"
+  find('#announcement_audiences_employer').click if role == "employee"
   expect(page).to have_content "Announcements"
   find('.interaction-click-control-create-announcement').click
 end
 
-When(/^Hbx admin enter announcement info with future date$/) do
+When(/^Hbx admin enter announcement info with future date for (.*?)$/) do |role|
   fill_in 'announcement[content]', with: 'announcement for future'
   fill_in 'jq_datepicker_ignore_announcement[start_date]', with: (TimeKeeper.date_of_record + 5.days).to_s
   fill_in 'jq_datepicker_ignore_announcement[end_date]', with: (TimeKeeper.date_of_record + 15.days).to_s
-  find('#announcement_audiences_ivl').trigger('click')
+  find('#announcement_content').click
+  find('#announcement_audiences_ivl').click if role == "ivl"
+  find('#announcement_audiences_employer').click if role == "employee"
   expect(page).to have_content "Announcements"
   find('.interaction-click-control-create-announcement').click
 end
@@ -39,15 +43,19 @@ Then(/^Hbx admin should not see the future announcement$/) do
   expect(page).not_to have_content('announcement for future')
 end
 
-When(/^Hbx admin enter announcement info with invalid params$/) do
+When(/^Hbx admin enter announcement info with invalid params for (.*?)$/) do |role|
   fill_in 'announcement[content]', with: 'invalid announcement'
   fill_in 'jq_datepicker_ignore_announcement[start_date]', with: (TimeKeeper.date_of_record + 5.days).to_s
   fill_in 'jq_datepicker_ignore_announcement[end_date]', with: (TimeKeeper.date_of_record).to_s
-  find('#announcement_audiences_ivl').click
+  find('#announcement_content').click
+  find('#announcement_audiences_ivl').click if role == "ivl"
+  find('#announcement_audiences_employer').click if role == "employee"
   find('.interaction-click-control-create-announcement').click
+  sleep 3
 end
 
 Then(/^Hbx admin should see the alert msg$/) do
+  find('.alert-error', wait: 5)
   expect(page).to have_content('prohibited this announcement from being saved')
   expect(page).to have_content('End Date should be later than Start date')
 end
@@ -57,6 +65,7 @@ When(/^Hbx admin click the link of all$/) do
 end
 
 Then(/^Hbx admin should see the future announcement$/) do
+  sleep 3
   expect(page).to have_content('announcement for future')
 end
 

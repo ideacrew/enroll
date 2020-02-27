@@ -6,35 +6,41 @@ Feature: Employee hired during renewal period
   Then New Employee should be able to match Employer
   And Employee should be able to purchase Insurance
 
+  Background: Setup site, employer, and benefit application
+    Given a CCA site exists with a benefit market
+    Given benefit market catalog exists for enrollment_open renewal employer with health benefits
+    And there is an employer ABC Widgets
+    And employer ABC Widgets has active and renewing enrollment_open benefit applications
+    And this employer offering 0.75 contribution to Employee
+    And this employer ABC Widgets has first_of_month rule
+
   Scenario: New hire should be able to purchase Insurance under current plan year & should be able to
             purchase coverage by clicking on make_changes button on passive renewal
 
-    Given Renewing Employer for Soren White exists with active and renewing plan year
-      And Employer for Soren White is under open enrollment
-      And Employer for Soren White has first_of_month rule
-      And Employee has current hired on date
-      And Soren White already matched and logged into employee portal
+    Given there exists Patrick Doe employee for employer ABC Widgets
+      And employee Patrick Doe has current hired on date
+      And employee Patrick Doe already matched with employer ABC Widgets and logged into employee portal
       When Employee clicks "Shop for Plans" on my account page
       Then Employee should see the group selection page
       When Employee clicks continue on the group selection page
       Then Employee should see the list of plans
       And I should not see any plan which premium is 0
       When Employee selects a plan on the plan shopping page
-      Then Employee Soren White should see coverage effective date
+      Then Employee Patrick Doe should see coverage effective date
       When Employee clicks on Confirm button on the coverage summary page
       Then Employee should see the receipt page
       Then Employee clicks on Continue button on receipt page
-      Then Soren White should see "my account" page with active enrollment
-      And Soren White should see passive renewal
-      Then Soren White click on make changes button on passive renewal
+      Then Patrick Doe should see "my account" page with active enrollment
+      And Patrick Doe should see passive renewal
+      Then Patrick Doe click on make changes button on passive renewal
       Then Employee should see the group selection page
       When Employee clicks continue on the group selection page
       Then Employee should see the list of plans
       And I should not see any plan which premium is 0
       When Employee selects a plan on the plan shopping page
-      Then Employee Soren White should see confirm your plan selection page
+      Then Employee Patrick Doe should see confirm your plan selection page
       When Employee clicks on Confirm button on the coverage summary page
       Then Employee should see the receipt page
       Then Employee clicks on Continue button on receipt page
-      Then Soren White should see "my account" page with active enrollment
-      And Soren White should see renewal policy in active status
+      Then Patrick Doe should see "my account" page with active enrollment
+      And Patrick Doe should see renewal policy in active status

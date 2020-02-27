@@ -21,4 +21,4 @@ for test_dir in `ls -1 $root/components/ | grep -v old_sponsored_benefits`; do
 done
 
 cd $root
-bundle exec rake parallel:spec[3]
+bundle exec rake parallel:spec[4]

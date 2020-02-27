@@ -35,13 +35,13 @@ Then(/^I fill the (.*?) email address for that user$/) do |email|
 end
 
 When(/^I click on the confirm link$/) do
-  find(:link, 'Confirm').trigger 'click'
+  find(:link, 'Confirm').click
   wait_for_ajax
   sleep 2
 end
 
 When 'I click on the confirm button' do
-  find(:button, 'Confirm').trigger 'click'
+  find(:button, 'Confirm').click
   wait_for_ajax
   sleep 1
 end

@@ -125,13 +125,14 @@ FactoryGirl.define do
     transient do
       census_employee_id nil
       employer_profile_id nil
+      benefit_sponsors_employer_profile_id nil
       hired_on nil
     end
 
     factory :person_with_employee_role do
 
       after(:create) do |person, evaluator|
-        create_list(:employee_role, 1, person: person, census_employee_id: evaluator.census_employee_id, employer_profile_id: evaluator.employer_profile_id, hired_on: evaluator.hired_on, ssn: evaluator.ssn, dob: evaluator.dob)
+        create_list(:employee_role, 1, person: person, census_employee_id: evaluator.census_employee_id, employer_profile_id: evaluator.employer_profile_id, benefit_sponsors_employer_profile_id: evaluator.benefit_sponsors_employer_profile_id, hired_on: evaluator.hired_on, ssn: evaluator.ssn, dob: evaluator.dob)
       end
     end
   end

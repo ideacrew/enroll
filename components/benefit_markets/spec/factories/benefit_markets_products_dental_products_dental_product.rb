@@ -7,7 +7,7 @@ FactoryGirl.define do
 
     sequence(:title)     { |n| "Dental BlueChoice Silver#{n} 2,000" }
     description          "Highest rated and highest value"
-    premium_ages         20..65
+    premium_ages         20..20
     # health_plan_kind     :pos
     ehb                  0.9943
     metal_level_kind     :dental
@@ -29,6 +29,7 @@ FactoryGirl.define do
           application_period: (product.application_period.min.next_year..product.application_period.max.next_year),
           product_package_kinds: product.product_package_kinds,
           service_area: evaluator.renewal_service_area,
+          issuer_profile_id: product.issuer_profile_id,
           metal_level_kind: product.metal_level_kind)
 
         product.renewal_product_id = renewal_product.id

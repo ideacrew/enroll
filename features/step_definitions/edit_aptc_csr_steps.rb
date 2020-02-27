@@ -3,7 +3,7 @@ Then (/^Hbx Admin sees Families link$/) do
   expect(page).to have_text("Families")
 end
 
-When(/^Hbx Admin clicks on Families link$/) do
+When(/^Hbx Admin click Families link$/) do
   click_link "Families"
 end
 

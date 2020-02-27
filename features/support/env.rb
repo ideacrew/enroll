@@ -5,11 +5,11 @@
 # files.
 require_relative '../../spec/ivl_helper'
 
+require 'selenium-webdriver'
 require 'cucumber/rails'
 require 'email_spec/cucumber'
 require 'rspec/expectations'
 require 'capybara/cucumber'
-require 'capybara/poltergeist'
 require 'capybara-screenshot/cucumber'
 require 'cucumber/rspec/doubles'
 
@@ -67,21 +67,36 @@ end
 # The :transaction strategy is faster, but might give you threading problems.
 # See https://github.com/cucumber/cucumber-rails/blob/master/features/choose_javascript_database_strategy.feature
 Cucumber::Rails::Database.javascript_strategy = :truncation
-Capybara.default_driver = :poltergeist
-Capybara.javascript_driver = :poltergeist
-phantomjs_options = ['--ignore-ssl-errors=yes', '--ssl-protocol=any', '--load-images=no']
-phantomjs_options.push('--proxy=localhost:9050', '--proxy-type=socks5') if Rails.env.production? || Rails.env.development?
 
-Capybara.register_driver :poltergeist do |app|
-  options = {
-      :port => (51674 + ENV['TEST_ENV_NUMBER'].to_i),
-      :js_errors => true,
-      :timeout => 120,
-      :debug => false,
-      :phantomjs_options => phantomjs_options,
-      :inspector => true,
-      :window_size => [1280,720],
-      :phantomjs_logger => File.open("log/phantomjs_test.log", "a"),
-  }
-  Capybara::Poltergeist::Driver.new(app, options)
+Capybara::Screenshot.webkit_options = { width: 2280, height: 1800 }
+Capybara::Screenshot.prune_strategy = :keep_last_run
+Webdrivers.cache_time = 86_400
+
+Capybara::Screenshot.register_driver(:selenium_chrome_custom) do |driver, path|
+  driver.browser.save_screenshot(path)
 end
+
+Capybara.register_driver :selenium_chrome_custom do |app|
+  options = Selenium::WebDriver::Chrome::Options.new
+  options.headless!
+  options.add_argument("no-sandbox")
+  options.add_argument("--window-size=1024,768")
+
+  if RUBY_PLATFORM =~ /darwin/
+    options.add_argument("--enable-features=NetworkService,NetworkServiceInProcess")
+  end
+
+  client = Selenium::WebDriver::Remote::Http::Default.new
+  client.open_timeout = 120 # instead of the default 60
+  client.read_timeout = 120 # instead of the default 60
+
+  Capybara::Selenium::Driver.new(app,
+    browser: :chrome,
+    options: options,
+    http_client: client
+  )
+end
+
+Capybara.default_driver = :selenium_chrome_custom
+Capybara.use_default_driver
+Capybara.current_driver = :selenium_chrome_custom

@@ -68,7 +68,7 @@ PATH
       i18n (= 0.7.0)
       mini_portile2 (= 2.0.0)
       mongoid (~> 5.4.0)
-      nokogiri (= 1.6.7.2)
+      nokogiri
       pundit (~> 1.0.1)
       rails (~> 4.2.7.1)
       slim (~> 3.0.9)
@@ -144,7 +144,7 @@ PATH
     transport_profiles (0.0.1)
       acapi
       mongoid (= 5.4.0)
-      nokogiri (= 1.6.7.2)
+      nokogiri (= 1.9.1)
       rails (>= 4.2.0, < 5.0)
       rubyzip (= 1.2.1)
       symmetric-encryption (~> 3.6.0)
@@ -226,6 +226,7 @@ GEM
       descendants_tracker (~> 0.0.4)
       ice_nine (~> 0.11.0)
       thread_safe (~> 0.3, >= 0.3.1)
+    backports (3.11.4)
     bcrypt (3.1.11)
     benchmark-malloc (0.1.0)
     benchmark-perf (0.5.0)
@@ -304,7 +305,6 @@ GEM
       cocaine
       orm_adapter (~> 0.5.0)
     climate_control (0.2.0)
-    cliver (0.3.2)
     cocaine (0.5.8)
       climate_control (>= 0.0.3, < 1.0)
     coercible (1.0.0)
@@ -325,22 +325,27 @@ GEM
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
     crass (1.0.4)
-    cucumber (2.3.3)
+    cucumber (3.1.2)
       builder (>= 2.1.2)
-      cucumber-core (~> 1.4.0)
+      cucumber-core (~> 3.2.0)
+      cucumber-expressions (~> 6.0.1)
       cucumber-wire (~> 0.0.1)
-      diff-lcs (>= 1.1.3)
-      gherkin (~> 3.2.0)
+      diff-lcs (~> 1.3)
+      gherkin (~> 5.1.0)
       multi_json (>= 1.7.5, < 2.0)
       multi_test (>= 0.1.2)
-    cucumber-core (1.4.0)
-      gherkin (~> 3.2.0)
-    cucumber-rails (1.4.3)
-      capybara (>= 1.1.2, < 3)
-      cucumber (>= 1.3.8, < 3)
-      mime-types (>= 1.16, < 4)
-      nokogiri (~> 1.5)
-      railties (>= 3, < 5)
+    cucumber-core (3.2.1)
+      backports (>= 3.8.0)
+      cucumber-tag_expressions (~> 1.1.0)
+      gherkin (~> 5.0)
+    cucumber-expressions (6.0.1)
+    cucumber-rails (1.6.0)
+      capybara (>= 1.1.2, < 4)
+      cucumber (>= 3.0.2, < 4)
+      mime-types (>= 1.17, < 4)
+      nokogiri (~> 1.8)
+      railties (>= 4, < 6)
+    cucumber-tag_expressions (1.1.1)
     cucumber-wire (0.0.1)
     curl (0.0.9)
       awesome_print (>= 0.2.1)
@@ -382,7 +387,7 @@ GEM
       redis (>= 3.2, < 5.0)
     ffi (1.10.0)
     forgery (0.7.0)
-    gherkin (3.2.0)
+    gherkin (5.1.0)
     globalid (0.4.1)
       activesupport (>= 4.2.0)
     haml (5.0.4)
@@ -511,7 +516,7 @@ GEM
     net-ssh (4.2.0)
     newrelic_rpm (5.0.0.342)
     nio4r (2.3.0)
-    nokogiri (1.6.7.2)
+    nokogiri (1.9.1)
       mini_portile2 (~> 2.0.0.rc2)
     nokogiri-happymapper (0.6.0)
       nokogiri (~> 1.5)
@@ -533,10 +538,6 @@ GEM
       hashery (~> 2.0)
       ruby-rc4
       ttfunk
-    poltergeist (1.17.0)
-      capybara (~> 2.1)
-      cliver (~> 0.3.1)
-      websocket-driver (>= 0.2.0)
     powerpack (0.1.2)
     puma (3.11.2)
     pundit (1.0.1)
@@ -680,7 +681,7 @@ GEM
     sdoc (0.4.2)
       json (~> 1.7, >= 1.7.7)
       rdoc (~> 4.0)
-    selenium-webdriver (3.11.0)
+    selenium-webdriver (3.14.0)
       childprocess (~> 0.5)
       rubyzip (~> 1.2)
     serverengine (1.5.11)
@@ -770,6 +771,11 @@ GEM
       binding_of_caller (>= 0.7.2)
       railties (>= 4.0)
       sprockets-rails (>= 2.0, < 4.0)
+    webdriver (0.1.0)
+    webdrivers (3.9.4)
+      nokogiri (~> 1.6)
+      rubyzip (~> 1.0)
+      selenium-webdriver (~> 3.0)
     webmock (3.0.1)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
@@ -778,9 +784,6 @@ GEM
       activesupport (>= 4.2)
       rack-proxy (>= 0.6.1)
       railties (>= 4.2)
-    websocket-driver (0.7.0)
-      websocket-extensions (>= 0.1.0)
-    websocket-extensions (0.1.3)
     wicked_pdf (1.0.6)
     wkhtmltopdf-binary-edge (0.12.3.0)
     xpath (2.1.0)
@@ -807,7 +810,7 @@ DEPENDENCIES
   bson (~> 4.3.0)
   capistrano (= 3.3.5)
   capistrano-rails (= 1.1.6)
-  capybara (= 2.6.2)
+  capybara
   capybara-screenshot
   carrierwave-mongoid
   certified
@@ -817,8 +820,8 @@ DEPENDENCIES
   coffee-rails (~> 4.1.0)
   combine_pdf
   config (~> 1.0.0)
-  cucumber (= 2.3.3)
-  cucumber-rails (= 1.4.3)
+  cucumber (= 3.1.2)
+  cucumber-rails (= 1.6.0)
   curl
   database_cleaner (= 1.5.3)
   devise (>= 3.5.4)
@@ -855,14 +858,13 @@ DEPENDENCIES
   mongoid_rails_migrations!
   mongoid_userstamp
   newrelic_rpm
-  nokogiri (= 1.6.7.2)
+  nokogiri (= 1.9.1)
   nokogiri-happymapper
   non-stupid-digest-assets (~> 1.0, >= 1.0.9)
   notifier!
   openhbx_cv2!
   overcommit
   parallel_tests (= 2.26.2)
-  poltergeist
   prawn!
   puma
   pundit (~> 1.0.1)
@@ -885,6 +887,7 @@ DEPENDENCIES
   ruby-saml (~> 1.3.0)
   sass-rails (~> 5.0)
   sdoc (~> 0.4.0)
+  selenium-webdriver (= 3.14.0)
   shoulda-matchers (= 3.1.1)
   simple_calendar!
   simplecov (= 0.14.1)
@@ -905,6 +908,8 @@ DEPENDENCIES
   warden
   watir
   web-console (= 2.3.0)
+  webdriver
+  webdrivers (~> 3.0)
   webmock
   webpacker
   wicked_pdf (= 1.0.6)
@@ -913,4 +918,4 @@ DEPENDENCIES
   yard-mongoid (~> 0.1.0)
 
 BUNDLED WITH
-   1.16.6
+   1.17.3

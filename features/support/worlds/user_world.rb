@@ -31,7 +31,9 @@ module UserWorld
         raise "No subrole was provided"
       end
       if Permission.where(name:subrole).present?
-        permission_id = Permission.where(name:subrole).first.id
+        permission = Permission.where(name:subrole).first
+        permission.update_attributes(can_modify_plan_year: true)
+        permission_id = permission.id
       else
         raise "No permission was found for subrole #{subrole}"
       end
@@ -44,21 +46,38 @@ end
 
 World(UserWorld)
 
-Given(/^that a user with a (.*?) role(?: with (.*?) subrole)? exists and is logged in$/) do |type, subrole|
+Given(/^that a user with a (.*?) role(?: with (.*?) subrole)? exists and (.*?) logged in$/) do |type, subrole, logged_in|
   case type
     when "Employer"
       user = employee(employer)
     when "Broker"
-      user = broker(broker_agency_profile)
+      # in features/step_definitions/broker_employee_quote_steps.rb BrokerWorld module
+      user = broker
     when "HBX staff"
       user = admin(subrole)
+    when 'Employer Role'
+      user = employer_staff
+    when 'Employee Role'
+      user = employee_role
+    else
+      user = users_by_role(type)
   end
-  login_as(user, :scope => :user)
+  case logged_in
+    when 'is'
+      login_as(user, :scope => :user)
+    when 'is not'
+      nil
+  end
 end
 
 And(/^the user is on the Employer Index of the Admin Dashboard$/) do
   visit exchanges_hbx_profiles_path
   find('.interaction-click-control-employers').click
+end
+
+And(/^the user is on the Family Index of the Admin Dashboard$/) do
+  visit exchanges_hbx_profiles_path
+  find('.interaction-click-control-families').click
 end
 
 When(/^the user clicks Action for that Employer$/) do
@@ -78,11 +97,11 @@ When(/^the user clicks Extend Open Enrollment$/) do
 end
 
 When(/^the user clicks Edit Open Enrollment$/) do
-  find('a.btn.btn-primary.btn-sm', text: 'Edit Open Enrollment').trigger('click')
+  find('a.btn.btn-primary.btn-sm', text: 'Edit Open Enrollment').click
 end
 
 Then(/^the user clicks Extend Open Enrollment button$/) do
-  find('input[value="Extend Open Enrollment"]').trigger('click')
+  find('input[value="Extend Open Enrollment"]').click
 end
 
 Then(/^the user enters a new open enrollment end date$/) do
@@ -128,7 +147,7 @@ When(/^the user partially fills out the Create Plan Year Form$/)  do
 end
 
 When(/^the user clicks the X icon on the Create Plan Year form$/) do
-  find('#closeBAForm').trigger('click')
+  find('#closeBAForm').click
 end
 
 Then(/^the Effective End Date will populate with a date equal to one year minus (\d+) day from the Effective Start Date$/) do |arg1|
@@ -155,10 +174,15 @@ Then(/^the user will( not)? see the Force Publish button$/) do |visible|
   end
 end
 
-And(/^system date is between submission deadline & OE End date$/) do
-  allow(TimeKeeper).to receive(:date_of_record).and_return((initial_application.open_enrollment_period.max - 1.day))
+Then(/^the user will( not)? see the Edit DOB SSN button$/) do |visible|
+  if visible.blank?
+    find_link('Edit DOB / SSN').visible?
+  else
+    find_link('Edit DOB / SSN').visible? == false
+  end
 end
 
-And(/^system date is between submission deadline & application effective date$/) do
-  allow(TimeKeeper).to receive(:date_of_record).and_return((initial_application.start_on - 3.days))
+
+And(/^system date is between submission deadline & OE End date$/) do
+  allow(TimeKeeper).to receive(:date_of_record).and_return((initial_application.open_enrollment_period.max - 1.day))
 end

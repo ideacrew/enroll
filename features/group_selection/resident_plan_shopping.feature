@@ -1,4 +1,4 @@
-@individual_enabled
+@wip
 Feature: IVL plan purchase
 
   Scenario: when Resident purchase plan for self & dependent
@@ -64,4 +64,3 @@ Feature: IVL plan purchase
     And Resident should also see the reason for ineligibility
     When Resident clicked on shop for new plan
     Then Resident should see primary and valid dependent
-

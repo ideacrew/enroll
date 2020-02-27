@@ -34,7 +34,7 @@ When /^they complete the new general agency form and hit the 'Submit' button$/ d
   find('.selectric-items').find('.interaction-choice-control-organization-market-kind-1').click
   find('.multiselect').click
   find(:xpath, "//li[contains(., 'English')]").click
-  find('.multiselect').trigger('click')
+  find('.multiselect').click
   find('input.interaction-field-control-organization-legal-name').click
   fill_in 'organization[office_locations_attributes][0][address_attributes][address_1]', with: Forgery(:address).street_address
   fill_in 'organization[office_locations_attributes][0][address_attributes][city]', with: 'Washington'
@@ -257,7 +257,7 @@ And /^selects the general agency from dropdown for the employer$/ do
   find(:xpath, "//*[@id='datatable_filter_bulk_actions']").click
   find(:xpath, "//p[@class='label'][contains(., 'Select General Agency')]").click
   find(:xpath, "//li[contains(., 'Rooxo')]").click
-  find("#assign_general_agency").trigger('click')
+  find("#assign_general_agency").click
 end
 
 Then /^the employer is assigned to general agency$/ do
@@ -380,7 +380,7 @@ And /^selects the GA2 from dropdown for the employer$/ do
   find(:xpath, "//*[@id='datatable_filter_bulk_actions']").click
   find(:xpath, "//p[@class='label'][contains(., 'Select General Agency')]").click
   find(:xpath, "//li[contains(., 'Zooxy')]").click
-  find("#assign_general_agency").trigger('click')
+  find("#assign_general_agency").click
 end
 
 Then /^the employer has assigned to GA2$/ do

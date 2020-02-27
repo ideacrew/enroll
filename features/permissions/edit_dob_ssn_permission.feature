@@ -1,4 +1,4 @@
-Feature: Only HBX Staff will be able to see & access the Reset Password Feature.
+Feature: Only Super Admin HBX Staff HBX Tier3 will be able to see & access the Edit DOB SSN Feature.
 
   Background: Setup site, employer, benefit application and active employee
     Given a CCA site exists with a benefit market
@@ -6,10 +6,10 @@ Feature: Only HBX Staff will be able to see & access the Reset Password Feature.
     And Qualifying life events are present
     And there is an employer ACME Widgets, Inc.
     And employer ACME Widgets, Inc. has enrollment_open benefit application
+    And there is a census employee record for Patrick Doe for employer ACME Widgets, Inc.
     And ACME Widgets, Inc. employer has a staff role
     And staff role person logged in
     And ACME Widgets, Inc. employer visit the Employee Roster
-    And there is a census employee record for Patrick Doe for employer ACME Widgets, Inc.
     And Employer logs out
     And Employee has not signed up as an HBX user
     And Patrick Doe visits the employee portal
@@ -30,16 +30,21 @@ Feature: Only HBX Staff will be able to see & access the Reset Password Feature.
     And Employee Patrick Doe should see their plan start date on the page
     And Hbx Admin logs out
 
-  Scenario Outline: HBX Staff with <subrole> subroles should <action> Reset Password button
+  Scenario Outline: HBX Staff with <subrole> subroles should <action> Change FEIN button
     Given that a user with a HBX staff role with <subrole> subrole exists and is logged in
-    And the user is on the User Accounts tab of the Admin Dashboard
-    Then user will click on action tab
-    Then Hbx Admin should see Reset Password link in action drop down
-    When Hbx Admin click on Reset Password link in action drop down
-    And Hbx admin confirms password send
-
+    And the user is on the Family Index of the Admin Dashboard
+    When the user clicks Action for that Employer
+    Then the user will <action> the Edit DOB SSN button
 
     Examples:
       | subrole       | action  |
+      | Super Admin   | see     |	
+      | HBX Tier3     | see     |
       | HBX Staff     | see     |
-      
+      | HBX Read Only | not see |
+      | Developer     | not see |
+
+
+
+
+
