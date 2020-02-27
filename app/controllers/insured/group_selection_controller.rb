@@ -193,7 +193,8 @@ class Insured::GroupSelectionController < ApplicationController
               InsuredEligibleForBenefitRule.new(role, @benefit, {family: @family, coverage_kind: @coverage_kind, new_effective_on: @new_effective_on, market_kind: @market_kind})
             end
     is_ivl_coverage, errors = rule.satisfied?
-    incarcerated = family_member.person.is_incarcerated.nil? ? "incarcerated_not_answered" : family_member.person.is_incarcerated
+    person = family_member.person
+    incarcerated = person.is_consumer_role_active? && person.is_incarcerated.nil? ? "incarcerated_not_answered" : family_member.person.is_incarcerated
     @fm_hash[family_member.id] = [is_ivl_coverage, rule, errors, incarcerated]
   end
 
