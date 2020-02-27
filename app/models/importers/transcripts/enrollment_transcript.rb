@@ -334,7 +334,7 @@ module Importers::Transcripts
         raise PersonMissingError, 'Matching person not found.' if matched_people.empty?
 
         matched_person = matched_people.first
-        employer_profile = BenefitSponsors::Organizations::Organization.employer_by_fein(@other_enrollment.employer_profile.fein).first.employer_profile
+        employer_profile = BenefitSponsors::Organizations::Organization.employer_by_hbx_id(@other_enrollment.employer_profile.hbx_id).first.employer_profile
         raise 'EmployerProfile missing!' if employer_profile.blank?
 
         employee_role = matched_person.active_employee_roles.detect {|e_role| e_role.employer_profile == employer_profile}
