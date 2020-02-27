@@ -425,6 +425,40 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
           end
         end
       end
+
+      context '#fetch_member_level_applicable_aptcs' do
+        let(:applicable_aptc) { 300.00 }
+
+        context 'with one enrollment member' do
+          before :each do
+            @eligibility_factory ||= described_class.new(enrollment1.id)
+            @member_level_aptcs ||= @eligibility_factory.fetch_member_level_applicable_aptcs(applicable_aptc)
+          end
+          it 'should return the ratio hash for 1 enrollment member' do
+            ratio_hash = {}
+            ratio_hash[family_member.id.to_s] = applicable_aptc
+            expect(@member_level_aptcs).to eq ratio_hash
+          end
+        end
+
+        context 'with two enrollment members' do
+          let!(:enrollment_member2) { FactoryBot.create(:hbx_enrollment_member, is_subscriber: false, hbx_enrollment: enrollment1, applicant_id: family_member2.id) }
+
+          before :each do
+            person.update_attributes(dob: TimeKeeper.date_of_record - 40.years)
+            person2.update_attributes(dob: TimeKeeper.date_of_record - 40.years)
+            @eligibility_factory ||= described_class.new(enrollment1.id)
+            @member_level_aptcs ||= @eligibility_factory.fetch_member_level_applicable_aptcs(applicable_aptc)
+          end
+
+          it 'should return ratio hash for 2 enrollment members' do
+            ratio_hash = {}
+            ratio_hash[family_member.id.to_s] = applicable_aptc / 2
+            ratio_hash[family_member2.id.to_s] = applicable_aptc / 2
+            expect(@member_level_aptcs).to eq ratio_hash
+          end
+        end
+      end
     end
   end
 end
