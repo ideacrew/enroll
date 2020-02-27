@@ -90,15 +90,10 @@ module Parsers::Xml::Cv::Importers
     def get_employee_role_by_shop_market_xml(shop_market)
       return nil if shop_market.blank?
       employer = shop_market.employer_link
-      fein = employer.id.strip.split('#').last rescue ''
-      org = BenefitSponsors::Organizations::Organization.new(
-        fein: fein,
-        legal_name: employer.try(:name)
-      )
+      hbx_id = employer.id.strip.split('#').last
+      org = BenefitSponsors::Organizations::Organization.new(hbx_id: hbx_id, legal_name: employer.try(:name))
       profile_class = Settings.site.key == :ma ? BenefitSponsors::Organizations::AcaShopDcEmployerProfile : BenefitSponsors::Organizations::AcaShopCcaEmployerProfile
-      EmployeeRole.new(
-        employer_profile: profile_class.new(organization: org)
-      )
+      EmployeeRole.new(employer_profile: profile_class.new(organization: org))
     end
 
     def get_household_by_policy_xml(policy)
