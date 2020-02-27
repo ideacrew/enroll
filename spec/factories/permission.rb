@@ -103,8 +103,13 @@ FactoryGirl.define do
       modify_admin_tabs false
       view_admin_tabs  true
       can_create_benefit_application true
-      view_the_configuration_tab false 
+      can_update_enrollment_end_date true
+      can_reinstate_enrollment true
+      view_the_configuration_tab false
       can_submit_time_travel_request false
+      can_view_username_and_email true
+      can_lock_unlock true
+      can_reset_password true
     end
 
     trait :super_admin do
@@ -115,6 +120,8 @@ FactoryGirl.define do
       can_modify_plan_year true
       can_create_benefit_application true
       can_force_publish true
+      can_update_enrollment_end_date true
+      can_reinstate_enrollment true
       view_the_configuration_tab true 
       can_submit_time_travel_request false
     end

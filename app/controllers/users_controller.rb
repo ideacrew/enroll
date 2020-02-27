@@ -1,5 +1,6 @@
 class UsersController < ApplicationController
   before_filter :confirm_existing_password, only: [:change_password]
+  before_action :set_user, except: [:confirm_lock]
 
   def confirm_lock
     params.permit!
@@ -48,6 +49,34 @@ class UsersController < ApplicationController
     redirect_to personal_insured_families_path
   end
 
+  def change_username_and_email
+    authorize User, :change_username_and_email?
+    @user_id = params[:user_id]
+  end
+
+  def confirm_change_username_and_email
+    authorize User, :change_username_and_email?
+    @element_to_replace_id = params[:family_actions_id]
+    @email_taken = User.where(:email => params[:new_email].strip, :id.ne => @user.id).first if params[:new_email]
+    @username_taken = User.where(:oim_id => params[:new_oim_id].strip, :id.ne => @user.id).first if params[:new_oim_id]
+    if @email_taken.present? || @username_taken.present?
+      @matches = true
+    else
+      @user.oim_id = params[:new_oim_id] if params[:new_oim_id] != params[:current_oim_id]
+      @user.email = params[:new_email] if params[:new_email] && (params[:new_email] != params[:current_email])
+      begin
+        @user.modifier = current_user
+        @user.save!
+      rescue => e
+        @errors = @user.errors.messages
+      end
+    end
+    respond_to do |format|
+      format.js { render "change_username_and_email"} if @errors
+      format.js { render "username_email_result"}
+    end
+  end
+
   def edit
     @user = User.find(params[:id])
   end
@@ -78,6 +107,10 @@ class UsersController < ApplicationController
 
   def user
     @user ||= User.find(params[:id])
+  end
+
+  def set_user
+    @user = User.find(params[:id])
   end
 
   def confirm_existing_password

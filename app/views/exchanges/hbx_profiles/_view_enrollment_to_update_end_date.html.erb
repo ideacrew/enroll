@@ -1,0 +1,151 @@
+<script type="text/javascript">
+    jQuery('[id^="terminate_hbx_"]:checked').closest('tr').find("input[type=checkbox]").prop('disabled', false);
+    jQuery('[id^="terminate_hbx_"]:checked').closest('tr').find("input[type=text]").prop('disabled', false);
+    jQuery('[id^="terminate_hbx_"]').click(function($) {
+        jQuery('[id^="terminate_hbx_"]').each(function($) {
+            if (this.checked) {
+                jQuery(jQuery(this).closest('tr').find('[type=checkbox]')[0]).prop('disabled', false);
+                jQuery(jQuery(this).closest('tr').find('[type=text]')[0]).prop('disabled', false);
+            }else{
+                jQuery(jQuery(this).closest('tr').find('[type=checkbox]')[0]).prop('disabled', true);
+                jQuery(jQuery(this).closest('tr').find('[type=checkbox]')[0]).prop('checked', false);
+                jQuery(jQuery(this).closest('tr').find('[type=text]')[0]).prop('disabled', true);
+            }
+        });
+    });
+
+    var TerminateWithEarlierDate = function () {
+        $('#termiante_with_earlier_date').modal('show');
+        jQuery('[id^="terminate_hbx_"]').each(function($) {
+            if (this.checked) {
+
+                var dup_enr_ids = <%= raw @dup_enr_ids %>;
+                var input_id = this.value;
+                var output = dup_enr_ids.includes(input_id);
+                var new_term_date = jQuery(this).closest('tr').find("input[name=new_termination_date]")[0].value
+                var enrollment_effective = jQuery(this).closest('tr').find("td#enrollment_effective_on").html();
+                var enrollment_eligible_for_reterm = jQuery(this).closest('tr').find("td#enrollment_eligible_for_reterm").text();
+
+                if (output || enrollment_eligible_for_reterm == "false") {
+                  jQuery('#no_termination_message').show();
+                  jQuery('#cancel_message').hide();
+                  jQuery('#termination_message').hide();
+                  jQuery("a.modal_confirm").hide();
+                  return
+                }
+
+                if(new_term_date == enrollment_effective){
+                  jQuery('#cancel_message').show();
+                  jQuery('#termination_message').hide();
+                  jQuery('#no_termination_message').hide();
+                  jQuery("a.modal_confirm").show();
+                }
+                else{
+                  jQuery('#cancel_message').hide();
+                  jQuery('#termination_message').show();
+                  jQuery('#no_termination_message').hide();
+                  jQuery("a.modal_confirm").show();
+                }
+            }
+        });
+    }
+    jQuery("a.modal_confirm").click(function() {
+        jQuery("#termiante_with_earlier_date-form").submit();
+    });
+</script>
+
+<td colspan="90%">
+  <%if @enrollments.present?%>
+      <%= form_tag update_enrollment_termianted_on_date_exchanges_hbx_profiles_path, :method => :post, remote: true, id: 'termiante_with_earlier_date-form' do %>
+          <h3 class='title'>Terminated Enrollment To Update End Date</h3>
+          <br />
+          <table  class="table table-striped">
+            <tr>
+              <th></th>
+              <th>HBX ID</th>
+              <th>Plan</th>
+              <th>Effective Date</th>
+              <th>Previous Terminated Date</th>
+              <th>Termination Date</th>
+              <th>Transmit to Carrier ?</th>
+            </tr>
+            <% @enrollments.each_with_index do |hbx, index| %>
+                <tr>
+                  <td> <%= radio_button_tag("enrollment_id", hbx.id, (index.zero? ? true : false), id:"terminate_hbx_#{hbx.id}") %> </td>
+                  <td><%= hbx.hbx_id %></td>
+                  <td><%= hbx.product.name %></td>
+                  <td id="enrollment_eligible_for_reterm" class="hidden"><%= hbx.enrollment_eligible_for_reterm? %></td>
+                  <td id="enrollment_effective_on"><%= hbx.effective_on %></td>
+                  <td><%= hbx.terminated_on %></td>
+                  <td><%= text_field_tag "new_termination_date", nil, readonly: true, disabled: true, value:  hbx.terminated_on, id: "termination-date-picker_#{hbx.id}", class: "form-control date-field date-picker", "data-date-min" =>  hbx.effective_on, "data-date-max" =>  hbx.terminated_on %></td>
+                  <td><%= check_box_tag "edi_required", hbx.id, false,  disabled: true%></td>
+                </tr>
+            <% end %>
+            <tr><td colspan = "7"><br /></td></tr>
+            <tr>
+              <td colspan = "6">
+                <span class="btn btn-default" onclick="$('tr.child-row:visible').remove();">Cancel</span>&nbsp;&nbsp;&nbsp;
+                <%= hidden_field_tag :family_actions_id, params[:family_actions_id] %>
+                <button class='btn btn-primary', type="button", onclick = "TerminateWithEarlierDate()" > Submit </button>
+              </td>
+            </tr>
+          </table>
+      <% end %>
+  <%else%>
+      <h4 class='title'>No Enrollments to terminate</h4>
+  <%end%>
+
+  <div class="modal fade" id="termiante_with_earlier_date" tabindex="-1" role="dialog" aria-labelledby="RetermConfirm" role="document">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header" style="border-bottom:none">
+
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="row" style="font-size: 15px;">
+            <p class="bg-warning"></p>
+            <div id="termination_message">
+              <div>
+                <h4 class="modal-title" style="display:inline;">&nbsp;&nbsp;
+                  You are about to update the enrollment end date on behalf of
+                </h4>
+                <p style="font-size:15px;font-weight: bolder;">&nbsp;&nbsp;
+                  <%= @person.full_name %>
+                </p>
+              </div>
+            </div>
+            <div id="no_termination_message">
+              <div>
+                <h4 class="modal-title">
+                  <p class="bg-warning">&nbsp;&nbsp;
+                    End Date changes allowable for current plan year </br> &nbsp;&nbsp; and previous plan year.
+                  </p>
+                </h4>
+              </div>
+            </div>
+            <div id="cancel_message">
+              <div>
+                <h4 class="modal-title" style="display:inline;">&nbsp;&nbsp;
+                  You are about to cancel the enrollment on behalf of
+                </h4>
+                <p style="display:inline;font-size:15px;font-weight: bolder;">
+                  <%= @person.full_name %>
+                </p>
+              </div>
+              <br>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Close</button>
+          <%= link_to "Confirm",  '', class: 'btn btn-primary mtz modal_confirm' %>
+        </div>
+      </div>
+    </div>
+  </div>
+</td>
+
+<style>.date-picker { width:90px !important;font-size: 12px;} </style>

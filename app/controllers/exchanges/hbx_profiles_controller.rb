@@ -1,4 +1,5 @@
 class Exchanges::HbxProfilesController < ApplicationController
+  include Exchanges::HbxProfilesHelper
   include ::DataTablesAdapter
   include ::DataTablesSearch
   include ::Pundit
@@ -300,6 +301,7 @@ def employer_poc
   end
 
   def user_account_index
+    authorize HbxProfile, :can_access_user_account_tab?
     @datatable = Effective::Datatables::UserAccountDatatable.new
   end
 
@@ -402,6 +404,30 @@ def employer_poc
     end
   end
 
+  def view_enrollment_to_update_end_date
+    @person = Person.find(params[:person_id])
+    @row = params[:family_actions_id]
+    @enrollments = @person.primary_family.terminated_enrollments
+    @coverage_ended_enrollments = @person.primary_family.enrollments.where(:aasm_state.in => ["coverage_terminated", "coverage_termination_pending", "coverage_expired"])
+    @dup_enr_ids = fetch_duplicate_enrollment_ids(@coverage_ended_enrollments).map(&:to_s)
+  end
+
+   def update_enrollment_termianted_on_date
+    begin
+      enrollment = HbxEnrollment.find(params[:enrollment_id])
+      @row = params[:family_actions_id]
+      termination_date = Date.strptime(params["new_termination_date"], "%m/%d/%Y")
+      if enrollment.present? && enrollment.reterm_enrollment_with_earlier_date(termination_date, params["edi_required"].present?)
+        message = {notice: "Enrollment Updated Successfully."}
+      else
+        message = {notice: "Unable to find/update Enrollment."}
+      end
+    rescue Exception => e
+      message = {error: e.to_s}
+    end
+    redirect_to exchanges_hbx_profiles_root_path, flash: message
+  end
+
   def broker_agency_index
 
     @datatable = Effective::Datatables::BrokerAgencyDatatable.new
@@ -495,6 +521,33 @@ def employer_poc
       format.html { render partial: "configuration_index" }
       format.js {}
     end
+  end
+
+  def view_terminated_hbx_enrollments
+    @person = Person.find(params[:person_id])
+    @element_to_replace_id = params[:family_actions_id]
+    @enrollments = @person.primary_family.terminated_enrollments
+  end
+
+  def reinstate_enrollment
+    enrollment = HbxEnrollment.find(params[:enrollment_id])
+     if enrollment.present?
+      begin
+        reinstated_enrollment = enrollment.reinstate(edi: params['edi_required'].present?)
+        if reinstated_enrollment.present?
+          if params['comments'].present?
+            reinstated_enrollment.comments.create(:content => params[:comments], :user => current_user.id)
+          end
+          message = {notice: "Enrollment Reinstated successfully."}
+        end
+      rescue Exception => e
+        message = {error: e.to_s}
+      end
+    else
+      message = {notice: "Unable to find Enrollment."}
+    end
+    
+    redirect_to exchanges_hbx_profiles_root_path, flash: message
   end
 
   def edit_dob_ssn
@@ -665,6 +718,69 @@ def employer_poc
   end
 
 private
+
+  def group_enrollments_by_year_and_market(all_enrollments)
+    current_year = TimeKeeper.date_of_record.year
+    years = (2015..(current_year + 1))
+
+    years.inject({}) do |hash_map, year|
+      ivl_enrs = all_enrollments.select{ |enrollment| !enrollment.is_shop? && enrollment.effective_on.year == year }
+      shop_enrs = all_enrollments.select do |enrollment|
+        next unless enrollment.present? || enrollment.sponsored_benefit_package.present?
+
+        enrollment.is_shop? && enrollment.sponsored_benefit_package.start_on.year == year
+      end
+      hash_map["ivl_#{year}"] = ivl_enrs if ivl_enrs.present?
+      hash_map["shop_#{year}"] = shop_enrs if shop_enrs.present?
+      hash_map
+    end
+  end
+
+  def duplicate_enrs_by_market_year(market_enrollments)
+    if market_enrollments.first.is_shop?
+      market_enrollments.each_cons(2).select do |enr, next_enr|
+        (enr.subscriber.applicant_id == next_enr.subscriber.applicant_id) &&
+          (enr.market_name == next_enr.market_name) &&
+          (enr.product.id == next_enr.product.id) &&
+          (enr.benefit_sponsorship_id == next_enr.benefit_sponsorship_id) &&
+          (enr.sponsored_benefit_package_id == next_enr.sponsored_benefit_package_id) &&
+          (enr.sponsored_benefit_package.start_on == next_enr.sponsored_benefit_package.start_on)
+      end
+    else
+      market_enrollments.each_cons(2).select do |enr, next_enr|
+        (enr.subscriber.applicant_id == next_enr.subscriber.applicant_id) &&
+          (enr.market_name == next_enr.market_name) &&
+          (enr.product.id == next_enr.product.id)
+      end
+    end
+  end
+
+  def get_duplicate_enrs(market_enrollments)
+    product_ids = market_enrollments.flatten.map(&:product_id)
+    return [] if product_ids.uniq.count == product_ids.count
+
+    dup_enrs = duplicate_enrs_by_market_year(market_enrollments)
+    dup_enr_arrays = dup_enrs.flatten.compact.count > 1 ? dup_enrs.flatten.compact : []
+    dup_enr_arrays
+  end
+
+  def fetch_duplicate_enrollment_ids(enrollments)
+    enrs_mapping_by_year_and_market = group_enrollments_by_year_and_market(enrollments)
+    return [] if enrs_mapping_by_year_and_market.blank?
+
+    enrs_mapping_by_year_and_market.inject([]) do |duplicate_ids, (_market_year, market_enrollments)|
+      next duplicate_ids unless market_enrollments.count > 1
+
+      dups = get_duplicate_enrs(market_enrollments)
+      next duplicate_ids if dups.empty?
+
+      effective_date = dups.map(&:effective_on).max
+      dups.each do |enr|
+        duplicate_ids << enr.id if enr.effective_on < effective_date
+      end
+      duplicate_ids
+    end
+  end
 
   def benefit_application_error_messages(obj)
     obj.errors.full_messages.collect { |error| "<li>#{error}</li>".html_safe }

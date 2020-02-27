@@ -83,10 +83,12 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
 
     before :each do
+      allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
       allow(view).to receive(:disable_make_changes_button?).with(hbx_enrollment).and_return(true)
     end
 
     it "when kind is employer_sponsored" do
+      allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
       allow(hbx_enrollment).to receive(:kind).and_return('employer_sponsored')
       allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
@@ -181,6 +183,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
 
     before :each do
+      allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
       allow(hbx_enrollment).to receive(:kind).and_return('employer_sponsored')
       allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
@@ -350,6 +353,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
 
     before :each do
+      allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
       allow(view).to receive(:disable_make_changes_button?).with(hbx_enrollment).and_return(true)
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
@@ -402,6 +406,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     let(:end_on) { Date.today }
 
     before :each do
+      allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
       allow(view).to receive(:disable_make_changes_button?).with(hbx_enrollment).and_return true
       allow(view).to receive(:enrollment_coverage_end).with(hbx_enrollment).and_return end_on
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }

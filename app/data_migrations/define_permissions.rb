@@ -9,7 +9,7 @@ class DefinePermissions < MigrationTask
       .find_or_initialize_by(name: 'hbx_staff')
       .update_attributes!(modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
                           send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_update_ssn: false, can_complete_resident_application: false,
-                          can_add_sep: false, can_lock_unlock: true, can_view_username_and_email: false, can_reset_password: false, modify_admin_tabs: true,
+                          can_add_sep: false, can_lock_unlock: true, can_view_username_and_email: true, can_reset_password: false, modify_admin_tabs: true,
                           view_admin_tabs: true,  view_the_configuration_tab: true, can_submit_time_travel_request: false)
     Permission
       .find_or_initialize_by(name: 'hbx_read_only')
@@ -40,13 +40,13 @@ class DefinePermissions < MigrationTask
       .find_or_initialize_by(name: 'hbx_tier3')
       .update_attributes!(modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
                           send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_update_ssn: false, can_complete_resident_application: false,
-                          can_add_sep: false, can_lock_unlock: true, can_view_username_and_email: false, can_reset_password: false, modify_admin_tabs: true,
+                          can_add_sep: false, can_lock_unlock: true, can_view_username_and_email: true, can_reset_password: false, modify_admin_tabs: true,
                           view_admin_tabs: true,  view_the_configuration_tab: true, can_submit_time_travel_request: false)
     Permission
       .find_or_initialize_by(name: 'super_admin')
       .update_attributes!(modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
                           send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_update_ssn: false, can_complete_resident_application: false,
-                          can_add_sep: false, can_lock_unlock: true, can_view_username_and_email: false, can_reset_password: false, modify_admin_tabs: true,
+                          can_add_sep: false, can_lock_unlock: true, can_view_username_and_email: true, can_reset_password: false, modify_admin_tabs: true,
                           view_admin_tabs: true, can_extend_open_enrollment: true, view_the_configuration_tab: true, can_submit_time_travel_request: false)
       #puts 'Permissions Updated!'
   end
@@ -90,6 +90,12 @@ class DefinePermissions < MigrationTask
     Permission.hbx_tier3.update_attributes!(can_update_ssn: true)
   end
 
+  def hbx_admin_can_access_user_account_tab
+    Permission.hbx_staff.update_attributes!(can_access_user_account_tab: true)
+    Permission.super_admin.update_attributes!(can_access_user_account_tab: true)
+    Permission.hbx_tier3.update_attributes!(can_access_user_account_tab: true)
+  end
+
   def hbx_admin_can_complete_resident_application
     Permission.hbx_staff.update_attributes!(can_complete_resident_application: true)
     Permission.super_admin.update_attributes!(can_complete_resident_application: true)
@@ -112,10 +118,6 @@ class DefinePermissions < MigrationTask
     Permission.hbx_staff.update_attributes!(can_view_username_and_email: true)
     Permission.super_admin.update_attributes!(can_view_username_and_email: true)
     Permission.hbx_tier3.update_attributes!(can_view_username_and_email: true)
-    Permission.hbx_read_only.update_attributes!(can_view_username_and_email: true)
-    Permission.hbx_csr_supervisor.update_attributes!(can_view_username_and_email: true)
-    Permission.hbx_csr_tier2.update_attributes!(can_view_username_and_email: true)
-    Permission.hbx_csr_tier1.update_attributes!(can_view_username_and_email: true)
   end
 
   def hbx_admin_can_reset_password
@@ -166,5 +168,10 @@ class DefinePermissions < MigrationTask
     users.each do |user|
       HbxStaffRole.create!( person: user.person, permission_id: Permission.hbx_tier3.id, subrole: 'hbx_tier3', hbx_profile_id: HbxProfile.current_hbx.id, benefit_sponsor_hbx_profile_id: hbx_organization.hbx_profile.id)
     end
+  end
+
+  def hbx_admin_can_update_enrollment_end_date_or_reinstate
+    Permission.super_admin.update_attributes(can_update_enrollment_end_date: true, can_reinstate_enrollment: true)
+    Permission.hbx_tier3.update_attributes(can_update_enrollment_end_date: true, can_reinstate_enrollment: true)
   end
 end
