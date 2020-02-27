@@ -94,9 +94,8 @@ Then(/Individual should see a form to enter personal information$/) do
   fill_in "person_addresses_attributes_0_address_1", :with => "4900 USAA BLVD"
   fill_in "person_addresses_attributes_0_address_2", :with => "212"
   fill_in "person_addresses_attributes_0_city", :with=> "Washington"
-  #find('.interaction-choice-control-state-id', text: 'SELECT STATE *').click
-  find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[2]/span').click
-  first('li', :text => 'DC').click
+  find(:xpath, "//span[@class='label'][contains(., 'SELECT STATE')]").click
+  find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'DC')]").click
   fill_in "person[addresses_attributes][0][zip]", :with => "20002"
 
   sleep 2
@@ -181,7 +180,7 @@ Then(/select I-551 doc and fill details/) do
   find('li', :text => 'I-551 (Permanent Resident Card)', wait: 10).click
   fill_in 'Alien Number', with: '987654323'
   fill_in 'Card Number', with: 'aaa1231231231'
-  fill_in 'Expiration Date', with: TimeKeeper.date_of_record.to_s
+  fill_in 'I-551 Expiration Date', with: TimeKeeper.date_of_record.to_s
   click_link((TimeKeeper.date_of_record + 10.days).day)
 end
 
