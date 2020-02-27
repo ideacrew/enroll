@@ -1384,8 +1384,7 @@ class HbxEnrollment
 
   def self.family_canceled_enrollments(family)
     canceled_enrollments = HbxEnrollment.family_home_page_hidden_enrollments(family)
-    # Blank product_id will throw exception 
-    canceled_enrollments.reject{|enrollment| enrollment.is_shop? && enrollment.sponsored_benefit_id.blank? || enrollment.product_id.blank? }
+    canceled_enrollments.reject{ |enrollment| enrollment.is_shop? && enrollment.sponsored_benefit_id.blank? }
   end
 
   # TODO: Fix this to properly respect mulitiple possible employee roles for the same employer

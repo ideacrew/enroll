@@ -280,8 +280,10 @@ class Family
   end
 
   def enrollments_for_home_page
-    enrollments = self.enrollments.non_external.product_present.order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) || []
-    enrollments.reject { |enrollment| enrollment.product_id.blank? }
+    enrollments = self.enrollments.non_external.product_present.order(
+      effective_on: :desc,
+      submitted_at: :desc, coverage_kind: :desc
+    ) || []
   end
 
   # The {FamilyMember} who is head and 'owner' of this family instance.
