@@ -37,7 +37,6 @@ Feature: Employer can view their employees
     Then employer should not see the address on the roster
     And employer clicks on cancel button
     When employer clicks on non-linked employee with address
-    And employer should not see the address on the roster
     Then employer clicks on cancel button
     When employer clicks on non-linked employee without address
     Then employer should see the address on the roster
