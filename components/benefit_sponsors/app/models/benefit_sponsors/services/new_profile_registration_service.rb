@@ -274,7 +274,7 @@ module BenefitSponsors
       end
 
       def has_general_agency_staff_role_for_profile?(user, profile) # When profile is general agency
-        ga_staff_roles = user.person.general_agency_staff_roles
+        ga_staff_roles = user.person.general_agency_staff_roles.active
         ga_staff_roles.any? {|role| role.benefit_sponsors_general_agency_profile_id == profile.id }
       end
 
