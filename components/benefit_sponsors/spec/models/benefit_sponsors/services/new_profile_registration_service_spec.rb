@@ -200,6 +200,24 @@ module BenefitSponsors
       end
     end
 
+    describe ".has_employer_staff_role_for_profile??" do
+      context "Staff for Employer profile" do
+
+        it "should return true if employer staff is active to a employer profile" do
+          params = { profile_id: employer_profile.id, profile_type: "employer_profile" }
+          service = subject.new params
+          expect(service.is_staff_for_agency?(user, employer_profile)). to eq true
+        end
+
+        it "should return false if employer staff is not active to a employer profile" do
+          person.employer_staff_roles.first.update_attributes(aasm_state: "is_closed")
+          params = { profile_id: employer_profile.id, profile_type: "employer_profile" }
+          service = subject.new params
+          expect(service.is_staff_for_agency?(user, employer_profile)). to eq false
+        end
+      end
+    end
+
     describe ".is_general_agency_staff_for_employer?" do
 
       let(:plan_design_organization) do

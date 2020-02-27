@@ -270,7 +270,7 @@ module BenefitSponsors
       def has_broker_role_for_profile?(user, profile) # When profile is broker agency
         broker_role = user.person.broker_role
         return false unless broker_role
-        profile.primary_broker_role_id == broker_role.id
+        profile.primary_broker_role_id == broker_role.id if is_broker_profile?
       end
 
       def has_general_agency_staff_role_for_profile?(user, profile) # When profile is general agency
@@ -284,7 +284,7 @@ module BenefitSponsors
       end
 
       def has_employer_staff_role_for_profile?(user, profile) # When profile is benefit sponsor
-        staff_roles = user.person.employer_staff_roles
+        staff_roles = user.person.employer_staff_roles.active
         staff_roles.any? {|role| role.benefit_sponsor_employer_profile_id == profile.id }
       end
 
