@@ -4,7 +4,7 @@ When(/^.+ visits the HBX Broker Registration form$/) do
 end
 
 When(/^Primary Broker should see the New Broker Agency form$/) do
-  wait_for_ajax
+  find('#broker_registration_form')
   expect(page).to have_css("#broker_registration_form")
   # Agency fields are part of the broker registration form
   expect(page).to have_content("Broker Agency Information")
@@ -89,7 +89,7 @@ And(/^.+ enters broker agency information for SHOP markets$/) do
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][area_code]', :with => location[:phone_area_code]
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][number]', :with => location[:phone_number]
   #fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][extension]', :with => location[:phone_extension]
-  wait_for_ajax
+  sleep 5
   # Clicking the 'Create Broker Agency' button 
   find("#broker-btn").click
 end
@@ -104,7 +104,7 @@ And(/^.+ clicks? on Create Broker Agency$/) do
 end
 
 Then(/^.+ should see broker registration successful message$/) do
-  wait_for_ajax
+  find('.alert', wait: 10)
   expect(page).to have_content('Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed.')
 end
 

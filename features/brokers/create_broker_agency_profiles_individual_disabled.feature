@@ -18,8 +18,8 @@ Feature: Create Primary Broker and Broker Agency
     Given Primary Broker has not signed up as an HBX user
     Then Primary Broker should see the New Broker Agency form
     When Primary Broker enters personal information
-    And Primary Broker enters broker agency information for SHOP markets
     And Primary Broker enters office location for default_office_location
+    And Primary Broker enters broker agency information for SHOP markets
     Then Primary Broker should see broker registration successful message
 
   @more_than_sole_source
