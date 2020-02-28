@@ -40,6 +40,5 @@ Feature: Employee hired during renewal period
       Then Employee Patrick Doe should see confirm your plan selection page
       When Employee clicks on Confirm button on the coverage summary page
       Then Employee should see the receipt page
-      Then Employee clicks on Continue button on receipt page
       Then Patrick Doe should see "my account" page with active enrollment
       And Patrick Doe should see renewal policy in active status
