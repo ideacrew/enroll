@@ -29,7 +29,6 @@ Feature: Employee hired during renewal period
       Then Employee Patrick Doe should see coverage effective date
       When Employee clicks on Confirm button on the coverage summary page
       Then Employee should see the receipt page
-      Then Employee clicks on Continue button on receipt page
       Then Patrick Doe should see "my account" page with active enrollment
       And Patrick Doe should see passive renewal
       Then Patrick Doe click on make changes button on passive renewal
