@@ -257,6 +257,23 @@ class Person
   index(
     {
       "is_active" => 1,
+      "broker_role._id" => 1,
+      "broker_agency_staff_roles._id" => 1,
+    },
+    {name: "people_agency_non_primary_agent_broker_query_index"}
+  )
+
+  index(
+    {
+      "is_active" => 1,
+      "general_agency_staff_roles.is_primary" => 1
+    },
+    {name: "people_agency_non_primary_agent_ga_query_index"}
+  )
+
+  index(
+    {
+      "is_active" => 1,
       "general_agency_staff_roles.is_primary" => 1,
       "broker_role._id" => 1,
       "broker_agency_staff_roles._id" => 1,
