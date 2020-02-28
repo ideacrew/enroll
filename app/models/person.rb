@@ -321,22 +321,11 @@ class Person
   after_update :notify_updated
 
   def self.api_staff_roles
-    broker_orgs =  BenefitSponsors::Organizations::Organization.where({
-          "profiles": {
-            "$elemMatch": {
-              "_type": /.*BrokerAgencyProfile$/,
-              "aasm_state": "is_approved"
-            }
-          }
-        })
-
-    broker_role_ids_to_exclude = broker_orgs.map{|x| x.profiles.first.try(:primary_broker_role_id)}
-
     Person.where(
       {
       "is_active" => true,
       "$or" => [
-          { "broker_agency_staff_roles._id" => { "$exists" => true }, "broker_role._id" => {"$nin" => broker_role_ids_to_exclude} },
+          { "broker_agency_staff_roles._id" => { "$exists" => true } },
           { "general_agency_staff_roles.is_primary" =>  false }
         ]
       }
