@@ -26,4 +26,4 @@ bundle install
 
 bundle exec rails r -e test "DatabaseCleaner.clean"
 
-COVERAGE=true bundle exec rake parallel:spec[4]
+bundle exec rake parallel:spec[4]
