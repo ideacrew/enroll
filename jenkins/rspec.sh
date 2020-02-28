@@ -15,7 +15,7 @@ rm -rf ./public/packs*
 [[ -s $HOME/.nvm/nvm.sh ]] && . $HOME/.nvm/nvm.sh
 # nvm install 9
 # nvm use 9 || exit -1
-npm install --global yarn
+# npm install --global yarn
 yarn install
 
 NODE_ENV=test RAILS_ENV=test ./bin/webpack
