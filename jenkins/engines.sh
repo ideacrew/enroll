@@ -13,8 +13,8 @@ rm -rf ./tmp/rspec_junit_*.xml
 rm -rf ./public/packs*
 
 [[ -s $HOME/.nvm/nvm.sh ]] && . $HOME/.nvm/nvm.sh
-nvm install 9
-nvm use 9 || exit -1
+# nvm install 9
+# nvm use 9 || exit -1
 npm install --global yarn
 yarn install
 

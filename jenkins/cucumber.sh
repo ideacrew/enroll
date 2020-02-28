@@ -14,8 +14,8 @@ rm -rf ./public/packs*
 bundle install
 
 [[ -s $HOME/.nvm/nvm.sh ]] && . $HOME/.nvm/nvm.sh
-nvm install 9
-nvm use 9 || exit -1
+# nvm install 9
+# nvm use 9 || exit -1
 npm install --global yarn
 yarn install
 
