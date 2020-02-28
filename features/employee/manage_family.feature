@@ -37,6 +37,7 @@ Feature: Employees can update their password or security questions
     When Employee selects a plan on the plan shopping page
     When Employee clicks on Confirm button on the coverage summary page
     Then Employee should see the receipt page
+    Then Employee clicks on Continue button on receipt page
     Then Employee should see the "my account" page
     Then Employee should click on Manage Family button
     Then Employee should click on the Personal Tab link

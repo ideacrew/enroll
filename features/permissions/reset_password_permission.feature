@@ -30,20 +30,10 @@ Feature: Only HBX Staff will be able to see & access the Reset Password Feature.
     And Employee Patrick Doe should see their plan start date on the page
     And Hbx Admin logs out
 
-  Scenario Outline: HBX Staff with <subrole> subroles should <action> Reset Password button
-    Given that a user with a HBX staff role with <subrole> subrole exists and is logged in
+  Scenario: HBX Staff with HBX staff subroles should <action> Reset Password button
+    Given that a user with a HBX staff role with HBX Staff subrole exists and is logged in
     And the user is on the User Accounts tab of the Admin Dashboard
     Then user will click on action tab
     Then Hbx Admin should see Reset Password link in action drop down
     When Hbx Admin click on Reset Password link in action drop down
     And Hbx admin confirms password send
-
-
-    Examples:
-      | subrole       | action  |
-      | HBX Staff     | see     |
-
-
-
-
-

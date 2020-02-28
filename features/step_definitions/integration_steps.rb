@@ -880,6 +880,7 @@ Then(/^.+ should see the receipt page$/) do
 end
 
 Then(/^.+ should see the "my account" page$/) do
+  find('.my-account-page')
   expect(page).to have_content("My #{Settings.site.short_name}")
   screenshot("my_account")
 end
@@ -1145,7 +1146,7 @@ Then(/Devops can verify session logs/) do
 end
 
 Given(/^a Hbx admin with read and write permissions and employers$/) do
-  p_staff=FactoryGirl.create :permission, :hbx_update_ssn
+  p_staff=FactoryGirl.create :permission, :hbx_update_ssn, can_access_user_account_tab: true
   person = people['Hbx AdminEnrollments']
   hbx_profile = FactoryGirl.create :hbx_profile
   user = FactoryGirl.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]

@@ -1,6 +1,6 @@
 Given(/^the HBX admin is on the User Accounts page$/) do
   visit '/exchanges/hbx_profiles'
-  find('.interaction-click-control-user-accounts').click
+  click_link 'User Accounts'
   expect(page).to have_content('Account Updates')
 end
 
@@ -11,8 +11,8 @@ When(/^the HBX admin searches for the given user$/) do
 end
 
 When(/^the HBX admin selects the Edit User option$/) do
-  find(:xpath, '//*[starts-with(@id, "dropdown_for_user_action")]').trigger('click')
-  all('.btn-xs', text: 'Edit User')[0].trigger('click')
+  find(:xpath, '//*[starts-with(@id, "dropdown_for_user_action")]').click
+  all('.btn-xs', text: 'Edit User')[0].click
 end
 
 Then(/^the HBX Admin will see the Edit User Credentials$/) do
@@ -23,44 +23,46 @@ end
 
 When(/^the HBX admin updates the username for the user$/) do
   find('#inputNewUsername').set('EmployeeOne')
-  find("input[type='submit']").trigger('click')
+  find("input[type='submit']").click
 end
 
 Then(/^the HBX admin should see the Edit User option$/) do
-  find(:xpath, '//*[starts-with(@id, "dropdown_for_user_action")]').trigger('click')
+  find(:xpath, '//*[starts-with(@id, "dropdown_for_user_action")]').click
   expect(page).to have_content('Edit User')
 end
 
 Then(/^the HBX admin should receive an success message$/) do
+  page.driver.browser.switch_to.alert.accept
   expect(page).to have_content('User Account Updated Successfully')
 end
 
 When(/^the HBX admin updates the email for the user$/) do
   find('#inputNewEmail').set('EmployeeOne@test.com')
-  find("input[type='submit']").trigger('click')
+  find("input[type='submit']").click
 end
 
 When(/^the HBX admin updates the email and username for the user$/) do
   find('#inputNewUsername').set('EmployeeOne')
   find('#inputNewEmail').set('EmployeeOne@test.com')
-  find("input[type='submit']").trigger('click')
+  find("input[type='submit']").click
 end
 
 When(/^the HBX admin updates the username with a username already in use$/) do
   @user = User.where(:'roles'.in => ["employer_staff"], locked_at: nil).first
   FactoryGirl.create(:person, user: @user)
   find('#inputNewUsername').set(@user.oim_id)
-  find("input[type='submit']").trigger('click')
+  find("input[type='submit']").click
 end
 
 When(/^the HBX admin updates the email with a email already in use$/) do
   @user = User.where(:'roles'.in => ["employer_staff"], locked_at: nil).first
   FactoryGirl.create(:person, user: @user)
   find('#inputNewEmail').set(@user.email)
-  find("input[type='submit']").trigger('click')
+  find("input[type='submit']").click
 end
 
 Then(/^an error message will appear stating that the credentials are currently in use$/) do
+  page.driver.browser.switch_to.alert.accept
   expect(page).to have_content(/The (.*?) matches with the following user:/)
 end
 
@@ -75,7 +77,7 @@ When(/^the HBX admin updates the email and username with a email and username al
   FactoryGirl.create(:person, user: @user)
   find('#inputNewEmail').set(@user.email)
   find('#inputNewUsername').set(@user.oim_id)
-  find("input[type='submit']").trigger('click')
+  find("input[type='submit']").click
 end
 
 When(/^the users username and email appear in the form fields$/) do
@@ -85,7 +87,7 @@ When(/^the users username and email appear in the form fields$/) do
 end
 
 When(/^the HBX Admin presses the Reset button on the Edit User form$/) do
-  find_button("Reset").trigger('click')
+  find_button("Reset").click
 end
 
 Then(/^the text in the username and email address fields will be cleared$/) do
