@@ -259,9 +259,9 @@ class Person
       "is_active" => 1,
       "general_agency_staff_roles.is_primary" => 1,
       "broker_role._id" => 1,
-      "broker_agency_staff_role.id" => 1,
+      "broker_agency_staff_roles._id" => 1,
     },
-    {name: "people_agency_agent_query_index"}
+    {name: "people_agency_non_primary_agent_query_index"}
   )
 
   scope :all_consumer_roles,          -> { exists(consumer_role: true) }
@@ -336,8 +336,8 @@ class Person
       {
       "is_active" => true,
       "$or" => [
-          { "broker_agency_staff_roles" => { "$exists" => true }, "broker_role._id" => {"$nin" => broker_role_ids_to_exclude} },
-          { "general_agency_staff_roles" => { "$exists" => true }, "general_agency_staff_roles.is_primary" =>  false }
+          { "broker_agency_staff_roles._id" => { "$exists" => true }, "broker_role._id" => {"$nin" => broker_role_ids_to_exclude} },
+          { "general_agency_staff_roles.is_primary" =>  false }
         ]
       }
     )
