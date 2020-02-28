@@ -7,7 +7,7 @@ function setupExternalRedirectedListener() {
     var jwtVal = changeElement.getAttribute("data-redirect-jwt");
     if (redirUrl != null) {
       window.localStorage.setItem("jwt", jwtVal);
-      window.location = (redirUrl + "?auth_token=" + jwtVal);
+      window.location.assign(redirUrl + "?auth_token=" + jwtVal);
     }
   }
 }
