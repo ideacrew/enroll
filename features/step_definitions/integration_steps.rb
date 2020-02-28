@@ -876,6 +876,7 @@ end
 Then(/^.+ should see the receipt page$/) do
   expect(page).to have_content('Enrollment Submitted')
   screenshot("receipt_page")
+  find('.interaction-click-control-continue').click
 end
 
 Then(/^.+ should see the "my account" page$/) do
