@@ -271,16 +271,6 @@ class Person
     {name: "people_agency_non_primary_agent_ga_query_index"}
   )
 
-  index(
-    {
-      "is_active" => 1,
-      "general_agency_staff_roles.is_primary" => 1,
-      "broker_role._id" => 1,
-      "broker_agency_staff_roles._id" => 1,
-    },
-    {name: "people_agency_non_primary_agent_query_index"}
-  )
-
   scope :all_consumer_roles,          -> { exists(consumer_role: true) }
   scope :all_resident_roles,          -> { exists(resident_role: true) }
   scope :all_employee_roles,          -> { exists(employee_roles: true) }
