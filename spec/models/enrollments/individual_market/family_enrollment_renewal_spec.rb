@@ -5,7 +5,6 @@ require "#{Rails.root}/spec/shared_contexts/enrollment.rb"
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
   RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :model, :dbclean => :after_each do
-    include FloatHelper
 
     let(:current_date) { Date.new(calender_year, 11, 1) }
 
