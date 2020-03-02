@@ -13,9 +13,9 @@ rm -rf ./tmp/rspec_junit_*.xml
 rm -rf ./public/packs*
 
 [[ -s $HOME/.nvm/nvm.sh ]] && . $HOME/.nvm/nvm.sh
-nvm install 9
-nvm use 9 || exit -1
-npm install --global yarn
+# nvm install 9
+# nvm use 9 || exit -1
+# npm install --global yarn
 yarn install
 
 NODE_ENV=test RAILS_ENV=test ./bin/webpack
@@ -26,4 +26,4 @@ bundle install
 
 bundle exec rails r -e test "DatabaseCleaner.clean"
 
-COVERAGE=true bundle exec rake parallel:spec[4]
+bundle exec rake parallel:spec[4]
