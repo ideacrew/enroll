@@ -28,7 +28,7 @@ module Queries
           "$or" => [
             {"broker_role._id" => {"$ne" => nil}},
             {"general_agency_staff_roles.is_primary" => true}]
-        })
+        }).without(:history_tracks, :versions, :consumer_role, :resident_role, :employee_roles, :verification_types, :documents, :employer_staff_roles)
       end
     end
   end
