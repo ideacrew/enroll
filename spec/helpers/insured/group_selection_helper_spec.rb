@@ -201,6 +201,25 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
       allow(person).to receive(:is_resident_role_active?).and_return(true)
       expect(helper.view_market_places(person)).to eq ["coverall"]
     end
+
+    it "should return individual & coverall if can_shop_individual_or_resident? return true" do
+      allow(person).to receive(:is_consumer_role_active?).and_return(true)
+      allow(person).to receive(:has_active_resident_member?).and_return(true)
+      expect(helper.view_market_places(person)).to eq ["individual", "coverall"]
+    end
+
+    it "should return individual if can_shop_individual_or_resident? return false" do
+      allow(person).to receive(:is_consumer_role_active?).and_return(true)
+      allow(person).to receive(:has_active_resident_member?).and_return(false)
+      expect(helper.view_market_places(person)).to eq ["individual"]
+    end
+
+    it "should return coverall if can_shop_individual_or_resident? return false" do
+      allow(person).to receive(:is_consumer_role_active?).and_return(false)
+      allow(person).to receive(:is_resident_role_active?).and_return(true)
+      allow(person).to receive(:has_active_resident_member?).and_return(false)
+      expect(helper.view_market_places(person)).to eq ["coverall"]
+    end
   end
 
   describe "#selected_enrollment" do

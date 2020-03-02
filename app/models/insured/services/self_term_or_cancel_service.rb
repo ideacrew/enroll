@@ -36,7 +36,10 @@ module Insured
           :family => ::Insured::Serializers::FamilySerializer.new(attrs[:family]).to_hash,
           :is_aptc_eligible => attrs[:is_aptc_eligible],
           new_effective_on: attrs[:new_effective_on],
-          available_aptc: attrs[:available_aptc]
+          available_aptc: attrs[:available_aptc],
+          elected_aptc_pct: attrs[:elected_aptc_pct],
+          default_tax_credit_value: attrs[:default_tax_credit_value],
+          new_enrollment_premium: attrs[:new_enrollment_premium]
         }
       end
     end

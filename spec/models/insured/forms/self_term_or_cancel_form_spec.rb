@@ -60,6 +60,11 @@ module Insured
       let!(:hbx_enrollment_member1) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, is_subscriber: true, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: enrollment)}
       let!(:hbx_enrollment_member2) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[1].id, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: enrollment)}
       let!(:hbx_profile) {FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)}
+      let!(:tax_household10) {FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil)}
+      let!(:eligibility_determination) {FactoryBot.create(:eligibility_determination, tax_household: tax_household10, max_aptc: 2000)}
+      let!(:tax_household_member1) {tax_household10.tax_household_members.create(applicant_id: family.primary_applicant.id, is_subscriber: true, is_ia_eligible: true)}
+      let!(:tax_household_member2) {tax_household10.tax_household_members.create(applicant_id: family.family_members[1].id, is_ia_eligible: true)}
+      let(:applied_aptc_amount) { 120.78 }
 
       before(:each) do
         @product = BenefitMarkets::Products::Product.all.where(benefit_market_kind: :aca_individual).first
@@ -68,7 +73,7 @@ module Insured
         premium_table.premium_tuples.where(age: 59).first.update_attributes(cost: 614.85)
         premium_table.premium_tuples.where(age: 61).first.update_attributes(cost: 679.8)
         @product.save!
-        enrollment.update_attributes(product: @product)
+        enrollment.update_attributes(product: @product, applied_aptc_amount: applied_aptc_amount)
         hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
         allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 59, 'R-DC001').and_return(814.85)
         allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 61, 'R-DC001').and_return(879.8)
@@ -76,7 +81,7 @@ module Insured
         family.family_members[1].person.update_attributes!(dob: (enrollment.effective_on - 59.years))
       end
 
-        it 'should create a valid form for the view' do
+      it 'should create a valid form for the view' do
         family.special_enrollment_periods << sep
         attrs = {enrollment_id: enrollment.id.to_s, family_id: family.id}
         form = Insured::Forms::SelfTermOrCancelForm.for_view(attrs)
@@ -84,6 +89,27 @@ module Insured
         expect(form.enrollment).not_to be nil
         expect(form.family).not_to be nil
         expect(form.product).not_to be nil
+      end
+
+      it 'should return available_aptc' do
+        family.special_enrollment_periods << sep
+        attrs = {enrollment_id: enrollment.id.to_s, family_id: family.id}
+        form = Insured::Forms::SelfTermOrCancelForm.for_view(attrs)
+        expect(form.available_aptc).to eq 1668.2
+      end
+
+      it 'should return default_tax_credit_value' do
+        family.special_enrollment_periods << sep
+        attrs = {enrollment_id: enrollment.id.to_s, family_id: family.id}
+        form = Insured::Forms::SelfTermOrCancelForm.for_view(attrs)
+        expect(form.default_tax_credit_value).to eq applied_aptc_amount
+      end
+
+      it 'should return new_enrollment_premium' do
+        family.special_enrollment_periods << sep
+        attrs = {enrollment_id: enrollment.id.to_s, family_id: family.id}
+        form = Insured::Forms::SelfTermOrCancelForm.for_view(attrs)
+        expect(form.new_enrollment_premium).to eq 1573.87
       end
     end
 
