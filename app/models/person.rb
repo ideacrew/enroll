@@ -202,7 +202,7 @@ class Person
   index({"broker_role.benefit_sponsors_broker_agency_profile_id" => 1})
   index({"broker_role.npn" => 1}, {sparse: true, unique: true})
   index({"general_agency_staff_roles.npn" => 1}, {sparse: true})
-  index({"general_agency_staff_roles.is_primary" => 1}, {sparse: true})
+  index({"general_agency_staff_roles.is_primary" => 1})
   index({"general_agency_staff_roles.benefit_sponsors_general_agency_profile_id" => 1}, {sparse: true})
 
   index({"first_name" => 1, "last_name" => 1, "broker_role.npn" => 1}, {name: "first_name_last_name_broker_npn_search"})
@@ -243,33 +243,6 @@ class Person
 
   index({"hbx_csr_role._id" => 1})
   index({"hbx_assister._id" => 1})
-
-  # Indexes for agency APIS
-  index(
-    {
-      "is_active" => 1,
-      "broker_role._id" => 1,
-      "general_agency_staff_roles.is_primary" => 1
-    },
-    {name: "people_agency_primary_agent_query_index"}
-  )
-
-  index(
-    {
-      "is_active" => 1,
-      "broker_role._id" => 1,
-      "broker_agency_staff_roles._id" => 1,
-    },
-    {name: "people_agency_non_primary_agent_broker_query_index"}
-  )
-
-  index(
-    {
-      "is_active" => 1,
-      "general_agency_staff_roles.is_primary" => 1
-    },
-    {name: "people_agency_non_primary_agent_ga_query_index"}
-  )
 
   scope :all_consumer_roles,          -> { exists(consumer_role: true) }
   scope :all_resident_roles,          -> { exists(resident_role: true) }
