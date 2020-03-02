@@ -119,5 +119,46 @@ module Insured
         expect(enrollment.applied_aptc_amount.to_f).to eq 1274.44
       end
     end
+
+    describe "build_form_params" do
+      let!(:tax_household10) {FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil)}
+      let!(:eligibility_determination) {FactoryBot.create(:eligibility_determination, tax_household: tax_household10, max_aptc: 2000)}
+      let!(:tax_household_member1) {tax_household10.tax_household_members.create(applicant_id: family.primary_applicant.id, is_subscriber: true, is_ia_eligible: true)}
+      let!(:tax_household_member2) {tax_household10.tax_household_members.create(applicant_id: family.family_members[1].id, is_ia_eligible: true)}
+      let(:applied_aptc_amount) { 120.78 }
+
+
+      before :each do
+        @product = BenefitMarkets::Products::Product.all.where(benefit_market_kind: :aca_individual).first
+        @product.update_attributes(ehb: 0.9844)
+        premium_table = @product.premium_tables.first
+        premium_table.premium_tuples.where(age: 59).first.update_attributes(cost: 614.85)
+        premium_table.premium_tuples.where(age: 60).first.update_attributes(cost: 646.72)
+        premium_table.premium_tuples.where(age: 61).first.update_attributes(cost: 679.8)
+        @product.save!
+        enrollment.update_attributes(product: @product, effective_on: TimeKeeper.date_of_record, applied_aptc_amount: applied_aptc_amount)
+        hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 59, 'R-DC001').and_return(614.85)
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 60, 'R-DC001').and_return(646.72)
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 61, 'R-DC001').and_return(679.8)
+        person.update_attributes!(dob: (enrollment.effective_on - 61.years))
+        family.family_members[1].person.update_attributes!(dob: (enrollment.effective_on - 59.years))
+      end
+
+      it 'should return default_tax_credit_value' do
+        params = subject.find(enrollment.id, family.id)
+        expect(params[:default_tax_credit_value]).to eq applied_aptc_amount
+      end
+
+      it 'should return available_aptc' do
+        params = subject.find(enrollment.id, family.id)
+        expect(params[:available_aptc]).to eq 1274.44
+      end
+
+      it 'should return elected_aptc_pct' do
+        params = subject.find(enrollment.id, family.id)
+        expect(params[:elected_aptc_pct]).to eq 0.09
+      end
+    end
   end
 end
