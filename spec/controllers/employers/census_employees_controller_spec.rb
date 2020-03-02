@@ -550,6 +550,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
           allow(census_employee_record).to receive(:employee_role).and_return(employee_role_double)
           allow(employee_role_person).to receive(:employee_roles).and_return([employee_role_double])
           allow(employee_role_double).to receive(:update_attributes!).with(is_active: false)
+          allow(employee_role_double).to receive(:census_employee).and_return(census_employee_record)
           CensusEmployee.destroy_all
           census_employee_record
         end
