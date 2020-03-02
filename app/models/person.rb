@@ -201,6 +201,7 @@ class Person
   index({"broker_role.broker_agency_id" => 1})
   index({"broker_role.benefit_sponsors_broker_agency_profile_id" => 1})
   index({"broker_role.npn" => 1}, {sparse: true, unique: true})
+
   index({"general_agency_staff_roles.npn" => 1}, {sparse: true})
   index({"general_agency_staff_roles.is_primary" => 1})
   index({"general_agency_staff_roles.benefit_sponsors_general_agency_profile_id" => 1}, {sparse: true})
@@ -243,6 +244,11 @@ class Person
 
   index({"hbx_csr_role._id" => 1})
   index({"hbx_assister._id" => 1})
+
+  index(
+    {"broker_agency_staff_roles._id" => 1},
+    {name: "person_broker_agency_staff_role_id_search"}
+  )
 
   scope :all_consumer_roles,          -> { exists(consumer_role: true) }
   scope :all_resident_roles,          -> { exists(resident_role: true) }

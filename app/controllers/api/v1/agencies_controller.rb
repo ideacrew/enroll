@@ -11,10 +11,11 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
   end
 
   def agency_staff
-      render json: Person.api_staff_roles.to_json(
-        :only => [:_id, :profiles, :first_name, :last_name, :hbx_id, :dob],
-        :methods => [:agency_roles, :agent_emails]
-      )
+    query = Queries::People::NonPrimaryAgentsQuery.new
+    render json: query.to_json(
+      :only => [:_id, :profiles, :first_name, :last_name, :hbx_id, :dob],
+      :methods => [:agency_roles, :agent_emails]
+    )
   end
 
   def primary_agency_staff
