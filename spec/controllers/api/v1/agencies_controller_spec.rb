@@ -6,6 +6,7 @@ RSpec.describe Api::V1::AgenciesController, :type => :controller, :dbclean => :a
   describe "#index" do
     before :each do
       sign_in(user)
+      get :index
     end
 
     it "is successful" do
