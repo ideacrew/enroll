@@ -18,10 +18,11 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
   end
 
   def primary_agency_staff
-      render json: Person.api_primary_staff_roles.to_json(
-        :only => [:profiles, :first_name, :last_name, :hbx_id],
-        :methods => [:agent_npn, :agent_role_id, :connected_profile_id]
-      )
+    query = Queries::People::PrimaryAgentsQuery.new
+    render json: query.to_json(
+      :only => [:profiles, :first_name, :last_name, :hbx_id],
+      :methods => [:agent_npn, :agent_role_id, :connected_profile_id]
+    )
   end
 
   def approve_general_agency_staff
