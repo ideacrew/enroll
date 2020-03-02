@@ -40,13 +40,13 @@ module SponsoredBenefits
       pdo = SponsoredBenefits::Organizations::PlanDesignOrganization.find(params[:id])
 
       if pdo.is_prospect?
-        pdo.assign_attributes(organization_params)
         ola = organization_params[:office_locations_attributes]
+        status = validate_and_assign(pdo)
 
         if ola.blank?
           flash[:error] = "Prospect Employer must have one Primary Office Location."
           redirect_to employers_organizations_broker_agency_profile_path(pdo.broker_agency_profile)
-        elsif pdo.save
+        elsif status && pdo.save
           flash[:success] = "Prospect Employer (#{pdo.legal_name}) Updated Successfully."
           redirect_to employers_organizations_broker_agency_profile_path(pdo.broker_agency_profile)
         else
@@ -57,6 +57,11 @@ module SponsoredBenefits
         flash[:error] = "Updating of Client employer records not allowed"
         redirect_to employers_organizations_broker_agency_profile_path(pdo.broker_agency_profile)
       end
+    end
+
+    def validate_and_assign(pdo)
+      pdo.assign_attributes(organization_params) if pdo.office_locations.count < 1 || pdo.valid?
+      pdo.valid?
     end
 
     def destroy
