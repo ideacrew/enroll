@@ -339,6 +339,8 @@ class Person
     )
   end
 
+  Person.where({ broker_agency_staff_roles: { "$exists": true, "$not": {"$size": 0} } })
+
   def self.api_primary_staff_roles
     Person.where(
       {
