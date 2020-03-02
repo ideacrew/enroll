@@ -872,7 +872,8 @@ class HbxEnrollment
   end
 
   def terminate_coverage_with(termination_date)
-    if termination_date >= TimeKeeper.datetime_of_record
+    # IVL enrollments go automatically to coverage_terminated
+    if termination_date >= TimeKeeper.datetime_of_record && is_shop?
       schedule_coverage_termination!(termination_date) if may_schedule_coverage_termination?
     else
       if may_terminate_coverage?
