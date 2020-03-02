@@ -332,12 +332,14 @@ class Person
       {
       "is_active" => true,
       "$or" => [
-          { "broker_agency_staff_roles._id" => { "$exists" => true } },
+          { "broker_agency_staff_roles" => { "$exists" => true, "$not" => {"$size" => 0} } },
           { "general_agency_staff_roles.is_primary" =>  false }
         ]
       }
     )
   end
+
+  Person.where({ broker_agency_staff_roles: { "$exists": true, "$not": {"$size": 0} } })
 
   def self.api_primary_staff_roles
     Person.where(
