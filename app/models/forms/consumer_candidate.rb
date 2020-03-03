@@ -17,7 +17,7 @@ module Forms
     validates_presence_of :gender, :allow_blank => nil
     validates_presence_of :dob
     # include ::Forms::DateOfBirthField
-    # include Validations::USDate.on(:dob)
+    #include Validations::USDate.on(:date_of_birth)
 
     validate :does_not_match_a_different_users_person
     validates :ssn,
