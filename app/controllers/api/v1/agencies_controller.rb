@@ -3,12 +3,17 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
   before_action :authenticate_user!, only: [:index, :agency_staff, :primary_agency_staff]
 
   def index
-    render json: BenefitSponsors::Organizations::Organization.all_agency_profiles
-      .to_json(
+    query = Queries::AgenciesQuery.new
+    render json: query.to_json(
              :only => [:dba, :legal_name],
              :methods => [:agency_profile_id, :organization_id, :agency_profile_type]
            )
   end
+
+  BenefitSponsors::Organizations::Organization.all_agency_profiles.count.to_json(
+         :only => [:dba, :legal_name],
+         :methods => [:agency_profile_id, :organization_id, :agency_profile_type]
+       )
 
   def agency_staff
     query = Queries::People::NonPrimaryAgentsQuery.new

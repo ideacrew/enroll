@@ -3,14 +3,55 @@ require 'rails_helper'
 RSpec.describe Api::V1::AgenciesController, :type => :controller, :dbclean => :after_each do
   let(:user) { FactoryBot.create(:user) }
 
-  describe "#index" do
+  describe "GET #index, with no records" do
     before :each do
       sign_in(user)
       get :index
     end
 
     it "is successful" do
-      expect(response.status).to eq 200
+      expect(response.status).to eq(200)
+    end
+
+    it "has and empty json response" do
+      expect(response.body).to eq("[]")
+    end
+  end
+
+  describe "GET #index, with a broker agency" do
+    let(:broker_agency) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile) }
+
+    before :each do
+      broker_agency
+      sign_in(user)
+      get :index
+    end
+
+    it "is successful" do
+      expect(response.status).to eq(200)
+    end
+
+    it "has and empty json response" do
+      expect(response.body).not_to eq("[]")
+    end
+  end
+
+  describe "GET #index, with a general agency" do
+    let(:org) { FactoryBot.build(:benefit_sponsors_organizations_exempt_organization) }
+    let(:general_agency) { FactoryBot.create(:benefit_sponsors_organizations_general_agency_profile, organization: org) }
+
+    before :each do
+      general_agency
+      sign_in(user)
+      get :index
+    end
+
+    it "is successful" do
+      expect(response.status).to eq(200)
+    end
+
+    it "has and empty json response" do
+      expect(response.body).not_to eq("[]")
     end
   end
 
