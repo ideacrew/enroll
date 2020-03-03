@@ -27,28 +27,32 @@ module Queries
     def agency_aggregate
       BenefitSponsors::Organizations::Organization.collection.aggregate([
         {"$match" => {
-          "profiles._type" => /.*AgencyProfile$/
+          "profiles._type" =>
+            {
+              "$in" =>
+            [
+              "BenefitSponsors::Organizations::BrokerAgencyProfile",
+              "BenefitSponsors::Organizations::GeneralAgencyProfile",
+              "::BenefitSponsors::Organizations::BrokerAgencyProfile",
+              "::BenefitSponsors::Organizations::GeneralAgencyProfile"
+            ]
+            }
         }},
-        {
-          "$project" => {
-            "dba" => 1,
-            "legal_name" => 1,
-            "profiles" => 1
-          }
-        },
         {
           "$unwind" => "$profiles"
         },
         {
           "$match" => {
-            "$or" => [
-              {
-                "profiles._type" => /.*BrokerAgencyProfile$/
-              },
-              {
-                "profiles._type" => /.*GeneralAgencyProfile$/
-              }
+            "profiles._type" =>
+            {
+              "$in" =>
+            [
+              "BenefitSponsors::Organizations::BrokerAgencyProfile",
+              "BenefitSponsors::Organizations::GeneralAgencyProfile",
+              "::BenefitSponsors::Organizations::BrokerAgencyProfile",
+              "::BenefitSponsors::Organizations::GeneralAgencyProfile"
             ]
+            }
           }
         },
         {
@@ -56,9 +60,20 @@ module Queries
             "_id" => "$_id",
             "dba" => {"$last" => "$dba"},
             "legal_name" => {"$last" => "$legal_name"},
-            "profiles" => {
-              "$push" => "$profiles"
+            "profiles" => {"$push" => 
+             {
+               "_type" => "$profiles._type",
+               "_id" => "$profiles._id"
+             }
             }
+          } 
+        },
+        {
+          "$project" => {
+            "id" => 1,
+            "dba" => 1,
+            "legal_name" => 1,
+            "profiles" => 1
           }
         }
       ])
