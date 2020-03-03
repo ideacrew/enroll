@@ -57,7 +57,7 @@ describe Forms::BrokerAgencyProfile, ".save", :dbclean => :after_each do
 
   let(:phone_attributes) {
     {
-      kind: "main",
+      kind: "phone main",
       area_code: "202",
       number: "324-2232"
     }

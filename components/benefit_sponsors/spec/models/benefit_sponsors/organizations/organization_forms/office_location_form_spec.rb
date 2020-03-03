@@ -25,7 +25,7 @@ module BenefitSponsors
 
       let(:phone) {
          {
-           kind: "main",
+           kind: "phone main",
            area_code:"222", number:"2221111",
            extension:""
          }
