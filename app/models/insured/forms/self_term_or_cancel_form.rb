@@ -6,19 +6,21 @@ module Insured
       include ActiveModel::Validations
       include Virtus.model
 
-      attribute :carrier_logo,          String
-      attribute :enrollment,            ::Insured::Forms::EnrollmentForm
-      attribute :family,                ::Insured::Forms::FamilyForm
-      attribute :is_aptc_eligible,      Boolean
-      attribute :market_kind,           String
-      attribute :product,               ::Insured::Forms::ProductForm
-      attribute :term_date,             Date
-      attribute :elected_aptc_pct,      String
-      attribute :available_aptc,        Float
-      attribute :enable_tax_credit_btn, Boolean
-      attribute :new_effective_on,      Date
+      attribute :carrier_logo,                      String
+      attribute :enrollment,                        ::Insured::Forms::EnrollmentForm
+      attribute :family,                            ::Insured::Forms::FamilyForm
+      attribute :is_aptc_eligible,                  Boolean
+      attribute :market_kind,                       String
+      attribute :product,                           ::Insured::Forms::ProductForm
+      attribute :term_date,                         Date
+      attribute :elected_aptc_pct,                  String
+      attribute :available_aptc,                    Float
+      attribute :enable_tax_credit_btn,             Boolean
+      attribute :new_effective_on,                  Date
+      attribute :default_tax_credit_value,          Float
+      attribute :new_enrollment_premium,            Float
 
-      validates :market_kind,           presence: true
+      validates :market_kind,                       presence: true
 
       def self.for_view(attrs)
         service     = self_term_or_cancel_service(attrs)

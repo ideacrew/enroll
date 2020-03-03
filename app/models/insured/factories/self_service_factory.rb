@@ -3,9 +3,10 @@
 module Insured
   module Factories
     class SelfServiceFactory
-      attr_accessor :document_id, :enrollment_id, :family_id, :product_id, :qle_id, :sep_id
       extend ::FloatHelper
+      include ::FloatHelper
       extend Acapi::Notifiers
+      attr_accessor :document_id, :enrollment_id, :family_id, :product_id, :qle_id, :sep_id
 
       def initialize(args)
         self.document_id   = args[:document_id] || nil
@@ -95,17 +96,23 @@ module Insured
       end
 
       def build_form_params
-        enrollment = HbxEnrollment.find(BSON::ObjectId.from_string(enrollment_id))
-        family     = Family.find(BSON::ObjectId.from_string(family_id))
-        sep        = SpecialEnrollmentPeriod.find(BSON::ObjectId.from_string(family.latest_active_sep.id)) if family.latest_active_sep.present?
-        qle        = QualifyingLifeEventKind.find(BSON::ObjectId.from_string(sep.qualifying_life_event_kind_id))  if sep.present?
+        enrollment                = HbxEnrollment.find(BSON::ObjectId.from_string(enrollment_id))
+        family                    = Family.find(BSON::ObjectId.from_string(family_id))
+        sep                       = SpecialEnrollmentPeriod.find(BSON::ObjectId.from_string(family.latest_active_sep.id)) if family.latest_active_sep.present?
+        qle                       = QualifyingLifeEventKind.find(BSON::ObjectId.from_string(sep.qualifying_life_event_kind_id))  if sep.present?
+        available_aptc            = calculate_max_applicable_aptc(enrollment)
+        elected_aptc_pct          = calculate_elected_aptc_pct(enrollment, available_aptc)
+        default_tax_credit_value  = default_tax_credit_value(enrollment, available_aptc)
         {
           enrollment: enrollment,
           family: family,
           qle: qle,
           is_aptc_eligible: is_aptc_eligible(enrollment, family),
           new_effective_on: Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(DateTime.now.in_time_zone("Eastern Time (US & Canada)")),
-          available_aptc: calculate_max_applicable_aptc(enrollment)
+          available_aptc: available_aptc,
+          default_tax_credit_value: default_tax_credit_value,
+          elected_aptc_pct: elected_aptc_pct,
+          new_enrollment_premium: new_enrollment_premium(default_tax_credit_value, enrollment)
         }
       end
 
@@ -127,6 +134,21 @@ module Insured
         min = hbx_created_datetime.min
         sec = hbx_created_datetime.sec
         return DateTime.new(year, month, day, hour, min, sec)
+      end
+
+      private
+
+      def default_tax_credit_value(enrollment, available_aptc)
+        enrollment.applied_aptc_amount.to_f > available_aptc ? available_aptc : enrollment.applied_aptc_amount.to_f
+      end
+
+      def calculate_elected_aptc_pct(enrollment, available_aptc)
+        pct = float_fix(enrollment.applied_aptc_amount.to_f / available_aptc).round(2)
+        pct > 1 ? 1 : pct
+      end
+
+      def new_enrollment_premium(default_tax_credit_value, enrollment)
+        float_fix(enrollment.total_premium - default_tax_credit_value)
       end
 
     end
