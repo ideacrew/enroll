@@ -15,6 +15,7 @@ class WhitelistedJwt
   validates :jti, :exp, presence: true
 
   index({:user_id => 1, :jti => 1})
+  index({:jti => 1, :aud => 1, :user_id => 1, :created_at => 1})
   index({:exp => 1})
 
   #add_index :whitelisted_jwts, :jti, unique: true
