@@ -899,5 +899,44 @@ module BenefitSponsors
         expect(initial_application.rate_schedule_date).to eq initial_application.start_on
       end
     end
+
+    describe '.enrollment_quiet_period', dbclean: :after_each do
+      include_context 'setup benefit market with market catalogs and product packages'
+      include_context 'setup initial benefit application'
+
+      let(:current_effective_date) {TimeKeeper.date_of_record.beginning_of_month}
+
+      context 'when intital application open enrollment end date inside plan year start date', dbclean: :after_each do
+
+        it 'should return next day of open_enrollment_end date as quiet_period start date' do
+          quiet_period = initial_application.enrollment_quiet_period
+          expect(quiet_period.min.to_date).to eq initial_application.open_enrollment_period.max + 1.day
+        end
+
+        it 'should return default quiet_period end date' do
+          quiet_period = initial_application.enrollment_quiet_period
+          initial_quiet_period_end = initial_application.start_on + Settings.aca.shop_market.initial_application.quiet_period.month_offset.months + (Settings.aca.shop_market.initial_application.quiet_period.mday - 1).days
+          expect(quiet_period.max).to eq TimeKeeper.end_of_exchange_day_from_utc(initial_quiet_period_end)
+        end
+      end
+
+      context 'when intital application open enrollment end date outside plan year start date', dbclean: :after_each do
+
+        before do
+          initial_application.open_enrollment_period = (initial_application.effective_period.min + 7.days..initial_application.effective_period.min + 11.days)
+          initial_application.save
+        end
+
+        it 'should return next day of open_enrollment_end date as quiet_period start date' do
+          quiet_period = initial_application.enrollment_quiet_period
+          expect(quiet_period.min.to_date).to eq initial_application.open_enrollment_period.max + 1.day
+        end
+
+        it 'should return next day of quiet_period start date as quiet_period end date' do
+          quiet_period = initial_application.enrollment_quiet_period
+          expect(quiet_period.max).to eq quiet_period.min + 1.day
+        end
+      end
+    end
   end
 end

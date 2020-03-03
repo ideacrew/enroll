@@ -982,7 +982,9 @@ module BenefitSponsors
                 else
                   quiet_period_start = open_enrollment_end_on + 1.day
                 end
-                quiet_period_end = initial_quiet_period_end(start_on)
+                expected_intial_or_offcyclerenewal_transmission_deadline = initial_quiet_period_end(start_on)
+                # Scenario when you extend open enrollment beyond start date for initial or offcycle renewal.
+                quiet_period_end = [expected_intial_or_offcyclerenewal_transmission_deadline, quiet_period_start].max
                 TimeKeeper.start_of_exchange_day_from_utc(quiet_period_start)..TimeKeeper.end_of_exchange_day_from_utc(quiet_period_end)
               end
             end
