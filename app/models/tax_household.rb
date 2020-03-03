@@ -150,11 +150,11 @@ class TaxHousehold
   end
 
   # Pass hbx_enrollment and get the total amount of APTC available by hbx_enrollment_members
-  def total_aptc_available_amount_for_enrollment(hbx_enrollment)
+  def total_aptc_available_amount_for_enrollment(hbx_enrollment, excluding_enrollment = nil)
     return 0 if hbx_enrollment.blank?
     return 0 if is_all_non_aptc?(hbx_enrollment)
     total = family.active_family_members.reduce(0) do |sum, member|
-      sum + (aptc_available_amount_by_member[member.id.to_s] || 0)
+      sum + (aptc_available_amount_by_member(excluding_enrollment)[member.id.to_s] || 0)
     end
     family_members = unwanted_family_members(hbx_enrollment)
     unchecked_aptc_fms = find_aptc_family_members(family_members)
@@ -171,7 +171,7 @@ class TaxHousehold
     total_sum
   end
 
-  def aptc_available_amount_by_member
+  def aptc_available_amount_by_member(excluding_enrollment_id = nil)
     # Find HbxEnrollments for aptc_members in the current plan year where they have used aptc
     # subtract from available amount
     aptc_available_amount_hash = {}
@@ -179,7 +179,9 @@ class TaxHousehold
       aptc_available_amount_hash[member_id] = current_max_aptc.to_f * ratio
     end
     # FIXME should get hbx_enrollments by effective_starting_on
-    household.hbx_enrollments_with_aptc_by_year(effective_starting_on.year).map(&:hbx_enrollment_members).flatten.each do |enrollment_member|
+    enrollments = household.hbx_enrollments_with_aptc_by_year(effective_starting_on.year)
+    enrollments = enrollments.where(:id.ne => BSON::ObjectId.from_string(excluding_enrollment_id)) if excluding_enrollment_id
+    enrollments.map(&:hbx_enrollment_members).flatten.each do |enrollment_member|
       applicant_id = enrollment_member.applicant_id.to_s
       if aptc_available_amount_hash.has_key?(applicant_id)
         aptc_available_amount_hash[applicant_id] -= (enrollment_member.applied_aptc_amount || 0).try(:to_f)

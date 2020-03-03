@@ -314,6 +314,7 @@ INSURED_TRANSLATIONS = {
   "en.select_plan_to_terminate" => "Select Plan to Terminate",
   "en.health_coverage" => "Health Coverage",
   "en.DCHL" => "DCHL",
+  "en.ID" => "ID",
   "en.DCHL_ID" => "DCHL ID",
   "en.confirmation" => "Confirmation",
   "en.insured.group_selection.terminate_confirm.terminate_this_plan_do_you_wish_proceed" => "Terminating this plan will terminate coverage for all members of your family. Do you wish to proceed? Y/N.",

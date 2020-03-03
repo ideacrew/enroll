@@ -1,5 +1,12 @@
 module Insured::FamiliesHelper
 
+  def display_change_tax_credits_button?(hbx_enrollment)
+    hbx_enrollment.has_at_least_one_aptc_eligible_member?(hbx_enrollment.effective_on.year) &&
+    hbx_enrollment.product.can_use_aptc? &&
+    !hbx_enrollment.is_coverall? &&
+    hbx_enrollment.coverage_kind != 'dental'
+  end
+
   def plan_shopping_dependent_text(hbx_enrollment)
     subscriber, dependents = hbx_enrollment.hbx_enrollment_members.partition {|h| h.is_subscriber == true }
     if subscriber.present? && dependents.count == 0
@@ -69,6 +76,21 @@ module Insured::FamiliesHelper
 
     plan_details.inject([]) do |data, element|
       data << "#{element}"
+    end.join("&nbsp<label class='separator'></label>").html_safe
+  end
+
+  def render_product_type_details(metal_level_kind, nationwide)
+    product_details = []
+
+    if metal_level_kind
+      product_level = metal_level_kind.to_s.try(:humanize)
+      product_details << "<span class=\"#{product_level.try(:downcase)}-icon\">#{product_level.titleize}</span>"
+    end
+
+    product_details << 'NATIONWIDE NETWORK' if nationwide
+
+    product_details.inject([]) do |data, element|
+      data << element.to_s
     end.join("&nbsp<label class='separator'></label>").html_safe
   end
 
@@ -295,5 +317,9 @@ module Insured::FamiliesHelper
       @qle = QualifyingLifeEventKind.where(reason: 'eligibility_documents_provided').first
       { @qle.title => @qle.reason }
     end
+  end
+
+  def enable_make_changes_button?(hbx_enrollment)
+    hbx_enrollment.is_ivl_by_kind? && ['coverage_selected', 'auto_renewing', 'unverified', 'renewing_coverage_selected', 'transmitted_to_carrier'].include?(hbx_enrollment.aasm_state)
   end
 end

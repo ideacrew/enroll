@@ -3,6 +3,7 @@ require 'rails_helper'
 module BenefitMarkets
   RSpec.describe Products::ProductFactory, type: :model, dbclean: :around_each do
     let!(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product)}
+    let(:year) {product.application_period.min.year}
     let(:product_factory) {::BenefitMarkets::Products::ProductFactory}
 
     describe "#has_rates?" do
