@@ -10,11 +10,6 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
            )
   end
 
-  BenefitSponsors::Organizations::Organization.all_agency_profiles.count.to_json(
-         :only => [:dba, :legal_name],
-         :methods => [:agency_profile_id, :organization_id, :agency_profile_type]
-       )
-
   def agency_staff
     query = Queries::People::NonPrimaryAgentsQuery.new
     render json: query.to_json(
