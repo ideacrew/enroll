@@ -38,7 +38,7 @@ module Insured
         )
       end
 
-      def self.update_aptc(enrollment_id, elected_aptc_pct, applied_aptc_amount)
+      def self.update_aptc(enrollment_id, applied_aptc_amount)
         # field :elected_aptc_pct, type: Float, default: 0.0
         # field :applied_aptc_amount, type: Money, default: 0.0
         enrollment = HbxEnrollment.find(BSON::ObjectId.from_string(enrollment_id))
@@ -46,16 +46,17 @@ module Insured
         new_effective_date = Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(DateTime.now.in_time_zone("Eastern Time (US & Canada)"))
         reinstatement = Enrollments::Replicator::Reinstatement.new(enrollment, new_effective_date, applied_aptc_amount).build
         reinstatement.save!
-        update_enrollment_for_apcts(elected_aptc_pct, reinstatement, applied_aptc_amount, enrollment)
+        update_enrollment_for_apcts(reinstatement, applied_aptc_amount)
         reinstatement.select_coverage!
       end
 
-      def self.update_enrollment_for_apcts(elected_aptc_pct, reinstatement, applied_aptc_amount, enrollment)
+      def self.update_enrollment_for_apcts(reinstatement, applied_aptc_amount)
         applicable_aptc_by_member = member_level_aptc_breakdown(reinstatement, applied_aptc_amount)
+        cost_decorator = UnassistedPlanCostDecorator.new(reinstatement.product, reinstatement, applied_aptc_amount)
+
         reinstatement.hbx_enrollment_members.each do |enrollment_member|
           member_aptc_value = applicable_aptc_by_member[enrollment_member.applicant_id.to_s]
           next enrollment_member unless member_aptc_value
-          cost_decorator = reinstatement.ivl_decorated_hbx_enrollment
           member_ehb_premium = cost_decorator.member_ehb_premium(enrollment_member)
 
           if member_aptc_value > member_ehb_premium
@@ -66,8 +67,10 @@ module Insured
 
           enrollment_member.update_attributes!(applied_aptc_amount: member_aptc_value)
         end
-        total_aptc = round_down_float_two_decimals(reinstatement.hbx_enrollment_members.pluck(:applied_aptc_amount).sum)
-        reinstatement.update_attributes!(elected_aptc_pct: elected_aptc_pct, applied_aptc_amount: total_aptc)
+
+        eli_fac_obj = ::Factories::EligibilityFactory.new(reinstatement.id)
+        max_applicable_aptc = eli_fac_obj.fetch_max_aptc
+        reinstatement.update_attributes!(elected_aptc_pct: applied_aptc_amount/max_applicable_aptc , applied_aptc_amount: cost_decorator.total_aptc_amount)
       end
 
       def self.member_level_aptc_breakdown(new_enrollment, applied_aptc_amount)
