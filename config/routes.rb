@@ -710,9 +710,9 @@ Rails.application.routes.draw do
       resources :agencies, only: %i[index] do
         collection do
           get :agency_staff
+          post 'agency_staff/:person_id/terminate/:role_id', to: 'agencies#terminate'
           get :primary_agency_staff
         end
-        get ':person_id/terminate/:role_id', to: 'agencies#terminate'
       end
 
       resources :slcsp, :only => []  do
