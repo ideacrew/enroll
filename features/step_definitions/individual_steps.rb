@@ -86,8 +86,10 @@ Then(/Individual should click on Individual market for plan shopping/) do
 end
 
 Then(/Individual should see a form to enter personal information$/) do
-  find(:xpath, '//label[@for="person_us_citizen_true"]').click
-  find(:xpath, '//label[@for="person_naturalized_citizen_false"]').click
+  find('label[for=person_us_citizen_true]', wait: 20).click
+  choose 'person_us_citizen_true', visible: false, allow_label_click: true
+  find('label[for=person_naturalized_citizen_false]', wait: 20).click
+  choose 'person_naturalized_citizen_false', visible: false, allow_label_click: true
   find('label[for=indian_tribe_member_no]', wait: 20).click
   choose 'indian_tribe_member_no', visible: false, allow_label_click: true
   find('label[for=radio_incarcerated_no]', wait: 20).click
@@ -192,7 +194,8 @@ Then(/click citizen no/) do
 end
 
 When(/click eligible immigration status yes/) do
-  find(:xpath, '//label[@for="person_eligible_immigration_status_true"]').click
+  find('label[for=person_eligible_immigration_status_true]', wait: 20).click
+  choose 'person_eligible_immigration_status_true', visible: false, allow_label_click: true
 end
 
 Then(/should find I-551 doc type/) do
