@@ -70,8 +70,9 @@ test:
       options:
         # In the test environment we lower the retries and retry interval to
         # low amounts for fast failures.
-        max_retries: 1
+        max_retries: 2
         retry_interval: 0
+        j: true
 production:
   clients:
     default:
