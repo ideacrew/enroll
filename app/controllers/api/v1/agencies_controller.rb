@@ -26,6 +26,17 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
     )
   end
 
+  def terminate
+    permitted = params.permit(:person_id, :role_id)
+    role = BrokerAgencyStaffRole.find(permitted[:role_id])
+    begin
+      role.broker_agency_terminate
+      render json: {status: "success"}
+    rescue
+      render json: {status: "error"}
+    end
+  end
+
   def approve_general_agency_staff
     #{"person_id"=>"5e4954c7b0b6c5c34cc4110e", "profile_id"=>"5e4953d3b0b6c5c34cc410f5", "id"=>"5e4953d3b0b6c5c34cc410f5"}
     # @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_approve(general_agency_staff_params)

@@ -712,6 +712,7 @@ Rails.application.routes.draw do
           get :agency_staff
           get :primary_agency_staff
         end
+        get ':person_id/terminate/:role_id', to: 'agencies#terminate'
       end
 
       resources :slcsp, :only => []  do

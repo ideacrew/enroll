@@ -155,4 +155,17 @@ RSpec.describe Api::V1::AgenciesController, :type => :controller, :dbclean => :a
       expect(response.body).not_to eq("[]")
     end
   end
+
+  # TODO: Working on spec while Mark G tests functionality
+  # describe "GET #terminate with an active role" do
+  #   let(:broker_agency_staff_role) {FactoryBot.create(:broker_agency_staff_role, aasm_state: "active")}
+  #   before :each do
+  #     sign_in(user)
+  #   end
+  #
+  #   it "is successful" do
+  #     get :terminate, params: { role_id: broker_agency_staff_role.id.to_s }
+  #     expect(response.status).to eq(200)
+  #   end
+  # end
 end
