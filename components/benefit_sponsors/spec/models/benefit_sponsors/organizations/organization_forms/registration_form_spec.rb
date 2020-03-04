@@ -158,7 +158,7 @@ module BenefitSponsors
           expect(edit_form).to be_valid
         end
 
-        it 'loads the employer profile in to the Registartion Form' do
+        it 'loads the employer profile in to the Registration Form' do
           expect(edit_form.profile_type).to eql("benefit_sponsor")
           expect(edit_form.organization.legal_name).to eql(general_org.legal_name)
           expect(edit_form.staff_roles.first.first_name).to eql(person.first_name)
@@ -174,7 +174,7 @@ module BenefitSponsors
           person.save!
         end
 
-        it 'loads the broker agency in to the Registartion Form' do
+        it 'loads the broker agency in to the Registration Form' do
           expect(edit_form.profile_type).to eql("broker_agency")
           expect(edit_form.organization.legal_name).to eql(broker_agency.legal_name)
           expect(edit_form.profile_id).to eql(broker_agency_profile.id.to_s)
@@ -270,7 +270,7 @@ module BenefitSponsors
           expect(update_form).to be_valid
         end
 
-        it "should assign the update params to Registartion forms" do
+        it "should assign the update params to Registration forms" do
           expect(update_form.organization.legal_name).to eq params["organization"]["legal_name"]
           expect(update_form.organization.fein).to eq params["organization"]["fein"]
           expect(update_form.profile_id).to eq params["profile_id"]

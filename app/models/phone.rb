@@ -41,17 +41,7 @@ class Phone
     length: { minimum: 7, maximum: 7, message: "%{value} is not a valid phone number" },
     allow_blank: false
 
-  validates :kind,
-    inclusion: { in: valid_phone_kinds, message: "%{value} is not a valid phone type" },
-    allow_blank: false
-
-  def valid_phone_kinds
-    if # is a person
-      KINDS
-    else # is an office
-      KINDS + OFFICE_KINDS
-    end
-  end
+  validate :validate_phone_kind
 
   def blank?
     [:full_phone_number, :area_code, :number, :extension].all? do |attr|
@@ -105,7 +95,43 @@ class Phone
     self.full_phone_number = to_s
   end
 
-private
+  def is_only_individual_person_phone?
+    # broker role phones will still be listed under the person record
+    # need to check if its attached to the broker role first too
+    # use & in case no broker_Role present
+    person_is_phone_parent = self._parent.class == Person
+    phone_number_is_not_broker_role_number = if _parent&.broker_role&.phone.respond_to?(:full_phone_number)
+                                 _parent&.broker_role&.phone.full_phone_number != full_phone_number
+                               elsif _parent.broker_role
+                                  # Needs to compensate because the broker_agency_profile
+                                  # wont be a phone instance that responds to full_phone_number
+                                  # but a string like "(202) 111-1111 x 3"
+                                  _parent.broker_role.phone.scan(/\d/).join.exclude?(full_phone_number)
+                                else # No broker role present
+                                  true
+                               end
+    # all? will return false if any value is nil or false
+    [person_is_phone_parent, phone_number_is_not_broker_role_number].all?
+  end
+  
+  # Needs to compensate because the broker_agency_profile wont be a phone instance that responds to full_phone_number, but a string like
+  # "(202) 111-1111 x 3"
+  # def phone
+  #  parent.phones.where(kind: "phone main").first || broker_agency_profile.phone || parent.phones.where(kind: "work").first rescue ""
+  # end
+
+  private
+
+  def validate_phone_kind
+    # "phone main" is invalid EDI for individual person phones
+    # broker role phones will stil
+    if self.is_only_individual_person_phone?
+      errors.add(:kind, "#{kind} is not a valid phone type") unless kind.in?(KINDS)
+    else # is an office
+      errors.add(:kind, "#{kind} is not a valid phone type") unless kind.in?(KINDS + OFFICE_KINDS)
+    end
+  end
+  
   def filter_non_numeric(str)
     str.present? ? str.to_s.gsub(/\D/,'') : ""
   end

@@ -59,6 +59,7 @@ describe Phone, type: :model do
   end
 
   context "kind" do
+    let(:person) { FactoryBot.create(:person) }
     it "invalid with null value" do
       expect(Phone.create(kind: "").errors[:kind].any?).to eq true
     end
@@ -70,9 +71,13 @@ describe Phone, type: :model do
     it "valid with proper value" do
       expect(Phone.create(kind: "work").errors[:kind].any?).to eq false
     end
+
+    it "is valid with 'phone main' if doesnt have person as parent record" do
+      expect(Phone.create(kind: 'phone main').errors[:kind].any?).to eq(false)
+    end
     
-    it "is invalid with 'phone main' as value" do
-      expect(Phone.create(kind: "phone main").errors[:kind].any?).to eq true
+    it "is invalid with 'phone main' as value if person is parent record" do
+      expect(person.phones.create(kind: "phone main").errors[:kind].any?).to eq(true)
     end
   end
 
