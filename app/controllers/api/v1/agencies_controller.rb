@@ -28,9 +28,13 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
 
   def terminate
     permitted = params.permit(:person_id, :role_id)
-    role = BrokerAgencyStaffRole.find(permitted[:role_id])
+    role = BrokerAgencyStaffRole.find(permitted[:role_id]) || GeneralAgencyStaffRole.find(permitted[:role_id])
     begin
-      role.broker_agency_terminate
+      if role.class.name == "BrokerAgencyStaffRole"
+        role.broker_agency_terminate!
+      else
+        role.general_agency_terminate!
+      end
       render json: {status: "success"}
     rescue
       render json: {status: "error"}
