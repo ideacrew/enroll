@@ -6,14 +6,31 @@ module VlpDoc
        [:vlp_documents_attributes =>
         [:subject, :citizenship_number, :naturalization_number,
          :alien_number, :passport_number, :sevis_id, :visa_number,
-         :receipt_number, :expiration_date, :card_number,
+         :receipt_number, :expiration_date, :card_number, :description,
          :i94_number, :country_of_citizenship]]}
     ]
+  end
+
+  def validate_vlp_params(params, source, consumer_role, dependent)
+    params.permit!
+    if params[source][:consumer_role].present? && params[source][:consumer_role][:vlp_documents_attributes].present?
+      vlp_doc_params = params[source][:consumer_role][:vlp_documents_attributes]['0'].to_h.delete_if {|k,v| v.blank? }
+      result = ::Validators::VlpV37Contract.new.call(vlp_doc_params)
+      if result.failure? && source == 'person'
+        add_document_errors_to_consumer_role(consumer_role, [result.errors.to_h.keys.first.to_s.titlecase, result.errors.to_h.values.flatten.first])
+        return false
+      elsif result.failure? && source == 'dependent'
+        add_document_errors_to_dependent(dependent, [result.errors.to_h.keys.first.to_s.titlecase, result.errors.to_h.values.flatten.first])
+        return false
+      end
+    end
+    true
   end
 
   def update_vlp_documents(consumer_role, source = 'person', dependent = nil)
     return true if consumer_role.blank?
     return true if params[source][:is_applying_coverage] == "false"
+    return false unless validate_vlp_params(params, source, consumer_role, dependent)
 
     if (params[source][:naturalized_citizen] == "true" || params[source][:eligible_immigration_status] == "true") && (params[source][:consumer_role].blank? || params[source][:consumer_role][:vlp_documents_attributes].blank?)
       if source == 'person'
