@@ -114,8 +114,8 @@ class Phone
       phone_is_not_general_agency_staff_role_number = if _parent.general_agency_staff_roles.count > 0
                                                       not_ga_staff_number = true
                                                       _parent.general_agency_staff_roles.each do |general_agency_staff_role|
-                                                        ga_profile_phone = general_agency_staff_role.general_agency_profile.phone.scan(/\d/).join
-                                                        if ga_profile_phone.include?(full_phone_number)
+                                                        ga_profile_phone = general_agency_staff_role&.general_agency_profile&.phone&.scan(/\d/)&.join
+                                                        if ga_profile_phone&.include?(full_phone_number)
                                                           not_ga_staff_number = false
                                                         end
                                                       end
@@ -132,7 +132,6 @@ class Phone
 
   def validate_phone_kind
     # "phone main" is invalid EDI for individual person phones
-    # broker role phones will stil
     if self.is_only_individual_person_phone?
       errors.add(:kind, "#{kind} is not a valid phone type") unless kind.in?(KINDS)
     else # is an office
