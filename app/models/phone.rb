@@ -114,8 +114,17 @@ class Phone
       phone_is_not_general_agency_staff_role_number = if _parent.general_agency_staff_roles.count > 0
                                                       not_ga_staff_number = true
                                                       _parent.general_agency_staff_roles.each do |general_agency_staff_role|
+                                                        general_agency_primary_staff_person =  general_agency_staff_role&.general_agency_profile&.primary_staff&.person
+                                                        # general_agency_primary_staff_person_phone = general_agency_primary_staff_person&.phone&.scan(/\d/)&.join
                                                         ga_profile_phone = general_agency_staff_role&.general_agency_profile&.phone&.scan(/\d/)&.join
+                                                        kind_being_updated = self.kind
                                                         if ga_profile_phone&.include?(full_phone_number)
+                                                          not_ga_staff_number = false
+                                                          # Use case: General Agency Phone number listed as "home",
+                                                          # but is the main contact for the agency.
+                                                          # allow the kind to be updated to "phone main"
+                                                          # see profiles_controller_spec "should update person main phone"
+                                                        elsif KINDS.exclude?(kind_being_updated)
                                                           not_ga_staff_number = false
                                                         end
                                                       end
