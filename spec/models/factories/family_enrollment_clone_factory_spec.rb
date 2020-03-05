@@ -63,6 +63,7 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model, dbclean
 
   before do
     allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(100.0)
+    allow_any_instance_of(BenefitSponsors::Factories::EnrollmentRenewalFactory).to receive(:has_renewal_product?).and_return(true)
   end
 
   context 'family under renewing employer' do

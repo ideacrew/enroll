@@ -388,6 +388,7 @@ module BenefitSponsors
       }
 
       before do
+        allow_any_instance_of(BenefitSponsors::Factories::EnrollmentRenewalFactory).to receive(:has_renewal_product?).and_return(true)
         census_employee.update_attributes(employee_role_id: employee_role.id)
         census_employee.employee_role.primary_family.active_household.hbx_enrollments << hbx_enrollment
         census_employee.employee_role.primary_family.save

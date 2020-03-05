@@ -1528,6 +1528,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
 
         before do
           allow(benefit_package).to receive(:is_renewal_benefit_available?).and_return(true)
+          allow_any_instance_of(BenefitSponsors::Factories::EnrollmentRenewalFactory).to receive(:has_renewal_product?).and_return(true)
           generate_passive_renewal
         end
 
@@ -1565,8 +1566,10 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
 
       context '.update_renewal_coverage', dbclean: :after_each do
 
+        let(:issuer_profile) { FactoryGirl.create(:benefit_sponsors_organizations_issuer_profile) }
         before do
           allow(benefit_package).to receive(:is_renewal_benefit_available?).and_return(true)
+          allow_any_instance_of(BenefitSponsors::Factories::EnrollmentRenewalFactory).to receive(:has_renewal_product?).and_return(true)
           generate_passive_renewal
         end
 
@@ -2101,6 +2104,7 @@ describe HbxEnrollment, type: :model, :dbclean => :after_each do
 
         before do 
           allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(100.0)
+          allow_any_instance_of(BenefitSponsors::Factories::EnrollmentRenewalFactory).to receive(:has_renewal_product?).and_return(true)
           renewal_benefit_package.sponsored_benefits.each do |sponsored_benefit|
             allow(sponsored_benefit).to receive(:products).and_return(sponsored_benefit.product_package.products)
           end
