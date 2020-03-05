@@ -192,6 +192,72 @@ module SponsoredBenefits
             end
           end
 
+          context 'office locations #update' do
+            let(:effective_period_start_on) {TimeKeeper.date_of_record.end_of_month + 1.day + 1.month}
+            let(:effective_period_end_on) {effective_period_start_on + 1.year - 1.day}
+            let(:effective_period) {effective_period_start_on..effective_period_end_on}
+
+            let(:open_enrollment_period_start_on) {effective_period_start_on.prev_month}
+            let(:open_enrollment_period_end_on) {open_enrollment_period_start_on + 9.days}
+            let(:open_enrollment_period) {open_enrollment_period_start_on..open_enrollment_period_end_on}
+
+            let(:params) do
+              {
+                effective_period: effective_period,
+                open_enrollment_period: open_enrollment_period,
+              }
+            end
+            let(:plan_design_proposal) {build(:plan_design_proposal)}
+            let(:benefit_application) {SponsoredBenefits::BenefitApplications::BenefitApplication.new(params)}
+            let(:benefit_sponsorship) do
+              SponsoredBenefits::BenefitSponsorships::BenefitSponsorship.new(
+                benefit_market: 'aca_shop_cca',
+                enrollment_frequency: 'rolling_month'
+              )
+            end
+
+            let(:profile) {SponsoredBenefits::Organizations::AcaShopCcaEmployerProfile.new}
+            let(:updated_valid_attributes) {
+              valid_attributes['legal_name'] = 'Some New Name'
+              valid_attributes
+            }
+            let(:plan) {FactoryGirl.create(:plan, :with_premium_tables)}
+
+            before do
+              prospect_plan_design_organization.plan_design_proposals << [plan_design_proposal]
+              plan_design_proposal.profile = profile
+              profile.benefit_sponsorships = [benefit_sponsorship]
+              benefit_sponsorship.benefit_applications = [benefit_application]
+              bg = benefit_application.benefit_groups.build
+              bg.build_relationship_benefits
+              bg.build_composite_tier_contributions
+              bg.assign_attributes(reference_plan_id: plan.id, plan_option_kind: 'sole_source', elected_plans: [plan])
+              bg.composite_tier_contributions[0].employer_contribution_percent = 60
+              bg.composite_tier_contributions[3].employer_contribution_percent = 50
+              bg.save!
+              prospect_plan_design_organization.save
+            end
+
+            it 'should not delete persisted office locations when embedded models are invalid' do
+              address_1_before_update = prospect_plan_design_organization.office_locations.first.address.address_1
+              prospect_plan_design_organization.plan_design_proposals.first.profile.benefit_sponsorships.first.benefit_applications.first.benefit_groups.first.relationship_benefits.delete_all
+              patch :update, {organization: updated_valid_attributes, id: prospect_plan_design_organization.id, format: 'js'}, valid_session
+              expect(response).to render_template(:edit)
+              prospect_plan_design_organization.reload
+              address_1_after_update = prospect_plan_design_organization.office_locations.first.address
+              expect(address_1_after_update.address_1).to eq address_1_before_update
+            end
+
+            it 'should update office locations when embedded models are valid' do
+              address_1_before_update = prospect_plan_design_organization.office_locations.first.address.address_1
+              patch :update, {organization: updated_valid_attributes, id: prospect_plan_design_organization.id, format: 'js'}, valid_session
+              expect(subject).to redirect_to(employers_organizations_broker_agency_profile_path(broker_agency_profile))
+              prospect_plan_design_organization.reload
+              address_1_after_update = prospect_plan_design_organization.office_locations.first.address
+              expect(address_1_after_update).not_to eq address_1_before_update
+            end
+          end
+
           context "with invalid params" do
             it "does not update Organizations::PlanDesignOrganization" do
               expect {
