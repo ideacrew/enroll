@@ -1,6 +1,6 @@
 class Api::V1::AgenciesController < Api::V1::ApiBaseController
 
-  before_action :authenticate_user!, only: [:index, :agency_staff, :primary_agency_staff]
+  before_action :authenticate_user!, only: [:index, :agency_staff, :primary_agency_staff, :terminate]
 
   def index
     query = Queries::AgenciesQuery.new
@@ -30,14 +30,14 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
     permitted = params.permit(:person_id, :role_id)
     role = BrokerAgencyStaffRole.find(permitted[:role_id]) || GeneralAgencyStaffRole.find(permitted[:role_id])
     begin
-      if role.class.name == "BrokerAgencyStaffRole"
-        role.broker_agency_terminate!
+      if role
+        role.class.name == "BrokerAgencyStaffRole" ? role.broker_agency_terminate! : role.general_agency_terminate!
+        render json: { status: "success" }, http_status: 200
       else
-        role.general_agency_terminate!
+        render json: { status: "error", message: "Unable to find role" }, http_status: 409
       end
-      render json: {status: "success"}
     rescue
-      render json: {status: "error"}
+      render json: { status: "error" }, http_status: 409
     end
   end
 
