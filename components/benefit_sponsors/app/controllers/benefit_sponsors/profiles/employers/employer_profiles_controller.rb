@@ -53,9 +53,7 @@ module BenefitSponsors
             @broker_agency_account = @employer_profile.active_broker_agency_account
           when 'inbox'
           when 'families'
-            # employer shouldn't have access to families
-            # Randomly sometimes employer receiving employer_profile_path with tab: families, 40549
-            redirect_to(profiles_employers_employer_profile_path(@employer_profile.id, tab: 'home'))
+            @employees = EmployeeRole.find_by_employer_profile(@employer_profile).select { |ee| CensusEmployee::EMPLOYMENT_ACTIVE_STATES.include?(ee.census_employee.aasm_state)}
           else
             @broker_agency_account = @employer_profile.active_broker_agency_account
             @benefit_sponsorship = @employer_profile.latest_benefit_sponsorship
