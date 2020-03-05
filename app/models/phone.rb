@@ -97,7 +97,8 @@ class Phone
 
   def is_only_individual_person_phone?
     person_is_phone_parent = self._parent.class == Person
-    phone_number_is_not_broker_role_number = if _parent&.broker_role&.phone.respond_to?(:full_phone_number)
+    if person_is_phone_parent
+      phone_number_is_not_broker_role_number = if _parent&.broker_role&.phone.respond_to?(:full_phone_number)
                                                _parent&.broker_role&.phone.full_phone_number != full_phone_number
                                              elsif _parent.broker_role
                                                # Needs to compensate because the broker_agency_profile
@@ -107,10 +108,10 @@ class Phone
                                              else # No broker role present
                                                true
                                              end
-    # person has many general_agency_staff_roles, which belong to general_agency_profile, which has a method #phone
-    # attached to it which calls office = organization.primary_office_location office && office.phone.to_s with a string like
-    # (111) 111-1111
-    phone_is_not_general_agency_staff_role_number = if _parent.general_agency_staff_roles.count > 0
+      # person has many general_agency_staff_roles, which belong to general_agency_profile, which has a method #phone
+      # attached to it which calls office = organization.primary_office_location office && office.phone.to_s with a string like
+      # (111) 111-1111
+      phone_is_not_general_agency_staff_role_number = if _parent.general_agency_staff_roles.count > 0
                                                       not_ga_staff_number = true
                                                       _parent.general_agency_staff_roles.each do |general_agency_staff_role|
                                                         ga_profile_phone = general_agency_staff_role.general_agency_profile.phone.scan(/\d/).join
@@ -122,8 +123,9 @@ class Phone
                                                     else
                                                       true
                                                     end
-    # all? will return false if any value is nil or false
-    [person_is_phone_parent, phone_number_is_not_broker_role_number, phone_is_not_general_agency_staff_role_number].all?
+      # all? will return false if any value is nil or false
+      [person_is_phone_parent, phone_number_is_not_broker_role_number, phone_is_not_general_agency_staff_role_number].all?
+    end
   end
 
   private
