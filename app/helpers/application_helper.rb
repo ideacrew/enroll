@@ -845,4 +845,10 @@ module ApplicationHelper
   def round_down_float_two_decimals(float_number)
     BigDecimal((float_number).to_s).round(8).round(2, BigDecimal::ROUND_DOWN).to_f
   end
+
+  def jwt_for_external_application
+    current_token = WhitelistedJwt.newest
+    return current_token.token if current_token
+    current_user.generate_jwt(warden.config[:default_scope], nil)
+  end
 end

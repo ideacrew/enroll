@@ -214,13 +214,6 @@
                                                                               pundit_method: nil
                                                                             } %>
               <% end %>
-              <li role="presentation">
-                <%= link_to(ExternalApplications::ApplicationProfile.find_by_application_name("admin").url + "/admin/agencies/agency-staff?auth_token=" + WhitelistedJwt.newest.token, "aria-expanded" => "true", data: { turbolinks: false } ) do  %>
-                <span class="hidden-xs">Agency Staff</span>
-                <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Agency Staff"></span>
-                <% end %>
-              </li>
-            </ul>
         </li>
     <li class="admin-dropdown dropdown">
       <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin <span class="caret"></span></a>
