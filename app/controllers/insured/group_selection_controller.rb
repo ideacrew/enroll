@@ -208,6 +208,8 @@ class Insured::GroupSelectionController < ApplicationController
   private
 
   def family_member_eligibility_check(family_member)
+    return if (@market_kind == 'shop' || @market_kind == 'fehb')
+
     role = if family_member.person.is_consumer_role_active?
              family_member.person.consumer_role
            elsif family_member.person.is_resident_role_active?
