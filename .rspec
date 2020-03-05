@@ -4,3 +4,10 @@
 --format RSpec::Instafail
 --format progress
 --order defined
+./spec/
+./components/benefit_markets/spec/
+./components/benefit_sponsors/spec/
+./components/notifier/spec/
+./components/sponsored_benefits/spec/
+./components/transport_gateway/spec/
+./components/transport_profiles/spec/
