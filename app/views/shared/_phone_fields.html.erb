@@ -3,7 +3,9 @@
 
     <%= f.fields_for :phones, errors: {}, fieldset: true do |phone|  %>
       <% kind = phone.object.kind.upcase %>
-      <% unless kind.downcase == 'phone main' && phone.is_person_phone? %>
+      <%# This conditional is_only_individual_person_phone aims to only show the phone kind of
+          phone main if it is likely only an office number %> 
+      <% unless kind.downcase == 'phone main' && phone.is_only_individual_person_phone? %>
 
       <% if((phone.index == 0) || (phone.index == 2)) %>
         <div class="row row-form-wrapper no-buffer">
