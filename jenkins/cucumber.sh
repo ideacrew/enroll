@@ -41,7 +41,7 @@ fi
 
 if [ -f 'cucumber3.summary' ]; then
   echo "We ran at least 3 times, checking for error output"
-  cucumber_results=$(tail -3 cucumber3.summary | head -1 | sed -e 's/.* (\(.*\) failed.*/\1/')
+  cucumber_results=$(tail -3 cucumber_3.summary | head -1 | sed -e 's/.* (\(.*\) failed.*/\1/')
   result_count=${cucumber_results##*[!0-9]}
 
   if [[ $result_count -ne 0 ]]; then
