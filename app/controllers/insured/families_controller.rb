@@ -218,35 +218,28 @@ class Insured::FamiliesController < FamiliesController
 
   # admin manually uploads a notice for person
   def upload_notice
-    if (!params.permit![:file]) || (!params.permit![:subject])
-      flash[:error] = "File or Subject not provided"
-      redirect_back(fallback_location: :back)
-      return
-    elsif file_content_type != 'application/pdf'
-      flash[:error] = "Please upload a PDF file. Other file formats are not supported."
-      redirect_back(fallback_location: :back)
-      return
-    end
-
-    doc_uri = Aws::S3Storage.save(file_path, 'notices')
-
-    if doc_uri.present?
-      notice_document = Document.new({title: file_name, creator: "hbx_staff", subject: "notice", identifier: doc_uri,
+    binding.pry
+    result = ::Validators::DocumentUploadContract.new.call(params_hash)
+    if result.success?
+      upload_result = ::Operations::UploadDocument.new.call(person_id: @person.id, file_path: file_path)
+      binding.pry
+      if upload_result.success?
+        result_hash = upload_result.to_h
+        notice_document = Document.new({title: file_name, creator: "hbx_staff", subject: "notice", identifier: result_hash["reference_id"],
                                       format: file_content_type})
-      begin
-        @person.documents << notice_document
-        @person.save!
-        send_notice_upload_notifications(notice_document, params.permit![:subject])
-        flash[:notice] = "File Saved"
-      rescue => e
-        flash[:error] = "Could not save file."
+        begin
+          @person.documents << notice_document
+          @person.save!
+          send_notice_upload_notifications(notice_document, params.permit![:subject])
+          flash[:notice] = "File Saved"
+        rescue => e
+          flash[:error] = "Could not save file."
+        end
       end
     else
       flash[:error] = "Could not save file."
     end
-
-      redirect_back(fallback_location: :back)
-    return
+    redirect_back(fallback_location: :back)
   end
 
   # displays the form to upload a notice for a person
@@ -318,6 +311,10 @@ class Insured::FamiliesController < FamiliesController
   end
 
   private
+
+  def params_hash
+    params.permit!.to_h
+  end
 
   def can_view_entire_family_enrollment_history?
     authorize Family, :can_view_entire_family_enrollment_history?
