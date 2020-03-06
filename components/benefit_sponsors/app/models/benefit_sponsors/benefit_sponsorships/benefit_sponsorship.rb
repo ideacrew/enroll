@@ -205,21 +205,30 @@ module BenefitSponsors
       )
     }
 
-    scope :may_transmit_initial_enrollment?, -> (compare_date = TimeKeeper.date_of_record) {
-      where(
-        :benefit_applications => {
-          :$elemMatch => {:"effective_period.min" => compare_date, :aasm_state => :binder_paid}
-        }
-      )
+    scope :may_transmit_initial_enrollment?, lambda { |compare_date = TimeKeeper.date_of_record, transition_at = nil|
+      if transition_at.blank?
+        where(:benefit_applications => {:$elemMatch => {:"effective_period.min" => compare_date, :aasm_state.in => [:binder_paid,:active]}})
+      else
+        where(:benefit_applications => {:$elemMatch => {:"effective_period.min" => compare_date,
+                                                        :aasm_state.in => [:binder_paid, :active], :workflow_state_transitions => {"$elemMatch" => {"to_state" => :binder_paid,
+                                                                                                                                                    "transition_at" => { "$gte" => TimeKeeper.start_of_exchange_day_from_utc(transition_at),
+                                                                                                                                                                         "$lt" => TimeKeeper.end_of_exchange_day_from_utc(transition_at)}}}}})
+      end
     }
 
-    scope :may_transmit_renewal_enrollment?, -> (compare_date = TimeKeeper.date_of_record) {
-      where(:benefit_applications => {
-        :$elemMatch => {:predecessor_id => { :$exists => true }, :"effective_period.min" => compare_date,
-                        :aasm_state.in => BenefitSponsors::BenefitApplications::BenefitApplication::RENEWAL_TRANSMISSION_STATES}
-            },
-        :aasm_state => :active
-      )
+    scope :may_transmit_renewal_enrollment?, lambda { |compare_date = TimeKeeper.date_of_record, transition_at = nil|
+      if transition_at.blank?
+        where(:benefit_applications => {:$elemMatch => {:predecessor_id => { :$exists => true },
+                                                        :"effective_period.min" => compare_date,
+                                                        :aasm_state.in => BenefitSponsors::BenefitApplications::BenefitApplication::RENEWAL_TRANSMISSION_STATES}},
+              :aasm_state => :active)
+      else
+        where(:benefit_applications => {:$elemMatch => {:predecessor_id => { :$exists => true }, :"effective_period.min" => compare_date,
+                                                        :aasm_state.in => [:enrollment_eligible, :active],
+                                                        :workflow_state_transitions => {"$elemMatch" => {"to_state" => :enrollment_eligible, "transition_at" => { "$gte" => TimeKeeper.start_of_exchange_day_from_utc(transition_at),
+                                                                                                                                                                  "$lt" => TimeKeeper.end_of_exchange_day_from_utc(transition_at)}}}}},
+              :aasm_state => :active)
+      end
     }
 
     scope :may_auto_submit_application?, -> (compare_date = TimeKeeper.date_of_record) {
@@ -501,6 +510,13 @@ module BenefitSponsors
       benefit_applications.where(:aasm_state.ne => :canceled).order_by(:"effective_period.min".desc).first || latest_benefit_application
     end
 
+    # use this only for EDI
+    def late_renewal_benefit_application
+      benefit_applications.order_by(:created_at.desc).detect do |application|
+        application.predecessor.present? && [:active, :enrollment_eligible].include?(application.aasm_state)
+      end
+    end
+
     def renewal_benefit_application
       benefit_applications.order_by(:"created_at".desc).detect {|application| application.is_renewing? }
     end
@@ -554,7 +570,7 @@ module BenefitSponsors
 
     #### TODO FIX Move these methods to domain logic layer
     def is_renewal_transmission_eligible?
-      renewal_benefit_application.present? && renewal_benefit_application.enrollment_eligible?
+      (renewal_benefit_application.present? && renewal_benefit_application.enrollment_eligible?) || late_renewal_benefit_application.present?
     end
 
     def is_renewal_carrier_drop?
@@ -566,7 +582,8 @@ module BenefitSponsors
     end
 
     def carriers_dropped_for(product_kind)
-      renewal_benefit_application.predecessor.issuers_offered_for(product_kind) - renewal_benefit_application.issuers_offered_for(product_kind)
+      renewal_benefit_application.predecessor.issuers_offered_for(product_kind) - renewal_benefit_application.issuers_offered_for(product_kind) if renewal_benefit_application.present?
+      late_renewal_benefit_application.predecessor.issuers_offered_for(product_kind) - late_renewal_benefit_application.issuers_offered_for(product_kind) if late_renewal_benefit_application.present?
     end
 
     ####
