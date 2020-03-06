@@ -116,6 +116,64 @@ RSpec.describe Exchanges::BrokerApplicantsController do
       end
     end
 
+    context 'when application extended' do
+      context "for denied application" do
+        before :each do
+          broker_role.deny!
+          put :update, params: { id: broker_role.person.id, extend: true }, format: :js
+          broker_role.reload
+        end
+
+        it 'should move application to application_extended' do
+          expect(assigns(:broker_applicant))
+          expect(broker_role.aasm_state).to eq 'application_extended'
+        end
+
+        it 'should redirect' do
+          expect(response).to have_http_status(:redirect)
+          expect(response).to redirect_to('/exchanges/hbx_profiles')
+        end
+      end
+
+      context "for pending application" do
+        before :each do
+          allow(broker_role).to receive(:is_primary_broker?).and_return(true)
+          broker_role.pending!
+          put :update, params: { id: broker_role.person.id, extend: true }, format: :js
+          broker_role.reload
+        end
+
+        it 'should move application to application_extended' do
+          expect(assigns(:broker_applicant))
+          expect(broker_role.aasm_state).to eq 'application_extended'
+        end
+
+        it 'should redirect' do
+          expect(response).to have_http_status(:redirect)
+          expect(response).to redirect_to('/exchanges/hbx_profiles')
+        end
+      end
+
+      context "for extended application" do
+        before :each do
+          broker_role.deny!
+          broker_role.extend_application!
+          put :update, params: { id: broker_role.person.id, extend: true }, format: :js
+          broker_role.reload
+        end
+
+        it 'should move application to application_extended' do
+          expect(assigns(:broker_applicant))
+          expect(broker_role.aasm_state).to eq 'application_extended'
+        end
+
+        it 'should redirect' do
+          expect(response).to have_http_status(:redirect)
+          expect(response).to redirect_to('/exchanges/hbx_profiles')
+        end
+      end
+    end
+
     context 'when application approved and applicant is not primary broker' do
 
       before :each do

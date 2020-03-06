@@ -75,7 +75,6 @@ Feature: Insured Plan Shopping on Individual market
     And I click on continue button to go to the individual home page
     Then I should see the individual home page
     When consumer clicked on make changes button
-    And consumer clicked on shop for new plan
     Then I should not see any plan which premium is 0
 
   Scenario: Individual should not see document errors when not applying for coverage.

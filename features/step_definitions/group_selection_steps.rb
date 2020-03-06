@@ -77,25 +77,61 @@ end
 
 And(/(.*) also has a health enrollment with primary person covered/) do |role|
   family = Family.all.first
+  # qle = FactoryBot.create(:qualifying_life_event_kind,market_kind: @employee_role.present? ? "employer_sponsored" : "individual")
   if ["consumer","Resident","user"].include? role
     qle = FactoryBot.create :qualifying_life_event_kind, market_kind: "individual"
     sep = FactoryBot.create :special_enrollment_period, qualifying_life_event_kind_id: qle.id, family: family
   else
     sep = FactoryBot.create :special_enrollment_period, family: family
   end
+  document = FactoryBot.build(:document, identifier: '525252')
+  product = FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile, sbc_document: document, :metal_level_kind => :silver)
+
+  if role == 'consumer'
+    FactoryBot.create(:hbx_profile, :no_open_enrollment_coverage_period)
+    benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
+    benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.date_of_record)}.update_attributes!(slcsp_id: product.id)
+    consumer_role = family.primary_applicant.person.consumer_role
+
+    tax_household = family.active_household.tax_households[0] || FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil)
+    FactoryBot.create(:tax_household_member, applicant_id: family.primary_applicant.id, tax_household: tax_household)
+    FactoryBot.create(:eligibility_determination, max_aptc: 500.00, tax_household: tax_household, csr_eligibility_kind: 'csr_73')
+  end
   sep.update_attributes!(effective_on: TimeKeeper.date_of_record.end_of_month)
-  product = FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile)
-  enrollment = FactoryBot.create(:hbx_enrollment, product: product,
-                                  household: family.active_household,
-                                  family: family,
-                                  kind: (@employee_role.present? ? "employer_sponsored" : (role == "Resident" ? "coverall" : "individual")),
-                                  effective_on: TimeKeeper.date_of_record,
-                                  enrollment_kind: "special_enrollment",
-                                  special_enrollment_period_id: sep.id,
-                                  employee_role_id: (@employee_role.id if @employee_role.present?),
-                                  benefit_group_id: (@benefit_group.id if @benefit_group.present?)
-                                )
+  kind =
+    if @employee_role.present?
+      'employer_sponsored'
+    elsif role == "Resident"
+      'coverall'
+    else
+      'individual'
+    end
+  enrollment =
+    FactoryBot.create(
+      :hbx_enrollment,
+      product: product,
+      household: family.active_household,
+      family: family,
+      kind: kind,
+      effective_on: TimeKeeper.date_of_record,
+      enrollment_kind: "special_enrollment",
+      special_enrollment_period_id: sep.id,
+      consumer_role_id: (consumer_role.id if consumer_role.present?),
+      employee_role_id: (@employee_role.id if @employee_role.present?),
+      benefit_group_id: (@benefit_group.id if @benefit_group.present?)
+    )
   enrollment.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: family.primary_applicant.id,
+    eligibility_date: TimeKeeper.date_of_record - 2.months,
+    coverage_start_on: TimeKeeper.date_of_record - 2.months
+  )
+  enrollment.save!
+end
+
+And(/(.*) has a health enrollment with dependent covered/) do |role|
+  family = Family.all.first
+  enrollment = family.hbx_enrollments.first
+  chm = family.active_household.immediate_family_coverage_household.coverage_household_members.last
+  enrollment.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: chm,
     eligibility_date: TimeKeeper.date_of_record - 2.months,
     coverage_start_on: TimeKeeper.date_of_record - 2.months
   )
@@ -282,7 +318,7 @@ Then(/(.*) should see the dental enrollment with make changes button/) do |role|
 end
 
 When(/(.*) clicked on make changes button/) do |role|
-  click_link "Make Changes"
+  click_link('Make Changes',  wait: 10)
 end
 
 Then(/(.*) should see keep existing plan and select plan to terminate button/) do |_role|
@@ -433,7 +469,7 @@ Given(/^the Resident is logged in$/) do
   login_as user
 end
 
-When(/Resident visits home page with qle/) do
+When(/Resident has QLE and goes to home page/) do
   # we have only shop & ivl as market kinds for qle
   FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual")
   FactoryBot.create(:hbx_profile, :no_open_enrollment_coverage_period)
@@ -443,4 +479,229 @@ end
 
 And(/Resident clicked on "Married" qle/) do
   click_link "Married"
+end
+
+# Replaced with Make Changes, commented out in case it's needed later
+# Then(/consumer (.*) see the edit plan button/) do |visibility|
+#   if visibility.eql?("should")
+#     expect(page).to have_selector("a", text: "Edit Plan",  count: 1)
+#   else
+#     expect(page).to_not have_selector("a", text: "Edit Plan",  count: 1)
+#   end
+# end
+
+Then(/^.* (.*) see make changes button in (.*) market/) do |visibility, market|
+  # There are two different buttons, each with links. one for IVl and one for SHOP
+  case market
+  when 'individual'
+    css_class = '.ivl-make-changes'
+  when 'shop'
+    css_class = '.ee-make-changes'
+  end
+  case visibility
+  when 'should'
+    expect(page).to have_css(css_class)
+  else
+    expect(page).to_not have_css(css_class)
+  end
+end
+
+# Replaced with Make Changes, commented out in case it's needed later
+# When(/(.*) clicks on the edit plan button/) do |_role|
+#   click_link 'Edit Plan'
+# end
+
+When(/(.*) clicks on the make changes button/) do |_role|
+  click_link('Make Changes')
+  wait_for_ajax
+end
+
+When(/(.*) clicks on the dental make changes button/) do |_role|
+  page.all('a', text: 'Make Changes').first.click
+end
+
+Then(/(.*) should see the make changes page/) do |_role|
+  wait_for_ajax
+  expect(page).to have_text('Tax credit amount')
+end
+
+When(/(.*) clicks on the Cancel Plan button/) do |_role|
+  find('.interaction-click-control-cancel-plan').click
+end
+
+Then(/(.*) should see the calender/) do |_role|
+  expect(page).to have_selector :css, '.date-picker'
+end
+
+Then(/the submit button should be disabled/) do
+  expect(page).to have_button('Are you sure?', disabled: true)
+end
+
+When(/(.*) selects a date/) do |_role|
+  fill_in 'term-date', :with => (TimeKeeper.date_of_record + 10).to_s
+end
+
+Then(/the submit button should be enabled/) do
+  expect(page).to have_button('Are you sure?', disabled: false)
+end
+
+When(/(.*) clicks the submit button/) do |_role|
+  click_button('Are you sure?')
+end
+
+Then(/the enrollment should be terminated/) do
+  expect(Family.all.first.all_enrollments.first.aasm_state).to eq('coverage_terminated')
+  expect(page).to have_content('Coverage End: ' + (TimeKeeper.date_of_record + 10).to_s)
+end
+
+# Given(/(.*) has a (.*) secondary role/) do |_primary_role, secondary_role|
+#  Family.all.first.all_enrollments.first.aasm_state == 'coverage_terminated'
+# end
+
+Then(/the enrollment should be pending termination/) do
+  expect(Family.all.first.all_enrollments.first.aasm_state).to eq('coverage_termination_pending')
+  expect(page).to have_content('Coverage End: ' + (TimeKeeper.date_of_record + 10).to_s)
+end
+
+Given(/(.*) has a (.*) secondary role/) do |_primary_role, secondary_role|
+  family = Family.all.first
+  # Assumes primary role is consumer.
+  if secondary_role.eql?('resident')
+    FactoryBot.create(:resident_role_object, person: family.primary_person)
+  elsif secondary_role.eql?('employee')
+    FactoryBot.create(:employee_role, person: family.primary_person)
+  end
+end
+
+When(/consumer's health enrollment has an effective date in the future/) do
+  Family.all.first.all_enrollments.first.update_attributes(effective_on: TimeKeeper.date_of_record + 20)
+  @family.all_enrollments.first.aasm_state == 'coverage_terminated'
+end
+
+
+# Given(/(.*) has a (.*) role/) do |_primary_role, secondary_role|
+#  family = Family.all.first
+#  # Assumes primary role is consumer.
+#  if secondary_role.eql?('resident')
+#    FactoryBot.create(:resident_role_object, person: family.primary_person)
+#  elsif secondary_role.eql?('employee')
+#    FactoryBot.create(:employee_role, person: family.primary_person)
+#  end
+# end
+
+When(/consumer's dental enrollment has an effective date in the future/) do
+  Family.all.last.all_enrollments.first.update_attributes(effective_on: TimeKeeper.date_of_record + 20)
+end
+
+Then(/(.*) should not see the calender/) do |_role|
+  expect(page).not_to have_selector :css, '.date-picker'
+end
+
+When(/(.*) selects (.*) to are you sure/) do |_role, option|
+  if option.eql?('yes')
+    choose('agreement_action-confirm-yes')
+  else
+    choose('agreement_action-confirm-no')
+  end
+end
+
+Then(/the enrollment should be canceled/) do
+  expect(Family.all.first.all_enrollments.first.aasm_state).to eq('coverage_canceled')
+  #Enrollment tile should not show
+  expect(page).not_to have_content("View Details")
+end
+
+Then(/the dental enrollment should be canceled/) do
+  expect(Family.all.first.all_enrollments.last.aasm_state).to eq('coverage_canceled')
+  #Enrollment tile should not show
+  expect(page).not_to have_content("View Details")
+end
+
+When(/(.*) clicks on the Shop for Plans button/) do |_role|
+  find('.interaction-click-control-shop-for-plans').click
+end
+
+And(/the enrollment is in (.*) state/) do |state|
+  Family.all.first.all_enrollments.first.update_attributes(aasm_state: state)
+  # Refresh page to ensure UI change
+  visit current_path
+end
+
+And(/the family has an active tax household/) do
+  @family = Family.all.first
+  household = @family.active_household
+  household.tax_households[0] || FactoryBot.create(:tax_household, household: @family.active_household)
+end
+
+And(/the tax household has at least one member that is APTC eligible/) do
+  tax_household = @family.active_household.latest_active_tax_household || FactoryBot.create(:tax_household, household: @family.active_household)
+  tax_household.tax_household_members.create!(is_ia_eligible: true, applicant_id: @family.enrollments.first.hbx_enrollment_members.first.applicant_id)
+  FactoryBot.create(:eligibility_determination, max_aptc: 500, tax_household: tax_household)
+end
+
+And(/the tax household has no members that are APTC eligible/) do
+  tax_household = @family.active_household.latest_active_tax_household || FactoryBot.create(:tax_household, household: @family.active_household)
+  tax_household.tax_household_members.each do |thhm|
+    thhm.update_attributes(is_ia_eligible: false, applicant_id: @family.enrollments.first.hbx_enrollment_members.first.applicant_id)
+  end
+end
+
+And(/the metal level is (.*)/) do |metal_level|
+  @family.enrollments.first.product.update_attributes(metal_level_kind: metal_level.to_sym)
+end
+
+Then(/the Change Tax Credit button should be available/) do
+  expect(page).to have_content("Change Tax Credit")
+end
+
+Then(/the Change Tax Credit button should NOT be available/) do
+  expect(page).to_not have_content("Tax Credit amount")
+end
+
+When(/the user clicks on the Change Tax Credit button/) do
+  find("#aptc-button").click
+end
+
+When(/the user submits the Change Tax Credit form/) do
+  find("#update-aptc-button").click
+end
+
+And(/the user sees the Change Tax Credit Form/) do
+  expect(page).to have_content("Are you sure you want to update your tax credit?")
+end
+
+When(/the user changes Tax credit applied to 50%/) do
+  fill_in("aptc_applied_total", with: "50.0")
+  page.execute_script('$(document.elementFromPoint(50, 350)).click();')
+end
+
+And(/the user confirms "Yes" to change the tax credit/) do
+  find("#agreement_action-confirm-yes-change-tax-credit").click
+end
+
+Then(/the user should see a message that their Tax Credits were updated/) do
+  wait_for_ajax
+  expect(page).to have_content("Tax credit updated successfully.")
+end
+
+Then(/the user should see that applied tax credit has been set accordingly/) do
+  expect(page).to have_content("25")
+end
+
+Given(/the enrollment has HIOS ID ending in (.*)/) do |id_number|
+  hios_id = @family.enrollments.first.product.hios_id
+  changed_id = hios_id.gsub(hios_id[-2..-1], id_number)
+  @family.enrollments.first.product.update_attributes(hios_id: changed_id)
+end
+
+Given(/the enrollment is a Health plan/) do
+  @family.enrollments.first.update_attributes!(coverage_kind: "health")
+end
+
+Given(/the enrollment is a Dental plan/) do
+  @family.enrollments.first.update_attributes!(coverage_kind: "dental")
+end
+
+Given(/the coverall enrollment flag is TRUE/) do
+  @family.enrollments.first.update_attributes!(kind: "coverall")
 end
