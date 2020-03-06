@@ -354,7 +354,6 @@ class HbxEnrollment
   scope :coverage_selected_and_waived, -> {where(:aasm_state.in => SELECTED_AND_WAIVED).order(created_at: :desc)}
   scope :non_terminated, -> { where(:aasm_state.ne => 'coverage_terminated') }
   scope :non_external, -> { where(:external_enrollment => false) }
-  scope :product_present, -> { where(:product_id.nin => [nil]) }
   scope :non_expired_and_non_terminated,  -> { any_of([enrolled.selector, renewing.selector, waived.selector]).order(created_at: :desc) }
   scope :by_benefit_sponsorship,   -> (benefit_sponsorship) { where(:benefit_sponsorship_id => benefit_sponsorship.id) }
   scope :by_benefit_package,       -> (benefit_package) { where(:sponsored_benefit_package_id => benefit_package.id) }
@@ -1384,7 +1383,9 @@ class HbxEnrollment
 
   def self.family_canceled_enrollments(family)
     canceled_enrollments = HbxEnrollment.family_home_page_hidden_enrollments(family)
-    canceled_enrollments.reject{ |enrollment| enrollment.is_shop? && enrollment.sponsored_benefit_id.blank? }
+    # Note: product_id.blank? should be added here as blank rather than a product_present scope elsewhere because some scopes like
+    # waived must render
+    canceled_enrollments.reject{ |enrollment| enrollment.is_shop? && enrollment.sponsored_benefit_id.blank? && enrollment.product_id.blank? }
   end
 
   # TODO: Fix this to properly respect mulitiple possible employee roles for the same employer

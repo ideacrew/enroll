@@ -280,7 +280,7 @@ class Family
   end
 
   def enrollments_for_home_page
-    enrollments = self.enrollments.non_external.product_present.order(
+    enrollments = self.enrollments.non_external.order(
       effective_on: :desc,
       submitted_at: :desc, coverage_kind: :desc
     ) || []
