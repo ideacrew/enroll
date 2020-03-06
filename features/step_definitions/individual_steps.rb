@@ -86,10 +86,10 @@ Then(/Individual should click on Individual market for plan shopping/) do
 end
 
 Then(/Individual should see a form to enter personal information$/) do
-  click_and_wait_on_stylized_radio('//label[@for="person_us_citizen_true"]', "person[us_citizen]")
-  click_and_wait_on_stylized_radio('//label[@for="person_naturalized_citizen_false"]', "person[naturalized_citizen]")
-  click_and_wait_on_stylized_radio('//label[@for="indian_tribe_member_no"]', "person[indian_tribe_member]")
-  click_and_wait_on_stylized_radio('//label[@for="radio_incarcerated_no"]', "person[is_incarcerated]")
+  click_and_wait_on_stylized_radio('//label[@for="person_us_citizen_true"]', "person_us_citizen_true", "person[us_citizen]", "true")
+  click_and_wait_on_stylized_radio('//label[@for="person_naturalized_citizen_false"]', "person_naturalized_citizen_false", "person[naturalized_citizen]", "false")
+  click_and_wait_on_stylized_radio('//label[@for="indian_tribe_member_no"]', "indian_tribe_member_no", "person[indian_tribe_member]", "false")
+  click_and_wait_on_stylized_radio('//label[@for="radio_incarcerated_no"]', "radio_incarcerated_no", "person[is_incarcerated]", "false")
 
   fill_in "person_addresses_attributes_0_address_1", :with => "4900 USAA BLVD"
   fill_in "person_addresses_attributes_0_address_2", :with => "212"
@@ -188,6 +188,7 @@ When /^Individual clicks on Individual and Family link should be on privacy agre
 end
 
 Then(/^\w+ agrees? to the privacy agreeement/) do
+  wait_for_ajax
   expect(page).to have_content('Authorization and Consent')
   find(:xpath, '//label[@for="agreement_agree"]').click
   click_link "Continue"
