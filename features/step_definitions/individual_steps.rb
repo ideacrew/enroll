@@ -86,11 +86,11 @@ Then(/Individual should click on Individual market for plan shopping/) do
 end
 
 Then(/Individual should see a form to enter personal information$/) do
-  find(:xpath, '//label[@for="person_us_citizen_true"]').click
-  find(:xpath, '//label[@for="person_naturalized_citizen_false"]').click
-  find(:xpath, '//label[@for="indian_tribe_member_no"]').click
+  click_and_wait_on_stylized_radio('//label[@for="person_us_citizen_true"]', "person[us_citizen]")
+  click_and_wait_on_stylized_radio('//label[@for="person_naturalized_citizen_false"]', "person[naturalized_citizen]")
+  click_and_wait_on_stylized_radio('//label[@for="indian_tribe_member_no"]', "person[indian_tribe_member]")
+  click_and_wait_on_stylized_radio('//label[@for="radio_incarcerated_no"]', "person[is_incarcerated]")
 
-  find(:xpath, '//label[@for="radio_incarcerated_no"]', :wait => 10).click
   fill_in "person_addresses_attributes_0_address_1", :with => "4900 USAA BLVD"
   fill_in "person_addresses_attributes_0_address_2", :with => "212"
   fill_in "person_addresses_attributes_0_city", :with=> "Washington"
@@ -98,12 +98,14 @@ Then(/Individual should see a form to enter personal information$/) do
   find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[2]/span').click
   first('li', :text => 'DC').click
   fill_in "person[addresses_attributes][0][zip]", :with => "20002"
+
+  sleep 2
   screenshot("personal_form")
 end
 
 And(/^.+ selects (.*) for coverage$/) do |coverage|
   if coverage == "applying"
-  find(:xpath, '//label[@for="is_applying_coverage_true"]').click
+    find(:xpath, '//label[@for="is_applying_coverage_true"]').click
   else
     find(:xpath, '//label[@for="is_applying_coverage_false"]').click
   end
@@ -423,6 +425,7 @@ Then(/Individual asks for help$/) do
   expect(page).to have_content "Help"
   find(:id => "CSR", :wait => 10).click
   wait_for_ajax(5,2.5)
+  sleep(2)
   expect(page).to have_content "First Name"
   #TODO bombs on help_first_name sometimes
   fill_in "help_first_name", with: "Sherry"
@@ -477,6 +480,7 @@ When(/I click on the header link to return to CSR page/) do
 end
 
 Then(/CSR clicks on New Consumer Paper Application/) do
+  find_link("New Consumer Paper Application")
   click_link "New Consumer Paper Application"
 end
 

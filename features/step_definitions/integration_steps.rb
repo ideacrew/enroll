@@ -456,7 +456,7 @@ When (/^(.*) logs? out$/) do |someone|
   find_link('Logout', wait: 5)
   click_link "Logout"
   visit "/"
-  find('.container.welcome', wait: 15) do |element|
+  find('.container.welcome', wait: 5) do |element|
     element.find('.heading-text', text: /Welcome to #{Settings.site.short_name}/i)
     element.find('.sub-text', text: /#{Settings.site.byline}/i)
   end

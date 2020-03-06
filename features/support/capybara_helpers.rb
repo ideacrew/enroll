@@ -79,6 +79,11 @@ module CapybaraHelpers
   def click_outside_datepicker(text_outside_datepicker)
     page.find(:xpath, "//*[text()='#{text_outside_datepicker}']").click
   end
+
+  def click_and_wait_on_stylized_radio(xpath, field_name)
+    find(:xpath, xpath).click
+    find_field(field_name, checked: true, visible: :all, disabled: :all, wait: 10)
+  end
 end
 
 World(CapybaraHelpers)
