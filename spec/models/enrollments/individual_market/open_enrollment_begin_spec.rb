@@ -5,6 +5,8 @@ require "#{Rails.root}/spec/shared_contexts/enrollment.rb"
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
   RSpec.describe "Enrollments::IndividualMarket::OpenEnrollmentBegin", type: :model do
+    include FloatHelper
+
     before do
       DatabaseCleaner.clean
     end
