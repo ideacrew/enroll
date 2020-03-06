@@ -27,7 +27,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
           test_family.enrollments.create!(
             household: test_family.households.first,
             kind: "employer_sponsored",
-            aasm_state: 'coverage_selected',
+            aasm_state: 'coverage_canceled',
             product_id: nil,
             external_enrollment: false,
           )
