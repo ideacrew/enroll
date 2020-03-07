@@ -847,6 +847,12 @@ module ApplicationHelper
     BigDecimal((float_number).to_s).round(8).round(2, BigDecimal::ROUND_DOWN).to_f
   end
 
+  def external_application_configured?(application_name)
+    external_app = ExternalApplications::ApplicationProfile.find_by_application_name(application_name)
+    return false unless external_app
+    !external_app.url.blank?
+  end
+
   def jwt_for_external_application
     current_token = WhitelistedJwt.newest
     return current_token.token if current_token
