@@ -863,6 +863,19 @@ module BenefitSponsors
         it "should NOT update terminated_on date on enrollment if terminated_on < benefit_application end_on" do
           expect(hbx_enrollment.terminated_on).to eq hbx_enrollment_terminated_on
         end
+
+        context "terminate_benefit_group_assignments", :dbclean => :after_each do
+
+          before :each do
+            @bga = initial_application.benefit_sponsorship.census_employees.first.benefit_group_assignments.first
+            @bga.update_attributes!(end_on: benefit_package.end_on)
+          end
+
+          it "should update benefit_group_assignment end_on if end_on < benefit_application end on" do
+            benefit_package.terminate_benefit_group_assignments
+            expect(benefit_package.end_on).to eq @bga.end_on
+          end
+        end
       end
     end
 
@@ -975,6 +988,20 @@ module BenefitSponsors
         it "should update hbx_enrollment terminated_on if terminated_on > benefit_application end on" do
           expect(hbx_enrollment_1.terminated_on).to eq end_on
         end
+
+        context "pending terminate_benefit_group_assignments", :dbclean => :after_each do
+          before :each do
+            @bga = initial_application.benefit_sponsorship.census_employees.first.benefit_group_assignments.first
+            @bga.update_attributes!(end_on: nil)
+          end
+
+          it "should update benefit_group_assignment end_on if end_on > benefit_application end on" do
+            expect(@bga.end_on).to eq nil
+            benefit_package.terminate_benefit_group_assignments
+            expect(@bga.end_on).to eq benefit_package.end_on
+          end
+        end
+
       end
 
       context "when an employee has coverage_terminated enrollment", :dbclean => :after_each do
