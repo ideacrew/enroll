@@ -156,7 +156,7 @@ RSpec.describe Api::V1::AgenciesController, :type => :controller, :dbclean => :a
     end
   end
 
-  describe "GET #terminate with an active role" do
+  describe "POST #terminate with an active role" do
     let(:person) { FactoryBot.create(:person) }
     let(:broker_agency) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile) }
 
@@ -184,7 +184,7 @@ RSpec.describe Api::V1::AgenciesController, :type => :controller, :dbclean => :a
         benefit_sponsors_broker_agency_profile_id: broker_agency.id
         )}
 
-      it "is fails to transition" do
+      it "fails to transition" do
         post :terminate, params: { person_id: person.id.to_s, role_id: broker_agency_staff_role.id.to_s }
         expect(response.status).to eq(409)
       end

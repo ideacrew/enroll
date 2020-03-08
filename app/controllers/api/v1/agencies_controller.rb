@@ -32,12 +32,12 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
     begin
       if role
         role.class.name == "BrokerAgencyStaffRole" ? role.broker_agency_terminate! : role.general_agency_terminate!
-        render json: { status: "success" }, http_status: 200
+        render json: { status: "success" }, status: 200
       else
-        render json: { status: "error", message: "Unable to find role" }, http_status: 409
+        render json: { status: "error", message: "Unable to find role" }, status: 409
       end
     rescue
-      render json: { status: "error" }, http_status: 409
+      render json: { status: "error" }, status: 409
     end
   end
 
