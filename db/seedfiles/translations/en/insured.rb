@@ -5,7 +5,7 @@ INSURED_TRANSLATIONS = {
   "en.insured.consumer_roles.docs_shared.card_number" => "Card Number",
   "en.insured.consumer_roles.docs_shared.card_number_req" => "Please enter the Card Number. The Card Number is exactly 13 letters and numbers. You must enter three letters followed by 10 numbers. You may not enter any special characters. -li- If you have a Resident Alien Card issued prior to December 1997, it does not contain a Card Number. In that case please enter three ‘A’s followed by 10 zeroes (i.e., 'AAA0000000000') so that you enter exactly 13 characters. \
   -li- How to find the Card Number: The document number, also called a Card Number, is printed on the back of the current version of the card. Previous versions of the card featured the document number and expiration date on the front of the card.",
-  "en.insured.consumer_roles.docs_shared.citizenship_number" => "Citizenship Number",
+  "en.insured.consumer_roles.docs_shared.citizenship_number" => "Certificate Number",
   "en.insured.consumer_roles.docs_shared.citizenship_number_req" => "When entering a Citizenship Certification Number, include all numbers and letters. Do not enter any other characters or spaces. -li- The Certification number entered must have between 6 and 12 characters. \
   -li- How to find Citizenship Certification Number: The Certificate of Citizenship certification number is most often in the upper right hand corner of the Certificate. \
   The Certificate of Citizenship certification number is printed in red on all US Certificates of Citizenship issued since September 27, 1906.",
@@ -151,7 +151,7 @@ INSURED_TRANSLATIONS = {
   "en.submit" => "Submit",
   "en.insured.families.individual_and_family" => "Individual & Family",
   "en.premium" => "Premium",
-  "en.effective_date" => "Effective Date",
+  "en.effective_date" => "Effective date",
   "en.coverage_end" => "Coverage End",
   "en.plan_selected" => "Plan Selected",
   "en.plan_type" => "Plan Type",
@@ -320,8 +320,10 @@ INSURED_TRANSLATIONS = {
   "en.select_plan_to_terminate" => "Select Plan to Terminate",
   "en.health_coverage" => "Health Coverage",
   "en.DCHL" => "DCHL",
-  "en.DCHL_ID" => "DCHL ID",
+  "en.ID" => "ID",
   "en.confirmation" => "Confirmation",
+  "en.do_you_want_to_cancel_this_plan" => "Do you want to cancel this plan? Cancelling means you will no longer have insurance. You will not be able to enroll in a new plan unless it’s open enrollment or you qualify for a special enrollment period.",
+  "en.are_you_sure_you_want_to_update_aptc" => "Are you sure you want to update your tax credit? If you make a change today, we’ll apply it to your premium starting on the date listed below.",
   "en.insured.group_selection.terminate_confirm.terminate_this_plan_do_you_wish_proceed" => "Terminating this plan will terminate coverage for all members of your family. Do you wish to proceed? Y/N.",
   "en.insured.group_selection.terminate_confirm.terminate_confirm_note_html" => "<strong>Note:</strong>Federal law allows your plan(s) to require that you make your request for termination no less than 14 days before the date you want your coverage to end. This requirement was included in the notice that you received from %{site_short_name} after you enrolled in your plan.",
   "en.enter_the_date_of_termination" => "Enter the date of termination",

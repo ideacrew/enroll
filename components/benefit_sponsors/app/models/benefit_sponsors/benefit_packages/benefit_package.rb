@@ -350,6 +350,7 @@ module BenefitSponsors
       end
  
       def terminate_member_benefits(term_date: nil, enroll_term_reason: nil, enroll_notify: false)
+        terminate_benefit_group_assignments
         enrolled_and_terminated_families.each do |family|
           enrollments = family.hbx_enrollments.enrolled_waived_terminated_and_expired.by_benefit_package(self)
           enrollments.each do |hbx_enrollment|
@@ -372,6 +373,7 @@ module BenefitSponsors
       end
 
       def termination_pending_member_benefits(term_date: nil, enroll_term_reason: nil, enroll_notify: false)
+        terminate_benefit_group_assignments
         enrolled_families.no_timeout.each do |family|
           enrollments = family.hbx_enrollments.enrolled_waived_terminated_and_expired.by_benefit_package(self)
           enrollments.each do |hbx_enrollment|
@@ -495,6 +497,15 @@ module BenefitSponsors
           benefit_group_assignments = ce.benefit_group_assignments.where(benefit_package_id: self.id)
           benefit_group_assignments.each do |benefit_group_assignment|
             benefit_group_assignment.update(is_active: false) unless is_renewing?
+          end
+        end
+      end
+
+      def terminate_benefit_group_assignments
+        benefit_application.benefit_sponsorship.census_employees.each do |ce|
+          benefit_group_assignments = ce.benefit_group_assignments.where(benefit_package_id: id)
+          benefit_group_assignments.each do |benefit_group_assignment|
+            benefit_group_assignment.update(end_on: end_on) if benefit_group_assignment&.end_on != end_on
           end
         end
       end
