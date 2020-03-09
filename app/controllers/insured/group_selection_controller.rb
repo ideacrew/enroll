@@ -58,7 +58,8 @@ class Insured::GroupSelectionController < ApplicationController
     # Only check eligibility for *active* family members because
     # family members "deleted" with family#remove_family_member
     # are set to is_active = false
-    @family.family_members.active.each do |family_member|
+    @active_family_members = @family.family_members.active
+    @active_family_members.each do |family_member|
       family_member_eligibility_check(family_member)
     end
     if @fm_hash.present? && @fm_hash.values.flatten.detect{|err| err.to_s.match(/incarcerated_not_answered/)}
