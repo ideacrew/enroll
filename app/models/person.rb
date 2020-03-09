@@ -340,7 +340,8 @@ class Person
         aasm_state: role.aasm_state,
         agency_profile_id: role.try(agency).to_s,
         type: role.class.name,
-        role_id: role._id.to_s
+        role_id: role._id.to_s,
+        history: role.workflow_state_transitions
       }
     end
   end

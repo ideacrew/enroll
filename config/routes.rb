@@ -714,6 +714,7 @@ Rails.application.routes.draw do
       resources :agencies, only: %i[index] do
         collection do
           get :agency_staff
+          get 'agency_staff/:person_id', to: 'agencies#agency_staff_detail'
           post 'agency_staff/:person_id/terminate/:role_id', to: 'agencies#terminate'
           get :primary_agency_staff
         end

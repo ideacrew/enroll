@@ -26,6 +26,13 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
     )
   end
 
+  def agency_staff_detail
+    render json: Person.find(params[:person_id]).to_json(
+      :only => [:first_name, :last_name, :hbx_id, :dob],
+      :methods => [:agency_roles, :agent_emails, :ssn]
+    )
+  end
+
   def terminate
     permitted = params.permit(:person_id, :role_id)
     role = BrokerAgencyStaffRole.find(permitted[:role_id]) || GeneralAgencyStaffRole.find(permitted[:role_id])
